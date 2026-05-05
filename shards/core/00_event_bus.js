@@ -10,6 +10,11 @@ const EventBus = {
         if (!this.events[event]) this.events[event] = [];
         this.events[event].push(callback);
         console.log(`Σ EventBus: New subscriber for [${event}]`);
+        
+        // Return unsubscribe function
+        return () => {
+            this.events[event] = this.events[event].filter(cb => cb !== callback);
+        };
     },
 
     publish(event, data) {

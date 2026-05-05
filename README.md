@@ -2,7 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://github.com/AaryanSinghChauhan09/SigmaOS/actions/workflows/ci.yml/badge.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/actions)
-[![Version](https://img.shields.io/badge/version-v100.0-blue.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/releases)
+[![Version](https://img.shields.io/badge/version-v100.1_Industrial-blue.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/releases)
+[![Security](https://img.shields.io/badge/Security-Hardened-green.svg)](SECURITY.md)
 
 > A browser-based OS simulation with a glassmorphic desktop, draggable windows, terminal, file manager, AI assistant, and live system telemetry. Zero build step — open `index.html` and go.
 

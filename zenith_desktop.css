@@ -1,75 +1,6 @@
 :root {
     --muted: #64748b;
     --border: rgba(255,255,255,0.1);
-    --glass-dark: rgba(15,15,25,0.97);
-    --accent: #fbbf24;
-    --accent-blue: #3b82f6;
-    --accent-cyan: #00f2ff;
-    --accent-gradient: linear-gradient(135deg, #fbbf24 0%, #3b82f6 100%);
-    --bg: #050507;
-    --panel-bg: rgba(20, 20, 25, 0.4);
-    --glass: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-blur: blur(30px);
-    --text: #f8fafc;
-    --text-muted: #64748b;
-    --text-light: #f1f5f9;
-    --success: #10b981;
-    --error: #f43f5e;
-    --studio-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.9), 0 20px 50px -25px rgba(0, 0, 0, 0.8);
-    --neon-shadow: 0 0 20px var(--accent-glow);
-}
-
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
-}
-
-
-/* Theme Shards */
-body.theme-gold {
-    --accent: #ffcc00;
-    --accent-glow: rgba(255, 204, 0, 0.3);
-}
-body.theme-crimson {
-    --accent: #ff4757;
-    --accent-glow: rgba(255, 71, 87, 0.3);
-}
-body.theme-solar {
-    --accent: #5eead4;
-    --accent-glow: rgba(94, 234, 212, 0.35);
-}
-
-/* Command Palette */
-.command-palette {
-    position: fixed;
-    top: 15%;
-    left: 50%;
-    transform: translate(-50%, -20%) scale(0.9);
-    width: 650px;
-    background: rgba(15, 15, 20, 0.6);
-    -webkit-backdrop-filter: blur(50px) saturate(200%);
-    backdrop-filter: blur(50px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
-    z-index: 10000;
-    padding: 0;
-    display: none;
-    box-shadow: 0 50px 100px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(255,255,255,0.05);
-    transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-    opacity: 0;
-}
-
-.command-palette.active {
-    display: block;
-    transform: translate(-50%, 0%) scale(1);
     opacity: 1;
 }
 
@@ -558,22 +489,168 @@ body {
 .start-footer { padding: 10px 20px; background: rgba(0,0,0,0.2); border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; font-size: 12px; border-radius: 0 0 12px 12px; }
 .footer-item { cursor: pointer; opacity: 0.7; }
 .footer-item:hover { opacity: 1; color: var(--accent); }
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+}
+
+#clock-date {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 6px;
+    margin-top: 10px;
+    opacity: 0.8;
+}
+
+/* App Icons on Desktop */
+.desktop-icons {
+    position: fixed;
+    top: 150px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+    z-index: 40;
+}
+
+.app-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    transition: transform 0.3s ease;
+}
+
+.app-icon:hover {
+    transform: scale(1.1);
+}
+
+.app-img {
+    width: 80px;
+    height: 80px;
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.app-label {
+    font-size: 13px;
+    font-weight: 500;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+/* Widget System */
+.widgets-container {
+    position: fixed;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+    z-index: 50;
+}
+
+.widget {
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 20px;
+    width: 260px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.widget-title {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.stat-bar {
+    height: 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.stat-progress {
+    height: 100%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent-glow);
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#cpu-progress { width: 12%; }
+#mem-progress { width: 25%; }
+
+/* Utility Shards */
+.widget-graph { width: 100%; height: 40px; margin-top: 10px; }
+.taskbar-divider { width: 1px; height: 30px; background: var(--glass-border); margin: 0 10px; }
+/* Start Menu */
+.start-menu {
+    position: absolute;
+    bottom: 80px;
+    left: 20px;
+    width: 320px;
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--blur);
+    backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    display: none;
+    flex-direction: column;
+    z-index: 1000;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    transform: translateY(20px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.start-menu.active { display: flex; transform: translateY(0); }
+.start-header { padding: 20px; border-bottom: 1px solid var(--glass-border); display: flex; align-items: center; gap: 15px; }
+.user-avatar { width: 40px; height: 40px; background: var(--accent-glow); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; border: 1px solid var(--accent); }
+.user-name { font-weight: 600; font-size: 14px; }
+.user-status { font-size: 10px; color: var(--text-muted); }
+.window-controls { margin-left: auto; display: flex; gap: 8px; }
+.win-btn { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; transition: filter 0.2s; }
+.win-btn.minimize { background: #ffbd2e; border: 1px solid rgba(0,0,0,0.1); }
+.win-btn.close { background: #ff5f56; border: 1px solid rgba(0,0,0,0.1); }
+.win-btn:hover { filter: brightness(1.2); transform: scale(1.1); }
+.win-btn:active { transform: scale(0.9); }
+.start-content { padding: 15px; flex-grow: 1; }
+.start-section { margin-bottom: 20px; }
+.section-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 10px; }
+.start-item { padding: 10px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-radius: 6px; transition: background 0.2s; }
+.start-item:hover { background: rgba(255,255,255,0.1); }
+.start-item .icon { font-size: 16px; }
+.start-footer { padding: 10px 20px; background: rgba(0,0,0,0.2); border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; font-size: 12px; border-radius: 0 0 12px 12px; }
+.footer-item { cursor: pointer; opacity: 0.7; }
+.footer-item:hover { opacity: 1; color: var(--accent); }
 
 /* Glassmorphism 2.0 Overrides */
 :root {
     --muted: #64748b;
     --border: rgba(255,255,255,0.1);
-    --glass-dark: rgba(15,15,25,0.97);
-    --glass-bg: rgba(15, 15, 15, 0.75);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --blur: blur(25px) saturate(180%);
-}
-.stat-progress.healing { background: var(--success); box-shadow: 0 0 10px rgba(0, 255, 157, 0.3); }
-.stat-progress.entropy { background: #ff00ff; box-shadow: 0 0 10px rgba(255, 0, 255, 0.3); }
-.stat-progress.auto { background: #ff8800; box-shadow: 0 0 10px rgba(255, 136, 0, 0.3); }
-.stat-progress.vault { background: #6600ff; box-shadow: 0 0 10px rgba(102, 0, 255, 0.3); }
-.stat-progress.vfs { background: #00ffcc; box-shadow: 0 0 10px rgba(0, 255, 204, 0.3); }
-.stat-progress.memory { background: #00ccff; box-shadow: 0 0 10px rgba(0, 204, 255, 0.3); }
 .stat-progress.sync { background: #ffcc00; box-shadow: 0 0 10px rgba(255, 204, 0, 0.3); }
 .stat-progress.ui { background: #ff0077; box-shadow: 0 0 10px rgba(255, 0, 119, 0.3); }
 .stat-progress.silicon { background: #00ff88; box-shadow: 0 0 10px rgba(0, 255, 136, 0.3); }

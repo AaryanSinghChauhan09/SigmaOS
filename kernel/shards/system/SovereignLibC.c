@@ -131,20 +131,20 @@ void sigma_printf(const char* format, ...) {
             if (v < 0) { buf[bi++] = '-'; v = -v; }
             char nb[24]; int ni = 0;
             do { nb[ni++] = (char)('0' + v % 10); v /= 10; } while (v);
-            while (ni--) buf[bi++] = nb[ni + 1];
+            while (ni > 0) buf[bi++] = nb[--ni];
         } else if (*f == 'u') {
             sigma_u64 v = (sigma_u64)va_arg(ap, unsigned int);
             char nb[24]; int ni = 0;
             if (v == 0) { buf[bi++] = '0'; } else {
                 do { nb[ni++] = (char)('0' + v % 10); v /= 10; } while (v);
-                while (ni--) buf[bi++] = nb[ni + 1];
+                while (ni > 0) buf[bi++] = nb[--ni];
             }
         } else if (*f == 'x' || *f == 'X') {
             sigma_u64 v = (sigma_u64)va_arg(ap, unsigned int);
             char nb[18]; int ni = 0;
             if (v == 0) { buf[bi++] = '0'; } else {
                 do { nb[ni++] = "0123456789abcdef"[v & 0xF]; v >>= 4; } while (v);
-                while (ni--) buf[bi++] = nb[ni + 1];
+                while (ni > 0) buf[bi++] = nb[--ni];
             }
         } else if (*f == 'l') {
             f++;
@@ -154,7 +154,7 @@ void sigma_printf(const char* format, ...) {
                 char nb[24]; int ni = 0;
                 if (v == 0) { buf[bi++] = '0'; } else {
                     do { nb[ni++] = (char)('0' + v % 10); v /= 10; } while (v);
-                    while (ni--) buf[bi++] = nb[ni + 1];
+                    while (ni > 0) buf[bi++] = nb[--ni];
                 }
             }
         } else if (*f == 'p') {

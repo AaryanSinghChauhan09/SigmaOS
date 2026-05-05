@@ -1,17 +1,19 @@
-**SigmaOS**
+**SigmaOS Knowledge Base**
 
 * [Home](Home)
-* [Getting Started](Getting-Started)
-* [Architecture](Architecture)
-* [Developer Guide](Developer-Guide)
-* [User Guide](User-Guide)
-* [Security Posture](Security-Posture)
-* [Roadmap](Roadmap)
-* [Feature Backlog (100)](Feature-Backlog-100)
-* [Competitive Gaps](Competitive-Gaps)
-* [Future Improvements](Future-Improvements)
-* [30-Day Action Plan](30-Day-Action-Plan)
-* [Zenith Desktop](Zenith-Desktop)
-* [Repository layout](Repository-layout)
-* [Contributing](Contributing)
+* [Industrial Evolution Roadmap](Roadmap)
+* [Sovereign Shard Manifest](Sovereign-Shard-Manifest)
+* [Feature Backlog](FEATURE_BACKLOG)
+* [Zenith Dashboard Architecture](Zenith-Dashboard)
 
+**🛡️ Security & Assurance**
+* [Security Issues & Fixes](Security-Issues-And-Fixes) ⚠️
+* [Industrial Hardening Status](Hardening-Status)
+
+**🚀 Future Frontiers**
+* [Advanced Future Features](Advanced-Future-Features) 🚀
+* [Zenith v100 Singularity](Zenith-Singularity)
+
+**🤝 Community**
+* [Contributing to the Lattice](Contributing)
+* [Code of Conduct](Code-of-Conduct)

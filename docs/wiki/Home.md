@@ -1,32 +1,32 @@
-# SigmaOS Wiki
 
-SigmaOS is an **experimental** operating-system project: a freestanding **C++ kernel** tree, headers under `include/`, and **Zenith Desktop** — a browser-based demo shell at the repo root.
 
-## Read this first
+Welcome to the **Sovereign Lattice**. SigmaOS is an industrial-grade, 600-shard operating system simulation designed for absolute sovereignty and high-assurance computing.
 
-| Topic | Page |
-|-------|------|
-| Install, run QEMU, open Zenith | [Getting Started](Getting-Started) |
-| Kernel, drivers, FS, security (honest scope) | [Architecture](Architecture) |
-| Contribute, style, tests, Doxygen | [Developer Guide](Developer-Guide) |
-| Zenith UI, packages (planned), accessibility | [User Guide](User-Guide) |
-| Security goals vs. current posture | [Security Posture](Security-Posture) |
-| Phased roadmap (fundamentals before “sovereignty” extras) | [Roadmap](Roadmap) |
-| Focused 30-day sequencing | [30-Day Action Plan](30-Day-Action-Plan) |
-| 100-item backlog (prioritization / icebox) | [Feature Backlog (100)](Feature-Backlog-100) |
-| vs Linux/BSD — honest gaps | [Competitive Gaps](Competitive-Gaps) |
-| Repo-wide future work (CI, security, process) | [Future Improvements](Future-Improvements) |
+**[? Open the Live Demo](https://aaryansinghchauhan09.github.io/SigmaOS/)**
 
-## Quick links
+Or run it locally in 10 seconds:
+`ash
+git clone <https://github.com/AaryanSinghChauhan09/SigmaOS.git>
+node SigmaOS/server.js
 
-- [Repository](https://github.com/AaryanSinghChauhan09/SigmaOS)
-- [Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
-- [Zenith Desktop](Zenith-Desktop) (modules under `js/zenith/`)
+`
+SigmaOS is a browser-based desktop simulation � the entire OS experience (terminal, file manager, AI assistant, notifications, marketplace) runs in a single HTML file with zero build step.
 
-- [Repository layout](Repository-layout)
-- [Contributing](Contributing) (short conventions; full detail in Developer Guide)
+---
 
-## Bottom line
+| Page | Description |
+| :--- | :--- |
+| [Build Guide](BUILD) | How to run the Zenith desktop |
+| [Architecture](Architecture_Overview) | Kernel & UI architecture overview |
+| [Contributing](CONTRIBUTING) | How to contribute |
+| [Changelog](CHANGELOG) | Version history |
+| [Security](SECURITY) | Security policy |
+| [Governance](GOVERNANCE) | Maintainer model |
+| [Personalization](Personalization) | Theme and persona system |
+| [Universal Integration](Universal-Integration) | Integration with MS Terminal, PowerToys, etc. |
 
-Many advanced ideas (quantum-safe TLS everywhere, full IPv6 stack, MAC/RBAC across the board) are **roadmap** items. The project stays honest about gaps — see [Competitive-Gaps](Competitive-Gaps) (and `docs/COMPETITIVE_GAPS.md` in the repo) and [Roadmap](Roadmap). Use [Feature-Backlog-100](Feature-Backlog-100) with milestones and **define done** (tests + docs) per item.
+---
+
+
+
 

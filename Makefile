@@ -12,78 +12,12 @@ CXXFLAGS = -ffreestanding -O2 -Wall -Wextra -Werror -fno-exceptions -fno-rtti -s
            -I./include -fno-stack-protector -mno-red-zone
 ASFLAGS  = -f elf64
 
-KERNEL_SHARDS = kernel/core/system/SovereignMain.o \
-                kernel/core/boot/SovereignInit.o \
-                kernel/core/ipc/SovereignIPC.o \
-                kernel/core/memory/SovereignMMU.o \
-                kernel/core/ai/SovereignAISched.o \
-                kernel/core/hal/SovereignSMP.o \
-                kernel/core/misc_utils/SovereignLazy.o \
-                kernel/core/misc_utils/SovereignSnap.o \
-                kernel/core/misc_utils/SovereignSearch.o \
-                kernel/core/ai/SovereignKube.o \
-                kernel/core/system/SovereignInstall.o \
-                kernel/core/network/SovereignBluetooth.o \
-                kernel/core/fs/SovereignPersistence.o \
-                kernel/core/system/SovereignKernelIO.o \
-                kernel/core/memory/SovereignAllocator.o \
-                kernel/core/system/SovereignLog.o \
-                kernel/core/process/SovereignProcess.o \
-                kernel/core/virtualization/SovereignHypervisor.o \
-                kernel/core/orchestration/SovereignOrchestrator.o \
-                kernel/core/observability/SovereignDiag.o \
-                kernel/core/system/SovereignBoot.o \
-                kernel/core/security/SovereignSecHardener.o \
-                kernel/core/fs/SovereignVFS.o \
-                kernel/core/security/SovereignEntropy.o \
-                kernel/core/memory/SovereignPMM.o \
-                kernel/core/memory/SovereignVMM.o \
-                kernel/core/memory/SovereignSASOS.o \
-                kernel/core/system/SovereignTime.o \
-                kernel/core/system/SovereignConfig.o \
-                kernel/core/system/SovereignHotSwap.o \
-                kernel/core/system/SovereignAppShard.o \
-                kernel/core/fs/SovereignDNACompression.o \
-                kernel/core/security/SovereignQKD.o \
-                kernel/core/security/SovereignVault.o \
-                kernel/core/hardware/SovereignHWTranspiler.o \
-                kernel/core/hal/SovereignHAL.o \
-                kernel/core/network/SovereignMeshLattice.o \
-                kernel/core/industrial/SovereignOrbMarketplace.o \
-                kernel/core/industrial/SovereignOrbRegistry.o \
-                kernel/core/industrial/SovereignOrbManager.o \
-                kernel/core/ai/SovereignNeuralNexus.o \
-                kernel/core/ai/SovereignNeuralAutomator.o \
-                kernel/core/ai/SovereignTaskAutomator.o \
-                kernel/core/ai/SovereignScriptNexus.o \
-                kernel/core/community/SovereignGovernance.o \
-                kernel/core/security/SovereignSandbox.o \
-                kernel/core/security/SovereignAppArmor.o \
-                kernel/core/security/SovereignAmnesicIncognito.o \
-                kernel/core/security/SovereignRBAC.o \
-                kernel/core/security/SovereignTrustFabric.o \
-                kernel/core/security/SovereignEnclave.o \
-                kernel/core/security/SovereignBiometrics.o \
-                kernel/core/security/SovereignAudit.o \
-                kernel/core/security/SovereignDID.o \
-                kernel/core/network/SovereignMeshLattice.o \
-                kernel/core/network/SovereignZeroNet.o \
-                kernel/core/network/SovereignAetherNet.o \
-                kernel/core/network/SovereignHFTNexus.o \
-                kernel/core/network/SovereignAetherFirewall.o \
-                kernel/core/industrial/SovereignOrbRegistry.o \
-                kernel/core/deployment/SovereignKube.o \
-                kernel/core/security/SovereignFocus.o \
-                kernel/core/process/SovereignPSE.o \
-                kernel/core/deployment/SovereignCI.o \
-                kernel/core/deployment/SovereignAtomicUpdater.o \
-                kernel/core/hal/SovereignHotplug.o \
-                kernel/core/observability/SovereignDump.o \
-                kernel/core/observability/SovereignDiag.o \
-                kernel/core/misc_utils/SovereignLazy.o \
-                kernel/shards/system/SovereignLibC.o \
-                kernel/core/container/SovereignContainer.o \
-                kernel/core/misc_utils/SovereignTests.o
+# Industrial Shard Orchestration (600-Shard Lattice)
+# Dynamically discovers all .cpp, .c, and .asm files in the kernel structure
+KERNEL_SHARDS = $(patsubst %.cpp,%.o,$(shell find kernel/core kernel/shards -name "*.cpp")) \
+                $(patsubst %.c,%.o,$(shell find kernel/core kernel/shards -name "*.c")) \
+                $(patsubst %.asm,%.o,$(shell find kernel/core kernel/shards -name "*.asm"))
+
 
 .PHONY: all singularity zenith-iso qemu clean
 

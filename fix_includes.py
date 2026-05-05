@@ -1,30 +1,22 @@
 import os
 import re
 
-core_dir = r"c:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS-Repo\kernel\core"
+def fix_includes(root_dir):
+    for root, dirs, files in os.walk(root_dir):
+        for file in files:
+            if file.endswith(('.cpp', '.h', '.c', '.hpp')):
+                path = os.path.join(root, file)
+                with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+                    content = f.read()
+                
+                # Replace #include "path/to/header.h"" with #include "path/to/header.h"
+                new_content = re.sub(r'(#include\s+["<][^">]+[">])""', r'\1', content)
+                
+                if new_content != content:
+                    print(f"Fixing {path}")
+                    with open(path, 'w', encoding='utf-8') as f:
+                        f.write(new_content)
 
-for filename in os.listdir(core_dir):
-    if filename.endswith(".cpp"):
-        filepath = os.path.join(core_dir, filename)
-        with open(filepath, "r", encoding="utf-8") as f:
-            content = f.read()
-        
-        # Replace Lattice.h with sigma_hal.h
-        content = content.replace('#include "Lattice.h"', '#include "sigma_hal.h"\n#include "sigma_types.h"')
-        content = content.replace('#include <Lattice.h>', '#include "sigma_hal.h"\n#include "sigma_types.h"')
-        
-        # Ensure sigma_hal.h is included
-        if '#include "sigma_hal.h"' not in content:
-            content = '#include "sigma_hal.h"\n' + content
-            
-        # Ensure sigma_types.h is included
-        if '#include "sigma_types.h"' not in content:
-            content = '#include "sigma_types.h"\n' + content
-            
-        # Fix SovereignOrchestratorEngine typo
-        content = content.replace("SovereignOrchestraEngine", "SovereignOrchestratorEngine")
-        
-        with open(filepath, "w", encoding="utf-8") as f:
-            f.write(content)
-
-print("Automated C++ fixes applied.")
+if __name__ == "__main__":
+    fix_includes('kernel')
+    fix_includes('include')

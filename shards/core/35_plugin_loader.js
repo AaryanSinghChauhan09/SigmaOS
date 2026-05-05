@@ -49,13 +49,25 @@ class SigmaPluginLoader {
 
         const script = document.createElement('script');
         script.src = meta.entry;
+        if (meta.sri) script.integrity = meta.sri;
+        script.crossOrigin = "anonymous";
+        
+        const timeout = setTimeout(() => {
+            console.error(`Σ://PLUGIN> Timeout loading ${meta.name}`);
+            script.remove();
+        }, 10000);
+
         script.onload = () => {
+            clearTimeout(timeout);
             if (window.SigmaPlugin) {
                 this._mount(meta, window.SigmaPlugin);
-                window.SigmaPlugin = undefined; // reset slot for next plugin
+                window.SigmaPlugin = undefined; 
             }
         };
-        script.onerror = () => console.error(`Σ://PLUGIN> Failed to load: ${meta.entry}`);
+        script.onerror = () => {
+            clearTimeout(timeout);
+            console.error(`Σ://PLUGIN> Failed to load: ${meta.entry}`);
+        };
         document.body.appendChild(script);
     }
 
@@ -106,9 +118,15 @@ class SigmaPluginLoader {
     unload(name) {
         const entry = this.registry.get(name);
         if (!entry) return;
+        
+        // Lifecycle: Unmount
         entry.instance.unmount?.();
+        
+        // DOM Cleanup
         document.getElementById(`plugin-${name}`)?.remove();
         document.querySelector(`[data-tab="plugin-${name}"]`)?.remove();
+        
+        // Memory Cleanup
         this.registry.delete(name);
         console.log(`Σ://PLUGIN> Unloaded: ${name}`);
     }

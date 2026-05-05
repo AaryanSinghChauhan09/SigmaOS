@@ -1,29 +1,30 @@
-# Future improvements (repository)
+# SigmaOS: Repository Future Improvements
 
-This page is the **wiki-facing index** for long-term engineering and process work. The **detailed checklist** lives in the main repository:
+This document tracks meta-development goals, process refinements, and engineering quality gates beyond the feature-specific roadmap.
 
-**[docs/REPO_FUTURE_IMPROVEMENTS.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/REPO_FUTURE_IMPROVEMENTS.md)**
+## ⚙️ Kernel & Platform Engineering
+*   **Declarative Manifests**: Transition to automated shard discovery (e.g., CMake/Ninja) to eliminate Makefile drift.
+*   **Panic Lifecycle**: Standardize uniform panic macros and serial minidumps for debugging.
+*   **SMP Maturity**: Formalize CPU bring-up and inter-processor interrupt (IPI) protocols.
+*   **Freestanding Audit**: Systematic removal of remaining STL headers from the core kernel.
 
-## What it covers
+## 🛡️ Security & Supply Chain
+*   **Formal Threat Modeling**: Document assets and adversaries in the Official Wiki.
+*   **Signed Releases**: Integrity-verified release artifacts via `sigstore` or checksums.
+*   **SBOM Generation**: Comprehensive Software Bill of Materials for all lattice dependencies.
 
-- Kernel/platform (shard manifest, boot docs, SMP, freestanding audit)
-- Security & supply chain (threat model, signed releases, `SECURITY.md`)
+## 🧪 Testing & Observability
+*   **QEMU Integration CI**: Automated boot tests on every PR to ensure kernel integrity.
+*   **Coverage Metrics**: Host-side unit test coverage tracking (gcov/llvm-cov).
+*   **Zenith E2E Smoke Tests**: Automated UI validation for critical dashboard paths.
 
-- Testing & CI (QEMU integration, coverage, scheduled builds)
-- Documentation (CHANGELOG, ADRs, glossary)
-- Developer experience (devcontainer, pre-commit, labels)
-- Zenith/web smoke tests
-- Community & releases
-- Honest progress metrics
+## 🛠️ Developer Experience (DX)
+*   **Reproducible Environments**: Implementation of Dev Containers or Nix Flakes for 1-click build setups.
+*   **ADR Registry**: Architecture Decision Records to document major design choices.
+*   **Doxygen Integration**: Automatically generated API documentation from kernel source.
 
-## Related in-repo docs
+## 📊 Honest Progress Tracking
+*   **Milestone Dashboards**: Regular updates to the build status, test counts, and backlog progress on the GitHub Wiki.
 
-- [Feature backlog (100 items)](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/FEATURE_ROADMAP_100.md) — product features
-- [Site / Pages improvements](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/SITE_FUTURE_IMPROVEMENTS.md) — **aaryansinghchauhan09.github.io/SigmaOS**
-- [Roadmap](Roadmap) — phased readiness
-- [Competitive Gaps](Competitive-Gaps) — positioning vs incumbents
-
-## Sync to this wiki
-
-Merging changes under **`docs/wiki/`** to `main` triggers the **Wiki sync** workflow when the repository secret **`WIKI_SYNC_TOKEN`** is configured. See **`docs/wiki/README.md`** in the repo for PAT setup.
-
+---
+*Σ Sovereignty is the Continuous Pursuit of Perfection.*

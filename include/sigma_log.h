@@ -15,6 +15,12 @@
 extern "C" {
 #endif
 
+#define LOG_DEBUG    0u
+#define LOG_INFO     1u
+#define LOG_WARN     2u
+#define LOG_ERROR    3u
+#define LOG_CRITICAL 4u
+
 typedef struct {
     uint32_t timestamp;
     uint32_t severity;

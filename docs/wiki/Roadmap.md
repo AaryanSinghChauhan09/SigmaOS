@@ -1,61 +1,41 @@
-# Roadmap (readiness)
+# Σ SIGMAOS: INDUSTRIAL EVOLUTION ROADMAP (Phase 2)
 
-This roadmap prioritizes **fundamentals** before futuristic “sovereignty” layers. Dates are not commitments; use GitHub milestones when the maintainers adopt them.
+This document outlines the strategic development path for evolving the SigmaOS Sovereign Lattice from a conceptual bootable kernel into a production-grade functional environment.
 
-## Phase 0 — Honesty and hygiene (now)
+## 1. Core Kernel Enhancements
+*   **Virtual Memory Manager (VMM)**: Augment the "Amnesic" bump allocator with a full paging system to enable process isolation.
+*   **ISR Framework**: Standardize shard interrupt handling for high-concurrency tasks.
+*   **ACPI Parsing**: Implement a shard to parse ACPI tables for SMP support.
 
-- [x] Modular Zenith source (`js/zenith/`)
+## 2. Sovereign Filesystem (LatticeFS)
+*   **VFS Layer**: Abstract file operations for parity between ISO, RAM Disk, and physical storage.
+*   **Stateless Recovery**: Develop a Copy-on-Write (CoW) mode where the system reverts to a pristine state on reboot.
 
-- [x] Wiki source in-repo with optional **auto-sync** (`docs/wiki/` + `wiki-sync.yml`)
+## 3. Userland & Interface Evolution
+*   **POSIX-lite Compatibility**: Implement core syscalls to allow porting of industrial tools like `vim`.
+*   **Morphic Zenith Graphics**: A framebuffer-driven graphical environment leveraging AVX-512.
 
-- [x] Style tooling: `.clang-format`, PR scoped format check
+## 4. Networking & Connectivity
+*   **ZCLN (Zero-Copy Lattice Net)**: Drivers for virtualized NICs (E1000) for lattice communication.
+*   **Distributed State**: Shared memory and task orchestration across multiple SigmaOS instances.
 
-- [x] Doxygen scaffold + CI artifact
-- [ ] Green CI on `main` for build + quality jobs (fix breakages as they appear)
+## Industrial Evolution Phases (2026)
 
-## Phase 1 — Codebase quality
+| Phase | Goal | Focus |
+| :--- | :--- | :--- |
+| **Phase 1: Stability** | Hardened Silicon Primitives | IDT standardization & VMM maturity. |
+| **Phase 2: Microkernel** | Zero-Trust Driver Isolation | Migrating drivers to User-Mode (Ring 3). |
+| **Phase 3: WASM** | Universal Execution | Native WASM runtime as primary binary format. |
+| **Phase 4: Persistence** | Instant-On Booting | Memory-mapped filesystem (PMFS) for <50ms boot. |
 
-- Incremental **modularization** of the largest kernel translation units (extract concerns; avoid mega-files).
-- Consistent **error handling** policy in touched code paths (document in Developer Guide).
-- **Unit tests** for pure logic (host-compiled) where feasible; **integration** tests under QEMU later.
+## Competitive Advantage Matrix
 
-## Phase 2 — Core OS depth
+| Feature | Linux Approach | SigmaOS Sovereign Potential |
+| :--- | :--- | :--- |
+| **Safety** | Root-based permissions | **Capability Tokens** (Immune to root exploits) |
+| **Stability** | Monolithic (Ring 0) | **Zero-Trust Microkernel** (Driver isolation) |
+| **Speed** | Heavy Abstractions | **Exokernel / SASOS** (Zero-cost switching) |
+| **Intelligence** | Static Algorithms | **AI-Native Scheduling** (Habit-based) |
 
-- Memory management and scheduling: document actual vs. intended behavior; add benchmarks.
-- File system path: VFS completeness, persistence stories, corruption handling.
-- **Profiling** hooks and documented workflows (sampling, traces).
-
-## Phase 3 — Security baseline
-
-- **Secure boot / verified boot** design doc + minimal implementation path.
-- **Sandbox** boundaries for userland when a stable syscall surface exists.
-- **Update pipeline** with signing and rollback.
-
-## Phase 4 — Networking (incremental)
-
-- IPv4/IPv6 feature matrix documented; implement parity in small steps.
-- VPN/mesh: prototype isolated from default kernel until stable.
-- **Post-quantum** TLS: follow standards (e.g. hybrid KEMs) when libraries and interop exist.
-
-## Phase 5 — User and developer experience
-
-- **Package manager** UX and policy.
-- **GUI** beyond Zenith demo: real compositor/session story.
-- **Accessibility** pass on Zenith + future shell.
-- **SDK** and codegen for third-party devs.
-
-## Phase 6 — Alpha release
-
-- Installation guide frozen for a tagged version.
-- Known limitations enumerated publicly.
-- Security contact and release signing keys published.
-
-## Related
-
-- [Architecture](Architecture) — diagram and directory roles.
-- [Feature Backlog (100)](Feature-Backlog-100) — icebox, milestones, define-done.
-- [Competitive Gaps](Competitive-Gaps) — honest comparison vs incumbents.
-- [Future Improvements](Future-Improvements) — CI, security process, docs meta-work ([repo file](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/REPO_FUTURE_IMPROVEMENTS.md)).
-- [Security Posture](Security-Posture) — what is real vs. aspirational.
-- `docs/COMPETITIVE_GAPS.md` — same as Competitive Gaps (repo canonical).
-
+---
+*Σ Sovereignty is Absolute. The Work Continues.*
