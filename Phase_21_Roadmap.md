@@ -55,5 +55,5 @@ Cryptographic Isolation Boundaries (CIB) enforced at the micro-shard level.
 - **Hardened Sovereignty**: 100% isolation between critical system shards.
 
 ---
-**Σ SIGMAOS: THE ZENITH OF EXECUTION.**
+# Σ SIGMAOS: THE ZENITH OF EXECUTION.
 

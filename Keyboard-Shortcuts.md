@@ -1,4 +1,4 @@
-
+# Keyboard-Shortcuts
 
 SigmaOS Zenith is designed for maximum efficiency through a keyboard-first interaction model.
 

@@ -1,4 +1,4 @@
-
+# INDUSTRIAL GAP RESOLUTION
 
 | Feature Shard | Status | Resolution / USP |
 | :--- | :--- | :--- |

@@ -1,3 +1,5 @@
+# bug report
+
 ---
 name: Bug Report
 about: Report a kernel shard malfunction or build failure
