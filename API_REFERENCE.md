@@ -118,3 +118,4 @@ Persona-driven sovereign setup wizard.
 Contextual predictive quick-action engine.
 
 - `void shortcuts_suggest(const char* context, const char* suggestion);`
+

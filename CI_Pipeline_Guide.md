@@ -88,3 +88,4 @@ Builds `orchestrator/main.cpp` and fuzzes with profiles: `kali`, `tails`, `arch`
 - Zero stdlib imports in atomic modules (must stay at 0)
 - Orchestrator compile time (target: < 2s)
 - All 9 matrix jobs green (target: 100%)
+

@@ -320,3 +320,4 @@
 | Lattice Verification | `02_Lattice_Verification.yml` | cppcheck + Kani proofs + fuzzing |
 | Native Quality Gate | `03_Web_Zenith.yml` | Compile check + sovereignty audit |
 | Dev Coverage | `04_Sigma_Dev_Coverage.yml` | Module count + OOP audit + ASM count |
+

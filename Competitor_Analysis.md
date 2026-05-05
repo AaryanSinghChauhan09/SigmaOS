@@ -96,3 +96,4 @@
 | **Quantum-Safe PQC** | Kyber/Dilithium crypto built into the kernel |
 | **Intent Bridge** | Natural language → OS shard dispatch |
 | **Atomic Architecture** | 1 function = 1 file — infinite composability |
+

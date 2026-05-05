@@ -49,3 +49,4 @@ Focus is placed on horizontal scaling (Cluster/Lattice) rather than vertical har
 - **Edge Mode**: A lightweight nameserver/kernel for ARM/Raspberry Pi devices to move closer to hardware management.
 - **Distributed Visual Profiler**: Real-time dashboard for visualizing proc hierarchies and RPC bottlenecks.
 - **WASM-Native Path**: First-class WebAssembly execution as a lightweight alternative to gVisor sandboxing.
+

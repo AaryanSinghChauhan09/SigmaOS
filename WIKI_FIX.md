@@ -6,7 +6,7 @@ The SigmaOS Wiki currently suffers from broken navigation and missing pages. Fol
 
 The GitHub Wiki uses a specific slug format. All relative links must point to the Wiki page name, not the file path.
 
-**Incorrect**: `[API Reference](wiki/API_Reference.md)`
+**Incorrect**: `[API Reference](wiki/API_Reference)`
 **Correct**: `[API Reference](API-Reference)`
 
 ### Action Plan
@@ -35,3 +35,4 @@ To automate Wiki synchronization, use the following GitHub Action pattern in you
     path: docs/
     token: ${{ secrets.GITHUB_TOKEN }}
 ```
+

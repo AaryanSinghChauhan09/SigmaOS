@@ -54,7 +54,7 @@ Ring-0 event bus with customizable sound profiles:
 ```c
 notif_init();
 notif_set_sound(true);
-notif_push("SovereignPackage", "Update available: sigma-core v29.1", 2);
+notif_push("SovereignPackage", "Update available: sigma-core v100.0", 2);
 notif_dismiss(1);
 ```
 
@@ -101,3 +101,4 @@ theme_market_publish("Sovereign Dark v2", "AaryanSC");
 theme_market_apply("Sovereign Dark v2");
 theme_market_list();
 ```
+

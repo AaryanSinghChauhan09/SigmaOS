@@ -1,6 +1,6 @@
 # 🏛️ SigmaOS: A Modular, Experimental Operating System
 
-SigmaOS is an experimental, bare-metal operating system kernel built to explore extreme modularity using C++ singleton patterns. While currently in a conceptual phase (v29.0), its goal is to provide a clean, zero-dependency alternative to legacy monolithic kernels.
+SigmaOS is an experimental, bare-metal operating system kernel built to explore extreme modularity using C++ singleton patterns. While currently in a conceptual phase (v100.0), its goal is to provide a clean, zero-dependency alternative to legacy monolithic kernels.
 
 ## 🚀 Current Status (What SigmaOS Does Today)
 
@@ -65,7 +65,7 @@ SigmaOS uses unique terminology for its architectural concepts. Here is what the
 
 We welcome contributions to help evolve SigmaOS from an experimental kernel into a fully usable distribution.
 
-- Please read [CONTRIBUTING.md](CONTRIBUTING.md) for our PR process and coding standards.
+- Please read [CONTRIBUTING.md](CONTRIBUTING) for our PR process and coding standards.
 
 ## 🚀 Current Status (Zenith Supreme: Singularity Complete)
 
@@ -81,3 +81,4 @@ For a detailed look at our implementation history, refer to the project Wiki and
 ---
 
 _Σ SIGMAOS: Absolute Sovereignty. Singularity Achieved._
+

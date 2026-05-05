@@ -26,3 +26,4 @@ SigmaOS employs multiple layers of defense:
 - **`SovereignSandbox`** — Zero-trust container isolation for all userland processes.
 - **CodeQL** — Automated vulnerability scanning on every pull request.
 - **Dependabot** — Weekly automated supply-chain patch management.
+

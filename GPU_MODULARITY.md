@@ -64,3 +64,4 @@ container_spawn("ai-workload", "/usr/bin/inference");
 | Kernel Update Breakage    | Yes (binary blob)         | Never (hardware-abstracted)   |
 | Security Auditability     | None                      | Full (open sovereign shard)   |
 | NUMA Awareness            | Manual (numactl)          | Automatic (SovereignNUMA)     |
+

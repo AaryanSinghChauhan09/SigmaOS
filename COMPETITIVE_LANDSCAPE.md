@@ -31,3 +31,4 @@ The Zenith UI serves as the **Industrial-Grade Workflow Orchestrator**. It is no
 
 ## Future Outlook
 SigmaOS focuses on **horizontal scaling** through shard expansion. As the 600-shard architecture matures, we aim to provide the same level of reliability as Linux/BSD while offering superior native isolation and distributed orchestration capabilities.
+

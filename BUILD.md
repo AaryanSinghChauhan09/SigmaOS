@@ -60,3 +60,4 @@ cppcheck --enable=warning,style,performance -Iinclude kernel/
 ---
 
 _Σ SIGMAOS: Sovereign Build System. Absolute Integrity._
+

@@ -37,4 +37,5 @@ All contributions must adhere to the **Sovereign Shard Standard**:
 
 ## Security Issues
 
-Please **do not** open public issues for security vulnerabilities. Read [SECURITY.md](../SECURITY.md) for responsible disclosure guidelines.
+Please **do not** open public issues for security vulnerabilities. Read [SECURITY.md](../SECURITY) for responsible disclosure guidelines.
+

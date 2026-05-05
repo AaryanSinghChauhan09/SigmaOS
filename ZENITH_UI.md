@@ -27,3 +27,4 @@ The `SovereignSnapEngine` (located in `kernel/core/misc_utils/`) provides indust
 Integrated via `SovereignPersonalization`, Zenith supports:
 *   **Adaptive Contrast**: Auto-scaling based on ambient telemetry.
 *   **Predictive Layouts**: NPWO-driven interface adjustment based on workload history.
+

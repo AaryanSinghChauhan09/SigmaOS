@@ -126,3 +126,4 @@ CI will automatically run all 4 workflows and report results.
 | `sigma_dns_resolver.h` | Unbound DNS | 🟡 Medium |
 | `sigma_thermal.h` | Linux ACPI | 🟢 Low |
 | `sigma_power_mgmt.h` | Windows ACPI | 🟢 Low |
+

@@ -31,3 +31,4 @@ Switch between visual paradigms instantly:
 
 ---
 *Master the lattice through your fingertips.*
+

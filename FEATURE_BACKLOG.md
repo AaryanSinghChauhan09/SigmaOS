@@ -22,3 +22,4 @@ The following table tracks the implementation status of the 100 core features of
 ## Full Backlog Registry
 
 Refer to the repository `docs/FEATURE_BACKLOG_100.md` for the complete list of 100+ functional aspirations.
+
