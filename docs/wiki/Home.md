@@ -1,8 +1,8 @@
-
+# Home
 
 Welcome to the **Sovereign Lattice**. SigmaOS is an industrial-grade, 600-shard operating system simulation designed for absolute sovereignty and high-assurance computing.
 
-**[? Open the Live Demo](https://aaryansinghchauhan09.github.io/SigmaOS/)**
+# [? Open the Live Demo](https://aaryansinghchauhan09.github.io/SigmaOS/)
 
 Or run it locally in 10 seconds:
 `ash

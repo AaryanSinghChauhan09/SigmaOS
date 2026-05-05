@@ -1,3 +1,5 @@
+# feature request
+
 ---
 name: Feature Request / New Shard
 about: Propose a new Sovereign Shard or architectural improvement

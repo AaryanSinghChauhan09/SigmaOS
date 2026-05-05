@@ -24,11 +24,12 @@ We are transitioning from a "personal desktop" focus to a **"Distributed Soverei
 ### 2. Foundations First
 
 Closing the gap with incumbents requires a commitment to industrial foundations:
-*   **Paging & Scheduling**: Implementation of advanced paging models and predictive scheduler policies (`SovereignAISched`).
 
-*   **Security & Integrity**: Moving beyond buzzwords to auditable mechanisms like Hardware-Assisted Attestation (`SovereignAttestation`) and Mandatory Access Control (`SovereignAppArmor`).
+* **Paging & Scheduling**: Implementation of advanced paging models and predictive scheduler policies (`SovereignAISched`).
 
-*   **Developer Ergonomics**: Providing a clear SDK, generated API docs, and industrial CI/CD signals.
+* **Security & Integrity**: Moving beyond buzzwords to auditable mechanisms like Hardware-Assisted Attestation (`SovereignAttestation`) and Mandatory Access Control (`SovereignAppArmor`).
+
+* **Developer Ergonomics**: Providing a clear SDK, generated API docs, and industrial CI/CD signals.
 
 ### 3. Zenith Orchestration
 

@@ -91,7 +91,7 @@ Following the "Sovereign Silicon" philosophy, the immediate development focus is
 
 1. **Lattice IPC Bridge**: Low-latency message bus for shard-to-shard comms.
 
-2. **WASM Interpreter Shard**: Integrating the core PSE engine into the scheduler.
+1. **WASM Interpreter Shard**: Integrating the core PSE engine into the scheduler.
 
-3. **Capability Vault**: Token-based access control for silicon resources.
+1. **Capability Vault**: Token-based access control for silicon resources.
 

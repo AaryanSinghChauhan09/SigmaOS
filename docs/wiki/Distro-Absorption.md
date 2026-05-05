@@ -15,6 +15,7 @@ SigmaOS does not compete with established Linux distributions on their terms. In
 | **Alpine Linux** | Ultra-Lightweight | **Amnesic Shards**: Sub-megabyte, amnesic execution environments for microservices. |
 
 ## 🏗️ Core Orchestration
+
 The shards responsible for this roadmap (e.g., `SovereignMarketplace`, `SovereignZenithDesktop`, `SovereignAtomicUpdater`) are natively integrated into the `SovereignOrchestrator` boot sequence.
 
 **Status**: The lattice is rapidly outclassing fragmented ecosystems by consolidating their best attributes into a single, sovereign architecture.

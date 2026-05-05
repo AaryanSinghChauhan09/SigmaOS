@@ -1,3 +1,5 @@
+# pull request template
+
 ---
 name: Pull Request
 about: Submit a new Sovereign Shard or bug fix

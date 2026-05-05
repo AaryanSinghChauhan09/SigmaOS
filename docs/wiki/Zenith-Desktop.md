@@ -1,4 +1,4 @@
-
+# Zenith-Desktop
 
 The **Zenith Desktop** is the primary human-lattice interface for SigmaOS. It is a premium, glassmorphic web-shell designed for orchestrating 600+ sovereign shards.
 

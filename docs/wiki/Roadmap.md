@@ -3,21 +3,25 @@
 This document outlines the strategic development path for evolving the SigmaOS Sovereign Lattice from a conceptual bootable kernel into a production-grade functional environment.
 
 ## 1. Core Kernel Enhancements
-*   **Virtual Memory Manager (VMM)**: Augment the "Amnesic" bump allocator with a full paging system to enable process isolation.
-*   **ISR Framework**: Standardize shard interrupt handling for high-concurrency tasks.
-*   **ACPI Parsing**: Implement a shard to parse ACPI tables for SMP support.
+
+* **Virtual Memory Manager (VMM)**: Augment the "Amnesic" bump allocator with a full paging system to enable process isolation.
+* **ISR Framework**: Standardize shard interrupt handling for high-concurrency tasks.
+* **ACPI Parsing**: Implement a shard to parse ACPI tables for SMP support.
 
 ## 2. Sovereign Filesystem (LatticeFS)
-*   **VFS Layer**: Abstract file operations for parity between ISO, RAM Disk, and physical storage.
-*   **Stateless Recovery**: Develop a Copy-on-Write (CoW) mode where the system reverts to a pristine state on reboot.
+
+* **VFS Layer**: Abstract file operations for parity between ISO, RAM Disk, and physical storage.
+* **Stateless Recovery**: Develop a Copy-on-Write (CoW) mode where the system reverts to a pristine state on reboot.
 
 ## 3. Userland & Interface Evolution
-*   **POSIX-lite Compatibility**: Implement core syscalls to allow porting of industrial tools like `vim`.
-*   **Morphic Zenith Graphics**: A framebuffer-driven graphical environment leveraging AVX-512.
+
+* **POSIX-lite Compatibility**: Implement core syscalls to allow porting of industrial tools like `vim`.
+* **Morphic Zenith Graphics**: A framebuffer-driven graphical environment leveraging AVX-512.
 
 ## 4. Networking & Connectivity
-*   **ZCLN (Zero-Copy Lattice Net)**: Drivers for virtualized NICs (E1000) for lattice communication.
-*   **Distributed State**: Shared memory and task orchestration across multiple SigmaOS instances.
+
+* **ZCLN (Zero-Copy Lattice Net)**: Drivers for virtualized NICs (E1000) for lattice communication.
+* **Distributed State**: Shared memory and task orchestration across multiple SigmaOS instances.
 
 ## Industrial Evolution Phases (2026)
 

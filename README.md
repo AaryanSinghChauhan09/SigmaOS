@@ -1,4 +1,4 @@
-
+# README
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://github.com/AaryanSinghChauhan09/SigmaOS/actions/workflows/ci.yml/badge.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/actions)
@@ -9,7 +9,7 @@
 
 ![SigmaOS Zenith Desktop](zenith_desktop_screenshot.png)
 
-**[→ Live Demo](https://aaryansinghchauhan09.github.io/SigmaOS/)**
+# [→ Live Demo](https://aaryansinghchauhan09.github.io/SigmaOS/)
 
 ```bash
 git clone <https://github.com/AaryanSinghChauhan09/SigmaOS.git>
