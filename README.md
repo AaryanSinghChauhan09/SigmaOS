@@ -35,9 +35,13 @@ SigmaOS is a next-generation, industrial-grade sovereign lattice operating syste
 | Shortcut | Action |
 | :--- | :--- |
 | `Ctrl + Space` | Toggle Command Palette |
+
 | `Alt + 1-4` | Switch Themes (Cyan, Gold, Crimson, Solar) |
+
 | `Ctrl + K` | Global Search & Shard Filter |
+
 | `Esc` | Close Active Shard / Start Menu |
+
 | `Alt + T` | Open Sovereign Terminal |
 
 ### 🛠️ Industrial Deployment
@@ -45,13 +49,16 @@ SigmaOS is a next-generation, industrial-grade sovereign lattice operating syste
 SigmaOS is designed for instant-ignition in any modern browser environment.
 
 1. **Bare Metal Launch**: Open `index.html` in any Evergreen browser.
+
 2. **Local Telemetry Server**: Recommended for high-fidelity performance simulation.
    ```bash
    npx serve . -p 8080
    ```
+
 3. **Production Sync**: Deployed automatically via GitHub Actions to GitHub Pages.
 
 ### 📖 Resources
+
 - **[Launch Live Demo](https://aaryansinghchauhan09.github.io/SigmaOS/)** 🚀
 - **[Official Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)**: The Single Source of Truth.
 - **[Developer Hub](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Developer_Guide)**: Build your own shards.
@@ -63,3 +70,4 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 *Built for the future of sovereign computing.*
+

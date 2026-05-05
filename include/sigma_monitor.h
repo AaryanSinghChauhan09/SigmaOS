@@ -21,7 +21,10 @@ public:
 
     void init();
     sigma_system_load_t getLoadMatrix();
+    void executeEbpfProgram(const void* bytecode, sigma_size_t size);
     void rebalanceLattice();
+
+
 
 private:
     SovereignMonitor() : m_initialized(false) {}

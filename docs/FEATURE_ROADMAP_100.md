@@ -134,3 +134,4 @@ Structured backlog for prioritization (GitHub Projects, milestones, or labels). 
 - **Honest sequencing**: Boot → memory/VM → scheduler → VFS → drivers → net → UX tooling.
 
 See also [COMPETITIVE_GAPS.md](./COMPETITIVE_GAPS.md) for gap analysis vs. mature OS ecosystems.
+

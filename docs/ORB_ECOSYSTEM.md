@@ -23,10 +23,13 @@ The `orb-man` utility (implemented in `SovereignOrbManager.cpp`) provides indust
 | Command | Action |
 | :--- | :--- |
 | `summon <orb>` | Download and verify an Orb from the Lattice Mesh. |
+
 | `shard <orb>` | Locally compile and sign a new Orb for distribution. |
+
 | `purge <orb>` | Immediately de-sharding the logic and wiping memory footprints. |
 
 ## 4. Future Roadmap
 
 - **Mesh-Repository Shards**: Peer-to-peer Orb distribution.
 - **Build-In-Lattice (BIL)**: On-device compilation using the `AVX-512` accelerated math shards.
+

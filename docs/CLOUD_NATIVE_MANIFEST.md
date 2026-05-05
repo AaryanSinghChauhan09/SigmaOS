@@ -78,3 +78,4 @@ Focus is placed on horizontal scaling (Cluster/Lattice) rather than vertical har
 - **Universal Virtio Shard**: Standardizing device access for disk, network, and console.
 - **WASM Browser Node**: A fully functional SigmaOS instance running in a browser tab.
 - **Lattice Continuity Engine**: Real-time task migration across heterogeneous hardware.
+

@@ -5,8 +5,11 @@ This roadmap prioritizes **fundamentals** before futuristic “sovereignty” la
 ## Phase 0 — Honesty and hygiene (now)
 
 - [x] Modular Zenith source (`js/zenith/`)
+
 - [x] Wiki source in-repo with optional **auto-sync** (`docs/wiki/` + `wiki-sync.yml`)
+
 - [x] Style tooling: `.clang-format`, PR scoped format check
+
 - [x] Doxygen scaffold + CI artifact
 - [ ] Green CI on `main` for build + quality jobs (fix breakages as they appear)
 
@@ -55,3 +58,4 @@ This roadmap prioritizes **fundamentals** before futuristic “sovereignty” la
 - [Future Improvements](Future-Improvements) — CI, security process, docs meta-work ([repo file](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/REPO_FUTURE_IMPROVEMENTS.md)).
 - [Security Posture](Security-Posture) — what is real vs. aspirational.
 - `docs/COMPETITIVE_GAPS.md` — same as Competitive Gaps (repo canonical).
+

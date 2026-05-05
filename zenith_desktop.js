@@ -1171,12 +1171,27 @@ function executeCommand(cmd) {
     if (command === 'launch' || command === 'open') {
         const app = args.slice(1).join(' ');
         launchApp(app);
-        return [ZENITH] Launching ...;
+        return `[ZENITH] Launching ${app}...`;
     } else if (command === 'theme') {
-        setTheme(args[1]);
-        return [ZENITH] Theme updated to .;
+        const themeName = args[1];
+        setTheme(themeName);
+        return `[ZENITH] Theme updated to ${themeName}.`;
     } else if (command === 'diag') {
-        return [DIAG] Silicon Health: 100%. All shards operational.;
+        return `[DIAG] Silicon Health: 100%. All shards operational.`;
     }
-    return [ZENITH] Unknown command: ;
+    return `[ZENITH] Unknown command: ${command}`;
 }
+
+function evaluateLatticeRun(query) {
+    if (query.startsWith('=')) {
+        const expr = query.substring(1);
+        try {
+            const res = eval(expr);
+            return `[L-RUN] Result: ${res}`;
+        } catch(e) {
+            return `[L-RUN] Math Error.`;
+        }
+    }
+    return null;
+}
+

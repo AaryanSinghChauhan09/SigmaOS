@@ -7,14 +7,19 @@ Structured suggestions beyond the numbered [FEATURE_ROADMAP_100.md](./FEATURE_RO
 ## Kernel & platform
 
 - [ ] **Shard manifest:** generate `KERNEL_SHARDS` (or CMake/Ninja) from a declarative list to wire `drivers/` and `fs/` without manual Makefile drift.
+
 - [ ] **Boot narrative:** one documented path (firmware → loader → kernel entry) with diagrams checked into `docs/`.
+
 - [ ] **Panic / crash:** uniform panic macro, optional `minidump` to serial or buffer; document in wiki.
+
 - [ ] **SMP:** formalize CPU bring-up and IPI story; tests under QEMU with `-smp`.
+
 - [ ] **Freestanding purity audit:** grep for STL headers in `kernel/` and track reduction over time ([LOW_LEVEL_CODING.md](./LOW_LEVEL_CODING.md)).
 
 ## Security & supply chain
 
 - [ ] **Threat model** doc (assets, adversaries, out-of-scope) in `docs/`, linked from the wiki [Security Posture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Security-Posture).
+
 - [ ] **Signed releases:** GitHub Release artifacts + checksum file + optional cosign/sigstore.
 - [ ] **SBOM** or dependency inventory for host toolchains and any vendored blobs.
 - [ ] **Security policy:** `SECURITY.md` with disclosure contact and supported branches.
@@ -22,15 +27,19 @@ Structured suggestions beyond the numbered [FEATURE_ROADMAP_100.md](./FEATURE_RO
 ## Testing & CI
 
 - [ ] **QEMU integration job:** boot `sigmaos.bin`, timeout, assert golden strings on serial (allow flaky retry).
+
 - [ ] **Coverage:** gcov/llvm-cov for host-compiled unit tests where applicable.
 - [ ] **Scheduled workflows:** weekly `main` build + issue on failure.
+
 - [ ] **PR template:** checklist (tests, docs, changelog snippet).
 
 ## Documentation & discoverability
 
 - [ ] **CHANGELOG.md** following Keep a Changelog; link from README and Releases.
 - [ ] **Architecture decision records (ADRs)** in `docs/adr/` for major choices.
+
 - [ ] **Auto-link** Doxygen HTML from README/Pages when `docs-api` artifact is published to a stable URL.
+
 - [ ] **Glossary:** `sigma_*` terms and “shard” vocabulary for new contributors.
 
 ## Developer experience
@@ -61,7 +70,10 @@ Structured suggestions beyond the numbered [FEATURE_ROADMAP_100.md](./FEATURE_RO
 | Goal | Action |
 |------|--------|
 | **Repository (source of truth)** | Edit **this file** in `docs/REPO_FUTURE_IMPROVEMENTS.md` and open a PR to [`SigmaOS`](https://github.com/AaryanSinghChauhan09/SigmaOS). |
+
 | **GitHub Wiki** | The wiki page [Future Improvements](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Future-Improvements) is generated from **`docs/wiki/Future-Improvements.md`**. After merging to `main`, run **Wiki sync** (push to `docs/wiki/**` triggers [`.github/workflows/wiki-sync.yml`](../.github/workflows/wiki-sync.yml) if `WIKI_SYNC_TOKEN` is set). |
+
 | **Local git** | `git add docs/REPO_FUTURE_IMPROVEMENTS.md docs/wiki/Future-Improvements.md` → `git commit` → `git push origin main` |
 
 This document is **not** automatically synced to the wiki full-text (to avoid duplication drift). The wiki holds a **summary + links**; detailed checklists live here in the repo.
+

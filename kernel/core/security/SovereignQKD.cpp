@@ -1,6 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h"
+#include "../../../include/sigma_types.h"
+#include "../../../include/SovereignLibC.h"
+
+extern "C" sigma_u64 cpu_rdtsc();
 
 /**
  * SigmaOS Sovereign QKD (Quantum Key Distribution)
@@ -34,8 +36,9 @@ public:
         
         // Pseudo-random quantum entropy
         for (sigma_size_t i = 0; i < size; i++) {
-            out_key_buffer[i] = (char)(sigma_get_tick() ^ (i * 0x7F));
+            out_key_buffer[i] = (char)(cpu_rdtsc() ^ (i * 0x7F));
         }
+
         
         this->m_active_keys++;
         sigma_printf("[QKD] New unhackable key injected into the lattice. Pool: %u\n", this->m_active_keys);

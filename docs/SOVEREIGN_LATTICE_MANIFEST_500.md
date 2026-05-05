@@ -3,20 +3,30 @@
 This manifest outlines the 500 individual features and functional shards that define the SigmaOS ecosystem, categorized into 50 thematic clusters.
 
 ## I. The Sovereign Kernel (Modular Lattice Core)
+
 *Organized into: /arch/x86_64, /runtime, /observability, /orchestration, /state, /security, /mem, /hal*
 
 1.  **Lattice-Aware Scheduler**: AI-Native predictive allocation.
+
 2.  **Sovereign GDT / IDT**: Standardized segments and exception landing zones (/arch).
+
 3.  **Bitmap Physical Memory Manager**: Single source of truth for page allocation (/mem).
+
 4.  **WASM-Native Runtime**: Universal Binary format for context-switch-free execution.
+
 5.  **Capability-Based Security**: Token-based access to silicon resources (No Root).
+
 6.  **Zero-Trust Microkernel**: All drivers run in User-Mode (Ring 3).
+
 7.  **Exokernel / SASOS**: Single Address Space for zero-cost communication.
+
 8.  **Persistent Memory FS (PMFS)**: RAM-speed storage for Instant-On booting.
+
 9.  **Deterministic Scheduling**: Hard Real-Time deadlines for robotics/audio.
 10. **Lattice IPC Bridge**: Low-latency zero-copy messaging bus.
 
 ## II. Morphic Zenith (UI & Graphics)
+
 11. **Vector-Only Compositor**: Perfect scaling from 4K to 16K.
 12. **Sub-Pixel Fluidity**: 240Hz+ refresh rate optimization.
 13. **AR-Ready Framebuffer**: Native stereoscopic overlay support.
@@ -29,6 +39,7 @@ This manifest outlines the 500 individual features and functional shards that de
 20. **Legacy Terminal Emulation**: Retro-Shard CRT mimicry.
 
 ## III. Aether & Networking (Connectivity)
+
 21. **Zero-Trust Networking Shard**: Per-packet session key encryption.
 22. **Mesh-Lattice Protocol**: P2P OS updates and shard sharing.
 23. **Protocol Ghosting**: HTTPS masking for bypass.
@@ -41,6 +52,7 @@ This manifest outlines the 500 individual features and functional shards that de
 30. **Air-Gap Mode**: Physical radio disablement shard.
 
 ## IV. Filesystem & Data (Sovereign FS)
+
 31. **Infinite Snapshotting**: Sub-second OS state restoration.
 32. **DNA-Inspired Compression**: Ultra-high-density storage.
 33. **Biometric Decryption**: Fingerprint/Iris-locked file shards.
@@ -53,6 +65,7 @@ This manifest outlines the 500 individual features and functional shards that de
 40. **Encrypted Metadata**: Hidden file names/dates from controllers.
 
 ## V. Developer & Sovereign Tools
+
 41. **Integrated Lattice IDE**: Bare-metal editor within the shell.
 42. **Live Shard Debugger**: Runtime inspection of C++ singletons.
 43. **AVX-512 Math Library**: Scientific computing shards.
@@ -65,6 +78,7 @@ This manifest outlines the 500 individual features and functional shards that de
 50. **Hardware Benchmarking Shard**: Silicon stress testing.
 
 ## VI - L. The Extended Lattice (Future Shards)
+
 - **Multimedia Shards (51–100)**: 8K Decoders, Spatial Audio Engines.
 - **Security & Red-Teaming (101–150)**: Port Scanners, Honeypots, Intrusion Wiping.
 - **AI Integration (151–200)**: On-device LLM Shards, Predictive Typing.
@@ -74,3 +88,4 @@ This manifest outlines the 500 individual features and functional shards that de
 - **Userland Productivity (351–400)**: Document Shards, Browser Engines.
 - **Legacy Support (401–450)**: x86 Emulation, BIOS Layers.
 - **The Zenith Layer (451–500)**: Custom Boot Anims, Amnesic Privacy Modes.
+

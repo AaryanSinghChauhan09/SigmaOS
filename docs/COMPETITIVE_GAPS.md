@@ -65,3 +65,4 @@ It complements [FEATURE_ROADMAP_100.md](./FEATURE_ROADMAP_100.md) and existing s
 ## Summary
 
 SigmaOS is **ambitious**; closing the gap with incumbents means **foundations first** (core OS behavior, security/update integrity, developer ergonomics, measured UX), then advanced features from the 100-item backlog as dependencies allow.
+

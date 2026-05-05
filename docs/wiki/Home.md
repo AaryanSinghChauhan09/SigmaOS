@@ -22,9 +22,11 @@ SigmaOS is an **experimental** operating-system project: a freestanding **C++ ke
 - [Repository](https://github.com/AaryanSinghChauhan09/SigmaOS)
 - [Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
 - [Zenith Desktop](Zenith-Desktop) (modules under `js/zenith/`)
+
 - [Repository layout](Repository-layout)
 - [Contributing](Contributing) (short conventions; full detail in Developer Guide)
 
 ## Bottom line
 
 Many advanced ideas (quantum-safe TLS everywhere, full IPv6 stack, MAC/RBAC across the board) are **roadmap** items. The project stays honest about gaps — see [Competitive-Gaps](Competitive-Gaps) (and `docs/COMPETITIVE_GAPS.md` in the repo) and [Roadmap](Roadmap). Use [Feature-Backlog-100](Feature-Backlog-100) with milestones and **define done** (tests + docs) per item.
+

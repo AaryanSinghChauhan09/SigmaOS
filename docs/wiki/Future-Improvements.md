@@ -8,6 +8,7 @@ This page is the **wiki-facing index** for long-term engineering and process wor
 
 - Kernel/platform (shard manifest, boot docs, SMP, freestanding audit)
 - Security & supply chain (threat model, signed releases, `SECURITY.md`)
+
 - Testing & CI (QEMU integration, coverage, scheduled builds)
 - Documentation (CHANGELOG, ADRs, glossary)
 - Developer experience (devcontainer, pre-commit, labels)
@@ -25,3 +26,4 @@ This page is the **wiki-facing index** for long-term engineering and process wor
 ## Sync to this wiki
 
 Merging changes under **`docs/wiki/`** to `main` triggers the **Wiki sync** workflow when the repository secret **`WIKI_SYNC_TOKEN`** is configured. See **`docs/wiki/README.md`** in the repo for PAT setup.
+

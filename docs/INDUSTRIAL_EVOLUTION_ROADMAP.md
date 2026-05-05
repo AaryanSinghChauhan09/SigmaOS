@@ -22,6 +22,7 @@ Implementing data persistence while maintaining amnesic security principles.
 Transitioning from `sigma_sh` to a high-fidelity "Neural UI" environment.
 
 - **POSIX-lite Compatibility**: Implement core syscalls to allow the porting of industrial tools like `vim` or `grep`.
+
 - **Morphic Zenith Graphics**: A framebuffer-driven graphical environment leveraging AVX-512 acceleration for high-speed window compositing.
 
 ## 4. Networking & Connectivity
@@ -89,5 +90,8 @@ Achieving the "Lattice Singularity" through distributed connectivity.
 Following the "Sovereign Silicon" philosophy, the immediate development focus is directed toward:
 
 1. **Lattice IPC Bridge**: Low-latency message bus for shard-to-shard comms.
+
 2. **WASM Interpreter Shard**: Integrating the core PSE engine into the scheduler.
+
 3. **Capability Vault**: Token-based access control for silicon resources.
+

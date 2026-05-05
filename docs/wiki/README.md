@@ -29,16 +29,21 @@ If the secret is **missing**, the workflow prints a notice and exits successfull
 ### Manual sync (fallback)
 
 ```bash
+
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS.wiki.git sigmaos-wiki
 cd sigmaos-wiki
 cp /path/to/SigmaOS/docs/wiki/*.md .
+
 # Do not copy README.md from docs/wiki unless you want a "README" wiki page
+
 rm -f README.md
 git add -A
 git commit -m "Sync wiki"
 git push
+
 ```
 
 ## Page names
 
 GitHub Wiki maps `Page-Name.md` → wiki URL `.../wiki/Page-Name`. This folder uses hyphenated names (e.g. `Getting-Started.md`).
+
