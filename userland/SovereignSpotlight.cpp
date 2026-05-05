@@ -3,7 +3,7 @@
 
 
 /**
- * S-SPOT: Sovereign Spotlight (v28.0 Zenith)
+ * S-SPOT: Sovereign Spotlight (v100.0 Zenith)
  * Fast, indexed search across the entire lattice.
  *
  * Design: OOP-isolated singleton — SovereignSpotlightEngine.
@@ -58,3 +58,4 @@ extern "C" void spotlight_search(const char* query) {
 extern "C" void spotlight_reindex() {
     SovereignSpotlightEngine::getInstance().reindexLattice();
 }
+

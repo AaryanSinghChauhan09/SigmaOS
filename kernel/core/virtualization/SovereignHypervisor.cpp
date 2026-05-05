@@ -4,7 +4,7 @@
 #include "sigma_hypervisor.h"
 
 /**
- * SigmaOS Sovereign Hypervisor Implementation (Zenith Edition - v28.0)
+ * SigmaOS Sovereign Hypervisor Implementation (Zenith Edition - v100.0)
  * Implements a Shard-Isolated Virtualization (SIV) Type-1 algorithm.
  * ZERO-DEPENDENCY: Direct VT-x/AMD-V hooks for silicon-native guests.
  * Competitor parity: KVM, Xen, ESXi, Hyper-V.
@@ -115,3 +115,4 @@ extern "C" void hyper_get_state(sigma_hypervisor_state_t* out_state) {
 extern "C" sigma_u64 hypervisor_get_exit_count() {
     return SigmaOS::Kernel::Virtualization::SovereignHyperEngine::getInstance().getExitCount();
 }
+

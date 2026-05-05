@@ -129,7 +129,7 @@ class SovereignTerminal extends ZenithComponent {
             },
             'help': () => this.write('AVAILABLE: theme, ls, cd, cat, ql, notify, shard, flush, stats, telemetry, set, get, vault, snapshot, tile, sandbox, session, top, prof, shortcuts, window, focus, audit, mem, plugin, profile, config, clear, version'),
             'clear': () => this.output.innerHTML = '',
-            'version': () => this.write('Σ SIGMAOS ZENITH v33.0.4-SINGULARITY'),
+            'version': () => this.write('Σ SIGMAOS ZENITH v100.0-SINGULARITY'),
             
             // Theme Integration
             'theme': (args) => {
@@ -182,7 +182,7 @@ class SovereignTerminal extends ZenithComponent {
                 this.write(`MEMORY USAGE: 144MB / 4G`);
             },
             'logs': () => {
-                this.write('Σ://LOGS> [BOOT] SOVEREIGN KERNEL v33.0.4 LOADED.');
+                this.write('Σ://LOGS> [BOOT] SOVEREIGN KERNEL v100.0 LOADED.');
                 this.write('Σ://LOGS> [AUTH] USER Ʃ_ZENITH AUTHENTICATED.');
                 this.write('Σ://LOGS> [LATTICE] 33 SUITES ONLINE.');
             },
@@ -288,3 +288,4 @@ class SovereignTerminal extends ZenithComponent {
 }
 
 window.SovereignTerminal = SovereignTerminal;
+

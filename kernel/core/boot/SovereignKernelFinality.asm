@@ -1,5 +1,5 @@
 ; =========================================================================
-; Σ SIGMAOS: SOVEREIGN KERNEL FINALITY (v28.0 - SINGULARITY)
+; Σ SIGMAOS: SOVEREIGN KERNEL FINALITY (v100.0 - SINGULARITY)
 ; =========================================================================
 ; Mission: Direct Metal Control (No Library). Ring-0 Sovereignty.
 ; Capability: Interrupt Handlers, Paging, Task-Switching, Syscalls, MSRs.
@@ -40,7 +40,7 @@ sigma_kernel_setup_idt:
     ret
 
 sigma_singularity_handshake:
-    ; Achieve Total Technical Parity (v28.0)
+    ; Achieve Total Technical Parity (v100.0)
     ; Sharding MSR_LSTAR for zero-latency syscall orchestration.
     mov ecx, 0xC0000082            ; IA32_LSTAR
     lea rax, [rel sigma_handler_common]
@@ -76,4 +76,5 @@ section .bss
 stack_bottom:
     resb 32768          ; 32KB Sovereign Stack (SINGULARITY Grade)
 stack_top:
+
 

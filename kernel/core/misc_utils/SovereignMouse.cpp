@@ -3,7 +3,7 @@
 #include "sigma_hal.h"
 
 /**
- * SigmaOS Sovereign USB Mouse Shard (v28.0 Zenith)
+ * SigmaOS Sovereign USB Mouse Shard (v100.0 Zenith)
  * Implements a HID Mouse Orchestration (HMO) algorithm.
  * ZERO-DEPENDENCY: Direct HID report parsing from S-USB.
  *
@@ -50,3 +50,4 @@ extern "C" void mouse_init() {
 extern "C" void mouse_handle_report(const sigma_u8* report) {
     SovereignMouseEngine::getInstance().handleReport(report);
 }
+

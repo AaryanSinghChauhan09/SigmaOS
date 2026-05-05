@@ -3,7 +3,7 @@
 #include "sigma_hal.h"
 
 /**
- * SigmaOS Sovereign Bluetooth Stack (v28.0 Zenith)
+ * SigmaOS Sovereign Bluetooth Stack (v100.0 Zenith)
  * Implements a Direct HCI Orchestration (DHO) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal silicon-native Bluetooth.
  *
@@ -60,3 +60,4 @@ extern "C" sigma_u32 bt_get_paired_count() {
 extern "C" const sigma_bt_config_t* bt_get_config() {
     return &SovereignBTEngine.config;
 }
+

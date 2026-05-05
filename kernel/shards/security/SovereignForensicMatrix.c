@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN FORENSIC MATRIX (v20.0 - PURE C11)
+ * Î£ SIGMAOS: SOVEREIGN FORENSIC MATRIX (v100.0 - PURE C11)
  * =========================================================================
  * Converted from C++ class/SigmaString to ISO C11 struct dispatch.
  * USP Absorbed: Kali (Metasploit/Burp), Volatility, FTK Imager.
@@ -97,7 +97,7 @@ static void forensic_audit_script(SovereignForensicMatrix* f, const char* script
 
 /* --- Full audit --- */
 static void forensic_audit(const SovereignForensicMatrix* f) {
-    sigma_printf("\n--- Î£ SOVEREIGN FORENSIC AUDIT (v20.0) ---\n");
+    sigma_printf("\n--- Î£ SOVEREIGN FORENSIC AUDIT (v100.0) ---\n");
     sigma_printf("| DMA Images     : %llu\n", f->dma_images);
     sigma_printf("| Memory Scans   : %llu\n", f->memory_scans);
     sigma_printf("| Audit Scripts  : %llu\n", f->audit_scripts);
@@ -121,3 +121,4 @@ int main(void) {
     sigma_printf("\n[SUCCESS]: Military-Grade Forensic Matrix Online.\n");
     return 0;
 }
+

@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * SIGMAOS: SOVEREIGN LIBC (v20.0 - PURE C11 ZERO-DEPENDENCY)
+ * SIGMAOS: SOVEREIGN LIBC (v100.0 - PURE C11 ZERO-DEPENDENCY)
  * =========================================================================
  */
 
@@ -50,6 +50,7 @@ void  sigma_strncat(char* dest, const char* src, sigma_size_t n);
 void  sigma_strcpy(char* dest, const char* src, sigma_size_t n);
 void  sigma_strncpy(char* dest, const char* src, sigma_size_t n);
 int   sigma_strcmp(const char* s1, const char* s2);
+char* sigma_strstr(const char* haystack, const char* needle);
 int   sigma_atoi(const char* s);
 
 void  sigma_print(const char* str);
@@ -64,6 +65,7 @@ void  sigma_log(const char* msg);
 void* sigma_secure_memset(void* s, int c, sigma_size_t n); // Prevents compiler optimization removals
 void  sigma_hardened_strcpy(char* dest, const char* src, sigma_size_t dest_size); // Bounds-checked strcpy
 int   sigma_hardened_strcmp(const char* s1, const char* s2);
+char* sigma_hardened_strstr(const char* haystack, const char* needle);
 int   sigma_hardened_strncmp(const char* s1, const char* s2, sigma_size_t n);
 
 /* =========================================================================
@@ -78,3 +80,4 @@ void  sigma_free(void* ptr);
 #endif
 
 #endif /* SOVEREIGN_LIBC_H */
+

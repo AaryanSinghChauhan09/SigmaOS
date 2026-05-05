@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN CORE UTILS (v20.0 - PURE C11)
+ * Î£ SIGMAOS: SOVEREIGN CORE UTILS (v100.0 - PURE C11)
  * =========================================================================
  * Converted from C++ class/namespace to ISO C11.
  * Utility: Bare-metal string ops, hex dump, process info, timestamps.
@@ -64,7 +64,7 @@ typedef struct SovereignCoreUtils {
 } SovereignCoreUtils;
 
 static void coreutils_init(SovereignCoreUtils* cu) {
-    cu->build_version = "v20.0-C11-SOVEREIGN";
+    cu->build_version = "v100.0-C11-SOVEREIGN";
     cu->uptime_ticks  = 0;
     cu->heap_used     = 0;
 }
@@ -107,3 +107,4 @@ int main(void) {
 
     return 0;
 }
+

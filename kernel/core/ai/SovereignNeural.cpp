@@ -4,7 +4,7 @@
 #include "sigma_neural.h"
 
 /**
- * SigmaOS Sovereign Neural Engine (v28.0 Zenith)
+ * SigmaOS Sovereign Neural Engine (v100.0 Zenith)
  * Implements Predictive Tensor Orchestration (PTO) for bare-metal AI acceleration.
  */
 
@@ -29,3 +29,4 @@ extern "C" void neural_report_status() {
                  SovereignNeuralEngine.inference_count, 
                  SovereignNeuralEngine.npu_active ? "ACTIVE" : "OFFLINE");
 }
+

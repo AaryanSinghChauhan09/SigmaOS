@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN LATTICE-PQC (v20.0 - PURE C11)
+ * Î£ SIGMAOS: SOVEREIGN LATTICE-PQC (v100.0 - PURE C11)
  * =========================================================================
  * Converted from C++ class/namespace/SigmaString to ISO C11 struct dispatch.
  * Mission: Neutralize classical and modular encryption standards.
@@ -77,7 +77,7 @@ static void pqc_init(SovereignLatticePQC* p) {
     p->quantum_shield_active = SIGMA_FALSE;
     p->encryptions          = 0;
     p->decryptions          = 0;
-    sigma_printf("[SECURITY-ZENITH]: Lattice-PQC Sentinel Online (v20.0). "
+    sigma_printf("[SECURITY-ZENITH]: Lattice-PQC Sentinel Online (v100.0). "
                  "Classical encryption is now non-relevant.\n");
 }
 
@@ -142,7 +142,7 @@ static void pqc_encrypt(SovereignLatticePQC* p,
 
 /* --- Audit (replaces C++ audit() method) --- */
 static void pqc_audit(const SovereignLatticePQC* p) {
-    sigma_printf("\n--- Î£ SOVEREIGN SECURITY AUDIT (v20.0) ---\n");
+    sigma_printf("\n--- Î£ SOVEREIGN SECURITY AUDIT (v100.0) ---\n");
     sigma_printf("| PQC Status     : %s\n",
                  p->quantum_shield_active ? "ACTIVE (SHIELDED)" : "IDLE");
     sigma_printf("| Lattice Dim n  : %u\n", PQC_DIM);
@@ -177,3 +177,4 @@ int main(void) {
     start_security_zenith();
     return 0;
 }
+

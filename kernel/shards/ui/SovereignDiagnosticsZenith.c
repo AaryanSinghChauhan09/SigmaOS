@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN DIAGNOSTICS ZENITH (v20.0 - PURE C11)
+ * Î£ SIGMAOS: SOVEREIGN DIAGNOSTICS ZENITH (v100.0 - PURE C11)
  * =========================================================================
  * Converted from C++ class/namespace to ISO C11 struct dispatch.
  * Mission: Absolute Self-Healing & Silicon Integrity Validation.
@@ -111,7 +111,7 @@ static void diag_extract_kernel_ring(SovereignDiagnosticsZenith* d) {
 
 /* --- Full audit (replaces C++ audit_all() method) --- */
 static void diag_audit_all(SovereignDiagnosticsZenith* d) {
-    sigma_print("\n--- Î£ SOVEREIGN HARDWARE DIAGNOSTIC AUDIT (v20.0) ---\n");
+    sigma_print("\n--- Î£ SOVEREIGN HARDWARE DIAGNOSTIC AUDIT (v100.0) ---\n");
     diag_probe_cpu(d);
     diag_probe_thermal(d);
     diag_extract_kernel_ring(d);
@@ -135,3 +135,4 @@ int main(void) {
     start_diagnostic_zenith();
     return 0;
 }
+

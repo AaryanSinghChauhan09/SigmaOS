@@ -2,7 +2,7 @@
 #include "sigma_hal.h"
 
 /**
- * SigmaOS Sovereign GPU Driver (v28.0 Zenith)
+ * SigmaOS Sovereign GPU Driver (v100.0 Zenith)
  * Zero-copy graphics acceleration and silicon-native compositing.
  *
  * Design: OOP-isolated singleton — SovereignGPU.
@@ -72,3 +72,4 @@ extern "C" void gpu_swap_buffers() {
 extern "C" void gpu_apply_motion_shader(void* shader_blob) {
     SovereignGPU::getInstance().applyMotionShader(shader_blob);
 }
+

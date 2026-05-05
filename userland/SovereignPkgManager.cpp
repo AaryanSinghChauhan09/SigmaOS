@@ -42,7 +42,7 @@ public:
     void listPackages() const {
         sigma_printf("[S-PKG] Installed Packages:\n");
         sigma_printf("  - sigma_core_utils (v1.0.0)\n");
-        sigma_printf("  - zenith_dashboard (v28.0)\n");
+        sigma_printf("  - zenith_dashboard (v100.0)\n");
     }
 
 private:
@@ -62,3 +62,4 @@ extern "C" bool spkg_install(const char* sab_file_path) {
 extern "C" void spkg_list() {
     SovereignPackageManager::getInstance().listPackages();
 }
+

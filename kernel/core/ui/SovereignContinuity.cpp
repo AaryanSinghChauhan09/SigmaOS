@@ -3,7 +3,7 @@
 #include "sigma_continuity.h"
 
 /**
- * SigmaOS Sovereign Continuity Engine (v28.0 Zenith)
+ * SigmaOS Sovereign Continuity Engine (v100.0 Zenith)
  * Handles seamless handoff between devices in the lattice.
  */
 
@@ -22,3 +22,4 @@ extern "C" void continuity_sync_state() {
     SovereignContinuityEngine.handoff_count++;
     sigma_log("[S-CONTINUITY] State synchronization COMPLETE.");
 }
+

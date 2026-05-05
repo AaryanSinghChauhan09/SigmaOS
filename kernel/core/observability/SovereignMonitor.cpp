@@ -1,5 +1,6 @@
+#include "
 #include "sigma_monitor.h"
-#include "SovereignLibC.h"
+#include "../../include/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -56,3 +57,4 @@ extern "C" void monitor_execute_ebpf(const void* bytecode, sigma_size_t size) {
 extern "C" void monitor_rebalance_lattice() {
     SigmaOS::Kernel::Observability::SovereignMonitor::getInstance().rebalanceLattice();
 }
+

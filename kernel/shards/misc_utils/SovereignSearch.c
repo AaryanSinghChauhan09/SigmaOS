@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN SEARCH (v20.0 - PURE C11)
+ * Î£ SIGMAOS: SOVEREIGN SEARCH (v100.0 - PURE C11)
  * =========================================================================
  * Converted from C++ class with broken SigmaString& refs to ISO C11.
  * USP Absorbed: DuckDuckGo (Tracker-Free), SearX (Meta-Search),
@@ -114,3 +114,4 @@ int main(void) {
     sigma_printf("\n[SUCCESS]: Military-Grade Privacy Search. Tracker-Free.\n");
     return 0;
 }
+

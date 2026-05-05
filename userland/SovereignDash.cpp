@@ -4,7 +4,7 @@
 #include "sigma_zenithui.h"
 
 /**
- * SigmaOS Sovereign Dashboard (v28.0 Zenith)
+ * SigmaOS Sovereign Dashboard (v100.0 Zenith)
  * Real-time silicon telemetry and shard health visualization.
  */
 
@@ -49,3 +49,4 @@ extern "C" void dash_refresh_telemetry() {
 extern "C" void dash_report_health() {
     SovereignDashEngine::getInstance().reportHealth();
 }
+

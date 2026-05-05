@@ -4,7 +4,7 @@
 #include "sigma_assistant.h"
 
 /**
- * SigmaOS Sovereign Assistant Implementation (v28.0 Zenith)
+ * SigmaOS Sovereign Assistant Implementation (v100.0 Zenith)
  * Implements an Intent-Driven Lattice Orchestration (IDLO) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal AI assistant.
  */
@@ -32,3 +32,4 @@ extern "C" void assistant_report_status() {
 extern "C" sigma_u32 assistant_get_query_count() {
     return SovereignAssistantEngine.query_count;
 }
+

@@ -1,7 +1,11 @@
 #ifndef SOVEREIGN_NEURAL_NEXUS_HPP
 #define SOVEREIGN_NEURAL_NEXUS_HPP
 
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
+
+namespace SigmaOS {
+namespace Kernel {
+namespace AI {
 
 class SovereignNeuralEngine {
 public:
@@ -16,11 +20,15 @@ public:
 private:
     SovereignNeuralEngine();
     bool probeNPUHardware();
-    bool npu_available;
-    sigma_u32 active_models;
-    bool initialized;
-    bool avx512_busy;
+    bool m_npu_available;
+    sigma_u32 m_active_models;
+    bool m_initialized;
+    bool m_avx512_busy;
 };
+
+} // namespace AI
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" {
     void neural_init();

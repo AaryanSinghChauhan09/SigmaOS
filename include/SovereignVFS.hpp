@@ -1,7 +1,11 @@
 #ifndef SOVEREIGN_VFS_HPP
 #define SOVEREIGN_VFS_HPP
 
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
+
+namespace SigmaOS {
+namespace Kernel {
+namespace FS {
 
 class SovereignDistributedVFS {
 public:
@@ -17,12 +21,16 @@ public:
 
 private:
     SovereignDistributedVFS();
-    char shard_nodes[8][32];
-    sigma_u32 active_shards;
-    sigma_u32 files_tracked;
-    sigma_u32 system_vector_clock;
-    sigma_u32 drift_correction_ms;
+    char m_shard_nodes[8][32];
+    sigma_u32 m_active_shards;
+    sigma_u32 m_files_tracked;
+    sigma_u32 m_system_vector_clock;
+    sigma_u32 m_drift_correction_ms;
 };
+
+} // namespace FS
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" {
     void vfs_init();

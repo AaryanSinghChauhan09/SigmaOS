@@ -3,7 +3,7 @@
 #include "sigma_hal.h"
 
 /**
- * SigmaOS Sovereign Silicon-Native Network Stack (Zenith v28.0)
+ * SigmaOS Sovereign Silicon-Native Network Stack (Zenith v100.0)
  * Implements a Zero-Buffer Packet Arbitration (ZBPA) algorithm.
  * ZERO-DEPENDENCY: Directly orchestrates hardware NICs.
  *
@@ -76,3 +76,4 @@ extern "C" void netstack_send_packet(const void* buffer, sigma_u32 size) {
 extern "C" sigma_u32 netstack_is_link_active() {
     return SovereignPacketArbiter::getInstance().isLinkActive();
 }
+

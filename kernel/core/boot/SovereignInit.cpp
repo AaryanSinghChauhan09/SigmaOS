@@ -1,5 +1,6 @@
 #include "SovereignLibC.h"
 #include "sigma_hal.h"
+#include "sigma_aisched.h"
 #include "SovereignNeuralNexus.hpp"
 #include "SovereignVFS.hpp"
 
@@ -50,6 +51,7 @@ public:
         
         sigma_printf("[INIT] ASI: Parallel Group Ignited. 600 Shards Active.\n");
     }
+
 
     void reportStatus() const {
         sigma_log("[INIT] S-Init Status: ALL SHARDS OPERATIONAL. Lattice reach: 100%.");

@@ -3,7 +3,7 @@
 #include "sigma_hal.h"
 
 /**
- * SigmaOS Sovereign Installer (S-Install) (v28.0 Zenith)
+ * SigmaOS Sovereign Installer (S-Install) (v100.0 Zenith)
  * Implements an Autonomous Bare-Metal Deployment (ABMD) algorithm.
  * ZERO-DEPENDENCY: No external shell or installation environment.
  *
@@ -59,3 +59,4 @@ extern "C" void install_execute() {
 extern "C" sigma_u32 install_get_progress() {
     return SovereignInstallerEngine::getInstance().getProgress();
 }
+

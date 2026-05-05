@@ -3,7 +3,7 @@
 #include "../../../include/sigma_types.h"
 
 /**
- * SigmaOS Sovereign Lua Scripting Engine (v28.0 Zenith)
+ * SigmaOS Sovereign Lua Scripting Engine (v100.0 Zenith)
  * Implements a Light-Weight Automation (LWA) algorithm.
  * ZERO-DEPENDENCY: Integrated for user personalization and assistant tasks.
  *
@@ -34,3 +34,4 @@ extern "C" void lua_execute_personalization(const char* script_shard) {
 extern "C" sigma_u32 lua_get_script_count() {
     return SovereignLuaEngine.scripts_loaded;
 }
+

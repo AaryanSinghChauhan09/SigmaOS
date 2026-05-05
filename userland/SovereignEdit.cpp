@@ -5,7 +5,7 @@
 #include "sigma_zenithui.h"
 
 /**
- * SigmaOS Sovereign Editor (v28.0 Zenith)
+ * SigmaOS Sovereign Editor (v100.0 Zenith)
  * A zero-dependency, bare-metal text orchestration shard.
  *
  * Design: OOP-isolated singleton — SovereignEditEngine.
@@ -45,3 +45,4 @@ extern "C" void edit_open_file(const char* path) {
 extern "C" void edit_save_file() {
     SovereignEditEngine::getInstance().saveFile();
 }
+

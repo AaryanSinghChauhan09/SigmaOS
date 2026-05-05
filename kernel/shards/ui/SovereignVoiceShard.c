@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN VOICE SHARD (v20.0 - PURE C11)
+ * Î£ SIGMAOS: SOVEREIGN VOICE SHARD (v100.0 - PURE C11)
  * =========================================================================
  * Converted from C++ abstract interfaces/std::thread/windows.h to C11.
  * USP: 100% Offline transcription with global HID injection.
@@ -134,7 +134,7 @@ static void voice_init(SovereignVoiceShard* v) {
     hid_init(&v->hid, SIGMA_TRUE);
     v->wake_active       = SIGMA_FALSE;
     v->events_processed  = 0;
-    sigma_printf("[VOICE/KERNEL]: Sovereign Voice Shard Online (v20.0). Zero-3rdParty.\n");
+    sigma_printf("[VOICE/KERNEL]: Sovereign Voice Shard Online (v100.0). Zero-3rdParty.\n");
 }
 
 static void voice_activate_wake_key(SovereignVoiceShard* v) {
@@ -158,7 +158,7 @@ static void voice_process_event(SovereignVoiceShard* v) {
 }
 
 static void voice_audit(const SovereignVoiceShard* v) {
-    sigma_printf("\n--- Î£ SOVEREIGN VOICE AUDIT (v20.0) ---\n");
+    sigma_printf("\n--- Î£ SOVEREIGN VOICE AUDIT (v100.0) ---\n");
     sigma_printf("| Events Processed : %llu\n", v->events_processed);
     sigma_printf("| Frames Transcribed: %llu\n", v->engine.frames_processed);
     sigma_printf("| Chars Injected   : %llu\n", v->hid.chars_injected);
@@ -183,3 +183,4 @@ int main(void) {
 
     return 0;
 }
+

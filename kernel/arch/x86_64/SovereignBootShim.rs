@@ -2,7 +2,7 @@
 #![no_main]
 
 /**
- * SigmaOS Sovereign Bootloader Shim (v20.0)
+ * SigmaOS Sovereign Bootloader Shim (v100.0)
  * Language: Rust (Safety, Bare-Metal Initialization)
  * Purpose: UEFI/BIOS handoff to the Sovereign Lattice Core.
  */
@@ -21,3 +21,4 @@ pub extern "C" fn _start() -> ! {
 fn panic(_info: &PanicInfo) -> ! {
     loop {}
 }
+

@@ -4,7 +4,7 @@
 #include "sigma_identity.h"
 
 /**
- * SigmaOS Sovereign Identity Engine (v28.0 Zenith)
+ * SigmaOS Sovereign Identity Engine (v100.0 Zenith)
  * Handles Decentralized Identity (DID) and PQC-hardened verification.
  */
 
@@ -28,3 +28,4 @@ extern "C" void identity_verify_shard(const char* shard_id) {
 extern "C" void identity_report_status() {
     sigma_printf("[S-IDENTITY] Total Shards Verified: %u\n", SovereignIdentityEngine.verified_shards);
 }
+

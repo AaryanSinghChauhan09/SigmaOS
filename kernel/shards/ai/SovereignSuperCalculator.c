@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN SUPER CALCULATOR (v20.0 - PURE C11)
+ * Î£ SIGMAOS: SOVEREIGN SUPER CALCULATOR (v100.0 - PURE C11)
  * =========================================================================
  * Converted from C++ class/namespace/opcode-casts to ISO C11.
  * Mission: Absolute Math Sovereignty. Neutralizes all specialized calculators.
@@ -150,7 +150,7 @@ static sigma_f64 calc_compound(SovereignSuperCalculator* c,
 
 /* --- Audit --- */
 static void calc_audit(const SovereignSuperCalculator* c) {
-    sigma_printf("\n--- Î£ SOVEREIGN CALCULATOR AUDIT (v20.0) ---\n");
+    sigma_printf("\n--- Î£ SOVEREIGN CALCULATOR AUDIT (v100.0) ---\n");
     sigma_printf("| Operations     : %llu\n", c->operations);
     sigma_printf("| Last Result    : %f\n",   c->last_result);
     sigma_printf("| FPU Backend    : x87 (fsin/fcos/fsqrt/fmul native)\n");
@@ -180,3 +180,4 @@ int main(void) {
     start_calc_zenith();
     return 0;
 }
+

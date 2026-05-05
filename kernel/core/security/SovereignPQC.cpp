@@ -1,6 +1,6 @@
 #include "sigma_pqc.h"
 #include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../include/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -71,3 +71,4 @@ extern "C" sigma_u64 pqc_get_signature_count() {
 extern "C" void pqc_refresh_lattice() {
     SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().refreshLattice();
 }
+
