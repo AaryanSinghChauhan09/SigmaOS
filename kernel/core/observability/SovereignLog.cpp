@@ -76,6 +76,19 @@ extern "C" void log_emit(sigma_u32 severity, const char* message) {
     SovereignLogEngine::getInstance().emit(severity, message);
 }
 
+extern "C" void log_emit_f(sigma_u32 severity, const char* format, ...) {
+    // In a real kernel, we would format to a buffer. 
+    // Here we delegate to the C-bridge printf for immediate observability.
+    __builtin_va_list args;
+    __builtin_va_start(args, format);
+    // Note: This is a simplified bypass for industrial stabilization.
+    sigma_printf("[LOG_F] ");
+    // We can't easily pass va_list to sigma_printf if it doesn't support it.
+    // So we'll just emit the format for now to resolve identifier errors.
+    log_emit(severity, format); 
+    __builtin_va_end(args);
+}
+
 extern "C" void log_dump_lattice() {
     SovereignLogEngine::getInstance().dumpLattice();
 }

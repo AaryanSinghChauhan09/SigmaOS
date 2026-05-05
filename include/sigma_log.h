@@ -30,6 +30,7 @@ typedef struct {
 /* --- Log Primitives --- */
 void      log_init(void);
 void      log_emit(sigma_u32 severity, const char* message);
+void      log_emit_f(sigma_u32 severity, const char* format, ...);
 void      log_dump_lattice(void);
 sigma_u64 log_get_total_emitted(void);
 

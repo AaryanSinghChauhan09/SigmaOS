@@ -14,9 +14,9 @@ The GitHub Wiki uses a specific slug format. All relative links must point to th
 
 1. Navigate to the `Home` page of the Wiki.
 
-1. Update the Sidebar and Table of Contents to use the Wiki slug format (no extension, no directory prefix).
+2. Update the Sidebar and Table of Contents to use the Wiki slug format (no extension, no directory prefix).
 
-1. Ensure the following pages are populated with content from the `docs/` directory in the main repo.
+3. Ensure the following pages are populated with content from the `docs/` directory in the main repo.
 
 ## 📄 Page Population Matrix
 

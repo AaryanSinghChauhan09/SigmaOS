@@ -14,7 +14,7 @@ node server.js
 # Open http://localhost:5000
 
 `
-Node.js is only used for the static file server. No 
+Node.js is only used for the static file server. No
 pm install or compilation is required.
 
 ## Option C — GitHub Pages (Cloud)

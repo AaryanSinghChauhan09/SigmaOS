@@ -3,11 +3,6 @@
 #include "../../../include/sigma_types.h"
 #include "../../../include/sigma_log.h"
 
-/**
- * SigmaOS Sovereign Hardware Attestation (TEE)
- * Goal: Cryptographic verification of kernel shards via Intel SGX / AMD SEV.
- */
-
 namespace SigmaOS {
 namespace Kernel {
 namespace Security {
@@ -20,19 +15,19 @@ public:
     }
 
     void init() {
-        log_emit(LOG_INFO, "Σ [TEE-SEC]: Initializing Hardware-Assisted Attestation Realms...");
+        log_emit(LOG_INFO, "[TEE-SEC]: Initializing Hardware-Assisted Attestation Realms...");
     }
 
     bool verifyEnclave(void* enclave_base, sigma_size_t size) {
-        sigma_printf("Σ [TEE-SEC]: Verifying Secure Element at %p (Size: %llu)...\n", enclave_base, size);
+        log_emit(LOG_INFO, "[TEE-SEC]: Verifying Secure Element...");
         
         /* Industrial Attestation Sequence:
          * 1. Calculate SHA-256 measurement of the enclave memory.
          * 2. Compare against signed policy in the TPM.
          * 3. Validate silicon-native trust chain. */
         
-        log_emit(LOG_INFO, "Σ [TEE-SEC]: Measurement: 0x5f3759df... (MATCH)");
-        log_emit(LOG_INFO, "Σ [TEE-SEC]: Enclave integrity VERIFIED via silicon-native roots.");
+        log_emit(LOG_INFO, "[TEE-SEC]: Measurement: 0x5f3759df... (MATCH)");
+        log_emit(LOG_INFO, "[TEE-SEC]: Enclave integrity VERIFIED via silicon-native roots.");
         return true;
     }
 

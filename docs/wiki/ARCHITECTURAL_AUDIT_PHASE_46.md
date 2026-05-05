@@ -9,7 +9,7 @@ This document provides an eleventh-round audit of the SigmaOS Sovereign Lattice,
 - **Observation**: The `kernel/core/virtualization` and `kernel/core/container` directories contain files (`hypervisor.cpp`, `sovereign_container.cpp`) that do not adhere to the strict `Sovereign<Name>.cpp` PascalCase paradigm. Furthermore, their logic overlaps with `SovereignHypervisor.cpp`.
 
 - **Risk**: Fragmented file naming breaks the CI/CD scripts and prevents the build system from natively linking all core services.
-- **Improvement**: Delete the non-compliant `.cpp` and `.hpp` files in virtualization and container. 
+- **Improvement**: Delete the non-compliant `.cpp` and `.hpp` files in virtualization and container.
 
 ### 1.2 Cloud Telemetry Bloat
 

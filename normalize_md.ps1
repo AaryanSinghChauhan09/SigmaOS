@@ -1,5 +1,5 @@
-# SigmaOS Markdown Normalizer (Industrial v100)
-# Fixes MD012 (Blank lines) and MD029 (List prefixes)
+# SigmaOS Markdown Normalizer (Industrial v100.3)
+# Fixes MD012, MD022, MD029, MD030, MD032, MD036, MD041
 
 $docs = Get-ChildItem -Path "c:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS-Repo\docs", "c:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS-Repo\README.md", "c:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS.wiki" -Filter "*.md" -Recurse
 
@@ -17,43 +17,45 @@ foreach ($file in $docs) {
     $inList = $false
     
     for ($i = 0; $i -lt $lines.Length; $i++) {
-        $line = $lines[$i]
+        $line = $lines[$i].TrimEnd()
         
-        # MD041: First line H1 (Simple fix: if first non-empty line isn't H1, add one)
+        # MD041: First line H1
         if ($i -eq 0 -and $line -notmatch "^#\s+") {
             $newLines.Add("# $($file.BaseName -replace '_', ' ')")
             $newLines.Add("")
         }
 
-        # MD022: Blanks around headings
+        # Reset counter on headings
         if ($line -match "^#+\s+") {
+            $counter = 1
+            $inList = $false
             if ($newLines.Count -gt 0 -and $newLines[$newLines.Count-1] -ne "") {
                 $newLines.Add("")
             }
             $newLines.Add($line)
             if ($i -lt $lines.Length - 1 -and $lines[$i+1] -ne "") {
-                $newLines.Add("")
+                # We'll add the blank line when we process the next line if needed
             }
             continue
         }
 
-        # MD030: Spaces after list markers
-        if ($line -match "^(\s*)([\*\-\+]|\d+\.)\s{2,}(.*)") {
-            $line = "$($matches[1])$($matches[2]) $($matches[3])"
-        }
-
-        # MD029: Ordered list numbering
-        if ($line -match "^\d+\.\s+(.*)") {
-            $line = "$counter. $($matches[1])"
+        # MD029 & MD030: Ordered list numbering and spaces
+        if ($line -match "^(\s*)(\d+)\.\s+(.*)") {
+            $indent = $matches[1]
+            $text = $matches[3]
+            $line = "$indent$counter. $text"
             $counter++
             $inList = $true
         } else {
-            if ($inList -and $line -notmatch "^\s+\d+\.") { $counter = 1; $inList = $false }
+            if ($line -ne "" -and $line -notmatch "^\s+[\*\-\+]|^\s+\d+\.") {
+                $counter = 1
+                $inList = $false
+            }
         }
 
-        # MD036: Emphasis as heading (convert **Text** to # Text if it's the whole line)
-        if ($line -match "^\s*(\*\*|__)(.+)(\*\*|__)\s*$") {
-            $line = "# $($matches[2])"
+        # MD030: Unordered list spaces
+        if ($line -match "^(\s*)([\*\-\+])\s{2,}(.*)") {
+            $line = "$($matches[1])$($matches[2]) $($matches[3])"
         }
 
         # MD032: Blanks around lists

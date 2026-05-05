@@ -72,7 +72,7 @@ For enterprise-grade cloud hosting:
 
 1. Initialize the **Sovereign Cloud Orchestrator** on your master node.
 
-1. Enable **Global Workload Balancing** to ensure 100% lattice parity across AWS, GCP, and Azure.
+2. Enable **Global Workload Balancing** to ensure 100% lattice parity across AWS, GCP, and Azure.
 
 ### 3. Network Ignition (PXE)
 
