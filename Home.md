@@ -69,3 +69,4 @@ SigmaOS is a browser-native simulation. To run it locally:
 ---
 
 *Sovereignty is Absolute. The Work continues.*
+
