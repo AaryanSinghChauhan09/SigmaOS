@@ -58,3 +58,4 @@ extern "C" void market_browse(const char* cat) {
 extern "C" bool market_download(const char* id) {
     return SigmaOS::Kernel::Industrial::SovereignOrbMarketplace::getInstance().downloadOrb(id);
 }
+

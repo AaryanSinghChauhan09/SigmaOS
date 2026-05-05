@@ -63,3 +63,4 @@ extern "C" void sched_enqueue(sigma_u32 thread_id, sigma_u32 priority) {
 extern "C" sigma_u32 sched_predict_next() {
     return SovereignScheduler::getInstance().predictNextThread();
 }
+

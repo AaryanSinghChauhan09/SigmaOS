@@ -40,3 +40,4 @@ extern "C" void shortcuts_init() {
 extern "C" void shortcuts_suggest(const char* context, const char* suggestion) {
     SovereignShortcutsEngine::getInstance().pushContextShortcut(context, suggestion);
 }
+

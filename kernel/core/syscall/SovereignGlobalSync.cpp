@@ -90,3 +90,4 @@ extern "C" void sync_reconcile_all() {
 extern "C" const sigma_sync_state_t* sync_get_state() {
     return SovereignSyncEngine::getInstance().getState();
 }
+

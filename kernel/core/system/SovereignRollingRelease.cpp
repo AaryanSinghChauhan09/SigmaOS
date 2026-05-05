@@ -58,3 +58,4 @@ extern "C" void rolling_release_init() {
 extern "C" void rolling_sync() {
     SigmaOS::Kernel::System::SovereignRollingRelease::getInstance().syncBleedingEdge();
 }
+

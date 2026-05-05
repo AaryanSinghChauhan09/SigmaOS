@@ -39,3 +39,4 @@ extern "C" void observe_trigger_probe(uint32_t probe_id) {
                      probe_id, active_probes[probe_id - 1].target_symbol);
     }
 }
+

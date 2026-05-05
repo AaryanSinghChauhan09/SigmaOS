@@ -39,3 +39,4 @@ extern "C" void hal_init() {
 extern "C" void hal_probe() {
     SigmaOS::Kernel::HAL::SovereignHAL::getInstance().probeBus();
 }
+

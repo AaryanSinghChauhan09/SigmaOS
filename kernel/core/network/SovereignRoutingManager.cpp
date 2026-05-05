@@ -58,3 +58,4 @@ extern "C" void routing_init() {
 extern "C" void routing_update(const char* dest, const char* next) {
     SigmaOS::Kernel::Network::SovereignRoutingManager::getInstance().updateRoute(dest, next);
 }
+

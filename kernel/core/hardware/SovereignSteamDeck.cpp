@@ -58,3 +58,4 @@ extern "C" void gaming_perf_init() {
 extern "C" void gaming_perf_optimize() {
     SigmaOS::Kernel::Hardware::SovereignGamingPerformance::getInstance().optimizeSession();
 }
+

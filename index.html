@@ -101,6 +101,8 @@
     <div class="command-item" onclick="launchApp('Utility Nexus')"><span>Utility Nexus</span><kbd>Utils</kbd></div>
     <div class="command-item" onclick="launchApp('Markup Forge')"><span>Markup Forge</span><kbd>MD</kbd></div>
     <div class="command-item" onclick="launchApp('Marketplace')"><span>Marketplace</span><kbd>Store</kbd></div>
+    <div class="command-item" onclick="launchApp('Data Forge')"><span>Data Forge</span><kbd>Data</kbd></div>
+    <div class="command-item" onclick="launchApp('Lattice Monitor')"><span>Lattice Monitor</span><kbd>Sys</kbd></div>
     <div class="command-item" onclick="launchApp('Lattice Settings')"><span>Lattice Settings</span><kbd>Set</kbd></div>
     <div class="command-item" onclick="setTheme('cyan')"><span>Theme: Neon Cyan</span><kbd>Th+1</kbd></div>
     <div class="command-item" onclick="setTheme('gold')"><span>Theme: Solar Gold</span><kbd>Th+2</kbd></div>
@@ -840,6 +842,26 @@ https://chatgpt.com/?q={{prompt}}</textarea>
         </div>
     </div>
 
+    <!-- Data Forge Window -->
+    <div class="window hidden-window" id="data-forge-win">
+        <div class="window-header">
+            <div class="window-title">📊 Data Forge v1.0</div>
+            <div class="window-controls">
+                <div class="win-btn minimize" onclick="minimizeWindow('data-forge-win')"></div>
+                <div class="win-btn close" onclick="closeWindow('data-forge-win')"></div>
+            </div>
+        </div>
+        <div class="window-content">
+            <div class="forge-container">
+                <textarea id="data-forge-input" class="forge-area" placeholder="Enter raw data for processing..."></textarea>
+                <div class="forge-actions">
+                    <button class="util-btn" onclick="processData()">Forge Structure</button>
+                </div>
+                <div id="data-forge-output" class="forge-area"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Markup Forge Window -->
     <div class="window" id="markup-forge-win">
         <div class="window-header">
@@ -1090,7 +1112,8 @@ https://chatgpt.com/?q={{prompt}}</textarea>
         <div class="task-icon active" onclick="toggleStart()" title="Start">Σ</div>
         <div class="task-icon" onclick="launchApp('File Manager')" title="Files">📂</div>
         <div class="task-icon" onclick="launchApp('Sigma Browser')" title="Browser">🌐</div>
-        <div class="task-icon" onclick="launchApp('AI Assistant')" title="AI">🧠</div>
+        <div class="app-icon" onclick="launchApp('Data Forge')" title="Data Forge">📊</div>
+        <div class="app-icon" onclick="launchApp('AI Assistant')" title="AI Assistant">🤖</div>
         <div class="task-icon" onclick="launchApp('Lattice Settings')" title="Settings">🖥️</div>
         <div class="task-icon" onclick="launchApp('Markup Forge')" title="Markup Forge">📄</div>
         <div class="task-icon" onclick="launchApp('Utility Nexus')" title="Utility Nexus">🛠️</div>

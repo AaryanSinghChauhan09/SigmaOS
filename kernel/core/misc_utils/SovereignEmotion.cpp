@@ -51,3 +51,4 @@ extern "C" void emotion_update_state(sigma_emotion_state_t new_state) {
 extern "C" sigma_emotion_state_t emotion_get_current_state() {
     return SovereignEmotionManager.current_state;
 }
+

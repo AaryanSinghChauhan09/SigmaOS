@@ -87,3 +87,4 @@ extern "C" void pmm_compact_shard() {
 extern "C" sigma_u64 pmm_get_used_shard() {
     return SigmaOS::Kernel::Memory::SovereignPMM::getInstance().getUsedMemory();
 }
+

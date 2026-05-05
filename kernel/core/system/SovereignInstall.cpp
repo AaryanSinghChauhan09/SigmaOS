@@ -60,3 +60,4 @@ extern "C" sigma_u32 install_get_progress() {
     return SovereignInstallerEngine::getInstance().getProgress();
 }
 
+

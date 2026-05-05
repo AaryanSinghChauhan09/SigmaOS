@@ -104,3 +104,4 @@ extern "C" void recover_trigger_healing(uint32_t shard_id) {
 extern "C" sigma_recovery_state_t recover_get_lattice_state() {
     return SovereignRecover::getInstance().getLatticeState();
 }
+

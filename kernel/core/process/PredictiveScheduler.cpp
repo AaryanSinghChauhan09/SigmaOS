@@ -59,3 +59,4 @@ extern "C" void predict_sched_init() {
 extern "C" void predict_sched_dispatch(const char* id, sigma_u32 prio) {
     SigmaOS::Kernel::Scheduling::PredictiveScheduler::getInstance().scheduleShard(id, prio);
 }
+

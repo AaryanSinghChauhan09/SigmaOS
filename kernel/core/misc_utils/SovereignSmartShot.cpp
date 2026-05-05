@@ -40,3 +40,4 @@ extern "C" void smartshot_capture_fullscreen() {
     sigma_log("[SMARTSHOT] CCA: Initiating fullscreen framebuffer capture...");
     smartshot_capture_region(0, 0, 1920, 1080);
 }
+

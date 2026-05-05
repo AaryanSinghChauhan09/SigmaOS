@@ -31,3 +31,4 @@ void SovereignKernelMain::ignite() {
 extern "C" void sigma_kernel_main() {
     SigmaOS::Kernel::System::SovereignKernelMain::getInstance().ignite();
 }
+

@@ -59,3 +59,4 @@ extern "C" void identity_init() {
 extern "C" bool identity_verify(const char* id, sigma_u32 mask) {
     return SigmaOS::Kernel::Security::SovereignIdentityManager::getInstance().verifyAccess(id, mask);
 }
+

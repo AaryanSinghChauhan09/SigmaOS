@@ -58,3 +58,4 @@ extern "C" void incognito_init() {
 extern "C" void incognito_launch(const char* shard) {
     SigmaOS::Kernel::Security::SovereignAmnesicIncognito::getInstance().launchUntraceableShard(shard);
 }
+

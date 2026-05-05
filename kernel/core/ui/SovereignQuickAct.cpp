@@ -39,3 +39,4 @@ extern "C" void quickact_process_input(const char* user_input) {
 extern "C" void quickact_dismiss() {
     sigma_log("[QUICKACT] UIR: Quick Actions Bar dismissed.");
 }
+

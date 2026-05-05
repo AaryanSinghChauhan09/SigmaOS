@@ -76,3 +76,4 @@ extern "C" bool ipc_receive_optimized(sigma_ipc_msg_t* out_msg) {
 extern "C" sigma_u64 ipc_get_dispatched_count() {
     return SigmaOS::Kernel::IPC::SovereignIPCManager::getInstance().getDispatchedCount();
 }
+

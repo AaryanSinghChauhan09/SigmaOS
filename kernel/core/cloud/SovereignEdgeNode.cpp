@@ -58,3 +58,4 @@ extern "C" void edge_node_init() {
 extern "C" void edge_deploy(const char* workload) {
     SigmaOS::Kernel::Cloud::SovereignEdgeNode::getInstance().deployWorkload(workload);
 }
+

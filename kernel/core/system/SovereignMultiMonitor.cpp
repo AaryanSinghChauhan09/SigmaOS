@@ -69,3 +69,4 @@ extern "C" void multimon_init() { SovereignMultiMonitorEngine::getInstance().ini
 extern "C" sigma_u32 multimon_add(const char* conn, sigma_u32 w, sigma_u32 h, sigma_u32 hz) { return SovereignMultiMonitorEngine::getInstance().addDisplay(conn, w, h, hz); }
 extern "C" void multimon_arrange(sigma_u32 primary, const char* layout) { SovereignMultiMonitorEngine::getInstance().setDisplayArrangement(primary, layout); }
 extern "C" void multimon_mirror(sigma_u32 src, sigma_u32 dst) { SovereignMultiMonitorEngine::getInstance().mirrorDisplays(src, dst); }
+

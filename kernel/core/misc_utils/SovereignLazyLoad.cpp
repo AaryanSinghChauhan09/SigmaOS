@@ -52,3 +52,4 @@ extern "C" void lazyload_trigger_event(sigma_trigger_type_t trigger, uint32_t co
     
     sigma_log("[LAZYLOAD] DSI: Services ignited. Routing traffic...");
 }
+

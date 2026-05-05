@@ -56,3 +56,4 @@ extern "C" void qkd_init() {
 extern "C" void qkd_handshake(const char* node) {
     SigmaOS::Kernel::Security::SovereignQKDManager::getInstance().performHandshake(node);
 }
+

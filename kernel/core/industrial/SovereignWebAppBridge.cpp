@@ -60,3 +60,4 @@ extern "C" void webapp_bridge_init() {
 extern "C" void webapp_bridge_inject(const char* name, const char* url) {
     SigmaOS::Kernel::Industrial::SovereignWebAppBridge::getInstance().injectWebApp(name, url);
 }
+

@@ -58,3 +58,4 @@ extern "C" void paging_map(void* virtual_addr, void* physical_addr, sigma_u32 fl
 extern "C" void paging_prefetch() {
     SovereignPagingEngine::getInstance().predictAndPrefetch();
 }
+

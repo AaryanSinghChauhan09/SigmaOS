@@ -66,3 +66,4 @@ extern "C" void gpu_register(const char* vendor_id, sigma_u32 vram_mb) {
 extern "C" bool gpu_dispatch(const char* workload_type) {
     return SovereignGPUEngine::getInstance().dispatchComputeKernel(workload_type);
 }
+

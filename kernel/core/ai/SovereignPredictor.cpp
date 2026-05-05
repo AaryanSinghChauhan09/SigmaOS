@@ -39,3 +39,4 @@ private:
 extern "C" void predictor_init() {
     SigmaOS::Kernel::AI::SovereignPredictor::getInstance().init();
 }
+

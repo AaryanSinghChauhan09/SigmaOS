@@ -40,3 +40,4 @@ extern "C" void transpiler_cross_transpile(sigma_u32 target_arch) {
     sigma_log("[TRANSPILER] UMSM: Shard logic successfully decoupled from physical silicon.");
 }
 
+

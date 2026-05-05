@@ -60,3 +60,4 @@ extern "C" void widgets_spawn(const char* widget_type, sigma_u32 x, sigma_u32 y)
 extern "C" void widgets_interact(sigma_u32 id, const char* interaction) {
     SovereignWidgetEngine::getInstance().interactWidget(id, interaction);
 }
+

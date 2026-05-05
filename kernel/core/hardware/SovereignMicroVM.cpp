@@ -47,3 +47,4 @@ extern "C" void microvm_terminate(uint32_t vm_id) {
         sigma_printf("[MICROVM] HBC: Terminating MicroVM %d and flushing EPT mappings.\n", vm_id);
     }
 }
+

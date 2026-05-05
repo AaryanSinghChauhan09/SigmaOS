@@ -58,3 +58,4 @@ extern "C" sigma_u32 audio_open_stream(const char* app, sigma_u32 channels) {
 extern "C" void audio_close_stream(sigma_u32 id) {
     SovereignAudioEngine::getInstance().closeStream(id);
 }
+

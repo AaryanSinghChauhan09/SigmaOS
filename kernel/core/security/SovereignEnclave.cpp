@@ -60,3 +60,4 @@ extern "C" void* enclave_create(sigma_size_t size) {
 extern "C" void enclave_enter(void* ptr) {
     SigmaOS::Kernel::Security::SovereignEnclaveManager::getInstance().enterEnclave(ptr);
 }
+

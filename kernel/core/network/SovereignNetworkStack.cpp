@@ -55,3 +55,4 @@ extern "C" void netstack_init() {
 extern "C" void netstack_receive(void* pkt, sigma_usize sz) {
     SigmaOS::Kernel::Network::SovereignNetworkStack::getInstance().handlePacket(pkt, sz);
 }
+

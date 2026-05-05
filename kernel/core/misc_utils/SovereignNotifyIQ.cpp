@@ -33,3 +33,4 @@ extern "C" void notifyiq_push(const char* source, const char* message, sigma_not
 extern "C" void notifyiq_deliver_batch() {
     sigma_log("[NOTIFYIQ] APT: Delivering consolidated notification summary to Universal UI.");
 }
+

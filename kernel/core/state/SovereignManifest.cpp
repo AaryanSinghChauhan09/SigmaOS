@@ -47,3 +47,4 @@ extern "C" sigma_shard_config_t* manifest_get_config(uint32_t shard_id) {
     if (shard_id >= 600) return SIGMA_NULL;
     return &active_lattice[shard_id];
 }
+

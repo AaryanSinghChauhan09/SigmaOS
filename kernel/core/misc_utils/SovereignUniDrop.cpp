@@ -45,3 +45,4 @@ extern "C" bool unidrop_commit_drop(uint32_t target_app_id) {
     active_drag_payload = nullptr;
     return true;
 }
+

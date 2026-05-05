@@ -27,3 +27,4 @@ void SovereignFirmwareNexus::Audit() {
 
 } // namespace Kernel
 } // namespace SigmaOS
+

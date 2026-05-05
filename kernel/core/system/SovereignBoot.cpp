@@ -70,3 +70,4 @@ extern "C" sigma_boot_stage_t boot_get_current_stage() {
 extern "C" sigma_u32 boot_get_ignited_count() {
     return SovereignBootEngine::getInstance().getIgnitedCount();
 }
+

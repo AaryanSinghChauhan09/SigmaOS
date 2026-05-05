@@ -64,3 +64,4 @@ extern "C" void iot_init() { SovereignIoTEngine::getInstance().init(); }
 extern "C" sigma_u32 iot_register_device(const char* type, sigma_u32 id) { return SovereignIoTEngine::getInstance().registerDevice(type, id); }
 extern "C" void iot_publish_telemetry(sigma_u32 id, sigma_u32 val, sigma_u32 tick) { SovereignIoTEngine::getInstance().publishTelemetry(id, val, tick); }
 extern "C" void iot_push_ota(sigma_u32 id, const char* fw) { SovereignIoTEngine::getInstance().pushFirmwareOTA(id, fw); }
+

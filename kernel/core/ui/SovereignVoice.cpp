@@ -29,3 +29,4 @@ extern "C" void voice_process_audio_stream(const void* audio_buffer, uint32_t si
 extern "C" void voice_execute_intent(const char* intent) {
     sigma_printf("[VOICE] NLI: Executing user intent '%s' with zero latency.\n", intent);
 }
+

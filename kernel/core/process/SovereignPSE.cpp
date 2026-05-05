@@ -74,3 +74,4 @@ extern "C" sigma_u32 pse_execute_wasm(const void* bytecode, sigma_size_t size) {
 extern "C" void pse_terminate_wasm(sigma_u32 thread_id) {
     SigmaOS::Kernel::Process::SovereignPSEEngine::getInstance().terminateWasm(thread_id);
 }
+

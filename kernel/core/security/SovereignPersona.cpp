@@ -58,3 +58,4 @@ extern "C" void persona_automate_workflow(uint32_t trigger_id) {
     
     sigma_log("[PERSONA] HHA: No high-confidence automation found for this trigger.");
 }
+

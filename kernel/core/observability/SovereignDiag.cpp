@@ -1,6 +1,6 @@
-#include "../../include/sigma_types.h"
-#include "../../include/SovereignLibC.h"
-#include "../../include/sigma_hal.h"
+#include "../../../include/sigma_types.h"
+#include "../../../include/SovereignLibC.h"
+#include "../../../include/sigma_hal.h"
 
 
 /**
@@ -63,3 +63,4 @@ extern "C" void diag_scan() {
 extern "C" void diag_report(const char* shard, const char* desc) {
     SigmaOS::Kernel::Observability::SovereignDiagEngine::getInstance().reportAnomaly(shard, desc);
 }
+

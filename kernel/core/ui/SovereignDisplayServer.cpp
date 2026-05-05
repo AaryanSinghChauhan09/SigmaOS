@@ -72,3 +72,4 @@ extern "C" void display_server_flush() {
 extern "C" const sigma_display_state_t* display_server_get_state() {
     return &SovereignDisplayManager.state;
 }
+

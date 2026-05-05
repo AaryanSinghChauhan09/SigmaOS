@@ -58,3 +58,4 @@ extern "C" void container_manager_init() {
 extern "C" void container_deploy(const char* hash) {
     SigmaOS::Kernel::Cloud::SovereignContainerManager::getInstance().deployContainer(hash);
 }
+

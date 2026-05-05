@@ -58,3 +58,4 @@ extern "C" void ai_persona_init() {
 extern "C" void ai_persona_adapt(const char* ctx) {
     SigmaOS::Kernel::AI::SovereignAIPersona::getInstance().adapt(ctx);
 }
+

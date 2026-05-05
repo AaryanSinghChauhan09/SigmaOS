@@ -54,3 +54,4 @@ extern "C" void virtio_init() {
 extern "C" void virtio_notify(sigma_u32 qid) {
     SigmaOS::Kernel::Virtualization::SovereignVirtIO::getInstance().processQueue(qid);
 }
+

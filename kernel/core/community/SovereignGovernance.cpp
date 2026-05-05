@@ -80,3 +80,4 @@ extern "C" void governance_submit(const char* prop) {
 extern "C" void governance_vote(const char* node, const char* prop, bool support) {
     SigmaOS::Kernel::Community::SovereignGovernance::getInstance().castVote(node, prop, support);
 }
+

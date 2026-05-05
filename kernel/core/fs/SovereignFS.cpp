@@ -59,3 +59,4 @@ extern "C" void fs_repair_corruption() {
 extern "C" sigma_u64 fs_get_total_writes() {
     return SovereignFSEngine.total_writes;
 }
+

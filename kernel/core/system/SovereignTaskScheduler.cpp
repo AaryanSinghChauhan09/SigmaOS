@@ -60,3 +60,4 @@ extern "C" void scheduler_add_task(const char* name, sigma_u32 interval_ms) {
 extern "C" void scheduler_tick(sigma_u32 elapsed_ms) {
     SovereignTaskScheduler::getInstance().tick(elapsed_ms);
 }
+

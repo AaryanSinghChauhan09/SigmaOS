@@ -15,7 +15,8 @@ void SovereignAISchedEngine::predictWorkload(sigma_u32 process_id) {
      * Uses lightweight on-device ML to predict process resource needs. */
     
     sigma_printf("[AISCHED] NPWO: Analyzing workload patterns for PID %u...\n", process_id);
-    this->m_prediction_count++;
+    this->prediction_count++;
+
     
     switch (this->m_current_mode) {
         case AISCHED_MODE_ENERGY_EFFICIENT:
@@ -55,4 +56,5 @@ extern "C" void aisched_set_mode(sigma_aisched_mode_t mode) {
 extern "C" sigma_u64 aisched_get_prediction_count() {
     return SigmaOS::Kernel::AI::SovereignAISchedEngine::getInstance().getPredictionCount();
 }
+
 

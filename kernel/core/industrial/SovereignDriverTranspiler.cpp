@@ -57,3 +57,4 @@ extern "C" void driver_transpiler_init() {
 extern "C" void driver_transpiler_map(const char* name, sigma_u32 ev) {
     SigmaOS::Kernel::Industrial::SovereignDriverTranspiler::getInstance().translateEvent(name, ev);
 }
+

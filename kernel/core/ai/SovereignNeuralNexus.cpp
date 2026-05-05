@@ -123,3 +123,4 @@ extern "C" void neural_predict(const void* input_tensor, void* output_tensor) {
 extern "C" void neural_report_status() {
     SigmaOS::Kernel::AI::SovereignNeuralEngine::getInstance().reportStatus();
 }
+

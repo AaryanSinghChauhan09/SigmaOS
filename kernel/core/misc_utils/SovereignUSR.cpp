@@ -64,3 +64,4 @@ extern "C" void usr_register_shard(const char* name, sigma_u32 id) {
 extern "C" sigma_u32 usr_discover_shard(const char* name) {
     return SovereignUSREngine::getInstance().discoverShard(name);
 }
+

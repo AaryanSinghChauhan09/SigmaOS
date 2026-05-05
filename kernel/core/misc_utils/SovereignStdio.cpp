@@ -53,3 +53,4 @@ extern "C" void stdio_init() {
 extern "C" void stdio_route_write(const char* buffer, sigma_u32 length) {
     SovereignStdioEngine::getInstance().routeWrite(buffer, length);
 }
+

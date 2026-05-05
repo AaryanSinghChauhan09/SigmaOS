@@ -58,3 +58,4 @@ extern "C" void consensus_init() {
 extern "C" bool consensus_propose(const char* key, const void* data, sigma_usize sz) {
     return SigmaOS::Kernel::Cloud::SovereignConsensusEngine::getInstance().propose(key, data, sz);
 }
+

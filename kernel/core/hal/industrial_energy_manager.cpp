@@ -27,3 +27,4 @@ void SovereignEnergyManager::Audit() {
 
 } // namespace Power
 } // namespace SigmaOS
+

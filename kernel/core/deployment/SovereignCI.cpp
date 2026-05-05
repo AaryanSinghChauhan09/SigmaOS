@@ -68,3 +68,4 @@ extern "C" bool sci_trigger_pipeline(const char* source_path, const char* target
 extern "C" sigma_u64 sci_get_executed_count() {
     return SigmaOS::Kernel::Deployment::SovereignCIEngine::getInstance().getExecutedCount();
 }
+

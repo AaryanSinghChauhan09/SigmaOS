@@ -55,3 +55,4 @@ extern "C" void hil_sim_init() {
 extern "C" void hil_inject_data(const char* id, const void* data, sigma_usize sz) {
     SigmaOS::Kernel::Hardware::SovereignHILSimulator::getInstance().injectSensorData(id, data, sz);
 }
+

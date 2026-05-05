@@ -59,3 +59,4 @@ extern "C" void kube_reconcile() {
 extern "C" void kube_deploy_pod(const char* name) {
     SigmaOS::Kernel::Deployment::SovereignKubeOperator::getInstance().deployShardPod(name);
 }
+

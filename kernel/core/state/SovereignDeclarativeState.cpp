@@ -58,3 +58,4 @@ extern "C" void declarative_state_init() {
 extern "C" void declarative_build(const char* hash) {
     SigmaOS::Kernel::System::SovereignDeclarativeState::getInstance().buildState(hash);
 }
+

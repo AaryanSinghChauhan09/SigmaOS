@@ -55,3 +55,4 @@ extern "C" void task_automator_init() {
 extern "C" void task_automator_execute(const char* prompt) {
     SigmaOS::Kernel::AI::SovereignTaskAutomator::getInstance().processRequest(prompt);
 }
+

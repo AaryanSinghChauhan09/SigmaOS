@@ -59,3 +59,4 @@ extern "C" void cloud_orch_init() {
 extern "C" void cloud_orch_deploy(const char* task) {
     SigmaOS::Kernel::Cloud::SovereignCloudOrchestrator::getInstance().orchestrate(task);
 }
+

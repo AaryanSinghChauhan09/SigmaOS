@@ -64,3 +64,4 @@ extern "C" void marketplace_init() {
 extern "C" void marketplace_publish(const char* orb, const char* author) {
     SigmaOS::Kernel::Ecosystem::SovereignMarketplace::getInstance().publishOrb(orb, author);
 }
+

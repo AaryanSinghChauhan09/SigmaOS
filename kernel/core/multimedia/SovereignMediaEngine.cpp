@@ -55,3 +55,4 @@ extern "C" void media_init() {
 extern "C" void media_process_frame(void* buf, sigma_usize sz) {
     SigmaOS::Kernel::Multimedia::SovereignMediaEngine::getInstance().processFrame(buf, sz);
 }
+

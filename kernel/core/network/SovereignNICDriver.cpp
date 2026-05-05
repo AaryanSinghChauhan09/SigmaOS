@@ -86,3 +86,4 @@ extern "C" bool nic_transmit(const char* payload, sigma_u32 length) {
 extern "C" void nic_rx_interrupt() {
     SovereignNICDriverEngine::getInstance().receiveInterrupt();
 }
+

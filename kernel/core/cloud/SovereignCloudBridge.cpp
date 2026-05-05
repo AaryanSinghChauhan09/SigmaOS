@@ -58,3 +58,4 @@ extern "C" void cloud_init_shard() {
 extern "C" void cloud_sync_shard() {
     SigmaOS::Kernel::Cloud::SovereignCloudBridge::getInstance().syncLattice();
 }
+

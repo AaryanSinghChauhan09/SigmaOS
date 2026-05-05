@@ -58,3 +58,4 @@ extern "C" void audit_log(const char* shard, const char* desc) {
 extern "C" void audit_verify() {
     SigmaOS::Kernel::Security::SovereignAuditEngine::getInstance().performIntegrityCheck();
 }
+

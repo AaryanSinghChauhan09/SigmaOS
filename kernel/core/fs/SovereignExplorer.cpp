@@ -60,3 +60,4 @@ extern "C" void explorer_init_shard() {
 extern "C" void explorer_nav_shard(const char* path) {
     SigmaOS::Kernel::FS::SovereignExplorer::getInstance().navigate(path);
 }
+

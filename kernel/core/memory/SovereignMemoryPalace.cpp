@@ -26,3 +26,4 @@ extern "C" void memorypalace_query_timeline(uint64_t start_time, uint64_t end_ti
     sigma_printf("[MEMORYPALACE] CCG: Retrieving context slice [%llu -> %llu]...\n", start_time, end_time);
     sigma_log("[MEMORYPALACE] CCG: Timeline rendered on the Sovereign Canvas.");
 }
+

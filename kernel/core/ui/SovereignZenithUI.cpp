@@ -145,3 +145,4 @@ extern "C" void zenith_render_frame() {
 extern "C" const sigma_zenith_state_t* zenith_get_state() {
     return &SovereignZenithEngine.state;
 }
+

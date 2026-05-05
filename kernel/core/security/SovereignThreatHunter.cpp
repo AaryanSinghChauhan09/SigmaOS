@@ -58,3 +58,4 @@ extern "C" void threat_hunter_init() {
 extern "C" void threat_hunter_audit(const char* target) {
     SigmaOS::Kernel::Security::SovereignThreatHunter::getInstance().executeAudit(target);
 }
+

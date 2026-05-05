@@ -32,3 +32,4 @@ void SovereignHardwareTranspiler::Audit() {
 
 } // namespace Kernel
 } // namespace SigmaOS
+

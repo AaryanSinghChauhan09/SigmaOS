@@ -61,3 +61,4 @@ extern "C" void automator_register_macro(const char* trigger, const char* action
 extern "C" void automator_context_tick(const char* context) {
     SovereignAutomatorEngine::getInstance().processContext(context);
 }
+

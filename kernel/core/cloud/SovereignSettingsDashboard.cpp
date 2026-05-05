@@ -56,3 +56,4 @@ extern "C" void settings_toggle() {
 extern "C" void settings_apply(const char* category, const char* value) {
     SovereignSettingsDashboard::getInstance().applyUserPreference(category, value);
 }
+

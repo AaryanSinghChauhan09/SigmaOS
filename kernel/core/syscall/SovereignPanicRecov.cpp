@@ -53,3 +53,4 @@ extern "C" void panicrecov_handle_panic(uint32_t fault_code, const void* registe
 extern "C" bool panicrecov_attempt_recovery() {
     return SovereignPanicRecov::attemptRecovery();
 }
+

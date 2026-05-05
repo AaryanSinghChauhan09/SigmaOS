@@ -26,3 +26,4 @@ extern "C" void canvas_zoom(float delta_zoom) {
     sigma_printf("[CANVAS] URM: Viewport zoom shifted by %.2fx.\n", delta_zoom);
     // Directly scale the GPU projection matrix
 }
+

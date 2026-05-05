@@ -54,3 +54,4 @@ extern "C" void accessibility_init() {
 extern "C" void accessibility_announce(const char* txt) {
     SigmaOS::Kernel::UI::SovereignAccessibility::getInstance().announceEvent(txt);
 }
+

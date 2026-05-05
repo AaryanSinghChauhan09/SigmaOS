@@ -32,3 +32,4 @@ extern "C" void parental_set_time_window(const char* profile_name, uint32_t star
     sigma_printf("[PARENTAL] CPE: Usage window for '%s' set to %02d:00 - %02d:00.\n",
                  profile_name, start_hour, end_hour);
 }
+

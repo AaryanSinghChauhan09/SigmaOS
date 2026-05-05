@@ -59,3 +59,4 @@ extern "C" void entropy_init() {
 extern "C" sigma_u64 entropy_get() {
     return SigmaOS::Kernel::Security::SovereignEntropySource::getInstance().harvestEntropy();
 }
+

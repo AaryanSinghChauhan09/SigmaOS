@@ -25,3 +25,4 @@ extern "C" void kernel_io_init() {
     serial_init();
     sigma_log("[KERNEL-IO] COM1 Serial Shard Active (115200 8N1).");
 }
+

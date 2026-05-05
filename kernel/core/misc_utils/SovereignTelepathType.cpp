@@ -29,3 +29,4 @@ extern "C" const char* telepathtype_predict_completion(const char* current_conte
 extern "C" void telepathtype_commit_prediction() {
     sigma_log("[TELEPATHTYPE] CNGP: Prediction committed to standard input buffer.");
 }
+

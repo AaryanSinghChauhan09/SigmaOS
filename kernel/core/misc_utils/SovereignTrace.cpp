@@ -35,3 +35,4 @@ extern "C" void trace_set_interceptor(uint32_t syscall_id, bool active) {
         sigma_printf("[TRACE] Interceptor for 0x%02X set to %d\n", syscall_id, active);
     }
 }
+

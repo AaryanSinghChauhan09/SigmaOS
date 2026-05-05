@@ -84,3 +84,4 @@ extern "C" sigma_u64 log_get_total_emitted() {
     return SovereignLogEngine::getInstance().getTotalEmitted();
 }
 
+

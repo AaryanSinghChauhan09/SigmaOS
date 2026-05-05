@@ -49,3 +49,4 @@ extern "C" void dump_init() {
 extern "C" void dump_trigger(const char* reason) {
     SigmaOS::Kernel::Observability::SovereignDumpEngine::getInstance().trigger(reason);
 }
+

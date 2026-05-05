@@ -35,3 +35,4 @@ void SovereignBootloader::Audit() {
 
 } // namespace Kernel
 } // namespace SigmaOS
+

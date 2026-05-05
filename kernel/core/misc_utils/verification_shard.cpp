@@ -24,3 +24,4 @@ void SovereignVerification::Audit() {
 
 } // namespace Core
 } // namespace SigmaOS
+

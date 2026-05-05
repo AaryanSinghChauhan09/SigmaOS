@@ -49,3 +49,4 @@ extern "C" void scheduler_init() {
 extern "C" void scheduler_push(void (*task)(), sigma_u32 priority) {
     SigmaOS::Kernel::Orchestration::SovereignScheduler::getInstance().schedule(task, priority);
 }
+

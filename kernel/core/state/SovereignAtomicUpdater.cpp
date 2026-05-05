@@ -73,3 +73,4 @@ extern "C" void atomic_deploy(const char* hash) {
 extern "C" void atomic_rollback() {
     SigmaOS::Kernel::System::SovereignAtomicUpdater::getInstance().rollback();
 }
+

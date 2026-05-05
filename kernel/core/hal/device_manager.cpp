@@ -26,3 +26,4 @@ void SovereignDeviceManager::Audit() {
 
 } // namespace Kernel
 } // namespace SigmaOS
+

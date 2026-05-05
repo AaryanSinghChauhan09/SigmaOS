@@ -70,3 +70,4 @@ extern "C" void vmm_map(sigma_u64 virt, sigma_u64 phys, sigma_u32 flags) {
 extern "C" void vmm_set_swap(bool enable) {
     SigmaOS::Kernel::Memory::SovereignVMM::getInstance().setSwap(enable);
 }
+

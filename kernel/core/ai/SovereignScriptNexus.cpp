@@ -54,3 +54,4 @@ extern "C" void script_nexus_init() {
 extern "C" void script_nexus_execute(const char* graph) {
     SigmaOS::Kernel::AI::SovereignScriptNexus::getInstance().executeGraph(graph);
 }
+

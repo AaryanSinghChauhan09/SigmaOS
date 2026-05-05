@@ -54,3 +54,4 @@ extern "C" void biometrics_init() {
 extern "C" bool biometrics_verify(const char* type, const void* data, sigma_size_t size) {
     return SigmaOS::Kernel::Security::SovereignBiometrics::getInstance().verifyUser(type, data, size);
 }
+

@@ -64,3 +64,4 @@ extern "C" void qkd_generate_key(char* buffer, sigma_size_t size) {
 extern "C" sigma_u32 qkd_get_key_count() {
     return SigmaOS::Kernel::Security::SovereignQKDEngine::getInstance().getActiveKeyCount();
 }
+

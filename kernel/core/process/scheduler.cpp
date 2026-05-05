@@ -77,3 +77,4 @@ extern "C" void scheduler_init_shard() {
 extern "C" void scheduler_spawn(const char* name, void (*entry)()) {
     SigmaOS::Kernel::Scheduling::SovereignScheduler::getInstance().createTask(name, entry);
 }
+

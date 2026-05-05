@@ -58,3 +58,4 @@ extern "C" void sovereign_dns_init() {
 extern "C" void sovereign_dns_resolve(const char* domain) {
     SigmaOS::Kernel::Network::SovereignDNS::getInstance().resolveName(domain);
 }
+

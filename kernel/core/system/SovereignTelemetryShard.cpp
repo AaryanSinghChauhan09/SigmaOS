@@ -55,3 +55,4 @@ extern "C" void telemetry_init() {
 extern "C" void telemetry_record(const char* name, sigma_u64 val) {
     SigmaOS::Kernel::System::SovereignTelemetryShard::getInstance().recordMetric(name, val);
 }
+

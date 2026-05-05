@@ -113,3 +113,4 @@ extern "C" sigma_u64 heap_get_total_allocations() {
 extern "C" sigma_u32 heap_get_active_allocations() {
     return SovereignHeapEngine::getInstance().getActiveAllocations();
 }
+

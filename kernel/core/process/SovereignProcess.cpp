@@ -126,3 +126,4 @@ extern "C" sigma_process_t* proc_get_current() {
 extern "C" sigma_u64 proc_get_switch_count() {
     return SigmaOS::Kernel::Process::SovereignProcessEngine::getInstance().getSwitchCount();
 }
+

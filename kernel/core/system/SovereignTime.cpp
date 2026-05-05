@@ -57,3 +57,4 @@ extern "C" sigma_time_t time_now() {
     t.silicon_ticks = SigmaOS::Kernel::System::SovereignTime::getInstance().getUptimeMs();
     return t;
 }
+

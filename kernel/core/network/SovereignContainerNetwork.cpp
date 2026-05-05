@@ -46,3 +46,4 @@ extern "C" void container_net_init() {
 extern "C" void container_net_attach(const char* container, const char* mac) {
     SovereignContainerNetEngine::getInstance().attachContainerNetwork(container, mac);
 }
+

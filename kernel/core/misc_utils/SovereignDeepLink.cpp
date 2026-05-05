@@ -34,3 +34,4 @@ extern "C" void deeplink_execute(const char* sigma_uri) {
     
     sigma_log("[DEEPLINK] USL: App ignited. State successfully injected via IPC.");
 }
+

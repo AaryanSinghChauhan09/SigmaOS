@@ -40,3 +40,4 @@ extern "C" void ide_compile_active_shard() {
 extern "C" void ide_render_ui() {
     sigma_log("[IDE] Rendering ZenCode UI (Glassmorphism + Neon Syntax Highlighting).");
 }
+

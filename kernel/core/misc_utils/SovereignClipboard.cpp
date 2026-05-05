@@ -53,3 +53,4 @@ extern "C" void clipboard_copy(sigma_clip_type_t type, const void* data, uint32_
 extern "C" void* clipboard_paste(sigma_clip_type_t* out_type, uint32_t* out_size) {
     return SovereignClipboardEngine::getInstance().paste(out_type, out_size);
 }
+

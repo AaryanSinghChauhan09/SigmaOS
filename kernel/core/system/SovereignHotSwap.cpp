@@ -60,3 +60,4 @@ extern "C" void hotswap_init() {
 extern "C" bool hotswap_execute(const char* id, const void* logic, sigma_size_t size) {
     return SigmaOS::Kernel::System::SovereignHotSwap::getInstance().swapShard(id, logic, size);
 }
+

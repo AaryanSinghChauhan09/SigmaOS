@@ -55,3 +55,4 @@ extern "C" void visscript_init() {
 extern "C" void visscript_execute_graph(const sigma_visscript_node_t* start_node) {
     SovereignVisScriptEngine::getInstance().executeGraph(start_node);
 }
+

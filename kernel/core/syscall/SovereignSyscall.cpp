@@ -80,3 +80,4 @@ extern "C" void syscall_handler_asm() {
 extern "C" sigma_u64 syscall_get_total_calls() {
     return SigmaOS::Kernel::Syscall::SovereignSyscallEngine::getInstance().getTotalCalls();
 }
+

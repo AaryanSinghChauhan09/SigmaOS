@@ -28,3 +28,4 @@ extern "C" void privdash_revoke_permission(uint32_t shard_id, const char* permis
     sigma_printf("[PRIVDASH] TDFA: Revoking permission '%s' from Shard %d.\n", permission_name, shard_id);
     sigma_log("[PRIVDASH] TDFA: Permission revoked. Shard sandboxed per S-Sentinel policy.");
 }
+

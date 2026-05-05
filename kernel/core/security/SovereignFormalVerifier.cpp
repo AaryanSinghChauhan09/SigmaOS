@@ -58,3 +58,4 @@ extern "C" void verifier_init() {
 extern "C" bool verifier_verify_shard(const char* id, void* ptr) {
     return SigmaOS::Kernel::Security::SovereignFormalVerifier::getInstance().verifyShard(id, ptr);
 }
+

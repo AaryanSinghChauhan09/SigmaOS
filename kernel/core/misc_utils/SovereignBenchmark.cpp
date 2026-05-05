@@ -67,3 +67,4 @@ extern "C" void bench_memory_throughput(sigma_u32 buffer_mb) {
 extern "C" void bench_publish() {
     SovereignBenchmarkEngine::getInstance().publishResults();
 }
+

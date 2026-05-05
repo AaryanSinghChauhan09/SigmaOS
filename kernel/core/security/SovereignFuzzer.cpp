@@ -58,3 +58,4 @@ extern "C" void fuzzer_init() {
 extern "C" void fuzzer_inject(const char* target, sigma_u32 iters) {
     SigmaOS::Kernel::Security::SovereignFuzzer::getInstance().injectFault(target, iters);
 }
+

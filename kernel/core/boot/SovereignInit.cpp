@@ -1,8 +1,8 @@
-#include "../../include/SovereignLibC.h"
-#include "../../include/sigma_hal.h"
-#include "../../include/sigma_aisched.h"
-#include "../../include/SovereignNeuralNexus.hpp"
-#include "../../include/SovereignVFS.hpp"
+#include "../../../include/SovereignLibC.h"
+#include "../../../include/sigma_hal.h"
+#include "../../../include/sigma_aisched.h"
+#include "../../../include/SovereignNeuralNexus.hpp"
+#include "../../../include/SovereignVFS.hpp"
 
 extern "C" void allocator_init();
 
@@ -79,3 +79,4 @@ extern "C" void sinit_execute_plan() {
 extern "C" void sinit_report_status() {
     SigmaOS::Kernel::Boot::SovereignInitEngine::getInstance().reportStatus();
 }
+

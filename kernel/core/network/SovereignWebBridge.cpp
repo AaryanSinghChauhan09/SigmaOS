@@ -53,3 +53,4 @@ extern "C" void web_bridge_init() {
 extern "C" void web_bridge_connect(const char* url) {
     SigmaOS::Kernel::Network::SovereignWebBridge::getInstance().connect(url);
 }
+

@@ -86,3 +86,4 @@ extern "C" bool storage_read(sigma_u32 lba, sigma_u32 count, void* buf) {
 extern "C" bool storage_write(sigma_u32 lba, sigma_u32 count, const void* data) {
     return SovereignStorageDriverEngine::getInstance().writeSectors(lba, count, data);
 }
+

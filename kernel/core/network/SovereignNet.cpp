@@ -90,3 +90,4 @@ extern "C" bool net_transmit_shard(uint32_t target_ip, uint32_t shard_id) {
 extern "C" void net_optimize_routes() {
     SovereignNetEngine::getInstance().optimizeRoutes();
 }
+

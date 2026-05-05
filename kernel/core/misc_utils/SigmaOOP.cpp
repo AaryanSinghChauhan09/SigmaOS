@@ -22,3 +22,4 @@ void operator delete(void* ptr, sigma_size_t size) noexcept {
 void operator delete[](void* ptr) noexcept {
     sigma_free(ptr);
 }
+

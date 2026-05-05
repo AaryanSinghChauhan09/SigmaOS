@@ -45,3 +45,4 @@ extern "C" void shard_layer_init() {
 extern "C" void shard_orchestrate(const char* id) {
     SigmaOS::Kernel::Core::SovereignAppShard::getInstance().orchestrate(id);
 }
+

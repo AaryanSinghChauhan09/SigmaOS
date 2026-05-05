@@ -28,3 +28,4 @@ extern "C" void predictux_preload_predicted_assets() {
     sigma_log("[PREDICTUX] NLP: Pre-fetching Sovereign VFS UI elements into L3 cache...");
     sigma_log("[PREDICTUX] NLP: UI assets staged. Zero-latency rendering ready.");
 }
+

@@ -66,3 +66,4 @@ extern "C" void power_init() {
 extern "C" void power_set_state(sigma_u32 s) {
     SigmaOS::Kernel::System::SovereignPowerManager::getInstance().setSleepState(s);
 }
+

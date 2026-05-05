@@ -28,3 +28,4 @@ extern "C" void fmv_register_variant(const char* func_name, sigma_cpu_feature_t 
     sigma_printf("[FMV] DSD: Registered optimized variant for '%s' (Feature Req: %d).\n", 
                  func_name, (int)required_feature);
 }
+

@@ -27,3 +27,4 @@ extern "C" void omnisync_trigger_sync() {
     sigma_log("[OMNISYNC] CDR: Transmitting encrypted diffs via Zero-Trust Tunnel.");
     sigma_log("[OMNISYNC] CDR: Synchronization COMPLETE.");
 }
+

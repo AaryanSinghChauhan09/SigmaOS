@@ -52,3 +52,4 @@ extern "C" void unifiedpkg_list_installed() {
         sigma_printf("  - %s (System: %d)\n", package_db[i].package_name, package_db[i].is_system_critical);
     }
 }
+

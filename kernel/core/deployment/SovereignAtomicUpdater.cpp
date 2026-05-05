@@ -70,3 +70,4 @@ extern "C" bool updater_commit_update() {
 extern "C" void updater_rollback() {
     SigmaOS::Kernel::Deployment::SovereignAtomicUpdater::getInstance().rollback();
 }
+

@@ -58,3 +58,4 @@ extern "C" void vpn_init() {
 extern "C" void vpn_connect(const char* peer) {
     SigmaOS::Kernel::Network::SovereignVPN::getInstance().establishTunnel(peer);
 }
+

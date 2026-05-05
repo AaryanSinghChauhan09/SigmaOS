@@ -59,3 +59,4 @@ extern "C" void transpiler_init_shard() {
 extern "C" void transpiler_run_shard(const char* id, const char* arch) {
     SigmaOS::Kernel::HAL::SovereignDriverTranspiler::getInstance().transpile(id, arch);
 }
+

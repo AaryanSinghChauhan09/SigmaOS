@@ -37,6 +37,7 @@ namespace AI {
 class SovereignAISchedEngine {
 public:
     static SovereignAISchedEngine& getInstance() {
+        /* sigma_memcpy, sigma_memset, sigma_strlen are implemented in SovereignLibC.asm */
         static SovereignAISchedEngine instance;
         return instance;
     }
@@ -44,13 +45,13 @@ public:
     void init();
     void predictWorkload(sigma_u32 process_id);
     void setMode(sigma_aisched_mode_t mode);
-    sigma_u64 getPredictionCount() const { return this->m_prediction_count; }
+    sigma_u64 getPredictionCount() const { return this->prediction_count; }
 
 private:
-    SovereignAISchedEngine() : m_current_mode(AISCHED_MODE_BALANCED), m_prediction_count(0), m_initialized(0) {}
+    SovereignAISchedEngine() : m_current_mode(AISCHED_MODE_BALANCED), prediction_count(0), m_initialized(0) {}
     
     sigma_aisched_mode_t m_current_mode;
-    sigma_u64            m_prediction_count;
+    sigma_u64            prediction_count;
     sigma_u32            m_initialized;
 };
 

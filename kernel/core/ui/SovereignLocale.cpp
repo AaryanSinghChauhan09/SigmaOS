@@ -104,3 +104,4 @@ extern "C" void locale_format_number(sigma_i64 value, char* out_buf, sigma_u32 b
     out_buf[out_pos] = '\0';
     (void)_locale_strlen; /* suppress unused warning */
 }
+

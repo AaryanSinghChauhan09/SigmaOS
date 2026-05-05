@@ -53,3 +53,4 @@ extern "C" void search_init() {
 extern "C" void search_query(const char* term) {
     SigmaOS::Kernel::Misc::SovereignSearchEngine::getInstance().query(term);
 }
+

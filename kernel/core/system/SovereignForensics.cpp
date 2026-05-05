@@ -58,3 +58,4 @@ extern "C" void forensics_init() {
 extern "C" void forensics_scan(const char* vol) {
     SigmaOS::Kernel::System::SovereignForensics::getInstance().executeDeepScan(vol);
 }
+

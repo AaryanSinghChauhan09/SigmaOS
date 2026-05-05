@@ -55,3 +55,4 @@ extern "C" void streamer_init() {
 extern "C" void streamer_push_frame(void* buf, sigma_usize sz) {
     SigmaOS::Kernel::Multimedia::SovereignSpatialStreamer::getInstance().streamFrame(buf, sz);
 }
+

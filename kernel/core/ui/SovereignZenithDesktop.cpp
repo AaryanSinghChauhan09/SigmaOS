@@ -58,3 +58,4 @@ extern "C" void zenith_desktop_init() {
 extern "C" void zenith_render(const char* context) {
     SigmaOS::Kernel::UI::SovereignZenithDesktop::getInstance().renderWorkspace(context);
 }
+

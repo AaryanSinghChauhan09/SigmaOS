@@ -48,3 +48,4 @@ extern "C" void container_storage_init() {
 extern "C" void container_storage_mount(const char* container, const char* path) {
     SovereignContainerStorageEngine::getInstance().mountVFSVolume(container, path);
 }
+

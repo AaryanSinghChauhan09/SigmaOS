@@ -77,3 +77,4 @@ extern "C" bool dynmodule_load(const char* module_path) {
 extern "C" bool dynmodule_unload(sigma_u32 module_id) {
     return SovereignDynModuleEngine::getInstance().unload(module_id);
 }
+

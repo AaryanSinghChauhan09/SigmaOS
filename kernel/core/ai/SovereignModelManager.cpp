@@ -56,3 +56,4 @@ extern "C" void model_man_init() {
 extern "C" void model_man_load(const char* id) {
     SigmaOS::Kernel::AI::SovereignModelManager::getInstance().loadModel(id);
 }
+

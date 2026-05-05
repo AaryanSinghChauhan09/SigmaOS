@@ -227,3 +227,4 @@ private:
 extern "C" void sigma_bootstrap_lattice() {
     SigmaOS::Kernel::System::SovereignOrchestrator::getInstance().bootstrap();
 }
+

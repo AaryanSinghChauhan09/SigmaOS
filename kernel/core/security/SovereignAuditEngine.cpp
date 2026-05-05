@@ -54,3 +54,4 @@ extern "C" void audit_init() {
 extern "C" void audit_log_shard_event(const char* shard, const char* ev) {
     SigmaOS::Kernel::Security::SovereignAuditEngine::getInstance().logEvent(shard, ev);
 }
+

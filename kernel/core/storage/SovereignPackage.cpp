@@ -30,3 +30,4 @@ extern "C" void package_manager_init() {
 extern "C" bool package_manager_install(const char* name) {
     return SovereignPackageEngine::getInstance().installPackage(name);
 }
+

@@ -30,3 +30,4 @@ extern "C" void neural_report_status() {
                  SovereignNeuralEngine.npu_active ? "ACTIVE" : "OFFLINE");
 }
 
+

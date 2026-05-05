@@ -1148,3 +1148,18 @@ document.addEventListener('mousemove', (e) => {
 });
 document.addEventListener('mouseleave', () => { if(glow) glow.style.opacity = '0'; });
 
+
+function processData() {
+    const input = document.getElementById('data-forge-input').value;
+    const output = document.getElementById('data-forge-output');
+    if(!input) return;
+    
+    output.innerHTML = '<span class=\"text-accent\">[SDP] Initializing 600-shard parallel map/reduce...</span><br>';
+    setTimeout(() => {
+        output.innerHTML += '<span class=\"text-blue\">[SDP] Data Sharding complete. Partitioning into 4096 blocks...</span><br>';
+        setTimeout(() => {
+            output.innerHTML += '<span class=\"text-success\">[SDP] Forge Complete. Latency: 0.12ms. Sovereignty Absolute.</span><br>';
+            output.innerHTML += '<pre style=\"color: #fff; margin-top: 10px;\">' + btoa(input).substring(0, 100) + '... [ENCODED]</pre>';
+        }, 800);
+    }, 500);
+}

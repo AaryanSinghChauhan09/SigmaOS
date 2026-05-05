@@ -66,3 +66,4 @@ extern "C" sigma_u32 power_get_battery_pct() {
 extern "C" void power_reboot() {
     SovereignPowerEngine::getInstance().reboot();
 }
+

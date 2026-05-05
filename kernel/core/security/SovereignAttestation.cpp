@@ -39,3 +39,4 @@ private:
 extern "C" void attestation_init() {
     SigmaOS::Kernel::Security::SovereignAttestation::getInstance().init();
 }
+

@@ -38,3 +38,4 @@ extern "C" void rollback_execute_to_last_stable() {
     // Simulate silicon-native state restoration
     sigma_log("[ROLLBACK] State RESTORED. Shard Lattice STABILIZED.");
 }
+

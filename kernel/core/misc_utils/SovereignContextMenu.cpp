@@ -28,3 +28,4 @@ extern "C" void contextmenu_invoke(uint32_t target_id, uint32_t x, uint32_t y) {
 extern "C" void contextmenu_dismiss() {
     sigma_log("[CONTEXTMENU] IDR: Radial menu dismissed.");
 }
+

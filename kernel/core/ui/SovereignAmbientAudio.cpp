@@ -26,3 +26,4 @@ extern "C" void ambientaudio_set_theme(sigma_ambient_theme_t theme) {
 extern "C" void ambientaudio_adjust_intensity(float intensity) {
     sigma_printf("[AMBIENTAUDIO] PAS: Modulating acoustic intensity to %.2f.\n", intensity);
 }
+

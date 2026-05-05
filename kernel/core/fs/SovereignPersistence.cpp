@@ -71,3 +71,4 @@ extern "C" void persistence_snapshot(const char* component) {
 extern "C" void persistence_restore(const char* component) {
     SigmaOS::Kernel::FS::SovereignPersistence::getInstance().restoreState(component);
 }
+

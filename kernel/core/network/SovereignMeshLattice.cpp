@@ -59,3 +59,4 @@ extern "C" void mesh_discover() {
 extern "C" void mesh_send(sigma_u32 node, const char* shard, const void* data, sigma_size_t size) {
     SigmaOS::Kernel::Network::SovereignMeshLattice::getInstance().sendShardMessage(node, shard, data, size);
 }
+

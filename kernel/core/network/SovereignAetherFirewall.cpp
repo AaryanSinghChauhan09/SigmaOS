@@ -78,3 +78,4 @@ extern "C" bool firewall_inspect(const void* data, sigma_size_t size, const char
 extern "C" void firewall_audit() {
     SigmaOS::Kernel::Network::SovereignAetherFirewall::getInstance().auditFirewall();
 }
+

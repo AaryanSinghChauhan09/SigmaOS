@@ -68,3 +68,4 @@ extern "C" void input_push_event(sigma_key_event_t* event) {
 extern "C" bool input_pop_event(sigma_key_event_t* out_event) {
     return SovereignInputEngine::getInstance().popEvent(out_event);
 }
+

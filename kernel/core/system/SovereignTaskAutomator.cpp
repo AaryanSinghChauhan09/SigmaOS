@@ -93,3 +93,4 @@ extern "C" void taskautomator_start_macro() {
 extern "C" void taskautomator_stop_macro() {
     SovereignAutomationEngine::getInstance().stopMacroRecording();
 }
+

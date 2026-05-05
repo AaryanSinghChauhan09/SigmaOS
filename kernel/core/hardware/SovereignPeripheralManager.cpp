@@ -55,3 +55,4 @@ extern "C" void peripheral_init() {
 extern "C" void peripheral_event(const char* id, bool plug) {
     SigmaOS::Kernel::Hardware::SovereignPeripheralManager::getInstance().handleHotSwap(id, plug);
 }
+

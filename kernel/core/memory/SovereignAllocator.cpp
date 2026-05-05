@@ -75,3 +75,4 @@ extern "C" void* allocator_malloc(sigma_u32 size) {
 extern "C" void allocator_free(void* ptr) {
     SovereignAllocatorEngine::getInstance().free(ptr);
 }
+

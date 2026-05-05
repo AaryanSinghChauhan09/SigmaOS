@@ -32,3 +32,4 @@ extern "C" void vissearch_query_visual_data(const char* search_term) {
     sigma_printf("[VISSEARCH] NPE: Searching visual vector space for '%s'...\n", search_term);
     // Directly links with S-NeuralSearch
 }
+

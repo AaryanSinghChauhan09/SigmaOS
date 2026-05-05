@@ -29,3 +29,4 @@ extern "C" void identity_report_status() {
     sigma_printf("[S-IDENTITY] Total Shards Verified: %u\n", SovereignIdentityEngine.verified_shards);
 }
 
+

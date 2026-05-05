@@ -36,3 +36,4 @@ extern "C" void lru_trigger_update(uint32_t shard_id, void* new_binary, uint32_t
 extern "C" sigma_lru_state_t lru_get_state() {
     return current_lru_state;
 }
+

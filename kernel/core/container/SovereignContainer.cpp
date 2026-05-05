@@ -73,3 +73,4 @@ extern "C" sigma_u32 container_spawn(const char* image_name) {
 extern "C" void container_destroy(sigma_u32 container_id) {
     SigmaOS::Kernel::Container::SovereignContainerEngine::getInstance().destroyContainer(container_id);
 }
+

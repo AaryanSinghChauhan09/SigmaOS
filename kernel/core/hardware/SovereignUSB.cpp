@@ -94,3 +94,4 @@ extern "C" void usb_hotplug_notify(sigma_u8 addr, sigma_u32 attached) {
     sigma_printf("[USB] SDXHC: Hotplug event — Addr=%d %s.\n",
                  (int)addr, attached ? "ATTACHED" : "DETACHED");
 }
+

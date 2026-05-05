@@ -57,3 +57,4 @@ extern "C" void federation_init() {
 extern "C" bool federation_sso(const char* dom, const char* prot) {
     return SigmaOS::Kernel::Security::SovereignFederationShard::getInstance().performSSO(dom, prot);
 }
+

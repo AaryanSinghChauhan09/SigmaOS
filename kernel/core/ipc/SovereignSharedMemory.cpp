@@ -40,3 +40,4 @@ extern "C" void* shmem_create(const char* id, sigma_usize sz) {
 extern "C" void shmem_audit() {
     SigmaOS::Kernel::IPC::SovereignSharedMemory::getInstance().audit();
 }
+

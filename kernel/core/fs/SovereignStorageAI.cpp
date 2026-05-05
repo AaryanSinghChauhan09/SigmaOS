@@ -58,3 +58,4 @@ extern "C" void storage_ai_init() {
 extern "C" void storage_ai_optimize(const char* vol) {
     SigmaOS::Kernel::FS::SovereignStorageAI::getInstance().optimizeVolume(vol);
 }
+

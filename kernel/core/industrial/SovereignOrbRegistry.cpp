@@ -65,3 +65,4 @@ extern "C" bool orbreg_register(const char* name, const char* cid) {
 extern "C" void orbreg_list() {
     SigmaOS::Kernel::Industrial::SovereignOrbRegistry::getInstance().listOrbs();
 }
+

@@ -56,3 +56,4 @@ extern "C" void ha_core_init() {
 extern "C" void ha_core_failover(const char* node) {
     SigmaOS::Kernel::Cloud::SovereignHACore::getInstance().handleFailover(node);
 }
+

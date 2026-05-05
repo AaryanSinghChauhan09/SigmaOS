@@ -33,3 +33,4 @@ extern "C" void wellbeing_set_daily_limit(uint32_t app_id, uint32_t max_minutes)
     sigma_printf("[WELLBEING] BUA: Daily limit for App %d set to %d minutes.\n", app_id, max_minutes);
     sigma_log("[WELLBEING] BUA: S-NotifyIQ will alert when 80% of limit is reached.");
 }
+

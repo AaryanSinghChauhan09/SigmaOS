@@ -90,3 +90,4 @@ extern "C" void theme_toggle_dark_mode() {
 extern "C" void theme_evaluate_adaptive() {
     SovereignThemeEngine::getInstance().evaluateAdaptiveTheme();
 }
+

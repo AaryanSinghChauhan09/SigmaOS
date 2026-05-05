@@ -61,3 +61,4 @@ extern "C" sigma_integrity_token_t crypto_verify_shard(sigma_u32 shard_id,
 extern "C" void crypto_sign_shard(sigma_u32 shard_id, sigma_integrity_token_t* token) {
     SovereignCryptoEngine::getInstance().signShard(shard_id, token);
 }
+

@@ -33,3 +33,4 @@ extern "C" void time_report_status() {
     sigma_log("[S-TIME] Synchronization status: NOMINAL");
 }
 
+

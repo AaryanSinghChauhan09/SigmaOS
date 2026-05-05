@@ -58,3 +58,4 @@ extern "C" void scp_add_peer(const char* peer) {
 extern "C" void scp_broadcast(const char* data) {
     SovereignProtocolEngine::getInstance().broadcast(data);
 }
+

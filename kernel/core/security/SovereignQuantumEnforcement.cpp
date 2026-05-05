@@ -59,3 +59,4 @@ extern "C" void qe_init_shard() {
 extern "C" void qe_enforce_shard(const char* id) {
     SigmaOS::Kernel::Security::SovereignQuantumEnforcement::getInstance().enforcePolicy(id);
 }
+

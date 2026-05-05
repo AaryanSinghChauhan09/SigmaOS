@@ -45,3 +45,4 @@ extern "C" void runit_stop(uint32_t shard_id) {
     services[shard_id].status = SHARD_DOWN;
     sigma_log("[RUNIT] Shard %d signal: TERMINATE.", shard_id);
 }
+

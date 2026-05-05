@@ -54,3 +54,4 @@ extern "C" void container_init() {
 extern "C" void container_spawn(const char* name, const char* entrypoint) {
     SovereignContainerEngine::getInstance().spawnContainer(name, entrypoint);
 }
+

@@ -44,3 +44,4 @@ extern "C" void cloud_monitor_health() {
         }
     }
 }
+

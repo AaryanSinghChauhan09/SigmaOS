@@ -29,3 +29,4 @@ extern "C" void haptic_play_pattern(sigma_haptic_pattern_t pattern, float intens
                  
     sigma_log("[HAPTIC] HFTA: Waveform sequence synthesized and dispatched to LRA.");
 }
+

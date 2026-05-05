@@ -68,3 +68,4 @@ extern "C" void orb_manager_init() {
 extern "C" void orb_install(const char* name, const char* sig) {
     SigmaOS::Kernel::Industrial::SovereignOrbManager::getInstance().installOrb(name, sig);
 }
+

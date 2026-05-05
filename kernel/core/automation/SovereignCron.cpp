@@ -56,3 +56,4 @@ extern "C" void cron_init() {
 extern "C" void cron_schedule(const char* task, sigma_u32 ms) {
     SigmaOS::Kernel::Automation::SovereignCron::getInstance().scheduleTask(task, ms);
 }
+

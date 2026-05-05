@@ -47,3 +47,4 @@ extern "C" bool sandbox_execute(sigma_u32 container_id, const char* binary_path)
 extern "C" void sandbox_destroy_container(sigma_u32 container_id) {
     SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().destroyContainer(container_id);
 }
+

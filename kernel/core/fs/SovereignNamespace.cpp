@@ -57,3 +57,4 @@ extern "C" void* namespace_resolve_path(const char* path) {
     sigma_log("[NAMESPACE] ORM: Path resolution failed.");
     return SIGMA_NULL;
 }
+

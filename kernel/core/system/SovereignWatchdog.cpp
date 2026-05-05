@@ -61,3 +61,4 @@ extern "C" void watchdog_init() {
 extern "C" void watchdog_pet(sigma_u32 id) {
     SigmaOS::Kernel::System::SovereignWatchdog::getInstance().petWatchdog(id);
 }
+

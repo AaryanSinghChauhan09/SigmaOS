@@ -33,3 +33,4 @@ extern "C" void collab_apply_remote_change(const void* delta, uint32_t delta_siz
     sigma_printf("[COLLAB] CFRD: Applying %d-byte remote delta.\n", delta_size);
     sigma_log("[COLLAB] CFRD: CRDT merge complete. Document state converged.");
 }
+

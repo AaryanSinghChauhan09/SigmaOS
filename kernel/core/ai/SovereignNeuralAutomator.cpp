@@ -58,3 +58,4 @@ extern "C" void neural_automator_init() {
 extern "C" void neural_automator_execute(const char* intent) {
     SigmaOS::Kernel::AI::SovereignNeuralAutomator::getInstance().inferAndExecute(intent);
 }
+

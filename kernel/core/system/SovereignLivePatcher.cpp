@@ -59,3 +59,4 @@ extern "C" void live_patch_init() {
 extern "C" void live_patch_apply(const char* func, const void* payload) {
     SigmaOS::Kernel::System::SovereignLivePatcher::getInstance().applyLivePatch(func, payload);
 }
+

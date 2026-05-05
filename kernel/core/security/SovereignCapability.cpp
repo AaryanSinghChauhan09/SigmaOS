@@ -74,3 +74,4 @@ extern "C" sigma_u64 cap_vault_issue(sigma_u32 res, sigma_u32 perm) {
 extern "C" int cap_vault_validate(sigma_u64 token, sigma_u32 res, sigma_u32 perm) {
     return SigmaOS::Kernel::Security::SovereignCapabilityVault::getInstance().validate(token, res, perm) ? 1 : 0;
 }
+

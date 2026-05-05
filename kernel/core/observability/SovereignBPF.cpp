@@ -56,3 +56,4 @@ extern "C" void ebpf_init() {
 extern "C" void ebpf_load_prog(const char* name, const void* code, sigma_usize sz) {
     SigmaOS::Kernel::System::SovereignBPF::getInstance().loadProgram(name, code, sz);
 }
+

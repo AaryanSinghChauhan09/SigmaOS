@@ -58,3 +58,4 @@ extern "C" void perf_profile_shard(sigma_u32 id) {
 extern "C" void perf_report() {
     SigmaOS::Kernel::System::SovereignPerf::getInstance().reportHotspots();
 }
+

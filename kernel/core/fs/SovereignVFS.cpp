@@ -35,3 +35,4 @@ extern "C" void vfs_list_files(const char* path) {
     SigmaOS::Kernel::FS::SovereignVFS::getInstance().listFiles(path);
 }
 
+

@@ -50,3 +50,4 @@ extern "C" void uxsrv_init() {
 extern "C" void uxsrv_handle_workflow(const char* id) {
     SigmaOS::Kernel::UI::SovereignUXSrv::getInstance().handleWorkflow(id);
 }
+

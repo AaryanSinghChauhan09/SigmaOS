@@ -58,3 +58,4 @@ extern "C" void compartmentalization_init() {
 extern "C" void compartment_isolate(const char* domain) {
     SigmaOS::Kernel::Security::SovereignCompartmentalization::getInstance().isolateDomain(domain);
 }
+

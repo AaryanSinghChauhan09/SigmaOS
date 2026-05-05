@@ -39,3 +39,4 @@ extern "C" void layout_switch(desktop_layout_t layout) {
             break;
     }
 }
+

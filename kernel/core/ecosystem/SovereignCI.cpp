@@ -58,3 +58,4 @@ extern "C" void ci_pipeline_init() {
 extern "C" void ci_trigger(const char* hash) {
     SigmaOS::Kernel::Development::SovereignCI::getInstance().triggerPipeline(hash);
 }
+

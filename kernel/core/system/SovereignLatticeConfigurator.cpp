@@ -58,3 +58,4 @@ extern "C" void configurator_init() {
 extern "C" void configurator_apply(const char* policy) {
     SigmaOS::Kernel::System::SovereignLatticeConfigurator::getInstance().applyPolicy(policy);
 }
+

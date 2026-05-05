@@ -50,3 +50,4 @@ extern "C" sigma_u32 multiuser_register(sigma_u32 uid, sigma_u32 gid, const char
 extern "C" bool multiuser_authenticate(sigma_u32 uid, const char* username) {
     return SovereignMultiUserEngine::getInstance().authenticate(uid, username);
 }
+

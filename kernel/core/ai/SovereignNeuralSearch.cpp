@@ -29,3 +29,4 @@ extern "C" void neuralsearch_query(const char* natural_language_query) {
 extern "C" void neuralsearch_index_shard(uint32_t shard_id) {
     sigma_printf("[NEURALSEARCH] OITR: Calculating semantic embeddings for Shard %d...\n", shard_id);
 }
+

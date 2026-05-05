@@ -42,3 +42,4 @@ extern "C" void healthcheck_render_dashboard() {
     sigma_health_report_t r = healthcheck_run_full_audit();
     sigma_log("[HEALTHCHECK] HSI: Live health dashboard rendered on Zenith Dashboard.");
 }
+

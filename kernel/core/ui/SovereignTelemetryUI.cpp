@@ -61,3 +61,4 @@ extern "C" void telemetry_ui_toggle() {
 extern "C" void telemetry_ui_update(sigma_u32 net, sigma_u32 numa) {
     SovereignTelemetryUIEngine::getInstance().updateDashboardMetrics(net, numa);
 }
+

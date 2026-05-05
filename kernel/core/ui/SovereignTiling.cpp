@@ -62,3 +62,4 @@ private:
 extern "C" void tiling_init() { SovereignTilingEngine::getInstance().init(); }
 extern "C" void tiling_add_app(const char* id) { SovereignTilingEngine::getInstance().tileApp(id); }
 extern "C" void tiling_set_layout(const char* layout) { SovereignTilingEngine::getInstance().setLayout(layout); }
+

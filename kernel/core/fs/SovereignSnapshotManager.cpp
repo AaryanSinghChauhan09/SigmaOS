@@ -64,3 +64,4 @@ extern "C" void snapshot_init() {
 extern "C" void snapshot_take(const char* vol, const char* snap) {
     SigmaOS::Kernel::FS::SovereignSnapshotManager::getInstance().takeSnapshot(vol, snap);
 }
+
