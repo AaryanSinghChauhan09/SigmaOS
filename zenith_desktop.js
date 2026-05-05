@@ -391,17 +391,16 @@ function minimizeWindow(id) {
         });
 
         function checkStatus() {
-    const urlInput = document.getElementById('status-url');
-    const output = document.getElementById('status-output');
-    if (!urlInput || !output) return;
-    const url = urlInput.value;
-    const safeUrl = escapeHtml(url);
-    output.innerHTML = <span style="color: var(--accent);">Checking silicon route to \...</span>;
-    setTimeout(() => {
-        output.innerHTML = <span style="color: var(--success);">? \ is UP and responsive in the lattice.</span>;
-        addLog("S [UTILITY]: Route check complete for " + url, "success");
-    }, 1500);
-}, 1500);
+            const urlInput = document.getElementById('status-url');
+            const output = document.getElementById('status-output');
+            if (!urlInput || !output) return;
+            const url = urlInput.value;
+            const safeUrl = escapeHtml(url);
+            output.innerHTML = `<span style="color: var(--accent);">Checking silicon route to ${safeUrl}...</span>`;
+            setTimeout(() => {
+                output.innerHTML = `<span style="color: var(--success);">✔ ${safeUrl} is UP and responsive in the lattice.</span>`;
+                addLog("Σ [UTILITY]: Route check complete for " + url, "success");
+            }, 1500);
         }
 
         function flashBootable() {
@@ -421,29 +420,22 @@ function minimizeWindow(id) {
         }
 
         function convertTable() {
-    const inputEl = document.getElementById('table-input');
-    const outputEl = document.getElementById('table-output');
-    if (!inputEl || !outputEl) return;
-    const csv = inputEl.value;
-    const rows = csv.split('\n');
-    let html = '<table style="width: 100%; border-collapse: collapse; font-size: 0.8em; color: white;">';
-    rows.forEach((row, i) => {
-        html += '<tr>';
-        row.split(',').forEach(col => {
-            const safeCol = escapeHtml(col.trim());
-            html += <td style="border: 1px solid rgba(255,255,255,0.1); padding: 8px; \ ">\</td>;
-        });
-        html += '</tr>';
-    });
-    html += '</table>';
-    outputEl.innerHTML = html;
-    addLog("S [UTILITY]: CSV-to-Table conversion complete.", "success");
-}">${col.trim()}</td>`;
+            const inputEl = document.getElementById('table-input');
+            const outputEl = document.getElementById('table-output');
+            if (!inputEl || !outputEl) return;
+            const csv = inputEl.value;
+            const rows = csv.split('\n');
+            let html = '<table style="width: 100%; border-collapse: collapse; font-size: 0.8em; color: white;">';
+            rows.forEach((row, i) => {
+                html += '<tr>';
+                row.split(',').forEach(col => {
+                    const safeCol = escapeHtml(col.trim());
+                    html += `<td style="border: 1px solid rgba(255,255,255,0.1); padding: 8px; ${i===0?'background: rgba(0,255,255,0.1); font-weight: 800;':''} ">${safeCol}</td>`;
                 });
                 html += '</tr>';
             });
             html += '</table>';
-            document.getElementById('table-output').innerHTML = html;
+            outputEl.innerHTML = html;
             addLog("Σ [UTILITY]: CSV-to-Table conversion complete.", "success");
         }
 
@@ -502,21 +494,17 @@ function minimizeWindow(id) {
         }
 
         function addBlockRule() {
-    const input = document.getElementById('firewall-input');
-    const list = document.getElementById('blocked-list');
-    if (!input || !input.value.trim() || !list) return;
-    
-    const val = input.value.trim();
-    const safeVal = escapeHtml(val);
-    const li = document.createElement('li');
-    li.className = "routine-item routine-border-magenta";
-    li.innerHTML = <strong>\</strong> <button class="cyber-btn small-btn" onclick="this.parentElement.remove()">UNBLOCK</button>;
-    list.prepend(li);
-    addLog(S [FIREWALL]: Blocked access to \., "error");
-    input.value = '';
-}</strong> <button class="cyber-btn small-btn" onclick="this.parentElement.remove()">UNBLOCK</button>`;
+            const input = document.getElementById('firewall-input');
+            const list = document.getElementById('blocked-list');
+            if (!input || !input.value.trim() || !list) return;
+            
+            const val = input.value.trim();
+            const safeVal = escapeHtml(val);
+            const li = document.createElement('li');
+            li.className = "routine-item routine-border-magenta";
+            li.innerHTML = `<strong>${safeVal}</strong> <button class="cyber-btn small-btn" onclick="this.parentElement.remove()">UNBLOCK</button>`;
             list.prepend(li);
-            addLog(`Σ [FIREWALL]: Blocked access to ${input.value.trim()}.`, "error");
+            addLog(`Σ [FIREWALL]: Blocked access to ${val}.`, "error");
             input.value = '';
         }
 
@@ -1234,6 +1222,7 @@ function evaluateLatticeRun(query) {
     }
     return null;
 }
+
 
 
 
