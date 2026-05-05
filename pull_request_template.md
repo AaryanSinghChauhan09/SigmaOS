@@ -49,4 +49,3 @@ Closes #
 
 <!-- Paste sigma_log output or screenshots if applicable -->
 
-

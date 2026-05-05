@@ -32,4 +32,3 @@ We strictly enforce `clang-tidy` to catch C++ object lifecycle bugs and potentia
 
 If you are modifying low-level parsing or cryptography shards, prefer the Rust implementations mapped via `SovereignRustInterop.cpp`. Rust's borrow checker eliminates a large class of memory bugs by default.
 
-

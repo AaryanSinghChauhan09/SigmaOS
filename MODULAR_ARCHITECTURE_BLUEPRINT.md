@@ -33,4 +33,3 @@ SigmaOS absorbs industry-leading features from top-tier distributions to ensure 
 
 > “The SigmaOS lattice is not just an operating system; it is a self-healing, modular silicon singularity.”
 
-

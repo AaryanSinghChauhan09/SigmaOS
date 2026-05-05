@@ -108,4 +108,3 @@ This document tracks the ideas from the backlog that have been successfully inte
 
 | Personalized guided setup flows | ✅ | `SovereignOnboarding.cpp` |
 
-

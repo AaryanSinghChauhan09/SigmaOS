@@ -28,4 +28,3 @@ This document tracks the resolution of critical system anomalies identified duri
 - **Symptom**: CSS property ordering lint errors causing CI/CD pipeline warnings.
 - **Resolution**: Standardized `-webkit-backdrop-filter` to strictly precede standard `backdrop-filter` across all UI glassmorphism targets in `zenith_desktop.css`.
 
-

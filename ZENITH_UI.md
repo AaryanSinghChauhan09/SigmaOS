@@ -34,4 +34,3 @@ Integrated via `SovereignPersonalization`, Zenith supports:
 *   **Adaptive Contrast**: Auto-scaling based on ambient telemetry.
 *   **Predictive Layouts**: NPWO-driven interface adjustment based on workload history.
 
-

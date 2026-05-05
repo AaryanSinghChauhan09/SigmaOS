@@ -28,4 +28,3 @@ Supports dynamic dispatch across heterogeneous silicon, including ARM and RISC-V
 
 `SovereignContainers` use the Sovereign Enforcement Layer (SEL) to spawn secure micro-VMs.
 
-

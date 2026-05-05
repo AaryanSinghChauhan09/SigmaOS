@@ -12,7 +12,7 @@ Thank you for considering a contribution to the **SigmaOS Sovereign Lattice**!
    python3 tools/sigma-build.py
    ```
 
-3. **Run static analysis** before submitting:
+1. **Run static analysis** before submitting:
 
    ```bash
    cppcheck --enable=warning,style,performance kernel/core/
@@ -39,5 +39,4 @@ All contributions must adhere to the **Sovereign Shard Standard**:
 ## Security Issues
 
 Please **do not** open public issues for security vulnerabilities. Read [SECURITY.md](../SECURITY) for responsible disclosure guidelines.
-
 

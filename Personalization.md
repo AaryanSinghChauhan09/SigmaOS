@@ -59,4 +59,3 @@ Profiles are defined in `profiles/*.json` (Modular JSON).
 
 Example: `sovereign_identity.json` enables the Persona Shard and triggers the Lattice Shard Matrix dashboard.
 
-

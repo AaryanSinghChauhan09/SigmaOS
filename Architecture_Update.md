@@ -14,4 +14,3 @@ The global namespace array supports zero-dependency mounting and natively integr
 
 All elements are fully modularized and integrated into the `kernel/core` subsystem.
 
-

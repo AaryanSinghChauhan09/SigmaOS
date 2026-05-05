@@ -44,4 +44,3 @@ To automate Wiki synchronization, use the following GitHub Action pattern in you
 
 ```
 
-

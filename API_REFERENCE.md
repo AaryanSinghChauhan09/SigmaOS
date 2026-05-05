@@ -128,4 +128,3 @@ Contextual predictive quick-action engine.
 
 - `void shortcuts_suggest(const char* context, const char* suggestion);`
 
-

@@ -8,4 +8,3 @@ Real-time event streaming native to the Sovereign Lattice.
 - **Kafka-Killer**: No external message brokers or Zookeeper required.
 - **Amnesic Buffer**: Data is processed in ephemeral memory and scrubbed.
 
-

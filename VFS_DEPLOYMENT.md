@@ -24,4 +24,3 @@ python3 tools/sovereign-deploy.py
 
 ```
 
-
