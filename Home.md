@@ -2,48 +2,34 @@
 
 Welcome to the **Sovereign Lattice**. SigmaOS is an industrial-grade, 600-shard operating system simulation designed for absolute sovereignty and high-assurance computing.
 
-## ?? Try It Now
+## ? Try it now — no setup needed
+**[? Open the Live Demo](https://aaryansinghchauhan09.github.io/SigmaOS/)**
 
-Experience the Zenith Desktop directly in your browser:
-**[Launch SigmaOS Zenith](https://aaryansinghchauhan09.github.io/SigmaOS/)**
-
----
-
-## ??? Industrial Data Ecosystem (Tool-Less Architecture)
-
-SigmaOS eliminates the need for external data infrastructure by integrating high-fidelity simulations of:
-- **[Sovereign Data Forge](Data-Forge)**: Map/Reduce processing (Spark replacement).
-- **[L-Stream](L-Stream)**: Real-time event streaming (Kafka replacement).
-- **[ML Hub](ML-Hub)**: Model versioning & deployment (MLflow replacement).
-- **[Lattice Object Store](Lattice-Object-Store)**: S3-compatible amnesic storage.
+Or run it locally in 10 seconds:
+`ash
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
+node SigmaOS/server.js
+# then open http://localhost:5000
+`
+SigmaOS is a browser-based desktop simulation — the entire OS experience (terminal, file manager, AI assistant, notifications, marketplace) runs in a single HTML file with zero build step.
 
 ---
 
-## ?? Project Documentation
-
-| Category | Resources |
+## ?? Wiki Navigation
+| Page | Description |
 | :--- | :--- |
-| **Core Architecture** | [Architecture_Overview](Architecture_Overview) \| [Lattice_Manifest](LATTICE_MANIFEST) \| [Shard_Manifest](SHARD_MANIFEST) |
-| **Developer Hub** | [Developer_Guide](Developer_Guide) \| [API_Reference](API_REFERENCE) \| [CI_Pipeline](CI_Pipeline) |
-| **User Experience** | [Zenith-Desktop](Zenith-Desktop) \| [Keyboard-Shortcuts](Keyboard-Shortcuts) \| [Personalization](Personalization) |
-| **Governance** | [Governance](GOVERNANCE) \| [Contribution_Guide](Contribution_Guide) \| [Security](SECURITY) |
+| [Build Guide](BUILD) | How to run the Zenith desktop |
+| [Architecture](Architecture_Overview) | Kernel & UI architecture overview |
+| [Contributing](CONTRIBUTING) | How to contribute |
+| [Changelog](CHANGELOG) | Version history |
+| [Security](SECURITY) | Security policy |
+| [Governance](GOVERNANCE) | Maintainer model |
+| [Personalization](Personalization) | Theme and persona system |
+| [Universal Integration](Universal-Integration) | Integration with MS Terminal, PowerToys, etc. |
 
 ---
 
 ## ??? System Status (v100.0)
-
 - **Lattice Reach**: 100%
 - **Shard Health**: ALL ACTIVE
 - **Sovereignty**: VERIFIED
-
----
-
-## ??? Universal Integration (UI) Initiative
-
-SigmaOS v100.0 integrates the best features from industry leaders:
-- **Sovereign Terminal**: Multi-tabbed lattice orchestration (Inspired by Windows Terminal).
-- **Lattice Zones**: Spatial shard arrangement (Inspired by PowerToys FancyZones).
-- **Sovereign Vault**: Shard-level encrypted credential nexus (Inspired by KeePass).
-- **Media Nexus**: Universal lattice-native codec simulation (Inspired by VLC).
-- **Lattice Office**: Sovereign document & calculation shards (Inspired by LibreOffice).
-
