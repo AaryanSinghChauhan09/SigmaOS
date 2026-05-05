@@ -1,8 +1,6 @@
-# ⌨️ Keyboard Shortcuts
+
 
 SigmaOS Zenith is designed for maximum efficiency through a keyboard-first interaction model.
-
-## 🚀 Global Commands
 
 | Shortcut | Action | Description |
 | :--- | :--- | :--- |
@@ -13,8 +11,6 @@ SigmaOS Zenith is designed for maximum efficiency through a keyboard-first inter
 | `Esc` | **Close/Exit** | Close the active window or the Start Menu. |
 
 | `F11` | **Full Screen** | Experience the Zenith Singularity in immersive mode. |
-
-## 🎨 Theme Switching
 
 Switch between visual paradigms instantly:
 
@@ -28,8 +24,6 @@ Switch between visual paradigms instantly:
 
 | `Alt + 4` | **Adaptive Solar** | Dynamic lighting based on time. |
 
-## 🛠️ Developer Console
-
 | Shortcut | Action |
 | :--- | :--- |
 | `Ctrl + Shift + J` | Open Browser Console (Kernel Diagnostics) |
@@ -38,5 +32,6 @@ Switch between visual paradigms instantly:
 
 ---
 *Master the lattice through your fingertips.*
+
 
 
