@@ -4,18 +4,18 @@ Thank you for helping improve SigmaOS. This document points to the conventions a
 
 ## Where to start
 
-- Read the **[Developer Guide](docs/wiki/Developer-Guide.md)** (published copy: [GitHub Wiki — Developer Guide](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Developer-Guide)).
-- For the browser shell, see **[Zenith Desktop](docs/wiki/Zenith-Desktop.md)** and `js/zenith/`.
+- Read the **[Developer Guide](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/BuildGuide)** (published copy: [GitHub Wiki — Developer Guide](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Developer-Guide)).
+- For the browser shell, see **[Zenith Desktop](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Zenith-Desktop)** and `zenith_desktop.js`.
 
-- For scope and honesty about what is implemented vs. aspirational, see `docs/COMPETITIVE_GAPS.md` and **[Roadmap](docs/wiki/Roadmap.md)**.
+- For scope and honesty about what is implemented vs. aspirational, see `https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/INDUSTRIAL_GAP_RESOLUTION` and **[Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Home)**.
 
 ## C and C++ (kernel / core)
 
-- Format with **clang-format** using the repo root [`.clang-format`](.clang-format).
+- Format with **clang-format** using the repo root [`LICENSE`](LICENSE).
 
-- Pull requests are checked for style on **changed** `.cpp` / `.h` / `.hpp` files (see `.github/workflows/sigma_style.yml`).
+- Pull requests are checked for style on **changed** `.cpp` / `.h` / `.hpp` files (see `.github/workflows/ci.yml`).
 
-- Prefer **`sigma_status`** + [`include/sigma_result.h`](include/sigma_result.h) over exceptions (kernel uses `-fno-exceptions`). See [`docs/LOW_LEVEL_CODING.md`](docs/LOW_LEVEL_CODING.md).
+- Prefer **`sigma_status`** + [`include/sigma_types.h`](include/sigma_types.h) over exceptions (kernel uses `-fno-exceptions`). See [`https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture`](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture).
 
 - Host smoke test: `make check-host` (compiles `tests/cpp_host` against headers).
 
@@ -40,7 +40,7 @@ doxygen Doxyfile
 
 ## JavaScript (Zenith Desktop)
 
-- Modules live under `js/zenith/`; the entry point is `js/zenith/main.js`.
+- Modules live under `zenith_desktop.js`; the entry point is `zenith_desktop.jsmain.js`.
 
 - Inline `onclick` handlers in `index.html` require corresponding exports on `window` in `main.js`.
 
@@ -57,4 +57,5 @@ doxygen Doxyfile
 ## Issues and PRs
 
 Use the GitHub issue templates for bugs and features. In PRs, describe motivation, testing performed, and any user-visible or build changes.
+
 

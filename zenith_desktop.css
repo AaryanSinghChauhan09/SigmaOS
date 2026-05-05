@@ -1,4 +1,7 @@
 :root {
+    --muted: #64748b;
+    --border: rgba(255,255,255,0.1);
+    --glass-dark: rgba(15,15,25,0.97);
     --accent: #fbbf24;
     --accent-blue: #3b82f6;
     --accent-cyan: #00f2ff;
@@ -557,6 +560,9 @@ body {
 
 /* Glassmorphism 2.0 Overrides */
 :root {
+    --muted: #64748b;
+    --border: rgba(255,255,255,0.1);
+    --glass-dark: rgba(15,15,25,0.97);
     --glass-bg: rgba(15, 15, 15, 0.75);
     --glass-border: rgba(255, 255, 255, 0.1);
     --blur: blur(25px) saturate(180%);
@@ -623,6 +629,7 @@ body {
 }
 
 .window-header {
+    user-select: none;
     background: rgba(255,255,255,0.05);
     padding: 12px 18px;
     display: flex;
@@ -1607,3 +1614,9 @@ body {
 
 .mouse-glow { position: fixed; width: 400px; height: 400px; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 1; transform: translate(-50%, -50%); transition: opacity 0.3s; opacity: 0; }
 
+
+@keyframes shattering {
+    0% { transform: scale(1); opacity: 1; filter: blur(0); }
+    100% { transform: scale(1.1); opacity: 0; filter: blur(10px); }
+}
+.shattering { animation: shattering 0.4s forwards; }
