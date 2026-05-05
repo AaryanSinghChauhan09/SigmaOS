@@ -24,7 +24,7 @@ void SovereignSnapEngine::init() {
 }
 
 void SovereignSnapEngine::applyLayout(sigma_u32 layout_id) {
-    sigma_printf("Σ [SNAP]: Applying spatial layout L%02u...\n", layout_id);
+    log_emit(LOG_INFO, "[SNAP]: Applying spatial layout.");
     log_emit(LOG_INFO, "Σ [SNAP]: Viewport reconciliation complete.");
 }
 
@@ -38,8 +38,7 @@ void SovereignSnapEngine::registerZone(sigma_u32 x, sigma_u32 y,
         zone->w        = w;
         zone->h        = h;
         zone->capacity = w * h;
-        sigma_printf("Σ [SNAP]: Zone %u registered (%u,%u,%u,%u).\n",
-                     this->active_zone_count, x, y, w, h);
+        log_emit(LOG_INFO, "Σ [SNAP]: Zone registered.");
     }
 }
 

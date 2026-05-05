@@ -36,7 +36,7 @@ void SovereignObservabilityMonitor::executeEbpfProgram(const void* bytecode, sig
 
 void SovereignObservabilityMonitor::rebalanceLattice() {
     log_emit(LOG_WARN, "[MONITOR] Lattice load imbalance detected via eBPF probes. Migrating shards...");
-    sigma_printf("[MONITOR] Migration: S412 -> Core 15, S092 -> Core 02.\n");
+    log_emit(LOG_INFO, "[MONITOR] Migration: S412 -> Core 15, S092 -> Core 02.");
 }
 
 } // namespace Observability

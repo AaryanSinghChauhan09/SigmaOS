@@ -57,6 +57,7 @@ qemu-system-x86_64 -cdrom build/sigmaos-x86_64.iso -m 2G -serial stdio
 To run SigmaOS on actual hardware:
 
 1. Insert a USB flash drive.
+
 # Warning: This will erase all data on the USB drive.
 
    ```bash

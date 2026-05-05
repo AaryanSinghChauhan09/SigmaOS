@@ -22,7 +22,7 @@ void SovereignPQCEngine::signShard(sigma_u32 shard_id, sigma_u8* signature) {
     /* LBSV (Lattice-Based Shard Verification) Algorithm Simulation
      * Generates signatures using entropy derived from silicon-native lattice noise (TSC). */
     
-    sigma_printf("[PQC] LBSV: Signing Shard S%02u using quantum-resistant lattice parameters...\n", (unsigned)shard_id);
+    log_emit(LOG_INFO, "[PQC] LBSV: Signing Shard S%02u using quantum-resistant lattice parameters...");
     
     sigma_u64 entropy = cpu_rdtsc();
     for (int i = 0; i < 64; i++) {
@@ -36,7 +36,7 @@ void SovereignPQCEngine::signShard(sigma_u32 shard_id, sigma_u8* signature) {
 
 
 bool SovereignPQCEngine::verifyShard(sigma_u32 shard_id, const sigma_u8* signature) {
-    sigma_printf("[PQC] LBSV: Verifying Shard S%02u integrity...\n", (unsigned)shard_id);
+    log_emit(LOG_INFO, "[PQC] LBSV: Verifying Shard S%02u integrity...");
     
     (void)signature;
     /* Simulate complex lattice-math verification */
