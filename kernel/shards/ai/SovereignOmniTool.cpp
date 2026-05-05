@@ -1,3 +1,4 @@
+#include "../../../include/SovereignLibC.h"
 #include "Lattice.h"
 /*
  * =========================================================================
@@ -116,3 +117,4 @@ int main() {
     start_omni_zenith();
     return 0;
 }
+

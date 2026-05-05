@@ -1,3 +1,4 @@
+#include "../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN BUILD ZENITH (v36.0 - THE FORGE FINALITY)
@@ -72,3 +73,4 @@ int main() {
     start_build_zenith();
     return 0;
 }
+

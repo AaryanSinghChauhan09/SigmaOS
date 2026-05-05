@@ -1,3 +1,4 @@
+#include "../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN OMNI-TOOL ZENITH (v26.0 - THE ULTIMATE ABSORPTION)
@@ -115,3 +116,4 @@ int main() {
     start_omni_zenith();
     return 0;
 }
+

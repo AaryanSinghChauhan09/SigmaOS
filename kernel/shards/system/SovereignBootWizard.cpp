@@ -1,3 +1,4 @@
+#include "../../../include/SovereignLibC.h"
 #include "Lattice.h"
 /*
  * =========================================================================
@@ -66,3 +67,4 @@ int main() {
     start_wizard_zenith();
     return 0;
 }
+
