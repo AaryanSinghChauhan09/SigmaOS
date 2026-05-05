@@ -7,3 +7,4 @@
 * **Community Modules:** User-contributed shards with signature verification.
 * **WASM Support:** High-performance web-shard execution.
 * **Marketplace Integration:** Sovereign app-shard discovery and installation.
+

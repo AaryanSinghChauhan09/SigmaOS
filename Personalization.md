@@ -20,6 +20,7 @@ The **Dashboard Generator** shard rasterizes SVG widgets directly into VRAM for 
 
 - **Real-Time Telemetry**: Visualize CPU, RAM, and Security lattice state with spring-physics animations.
 - **Layout Management**: Swap layouts via the `DASHBOARD_APPLY` shell command.
+
 - **Silicon Audit Widgets**: Real-time hardware monitoring with zero context-switch overhead.
 
 ---
@@ -29,7 +30,9 @@ The **Dashboard Generator** shard rasterizes SVG widgets directly into VRAM for 
 The Omni-Shell provides several features to improve the user experience:
 
 - **`HISTORY`**: Access previously summoned shards and executed commands.
+
 - **`HELP`**: Dynamic technical reference for all active shell primitives.
+
 - **`SEARCH`**: Sub-millisecond indexing of the local shard repository.
 
 ---
@@ -55,4 +58,5 @@ The **Lattice Shard Matrix** provides an industrial-grade visualization of the 5
 Profiles are defined in `profiles/*.json` (Modular JSON).
 
 Example: `sovereign_identity.json` enables the Persona Shard and triggers the Lattice Shard Matrix dashboard.
+
 

@@ -3,6 +3,7 @@
 ## 🌌 Sovereign Stewardship
 
 SigmaOS is governed by the **Sovereign Maintainers Collective**. Unlike
+
 legacy projects, governance is integrated into the lattice itself.
 
 ### 1. The Shard Maintainers
@@ -14,6 +15,7 @@ specific modular boundary.
 ### 2. Decision Making
 
 Technical decisions are made via the **Zenith Consensus Protocol**. Major
+
 architectural shifts require an **80% shard-parity vote** from the
 collective.
 
@@ -27,4 +29,5 @@ isolation.
 ---
 
 _Σ SIGMAOS: Beyond Linux. Absolute Sovereignty._
+
 

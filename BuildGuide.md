@@ -7,8 +7,10 @@ Welcome to SigmaOS. This guide provides practical steps for building, running, a
 To build SigmaOS, you will need a modern Linux environment (Ubuntu 22.04+ recommended) with the following tools installed:
 
 ```bash
+
 sudo apt update
 sudo apt install build-essential g++ make qemu-system-x86 nasm mtools
+
 ```
 
 ## Building from Source
@@ -45,7 +47,9 @@ SigmaOS uses the `s-cli` orchestrator for all build operations.
 The fastest way to test SigmaOS is via QEMU:
 
 ```bash
+
 qemu-system-x86_64 -cdrom build/sigmaos-x86_64.iso -m 2G -serial stdio
+
 ```
 
 ### On Bare Metal
@@ -53,6 +57,7 @@ qemu-system-x86_64 -cdrom build/sigmaos-x86_64.iso -m 2G -serial stdio
 To run SigmaOS on actual hardware:
 
 1. Insert a USB flash drive.
+
 2. Flash the ISO to the drive using `dd` (Linux/macOS) or Rufus (Windows).
    **Warning: This will erase all data on the USB drive.**
 
@@ -66,4 +71,5 @@ To run SigmaOS on actual hardware:
 ## Navigating the Zenith UI
 
 Upon boot, you will be greeted by the Zenith UI dashboard. You can switch to the `SigmaShell` fallback terminal by pressing `Ctrl + Alt + F1`.
+
 

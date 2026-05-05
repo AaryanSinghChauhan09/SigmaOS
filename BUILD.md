@@ -7,6 +7,7 @@ This guide provides instructions for building the SigmaOS Sovereign Lattice and 
 To build and run SigmaOS, you need the following tools:
 
 - **GCC / G++**: Cross-compiler for `x86_64-elf` (or local `g++` if building for simulation).
+
 - **NASM**: Assembly compiler for low-level silicon orchestration.
 - **Make**: Build orchestration tool.
 - **QEMU**: Hardware emulator for kernel verification.
@@ -18,13 +19,17 @@ To build and run SigmaOS, you need the following tools:
 ### 1. Clean previous builds
 
 ```bash
+
 make clean
+
 ```
 
 ### 2. Build the kernel singularity
 
 ```bash
+
 make singularity
+
 ```
 
 This will generate `sigmaos.bin` in the root directory.
@@ -32,7 +37,9 @@ This will generate `sigmaos.bin` in the root directory.
 ### 3. Generate a bootable ISO
 
 ```bash
+
 make zenith-iso
+
 ```
 
 This requires an `iso_root` directory with the appropriate GRUB configuration.
@@ -42,7 +49,9 @@ This requires an `iso_root` directory with the appropriate GRUB configuration.
 To boot the kernel in QEMU and trace execution via serial output:
 
 ```bash
+
 make qemu
+
 ```
 
 ### Serial Debugging
@@ -54,10 +63,13 @@ Kernel logs are piped to `stdio` (serial port 0). You can monitor the boot seque
 We recommend running `cppcheck` before submitting any PRs:
 
 ```bash
+
 cppcheck --enable=warning,style,performance -Iinclude kernel/
+
 ```
 
 ---
 
 _Σ SIGMAOS: Sovereign Build System. Absolute Integrity._
+
 

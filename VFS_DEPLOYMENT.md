@@ -19,6 +19,9 @@ The Sovereign Lattice dynamically unites heterogeneous silicon:
 Run the orchestrator:
 
 ```bash
+
 python3 tools/sovereign-deploy.py
+
 ```
+
 

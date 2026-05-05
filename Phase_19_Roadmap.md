@@ -17,7 +17,9 @@ Shards are modularised into three core layers:
 | Module | Path | Responsibility |
 | --- | --- | --- |
 | `collective_conscious.c` | `modules/core/kernel/` | Thought-stream acquisition & harmony evaluation |
+
 | `neural_market.c` | `modules/core/kernel/` | Neural-adaptive shard trading |
+
 | `neural_ui.c` | `modules/ui/` | Mind-responsive holographic UI |
 
 ### Harmony Algorithm
@@ -39,7 +41,9 @@ Shards evolve into **cultural councils** that enforce sovereign ethics across ci
 | Module | Path | Responsibility |
 | --- | --- | --- |
 | `cultural_governance.c` | `modules/core/kernel/` | Council logic & heritage preservation |
+
 | `species_council.c` | `modules/core/kernel/` | Multi-species federated governance |
+
 | `universal_ethics.c` | `modules/core/kernel/` | Cross-civilization ethics enforcement |
 
 ## Impact
@@ -47,4 +51,5 @@ Shards evolve into **cultural councils** that enforce sovereign ethics across ci
 - Positions SigmaOS as the **first OS with mind-adaptive sovereignty**.
 - Establishes **culture-sovereign governance** across planetary societies.
 - Opens new frontiers in accessibility, education, and collective creativity.
+
 

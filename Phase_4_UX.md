@@ -16,7 +16,9 @@ Build out the Morphic UI beyond the prototype to support real window management.
 Provide a command-line interface for shard management and system control.
 
 - Implement basic commands (`ls`, `cd`, `ps` equivalents).
+
 - Add shard-specific commands (`create`, `kill`, `isolate`).
+
 - Support scripting for automation.
 - Ensure POSIX-like behavior for compatibility.
 
@@ -46,4 +48,5 @@ Add support for multiple languages and accessibility features.
 - Add screen reader compatibility.
 - Provide high-contrast UI themes.
 - Ensure shard-level accessibility APIs.
+
 

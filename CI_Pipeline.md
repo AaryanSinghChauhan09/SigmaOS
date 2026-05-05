@@ -40,6 +40,9 @@ The SigmaOS CI/CD pipeline is designed for absolute bit-perfect parity across he
 To trigger a manual convergence of the Sovereign Lattice:
 
 ```bash
+
 make industrial_sync
+
 ```
+
 

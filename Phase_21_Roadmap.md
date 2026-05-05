@@ -11,7 +11,9 @@ The first step towards planetary ubiquity. S-Install allows SigmaOS to autonomou
 | Module | Path | Responsibility |
 | --- | --- | --- |
 | `sovereign_installer.cpp` | `kernel/orchestration/` | Bare-metal disk sharding and bootloader injection |
+
 | `silicon_discovery.cpp` | `kernel/drivers/` | Autonomous hardware capability mapping |
+
 | `lattice_reproduction.cpp` | `kernel/core/` | Self-propagating kernel binary replication |
 
 ## Track B: Silicon-Native Networking (Zero-Buffer Stack)
@@ -21,6 +23,7 @@ Removing the overhead of traditional networking. A stack designed for agentic co
 | Module | Path | Responsibility |
 | --- | --- | --- |
 | `sovereign_stack.cpp` | `kernel/net/` | Zero-copy UDP/TCP implementation |
+
 | `mesh_protocol.cpp` | `kernel/net/` | Decentralized lattice-to-lattice synchronization |
 
 ## Phase 21 Disruptive Additions
@@ -32,6 +35,7 @@ Moving beyond the keyboard. UI elements that morph based on cognitive load and e
 | Module | Path | Responsibility |
 | --- | --- | --- |
 | `neural_bridge.cpp` | `kernel/shards/` | Biometric-gated interaction logic |
+
 | `emotion_engine.cpp` | `kernel/core/` | Cognitive state empathy (CSE) implementation |
 
 ### Industrial-Grade Hardening (CIB v100.0)
@@ -41,6 +45,7 @@ Cryptographic Isolation Boundaries (CIB) enforced at the micro-shard level.
 | Module | Path | Responsibility |
 | --- | --- | --- |
 | `sovereign_sandbox.cpp` | `kernel/core/` | Enclave-gated container execution |
+
 | `audit_sentinel.cpp` | `kernel/shards/` | Real-time legal and security audit |
 
 ## Impact
@@ -51,4 +56,5 @@ Cryptographic Isolation Boundaries (CIB) enforced at the micro-shard level.
 
 ---
 **Σ SIGMAOS: THE ZENITH OF EXECUTION.**
+
 

@@ -11,7 +11,9 @@ SigmaOS abandons legacy `make` pipelines in favor of a mathematically determinis
 To cross-compile the 600-shard C++ kernel for all supported Sovereign Architectures (x86_64, ARM64, RISC-V):
 
 ```bash
+
 python3 tools/sigma-build.py
+
 ```
 
 This will automatically resolve dependencies, parse the `SovereignEnclave` constraints, and output a bootable ISO.
@@ -19,4 +21,5 @@ This will automatically resolve dependencies, parse the `SovereignEnclave` const
 ## Binary Instruction Translation (BIT)
 
 SigmaOS supports unmodified Linux ELF binaries through the `SovereignCompat` shard. You do not need to recompile userland Linux apps; simply drop the binary onto the `SovereignVFS` and the BIT engine will dynamically translate the POSIX syscalls into native Sovereign API hooks.
+
 

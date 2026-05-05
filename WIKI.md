@@ -65,7 +65,9 @@ The OS implements the **S80 Amnesia** protocol, ensuring that sensitive silicon 
 To deploy SigmaOS on physical silicon:
 
 1. Ignite the **Live Boot Nexus** from a portable silicon medium.
+
 2. Select **Sovereign Colonization** to map the lattice core to the local NVMe nexus.
+
 3. The **Sovereign Bootloader** will verify silicon integrity before first ignition.
 
 ### 2. Multi-Cloud Lattice Clustering
@@ -73,7 +75,9 @@ To deploy SigmaOS on physical silicon:
 For enterprise-grade cloud hosting:
 
 1. Initialize the **Sovereign Cloud Orchestrator** on your master node.
+
 2. Join nodes using the `JoinCluster` protocol over an encrypted **PQC-Lattice** handshake.
+
 3. Enable **Global Workload Balancing** to ensure 100% lattice parity across AWS, GCP, and Azure.
 
 ### 3. Network Ignition (PXE)
@@ -81,7 +85,9 @@ For enterprise-grade cloud hosting:
 For large-scale data center deployment:
 
 1. Configure the **Sovereign PXE Nexus** to stream lattice shards over RDMA.
+
 2. Ensure the **Post-Quantum Handshake** is active for all boot-nodes.
+
 3. Shards will be projected directly into RAM-phantom space for zero-trace execution.
 
 ---
@@ -93,7 +99,9 @@ The **Sovereign Industrial API** provides a clean, C++ OOP interface for develop
 ### Core Primitives
 
 - `SovereignAPI::Log(const char*)`: Industrial-grade diagnostic logging.
+
 - `SovereignAPI::AllocateShard(sigma_size_t)`: Allocates memory in protected RAM-phantom space.
+
 - `SovereignAPI::ReleaseShard(void*)`: Wipes and releases shard memory using the **S80 Amnesia** protocol.
 
 ### Distributed & Consensus
@@ -113,6 +121,7 @@ SigmaOS is an open-governance silicon singularity. Developers can contribute to 
 ### 1. Development Environment
 
 - Use the **Sovereign Industrial API** (`include/SovereignAPI.hpp`).
+
 - Ensure all code is **Zero-Dependency** and adheres to **Silicon-Native** performance standards.
 
 ### 2. Verification & PQC Signing
@@ -132,9 +141,13 @@ SigmaOS is an open-governance silicon singularity. Developers can contribute to 
 The following core shards form the foundation of the Sovereign Lattice:
 
 - **`SovereignCore`**: The root orchestrator shard.
+
 - **`SovereignNetMesh`**: PQC-hardened distributed networking.
+
 - **`SovereignZenith`**: Morphic UI and hardware-accelerated graphics.
+
 - **`SovereignIDS`**: Real-time silicon anomaly detection.
+
 - **`SovereignLatticePQC`**: Quantum-resistant cryptographic nexus.
 
 ## 🏆 Competitive Dominance Analysis
@@ -294,4 +307,5 @@ Integrated with the **Sovereign Neural Engine**, the vision system provides real
 ---
 
 _Σ SIGMAOS: Absolute Mastery. Silicon-Direct. Zero-Dependency. Aware._
+
 

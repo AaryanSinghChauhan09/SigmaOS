@@ -17,7 +17,9 @@ assignees: ''
 ## Reproduction Steps
 
 1. Step one
+
 2. Step two
+
 3. Step three
 
 ## Expected Behavior
@@ -37,6 +39,9 @@ assignees: ''
 ## Logs
 
 ```text
+
 <!-- Paste sigma_log / serial output here -->
+
 ```
+
 

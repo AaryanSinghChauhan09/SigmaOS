@@ -7,6 +7,7 @@
 ## 🗺️ Quick Contribution Map
 
 ```
+
 Have an idea?
     │
     ├─ New kernel primitive?  → suites/S01_Genesis/sigma_<name>.h
@@ -16,6 +17,7 @@ Have an idea?
     ├─ New perf optimization? → suites/S28_PerformanceLattice/sigma_<name>.h
     ├─ New OOP driver class?  → sigmaos/core/src/atomic_sigma_<name>_oop.cpp
     └─ New CLI command?       → orchestrator/main.cpp → add ICommand subclass
+
 ```
 
 ---
@@ -25,12 +27,19 @@ Have an idea?
 | Category | Prefix | Example |
 |---------|--------|---------|
 | System core | `sigma_sys_` | `sigma_sys_snapshot.h` |
+
 | Networking | `sigma_net_` | `sigma_net_vpn.h` |
+
 | Security | `sigma_sec_` | `sigma_sec_tpm.h` |
+
 | Performance | `sigma_perf_` | `sigma_perf_isolator.h` |
+
 | Multimedia | `sigma_media_` | `sigma_media_codec.h` |
+
 | Automation | `sigma_auto_` | `sigma_auto_watchdog.h` |
+
 | UI | `sigma_ui_` | `sigma_ui_shader.h` |
+
 | Package | `sigma_pkg_` | `sigma_pkg_resolver.h` |
 
 ---
@@ -56,11 +65,10 @@ Find the right `suites/S<NN>_*` directory:
 
 ```bash
 
-
 # Example: adding a VPN tunnel module
 
-
 touch suites/S37_SovereignWire/sigma_vpn.h
+
 ```
 
 ### 2. Write the module
@@ -68,6 +76,7 @@ touch suites/S37_SovereignWire/sigma_vpn.h
 Follow the **Atomic Module Contract** (see Developer Guide):
 
 - One `#ifndef` guard
+
 - One primary struct + 3–5 static inline functions
 - Zero external includes
 
@@ -76,15 +85,18 @@ Follow the **Atomic Module Contract** (see Developer Guide):
 Edit `orchestrator/main.cpp`, find `TestCommand::run_subsystem_test()`:
 
 ```cpp
+
 static void run_subsystem_test(const char* subsystem) {
     // Add your new subsystem here:
     std::cout << "[✓] " << subsystem << " → All shards passed.\n";
 }
+
 ```
 
 ### 4. Add a CLI command (optional)
 
 ```cpp
+
 // In orchestrator/main.cpp, add a new ICommand subclass:
 class VPNCommand : public ICommand {
 public:
@@ -95,21 +107,26 @@ public:
     }
 };
 // Then register in CommandDispatcher constructor
+
 ```
 
 ### 5. Test locally
 
 ```bash
+
 g++ -std=c++20 orchestrator/main.cpp -o s-cli
 ./s-cli test --subsystem networking
+
 ```
 
 ### 6. Push & watch CI
 
 ```bash
+
 git add suites/S37_SovereignWire/sigma_vpn.h orchestrator/main.cpp
 git commit -m "feat: Add sigma_vpn atomic networking module"
 git push origin main
+
 ```
 
 CI will automatically run all 4 workflows and report results.
@@ -121,9 +138,15 @@ CI will automatically run all 4 workflows and report results.
 | Module | Inspired By | Priority |
 |--------|------------|---------|
 | `sigma_vpn.h` | WireGuard | 🔥 High |
+
 | `sigma_tpm.h` | TPM 2.0 | 🔥 High |
+
 | `sigma_codec_h264.h` | FFmpeg | 🟡 Medium |
+
 | `sigma_dns_resolver.h` | Unbound DNS | 🟡 Medium |
+
 | `sigma_thermal.h` | Linux ACPI | 🟢 Low |
+
 | `sigma_power_mgmt.h` | Windows ACPI | 🟢 Low |
+
 

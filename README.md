@@ -10,6 +10,7 @@ SigmaOS is **not** a daily-driver operating system. Currently, the kernel can:
 - **Initialize Hardware:** Basic probing of the CPU and establishing serial output (COM1) for debugging.
 - **Allocate Memory:** A simple bare-metal bump allocator (QBMP) with basic guard checks.
 - **Execute Minimal Userland:** A barebones interactive shell (`sigma_sh`) is in development to provide basic I/O.
+
 - **Demonstrate Architecture:** The entire kernel is divided into isolated C++ singletons ("Shards") that communicate via strict C-linkage interfaces.
 
 SigmaOS currently lacks a fully functional filesystem, robust device drivers (e.g., USB, GPU), and a mature networking stack, though stubs exist.
@@ -19,16 +20,22 @@ SigmaOS currently lacks a fully functional filesystem, robust device drivers (e.
 ### Dependencies
 
 - `make`
+
 - `nasm`
+
 - `g++` (multilib / cross-compiler)
+
 - `qemu-system-x86_64`
+
 - `grub-mkrescue` and `xorriso` (for ISO generation)
 
 ### 1. Build the Kernel
 
 ```bash
+
 make clean
 make singularity
+
 ```
 
 _This generates `sigmaos.bin`, the core Multiboot2 executable._
@@ -36,7 +43,9 @@ _This generates `sigmaos.bin`, the core Multiboot2 executable._
 ### 2. Generate a Bootable ISO
 
 ```bash
+
 make zenith-iso
+
 ```
 
 _Creates a GRUB-bootable ISO image for testing on hardware or VMs._
@@ -44,7 +53,9 @@ _Creates a GRUB-bootable ISO image for testing on hardware or VMs._
 ### 3. Run in Emulator
 
 ```bash
+
 make qemu
+
 ```
 
 _Boots the kernel in QEMU and pipes the internal kernel logs directly to your terminal._
@@ -81,4 +92,5 @@ For a detailed look at our implementation history, refer to the project Wiki and
 ---
 
 _Σ SIGMAOS: Absolute Sovereignty. Singularity Achieved._
+
 

@@ -5,6 +5,7 @@ Thank you for considering a contribution to the **SigmaOS Sovereign Lattice**!
 ## Getting Started
 
 1. **Fork** the repository and create a branch from `main`.
+
 2. **Build** the project using the deterministic build pipeline:
 
    ```bash
@@ -38,4 +39,5 @@ All contributions must adhere to the **Sovereign Shard Standard**:
 ## Security Issues
 
 Please **do not** open public issues for security vulnerabilities. Read [SECURITY.md](../SECURITY) for responsible disclosure guidelines.
+
 

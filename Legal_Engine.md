@@ -20,10 +20,13 @@ The **Sovereign Legal Engine** is a specialized diagnostic shard designed to orc
 The engine is initialized via the `checklist_init()` interface, which hot-loads the sharded law templates into the Zenith kernel.
 
 ```c
+
 extern "C" void checklist_init(void);
+
 ```
 
 ## 🚀 Performance
 
 The Legal Engine executes compliance audits with sub-microsecond latency, ensuring that judicial sentinels do not bottleneck the sovereign boot sequence.
+
 

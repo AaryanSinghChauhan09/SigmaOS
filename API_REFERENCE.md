@@ -9,6 +9,7 @@ Complete API mapping for all Sovereign Singleton shards.
 Per-process syscall gating with bitmask precision.
 
 - `void capability_grant(sigma_u32 pid, sigma_u64 caps);`
+
 - `bool capability_check(sigma_u32 pid, sigma_u64 required);`
 
 ### `SovereignEnclaveEngine`
@@ -16,6 +17,7 @@ Per-process syscall gating with bitmask precision.
 Hardware-level PQC key isolation.
 
 - `void enclave_provision(sigma_u32 id);`
+
 - `void enclave_store_key(sigma_u32 id, const char* key);`
 
 ### `SovereignMultiUserEngine`
@@ -23,6 +25,7 @@ Hardware-level PQC key isolation.
 UID/GID process identity with PQC attestation.
 
 - `sigma_u32 multiuser_register(sigma_u32 uid, sigma_u32 gid, const char* user, sigma_u64 caps);`
+
 - `bool multiuser_authenticate(sigma_u32 uid, const char* username);`
 
 ## Package & Automation
@@ -40,6 +43,7 @@ S-PKG: Sovereign App Bundle installer.
 Ring-0 cron replacement with macro recording.
 
 - `void scheduler_add_task(const char* name, sigma_u32 interval_ms);`
+
 - `void scheduler_tick(sigma_u32 elapsed_ms);`
 
 ### `SovereignAutomatorEngine`
@@ -47,6 +51,7 @@ Ring-0 cron replacement with macro recording.
 AI-driven predictive workflow macro engine.
 
 - `void automator_register_macro(const char* trigger, const char* action);`
+
 - `void automator_context_tick(const char* context);`
 
 ## Compute & Hardware
@@ -56,6 +61,7 @@ AI-driven predictive workflow macro engine.
 Vendor-agnostic GPU compute dispatcher.
 
 - `void gpu_register(const char* vendor_id, sigma_u32 vram_mb);`
+
 - `bool gpu_dispatch(const char* workload_type);`
 
 ### `SovereignHWTranspilerEngine`
@@ -69,6 +75,7 @@ Self-learning PCIe driver shim generator.
 Hardware hang recovery timer.
 
 - `void watchdog_init(sigma_u32 timeout_ms);`
+
 - `void watchdog_service(sigma_u32 tick_ms);`
 
 ## Networking & Storage
@@ -78,6 +85,7 @@ Hardware hang recovery timer.
 Zero-trust Ring-0 TCP/IP stack.
 
 - `void netstack_register_interface(const char* mac_addr);`
+
 - `bool netstack_dispatch_packet(const char* payload, sigma_u32 length);`
 
 ### `SovereignVFSEngine`
@@ -85,6 +93,7 @@ Zero-trust Ring-0 TCP/IP stack.
 Distributed, multi-node replicated filesystem.
 
 - `void vfs_mount_node(const char* node_address);`
+
 - `void vfs_write_file(const char* filepath, const char* data);`
 
 ### `SovereignContainerStorageEngine`
@@ -118,4 +127,5 @@ Persona-driven sovereign setup wizard.
 Contextual predictive quick-action engine.
 
 - `void shortcuts_suggest(const char* context, const char* suggestion);`
+
 

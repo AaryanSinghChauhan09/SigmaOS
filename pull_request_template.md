@@ -24,10 +24,15 @@ Closes #
 ## Shard Checklist (New Shards Only)
 
 - [ ] C++ OOP Singleton with `getInstance()`
+
 - [ ] `extern "C"` wrappers for all public functions
+
 - [ ] Registered in `SovereignUSR` via `usr_register_shard()`
+
 - [ ] `cppcheck` passes with zero warnings
+
 - [ ] Wiki page created or updated in `SigmaOS.wiki/`
+
 - [ ] `IDEAS_BACKLOG.md` or `MISSING_COMPONENTS.md` updated
 
 ## Bug Fix Checklist
@@ -43,4 +48,5 @@ Closes #
 ## Screenshots / Serial Output
 
 <!-- Paste sigma_log output or screenshots if applicable -->
+
 

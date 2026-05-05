@@ -5,2200 +5,4397 @@
 | Suite | Shard | USPs Absorbed |
 | :--- | :--- | :--- |
 | `S01_Genesis` | `kmain.c` | — |
+
 | `S01_Genesis` | `S01_01_GranularShard.c` | — |
+
 | `S01_Genesis` | `S01_02_GranularShard.c` | — |
+
 | `S01_Genesis` | `S01_03_GranularShard.c` | — |
+
 | `S01_Genesis` | `S01_04_GranularShard.c` | — |
+
 | `S01_Genesis` | `S01_06_Syscall_Dispatcher.c` | — |
+
 | `S01_Genesis` | `S01_07_Kernel_Panic.c` | — |
+
 | `S01_Genesis` | `S01_Boot_Stage1_Nexus.c` | — |
+
 | `S01_Genesis` | `S01_Boot_Stage2_Nexus.c` | — |
+
 | `S01_Genesis` | `S01_Boot_Stage3_Nexus.c` | — |
+
 | `S01_Genesis` | `S01_Boot_Stage4_Nexus.c` | — |
+
 | `S01_Genesis` | `S01_Boot_Stage5_Nexus.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_10.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_11.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_12.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_13.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_14.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_15.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_16.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_17.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_18.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_19.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_20.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_21.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_22.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_23.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_24.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_25.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_26.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_27.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_28.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_29.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_30.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_31.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_32.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_33.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_34.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_35.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_36.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_37.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_38.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_39.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_40.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_41.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_42.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_43.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_44.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_45.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_46.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_47.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_48.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_49.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_50.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_51.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_52.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_53.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_54.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_55.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_56.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_57.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_58.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_59.c` | — |
+
 | `S01_Genesis` | `S01_Lattice_Shard_60.c` | — |
+
 | `S01_Genesis` | `SigmaOS_Zenith_Monolith.c` | — |
+
 | `S01_Genesis` | `sigma_main.c` | — |
+
 | `S01_Genesis` | `sigma_string.h` | — |
+
 | `S01_Genesis` | `sigma_syscall_table.c` | — |
+
 | `S01_Genesis` | `sigma_syscall_table.h` | — |
+
 | `S01_Genesis` | `simulate_sovereign.c` | — |
+
 | `S01_Genesis` | `SovereignBackendSuite.c` | — |
+
 | `S01_Genesis` | `SovereignGenesisDeployer.c` | — |
+
 | `S01_Genesis` | `SovereignIDT.c` | — |
+
 | `S01_Genesis` | `SovereignKMain.c` | — |
+
 | `S01_Genesis` | `SovereignLibC.c` | — |
+
 | `S01_Genesis` | `SovereignPrincipleSuite.c` | — |
+
 | `S01_Genesis` | `SovereignSuiteRegistry.c` | — |
+
 | `S01_Genesis` | `SovereignSyscallDispatcher.c` | — |
+
 | `S01_Genesis` | `SovereignSyscallInterface.c` | — |
+
 | `S01_Genesis` | `test_sigma_atoi_nano.c` | — |
+
 | `S01_Genesis` | `utils.c` | — |
+
 | `S02_ZenithUI` | `S02_01_GranularShard.c` | — |
+
 | `S02_ZenithUI` | `S02_02_GranularShard.c` | — |
+
 | `S02_ZenithUI` | `S02_03_GranularShard.c` | — |
+
 | `S02_ZenithUI` | `S02_04_GranularShard.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_10.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_11.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_12.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_13.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_14.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_15.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_16.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_17.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_18.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_19.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_20.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_21.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_22.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_23.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_24.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_25.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_26.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_27.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_28.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_29.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_30.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_31.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_32.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_33.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_34.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_35.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_36.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_37.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_38.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_39.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_40.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_41.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_42.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_43.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_44.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_45.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_46.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_47.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_48.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_49.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_50.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_51.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_52.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_53.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_54.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_55.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_56.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_57.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_58.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_59.c` | — |
+
 | `S02_ZenithUI` | `S02_Lattice_Shard_60.c` | — |
+
 | `S02_ZenithUI` | `sigma_boot.c` | — |
+
 | `S02_ZenithUI` | `sigma_boot.h` | — |
+
 | `S02_ZenithUI` | `SovereignAlphaCompositor.c` | — |
+
 | `S02_ZenithUI` | `SovereignAudio.c` | — |
+
 | `S02_ZenithUI` | `SovereignBootMaster.c` | — |
+
 | `S02_ZenithUI` | `SovereignCanvasShard.c` | — |
+
 | `S02_ZenithUI` | `SovereignControlCenter.c` | macOS Control Center — unified toggles for Net, Audio, Focus, Windows 11 Action Center — fluent flyouts and interactive notifications, iOS Dashboard     — widget-based layout with real-time stats, KDE Plasma Widgets— customisable, modular UI widgets, Gaussian Blur Background (Aero Glass vNext), Reactive Motion Shaders, Unified Hardware Toggle Hub |
+
 | `S02_ZenithUI` | `SovereignDesktopShell.c` | Windows Explorer — Integrated File Browsing + Taskbar, macOS Finder      — Column-view navigation and Spotlight integration, GNOME Shell       — Clean, extension-based modularity, visionOS Dashboard — Floating volumetric window management |
+
 | `S02_ZenithUI` | `SovereignDirectFramebuffer.c` | — |
+
 | `S02_ZenithUI` | `SovereignDisplayServer.c` | — |
+
 | `S02_ZenithUI` | `SovereignDisplayShard.c` | — |
+
 | `S02_ZenithUI` | `SovereignFrontendSuite.c` | — |
+
 | `S02_ZenithUI` | `SovereignGfxAccelerator.c` | — |
+
 | `S02_ZenithUI` | `SovereignGraphicsShard.c` | — |
+
 | `S02_ZenithUI` | `SovereignGraphShard.c` | — |
+
 | `S02_ZenithUI` | `SovereignHolographicCore.c` | — |
+
 | `S02_ZenithUI` | `SovereignHolographicEngine.c` | Apple visionOS     — volumetric windowing, spatial depth, real-time light, Windows Aero/Glass — transparent blurred surfaces (Gaussian), macOS Quartz Extreme — GPU accelerated window composition and shadow, Android Material   — depth elevation and motion-curated physics, Native 48-bit depth buffer for non-overlapping Z-order physics, Real-time Ray-Traced Blur (RTRB) in the kernel compositor, Parallax holographic icons that react to gyroscope/mouse tilt |
+
 | `S02_ZenithUI` | `SovereignHyperCompositor.c` | — |
+
 | `S02_ZenithUI` | `SovereignInfiniteDisplay.c` | — |
+
 | `S02_ZenithUI` | `SovereignInputShard.c` | — |
+
 | `S02_ZenithUI` | `SovereignLiquidUI.c` | — |
+
 | `S02_ZenithUI` | `SovereignMediaCodec.c` | — |
+
 | `S02_ZenithUI` | `SovereignMediaV4L2.c` | — |
+
 | `S02_ZenithUI` | `SovereignMusicSynthShard.c` | — |
+
 | `S02_ZenithUI` | `SovereignOmniSearch.c` | — |
+
 | `S02_ZenithUI` | `SovereignPersonalization.c` | — |
+
 | `S02_ZenithUI` | `SovereignPhysicsEngine.c` | NVIDIA PhysX / Havok — Real-time physics for games and graphics, visionOS Physics — Volumetric window and object interaction |
+
 | `S02_ZenithUI` | `SovereignPredictiveLaunch.c` | — |
+
 | `S02_ZenithUI` | `SovereignProVideoEngine.c` | Apple ProRes / After Effects — Pro-grade RAW video handling, Windows Media Foundation — standard video pipeline, Linux ffmpeg (Kernel-accelerated) — universal codec support, 12-bit RAW pipeline: No quality loss between drive (S06) and screen (S02)., GPU-Native Effects: Real-time 8K HDR grading in the compositor., Zero-Latency Scrubbing: Uses S13 Sentience to pre-fetch video blocks. |
+
 | `S02_ZenithUI` | `SovereignSmartExplorerShard.c` | — |
+
 | `S02_ZenithUI` | `SovereignSoundALSA.c` | — |
+
 | `S02_ZenithUI` | `SovereignSoundShard.c` | — |
+
 | `S02_ZenithUI` | `SovereignSpatialProjection.c` | — |
+
 | `S02_ZenithUI` | `SovereignSpotlight.c` | macOS Spotlight — Instant search across files, apps, and metadata, Windows Everything — Sub-millisecond filename indexing, Linux mlocate — database-driven fast local search, Deep Registry integration: Search within settings (Registry v2), Contextual App Intelligence: Searches inside .sab app manifests, Real-time VFS watcher: Instant index updates on every S06 write |
+
 | `S02_ZenithUI` | `SovereignSuiteRegistry.c` | — |
+
 | `S02_ZenithUI` | `SovereignTop.c` | — |
+
 | `S02_ZenithUI` | `SovereignTypography.c` | macOS Quartz — Fluid, heavy-weight smoothing with natural curves, Windows ClearType — High-contrast sub-pixel LCD optimization, FreeType (Linux) — Universal font format compatibility (OTF/TTF), Real-time Kerning & Ligature Support at the Kernel Compositor level, Sovereign-Smooth: AI-augmented edge anti-aliasing for 8K displays, Dynamic Weighting: Adjusts font weight based on system "Sentiment" scale |
+
 | `S02_ZenithUI` | `SovereignUSBShard.c` | — |
+
 | `S02_ZenithUI` | `SovereignVectorShard.c` | — |
+
 | `S02_ZenithUI` | `SovereignWebShard.c` | — |
+
 | `S02_ZenithUI` | `SovereignZenithDashboard_v3.c` | — |
+
 | `S02_ZenithUI` | `SovereignZSpaceManager.c` | — |
+
 | `S03_Orchestrator` | `S03_01_GranularShard.c` | — |
+
 | `S03_Orchestrator` | `S03_02_GranularShard.c` | — |
+
 | `S03_Orchestrator` | `S03_03_GranularShard.c` | — |
+
 | `S03_Orchestrator` | `S03_04_GranularShard.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_10.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_11.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_12.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_13.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_14.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_15.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_16.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_17.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_18.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_19.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_20.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_21.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_22.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_23.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_24.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_25.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_26.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_27.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_28.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_29.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_30.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_31.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_32.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_33.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_34.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_35.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_36.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_37.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_38.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_39.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_40.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_41.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_42.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_43.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_44.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_45.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_46.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_47.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_48.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_49.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_50.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_51.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_52.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_53.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_54.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_55.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_56.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_57.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_58.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_59.c` | — |
+
 | `S03_Orchestrator` | `S03_Lattice_Shard_60.c` | — |
+
 | `S03_Orchestrator` | `SigmaGamingPerformance.c` | — |
+
 | `S03_Orchestrator` | `SigmaGodMatrix.c` | — |
+
 | `S03_Orchestrator` | `SigmaLegacyIntegration.c` | — |
+
 | `S03_Orchestrator` | `SigmaMultimediaRealtime.c` | — |
+
 | `S03_Orchestrator` | `SigmaPrivacyAmnesic.c` | — |
+
 | `S03_Orchestrator` | `SigmaSecuritySpecialized.c` | — |
+
 | `S03_Orchestrator` | `sigma_sched.c` | — |
+
 | `S03_Orchestrator` | `sigma_sched.h` | — |
+
 | `S03_Orchestrator` | `SovereignABI.c` | — |
+
 | `S03_Orchestrator` | `SovereignActor.c` | — |
+
 | `S03_Orchestrator` | `SovereignActorShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignAIDE.c` | — |
+
 | `S03_Orchestrator` | `SovereignAL2.c` | — |
+
 | `S03_Orchestrator` | `SovereignAlma.c` | — |
+
 | `S03_Orchestrator` | `SovereignAlpine.c` | — |
+
 | `S03_Orchestrator` | `SovereignALPM.c` | — |
+
 | `S03_Orchestrator` | `SovereignAmnesia.c` | — |
+
 | `S03_Orchestrator` | `SovereignAmoebaRPC.c` | — |
+
 | `S03_Orchestrator` | `SovereignAnonsurf.c` | — |
+
 | `S03_Orchestrator` | `SovereignAntiX.c` | — |
+
 | `S03_Orchestrator` | `SovereignApk.c` | — |
+
 | `S03_Orchestrator` | `SovereignAppArmor.c` | — |
+
 | `S03_Orchestrator` | `SovereignAPT.c` | — |
+
 | `S03_Orchestrator` | `SovereignARC.c` | — |
+
 | `S03_Orchestrator` | `SovereignArchShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignART.c` | — |
+
 | `S03_Orchestrator` | `SovereignAsahi.c` | — |
+
 | `S03_Orchestrator` | `SovereignAshmem.c` | — |
+
 | `S03_Orchestrator` | `SovereignAsync.c` | — |
+
 | `S03_Orchestrator` | `SovereignAtomicFS.c` | — |
+
 | `S03_Orchestrator` | `SovereignAudit.c` | — |
+
 | `S03_Orchestrator` | `SovereignAuditCLI.c` | — |
+
 | `S03_Orchestrator` | `SovereignAutoconfig.c` | — |
+
 | `S03_Orchestrator` | `SovereignAutoTile.c` | — |
+
 | `S03_Orchestrator` | `SovereignAVX.c` | — |
+
 | `S03_Orchestrator` | `SovereignBarrelfish.c` | — |
+
 | `S03_Orchestrator` | `SovereignBarrierShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignBatocera.c` | — |
+
 | `S03_Orchestrator` | `SovereignBazzite.c` | — |
+
 | `S03_Orchestrator` | `SovereignBedrock.c` | — |
+
 | `S03_Orchestrator` | `SovereignBFS.c` | — |
+
 | `S03_Orchestrator` | `SovereignBinaryTranslatorShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignBinder.c` | — |
+
 | `S03_Orchestrator` | `SovereignBitRot.c` | — |
+
 | `S03_Orchestrator` | `SovereignBodhi.c` | — |
+
 | `S03_Orchestrator` | `SovereignBPF.c` | — |
+
 | `S03_Orchestrator` | `SovereignBPFShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignBtrfs.c` | — |
+
 | `S03_Orchestrator` | `SovereignBusybox.c` | — |
+
 | `S03_Orchestrator` | `SovereignCapsicum.c` | — |
+
 | `S03_Orchestrator` | `SovereignCeph.c` | — |
+
 | `S03_Orchestrator` | `SovereignCgroup.c` | — |
+
 | `S03_Orchestrator` | `SovereignCHERI.c` | — |
+
 | `S03_Orchestrator` | `SovereignCHERICore.c` | — |
+
 | `S03_Orchestrator` | `SovereignChimera.c` | — |
+
 | `S03_Orchestrator` | `SovereignCinnamon.c` | — |
+
 | `S03_Orchestrator` | `SovereignClear.c` | — |
+
 | `S03_Orchestrator` | `SovereignClone.c` | — |
+
 | `S03_Orchestrator` | `SovereignCloudInit.c` | — |
+
 | `S03_Orchestrator` | `SovereignClusteredObject.c` | — |
+
 | `S03_Orchestrator` | `SovereignCohortLockShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignCombiningTreeShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignConcurrencyShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignCoopScheduler.c` | — |
+
 | `S03_Orchestrator` | `SovereignCoreboot.c` | — |
+
 | `S03_Orchestrator` | `SovereignCosmic.c` | — |
+
 | `S03_Orchestrator` | `SovereignCrOS.c` | — |
+
 | `S03_Orchestrator` | `SovereignCSPShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignDBus.c` | — |
+
 | `S03_Orchestrator` | `SovereignDeadlockPreventerShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignDedupe.c` | — |
+
 | `S03_Orchestrator` | `SovereignDeepin.c` | — |
+
 | `S03_Orchestrator` | `SovereignDemandShardEngine.c` | — |
+
 | `S03_Orchestrator` | `SovereignDissect.c` | — |
+
 | `S03_Orchestrator` | `SovereignDistroAmalgamation.c` | — |
+
 | `S03_Orchestrator` | `SovereignDLM.c` | — |
+
 | `S03_Orchestrator` | `SovereignDragora.c` | — |
+
 | `S03_Orchestrator` | `SovereignDRBD.c` | — |
+
 | `S03_Orchestrator` | `SovereignDTrace.c` | — |
+
 | `S03_Orchestrator` | `SovereignEBPF.c` | — |
+
 | `S03_Orchestrator` | `SovereignEBRShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignEliminationStackShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignEndeavour.c` | — |
+
 | `S03_Orchestrator` | `SovereignEndless.c` | — |
+
 | `S03_Orchestrator` | `SovereignEnterprise.c` | — |
+
 | `S03_Orchestrator` | `SovereignEROS.c` | — |
+
 | `S03_Orchestrator` | `SovereignEthernet.c` | — |
+
 | `S03_Orchestrator` | `SovereignFactoryReset.c` | — |
+
 | `S03_Orchestrator` | `SovereignFCPQShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignFeren.c` | — |
+
 | `S03_Orchestrator` | `SovereignFineGrained.c` | — |
+
 | `S03_Orchestrator` | `SovereignFirecracker.c` | — |
+
 | `S03_Orchestrator` | `SovereignFlatcar.c` | — |
+
 | `S03_Orchestrator` | `SovereignFlatCombineShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignForensics.c` | — |
+
 | `S03_Orchestrator` | `SovereignForthShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignFrugal.c` | — |
+
 | `S03_Orchestrator` | `SovereignFrugalDeep.c` | — |
+
 | `S03_Orchestrator` | `SovereignFuzzer.c` | — |
+
 | `S03_Orchestrator` | `SovereignGameMode.c` | Windows Game Mode — prioritizes GPU/CPU for gaming threads, macOS Game Mode   — doubles Bluetooth/audio polling rate, Linux RT-Kernel   — preemptive real-time priority, Silicon-Lock: Locks CPU cores exclusively to the game PID (No jitter)., Cache-Inlining: S05 slab cache prevents other apps from evicting game data., 100% Zero-Throttling: Bypasses S04 PowerPulse to maintain max clock. |
+
 | `S03_Orchestrator` | `SovereignGamescope.c` | — |
+
 | `S03_Orchestrator` | `SovereignGaruda.c` | — |
+
 | `S03_Orchestrator` | `SovereignGarudaShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignGarudaZenShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignGCD.c` | — |
+
 | `S03_Orchestrator` | `SovereignGenode.c` | — |
+
 | `S03_Orchestrator` | `SovereignGEOM.c` | — |
+
 | `S03_Orchestrator` | `SovereignGitShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignGuix.c` | — |
+
 | `S03_Orchestrator` | `SovereignHAL.c` | — |
+
 | `S03_Orchestrator` | `SovereignHandoffLockShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignHandoffQueueShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignHazardShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignHeartbeat.c` | — |
+
 | `S03_Orchestrator` | `SovereignHLEShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignHotSwap.c` | — |
+
 | `S03_Orchestrator` | `SovereignHypervisorShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignIce.c` | — |
+
 | `S03_Orchestrator` | `SovereignIgnition.c` | — |
+
 | `S03_Orchestrator` | `SovereignImmutable.c` | — |
+
 | `S03_Orchestrator` | `SovereignInit.c` | — |
+
 | `S03_Orchestrator` | `SovereignInjection.c` | — |
+
 | `S03_Orchestrator` | `SovereignIntelliViz.c` | — |
+
 | `S03_Orchestrator` | `SovereignIOMMU.c` | — |
+
 | `S03_Orchestrator` | `SovereignIOSubsystem.c` | — |
+
 | `S03_Orchestrator` | `SovereignIPCShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignIsolationShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignJail.c` | — |
+
 | `S03_Orchestrator` | `SovereignJournal.c` | — |
+
 | `S03_Orchestrator` | `SovereignKexec.c` | — |
+
 | `S03_Orchestrator` | `SovereignKISS.c` | — |
+
 | `S03_Orchestrator` | `SovereignKnoppix.c` | — |
+
 | `S03_Orchestrator` | `SovereignKodachi.c` | — |
+
 | `S03_Orchestrator` | `SovereignKolibri_ASM.c` | — |
+
 | `S03_Orchestrator` | `SovereignKpatch.c` | — |
+
 | `S03_Orchestrator` | `SovereignKqueue.c` | — |
+
 | `S03_Orchestrator` | `SovereignL4.c` | — |
+
 | `S03_Orchestrator` | `SovereignLakka.c` | — |
+
 | `S03_Orchestrator` | `SovereignLandlock.c` | — |
+
 | `S03_Orchestrator` | `SovereignLaunchd.c` | — |
+
 | `S03_Orchestrator` | `SovereignLAVD.c` | — |
+
 | `S03_Orchestrator` | `SovereignLawShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignLibre.c` | — |
+
 | `S03_Orchestrator` | `SovereignLibreboot.c` | — |
+
 | `S03_Orchestrator` | `SovereignLimbo.c` | — |
+
 | `S03_Orchestrator` | `SovereignLisket.c` | — |
+
 | `S03_Orchestrator` | `SovereignLite.c` | — |
+
 | `S03_Orchestrator` | `SovereignLockless.c` | — |
+
 | `S03_Orchestrator` | `SovereignLUKS.c` | — |
+
 | `S03_Orchestrator` | `SovereignLUNA.c` | — |
+
 | `S03_Orchestrator` | `SovereignLVM.c` | — |
+
 | `S03_Orchestrator` | `SovereignLXD.c` | — |
+
 | `S03_Orchestrator` | `SovereignLXDE.c` | — |
+
 | `S03_Orchestrator` | `SovereignLXQt.c` | — |
+
 | `S03_Orchestrator` | `SovereignMageia.c` | — |
+
 | `S03_Orchestrator` | `SovereignMakulu.c` | — |
+
 | `S03_Orchestrator` | `SovereignMasterOrchestrator.c` | — |
+
 | `S03_Orchestrator` | `SovereignMCSLockShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignMenuet.c` | — |
+
 | `S03_Orchestrator` | `SovereignMetadata.c` | — |
+
 | `S03_Orchestrator` | `SovereignMetadataFS.c` | — |
+
 | `S03_Orchestrator` | `SovereignMHWD.c` | — |
+
 | `S03_Orchestrator` | `SovereignMicroOS.c` | — |
+
 | `S03_Orchestrator` | `SovereignMidiEngine.c` | — |
+
 | `S03_Orchestrator` | `SovereignMinix_SelfHealing.c` | — |
+
 | `S03_Orchestrator` | `SovereignMPTCP.c` | — |
+
 | `S03_Orchestrator` | `SovereignMultiProcessShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignMusl.c` | — |
+
 | `S03_Orchestrator` | `SovereignMXTools.c` | — |
+
 | `S03_Orchestrator` | `SovereignNetFilter.c` | — |
+
 | `S03_Orchestrator` | `SovereignNetplan.c` | — |
+
 | `S03_Orchestrator` | `SovereignNextDO.c` | — |
+
 | `S03_Orchestrator` | `SovereignNixCore.c` | — |
+
 | `S03_Orchestrator` | `SovereignNobara.c` | — |
+
 | `S03_Orchestrator` | `SovereignNT_Compat.c` | — |
+
 | `S03_Orchestrator` | `SovereignNUMAShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignOberon.c` | — |
+
 | `S03_Orchestrator` | `SovereignObjectStore.c` | — |
+
 | `S03_Orchestrator` | `SovereignOBS.c` | — |
+
 | `S03_Orchestrator` | `SovereignOMV.c` | — |
+
 | `S03_Orchestrator` | `SovereignOpenRC.c` | — |
+
 | `S03_Orchestrator` | `SovereignOPNsense.c` | — |
+
 | `S03_Orchestrator` | `SovereignPamac.c` | — |
+
 | `S03_Orchestrator` | `SovereignPantheon.c` | — |
+
 | `S03_Orchestrator` | `SovereignPCC.c` | — |
+
 | `S03_Orchestrator` | `SovereignPF.c` | — |
+
 | `S03_Orchestrator` | `SovereignPhoton.c` | — |
+
 | `S03_Orchestrator` | `SovereignPipeline.c` | — |
+
 | `S03_Orchestrator` | `SovereignPkgtool.c` | — |
+
 | `S03_Orchestrator` | `SovereignPlan9.c` | — |
+
 | `S03_Orchestrator` | `SovereignPledge.c` | — |
+
 | `S03_Orchestrator` | `SovereignPlist.c` | — |
+
 | `S03_Orchestrator` | `SovereignPlug.c` | — |
+
 | `S03_Orchestrator` | `SovereignPolicy.c` | — |
+
 | `S03_Orchestrator` | `SovereignPortage.c` | — |
+
 | `S03_Orchestrator` | `SovereignPredictive.c` | — |
+
 | `S03_Orchestrator` | `SovereignPriorityInheritanceShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignProcd.c` | — |
+
 | `S03_Orchestrator` | `SovereignProcessPair.c` | — |
+
 | `S03_Orchestrator` | `SovereignProcessScheduler.c` | Linux CFS       — red-black vruntime tree, nanosecond fairness, Windows MLFQ    — Multi-Level Feedback Queue for interactive boost, macOS GCD       — work-stealing thread pool for async dispatch, RTLinux/RTOS    — fixed-priority preemptive real-time class |
+
 | `S03_Orchestrator` | `SovereignProxmox.c` | — |
+
 | `S03_Orchestrator` | `SovereignPure.c` | — |
+
 | `S03_Orchestrator` | `SovereignPurple.c` | — |
+
 | `S03_Orchestrator` | `SovereignQiana.c` | — |
+
 | `S03_Orchestrator` | `SovereignQNet.c` | — |
+
 | `S03_Orchestrator` | `SovereignQubes.c` | — |
+
 | `S03_Orchestrator` | `SovereignQuorum.c` | — |
+
 | `S03_Orchestrator` | `SovereignRAID.c` | — |
+
 | `S03_Orchestrator` | `SovereignRancher.c` | — |
+
 | `S03_Orchestrator` | `SovereignRC.c` | — |
+
 | `S03_Orchestrator` | `SovereignRCUHashShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignRCUShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignRDMAShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignReaper.c` | — |
+
 | `S03_Orchestrator` | `SovereignRecalbox.c` | — |
+
 | `S03_Orchestrator` | `SovereignRelay.c` | — |
+
 | `S03_Orchestrator` | `SovereignRescue.c` | — |
+
 | `S03_Orchestrator` | `SovereignRiscModule.c` | — |
+
 | `S03_Orchestrator` | `SovereignRocky.c` | — |
+
 | `S03_Orchestrator` | `SovereignRTGDSShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignRTOSShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignRunit.c` | — |
+
 | `S03_Orchestrator` | `SovereignRWLockShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignSBFShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignScanner.c` | — |
+
 | `S03_Orchestrator` | `SovereignScheduler_O1.c` | — |
+
 | `S03_Orchestrator` | `SovereignSDMTShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignSecurity.c` | — |
+
 | `S03_Orchestrator` | `SovereignSEH.c` | — |
+
 | `S03_Orchestrator` | `SovereignSeL4_Proof.c` | — |
+
 | `S03_Orchestrator` | `SovereignSELinux.c` | — |
+
 | `S03_Orchestrator` | `SovereignSeptor.c` | — |
+
 | `S03_Orchestrator` | `SovereignSeqlockShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignSerenity.c` | — |
+
 | `S03_Orchestrator` | `SovereignServiceMaster.c` | — |
+
 | `S03_Orchestrator` | `SovereignSIP.c` | — |
+
 | `S03_Orchestrator` | `SovereignSlackInit.c` | — |
+
 | `S03_Orchestrator` | `SovereignSLES.c` | — |
+
 | `S03_Orchestrator` | `SovereignSMTShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignSnap.c` | — |
+
 | `S03_Orchestrator` | `SovereignSnapshot.c` | — |
+
 | `S03_Orchestrator` | `SovereignSnapshotShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignSoup.c` | — |
+
 | `S03_Orchestrator` | `SovereignSpaceBank.c` | — |
+
 | `S03_Orchestrator` | `SovereignStateless.c` | — |
+
 | `S03_Orchestrator` | `SovereignStealStackShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignSTMShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignSuiteRegistry.c` | — |
+
 | `S03_Orchestrator` | `SovereignSuper.c` | — |
+
 | `S03_Orchestrator` | `SovereignSystemdStub.c` | — |
+
 | `S03_Orchestrator` | `SovereignTaggedMemory.c` | — |
+
 | `S03_Orchestrator` | `SovereignTails.c` | — |
+
 | `S03_Orchestrator` | `SovereignTaskDAG.c` | — |
+
 | `S03_Orchestrator` | `SovereignTempleOS.c` | — |
+
 | `S03_Orchestrator` | `SovereignTHP.c` | — |
+
 | `S03_Orchestrator` | `SovereignTicketLockShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignTimeShareShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignTiny.c` | — |
+
 | `S03_Orchestrator` | `SovereignTranslate.c` | — |
+
 | `S03_Orchestrator` | `SovereignTranslator.c` | — |
+
 | `S03_Orchestrator` | `SovereignTrueNAS.c` | — |
+
 | `S03_Orchestrator` | `SovereignUbuntuCore.c` | — |
+
 | `S03_Orchestrator` | `SovereignUCI.c` | — |
+
 | `S03_Orchestrator` | `SovereignUEK.c` | — |
+
 | `S03_Orchestrator` | `SovereignUKUI.c` | — |
+
 | `S03_Orchestrator` | `SovereignUpdateA.c` | — |
+
 | `S03_Orchestrator` | `SovereignUpdateB.c` | — |
+
 | `S03_Orchestrator` | `SovereignVault.c` | — |
+
 | `S03_Orchestrator` | `SovereignVerification.c` | — |
+
 | `S03_Orchestrator` | `SovereignVisopsys.c` | — |
+
 | `S03_Orchestrator` | `SovereignVoidShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignVolat.c` | — |
+
 | `S03_Orchestrator` | `SovereignVoyager.c` | — |
+
 | `S03_Orchestrator` | `SovereignVT.c` | — |
+
 | `S03_Orchestrator` | `SovereignVTable.c` | — |
+
 | `S03_Orchestrator` | `SovereignVyOS.c` | — |
+
 | `S03_Orchestrator` | `SovereignWaitFreeShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignWasmShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignWFRingShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignWFStackShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignWhonix.c` | — |
+
 | `S03_Orchestrator` | `SovereignWireGuard.c` | — |
+
 | `S03_Orchestrator` | `SovereignWorkload.c` | — |
+
 | `S03_Orchestrator` | `SovereignWorkPalingShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignWorkStealShard.c` | — |
+
 | `S03_Orchestrator` | `SovereignYaST.c` | — |
+
 | `S03_Orchestrator` | `SovereignZenithOrchestrator.c` | — |
+
 | `S03_Orchestrator` | `SovereignZFS.c` | — |
+
 | `S03_Orchestrator` | `SovereignZircon.c` | — |
+
 | `S03_Orchestrator` | `SovereignZorin.c` | — |
+
 | `S03_Orchestrator` | `SovereignZOSPilot.c` | — |
+
 | `S03_Orchestrator` | `SovereignZram.c` | — |
+
 | `S04_HAL` | `console.c` | — |
+
 | `S04_HAL` | `paging.c` | — |
+
 | `S04_HAL` | `S04_01_GpuDriverStack.c` | — |
+
 | `S04_HAL` | `S04_01_GranularShard.c` | — |
+
 | `S04_HAL` | `S04_02_GranularShard.c` | — |
+
 | `S04_HAL` | `S04_03_GranularShard.c` | — |
+
 | `S04_HAL` | `S04_04_GranularShard.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_10.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_11.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_12.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_13.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_14.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_15.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_16.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_17.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_18.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_19.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_20.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_21.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_22.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_23.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_24.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_25.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_26.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_27.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_28.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_29.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_30.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_31.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_32.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_33.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_34.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_35.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_36.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_37.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_38.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_39.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_40.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_41.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_42.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_43.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_44.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_45.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_46.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_47.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_48.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_49.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_50.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_51.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_52.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_53.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_54.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_55.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_56.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_57.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_58.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_59.c` | — |
+
 | `S04_HAL` | `S04_Lattice_Shard_60.c` | — |
+
 | `S04_HAL` | `sigma_hal.c` | — |
+
 | `S04_HAL` | `sigma_hal.h` | — |
+
 | `S04_HAL` | `SovereignACPI.c` | — |
+
 | `S04_HAL` | `SovereignACPI_Core.c` | — |
+
 | `S04_HAL` | `SovereignAMXShard.c` | — |
+
 | `S04_HAL` | `SovereignAndroidBridgeShard.c` | — |
+
 | `S04_HAL` | `SovereignArchBridgeShard.c` | — |
+
 | `S04_HAL` | `SovereignArchRegistry.c` | — |
+
 | `S04_HAL` | `SovereignArch_Zen.c` | — |
+
 | `S04_HAL` | `SovereignARM64Shard.c` | — |
+
 | `S04_HAL` | `SovereignAudioShard.c` | — |
+
 | `S04_HAL` | `SovereignAudioStack.c` | — |
+
 | `S04_HAL` | `SovereignBlockIO.c` | — |
+
 | `S04_HAL` | `SovereignBluetooth.c` | — |
+
 | `S04_HAL` | `SovereignBusShard.c` | — |
+
 | `S04_HAL` | `SovereignCacheInjectorShard.c` | — |
+
 | `S04_HAL` | `SovereignCapabilityAbstraction.c` | — |
+
 | `S04_HAL` | `SovereignCATShard.c` | — |
+
 | `S04_HAL` | `SovereignCloudHAL.c` | — |
+
 | `S04_HAL` | `SovereignControlShard.c` | — |
+
 | `S04_HAL` | `SovereignCXLCShard.c` | — |
+
 | `S04_HAL` | `SovereignCXLShard.c` | — |
+
 | `S04_HAL` | `SovereignDCAShard.c` | — |
+
 | `S04_HAL` | `SovereignDeviceProbe.c` | — |
+
 | `S04_HAL` | `SovereignDPUShard.c` | — |
+
 | `S04_HAL` | `SovereignDriverDevelopmentKit.c` | Windows WDF (KMDF/UMDF) — Standardized driver object model, Linux DKMS — Dynamic kernel module re-compilation, macOS IOKit — Object-oriented driver hierarchy and C++-lite runtime |
+
 | `S04_HAL` | `SovereignDriverFramework.c` | — |
+
 | `S04_HAL` | `SovereignDriverRegistry.c` | — |
+
 | `S04_HAL` | `SovereignDriverWrapper.c` | — |
+
 | `S04_HAL` | `SovereignDSAShard.c` | — |
+
 | `S04_HAL` | `SovereignEdgeHAL.c` | — |
+
 | `S04_HAL` | `SovereignEmbeddedShard.c` | — |
+
 | `S04_HAL` | `SovereignEntropyShard.c` | — |
+
 | `S04_HAL` | `SovereignFAMShard.c` | — |
+
 | `S04_HAL` | `SovereignFastMove.c` | — |
+
 | `S04_HAL` | `SovereignGDRShard.c` | — |
+
 | `S04_HAL` | `SovereignGestureCore.c` | Apple Magic Trackpad — Force Touch and fluid 4-finger gestures, Windows Precision Touchpad — Low-latency scrolling and pinch-to-zoom, Android Haptics — Waveform-based localized tactile feedback, Hardware-accelerated gesture recognition (Sub-1ms path to S02), Adaptive Palm Rejection using S13 Sentience patterns, Unified Gesture API: Same logic for touchscreens, trackpads, and sensors |
+
 | `S04_HAL` | `SovereignGPUShard.c` | — |
+
 | `S04_HAL` | `SovereignGpuStack.c` | — |
+
 | `S04_HAL` | `SovereignGraphicsBridge.c` | Apple Metal      — Low-overhead, high-efficiency GPU access, Vulkan (Khronos) — Universal, explicit GPU state control, Windows DirectX12— DirectStorage integration and rich feature set |
+
 | `S04_HAL` | `SovereignGreenShard.c` | — |
+
 | `S04_HAL` | `SovereignHAL_x86_64.c` | — |
+
 | `S04_HAL` | `SovereignHardwareMaster.c` | — |
+
 | `S04_HAL` | `SovereignHardwareTuner.c` | — |
+
 | `S04_HAL` | `SovereignHBMShard.c` | — |
+
 | `S04_HAL` | `SovereignHCPShard.c` | — |
+
 | `S04_HAL` | `SovereignHIDBridgeShard.c` | — |
+
 | `S04_HAL` | `SovereignHMATShard.c` | — |
+
 | `S04_HAL` | `SovereignHPCShard.c` | — |
+
 | `S04_HAL` | `SovereignHTMShard.c` | — |
+
 | `S04_HAL` | `SovereignI2CCore.c` | — |
+
 | `S04_HAL` | `SovereignInput.c` | — |
+
 | `S04_HAL` | `SovereignInputPipeline.c` | Nvidia Reflex (PC) — Reduced latency between click and render, Apple ProMotion (macOS) — 120Hz display sync with input, Windows Raw Input — Direct peripheral access, Direct-Path: Input events move from S04_HAL directly to S02 GPU, Native 8000Hz Polling Support for pro-level HID interaction. |
+
 | `S04_HAL` | `SovereignInterruptHandler.c` | — |
+
 | `S04_HAL` | `SovereignIOMMUShard.c` | — |
+
 | `S04_HAL` | `SovereignLegacyHALShard.c` | — |
+
 | `S04_HAL` | `SovereignLPOShard.c` | — |
+
 | `S04_HAL` | `SovereignMathCompute.c` | Intel MKL / OpenBLAS — High-performance math kernels, NVIDIA cuBLAS / ROCm — GPU-accelerated matrix math, Apple Accelerate    — Vectorized DSP and AMX-optimized math |
+
 | `S04_HAL` | `SovereignMBMShard.c` | — |
+
 | `S04_HAL` | `SovereignMobileShard.c` | — |
+
 | `S04_HAL` | `SovereignMPAMShard.c` | — |
+
 | `S04_HAL` | `SovereignMPKShard.c` | — |
+
 | `S04_HAL` | `SovereignNPUShard.c` | — |
+
 | `S04_HAL` | `SovereignNVDIMMShard.c` | — |
+
 | `S04_HAL` | `SovereignNVMe.c` | — |
+
 | `S04_HAL` | `SovereignNVMERingShard.c` | — |
+
 | `S04_HAL` | `SovereignNVSWShard.c` | — |
+
 | `S04_HAL` | `SovereignOIOShard.c` | — |
+
 | `S04_HAL` | `SovereignP2PDMAShard.c` | — |
+
 | `S04_HAL` | `SovereignPageColoringShard.c` | — |
+
 | `S04_HAL` | `SovereignPageWalkBridgeShard.c` | — |
+
 | `S04_HAL` | `SovereignPCIScan.c` | — |
+
 | `S04_HAL` | `SovereignPMEMShard.c` | — |
+
 | `S04_HAL` | `SovereignPMUShard.c` | — |
+
 | `S04_HAL` | `SovereignPowerGovShard.c` | — |
+
 | `S04_HAL` | `SovereignPowerManagement.c` | — |
+
 | `S04_HAL` | `SovereignPowerManager.c` | — |
+
 | `S04_HAL` | `SovereignPowerPulse.c` | macOS Energy Saver — Fine-grained component nap (App Nap parity), Windows Power Profiles — Dynamic clock scaling, Android Doze — Deep sleep state with background batching, Nano-Gating: Shuts down individual CPU logical blocks between cycles, Predictive Throttling: Cools the CPU *before* heat spikes occur, Sentiment Efficiency: Correlates user patterns (S13) to battery drain |
+
 | `S04_HAL` | `SovereignPrefetchIntShard.c` | — |
+
 | `S04_HAL` | `SovereignPrefetchShard.c` | — |
+
 | `S04_HAL` | `SovereignPrefetchTunerShard.c` | — |
+
 | `S04_HAL` | `SovereignProAudio.c` | CoreAudio (macOS) — world-standard low latency, aggregate devices, ASIO (Windows)    — hardware-exclusive mode, bypasses OS mixer, JACK (Linux)      — cross-app routing and sample-accurate sync, WDM/ALSA          — standard multi-channel PCM support |
+
 | `S04_HAL` | `SovereignQATShard.c` | — |
+
 | `S04_HAL` | `SovereignQPUShard.c` | — |
+
 | `S04_HAL` | `SovereignR3SchedShard.c` | — |
+
 | `S04_HAL` | `SovereignRDTSCShard.c` | — |
+
 | `S04_HAL` | `SovereignRISCVShard.c` | — |
+
 | `S04_HAL` | `SovereignROM_Boot.c` | — |
+
 | `S04_HAL` | `SovereignSignalShard.c` | — |
+
 | `S04_HAL` | `SovereignSiliconOverdriver.c` | — |
+
 | `S04_HAL` | `SovereignSiliconResynthesizer.c` | — |
+
 | `S04_HAL` | `SovereignSIMDShard.c` | — |
+
 | `S04_HAL` | `SovereignSMPShard.c` | — |
+
 | `S04_HAL` | `SovereignSpatialAudio.c` | Apple Spatial Audio — Dynamic head tracking and object placement, Dolby Atmos        — multi-channel object-based audio, Windows Sonic      — Virtual surround sound, HRTF Silicon: Uses S04 MathCompute to perform Head-Related Transfer, 128 Object Limit: Simulates 128 concurrent sound sources in 3D space. |
+
 | `S04_HAL` | `SovereignSPDKShard.c` | — |
+
 | `S04_HAL` | `SovereignSpecGuardShard.c` | — |
+
 | `S04_HAL` | `SovereignSPICore.c` | — |
+
 | `S04_HAL` | `SovereignSRIOVShard.c` | — |
+
 | `S04_HAL` | `SovereignSuiteRegistry.c` | — |
+
 | `S04_HAL` | `SovereignTelemetryShard.c` | — |
+
 | `S04_HAL` | `SovereignTouchInputStack.c` | — |
+
 | `S04_HAL` | `SovereignTPMShard.c` | — |
+
 | `S04_HAL` | `SovereignUCIShard.c` | — |
+
 | `S04_HAL` | `SovereignUnifiedDriver.c` | — |
+
 | `S04_HAL` | `SovereignUSBCore.c` | — |
+
 | `S04_HAL` | `SovereignUSBSubsystem.c` | — |
+
 | `S04_HAL` | `SovereignVDMAShard.c` | — |
+
 | `S04_HAL` | `SovereignVectorShard.c` | — |
+
 | `S04_HAL` | `SovereignVMMShard.c` | — |
+
 | `S04_HAL` | `SovereignVTableRegistry.c` | — |
+
 | `S04_HAL` | `SovereignWSEShard.c` | — |
+
 | `S04_HAL` | `SovereignZeroPowerState.c` | — |
+
 | `S04_HAL` | `SovereignZNSShard.c` | — |
+
 | `S04_HAL` | `Sovereign_Interrupt_Dispatch.c` | — |
+
 | `S05_Memory` | `S05_01_GranularShard.c` | — |
+
 | `S05_Memory` | `S05_02_GranularShard.c` | — |
+
 | `S05_Memory` | `S05_03_GranularShard.c` | — |
+
 | `S05_Memory` | `S05_04_GranularShard.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_10.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_11.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_12.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_13.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_14.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_15.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_16.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_17.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_18.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_19.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_20.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_21.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_22.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_23.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_24.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_25.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_26.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_27.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_28.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_29.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_30.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_31.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_32.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_33.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_34.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_35.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_36.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_37.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_38.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_39.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_40.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_41.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_42.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_43.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_44.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_45.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_46.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_47.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_48.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_49.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_50.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_51.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_52.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_53.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_54.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_55.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_56.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_57.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_58.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_59.c` | — |
+
 | `S05_Memory` | `S05_Lattice_Shard_60.c` | — |
+
 | `S05_Memory` | `sigma_vmm.c` | — |
+
 | `S05_Memory` | `sigma_vmm.h` | — |
+
 | `S05_Memory` | `SovereignAccelShiftShard.c` | — |
+
 | `S05_Memory` | `SovereignBuddyShard.c` | — |
+
 | `S05_Memory` | `SovereignConcurrencyEngine.c` | — |
+
 | `S05_Memory` | `SovereignMagazineSlabShard.c` | — |
+
 | `S05_Memory` | `SovereignMemoryCore.c` | — |
+
 | `S05_Memory` | `SovereignMemoryRegistry.c` | — |
+
 | `S05_Memory` | `SovereignMemorySuite.c` | — |
+
 | `S05_Memory` | `SovereignMeshNuma.c` | — |
+
 | `S05_Memory` | `SovereignObjectShard.c` | — |
+
 | `S05_Memory` | `SovereignOmnicache.c` | — |
+
 | `S05_Memory` | `SovereignPMM.c` | — |
+
 | `S05_Memory` | `SovereignPMM_Bitmap.c` | — |
+
 | `S05_Memory` | `SovereignSlabAllocator.c` | — |
+
 | `S05_Memory` | `SovereignSlabAllocatorV2.c` | Linux SLUB       — simplified, cache-hot per-CPU slabs, Solaris SLAB     — magazine cache layer for O(1) alloc/free, macOS zone alloc — fixed-size zone lists per object type, jemalloc (FreeBSD) — size-class bucketing, fragmentation control |
+
 | `S05_Memory` | `SovereignSlabShard.c` | — |
+
 | `S05_Memory` | `SovereignSubAtomicPager.c` | — |
+
 | `S05_Memory` | `SovereignSuiteRegistry.c` | — |
+
 | `S05_Memory` | `SovereignVirtualMemory.c` | — |
+
 | `S06_Storage` | `S06_01_GranularShard.c` | — |
+
 | `S06_Storage` | `S06_02_GranularShard.c` | — |
+
 | `S06_Storage` | `S06_03_GranularShard.c` | — |
+
 | `S06_Storage` | `S06_04_GranularShard.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_10.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_11.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_12.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_13.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_14.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_15.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_16.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_17.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_18.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_19.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_20.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_21.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_22.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_23.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_24.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_25.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_26.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_27.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_28.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_29.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_30.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_31.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_32.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_33.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_34.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_35.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_36.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_37.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_38.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_39.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_40.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_41.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_42.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_43.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_44.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_45.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_46.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_47.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_48.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_49.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_50.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_51.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_52.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_53.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_54.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_55.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_56.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_57.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_58.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_59.c` | — |
+
 | `S06_Storage` | `S06_Lattice_Shard_60.c` | — |
+
 | `S06_Storage` | `sigma_vfs.h` | — |
+
 | `S06_Storage` | `Sovereign9PShard.c` | — |
+
 | `S06_Storage` | `SovereignACIDEngine.c` | — |
+
 | `S06_Storage` | `SovereignBTreeShard.c` | — |
+
 | `S06_Storage` | `SovereignDatabaseShard.c` | — |
+
 | `S06_Storage` | `SovereignDataframeShard.c` | — |
+
 | `S06_Storage` | `SovereignDHTShard.c` | — |
+
 | `S06_Storage` | `SovereignDirectPath.c` | — |
+
 | `S06_Storage` | `SovereignDirectStorage.c` | Windows DirectStorage — bypasses CPU for game/asset loading to GPU VRAM, NVIDIA GPUDirect      — RDMA for storage directly to GPU buffers, macOS APFS Fast Copy — kernel-level metadata speed-up for big files |
+
 | `S06_Storage` | `SovereignExt4Shard.c` | — |
+
 | `S06_Storage` | `SovereignFAT32Shard.c` | — |
+
 | `S06_Storage` | `SovereignFileEncryption.c` | LUKS2 (Linux)   — PBKDF2/Argon2 key derivation, header backup, BitLocker (Win) — TPM-sealed key, pre-boot auth, volume master key, FileVault 2 (macOS) — iCloud recovery key, HFS+ wrapper volume, VeraCrypt (OSS) — plausible deniability hidden volumes, APFS Encryption — per-extent encryption, no performance cliff |
+
 | `S06_Storage` | `SovereignFSRegistry.c` | — |
+
 | `S06_Storage` | `SovereignHiveBlockStore.c` | — |
+
 | `S06_Storage` | `SovereignImmortalization.c` | — |
+
 | `S06_Storage` | `SovereignIOCPShard.c` | — |
+
 | `S06_Storage` | `SovereignIORingShard.c` | — |
+
 | `S06_Storage` | `SovereignJournalingFS.c` | ext4 (Linux)  — ordered journaling: metadata + optional data journal, NTFS (Windows)— transaction log ($LogFile) for crash consistency, ZFS (Sun)     — Copy-on-Write: never overwrites live data, always atomic, APFS (Apple)  — atomic safe-save: power-fail consistent transactions |
+
 | `S06_Storage` | `SovereignJournalingShard.c` | — |
+
 | `S06_Storage` | `SovereignLBUShard.c` | — |
+
 | `S06_Storage` | `SovereignLZShard.c` | — |
+
 | `S06_Storage` | `SovereignPageCacheShard.c` | — |
+
 | `S06_Storage` | `SovereignPrefetcherShard.c` | — |
+
 | `S06_Storage` | `SovereignSQLShard.c` | — |
+
 | `S06_Storage` | `SovereignSSD_Direct.c` | — |
+
 | `S06_Storage` | `SovereignStoragePool.c` | — |
+
 | `S06_Storage` | `SovereignSuiteRegistry.c` | — |
+
 | `S06_Storage` | `SovereignTimeVault.c` | macOS Time Machine — user-friendly historical file recovery, Windows Shadow Copy (VSS) — block-level snapshotting for backups, APFS/ZFS Snapshots — near-instant, zero-cost CoW snapshots, "Total System Revert": Roll back the kernel, registry, and userland |
+
 | `S06_Storage` | `SovereignVFSShard.c` | — |
+
 | `S06_Storage` | `vfs.c` | — |
+
 | `S07_Network` | `S07_01_GranularShard.c` | — |
+
 | `S07_Network` | `S07_02_GranularShard.c` | — |
+
 | `S07_Network` | `S07_03_GranularShard.c` | — |
+
 | `S07_Network` | `S07_04_GranularShard.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_10.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_11.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_12.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_13.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_14.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_15.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_16.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_17.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_18.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_19.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_20.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_21.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_22.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_23.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_24.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_25.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_26.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_27.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_28.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_29.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_30.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_31.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_32.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_33.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_34.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_35.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_36.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_37.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_38.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_39.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_40.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_41.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_42.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_43.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_44.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_45.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_46.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_47.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_48.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_49.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_50.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_51.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_52.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_53.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_54.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_55.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_56.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_57.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_58.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_59.c` | — |
+
 | `S07_Network` | `S07_Lattice_Shard_60.c` | — |
+
 | `S07_Network` | `sigma_http.c` | — |
+
 | `S07_Network` | `sigma_netstack.c` | — |
+
 | `S07_Network` | `sigma_netstack.h` | — |
+
 | `S07_Network` | `sigma_network.c` | — |
+
 | `S07_Network` | `SovereignAirDropShard.c` | — |
+
 | `S07_Network` | `SovereignAnycastShard.c` | — |
+
 | `S07_Network` | `SovereignCloudSyncService.c` | iCloud (Apple)    — transparent file sync, delta compression, OneDrive (Windows)— on-demand placeholders, selective sync, Dropbox           — block-level dedup, LAN sync peer discovery, Google Drive      — real-time collaborative document streaming, Microsoft RDP     — hardware-encoded GPU frame streaming |
+
 | `S07_Network` | `SovereignClusterShard.c` | — |
+
 | `S07_Network` | `SovereignConsensusShard.c` | — |
+
 | `S07_Network` | `SovereignDistributedShard.c` | — |
+
 | `S07_Network` | `SovereignDNS_DHCP.c` | — |
+
 | `S07_Network` | `SovereignEthernetShard.c` | — |
+
 | `S07_Network` | `SovereignFirewall.c` | — |
+
 | `S07_Network` | `SovereignHTTPServer.c` | — |
+
 | `S07_Network` | `SovereignIgnitionCluster.c` | — |
+
 | `S07_Network` | `SovereignInfernoDisVM.c` | — |
+
 | `S07_Network` | `SovereignL3Shard.c` | — |
+
 | `S07_Network` | `SovereignMeshRouteShard.c` | — |
+
 | `S07_Network` | `SovereignMultiserverTopology.c` | — |
+
 | `S07_Network` | `SovereignNetNavigator.c` | — |
+
 | `S07_Network` | `SovereignNetRegistry.c` | — |
+
 | `S07_Network` | `SovereignNetStackShard.c` | — |
+
 | `S07_Network` | `SovereignNetworkShard.c` | — |
+
 | `S07_Network` | `SovereignNetworkStack.c` | — |
+
 | `S07_Network` | `SovereignNetwork_FSM.c` | — |
+
 | `S07_Network` | `SovereignNVMeFabricsShard.c` | — |
+
 | `S07_Network` | `SovereignOpenWrtMesh.c` | — |
+
 | `S07_Network` | `SovereignPentestNexus.c` | — |
+
 | `S07_Network` | `SovereignPipeShard.c` | — |
+
 | `S07_Network` | `SovereignProxmoxHCI.c` | — |
+
 | `S07_Network` | `SovereignQSSS.c` | — |
+
 | `S07_Network` | `SovereignQuorumShard.c` | — |
+
 | `S07_Network` | `SovereignRancherPID1.c` | — |
+
 | `S07_Network` | `SovereignRoutingPacketFilter.c` | — |
+
 | `S07_Network` | `SovereignSuiteRegistry.c` | — |
+
 | `S07_Network` | `SovereignTalosAPI.c` | — |
+
 | `S07_Network` | `SovereignTCPIPShard.c` | — |
+
 | `S07_Network` | `SovereignVPNShard.c` | — |
+
 | `S07_Network` | `SovereignXDPShard.c` | — |
+
 | `S07_Network` | `SovereignZeroCopyRing.c` | — |
+
 | `S08_Security` | `S08_01_GranularShard.c` | — |
+
 | `S08_Security` | `S08_01_LsmEnforcer.c` | — |
+
 | `S08_Security` | `S08_02_GranularShard.c` | — |
+
 | `S08_Security` | `S08_03_GranularShard.c` | — |
+
 | `S08_Security` | `S08_04_GranularShard.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_10.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_11.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_12.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_13.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_14.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_15.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_16.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_17.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_18.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_19.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_20.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_21.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_22.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_23.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_24.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_25.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_26.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_27.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_28.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_29.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_30.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_31.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_32.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_33.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_34.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_35.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_36.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_37.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_38.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_39.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_40.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_41.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_42.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_43.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_44.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_45.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_46.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_47.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_48.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_49.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_50.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_51.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_52.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_53.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_54.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_55.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_56.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_57.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_58.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_59.c` | — |
+
 | `S08_Security` | `S08_Lattice_Shard_60.c` | — |
+
 | `S08_Security` | `sentinel.c` | — |
+
 | `S08_Security` | `sigma_lsm.c` | — |
+
 | `S08_Security` | `sigma_lsm.h` | — |
+
 | `S08_Security` | `SovereignABSShard.c` | — |
+
 | `S08_Security` | `SovereignAESShard.c` | — |
+
 | `S08_Security` | `SovereignAmnesicRoot.c` | — |
+
 | `S08_Security` | `SovereignASLRV2Shard.c` | — |
+
 | `S08_Security` | `SovereignAttestationShard.c` | — |
+
 | `S08_Security` | `SovereignAuditLog.c` | — |
+
 | `S08_Security` | `SovereignAuthShard.c` | — |
+
 | `S08_Security` | `SovereignBioEnclave.c` | Apple Secure Enclave — Isolated co-processor for FaceID/TouchID, Windows Hello / TPM 2.0 — Hardware-backed identity verification, Android TEE (TrustZone) — Trusted Execution Environment for secure apps, Sovereign Biometrics: Multi-modal fusion (Face + Voice + Neural-Pattern), Zero-Knowledge Keys: Private keys NEVER leave the silicon enclave., Anti-Tamper: Physical memory erasure on unauthorized hardware access. |
+
 | `S08_Security` | `SovereignBootAuditShard.c` | — |
+
 | `S08_Security` | `SovereignBPFInterpreter.c` | — |
+
 | `S08_Security` | `SovereignCapabilityACL.c` | Linux Capabilities — fine-grained privilege split from monolithic root, macOS Entitlements — code-signed capability manifests per binary, OpenBSD Pledge     — syscall whitelist commitment (irrevocable), Windows ACL/Token  — access token with privilege bitfield per process, SELinux MTE        — mandatory type enforcement, no DAC bypass |
+
 | `S08_Security` | `SovereignCETShard.c` | — |
+
 | `S08_Security` | `SovereignColdBootShard.c` | — |
+
 | `S08_Security` | `SovereignConstTimeShard.c` | — |
+
 | `S08_Security` | `SovereignCryptoShard.c` | — |
+
 | `S08_Security` | `SovereignCryptoSuite.c` | — |
+
 | `S08_Security` | `SovereignCrypto_SHA256.c` | — |
+
 | `S08_Security` | `SovereignCyberDefense.c` | — |
+
 | `S08_Security` | `SovereignDHShard.c` | — |
+
 | `S08_Security` | `SovereignDICEShard.c` | — |
+
 | `S08_Security` | `SovereignDiffPrivacyShard.c` | — |
+
 | `S08_Security` | `SovereignDITShard.c` | — |
+
 | `S08_Security` | `SovereignDPAShard.c` | — |
+
 | `S08_Security` | `SovereignDTrace.c` | — |
+
 | `S08_Security` | `SovereignDynamicTrace.c` | — |
+
 | `S08_Security` | `SovereignEBPF.c` | — |
+
 | `S08_Security` | `SovereignFirewallIPS.c` | Little Snitch (macOS) — App-level outbound connection control, Windows Firewall / Defender — Port and signature-based blocking, pf (OpenBSD) — Statefully tracking and packet normalization, Falco/eBPF (Linux) — Kernel-level network observability, Real-time AI Anomaly Detection: Blocks traffic that "feels" wrong for an app, Per-Bundle Sandbox: Each .sab bundle has an isolated micro-firewall, Invisible Mode: Zero response to unauthorized probes (Dark Cloud parity) |
+
 | `S08_Security` | `SovereignFormalVerification.c` | — |
+
 | `S08_Security` | `SovereignFTrace.c` | — |
+
 | `S08_Security` | `SovereignHardwareLinkedID.c` | — |
+
 | `S08_Security` | `SovereignHEShard.c` | — |
+
 | `S08_Security` | `SovereignHoneypotFSShard.c` | — |
+
 | `S08_Security` | `SovereignIDSShard.c` | — |
+
 | `S08_Security` | `SovereignIntegrityShard.c` | — |
+
 | `S08_Security` | `SovereignIntrusionDetection.c` | Linux eBPF/Falco  — kernel syscall tracing, runtime behavioural rules, Windows Defender  — process hollowing, memory injection detection, macOS XProtect    — signature + heuristic scanning on exec(), Snort/Suricata    — network anomaly rules engine (inline IDS mode), OSSEC             — log-based correlation, rootkit detection |
+
 | `S08_Security` | `SovereignIntrusionDetectionShard.c` | — |
+
 | `S08_Security` | `SovereignIOMPUShard.c` | — |
+
 | `S08_Security` | `SovereignJailShard.c` | — |
+
 | `S08_Security` | `SovereignKali_Forensics.c` | — |
+
 | `S08_Security` | `SovereignKASANShard.c` | — |
+
 | `S08_Security` | `SovereignKLockerShard.c` | — |
+
 | `S08_Security` | `SovereignKPTIShard.c` | — |
+
 | `S08_Security` | `SovereignKyberSuite.c` | — |
+
 | `S08_Security` | `SovereignLSMShard.c` | — |
+
 | `S08_Security` | `SovereignMandatoryAccessControl.c` | — |
+
 | `S08_Security` | `SovereignMPCShard.c` | — |
+
 | `S08_Security` | `SovereignMPUShard.c` | — |
+
 | `S08_Security` | `SovereignMTEShard.c` | — |
+
 | `S08_Security` | `SovereignMutexShard.c` | — |
+
 | `S08_Security` | `SovereignNamespaceShard.c` | — |
+
 | `S08_Security` | `SovereignOOBShard.c` | — |
+
 | `S08_Security` | `SovereignORAMShard.c` | — |
+
 | `S08_Security` | `SovereignPACShard.c` | — |
+
 | `S08_Security` | `SovereignPerfTelemetry.c` | — |
+
 | `S08_Security` | `SovereignPermissionManager.c` | — |
+
 | `S08_Security` | `SovereignPKSShard.c` | — |
+
 | `S08_Security` | `SovereignPledgeShard.c` | — |
+
 | `S08_Security` | `SovereignPOPShard.c` | — |
+
 | `S08_Security` | `SovereignPostQuantum.c` | — |
+
 | `S08_Security` | `SovereignPQCShard.c` | — |
+
 | `S08_Security` | `SovereignPrivacyShard.c` | — |
+
 | `S08_Security` | `SovereignPUFShard.c` | — |
+
 | `S08_Security` | `SovereignQECShard.c` | — |
+
 | `S08_Security` | `SovereignQKDShard.c` | — |
+
 | `S08_Security` | `SovereignQSTShard.c` | — |
+
 | `S08_Security` | `SovereignQuantumCrypto.c` | Windows/macOS/Linux — Standard RSA/ECC (Vulnerable to future quantum), NIST Post-Quantum (PQC) — New standards (Kyber, Dilithium, SPHINCS+), Defaults to CRYSTALS-Kyber for key exchange., CRYSTALS-Dilithium for digital signatures (.sab verification)., Optimized AVX-512 implementation for zero-latency encryption. |
+
 | `S08_Security` | `SovereignRMEShard.c` | — |
+
 | `S08_Security` | `SovereignSecurityHardening.c` | — |
+
 | `S08_Security` | `SovereignSecurityRegistry.c` | — |
+
 | `S08_Security` | `SovereignSentinelIDS.c` | — |
+
 | `S08_Security` | `SovereignSEVShard.c` | — |
+
 | `S08_Security` | `SovereignSFIShard.c` | — |
+
 | `S08_Security` | `SovereignSGXShard.c` | — |
+
 | `S08_Security` | `SovereignSHA256.c` | — |
+
 | `S08_Security` | `SovereignShadowStackShard.c` | — |
+
 | `S08_Security` | `SovereignSHRShard.c` | — |
+
 | `S08_Security` | `SovereignSiliconFingerprinter.c` | — |
+
 | `S08_Security` | `SovereignSMAPShard.c` | — |
+
 | `S08_Security` | `SovereignSMEPShard.c` | — |
+
 | `S08_Security` | `SovereignSMEShard.c` | — |
+
 | `S08_Security` | `SovereignSMMShard.c` | — |
+
 | `S08_Security` | `SovereignSSPV2Shard.c` | — |
+
 | `S08_Security` | `SovereignSuiteRegistry.c` | — |
+
 | `S08_Security` | `SovereignTDXShard.c` | — |
+
 | `S08_Security` | `SovereignTemporalShard.c` | — |
+
 | `S08_Security` | `SovereignTRNGShard.c` | — |
+
 | `S08_Security` | `SovereignVBSShard.c` | — |
+
 | `S09_Intelligence` | `S09_01_GranularShard.c` | — |
+
 | `S09_Intelligence` | `S09_02_GranularShard.c` | — |
+
 | `S09_Intelligence` | `S09_03_GranularShard.c` | — |
+
 | `S09_Intelligence` | `S09_04_GranularShard.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_10.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_11.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_12.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_13.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_14.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_15.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_16.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_17.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_18.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_19.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_20.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_21.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_22.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_23.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_24.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_25.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_26.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_27.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_28.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_29.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_30.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_31.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_32.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_33.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_34.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_35.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_36.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_37.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_38.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_39.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_40.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_41.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_42.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_43.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_44.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_45.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_46.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_47.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_48.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_49.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_50.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_51.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_52.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_53.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_54.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_55.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_56.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_57.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_58.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_59.c` | — |
+
 | `S09_Intelligence` | `S09_Lattice_Shard_60.c` | — |
+
 | `S09_Intelligence` | `sigma_neural_sched.c` | — |
+
 | `S09_Intelligence` | `sigma_neural_sched.h` | — |
+
 | `S09_Intelligence` | `sigma_sentience.c` | — |
+
 | `S09_Intelligence` | `sigma_sentience.h` | — |
+
 | `S09_Intelligence` | `SovereignABCShard.c` | — |
+
 | `S09_Intelligence` | `SovereignAEOShard.c` | — |
+
 | `S09_Intelligence` | `SovereignAGIShard.c` | — |
+
 | `S09_Intelligence` | `SovereignAHAShard.c` | — |
+
 | `S09_Intelligence` | `SovereignALOShard.c` | — |
+
 | `S09_Intelligence` | `SovereignAnnealerShard.c` | — |
+
 | `S09_Intelligence` | `SovereignAntColonyShard.c` | — |
+
 | `S09_Intelligence` | `SovereignAOAShard.c` | — |
+
 | `S09_Intelligence` | `SovereignBatchShard.c` | — |
+
 | `S09_Intelligence` | `SovereignBatShard.c` | — |
+
 | `S09_Intelligence` | `SovereignBayesianShard.c` | — |
+
 | `S09_Intelligence` | `SovereignBBBCShard.c` | — |
+
 | `S09_Intelligence` | `SovereignBBOShard.c` | — |
+
 | `S09_Intelligence` | `SovereignBFAShard.c` | — |
+
 | `S09_Intelligence` | `SovereignBFOShard.c` | — |
+
 | `S09_Intelligence` | `SovereignBHAShard.c` | — |
+
 | `S09_Intelligence` | `SovereignBOAShard.c` | — |
+
 | `S09_Intelligence` | `SovereignBranchBoundShard.c` | — |
+
 | `S09_Intelligence` | `SovereignCMAShard.c` | — |
+
 | `S09_Intelligence` | `SovereignCommandShard.c` | — |
+
 | `S09_Intelligence` | `SovereignCSOShard.c` | — |
+
 | `S09_Intelligence` | `SovereignCSPSolverShard.c` | — |
+
 | `S09_Intelligence` | `SovereignCSSShard.c` | — |
+
 | `S09_Intelligence` | `SovereignCuckooShard.c` | — |
+
 | `S09_Intelligence` | `SovereignDiffEvolutionShard.c` | — |
+
 | `S09_Intelligence` | `SovereignEHOShard.c` | — |
+
 | `S09_Intelligence` | `SovereignEPOShard.c` | — |
+
 | `S09_Intelligence` | `SovereignFireflyShard.c` | — |
+
 | `S09_Intelligence` | `SovereignFOAShard.c` | — |
+
 | `S09_Intelligence` | `SovereignFPAShard.c` | — |
+
 | `S09_Intelligence` | `SovereignFuzzyControllerShard.c` | — |
+
 | `S09_Intelligence` | `SovereignGBOShard.c` | — |
+
 | `S09_Intelligence` | `SovereignGeneticAlgorithmShard.c` | — |
+
 | `S09_Intelligence` | `SovereignGeneticProgrammingShard.c` | — |
+
 | `S09_Intelligence` | `SovereignGeneticShard.c` | — |
+
 | `S09_Intelligence` | `SovereignGOAShard.c` | — |
+
 | `S09_Intelligence` | `SovereignGreyWolfShard.c` | — |
+
 | `S09_Intelligence` | `SovereignGSAShard.c` | — |
+
 | `S09_Intelligence` | `SovereignGSOShard.c` | — |
+
 | `S09_Intelligence` | `SovereignHarmonySearchShard.c` | — |
+
 | `S09_Intelligence` | `SovereignHBAShard.c` | — |
+
 | `S09_Intelligence` | `SovereignHHOShard.c` | — |
+
 | `S09_Intelligence` | `SovereignHyperHeuristicShard.c` | — |
+
 | `S09_Intelligence` | `SovereignIntelligenceBridge.c` | Windows Copilot — Integrated AI chat and system control, Apple Intelligence — Privacy-focused on-device models, Google Gemini (Pixel) — Local generative AI features, Zero-Cloud Policy: 100% of inference happens on the local GPU/NPU via S04., Contextual Awareness: Access to VFS, Registry, and Logs (Local-only)., Multi-Model Support: Swap between lightweight 1B models and Pro-Models. |
+
 | `S09_Intelligence` | `SovereignIntelligenceShard.c` | — |
+
 | `S09_Intelligence` | `SovereignIntelligenceSuite.c` | — |
+
 | `S09_Intelligence` | `SovereignIWDShard.c` | — |
+
 | `S09_Intelligence` | `SovereignIWOShard.c` | — |
+
 | `S09_Intelligence` | `SovereignKHAShard.c` | — |
+
 | `S09_Intelligence` | `SovereignKMeansShard.c` | — |
+
 | `S09_Intelligence` | `SovereignLexerShard.c` | — |
+
 | `S09_Intelligence` | `SovereignLSHShard.c` | — |
+
 | `S09_Intelligence` | `SovereignMBOShard.c` | — |
+
 | `S09_Intelligence` | `SovereignMFOShard.c` | — |
+
 | `S09_Intelligence` | `SovereignMROShard.c` | — |
+
 | `S09_Intelligence` | `SovereignMVOShard.c` | — |
+
 | `S09_Intelligence` | `SovereignNEATShard.c` | — |
+
 | `S09_Intelligence` | `SovereignNeuralAutomator.c` | Apple Shortcuts — Visual workflow builder and automation, Windows Power Automate — Enterprise-grade desktop flows, IFTTT / Zapier — Cross-app event-based triggers, Autonomous Synthesis: S13 Sentience identifies repetitive patterns, Kernel-Level Trigger: Triggers based on S04 HAL hardware events or, Private & Native: Zero cloud dependencies; all logic runs in C/Wasm. |
+
 | `S09_Intelligence` | `SovereignNeuralBalancer.c` | — |
+
 | `S09_Intelligence` | `SovereignNeuralEngine.c` | — |
+
 | `S09_Intelligence` | `SovereignNeuralPredictorShard.c` | — |
+
 | `S09_Intelligence` | `SovereignNPUManager.c` | — |
+
 | `S09_Intelligence` | `SovereignPBOShard.c` | — |
+
 | `S09_Intelligence` | `SovereignPIDShard.c` | — |
+
 | `S09_Intelligence` | `SovereignPSOShard.c` | — |
+
 | `S09_Intelligence` | `SovereignQSAShard.c` | — |
+
 | `S09_Intelligence` | `SovereignQSOShard.c` | — |
+
 | `S09_Intelligence` | `SovereignQuenchingShard.c` | — |
+
 | `S09_Intelligence` | `SovereignRLShard.c` | — |
+
 | `S09_Intelligence` | `SovereignRUNShard.c` | — |
+
 | `S09_Intelligence` | `SovereignSCAShard.c` | — |
+
 | `S09_Intelligence` | `SovereignSemanticSearchShard.c` | — |
+
 | `S09_Intelligence` | `SovereignSigmaAgent.c` | — |
+
 | `S09_Intelligence` | `SovereignSMAShard.c` | — |
+
 | `S09_Intelligence` | `SovereignSSAShard.c` | — |
+
 | `S09_Intelligence` | `SovereignSSOShard.c` | — |
+
 | `S09_Intelligence` | `SovereignSuiteRegistry.c` | — |
+
 | `S09_Intelligence` | `SovereignTabuShard.c` | — |
+
 | `S09_Intelligence` | `SovereignTensorShard.c` | — |
+
 | `S09_Intelligence` | `SovereignTLBOShard.c` | — |
+
 | `S09_Intelligence` | `SovereignVisionShard.c` | — |
+
 | `S09_Intelligence` | `SovereignVoiceAssistant.c` | Apple Siri       — on-device privacy-first NLU, wake-word engine, Google Assistant — streaming ASR, context-aware multi-turn dialogue, Cortana (Windows)— OS-deep integration: open apps, query registry, Amazon Alexa     — skill/intent dispatch model for extensibility |
+
 | `S09_Intelligence` | `SovereignWCAShard.c` | — |
+
 | `S09_Intelligence` | `SovereignWDOShard.c` | — |
+
 | `S09_Intelligence` | `SovereignWOAShard.c` | — |
+
 | `S10_Registry` | `academy.c` | — |
+
 | `S10_Registry` | `backup_manager.c` | — |
+
 | `S10_Registry` | `chrono_vault.c` | — |
+
 | `S10_Registry` | `gaming.c` | — |
+
 | `S10_Registry` | `indian_law.c` | — |
+
 | `S10_Registry` | `ncert_core.c` | — |
+
 | `S10_Registry` | `omni_media_engine.c` | — |
+
 | `S10_Registry` | `omni_search.c` | — |
+
 | `S10_Registry` | `remote_bot.c` | — |
+
 | `S10_Registry` | `S10_01_GranularShard.c` | — |
+
 | `S10_Registry` | `S10_01_HkeyLocalMachine.c` | — |
+
 | `S10_Registry` | `S10_02_GranularShard.c` | — |
+
 | `S10_Registry` | `S10_03_GranularShard.c` | — |
+
 | `S10_Registry` | `S10_04_GranularShard.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_10.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_11.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_12.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_13.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_14.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_15.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_16.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_17.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_18.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_19.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_20.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_21.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_22.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_23.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_24.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_25.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_26.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_27.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_28.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_29.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_30.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_31.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_32.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_33.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_34.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_35.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_36.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_37.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_38.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_39.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_40.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_41.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_42.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_43.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_44.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_45.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_46.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_47.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_48.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_49.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_50.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_51.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_52.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_53.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_54.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_55.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_56.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_57.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_58.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_59.c` | — |
+
 | `S10_Registry` | `S10_Lattice_Shard_60.c` | — |
+
 | `S10_Registry` | `sigma-bench.c` | — |
+
 | `S10_Registry` | `SigmaCLI_Dispatcher.c` | — |
+
 | `S10_Registry` | `sigma_ai_distribute.c` | — |
+
 | `S10_Registry` | `sigma_automation_matrix.c` | — |
+
 | `S10_Registry` | `sigma_auto_optimizer.c` | — |
+
 | `S10_Registry` | `sigma_cli_omnibus.c` | — |
+
 | `S10_Registry` | `sigma_container.c` | — |
+
 | `S10_Registry` | `sigma_container.h` | — |
+
 | `S10_Registry` | `sigma_distro_absorber.c` | — |
+
 | `S10_Registry` | `sigma_linux_usps.c` | — |
+
 | `S10_Registry` | `sigma_persona_engine.c` | — |
+
 | `S10_Registry` | `sigma_tool_absorber.c` | — |
+
 | `S10_Registry` | `SovereignACOShaderCompiler.c` | — |
+
 | `S10_Registry` | `SovereignAdvancedCommands.c` | — |
+
 | `S10_Registry` | `SovereignAIKernelZenith.c` | — |
+
 | `S10_Registry` | `SovereignApiBridge.c` | Wine / Proton    — Standard for running Windows apps on Linux, WSL (Original)   — Linux syscall translation on Windows, Darling (Linux)  — macOS API translation on Linux, Direct syscall re-mapping: Windows NT syscalls -> SigmaOS shards, Userland Library Thunking: Redirects User32/Cocoa calls to ZenithUI, 100% Zero-Dependency: No external glibc or wine-runtime required. |
+
 | `S10_Registry` | `SovereignAppBundleManager.c` | macOS .app Bundles — Self-contained, multi-architecture binaries, Windows AppX/MSIX — Secure, sandboxed application identity, Flatpak (Linux)    — Runtime isolation and dependency bundling, Android APK/AAB    — Manifest-driven permission system |
+
 | `S10_Registry` | `SovereignAutomationCommands.c` | — |
+
 | `S10_Registry` | `SovereignAutomationShard.c` | — |
+
 | `S10_Registry` | `SovereignBench.c` | — |
+
 | `S10_Registry` | `SovereignBillionShard.c` | — |
+
 | `S10_Registry` | `SovereignBootBuilder.c` | — |
+
 | `S10_Registry` | `SovereignBootWizard.c` | — |
+
 | `S10_Registry` | `SovereignBuildMaster.c` | — |
+
 | `S10_Registry` | `SovereignCFSShard.c` | — |
+
 | `S10_Registry` | `SovereignCloudShard.c` | — |
+
 | `S10_Registry` | `SovereignCommandRegistry.c` | — |
+
 | `S10_Registry` | `SovereignDataframeMatrix.c` | — |
+
 | `S10_Registry` | `SovereignDependencyPurge.c` | — |
+
 | `S10_Registry` | `SovereignDesignPatterns.c` | — |
+
 | `S10_Registry` | `SovereignDistroCommands.c` | — |
+
 | `S10_Registry` | `SovereignDistroRegistry.c` | — |
+
 | `S10_Registry` | `SovereignDSAShard.c` | — |
+
 | `S10_Registry` | `SovereignDSMatrix.c` | — |
+
 | `S10_Registry` | `SovereignDuckTyping.c` | — |
+
 | `S10_Registry` | `SovereignEventBusShard.c` | — |
+
 | `S10_Registry` | `SovereignFileSyscalls.c` | — |
+
 | `S10_Registry` | `SovereignGrammarOfGraphics.c` | — |
+
 | `S10_Registry` | `SovereignHealthHub.c` | — |
+
 | `S10_Registry` | `SovereignHolyJIT.c` | — |
+
 | `S10_Registry` | `SovereignIdentityNexus.c` | Apple ID / Microsoft Account — Single-sign-on (SSO) for the whole OS, Google Account   — Synchronized preferences and history, Passport (Linux) — Unified identity management, No Central Server: Identity is stored in the BioEnclave (S08) and, Soul-Bound Keys: Private keys tied to hardware + bio-signature., Zero-Knowledge Proofs: Login without ever transmitting the password. |
+
 | `S10_Registry` | `SovereignInitRegistry.c` | — |
+
 | `S10_Registry` | `SovereignInitSystem.c` | systemd (Linux)    — unit files, dependency ordering, socket activation, launchd (macOS)    — on-demand shard activation, parallel boot, Windows SCM        — service installation, recovery policies, OpenRC (Gentoo)    — dependency-based RC scripts, clean shutdown order, runit (Void Linux) — supervision tree, instant <1s boot target |
+
 | `S10_Registry` | `SovereignJunkPurge.c` | — |
+
 | `S10_Registry` | `SovereignLatencyAudit.c` | — |
+
 | `S10_Registry` | `SovereignLatticeHibernator.c` | — |
+
 | `S10_Registry` | `SovereignLexerShard.c` | — |
+
 | `S10_Registry` | `SovereignLoggerShard.c` | — |
+
 | `S10_Registry` | `SovereignMacroVM.c` | — |
+
 | `S10_Registry` | `SovereignMapReduce.c` | — |
+
 | `S10_Registry` | `SovereignMasterSeal.c` | — |
+
 | `S10_Registry` | `SovereignMetricsShard.c` | — |
+
 | `S10_Registry` | `SovereignMicroserviceShard.c` | — |
+
 | `S10_Registry` | `SovereignMirrorShard.c` | — |
+
 | `S10_Registry` | `SovereignModuleRegistry.c` | — |
+
 | `S10_Registry` | `SovereignNeuralGradient.c` | — |
+
 | `S10_Registry` | `SovereignNeuralShard.c` | — |
+
 | `S10_Registry` | `SovereignNixLattice.c` | — |
+
 | `S10_Registry` | `SovereignNLPShard.c` | — |
+
 | `S10_Registry` | `SovereignOmniCLI.c` | — |
+
 | `S10_Registry` | `SovereignParadigmGuard.c` | — |
+
 | `S10_Registry` | `SovereignParallelShard.c` | — |
+
 | `S10_Registry` | `SovereignPersonaAIShard.c` | — |
+
 | `S10_Registry` | `SovereignPersonaShard.c` | — |
+
 | `S10_Registry` | `SovereignPowerQueryMaster.c` | — |
+
 | `S10_Registry` | `SovereignProbe.c` | — |
+
 | `S10_Registry` | `SovereignPurityScan.c` | — |
+
 | `S10_Registry` | `SovereignPythonVM.c` | — |
+
 | `S10_Registry` | `SovereignQuantumShard.c` | — |
+
 | `S10_Registry` | `SovereignRegistry.c` | — |
+
 | `S10_Registry` | `SovereignRVectorMath.c` | — |
+
 | `S10_Registry` | `SovereignSecCommands.c` | — |
+
 | `S10_Registry` | `SovereignSelfHeal.c` | — |
+
 | `S10_Registry` | `SovereignSelfHealingEngine.c` | — |
+
 | `S10_Registry` | `SovereignShardFusionEngine.c` | — |
+
 | `S10_Registry` | `SovereignSiliconDefectTest.c` | — |
+
 | `S10_Registry` | `SovereignSingularityOrchestrator.c` | — |
+
 | `S10_Registry` | `SovereignSmartExplorer.c` | — |
+
 | `S10_Registry` | `SovereignSpreadsheetDAG.c` | — |
+
 | `S10_Registry` | `SovereignSuiteRegistry.c` | — |
+
 | `S10_Registry` | `SovereignSyscallRegistry.c` | — |
+
 | `S10_Registry` | `SovereignSysCommands.c` | — |
+
 | `S10_Registry` | `SovereignSystemRegistry.c` | — |
+
 | `S10_Registry` | `SovereignSystemUpdater.c` | Windows Update    — staged rollout, driver signing verification, macOS SoftwareUpdate — sealed system volume, no partial updates, NixOS             — atomic generations: rollback to any prior state, ChromeOS          — dual A/B partition silent background update, Flatpak/OSTree    — immutable read-only base, delta updates |
+
 | `S10_Registry` | `SovereignTensorShard.c` | — |
+
 | `S10_Registry` | `SovereignThemeShard.c` | — |
+
 | `S10_Registry` | `SovereignToolchain.c` | — |
+
 | `S10_Registry` | `SovereignToolRegistry.c` | — |
+
 | `S10_Registry` | `SovereignUDFEngine.c` | — |
+
 | `S10_Registry` | `SovereignUSPRegistry.c` | — |
+
 | `S10_Registry` | `SovereignVizQLEngine.c` | — |
+
 | `S10_Registry` | `SovereignWikiShard.c` | — |
+
 | `S10_Registry` | `studio.c` | — |
+
 | `S10_Registry` | `system_cleaner.c` | — |
+
 | `S10_Registry` | `xclicker.c` | — |
+
 | `S11_Virtualization` | `S11_01_GranularShard.c` | — |
+
 | `S11_Virtualization` | `S11_02_GranularShard.c` | — |
+
 | `S11_Virtualization` | `S11_03_GranularShard.c` | — |
+
 | `S11_Virtualization` | `S11_04_GranularShard.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_10.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_11.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_12.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_13.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_14.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_15.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_16.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_17.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_18.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_19.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_20.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_21.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_22.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_23.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_24.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_25.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_26.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_27.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_28.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_29.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_30.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_31.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_32.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_33.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_34.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_35.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_36.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_37.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_38.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_39.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_40.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_41.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_42.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_43.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_44.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_45.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_46.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_47.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_48.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_49.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_50.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_51.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_52.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_53.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_54.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_55.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_56.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_57.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_58.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_59.c` | — |
+
 | `S11_Virtualization` | `S11_Lattice_Shard_60.c` | — |
+
 | `S11_Virtualization` | `sigma_pqc.c` | — |
+
 | `S11_Virtualization` | `sigma_pqc.h` | — |
+
 | `S11_Virtualization` | `SovereignAppManagement.c` | — |
+
 | `S11_Virtualization` | `SovereignBinaryTransmuter.c` | — |
+
 | `S11_Virtualization` | `SovereignContainerCore.c` | — |
+
 | `S11_Virtualization` | `SovereignCoroutineScheduler.c` | — |
+
 | `S11_Virtualization` | `SovereignEcosystemBridge.c` | — |
+
 | `S11_Virtualization` | `SovereignFluidBinary.c` | — |
+
 | `S11_Virtualization` | `SovereignHypervisor.c` | Windows WSL2 (Hyper-V) — Linux-in-Windows via lightweight VM, macOS Hypervisor.framework — userland VM management without kexts, Linux KVM/QEMU — near-native perf via hardware acceleration (VT-x/AMD-V), Firecracker (AWS) — sub-5ms microVM boot times |
+
 | `S11_Virtualization` | `SovereignPOSIX_Bridge.c` | — |
+
 | `S11_Virtualization` | `SovereignRosetta.c` | Apple Rosetta 2 — Near-native performance translation (x86 to ARM), Windows x64 Emulation — Multi-arch execution on ARM devices, QEMU TCG         — Universal binary translation engine |
+
 | `S11_Virtualization` | `SovereignScheduler.c` | — |
+
 | `S11_Virtualization` | `SovereignSchedulerRegistry.c` | — |
+
 | `S11_Virtualization` | `SovereignSelfSynthesizer.c` | — |
+
 | `S11_Virtualization` | `SovereignSuiteRegistry.c` | — |
+
 | `S11_Virtualization` | `SovereignTaskScheduler.c` | — |
+
 | `S11_Virtualization` | `SovereignWASM_Runtime.c` | — |
+
 | `S12_Ecosystem` | `S12_01_GranularShard.c` | — |
+
 | `S12_Ecosystem` | `S12_02_GranularShard.c` | — |
+
 | `S12_Ecosystem` | `S12_03_GranularShard.c` | — |
+
 | `S12_Ecosystem` | `S12_04_GranularShard.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_10.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_11.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_12.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_13.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_14.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_15.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_16.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_17.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_18.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_19.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_20.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_21.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_22.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_23.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_24.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_25.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_26.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_27.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_28.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_29.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_30.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_31.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_32.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_33.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_34.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_35.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_36.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_37.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_38.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_39.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_40.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_41.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_42.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_43.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_44.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_45.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_46.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_47.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_48.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_49.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_50.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_51.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_52.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_53.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_54.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_55.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_56.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_57.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_58.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_59.c` | — |
+
 | `S12_Ecosystem` | `S12_Lattice_Shard_60.c` | — |
+
 | `S12_Ecosystem` | `sigma_distro.c` | — |
+
 | `S12_Ecosystem` | `sigma_distro.h` | — |
+
 | `S12_Ecosystem` | `SovereignAppStoreCore.c` | Apple App Store   — Curation, E2EE signatures, safe distribution, Windows Store (WinGet) — Command-line and GUI package management, Homebrew / Pacman — Powerful CLI-driven repo management, Sovereign P2P Distribution: If a server is down, fetch apps via S12 Mesh., Zero-Trust Curation: Automatic Formal Verification (S08) for all uploads., Immutable Apps: Every app is a .sab bundle, guaranteed unmodifiable. |
+
 | `S12_Ecosystem` | `SovereignContinuity.c` | Apple Handoff      — seamless app state transfer between devices, Apple AirDrop      — zero-config peer-to-peer file transfer, Apple Universal Control — control multiple devices with one mouse/kb, Windows Phone Link — notifications and clipboard sync, Android Nearby Share — mDNS + WiFi-Direct file exchange |
+
 | `S12_Ecosystem` | `SovereignCoreUtils.c` | — |
+
 | `S12_Ecosystem` | `SovereignDirectoryMesh.c` | Microsoft Active Directory (AD) — Group policy and user management, LDAP / OpenDirectory — Hierarchical user discovery, Unix Groups / Sudoers — Permission escalation and membership, Mesh-based consensus: No single "Domain Controller" to fail., Dynamic Group Policy: Automatically adapts S08 ACLs across the Hive., E2EE Membership: Group rosters are encrypted via PQC (S08). |
+
 | `S12_Ecosystem` | `SovereignEcosystemSuite.c` | — |
+
 | `S12_Ecosystem` | `SovereignEcosystem_Consensus.c` | — |
+
 | `S12_Ecosystem` | `SovereignMeshDisplay.c` | Apple Sidecar / AirPlay — Wireless display to iPad/Mac, Windows Wireless Display  — Miracast protocol display extension, Universal Control (Apple) — One HID for multiple devices, Zero-Latency: Direct VRAM-to-S07-Packet blitting (Zero-copy)., Unified Buffer: The second device's VRAM becomes an extension of yours., Touch-Back: Multi-touch on external device flows back to host (S04). |
+
 | `S12_Ecosystem` | `SovereignMeshUpdate.c` | — |
+
 | `S12_Ecosystem` | `SovereignNix_Immutable.c` | — |
+
 | `S12_Ecosystem` | `SovereignProximityHandoff.c` | Apple Handoff / AirDrop — Seamless transfer based on closeness, Google Nearby Share / Quick Share — Local discovery and transfer, Microsoft Phone Link — Notification and clip sync, Ultra-Wideband (UWB) Logic: Precise <10cm distance tracking (via S04)., Sentiment-Handoff: S13 predicts *where* you are going to hand off based on |
+
 | `S12_Ecosystem` | `SovereignScreenFlow.c` | — |
+
 | `S12_Ecosystem` | `SovereignSuiteRegistry.c` | — |
+
 | `S12_Ecosystem` | `SovereignUniversalDistroSuite.c` | — |
+
 | `S12_Ecosystem` | `SovereignUniversalDistroSuite.h` | — |
+
 | `S12_Parallelism` | `S12_Registry.c` | — |
+
 | `S12_Parallelism` | `SovereignURING.c` | — |
+
 | `S13_Sentience` | `S13_01_Global_Consensus.c` | — |
+
 | `S13_Sentience` | `S13_01_GranularShard.c` | — |
+
 | `S13_Sentience` | `S13_02_GranularShard.c` | — |
+
 | `S13_Sentience` | `S13_03_GranularShard.c` | — |
+
 | `S13_Sentience` | `S13_04_GranularShard.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_10.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_11.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_12.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_13.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_14.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_15.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_16.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_17.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_18.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_19.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_20.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_21.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_22.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_23.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_24.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_25.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_26.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_27.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_28.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_29.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_30.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_31.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_32.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_33.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_34.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_35.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_36.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_37.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_38.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_39.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_40.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_41.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_42.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_43.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_44.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_45.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_46.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_47.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_48.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_49.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_50.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_51.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_52.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_53.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_54.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_55.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_56.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_57.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_58.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_59.c` | — |
+
 | `S13_Sentience` | `S13_Lattice_Shard_60.c` | — |
+
 | `S13_Sentience` | `sigma_perf.c` | — |
+
 | `S13_Sentience` | `sigma_perf.h` | — |
+
 | `S13_Sentience` | `SovereignAdaptiveScheduler.c` | — |
+
 | `S13_Sentience` | `SovereignForensicLogger.c` | — |
+
 | `S13_Sentience` | `SovereignGlobalTranslator.c` | Apple Translate — System-wide translation and offline modes, Google Lens     — Real-time visual overlay translation, Windows Live Captions — Real-time audio-to-text translation, Zero-Latency Overlay: Translates GUI text in the S02 Compositor layer., ProAudio Integration: Real-time translation of system audio streams (S04)., Continuity Sync: Shared translation caches across Hive peers (S12). |
+
 | `S13_Sentience` | `SovereignHiveOrchestrator.c` | — |
+
 | `S13_Sentience` | `SovereignIntentionOracle.c` | — |
+
 | `S13_Sentience` | `SovereignLatticeAuditor.c` | — |
+
 | `S13_Sentience` | `SovereignMetaEvolution.c` | — |
+
 | `S13_Sentience` | `SovereignNeuralFabric.c` | — |
+
 | `S13_Sentience` | `SovereignNeuralLogOracle.c` | — |
+
 | `S13_Sentience` | `SovereignPerfScrubber.c` | — |
+
 | `S13_Sentience` | `SovereignResourceGuardian.c` | — |
+
 | `S13_Sentience` | `SovereignSelfHealer.c` | — |
+
 | `S13_Sentience` | `SovereignSelfHealing.c` | — |
+
 | `S13_Sentience` | `SovereignSentienceCore.c` | — |
+
 | `S13_Sentience` | `SovereignSpeculativeMaterializer.c` | — |
+
 | `S13_Sentience` | `SovereignSuiteRegistry.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_10.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_11.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_12.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_13.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_14.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_15.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_16.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_17.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_18.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_19.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_20.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_21.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_22.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_23.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_24.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_25.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_26.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_27.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_28.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_29.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_30.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_31.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_32.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_33.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_34.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_35.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_36.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_37.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_38.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_39.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_40.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_41.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_42.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_43.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_44.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_45.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_46.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_47.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_48.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_49.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_50.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_51.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_52.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_53.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_54.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_55.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_56.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_57.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_58.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_59.c` | — |
+
 | `S14_Transcendence` | `S14_Lattice_Shard_60.c` | — |
+
 | `S14_Transcendence` | `sigma_pm.c` | — |
+
 | `S14_Transcendence` | `sigma_pm.h` | — |
+
 | `S14_Transcendence` | `SovereignISASynthesizer.c` | — |
+
 | `S14_Transcendence` | `SovereignSuiteRegistry.c` | — |
+
 | `S15_DevNexus` | `pkg_manager.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_10.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_11.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_12.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_13.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_14.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_15.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_16.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_17.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_18.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_19.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_20.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_21.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_22.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_23.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_24.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_25.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_26.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_27.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_28.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_29.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_30.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_31.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_32.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_33.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_34.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_35.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_36.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_37.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_38.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_39.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_40.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_41.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_42.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_43.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_44.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_45.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_46.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_47.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_48.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_49.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_50.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_51.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_52.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_53.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_54.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_55.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_56.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_57.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_58.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_59.c` | — |
+
 | `S15_DevNexus` | `S15_Lattice_Shard_60.c` | — |
+
 | `S15_DevNexus` | `sigma_raft.c` | — |
+
 | `S15_DevNexus` | `sigma_raft.h` | — |
+
 | `S15_DevNexus` | `SovereignCLI_Core.c` | — |
+
 | `S15_DevNexus` | `SovereignCLI_CyberSuite.c` | — |
+
 | `S15_DevNexus` | `SovereignCLI_DevSuite.c` | — |
+
 | `S15_DevNexus` | `SovereignCLI_DistroSuite.c` | — |
+
 | `S15_DevNexus` | `SovereignCLI_Registry.c` | — |
+
 | `S15_DevNexus` | `SovereignCommandRegistry.c` | — |
+
 | `S15_DevNexus` | `SovereignCompiler_Frontend.c` | — |
+
 | `S15_DevNexus` | `SovereignDevEnvironment.c` | — |
+
 | `S15_DevNexus` | `SovereignIDE.c` | — |
+
 | `S15_DevNexus` | `SovereignSigPac.c` | — |
+
 | `S15_DevNexus` | `SovereignSuiteRegistry.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_10.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_11.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_12.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_13.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_14.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_15.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_16.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_17.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_18.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_19.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_20.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_21.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_22.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_23.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_24.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_25.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_26.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_27.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_28.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_29.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_30.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_31.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_32.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_33.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_34.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_35.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_36.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_37.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_38.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_39.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_40.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_41.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_42.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_43.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_44.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_45.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_46.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_47.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_48.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_49.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_50.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_51.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_52.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_53.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_54.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_55.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_56.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_57.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_58.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_59.c` | — |
+
 | `S16_SoulMolding` | `S16_Lattice_Shard_60.c` | — |
+
 | `S16_SoulMolding` | `sigma_gpu.c` | — |
+
 | `S16_SoulMolding` | `sigma_gpu.h` | — |
+
 | `S16_SoulMolding` | `SovereignCognitiveMirror.c` | — |
+
 | `S16_SoulMolding` | `SovereignCustomisationEngine.c` | — |
+
 | `S16_SoulMolding` | `SovereignPersonalizationShard.c` | — |
+
 | `S16_SoulMolding` | `SovereignSuiteRegistry.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_10.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_11.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_12.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_13.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_14.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_15.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_16.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_17.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_18.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_19.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_20.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_21.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_22.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_23.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_24.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_25.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_26.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_27.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_28.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_29.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_30.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_31.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_32.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_33.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_34.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_35.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_36.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_37.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_38.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_39.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_40.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_41.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_42.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_43.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_44.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_45.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_46.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_47.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_48.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_49.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_50.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_51.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_52.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_53.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_54.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_55.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_56.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_57.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_58.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_59.c` | — |
+
 | `S17_BioNexus` | `S17_Lattice_Shard_60.c` | — |
+
 | `S17_BioNexus` | `sigma_audio.c` | — |
+
 | `S17_BioNexus` | `sigma_audio.h` | — |
+
 | `S17_BioNexus` | `SovereignAudioEngine.c` | — |
+
 | `S17_BioNexus` | `SovereignBioSuite.c` | — |
+
 | `S17_BioNexus` | `SovereignBrainInterface.c` | — |
+
 | `S17_BioNexus` | `SovereignSuiteRegistry.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_10.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_11.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_12.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_13.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_14.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_15.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_16.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_17.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_18.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_19.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_20.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_21.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_22.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_23.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_24.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_25.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_26.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_27.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_28.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_29.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_30.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_31.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_32.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_33.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_34.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_35.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_36.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_37.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_38.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_39.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_40.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_41.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_42.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_43.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_44.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_45.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_46.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_47.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_48.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_49.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_50.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_51.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_52.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_53.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_54.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_55.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_56.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_57.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_58.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_59.c` | — |
+
 | `S18_QuantumLink` | `S18_Lattice_Shard_60.c` | — |
+
 | `S18_QuantumLink` | `sigma_usb.c` | — |
+
 | `S18_QuantumLink` | `sigma_usb.h` | — |
+
 | `S18_QuantumLink` | `SovereignQuantumCache.c` | — |
+
 | `S18_QuantumLink` | `SovereignQuantumEntanglement.c` | — |
+
 | `S18_QuantumLink` | `SovereignQuantumSuite.c` | — |
+
 | `S18_QuantumLink` | `SovereignSuiteRegistry.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_10.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_11.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_12.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_13.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_14.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_15.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_16.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_17.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_18.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_19.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_20.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_21.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_22.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_23.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_24.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_25.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_26.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_27.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_28.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_29.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_30.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_31.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_32.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_33.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_34.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_35.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_36.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_37.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_38.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_39.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_40.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_41.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_42.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_43.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_44.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_45.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_46.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_47.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_48.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_49.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_50.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_51.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_52.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_53.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_54.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_55.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_56.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_57.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_58.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_59.c` | — |
+
 | `S19_SelfEvolution` | `S19_Lattice_Shard_60.c` | — |
+
 | `S19_SelfEvolution` | `sigma_gcd.c` | — |
+
 | `S19_SelfEvolution` | `sigma_gcd.h` | — |
+
 | `S19_SelfEvolution` | `SovereignAutoOptimizer.c` | — |
+
 | `S19_SelfEvolution` | `SovereignCodeSynthesizer.c` | — |
+
 | `S19_SelfEvolution` | `SovereignLatencyOptimizer.c` | — |
+
 | `S19_SelfEvolution` | `SovereignShardFactory.c` | — |
+
 | `S19_SelfEvolution` | `SovereignSuiteRegistry.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_10.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_11.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_12.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_13.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_14.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_15.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_16.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_17.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_18.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_19.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_20.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_21.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_22.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_23.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_24.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_25.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_26.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_27.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_28.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_29.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_30.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_31.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_32.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_33.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_34.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_35.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_36.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_37.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_38.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_39.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_40.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_41.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_42.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_43.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_44.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_45.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_46.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_47.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_48.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_49.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_50.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_51.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_52.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_53.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_54.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_55.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_56.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_57.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_58.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_59.c` | — |
+
 | `S20_Interconnect` | `S20_Lattice_Shard_60.c` | — |
+
 | `S20_Interconnect` | `sigma_interconnect.c` | — |
+
 | `S20_Interconnect` | `sigma_interconnect.h` | — |
+
 | `S20_Interconnect` | `sigma_vfs.c` | — |
+
 | `S20_Interconnect` | `SovereignPlanetVFS.c` | — |
+
 | `S20_Interconnect` | `SovereignSuiteRegistry.c` | — |
+
 | `S20_Interconnect` | `SovereignVFSCore.c` | — |
+
 | `S20_Interconnect` | `SovereignVFS_Node.c` | — |
+
 | `S20_Interconnect` | `vfs_core.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_10.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_11.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_12.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_13.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_14.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_15.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_16.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_17.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_18.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_19.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_20.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_21.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_22.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_23.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_24.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_25.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_26.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_27.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_28.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_29.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_30.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_31.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_32.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_33.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_34.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_35.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_36.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_37.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_38.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_39.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_40.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_41.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_42.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_43.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_44.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_45.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_46.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_47.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_48.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_49.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_50.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_51.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_52.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_53.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_54.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_55.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_56.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_57.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_58.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_59.c` | — |
+
 | `S21_EternalState` | `S21_Lattice_Shard_60.c` | — |
+
 | `S21_EternalState` | `sigma_shell.c` | — |
+
 | `S21_EternalState` | `sigma_shell.h` | — |
+
 | `S21_EternalState` | `SovereignGhostMesh.c` | — |
+
 | `S21_EternalState` | `SovereignSuiteRegistry.c` | — |
+
 | `S21_EternalState` | `SovereignTemporalSuite.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_10.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_11.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_12.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_13.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_14.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_15.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_16.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_17.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_18.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_19.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_20.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_21.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_22.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_23.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_24.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_25.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_26.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_27.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_28.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_29.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_30.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_31.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_32.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_33.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_34.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_35.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_36.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_37.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_38.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_39.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_40.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_41.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_42.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_43.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_44.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_45.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_46.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_47.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_48.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_49.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_50.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_51.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_52.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_53.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_54.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_55.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_56.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_57.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_58.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_59.c` | — |
+
 | `S22_SimulationNexus` | `S22_Lattice_Shard_60.c` | — |
+
 | `S22_SimulationNexus` | `sigma_ipc.c` | — |
+
 | `S22_SimulationNexus` | `sigma_ipc.h` | — |
+
 | `S22_SimulationNexus` | `SovereignIPCRegistry.c` | — |
+
 | `S22_SimulationNexus` | `SovereignPhysicsEngine.c` | — |
+
 | `S22_SimulationNexus` | `SovereignScenarioSimulator.c` | — |
+
 | `S22_SimulationNexus` | `SovereignSuiteRegistry.c` | — |
+
 | `S22_SimulationNexus` | `Sovereign_Simulator_Mocks.c` | — |
+
 | `S23_OmniNexus` | `sigma_biosphere.c` | — |
+
 | `S23_OmniNexus` | `sigma_biosphere.h` | — |
+
 | `S23_OmniNexus` | `SovereignSuiteRegistry.c` | — |
+
 | `S23_OmniNexus` | `SovereignUniversalOrchestrator.c` | — |
+
 | `S24_GlobalDebugger` | `drivers.c` | — |
+
 | `S24_GlobalDebugger` | `fs.c` | — |
+
 | `S24_GlobalDebugger` | `kernel.c` | — |
+
 | `S24_GlobalDebugger` | `memory.c` | — |
+
 | `S24_GlobalDebugger` | `net_sec.c` | — |
+
 | `S24_GlobalDebugger` | `sigma_simulation.c` | — |
+
 | `S24_GlobalDebugger` | `sigma_simulation.h` | — |
+
 | `S24_GlobalDebugger` | `SovereignFunctionalTest.c` | — |
+
 | `S24_GlobalDebugger` | `SovereignLatticeStepper.c` | — |
+
 | `S24_GlobalDebugger` | `SovereignSuiteRegistry.c` | — |
+
 | `S24_GlobalDebugger` | `SovereignTestSuite.c` | — |
+
 | `S24_GlobalDebugger` | `userland.c` | — |
+
 | `S25_ZeroKernel` | `sigma_zerotrust.c` | — |
+
 | `S25_ZeroKernel` | `sigma_zerotrust.h` | — |
+
 | `S25_ZeroKernel` | `SovereignHardwareOffloader.c` | — |
+
 | `S25_ZeroKernel` | `SovereignISA_Emulator.c` | — |
+
 | `S25_ZeroKernel` | `SovereignKernelMain.c` | — |
+
 | `S25_ZeroKernel` | `SovereignSuiteRegistry.c` | — |
+
 | `S26_OmniFabric` | `sigma_omnifabric.c` | — |
+
 | `S26_OmniFabric` | `sigma_omnifabric.h` | — |
+
 | `S26_OmniFabric` | `SovereignOmniFabric.c` | — |
+
 | `S26_OmniFabric` | `SovereignStatelessLattice.c` | — |
+
 | `S26_OmniFabric` | `SovereignSuiteRegistry.c` | — |
+
 | `S27_NeuralLink` | `SovereignCreativePredictor.c` | — |
+
 | `S27_NeuralLink` | `SovereignNeuralWeights.c` | — |
+
 | `S27_NeuralLink` | `SovereignSuiteRegistry.c` | — |
+
 | `S28_OmniBus` | `SovereignGlobalBus.c` | — |
+
 | `S28_OmniBus` | `SovereignPCIWalk.c` | — |
+
 | `S28_OmniBus` | `SovereignPCI_USB.c` | — |
+
 | `S28_OmniBus` | `SovereignPRU_Drone.c` | — |
+
 | `S28_OmniBus` | `SovereignSuiteRegistry.c` | — |
+
 | `S29_LatticeMerge` | `SovereignGlobalFusion.c` | — |
+
 | `S29_LatticeMerge` | `SovereignSuiteRegistry.c` | — |
+
 | `S30_Supremacy` | `SovereignLockdown.c` | — |
+
 | `S30_Supremacy` | `SovereignSuiteRegistry.c` | — |
+
 | `S30_Supremacy` | `SovereignTurboBootstrap.c` | — |
+
 | `S31_GlobalGovernance` | `SovereignAudioEngine.c` | — |
+
 | `S31_GlobalGovernance` | `SovereignConfigIdentitySuite.c` | — |
+
 | `S31_GlobalGovernance` | `SovereignHibernation.c` | — |
+
 | `S31_GlobalGovernance` | `SovereignJournal.c` | — |
+
 | `S31_GlobalGovernance` | `SovereignLifecycle.c` | — |
+
 | `S31_GlobalGovernance` | `SovereignPkgRegistry.c` | — |
+
 | `S31_GlobalGovernance` | `SovereignServiceControl.c` | — |
+
 | `S31_GlobalGovernance` | `SovereignServiceManager.c` | — |
+
 | `S31_GlobalGovernance` | `SovereignServiceRegistry.c` | — |
+
 | `S31_GlobalGovernance` | `SovereignSuiteRegistry.c` | — |
+
 | `S31_GlobalGovernance` | `SovereignUDFRegistry.c` | — |
+
 | `S31_GlobalGovernance` | `SovereignVoiceSuite.c` | — |
+
 | `S32_UnifiedSovereignty` | `SovereignSuiteRegistry.c` | — |
+
 | `S33_TerminalFulfillment` | `SovereignSuiteRegistry.c` | — |
+
 | `S33_TerminalFulfillment` | `SovereignSyncZenith.c` | — |
+
 

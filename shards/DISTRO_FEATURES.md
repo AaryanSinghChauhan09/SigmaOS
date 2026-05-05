@@ -17,3 +17,4 @@
 - **Amnesic Memory (Tails-inspired):** Zero-artifact wiping.
 - **Isolated Sandboxing (Qubes-inspired):** Silicon-level sandboxing.
 - **Security-Hardened LibC (Alpine/musl-inspired):** Sovereign Musl layer.
+
