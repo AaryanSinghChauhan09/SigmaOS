@@ -13,6 +13,10 @@
 
 SigmaOS is a next-generation, industrial-grade sovereign lattice operating system **simulated within the browser**. Unlike traditional OS designs, SigmaOS uses a shard-based architecture to deliver extreme modularity and silicon-native UX logic.
 
+### 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
 ## 🏛️ Project Vision
 
 SigmaOS aims to be the fastest and most secure platform for sovereign computing, blending the purity of a 600-shard Sovereign Lattice with silicon-native AI, spatial computing, and cognitive UX.

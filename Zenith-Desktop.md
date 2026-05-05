@@ -3,11 +3,13 @@
 The **Zenith Desktop** is the primary human-lattice interface for SigmaOS. It is a premium, glassmorphic web-shell designed for orchestrating 600+ sovereign shards.
 
 ## 🎨 Design Philosophy
+
 - **Glassmorphism 2.0**: High-translucency panels with multi-layer blur and vibrant accent colors.
 - **Adaptive Themes**: Real-time switching between Neon Cyan, Solar Gold, Crimson Shard, and Adaptive Solar paradigms.
 - **Cognitive UX**: Micro-animations and layout shifts that adapt to system telemetry.
 
 ## 🛠️ Key Components
+
 
 ### 1. The Lattice Menu (Start)
 Accessed via the Σ icon, the Lattice Menu provides access to all pinned and system shards. It features a hierarchical view of the 600-shard ecosystem.
@@ -25,6 +27,7 @@ Real-time visualizations of the sovereign lattice health:
 A streaming telemetry shard that shows real-time kernel logs, IPC exchanges, and scheduler decisions.
 
 ## ⌨️ Interaction Paradigms
+
 Zenith is designed to be keyboard-first but touch-optimized. 
 - Use `Ctrl + Space` for the Command Palette.
 - Use `Alt + 1-4` for instant theme switching.
@@ -32,3 +35,4 @@ Zenith is designed to be keyboard-first but touch-optimized.
 
 ---
 *The Zenith Singularity is the pinnacle of sovereign UI design.*
+
