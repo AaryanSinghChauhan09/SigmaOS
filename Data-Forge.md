@@ -14,7 +14,7 @@ The Forge operates on a **Map-Shuffle-Reduce** model optimized for high-affinity
 
 1. **Dispatch**: Kernel identifies data partitions across shards.
 
-1. **Ignition**: SDP pipelines are ignited in parallel.
+2. **Ignition**: SDP pipelines are ignited in parallel.
 
-1. **Consensus**: Results are aggregated via the Sovereign Neural Nexus.
+3. **Consensus**: Results are aggregated via the Sovereign Neural Nexus.
 

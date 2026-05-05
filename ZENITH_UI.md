@@ -8,7 +8,7 @@ Zenith utilizes the **Morphic Layer Composition (MLC)** algorithm, natively impl
 
 ## Industrial CSS Architecture
 
-As of **Phase 45 Stabilization**, Zenith has migrated to a **Strict Utility-Class Architecture**. 
+As of **Phase 45 Stabilization**, Zenith has migrated to a **Strict Utility-Class Architecture**.
 
 * **Zero Inline Styles**: 100% of the UI styling is now encapsulated within `zenith_desktop.css`.
 
@@ -20,9 +20,9 @@ The `SovereignTelemetryUI` exposes deep kernel insights with sub-millisecond lat
 
 1. **SovereignNetStack**: Real-time throughput and packet-level entropy.
 
-1. **SovereignMonitor**: Multi-die workload balancing and shard migration telemetry.
+2. **SovereignMonitor**: Multi-die workload balancing and shard migration telemetry.
 
-1. **SovereignDiag**: Silicon-direct fault localization and machine-state forensics.
+3. **SovereignDiag**: Silicon-direct fault localization and machine-state forensics.
 
 ## Spatial Shard Snapping (DSS)
 

@@ -6,7 +6,7 @@
 
 ## 🏗️ Workflow 01 — Sovereign Build & Test
 
-**File**: `.github/workflows/01_Sovereign_Build.yml`  
+**File**: `.github/workflows/01_Sovereign_Build.yml`
 
 **Matrix**: `os × profile` → 9 parallel jobs (Ubuntu / macOS / Windows × server / iot / dev)
 
@@ -39,7 +39,7 @@
 
 ## 🔬 Workflow 02 — Lattice Verification
 
-**File**: `.github/workflows/02_Lattice_Verification.yml`  
+**File**: `.github/workflows/02_Lattice_Verification.yml`
 
 **Jobs**: Static Analysis, Formal Proofs (Kani), Entropy Fuzzing
 
@@ -79,9 +79,9 @@ Builds `orchestrator/main.cpp` and fuzzes with profiles: `kali`, `tails`, `arch`
 
 1. **cppcheck** — full static analysis on core + HAL + security
 
-1. **Atomic module count** — reports how many `atomic_*.cpp/.hpp` files exist
+2. **Atomic module count** — reports how many `atomic_*.cpp/.hpp` files exist
 
-1. **Sovereignty check** — scans for forbidden `#include <stdlib.h>` etc. in atomic modules
+3. **Sovereignty check** — scans for forbidden `#include <stdlib.h>` etc. in atomic modules
 
 ---
 

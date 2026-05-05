@@ -10,7 +10,7 @@ Real-time visualizations of the sovereign lattice health:
 
 A streaming telemetry shard that shows real-time kernel logs, IPC exchanges, and scheduler decisions.
 
-Zenith is designed to be keyboard-first but touch-optimized. 
+Zenith is designed to be keyboard-first but touch-optimized.
 
 ---
 *The Zenith Singularity is the pinnacle of sovereign UI design.*

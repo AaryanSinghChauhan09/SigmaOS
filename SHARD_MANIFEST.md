@@ -8,22 +8,22 @@ This manifest outlines the 500 individual features and functional shards that de
 
 1. **Lattice-Aware Scheduler**: AI-Native predictive allocation.
 
-1. **Sovereign GDT / IDT**: Standardized segments and exception landing zones (/arch).
+2. **Sovereign GDT / IDT**: Standardized segments and exception landing zones (/arch).
 
-1. **Bitmap Physical Memory Manager**: Single source of truth for page allocation (/mem).
+3. **Bitmap Physical Memory Manager**: Single source of truth for page allocation (/mem).
 
-1. **WASM-Native Runtime**: Universal Binary format for context-switch-free execution.
+4. **WASM-Native Runtime**: Universal Binary format for context-switch-free execution.
 
-1. **Capability-Based Security**: Token-based access to silicon resources (No Root).
+5. **Capability-Based Security**: Token-based access to silicon resources (No Root).
 
-1. **Zero-Trust Microkernel**: All drivers run in User-Mode (Ring 3).
+6. **Zero-Trust Microkernel**: All drivers run in User-Mode (Ring 3).
 
-1. **Exokernel / SASOS**: Single Address Space for zero-cost communication.
+7. **Exokernel / SASOS**: Single Address Space for zero-cost communication.
 
-1. **Persistent Memory FS (PMFS)**: RAM-speed storage for Instant-On booting.
+8. **Persistent Memory FS (PMFS)**: RAM-speed storage for Instant-On booting.
 
-1. **Deterministic Scheduling**: Hard Real-Time deadlines for robotics/audio.
-2. **Lattice IPC Bridge**: Low-latency zero-copy messaging bus.
+9. **Deterministic Scheduling**: Hard Real-Time deadlines for robotics/audio.
+10. **Lattice IPC Bridge**: Low-latency zero-copy messaging bus.
 
 ## II. Morphic Zenith (UI & Graphics)
 
