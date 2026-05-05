@@ -1,3 +1,4 @@
+#include "sigma_hal.h"
 #include "sigma_main.h"
 #include "SovereignLibC.h"
 
@@ -31,4 +32,5 @@ void SovereignKernelMain::ignite() {
 extern "C" void sigma_kernel_main() {
     SigmaOS::Kernel::System::SovereignKernelMain::getInstance().ignite();
 }
+
 

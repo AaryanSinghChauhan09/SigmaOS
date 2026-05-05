@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 #include "sigma_micro.h"
 #include "sigma_hal.h"
 
@@ -58,4 +58,5 @@ extern "C" bool micro_spawn_isolated_shard(uint32_t shard_id, sigma_micro_contex
 extern "C" void micro_mediate_ipc(uint32_t source_id, uint32_t target_id, void* msg) {
     SovereignMicroEngine::getInstance().mediateIPC(source_id, target_id, msg);
 }
+
 

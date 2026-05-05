@@ -1,3 +1,4 @@
+#include "sigma_hal.h"
 #include "sigma_virtio.h"
 #include "SovereignLibC.h"
 
@@ -40,4 +41,5 @@ extern "C" void virtio_init() {
 extern "C" bool virtio_probe(sigma_u32 id) {
     return SigmaOS::Kernel::HAL::SovereignVirtio::getInstance().probeDevice(id);
 }
+
 

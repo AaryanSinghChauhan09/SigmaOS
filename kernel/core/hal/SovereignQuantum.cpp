@@ -1,5 +1,6 @@
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 
 /**
  * SigmaOS Sovereign Quantum APIs (v100.0 Zenith)
@@ -28,5 +29,6 @@ extern "C" void quantum_dispatch_circuit(const void* circuit_data) {
     /* QSI Algorithm: Offloads quantum kernels to available QPU shards */
     sigma_log("[QUANTUM] QSI: Result coherent. Lattice state synchronized.");
 }
+
 
 

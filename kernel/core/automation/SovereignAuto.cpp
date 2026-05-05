@@ -1,6 +1,6 @@
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_auto.h"
 #include "sigma_hal.h"
 #include "sigma_telemetry.h"
@@ -44,4 +44,5 @@ extern "C" void auto_trigger_event(uint32_t event_id) {
         }
     }
 }
+
 

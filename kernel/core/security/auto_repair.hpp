@@ -1,9 +1,10 @@
+#include "sigma_hal.h"
 #ifndef AUTO_REPAIR_HPP
 #define AUTO_REPAIR_HPP
 
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "../../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Security {
@@ -29,3 +30,4 @@ public:
 } // namespace SigmaOS
 
 #endif
+

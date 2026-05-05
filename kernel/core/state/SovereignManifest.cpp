@@ -1,5 +1,6 @@
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_manifest.h"
 #include "sigma_hal.h"
 #include "sigma_libc.h"
@@ -47,4 +48,5 @@ extern "C" sigma_shard_config_t* manifest_get_config(uint32_t shard_id) {
     if (shard_id >= 600) return SIGMA_NULL;
     return &active_lattice[shard_id];
 }
+
 

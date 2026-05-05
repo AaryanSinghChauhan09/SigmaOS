@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 #include "sigma_rust.h"
 #include "sigma_hal.h"
@@ -34,4 +34,5 @@ extern "C" bool rust_execute_safe_driver(uint32_t driver_id) {
     
     return true;
 }
+
 

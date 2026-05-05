@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign eBPF Nexus Shard
@@ -56,4 +57,5 @@ extern "C" void ebpf_init() {
 extern "C" void ebpf_load_prog(const char* name, const void* code, sigma_usize sz) {
     SigmaOS::Kernel::System::SovereignBPF::getInstance().loadProgram(name, code, sz);
 }
+
 

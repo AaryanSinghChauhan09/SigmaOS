@@ -1,7 +1,7 @@
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "shard_orchestrator.hpp"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -61,4 +61,5 @@ void SovereignShardOrchestrator::Audit() {
 
 } // namespace Kernel
 } // namespace SigmaOS
+
 

@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
 
 /**
@@ -59,5 +59,6 @@ extern "C" void install_execute() {
 extern "C" sigma_u32 install_get_progress() {
     return SovereignInstallerEngine::getInstance().getProgress();
 }
+
 
 

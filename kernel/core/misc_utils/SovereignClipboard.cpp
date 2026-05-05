@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 #include "sigma_clipboard.h"
 #include "sigma_hal.h"
@@ -53,4 +53,5 @@ extern "C" void clipboard_copy(sigma_clip_type_t type, const void* data, uint32_
 extern "C" void* clipboard_paste(sigma_clip_type_t* out_type, uint32_t* out_size) {
     return SovereignClipboardEngine::getInstance().paste(out_type, out_size);
 }
+
 

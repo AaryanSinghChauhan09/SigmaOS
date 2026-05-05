@@ -1,6 +1,6 @@
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_assistant.h"
 
 /**
@@ -32,5 +32,6 @@ extern "C" void assistant_report_status() {
 extern "C" sigma_u32 assistant_get_query_count() {
     return SovereignAssistantEngine.query_count;
 }
+
 
 

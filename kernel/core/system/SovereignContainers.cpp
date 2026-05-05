@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Containerization Engine
@@ -54,4 +54,5 @@ extern "C" void container_init() {
 extern "C" void container_spawn(const char* name, const char* entrypoint) {
     SovereignContainerEngine::getInstance().spawnContainer(name, entrypoint);
 }
+
 

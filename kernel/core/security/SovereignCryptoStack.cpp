@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Crypto Stack Shard
@@ -55,4 +56,5 @@ extern "C" void cryptostack_init() {
 extern "C" void cryptostack_encrypt(void* data, sigma_usize sz, sigma_u32 algo) {
     SigmaOS::Kernel::Security::SovereignCryptoStack::getInstance().encrypt(data, sz, algo);
 }
+
 

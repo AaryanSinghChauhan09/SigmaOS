@@ -1,5 +1,5 @@
-#include "../../../include/sigma_types.h"
-#include "../../../include/SovereignLibC.h"
+#include "sigma_types.h"
+#include "SovereignLibC.h"
 #include "sigma_mem.h"
 #include "sigma_hal.h"
 
@@ -113,4 +113,5 @@ extern "C" sigma_u64 heap_get_total_allocations() {
 extern "C" sigma_u32 heap_get_active_allocations() {
     return SovereignHeapEngine::getInstance().getActiveAllocations();
 }
+
 

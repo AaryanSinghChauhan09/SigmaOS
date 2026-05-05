@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 #include "sigma_ergo.h"
 #include "sigma_hal.h"
@@ -30,4 +30,5 @@ extern "C" void ergo_evaluate_fatigue(uint32_t active_minutes) {
         sigma_log("[ERGO] CDS: Fatigue levels nominal.");
     }
 }
+
 

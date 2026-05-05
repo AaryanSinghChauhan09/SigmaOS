@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Cloud Orchestrator Shard
@@ -59,4 +60,5 @@ extern "C" void cloud_orch_init() {
 extern "C" void cloud_orch_deploy(const char* task) {
     SigmaOS::Kernel::Cloud::SovereignCloudOrchestrator::getInstance().orchestrate(task);
 }
+
 

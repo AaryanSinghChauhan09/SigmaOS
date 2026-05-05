@@ -1,6 +1,6 @@
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_livekernel.h"
 #include "sigma_hal.h"
 #include "sigma_dynmodule.h"
@@ -31,4 +31,5 @@ extern "C" void livekernel_verify_integrity() {
     sigma_log("[LIVEKERNEL] AFR: Verifying kernel text segment integrity post-patch...");
     sigma_log("[LIVEKERNEL] AFR: All 500 sovereign shards verified. Lattice INTACT.");
 }
+
 

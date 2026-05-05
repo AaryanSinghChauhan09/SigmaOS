@@ -1,3 +1,5 @@
+#include "../../../include/sigma_hal.h"
+
 #include "../../../include/sigma_kernel_types.h"
 #include "../../../include/SovereignLibC.h"
 #include "../../../include/sigma_snap_types.h"
@@ -62,4 +64,7 @@ extern "C" void snap_auto_arrange() {
 extern "C" void snap_register_zone(sigma_u32 x, sigma_u32 y, sigma_u32 w, sigma_u32 h) {
     SigmaOS::Kernel::UI::SovereignSnapEngine::getInstance().registerZone(x, y, w, h);
 }
+
+
+
 

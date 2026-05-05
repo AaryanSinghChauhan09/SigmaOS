@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Cron Shard
@@ -56,4 +57,5 @@ extern "C" void cron_init() {
 extern "C" void cron_schedule(const char* task, sigma_u32 ms) {
     SigmaOS::Kernel::Automation::SovereignCron::getInstance().scheduleTask(task, ms);
 }
+
 

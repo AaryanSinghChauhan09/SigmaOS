@@ -1,5 +1,6 @@
+#include "sigma_hal.h"
 #include "SovereignAppShard.hpp"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -45,4 +46,5 @@ extern "C" void shard_layer_init() {
 extern "C" void shard_orchestrate(const char* id) {
     SigmaOS::Kernel::Core::SovereignAppShard::getInstance().orchestrate(id);
 }
+
 

@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Storage Deduplication Engine
@@ -61,4 +61,5 @@ private:
 extern "C" void dedup_init() { SovereignStorageDedupEngine::getInstance().init(); }
 extern "C" bool dedup_check_block(sigma_u32 hash, sigma_u32 size) { return SovereignStorageDedupEngine::getInstance().checkAndDedup(hash, size); }
 extern "C" void dedup_stats() { SovereignStorageDedupEngine::getInstance().printStats(); }
+
 

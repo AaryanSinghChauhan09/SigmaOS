@@ -1,6 +1,6 @@
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_spatialaudio.h"
 #include "sigma_hal.h"
 #include "sigma_audio.h"
@@ -33,4 +33,5 @@ extern "C" void spatialaudio_play_source(uint32_t source_id, float x, float y, f
                  source_id, dx, dy, dz);
     sigma_log("[SPATIALAUDIO] HRTF: Stereo convolution dispatched to silicon DAC.");
 }
+
 

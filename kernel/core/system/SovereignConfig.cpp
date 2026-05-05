@@ -1,3 +1,4 @@
+#include "sigma_hal.h"
 #include "sigma_types.h"
 #include "SovereignLibC.h"
 
@@ -55,4 +56,5 @@ extern "C" void config_set(const char* key, const char* value) {
 extern "C" const char* config_get(const char* key) {
     return SigmaOS::Kernel::System::SovereignConfigManager::getInstance().getParameter(key);
 }
+
 

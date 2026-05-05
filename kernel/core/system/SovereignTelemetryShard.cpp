@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Telemetry Shard
@@ -55,4 +56,5 @@ extern "C" void telemetry_init() {
 extern "C" void telemetry_record(const char* name, sigma_u64 val) {
     SigmaOS::Kernel::System::SovereignTelemetryShard::getInstance().recordMetric(name, val);
 }
+
 

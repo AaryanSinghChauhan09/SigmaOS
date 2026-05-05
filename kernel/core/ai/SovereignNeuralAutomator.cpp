@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Neural Automator Shard
@@ -58,4 +59,5 @@ extern "C" void neural_automator_init() {
 extern "C" void neural_automator_execute(const char* intent) {
     SigmaOS::Kernel::AI::SovereignNeuralAutomator::getInstance().inferAndExecute(intent);
 }
+
 

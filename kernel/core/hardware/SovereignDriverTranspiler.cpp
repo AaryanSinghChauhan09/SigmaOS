@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Driver Transpiler Shard
@@ -58,4 +59,5 @@ extern "C" void driver_transpiler_init() {
 extern "C" void driver_transpiler_compile(const char* driver, const char* arch) {
     SigmaOS::Kernel::Hardware::SovereignDriverTranspiler::getInstance().transpileDriver(driver, arch);
 }
+
 

@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Lattice Configurator Shard
@@ -58,4 +59,5 @@ extern "C" void configurator_init() {
 extern "C" void configurator_apply(const char* policy) {
     SigmaOS::Kernel::System::SovereignLatticeConfigurator::getInstance().applyPolicy(policy);
 }
+
 

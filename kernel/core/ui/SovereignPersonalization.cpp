@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Personalization Engine
@@ -60,4 +60,5 @@ extern "C" void personalize_process_event(sigma_u32 event_id, const char* contex
 extern "C" void personalize_suggest_theme(sigma_u32 ambient_light_lux) {
     SovereignPersonalizationEngine::getInstance().suggestThemeForEnvironment(ambient_light_lux);
 }
+
 

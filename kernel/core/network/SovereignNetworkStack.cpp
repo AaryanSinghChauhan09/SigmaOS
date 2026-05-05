@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Network Stack Shard
@@ -55,4 +56,5 @@ extern "C" void netstack_init() {
 extern "C" void netstack_receive(void* pkt, sigma_usize sz) {
     SigmaOS::Kernel::Network::SovereignNetworkStack::getInstance().handlePacket(pkt, sz);
 }
+
 

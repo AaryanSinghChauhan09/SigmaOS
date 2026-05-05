@@ -1,9 +1,10 @@
+#include "sigma_hal.h"
 #ifndef TRANSPILER_SHARD_HPP
 #define TRANSPILER_SHARD_HPP
 
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "../../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -31,3 +32,4 @@ public:
 } // namespace SigmaOS
 
 #endif
+

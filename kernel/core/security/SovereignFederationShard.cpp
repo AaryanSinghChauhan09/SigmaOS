@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Identity Federation Shard
@@ -57,4 +58,5 @@ extern "C" void federation_init() {
 extern "C" bool federation_sso(const char* dom, const char* prot) {
     return SigmaOS::Kernel::Security::SovereignFederationShard::getInstance().performSSO(dom, prot);
 }
+
 

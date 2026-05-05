@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Threat Hunter Shard
@@ -58,4 +59,5 @@ extern "C" void threat_hunter_init() {
 extern "C" void threat_hunter_audit(const char* target) {
     SigmaOS::Kernel::Security::SovereignThreatHunter::getInstance().executeAudit(target);
 }
+
 

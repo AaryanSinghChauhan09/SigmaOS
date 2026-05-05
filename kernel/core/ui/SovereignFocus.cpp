@@ -1,6 +1,6 @@
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_focus.h"
 #include "sigma_hal.h"
 #include "sigma_zeronet.h"
@@ -28,4 +28,5 @@ extern "C" void focus_engage(uint32_t active_app_id, uint32_t duration_minutes) 
 extern "C" void focus_disengage() {
     sigma_log("[FOCUS] CIB: Disengaging focus mode. Restoring full network and IPC topology.");
 }
+
 

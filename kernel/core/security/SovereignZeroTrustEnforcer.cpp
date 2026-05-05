@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Zero-Trust Enforcer Shard
@@ -57,4 +58,5 @@ extern "C" void zta_enforcer_init() {
 extern "C" bool zta_verify_access(const char* id, const char* res) {
     return SigmaOS::Kernel::Security::SovereignZeroTrustEnforcer::getInstance().verifyAccess(id, res);
 }
+
 

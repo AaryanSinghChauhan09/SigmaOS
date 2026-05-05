@@ -1,7 +1,9 @@
+#include "sigma_hal.h"
+#include "SovereignLibC.h"
 #ifndef INTERRUPT_SHARD_HPP
 #define INTERRUPT_SHARD_HPP
 
-#include "../../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -35,3 +37,4 @@ public:
 } // namespace SigmaOS
 
 #endif
+

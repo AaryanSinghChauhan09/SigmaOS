@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Container Networking (CNI)
@@ -46,4 +46,5 @@ extern "C" void container_net_init() {
 extern "C" void container_net_attach(const char* container, const char* mac) {
     SovereignContainerNetEngine::getInstance().attachContainerNetwork(container, mac);
 }
+
 

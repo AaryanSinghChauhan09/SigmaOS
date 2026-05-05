@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Gesture Navigation
@@ -48,4 +48,5 @@ extern "C" void gesture_init() {
 extern "C" void gesture_process_touch(sigma_u32 fingers, sigma_u32 dx, sigma_u32 dy) {
     SovereignGestureEngine::getInstance().processMultiTouch(fingers, dx, dy);
 }
+
 

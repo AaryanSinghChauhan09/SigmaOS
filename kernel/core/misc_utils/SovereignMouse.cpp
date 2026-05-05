@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
 
 /**
@@ -50,5 +50,6 @@ extern "C" void mouse_init() {
 extern "C" void mouse_handle_report(const sigma_u8* report) {
     SovereignMouseEngine::getInstance().handleReport(report);
 }
+
 
 

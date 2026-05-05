@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Performance Profiler (SovereignPerf)
@@ -58,4 +59,5 @@ extern "C" void perf_profile_shard(sigma_u32 id) {
 extern "C" void perf_report() {
     SigmaOS::Kernel::System::SovereignPerf::getInstance().reportHotspots();
 }
+
 

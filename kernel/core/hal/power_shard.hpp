@@ -1,9 +1,10 @@
+#include "sigma_hal.h"
 #ifndef POWER_SHARD_HPP
 #define POWER_SHARD_HPP
 
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "../../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 #include "port_shard.hpp"
 
 namespace SigmaOS {
@@ -41,3 +42,4 @@ public:
 } // namespace SigmaOS
 
 #endif
+

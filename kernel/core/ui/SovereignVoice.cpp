@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 #include "sigma_voice.h"
 #include "sigma_hal.h"
@@ -29,4 +29,5 @@ extern "C" void voice_process_audio_stream(const void* audio_buffer, uint32_t si
 extern "C" void voice_execute_intent(const char* intent) {
     sigma_printf("[VOICE] NLI: Executing user intent '%s' with zero latency.\n", intent);
 }
+
 

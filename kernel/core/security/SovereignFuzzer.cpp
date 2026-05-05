@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Fuzzer Shard
@@ -58,4 +59,5 @@ extern "C" void fuzzer_init() {
 extern "C" void fuzzer_inject(const char* target, sigma_u32 iters) {
     SigmaOS::Kernel::Security::SovereignFuzzer::getInstance().injectFault(target, iters);
 }
+
 

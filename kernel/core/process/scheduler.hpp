@@ -1,8 +1,10 @@
+#include "sigma_hal.h"
+#include "SovereignLibC.h"
 #ifndef SCHEDULER_HPP
 #define SCHEDULER_HPP
 
-#include "../../../include/sigma_types.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_types.h"
+#include "SigmaOOP.hpp"
 #include "SovereignString.hpp"
 
 namespace SigmaOS {
@@ -55,3 +57,4 @@ public:
 } // namespace SigmaOS
 
 #endif
+

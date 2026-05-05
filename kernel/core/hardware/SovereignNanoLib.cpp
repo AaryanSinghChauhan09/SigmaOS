@@ -1,4 +1,5 @@
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 #include "sigma_nanolib.h"
 #include "sigma_hal.h"
@@ -43,4 +44,5 @@ extern "C" void* nanolib_memset(void* s, int c, uint32_t n) {
     while (n--) *p++ = (unsigned char)c;
     return s;
 }
+
 

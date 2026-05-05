@@ -1,7 +1,7 @@
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "predictive_scheduler.hpp"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -29,4 +29,5 @@ void SovereignPredictiveScheduler::Audit() {
 
 } // namespace Kernel
 } // namespace SigmaOS
+
 

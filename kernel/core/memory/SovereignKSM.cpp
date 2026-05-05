@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
 
 
@@ -49,4 +49,5 @@ extern "C" void* ksm_access_shard(uint32_t shard_id) {
     if (shard_id >= 600) return SIGMA_NULL;
     return memory_lattice[shard_id].actual_ptr;
 }
+
 

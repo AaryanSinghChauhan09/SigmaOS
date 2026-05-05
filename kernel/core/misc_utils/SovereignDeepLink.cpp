@@ -1,6 +1,6 @@
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_deeplink.h"
 #include "sigma_hal.h"
 #include "sigma_process.h"
@@ -34,4 +34,5 @@ extern "C" void deeplink_execute(const char* sigma_uri) {
     
     sigma_log("[DEEPLINK] USL: App ignited. State successfully injected via IPC.");
 }
+
 

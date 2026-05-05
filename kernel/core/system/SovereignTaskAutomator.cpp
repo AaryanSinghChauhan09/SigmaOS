@@ -1,7 +1,7 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_taskautomator.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Automation Engine
@@ -93,4 +93,5 @@ extern "C" void taskautomator_start_macro() {
 extern "C" void taskautomator_stop_macro() {
     SovereignAutomationEngine::getInstance().stopMacroRecording();
 }
+
 

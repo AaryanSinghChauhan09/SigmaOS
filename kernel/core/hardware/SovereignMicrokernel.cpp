@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Microkernel Orchestrator
@@ -73,4 +73,5 @@ extern "C" void microkernel_disable() {
 extern "C" sigma_u32 microkernel_allocate_ipc(sigma_u32 service_a, sigma_u32 service_b) {
     return SovereignMicrokernelEngine::getInstance().allocateIPCChannel(service_a, service_b);
 }
+
 

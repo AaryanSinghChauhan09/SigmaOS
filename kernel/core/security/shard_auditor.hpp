@@ -1,9 +1,10 @@
+#include "sigma_hal.h"
 #ifndef SHARD_AUDITOR_HPP
 #define SHARD_AUDITOR_HPP
 
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "../../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Security {
@@ -30,3 +31,4 @@ public:
 } // namespace SigmaOS
 
 #endif
+

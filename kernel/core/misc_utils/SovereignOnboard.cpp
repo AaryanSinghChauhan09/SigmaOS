@@ -1,6 +1,6 @@
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_onboard.h"
 #include "sigma_hal.h"
 #include "sigma_persona.h"
@@ -33,4 +33,5 @@ extern "C" void onboard_start_wizard() {
 extern "C" void onboard_complete_step(uint32_t step_id) {
     sigma_printf("[ONBOARD] GSP: Step %d completed successfully.\n", step_id);
 }
+
 

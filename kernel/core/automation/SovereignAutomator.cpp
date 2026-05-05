@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Workflow Automation Engine
@@ -61,4 +61,5 @@ extern "C" void automator_register_macro(const char* trigger, const char* action
 extern "C" void automator_context_tick(const char* context) {
     SovereignAutomatorEngine::getInstance().processContext(context);
 }
+
 

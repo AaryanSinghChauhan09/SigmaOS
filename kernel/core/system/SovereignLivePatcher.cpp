@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Live Patcher Shard
@@ -59,4 +60,5 @@ extern "C" void live_patch_init() {
 extern "C" void live_patch_apply(const char* func, const void* payload) {
     SigmaOS::Kernel::System::SovereignLivePatcher::getInstance().applyLivePatch(func, payload);
 }
+
 

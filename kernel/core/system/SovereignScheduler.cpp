@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Predictive Scheduler (S-Sched)
@@ -63,4 +63,5 @@ extern "C" void sched_enqueue(sigma_u32 thread_id, sigma_u32 priority) {
 extern "C" sigma_u32 sched_predict_next() {
     return SovereignScheduler::getInstance().predictNextThread();
 }
+
 

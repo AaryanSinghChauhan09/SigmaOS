@@ -1,7 +1,7 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
 #include "sigma_allocator.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Test Suite (v1.0)
@@ -46,4 +46,5 @@ extern "C" void run_sovereign_tests() {
     sigma_log("✅ ALL CORE TESTS PASSED. SYSTEM STABLE.");
     sigma_log("==================================================");
 }
+
 

@@ -1,3 +1,4 @@
+#include "sigma_hal.h"
 /* =========================================================================
  * Σ SIGMAOS: VFS SHARD (v2.0 - OOP SOVEREIGNTY)
  * =========================================================================
@@ -6,9 +7,9 @@
 #ifndef VFS_SHARD_HPP
 #define VFS_SHARD_HPP
 
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "../../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -56,3 +57,4 @@ public:
 } // namespace SigmaOS
 
 #endif
+

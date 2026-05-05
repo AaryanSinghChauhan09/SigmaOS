@@ -1,6 +1,6 @@
 #include "SovereignPackage.hpp"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 SovereignPackageEngine& SovereignPackageEngine::getInstance() {
     static SovereignPackageEngine instance;
@@ -30,4 +30,5 @@ extern "C" void package_manager_init() {
 extern "C" bool package_manager_install(const char* name) {
     return SovereignPackageEngine::getInstance().installPackage(name);
 }
+
 

@@ -1163,3 +1163,20 @@ function processData() {
         }, 800);
     }, 500);
 }
+
+function executeCommand(cmd) {
+    const args = cmd.split(' ');
+    const command = args[0].toLowerCase();
+    
+    if (command === 'launch' || command === 'open') {
+        const app = args.slice(1).join(' ');
+        launchApp(app);
+        return [ZENITH] Launching ...;
+    } else if (command === 'theme') {
+        setTheme(args[1]);
+        return [ZENITH] Theme updated to .;
+    } else if (command === 'diag') {
+        return [DIAG] Silicon Health: 100%. All shards operational.;
+    }
+    return [ZENITH] Unknown command: ;
+}

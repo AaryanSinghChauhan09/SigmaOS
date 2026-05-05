@@ -1,3 +1,4 @@
+#include "sigma_hal.h"
 #include "sigma_types.h"
 #include "SovereignLibC.h"
 #include "sigma_fs.h"
@@ -68,4 +69,5 @@ extern "C" bool sci_trigger_pipeline(const char* source_path, const char* target
 extern "C" sigma_u64 sci_get_executed_count() {
     return SigmaOS::Kernel::Deployment::SovereignCIEngine::getInstance().getExecutedCount();
 }
+
 

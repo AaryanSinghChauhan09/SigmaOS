@@ -1,3 +1,4 @@
+#include "sigma_hal.h"
 #include "sigma_types.h"
 #include "SovereignLibC.h"
 
@@ -49,4 +50,5 @@ extern "C" void hft_init() {
 extern "C" void hft_process(const void* data, sigma_size_t size) {
     SigmaOS::Kernel::Network::SovereignHFTNexus::getInstance().processTradePacket(data, size);
 }
+
 

@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Power Manager (Sovereign-ACPI)
@@ -66,4 +67,5 @@ extern "C" void power_init() {
 extern "C" void power_set_state(sigma_u32 s) {
     SigmaOS::Kernel::System::SovereignPowerManager::getInstance().setSleepState(s);
 }
+
 

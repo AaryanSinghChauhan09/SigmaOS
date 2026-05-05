@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Memory Compression Engine
@@ -51,4 +51,5 @@ private:
 extern "C" void memcompress_init() { SovereignMemCompressEngine::getInstance().init(); }
 extern "C" sigma_u32 memcompress_compress(sigma_u32 pages) { return SovereignMemCompressEngine::getInstance().compressColdPages(pages); }
 extern "C" void memcompress_stats() { SovereignMemCompressEngine::getInstance().printStats(); }
+
 

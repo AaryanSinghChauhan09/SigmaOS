@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Notification Center
@@ -80,4 +80,5 @@ extern "C" void notif_init() { SovereignNotificationEngine::getInstance().init()
 extern "C" sigma_u32 notif_push(const char* src, const char* msg, sigma_u32 sound) { return SovereignNotificationEngine::getInstance().push(src, msg, sound); }
 extern "C" void notif_dismiss(sigma_u32 id) { SovereignNotificationEngine::getInstance().dismiss(id); }
 extern "C" void notif_set_sound(bool enabled) { SovereignNotificationEngine::getInstance().setSoundEnabled(enabled); }
+
 

@@ -1,4 +1,5 @@
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 #include "sigma_adaptivetype.h"
 #include "sigma_hal.h"
@@ -31,4 +32,5 @@ extern "C" void adaptivetype_render_glyph(char c, uint32_t x, uint32_t y) {
     // Pass scaled glyph data to the DFO rendering pipeline
     // universalui_render_widget(...)
 }
+
 

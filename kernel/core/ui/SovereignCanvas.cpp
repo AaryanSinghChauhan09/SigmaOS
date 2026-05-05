@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 #include "sigma_canvas.h"
 #include "sigma_hal.h"
@@ -26,4 +26,5 @@ extern "C" void canvas_zoom(float delta_zoom) {
     sigma_printf("[CANVAS] URM: Viewport zoom shifted by %.2fx.\n", delta_zoom);
     // Directly scale the GPU projection matrix
 }
+
 

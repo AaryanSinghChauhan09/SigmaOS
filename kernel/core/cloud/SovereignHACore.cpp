@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign HA Core Shard
@@ -56,4 +57,5 @@ extern "C" void ha_core_init() {
 extern "C" void ha_core_failover(const char* node) {
     SigmaOS::Kernel::Cloud::SovereignHACore::getInstance().handleFailover(node);
 }
+
 

@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 #include "../security/SovereignQKD.hpp"
 
 namespace SigmaOS {
@@ -80,4 +81,5 @@ extern "C" void governance_submit(const char* prop) {
 extern "C" void governance_vote(const char* node, const char* prop, bool support) {
     SigmaOS::Kernel::Community::SovereignGovernance::getInstance().castVote(node, prop, support);
 }
+
 

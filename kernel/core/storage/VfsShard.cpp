@@ -1,5 +1,6 @@
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "VfsShard.hpp"
 
 // Implementation for SovereignVFS could go here if needed, 
@@ -13,4 +14,5 @@ SovereignVFS g_VFS;
 
 } // namespace Kernel
 } // namespace SigmaOS
+
 

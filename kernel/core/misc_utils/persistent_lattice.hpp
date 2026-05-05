@@ -1,8 +1,10 @@
+#include "sigma_hal.h"
+#include "SovereignLibC.h"
 #ifndef PERSISTENT_LATTICE_HPP
 #define PERSISTENT_LATTICE_HPP
 
-#include "../../../include/sigma_types.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -33,3 +35,4 @@ public:
 } // namespace SigmaOS
 
 #endif
+

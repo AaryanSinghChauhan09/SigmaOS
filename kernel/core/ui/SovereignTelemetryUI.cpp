@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Telemetry UI Engine
@@ -61,4 +61,5 @@ extern "C" void telemetry_ui_toggle() {
 extern "C" void telemetry_ui_update(sigma_u32 net, sigma_u32 numa) {
     SovereignTelemetryUIEngine::getInstance().updateDashboardMetrics(net, numa);
 }
+
 

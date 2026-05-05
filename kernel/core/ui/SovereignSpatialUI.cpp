@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Hot Corners & Split Snapping Engine
@@ -58,4 +58,5 @@ extern "C" void spatial_ui_init() { SovereignSpatialUIEngine::getInstance().init
 extern "C" void spatial_ui_set_corner(sigma_u32 corner, const char* action) { SovereignSpatialUIEngine::getInstance().setHotCorner((sigma_corner_t)corner, action); }
 extern "C" void spatial_ui_trigger_corner(sigma_u32 corner) { SovereignSpatialUIEngine::getInstance().triggerCorner((sigma_corner_t)corner); }
 extern "C" void spatial_ui_snap_window(sigma_u32 wid, const char* zone) { SovereignSpatialUIEngine::getInstance().snapWindow(wid, zone); }
+
 

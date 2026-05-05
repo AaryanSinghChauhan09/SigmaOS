@@ -1,6 +1,6 @@
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_contextmenu.h"
 #include "sigma_hal.h"
 #include "sigma_neural.h"
@@ -28,4 +28,5 @@ extern "C" void contextmenu_invoke(uint32_t target_id, uint32_t x, uint32_t y) {
 extern "C" void contextmenu_dismiss() {
     sigma_log("[CONTEXTMENU] IDR: Radial menu dismissed.");
 }
+
 

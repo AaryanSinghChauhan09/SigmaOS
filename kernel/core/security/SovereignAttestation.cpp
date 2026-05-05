@@ -1,3 +1,4 @@
+#include "sigma_hal.h"
 #include "SovereignLibC.h"
 #include "sigma_types.h"
 
@@ -39,4 +40,5 @@ private:
 extern "C" void attestation_init() {
     SigmaOS::Kernel::Security::SovereignAttestation::getInstance().init();
 }
+
 

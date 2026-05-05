@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 #include "sigma_emotion.h"
 #include "sigma_hal.h"
 #include "sigma_universal_ui.h"
@@ -51,4 +51,5 @@ extern "C" void emotion_update_state(sigma_emotion_state_t new_state) {
 extern "C" sigma_emotion_state_t emotion_get_current_state() {
     return SovereignEmotionManager.current_state;
 }
+
 

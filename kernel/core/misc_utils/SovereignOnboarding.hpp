@@ -1,7 +1,9 @@
+#include "sigma_hal.h"
+#include "SovereignLibC.h"
 #ifndef SOVEREIGN_ONBOARDING_HPP
 #define SOVEREIGN_ONBOARDING_HPP
 
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 
 class SovereignOnboardingEngine {
 public:
@@ -20,3 +22,4 @@ extern "C" {
 }
 
 #endif
+

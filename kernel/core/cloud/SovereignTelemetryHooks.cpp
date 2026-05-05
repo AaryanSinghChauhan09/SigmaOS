@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Telemetry Exporter Hooks
@@ -55,4 +55,5 @@ extern "C" void telemetry_ex_configure(const char* ip) {
 extern "C" void telemetry_ex_export(sigma_u32 cpu, sigma_u32 mem) {
     SovereignTelemetryExporter::getInstance().exportMetrics(cpu, mem);
 }
+
 

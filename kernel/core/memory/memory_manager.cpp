@@ -1,7 +1,7 @@
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "memory_manager.hpp"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -97,4 +97,5 @@ void SovereignMemoryManager::audit() {
 
 } // namespace Kernel
 } // namespace SigmaOS
+
 

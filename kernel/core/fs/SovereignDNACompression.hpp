@@ -1,8 +1,10 @@
+#include "sigma_hal.h"
+#include "SovereignLibC.h"
 #ifndef SOVEREIGN_DNA_COMPRESSION_HPP
 #define SOVEREIGN_DNA_COMPRESSION_HPP
 
-#include "../../../include/sigma_types.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -44,3 +46,4 @@ private:
 } // namespace SigmaOS
 
 #endif
+

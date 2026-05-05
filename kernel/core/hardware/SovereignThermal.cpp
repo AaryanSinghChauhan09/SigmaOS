@@ -1,4 +1,5 @@
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 #include "sigma_thermaliq.h"
 #include "sigma_hal.h"
 
@@ -64,4 +65,5 @@ extern "C" void thermaliq_update() {
 extern "C" const sigma_thermal_state_t* thermaliq_get_state() {
     return SovereignThermalEngine::getInstance().getState();
 }
+
 

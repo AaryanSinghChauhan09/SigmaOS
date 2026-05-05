@@ -1,5 +1,6 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_hal.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 /**
  * SigmaOS Sovereign Predictive Resource Engine
@@ -39,4 +40,5 @@ private:
 extern "C" void predictor_init() {
     SigmaOS::Kernel::AI::SovereignPredictor::getInstance().init();
 }
+
 

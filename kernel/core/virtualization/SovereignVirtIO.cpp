@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign VirtIO Shard
@@ -54,4 +55,5 @@ extern "C" void virtio_init() {
 extern "C" void virtio_notify(sigma_u32 qid) {
     SigmaOS::Kernel::Virtualization::SovereignVirtIO::getInstance().processQueue(qid);
 }
+
 

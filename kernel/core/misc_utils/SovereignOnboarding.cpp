@@ -1,6 +1,6 @@
 #include "SovereignOnboarding.hpp"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 SovereignOnboardingEngine& SovereignOnboardingEngine::getInstance() {
     static SovereignOnboardingEngine instance;
@@ -25,4 +25,5 @@ void SovereignOnboardingEngine::setPersona(const char* persona_name) {
 extern "C" void onboarding_start() {
     SovereignOnboardingEngine::getInstance().startWizard();
 }
+
 

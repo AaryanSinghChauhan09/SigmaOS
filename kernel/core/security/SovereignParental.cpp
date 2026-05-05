@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 #include "sigma_parental.h"
 #include "sigma_hal.h"
@@ -32,4 +32,5 @@ extern "C" void parental_set_time_window(const char* profile_name, uint32_t star
     sigma_printf("[PARENTAL] CPE: Usage window for '%s' set to %02d:00 - %02d:00.\n",
                  profile_name, start_hour, end_hour);
 }
+
 

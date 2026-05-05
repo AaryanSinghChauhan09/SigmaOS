@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 #include "sigma_persona.h"
 #include "sigma_hal.h"
@@ -58,4 +58,5 @@ extern "C" void persona_automate_workflow(uint32_t trigger_id) {
     
     sigma_log("[PERSONA] HHA: No high-confidence automation found for this trigger.");
 }
+
 

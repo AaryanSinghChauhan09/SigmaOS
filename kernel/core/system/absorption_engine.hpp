@@ -1,9 +1,10 @@
+#include "sigma_hal.h"
 #ifndef ABSORPTION_ENGINE_HPP
 #define ABSORPTION_ENGINE_HPP
 
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "../../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 
@@ -49,3 +50,4 @@ public:
 } // namespace SigmaOS
 
 #endif
+

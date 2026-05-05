@@ -1,7 +1,7 @@
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "industrial_hypervisor.hpp"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Core {
@@ -27,4 +27,5 @@ void SovereignHypervisor::Audit() {
 
 } // namespace Core
 } // namespace SigmaOS
+
 

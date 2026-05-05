@@ -1,10 +1,11 @@
+#include "sigma_hal.h"
 #ifndef SOVEREIGN_DEPLOYER_HPP
 #define SOVEREIGN_DEPLOYER_HPP
 
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "../../../include/sigma_types.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Deployment {
@@ -40,3 +41,4 @@ public:
 } // namespace SigmaOS
 
 #endif
+

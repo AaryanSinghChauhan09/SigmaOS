@@ -1,8 +1,10 @@
+#include "sigma_hal.h"
+#include "SovereignLibC.h"
 #ifndef DIGITAL_TWIN_HPP
 #define DIGITAL_TWIN_HPP
 
-#include "../../../include/sigma_types.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -34,3 +36,4 @@ public:
 } // namespace SigmaOS
 
 #endif
+

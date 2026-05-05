@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h"
-#include "../../../include/sigma_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Scheduler
@@ -77,4 +77,5 @@ extern "C" void scheduler_init_shard() {
 extern "C" void scheduler_spawn(const char* name, void (*entry)()) {
     SigmaOS::Kernel::Scheduling::SovereignScheduler::getInstance().createTask(name, entry);
 }
+
 

@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Watchdog Shard
@@ -61,4 +62,5 @@ extern "C" void watchdog_init() {
 extern "C" void watchdog_pet(sigma_u32 id) {
     SigmaOS::Kernel::System::SovereignWatchdog::getInstance().petWatchdog(id);
 }
+
 

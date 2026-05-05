@@ -1,5 +1,5 @@
-#include "../../../include/sigma_types.h"
-#include "../../../include/SovereignLibC.h"
+#include "sigma_types.h"
+#include "SovereignLibC.h"
 #include "sigma_dynmodule.h"
 #include "sigma_hal.h"
 
@@ -77,4 +77,5 @@ extern "C" bool dynmodule_load(const char* module_path) {
 extern "C" bool dynmodule_unload(sigma_u32 module_id) {
     return SovereignDynModuleEngine::getInstance().unload(module_id);
 }
+
 

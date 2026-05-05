@@ -1,7 +1,7 @@
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "shard_manager.hpp"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Core {
@@ -35,4 +35,5 @@ void SovereignShardManager::Audit() {
 
 } // namespace Core
 } // namespace SigmaOS
+
 

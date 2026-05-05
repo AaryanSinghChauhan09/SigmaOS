@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 #include "sigma_visscript.h"
 #include "sigma_hal.h"
 
@@ -55,4 +55,5 @@ extern "C" void visscript_init() {
 extern "C" void visscript_execute_graph(const sigma_visscript_node_t* start_node) {
     SovereignVisScriptEngine::getInstance().executeGraph(start_node);
 }
+
 

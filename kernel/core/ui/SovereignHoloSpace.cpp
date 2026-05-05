@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 #include "sigma_holospace.h"
 #include "sigma_hal.h"
@@ -29,4 +29,5 @@ extern "C" void holospace_update_head_tracking(float pitch, float yaw, float rol
     // Recompute spatial perspective based on HMD telemetry
     // VSC algorithm applies immediate transform matrix updates
 }
+
 

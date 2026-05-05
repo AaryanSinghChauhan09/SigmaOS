@@ -1,5 +1,6 @@
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
 #include "sigma_libc.h"
 
@@ -36,4 +37,5 @@ extern "C" bool gatekeeper_verify_shard_access(uint32_t shard_id) {
     // Zero-trust verification for cross-shard communication
     return true; 
 }
+
 

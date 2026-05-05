@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /* --- External Shard Endpoints --- */
 extern "C" {
@@ -227,4 +228,5 @@ private:
 extern "C" void sigma_bootstrap_lattice() {
     SigmaOS::Kernel::System::SovereignOrchestrator::getInstance().bootstrap();
 }
+
 

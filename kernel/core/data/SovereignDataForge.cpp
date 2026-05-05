@@ -1,6 +1,6 @@
-#include "../../../include/sigma_data_forge.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_hal.h"
+#include "sigma_data_forge.h"
+#include "SovereignLibC.h"
+#include "sigma_hal.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -60,3 +60,4 @@ extern "C" sigma_u64 forge_get_processed_bytes() {
     // Implementation placeholder
     return 0;
 }
+

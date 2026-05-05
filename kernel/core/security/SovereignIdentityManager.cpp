@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Identity Manager (Sovereign-IAM)
@@ -59,4 +60,5 @@ extern "C" void identity_init() {
 extern "C" bool identity_verify(const char* id, sigma_u32 mask) {
     return SigmaOS::Kernel::Security::SovereignIdentityManager::getInstance().verifyAccess(id, mask);
 }
+
 

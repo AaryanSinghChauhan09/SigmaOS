@@ -1,6 +1,6 @@
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_identity.h"
 
 /**
@@ -28,5 +28,6 @@ extern "C" void identity_verify_shard(const char* shard_id) {
 extern "C" void identity_report_status() {
     sigma_printf("[S-IDENTITY] Total Shards Verified: %u\n", SovereignIdentityEngine.verified_shards);
 }
+
 
 

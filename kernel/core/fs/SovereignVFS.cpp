@@ -1,5 +1,6 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_vfs.h"
+#include "sigma_hal.h"
+#include "SovereignLibC.h"
+#include "sigma_vfs.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -34,5 +35,6 @@ extern "C" void vfs_mount(const char* source, const char* target) {
 extern "C" void vfs_list_files(const char* path) {
     SigmaOS::Kernel::FS::SovereignVFS::getInstance().listFiles(path);
 }
+
 
 

@@ -1,3 +1,4 @@
+#include "sigma_hal.h"
 #include "sigma_types.h"
 #include "SovereignLibC.h"
 
@@ -66,4 +67,5 @@ extern "C" bool trust_verify(const char* shard, const char* sig) {
 extern "C" void trust_add_node(uint32_t id) {
     SigmaOS::Kernel::Security::SovereignTrustFabric::getInstance().addTrustedNode(id);
 }
+
 

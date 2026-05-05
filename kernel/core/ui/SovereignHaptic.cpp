@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 #include "sigma_haptic.h"
 #include "sigma_hal.h"
@@ -29,4 +29,5 @@ extern "C" void haptic_play_pattern(sigma_haptic_pattern_t pattern, float intens
                  
     sigma_log("[HAPTIC] HFTA: Waveform sequence synthesized and dispatched to LRA.");
 }
+
 

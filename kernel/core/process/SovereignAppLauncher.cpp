@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign App Launcher
@@ -69,4 +69,5 @@ extern "C" void launcher_init() { SovereignAppLauncherEngine::getInstance().init
 extern "C" void launcher_register(const char* id, const char* name) { SovereignAppLauncherEngine::getInstance().registerApp(id, name); }
 extern "C" void launcher_launch(const char* query) { SovereignAppLauncherEngine::getInstance().launch(query); }
 extern "C" void launcher_list_top(sigma_u32 n) { SovereignAppLauncherEngine::getInstance().listTop(n); }
+
 

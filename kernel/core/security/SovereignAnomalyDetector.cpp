@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Anomaly Detector Shard
@@ -62,4 +63,5 @@ extern "C" void anomaly_detector_init() {
 extern "C" void anomaly_analyze(const char* proc, sigma_u32 sys_rate, sigma_u32 mem) {
     SigmaOS::Kernel::Security::SovereignAnomalyDetector::getInstance().analyzeBehavior(proc, sys_rate, mem);
 }
+
 

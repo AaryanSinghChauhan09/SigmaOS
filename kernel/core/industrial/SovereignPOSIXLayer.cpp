@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign POSIX Emulation Shard
@@ -67,4 +68,5 @@ extern "C" void posix_init() {
 extern "C" void posix_signal_shard(sigma_u32 sig, sigma_u32 shard) {
     SigmaOS::Kernel::Industrial::SovereignPOSIXLayer::getInstance().mapSignal(sig, shard);
 }
+
 

@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Benchmark Engine
@@ -67,4 +67,5 @@ extern "C" void bench_memory_throughput(sigma_u32 buffer_mb) {
 extern "C" void bench_publish() {
     SovereignBenchmarkEngine::getInstance().publishResults();
 }
+
 

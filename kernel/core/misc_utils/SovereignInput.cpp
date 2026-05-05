@@ -1,6 +1,6 @@
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_input.h"
 #include "sigma_hal.h"
 
@@ -68,4 +68,5 @@ extern "C" void input_push_event(sigma_key_event_t* event) {
 extern "C" bool input_pop_event(sigma_key_event_t* out_event) {
     return SovereignInputEngine::getInstance().popEvent(out_event);
 }
+
 

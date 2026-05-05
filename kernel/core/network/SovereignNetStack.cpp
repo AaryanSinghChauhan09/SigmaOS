@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Networking Stack (NetStack)
@@ -65,4 +65,5 @@ extern "C" void netstack_register_iface(const char* mac_addr) {
 extern "C" bool netstack_dispatch(const char* payload, sigma_u32 length) {
     return SovereignNetStackEngine::getInstance().dispatchPacket(payload, length);
 }
+
 

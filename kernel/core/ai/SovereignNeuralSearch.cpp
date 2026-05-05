@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 #include "sigma_neuralsearch.h"
 #include "sigma_hal.h"
@@ -29,4 +29,5 @@ extern "C" void neuralsearch_query(const char* natural_language_query) {
 extern "C" void neuralsearch_index_shard(uint32_t shard_id) {
     sigma_printf("[NEURALSEARCH] OITR: Calculating semantic embeddings for Shard %d...\n", shard_id);
 }
+
 

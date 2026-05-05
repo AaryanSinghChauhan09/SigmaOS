@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Kernel Analytics Shard
@@ -57,4 +58,5 @@ extern "C" void diag_analytics_init() {
 extern "C" void diag_track_shard(const char* id, const char* type) {
     SigmaOS::Kernel::Diag::SovereignAnalytics::getInstance().trackEvent(id, type);
 }
+
 

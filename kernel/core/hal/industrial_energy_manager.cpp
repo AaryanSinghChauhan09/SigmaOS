@@ -1,7 +1,7 @@
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "industrial_energy_manager.hpp"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Power {
@@ -27,4 +27,5 @@ void SovereignEnergyManager::Audit() {
 
 } // namespace Power
 } // namespace SigmaOS
+
 

@@ -1,7 +1,9 @@
+#include "sigma_hal.h"
+#include "SovereignLibC.h"
 #ifndef SOVEREIGN_MULTI_USER_HPP
 #define SOVEREIGN_MULTI_USER_HPP
 
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 
 typedef struct {
     sigma_u32 uid;
@@ -30,3 +32,4 @@ extern "C" {
 }
 
 #endif
+

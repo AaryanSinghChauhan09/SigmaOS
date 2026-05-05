@@ -1,7 +1,7 @@
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "firmware_nexus.hpp"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -27,4 +27,5 @@ void SovereignFirmwareNexus::Audit() {
 
 } // namespace Kernel
 } // namespace SigmaOS
+
 

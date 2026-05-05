@@ -1,3 +1,4 @@
+#include "sigma_hal.h"
 #include "sigma_time.h"
 #include "SovereignLibC.h"
 #include "SigmaOOP.hpp"
@@ -57,4 +58,5 @@ extern "C" sigma_time_t time_now() {
     t.silicon_ticks = SigmaOS::Kernel::System::SovereignTime::getInstance().getUptimeMs();
     return t;
 }
+
 

@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Crypto Accelerator Shard
@@ -59,4 +60,5 @@ extern "C" void crypto_accel_init() {
 extern "C" void crypto_accel_encrypt(const void* data, sigma_usize size) {
     SigmaOS::Kernel::Security::SovereignCryptoAccelerator::getInstance().offloadEncryption(data, size);
 }
+
 

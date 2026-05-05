@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 #include "sigma_net.h"
 #include "sigma_hal.h"
 
@@ -90,4 +90,5 @@ extern "C" bool net_transmit_shard(uint32_t target_ip, uint32_t shard_id) {
 extern "C" void net_optimize_routes() {
     SovereignNetEngine::getInstance().optimizeRoutes();
 }
+
 

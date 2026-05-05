@@ -1,7 +1,7 @@
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "hardware_transpiler.hpp"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -32,4 +32,5 @@ void SovereignHardwareTranspiler::Audit() {
 
 } // namespace Kernel
 } // namespace SigmaOS
+
 

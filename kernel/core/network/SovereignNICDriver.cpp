@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign NIC Driver (VirtIO-Net)
@@ -86,4 +86,5 @@ extern "C" bool nic_transmit(const char* payload, sigma_u32 length) {
 extern "C" void nic_rx_interrupt() {
     SovereignNICDriverEngine::getInstance().receiveInterrupt();
 }
+
 

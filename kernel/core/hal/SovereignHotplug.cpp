@@ -57,3 +57,4 @@ extern "C" void hotplug_handle_event() {
     SigmaOS::Kernel::HAL::SovereignHotplugManager::getInstance().handleInterrupt();
 }
 
+

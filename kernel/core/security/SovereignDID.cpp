@@ -1,3 +1,4 @@
+#include "sigma_hal.h"
 #include "sigma_types.h"
 #include "SovereignLibC.h"
 
@@ -60,4 +61,5 @@ extern "C" void did_create(const char* subject) {
 extern "C" bool did_verify(const char* did) {
     return SigmaOS::Kernel::Security::SovereignDIDManager::getInstance().verifyDID(did);
 }
+
 

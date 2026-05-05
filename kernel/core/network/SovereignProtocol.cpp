@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Custom Protocol (SCP)
@@ -58,4 +58,5 @@ extern "C" void scp_add_peer(const char* peer) {
 extern "C" void scp_broadcast(const char* data) {
     SovereignProtocolEngine::getInstance().broadcast(data);
 }
+
 

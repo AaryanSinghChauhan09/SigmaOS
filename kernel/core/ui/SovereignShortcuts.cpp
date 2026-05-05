@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Quick Shortcuts
@@ -40,4 +40,5 @@ extern "C" void shortcuts_init() {
 extern "C" void shortcuts_suggest(const char* context, const char* suggestion) {
     SovereignShortcutsEngine::getInstance().pushContextShortcut(context, suggestion);
 }
+
 

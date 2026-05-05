@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Zenith Desktop Shard
@@ -58,4 +59,5 @@ extern "C" void zenith_desktop_init() {
 extern "C" void zenith_render(const char* context) {
     SigmaOS::Kernel::UI::SovereignZenithDesktop::getInstance().renderWorkspace(context);
 }
+
 

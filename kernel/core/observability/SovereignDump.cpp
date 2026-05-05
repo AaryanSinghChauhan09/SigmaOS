@@ -1,3 +1,4 @@
+#include "sigma_hal.h"
 #include "sigma_types.h"
 #include "SovereignLibC.h"
 
@@ -49,4 +50,5 @@ extern "C" void dump_init() {
 extern "C" void dump_trigger(const char* reason) {
     SigmaOS::Kernel::Observability::SovereignDumpEngine::getInstance().trigger(reason);
 }
+
 

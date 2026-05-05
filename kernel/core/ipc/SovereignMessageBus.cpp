@@ -1,5 +1,6 @@
-#include "../../../include/sigma_ipc.h"
-#include "../../../include/SovereignLibC.h"
+#include "sigma_hal.h"
+#include "sigma_ipc.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -32,4 +33,5 @@ extern "C" void ipc_bus_init() {
 extern "C" void ipc_bus_send(sigma_u32 target, const void* data, sigma_usize sz) {
     SigmaOS::Kernel::IPC::SovereignMessageBus::getInstance().sendMessage(target, data, sz);
 }
+
 

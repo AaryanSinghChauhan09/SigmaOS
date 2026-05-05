@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 #include "sigma_telemetry.h"
 #include "sigma_hal.h"
 
@@ -32,4 +32,5 @@ extern "C" sigma_telemetry_data_t telemetry_get_snapshot() {
 extern "C" void telemetry_log_shard_event(uint32_t shard_id, const char* event) {
     sigma_printf("[TELEMETRY] Shard S%02d Event: %s\n", shard_id, event);
 }
+
 

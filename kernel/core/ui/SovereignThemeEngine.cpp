@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include "sigma_time.h"
 
 /**
@@ -90,4 +90,5 @@ extern "C" void theme_toggle_dark_mode() {
 extern "C" void theme_evaluate_adaptive() {
     SovereignThemeEngine::getInstance().evaluateAdaptiveTheme();
 }
+
 

@@ -1,7 +1,7 @@
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "verification_shard.hpp"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Core {
@@ -24,4 +24,5 @@ void SovereignVerification::Audit() {
 
 } // namespace Core
 } // namespace SigmaOS
+
 

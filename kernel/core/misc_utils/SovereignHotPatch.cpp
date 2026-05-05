@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Hot-Patch Engine
@@ -46,4 +46,5 @@ extern "C" void hotpatch_init() {
 extern "C" void hotpatch_apply(const char* shard, sigma_u32 patch_id) {
     SovereignHotPatchEngine::getInstance().applyPatch(shard, patch_id);
 }
+
 

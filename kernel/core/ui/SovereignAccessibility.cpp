@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Accessibility Shard
@@ -54,4 +55,5 @@ extern "C" void accessibility_init() {
 extern "C" void accessibility_announce(const char* txt) {
     SigmaOS::Kernel::UI::SovereignAccessibility::getInstance().announceEvent(txt);
 }
+
 

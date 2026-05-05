@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Kernel-Level I/O Orchestrator (Step 3: Debugging)
@@ -25,4 +25,5 @@ extern "C" void kernel_io_init() {
     serial_init();
     sigma_log("[KERNEL-IO] COM1 Serial Shard Active (115200 8N1).");
 }
+
 

@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
 #include "sigma_crypto.h"
 
@@ -61,4 +61,5 @@ extern "C" sigma_integrity_token_t crypto_verify_shard(sigma_u32 shard_id,
 extern "C" void crypto_sign_shard(sigma_u32 shard_id, sigma_integrity_token_t* token) {
     SovereignCryptoEngine::getInstance().signShard(shard_id, token);
 }
+
 

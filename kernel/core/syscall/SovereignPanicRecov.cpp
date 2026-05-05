@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 #include "sigma_panicrecov.h"
 #include "sigma_hal.h"
 #include "sigma_rollback.h"
@@ -53,4 +53,5 @@ extern "C" void panicrecov_handle_panic(uint32_t fault_code, const void* registe
 extern "C" bool panicrecov_attempt_recovery() {
     return SovereignPanicRecov::attemptRecovery();
 }
+
 

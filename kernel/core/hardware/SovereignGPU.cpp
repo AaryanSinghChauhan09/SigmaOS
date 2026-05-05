@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Modular GPU Driver Framework
@@ -66,4 +66,5 @@ extern "C" void gpu_register(const char* vendor_id, sigma_u32 vram_mb) {
 extern "C" bool gpu_dispatch(const char* workload_type) {
     return SovereignGPUEngine::getInstance().dispatchComputeKernel(workload_type);
 }
+
 

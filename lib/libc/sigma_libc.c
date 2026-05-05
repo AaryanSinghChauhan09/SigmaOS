@@ -9,10 +9,7 @@
 
 
 #ifndef SIGMA_STRCMP_DEFINED
-int sigma_strcmp(const char* s1, const char* s2) {
-    while (*s1 && (*s1 == *s2)) {
-        s1++; s2++;
-    }
+/* sigma_strcmp in ASM */
     return *(sigma_u8*)s1 - *(sigma_u8*)s2;
 }
 #endif
@@ -40,5 +37,7 @@ char* sigma_strstr(const char* haystack, const char* needle) {
 char* sigma_hardened_strstr(const char* haystack, const char* needle) {
     return sigma_strstr(haystack, needle);
 }
+
+
 
 

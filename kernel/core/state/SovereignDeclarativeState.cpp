@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Declarative State Shard
@@ -58,4 +59,5 @@ extern "C" void declarative_state_init() {
 extern "C" void declarative_build(const char* hash) {
     SigmaOS::Kernel::System::SovereignDeclarativeState::getInstance().buildState(hash);
 }
+
 

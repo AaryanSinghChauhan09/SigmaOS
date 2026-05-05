@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Application Sharding Manager
@@ -63,4 +64,5 @@ extern "C" void app_sharding_init() {
 extern "C" void app_shard_spawn(const char* name, sigma_u32 count) {
     SigmaOS::Kernel::Process::SovereignAppSharding::getInstance().shardApp(name, count);
 }
+
 

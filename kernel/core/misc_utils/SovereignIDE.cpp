@@ -1,5 +1,5 @@
-#include "../../../include/sigma_types.h"
-#include "../../../include/SovereignLibC.h"
+#include "sigma_types.h"
+#include "SovereignLibC.h"
 
 #include "sigma_ide.h"
 #include "sigma_hal.h"
@@ -40,4 +40,5 @@ extern "C" void ide_compile_active_shard() {
 extern "C" void ide_render_ui() {
     sigma_log("[IDE] Rendering ZenCode UI (Glassmorphism + Neon Syntax Highlighting).");
 }
+
 

@@ -1,3 +1,4 @@
+#include "sigma_hal.h"
 #include "sigma_pmm.h"
 #include "SovereignLibC.h"
 
@@ -87,4 +88,5 @@ extern "C" void pmm_compact_shard() {
 extern "C" sigma_u64 pmm_get_used_shard() {
     return SigmaOS::Kernel::Memory::SovereignPMM::getInstance().getUsedMemory();
 }
+
 

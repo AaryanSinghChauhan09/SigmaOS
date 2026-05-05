@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 #include "sigma_quickact.h"
 #include "sigma_hal.h"
@@ -39,4 +39,5 @@ extern "C" void quickact_process_input(const char* user_input) {
 extern "C" void quickact_dismiss() {
     sigma_log("[QUICKACT] UIR: Quick Actions Bar dismissed.");
 }
+
 

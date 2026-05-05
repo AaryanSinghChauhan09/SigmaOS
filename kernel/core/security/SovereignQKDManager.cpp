@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign QKD (Quantum Key Distribution) Manager Shard
@@ -56,4 +57,5 @@ extern "C" void qkd_init() {
 extern "C" void qkd_handshake(const char* node) {
     SigmaOS::Kernel::Security::SovereignQKDManager::getInstance().performHandshake(node);
 }
+
 

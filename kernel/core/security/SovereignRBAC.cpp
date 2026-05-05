@@ -1,3 +1,4 @@
+#include "sigma_hal.h"
 #include "sigma_types.h"
 #include "SovereignLibC.h"
 
@@ -53,4 +54,5 @@ extern "C" void rbac_init() {
 extern "C" bool rbac_check(const char* role, const char* resource, const char* action) {
     return SigmaOS::Kernel::Security::SovereignRBAC::getInstance().checkPermission(role, resource, action);
 }
+
 

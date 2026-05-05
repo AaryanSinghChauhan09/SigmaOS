@@ -1,6 +1,7 @@
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_types.h"
+#include "SigmaOOP.hpp"
 
 void* operator new(sigma_size_t size) {
     return sigma_malloc(size);
@@ -22,4 +23,5 @@ void operator delete(void* ptr, sigma_size_t size) noexcept {
 void operator delete[](void* ptr) noexcept {
     sigma_free(ptr);
 }
+
 

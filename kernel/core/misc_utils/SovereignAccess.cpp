@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 #include "sigma_access.h"
 #include "sigma_hal.h"
 
@@ -53,4 +53,5 @@ extern "C" void access_enable_mode(sigma_access_mode_t mode) {
 extern "C" void access_announce_ui_element(const char* element_desc) {
     SovereignAccess::getInstance().announceUIElement(element_desc);
 }
+
 

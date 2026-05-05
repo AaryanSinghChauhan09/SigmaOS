@@ -1,7 +1,7 @@
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "lattice_mirror.hpp"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -34,4 +34,5 @@ void SovereignLatticeMirror::Audit() {
 
 } // namespace Kernel
 } // namespace SigmaOS
+
 

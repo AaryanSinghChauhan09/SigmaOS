@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Hardware-In-The-Loop (HIL) Simulator Shard
@@ -55,4 +56,5 @@ extern "C" void hil_sim_init() {
 extern "C" void hil_inject_data(const char* id, const void* data, sigma_usize sz) {
     SigmaOS::Kernel::Hardware::SovereignHILSimulator::getInstance().injectSensorData(id, data, sz);
 }
+
 

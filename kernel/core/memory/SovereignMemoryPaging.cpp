@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Memory Paging Orchestrator
@@ -58,4 +58,5 @@ extern "C" void paging_map(void* virtual_addr, void* physical_addr, sigma_u32 fl
 extern "C" void paging_prefetch() {
     SovereignPagingEngine::getInstance().predictAndPrefetch();
 }
+
 

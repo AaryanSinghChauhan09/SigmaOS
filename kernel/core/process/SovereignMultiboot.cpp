@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Multiboot2 Integration
@@ -52,4 +52,5 @@ extern "C" void multiboot_init(sigma_u32 magic, void* addr) {
 extern "C" bool multiboot_is_secure() {
     return SovereignMultibootEngine::getInstance().isBootSecure();
 }
+
 

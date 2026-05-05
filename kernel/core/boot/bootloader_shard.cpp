@@ -1,7 +1,7 @@
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "bootloader_shard.hpp"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -35,4 +35,5 @@ void SovereignBootloader::Audit() {
 
 } // namespace Kernel
 } // namespace SigmaOS
+
 

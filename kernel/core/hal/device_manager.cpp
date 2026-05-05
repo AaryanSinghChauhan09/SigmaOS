@@ -1,7 +1,7 @@
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "device_manager.hpp"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -26,4 +26,5 @@ void SovereignDeviceManager::Audit() {
 
 } // namespace Kernel
 } // namespace SigmaOS
+
 

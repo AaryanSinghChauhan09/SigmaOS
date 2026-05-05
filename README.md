@@ -21,12 +21,14 @@ SigmaOS is a next-generation, industrial-grade sovereign lattice operating syste
 
 ---
 
-### 🚀 Key Features
+### 🚀 Key Features & USPs
+
 - **600-Shard Sovereign Lattice**: A highly decoupled architecture where every component is an isolated shard.
+- **Sovereign Data Forge (S-DATAFORGE)**: Native distributed processing (Map/Reduce) built into the kernel. **Eliminates the need for Spark, Dask, or Pandas.**
+- **L-Stream (L-STREAM)**: Real-time event streaming lattice simulation. **Eliminates the need for Kafka or Flink.**
+- **ML Hub (S-MLHUB)**: Silicon-native model versioning and deployment nexus. **Eliminates the need for MLflow.**
 - **Zenith Desktop**: A premium, glassmorphic web-shell interface for lattice orchestration.
 - **Zero-Trust Security**: Native PQC (Post-Quantum Cryptography) and amnesic sandboxing simulations.
-- **AI-Optimized Scheduling**: Neural predictive workload orchestration logic.
-- **Morphic Automation**: Task-based automation engine with real-time cognitive feedback.
 
 ### ⌨️ Keyboard Shortcuts
 
@@ -34,26 +36,20 @@ SigmaOS is a next-generation, industrial-grade sovereign lattice operating syste
 | :--- | :--- |
 | `Ctrl + Space` | Toggle Command Palette |
 | `Alt + 1-4` | Switch Themes (Cyan, Gold, Crimson, Solar) |
-| `Ctrl + K` | Search Shards |
-| `Esc` | Close Windows / Start Menu |
+| `Ctrl + K` | Global Search & Shard Filter |
+| `Esc` | Close Active Shard / Start Menu |
+| `Alt + T` | Open Sovereign Terminal |
 
-### 🛠️ Getting Started
+### 🛠️ Industrial Deployment
 
-SigmaOS runs directly in your browser. No complex installation required.
+SigmaOS is designed for instant-ignition in any modern browser environment.
 
-1. **Clone the repository**:
-
+1. **Bare Metal Launch**: Open `index.html` in any Evergreen browser.
+2. **Local Telemetry Server**: Recommended for high-fidelity performance simulation.
    ```bash
-   git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
+   npx serve . -p 8080
    ```
-2. **Launch the OS**:
-   - Simply open `index.html` in any modern web browser.
-3. **Local Server (Optional)**: For optimal performance and telemetry simulation:
-
-   ```bash
-     npx serve .
-     ```
-4. **Explore**: Use the Start Menu (Σ icon) or the Command Palette to summon shards.
+3. **Production Sync**: Deployed automatically via GitHub Actions to GitHub Pages.
 
 ### 📖 Resources
 - **[Official Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)**: Deep dive into the shard architecture.

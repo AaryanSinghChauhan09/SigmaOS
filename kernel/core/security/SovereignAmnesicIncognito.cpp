@@ -1,3 +1,4 @@
+#include "sigma_hal.h"
 #include "sigma_kernel_types.h"
 #include "SovereignLibC.h"
 #include "SigmaOOP.hpp"
@@ -58,4 +59,5 @@ extern "C" void incognito_init() {
 extern "C" void incognito_launch(const char* shard) {
     SigmaOS::Kernel::Security::SovereignAmnesicIncognito::getInstance().launchUntraceableShard(shard);
 }
+
 

@@ -1,9 +1,10 @@
+#include "sigma_hal.h"
 #ifndef JOB_SHARD_HPP
 #define JOB_SHARD_HPP
 
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "../../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -33,3 +34,4 @@ public:
 } // namespace SigmaOS
 
 #endif
+

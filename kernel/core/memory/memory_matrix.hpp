@@ -1,9 +1,10 @@
+#include "sigma_hal.h"
 #ifndef MEMORY_MATRIX_HPP
 #define MEMORY_MATRIX_HPP
 
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "../../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -41,3 +42,4 @@ public:
 } // namespace SigmaOS
 
 #endif
+

@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 #include "sigma_compat.h"
 #include "sigma_hal.h"
 
@@ -60,4 +60,5 @@ extern "C" bool compat_load_binary(const char* path, sigma_compat_mode_t mode) {
 extern "C" void compat_mediate_syscall(uint32_t foreign_id, void* args) {
     SovereignCompatEngine::getInstance().mediateSyscall(foreign_id, args);
 }
+
 

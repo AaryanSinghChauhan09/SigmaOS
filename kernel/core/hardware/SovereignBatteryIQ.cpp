@@ -1,4 +1,5 @@
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 #include "sigma_batteryiq.h"
 #include "sigma_hal.h"
@@ -31,4 +32,5 @@ extern "C" void batteryiq_optimize_charge() {
 extern "C" void batteryiq_render_report() {
     sigma_log("[BATTERYIQ] PCL: Battery Health: 94%. Cycles: 247. Est. Remaining: 3.2 years.");
 }
+
 

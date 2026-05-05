@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Peripheral Manager Shard
@@ -55,4 +56,5 @@ extern "C" void peripheral_init() {
 extern "C" void peripheral_event(const char* id, bool plug) {
     SigmaOS::Kernel::Hardware::SovereignPeripheralManager::getInstance().handleHotSwap(id, plug);
 }
+
 

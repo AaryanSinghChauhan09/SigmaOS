@@ -1,6 +1,6 @@
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_lru.h"
 #include "sigma_hal.h"
 #include "sigma_telemetry.h"
@@ -36,4 +36,5 @@ extern "C" void lru_trigger_update(uint32_t shard_id, void* new_binary, uint32_t
 extern "C" sigma_lru_state_t lru_get_state() {
     return current_lru_state;
 }
+
 

@@ -1,3 +1,4 @@
+#include "sigma_hal.h"
 #include "sigma_types.h"
 #include "SovereignLibC.h"
 
@@ -53,4 +54,5 @@ extern "C" void search_init() {
 extern "C" void search_query(const char* term) {
     SigmaOS::Kernel::Misc::SovereignSearchEngine::getInstance().query(term);
 }
+
 

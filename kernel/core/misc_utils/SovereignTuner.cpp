@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Tuner
@@ -60,4 +60,5 @@ extern "C" void tuner_probe() {
 extern "C" void tuner_exec(const char* workload) {
     SovereignTunerEngine::getInstance().executeAcceleratedWorkload(workload);
 }
+
 

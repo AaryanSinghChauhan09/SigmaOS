@@ -1,5 +1,6 @@
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_eyetrack.h"
 #include "sigma_hal.h"
 #include "sigma_neural.h"
@@ -26,4 +27,5 @@ extern "C" void eyetrack_process_frame(const void* frame_data) {
 extern "C" void eyetrack_calibrate() {
     sigma_log("[EYETRACK] OKM: Initiating multi-point optical calibration sequence...");
 }
+
 

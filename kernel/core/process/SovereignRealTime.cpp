@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 #include "sigma_realtime.h"
 #include "sigma_hal.h"
 
@@ -57,4 +57,5 @@ extern "C" bool realtime_schedule_task(const sigma_realtime_task_t* task, void (
 extern "C" void realtime_execute_critical_path() {
     SovereignRealTimeManager::getInstance().executeCriticalPath();
 }
+
 

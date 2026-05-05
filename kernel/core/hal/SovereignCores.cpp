@@ -1,3 +1,4 @@
+#include "sigma_hal.h"
 #include "sigma_types.h"
 #include "SovereignLibC.h"
 
@@ -58,4 +59,5 @@ extern "C" void cores_scale(sigma_u32 count) {
 extern "C" void cores_status() {
     SigmaOS::Kernel::HAL::SovereignCoreManager::getInstance().listCoreStatus();
 }
+
 

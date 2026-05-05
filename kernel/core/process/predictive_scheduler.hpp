@@ -1,10 +1,11 @@
+#include "sigma_hal.h"
 #ifndef PREDICTIVE_SCHEDULER_HPP
 #define PREDICTIVE_SCHEDULER_HPP
 
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "../../../include/sigma_types.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -39,3 +40,4 @@ public:
 } // namespace SigmaOS
 
 #endif
+
