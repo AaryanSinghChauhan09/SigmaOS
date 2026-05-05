@@ -2,7 +2,7 @@
 
 All notable changes to the SigmaOS Sovereign Lattice will be documented in this file.
 
-## [v28.0 Zenith] - 2026-04-30
+## [v100.0 Zenith] - 2026-04-30
 
 ### Added
 
@@ -30,3 +30,4 @@ All notable changes to the SigmaOS Sovereign Lattice will be documented in this 
 ---
 
 _Σ SIGMAOS: Sovereign Versioning. Absolute Continuity._
+
