@@ -31,4 +31,3 @@ This manifest outlines the 500 individual features and functional shards that de
 
 ...
 
-

@@ -5,8 +5,6 @@ The SigmaOS CI pipeline is an industrial-grade, automated sentinel that ensures 
 ## 🚀 Pipeline Phases
 
 1. **Shard Forge (Build)**: Cross-compiles the 500-shard lattice for x86_64, ARM, and RISC-V.
-
-2. **Shard Sentinel (Audit)**: Performs deep static analysis and zero-dependency verification.
    - **CodeQL / Cppcheck**: Deep static analysis for industrial safety.
    - **Zero-Dependency Audit**: Verifies that no standard libraries are linked.
 
@@ -23,5 +21,4 @@ The pipeline is automatically triggered on every push to the `main` branch. Manu
 make industrial_sync
 
 ```
-
 

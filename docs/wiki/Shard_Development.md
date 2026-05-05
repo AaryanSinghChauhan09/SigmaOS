@@ -22,4 +22,3 @@ SigmaOS is built on **Atomic Shards**. Follow these rules to build new modules.
 
 4. Register the shard in the orchestrator if it provides a system service.
 
-

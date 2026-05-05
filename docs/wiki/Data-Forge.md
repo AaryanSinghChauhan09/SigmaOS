@@ -18,4 +18,3 @@ The Forge operates on a **Map-Shuffle-Reduce** model optimized for high-affinity
 
 3. **Consensus**: Results are aggregated via the Sovereign Neural Nexus.
 
-

@@ -66,17 +66,11 @@ To deploy SigmaOS on physical silicon:
 
 1. Ignite the **Live Boot Nexus** from a portable silicon medium.
 
-2. Select **Sovereign Colonization** to map the lattice core to the local NVMe nexus.
-
-3. The **Sovereign Bootloader** will verify silicon integrity before first ignition.
-
 ### 2. Multi-Cloud Lattice Clustering
 
 For enterprise-grade cloud hosting:
 
 1. Initialize the **Sovereign Cloud Orchestrator** on your master node.
-
-2. Join nodes using the `JoinCluster` protocol over an encrypted **PQC-Lattice** handshake.
 
 3. Enable **Global Workload Balancing** to ensure 100% lattice parity across AWS, GCP, and Azure.
 
@@ -85,10 +79,6 @@ For enterprise-grade cloud hosting:
 For large-scale data center deployment:
 
 1. Configure the **Sovereign PXE Nexus** to stream lattice shards over RDMA.
-
-2. Ensure the **Post-Quantum Handshake** is active for all boot-nodes.
-
-3. Shards will be projected directly into RAM-phantom space for zero-trace execution.
 
 ---
 
@@ -307,5 +297,4 @@ Integrated with the **Sovereign Neural Engine**, the vision system provides real
 ---
 
 _Σ SIGMAOS: Absolute Mastery. Silicon-Direct. Zero-Dependency. Aware._
-
 

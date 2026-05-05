@@ -45,4 +45,3 @@ This document provides an eighth-round audit of the SigmaOS Sovereign Lattice, f
 ---
 *Σ SIGMAOS: The Final Sovereign Singularity.*
 
-

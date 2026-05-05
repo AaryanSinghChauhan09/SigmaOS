@@ -1,6 +1,7 @@
-#include "sigma_monitor.h"
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_monitor.h"
+#include "../../../include/SovereignLibC.h"
+#include "../../../include/sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 
 namespace SigmaOS {
@@ -13,7 +14,7 @@ SovereignObservabilityMonitor& SovereignObservabilityMonitor::getInstance() {
 }
 
 void SovereignObservabilityMonitor::init() {
-    sigma_log("[MONITOR] Initializing Sovereign Observability Matrix (eBPF-Native)...");
+    log_emit(LOG_INFO, "[MONITOR] Initializing Sovereign Observability Matrix (eBPF-Native)...");
     this->m_initialized = true;
 }
 
@@ -28,13 +29,13 @@ sigma_system_load_t SovereignObservabilityMonitor::getLoadMatrix() {
 
 void SovereignObservabilityMonitor::executeEbpfProgram(const void* bytecode, sigma_size_t size) {
     (void)bytecode; (void)size;
-    sigma_log("[MONITOR] eBPF: Injecting tracing program into the silicon bus...");
-    sigma_log("[MONITOR] eBPF: Attaching kprobe to 'sigma_syscall_gate'...");
-    sigma_log("[MONITOR] eBPF: Real-time telemetry collection STARTED.");
+    log_emit(LOG_INFO, "[MONITOR] eBPF: Injecting tracing program into the silicon bus...");
+    log_emit(LOG_INFO, "[MONITOR] eBPF: Attaching kprobe to 'sigma_syscall_gate'...");
+    log_emit(LOG_INFO, "[MONITOR] eBPF: Real-time telemetry collection STARTED.");
 }
 
 void SovereignObservabilityMonitor::rebalanceLattice() {
-    sigma_log("[MONITOR] Lattice load imbalance detected via eBPF probes. Migrating shards...");
+    log_emit(LOG_WARN, "[MONITOR] Lattice load imbalance detected via eBPF probes. Migrating shards...");
     sigma_printf("[MONITOR] Migration: S412 -> Core 15, S092 -> Core 02.\n");
 }
 

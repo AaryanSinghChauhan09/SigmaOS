@@ -149,4 +149,3 @@ CI will automatically run all 4 workflows and report results.
 
 | `sigma_power_mgmt.h` | Windows ACPI | 🟢 Low |
 
-

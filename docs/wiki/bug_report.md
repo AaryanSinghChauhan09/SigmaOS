@@ -18,10 +18,6 @@ assignees: ''
 
 1. Step one
 
-2. Step two
-
-3. Step three
-
 ## Expected Behavior
 
 <!-- What should happen -->
@@ -43,5 +39,4 @@ assignees: ''
 <!-- Paste sigma_log / serial output here -->
 
 ```
-
 

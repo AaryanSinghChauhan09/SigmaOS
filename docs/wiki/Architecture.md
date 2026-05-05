@@ -39,4 +39,3 @@ By maintaining zero-dependency at the C source level, SigmaOS shards are natural
 
 *Next: [Shard Development Guide](Shard_Development)*
 
-

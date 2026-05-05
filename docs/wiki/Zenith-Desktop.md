@@ -15,5 +15,3 @@ Zenith is designed to be keyboard-first but touch-optimized.
 ---
 *The Zenith Singularity is the pinnacle of sovereign UI design.*
 
-
-

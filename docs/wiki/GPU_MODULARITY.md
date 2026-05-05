@@ -15,10 +15,6 @@ Traditional OS kernels (Linux, Windows) rely on massive proprietary binary blobs
 
 1. Probes the GPU's PCIe BAR registers at boot
 
-2. Maps the compute register interface to a normalized sovereign API
-
-3. Routes workloads via `SovereignNUMA` for O(1) latency to the nearest GPU die
-
 ```c
 
 // Register a GPU with the sovereign framework
@@ -72,5 +68,4 @@ container_spawn("ai-workload", "/usr/bin/inference");
 | Kernel Update Breakage    | Yes (binary blob)         | Never (hardware-abstracted)   |
 | Security Auditability     | None                      | Full (open sovereign shard)   |
 | NUMA Awareness            | Manual (numactl)          | Automatic (SovereignNUMA)     |
-
 

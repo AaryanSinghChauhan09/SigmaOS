@@ -41,5 +41,3 @@ This document frames why SigmaOS can feel “behind” established systems (Linu
 
 SigmaOS is ambitious; closing the gap with incumbents means foundations first (core OS behavior, security/update integrity, developer ergonomics, measured UX), then advanced features from the 100-item backlog as dependencies allow.
 
-
-

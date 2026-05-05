@@ -24,14 +24,14 @@ SigmaOS uses the `s-cli` orchestrator for all build operations.
    g++ -std=c++20 orchestrator/main.cpp -o s-cli
    ```
 
-2. **Select a Build Profile:**
+1. **Select a Build Profile:**
    Configure the system for your target environment:
 
    ```bash
    ./s-cli profile dev
    ```
 
-3. **Compile the Lattice:**
+1. **Compile the Lattice:**
    Build the kernel and all enabled shards for the x86_64 architecture:
 
    ```bash
@@ -57,8 +57,6 @@ qemu-system-x86_64 -cdrom build/sigmaos-x86_64.iso -m 2G -serial stdio
 To run SigmaOS on actual hardware:
 
 1. Insert a USB flash drive.
-
-2. Flash the ISO to the drive using `dd` (Linux/macOS) or Rufus (Windows).
    **Warning: This will erase all data on the USB drive.**
 
    ```bash
@@ -66,10 +64,9 @@ To run SigmaOS on actual hardware:
    sudo dd if=build/sigmaos-x86_64.iso of=/dev/sdX bs=4M status=progress
    ```
 
-3. Boot your machine from the USB drive. Ensure Legacy BIOS or UEFI compatibility mode is enabled in your firmware settings.
+1. Boot your machine from the USB drive. Ensure Legacy BIOS or UEFI compatibility mode is enabled in your firmware settings.
 
 ## Navigating the Zenith UI
 
 Upon boot, you will be greeted by the Zenith UI dashboard. You can switch to the `SigmaShell` fallback terminal by pressing `Ctrl + Alt + F1`.
-
 

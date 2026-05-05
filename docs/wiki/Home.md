@@ -27,6 +27,3 @@ SigmaOS is a browser-based desktop simulation — the entire OS experience (termin
 
 ---
 
-
-
-

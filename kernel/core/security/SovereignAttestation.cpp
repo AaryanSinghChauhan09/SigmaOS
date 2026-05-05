@@ -1,6 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h"
+#include "../../../include/SovereignLibC.h"
+#include "../../../include/sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Hardware Attestation (TEE)
@@ -19,7 +20,7 @@ public:
     }
 
     void init() {
-        sigma_log("Σ [TEE-SEC]: Initializing Hardware-Assisted Attestation Realms...");
+        log_emit(LOG_INFO, "Σ [TEE-SEC]: Initializing Hardware-Assisted Attestation Realms...");
     }
 
     bool verifyEnclave(void* enclave_base, sigma_size_t size) {
@@ -30,8 +31,8 @@ public:
          * 2. Compare against signed policy in the TPM.
          * 3. Validate silicon-native trust chain. */
         
-        sigma_log("Σ [TEE-SEC]: Measurement: 0x5f3759df... (MATCH)");
-        sigma_log("Σ [TEE-SEC]: Enclave integrity VERIFIED via silicon-native roots.");
+        log_emit(LOG_INFO, "Σ [TEE-SEC]: Measurement: 0x5f3759df... (MATCH)");
+        log_emit(LOG_INFO, "Σ [TEE-SEC]: Enclave integrity VERIFIED via silicon-native roots.");
         return true;
     }
 

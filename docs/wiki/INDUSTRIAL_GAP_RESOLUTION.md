@@ -8,4 +8,3 @@
 | **Identity** | ? FIXED | Zero-Trust Sovereign DID. |
 | **UX** | ? FIXED | Zenith v2.0 (Glassmorphism Singularity). |
 
-

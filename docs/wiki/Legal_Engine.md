@@ -29,4 +29,3 @@ extern "C" void checklist_init(void);
 
 The Legal Engine executes compliance audits with sub-microsecond latency, ensuring that judicial sentinels do not bottleneck the sovereign boot sequence.
 
-

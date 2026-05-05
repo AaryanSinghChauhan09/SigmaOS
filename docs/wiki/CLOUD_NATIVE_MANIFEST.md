@@ -60,4 +60,3 @@ Focus is placed on horizontal scaling (Cluster/Lattice) rather than vertical har
 - **Distributed Visual Profiler**: Real-time dashboard for visualizing proc hierarchies and RPC bottlenecks.
 - **WASM-Native Path**: First-class WebAssembly execution as a lightweight alternative to gVisor sandboxing.
 
-

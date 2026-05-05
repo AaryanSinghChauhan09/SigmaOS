@@ -147,4 +147,3 @@ Structured backlog for prioritization. Items are aspirational until each has imp
 - **Define done**: Each item needs acceptance criteria (API, tests, docs).
 - **Honest sequencing**: Boot → memory/VM → scheduler → VFS → drivers → net → UX tooling.
 
-

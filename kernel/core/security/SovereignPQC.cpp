@@ -1,6 +1,7 @@
-#include "sigma_pqc.h"
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_pqc.h"
+#include "../../../include/sigma_hal.h"
+#include "../../../include/SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 
 namespace SigmaOS {
@@ -13,7 +14,7 @@ SovereignPQCEngine& SovereignPQCEngine::getInstance() {
 }
 
 void SovereignPQCEngine::init() {
-    sigma_log("[PQC] Initializing Sovereign Post-Quantum Cryptography Nexus (LBSV Algorithm)...");
+    log_emit(LOG_INFO, "[PQC] Initializing Sovereign Post-Quantum Cryptography Nexus (LBSV Algorithm)...");
     this->initialized = 1u;
 }
 
@@ -39,13 +40,13 @@ bool SovereignPQCEngine::verifyShard(sigma_u32 shard_id, const sigma_u8* signatu
     
     (void)signature;
     /* Simulate complex lattice-math verification */
-    sigma_log("[PQC] LBSV: Quantum-Resistant Integrity VERIFIED.");
+    log_emit(LOG_INFO, "[PQC] LBSV: Quantum-Resistant Integrity VERIFIED.");
     this->verified_shards++;
     return true;
 }
 
 void SovereignPQCEngine::refreshLattice() {
-    sigma_log("[PQC] LBSV: Refreshing silicon lattice noise entropy for high-fidelity signatures...");
+    log_emit(LOG_INFO, "[PQC] LBSV: Refreshing silicon lattice noise entropy for high-fidelity signatures...");
 }
 
 } // namespace Security
