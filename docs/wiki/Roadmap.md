@@ -42,4 +42,5 @@ This document outlines the strategic development path for evolving the SigmaOS S
 | **Intelligence** | Static Algorithms | **AI-Native Scheduling** (Habit-based) |
 
 ---
-*Σ Sovereignty is Absolute. The Work Continues.*
+
+### Σ Sovereignty is Absolute. The Work Continues.

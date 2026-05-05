@@ -1,6 +1,6 @@
 # 🌟 Ultimate Distro-Level Features
 
-*Inspired by industry-leading Linux distributions.*
+### Inspired by industry-leading Linux distributions.
 
 - **Privacy Gatekeeper (Whonix-inspired):** Enforces zero-trust shard communication.
 - **Intelligent Lattice Assistant (Deepin-inspired):** AI-native lattice configuration.

@@ -35,5 +35,5 @@ All notable changes to the SigmaOS Sovereign Lattice will be documented in this 
 
 ---
 
-_Σ SIGMAOS: Sovereign Versioning. Absolute Continuity._
+### Σ SIGMAOS: Sovereign Versioning. Absolute Continuity.
 

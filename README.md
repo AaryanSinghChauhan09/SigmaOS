@@ -1,4 +1,4 @@
-# README
+# SigmaOS: Sovereign Lattice Industrial v100
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://github.com/AaryanSinghChauhan09/SigmaOS/actions/workflows/ci.yml/badge.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/actions)
@@ -11,13 +11,34 @@
 
 # [→ Live Demo](https://aaryansinghchauhan09.github.io/SigmaOS/)
 
+## Quick Start
 ```bash
-git clone <https://github.com/AaryanSinghChauhan09/SigmaOS.git>
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
-node server.js          # serves on <http://localhost:5000>
-
+node server.js          # Serves on http://localhost:5000
 ```
 
+## System Architecture: The Sovereign Lattice
+SigmaOS is built on the **Sovereign Lattice**, a modular 600-shard architecture designed for absolute isolation and high-assurance computing.
+
+```mermaid
+graph TD
+    User([Zenith UI]) --> Shards[Sovereign Shard Lattice]
+    Shards --> Bus{SovereignEventBus}
+    Bus --> Kernel[Core Kernel Shards]
+    Kernel --> Security[PQC & Attestation]
+    Kernel --> Observability[eBPF-Native Monitor]
+```
+
+## Zenith Desktop Features
+| Category | Features |
+| :--- | :--- |
+| **Interface** | Glassmorphic UI, Dynamic Desktop Shards, Drag & Snap Windows |
+| **Observability** | Real-time eBPF System Telemetry, CPU/Memory Heatmaps |
+| **Security** | Post-Quantum Cryptography (LBSV), Hardware Attestation (TEE) |
+| **Intelligence** | Integrated SovereignAI Assistant, Command Palette (Ctrl+Space) |
+
+## Shortcuts
 | Shortcut | Action |
 | :--- | :--- |
 | **Ctrl + Space** | Command Palette (Search all actions) |
@@ -25,9 +46,8 @@ node server.js          # serves on <http://localhost:5000>
 | **↑ / ↓** | Terminal Command History |
 | **Right-Click** | Desktop Context Menu |
 
-SigmaOS is built on the **Sovereign Lattice**, a modular 600-shard architecture designed for absolute isolation and high-assurance computing.
-
+## Contributions
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) and the [Official Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki).
 
+## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-

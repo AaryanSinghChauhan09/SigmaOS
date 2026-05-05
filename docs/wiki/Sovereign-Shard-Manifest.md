@@ -62,4 +62,5 @@ This manifest provides a comprehensive registry of the functional shards that co
 - **SovereignEyeTrack**: Hands-free interaction via pupillary tracking.
 
 ---
-*Σ Sovereignty is defined by the Shard. The Lattice is Infinite.*
+
+### Σ Sovereignty is defined by the Shard. The Lattice is Infinite.

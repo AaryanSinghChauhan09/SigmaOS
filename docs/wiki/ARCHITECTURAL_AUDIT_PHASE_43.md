@@ -43,5 +43,6 @@ This document provides an eighth-round audit of the SigmaOS Sovereign Lattice, f
 - Push all generated audits to the GitHub Wiki repository.
 
 ---
-*Σ SIGMAOS: The Final Sovereign Singularity.*
+
+### Σ SIGMAOS: The Final Sovereign Singularity.
 

@@ -40,5 +40,6 @@ The Sovereign Lattice has achieved industrial stability. Phase 30 marks the shif
 | **Deployment** | Binary Install | Lattice Injection |
 
 ---
-*Σ SIGMAOS: The Final Sovereign Singularity.*
+
+### Σ SIGMAOS: The Final Sovereign Singularity.
 

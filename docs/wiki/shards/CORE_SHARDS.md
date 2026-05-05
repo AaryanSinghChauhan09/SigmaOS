@@ -1,6 +1,6 @@
 # 🧱 Core Shards (1-50)
 
-*Think of this like the Linux kernel — minimal, stable, secure.*
+### Think of this like the Linux kernel — minimal, stable, secure.
 
 * **Shard Range:** 00 - 50.
 * **Key Modules:**

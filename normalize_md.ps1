@@ -1,9 +1,10 @@
-# SigmaOS Markdown Normalizer (Industrial v100.3)
+# SigmaOS Markdown Normalizer (Industrial v100.4)
 # Fixes MD012, MD022, MD029, MD030, MD032, MD036, MD041
 
-$docs = Get-ChildItem -Path "c:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS-Repo\docs", "c:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS-Repo\README.md", "c:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS.wiki" -Filter "*.md" -Recurse
+$docs = Get-ChildItem -Path "c:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS-Repo", "c:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS.wiki" -Filter "*.md" -Recurse
 
 foreach ($file in $docs) {
+    if ($file.FullName -like "*node_modules*") { continue }
     $content = Get-Content $file.FullName -Raw
     if (-not $content) { continue }
 
@@ -21,30 +22,33 @@ foreach ($file in $docs) {
         
         # MD041: First line H1
         if ($i -eq 0 -and $line -notmatch "^#\s+") {
-            $newLines.Add("# $($file.BaseName -replace '_', ' ')")
-            $newLines.Add("")
-        }
-
-        # Reset counter on headings
-        if ($line -match "^#+\s+") {
-            $counter = 1
-            $inList = $false
-            if ($newLines.Count -gt 0 -and $newLines[$newLines.Count-1] -ne "") {
+            if ($line -match "^#+\s+") {
+                 # It's a heading but not H1, convert or leave? 
+                 # Let's enforce H1 if it's the very first line
+                 $line = "# " + ($line -replace "^#+\s*", "")
+            } else {
+                $newLines.Add("# $($file.BaseName -replace '_', ' ')")
                 $newLines.Add("")
             }
-            $newLines.Add($line)
-            if ($i -lt $lines.Length - 1 -and $lines[$i+1] -ne "") {
-                # We'll add the blank line when we process the next line if needed
-            }
-            continue
         }
 
-        # MD029 & MD030: Ordered list numbering and spaces
+        # MD036: No emphasis as heading (simplified: if line is just bold/italic and short)
+        if ($line -match "^\s*[\*_]{1,2}[^\*_]+[\*_]{1,2}\s*$" -and $line.Length -lt 100) {
+            $line = "### " + ($line -replace "[\*_]", "")
+        }
+
+        # MD029 & MD030: Ordered list numbering
         if ($line -match "^(\s*)(\d+)\.\s+(.*)") {
             $indent = $matches[1]
             $text = $matches[3]
-            $line = "$indent$counter. $text"
-            $counter++
+            # Reset counter if indent changes significantly or if it's a new list
+            if ($indent.Length -eq 0) {
+                 $line = "$counter. $text"
+                 $counter++
+            } else {
+                 # Nested list, we'll leave numbering as is for now or use 1.
+                 $line = "$indent$($matches[2]). $text"
+            }
             $inList = $true
         } else {
             if ($line -ne "" -and $line -notmatch "^\s+[\*\-\+]|^\s+\d+\.") {
@@ -65,10 +69,27 @@ foreach ($file in $docs) {
             }
         }
 
+        # MD022: Blanks around headings
+        if ($line -match "^#+\s+") {
+            if ($newLines.Count -gt 0 -and $newLines[$newLines.Count-1] -ne "") {
+                $newLines.Add("")
+            }
+        }
+
         $newLines.Add($line)
+        
+        # MD022: Blank after heading
+        if ($line -match "^#+\s+") {
+            if ($i -lt $lines.Length - 1 -and $lines[$i+1] -ne "") {
+                $newLines.Add("")
+            }
+        }
     }
     
     $content = $newLines -join "`r`n"
+    # Final cleanup of multiple blanks again just in case
+    $content = $content -replace "(\r?\n){3,}", "`r`n`r`n"
+    
     Set-Content -Path $file.FullName -Value $content -NoNewline
     Write-Host "Normalized: $($file.Name)"
 }

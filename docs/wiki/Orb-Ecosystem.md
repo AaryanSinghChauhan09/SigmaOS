@@ -29,4 +29,5 @@ Developers can build custom Orbs using the SigmaOS Shard SDK (C++/Rust/WASM).
 * **Telemetry Hooks**: Integrated observability via the eBPF-based monitoring engine.
 
 ---
-*Σ Sovereignty is Modular. The Lattice is the Orchestrator.*
+
+### Σ Sovereignty is Modular. The Lattice is the Orchestrator.

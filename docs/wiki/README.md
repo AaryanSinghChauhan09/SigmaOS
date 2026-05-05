@@ -38,7 +38,7 @@ make singularity
 
 ```
 
-_This generates `sigmaos.bin`, the core Multiboot2 executable._
+### This generates `sigmaos.bin`, the core Multiboot2 executable.
 
 ### 2. Generate a Bootable ISO
 
@@ -48,7 +48,7 @@ make zenith-iso
 
 ```
 
-_Creates a GRUB-bootable ISO image for testing on hardware or VMs._
+### Creates a GRUB-bootable ISO image for testing on hardware or VMs.
 
 ### 3. Run in Emulator
 
@@ -58,7 +58,7 @@ make qemu
 
 ```
 
-_Boots the kernel in QEMU and pipes the internal kernel logs directly to your terminal._
+### Boots the kernel in QEMU and pipes the internal kernel logs directly to your terminal.
 
 ## 📚 Glossary: Translating the Vision
 
@@ -91,5 +91,5 @@ For a detailed look at our implementation history, refer to the project Wiki and
 
 ---
 
-_Σ SIGMAOS: Absolute Sovereignty. Singularity Achieved._
+### Σ SIGMAOS: Absolute Sovereignty. Singularity Achieved.
 

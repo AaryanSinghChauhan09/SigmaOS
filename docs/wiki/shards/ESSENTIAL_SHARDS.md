@@ -1,6 +1,6 @@
 # 🛠️ Essential Shards (51-150)
 
-*Comparable to the Linux "base system" packages (e.g., coreutils).*
+### Comparable to the Linux "base system" packages (e.g., coreutils).
 
 * **Shard Range:** 51 - 150.
 * **Key Modules:**

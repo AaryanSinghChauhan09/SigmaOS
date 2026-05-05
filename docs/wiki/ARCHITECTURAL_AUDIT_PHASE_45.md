@@ -50,5 +50,6 @@ This document provides a tenth-round audit of the SigmaOS Sovereign Lattice, foc
 - Push all changes to the Main GitHub repo and Wiki.
 
 ---
-*Σ SIGMAOS: The Final Sovereign Singularity.*
+
+### Σ SIGMAOS: The Final Sovereign Singularity.
 
