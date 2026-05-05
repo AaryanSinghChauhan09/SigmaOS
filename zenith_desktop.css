@@ -401,6 +401,7 @@ body {
     letter-spacing: -5px;
     background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.4) 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     line-height: 1;
 }
@@ -1621,5 +1622,6 @@ body {
     100% { transform: scale(1.1); opacity: 0; filter: blur(10px); }
 }
 .shattering { animation: shattering 0.4s forwards; }
+
 
 
