@@ -15,9 +15,9 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Observability {
 
-class SovereignMonitor {
+class SovereignObservabilityMonitor {
 public:
-    static SovereignMonitor& getInstance();
+    static SovereignObservabilityMonitor& getInstance();
 
     void init();
     sigma_system_load_t getLoadMatrix();
@@ -26,8 +26,9 @@ public:
 
 
 
+    virtual ~SovereignObservabilityMonitor() {}
 private:
-    SovereignMonitor() : m_initialized(false) {}
+    SovereignObservabilityMonitor() : m_initialized(false) {}
     bool m_initialized;
 };
 

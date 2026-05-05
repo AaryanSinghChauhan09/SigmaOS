@@ -11,9 +11,9 @@
 **[→ Live Demo](https://aaryansinghchauhan09.github.io/SigmaOS/)**
 
 ```bash
-git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
+git clone <https://github.com/AaryanSinghChauhan09/SigmaOS.git>
 cd SigmaOS
-node server.js          # serves on http://localhost:5000
+node server.js          # serves on <http://localhost:5000>
 
 ```
 
@@ -29,4 +29,5 @@ SigmaOS is built on the **Sovereign Lattice**, a modular 600-shard architecture 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) and the [Official Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki).
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
 

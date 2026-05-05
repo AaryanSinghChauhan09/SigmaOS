@@ -1,6 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_aisched.h""
-#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h"
+#include "../../../include/sigma_aisched.h"
+#include "../../../include/sigma_types.h"
+#include "../../../include/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
