@@ -1184,15 +1184,30 @@ function executeCommand(cmd) {
 
 function evaluateLatticeRun(query) {
     if (query.startsWith('=')) {
-        const expr = query.substring(1);
-        try {
-            const res = eval(expr);
-            return `[L-RUN] Result: ${res}`;
+        const expr = query.substring(1).trim();
+        // Strict regex for basic math only: numbers, +, -, *, /, (), .
+        if (/^[0-9\+\-\*\/\(\)\. ]+$/.test(expr)) {
+            try {
+                // Using Function constructor is slightly safer than eval, but still risky.
+                // For a simulation, we'll keep it but sanitize heavily.
+                const res = new Function(eturn )();
+                return [L-RUN] Result: ;
+            } catch(e) {
+                return [L-RUN] Math Error.;
+            }
+        } else {
+            return [L-RUN] Access Denied: Unsafe characters detected.;
+        }
+    }
+    return null;
+}`;
         } catch(e) {
             return `[L-RUN] Math Error.`;
         }
     }
     return null;
 }
+
+
 
 
