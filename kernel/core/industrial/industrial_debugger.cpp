@@ -1,7 +1,7 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "industrial_debugger.hpp"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h""
 
 namespace SigmaOS {
 namespace Debug {
@@ -27,5 +27,6 @@ void SovereignDebugger::Audit() {
 
 } // namespace Debug
 } // namespace SigmaOS
+
 
 

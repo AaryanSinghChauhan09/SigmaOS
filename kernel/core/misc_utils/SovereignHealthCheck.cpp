@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "sigma_healthcheck.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 #include "sigma_batteryiq.h"
 #include "sigma_thermaliq.h"
 #include "sigma_sentinel.h"
@@ -42,5 +42,6 @@ extern "C" void healthcheck_render_dashboard() {
     sigma_health_report_t r = healthcheck_run_full_audit();
     sigma_log("[HEALTHCHECK] HSI: Live health dashboard rendered on Zenith Dashboard.");
 }
+
 
 

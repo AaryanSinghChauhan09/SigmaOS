@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
 
 /**
@@ -58,5 +58,6 @@ extern "C" void driver_transpiler_init() {
 extern "C" void driver_transpiler_map(const char* name, sigma_u32 ev) {
     SigmaOS::Kernel::Industrial::SovereignDriverTranspiler::getInstance().translateEvent(name, ev);
 }
+
 
 

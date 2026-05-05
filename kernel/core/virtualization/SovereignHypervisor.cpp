@@ -1,6 +1,6 @@
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "sigma_hypervisor.h"
 
 /**
@@ -115,6 +115,7 @@ extern "C" void hyper_get_state(sigma_hypervisor_state_t* out_state) {
 extern "C" sigma_u64 hypervisor_get_exit_count() {
     return SigmaOS::Kernel::Virtualization::SovereignHyperEngine::getInstance().getExitCount();
 }
+
 
 
 

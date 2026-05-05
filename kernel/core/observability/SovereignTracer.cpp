@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
 
 /**
@@ -55,5 +55,6 @@ extern "C" void tracer_init() {
 extern "C" void tracer_log_instr(sigma_u64 rip, const char* mnemonic) {
     SigmaOS::Kernel::System::SovereignTracer::getInstance().traceInstruction(rip, mnemonic);
 }
+
 
 

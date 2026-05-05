@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
 
 /**
@@ -61,5 +61,6 @@ extern "C" void explorer_init_shard() {
 extern "C" void explorer_nav_shard(const char* path) {
     SigmaOS::Kernel::FS::SovereignExplorer::getInstance().navigate(path);
 }
+
 
 

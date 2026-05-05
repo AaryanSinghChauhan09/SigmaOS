@@ -1,6 +1,6 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign NUMA Architecture Optimizer
@@ -64,5 +64,6 @@ extern "C" void numa_register_node(sigma_u32 node_id, sigma_u32 memory_mb) {
 extern "C" void numa_optimize_thread(sigma_u32 thread_id) {
     SovereignNUMAEngine::getInstance().optimizeThreadLocality(thread_id);
 }
+
 
 

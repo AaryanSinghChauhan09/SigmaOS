@@ -1,7 +1,7 @@
-#include "sigma_types.h"
+#include "../../../include/sigma_types.h""
 #include "sigma_proc.h"
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Process Manager
@@ -126,5 +126,6 @@ extern "C" sigma_process_t* proc_get_current() {
 extern "C" sigma_u64 proc_get_switch_count() {
     return SigmaOS::Kernel::Process::SovereignProcessEngine::getInstance().getSwitchCount();
 }
+
 
 

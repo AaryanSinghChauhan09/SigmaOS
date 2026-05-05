@@ -1,7 +1,7 @@
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h""
 #include "sigma_usb.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 
 /**
  * SigmaOS Sovereign USB Subsystem Implementation
@@ -94,5 +94,6 @@ extern "C" void usb_hotplug_notify(sigma_u8 addr, sigma_u32 attached) {
     sigma_printf("[USB] SDXHC: Hotplug event — Addr=%d %s.\n",
                  (int)addr, attached ? "ATTACHED" : "DETACHED");
 }
+
 
 

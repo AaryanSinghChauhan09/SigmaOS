@@ -1,6 +1,6 @@
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 /**
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN SECURITY HARDENER (S-SECHARDENER) — SHARD #500
@@ -15,7 +15,7 @@
  */
 
 #include "sigma_sechardener.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 #include "sigma_libc.h"
 
 /**
@@ -92,5 +92,6 @@ extern "C" void sechardener_audit_all_shards() {
     sigma_log("[SECHARDENER] PLPE: Checking S-Vault ZKEP enclave integrity...");
     sigma_log("[SECHARDENER] PLPE: ✅ Security posture: SOVEREIGN. All 500 shards HARDENED.");
 }
+
 
 

@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 #include "sigma_predictux.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 
 /**
@@ -28,5 +28,6 @@ extern "C" void predictux_preload_predicted_assets() {
     sigma_log("[PREDICTUX] NLP: Pre-fetching Sovereign VFS UI elements into L3 cache...");
     sigma_log("[PREDICTUX] NLP: UI assets staged. Zero-latency rendering ready.");
 }
+
 
 

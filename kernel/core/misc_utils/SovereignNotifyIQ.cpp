@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 #include "sigma_notifyiq.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 #include "sigma_emotion.h"
 
@@ -33,5 +33,6 @@ extern "C" void notifyiq_push(const char* source, const char* message, sigma_not
 extern "C" void notifyiq_deliver_batch() {
     sigma_log("[NOTIFYIQ] APT: Delivering consolidated notification summary to Universal UI.");
 }
+
 
 

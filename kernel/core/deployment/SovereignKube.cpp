@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Kubernetes Operator (SovereignKube)
@@ -60,5 +60,6 @@ extern "C" void kube_reconcile() {
 extern "C" void kube_deploy_pod(const char* name) {
     SigmaOS::Kernel::Deployment::SovereignKubeOperator::getInstance().deployShardPod(name);
 }
+
 
 

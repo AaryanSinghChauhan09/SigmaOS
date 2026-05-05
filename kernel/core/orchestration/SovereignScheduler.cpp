@@ -1,5 +1,5 @@
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
 #include "sigma_scheduler.h"
 
 namespace SigmaOS {
@@ -50,5 +50,6 @@ extern "C" void scheduler_init() {
 extern "C" void scheduler_push(void (*task)(), sigma_u32 priority) {
     SigmaOS::Kernel::Orchestration::SovereignScheduler::getInstance().schedule(task, priority);
 }
+
 
 

@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 /**
  * SigmaOS Sovereign Web Bridge (WebSocket/WebRTC)
@@ -54,5 +54,6 @@ extern "C" void web_bridge_init() {
 extern "C" void web_bridge_connect(const char* url) {
     SigmaOS::Kernel::Network::SovereignWebBridge::getInstance().connect(url);
 }
+
 
 

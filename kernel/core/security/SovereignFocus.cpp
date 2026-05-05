@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Focus (S-Focus Shard)
@@ -60,5 +60,6 @@ extern "C" void focus_activate(sigma_u32 level) {
 extern "C" void focus_deactivate() {
     SigmaOS::Kernel::Security::SovereignFocus::getInstance().deactivateFocusLock();
 }
+
 
 

@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 #include "sigma_lazyload.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 
 /**
@@ -52,5 +52,6 @@ extern "C" void lazyload_trigger_event(sigma_trigger_type_t trigger, uint32_t co
     
     sigma_log("[LAZYLOAD] DSI: Services ignited. Routing traffic...");
 }
+
 
 

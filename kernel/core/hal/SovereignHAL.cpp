@@ -1,5 +1,5 @@
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
 
 namespace SigmaOS {
 namespace Kernel {
@@ -39,5 +39,6 @@ extern "C" void hal_init() {
 extern "C" void hal_probe() {
     SigmaOS::Kernel::HAL::SovereignHAL::getInstance().probeBus();
 }
+
 
 

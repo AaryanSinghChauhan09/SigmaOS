@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Search (S-Search)
@@ -54,5 +54,6 @@ extern "C" void search_init() {
 extern "C" void search_query(const char* term) {
     SigmaOS::Kernel::Misc::SovereignSearchEngine::getInstance().query(term);
 }
+
 
 

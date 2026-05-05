@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 #include "sigma_modules.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 
 
@@ -55,5 +55,6 @@ extern "C" void modules_list_active() {
     }
     sigma_log("---------------------------------\n");
 }
+
 
 

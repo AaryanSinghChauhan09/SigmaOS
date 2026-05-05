@@ -1,6 +1,6 @@
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 
 /**
  * S-TOOLS: Sovereign Utility Engine (v100.0 Zenith)
@@ -38,6 +38,7 @@ extern "C" void tools_execute(sigma_u32 tool_id) {
         sigma_log("[S-TOOLS] Utility shard state: NOMINAL.");
     }
 }
+
 
 
 

@@ -1,6 +1,6 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Dock Engine
@@ -71,5 +71,6 @@ extern "C" void dock_add_app(const char* app_name) {
 extern "C" void dock_configure(const char* pos, bool hide, float scale) {
     SovereignDockEngine::getInstance().configureDock(pos, hide, scale);
 }
+
 
 

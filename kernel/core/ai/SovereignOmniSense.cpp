@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 #include "sigma_omnisense.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 #include "sigma_universal_ui.h"
 #include "sigma_energysched.h"
 
@@ -44,5 +44,6 @@ extern "C" void omnisense_adapt_system(const sigma_omnisense_data_t* data) {
         }
     }
 }
+
 
 

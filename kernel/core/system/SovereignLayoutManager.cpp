@@ -1,7 +1,7 @@
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "sigma_hal.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
 #include "sigma_libc.h"
 
 /**
@@ -40,5 +40,6 @@ extern "C" void layout_switch(desktop_layout_t layout) {
             break;
     }
 }
+
 
 

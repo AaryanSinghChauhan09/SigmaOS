@@ -1,9 +1,9 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "sigma_gui.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 /**
  * SigmaOS Sovereign GUI Implementation
@@ -49,5 +49,6 @@ extern "C" void gui_draw_pixel(sigma_u32 x, sigma_u32 y, sigma_u32 color) {
 extern "C" void gui_flush() {
     SovereignGUIEngine::getInstance().flush();
 }
+
 
 

@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 #include "sigma_hybrid.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 
 /**
@@ -36,5 +36,6 @@ extern "C" bool hybrid_execute_syscall(uint32_t syscall_id, void* args) {
     
     return true;
 }
+
 
 

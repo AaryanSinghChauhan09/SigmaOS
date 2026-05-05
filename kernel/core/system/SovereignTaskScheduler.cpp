@@ -1,6 +1,6 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Task Scheduler
@@ -60,5 +60,6 @@ extern "C" void scheduler_add_task(const char* name, sigma_u32 interval_ms) {
 extern "C" void scheduler_tick(sigma_u32 elapsed_ms) {
     SovereignTaskScheduler::getInstance().tick(elapsed_ms);
 }
+
 
 

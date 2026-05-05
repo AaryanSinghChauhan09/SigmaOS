@@ -1,6 +1,6 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Accessibility Engine
@@ -61,5 +61,6 @@ extern "C" void access_set_colorblind(const char* mode) {
 extern "C" void access_set_font_scale(float scale) {
     SovereignAccessibilityEngine::getInstance().adjustFontScaling(scale);
 }
+
 
 

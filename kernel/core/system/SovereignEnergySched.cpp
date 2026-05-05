@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 #include "sigma_energysched.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 
 /**
@@ -40,5 +40,6 @@ extern "C" void energysched_set_shard_state(uint32_t shard_id, sigma_energy_stat
         sigma_printf("[ENERGYSCHED] Shard S%02d energy state set to %d.\n", shard_id, (int)state);
     }
 }
+
 
 

@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Vault (Storage Shard)
@@ -64,5 +64,6 @@ extern "C" bool vault_pin(const char* id, const void* data, sigma_size_t size) {
 extern "C" void vault_audit() {
     SigmaOS::Kernel::Security::SovereignVault::getInstance().auditVault();
 }
+
 
 

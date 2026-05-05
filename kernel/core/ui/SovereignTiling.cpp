@@ -1,6 +1,6 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Tiling Window Manager
@@ -62,5 +62,6 @@ private:
 extern "C" void tiling_init() { SovereignTilingEngine::getInstance().init(); }
 extern "C" void tiling_add_app(const char* id) { SovereignTilingEngine::getInstance().tileApp(id); }
 extern "C" void tiling_set_layout(const char* layout) { SovereignTilingEngine::getInstance().setLayout(layout); }
+
 
 

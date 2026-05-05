@@ -1,7 +1,7 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 #include "sigma_fs.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 /**
  * SigmaOS Sovereign File System Implementation
@@ -59,5 +59,6 @@ extern "C" void fs_repair_corruption() {
 extern "C" sigma_u64 fs_get_total_writes() {
     return SovereignFSEngine.total_writes;
 }
+
 
 

@@ -1,6 +1,6 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
-#include "sigma_hal.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
 #include "sigma_neural.h"
 
 /**
@@ -44,5 +44,6 @@ extern "C" void neural_init() {
 extern "C" void neural_morph_ui(sigma_u32 widget_id, sigma_u32 cognitive_load) {
     SovereignNeuralAccelEngine::getInstance().morphUI(widget_id, cognitive_load);
 }
+
 
 

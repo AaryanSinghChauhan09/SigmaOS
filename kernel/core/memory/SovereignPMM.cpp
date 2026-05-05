@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 #include "sigma_pmm.h"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h""
 
 namespace SigmaOS {
 namespace Kernel {
@@ -88,5 +88,6 @@ extern "C" void pmm_compact_shard() {
 extern "C" sigma_u64 pmm_get_used_shard() {
     return SigmaOS::Kernel::Memory::SovereignPMM::getInstance().getUsedMemory();
 }
+
 
 

@@ -1,6 +1,6 @@
-#include "sigma_types.h"
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_types.h""
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h""
 
 /**
  * SigmaOS Sovereign Hotplug Manager
@@ -56,5 +56,6 @@ extern "C" void hotplug_init() {
 extern "C" void hotplug_handle_event() {
     SigmaOS::Kernel::HAL::SovereignHotplugManager::getInstance().handleInterrupt();
 }
+
 
 

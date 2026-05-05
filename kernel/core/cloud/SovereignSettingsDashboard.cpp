@@ -1,6 +1,6 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign System Settings Dashboard
@@ -56,5 +56,6 @@ extern "C" void settings_toggle() {
 extern "C" void settings_apply(const char* category, const char* value) {
     SovereignSettingsDashboard::getInstance().applyUserPreference(category, value);
 }
+
 
 

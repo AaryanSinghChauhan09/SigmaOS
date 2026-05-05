@@ -1,6 +1,6 @@
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "sigma_syscall.h"
 #include "sigma_proc.h"
 #include "sigma_mem.h"
@@ -80,5 +80,6 @@ extern "C" void syscall_handler_asm() {
 extern "C" sigma_u64 syscall_get_total_calls() {
     return SigmaOS::Kernel::Syscall::SovereignSyscallEngine::getInstance().getTotalCalls();
 }
+
 
 

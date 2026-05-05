@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
 
 /**
@@ -65,5 +65,6 @@ extern "C" void snapshot_init() {
 extern "C" void snapshot_take(const char* vol, const char* snap) {
     SigmaOS::Kernel::FS::SovereignSnapshotManager::getInstance().takeSnapshot(vol, snap);
 }
+
 
 

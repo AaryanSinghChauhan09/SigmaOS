@@ -1,6 +1,6 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Storage Driver (VirtIO-Blk / ATA PIO)
@@ -86,5 +86,6 @@ extern "C" bool storage_read(sigma_u32 lba, sigma_u32 count, void* buf) {
 extern "C" bool storage_write(sigma_u32 lba, sigma_u32 count, const void* data) {
     return SovereignStorageDriverEngine::getInstance().writeSectors(lba, count, data);
 }
+
 
 

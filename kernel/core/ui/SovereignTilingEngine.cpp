@@ -1,7 +1,7 @@
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "sigma_hal.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
 #include "sigma_libc.h"
 
 /**
@@ -31,5 +31,6 @@ extern "C" void tiling_switch_mode(tiling_mode_t mode) {
     current_mode = mode;
     sigma_log("[TILING] Mode switched to %d.", mode);
 }
+
 
 

@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
 
 /**
@@ -59,5 +59,6 @@ extern "C" void consensus_init() {
 extern "C" bool consensus_propose(const char* key, const void* data, sigma_usize sz) {
     return SigmaOS::Kernel::Cloud::SovereignConsensusEngine::getInstance().propose(key, data, sz);
 }
+
 
 

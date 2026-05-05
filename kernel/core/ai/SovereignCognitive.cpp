@@ -1,6 +1,6 @@
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "sigma_cognitive.h"
 #include "sigma_neural.h"
 
@@ -54,5 +54,6 @@ extern "C" void cognitive_auto_heal() {
 extern "C" const sigma_cognitive_state_t* cognitive_get_state() {
     return &SovereignCognitiveEngine.state;
 }
+
 
 

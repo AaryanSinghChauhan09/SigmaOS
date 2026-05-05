@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 #include "sigma_namespace.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 
 /**
@@ -57,5 +57,6 @@ extern "C" void* namespace_resolve_path(const char* path) {
     sigma_log("[NAMESPACE] ORM: Path resolution failed.");
     return SIGMA_NULL;
 }
+
 
 

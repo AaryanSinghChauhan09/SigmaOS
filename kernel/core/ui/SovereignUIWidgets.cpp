@@ -1,6 +1,6 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Widget Engine
@@ -60,5 +60,6 @@ extern "C" void widgets_spawn(const char* widget_type, sigma_u32 x, sigma_u32 y)
 extern "C" void widgets_interact(sigma_u32 id, const char* interaction) {
     SovereignWidgetEngine::getInstance().interactWidget(id, interaction);
 }
+
 
 

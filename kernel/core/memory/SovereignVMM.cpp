@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign VMM (Virtual Memory Manager)
@@ -71,5 +71,6 @@ extern "C" void vmm_map(sigma_u64 virt, sigma_u64 phys, sigma_u32 flags) {
 extern "C" void vmm_set_swap(bool enable) {
     SigmaOS::Kernel::Memory::SovereignVMM::getInstance().setSwap(enable);
 }
+
 
 

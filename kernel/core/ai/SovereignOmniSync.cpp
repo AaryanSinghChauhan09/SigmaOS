@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 #include "sigma_omnisync.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 
 /**
@@ -27,5 +27,6 @@ extern "C" void omnisync_trigger_sync() {
     sigma_log("[OMNISYNC] CDR: Transmitting encrypted diffs via Zero-Trust Tunnel.");
     sigma_log("[OMNISYNC] CDR: Synchronization COMPLETE.");
 }
+
 
 

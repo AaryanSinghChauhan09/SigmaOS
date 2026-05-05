@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign HFT Nexus (Ultra-Low Latency Networking)
@@ -50,5 +50,6 @@ extern "C" void hft_init() {
 extern "C" void hft_process(const void* data, sigma_size_t size) {
     SigmaOS::Kernel::Network::SovereignHFTNexus::getInstance().processTradePacket(data, size);
 }
+
 
 

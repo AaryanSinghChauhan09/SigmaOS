@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
 
 /**
@@ -56,5 +56,6 @@ extern "C" void streamer_init() {
 extern "C" void streamer_push_frame(void* buf, sigma_usize sz) {
     SigmaOS::Kernel::Multimedia::SovereignSpatialStreamer::getInstance().streamFrame(buf, sz);
 }
+
 
 

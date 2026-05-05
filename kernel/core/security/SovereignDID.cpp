@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign DID (Decentralized Identifier)
@@ -61,5 +61,6 @@ extern "C" void did_create(const char* subject) {
 extern "C" bool did_verify(const char* did) {
     return SigmaOS::Kernel::Security::SovereignDIDManager::getInstance().verifyDID(did);
 }
+
 
 

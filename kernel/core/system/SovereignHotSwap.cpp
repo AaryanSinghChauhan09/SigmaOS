@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign HotSwap (Dynamic Shard Hot-Swapping)
@@ -61,5 +61,6 @@ extern "C" void hotswap_init() {
 extern "C" bool hotswap_execute(const char* id, const void* logic, sigma_size_t size) {
     return SigmaOS::Kernel::System::SovereignHotSwap::getInstance().swapShard(id, logic, size);
 }
+
 
 

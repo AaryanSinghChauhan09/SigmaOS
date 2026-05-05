@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 /**
  * SigmaOS Sovereign UXSrv (User Experience Service)
@@ -51,5 +51,6 @@ extern "C" void uxsrv_init() {
 extern "C" void uxsrv_handle_workflow(const char* id) {
     SigmaOS::Kernel::UI::SovereignUXSrv::getInstance().handleWorkflow(id);
 }
+
 
 

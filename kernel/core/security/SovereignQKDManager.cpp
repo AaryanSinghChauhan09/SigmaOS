@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
 
 /**
@@ -57,5 +57,6 @@ extern "C" void qkd_init() {
 extern "C" void qkd_handshake(const char* node) {
     SigmaOS::Kernel::Security::SovereignQKDManager::getInstance().performHandshake(node);
 }
+
 
 

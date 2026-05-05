@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_aisched.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_aisched.h""
+#include "../../../include/SovereignLibC.h""
 
 namespace SigmaOS {
 namespace Kernel {
@@ -57,6 +57,7 @@ extern "C" void aisched_set_mode(sigma_aisched_mode_t mode) {
 extern "C" sigma_u64 aisched_get_prediction_count() {
     return SigmaOS::Kernel::AI::SovereignAISchedEngine::getInstance().getPredictionCount();
 }
+
 
 
 

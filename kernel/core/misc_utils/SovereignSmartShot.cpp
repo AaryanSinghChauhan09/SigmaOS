@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 #include "sigma_smartshot.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 #include "sigma_vissearch.h"
 #include "sigma_memorypalace.h"
 #include "sigma_clipboard.h"
@@ -40,5 +40,6 @@ extern "C" void smartshot_capture_fullscreen() {
     sigma_log("[SMARTSHOT] CCA: Initiating fullscreen framebuffer capture...");
     smartshot_capture_region(0, 0, 1920, 1080);
 }
+
 
 

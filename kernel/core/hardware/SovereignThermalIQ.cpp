@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 #include "sigma_thermaliq.h"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h""
 
 extern "C" void energysched_set_shard_state(sigma_u32 shard_id, sigma_u32 state);
 
@@ -68,6 +68,7 @@ extern "C" void thermaliq_apply_thermal_policy() {
 extern "C" void thermaliq_emergency_throttle(sigma_u32 threshold_celsius) {
     SigmaOS::Kernel::Hardware::SovereignThermalIQ::getInstance().emergencyThrottle(threshold_celsius);
 }
+
 
 
 

@@ -1,7 +1,7 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "sigma_proc.h"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign PSE (Programmable Shard Execution)
@@ -75,5 +75,6 @@ extern "C" sigma_u32 pse_execute_wasm(const void* bytecode, sigma_size_t size) {
 extern "C" void pse_terminate_wasm(sigma_u32 thread_id) {
     SigmaOS::Kernel::Process::SovereignPSEEngine::getInstance().terminateWasm(thread_id);
 }
+
 
 

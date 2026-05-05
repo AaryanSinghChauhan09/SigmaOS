@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Orb Registry
@@ -66,5 +66,6 @@ extern "C" bool orbreg_register(const char* name, const char* cid) {
 extern "C" void orbreg_list() {
     SigmaOS::Kernel::Industrial::SovereignOrbRegistry::getInstance().listOrbs();
 }
+
 
 

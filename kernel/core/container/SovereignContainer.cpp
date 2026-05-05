@@ -1,6 +1,6 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
-#include "sigma_hal.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
 
 /**
  * SigmaOS Sovereign Containerization (S-Container)
@@ -73,5 +73,6 @@ extern "C" sigma_u32 container_spawn(const char* image_name) {
 extern "C" void container_destroy(sigma_u32 container_id) {
     SigmaOS::Kernel::Container::SovereignContainerEngine::getInstance().destroyContainer(container_id);
 }
+
 
 

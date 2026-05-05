@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
 
 /**
@@ -59,5 +59,6 @@ extern "C" void verifier_init() {
 extern "C" bool verifier_verify_shard(const char* id, void* ptr) {
     return SigmaOS::Kernel::Security::SovereignFormalVerifier::getInstance().verifyShard(id, ptr);
 }
+
 
 

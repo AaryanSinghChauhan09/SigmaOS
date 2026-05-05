@@ -1,7 +1,7 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "industrial_vito.hpp"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h""
 
 namespace SigmaOS {
 namespace Virtualization {
@@ -26,5 +26,6 @@ void SovereignVito::Audit() {
 
 } // namespace Virtualization
 } // namespace SigmaOS
+
 
 

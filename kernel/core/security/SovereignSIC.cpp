@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "sigma_sic.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 #include "sigma_libc.h"
 
 /**
@@ -47,5 +47,6 @@ extern "C" bool sic_verify_token(uint32_t shard_id, sigma_sic_token_t token) {
     
     return success;
 }
+
 
 

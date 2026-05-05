@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "sigma_universal_ui.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 #include "sigma_telemetry.h"
 
 /**
@@ -36,5 +36,6 @@ extern "C" void universalui_render_widget(uint32_t widget_id, uint32_t x, uint32
     
     sigma_log("[UNIVERSALUI] DFO: Framebuffer flush COMPLETE.");
 }
+
 
 

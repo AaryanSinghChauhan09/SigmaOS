@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "sigma_unifiedpkg.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 #include "sigma_libc.h"
 
 /**
@@ -52,5 +52,6 @@ extern "C" void unifiedpkg_list_installed() {
         sigma_printf("  - %s (System: %d)\n", package_db[i].package_name, package_db[i].is_system_critical);
     }
 }
+
 
 

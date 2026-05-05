@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
 
 /**
@@ -59,5 +59,6 @@ extern "C" void routing_init() {
 extern "C" void routing_update(const char* dest, const char* next) {
     SigmaOS::Kernel::Network::SovereignRoutingManager::getInstance().updateRoute(dest, next);
 }
+
 
 

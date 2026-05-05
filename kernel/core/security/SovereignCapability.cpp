@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 /**
  * SigmaOS Sovereign Capability Vault
@@ -75,5 +75,6 @@ extern "C" sigma_u64 cap_vault_issue(sigma_u32 res, sigma_u32 perm) {
 extern "C" int cap_vault_validate(sigma_u64 token, sigma_u32 res, sigma_u32 perm) {
     return SigmaOS::Kernel::Security::SovereignCapabilityVault::getInstance().validate(token, res, perm) ? 1 : 0;
 }
+
 
 

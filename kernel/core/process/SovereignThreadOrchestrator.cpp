@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
 
 /**
@@ -60,5 +60,6 @@ extern "C" void thread_orch_init() {
 extern "C" void thread_orch_spawn(const char* id, sigma_u32 p) {
     SigmaOS::Kernel::Process::SovereignThreadOrchestrator::getInstance().spawnThread(id, p);
 }
+
 
 

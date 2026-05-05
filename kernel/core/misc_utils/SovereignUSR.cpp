@@ -1,6 +1,6 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Unified Shard Registry (USR)
@@ -64,5 +64,6 @@ extern "C" void usr_register_shard(const char* name, sigma_u32 id) {
 extern "C" sigma_u32 usr_discover_shard(const char* name) {
     return SovereignUSREngine::getInstance().discoverShard(name);
 }
+
 
 

@@ -1,6 +1,6 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
-#include "sigma_hal.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
 
 /**
  * SigmaOS Sovereign Installer (S-Install) (v100.0 Zenith)
@@ -59,6 +59,7 @@ extern "C" void install_execute() {
 extern "C" sigma_u32 install_get_progress() {
     return SovereignInstallerEngine::getInstance().getProgress();
 }
+
 
 
 

@@ -1,7 +1,7 @@
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "sigma_log.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 
 /**
@@ -83,6 +83,7 @@ extern "C" void log_dump_lattice() {
 extern "C" sigma_u64 log_get_total_emitted() {
     return SovereignLogEngine::getInstance().getTotalEmitted();
 }
+
 
 
 

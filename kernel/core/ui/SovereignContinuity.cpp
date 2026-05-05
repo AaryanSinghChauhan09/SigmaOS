@@ -1,6 +1,6 @@
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "sigma_continuity.h"
 
 /**
@@ -23,6 +23,7 @@ extern "C" void continuity_sync_state() {
     SovereignContinuityEngine.handoff_count++;
     sigma_log("[S-CONTINUITY] State synchronization COMPLETE.");
 }
+
 
 
 

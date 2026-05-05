@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 #include "sigma_main.h"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h""
 
 // Engine Initialisers (Extern C)
 extern "C" void sigma_bootstrap_lattice();
@@ -32,5 +32,6 @@ void SovereignKernelMain::ignite() {
 extern "C" void sigma_kernel_main() {
     SigmaOS::Kernel::System::SovereignKernelMain::getInstance().ignite();
 }
+
 
 

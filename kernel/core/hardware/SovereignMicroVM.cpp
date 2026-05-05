@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 #include "sigma_microvm.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 
 /**
@@ -47,5 +47,6 @@ extern "C" void microvm_terminate(uint32_t vm_id) {
         sigma_printf("[MICROVM] HBC: Terminating MicroVM %d and flushing EPT mappings.\n", vm_id);
     }
 }
+
 
 

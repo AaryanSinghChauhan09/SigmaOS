@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Script Nexus (S-ScriptNexus)
@@ -55,5 +55,6 @@ extern "C" void script_nexus_init() {
 extern "C" void script_nexus_execute(const char* graph) {
     SigmaOS::Kernel::AI::SovereignScriptNexus::getInstance().executeGraph(graph);
 }
+
 
 

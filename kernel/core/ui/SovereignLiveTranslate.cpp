@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 #include "sigma_livetranslate.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 
 /**
@@ -29,5 +29,6 @@ extern "C" void livetranslate_overlay_ui(const char* target_lang) {
     // Seamlessly overlays translated labels atop the Universal UI in real-time.
     sigma_printf("[LIVETRANSLATE] CSS2S: Overlaying full UI translation to '%s'.\n", target_lang);
 }
+
 
 

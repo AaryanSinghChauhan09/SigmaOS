@@ -1,6 +1,6 @@
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "sigma_print.h"
 
 /**
@@ -129,5 +129,6 @@ extern "C" void print_flush_spooler() {
 extern "C" const sigma_print_state_t* print_get_state() {
     return &SovereignPrintSpooler.state;
 }
+
 
 

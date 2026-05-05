@@ -1,6 +1,6 @@
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "sigma_neural.h"
 
 /**
@@ -29,6 +29,7 @@ extern "C" void neural_report_status() {
                  SovereignNeuralEngine.inference_count, 
                  SovereignNeuralEngine.npu_active ? "ACTIVE" : "OFFLINE");
 }
+
 
 
 

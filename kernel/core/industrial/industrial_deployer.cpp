@@ -1,7 +1,7 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "industrial_deployer.hpp"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h""
 
 extern "C" void gatekeeper_init();
 extern "C" void assistant_init();
@@ -49,5 +49,6 @@ void SovereignDeployer::Audit() {
 
 } // namespace Deployment
 } // namespace SigmaOS
+
 
 

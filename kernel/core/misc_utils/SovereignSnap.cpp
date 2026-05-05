@@ -68,3 +68,4 @@ extern "C" void snap_register_zone(sigma_u32 x, sigma_u32 y, sigma_u32 w, sigma_
 
 
 
+

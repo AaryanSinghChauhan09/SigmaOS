@@ -1,6 +1,6 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
 #include "SovereignDNACompression.hpp"
 
@@ -71,5 +71,6 @@ extern "C" void persistence_snapshot(const char* component) {
 extern "C" void persistence_restore(const char* component) {
     SigmaOS::Kernel::FS::SovereignPersistence::getInstance().restoreState(component);
 }
+
 
 

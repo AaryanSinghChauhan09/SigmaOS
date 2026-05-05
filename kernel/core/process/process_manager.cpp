@@ -1,6 +1,6 @@
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "process_manager.hpp"
 
 namespace SigmaOS {
@@ -82,5 +82,6 @@ void SovereignProcessManager::audit() {
 
 } // namespace Kernel
 } // namespace SigmaOS
+
 
 

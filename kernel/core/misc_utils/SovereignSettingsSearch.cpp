@@ -1,6 +1,6 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Predictive Settings Search
@@ -67,5 +67,6 @@ private:
 extern "C" void settings_search_init() { SovereignSettingsSearchEngine::getInstance().init(); }
 extern "C" void settings_search_register(const char* key, const char* label, const char* cat) { SovereignSettingsSearchEngine::getInstance().registerSetting(key, label, cat); }
 extern "C" void settings_search_query(const char* query) { SovereignSettingsSearchEngine::getInstance().search(query); }
+
 
 

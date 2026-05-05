@@ -1,6 +1,6 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Standard I/O Router
@@ -53,5 +53,6 @@ extern "C" void stdio_init() {
 extern "C" void stdio_route_write(const char* buffer, sigma_u32 length) {
     SovereignStdioEngine::getInstance().routeWrite(buffer, length);
 }
+
 
 

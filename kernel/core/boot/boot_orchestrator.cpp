@@ -1,7 +1,7 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "boot_orchestrator.hpp"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h""
 
 namespace SigmaOS {
 namespace Kernel {
@@ -27,5 +27,6 @@ void SovereignBootOrchestrator::Finalize() {
 
 } // namespace Kernel
 } // namespace SigmaOS
+
 
 

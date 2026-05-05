@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
 
 /**
@@ -59,5 +59,6 @@ extern "C" void gaming_perf_init() {
 extern "C" void gaming_perf_optimize() {
     SigmaOS::Kernel::Hardware::SovereignGamingPerformance::getInstance().optimizeSession();
 }
+
 
 

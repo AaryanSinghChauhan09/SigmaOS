@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Lazy Allocator (SovereignLazy)
@@ -61,5 +61,6 @@ extern "C" void* lazy_alloc(sigma_size_t size) {
 extern "C" void lazy_resolve(void* ptr) {
     SigmaOS::Kernel::Misc::SovereignLazyManager::getInstance().resolveFault(ptr);
 }
+
 
 

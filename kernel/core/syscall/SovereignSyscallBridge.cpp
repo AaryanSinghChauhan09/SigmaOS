@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
 
 /**
@@ -66,5 +66,6 @@ extern "C" void sysbridge_init_shard() {
 extern "C" sigma_u64 sysbridge_handle_shard(sigma_u64 n, sigma_u64 a1, sigma_u64 a2, sigma_u64 a3) {
     return SigmaOS::Kernel::Syscall::SovereignSyscallBridge::getInstance().handle(n, a1, a2, a3);
 }
+
 
 

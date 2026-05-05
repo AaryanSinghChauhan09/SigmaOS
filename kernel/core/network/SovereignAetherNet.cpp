@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Aether-Net (Stealth Mode)
@@ -54,5 +54,6 @@ extern "C" void aether_init() {
 extern "C" void aether_set_stealth(bool active) {
     SigmaOS::Kernel::Network::SovereignAetherNet::getInstance().setStealthMode(active);
 }
+
 
 

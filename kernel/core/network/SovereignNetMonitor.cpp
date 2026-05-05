@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "sigma_netmonitor.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 #include "sigma_zeronet.h"
 #include "sigma_sentinel.h"
 
@@ -31,5 +31,6 @@ extern "C" void netmonitor_throttle_shard(uint32_t shard_id, uint32_t max_kbps) 
     sigma_printf("[NETMONITOR] PSTT: Throttling Shard %d to %d KB/s max bandwidth.\n",
                  shard_id, max_kbps);
 }
+
 
 

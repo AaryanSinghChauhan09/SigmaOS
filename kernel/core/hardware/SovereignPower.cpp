@@ -1,7 +1,7 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 #include "sigma_power.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 /**
  * SigmaOS Sovereign Power Management (SPM)
@@ -66,5 +66,6 @@ extern "C" sigma_u32 power_get_battery_pct() {
 extern "C" void power_reboot() {
     SovereignPowerEngine::getInstance().reboot();
 }
+
 
 

@@ -1,8 +1,8 @@
-#include "sigma_hal.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
-#include "SovereignNeuralNexus.hpp"
+#include "../../../include/SovereignNeuralNexus.hpp""
 
 namespace SigmaOS {
 namespace Kernel {
@@ -124,5 +124,6 @@ extern "C" void neural_predict(const void* input_tensor, void* output_tensor) {
 extern "C" void neural_report_status() {
     SigmaOS::Kernel::AI::SovereignNeuralEngine::getInstance().reportStatus();
 }
+
 
 

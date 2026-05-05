@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 #include "sigma_telepathtype.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 
 /**
@@ -29,5 +29,6 @@ extern "C" const char* telepathtype_predict_completion(const char* current_conte
 extern "C" void telepathtype_commit_prediction() {
     sigma_log("[TELEPATHTYPE] CNGP: Prediction committed to standard input buffer.");
 }
+
 
 

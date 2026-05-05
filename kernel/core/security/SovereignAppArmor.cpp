@@ -1,7 +1,7 @@
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 #include "sigma_apparmor.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 
 namespace SigmaOS {
 namespace Kernel {
@@ -48,6 +48,7 @@ extern "C" void apparmor_load_profile(const char* name, const void* rules) {
 extern "C" void apparmor_audit() {
     SigmaOS::Kernel::Security::SovereignAppArmor::getInstance().audit();
 }
+
 
 
 

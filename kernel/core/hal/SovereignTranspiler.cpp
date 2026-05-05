@@ -1,6 +1,6 @@
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 
 /**
  * SigmaOS Self-Learning Hardware Transpiler (v100.0 Zenith)
@@ -39,6 +39,7 @@ extern "C" void transpiler_cross_transpile(sigma_u32 target_arch) {
     sigma_printf("[TRANSPILER] UMSM: Initiating cross-transpilation to Arch %u...\n", target_arch);
     sigma_log("[TRANSPILER] UMSM: Shard logic successfully decoupled from physical silicon.");
 }
+
 
 
 

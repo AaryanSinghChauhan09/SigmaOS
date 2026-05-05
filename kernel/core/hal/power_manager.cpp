@@ -1,7 +1,7 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "power_manager.hpp"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h""
 
 namespace SigmaOS {
 namespace Kernel {
@@ -49,5 +49,6 @@ void SovereignPowerManager::Audit() {
 
 } // namespace Kernel
 } // namespace SigmaOS
+
 
 

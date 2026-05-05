@@ -1,6 +1,6 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Bluetooth Stack
@@ -51,5 +51,6 @@ private:
 extern "C" void bt_init() { SovereignBluetoothEngine::getInstance().init(); }
 extern "C" bool bt_probe(sigma_u32 vid, sigma_u32 pid) { return SovereignBluetoothEngine::getInstance().probeController(vid, pid); }
 extern "C" bool bt_pair(const char* addr, const char* name) { return SovereignBluetoothEngine::getInstance().pairDevice(addr, name); }
+
 
 

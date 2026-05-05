@@ -1,7 +1,7 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 #include "sigma_mmu.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 /**
  * SigmaOS Sovereign MMU Implementation
@@ -58,6 +58,7 @@ extern "C" void mmu_handle_fault(sigma_u64 faulting_addr) {
 extern "C" sigma_u64 mmu_get_fault_count() {
     return SovereignMMUEngine::getInstance().getFaultCount();
 }
+
 
 
 

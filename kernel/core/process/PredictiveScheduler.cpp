@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
 
 /**
@@ -60,5 +60,6 @@ extern "C" void predict_sched_init() {
 extern "C" void predict_sched_dispatch(const char* id, sigma_u32 prio) {
     SigmaOS::Kernel::Scheduling::PredictiveScheduler::getInstance().scheduleShard(id, prio);
 }
+
 
 

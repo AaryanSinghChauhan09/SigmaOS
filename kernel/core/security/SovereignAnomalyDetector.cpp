@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
 
 /**
@@ -63,5 +63,6 @@ extern "C" void anomaly_detector_init() {
 extern "C" void anomaly_analyze(const char* proc, sigma_u32 sys_rate, sigma_u32 mem) {
     SigmaOS::Kernel::Security::SovereignAnomalyDetector::getInstance().analyzeBehavior(proc, sys_rate, mem);
 }
+
 
 

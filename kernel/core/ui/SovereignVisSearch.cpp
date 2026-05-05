@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 #include "sigma_vissearch.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 #include "sigma_neural.h"
 
 /**
@@ -32,5 +32,6 @@ extern "C" void vissearch_query_visual_data(const char* search_term) {
     sigma_printf("[VISSEARCH] NPE: Searching visual vector space for '%s'...\n", search_term);
     // Directly links with S-NeuralSearch
 }
+
 
 

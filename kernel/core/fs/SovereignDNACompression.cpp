@@ -1,7 +1,7 @@
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 #include "sigma_dna.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 
 namespace SigmaOS {
 namespace Kernel {
@@ -59,5 +59,6 @@ extern "C" void dna_init() {
 extern "C" sigma_size_t dna_compress(const void* in, sigma_size_t sz, void* out) {
     return SigmaOS::Kernel::FS::SovereignDNACompression::getInstance().encode(in, sz, out, SIGMA_NULL);
 }
+
 
 

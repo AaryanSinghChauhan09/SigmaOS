@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Dump (SovereignDump)
@@ -50,5 +50,6 @@ extern "C" void dump_init() {
 extern "C" void dump_trigger(const char* reason) {
     SigmaOS::Kernel::Observability::SovereignDumpEngine::getInstance().trigger(reason);
 }
+
 
 

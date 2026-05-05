@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 #include "sigma_observe.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 
 /**
@@ -39,5 +39,6 @@ extern "C" void observe_trigger_probe(uint32_t probe_id) {
                      probe_id, active_probes[probe_id - 1].target_symbol);
     }
 }
+
 
 

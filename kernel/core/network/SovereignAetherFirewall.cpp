@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Aether Firewall (Neural Nexus)
@@ -79,5 +79,6 @@ extern "C" bool firewall_inspect(const void* data, sigma_size_t size, const char
 extern "C" void firewall_audit() {
     SigmaOS::Kernel::Network::SovereignAetherFirewall::getInstance().auditFirewall();
 }
+
 
 

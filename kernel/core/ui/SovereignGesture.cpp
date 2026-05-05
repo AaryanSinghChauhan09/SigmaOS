@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 #include "sigma_gesture.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 
 /**
@@ -29,5 +29,6 @@ extern "C" void gesture_process_camera_frame(const void* frame_data) {
 extern "C" void gesture_dispatch_event(sigma_gesture_type_t gesture) {
     sigma_printf("[GESTURE] KNT: Dispatching %d as a native UI event bypassing X11/Wayland.\n", (int)gesture);
 }
+
 
 

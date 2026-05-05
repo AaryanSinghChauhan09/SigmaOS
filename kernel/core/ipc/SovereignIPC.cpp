@@ -1,7 +1,7 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 #include "sigma_ipc.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 /**
  * SigmaOS Sovereign IPC Implementation (Optimized)
@@ -76,5 +76,6 @@ extern "C" bool ipc_receive_optimized(sigma_ipc_msg_t* out_msg) {
 extern "C" sigma_u64 ipc_get_dispatched_count() {
     return SigmaOS::Kernel::IPC::SovereignIPCManager::getInstance().getDispatchedCount();
 }
+
 
 

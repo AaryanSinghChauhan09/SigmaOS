@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
 
 /**
@@ -60,5 +60,6 @@ extern "C" void transpiler_init_shard() {
 extern "C" void transpiler_run_shard(const char* id, const char* arch) {
     SigmaOS::Kernel::HAL::SovereignDriverTranspiler::getInstance().transpile(id, arch);
 }
+
 
 

@@ -1,7 +1,7 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "persistent_lattice.hpp"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h""
 
 namespace SigmaOS {
 namespace Kernel {
@@ -28,5 +28,6 @@ void SovereignPersistentLattice::Audit() {
 
 } // namespace Kernel
 } // namespace SigmaOS
+
 
 

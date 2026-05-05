@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 #include "sigma_smp.h"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h""
 
 namespace SigmaOS {
 namespace Kernel {
@@ -61,5 +61,6 @@ extern "C" void smp_broadcast_ipi(sigma_u32 vector) {
 extern "C" sigma_u32 smp_get_core_count() {
     return SigmaOS::Kernel::HAL::SovereignSMPEngine::getInstance().getCoreCount();
 }
+
 
 

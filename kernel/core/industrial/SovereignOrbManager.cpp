@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
 #include "SovereignQKD.hpp"
 
@@ -69,5 +69,6 @@ extern "C" void orb_manager_init() {
 extern "C" void orb_install(const char* name, const char* sig) {
     SigmaOS::Kernel::Industrial::SovereignOrbManager::getInstance().installOrb(name, sig);
 }
+
 
 

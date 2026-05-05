@@ -1,6 +1,6 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Hybrid Architecture Bridge (ARM/RISC-V)
@@ -64,5 +64,6 @@ extern "C" void hybridarch_register_core(sigma_u32 core_id, const char* isa_type
 extern "C" bool hybridarch_dispatch_task(void* task_ptr) {
     return SovereignHybridArchEngine::getInstance().dispatchHeterogeneousTask(task_ptr);
 }
+
 
 

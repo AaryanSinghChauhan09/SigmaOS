@@ -52,9 +52,10 @@ SigmaOS is designed for instant-ignition in any modern browser environment.
 3. **Production Sync**: Deployed automatically via GitHub Actions to GitHub Pages.
 
 ### 📖 Resources
-- **[Official Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)**: Deep dive into the shard architecture.
-- **[Developer Guide](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Developer-Guide)**: Learn how to build new shards.
-- **[Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture)**: Data flow and silicon-native design.
+- **[Launch Live Demo](https://aaryansinghchauhan09.github.io/SigmaOS/)** 🚀
+- **[Official Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)**: The Single Source of Truth.
+- **[Developer Hub](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Developer_Guide)**: Build your own shards.
+- **[Industrial Gap Resolution](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/INDUSTRIAL_GAP_RESOLUTION)**: Competitive analysis vs legacy tools.
 
 ### 📄 License
 

@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 #include "sigma_nanolib.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 /**
  * SigmaOS Sovereign Nano-Library
@@ -44,5 +44,6 @@ extern "C" void* nanolib_memset(void* s, int c, uint32_t n) {
     while (n--) *p++ = (unsigned char)c;
     return s;
 }
+
 
 

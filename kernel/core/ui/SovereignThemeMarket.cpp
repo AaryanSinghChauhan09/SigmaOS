@@ -1,6 +1,6 @@
 #include "SovereignThemeMarket.hpp"
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
 
 SovereignThemeMarketEngine& SovereignThemeMarketEngine::getInstance() {
     static SovereignThemeMarketEngine instance;
@@ -47,5 +47,6 @@ extern "C" void theme_market_init() { SovereignThemeMarketEngine::getInstance().
 extern "C" void theme_market_publish(const char* name, const char* author) { SovereignThemeMarketEngine::getInstance().publishTheme(name, author); }
 extern "C" bool theme_market_apply(const char* name) { return SovereignThemeMarketEngine::getInstance().applyTheme(name); }
 extern "C" void theme_market_list() { SovereignThemeMarketEngine::getInstance().listThemes(); }
+
 
 

@@ -1,6 +1,6 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
-#include "sigma_hal.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
 #include "sigma_globalsync.h"
 
 /**
@@ -90,5 +90,6 @@ extern "C" void sync_reconcile_all() {
 extern "C" const sigma_sync_state_t* sync_get_state() {
     return SovereignSyncEngine::getInstance().getState();
 }
+
 
 

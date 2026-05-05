@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
 
 /**
@@ -55,5 +55,6 @@ extern "C" void audit_init() {
 extern "C" void audit_log_shard_event(const char* shard, const char* ev) {
     SigmaOS::Kernel::Security::SovereignAuditEngine::getInstance().logEvent(shard, ev);
 }
+
 
 

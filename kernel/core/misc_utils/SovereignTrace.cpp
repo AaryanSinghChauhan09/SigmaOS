@@ -1,7 +1,7 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 #include "sigma_trace.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 #include "sigma_time.h"
 
 /**
@@ -35,5 +35,6 @@ extern "C" void trace_set_interceptor(uint32_t syscall_id, bool active) {
         sigma_printf("[TRACE] Interceptor for 0x%02X set to %d\n", syscall_id, active);
     }
 }
+
 
 

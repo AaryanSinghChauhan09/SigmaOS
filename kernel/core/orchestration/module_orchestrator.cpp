@@ -1,7 +1,7 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "module_orchestrator.hpp"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h""
 
 namespace SigmaOS {
 namespace Core {
@@ -26,5 +26,6 @@ void SovereignModuleOrchestrator::AuditAllShards() {
 
 } // namespace Core
 } // namespace SigmaOS
+
 
 

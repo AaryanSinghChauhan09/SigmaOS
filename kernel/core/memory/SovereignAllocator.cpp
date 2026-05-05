@@ -1,7 +1,7 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 #include "sigma_allocator.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 /**
  * SigmaOS Sovereign Custom Allocator
@@ -75,5 +75,6 @@ extern "C" void* allocator_malloc(sigma_u32 size) {
 extern "C" void allocator_free(void* ptr) {
     SovereignAllocatorEngine::getInstance().free(ptr);
 }
+
 
 

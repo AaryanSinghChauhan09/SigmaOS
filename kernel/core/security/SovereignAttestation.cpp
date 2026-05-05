@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 /**
  * SigmaOS Sovereign Hardware Attestation (TEE)
@@ -40,5 +40,6 @@ private:
 extern "C" void attestation_init() {
     SigmaOS::Kernel::Security::SovereignAttestation::getInstance().init();
 }
+
 
 

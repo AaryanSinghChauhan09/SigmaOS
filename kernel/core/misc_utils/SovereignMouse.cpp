@@ -1,6 +1,6 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
-#include "sigma_hal.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
 
 /**
  * SigmaOS Sovereign USB Mouse Shard (v100.0 Zenith)
@@ -50,6 +50,7 @@ extern "C" void mouse_init() {
 extern "C" void mouse_handle_report(const sigma_u8* report) {
     SovereignMouseEngine::getInstance().handleReport(report);
 }
+
 
 
 

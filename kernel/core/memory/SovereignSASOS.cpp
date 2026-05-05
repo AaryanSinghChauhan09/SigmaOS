@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign SASOS (Single Address Space Operating System)
@@ -60,5 +60,6 @@ extern "C" sigma_u32 sasos_register(const char* shard) {
 extern "C" void sasos_switch(sigma_u32 pkey) {
     SigmaOS::Kernel::Memory::SovereignSASOS::getInstance().switchDomain(pkey);
 }
+
 
 

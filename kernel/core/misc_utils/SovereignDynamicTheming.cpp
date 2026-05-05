@@ -1,6 +1,6 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_types.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Dynamic Theming Engine
@@ -49,5 +49,6 @@ extern "C" void theme_init() {
 extern "C" void theme_update_ambient(sigma_u32 lux) {
     SovereignThemeEngine::getInstance().updateAmbientContext(lux);
 }
+
 
 

@@ -1,6 +1,6 @@
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 
 /**
  * SigmaOS Sovereign Self-Healer (v100.0 Zenith)
@@ -38,6 +38,7 @@ extern "C" void healer_repair_shard(sigma_u32 shard_id) {
     SovereignHealerEngine.total_repairs++;
     sigma_log("[HEALER] ASR: Shard logic RESTORED from amnesic mirror.");
 }
+
 
 
 

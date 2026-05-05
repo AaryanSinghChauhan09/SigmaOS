@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
 #include "../security/SovereignQKD.hpp"
 
@@ -73,5 +73,6 @@ extern "C" void sel_init_shard() {
 extern "C" void sel_spawn_sandbox(const char* name) {
     SigmaOS::Kernel::Security::SovereignSEL::getInstance().spawnSandbox(name);
 }
+
 
 

@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_kernel_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_kernel_types.h""
+#include "../../../include/SovereignLibC.h""
 #include "SigmaOOP.hpp"
 
 namespace SigmaOS {
@@ -75,5 +75,6 @@ extern "C" void silicon_init_transpiler() {
 extern "C" void silicon_transpile(const char* id, const char* spec, const char* arch) {
     SigmaOS::Kernel::Hardware::SovereignHWTranspiler::getInstance().transpileDriver(id, spec, arch);
 }
+
 
 

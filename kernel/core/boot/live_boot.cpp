@@ -1,7 +1,7 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
 #include "live_boot.hpp"
-#include "SovereignLibC.h"
+#include "../../../include/SovereignLibC.h""
 
 namespace SigmaOS {
 namespace Kernel {
@@ -32,5 +32,6 @@ void SovereignLiveBoot::Audit() {
 
 } // namespace Kernel
 } // namespace SigmaOS
+
 
 

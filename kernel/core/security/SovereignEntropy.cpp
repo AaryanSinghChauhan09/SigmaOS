@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Entropy (Neural Entropy Source)
@@ -60,5 +60,6 @@ extern "C" void entropy_init() {
 extern "C" sigma_u64 entropy_get() {
     return SigmaOS::Kernel::Security::SovereignEntropySource::getInstance().harvestEntropy();
 }
+
 
 

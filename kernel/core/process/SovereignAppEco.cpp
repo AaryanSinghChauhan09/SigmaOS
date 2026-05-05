@@ -1,8 +1,8 @@
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_types.h""
 
 #include "sigma_appeco.h"
-#include "sigma_hal.h"
+#include "../../../include/sigma_hal.h""
 
 
 
@@ -38,5 +38,6 @@ extern "C" bool appeco_launch(const char* app_name) {
 extern "C" void appeco_uninstall(const char* app_name) {
     sigma_printf("[APPECO] UAV: Atomically removing '%s' and all associated state.\n", app_name);
 }
+
 
 

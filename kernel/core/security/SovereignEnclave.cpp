@@ -1,6 +1,6 @@
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../../include/sigma_hal.h""
+#include "../../../include/sigma_types.h""
+#include "../../../include/SovereignLibC.h""
 
 /**
  * SigmaOS Sovereign Enclave (TEE Manager)
@@ -61,5 +61,6 @@ extern "C" void* enclave_create(sigma_size_t size) {
 extern "C" void enclave_enter(void* ptr) {
     SigmaOS::Kernel::Security::SovereignEnclaveManager::getInstance().enterEnclave(ptr);
 }
+
 
 
