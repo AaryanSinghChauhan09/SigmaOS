@@ -21,4 +21,5 @@ The shards responsible for this roadmap (e.g., `SovereignMarketplace`, `Sovereig
 **Status**: The lattice is rapidly outclassing fragmented ecosystems by consolidating their best attributes into a single, sovereign architecture.
 
 ---
-*Σ Sovereignty is the Synthesis of all Strengths.*
+
+### Σ Sovereignty is the Synthesis of all Strengths.

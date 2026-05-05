@@ -13,5 +13,6 @@ A streaming telemetry shard that shows real-time kernel logs, IPC exchanges, and
 Zenith is designed to be keyboard-first but touch-optimized.
 
 ---
-*The Zenith Singularity is the pinnacle of sovereign UI design.*
+
+### The Zenith Singularity is the pinnacle of sovereign UI design.
 

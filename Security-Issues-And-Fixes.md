@@ -37,4 +37,5 @@ This document serves as the high-assurance security ledger for the SigmaOS Sover
 **Fix**: Added unsubscription callbacks to `00_event_bus.js`.
 
 ---
-*Σ Sovereignty requires Absolute Vigilance.*
+
+### Σ Sovereignty requires Absolute Vigilance.

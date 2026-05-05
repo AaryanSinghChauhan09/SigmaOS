@@ -124,4 +124,5 @@ This document outlines the 100 functional aspirations for the SigmaOS Sovereign 
 10. Autonomous resource orchestration
 
 ---
-*Σ Sovereignty is the Achievement of the Backlog.*
+
+### Σ Sovereignty is the Achievement of the Backlog.

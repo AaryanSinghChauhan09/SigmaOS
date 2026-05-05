@@ -32,4 +32,5 @@ This document tracks meta-development goals, process refinements, and engineerin
 * **Milestone Dashboards**: Regular updates to the build status, test counts, and backlog progress on the GitHub Wiki.
 
 ---
-*Σ Sovereignty is the Continuous Pursuit of Perfection.*
+
+### Σ Sovereignty is the Continuous Pursuit of Perfection.

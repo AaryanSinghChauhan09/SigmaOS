@@ -37,4 +37,5 @@ Focus is placed on "Lattice-level" resource management, treating distributed mac
 | **Mobile** | PWA Wrapper for "Installable" dashboard access |
 
 ---
-*Σ Sovereignty is Distributed. The Lattice is One.*
+
+### Σ Sovereignty is Distributed. The Lattice is One.

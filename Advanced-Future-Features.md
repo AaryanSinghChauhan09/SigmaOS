@@ -29,4 +29,5 @@ The following strategic initiatives define the "Zenith Singularity" roadmap for 
 2. **Hardware-Assisted Attestation**: Silicon-level verification of shard integrity before execution using TPM 2.0 / SGX.
 
 ---
-*The Lattice is Infinite. The Evolution is Eternal.*
+
+### The Lattice is Infinite. The Evolution is Eternal.

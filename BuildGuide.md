@@ -38,7 +38,7 @@ SigmaOS uses the `s-cli` orchestrator for all build operations.
    ./s-cli build x86_64
    ```
 
-   *This will generate a bootable `.iso` image in the `build/` directory.*
+###    This will generate a bootable `.iso` image in the `build/` directory.
 
 ## Running SigmaOS
 

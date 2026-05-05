@@ -33,4 +33,5 @@ This document frames why SigmaOS can feel “behind” established systems (Linu
 * **Strategy**: Tie public messaging to **verified capabilities**; use the roadmap to move claims from narrative to evidence.
 
 ---
-*Σ Sovereignty is Earned Through Engineering.*
+
+### Σ Sovereignty is Earned Through Engineering.

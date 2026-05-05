@@ -28,5 +28,5 @@ isolation.
 
 ---
 
-_Σ SIGMAOS: Beyond Linux. Absolute Sovereignty._
+### Σ SIGMAOS: Beyond Linux. Absolute Sovereignty.
 

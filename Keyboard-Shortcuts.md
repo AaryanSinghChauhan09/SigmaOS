@@ -31,5 +31,6 @@ Switch between visual paradigms instantly:
 | `Alt + T` | Toggle Telemetry Overlay |
 
 ---
-*Master the lattice through your fingertips.*
+
+### Master the lattice through your fingertips.
 
