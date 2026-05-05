@@ -1,5 +1,7 @@
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../include/sigma_types.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/sigma_hal.h"
+
 
 /**
  * SigmaOS Sovereign Diagnostics (SovereignDiag)

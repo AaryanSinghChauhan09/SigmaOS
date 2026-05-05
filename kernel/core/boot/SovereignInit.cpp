@@ -1,10 +1,11 @@
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_aisched.h"
-#include "SovereignNeuralNexus.hpp"
-#include "SovereignVFS.hpp"
+#include "../../include/SovereignLibC.h"
+#include "../../include/sigma_hal.h"
+#include "../../include/sigma_aisched.h"
+#include "../../include/SovereignNeuralNexus.hpp"
+#include "../../include/SovereignVFS.hpp"
 
 extern "C" void allocator_init();
+
 
 /**
  * SigmaOS Sovereign Init Implementation

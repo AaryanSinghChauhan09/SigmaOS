@@ -12,7 +12,8 @@ SigmaOS is a next-generation, industrial-grade sovereign lattice operating syste
 ---
 
 ### 🌐 Live Demo
-**[Launch Zenith Desktop Now](https://aaryansinghchauhan09.github.io/SigmaOS/)**
+
+- **Experience SigmaOS Zenith Live**: [aaryansinghchauhan09.github.io/SigmaOS/](https://aaryansinghchauhan09.github.io/SigmaOS/)
 
 ---
 
@@ -47,11 +48,12 @@ SigmaOS runs directly in your browser. No complex installation required.
    ```
 2. **Launch the OS**:
    - Simply open `index.html` in any modern web browser.
-   - For the full experience with local telemetry, run a local server:
-     ```bash
+3. **Local Server (Optional)**: For optimal performance and telemetry simulation:
+
+   ```bash
      npx serve .
      ```
-3. **Explore**: Use the Start Menu (Σ icon) or the Command Palette to summon shards.
+4. **Explore**: Use the Start Menu (Σ icon) or the Command Palette to summon shards.
 
 ### 📖 Resources
 - **[Official Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)**: Deep dive into the shard architecture.

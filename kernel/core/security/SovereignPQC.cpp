@@ -72,3 +72,4 @@ extern "C" void pqc_refresh_lattice() {
     SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().refreshLattice();
 }
 
+
