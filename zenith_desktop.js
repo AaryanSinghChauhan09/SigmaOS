@@ -52,7 +52,13 @@ const SIGMA_REPO_URL = 'https://github.com/AaryanSinghChauhan09/SigmaOS';
         }
         const persona = new PersonalizationEngine();
 
-        function minimizeWindow(id) {
+        function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function minimizeWindow(id) {
             const win = document.getElementById(id);
             if (win) win.style.display = 'none';
         }
@@ -385,13 +391,17 @@ const SIGMA_REPO_URL = 'https://github.com/AaryanSinghChauhan09/SigmaOS';
         });
 
         function checkStatus() {
-            const url = document.getElementById('status-url').value;
-            const output = document.getElementById('status-output');
-            output.innerHTML = '<span style="color: var(--accent);">Checking silicon route to ' + url + '...</span>';
-            setTimeout(() => {
-                output.innerHTML = '<span style="color: var(--success);">✔ ' + url + ' is UP and responsive in the lattice.</span>';
-                addLog("Σ [UTILITY]: Route check complete for " + url, "success");
-            }, 1500);
+    const urlInput = document.getElementById('status-url');
+    const output = document.getElementById('status-output');
+    if (!urlInput || !output) return;
+    const url = urlInput.value;
+    const safeUrl = escapeHtml(url);
+    output.innerHTML = <span style="color: var(--accent);">Checking silicon route to \...</span>;
+    setTimeout(() => {
+        output.innerHTML = <span style="color: var(--success);">? \ is UP and responsive in the lattice.</span>;
+        addLog("S [UTILITY]: Route check complete for " + url, "success");
+    }, 1500);
+}, 1500);
         }
 
         function flashBootable() {
@@ -411,13 +421,24 @@ const SIGMA_REPO_URL = 'https://github.com/AaryanSinghChauhan09/SigmaOS';
         }
 
         function convertTable() {
-            const csv = document.getElementById('table-input').value;
-            const rows = csv.split('\n');
-            let html = '<table style="width: 100%; border-collapse: collapse; font-size: 0.8em; color: white;">';
-            rows.forEach((row, i) => {
-                html += '<tr>';
-                row.split(',').forEach(col => {
-                    html += `<td style="border: 1px solid rgba(255,255,255,0.1); padding: 8px; ${i===0?'background: rgba(0,255,255,0.1); font-weight: 800;':''}">${col.trim()}</td>`;
+    const inputEl = document.getElementById('table-input');
+    const outputEl = document.getElementById('table-output');
+    if (!inputEl || !outputEl) return;
+    const csv = inputEl.value;
+    const rows = csv.split('\n');
+    let html = '<table style="width: 100%; border-collapse: collapse; font-size: 0.8em; color: white;">';
+    rows.forEach((row, i) => {
+        html += '<tr>';
+        row.split(',').forEach(col => {
+            const safeCol = escapeHtml(col.trim());
+            html += <td style="border: 1px solid rgba(255,255,255,0.1); padding: 8px; \ ">\</td>;
+        });
+        html += '</tr>';
+    });
+    html += '</table>';
+    outputEl.innerHTML = html;
+    addLog("S [UTILITY]: CSV-to-Table conversion complete.", "success");
+}">${col.trim()}</td>`;
                 });
                 html += '</tr>';
             });
@@ -481,13 +502,19 @@ const SIGMA_REPO_URL = 'https://github.com/AaryanSinghChauhan09/SigmaOS';
         }
 
         function addBlockRule() {
-            const input = document.getElementById('firewall-input');
-            const list = document.getElementById('blocked-list');
-            if (!input.value.trim()) return;
-            
-            const li = document.createElement('li');
-            li.className = "routine-item routine-border-magenta";
-            li.innerHTML = `<strong>${input.value.trim()}</strong> <button class="cyber-btn small-btn" onclick="this.parentElement.remove()">UNBLOCK</button>`;
+    const input = document.getElementById('firewall-input');
+    const list = document.getElementById('blocked-list');
+    if (!input || !input.value.trim() || !list) return;
+    
+    const val = input.value.trim();
+    const safeVal = escapeHtml(val);
+    const li = document.createElement('li');
+    li.className = "routine-item routine-border-magenta";
+    li.innerHTML = <strong>\</strong> <button class="cyber-btn small-btn" onclick="this.parentElement.remove()">UNBLOCK</button>;
+    list.prepend(li);
+    addLog(S [FIREWALL]: Blocked access to \., "error");
+    input.value = '';
+}</strong> <button class="cyber-btn small-btn" onclick="this.parentElement.remove()">UNBLOCK</button>`;
             list.prepend(li);
             addLog(`Σ [FIREWALL]: Blocked access to ${input.value.trim()}.`, "error");
             input.value = '';
@@ -1207,6 +1234,7 @@ function evaluateLatticeRun(query) {
     }
     return null;
 }
+
 
 
 
