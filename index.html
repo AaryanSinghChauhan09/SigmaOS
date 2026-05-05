@@ -17,6 +17,8 @@
 </head>
 
 <body class="zenith-sovereign">
+    <div class="desktop-overlay"></div><div class="mouse-glow" id="mouse-glow"></div>
+
     <noscript>
         <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0c0c0e;color:#fff;font-family:system-ui;padding:2rem;text-align:center;">
             <p>Σ SigmaOS Zenith requires JavaScript. Enable scripts to boot the sovereign lattice.</p>
@@ -86,9 +88,13 @@
 </div>
 <!-- Command Palette (Ctrl+K / Ctrl+Space) -->
 <div class="command-palette" id="cmd-palette">
-<label for="cmd-input" class="sr-only">Command Filter</label>
-<input type="text" class="command-input" placeholder="Filter commands…" id="cmd-input" autocomplete="off" aria-label="Search and filter lattice commands">
-<div class="command-results" id="cmd-results">
+    <div class="command-header">
+        <label for="cmd-input" class="sr-only">Command Filter</label>
+        <input type="text" class="command-input" placeholder="Type a command or search shards…" id="cmd-input" autocomplete="off" aria-label="Search and filter lattice commands">
+    </div>
+    <div style="padding: 10px 24px 24px;">
+        <div class="command-results" id="cmd-results">
+
     <div class="command-item" onclick="launchApp('File Manager')"><span>File Manager</span><kbd>Files</kbd></div>
     <div class="command-item" onclick="launchApp('Sigma Browser')"><span>Sigma Browser</span><kbd>Web</kbd></div>
     <div class="command-item" onclick="launchApp('AI Assistant')"><span>AI Assistant</span><kbd>AI</kbd></div>
@@ -1130,4 +1136,5 @@ https://chatgpt.com/?q={{prompt}}</textarea>
 
 </body>
 </html>
+
 

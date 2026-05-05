@@ -1,18 +1,20 @@
 :root {
     --accent: #fbbf24;
     --accent-blue: #3b82f6;
+    --accent-cyan: #00f2ff;
     --accent-gradient: linear-gradient(135deg, #fbbf24 0%, #3b82f6 100%);
-    --bg: #0c0c0e;
-    --panel-bg: rgba(255, 255, 255, 0.05);
-    --glass: rgba(255, 255, 255, 0.08);
-    --glass-border: rgba(255, 255, 255, 0.15);
-    --glass-blur: blur(20px);
-    --text: #ffffff;
-    --text-muted: #94a3b8;
-    --text-light: #e2e8f0;
-    --success: #22c55e;
-    --error: #ef4444;
-    --studio-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), 0 18px 36px -18px rgba(0, 0, 0, 0.9);
+    --bg: #050507;
+    --panel-bg: rgba(20, 20, 25, 0.4);
+    --glass: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-blur: blur(30px);
+    --text: #f8fafc;
+    --text-muted: #64748b;
+    --text-light: #f1f5f9;
+    --success: #10b981;
+    --error: #f43f5e;
+    --studio-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.9), 0 20px 50px -25px rgba(0, 0, 0, 0.8);
+    --neon-shadow: 0 0 20px var(--accent-glow);
 }
 
 .sr-only {
@@ -45,37 +47,44 @@ body.theme-solar {
 /* Command Palette */
 .command-palette {
     position: fixed;
-    top: 20%;
+    top: 15%;
     left: 50%;
-    transform: translate(-50%, -20%) scale(0.95);
-    width: 600px;
-    background: rgba(10, 10, 15, 0.8);
-    -webkit-backdrop-filter: blur(30px);
-    backdrop-filter: blur(30px);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    z-index: 1000;
-    padding: 20px;
+    transform: translate(-50%, -20%) scale(0.9);
+    width: 650px;
+    background: rgba(15, 15, 20, 0.6);
+    -webkit-backdrop-filter: blur(50px) saturate(200%);
+    backdrop-filter: blur(50px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    z-index: 10000;
+    padding: 0;
     display: none;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-    transition: all 0.2s ease;
+    box-shadow: 0 50px 100px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(255,255,255,0.05);
+    transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    opacity: 0;
 }
 
 .command-palette.active {
     display: block;
-    transform: translate(-50%, -20%) scale(1);
+    transform: translate(-50%, 0%) scale(1);
+    opacity: 1;
+}
+
+.command-header {
+    padding: 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
 .command-input {
     width: 100%;
     background: transparent;
     border: none;
-    border-bottom: 1px solid var(--glass-border);
     color: var(--text);
-    font-size: 20px;
-    padding: 10px;
+    font-size: 24px;
+    font-weight: 200;
     font-family: 'Outfit', sans-serif;
     outline: none;
+    letter-spacing: -0.5px;
 }
 
 .command-results {
@@ -118,8 +127,9 @@ body {
     font-family: 'Outfit', sans-serif;
     height: 100vh;
     overflow: hidden;
-    background: url('zenith_professional_wallpaper_1777356063201.png') no-repeat center center fixed;
-    background-size: cover;
+    background: radial-gradient(circle at 0% 0%, rgba(251, 191, 36, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+                #050507;
 }
 
 /* Background Overlay */
@@ -129,45 +139,49 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at center, transparent, rgba(0,0,0,0.4));
-    z-index: 0;
-    pointer-events: none;
+    background-image: url('zenith_professional_wallpaper_1777356063201.png');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.8;
+    z-index: -1;
+    filter: saturate(1.2) brightness(0.8);
 }
+
 .desktop-overlay::after {
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    opacity: 0.04;
-    mix-blend-mode: overlay;
+    background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.6) 100%);
     pointer-events: none;
 }
 
 /* Taskbar (Sigma-Dock) */
 .taskbar {
     position: fixed;
-    bottom: 20px;
+    bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
     width: auto;
-    min-width: 450px;
-    height: 64px;
-    background: var(--panel-bg);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    backdrop-filter: blur(40px) saturate(180%);
-    border: 1px solid var(--glass-border);
-    border-radius: 24px;
+    min-width: 500px;
+    height: 72px;
+    background: rgba(15, 15, 20, 0.4);
+    -webkit-backdrop-filter: blur(50px) saturate(200%);
+    backdrop-filter: blur(50px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 30px;
-    gap: 15px;
+    padding: 10px 40px;
+    gap: 20px;
     z-index: 500;
-    box-shadow: var(--studio-shadow);
-    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 40px 80px -15px rgba(0,0,0,0.9);
+    transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
 }
+
 .taskbar:hover {
-    transform: translateX(-50%) scale(1.02);
+    transform: translateX(-50%) translateY(-5px);
+    background: rgba(20, 20, 25, 0.5);
     border-color: var(--accent);
 }
 .shelf-icons {
@@ -254,19 +268,20 @@ body {
 }
 
 .widget {
-    background: var(--panel-bg);
-    -webkit-backdrop-filter: blur(30px) saturate(150%);
-    backdrop-filter: blur(30px) saturate(150%);
-    border: 1px solid var(--glass-border);
-    border-radius: 24px;
-    padding: 30px;
+    background: rgba(255, 255, 255, 0.03);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    backdrop-filter: blur(40px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 28px;
+    padding: 24px;
     transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-    box-shadow: var(--studio-shadow);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.05);
 }
 .widget:hover {
-    transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-10px) scale(1.02);
+    background: rgba(255, 255, 255, 0.06);
     border-color: var(--accent);
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 30px var(--accent-glow);
 }
 
 .widget::before {
@@ -369,24 +384,32 @@ body {
 /* Clock */
 .clock-container {
     position: fixed;
-    top: 40px;
+    top: 50px;
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
     z-index: 50;
+    pointer-events: none;
 }
 
 #clock-time {
-    font-size: 84px;
-    font-weight: 200;
-    letter-spacing: -2px;
+    font-size: 110px;
+    font-weight: 800;
+    letter-spacing: -5px;
+    background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.4) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
 }
 
 #clock-date {
-    font-size: 16px;
-    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
     text-transform: uppercase;
-    letter-spacing: 4px;
+    letter-spacing: 6px;
+    margin-top: 10px;
+    opacity: 0.8;
 }
 
 /* App Icons on Desktop */
@@ -589,14 +612,14 @@ body {
     display: none;
     position: absolute;
     z-index: 1000;
-    border: 1px solid var(--accent);
-    border-radius: 12px;
+    background: rgba(15, 15, 20, 0.4);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    backdrop-filter: blur(40px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-    background: rgba(10, 10, 15, 0.4);
-    -webkit-backdrop-filter: blur(25px) saturate(180%);
-    backdrop-filter: blur(25px) saturate(180%);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.05);
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.4s ease;
 }
 
 .window-header {
@@ -1580,4 +1603,7 @@ body {
 
 
 .eighty-seven-width { width: 87%; }
+
+
+.mouse-glow { position: fixed; width: 400px; height: 400px; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 1; transform: translate(-50%, -50%); transition: opacity 0.3s; opacity: 0; }
 
