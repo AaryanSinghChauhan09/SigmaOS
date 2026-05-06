@@ -1,42 +1,68 @@
 # Contributing to SigmaOS
 
-Thank you for considering a contribution to the **SigmaOS Sovereign Lattice**!
+Thank you for helping improve SigmaOS. This document points to the conventions and automation used in this repository.
 
-## Getting Started
+## Where to start
 
-1. **Fork** the repository and create a branch from `main`.
+- Read the **[Developer Guide](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/BuildGuide)** (published copy: [GitHub Wiki — Developer Guide](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Developer-Guide)).
+- For the browser shell, see **[Zenith Desktop](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Zenith-Desktop)** and `zenith_desktop.js`.
 
-2. **Build** the project using the deterministic build pipeline:
+- For scope and honesty about what is implemented vs. aspirational, see `https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/INDUSTRIAL_GAP_RESOLUTION` and **[Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Home)**.
 
-   ```bash
-   python3 tools/sigma-build.py
-   ```
+## C and C++ (kernel / core)
 
-1. **Run static analysis** before submitting:
+- Format with **clang-format** using the repo root [`LICENSE`](LICENSE).
 
-   ```bash
-   cppcheck --enable=warning,style,performance kernel/core/
-   ```
+- Pull requests are checked for style on **changed** `.cpp` / `.h` / `.hpp` files (see `.github/workflows/ci.yml`).
 
-## Code Standards
+- Prefer **`sigma_status`** + [`include/sigma_types.h`](include/sigma_types.h) over exceptions (kernel uses `-fno-exceptions`). See [`https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture`](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture).
 
-All contributions must adhere to the **Sovereign Shard Standard**:
+- Host smoke test: `make check-host` (compiles `tests/cpp_host` against headers).
 
-- ✅ Every new kernel component must be a **C++ OOP Singleton** with `extern "C"` wrappers
+- Static analysis: `cppcheck` and `clang-tidy` run in existing quality workflows (see `.github/workflows/sigma_quality.yml`).
 
- ✅ All functions must emit structured log output via `sigma_log()` / `sigma_printf()`
+Generate API HTML locally:
 
- ✅ New shards must be registered in `SovereignUSR` at init.
+```bash
 
-## Pull Request Checklist
+sudo apt install doxygen graphviz   # optional: graphviz for diagrams
+doxygen Doxyfile
 
-- [ ] Code compiles with `-Wall -Wextra -Werror
+# Open docs/api/html/index.html
 
- [ ] New shard has a `_init()`, at least one primary function, and C wrapper
+```
 
- [ ] `MISSING_COMPONENTS.md` updated if a gap is closed
+## Python (host scripts)
 
-## Security Issues
+- Format with **Black** using [`pyproject.toml`](pyproject.toml) (`scripts/`, `tools/`, root `fix_includes.py`). The `userland/` tree is excluded until you opt in.
 
-Please **do not** open public issues for security vulnerabilities. Read [SECURITY.md](../SECURITY) for responsible disclosure guidelines.
+- CI: `.github/workflows/python_quality.yml` (`black --check`, `pytest`).
 
+## JavaScript (Zenith Desktop)
+
+- Modules live under `zenith_desktop.js`; the entry point is `zenith_desktop.jsmain.js`.
+
+- Inline `onclick` handlers in `index.html` require corresponding exports on `window` in `main.js`.
+
+## Documentation and wiki
+
+- Wiki **source** pages live in **`docs/wiki/`**.
+
+- Pushes to the default branch sync the wiki when **`WIKI_SYNC_TOKEN`** is configured (see `docs/wiki/README.md`).
+
+- Large design matrices and backlogs stay in `docs/`; the wiki links to them where useful.
+
+- Cross-cutting **future improvements** (CI, security process, tooling): [`docs/REPO_FUTURE_IMPROVEMENTS.md`](docs/REPO_FUTURE_IMPROVEMENTS.md).
+
+## Issues and PRs
+
+Use the GitHub issue templates for bugs and features. In PRs, describe motivation, testing performed, and any user-visible or build changes.
+
+## Development Setup & Verification
+
+To verify the boot process locally in QEMU:
+1. Ensure you have `build-essential`, `nasm`, and `qemu-system-x86` installed.
+2. Run `./qemu-boot.sh` from the repository root.
+   - This script will build the kernel.
+   - It will launch QEMU headlessly and pipe the serial output to `serial.log`.
+   - It will automatically verify that the `"SOVEREIGN BOOT"` message appears, validating a successful boot.
