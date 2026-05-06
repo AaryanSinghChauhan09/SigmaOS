@@ -9,15 +9,17 @@ CXX      = g++
 AS       = nasm
 QEMU     = qemu-system-x86_64
 CXXFLAGS = -ffreestanding -O2 -Wall -Wextra -Werror -fno-exceptions -fno-rtti -std=c++17 \
-           -I./include -fno-stack-protector -mno-red-zone
+           -I./include -fno-stack-protector -mno-red-zone -MMD -MP
 ASFLAGS  = -f elf64
 
 # Industrial Shard Orchestration (600-Shard Lattice)
 # Dynamically discovers all .cpp, .c, and .asm files in the kernel structure
-KERNEL_SHARDS = $(patsubst %.cpp,%.o,$(shell find kernel/core kernel/shards -name "*.cpp")) \
-                $(patsubst %.c,%.o,$(shell find kernel/core kernel/shards -name "*.c")) \
-                $(patsubst %.asm,%.o,$(shell find kernel/core kernel/shards -name "*.asm"))
+KERNEL_SHARDS = $(patsubst %.cpp,%.o,$(shell find kernel/core kernel/shards -name "*.cpp" 2>/dev/null)) \
+                $(patsubst %.c,%.o,$(shell find kernel/core kernel/shards -name "*.c" 2>/dev/null)) \
+                $(patsubst %.asm,%.o,$(shell find kernel/core kernel/shards -name "*.asm" 2>/dev/null))
 
+# Dependency files
+DEPS = $(KERNEL_SHARDS:.o=.d)
 
 .PHONY: all singularity zenith-iso qemu clean
 
@@ -40,7 +42,9 @@ zenith-iso: singularity
 	@echo "[STATUS] Deployment image ready: zenith-singularity.iso"
 
 clean:
-	rm -f $(KERNEL_SHARDS) sigmaos.bin zenith-singularity.iso
+	rm -f $(KERNEL_SHARDS) $(DEPS) sigmaos.bin zenith-singularity.iso
+
+-include $(DEPS)
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

@@ -1,4 +1,22 @@
-/** SigmaOS Zenith Desktop — https://github.com/AaryanSinghChauhan09/SigmaOS */
+
+const SecurityUtils = {
+    sanitizeHTML(html) {
+        const div = document.createElement('div');
+        div.textContent = html;
+        return div.innerHTML;
+    }
+};
+
+const InputValidator = {
+    isValidURL(str) {
+        try { new URL(str.startsWith('http') ? str : 'http://' + str); return true; } catch { return false; }
+    },
+    sanitizeInput(str, maxLength = 1000) {
+        if (typeof str !== 'string') return '';
+        return str.slice(0, maxLength).trim();
+    }
+};
+\n/** SigmaOS Zenith Desktop — https://github.com/AaryanSinghChauhan09/SigmaOS */
 'use strict';
 
 const SIGMA_APP_VERSION = '100.0';
@@ -218,7 +236,16 @@ function minimizeWindow(id) {
         });
 
         if (cmdInput) {
-            cmdInput.addEventListener('input', () => {
+            
+function createDebounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => { clearTimeout(timeout); func(...args); };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+\n        const filterCommands = createDebounce((q) => {\n            document.querySelectorAll('#cmd-results .command-item').forEach((el) => {\n                const t = el.textContent.toLowerCase();\n                el.style.display = !q || t.includes(q) ? '' : 'none';\n            });\n        }, 200);\n\n        cmdInput.addEventListener('input', (e) => {\n            const q = e.target.value.trim().toLowerCase();\n            filterCommands(q);\n        });\n/*
                 const q = cmdInput.value.trim().toLowerCase();
                 document.querySelectorAll('#cmd-results .command-item').forEach((el) => {
                     const t = el.textContent.toLowerCase();
@@ -394,30 +421,25 @@ function minimizeWindow(id) {
             const urlInput = document.getElementById('status-url');
             const output = document.getElementById('status-output');
             if (!urlInput || !output) return;
-            const url = urlInput.value;
-            const safeUrl = escapeHtml(url);
-            output.innerHTML = `<span style="color: var(--accent);">Checking silicon route to ${safeUrl}...</span>`;
+            const url = InputValidator.sanitizeInput(urlInput.value);
+            if (!url || !InputValidator.isValidURL(url)) {
+                output.textContent = '❌ Invalid URL format';
+                output.style.color = 'var(--error)';
+                return;
+            }
+            output.textContent = `Checking: ${url}...`;
+            output.style.color = 'var(--accent)';
             setTimeout(() => {
-                output.innerHTML = `<span style="color: var(--success);">✔ ${safeUrl} is UP and responsive in the lattice.</span>`;
-                addLog("Σ [UTILITY]: Route check complete for " + url, "success");
+                output.textContent = `✔ ${url} is UP and responsive in the lattice.`;
+                output.style.color = 'var(--success)';
             }, 1500);
-        }
-
-        function flashBootable() {
+        }\n\n        function flashBootable() {
             document.getElementById('boot-target').innerText = "SiliconDrive (64GB) [LOCKED]";
             const barContainer = document.getElementById('flash-progress');
             const bar = document.getElementById('flash-bar');
             barContainer.style.display = 'block';
             let progress = 0;
-            const interval = setInterval(() => {
-                progress += 5;
-                bar.style.width = progress + '%';
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    addLog("Σ [FLASH]: Bootable shard written successfully.", "success");
-                }
-            }, 100);
-        }
+            const interval =         }
 
         function convertTable() {
             const inputEl = document.getElementById('table-input');
@@ -425,17 +447,21 @@ function minimizeWindow(id) {
             if (!inputEl || !outputEl) return;
             const csv = inputEl.value;
             const rows = csv.split('\n');
-            let html = '<table style="width: 100%; border-collapse: collapse; font-size: 0.8em; color: white;">';
+            const table = document.createElement('table');
+            table.style.cssText = 'width: 100%; border-collapse: collapse; font-size: 0.8em; color: white;';
             rows.forEach((row, i) => {
-                html += '<tr>';
+                const tr = document.createElement('tr');
                 row.split(',').forEach(col => {
-                    const safeCol = escapeHtml(col.trim());
-                    html += `<td style="border: 1px solid rgba(255,255,255,0.1); padding: 8px; ${i===0?'background: rgba(0,255,255,0.1); font-weight: 800;':''} ">${safeCol}</td>`;
+                    const td = document.createElement('td');
+                    td.textContent = col.trim();
+                    td.style.cssText = 'border: 1px solid rgba(255,255,255,0.1); padding: 8px;';
+                    if (i === 0) td.style.cssText += 'background: rgba(0,255,255,0.1); font-weight: 800;';
+                    tr.appendChild(td);
                 });
-                html += '</tr>';
+                table.appendChild(tr);
             });
-            html += '</table>';
-            outputEl.innerHTML = html;
+            outputEl.innerHTML = '';
+            outputEl.appendChild(table);
             addLog("Σ [UTILITY]: CSV-to-Table conversion complete.", "success");
         }
 
@@ -541,323 +567,7 @@ function minimizeWindow(id) {
         function startSpeedTest() {
             const gauge = document.getElementById('speed-gauge');
             let speed = 0;
-            const interval = setInterval(() => {
-                speed = Math.floor(Math.random() * 900) + 100;
-                gauge.innerText = speed;
-                gauge.style.borderColor = `hsl(${speed/10}, 70%, 50%)`;
-            }, 100);
-            setTimeout(() => {
-                clearInterval(interval);
-                addLog(`Σ [SPEED]: Test complete. Result: ${speed} MBPS.`, "success");
-            }, 3000);
-        }
-
-        function dataAction(action) {
-            const input = document.getElementById('util-data-input').value;
-            const output = document.getElementById('util-data-output');
-            if (action === 'json-xml') {
-                output.innerText = "<root>\n  <data>" + input + "</data>\n</root>";
-            } else {
-                output.innerText = "[{ \"data\": \"" + input + "\" }]";
-            }
-            addLog(`Σ [UTILITY]: Data conversion complete.`, "success");
-        }
-
-        function renderCode() {
-            const code = document.getElementById('util-code-input').value;
-            document.getElementById('code-render-box').innerText = code;
-            addLog("Σ [UTILITY]: Code-to-Image preview rendered.", "success");
-        }
-
-        function compareText() {
-            const left = document.getElementById('diff-left').value;
-            const right = document.getElementById('diff-right').value;
-            const output = document.getElementById('diff-output');
-            
-            if (left === right) {
-                output.innerHTML = '<span style="color: var(--success);">✔ Shards are bit-perfect matches.</span>';
-            } else {
-                output.innerHTML = '<span style="color: var(--error);">✘ Shard mismatch detected. Diff reconciliation required.</span>';
-            }
-            addLog("Σ [UTILITY]: Text comparison complete.", "success");
-        }
-
-        function textAction(action) {
-            const input = document.getElementById('util-text-input').value;
-            const output = document.getElementById('util-text-output');
-            
-            if (action === 'upper') output.innerText = input.toUpperCase();
-            else if (action === 'lower') output.innerText = input.toLowerCase();
-            else if (action === 'title') output.innerText = input.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
-            else if (action === 'sentence') output.innerText = input.toLowerCase().replace(/(^\s*\w|[\.\!\?]\s*\w)/g, c => c.toUpperCase());
-            else if (action === 'count') {
-                const words = input.trim().split(/\s+/).filter(w => w.length > 0).length;
-                const chars = input.length;
-                const lines = input.split('\n').filter(l => l.length > 0).length;
-                output.innerText = `Words: ${words} | Characters: ${chars} | Lines: ${lines}`;
-            }
-            else if (action === 'clear-lines') output.innerText = input.replace(/\n/g, ' ');
-            
-            addLog(`Σ [UTILITY]: Executed ${action} on text buffer.`, "success");
-        }
-
-        function forgeHTML() {
-            const input = document.getElementById('markup-input').value;
-            const output = document.getElementById('markup-output');
-            
-            // Simple Text-to-HTML conversion logic
-            let html = input
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;")
-                .replace(/\n/g, "<br>\n");
-            
-            // Add some "sovereign" tags
-            html = html.replace(/Σ/g, '<span style="color: cyan;">Σ</span>');
-            
-            output.innerText = html;
-            addLog("Σ [MARKUP]: HTML Shard forged successfully.", "success");
-        }
-
-        function clearMarkup() {
-            document.getElementById('markup-input').value = '';
-            document.getElementById('markup-output').innerText = '';
-            addLog("Σ [MARKUP]: Buffer purged.", "success");
-        }
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                document.getElementById('start-menu').classList.remove('active');
-                document.getElementById('cmd-palette').classList.remove('active');
-                hideContextMenu();
-                toggleNotifications(false);
-                toggleBatteryPanel(false);
-            }
-        });
-
-        setInterval(() => {
-            smoothCpu = Math.max(5, Math.min(95, smoothCpu + (Math.random() - 0.5) * 5));
-            const cpu = Math.round(smoothCpu);
-            document.getElementById('cpu-load').textContent = cpu + "%";
-            document.getElementById('cpu-progress').style.width = cpu + "%";
-            updateGraph(cpu);
-
-            smoothMem = Math.max(3.5, Math.min(8.0, smoothMem + (Math.random() - 0.5) * 0.08));
-            document.getElementById('mem-load').textContent = smoothMem.toFixed(1) + " GB";
-            document.getElementById('mem-progress').style.width = (35 + smoothCpu * 0.45) + "%";
-
-            const cacheHit = (99.0 + Math.random() * 0.9).toFixed(1);
-            document.getElementById('cache-hit').textContent = cacheHit + "% Hit";
-            document.getElementById('cache-progress').style.width = cacheHit + "%";
-
-            // Voice Simulation
-            if (Math.random() > 0.98) {
-                document.getElementById('voice-status').textContent = "Listening...";
-                document.getElementById('voice-status').style.color = "var(--success)";
-                addLog("Σ [VOICE]: Wake-word 'Sigma' detected. Listening...", "success");
-
-                setTimeout(() => {
-                    document.getElementById('voice-status').textContent = "Processing";
-                    document.getElementById('voice-status').style.color = "var(--accent)";
-                    setTimeout(() => {
-                        document.getElementById('voice-status').textContent = "Idle";
-                        document.getElementById('voice-status').style.color = "var(--text-muted)";
-                        addLog("Σ [VOICE]: Transcription: 'Initialize neural lattice'. Executing...", "success");
-                    }, 1500);
-                }, 2000);
-            }
-
-            // Automation Simulation
-            const efficiency = (97.0 + Math.random() * 2.5).toFixed(1);
-            document.getElementById('auto-efficiency').textContent = `Efficiency: ${efficiency}%`;
-            document.getElementById('auto-progress').style.width = efficiency + "%";
-
-            // Vault Simulation
-            if (Math.random() > 0.99) {
-                document.getElementById('vault-status').textContent = "Syncing";
-                document.getElementById('vault-status').style.color = "var(--accent)";
-                addLog("Σ [STORAGE]: Synchronizing state with decentralized lattice...", "success");
-
-                setTimeout(() => {
-                    document.getElementById('vault-status').textContent = "Pinned";
-                    document.getElementById('vault-status').style.color = "var(--text-muted)";
-                    addLog("Σ [STORAGE]: State Shard pinned. CID: Qm... finalized.", "success");
-                }, 2500);
-            }
-            document.getElementById('vault-progress').style.width = (60 + Math.random() * 10) + "%";
-
-            // VFS Simulation
-            if (Math.random() > 0.96) {
-                const nodes = Math.floor(Math.random() * 5) + 10;
-                document.getElementById('vfs-nodes').textContent = `${nodes} Nodes`;
-                addLog(`Σ [VFS]: Registered ${nodes} active shard nodes.`, "success");
-            }
-            document.getElementById('vfs-progress').style.width = (75 + Math.random() * 10) + "%";
-
-            // Memory Simulation
-            const memUsage = (20 + Math.random() * 10).toFixed(0);
-            document.getElementById('mem-usage').textContent = `${memUsage}% Used`;
-            document.getElementById('memory-progress').style.width = memUsage + "%";
-
-            // Sync Simulation
-            if (Math.random() > 0.95) {
-                const latency = (5 + Math.random() * 15).toFixed(0);
-                document.getElementById('sync-latency').textContent = `${latency}ms Latency`;
-                addLog(`Σ [SYNC]: Distributed lock cycle complete. Latency: ${latency}ms.`, "success");
-            }
-            document.getElementById('sync-progress').style.width = (90 + Math.random() * 10) + "%";
-
-            // UI Simulation
-            const frameTime = (8.0 + Math.random() * 0.5).toFixed(1);
-            document.getElementById('ui-frametime').textContent = `${frameTime}ms`;
-            document.getElementById('ui-progress').style.width = "100%";
-
-            // Silicon Simulation
-            if (Math.random() > 0.98) {
-                const bus = Math.floor(Math.random() * 10).toString().padStart(2, '0');
-                const slot = Math.floor(Math.random() * 32).toString().padStart(2, '0');
-                document.getElementById('pci-devices').textContent = `Bus: ${bus} | Slot: ${slot}`;
-                addLog(`Σ [PCI]: Hardware Shard detected on Bus ${bus}, Slot ${slot}. Auditing...`, "success");
-            }
-            document.getElementById('silicon-progress').style.width = "100%";
-
-            // Scholar Simulation
-            const labs = ["Physics: Magnetism", "Chemistry: Titration", "Biology: Microscopy", "Math: Geometry"];
-            if (Math.random() > 0.95) {
-                const lab = labs[Math.floor(Math.random() * labs.length)];
-                document.getElementById('lab-active').textContent = lab;
-                addLog(`Σ [SCHOLAR]: Executing Virtual Lab Shard: ${lab}. Procedure synced.`, "success");
-            }
-            document.getElementById('scholar-progress').style.width = (95 + Math.random() * 5) + "%";
-
-            // Persona Simulation
-            if (Math.random() > 0.99) {
-                const names = ["Sovereign_Alpha", "Lattice_Master", "Silicon_Savant"];
-                const name = names[Math.floor(Math.random() * names.length)];
-                document.getElementById('persona-name').textContent = name;
-                document.getElementById('menu-user-name').textContent = name;
-                addLog(`Σ [PERSONA]: Identity Shard adapted. New Alias: ${name}.`, "success");
-            }
-            document.getElementById('persona-progress').style.width = "100%";
-
-            // Sentinel Simulation
-            if (Math.random() > 0.94) {
-                const scrubs = Math.floor(Math.random() * 20) + 10;
-                document.getElementById('log-scrubs').textContent = `${scrubs} Scrubs`;
-                addLog(`Σ [SENTINEL]: Amnesic audit complete. ${scrubs} traces neutralized.`, "success");
-            }
-            document.getElementById('amnesic-progress').style.width = (80 + Math.random() * 20) + "%";
-
-            // Judicial Simulation
-            if (Math.random() > 0.98) {
-                document.getElementById('legal-status').textContent = "AUDITING";
-                document.getElementById('legal-status').style.color = "var(--accent)";
-                addLog("Σ [LEGAL]: Performing BNSS/BNS/BSA silicon-to-statute audit...", "success");
-
-                setTimeout(() => {
-                    document.getElementById('legal-status').textContent = "Compliant";
-                    document.getElementById('legal-status').style.color = "var(--success)";
-                    addLog("Σ [LEGAL]: Judicial integrity verified. Compliance: 100%.", "success");
-                }, 2000);
-            }
-            document.getElementById('legal-progress').style.width = "100%";
-
-            // Colonization Simulation
-            if (Math.random() > 0.99) {
-                const nodes = parseInt(document.getElementById('node-count').textContent) + 1;
-                document.getElementById('node-count').textContent = `${nodes} Nodes`;
-                addLog(`Σ [COLONIZER]: Shard projection successful. New node colonized in the mesh.`, "success");
-            }
-            document.getElementById('mesh-progress').style.width = (40 + Math.random() * 60) + "%";
-
-            // VRAM Simulation
-            const vramUsage = (10 + Math.random() * 10).toFixed(0);
-            document.getElementById('vram-usage').textContent = `${vramUsage}MB / 256MB`;
-            document.getElementById('vram-progress').style.width = (vramUsage / 2.56) + "%";
-
-            // Boot Simulation
-            document.getElementById('boot-progress-bar').style.width = "98%";
-
-            // Integrity Simulation
-            if (Math.random() > 0.97) {
-                document.getElementById('test-status').textContent = "Auditing";
-                document.getElementById('test-status').style.color = "var(--accent)";
-                addLog("Σ [AUDIT]: Running 500-shard integrity verification...", "success");
-
-                setTimeout(() => {
-                    document.getElementById('test-status').textContent = "Verified";
-                    document.getElementById('test-status').style.color = "var(--success)";
-                    addLog("Σ [AUDIT]: All shards verified. Integrity: BIT-PERFECT.", "success");
-                }, 1800);
-            }
-            document.getElementById('test-progress').style.width = "100%";
-
-            // Entropy Simulation
-            const entropyHex = Array.from({ length: 4 }, () => Math.floor(Math.random() * 256).toString(16).padStart(2, '0')).join('').toUpperCase();
-            document.getElementById('entropy-val').textContent = `0x${entropyHex}...`;
-            document.getElementById('entropy-progress').style.width = (85 + Math.random() * 15) + "%";
-
-            // UI Interactions
-            // Self-Healing Simulation
-            const auditTime = Math.floor(Math.random() * 15) + 5;
-            document.getElementById('healing-info').textContent = `Last Audit: ${auditTime}ms ago`;
-            const healingProgress = Math.floor(Math.random() * 20) + 80;
-            document.getElementById('healing-progress').style.width = healingProgress + "%";
-
-            if (Math.random() > 0.95) {
-                document.getElementById('healing-status').textContent = "RESTORING";
-                document.getElementById('healing-status').style.color = "var(--error)";
-                addLog("Σ [SELF-HEAL]: Entropy spike detected in VFS shard. Restoring...", "error");
-                setTimeout(() => {
-                    document.getElementById('healing-status').textContent = "OPTIMAL";
-                    document.getElementById('healing-status').style.color = "var(--success)";
-                    addLog("Σ [SELF-HEAL]: VFS Shard restored to bit-perfect state.", "success");
-                }, 1500);
-            }
-
-            // Security Audit Simulation
-            const secProgress = (parseFloat(document.getElementById('security-progress').style.width) || 0) + (Math.random() * 10);
-            if (secProgress >= 100) {
-                document.getElementById('security-progress').style.width = "0%";
-                document.getElementById('security-info').textContent = "Scanning Lattice...";
-                if (Math.random() > 0.8) {
-                    addLog("Σ [SEC-AUDIT]: Architectural drift detected. Hardening lattice...", "error");
-                    document.getElementById('security-status').textContent = "HARDENING";
-                    document.getElementById('security-status').style.color = "var(--error)";
-                    setTimeout(() => {
-                        document.getElementById('security-status').textContent = "SHIELDED";
-                        document.getElementById('security-status').style.color = "var(--accent)";
-                        addLog("Σ [SEC-AUDIT]: Lattice-PQC parity restored.", "success");
-                    }, 2000);
-                }
-            } else {
-                document.getElementById('security-progress').style.width = secProgress + "%";
-                document.getElementById('security-info').textContent = `Auditing Shard ${Math.floor(Math.random() * 500)}...`;
-            }
-
-            // Colonization Simulation
-            const colProgress = (parseFloat(document.getElementById('col-progress').style.width) || 0) + (Math.random() * 5);
-            if (colProgress >= 100) {
-                const nodes = parseInt(document.getElementById('node-count').textContent) + 1;
-                document.getElementById('node-count').textContent = `${nodes} Nodes`;
-                document.getElementById('col-progress').style.width = "0%";
-                const newIp = `192.168.1.${Math.floor(Math.random() * 254) + 1}`;
-                document.getElementById('col-target').textContent = `Target: ${newIp}`;
-                addLog(`Σ [COLONIZER]: Shard projected to ${newIp}. Node synchronized.`, "success");
-            } else {
-                document.getElementById('col-progress').style.width = colProgress + "%";
-            }
-
-            // Shard Matrix Animation
-            const dots = document.querySelectorAll('.shard-dot');
-            dots.forEach(dot => {
-                if (Math.random() > 0.98) {
-                    dot.classList.toggle('active');
-                }
-            });
-
+            const interval = 
             if (Math.random() > 0.99) {
                 const faultIdx = Math.floor(Math.random() * 500);
                 dots[faultIdx].classList.add('error');
@@ -1220,3 +930,72 @@ function evaluateLatticeRun(query) {
 
 
 
+\n
+// REFACTORED TELEMETRY SYSTEM
+class TelemetrySystem {
+    constructor() {
+        this.smoothCpu = 12;
+        this.smoothMem = 4.2;
+        this.batCharge = 87;
+        this.peers = 0;
+        this.animationFrameId = null;
+        this.lastUpdateTime = 0;
+        this.updateInterval = 2000;
+        
+        this.domCache = {
+            cpuLoad: document.getElementById('cpu-load'),
+            cpuProgress: document.getElementById('cpu-progress'),
+            memLoad: document.getElementById('mem-load'),
+            memProgress: document.getElementById('mem-progress'),
+            vfsNodes: document.getElementById('vfs-nodes'),
+            vfsProgress: document.getElementById('vfs-progress'),
+            uiFrametime: document.getElementById('ui-frametime')
+        };
+    }
+    start() {
+        this.lastUpdateTime = Date.now();
+        this.loop();
+    }
+    stop() {
+        if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+    }
+    loop = () => {
+        const now = Date.now();
+        if (now - this.lastUpdateTime >= this.updateInterval) {
+            this.updateAllMetrics();
+            this.lastUpdateTime = now;
+        }
+        this.animationFrameId = requestAnimationFrame(this.loop);
+    }
+    updateAllMetrics() {
+        this.updateCPUMetrics();
+        this.updateMemoryMetrics();
+        this.updateVFSMounts();
+        this.updateUI();
+    }
+    updateCPUMetrics() {
+        this.smoothCpu = Math.max(5, Math.min(95, this.smoothCpu + (Math.random() - 0.5) * 5));
+        const cpu = Math.round(this.smoothCpu);
+        if (this.domCache.cpuLoad) this.domCache.cpuLoad.textContent = cpu + "%";
+        if (this.domCache.cpuProgress) this.domCache.cpuProgress.style.width = cpu + "%";
+        if (typeof updateGraph === 'function') updateGraph(cpu);
+    }
+    updateMemoryMetrics() {
+        this.smoothMem = Math.max(3.5, Math.min(8.0, this.smoothMem + (Math.random() - 0.5) * 0.08));
+        if (this.domCache.memLoad) this.domCache.memLoad.textContent = this.smoothMem.toFixed(1) + " GB";
+        if (this.domCache.memProgress) this.domCache.memProgress.style.width = (35 + this.smoothCpu * 0.45) + "%";
+    }
+    updateVFSMounts() {
+        if (Math.random() > 0.96 && this.domCache.vfsNodes) {
+            const nodes = Math.floor(Math.random() * 5) + 10;
+            this.domCache.vfsNodes.textContent = `${nodes} Nodes`;
+        }
+        if (this.domCache.vfsProgress) this.domCache.vfsProgress.style.width = (75 + Math.random() * 10) + "%";
+    }
+    updateUI() {
+        if (this.domCache.uiFrametime) this.domCache.uiFrametime.textContent = (8.0 + Math.random() * 0.5).toFixed(1) + 'ms';
+    }
+}
+const telemetry = new TelemetrySystem();
+window.addEventListener('load', () => telemetry.start());
+window.addEventListener('beforeunload', () => telemetry.stop());
