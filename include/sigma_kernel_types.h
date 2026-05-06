@@ -75,6 +75,7 @@ static inline void cpu_fence(void) { __asm__ __volatile__("mfence" ::: "memory")
 static inline void cpu_sti(void)   { __asm__ __volatile__("sti"); }
 static inline void cpu_cli(void)   { __asm__ __volatile__("cli"); }
 
+#ifndef SIGMA_HOST
 static inline sigma_u64 cpu_rdtsc(void) {
     sigma_u64 v;
     __asm__ __volatile__(
@@ -82,6 +83,11 @@ static inline sigma_u64 cpu_rdtsc(void) {
         : "=a"(v) :: "rdx");
     return v;
 }
+#else
+/* Mock version for host-mode tests */
+sigma_u64 cpu_rdtsc(void);
+#endif
+
 
 static inline sigma_u64 cpu_read_cr3(void) {
     sigma_u64 v;

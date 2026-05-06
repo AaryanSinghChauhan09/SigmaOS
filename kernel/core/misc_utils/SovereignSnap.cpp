@@ -7,6 +7,7 @@
 
 
 
+
 namespace SigmaOS {
 namespace Kernel {
 namespace UI {
@@ -36,16 +37,17 @@ void SovereignSnapEngine::applyLayout(sigma_u32 layout_id) {
 void SovereignSnapEngine::registerZone(sigma_u32 x, sigma_u32 y,
                                         sigma_u32 w, sigma_u32 h) {
     if (this->active_zone_count < 8u) {
-        sigma_snap_zone_t* zone = &this->zones[this->active_zone_count++];
+        sigma_snap_zone_t* zone = &this->m_zones[this->active_zone_count++];
         zone->id       = this->active_zone_count;
         zone->x        = x;
         zone->y        = y;
         zone->w        = w;
         zone->h        = h;
         zone->capacity = w * h;
-        log_emit(LOG_INFO, "Σ [SNAP]: Zone registered.");
+        log_emit(LOG_INFO, "Σ [SNAP]: Zone registered and calibrated.");
     }
 }
+
 
 } // namespace UI
 } // namespace Kernel

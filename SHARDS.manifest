@@ -22,3 +22,5 @@ kernel/core/ui/SovereignZenithUI.cpp
 # --- System Services ---
 kernel/core/system/SovereignSyscall.cpp
 kernel/core/system/SovereignScheduler.cpp
+kernel/core/system/SovereignShardManager.cpp
+

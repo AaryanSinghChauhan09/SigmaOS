@@ -28,7 +28,7 @@ private:
     SovereignSnapEngine();
     sigma_u32 initialized;
     sigma_u32 active_zone_count;
-    sigma_snap_zone_t zones[8];
+    sigma_snap_zone_t m_zones[8];
 };
 
 } // namespace UI

@@ -980,7 +980,7 @@ function processData() {
     setTimeout(() => {
         output.innerHTML += '<span class=\"text-blue\">[SDP] Data Sharding complete. Partitioning into 4096 blocks...</span><br>';
         setTimeout(() => {
-            output.innerHTML += '<span class=\"text-success\">[SDP] Forge Complete. Latency: 0.12ms. Sovereignty Absolute.</span><br>';
+            output.innerHTML += '<span class=\"text-success\">[SDP] Forge Complete. Latency Absolute.</span><br>';
             output.innerHTML += '<pre style=\"color: #fff; margin-top: 10px;\">' + btoa(input).substring(0, 100) + '... [ENCODED]</pre>';
         }, 800);
     }, 500);
@@ -1027,7 +1027,7 @@ function evaluateLatticeRun(query) {
 
 
 
-\n
+
 // REFACTORED TELEMETRY SYSTEM
 class TelemetrySystem {
     constructor() {
