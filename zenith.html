@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Σ SIGMAOS: SOVEREIGN ZENITH</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="zenith_desktop.css">
+    <style>
+        @keyframes shatter {
+            0% { transform: scale(1) rotate(0); opacity: 1; filter: blur(0); }
+            100% { transform: scale(1.2) rotate(10deg); opacity: 0; filter: blur(20px); }
+        }
+        .shattering {
+            animation: shatter 0.4s forwards ease-in;
+            pointer-events: none;
+        }
+        .focus-mode-active .desktop-overlay {
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: grayscale(1);
+            -webkit-backdrop-filter: grayscale(1);
+        }
+        .focus-mode-active .widgets-container, .focus-mode-active .desktop-icons {
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        .util-nav {
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            color: var(--text-muted);
+            transition: 0.3s;
+            font-size: 0.85em;
+        }
+        .util-nav:hover, .util-nav.active {
+            background: rgba(255,255,255,0.05);
+            color: var(--accent);
+        }
+        .util-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: 0.3s;
+        }
+        .util-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(0,255,255,0.05);
+        }
+        @keyframes neuralPulse {
+            0% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 0.5; }
+        }
+        .lattice-node {
+            animation: neuralPulse 4s infinite ease-in-out;
+        }
+        .lattice-line {
+            stroke-dasharray: 100;
+            animation: latticeFlow 10s infinite linear;
+        }
+        @keyframes latticeFlow {
+            from { stroke-dashoffset: 200; }
+            to { stroke-dashoffset: 0; }
+        }
+        @keyframes neuralBreathe {
+            0% { transform: scale(1); box-shadow: 0 0 5px rgba(0,255,255,0.2); }
+            50% { transform: scale(1.02); box-shadow: 0 0 15px rgba(0,255,255,0.4); }
+            100% { transform: scale(1); box-shadow: 0 0 5px rgba(0,255,255,0.2); }
+        }
+        .neural-active {
+            animation: neuralBreathe 3s infinite ease-in-out;
+            border-color: var(--accent) !important;
+        }
+    </style>
+    <script>
+        /* Σ Neural UI Layout Engine (NeuralWM) */
+        class NeuralLayoutEngine {
+            constructor() {
+                this.interactions = {};
+            }
+            track(shardId) {
+                this.interactions[shardId] = (this.interactions[shardId] || 0) + 1;
+                this.reorganize();
+            }
+            reorganize() {
+                const sorted = Object.entries(this.interactions).sort((a,b) => b[1] - a[1]);
+                sorted.forEach(([id, count], i) => {
+                    const el = document.getElementById(id);
+                    if (el && i === 0) el.classList.add('neural-active');
+                    else if (el) el.classList.remove('neural-active');
+                });
+            }
+            setMindfulness(active) {
+                document.body.classList.toggle('focus-mode-active', active);
+                addLog(active ? 'Î£ [NEURAL]: Mindfulness Mode ACTIVE. Filtering noise...' : 'Î£ [NEURAL]: Mindfulness Mode DISABLED.');
+            }
+        }
+        const neural = new NeuralLayoutEngine();
+
+        /* Σ Personalization & Theme Orchestration */
+        class PersonalizationEngine {
+            constructor() {
+                this.registry = JSON.parse(localStorage.getItem('sigma_registry') || '{}');
+                this.apply();
+            }
+            setTheme(name) {
+                this.registry.theme = name;
+                this.save();
+                this.apply();
+            }
+            save() {
+                localStorage.setItem('sigma_registry', JSON.stringify(this.registry));
+            }
+            apply() {
+                const theme = this.registry.theme || 'cyan';
+                document.body.setAttribute('data-theme', theme);
+                addLog(`Σ [PERSONAL]: Shifting lattice hue to ${theme}...`, 'success');
+            }
+        }
+        const persona = new PersonalizationEngine();
+
+        function toggleStart() {
+            const menu = document.getElementById('start-menu');
+            menu.classList.toggle('active');
+        }
+        function minimizeWindow(id) {
+            const win = document.getElementById(id);
+            win.style.display = 'none';
+        }
+        function closeWindow(id) {
+            const win = document.getElementById(id);
+            win.classList.add('shattering');
+            setTimeout(() => win.remove(), 400);
+        }
+
+        /* Σ Zenith Window Manager (ZenithWM) Logic */
+        class ZenithWM {
+            constructor() {
+                this.windows = [];
+                this.topZ = 1000;
+            }
+            register(id) {
+                const win = document.getElementById(id);
+                if (!win) return;
+                this.windows.push(win);
+                win.addEventListener('mousedown', () => this.bringToFront(win));
+            }
+            bringToFront(win) {
+                this.topZ++;
+                win.style.zIndex = this.topZ;
+            }
+            tileAll() {
+                const width = window.innerWidth / this.windows.length;
+                this.windows.forEach((win, i) => {
+                    win.style.width = `${width - 20}px`;
+                    win.style.left = `${i * width + 10}px`;
+                    win.style.top = '100px';
+                });
+            }
+        }
+        const wm = new ZenithWM();
+    </script>
+</head>
+
+<body class="zenith-sovereign">
+    <!-- Start Menu -->
+    <div class="start-menu" id="start-menu">
+        <div class="start-header">
+            <div class="user-avatar">Σ</div>
+            <div class="user-info">
+                <div class="user-name" id="menu-user-name">Sovereign_User</div>
+                <div class="user-status">Authorized Shard Master</div>
+            </div>
+            <div class="window-controls">
+                <div class="win-btn minimize"></div>
+                <div class="win-btn close" onclick="toggleStart()"></div>
+            </div>
+        </div>
+        <div class="start-content">
+            <div class="start-section">
+                <div class="section-title">Pinned Shards</div>
+                <div class="start-item" onclick="toggleStart()">
+                    <span class="icon">⌨️</span>
+                    <span>OmniShell v5.1</span>
+                </div>
+                <div class="start-item" onclick="toggleStart()">
+                    <span class="icon">📝</span>
+                    <span>Zenith Editor</span>
+                </div>
+                <div class="start-item" onclick="toggleStart()">
+                    <span class="icon">🛡️</span>
+                    <span>Quantum Shield</span>
+                </div>
+                <div class="start-item" onclick="launchApp('Markup Forge')">
+                    <span class="icon">📝</span>
+                    <span>Markup Forge</span>
+                </div>
+                <div class="start-item" onclick="launchApp('Utility Nexus')">
+                    <span class="icon">🛠️</span>
+                    <span>Utility Nexus</span>
+                </div>
+            </div>
+            <div class="start-section">
+                <div class="section-title">System Shards</div>
+                <div class="start-item">
+                    <span class="icon">⚙️</span>
+                    <span>Lattice Settings</span>
+                </div>
+                <div class="start-item">
+                    <span class="icon">📈</span>
+                    <span>Performance Matrix</span>
+                </div>
+                <div class="start-item" onclick="toggleStart()">
+                    <span class="icon">🚀</span>
+                    <span>Live Boot Nexus</span>
+                </div>
+                <div class="start-item" onclick="toggleStart()">
+                    <span class="icon">☁️</span>
+                    <span>Hypervisor Shard</span>
+                </div>
+            </div>
+        </div>
+        <div class="start-footer">
+            <div class="footer-item" onclick="location.reload()">Reboot</div>
+            <div class="footer-item" onclick="toggleStart()">Lock</div>
+        </div>
+    </div>
+    <!-- Command Palette -->
+    <div class="command-palette" id="cmd-palette">
+        <input type="text" class="command-input" placeholder="Summon Shard or Execute Command..." id="cmd-input">
+        <div class="command-results" id="cmd-results">
+            <div class="command-item" onclick="setTheme('cyan')"><span>Theme: Neon Cyan</span><kbd>Alt+1</kbd></div>
+            <div class="command-item" onclick="setTheme('gold')"><span>Theme: Solar Gold</span><kbd>Alt+2</kbd></div>
+            <div class="command-item" onclick="setTheme('crimson')"><span>Theme: Crimson Shard</span><kbd>Alt+3</kbd>
+            </div>
+            <div class="command-item" onclick="addLog('Σ [AUTO]: Optimizing Shard Lattice...', 'success')">
+                <span>Optimize Lattice</span><kbd>Alt+O</kbd></div>
+        </div>
+    </div>
+
+    <!-- Central Clock & Theme Selector -->
+    <div class="zenith-top-panel">
+        <div class="theme-shards">
+            <div class="theme-shard cyan" onclick="setTheme('cyan')" title="Neon Cyan"></div>
+            <div class="theme-shard gold" onclick="setTheme('gold')" title="Solar Gold"></div>
+            <div class="theme-shard crimson" onclick="setTheme('crimson')" title="Crimson Shard"></div>
+            <div class="theme-shard solar" onclick="setTheme('solar')" title="Adaptive Solar"></div>
+        </div>
+        <div class="clock-container">
+            <div id="clock-time">00:00</div>
+            <div id="clock-date">Tuesday, April 28</div>
+        </div>
+        <div class="persona-indicator" onclick="launchApp('Lattice Settings')">
+            <div class="persona-avatar">Σ</div>
+            <span id="top-user-name">Sovereign_User</span>
+        </div>
+    </div>
+
+    <!-- Notification Center / Kernel Logs -->
+    <div class="notification-center" id="kernel-logs">
+        <!-- Logs will be injected here -->
+    </div>
+
+    <!-- Widgets -->
+    <div class="widgets-container">
+        <!-- Silicon Thermal Heatmap Widget -->
+        <div class="widget">
+            <div class="widget-title">
+                <span>Silicon Heat Map</span>
+                <span class="accent">Thermal IQ</span>
+            </div>
+            <div class="thermal-grid">
+                <div class="thermal-shard ts-1"></div>
+                <div class="thermal-shard ts-2"></div>
+                <div class="thermal-shard ts-3"></div>
+                <div class="thermal-shard ts-4"></div>
+                <div class="thermal-shard ts-5"></div>
+                <div class="thermal-shard ts-6"></div>
+                <div class="thermal-shard ts-7"></div>
+                <div class="thermal-shard ts-8"></div>
+            </div>
+            <div class="stat-label">Avg Temp: 34°C (Optimal)</div>
+        </div>
+
+        <!-- Sovereign Trust Fabric Widget -->
+        <div class="widget">
+            <div class="widget-title">
+                <span>Trust Fabric</span>
+                <span class="accent">Quantum-Synced</span>
+            </div>
+            <div class="stat-value" id="trust-level">99.9%</div>
+            <div class="stat-label">Keys Active: <span id="qkd-keys">128</span></div>
+            <div class="stat-bar">
+                <div class="stat-progress security" id="trust-progress" class="full-width"></div>
+            </div>
+            <div class="audit-info">Lattice Entropy: OPTIMAL</div>
+        </div>
+
+        <!-- Sovereign Orb Marketplace Widget -->
+        <div class="widget">
+            <div class="widget-title">
+                <span>Orb Marketplace</span>
+                <span class="accent">Mesh-Live</span>
+            </div>
+            <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+                <div class="market-item" style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; font-size: 0.8em; display: flex; justify-content: space-between; align-items: center;">
+                    <span>NeuralVisualizer-v2</span>
+                    <button class="cyber-btn small-btn primary" onclick="addLog('Σ [MARKET]: Summoning Shard...')">SUMMON</button>
+                </div>
+                <div class="market-item" style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; font-size: 0.8em; display: flex; justify-content: space-between; align-items: center;">
+                    <span>BioFS-DNA-Module</span>
+                    <button class="cyber-btn small-btn primary" onclick="addLog('Σ [MARKET]: Summoning Shard...')">SUMMON</button>
+                </div>
+            </div>
+            <div class="audit-info">Trending: QuantumSieve-PQC</div>
+        </div>
+
+        <!-- Sovereign App Sharding Matrix Widget -->
+        <div class="widget">
+            <div class="widget-title">
+                <span>App Sharding Matrix</span>
+                <span class="accent">Lattice-Dist</span>
+            </div>
+            <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+                <div class="app-shard-item" style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; font-size: 0.8em;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <span>OmniShell-v5</span>
+                        <span class="accent">4 Shards</span>
+                    </div>
+                    <div class="stat-bar" style="height: 4px;">
+                        <div class="stat-progress primary" style="width: 100%;"></div>
+                    </div>
+                </div>
+                <div class="app-shard-item" style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; font-size: 0.8em;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <span>Zenith-Desktop-Pro</span>
+                        <span class="accent">12 Shards</span>
+                    </div>
+                    <div class="stat-bar" style="height: 4px;">
+                        <div class="stat-progress primary" style="width: 85%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="audit-info">Active Shards: 16 | Efficiency: 99%</div>
+        </div>
+
+        <!-- Live Kernel Console Shard -->
+        <div class="kernel-console-shard" id="kernel-console" style="position: fixed; bottom: 60px; right: 20px; width: 350px; height: 220px; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); border: 1px solid rgba(0,255,255,0.2); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000;">
+            <div style="background: rgba(255,255,255,0.05); padding: 8px 12px; font-size: 0.7em; color: var(--accent); display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <span>LIVE KERNEL TELEMETRY</span>
+                <span>SHARD-ID: 0x8F2</span>
+            </div>
+            <div id="console-output" style="flex: 1; padding: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.75em; color: rgba(255,255,255,0.8); overflow-y: auto;">
+                <div>[0.000] Σ [ORCHESTRATOR]: Sharding Foundation...</div>
+                <div>[0.012] Σ [PMM]: Silicon Memory Shard ONLINE.</div>
+                <div>[0.045] Σ [VMM]: PML4 Tables Orchestrated.</div>
+                <div>[0.102] Σ [SEL]: Zero-Trust Policy Active.</div>
+                <div>[0.158] Σ [SYSBRIDGE]: POSIX-lite Shards Ready.</div>
+                <div>[0.210] Σ [LATTICE]: Heartbeat Sync Active.</div>
+                <div>[0.255] Σ [QKD]: BB84 Quantum Lattice Established.</div>
+                <div>[0.312] Σ [TRUST]: Fabric Unified & Sealed.</div>
+                <div>[0.380] Σ [APP-SHARD]: OmniShell Partitioned (4 Shards).</div>
+                <div>[0.445] Σ [PREDICT]: Shard Dispatch -> Node-0x8F (2ms).</div>
+                <div>[0.512] Σ [LATTICE]: Application Fabric ONLINE.</div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Silicon Audit</span>
+                <span class="accent">16 Cores</span>
+            </div>
+            <div class="stat-value" id="cpu-load">12%</div>
+            <svg viewBox="0 0 300 40" class="widget-graph">
+                <polyline id="cpu-graph" fill="none" stroke="var(--accent)" stroke-width="2"
+                    points="0,40 30,30 60,35 90,20 120,25 150,10 180,15 210,5 240,12 270,8 300,20" />
+            </svg>
+            <div class="stat-bar">
+                <div class="stat-progress" id="cpu-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Memory Zenith</span>
+                <span class="accent">Slab Alloc</span>
+            </div>
+            <div class="stat-value" id="mem-load">4.2 GB</div>
+            <div class="stat-bar">
+                <div class="stat-progress" id="mem-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Cache Matrix</span>
+                <span class="accent">L1/L2/L3 Shards</span>
+            </div>
+            <div class="stat-value" id="cache-hit">99.2% Hit</div>
+            <div class="stat-bar">
+                <div class="stat-progress cache" id="cache-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Quantum Shield</span>
+                <span class="accent">Zero-Trust Active</span>
+            </div>
+            <div class="stat-value" id="security-status">SHIELDED</div>
+            <div class="audit-info" id="security-info">Scanning Shards...</div>
+            <div class="stat-bar">
+                <div class="stat-progress security" id="security-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Self-Healing Shard</span>
+                <span class="accent">Auto-Restore</span>
+            </div>
+            <div class="stat-value" id="healing-status">OPTIMAL</div>
+            <div class="audit-info" id="healing-info">Last Audit: 12ms ago</div>
+            <div class="stat-bar">
+                <div class="stat-progress healing" id="healing-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Quantum Entropy</span>
+                <span class="accent" id="entropy-rate">High</span>
+            </div>
+            <div class="stat-value" id="entropy-val">0x8F2E...</div>
+            <div class="stat-label">Source: RDRAND Shard</div>
+            <div class="stat-bar">
+                <div class="stat-progress entropy" id="entropy-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Automation Matrix</span>
+                <span class="accent" id="auto-efficiency">Efficiency: 98%</span>
+            </div>
+            <div class="stat-value" id="auto-recipes">3 Recipes</div>
+            <div class="stat-label">Active: Thermal-Balance</div>
+            <div class="stat-bar">
+                <div class="stat-progress auto" id="auto-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Cold Storage Vault</span>
+                <span class="accent" id="vault-status">Pinned</span>
+            </div>
+            <div class="stat-value" id="vault-blocks">2 Blocks</div>
+            <div class="stat-label">CID: QmXoypiz...</div>
+            <div class="stat-bar">
+                <div class="stat-progress vault" id="vault-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>VFS Shard Map</span>
+                <span class="accent" id="vfs-nodes">12 Nodes</span>
+            </div>
+            <div class="stat-value" id="vfs-mounts">3 Mounts</div>
+            <div class="stat-label">Root: /sovereign/shards</div>
+            <div class="stat-bar">
+                <div class="stat-progress vfs" id="vfs-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Memory Matrix</span>
+                <span class="accent" id="mem-pages">4096 Pages</span>
+            </div>
+            <div class="stat-value" id="mem-usage">25% Used</div>
+            <div class="stat-label">Mode: Demand Paging</div>
+            <div class="stat-bar">
+                <div class="stat-progress memory" id="memory-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Sync Matrix</span>
+                <span class="accent" id="sync-locks">3 Active Locks</span>
+            </div>
+            <div class="stat-value" id="sync-latency">12ms Latency</div>
+            <div class="stat-label">Distributed Mutex: ON</div>
+            <div class="stat-bar">
+                <div class="stat-progress sync" id="sync-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>UI Design Matrix</span>
+                <span class="accent" id="ui-frametime">8.3ms</span>
+            </div>
+            <div class="stat-value" id="ui-fps">120 FPS</div>
+            <div class="stat-label">Glassmorphism: 2.0</div>
+            <div class="stat-bar">
+                <div class="stat-progress ui" id="ui-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Silicon Matrix</span>
+                <span class="accent" id="pci-devices">4 Devices</span>
+            </div>
+            <div class="stat-value" id="pci-status">Enum Complete</div>
+            <div class="stat-label">Bus: 02 | Slot: 00 | Func: 00</div>
+            <div class="stat-bar">
+                <div class="stat-progress silicon" id="silicon-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Scholar Zenith</span>
+                <span class="accent" id="lab-accuracy">99.9% Accuracy</span>
+            </div>
+            <div class="stat-value" id="lab-active">Physics: Magnetism</div>
+            <div class="stat-label">NCERT Standards: DIKSHA-Sync</div>
+            <div class="stat-bar">
+                <div class="stat-progress scholar" id="scholar-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget persona">
+            <div class="widget-title">
+                <span>Sovereign Persona</span>
+                <span class="accent" id="persona-name">User_01</span>
+            </div>
+            <div class="stat-value" id="persona-theme">Theme: Glass</div>
+            <div class="stat-label">Automation: Active</div>
+            <div class="stat-label" id="persona-sync">Lattice Sync: 100%</div>
+            <div class="stat-bar">
+                <div class="stat-progress persona" id="persona-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Security Sentinel</span>
+                <span class="accent" id="log-status">Anonymizing</span>
+            </div>
+            <div class="stat-value" id="log-scrubs">12 Scrubs</div>
+            <div class="stat-label">Mode: Amnesic Logging</div>
+            <div class="stat-bar">
+                <div class="stat-progress amnesic" id="amnesic-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Healing Nexus</span>
+                <span class="accent" id="healing-status">Monitoring</span>
+            </div>
+            <div class="stat-value" id="healing-restores">0 Restores</div>
+            <div class="stat-label">Shard Health: 100%</div>
+            <div class="stat-bar">
+                <div class="stat-progress healing" id="healing-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Judicial Matrix</span>
+                <span class="accent" id="legal-status">Compliant</span>
+            </div>
+            <div class="stat-value" id="legal-statutes">BNSS/BNS/BSA</div>
+            <div class="stat-label">Audit: Zero FIR Ready</div>
+            <div class="stat-bar">
+                <div class="stat-progress legal" id="legal-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Colonization Matrix</span>
+                <span class="accent" id="node-count">3 Nodes</span>
+            </div>
+            <div class="stat-value" id="mesh-status">Expanding</div>
+            <div class="stat-label">Target: 0x8F2E... (Remote)</div>
+            <div class="stat-bar">
+                <div class="stat-progress mesh" id="mesh-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>VRAM Matrix</span>
+                <span class="accent" id="vram-res">1920x1080</span>
+            </div>
+            <div class="stat-value" id="vram-usage">12MB / 256MB</div>
+            <div class="stat-label">Aperture: 0xFD000000</div>
+            <div class="stat-bar">
+                <div class="stat-progress vram" id="vram-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Boot Matrix</span>
+                <span class="accent" id="boot-status">Handshake</span>
+            </div>
+            <div class="stat-value" id="boot-progress">98% Complete</div>
+            <div class="stat-label">UEFI: Secure | Mode: Sovereign</div>
+            <div class="stat-bar">
+                <div class="stat-progress boot" id="boot-progress-bar"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Lattice Integrity</span>
+                <span class="accent" id="test-status">Verified</span>
+            </div>
+            <div class="stat-value" id="test-pass">5/5 Shards</div>
+            <div class="stat-label">Self-Audit Active</div>
+            <div class="stat-bar">
+                <div class="stat-progress test" id="test-progress"></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>Lattice Growth</span>
+                <span class="accent">Colonizing</span>
+            </div>
+            <div class="stat-value" id="node-count">1 Node</div>
+            <div class="stat-bar">
+                <div class="stat-progress colonization" id="col-progress"></div>
+            </div>
+            <div class="stat-label" id="col-target">Target: Scanning...</div>
+        </div>
+
+        <div class="widget persona">
+            <div class="widget-title">
+                <span>Sovereign Persona</span>
+                <span class="accent" id="persona-name">User_01</span>
+            </div>
+            <div class="stat-value">ACTIVE</div>
+            <div class="stat-label">Automation: Enabled</div>
+            <div class="stat-label">Cognitive Sync: 12ms</div>
+        </div>
+
+        <!-- NEW: Morphic Automation Widget -->
+        <div class="widget automation" onclick="toggleUtilityNexus()">
+            <div class="widget-title">
+                <span>Morphic Automation</span>
+                <span class="pulse-dot"></span>
+            </div>
+            <div class="stat-value" id="auto-task-count">0 Tasks Active</div>
+            <div class="stat-label" id="auto-current-task">Next: Idle</div>
+            <div class="cognitive-queue" id="cognitive-queue" style="margin-top: 10px; max-height: 40px; overflow: hidden; font-size: 0.8em; color: var(--accent);">
+                <!-- Tasks generated by JS -->
+            </div>
+            <div class="stat-bar"><div class="stat-progress stat-progress--automator" id="auto-progress" style="width: 0%;"></div></div>
+        </div>
+
+        <div class="widget voice">
+            <div class="widget-title">
+                <span>Sovereign Voice</span>
+                <span class="accent" id="voice-status">Idle</span>
+            </div>
+            <div class="voice-wave" id="voice-wave">
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+            </div>
+            <div class="stat-label">Wake-Key: Caps Lock</div>
+        </div>
+
+        <div class="widget lattice-viz">
+            <div class="widget-title">
+                <span>Lattice Shard Matrix</span>
+                <span class="accent">500 Modules</span>
+            </div>
+            <div class="shard-grid" id="shard-matrix">
+                <!-- Script will inject 999 shards here -->
+            </div>
+            <div class="stat-label" id="shard-status">Integrity: 100.0%</div>
+        </div>
+
+        <!-- Lattice Mesh Topology -->
+        <div class="widget" id="mesh-widget">
+            <div class="widget-title">
+                <span>Lattice Mesh</span>
+                <span class="accent">P2P Discovery</span>
+            </div>
+            <div class="mesh-topology-view" id="mesh-view">
+                <svg id="mesh-svg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></svg>
+                <!-- Nodes generated by JS -->
+            </div>
+            <div class="stat-label mt-10">Nodes Discovered: <span class="accent" id="peer-count">0</span></div>
+            <div class="stat-label">Mesh Protocol: <span class="accent">v1.0 (BB84)</span></div>
+        </div>
+
+        <!-- DNA Compression Shard -->
+        <div class="widget">
+            <div class="widget-title">
+                <span>Biological Density</span>
+                <span class="accent">4.0x</span>
+            </div>
+            <div class="stat-value" id="dna-savings">0 MB</div>
+            <div class="stat-label">SELF-HEALING: <span class="accent">ACTIVE</span></div>
+            <div class="stat-bar">
+                <div class="stat-progress" style="width: 75%; background: var(--success); box-shadow: 0 0 10px var(--success);"></div>
+            </div>
+        </div>
+
+        <!-- Quantum Trust Shard -->
+        <div class="widget" id="qkd-widget">
+            <div class="widget-title">
+                <span>Quantum Trust</span>
+                <span class="accent">SEALED</span>
+            </div>
+            <div class="stat-value" id="qkd-status">Entangled</div>
+            <div class="stat-label">EAVESDROP DETECT: <span class="accent">ENABLED</span></div>
+            <div class="stat-bar">
+                <div class="stat-progress" style="width: 100%; background: var(--accent); box-shadow: 0 0 15px var(--accent-glow);"></div>
+            </div>
+        </div>
+
+        <!-- Silicon Matrix Shard -->
+        <div class="widget" id="silicon-widget">
+            <div class="widget-title">
+                <span>Silicon Matrix</span>
+                <span class="accent">NATIVE</span>
+            </div>
+            <div class="stat-value" id="silicon-isa">RISC-V (RV64GC)</div>
+            <div class="stat-label">Driver Transpilation: <span class="accent" id="transpiled-count">0</span> Active</div>
+            <div class="stat-bar">
+                <div class="stat-progress" style="width: 100%; background: var(--success); box-shadow: 0 0 10px var(--success);"></div>
+            </div>
+        </div>
+
+        <!-- Orb Exchange Shard -->
+        <div class="widget" id="orb-widget">
+            <div class="widget-title">
+                <span>Orb Exchange</span>
+                <span class="accent">P2P MARKET</span>
+            </div>
+            <div class="stat-value" id="orb-active">Idle</div>
+            <div class="stat-label">Trust Status: <span class="status-success" id="orb-trust">QKD-VERIFIED</span></div>
+            <div class="stat-bar">
+                <div class="stat-progress" id="orb-progress" style="width: 0%; background: var(--accent); box-shadow: 0 0 10px var(--accent-glow);"></div>
+            </div>
+        </div>
+
+        <!-- Governance Matrix Shard -->
+        <div class="widget" id="gov-widget">
+            <div class="widget-title">
+                <span>Governance Matrix</span>
+                <span class="accent">CONSENSUS</span>
+            </div>
+            <div class="stat-value" id="gov-active">0 Active Proposals</div>
+            <div class="stat-label">Last Vote: <span class="status-success" id="gov-vote">YEA (QKD-VERIFIED)</span></div>
+            <div class="stat-bar">
+                <div class="stat-progress" id="gov-progress" style="width: 50%; background: var(--success); box-shadow: 0 0 10px var(--success);"></div>
+            </div>
+        </div>
+
+        <!-- Hardened Status Shard -->
+        <div class="widget">
+            <div class="widget-title">
+                <span>Hardened Status</span>
+                <span class="accent">Lattice v29.0</span>
+            </div>
+            <div class="stat-label">Neural UI: <span id="ui-status" class="status-success">AVX-512 DEDICATED</span></div>
+            <div class="stat-label">VFS Sync: <span id="vfs-status" class="status-success">ZERO DRIFT (PQC)</span></div>
+            <div class="stat-label">S-CLI: <span id="cli-status" class="status-success">AMNESIC (CLEAN)</span></div>
+            <div class="stat-bar"><div class="stat-progress stat-progress--full"></div></div>
+        </div>
+        <!-- Sovereign Network Stack Widget -->
+        <div class="widget">
+            <div class="widget-title">
+                <span>Network Stack</span>
+                <span class="accent">Lattice-IP</span>
+            </div>
+            <div class="stat-value" id="net-status">CONNECTED</div>
+            <div class="stat-label">Lattice-IP: <span class="accent">10.0.0.Σ</span></div>
+            <div class="stat-label">Protocols: <span class="accent">TCP, UDP, ICMP</span></div>
+            <div class="stat-bar">
+                <div class="stat-progress primary" style="width: 100%;"></div>
+            </div>
+        </div>
+
+        <!-- Sovereign Identity Manager Widget -->
+        <div class="widget">
+            <div class="widget-title">
+                <span>Identity Manager</span>
+                <span class="accent">Zero-Trust SSI</span>
+            </div>
+            <div class="stat-value" id="iam-status">VERIFIED</div>
+            <div class="stat-label">Identity: <span class="accent">Sovereign_User</span></div>
+            <div class="stat-label">Auth Mode: <span class="accent">Secure Element</span></div>
+            <div class="stat-bar">
+                <div class="stat-progress security" style="width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Utility Nexus Window -->
+    <div class="window" id="utility-nexus-win">
+        <div class="window-header">
+            <div class="window-title">Σ Utility Nexus v2.0</div>
+            <div class="window-controls">
+                <div class="win-btn minimize" onclick="minimizeWindow('utility-nexus-win')"></div>
+                <div class="win-btn close" onclick="closeWindow('utility-nexus-win')"></div>
+            </div>
+        </div>
+        <div class="window-content">
+            <!-- Sidebar -->
+            <div class="util-sidebar">
+                <div class="util-nav active" onclick="switchUtil('text-ops')">Text Operations</div>
+                <div class="util-nav" onclick="switchUtil('data-conv')">Data Converter</div>
+                <div class="util-nav" onclick="switchUtil('code-img')">Code to Image</div>
+                <div class="util-nav" onclick="switchUtil('diff')">Compare Text</div>
+                <div class="util-nav" onclick="switchUtil('dup-find')">Duplicate Finder</div>
+                <div class="util-nav" onclick="switchUtil('key-test')">Key-Test</div>
+                <div class="util-nav" onclick="switchUtil('speed')">Ookla Speed Shard</div>
+                <div class="util-nav" onclick="switchUtil('status')">IsItDownRightNow</div>
+                <div class="util-nav" onclick="switchUtil('bootable')">Bootable Creator</div>
+                <div class="util-nav" onclick="switchUtil('table')">Table Convert</div>
+                <div class="util-nav" onclick="switchUtil('broadcaster')">Prompt Broadcaster</div>
+                <div class="util-nav" onclick="switchUtil('firewall')">Aether Firewall</div>
+            </div>
+            <!-- Main Area -->
+            <div id="util-main" class="util-main">
+                <div id="util-text-ops">
+                    <h3>Text Operations</h3>
+                    <textarea id="util-text-input" class="util-input" placeholder="Enter text to transform..."></textarea>
+                    <div class="util-actions">
+                        <button class="util-btn" onclick="textAction('upper')">UPPERCASE</button>
+                        <button class="util-btn" onclick="textAction('lower')">lowercase</button>
+                        <button class="util-btn" onclick="textAction('title')">Title Case</button>
+                        <button class="util-btn" onclick="textAction('sentence')">Sentence case</button>
+                        <button class="util-btn" onclick="textAction('count')">Count Words</button>
+                        <button class="util-btn" onclick="textAction('clear-lines')">Remove Line Breaks</button>
+                    </div>
+                    <div id="util-text-output" class="util-output">Results will appear here...</div>
+                </div>
+                <div id="util-data-conv" class="hidden-shard">
+                    <h3>Data Converter</h3>
+                    <textarea id="util-data-input" class="util-input" placeholder="Enter JSON or CSV data..."></textarea>
+                    <div class="util-actions">
+                        <button class="util-btn" onclick="dataAction('json-xml')">JSON to XML</button>
+                        <button class="util-btn" onclick="dataAction('csv-json')">CSV to JSON</button>
+                    </div>
+                    <div id="util-data-output" class="util-output">Converted data will appear here...</div>
+                </div>
+                <div id="util-code-img" class="hidden-shard">
+                    <h3>Code to Image</h3>
+                    <textarea id="util-code-input" class="util-input" placeholder="Paste code here..."></textarea>
+                    <div class="code-preview-canvas">
+                        <div class="code-editor-mock">
+                            <div class="editor-header">
+                                <div class="dot red"></div>
+                                <div class="dot yellow"></div>
+                                <div class="dot green"></div>
+                            </div>
+                            <pre id="code-render-box">// Your code will be rendered here...</pre>
+                        </div>
+                    </div>
+                    <button class="util-btn" onclick="renderCode()">Render Preview</button>
+                </div>
+                <div id="util-diff" class="hidden-shard">
+                    <h3>Compare Text</h3>
+                    <div class="forge-split">
+                        <textarea id="diff-left" class="util-input" placeholder="Original text..."></textarea>
+                        <textarea id="diff-right" class="util-input" placeholder="Modified text..."></textarea>
+                    </div>
+                    <button class="util-btn" onclick="compareText()">Compare Shards</button>
+                    <div id="diff-output" class="util-output"></div>
+                </div>
+                <div id="util-dup-find" class="hidden-shard">
+                    <h3>Duplicate Word Finder</h3>
+                    <textarea id="dup-input" class="util-input" placeholder="Paste text to analyze..."></textarea>
+                    <button class="util-btn" onclick="findDuplicates()">Scan for Duplicates</button>
+                    <div id="dup-output" class="util-output"></div>
+                </div>
+                <div id="util-key-test" class="hidden-shard">
+                    <h3>Key-Test (Keyboard Shard)</h3>
+                    <div class="key-monitor">
+                        <div id="last-key">PRESS A KEY</div>
+                        <div id="key-code">CODE: --</div>
+                    </div>
+                </div>
+                <div id="util-speed" class="hidden-shard">
+                    <h3>Ookla Speed Shard</h3>
+                    <div class="speed-container">
+                        <div id="speed-gauge">0</div>
+                        <div class="unit">MBPS DOWNLOAD</div>
+                        <button class="util-btn" onclick="startSpeedTest()">Test Silicon Latency</button>
+                    </div>
+                </div>
+                <div id="util-status" class="hidden-shard">
+                    <h3>IsItDownRightNow Shard</h3>
+                    <input type="text" id="status-url" class="util-input" placeholder="Enter URL (e.g. sigmaos.io)...">
+                    <button class="util-btn" onclick="checkStatus()">Check Shard Availability</button>
+                    <div id="status-output" class="util-output"></div>
+                </div>
+                <div id="util-bootable" class="hidden-shard">
+                    <h3>Bootable Shard Creator</h3>
+                    <div class="bootable-pane">
+                        <div class="target-info">Target: <span id="boot-target">NO DEVICE DETECTED</span></div>
+                        <button class="util-btn" onclick="flashBootable()">Flash Sovereign Image</button>
+                        <div id="flash-progress" class="progress-container hidden-shard">
+                            <div id="flash-bar" class="progress-bar"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="util-table" class="hidden-shard">
+                    <h3>Table Convert Shard</h3>
+                    <textarea id="table-input" class="util-input" placeholder="Enter CSV data..."></textarea>
+                    <button class="util-btn" onclick="convertTable()">Forge HTML Table</button>
+                    <div id="table-output" class="util-output"></div>
+                </div>
+                <div id="util-broadcaster" class="hidden-shard">
+                    <h3>Prompt Broadcaster</h3>
+                    <textarea id="util-broadcast-prompt" class="util-input" placeholder="Enter prompt to broadcast..." style="height: 100px !important;"></textarea>
+                    <textarea id="util-broadcast-sites" class="util-input" placeholder="Enter site URLs (one per line, use {{prompt}} as placeholder)..." style="height: 120px !important;">https://www.perplexity.ai/search?q={{prompt}}
+https://www.google.com/search?q={{prompt}}
+https://chatgpt.com/?q={{prompt}}</textarea>
+                    <div class="util-actions">
+                        <button class="util-btn" onclick="broadcastPromptUtility()">BROADCAST PROMPT</button>
+                    </div>
+                </div>
+                <div id="util-firewall" class="hidden-shard">
+                    <h3>Aether Firewall (Site Blocker)</h3>
+                    <p class="stat-label">Block domains at the lattice level to preserve focus.</p>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="firewall-input" class="util-input" placeholder="Enter domain (e.g. twitter.com)..." style="height: 45px !important; margin: 0;">
+                        <button class="util-btn" onclick="addBlockRule()" style="height: 45px;">BLOCK</button>
+                    </div>
+                    <ul id="blocked-list" class="workflow-list" style="max-height: 200px; overflow-y: auto;">
+                        <li class="routine-item routine-border-magenta"><strong>facebook.com</strong> <button class="cyber-btn small-btn" onclick="this.parentElement.remove()">UNBLOCK</button></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Markup Forge Window -->
+    <div class="window" id="markup-forge-win">
+        <div class="window-header">
+            <div class="window-title">Σ Markup Forge v1.0</div>
+            <div class="window-controls">
+                <div class="win-btn minimize" onclick="minimizeWindow('markup-forge-win')"></div>
+                <div class="win-btn close" onclick="closeWindow('markup-forge-win')"></div>
+            </div>
+        </div>
+        <div class="window-content">
+            <div class="forge-container">
+                <div class="forge-split">
+                    <textarea id="markup-input" class="forge-area" placeholder="Input sovereign text here..."></textarea>
+                    <div id="markup-output" class="forge-area"></div>
+                </div>
+                <div class="forge-actions">
+                    <button class="util-btn" onclick="forgeHTML()">Forge HTML Shard</button>
+                    <button class="util-btn" onclick="clearMarkup()">Purge Buffer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Marketplace Window -->
+    <div class="window" id="marketplace-win">
+        <div class="window-header">
+            <div class="window-title">Σ Sovereign Marketplace</div>
+            <div class="window-controls">
+                <div class="win-btn minimize" onclick="minimizeWindow('marketplace-win')"></div>
+                <div class="win-btn close" onclick="closeWindow('marketplace-win')"></div>
+            </div>
+        </div>
+        <div class="window-content window-content--padded">
+            <h3>Sovereign Shard Exchange</h3>
+            <p class="stat-label">Verified PQC bundles ready for lattice injection.</p>
+            <div class="mkt-grid">
+                <div class="mkt-item">
+                    <div class="mkt-icon">🚀</div>
+                    <div class="mkt-name">HyperBoost</div>
+                    <div class="mkt-desc">Sub-10ms context switching shard.</div>
+                    <button class="util-btn" onclick="installShard('HyperBoost')">INJECT</button>
+                </div>
+                <div class="mkt-item">
+                    <div class="mkt-icon">🛡️</div>
+                    <div class="mkt-name">Amnesic-X</div>
+                    <div class="mkt-desc">Zero-trace artifact scrubbing engine.</div>
+                    <button class="util-btn" onclick="installShard('Amnesic-X')">INJECT</button>
+                </div>
+                <div class="mkt-item">
+                    <div class="mkt-icon">🎨</div>
+                    <div class="mkt-name">Glass-Pro</div>
+                    <div class="mkt-desc">Advanced HSL-tailored blurring.</div>
+                    <button class="util-btn" onclick="installShard('Glass-Pro')">INJECT</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customization Window -->
+    <div class="window" id="customization-win">
+        <div class="window-header">
+            <div class="window-title">✨ Quantum Customization</div>
+            <div class="window-controls">
+                <div class="win-btn minimize" onclick="minimizeWindow('customization-win')"></div>
+                <div class="win-btn close" onclick="closeWindow('customization-win')"></div>
+            </div>
+        </div>
+        <div class="window-content window-content--customization">
+            <h3>Sovereign Personalization</h3>
+            <p class="stat-label">Tune the lattice AI-driven aesthetics and automation.</p>
+            <div class="mkt-grid">
+                <div class="mkt-item" onclick="setTheme('gold')">
+                    <div class="mkt-icon">🌞</div>
+                    <div class="mkt-name">Solar Zenith</div>
+                    <div class="mkt-desc">Daylight-adaptive energetic UI.</div>
+                </div>
+                <div class="mkt-item" onclick="setTheme('cyan')">
+                    <div class="mkt-icon">🌌</div>
+                    <div class="mkt-name">Neon Cyber</div>
+                    <div class="mkt-desc">Deep-focus cyan glassmorphism.</div>
+                </div>
+                <div class="mkt-item" onclick="setTheme('crimson')">
+                    <div class="mkt-icon">🩸</div>
+                    <div class="mkt-name">Crimson Shard</div>
+                    <div class="mkt-desc">High-alert, performance-driven red.</div>
+                </div>
+            </div>
+            <h3 class="param-header">Personalization Parameters</h3>
+            <div class="ai-segment personalization-segment">
+                <div class="stat-label">Accent Hue (PQC-Sync)</div>
+                <input type="range" min="0" max="360" value="180" class="stat-bar personalization-slider" title="Accent Hue Adjustment" oninput="updateAccentHue(this.value)">
+                
+                <div class="stat-label mt-20">Glass Blur Intensity</div>
+                <input type="range" min="0" max="50" value="25" class="stat-bar personalization-slider" title="Glass Blur Intensity" oninput="updateGlassBlur(this.value)">
+            </div>
+
+            <h3 class="param-header mt-30">Lattice Health Audit</h3>
+            <div class="ai-segment personalization-segment health-audit-view">
+                <div class="stat-label">Shard Integrity (999+ Units)</div>
+                <div class="health-bar-container">
+                    <div class="health-bar-fill" style="width: 100%;"></div>
+                </div>
+                <div class="stat-label mt-10">Silicon-Direct Latency: <span class="accent">0.8ms</span></div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onboarding Wizard -->
+    <div class="wizard-overlay wizard-overlay--hidden" id="wizard-overlay">
+        <div class="wizard-box">
+            <div class="wizard-step active" id="step-1">
+                <div class="wizard-title">Lattice Ignition</div>
+                <div class="wizard-text">Welcome to the Zenith Supreme Singularity. Choose your operational persona to begin the sovereign handshake.</div>
+                <div class="wizard-options">
+                    <div class="wizard-option" onclick="selectPersona('Sovereign')">
+                        <strong>Sovereign</strong>
+                        <div class="stat-label">Full administrative lattice control.</div>
+                    </div>
+                    <div class="wizard-option" onclick="selectPersona('Amnesic')">
+                        <strong>Amnesic</strong>
+                        <div class="stat-label">Zero-persistence, secure execution.</div>
+                    </div>
+                    <div class="wizard-option" onclick="selectPersona('Industrial')">
+                        <strong>Industrial</strong>
+                        <div class="stat-label">Hardened production stability.</div>
+                    </div>
+                </div>
+                <button class="util-btn" onclick="nextStep(2)">INITIALIZE HANDSHAKE</button>
+            </div>
+            <div class="wizard-step" id="step-2">
+                <div class="wizard-title">Handshake Complete</div>
+                <div class="wizard-text">The silicon lattice is now aligned with your persona. 600 shards are active.</div>
+                <button class="util-btn" onclick="completeWizard()">ENTER SINGULARITY</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Desktop Icons -->
+    <div class="desktop-icons">
+        <div class="app-icon">
+            <div class="app-img">📚</div>
+            <div class="app-label">Scholar Zenith</div>
+        </div>
+        <div class="app-icon">
+            <div class="app-img">🛡️</div>
+            <div class="app-label">Lattice Security</div>
+        </div>
+        <div class="app-icon">
+            <div class="app-img">☁️</div>
+            <div class="app-label">Cloud Maestro</div>
+        </div>
+        <div class="app-icon" onclick="launchApp('Markup Forge')">
+            <div class="app-img">📄</div>
+            <div class="app-label">Markup Forge</div>
+        </div>
+        <div class="app-icon">
+            <div class="app-img">⚙️</div>
+            <div class="app-label">Core Orchestrator</div>
+        </div>
+    </div>
+
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <div class="task-icon active">Σ</div>
+        <div class="task-icon">📂</div>
+        <div class="task-icon">🌐</div>
+        <div class="task-icon">🧠</div>
+        <div class="task-icon">🖥️</div>
+        <div class="task-icon" onclick="launchApp('Markup Forge')">📄</div>
+        <div class="task-icon" onclick="launchApp('Utility Nexus')">🛠️</div>
+        <div class="task-icon" onclick="launchApp('Marketplace')">🛒</div>
+        <div class="task-icon" onclick="launchApp('Customization Panel')">✨</div>
+        <div class="taskbar-divider"></div>
+        <div class="task-icon">🔔</div>
+        <div class="task-icon">🔋</div>
+        <div class="taskbar-divider"></div>
+        <div class="status-indicator-wasm" title="Silicon-WASM Nexus">
+            <div class="pulse-dot"></div>
+            <span>WASM-Nexus: ACTIVE</span>
+        </div>
+    </div>
+
+    <script>
+        // Update Clock
+        function updateClock() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            const date = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+            document.getElementById('clock-time').textContent = time;
+            document.getElementById('clock-date').textContent = date;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Command Palette Logic
+        const cmdPalette = document.getElementById('cmd-palette');
+        const cmdInput = document.getElementById('cmd-input');
+
+        window.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                cmdPalette.classList.toggle('active');
+                if (cmdPalette.classList.contains('active')) cmdInput.focus();
+            }
+            if (e.key === 'Escape') cmdPalette.classList.remove('active');
+        });
+
+        function setTheme(name) {
+            document.body.className = name === 'cyan' ? '' : 'theme-' + name;
+            const status = name.toUpperCase();
+            addLog(`Σ [CONFIG]: Shard Theme switched to ${status}.`, 'success');
+            
+            // Sync Persona Indicator
+            const personaLabel = document.getElementById('persona-theme');
+            if (personaLabel) personaLabel.textContent = `Theme: ${status}`;
+            
+            cmdPalette.classList.remove('active');
+        }
+
+        // SVG Graph Logic
+        const cpuGraph = document.getElementById('cpu-graph');
+        const points = [40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40];
+
+        function updateGraph(val) {
+            points.shift();
+            points.push(40 - (val / 100 * 40));
+            const path = points.map((p, i) => `${i * 30},${p}`).join(' ');
+            cpuGraph.setAttribute('points', path);
+        }
+
+        // Simulate Kernel Logs
+        const logContainer = document.getElementById('kernel-logs');
+        const logs = [
+            { t: "Σ [BOOT]: Sovereign Lattice Online.", c: "" },
+            { t: "Σ [SECURE]: PQC Shard Initialized (Lattice-V5).", c: "success" },
+            { t: "Σ [AUTO]: Neural Personalization active.", c: "" },
+            { t: "Σ [NET]: Cloud Maestro projected to EU-WEST-1.", c: "" },
+            { t: "Σ [KERN]: Memory Slab Shard mapped (64MB).", c: "success" },
+            { t: "Σ [AUDIT]: CPU Silicon Discovery: 16 Zenith Cores.", c: "" },
+            { t: "Σ [VGA]: Direct Framebuffer Projector Online.", c: "success" },
+            { t: "Σ [ZENITH]: Command Palette (Ctrl+K) ready.", c: "success" }
+        ];
+
+        function addLog(text, type) {
+            const div = document.createElement('div');
+            div.className = `log-item ${type}`;
+            div.textContent = text;
+            logContainer.prepend(div);
+            if (logContainer.children.length > 15) logContainer.lastChild.remove();
+        }
+
+        let logIdx = 0;
+        function cycleLogs() {
+            if (logIdx < logs.length) {
+                addLog(logs[logIdx].t, logs[logIdx].c);
+                logIdx++;
+                setTimeout(cycleLogs, 800);
+            }
+        }
+        cycleLogs();
+
+        // Simulate Hardware Stats
+        // UI Interactions
+        function toggleStart() {
+            const menu = document.getElementById('start-menu');
+            menu.classList.toggle('active');
+            if (menu.classList.contains('active')) {
+                addLog("Σ [ZENITH]: Start Menu Shard ACTIVE.", "success");
+            }
+        }
+
+        function launchApp(app) {
+            addLog(`Σ [ZENITH]: Launching ${app} Shard...`, "success");
+            if (app === 'Markup Forge') {
+                const win = document.getElementById('markup-forge-win');
+                win.style.display = 'block';
+                win.style.zIndex = '2000';
+            } else if (app === 'Utility Nexus') {
+                const win = document.getElementById('utility-nexus-win');
+                win.style.display = 'block';
+                win.style.zIndex = '2000';
+            } else if (app === 'Marketplace') {
+                const win = document.getElementById('marketplace-win');
+                win.style.display = 'block';
+                win.style.zIndex = '2000';
+            } else if (app === 'Customization Panel') {
+                const win = document.getElementById('customization-win');
+                win.style.display = 'block';
+                win.style.zIndex = '2000';
+            }
+            toggleStart();
+        }
+
+        // Marketplace Logic
+        function installShard(name) {
+            addLog(`Σ [PKG]: Fetching ${name} bundle...`, "success");
+            setTimeout(() => {
+                addLog(`Σ [PKG]: ${name} injected into lattice.`, "success");
+                if (name === 'Glass-Pro') {
+                    document.body.style.backdropFilter = 'blur(40px)';
+                    addLog("Σ [CONFIG]: AVX-512 Shard Preempted for Glass-Pro.", "success");
+                }
+            }, 1000);
+        }
+
+        // Wizard Logic
+        function selectPersona(p) {
+            document.querySelectorAll('.wizard-option').forEach(opt => opt.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            document.getElementById('top-user-name').textContent = p + '_User';
+            document.getElementById('menu-user-name').textContent = p + '_User';
+            addLog(`Σ [IDENTITY]: Persona set to ${p}.`, "success");
+        }
+
+        function nextStep(s) {
+            document.querySelectorAll('.wizard-step').forEach(step => step.classList.remove('active'));
+            document.getElementById('step-' + s).classList.add('active');
+        }
+
+        function completeWizard() {
+            document.getElementById('wizard-overlay').style.display = 'none';
+            addLog("Σ [ZENITH]: Zenith Singularity Fully Initialized.", "success");
+        }
+
+        // Auto-show wizard if not shown
+        window.addEventListener('load', () => {
+            if (!localStorage.getItem('sigma_onboarded')) {
+                document.getElementById('wizard-overlay').style.display = 'flex';
+                localStorage.setItem('sigma_onboarded', 'true');
+            }
+        });
+
+        function checkStatus() {
+            const url = document.getElementById('status-url').value;
+            const output = document.getElementById('status-output');
+            output.innerHTML = '<span style="color: var(--accent);">Checking silicon route to ' + url + '...</span>';
+            setTimeout(() => {
+                output.innerHTML = '<span style="color: var(--success);">✔ ' + url + ' is UP and responsive in the lattice.</span>';
+                addLog("Σ [UTILITY]: Route check complete for " + url, "success");
+            }, 1500);
+        }
+
+        function flashBootable() {
+            document.getElementById('boot-target').innerText = "SiliconDrive (64GB) [LOCKED]";
+            const barContainer = document.getElementById('flash-progress');
+            const bar = document.getElementById('flash-bar');
+            barContainer.style.display = 'block';
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                bar.style.width = progress + '%';
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    addLog("Σ [FLASH]: Bootable shard written successfully.", "success");
+                }
+            }, 100);
+        }
+
+        function convertTable() {
+            const csv = document.getElementById('table-input').value;
+            const rows = csv.split('\n');
+            let html = '<table style="width: 100%; border-collapse: collapse; font-size: 0.8em; color: white;">';
+            rows.forEach((row, i) => {
+                html += '<tr>';
+                row.split(',').forEach(col => {
+                    html += `<td style="border: 1px solid rgba(255,255,255,0.1); padding: 8px; ${i===0?'background: rgba(0,255,255,0.1); font-weight: 800;':''}">${col.trim()}</td>`;
+                });
+                html += '</tr>';
+            });
+            html += '</table>';
+            document.getElementById('table-output').innerHTML = html;
+            addLog("Σ [UTILITY]: CSV-to-Table conversion complete.", "success");
+        }
+
+        function switchUtil(utilId) {
+            const panes = ['text-ops', 'data-conv', 'code-img', 'diff', 'dup-find', 'key-test', 'speed', 'status', 'bootable', 'table', 'broadcaster', 'firewall'];
+            panes.forEach(p => {
+                const el = document.getElementById(`util-${p}`);
+                if (el) el.style.display = 'none';
+            });
+            const targetPane = document.getElementById(`util-${utilId}`);
+            if (targetPane) targetPane.style.display = 'block';
+            
+            const navs = document.querySelectorAll('.util-nav');
+            navs.forEach(n => n.classList.remove('active'));
+            if (event.target.classList.contains('util-nav')) {
+                event.target.classList.add('active');
+            }
+            
+            addLog(`Σ [UTILITY]: Switching to ${utilId} module.`, "success");
+        }
+
+        function findDuplicates() {
+            const input = document.getElementById('dup-input').value;
+            const words = input.toLowerCase().match(/\w+/g) || [];
+            const counts = {};
+            words.forEach(w => counts[w] = (counts[w] || 0) + 1);
+            const dups = Object.keys(counts).filter(w => counts[w] > 1);
+            document.getElementById('dup-output').innerText = dups.length > 0 ? "Duplicates: " + dups.join(', ') : "No duplicates found.";
+            addLog("Σ [UTILITY]: Duplicate scan complete.", "success");
+        }
+
+        function broadcastPromptUtility() {
+            const promptInput = document.getElementById('util-broadcast-prompt');
+            const sitesInput = document.getElementById('util-broadcast-sites');
+            
+            if (!promptInput.value.trim()) {
+                addLog("Σ [ERR]: Broadcast failed - No prompt.", "error");
+                return;
+            }
+
+            const prompt = encodeURIComponent(promptInput.value.trim());
+            const sites = sitesInput.value.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+
+            if (sites.length === 0) {
+                addLog("Σ [ERR]: Broadcast failed - No sites.", "error");
+                return;
+            }
+
+            addLog(`Σ [ZENITH]: Broadcasting to ${sites.length} shards...`, "success");
+            
+            sites.forEach(site => {
+                const url = site.replace('{{prompt}}', prompt);
+                window.open(url, '_blank');
+            });
+        }
+
+        function addBlockRule() {
+            const input = document.getElementById('firewall-input');
+            const list = document.getElementById('blocked-list');
+            if (!input.value.trim()) return;
+            
+            const li = document.createElement('li');
+            li.className = "routine-item routine-border-magenta";
+            li.innerHTML = `<strong>${input.value.trim()}</strong> <button class="cyber-btn small-btn" onclick="this.parentElement.remove()">UNBLOCK</button>`;
+            list.prepend(li);
+            addLog(`Σ [FIREWALL]: Blocked access to ${input.value.trim()}.`, "error");
+            input.value = '';
+        }
+
+        function updateAccentHue(val) {
+            document.documentElement.style.setProperty('--accent', `hsl(${val}, 100%, 50%)`);
+            document.documentElement.style.setProperty('--accent-glow', `hsla(${val}, 100%, 50%, 0.3)`);
+        }
+
+        function updateGlassBlur(val) {
+            document.documentElement.style.setProperty('--glass-blur', `blur(${val}px)`);
+            addLog(`Σ [CONFIG]: Glass Intensity set to ${val}px.`, "success");
+        }
+
+        function setWallpaper(src) {
+            if (src === 'none') {
+                document.body.style.backgroundImage = 'none';
+                document.body.style.backgroundColor = '#030305';
+            } else {
+                document.body.style.backgroundImage = `url('${src}')`;
+            }
+            addLog(`Σ [CONFIG]: Wallpaper Shard updated.`, "success");
+        }
+
+        window.addEventListener('keydown', (e) => {
+            const keyDisplay = document.getElementById('last-key');
+            const codeDisplay = document.getElementById('key-code');
+            if (keyDisplay && document.getElementById('util-key-test').style.display !== 'none') {
+                keyDisplay.innerText = e.key.toUpperCase();
+                codeDisplay.innerText = "CODE: " + e.code;
+                addLog(`Σ [KEY-TEST]: Input detected: ${e.key}`, "success");
+            }
+        });
+
+        function startSpeedTest() {
+            const gauge = document.getElementById('speed-gauge');
+            let speed = 0;
+            const interval = setInterval(() => {
+                speed = Math.floor(Math.random() * 900) + 100;
+                gauge.innerText = speed;
+                gauge.style.borderColor = `hsl(${speed/10}, 70%, 50%)`;
+            }, 100);
+            setTimeout(() => {
+                clearInterval(interval);
+                addLog(`Σ [SPEED]: Test complete. Result: ${speed} MBPS.`, "success");
+            }, 3000);
+        }
+
+        function dataAction(action) {
+            const input = document.getElementById('util-data-input').value;
+            const output = document.getElementById('util-data-output');
+            if (action === 'json-xml') {
+                output.innerText = "<root>\n  <data>" + input + "</data>\n</root>";
+            } else {
+                output.innerText = "[{ \"data\": \"" + input + "\" }]";
+            }
+            addLog(`Σ [UTILITY]: Data conversion complete.`, "success");
+        }
+
+        function renderCode() {
+            const code = document.getElementById('util-code-input').value;
+            document.getElementById('code-render-box').innerText = code;
+            addLog("Σ [UTILITY]: Code-to-Image preview rendered.", "success");
+        }
+
+        function compareText() {
+            const left = document.getElementById('diff-left').value;
+            const right = document.getElementById('diff-right').value;
+            const output = document.getElementById('diff-output');
+            
+            if (left === right) {
+                output.innerHTML = '<span style="color: var(--success);">✔ Shards are bit-perfect matches.</span>';
+            } else {
+                output.innerHTML = '<span style="color: var(--error);">✘ Shard mismatch detected. Diff reconciliation required.</span>';
+            }
+            addLog("Σ [UTILITY]: Text comparison complete.", "success");
+        }
+
+        function textAction(action) {
+            const input = document.getElementById('util-text-input').value;
+            const output = document.getElementById('util-text-output');
+            
+            if (action === 'upper') output.innerText = input.toUpperCase();
+            else if (action === 'lower') output.innerText = input.toLowerCase();
+            else if (action === 'title') output.innerText = input.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+            else if (action === 'sentence') output.innerText = input.toLowerCase().replace(/(^\s*\w|[\.\!\?]\s*\w)/g, c => c.toUpperCase());
+            else if (action === 'count') {
+                const words = input.trim().split(/\s+/).filter(w => w.length > 0).length;
+                const chars = input.length;
+                const lines = input.split('\n').filter(l => l.length > 0).length;
+                output.innerText = `Words: ${words} | Characters: ${chars} | Lines: ${lines}`;
+            }
+            else if (action === 'clear-lines') output.innerText = input.replace(/\n/g, ' ');
+            
+            addLog(`Σ [UTILITY]: Executed ${action} on text buffer.`, "success");
+        }
+
+        function forgeHTML() {
+            const input = document.getElementById('markup-input').value;
+            const output = document.getElementById('markup-output');
+            
+            // Simple Text-to-HTML conversion logic
+            let html = input
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;")
+                .replace(/\n/g, "<br>\n");
+            
+            // Add some "sovereign" tags
+            html = html.replace(/Σ/g, '<span style="color: cyan;">Σ</span>');
+            
+            output.innerText = html;
+            addLog("Σ [MARKUP]: HTML Shard forged successfully.", "success");
+        }
+
+        function clearMarkup() {
+            document.getElementById('markup-input').value = '';
+            document.getElementById('markup-output').innerText = '';
+            addLog("Σ [MARKUP]: Buffer purged.", "success");
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Meta' || e.key === 'Control') {
+                // Potential Start Menu shortcut
+            }
+            if (e.key === 'Escape') {
+                document.getElementById('start-menu').classList.remove('active');
+                document.getElementById('cmd-palette').classList.remove('active');
+            }
+        });
+
+        // Update Start Menu Click
+        document.querySelector('.taskbar-start').onclick = toggleStart;
+
+        setInterval(() => {
+            const cpu = Math.floor(Math.random() * 20) + 10;
+            document.getElementById('cpu-load').textContent = cpu + "%";
+            document.getElementById('cpu-progress').style.width = cpu + "%";
+            updateGraph(cpu);
+
+            const mem = (Math.random() * 0.5 + 4.1).toFixed(1);
+            document.getElementById('mem-load').textContent = (4.0 + Math.random() * 0.5).toFixed(1) + " GB";
+            document.getElementById('mem-progress').style.width = (40 + Math.random() * 5) + "%";
+
+            const cacheHit = (99.0 + Math.random() * 0.9).toFixed(1);
+            document.getElementById('cache-hit').textContent = cacheHit + "% Hit";
+            document.getElementById('cache-progress').style.width = cacheHit + "%";
+
+            // Voice Simulation
+            if (Math.random() > 0.98) {
+                document.getElementById('voice-status').textContent = "Listening...";
+                document.getElementById('voice-status').style.color = "var(--success)";
+                addLog("Σ [VOICE]: Wake-word 'Sigma' detected. Listening...", "success");
+
+                setTimeout(() => {
+                    document.getElementById('voice-status').textContent = "Processing";
+                    document.getElementById('voice-status').style.color = "var(--accent)";
+                    setTimeout(() => {
+                        document.getElementById('voice-status').textContent = "Idle";
+                        document.getElementById('voice-status').style.color = "var(--text-muted)";
+                        addLog("Σ [VOICE]: Transcription: 'Initialize neural lattice'. Executing...", "success");
+                    }, 1500);
+                }, 2000);
+            }
+
+            // Automation Simulation
+            const efficiency = (97.0 + Math.random() * 2.5).toFixed(1);
+            document.getElementById('auto-efficiency').textContent = `Efficiency: ${efficiency}%`;
+            document.getElementById('auto-progress').style.width = efficiency + "%";
+
+            // Vault Simulation
+            if (Math.random() > 0.99) {
+                document.getElementById('vault-status').textContent = "Syncing";
+                document.getElementById('vault-status').style.color = "var(--accent)";
+                addLog("Σ [STORAGE]: Synchronizing state with decentralized lattice...", "success");
+
+                setTimeout(() => {
+                    document.getElementById('vault-status').textContent = "Pinned";
+                    document.getElementById('vault-status').style.color = "var(--text-muted)";
+                    addLog("Σ [STORAGE]: State Shard pinned. CID: Qm... finalized.", "success");
+                }, 2500);
+            }
+            document.getElementById('vault-progress').style.width = (60 + Math.random() * 10) + "%";
+
+            // VFS Simulation
+            if (Math.random() > 0.96) {
+                const nodes = Math.floor(Math.random() * 5) + 10;
+                document.getElementById('vfs-nodes').textContent = `${nodes} Nodes`;
+                addLog(`Σ [VFS]: Registered ${nodes} active shard nodes.`, "success");
+            }
+            document.getElementById('vfs-progress').style.width = (75 + Math.random() * 10) + "%";
+
+            // Memory Simulation
+            const memUsage = (20 + Math.random() * 10).toFixed(0);
+            document.getElementById('mem-usage').textContent = `${memUsage}% Used`;
+            document.getElementById('memory-progress').style.width = memUsage + "%";
+
+            // Sync Simulation
+            if (Math.random() > 0.95) {
+                const latency = (5 + Math.random() * 15).toFixed(0);
+                document.getElementById('sync-latency').textContent = `${latency}ms Latency`;
+                addLog(`Σ [SYNC]: Distributed lock cycle complete. Latency: ${latency}ms.`, "success");
+            }
+            document.getElementById('sync-progress').style.width = (90 + Math.random() * 10) + "%";
+
+            // UI Simulation
+            const frameTime = (8.0 + Math.random() * 0.5).toFixed(1);
+            document.getElementById('ui-frametime').textContent = `${frameTime}ms`;
+            document.getElementById('ui-progress').style.width = "100%";
+
+            // Silicon Simulation
+            if (Math.random() > 0.98) {
+                const bus = Math.floor(Math.random() * 10).toString().padStart(2, '0');
+                const slot = Math.floor(Math.random() * 32).toString().padStart(2, '0');
+                document.getElementById('pci-devices').textContent = `Bus: ${bus} | Slot: ${slot}`;
+                addLog(`Σ [PCI]: Hardware Shard detected on Bus ${bus}, Slot ${slot}. Auditing...`, "success");
+            }
+            document.getElementById('silicon-progress').style.width = "100%";
+
+            // Scholar Simulation
+            const labs = ["Physics: Magnetism", "Chemistry: Titration", "Biology: Microscopy", "Math: Geometry"];
+            if (Math.random() > 0.95) {
+                const lab = labs[Math.floor(Math.random() * labs.length)];
+                document.getElementById('lab-active').textContent = lab;
+                addLog(`Σ [SCHOLAR]: Executing Virtual Lab Shard: ${lab}. Procedure synced.`, "success");
+            }
+            document.getElementById('scholar-progress').style.width = (95 + Math.random() * 5) + "%";
+
+            // Persona Simulation
+            if (Math.random() > 0.99) {
+                const names = ["Sovereign_Alpha", "Lattice_Master", "Silicon_Savant"];
+                const name = names[Math.floor(Math.random() * names.length)];
+                document.getElementById('persona-name').textContent = name;
+                document.getElementById('menu-user-name').textContent = name;
+                addLog(`Σ [PERSONA]: Identity Shard adapted. New Alias: ${name}.`, "success");
+            }
+            document.getElementById('persona-progress').style.width = "100%";
+
+            // Sentinel Simulation
+            if (Math.random() > 0.94) {
+                const scrubs = Math.floor(Math.random() * 20) + 10;
+                document.getElementById('log-scrubs').textContent = `${scrubs} Scrubs`;
+                addLog(`Σ [SENTINEL]: Amnesic audit complete. ${scrubs} traces neutralized.`, "success");
+            }
+            document.getElementById('amnesic-progress').style.width = (80 + Math.random() * 20) + "%";
+
+            // Judicial Simulation
+            if (Math.random() > 0.98) {
+                document.getElementById('legal-status').textContent = "AUDITING";
+                document.getElementById('legal-status').style.color = "var(--accent)";
+                addLog("Σ [LEGAL]: Performing BNSS/BNS/BSA silicon-to-statute audit...", "success");
+
+                setTimeout(() => {
+                    document.getElementById('legal-status').textContent = "Compliant";
+                    document.getElementById('legal-status').style.color = "var(--success)";
+                    addLog("Σ [LEGAL]: Judicial integrity verified. Compliance: 100%.", "success");
+                }, 2000);
+            }
+            document.getElementById('legal-progress').style.width = "100%";
+
+            // Colonization Simulation
+            if (Math.random() > 0.99) {
+                const nodes = parseInt(document.getElementById('node-count').textContent) + 1;
+                document.getElementById('node-count').textContent = `${nodes} Nodes`;
+                addLog(`Σ [COLONIZER]: Shard projection successful. New node colonized in the mesh.`, "success");
+            }
+            document.getElementById('mesh-progress').style.width = (40 + Math.random() * 60) + "%";
+
+            // VRAM Simulation
+            const vramUsage = (10 + Math.random() * 10).toFixed(0);
+            document.getElementById('vram-usage').textContent = `${vramUsage}MB / 256MB`;
+            document.getElementById('vram-progress').style.width = (vramUsage / 2.56) + "%";
+
+            // Boot Simulation
+            document.getElementById('boot-progress-bar').style.width = "98%";
+
+            // Integrity Simulation
+            if (Math.random() > 0.97) {
+                document.getElementById('test-status').textContent = "Auditing";
+                document.getElementById('test-status').style.color = "var(--accent)";
+                addLog("Σ [AUDIT]: Running 500-shard integrity verification...", "success");
+
+                setTimeout(() => {
+                    document.getElementById('test-status').textContent = "Verified";
+                    document.getElementById('test-status').style.color = "var(--success)";
+                    addLog("Σ [AUDIT]: All shards verified. Integrity: BIT-PERFECT.", "success");
+                }, 1800);
+            }
+            document.getElementById('test-progress').style.width = "100%";
+
+            // Entropy Simulation
+            const entropyHex = Array.from({ length: 4 }, () => Math.floor(Math.random() * 256).toString(16).padStart(2, '0')).join('').toUpperCase();
+            document.getElementById('entropy-val').textContent = `0x${entropyHex}...`;
+            document.getElementById('entropy-progress').style.width = (85 + Math.random() * 15) + "%";
+
+            // UI Interactions
+            // Self-Healing Simulation
+            const auditTime = Math.floor(Math.random() * 15) + 5;
+            document.getElementById('healing-info').textContent = `Last Audit: ${auditTime}ms ago`;
+            const healingProgress = Math.floor(Math.random() * 20) + 80;
+            document.getElementById('healing-progress').style.width = healingProgress + "%";
+
+            if (Math.random() > 0.95) {
+                document.getElementById('healing-status').textContent = "RESTORING";
+                document.getElementById('healing-status').style.color = "var(--error)";
+                addLog("Σ [SELF-HEAL]: Entropy spike detected in VFS shard. Restoring...", "error");
+                setTimeout(() => {
+                    document.getElementById('healing-status').textContent = "OPTIMAL";
+                    document.getElementById('healing-status').style.color = "var(--success)";
+                    addLog("Σ [SELF-HEAL]: VFS Shard restored to bit-perfect state.", "success");
+                }, 1500);
+            }
+
+            // Security Audit Simulation
+            const secProgress = (parseFloat(document.getElementById('security-progress').style.width) || 0) + (Math.random() * 10);
+            if (secProgress >= 100) {
+                document.getElementById('security-progress').style.width = "0%";
+                document.getElementById('security-info').textContent = "Scanning Lattice...";
+                if (Math.random() > 0.8) {
+                    addLog("Σ [SEC-AUDIT]: Architectural drift detected. Hardening lattice...", "error");
+                    document.getElementById('security-status').textContent = "HARDENING";
+                    document.getElementById('security-status').style.color = "var(--error)";
+                    setTimeout(() => {
+                        document.getElementById('security-status').textContent = "SHIELDED";
+                        document.getElementById('security-status').style.color = "var(--accent)";
+                        addLog("Σ [SEC-AUDIT]: Lattice-PQC parity restored.", "success");
+                    }, 2000);
+                }
+            } else {
+                document.getElementById('security-progress').style.width = secProgress + "%";
+                document.getElementById('security-info').textContent = `Auditing Shard ${Math.floor(Math.random() * 500)}...`;
+            }
+
+            // Colonization Simulation
+            const colProgress = (parseFloat(document.getElementById('col-progress').style.width) || 0) + (Math.random() * 5);
+            if (colProgress >= 100) {
+                const nodes = parseInt(document.getElementById('node-count').textContent) + 1;
+                document.getElementById('node-count').textContent = `${nodes} Nodes`;
+                document.getElementById('col-progress').style.width = "0%";
+                const newIp = `192.168.1.${Math.floor(Math.random() * 254) + 1}`;
+                document.getElementById('col-target').textContent = `Target: ${newIp}`;
+                addLog(`Σ [COLONIZER]: Shard projected to ${newIp}. Node synchronized.`, "success");
+            } else {
+                document.getElementById('col-progress').style.width = colProgress + "%";
+            }
+
+            // Shard Matrix Animation
+            const dots = document.querySelectorAll('.shard-dot');
+            dots.forEach(dot => {
+                if (Math.random() > 0.98) {
+                    dot.classList.toggle('active');
+                }
+            });
+
+            if (Math.random() > 0.99) {
+                const faultIdx = Math.floor(Math.random() * 500);
+                dots[faultIdx].classList.add('error');
+                document.getElementById('shard-status').textContent = "Integrity: 99.8% (Fault Detected)";
+                document.getElementById('shard-status').style.color = "var(--error)";
+
+                setTimeout(() => {
+                    dots[faultIdx].classList.remove('error');
+                    dots[faultIdx].classList.add('healing');
+                    document.getElementById('shard-status').textContent = "Integrity: 100.0% (Self-Healed)";
+                    document.getElementById('shard-status').style.color = "var(--success)";
+                    setTimeout(() => dots[faultIdx].classList.remove('healing'), 2000);
+                }, 1500);
+            }
+        }, 2000);
+
+        // Inject 999 Shards for 999+ Singularity
+        const matrix = document.getElementById('shard-matrix');
+        for (let i = 0; i < 999; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'shard-dot';
+            if (Math.random() > 0.95) dot.classList.add('active');
+            matrix.appendChild(dot);
+        }
+
+        // DNA Telemetry Sync
+        let totalSaved = 0;
+        setInterval(() => {
+            totalSaved += Math.floor(Math.random() * 500);
+            document.getElementById('dna-savings').innerText = (totalSaved / 1024).toFixed(2) + " MB";
+        }, 2000);
+
+        // Lattice Mesh Discovery & Streaming
+        let peers = 0;
+        const meshView = document.getElementById('mesh-view');
+        const meshSvg = document.getElementById('mesh-svg');
+        const meshNodes = [];
+
+        function discoverPeer() {
+            peers++;
+            document.getElementById('peer-count').innerText = peers;
+            const node = document.createElement('div');
+            node.className = 'mesh-node mesh-node-pulse';
+            
+            const x = Math.random() * 90;
+            const y = Math.random() * 90;
+            node.style.left = x + '%';
+            node.style.top = y + '%';
+            
+            if (meshView) meshView.appendChild(node);
+            meshNodes.push({x, y});
+
+            // Simulate Data Stream to a random previous node
+            if (peers > 1 && meshSvg) {
+                const targetIdx = Math.floor(Math.random() * (peers - 1));
+                const target = meshNodes[targetIdx];
+                
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', x + '%');
+                line.setAttribute('y1', y + '%');
+                line.setAttribute('x2', target.x + '%');
+                line.setAttribute('y2', target.y + '%');
+                line.setAttribute('stroke', 'var(--accent)');
+                line.setAttribute('stroke-width', '1');
+                line.setAttribute('stroke-dasharray', '5,5');
+                line.style.opacity = '0.5';
+                
+                // Animate stream
+                let offset = 0;
+                setInterval(() => {
+                    offset -= 1;
+                    line.setAttribute('stroke-dashoffset', offset);
+                }, 50);
+
+                meshSvg.appendChild(line);
+            }
+        }
+        setInterval(() => { if (peers < 12) discoverPeer(); }, 5000);
+        // Silicon-Direct Transpiler Telemetry
+        let transpiledDrivers = 0;
+        const driverElement = document.getElementById('transpiled-count');
+        const isaElement = document.getElementById('silicon-isa');
+        
+        setInterval(() => {
+            if(transpiledDrivers < 24) {
+                transpiledDrivers += Math.floor(Math.random() * 3);
+                if (driverElement) driverElement.innerText = transpiledDrivers;
+            }
+            if(Math.random() > 0.98) {
+                isaElement.innerText = "ARM (AArch64)";
+            } else if (Math.random() > 0.98) {
+                isaElement.innerText = "RISC-V (RV64GC)";
+            }
+        }, 3000);
+        // Neural Automator Telemetry
+        const cognitiveTasks = ["Preemptive VRAM Caching", "Predictive Shard Loading", "Background Lattice Audit", "DNA Re-indexing", "Quantum Key Rotation"];
+        const queueElement = document.getElementById('cognitive-queue');
+        const currentTaskElement = document.getElementById('auto-current-task');
+        const countElement = document.getElementById('auto-task-count');
+        const autoProgress = document.getElementById('auto-progress');
+        let activeTasks = 0;
+
+        setInterval(() => {
+            if (Math.random() > 0.6) {
+                // Schedule new cognitive task
+                const task = cognitiveTasks[Math.floor(Math.random() * cognitiveTasks.length)];
+                const taskEl = document.createElement('div');
+                taskEl.innerText = ">> " + task;
+                taskEl.style.opacity = '0';
+                taskEl.style.transition = 'opacity 0.5s';
+                queueElement.prepend(taskEl);
+                setTimeout(() => taskEl.style.opacity = '1', 50);
+                
+                activeTasks++;
+                countElement.innerText = activeTasks + " Tasks Active";
+                currentTaskElement.innerText = "Running: " + task;
+                
+                // Animate progress bar
+                autoProgress.style.transition = 'width 2s linear';
+                autoProgress.style.width = '100%';
+                
+                // Task completion
+                setTimeout(() => {
+                    activeTasks--;
+                    countElement.innerText = activeTasks + " Tasks Active";
+                    if (queueElement.contains(taskEl)) {
+                        queueElement.removeChild(taskEl);
+                    }
+                    if (activeTasks === 0) {
+                        currentTaskElement.innerText = "Next: Idle";
+                    }
+                    autoProgress.style.transition = 'none';
+                    autoProgress.style.width = '0%';
+                }, 2000);
+            }
+        }, 3500);
+
+        // Orb Exchange Telemetry
+        const orbList = ["NeuralVisualizer-v2", "QuantumSieve-PQC", "BioFS-DNA-Module", "CryptoLedger-X"];
+        const orbStatus = document.getElementById('orb-active');
+        const orbProgress = document.getElementById('orb-progress');
+        
+        setInterval(() => {
+            if (Math.random() > 0.8) {
+                const orb = orbList[Math.floor(Math.random() * orbList.length)];
+                orbStatus.innerText = "Summoning: " + orb;
+                orbProgress.style.transition = 'width 1.5s linear';
+                orbProgress.style.width = '100%';
+                
+                setTimeout(() => {
+                    orbStatus.innerText = "Idle";
+                    orbProgress.style.transition = 'none';
+                    orbProgress.style.width = '0%';
+                }, 1600);
+            }
+        }, 4000);
+        
+        // Community Governance Telemetry
+        let activeProposals = 0;
+        const propElement = document.getElementById('gov-active');
+        const voteElement = document.getElementById('gov-vote');
+        const govProgress = document.getElementById('gov-progress');
+        
+        setInterval(() => {
+            if(Math.random() > 0.7) {
+                activeProposals = Math.floor(Math.random() * 12) + 1;
+                propElement.innerText = activeProposals + " Active Proposals";
+                
+                if(Math.random() > 0.5) {
+                    voteElement.innerText = "YEA (QKD-VERIFIED)";
+                    voteElement.className = "status-success";
+                    govProgress.style.width = (50 + Math.random() * 40) + '%';
+                    govProgress.style.background = 'var(--success)';
+                    govProgress.style.boxShadow = '0 0 10px var(--success)';
+                } else {
+                    voteElement.innerText = "NAY (QKD-VERIFIED)";
+                    voteElement.className = "accent";
+                    govProgress.style.width = (10 + Math.random() * 40) + '%';
+                    govProgress.style.background = 'var(--error)';
+                    govProgress.style.boxShadow = '0 0 10px var(--error)';
+                }
+            }
+        }, 5000);
+
+        // Trust Fabric Lockdown Mode
+        setInterval(() => {
+            if(Math.random() > 0.95) {
+                // Trigger Lockdown
+                document.body.classList.add('lockdown-mode');
+                document.getElementById('qkd-status').innerText = "ANOMALY DETECTED";
+                document.getElementById('qkd-status').style.color = "var(--error)";
+                document.getElementById('orb-trust').innerText = "LOCKDOWN ACTIVE";
+                document.getElementById('orb-trust').className = "accent";
+                
+                // Heal after 5 seconds
+                setTimeout(() => {
+                    document.body.classList.remove('lockdown-mode');
+                    document.getElementById('qkd-status').innerText = "Entangled";
+                    document.getElementById('qkd-status').style.color = "var(--text-light)";
+                    document.getElementById('orb-trust').innerText = "QKD-VERIFIED";
+                    document.getElementById('orb-trust').className = "status-success";
+                }, 5000);
+            }
+        }, 8000);
+
+    </script>
+</body>
+</html>

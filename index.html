@@ -1,1232 +1,299 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="SigmaOS Sovereign Zenith: The next-generation shard-based industrial lattice operating system dashboard.">
-    <meta name="keywords" content="SigmaOS, Sovereign Lattice, Operating System, Zenith UI, Shard Architecture">
-    <meta http-equiv="Content-Security-Policy" content="
-        default-src 'self';
-        script-src 'self' 'unsafe-inline';
-        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-        img-src 'self' data: https:;
-        font-src 'self' https://fonts.gstatic.com;
-        connect-src 'self';
-        frame-src 'self';
-    ">
-    <title>Σ SIGMAOS: SOVEREIGN ZENITH</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="zenith_desktop.css">
-    <link rel="stylesheet" href="industrial_overrides.css">
-    <script src="zenith_desktop.js" defer></script>
+    <title>SigmaOS: The Sovereign Operating System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #030305;
+            --surface: #0a0a0f;
+            --accent: #00ffcc;
+            --accent-glow: rgba(0, 255, 204, 0.4);
+            --text-main: #f0f0f0;
+            --text-muted: #888;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        header {
+            padding: 40px 10%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(3, 3, 5, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        nav a {
+            color: var(--text-main);
+            text-decoration: none;
+            margin-left: 30px;
+            font-weight: 400;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--accent);
+        }
+
+        .hero {
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            background: radial-gradient(circle at center, rgba(0, 255, 204, 0.1) 0%, transparent 60%);
+        }
+
+        h1 {
+            font-size: 5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .btn:hover {
+            background: var(--accent);
+            color: var(--bg);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid transparent;
+            color: white;
+            box-shadow: none;
+            margin-left: 20px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            box-shadow: none;
+        }
+
+        .features {
+            padding: 100px 10%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .zenith-demo {
+            padding: 100px 10%;
+            background: var(--surface);
+            text-align: center;
+        }
+
+        .zenith-demo h2 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .zenith-demo p {
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            font-size: 1.2rem;
+        }
+
+        .demo-window {
+            width: 100%;
+            max-width: 1200px;
+            height: 600px;
+            margin: 0 auto;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .demo-window iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background: rgba(0, 255, 204, 0.1);
+            color: var(--accent);
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 20px;
+            border: 1px solid rgba(0, 255, 204, 0.3);
+        }
+
+        footer {
+            padding: 60px 10%;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+        }
+    </style>
 </head>
+<body>
 
-<body class="zenith-sovereign">
-    <div class="desktop-overlay"></div>
-    <div class="mouse-glow" id="mouse-glow"></div>
+    <header>
+        <div class="logo">Σ <span>SigmaOS</span></div>
+        <nav>
+            <a href="#features">Architecture</a>
+            <a href="#zenith">Zenith UI</a>
+            <a href="https://github.com/AaryanSinghChauhan09/SigmaOS/wiki" target="_blank">Wiki</a>
+            <a href="https://github.com/AaryanSinghChauhan09/SigmaOS/discussions" target="_blank">Discussions</a>
+            <a href="https://github.com/AaryanSinghChauhan09/SigmaOS" target="_blank">GitHub</a>
+        </nav>
+    </header>
 
-    <noscript>
-        <div class="u-flex-center-vh">
-            <p>Σ SigmaOS Zenith requires JavaScript. Enable scripts to boot the sovereign lattice.</p>
+    <section class="hero">
+        <div class="badge">LATTICE BUILD 1.0 (QUANTUM-READY)</div>
+        <h1>The World's Most Advanced<br>Sovereign Operating System</h1>
+        <p>A decentralized, quantum-hardened, and AI-driven ecosystem designed to absorb and outclass traditional Linux distributions. SigmaOS represents the evolution of hardware sovereignty and cognitive user experience.</p>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <a href="https://github.com/AaryanSinghChauhan09/SigmaOS/releases" class="btn">Download ISO</a>
+            <a href="zenith.html" class="btn btn-secondary">Launch Zenith Demo</a>
+            <a href="https://github.com/AaryanSinghChauhan09/SigmaOS/discussions" class="btn btn-secondary" style="border: 1px solid rgba(255,255,255,0.2);">Join the Community</a>
         </div>
-    </noscript>
-    <!-- Start Menu -->
-    <div class="start-menu" id="start-menu">
-        <div class="start-header">
-            <div class="user-avatar">Σ</div>
-            <div class="user-info">
-                <div class="user-name" id="menu-user-name">Sovereign_User</div>
-                <div class="user-status">Authorized Shard Master</div>
-            </div>
-            <div class="window-controls">
-                <div class="win-btn minimize" onclick="minimizeWindow('start-menu')"></div>
-                <div class="win-btn close" onclick="toggleStart()"></div>
-            </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="feature-card">
+            <h3>Orb Marketplace</h3>
+            <p>A massive, decentralized P2P package distribution registry rivaling APT and DNF, backed by continuous QKD validation. True sovereign application distribution.</p>
         </div>
-        <div class="start-content">
-            <div class="start-section">
-                <div class="section-title">Pinned Shards</div>
-                <div class="start-item" onclick="toggleStart()">
-                    <span class="icon">⌨️</span>
-                    <span>OmniShell v100.0</span>
-                </div>
-                <div class="start-item" onclick="toggleStart()">
-                    <span class="icon">📝</span>
-                    <span>Zenith Editor</span>
-                </div>
-                <div class="start-item" onclick="toggleStart()">
-                    <span class="icon">🛡️</span>
-                    <span>Quantum Shield</span>
-                </div>
-                <div class="start-item" onclick="launchApp('Markup Forge')">
-                    <span class="icon">📝</span>
-                    <span>Markup Forge</span>
-                </div>
-                <div class="start-item" onclick="launchApp('Utility Nexus')">
-                    <span class="icon">🛠️</span>
-                    <span>Utility Nexus</span>
-                </div>
-                <div class="start-item" onclick="window.open('https://github.com/AaryanSinghChauhan09/SigmaOS/wiki', '_blank')">
-                    <span class="icon">📚</span>
-                    <span>Project Wiki</span>
-                </div>
-            </div>
-            <div class="start-section">
-                <div class="section-title">System Shards</div>
-                <div class="start-item">
-                    <span class="icon">⚙️</span>
-                    <span>Lattice Settings</span>
-                </div>
-                <div class="start-item">
-                    <span class="icon">📈</span>
-                    <span>Performance Matrix</span>
-                </div>
-                <div class="start-item" onclick="toggleStart()">
-                    <span class="icon">🚀</span>
-                    <span>Live Boot Nexus</span>
-                </div>
-                <div class="start-item" onclick="toggleStart()">
-                    <span class="icon">☁️</span>
-                    <span>Hypervisor Shard</span>
-                </div>
-            </div>
+        <div class="feature-card">
+            <h3>Quantum Security</h3>
+            <p>Bare-metal Quantum-Key Distribution (QKD), post-quantum cryptography, and zero-trust mesh routing enforced at the hardware level across the entire lattice.</p>
         </div>
-        <div class="start-footer">
-            <div class="footer-item" onclick="location.reload()">Reboot</div>
-            <div class="footer-item" onclick="toggleStart()">Lock</div>
+        <div class="feature-card">
+            <h3>Silicon-Direct Sovereignty</h3>
+            <p>JIT translation of legacy drivers to native RISC-V and ARM architectures natively within the lattice, ensuring total hardware mobility without vendor lock-in.</p>
         </div>
-    </div>
-    <!-- Command Palette (Ctrl+K / Ctrl+Space) -->
-    <div class="command-palette" id="cmd-palette">
-        <div class="command-header">
-            <label for="cmd-input" class="sr-only">Command Filter</label>
-            <input type="text" class="command-input" placeholder="Type a command or search shards…" id="cmd-input"
-                autocomplete="off" aria-label="Search and filter lattice commands">
+        <div class="feature-card">
+            <h3>Neural UI (Zenith)</h3>
+            <p>An AI-adaptive desktop environment featuring sub-millisecond glassmorphic compositing, predictive task queues, and intent-based workflow automation.</p>
         </div>
-        <div class="u-padding-24">
-            <div class="command-results" id="cmd-results">
-
-                <div class="command-item" onclick="launchApp('File Manager')"><span>File Manager</span><kbd>Files</kbd>
-                </div>
-                <div class="command-item" onclick="launchApp('Sigma Browser')"><span>Sigma Browser</span><kbd>Web</kbd>
-                </div>
-                <div class="command-item" onclick="launchApp('AI Assistant')"><span>AI Assistant</span><kbd>AI</kbd>
-                </div>
-                <div class="command-item" onclick="launchApp('Utility Nexus')"><span>Utility
-                        Nexus</span><kbd>Utils</kbd></div>
-                <div class="command-item" onclick="launchApp('Markup Forge')"><span>Markup Forge</span><kbd>MD</kbd>
-                </div>
-                <div class="command-item" onclick="launchApp('Marketplace')"><span>Marketplace</span><kbd>Store</kbd>
-                </div>
-                <div class="command-item" onclick="launchApp('Data Forge')"><span>Data Forge</span><kbd>Data</kbd></div>
-                <div class="command-item" onclick="launchApp('Lattice Monitor')"><span>Lattice
-                        Monitor</span><kbd>Sys</kbd></div>
-                <div class="command-item" onclick="launchApp('Lattice Settings')"><span>Lattice
-                        Settings</span><kbd>Set</kbd></div>
-                <div class="command-item" onclick="setTheme('cyan')"><span>Theme: Neon Cyan</span><kbd>Th+1</kbd></div>
-                <div class="command-item" onclick="setTheme('gold')"><span>Theme: Solar Gold</span><kbd>Th+2</kbd></div>
-                <div class="command-item" onclick="setTheme('crimson')"><span>Theme: Crimson Shard</span><kbd>Th+3</kbd>
-                </div>
-                <div class="command-item" onclick="setTheme('solar')"><span>Theme: Adaptive Solar</span><kbd>Th+4</kbd>
-                </div>
-                <div class="command-item" onclick="addLog('Σ [AUTO]: Optimizing Shard Lattice...', 'success')">
-                    <span>Optimize Lattice</span><kbd>Opt</kbd></div>
-            </div>
+        <div class="feature-card">
+            <h3>Distro Absorption</h3>
+            <p>Merging the stability of Debian, the innovation of Fedora, the extreme isolation of Qubes, and the lightweight edge-deployability of Alpine into modular Shards.</p>
         </div>
-
-        <!-- Central Clock & Theme Selector -->
-        <div class="zenith-top-panel">
-            <div class="theme-shards">
-                <div class="theme-shard cyan" onclick="setTheme('cyan')" title="Neon Cyan"></div>
-                <div class="theme-shard gold" onclick="setTheme('gold')" title="Solar Gold"></div>
-                <div class="theme-shard crimson" onclick="setTheme('crimson')" title="Crimson Shard"></div>
-                <div class="theme-shard solar" onclick="setTheme('solar')" title="Adaptive Solar"></div>
-            </div>
-            <div class="clock-container">
-                <div id="clock-time">00:00</div>
-                <div id="clock-date">Tuesday, April 28</div>
-            </div>
-            <div class="persona-indicator" onclick="launchApp('Lattice Settings')">
-                <div class="persona-avatar">Σ</div>
-                <span id="top-user-name">Sovereign_User</span>
-            </div>
+        <div class="feature-card">
+            <h3>DNA-Inspired Filesystem</h3>
+            <p>O(1) Copy-on-Write snapshots, AI-driven predictive storage tiering, and biological-inspired compression algorithms for infinite scalability.</p>
         </div>
+    </section>
 
-        <!-- Notification Center / Kernel Logs -->
-        <div class="notification-center" id="kernel-logs">
-            <!-- Logs will be injected here -->
+    <section class="zenith-demo" id="zenith">
+        <h2>Experience Zenith</h2>
+        <p>Interact with the live, browser-rendered prototype of the Sovereign Zenith Desktop.</p>
+        <div class="demo-window">
+            <iframe src="zenith.html" title="Zenith Desktop Demo"></iframe>
         </div>
+    </section>
 
-        <div id="zenith-desktop" class="zenith-desktop-root">
-            <!-- Widgets -->
-            <div class="widgets-container">
-                <!-- Silicon Thermal Heatmap Widget -->
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Silicon Heat Map</span>
-                        <span class="accent">Thermal IQ</span>
-                    </div>
-                    <div class="thermal-grid">
-                        <div class="thermal-shard ts-1"></div>
-                        <div class="thermal-shard ts-2"></div>
-                        <div class="thermal-shard ts-3"></div>
-                        <div class="thermal-shard ts-4"></div>
-                        <div class="thermal-shard ts-5"></div>
-                        <div class="thermal-shard ts-6"></div>
-                        <div class="thermal-shard ts-7"></div>
-                        <div class="thermal-shard ts-8"></div>
-                    </div>
-                    <div class="stat-label">Avg Temp: 34°C (Optimal)</div>
-                </div>
-
-                <!-- Sovereign Trust Fabric Widget -->
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Trust Fabric</span>
-                        <span class="accent">Quantum-Synced</span>
-                    </div>
-                    <div class="stat-value" id="trust-level">99.9%</div>
-                    <div class="stat-label">Keys Active: <span id="qkd-keys">128</span></div>
-                    <div class="stat-bar">
-                        <div class="stat-progress security" id="trust-progress" class="full-width"></div>
-                    </div>
-                    <div class="audit-info">Lattice Entropy: OPTIMAL</div>
-                </div>
-
-                <!-- NEW: Modular Shard Lattice Widget -->
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Modular Lattice</span>
-                        <span class="accent">600 Shards</span>
-                    </div>
-                    <div class="stat-value" id="shard-modularity">94.0%</div>
-                    <div class="stat-label">Namespaces: <span class="accent">ISOLATED</span></div>
-                    <div class="stat-bar">
-                        <div class="stat-progress primary eighty-five-width"></div>
-                    </div>
-                    <div class="audit-info">Lattice State: ZENITH</div>
-                </div>
-
-                <!-- Sovereign Orb Marketplace Widget -->
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Orb Marketplace</span>
-                        <span class="accent">Mesh-Live</span>
-                    </div>
-                    <div class="market-list">
-                        <div class="market-item">
-                            <span>NeuralVisualizer-v2</span>
-                            <button class="cyber-btn small-btn primary"
-                                onclick="addLog('Σ [MARKET]: Summoning Shard...')">SUMMON</button>
-                        </div>
-                        <div class="market-item">
-                            <span>BioFS-DNA-Module</span>
-                            <button class="cyber-btn small-btn primary"
-                                onclick="addLog('Σ [MARKET]: Summoning Shard...')">SUMMON</button>
-                        </div>
-                    </div>
-                    <div class="audit-info">Trending: QuantumSieve-PQC</div>
-                </div>
-
-                <!-- Sovereign App Sharding Matrix Widget -->
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>App Sharding Matrix</span>
-                        <span class="accent">Lattice-Dist</span>
-                    </div>
-                    <div class="app-shard-list">
-                        <div class="app-shard-item">
-                            <div class="shard-item-header">
-                                <span>OmniShell-v100</span>
-                                <span class="accent">4 Shards</span>
-                            </div>
-                            <div class="stat-bar thin-bar">
-                                <div class="stat-progress primary full-width"></div>
-                            </div>
-                        </div>
-                        <div class="app-shard-item">
-                            <div class="shard-item-header">
-                                <span>Zenith-Desktop-Pro</span>
-                                <span class="accent">12 Shards</span>
-                            </div>
-                            <div class="stat-bar thin-bar">
-                                <div class="stat-progress primary eighty-five-width"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="audit-info">Active Shards: 16 | Efficiency: 99%</div>
-                </div>
-
-                <!-- Live Kernel Console Shard -->
-                <div class="kernel-console-shard" id="kernel-console">
-                    <div class="console-header">
-                        <span>LIVE KERNEL TELEMETRY</span>
-                        <span>SHARD-ID: 0x8F2</span>
-                    </div>
-                    <div id="console-output" class="console-output">
-                        <div>[0.000] Σ [ORCHESTRATOR]: Sharding Foundation...</div>
-                        <div>[0.012] Σ [PMM]: Silicon Memory Shard ONLINE.</div>
-                        <div>[0.045] Σ [VMM]: PML4 Tables Orchestrated.</div>
-                        <div>[0.102] Σ [SEL]: Zero-Trust Policy Active.</div>
-                        <div>[0.158] Σ [SYSBRIDGE]: POSIX-lite Shards Ready.</div>
-                        <div>[0.210] Σ [LATTICE]: Heartbeat Sync Active.</div>
-                        <div>[0.255] Σ [QKD]: BB84 Quantum Lattice Established.</div>
-                        <div>[0.312] Σ [TRUST]: Fabric Unified & Sealed.</div>
-                        <div>[0.380] Σ [APP-SHARD]: OmniShell Partitioned (4 Shards).</div>
-                        <div>[0.445] Σ [PREDICT]: Shard Dispatch -> Node-0x8F (2ms).</div>
-                        <div>[0.512] Σ [LATTICE]: Application Fabric ONLINE.</div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Silicon Audit</span>
-                        <span class="accent">16 Cores</span>
-                    </div>
-                    <div class="stat-value" id="cpu-load">12%</div>
-                    <svg viewBox="0 0 300 40" class="widget-graph">
-                        <polyline id="cpu-graph" fill="none" stroke="var(--accent)" stroke-width="2"
-                            points="0,40 30,30 60,35 90,20 120,25 150,10 180,15 210,5 240,12 270,8 300,20" />
-                    </svg>
-                    <div class="stat-bar">
-                        <div class="stat-progress" id="cpu-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Memory Zenith</span>
-                        <span class="accent">Slab Alloc</span>
-                    </div>
-                    <div class="stat-value" id="mem-load">4.2 GB</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress" id="mem-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Cache Matrix</span>
-                        <span class="accent">L1/L2/L3 Shards</span>
-                    </div>
-                    <div class="stat-value" id="cache-hit">99.2% Hit</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress cache" id="cache-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Quantum Shield</span>
-                        <span class="accent">Zero-Trust Active</span>
-                    </div>
-                    <div class="stat-value" id="security-status">SHIELDED</div>
-                    <div class="audit-info" id="security-info">Scanning Shards...</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress security" id="security-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Self-Healing Shard</span>
-                        <span class="accent">Auto-Restore</span>
-                    </div>
-                    <div class="stat-value" id="healing-status">OPTIMAL</div>
-                    <div class="audit-info" id="healing-info">Last Audit: 12ms ago</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress healing" id="healing-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Quantum Entropy</span>
-                        <span class="accent" id="entropy-rate">High</span>
-                    </div>
-                    <div class="stat-value" id="entropy-val">0x8F2E...</div>
-                    <div class="stat-label">Source: RDRAND Shard</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress entropy" id="entropy-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Automation Matrix</span>
-                        <span class="accent" id="auto-efficiency">Efficiency: 98%</span>
-                    </div>
-                    <div class="stat-value" id="auto-recipes">3 Recipes</div>
-                    <div class="stat-label">Active: Thermal-Balance</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress auto" id="auto-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Cold Storage Vault</span>
-                        <span class="accent" id="vault-status">Pinned</span>
-                    </div>
-                    <div class="stat-value" id="vault-blocks">2 Blocks</div>
-                    <div class="stat-label">CID: QmXoypiz...</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress vault" id="vault-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>VFS Shard Map</span>
-                        <span class="accent" id="vfs-nodes">12 Nodes</span>
-                    </div>
-                    <div class="stat-value" id="vfs-mounts">3 Mounts</div>
-                    <div class="stat-label">Root: /sovereign/shards</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress vfs" id="vfs-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Memory Matrix</span>
-                        <span class="accent" id="mem-pages">4096 Pages</span>
-                    </div>
-                    <div class="stat-value" id="mem-usage">25% Used</div>
-                    <div class="stat-label">Mode: Demand Paging</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress memory" id="memory-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Sync Matrix</span>
-                        <span class="accent" id="sync-locks">3 Active Locks</span>
-                    </div>
-                    <div class="stat-value" id="sync-latency">12ms Latency</div>
-                    <div class="stat-label">Distributed Mutex: ON</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress sync" id="sync-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>UI Design Matrix</span>
-                        <span class="accent" id="ui-frametime">8.3ms</span>
-                    </div>
-                    <div class="stat-value" id="ui-fps">120 FPS</div>
-                    <div class="stat-label">Glassmorphism: 2.0</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress ui" id="ui-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Silicon Matrix</span>
-                        <span class="accent" id="pci-devices">4 Devices</span>
-                    </div>
-                    <div class="stat-value" id="pci-status">Enum Complete</div>
-                    <div class="stat-label">Bus: 02 | Slot: 00 | Func: 00</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress silicon" id="silicon-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Scholar Zenith</span>
-                        <span class="accent" id="lab-accuracy">99.9% Accuracy</span>
-                    </div>
-                    <div class="stat-value" id="lab-active">Physics: Magnetism</div>
-                    <div class="stat-label">NCERT Standards: DIKSHA-Sync</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress scholar" id="scholar-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget persona">
-                    <div class="widget-title">
-                        <span>Sovereign Persona</span>
-                        <span class="accent" id="persona-name">User_01</span>
-                    </div>
-                    <div class="stat-value" id="persona-theme">Theme: Glass</div>
-                    <div class="stat-label">Automation: Active</div>
-                    <div class="stat-label" id="persona-sync">Lattice Sync: 100%</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress persona" id="persona-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Security Sentinel</span>
-                        <span class="accent" id="log-status">Anonymizing</span>
-                    </div>
-                    <div class="stat-value" id="log-scrubs">12 Scrubs</div>
-                    <div class="stat-label">Mode: Amnesic Logging</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress amnesic" id="amnesic-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Healing Nexus</span>
-                        <span class="accent" id="healing-status">Monitoring</span>
-                    </div>
-                    <div class="stat-value" id="healing-restores">0 Restores</div>
-                    <div class="stat-label">Shard Health: 100%</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress healing" id="healing-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Judicial Matrix</span>
-                        <span class="accent" id="legal-status">Compliant</span>
-                    </div>
-                    <div class="stat-value" id="legal-statutes">BNSS/BNS/BSA</div>
-                    <div class="stat-label">Audit: Zero FIR Ready</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress legal" id="legal-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Colonization Matrix</span>
-                        <span class="accent" id="node-count">3 Nodes</span>
-                    </div>
-                    <div class="stat-value" id="mesh-status">Expanding</div>
-                    <div class="stat-label">Target: 0x8F2E... (Remote)</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress mesh" id="mesh-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>VRAM Matrix</span>
-                        <span class="accent" id="vram-res">1920x1080</span>
-                    </div>
-                    <div class="stat-value" id="vram-usage">12MB / 256MB</div>
-                    <div class="stat-label">Aperture: 0xFD000000</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress vram" id="vram-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Boot Matrix</span>
-                        <span class="accent" id="boot-status">Handshake</span>
-                    </div>
-                    <div class="stat-value" id="boot-progress">98% Complete</div>
-                    <div class="stat-label">UEFI: Secure | Mode: Sovereign</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress boot" id="boot-progress-bar"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Lattice Integrity</span>
-                        <span class="accent" id="test-status">Verified</span>
-                    </div>
-                    <div class="stat-value" id="test-pass">5/5 Shards</div>
-                    <div class="stat-label">Self-Audit Active</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress test" id="test-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Lattice Growth</span>
-                        <span class="accent">Colonizing</span>
-                    </div>
-                    <div class="stat-value" id="node-count">1 Node</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress colonization" id="col-progress"></div>
-                    </div>
-                    <div class="stat-label" id="col-target">Target: Scanning...</div>
-                </div>
-
-                <div class="widget persona">
-                    <div class="widget-title">
-                        <span>Sovereign Persona</span>
-                        <span class="accent" id="persona-name">User_01</span>
-                    </div>
-                    <div class="stat-value">ACTIVE</div>
-                    <div class="stat-label">Automation: Enabled</div>
-                    <div class="stat-label">Cognitive Sync: 12ms</div>
-                </div>
-
-                <!-- NEW: Morphic Automation Widget -->
-                <div class="widget automation" onclick="toggleUtilityNexus()">
-                    <div class="widget-title">
-                        <span>Morphic Automation</span>
-                        <span class="pulse-dot"></span>
-                    </div>
-                    <div class="stat-value" id="auto-task-count">0 Tasks Active</div>
-                    <div class="stat-label" id="auto-current-task">Next: Idle</div>
-                    <div class="cognitive-queue" id="cognitive-queue">
-                        <!-- Tasks generated by JS -->
-                    </div>
-                    <div class="stat-bar">
-                        <div class="stat-progress stat-progress--automator" id="auto-progress"></div>
-                    </div>
-                </div>
-
-                <div class="widget voice">
-                    <div class="widget-title">
-                        <span>Sovereign Voice</span>
-                        <span class="accent" id="voice-status">Idle</span>
-                    </div>
-                    <div class="voice-wave" id="voice-wave">
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                    </div>
-                    <div class="stat-label">Wake-Key: Caps Lock</div>
-                </div>
-
-                <div class="widget lattice-viz">
-                    <div class="widget-title">
-                        <span>Lattice Shard Matrix</span>
-                        <span class="accent">500 Modules</span>
-                    </div>
-                    <div class="shard-grid" id="shard-matrix">
-                        <!-- Script will inject 999 shards here -->
-                    </div>
-                    <div class="stat-label" id="shard-status">Integrity: 100.0%</div>
-                </div>
-
-                <!-- Lattice Mesh Topology -->
-                <div class="widget" id="mesh-widget">
-                    <div class="widget-title">
-                        <span>Lattice Mesh</span>
-                        <span class="accent">P2P Discovery</span>
-                    </div>
-                    <div class="mesh-topology-view" id="mesh-view">
-                        <svg id="mesh-svg" class="mesh-svg-canvas"></svg>
-                        <!-- Nodes generated by JS -->
-                    </div>
-                    <div class="stat-label mt-10">Nodes Discovered: <span class="accent" id="peer-count">0</span></div>
-                    <div class="stat-label">Mesh Protocol: <span class="accent">v1.0 (BB84)</span></div>
-                </div>
-
-                <!-- DNA Compression Shard -->
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Biological Density</span>
-                        <span class="accent">4.0x</span>
-                    </div>
-                    <div class="stat-value" id="dna-savings">0 MB</div>
-                    <div class="stat-label">SELF-HEALING: <span class="accent">ACTIVE</span></div>
-                    <div class="stat-bar">
-                        <div class="stat-progress success-bg" id="dna-progress"></div>
-                    </div>
-                </div>
-
-                <!-- Quantum Trust Shard -->
-                <div class="widget" id="qkd-widget">
-                    <div class="widget-title">
-                        <span>Quantum Trust</span>
-                        <span class="accent">SEALED</span>
-                    </div>
-                    <div class="stat-value" id="qkd-status">Entangled</div>
-                    <div class="stat-label">EAVESDROP DETECT: <span class="accent">ENABLED</span></div>
-                    <div class="stat-bar">
-                        <div class="stat-progress accent-bg" id="qkd-progress"></div>
-                    </div>
-                </div>
-
-                <!-- Silicon Matrix Shard -->
-                <div class="widget" id="silicon-widget">
-                    <div class="widget-title">
-                        <span>Silicon Matrix</span>
-                        <span class="accent">NATIVE</span>
-                    </div>
-                    <div class="stat-value" id="silicon-isa">RISC-V (RV64GC)</div>
-                    <div class="stat-label">Driver Transpilation: <span class="accent" id="transpiled-count">0</span>
-                        Active</div>
-                    <div class="stat-bar">
-                        <div class="stat-progress success-bg" id="silicon-progress"></div>
-                    </div>
-                </div>
-
-                <!-- Orb Exchange Shard -->
-                <div class="widget" id="orb-widget">
-                    <div class="widget-title">
-                        <span>Orb Exchange</span>
-                        <span class="accent">P2P MARKET</span>
-                    </div>
-                    <div class="stat-value" id="orb-active">Idle</div>
-                    <div class="stat-label">Trust Status: <span class="status-success"
-                            id="orb-trust">QKD-VERIFIED</span></div>
-                    <div class="stat-bar">
-                        <div class="stat-progress accent-bg" id="orb-progress"></div>
-                    </div>
-                </div>
-
-                <!-- Governance Matrix Shard -->
-                <div class="widget" id="gov-widget">
-                    <div class="widget-title">
-                        <span>Governance Matrix</span>
-                        <span class="accent">CONSENSUS</span>
-                    </div>
-                    <div class="stat-value" id="gov-active">0 Active Proposals</div>
-                    <div class="stat-label">Last Vote: <span class="status-success" id="gov-vote">YEA
-                            (QKD-VERIFIED)</span></div>
-                    <div class="stat-bar">
-                        <div class="stat-progress success-bg" id="gov-progress"></div>
-                    </div>
-                </div>
-
-                <!-- Hardened Status Shard -->
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Hardened Status</span>
-                        <span class="accent">Lattice v100.0</span>
-                    </div>
-                    <div class="stat-label">Neural UI: <span id="ui-status" class="status-success">AVX-512
-                            DEDICATED</span></div>
-                    <div class="stat-label">VFS Sync: <span id="vfs-status" class="status-success">ZERO DRIFT
-                            (PQC)</span></div>
-                    <div class="stat-label">S-CLI: <span id="cli-status" class="status-success">AMNESIC (CLEAN)</span>
-                    </div>
-                    <div class="stat-bar">
-                        <div class="stat-progress stat-progress--full"></div>
-                    </div>
-                </div>
-                <!-- Sovereign Network Stack Widget -->
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Network Stack</span>
-                        <span class="accent">Lattice-IP</span>
-                    </div>
-                    <div class="stat-value" id="net-status">CONNECTED</div>
-                    <div class="stat-label">Lattice-IP: <span class="accent">10.0.0.Σ</span></div>
-                    <div class="stat-label">Protocols: <span class="accent">TCP, UDP, ICMP</span></div>
-                    <div class="stat-bar">
-                        <div class="stat-progress primary full-width"></div>
-                    </div>
-                </div>
-
-                <!-- Sovereign Identity Manager Widget -->
-                <div class="widget">
-                    <div class="widget-title">
-                        <span>Identity Manager</span>
-                        <span class="accent">Zero-Trust SSI</span>
-                    </div>
-                    <div class="stat-value" id="iam-status">VERIFIED</div>
-                    <div class="stat-label">Identity: <span class="accent">Sovereign_User</span></div>
-                    <div class="stat-label">Auth Mode: <span class="accent">Secure Element</span></div>
-                    <div class="stat-bar">
-                        <div class="stat-progress security full-width"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Utility Nexus Window -->
-            <div class="window" id="utility-nexus-win">
-                <div class="window-header">
-                    <div class="window-title">Σ Utility Nexus v2.0</div>
-                    <div class="window-controls">
-                        <div class="win-btn minimize" onclick="minimizeWindow('utility-nexus-win')"></div>
-                        <div class="win-btn close" onclick="closeWindow('utility-nexus-win')"></div>
-                    </div>
-                </div>
-                <div class="window-content">
-                    <!-- Sidebar -->
-                    <div class="util-sidebar">
-                        <div class="util-nav active" onclick="switchUtil('text-ops', event)">Text Operations</div>
-                        <div class="util-nav" onclick="switchUtil('data-conv', event)">Data Converter</div>
-                        <div class="util-nav" onclick="switchUtil('code-img', event)">Code to Image</div>
-                        <div class="util-nav" onclick="switchUtil('diff', event)">Compare Text</div>
-                        <div class="util-nav" onclick="switchUtil('dup-find', event)">Duplicate Finder</div>
-                        <div class="util-nav" onclick="switchUtil('key-test', event)">Key-Test</div>
-                        <div class="util-nav" onclick="switchUtil('speed', event)">Ookla Speed Shard</div>
-                        <div class="util-nav" onclick="switchUtil('status', event)">IsItDownRightNow</div>
-                        <div class="util-nav" onclick="switchUtil('bootable', event)">Bootable Creator</div>
-                        <div class="util-nav" onclick="switchUtil('table', event)">Table Convert</div>
-                        <div class="util-nav" onclick="switchUtil('broadcaster', event)">Prompt Broadcaster</div>
-                        <div class="util-nav" onclick="switchUtil('firewall', event)">Aether Firewall</div>
-                    </div>
-                    <!-- Main Area -->
-                    <div id="util-main" class="util-main">
-                        <div id="util-text-ops">
-                            <h3>Text Operations</h3>
-                            <textarea id="util-text-input" class="util-input"
-                                placeholder="Enter text to transform..."></textarea>
-                            <div class="util-actions">
-                                <button class="util-btn" onclick="textAction('upper')">UPPERCASE</button>
-                                <button class="util-btn" onclick="textAction('lower')">lowercase</button>
-                                <button class="util-btn" onclick="textAction('title')">Title Case</button>
-                                <button class="util-btn" onclick="textAction('sentence')">Sentence case</button>
-                                <button class="util-btn" onclick="textAction('count')">Count Words</button>
-                                <button class="util-btn" onclick="textAction('clear-lines')">Remove Line Breaks</button>
-                            </div>
-                            <div id="util-text-output" class="util-output">Results will appear here...</div>
-                        </div>
-                        <div id="util-data-conv" class="hidden-shard">
-                            <h3>Data Converter</h3>
-                            <textarea id="util-data-input" class="util-input"
-                                placeholder="Enter JSON or CSV data..."></textarea>
-                            <div class="util-actions">
-                                <button class="util-btn" onclick="dataAction('json-xml')">JSON to XML</button>
-                                <button class="util-btn" onclick="dataAction('csv-json')">CSV to JSON</button>
-                            </div>
-                            <div id="util-data-output" class="util-output">Converted data will appear here...</div>
-                        </div>
-                        <div id="util-code-img" class="hidden-shard">
-                            <h3>Code to Image</h3>
-                            <textarea id="util-code-input" class="util-input"
-                                placeholder="Paste code here..."></textarea>
-                            <div class="code-preview-canvas">
-                                <div class="code-editor-mock">
-                                    <div class="editor-header">
-                                        <div class="dot red"></div>
-                                        <div class="dot yellow"></div>
-                                        <div class="dot green"></div>
-                                    </div>
-                                    <pre id="code-render-box">// Your code will be rendered here...</pre>
-                                </div>
-                            </div>
-                            <button class="util-btn" onclick="renderCode()">Render Preview</button>
-                        </div>
-                        <div id="util-diff" class="hidden-shard">
-                            <h3>Compare Text</h3>
-                            <div class="forge-split">
-                                <textarea id="diff-left" class="util-input" placeholder="Original text..."></textarea>
-                                <textarea id="diff-right" class="util-input" placeholder="Modified text..."></textarea>
-                            </div>
-                            <button class="util-btn" onclick="compareText()">Compare Shards</button>
-                            <div id="diff-output" class="util-output"></div>
-                        </div>
-                        <div id="util-dup-find" class="hidden-shard">
-                            <h3>Duplicate Word Finder</h3>
-                            <textarea id="dup-input" class="util-input"
-                                placeholder="Paste text to analyze..."></textarea>
-                            <button class="util-btn" onclick="findDuplicates()">Scan for Duplicates</button>
-                            <div id="dup-output" class="util-output"></div>
-                        </div>
-                        <div id="util-key-test" class="hidden-shard">
-                            <h3>Key-Test (Keyboard Shard)</h3>
-                            <div class="key-monitor">
-                                <div id="last-key">PRESS A KEY</div>
-                                <div id="key-code">CODE: --</div>
-                            </div>
-                        </div>
-                        <div id="util-speed" class="hidden-shard">
-                            <h3>Ookla Speed Shard</h3>
-                            <div class="speed-container">
-                                <div id="speed-gauge">0</div>
-                                <div class="unit">MBPS DOWNLOAD</div>
-                                <button class="util-btn" onclick="startSpeedTest()">Test Silicon Latency</button>
-                            </div>
-                        </div>
-                        <div id="util-status" class="hidden-shard">
-                            <h3>IsItDownRightNow Shard</h3>
-                            <input type="text" id="status-url" class="util-input"
-                                placeholder="Enter URL (e.g. sigmaos.io)...">
-                            <button class="util-btn" onclick="checkStatus()">Check Shard Availability</button>
-                            <div id="status-output" class="util-output"></div>
-                        </div>
-                        <div id="util-bootable" class="hidden-shard">
-                            <h3>Bootable Shard Creator</h3>
-                            <div class="bootable-pane">
-                                <div class="target-info">Target: <span id="boot-target">NO DEVICE DETECTED</span></div>
-                                <button class="util-btn" onclick="flashBootable()">Flash Sovereign Image</button>
-                                <div id="flash-progress" class="progress-container hidden-shard">
-                                    <div id="flash-bar" class="progress-bar"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="util-table" class="hidden-shard">
-                            <h3>Table Convert Shard</h3>
-                            <textarea id="table-input" class="util-input" placeholder="Enter CSV data..."></textarea>
-                            <button class="util-btn" onclick="convertTable()">Forge HTML Table</button>
-                            <div id="table-output" class="util-output"></div>
-                        </div>
-                        <div id="util-broadcaster" class="hidden-shard">
-                            <h3>Prompt Broadcaster</h3>
-                            <textarea id="util-broadcast-prompt" class="util-input broadcast-textarea"
-                                placeholder="Enter prompt to broadcast..."></textarea>
-                            <textarea id="util-broadcast-sites" class="util-input broadcast-sites-textarea"
-                                placeholder="Enter site URLs (one per line, use {{prompt}} as placeholder)...">https://www.perplexity.ai/search?q={{prompt}}
-https://www.google.com/search?q={{prompt}}
-https://chatgpt.com/?q={{prompt}}</textarea>
-                            <div class="util-actions">
-                                <button class="util-btn" onclick="broadcastPromptUtility()">BROADCAST PROMPT</button>
-                            </div>
-                        </div>
-                        <div id="util-firewall" class="hidden-shard">
-                            <h3>Aether Firewall (Site Blocker)</h3>
-                            <p class="stat-label">Block domains at the lattice level to preserve focus.</p>
-                            <div class="firewall-controls">
-                                <input type="text" id="firewall-input" class="util-input firewall-input"
-                                    placeholder="Enter domain (e.g. twitter.com)...">
-                                <button class="util-btn firewall-btn" onclick="addBlockRule()">BLOCK</button>
-                            </div>
-                            <ul id="blocked-list" class="workflow-list blocked-list">
-                                <li class="routine-item routine-border-magenta"><strong>facebook.com</strong> <button
-                                        class="cyber-btn small-btn"
-                                        onclick="this.parentElement.remove()">UNBLOCK</button></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Data Forge Window -->
-            <div class="window hidden-window" id="data-forge-win">
-                <div class="window-header">
-                    <div class="window-title">📊 Data Forge v1.0</div>
-                    <div class="window-controls">
-                        <div class="win-btn minimize" onclick="minimizeWindow('data-forge-win')"></div>
-                        <div class="win-btn close" onclick="closeWindow('data-forge-win')"></div>
-                    </div>
-                </div>
-                <div class="window-content">
-                    <div class="forge-container">
-                        <textarea id="data-forge-input" class="forge-area"
-                            placeholder="Enter raw data for processing..."></textarea>
-                        <div class="forge-actions">
-                            <button class="util-btn" onclick="processData()">Forge Structure</button>
-                        </div>
-                        <div id="data-forge-output" class="forge-area"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Markup Forge Window -->
-            <div class="window" id="markup-forge-win">
-                <div class="window-header">
-                    <div class="window-title">Σ Markup Forge v1.0</div>
-                    <div class="window-controls">
-                        <div class="win-btn minimize" onclick="minimizeWindow('markup-forge-win')"></div>
-                        <div class="win-btn close" onclick="closeWindow('markup-forge-win')"></div>
-                    </div>
-                </div>
-                <div class="window-content">
-                    <div class="forge-container">
-                        <div class="forge-split">
-                            <textarea id="markup-input" class="forge-area"
-                                placeholder="Input sovereign text here..."></textarea>
-                            <div id="markup-output" class="forge-area"></div>
-                        </div>
-                        <div class="forge-actions">
-                            <button class="util-btn" onclick="forgeHTML()">Forge HTML Shard</button>
-                            <button class="util-btn" onclick="clearMarkup()">Purge Buffer</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Marketplace Window -->
-            <div class="window" id="marketplace-win">
-                <div class="window-header">
-                    <div class="window-title">Σ Sovereign Marketplace</div>
-                    <div class="window-controls">
-                        <div class="win-btn minimize" onclick="minimizeWindow('marketplace-win')"></div>
-                        <div class="win-btn close" onclick="closeWindow('marketplace-win')"></div>
-                    </div>
-                </div>
-                <div class="window-content window-content--padded">
-                    <h3>Sovereign Shard Exchange</h3>
-                    <p class="stat-label">Verified PQC bundles ready for lattice injection.</p>
-                    <div class="mkt-grid">
-                        <div class="mkt-item" data-mkt-shard="HyperBoost">
-                            <div class="mkt-icon">🚀</div>
-                            <div class="mkt-name">HyperBoost</div>
-                            <div class="mkt-desc">Sub-10ms context switching shard.</div>
-                            <button type="button" class="util-btn" onclick="installShard('HyperBoost')">INJECT</button>
-                        </div>
-                        <div class="mkt-item" data-mkt-shard="Amnesic-X">
-                            <div class="mkt-icon">🛡️</div>
-                            <div class="mkt-name">Amnesic-X</div>
-                            <div class="mkt-desc">Zero-trace artifact scrubbing engine.</div>
-                            <button type="button" class="util-btn" onclick="installShard('Amnesic-X')">INJECT</button>
-                        </div>
-                        <div class="mkt-item" data-mkt-shard="Glass-Pro">
-                            <div class="mkt-icon">🎨</div>
-                            <div class="mkt-name">Glass-Pro</div>
-                            <div class="mkt-desc">Advanced HSL-tailored blurring.</div>
-                            <button type="button" class="util-btn" onclick="installShard('Glass-Pro')">INJECT</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Customization Window -->
-            <div class="window" id="customization-win">
-                <div class="window-header">
-                    <div class="window-title">✨ Quantum Customization</div>
-                    <div class="window-controls">
-                        <div class="win-btn minimize" onclick="minimizeWindow('customization-win')"></div>
-                        <div class="win-btn close" onclick="closeWindow('customization-win')"></div>
-                    </div>
-                </div>
-                <div class="window-content window-content--customization">
-                    <h3>Sovereign Personalization</h3>
-                    <p class="stat-label">Tune the lattice AI-driven aesthetics and automation.</p>
-                    <div class="mkt-grid">
-                        <div class="mkt-item" onclick="setTheme('gold')">
-                            <div class="mkt-icon">🌞</div>
-                            <div class="mkt-name">Solar Zenith</div>
-                            <div class="mkt-desc">Daylight-adaptive energetic UI.</div>
-                        </div>
-                        <div class="mkt-item" onclick="setTheme('cyan')">
-                            <div class="mkt-icon">🌌</div>
-                            <div class="mkt-name">Neon Cyber</div>
-                            <div class="mkt-desc">Deep-focus cyan glassmorphism.</div>
-                        </div>
-                        <div class="mkt-item" onclick="setTheme('crimson')">
-                            <div class="mkt-icon">🩸</div>
-                            <div class="mkt-name">Crimson Shard</div>
-                            <div class="mkt-desc">High-alert, performance-driven red.</div>
-                        </div>
-                    </div>
-                    <h3 class="param-header">Personalization Parameters</h3>
-                    <div class="ai-segment personalization-segment">
-                        <div class="stat-label">Accent Hue (PQC-Sync)</div>
-                        <input type="range" min="0" max="360" value="180" class="stat-bar personalization-slider"
-                            title="Accent Hue Adjustment" oninput="updateAccentHue(this.value)">
-
-                        <div class="stat-label mt-20">Glass Blur Intensity</div>
-                        <input type="range" min="0" max="50" value="25" class="stat-bar personalization-slider"
-                            title="Glass Blur Intensity" oninput="updateGlassBlur(this.value)">
-                    </div>
-
-                    <h3 class="param-header mt-30">Lattice Health Audit</h3>
-                    <div class="ai-segment personalization-segment health-audit-view">
-                        <div class="stat-label">Shard Integrity (999+ Units)</div>
-                        <div class="health-bar-container">
-                            <div class="health-bar-fill full-width"></div>
-                        </div>
-                        <div class="stat-label mt-10">Silicon-Direct Latency: <span class="accent">0.8ms</span></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Lattice Settings -->
-        <div class="window hidden-window" id="lattice-settings-win">
-            <div class="window-header">
-                <div class="window-title">🖥️ Lattice Settings</div>
-                <div class="window-controls">
-                    <div class="win-btn minimize" onclick="minimizeWindow('lattice-settings-win')"></div>
-                    <div class="win-btn close" onclick="closeWindow('lattice-settings-win')"></div>
-                </div>
-            </div>
-            <div class="window-content window-content--padded">
-                <p class="stat-label">Sovereign identity and lattice metadata.</p>
-                <p class="stat-label mt-10">Repo: <a href="https://github.com/AaryanSinghChauhan09/SigmaOS"
-                        target="_blank" rel="noopener" class="zenith-link">github.com/AaryanSinghChauhan09/SigmaOS</a>
-                </p>
-                <p class="stat-label">Zenith build: v30 (Neural UI)</p>
-            </div>
-        </div>
-
-        <!-- File Manager -->
-        <div class="window hidden-window" id="file-manager-win">
-            <div class="window-header">
-                <div class="window-title">📂 Sovereign File Manager</div>
-                <div class="window-controls">
-                    <div class="win-btn minimize" onclick="minimizeWindow('file-manager-win')"></div>
-                    <div class="win-btn close" onclick="closeWindow('file-manager-win')"></div>
-                </div>
-            </div>
-            <div class="window-content window-content--padded file-manager-body">
-                <div class="fm-sidebar">
-                    <div class="fm-dir">/home/sovereign</div>
-                    <div class="fm-dir">/kernel</div>
-                    <div class="fm-dir">/lattice</div>
-                    <div class="fm-dir">/vault</div>
-                    <div class="fm-dir">/mesh</div>
-                </div>
-                <div class="fm-main">
-                    <div class="fm-row" ondblclick="addLog('Σ [VFS]: Opened manifest.sig','success')">manifest.sig</div>
-                    <div class="fm-row" ondblclick="addLog('Σ [VFS]: Opened shardmap.json','success')">shardmap.json
-                    </div>
-                    <div class="fm-row" ondblclick="addLog('Σ [VFS]: Opened boot.nsh','success')">boot.nsh</div>
-                </div>
-            </div>
-            <div class="fm-status">3 objects · PQC-sealed VFS</div>
-        </div>
-
-        <!-- Sigma Browser -->
-        <div class="window hidden-window" id="browser-win">
-            <div class="window-header">
-                <div class="window-title">🌐 Sigma Browser</div>
-                <div class="window-controls">
-                    <div class="win-btn minimize" onclick="minimizeWindow('browser-win')"></div>
-                    <div class="win-btn close" onclick="closeWindow('browser-win')"></div>
-                </div>
-            </div>
-            <div class="window-content browser-body">
-                <div class="browser-toolbar">
-                    <button type="button" class="util-btn" onclick="sigmaBrowseBack()">←</button>
-                    <button type="button" class="util-btn" onclick="sigmaBrowseForward()">→</button>
-                    <label for="browser-url" class="sr-only">Sigma URL</label>
-                    <input type="text" id="browser-url" class="browser-url" value="sigma://lattice"
-                        title="Browser Address Bar" aria-label="Enter Sigma URL" />
-                    <button type="button" class="util-btn" onclick="sigmaBrowseGo()">Go</button>
-                </div>
-                <iframe id="browser-frame" class="browser-frame" title="Sigma browser"
-                    srcdoc="&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;body style=background:#0a0a0f;color:#7dd3fc;font-family:system-ui;padding:2rem&gt;&lt;h1&gt;σ Lattice Home&lt;/h1&gt;&lt;p&gt;Simulated sigma:// page.&lt;/p&gt;&lt;a href=&quot;https://github.com/AaryanSinghChauhan09/SigmaOS&quot; style=color:#fbbf24&gt;GitHub — SigmaOS&lt;/a&gt;&lt;/body&gt;&lt;/html&gt;"></iframe>
-            </div>
-        </div>
-
-        <!-- AI Assistant -->
-        <div class="window hidden-window" id="ai-assistant-win">
-            <div class="window-header">
-                <div class="window-title">🧠 Neural Assistant</div>
-                <div class="window-controls">
-                    <div class="win-btn minimize" onclick="minimizeWindow('ai-assistant-win')"></div>
-                    <div class="win-btn close" onclick="closeWindow('ai-assistant-win')"></div>
-                </div>
-            </div>
-            <div class="window-content ai-chat-body">
-                <div id="ai-chat-log" class="ai-chat-log"></div>
-                <div class="ai-chat-input-row">
-                    <label for="ai-chat-input" class="sr-only">Neural Assistant Input</label>
-                    <input type="text" id="ai-chat-input" class="ai-chat-input" placeholder="Ask the lattice…"
-                        onkeydown="if(event.key==='Enter')sendAiChat()"
-                        aria-label="Ask the neural assistant a question" />
-                    <button type="button" class="util-btn" onclick="sendAiChat()">Send</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Onboarding Wizard -->
-        <div class="wizard-overlay wizard-overlay--hidden" id="wizard-overlay">
-            <div class="wizard-box">
-                <div class="wizard-step active" id="step-1">
-                    <div class="wizard-title">Lattice Ignition</div>
-                    <div class="wizard-text">Welcome to the Zenith Supreme Singularity. Choose your operational persona
-                        to begin the sovereign handshake.</div>
-                    <div class="wizard-options">
-                        <div class="wizard-option" onclick="selectPersona('Sovereign', this)">
-                            <strong>Sovereign</strong>
-                            <div class="stat-label">Full administrative lattice control.</div>
-                        </div>
-                        <div class="wizard-option" onclick="selectPersona('Amnesic', this)">
-                            <strong>Amnesic</strong>
-                            <div class="stat-label">Zero-persistence, secure execution.</div>
-                        </div>
-                        <div class="wizard-option" onclick="selectPersona('Industrial', this)">
-                            <strong>Industrial</strong>
-                            <div class="stat-label">Hardened production stability.</div>
-                        </div>
-                    </div>
-                    <button class="util-btn" onclick="nextStep(2)">INITIALIZE HANDSHAKE</button>
-                </div>
-                <div class="wizard-step" id="step-2">
-                    <div class="wizard-title">Handshake Complete</div>
-                    <div class="wizard-text">The silicon lattice is now aligned with your persona. 600 shards are
-                        active.</div>
-                    <button class="util-btn" onclick="completeWizard()">ENTER SINGULARITY</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Desktop Icons -->
-        <div class="desktop-icons">
-            <div class="app-icon">
-                <div class="app-img">📚</div>
-                <div class="app-label">Scholar Zenith</div>
-            </div>
-            <div class="app-icon">
-                <div class="app-img">🛡️</div>
-                <div class="app-label">Lattice Security</div>
-            </div>
-            <div class="app-icon">
-                <div class="app-img">☁️</div>
-                <div class="app-label">Cloud Maestro</div>
-            </div>
-            <div class="app-icon" onclick="launchApp('Markup Forge')">
-                <div class="app-img">📄</div>
-                <div class="app-label">Markup Forge</div>
-            </div>
-            <div class="app-icon">
-                <div class="app-img">⚙️</div>
-                <div class="app-label">Core Orchestrator</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Taskbar -->
-    <div class="taskbar">
-        <div class="task-icon active" onclick="toggleStart()" title="Start">Σ</div>
-        <div class="task-icon" onclick="launchApp('File Manager')" title="Files">📂</div>
-        <div class="task-icon" onclick="launchApp('Sigma Browser')" title="Browser">🌐</div>
-        <div class="app-icon" onclick="launchApp('Data Forge')" title="Data Forge">📊</div>
-        <div class="app-icon" onclick="launchApp('AI Assistant')" title="AI Assistant">🤖</div>
-        <div class="task-icon" onclick="launchApp('Lattice Settings')" title="Settings">🖥️</div>
-        <div class="task-icon" onclick="launchApp('Markup Forge')" title="Markup Forge">📄</div>
-        <div class="task-icon" onclick="launchApp('Utility Nexus')" title="Utility Nexus">🛠️</div>
-        <div class="task-icon" onclick="launchApp('Marketplace')" title="Marketplace">🛒</div>
-        <div class="task-icon" onclick="launchApp('Customization Panel')" title="Customization">✨</div>
-        <div class="app-icon" onclick="launchApp('Sovereign Vault')" title="Sovereign Vault">🔐</div>
-        <div class="app-icon" onclick="launchApp('Media Nexus')" title="Media Nexus">🎬</div>
-        <div class="app-icon" onclick="launchApp('Lattice Office')" title="Lattice Office">📝</div>
-        <div class="app-icon" onclick="launchApp('Sovereign Calc')" title="Sovereign Calculator">🧮</div>
-        <div class="taskbar-divider"></div>
-        <div class="task-icon task-icon--notif" onclick="toggleNotifications()" title="Notifications">🔔<span
-                class="notif-badge hidden-shard" id="notif-badge">0</span></div>
-        <div class="task-icon" onclick="toggleBatteryPanel()" title="Power">🔋</div>
-        <div class="taskbar-divider"></div>
-        <div class="status-indicator-wasm" title="Silicon-WASM Nexus">
-            <div class="pulse-dot"></div>
-            <span>WASM-Nexus: ACTIVE</span>
-        </div>
-    </div>
-
-    <div id="notif-panel" class="zenith-flyout zenith-flyout--notifications">
-        <div class="zenith-flyout__head">
-            <span>Notifications</span>
-            <button type="button" class="util-btn" onclick="clearAllNotifications()">Clear all</button>
-        </div>
-        <div id="notif-list" class="zenith-flyout__body"></div>
-    </div>
-
-    <div id="battery-panel" class="zenith-flyout zenith-flyout--battery">
-        <div class="zenith-flyout__head"><span>Power</span></div>
-        <div class="battery-meter">
-            <div id="battery-fill" class="battery-meter__fill eighty-seven-width"></div>
-        </div>
-        <div id="battery-pct" class="battery-pct">87%</div>
-        <div class="stat-label">Mode: <span id="power-mode-label">Balanced</span></div>
-        <div class="power-actions">
-            <button type="button" class="util-btn" onclick="setPowerMode('Performance')">Performance</button>
-            <button type="button" class="util-btn" onclick="setPowerMode('Balanced')">Balanced</button>
-            <button type="button" class="util-btn" onclick="setPowerMode('Power Saver')">Saver</button>
-        </div>
-    </div>
-
-    <nav id="context-menu" class="context-menu" aria-hidden="true">
-        <button type="button" class="context-menu__item" onclick="ctxAction('palette')">Command Palette</button>
-        <button type="button" class="context-menu__item" onclick="ctxAction('settings')">Lattice Settings</button>
-        <button type="button" class="context-menu__item" onclick="ctxAction('reload')">Reload Shell</button>
-        <button type="button" class="context-menu__item" onclick="ctxAction('repo')">Open GitHub Repo</button>
-        <button type="button" class="context-menu__item" onclick="ctxAction('widgets')">Toggle Widget Focus</button>
-    </nav>
+    <footer>
+        <p>SigmaOS is distributed under the Sovereign Lattice License. <br><br> Absorb. Adapt. Outclass.</p>
+    </footer>
 
 </body>
-
 </html>
