@@ -1,4 +1,31 @@
 
+class ErrorHandler {
+    static handle(error, context = '') {
+        console.error(`[ERROR] ${context}:`, error);
+        if (typeof addLog === 'function') {
+            addLog(`Σ [ERR]: ${context} - ${error.message}`, 'error');
+        }
+    }
+
+    static async safely(fn, context = 'Unknown') {
+        try {
+            return await fn();
+        } catch (error) {
+            this.handle(error, context);
+            return null;
+        }
+    }
+}
+
+window.addEventListener('error', (event) => {
+    ErrorHandler.handle(event.error, 'Uncaught exception');
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+    ErrorHandler.handle(event.reason, 'Unhandled Promise rejection');
+});
+
+
 const SecurityUtils = {
     sanitizeHTML(html) {
         const div = document.createElement('div');
@@ -357,31 +384,39 @@ function createDebounce(func, wait) {
 
         // Marketplace Logic
         function installShard(name) {
-            if (installedShards.has(name)) {
-                addLog(`Σ [PKG]: ${name} is already injected.`, "error");
-                return;
-            }
-            const item = document.querySelector(`[data-mkt-shard="${name}"]`);
-            const btn = item && item.querySelector('button');
-            if (btn) {
+            try {
+                if (installedShards.has(name)) {
+                    addLog(`Σ [PKG]: ${name} is already injected.`, "error");
+                    return;
+                }
+                const item = document.querySelector(`[data-mkt-shard="${name}"]`);
+                const btn = item && item.querySelector('button');
+                if (!btn) {
+                    throw new Error(`Invalid shard UI for ${name}`);
+                }
                 btn.textContent = 'INJECTING...';
                 btn.disabled = true;
+                addLog(`Σ [PKG]: Fetching ${name} bundle...`, "success");
+                setTimeout(() => {
+                    try {
+                        installedShards.add(name);
+                        if (item) item.classList.add('mkt-item--installed');
+                        btn.textContent = '✓ INSTALLED';
+                        btn.disabled = true;
+                        addLog(`Σ [PKG]: ${name} injected successfully.`, "success");
+                        pushNotification(`Pkg: ${name} installed`);
+                        if (name === 'Glass-Pro') {
+                            document.body.style.backdropFilter = 'blur(40px)';
+                            addLog("Σ [CONFIG]: AVX-512 Shard Preempted for Glass-Pro.", "success");
+                        }
+                    } catch (e) {
+                        ErrorHandler.handle(e, 'Shard installation completion');
+                        btn.textContent = 'FAILED';
+                    }
+                }, 1000);
+            } catch (error) {
+                ErrorHandler.handle(error, `Install shard: ${name}`);
             }
-            addLog(`Σ [PKG]: Fetching ${name} bundle...`, "success");
-            setTimeout(() => {
-                installedShards.add(name);
-                if (item) item.classList.add('mkt-item--installed');
-                if (btn) {
-                    btn.textContent = '✓ INSTALLED';
-                    btn.disabled = true;
-                }
-                addLog(`Σ [PKG]: ${name} injected into lattice.`, "success");
-                pushNotification(`Pkg: ${name} installed`);
-                if (name === 'Glass-Pro') {
-                    document.body.style.backdropFilter = 'blur(40px)';
-                    addLog("Σ [CONFIG]: AVX-512 Shard Preempted for Glass-Pro.", "success");
-                }
-            }, 1000);
         }
 
         // Wizard Logic

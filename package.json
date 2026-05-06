@@ -1,18 +1,25 @@
 {
-  "name": "sigmaos-repo",
-  "version": "1.0.0",
-  "description": "SigmaOS Web UI and Utilities",
-  "main": "zenith_desktop.js",
+  "name": "sigmaos-zenith",
+  "version": "100.0.0",
+  "description": "SigmaOS Zenith Desktop Environment",
+  "type": "module",
+  "main": "zenith_desktop/index.js",
   "scripts": {
-    "test": "vitest run",
-    "lint": "eslint . && prettier --check .",
-    "format": "prettier --write .",
-    "build": "echo \"Building web_ui...\""
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "lint": "eslint zenith_desktop --ext .js",
+    "format": "prettier --write zenith_desktop"
   },
+  "dependencies": {},
   "devDependencies": {
-    "eslint": "^8.57.0",
-    "jsdom": "^24.0.0",
-    "prettier": "^3.2.5",
-    "vitest": "^1.4.0"
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
+    "jsdom": "^23.0.0",
+    "eslint": "^8.55.0",
+    "prettier": "^3.1.0"
   }
 }

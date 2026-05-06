@@ -12,45 +12,53 @@ CXXFLAGS = -ffreestanding -O2 -Wall -Wextra -Werror -fno-exceptions -fno-rtti -s
            -I./include -fno-stack-protector -mno-red-zone -MMD -MP
 ASFLAGS  = -f elf64
 
-# Industrial Shard Orchestration (600-Shard Lattice)
-# Dynamically discovers all .cpp, .c, and .asm files in the kernel structure
+# Dependency files
+DEPS = $(KERNEL_SHARDS:.o=.d)
+
+# Dynamic discovery with proper dependencies
 KERNEL_SHARDS = $(patsubst %.cpp,%.o,$(shell find kernel/core kernel/shards -name "*.cpp" 2>/dev/null)) \
                 $(patsubst %.c,%.o,$(shell find kernel/core kernel/shards -name "*.c" 2>/dev/null)) \
                 $(patsubst %.asm,%.o,$(shell find kernel/core kernel/shards -name "*.asm" 2>/dev/null))
 
-# Dependency files
-DEPS = $(KERNEL_SHARDS:.o=.d)
-
-.PHONY: all singularity zenith-iso qemu clean
+.PHONY: all singularity zenith-iso qemu clean rebuild
 
 all: singularity
 
-# Runs the sovereign kernel in QEMU (Step 1 parity)
 qemu: singularity
+	@echo "[QEMU] Booting SigmaOS..."
 	$(QEMU) -kernel sigmaos.bin -serial stdio -m 2G
 
-# Reaches the 600-shard modularity zenith
 singularity: $(KERNEL_SHARDS)
-	@echo "[BUILD] Igniting 600-shard modular lattice..."
+	@echo "[BUILD] Linking 600-shard modular lattice..."
 	$(CXX) $(CXXFLAGS) -T kernel/sigma.ld -o sigmaos.bin $^
-	@echo "[STATUS] SINGULARITY ACHIEVED. SigmaOS kernel ready."
+	@echo "[STATUS] SINGULARITY ACHIEVED."
 
-# Generates the production-grade deployment image
 zenith-iso: singularity
-	@echo "[ISO] Generating Zenith Singularity deployment image..."
+	@echo "[ISO] Generating deployment image..."
 	grub-mkrescue -o zenith-singularity.iso iso_root
-	@echo "[STATUS] Deployment image ready: zenith-singularity.iso"
+	@echo "[STATUS] ISO ready: zenith-singularity.iso"
 
 clean:
-	rm -f $(KERNEL_SHARDS) $(DEPS) sigmaos.bin zenith-singularity.iso
+	find . -type f \( -name "*.o" -o -name "*.d" \) -delete
+	rm -f sigmaos.bin zenith-singularity.iso
 
+rebuild: clean all
+
+# Include dependencies
 -include $(DEPS)
 
+# Compilation rules
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	@mkdir -p $(dir $@)
+	@echo "[CC++] $<"
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 %.o: %.c
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	@mkdir -p $(dir $@)
+	@echo "[CC] $<"
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 %.o: %.asm
-	$(AS) $(ASFLAGS) $< -o $@
+	@mkdir -p $(dir $@)
+	@echo "[AS] $<"
+	@$(AS) $(ASFLAGS) $< -o $@
