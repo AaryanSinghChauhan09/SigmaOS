@@ -117,9 +117,9 @@ Structured backlog for prioritization. Items are aspirational until each has imp
 - [ ] Gesture-based navigation
 - [ ] Notification center
 - [ ] Clipboard manager
-- [ ] Virtual desktops
+- [x] Virtual desktops
 - [ ] Dock/taskbar customization
-- [ ] Hotkey manager
+- [x] Hotkey manager
 - [ ] System-wide search
 - [ ] App store integration
 - [ ] User session management
@@ -129,9 +129,9 @@ Structured backlog for prioritization. Items are aspirational until each has imp
 - [ ] AI-assisted workload balancing
 - [ ] Predictive failure detection
 - [ ] Self-healing kernel modules
-- [ ] Hot-Reloading for Cloud Functions (Live Shard Update)
+- [x] Hot-Reloading for Cloud Functions (Live Shard Update)
 - [ ] Blockchain-based identity management
-- [ ] Fine-Grained Capability Model
+- [x] Fine-Grained Capability Model
 - [ ] Secure federated computing
 - [ ] Lightweight "Edge" Mode (ARM/Pi)
 - [ ] Edge computing optimization

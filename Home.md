@@ -9,9 +9,10 @@
 
 ![SigmaOS Zenith Desktop](zenith_desktop_screenshot.png)
 
-# [→ Live Demo](https://aaryansinghchauhan09.github.io/SigmaOS/)
+## [→ Live Demo](https://aaryansinghchauhan09.github.io/SigmaOS/)
 
 ## Quick Start
+
 ```bash
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
@@ -19,7 +20,14 @@ node server.js          # Serves on http://localhost:5000
 ```
 
 ## System Architecture: The Sovereign Lattice
+
 SigmaOS is built on the **Sovereign Lattice**, a modular 600-shard architecture designed for absolute isolation and high-assurance computing.
+
+### Key Documentation
+
+- [**Shard Orchestration & Self-Healing**](SHARD_ORCHESTRATION.md)
+- [**Architectural Stabilization & Industrialization**](ARCHITECTURAL_STABILIZATION.md)
+- [**Sovereign Shard Manifest (v100)**](SOVEREIGN_LATTICE_MANIFEST_500.md)
 
 ```mermaid
 graph TD
@@ -31,6 +39,7 @@ graph TD
 ```
 
 ## Zenith Desktop Features
+
 | Category | Features |
 | :--- | :--- |
 | **Interface** | Glassmorphic UI, Dynamic Desktop Shards, Drag & Snap Windows |
@@ -39,15 +48,19 @@ graph TD
 | **Intelligence** | Integrated SovereignAI Assistant, Command Palette (Ctrl+Space) |
 
 ## Shortcuts
+
 | Shortcut | Action |
 | :--- | :--- |
 | **Ctrl + Space** | Command Palette (Search all actions) |
-| **Alt + 1 – 4** | Switch Themes (Cyan / Gold / Crimson / Solar) |
+| **Alt + 1 – 4** | Switch Virtual Desktops (1 - 4) |
+| **Ctrl + Alt + T**| Launch Markup Forge |
 | **↑ / ↓** | Terminal Command History |
 | **Right-Click** | Desktop Context Menu |
 
 ## Contributions
+
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) and the [Official Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki).
 
 ## License
+
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
