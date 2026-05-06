@@ -13,6 +13,10 @@ Thank you for helping improve SigmaOS. This document points to the conventions a
 
 - Format with **clang-format** using the repo root [`LICENSE`](LICENSE).
 
+- Pull requests should be against the `main` branch.
+
+- Ensure all CI/CD checks pass.
+
 - Pull requests are checked for style on **changed** `.cpp` / `.h` / `.hpp` files (see `.github/workflows/ci.yml`).
 
 - Prefer **`sigma_status`** + [`include/sigma_types.h`](include/sigma_types.h) over exceptions (kernel uses `-fno-exceptions`). See [`https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture`](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture).
@@ -24,12 +28,10 @@ Thank you for helping improve SigmaOS. This document points to the conventions a
 Generate API HTML locally:
 
 ```bash
-
 sudo apt install doxygen graphviz   # optional: graphviz for diagrams
 doxygen Doxyfile
 
 # Open docs/api/html/index.html
-
 ```
 
 ## Python (host scripts)

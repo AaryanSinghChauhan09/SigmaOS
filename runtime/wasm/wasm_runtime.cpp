@@ -22,7 +22,8 @@ public:
 
     // Execute an exported function – stub always returns true.
     bool invoke(const char* funcName) {
-        log_emit(LOG_INFO, (std::string("[WASM] Invoke function: ") + funcName + " (stub).").c_str());
+        using namespace std;
+        log_emit(LOG_INFO, (string("[WASM] Invoke function: ") + funcName + " (stub).").c_str());
         return true;
     }
 };

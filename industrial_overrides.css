@@ -61,3 +61,39 @@
     transform: translate(-50%, 0%) scale(1);
     opacity: 1;
 }
+
+/* Desktop Indicators */
+.desktop-indicator-container {
+    display: flex;
+    gap: 8px;
+    margin-right: 20px;
+}
+
+.desktop-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    transition: all 0.3s ease;
+}
+
+.desktop-indicator.active {
+    background: var(--accent-cyan);
+    box-shadow: 0 0 10px var(--accent-cyan);
+    transform: scale(1.2);
+}
+
+.hotkey-legend {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    pointer-events: none;
+    z-index: 100;
+}

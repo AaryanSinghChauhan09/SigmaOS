@@ -9,7 +9,7 @@
 
 ![SigmaOS Zenith Desktop](zenith_desktop_screenshot.png)
 
-# [→ Live Demo](https://aaryansinghchauhan09.github.io/SigmaOS/)
+## [→ Live Demo](https://aaryansinghchauhan09.github.io/SigmaOS/)
 
 ## Quick Start
 ```bash
@@ -42,7 +42,8 @@ graph TD
 | Shortcut | Action |
 | :--- | :--- |
 | **Ctrl + Space** | Command Palette (Search all actions) |
-| **Alt + 1 – 4** | Switch Themes (Cyan / Gold / Crimson / Solar) |
+| **Alt + 1 – 4** | Switch Virtual Desktops (1 - 4) |
+| **Ctrl + Alt + T**| Launch Markup Forge |
 | **↑ / ↓** | Terminal Command History |
 | **Right-Click** | Desktop Context Menu |
 

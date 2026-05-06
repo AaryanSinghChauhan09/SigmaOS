@@ -143,20 +143,38 @@ function minimizeWindow(id) {
             constructor() {
                 this.windows = [];
                 this.topZ = 1000;
+                this.desktops = [[], [], [], []]; // 4 Virtual Desktops
+                this.activeDesktop = 0;
             }
             register(id) {
                 const win = document.getElementById(id);
                 if (!win) return;
                 this.windows.push(win);
+                this.desktops[this.activeDesktop].push(win);
                 win.addEventListener('mousedown', () => this.bringToFront(win));
             }
             bringToFront(win) {
                 this.topZ = this.topZ >= 9999 ? 1000 : this.topZ + 1;
                 win.style.zIndex = String(this.topZ);
             }
+            switchToDesktop(index) {
+                if (index < 0 || index >= this.desktops.length) return;
+                this.activeDesktop = index;
+                this.windows.forEach(win => {
+                    if (this.desktops[index].includes(win)) {
+                        win.style.display = win.dataset.prevDisplay || 'block';
+                    } else {
+                        win.dataset.prevDisplay = win.style.display;
+                        win.style.display = 'none';
+                    }
+                });
+                addLog(`Σ [WM]: Switched to Virtual Desktop ${index + 1}.`, 'success');
+                updateDesktopUI(index);
+            }
             tileAll() {
-                const width = window.innerWidth / this.windows.length;
-                this.windows.forEach((win, i) => {
+                const visibleWindows = this.windows.filter(w => w.style.display !== 'none');
+                const width = window.innerWidth / visibleWindows.length;
+                visibleWindows.forEach((win, i) => {
                     win.style.width = `${width - 20}px`;
                     win.style.left = `${i * width + 10}px`;
                     win.style.top = '100px';
@@ -164,6 +182,13 @@ function minimizeWindow(id) {
             }
         }
         const wm = new ZenithWM();
+
+        function updateDesktopUI(index) {
+            document.querySelectorAll('.desktop-indicator').forEach((el, i) => {
+                el.classList.toggle('active', i === index);
+            });
+        }
+
 
         const installedShards = new Set();
         let notifCount = 0;
@@ -263,25 +288,56 @@ function minimizeWindow(id) {
         updateClock();
 
         // Command Palette Logic
-        const cmdPalette = document.getElementById('cmd-palette');
-        const cmdInput = document.getElementById('cmd-input');
+        /* Σ Hotkey Orchestrator */
+        class HotkeyManager {
+            constructor() {
+                this.hotkeys = new Map();
+                window.addEventListener('keydown', (e) => this.handle(e));
+            }
+            register(combo, callback) {
+                this.hotkeys.set(combo.toLowerCase(), callback);
+            }
+            handle(e) {
+                const parts = [];
+                if (e.ctrlKey) parts.push('ctrl');
+                if (e.altKey) parts.push('alt');
+                if (e.shiftKey) parts.push('shift');
+                if (e.metaKey) parts.push('meta');
+                parts.push(e.key.toLowerCase());
+                
+                const combo = parts.join('+');
+                if (this.hotkeys.has(combo)) {
+                    e.preventDefault();
+                    this.hotkeys.get(combo)(e);
+                }
 
-        window.addEventListener('keydown', (e) => {
-            const tag = (e.target && e.target.tagName) || '';
-            const isOtherField = ['INPUT', 'TEXTAREA', 'SELECT'].includes(tag) && e.target && e.target.id !== 'cmd-input';
-            const paletteHotkey = (e.metaKey || e.ctrlKey) && (e.key === 'k' || e.code === 'Space');
-            if (paletteHotkey && !isOtherField) {
-                e.preventDefault();
-                cmdPalette.classList.toggle('active');
-                if (cmdPalette.classList.contains('active') && cmdInput) cmdInput.focus();
+                // Legacy palette handling
+                const tag = (e.target && e.target.tagName) || '';
+                const isOtherField = ['INPUT', 'TEXTAREA', 'SELECT'].includes(tag) && e.target && e.target.id !== 'cmd-input';
+                const paletteHotkey = (e.metaKey || e.ctrlKey) && (e.key === 'k' || e.code === 'Space');
+                if (paletteHotkey && !isOtherField) {
+                    e.preventDefault();
+                    cmdPalette.classList.toggle('active');
+                    if (cmdPalette.classList.contains('active') && cmdInput) cmdInput.focus();
+                }
+                if (e.key === 'Escape') {
+                    cmdPalette.classList.remove('active');
+                    hideContextMenu();
+                    toggleNotifications(false);
+                    toggleBatteryPanel(false);
+                }
             }
-            if (e.key === 'Escape') {
-                cmdPalette.classList.remove('active');
-                hideContextMenu();
-                toggleNotifications(false);
-                toggleBatteryPanel(false);
-            }
-        });
+        }
+        const hotkeys = new HotkeyManager();
+
+        // Register default hotkeys
+        hotkeys.register('alt+1', () => wm.switchToDesktop(0));
+        hotkeys.register('alt+2', () => wm.switchToDesktop(1));
+        hotkeys.register('alt+3', () => wm.switchToDesktop(2));
+        hotkeys.register('alt+4', () => wm.switchToDesktop(3));
+        hotkeys.register('ctrl+alt+t', () => launchApp('Markup Forge'));
+        hotkeys.register('ctrl+shift+l', () => addLog('Σ [USER]: User triggered manual audit.', 'success'));
+
 
         if (cmdInput) {
             
@@ -972,9 +1028,9 @@ document.addEventListener('mouseleave', () => { if(glow) glow.style.opacity = '0
 
 
 function processData() {
-    const input = document.getElementById('data-forge-input').value;
+    const input = document.getElementById('data-forge-input')?.value;
     const output = document.getElementById('data-forge-output');
-    if(!input) return;
+    if(!input || !output) return;
     
     output.innerHTML = '<span class=\"text-accent\">[SDP] Initializing 600-shard parallel map/reduce...</span><br>';
     setTimeout(() => {
