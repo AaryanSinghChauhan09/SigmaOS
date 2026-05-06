@@ -15,14 +15,20 @@ ASFLAGS  = -f elf64
 # Dependency files
 DEPS = $(KERNEL_SHARDS:.o=.d)
 
-# Dynamic discovery with proper dependencies
-KERNEL_SHARDS = $(patsubst %.cpp,%.o,$(shell find kernel/core kernel/shards -name "*.cpp" 2>/dev/null)) \
-                $(patsubst %.c,%.o,$(shell find kernel/core kernel/shards -name "*.c" 2>/dev/null)) \
-                $(patsubst %.asm,%.o,$(shell find kernel/core kernel/shards -name "*.asm" 2>/dev/null))
+# Declarative discovery via SHARDS.manifest (Fix Issue #9)
+MANIFEST_SOURCES = $(shell cat SHARDS.manifest | grep -v '^\#' | grep -v '^[[:space:]]*$$')
+KERNEL_SHARDS    = $(patsubst %.cpp,%.o,$(filter %.cpp,$(MANIFEST_SOURCES))) \
+                   $(patsubst %.c,%.o,$(filter %.c,$(MANIFEST_SOURCES))) \
+                   $(patsubst %.asm,%.o,$(filter %.asm,$(MANIFEST_SOURCES)))
 
-.PHONY: all singularity zenith-iso qemu clean rebuild
+.PHONY: all singularity zenith-iso qemu clean rebuild test
 
 all: singularity
+
+test:
+	@echo "[TEST] Building and running GTest host suite..."
+	@mkdir -p tests/cpp_host/build
+	@cd tests/cpp_host/build && cmake .. && make && ./test_kernel
 
 qemu: singularity
 	@echo "[QEMU] Booting SigmaOS..."

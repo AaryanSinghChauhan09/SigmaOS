@@ -16,6 +16,10 @@ SovereignSnapEngine& SovereignSnapEngine::getInstance() {
     return instance;
 }
 
+SovereignSnapEngine::SovereignSnapEngine() : initialized(0), active_zone_count(0) {
+    // Shard-init
+}
+
 void SovereignSnapEngine::init() {
     log_emit(LOG_INFO, "Σ [SNAP]: Initializing Sovereign Dynamic Shard-Snapping (DSS)...");
     this->active_zone_count = 0u;
@@ -24,6 +28,7 @@ void SovereignSnapEngine::init() {
 }
 
 void SovereignSnapEngine::applyLayout(sigma_u32 layout_id) {
+    (void)layout_id;
     log_emit(LOG_INFO, "[SNAP]: Applying spatial layout.");
     log_emit(LOG_INFO, "Σ [SNAP]: Viewport reconciliation complete.");
 }

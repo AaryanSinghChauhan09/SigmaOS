@@ -43,7 +43,7 @@ const InputValidator = {
         return str.slice(0, maxLength).trim();
     }
 };
-\n/** SigmaOS Zenith Desktop — https://github.com/AaryanSinghChauhan09/SigmaOS */
+/** SigmaOS Zenith Desktop — https://github.com/AaryanSinghChauhan09/SigmaOS */
 'use strict';
 
 const SIGMA_APP_VERSION = '100.0';
@@ -293,14 +293,21 @@ function createDebounce(func, wait) {
         timeout = setTimeout(later, wait);
     };
 }
-\n        const filterCommands = createDebounce((q) => {\n            document.querySelectorAll('#cmd-results .command-item').forEach((el) => {\n                const t = el.textContent.toLowerCase();\n                el.style.display = !q || t.includes(q) ? '' : 'none';\n            });\n        }, 200);\n\n        cmdInput.addEventListener('input', (e) => {\n            const q = e.target.value.trim().toLowerCase();\n            filterCommands(q);\n        });\n/*
-                const q = cmdInput.value.trim().toLowerCase();
-                document.querySelectorAll('#cmd-results .command-item').forEach((el) => {
-                    const t = el.textContent.toLowerCase();
-                    el.style.display = !q || t.includes(q) ? '' : 'none';
-                });
+        const filterCommands = createDebounce((q) => {
+            document.querySelectorAll('#cmd-results .command-item').forEach((el) => {
+                const t = el.textContent.toLowerCase();
+                el.style.display = !q || t.includes(q) ? '' : 'none';
+            });
+        }, 200);
+
+        const cmdInput = document.getElementById('cmd-input');
+        if (cmdInput) {
+            cmdInput.addEventListener('input', (e) => {
+                const q = e.target.value.trim().toLowerCase();
+                filterCommands(q);
             });
         }
+    }
 
         function setTheme(name) {
             ['theme-gold', 'theme-crimson', 'theme-solar'].forEach((c) => document.body.classList.remove(c));
@@ -489,13 +496,27 @@ function createDebounce(func, wait) {
                 output.textContent = `✔ ${url} is UP and responsive in the lattice.`;
                 output.style.color = 'var(--success)';
             }, 1500);
-        }\n\n        function flashBootable() {
-            document.getElementById('boot-target').innerText = "SiliconDrive (64GB) [LOCKED]";
+        }
+
+        function flashBootable() {
+            const bootTarget = document.getElementById('boot-target');
+            if (bootTarget) bootTarget.innerText = "SiliconDrive (64GB) [LOCKED]";
             const barContainer = document.getElementById('flash-progress');
             const bar = document.getElementById('flash-bar');
+            if (!barContainer || !bar) return;
             barContainer.style.display = 'block';
             let progress = 0;
-            const interval =         }
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 8) + 2;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    if (bootTarget) bootTarget.innerText = "SiliconDrive (64GB) [FLASHED ✓]";
+                    addLog("Σ [FLASH]: Bootable image written successfully.", "success");
+                }
+                bar.style.width = progress + '%';
+            }, 200);
+        }
 
         function convertTable() {
             const inputEl = document.getElementById('table-input');
@@ -630,6 +651,36 @@ function createDebounce(func, wait) {
         }
 
         // Shard Dot Pool (Fix Issue #4)
+        /**
+         * Σ Industrial Heartbeat Nexus
+         * Consolidates all periodic lattice telemetry into a single requestAnimationFrame loop.
+         * Principle: Batch DOM updates. Reduce reflow. Achieve 60fps Sovereign parity.
+         */
+        class IndustrialHeartbeat {
+            constructor() {
+                this.tasks = [];
+                this.startTime = Date.now();
+            }
+            addTask(id, fn, intervalMs) {
+                this.tasks.push({ id, fn, intervalMs, lastRun: 0 });
+            }
+            start() {
+                const tick = () => {
+                    const now = Date.now();
+                    this.tasks.forEach(task => {
+                        if (now - task.lastRun >= task.intervalMs) {
+                            try { task.fn(now); } catch(e) { ErrorHandler.handle(e, `Heartbeat: ${task.id}`); }
+                            task.lastRun = now;
+                        }
+                    });
+                    requestAnimationFrame(tick);
+                };
+                requestAnimationFrame(tick);
+            }
+        }
+        const heartbeat = new IndustrialHeartbeat();
+
+        // Shard Dot Matrix Task
         class ShardDotPool {
             constructor(containerId, maxDots = 100) {
                 this.container = document.getElementById(containerId);
@@ -639,13 +690,15 @@ function createDebounce(func, wait) {
             }
             init() {
                 if (!this.container) return;
+                const frag = document.createDocumentFragment();
                 for (let i = 0; i < this.maxDots; i++) {
                     const dot = document.createElement('div');
                     dot.className = 'shard-dot';
                     if (Math.random() > 0.8) dot.classList.add('active');
-                    this.container.appendChild(dot);
+                    frag.appendChild(dot);
                     this.dots.push(dot);
                 }
+                this.container.appendChild(frag);
             }
             pulseRandom() {
                 if (!this.dots.length) return;
@@ -656,193 +709,166 @@ function createDebounce(func, wait) {
             }
         }
         const shardPool = new ShardDotPool('shard-matrix');
-        setInterval(() => shardPool.pulseRandom(), 2000);
+        heartbeat.addTask('shard-pulse', () => shardPool.pulseRandom(), 2000);
 
-        // DNA Telemetry Sync
+        // DNA Telemetry Task
         let totalSaved = 0;
-        setInterval(() => {
+        heartbeat.addTask('dna-telemetry', () => {
             totalSaved += Math.floor(Math.random() * 500);
             const el = document.getElementById('dna-savings');
             if(el) el.innerText = (totalSaved / 1024).toFixed(2) + " MB";
         }, 2000);
 
-        // Lattice Mesh Discovery & Streaming
+        // Lattice Mesh Discovery
         let peers = 0;
         const meshView = document.getElementById('mesh-view');
         const meshSvg = document.getElementById('mesh-svg');
         const meshNodes = [];
-        const MAX_LINES = 50; // Cap unbounded lines
+        const MAX_LINES = 50; 
         const lines = [];
 
         function discoverPeer() {
+            if (peers >= 12) return;
             peers++;
             const pc = document.getElementById('peer-count');
             if(pc) pc.innerText = peers;
             const node = document.createElement('div');
             node.className = 'mesh-node mesh-node-pulse';
-            
             const x = Math.random() * 90;
             const y = Math.random() * 90;
             node.style.left = x + '%';
             node.style.top = y + '%';
-            
             if (meshView) meshView.appendChild(node);
             meshNodes.push({x, y});
 
             if (peers > 1 && meshSvg) {
                 const targetIdx = Math.floor(Math.random() * (peers - 1));
                 const target = meshNodes[targetIdx];
-                
                 const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', x + '%');
-                line.setAttribute('y1', y + '%');
-                line.setAttribute('x2', target.x + '%');
-                line.setAttribute('y2', target.y + '%');
+                line.setAttribute('x1', x + '%'); line.setAttribute('y1', y + '%');
+                line.setAttribute('x2', target.x + '%'); line.setAttribute('y2', target.y + '%');
                 line.setAttribute('stroke', 'var(--accent)');
                 line.setAttribute('stroke-width', '1');
                 line.setAttribute('stroke-dasharray', '5,5');
                 line.style.opacity = '0.5';
-                
-                // CSS Animation instead of JS Interval (Fix Issue #2)
                 line.style.animation = 'dash 2s linear infinite';
-                
                 meshSvg.appendChild(line);
                 lines.push(line);
-                
-                // Fix Issue #5: Unbounded SVG lines
                 if (lines.length > MAX_LINES) {
                     const oldLine = lines.shift();
-                    meshSvg.removeChild(oldLine);
+                    if (oldLine.parentNode) oldLine.parentNode.removeChild(oldLine);
                 }
             }
         }
-        setInterval(() => { if (peers < 12) discoverPeer(); }, 5000);
-        // Silicon-Direct Transpiler Telemetry
+        heartbeat.addTask('mesh-discovery', discoverPeer, 5000);
+
+        // Transpiler & ISA Telemetry
         let transpiledDrivers = 0;
-        const driverElement = document.getElementById('transpiled-count');
-        const isaElement = document.getElementById('silicon-isa');
-        
-        setInterval(() => {
+        heartbeat.addTask('transpiler-telemetry', () => {
             if(transpiledDrivers < 24) {
                 transpiledDrivers += Math.floor(Math.random() * 3);
-                if (driverElement) driverElement.innerText = transpiledDrivers;
+                const el = document.getElementById('transpiled-count');
+                if (el) el.innerText = transpiledDrivers;
             }
-            if(Math.random() > 0.98) {
-                isaElement.innerText = "ARM (AArch64)";
-            } else if (Math.random() > 0.98) {
-                isaElement.innerText = "RISC-V (RV64GC)";
+            const isaEl = document.getElementById('silicon-isa');
+            if(isaEl && Math.random() > 0.95) {
+                isaEl.innerText = Math.random() > 0.5 ? "ARM (AArch64)" : "RISC-V (RV64GC)";
             }
         }, 3000);
-        // Neural Automator Telemetry
-        const cognitiveTasks = ["Preemptive VRAM Caching", "Predictive Shard Loading", "Background Lattice Audit", "DNA Re-indexing", "Quantum Key Rotation"];
-        const queueElement = document.getElementById('cognitive-queue');
-        const currentTaskElement = document.getElementById('auto-current-task');
-        const countElement = document.getElementById('auto-task-count');
-        const autoProgress = document.getElementById('auto-progress');
-        let activeTasks = 0;
 
-        setInterval(() => {
+        // Neural Automator
+        const cognitiveTasks = ["Preemptive VRAM Caching", "Predictive Shard Loading", "Background Lattice Audit", "DNA Re-indexing", "Quantum Key Rotation"];
+        let activeTasks = 0;
+        heartbeat.addTask('neural-automator', () => {
             if (Math.random() > 0.6) {
-                // Schedule new cognitive task
                 const task = cognitiveTasks[Math.floor(Math.random() * cognitiveTasks.length)];
+                const queueEl = document.getElementById('cognitive-queue');
                 const taskEl = document.createElement('div');
                 taskEl.innerText = ">> " + task;
                 taskEl.style.opacity = '0';
                 taskEl.style.transition = 'opacity 0.5s';
-                queueElement.prepend(taskEl);
+                if (queueEl) queueEl.prepend(taskEl);
                 setTimeout(() => taskEl.style.opacity = '1', 50);
-                
                 activeTasks++;
-                countElement.innerText = activeTasks + " Tasks Active";
-                currentTaskElement.innerText = "Running: " + task;
-                
-                // Animate progress bar
-                autoProgress.style.transition = 'width 2s linear';
-                autoProgress.style.width = '100%';
-                
-                // Task completion
+                const countEl = document.getElementById('auto-task-count');
+                const currentEl = document.getElementById('auto-current-task');
+                if (countEl) countEl.innerText = activeTasks + " Tasks Active";
+                if (currentEl) currentEl.innerText = "Running: " + task;
+                const autoProgress = document.getElementById('auto-progress');
+                if (autoProgress) {
+                    autoProgress.style.transition = 'width 2s linear';
+                    autoProgress.style.width = '100%';
+                }
                 setTimeout(() => {
                     activeTasks--;
-                    countElement.innerText = activeTasks + " Tasks Active";
-                    if (queueElement.contains(taskEl)) {
-                        queueElement.removeChild(taskEl);
-                    }
-                    if (activeTasks === 0) {
-                        currentTaskElement.innerText = "Next: Idle";
-                    }
-                    autoProgress.style.transition = 'none';
-                    autoProgress.style.width = '0%';
+                    if (countEl) countEl.innerText = activeTasks + " Tasks Active";
+                    if (taskEl.parentNode) taskEl.parentNode.removeChild(taskEl);
+                    if (activeTasks === 0 && currentEl) currentEl.innerText = "Next: Idle";
+                    if (autoProgress) { autoProgress.style.transition = 'none'; autoProgress.style.width = '0%'; }
                 }, 2000);
             }
         }, 3500);
 
-        // Orb Exchange Telemetry
+        // Orb Exchange
         const orbList = ["NeuralVisualizer-v2", "QuantumSieve-PQC", "BioFS-DNA-Module", "CryptoLedger-X"];
-        const orbStatus = document.getElementById('orb-active');
-        const orbProgress = document.getElementById('orb-progress');
-        
-        setInterval(() => {
+        heartbeat.addTask('orb-exchange', () => {
             if (Math.random() > 0.8) {
                 const orb = orbList[Math.floor(Math.random() * orbList.length)];
-                orbStatus.innerText = "Summoning: " + orb;
-                orbProgress.style.transition = 'width 1.5s linear';
-                orbProgress.style.width = '100%';
-                
+                const statusEl = document.getElementById('orb-active');
+                const progressEl = document.getElementById('orb-progress');
+                if (statusEl) statusEl.innerText = "Summoning: " + orb;
+                if (progressEl) {
+                    progressEl.style.transition = 'width 1.5s linear';
+                    progressEl.style.width = '100%';
+                }
                 setTimeout(() => {
-                    orbStatus.innerText = "Idle";
-                    orbProgress.style.transition = 'none';
-                    orbProgress.style.width = '0%';
+                    if (statusEl) statusEl.innerText = "Idle";
+                    if (progressEl) { progressEl.style.transition = 'none'; progressEl.style.width = '0%'; }
                 }, 1600);
             }
         }, 4000);
-        
-        // Community Governance Telemetry
-        let activeProposals = 0;
-        const propElement = document.getElementById('gov-active');
-        const voteElement = document.getElementById('gov-vote');
-        const govProgress = document.getElementById('gov-progress');
-        
-        setInterval(() => {
+
+        // Community Governance
+        heartbeat.addTask('governance-telemetry', () => {
             if(Math.random() > 0.7) {
-                activeProposals = Math.floor(Math.random() * 12) + 1;
-                propElement.innerText = activeProposals + " Active Proposals";
-                
-                if(Math.random() > 0.5) {
-                    voteElement.innerText = "YEA (QKD-VERIFIED)";
-                    voteElement.className = "status-success";
-                    govProgress.style.width = (50 + Math.random() * 40) + '%';
-                    govProgress.style.background = 'var(--success)';
-                    govProgress.style.boxShadow = '0 0 10px var(--success)';
-                } else {
-                    voteElement.innerText = "NAY (QKD-VERIFIED)";
-                    voteElement.className = "accent";
-                    govProgress.style.width = (10 + Math.random() * 40) + '%';
-                    govProgress.style.background = 'var(--error)';
-                    govProgress.style.boxShadow = '0 0 10px var(--error)';
+                const activeProposals = Math.floor(Math.random() * 12) + 1;
+                const propEl = document.getElementById('gov-active');
+                const voteEl = document.getElementById('gov-vote');
+                const govProgress = document.getElementById('gov-progress');
+                if (propEl) propEl.innerText = activeProposals + " Active Proposals";
+                if (voteEl && govProgress) {
+                    if(Math.random() > 0.5) {
+                        voteEl.innerText = "YEA (QKD-VERIFIED)";
+                        voteEl.className = "status-success";
+                        govProgress.style.width = (50 + Math.random() * 40) + '%';
+                        govProgress.style.background = 'var(--success)';
+                    } else {
+                        voteEl.innerText = "NAY (QKD-VERIFIED)";
+                        voteEl.className = "accent";
+                        govProgress.style.width = (10 + Math.random() * 40) + '%';
+                        govProgress.style.background = 'var(--error)';
+                    }
                 }
             }
         }, 5000);
 
-        // Trust Fabric Lockdown Mode
-        setInterval(() => {
-            if(Math.random() > 0.95) {
-                // Trigger Lockdown
+        // Trust Fabric Lockdown
+        heartbeat.addTask('trust-fabric-audit', () => {
+            if(Math.random() > 0.98) {
                 document.body.classList.add('lockdown-mode');
-                document.getElementById('qkd-status').innerText = "ANOMALY DETECTED";
-                document.getElementById('qkd-status').style.color = "var(--error)";
-                document.getElementById('orb-trust').innerText = "LOCKDOWN ACTIVE";
-                document.getElementById('orb-trust').className = "accent";
-                
-                // Heal after 5 seconds
+                const qkdStatus = document.getElementById('qkd-status');
+                const orbTrust = document.getElementById('orb-trust');
+                if (qkdStatus) { qkdStatus.innerText = "ANOMALY DETECTED"; qkdStatus.style.color = "var(--error)"; }
+                if (orbTrust) { orbTrust.innerText = "LOCKDOWN ACTIVE"; orbTrust.className = "accent"; }
                 setTimeout(() => {
                     document.body.classList.remove('lockdown-mode');
-                    document.getElementById('qkd-status').innerText = "Entangled";
-                    document.getElementById('qkd-status').style.color = "var(--text-light)";
-                    document.getElementById('orb-trust').innerText = "QKD-VERIFIED";
-                    document.getElementById('orb-trust').className = "status-success";
+                    if (qkdStatus) { qkdStatus.innerText = "Entangled"; qkdStatus.style.color = ""; }
+                    if (orbTrust) { orbTrust.innerText = "QKD-VERIFIED"; orbTrust.className = "status-success"; }
                 }, 5000);
             }
-        }, 8000);
+        }, 10000);
+
+        heartbeat.start();
 
         const SigmaBrowser = {
             stack: ['sigma://lattice'],

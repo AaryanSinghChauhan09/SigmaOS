@@ -1,0 +1,24 @@
+# Σ SIGMAOS: SOVEREIGN SHARD MANIFEST
+# Use this file to declaratively include shards in the build.
+# Empty lines and lines starting with # are ignored.
+
+# --- Core HAL & Boot ---
+kernel/core/hal/SovereignCores.cpp
+kernel/core/hal/SovereignPMM.cpp
+kernel/core/hal/SovereignVMM.cpp
+
+# --- Security Shards ---
+kernel/core/security/SovereignPQC.cpp
+kernel/core/security/SovereignSandbox.cpp
+kernel/core/security/SovereignAttestation.cpp
+
+# --- Observability ---
+kernel/core/observability/SovereignMonitor.cpp
+
+# --- UI & Experience ---
+kernel/core/misc_utils/SovereignSnap.cpp
+kernel/core/ui/SovereignZenithUI.cpp
+
+# --- System Services ---
+kernel/core/system/SovereignSyscall.cpp
+kernel/core/system/SovereignScheduler.cpp

@@ -8,18 +8,20 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "lint": "eslint zenith_desktop --ext .js",
-    "format": "prettier --write zenith_desktop"
+    "lint": "eslint zenith_desktop --ext .js --report-unused-disable-directives --max-warnings 0",
+    "format": "prettier --write zenith_desktop",
+    "audit": "npm audit --audit-level=moderate"
   },
-  "dependencies": {},
   "devDependencies": {
-    "vite": "^5.0.0",
-    "vitest": "^1.0.0",
-    "@vitest/ui": "^1.0.0",
-    "jsdom": "^23.0.0",
-    "eslint": "^8.55.0",
-    "prettier": "^3.1.0"
+    "@vitest/ui": "^3.2.0",
+    "eslint": "^9.26.0",
+    "eslint-plugin-security": "^3.0.1",
+    "jsdom": "^26.1.0",
+    "prettier": "^3.5.3",
+    "vite": "^6.3.5",
+    "vitest": "^3.2.0"
   }
 }

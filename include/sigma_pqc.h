@@ -16,14 +16,18 @@ public:
     void signShard(sigma_u32 shard_id, sigma_u8* signature);
     bool verifyShard(sigma_u32 shard_id, const sigma_u8* signature);
     void refreshLattice();
-    sigma_u64 getSignatureCount() const { return this->total_signatures; }
+    
+    sigma_u64 getSignatureCount() const { return total_signatures; }
+    sigma_u64 getVerifiedCount()  const { return verified_shards; }
 
 private:
-    SovereignPQCEngine() : total_signatures(0), verified_shards(0), initialized(0) {}
-    
+    SovereignPQCEngine();
+    SovereignPQCEngine(const SovereignPQCEngine&) = delete;
+    SovereignPQCEngine& operator=(const SovereignPQCEngine&) = delete;
+
+    sigma_u32 initialized;
     sigma_u64 total_signatures;
     sigma_u64 verified_shards;
-    sigma_u32 initialized;
 };
 
 } // namespace Security

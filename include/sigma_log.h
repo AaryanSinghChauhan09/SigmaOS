@@ -34,6 +34,24 @@ void      log_emit_f(sigma_u32 severity, const char* format, ...);
 void      log_dump_lattice(void);
 sigma_u64 log_get_total_emitted(void);
 
+/* --- Compat aliases: map sigma_log/sigma_printf → log_emit --- */
+#ifndef sigma_log
+#define sigma_log(msg)          log_emit(LOG_INFO, (msg))
+#endif
+
+#ifndef sigma_log_level
+#define sigma_log_level(lvl, msg) log_emit((lvl), (msg))
+#endif
+
+/* sigma_printf: formatted kernel print (maps to kprintf defined in sigma_kernel_types.h) */
+#ifndef sigma_printf
+#ifdef __cplusplus
+extern "C"
+#endif
+void kprintf(const char* fmt, ...);
+#define sigma_printf(fmt, ...)  kprintf((fmt), ##__VA_ARGS__)
+#endif
+
 #ifdef __cplusplus
 }
 #endif

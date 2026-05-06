@@ -1,6 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "sigma_sandbox.h"
-#include "../../../include/SovereignLibC.h""
+#include "../../../include/sigma_hal.h"
+#include "../../../include/sigma_sandbox.h"
+#include "../../../include/SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -8,12 +9,12 @@ namespace Security {
 
 void SovereignSandboxEngine::init() {
     sigma_log("[SANDBOX] Initializing Sovereign Zero-Trust Sandbox Isolation...");
-    this->m_initialized = 1u;
+    this->initialized = 1u;
 }
 
 sigma_u32 SovereignSandboxEngine::createContainer(const sigma_sandbox_config_t* config) {
     (void)config;
-    sigma_u32 id = this->m_next_container_id++;
+    sigma_u32 id = this->next_container_id++;
     sigma_printf("[SANDBOX] Container C%04u created with sealed amnesic profile.\n", id);
     return id;
 }

@@ -12,3 +12,8 @@ tmp/
 *.tmp
 .cache/
 *.idx
+node_modules/  
+package-lock.json  
+patch_zenith.js  
+patch_zenith.py  
+patch_zenith_error.cjs  

@@ -25,7 +25,7 @@ public:
     void registerZone(sigma_u32 x, sigma_u32 y, sigma_u32 w, sigma_u32 h);
 
 private:
-    SovereignSnapEngine() : initialized(0), active_zone_count(0) {}
+    SovereignSnapEngine();
     sigma_u32 initialized;
     sigma_u32 active_zone_count;
     sigma_snap_zone_t zones[8];
