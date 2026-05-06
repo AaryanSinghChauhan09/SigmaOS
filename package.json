@@ -1,0 +1,18 @@
+{
+  "name": "sigmaos-repo",
+  "version": "1.0.0",
+  "description": "SigmaOS Web UI and Utilities",
+  "main": "zenith_desktop.js",
+  "scripts": {
+    "test": "vitest run",
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
+    "build": "echo \"Building web_ui...\""
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "jsdom": "^24.0.0",
+    "prettier": "^3.2.5",
+    "vitest": "^1.4.0"
+  }
+}

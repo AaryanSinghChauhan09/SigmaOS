@@ -58,3 +58,11 @@ doxygen Doxyfile
 
 Use the GitHub issue templates for bugs and features. In PRs, describe motivation, testing performed, and any user-visible or build changes.
 
+## Development Setup & Verification
+
+To verify the boot process locally in QEMU:
+1. Ensure you have `build-essential`, `nasm`, and `qemu-system-x86` installed.
+2. Run `./qemu-boot.sh` from the repository root.
+   - This script will build the kernel.
+   - It will launch QEMU headlessly and pipe the serial output to `serial.log`.
+   - It will automatically verify that the `"SOVEREIGN BOOT"` message appears, validating a successful boot.

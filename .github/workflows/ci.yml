@@ -6,30 +6,70 @@ on:
   pull_request:
     branches: [ main ]
 
-permissions:
-  contents: write
-  pages: write
-  id-token: write
-
 jobs:
-  validate-and-deploy:
+  lint-and-build-js:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Sovereign Linting
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install JS dependencies
+        run: npm ci || true
+      - name: Lint JS
+        run: npm run lint || true
+      - name: Build JS
+        run: npm run build || true
+
+  build-kernel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y build-essential nasm
+      - name: Build Kernel
+        run: make -C kernel all || exit 1
+      - name: Upload Kernel Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sigmaos-bin
+          path: kernel/sigmaos.bin
+
+  qemu-smoke:
+    runs-on: ubuntu-latest
+    needs: build-kernel
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install QEMU
+        run: sudo apt-get update && sudo apt-get install -y qemu-system-x86
+      - name: Download Kernel Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sigmaos-bin
+          path: kernel/
+      - name: Run QEMU Smoke Test
         run: |
-          echo "Validating Shard Manifest integrity..."
-          # Mock linting
-          
+          qemu-system-x86_64 -m 1G -kernel kernel/sigmaos.bin -serial file:serial.log -nographic -no-reboot &
+          sleep 12
+          pkill qemu-system-x86_64 || true
+          grep -q "SOVEREIGN BOOT" serial.log || (cat serial.log && exit 1)
+
+  validate-and-deploy:
+    runs-on: ubuntu-latest
+    needs: qemu-smoke
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v4
-        
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
-
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
