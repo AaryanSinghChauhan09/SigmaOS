@@ -53,22 +53,43 @@ const SIGMA_REPO_URL = 'https://github.com/AaryanSinghChauhan09/SigmaOS';
         class NeuralLayoutEngine {
             constructor() {
                 this.interactions = {};
+                this.reorgTimeout = null;
+                this.domCache = new Map();
             }
             track(shardId) {
                 this.interactions[shardId] = (this.interactions[shardId] || 0) + 1;
-                this.reorganize();
+                this.scheduleReorganize();
+            }
+            scheduleReorganize() {
+                if (this.reorgTimeout) clearTimeout(this.reorgTimeout);
+                this.reorgTimeout = setTimeout(() => this.reorganize(), 300);
+            }
+            getEl(id) {
+                if (!this.domCache.has(id)) {
+                    this.domCache.set(id, document.getElementById(id));
+                }
+                return this.domCache.get(id);
             }
             reorganize() {
-                const sorted = Object.entries(this.interactions).sort((a,b) => b[1] - a[1]);
-                sorted.forEach(([id, count], i) => {
-                    const el = document.getElementById(id);
-                    if (el && i === 0) el.classList.add('neural-active');
-                    else if (el) el.classList.remove('neural-active');
-                });
+                // Determine top interaction directly without sorting the entire array if we only care about the top 1
+                let maxCount = -1;
+                let topId = null;
+                for (const [id, count] of Object.entries(this.interactions)) {
+                    if (count > maxCount) {
+                        maxCount = count;
+                        topId = id;
+                    }
+                }
+                for (const id of Object.keys(this.interactions)) {
+                    const el = this.getEl(id);
+                    if (!el) continue;
+                    if (id === topId) el.classList.add('neural-active');
+                    else el.classList.remove('neural-active');
+                }
             }
             setMindfulness(active) {
                 document.body.classList.toggle('focus-mode-active', active);
-                addLog(active ? 'Σ [NEURAL]: Mindfulness Mode ACTIVE. Filtering noise...' : 'Σ [NEURAL]: Mindfulness Mode DISABLED.');
+                if (typeof addLog === 'function') addLog(active ? 'Σ [NEURAL]: Mindfulness Mode ACTIVE. Filtering noise...' : 'Σ [NEURAL]: Mindfulness Mode DISABLED.');
             }
         }
         const neural = new NeuralLayoutEngine();
@@ -600,39 +621,49 @@ function createDebounce(func, wait) {
         });
 
         function startSpeedTest() {
-            const gauge = document.getElementById('speed-gauge');
-            let speed = 0;
-            const interval = 
-            if (Math.random() > 0.99) {
-                const faultIdx = Math.floor(Math.random() * 500);
-                dots[faultIdx].classList.add('error');
-                document.getElementById('shard-status').textContent = "Integrity: 99.8% (Fault Detected)";
-                document.getElementById('shard-status').style.color = "var(--error)";
-
-                setTimeout(() => {
-                    dots[faultIdx].classList.remove('error');
-                    dots[faultIdx].classList.add('healing');
-                    document.getElementById('shard-status').textContent = "Integrity: 100.0% (Self-Healed)";
-                    document.getElementById('shard-status').style.color = "var(--success)";
-                    setTimeout(() => dots[faultIdx].classList.remove('healing'), 2000);
-                }, 1500);
-            }
-        }, 2000);
-
-        // Inject 999 Shards for 999+ Singularity
-        const matrix = document.getElementById('shard-matrix');
-        for (let i = 0; i < 999; i++) {
-            const dot = document.createElement('div');
-            dot.className = 'shard-dot';
-            if (Math.random() > 0.95) dot.classList.add('active');
-            matrix.appendChild(dot);
+            const output = document.getElementById('util-speed-output');
+            if (output) output.innerHTML = 'Testing latency... <br/> [=====>     ] 50%';
+            setTimeout(() => {
+                if (output) output.innerHTML = 'Ping: 12ms<br/>Download: 1.2 GB/s<br/>Upload: 900 MB/s<br/><span style="color:var(--success)">Lattice connection OPTIMAL.</span>';
+                addLog("Σ [SPEED]: Speedtest complete. Optic link active.", "success");
+            }, 1500);
         }
+
+        // Shard Dot Pool (Fix Issue #4)
+        class ShardDotPool {
+            constructor(containerId, maxDots = 100) {
+                this.container = document.getElementById(containerId);
+                this.maxDots = maxDots;
+                this.dots = [];
+                this.init();
+            }
+            init() {
+                if (!this.container) return;
+                for (let i = 0; i < this.maxDots; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'shard-dot';
+                    if (Math.random() > 0.8) dot.classList.add('active');
+                    this.container.appendChild(dot);
+                    this.dots.push(dot);
+                }
+            }
+            pulseRandom() {
+                if (!this.dots.length) return;
+                const idx = Math.floor(Math.random() * this.dots.length);
+                const dot = this.dots[idx];
+                dot.classList.add('pulse');
+                setTimeout(() => dot.classList.remove('pulse'), 1000);
+            }
+        }
+        const shardPool = new ShardDotPool('shard-matrix');
+        setInterval(() => shardPool.pulseRandom(), 2000);
 
         // DNA Telemetry Sync
         let totalSaved = 0;
         setInterval(() => {
             totalSaved += Math.floor(Math.random() * 500);
-            document.getElementById('dna-savings').innerText = (totalSaved / 1024).toFixed(2) + " MB";
+            const el = document.getElementById('dna-savings');
+            if(el) el.innerText = (totalSaved / 1024).toFixed(2) + " MB";
         }, 2000);
 
         // Lattice Mesh Discovery & Streaming
@@ -640,10 +671,13 @@ function createDebounce(func, wait) {
         const meshView = document.getElementById('mesh-view');
         const meshSvg = document.getElementById('mesh-svg');
         const meshNodes = [];
+        const MAX_LINES = 50; // Cap unbounded lines
+        const lines = [];
 
         function discoverPeer() {
             peers++;
-            document.getElementById('peer-count').innerText = peers;
+            const pc = document.getElementById('peer-count');
+            if(pc) pc.innerText = peers;
             const node = document.createElement('div');
             node.className = 'mesh-node mesh-node-pulse';
             
@@ -655,7 +689,6 @@ function createDebounce(func, wait) {
             if (meshView) meshView.appendChild(node);
             meshNodes.push({x, y});
 
-            // Simulate Data Stream to a random previous node
             if (peers > 1 && meshSvg) {
                 const targetIdx = Math.floor(Math.random() * (peers - 1));
                 const target = meshNodes[targetIdx];
@@ -670,14 +703,17 @@ function createDebounce(func, wait) {
                 line.setAttribute('stroke-dasharray', '5,5');
                 line.style.opacity = '0.5';
                 
-                // Animate stream
-                let offset = 0;
-                setInterval(() => {
-                    offset -= 1;
-                    line.setAttribute('stroke-dashoffset', offset);
-                }, 50);
-
+                // CSS Animation instead of JS Interval (Fix Issue #2)
+                line.style.animation = 'dash 2s linear infinite';
+                
                 meshSvg.appendChild(line);
+                lines.push(line);
+                
+                // Fix Issue #5: Unbounded SVG lines
+                if (lines.length > MAX_LINES) {
+                    const oldLine = lines.shift();
+                    meshSvg.removeChild(oldLine);
+                }
             }
         }
         setInterval(() => { if (peers < 12) discoverPeer(); }, 5000);
