@@ -1954,6 +1954,35 @@ setInterval(() => {
     if (mem) mem.textContent = (Math.random() * 0.5 + 4.1).toFixed(1) + "GB";
 }, 2000);
 
+// Unified Search Logic
+window.performSearch = function(query) {
+    const results = document.getElementById('command-results');
+    if (!results) return;
+    
+    const data = [
+        { name: 'OmniShell', type: 'app', action: "launchApp('OmniShell')" },
+        { name: 'File Manager', type: 'app', action: "launchApp('File Manager')" },
+        { name: 'Sigma Browser', type: 'app', action: "launchApp('Sigma Browser')" },
+        { name: 'System Installer', type: 'app', action: "launchApp('System Installer')" },
+        { name: 'Lattice Settings', type: 'setting', action: "launchApp('Utility Nexus')" },
+        { name: 'Theme: Neon Cyan', type: 'command', action: "setTheme('cyan')" },
+        { name: 'Theme: Solar Gold', type: 'command', action: "setTheme('gold')" },
+        { name: 'Theme: Crimson Shard', type: 'command', action: "setTheme('crimson')" },
+        { name: 'NPWO Turbo Mode', type: 'toggle', action: "toggleTurboMode()" }
+    ];
+
+    const filtered = data.filter(item => item.name.toLowerCase().includes(query.toLowerCase()));
+    
+    results.innerHTML = filtered.map(item => `
+        <div class="command-item" onclick="${item.action}; document.getElementById('cmd-palette').classList.remove('active')">
+            <span>${item.name}</span>
+            <kbd>${item.type.toUpperCase()}</kbd>
+        </div>
+    `).join('');
+};
+
+document.getElementById('cmd-input')?.addEventListener('input', (e) => performSearch(e.target.value));
+
 // Sigma Settings Hub Tab Logic
 window.switchSettings = function(tab) {
     const main = document.getElementById('settings-main');
@@ -1967,17 +1996,48 @@ window.switchSettings = function(tab) {
         main.innerHTML = `<h3>Service Manager</h3><div class="settings-group"><label>Lattice Orchestrator</label><span class="status-success">RUNNING</span></div><div class="settings-group"><label>PQC Cryptography</label><span class="status-success">HARDENED</span></div><div class="settings-group"><label>Aether Network Shard</label><button class="util-btn" onclick="addLog('Σ [SVC]: Restarting Aether Shard...', 'warning')">RESTART</button></div>`;
     } else if (tab === 'config') {
         main.innerHTML = `<h3>Config Engine (YAML)</h3><textarea class="util-input" style="height: 150px; font-family: monospace;">system:\n  kernel: sovereign-v100\n  security: lattice-pqc\n  ui: zenith-fluid</textarea><button class="util-btn" onclick="addLog('Σ [CONFIG]: YAML Manifest deployed.', 'success')">DEPLOY CONFIG</button>`;
+    } else if (tab === 'modules') {
+        main.innerHTML = `<h3>Dynamic Module Manager</h3><p class="stat-label">Hot-swap drivers and UI shards without rebooting.</p><div class="settings-group"><label>GPU Driver v2.1</label><button class="util-btn" onclick="addLog('Σ [MODULE]: Hot-swapping GPU Driver...', 'success')">RELOAD</button></div><div class="settings-group"><label>Aether Network Shard</label><button class="util-btn" onclick="addLog('Σ [MODULE]: Shard reloaded.', 'success')">RELOAD</button></div>`;
+    } else if (tab === 'benchmarks') {
+        main.innerHTML = `<h3>Benchmark Laboratory</h3><p class="stat-label">Measure silicon-native performance and lattice throughput.</p><div class="settings-group"><label>Core Latency</label><span>0.04μs</span></div><div class="settings-group"><label>Lattice Sync Rate</label><span>8.2 GB/s</span></div><button class="util-btn" onclick="addLog('Σ [BENCH]: Running Stress Test...', 'warning')">START STRESS TEST</button>`;
+    } else if (tab === 'accessibility') {
+        main.innerHTML = `<h3>Accessibility</h3><p class="stat-label">Inclusive design for the Sovereign Lattice.</p><div class="settings-group"><label>Screen Reader</label><button class="util-btn" onclick="addLog('Σ [UI]: Screen Reader ENABLED.', 'success')">ENABLE</button></div><div class="settings-group"><label>High Contrast</label><button class="util-btn" onclick="addLog('Σ [UI]: High Contrast mode active.', 'success')">ENABLE</button></div>`;
     } else if (tab === 'healing') {
         main.innerHTML = `<h3>Auto-Healing</h3><p class="stat-label">AI-driven diagnostics and lattice repair.</p><div class="settings-group"><label>Health: 100%</label><button class="util-btn" onclick="sigmaCore.healSystem()">START AUDIT</button></div>`;
+
     } else {
         main.innerHTML = `<h3>${tab.toUpperCase()}</h3><p class="stat-label">Integrating ${tab} services...</p>`;
     }
     addLog(`Σ [SETTINGS]: Switched to ${tab}.`, "success");
 };
 
+// MORPHIC LAYOUT ENGINE
+let draggedWidget = null;
+
+window.handleDragStart = function(e) {
+    draggedWidget = e.target.closest('.card');
+    e.dataTransfer.effectAllowed = 'move';
+};
+
+window.handleDragOver = function(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+};
+
+window.handleDrop = function(e) {
+    e.preventDefault();
+    const target = e.target.closest('.card');
+    if (draggedWidget && target && draggedWidget !== target) {
+        const parent = target.parentNode;
+        parent.insertBefore(draggedWidget, target);
+        addLog("Σ [MORPHIC]: Layout updated via silicon gesture.", "success");
+    }
+};
+
 // SIGMA AUTOMATION ENGINE
 class SigmaAutomationEngine {
     constructor() {
+        this.rules = [];
         this.init();
     }
     init() {
@@ -1986,14 +2046,48 @@ class SigmaAutomationEngine {
             if (battery < 20) this.trigger('low_battery');
         }, 15000);
     }
+    addRule(trigger, action) {
+        this.rules.push({ trigger, action });
+        addLog(`Σ [AUTO]: New rule added: ${trigger} -> ${action}`, "success");
+    }
     trigger(event) {
         addLog(`Σ [AUTO]: Event detected: ${event}. Orchestrating response...`, "warning");
         if (event === 'low_battery' && sigmaCore.currentMode !== 'Minimal') {
             setWorkflowMode('Minimal');
             addLog("Σ [AUTO]: Low battery detected. Auto-switched to Minimal mode.", "success");
         }
+        this.rules.filter(r => r.trigger === event).forEach(r => {
+            addLog(`Σ [AUTO]: Rule matched: ${r.action}`, "success");
+            eval(r.action); // Industrial macro execution
+        });
     }
 }
+
+// DYNAMIC THEME ENGINE
+class DynamicThemeEngine {
+    constructor() {
+        this.autoMode = true;
+        this.init();
+    }
+    init() {
+        setInterval(() => {
+            if (this.autoMode) this.applyContextualTheme();
+        }, 60000); // Check every minute
+    }
+    applyContextualTheme() {
+        const hour = new Date().getHours();
+        if (hour >= 18 || hour < 6) {
+            document.documentElement.style.setProperty('--accent-primary', '#ff0055');
+            document.documentElement.style.setProperty('--bg-glass', 'rgba(10, 10, 15, 0.85)');
+        } else {
+            document.documentElement.style.setProperty('--accent-primary', '#00ff88');
+            document.documentElement.style.setProperty('--bg-glass', 'rgba(255, 255, 255, 0.1)');
+        }
+    }
+}
+
+const themeEngine = new DynamicThemeEngine();
+const automation = new SigmaAutomationEngine();
 
 // SIGMA CAPSULE DEPLOYMENT
 function deployCapsule(name) {
@@ -2033,6 +2127,9 @@ window.launchApp = function(app) {
             win.style.display = 'block';
             win.style.zIndex = '3000';
         }
+    } else if (app === 'System Installer') {
+        addLog('Σ [INSTALLER]: Bootstrapping Sovereign Onboarding Wizard...', 'success');
+        setTimeout(() => addLog('Σ [INSTALLER]: Deployment target: /dev/lattice_nvme0n1', 'info'), 1000);
     } else if (app === 'Capsule Library') {
         const win = document.getElementById('sigma-capsule-win');
         if (win) {

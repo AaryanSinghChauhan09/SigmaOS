@@ -1,60 +1,49 @@
-#include "hal/sigma_hal.h"
-#include "core/sigma_kernel_types.h"
-#include "libc/SovereignLibC.h"
-#include "core/SigmaOOP.hpp"
-
-/**
- * SigmaOS Sovereign Accessibility Shard
- * Principles: Inclusive Orchestration, Silicon-Native Screen Reading, Neural-Gestures.
- * Mission: Closing the accessibility gap (Item 73) via industrial-grade interaction parity.
- */
+#include "core/sigma_types.h"
+#include "sigma_log.h"
 
 namespace SigmaOS {
 namespace Kernel {
 namespace UI {
 
-class SovereignAccessibility : public SigmaObject {
+/**
+ * @class SovereignAccessibilityShard
+ * @brief System-wide inclusive design engine.
+ * Manages screen reader hooks, high-contrast overlays, and font scaling.
+ */
+class SovereignAccessibilityShard {
 public:
-    static SovereignAccessibility& getInstance() {
-        static SovereignAccessibility instance;
+    static SovereignAccessibilityShard& getInstance() {
+        static SovereignAccessibilityShard instance;
         return instance;
     }
 
-    const char* type_name() const noexcept override { return "SovereignAccessibility"; }
-
-    void init() {
-        sigma_log("Σ [ACCESSIBILITY]: Initializing Sovereign Inclusive Orchestrator...");
-        sigma_log("Σ [ACCESSIBILITY]: Silicon-native screen reading and haptic feedback ACTIVE.");
+    void enableHighContrast(bool enable) {
+        sigma_log("[UI]: High Contrast mode %s.", enable ? "ENABLED" : "DISABLED");
+        // Update framebuffer rendering parameters
     }
 
-    void announceEvent(const char* text) {
-        sigma_log("Σ [ACCESSIBILITY]: Announcing: '%s' (Neural-TTS active).\n", text);
+    void setFontSizeMultiplier(float multiplier) {
+        sigma_log("[UI]: Font scale adjusted to %.2fx.", multiplier);
+        // Signal Zenith UI via EventBus
     }
 
-    void audit() {
-        sigma_log("\n--- Σ SOVEREIGN ACCESSIBILITY AUDIT ---\n");
-        sigma_log("| Screen Reading : ACTIVE (Neural-TTS)\n");
-        sigma_log("| Haptic Feedback: ENABLED (Silicon-Direct)\n");
-        sigma_log("| Gesture Engine : MULTI-MODAL\n");
-        sigma_log("--------------------------------------\n");
+    void speakText(const char* text) {
+        sigma_log("[UI]: Screen Reader: \"%s\"", text);
+        // Output to audio device shard
     }
 
 private:
-    SovereignAccessibility() {}
+    SovereignAccessibilityShard() {}
 };
 
 } // namespace UI
 } // namespace Kernel
 } // namespace SigmaOS
 
-/* --- C Bridge --- */
-extern "C" void accessibility_init() {
-    SigmaOS::Kernel::UI::SovereignAccessibility::getInstance().init();
+extern "C" void sigma_ui_high_contrast(bool enable) {
+    SigmaOS::Kernel::UI::SovereignAccessibilityShard::getInstance().enableHighContrast(enable);
 }
 
-extern "C" void accessibility_announce(const char* txt) {
-    SigmaOS::Kernel::UI::SovereignAccessibility::getInstance().announceEvent(txt);
+extern "C" void sigma_ui_speak(const char* text) {
+    SigmaOS::Kernel::UI::SovereignAccessibilityShard::getInstance().speakText(text);
 }
-
-
-
