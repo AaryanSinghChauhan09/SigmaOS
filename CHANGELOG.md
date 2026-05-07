@@ -1,39 +1,20 @@
-# 📜 SigmaOS Change Log
+# Changelog
 
-All notable changes to the SigmaOS Sovereign Lattice will be documented in this file.
+All notable changes to this project will be documented in this file.
 
-## [v100.0 Zenith] - 2026-04-30
+## [100.0] - 2026-05-05
 
 ### Added
 
-- **QEMU Emulation Support**: Added `make qemu` target for kernel verification.
-
-- **Serial Boot Tracing**: Direct silicon logging to COM1 for kernel-level debugging.
-- **QBMP Allocator**: Functional bump allocator with 8-byte alignment and assertions.
-- **CI/CD Pipeline**: GitHub Actions workflow for automated build and security auditing.
-- **Architecture Documentation**: New `docs/architecture.md` explaining the lattice sharding model.
-
-- **Verification Assertions**: Added `sigma_assert` for kernel-level sanity checks.
-
-### Changed
-
-- **Build System**: Standardized on `kernel/sigma.ld` and enabled `-Werror` for strict compilation.
-
-- **Documentation**: Updated README with boot instructions and architecture diagrams.
-- **Include Strategy**: Consolidated include paths to use flat `include/` directory.
-
-- **Modularization**: Refactored core subsystems to the `SovereignEngine` singleton pattern for enhanced state isolation and ABI stability. Newly hardened engines: `SovereignSyscallEngine`, `SovereignEntropyEngine`, `SovereignAuditEngine`, `SovereignCryptoEngine`, `SovereignGUIEngine`, `SovereignEditEngine`, `SovereignDashEngine`, `SovereignTunerEngine`, `SovereignAllocatorEngine` — eliminating all static global state from these critical shards.
-
-- **CI/CD Hardening**: Corrected GitHub Actions audit paths and synchronized the Makefile with the expanded 600-shard modular lattice to ensure production-grade build stability.
+- **Sovereign Zenith UI**: Complete glassmorphic desktop environment.
+- **Industrial Data Tools**: Native Data Forge, L-Stream, and ML Hub.
+- **Universal Integration**: Features inspired by MS Terminal, PowerToys, and VLC.
+- **600-Shard Lattice**: Industrial-grade modular kernel architecture.
+- **Self-Healing**: Automated shard diagnostic and repair logic.
+- **Security**: Sovereign DID and Quantum Key Distribution (QKD) shards.
 
 ### Fixed
 
-- Resolved `sigma_hardened_strcpy` undeclared error in `SovereignTuner.cpp`.
-
-- Fixed various markdown linting violations (MD012, MD022, MD058) in developer guides.
-- Removed stale/unused header includes across 15+ kernel files.
-
----
-
-### Σ SIGMAOS: Sovereign Versioning. Absolute Continuity.
-
+- All cross-translation unit linkage errors.
+- Global link repairs on the GitHub Wiki.
+- Repository hygiene and CI/CD stabilization.

@@ -1,41 +1,58 @@
-# The Sovereign Lattice: Atomic OS Architecture
+# SigmaOS: Sovereign Lattice Architecture
 
-SigmaOS represents a paradigm shift in operating system design. We have abandoned the monolithic kernel and even the traditional microkernel in favor of the **Sovereign Lattice**.
+This document provides a high-fidelity overview of the SigmaOS Sovereign Lattice (Zenith v100).
 
-## ⚛️ Atomic Sharding
+## 1. High-Level System Design
 
-Every OS capability—from memory allocation to networking—is a self-contained, zero-dependency **Shard**.
+SigmaOS is a **600-shard distributed operating system** built on the principles of **Sovereign Computing**. Unlike monolithic kernels, SigmaOS decomposes system services into immutable, cryptographically signed shards.
 
-### Genesis Kernel (S01)
+```mermaid
+graph TD
+    UI[Zenith UI Shard] --> IPC[Sovereign IPC Bridge]
+    IPC --> Core[Sovereign Core Lattice]
 
-The Genesis Kernel is the minimal bootstrap shard responsible for:
+    subgraph Core
+        PMM[Sovereign PMM]
+        VMM[Sovereign VMM]
+        WASM[WASM Runtime Shard]
+        PQC[Sovereign PQC Nexus]
+    end
 
-- **Slab Allocation**: O(1) deterministic memory management.
-- **Priority Scheduling**: Hard real-time task preemption.
-- **VMM Initialization**: Setting up the hardware-native page tables.
+    PMM --> HW[Physical Silicon]
+    VMM --> PMM
+    WASM --> VMM
+    PQC --> WASM
+```
 
-### Sovereign HAL (S04)
+## 2. Memory Management (PMM/VMM)
 
-The Hardware Abstraction Layer is not a single library, but a collection of atomic drivers (GPU, USB, Wi-Fi) that communicate via lock-free ring buffers.
+The Memory Management unit uses **Amnesic Policies** to ensure zero data remnancy.
 
-## 🔒 Security: The Capability Mesh
+- **PMM (Physical Memory Manager)**: Manages 4KB pages with a bitset-based allocation for O(1) performance.
+- **VMM (Virtual Memory Manager)**: Implements recursive page table mapping with support for **Huge Pages (2MB/1GB)** for high-throughput shards.
 
-Traditional permission models are replaced by **Capability Tokens**. A shard cannot even "see" a hardware resource or another shard unless it holds a cryptographically signed token.
+## 3. Shard Orchestration
 
-### Isolation Mechanisms
+Each shard is an isolated execution unit. The `SovereignShardManager` handles the lifecycle of these shards.
 
-- **Virtual Memory Namespacing**: Each shard runs in its own address space.
-- **IPC Sandboxing**: Communication is mediated by the Security Shard.
+| Component | Responsibility | Isolation Level |
+|-----------|----------------|-----------------|
+| `SovereignPQC` | Signature & Attestation | Silicon-Isolated |
+| `SovereignSandbox` | Syscall Filtering (WASI) | Process-Isolated |
+| `SovereignWASM` | AOT-Compiled Runtime | Runtime-Isolated |
 
-## 🌍 Cross-Architecture Support
+## 4. Security & The Sandbox
 
-By maintaining zero-dependency at the C source level, SigmaOS shards are naturally portable across:
+The sandbox uses a **Config-Driven Policy** engine.
 
-- **x86_64**: Industrial servers.
-- **aarch64**: Mobile and embedded powerhouses.
-- **riscv64**: The future of open-silicon sovereignty.
+- **Syscall Filtering**: seccomp-style filtering for `sigma_syscall_gate`.
+- **Resource Constraints**: Cgroups-inspired CPU and Memory quotas per shard.
+- **Mesh Trust**: DHT-based integrity verification across distributed nodes.
 
----
+## 5. Industrial Evolution
 
-*Next: [Shard Development Guide](Shard_Development)*
+SigmaOS absorbs the best of breed features:
 
+- **eBPF Tracing**: For real-time lattice observability.
+- **CoW Snapshots**: For amnesic persistence and state rollback.
+- **Neural Scheduling**: AI-driven resource pre-allocation.
