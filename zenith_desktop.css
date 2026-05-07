@@ -2404,3 +2404,8 @@ body {
 
 
 
+
+.context-item:hover {
+    background: rgba(0, 255, 136, 0.2);
+    color: #00ff88 !important;
+}

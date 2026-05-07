@@ -1410,6 +1410,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
         <div class="task-icon" id="turbo-toggle" onclick="toggleTurboMode()" title="Turbo Mode (NPWO)">🚀</div>
         <div class="taskbar-divider"></div>
         <div class="task-icon" onclick="toggleNotifications()">🔔</div>
+        <div class="task-icon" onclick="toggleHelp()">❓</div>
         <div class="task-icon" onclick="toggleBatteryPanel()">🔋</div>
         <div class="taskbar-divider"></div>
         <div class="status-indicator-wasm" title="Silicon-WASM Nexus">
@@ -2250,3 +2251,37 @@ https://chatgpt.com/?q={{prompt}}</textarea>
     </script>
 </body>
 </html>
+
+    <!-- Sovereign Context Menu -->
+    <div id="context-menu" class="context-menu" style="display: none; position: absolute; min-width: 180px; background: rgba(15, 15, 25, 0.9); backdrop-filter: blur(15px); border: 1px solid rgba(0, 255, 136, 0.3); border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
+        <div class="context-item" onclick="contextAction('refresh')" style="padding: 10px 15px; cursor: pointer; color: #fff; transition: background 0.2s;">? Refresh Lattice</div>
+        <div class="context-item" onclick="contextAction('optimize')" style="padding: 10px 15px; cursor: pointer; color: #fff; transition: background 0.2s;">? Optimize Shards</div>
+        <div class="context-item" onclick="contextAction('terminal')" style="padding: 10px 15px; cursor: pointer; color: #fff; transition: background 0.2s;">??? OmniShell Here</div>
+        <div class="context-divider" style="height: 1px; background: rgba(255,255,255,0.1); margin: 5px 0;"></div>
+        <div class="context-item" onclick="contextAction('settings')" style="padding: 10px 15px; cursor: pointer; color: #fff; transition: background 0.2s;">?? System Settings</div>
+    </div>
+
+    <!-- Sovereign Help Overlay -->
+    <div id="help-overlay" class="wizard-overlay wizard-overlay--hidden">
+        <div class="wizard-box" style="max-width: 600px;">
+            <div class="wizard-title">S Sovereign Help Matrix</div>
+            <div class="wizard-text" style="text-align: left; max-height: 400px; overflow-y: auto;">
+                <h4>Keyboard Shortcuts</h4>
+                <ul>
+                    <li><strong>Alt + Space</strong>: Summon Command Center</li>
+                    <li><strong>Meta + K</strong>: Unified Search</li>
+                    <li><strong>Alt + T</strong>: Open OmniShell</li>
+                    <li><strong>Alt + O</strong>: Optimize Lattice</li>
+                </ul>
+                <h4>Operational Modes</h4>
+                <ul>
+                    <li><strong>Balanced</strong>: Standard high-performance orchestration.</li>
+                    <li><strong>Minimal</strong>: Power-saving, low-latency mode.</li>
+                    <li><strong>Turbo</strong>: Maximize silicon throughput (NPWO).</li>
+                </ul>
+                <h4>Advanced Shards</h4>
+                <p>The 600-shard architecture ensures zero-trust isolation and self-healing. Use the <strong>Auto-Healing Hub</strong> to audit system integrity.</p>
+            </div>
+            <button class="util-btn" onclick="toggleHelp()">CLOSE MATRIX</button>
+        </div>
+    </div>
