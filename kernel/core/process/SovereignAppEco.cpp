@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 #include "sigma_appeco.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 
 
@@ -20,7 +20,7 @@ extern "C" bool appeco_install(const char* package_uri, sigma_app_format_t forma
     // UAV (Universal Application Virtualization) Algorithm
     // Wraps any app format into a sandboxed sovereign shard.
     
-    sigma_printf("[APPECO] UAV: Downloading and verifying '%s' (Format: %d)...\n", package_uri, (int)format);
+    sigma_log("[APPECO] UAV: Downloading and verifying '%s' (Format: %d)...\n", package_uri, (int)format);
     
     if (format == APP_FORMAT_LINUX_COMPAT) {
         sigma_log("[APPECO] UAV: Engaging Linux compatibility shim within S-Sandbox CIB boundary.");
@@ -31,12 +31,12 @@ extern "C" bool appeco_install(const char* package_uri, sigma_app_format_t forma
 }
 
 extern "C" bool appeco_launch(const char* app_name) {
-    sigma_printf("[APPECO] UAV: Launching application '%s' within isolated sandbox.\n", app_name);
+    sigma_log("[APPECO] UAV: Launching application '%s' within isolated sandbox.\n", app_name);
     return true;
 }
 
 extern "C" void appeco_uninstall(const char* app_name) {
-    sigma_printf("[APPECO] UAV: Atomically removing '%s' and all associated state.\n", app_name);
+    sigma_log("[APPECO] UAV: Atomically removing '%s' and all associated state.\n", app_name);
 }
 
 

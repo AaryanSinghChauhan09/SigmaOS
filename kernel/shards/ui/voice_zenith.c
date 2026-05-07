@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-VOICE-ZENITH (v1.0 - SILICON-DIRECT AUDIO)
@@ -10,7 +11,7 @@
  * =============================================================================
  */
 
-#include "../../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 typedef struct VoiceConfig {
     sigma_u32 sample_rate;

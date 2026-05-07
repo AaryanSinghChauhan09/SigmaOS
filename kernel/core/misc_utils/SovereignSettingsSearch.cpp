@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Predictive Settings Search
@@ -42,13 +42,13 @@ public:
     }
 
     void search(const char* query) {
-        sigma_printf("[SETTINGS-SEARCH] Searching for '%s'...\n", query);
+        sigma_log("[SETTINGS-SEARCH] Searching for '%s'...\n", query);
         sigma_u32 results = 0;
         for (sigma_u32 i = 0; i < this->settings_count; i++) {
             // Naive prefix match — real impl would use Levenshtein distance
             if (sigma_hardened_strncmp(this->settings[i].label, query, 4) == 0 ||
                 sigma_hardened_strncmp(this->settings[i].category, query, 4) == 0) {
-                sigma_printf("  -> [%s] %s (%u accesses)\n",
+                sigma_log("  -> [%s] %s (%u accesses)\n",
                              this->settings[i].category,
                              this->settings[i].label,
                              this->settings[i].access_count);

@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: PIT TIMER + PIT/HPET DRIVER (v1.0 - PURE C11)
@@ -13,7 +14,7 @@
  * =============================================================================
  */
 
-#include "../../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 /* =========================================================================
  * PIT Constants

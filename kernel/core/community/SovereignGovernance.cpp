@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 #include "../security/SovereignQKD.hpp"
 
 namespace SigmaOS {
@@ -31,32 +32,32 @@ public:
 
     void submitProposal(const char* proposal_id) {
         if (m_active_proposals >= 16) return;
-        sigma_printf("Σ [GOVERNANCE]: Proposal Submitted -> '%s'\n", proposal_id);
+        sigma_log("Σ [GOVERNANCE]: Proposal Submitted -> '%s'\n", proposal_id);
         m_active_proposals++;
     }
 
     void castVote(const char* node_id, const char* proposal_id, bool support) {
         // Enforce QKD verification for voting rights
         if (!Security::SovereignQKD::getInstance().verifyQuantumIntegrity()) {
-            sigma_printf("Σ [GOVERNANCE]: [ERROR] Node '%s' rejected. Invalid Quantum Signature.\n", node_id);
+            sigma_log("Σ [GOVERNANCE]: [ERROR] Node '%s' rejected. Invalid Quantum Signature.\n", node_id);
             return;
         }
 
-        sigma_printf("Σ [GOVERNANCE]: Node '%s' voted %s on '%s'.\n", 
+        sigma_log("Σ [GOVERNANCE]: Node '%s' voted %s on '%s'.\n", 
                      node_id, support ? "YEA" : "NAY", proposal_id);
         m_total_votes++;
     }
 
     void rewardContributor(const char* node_id, sigma_u32 credits) {
-        sigma_printf("Σ [GOVERNANCE]: Contributor '%s' rewarded %u SigmaCredits for successful merge.\n", node_id, credits);
+        sigma_log("Σ [GOVERNANCE]: Contributor '%s' rewarded %u SigmaCredits for successful merge.\n", node_id, credits);
     }
 
     void audit() {
-        sigma_printf("\n--- Σ GOVERNANCE AUDIT ---\n");
-        sigma_printf("| Active Proposals : %u\n", m_active_proposals);
-        sigma_printf("| Total Votes Cast : %u\n", m_total_votes);
-        sigma_printf("| Consensus Model  : MESH-WEIGHTED\n");
-        sigma_printf("--------------------------\n");
+        sigma_log("\n--- Σ GOVERNANCE AUDIT ---\n");
+        sigma_log("| Active Proposals : %u\n", m_active_proposals);
+        sigma_log("| Total Votes Cast : %u\n", m_total_votes);
+        sigma_log("| Consensus Model  : MESH-WEIGHTED\n");
+        sigma_log("--------------------------\n");
     }
 
 private:

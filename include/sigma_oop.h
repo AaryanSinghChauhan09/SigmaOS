@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-OOP (v1.0)
@@ -8,7 +9,7 @@
 #ifndef SIGMA_OOP_H
 #define SIGMA_OOP_H
 
-#include "sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 typedef struct SovereignObject {
     sigma_u32     id;

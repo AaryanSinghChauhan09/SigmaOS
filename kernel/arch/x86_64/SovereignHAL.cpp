@@ -1,6 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Hardware Abstraction Layer (HAL) Shard

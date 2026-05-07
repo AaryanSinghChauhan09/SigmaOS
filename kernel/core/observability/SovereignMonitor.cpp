@@ -1,7 +1,8 @@
-#include "../../../include/sigma_monitor.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "core/sigma_types.h"
+#include "observability/sigma_monitor.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
 
 
 namespace SigmaOS {

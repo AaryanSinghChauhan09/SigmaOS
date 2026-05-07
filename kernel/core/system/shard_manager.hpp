@@ -1,11 +1,11 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef SHARD_MANAGER_HPP
 #define SHARD_MANAGER_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Core {
@@ -26,7 +26,7 @@ private:
 
 public:
     SovereignShardManager() : m_installed_shards(512), m_total_shard_storage(1024ULL * 1024 * 1024 * 64), m_auto_verify(SIGMA_TRUE) {
-        sigma_printf("[SHARD-MGR]: Sovereign Silicon Nexus [ACTIVE].\n");
+        sigma_log("[SHARD-MGR]: Sovereign Silicon Nexus [ACTIVE].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignShardManager"; }

@@ -1,11 +1,11 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef SOVEREIGN_HYPERVISOR_HPP
 #define SOVEREIGN_HYPERVISOR_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Core {
@@ -26,7 +26,7 @@ private:
 
 public:
     SovereignHypervisor() : m_active_guests(0), m_virtual_silicon_bandwidth(1024ULL * 1024 * 1024 * 10), m_passthrough_active(SIGMA_TRUE) {
-        sigma_printf("[HYPERVISOR]: Sovereign Hypervisor Nexus [ARMED].\n");
+        sigma_log("[HYPERVISOR]: Sovereign Hypervisor Nexus [ARMED].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignHypervisor"; }

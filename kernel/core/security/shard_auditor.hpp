@@ -1,10 +1,10 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef SHARD_AUDITOR_HPP
 #define SHARD_AUDITOR_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Security {
@@ -14,16 +14,16 @@ public:
     const char* type_name() const noexcept override { return "SovereignShardAuditor"; }
 
     void AuditLattice() {
-        sigma_printf("\n--- Î£ SOVEREIGN SHARD AUDIT (INDUSTRIAL GRADE) ---\n");
-        sigma_printf("| Total Shards   : 512 [FULL LATTICE]\n");
-        sigma_printf("| Bit-Perfect    : 100%%\n");
-        sigma_printf("| PQC Integrity  : VERIFIED\n");
-        sigma_printf("| Silicon Sync   : LOCK-STEP ACTIVE\n");
-        sigma_printf("--------------------------------------------------\n");
+        sigma_log("\n--- Î£ SOVEREIGN SHARD AUDIT (INDUSTRIAL GRADE) ---\n");
+        sigma_log("| Total Shards   : 512 [FULL LATTICE]\n");
+        sigma_log("| Bit-Perfect    : 100%%\n");
+        sigma_log("| PQC Integrity  : VERIFIED\n");
+        sigma_log("| Silicon Sync   : LOCK-STEP ACTIVE\n");
+        sigma_log("--------------------------------------------------\n");
     }
 
     void VerifyShard(const char* shard_id) {
-        sigma_printf("[AUDITOR]: Cryptographic verification of Shard: %s... [OK]\n", shard_id);
+        sigma_log("[AUDITOR]: Cryptographic verification of Shard: %s... [OK]\n", shard_id);
     }
 };
 

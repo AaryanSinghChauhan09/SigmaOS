@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Power Manager (Sovereign-ACPI)
@@ -28,7 +29,7 @@ public:
     }
 
     void setSleepState(sigma_u32 state) {
-        sigma_printf("Σ [POWER]: Transitioning Silicon Lattice to State S%u...\n", state);
+        sigma_log("Σ [POWER]: Transitioning Silicon Lattice to State S%u...\n", state);
         
         switch (state) {
             case 3: // Sleep (RAM)
@@ -44,11 +45,11 @@ public:
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN POWER AUDIT ---\n");
-        sigma_printf("| Energy Mode     : OPTIMIZED-SILICON\n");
-        sigma_printf("| ACPI Parity     : V6.3 (Simulated)\n");
-        sigma_printf("| Sleep Resilience: 100% (DNA-Backed)\n");
-        sigma_printf("-------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN POWER AUDIT ---\n");
+        sigma_log("| Energy Mode     : OPTIMIZED-SILICON\n");
+        sigma_log("| ACPI Parity     : V6.3 (Simulated)\n");
+        sigma_log("| Sleep Resilience: 100% (DNA-Backed)\n");
+        sigma_log("-------------------------------\n");
     }
 
 private:

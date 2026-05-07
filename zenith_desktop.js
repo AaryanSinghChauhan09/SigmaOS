@@ -1152,3 +1152,900 @@ class TelemetrySystem {
 const telemetry = new TelemetrySystem();
 window.addEventListener('load', () => telemetry.start());
 window.addEventListener('beforeunload', () => telemetry.stop());
+
+// =========================================================================
+// Σ SIGMAOS: VIRTUAL FILE SYSTEM (VFS) ZENITH
+// =========================================================================
+class VirtualFS {
+    constructor() {
+        this.storageKey = 'sigma_vfs_zenith';
+        this.root = JSON.parse(localStorage.getItem(this.storageKey)) || {
+            name: '/',
+            type: 'dir',
+            children: {
+                'bin': { name: 'bin', type: 'dir', children: {} },
+                'etc': { name: 'etc', type: 'dir', children: {
+                    'os-release': { name: 'os-release', type: 'file', content: 'NAME="SigmaOS"\nVERSION="100.0-ZENITH"\nCODENAME="Singularity"' }
+                }},
+                'home': { name: 'home', type: 'dir', children: {
+                    'sovereign': { name: 'sovereign', type: 'dir', children: {
+                        'welcome.txt': { name: 'welcome.txt', type: 'file', content: 'Welcome to SigmaOS Sovereign Zenith.\nYour files are now persistent.' },
+                        'projects': { name: 'projects', type: 'dir', children: {} }
+                    }}
+                }},
+                'tmp': { name: 'tmp', type: 'dir', children: {} }
+            }
+        };
+        this.currentPath = '/home/sovereign';
+    }
+
+    save() {
+        localStorage.setItem(this.storageKey, JSON.stringify(this.root));
+    }
+
+    resolve(path) {
+        if (!path) return null;
+        let parts = path.startsWith('/') ? path.split('/') : [...this.currentPath.split('/'), ...path.split('/')];
+        parts = parts.filter(p => p !== '' && p !== '.');
+        
+        // Handle ..
+        let resolvedParts = [];
+        for (let p of parts) {
+            if (p === '..') resolvedParts.pop();
+            else resolvedParts.push(p);
+        }
+
+        let curr = this.root;
+        for (let p of resolvedParts) {
+            if (curr.type !== 'dir' || !curr.children[p]) return null;
+            curr = curr.children[p];
+        }
+        return curr;
+    }
+
+    mkdir(path) {
+        const parts = path.split('/');
+        const name = parts.pop();
+        const parentPath = parts.join('/') || this.currentPath;
+        const parent = this.resolve(parentPath);
+        if (parent && parent.type === 'dir' && !parent.children[name]) {
+            parent.children[name] = { name: name, type: 'dir', children: {} };
+            this.save();
+            return true;
+        }
+        return false;
+    }
+
+    writeFile(path, content) {
+        const parts = path.split('/');
+        const name = parts.pop();
+        const parentPath = parts.join('/') || this.currentPath;
+        const parent = this.resolve(parentPath);
+        if (parent && parent.type === 'dir') {
+            parent.children[name] = { name: name, type: 'file', content: content };
+            this.save();
+            return true;
+        }
+        return false;
+    }
+
+    readFile(path) {
+        const node = this.resolve(path);
+        return (node && node.type === 'file') ? node.content : null;
+    }
+
+    ls(path = '.') {
+        const node = this.resolve(path);
+        if (node && node.type === 'dir') {
+            return Object.keys(node.children);
+        }
+        return null;
+    }
+}
+
+const vfs = new VirtualFS();
+
+// SIGMA TERMINAL ENGINE
+class SigmaTerminal {
+    constructor(outputId, inputId) {
+        this.output = document.getElementById(outputId);
+        this.input = document.getElementById(inputId);
+        this.history = [];
+        this.historyPtr = -1;
+        
+        if (this.input) {
+            this.input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const cmd = this.input.value;
+                    this.execute(cmd);
+                    this.input.value = '';
+                }
+            });
+        }
+    }
+
+    print(text, type = '') {
+        if (!this.output) return;
+        const div = document.createElement('div');
+        div.className = `term-line ${type}`;
+        div.innerHTML = text.replace(/\n/g, '<br>');
+        this.output.appendChild(div);
+        this.output.scrollTop = this.output.scrollHeight;
+    }
+
+    execute(line) {
+        this.print(`<span class="term-prompt">sovereign@sigma:${vfs.currentPath}$</span> ${line}`);
+        const parts = line.trim().split(/\s+/);
+        const cmd = parts[0].toLowerCase();
+        const args = parts.slice(1);
+
+        switch(cmd) {
+            case 'help':
+                this.print('Available Commands: ls, cd, pwd, cat, mkdir, touch, rm, clear, sc, info, reboot');
+                break;
+            case 'ls':
+                const files = vfs.ls(args[0] || '.');
+                if (files) this.print(files.join('  '));
+                else this.print('ls: cannot access directory', 'error');
+                break;
+            case 'pwd':
+                this.print(vfs.currentPath);
+                break;
+            case 'cd':
+                const newDir = args[0] || '/home/sovereign';
+                const resolved = vfs.resolve(newDir);
+                if (resolved && resolved.type === 'dir') {
+                    if (newDir.startsWith('/')) vfs.currentPath = newDir;
+                    else {
+                        // Very basic relative path handling
+                        if (newDir === '..') {
+                            const p = vfs.currentPath.split('/');
+                            p.pop();
+                            vfs.currentPath = p.join('/') || '/';
+                        } else {
+                            vfs.currentPath = (vfs.currentPath === '/' ? '' : vfs.currentPath) + '/' + newDir;
+                        }
+                    }
+                } else this.print(`cd: no such directory: ${newDir}`, 'error');
+                break;
+            case 'cat':
+                const content = vfs.readFile(args[0]);
+                if (content !== null) this.print(content);
+                else this.print(`cat: ${args[0]}: No such file`, 'error');
+                break;
+            case 'mkdir':
+                if (vfs.mkdir(args[0])) this.print(`Directory created: ${args[0]}`);
+                else this.print(`mkdir: failed to create ${args[0]}`, 'error');
+                break;
+            case 'touch':
+                if (vfs.writeFile(args[0], '')) this.print(`File created: ${args[0]}`);
+                else this.print(`touch: failed to create ${args[0]}`, 'error');
+                break;
+            case 'clear':
+                if (this.output) this.output.innerHTML = '';
+                break;
+            case 'sc': // Sigma Compiler (Mock Toolchain)
+                this.print('Σ [TOOLCHAIN]: Porting Clang/LLVM to lattice...');
+                this.print(`Σ [TOOLCHAIN]: Compiling ${args[0]} -> /bin/${args[0].replace('.c', '')}`);
+                setTimeout(() => this.print('Σ [TOOLCHAIN]: Success. Binary injected.', 'success'), 1000);
+                break;
+
+            case 'reboot':
+                this.print('Σ [KERN]: Soft reboot initiated...');
+                setTimeout(() => location.reload(), 1000);
+                break;
+            case 'browse':
+                const url = args[0] || 'sigma://lattice';
+                launchApp('Sigma Browser');
+                const browserInput = document.getElementById('browser-url');
+                if (browserInput) {
+                    browserInput.value = url;
+                    if (typeof sigmaBrowseGo === 'function') sigmaBrowseGo();
+                }
+                this.print(`Σ [WEB]: Redirecting to ${url}...`);
+                break;
+            case 'shard':
+                this.print('Σ [LATTICE]: Listing active shards...');
+                this.print('>> Shard-0x8F (Zenith-UI): ACTIVE');
+                this.print('>> Shard-0x92 (VFS-Core): ACTIVE');
+                this.print('>> Shard-0x44 (PQC-Shield): ACTIVE');
+                break;
+            case 'info':
+                this.print('Σ SIGMAOS: SOVEREIGN ZENITH v100.0');
+                this.print('Host: Sigma-Lattice-01');
+                this.print('Uptime: 12ms (Singularity Scale)');
+                this.print('Memory: 4.2 GB / 16.0 GB');
+                this.print('FS: Persistent (localStorage)');
+                break;
+
+            default:
+                if (line.trim() !== '') this.print(`sigma: command not found: ${cmd}`, 'error');
+        }
+    }
+}
+
+// Initialize terminal when window is available
+let sigmaTerm;
+function initTerminal() {
+    sigmaTerm = new SigmaTerminal('terminal-output', 'terminal-input');
+    sigmaTerm.print('Σ SIGMAOS SOVEREIGN TERMINAL v5.1');
+    sigmaTerm.print('Type "help" for a list of commands.\n');
+}
+
+window.addEventListener('load', () => {
+    initTerminal();
+    addLog('Σ [VFS]: Persistent Shard Sharding Matrix ACTIVE.', 'success');
+});
+
+// SOVEREIGN FILE MANAGER
+class FileManager {
+    constructor(gridId, breadcrumbsId) {
+        this.grid = document.getElementById(gridId);
+        this.breadcrumbs = document.getElementById(breadcrumbsId);
+        this.currentPath = '/home/sovereign';
+        this.update();
+    }
+
+    update() {
+        if (!this.grid || !this.breadcrumbs) return;
+        this.grid.innerHTML = '';
+        this.breadcrumbs.innerText = this.currentPath;
+
+        const files = vfs.ls(this.currentPath);
+        if (files) {
+            files.forEach(name => {
+                const node = vfs.resolve(this.currentPath + '/' + name);
+                const item = document.createElement('div');
+                item.className = 'fm-item';
+                item.innerHTML = `
+                    <div class="fm-item-icon">${node.type === 'dir' ? '📁' : '📄'}</div>
+                    <div class="fm-item-label">${name}</div>
+                `;
+                item.onclick = () => {
+                    if (node.type === 'dir') {
+                        this.currentPath = (this.currentPath === '/' ? '' : this.currentPath) + '/' + name;
+                        this.update();
+                    } else {
+                        addLog(`Σ [FS]: Reading ${name}...`, 'success');
+                        alert(node.content || '(Empty File)');
+                    }
+                };
+                this.grid.appendChild(item);
+            });
+        }
+    }
+
+    goBack() {
+        if (this.currentPath === '/') return;
+        const parts = this.currentPath.split('/');
+        parts.pop();
+        this.currentPath = parts.join('/') || '/';
+        this.update();
+    }
+}
+
+let fileManager;
+function initFileManager() {
+    fileManager = new FileManager('fm-grid', 'fm-breadcrumbs');
+}
+
+// Update existing launchApp to handle new windows
+const originalLaunchApp = launchApp;
+launchApp = function(app) {
+    if (app === 'OmniShell' || app === 'OmniShell v5.1') {
+        openWindow('terminal-win');
+    } else if (app === 'File Manager' || app === '📂') {
+        openWindow('file-manager-win');
+        if (fileManager) fileManager.update();
+    } else {
+        originalLaunchApp(app);
+    }
+};
+
+window.addEventListener('load', () => {
+    initFileManager();
+    // Register the new windows with WM
+    if (typeof wm !== 'undefined') {
+        wm.register('terminal-win');
+        wm.register('file-manager-win');
+    }
+});
+
+
+function fmBack() {
+    if (fileManager) fileManager.goBack();
+}
+
+// NEURAL INTELLIGENCE & TURBO MODE
+let isTurboMode = false;
+function toggleTurboMode() {
+    isTurboMode = !isTurboMode;
+    const btn = document.getElementById('turbo-toggle');
+    if (isTurboMode) {
+        btn.classList.add('active');
+        btn.style.color = 'var(--accent)';
+        btn.style.boxShadow = '0 0 20px var(--accent-glow)';
+        addLog('Σ [AISCHED]: NPWO Neural Scheduler entering PERFORMANCE mode.', 'success');
+        // Simulate ring-buffer submission for speed boost
+        if (typeof vfs !== 'undefined') {
+            addLog('Σ [KERN]: sigma_ring SQPOLL thread active. Context switches minimized.', 'success');
+        }
+    } else {
+        btn.classList.remove('active');
+        btn.style.color = '';
+        btn.style.boxShadow = '';
+        addLog('Σ [AISCHED]: NPWO Neural Scheduler entering BALANCED mode.', 'success');
+    }
+}
+
+function semanticSearch() {
+    const input = document.getElementById('semantic-search-input').value.toLowerCase();
+    const output = document.getElementById('ai-hub-results');
+    if (!input) return;
+
+    output.innerHTML = '<span class="accent">Σ [NEURAL]: Retrieving semantic embeddings from local VFS...</span>';
+    
+    setTimeout(() => {
+        let results = '';
+        if (input.includes('project') || input.includes('silicon')) {
+            results = '>> Found: /home/sovereign/projects/silicon_lattice_v1.sh<br>>> Relevance: 0.98 (Semantic Match)';
+        } else if (input.includes('welcome') || input.includes('document')) {
+            results = '>> Found: /home/sovereign/welcome.txt<br>>> Relevance: 0.85 (Contextual Match)';
+        } else {
+            results = '>> No direct semantic matches found. Expanding search to encrypted shards...';
+        }
+        output.innerHTML = results;
+        addLog('Σ [NEURAL]: Semantic Retrieval complete.', 'success');
+    }, 1200);
+}
+
+// Update switchUtil to handle neural-hub
+const originalSwitchUtil = typeof switchUtil === 'function' ? switchUtil : null;
+window.switchUtil = function(utilId) {
+
+    const panes = ['text-ops', 'data-conv', 'code-img', 'diff', 'dup-find', 'key-test', 'speed', 'status', 'bootable', 'table', 'broadcaster', 'firewall', 'neural-hub', 'snapshots'];
+
+    panes.forEach(p => {
+        const el = document.getElementById(`util-${p}`);
+        if (el) el.style.display = 'none';
+        else {
+            const el2 = document.getElementById(p);
+            if (el2) el2.style.display = 'none';
+        }
+    });
+    
+    const targetPane = document.getElementById(`util-${utilId}`) || document.getElementById(utilId);
+    if (targetPane) targetPane.style.display = 'block';
+    
+    const navs = document.querySelectorAll('.util-nav');
+    navs.forEach(n => n.classList.remove('active'));
+    
+    if (window.event && window.event.target && window.event.target.classList.contains('util-nav')) {
+        window.event.target.classList.add('active');
+    }
+    
+
+
+    addLog(`Σ [UTILITY]: Switching to ${utilId} module.`, "success");
+};
+
+// ATOMIC SNAPSHOTS & SWAPS
+function createSnapshot() {
+    const name = document.getElementById('snap-name').value || `Snap_${Date.now()}`;
+    addLog(`Σ [SNAP]: Initiating Atomic State Capture: ${name}...`, 'success');
+    
+    // Simulate VFS Serialization
+    setTimeout(() => {
+        const list = document.getElementById('snapshot-list');
+        const li = document.createElement('li');
+        li.className = 'routine-item routine-border-cyan';
+        li.innerHTML = `<strong>${name}</strong> (User State) <button class="cyber-btn small-btn" onclick="atomicSwap('${name}')">SWAP</button>`;
+        list.appendChild(li);
+        
+        addLog(`Σ [SNAP]: Snapshot ${name} persisted.`, 'success');
+        document.getElementById('snap-name').value = '';
+    }, 1500);
+}
+
+async function atomicSwap(target) {
+    addLog(`Σ [SNAP]: CRITICAL: Atomic Swap triggered for [${target}].`, 'warning');
+    addLog(`Σ [KERN]: Locking Lattice Shards...`, 'success');
+    
+    // Simulate UI freeze/transition
+    document.body.style.opacity = '0.3';
+    
+    setTimeout(() => {
+        document.body.style.opacity = '1';
+        addLog(`Σ [KERN]: Pointer Swap Complete. New Root: ${target}`, 'success');
+        addLog(`Σ [SNAP]: System Resume Successful.`, 'success');
+        
+        // Notify the simulated kernel
+        ipc.syscall('SYS_SNAP_SWAP', { target });
+    }, 2000);
+}
+
+
+// =========================================================================
+// Σ SIGMAOS: SOVEREIGN IPC BRIDGE (LATTICE-BUS)
+// =========================================================================
+class SigmaIPC {
+    constructor() {
+        this.ring = {
+            sq: { head: 0, tail: 0, entries: [] },
+            cq: { head: 0, tail: 0, entries: [] }
+        };
+        this.callbacks = new Map();
+        this.nextId = 1;
+    }
+
+    /**
+     * @brief Send a structured "System Call" to the Kernel Shard.
+     */
+    async syscall(op, params = {}) {
+        const id = this.nextId++;
+        const sqe = { id, op, params, timestamp: Date.now() };
+        
+        // Push to Submission Queue
+        this.ring.sq.entries.push(sqe);
+        this.ring.sq.tail++;
+        
+        addLog(`Σ [IPC]: Call 0x${id.toString(16)} [${op}] Submitted.`, 'success');
+        
+        return new Promise((resolve) => {
+            this.callbacks.set(id, resolve);
+            // Simulate Kernel Processing
+            setTimeout(() => this.processCQE(id), 50 + Math.random() * 100);
+        });
+    }
+
+    processCQE(id) {
+        const callback = this.callbacks.get(id);
+        if (callback) {
+            const res = { status: 'success', data: 'Silicon Acknowledged.' };
+            this.ring.cq.entries.push({ id, res });
+            this.ring.cq.tail++;
+            callback(res);
+            this.callbacks.delete(id);
+        }
+    }
+}
+
+const ipc = new SigmaIPC();
+
+// =========================================================================
+// Σ SIGMAOS: ZENITH HARDWARE-ACCELERATED COMPOSITOR
+// =========================================================================
+class ZenithCompositor {
+    constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        if (this.canvas) {
+            this.ctx = this.canvas.getContext('2d', { alpha: false });
+            this.width = this.canvas.width;
+            this.height = this.canvas.height;
+            this.layers = [];
+        }
+    }
+
+    /**
+     * @brief Direct-to-VRAM Framebuffer projection.
+     */
+    render() {
+        if (!this.ctx) return;
+        
+        // Fast Clear (Direct Path)
+        this.ctx.fillStyle = '#050507';
+        this.ctx.fillRect(0, 0, this.width, this.height);
+
+        // Render Layers (Shards)
+        this.layers.forEach(layer => {
+            if (layer.visible) {
+                this.ctx.globalAlpha = layer.opacity || 1;
+                this.ctx.drawImage(layer.buffer, layer.x, layer.y);
+            }
+        });
+
+        requestAnimationFrame(() => this.render());
+    }
+
+    addLayer(name, buffer, x = 0, y = 0) {
+        this.layers.push({ name, buffer, x, y, visible: true, opacity: 1 });
+    }
+}
+
+let compositor;
+function initCompositor() {
+    compositor = new ZenithCompositor('zenith-framebuffer');
+    if (compositor.canvas) compositor.render();
+}
+
+window.addEventListener('load', () => {
+    initCompositor();
+});
+
+
+// SHARD LOADER
+async function loadShard(url) {
+    addLog(`Σ [LATTICE]: Fetching Shard Manifest from ${url}...`, 'success');
+    
+    // 1. Fetch Manifest (Mock)
+    const manifest = {
+        name: "NeuralVisualizer",
+        capabilities: ["FRAMEBUFFER_WRITE"]
+    };
+
+    // 2. Syscall to Inject
+    const res = await ipc.syscall('SHARD_INJECT', { name: manifest.name });
+    addLog(`Σ [LATTICE]: Shard Verified (PQC-Signature: OK).`, 'success');
+
+    // 3. Create Compositor Layer for Shard
+    const shardBuffer = document.createElement('canvas');
+    shardBuffer.width = 400;
+    shardBuffer.height = 300;
+    const sctx = shardBuffer.getContext('2d');
+    
+    if (compositor) {
+        compositor.addLayer(manifest.name, shardBuffer, 100, 100);
+        executeShard(manifest.name, sctx);
+    }
+}
+
+/**
+ * @brief Mock WASM Execution.
+ * In a real scenario, this would be AOT-compiled machine code writing to VRAM.
+ */
+function executeShard(name, ctx) {
+    addLog(`Σ [WASM]: AOT-Compiling ${name} bytecode...`, 'success');
+    addLog(`Σ [WASM]: ${name} is now executing on bare metal.`, 'success');
+
+    function animate() {
+        ctx.clearRect(0,0, 400, 300);
+        ctx.fillStyle = 'rgba(0, 255, 163, 0.2)';
+        ctx.strokeStyle = '#00ffa3';
+        ctx.lineWidth = 2;
+        
+        // Render some "Neural" nodes
+        for(let i=0; i<10; i++) {
+            const x = 200 + Math.sin(Date.now()/1000 + i) * 100;
+            const y = 150 + Math.cos(Date.now()/1000 + i) * 80;
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI*2);
+            ctx.fill();
+            ctx.stroke();
+        }
+        requestAnimationFrame(animate);
+    }
+    animate();
+}
+
+
+
+
+
+// =========================================================================
+// Σ SIGMAOS: SIGMA CORE & ADAPTIVE WORKFLOW ENGINE
+// =========================================================================
+class SigmaCore {
+    constructor() {
+        this.currentMode = 'Balanced';
+        this.modes = {
+
+
+
+            'Balanced': { accent: '#00ffa3', bg: 'rgba(5, 5, 7, 0.95)', cpu: 'BALANCED' },
+            'Gamer': { accent: '#ff00ff', bg: 'rgba(10, 5, 15, 0.98)', cpu: 'TURBO' },
+            'Creator': { accent: '#00c3ff', bg: 'rgba(5, 10, 15, 0.98)', cpu: 'MAX-THREADS' },
+            'Streamer': { accent: '#ff3300', bg: 'rgba(15, 5, 5, 0.98)', cpu: 'ENCODE-PRIO' },
+            'Red Team': { accent: '#ff0055', bg: 'rgba(10, 5, 5, 0.98)', cpu: 'MAX-PERF' },
+            'Coding': { accent: '#00c3ff', bg: 'rgba(5, 7, 10, 0.98)', cpu: 'PERFORMANCE' },
+            'Minimal': { accent: '#ffffff', bg: 'rgba(0, 0, 0, 1)', cpu: 'POWERSAVE' }
+
+
+
+        };
+    }
+
+    setMode(modeName) {
+        const mode = this.modes[modeName];
+        if (!mode) return;
+
+        this.currentMode = modeName;
+        document.documentElement.style.setProperty('--accent', mode.accent);
+        document.documentElement.style.setProperty('--accent-glow', mode.accent + '66');
+        const activeWorkflowEl = document.getElementById('active-workflow');
+        if (activeWorkflowEl) activeWorkflowEl.innerText = `MODAL: ${modeName.toUpperCase()}`;
+        
+        addLog(`Σ [CORE]: Workflow Engine optimized for ${modeName}. Mode: ${mode.cpu}.`, 'success');
+        
+        // Notify Kernel (Simulated)
+        if (typeof ipc !== 'undefined') {
+            ipc.syscall('SYS_SET_CPU_GOVERNOR', { mode: mode.cpu });
+        }
+    }
+}
+
+const sigmaCore = new SigmaCore();
+
+function setWorkflowMode(mode) {
+    sigmaCore.setMode(mode);
+}
+
+// =========================================================================
+// Σ SIGMAOS: COMMAND CENTER (UNIVERSAL PALETTE)
+// =========================================================================
+let commandPaletteActive = false;
+function toggleCommandPalette() {
+    const palette = document.getElementById('command-center');
+    if (!palette) return;
+    commandPaletteActive = !commandPaletteActive;
+    
+    if (commandPaletteActive) {
+        palette.classList.remove('hidden');
+        document.getElementById('command-input').focus();
+    } else {
+        palette.classList.add('hidden');
+    }
+}
+
+// Keybindings
+window.addEventListener('keydown', (e) => {
+    // Alt + Space to toggle command center
+    if (e.altKey && e.code === 'Space') {
+        e.preventDefault();
+        toggleCommandPalette();
+    }
+    
+    // Escape to close
+    if (e.key === 'Escape' && commandPaletteActive) {
+        toggleCommandPalette();
+    }
+});
+
+// Command Search Logic
+const commandInput = document.getElementById('command-input');
+const commandResults = document.getElementById('command-results');
+
+const availableCommands = [
+
+
+
+
+    { label: 'Optimize Gaming', hint: 'Workflow', action: () => setWorkflowMode('Gamer') },
+    { label: 'Deploy Capsule: AI Research', hint: 'Capsule', action: () => deployCapsule('AI Research') },
+    { label: 'Deploy Capsule: Hacker Lab', hint: 'Capsule', action: () => deployCapsule('Hacker Lab') },
+    { label: 'Browse Capsules', hint: 'App', action: () => launchApp('Capsule Library') },
+    { label: 'Fix my system', hint: 'Semantic Search', action: () => sigmaCore.healSystem() },
+
+
+
+    { label: 'Explain Tool: Nmap', hint: 'AI Assistant', action: () => addLog('Σ [AI]: Nmap is a network discovery and security auditing tool.', 'success') },
+    { label: 'Explain Tool: Metasploit', hint: 'AI Assistant', action: () => addLog('Σ [AI]: Metasploit is an exploitation framework for developing and executing exploit code.', 'success') },
+    { label: 'Create Snapshot', hint: 'System', action: () => switchUtil('snapshots') },
+
+    { label: 'Network Scan', hint: 'Security', action: () => addLog('Σ [NET]: Scanning mesh...', 'success') },
+    { label: 'Clear Logs', hint: 'System', action: () => {
+        const logOut = document.getElementById('log-output');
+        if (logOut) logOut.innerHTML = '';
+    }}
+];
+
+if (commandInput) {
+    commandInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        const filtered = availableCommands.filter(cmd => 
+            cmd.label.toLowerCase().includes(query) || cmd.hint.toLowerCase().includes(query)
+        );
+        
+        renderCommandResults(filtered);
+    });
+}
+
+function renderCommandResults(results) {
+    if (!commandResults) return;
+    commandResults.innerHTML = '';
+    results.forEach((cmd, index) => {
+        const el = document.createElement('div');
+        el.className = 'command-item';
+        el.innerHTML = `
+            <span class="cmd-label">${cmd.label}</span>
+            <span class="cmd-hint">${cmd.hint}</span>
+        `;
+        el.onclick = () => {
+            cmd.action();
+            toggleCommandPalette();
+            commandInput.value = '';
+        };
+        commandResults.appendChild(el);
+    });
+}
+
+// SIDEBAR & LIVE STYLE
+function toggleSidebar() {
+    const sidebar = document.getElementById('sigma-sidebar');
+    if (sidebar) sidebar.classList.toggle('hidden');
+}
+
+function updateLiveStyle(param, value) {
+    const root = document.documentElement;
+    if (param === 'blur') {
+        // Find all windows and apply backdrop-filter
+        const windows = document.querySelectorAll('.window, .sidebar, .command-palette');
+        windows.forEach(win => {
+            win.style.backdropFilter = `blur(${value}px) saturate(160%)`;
+        });
+    } else if (param === 'saturate') {
+        const windows = document.querySelectorAll('.window, .sidebar, .command-palette');
+        windows.forEach(win => {
+            win.style.backdropFilter = win.style.backdropFilter.replace(/saturate\(\d+%\)/, `saturate(${value}%)`);
+        });
+    }
+    addLog(`Σ [CORE]: Style Parameter ${param} optimized to ${value}.`, 'success');
+}
+
+// Update taskbar binding
+window.addEventListener('load', () => {
+    const aiIcon = document.querySelector('.task-icon[onclick="launchApp(\'AI Assistant\')"]');
+    if (aiIcon) {
+        aiIcon.setAttribute('onclick', 'toggleSidebar()');
+    }
+});
+
+
+// SECURITY MISSION CONTROL LOGIC
+function runSecurityScan() {
+    const output = document.getElementById('recon-output');
+    if (!output) return;
+    output.innerHTML = '<span class="accent">Σ [RECON]: Enumerating target lattice...</span>';
+    
+    setTimeout(() => {
+        output.innerHTML = `
+            <div class="log-item success">Σ [RECON]: Port 80 OPEN (Nginx/1.18.0)</div>
+            <div class="log-item success">Σ [RECON]: Port 443 OPEN (OpenSSL/1.1.1)</div>
+            <div class="log-item warning">Σ [RECON]: Subdomain discovered: dev.lattice.local</div>
+        `;
+        addLog("Σ [RECON]: Target enumeration complete. 3 Findings.", "success");
+    }, 2000);
+}
+
+function switchSecTab(tab) {
+    const main = document.getElementById('sec-main');
+    if (!main) return;
+    const navs = document.querySelectorAll('.sec-nav');
+    navs.forEach(n => n.classList.remove('active'));
+    
+    // Simple mock tab switching
+    main.innerHTML = `<h3>Security Shard: ${tab.toUpperCase()}</h3><p class="stat-label">Initializing intelligent auditing for ${tab}...</p>`;
+    addLog(`Σ [SEC]: Mission Control switched to ${tab} tab.`, "success");
+}
+
+// Update start menu launch
+
+// SIGMA CONFIG ENGINE
+class SigmaConfig {
+    constructor() {
+        this.data = {
+            desktop: { opacity: 0.95, blur: 20 },
+            ai: { enabled: true, autoOptimize: true },
+            services: { boot: 'FAST' }
+        };
+    }
+
+    update(path, value) {
+        addLog(`Σ [CONFIG]: Updating ${path} to ${value}...`, "success");
+        if (path === 'desktop.opacity') {
+            document.body.style.backgroundColor = `rgba(3, 3, 5, ${value/100})`;
+        }
+    }
+}
+
+// PERFORMANCE HUD LOGIC
+function toggleOverlay() {
+    const hud = document.getElementById('performance-hud');
+    if (hud) {
+        hud.classList.toggle('hidden');
+        addLog(`Σ [HUD]: Overlay ${hud.classList.contains('hidden') ? 'OFF' : 'ON'}.`, "success");
+    }
+}
+
+// Update HUD Telemetry
+setInterval(() => {
+    const cpu = document.getElementById('hud-cpu');
+    const mem = document.getElementById('hud-mem');
+    if (cpu) cpu.textContent = (Math.random() * 20 + 10).toFixed(1) + "%";
+    if (mem) mem.textContent = (Math.random() * 0.5 + 4.1).toFixed(1) + "GB";
+}, 2000);
+
+// Sigma Settings Hub Tab Logic
+window.switchSettings = function(tab) {
+    const main = document.getElementById('settings-main');
+    if (!main) return;
+    document.querySelectorAll('.settings-nav').forEach(n => {
+        n.classList.remove('active');
+        if (n.textContent.toLowerCase().includes(tab)) n.classList.add('active');
+    });
+
+    if (tab === 'services') {
+        main.innerHTML = `<h3>Service Manager</h3><div class="settings-group"><label>Lattice Orchestrator</label><span class="status-success">RUNNING</span></div><div class="settings-group"><label>PQC Cryptography</label><span class="status-success">HARDENED</span></div><div class="settings-group"><label>Aether Network Shard</label><button class="util-btn" onclick="addLog('Σ [SVC]: Restarting Aether Shard...', 'warning')">RESTART</button></div>`;
+    } else if (tab === 'config') {
+        main.innerHTML = `<h3>Config Engine (YAML)</h3><textarea class="util-input" style="height: 150px; font-family: monospace;">system:\n  kernel: sovereign-v100\n  security: lattice-pqc\n  ui: zenith-fluid</textarea><button class="util-btn" onclick="addLog('Σ [CONFIG]: YAML Manifest deployed.', 'success')">DEPLOY CONFIG</button>`;
+    } else if (tab === 'healing') {
+        main.innerHTML = `<h3>Auto-Healing</h3><p class="stat-label">AI-driven diagnostics and lattice repair.</p><div class="settings-group"><label>Health: 100%</label><button class="util-btn" onclick="sigmaCore.healSystem()">START AUDIT</button></div>`;
+    } else {
+        main.innerHTML = `<h3>${tab.toUpperCase()}</h3><p class="stat-label">Integrating ${tab} services...</p>`;
+    }
+    addLog(`Σ [SETTINGS]: Switched to ${tab}.`, "success");
+};
+
+// SIGMA AUTOMATION ENGINE
+class SigmaAutomationEngine {
+    constructor() {
+        this.init();
+    }
+    init() {
+        setInterval(() => {
+            const battery = Math.floor(Math.random() * 100);
+            if (battery < 20) this.trigger('low_battery');
+        }, 15000);
+    }
+    trigger(event) {
+        addLog(`Σ [AUTO]: Event detected: ${event}. Orchestrating response...`, "warning");
+        if (event === 'low_battery' && sigmaCore.currentMode !== 'Minimal') {
+            setWorkflowMode('Minimal');
+            addLog("Σ [AUTO]: Low battery detected. Auto-switched to Minimal mode.", "success");
+        }
+    }
+}
+
+// SIGMA CAPSULE DEPLOYMENT
+function deployCapsule(name) {
+    addLog(`Σ [CAPSULE]: Deploying ${name} Environment...`, "success");
+    const label = document.getElementById('active-capsule');
+    if (label) label.textContent = `CAPSULE: ${name.toUpperCase()}`;
+    
+    if (name === 'AI Research') {
+        setWorkflowMode('AI Research');
+        launchApp('AI Assistant');
+    } else if (name === 'Hacker Lab') {
+        setWorkflowMode('Red Team');
+        launchApp('OmniShell');
+        launchApp('Security Mission Control');
+    } else if (name === 'Cyberpunk Dev') {
+        setWorkflowMode('Coding');
+        launchApp('Markup Forge');
+    }
+    const win = document.getElementById('sigma-capsule-win');
+    if (win) win.style.display = 'none';
+}
+
+// --- Global Orchestration Hooks ---
+
+// Master launchApp Controller
+const baseLaunchApp = typeof launchApp === 'function' ? launchApp : (a) => console.log("Launching: " + a);
+window.launchApp = function(app) {
+    if (app === 'Security Mission Control') {
+        const win = document.getElementById('security-mission-control-win');
+        if (win) {
+            win.style.display = 'block';
+            win.style.zIndex = '3000';
+        }
+    } else if (app === 'Sigma Settings') {
+        const win = document.getElementById('sigma-settings-win');
+        if (win) {
+            win.style.display = 'block';
+            win.style.zIndex = '3000';
+        }
+    } else if (app === 'Capsule Library') {
+        const win = document.getElementById('sigma-capsule-win');
+        if (win) {
+            win.style.display = 'block';
+            win.style.zIndex = '3000';
+        }
+    } else {
+        baseLaunchApp(app);
+    }
+};
+
+// Singleton Initializations
+if (typeof sigmaConfig === 'undefined') window.sigmaConfig = new SigmaConfig();
+if (typeof sigmaCore === 'undefined') window.sigmaCore = new SigmaCore();
+if (typeof automationEngine === 'undefined') window.automationEngine = new SigmaAutomationEngine();
+

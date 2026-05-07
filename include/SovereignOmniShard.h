@@ -10,7 +10,7 @@
 #ifndef SOVEREIGN_OMNI_SHARD_H
 #define SOVEREIGN_OMNI_SHARD_H
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "sigma_system_shards.h"
 
 /* =========================================================================

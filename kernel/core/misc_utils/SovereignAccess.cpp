@@ -1,7 +1,7 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 #include "sigma_access.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Accessibility Core
@@ -21,7 +21,7 @@ public:
     }
 
     void enableMode(sigma_access_mode_t mode) {
-        sigma_printf("[ACCESS] UIT: Accessibility mode %d enabled.\n", (int)mode);
+        sigma_log("[ACCESS] UIT: Accessibility mode %d enabled.\n", (int)mode);
         
         if (mode == ACCESS_MODE_HIGH_CONTRAST) {
             sigma_log("[ACCESS] UIT: Overriding global shader pipeline with high-contrast vectors.");
@@ -33,7 +33,7 @@ public:
         // UIT (Universal Interface Translation) Algorithm
         // Instantly translates UI metadata into spoken audio via the Sovereign Voice engine.
         
-        sigma_printf("[ACCESS] UIT: Translating element to audio buffer: '%s'\n", element_desc);
+        sigma_log("[ACCESS] UIT: Translating element to audio buffer: '%s'\n", element_desc);
         sigma_log("[ACCESS] UIT: Audio playback dispatched directly to silicon DAC.");
     }
 

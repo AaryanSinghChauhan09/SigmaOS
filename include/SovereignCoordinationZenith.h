@@ -1,9 +1,9 @@
 #ifndef SOVEREIGN_COORDINATION_ZENITH_H
 #define SOVEREIGN_COORDINATION_ZENITH_H
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Coordination {
@@ -45,8 +45,8 @@ class SovereignMonitor : public SigmaObject {
 public:
     const char* type_name() const noexcept override { return "SovereignMonitor"; }
     virtual void InitializationCode() = 0;
-    void EnterMonitor() { sigma_printf("[ZENITH-MONITOR]: Mutual exclusion entry.\n"); }
-    void LeaveMonitor() { sigma_printf("[ZENITH-MONITOR]: Mutual exclusion release.\n"); }
+    void EnterMonitor() { sigma_log("[ZENITH-MONITOR]: Mutual exclusion entry.\n"); }
+    void LeaveMonitor() { sigma_log("[ZENITH-MONITOR]: Mutual exclusion release.\n"); }
 };
 
 } // namespace Coordination

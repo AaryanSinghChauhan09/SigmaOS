@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 #include "Lattice.h"
 #include "aether_orchestrator.hpp"
 

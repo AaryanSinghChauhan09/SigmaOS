@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Live Patcher Shard
@@ -29,18 +30,18 @@ public:
 
     void applyLivePatch(const char* target_function, const void* patch_payload) {
         (void)patch_payload;
-        sigma_printf("Σ [LIVE-PATCH]: Applying live trampoline to '%s'...\n", target_function);
+        sigma_log("Σ [LIVE-PATCH]: Applying live trampoline to '%s'...\n", target_function);
         // Suspend threads executing the target function, patch, and resume
         sigma_log("Σ [LIVE-PATCH]: Hot-patch COMPLETE. Silicon executing updated logic without reboot.");
         m_active_patches++;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN LIVE PATCH AUDIT ---\n");
-        sigma_printf("| Active Patches : %u\n", m_active_patches);
-        sigma_printf("| Patch Model    : TRAMPOLINE-REDIRECT\n");
-        sigma_printf("| State Security : PQC-SIGNED\n");
-        sigma_printf("------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN LIVE PATCH AUDIT ---\n");
+        sigma_log("| Active Patches : %u\n", m_active_patches);
+        sigma_log("| Patch Model    : TRAMPOLINE-REDIRECT\n");
+        sigma_log("| State Security : PQC-SIGNED\n");
+        sigma_log("------------------------------------\n");
     }
 
 private:

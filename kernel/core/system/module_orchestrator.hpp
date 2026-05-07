@@ -1,11 +1,11 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef MODULE_ORCHESTRATOR_HPP
 #define MODULE_ORCHESTRATOR_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Core {
@@ -25,7 +25,7 @@ private:
 
 public:
     SovereignModuleOrchestrator() : m_active_shards(0), m_hotplug_enabled(SIGMA_TRUE) {
-        sigma_printf("[MOD-ORCH]: Sovereign Shard Orchestrator [IGNITED].\n");
+        sigma_log("[MOD-ORCH]: Sovereign Shard Orchestrator [IGNITED].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignModuleOrchestrator"; }

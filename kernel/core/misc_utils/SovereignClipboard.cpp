@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 #include "sigma_clipboard.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 #include "sigma_continuity.h"
 
 /**
@@ -17,21 +17,21 @@ void SovereignClipboardEngine::init() {
     sigma_log("[CLIPBOARD] Initializing Sovereign Smart Clipboard (USC Algorithm)...");
 }
 
-void SovereignClipboardEngine::copy(sigma_clip_type_t type, const void* data, uint32_t size) {
+void SovereignClipboardEngine::copy(sigma_clip_type_t type, const void* data, sigma_u32 size) {
     /* USC (Universal Semantic Copy) Algorithm
      * Evaluates data semantics and broadcasts state to S-Continuity. */
     this->type = type;
     this->data = (void*)data; /* Simulated allocation/copy */
     this->size = size;
 
-    sigma_printf("[CLIPBOARD] USC: Copied %d bytes (Type: %d) to global buffer.\n",
+    sigma_log("[CLIPBOARD] USC: Copied %d bytes (Type: %d) to global buffer.\n",
                  size, (int)type);
 
     /* Auto-sync via continuity */
     continuity_push_state(0xDEADBEEF);
 }
 
-void* SovereignClipboardEngine::paste(sigma_clip_type_t* out_type, uint32_t* out_size) {
+void* SovereignClipboardEngine::paste(sigma_clip_type_t* out_type, sigma_u32* out_size) {
     if (this->size == 0) return nullptr;
 
     *out_type = this->type;
@@ -46,11 +46,11 @@ extern "C" void clipboard_init() {
     SovereignClipboardEngine::getInstance().init();
 }
 
-extern "C" void clipboard_copy(sigma_clip_type_t type, const void* data, uint32_t size) {
+extern "C" void clipboard_copy(sigma_clip_type_t type, const void* data, sigma_u32 size) {
     SovereignClipboardEngine::getInstance().copy(type, data, size);
 }
 
-extern "C" void* clipboard_paste(sigma_clip_type_t* out_type, uint32_t* out_size) {
+extern "C" void* clipboard_paste(sigma_clip_type_t* out_type, sigma_u32* out_size) {
     return SovereignClipboardEngine::getInstance().paste(out_type, out_size);
 }
 

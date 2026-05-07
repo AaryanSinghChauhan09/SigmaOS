@@ -1,7 +1,7 @@
-#include "../../../include/sigma_types.h""
+#include "core/sigma_types.h"
 
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
 
 
 /**
@@ -10,8 +10,8 @@
  */
 
 typedef struct {
-    uint32_t shard_id;
-    uint64_t hash;
+    sigma_u32 shard_id;
+    sigma_u64 hash;
     void* actual_ptr;
     bool is_merged;
 } ksm_node_t;
@@ -25,14 +25,14 @@ extern "C" void ksm_init() {
 extern "C" void ksm_scan_and_merge() {
     sigma_log("[KSM] Initiating Deep Scan of 600-shard memory lattice...");
     
-    uint32_t merged_count = 0;
-    uint32_t scanned_shards = 600;
+    sigma_u32 merged_count = 0;
+    sigma_u32 scanned_shards = 600;
 
-    for (uint32_t i = 0; i < scanned_shards; i++) {
+    for (sigma_u32 i = 0; i < scanned_shards; i++) {
         if (memory_lattice[i].is_merged) continue;
         
         // Simulating hash collision detection for deduplication
-        for (uint32_t j = i + 1; j < scanned_shards; j++) {
+        for (sigma_u32 j = i + 1; j < scanned_shards; j++) {
             if (!memory_lattice[j].is_merged && memory_lattice[i].hash == memory_lattice[j].hash) {
                 memory_lattice[j].is_merged = true;
                 memory_lattice[j].actual_ptr = memory_lattice[i].actual_ptr; // Shard Merging
@@ -42,10 +42,10 @@ extern "C" void ksm_scan_and_merge() {
     }
     
     sigma_log("[KSM] Scan Complete.");
-    sigma_printf("[KSM] Merged %d redundant shards. Sovereign memory pressure optimized.\n", merged_count);
+    sigma_log("[KSM] Merged %d redundant shards. Sovereign memory pressure optimized.\n", merged_count);
 }
 
-extern "C" void* ksm_access_shard(uint32_t shard_id) {
+extern "C" void* ksm_access_shard(sigma_u32 shard_id) {
     if (shard_id >= 600) return SIGMA_NULL;
     return memory_lattice[shard_id].actual_ptr;
 }

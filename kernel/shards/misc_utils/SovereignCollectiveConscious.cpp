@@ -1,5 +1,5 @@
 #include "Lattice.h"
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN COLLECTIVE CONSCIOUS (v1.0 - NEURAL SYNC)
@@ -8,7 +8,7 @@
  * =========================================================================
  */
 
-#include "../../../include/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 #include "userland/apps/collective_conscious/agents.hpp"
 
 using namespace SigmaOS;
@@ -28,14 +28,14 @@ public:
 
     void BroadcastIntent(const char* intent) {
         m_last_global_intent = intent;
-        sigma_printf("\n[COLLECTIVE/ZENITH]: Broadcasting Global Intent: %s\n", intent);
+        sigma_log("\n[COLLECTIVE/ZENITH]: Broadcasting Global Intent: %s\n", intent);
         for (int i = 0; i < m_agent_count; i++) {
             m_agents[i]->Sync(intent);
         }
     }
 
     void OrchestratePulse() {
-        sigma_printf("--- Î£ COLLECTIVE CONSCIOUS PULSE (State: %s) ---\n", m_last_global_intent);
+        sigma_log("--- Î£ COLLECTIVE CONSCIOUS PULSE (State: %s) ---\n", m_last_global_intent);
         for (int i = 0; i < m_agent_count; i++) {
             m_agents[i]->Pulse();
         }
@@ -47,7 +47,7 @@ public:
 };
 
 int main() {
-    sigma_printf("--- Î£ SIGMA OS SOVEREIGN COLLECTIVE CONSCIOUS (v1.0) ---\n");
+    sigma_log("--- Î£ SIGMA OS SOVEREIGN COLLECTIVE CONSCIOUS (v1.0) ---\n");
     
     SovereignCollectiveConscious collective;
     collective.RegisterAgent(new SecurityConsciousAgent());
@@ -57,6 +57,6 @@ int main() {
     collective.BroadcastIntent("ASCENDING_TO_SINGULARITY");
     collective.OrchestratePulse();
 
-    sigma_printf("\n[SUCCESS]: Collective-Conscious Shard Unified. Mesh Awareness at 100%.\n");
+    sigma_log("\n[SUCCESS]: Collective-Conscious Shard Unified. Mesh Awareness at 100%.\n");
     return 0;
 }

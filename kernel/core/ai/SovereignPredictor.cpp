@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 /**
  * SigmaOS Sovereign Predictive Resource Engine
@@ -24,7 +24,7 @@ public:
 
     sigma_u32 predictCPURequirement(sigma_u32 proc_id) {
         // Logic for silicon-native compute estimation
-        sigma_printf("Σ [AI-PREDICT]: Proc %u predicted to need High-Density Compute.\n", proc_id);
+        sigma_log("Σ [AI-PREDICT]: Proc %u predicted to need High-Density Compute.\n", proc_id);
         return 80; // 80% usage predicted
     }
 

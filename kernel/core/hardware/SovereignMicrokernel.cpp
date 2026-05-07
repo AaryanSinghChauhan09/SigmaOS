@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Microkernel Orchestrator
@@ -45,7 +45,7 @@ public:
         }
         
         sigma_u32 channel_id = ++this->ipc_channels_active;
-        sigma_printf("[MICROKERNEL] IPC Channel %u allocated between Service 0x%04X and Service 0x%04X.\n", 
+        sigma_log("[MICROKERNEL] IPC Channel %u allocated between Service 0x%04X and Service 0x%04X.\n", 
                      channel_id, service_a, service_b);
         return channel_id;
     }

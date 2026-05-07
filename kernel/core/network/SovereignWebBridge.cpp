@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 /**
  * SigmaOS Sovereign Web Bridge (WebSocket/WebRTC)
@@ -25,7 +25,7 @@ public:
     }
 
     void connect(const char* relay_url) {
-        sigma_printf("Σ [WEB-BRIDGE]: Tunneling to Lattice Relay: %s\n", relay_url);
+        sigma_log("Σ [WEB-BRIDGE]: Tunneling to Lattice Relay: %s\n", relay_url);
         // Wrapper for browser-based WebSocket communication
         this->connection_active = true;
     }

@@ -1,10 +1,11 @@
-#include "sigma_hal.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
 #ifndef CRYPTO_SHARD_HPP
 #define CRYPTO_SHARD_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Security {
@@ -14,7 +15,7 @@ public:
     const char* type_name() const noexcept override { return "SovereignCryptoShard"; }
 
     void GenerateKey(sigma_u8* buffer, sigma_size_t length) {
-        sigma_printf("[CRYPTO-SHARD]: Generating High-Entropy Shard Key via RDRAND...\n");
+        sigma_log("[CRYPTO-SHARD]: Generating High-Entropy Shard Key via RDRAND...\n");
 #if defined(SIGMA_ARCH_X86_64)
         for (sigma_size_t i = 0; i < length / 8; i++) {
             unsigned long long val;
@@ -27,7 +28,7 @@ public:
     }
 
     void EncryptShard(const char* shard_id) {
-        sigma_printf("[CRYPTO-SHARD]: Encrypting Shard: %s [AES-256-GCM SILICON-DIRECT]\n", shard_id);
+        sigma_log("[CRYPTO-SHARD]: Encrypting Shard: %s [AES-256-GCM SILICON-DIRECT]\n", shard_id);
     }
 };
 

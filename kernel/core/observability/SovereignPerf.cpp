@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Performance Profiler (SovereignPerf)
@@ -28,7 +29,7 @@ public:
     }
 
     void profileShard(sigma_u32 shard_id) {
-        sigma_printf("Σ [PERF]: Profiling Shard S%02u: 420.69 CPU Cycles/Event.\n", shard_id);
+        sigma_log("Σ [PERF]: Profiling Shard S%02u: 420.69 CPU Cycles/Event.\n", shard_id);
     }
 
     void reportHotspots() {

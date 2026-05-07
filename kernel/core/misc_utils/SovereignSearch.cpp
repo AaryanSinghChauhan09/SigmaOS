@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Search (S-Search)
@@ -27,7 +27,7 @@ public:
     }
 
     void query(const char* term) {
-        sigma_printf("[SEARCH] Querying Lattice for term: '%s'...\n", term);
+        sigma_log("[SEARCH] Querying Lattice for term: '%s'...\n", term);
         sigma_log("[SEARCH] Scanning VFS nodes, Shard Registry, and Orb Marketplace.");
         sigma_log("[SEARCH] Result: 42 relevant shards detected across the mesh.");
     }

@@ -1,8 +1,9 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
-#include "../../../include/SovereignNeuralNexus.hpp""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
+#include "SovereignNeuralNexus.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -41,7 +42,7 @@ public:
         return false;
     }
 
-    sigma_printf("[NEURAL] Loading Foundation Model '%s' (%u MB) into NPU VRAM...\n", model_name, parameters_mb);
+    sigma_log("[NEURAL] Loading Foundation Model '%s' (%u MB) into NPU VRAM...\n", model_name, parameters_mb);
     this->active_models++;
     sigma_log("[NEURAL] Model loaded. Zero-latency inference active.");
     return true;
@@ -51,7 +52,7 @@ public:
     (void)system_telemetry;
     (void)size;
     if (!this->initialized) return;
-    sigma_printf("[NEURAL] Executing O(1) Anomaly Detection on %u bytes of telemetry...\n", size);
+    sigma_log("[NEURAL] Executing O(1) Anomaly Detection on %u bytes of telemetry...\n", size);
     /* Hardware accelerated tensor multiplication simulated here */
     sigma_log("[NEURAL] Inference Complete: 0 anomalies detected. System is 100% Sovereign.");
 }
@@ -64,7 +65,7 @@ public:
 }
 
     void reportStatus() {
-    sigma_printf("[NEURAL] Models: %u | Hardware: %s\n", 
+    sigma_log("[NEURAL] Models: %u | Hardware: %s\n", 
                  this->active_models, 
                  this->npu_available ? "ACTIVE" : "EMULATED");
 }
@@ -79,7 +80,7 @@ public:
         this->avx512_busy = false; // Forced reset for high-priority UI task
     }
 
-    sigma_printf("[NEURAL] Neural UI (AVX-512 Dedicated): Optimising %s...\n", css_shard);
+    sigma_log("[NEURAL] Neural UI (AVX-512 Dedicated): Optimising %s...\n", css_shard);
     sigma_hardened_strcpy(out_morphic_shard, "morphic_zenith_v2.5_singularity", 64);
     
     sigma_log("[NEURAL] Transpilation Complete. Zero-latency Glassmorphism ACTIVE.");

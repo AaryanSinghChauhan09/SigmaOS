@@ -1,11 +1,11 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef SOVEREIGN_COMPRESSION_HPP
 #define SOVEREIGN_COMPRESSION_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Storage {
@@ -27,7 +27,7 @@ private:
 
 public:
     SovereignCompression() : m_compression_level(9), m_bytes_compressed(0), m_hardware_acceleration(SIGMA_TRUE) {
-        sigma_printf("[COMPRESSION]: Sovereign Entropy Nexus [IGNITED].\n");
+        sigma_log("[COMPRESSION]: Sovereign Entropy Nexus [IGNITED].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignCompression"; }

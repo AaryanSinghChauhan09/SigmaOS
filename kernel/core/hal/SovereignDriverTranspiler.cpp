@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Driver Transpiler Shard
@@ -29,18 +30,18 @@ public:
     }
 
     void transpile(const char* driver_id, const char* target_arch) {
-        sigma_printf("Î£ [TRANSPILER]: Transpiling driver '%s' for target silicon: %s...\n", driver_id, target_arch);
+        sigma_log("Î£ [TRANSPILER]: Transpiling driver '%s' for target silicon: %s...\n", driver_id, target_arch);
         // Logic to rewrite register-level access into Sovereign HAL calls
         m_transpiled_drivers++;
         sigma_log("Î£ [TRANSPILER]: Driver successfully sharded and integrated.");
     }
 
     void audit() {
-        sigma_printf("\n--- Î£ SOVEREIGN TRANSPILER AUDIT ---\n");
-        sigma_printf("| Drivers Active  : %u\n", m_transpiled_drivers);
-        sigma_printf("| Tech Mode       : ZERO-DEPENDENCY-HAL\n");
-        sigma_printf("| Parity Level    : INDUSTRIAL-GRADE\n");
-        sigma_printf("--------------------------------------\n");
+        sigma_log("\n--- Î£ SOVEREIGN TRANSPILER AUDIT ---\n");
+        sigma_log("| Drivers Active  : %u\n", m_transpiled_drivers);
+        sigma_log("| Tech Mode       : ZERO-DEPENDENCY-HAL\n");
+        sigma_log("| Parity Level    : INDUSTRIAL-GRADE\n");
+        sigma_log("--------------------------------------\n");
     }
 
 private:

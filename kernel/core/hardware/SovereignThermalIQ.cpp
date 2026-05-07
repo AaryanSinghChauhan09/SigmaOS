@@ -1,6 +1,7 @@
-#include "../../../include/sigma_hal.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
 #include "sigma_thermaliq.h"
-#include "../../../include/SovereignLibC.h""
+#include "libc/SovereignLibC.h"
 
 extern "C" void energysched_set_shard_state(sigma_u32 shard_id, sigma_u32 state);
 
@@ -36,7 +37,7 @@ void SovereignThermalIQ::applyThermalPolicy() {
                           this->temp_history[2] +
                           this->temp_history[3]) / 4u;
 
-    sigma_printf("[THERMALIQ] PTR: Current: %u C, 4-sample average: %u C.\n", current_temp, avg_temp);
+    sigma_log("[THERMALIQ] PTR: Current: %u C, 4-sample average: %u C.\n", current_temp, avg_temp);
 
     if (avg_temp > 75u) {
         sigma_log("[THERMALIQ] PTR: Thermal trend upwards. Engaging predictive silicon throttling.");
@@ -45,7 +46,7 @@ void SovereignThermalIQ::applyThermalPolicy() {
 }
 
 void SovereignThermalIQ::emergencyThrottle(sigma_u32 threshold_celsius) {
-    sigma_printf("[THERMALIQ] PTR: EMERGENCY THROTTLE engaged at %u C.\n", threshold_celsius);
+    sigma_log("[THERMALIQ] PTR: EMERGENCY THROTTLE engaged at %u C.\n", threshold_celsius);
 }
 
 } // namespace Hardware

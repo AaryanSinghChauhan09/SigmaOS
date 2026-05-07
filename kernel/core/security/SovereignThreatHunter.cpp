@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Threat Hunter Shard
@@ -28,18 +29,18 @@ public:
     }
 
     void executeAudit(const char* target_subsystem) {
-        sigma_printf("Σ [THREAT-HUNTER]: Launching zero-trust penetration audit against '%s'...\n", target_subsystem);
+        sigma_log("Σ [THREAT-HUNTER]: Launching zero-trust penetration audit against '%s'...\n", target_subsystem);
         // Dispatch autonomous vulnerability scanners
         sigma_log("Σ [THREAT-HUNTER]: Audit COMPLETE. Subsystem hardened against known attack vectors.");
         m_audits_performed++;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN THREAT HUNTER AUDIT ---\n");
-        sigma_printf("| Audits Executed : %u\n", m_audits_performed);
-        sigma_printf("| Ideology Absorbed: KALI LINUX / PARROT OS\n");
-        sigma_printf("| Defense Model    : OFFENSIVE VALIDATION\n");
-        sigma_printf("-------------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN THREAT HUNTER AUDIT ---\n");
+        sigma_log("| Audits Executed : %u\n", m_audits_performed);
+        sigma_log("| Ideology Absorbed: KALI LINUX / PARROT OS\n");
+        sigma_log("| Defense Model    : OFFENSIVE VALIDATION\n");
+        sigma_log("-------------------------------------------\n");
     }
 
 private:

@@ -1,7 +1,7 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "sigma_neural.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "ai/sigma_neural.h"
 
 /**
  * SigmaOS Sovereign Neural Hardware Acceleration
@@ -22,7 +22,7 @@ public:
     }
 
     void morphUI(sigma_u32 widget_id, sigma_u32 cognitive_load) {
-        sigma_printf("[NEURAL] Morphing Widget %u based on cognitive load %u...\n", (unsigned)widget_id, (unsigned)cognitive_load);
+        sigma_log("[NEURAL] Morphing Widget %u based on cognitive load %u...\n", (unsigned)widget_id, (unsigned)cognitive_load);
         // Perform tensor calculations for glassmorphic transitions
         sigma_log("[NEURAL] UI Transition optimized by silicon-native predictive model.");
     }

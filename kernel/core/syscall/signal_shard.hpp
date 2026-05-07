@@ -1,10 +1,11 @@
-#include "sigma_hal.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
 #ifndef SIGNAL_SHARD_HPP
 #define SIGNAL_SHARD_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -14,12 +15,12 @@ public:
     const char* type_name() const noexcept override { return "SovereignSignalShard"; }
 
     void SendSignal(sigma_u32 pid, int sig) {
-        sigma_printf("[SIGNAL-SHARD]: Sending Signal %d to Shard PID: %u\n", sig, pid);
+        sigma_log("[SIGNAL-SHARD]: Sending Signal %d to Shard PID: %u\n", sig, pid);
     }
 
     void HandleException(int ex) {
-        sigma_printf("[SIGNAL-SHARD]: Intercepted Hardware Exception: 0x%X\n", ex);
-        sigma_printf("[SIGNAL-SHARD]: Transitioning to Sovereign Recovery State.\n");
+        sigma_log("[SIGNAL-SHARD]: Intercepted Hardware Exception: 0x%X\n", ex);
+        sigma_log("[SIGNAL-SHARD]: Transitioning to Sovereign Recovery State.\n");
     }
 };
 

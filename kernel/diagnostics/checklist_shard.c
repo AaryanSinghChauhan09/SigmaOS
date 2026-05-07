@@ -6,8 +6,8 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_types.h"
-#include "../../include/SovereignLibC.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 #define MAX_CHECKLIST_ITEMS 32
 #define MAX_TEMPLATES      16
@@ -131,5 +131,5 @@ void checklist_init(void) {
     create_template(DOMAIN_SUBSTANTIVE_BNS, "BNS_2023", "Substantive Offences", init_bns_template);
     create_template(DOMAIN_EVIDENCE_BSA, "BSA_2023", "Evidence & Forensics", init_bsa_template);
     
-    sigma_printf("[CHECKLIST-ZENITH]: Legal Engine Online. BNSS/BNS/BSA Shards Active.\n");
+    sigma_log("[CHECKLIST-ZENITH]: Legal Engine Online. BNSS/BNS/BSA Shards Active.\n");
 }

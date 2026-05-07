@@ -10,7 +10,7 @@
 #ifndef SIGMA_APPECO_H
 #define SIGMA_APPECO_H
 
-#include "sigma_types.h"
+#include "core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

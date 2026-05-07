@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SIGMAFS (v1.0 - LOG-STRUCTURED)
@@ -5,7 +6,7 @@
  * Principles: Crash Resilience, Sequential Write Performance.
  * =============================================================================
  */
-#include "../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 typedef struct {
     sigma_u32 id;

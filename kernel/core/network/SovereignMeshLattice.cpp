@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Mesh Lattice (Aether-Net)
@@ -30,12 +30,12 @@ public:
         sigma_log("[MESH] Executing Aether-Discovery protocol...");
         // Simulated P2P discovery
         this->m_peer_count += 3;
-        sigma_printf("[MESH] 3 new Sovereign Nodes discovered in the local lattice. Total: %u\n", this->m_peer_count);
+        sigma_log("[MESH] 3 new Sovereign Nodes discovered in the local lattice. Total: %u\n", this->m_peer_count);
     }
 
     void sendShardMessage(sigma_u32 target_node, const char* shard_id, const void* data, sigma_size_t size) {
         (void)data; (void)size;
-        sigma_printf("[MESH] Dispatching Shard Message: [ID: %s] -> [Node: 0x%04X] via Zero-Copy Tunnel.\n", shard_id, target_node);
+        sigma_log("[MESH] Dispatching Shard Message: [ID: %s] -> [Node: 0x%04X] via Zero-Copy Tunnel.\n", shard_id, target_node);
     }
 
 private:

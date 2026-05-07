@@ -1,10 +1,10 @@
 #ifndef SOVEREIGN_VISION_ENGINE_HPP
 #define SOVEREIGN_VISION_ENGINE_HPP
 
-#include "../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "../../include/sigma_types.h"
-#include "../../include/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace AI {
@@ -26,7 +26,7 @@ private:
 
 public:
     SovereignVisionEngine() : m_active_tensors(512), m_frames_processed(0), m_spatial_sharding_active(SIGMA_TRUE) {
-        sigma_printf("[VISION-ENGINE]: Sovereign Vision Nexus [IGNITED].\n");
+        sigma_log("[VISION-ENGINE]: Sovereign Vision Nexus [IGNITED].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignVisionEngine"; }

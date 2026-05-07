@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign NIC Driver (VirtIO-Net)
@@ -54,13 +54,13 @@ public:
         if (this->nic_type == NIC_TYPE_UNKNOWN) return false;
         (void)payload;
         this->tx_packets++;
-        sigma_printf("[NIC] TX Packet #%u (%u bytes) sent via DMA ring.\n", this->tx_packets, length);
+        sigma_log("[NIC] TX Packet #%u (%u bytes) sent via DMA ring.\n", this->tx_packets, length);
         return true;
     }
 
     void receiveInterrupt() {
         this->rx_packets++;
-        sigma_printf("[NIC] RX Packet #%u received. Routing to SovereignNetStack.\n", this->rx_packets);
+        sigma_log("[NIC] RX Packet #%u received. Routing to SovereignNetStack.\n", this->rx_packets);
     }
 
 private:

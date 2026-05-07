@@ -11,7 +11,7 @@
 #ifndef SIGMA_GLOBAL_SYNC_H
 #define SIGMA_GLOBAL_SYNC_H
 
-#include "sigma_types.h"
+#include "core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Identity Manager (Sovereign-IAM)
@@ -28,7 +29,7 @@ public:
     }
 
     bool verifyAccess(const char* identity_orb_id, sigma_u32 capability_mask) {
-        sigma_printf("Σ [IDENTITY]: Verifying Access for Identity '%s' (Mask: 0x%X)...\n", 
+        sigma_log("Σ [IDENTITY]: Verifying Access for Identity '%s' (Mask: 0x%X)...\n", 
                      identity_orb_id, capability_mask);
         
         // Zero-Trust: Always verify against local Secure Element
@@ -37,11 +38,11 @@ public:
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN IAM AUDIT ---\n");
-        sigma_printf("| Identities Active : 1 (Primary Sovereign)\n");
-        sigma_printf("| IAM Model         : ZERO-TRUST-SSI\n");
-        sigma_printf("| Enterprise Parity : LDAP-EQUIVALENT (Lattice-Bound)\n");
-        sigma_printf("------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN IAM AUDIT ---\n");
+        sigma_log("| Identities Active : 1 (Primary Sovereign)\n");
+        sigma_log("| IAM Model         : ZERO-TRUST-SSI\n");
+        sigma_log("| Enterprise Parity : LDAP-EQUIVALENT (Lattice-Bound)\n");
+        sigma_log("------------------------------\n");
     }
 
 private:

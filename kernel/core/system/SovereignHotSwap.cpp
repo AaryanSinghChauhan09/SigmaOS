@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign HotSwap (Dynamic Shard Hot-Swapping)
@@ -27,7 +27,7 @@ public:
 
     bool swapShard(const char* shard_id, const void* new_logic, sigma_size_t size) {
         (void)new_logic; (void)size;
-        sigma_printf("[HOTSWAP] Initiating Live-Swap for Shard: %s\n", shard_id);
+        sigma_log("[HOTSWAP] Initiating Live-Swap for Shard: %s\n", shard_id);
         
         // Step 1: Quiesce the shard
         sigma_log("[HOTSWAP] Quiescing shard execution threads...");
@@ -39,7 +39,7 @@ public:
         sigma_log("[HOTSWAP] ATOMIC-REMAP: Overwriting function pointers in the Sovereign Jump Table.");
         
         // Step 4: Resume
-        sigma_printf("[HOTSWAP] Shard %s RE-IGNITED with updated logic. 0ms downtime.\n", shard_id);
+        sigma_log("[HOTSWAP] Shard %s RE-IGNITED with updated logic. 0ms downtime.\n", shard_id);
         
         return true;
     }

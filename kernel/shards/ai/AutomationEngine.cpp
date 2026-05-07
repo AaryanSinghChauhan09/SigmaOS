@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 #include "Lattice.h"
 /*
  * =========================================================================
@@ -8,8 +9,8 @@
  * =========================================================================
  */
 
-#include "../../../include/SigmaOOP.hpp"
-#include "../../../include/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Automation {
@@ -28,7 +29,7 @@ private:
 
 public:
     MorphicAutomationEngine() : m_execution_count(0) {
-        sigma_printf("[AUTO-ZENITH]: Morphic Automation Engine Online.\n");
+        sigma_log("[AUTO-ZENITH]: Morphic Automation Engine Online.\n");
     }
 
     const char* type_name() const noexcept override { return "MorphicAutomationEngine"; }
@@ -41,22 +42,22 @@ public:
         recipe.is_active = SIGMA_TRUE;
 
         m_recipes.push_back(recipe);
-        sigma_printf("[AUTO-ZENITH]: Recipe '%s' synced to global lattice.\n", name);
+        sigma_log("[AUTO-ZENITH]: Recipe '%s' synced to global lattice.\n", name);
     }
 
     void run_cycle() {
         m_execution_count++;
-        // sigma_printf("[AUTO-ZENITH]: Execution Cycle #%u...\n", m_execution_count);
+        // sigma_log("[AUTO-ZENITH]: Execution Cycle #%u...\n", m_execution_count);
         for (sigma_usize i = 0; i < m_recipes.size(); i++) {
             if (m_recipes[i].is_active) {
                 // In a real kernel, this would check triggers and fire actions
-                // sigma_printf("  -> Executing Shard Action: %s\n", m_recipes[i].action.c_str());
+                // sigma_log("  -> Executing Shard Action: %s\n", m_recipes[i].action.c_str());
             }
         }
     }
 
     void audit_performance() {
-        sigma_printf("[AUTO-ZENITH]: Audit: %zu active recipes, %u cycles executed.\n", 
+        sigma_log("[AUTO-ZENITH]: Audit: %zu active recipes, %u cycles executed.\n", 
             m_recipes.size(), m_execution_count);
     }
 };

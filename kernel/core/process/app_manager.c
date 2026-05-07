@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-APP-MANAGER (v1.0 - INDUSTRIAL ORCHESTRATION)
@@ -10,7 +11,7 @@
  * =============================================================================
  */
 
-#include "../../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 #define MAX_ZENITH_APPS 16
 

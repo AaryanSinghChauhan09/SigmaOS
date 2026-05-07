@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Driver Transpiler Shard
@@ -28,18 +29,18 @@ public:
     }
 
     void transpileDriver(const char* driver_id, const char* target_arch) {
-        sigma_printf("Σ [TRANSPILER]: Transpiling driver '%s' to target architecture '%s'...\n", driver_id, target_arch);
+        sigma_log("Σ [TRANSPILER]: Transpiling driver '%s' to target architecture '%s'...\n", driver_id, target_arch);
         // Execute JIT IR translation
         sigma_log("Σ [TRANSPILER]: Translation COMPLETE. Native silicon bytecode generated.");
         m_transpiled_drivers++;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN DRIVER TRANSPILER AUDIT ---\n");
-        sigma_printf("| Transpiled Drivers : %u\n", m_transpiled_drivers);
-        sigma_printf("| Target Architectures: RISC-V, ARM64, x86_64\n");
-        sigma_printf("| Mode               : SILICON-DIRECT JIT\n");
-        sigma_printf("--------------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN DRIVER TRANSPILER AUDIT ---\n");
+        sigma_log("| Transpiled Drivers : %u\n", m_transpiled_drivers);
+        sigma_log("| Target Architectures: RISC-V, ARM64, x86_64\n");
+        sigma_log("| Mode               : SILICON-DIRECT JIT\n");
+        sigma_log("--------------------------------------------\n");
     }
 
 private:

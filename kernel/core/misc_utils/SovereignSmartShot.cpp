@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 #include "sigma_smartshot.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 #include "sigma_vissearch.h"
 #include "sigma_memorypalace.h"
 #include "sigma_clipboard.h"
@@ -17,11 +17,11 @@ extern "C" void smartshot_init() {
     sigma_log("[SMARTSHOT] Initializing Sovereign Smart Screenshot (CCA Algorithm)...");
 }
 
-extern "C" void smartshot_capture_region(uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
+extern "C" void smartshot_capture_region(sigma_u32 x, sigma_u32 y, sigma_u32 w, sigma_u32 h) {
     // CCA (Contextual Capture Analysis) Algorithm
     // Captures framebuffer region, immediately runs S-VisSearch NPE for OCR/object tagging.
     
-    sigma_printf("[SMARTSHOT] CCA: Capturing region (%d,%d) %dx%d from active framebuffer.\n", x, y, w, h);
+    sigma_log("[SMARTSHOT] CCA: Capturing region (%d,%d) %dx%d from active framebuffer.\n", x, y, w, h);
     
     // Instant OCR via S-VisSearch
     sigma_log("[SMARTSHOT] CCA: Running Neural Pixel Extraction on capture...");

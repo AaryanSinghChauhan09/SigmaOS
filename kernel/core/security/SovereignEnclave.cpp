@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Enclave (TEE Manager)
@@ -27,7 +27,7 @@ public:
     }
 
     void* createEnclave(sigma_size_t size) {
-        sigma_printf("[ENCLAVE] Creating Secure Element (Size: %llu bytes)...\n", size);
+        sigma_log("[ENCLAVE] Creating Secure Element (Size: %llu bytes)...\n", size);
         sigma_log("[ENCLAVE] HW: Locking physical memory range for enclave execution.");
         sigma_log("[ENCLAVE] HW: Initializing Intel SGX/AMD SEV measurement sequence.");
         this->m_active_enclaves++;
@@ -35,7 +35,7 @@ public:
     }
 
     void enterEnclave(void* enclave_ptr) {
-        sigma_printf("[ENCLAVE] Transitioning context to Secure Realm at %p...\n", enclave_ptr);
+        sigma_log("[ENCLAVE] Transitioning context to Secure Realm at %p...\n", enclave_ptr);
         sigma_log("[ENCLAVE] [EENTER]: Silicon execution mode: ENCLAVE_SECURE.");
     }
 

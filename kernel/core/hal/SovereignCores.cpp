@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h"
-#include "../../../include/sigma_types.h"
-#include "../../../include/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Cores (Neural Core Scaling)
@@ -27,14 +27,14 @@ public:
     }
 
     void scaleCores(sigma_u32 target_cores) {
-        sigma_printf("[CORES] AI-SCALING: Adjusting active silicon cores to %u...\n", target_cores);
+        sigma_log("[CORES] AI-SCALING: Adjusting active silicon cores to %u...\n", target_cores);
         sigma_log("[CORES] Triggering hardware P-state transitions via SovereignHAL.");
         this->m_active_cores = target_cores;
         sigma_log("[CORES] Lattice thermal IQ optimized for new core count.");
     }
 
     void listCoreStatus() {
-        sigma_printf("[CORES] Silicon Status: %u active cores. IQ: 142. Thermal: 45C.\n", this->m_active_cores);
+        sigma_log("[CORES] Silicon Status: %u active cores. IQ: 142. Thermal: 45C.\n", this->m_active_cores);
     }
 
 private:

@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN NET-MESH (v25.0 - PURE C11 FINALITY)
@@ -10,7 +11,7 @@
  * =========================================================================
  */
 
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 /* =========================================================================
  * Raw NIC opcode shards (x86_64 inline â€ bypasses POSIX send/recv)

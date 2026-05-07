@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 #include "sigma_omnisense.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 #include "sigma_universal_ui.h"
 #include "sigma_energysched.h"
 

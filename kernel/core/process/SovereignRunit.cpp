@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/sigma_libc.h"
 
 /**
  * SigmaOS Sovereign Runit (Shard Life-cycle Manager)
@@ -17,7 +17,7 @@ typedef enum {
 } shard_status_t;
 
 typedef struct {
-    uint32_t shard_id;
+    sigma_u32 shard_id;
     shard_status_t status;
     void (*entry_point)();
 } sovereign_service_t;
@@ -28,7 +28,7 @@ extern "C" void runit_init() {
     sigma_log("[RUNIT] Initializing Sovereign Shard Lifecycle Manager (Void Linux Parity)...");
 }
 
-extern "C" void runit_supervise(uint32_t shard_id, void (*entry)()) {
+extern "C" void runit_supervise(sigma_u32 shard_id, void (*entry)()) {
     if (shard_id >= 600) return;
     
     services[shard_id].shard_id = shard_id;
@@ -41,7 +41,7 @@ extern "C" void runit_supervise(uint32_t shard_id, void (*entry)()) {
     // entry();
 }
 
-extern "C" void runit_stop(uint32_t shard_id) {
+extern "C" void runit_stop(sigma_u32 shard_id) {
     if (shard_id >= 600) return;
     services[shard_id].status = SHARD_DOWN;
     sigma_log("[RUNIT] Shard %d signal: TERMINATE.", shard_id);

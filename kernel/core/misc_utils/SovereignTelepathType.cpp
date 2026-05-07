@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 #include "sigma_telepathtype.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 
 /**
@@ -19,7 +19,7 @@ extern "C" const char* telepathtype_predict_completion(const char* current_conte
     // CNGP (Contextual N-Gram Preemption) Algorithm
     // Instantly evaluates the current semantic context and outputs the most probable continuation.
     
-    sigma_printf("[TELEPATHTYPE] CNGP: Analyzing active semantic context: '%s'...\n", current_context);
+    sigma_log("[TELEPATHTYPE] CNGP: Analyzing active semantic context: '%s'...\n", current_context);
     sigma_log("[TELEPATHTYPE] CNGP: High-probability linguistic chain computed.");
     
     // Simulate returned prediction

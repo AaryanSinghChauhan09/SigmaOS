@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign HA Core Shard
@@ -28,17 +28,17 @@ public:
     }
 
     void handleFailover(const char* failed_node) {
-        sigma_printf("Σ [HA-CORE]: [CRITICAL] Node '%s' heartbeat lost. Initiating Zero-Downtime Failover...\n", failed_node);
+        sigma_log("Σ [HA-CORE]: [CRITICAL] Node '%s' heartbeat lost. Initiating Zero-Downtime Failover...\n", failed_node);
         // Reroute network traffic and recover state from Consensus Engine
         sigma_log("Σ [HA-CORE]: Failover COMPLETE. Workloads rebalanced across surviving lattice nodes.");
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN HA AUDIT ---\n");
-        sigma_printf("| Cluster Mode   : ACTIVE-ACTIVE\n");
-        sigma_printf("| Failover Time  : < 50ms\n");
-        sigma_printf("| State Sync     : LATTICE-PAXOS VERIFIED\n");
-        sigma_printf("------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN HA AUDIT ---\n");
+        sigma_log("| Cluster Mode   : ACTIVE-ACTIVE\n");
+        sigma_log("| Failover Time  : < 50ms\n");
+        sigma_log("| State Sync     : LATTICE-PAXOS VERIFIED\n");
+        sigma_log("------------------------------\n");
     }
 
 private:

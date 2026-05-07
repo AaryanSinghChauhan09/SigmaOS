@@ -1,11 +1,11 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef VERIFICATION_SHARD_HPP
 #define VERIFICATION_SHARD_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Core {
@@ -25,7 +25,7 @@ private:
 
 public:
     SovereignVerification() : m_verified_shards(0), m_violations_blocked(0) {
-        sigma_printf("[VERIFICATION]: Sovereign Logic Sentinel [ACTIVE].\n");
+        sigma_log("[VERIFICATION]: Sovereign Logic Sentinel [ACTIVE].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignVerification"; }

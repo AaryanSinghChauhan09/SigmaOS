@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign GPGPU Manager Shard
@@ -28,18 +29,18 @@ public:
     }
 
     void dispatchKernel(const char* kernel_name, sigma_u32 threads, sigma_u32 blocks) {
-        sigma_printf("Σ [GPGPU-MAN]: Dispatching Compute Kernel '%s' [%ux%u] to Silicon...\n", 
+        sigma_log("Σ [GPGPU-MAN]: Dispatching Compute Kernel '%s' [%ux%u] to Silicon...\n", 
                      kernel_name, blocks, threads);
         // Map payload to GPGPU queues
         sigma_log("Σ [GPGPU-MAN]: Compute Kernel EXECUTED. Memory synchronized.");
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN GPGPU AUDIT ---\n");
-        sigma_printf("| Compute Targets : CUDA/PTX, ROCm/HSA\n");
-        sigma_printf("| Dispatch Mode   : DIRECT-SILICON (No-Driver)\n");
-        sigma_printf("| Isolation       : CIB-SECURED\n");
-        sigma_printf("----------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN GPGPU AUDIT ---\n");
+        sigma_log("| Compute Targets : CUDA/PTX, ROCm/HSA\n");
+        sigma_log("| Dispatch Mode   : DIRECT-SILICON (No-Driver)\n");
+        sigma_log("| Isolation       : CIB-SECURED\n");
+        sigma_log("----------------------------------\n");
     }
 
 private:

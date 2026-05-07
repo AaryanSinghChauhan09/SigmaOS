@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-SOUND-CORE (v1.0 - INDUSTRIAL ALERTS)
@@ -11,7 +12,7 @@
  * =============================================================================
  */
 
-#include "../../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 typedef struct SoundShard {
     sigma_u32 frequency;

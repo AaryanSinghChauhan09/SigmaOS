@@ -1,6 +1,6 @@
 #include "Lattice.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 /* va_list support in freestanding mode via compiler builtins */
 #ifndef va_list
@@ -137,7 +137,7 @@ int sigma_pipe(int pipefd[2]) {
 
 unsigned int sigma_sleep(unsigned int seconds) {
     // x86_64 rax=35 (nanosleep) - implementation simplifies for seconds
-    sigma_printf("[ZENITH-LIBC]: Pulse sleep for %d seconds...\n", seconds);
+    sigma_log("[ZENITH-LIBC]: Pulse sleep for %d seconds...\n", seconds);
     return 0;
 }
 
@@ -160,8 +160,8 @@ int sigma_dup(int oldfd) {
     return (int)res;
 }
 
-// --- sigma_printf (v1.0 ZENITH) ---
-void sigma_printf(const char* format, ...) {
+// --- sigma_log (v1.0 ZENITH) ---
+void sigma_log(const char* format, ...) {
     va_list args;
     va_start(args, format);
     

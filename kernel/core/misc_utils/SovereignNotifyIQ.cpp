@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 #include "sigma_notifyiq.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 #include "sigma_emotion.h"
 
@@ -23,11 +23,11 @@ extern "C" void notifyiq_push(const char* source, const char* message, sigma_not
     sigma_emotion_state_t user_mood = emotion_get_current_state();
     
     if (user_mood == EMOTION_STATE_FOCUSED && priority > NOTIFY_PRIORITY_HIGH) {
-        sigma_printf("[NOTIFYIQ] APT: Silenced '%s' from '%s' (User is focused).\n", message, source);
+        sigma_log("[NOTIFYIQ] APT: Silenced '%s' from '%s' (User is focused).\n", message, source);
         return; // Silently batch
     }
     
-    sigma_printf("[NOTIFYIQ] APT: Delivering [P%d] from '%s': '%s'\n", (int)priority, source, message);
+    sigma_log("[NOTIFYIQ] APT: Delivering [P%d] from '%s': '%s'\n", (int)priority, source, message);
 }
 
 extern "C" void notifyiq_deliver_batch() {

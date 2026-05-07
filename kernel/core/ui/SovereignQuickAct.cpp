@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 #include "sigma_quickact.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 #include "sigma_neuralsearch.h"
 
 
@@ -25,7 +25,7 @@ extern "C" void quickact_process_input(const char* user_input) {
     // UIR (Unified Intent Router) Algorithm
     // Classifies input as: app search, file search, system command, sigma:// URI, or automation rule.
     
-    sigma_printf("[QUICKACT] UIR: Processing input: '%s'\n", user_input);
+    sigma_log("[QUICKACT] UIR: Processing input: '%s'\n", user_input);
     
     // Attempt semantic search first
     neuralsearch_query(user_input);

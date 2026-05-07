@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Memory Paging Orchestrator
@@ -29,7 +29,7 @@ public:
     void mapVirtualToPhysical(void* virtual_addr, void* physical_addr, sigma_u32 flags) {
         // Simulated mapping
         this->active_pages++;
-        sigma_printf("[PAGING] Mapped %p -> %p (Flags: %X). Total active: %u\n", 
+        sigma_log("[PAGING] Mapped %p -> %p (Flags: %X). Total active: %u\n", 
                      virtual_addr, physical_addr, flags, this->active_pages);
     }
 

@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h"
-#include "../../../include/sigma_types.h"
-#include "../../../include/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 extern "C" sigma_u64 cpu_rdtsc();
 
@@ -41,7 +41,7 @@ public:
 
         
         this->m_active_keys++;
-        sigma_printf("[QKD] New unhackable key injected into the lattice. Pool: %u\n", this->m_active_keys);
+        sigma_log("[QKD] New unhackable key injected into the lattice. Pool: %u\n", this->m_active_keys);
     }
 
     sigma_u32 getActiveKeyCount() const { return this->m_active_keys; }

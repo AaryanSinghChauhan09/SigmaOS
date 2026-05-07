@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign VirtIO Shard
@@ -28,15 +29,15 @@ public:
     }
 
     void processQueue(sigma_u32 queue_id) {
-        sigma_printf("Σ [VIRTIO]: Processing Virtual Queue %u (Zero-Copy Frame Transfer)...\n", queue_id);
+        sigma_log("Σ [VIRTIO]: Processing Virtual Queue %u (Zero-Copy Frame Transfer)...\n", queue_id);
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN VIRTIO AUDIT ---\n");
-        sigma_printf("| Devices Emulated : Net, Block, Console\n");
-        sigma_printf("| Interface Mode   : SILICON-DIRECT (PASSTHROUGH)\n");
-        sigma_printf("| Performance      : 99%% Bare-Metal Parity\n");
-        sigma_printf("--------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN VIRTIO AUDIT ---\n");
+        sigma_log("| Devices Emulated : Net, Block, Console\n");
+        sigma_log("| Interface Mode   : SILICON-DIRECT (PASSTHROUGH)\n");
+        sigma_log("| Performance      : 99%% Bare-Metal Parity\n");
+        sigma_log("--------------------------------\n");
     }
 
 private:

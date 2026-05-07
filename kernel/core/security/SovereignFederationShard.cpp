@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Identity Federation Shard
@@ -28,18 +28,18 @@ public:
     }
 
     bool performSSO(const char* domain, const char* protocol) {
-        sigma_printf("Σ [FEDERATION]: Initiating SSO Handshake with domain '%s' via %s...\n", domain, protocol);
+        sigma_log("Σ [FEDERATION]: Initiating SSO Handshake with domain '%s' via %s...\n", domain, protocol);
         // Execute SAML/OIDC token verification
         sigma_log("Σ [FEDERATION]: Identity Federated. Access granted to Sovereign Lattice.");
         return true;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN FEDERATION AUDIT ---\n");
-        sigma_printf("| Protocols      : OIDC, SAML 2.0, OAuth 2.1\n");
-        sigma_printf("| Trust Circles  : 0 (Isolated)\n");
-        sigma_printf("| Security Mode  : ZERO-TRUST-FEDERATION\n");
-        sigma_printf("------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN FEDERATION AUDIT ---\n");
+        sigma_log("| Protocols      : OIDC, SAML 2.0, OAuth 2.1\n");
+        sigma_log("| Trust Circles  : 0 (Isolated)\n");
+        sigma_log("| Security Mode  : ZERO-TRUST-FEDERATION\n");
+        sigma_log("------------------------------------\n");
     }
 
 private:

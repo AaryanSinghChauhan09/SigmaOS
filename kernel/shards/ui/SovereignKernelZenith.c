@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN KERNEL ZENITH (v1.0 - PERFORMANCE ENGINE)
@@ -7,7 +8,7 @@
  * =========================================================================
  */
 
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 /* --- External Rust Kernel Pulse --- */
 extern void sovereign_kernel_initial_pulse(void);
@@ -30,7 +31,7 @@ void sovereign_register_shard(const char* name, void (*entry)(void)) {
     g_shard_table[g_shard_count].shard_name = name;
     g_shard_table[g_shard_count].shard_entry = entry;
     g_shard_count++;
-    sigma_printf("[KERNEL-ZENITH]: Registered Shard [%llu]: %s\n", g_shard_count-1, name);
+    sigma_log("[KERNEL-ZENITH]: Registered Shard [%llu]: %s\n", g_shard_count-1, name);
 }
 
 /* =========================================================================
@@ -39,7 +40,7 @@ void sovereign_register_shard(const char* name, void (*entry)(void)) {
 void sigma_hw_wipe_page(sigma_u64 addr) {
     // In a real bare-metal kernel, this would use AVX-512 or REP STOS 
     // to zero out memory with minimum latency and cache-line flushing.
-    sigma_printf("[KERNEL-ZENITH]: Amnesic Wipe of Memory at [0x%llx] - SILICON INTEGRITY [OK]\n", addr);
+    sigma_log("[KERNEL-ZENITH]: Amnesic Wipe of Memory at [0x%llx] - SILICON INTEGRITY [OK]\n", addr);
     
     // Simulate high-speed zeroing
     char* p = (char*)addr;
@@ -58,10 +59,10 @@ typedef enum {
 sigma_i64 sovereign_syscall_dispatch(SovereignSyscall call, sigma_u64 arg1, sigma_u64 arg2) {
     switch (call) {
         case SOV_SYS_SHARD_EXEC:
-            sigma_printf("[KERNEL-ZENITH]: Syscall [SHARD_EXEC] - Thread: %llu\n", arg1);
+            sigma_log("[KERNEL-ZENITH]: Syscall [SHARD_EXEC] - Thread: %llu\n", arg1);
             return 0;
         case SOV_SYS_AMNESIC_EXIT:
-            sigma_printf("[KERNEL-ZENITH]: Syscall [AMNESIC_EXIT] - Wiping State...\n");
+            sigma_log("[KERNEL-ZENITH]: Syscall [AMNESIC_EXIT] - Wiping State...\n");
             sigma_hw_wipe_page(arg1);
             return 0;
         case SOV_SYS_PREDICTIVE_SYNC:
@@ -76,10 +77,10 @@ sigma_i64 sovereign_syscall_dispatch(SovereignSyscall call, sigma_u64 arg1, sigm
  * KERNEL BOOTSTRAP (C Side)
  * ========================================================================= */
 void start_kernel_zenith(void) {
-    sigma_printf("=================================================================\n");
-    sigma_printf("[SIGMAOS KERNEL ZENITH v1.0]: INITIALIZING SILICON ROOT.\n");
-    sigma_printf("[SIGMAOS]: Absorbing Linux RCU, Windows I/O, Mac Mach-Port USPs.\n");
-    sigma_printf("=================================================================\n\n");
+    sigma_log("=================================================================\n");
+    sigma_log("[SIGMAOS KERNEL ZENITH v1.0]: INITIALIZING SILICON ROOT.\n");
+    sigma_log("[SIGMAOS]: Absorbing Linux RCU, Windows I/O, Mac Mach-Port USPs.\n");
+    sigma_log("=================================================================\n\n");
 
     // Initialize Shard Table
     sovereign_register_shard("SovereignAI", 0);
@@ -93,7 +94,7 @@ void start_kernel_zenith(void) {
     sovereign_syscall_dispatch(SOV_SYS_PREDICTIVE_SYNC, 0, 0);
     sovereign_syscall_dispatch(SOV_SYS_AMNESIC_EXIT, 0x1000, 0);
 
-    sigma_printf("\n[SIGMAOS KERNEL ZENITH]: ALL SYSTEMS OPERATIONAL - SOVEREIGN.\n");
+    sigma_log("\n[SIGMAOS KERNEL ZENITH]: ALL SYSTEMS OPERATIONAL - SOVEREIGN.\n");
 }
 
 int main(void) {

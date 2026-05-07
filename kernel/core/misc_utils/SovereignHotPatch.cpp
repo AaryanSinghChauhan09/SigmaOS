@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Hot-Patch Engine
@@ -26,9 +26,9 @@ public:
     }
 
     void applyPatch(const char* shard_name, sigma_u32 patch_id) {
-        sigma_printf("[HOTPATCH] Applying Patch %u to shard '%s'...\n", patch_id, shard_name);
+        sigma_log("[HOTPATCH] Applying Patch %u to shard '%s'...\n", patch_id, shard_name);
         // Atomically swap function pointer via kernel write barrier
-        sigma_printf("[HOTPATCH] Write barrier acquired. Shard '%s' live-patched without reboot.\n",
+        sigma_log("[HOTPATCH] Write barrier acquired. Shard '%s' live-patched without reboot.\n",
                      shard_name);
         this->patches_applied++;
     }

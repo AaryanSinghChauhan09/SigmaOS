@@ -1,11 +1,11 @@
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 #ifndef BOOT_ORCHESTRATOR_HPP
 #define BOOT_ORCHESTRATOR_HPP
 
 
 
-#include "SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

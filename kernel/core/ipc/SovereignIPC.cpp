@@ -1,7 +1,7 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
-#include "sigma_ipc.h"
-#include "../../../include/sigma_hal.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
+#include "system/sigma_ipc.h"
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign IPC Implementation (Optimized)
@@ -39,7 +39,7 @@ bool SovereignIPCManager::sendOptimized(sigma_u32 target, sigma_u32 type, sigma_
     __atomic_store_n(&this->m_head, next_head, __ATOMIC_SEQ_CST);
     this->m_messages_dispatched++;
     
-    sigma_printf("[IPC] WFAE: Message -> S%02u dispatched.\n", target);
+    sigma_log("[IPC] WFAE: Message -> S%02u dispatched.\n", target);
     return true;
 }
 

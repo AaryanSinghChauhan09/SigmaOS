@@ -1,10 +1,10 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef VFS_SHARD_HPP
 #define VFS_SHARD_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -14,12 +14,12 @@ public:
     const char* type_name() const noexcept override { return "SovereignVFSShard"; }
 
     void MountSovereignShard(const char* mount_point) {
-        sigma_printf("[VFS-SHARD]: Mounting Sovereign Shard at: %s\n", mount_point);
-        sigma_printf("[VFS-SHARD]: Status: Read-Only / Immutable Shard Forge Active.\n");
+        sigma_log("[VFS-SHARD]: Mounting Sovereign Shard at: %s\n", mount_point);
+        sigma_log("[VFS-SHARD]: Status: Read-Only / Immutable Shard Forge Active.\n");
     }
 
     void AuditVFS() {
-        sigma_printf("[VFS-SHARD]: Active Mounts: 3 | Consistency: BIT-PERFECT\n");
+        sigma_log("[VFS-SHARD]: Active Mounts: 3 | Consistency: BIT-PERFECT\n");
     }
 };
 

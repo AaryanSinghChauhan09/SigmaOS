@@ -1,10 +1,10 @@
 #ifndef CLOUD_NEXUS_HPP
 #define CLOUD_NEXUS_HPP
 
-#include "../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "../../include/sigma_types.h"
-#include "../../include/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Net {
@@ -24,7 +24,7 @@ private:
 
 public:
     SovereignCloudNexus() : m_node_count(0), m_total_synced_bytes(0), m_edge_acceleration(SIGMA_TRUE) {
-        sigma_printf("[CLOUD-NEXUS]: Sovereign Edge Synchronization [ONLINE].\n");
+        sigma_log("[CLOUD-NEXUS]: Sovereign Edge Synchronization [ONLINE].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignCloudNexus"; }

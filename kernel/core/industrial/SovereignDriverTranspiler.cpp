@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Driver Transpiler Shard
@@ -28,7 +29,7 @@ public:
     }
 
     void translateEvent(const char* legacy_driver_name, sigma_u32 event_code) {
-        sigma_printf("Σ [DRIVER-TRANS]: Mapping Legacy Event 0x%X from '%s' to Lattice Shard...\n", 
+        sigma_log("Σ [DRIVER-TRANS]: Mapping Legacy Event 0x%X from '%s' to Lattice Shard...\n", 
                      event_code, legacy_driver_name);
         
         // Simulation of mapping legacy interrupt/IO to sharded event lattice
@@ -36,10 +37,10 @@ public:
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN DRIVER-TRANS AUDIT ---\n");
-        sigma_printf("| Translated Shards : 0 (Phase 1 Baseline)\n");
-        sigma_printf("| Silicon Parity    : 100% Native\n");
-        sigma_printf("--------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN DRIVER-TRANS AUDIT ---\n");
+        sigma_log("| Translated Shards : 0 (Phase 1 Baseline)\n");
+        sigma_log("| Silicon Parity    : 100% Native\n");
+        sigma_log("--------------------------------------\n");
     }
 
 private:

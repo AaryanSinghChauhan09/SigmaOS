@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_hal.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
 
 namespace SigmaOS {
 namespace Kernel {

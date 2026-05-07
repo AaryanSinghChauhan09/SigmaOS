@@ -1,11 +1,11 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef SOVEREIGN_ENERGY_MANAGER_HPP
 #define SOVEREIGN_ENERGY_MANAGER_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Power {
@@ -26,7 +26,7 @@ private:
 
 public:
     SovereignEnergyManager() : m_power_shards_active(128), m_joules_saved(0), m_neural_throttling_active(SIGMA_TRUE) {
-        sigma_printf("[ENERGY-MGR]: Sovereign Power Nexus [IGNITED].\n");
+        sigma_log("[ENERGY-MGR]: Sovereign Power Nexus [IGNITED].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignEnergyManager"; }

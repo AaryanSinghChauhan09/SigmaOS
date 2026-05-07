@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 /**
  * SigmaOS Sovereign Virtio Driver Layer
@@ -35,7 +35,7 @@ public:
         this->devices[this->device_count].device_id = id;
         this->devices[this->device_count].status = 1; // ACK
         this->device_count++;
-        sigma_printf("Σ [VIRTIO]: Registered Generic Device Type %u\n", id);
+        sigma_log("Σ [VIRTIO]: Registered Generic Device Type %u\n", id);
     }
 
 private:

@@ -1,7 +1,7 @@
-#include "../../../include/SovereignLibC.h""
-#include "sigma_usb.h"
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "drivers/sigma_usb.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 
 /**
  * SigmaOS Sovereign USB Subsystem Implementation
@@ -39,7 +39,7 @@ extern "C" void usb_init(sigma_u32 xhci_mmio_base) {
     sigma_log("[USB] Initializing Sovereign Silicon-Direct xHCI Host Controller (SDXHC)...");
     SovereignUSBManager.state.controller_mmio_base = xhci_mmio_base;
     SovereignUSBManager.initialized = 1u;
-    sigma_printf("[USB] SDXHC: Controller MMIO @ 0x%08X. USB 3.x bus ONLINE.\n",
+    sigma_log("[USB] SDXHC: Controller MMIO @ 0x%08X. USB 3.x bus ONLINE.\n",
                  xhci_mmio_base);
 }
 
@@ -64,11 +64,11 @@ extern "C" void usb_enumerate_bus() {
 
         SovereignUSBManager.state.device_count = 2u;
     }
-    sigma_printf("[USB] SDXHC: Enumeration complete — %d device(s) detected.\n",
+    sigma_log("[USB] SDXHC: Enumeration complete — %d device(s) detected.\n",
                  (int)SovereignUSBManager.state.device_count);
     for (sigma_u32 i = 0; i < SovereignUSBManager.state.device_count; i++) {
         const sigma_usb_device_t* d = &SovereignUSBManager.state.devices[i];
-        sigma_printf("[USB]  Addr=%d  VID=%04X PID=%04X  Class=%s\n",
+        sigma_log("[USB]  Addr=%d  VID=%04X PID=%04X  Class=%s\n",
                      (int)d->address, (int)d->vendor_id, (int)d->product_id,
                      usb_class_name(d->class_code));
     }
@@ -86,12 +86,12 @@ extern "C" const sigma_usb_device_t* usb_get_device(sigma_u32 idx) {
 extern "C" void usb_transfer(sigma_u8 addr, sigma_u8 endpoint,
                               const void* data, sigma_u32 len) {
     (void)data;
-    sigma_printf("[USB] SDXHC: Transfer — Addr=%d EP=%d Len=%d bytes.\n",
+    sigma_log("[USB] SDXHC: Transfer — Addr=%d EP=%d Len=%d bytes.\n",
                  (int)addr, (int)endpoint, (int)len);
 }
 
 extern "C" void usb_hotplug_notify(sigma_u8 addr, sigma_u32 attached) {
-    sigma_printf("[USB] SDXHC: Hotplug event — Addr=%d %s.\n",
+    sigma_log("[USB] SDXHC: Hotplug event — Addr=%d %s.\n",
                  (int)addr, attached ? "ATTACHED" : "DETACHED");
 }
 

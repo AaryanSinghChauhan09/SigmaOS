@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN AUTOMATION SHARD (v7.0 - INDUSTRIAL FINALITY)
@@ -11,7 +12,7 @@
  * =============================================================================
  */
 
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 #define AUTOMATION_TICK_THRESHOLD 60000 // Every 60s @ 1kHz
 
@@ -61,7 +62,7 @@ void automation_on_tick(sigma_u64 current_tick) {
 
 void automation_audit(void) {
     sigma_print("\n--- Î£ SOVEREIGN AUTOMATION AUDIT (MOLT-AGENT) ---\n");
-    sigma_printf("| Audits Executed: %u\n", g_molt_agent.audit_count);
-    sigma_printf("| Repairs Done   : %u\n", g_molt_agent.repair_count);
+    sigma_log("| Audits Executed: %u\n", g_molt_agent.audit_count);
+    sigma_log("| Repairs Done   : %u\n", g_molt_agent.repair_count);
     sigma_print("| State          : [HEALTHY/AUTONOMOUS]\n");
 }

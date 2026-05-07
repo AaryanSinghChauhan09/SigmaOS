@@ -792,7 +792,21 @@
             <div class="stat-label">VFS Sync: <span id="vfs-status" class="status-success">ZERO DRIFT (PQC)</span></div>
             <div class="stat-label">S-CLI: <span id="cli-status" class="status-success">AMNESIC (CLEAN)</span></div>
             <div class="stat-bar"><div class="stat-progress stat-progress--full"></div></div>
+
+        <!-- Silicon Parallelism Shard (SMP) -->
+        <div class="widget" id="smp-widget">
+            <div class="widget-title">
+                <span>Silicon Parallelism</span>
+                <span class="accent">SMP-ZENITH</span>
+            </div>
+            <div class="stat-value" id="smp-cores">16 CORES ACTIVE</div>
+            <div class="stat-label">Lattice Parallelism: <span class="status-success">OPTIMIZED (APIC)</span></div>
+            <div class="stat-label">IPI Latency: <span class="accent">~150ns</span></div>
+            <div class="stat-bar">
+                <div class="stat-progress" style="width: 100%; background: linear-gradient(90deg, var(--accent), var(--success)); box-shadow: 0 0 10px var(--accent-glow);"></div>
+            </div>
         </div>
+
         <!-- Sovereign Network Stack Widget -->
         <div class="widget">
             <div class="widget-title">
@@ -832,12 +846,14 @@
             </div>
         </div>
         <div class="window-content">
+
             <!-- Sidebar -->
             <div class="util-sidebar">
                 <div class="util-nav active" onclick="switchUtil('text-ops')">Text Operations</div>
                 <div class="util-nav" onclick="switchUtil('data-conv')">Data Converter</div>
                 <div class="util-nav" onclick="switchUtil('code-img')">Code to Image</div>
                 <div class="util-nav" onclick="switchUtil('diff')">Compare Text</div>
+
                 <div class="util-nav" onclick="switchUtil('dup-find')">Duplicate Finder</div>
                 <div class="util-nav" onclick="switchUtil('key-test')">Key-Test</div>
                 <div class="util-nav" onclick="switchUtil('speed')">Ookla Speed Shard</div>
@@ -845,7 +861,13 @@
                 <div class="util-nav" onclick="switchUtil('bootable')">Bootable Creator</div>
                 <div class="util-nav" onclick="switchUtil('table')">Table Convert</div>
                 <div class="util-nav" onclick="switchUtil('broadcaster')">Prompt Broadcaster</div>
+
+
                 <div class="util-nav" onclick="switchUtil('firewall')">Aether Firewall</div>
+                <div class="util-nav" onclick="switchUtil('neural-hub')">Neural Intelligence</div>
+                <div class="util-nav" onclick="switchUtil('snapshots')">Lattice Snapshots</div>
+
+
             </div>
             <!-- Main Area -->
             <div id="util-main" class="util-main">
@@ -958,8 +980,38 @@ https://chatgpt.com/?q={{prompt}}</textarea>
                     <ul id="blocked-list" class="workflow-list" style="max-height: 200px; overflow-y: auto;">
                         <li class="routine-item routine-border-magenta"><strong>facebook.com</strong> <button class="cyber-btn small-btn" onclick="this.parentElement.remove()">UNBLOCK</button></li>
                     </ul>
+
+                <div id="util-neural-hub" class="hidden-shard">
+                    <h3>Zero-Configuration AI Hub</h3>
+                    <p class="stat-label">Local-only LLM Shard (1.2B Parameters) — Sovereign Intelligence.</p>
+                    <div class="ai-hub-container">
+
+                        <div class="ai-search-box">
+                            <input type="text" id="semantic-search-input" class="util-input" placeholder="Ask Semantic Search: 'Show me my silicon project'... ">
+                            <button class="util-btn" onclick="semanticSearch()">RETRIEVE</button>
+                        </div>
+
+                        <div id="ai-hub-results" class="util-output">Ready for semantic retrieval.</div>
+                    </div>
+    
+                <div id="util-snapshots" class="hidden-shard">
+                    <h3>Atomic Lattice Snapshots</h3>
+                    <p class="stat-label">Create immutable system points for zero-downtime rollbacks.</p>
+                    <div class="snap-actions">
+                        <input type="text" id="snap-name" class="util-input" placeholder="Snapshot Label (e.g. Pre-Update-v2)...">
+                        <button class="util-btn" onclick="createSnapshot()">CAPTURE STATE</button>
+                    </div>
+                    <div class="snap-list-container">
+                        <h4>Available Snapshots</h4>
+                        <ul id="snapshot-list" class="workflow-list">
+                            <li class="routine-item routine-border-cyan"><strong>SigmaOS_Core_v100.0</strong> (Base System) <button class="cyber-btn small-btn" onclick="atomicSwap('v100.0')">SWAP</button></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
+
+            </div>
+
         </div>
     </div>
 
@@ -986,7 +1038,52 @@ https://chatgpt.com/?q={{prompt}}</textarea>
         </div>
     </div>
 
+
+    <!-- Sovereign Terminal Window -->
+    <div class="window" id="terminal-win">
+        <div class="window-header">
+            <div class="window-title">Σ Sovereign Terminal v5.1</div>
+            <div class="window-controls">
+                <div class="win-btn minimize" onclick="minimizeWindow('terminal-win')"></div>
+                <div class="win-btn close" onclick="closeWindow('terminal-win')"></div>
+            </div>
+        </div>
+        <div class="window-content">
+            <div class="term-container">
+                <div class="term-output" id="terminal-output"></div>
+                <div class="term-input-line">
+                    <span class="term-prompt">sovereign@sigma:~$</span>
+                    <input type="text" class="term-input" id="terminal-input" spellcheck="false" autocomplete="off">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Manager Window -->
+    <div class="window" id="file-manager-win">
+        <div class="window-header">
+            <div class="window-title">Σ Sovereign File Manager</div>
+            <div class="window-controls">
+                <div class="win-btn minimize" onclick="minimizeWindow('file-manager-win')"></div>
+                <div class="win-btn close" onclick="closeWindow('file-manager-win')"></div>
+            </div>
+        </div>
+        <div class="window-content">
+            <div class="fm-container">
+                <div class="fm-toolbar">
+                    <button class="util-btn" onclick="fmBack()">← BACK</button>
+                    <div class="fm-breadcrumbs" id="fm-breadcrumbs">/home/sovereign</div>
+                    <button class="util-btn" onclick="vfs.save(); addLog('Σ [FS]: Manual Sync Complete.', 'success')">SYNC</button>
+                </div>
+                <div class="fm-grid" id="fm-grid">
+                    <!-- Files will be injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Marketplace Window -->
+
     <div class="window" id="marketplace-win">
         <div class="window-header">
             <div class="window-title">Σ Sovereign Marketplace</div>
@@ -1050,6 +1147,36 @@ https://chatgpt.com/?q={{prompt}}</textarea>
                     <div class="mkt-desc">High-alert, performance-driven red.</div>
                 </div>
             </div>
+
+            <h3 style="margin-top: 30px;">Adaptive Workflow Engine</h3>
+            <p class="stat-label">Select a mode to optimize the lattice for specific workloads.</p>
+
+
+
+            <div class="workflow-selector">
+                <button class="util-btn" onclick="setWorkflowMode('Gamer')">🎮 GAMER</button>
+                <button class="util-btn" onclick="setWorkflowMode('Creator')">🎨 CREATOR</button>
+                <button class="util-btn" onclick="setWorkflowMode('Streamer')">🎥 STREAMER</button>
+                <button class="util-btn" onclick="setWorkflowMode('Red Team')">🧨 RED TEAM</button>
+                <button class="util-btn" onclick="setWorkflowMode('Coding')">💻 CODING</button>
+                <button class="util-btn" onclick="setWorkflowMode('Minimal')">🍃 MINIMAL</button>
+            </div>
+
+
+
+            <h3 style="margin-top: 30px;">Live Desktop Editor</h3>
+            <div class="style-editor">
+                <div class="param-row">
+                    <label>Glass Blur</label>
+                    <input type="range" min="0" max="50" value="20" oninput="updateLiveStyle('blur', this.value)">
+                </div>
+                <div class="param-row">
+                    <label>Saturation</label>
+                    <input type="range" min="50" max="250" value="150" oninput="updateLiveStyle('saturate', this.value)">
+                </div>
+            </div>
+
+
             <h3 class="param-header">Personalization Parameters</h3>
             <div class="ai-segment personalization-segment">
                 <div class="stat-label">Accent Hue (PQC-Sync)</div>
@@ -1125,26 +1252,170 @@ https://chatgpt.com/?q={{prompt}}</textarea>
         </div>
     </div>
 
+    <canvas id="zenith-framebuffer" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none;"></canvas>
+    <div id="mouse-glow"></div>
+
+    <!-- Sigma Command Center (Universal Palette) -->
+    <div id="command-center" class="command-palette hidden">
+        <div class="command-input-container">
+            <span class="command-prefix">Σ</span>
+            <input type="text" id="command-input" placeholder="Search files, apps, or AI actions... (Alt+Space)" autocomplete="off">
+        </div>
+        <div id="command-results" class="command-results">
+            <!-- Results injected here -->
+        </div>
+    </div>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="top-left">
+            <span class="system-time" id="clock">00:00:00</span>
+            <span class="top-divider">|</span>
+
+
+            <span class="workflow-mode" id="active-workflow">MODAL: BALANCED</span>
+            <span class="top-divider">|</span>
+            <span class="active-capsule" id="active-capsule">CAPSULE: NONE</span>
+            <span class="top-divider">|</span>
+            <span class="threat-level" id="threat-level">THREAT: LOW</span>
+        </div>
+
+
+    </div>
+
+
+    <!-- Sigma Sidebar (Slide-out) -->
+    <div id="sigma-sidebar" class="sidebar hidden">
+        <div class="sidebar-header">
+            <h3>Σ Sovereign Companion</h3>
+            <button class="sidebar-close" onclick="toggleSidebar()">×</button>
+        </div>
+        <div class="sidebar-content">
+            <div class="sidebar-widget">
+                <div class="widget-label">AI ASSISTANT</div>
+                <div class="sidebar-ai-chat" id="sidebar-ai-chat">
+                    <div class="ai-msg">How can I help optimize your workspace today?</div>
+                </div>
+                <input type="text" class="sidebar-input" placeholder="Type a command or question...">
+            </div>
+            <div class="sidebar-widget">
+                <div class="widget-label">CLIPBOARD HUB</div>
+                <div class="sidebar-list">
+                    <div class="list-item">https://github.com/SigmaOS...</div>
+                    <div class="list-item">npm run build:lattice</div>
+                </div>
+            </div>
+            <div class="sidebar-widget">
+                <div class="widget-label">QUICK NOTES</div>
+                <textarea class="sidebar-textarea" placeholder="Note down your lattice ideas..."></textarea>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Performance HUD Overlay -->
+    <div id="performance-hud" class="hud-overlay hidden">
+        <div class="hud-item">CPU: <span id="hud-cpu">--%</span></div>
+        <div class="hud-item">MEM: <span id="hud-mem">--GB</span></div>
+        <div class="hud-item">VFS: <span id="hud-vfs">ACTIVE</span></div>
+        <div class="hud-item">PQC: <span id="hud-pqc">SHIELDED</span></div>
+    </div>
+
+    <!-- Sigma Settings Hub Window -->
+    <div class="window" id="sigma-settings-win">
+        <div class="window-header">
+            <div class="window-title">Σ Sigma Settings Hub</div>
+            <div class="window-controls">
+                <div class="win-btn minimize" onclick="minimizeWindow('sigma-settings-win')"></div>
+                <div class="win-btn close" onclick="closeWindow('sigma-settings-win')"></div>
+            </div>
+        </div>
+        <div class="window-content" style="padding: 0;">
+            <div class="settings-container">
+                <div class="settings-sidebar">
+                    <div class="settings-nav active" onclick="switchSettings('general')">General</div>
+                    <div class="settings-nav" onclick="switchSettings('ai')">AI & Automation</div>
+                    <div class="settings-nav" onclick="switchSettings('services')">Service Manager</div>
+                    <div class="settings-nav" onclick="switchSettings('config')">Config Engine</div>
+                    <div class="settings-nav" onclick="switchSettings('healing')">Auto-Healing</div>
+                </div>
+                <div class="settings-main" id="settings-main">
+                    <!-- Default: General -->
+                    <h3>General Settings</h3>
+                    <div class="settings-group">
+                        <label>Performance HUD Overlay</label>
+                        <button class="util-btn" onclick="toggleOverlay()">TOGGLE HUD</button>
+                    </div>
+                    <div class="settings-group">
+                        <label>Desktop Transparency</label>
+                        <input type="range" min="0" max="100" value="95" oninput="sigmaConfig.update('desktop.opacity', this.value)">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sigma Capsule Library Window -->
+    <div class="window" id="sigma-capsule-win">
+        <div class="window-header">
+            <div class="window-title">Σ Sigma Capsule Library</div>
+            <div class="window-controls">
+                <div class="win-btn minimize" onclick="minimizeWindow('sigma-capsule-win')"></div>
+                <div class="win-btn close" onclick="closeWindow('sigma-capsule-win')"></div>
+            </div>
+        </div>
+        <div class="window-content" style="padding: 20px;">
+            <div class="capsule-grid">
+                <div class="capsule-card" onclick="deployCapsule('AI Research')">
+                    <div class="capsule-icon">🧠</div>
+                    <div class="capsule-info">
+                        <div class="capsule-name">AI Research</div>
+                        <div class="capsule-desc">Jupyter, Ollama, Neural Hub</div>
+                    </div>
+                </div>
+                <div class="capsule-card" onclick="deployCapsule('Hacker Lab')">
+                    <div class="capsule-icon">🧨</div>
+                    <div class="capsule-info">
+                        <div class="capsule-name">Hacker Lab</div>
+                        <div class="capsule-desc">Metasploit, Nmap, OmniShell</div>
+                    </div>
+                </div>
+                <div class="capsule-card" onclick="deployCapsule('Cyberpunk Dev')">
+                    <div class="capsule-icon">💻</div>
+                    <div class="capsule-info">
+                        <div class="capsule-name">Cyberpunk Dev</div>
+                        <div class="capsule-desc">VS Code, Docker, GitHub Desktop</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Taskbar -->
+
+
     <div class="taskbar">
-        <div class="task-icon active">Σ</div>
-        <div class="task-icon">📂</div>
-        <div class="task-icon">🌐</div>
-        <div class="task-icon">🧠</div>
-        <div class="task-icon">🖥️</div>
+        <div class="task-icon active" onclick="toggleStart()">Σ</div>
+        <div class="task-icon" onclick="launchApp('File Manager')">📂</div>
+        <div class="task-icon" onclick="launchApp('Sigma Browser')">🌐</div>
+        <div class="task-icon" onclick="launchApp('AI Assistant')">🧠</div>
+        <div class="task-icon" onclick="launchApp('OmniShell')">🖥️</div>
         <div class="task-icon" onclick="launchApp('Markup Forge')">📄</div>
         <div class="task-icon" onclick="launchApp('Utility Nexus')">🛠️</div>
         <div class="task-icon" onclick="launchApp('Marketplace')">🛒</div>
-        <div class="task-icon" onclick="launchApp('Customization Panel')">✨</div>
         <div class="taskbar-divider"></div>
-        <div class="task-icon">🔔</div>
-        <div class="task-icon">🔋</div>
+        <div class="task-icon" id="turbo-toggle" onclick="toggleTurboMode()" title="Turbo Mode (NPWO)">🚀</div>
+        <div class="taskbar-divider"></div>
+        <div class="task-icon" onclick="toggleNotifications()">🔔</div>
+        <div class="task-icon" onclick="toggleBatteryPanel()">🔋</div>
         <div class="taskbar-divider"></div>
         <div class="status-indicator-wasm" title="Silicon-WASM Nexus">
             <div class="pulse-dot"></div>
             <span>WASM-Nexus: ACTIVE</span>
         </div>
     </div>
+
+
 
     <script>
         // Update Clock
@@ -1249,11 +1520,23 @@ https://chatgpt.com/?q={{prompt}}</textarea>
                 const win = document.getElementById('marketplace-win');
                 win.style.display = 'block';
                 win.style.zIndex = '2000';
+
             } else if (app === 'Customization Panel') {
                 const win = document.getElementById('customization-win');
                 win.style.display = 'block';
                 win.style.zIndex = '2000';
+
+            } else if (app === 'Sigma Settings') {
+                const win = document.getElementById('sigma-settings-win');
+                win.style.display = 'block';
+                win.style.zIndex = '2000';
+            } else if (app === 'Capsule Library') {
+                const win = document.getElementById('sigma-capsule-win');
+                win.style.display = 'block';
+                win.style.zIndex = '2000';
             }
+
+
             toggleStart();
         }
 

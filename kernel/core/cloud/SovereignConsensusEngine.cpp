@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Consensus Engine Shard
@@ -29,18 +29,18 @@ public:
 
     bool propose(const char* state_key, const void* data, sigma_usize size) {
         (void)data; (void)size;
-        sigma_printf("Σ [CONSENSUS]: Proposing state update for '%s' to lattice nodes...\n", state_key);
+        sigma_log("Σ [CONSENSUS]: Proposing state update for '%s' to lattice nodes...\n", state_key);
         // Execute Lattice-Paxos handshake
         sigma_log("Σ [CONSENSUS]: Consensus ACHIEVED. State committed to distributed lattice.");
         return true;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN CONSENSUS AUDIT ---\n");
-        sigma_printf("| Consensus Algorithm : LATTICE-PAXOS\n");
-        sigma_printf("| Quorum Type        : BYZANTINE-FAULT-TOLERANT\n");
-        sigma_printf("| Security Status     : QUANTUM-VERIFIED\n");
-        sigma_printf("------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN CONSENSUS AUDIT ---\n");
+        sigma_log("| Consensus Algorithm : LATTICE-PAXOS\n");
+        sigma_log("| Quorum Type        : BYZANTINE-FAULT-TOLERANT\n");
+        sigma_log("| Security Status     : QUANTUM-VERIFIED\n");
+        sigma_log("------------------------------------\n");
     }
 
 private:

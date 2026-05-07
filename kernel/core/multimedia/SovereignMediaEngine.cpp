@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Media Engine Shard
@@ -33,11 +33,11 @@ public:
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN MEDIA AUDIT ---\n");
-        sigma_printf("| Codecs Supported: AV1, H.265, Opus, FLAC\n");
-        sigma_printf("| Hardware Accel  : Silicon-Native (GPU-UVD)\n");
-        sigma_printf("| Frame Sync      : Zero-Latency (Lattice-Vsync)\n");
-        sigma_printf("--------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN MEDIA AUDIT ---\n");
+        sigma_log("| Codecs Supported: AV1, H.265, Opus, FLAC\n");
+        sigma_log("| Hardware Accel  : Silicon-Native (GPU-UVD)\n");
+        sigma_log("| Frame Sync      : Zero-Latency (Lattice-Vsync)\n");
+        sigma_log("--------------------------------\n");
     }
 
 private:

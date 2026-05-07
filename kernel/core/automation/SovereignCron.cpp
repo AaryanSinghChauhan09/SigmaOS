@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Cron Shard
@@ -28,16 +29,16 @@ public:
     }
 
     void scheduleTask(const char* task_name, sigma_u32 interval_ms) {
-        sigma_printf("Σ [CRON]: Task '%s' scheduled for execution every %u ms.\n", task_name, interval_ms);
+        sigma_log("Σ [CRON]: Task '%s' scheduled for execution every %u ms.\n", task_name, interval_ms);
         m_active_jobs++;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN CRON AUDIT ---\n");
-        sigma_printf("| Active Jobs    : %u\n", m_active_jobs);
-        sigma_printf("| Granularity    : MILLISECOND\n");
-        sigma_printf("| Execution Mode : DISTRIBUTED\n");
-        sigma_printf("----------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN CRON AUDIT ---\n");
+        sigma_log("| Active Jobs    : %u\n", m_active_jobs);
+        sigma_log("| Granularity    : MILLISECOND\n");
+        sigma_log("| Execution Mode : DISTRIBUTED\n");
+        sigma_log("----------------------------------\n");
     }
 
 private:

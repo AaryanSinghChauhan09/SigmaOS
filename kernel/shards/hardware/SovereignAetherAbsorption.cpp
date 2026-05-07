@@ -1,5 +1,5 @@
 #include "Lattice.h"
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN AETHER ABSORPTION (v94.0)
@@ -17,7 +17,7 @@ extern "C" void _start(void) {
 }
 
 int main() {
-    sigma_printf("[SIGMA_ABSORPTION]: Initiating Sovereign System Convergence...\n");
+    sigma_log("[SIGMA_ABSORPTION]: Initiating Sovereign System Convergence...\n");
     _start();
     return 0;
 }

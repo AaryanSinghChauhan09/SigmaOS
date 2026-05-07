@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Cloud Orchestrator Shard
@@ -29,18 +30,18 @@ public:
     }
 
     void orchestrate(const char* task_id) {
-        sigma_printf("Σ [CLOUD-ORCH]: Distributing task '%s' across Cloud-Lattice nodes...\n", task_id);
+        sigma_log("Σ [CLOUD-ORCH]: Distributing task '%s' across Cloud-Lattice nodes...\n", task_id);
         // Delegate to CloudBridge and MeshLattice
         m_coordinated_nodes++;
         sigma_log("Σ [CLOUD-ORCH]: Task distribution consensus achieved.");
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN CLOUD ORCHESTRATION AUDIT ---\n");
-        sigma_printf("| Coordinated Nodes : %u\n", m_coordinated_nodes);
-        sigma_printf("| Consensus Mode    : LATTICE-RAFT\n");
-        sigma_printf("| Sync Integrity    : QUANTUM-VERIFIED\n");
-        sigma_printf("--------------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN CLOUD ORCHESTRATION AUDIT ---\n");
+        sigma_log("| Coordinated Nodes : %u\n", m_coordinated_nodes);
+        sigma_log("| Consensus Mode    : LATTICE-RAFT\n");
+        sigma_log("| Sync Integrity    : QUANTUM-VERIFIED\n");
+        sigma_log("--------------------------------------------\n");
     }
 
 private:

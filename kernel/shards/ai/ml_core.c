@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-ML-CORE (v1.0 - AI/ML ACCELERATION)
@@ -11,7 +12,7 @@
  * =============================================================================
  */
 
-#include "../../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 typedef struct MatrixShard {
     sigma_u32 rows;

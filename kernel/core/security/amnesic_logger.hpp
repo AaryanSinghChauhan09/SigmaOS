@@ -1,10 +1,10 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef AMNESIC_LOGGER_HPP
 #define AMNESIC_LOGGER_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Security {
@@ -15,20 +15,20 @@ public:
 
     void Log(const char* level, const char* msg) {
         // Shunt: Automatically scrub PII or sensitive hashes
-        sigma_printf("[AMNESIC-LOG] [%s]: %s\n", level, msg);
+        sigma_log("[AMNESIC-LOG] [%s]: %s\n", level, msg);
     }
 
     void CommitToColdStorage() {
-        sigma_printf("[AMNESIC-LOG]: Committing anonymized shards to cold storage lattice...\n");
-        sigma_printf("[OK]: Local traces purged for amnesic compliance.\n");
+        sigma_log("[AMNESIC-LOG]: Committing anonymized shards to cold storage lattice...\n");
+        sigma_log("[OK]: Local traces purged for amnesic compliance.\n");
     }
 
     void AuditLogs() {
-        sigma_printf("\n--- Î£ SOVEREIGN LOGGING AUDIT ---\n");
-        sigma_printf("| Storage Mode   : AMNESIC (Trace-Free)\n");
-        sigma_printf("| Scrubbing      : ACTIVE [PII-REGEX-SHARD]\n");
-        sigma_printf("| Persistence    : DECENTRALIZED SYNC\n");
-        sigma_printf("------------------------------------\n");
+        sigma_log("\n--- Î£ SOVEREIGN LOGGING AUDIT ---\n");
+        sigma_log("| Storage Mode   : AMNESIC (Trace-Free)\n");
+        sigma_log("| Scrubbing      : ACTIVE [PII-REGEX-SHARD]\n");
+        sigma_log("| Persistence    : DECENTRALIZED SYNC\n");
+        sigma_log("------------------------------------\n");
     }
 };
 

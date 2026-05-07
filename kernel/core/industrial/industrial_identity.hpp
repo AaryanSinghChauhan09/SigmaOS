@@ -1,11 +1,11 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef SOVEREIGN_IDENTITY_HPP
 #define SOVEREIGN_IDENTITY_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Security {
@@ -27,7 +27,7 @@ private:
 
 public:
     SovereignIdentity() : m_sovereign_id(0), m_attestation_active(SIGMA_TRUE) {
-        sigma_printf("[IDENTITY-NEXUS]: Sovereign Identity Shard [IGNITED].\n");
+        sigma_log("[IDENTITY-NEXUS]: Sovereign Identity Shard [IGNITED].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignIdentity"; }

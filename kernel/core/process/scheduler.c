@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-SCHEDULER (v1.1)
@@ -5,7 +6,7 @@
  * Principles: Preemptive Round-Robin, Zero-Latency Context Switching.
  * =============================================================================
  */
-#include "../../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 typedef struct Task {
     sigma_u64     rsp;            /* Stack Pointer */

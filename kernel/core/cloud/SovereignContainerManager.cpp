@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Container Manager Shard
@@ -28,18 +29,18 @@ public:
     }
 
     void deployContainer(const char* image_hash) {
-        sigma_printf("Σ [CONTAINER]: Deploying lightweight execution environment from hash '%s'...\n", image_hash);
+        sigma_log("Σ [CONTAINER]: Deploying lightweight execution environment from hash '%s'...\n", image_hash);
         // Execute chroot/cgroup isolation natively
         sigma_log("Σ [CONTAINER]: Container DEPLOYED. Sandboxed environment operational with zero overhead.");
         m_active_containers++;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN CONTAINER AUDIT ---\n");
-        sigma_printf("| Active Containers: %u\n", m_active_containers);
-        sigma_printf("| Ideology Absorbed: ALPINE LINUX / TALOS OS\n");
-        sigma_printf("| State Model      : IMMUTABLE EXECUTION\n");
-        sigma_printf("--------------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN CONTAINER AUDIT ---\n");
+        sigma_log("| Active Containers: %u\n", m_active_containers);
+        sigma_log("| Ideology Absorbed: ALPINE LINUX / TALOS OS\n");
+        sigma_log("| State Model      : IMMUTABLE EXECUTION\n");
+        sigma_log("--------------------------------------------\n");
     }
 
 private:

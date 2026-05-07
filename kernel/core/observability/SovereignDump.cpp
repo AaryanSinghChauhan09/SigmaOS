@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Dump (SovereignDump)
@@ -26,7 +26,7 @@ public:
     }
 
     void trigger(const char* reason) {
-        sigma_printf("[DUMP] [CRITICAL] Kernel Anomaly: %s. Preserving silicon state...\n", reason);
+        sigma_log("[DUMP] [CRITICAL] Kernel Anomaly: %s. Preserving silicon state...\n", reason);
         sigma_log("[DUMP] SSP: Freezing all shard execution...");
         sigma_log("[DUMP] SSP: Serializing PML4, GDT, IDT, and Task States...");
         sigma_log("[DUMP] SSP: Encrypting dump with Sovereign Master Key...");

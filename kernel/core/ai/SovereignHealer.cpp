@@ -1,6 +1,6 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 
 /**
  * SigmaOS Sovereign Self-Healer (v100.0 Zenith)
@@ -33,7 +33,7 @@ extern "C" void healer_audit_lattice() {
 }
 
 extern "C" void healer_repair_shard(sigma_u32 shard_id) {
-    sigma_printf("[HEALER] ASR: [CRITICAL] Shard S%02u corruption detected! Repairing...\n", shard_id);
+    sigma_log("[HEALER] ASR: [CRITICAL] Shard S%02u corruption detected! Repairing...\n", shard_id);
     /* ASR Algorithm: Hot-reloads shard from DSP persistence */
     SovereignHealerEngine.total_repairs++;
     sigma_log("[HEALER] ASR: Shard logic RESTORED from amnesic mirror.");

@@ -1,7 +1,7 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
-#include "sigma_trace.h"
-#include "../../../include/sigma_hal.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
+#include "observability/sigma_trace.h"
+#include "hal/sigma_hal.h"
 #include "sigma_time.h"
 
 /**
@@ -17,22 +17,22 @@ extern "C" void trace_init() {
     for(int i=0; i<256; i++) interceptor_map[i] = SIGMA_FALSE;
 }
 
-extern "C" void trace_log_syscall(uint32_t id, uint32_t shard_id) {
+extern "C" void trace_log_syscall(sigma_u32 id, sigma_u32 shard_id) {
     // PSI (Predictive Syscall Interception) Algorithm
     // Intercepts syscalls based on behavioral patterns before they reach the SSG.
     
     if (id < 256 && interceptor_map[id]) {
-        sigma_printf("[TRACE] [PSI] Intercepted Syscall 0x%02X from Shard S%02d\n", id, shard_id);
+        sigma_log("[TRACE] [PSI] Intercepted Syscall 0x%02X from Shard S%02d\n", id, shard_id);
     } else {
-        sigma_printf("[TRACE] Syscall 0x%02X triggered by Shard S%02d at %d ms\n", 
+        sigma_log("[TRACE] Syscall 0x%02X triggered by Shard S%02d at %d ms\n", 
                      id, shard_id, (int)time_get_uptime_ms());
     }
 }
 
-extern "C" void trace_set_interceptor(uint32_t syscall_id, bool active) {
+extern "C" void trace_set_interceptor(sigma_u32 syscall_id, bool active) {
     if (syscall_id < 256) {
         interceptor_map[syscall_id] = active;
-        sigma_printf("[TRACE] Interceptor for 0x%02X set to %d\n", syscall_id, active);
+        sigma_log("[TRACE] Interceptor for 0x%02X set to %d\n", syscall_id, active);
     }
 }
 

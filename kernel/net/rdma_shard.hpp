@@ -1,9 +1,10 @@
+#include "core/sigma_types.h"
 #ifndef RDMA_SHARD_HPP
 #define RDMA_SHARD_HPP
 
-#include "../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "../../include/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Net {
@@ -13,12 +14,12 @@ public:
     const char* type_name() const noexcept override { return "SovereignRDMAShard"; }
 
     void DirectMemoryAccess(void* local_addr, void* remote_addr, sigma_size_t length) {
-        sigma_printf("[RDMA-SHARD]: Initiating Zero-Copy Transfer (%llu bytes)...\n", (sigma_u64)length);
-        sigma_printf("[RDMA-SHARD]: Status: Bypass OS Kernel. Direct Silicon Handshake.\n");
+        sigma_log("[RDMA-SHARD]: Initiating Zero-Copy Transfer (%llu bytes)...\n", (sigma_u64)length);
+        sigma_log("[RDMA-SHARD]: Status: Bypass OS Kernel. Direct Silicon Handshake.\n");
     }
 
     void AuditRDMA() {
-        sigma_printf("[RDMA-SHARD]: Active Channels: 8 | Bandwidth: 400Gbps SHARDED\n");
+        sigma_log("[RDMA-SHARD]: Active Channels: 8 | Bandwidth: 400Gbps SHARDED\n");
     }
 };
 

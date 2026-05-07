@@ -1,9 +1,9 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "sigma_auto.h"
-#include "../../../include/sigma_hal.h""
-#include "sigma_telemetry.h"
+#include "hal/sigma_hal.h"
+#include "observability/sigma_telemetry.h"
 
 /**
  * SigmaOS Sovereign Auto Implementation
@@ -12,13 +12,13 @@
  */
 
 static sigma_automation_rule_t rule_lattice[128];
-static uint32_t rule_count = 0;
+static sigma_u32 rule_count = 0;
 
 extern "C" void auto_init() {
     sigma_log("[AUTO] Initializing Sovereign System Automation Nexus...");
 }
 
-extern "C" void auto_register_rule(uint32_t event_id, uint32_t shard_id, uint32_t action) {
+extern "C" void auto_register_rule(sigma_u32 event_id, sigma_u32 shard_id, sigma_u32 action) {
     if (rule_count >= 128) return;
     
     sigma_automation_rule_t* rule = &rule_lattice[rule_count++];
@@ -27,19 +27,19 @@ extern "C" void auto_register_rule(uint32_t event_id, uint32_t shard_id, uint32_
     rule->action_mask = action;
     rule->is_periodic = SIGMA_FALSE;
     
-    sigma_printf("[AUTO] Registered: Event E%02X -> Shard S%02d (Action: %08X)\n", 
+    sigma_log("[AUTO] Registered: Event E%02X -> Shard S%02d (Action: %08X)\n", 
                  event_id, shard_id, action);
 }
 
-extern "C" void auto_trigger_event(uint32_t event_id) {
+extern "C" void auto_trigger_event(sigma_u32 event_id) {
     // EDSA (Event-Driven Shard Automation) Algorithm
     // Dispatches automated actions to target shards based on incoming event IDs.
     
-    sigma_printf("[AUTO] EDSA: Triggering Event E%02X...\n", event_id);
+    sigma_log("[AUTO] EDSA: Triggering Event E%02X...\n", event_id);
     
-    for (uint32_t i = 0; i < rule_count; i++) {
+    for (sigma_u32 i = 0; i < rule_count; i++) {
         if (rule_lattice[i].event_id == event_id) {
-            sigma_printf("[AUTO] EDSA: Executing Action %08X on Shard S%02d\n", 
+            sigma_log("[AUTO] EDSA: Executing Action %08X on Shard S%02d\n", 
                          rule_lattice[i].action_mask, rule_lattice[i].target_shard_id);
         }
     }

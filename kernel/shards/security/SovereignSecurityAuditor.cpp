@@ -1,6 +1,7 @@
-#include "../../../include/SovereignLibC.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 
 
 /**
@@ -9,28 +10,28 @@
  */
 
 typedef struct {
-    uint32_t shard_id;
+    sigma_u32 shard_id;
     const char* signature;
     bool verified;
 } audit_record_t;
 
 static audit_record_t security_log[100];
-static uint32_t log_index = 0;
+static sigma_u32 log_index = 0;
 
 extern "C" void security_audit_init() {
     sigma_log("[SECURITY] Initializing Sovereign Auditor (Zero-Trust Enforcement)...");
 }
 
-extern "C" bool security_verify_shard(uint32_t shard_id, const char* expected_signature) {
-    sigma_printf("[SECURITY] Verifying Shard S%02d...\n", shard_id);
+extern "C" bool security_verify_shard(sigma_u32 shard_id, const char* expected_signature) {
+    sigma_log("[SECURITY] Verifying Shard S%02d...\n", shard_id);
     
     // Industrial Hashing Simulation
     bool is_valid = true; // In real implementation, this would compare SHA-256 hashes
     
     if (is_valid) {
-        sigma_printf("[SECURITY] Shard S%02d: VERIFIED (Signature: %s)\n", shard_id, expected_signature);
+        sigma_log("[SECURITY] Shard S%02d: VERIFIED (Signature: %s)\n", shard_id, expected_signature);
     } else {
-        sigma_printf("[SECURITY] [CRITICAL] Shard S%02d: SIGNATURE MISMATCH!\n", shard_id);
+        sigma_log("[SECURITY] [CRITICAL] Shard S%02d: SIGNATURE MISMATCH!\n", shard_id);
     }
     
     // Log audit event
@@ -46,6 +47,6 @@ extern "C" bool security_verify_shard(uint32_t shard_id, const char* expected_si
 
 extern "C" void security_report() {
     sigma_log("[SECURITY] Generating Global Lattice Audit Report...");
-    sigma_printf("[SECURITY] Total Shards Audited: %d\n", log_index);
+    sigma_log("[SECURITY] Total Shards Audited: %d\n", log_index);
     sigma_log("[SECURITY] Integrity Level: 100% Sovereign.");
 }

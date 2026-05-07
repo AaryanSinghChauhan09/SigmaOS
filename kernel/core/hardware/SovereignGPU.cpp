@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Modular GPU Driver Framework
@@ -31,7 +31,7 @@ public:
         if (this->active_gpus >= 4) return;
         sigma_hardened_strcpy(this->gpu_vendors[this->active_gpus], vendor_id, 16);
         this->active_gpus++;
-        sigma_printf("[GPU] Registered %s GPU with %u MB VRAM.\n", vendor_id, vram_mb);
+        sigma_log("[GPU] Registered %s GPU with %u MB VRAM.\n", vendor_id, vram_mb);
     }
 
     bool dispatchComputeKernel(const char* workload_type) {
@@ -41,7 +41,7 @@ public:
         }
 
         this->ai_workloads_dispatched++;
-        sigma_printf("[GPU] Dispatching '%s' workload to %s. (Total dispatched: %u)\n", 
+        sigma_log("[GPU] Dispatching '%s' workload to %s. (Total dispatched: %u)\n", 
                      workload_type, this->gpu_vendors[0], this->ai_workloads_dispatched);
         return true;
     }

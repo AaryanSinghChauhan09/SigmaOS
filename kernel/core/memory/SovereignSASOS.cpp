@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign SASOS (Single Address Space Operating System)
@@ -28,14 +28,14 @@ public:
 
     sigma_u32 registerShardDomain(const char* shard_id) {
         sigma_u32 pkey = ++this->m_active_keys;
-        sigma_printf("[SASOS] Domain Registered: %s [PKey: %u]\n", shard_id, pkey);
+        sigma_log("[SASOS] Domain Registered: %s [PKey: %u]\n", shard_id, pkey);
         sigma_log("[SASOS] Hardware PKey assigned to shard memory range.");
         return pkey;
     }
 
     void switchDomain(sigma_u32 pkey) {
         // In a real x86_64 implementation, we would use WRPKRU instruction here.
-        sigma_printf("[SASOS] SWITCH: Transitioning to Domain PKey %u via WRPKRU (Zero-Cost).\n", pkey);
+        sigma_log("[SASOS] SWITCH: Transitioning to Domain PKey %u via WRPKRU (Zero-Cost).\n", pkey);
     }
 
 private:

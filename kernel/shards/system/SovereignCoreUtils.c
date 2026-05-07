@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN CORE UTILS (v100.0 - PURE C11)
@@ -8,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 /* =========================================================================
  * Sovereign Hex Dump (replaces C++ class utility)
@@ -16,7 +17,7 @@
 void sigma_hexdump(const void* ptr, sigma_size_t len) {
     const sigma_u8* p = (const sigma_u8*)ptr;
     sigma_size_t i;
-    sigma_printf("[HEXDUMP]: %llu bytes @ addr ", len);
+    sigma_log("[HEXDUMP]: %llu bytes @ addr ", len);
     sigma_print_hex((sigma_u64)(sigma_size_t)ptr);
     sigma_print("\n");
     for (i = 0; i < len; i++) {
@@ -81,13 +82,13 @@ static void coreutils_tick(SovereignCoreUtils* cu) {
 }
 
 static void coreutils_banner(const SovereignCoreUtils* cu) {
-    sigma_printf("\n");
-    sigma_printf("Î£ ======================================================= Î£\n");
-    sigma_printf("  SigmaOS Sovereign Core Utils %s\n", cu->build_version);
-    sigma_printf("  TSC Uptime Ticks : %llu\n", cu->uptime_ticks);
-    sigma_printf("  Language Stack   : C11 (98%) + ASM (0.7%) + Rust (0.3%)\n");
-    sigma_printf("  libc             : SovereignLibC (zero glibc dependency)\n");
-    sigma_printf("Î£ ======================================================= Î£\n");
+    sigma_log("\n");
+    sigma_log("Î£ ======================================================= Î£\n");
+    sigma_log("  SigmaOS Sovereign Core Utils %s\n", cu->build_version);
+    sigma_log("  TSC Uptime Ticks : %llu\n", cu->uptime_ticks);
+    sigma_log("  Language Stack   : C11 (98%) + ASM (0.7%) + Rust (0.3%)\n");
+    sigma_log("  libc             : SovereignLibC (zero glibc dependency)\n");
+    sigma_log("Î£ ======================================================= Î£\n");
 }
 
 /* =========================================================================

@@ -1,5 +1,5 @@
 #include "Lattice.h"
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN HARDWARE AUDIT (v128.0 - ZERO-STD NATIVE)
@@ -11,11 +11,11 @@
 #include "kernel/diagnostics/hardware_audit.hpp"
 
 extern "C" void _start(void) {
-    sigma_printf("--- Î£ SIGMA OS SOVEREIGN HARDWARE AUDIT (ZENITH) ---\n");
+    sigma_log("--- Î£ SIGMA OS SOVEREIGN HARDWARE AUDIT (ZENITH) ---\n");
     SigmaOS::Diagnostics::SovereignHardwareAudit audit;
     audit.AuditProcessors();
     audit.AuditMemory();
     
-    sigma_printf("[SUCCESS]: All Hardware Shards mapped via Silicon-Direct APEX-API.\n");
+    sigma_log("[SUCCESS]: All Hardware Shards mapped via Silicon-Direct APEX-API.\n");
     sigma_exit(0);
 }

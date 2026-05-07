@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-HOT-REPLACE (v1.0 - ZERO-DOWNTIME PATCHING)
@@ -11,7 +12,7 @@
  * =============================================================================
  */
 
-#include "../../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 #define MAX_HOT_SHARDS 32
 

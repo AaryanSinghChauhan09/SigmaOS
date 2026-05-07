@@ -1,9 +1,10 @@
+#include "core/sigma_types.h"
 #ifndef SOVEREIGN_SNAP_H
 #define SOVEREIGN_SNAP_H
 
-#include "sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 #include "sigma_snap_types.h"
-#include "SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Snap Engine

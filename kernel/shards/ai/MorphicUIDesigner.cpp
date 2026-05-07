@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 #include "Lattice.h"
 /*
  * =========================================================================
@@ -8,8 +9,8 @@
  * =========================================================================
  */
 
-#include "../../../include/SigmaOOP.hpp"
-#include "../../../include/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Design {
@@ -28,7 +29,7 @@ private:
 
 public:
     MorphicUIDesigner() : m_active_layer(0) {
-        sigma_printf("[DESIGN-ZENITH]: Morphic UI Engine Initialized.\n");
+        sigma_log("[DESIGN-ZENITH]: Morphic UI Engine Initialized.\n");
     }
 
     const char* type_name() const noexcept override { return "MorphicUIDesigner"; }
@@ -44,21 +45,21 @@ public:
         widget.blur_radius = 20;
 
         m_widgets.push_back(widget);
-        sigma_printf("[DESIGN-ZENITH]: Widget '%s' summoned to lattice.\n", name);
+        sigma_log("[DESIGN-ZENITH]: Widget '%s' summoned to lattice.\n", name);
     }
 
     void rasterize_all() {
-        sigma_printf("[DESIGN-ZENITH]: Rasterizing %u Morphic Widgets...\n", (unsigned int)m_widgets.size());
+        sigma_log("[DESIGN-ZENITH]: Rasterizing %u Morphic Widgets...\n", (unsigned int)m_widgets.size());
         for (sigma_usize i = 0; i < m_widgets.size(); i++) {
             // In a real kernel, this would call the SVG renderer or DMA to VRAM
-            sigma_printf("  -> [%zu] %s: Pos(%u,%u) Dim(%u,%u) Glass(%u%%)\n", 
+            sigma_log("  -> [%zu] %s: Pos(%u,%u) Dim(%u,%u) Glass(%u%%)\n", 
                 i, m_widgets[i].name.c_str(), m_widgets[i].x, m_widgets[i].y, 
                 m_widgets[i].w, m_widgets[i].h, (unsigned int)(m_widgets[i].opacity * 100 / 255));
         }
     }
 
     void apply_glassmorphism(sigma_u8 level) {
-        sigma_printf("[DESIGN-ZENITH]: Hot-patching glassmorphism lattice to level %u...\n", level);
+        sigma_log("[DESIGN-ZENITH]: Hot-patching glassmorphism lattice to level %u...\n", level);
         // Logic to update shader parameters globally
     }
 };

@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
-#include "sigma_canvas.h"
-#include "../../../include/sigma_hal.h""
+#include "ui/sigma_canvas.h"
+#include "hal/sigma_hal.h"
 
 
 /**
@@ -19,11 +19,11 @@ extern "C" void canvas_pan(float delta_x, float delta_y) {
     // URM (Unbounded Render Matrix) Algorithm
     // Instantly transforms the viewport matrix without redrawing underlying geometries.
     
-    sigma_printf("[CANVAS] URM: Viewport panned by (%.2f, %.2f).\n", delta_x, delta_y);
+    sigma_log("[CANVAS] URM: Viewport panned by (%.2f, %.2f).\n", delta_x, delta_y);
 }
 
 extern "C" void canvas_zoom(float delta_zoom) {
-    sigma_printf("[CANVAS] URM: Viewport zoom shifted by %.2fx.\n", delta_zoom);
+    sigma_log("[CANVAS] URM: Viewport zoom shifted by %.2fx.\n", delta_zoom);
     // Directly scale the GPU projection matrix
 }
 

@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 #include "sigma_time.h"
 
 /**
@@ -33,7 +33,7 @@ public:
 
     void applyAccent(sigma_u32 color) {
         this->active_theme.accent_color = color;
-        sigma_printf("[THEME] Silicon Accent Color updated to 0x%06X.\n", (unsigned)color);
+        sigma_log("[THEME] Silicon Accent Color updated to 0x%06X.\n", (unsigned)color);
     }
 
     void toggleDarkMode() {
@@ -51,7 +51,7 @@ public:
         bool should_be_dark = (now.hour >= 18 || now.hour <= 6);
         
         if (should_be_dark != this->active_theme.dark_mode) {
-            sigma_printf("[THEME] Adaptive Trigger: Auto-switching theme due to time (%02d:%02d).\n", now.hour, now.minute);
+            sigma_log("[THEME] Adaptive Trigger: Auto-switching theme due to time (%02d:%02d).\n", now.hour, now.minute);
             this->toggleDarkMode();
         }
     }

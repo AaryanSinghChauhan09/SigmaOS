@@ -1,6 +1,7 @@
-#include "../../../include/sigma_hal.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
 #include "sigma_kube.h"
-#include "../../../include/SovereignLibC.h""
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -40,7 +41,7 @@ sigma_u32 SovereignKubeEngine::createDeployment(const char* name, sigma_u32 cont
     }
     dep->name[i] = '\0';
 
-    sigma_printf("[KUBE] LRL: Deployment '%s' (ID=%u) CREATED. Desired replicas: %u.\n",
+    sigma_log("[KUBE] LRL: Deployment '%s' (ID=%u) CREATED. Desired replicas: %u.\n",
                  dep->name, dep->deployment_id, replicas);
     
     this->reconcileLattice();
@@ -52,7 +53,7 @@ void SovereignKubeEngine::scaleDeployment(sigma_u32 deployment_id, sigma_u32 rep
     if (!dep) return;
 
     dep->replicas = replicas;
-    sigma_printf("[KUBE] LRL: Scaling deployment '%s' to %u replicas.\n", dep->name, replicas);
+    sigma_log("[KUBE] LRL: Scaling deployment '%s' to %u replicas.\n", dep->name, replicas);
     this->reconcileLattice();
 }
 
@@ -60,7 +61,7 @@ void SovereignKubeEngine::deleteDeployment(sigma_u32 deployment_id) {
     sigma_kube_deployment_t* dep = this->findDeployment(deployment_id);
     if (!dep) return;
 
-    sigma_printf("[KUBE] LRL: Deleting deployment '%s'. Terminating shards...\n", dep->name);
+    sigma_log("[KUBE] LRL: Deleting deployment '%s'. Terminating shards...\n", dep->name);
     dep->replicas = 0u;
     this->reconcileLattice();
 }
@@ -74,11 +75,11 @@ void SovereignKubeEngine::reconcileLattice() {
         
         if (dep->current_count < dep->replicas) {
             sigma_u32 diff = dep->replicas - dep->current_count;
-            sigma_printf("[KUBE] LRL: Scaling UP '%s'. Spawning %u instances.\n", dep->name, diff);
+            sigma_log("[KUBE] LRL: Scaling UP '%s'. Spawning %u instances.\n", dep->name, diff);
             dep->current_count = dep->replicas; /* Simulated immediate spawn */
         } else if (dep->current_count > dep->replicas) {
             sigma_u32 diff = dep->current_count - dep->replicas;
-            sigma_printf("[KUBE] LRL: Scaling DOWN '%s'. Terminating %u instances.\n", dep->name, diff);
+            sigma_log("[KUBE] LRL: Scaling DOWN '%s'. Terminating %u instances.\n", dep->name, diff);
             dep->current_count = dep->replicas; /* Simulated immediate term */
         }
         new_total_pods += dep->current_count;

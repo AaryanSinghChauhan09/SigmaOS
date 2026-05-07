@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 #include "Lattice.h"
 /*
  * =========================================================================
@@ -8,8 +9,8 @@
  * =========================================================================
  */
 
-#include "../../../include/SigmaOOP.hpp"
-#include "../../../include/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace UI {
@@ -29,7 +30,7 @@ private:
 
 public:
     ThemePersonalizer() : m_is_dark_mode(SIGMA_TRUE) {
-        sigma_printf("[UI-ZENITH]: Theme Personalizer Shard Initialized.\n");
+        sigma_log("[UI-ZENITH]: Theme Personalizer Shard Initialized.\n");
     }
 
     const char* type_name() const noexcept override { return "ThemePersonalizer"; }
@@ -41,17 +42,17 @@ public:
         m_current_palette.accent = a;
         m_current_palette.blur_intensity = 20;
 
-        sigma_printf("[UI-ZENITH]: Injecting Aesthetic Shard: %s\n", name);
-        sigma_printf("  -> Primary: 0x%08x | Accent: 0x%08x\n", p, a);
+        sigma_log("[UI-ZENITH]: Injecting Aesthetic Shard: %s\n", name);
+        sigma_log("  -> Primary: 0x%08x | Accent: 0x%08x\n", p, a);
     }
 
     void toggle_dark_mode() {
         m_is_dark_mode = !m_is_dark_mode;
-        sigma_printf("[UI-ZENITH]: Dark Mode %s.\n", m_is_dark_mode ? "ACTIVE" : "INACTIVE");
+        sigma_log("[UI-ZENITH]: Dark Mode %s.\n", m_is_dark_mode ? "ACTIVE" : "INACTIVE");
     }
 
     void sync_with_dashboard() {
-        sigma_printf("[UI-ZENITH]: Synchronizing aesthetics with Zenith Dashboard...\n");
+        sigma_log("[UI-ZENITH]: Synchronizing aesthetics with Zenith Dashboard...\n");
         // Logic to push CSS variables or DMA color buffers
     }
 };

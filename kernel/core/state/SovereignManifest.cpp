@@ -1,9 +1,9 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "sigma_manifest.h"
-#include "../../../include/sigma_hal.h""
-#include "sigma_libc.h"
+#include "hal/sigma_hal.h"
+#include "libc/sigma_libc.h"
 
 /**
  * SigmaOS Sovereign Manifest Implementation
@@ -44,7 +44,7 @@ extern "C" void manifest_rollback_atomic() {
     sigma_log("[MANIFEST] Rollback SUCCESSFUL. Stability restored.");
 }
 
-extern "C" sigma_shard_config_t* manifest_get_config(uint32_t shard_id) {
+extern "C" sigma_shard_config_t* manifest_get_config(sigma_u32 shard_id) {
     if (shard_id >= 600) return SIGMA_NULL;
     return &active_lattice[shard_id];
 }

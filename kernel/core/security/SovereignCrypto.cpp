@@ -1,7 +1,7 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "sigma_crypto.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "security/sigma_crypto.h"
 
 /**
  * SigmaOS Sovereign Cryptography Implementation
@@ -31,7 +31,7 @@ sigma_integrity_token_t SovereignCryptoEngine::verifyShard(sigma_u32 shard_id, c
 
     this->total_verifications++;
 
-    sigma_printf("[CRYPTO] HASI: Verified Shard S%02d (Token: %08X-%08X) â€” Total: %llu\n",
+    sigma_log("[CRYPTO] HASI: Verified Shard S%02d (Token: %08X-%08X) â€” Total: %llu\n",
                  (int)shard_id, (unsigned)token.hash_high, (unsigned)token.hash_low,
                  (unsigned long long)this->total_verifications);
     (void)data;
@@ -42,7 +42,7 @@ void SovereignCryptoEngine::signShard(sigma_u32 shard_id, sigma_integrity_token_
     if (!token) return;
     token->is_verified = SIGMA_TRUE;
     this->total_signatures++;
-    sigma_printf("[CRYPTO] HASI: Signed Shard S%02d with Integrity Token â€” Total sigs: %llu\n",
+    sigma_log("[CRYPTO] HASI: Signed Shard S%02d with Integrity Token â€” Total sigs: %llu\n",
                  (int)shard_id,
                  (unsigned long long)this->total_signatures);
 }

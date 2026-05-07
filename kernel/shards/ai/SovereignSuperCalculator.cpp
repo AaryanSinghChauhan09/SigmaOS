@@ -21,7 +21,7 @@
  * =========================================================================
  */
 
-#include "../../../include/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Science {

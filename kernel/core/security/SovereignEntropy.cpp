@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Entropy (Neural Entropy Source)
@@ -30,7 +30,7 @@ public:
         // Harvesting simulated thermal noise from silicon cores
         sigma_u64 noise = sigma_get_tick() * 0xDEADC0DE;
         this->m_pool_bits += 64;
-        sigma_printf("[ENTROPY] Harvested 64 bits of silicon thermal noise. Pool: %u bits.\n", this->m_pool_bits);
+        sigma_log("[ENTROPY] Harvested 64 bits of silicon thermal noise. Pool: %u bits.\n", this->m_pool_bits);
         return noise;
     }
 

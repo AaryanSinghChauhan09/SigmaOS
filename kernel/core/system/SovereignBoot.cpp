@@ -1,7 +1,7 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 #include "sigma_boot.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Boot Implementation
@@ -34,7 +34,7 @@ public:
         for (sigma_u32 i = 1u; i <= 600u; i++) {
             // Simulate silicon-native verification
             if (i % 100u == 0u) {
-                sigma_printf("[BOOT] SSB: Verified and Ignited Shard Cluster S%03u-S%03u\n", i-99u, i);
+                sigma_log("[BOOT] SSB: Verified and Ignited Shard Cluster S%03u-S%03u\n", i-99u, i);
             }
             this->ignited_shards++;
         }

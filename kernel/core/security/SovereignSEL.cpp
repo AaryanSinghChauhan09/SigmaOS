@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 #include "../security/SovereignQKD.hpp"
 
 namespace SigmaOS {
@@ -37,23 +38,23 @@ public:
 
     void spawnSandbox(const char* name) {
         if (!verifyShardTrust(name)) {
-            sigma_printf("[SEL] ERR: Shard '%s' failed QKD-Verification. Ignition ABORTED.\n", name);
+            sigma_log("[SEL] ERR: Shard '%s' failed QKD-Verification. Ignition ABORTED.\n", name);
             return;
         }
         
-        sigma_printf("[SEL] Spawning QKD-Verified Sandbox Shard: %s\n", name);
+        sigma_log("[SEL] Spawning QKD-Verified Sandbox Shard: %s\n", name);
         m_active_sandboxes++;
     }
 
     void enforcePolicy(const char* shard_id, sigma_u32 capability) {
-        sigma_printf("[SEL] Enforcing Policy on Shard %s (Cap: %X)\n", shard_id, capability);
+        sigma_log("[SEL] Enforcing Policy on Shard %s (Cap: %X)\n", shard_id, capability);
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN SEL AUDIT ---\n");
-        sigma_printf("| Sandboxes Active : %u\n", m_active_sandboxes);
-        sigma_printf("| Trust Fabric     : QKD-ENFORCED\n");
-        sigma_printf("-------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN SEL AUDIT ---\n");
+        sigma_log("| Sandboxes Active : %u\n", m_active_sandboxes);
+        sigma_log("| Trust Fabric     : QKD-ENFORCED\n");
+        sigma_log("-------------------------------\n");
     }
 
 private:

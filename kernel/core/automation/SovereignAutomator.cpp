@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Workflow Automation Engine
@@ -30,13 +30,13 @@ public:
         sigma_hardened_strcpy(this->macro_triggers[this->active_macros], trigger, 32);
         sigma_hardened_strcpy(this->macro_actions[this->active_macros], action, 32);
         this->active_macros++;
-        sigma_printf("[AUTOMATOR] Macro registered: When '%s', execute '%s'.\n", trigger, action);
+        sigma_log("[AUTOMATOR] Macro registered: When '%s', execute '%s'.\n", trigger, action);
     }
 
     void processContext(const char* user_context) {
         for (sigma_u32 i = 0; i < this->active_macros; i++) {
             if (sigma_hardened_strcmp(user_context, this->macro_triggers[i]) == 0) {
-                sigma_printf("[AUTOMATOR] Context match! Auto-Executing macro: %s\n", this->macro_actions[i]);
+                sigma_log("[AUTOMATOR] Context match! Auto-Executing macro: %s\n", this->macro_actions[i]);
             }
         }
     }

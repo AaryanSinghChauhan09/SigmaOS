@@ -1,7 +1,7 @@
-#include "../../../include/sigma_types.h""
+#include "core/sigma_types.h"
 #include "sigma_proc.h"
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Process Manager
@@ -40,7 +40,7 @@ public:
         proc->cpu_time = 0u;
         proc->capability_mask = 0xFFFFFFFFu; // Full sovereignty by default
         
-        sigma_printf("[PROC] Spawned Task: %s (PID: %u, Priority: %u)\n", name, (unsigned)proc->pid, (unsigned)priority);
+        sigma_log("[PROC] Spawned Task: %s (PID: %u, Priority: %u)\n", name, (unsigned)proc->pid, (unsigned)priority);
         return proc->pid;
     }
 
@@ -52,7 +52,7 @@ public:
             if (current->state == SIGMA_PROC_RUNNING) {
                 current->cpu_time++;
                 if (current->cpu_time > this->m_quantum_limit) {
-                    sigma_printf("[PROC] [WATCHDOG] PID %u ('%s') exceeded quota. Deprioritizing.\n", 
+                    sigma_log("[PROC] [WATCHDOG] PID %u ('%s') exceeded quota. Deprioritizing.\n", 
                                  (unsigned)current->pid, current->name);
                     current->priority++;
                     current->cpu_time = 0u;
@@ -64,9 +64,9 @@ public:
         sigma_process_t* next = (sigma_process_t*)SIGMA_NULL;
         sigma_u32 highest_priority = 0xFFFFFFFFu;
         
-        uint32_t start_idx = this->m_current_pid; 
-        for (uint32_t offset = 0u; offset < this->m_active_count; offset++) {
-            uint32_t i = (start_idx + offset) % this->m_active_count;
+        sigma_u32 start_idx = this->m_current_pid; 
+        for (sigma_u32 offset = 0u; offset < this->m_active_count; offset++) {
+            sigma_u32 i = (start_idx + offset) % this->m_active_count;
             
             if (this->m_table[i].state == SIGMA_PROC_READY && 
                 this->m_table[i].priority < highest_priority) {
@@ -76,7 +76,7 @@ public:
         }
         
         if (next) {
-            sigma_printf("[PROC] PATS Context Switch: PID %u -> PID %u (%s)\n", 
+            sigma_log("[PROC] PATS Context Switch: PID %u -> PID %u (%s)\n", 
                          (unsigned)this->m_current_pid, (unsigned)next->pid, next->name);
             this->m_current_pid = next->pid;
             next->state = SIGMA_PROC_RUNNING;

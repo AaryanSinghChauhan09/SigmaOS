@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Trust Fabric
@@ -27,7 +27,7 @@ public:
     }
 
     bool verifyShardTrust(const char* shard_id, const char* signature) {
-        sigma_printf("[TRUST] Verifying Shard %s via Lattice Trust Graph...\n", shard_id);
+        sigma_log("[TRUST] Verifying Shard %s via Lattice Trust Graph...\n", shard_id);
         sigma_log("[TRUST] Resolving identity via Blockchain Vault and QKD keys...");
         
         // Simulated trust verification
@@ -40,8 +40,8 @@ public:
         return false;
     }
 
-    void addTrustedNode(uint32_t node_id) {
-        sigma_printf("[TRUST] Node 0x%04X added to the Sovereign Trust Fabric.\n", node_id);
+    void addTrustedNode(sigma_u32 node_id) {
+        sigma_log("[TRUST] Node 0x%04X added to the Sovereign Trust Fabric.\n", node_id);
         this->m_trusted_nodes++;
     }
 
@@ -64,7 +64,7 @@ extern "C" bool trust_verify(const char* shard, const char* sig) {
     return SigmaOS::Kernel::Security::SovereignTrustFabric::getInstance().verifyShardTrust(shard, sig);
 }
 
-extern "C" void trust_add_node(uint32_t id) {
+extern "C" void trust_add_node(sigma_u32 id) {
     SigmaOS::Kernel::Security::SovereignTrustFabric::getInstance().addTrustedNode(id);
 }
 

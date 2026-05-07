@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Audit (SovereignAudit)
@@ -27,14 +27,14 @@ public:
     }
 
     void logEvent(const char* shard_id, const char* event_desc) {
-        sigma_printf("[AUDIT] [%s]: %s\n", shard_id, event_desc);
+        sigma_log("[AUDIT] [%s]: %s\n", shard_id, event_desc);
         sigma_log("[AUDIT] Signing event blob with Sovereign Private Key...");
         sigma_log("[AUDIT] Pinning audit fragment to SovereignVault Blockchain.");
         this->m_audit_entries++;
     }
 
     void performIntegrityCheck() {
-        sigma_printf("[AUDIT] Integrity Check: %u entries verified via Merkle-Root.\n", this->m_audit_entries);
+        sigma_log("[AUDIT] Integrity Check: %u entries verified via Merkle-Root.\n", this->m_audit_entries);
     }
 
 private:

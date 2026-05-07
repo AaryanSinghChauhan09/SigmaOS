@@ -9,7 +9,7 @@
 #ifndef SIGMA_LOG_H
 #define SIGMA_LOG_H
 
-#include "sigma_types.h"
+#include "core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,6 +27,7 @@ typedef struct {
     char message[128];
 } sigma_log_entry_t;
 
+
 /* --- Log Primitives --- */
 void      log_init(void);
 void      log_emit(sigma_u32 severity, const char* message);
@@ -34,23 +35,17 @@ void      log_emit_f(sigma_u32 severity, const char* format, ...);
 void      log_dump_lattice(void);
 sigma_u64 log_get_total_emitted(void);
 
-/* --- Compat aliases: map sigma_log/sigma_printf → log_emit --- */
-#ifndef sigma_log
-#define sigma_log(msg)          log_emit(LOG_INFO, (msg))
-#endif
-
-#ifndef sigma_log_level
-#define sigma_log_level(lvl, msg) log_emit((lvl), (msg))
-#endif
-
-/* sigma_printf: formatted kernel print (maps to kprintf defined in sigma_kernel_types.h) */
-#ifndef sigma_printf
 #ifdef __cplusplus
 extern "C"
 #endif
 void kprintf(const char* fmt, ...);
-#define sigma_printf(fmt, ...)  kprintf((fmt), ##__VA_ARGS__)
-#endif
+
+/* --- Industrial Logging Macros --- */
+#define sigma_log(fmt, ...)      kprintf((fmt), ##__VA_ARGS__)
+#define sigma_log_info(fmt, ...) log_emit_f(LOG_INFO, (fmt), ##__VA_ARGS__)
+#define sigma_log_warn(fmt, ...) log_emit_f(LOG_WARN, (fmt), ##__VA_ARGS__)
+#define sigma_log_err(fmt, ...)  log_emit_f(LOG_ERROR, (fmt), ##__VA_ARGS__)
+
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,6 @@
-#include "../../include/SovereignLibC.h"
-#include "sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
 #include "sigma_transpiler.h"
 
 
@@ -24,8 +25,8 @@ public:
         this->state.transpilation_active = true;
     }
 
-    void autoMap(uint32_t device_id) {
-        sigma_printf("[TRANSPILER] Analyzing device 0x%04X for silicon-native mapping...\n", device_id);
+    void autoMap(sigma_u32 device_id) {
+        sigma_log("[TRANSPILER] Analyzing device 0x%04X for silicon-native mapping...\n", device_id);
         // Logic to bridge generic IR to silicon-specific instructions
         sigma_log("[TRANSPILER] Transpilation complete. Hardware sharding active.");
     }
@@ -43,6 +44,6 @@ extern "C" void transpiler_init() {
     SovereignTranspilerEngine::getInstance().init();
 }
 
-extern "C" void transpiler_auto_map(uint32_t device_id) {
+extern "C" void transpiler_auto_map(sigma_u32 device_id) {
     SovereignTranspilerEngine::getInstance().autoMap(device_id);
 }

@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Zero-Trust Enforcer Shard
@@ -28,18 +28,18 @@ public:
     }
 
     bool verifyAccess(const char* identity_hash, const char* resource_id) {
-        sigma_printf("Σ [ZERO-TRUST]: Verifying continuous access token for %s -> %s...\n", identity_hash, resource_id);
+        sigma_log("Σ [ZERO-TRUST]: Verifying continuous access token for %s -> %s...\n", identity_hash, resource_id);
         // Execute continuous ML-driven anomaly verification
         sigma_log("Σ [ZERO-TRUST]: Verification PASSED. Zero-Trust Access Granted.");
         return true;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN ZERO-TRUST AUDIT ---\n");
-        sigma_printf("| Auth Mode       : CONTINUOUS\n");
-        sigma_printf("| Segmentation    : SHARD-LEVEL\n");
-        sigma_printf("| Threat Intel    : AI-DRIVEN\n");
-        sigma_printf("------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN ZERO-TRUST AUDIT ---\n");
+        sigma_log("| Auth Mode       : CONTINUOUS\n");
+        sigma_log("| Segmentation    : SHARD-LEVEL\n");
+        sigma_log("| Threat Intel    : AI-DRIVEN\n");
+        sigma_log("------------------------------------\n");
     }
 
 private:

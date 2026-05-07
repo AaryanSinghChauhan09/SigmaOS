@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Tracer Shard
@@ -28,15 +29,15 @@ public:
     }
 
     void traceInstruction(sigma_u64 rip, const char* mnemonic) {
-        sigma_printf("Σ [TRACER]: TRACE [0x%016llX] -> %s\n", rip, mnemonic);
+        sigma_log("Σ [TRACER]: TRACE [0x%016llX] -> %s\n", rip, mnemonic);
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN TRACER AUDIT ---\n");
-        sigma_printf("| Active Hooks    : 0\n");
-        sigma_printf("| Trace Mode      : HARDWARE-ACCELERATED\n");
-        sigma_printf("| Safety Boundary : Lattice-Isolation\n");
-        sigma_printf("----------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN TRACER AUDIT ---\n");
+        sigma_log("| Active Hooks    : 0\n");
+        sigma_log("| Trace Mode      : HARDWARE-ACCELERATED\n");
+        sigma_log("| Safety Boundary : Lattice-Isolation\n");
+        sigma_log("----------------------------------\n");
     }
 
 private:

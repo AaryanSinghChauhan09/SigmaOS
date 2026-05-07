@@ -1,5 +1,5 @@
 #include "Lattice.h"
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../../include/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 /**
  * Î£ SIGMA OS: SOVEREIGN CONCEPT GENERATOR (v128.0 - ZERO-STD NATIVE)
@@ -31,8 +31,8 @@ public:
 class RelativityShard : public IConceptShard {
 public:
     void Simulate() override {
-        sigma_printf("[PHYSICS/RELATIVITY]: Concept: E = mc^2 (Mass-Energy Parity).\n");
-        sigma_printf("[PHYSICS/RELATIVITY]: Mass Shard of 1kg = 8.98e16 Joules.\n");
+        sigma_log("[PHYSICS/RELATIVITY]: Concept: E = mc^2 (Mass-Energy Parity).\n");
+        sigma_log("[PHYSICS/RELATIVITY]: Mass Shard of 1kg = 8.98e16 Joules.\n");
     }
     SigmaString GetTitle() override { return "Relativity_Apex"; }
 };
@@ -41,8 +41,8 @@ public:
 class InductionShard : public IConceptShard {
 public:
     void Simulate() override {
-        sigma_printf("[PHYSICS/INDUCTION]: Concept: Faraday's Law (e = -dPhi/dt).\n");
-        sigma_printf("[PHYSICS/INDUCTION]: Induced EMF Shard detected in Shard-Coil.\n");
+        sigma_log("[PHYSICS/INDUCTION]: Concept: Faraday's Law (e = -dPhi/dt).\n");
+        sigma_log("[PHYSICS/INDUCTION]: Induced EMF Shard detected in Shard-Coil.\n");
     }
     SigmaString GetTitle() override { return "Induction_Shard"; }
 };
@@ -51,8 +51,8 @@ public:
 class ThermoDynamicsShard : public IConceptShard {
 public:
     void Simulate() override {
-        sigma_printf("[CHEMISTRY/THERMO]: Concept: Enthalpy (dH) & Entropy (dS).\n");
-        sigma_printf("[CHEMISTRY/THERMO]: Gibbs Free Energy: dG = dH - TdS [Verified].\n");
+        sigma_log("[CHEMISTRY/THERMO]: Concept: Enthalpy (dH) & Entropy (dS).\n");
+        sigma_log("[CHEMISTRY/THERMO]: Gibbs Free Energy: dG = dH - TdS [Verified].\n");
     }
     SigmaString GetTitle() override { return "Enthalpy_Shard"; }
 };
@@ -61,8 +61,8 @@ public:
 class EcologyShard : public IConceptShard {
 public:
     void Simulate() override {
-        sigma_printf("[BIOLOGY/ECOLOGY]: Concept: Energy Flow in Ecosystem (10%% Law).\n");
-        sigma_printf("[BIOLOGY/ECOLOGY]: 1000J Primary -> 100J Secondary -> 10J Tertiary.\n");
+        sigma_log("[BIOLOGY/ECOLOGY]: Concept: Energy Flow in Ecosystem (10%% Law).\n");
+        sigma_log("[BIOLOGY/ECOLOGY]: 1000J Primary -> 100J Secondary -> 10J Tertiary.\n");
     }
     SigmaString GetTitle() override { return "Ecology_Shard"; }
 };
@@ -71,8 +71,8 @@ public:
 class Geometry3DShard : public IConceptShard {
 public:
     void Simulate() override {
-        sigma_printf("[MATH/3D]: Concept: Vectors & 3D Lines (Class 12).\n");
-        sigma_printf("[MATH/3D]: Shortest Distance between Shard-Lines calculated.\n");
+        sigma_log("[MATH/3D]: Concept: Vectors & 3D Lines (Class 12).\n");
+        sigma_log("[MATH/3D]: Shortest Distance between Shard-Lines calculated.\n");
     }
     SigmaString GetTitle() override { return "3D_Geometry_Shard"; }
 };
@@ -93,14 +93,14 @@ public:
         if (m_registry.contains(topic)) {
             m_registry.at(topic)->Simulate();
         } else {
-            sigma_printf("[!] ALERT: Topic Shard '%s' not yet synthesized.\n", topic.c_str());
+            sigma_log("[!] ALERT: Topic Shard '%s' not yet synthesized.\n", topic.c_str());
         }
     }
 
     void RunFullScholasticAudit() {
-        sigma_printf("--- Î£ SIGMA OS SOVEREIGN KNOWLEDGE ZENITH ---\n");
+        sigma_log("--- Î£ SIGMA OS SOVEREIGN KNOWLEDGE ZENITH ---\n");
         for (sigma_usize i = 0; i < m_registry.size(); i++) {
-            sigma_printf("\n------------------------------------------------\n");
+            sigma_log("\n------------------------------------------------\n");
             m_registry.at_index(i)->Simulate();
         }
     }
@@ -111,7 +111,7 @@ extern "C" void _start(void) {
     gen.GenerateAll();
     gen.RunFullScholasticAudit();
 
-    sigma_printf("\n[SUCCESS]: Universal NCERT Concept Generator Active. Mastery Verified.\n");
+    sigma_log("\n[SUCCESS]: Universal NCERT Concept Generator Active. Mastery Verified.\n");
     sigma_exit(0);
 }
 

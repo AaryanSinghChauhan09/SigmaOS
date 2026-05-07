@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: AETHER ABSORPTION (v1.0 - C11 SOVEREIGN)
@@ -11,7 +12,7 @@
  * =============================================================================
  */
 
-#include "../../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 typedef struct AetherAbsorber {
     sigma_u64 absorb_id;

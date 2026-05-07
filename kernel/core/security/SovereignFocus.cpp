@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Focus (S-Focus Shard)
@@ -28,7 +28,7 @@ public:
 
     void activateFocusLock(sigma_u32 level) {
         this->m_focus_active = 1u;
-        sigma_printf("[FOCUS] Focus-Lock ACTIVE (Level: %u). Shielding silicon from non-essential interrupts...\n", level);
+        sigma_log("[FOCUS] Focus-Lock ACTIVE (Level: %u). Shielding silicon from non-essential interrupts...\n", level);
         sigma_log("[FOCUS] Aether-Net: Diverting social/distraction blobs to null-sink.");
         sigma_log("[FOCUS] Shard-Scheduler: Prioritizing focus-task threads on Gold Cores.");
     }

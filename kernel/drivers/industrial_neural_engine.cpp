@@ -1,6 +1,7 @@
+#include "core/sigma_types.h"
 #include "Lattice.h"
 #include "industrial_neural_engine.hpp"
-#include "../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace AI {
@@ -12,18 +13,18 @@ void SovereignNeuralEngine::ProcessSpike(sigma_u32 neuron_id, sigma_u16 potentia
 }
 
 void SovereignNeuralEngine::TrainLatticeModel(const void* data, sigma_size_t size) {
-    sigma_printf("[NEURAL-ENGINE]: Training Sovereign Lattice Model on %llu bytes of silicon telemetry...\n", size);
+    sigma_log("[NEURAL-ENGINE]: Training Sovereign Lattice Model on %llu bytes of silicon telemetry...\n", size);
     (void)data;
-    sigma_printf("[NEURAL-ENGINE]: Model Optimized. Synaptic Weights [STABLE].\n");
+    sigma_log("[NEURAL-ENGINE]: Model Optimized. Synaptic Weights [STABLE].\n");
 }
 
 void SovereignNeuralEngine::Audit() {
-    sigma_printf("\n--- Σ SOVEREIGN NEURAL ENGINE AUDIT ---\n");
-    sigma_printf("| Neuron Count      : %d\n", m_neuron_count);
-    sigma_printf("| Synaptic Updates  : %llu\n", m_synaptic_updates);
-    sigma_printf("| Learning Mode     : REINFORCEMENT-LATTICE\n");
-    sigma_printf("| Hardware Backend  : SILICON-DIRECT-SNN\n");
-    sigma_printf("----------------------------------------\n");
+    sigma_log("\n--- Σ SOVEREIGN NEURAL ENGINE AUDIT ---\n");
+    sigma_log("| Neuron Count      : %d\n", m_neuron_count);
+    sigma_log("| Synaptic Updates  : %llu\n", m_synaptic_updates);
+    sigma_log("| Learning Mode     : REINFORCEMENT-LATTICE\n");
+    sigma_log("| Hardware Backend  : SILICON-DIRECT-SNN\n");
+    sigma_log("----------------------------------------\n");
 }
 
 } // namespace AI

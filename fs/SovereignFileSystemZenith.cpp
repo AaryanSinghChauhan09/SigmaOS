@@ -19,7 +19,9 @@
  * =========================================================================
  */
 
-#include "../include/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
+#include "sigma_log.h"
+
 
 namespace SigmaOS {
 namespace Storage {
@@ -31,14 +33,14 @@ struct ZenithVFSNode {
     bool  is_directory;
 };
 
-class SovereignFileSystemZenith : public SigmaObject {
+class SovereignFileSystemZenith : public SigmaOS::SigmaObject {
 private:
     ZenithVFSNode m_nodes[4096];
     unsigned long m_node_count;
 
 public:
     SovereignFileSystemZenith() : m_node_count(0) {
-        sigma_print("[VFS-SOVEREIGN]: Bootstrapping Sharded-Journaling Silicon File System...\n");
+        sigma_log("[VFS-SOVEREIGN]: Bootstrapping Sharded-Journaling Silicon File System...\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignFileSystemZenith"; }
@@ -47,9 +49,9 @@ public:
     void mount_silicon_shard(const char* name, void* raw_data, unsigned long size) {
         if(m_node_count >= 4096) return;
         
-        sigma_print("[VFS-SOVEREIGN]: Mounting Hardware Shard: ");
-        sigma_print(name);
-        sigma_print("\n");
+        sigma_log("[VFS-SOVEREIGN]: Mounting Hardware Shard: ");
+        sigma_log(name);
+        sigma_log("\n");
         
         m_nodes[m_node_count].name = name;
         m_nodes[m_node_count].data = raw_data;
@@ -59,19 +61,19 @@ public:
     }
 
     void list_files() {
-        sigma_print("\n--- Î£ SOVEREIGN VFS LISTING ---\n");
+        sigma_log("\n--- Î£ SOVEREIGN VFS LISTING ---\n");
         for (unsigned long i = 0; i < m_node_count; i++) {
-            sigma_print("| NATIVE SHARD: ");
-            sigma_print(m_nodes[i].name);
-            sigma_print("\n");
+            sigma_log("| NATIVE SHARD: ");
+            sigma_log(m_nodes[i].name);
+            sigma_log("\n");
         }
-        sigma_print("--------------------------------\n");
+        sigma_log("--------------------------------\n");
     }
 
     void write_native(const char* filename, const char* content) {
-        sigma_print("[VFS-SOVEREIGN]: Atomic commit via Raw Hexadecimal Machine Opcodes: ");
-        sigma_print(filename);
-        sigma_print("\n");
+        sigma_log("[VFS-SOVEREIGN]: Atomic commit via Raw Hexadecimal Machine Opcodes: ");
+        sigma_log(filename);
+        sigma_log("\n");
         
         // Execute raw x86_64 hexadecimal instructions to invoke directly over Hardware
         // SYS_OPEN = mov rax, 2
@@ -102,7 +104,7 @@ extern "C" void start_vfs_zenith() {
 }
 
 int main() {
-    sigma_print("[SIGMA_KERNEL]: Transitioning to Sovereign Finality Layer VFS...\n");
+    sigma_log("[SIGMA_KERNEL]: Transitioning to Sovereign Finality Layer VFS...\n");
     start_vfs_zenith();
     return 0;
 }

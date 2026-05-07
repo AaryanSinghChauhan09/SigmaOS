@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN FIREWALL SHARD (v1.0)
@@ -5,7 +6,7 @@
  * Principles: Shard-Level Packet Filtering & Zero-Trust Mesh.
  * =============================================================================
  */
-#include "../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 typedef struct Rule {
     sigma_u32 src_ip;

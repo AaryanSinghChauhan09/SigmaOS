@@ -1,7 +1,7 @@
-#include "../../../include/sigma_types.h"
-#include "../../../include/SovereignLibC.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 #include "sigma_log.h"
-#include "../../../include/sigma_hal.h"
+#include "hal/sigma_hal.h"
 
 
 /**
@@ -44,7 +44,7 @@ public:
         else if (severity == 2u) tag = "WARN";
         else if (severity == 0u) tag = "DEBUG";
 
-        sigma_printf("[LOG] [%s] %s\n", tag, message);
+        sigma_log("[LOG] [%s] %s\n", tag, message);
     }
 
     void dumpLattice() {
@@ -52,7 +52,7 @@ public:
         sigma_u32 limit = (this->write_ptr > LOG_BUFFER_SIZE) ? LOG_BUFFER_SIZE : this->write_ptr;
         for(sigma_u32 i=0; i < limit; i++) {
             sigma_log_entry_t* entry = &this->circular_buffer[i];
-            sigma_printf("[TRACE] S%u: %s\n", entry->severity, entry->message);
+            sigma_log("[TRACE] S%u: %s\n", entry->severity, entry->message);
         }
     }
 
@@ -82,8 +82,8 @@ extern "C" void log_emit_f(sigma_u32 severity, const char* format, ...) {
     __builtin_va_list args;
     __builtin_va_start(args, format);
     // Note: This is a simplified bypass for industrial stabilization.
-    sigma_printf("[LOG_F] ");
-    // We can't easily pass va_list to sigma_printf if it doesn't support it.
+    sigma_log("[LOG_F] ");
+    // We can't easily pass va_list to sigma_log if it doesn't support it.
     // So we'll just emit the format for now to resolve identifier errors.
     log_emit(severity, format); 
     __builtin_va_end(args);

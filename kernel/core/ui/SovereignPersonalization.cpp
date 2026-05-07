@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Personalization Engine
@@ -30,7 +30,7 @@ public:
         this->telemetry_events_processed++;
         // Simulate local AI predicting the user's next action
         if (this->telemetry_events_processed % 10 == 0) {
-            sigma_printf("[PERSONALIZE] Heuristic Triggered: Suggesting new Workflow based on Context '%s'.\n", context);
+            sigma_log("[PERSONALIZE] Heuristic Triggered: Suggesting new Workflow based on Context '%s'.\n", context);
         }
     }
 

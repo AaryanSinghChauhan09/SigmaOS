@@ -1,6 +1,7 @@
-#include "../../include/SovereignLibC.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Silicon-Native Network Stack (Zenith v100.0)
@@ -29,7 +30,7 @@ public:
          * Packets are zero-copy DMA'd directly to the consuming shard.      */
         this->packets_in++;
         this->bytes_in += size;
-        sigma_printf("[NETSTACK] ZBPA Ingress: %d bytes (total pkts=%llu bytes=%llu).\n",
+        sigma_log("[NETSTACK] ZBPA Ingress: %d bytes (total pkts=%llu bytes=%llu).\n",
                      (int)size,
                      (unsigned long long)this->packets_in,
                      (unsigned long long)this->bytes_in);
@@ -40,7 +41,7 @@ public:
         /* ZBPA Algorithm: Egress path zero-copies frame to NIC TX ring.      */
         this->packets_out++;
         this->bytes_out += size;
-        sigma_printf("[NETSTACK] ZBPA Egress: %d bytes (total pkts=%llu bytes=%llu).\n",
+        sigma_log("[NETSTACK] ZBPA Egress: %d bytes (total pkts=%llu bytes=%llu).\n",
                      (int)size,
                      (unsigned long long)this->packets_out,
                      (unsigned long long)this->bytes_out);

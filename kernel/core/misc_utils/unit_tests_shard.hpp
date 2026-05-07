@@ -1,10 +1,10 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef UNIT_TESTS_SHARD_HPP
 #define UNIT_TESTS_SHARD_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -14,7 +14,7 @@ public:
     const char* type_name() const noexcept override { return "SovereignUnitTestShard"; }
 
     void RunShardTests() {
-        sigma_printf("\n--- Î£ SOVEREIGN UNIT TEST NEXUS (v1.0) ---\n");
+        sigma_log("\n--- Î£ SOVEREIGN UNIT TEST NEXUS (v1.0) ---\n");
         
         TestMemoryShard();
         TestSecurityShard();
@@ -22,39 +22,39 @@ public:
         TestHardwareAudit();
         TestNetworkPurity();
         
-        sigma_printf("------------------------------------------\n");
-        sigma_printf("Î£ [TEST]: ALL SHARDS VERIFIED. LATTICE STABLE.\n");
+        sigma_log("------------------------------------------\n");
+        sigma_log("Î£ [TEST]: ALL SHARDS VERIFIED. LATTICE STABLE.\n");
     }
 
 private:
     void TestMemoryShard() {
-        sigma_printf("[TEST]: Shard 0 (Memory)   -> Verifying Slab Allocation...");
+        sigma_log("[TEST]: Shard 0 (Memory)   -> Verifying Slab Allocation...");
         void* ptr = sigma_malloc(1024);
         if (ptr) {
-            sigma_printf(" [PASS]\n");
+            sigma_log(" [PASS]\n");
         } else {
-            sigma_printf(" [FAIL]\n");
+            sigma_log(" [FAIL]\n");
         }
     }
 
     void TestSecurityShard() {
-        sigma_printf("[TEST]: Shard 1 (Security) -> Verifying RBAC Shunts...");
-        sigma_printf(" [PASS]\n");
+        sigma_log("[TEST]: Shard 1 (Security) -> Verifying RBAC Shunts...");
+        sigma_log(" [PASS]\n");
     }
 
     void TestPQCShard() {
-        sigma_printf("[TEST]: Shard 2 (PQC)      -> Verifying Lattice Entropy...");
-        sigma_printf(" [PASS]\n");
+        sigma_log("[TEST]: Shard 2 (PQC)      -> Verifying Lattice Entropy...");
+        sigma_log(" [PASS]\n");
     }
 
     void TestHardwareAudit() {
-        sigma_printf("[TEST]: Shard 3 (Silicon)  -> Verifying PCI Shard Mapping...");
-        sigma_printf(" [PASS]\n");
+        sigma_log("[TEST]: Shard 3 (Silicon)  -> Verifying PCI Shard Mapping...");
+        sigma_log(" [PASS]\n");
     }
 
     void TestNetworkPurity() {
-        sigma_printf("[TEST]: Shard 4 (Network)  -> Verifying Zero-Trace Routing...");
-        sigma_printf(" [PASS]\n");
+        sigma_log("[TEST]: Shard 4 (Network)  -> Verifying Zero-Trace Routing...");
+        sigma_log(" [PASS]\n");
     }
 };
 

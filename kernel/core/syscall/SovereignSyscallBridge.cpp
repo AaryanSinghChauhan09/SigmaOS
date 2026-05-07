@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Syscall Bridge
@@ -31,22 +32,22 @@ public:
         m_calls_handled++;
         switch (sys_num) {
             case 1: // WRITE
-                sigma_printf("[SYSBRIDGE] write(%d, %p, %d)\n", arg1, arg2, arg3);
+                sigma_log("[SYSBRIDGE] write(%d, %p, %d)\n", arg1, arg2, arg3);
                 return arg3;
             case 2: // OPEN
-                sigma_printf("[SYSBRIDGE] open(%s, %X)\n", (const char*)arg1, arg2);
+                sigma_log("[SYSBRIDGE] open(%s, %X)\n", (const char*)arg1, arg2);
                 return 3; // Simulated FD
             default:
-                sigma_printf("[SYSBRIDGE] ERR: Unknown Syscall %d\n", sys_num);
+                sigma_log("[SYSBRIDGE] ERR: Unknown Syscall %d\n", sys_num);
                 return (sigma_u64)-1;
         }
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN SYSBRIDGE AUDIT ---\n");
-        sigma_printf("| Calls Handled   : %llu\n", m_calls_handled);
-        sigma_printf("| Parity Mode     : POSIX-LITE\n");
-        sigma_printf("----------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN SYSBRIDGE AUDIT ---\n");
+        sigma_log("| Calls Handled   : %llu\n", m_calls_handled);
+        sigma_log("| Parity Mode     : POSIX-LITE\n");
+        sigma_log("----------------------------------\n");
     }
 
 private:

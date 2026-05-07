@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN SEARCH (v100.0 - PURE C11)
@@ -9,7 +10,7 @@
  * =========================================================================
  */
 
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 /* =========================================================================
  * Search Result (replaces SigmaString return)
@@ -33,8 +34,8 @@ typedef struct SovereignSearch {
 /* --- Init (replaces C++ constructor) --- */
 static void search_init(SovereignSearch* s) {
     sigma_memset(s, 0, sizeof(*s));
-    sigma_printf("[SOVEREIGN_SEARCH]: Bootstrapping Military-Grade Privacy Search.\n");
-    sigma_printf("[SOVEREIGN_SEARCH]: Absorbed SearX, DuckDuckGo, Everything USPs.\n");
+    sigma_log("[SOVEREIGN_SEARCH]: Bootstrapping Military-Grade Privacy Search.\n");
+    sigma_log("[SOVEREIGN_SEARCH]: Absorbed SearX, DuckDuckGo, Everything USPs.\n");
 }
 
 /* --- Add a result shard --- */
@@ -54,9 +55,9 @@ static void search_add_result(SovereignSearch* s,
 
 /* --- Meta-search across 100+ engines (replaces C++ method) --- */
 static void search_meta(SovereignSearch* s, const char* query) {
-    sigma_printf("[SEARCH_META]: Aggregating shards for: '%s'\n", query);
-    sigma_printf("[SEARCH_META]: Removing Tracker Pixels/Cookies... Zero metadata leaked.\n");
-    sigma_printf("[SEARCH_META]: Locally ranking %u+ engine shards.\n", 100u);
+    sigma_log("[SEARCH_META]: Aggregating shards for: '%s'\n", query);
+    sigma_log("[SEARCH_META]: Removing Tracker Pixels/Cookies... Zero metadata leaked.\n");
+    sigma_log("[SEARCH_META]: Locally ranking %u+ engine shards.\n", 100u);
 
     /* Simulated top results */
     search_add_result(s, "SigmaOS Sovereign Architecture", "sigma://internal");
@@ -68,35 +69,35 @@ static void search_meta(SovereignSearch* s, const char* query) {
 
 /* --- MFT instant local file search (replaces broken << operator) --- */
 static void search_local_files(SovereignSearch* s, const char* pattern) {
-    sigma_printf("[SEARCH_LOCAL]: SCANNING VFS MASTER FILE TABLE FOR '%s'...\n", pattern);
+    sigma_log("[SEARCH_LOCAL]: SCANNING VFS MASTER FILE TABLE FOR '%s'...\n", pattern);
     /* REPZ CMPSB â€ MFT byte-scan shard */
     __asm__ __volatile__(
         "xor %%rcx, %%rcx\n\t"
         "repz cmpsb"
         ::: "rcx","rdi","rsi","memory");
-    sigma_printf("[SEARCH_LOCAL]: Time-to-find: 0.001ms. Shard-Links online.\n");
+    sigma_log("[SEARCH_LOCAL]: Time-to-find: 0.001ms. Shard-Links online.\n");
     s->queries_served++;
 }
 
 /* --- Tor Onion routing shard (replaces C++ method) --- */
 static void search_onion(SovereignSearch* s) {
-    sigma_printf("[SEARCH_ONION]: ROUTING SEARCH VIA PRIVACY ENCLAVE ENCRYPTED HOPS...\n");
-    sigma_printf("[SEARCH_ONION]: 3-hop Lattice-PQC-V5 circuit established.\n");
+    sigma_log("[SEARCH_ONION]: ROUTING SEARCH VIA PRIVACY ENCLAVE ENCRYPTED HOPS...\n");
+    sigma_log("[SEARCH_ONION]: 3-hop Lattice-PQC-V5 circuit established.\n");
     s->onion_active = SIGMA_TRUE;
 }
 
 /* --- Print results --- */
 static void search_print_results(const SovereignSearch* s) {
-    sigma_printf("\n--- Î£ META-SEARCH RESULTS ---\n");
+    sigma_log("\n--- Î£ META-SEARCH RESULTS ---\n");
     sigma_u32 i;
     for (i = 0; i < s->result_count; i++) {
-        sigma_printf("| [%llu] %s  (%s)\n",
+        sigma_log("| [%llu] %s  (%s)\n",
                      s->results[i].rank,
                      s->results[i].title,
                      s->results[i].source);
     }
-    sigma_printf("| Onion : %s\n", s->onion_active ? "ACTIVE" : "OFF");
-    sigma_printf("-----------------------------\n");
+    sigma_log("| Onion : %s\n", s->onion_active ? "ACTIVE" : "OFF");
+    sigma_log("-----------------------------\n");
 }
 
 /* =========================================================================
@@ -111,7 +112,7 @@ int main(void) {
     search_local_files(&search, "sigma*.bin");
     search_print_results(&search);
 
-    sigma_printf("\n[SUCCESS]: Military-Grade Privacy Search. Tracker-Free.\n");
+    sigma_log("\n[SUCCESS]: Military-Grade Privacy Search. Tracker-Free.\n");
     return 0;
 }
 

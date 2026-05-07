@@ -1,10 +1,10 @@
 #ifndef CLOUD_ORCHESTRATOR_HPP
 #define CLOUD_ORCHESTRATOR_HPP
 
-#include "../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "../../include/sigma_types.h"
-#include "../../include/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Net {
@@ -25,7 +25,7 @@ private:
 
 public:
     SovereignCloudOrchestrator() : m_active_nodes(0), m_global_throughput(0), m_inter_cloud_sync(SIGMA_TRUE) {
-        sigma_printf("[CLOUD-ORCH]: Sovereign Cluster Nexus [ACTIVE].\n");
+        sigma_log("[CLOUD-ORCH]: Sovereign Cluster Nexus [ACTIVE].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignCloudOrchestrator"; }

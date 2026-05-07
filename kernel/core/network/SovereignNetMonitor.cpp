@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "sigma_netmonitor.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 #include "sigma_zeronet.h"
 #include "sigma_sentinel.h"
 
@@ -27,8 +27,8 @@ extern "C" void netmonitor_poll_traffic() {
     sigma_log("[NETMONITOR] PSTT: Anomaly scan complete. No suspicious exfiltration detected.");
 }
 
-extern "C" void netmonitor_throttle_shard(uint32_t shard_id, uint32_t max_kbps) {
-    sigma_printf("[NETMONITOR] PSTT: Throttling Shard %d to %d KB/s max bandwidth.\n",
+extern "C" void netmonitor_throttle_shard(sigma_u32 shard_id, sigma_u32 max_kbps) {
+    sigma_log("[NETMONITOR] PSTT: Throttling Shard %d to %d KB/s max bandwidth.\n",
                  shard_id, max_kbps);
 }
 

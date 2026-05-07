@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Hot Corners & Split Snapping Engine
@@ -35,17 +35,17 @@ public:
     void setHotCorner(sigma_corner_t corner, const char* action) {
         sigma_hardened_strcpy(this->corner_actions[corner], action, 32);
         const char* names[] = {"TOP-LEFT", "TOP-RIGHT", "BOTTOM-LEFT", "BOTTOM-RIGHT"};
-        sigma_printf("[SPATIAL-UI] Hot Corner %s -> '%s' registered.\n", names[corner], action);
+        sigma_log("[SPATIAL-UI] Hot Corner %s -> '%s' registered.\n", names[corner], action);
     }
 
     void triggerCorner(sigma_corner_t corner) {
-        sigma_printf("[SPATIAL-UI] Hot Corner triggered! Executing: '%s'\n",
+        sigma_log("[SPATIAL-UI] Hot Corner triggered! Executing: '%s'\n",
                      this->corner_actions[corner]);
     }
 
     void snapWindow(sigma_u32 window_id, const char* snap_zone) {
         // snap_zone: "left-half", "right-half", "top-half", "bottom-half", "quarter-TL", etc.
-        sigma_printf("[SPATIAL-UI] Window %u snapped to '%s' zone. Zenith MLC recompositing.\n",
+        sigma_log("[SPATIAL-UI] Window %u snapped to '%s' zone. Zenith MLC recompositing.\n",
                      window_id, snap_zone);
     }
 

@@ -1,7 +1,8 @@
+#include "core/sigma_types.h"
 #ifndef COMPOSITOR_HPP
 #define COMPOSITOR_HPP
 
-#include "../../../include/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Graphics {

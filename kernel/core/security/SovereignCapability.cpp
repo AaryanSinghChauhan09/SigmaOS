@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 /**
  * SigmaOS Sovereign Capability Vault
@@ -39,7 +39,7 @@ public:
     sigma_capability_t issueToken(sigma_u32 resource_id, sigma_u32 permissions) {
         sigma_capability_t token = ((sigma_capability_t)resource_id << 32) | permissions;
         this->tokens_issued++;
-        sigma_printf("Σ [CAP-VAULT]: Issued Token 0x%llX for Resource %u\n", token, resource_id);
+        sigma_log("Σ [CAP-VAULT]: Issued Token 0x%llX for Resource %u\n", token, resource_id);
         return token;
     }
 

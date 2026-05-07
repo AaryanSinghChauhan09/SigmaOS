@@ -1,6 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "sigma_virtio.h"
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "drivers/sigma_virtio.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -17,7 +18,7 @@ void SovereignVirtio::init() {
 }
 
 bool SovereignVirtio::probeDevice(sigma_u32 device_id) {
-    sigma_printf("[VIRTIO] Probing PCI Slot %u for Virtio capabilities...\n", device_id);
+    sigma_log("[VIRTIO] Probing PCI Slot %u for Virtio capabilities...\n", device_id);
     
     // Simulate Virtio Magic Check (0x74726976)
     sigma_log("[VIRTIO] Virtio Magic Found. Device Type: BLOCK_STORAGE.");
@@ -26,7 +27,7 @@ bool SovereignVirtio::probeDevice(sigma_u32 device_id) {
 }
 
 void SovereignVirtio::resetDevice(sigma_u32 device_id) {
-    sigma_printf("[VIRTIO] Resetting device %u status register...\n", device_id);
+    sigma_log("[VIRTIO] Resetting device %u status register...\n", device_id);
 }
 
 } // namespace HAL

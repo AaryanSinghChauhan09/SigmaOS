@@ -1,10 +1,10 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef POWER_SHARD_HPP
 #define POWER_SHARD_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 #include "port_shard.hpp"
 
 namespace SigmaOS {
@@ -15,7 +15,7 @@ public:
     const char* type_name() const noexcept override { return "SovereignPowerShard"; }
 
     void Shutdown() {
-        sigma_printf("[POWER-SHARD]: Initiating Sovereign Shutdown Shunt (ACPI S5)...\n");
+        sigma_log("[POWER-SHARD]: Initiating Sovereign Shutdown Shunt (ACPI S5)...\n");
 #if defined(SIGMA_ARCH_X86_64)
         // QEMU/VirtualBox specific shutdown port (simulated)
         SovereignPortShard::outw(0x604, 0x2000);
@@ -23,18 +23,18 @@ public:
     }
 
     void Reboot() {
-        sigma_printf("[POWER-SHARD]: Initiating Sovereign Reboot Shunt (PS/2 Controller)...\n");
+        sigma_log("[POWER-SHARD]: Initiating Sovereign Reboot Shunt (PS/2 Controller)...\n");
 #if defined(SIGMA_ARCH_X86_64)
         SovereignPortShard::outb(0x64, 0xFE);
 #endif
     }
 
     void AuditPower() {
-        sigma_printf("\n--- Î£ SOVEREIGN POWER AUDIT ---\n");
-        sigma_printf("| Energy State   : S0 (Operational Shard)\n");
-        sigma_printf("| Battery Shard  : 100%% [ZENITH-CHARGE]\n");
-        sigma_printf("| Thermal Shunt  : OPTIMAL (42 C)\n");
-        sigma_printf("-------------------------------\n");
+        sigma_log("\n--- Î£ SOVEREIGN POWER AUDIT ---\n");
+        sigma_log("| Energy State   : S0 (Operational Shard)\n");
+        sigma_log("| Battery Shard  : 100%% [ZENITH-CHARGE]\n");
+        sigma_log("| Thermal Shunt  : OPTIMAL (42 C)\n");
+        sigma_log("-------------------------------\n");
     }
 };
 

@@ -1,6 +1,7 @@
-#include "../../include/SovereignLibC.h"
-#include "sigma_bluetooth.h"
-#include "sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "drivers/sigma_bluetooth.h"
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Bluetooth Stack (v100.0 Zenith)
@@ -42,13 +43,13 @@ extern "C" void bt_disable() {
 }
 
 extern "C" void bt_start_scan(sigma_u32 duration_ms) {
-    sigma_printf("[BT] DHO: Starting silicon-native scan (%ums)...\n", (unsigned)duration_ms);
+    sigma_log("[BT] DHO: Starting silicon-native scan (%ums)...\n", (unsigned)duration_ms);
     sigma_log("[BT] DHO: Scan results streaming to Sovereign Lattice.");
 }
 
 extern "C" void bt_pair(const sigma_u8* addr) {
     if (!addr) return;
-    sigma_printf("[BT] DHO: Pairing with device %02X:%02X:%02X...\n", addr[0], addr[1], addr[2]);
+    sigma_log("[BT] DHO: Pairing with device %02X:%02X:%02X...\n", addr[0], addr[1], addr[2]);
     SovereignBTEngine.config.paired_count++;
     sigma_log("[BT] DHO: Cryptographic pairing SUCCESS.");
 }

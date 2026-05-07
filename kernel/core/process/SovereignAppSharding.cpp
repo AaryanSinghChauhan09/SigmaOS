@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Application Sharding Manager
@@ -30,20 +31,20 @@ public:
     }
 
     void shardApp(const char* app_name, sigma_u32 shard_count) {
-        sigma_printf("Î£ [APP-SHARDING]: Partitioning application '%s' into %u shards...\n", app_name, shard_count);
+        sigma_log("Î£ [APP-SHARDING]: Partitioning application '%s' into %u shards...\n", app_name, shard_count);
         // Bind shards to the Mesh Lattice and Orb Manager
         m_active_apps++;
         m_total_shards += shard_count;
         
-        sigma_printf("Î£ [APP-SHARDING]: Application '%s' successfully distributed across %u nodes.\n", app_name, shard_count);
+        sigma_log("Î£ [APP-SHARDING]: Application '%s' successfully distributed across %u nodes.\n", app_name, shard_count);
     }
 
     void audit() {
-        sigma_printf("\n--- Î£ SOVEREIGN APP-SHARDING AUDIT ---\n");
-        sigma_printf("| Active Apps     : %u\n", m_active_apps);
-        sigma_printf("| Total Shards    : %u\n", m_total_shards);
-        sigma_printf("| Fabric Status   : ORCHESTRATED\n");
-        sigma_printf("--------------------------------------\n");
+        sigma_log("\n--- Î£ SOVEREIGN APP-SHARDING AUDIT ---\n");
+        sigma_log("| Active Apps     : %u\n", m_active_apps);
+        sigma_log("| Total Shards    : %u\n", m_total_shards);
+        sigma_log("| Fabric Status   : ORCHESTRATED\n");
+        sigma_log("--------------------------------------\n");
     }
 
 private:

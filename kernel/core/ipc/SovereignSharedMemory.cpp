@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "sigma_ipc.h"
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "system/sigma_ipc.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -12,17 +12,17 @@ void SovereignSharedMemory::init() {
 }
 
 void* SovereignSharedMemory::createSegment(const char* segment_id, sigma_usize size) {
-    sigma_printf("Σ [SHMEM]: Creating Shared Segment '%s' (%lu bytes)...\n", segment_id, size);
+    sigma_log("Σ [SHMEM]: Creating Shared Segment '%s' (%lu bytes)...\n", segment_id, size);
     // Future implementation: Silicon-direct mapping via VMM
     return SIGMA_NULL;
 }
 
 void SovereignSharedMemory::audit() {
-    sigma_printf("\n--- Σ SOVEREIGN SHMEM AUDIT ---\n");
-    sigma_printf("| Active Segments : 0\n");
-    sigma_printf("| Transfer Mode   : ZERO-COPY (Silicon-Direct)\n");
-    sigma_printf("| Safety Model    : Lattice-Isolation\n");
-    sigma_printf("--------------------------------\n");
+    sigma_log("\n--- Σ SOVEREIGN SHMEM AUDIT ---\n");
+    sigma_log("| Active Segments : 0\n");
+    sigma_log("| Transfer Mode   : ZERO-COPY (Silicon-Direct)\n");
+    sigma_log("| Safety Model    : Lattice-Isolation\n");
+    sigma_log("--------------------------------\n");
 }
 
 } // namespace IPC

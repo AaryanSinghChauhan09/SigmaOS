@@ -1,8 +1,9 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/sigma_aisched.h"
-#include "../../../include/SovereignNeuralNexus.hpp"
-#include "../../../include/SovereignVFS.hpp"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "ai/sigma_aisched.h"
+#include "SovereignNeuralNexus.hpp"
+#include "fs/SovereignVFS.hpp"
 
 extern "C" void neural_init();
 extern "C" void vfs_init();
@@ -54,7 +55,7 @@ public:
         vfs_init();
         SigmaOS::Kernel::FS::SovereignDistributedVFS::getInstance().atomicSync();
         
-        sigma_printf("[INIT] ASI: Parallel Group Ignited. 600 Shards Active.\n");
+        sigma_log("[INIT] ASI: Parallel Group Ignited. 600 Shards Active.\n");
     }
 
 

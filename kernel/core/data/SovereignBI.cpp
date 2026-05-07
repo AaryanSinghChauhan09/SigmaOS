@@ -1,5 +1,5 @@
-#include "../../../include/sigma_data_forge.h"
-#include "../../../include/SovereignLibC.h"
+#include "sigma_data_forge.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {

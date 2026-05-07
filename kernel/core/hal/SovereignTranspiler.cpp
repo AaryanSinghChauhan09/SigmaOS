@@ -1,6 +1,6 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 
 /**
  * SigmaOS Self-Learning Hardware Transpiler (v100.0 Zenith)
@@ -28,7 +28,7 @@ extern "C" void transpiler_init() {
 
 extern "C" void transpiler_map_hardware() {
     sigma_log("[TRANSPILER] UMSM: Scanning silicon architecture...");
-    sigma_printf("[TRANSPILER] UMSM: Architecture %u detected. Mapping IA32/AMD64 registers to shards...\n", 
+    sigma_log("[TRANSPILER] UMSM: Architecture %u detected. Mapping IA32/AMD64 registers to shards...\n", 
                  SovereignTranspilerEngine.architecture_id);
     
     SovereignTranspilerEngine.mapped_registers = 256u;
@@ -36,7 +36,7 @@ extern "C" void transpiler_map_hardware() {
 }
 
 extern "C" void transpiler_cross_transpile(sigma_u32 target_arch) {
-    sigma_printf("[TRANSPILER] UMSM: Initiating cross-transpilation to Arch %u...\n", target_arch);
+    sigma_log("[TRANSPILER] UMSM: Initiating cross-transpilation to Arch %u...\n", target_arch);
     sigma_log("[TRANSPILER] UMSM: Shard logic successfully decoupled from physical silicon.");
 }
 

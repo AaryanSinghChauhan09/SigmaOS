@@ -10,7 +10,7 @@
 #ifndef SIGMA_OMNISYNC_H
 #define SIGMA_OMNISYNC_H
 
-#include "sigma_types.h"
+#include "core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,11 +1,11 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef DEVICE_MANAGER_HPP
 #define DEVICE_MANAGER_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 // display_driver.hpp removed (not used directly)
 
 namespace SigmaOS {
@@ -26,7 +26,7 @@ private:
 
 public:
     SovereignDeviceManager() : m_device_count(0), m_io_throughput(0) {
-        sigma_printf("[DEVICE-MANAGER]: Sovereign I/O Nexus [ACTIVE].\n");
+        sigma_log("[DEVICE-MANAGER]: Sovereign I/O Nexus [ACTIVE].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignDeviceManager"; }

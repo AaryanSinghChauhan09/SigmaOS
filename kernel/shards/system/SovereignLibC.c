@@ -11,8 +11,8 @@
  * ==========================================================================
  */
 
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 /* va_list support in freestanding mode via compiler builtins */
 #ifndef va_list
@@ -112,7 +112,7 @@ void sigma_print_hex(sigma_u64 val) {
 }
 
 /* Minimal freestanding printf — supports %s, %d, %u, %x, %llu, %p, %c */
-void sigma_printf(const char* format, ...) {
+void sigma_log(const char* format, ...) {
     if (!format) return;
     char buf[512];
     int bi = 0;

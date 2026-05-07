@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Task Automator (S-TaskAutomator)
@@ -26,7 +26,7 @@ public:
     }
 
     void processRequest(const char* nlp_prompt) {
-        sigma_printf("[TASK-AUTO] Decoding NLP Intent: '%s'\n", nlp_prompt);
+        sigma_log("[TASK-AUTO] Decoding NLP Intent: '%s'\n", nlp_prompt);
         
         // Pseudo-NLP intent mapping
         if (sigma_strstr(nlp_prompt, "optimize memory")) {

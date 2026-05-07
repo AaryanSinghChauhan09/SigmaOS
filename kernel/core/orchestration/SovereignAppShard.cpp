@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 #include "SovereignAppShard.hpp"
-#include "../../../include/SovereignLibC.h""
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -18,20 +18,20 @@ void SovereignAppShard::init() {
 }
 
 void SovereignAppShard::orchestrate(const char* shard_id) {
-    sigma_printf("Σ [APP-SHARD]: Orchestrating Shard '%s' across silicon lattice...\n", shard_id);
+    sigma_log("Σ [APP-SHARD]: Orchestrating Shard '%s' across silicon lattice...\n", shard_id);
     m_active_shards++;
     // Logic for distributed execution mapping
 }
 
 void SovereignAppShard::de_shard(const char* shard_id) {
-    sigma_printf("Σ [APP-SHARD]: De-orchestrating Shard '%s'...\n", shard_id);
+    sigma_log("Σ [APP-SHARD]: De-orchestrating Shard '%s'...\n", shard_id);
     if (m_active_shards > 0) m_active_shards--;
 }
 
 void SovereignAppShard::listActiveShards() {
-    sigma_printf("\n--- Σ ACTIVE APP SHARDS ---\n");
-    sigma_printf("| Active Shards : %u\n", m_active_shards);
-    sigma_printf("---------------------------\n");
+    sigma_log("\n--- Σ ACTIVE APP SHARDS ---\n");
+    sigma_log("| Active Shards : %u\n", m_active_shards);
+    sigma_log("---------------------------\n");
 }
 
 } // namespace Core

@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Peripheral Manager Shard
@@ -28,16 +28,16 @@ public:
     }
 
     void handleHotSwap(const char* device_id, bool is_plugged) {
-        sigma_printf("Σ [PERIPHERAL]: %s Event -> Device '%s' (Mapping to Lattice).\n", 
+        sigma_log("Σ [PERIPHERAL]: %s Event -> Device '%s' (Mapping to Lattice).\n", 
                      is_plugged ? "ATTACH" : "DETACH", device_id);
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN PERIPHERAL AUDIT ---\n");
-        sigma_printf("| Connected Devices : 2 (USB-HID, NVMe)\n");
-        sigma_printf("| Rule Mode         : LATTICE-UDEX (Dynamic)\n");
-        sigma_printf("| Security Policy   : EXPLICIT-MOUNT-ONLY\n");
-        sigma_printf("------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN PERIPHERAL AUDIT ---\n");
+        sigma_log("| Connected Devices : 2 (USB-HID, NVMe)\n");
+        sigma_log("| Rule Mode         : LATTICE-UDEX (Dynamic)\n");
+        sigma_log("| Security Policy   : EXPLICIT-MOUNT-ONLY\n");
+        sigma_log("------------------------------------\n");
     }
 
 private:

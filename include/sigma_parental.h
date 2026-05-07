@@ -10,7 +10,7 @@
 #ifndef SIGMA_PARENTAL_H
 #define SIGMA_PARENTAL_H
 
-#include "sigma_types.h"
+#include "core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

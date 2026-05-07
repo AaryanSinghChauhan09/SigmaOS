@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 #include "sigma_nanolib.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Nano-Library
@@ -14,14 +14,14 @@ extern "C" void nanolib_init() {
     sigma_log("[NANOLIB] Initializing Sovereign Nano-Library Core (HOB Algorithm)...");
 }
 
-extern "C" uint32_t nanolib_strlen(const char* str) {
+extern "C" sigma_u32 nanolib_strlen(const char* str) {
     // HOB: Vectorized string length calculation (Simulated)
     const char* s;
     for (s = str; *s; ++s);
     return (s - str);
 }
 
-extern "C" void* nanolib_memcpy(void* dest, const void* src, uint32_t n) {
+extern "C" void* nanolib_memcpy(void* dest, const void* src, sigma_u32 n) {
     // HOB: Block-aligned, AVX-accelerated memory copy (Simulated)
     char* d = (char*)dest;
     const char* s = (const char*)src;
@@ -38,7 +38,7 @@ extern "C" int nanolib_strcmp(const char* s1, const char* s2) {
     return *(const unsigned char*)s1 - *(const unsigned char*)s2;
 }
 
-extern "C" void* nanolib_memset(void* s, int c, uint32_t n) {
+extern "C" void* nanolib_memset(void* s, int c, sigma_u32 n) {
     // HOB: Block-aligned zeroing for sensitive memory lattice areas
     unsigned char* p = (unsigned char*)s;
     while (n--) *p++ = (unsigned char)c;

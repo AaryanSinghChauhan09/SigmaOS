@@ -1,7 +1,7 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 #include "sigma_micro.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Micro Implementation
@@ -22,12 +22,12 @@ public:
         sigma_log("[MICRO] Initializing Sovereign Micro-Orchestrator (ISM Algorithm)...");
     }
 
-    bool spawnIsolatedShard(uint32_t shard_id, sigma_micro_context_t /*context*/) {
+    bool spawnIsolatedShard(sigma_u32 shard_id, sigma_micro_context_t /*context*/) {
 
         // ISM (Isolated Service Mediation) Algorithm
         // Orchestrates shard execution within restricted silicon memory domains.
         
-        sigma_printf("[MICRO] ISM: Spawning Isolated Shard S%02d...\n", shard_id);
+        sigma_log("[MICRO] ISM: Spawning Isolated Shard S%02d...\n", shard_id);
         
         // Simulate silicon-native domain setup
         sigma_log("[MICRO] ISM: Page Directory Isolation COMPLETE.");
@@ -36,10 +36,10 @@ public:
         return true;
     }
 
-    void mediateIPC(uint32_t source_id, uint32_t target_id, void* msg) {
+    void mediateIPC(sigma_u32 source_id, sigma_u32 target_id, void* msg) {
         // ISM: Mediates all cross-shard communication to ensure zero-bypass security.
         (void)msg;
-        sigma_printf("[MICRO] ISM: Mediating IPC (S%02d -> S%02d) [SECURE].\n", source_id, target_id);
+        sigma_log("[MICRO] ISM: Mediating IPC (S%02d -> S%02d) [SECURE].\n", source_id, target_id);
     }
 
 private:
@@ -51,11 +51,11 @@ extern "C" void micro_init() {
     SovereignMicroEngine::getInstance().init();
 }
 
-extern "C" bool micro_spawn_isolated_shard(uint32_t shard_id, sigma_micro_context_t context) {
+extern "C" bool micro_spawn_isolated_shard(sigma_u32 shard_id, sigma_micro_context_t context) {
     return SovereignMicroEngine::getInstance().spawnIsolatedShard(shard_id, context);
 }
 
-extern "C" void micro_mediate_ipc(uint32_t source_id, uint32_t target_id, void* msg) {
+extern "C" void micro_mediate_ipc(sigma_u32 source_id, sigma_u32 target_id, void* msg) {
     SovereignMicroEngine::getInstance().mediateIPC(source_id, target_id, msg);
 }
 

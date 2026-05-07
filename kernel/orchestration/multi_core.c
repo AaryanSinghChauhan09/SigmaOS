@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: MULTI-CORE ORCHESTRATION (v1.0)
@@ -5,7 +6,7 @@
  * Principles: CPU-Local State (GS-Base) & Scalable Sharding.
  * =============================================================================
  */
-#include "../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 typedef struct CPU {
     sigma_u32     id;

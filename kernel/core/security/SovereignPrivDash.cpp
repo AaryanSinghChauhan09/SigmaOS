@@ -1,9 +1,9 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "sigma_privdash.h"
-#include "../../../include/sigma_hal.h""
-#include "sigma_telemetry.h"
+#include "hal/sigma_hal.h"
+#include "observability/sigma_telemetry.h"
 #include "sigma_sentinel.h"
 
 /**
@@ -24,8 +24,8 @@ extern "C" void privdash_list_active_permissions() {
     sigma_log("[PRIVDASH] TDFA: Rendering permission matrix on Universal UI.");
 }
 
-extern "C" void privdash_revoke_permission(uint32_t shard_id, const char* permission_name) {
-    sigma_printf("[PRIVDASH] TDFA: Revoking permission '%s' from Shard %d.\n", permission_name, shard_id);
+extern "C" void privdash_revoke_permission(sigma_u32 shard_id, const char* permission_name) {
+    sigma_log("[PRIVDASH] TDFA: Revoking permission '%s' from Shard %d.\n", permission_name, shard_id);
     sigma_log("[PRIVDASH] TDFA: Permission revoked. Shard sandboxed per S-Sentinel policy.");
 }
 

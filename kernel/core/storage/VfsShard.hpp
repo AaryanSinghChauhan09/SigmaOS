@@ -1,4 +1,5 @@
-#include "sigma_hal.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
 /* =========================================================================
  * Σ SIGMAOS: VFS SHARD (v2.0 - OOP SOVEREIGNTY)
  * =========================================================================
@@ -7,9 +8,9 @@
 #ifndef VFS_SHARD_HPP
 #define VFS_SHARD_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -40,7 +41,7 @@ public:
 
     void RegisterNode(VfsNode* node) {
         m_nodes.push_back(node);
-        sigma_printf("[VFS]: Registered Node: %s\n", node->GetName());
+        sigma_log("[VFS]: Registered Node: %s\n", node->GetName());
     }
 
     VfsNode* FindNode(const char* name) {

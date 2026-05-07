@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-FIREWALL-SHARD (v1.0 - NETFILTER PARITY)
@@ -11,7 +12,7 @@
  * =============================================================================
  */
 
-#include "../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 #define MAX_FIREWALL_RULES 64
 

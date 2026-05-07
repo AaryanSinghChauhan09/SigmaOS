@@ -1,7 +1,7 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 #include "sigma_thermaliq.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Thermal Intelligence (ThermalIQ)

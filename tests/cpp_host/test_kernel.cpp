@@ -1,3 +1,4 @@
+#define SIGMA_HOST
 #include <gtest/gtest.h>
 #include <string.h>
 

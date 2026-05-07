@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Edge Node Shard
@@ -28,18 +29,18 @@ public:
     }
 
     void deployWorkload(const char* workload_id) {
-        sigma_printf("Σ [EDGE]: Deploying edge-optimized workload '%s' to remote silicon...\n", workload_id);
+        sigma_log("Σ [EDGE]: Deploying edge-optimized workload '%s' to remote silicon...\n", workload_id);
         // Dispatch to Edge mesh
         sigma_log("Σ [EDGE]: Workload DEPLOYED. Edge latency reduced to sub-5ms.");
         m_active_workloads++;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN EDGE AUDIT ---\n");
-        sigma_printf("| Active Workloads : %u\n", m_active_workloads);
-        sigma_printf("| Topology         : MESH-DECENTRALIZED\n");
-        sigma_printf("| Trust Model      : ZERO-TRUST EDGE\n");
-        sigma_printf("------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN EDGE AUDIT ---\n");
+        sigma_log("| Active Workloads : %u\n", m_active_workloads);
+        sigma_log("| Topology         : MESH-DECENTRALIZED\n");
+        sigma_log("| Trust Model      : ZERO-TRUST EDGE\n");
+        sigma_log("------------------------------------\n");
     }
 
 private:

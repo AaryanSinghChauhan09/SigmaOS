@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN LATTICE-PQC (v100.0 - PURE C11)
@@ -10,7 +11,7 @@
  * =========================================================================
  */
 
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 /* =========================================================================
  * PQC Constants
@@ -77,13 +78,13 @@ static void pqc_init(SovereignLatticePQC* p) {
     p->quantum_shield_active = SIGMA_FALSE;
     p->encryptions          = 0;
     p->decryptions          = 0;
-    sigma_printf("[SECURITY-ZENITH]: Lattice-PQC Sentinel Online (v100.0). "
+    sigma_log("[SECURITY-ZENITH]: Lattice-PQC Sentinel Online (v100.0). "
                  "Classical encryption is now non-relevant.\n");
 }
 
 /* --- Generate sovereign key shard (replaces C++ generate_sovereign_key()) --- */
 static void pqc_generate_key(SovereignLatticePQC* p) {
-    sigma_printf("[SECURITY-ZENITH]: Generating n=%u Lattice Key Shard (q=%u)...\n",
+    sigma_log("[SECURITY-ZENITH]: Generating n=%u Lattice Key Shard (q=%u)...\n",
                  PQC_DIM, PQC_MODULUS);
 
     sigma_u64 entropy = pqc_entropy();
@@ -104,10 +105,10 @@ static void pqc_generate_key(SovereignLatticePQC* p) {
     p->shard.valid           = SIGMA_TRUE;
     p->quantum_shield_active = SIGMA_TRUE;
 
-    sigma_printf("[SECURITY-ZENITH]: Key ID: ");
+    sigma_log("[SECURITY-ZENITH]: Key ID: ");
     sigma_print_hex(p->key_id);
-    sigma_printf(" | Quantum Shield ACTIVE\n");
-    sigma_printf("[SECURITY-ZENITH]: MAC(a,s) mod q = %u\n",
+    sigma_log(" | Quantum Shield ACTIVE\n");
+    sigma_log("[SECURITY-ZENITH]: MAC(a,s) mod q = %u\n",
                  pqc_poly_mac(p->shard.a, p->shard.s, PQC_DIM, PQC_MODULUS));
 }
 
@@ -120,7 +121,7 @@ static void pqc_encrypt(SovereignLatticePQC* p,
         sigma_print("[SECURITY-ZENITH]: Key not generated. Aborting encrypt.\n");
         return;
     }
-    sigma_printf("[SECURITY-ZENITH]: Sharding Plaintext via Lattice-Vector Transform...\n");
+    sigma_log("[SECURITY-ZENITH]: Sharding Plaintext via Lattice-Vector Transform...\n");
 
     sigma_size_t len = sigma_strlen(plaintext);
     if (len + 13 >= buflen) len = buflen - 14;
@@ -142,16 +143,16 @@ static void pqc_encrypt(SovereignLatticePQC* p,
 
 /* --- Audit (replaces C++ audit() method) --- */
 static void pqc_audit(const SovereignLatticePQC* p) {
-    sigma_printf("\n--- Î£ SOVEREIGN SECURITY AUDIT (v100.0) ---\n");
-    sigma_printf("| PQC Status     : %s\n",
+    sigma_log("\n--- Î£ SOVEREIGN SECURITY AUDIT (v100.0) ---\n");
+    sigma_log("| PQC Status     : %s\n",
                  p->quantum_shield_active ? "ACTIVE (SHIELDED)" : "IDLE");
-    sigma_printf("| Lattice Dim n  : %u\n", PQC_DIM);
-    sigma_printf("| Modulus q      : %u\n", PQC_MODULUS);
-    sigma_printf("| Key ID         : "); sigma_print_hex(p->key_id); sigma_print("\n");
-    sigma_printf("| Encryptions    : %llu\n", p->encryptions);
-    sigma_printf("| Decryptions    : %llu\n", p->decryptions);
-    sigma_printf("| Competitors    : AES-256/RSA-4096 neutralized by PQC.\n");
-    sigma_printf("--------------------------------------\n");
+    sigma_log("| Lattice Dim n  : %u\n", PQC_DIM);
+    sigma_log("| Modulus q      : %u\n", PQC_MODULUS);
+    sigma_log("| Key ID         : "); sigma_print_hex(p->key_id); sigma_print("\n");
+    sigma_log("| Encryptions    : %llu\n", p->encryptions);
+    sigma_log("| Decryptions    : %llu\n", p->decryptions);
+    sigma_log("| Competitors    : AES-256/RSA-4096 neutralized by PQC.\n");
+    sigma_log("--------------------------------------\n");
 }
 
 /* =========================================================================
@@ -165,7 +166,7 @@ void start_security_zenith(void) {
     char cipher[128];
     pqc_encrypt(&pqc, "SIGMA_CORE_V20", cipher, sizeof(cipher));
 
-    sigma_printf("\n[SECURITY-ZENITH]: SHARDED CIPHER: ");
+    sigma_log("\n[SECURITY-ZENITH]: SHARDED CIPHER: ");
     sigma_print_hex((sigma_u64)(sigma_size_t)cipher);
     sigma_print("\n");
 
@@ -173,7 +174,7 @@ void start_security_zenith(void) {
 }
 
 int main(void) {
-    sigma_printf("[SIGMA_SEC]: Bootstrapping Security Zenith (Pure C11 Lattice-PQC)...\n");
+    sigma_log("[SIGMA_SEC]: Bootstrapping Security Zenith (Pure C11 Lattice-PQC)...\n");
     start_security_zenith();
     return 0;
 }

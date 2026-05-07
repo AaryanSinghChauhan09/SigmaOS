@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Quantum Enforcement Shard
@@ -29,18 +30,18 @@ public:
     }
 
     void enforcePolicy(const char* shard_id) {
-        sigma_printf("Î£ [QE-SHARD]: Enforcing Quantum Policy on Shard: %s...\n", shard_id);
+        sigma_log("Î£ [QE-SHARD]: Enforcing Quantum Policy on Shard: %s...\n", shard_id);
         // Bind shard to QKD key and SEL isolation
         m_enforced_policies++;
-        sigma_printf("Î£ [QE-SHARD]: Shard '%s' verified via BB84 Lattice. Security SEALED.\n", shard_id);
+        sigma_log("Î£ [QE-SHARD]: Shard '%s' verified via BB84 Lattice. Security SEALED.\n", shard_id);
     }
 
     void audit() {
-        sigma_printf("\n--- Î£ SOVEREIGN QUANTUM ENFORCEMENT AUDIT ---\n");
-        sigma_printf("| Policies Enforced : %u\n", m_enforced_policies);
-        sigma_printf("| Enforcement Mode  : REAL-TIME-LATTICE\n");
-        sigma_printf("| Trust Level       : QUANTUM-VERIFIED\n");
-        sigma_printf("--------------------------------------------\n");
+        sigma_log("\n--- Î£ SOVEREIGN QUANTUM ENFORCEMENT AUDIT ---\n");
+        sigma_log("| Policies Enforced : %u\n", m_enforced_policies);
+        sigma_log("| Enforcement Mode  : REAL-TIME-LATTICE\n");
+        sigma_log("| Trust Level       : QUANTUM-VERIFIED\n");
+        sigma_log("--------------------------------------------\n");
     }
 
 private:

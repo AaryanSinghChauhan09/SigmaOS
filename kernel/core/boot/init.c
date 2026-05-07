@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 typedef enum {
     SERVICE_STOPPED,
@@ -39,17 +39,17 @@ void sigma_init_register(const char* name, void (*entry)()) {
 }
 
 void sigma_init_start_all() {
-    sigma_printf("[INIT] Starting Sovereign System Services...\n");
+    sigma_log("[INIT] Starting Sovereign System Services...\n");
     for (sigma_u32 i = 0; i < service_count; i++) {
-        sigma_printf("[INIT] Launching Service: %s... ", system_services[i].name);
+        sigma_log("[INIT] Launching Service: %s... ", system_services[i].name);
         system_services[i].state = SERVICE_RUNNING;
         // In a real kernel, we would fork/exec here.
-        sigma_printf("OK (PID: %d)\n", 100 + i);
+        sigma_log("OK (PID: %d)\n", 100 + i);
     }
 }
 
 void sigma_init_main() {
-    sigma_printf("[INIT] Sovereign Init Shard Sequence Initialized.\n");
+    sigma_log("[INIT] Sovereign Init Shard Sequence Initialized.\n");
     // Register default services
     sigma_init_register("sigma_network", SIGMA_NULL);
     sigma_init_register("sigma_fs_mount", SIGMA_NULL);

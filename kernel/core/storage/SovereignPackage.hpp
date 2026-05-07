@@ -1,9 +1,9 @@
-#include "sigma_hal.h"
-#include "SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 #ifndef SOVEREIGN_PACKAGE_HPP
 #define SOVEREIGN_PACKAGE_HPP
 
-#include "sigma_types.h"
+#include "core/sigma_types.h"
 
 class SovereignPackageEngine {
 public:

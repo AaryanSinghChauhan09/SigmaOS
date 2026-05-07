@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Hardware-In-The-Loop (HIL) Simulator Shard
@@ -29,15 +29,15 @@ public:
 
     void injectSensorData(const char* sensor_id, const void* payload, sigma_usize size) {
         (void)payload; (void)size;
-        sigma_printf("Σ [HIL-SIM]: Injecting emulated telemetry for sensor '%s' (Zero-Latency).\n", sensor_id);
+        sigma_log("Σ [HIL-SIM]: Injecting emulated telemetry for sensor '%s' (Zero-Latency).\n", sensor_id);
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN HIL SIMULATOR AUDIT ---\n");
-        sigma_printf("| Timing Model   : DETERMINISTIC\n");
-        sigma_printf("| Resolution     : MICROSECOND\n");
-        sigma_printf("| Target Domain  : AEROSPACE & ROBOTICS\n");
-        sigma_printf("---------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN HIL SIMULATOR AUDIT ---\n");
+        sigma_log("| Timing Model   : DETERMINISTIC\n");
+        sigma_log("| Resolution     : MICROSECOND\n");
+        sigma_log("| Target Domain  : AEROSPACE & ROBOTICS\n");
+        sigma_log("---------------------------------------\n");
     }
 
 private:

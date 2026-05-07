@@ -1,6 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "sigma_pmm.h"
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "hal/sigma_pmm.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -50,7 +51,7 @@ void SovereignPMM::unlockPage(sigma_u64 addr) {
 void SovereignPMM::compactMemory() {
     sigma_log("Σ [PMM]: Initiating Atomic Memory Compaction Shard...");
     // Logic for defragmenting the bitmap lattice
-    sigma_printf("Σ [PMM]: Memory Compaction COMPLETE. Fragmentation reduced to 0.01%.\n");
+    sigma_log("Σ [PMM]: Memory Compaction COMPLETE. Fragmentation reduced to 0.01%.\n");
 }
 
 sigma_u64 SovereignPMM::getUsedMemory() const {

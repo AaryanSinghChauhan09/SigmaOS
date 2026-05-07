@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Standard I/O Router
@@ -30,11 +30,11 @@ public:
         (void)length;
         if (this->echo_to_serial) {
             // Simulated write to COM1
-            sigma_printf("[COM1] %s", buffer);
+            sigma_log("[COM1] %s", buffer);
         }
         if (this->echo_to_framebuffer) {
             // Simulated write to Zenith Framebuffer
-            sigma_printf("[FRAMEBUFFER] %s", buffer);
+            sigma_log("[FRAMEBUFFER] %s", buffer);
         }
     }
 

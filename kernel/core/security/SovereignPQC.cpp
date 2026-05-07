@@ -1,24 +1,25 @@
-#include "../../../include/sigma_pqc.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_log.h"
+#include "core/sigma_types.h"
+#include "security/sigma_pqc.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_log.h"
 
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Security {
 
-SovereignPQCEngine& SovereignPQCEngine::getInstance() {
-    static SovereignPQCEngine instance;
+SigmaOS::Kernel::Security::SovereignPQCEngine& SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance() {
+    static SigmaOS::Kernel::Security::SovereignPQCEngine instance;
     return instance;
 }
 
-void SovereignPQCEngine::init() {
+void SigmaOS::Kernel::Security::SovereignPQCEngine::init() {
     log_emit(LOG_INFO, "[PQC] Initializing Sovereign Post-Quantum Cryptography Nexus (LBSV Algorithm)...");
     this->initialized = 1u;
 }
 
-void SovereignPQCEngine::signShard(sigma_u32 shard_id, sigma_u8* signature) {
+void SigmaOS::Kernel::Security::SovereignPQCEngine::signShard(sigma_u32 shard_id, sigma_u8* signature) {
     /* LBSV (Lattice-Based Shard Verification) Algorithm Simulation
      * Generates signatures using entropy derived from silicon-native lattice noise (TSC). */
     
@@ -35,7 +36,7 @@ void SovereignPQCEngine::signShard(sigma_u32 shard_id, sigma_u8* signature) {
 }
 
 
-bool SovereignPQCEngine::verifyShard(sigma_u32 shard_id, const sigma_u8* signature) {
+bool SigmaOS::Kernel::Security::SovereignPQCEngine::verifyShard(sigma_u32 shard_id, const sigma_u8* signature) {
     log_emit_f(LOG_INFO, "[PQC] LBSV: Verifying Shard S%02u integrity...", (unsigned)shard_id);
     /* Use shard_id in the verify path to derive an expected checksum */
     sigma_u8 expected_first = (sigma_u8)(shard_id * 0x5Fu);
@@ -45,7 +46,7 @@ bool SovereignPQCEngine::verifyShard(sigma_u32 shard_id, const sigma_u8* signatu
     return valid;
 }
 
-void SovereignPQCEngine::refreshLattice() {
+void SigmaOS::Kernel::Security::SovereignPQCEngine::refreshLattice() {
     log_emit(LOG_INFO, "[PQC] LBSV: Refreshing silicon lattice noise entropy for high-fidelity signatures...");
 }
 

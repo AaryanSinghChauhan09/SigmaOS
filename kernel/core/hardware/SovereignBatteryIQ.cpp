@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 #include "sigma_batteryiq.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 
 /**
@@ -15,7 +15,7 @@ extern "C" void batteryiq_init() {
     sigma_log("[BATTERYIQ] Initializing Sovereign Battery Intelligence (PCL Algorithm)...");
 }
 
-extern "C" uint32_t batteryiq_get_health_percent() {
+extern "C" sigma_u32 batteryiq_get_health_percent() {
     // Simulate reading battery EEPROM data
     sigma_log("[BATTERYIQ] PCL: Querying battery EEPROM for cycle count and capacity...");
     return 94; // 94% health

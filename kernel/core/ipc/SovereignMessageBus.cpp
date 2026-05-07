@@ -1,6 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "sigma_ipc.h"
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "system/sigma_ipc.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -12,7 +13,7 @@ void SovereignMessageBus::init() {
 }
 
 void SovereignMessageBus::sendMessage(sigma_u32 target_id, const void* data, sigma_usize size) {
-    sigma_printf("Σ [IPC-BUS]: Dispatching message to Shard %u (%lu bytes)...\n", target_id, size);
+    sigma_log("Σ [IPC-BUS]: Dispatching message to Shard %u (%lu bytes)...\n", target_id, size);
     (void)data;
     // Logic: Map-and-Swap zero-copy message delivery
 }

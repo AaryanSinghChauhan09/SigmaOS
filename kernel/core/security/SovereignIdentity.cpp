@@ -1,6 +1,6 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "sigma_identity.h"
 
 /**
@@ -19,14 +19,14 @@ extern "C" void identity_init() {
 }
 
 extern "C" void identity_verify_shard(const char* shard_id) {
-    sigma_printf("[S-IDENTITY] Verifying shard signature: %s\n", shard_id);
+    sigma_log("[S-IDENTITY] Verifying shard signature: %s\n", shard_id);
     /* Sovereign PQC Algorithm: Post-Quantum cryptographic verification. */
     SovereignIdentityEngine.verified_shards++;
     sigma_log("[S-IDENTITY] Shard integrity VERIFIED.");
 }
 
 extern "C" void identity_report_status() {
-    sigma_printf("[S-IDENTITY] Total Shards Verified: %u\n", SovereignIdentityEngine.verified_shards);
+    sigma_log("[S-IDENTITY] Total Shards Verified: %u\n", SovereignIdentityEngine.verified_shards);
 }
 
 

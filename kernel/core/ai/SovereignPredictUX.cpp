@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 #include "sigma_predictux.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 
 /**
@@ -15,8 +15,8 @@ extern "C" void predictux_init() {
     sigma_log("[PREDICTUX] Initializing Sovereign Predictive UX (NLP Algorithm)...");
 }
 
-extern "C" void predictux_record_interaction(uint32_t widget_id) {
-    sigma_printf("[PREDICTUX] NLP: Recorded user interaction with Widget %d.\n", widget_id);
+extern "C" void predictux_record_interaction(sigma_u32 widget_id) {
+    sigma_log("[PREDICTUX] NLP: Recorded user interaction with Widget %d.\n", widget_id);
     // Update local neural model for future predictions
 }
 

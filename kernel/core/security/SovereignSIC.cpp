@@ -1,9 +1,9 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "sigma_sic.h"
-#include "../../../include/sigma_hal.h""
-#include "sigma_libc.h"
+#include "hal/sigma_hal.h"
+#include "libc/sigma_libc.h"
 
 /**
  * SigmaOS Sovereign SIC Implementation
@@ -15,7 +15,7 @@ extern "C" void sic_init() {
     sigma_log("[SIC] Initializing Sovereign Integrity Checksum Nexus...");
 }
 
-extern "C" sigma_sic_token_t sic_generate_token(uint32_t shard_id, const void* binary, uint32_t size) {
+extern "C" sigma_sic_token_t sic_generate_token(sigma_u32 shard_id, const void* binary, sigma_u32 size) {
     // RSH (Reproducible Shard Hashing) Algorithm
     // Computes a deterministic hash of the shard binary to ensure build reproducibility.
     
@@ -27,14 +27,14 @@ extern "C" sigma_sic_token_t sic_generate_token(uint32_t shard_id, const void* b
     token.checksum_lo = 0xFEEDFACE ^ shard_id;
     token.is_verified = true;
     
-    sigma_printf("[SIC] RSH: Generated Token for S%02d -> %08X%08X\n", 
+    sigma_log("[SIC] RSH: Generated Token for S%02d -> %08X%08X\n", 
                  shard_id, token.checksum_hi, token.checksum_lo);
                  
     return token;
 }
 
-extern "C" bool sic_verify_token(uint32_t shard_id, sigma_sic_token_t token) {
-    sigma_printf("[SIC] RSH: Verifying Shard S%02d integrity token...\n", shard_id);
+extern "C" bool sic_verify_token(sigma_u32 shard_id, sigma_sic_token_t token) {
+    sigma_log("[SIC] RSH: Verifying Shard S%02d integrity token...\n", shard_id);
     
     // In real implementation, this would re-hash the binary and compare
     bool success = token.is_verified;

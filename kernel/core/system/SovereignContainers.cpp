@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Containerization Engine
@@ -35,7 +35,7 @@ public:
         sigma_hardened_strcpy(this->containers[this->active_containers], container_name, 32);
         this->active_containers++;
         
-        sigma_printf("[CONTAINER] Spawned Container '%s' executing '%s'. Total Active: %u\n", 
+        sigma_log("[CONTAINER] Spawned Container '%s' executing '%s'. Total Active: %u\n", 
                      container_name, entrypoint, this->active_containers);
     }
 

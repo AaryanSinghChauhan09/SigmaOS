@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 /**
  * SigmaOS Sovereign Browser VFS (Mock Syscall Layer)
@@ -26,13 +26,13 @@ public:
 
     sigma_ssize_t mock_read(int fd, void* buf, sigma_size_t count) {
         (void)buf; // Stub: IndexedDB binding not yet wired
-        sigma_printf("Σ [VFS-BROWSER]: Reading %llu bytes from Browser Storage (FD: %d)\n", count, fd);
+        sigma_log("Σ [VFS-BROWSER]: Reading %llu bytes from Browser Storage (FD: %d)\n", count, fd);
         return (sigma_ssize_t)count;
     }
 
     sigma_ssize_t mock_write(int fd, const void* buf, sigma_size_t count) {
         (void)buf; // Stub: LocalStorage binding not yet wired
-        sigma_printf("Σ [VFS-BROWSER]: Writing %llu bytes to Browser LocalStorage (FD: %d)\n", count, fd);
+        sigma_log("Σ [VFS-BROWSER]: Writing %llu bytes to Browser LocalStorage (FD: %d)\n", count, fd);
         return (sigma_ssize_t)count;
     }
 

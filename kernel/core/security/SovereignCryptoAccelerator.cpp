@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Crypto Accelerator Shard
@@ -29,18 +30,18 @@ public:
 
     void offloadEncryption(const void* data, sigma_usize size) {
         (void)data; (void)size;
-        sigma_printf("Σ [CRYPTO-ACCEL]: Offloading %lu bytes to hardware encryption engine...\n", size);
+        sigma_log("Σ [CRYPTO-ACCEL]: Offloading %lu bytes to hardware encryption engine...\n", size);
         // Dispatch to hardware AES/PQC accelerator
         sigma_log("Σ [CRYPTO-ACCEL]: Encryption COMPLETE. Zero CPU overhead.");
         m_bytes_encrypted += size;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN CRYPTO ACCEL AUDIT ---\n");
-        sigma_printf("| Bytes Encrypted : %llu\n", m_bytes_encrypted);
-        sigma_printf("| Execution Mode  : HARDWARE-OFFLOAD\n");
-        sigma_printf("| PQC Support     : ENABLED\n");
-        sigma_printf("--------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN CRYPTO ACCEL AUDIT ---\n");
+        sigma_log("| Bytes Encrypted : %llu\n", m_bytes_encrypted);
+        sigma_log("| Execution Mode  : HARDWARE-OFFLOAD\n");
+        sigma_log("| PQC Support     : ENABLED\n");
+        sigma_log("--------------------------------------\n");
     }
 
 private:

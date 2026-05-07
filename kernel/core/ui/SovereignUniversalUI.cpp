@@ -1,9 +1,9 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "sigma_universal_ui.h"
-#include "../../../include/sigma_hal.h""
-#include "sigma_telemetry.h"
+#include "hal/sigma_hal.h"
+#include "observability/sigma_telemetry.h"
 
 /**
  * SigmaOS Sovereign Universal UI
@@ -19,14 +19,14 @@ extern "C" void universalui_init() {
 
 extern "C" void universalui_set_theme(sigma_ui_theme_t theme) {
     active_theme = theme;
-    sigma_printf("[UNIVERSALUI] Theme updated to %d. Regenerating shader pipelines...\n", (int)theme);
+    sigma_log("[UNIVERSALUI] Theme updated to %d. Regenerating shader pipelines...\n", (int)theme);
 }
 
-extern "C" void universalui_render_widget(uint32_t widget_id, uint32_t x, uint32_t y) {
+extern "C" void universalui_render_widget(sigma_u32 widget_id, sigma_u32 x, sigma_u32 y) {
     // DFO (Direct Framebuffer Orchestration) Algorithm
     // Bypasses display servers (like X11/Wayland) to draw directly to the GPU framebuffer.
     
-    sigma_printf("[UNIVERSALUI] DFO: Rendering Widget %d at (%d, %d)...\n", widget_id, x, y);
+    sigma_log("[UNIVERSALUI] DFO: Rendering Widget %d at (%d, %d)...\n", widget_id, x, y);
     
     if (active_theme == UI_THEME_HOLO_HUD) {
         sigma_log("[UNIVERSALUI] DFO: Applying Holographic Parallax Shaders.");

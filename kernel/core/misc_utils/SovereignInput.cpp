@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "sigma_input.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Input Implementation
@@ -36,7 +36,7 @@ public:
         this->event_queue[this->queue_head] = *event;
         this->queue_head = next_head;
         
-        sigma_printf("[INPUT] SII: Key Event Captured (Scancode: %02X, State: %d)\n", 
+        sigma_log("[INPUT] SII: Key Event Captured (Scancode: %02X, State: %d)\n", 
                      event->scancode, event->state);
     }
 

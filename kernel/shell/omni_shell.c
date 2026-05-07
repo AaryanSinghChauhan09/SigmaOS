@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: OMNI-SHELL-ZENITH (v3.0 - ADVANCED SOVEREIGN CLI)
@@ -13,7 +14,7 @@
  * =============================================================================
  */
 
-#include "../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 /* =========================================================================
  * External kernel functions

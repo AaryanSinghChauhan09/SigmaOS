@@ -1,7 +1,8 @@
-#include "../../include/SovereignLibC.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 #include "sigma_ux.h"
-#include "sigma_gui.h"
-#include "sigma_hal.h"
+#include "ui/sigma_gui.h"
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign UX Implementation
@@ -33,7 +34,7 @@ public:
         // Automatically adjusts contrast and readability based on shard load.
         
         this->active_theme = *theme;
-        sigma_printf("[UX] Theme Applied: Primary %06X, Blur: %d\n", 
+        sigma_log("[UX] Theme Applied: Primary %06X, Blur: %d\n", 
                      theme->primary_color, theme->blur_enabled);
     }
 

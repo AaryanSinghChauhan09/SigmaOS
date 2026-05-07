@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/sigma_libc.h"
 
 /**
  * SigmaOS Sovereign Gatekeeper
@@ -13,7 +13,7 @@
 typedef struct {
     bool tor_routing_active;
     bool lattice_isolation_enabled;
-    uint32_t firewall_rules_count;
+    sigma_u32 firewall_rules_count;
 } gatekeeper_config_t;
 
 static gatekeeper_config_t sovereign_gatekeeper;
@@ -33,7 +33,7 @@ extern "C" void gatekeeper_scrub_traffic() {
     // Logic for metadata stripping and shard-level routing
 }
 
-extern "C" bool gatekeeper_verify_shard_access(uint32_t shard_id) {
+extern "C" bool gatekeeper_verify_shard_access(sigma_u32 shard_id) {
     // Zero-trust verification for cross-shard communication
     return true; 
 }

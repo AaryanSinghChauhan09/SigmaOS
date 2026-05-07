@@ -24,3 +24,16 @@ kernel/core/system/SovereignSyscall.cpp
 kernel/core/system/SovereignScheduler.cpp
 kernel/core/system/SovereignShardManager.cpp
 
+# --- Filesystem Shards ---
+kernel/core/fs/vfs/SovereignVFS.cpp
+kernel/core/fs/vfs/SovereignNamespace.cpp
+kernel/core/fs/vfs/SovereignExplorer.cpp
+kernel/core/fs/storage/SovereignStorageDriver.cpp
+kernel/core/fs/storage/SovereignPersistence.cpp
+kernel/core/fs/storage/SovereignContainerStorage.cpp
+kernel/core/fs/optimization/SovereignDNACompression.cpp
+kernel/core/fs/optimization/SovereignStorageDedup.cpp
+kernel/core/fs/management/SovereignSnapshotManager.cpp
+kernel/core/fs/management/SovereignStorageAI.cpp
+kernel/core/fs/management/SovereignFS.cpp
+

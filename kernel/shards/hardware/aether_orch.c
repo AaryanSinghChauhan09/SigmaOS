@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: AETHER ORCHESTRATOR (v1.0 - SILICON TRIGGER BUS)
@@ -12,7 +13,7 @@
  * =============================================================================
  */
 
-#include "../../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 #define MAX_AETHER_VECTORS 512
 #define VECTOR_MAGIC       0x41455448 // "AETH"

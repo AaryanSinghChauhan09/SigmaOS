@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS SHELL: SOVEREIGN CALCULATOR SHARD (v1.0)
@@ -5,7 +6,7 @@
  * Modules: NCERT Physics/Math & Indian Law Timelines/Fines.
  * =============================================================================
  */
-#include "../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 /* --- NCERT Module: Classical Physics --- */
 sigma_u64 ncert_calc_force(sigma_u64 mass, sigma_u64 acceleration) {

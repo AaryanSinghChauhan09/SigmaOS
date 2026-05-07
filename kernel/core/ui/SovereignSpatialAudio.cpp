@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "sigma_spatialaudio.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 #include "sigma_audio.h"
 
 /**
@@ -21,7 +21,7 @@ extern "C" void spatialaudio_set_listener_position(float x, float y, float z) {
     listener_x = x; listener_y = y; listener_z = z;
 }
 
-extern "C" void spatialaudio_play_source(uint32_t source_id, float x, float y, float z) {
+extern "C" void spatialaudio_play_source(sigma_u32 source_id, float x, float y, float z) {
     // HRTF (Head-Related Transfer Function) Algorithm
     // Computes interaural time and level differences for binaural rendering.
     
@@ -29,7 +29,7 @@ extern "C" void spatialaudio_play_source(uint32_t source_id, float x, float y, f
     float dy = y - listener_y;
     float dz = z - listener_z;
     
-    sigma_printf("[SPATIALAUDIO] HRTF: Source %d at delta (%.1f, %.1f, %.1f). Applying binaural filter.\n",
+    sigma_log("[SPATIALAUDIO] HRTF: Source %d at delta (%.1f, %.1f, %.1f). Applying binaural filter.\n",
                  source_id, dx, dy, dz);
     sigma_log("[SPATIALAUDIO] HRTF: Stereo convolution dispatched to silicon DAC.");
 }

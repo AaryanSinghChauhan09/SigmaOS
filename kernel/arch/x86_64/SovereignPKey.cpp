@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 /**
  * SigmaOS Sovereign Protection Key (PKey) Manager
@@ -28,13 +28,13 @@ public:
     int allocateKey() {
         if (this->active_keys >= 16) return -1;
         int key = this->active_keys++;
-        sigma_printf("Σ [PKEY]: Allocated Memory Protection Key: %d\n", key);
+        sigma_log("Σ [PKEY]: Allocated Memory Protection Key: %d\n", key);
         return key;
     }
 
     void setProtection(int key, sigma_u32 rights) {
         // WRPKRU instruction to set rights for the key
-        sigma_printf("Σ [PKEY]: Setting Rights 0x%X for Key %d\n", rights, key);
+        sigma_log("Σ [PKEY]: Setting Rights 0x%X for Key %d\n", rights, key);
     }
 
 private:

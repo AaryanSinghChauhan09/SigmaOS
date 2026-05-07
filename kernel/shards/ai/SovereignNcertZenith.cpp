@@ -1,5 +1,5 @@
 #include "Lattice.h"
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN NCERT ZENITH (v128.0 - SCHOLAR ZENITH)
@@ -8,7 +8,7 @@
  * =========================================================================
  */
 
-#include "../../../include/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 #include "userland/apps/scholar_zenith/ncert_base.hpp"
 #include "userland/apps/scholar_zenith/ncert_physics.hpp"
 #include "userland/apps/scholar_zenith/ncert_chemistry.hpp"
@@ -16,7 +16,7 @@
 #include "userland/apps/scholar_zenith/ncert_math.hpp"
 
 int main() {
-    sigma_printf("--- Î£ SIGMA OS SOVEREIGN NCERT ZENITH SHARD ENGINE (v128.0) ---\n");
+    sigma_log("--- Î£ SIGMA OS SOVEREIGN NCERT ZENITH SHARD ENGINE (v128.0) ---\n");
     
     INCERTSim* simulations[] = { 
         new GravitationSim(), 
@@ -32,12 +32,12 @@ int main() {
     };
     
     for (int i = 0; i < 10; i++) {
-        sigma_printf("\n------------------------------------------------------------\n");
-        sigma_printf("[SHARD-INIT]: Summoning %s (%s)...\n", simulations[i]->type_name(), simulations[i]->GetConcept());
+        sigma_log("\n------------------------------------------------------------\n");
+        sigma_log("[SHARD-INIT]: Summoning %s (%s)...\n", simulations[i]->type_name(), simulations[i]->GetConcept());
         simulations[i]->Simulate();
         delete simulations[i];
     }
 
-    sigma_printf("\n[SUCCESS]: Competitive NCERT Shard Cluster Verified. Eradication Level: [APEX].\n");
+    sigma_log("\n[SUCCESS]: Competitive NCERT Shard Cluster Verified. Eradication Level: [APEX].\n");
     return 0;
 }

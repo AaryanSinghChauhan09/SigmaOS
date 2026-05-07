@@ -1,5 +1,5 @@
 #include "Lattice.h"
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -34,8 +34,8 @@ public:
     void Execute(const void*& inputs) override {
         double L0 = inputs.at("L0"), alpha = inputs.at("alpha"), deltaT = inputs.at("deltaT");
         double deltaL = alpha * L0 * deltaT;
-        sigma_printf("[PHYSICS/LAB]: Thermal Expansion (L0=" << L0 << ", dT=" << deltaT << ")\n");
-        sigma_printf("[PHYSICS/LAB]: Expansion Shard (dL): " << deltaL << " Meters.\n");
+        sigma_log("[PHYSICS/LAB]: Thermal Expansion (L0=" << L0 << ", dT=" << deltaT << ")\n");
+        sigma_log("[PHYSICS/LAB]: Expansion Shard (dL): " << deltaL << " Meters.\n");
     }
 };
 
@@ -45,8 +45,8 @@ public:
     void Execute(const void*& inputs) override {
         double Q = inputs.at("Q"), V = inputs.at("V");
         double C = Q / V;
-        sigma_printf("[PHYSICS/LAB]: Capacitance (Q=" << Q << ", V=" << V << ")\n");
-        sigma_printf("[PHYSICS/LAB]: Capacitance Shard (C): " << C << " Farads.\n");
+        sigma_log("[PHYSICS/LAB]: Capacitance (Q=" << Q << ", V=" << V << ")\n");
+        sigma_log("[PHYSICS/LAB]: Capacitance Shard (C): " << C << " Farads.\n");
     }
 };
 
@@ -56,8 +56,8 @@ public:
     void Execute(const void*& inputs) override {
         double I = inputs.at("I"), t = inputs.at("t"), Z = inputs.at("Z");
         double mass = Z * I * t;
-        sigma_printf("[CHEMISTRY/LAB]: Electrolysis (I=" << I << ", t=" << t << ")\n");
-        sigma_printf("[CHEMISTRY/LAB]: Deposited Shard (W): " << mass << " grams.\n");
+        sigma_log("[CHEMISTRY/LAB]: Electrolysis (I=" << I << ", t=" << t << ")\n");
+        sigma_log("[CHEMISTRY/LAB]: Deposited Shard (W): " << mass << " grams.\n");
     }
 };
 
@@ -65,7 +65,7 @@ public:
 class DeterminantShard : public IUniversalShard {
 public:
     void Execute(const void*& inputs) override {
-        sigma_printf("[MATH/LAB]: 2x2 Determinant Shard (a,b,c,d) = ad-bc.\n");
+        sigma_log("[MATH/LAB]: 2x2 Determinant Shard (a,b,c,d) = ad-bc.\n");
         double a = inputs.at("a"), b = inputs.at("b"), c = inputs.at("c"), d = inputs.at("d");
         std::cout << "[MATH/LAB]: Result Det: " << (a*d - b*c) << std::endl;
     }
@@ -87,7 +87,7 @@ public:
             std::cout << "\n[UNIVERSAL-LAB]: Executing Shard: " << id << std::endl;
             m_lab[id]->Execute(inputs);
         } else {
-            sigma_printf("[ERROR]: Shard '" << id << "' not synthesized. Repository expanding...\n");
+            sigma_log("[ERROR]: Shard '" << id << "' not synthesized. Repository expanding...\n");
         }
     }
 };
@@ -102,7 +102,7 @@ int main() {
     void* cap_in = {{"Q", 5.0e-6}, {"V", 10.0}};
     lab.ExecuteLabShard("CAPACITANCE", cap_in);
 
-    sigma_printf("\n[SUCCESS]: Competitive Universal Lab Online. NCERT Sovereignty 100%.\n");
+    sigma_log("\n[SUCCESS]: Competitive Universal Lab Online. NCERT Sovereignty 100%.\n");
     return 0;
 }
 

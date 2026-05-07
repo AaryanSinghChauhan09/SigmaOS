@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Formal Verifier Shard
@@ -29,18 +29,18 @@ public:
 
     bool verifyShard(const char* shard_id, void* shard_ptr) {
         (void)shard_ptr;
-        sigma_printf("Σ [VERIFIER]: Executing formal model verification for Shard '%s'...\n", shard_id);
+        sigma_log("Σ [VERIFIER]: Executing formal model verification for Shard '%s'...\n", shard_id);
         // Compare against Z-notation or Coq-based models
         sigma_log("Σ [VERIFIER]: Shard behavior MATHEMATICALLY PROVEN against Sovereign-Specs.");
         return true;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN VERIFICATION AUDIT ---\n");
-        sigma_printf("| Proven Primitives : 12 (Core Lattice)\n");
-        sigma_printf("| Formal Model      : Sovereign-Z-Spec v1.1\n");
-        sigma_printf("| Assurance Level   : EAL7-PARITY\n");
-        sigma_printf("--------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN VERIFICATION AUDIT ---\n");
+        sigma_log("| Proven Primitives : 12 (Core Lattice)\n");
+        sigma_log("| Formal Model      : Sovereign-Z-Spec v1.1\n");
+        sigma_log("| Assurance Level   : EAL7-PARITY\n");
+        sigma_log("--------------------------------------\n");
     }
 
 private:

@@ -1,6 +1,6 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
 #include "sigma_globalsync.h"
 
 /**
@@ -26,7 +26,7 @@ public:
     void push(sigma_u32 shard_id, const void* data, sigma_size_t size) {
         /* SCR Algorithm: Pushes shard state to global lattice mirror. */
         this->state.sync_status = SIGMA_SYNC_PUSHING;
-        sigma_printf("[SYNC] SCR: Pushing Shard S%02u state (%u bytes) to global mirror.\n",
+        sigma_log("[SYNC] SCR: Pushing Shard S%02u state (%u bytes) to global mirror.\n",
                      shard_id, (unsigned)size);
         
         this->state.total_payload_bytes += size;
@@ -36,7 +36,7 @@ public:
     void pull(sigma_u32 shard_id, void* out_data, sigma_size_t size) {
         /* SCR Algorithm: Pulls shard state from global lattice mirror. */
         this->state.sync_status = SIGMA_SYNC_PULLING;
-        sigma_printf("[SYNC] SCR: Pulling Shard S%02u state (%u bytes) from global mirror.\n",
+        sigma_log("[SYNC] SCR: Pulling Shard S%02u state (%u bytes) from global mirror.\n",
                      shard_id, (unsigned)size);
         
         this->state.sync_status = SIGMA_SYNC_IDLE;

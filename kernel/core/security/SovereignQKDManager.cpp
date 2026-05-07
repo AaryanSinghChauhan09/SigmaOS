@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign QKD (Quantum Key Distribution) Manager Shard
@@ -28,17 +28,17 @@ public:
     }
 
     void performHandshake(const char* target_node) {
-        sigma_printf("Σ [QKD]: Initiating BB84 Handshake with node '%s'...\n", target_node);
+        sigma_log("Σ [QKD]: Initiating BB84 Handshake with node '%s'...\n", target_node);
         // Verify photon polarity and basis alignment
         sigma_log("Σ [QKD]: Quantum-Secure Key Exchange COMPLETE. Trust SEALED.");
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN QKD AUDIT ---\n");
-        sigma_printf("| Protocol Support : BB84, COW, SARG04\n");
-        sigma_printf("| Trust Fabric     : ENTANGLED (Node-to-Lattice)\n");
-        sigma_printf("| Security Status   : EAVESDROP-PROOF\n");
-        sigma_printf("-------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN QKD AUDIT ---\n");
+        sigma_log("| Protocol Support : BB84, COW, SARG04\n");
+        sigma_log("| Trust Fabric     : ENTANGLED (Node-to-Lattice)\n");
+        sigma_log("| Security Status   : EAVESDROP-PROOF\n");
+        sigma_log("-------------------------------\n");
     }
 
 private:

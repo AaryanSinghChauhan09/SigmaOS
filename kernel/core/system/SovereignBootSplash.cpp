@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Boot Splash Engine
@@ -24,17 +24,17 @@ public:
         this->fb_w = fb_width;
         this->fb_h = fb_height;
         this->progress = 0;
-        sigma_printf("[BOOT-SPLASH] Framebuffer acquired (%ux%u). Rendering Σ SIGMAOS splash...\n",
+        sigma_log("[BOOT-SPLASH] Framebuffer acquired (%ux%u). Rendering Σ SIGMAOS splash...\n",
                      fb_width, fb_height);
     }
 
     void updateProgress(sigma_u32 percent, const char* stage_name) {
         this->progress = percent;
-        sigma_printf("[BOOT-SPLASH] [%3u%%] %s\n", percent, stage_name);
+        sigma_log("[BOOT-SPLASH] [%3u%%] %s\n", percent, stage_name);
     }
 
     void setTheme(const char* theme_name) {
-        sigma_printf("[BOOT-SPLASH] Applying boot splash theme: '%s'.\n", theme_name);
+        sigma_log("[BOOT-SPLASH] Applying boot splash theme: '%s'.\n", theme_name);
     }
 
     void dismiss() {

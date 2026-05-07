@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Spatial Streamer Shard
@@ -33,11 +33,11 @@ public:
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN STREAMING AUDIT ---\n");
-        sigma_printf("| Streaming Mode : SPATIAL-SYNC\n");
-        sigma_printf("| Latency Target : < 5ms (Orbital-Direct)\n");
-        sigma_printf("| Security       : PQC-ENCRYPTED\n");
-        sigma_printf("----------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN STREAMING AUDIT ---\n");
+        sigma_log("| Streaming Mode : SPATIAL-SYNC\n");
+        sigma_log("| Latency Target : < 5ms (Orbital-Direct)\n");
+        sigma_log("| Security       : PQC-ENCRYPTED\n");
+        sigma_log("----------------------------------\n");
     }
 
 private:

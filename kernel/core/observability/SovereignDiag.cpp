@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
 
 
 /**
@@ -32,11 +32,11 @@ public:
         sigma_log("[DIAG] Verifying L1/L2 cache integrity across the lattice...");
         
         // Simulated health check
-        sigma_printf("[DIAG] Silicon Health: 99.99%%. 0 predicted faults in next 24h.\n");
+        sigma_log("[DIAG] Silicon Health: 99.99%%. 0 predicted faults in next 24h.\n");
     }
 
     void reportAnomaly(const char* shard_id, const char* description) {
-        sigma_printf("[DIAG] [CRITICAL] Shard Anomaly: %s - %s\n", shard_id, description);
+        sigma_log("[DIAG] [CRITICAL] Shard Anomaly: %s - %s\n", shard_id, description);
         this->m_fault_count++;
         // Trigger self-healing if threshold reached
     }

@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: VIRTUAL FILE SYSTEM (VFS) (v1.0)
@@ -8,7 +9,7 @@
 #ifndef SIGMA_VFS_H
 #define SIGMA_VFS_H
 
-#include "sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 typedef struct vfs_node {
     char name[128];

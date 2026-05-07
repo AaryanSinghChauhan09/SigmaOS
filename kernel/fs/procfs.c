@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-PROCFS (v1.0 - LINUX OBSERVABILITY)
@@ -10,7 +11,7 @@
  * =============================================================================
  */
 
-#include "../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 /* =========================================================================
  * PROCFS Engine (The Linux Status Monitor)

@@ -1,5 +1,6 @@
+#include "core/sigma_types.h"
 #include "Lattice.h"
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /* =========================================================================
  * Σ SIGMAOS: COLONIZATION SHARD (v1.0 - SOVEREIGN EXPANSION)
  * =========================================================================
@@ -8,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../../include/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Expansion {
@@ -20,19 +21,19 @@ private:
 
 public:
     SovereignColonizer() : m_node_count(1), m_target_latency(10) {
-        sigma_printf("[COLONIZER]: Initializing Propagation Shard...\n");
+        sigma_log("[COLONIZER]: Initializing Propagation Shard...\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignColonizer"; }
 
     void InitiateColonization(const char* target_ip) {
-        sigma_printf("[COLONIZER]: Target Identified: %s. Initiating Shard Projection...\n", target_ip);
-        sigma_printf("[COLONIZER]: Mapping Remote Silicon Topology...\n");
-        sigma_printf("[COLONIZER]: Injecting Sovereign Bootloader Shard...\n");
+        sigma_log("[COLONIZER]: Target Identified: %s. Initiating Shard Projection...\n", target_ip);
+        sigma_log("[COLONIZER]: Mapping Remote Silicon Topology...\n");
+        sigma_log("[COLONIZER]: Injecting Sovereign Bootloader Shard...\n");
         
         // Simulated latency for industrial feel
         m_node_count++;
-        sigma_printf("[COLONIZER]: SUCCESS: Node %s colonized. Total Lattice Nodes: %u.\n", 
+        sigma_log("[COLONIZER]: SUCCESS: Node %s colonized. Total Lattice Nodes: %u.\n", 
                      target_ip, m_node_count);
     }
 

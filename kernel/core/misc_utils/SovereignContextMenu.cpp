@@ -1,9 +1,9 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "sigma_contextmenu.h"
-#include "../../../include/sigma_hal.h""
-#include "sigma_neural.h"
+#include "hal/sigma_hal.h"
+#include "ai/sigma_neural.h"
 #include "sigma_universal_ui.h"
 
 /**
@@ -16,11 +16,11 @@ extern "C" void contextmenu_init() {
     sigma_log("[CONTEXTMENU] Initializing Sovereign Context Menu Engine (IDR Algorithm)...");
 }
 
-extern "C" void contextmenu_invoke(uint32_t target_id, uint32_t x, uint32_t y) {
+extern "C" void contextmenu_invoke(sigma_u32 target_id, sigma_u32 x, sigma_u32 y) {
     // IDR (Intent-Driven Radial) Algorithm
     // Uses the neural engine to prune legacy bloat from menus, showing only highly probable actions.
     
-    sigma_printf("[CONTEXTMENU] IDR: Context interaction invoked on target %d at (%d, %d).\n", target_id, x, y);
+    sigma_log("[CONTEXTMENU] IDR: Context interaction invoked on target %d at (%d, %d).\n", target_id, x, y);
     sigma_log("[CONTEXTMENU] IDR: Synthesizing top 3 most probable actions based on S-Persona habits...");
     sigma_log("[CONTEXTMENU] IDR: Rendering adaptive radial menu.");
 }

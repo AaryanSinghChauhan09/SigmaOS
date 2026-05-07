@@ -1,5 +1,5 @@
 #include "Lattice.h"
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -36,8 +36,8 @@ public:
         double initial_atoms = 1000.0;
         double time = 20.0;
         double remaining = initial_atoms * std::pow(0.5, time / half_life);
-        sigma_printf("[PHYSICS/NUCLEI]: Concept: Radioactivity (Law of Decay).\n");
-        sigma_printf("[PHYSICS/NUCLEI]: Remaining Atoms after 2 Half-lives: " << remaining << " (Apex Parity).\n");
+        sigma_log("[PHYSICS/NUCLEI]: Concept: Radioactivity (Law of Decay).\n");
+        sigma_log("[PHYSICS/NUCLEI]: Remaining Atoms after 2 Half-lives: " << remaining << " (Apex Parity).\n");
     }
 };
 
@@ -45,8 +45,8 @@ public:
 class PolymerShard : public IScienceShard {
 public:
     void ProjectSimulation() override {
-        sigma_printf("[CHEMISTRY/POLYMER]: Concept: Addition Polymerization (Ethene).\n");
-        sigma_printf("[CHEMISTRY/POLYMER]: n(CH2=CH2) -> [-CH2-CH2-]n [Verified].\n");
+        sigma_log("[CHEMISTRY/POLYMER]: Concept: Addition Polymerization (Ethene).\n");
+        sigma_log("[CHEMISTRY/POLYMER]: n(CH2=CH2) -> [-CH2-CH2-]n [Verified].\n");
     }
 };
 
@@ -54,8 +54,8 @@ public:
 class CirculationShard : public IScienceShard {
 public:
     void ProjectSimulation() override {
-        sigma_printf("[BIOLOGY/HEART]: Concept: Double Circulation Shard.\n");
-        sigma_printf("[BIOLOGY/HEART]: Pulmonary & Systemic Circuits synchronized.\n");
+        sigma_log("[BIOLOGY/HEART]: Concept: Double Circulation Shard.\n");
+        sigma_log("[BIOLOGY/HEART]: Pulmonary & Systemic Circuits synchronized.\n");
     }
 };
 
@@ -63,8 +63,8 @@ public:
 class IntegrationShard : public IScienceShard {
 public:
     void ProjectSimulation() override {
-        sigma_printf("[MATH/CALCULUS]: Concept: Definite Integrals (Area under Curve).\n");
-        sigma_printf("[MATH/CALCULUS]: Integral of x^2 from 0 to 3 = 9.0 (Verified).\n");
+        sigma_log("[MATH/CALCULUS]: Concept: Definite Integrals (Area under Curve).\n");
+        sigma_log("[MATH/CALCULUS]: Integral of x^2 from 0 to 3 = 9.0 (Verified).\n");
     }
 };
 
@@ -80,9 +80,9 @@ public:
     }
 
     void ExecuteApexAudit() {
-        sigma_printf("--- Î£ SIGMA OS SOVEREIGN SCIENCE ZENITH ---\n");
+        sigma_log("--- Î£ SIGMA OS SOVEREIGN SCIENCE ZENITH ---\n");
         for (const auto& shard : m_shards) {
-            sigma_printf("\n------------------------------------------------\n");
+            sigma_log("\n------------------------------------------------\n");
             shard->ProjectSimulation();
         }
     }
@@ -93,7 +93,7 @@ int main() {
     sm.Synthesize();
     sm.ExecuteApexAudit();
 
-    sigma_printf("\n[SUCCESS]: Competitive Science Zenith Cluster Active. Industry Sovereignty Secured.\n");
+    sigma_log("\n[SUCCESS]: Competitive Science Zenith Cluster Active. Industry Sovereignty Secured.\n");
     return 0;
 }
 

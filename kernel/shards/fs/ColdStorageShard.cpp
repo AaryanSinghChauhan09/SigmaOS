@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 #include "Lattice.h"
 /*
  * =========================================================================
@@ -8,8 +9,8 @@
  * =========================================================================
  */
 
-#include "../../../include/SigmaOOP.hpp"
-#include "../../../include/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Storage {
@@ -28,7 +29,7 @@ private:
 
 public:
     ColdStorageShard() : m_total_blocks(0) {
-        sigma_printf("[STORAGE-ZENITH]: Cold Storage Lattice Online.\n");
+        sigma_log("[STORAGE-ZENITH]: Cold Storage Lattice Online.\n");
     }
 
     const char* type_name() const noexcept override { return "ColdStorageShard"; }
@@ -42,19 +43,19 @@ public:
 
         m_vault.push_back(shard);
         m_total_blocks++;
-        sigma_printf("[STORAGE-ZENITH]: Block '%s' pinned to decentralized lattice.\n", cid);
+        sigma_log("[STORAGE-ZENITH]: Block '%s' pinned to decentralized lattice.\n", cid);
     }
 
     void audit_vault() {
-        sigma_printf("[STORAGE-ZENITH]: Vault Audit: %u blocks synchronized.\n", m_total_blocks);
+        sigma_log("[STORAGE-ZENITH]: Vault Audit: %u blocks synchronized.\n", m_total_blocks);
         for (sigma_usize i = 0; i < m_vault.size(); i++) {
-            sigma_printf("  -> [%zu] CID: %s (Size: %u bytes)\n", 
+            sigma_log("  -> [%zu] CID: %s (Size: %u bytes)\n", 
                 i, m_vault[i].hash, m_vault[i].size);
         }
     }
 
     void wipe_local_cache() {
-        sigma_printf("[STORAGE-ZENITH]: Amnesic wipe initiated. Local residues neutralized.\n");
+        sigma_log("[STORAGE-ZENITH]: Amnesic wipe initiated. Local residues neutralized.\n");
         // Logic to scrub local cache shards
     }
 };

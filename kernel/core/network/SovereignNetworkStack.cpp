@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Network Stack Shard
@@ -33,11 +33,11 @@ public:
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN NETSTACK AUDIT ---\n");
-        sigma_printf("| Active Streams  : 0 (Baseline Phase)\n");
-        sigma_printf("| Lattice-IP      : 10.0.0.Σ\n");
-        sigma_printf("| Protocol Parity : TCP/IP, UDP, ICMP\n");
-        sigma_printf("----------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN NETSTACK AUDIT ---\n");
+        sigma_log("| Active Streams  : 0 (Baseline Phase)\n");
+        sigma_log("| Lattice-IP      : 10.0.0.Σ\n");
+        sigma_log("| Protocol Parity : TCP/IP, UDP, ICMP\n");
+        sigma_log("----------------------------------\n");
     }
 
 private:

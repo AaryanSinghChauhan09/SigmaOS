@@ -1,10 +1,11 @@
-#include "sigma_hal.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
 #ifndef MEMORY_MATRIX_HPP
 #define MEMORY_MATRIX_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -21,7 +22,7 @@ public:
     const char* type_name() const noexcept override { return "SovereignMemoryMatrix"; }
 
     void Initialize() {
-        sigma_printf("[MEMORY-MATRIX]: Mapping 256MB Sovereign Shard at fixed address...\n");
+        sigma_log("[MEMORY-MATRIX]: Mapping 256MB Sovereign Shard at fixed address...\n");
         m_matrix_pool = (sigma_u8*)sigma_mmap(SIGMA_NULL, MATRIX_POOL_SIZE, 3, 0x22, -1, 0);
     }
 
@@ -33,7 +34,7 @@ public:
     }
 
     void AuditMatrix() {
-        sigma_printf("[MEMORY-MATRIX]: Usage: %llu / %llu bytes | Fragmentation: 0%%\n", 
+        sigma_log("[MEMORY-MATRIX]: Usage: %llu / %llu bytes | Fragmentation: 0%%\n", 
                       (sigma_u64)m_allocation_cursor, (sigma_u64)MATRIX_POOL_SIZE);
     }
 };

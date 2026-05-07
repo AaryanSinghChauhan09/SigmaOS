@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 #include "sigma_ergo.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 
 /**
@@ -15,12 +15,12 @@ extern "C" void ergo_init() {
     sigma_log("[ERGO] Initializing Sovereign Adaptive Ergonomics (CDS Algorithm)...");
 }
 
-extern "C" void ergo_update_screen_temperature(uint32_t kelvin) {
-    sigma_printf("[ERGO] CDS: Adjusting global display temperature to %dK.\n", kelvin);
+extern "C" void ergo_update_screen_temperature(sigma_u32 kelvin) {
+    sigma_log("[ERGO] CDS: Adjusting global display temperature to %dK.\n", kelvin);
     // Direct GPU LUT adjustment
 }
 
-extern "C" void ergo_evaluate_fatigue(uint32_t active_minutes) {
+extern "C" void ergo_evaluate_fatigue(sigma_u32 active_minutes) {
     // CDS (Circadian Display Sync) Algorithm
     
     if (active_minutes > 120) {

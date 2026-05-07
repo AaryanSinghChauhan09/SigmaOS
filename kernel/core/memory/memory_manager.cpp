@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "memory_manager.hpp"
-#include "../../../include/SovereignLibC.h""
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -13,7 +13,7 @@ SovereignMemoryManager::SovereignMemoryManager() : m_pool(reinterpret_cast<sigma
         sigma_memset(m_pool, 0, INITIAL_POOL_SIZE);
         m_segments[0] = { (sigma_u64)m_pool, INITIAL_POOL_SIZE, SIGMA_FALSE };
         m_segment_count = 1;
-        sigma_printf("[MEM]: Industrial Sovereign Slab Initialized (128MB Nexus).\n");
+        sigma_log("[MEM]: Industrial Sovereign Slab Initialized (128MB Nexus).\n");
     }
 }
 
@@ -86,13 +86,13 @@ sigma_size_t SovereignMemoryManager::fragmentation_factor() const {
 }
 
 void SovereignMemoryManager::audit() {
-    sigma_printf("\n--- Σ SOVEREIGN MEMORY INDUSTRIAL AUDIT ---\n");
-    sigma_printf("| Pool Nexus     : %p\n", m_pool);
-    sigma_printf("| Utilization    : %llu KB / %llu KB\n", m_used/1024, INITIAL_POOL_SIZE/1024);
-    sigma_printf("| Active Shards  : %llu\n", m_segment_count);
-    sigma_printf("| Fragmentation  : %llu Nodes\n", fragmentation_factor());
-    sigma_printf("| Security       : AMNESIC-WIPE ENABLED\n");
-    sigma_printf("------------------------------------------\n");
+    sigma_log("\n--- Σ SOVEREIGN MEMORY INDUSTRIAL AUDIT ---\n");
+    sigma_log("| Pool Nexus     : %p\n", m_pool);
+    sigma_log("| Utilization    : %llu KB / %llu KB\n", m_used/1024, INITIAL_POOL_SIZE/1024);
+    sigma_log("| Active Shards  : %llu\n", m_segment_count);
+    sigma_log("| Fragmentation  : %llu Nodes\n", fragmentation_factor());
+    sigma_log("| Security       : AMNESIC-WIPE ENABLED\n");
+    sigma_log("------------------------------------------\n");
 }
 
 } // namespace Kernel

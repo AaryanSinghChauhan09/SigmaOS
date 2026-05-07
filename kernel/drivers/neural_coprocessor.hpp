@@ -1,10 +1,10 @@
 #ifndef NEURAL_COPROCESSOR_HPP
 #define NEURAL_COPROCESSOR_HPP
 
-#include "../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "../../include/sigma_types.h"
-#include "../../include/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Drivers {
@@ -25,7 +25,7 @@ private:
 
 public:
     SovereignNeuralCoprocessor() : m_tpu_shards(8), m_flops_available(1000000000000ULL), m_acceleration_active(SIGMA_TRUE) {
-        sigma_printf("[NEURAL-COPROC]: Sovereign AI Acceleration Shard [READY].\n");
+        sigma_log("[NEURAL-COPROC]: Sovereign AI Acceleration Shard [READY].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignNeuralCoprocessor"; }

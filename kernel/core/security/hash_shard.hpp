@@ -1,10 +1,11 @@
-#include "sigma_hal.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
 #ifndef HASH_SHARD_HPP
 #define HASH_SHARD_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Security {
@@ -14,14 +15,14 @@ public:
     const char* type_name() const noexcept override { return "SovereignHashShard"; }
 
     void ComputeSHA256(const sigma_u8* data, sigma_size_t length, sigma_u8* digest) {
-        sigma_printf("[HASH-SHARD]: Computing SHA-256 for Shard Data (Zero-Dependency)...\n");
+        sigma_log("[HASH-SHARD]: Computing SHA-256 for Shard Data (Zero-Dependency)...\n");
         // Placeholder for bit-perfect SHA-256 logic
         sigma_memset(digest, 0xA5, 32); 
     }
 
     void VerifyShardIntegrity(const char* shard_id, const sigma_u8* expected_hash) {
-        sigma_printf("[HASH-SHARD]: Verifying Integrity for Shard: %s\n", shard_id);
-        sigma_printf("[OK]: Shard Hash verified against Silicon Signature.\n");
+        sigma_log("[HASH-SHARD]: Verifying Integrity for Shard: %s\n", shard_id);
+        sigma_log("[OK]: Shard Hash verified against Silicon Signature.\n");
     }
 };
 

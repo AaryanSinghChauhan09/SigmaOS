@@ -1,5 +1,6 @@
+#include "core/sigma_types.h"
 #include "Lattice.h"
-#include "../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "cloud_maestro.hpp"
 
 namespace SigmaOS {
@@ -12,7 +13,7 @@ CloudMaestro::CloudMaestro() {
 }
 
 void CloudMaestro::DeployToCloud(const SigmaString& shardName) {
-    sigma_printf("[SOVEREIGN/CLOUD]: Initiating Native Cloud-Shard Projection for '%s'...\n", shardName.c_str());
+    sigma_log("[SOVEREIGN/CLOUD]: Initiating Native Cloud-Shard Projection for '%s'...\n", shardName.c_str());
     
     for (sigma_size_t i = 0; i < 3; ++i) {
         SigmaString shardId = shardName;
@@ -26,23 +27,23 @@ void CloudMaestro::DeployToCloud(const SigmaString& shardName) {
         CloudShard shard = {m_regions[i], "PROVISIONED", ip_buf};
         m_active_shards.insert(shardId, shard);
         
-        sigma_printf("[SOVEREIGN/CLOUD]: %s -> [DEPLOYED] @ %s (Silicon Latency: <1ms via RDMA)\n", shardId.c_str(), m_regions[i].c_str());
+        sigma_log("[SOVEREIGN/CLOUD]: %s -> [DEPLOYED] @ %s (Silicon Latency: <1ms via RDMA)\n", shardId.c_str(), m_regions[i].c_str());
     }
 }
 
 void CloudMaestro::ShowCloudMatrix() const {
-    sigma_printf("\n--- Î£ SIGMA OS SOVEREIGN CLOUD SHARD MATRIX ---\n");
-    sigma_printf("%-30s | %-15s | %-15s | %s\n", "Shard ID", "Region", "Node IP", "Status");
-    sigma_printf("---------------------------------------------------------------------------\n");
+    sigma_log("\n--- Î£ SIGMA OS SOVEREIGN CLOUD SHARD MATRIX ---\n");
+    sigma_log("%-30s | %-15s | %-15s | %s\n", "Shard ID", "Region", "Node IP", "Status");
+    sigma_log("---------------------------------------------------------------------------\n");
     
     for (sigma_size_t i = 0; i < m_active_shards.size(); i++) {
         const SigmaString& sid = m_active_shards.key_at(i);
         const CloudShard* info = m_active_shards.at_index(i);
-        sigma_printf("%-30s | %-15s | %-15s | [ACTIVE]\n", sid.c_str(), info->region.c_str(), info->ip.c_str());
+        sigma_log("%-30s | %-15s | %-15s | [ACTIVE]\n", sid.c_str(), info->region.c_str(), info->ip.c_str());
     }
     
-    sigma_printf("---------------------------------------------------------------------------\n");
-    sigma_printf("Cloud Sovereignty: [ENABLED] | Redundancy: 3x | Protocol: Sovereign-RDMA\n\n");
+    sigma_log("---------------------------------------------------------------------------\n");
+    sigma_log("Cloud Sovereignty: [ENABLED] | Redundancy: 3x | Protocol: Sovereign-RDMA\n\n");
 }
 
 } // namespace Net

@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: POSIX-BRIDGE (v1.0 - LINUX BINARY COMPATIBILITY)
@@ -10,7 +11,7 @@
  * =============================================================================
  */
 
-#include "../../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 /* Linux x86_64 Syscall IDs */
 #define SYS_READ      0

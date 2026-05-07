@@ -1,11 +1,11 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef FIRMWARE_NEXUS_HPP
 #define FIRMWARE_NEXUS_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -24,7 +24,7 @@ private:
 
 public:
     SovereignFirmwareNexus() : m_current_version(0x0505), m_last_update_ts(0) {
-        sigma_printf("[FIRMWARE-NEXUS]: Sovereign Silicon Updates [READY].\n");
+        sigma_log("[FIRMWARE-NEXUS]: Sovereign Silicon Updates [READY].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignFirmwareNexus"; }

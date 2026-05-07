@@ -1,11 +1,11 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef RECOVERY_AGENT_HPP
 #define RECOVERY_AGENT_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Core {
@@ -25,7 +25,7 @@ private:
 
 public:
     SovereignRecoveryAgent() : m_restorations_completed(0), m_shadow_parity_active(SIGMA_TRUE) {
-        sigma_printf("[RECOVERY-AGENT]: Sovereign Self-Healing Sentinel [IGNITED].\n");
+        sigma_log("[RECOVERY-AGENT]: Sovereign Self-Healing Sentinel [IGNITED].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignRecoveryAgent"; }

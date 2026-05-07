@@ -1,6 +1,6 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "sigma_print.h"
 
 /**
@@ -88,7 +88,7 @@ extern "C" sigma_u32 print_submit_job(sigma_u32 format, sigma_u32 priority,
 
     SovereignPrintSpooler.state.jobs_queued++;
 
-    sigma_printf("[PRINT] ZDPS: Job #%d queued — fmt=%s pri=%s pages~%d (%d bytes).\n",
+    sigma_log("[PRINT] ZDPS: Job #%d queued — fmt=%s pri=%s pages~%d (%d bytes).\n",
                  (int)job->job_id,
                  _print_fmt_name(format),
                  _print_pri_name(priority),
@@ -102,11 +102,11 @@ extern "C" void print_cancel_job(sigma_u32 job_id) {
         if (SovereignPrintSpooler.jobs[i].job_id == job_id) {
             SovereignPrintSpooler.jobs[i].completed = 1u;
             SovereignPrintSpooler.state.jobs_failed++;
-            sigma_printf("[PRINT] ZDPS: Job #%d CANCELLED.\n", (int)job_id);
+            sigma_log("[PRINT] ZDPS: Job #%d CANCELLED.\n", (int)job_id);
             return;
         }
     }
-    sigma_printf("[PRINT] ZDPS: [WARN] Job #%d not found.\n", (int)job_id);
+    sigma_log("[PRINT] ZDPS: [WARN] Job #%d not found.\n", (int)job_id);
 }
 
 extern "C" void print_flush_spooler() {
@@ -116,7 +116,7 @@ extern "C" void print_flush_spooler() {
     for (sigma_u32 i = 0u; i < SovereignPrintSpooler.state.jobs_queued; i++) {
         sigma_print_job_t* job = &SovereignPrintSpooler.jobs[i];
         if (!job->completed) {
-            sigma_printf("[PRINT] ZDPS: Dispatching Job #%d (%s) via IPP socket.\n",
+            sigma_log("[PRINT] ZDPS: Dispatching Job #%d (%s) via IPP socket.\n",
                          (int)job->job_id, _print_fmt_name(job->format));
             job->completed = 1u;
             SovereignPrintSpooler.state.jobs_completed++;

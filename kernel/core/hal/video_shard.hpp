@@ -1,8 +1,9 @@
-#include "sigma_hal.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
 #ifndef VIDEO_SHARD_HPP
 #define VIDEO_SHARD_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 #include "port_shard.hpp"
 
@@ -19,7 +20,7 @@ public:
     }
 
     void SetResolution(sigma_u16 width, sigma_u16 height, sigma_u16 bpp) {
-        sigma_printf("[VIDEO-SHARD]: Setting Sovereign Resolution: %ux%ux%u\n", width, height, bpp);
+        sigma_log("[VIDEO-SHARD]: Setting Sovereign Resolution: %ux%ux%u\n", width, height, bpp);
         WriteBGA(4, 0); // Disable
         WriteBGA(1, width);
         WriteBGA(2, height);
@@ -28,11 +29,11 @@ public:
     }
 
     void AuditVideo() {
-        sigma_printf("\n--- Î£ SOVEREIGN VIDEO AUDIT ---\n");
-        sigma_printf("| Display Mode   : BGA / LFB ACTIVE\n");
-        sigma_printf("| VRAM Aperture  : 0xFD000000 [SHARDED]\n");
-        sigma_printf("| Acceleration   : 2D-BLIT / SHARD-FLIP\n");
-        sigma_printf("-------------------------------\n");
+        sigma_log("\n--- Î£ SOVEREIGN VIDEO AUDIT ---\n");
+        sigma_log("| Display Mode   : BGA / LFB ACTIVE\n");
+        sigma_log("| VRAM Aperture  : 0xFD000000 [SHARDED]\n");
+        sigma_log("| Acceleration   : 2D-BLIT / SHARD-FLIP\n");
+        sigma_log("-------------------------------\n");
     }
 };
 

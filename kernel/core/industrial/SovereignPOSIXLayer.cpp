@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign POSIX Emulation Shard
@@ -28,7 +29,7 @@ public:
     }
 
     void mapSignal(sigma_u32 posix_signal, sigma_u32 target_shard_id) {
-        sigma_printf("Σ [POSIX]: Mapping POSIX Signal %u to Shard S%02u event...\n", 
+        sigma_log("Σ [POSIX]: Mapping POSIX Signal %u to Shard S%02u event...\n", 
                      posix_signal, target_shard_id);
         
         // Translate POSIX signal to Sovereign Shard Event
@@ -46,10 +47,10 @@ public:
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN POSIX AUDIT ---\n");
-        sigma_printf("| Signal Maps Active: 3\n");
-        sigma_printf("| ABI Compatibility : POSIX.1-2017 (Simulated)\n");
-        sigma_printf("-------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN POSIX AUDIT ---\n");
+        sigma_log("| Signal Maps Active: 3\n");
+        sigma_log("| ABI Compatibility : POSIX.1-2017 (Simulated)\n");
+        sigma_log("-------------------------------\n");
     }
 
 private:

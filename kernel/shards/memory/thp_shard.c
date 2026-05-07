@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-THP-SHARD (v1.0 - PERFORMANCE SCALING)
@@ -11,7 +12,7 @@
  * =============================================================================
  */
 
-#include "../../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 #define HUGE_PAGE_SIZE (2u * 1024u * 1024u) /* 2MB Shard */
 

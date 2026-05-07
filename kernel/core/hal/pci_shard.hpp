@@ -1,10 +1,11 @@
-#include "sigma_hal.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
 #ifndef PCI_SHARD_HPP
 #define PCI_SHARD_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -27,9 +28,9 @@ public:
     }
 
     void EnumerateLattice() {
-        sigma_printf("[PCI-SHARD]: Enumerating Hardware Lattice via Configuration Space...\n");
-        sigma_printf("[PCI-SHARD]: Found: NVMe Shard [01:00:00]\n");
-        sigma_printf("[PCI-SHARD]: Found: GPU Shard [02:00:00]\n");
+        sigma_log("[PCI-SHARD]: Enumerating Hardware Lattice via Configuration Space...\n");
+        sigma_log("[PCI-SHARD]: Found: NVMe Shard [01:00:00]\n");
+        sigma_log("[PCI-SHARD]: Found: GPU Shard [02:00:00]\n");
     }
 };
 

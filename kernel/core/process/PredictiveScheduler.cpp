@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Predictive Scheduler
@@ -29,18 +30,18 @@ public:
     }
 
     void scheduleShard(const char* shard_id, sigma_u32 priority) {
-        sigma_printf("Î£ [PREDICT-SCHED]: Analyzing silicon density for Shard: %s...\n", shard_id);
+        sigma_log("Î£ [PREDICT-SCHED]: Analyzing silicon density for Shard: %s...\n", shard_id);
         // Simulated Predictive placement based on thermal/latency metrics
         m_optimizations++;
-        sigma_printf("Î£ [PREDICT-SCHED]: Shard '%s' dispatched to Optimal Silicon Node (Latency: 2ms).\n", shard_id);
+        sigma_log("Î£ [PREDICT-SCHED]: Shard '%s' dispatched to Optimal Silicon Node (Latency: 2ms).\n", shard_id);
     }
 
     void audit() {
-        sigma_printf("\n--- Î£ SOVEREIGN PREDICTIVE AUDIT ---\n");
-        sigma_printf("| Optimizations   : %u\n", m_optimizations);
-        sigma_printf("| Efficiency      : 98.4%%\n");
-        sigma_printf("| Dispatch Mode   : NEURAL-AWARE\n");
-        sigma_printf("------------------------------------\n");
+        sigma_log("\n--- Î£ SOVEREIGN PREDICTIVE AUDIT ---\n");
+        sigma_log("| Optimizations   : %u\n", m_optimizations);
+        sigma_log("| Efficiency      : 98.4%%\n");
+        sigma_log("| Dispatch Mode   : NEURAL-AWARE\n");
+        sigma_log("------------------------------------\n");
     }
 
 private:

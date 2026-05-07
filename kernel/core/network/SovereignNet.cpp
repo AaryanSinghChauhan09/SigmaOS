@@ -1,7 +1,7 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 #include "sigma_net.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Networking Implementation
@@ -11,8 +11,8 @@
  */
 
 typedef struct {
-    uint16_t port;
-    uint32_t shard_id;
+    sigma_u16 port;
+    sigma_u32 shard_id;
 } net_route_t;
 
 class SovereignNetEngine {
@@ -41,12 +41,12 @@ public:
         // Directs packets to specific system shards based on port/IP patterns
         // without intermediate kernel buffers.
         
-        sigma_printf("[NET] PPR: Analyzing Packet: %08X -> %08X (Port %d)\n", 
+        sigma_log("[NET] PPR: Analyzing Packet: %08X -> %08X (Port %d)\n", 
                      pkt->src_ip, pkt->dst_ip, pkt->dst_port);
                      
         for (int i = 0; i < 8; i++) {
             if (this->ppr_routing_table[i].port == pkt->dst_port) {
-                sigma_printf("[NET] PPR: Direct-routing to Shard S%02d based on silicon-mapped port.\n", 
+                sigma_log("[NET] PPR: Direct-routing to Shard S%02d based on silicon-mapped port.\n", 
                              this->ppr_routing_table[i].shard_id);
                 return;
             }
@@ -55,8 +55,8 @@ public:
         sigma_log("[NET] PPR: No route found. Defaulting to Genesis Orchestrator (S01).");
     }
 
-    bool transmitShard(uint32_t target_ip, uint32_t shard_id) {
-        sigma_printf("[NET] Silicon-Direct Transmit: Shard S%02d -> %08X\n", shard_id, target_ip);
+    bool transmitShard(sigma_u32 target_ip, sigma_u32 shard_id) {
+        sigma_log("[NET] Silicon-Direct Transmit: Shard S%02d -> %08X\n", shard_id, target_ip);
         
         // Simulate bare-metal DMA transfer
         sigma_log("[NET] DMA Transfer COMPLETE. Shard delivered to wire.");
@@ -83,7 +83,7 @@ extern "C" void net_process_packet(sigma_packet_t* pkt) {
     SovereignNetEngine::getInstance().processPacket(pkt);
 }
 
-extern "C" bool net_transmit_shard(uint32_t target_ip, uint32_t shard_id) {
+extern "C" bool net_transmit_shard(sigma_u32 target_ip, sigma_u32 shard_id) {
     return SovereignNetEngine::getInstance().transmitShard(target_ip, shard_id);
 }
 

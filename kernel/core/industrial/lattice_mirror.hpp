@@ -1,11 +1,11 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef LATTICE_MIRROR_HPP
 #define LATTICE_MIRROR_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -26,7 +26,7 @@ private:
 
 public:
     SovereignLatticeMirror() : m_mirror_id(0x7A7), m_last_sync_ts(0), m_parity_valid(SIGMA_TRUE) {
-        sigma_printf("[MIRROR]: Shadow Lattice Nexus [ARMED].\n");
+        sigma_log("[MIRROR]: Shadow Lattice Nexus [ARMED].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignLatticeMirror"; }

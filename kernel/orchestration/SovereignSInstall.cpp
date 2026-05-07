@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =========================================================================
  * SIGMAOS: SOVEREIGN S-INSTALL (SovereignDeploymentEngine)
@@ -11,7 +12,7 @@
  */
 
 #include "sigma_sinstall.h"
-#include "../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 /* =========================================================================
  * SovereignDeploymentEngine Method Implementations
@@ -29,7 +30,7 @@ public:
     }
 
     void ignite(const char* target_disk) {
-        sigma_printf("[S-INSTALL] Igniting Sovereign Lattice on %s...\n", target_disk);
+        sigma_log("[S-INSTALL] Igniting Sovereign Lattice on %s...\n", target_disk);
         sigma_hardened_strcpy(this->session.target_disk, target_disk, 32u);
         this->session.progress_percent = 0u;
 

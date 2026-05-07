@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Widget Engine
@@ -33,12 +33,12 @@ public:
 
         sigma_hardened_strcpy(this->widgets[this->active_widgets], widget_type, 32);
         this->active_widgets++;
-        sigma_printf("[WIDGETS] Spawned '%s' widget at (%u, %u) with Glassmorphism FX.\n", widget_type, x, y);
+        sigma_log("[WIDGETS] Spawned '%s' widget at (%u, %u) with Glassmorphism FX.\n", widget_type, x, y);
     }
 
     void interactWidget(sigma_u32 id, const char* interaction) {
         if (id >= this->active_widgets) return;
-        sigma_printf("[WIDGETS] User interaction '%s' registered on Widget %u.\n", interaction, id);
+        sigma_log("[WIDGETS] User interaction '%s' registered on Widget %u.\n", interaction, id);
     }
 
 private:

@@ -1,7 +1,7 @@
 #ifndef SIGMA_DIAG_H
 #define SIGMA_DIAG_H
 
-#include "sigma_types.h"
+#include "core/sigma_types.h"
 
 typedef struct {
     sigma_u32 component_id;

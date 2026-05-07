@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Atomic Updater Shard
@@ -29,7 +30,7 @@ public:
     }
 
     void deployUpdate(const char* image_hash) {
-        sigma_printf("Σ [ATOMIC-OS]: Staging immutable system image '%s'...\n", image_hash);
+        sigma_log("Σ [ATOMIC-OS]: Staging immutable system image '%s'...\n", image_hash);
         // Stage update in secondary partition
         m_current_generation++;
         sigma_log("Σ [ATOMIC-OS]: Update staged. Rebooting into Generation + 1 via A/B partition flip.");
@@ -38,7 +39,7 @@ public:
     void rollback() {
         if (m_current_generation > 1) {
             m_current_generation--;
-            sigma_printf("Σ [ATOMIC-OS]: Rolling back to Generation %u...\n", m_current_generation);
+            sigma_log("Σ [ATOMIC-OS]: Rolling back to Generation %u...\n", m_current_generation);
             sigma_log("Σ [ATOMIC-OS]: Rollback complete. System state restored flawlessly.");
         } else {
             sigma_log("Σ [ATOMIC-OS]: [ERROR] Already at Genesis generation.");
@@ -46,11 +47,11 @@ public:
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN ATOMIC OS AUDIT ---\n");
-        sigma_printf("| Generation     : %u\n", m_current_generation);
-        sigma_printf("| State Model    : DECLARATIVE IMMUTABLE\n");
-        sigma_printf("| Update Mode    : A/B FLIP (OSTree Parity)\n");
-        sigma_printf("------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN ATOMIC OS AUDIT ---\n");
+        sigma_log("| Generation     : %u\n", m_current_generation);
+        sigma_log("| State Model    : DECLARATIVE IMMUTABLE\n");
+        sigma_log("| Update Mode    : A/B FLIP (OSTree Parity)\n");
+        sigma_log("------------------------------------\n");
     }
 
 private:

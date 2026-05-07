@@ -1,6 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
-#include "sigma_scheduler.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
+#include "system/sigma_scheduler.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -34,7 +35,7 @@ void SovereignScheduler::schedule(void (*task)(), sigma_u32 priority) {
         new_task.silicon_affinity = new_task.id % 8; 
     }
     
-    sigma_printf("Σ [SCHEDULER]: Scheduled Task %u [Priority: %u] on Core %u (Silicon Thermal: %uC)\n", 
+    sigma_log("Σ [SCHEDULER]: Scheduled Task %u [Priority: %u] on Core %u (Silicon Thermal: %uC)\n", 
                  new_task.id, priority, new_task.silicon_affinity, core_temp);
 }
 

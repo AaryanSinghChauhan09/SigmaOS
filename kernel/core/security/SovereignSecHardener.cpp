@@ -1,6 +1,6 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 /**
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN SECURITY HARDENER (S-SECHARDENER) — SHARD #500
@@ -15,8 +15,8 @@
  */
 
 #include "sigma_sechardener.h"
-#include "../../../include/sigma_hal.h""
-#include "sigma_libc.h"
+#include "hal/sigma_hal.h"
+#include "libc/sigma_libc.h"
 
 /**
  * sigma_hardened_strcpy — CWE-119 fix for unsafe strcpy usage.
@@ -49,14 +49,14 @@ extern "C" void sechardener_init() {
     sigma_log("[SECHARDENER] PLPE: Enforcing Principle of Least Privilege across all 500 shards.");
 }
 
-extern "C" void sechardener_apply_to_shard(uint32_t shard_id, sigma_harden_level_t level) {
+extern "C" void sechardener_apply_to_shard(sigma_u32 shard_id, sigma_harden_level_t level) {
     /**
      * PLPE (Principle of Least Privilege Enforcement) Algorithm:
      * Level 0 — BASELINE: ASLR randomization + stack canary injection.
      * Level 1 — STRICT:   + seccomp-style syscall allow-list filtering.
      * Level 2 — SOVEREIGN: + full Cryptographic Isolation Boundary (from S-Sandbox).
      */
-    sigma_printf("[SECHARDENER] PLPE: Applying harden level %d to Shard %d.\n", (int)level, shard_id);
+    sigma_log("[SECHARDENER] PLPE: Applying harden level %d to Shard %d.\n", (int)level, shard_id);
 
     if (level >= HARDEN_LEVEL_BASELINE) {
         sigma_log("[SECHARDENER] PLPE: ASLR randomization applied. Stack canary injected.");
@@ -69,14 +69,14 @@ extern "C" void sechardener_apply_to_shard(uint32_t shard_id, sigma_harden_level
     }
 }
 
-extern "C" void sechardener_validate_buffer(const void* buf, uint32_t claimed_size, uint32_t actual_capacity) {
+extern "C" void sechardener_validate_buffer(const void* buf, sigma_u32 claimed_size, sigma_u32 actual_capacity) {
     /* CWE-119 runtime guard — called at every shard public API boundary */
     if (!buf) {
         sigma_log("[SECHARDENER] ❌ PLPE: NULL buffer passed to public API. REJECTED.");
         return;
     }
     if (claimed_size > actual_capacity) {
-        sigma_printf("[SECHARDENER] ❌ PLPE: Buffer overflow attempt blocked! Claimed=%d, Actual=%d.\n",
+        sigma_log("[SECHARDENER] ❌ PLPE: Buffer overflow attempt blocked! Claimed=%d, Actual=%d.\n",
                      claimed_size, actual_capacity);
         return;
     }

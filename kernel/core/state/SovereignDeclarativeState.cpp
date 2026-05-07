@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Declarative State Shard
@@ -28,18 +29,18 @@ public:
     }
 
     void buildState(const char* state_hash) {
-        sigma_printf("Σ [DECLARATIVE]: Reconstructing system state from hash '%s'...\n", state_hash);
+        sigma_log("Σ [DECLARATIVE]: Reconstructing system state from hash '%s'...\n", state_hash);
         // Execute pure functional evaluation of the Lattice state
         sigma_log("Σ [DECLARATIVE]: State RECONSTRUCTED. 100% mathematical reproducibility achieved.");
         m_states_built++;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN DECLARATIVE AUDIT ---\n");
-        sigma_printf("| States Reconstructed : %u\n", m_states_built);
-        sigma_printf("| Ideology Absorbed    : NIX OS\n");
-        sigma_printf("| Model                : PURE FUNCTIONAL STATE\n");
-        sigma_printf("----------------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN DECLARATIVE AUDIT ---\n");
+        sigma_log("| States Reconstructed : %u\n", m_states_built);
+        sigma_log("| Ideology Absorbed    : NIX OS\n");
+        sigma_log("| Model                : PURE FUNCTIONAL STATE\n");
+        sigma_log("----------------------------------------------\n");
     }
 
 private:

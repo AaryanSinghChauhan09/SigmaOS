@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Quick Shortcuts
@@ -24,7 +24,7 @@ public:
     }
 
     void pushContextShortcut(const char* context, const char* suggestion) {
-        sigma_printf("[SHORTCUTS] Predicted Action: Context '%s' -> Suggesting '%s'.\n", 
+        sigma_log("[SHORTCUTS] Predicted Action: Context '%s' -> Suggesting '%s'.\n", 
                      context, suggestion);
     }
 

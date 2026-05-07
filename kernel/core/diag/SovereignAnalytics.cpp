@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Kernel Analytics Shard
@@ -29,16 +30,16 @@ public:
     }
 
     void trackEvent(const char* shard_id, const char* event_type) {
-        sigma_printf("Î£ [ANALYTICS]: Tracking [%s] Event for Shard: %s...\n", event_type, shard_id);
+        sigma_log("Î£ [ANALYTICS]: Tracking [%s] Event for Shard: %s...\n", event_type, shard_id);
         m_events_tracked++;
     }
 
     void audit() {
-        sigma_printf("\n--- Î£ SOVEREIGN ANALYTICS AUDIT ---\n");
-        sigma_printf("| Events Tracked  : %u\n", m_events_tracked);
-        sigma_printf("| Telemetry Mode  : SILICON-DIRECT\n");
-        sigma_printf("| Lattice Health  : 100%%\n");
-        sigma_printf("------------------------------------\n");
+        sigma_log("\n--- Î£ SOVEREIGN ANALYTICS AUDIT ---\n");
+        sigma_log("| Events Tracked  : %u\n", m_events_tracked);
+        sigma_log("| Telemetry Mode  : SILICON-DIRECT\n");
+        sigma_log("| Lattice Health  : 100%%\n");
+        sigma_log("------------------------------------\n");
     }
 
 private:

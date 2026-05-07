@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Telemetry Shard
@@ -29,15 +30,15 @@ public:
 
     void recordMetric(const char* metric_name, sigma_u64 value) {
         // High-speed, lockless ring-buffer telemetry logging
-        sigma_printf("Σ [TELEMETRY]: METRIC_UPDATE -> %s : %llu\n", metric_name, value);
+        sigma_log("Σ [TELEMETRY]: METRIC_UPDATE -> %s : %llu\n", metric_name, value);
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN TELEMETRY AUDIT ---\n");
-        sigma_printf("| Resolution     : SUB-MICROSECOND\n");
-        sigma_printf("| Overhead Target: < 1%%\n");
-        sigma_printf("| Mode           : SILICON-DIRECT\n");
-        sigma_printf("-----------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN TELEMETRY AUDIT ---\n");
+        sigma_log("| Resolution     : SUB-MICROSECOND\n");
+        sigma_log("| Overhead Target: < 1%%\n");
+        sigma_log("| Mode           : SILICON-DIRECT\n");
+        sigma_log("-----------------------------------\n");
     }
 
 private:

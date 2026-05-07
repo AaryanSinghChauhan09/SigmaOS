@@ -1,5 +1,5 @@
 #include "Lattice.h"
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN PROBLEM SOLVER (v128.0 - SCHOLASTIC SOLVER)
@@ -8,7 +8,7 @@
  * =========================================================================
  */
 
-#include "../../../include/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 #include "userland/apps/scholar_zenith/solvers.hpp"
 
 using namespace SigmaOS;
@@ -26,9 +26,9 @@ public:
     }
 
     void ExecuteSolverAudit() {
-        sigma_printf("--- Î£ SIGMA OS MASTER SCHOLASTIC PROBLEM SOLVER ---\n");
+        sigma_log("--- Î£ SIGMA OS MASTER SCHOLASTIC PROBLEM SOLVER ---\n");
         for (int i = 0; i < m_count; i++) {
-            sigma_printf("\n[SOLVE-SHADING]: Executing Solution Shard: %s...\n", m_solvers[i]->type_name());
+            sigma_log("\n[SOLVE-SHADING]: Executing Solution Shard: %s...\n", m_solvers[i]->type_name());
             m_solvers[i]->Solve();
         }
     }
@@ -43,6 +43,6 @@ int main() {
     solver.Synthesize();
     solver.ExecuteSolverAudit();
 
-    sigma_printf("\n[SUCCESS]: Competitive Scholastic Problem Solver Online. NCERT Sovereignty 100%.\n");
+    sigma_log("\n[SUCCESS]: Competitive Scholastic Problem Solver Online. NCERT Sovereignty 100%.\n");
     return 0;
 }

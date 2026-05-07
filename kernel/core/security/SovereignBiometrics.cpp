@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Biometrics (Identity Shard)
@@ -28,7 +28,7 @@ public:
 
     bool verifyUser(const char* biometric_type, const void* sample_data, sigma_size_t size) {
         (void)sample_data; (void)size;
-        sigma_printf("[BIOMETRICS] Scanning %s signature on the silicon fabric...\n", biometric_type);
+        sigma_log("[BIOMETRICS] Scanning %s signature on the silicon fabric...\n", biometric_type);
         sigma_log("[BIOMETRICS] PQC-verifying biometric hash against SovereignVault...");
         
         // Simulated biometric match

@@ -1,5 +1,5 @@
 #include "Lattice.h"
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN PERSONA MANAGER (v21.0)
@@ -20,7 +20,7 @@ extern "C" void _start(void) {
 }
 
 int main() {
-    sigma_printf("[SIGMA_PERSONA]: Initiating Sovereign Customization Shards...\n");
+    sigma_log("[SIGMA_PERSONA]: Initiating Sovereign Customization Shards...\n");
     _start();
     return 0;
 }

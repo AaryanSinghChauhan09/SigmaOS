@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign DNS Shard
@@ -28,18 +29,18 @@ public:
     }
 
     void resolveName(const char* sovereign_domain) {
-        sigma_printf("Σ [DNS]: Resolving domain '%s' via Lattice DHT...\n", sovereign_domain);
+        sigma_log("Σ [DNS]: Resolving domain '%s' via Lattice DHT...\n", sovereign_domain);
         // Decentralized hash table lookup
         sigma_log("Σ [DNS]: Resolution SUCCESS. Cryptographic IP acquired.");
         m_resolutions++;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN DNS AUDIT ---\n");
-        sigma_printf("| Resolutions  : %u\n", m_resolutions);
-        sigma_printf("| Architecture : DECENTRALIZED (DHT)\n");
-        sigma_printf("| Dependency   : ZERO (Legacy DNS bypassed)\n");
-        sigma_printf("------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN DNS AUDIT ---\n");
+        sigma_log("| Resolutions  : %u\n", m_resolutions);
+        sigma_log("| Architecture : DECENTRALIZED (DHT)\n");
+        sigma_log("| Dependency   : ZERO (Legacy DNS bypassed)\n");
+        sigma_log("------------------------------------\n");
     }
 
 private:

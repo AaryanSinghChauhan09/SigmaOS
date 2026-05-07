@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN HYPERVISOR ZENITH (v100.0 - PURE C11)
@@ -10,7 +11,7 @@
  * =========================================================================
  */
 
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 /* =========================================================================
  * Guest Type enum (replaces C++ enum class)
@@ -62,7 +63,7 @@ static void vmm_enable_vtx(void) {
         "or  $0x2000, %0\n\t"   /* set CR4.VMXE (bit 13) */
         "mov %0, %%cr4"
         : "=r"(cr4));
-    sigma_printf("[HYPERVISOR-ZENITH]: CR4.VMXE set. VT-x hardware enabled.\n");
+    sigma_log("[HYPERVISOR-ZENITH]: CR4.VMXE set. VT-x hardware enabled.\n");
 }
 
 /* --- Init (replaces C++ constructor) --- */
@@ -71,7 +72,7 @@ static void vmm_init(SovereignHypervisor* vmm) {
     vmm->active_shards      = 0;
     vmm->ring_minus_1_active = SIGMA_TRUE;
     vmm->vmexit_count       = 0;
-    sigma_printf("[HYPERVISOR-ZENITH]: Sovereign Hypervisor Shard Online (v100.0).\n");
+    sigma_log("[HYPERVISOR-ZENITH]: Sovereign Hypervisor Shard Online (v100.0).\n");
     vmm_enable_vtx();
 }
 
@@ -89,16 +90,16 @@ static void vmm_swallow_guest(SovereignHypervisor* vmm, GuestType type) {
         sigma_print("[HYPERVISOR-ZENITH]: Guest shard table full.\n");
         return;
     }
-    sigma_printf("[HYPERVISOR-ZENITH]: Swallowing %s Shard...\n",
+    sigma_log("[HYPERVISOR-ZENITH]: Swallowing %s Shard...\n",
                  guest_type_str(type));
-    sigma_printf("[HYPERVISOR-ZENITH]: | Guest Ring-0 -> Sigma-Ring-3 (Isolated).\n");
+    sigma_log("[HYPERVISOR-ZENITH]: | Guest Ring-0 -> Sigma-Ring-3 (Isolated).\n");
 
     GuestShard* gs = &vmm->guests[vmm->active_shards];
     vmm_init_vmcs(gs, type, vmm->active_shards);
 
-    sigma_printf("[HYPERVISOR-ZENITH]: | VMCS @ ");
+    sigma_log("[HYPERVISOR-ZENITH]: | VMCS @ ");
     sigma_print_hex(gs->vmcs_base);
-    sigma_printf("  gCR3 @ ");
+    sigma_log("  gCR3 @ ");
     sigma_print_hex(gs->guest_cr3);
     sigma_print("\n");
 
@@ -107,19 +108,19 @@ static void vmm_swallow_guest(SovereignHypervisor* vmm, GuestType type) {
 
 /* --- VMEXIT handler (new C11 shard) --- */
 static void vmm_handle_vmexit(SovereignHypervisor* vmm, sigma_u32 reason) {
-    sigma_printf("[HYPERVISOR-ZENITH]: VMEXIT reason=0x%x intercepted.\n", reason);
+    sigma_log("[HYPERVISOR-ZENITH]: VMEXIT reason=0x%x intercepted.\n", reason);
     vmm->vmexit_count++;
 }
 
 /* --- Audit (replaces C++ audit() method) --- */
 static void vmm_audit(const SovereignHypervisor* vmm) {
-    sigma_printf("\n--- Î£ SOVEREIGN HYPERVISOR AUDIT (v100.0) ---\n");
-    sigma_printf("| Guest Shards   : %u\n", vmm->active_shards);
-    sigma_printf("| Ring -1 Active : %s\n",
+    sigma_log("\n--- Î£ SOVEREIGN HYPERVISOR AUDIT (v100.0) ---\n");
+    sigma_log("| Guest Shards   : %u\n", vmm->active_shards);
+    sigma_log("| Ring -1 Active : %s\n",
                  vmm->ring_minus_1_active ? "YES (VT-x CAPTURED)" : "NO");
-    sigma_printf("| VMEXIT Count   : %llu\n", vmm->vmexit_count);
-    sigma_printf("| Competitors    : KVM/Xen/Hyper-V neutralized.\n");
-    sigma_printf("--------------------------------------------\n");
+    sigma_log("| VMEXIT Count   : %llu\n", vmm->vmexit_count);
+    sigma_log("| Competitors    : KVM/Xen/Hyper-V neutralized.\n");
+    sigma_log("--------------------------------------------\n");
 }
 
 /* =========================================================================
@@ -138,7 +139,7 @@ void start_hypervisor_zenith(void) {
 }
 
 int main(void) {
-    sigma_printf("[SIGMA_VMM]: Bootstrapping Hypervisor Zenith (Pure C11)...\n");
+    sigma_log("[SIGMA_VMM]: Bootstrapping Hypervisor Zenith (Pure C11)...\n");
     start_hypervisor_zenith();
     return 0;
 }

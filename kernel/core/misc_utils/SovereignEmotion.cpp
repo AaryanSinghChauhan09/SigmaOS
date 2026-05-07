@@ -1,7 +1,7 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 #include "sigma_emotion.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 #include "sigma_universal_ui.h"
 #include "sigma_focus.h"
 
@@ -14,8 +14,8 @@
 /* --- Sovereign Emotion Manager (OOPS Isolation) --- */
 static struct {
     sigma_emotion_state_t current_state;
-    uint32_t state_dwell_time;
-    uint32_t dwell_threshold;
+    sigma_u32 state_dwell_time;
+    sigma_u32 dwell_threshold;
 } SovereignEmotionManager = {
     .current_state = EMOTION_STATE_NEUTRAL,
     .state_dwell_time = 0,
@@ -37,7 +37,7 @@ extern "C" void emotion_update_state(sigma_emotion_state_t new_state) {
     
     SovereignEmotionManager.current_state = new_state;
     SovereignEmotionManager.state_dwell_time = 0;
-    sigma_printf("[EMOTION] CSE: Confirmed user state transition to %d.\n", (int)new_state);
+    sigma_log("[EMOTION] CSE: Confirmed user state transition to %d.\n", (int)new_state);
     
     if (new_state == EMOTION_STATE_FRUSTRATED) {
         sigma_log("[EMOTION] CSE: Stress threshold reached. Cooling UI palette.");

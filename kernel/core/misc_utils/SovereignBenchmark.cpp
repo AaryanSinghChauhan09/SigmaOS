@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Benchmark Engine
@@ -25,23 +25,23 @@ public:
     }
 
     void runContextSwitchBenchmark(sigma_u32 iterations) {
-        sigma_printf("[BENCH] Context Switch Benchmark: %u iterations...\n", iterations);
+        sigma_log("[BENCH] Context Switch Benchmark: %u iterations...\n", iterations);
         // Simulate bare-metal cycle counter
         sigma_u32 simulated_ns = 42; // SigmaOS: ~42ns vs Linux ~1200ns
-        sigma_printf("[BENCH] Result: %u ns/switch — %.1fx faster than Linux.\n",
+        sigma_log("[BENCH] Result: %u ns/switch — %.1fx faster than Linux.\n",
                      simulated_ns, 1200.0f / simulated_ns);
         this->benchmarks_run++;
     }
 
     void runMemoryThroughputBenchmark(sigma_u32 buffer_mb) {
-        sigma_printf("[BENCH] Memory Throughput Benchmark: %u MB buffer...\n", buffer_mb);
+        sigma_log("[BENCH] Memory Throughput Benchmark: %u MB buffer...\n", buffer_mb);
         sigma_u32 simulated_gbps = 98; // SigmaOS NUMA-pinned throughput
-        sigma_printf("[BENCH] Result: %u GB/s — NUMA-optimal bandwidth achieved.\n", simulated_gbps);
+        sigma_log("[BENCH] Result: %u GB/s — NUMA-optimal bandwidth achieved.\n", simulated_gbps);
         this->benchmarks_run++;
     }
 
     void publishResults() {
-        sigma_printf("[BENCH] Silicon Sovereignty Benchmark complete. %u benchmarks run.\n",
+        sigma_log("[BENCH] Silicon Sovereignty Benchmark complete. %u benchmarks run.\n",
                      this->benchmarks_run);
         sigma_log("[BENCH] Results exported to SovereignTelemetryExporter endpoint.");
     }

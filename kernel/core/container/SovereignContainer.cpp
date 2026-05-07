@@ -1,6 +1,6 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Containerization (S-Container)
@@ -37,7 +37,7 @@ public:
         }
 
         sigma_u32 container_id = ++this->m_active_containers;
-        sigma_printf("[CONTAINER] Spawning Micro-VM Container C%02X from image '%s'...\n", container_id, image_name);
+        sigma_log("[CONTAINER] Spawning Micro-VM Container C%02X from image '%s'...\n", container_id, image_name);
         
         // Simulate namespace and cgroup isolation
         sigma_log("[CONTAINER] Network namespace and storage isolated. Container running.");
@@ -45,7 +45,7 @@ public:
     }
 
     void destroyContainer(sigma_u32 container_id) {
-        sigma_printf("[CONTAINER] Terminating Micro-VM Container C%02X...\n", container_id);
+        sigma_log("[CONTAINER] Terminating Micro-VM Container C%02X...\n", container_id);
         if (this->m_active_containers > 0) this->m_active_containers--;
         sigma_log("[CONTAINER] Resources freed. Container destroyed.");
     }

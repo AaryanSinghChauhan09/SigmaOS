@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Watchdog Shard
@@ -28,21 +29,21 @@ public:
     }
 
     void petWatchdog(sigma_u32 shard_id) {
-        sigma_printf("Σ [WATCHDOG]: Heartbeat received from Shard %u.\n", shard_id);
+        sigma_log("Σ [WATCHDOG]: Heartbeat received from Shard %u.\n", shard_id);
     }
 
     void triggerRecovery(sigma_u32 shard_id) {
-        sigma_printf("Σ [WATCHDOG]: [CRITICAL] Shard %u unresponsive. Triggering Self-Healing Restart...\n", shard_id);
+        sigma_log("Σ [WATCHDOG]: [CRITICAL] Shard %u unresponsive. Triggering Self-Healing Restart...\n", shard_id);
         sigma_log("Σ [WATCHDOG]: Recovery COMPLETE. Subsystem re-initialized.");
         m_recovery_events++;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN WATCHDOG AUDIT ---\n");
-        sigma_printf("| Recovery Events : %u\n", m_recovery_events);
-        sigma_printf("| Detection Mode  : LATTICE-HEARTBEAT\n");
-        sigma_printf("| Action          : AUTO-RESTART\n");
-        sigma_printf("------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN WATCHDOG AUDIT ---\n");
+        sigma_log("| Recovery Events : %u\n", m_recovery_events);
+        sigma_log("| Detection Mode  : LATTICE-HEARTBEAT\n");
+        sigma_log("| Action          : AUTO-RESTART\n");
+        sigma_log("------------------------------------\n");
     }
 
 private:

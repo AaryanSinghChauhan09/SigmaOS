@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN VFS ZENITH (v100.0 - PURE C11)
@@ -12,7 +13,7 @@
  * =========================================================================
  */
 
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 /* =========================================================================
  * Zenith VFS Node (replaces C++ struct with bool)
@@ -110,10 +111,10 @@ static void vfs_write_native(SovereignFileSystemZenith* vfs,
         sigma_size_t len = sigma_strlen(content);
         vfs_raw_write_shard(fd, content, len);
         sigma_close(fd);
-        sigma_printf("[VFS-SOVEREIGN]: Committed %llu bytes to %s\n",
+        sigma_log("[VFS-SOVEREIGN]: Committed %llu bytes to %s\n",
                      (sigma_u64)len, filename);
     } else {
-        sigma_printf("[VFS-SOVEREIGN]: Shard write queued (fd=%d, in-memory).\n", fd);
+        sigma_log("[VFS-SOVEREIGN]: Shard write queued (fd=%d, in-memory).\n", fd);
     }
     vfs->writes_committed++;
 }
@@ -123,24 +124,24 @@ static void vfs_list(const SovereignFileSystemZenith* vfs) {
     sigma_print("\n--- Î£ SOVEREIGN VFS LISTING ---\n");
     sigma_size_t i;
     for (i = 0; i < vfs->node_count; i++) {
-        sigma_printf("| inode=%llu  [%s]  %s  %llu bytes\n",
+        sigma_log("| inode=%llu  [%s]  %s  %llu bytes\n",
                      vfs->nodes[i].inode,
                      vfs->nodes[i].is_directory ? "DIR " : "FILE",
                      vfs->nodes[i].name,
                      (sigma_u64)vfs->nodes[i].size);
     }
-    sigma_printf("| Total nodes: %llu\n", (sigma_u64)vfs->node_count);
+    sigma_log("| Total nodes: %llu\n", (sigma_u64)vfs->node_count);
     sigma_print("--------------------------------\n");
 }
 
 /* --- Audit (replaces C++ class method) --- */
 static void vfs_audit(const SovereignFileSystemZenith* vfs) {
-    sigma_printf("\n--- Î£ SOVEREIGN VFS AUDIT (v100.0) ---\n");
-    sigma_printf("| Mounted Shards  : %llu\n", (sigma_u64)vfs->node_count);
-    sigma_printf("| Writes Committed: %llu\n", vfs->writes_committed);
-    sigma_printf("| Reads Served    : %llu\n", vfs->reads_served);
-    sigma_printf("| Competitors     : ext4/ZFS/NTFS neutralized.\n");
-    sigma_printf("--------------------------------------\n");
+    sigma_log("\n--- Î£ SOVEREIGN VFS AUDIT (v100.0) ---\n");
+    sigma_log("| Mounted Shards  : %llu\n", (sigma_u64)vfs->node_count);
+    sigma_log("| Writes Committed: %llu\n", vfs->writes_committed);
+    sigma_log("| Reads Served    : %llu\n", vfs->reads_served);
+    sigma_log("| Competitors     : ext4/ZFS/NTFS neutralized.\n");
+    sigma_log("--------------------------------------\n");
 }
 
 /* =========================================================================
@@ -158,7 +159,7 @@ void start_vfs_zenith(void) {
 
     const ZenithVFSNode* n = vfs_lookup(&vfs, "boot.sys");
     if (n) {
-        sigma_printf("[VFS]: Lookup OK â€ inode=%llu size=%llu\n",
+        sigma_log("[VFS]: Lookup OK â€ inode=%llu size=%llu\n",
                      n->inode, (sigma_u64)n->size);
     }
 

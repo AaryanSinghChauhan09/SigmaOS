@@ -1,5 +1,5 @@
 #include "Lattice.h"
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN CLOUD MAESTRO (v128.0 - ZERO-STD NATIVE)
@@ -16,6 +16,6 @@ extern "C" void _start(void) {
     maestro.DeployToCloud("APEX_AI_FUSION");
     maestro.ShowCloudMatrix();
     
-    sigma_printf("\n[SUCCESS]: Competitive Cloud Maestro Online. Zero-STL Sovereignty 100%%.\n");
+    sigma_log("\n[SUCCESS]: Competitive Cloud Maestro Online. Zero-STL Sovereignty 100%%.\n");
     sigma_exit(0);
 }

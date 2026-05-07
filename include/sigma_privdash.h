@@ -10,7 +10,7 @@
 #ifndef SIGMA_PRIVDASH_H
 #define SIGMA_PRIVDASH_H
 
-#include "sigma_types.h"
+#include "core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign VPN Shard
@@ -28,18 +29,18 @@ public:
     }
 
     void establishTunnel(const char* peer_address) {
-        sigma_printf("Σ [VPN]: Establishing Zero-Trust tunnel to %s...\n", peer_address);
+        sigma_log("Σ [VPN]: Establishing Zero-Trust tunnel to %s...\n", peer_address);
         // Integrate with QKD and Mesh Lattice
         sigma_log("Σ [VPN]: Tunnel ESTABLISHED. Traffic is now encrypted and routed via Lattice.");
         m_active_tunnels++;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN VPN AUDIT ---\n");
-        sigma_printf("| Active Tunnels : %u\n", m_active_tunnels);
-        sigma_printf("| Protocol       : SOVEREIGN-WG (WireGuard Parity)\n");
-        sigma_printf("| Security       : PQC-ENCRYPTED\n");
-        sigma_printf("------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN VPN AUDIT ---\n");
+        sigma_log("| Active Tunnels : %u\n", m_active_tunnels);
+        sigma_log("| Protocol       : SOVEREIGN-WG (WireGuard Parity)\n");
+        sigma_log("| Security       : PQC-ENCRYPTED\n");
+        sigma_log("------------------------------------\n");
     }
 
 private:

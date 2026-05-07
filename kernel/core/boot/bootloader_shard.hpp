@@ -1,11 +1,11 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef BOOTLOADER_SHARD_HPP
 #define BOOTLOADER_SHARD_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -25,7 +25,7 @@ private:
 
 public:
     SovereignBootloader() : m_boot_status(0), m_memory_map_addr(0x1000) {
-        sigma_printf("[BOOTLOADER]: Stage-1 Sovereign Ignition [READY].\n");
+        sigma_log("[BOOTLOADER]: Stage-1 Sovereign Ignition [READY].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignBootloader"; }

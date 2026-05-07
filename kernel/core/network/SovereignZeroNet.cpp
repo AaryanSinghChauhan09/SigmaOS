@@ -1,5 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 #include "sigma_zeronet.h"
 
 namespace SigmaOS {
@@ -14,12 +15,12 @@ void SovereignZeroNet::init() {
 
 void SovereignZeroNet::transfer(void* data, sigma_size_t len, const char* destination) {
     (void)data; // Stub: will map to NIC DMA buffer
-    sigma_printf("Σ [ZERONET]: Zero-Copy Transfer of %llu bytes to %s\n", len, destination);
+    sigma_log("Σ [ZERONET]: Zero-Copy Transfer of %llu bytes to %s\n", len, destination);
     this->packets_processed++;
 }
 
-bool SovereignZeroNet::establishConnection(uint32_t source, uint32_t target) {
-    sigma_printf("Σ [ZERONET]: Establishing Zero-Trust Lattice link (Shard %u -> Shard %u)...\n", source, target);
+bool SovereignZeroNet::establishConnection(sigma_u32 source, sigma_u32 target) {
+    sigma_log("Σ [ZERONET]: Establishing Zero-Trust Lattice link (Shard %u -> Shard %u)...\n", source, target);
     return true;
 }
 
@@ -36,11 +37,11 @@ extern "C" void zeronet_transfer(void* data, sigma_size_t len, const char* dest)
     SigmaOS::Kernel::Network::SovereignZeroNet::getInstance().transfer(data, len, dest);
 }
 
-extern "C" bool zeronet_establish_connection(uint32_t source, uint32_t target) {
+extern "C" bool zeronet_establish_connection(sigma_u32 source, sigma_u32 target) {
     return SigmaOS::Kernel::Network::SovereignZeroNet::getInstance().establishConnection(source, target);
 }
 
-extern "C" void zeronet_verify_traffic(uint32_t conn_id, const void* payload, uint32_t size) {
+extern "C" void zeronet_verify_traffic(sigma_u32 conn_id, const void* payload, sigma_u32 size) {
     (void)conn_id; (void)payload; (void)size;
     sigma_log("Σ [ZERONET]: PQC-verification successful for inbound frame.");
 }

@@ -1,6 +1,7 @@
-#include "../../../include/sigma_data_forge.h"
-#include "../../../include/SovereignLibC.h"
-#include "../../../include/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "sigma_data_forge.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -27,7 +28,7 @@ void SovereignDataForge::dispatch(sigma_forge_op_t op, const void* data, sigma_s
         case FORGE_OP_TRANSFORM: op_name = "TRANSFORM"; break;
     }
 
-    sigma_printf("[DATAFORGE] SDP: Dispatching %s operation to %u shards (Dataset: %lu bytes)...\n", 
+    sigma_log("[DATAFORGE] SDP: Dispatching %s operation to %u shards (Dataset: %lu bytes)...\n", 
                  op_name, 600, (unsigned long)size);
     
     // Simulate parallel execution
@@ -35,7 +36,7 @@ void SovereignDataForge::dispatch(sigma_forge_op_t op, const void* data, sigma_s
 }
 
 void SovereignDataForge::reportStatus() {
-    sigma_printf("[DATAFORGE] Matrix Status: %u active pipelines. %lu bytes processed since boot.\n", 
+    sigma_log("[DATAFORGE] Matrix Status: %u active pipelines. %lu bytes processed since boot.\n", 
                  this->m_active_pipelines, (unsigned long)this->m_processed_bytes);
 }
 

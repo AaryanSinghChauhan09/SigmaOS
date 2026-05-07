@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: EXCEPTION HANDLER (v1.0)
@@ -5,7 +6,7 @@
  * Principles: Autonomous Error Handling & System Resilience.
  * =============================================================================
  */
-#include "../../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 extern void kprintf(const char* fmt, ...);
 

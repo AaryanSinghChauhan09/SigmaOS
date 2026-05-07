@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Accessibility Shard
@@ -28,15 +28,15 @@ public:
     }
 
     void announceEvent(const char* text) {
-        sigma_printf("Σ [ACCESSIBILITY]: Announcing: '%s' (Neural-TTS active).\n", text);
+        sigma_log("Σ [ACCESSIBILITY]: Announcing: '%s' (Neural-TTS active).\n", text);
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN ACCESSIBILITY AUDIT ---\n");
-        sigma_printf("| Screen Reading : ACTIVE (Neural-TTS)\n");
-        sigma_printf("| Haptic Feedback: ENABLED (Silicon-Direct)\n");
-        sigma_printf("| Gesture Engine : MULTI-MODAL\n");
-        sigma_printf("--------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN ACCESSIBILITY AUDIT ---\n");
+        sigma_log("| Screen Reading : ACTIVE (Neural-TTS)\n");
+        sigma_log("| Haptic Feedback: ENABLED (Silicon-Direct)\n");
+        sigma_log("| Gesture Engine : MULTI-MODAL\n");
+        sigma_log("--------------------------------------\n");
     }
 
 private:

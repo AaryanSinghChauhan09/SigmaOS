@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign eBPF Nexus Shard
@@ -29,16 +29,16 @@ public:
 
     void loadProgram(const char* prog_name, const void* bytecode, sigma_usize size) {
         (void)bytecode; (void)size;
-        sigma_printf("Σ [eBPF-NEXUS]: Verifying and JIT-compiling tracing program '%s'...\n", prog_name);
+        sigma_log("Σ [eBPF-NEXUS]: Verifying and JIT-compiling tracing program '%s'...\n", prog_name);
         sigma_log("Σ [eBPF-NEXUS]: Verification PASSED. Program attached to Lattice hook.");
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN eBPF AUDIT ---\n");
-        sigma_printf("| Verification Model : FORMAL-PROOFS\n");
-        sigma_printf("| Execution Mode     : JIT-COMPILED\n");
-        sigma_printf("| Hook Injection     : ZERO-LATENCY\n");
-        sigma_printf("------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN eBPF AUDIT ---\n");
+        sigma_log("| Verification Model : FORMAL-PROOFS\n");
+        sigma_log("| Execution Mode     : JIT-COMPILED\n");
+        sigma_log("| Hook Injection     : ZERO-LATENCY\n");
+        sigma_log("------------------------------------\n");
     }
 
 private:

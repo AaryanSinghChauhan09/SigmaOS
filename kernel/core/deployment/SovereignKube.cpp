@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Kubernetes Operator (SovereignKube)
@@ -29,11 +29,11 @@ public:
     void reconcileLatticeState() {
         sigma_log("[KUBE] Reconciling desired vs. actual lattice state...");
         // Check if all pods (shards) are running on the correct nodes
-        sigma_printf("[KUBE] Lattice Status: %u Pods (Shards) HEALTHY.\n", this->m_active_pods);
+        sigma_log("[KUBE] Lattice Status: %u Pods (Shards) HEALTHY.\n", this->m_active_pods);
     }
 
     void deployShardPod(const char* pod_name) {
-        sigma_printf("[KUBE] Deploying Shard-Pod '%s' via Mesh-Lattice Orchestrator...\n", pod_name);
+        sigma_log("[KUBE] Deploying Shard-Pod '%s' via Mesh-Lattice Orchestrator...\n", pod_name);
         this->m_active_pods++;
         sigma_log("[KUBE] Pod successfully scheduled on Node-0x8F.");
     }

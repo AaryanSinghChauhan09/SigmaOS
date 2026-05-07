@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN PROCESS MANAGER (v25.0 - PURE C11)
@@ -10,7 +11,7 @@
  * =========================================================================
  */
 
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 /* PCB state constants */
 #define PROC_STATE_READY   0u
@@ -115,12 +116,12 @@ static void pm_isolate_vfs(SovereignProcessManager* pm, const char* ns) {
 
 /* --- Audit (replaces C++ audit() method) --- */
 static void pm_audit(const SovereignProcessManager* pm) {
-    sigma_printf("\n--- Î£ SOVEREIGN PROCESS AUDIT (v25.0) ---\n");
-    sigma_printf("| Active Shards  : %u\n", pm->active_count);
-    sigma_printf("| Killed Shards  : %u\n", pm->kills);
-    sigma_printf("| Virtualization : [VT-x/SVM SHARDED ACTIVE]\n");
-    sigma_printf("| Isolation      : [CAPABILITY-BASED NAMESPACE]\n");
-    sigma_printf("------------------------------------------\n");
+    sigma_log("\n--- Î£ SOVEREIGN PROCESS AUDIT (v25.0) ---\n");
+    sigma_log("| Active Shards  : %u\n", pm->active_count);
+    sigma_log("| Killed Shards  : %u\n", pm->kills);
+    sigma_log("| Virtualization : [VT-x/SVM SHARDED ACTIVE]\n");
+    sigma_log("| Isolation      : [CAPABILITY-BASED NAMESPACE]\n");
+    sigma_log("------------------------------------------\n");
 }
 
 /* =========================================================================

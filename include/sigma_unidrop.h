@@ -10,7 +10,7 @@
 #ifndef SIGMA_UNIDROP_H
 #define SIGMA_UNIDROP_H
 
-#include "sigma_types.h"
+#include "core/sigma_types.h"
 #include "sigma_clipboard.h"
 
 #ifdef __cplusplus

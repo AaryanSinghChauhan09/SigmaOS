@@ -1,11 +1,11 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef SOVEREIGN_VITO_HPP
 #define SOVEREIGN_VITO_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Virtualization {
@@ -27,7 +27,7 @@ private:
 
 public:
     SovereignVito() : m_active_guests(0), m_guest_instructions(0), m_hardware_passthrough_active(SIGMA_TRUE) {
-        sigma_printf("[VITO-NEXUS]: Sovereign Virtualization Shard [IGNITED].\n");
+        sigma_log("[VITO-NEXUS]: Sovereign Virtualization Shard [IGNITED].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignVito"; }

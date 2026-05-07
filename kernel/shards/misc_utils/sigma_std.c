@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SIGMA-STANDARD-SHARD (v2.0 - SOVEREIGN SILICON DIRECT)
@@ -11,7 +12,7 @@
  * =============================================================================
  */
 
-#include "../../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 /* =========================================================================
  * SILICON-DIRECT SYSCALL BRIDGE (x86_64)

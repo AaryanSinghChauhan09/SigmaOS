@@ -1,9 +1,9 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "sigma_gui.h"
-#include "../../../include/sigma_hal.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "ui/sigma_gui.h"
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign GUI Implementation

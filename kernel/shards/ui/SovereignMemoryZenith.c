@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN MEMORY ZENITH (v100.0 - PURE C11)
@@ -13,7 +14,7 @@
  * =========================================================================
  */
 
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 /* =========================================================================
  * Memory Segment Descriptor (replaces C++ struct with bool)
@@ -41,17 +42,17 @@ typedef struct SovereignMemoryManager {
 
 /* --- Init (replaces C++ constructor) --- */
 static void mem_init(SovereignMemoryManager* mm) {
-    sigma_printf("[KERNEL-SOVEREIGN]: Mapping Raw Silicon Stack (64MB Shard)...\n");
+    sigma_log("[KERNEL-SOVEREIGN]: Mapping Raw Silicon Stack (64MB Shard)...\n");
     mm->pool = (sigma_u8*)sigma_slab_alloc_raw(MEM_POOL_SIZE);
     if (!mm->pool) {
-        sigma_printf("[ERROR]: Failed to map sovereign heap shard.\n");
+        sigma_log("[ERROR]: Failed to map sovereign heap shard.\n");
         sigma_exit(1);
     }
     mm->used          = 0;
     mm->segment_count = 0;
     mm->alloc_calls   = 0;
     mm->free_calls    = 0;
-    sigma_printf("[KERNEL-SOVEREIGN]: Memory Shard Mapped at ");
+    sigma_log("[KERNEL-SOVEREIGN]: Memory Shard Mapped at ");
     sigma_print_hex((sigma_u64)(sigma_size_t)mm->pool);
     sigma_print("\n");
 }
@@ -95,18 +96,18 @@ static sigma_size_t mem_page_align(sigma_size_t size) {
 
 /* --- Audit (replaces C++ audit() method) --- */
 static void mem_audit(const SovereignMemoryManager* mm) {
-    sigma_printf("\n--- Î£ SOVEREIGN MEMORY AUDIT (v100.0) ---\n");
-    sigma_printf("| Total Pool     : %u MB\n",
+    sigma_log("\n--- Î£ SOVEREIGN MEMORY AUDIT (v100.0) ---\n");
+    sigma_log("| Total Pool     : %u MB\n",
                  (unsigned int)(MEM_POOL_SIZE / 1024u / 1024u));
-    sigma_printf("| Used Space     : %u KB\n",
+    sigma_log("| Used Space     : %u KB\n",
                  (unsigned int)(mm->used / 1024u));
-    sigma_printf("| Free Space     : %u KB\n",
+    sigma_log("| Free Space     : %u KB\n",
                  (unsigned int)((MEM_POOL_SIZE - mm->used) / 1024u));
-    sigma_printf("| Managed Shards : %llu\n", (sigma_u64)mm->segment_count);
-    sigma_printf("| Alloc Calls    : %llu\n", mm->alloc_calls);
-    sigma_printf("| Free  Calls    : %llu\n", mm->free_calls);
-    sigma_printf("| Competitors    : jemalloc/ptmalloc neutralized.\n");
-    sigma_printf("-----------------------------------------\n");
+    sigma_log("| Managed Shards : %llu\n", (sigma_u64)mm->segment_count);
+    sigma_log("| Alloc Calls    : %llu\n", mm->alloc_calls);
+    sigma_log("| Free  Calls    : %llu\n", mm->free_calls);
+    sigma_log("| Competitors    : jemalloc/ptmalloc neutralized.\n");
+    sigma_log("-----------------------------------------\n");
 }
 
 /* =========================================================================
@@ -120,16 +121,16 @@ void start_memory_zenith(void) {
     void* b2 = mem_allocate(&manager, mem_page_align(1024 * 1024 * 2));
     void* b3 = mem_allocate(&manager, 256);
 
-    sigma_printf("[MEM-ZENITH]: b1=%p b2=%p b3=%p\n", b1, b2, b3);
+    sigma_log("[MEM-ZENITH]: b1=%p b2=%p b3=%p\n", b1, b2, b3);
     sigma_memset(b3, 0xAA, 256);  /* zero-fill demo */
 
     mem_audit(&manager);
     mem_deallocate(&manager, b1);
-    sigma_printf("[MEM-ZENITH]: b1 deallocated (shard-marked).\n");
+    sigma_log("[MEM-ZENITH]: b1 deallocated (shard-marked).\n");
 }
 
 int main(void) {
-    sigma_printf("[SIGMA_KERNEL]: Transitioning to Sovereign Memory Management (C11)...\n");
+    sigma_log("[SIGMA_KERNEL]: Transitioning to Sovereign Memory Management (C11)...\n");
     start_memory_zenith();
     return 0;
 }

@@ -1,10 +1,10 @@
 #ifndef SOVEREIGN_SENSOR_NEXUS_HPP
 #define SOVEREIGN_SENSOR_NEXUS_HPP
 
-#include "../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "../../include/sigma_types.h"
-#include "../../include/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Drivers {
@@ -26,7 +26,7 @@ private:
 
 public:
     SovereignSensorNexus() : m_active_sensors(1024), m_telemetry_shards(0), m_environmental_awareness_active(SIGMA_TRUE) {
-        sigma_printf("[SENSOR-NEXUS]: Sovereign Telemetry Shard [IGNITED].\n");
+        sigma_log("[SENSOR-NEXUS]: Sovereign Telemetry Shard [IGNITED].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignSensorNexus"; }

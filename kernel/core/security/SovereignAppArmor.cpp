@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "sigma_apparmor.h"
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "security/sigma_apparmor.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -19,17 +19,17 @@ void SovereignAppArmor::init() {
 
 void SovereignAppArmor::loadProfile(const char* profile_name, const void* rules) {
     (void)rules;
-    sigma_printf("Σ [APPARMOR]: Loading security profile '%s' into Lattice...\n", profile_name);
+    sigma_log("Σ [APPARMOR]: Loading security profile '%s' into Lattice...\n", profile_name);
     sigma_log("Σ [APPARMOR]: Profile ENFORCED. Sub-process syscalls restricted.");
     m_active_profiles++;
 }
 
 void SovereignAppArmor::audit() {
-    sigma_printf("\n--- Σ SOVEREIGN APPARMOR AUDIT ---\n");
-    sigma_printf("| Active Profiles : %u\n", m_active_profiles);
-    sigma_printf("| Enforcement     : MANDATORY (MAC)\n");
-    sigma_printf("| Isolation Level : SHARD-BOUNDARY\n");
-    sigma_printf("------------------------------------\n");
+    sigma_log("\n--- Σ SOVEREIGN APPARMOR AUDIT ---\n");
+    sigma_log("| Active Profiles : %u\n", m_active_profiles);
+    sigma_log("| Enforcement     : MANDATORY (MAC)\n");
+    sigma_log("| Isolation Level : SHARD-BOUNDARY\n");
+    sigma_log("------------------------------------\n");
 }
 
 } // namespace Security

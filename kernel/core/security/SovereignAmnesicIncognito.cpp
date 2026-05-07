@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Amnesic Incognito Shard
@@ -28,18 +29,18 @@ public:
     }
 
     void launchUntraceableShard(const char* target_shard) {
-        sigma_printf("Σ [INCOGNITO]: Launching Shard '%s' in Amnesic Isolation...\n", target_shard);
+        sigma_log("Σ [INCOGNITO]: Launching Shard '%s' in Amnesic Isolation...\n", target_shard);
         // Ensure all writes are diverted to volatile memory and network traffic is Tor-routed
         sigma_log("Σ [INCOGNITO]: Shard launched. All footprints will be cryptographically erased upon termination.");
         m_amnesic_sessions++;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN INCOGNITO AUDIT ---\n");
-        sigma_printf("| Amnesic Sessions : %u\n", m_amnesic_sessions);
-        sigma_printf("| Ideology Absorbed: TAILS OS\n");
-        sigma_printf("| Network Routing  : ONION-ROUTED / ZERO-TRUST\n");
-        sigma_printf("--------------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN INCOGNITO AUDIT ---\n");
+        sigma_log("| Amnesic Sessions : %u\n", m_amnesic_sessions);
+        sigma_log("| Ideology Absorbed: TAILS OS\n");
+        sigma_log("| Network Routing  : ONION-ROUTED / ZERO-TRUST\n");
+        sigma_log("--------------------------------------------\n");
     }
 
 private:

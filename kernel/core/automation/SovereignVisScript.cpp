@@ -1,7 +1,7 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 #include "sigma_visscript.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Visual Scripting (S-VisScript)
@@ -30,7 +30,7 @@ public:
         
         const sigma_visscript_node_t* current = start_node;
         while (current != SIGMA_NULL) {
-            sigma_printf("[VISSCRIPT] NGE: Executing Node ID %u (Op: %s)...\n", 
+            sigma_log("[VISSCRIPT] NGE: Executing Node ID %u (Op: %s)...\n", 
                          current->node_id, current->operation);
             
             // Logic to bridge node operations to kernel syscalls

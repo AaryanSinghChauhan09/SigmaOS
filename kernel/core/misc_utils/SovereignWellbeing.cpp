@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 #include "sigma_wellbeing.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 
 
@@ -16,8 +16,8 @@ extern "C" void wellbeing_init() {
     sigma_log("[WELLBEING] Initializing Sovereign Digital Wellbeing (BUA Algorithm)...");
 }
 
-extern "C" void wellbeing_log_app_usage(uint32_t app_id, uint32_t seconds) {
-    sigma_printf("[WELLBEING] BUA: App %d used for %d seconds this session.\n", app_id, seconds);
+extern "C" void wellbeing_log_app_usage(sigma_u32 app_id, sigma_u32 seconds) {
+    sigma_log("[WELLBEING] BUA: App %d used for %d seconds this session.\n", app_id, seconds);
 }
 
 extern "C" void wellbeing_render_daily_report() {
@@ -29,8 +29,8 @@ extern "C" void wellbeing_render_daily_report() {
     sigma_log("[WELLBEING] BUA: Report rendered on Universal UI.");
 }
 
-extern "C" void wellbeing_set_daily_limit(uint32_t app_id, uint32_t max_minutes) {
-    sigma_printf("[WELLBEING] BUA: Daily limit for App %d set to %d minutes.\n", app_id, max_minutes);
+extern "C" void wellbeing_set_daily_limit(sigma_u32 app_id, sigma_u32 max_minutes) {
+    sigma_log("[WELLBEING] BUA: Daily limit for App %d set to %d minutes.\n", app_id, max_minutes);
     sigma_log("[WELLBEING] BUA: S-NotifyIQ will alert when 80% of limit is reached.");
 }
 

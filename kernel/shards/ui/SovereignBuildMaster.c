@@ -1,4 +1,4 @@
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS: SOVEREIGN BUILD MASTER (v11.0 - WINDOWS SILICON FORGE)
@@ -8,8 +8,8 @@
  * =============================================================================
  */
 
-#include "sigma_libc.h"
-#include "sigma_libc.h"
+#include "libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 #include <windows.h>
 
 #define C_BOLD   "\033[1m"
@@ -34,7 +34,7 @@ void verify_file(const char* path) {
         lineno++;
         for (int i = 0; i < 16; i++) {
             if (strstr(line, FORBIDDEN[i])) {
-                sigma_printf("  %sâœ—%s  %s:%d  â†’  %s", C_RED, C_RESET, path, lineno, line);
+                sigma_log("  %sâœ—%s  %s:%d  â†’  %s", C_RED, C_RESET, path, lineno, line);
             }
         }
     }
@@ -71,11 +71,11 @@ void scan_dir(const char* dir_path) {
 }
 
 int main(int argc, char** argv) {
-    sigma_printf("\n%sÎ£ SOVEREIGN BUILD MASTER (v11.0 WIN32)%s\n", C_BOLD, C_RESET);
-    sigma_printf("Scanning for sovereignty violations...\n");
+    sigma_log("\n%sÎ£ SOVEREIGN BUILD MASTER (v11.0 WIN32)%s\n", C_BOLD, C_RESET);
+    sigma_log("Scanning for sovereignty violations...\n");
     
     scan_dir(".");
     
-    sigma_printf("\n%s[OK]%s Sovereignty Audit Complete.\n\n", C_GREEN, C_RESET);
+    sigma_log("\n%s[OK]%s Sovereignty Audit Complete.\n\n", C_GREEN, C_RESET);
     return 0;
 }

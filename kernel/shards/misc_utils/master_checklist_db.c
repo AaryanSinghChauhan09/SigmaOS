@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-MASTER-CHECKLIST-DATABASE (v14.0 - EDUCATIONAL)
@@ -13,7 +14,7 @@
  * =============================================================================
  */
 
-#include "../../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 #define TOTAL_DOMAINS 262144
 #define MAX_TUTORIAL_STEPS 2048

@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Notification Center
@@ -46,9 +46,9 @@ public:
         sigma_hardened_strcpy(n->source, source, 32);
         sigma_hardened_strcpy(n->message, message, 128);
 
-        sigma_printf("[NOTIF] #%u from '%s': %s\n", n->id, source, message);
+        sigma_log("[NOTIF] #%u from '%s': %s\n", n->id, source, message);
         if (this->sound_enabled && sound_id > 0) {
-            sigma_printf("[NOTIF] Playing sound profile %u via SovereignAudio DMA.\n", sound_id);
+            sigma_log("[NOTIF] Playing sound profile %u via SovereignAudio DMA.\n", sound_id);
         }
         return n->id;
     }
@@ -57,7 +57,7 @@ public:
         for (sigma_u32 i = 0; i < this->notif_count; i++) {
             if (this->notifications[i].id == notif_id) {
                 this->notifications[i].dismissed = true;
-                sigma_printf("[NOTIF] Dismissed notification #%u.\n", notif_id);
+                sigma_log("[NOTIF] Dismissed notification #%u.\n", notif_id);
                 return;
             }
         }
@@ -65,7 +65,7 @@ public:
 
     void setSoundEnabled(bool enabled) {
         this->sound_enabled = enabled;
-        sigma_printf("[NOTIF] Sound notifications: %s.\n", enabled ? "ON" : "OFF");
+        sigma_log("[NOTIF] Sound notifications: %s.\n", enabled ? "ON" : "OFF");
     }
 
 private:

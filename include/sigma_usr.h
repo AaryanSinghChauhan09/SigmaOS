@@ -9,7 +9,7 @@
 #ifndef SIGMA_USR_H
 #define SIGMA_USR_H
 
-#include "sigma_types.h"
+#include "core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

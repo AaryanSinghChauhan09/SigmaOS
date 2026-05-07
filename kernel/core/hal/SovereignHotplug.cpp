@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Hotplug Manager
@@ -35,7 +35,7 @@ public:
         sigma_log("[HOTPLUG] Scanning PCIe/USB shards for new silicon signatures...");
         // Simulated discovery
         this->m_device_count++;
-        sigma_printf("[HOTPLUG] Device Discovered: SiliconID 0x%04X, Sharding driver...\n", 0x1234);
+        sigma_log("[HOTPLUG] Device Discovered: SiliconID 0x%04X, Sharding driver...\n", 0x1234);
     }
 
 private:

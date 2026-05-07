@@ -5,232 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SigmaOS: The Sovereign Operating System</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #030305;
-            --surface: #0a0a0f;
-            --accent: #00ffcc;
-            --accent-glow: rgba(0, 255, 204, 0.4);
-            --text-main: #f0f0f0;
-            --text-muted: #888;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            overflow-x: hidden;
-        }
-
-        header {
-            padding: 40px 10%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            background: rgba(3, 3, 5, 0.8);
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 900;
-            letter-spacing: 2px;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo span {
-            color: var(--accent);
-        }
-
-        nav a {
-            color: var(--text-main);
-            text-decoration: none;
-            margin-left: 30px;
-            font-weight: 400;
-            transition: color 0.3s;
-        }
-
-        nav a:hover {
-            color: var(--accent);
-        }
-
-        .hero {
-            height: 90vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: relative;
-            background: radial-gradient(circle at center, rgba(0, 255, 204, 0.1) 0%, transparent 60%);
-        }
-
-        h1 {
-            font-size: 5rem;
-            font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 20px;
-            background: linear-gradient(to right, #fff, #888);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero p {
-            font-size: 1.5rem;
-            color: var(--text-muted);
-            max-width: 800px;
-            margin-bottom: 40px;
-        }
-
-        .btn {
-            padding: 15px 40px;
-            background: transparent;
-            border: 2px solid var(--accent);
-            color: var(--accent);
-            font-size: 1.1rem;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px var(--accent-glow);
-        }
-
-        .btn:hover {
-            background: var(--accent);
-            color: var(--bg);
-            box-shadow: 0 0 30px var(--accent-glow);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid transparent;
-            color: white;
-            box-shadow: none;
-            margin-left: 20px;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            box-shadow: none;
-        }
-
-        .features {
-            padding: 100px 10%;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-        }
-
-        .feature-card {
-            background: var(--surface);
-            padding: 40px;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: transform 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, var(--accent), transparent);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-10px);
-        }
-
-        .feature-card:hover::before {
-            opacity: 1;
-        }
-
-        .feature-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            color: var(--accent);
-        }
-
-        .feature-card p {
-            color: var(--text-muted);
-            line-height: 1.6;
-        }
-
-        .zenith-demo {
-            padding: 100px 10%;
-            background: var(--surface);
-            text-align: center;
-        }
-
-        .zenith-demo h2 {
-            font-size: 3rem;
-            margin-bottom: 20px;
-        }
-
-        .zenith-demo p {
-            color: var(--text-muted);
-            margin-bottom: 40px;
-            font-size: 1.2rem;
-        }
-
-        .demo-window {
-            width: 100%;
-            max-width: 1200px;
-            height: 600px;
-            margin: 0 auto;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            position: relative;
-        }
-
-        .demo-window iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 5px 10px;
-            background: rgba(0, 255, 204, 0.1);
-            color: var(--accent);
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-family: 'JetBrains Mono', monospace;
-            margin-bottom: 20px;
-            border: 1px solid rgba(0, 255, 204, 0.3);
-        }
-
-        footer {
-            padding: 60px 10%;
-            text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            color: var(--text-muted);
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -239,9 +14,9 @@
         <nav>
             <a href="#features">Architecture</a>
             <a href="#zenith">Zenith UI</a>
-            <a href="https://github.com/AaryanSinghChauhan09/SigmaOS/wiki" target="_blank">Wiki</a>
-            <a href="https://github.com/AaryanSinghChauhan09/SigmaOS/discussions" target="_blank">Discussions</a>
-            <a href="https://github.com/AaryanSinghChauhan09/SigmaOS" target="_blank">GitHub</a>
+            <a href="https://github.com/AaryanSinghChauhan09/SigmaOS/wiki" target="_blank" rel="noopener">Wiki</a>
+            <a href="https://github.com/AaryanSinghChauhan09/SigmaOS/discussions" target="_blank" rel="noopener">Discussions</a>
+            <a href="https://github.com/AaryanSinghChauhan09/SigmaOS" target="_blank" rel="noopener">GitHub</a>
         </nav>
     </header>
 
@@ -249,10 +24,10 @@
         <div class="badge">LATTICE BUILD 1.0 (QUANTUM-READY)</div>
         <h1>The World's Most Advanced<br>Sovereign Operating System</h1>
         <p>A decentralized, quantum-hardened, and AI-driven ecosystem designed to absorb and outclass traditional Linux distributions. SigmaOS represents the evolution of hardware sovereignty and cognitive user experience.</p>
-        <div style="display: flex; gap: 20px; align-items: center;">
-            <a href="https://github.com/AaryanSinghChauhan09/SigmaOS/releases" class="btn">Download ISO</a>
+        <div class="hero-actions">
+            <a href="https://github.com/AaryanSinghChauhan09/SigmaOS/releases" class="btn" target="_blank" rel="noopener">Download ISO</a>
             <a href="zenith.html" class="btn btn-secondary">Launch Zenith Demo</a>
-            <a href="https://github.com/AaryanSinghChauhan09/SigmaOS/discussions" class="btn btn-secondary" style="border: 1px solid rgba(255,255,255,0.2);">Join the Community</a>
+            <a href="https://github.com/AaryanSinghChauhan09/SigmaOS/discussions" class="btn btn-secondary btn-community" target="_blank" rel="noopener">Join the Community</a>
         </div>
     </section>
 

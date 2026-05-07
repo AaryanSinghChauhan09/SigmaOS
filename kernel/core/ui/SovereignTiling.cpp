@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Tiling Window Manager
@@ -45,11 +45,11 @@ public:
         }
         sigma_hardened_strcpy(t->app_id, app_id, 32);
         this->tile_count++;
-        sigma_printf("[TILING] Tiled '%s'. Layout: %u equal columns.\n", app_id, this->tile_count);
+        sigma_log("[TILING] Tiled '%s'. Layout: %u equal columns.\n", app_id, this->tile_count);
     }
 
     void setLayout(const char* layout_name) {
-        sigma_printf("[TILING] Applying layout: '%s' across %u tiles.\n", layout_name, this->tile_count);
+        sigma_log("[TILING] Applying layout: '%s' across %u tiles.\n", layout_name, this->tile_count);
     }
 
 private:

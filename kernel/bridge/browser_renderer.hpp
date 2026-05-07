@@ -1,10 +1,10 @@
 #ifndef BROWSER_RENDERER_HPP
 #define BROWSER_RENDERER_HPP
 
-#include "../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "../../include/sigma_types.h"
-#include "../../include/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Bridge {
@@ -24,7 +24,7 @@ private:
 
 public:
     SovereignBrowserRenderer() : m_frame_nexus_id(0xCC77), m_gpu_accel(SIGMA_TRUE) {
-        sigma_printf("[BROWSER-RENDER]: Sovereign Web-Zenith Shard [ONLINE].\n");
+        sigma_log("[BROWSER-RENDER]: Sovereign Web-Zenith Shard [ONLINE].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignBrowserRenderer"; }

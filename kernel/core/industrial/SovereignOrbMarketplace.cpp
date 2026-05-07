@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Orb Marketplace
@@ -27,12 +27,12 @@ public:
     }
 
     void browseOrbs(const char* category) {
-        sigma_printf("[MARKET] Browsing category: %s on the lattice...\n", category);
+        sigma_log("[MARKET] Browsing category: %s on the lattice...\n", category);
         sigma_log("[MARKET] Fetching PQC-signed metadata from Global Shard Registry.");
     }
 
     bool downloadOrb(const char* orb_id) {
-        sigma_printf("[MARKET] Downloading Orb: %s [Merkle-Root verified]...\n", orb_id);
+        sigma_log("[MARKET] Downloading Orb: %s [Merkle-Root verified]...\n", orb_id);
         sigma_log("[MARKET] Deploying orb to SovereignSandbox for pre-ignition audit.");
         return true;
     }

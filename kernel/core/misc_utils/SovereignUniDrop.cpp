@@ -1,9 +1,9 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "sigma_unidrop.h"
-#include "../../../include/sigma_hal.h""
-#include "sigma_ipc.h"
+#include "hal/sigma_hal.h"
+#include "system/sigma_ipc.h"
 #include "sigma_continuity.h"
 
 /**
@@ -19,23 +19,23 @@ extern "C" void unidrop_init() {
     sigma_log("[UNIDROP] Initializing Sovereign Universal Drag & Drop (CBPT Algorithm)...");
 }
 
-extern "C" void unidrop_begin_drag(uint32_t source_app_id, sigma_clip_type_t data_type, const void* data_ptr, uint32_t size) {
+extern "C" void unidrop_begin_drag(sigma_u32 source_app_id, sigma_clip_type_t data_type, const void* data_ptr, sigma_u32 size) {
     active_drag_type = data_type;
     active_drag_payload = (void*)data_ptr;
-    sigma_printf("[UNIDROP] CBPT: Drag initiated from App %d (Type: %d, Size: %d).\n", 
+    sigma_log("[UNIDROP] CBPT: Drag initiated from App %d (Type: %d, Size: %d).\n", 
                  source_app_id, (int)data_type, size);
 }
 
-extern "C" void unidrop_update_cursor(uint32_t x, uint32_t y) {
+extern "C" void unidrop_update_cursor(sigma_u32 x, sigma_u32 y) {
     // Render visual feedback representing the drag state
 }
 
-extern "C" bool unidrop_commit_drop(uint32_t target_app_id) {
+extern "C" bool unidrop_commit_drop(sigma_u32 target_app_id) {
     // CBPT (Cross-Boundary Payload Transfer) Algorithm
     
     if (!active_drag_payload) return false;
     
-    sigma_printf("[UNIDROP] CBPT: Drop committed to App %d. Tunneling payload safely...\n", target_app_id);
+    sigma_log("[UNIDROP] CBPT: Drop committed to App %d. Tunneling payload safely...\n", target_app_id);
     
     // Determine if target is local, in a MicroVM, or on a remote device
     // If remote, route through S-Continuity

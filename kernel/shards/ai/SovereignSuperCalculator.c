@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN SUPER CALCULATOR (v100.0 - PURE C11)
@@ -9,7 +10,7 @@
  * =========================================================================
  */
 
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 /* =========================================================================
  * Native math shards (inline asm â€ replaces x87 opcode casts)
@@ -80,7 +81,7 @@ static sigma_f64 calc_gst(SovereignSuperCalculator* c, sigma_f64 amount) {
     sigma_f64 result = fpu_mul(amount, 1.18);
     c->last_result = result;
     c->operations++;
-    sigma_printf("[CALC-ZENITH]: GST Result = %f\n", result);
+    sigma_log("[CALC-ZENITH]: GST Result = %f\n", result);
     return result;
 }
 
@@ -90,14 +91,14 @@ static void calc_graph(SovereignSuperCalculator* c, const char* equation) {
     sigma_print(equation);
     sigma_print("\n");
     /* Sample 8 points of sin(x)*cos(x/2) via x87 */
-    sigma_printf("[CALC-ZENITH]: x  | sin(x)   | cos(x/2)\n");
+    sigma_log("[CALC-ZENITH]: x  | sin(x)   | cos(x/2)\n");
     int xi;
     for (xi = 0; xi < 8; xi++) {
         /* Simple rational approx to pi*xi/4 */
         sigma_f64 x   = (sigma_f64)xi * 0.3927; /* pi/8 */
         sigma_f64 s   = fpu_sin(x);
         sigma_f64 co  = fpu_cos(x * 0.5);
-        sigma_printf("[CALC-ZENITH]: %d  | %f   | %f\n", xi, s, co);
+        sigma_log("[CALC-ZENITH]: %d  | %f   | %f\n", xi, s, co);
     }
     (void)c;
 }
@@ -108,7 +109,7 @@ static sigma_f64 calc_sine(SovereignSuperCalculator* c, sigma_f64 angle) {
     sigma_f64 result = fpu_sin(angle);
     c->last_result = result;
     c->operations++;
-    sigma_printf("[CALC-ZENITH]: sin(%f) = %f\n", angle, result);
+    sigma_log("[CALC-ZENITH]: sin(%f) = %f\n", angle, result);
     return result;
 }
 
@@ -117,7 +118,7 @@ static sigma_f64 calc_sqrt(SovereignSuperCalculator* c, sigma_f64 x) {
     sigma_f64 result = fpu_sqrt(x);
     c->last_result = result;
     c->operations++;
-    sigma_printf("[CALC-ZENITH]: sqrt(%f) = %f\n", x, result);
+    sigma_log("[CALC-ZENITH]: sqrt(%f) = %f\n", x, result);
     return result;
 }
 
@@ -128,7 +129,7 @@ static sigma_f64 calc_predict(SovereignSuperCalculator* c,
     sigma_f64 result = a + b;  /* FADD via x87 ABI automatically */
     c->last_result = result;
     c->operations++;
-    sigma_printf("[CALC-ZENITH]: predict(%f, %f) = %f\n", a, b, result);
+    sigma_log("[CALC-ZENITH]: predict(%f, %f) = %f\n", a, b, result);
     return result;
 }
 
@@ -143,19 +144,19 @@ static sigma_f64 calc_compound(SovereignSuperCalculator* c,
         result = fpu_mul(result, 1.0 + rate);
     c->last_result = result;
     c->operations++;
-    sigma_printf("[CALC-ZENITH]: Compound Interest A = %f (P=%f r=%f n=%u)\n",
+    sigma_log("[CALC-ZENITH]: Compound Interest A = %f (P=%f r=%f n=%u)\n",
                  result, principal, rate, years);
     return result;
 }
 
 /* --- Audit --- */
 static void calc_audit(const SovereignSuperCalculator* c) {
-    sigma_printf("\n--- Î£ SOVEREIGN CALCULATOR AUDIT (v100.0) ---\n");
-    sigma_printf("| Operations     : %llu\n", c->operations);
-    sigma_printf("| Last Result    : %f\n",   c->last_result);
-    sigma_printf("| FPU Backend    : x87 (fsin/fcos/fsqrt/fmul native)\n");
-    sigma_printf("| Competitors    : Python math / WolframAlpha neutralized.\n");
-    sigma_printf("--------------------------------------------\n");
+    sigma_log("\n--- Î£ SOVEREIGN CALCULATOR AUDIT (v100.0) ---\n");
+    sigma_log("| Operations     : %llu\n", c->operations);
+    sigma_log("| Last Result    : %f\n",   c->last_result);
+    sigma_log("| FPU Backend    : x87 (fsin/fcos/fsqrt/fmul native)\n");
+    sigma_log("| Competitors    : Python math / WolframAlpha neutralized.\n");
+    sigma_log("--------------------------------------------\n");
 }
 
 /* =========================================================================

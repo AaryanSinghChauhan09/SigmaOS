@@ -1,10 +1,10 @@
 #ifndef SOVEREIGN_NEURAL_ENGINE_HPP
 #define SOVEREIGN_NEURAL_ENGINE_HPP
 
-#include "../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "../../include/sigma_types.h"
-#include "../../include/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace AI {
@@ -26,7 +26,7 @@ private:
 
 public:
     SovereignNeuralEngine() : m_neuron_count(1024 * 1024), m_synaptic_updates(0), m_learning_enabled(true) {
-        sigma_printf("[NEURAL-ENGINE]: Sovereign SNN Shard [IGNITED].\n");
+        sigma_log("[NEURAL-ENGINE]: Sovereign SNN Shard [IGNITED].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignNeuralEngine"; }

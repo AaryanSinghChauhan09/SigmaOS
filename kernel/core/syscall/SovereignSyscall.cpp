@@ -1,34 +1,34 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "sigma_syscall.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "system/sigma_syscall.h"
 #include "sigma_proc.h"
 #include "sigma_mem.h"
-#include "sigma_ipc.h"
+#include "system/sigma_ipc.h"
 
 /**
  * SigmaOS Sovereign System Call Implementation
  * Implements a Fast-Path Shard Transition (FPST) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal context management.
  *
- * Design: OOP-isolated singleton — SovereignSyscallEngine.
+ * Design: OOP-isolated singleton — SigmaOS::Kernel::Syscall::SovereignSyscallEngine.
  */
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Syscall {
 
-void SovereignSyscallEngine::init() {
+void SigmaOS::Kernel::Syscall::SovereignSyscallEngine::init() {
     sigma_log("[SYSCALL] Initializing Sovereign FPST Gate...");
     this->m_initialized = 1u;
 }
 
-sigma_u32 SovereignSyscallEngine::dispatch(sigma_syscall_id_t id, sigma_u32 arg1, sigma_u32 arg2, sigma_u32 arg3) {
+sigma_u32 SigmaOS::Kernel::Syscall::SovereignSyscallEngine::dispatch(sigma_syscall_id_t id, sigma_u32 arg1, sigma_u32 arg2, sigma_u32 arg3) {
     /* FPST (Fast-Path Shard Transition) Algorithm
      * Dispatches kernel services with minimum context overhead. */
     
     this->m_total_calls++;
-    sigma_printf("[SYSCALL] SSG Entry: ID 0x%02X, Args: [%08X, %08X, %08X]\n", (unsigned)id, (unsigned)arg1, (unsigned)arg2, (unsigned)arg3);
+    sigma_log("[SYSCALL] SSG Entry: ID 0x%02X, Args: [%08X, %08X, %08X]\n", (unsigned)id, (unsigned)arg1, (unsigned)arg2, (unsigned)arg3);
     
     switch (id) {
         case SIGMA_SYS_YIELD:
@@ -52,8 +52,8 @@ sigma_u32 SovereignSyscallEngine::dispatch(sigma_syscall_id_t id, sigma_u32 arg1
     }
 }
 
-sigma_u32 SovereignSyscallEngine::attemptSelfHealing(sigma_syscall_id_t id, sigma_u32 a1, sigma_u32 a2, sigma_u32 a3) {
-    sigma_printf("[SYSCALL] SELF-HEAL: Redirecting ID 0x%X to SovereignFallback Shard...\n", id);
+sigma_u32 SigmaOS::Kernel::Syscall::SovereignSyscallEngine::attemptSelfHealing(sigma_syscall_id_t id, sigma_u32 a1, sigma_u32 a2, sigma_u32 a3) {
+    sigma_log("[SYSCALL] SELF-HEAL: Redirecting ID 0x%X to SovereignFallback Shard...\n", id);
     (void)a1; (void)a2; (void)a3;
     sigma_log("[SYSCALL] SELF-HEAL: Fallback execution SUCCESS. Service restored.");
     return SIGMA_OK;

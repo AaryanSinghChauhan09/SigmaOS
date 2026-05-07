@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Scheduler
@@ -28,7 +28,7 @@ public:
     }
 
     void createTask(const char* name, void (*entry)()) {
-        sigma_printf("[SCHED] Spawning task shard: %s\n", name);
+        sigma_log("[SCHED] Spawning task shard: %s\n", name);
         SovereignTask* task = new SovereignTask(m_tasks->size(), name, entry);
         m_tasks->push_back(task);
     }
@@ -40,16 +40,16 @@ public:
         current_idx = (current_idx + 1) % m_tasks->size();
         
         SovereignTask* task = (*m_tasks)[current_idx];
-        sigma_printf("[SCHED] Silicon Dispatch -> %s [0x%p]\n", task->name, task->entry);
+        sigma_log("[SCHED] Silicon Dispatch -> %s [0x%p]\n", task->name, task->entry);
         
         // In a real kernel, this would call the ASM switch_to_task
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN SCHEDULER AUDIT ---\n");
-        sigma_printf("| Active Shards : %d\n", m_tasks->size());
+        sigma_log("\n--- Σ SOVEREIGN SCHEDULER AUDIT ---\n");
+        sigma_log("| Active Shards : %d\n", m_tasks->size());
         for (sigma_u32 i = 0; i < m_tasks->size(); i++) {
-            sigma_printf("| [%d] %-15s | Entry: %p\n", i, (*m_tasks)[i]->name, (*m_tasks)[i]->entry);
+            sigma_log("| [%d] %-15s | Entry: %p\n", i, (*m_tasks)[i]->name, (*m_tasks)[i]->entry);
         }
     }
 

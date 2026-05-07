@@ -1,7 +1,7 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 #include "sigma_allocator.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Custom Allocator
@@ -26,7 +26,7 @@ void* SovereignAllocatorEngine::malloc(sigma_u32 size) {
     sigma_u32 aligned_size = (total_size + 7u) & ~7u;
     
     if (this->heap_offset + aligned_size > SIGMA_HEAP_SIZE) {
-        sigma_printf("[ALLOCATOR] [FATAL] OOM: Requested %u bytes, heap full.\n", size);
+        sigma_log("[ALLOCATOR] [FATAL] OOM: Requested %u bytes, heap full.\n", size);
         return nullptr;
     }
     
@@ -35,15 +35,15 @@ void* SovereignAllocatorEngine::malloc(sigma_u32 size) {
     *prefix = SIGMA_GUARD_MAGIC;
     
     // Calculate user pointer
-    void* ptr = (void*)((uint8_t*)prefix + sizeof(sigma_u32));
+    void* ptr = (void*)((sigma_u8*)prefix + sizeof(sigma_u32));
     
     // Write suffix guard
-    sigma_u32* suffix = (sigma_u32*)((uint8_t*)ptr + size);
+    sigma_u32* suffix = (sigma_u32*)((sigma_u8*)ptr + size);
     *suffix = SIGMA_GUARD_MAGIC;
     
     this->heap_offset += aligned_size;
     
-    sigma_printf("[ALLOCATOR] QBMP: Allocated %u bytes at %p (Used: %u/%u)\n",
+    sigma_log("[ALLOCATOR] QBMP: Allocated %u bytes at %p (Used: %u/%u)\n",
                  size, ptr, this->heap_offset, SIGMA_HEAP_SIZE);
     return ptr;
 }
@@ -52,15 +52,15 @@ void SovereignAllocatorEngine::free(void* ptr) {
     if (!ptr) return;
     
     // Verify prefix guard
-    sigma_u32* prefix = (sigma_u32*)((uint8_t*)ptr - sizeof(sigma_u32));
+    sigma_u32* prefix = (sigma_u32*)((sigma_u8*)ptr - sizeof(sigma_u32));
     if (*prefix != SIGMA_GUARD_MAGIC) {
-        sigma_printf("[ALLOCATOR] [FATAL] Memory corruption detected: Prefix guard overwritten at %p!\n", ptr);
+        sigma_log("[ALLOCATOR] [FATAL] Memory corruption detected: Prefix guard overwritten at %p!\n", ptr);
         return;
     }
     
     /* Bump allocator doesn't support individual free.
      * In SigmaOS, we use per-shard reclamation. */
-    sigma_printf("[ALLOCATOR] QBMP: Verified guards, ignoring free for %p (Sovereign Policy).\n", ptr);
+    sigma_log("[ALLOCATOR] QBMP: Verified guards, ignoring free for %p (Sovereign Policy).\n", ptr);
 }
 
 /* --- C Wrappers --- */

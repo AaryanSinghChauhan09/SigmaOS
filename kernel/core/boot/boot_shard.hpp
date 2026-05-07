@@ -1,10 +1,10 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef BOOT_SHARD_HPP
 #define BOOT_SHARD_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -14,12 +14,12 @@ public:
     const char* type_name() const noexcept override { return "SovereignBootShard"; }
 
     void ValidateProtocol(const char* protocol_id) {
-        sigma_printf("[BOOT-SHARD]: Validating Sovereign Boot Protocol: %s\n", protocol_id);
-        sigma_printf("[BOOT-SHARD]: MultiBoot2 / UEFI Handshake... [OK]\n");
+        sigma_log("[BOOT-SHARD]: Validating Sovereign Boot Protocol: %s\n", protocol_id);
+        sigma_log("[BOOT-SHARD]: MultiBoot2 / UEFI Handshake... [OK]\n");
     }
 
     void JumpToKernel() {
-        sigma_printf("[BOOT-SHARD]: Transferring Control to Sovereign Kernel Zenith...\n");
+        sigma_log("[BOOT-SHARD]: Transferring Control to Sovereign Kernel Zenith...\n");
         // Simulated far jump
 #if defined(SIGMA_ARCH_X86_64)
         __asm__ volatile ("jmp *%%rax" : : "a"(0x100000) : "memory");

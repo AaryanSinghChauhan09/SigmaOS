@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "sigma_onboard.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 #include "sigma_persona.h"
 #include "sigma_biometrics.h"
 #include "sigma_access.h"
@@ -30,8 +30,8 @@ extern "C" void onboard_start_wizard() {
     sigma_log("[ONBOARD] GSP: Step 6/6: Network & Privacy Configuration...");
 }
 
-extern "C" void onboard_complete_step(uint32_t step_id) {
-    sigma_printf("[ONBOARD] GSP: Step %d completed successfully.\n", step_id);
+extern "C" void onboard_complete_step(sigma_u32 step_id) {
+    sigma_log("[ONBOARD] GSP: Step %d completed successfully.\n", step_id);
 }
 
 

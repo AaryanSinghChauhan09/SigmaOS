@@ -1,9 +1,9 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "sigma_eyetrack.h"
-#include "../../../include/sigma_hal.h""
-#include "sigma_neural.h"
+#include "hal/sigma_hal.h"
+#include "ai/sigma_neural.h"
 #include "sigma_universal_ui.h"
 
 /**

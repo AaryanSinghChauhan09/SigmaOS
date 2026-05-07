@@ -1,6 +1,7 @@
+#include "core/sigma_types.h"
 #include "SovereignMultiUser.hpp"
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 SovereignMultiUserEngine& SovereignMultiUserEngine::getInstance() {
     static SovereignMultiUserEngine instance;
@@ -22,7 +23,7 @@ sigma_u32 SovereignMultiUserEngine::registerUser(sigma_u32 uid, sigma_u32 gid, c
     u->gid = gid;
     sigma_hardened_strcpy(u->username, username, 32);
     u->capability_mask = caps;
-    sigma_printf("[MULTIUSER] User '%s' (UID:%u GID:%u) registered with cap 0x%llX.\n",
+    sigma_log("[MULTIUSER] User '%s' (UID:%u GID:%u) registered with cap 0x%llX.\n",
                  username, uid, gid, (unsigned long long)caps);
     return uid;
 }
@@ -31,7 +32,7 @@ bool SovereignMultiUserEngine::authenticate(sigma_u32 uid, const char* username)
     for (sigma_u32 i = 0; i < this->user_count; i++) {
         if (this->users[i].uid == uid &&
             sigma_strcmp(this->users[i].username, username) == 0) {
-            sigma_printf("[MULTIUSER] Authenticated: '%s' (UID:%u).\n", username, uid);
+            sigma_log("[MULTIUSER] Authenticated: '%s' (UID:%u).\n", username, uid);
             return true;
         }
     }

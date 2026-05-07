@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Rolling Release Shard
@@ -28,18 +29,18 @@ public:
     }
 
     void syncBleedingEdge() {
-        sigma_printf("Σ [ROLLING]: Synchronizing Lattice with continuous integration edge...\n");
+        sigma_log("Σ [ROLLING]: Synchronizing Lattice with continuous integration edge...\n");
         // Pull latest shards without breaking existing active sessions
         sigma_log("Σ [ROLLING]: Sync COMPLETE. Architecture updated with zero downtime.");
         m_syncs_completed++;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN ROLLING RELEASE AUDIT ---\n");
-        sigma_printf("| Syncs Completed  : %u\n", m_syncs_completed);
-        sigma_printf("| Ideology Absorbed: ARCH / SOLUS / ENDEAVOUROS\n");
-        sigma_printf("| Update Model     : FRICTIONLESS ROLLING\n");
-        sigma_printf("----------------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN ROLLING RELEASE AUDIT ---\n");
+        sigma_log("| Syncs Completed  : %u\n", m_syncs_completed);
+        sigma_log("| Ideology Absorbed: ARCH / SOLUS / ENDEAVOUROS\n");
+        sigma_log("| Update Model     : FRICTIONLESS ROLLING\n");
+        sigma_log("----------------------------------------------\n");
     }
 
 private:

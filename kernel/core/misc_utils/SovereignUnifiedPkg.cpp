@@ -1,9 +1,9 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "sigma_unifiedpkg.h"
-#include "../../../include/sigma_hal.h""
-#include "sigma_libc.h"
+#include "hal/sigma_hal.h"
+#include "libc/sigma_libc.h"
 
 /**
  * SigmaOS Sovereign Unified Package System
@@ -12,7 +12,7 @@
  */
 
 static sigma_unified_pkg_t package_db[1024];
-static uint32_t installed_packages = 0;
+static sigma_u32 installed_packages = 0;
 
 extern "C" void unifiedpkg_init() {
     sigma_log("[UNIFIEDPKG] Initializing Sovereign Unified Package System (UCPG Algorithm)...");
@@ -20,7 +20,7 @@ extern "C" void unifiedpkg_init() {
 
 extern "C" bool unifiedpkg_verify_signature(const sigma_unified_pkg_t* pkg) {
     // Validate the cryptographic signature using post-quantum secure hashing
-    sigma_printf("[UNIFIEDPKG] UCPG: Verifying signature for %s...\n", pkg->package_name);
+    sigma_log("[UNIFIEDPKG] UCPG: Verifying signature for %s...\n", pkg->package_name);
     // Simulate verification
     return true;
 }
@@ -28,7 +28,7 @@ extern "C" bool unifiedpkg_verify_signature(const sigma_unified_pkg_t* pkg) {
 extern "C" bool unifiedpkg_install(const char* package_url, bool system_level) {
     if (installed_packages >= 1024) return false;
 
-    sigma_printf("[UNIFIEDPKG] UCPG: Fetching and verifying package from %s...\n", package_url);
+    sigma_log("[UNIFIEDPKG] UCPG: Fetching and verifying package from %s...\n", package_url);
     
     sigma_unified_pkg_t* new_pkg = &package_db[installed_packages++];
     sigma_hardened_strcpy(new_pkg->package_name, "sigma_app_bundle", 64);
@@ -42,14 +42,14 @@ extern "C" bool unifiedpkg_install(const char* package_url, bool system_level) {
         return false;
     }
     
-    sigma_printf("[UNIFIEDPKG] UCPG: Package %s installed successfully.\n", new_pkg->package_name);
+    sigma_log("[UNIFIEDPKG] UCPG: Package %s installed successfully.\n", new_pkg->package_name);
     return true;
 }
 
 extern "C" void unifiedpkg_list_installed() {
     sigma_log("[UNIFIEDPKG] Installed Packages:");
-    for (uint32_t i = 0; i < installed_packages; i++) {
-        sigma_printf("  - %s (System: %d)\n", package_db[i].package_name, package_db[i].is_system_critical);
+    for (sigma_u32 i = 0; i < installed_packages; i++) {
+        sigma_log("  - %s (System: %d)\n", package_db[i].package_name, package_db[i].is_system_critical);
     }
 }
 

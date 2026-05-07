@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Wi-Fi Stack
@@ -36,18 +36,18 @@ public:
     sigma_u32 scan() {
         sigma_log("[WIFI] Scanning 2.4GHz + 5GHz + 6GHz bands...");
         this->networks_scanned = 8; // Simulated
-        sigma_printf("[WIFI] Scan complete. %u networks found.\n", this->networks_scanned);
+        sigma_log("[WIFI] Scan complete. %u networks found.\n", this->networks_scanned);
         return this->networks_scanned;
     }
 
     bool connect(const char* ssid, const char* passphrase, sigma_wifi_security_t security) {
-        sigma_printf("[WIFI] Connecting to '%s' (WPA%u)...\n", ssid, security + 1);
+        sigma_log("[WIFI] Connecting to '%s' (WPA%u)...\n", ssid, security + 1);
         if (security == WIFI_WPA3) {
             sigma_log("[WIFI] WPA3-SAE handshake using SovereignPQC entropy — FORWARD SECRECY GUARANTEED.");
         }
         this->connected = true;
         this->signal_dbm = -45; // Strong signal simulated
-        sigma_printf("[WIFI] Connected to '%s'. Signal: %d dBm.\n", ssid, this->signal_dbm);
+        sigma_log("[WIFI] Connected to '%s'. Signal: %d dBm.\n", ssid, this->signal_dbm);
         return true;
     }
 

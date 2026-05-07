@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: ZENITH GUI COMPOSITOR (v1.0)
@@ -5,7 +6,7 @@
  * Principles: Sharded Window Management & VGA Glassmorphism.
  * =============================================================================
  */
-#include "../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 #define COLS 80
 #define ROWS 25

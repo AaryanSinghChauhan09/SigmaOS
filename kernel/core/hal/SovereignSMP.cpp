@@ -1,6 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "sigma_smp.h"
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "hal/sigma_smp.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -19,9 +20,9 @@ void SovereignTicketLock::unlock() {
     __atomic_fetch_add(&m_now_serving, 1, __ATOMIC_SEQ_CST);
 }
 
-/* --- SovereignSMPEngine Implementation --- */
+/* --- SigmaOS::Kernel::HAL::SovereignSMPEngine Implementation --- */
 
-void SovereignSMPEngine::init() {
+void SigmaOS::Kernel::HAL::SovereignSMPEngine::init() {
     sigma_log("[SMP] Initializing Sovereign Silicon-Parallel Execution (SPE)...");
     this->m_active_cores = 1u;
     this->m_bsp_id = 0u;
@@ -29,16 +30,16 @@ void SovereignSMPEngine::init() {
     sigma_log("[SMP] Industrial Primitives: Ticket Locks ARMED.");
 }
 
-void SovereignSMPEngine::igniteCores() {
+void SigmaOS::Kernel::HAL::SovereignSMPEngine::igniteCores() {
     sigma_log("[SMP] SPE: Broadcasting Startup IPI (SIPI) to all silicon cores...");
     /* SPE Algorithm: Parallel ignition of APs (Application Processors) */
     this->m_active_cores = 16u; // Simulated 16-core ignition
-    sigma_printf("[SMP] SPE: %u cores successfully synchronized in the lattice.\n", 
+    sigma_log("[SMP] SPE: %u cores successfully synchronized in the lattice.\n", 
                  this->m_active_cores);
 }
 
-void SovereignSMPEngine::broadcastIPI(sigma_u32 vector) {
-    sigma_printf("[SMP] SPE: Dispatching Inter-Processor Interrupt (Vector: 0x%02X).\n", vector);
+void SigmaOS::Kernel::HAL::SovereignSMPEngine::broadcastIPI(sigma_u32 vector) {
+    sigma_log("[SMP] SPE: Dispatching Inter-Processor Interrupt (Vector: 0x%02X).\n", vector);
 }
 
 } // namespace HAL

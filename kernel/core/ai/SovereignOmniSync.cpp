@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 #include "sigma_omnisync.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 
 /**
@@ -16,7 +16,7 @@ extern "C" void omnisync_init() {
 }
 
 extern "C" void omnisync_register_directory(const char* dir_path) {
-    sigma_printf("[OMNISYNC] CDR: Directory '%s' registered for continuous replication.\n", dir_path);
+    sigma_log("[OMNISYNC] CDR: Directory '%s' registered for continuous replication.\n", dir_path);
 }
 
 extern "C" void omnisync_trigger_sync() {

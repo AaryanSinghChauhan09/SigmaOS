@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Aether Firewall (Neural Nexus)
@@ -28,7 +28,7 @@ public:
 
     bool inspectPacket(const void* data, sigma_size_t size, const char* source) {
         (void)data; (void)size;
-        sigma_printf("[FIREWALL] Inspecting packet from %s via Neural Heuristics...\n", source);
+        sigma_log("[FIREWALL] Inspecting packet from %s via Neural Heuristics...\n", source);
         
         // Simulated AI threat detection
         if (sigma_strstr(source, "MALICIOUS") || sigma_strstr(source, "EXFIL")) {
@@ -50,11 +50,11 @@ public:
     }
 
     void auditFirewall() {
-        sigma_printf("\n--- Σ SOVEREIGN FIREWALL AUDIT ---\n");
-        sigma_printf("| Blocked Threats : %u\n", m_blocked_threats);
-        sigma_printf("| AI Intelligence : NEURAL-HEURISTIC v10.0\n");
-        sigma_printf("| Perimeter Status: SEALED\n");
-        sigma_printf("------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN FIREWALL AUDIT ---\n");
+        sigma_log("| Blocked Threats : %u\n", m_blocked_threats);
+        sigma_log("| AI Intelligence : NEURAL-HEURISTIC v10.0\n");
+        sigma_log("| Perimeter Status: SEALED\n");
+        sigma_log("------------------------------------\n");
     }
 
 private:

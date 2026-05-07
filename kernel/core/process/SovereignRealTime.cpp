@@ -1,7 +1,7 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 #include "sigma_realtime.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Real-Time Core
@@ -27,7 +27,7 @@ public:
         if (this->active_tasks >= 16) return false;
         
         this->task_queue[this->active_tasks++] = *task;
-        sigma_printf("[REALTIME] EDFC: Scheduled Task %d (Priority: %d).\n", 
+        sigma_log("[REALTIME] EDFC: Scheduled Task %d (Priority: %d).\n", 
                      task->task_id, task->priority);
                      
         return true;
@@ -42,7 +42,7 @@ private:
     SovereignRealTimeManager() : active_tasks(0) {}
     
     sigma_realtime_task_t task_queue[16];
-    uint32_t active_tasks;
+    sigma_u32 active_tasks;
 };
 
 /* --- C Wrappers --- */

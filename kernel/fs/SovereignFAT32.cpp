@@ -1,13 +1,13 @@
-#include "../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /**
  * SigmaOS Sovereign FAT32 Filesystem
  * v29.0 Zenith Foundation — Minimal Filesystem
  * ZERO-DEPENDENCY: Strictly bare-metal FAT32 parsing.
  */
 
-#include "sigma_hal.h"
-#include "../../include/sigma_types.h"
-#include "sigma_vfs.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "fs/sigma_vfs.h"
 
 class SovereignFAT32Engine {
 public:
@@ -22,8 +22,8 @@ public:
         this->root_cluster = 0;
     }
 
-    bool mount(uint32_t partition_offset) {
-        sigma_printf("[FAT32] Mounting volume at offset 0x%X...\n", partition_offset);
+    bool mount(sigma_u32 partition_offset) {
+        sigma_log("[FAT32] Mounting volume at offset 0x%X...\n", partition_offset);
         
         // Simulate reading Boot Sector (BPB)
         sigma_log("[FAT32] Parsing BIOS Parameter Block (BPB)...");
@@ -42,15 +42,15 @@ public:
         this->mounted = false;
     }
 
-    int readFile(const char* path, void* buffer, uint32_t size) { (void)buffer;
+    int readFile(const char* path, void* buffer, sigma_u32 size) { (void)buffer;
         if (!this->mounted) {
             sigma_log("[FAT32] [ERROR] Cannot read file: volume not mounted.");
             return -1;
         }
         
-        sigma_printf("[FAT32] Searching directory tree for: %s\n", path);
+        sigma_log("[FAT32] Searching directory tree for: %s\n", path);
         // Simulate file lookup and read
-        sigma_printf("[FAT32] File found. Reading %u bytes into buffer...\n", size);
+        sigma_log("[FAT32] File found. Reading %u bytes into buffer...\n", size);
         
         return size; // Simulate success
     }
@@ -59,9 +59,9 @@ private:
     SovereignFAT32Engine() : mounted(false), bytes_per_sector(0), sectors_per_cluster(0), root_cluster(0) {}
 
     bool mounted;
-    uint32_t bytes_per_sector;
-    uint32_t sectors_per_cluster;
-    uint32_t root_cluster;
+    sigma_u32 bytes_per_sector;
+    sigma_u32 sectors_per_cluster;
+    sigma_u32 root_cluster;
 };
 
 /* --- C Wrappers --- */
@@ -69,7 +69,7 @@ extern "C" void fat32_init() {
     SovereignFAT32Engine::getInstance().init();
 }
 
-extern "C" bool fat32_mount(uint32_t partition_offset) {
+extern "C" bool fat32_mount(sigma_u32 partition_offset) {
     return SovereignFAT32Engine::getInstance().mount(partition_offset);
 }
 
@@ -77,6 +77,6 @@ extern "C" void fat32_unmount() {
     SovereignFAT32Engine::getInstance().unmount();
 }
 
-extern "C" int fat32_read_file(const char* path, void* buffer, uint32_t size) { (void)buffer;
+extern "C" int fat32_read_file(const char* path, void* buffer, sigma_u32 size) { (void)buffer;
     return SovereignFAT32Engine::getInstance().readFile(path, buffer, size);
 }

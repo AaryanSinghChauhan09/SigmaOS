@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign DID (Decentralized Identifier)
@@ -27,14 +27,14 @@ public:
     }
 
     void createDID(const char* subject) {
-        sigma_printf("[DID] Creating Decentralized Identifier for %s...\n", subject);
-        sigma_printf("[DID] Result: did:sigma:%s\n", subject);
+        sigma_log("[DID] Creating Decentralized Identifier for %s...\n", subject);
+        sigma_log("[DID] Result: did:sigma:%s\n", subject);
         this->m_total_dids++;
         sigma_log("[DID] DID pinned to the SovereignTrustFabric.");
     }
 
     bool verifyDID(const char* did_string) {
-        sigma_printf("[DID] Resolving and verifying DID: %s\n", did_string);
+        sigma_log("[DID] Resolving and verifying DID: %s\n", did_string);
         sigma_log("[DID] Cryptographic proof verified via SovereignVault.");
         return true;
     }

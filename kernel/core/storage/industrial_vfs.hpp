@@ -1,11 +1,11 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef SOVEREIGN_VFS_HPP
 #define SOVEREIGN_VFS_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Storage {
@@ -26,7 +26,7 @@ private:
 
 public:
     SovereignVFS() : m_total_blocks(0), m_active_mounts(1), m_deduplication_active(SIGMA_TRUE) {
-        sigma_printf("[VFS-NEXUS]: Sovereign Storage Shard [IGNITED].\n");
+        sigma_log("[VFS-NEXUS]: Sovereign Storage Shard [IGNITED].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignVFS"; }

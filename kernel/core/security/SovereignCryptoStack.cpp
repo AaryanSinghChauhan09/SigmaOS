@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Crypto Stack Shard
@@ -33,11 +34,11 @@ public:
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN CRYPTO AUDIT ---\n");
-        sigma_printf("| Ciphers Supported: AES-GCM, RSA-4096, ECC-P384\n");
-        sigma_printf("| Acceleration     : Silicon-Native (AES-NI)\n");
-        sigma_printf("| Trust Model      : Hardened Lattice\n");
-        sigma_printf("--------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN CRYPTO AUDIT ---\n");
+        sigma_log("| Ciphers Supported: AES-GCM, RSA-4096, ECC-P384\n");
+        sigma_log("| Acceleration     : Silicon-Native (AES-NI)\n");
+        sigma_log("| Trust Model      : Hardened Lattice\n");
+        sigma_log("--------------------------------\n");
     }
 
 private:

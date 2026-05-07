@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Cloud Bridge Shard
@@ -35,11 +36,11 @@ public:
     }
 
     void audit() {
-        sigma_printf("\n--- Î£ SOVEREIGN CLOUD AUDIT ---\n");
-        sigma_printf("| Cloud Status    : CONNECTED\n");
-        sigma_printf("| Remote Nodes    : %u\n", m_remote_nodes);
-        sigma_printf("| Encryption      : KYBER-1024 / AES-GCM\n");
-        sigma_printf("-------------------------------\n");
+        sigma_log("\n--- Î£ SOVEREIGN CLOUD AUDIT ---\n");
+        sigma_log("| Cloud Status    : CONNECTED\n");
+        sigma_log("| Remote Nodes    : %u\n", m_remote_nodes);
+        sigma_log("| Encryption      : KYBER-1024 / AES-GCM\n");
+        sigma_log("-------------------------------\n");
     }
 
 private:

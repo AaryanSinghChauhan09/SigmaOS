@@ -1,10 +1,10 @@
 #ifndef SOVEREIGN_REGISTRY_HPP
 #define SOVEREIGN_REGISTRY_HPP
 
-#include "../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "../../include/sigma_types.h"
-#include "../../include/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Net {
@@ -24,7 +24,7 @@ private:
 
 public:
     SovereignRegistry() : m_indexed_shards(1024), m_mesh_sync_active(SIGMA_TRUE) {
-        sigma_printf("[REGISTRY]: Sovereign Shard Index [IGNITED].\n");
+        sigma_log("[REGISTRY]: Sovereign Shard Index [IGNITED].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignRegistry"; }

@@ -1,5 +1,6 @@
-#include "../../include/SovereignLibC.h"
-#include "sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
 #include "sigma_usr.h"
 
 /**
@@ -16,10 +17,10 @@ void SovereignUSRManager::init() {
     sigma_log("[USR] Initializing Sovereign Unified Shard Registry...");
 }
 
-uint32_t SovereignUSRManager::registerShard(const char* name, uint32_t quantum_key) {
+sigma_u32 SovereignUSRManager::registerShard(const char* name, sigma_u32 quantum_key) {
     if (this->count >= 512) return 0;
 
-    uint32_t id = ++this->count;
+    sigma_u32 id = ++this->count;
     sigma_usr_entry_t* entry = &this->registry[id - 1];
 
     entry->shard_id    = id;
@@ -27,22 +28,22 @@ uint32_t SovereignUSRManager::registerShard(const char* name, uint32_t quantum_k
     entry->quantum_key = quantum_key;
 
     /* Hardened string copy: bounded, null-terminated */
-    uint32_t i = 0;
+    sigma_u32 i = 0;
     while (i < 63 && name[i] != '\0') {
         entry->name[i] = name[i];
         i++;
     }
     entry->name[i] = '\0';
 
-    sigma_printf("[USR] Registered Shard: %s (ID: %d, Key: 0x%08X)\n",
+    sigma_log("[USR] Registered Shard: %s (ID: %d, Key: 0x%08X)\n",
                  entry->name, id, quantum_key);
     return id;
 }
 
-bool SovereignUSRManager::activateShard(uint32_t shard_id) {
+bool SovereignUSRManager::activateShard(sigma_u32 shard_id) {
     if (shard_id == 0 || shard_id > this->count) return false;
     this->registry[shard_id - 1].is_active = true;
-    sigma_printf("[USR] Shard S%02d Activated.\n", shard_id);
+    sigma_log("[USR] Shard S%02d Activated.\n", shard_id);
     return true;
 }
 
@@ -51,10 +52,10 @@ extern "C" void usr_init() {
     SovereignUSRManager::getInstance().init();
 }
 
-extern "C" uint32_t usr_register_shard(const char* name, uint32_t quantum_key) {
+extern "C" sigma_u32 usr_register_shard(const char* name, sigma_u32 quantum_key) {
     return SovereignUSRManager::getInstance().registerShard(name, quantum_key);
 }
 
-extern "C" bool usr_activate_shard(uint32_t shard_id) {
+extern "C" bool usr_activate_shard(sigma_u32 shard_id) {
     return SovereignUSRManager::getInstance().activateShard(shard_id);
 }

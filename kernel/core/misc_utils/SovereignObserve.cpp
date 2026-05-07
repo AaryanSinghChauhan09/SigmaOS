@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
-#include "sigma_observe.h"
-#include "../../../include/sigma_hal.h""
+#include "observability/sigma_observe.h"
+#include "hal/sigma_hal.h"
 
 
 /**
@@ -12,7 +12,7 @@
  */
 
 static sigma_observe_probe_t active_probes[128];
-static uint32_t probe_count = 0;
+static sigma_u32 probe_count = 0;
 
 extern "C" void observe_init() {
     sigma_log("[OBSERVE] Initializing Sovereign Observability Matrix (DSI Algorithm)...");
@@ -24,18 +24,18 @@ extern "C" bool observe_attach_probe(const char* symbol, void (*callback)(void))
     // DSI (Dynamic Silicon Instrumentation) Algorithm
     // Rewrites live kernel memory to insert safe JMP instructions to the probe.
     
-    uint32_t id = ++probe_count;
+    sigma_u32 id = ++probe_count;
     active_probes[id - 1].probe_id = id;
     sigma_hardened_strcpy(active_probes[id - 1].target_symbol, symbol, 64);
     active_probes[id - 1].is_active = true;
     
-    sigma_printf("[OBSERVE] DSI: Safely attached probe %d to symbol '%s'.\n", id, symbol);
+    sigma_log("[OBSERVE] DSI: Safely attached probe %d to symbol '%s'.\n", id, symbol);
     return true;
 }
 
-extern "C" void observe_trigger_probe(uint32_t probe_id) {
+extern "C" void observe_trigger_probe(sigma_u32 probe_id) {
     if (probe_id > 0 && probe_id <= probe_count && active_probes[probe_id - 1].is_active) {
-        sigma_printf("[OBSERVE] DSI: Probe %d triggered on '%s'. Capturing registers...\n", 
+        sigma_log("[OBSERVE] DSI: Probe %d triggered on '%s'. Capturing registers...\n", 
                      probe_id, active_probes[probe_id - 1].target_symbol);
     }
 }

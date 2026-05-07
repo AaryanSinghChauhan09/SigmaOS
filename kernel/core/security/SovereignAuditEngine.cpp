@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Audit Engine Shard
@@ -28,15 +28,15 @@ public:
     }
 
     void logEvent(const char* shard_id, const char* event_type) {
-        sigma_printf("Σ [AUDIT]: EVENT [%s] -> Shard '%s' (Quantum-Signed).\n", event_type, shard_id);
+        sigma_log("Σ [AUDIT]: EVENT [%s] -> Shard '%s' (Quantum-Signed).\n", event_type, shard_id);
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN AUDIT REPORT ---\n");
-        sigma_printf("| Integrity Mode : PQC-SIGNED (CRYSTALS-Dilithium)\n");
-        sigma_printf("| Compliance     : ISO/IEC 27001 EQUIVALENT\n");
-        sigma_printf("| Storage        : Distributed-Lattice\n");
-        sigma_printf("----------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN AUDIT REPORT ---\n");
+        sigma_log("| Integrity Mode : PQC-SIGNED (CRYSTALS-Dilithium)\n");
+        sigma_log("| Compliance     : ISO/IEC 27001 EQUIVALENT\n");
+        sigma_log("| Storage        : Distributed-Lattice\n");
+        sigma_log("----------------------------------\n");
     }
 
 private:

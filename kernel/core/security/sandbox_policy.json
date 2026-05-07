@@ -1,0 +1,25 @@
+{
+    "version": "1.0",
+    "global_policy": {
+        "default_action": "DENY",
+        "allowed_syscalls": [
+            "sigma_yield",
+            "sigma_log_emit",
+            "sigma_shard_query"
+        ]
+    },
+    "shards": {
+        "SovereignMonitor": {
+            "capabilities": ["OBSERVE_LATTICE", "EBPF_INJECT"],
+            "allowed_paths": ["/dev/bus/silicon"]
+        },
+        "SovereignPQC": {
+            "capabilities": ["CRYPTO_SIGN", "ENTROPY_READ"],
+            "allowed_paths": ["/sec/keys"]
+        },
+        "SovereignWASM": {
+            "capabilities": ["RUNTIME_EXEC"],
+            "allowed_paths": ["/bin/wasm"]
+        }
+    }
+}

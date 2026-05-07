@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: USB XHCI HOST CONTROLLER DRIVER (v1.0 â€ PURE C11)
@@ -13,7 +14,7 @@
  * =============================================================================
  */
 
-#include "../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 extern void  kprintf(const char *fmt, ...);
 extern void *vmm_map_mmio(sigma_u64 phys, sigma_usize size);

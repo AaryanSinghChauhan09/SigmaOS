@@ -1,6 +1,6 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 
 /**
  * SigmaOS Sovereign Lua Scripting Engine (v100.0 Zenith)
@@ -25,7 +25,7 @@ extern "C" void lua_init() {
 }
 
 extern "C" void lua_execute_personalization(const char* script_shard) {
-    sigma_printf("[LUA] LWA: Executing personalization shard '%s'...\n", script_shard);
+    sigma_log("[LUA] LWA: Executing personalization shard '%s'...\n", script_shard);
     /* LWA Algorithm: Safe execution of user-defined automation logic */
     SovereignLuaEngine.scripts_loaded++;
     sigma_log("[LUA] LWA: Personalization shard execution SUCCESS.");

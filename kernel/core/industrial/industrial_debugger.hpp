@@ -1,11 +1,11 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef SOVEREIGN_DEBUGGER_HPP
 #define SOVEREIGN_DEBUGGER_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Debug {
@@ -26,7 +26,7 @@ private:
 
 public:
     SovereignDebugger() : m_active_breakpoints(0), m_trace_buffer_size(1024ULL * 1024 * 64), m_realtime_tracing(SIGMA_TRUE) {
-        sigma_printf("[DEBUGGER]: Sovereign Diagnostic Shard [IGNITED].\n");
+        sigma_log("[DEBUGGER]: Sovereign Diagnostic Shard [IGNITED].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignDebugger"; }

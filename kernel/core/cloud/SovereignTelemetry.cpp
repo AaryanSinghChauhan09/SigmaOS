@@ -1,7 +1,7 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
-#include "sigma_telemetry.h"
-#include "../../../include/sigma_hal.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
+#include "observability/sigma_telemetry.h"
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Telemetry Implementation
@@ -23,14 +23,14 @@ extern "C" sigma_telemetry_data_t telemetry_get_snapshot() {
     data.active_shards = 407;
     data.lattice_temp_c = 42;
     
-    sigma_printf("[TELEMETRY] ALO Snapshot: CPU %d%%, Shards %d, Temp %d C\n", 
+    sigma_log("[TELEMETRY] ALO Snapshot: CPU %d%%, Shards %d, Temp %d C\n", 
                  data.cpu_load_pct, data.active_shards, data.lattice_temp_c);
                  
     return data;
 }
 
-extern "C" void telemetry_log_shard_event(uint32_t shard_id, const char* event) {
-    sigma_printf("[TELEMETRY] Shard S%02d Event: %s\n", shard_id, event);
+extern "C" void telemetry_log_shard_event(sigma_u32 shard_id, const char* event) {
+    sigma_log("[TELEMETRY] Shard S%02d Event: %s\n", shard_id, event);
 }
 
 

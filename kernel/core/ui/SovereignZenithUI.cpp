@@ -1,7 +1,7 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "sigma_zenithui.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "ui/sigma_zenithui.h"
 
 /**
  * SigmaOS Sovereign Zenith UI Compositor Implementation
@@ -61,7 +61,7 @@ extern "C" sigma_u32 zenith_create_element(const char* name, sigma_u32 type,
         { el->name[i] = name[i]; i++; }
     el->name[i] = '\0';
 
-    sigma_printf("[ZENITH] MLC: Element '%s' (ID=%d) CREATED at [%d, %d] (%dx%d).\n",
+    sigma_log("[ZENITH] MLC: Element '%s' (ID=%d) CREATED at [%d, %d] (%dx%d).\n",
                  el->name, (int)el->id, (int)x, (int)y, (int)w, (int)h);
     return el->id;
 }
@@ -71,7 +71,7 @@ extern "C" void zenith_set_flags(sigma_u32 id, sigma_u32 flags) {
         if (SovereignZenithEngine.state.elements[i].id == id) {
             SovereignZenithEngine.state.elements[i].flags = flags;
             if (flags & SIGMA_UI_FLAG_GLASS) SovereignZenithEngine.state.active_glass++;
-            sigma_printf("[ZENITH] MLC: Element #%d flags updated to 0x%02X.\n", (int)id, (int)flags);
+            sigma_log("[ZENITH] MLC: Element #%d flags updated to 0x%02X.\n", (int)id, (int)flags);
             return;
         }
     }
@@ -90,7 +90,7 @@ extern "C" void zenith_set_geometry(sigma_u32 id, sigma_u32 x, sigma_u32 y, sigm
 }
 
     void setThemePremium(const char* theme_name) {
-        sigma_printf("[ZENITH] MLC: Applying Premium Theme: '%s' (HSL Master Palette).\n", theme_name);
+        sigma_log("[ZENITH] MLC: Applying Premium Theme: '%s' (HSL Master Palette).\n", theme_name);
         sigma_log("[ZENITH] MLC: Adaptive glow and glassmorphism shaders RECALIBRATED.");
     }
 
@@ -102,7 +102,7 @@ extern "C" void zenith_set_geometry(sigma_u32 id, sigma_u32 x, sigma_u32 y, sigm
         
         /* Simulate composition loop */
         if (SovereignZenithEngine.state.frame_count % 60 == 0) {
-            sigma_printf("[ZENITH] MLC: Compositing %d elements (Active Glass: %d). Frame %u.\n",
+            sigma_log("[ZENITH] MLC: Compositing %d elements (Active Glass: %d). Frame %u.\n",
                          (int)SovereignZenithEngine.state.count,
                          (int)SovereignZenithEngine.state.active_glass,
                          (unsigned)SovereignZenithEngine.state.frame_count);
@@ -124,7 +124,7 @@ extern "C" void zenith_init() {
 
 extern "C" void zenith_set_theme_premium(const char* theme) {
     // In a real impl, this would update the global HSL palette
-    sigma_printf("[ZENITH] MLC: Theme set to '%s'.\n", theme);
+    sigma_log("[ZENITH] MLC: Theme set to '%s'.\n", theme);
 }
 
 extern "C" void zenith_render_frame() {
@@ -133,7 +133,7 @@ extern "C" void zenith_render_frame() {
         void render() {
             SovereignZenithEngine.state.frame_count++;
             if (SovereignZenithEngine.state.frame_count % 60 == 0) {
-                sigma_printf("[ZENITH] MLC: Compositing %d elements. Frame %u. [PREMIUM GLOW ACTIVE]\n",
+                sigma_log("[ZENITH] MLC: Compositing %d elements. Frame %u. [PREMIUM GLOW ACTIVE]\n",
                              (int)SovereignZenithEngine.state.count,
                              (unsigned)SovereignZenithEngine.state.frame_count);
             }

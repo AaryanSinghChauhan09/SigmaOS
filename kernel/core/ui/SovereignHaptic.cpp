@@ -1,8 +1,8 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 #include "sigma_haptic.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Haptic Engine
@@ -18,13 +18,13 @@ extern "C" void haptic_play_pattern(sigma_haptic_pattern_t pattern, float intens
     // HFTA (High-Fidelity Tactile Actuation) Algorithm
     // Direct synthesis of waveforms to linear resonant actuators (LRAs).
     
-    sigma_printf("[HAPTIC] HFTA: Synthesizing waveform for pattern %d at %.2f intensity...\n", 
+    sigma_log("[HAPTIC] HFTA: Synthesizing waveform for pattern %d at %.2f intensity...\n", 
                  (int)pattern, intensity);
                  
     // Simulate PWM waveform synthesis loop
     for (int i = 0; i < 8; i++) {
         // Mock hardware register manipulation
-        // hal_i2c_write(HAPTIC_LRA_REG, (uint8_t)(intensity * 255));
+        // hal_i2c_write(HAPTIC_LRA_REG, (sigma_u8)(intensity * 255));
     }
                  
     sigma_log("[HAPTIC] HFTA: Waveform sequence synthesized and dispatched to LRA.");

@@ -1,10 +1,11 @@
-#include "sigma_hal.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
 #ifndef PERSONA_MANAGER_HPP
 #define PERSONA_MANAGER_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -32,23 +33,23 @@ public:
     const char* type_name() const noexcept override { return "SovereignPersonaManager"; }
 
     void SwitchPersona(const char* name, sigma_u32 color) {
-        sigma_printf("[PERSONA-ZENITH]: Hot-swapping System State to: %s\n", name);
+        sigma_log("[PERSONA-ZENITH]: Hot-swapping System State to: %s\n", name);
         sigma_strncpy(m_current.name, name, 31);
         m_current.accent_color = color;
-        sigma_printf("[PERSONA-ZENITH]: Accent Shard updated to 0x%x\n", color);
+        sigma_log("[PERSONA-ZENITH]: Accent Shard updated to 0x%x\n", color);
     }
 
     void EnableMorphicSync() {
         m_morphic_sync = SIGMA_TRUE;
-        sigma_printf("[PERSONA-ZENITH]: Morphic Sync ACTIVE. System adaptation enabled.\n");
+        sigma_log("[PERSONA-ZENITH]: Morphic Sync ACTIVE. System adaptation enabled.\n");
     }
 
     void AuditPersona() {
-        sigma_printf("\n--- Î£ SOVEREIGN PERSONA AUDIT ---\n");
-        sigma_printf("| Current Persona: %s\n", m_current.name);
-        sigma_printf("| Clearance Level: %u\n", m_current.clearance_level);
-        sigma_printf("| Morphic Sync   : %s\n", m_morphic_sync ? "ENABLED" : "DISABLED");
-        sigma_printf("----------------------------------\n");
+        sigma_log("\n--- Î£ SOVEREIGN PERSONA AUDIT ---\n");
+        sigma_log("| Current Persona: %s\n", m_current.name);
+        sigma_log("| Clearance Level: %u\n", m_current.clearance_level);
+        sigma_log("| Morphic Sync   : %s\n", m_morphic_sync ? "ENABLED" : "DISABLED");
+        sigma_log("----------------------------------\n");
     }
 };
 

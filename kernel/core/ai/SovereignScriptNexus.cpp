@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Script Nexus (S-ScriptNexus)
@@ -27,14 +27,14 @@ public:
     }
 
     void executeGraph(const char* graph_json) {
-        sigma_printf("[SCRIPT-NEXUS] Parsing Visual Graph: %s\n", graph_json);
+        sigma_log("[SCRIPT-NEXUS] Parsing Visual Graph: %s\n", graph_json);
         sigma_log("[SCRIPT-NEXUS] Sequence: [InputNode] -> [FilterNode] -> [ActionShard].");
         sigma_log("[SCRIPT-NEXUS] Execution SUCCESS. Lattice state updated.");
         this->m_active_graphs++;
     }
 
     void listActiveGraphs() {
-        sigma_printf("[SCRIPT-NEXUS] Active Logic Graphs: %u\n", this->m_active_graphs);
+        sigma_log("[SCRIPT-NEXUS] Active Logic Graphs: %u\n", this->m_active_graphs);
     }
 
 private:

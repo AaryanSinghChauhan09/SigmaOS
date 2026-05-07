@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN AETHER ORCHESTRATOR (v100.0 - PURE C11)
@@ -10,7 +11,7 @@
  * =========================================================================
  */
 
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 /* =========================================================================
  * Zenith Interrupt Vector (struct replaces C++ struct with bool)
@@ -78,7 +79,7 @@ static void aether_register_interrupt(SovereignAetherOrchestrator* a,
 /* --- Pulse Silicon Events (replaces C++ class method) --- */
 static void aether_pulse_events(SovereignAetherOrchestrator* a) {
     sigma_u64 tsc = rdtsc_read();
-    sigma_printf("[AETHER-ORCH]: RDTSC Hardware Clock Shard = %llu\n", tsc);
+    sigma_log("[AETHER-ORCH]: RDTSC Hardware Clock Shard = %llu\n", tsc);
     sigma_print("[AETHER-ORCH]: Scanning Interrupt Service Routine Table...\n");
 
     sigma_u32 i;
@@ -94,11 +95,11 @@ static void aether_pulse_events(SovereignAetherOrchestrator* a) {
 
 /* --- Audit (replaces C++ class method) --- */
 static void aether_audit(const SovereignAetherOrchestrator* a) {
-    sigma_printf("\n--- Î£ SOVEREIGN AUTOMATION AUDIT (v93.0) ---\n");
-    sigma_printf("| Registered ISRs: %u\n", a->registered_count);
-    sigma_printf("| Events Pulsed  : %u\n", a->events_pulsed);
-    sigma_printf("| Competitors    : Zapier/n8n/cron/systemd-timer neutralized.\n");
-    sigma_printf("--------------------------------------------\n");
+    sigma_log("\n--- Î£ SOVEREIGN AUTOMATION AUDIT (v93.0) ---\n");
+    sigma_log("| Registered ISRs: %u\n", a->registered_count);
+    sigma_log("| Events Pulsed  : %u\n", a->events_pulsed);
+    sigma_log("| Competitors    : Zapier/n8n/cron/systemd-timer neutralized.\n");
+    sigma_log("--------------------------------------------\n");
 }
 
 /* =========================================================================

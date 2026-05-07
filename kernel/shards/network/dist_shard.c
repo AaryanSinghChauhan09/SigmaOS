@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN DISTRIBUTED TASK SHARD (v9.0 - INDUSTRIAL ZENITH)
@@ -11,7 +12,7 @@
  * =============================================================================
  */
 
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 #ifndef __cplusplus
 typedef _Bool bool;
@@ -21,7 +22,7 @@ typedef _Bool bool;
 
 /* Forward declarations for low-level I/O */
 void sigma_print(const char* s);
-void sigma_printf(const char* fmt, ...);
+void sigma_log(const char* fmt, ...);
 
 #define MAX_NODES 256
 #define TASK_BUFFER_SIZE 4096
@@ -73,7 +74,7 @@ sigma_status dist_register_node(sigma_u32 remote_id, sigma_u32 cpus, sigma_u64 m
     g_node_table[g_active_nodes].active = true;
     g_active_nodes++;
     
-    sigma_printf("[DIST-SHARD]: Multi-node handshake success. Node ID: %u Joined.\n", remote_id);
+    sigma_log("[DIST-SHARD]: Multi-node handshake success. Node ID: %u Joined.\n", remote_id);
     return K_OK;
 }
 
@@ -94,14 +95,14 @@ sigma_status dist_delegate_task(sigma_u64 task_id, const void* data, sigma_u32 l
         return K_ERR_INVAL;
     }
     
-    sigma_printf("[DIST-SHARD]: Delegating Task 0x%llx to Node %u...\n", task_id, best_node);
+    sigma_log("[DIST-SHARD]: Delegating Task 0x%llx to Node %u...\n", task_id, best_node);
     /* In a real scenario, this would trigger NIC DMA via SovereignNetMesh.c */
     return K_OK;
 }
 
 void dist_audit(void) {
     sigma_print("\n--- Î£ SOVEREIGN DIST-GRID AUDIT ---\n");
-    sigma_printf("| Active Nodes   : %u\n", g_active_nodes);
+    sigma_log("| Active Nodes   : %u\n", g_active_nodes);
     sigma_print("| Encryption     : [LATTICE-PQC-V5 ENABLED]\n");
     sigma_print("| Protocol       : [SPTS-ZENITH-PRO]\n");
 }

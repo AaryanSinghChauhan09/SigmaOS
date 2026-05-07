@@ -1,8 +1,8 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 #include "sigma_ide.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 
 /**
@@ -19,8 +19,8 @@ extern "C" void ide_init() {
     ide_state.cursor_col = 1;
 }
 
-extern "C" void ide_open_shard(uint32_t shard_id) {
-    sigma_printf("[IDE] ISC: Loading Shard S%02d source into buffer...\n", shard_id);
+extern "C" void ide_open_shard(sigma_u32 shard_id) {
+    sigma_log("[IDE] ISC: Loading Shard S%02d source into buffer...\n", shard_id);
     sigma_hardened_strcpy(ide_state.current_file, "SovereignNewShard.cpp", 64);
 }
 

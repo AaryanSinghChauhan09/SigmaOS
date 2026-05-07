@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign NUMA Architecture Optimizer
@@ -32,13 +32,13 @@ public:
         this->node_memory[this->active_nodes] = memory_mb;
         this->active_nodes++;
         
-        sigma_printf("[NUMA] Registered physical Node %u with %u MB local RAM.\n", node_id, memory_mb);
+        sigma_log("[NUMA] Registered physical Node %u with %u MB local RAM.\n", node_id, memory_mb);
     }
 
     void optimizeThreadLocality(sigma_u32 thread_id) {
         if (this->active_nodes < 2) return; // No optimization needed for UMA
 
-        sigma_printf("[NUMA] Migrating Thread T%04X cache to local Node %u to reduce latency.\n", 
+        sigma_log("[NUMA] Migrating Thread T%04X cache to local Node %u to reduce latency.\n", 
                      thread_id, this->nodes[0]);
         this->pages_migrated += 4;
     }

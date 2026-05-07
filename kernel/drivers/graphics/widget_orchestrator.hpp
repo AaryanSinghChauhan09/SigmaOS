@@ -1,9 +1,9 @@
 #ifndef WIDGET_ORCHESTRATOR_HPP
 #define WIDGET_ORCHESTRATOR_HPP
 
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "../../../include/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Graphics {
@@ -13,13 +13,13 @@ public:
     const char* type_name() const noexcept override { return "SovereignWidgetOrchestrator"; }
 
     void RenderSystemStats() {
-        sigma_printf("[WIDGET]: Rendering CPU Silicon Audit Graph (SVG-Direct)...\n");
-        sigma_printf("[WIDGET]: Rendering Memory Zenith Slab Matrix...\n");
-        sigma_printf("[WIDGET]: Rendering Quantum Shield Security Status...\n");
+        sigma_log("[WIDGET]: Rendering CPU Silicon Audit Graph (SVG-Direct)...\n");
+        sigma_log("[WIDGET]: Rendering Memory Zenith Slab Matrix...\n");
+        sigma_log("[WIDGET]: Rendering Quantum Shield Security Status...\n");
     }
 
     void ProjectToZenithUI() {
-        sigma_printf("[ZENITH-UI]: Projecting real-time diagnostic widgets to Desktop Layer.\n");
+        sigma_log("[ZENITH-UI]: Projecting real-time diagnostic widgets to Desktop Layer.\n");
         RenderSystemStats();
     }
 };

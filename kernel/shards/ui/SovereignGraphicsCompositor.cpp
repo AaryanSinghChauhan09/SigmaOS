@@ -1,5 +1,5 @@
 #include "Lattice.h"
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN GRAPHICS COMPOSITOR (v21.0)
@@ -26,7 +26,7 @@ extern "C" void _start(void) {
 }
 
 int main() {
-    sigma_printf("[SIGMA_GRAPHICS]: Initiating Sovereign Compositor Nexus...\n");
+    sigma_log("[SIGMA_GRAPHICS]: Initiating Sovereign Compositor Nexus...\n");
     _start();
     return 0;
 }

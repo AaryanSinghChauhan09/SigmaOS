@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign System Settings Dashboard
@@ -34,7 +34,7 @@ public:
     }
 
     void applyUserPreference(const char* category, const char* value) {
-        sigma_printf("[DASHBOARD] User preference applied -> %s: %s\n", category, value);
+        sigma_log("[DASHBOARD] User preference applied -> %s: %s\n", category, value);
         // E.g., if category is "THEME", interact with SovereignThemeEngine
     }
 

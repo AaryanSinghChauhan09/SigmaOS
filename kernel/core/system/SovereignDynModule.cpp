@@ -1,7 +1,7 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 #include "sigma_dynmodule.h"
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 
 
 /**
@@ -32,7 +32,7 @@ public:
         sigma_log("[DYNMODULE] AHSL: Performing silicon-native security validation...");
         // Simulate verification (SHA-3 / PQC)
         
-        sigma_printf("[DYNMODULE] AHSL: Resolving symbols for module at '%s'...\n", module_path);
+        sigma_log("[DYNMODULE] AHSL: Resolving symbols for module at '%s'...\n", module_path);
         
         sigma_u32 id = ++this->module_count;
         sigma_dynmodule_t* mod = &this->active_modules[id - 1];
@@ -41,7 +41,7 @@ public:
         mod->entry_point = (void*)0xC0FFEE00; 
         mod->is_loaded = true;
         
-        sigma_printf("[DYNMODULE] AHSL: Plugin %d ('%s') successfully linked to lattice.\n", 
+        sigma_log("[DYNMODULE] AHSL: Plugin %d ('%s') successfully linked to lattice.\n", 
                      (int)id, mod->module_name);
         return true;
     }
@@ -51,7 +51,7 @@ public:
         
         sigma_dynmodule_t* mod = &this->active_modules[module_id - 1];
         if (mod->is_loaded) {
-            sigma_printf("[DYNMODULE] AHSL: Unloading module %d and clearing memory...\n", (int)module_id);
+            sigma_log("[DYNMODULE] AHSL: Unloading module %d and clearing memory...\n", (int)module_id);
             mod->is_loaded = false;
             return true;
         }

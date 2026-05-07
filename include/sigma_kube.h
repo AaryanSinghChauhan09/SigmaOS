@@ -11,7 +11,7 @@
 #ifndef SIGMA_KUBE_H
 #define SIGMA_KUBE_H
 
-#include "sigma_types.h"
+#include "core/sigma_types.h"
 
 /* --- Orchestration Patterns --- */
 #define SIGMA_KUBE_PATTERN_SINGLETON  0x00u  /* Exactly one shard active     */

@@ -1,5 +1,6 @@
+#include "core/sigma_types.h"
 #include "Lattice.h"
-#include "../../../include/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN WEB BRIDGE (v15.5 - EXTREME FINALITY)
@@ -10,7 +11,7 @@
  * =========================================================================
  */
 
-#include "../../../include/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Net {
@@ -21,23 +22,23 @@ private:
 
 public:
     SovereignWebBridge() : m_packets_sharded(0) {
-        sigma_printf("[WEB-BRIDGE-ZENITH]: Sovereign Web Bridge Shard Online (v15.5).\n");
+        sigma_log("[WEB-BRIDGE-ZENITH]: Sovereign Web Bridge Shard Online (v15.5).\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignWebBridge"; }
 
     // --- Core Web Logic (Custom Native Functions) ---
     void fetch_url(const char* url) {
-        sigma_printf("[WEB-BRIDGE-ZENITH]: Pulsing URL Request: %s... [SHARDED]\n", url);
+        sigma_log("[WEB-BRIDGE-ZENITH]: Pulsing URL Request: %s... [SHARDED]\n", url);
         m_packets_sharded++;
     }
 
     void audit() {
-        sigma_printf("\n--- Î£ SOVEREIGN WEB AUDIT (v15.5) ---\n");
-        sigma_printf("| Packets Sharded: %u\n", m_packets_sharded);
-        sigma_printf("| Buffer Status  : BIT-PERFECT\n");
-        sigma_printf("| Competitors    : Chromium/Webkit/Gecko neutralized.\n");
-        sigma_printf("--------------------------------------\n");
+        sigma_log("\n--- Î£ SOVEREIGN WEB AUDIT (v15.5) ---\n");
+        sigma_log("| Packets Sharded: %u\n", m_packets_sharded);
+        sigma_log("| Buffer Status  : BIT-PERFECT\n");
+        sigma_log("| Competitors    : Chromium/Webkit/Gecko neutralized.\n");
+        sigma_log("--------------------------------------\n");
     }
 };
 
@@ -52,7 +53,7 @@ extern "C" void start_web_zenith() {
 }
 
 int main() {
-    sigma_printf("[SIGMA_NET]: Bootstrapping Web Bridge Zenith...\n");
+    sigma_log("[SIGMA_NET]: Bootstrapping Web Bridge Zenith...\n");
     start_web_zenith();
     return 0;
 }

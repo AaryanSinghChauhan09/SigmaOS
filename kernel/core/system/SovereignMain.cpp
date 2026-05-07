@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
+#include "hal/sigma_hal.h"
 #include "sigma_main.h"
-#include "../../../include/SovereignLibC.h""
+#include "libc/SovereignLibC.h"
 
 // Engine Initialisers (Extern C)
 extern "C" void sigma_bootstrap_lattice();
@@ -15,14 +15,14 @@ SovereignKernelMain& SovereignKernelMain::getInstance() {
 }
 
 void SovereignKernelMain::ignite() {
-    sigma_printf("\nΣ SIGMAOS ZENITH SINGULARITY (v100.0) IGNITING...\n");
-    sigma_printf("--------------------------------------------------\n");
+    sigma_log("\nΣ SIGMAOS ZENITH SINGULARITY (v100.0) IGNITING...\n");
+    sigma_log("--------------------------------------------------\n");
 
     // Sovereign 4-Phase Shard Orchestration
     sigma_bootstrap_lattice();
 
-    sigma_printf("--------------------------------------------------\n");
-    sigma_printf("Σ SYSTEM SOVEREIGNTY ACHIEVED. LATTICE READY.\n\n");
+    sigma_log("--------------------------------------------------\n");
+    sigma_log("Σ SYSTEM SOVEREIGNTY ACHIEVED. LATTICE READY.\n\n");
 }
 
 } // namespace System

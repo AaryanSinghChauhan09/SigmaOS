@@ -1,10 +1,11 @@
-#include "sigma_hal.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
 #ifndef CLOCK_SHARD_HPP
 #define CLOCK_SHARD_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 #include "port_shard.hpp"
 
 namespace SigmaOS {
@@ -28,11 +29,11 @@ public:
     void AuditClock() {
         sigma_u8 h, m, s;
         GetSystemTime(&h, &m, &s);
-        sigma_printf("\n--- Î£ SOVEREIGN CLOCK AUDIT ---\n");
-        sigma_printf("| System Time    : %02x:%02x:%02x [RTC SHARD]\n", h, m, s);
-        sigma_printf("| Clock Source   : CMOS / Silicon Crystal\n");
-        sigma_printf("| Drift Status   : ZERO-PPM SHUNTED\n");
-        sigma_printf("-------------------------------\n");
+        sigma_log("\n--- Î£ SOVEREIGN CLOCK AUDIT ---\n");
+        sigma_log("| System Time    : %02x:%02x:%02x [RTC SHARD]\n", h, m, s);
+        sigma_log("| Clock Source   : CMOS / Silicon Crystal\n");
+        sigma_log("| Drift Status   : ZERO-PPM SHUNTED\n");
+        sigma_log("-------------------------------\n");
     }
 };
 

@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Telemetry UI Engine
@@ -37,7 +37,7 @@ public:
     void updateDashboardMetrics(sigma_u32 net_throughput, sigma_u32 numa_latency) {
         this->metrics_collected++;
         if (this->ui_visible && this->metrics_collected % 60 == 0) {
-            sigma_printf("[TELEMETRY-UI] GRAPH UPDATE: Net: %u Mbps | NUMA Latency: %u ns\n", 
+            sigma_log("[TELEMETRY-UI] GRAPH UPDATE: Net: %u Mbps | NUMA Latency: %u ns\n", 
                          net_throughput, numa_latency);
         }
     }

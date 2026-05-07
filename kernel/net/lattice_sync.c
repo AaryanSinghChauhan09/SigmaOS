@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: LATTICE-SYNC (v1.0 - PQC PROTECTED NETWORK SYNC)
@@ -11,7 +12,7 @@
  * =============================================================================
  */
 
-#include "../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 typedef struct LatticePacket {
     sigma_u64  seq_id;

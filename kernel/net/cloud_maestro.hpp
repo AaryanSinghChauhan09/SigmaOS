@@ -1,7 +1,7 @@
 #ifndef CLOUD_MAESTRO_HPP
 #define CLOUD_MAESTRO_HPP
 
-#include "../../include/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Net {

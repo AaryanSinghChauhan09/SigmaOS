@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign VMM (Virtual Memory Manager)
@@ -28,11 +28,11 @@ public:
 
     void mapAddress(sigma_u64 virt, sigma_u64 phys, sigma_u32 flags) {
         (void)phys; (void)flags;
-        sigma_printf("[VMM] Mapping Shard: 0x%016llX -> Silicon::0x%016llX [FLAGS: %u]\n", virt, phys, flags);
+        sigma_log("[VMM] Mapping Shard: 0x%016llX -> Silicon::0x%016llX [FLAGS: %u]\n", virt, phys, flags);
     }
 
     void handlePageFault(sigma_u64 faulting_addr) {
-        sigma_printf("[VMM] [EXCEPTION] Page Fault Shard at 0x%016llX. Resolving via swap-lattice...\n", faulting_addr);
+        sigma_log("[VMM] [EXCEPTION] Page Fault Shard at 0x%016llX. Resolving via swap-lattice...\n", faulting_addr);
         if (this->m_swap_enabled) {
             sigma_log("[VMM] SWAP: Page fetched from SovereignColdStorage.");
         } else {
@@ -42,7 +42,7 @@ public:
 
     void setSwap(bool enable) {
         this->m_swap_enabled = enable;
-        sigma_printf("[VMM] Swapping Shard set to %s.\n", enable ? "ACTIVE" : "INACTIVE");
+        sigma_log("[VMM] Swapping Shard set to %s.\n", enable ? "ACTIVE" : "INACTIVE");
     }
 
 private:

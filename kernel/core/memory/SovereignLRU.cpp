@@ -1,9 +1,9 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "sigma_lru.h"
-#include "../../../include/sigma_hal.h""
-#include "sigma_telemetry.h"
+#include "hal/sigma_hal.h"
+#include "observability/sigma_telemetry.h"
 
 /**
  * SigmaOS Sovereign LRU Implementation
@@ -17,12 +17,12 @@ extern "C" void lru_init() {
     sigma_log("[LRU] Initializing Sovereign Lattice Rolling Update Engine...");
 }
 
-extern "C" void lru_trigger_update(uint32_t shard_id, void* new_binary, uint32_t size) {
+extern "C" void lru_trigger_update(sigma_u32 shard_id, void* new_binary, sigma_u32 size) {
     // ZDSM (Zero-Downtime Shard Migration) Algorithm
     // Hot-swaps shard binaries while preserving machine-state context.
     
     current_lru_state = LRU_MIGRATING;
-    sigma_printf("[LRU] ZDSM: Migrating Shard S%02d to new binary (%d bytes)...\n", shard_id, size);
+    sigma_log("[LRU] ZDSM: Migrating Shard S%02d to new binary (%d bytes)...\n", shard_id, size);
     
     // Simulate state preservation
     sigma_log("[LRU] ZDSM: Capturing shard context registers...");

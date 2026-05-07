@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Forensics Shard
@@ -28,18 +29,18 @@ public:
     }
 
     void executeDeepScan(const char* target_volume) {
-        sigma_printf("Σ [FORENSICS]: Launching deep cryptographic scan on volume '%s'...\n", target_volume);
+        sigma_log("Σ [FORENSICS]: Launching deep cryptographic scan on volume '%s'...\n", target_volume);
         // Dispatch forensic memory algorithms and lattice reconstruction
         sigma_log("Σ [FORENSICS]: Scan COMPLETE. Immutable forensic timeline generated and signed.");
         m_scans_performed++;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN FORENSICS AUDIT ---\n");
-        sigma_printf("| Forensic Scans   : %u\n", m_scans_performed);
-        sigma_printf("| Ideology Absorbed: CAINE / SYSTEMRESCUE\n");
-        sigma_printf("| Analysis Model   : CRYPTOGRAPHIC READ-ONLY\n");
-        sigma_printf("--------------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN FORENSICS AUDIT ---\n");
+        sigma_log("| Forensic Scans   : %u\n", m_scans_performed);
+        sigma_log("| Ideology Absorbed: CAINE / SYSTEMRESCUE\n");
+        sigma_log("| Analysis Model   : CRYPTOGRAPHIC READ-ONLY\n");
+        sigma_log("--------------------------------------------\n");
     }
 
 private:

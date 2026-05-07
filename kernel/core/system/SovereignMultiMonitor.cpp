@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Multi-Monitor Engine
@@ -43,19 +43,19 @@ public:
         d->pos_x = 0; d->pos_y = 0;
         sigma_hardened_strcpy(d->connector, connector, 16);
         this->display_count++;
-        sigma_printf("[MULTIMON] Display %u: %s @ %ux%u %uHz registered.\n",
+        sigma_log("[MULTIMON] Display %u: %s @ %ux%u %uHz registered.\n",
                      d->id, connector, w, h, hz);
         return d->id;
     }
 
     void setDisplayArrangement(sigma_u32 primary_id, const char* arrangement) {
-        sigma_printf("[MULTIMON] Display %u set as primary. Arrangement: '%s'.\n",
+        sigma_log("[MULTIMON] Display %u set as primary. Arrangement: '%s'.\n",
                      primary_id, arrangement);
         sigma_log("[MULTIMON] Zenith MLC compositor updated with new topology.");
     }
 
     void mirrorDisplays(sigma_u32 src_id, sigma_u32 dst_id) {
-        sigma_printf("[MULTIMON] Mirroring Display %u -> Display %u via DMA framebuffer copy.\n",
+        sigma_log("[MULTIMON] Mirroring Display %u -> Display %u via DMA framebuffer copy.\n",
                      src_id, dst_id);
     }
 

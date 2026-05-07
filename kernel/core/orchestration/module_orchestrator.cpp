@@ -1,27 +1,27 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "module_orchestrator.hpp"
-#include "../../../include/SovereignLibC.h""
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Core {
 
 void SovereignModuleOrchestrator::RegisterShard(const char* name, SigmaObject* shard) {
-    sigma_printf("[MOD-ORCH]: Mapping Shard %s to Silicon Address %p...\n", name, shard);
+    sigma_log("[MOD-ORCH]: Mapping Shard %s to Silicon Address %p...\n", name, shard);
     m_active_shards++;
 }
 
 void SovereignModuleOrchestrator::IgniteLattice() {
-    sigma_printf("[MOD-ORCH]: Igniting 500-Shard Sovereign Lattice Shards...\n");
-    sigma_printf("[MOD-ORCH]: Critical Shards [READY] | Distributed Consensus [ACTIVE].\n");
+    sigma_log("[MOD-ORCH]: Igniting 500-Shard Sovereign Lattice Shards...\n");
+    sigma_log("[MOD-ORCH]: Critical Shards [READY] | Distributed Consensus [ACTIVE].\n");
 }
 
 void SovereignModuleOrchestrator::AuditAllShards() {
-    sigma_printf("\n--- Σ SOVEREIGN SHARD AUDIT ---\n");
-    sigma_printf("| Active Shards     : %d\n", m_active_shards);
-    sigma_printf("| Lattice Status    : STABLE\n");
-    sigma_printf("| Modular Integrity : 100%% (OOP-ENCAPSULATED)\n");
-    sigma_printf("-------------------------------\n");
+    sigma_log("\n--- Σ SOVEREIGN SHARD AUDIT ---\n");
+    sigma_log("| Active Shards     : %d\n", m_active_shards);
+    sigma_log("| Lattice Status    : STABLE\n");
+    sigma_log("| Modular Integrity : 100%% (OOP-ENCAPSULATED)\n");
+    sigma_log("-------------------------------\n");
 }
 
 } // namespace Core

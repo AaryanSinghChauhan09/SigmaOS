@@ -1,11 +1,11 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef PREDICTIVE_SCHEDULER_HPP
 #define PREDICTIVE_SCHEDULER_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -26,7 +26,7 @@ private:
 
 public:
     SovereignPredictiveScheduler() : m_active_tasks(0), m_total_cycles_predicted(0), m_ai_optimization_active(SIGMA_TRUE) {
-        sigma_printf("[PREDICT-SCHED]: Sovereign AI Process Nexus [IGNITED].\n");
+        sigma_log("[PREDICT-SCHED]: Sovereign AI Process Nexus [IGNITED].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignPredictiveScheduler"; }

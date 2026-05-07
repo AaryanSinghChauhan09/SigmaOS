@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: INTERRUPT DESCRIPTOR TABLE (v1.0)
@@ -5,7 +6,7 @@
  * Principles: Event-Driven Sovereignty.
  * =============================================================================
  */
-#include "../../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 typedef struct {
     sigma_u16 offset_low;

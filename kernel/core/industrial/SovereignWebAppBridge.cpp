@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign WebApp Bridge Shard
@@ -30,18 +31,18 @@ public:
     }
 
     void injectWebApp(const char* name, const char* url) {
-        sigma_printf("Σ [WEBAPP-BRIDGE]: Injecting Web-Orb '%s' from URL: %s...\n", name, url);
+        sigma_log("Σ [WEBAPP-BRIDGE]: Injecting Web-Orb '%s' from URL: %s...\n", name, url);
         // Bind URL to an isolated Sovereign Sandbox
         m_active_webapps++;
         sigma_log("Σ [WEBAPP-BRIDGE]: Shard successfully isolated and pinned to Sigma-Shelf.");
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN WEBAPP AUDIT ---\n");
-        sigma_printf("| Active Web-Orbs : %u\n", m_active_webapps);
-        sigma_printf("| Isolation Mode  : SANDBOX-SILICON\n");
-        sigma_printf("| Runtime Integrity: VERIFIED\n");
-        sigma_printf("----------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN WEBAPP AUDIT ---\n");
+        sigma_log("| Active Web-Orbs : %u\n", m_active_webapps);
+        sigma_log("| Isolation Mode  : SANDBOX-SILICON\n");
+        sigma_log("| Runtime Integrity: VERIFIED\n");
+        sigma_log("----------------------------------\n");
     }
 
 private:

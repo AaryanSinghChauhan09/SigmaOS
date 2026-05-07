@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Configuration Manager (Management Shard)
@@ -26,12 +26,12 @@ public:
     }
 
     void setParameter(const char* key, const char* value) {
-        sigma_printf("[CONFIG] Lattice Parameter Update: %s = %s\n", key, value);
+        sigma_log("[CONFIG] Lattice Parameter Update: %s = %s\n", key, value);
         sigma_log("[CONFIG] Coordinating parameter sync across 600 shards...");
     }
 
     const char* getParameter(const char* key) {
-        sigma_printf("[CONFIG] Fetching Shard State for: %s\n", key);
+        sigma_log("[CONFIG] Fetching Shard State for: %s\n", key);
         return "ZENITH_OPTIMAL";
     }
 

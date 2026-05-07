@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 #include "SovereignQKD.hpp"
 
 /**
@@ -32,13 +33,13 @@ public:
 
     void installOrb(const char* orb_name, const char* signature) {
         (void)signature;
-        sigma_printf("Σ [ORB-MAN]: Deploying Orb: %s...\n", orb_name);
+        sigma_log("Σ [ORB-MAN]: Deploying Orb: %s...\n", orb_name);
         
         // Zero-Trust Enforcement: Cryptographically verify Orb signature
         bool verified = Security::SovereignQKD::getInstance().verifyQuantumIntegrity();
         
         if (verified) {
-            sigma_printf("Σ [ORB-MAN]: Orb '%s' INTEGRATED into Lattice.\n", orb_name);
+            sigma_log("Σ [ORB-MAN]: Orb '%s' INTEGRATED into Lattice.\n", orb_name);
             m_installed_orbs++;
         } else {
             sigma_log("Σ [ORB-MAN]: [CRITICAL ERROR] SIGNATURE MISMATCH. Orb Rejected by QKD Core.");
@@ -46,10 +47,10 @@ public:
     }
 
     void listOrbs() {
-        sigma_printf("\n--- Σ SOVEREIGN ORB REGISTRY ---\n");
-        sigma_printf("| Active Orbs     : %u\n", m_installed_orbs);
-        sigma_printf("| Parity Level    : INDUSTRIAL\n");
-        sigma_printf("--------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN ORB REGISTRY ---\n");
+        sigma_log("| Active Orbs     : %u\n", m_installed_orbs);
+        sigma_log("| Parity Level    : INDUSTRIAL\n");
+        sigma_log("--------------------------------\n");
     }
 
 private:

@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "sigma_proc.h"
-#include "../../../include/SovereignLibC.h""
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign PSE (Programmable Shard Execution)
@@ -39,17 +39,17 @@ public:
         }
 
         sigma_u32 thread_id = ++this->m_active_wasm_threads;
-        sigma_printf("[PSE] Shard Verification SUCCESS. JIT-Compiling Shard Thread T%04u...\n", thread_id);
+        sigma_log("[PSE] Shard Verification SUCCESS. JIT-Compiling Shard Thread T%04u...\n", thread_id);
         
         // In a real implementation, we would call the JIT compiler here.
         // For the Sovereign Lattice, we simulate the high-speed ignition.
-        sigma_printf("[PSE] T%04u ignited on optimized silicon path.\n", thread_id);
+        sigma_log("[PSE] T%04u ignited on optimized silicon path.\n", thread_id);
         
         return thread_id;
     }
 
     void terminateWasm(sigma_u32 thread_id) {
-        sigma_printf("[PSE] T%04u reached HALT instruction. Terminating sandbox...\n", thread_id);
+        sigma_log("[PSE] T%04u reached HALT instruction. Terminating sandbox...\n", thread_id);
         if (this->m_active_wasm_threads > 0) this->m_active_wasm_threads--;
     }
 

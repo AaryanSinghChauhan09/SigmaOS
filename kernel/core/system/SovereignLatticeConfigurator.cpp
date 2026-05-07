@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Lattice Configurator Shard
@@ -28,18 +29,18 @@ public:
     }
 
     void applyPolicy(const char* policy_name) {
-        sigma_printf("Σ [CONFIGURATOR]: Applying enterprise management policy '%s' across all shards...\n", policy_name);
+        sigma_log("Σ [CONFIGURATOR]: Applying enterprise management policy '%s' across all shards...\n", policy_name);
         // Distribute declarative configuration via IPC
         sigma_log("Σ [CONFIGURATOR]: Policy DEPLOYED. Lattice configuration universally synchronized.");
         m_policies_applied++;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN CONFIGURATOR AUDIT ---\n");
-        sigma_printf("| Policies Applied : %u\n", m_policies_applied);
-        sigma_printf("| Ideology Absorbed: OPENSUSE YaST\n");
-        sigma_printf("| Management Model : CENTRALIZED AI-ASSISTED\n");
-        sigma_printf("-------------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN CONFIGURATOR AUDIT ---\n");
+        sigma_log("| Policies Applied : %u\n", m_policies_applied);
+        sigma_log("| Ideology Absorbed: OPENSUSE YaST\n");
+        sigma_log("| Management Model : CENTRALIZED AI-ASSISTED\n");
+        sigma_log("-------------------------------------------\n");
     }
 
 private:

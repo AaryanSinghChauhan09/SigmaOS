@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "sigma_fs.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "fs/sigma_fs.h"
 
 /**
  * SigmaOS Sovereign Atomic Updater
@@ -29,7 +29,7 @@ public:
 
     bool stageUpdate(const char* shard_id, const void* new_data, sigma_size_t size) {
         (void)new_data; (void)size;
-        sigma_printf("[UPDATER] Staging Shard %s (Generation: %u)...\n", shard_id, this->m_current_generation + 1);
+        sigma_log("[UPDATER] Staging Shard %s (Generation: %u)...\n", shard_id, this->m_current_generation + 1);
         sigma_log("[UPDATER] Verifying shard checksum via QKD lattice...");
         return true;
     }
@@ -37,7 +37,7 @@ public:
     bool commitUpdate() {
         sigma_log("[UPDATER] COMMIT: Atomic swap of Shard Lattice pointers...");
         this->m_current_generation++;
-        sigma_printf("[UPDATER] Lattice Generation advanced to v%u.0\n", this->m_current_generation);
+        sigma_log("[UPDATER] Lattice Generation advanced to v%u.0\n", this->m_current_generation);
         return true;
     }
 

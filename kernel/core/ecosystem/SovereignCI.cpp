@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign CI/CD Shard
@@ -28,18 +29,18 @@ public:
     }
 
     void triggerPipeline(const char* commit_hash) {
-        sigma_printf("Σ [CI-CD]: Triggering native build pipeline for commit '%s'...\n", commit_hash);
+        sigma_log("Σ [CI-CD]: Triggering native build pipeline for commit '%s'...\n", commit_hash);
         // Execute compiler toolchain and static analysis
         sigma_log("Σ [CI-CD]: Build SUCCESS. Static analysis PASSED. Ready for Lattice integration.");
         m_successful_builds++;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN CI/CD AUDIT ---\n");
-        sigma_printf("| Successful Builds : %u\n", m_successful_builds);
-        sigma_printf("| Execution Mode    : NATIVE (On-Lattice)\n");
-        sigma_printf("| Sync Target       : GITHUB MAIN\n");
-        sigma_printf("--------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN CI/CD AUDIT ---\n");
+        sigma_log("| Successful Builds : %u\n", m_successful_builds);
+        sigma_log("| Execution Mode    : NATIVE (On-Lattice)\n");
+        sigma_log("| Sync Target       : GITHUB MAIN\n");
+        sigma_log("--------------------------------------\n");
     }
 
 private:

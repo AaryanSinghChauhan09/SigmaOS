@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign RBAC (Role-Based Access Control)
@@ -26,7 +26,7 @@ public:
     }
 
     bool checkPermission(const char* role, const char* resource, const char* action) {
-        sigma_printf("[RBAC] Checking Permission: [Role: %s] -> [Action: %s] on [Resource: %s]\n", role, action, resource);
+        sigma_log("[RBAC] Checking Permission: [Role: %s] -> [Action: %s] on [Resource: %s]\n", role, action, resource);
         
         // Simple permission map simulation
         if (sigma_strstr(role, "admin") || sigma_strstr(role, "sovereign")) {

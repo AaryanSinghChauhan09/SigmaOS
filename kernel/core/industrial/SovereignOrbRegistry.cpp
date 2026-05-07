@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Orb Registry
@@ -27,14 +27,14 @@ public:
     }
 
     bool registerOrb(const char* orb_name, const char* cid) {
-        sigma_printf("[ORB-REG] Registering Shard-Orb '%s' [CID: %s]...\n", orb_name, cid);
+        sigma_log("[ORB-REG] Registering Shard-Orb '%s' [CID: %s]...\n", orb_name, cid);
         sigma_log("[ORB-REG] Verifying orb signature via QKD Trust Fabric...");
         this->m_registered_orbs++;
         return true;
     }
 
     void listOrbs() {
-        sigma_printf("[ORB-REG] Lattice Orbit: %u verified orbs detected.\n", this->m_registered_orbs);
+        sigma_log("[ORB-REG] Lattice Orbit: %u verified orbs detected.\n", this->m_registered_orbs);
     }
 
     void synchronize() {

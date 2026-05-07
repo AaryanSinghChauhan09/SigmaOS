@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Lazy Allocator (SovereignLazy)
@@ -27,14 +27,14 @@ public:
     }
 
     void* deferAllocation(sigma_size_t size) {
-        sigma_printf("[LAZY] Deferring allocation of %llu bytes. Zeroing virtual mapping...\n", size);
+        sigma_log("[LAZY] Deferring allocation of %llu bytes. Zeroing virtual mapping...\n", size);
         this->m_pending_allocs++;
         // Return a guarded pointer that triggers a fault on access
         return (void*)0xDEADBEEF00000000;
     }
 
     void resolveFault(void* faulting_ptr) {
-        sigma_printf("[LAZY] Fault detected at %p. Materializing physical memory shard...\n", faulting_ptr);
+        sigma_log("[LAZY] Fault detected at %p. Materializing physical memory shard...\n", faulting_ptr);
         this->m_pending_allocs--;
         sigma_log("[LAZY] Allocation SUCCESS. Resuming execution.");
     }

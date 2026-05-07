@@ -1,6 +1,6 @@
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "sigma_time.h"
 
 /**
@@ -29,7 +29,7 @@ extern "C" void time_get_uptime(sigma_u64* uptime) {
 }
 
 extern "C" void time_report_status() {
-    sigma_printf("[S-TIME] Lattice Uptime: %llu cycles\n", SovereignTimeEngine.lattice_uptime);
+    sigma_log("[S-TIME] Lattice Uptime: %llu cycles\n", SovereignTimeEngine.lattice_uptime);
     sigma_log("[S-TIME] Synchronization status: NOMINAL");
 }
 

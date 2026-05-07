@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Gaming Performance Shard
@@ -28,18 +29,18 @@ public:
     }
 
     void optimizeSession() {
-        sigma_printf("Σ [GAMING]: Isolating CPU/GPU resources for maximum rendering throughput...\n");
+        sigma_log("Σ [GAMING]: Isolating CPU/GPU resources for maximum rendering throughput...\n");
         // Divert resources, pause non-critical shards, lock GPU clocks
         sigma_log("Σ [GAMING]: Session OPTIMIZED. Clear Linux-grade throughput achieved.");
         m_sessions_optimized++;
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SOVEREIGN GAMING PERFORMANCE AUDIT ---\n");
-        sigma_printf("| Sessions Optimized : %u\n", m_sessions_optimized);
-        sigma_printf("| Ideology Absorbed  : STEAM OS / CLEAR LINUX\n");
-        sigma_printf("| Performance Model  : RESOURCE ISOLATION\n");
-        sigma_printf("----------------------------------------------\n");
+        sigma_log("\n--- Σ SOVEREIGN GAMING PERFORMANCE AUDIT ---\n");
+        sigma_log("| Sessions Optimized : %u\n", m_sessions_optimized);
+        sigma_log("| Ideology Absorbed  : STEAM OS / CLEAR LINUX\n");
+        sigma_log("| Performance Model  : RESOURCE ISOLATION\n");
+        sigma_log("----------------------------------------------\n");
     }
 
 private:

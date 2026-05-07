@@ -16,16 +16,24 @@ FetchContent_MakeAvailable(googletest)
 
 # Include kernel headers for host-mode testing (stubs replace bare-metal ASM)
 include_directories(
-    ${CMAKE_SOURCE_DIR}/../../include
     ${CMAKE_SOURCE_DIR}/stubs
+    ${CMAKE_SOURCE_DIR}/../../include
 )
+
+# Enable Static Analysis
+find_program(CLANG_TIDY_EXE NAMES "clang-tidy")
+if(CLANG_TIDY_EXE)
+    set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE};-checks=-*,readability-*,bugprone-*;--warnings-as-errors=*")
+endif()
 
 enable_testing()
 
 add_executable(test_kernel 
     test_kernel.cpp 
     test_pqc.cpp 
+    test_sandbox.cpp
     ../../kernel/core/security/SovereignPQC.cpp
+    ../../kernel/core/security/SovereignSandbox.cpp
 )
 target_link_libraries(test_kernel GTest::gtest_main)
 

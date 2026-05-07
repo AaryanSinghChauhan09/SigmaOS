@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h""
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign App Launcher
@@ -44,18 +44,18 @@ public:
         for (sigma_u32 i = 0; i < this->app_count; i++) {
             if (sigma_hardened_strcmp(this->apps[i].app_id, query) == 0) {
                 this->apps[i].launch_count++;
-                sigma_printf("[LAUNCHER] Launching '%s' (ranked #1, %u prior launches).\n",
+                sigma_log("[LAUNCHER] Launching '%s' (ranked #1, %u prior launches).\n",
                              this->apps[i].display_name, this->apps[i].launch_count);
                 return;
             }
         }
-        sigma_printf("[LAUNCHER] No match for '%s'. Falling back to sigma_sh exec.\n", query);
+        sigma_log("[LAUNCHER] No match for '%s'. Falling back to sigma_sh exec.\n", query);
     }
 
     void listTop(sigma_u32 count) {
-        sigma_printf("[LAUNCHER] Top %u apps by usage:\n", count);
+        sigma_log("[LAUNCHER] Top %u apps by usage:\n", count);
         for (sigma_u32 i = 0; i < count && i < this->app_count; i++) {
-            sigma_printf("  %u. %s (%u launches)\n", i+1, this->apps[i].display_name, this->apps[i].launch_count);
+            sigma_log("  %u. %s (%u launches)\n", i+1, this->apps[i].display_name, this->apps[i].launch_count);
         }
     }
 

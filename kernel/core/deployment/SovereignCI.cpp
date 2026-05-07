@@ -1,7 +1,7 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "sigma_fs.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "fs/sigma_fs.h"
 
 /**
  * SigmaOS SovereignCI (Source-to-Shard Pipeline)
@@ -30,7 +30,7 @@ public:
     bool triggerPipeline(const char* source_path, const char* target_shard_name) {
         if (!this->m_initialized) return false;
 
-        sigma_printf("[SOVEREIGN-CI] Pipeline Triggered: %s -> %s\n", source_path, target_shard_name);
+        sigma_log("[SOVEREIGN-CI] Pipeline Triggered: %s -> %s\n", source_path, target_shard_name);
         
         // Step 1: Lexical Analysis & Verification
         sigma_log("[SOVEREIGN-CI] Phase 1: Silicon-Verification of source shard...");
@@ -39,7 +39,7 @@ public:
         sigma_log("[SOVEREIGN-CI] Phase 2: Applying Zenith-Optimization (AVX-512 / AMX targets)...");
         
         // Step 3: Shard Ignition
-        sigma_printf("[SOVEREIGN-CI] Phase 3: Injection of %s into the Sovereign Lattice.\n", target_shard_name);
+        sigma_log("[SOVEREIGN-CI] Phase 3: Injection of %s into the Sovereign Lattice.\n", target_shard_name);
         
         this->m_pipelines_executed++;
         return true;

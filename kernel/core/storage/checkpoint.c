@@ -1,3 +1,4 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: PROCESS CHECKPOINTING SHARD (v1.0)
@@ -5,7 +6,7 @@
  * Principles: Shard State Persistence & Fault-Tolerant Execution.
  * =============================================================================
  */
-#include "../../../include/sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 typedef struct Checkpoint {
     sigma_u64     task_id;

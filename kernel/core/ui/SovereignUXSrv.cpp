@@ -1,6 +1,6 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/SovereignLibC.h""
-#include "../../../include/sigma_types.h""
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 /**
  * SigmaOS Sovereign UXSrv (User Experience Service)
@@ -26,7 +26,7 @@ public:
     }
 
     void handleWorkflow(const char* workflow_id) {
-        sigma_printf("Σ [UXSRV]: Processing industrial workflow '%s'...\n", workflow_id);
+        sigma_log("Σ [UXSRV]: Processing industrial workflow '%s'...\n", workflow_id);
         // Logic for workflow orchestration across distributed shards
         this->active_sessions++;
     }

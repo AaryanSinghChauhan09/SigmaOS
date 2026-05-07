@@ -1,10 +1,10 @@
-#include "sigma_hal.h"
+#include "hal/sigma_hal.h"
 #ifndef CACHE_SHARD_HPP
 #define CACHE_SHARD_HPP
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -15,7 +15,7 @@ public:
 
     void FlushL1Cache() {
 #if defined(SIGMA_ARCH_X86_64)
-        sigma_printf("[CACHE-SHARD]: Executing WBINVD for absolute silicon cache finality...\n");
+        sigma_log("[CACHE-SHARD]: Executing WBINVD for absolute silicon cache finality...\n");
         __asm__ volatile ("wbinvd" : : : "memory");
 #endif
     }
@@ -27,11 +27,11 @@ public:
     }
 
     void AuditCache() {
-        sigma_printf("\n--- Î£ SOVEREIGN CACHE AUDIT ---\n");
-        sigma_printf("| L1 Cache Shards: 32 KB [PRIVATE]\n");
-        sigma_printf("| L2 Cache Shards: 256 KB [SEMI-PRIVATE]\n");
-        sigma_printf("| L3 Cache Shards: 16 MB [SHARED LATTICE]\n");
-        sigma_printf("-------------------------------\n");
+        sigma_log("\n--- Î£ SOVEREIGN CACHE AUDIT ---\n");
+        sigma_log("| L1 Cache Shards: 32 KB [PRIVATE]\n");
+        sigma_log("| L2 Cache Shards: 256 KB [SEMI-PRIVATE]\n");
+        sigma_log("| L3 Cache Shards: 16 MB [SHARED LATTICE]\n");
+        sigma_log("-------------------------------\n");
     }
 };
 

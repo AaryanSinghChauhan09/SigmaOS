@@ -1,7 +1,8 @@
-#include "../../../include/sigma_hal.h""
-#include "../../../include/sigma_kernel_types.h""
-#include "../../../include/SovereignLibC.h""
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -29,7 +30,7 @@ public:
 
     void transpileDriver(const char* chip_id, const char* spec_shard, const char* arch) {
         (void)spec_shard;
-        sigma_printf("Σ [SILICON-DIRECT]: Transpiling driver for Chip ID: %s (%s)...\n", chip_id, arch);
+        sigma_log("Σ [SILICON-DIRECT]: Transpiling driver for Chip ID: %s (%s)...\n", chip_id, arch);
         
         if (sigma_strcmp(arch, "RISC-V") == 0) {
             transpileRISCV();
@@ -40,7 +41,7 @@ public:
         }
         
         m_transpiled_drivers++;
-        sigma_printf("Σ [SILICON-DIRECT]: Driver '%s' ONLINE (Zero-Binary-Bloat).\n", chip_id);
+        sigma_log("Σ [SILICON-DIRECT]: Driver '%s' ONLINE (Zero-Binary-Bloat).\n", chip_id);
     }
 
     void transpileRISCV() {
@@ -52,10 +53,10 @@ public:
     }
 
     void audit() {
-        sigma_printf("\n--- Σ SILICON-DIRECT AUDIT ---\n");
-        sigma_printf("| Active Drivers    : %u\n", m_transpiled_drivers);
-        sigma_printf("| HW Sovereignty    : ABSOLUTE\n");
-        sigma_printf("------------------------------\n");
+        sigma_log("\n--- Σ SILICON-DIRECT AUDIT ---\n");
+        sigma_log("| Active Drivers    : %u\n", m_transpiled_drivers);
+        sigma_log("| HW Sovereignty    : ABSOLUTE\n");
+        sigma_log("------------------------------\n");
     }
 
 private:
