@@ -62,6 +62,23 @@ class StateManager {
             localStorage.setItem('sigmaos-state', JSON.stringify(this.state));
         }
     }
+
+    /**
+     * Filters system shards based on query.
+     * Mock implementation for demo — in production this queries the Shard Manifest.
+     */
+    filterShards(query) {
+        const shards = [
+            { name: "SovereignDAL", layer: 5, description: "Distro Abstraction Layer" },
+            { name: "SovereignPQC", layer: 3, description: "Post-Quantum Cryptography" },
+            { name: "SovereignNet", layer: 2, description: "Zero-Trust Mesh Networking" },
+            { name: "SovereignClaw", layer: 4, description: "AI Automation Gateway" }
+        ];
+        return shards.filter(s => 
+            s.name.toLowerCase().includes(query.toLowerCase()) || 
+            s.description.toLowerCase().includes(query.toLowerCase())
+        );
+    }
 }
 
 export const stateManager = new StateManager();

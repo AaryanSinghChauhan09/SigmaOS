@@ -28,13 +28,27 @@ Instead of "making Linux work," SigmaOS focuses on "making Linux feel futuristic
 *   **Neural Search**: A universal command palette (`Alt+Space`) for files, apps, and AI-driven actions.
 *   **Sigma Profiles**: Instant environment optimization for Developers, Gamers, and AI Engineers.
 *   **AI Desktop Assistant**: A persistent sidebar assistant (`Alt+A`) that monitors lattice health and automates tasks.
-*   **Universal Package Layer**: One interface, three package managers. Seamlessly inject software into the lattice.
-*   **Morphic CSS Styling**: Live, non-destructive editing of the UI's visual identity (blur, radius, glow).
-
-## 🛠️ Industrial Core
-*   **Sovereign PQC**: Post-Quantum Cryptography for all internal communications.
-*   **Amnesic Memory Manager**: Zero-forensic memory allocation for high-security shards.
+*   **Universal Package Layer**: One interface, three package managers. Seamlessly inject high-security shards.
 *   **Hardware Attestation**: Silicon-level verification of the physical lattice.
+
+## 🏗️ The Sovereign Lattice Architecture
+
+SigmaOS is built on a 7-layer modular architecture designed for high-assurance AI automation:
+
+1. **Layer 0: Silicon Ignition** (HAL, PMM, VMM)
+2. **Layer 1: Lattice Foundation** (IPC, Scheduler)
+3. **Layer 2: Core Services** (FS, Net, Self-Healing)
+4. **Layer 3: Security & PQC** (Sandbox, Post-Quantum Crypto)
+5. **Layer 4: AI & Automation** (Claw Stack, Agents, Workflows)
+6. **Layer 5: Industrial Ecosystem** (DAL, Packaging, Updates)
+7. **Layer 6: Zenith Interface** (Compositor, Dashboard)
+
+## 📚 Documentation
+
+*   [Architecture Overview](docs/ARCHITECTURE.md)
+*   [Build Guide](docs/BUILD.md)
+*   [Modularization Roadmap](docs/wiki/Modularization-Roadmap.md)
+*   [Shard Manifest](SHARDS.manifest)
 
 ## ⌨️ Hotkeys
 | Shortcut | Action |

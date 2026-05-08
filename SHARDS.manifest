@@ -59,6 +59,7 @@ kernel/core/automation/SovereignCron.cpp
 # LAYER 5: INDUSTRIAL ECOSYSTEM & USERLAND
 # ═══════════════════════════════════════════════════════════════════════
 userland/update-agent.cpp
+kernel/core/system/SovereignDAL.cpp
 userland/logd.cpp
 userland/SovereignSpotlight.cpp
 userland/SovereignSnap.cpp
