@@ -35,3 +35,9 @@ Integrated via `SovereignPersonalization`, Zenith supports:
 * **Adaptive Contrast**: Auto-scaling based on ambient telemetry.
 * **Predictive Layouts**: NPWO-driven interface adjustment based on workload history.
 
+## AI Automation & Live Canvas
+
+Integrated via the `SovereignClawGateway` (an OpenClaw-inspired control plane), Zenith features the **Live Canvas** and **Claw Gateway UI**.
+* **Sandboxed Tool Execution Feedback**: The dashboard provides real-time visualizations for AI-driven system operations.
+* **Multi-channel Sync**: Displays and orchestrates incoming events mapped by the `SovereignWorkflowEngine`.
+* **Talk Mode / Voice Wake**: Real-time microphone and voice visualization when communicating with the sovereign agent.
