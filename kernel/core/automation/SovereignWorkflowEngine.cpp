@@ -55,7 +55,6 @@ public:
         (void)data;
         for (sigma_u32 i = 0u; i < m_rule_count; i++) {
             if (!m_rules[i].valid) continue;
-            /* Simple strcmp using builtin to avoid libc dependency */
             sigma_u32 match = 1u;
             const char* a = m_rules[i].trigger;
             const char* b = trigger;
@@ -70,19 +69,55 @@ public:
         }
     }
 
+    void update(sigma_u64 uptime_ms) {
+        for (sigma_u32 i = 0u; i < m_schedule_count; i++) {
+            if (m_schedule[i].next_run_ms <= uptime_ms) {
+                sigma_log_info("[AUTO] Scheduled task triggered — executing action.");
+                if (m_schedule[i].action) m_schedule[i].action();
+                m_schedule[i].next_run_ms = uptime_ms + m_schedule[i].interval_ms;
+            }
+        }
+    }
+
+    void scheduleTask(sigma_u64 interval_ms, sigma_action_fn action) {
+        if (m_schedule_count >= SIGMA_MAX_RULES) return;
+        m_schedule[m_schedule_count].interval_ms = interval_ms;
+        m_schedule[m_schedule_count].next_run_ms = interval_ms;
+        m_schedule[m_schedule_count].action = action;
+        m_schedule_count++;
+        sigma_log_info("[AUTO] Recurring task scheduled.");
+    }
+
     void initialize() {
         registerRule("SYS_BATTERY_LOW", "pct < 15",    action_low_power);
         registerRule("SYS_APP_LAUNCH",  "app == Gamer", action_gaming);
+        
+        // System Monitoring Automation: Self-healing high CPU load
+        registerRule("SYS_CPU_HIGH", "load > 90", [](){
+            sigma_log_warn("[AUTO] CPU Critical: Shifting workloads to secondary silicon nodes.");
+        });
+        
+        // Example: Auto-optimization task every 5 minutes
+        scheduleTask(300000, [](){ sigma_log_info("[AUTO] Periodic lattice optimization running..."); });
+        
         sigma_log_info("[AUTO] Sovereign Workflow Engine initialized.");
     }
 
 private:
-    SovereignWorkflowEngineShard() : m_rule_count(0u) {}
+    SovereignWorkflowEngineShard() : m_rule_count(0u), m_schedule_count(0u) {}
     SovereignWorkflowEngineShard(const SovereignWorkflowEngineShard&) = delete;
     SovereignWorkflowEngineShard& operator=(const SovereignWorkflowEngineShard&) = delete;
 
-    WorkflowRule m_rules[SIGMA_MAX_RULES];
-    sigma_u32    m_rule_count;
+    struct ScheduledTask {
+        sigma_u64       interval_ms;
+        sigma_u64       next_run_ms;
+        sigma_action_fn action;
+    };
+
+    WorkflowRule  m_rules[SIGMA_MAX_RULES];
+    sigma_u32     m_rule_count;
+    ScheduledTask m_schedule[SIGMA_MAX_RULES];
+    sigma_u32     m_schedule_count;
 };
 
 } // namespace Automation
@@ -96,4 +131,8 @@ extern "C" void sigma_workflow_init() {
 
 extern "C" void sigma_workflow_dispatch(const char* trigger, const char* data) {
     SigmaOS::Kernel::Automation::SovereignWorkflowEngineShard::getInstance().dispatchEvent(trigger, data);
+}
+
+extern "C" void sigma_workflow_update(unsigned long long uptime_ms) {
+    SigmaOS::Kernel::Automation::SovereignWorkflowEngineShard::getInstance().update(uptime_ms);
 }

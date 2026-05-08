@@ -1,9 +1,7 @@
-#include "core/sigma_types.h"
-#include "observability/sigma_monitor.h"
-#include "libc/SovereignLibC.h"
-#include "hal/sigma_hal.h"
+#include "sigma_types.h"
+#include "sigma_hal.h"
 #include "sigma_log.h"
-
+#include "observability/sigma_monitor.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -15,29 +13,29 @@ SovereignObservabilityMonitor& SovereignObservabilityMonitor::getInstance() {
 }
 
 void SovereignObservabilityMonitor::init() {
-    log_emit(LOG_INFO, "[MONITOR] Initializing Sovereign Observability Matrix (eBPF-Native)...");
+    sigma_log_info("[MONITOR] Initializing Sovereign Observability Matrix (eBPF-Native)...");
     this->m_initialized = true;
 }
 
 sigma_system_load_t SovereignObservabilityMonitor::getLoadMatrix() {
     sigma_system_load_t load;
-    load.cpu_utilization = 12u; // Simulated 12% load
-    load.memory_pressure = 45u; // Simulated 45% pressure
-    load.network_throughput = 850u; // 850 Mbps
-    load.shard_migration_rate = 2u; // 2 shards/sec
+    load.cpu_utilization    = 12u;  /* Simulated 12% load */
+    load.memory_pressure    = 45u;  /* Simulated 45% pressure */
+    load.network_throughput = 850u; /* 850 Mbps */
+    load.shard_migration_rate = 2u; /* 2 shards/sec */
     return load;
 }
 
-void SovereignObservabilityMonitor::executeEbpfProgram(const void* bytecode, sigma_size_t size) {
+void SovereignObservabilityMonitor::executeEbpfProgram(const void* bytecode, sigma_usize size) {
     (void)bytecode; (void)size;
-    log_emit(LOG_INFO, "[MONITOR] eBPF: Injecting tracing program into the silicon bus...");
-    log_emit(LOG_INFO, "[MONITOR] eBPF: Attaching kprobe to 'sigma_syscall_gate'...");
-    log_emit(LOG_INFO, "[MONITOR] eBPF: Real-time telemetry collection STARTED.");
+    sigma_log_info("[MONITOR] eBPF: Injecting tracing program into the silicon bus...");
+    sigma_log_info("[MONITOR] eBPF: Attaching kprobe to 'sigma_syscall_gate'...");
+    sigma_log_info("[MONITOR] eBPF: Real-time telemetry collection STARTED.");
 }
 
 void SovereignObservabilityMonitor::rebalanceLattice() {
-    log_emit(LOG_WARN, "[MONITOR] Lattice load imbalance detected via eBPF probes. Migrating shards...");
-    log_emit(LOG_INFO, "[MONITOR] Migration: S412 -> Core 15, S092 -> Core 02.");
+    sigma_log_warn("[MONITOR] Lattice load imbalance detected via eBPF probes. Migrating shards...");
+    sigma_log_info("[MONITOR] Migration: S412 -> Core 15, S092 -> Core 02.");
 }
 
 } // namespace Observability
@@ -53,15 +51,10 @@ extern "C" sigma_system_load_t monitor_get_load_matrix() {
     return SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().getLoadMatrix();
 }
 
-extern "C" void monitor_execute_ebpf(const void* bytecode, sigma_size_t size) {
+extern "C" void monitor_execute_ebpf(const void* bytecode, sigma_usize size) {
     SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().executeEbpfProgram(bytecode, size);
 }
 
 extern "C" void monitor_rebalance_lattice() {
     SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().rebalanceLattice();
 }
-
-
-
-
-

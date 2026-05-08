@@ -1,60 +1,56 @@
-# SigmaOS: Sovereign Lattice Industrial v100
+# Σ SIGMAOS: THE SOVEREIGN ZENITH (V2)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://github.com/AaryanSinghChauhan09/SigmaOS/actions/workflows/ci.yml/badge.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/actions)
-[![Version](https://img.shields.io/badge/version-v100.1_Industrial-blue.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/releases)
-[![Security](https://img.shields.io/badge/Security-Hardened-green.svg)](SECURITY.md)
+[![Version](https://img.shields.io/badge/version-v100.2_Futuristic-blue.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/releases)
+[![Security](https://img.shields.io/badge/Security-Post--Quantum-green.svg)](SECURITY.md)
 
-> A high-performance, cloud-native operating system designed for distributed sovereignty. SigmaOS manages 600+ independent functional shards across clusters and edge nodes, outclassing traditional monolithic distributions in isolation, scalability, and security.
+> **SigmaOS** is an intelligent, AI-native adaptive operating system built on a hardened Linux foundation. It represents a paradigm shift from traditional distributions, focusing on **visual excellence**, **intelligent automation**, and **seamless workflow optimization**.
 
-![SigmaOS Sovereign Lattice](zenith_desktop_screenshot.png)
+![SigmaOS Sovereign Zenith](zenith_desktop_screenshot.png)
 
 ## [→ Live Demo](https://aaryansinghchauhan09.github.io/SigmaOS/)
 
-## Quick Start
+## 🎯 The Futuristic Paradigm
 
+Instead of "making Linux work," SigmaOS focuses on "making Linux feel futuristic." It is a **Sovereign environment** where the OS adapts to *you*.
+
+### 🏗️ Sigma Layers Architecture
+1.  **Linux Base**: Hardened host kernel (LTS) for maximum hardware compatibility.
+2.  **Sigma Core**: C++ Sovereign Lattice shards for high-performance orchestration.
+3.  **Sigma UI**: The Zenith Desktop — a cyberpunk-inspired, CSS-extensible interface.
+4.  **Sigma AI**: Integrated Neural Assistant for real-time optimization and troubleshooting.
+5.  **Sigma Automations**: The Workflow Engine (IF/THEN) for contextual system responses.
+6.  **Sigma Marketplace**: Universal Package Layer dispatching to Pacman, Flatpak, and Nix.
+
+### 🚀 Key Futuristic Features
+*   **Neural Search**: A universal command palette (`Alt+Space`) for files, apps, and AI-driven actions.
+*   **Sigma Profiles**: Instant environment optimization for Developers, Gamers, and AI Engineers.
+*   **AI Desktop Assistant**: A persistent sidebar assistant (`Alt+A`) that monitors lattice health and automates tasks.
+*   **Universal Package Layer**: One interface, three package managers. Seamlessly inject software into the lattice.
+*   **Morphic CSS Styling**: Live, non-destructive editing of the UI's visual identity (blur, radius, glow).
+
+## 🛠️ Industrial Core
+*   **Sovereign PQC**: Post-Quantum Cryptography for all internal communications.
+*   **Amnesic Memory Manager**: Zero-forensic memory allocation for high-security shards.
+*   **Hardware Attestation**: Silicon-level verification of the physical lattice.
+
+## ⌨️ Hotkeys
+| Shortcut | Action |
+| :--- | :--- |
+| **Alt + Space** | **Neural Search** (Universal Command Center) |
+| **Alt + A** | **AI Assistant** (Sidebar Sidebar) |
+| **Alt + T** | **OmniShell** (Command Line Shard) |
+| **Esc** | Close Overlays & Modals |
+
+## 📦 Quick Start
 ```bash
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
 node server.js          # Serves on http://localhost:5000
 ```
 
-## System Architecture: The Sovereign Lattice
-
-SigmaOS is built on the **Sovereign Lattice**, a modular 600-shard architecture designed for horizontal scalability, absolute isolation, and high-assurance computing. Unlike monolithic kernels, SigmaOS shards are distributed across the lattice, enabling seamless cloud-bursting and self-healing.
-
-```mermaid
-graph TD
-    User([Zenith UI]) --> Shards[Sovereign Shard Lattice]
-    Shards --> Bus{SovereignEventBus}
-    Bus --> Kernel[Core Kernel Shards]
-    Kernel --> Security[PQC & Attestation]
-    Kernel --> Observability[eBPF-Native Monitor]
-```
-
-## Zenith Desktop Features
-
-| Category | Features |
-| :--- | :--- |
-| **Interface** | Glassmorphic UI, Dynamic Desktop Shards, Drag & Snap Windows |
-| **Observability** | Real-time eBPF System Telemetry, CPU/Memory Heatmaps |
-| **Security** | Post-Quantum Cryptography (LBSV), Hardware Attestation (TEE) |
-| **Intelligence** | Integrated SovereignAI Assistant, Command Palette (Ctrl+Space) |
-
-## Shortcuts
-
-| Shortcut | Action |
-| :--- | :--- |
-| **Ctrl + Space** | Command Palette (Search all actions) |
-| **Alt + 1 – 4** | Switch Virtual Desktops (1 - 4) |
-| **Ctrl + Alt + T** | Launch Markup Forge |
-| **↑ / ↓** | Terminal Command History |
-| **Right-Click** | Desktop Context Menu |
-
 ## Contributions
-
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) and the [Official Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki).
 
 ## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE).

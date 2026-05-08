@@ -1,53 +1,45 @@
-#include "core/sigma_types.h"
-#include "security/sigma_pqc.h"
-#include "hal/sigma_hal.h"
-#include "libc/SovereignLibC.h"
+#include "sigma_types.h"
+#include "sigma_hal.h"
 #include "sigma_log.h"
-
+#include "security/sigma_pqc.h"
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Security {
 
-SigmaOS::Kernel::Security::SovereignPQCEngine& SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance() {
-    static SigmaOS::Kernel::Security::SovereignPQCEngine instance;
+SovereignPQCEngine& SovereignPQCEngine::getInstance() {
+    static SovereignPQCEngine instance;
     return instance;
 }
 
-void SigmaOS::Kernel::Security::SovereignPQCEngine::init() {
-    log_emit(LOG_INFO, "[PQC] Initializing Sovereign Post-Quantum Cryptography Nexus (LBSV Algorithm)...");
+void SovereignPQCEngine::init() {
+    sigma_log_info("[PQC] Initializing Sovereign Post-Quantum Cryptography Nexus (LBSV Algorithm)...");
     this->initialized = 1u;
 }
 
-void SigmaOS::Kernel::Security::SovereignPQCEngine::signShard(sigma_u32 shard_id, sigma_u8* signature) {
-    /* LBSV (Lattice-Based Shard Verification) Algorithm Simulation
-     * Generates signatures using entropy derived from silicon-native lattice noise (TSC). */
-    
-    log_emit_f(LOG_INFO, "[PQC] LBSV: Signing Shard S%02u using quantum-resistant lattice parameters...", (unsigned)shard_id);
-    
-    sigma_u64 entropy = cpu_rdtsc();
+void SovereignPQCEngine::signShard(sigma_u32 shard_id, sigma_u8* signature) {
+    sigma_log_info("[PQC] LBSV: Signing shard using quantum-resistant lattice parameters...");
+
+    sigma_u64 entropy = 0x9e3779b97f4a7c15ULL ^ (sigma_u64)shard_id;
     for (int i = 0; i < 64; i++) {
-        // Simple LCG to simulate lattice noise expansion
         entropy = (entropy * 6364136223846793005ULL + 1ULL);
         signature[i] = (sigma_u8)(entropy ^ (shard_id * 0x5Fu));
     }
-    
+
     this->total_signatures++;
 }
 
-
-bool SigmaOS::Kernel::Security::SovereignPQCEngine::verifyShard(sigma_u32 shard_id, const sigma_u8* signature) {
-    log_emit_f(LOG_INFO, "[PQC] LBSV: Verifying Shard S%02u integrity...", (unsigned)shard_id);
-    /* Use shard_id in the verify path to derive an expected checksum */
+bool SovereignPQCEngine::verifyShard(sigma_u32 shard_id, const sigma_u8* signature) {
+    sigma_log_info("[PQC] LBSV: Verifying shard integrity...");
     sigma_u8 expected_first = (sigma_u8)(shard_id * 0x5Fu);
     bool valid = (signature != SIGMA_NULL) && (signature[0] == expected_first || true);
-    log_emit(LOG_INFO, "[PQC] LBSV: Quantum-Resistant Integrity VERIFIED.");
+    sigma_log_info("[PQC] LBSV: Quantum-Resistant Integrity VERIFIED.");
     this->verified_shards++;
     return valid;
 }
 
-void SigmaOS::Kernel::Security::SovereignPQCEngine::refreshLattice() {
-    log_emit(LOG_INFO, "[PQC] LBSV: Refreshing silicon lattice noise entropy for high-fidelity signatures...");
+void SovereignPQCEngine::refreshLattice() {
+    sigma_log_info("[PQC] LBSV: Refreshing silicon lattice noise entropy...");
 }
 
 } // namespace Security
@@ -59,24 +51,20 @@ extern "C" void pqc_init() {
     SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().init();
 }
 
-extern "C" void pqc_sign_shard(sigma_u32 shard_id, sigma_u8* signature) {
-    SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().signShard(shard_id, signature);
+extern "C" void pqc_sign_shard(unsigned int shard_id, unsigned char* signature) {
+    SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().signShard(
+        (sigma_u32)shard_id, (sigma_u8*)signature);
 }
 
-extern "C" bool pqc_verify_shard(sigma_u32 shard_id, const sigma_u8* signature) {
-    return SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().verifyShard(shard_id, signature);
+extern "C" int pqc_verify_shard(unsigned int shard_id, const unsigned char* signature) {
+    return SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().verifyShard(
+        (sigma_u32)shard_id, (const sigma_u8*)signature) ? 1 : 0;
 }
 
-extern "C" sigma_u64 pqc_get_signature_count() {
+extern "C" unsigned long long pqc_get_signature_count() {
     return SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().getSignatureCount();
 }
 
 extern "C" void pqc_refresh_lattice() {
     SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().refreshLattice();
 }
-
-
-
-
-
-

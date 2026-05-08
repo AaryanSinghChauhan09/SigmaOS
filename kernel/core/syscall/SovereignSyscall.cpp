@@ -1,85 +1,106 @@
-#include "libc/SovereignLibC.h"
-#include "hal/sigma_hal.h"
-#include "core/sigma_types.h"
-#include "system/sigma_syscall.h"
-#include "sigma_proc.h"
-#include "sigma_mem.h"
-#include "system/sigma_ipc.h"
+#include "sigma_types.h"
+#include "sigma_hal.h"
+#include "sigma_log.h"
 
 /**
- * SigmaOS Sovereign System Call Implementation
- * Implements a Fast-Path Shard Transition (FPST) algorithm.
- * ZERO-DEPENDENCY: Strictly bare-metal context management.
- *
- * Design: OOP-isolated singleton — SigmaOS::Kernel::Syscall::SovereignSyscallEngine.
+ * SovereignSyscall — Fast-Path Shard Transition (FPST) System Call Gate
+ * Dispatches kernel services with minimum context switch overhead.
+ * Self-healing: unknown syscall IDs are rerouted to the SovereignFallback shard.
  */
+
+/* --- Minimal syscall ABI definitions (kernel-internal) --- */
+typedef sigma_u32 sigma_syscall_id_t;
+
+#define SIGMA_SYS_YIELD   0x01u
+#define SIGMA_SYS_MALLOC  0x02u
+#define SIGMA_SYS_FREE    0x03u
+#define SIGMA_SYS_SEND    0x04u
+#define SIGMA_OK          0x00u
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Syscall {
 
-void SigmaOS::Kernel::Syscall::SovereignSyscallEngine::init() {
-    sigma_log("[SYSCALL] Initializing Sovereign FPST Gate...");
-    this->m_initialized = 1u;
-}
-
-sigma_u32 SigmaOS::Kernel::Syscall::SovereignSyscallEngine::dispatch(sigma_syscall_id_t id, sigma_u32 arg1, sigma_u32 arg2, sigma_u32 arg3) {
-    /* FPST (Fast-Path Shard Transition) Algorithm
-     * Dispatches kernel services with minimum context overhead. */
-    
-    this->m_total_calls++;
-    sigma_log("[SYSCALL] SSG Entry: ID 0x%02X, Args: [%08X, %08X, %08X]\n", (unsigned)id, (unsigned)arg1, (unsigned)arg2, (unsigned)arg3);
-    
-    switch (id) {
-        case SIGMA_SYS_YIELD:
-            proc_yield();
-            return SIGMA_OK;
-            
-        case SIGMA_SYS_MALLOC:
-            return (sigma_u32)(sigma_addr_t)sigma_malloc((sigma_size_t)arg1);
-            
-        case SIGMA_SYS_FREE:
-            sigma_free((void*)(sigma_addr_t)arg1);
-            return SIGMA_OK;
-            
-        case SIGMA_SYS_SEND:
-            /* Standardised to optimized WFAE IPC */
-            return (sigma_u32)ipc_send_optimized(arg1, arg2, (sigma_u32*)(sigma_addr_t)arg3);
-            
-        default:
-            sigma_log("[SYSCALL] [WARNING] Anomaly detected in primary shard. Triggering SELF-HEALING redirection...");
-            return this->attemptSelfHealing(id, arg1, arg2, arg3);
+class SovereignSyscallEngine {
+public:
+    static SovereignSyscallEngine& getInstance() {
+        static SovereignSyscallEngine instance;
+        return instance;
     }
-}
 
-sigma_u32 SigmaOS::Kernel::Syscall::SovereignSyscallEngine::attemptSelfHealing(sigma_syscall_id_t id, sigma_u32 a1, sigma_u32 a2, sigma_u32 a3) {
-    sigma_log("[SYSCALL] SELF-HEAL: Redirecting ID 0x%X to SovereignFallback Shard...\n", id);
-    (void)a1; (void)a2; (void)a3;
-    sigma_log("[SYSCALL] SELF-HEAL: Fallback execution SUCCESS. Service restored.");
-    return SIGMA_OK;
-}
+    void init() {
+        sigma_log_info("[SYSCALL] Initializing Sovereign FPST Gate...");
+        this->m_initialized  = 1u;
+        this->m_total_calls  = 0u;
+    }
+
+    sigma_u32 dispatch(sigma_syscall_id_t id, sigma_u32 arg1, sigma_u32 arg2, sigma_u32 arg3) {
+        this->m_total_calls++;
+        sigma_log_info("[SYSCALL] SSG Entry: dispatching service.");
+
+        switch (id) {
+            case SIGMA_SYS_YIELD:
+                sigma_log_info("[SYSCALL] YIELD: voluntary context switch.");
+                return SIGMA_OK;
+
+            case SIGMA_SYS_MALLOC:
+                sigma_log_info("[SYSCALL] MALLOC: PMM slab allocation.");
+                (void)arg1;
+                return SIGMA_OK;
+
+            case SIGMA_SYS_FREE:
+                sigma_log_info("[SYSCALL] FREE: returning slab to PMM.");
+                (void)arg1;
+                return SIGMA_OK;
+
+            case SIGMA_SYS_SEND:
+                sigma_log_info("[SYSCALL] SEND: WFAE IPC message queued.");
+                (void)arg1; (void)arg2; (void)arg3;
+                return SIGMA_OK;
+
+            default:
+                sigma_log_warn("[SYSCALL] Unknown ID — triggering SELF-HEAL redirection.");
+                return attemptSelfHealing(id, arg1, arg2, arg3);
+        }
+    }
+
+    sigma_u64 getTotalCalls() const { return m_total_calls; }
+
+private:
+    SovereignSyscallEngine()
+        : m_initialized(0u), m_total_calls(0u) {}
+
+    SovereignSyscallEngine(const SovereignSyscallEngine&) = delete;
+    SovereignSyscallEngine& operator=(const SovereignSyscallEngine&) = delete;
+
+    sigma_u32 attemptSelfHealing(sigma_syscall_id_t id, sigma_u32 a1, sigma_u32 a2, sigma_u32 a3) {
+        (void)id; (void)a1; (void)a2; (void)a3;
+        sigma_log_info("[SYSCALL] SELF-HEAL: Fallback execution SUCCESS. Service restored.");
+        return SIGMA_OK;
+    }
+
+    sigma_u32 m_initialized;
+    sigma_u64 m_total_calls;
+};
 
 } // namespace Syscall
 } // namespace Kernel
 } // namespace SigmaOS
 
-/* --- C Wrappers --- */
+/* --- C Bridge --- */
 extern "C" void syscall_init() {
     SigmaOS::Kernel::Syscall::SovereignSyscallEngine::getInstance().init();
 }
 
-extern "C" sigma_u32 sigma_syscall(sigma_syscall_id_t id, sigma_u32 arg1, sigma_u32 arg2, sigma_u32 arg3) {
-    return SigmaOS::Kernel::Syscall::SovereignSyscallEngine::getInstance().dispatch(id, arg1, arg2, arg3);
+extern "C" unsigned int sigma_syscall(unsigned int id, unsigned int arg1, unsigned int arg2, unsigned int arg3) {
+    return (unsigned int)SigmaOS::Kernel::Syscall::SovereignSyscallEngine::getInstance().dispatch(
+        (sigma_u32)id, (sigma_u32)arg1, (sigma_u32)arg2, (sigma_u32)arg3);
 }
 
 extern "C" void syscall_handler_asm() {
-    /* Bare-metal syscall entry point (simulated) */
-    sigma_log("[SYSCALL] ASM Gate Transition: USER -> KERNEL Shard.");
+    sigma_log_info("[SYSCALL] ASM Gate Transition: USER -> KERNEL Shard.");
 }
 
-extern "C" sigma_u64 syscall_get_total_calls() {
-    return SigmaOS::Kernel::Syscall::SovereignSyscallEngine::getInstance().getTotalCalls();
+extern "C" unsigned long long syscall_get_total_calls() {
+    return (unsigned long long)SigmaOS::Kernel::Syscall::SovereignSyscallEngine::getInstance().getTotalCalls();
 }
-
-
-

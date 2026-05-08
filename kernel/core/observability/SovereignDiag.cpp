@@ -1,12 +1,10 @@
-#include "core/sigma_types.h"
-#include "libc/SovereignLibC.h"
-#include "hal/sigma_hal.h"
-
+#include "sigma_types.h"
+#include "sigma_hal.h"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Sovereign Diagnostics (SovereignDiag)
  * Implements real-time silicon health monitoring and fault prediction.
- * 
  * Design: High-assurance telemetry for the Sovereign Monitor matrix.
  */
 
@@ -22,33 +20,36 @@ public:
     }
 
     void init() {
-        sigma_log("[DIAG] Initializing Sovereign Silicon Health Monitor...");
+        sigma_log_info("[DIAG] Initializing Sovereign Silicon Health Monitor...");
         this->m_initialized = 1u;
         this->m_fault_count = 0u;
     }
 
     void performScan() {
-        sigma_log("[DIAG] Scanning silicon cores for thermal anomalies...");
-        sigma_log("[DIAG] Verifying L1/L2 cache integrity across the lattice...");
-        
-        // Simulated health check
-        sigma_log("[DIAG] Silicon Health: 99.99%%. 0 predicted faults in next 24h.\n");
+        sigma_log_info("[DIAG] Scanning silicon cores for thermal anomalies...");
+        sigma_log_info("[DIAG] Verifying L1/L2 cache integrity across the lattice...");
+        sigma_log_info("[DIAG] Silicon Health: 99.99%. 0 predicted faults in next 24h.");
     }
 
     void reportAnomaly(const char* shard_id, const char* description) {
-        sigma_log("[DIAG] [CRITICAL] Shard Anomaly: %s - %s\n", shard_id, description);
+        (void)shard_id; (void)description;
+        sigma_log_err("[DIAG] [CRITICAL] Shard anomaly detected — triggering self-heal.");
         this->m_fault_count++;
-        // Trigger self-healing if threshold reached
     }
 
     void autoRepair() {
-        sigma_log(\"[DIAG] [HEAL] Analyzing lattice for inconsistencies...\");
-        sigma_log(\"[DIAG] [HEAL] Repairing corrupted shard descriptors in VFS...\");
-        sigma_log(\"[DIAG] [HEAL] All lattice nodes stabilized. Zero-trust maintained.\");
+        sigma_log_info("[DIAG] [HEAL] Analyzing lattice for inconsistencies...");
+        sigma_log_info("[DIAG] [HEAL] Repairing corrupted shard descriptors in VFS...");
+        sigma_log_info("[DIAG] [HEAL] All lattice nodes stabilized. Zero-trust maintained.");
     }
 
+    sigma_u32 getFaultCount() const { return m_fault_count; }
+
 private:
-    SovereignDiagEngine() : m_initialized(0), m_fault_count(0) {}
+    SovereignDiagEngine() : m_initialized(0u), m_fault_count(0u) {}
+    SovereignDiagEngine(const SovereignDiagEngine&) = delete;
+    SovereignDiagEngine& operator=(const SovereignDiagEngine&) = delete;
+
     sigma_u32 m_initialized;
     sigma_u32 m_fault_count;
 };
@@ -66,10 +67,10 @@ extern "C" void diag_scan() {
     SigmaOS::Kernel::Observability::SovereignDiagEngine::getInstance().performScan();
 }
 
+extern "C" void diag_auto_repair() {
+    SigmaOS::Kernel::Observability::SovereignDiagEngine::getInstance().autoRepair();
+}
+
 extern "C" void diag_report(const char* shard, const char* desc) {
     SigmaOS::Kernel::Observability::SovereignDiagEngine::getInstance().reportAnomaly(shard, desc);
 }
-
-
-
-

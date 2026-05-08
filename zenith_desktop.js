@@ -416,12 +416,17 @@ function createDebounce(func, wait) {
             { t: "Σ [ZENITH]: Command Palette (Ctrl+K / Ctrl+Space) ready.", c: "success" }
         ];
 
+        const notificationHistory = [];
         function addLog(text, type) {
             const div = document.createElement('div');
             div.className = `log-item ${type}`;
             div.textContent = text;
             logContainer.prepend(div);
-            if (logContainer.children.length > 15) logContainer.lastChild.remove();
+            if (logContainer.children.length > 25) logContainer.lastChild.remove();
+            
+            // Persist to history
+            notificationHistory.push({ text, type, time: new Date().toLocaleTimeString() });
+            if (notificationHistory.length > 100) notificationHistory.shift();
         }
 
         let logIdx = 0;
@@ -449,7 +454,93 @@ function createDebounce(func, wait) {
             const map = {
                 'Markup Forge': 'markup-forge-win',
                 'Utility Nexus': 'utility-nexus-win',
-                'Marketplace': 'marketplace-win',
+                'Marketplace': 'sigma-market-win',
+                'Customization Panel': 'customization-win',
+                'Lattice Settings': 'lattice-settings-win',
+                'File Manager': 'file-manager-win',
+                'Sigma Browser': 'browser-win',
+                'AI Assistant': 'ai-assistant-win',
+            };
+            const id = map[app];
+            if (id) {
+                document.getElementById('cmd-palette').classList.add('active');
+                document.getElementById('cmd-input').focus();
+            } else if (act === 'settings') launchApp('Lattice Settings');
+            else if (act === 'repo') window.open(SIGMA_REPO_URL, '_blank', 'noopener');
+            else if (act === 'widgets') neural.setMindfulness(!document.body.classList.contains('focus-mode-active'));
+            else addLog(`Σ [CTX]: ${act} queued on sovereign lattice.`, 'success');
+        }
+
+        // Update Clock
+        function updateClock() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            const date = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+            document.getElementById('clock-time').textContent = time;
+            document.getElementById('clock-date').textContent = date;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Command Palette Logic
+        /* Σ Hotkey Orchestrator */
+        class HotkeyManager {
+            constructor() {
+                this.hotkeys = new Map();
+                window.addEventListener('keydown', (e) => this.handle(e));
+            }
+            register(combo, callback) {
+                this.hotkeys.set(combo.toLowerCase(), callback);
+            }
+            handle(e) {
+                const parts = [];
+                if (e.ctrlKey) parts.push('ctrl');
+                if (e.altKey) parts.push('alt');
+                if (e.shiftKey) parts.push('shift');
+                if (e.metaKey) parts.push('meta');
+                parts.push(e.key.toLowerCase());
+                
+                const combo = parts.join('+');
+                if (this.hotkeys.has(combo)) {
+                    e.preventDefault();
+                    this.hotkeys.get(combo)(e);
+                }
+
+                // Legacy palette handling
+                const tag = (e.target && e.target.tagName) || '';
+                const isOtherField = ['INPUT', 'TEXTAREA', 'SELECT'].includes(tag) && e.target && e.target.id !== 'cmd-input';
+                const paletteHotkey = (e.metaKey || e.ctrlKey) && (e.key === 'k' || e.code === 'Space');
+                if (paletteHotkey && !isOtherField) {
+                    e.preventDefault();
+                    cmdPalette.classList.toggle('active');
+                    if (cmdPalette.classList.contains('active') && cmdInput) cmdInput.focus();
+                }
+                if (e.key === 'Escape') {
+                    cmdPalette.classList.remove('active');
+                    hideContextMenu();
+                    toggleNotifications(false);
+                    toggleBatteryPanel(false);
+                }
+            }
+        }
+
+
+        // Simulate Hardware Stats
+        // UI Interactions
+        function toggleStart() {
+            const menu = document.getElementById('start-menu');
+            menu.classList.toggle('active');
+            if (menu.classList.contains('active')) {
+                addLog("Σ [ZENITH]: Start Menu Shard ACTIVE.", "success");
+            }
+        }
+
+        function launchApp(app) {
+            addLog(`Σ [ZENITH]: Launching ${app} Shard...`, "success");
+            const map = {
+                'Markup Forge': 'markup-forge-win',
+                'Utility Nexus': 'utility-nexus-win',
+                'Marketplace': 'sigma-market-win',
                 'Customization Panel': 'customization-win',
                 'Lattice Settings': 'lattice-settings-win',
                 'File Manager': 'file-manager-win',
@@ -466,7 +557,7 @@ function createDebounce(func, wait) {
             if (menu && menu.classList.contains('active')) toggleStart();
         }
 
-        // Marketplace Logic
+        // Marketplace Logic (Integrated with DAL)
         function installShard(name) {
             try {
                 if (installedShards.has(name)) {
@@ -475,29 +566,26 @@ function createDebounce(func, wait) {
                 }
                 const item = document.querySelector(`[data-mkt-shard="${name}"]`);
                 const btn = item && item.querySelector('button');
-                if (!btn) {
-                    throw new Error(`Invalid shard UI for ${name}`);
-                }
+                if (!btn) throw new Error(`Invalid shard UI for ${name}`);
+                
                 btn.textContent = 'INJECTING...';
                 btn.disabled = true;
-                addLog(`Σ [PKG]: Fetching ${name} bundle...`, "success");
+                
+                // Route through DAL for industrial parity
+                sigmaDAL.install(name);
+                
                 setTimeout(() => {
-                    try {
-                        installedShards.add(name);
-                        if (item) item.classList.add('mkt-item--installed');
-                        btn.textContent = '✓ INSTALLED';
-                        btn.disabled = true;
-                        addLog(`Σ [PKG]: ${name} injected successfully.`, "success");
-                        pushNotification(`Pkg: ${name} installed`);
-                        if (name === 'Glass-Pro') {
-                            document.body.style.backdropFilter = 'blur(40px)';
-                            addLog("Σ [CONFIG]: AVX-512 Shard Preempted for Glass-Pro.", "success");
-                        }
-                    } catch (e) {
-                        ErrorHandler.handle(e, 'Shard installation completion');
-                        btn.textContent = 'FAILED';
+                    installedShards.add(name);
+                    if (item) item.classList.add('mkt-item--installed');
+                    btn.textContent = '✓ INSTALLED';
+                    btn.disabled = true;
+                    addLog(`Σ [PKG]: ${name} successfully mapped to lattice via DAL.`, "success");
+                    
+                    if (name === 'Glass-Pro') {
+                        sigmaConfig.update('ui.glass', 40);
+                        addLog("Σ [CONFIG]: Glass intensity optimized for pro-grade lattice.", "success");
                     }
-                }, 1000);
+                }, 2000);
             } catch (error) {
                 ErrorHandler.handle(error, `Install shard: ${name}`);
             }
@@ -1021,7 +1109,7 @@ document.addEventListener('mousemove', (e) => {
     if(glow) {
         glow.style.left = e.clientX + 'px';
         glow.style.top = e.clientY + 'px';
-        glow.style.opacity = '1';
+        glow.opacity = '1';
     }
 });
 document.addEventListener('mouseleave', () => { if(glow) glow.style.opacity = '0'; });
@@ -1722,26 +1810,49 @@ function executeShard(name, ctx) {
 
 
 // =========================================================================
-// Σ SIGMAOS: SIGMA CORE & ADAPTIVE WORKFLOW ENGINE
+// Σ SIGMAOS: SIGMA CORE & ADAPTIVE WORKFLOW ENGINE (V2)
 // =========================================================================
 class SigmaCore {
     constructor() {
         this.currentMode = 'Balanced';
+        this.currentEdition = 'Neon'; // Default futuristic edition
+        this.automationRules = [];
         this.modes = {
-
-
-
             'Balanced': { accent: '#00ffa3', bg: 'rgba(5, 5, 7, 0.95)', cpu: 'BALANCED' },
             'Gamer': { accent: '#ff00ff', bg: 'rgba(10, 5, 15, 0.98)', cpu: 'TURBO' },
             'Creator': { accent: '#00c3ff', bg: 'rgba(5, 10, 15, 0.98)', cpu: 'MAX-THREADS' },
             'Streamer': { accent: '#ff3300', bg: 'rgba(15, 5, 5, 0.98)', cpu: 'ENCODE-PRIO' },
             'Red Team': { accent: '#ff0055', bg: 'rgba(10, 5, 5, 0.98)', cpu: 'MAX-PERF' },
             'Coding': { accent: '#00c3ff', bg: 'rgba(5, 7, 10, 0.98)', cpu: 'PERFORMANCE' },
-            'Minimal': { accent: '#ffffff', bg: 'rgba(0, 0, 0, 1)', cpu: 'POWERSAVE' }
-
-
-
+            'Minimal': { accent: '#ffffff', bg: 'rgba(0, 0, 0, 1)', cpu: 'POWERSAVE' },
+            'AI Native': { accent: '#7000ff', bg: 'rgba(10, 0, 20, 0.95)', cpu: 'NEURAL-BOOST' }
         };
+        this.initAutomation();
+    }
+
+    initAutomation() {
+        // Register default contextual automations
+        this.addAutomationRule({
+            trigger: 'app_launch',
+            condition: (app) => app === 'Markup Forge',
+            action: () => this.setMode('Coding')
+        });
+        this.addAutomationRule({
+            trigger: 'battery_low',
+            condition: (pct) => pct < 20,
+            action: () => this.setMode('Minimal')
+        });
+    }
+
+    addAutomationRule(rule) {
+        this.automationRules.push(rule);
+        addLog(`Σ [AUTO]: New context rule registered for ${rule.trigger}.`, "success");
+    }
+
+    triggerEvent(type, data) {
+        this.automationRules
+            .filter(r => r.trigger === type && r.condition(data))
+            .forEach(r => r.action());
     }
 
     setMode(modeName) {
@@ -1751,15 +1862,21 @@ class SigmaCore {
         this.currentMode = modeName;
         document.documentElement.style.setProperty('--accent', mode.accent);
         document.documentElement.style.setProperty('--accent-glow', mode.accent + '66');
+        
         const activeWorkflowEl = document.getElementById('active-workflow');
-        if (activeWorkflowEl) activeWorkflowEl.innerText = `MODAL: ${modeName.toUpperCase()}`;
+        if (activeWorkflowEl) activeWorkflowEl.innerText = `LATTICE: ${modeName.toUpperCase()}`;
         
-        addLog(`Σ [CORE]: Workflow Engine optimized for ${modeName}. Mode: ${mode.cpu}.`, 'success');
+        addLog(`Σ [CORE]: Environment optimized for ${modeName}. Base: ${sigmaConfig.data.system.base}.`, 'success');
         
-        // Notify Kernel (Simulated)
+        // Notify Kernel (Simulated Bridge to systemd/dbus)
         if (typeof ipc !== 'undefined') {
             ipc.syscall('SYS_SET_CPU_GOVERNOR', { mode: mode.cpu });
         }
+    }
+
+    healSystem() {
+        addLog("Σ [HEAL]: Initiating lattice-wide self-diagnostics...", "warning");
+        setTimeout(() => addLog("Σ [HEAL]: Shard integrity verified. 0 defects found.", "success"), 2000);
     }
 }
 
@@ -1805,22 +1922,14 @@ const commandInput = document.getElementById('command-input');
 const commandResults = document.getElementById('command-results');
 
 const availableCommands = [
-
-
-
-
     { label: 'Optimize Gaming', hint: 'Workflow', action: () => setWorkflowMode('Gamer') },
     { label: 'Deploy Capsule: AI Research', hint: 'Capsule', action: () => deployCapsule('AI Research') },
     { label: 'Deploy Capsule: Hacker Lab', hint: 'Capsule', action: () => deployCapsule('Hacker Lab') },
     { label: 'Browse Capsules', hint: 'App', action: () => launchApp('Capsule Library') },
     { label: 'Fix my system', hint: 'Semantic Search', action: () => sigmaCore.healSystem() },
-
-
-
     { label: 'Explain Tool: Nmap', hint: 'AI Assistant', action: () => addLog('Σ [AI]: Nmap is a network discovery and security auditing tool.', 'success') },
     { label: 'Explain Tool: Metasploit', hint: 'AI Assistant', action: () => addLog('Σ [AI]: Metasploit is an exploitation framework for developing and executing exploit code.', 'success') },
     { label: 'Create Snapshot', hint: 'System', action: () => switchUtil('snapshots') },
-
     { label: 'Network Scan', hint: 'Security', action: () => addLog('Σ [NET]: Scanning mesh...', 'success') },
     { label: 'Clear Logs', hint: 'System', action: () => {
         const logOut = document.getElementById('log-output');
@@ -1912,30 +2021,226 @@ function switchSecTab(tab) {
     const navs = document.querySelectorAll('.sec-nav');
     navs.forEach(n => n.classList.remove('active'));
     
-    // Simple mock tab switching
-    main.innerHTML = `<h3>Security Shard: ${tab.toUpperCase()}</h3><p class="stat-label">Initializing intelligent auditing for ${tab}...</p>`;
+    if (tab === 'recon') {
+        main.innerHTML = `<h3>Reconnaissance Shard</h3><div id="recon-output" class="log-output" style="height: 150px;"></div><button class="util-btn" onclick="runSecurityScan()">START SCAN</button>`;
+    } else if (tab === 'attestation') {
+        main.innerHTML = `<h3>Hardware Attestation</h3><div class="settings-group"><label>Root of Trust</label><span class="status-success">VERIFIED</span></div><div class="settings-group"><label>Hardware ID</label><span>LATTICE-ID-7742-PQ</span></div><div class="settings-group"><label>PQC Shield</label><span class="status-success">ACTIVE</span></div><button class="util-btn" onclick="addLog('Σ [ATTEST]: Manually re-verifying lattice...', 'warning'); setTimeout(() => addLog('Σ [ATTEST]: Integrity audit SUCCESS.', 'success'), 1500)">RE-VERIFY</button>`;
+    } else if (tab === 'vault') {
+        main.innerHTML = `<h3>Sovereign Vault</h3><p class="stat-label">Secure enclave for cryptographic material.</p><div class="settings-group"><label>Active Keys</label><span>14</span></div><button class="util-btn" onclick="addLog('Σ [VAULT]: Rotating PQC keys...', 'info')">ROTATE KEYS</button>`;
+    } else {
+        main.innerHTML = `<h3>Security Shard: ${tab.toUpperCase()}</h3><p class="stat-label">Initializing intelligent auditing for ${tab}...</p>`;
+    }
     addLog(`Σ [SEC]: Mission Control switched to ${tab} tab.`, "success");
 }
 
-// Update start menu launch
-
-// SIGMA CONFIG ENGINE
+// SIGMA CONFIG ENGINE (Industrial Grade YAML Persistence)
 class SigmaConfig {
     constructor() {
-        this.data = {
-            desktop: { opacity: 0.95, blur: 20 },
-            ai: { enabled: true, autoOptimize: true },
-            services: { boot: 'FAST' }
+        this.storageKey = 'sigma_config_manifest';
+        this.data = this.load();
+        this.applyAll();
+    }
+
+    load() {
+        const saved = localStorage.getItem(this.storageKey);
+        if (saved) {
+            try {
+                return JSON.parse(saved);
+            } catch (e) {
+                console.error("Config corruption detected. Resetting to defaults.");
+            }
+        }
+        return {
+            system: { 
+                kernel: 'linux-lts', 
+                base: 'Arch Linux',
+                init: 'systemd',
+                security: 'lattice-pqc',
+                edition: 'Neon',
+                profile: 'Developer'
+            },
+            ui: { 
+                accent: '#00ff88', 
+                glass: 20, 
+                theme: 'cyan',
+                borderRadius: '18px',
+                panelBlur: '20px'
+            },
+            shortcuts: {
+                'OmniShell': 'Alt+T',
+                'CommandPalette': 'Alt+Space',
+                'Settings': 'Ctrl+I'
+            },
+            workflows: [
+                { if: "app == 'Markup Forge'", then: "mode = 'Coding'" },
+                { if: "battery < 20", then: "mode = 'Minimal'" }
+            ],
+            automation: { 
+                autoOptimize: true, 
+                batteryAware: true,
+                contextualTriggers: true
+            }
         };
     }
 
+    save() {
+        localStorage.setItem(this.storageKey, JSON.stringify(this.data));
+        addLog("Σ [CONFIG]: YAML Manifest persisted to silicon.", "success");
+    }
+
     update(path, value) {
-        addLog(`Σ [CONFIG]: Updating ${path} to ${value}...`, "success");
-        if (path === 'desktop.opacity') {
-            document.body.style.backgroundColor = `rgba(3, 3, 5, ${value/100})`;
+        const keys = path.split('.');
+        let current = this.data;
+        for (let i = 0; i < keys.length - 1; i++) {
+            if (!current[keys[i]]) current[keys[i]] = {};
+            current = current[keys[i]];
+        }
+        current[keys[keys.length - 1]] = value;
+        this.apply(path, value);
+        this.save();
+    }
+
+    apply(path, value) {
+        if (path === 'ui.accent') {
+            document.documentElement.style.setProperty('--accent', value);
+            document.documentElement.style.setProperty('--accent-glow', value + '44');
+        } else if (path === 'ui.glass' || path === 'ui.panelBlur') {
+            document.documentElement.style.setProperty('--glass-blur', `${value}`);
+        } else if (path === 'ui.borderRadius') {
+            document.documentElement.style.setProperty('--border-radius', value);
+        } else if (path === 'ui.theme') {
+            setTheme(value);
+        } else if (path === 'system.profile') {
+            this.setProfile(value);
         }
     }
+
+    applyAll() {
+        Object.entries(this.data.ui).forEach(([k, v]) => this.apply(`ui.${k}`, v));
+        this.setProfile(this.data.system.profile);
+    }
+
+    setProfile(profile) {
+        addLog(`Σ [CORE]: Applying '${profile}' Profile optimizations...`, "success");
+        if (profile === 'Developer') {
+            // Simulated: Load VS Code extensions, Docker, Git tweaks
+        } else if (profile === 'Gamer') {
+            sigmaCore.setMode('Gamer');
+        }
+    }
+
+    exportYAML() {
+        // Simple JSON-to-YAML simulation
+        let yaml = "system:\n";
+        Object.entries(this.data.system).forEach(([k,v]) => yaml += `  ${k}: ${v}\n`);
+        yaml += "ui:\n";
+        Object.entries(this.data.ui).forEach(([k,v]) => yaml += `  ${k}: ${v}\n`);
+        yaml += "shortcuts:\n";
+        Object.entries(this.data.shortcuts).forEach(([k,v]) => yaml += `  ${k}: ${v}\n`);
+        return yaml;
+    }
 }
+
+// SIGMA DISTRO ABSTRACTION LAYER (DAL) V3 - Universal Package Layer
+const sigmaDAL = {
+    install(pkg) {
+        addLog(`Σ [DAL]: Universal Dispatcher analyzing ${pkg}...`, "info");
+        
+        // Simulated Universal Package Layer logic
+        let method = "pacman";
+        if (pkg.startsWith("flatpak:")) method = "flatpak";
+        if (pkg.startsWith("nix:")) method = "nix";
+
+        addLog(`Σ [DAL]: Routing to host '${method}' layer...`, "info");
+        
+        setTimeout(() => {
+            addLog(`Σ [DAL]: ${pkg} injected into lattice via ${method}.`, "success");
+            pushNotification(`Universal Install: ${pkg}`);
+        }, 2000);
+    },
+    search(query) {
+        addLog(`Σ [DAL]: Querying Universal Registry (Pacman/Flatpak/Nix) for "${query}"...`, "info");
+        return [
+            { name: "sigma-cli", version: "1.0.0", desc: "SigmaOS Command Line Interface", origin: "native" },
+            { name: "code-oss", version: "1.85.0", desc: "Visual Studio Code", origin: "flatpak" },
+            { name: "neovim", version: "0.9.4", desc: "Hyper-extensible Vim", origin: "nix" }
+        ];
+    }
+};
+
+// UNIVERSAL SEARCH & COMMAND CENTER
+window.toggleCommandCenter = function() {
+    const cc = document.getElementById('command-center');
+    if (!cc) return;
+    cc.classList.toggle('hidden');
+    if (!cc.classList.contains('hidden')) {
+        document.getElementById('command-input').focus();
+        addLog("Σ [NEURAL]: Command Center summoned.", "success");
+    }
+};
+
+window.toggleSidebar = function() {
+    const sb = document.getElementById('sigma-sidebar');
+    if (!sb) return;
+    sb.classList.toggle('hidden');
+    addLog(`Σ [NEURAL]: AI Assistant ${sb.classList.contains('hidden') ? 'retracted' : 'deployed'}.`, "info");
+};
+
+window.sendAiChat = function() {
+    const input = document.getElementById('ai-chat-input');
+    const log = document.getElementById('ai-assistant-log');
+    if (!input || !input.value.trim()) return;
+
+    const userLine = document.createElement('div');
+    userLine.className = 'ai-chat-line user';
+    userLine.innerText = input.value;
+    log.appendChild(userLine);
+
+    const query = input.value.toLowerCase();
+    input.value = '';
+    log.scrollTop = log.scrollHeight;
+
+    setTimeout(() => {
+        const botLine = document.createElement('div');
+        botLine.className = 'ai-chat-line bot';
+        
+        if (query.includes('optimize') || query.includes('fix')) {
+            botLine.innerText = "Σ [NEURAL]: Initiating lattice-wide optimization... Memory purged, cache rotated. Efficiency increased by 14%.";
+            sigmaCore.healSystem();
+        } else if (query.includes('mode') || query.includes('profile')) {
+            botLine.innerText = "Σ [NEURAL]: Profiles can be switched in the Settings Shard. Shall I open it for you?";
+        } else {
+            botLine.innerText = "Σ [NEURAL]: Analyzing request... How else can I assist with your Sovereign environment?";
+        }
+        
+        log.appendChild(botLine);
+        log.scrollTop = log.scrollHeight;
+    }, 800);
+};
+
+// KEYBINDING ORCHESTRATOR
+window.addEventListener('keydown', (e) => {
+    // Alt + Space: Command Center
+    if (e.altKey && e.code === 'Space') {
+        e.preventDefault();
+        toggleCommandCenter();
+    }
+    // Alt + A: AI Assistant
+    if (e.altKey && e.key === 'a') {
+        e.preventDefault();
+        toggleSidebar();
+    }
+    // Alt + T: OmniShell
+    if (e.altKey && e.key === 't') {
+        e.preventDefault();
+        launchApp('OmniShell');
+    }
+    // Esc: Close Overlays
+    if (e.key === 'Escape') {
+        document.getElementById('command-center')?.classList.add('hidden');
+        document.getElementById('start-menu')?.classList.remove('active');
+    }
+});
 
 // PERFORMANCE HUD LOGIC
 function toggleOverlay() {
@@ -1965,6 +2270,7 @@ window.performSearch = function(query) {
         { name: 'Sigma Browser', type: 'app', action: "launchApp('Sigma Browser')" },
         { name: 'System Installer', type: 'app', action: "launchApp('System Installer')" },
         { name: 'Lattice Settings', type: 'setting', action: "launchApp('Utility Nexus')" },
+        { name: 'Marketplace', type: 'app', action: "launchApp('Marketplace')" },
         { name: 'Theme: Neon Cyan', type: 'command', action: "setTheme('cyan')" },
         { name: 'Theme: Solar Gold', type: 'command', action: "setTheme('gold')" },
         { name: 'Theme: Crimson Shard', type: 'command', action: "setTheme('crimson')" },
@@ -1995,16 +2301,86 @@ window.switchSettings = function(tab) {
     if (tab === 'services') {
         main.innerHTML = `<h3>Service Manager</h3><div class="settings-group"><label>Lattice Orchestrator</label><span class="status-success">RUNNING</span></div><div class="settings-group"><label>PQC Cryptography</label><span class="status-success">HARDENED</span></div><div class="settings-group"><label>Aether Network Shard</label><button class="util-btn" onclick="addLog('Σ [SVC]: Restarting Aether Shard...', 'warning')">RESTART</button></div>`;
     } else if (tab === 'config') {
-        main.innerHTML = `<h3>Config Engine (YAML)</h3><textarea class="util-input" style="height: 150px; font-family: monospace;">system:\n  kernel: sovereign-v100\n  security: lattice-pqc\n  ui: zenith-fluid</textarea><button class="util-btn" onclick="addLog('Σ [CONFIG]: YAML Manifest deployed.', 'success')">DEPLOY CONFIG</button>`;
+        main.innerHTML = `<h3>Config Engine (YAML)</h3><textarea class="util-input" style="height: 150px; font-family: monospace;">${sigmaConfig.exportYAML()}</textarea><button class="util-btn" onclick="addLog('Σ [CONFIG]: YAML Manifest deployed.', 'success')">DEPLOY CONFIG</button>`;
     } else if (tab === 'modules') {
         main.innerHTML = `<h3>Dynamic Module Manager</h3><p class="stat-label">Hot-swap drivers and UI shards without rebooting.</p><div class="settings-group"><label>GPU Driver v2.1</label><button class="util-btn" onclick="addLog('Σ [MODULE]: Hot-swapping GPU Driver...', 'success')">RELOAD</button></div><div class="settings-group"><label>Aether Network Shard</label><button class="util-btn" onclick="addLog('Σ [MODULE]: Shard reloaded.', 'success')">RELOAD</button></div>`;
+    } else if (tab === 'system') {
+        const sys = sigmaConfig.data.system;
+        main.innerHTML = `
+            <h3>Foundation Matrix</h3>
+            <p class="stat-label">Core system parameters and lattice health.</p>
+            <div class="settings-group">
+                <label>Base Distro</label>
+                <span>${sys.base}</span>
+            </div>
+            <div class="settings-group">
+                <label>Kernel Layer</label>
+                <span>${sys.kernel}</span>
+            </div>
+            <div class="settings-group">
+                <label>Init System</label>
+                <span>${sys.init}</span>
+            </div>
+            <div class="settings-group">
+                <label>Security Lattice</label>
+                <span class="status-success">${sys.security.toUpperCase()}</span>
+            </div>
+            <button class="util-btn" onclick="addLog('Σ [SYS]: Initiating systemd-sync...', 'info')">SYNC HOST</button>`;
+    } else if (tab === 'appearance') {
+        const ui = sigmaConfig.data.ui;
+        main.innerHTML = `
+            <h3>Morphic UI Styling</h3>
+            <p class="stat-label">Live-edit the visual identity of the Sovereign Lattice.</p>
+            <div class="settings-group">
+                <label>Accent Color</label>
+                <input type="color" class="util-input" value="${ui.accent}" onchange="sigmaConfig.update('ui.accent', this.value)">
+            </div>
+            <div class="settings-group">
+                <label>Panel Blur (px)</label>
+                <input type="range" min="0" max="50" value="${ui.panelBlur.replace('px','')}" oninput="sigmaConfig.update('ui.panelBlur', this.value + 'px')">
+            </div>
+            <div class="settings-group">
+                <label>Border Radius (px)</label>
+                <input type="range" min="0" max="40" value="${ui.borderRadius.replace('px','')}" oninput="sigmaConfig.update('ui.borderRadius', this.value + 'px')">
+            </div>
+            <button class="util-btn" onclick="addLog('Σ [UI]: Aesthetic shards synchronized.', 'success')">RESTORE DEFAULTS</button>`;
+    } else if (tab === 'workflows') {
+        const wf = sigmaConfig.data.workflows;
+        main.innerHTML = `
+            <h3>Sigma Workflow Engine</h3>
+            <p class="stat-label">Configure intelligent IF/THEN automation rules.</p>
+            <div class="settings-group" style="flex-direction: column; align-items: flex-start;">
+                ${wf.map((r, i) => `
+                    <div style="margin-bottom: 10px; font-size: 0.9em; color: var(--accent);">
+                        IF <code>${r.if}</code> THEN <code>${r.then}</code>
+                    </div>
+                `).join('')}
+            </div>
+            <button class="util-btn" onclick="addLog('Σ [AUTO]: New workflow shard injected.', 'success')">ADD NEW RULE</button>`;
     } else if (tab === 'benchmarks') {
         main.innerHTML = `<h3>Benchmark Laboratory</h3><p class="stat-label">Measure silicon-native performance and lattice throughput.</p><div class="settings-group"><label>Core Latency</label><span>0.04μs</span></div><div class="settings-group"><label>Lattice Sync Rate</label><span>8.2 GB/s</span></div><button class="util-btn" onclick="addLog('Σ [BENCH]: Running Stress Test...', 'warning')">START STRESS TEST</button>`;
+    } else if (tab === 'shortcuts') {
+        const s = sigmaConfig.data.shortcuts;
+        main.innerHTML = `
+            <h3>Visual Shortcut Builder</h3>
+            <p class="stat-label">Customize system-wide keybindings without config editing.</p>
+            <div class="settings-group">
+                <label>Command Palette</label>
+                <input type="text" class="util-input" id="bind-cp" value="${s['CommandPalette']}">
+            </div>
+            <div class="settings-group">
+                <label>OmniShell</label>
+                <input type="text" class="util-input" id="bind-os" value="${s['OmniShell']}">
+            </div>
+            <button class="util-btn" onclick="
+                sigmaConfig.update('shortcuts.CommandPalette', document.getElementById('bind-cp').value);
+                sigmaConfig.update('shortcuts.OmniShell', document.getElementById('bind-os').value);
+                addLog('Σ [CONFIG]: Keybinds remapped and persisted.', 'success');
+            ">SAVE BINDINGS</button>`;
     } else if (tab === 'accessibility') {
         main.innerHTML = `<h3>Accessibility</h3><p class="stat-label">Inclusive design for the Sovereign Lattice.</p><div class="settings-group"><label>Screen Reader</label><button class="util-btn" onclick="addLog('Σ [UI]: Screen Reader ENABLED.', 'success')">ENABLE</button></div><div class="settings-group"><label>High Contrast</label><button class="util-btn" onclick="addLog('Σ [UI]: High Contrast mode active.', 'success')">ENABLE</button></div>`;
     } else if (tab === 'healing') {
         main.innerHTML = `<h3>Auto-Healing</h3><p class="stat-label">AI-driven diagnostics and lattice repair.</p><div class="settings-group"><label>Health: 100%</label><button class="util-btn" onclick="sigmaCore.healSystem()">START AUDIT</button></div>`;
-
     } else {
         main.innerHTML = `<h3>${tab.toUpperCase()}</h3><p class="stat-label">Integrating ${tab} services...</p>`;
     }
@@ -2015,7 +2391,7 @@ window.switchSettings = function(tab) {
 let draggedWidget = null;
 
 window.handleDragStart = function(e) {
-    draggedWidget = e.target.closest('.card');
+    draggedWidget = e.target.closest('.widget') || e.target.closest('.card');
     e.dataTransfer.effectAllowed = 'move';
 };
 
@@ -2026,7 +2402,7 @@ window.handleDragOver = function(e) {
 
 window.handleDrop = function(e) {
     e.preventDefault();
-    const target = e.target.closest('.card');
+    const target = e.target.closest('.widget') || e.target.closest('.card');
     if (draggedWidget && target && draggedWidget !== target) {
         const parent = target.parentNode;
         parent.insertBefore(draggedWidget, target);
@@ -2086,8 +2462,94 @@ class DynamicThemeEngine {
     }
 }
 
+// SOVEREIGN MAINTENANCE DAEMON
+class SovereignMaintenanceDaemon {
+    constructor() {
+        this.init();
+    }
+    init() {
+        setInterval(() => this.runHygiene(), 300000); // Every 5 minutes
+    }
+    runHygiene() {
+        addLog('Σ [MAINT]: Background hygiene cycle started...', 'info');
+        // Simulate cleanup
+        setTimeout(() => addLog('Σ [MAINT]: Cache purged. 142MB reclaimed.', 'success'), 2000);
+    }
+}
+
+// CUSTOM CONTEXT MENU SYSTEM
+window.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    const menu = document.getElementById('context-menu');
+    if (!menu) return;
+    
+    menu.style.display = 'block';
+    menu.style.left = `${e.pageX}px`;
+    menu.style.top = `${e.pageY}px`;
+    menu.style.zIndex = '10000';
+});
+
+window.addEventListener('click', () => {
+    const menu = document.getElementById('context-menu');
+    if (menu) menu.style.display = 'none';
+});
+
+window.contextAction = function(action) {
+    addLog(`Σ [UI]: Context Action: ${action}`, 'success');
+    if (action === 'refresh') location.reload();
+};
+
+window.toggleHelp = function() {
+    const help = document.getElementById('help-overlay');
+    if (!help) return;
+    
+    if (help.classList.contains('wizard-overlay--hidden')) {
+        help.innerHTML = `
+            <div class="wizard-card">
+                <h2>Σ Sovereign Help Matrix</h2>
+                <div class="wizard-steps" style="max-height: 400px; overflow-y: auto; text-align: left;">
+                    <div class="settings-group">
+                        <label>Alt + Space</label>
+                        <span>Toggle Command Center (Universal Palette)</span>
+                    </div>
+                    <div class="settings-group">
+                        <label>Alt + T</label>
+                        <span>Launch OmniShell Terminal</span>
+                    </div>
+                    <div class="settings-group">
+                        <label>Ctrl + Space</label>
+                        <span>Open Unified Search</span>
+                    </div>
+                    <div class="settings-group">
+                        <label>Right Click</label>
+                        <span>Access Sovereign Context Menu</span>
+                    </div>
+                    <div class="settings-group">
+                        <label>Automated Hygiene</label>
+                        <span>The Maintenance Daemon runs every 5 minutes to purge cache and rotate logs.</span>
+                    </div>
+                    <div class="settings-group">
+                        <label>Workflow Modes</label>
+                        <span>Switch modes (Balanced, Gamer, Minimal) via the Command Center or Settings.</span>
+                    </div>
+                    <div class="settings-group">
+                        <label>Lattice Marketplace</label>
+                        <span>Inject new system shards (Glass-Pro, AVX-512) directly into the kernel.</span>
+                    </div>
+                </div>
+                <button class="wizard-btn" onclick="toggleHelp()">DISMISS MATRIX</button>
+            </div>
+        `;
+        help.classList.remove('wizard-overlay--hidden');
+    } else {
+        help.classList.add('wizard-overlay--hidden');
+    }
+};
+
+// Singleton Initializations
 const themeEngine = new DynamicThemeEngine();
 const automation = new SigmaAutomationEngine();
+const maintenance = new SovereignMaintenanceDaemon();
 
 // SIGMA CAPSULE DEPLOYMENT
 function deployCapsule(name) {
@@ -2141,51 +2603,6 @@ window.launchApp = function(app) {
     }
 };
 
-// Singleton Initializations
 if (typeof sigmaConfig === 'undefined') window.sigmaConfig = new SigmaConfig();
 if (typeof sigmaCore === 'undefined') window.sigmaCore = new SigmaCore();
 if (typeof automationEngine === 'undefined') window.automationEngine = new SigmaAutomationEngine();
-
-
-// SOVEREIGN MAINTENANCE DAEMON
-class SovereignMaintenanceDaemon {
-    constructor() {
-        this.init();
-    }
-    init() {
-        setInterval(() => this.runHygiene(), 300000); // Every 5 minutes
-    }
-    runHygiene() {
-        addLog('S [MAINT]: Background hygiene cycle started...', 'info');
-        // Simulate cleanup
-        setTimeout(() => addLog('S [MAINT]: Cache purged. 142MB reclaimed.', 'success'), 2000);
-    }
-}
-const maintenance = new SovereignMaintenanceDaemon();
-
-// CUSTOM CONTEXT MENU SYSTEM
-window.addEventListener('contextmenu', (e) => {
-    e.preventDefault();
-    const menu = document.getElementById('context-menu');
-    if (!menu) return;
-    
-    menu.style.display = 'block';
-    menu.style.left = \\px\;
-    menu.style.top = \\px\;
-    menu.style.zIndex = '10000';
-});
-
-window.addEventListener('click', () => {
-    const menu = document.getElementById('context-menu');
-    if (menu) menu.style.display = 'none';
-});
-
-window.contextAction = function(action) {
-    addLog(\S [UI]: Context Action: \\, 'success');
-    if (action === 'refresh') location.reload();
-};
-
-window.toggleHelp = function() {
-    const help = document.getElementById('help-overlay');
-    if (help) help.classList.toggle('wizard-overlay--hidden');
-};
