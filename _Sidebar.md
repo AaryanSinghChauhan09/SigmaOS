@@ -9,7 +9,9 @@
 
 ## 🗂️ Architecture & Design
 * [Architecture Philosophy](Architecture_Philosophy)
+* [**🗺️ Modularization Map**](MODULARIZATION_MAP) ← Layer reference
 * [Modularization Roadmap](Modularization-Roadmap)
+* [Component Status](COMPONENT_STATUS_AND_MODULARIZATION)
 * [Shard Manifest](Sovereign-Shard-Manifest)
 * [Kernel Module Reference](Kernel_Module_Reference)
 * [API Reference](API_REFERENCE)
