@@ -4,9 +4,9 @@ This document outlines the extensive strategic roadmap for automation, customiza
 
 ## 🤖 Part 1: Automation Enhancements
 - [x] **Intelligent Task Automation**: Pattern detection for user actions and macro recording (Automation Shard).
-- [ ] **Scheduled Task Executor**: Visual cron-job builder for recurring lattice tasks.
-- [ ] **GitOps Integration**: Auto-sync system configurations and theme manifests to GitHub.
-- [ ] **System Monitoring Automation**: Auto-scaling and self-healing based on performance thresholds.
+- [x] **Scheduled Task Executor**: Visual cron-job builder for recurring lattice tasks.
+- [x] **GitOps Integration**: Auto-sync system configurations and theme manifests to GitHub.
+- [x] **System Monitoring Automation**: Auto-scaling and self-healing based on performance thresholds.
 
 ## 🎨 Part 2: Deep Customization & Personalization
 - [x] **Advanced Theme Engine**: Context-aware themes (Time-based colors) with active status.
@@ -27,7 +27,7 @@ This document outlines the extensive strategic roadmap for automation, customiza
 - **Real-Time Notification Center**: Grouped notifications with priority levels and action hooks.
 
 ## 🐧 Part 5: Linux Distro Integration
-- **Distro Abstraction Layer (DAL)**: Seamless interaction with `apt`, `pacman`, and `dnf`.
+- [x] **Distro Abstraction Layer (DAL)**: Seamless interaction with `apt`, `pacman`, and `dnf`.
 - **Package Management UI**: A visual "Software Center" for shard and application distribution.
 - **System Config Manager**: GUI for `systemd`, network management, and kernel parameters.
 
