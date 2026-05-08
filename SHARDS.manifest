@@ -25,8 +25,8 @@ kernel/core/sched/SovereignRTSched.cpp
 # ═══════════════════════════════════════════════════════════════════════
 # LAYER 2: SYSTEM SERVICES
 # ═══════════════════════════════════════════════════════════════════════
-kernel/core/system/SovereignMonitor.cpp
-kernel/core/system/SovereignDiag.cpp
+kernel/core/observability/SovereignMonitor.cpp
+kernel/core/observability/SovereignDiag.cpp
 kernel/core/system/SovereignFS.cpp
 kernel/core/system/SovereignNet.cpp
 kernel/core/system/SovereignIPC.cpp
@@ -65,7 +65,7 @@ userland/update-agent.cpp
 kernel/core/system/SovereignDAL.cpp
 userland/logd.cpp
 userland/SovereignSpotlight.cpp
-userland/SovereignSnap.cpp
+kernel/core/ui/SovereignSnap.cpp
 iso_root/installer/install.sh
 ecosystem/packager/sigma-pkg.sh
 
