@@ -29,6 +29,7 @@ kernel/core/system/SovereignFS.cpp
 kernel/core/system/SovereignNet.cpp
 kernel/core/system/SovereignIPC.cpp
 kernel/core/system/SovereignForge.cpp
+kernel/core/system/SovereignSelfHealing.cpp
 
 # ═══════════════════════════════════════════════════════════════════════
 # LAYER 3: SECURITY & PQC
