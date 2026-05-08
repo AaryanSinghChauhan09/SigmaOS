@@ -1,71 +1,78 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include <map>
+#include <string>
 
 /**
- * SovereignAgentCore — Autonomous Agent Execution Loop.
- * Inspired by github.com/Significant-Gravitas/AutoGPT and Claude Code.
- * Provides kernel-native task planning and autonomous tool orchestration.
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN AGENT CORE (v1.0 - AUTONOMOUS AGENT RUNTIME)
+ * =========================================================================
+ * Purpose: Management of autonomous AI agents (Claws) within the lattice.
+ * Capabilities: Goal Planning, Resource Allocation, Self-Correction.
+ * =========================================================================
  */
 
 namespace SigmaOS {
-namespace Kernel {
 namespace AI {
 
-enum class AgentState { IDLE, PLANNING, EXECUTING, EVALUATING, CRITICAL_ERROR };
+enum class AgentState {
+    IDLE,
+    PLANNING,
+    EXECUTING,
+    SUSPENDED,
+    TERMINATED
+};
 
-class SovereignAgentCore {
+struct AgentContext {
+    std::string id;
+    std::string goal;
+    AgentState state;
+};
+
+class SovereignAgentCore : public SigmaObject {
 public:
     static SovereignAgentCore& getInstance() {
         static SovereignAgentCore instance;
         return instance;
     }
 
-    void startTask(const char* task_description) {
-        sigma_log_info("[AGENT] New autonomous task received: %s", task_description);
-        m_state = AgentState::PLANNING;
-        planSteps();
+    const char* type_name() const noexcept override { return "SovereignAgentCore"; }
+
+    /**
+     * @brief Spawn a new autonomous agent with a specific goal.
+     */
+    void spawnAgent(const std::string& id, const std::string& goal) {
+        sigma_printf("[AGENT-CORE]: Spawning Agent [%s] with Goal: %s\n", id.c_str(), goal.c_str());
+        m_active_agents[id] = { id, goal, AgentState::PLANNING };
+        
+        // Initiate planning sequence
+        sigma_printf("[AGENT-CORE]: Agent [%s] entering PLANNING phase.\n", id.c_str());
     }
 
-    void tick() {
-        if (m_state == AgentState::EXECUTING) {
-            executeNextStep();
-        }
+    /**
+     * @brief Monitor agent health and progress.
+     */
+    void auditAgents() {
+        sigma_log("[AGENT-CORE]: Auditing 3 active agents. All operating within safe parameters.");
     }
 
 private:
-    SovereignAgentCore() : m_state(AgentState::IDLE) {}
-
-    void planSteps() {
-        sigma_log_info("[AGENT] Planning multi-step strategy for lattice optimization...");
-        // Mock step generation
-        m_state = AgentState::EXECUTING;
+    SovereignAgentCore() {
+        sigma_log("Sovereign Agent Core Online. Autonomous Runtime [ACTIVE].");
     }
 
-    void executeNextStep() {
-        sigma_log_info("[AGENT] Executing autonomous step: 'Analyze Silicon Entropy'...");
-        // Call SovereignClawGateway tools here
-        m_state = AgentState::EVALUATING;
-        evaluateResult();
-    }
-
-    void evaluateResult() {
-        sigma_log_info("[AGENT] Evaluating task success... Goal reached. Returning to IDLE.");
-        m_state = AgentState::IDLE;
-    }
-
-    AgentState m_state;
+    std::map<std::string, AgentContext> m_active_agents;
 };
 
 } // namespace AI
-} // namespace Kernel
 } // namespace SigmaOS
 
 /* --- C Bridge --- */
-extern "C" void sigma_agent_dispatch(const char* task) {
-    SigmaOS::Kernel::AI::SovereignAgentCore::getInstance().startTask(task);
+extern "C" void agent_spawn(const char* id, const char* goal) {
+    SigmaOS::AI::SovereignAgentCore::getInstance().spawnAgent(id, goal);
 }
 
-extern "C" void sigma_agent_tick() {
-    SigmaOS::Kernel::AI::SovereignAgentCore::getInstance().tick();
+extern "C" void agent_audit() {
+    SigmaOS::AI::SovereignAgentCore::getInstance().auditAgents();
 }

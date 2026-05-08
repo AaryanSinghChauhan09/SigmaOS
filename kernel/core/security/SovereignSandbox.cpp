@@ -41,17 +41,17 @@ bool SovereignSandboxEngine::checkSyscall(sigma_u32 syscall_id) {
     return (syscall_id == 0x01u);
 }
 
-    bool validateMACPolicy(const char* subject, const char* object, const char* action) {
-        sigma_log_info("[SANDBOX] MAC: Validating policy for %s -> %s [%s]", subject, object, action);
-        // Default: Deny-All policy
-        return false;
-    }
+bool SovereignSandboxEngine::validateMACPolicy(const char* subject, const char* object, const char* action) {
+    sigma_log_info("[SANDBOX] MAC: Validating policy for %s -> %s [%s]", subject, object, action);
+    // Default: Deny-All policy — all access must be explicitly granted
+    return false;
+}
 
-    bool hasCapability(const char* shard_name, const char* capability) {
-        /* Mock capability matrix — replaced by policy engine at runtime */
-        sigma_log_info("[SANDBOX] CAP: Checking if %s possesses %s", shard_name, capability);
-        return false;
-    }
+bool SovereignSandboxEngine::hasCapability(const char* shard_name, const char* capability) {
+    /* Mock capability matrix — replaced by policy engine at runtime */
+    sigma_log_info("[SANDBOX] CAP: Checking if %s possesses %s", shard_name, capability);
+    return false;
+}
 
 } // namespace Security
 } // namespace Kernel

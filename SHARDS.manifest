@@ -1,54 +1,72 @@
-# Σ SIGMAOS: SOVEREIGN SHARD MANIFEST
-# Use this file to declaratively include shards in the build.
-# Empty lines and lines starting with # are ignored.
+# Σ SIGMAOS: SOVEREIGN LATTICE SHARDS MANIFEST
+# Format: <Relative Path to Shard Source>
+# Purpose: Single source of truth for all modular OS components.
+# Standard: Every file listed here must be buildable by the root Makefile/CMake.
 
-# --- Core HAL & Boot ---
-kernel/core/hal/SovereignCores.cpp
+# ═══════════════════════════════════════════════════════════════════════
+# LAYER 0: HAL & BOOT
+# ═══════════════════════════════════════════════════════════════════════
+kernel/core/hal/SovereignHAL.cpp
 kernel/core/hal/SovereignPMM.cpp
 kernel/core/hal/SovereignVMM.cpp
+kernel/core/hal/SovereignISR.cpp
+kernel/core/hal/SovereignPCI.cpp
+kernel/core/hal/SovereignACPI.cpp
 
-# --- Security Shards ---
+# ═══════════════════════════════════════════════════════════════════════
+# LAYER 1: KERNEL CORE (IPC, SCHEDULER, MEMORY)
+# ═══════════════════════════════════════════════════════════════════════
+# Headers (zero-STL, kernel-safe)
+include/ipc/SovereignEventBus.h
+include/sched/SovereignScheduler.h
+
+# ═══════════════════════════════════════════════════════════════════════
+# LAYER 2: SYSTEM SERVICES
+# ═══════════════════════════════════════════════════════════════════════
+kernel/core/system/SovereignMonitor.cpp
+kernel/core/system/SovereignDiag.cpp
+kernel/core/system/SovereignFS.cpp
+kernel/core/system/SovereignNet.cpp
+kernel/core/system/SovereignIPC.cpp
+kernel/core/system/SovereignForge.cpp
+
+# ═══════════════════════════════════════════════════════════════════════
+# LAYER 3: SECURITY & PQC
+# ═══════════════════════════════════════════════════════════════════════
 kernel/core/security/SovereignPQC.cpp
 kernel/core/security/SovereignSandbox.cpp
 kernel/core/security/SovereignAttestation.cpp
 
-# --- Observability ---
-kernel/core/observability/SovereignMonitor.cpp
-
-# --- UI & Experience ---
-kernel/core/misc_utils/SovereignSnap.cpp
-kernel/core/ui/SovereignZenithUI.cpp
-
-# --- System Services ---
-kernel/core/system/SovereignSyscall.cpp
-kernel/core/system/SovereignScheduler.cpp
-kernel/core/system/SovereignShardManager.cpp
-
-# --- Filesystem Shards ---
-kernel/core/fs/vfs/SovereignVFS.cpp
-kernel/core/fs/vfs/SovereignNamespace.cpp
-kernel/core/fs/vfs/SovereignExplorer.cpp
-kernel/core/fs/storage/SovereignStorageDriver.cpp
-kernel/core/fs/storage/SovereignPersistence.cpp
-kernel/core/fs/storage/SovereignContainerStorage.cpp
-kernel/core/fs/optimization/SovereignDNACompression.cpp
-kernel/core/fs/optimization/SovereignStorageDedup.cpp
-kernel/core/fs/management/SovereignSnapshotManager.cpp
-kernel/core/fs/management/SovereignStorageAI.cpp
-kernel/core/fs/management/SovereignFS.cpp
-
-# --- AI & Assistant Gateway ---
+# ═══════════════════════════════════════════════════════════════════════
+# LAYER 4: AI & AUTOMATION (CLAW STACK)
+# ═══════════════════════════════════════════════════════════════════════
+kernel/core/ai/SovereignNeural.cpp
+kernel/core/ai/SovereignCognitive.cpp
+kernel/core/ai/SovereignAIPersona.cpp
 kernel/core/ai/SovereignClawGateway.cpp
-kernel/core/automation/SovereignWorkflowEngine.cpp
-kernel/core/system/SovereignDAL.cpp
-kernel/core/ai/SovereignAlgos.cpp
-kernel/core/misc_utils/SovereignKeybind.cpp
-kernel/core/ai/SovereignPredictiveUX.cpp
 kernel/core/ai/SovereignAgentCore.cpp
-kernel/core/ai/SovereignChain.cpp
+kernel/core/ai/SovereignKernelBridge.cpp
+kernel/core/ai/SovereignNeuralAccel.cpp
+kernel/core/ai/SovereignNeuralNexus.cpp
+kernel/core/ai/SovereignModelManager.cpp
 kernel/core/ai/SovereignModelOptimizer.cpp
-kernel/core/system/SovereignForge.cpp
+kernel/core/automation/SovereignWorkflowEngine.cpp
+kernel/core/automation/SovereignAuto.cpp
+kernel/core/automation/SovereignCron.cpp
+
+# ═══════════════════════════════════════════════════════════════════════
+# LAYER 5: INDUSTRIAL ECOSYSTEM & USERLAND
+# ═══════════════════════════════════════════════════════════════════════
 userland/update-agent.cpp
 userland/logd.cpp
+userland/SovereignSpotlight.cpp
+userland/SovereignSnap.cpp
 iso_root/installer/install.sh
 ecosystem/packager/sigma-pkg.sh
+
+# ═══════════════════════════════════════════════════════════════════════
+# LAYER 6: AI RESEARCH SHARDS (kernel/shards/)
+# ═══════════════════════════════════════════════════════════════════════
+kernel/shards/ai/SovereignResearchMatrix.cpp
+kernel/shards/ai/SovereignScholasticRepo.cpp
+kernel/shards/ai/SovereignOmniTool.cpp
