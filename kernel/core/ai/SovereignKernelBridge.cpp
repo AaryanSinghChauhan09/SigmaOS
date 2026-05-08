@@ -25,10 +25,15 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignKernelBridge"; }
 
+    /* Strong-type wrappers for industrial safety */
+    struct ShardPath { const char* value; };
+    struct HintType  { const char* value; };
+    struct HintData  { const char* value; };
+
     /**
      * @brief Query the current system health snapshot.
      */
-    void getSystemSnapshot() {
+    static void getSystemSnapshot() {
         sigma_log_info("[KERNEL-BRIDGE] Fetching L0 Telemetry...");
         sigma_log_info("[KERNEL-BRIDGE] CPU: 12% | MEM: 4.2GB / 32GB | LATTICE: STABLE.");
     }
@@ -36,8 +41,8 @@ public:
     /**
      * @brief Check health of a specific shard.
      */
-    bool checkShardIntegrity(const char* shard_path) {
-        (void)shard_path;
+    static bool checkShardIntegrity(ShardPath path) {
+        (void)path;
         sigma_log_info("[KERNEL-BRIDGE] Auditing shard via Dilithium-PQC...");
         return true;
     }
@@ -45,7 +50,7 @@ public:
     /**
      * @brief Emit an AI-directed kernel hint.
      */
-    void emitHint(const char* hint_type, const char* data) {
+    static void emitHint(HintType hint_type, HintData data) {
         (void)hint_type; (void)data;
         sigma_log_info("[KERNEL-BRIDGE] AI-Hint emitted: optimizing scheduler and memory policies.");
     }
@@ -61,13 +66,16 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void bridge_get_snapshot() {
-    SigmaOS::AI::SovereignKernelBridge::getInstance().getSystemSnapshot();
+    SigmaOS::AI::SovereignKernelBridge::getSystemSnapshot();
 }
 
 extern "C" int bridge_verify_shard(const char* path) {
-    return SigmaOS::AI::SovereignKernelBridge::getInstance().checkShardIntegrity(path) ? 1 : 0;
+    return SigmaOS::AI::SovereignKernelBridge::checkShardIntegrity(
+        SigmaOS::AI::SovereignKernelBridge::ShardPath{path}) ? 1 : 0;
 }
 
 extern "C" void bridge_emit_hint(const char* type, const char* data) {
-    SigmaOS::AI::SovereignKernelBridge::getInstance().emitHint(type, data);
+    SigmaOS::AI::SovereignKernelBridge::emitHint(
+        SigmaOS::AI::SovereignKernelBridge::HintType{type},
+        SigmaOS::AI::SovereignKernelBridge::HintData{data});
 }

@@ -2,6 +2,7 @@
 #include "sigma_hal.h"
 #include "sigma_log.h"
 #include "security/sigma_sandbox.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SovereignSandbox — Sovereign Zero-Trust Container Engine
@@ -12,9 +13,21 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Security {
 
+/* Policy Constants */
+static constexpr sigma_u32 SYSCALL_SIGMA_YIELD = 0x01U;
+
+SovereignSandboxEngine& SovereignSandboxEngine::getInstance() {
+    static SovereignSandboxEngine instance;
+    return instance;
+}
+
+const char* SovereignSandboxEngine::type_name() const noexcept {
+    return "SovereignSandboxEngine";
+}
+
 void SovereignSandboxEngine::init() {
     sigma_log_info("[SANDBOX] Initializing Sovereign Zero-Trust Sandbox Isolation...");
-    this->initialized = 1u;
+    this->initialized = 1U;
 }
 
 sigma_u32 SovereignSandboxEngine::createContainer(const sigma_sandbox_config_t* config) {
@@ -37,19 +50,19 @@ void SovereignSandboxEngine::destroyContainer(sigma_u32 container_id) {
 }
 
 bool SovereignSandboxEngine::checkSyscall(sigma_u32 syscall_id) {
-    /* Basic policy: only sigma_yield (0x01) is globally permitted */
-    return (syscall_id == 0x01u);
+    /* Basic policy: only sigma_yield is globally permitted */
+    return (syscall_id == SYSCALL_SIGMA_YIELD);
 }
 
-bool SovereignSandboxEngine::validateMACPolicy(const char* subject, const char* object, const char* action) {
-    sigma_log_info("[SANDBOX] MAC: Validating policy for %s -> %s [%s]", subject, object, action);
+bool SovereignSandboxEngine::validateMACPolicy(Subject sub, Object obj, Action act) {
+    sigma_log_info("[SANDBOX] MAC: Validating policy for %s -> %s [%s]", sub.value, obj.value, act.value);
     // Default: Deny-All policy — all access must be explicitly granted
     return false;
 }
 
-bool SovereignSandboxEngine::hasCapability(const char* shard_name, const char* capability) {
+bool SovereignSandboxEngine::hasCapability(ShardName shard, Capability cap) {
     /* Mock capability matrix — replaced by policy engine at runtime */
-    sigma_log_info("[SANDBOX] CAP: Checking if %s possesses %s", shard_name, capability);
+    sigma_log_info("[SANDBOX] CAP: Checking if %s possesses %s", shard.value, cap.value);
     return false;
 }
 
@@ -62,26 +75,31 @@ extern "C" void sandbox_init() {
     SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().init();
 }
 
-extern "C" unsigned int sandbox_create_container(const sigma_sandbox_config_t* config) {
-    return (unsigned int)SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().createContainer(config);
+extern "C" sigma_u32 sandbox_create_container(const sigma_sandbox_config_t* config) {
+    return SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().createContainer(config);
 }
 
-extern "C" int sandbox_execute(unsigned int container_id, const char* binary_path) {
-    return SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().execute(
-        (sigma_u32)container_id, binary_path) ? 1 : 0;
+extern "C" int sandbox_execute(sigma_u32 container_id, const char* binary_path) {
+    return SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().execute(container_id, binary_path) ? 1 : 0;
 }
 
-extern "C" void sandbox_destroy_container(unsigned int container_id) {
-    SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().destroyContainer((sigma_u32)container_id);
+extern "C" void sandbox_destroy_container(sigma_u32 container_id) {
+    SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().destroyContainer(container_id);
 }
 
-extern "C" int sandbox_check_syscall(unsigned int syscall_id) {
-    return SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().checkSyscall((sigma_u32)syscall_id) ? 1 : 0;
+extern "C" int sandbox_check_syscall(sigma_u32 syscall_id) {
+    return SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().checkSyscall(syscall_id) ? 1 : 0;
 }
 
 extern "C" int sandbox_has_capability(const char* shard_name, const char* capability) {
-    return SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().hasCapability(shard_name, capability) ? 1 : 0;
+    return SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().hasCapability(
+        SigmaOS::Kernel::Security::SovereignSandboxEngine::ShardName{shard_name},
+        SigmaOS::Kernel::Security::SovereignSandboxEngine::Capability{capability}) ? 1 : 0;
 }
+
 extern "C" int sandbox_validate_mac(const char* subject, const char* object, const char* action) {
-    return SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().validateMACPolicy(subject, object, action) ? 1 : 0;
+    return SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().validateMACPolicy(
+        SigmaOS::Kernel::Security::SovereignSandboxEngine::Subject{subject},
+        SigmaOS::Kernel::Security::SovereignSandboxEngine::Object{object},
+        SigmaOS::Kernel::Security::SovereignSandboxEngine::Action{action}) ? 1 : 0;
 }

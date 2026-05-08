@@ -2,14 +2,25 @@
 #include "sigma_hal.h"
 #include "sigma_log.h"
 #include "observability/sigma_monitor.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Observability {
 
+/* Industrial Constants */
+static constexpr sigma_u32 SIMULATED_CPU_LOAD    = 12U;
+static constexpr sigma_u32 SIMULATED_MEM_PRESSURE = 45U;
+static constexpr sigma_u32 SIMULATED_NET_THROUGHPUT = 850U;
+static constexpr sigma_u32 SIMULATED_MIGRATION_RATE = 2U;
+
 SovereignObservabilityMonitor& SovereignObservabilityMonitor::getInstance() {
     static SovereignObservabilityMonitor instance;
     return instance;
+}
+
+const char* SovereignObservabilityMonitor::type_name() const noexcept {
+    return "SovereignObservabilityMonitor";
 }
 
 void SovereignObservabilityMonitor::init() {
@@ -19,10 +30,10 @@ void SovereignObservabilityMonitor::init() {
 
 sigma_system_load_t SovereignObservabilityMonitor::getLoadMatrix() {
     sigma_system_load_t load;
-    load.cpu_utilization    = 12u;  /* Simulated 12% load */
-    load.memory_pressure    = 45u;  /* Simulated 45% pressure */
-    load.network_throughput = 850u; /* 850 Mbps */
-    load.shard_migration_rate = 2u; /* 2 shards/sec */
+    load.cpu_utilization    = SIMULATED_CPU_LOAD;
+    load.memory_pressure    = SIMULATED_MEM_PRESSURE;
+    load.network_throughput = SIMULATED_NET_THROUGHPUT;
+    load.shard_migration_rate = SIMULATED_MIGRATION_RATE;
     return load;
 }
 

@@ -22,8 +22,8 @@
         }
         .focus-mode-active .desktop-overlay {
             background: rgba(0,0,0,0.8);
-            backdrop-filter: grayscale(1);
             -webkit-backdrop-filter: grayscale(1);
+            backdrop-filter: grayscale(1);
         }
         .focus-mode-active .widgets-container, .focus-mode-active .desktop-icons {
             opacity: 0.1;
@@ -217,7 +217,7 @@
     <div class="command-palette hidden" id="command-center">
         <div class="palette-header">
             <span class="icon">🔍</span>
-            <input type="text" class="command-input" placeholder="Neural Search: Files, Apps, AI Prompts..." id="command-input">
+            <input type="text" class="command-input" placeholder="Neural Search: Files, Apps, AI Prompts..." id="universal-search-input" aria-label="Universal Search">
         </div>
         <div class="command-results" id="command-results">
             <!-- Results dynamically injected -->
@@ -266,7 +266,7 @@
             <div style="color: var(--text-muted);">[ Live Canvas - Awaiting Agent Tools ]</div>
         </div>
         <div class="sidebar-footer">
-            <input type="text" id="ai-chat-input" placeholder="Execute AI workflow...">
+            <input type="text" id="ai-chat-input" placeholder="Execute AI workflow..." aria-label="AI Chat Input">
             <button onclick="sendAiChat()">→</button>
         </div>
     </div>
@@ -1054,7 +1054,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
                 <div class="term-output" id="terminal-output"></div>
                 <div class="term-input-line">
                     <span class="term-prompt">sovereign@sigma:~$</span>
-                    <input type="text" class="term-input" id="terminal-input" spellcheck="false" autocomplete="off">
+                    <input type="text" class="term-input" id="terminal-input" spellcheck="false" autocomplete="off" aria-label="Terminal Input">
                 </div>
             </div>
         </div>

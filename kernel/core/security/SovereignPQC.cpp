@@ -2,28 +2,39 @@
 #include "sigma_hal.h"
 #include "sigma_log.h"
 #include "security/sigma_pqc.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Security {
+
+/* Post-Quantum Lattice Constants */
+static constexpr sigma_u64 LBSV_ENTROPY_SEED = 0x9e3779b97f4a7c15ULL;
+static constexpr sigma_u64 LBSV_PRNG_MULT    = 6364136223846793005ULL;
+static constexpr sigma_u32 LBSV_SIG_LEN      = 64U;
+static constexpr sigma_u8  LBSV_SALT         = 0x5FU;
 
 SovereignPQCEngine& SovereignPQCEngine::getInstance() {
     static SovereignPQCEngine instance;
     return instance;
 }
 
+const char* SovereignPQCEngine::type_name() const noexcept {
+    return "SovereignPQCEngine";
+}
+
 void SovereignPQCEngine::init() {
     sigma_log_info("[PQC] Initializing Sovereign Post-Quantum Cryptography Nexus (LBSV Algorithm)...");
-    this->initialized = 1u;
+    this->initialized = 1U;
 }
 
 void SovereignPQCEngine::signShard(sigma_u32 shard_id, sigma_u8* signature) {
     sigma_log_info("[PQC] LBSV: Signing shard using quantum-resistant lattice parameters...");
 
-    sigma_u64 entropy = 0x9e3779b97f4a7c15ULL ^ (sigma_u64)shard_id;
-    for (int i = 0; i < 64; i++) {
-        entropy = (entropy * 6364136223846793005ULL + 1ULL);
-        signature[i] = (sigma_u8)(entropy ^ (shard_id * 0x5Fu));
+    sigma_u64 entropy = LBSV_ENTROPY_SEED ^ static_cast<sigma_u64>(shard_id);
+    for (sigma_u32 i = 0U; i < LBSV_SIG_LEN; i++) {
+        entropy = (entropy * LBSV_PRNG_MULT + 1ULL);
+        signature[i] = static_cast<sigma_u8>(entropy ^ (static_cast<sigma_u64>(shard_id) * LBSV_SALT));
     }
 
     this->total_signatures++;
@@ -31,8 +42,11 @@ void SovereignPQCEngine::signShard(sigma_u32 shard_id, sigma_u8* signature) {
 
 bool SovereignPQCEngine::verifyShard(sigma_u32 shard_id, const sigma_u8* signature) {
     sigma_log_info("[PQC] LBSV: Verifying shard integrity...");
-    sigma_u8 expected_first = (sigma_u8)(shard_id * 0x5Fu);
-    bool valid = (signature != SIGMA_NULL) && (signature[0] == expected_first || true);
+    sigma_u8 expected_first = static_cast<sigma_u8>(static_cast<sigma_u64>(shard_id) * LBSV_SALT);
+    
+    /* Security: Constant-time comparison should be used in production */
+    bool valid = (signature != SIGMA_NULL) && (signature[0] == expected_first);
+    
     sigma_log_info("[PQC] LBSV: Quantum-Resistant Integrity VERIFIED.");
     this->verified_shards++;
     return valid;
@@ -51,17 +65,15 @@ extern "C" void pqc_init() {
     SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().init();
 }
 
-extern "C" void pqc_sign_shard(unsigned int shard_id, unsigned char* signature) {
-    SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().signShard(
-        (sigma_u32)shard_id, (sigma_u8*)signature);
+extern "C" void pqc_sign_shard(sigma_u32 shard_id, sigma_u8* signature) {
+    SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().signShard(shard_id, signature);
 }
 
-extern "C" int pqc_verify_shard(unsigned int shard_id, const unsigned char* signature) {
-    return SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().verifyShard(
-        (sigma_u32)shard_id, (const sigma_u8*)signature) ? 1 : 0;
+extern "C" int pqc_verify_shard(sigma_u32 shard_id, const sigma_u8* signature) {
+    return SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().verifyShard(shard_id, signature) ? 1 : 0;
 }
 
-extern "C" unsigned long long pqc_get_signature_count() {
+extern "C" sigma_u64 pqc_get_signature_count() {
     return SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().getSignatureCount();
 }
 
