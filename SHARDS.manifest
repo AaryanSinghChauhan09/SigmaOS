@@ -12,6 +12,7 @@ kernel/core/hal/SovereignVMM.cpp
 kernel/core/hal/SovereignISR.cpp
 kernel/core/hal/SovereignPCI.cpp
 kernel/core/hal/SovereignACPI.cpp
+kernel/core/hal/SovereignPager.cpp
 
 # ═══════════════════════════════════════════════════════════════════════
 # LAYER 1: KERNEL CORE (IPC, SCHEDULER, MEMORY)
@@ -19,6 +20,7 @@ kernel/core/hal/SovereignACPI.cpp
 # Headers (zero-STL, kernel-safe)
 include/ipc/SovereignEventBus.h
 include/sched/SovereignScheduler.h
+kernel/core/sched/SovereignRTSched.cpp
 
 # ═══════════════════════════════════════════════════════════════════════
 # LAYER 2: SYSTEM SERVICES
@@ -37,6 +39,7 @@ kernel/core/system/SovereignSelfHealing.cpp
 kernel/core/security/SovereignPQC.cpp
 kernel/core/security/SovereignSandbox.cpp
 kernel/core/security/SovereignAttestation.cpp
+kernel/core/security/SovereignTPM.cpp
 
 # ═══════════════════════════════════════════════════════════════════════
 # LAYER 4: AI & AUTOMATION (CLAW STACK)

@@ -10,8 +10,9 @@ To ensure the **Sovereignty** of the lattice, SigmaOS implements a chain of trus
 
 ## 🛠️ Implementation Details
 - **Signature Algorithm**: Dilithium-based Post-Quantum Cryptography (PQC).
-- **TPM Integration**: Measurements of each shard are stored in TPM PCRs.
-- **Attestation**: Real-time verification of shard integrity via the `SovereignAttestation` shard.
+- **TPM Integration**: Measurements of each shard are stored in TPM PCRs via the `SovereignTPM` shard.
+- **PCR Management**: PCR[0-7] track the core lattice state, while PCR[17-23] are available for userland-signed shards.
+- **Attestation**: Real-time verification of shard integrity via the `SovereignAttestation` shard, which cross-references TPM signatures.
 
 ## 🖋️ Signing Shards
 Developers can sign their custom shards using the `sigma-sign` tool:

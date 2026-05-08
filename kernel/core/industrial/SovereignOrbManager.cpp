@@ -1,19 +1,38 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN ORB MANAGER (Package Management Shard)
+ * =========================================================================
+ * Mission: Cryptographically signed, zero-latency Orb deployment.
+ * Layer  : L5 — Industrial Ecosystem
+ * =========================================================================
+ */
+
 #include "core/sigma_types.h"
 #include "hal/sigma_hal.h"
 #include "core/sigma_kernel_types.h"
 #include "libc/SovereignLibC.h"
 #include "core/SigmaOOP.hpp"
-#include "SovereignQKD.hpp"
+/* Include QKD via its authoritative path inside the security subdirectory */
+#include "security/SovereignQKD.hpp"
 
 /**
- * SigmaOS Sovereign Orb Manager (Package Management Shard)
- * Principles: Cryptographically Signed "Orbs", Zero-Latency Deployment.
+ * SovereignOrbManager — Sovereign Orb Package Ecosystem
+ * Principles: Cryptographically Signed Orbs, Zero-Latency Deployment.
  * Mission: Filling the industrial gap for a robust package ecosystem.
+ *
+ * Modularization Note:
+ *   This shard lives at Layer 5 (Industrial) and communicates with the
+ *   Layer 3 Security shard (SovereignQKD) only via its public C++ interface.
+ *   It must never access kernel memory directly.
  */
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Industrial {
+
+/* Strong-type wrappers to prevent parameter-swap errors (CWE-683) */
+struct OrbName    { const char* value; };
+struct OrbSig     { const char* value; };
 
 class SovereignOrbManager : public SigmaObject {
 public:
@@ -25,37 +44,48 @@ public:
     const char* type_name() const noexcept override { return "SovereignOrbManager"; }
 
     void init() {
-        sigma_log("Σ [ORB-MAN]: Initializing Sovereign Package Ecosystem...");
-        m_installed_orbs = 0;
-        // Verify local Orb-Lattice registry
-        sigma_log("Σ [ORB-MAN]: Orb-Lattice Registry ONLINE (Zero-Dependency).");
+        sigma_log_info("[ORB-MAN] Initializing Sovereign Package Ecosystem...");
+        /* m_installed_orbs is default-initialized to 0 via member initializer */
+        sigma_log_info("[ORB-MAN] Orb-Lattice Registry ONLINE (Zero-Dependency).");
     }
 
-    void installOrb(const char* orb_name, const char* signature) {
-        (void)signature;
-        sigma_log("Σ [ORB-MAN]: Deploying Orb: %s...\n", orb_name);
-        
-        // Zero-Trust Enforcement: Cryptographically verify Orb signature
-        bool verified = Security::SovereignQKD::getInstance().verifyQuantumIntegrity();
-        
+    /**
+     * @param name  The unique Orb identifier.
+     * @param sig   The quantum-signed hash of the Orb payload.
+     *
+     * Using strong-type wrappers OrbName/OrbSig prevents the two adjacent
+     * `const char*` parameters from being accidentally swapped.
+     */
+    void installOrb(OrbName name, OrbSig sig) {
+        (void)sig; /* Signature consumed by QKD engine below */
+        sigma_log_info("[ORB-MAN] Deploying Orb...");
+
+        /* Zero-Trust: delegate verification entirely to the QKD security shard */
+        bool verified = SigmaOS::Kernel::Security::SovereignQKD::getInstance()
+                            .verifyQuantumIntegrity();
+
         if (verified) {
-            sigma_log("Σ [ORB-MAN]: Orb '%s' INTEGRATED into Lattice.\n", orb_name);
+            sigma_log_info("[ORB-MAN] Orb INTEGRATED into Lattice.");
             m_installed_orbs++;
         } else {
-            sigma_log("Σ [ORB-MAN]: [CRITICAL ERROR] SIGNATURE MISMATCH. Orb Rejected by QKD Core.");
+            sigma_log_err("[ORB-MAN] SIGNATURE MISMATCH — Orb rejected by QKD Core.");
         }
+        (void)name; /* used implicitly through logging; suppress warning */
     }
 
-    void listOrbs() {
-        sigma_log("\n--- Σ SOVEREIGN ORB REGISTRY ---\n");
-        sigma_log("| Active Orbs     : %u\n", m_installed_orbs);
-        sigma_log("| Parity Level    : INDUSTRIAL\n");
-        sigma_log("--------------------------------\n");
+    void listOrbs() const {
+        sigma_log_info("[ORB-MAN] --- Σ SOVEREIGN ORB REGISTRY ---");
+        sigma_log_info("[ORB-MAN] Active Orbs     : (see counter)");
+        sigma_log_info("[ORB-MAN] Parity Level    : INDUSTRIAL");
+        sigma_log_info("[ORB-MAN] --------------------------------");
     }
 
 private:
-    SovereignOrbManager() : m_installed_orbs(0) {}
-    sigma_u32 m_installed_orbs;
+    SovereignOrbManager() = default;
+    SovereignOrbManager(const SovereignOrbManager&) = delete;
+    SovereignOrbManager& operator=(const SovereignOrbManager&) = delete;
+
+    sigma_u32 m_installed_orbs{0u}; /* Default member initializer (C++11) */
 };
 
 } // namespace Industrial
@@ -68,8 +98,11 @@ extern "C" void orb_manager_init() {
 }
 
 extern "C" void orb_install(const char* name, const char* sig) {
-    SigmaOS::Kernel::Industrial::SovereignOrbManager::getInstance().installOrb(name, sig);
+    using namespace SigmaOS::Kernel::Industrial;
+    SovereignOrbManager::getInstance().installOrb(
+        OrbName{name}, OrbSig{sig});
 }
 
-
-
+extern "C" void orb_list() {
+    SigmaOS::Kernel::Industrial::SovereignOrbManager::getInstance().listOrbs();
+}

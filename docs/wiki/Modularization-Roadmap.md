@@ -12,14 +12,14 @@ This page tracks the implementation progress of the **1000-Shard Modularization 
 ### 1. Kernel Foundations (L0/L1)
 - [x] SovereignHAL
 - [x] SovereignPMM / VMM
-- [ ] Virtual Memory Pager
-- [ ] Real-time Scheduler Policy
+- [x] Virtual Memory Pager
+- [x] Real-time Scheduler Policy
 
 ### 2. Security & Sovereignty
 - [x] SovereignPQC
 - [x] SovereignSandbox (MAC/CAP)
 - [x] SovereignAttestation
-- [ ] Measured Boot (TPM)
+- [x] Measured Boot (TPM)
 
 ### 3. AI & Automation (L3)
 - [x] ClawGateway
