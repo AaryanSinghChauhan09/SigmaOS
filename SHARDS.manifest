@@ -37,3 +37,6 @@ kernel/core/fs/management/SovereignSnapshotManager.cpp
 kernel/core/fs/management/SovereignStorageAI.cpp
 kernel/core/fs/management/SovereignFS.cpp
 
+# --- AI & Assistant Gateway ---
+kernel/core/ai/SovereignClawGateway.cpp
+kernel/core/automation/SovereignWorkflowEngine.cpp
