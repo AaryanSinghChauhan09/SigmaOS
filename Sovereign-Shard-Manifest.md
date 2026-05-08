@@ -8,6 +8,8 @@ This manifest provides a comprehensive registry of the functional shards that co
 - **SovereignNeuralNexus**: The core synapse for lattice-wide intelligence.
 - **SovereignClawGateway**: OpenClaw-inspired local-first AI automation control plane and Live Canvas router.
 - **SovereignWorkflowEngine**: Zero-STL deterministic IF/THEN automation rule engine.
+- **SovereignAlgos**: High-performance algorithmic primitives (Sorting, FFT, Graph).
+- **SovereignPredictiveUX**: Anticipatory UI adjustment and user behavior modeling.
 - **SovereignTaskAutomator**: NLP-based task orchestration.
 - **SovereignHealer**: Self-healing kernel logic for automated error recovery.
 - **SovereignPredictUX**: Anticipatory UI pre-loading based on user habits.
