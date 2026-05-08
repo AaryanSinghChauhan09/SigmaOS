@@ -7,6 +7,20 @@ on:
     branches: [ main ]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install Linting Tools
+      run: sudo apt-get install -y clang-format clang-tidy
+    - name: Run clang-format Check
+      run: |
+        find . -name "*.cpp" -o -name "*.h" | xargs clang-format --dry-run --Werror
+    - name: Run clang-tidy
+      run: |
+        # Generate compile_commands.json if not already there or use existing
+        clang-tidy kernel/core/*.cpp include/*.h -- -Iinclude
+
   build-and-test:
     runs-on: ubuntu-latest
     strategy:

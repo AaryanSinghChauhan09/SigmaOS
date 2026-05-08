@@ -42,12 +42,36 @@ Instead of "making Linux work," SigmaOS focuses on "making Linux feel futuristic
 | **Alt + T** | **OmniShell** (Command Line Shard) |
 | **Esc** | Close Overlays & Modals |
 
-## 📦 Quick Start
-```bash
-git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
-cd SigmaOS
-node server.js          # Serves on http://localhost:5000
+## 🏗️ Architecture Map
+```mermaid
+graph TD
+    UserLand[User Space / Zenith UI] -->|Syscalls| Core[Sovereign Core Shards]
+    Core -->|HAL| Hardware[Silicon / QEMU]
+    Core -->|Sandbox| AI[Sovereign AI Gateway]
+    AI -->|Rules| Workflow[Workflow Engine]
 ```
+
+## 📦 Technical Quickstart
+
+### Prerequisites
+- `gcc-x86-64-linux-gnu` / `clang`
+- `nasm`, `make`, `cmake`
+- `qemu-system-x86`
+
+### Build & Run
+```bash
+# 1. Build the Sovereign Lattice
+make all
+
+# 2. Launch in QEMU (Headless with Serial Log)
+./qemu-boot.sh
+
+# 3. View Kernel Logs
+tail -f serial.log
+```
+
+### Development Environment
+For a reproducible environment, use the provided **DevContainer** (VS Code) or the `Dockerfile` in the root directory.
 
 ## Contributions
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) and the [Official Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki).
