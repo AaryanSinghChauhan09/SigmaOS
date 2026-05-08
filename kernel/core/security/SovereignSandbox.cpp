@@ -41,11 +41,17 @@ bool SovereignSandboxEngine::checkSyscall(sigma_u32 syscall_id) {
     return (syscall_id == 0x01u);
 }
 
-bool SovereignSandboxEngine::hasCapability(const char* shard_name, const char* capability) {
-    /* Mock capability matrix — replaced by policy engine at runtime */
-    (void)shard_name; (void)capability;
-    return false;
-}
+    bool validateMACPolicy(const char* subject, const char* object, const char* action) {
+        sigma_log_info("[SANDBOX] MAC: Validating policy for %s -> %s [%s]", subject, object, action);
+        // Default: Deny-All policy
+        return false;
+    }
+
+    bool hasCapability(const char* shard_name, const char* capability) {
+        /* Mock capability matrix — replaced by policy engine at runtime */
+        sigma_log_info("[SANDBOX] CAP: Checking if %s possesses %s", shard_name, capability);
+        return false;
+    }
 
 } // namespace Security
 } // namespace Kernel
@@ -75,4 +81,7 @@ extern "C" int sandbox_check_syscall(unsigned int syscall_id) {
 
 extern "C" int sandbox_has_capability(const char* shard_name, const char* capability) {
     return SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().hasCapability(shard_name, capability) ? 1 : 0;
+}
+extern "C" int sandbox_validate_mac(const char* subject, const char* object, const char* action) {
+    return SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().validateMACPolicy(subject, object, action) ? 1 : 0;
 }
