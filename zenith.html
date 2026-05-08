@@ -235,16 +235,19 @@
             <div class="footer-item" onclick="toggleStart()">Lock</div>
         </div>
     </div>
-    <!-- Command Palette -->
-    <div class="command-palette" id="cmd-palette">
-        <input type="text" class="command-input" placeholder="Summon Shard or Execute Command..." id="cmd-input">
-        <div class="command-results" id="cmd-results">
-            <div class="command-item" onclick="setTheme('cyan')"><span>Theme: Neon Cyan</span><kbd>Alt+1</kbd></div>
-            <div class="command-item" onclick="setTheme('gold')"><span>Theme: Solar Gold</span><kbd>Alt+2</kbd></div>
-            <div class="command-item" onclick="setTheme('crimson')"><span>Theme: Crimson Shard</span><kbd>Alt+3</kbd>
-            </div>
-            <div class="command-item" onclick="addLog('Σ [AUTO]: Optimizing Shard Lattice...', 'success')">
-                <span>Optimize Lattice</span><kbd>Alt+O</kbd></div>
+    <!-- Universal Search System (Futuristic) -->
+    <div class="command-palette hidden" id="command-center">
+        <div class="palette-header">
+            <span class="icon">🔍</span>
+            <input type="text" class="command-input" placeholder="Neural Search: Files, Apps, AI Prompts..." id="command-input">
+        </div>
+        <div class="command-results" id="command-results">
+            <!-- Results dynamically injected -->
+        </div>
+        <div class="palette-footer">
+            <span>↑↓ to Navigate</span>
+            <span>Enter to Execute</span>
+            <span>Esc to Dismiss</span>
         </div>
     </div>
 
@@ -270,6 +273,26 @@
     <div class="notification-center" id="kernel-logs">
         <!-- Logs will be injected here -->
     </div>
+
+    <!-- Sigma AI Assistant Sidebar -->
+    <div class="sidebar hidden" id="sigma-sidebar">
+        <div class="sidebar-header">
+            <h3>🦞 CLAW GATEWAY</h3>
+            <button class="close-btn" onclick="toggleSidebar()">×</button>
+        </div>
+        <div class="sidebar-content" id="ai-assistant-log">
+            <div class="ai-chat-line bot">Sovereign Claw Gateway initialized. Sandboxed AI Automation is standing by.</div>
+        </div>
+        <!-- Live Canvas Area -->
+        <div class="live-canvas-area" id="live-canvas-area" style="min-height: 150px; background: rgba(0,0,0,0.5); border-top: 1px solid rgba(0,255,255,0.2); border-bottom: 1px solid rgba(0,255,255,0.2); padding: 10px; font-size: 0.85em; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <div style="color: var(--text-muted);">[ Live Canvas - Awaiting Agent Tools ]</div>
+        </div>
+        <div class="sidebar-footer">
+            <input type="text" id="ai-chat-input" placeholder="Execute AI workflow...">
+            <button onclick="sendAiChat()">→</button>
+        </div>
+    </div>
+
 
     <!-- Widgets -->
     <div class="widgets-container">
@@ -1339,6 +1362,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
                     <div class="settings-nav" onclick="switchSettings('config')">Config Engine</div>
                     <div class="settings-nav" onclick="switchSettings('modules')">Module Manager</div>
                     <div class="settings-nav" onclick="switchSettings('benchmarks')">Benchmarks</div>
+                    <div class="settings-nav" onclick="switchSettings('shortcuts')">Shortcut Builder</div>
                     <div class="settings-nav" onclick="switchSettings('accessibility')">Accessibility</div>
                     <div class="settings-nav" onclick="switchSettings('healing')">Auto-Healing</div>
                 </div>
@@ -2283,5 +2307,36 @@ https://chatgpt.com/?q={{prompt}}</textarea>
                 <p>The 600-shard architecture ensures zero-trust isolation and self-healing. Use the <strong>Auto-Healing Hub</strong> to audit system integrity.</p>
             </div>
             <button class="util-btn" onclick="toggleHelp()">CLOSE MATRIX</button>
+        </div>
+    </div>
+
+    <!-- Sigma Marketplace (Software Center) -->
+    <div class="window" id="sigma-market-win">
+        <div class="window-header">
+            <div class="window-title">S Sovereign Lattice Marketplace</div>
+            <div class="window-controls">
+                <div class="win-btn minimize" onclick="minimizeWindow('sigma-market-win')"></div>
+                <div class="win-btn close" onclick="closeWindow('sigma-market-win')"></div>
+            </div>
+        </div>
+        <div class="window-content" style="padding: 20px;">
+            <div class="market-grid" style="display: grid; gap: 15px;">
+                <div class="market-item" style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
+                    <div class="market-icon" style="font-size: 2rem;">???</div>
+                    <div class="market-info" style="flex: 1;">
+                        <strong style="display: block; color: #00ff88;">Neural Firewall v2.0</strong>
+                        <p style="font-size: 0.85rem; opacity: 0.7;">Advanced packet sharding for the 600-shard core.</p>
+                    </div>
+                    <button class="util-btn" onclick="addLog('S [MARKET]: Shard deployed.', 'success')">INSTALL</button>
+                </div>
+                <div class="market-item" style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
+                    <div class="market-icon" style="font-size: 2rem;">??</div>
+                    <div class="market-info" style="flex: 1;">
+                        <strong style="display: block; color: #00ff88;">Cyberpunk Theme Pack</strong>
+                        <p style="font-size: 0.85rem; opacity: 0.7;">High-contrast neon aesthetics for Zenith.</p>
+                    </div>
+                    <button class="util-btn" onclick="addLog('S [MARKET]: Theme applied.', 'success')">GET</button>
+                </div>
+            </div>
         </div>
     </div>
