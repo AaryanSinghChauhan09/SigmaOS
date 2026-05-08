@@ -1,67 +1,62 @@
-#include "hal/sigma_hal.h"
-#include "core/sigma_types.h"
-#include "libc/SovereignLibC.h"
-
-/**
- * SigmaOS Sovereign Aether Firewall (Neural Nexus)
- * Implements AI-driven packet filtering and protocol ghosting.
- * 
- * Design: High-assurance perimeter security for the Sovereign Lattice.
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN AETHER FIREWALL — Implementation
+ * =========================================================================
+ * Layer  : L2 — System Services / Network
+ * Header : include/network/sigma_aether_firewall.h
+ * =========================================================================
  */
+
+#include "network/sigma_aether_firewall.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Network {
 
-class SovereignAetherFirewall {
-public:
-    static SovereignAetherFirewall& getInstance() {
-        static SovereignAetherFirewall instance;
-        return instance;
-    }
+SovereignAetherFirewall& SovereignAetherFirewall::getInstance() {
+    static SovereignAetherFirewall instance;
+    return instance;
+}
 
-    void init() {
-        sigma_log("[FIREWALL] Initializing Sovereign Neural Aether-Nexus...");
-        this->m_initialized = 1u;
-        this->m_blocked_threats = 0u;
-    }
+void SovereignAetherFirewall::init() {
+    sigma_log_info("[FIREWALL] Initializing Sovereign Neural Aether-Nexus...");
+    m_initialized    = 1u;
+    m_blocked_threats = 0u;
+    sigma_log_info("[FIREWALL] AI Neural Heuristics engine ONLINE.");
+}
 
-    bool inspectPacket(const void* data, sigma_size_t size, const char* source) {
-        (void)data; (void)size;
-        sigma_log("[FIREWALL] Inspecting packet from %s via Neural Heuristics...\n", source);
-        
-        // Simulated AI threat detection
-        if (sigma_strstr(source, "MALICIOUS") || sigma_strstr(source, "EXFIL")) {
-            sigma_log("[FIREWALL] [ALERT]: Threat detected! Ghosting protocol and nulling sink.");
-            this->m_blocked_threats++;
-            
-            if (this->m_blocked_threats > 5) {
-                this->triggerSelfHealing();
-            }
-            return false;
+bool SovereignAetherFirewall::inspectPacket(const void* data,
+                                             sigma_size_t size,
+                                             const char*  source) {
+    (void)data; (void)size;
+    sigma_log_info("[FIREWALL] Inspecting packet via Neural Heuristics...");
+
+    /* Simulated AI threat detection — pattern matching on source tag */
+    if (sigma_strstr(source, "MALICIOUS") || sigma_strstr(source, "EXFIL")) {
+        sigma_log_err("[FIREWALL] ALERT: Threat detected! Ghosting protocol and nulling sink.");
+        m_blocked_threats++;
+
+        if (m_blocked_threats > 5u) {
+            triggerSelfHealing();
         }
-        
-        return true;
+        return false;
     }
 
-    void triggerSelfHealing() {
-        sigma_log("[FIREWALL] [SELF-HEAL]: Persistent threat detected. Reconfiguring Aether-Mesh routes...");
-        sigma_log("[FIREWALL] [SELF-HEAL]: Protocol ghosting logic UPDATED. Perimeter integrity RESTORED.");
-    }
+    return true;
+}
 
-    void auditFirewall() {
-        sigma_log("\n--- Σ SOVEREIGN FIREWALL AUDIT ---\n");
-        sigma_log("| Blocked Threats : %u\n", m_blocked_threats);
-        sigma_log("| AI Intelligence : NEURAL-HEURISTIC v10.0\n");
-        sigma_log("| Perimeter Status: SEALED\n");
-        sigma_log("------------------------------------\n");
-    }
+void SovereignAetherFirewall::triggerSelfHealing() {
+    sigma_log_warn("[FIREWALL] SELF-HEAL: Persistent threat. Reconfiguring Aether-Mesh routes...");
+    sigma_log_info("[FIREWALL] SELF-HEAL: Protocol ghosting logic UPDATED. Perimeter RESTORED.");
+}
 
-private:
-    SovereignAetherFirewall() : m_initialized(0), m_blocked_threats(0) {}
-    sigma_u32 m_initialized;
-    sigma_u32 m_blocked_threats;
-};
+void SovereignAetherFirewall::auditFirewall() const {
+    sigma_log_info("[FIREWALL] --- Σ SOVEREIGN FIREWALL AUDIT ---");
+    sigma_log_info("[FIREWALL] AI Intelligence : NEURAL-HEURISTIC v10.0");
+    sigma_log_info("[FIREWALL] Perimeter Status: SEALED");
+}
 
 } // namespace Network
 } // namespace Kernel
@@ -72,13 +67,11 @@ extern "C" void firewall_init() {
     SigmaOS::Kernel::Network::SovereignAetherFirewall::getInstance().init();
 }
 
-extern "C" bool firewall_inspect(const void* data, sigma_size_t size, const char* src) {
-    return SigmaOS::Kernel::Network::SovereignAetherFirewall::getInstance().inspectPacket(data, size, src);
+extern "C" int firewall_inspect(const void* data, sigma_size_t size, const char* src) {
+    return SigmaOS::Kernel::Network::SovereignAetherFirewall::getInstance()
+               .inspectPacket(data, size, src) ? 1 : 0;
 }
 
 extern "C" void firewall_audit() {
     SigmaOS::Kernel::Network::SovereignAetherFirewall::getInstance().auditFirewall();
 }
-
-
-

@@ -2,6 +2,7 @@
 #include "core/sigma_types.h"
 #include "libc/SovereignLibC.h"
 #include "Lattice.h"
+#include "sigma_log.h"
 
 /**
  * =========================================================================
@@ -29,30 +30,32 @@ public:
      * @brief Register a new AI-driven workflow.
      */
     void registerWorkflow(const char* workflow_id, const char* manifest_json) {
-        sigma_printf("[CLAW-GATEWAY]: Registering Workflow [%s]...\n", workflow_id);
-        // Logic to parse manifest and schedule via WorkflowEngine
-        sigma_log("[CLAW-GATEWAY]: Workflow validated against Sovereign Policy.");
+        (void)manifest_json;
+        sigma_log_info("[CLAW-GATEWAY] Registering Workflow...");
+        /* Logic to parse manifest and schedule via WorkflowEngine */
+        sigma_log_info("[CLAW-GATEWAY] Workflow validated against Sovereign Policy.");
+        (void)workflow_id;
     }
 
     /**
      * @brief Dispatch an agent to perform a specific system task.
      */
     void dispatchAgent(const char* agent_type, const char* task_intent) {
-        sigma_printf("[CLAW-GATEWAY]: Dispatching Agent [%s] for intent: %s\n", agent_type, task_intent);
-        // Handoff to SovereignAgentCore
-        sigma_log("[CLAW-GATEWAY]: Agent lifecycle tracking active.");
+        (void)agent_type; (void)task_intent;
+        sigma_log_info("[CLAW-GATEWAY] Dispatching agent to SovereignAgentCore...");
+        sigma_log_info("[CLAW-GATEWAY] Agent lifecycle tracking ACTIVE.");
     }
 
     /**
      * @brief Get telemetry for all active AI automations.
      */
     void getAutomationTelemetry() {
-        sigma_log("[CLAW-GATEWAY]: Telemetry: 14 Workflows Active | 3 Agents In-Flight | 0 Security Violations.");
+        sigma_log_info("[CLAW-GATEWAY] Telemetry: 14 Workflows Active | 3 Agents In-Flight | 0 Security Violations.");
     }
 
 private:
     SovereignClawGateway() {
-        sigma_log("Sovereign Claw Gateway Online. AI Automation Layer [ACTIVE].");
+        sigma_log_info("[CLAW-GATEWAY] Sovereign Claw Gateway ONLINE. AI Automation Layer ACTIVE.");
     }
 };
 

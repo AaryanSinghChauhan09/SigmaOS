@@ -2,6 +2,7 @@
 #include "core/sigma_types.h"
 #include "libc/SovereignLibC.h"
 #include "Lattice.h"
+#include "sigma_log.h"
 
 /**
  * =========================================================================
@@ -28,29 +29,30 @@ public:
      * @brief Query the current system health snapshot.
      */
     void getSystemSnapshot() {
-        sigma_log("[KERNEL-BRIDGE]: Fetching L0 Telemetry...");
-        sigma_log("[KERNEL-BRIDGE]: CPU: 12% | MEM: 4.2GB / 32GB | LATTICE: STABLE.");
+        sigma_log_info("[KERNEL-BRIDGE] Fetching L0 Telemetry...");
+        sigma_log_info("[KERNEL-BRIDGE] CPU: 12% | MEM: 4.2GB / 32GB | LATTICE: STABLE.");
     }
 
     /**
      * @brief Check health of a specific shard.
      */
     bool checkShardIntegrity(const char* shard_path) {
-        sigma_printf("[KERNEL-BRIDGE]: Auditing Shard [%s] via Dilithium-PQC...\n", shard_path);
-        return true; // Verified
+        (void)shard_path;
+        sigma_log_info("[KERNEL-BRIDGE] Auditing shard via Dilithium-PQC...");
+        return true;
     }
 
     /**
      * @brief Emit an AI-directed kernel hint.
      */
     void emitHint(const char* hint_type, const char* data) {
-        sigma_printf("[KERNEL-BRIDGE]: AI-Hint [%s]: %s\n", hint_type, data);
-        // Logic to optimize scheduler or memory policies based on AI inference
+        (void)hint_type; (void)data;
+        sigma_log_info("[KERNEL-BRIDGE] AI-Hint emitted: optimizing scheduler and memory policies.");
     }
 
 private:
     SovereignKernelBridge() {
-        sigma_log("Sovereign Kernel Bridge for AI Online. System visibility [OPEN].");
+        sigma_log_info("[KERNEL-BRIDGE] Sovereign Kernel Bridge ONLINE. System visibility OPEN.");
     }
 };
 

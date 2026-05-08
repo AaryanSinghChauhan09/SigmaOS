@@ -12,8 +12,9 @@
 #include "core/sigma_kernel_types.h"
 #include "libc/SovereignLibC.h"
 #include "core/SigmaOOP.hpp"
-/* Include QKD via its authoritative path inside the security subdirectory */
-#include "security/SovereignQKD.hpp"
+#include "sigma_log.h"
+/* Use relative path from industrial/ → security/ within the same kernel tree */
+#include "../security/SovereignQKD.hpp"
 
 /**
  * SovereignOrbManager — Sovereign Orb Package Ecosystem
@@ -85,7 +86,7 @@ private:
     SovereignOrbManager(const SovereignOrbManager&) = delete;
     SovereignOrbManager& operator=(const SovereignOrbManager&) = delete;
 
-    sigma_u32 m_installed_orbs{0u}; /* Default member initializer (C++11) */
+    sigma_u32 m_installed_orbs{0U}; /* Default member initializer (C++11) */
 };
 
 } // namespace Industrial
@@ -97,10 +98,10 @@ extern "C" void orb_manager_init() {
     SigmaOS::Kernel::Industrial::SovereignOrbManager::getInstance().init();
 }
 
-extern "C" void orb_install(const char* name, const char* sig) {
-    using namespace SigmaOS::Kernel::Industrial;
-    SovereignOrbManager::getInstance().installOrb(
-        OrbName{name}, OrbSig{sig});
+extern "C" void orb_install(const char* orb_name, const char* orb_sig) {
+    SigmaOS::Kernel::Industrial::SovereignOrbManager::getInstance().installOrb(
+        SigmaOS::Kernel::Industrial::OrbName{orb_name},
+        SigmaOS::Kernel::Industrial::OrbSig{orb_sig});
 }
 
 extern "C" void orb_list() {
