@@ -41,3 +41,6 @@ kernel/core/fs/management/SovereignFS.cpp
 kernel/core/ai/SovereignClawGateway.cpp
 kernel/core/automation/SovereignWorkflowEngine.cpp
 kernel/core/system/SovereignDAL.cpp
+kernel/core/ai/SovereignAlgos.cpp
+kernel/core/misc_utils/SovereignKeybind.cpp
+kernel/core/ai/SovereignPredictiveUX.cpp
