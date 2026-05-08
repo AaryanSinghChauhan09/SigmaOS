@@ -6,7 +6,7 @@ This page is the **single source of truth** for how SigmaOS code is organized in
 
 ## 🗺️ Architecture Overview
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────┐
 │  L6 ·· Zenith UI / Display Server                                │
 │         zenith.html  SovereignZenithDesktop  SovereignGUI        │
@@ -54,6 +54,8 @@ Rather than using fragile relative paths, every shard `#include`s the canonical 
 | `SIGMA_INC_IPC` | `ipc/sigma_ipc.h` | L2 |
 | `SIGMA_INC_MONITOR` | `observability/sigma_monitor.h` | L2 |
 | `SIGMA_INC_VFS` | `vfs.h` | L2 |
+| `SIGMA_INC_NET` | `sigma_net.h` | L2 |
+| `SIGMA_INC_FIREWALL` | `network/sigma_aether_firewall.h` | L2 |
 | `SIGMA_INC_PQC` | `security/sigma_pqc.h` | L3 |
 | `SIGMA_INC_SANDBOX` | `security/sigma_sandbox.h` | L3 |
 | `SIGMA_INC_QKD` | `security/SovereignQKD.hpp` | L3 |
