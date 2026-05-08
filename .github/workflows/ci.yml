@@ -10,7 +10,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
     - name: Install Linting Tools
       run: sudo apt-get install -y clang-format clang-tidy
     - name: Run clang-format Check
@@ -29,7 +29,7 @@ jobs:
         arch: [x86_64, arm64]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
 
     - name: Set up Environment
       run: |
@@ -63,7 +63,7 @@ jobs:
   benchmark:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
     
     - name: Run Shard Benchmarks
       run: |
@@ -81,7 +81,7 @@ jobs:
   security-scan:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
     - name: Run CodeQL Analysis
       uses: github/codeql-action/init@v2
       with:
