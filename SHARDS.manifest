@@ -44,3 +44,7 @@ kernel/core/system/SovereignDAL.cpp
 kernel/core/ai/SovereignAlgos.cpp
 kernel/core/misc_utils/SovereignKeybind.cpp
 kernel/core/ai/SovereignPredictiveUX.cpp
+kernel/core/ai/SovereignAgentCore.cpp
+kernel/core/ai/SovereignChain.cpp
+kernel/core/ai/SovereignModelOptimizer.cpp
+kernel/core/system/SovereignForge.cpp
