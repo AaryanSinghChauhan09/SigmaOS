@@ -11,8 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Agentic Infrastructure**: Added `SovereignAgentCore` and `SovereignChain` for autonomous task orchestration.
 - **Industrial Infrastructure**: Added `.clang-format`, `.clang-tidy`, and `Doxyfile`.
 - **Reproducible Environments**: Added DevContainer and root `Dockerfile`.
-- **New Documentation**: Added `ARCHITECTURE.md`, `ROADMAP.md`, `GETTING_STARTED.md`, and `HARDWARE.md`.
+- **New Documentation**: Added `ARCHITECTURE.md`, `ROADMAP.md`, `GETTING_STARTED.md`, `HARDWARE.md`, and `MODULARIZATION_ROADMAP.md`.
 - **Infrastructure**: Added `SovereignDAL` for cross-distro package management abstraction.
+- **Strategy**: Published the **1000-Shard Modularization Roadmap** for long-term lattice evolution.
 
 ### Fixed
 - Improved header normalization across all 600 shards.
