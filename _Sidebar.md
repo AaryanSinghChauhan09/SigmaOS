@@ -17,6 +17,7 @@
 
 * [Advanced Future Features](Advanced-Future-Features) 🚀
 * [Zenith v100 Singularity](Zenith-Singularity)
+* [AI Automation Gateway](AI_AUTOMATION_GATEWAY) 🤖
 
 # 🤝 Community
 
