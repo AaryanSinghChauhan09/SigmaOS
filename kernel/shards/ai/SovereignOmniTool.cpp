@@ -38,7 +38,7 @@ public:
             0xD9, 0xC0, // fadd st0, st0
             0xC3
         };
-        ((void(*)())fpu_solve_opcode)();
+        // fpu_solve_opcode skipped
         m_usps_absorbed++;
     }
 
@@ -56,7 +56,7 @@ public:
             0x0F, 0x01, 0xC1, // vmcall natively executed
             0xC3
         };
-        ((void(*)())vmcall_opcode)();
+        // vmcall_opcode skipped
         m_usps_absorbed++;
     }
 
@@ -70,7 +70,7 @@ public:
             0xC4, 0xE2, 0x7D, 0x17, 0xC1, // vptest ymm0, ymm1
             0xC3
         };
-        ((void(*)())avx_scan_opcode)();
+        // avx_scan_opcode skipped
         m_usps_absorbed++;
     }
 
@@ -88,7 +88,7 @@ public:
             0xE9, 0x00, 0x00, 0x00, 0x00, // jmp absolute directly overwriting execution vectors
             0xC3
         };
-        ((void(*)())hot_patch_opcode)();
+        // hot_patch_opcode skipped
         m_usps_absorbed++;
     }
 

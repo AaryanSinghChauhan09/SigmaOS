@@ -1,3 +1,8 @@
+#include <map>
+#include <memory>
+#include <string>
+#include <iostream>
+
 #include "Lattice.h"
 #include "libc/SovereignLibC.h"
 /*
@@ -81,7 +86,7 @@ public:
 
 class SovereignScholasticRepo {
 private:
-    void* m_repo;
+    std::map<std::string, std::unique_ptr<IScholasticShard>> m_repo;
 public:
     void Synthesize() {
         m_repo["RELATIVITY"] = std::make_unique<RelativityShard>();
@@ -92,10 +97,10 @@ public:
     }
 
     void ExecuteMasterAudit() {
-        sigma_log("--- Î£ SIGMA OS MASTER SCHOLASTIC REPOSITORY ---\n");
-        for (auto it = m_repo.begin(); it != m_repo.end(); ++it) {
-            std::cout << "\n[REPOSHADING]: " << it->first << std::endl;
-            it->second->Execute();
+        sigma_log("--- Σ SIGMA OS MASTER SCHOLASTIC REPOSITORY ---\n");
+        for (auto const& [name, shard] : m_repo) {
+            std::cout << "\n[REPOSHADING]: " << name << std::endl;
+            shard->Execute();
         }
     }
 };

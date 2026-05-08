@@ -1,5 +1,6 @@
 #include "../include/SovereignLibC.h"
 #include "sigma_hal.h"
+#include <thread>
 
 
 /**
@@ -18,7 +19,7 @@ public:
 
     void init() {
         sigma_log("[S-SPOT] Initializing Sovereign Spotlight Engine...");
-        this->reindexLattice();
+        std::thread([this]() { this->reindexLattice(); }).detach();
     }
 
     void search(const char* query) {

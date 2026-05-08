@@ -1937,14 +1937,29 @@ const availableCommands = [
     }}
 ];
 
+// Debounce Utility
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
 if (commandInput) {
-    commandInput.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
+    const performSearch = debounce((query) => {
         const filtered = availableCommands.filter(cmd => 
             cmd.label.toLowerCase().includes(query) || cmd.hint.toLowerCase().includes(query)
         );
-        
         renderCommandResults(filtered);
+    }, 150);
+
+    commandInput.addEventListener('input', (e) => {
+        performSearch(e.target.value.toLowerCase());
     });
 }
 

@@ -27,7 +27,7 @@
 class IResearchEngine {
 public:
     virtual ~IResearchEngine() = default;
-    virtual void MineData(const const char*& source) = 0;
+    virtual void MineData(const char* source) = 0;
     virtual void SynthesizeInsights() = 0;
     virtual void GenerateHypothesis() = 0;
 };
@@ -38,16 +38,16 @@ private:
     void* m_correlations;
 
 public:
-    void MineData(const const char*& source) override {
+    void MineData(const char* source) override {
         sigma_log("[RESEARCH/MINER]: Scraping industry-standard repositories for: " << source << "...\n");
-        std::this_thread::sleep_for(std::chrono::milliseconds(800));
+        // Async indexing simulation
         m_knowledge_base.push_back("Data Ingested from " + source);
         sigma_log("[RESEARCH/MINER]: SUCCESS. 1.4TB of raw technical shards indexed.\n");
     }
 
     void SynthesizeInsights() override {
         sigma_log("[RESEARCH/SYNTH]: Correlating 4,000+ technical whitepapers via Neural-Oculus...\n");
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        // Async synth simulation
         sigma_log("[RESEARCH/SYNTH]: Found 14 competitive gaps in standard Linux kernels.\n");
         m_correlations["Competitive_Gap"] = 0.98f;
     }
