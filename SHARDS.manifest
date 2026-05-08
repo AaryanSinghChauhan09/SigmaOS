@@ -48,3 +48,7 @@ kernel/core/ai/SovereignAgentCore.cpp
 kernel/core/ai/SovereignChain.cpp
 kernel/core/ai/SovereignModelOptimizer.cpp
 kernel/core/system/SovereignForge.cpp
+userland/update-agent.cpp
+userland/logd.cpp
+iso_root/installer/install.sh
+ecosystem/packager/sigma-pkg.sh
