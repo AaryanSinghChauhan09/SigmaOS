@@ -8,7 +8,7 @@ This document tracks features that are currently non-functional, inconsistent, o
 - **Memory Management**: Improve efficiency of the slab allocator and coalescence shards.
 - **Hardware Portability**: Add support for more hardware architectures (RISC-V, ARM64).
 - **File System Performance**: Enhance I/O throughput and metadata handling.
-- **Driver Framework**: Introduce a modular, zero-dependency driver framework.
+- [x] **Driver Framework**: Introduced a modular, zero-dependency driver framework.
 - **Boot Speed**: Further optimize parallel silicon ignition for sub-50ms boot times.
 - **Caching**: Implement advanced predictive caching strategies.
 - **Isolation**: Strengthen process and memory isolation via hardware-assisted sharding.
@@ -33,12 +33,12 @@ This document tracks features that are currently non-functional, inconsistent, o
 - **Installation**: Simplify the S-Install process for non-technical users.
 - **Documentation**: Improve clarity and visual aids in the OS Wiki.
 - **Theming**: Add customizable UI themes for the Zenith Dashboard.
-- **Accessibility**: Enhance accessibility features for inclusive sovereignty.
+- [x] **Accessibility**: Enhanced accessibility features for inclusive sovereignty (a11y.md).
 - **Navigation**: Introduce voice-based and gesture-based navigation shards.
 - **Error Messages**: Improve error diagnostics with AI-driven explanations.
 - **Setup Wizard**: Add a guided setup wizard for initial lattice configuration.
 - **Logging**: Provide better visual logging tools in the dashboard.
-- **Package Manager**: Create an intuitive, GUI-based package manager.
+- [x] **Package Manager**: Create an intuitive, GUI-based package manager (Marketplace UI).
 - **Localization**: Improve multi-language support across the OS.
 
 ## 🌐 Networking Stack
@@ -82,7 +82,7 @@ This document tracks features that are currently non-functional, inconsistent, o
 ## 📦 Package & Software Management
 
 - **Dependency Resolution**: Improve the speed and reliability of dependency resolution.
-- **Rollback**: Add atomic rollback functionality for shard updates.
+- [x] **Rollback**: Add atomic rollback functionality for shard updates.
 - **Delta Updates**: Introduce delta updates to reduce bandwidth usage.
 - **Signing**: Enhance package signing security via PQC.
 - **GUI Manager**: Add a professional GUI package manager.
@@ -107,8 +107,8 @@ This document tracks features that are currently non-functional, inconsistent, o
 
 ## 🔮 Future-Oriented Features
 
-- **AI Optimization**: Add AI-driven kernel optimization and self-healing.
-- **Quantum Safety**: Full support for quantum-safe cryptography.
+- [x] **AI Optimization**: Add AI-driven kernel optimization and self-healing (SovereignClaw).
+- [x] **Quantum Safety**: Full support for quantum-safe cryptography (SovereignPQC).
 - **Blockchain Identity**: Introduce blockchain-based identity management.
 - **AR/VR Integration**: Add native support for AR/VR interface shards.
 - **Edge Computing**: Support edge computing and decentralized nodes.
