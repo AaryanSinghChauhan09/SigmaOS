@@ -10,7 +10,11 @@ This manifest provides a comprehensive registry of the functional shards that co
 - **SovereignWorkflowEngine**: Zero-STL deterministic IF/THEN automation rule engine.
 - **SovereignAlgos**: High-performance algorithmic primitives (Sorting, FFT, Graph).
 - **SovereignPredictiveUX**: Anticipatory UI adjustment and user behavior modeling.
+- **SovereignAgentCore**: Autonomous task planning and agentic execution.
+- **SovereignChain**: Modular AI flow orchestration and chaining.
+- **SovereignModelOptimizer**: Local model weight management and inference optimization.
 - **SovereignTaskAutomator**: NLP-based task orchestration.
+- **SovereignForge**: Native development and shard construction environment.
 - **SovereignHealer**: Self-healing kernel logic for automated error recovery.
 - **SovereignPredictUX**: Anticipatory UI pre-loading based on user habits.
 
