@@ -15,13 +15,13 @@ This page is the **single source of truth** for how SigmaOS code is organized in
 │         SovereignOrbManager  SovereignUnifiedPkg  SovereignSnap  │
 ├──────────────────────────────────────────────────────────────────┤
 │  L4 ·· AI & Automation                                           │
-│         SovereignWorkflowEngine  SovereignAgentCore  OpenClawHub │
+│         SovereignClawGateway  SovereignAgentCore  OpenClawHub    │
 ├──────────────────────────────────────────────────────────────────┤
 │  L3 ·· Security Fabric                                           │
 │         SovereignPQC  SovereignQKD  SovereignSandbox  SovereignTPM│
 ├──────────────────────────────────────────────────────────────────┤
 │  L2 ·· System Services                                           │
-│         VFS  SovereignIPC  SovereignMonitor  AetherFirewall      │
+│         VFS  SovereignIPC  SovereignMonitor  SovereignDiag       │
 ├──────────────────────────────────────────────────────────────────┤
 │  L1 ·· Kernel Primitives                                         │
 │         Scheduler  MemoryManager  SovereignLibC  SovereignHAL    │
@@ -53,15 +53,18 @@ Rather than using fragile relative paths, every shard `#include`s the canonical 
 | `SIGMA_INC_LOG` | `sigma_log.h` | L1 |
 | `SIGMA_INC_IPC` | `ipc/sigma_ipc.h` | L2 |
 | `SIGMA_INC_MONITOR` | `observability/sigma_monitor.h` | L2 |
+| `SIGMA_INC_DIAG` | `observability/sigma_diag.h` | L2 |
 | `SIGMA_INC_VFS` | `vfs.h` | L2 |
 | `SIGMA_INC_NET` | `sigma_net.h` | L2 |
 | `SIGMA_INC_FIREWALL` | `network/sigma_aether_firewall.h` | L2 |
 | `SIGMA_INC_PQC` | `security/sigma_pqc.h` | L3 |
 | `SIGMA_INC_SANDBOX` | `security/sigma_sandbox.h` | L3 |
 | `SIGMA_INC_QKD` | `security/SovereignQKD.hpp` | L3 |
+| `SIGMA_INC_CLAW` | `ai/sigma_claw.h` | L4 |
 | `SIGMA_INC_NEURAL` | `ai/sigma_neural.h` | L4 |
 | `SIGMA_INC_WORKFLOW` | `ai/sigma_workflow.h` | L4 |
 | `SIGMA_INC_PKG` | `sigma_pkg.h` | L5 |
+| `SIGMA_INC_SNAP` | `ui/sigma_snap.h` | L5 |
 | `SIGMA_INC_DISPLAY` | `sigma_displayserver.h` | L6 |
 
 ---
@@ -109,6 +112,12 @@ Rather than using fragile relative paths, every shard `#include`s the canonical 
 | `SovereignOrbManager.cpp` | `listOrbs()` not `const` | Marked method `const` |
 | `SovereignOrbManager.cpp` | `m_installed_orbs` uninitialized | Default member initializer `{0u}` |
 | `SovereignHAL.cpp` | Drivers not required at boot | Added mandatory `gpu_init`, `nvme_init`, `nic_init`, `usb_init`, `wifi_init` calls |
+| `SovereignClawGateway.cpp` | AI parameter swap risk | Implemented strong-type wrappers `WorkflowID` / `AgentType` |
+| `SovereignPQC.cpp` | C-style casts & magic numbers | Migrated to `static_cast` and lattice constants |
+| `SovereignSandbox.cpp` | Missing aria-labels & labels | Hardened security policy and added Zenith UI accessibility markers |
+| `SovereignMonitor.cpp` | Magic numbers in telemetry | Replaced with constexpr industrial constants |
+| `SovereignSnap.cpp` | Pure C-style implementation | Refactored to `SigmaObject` singleton in UI namespace |
+| `zenith.html` | Duplicate IDs & a11y violations | Renamed `command-input` and added `aria-label` to all inputs |
 
 ---
 
