@@ -78,37 +78,51 @@ public:
 
         if (verified) {
             sigma_log_info("[ORB-MAN] Orb INTEGRATED into Lattice.");
-            m_installed_orbs++;
-            // Note: In a real implementation, we would store previous states here for rollback.
+            if (m_installed_orbs < 10) {
+                sigma_strncpy(m_registry[m_installed_orbs], name.value, 63);
+                m_installed_orbs++;
+            }
         } else {
             sigma_log_err("[ORB-MAN] SIGNATURE MISMATCH — Orb rejected by QKD Core.");
         }
-        (void)name; /* used implicitly through logging; suppress warning */
     }
 
     void rollbackOrb(OrbName name) {
         sigma_log_info("[ORB-MAN] Initiating rollback for Orb...");
-        if (m_installed_orbs > 0) {
-            m_installed_orbs--;
-            sigma_log_info("[ORB-MAN] Rollback SUCCESSFUL. System state reverted.");
-        } else {
-            sigma_log_err("[ORB-MAN] Rollback FAILED: No installed Orbs to revert.");
+        bool found = false;
+        for (sigma_u32 i = 0; i < m_installed_orbs; ++i) {
+            if (sigma_streq(m_registry[i], name.value)) {
+                sigma_log_info("[ORB-MAN] Rollback SUCCESSFUL. System state reverted for:");
+                sigma_log_info(name.value);
+                m_registry[i][0] = '\0'; // Simple mock removal
+                m_installed_orbs--;
+                found = true;
+                break;
+            }
         }
-        (void)name;
+        if (!found) {
+            sigma_log_err("[ORB-MAN] Rollback FAILED: Orb not found in registry.");
+        }
     }
 
     void listOrbs() const {
         sigma_log_info("[ORB-MAN] --- Σ SOVEREIGN ORB REGISTRY ---");
-        sigma_log_info("[ORB-MAN] Active Orbs     : (see counter)");
-        sigma_log_info("[ORB-MAN] Parity Level    : INDUSTRIAL");
+        for (sigma_u32 i = 0; i < 10; ++i) {
+            if (m_registry[i][0] != '\0') {
+                sigma_log_info(m_registry[i]);
+            }
+        }
         sigma_log_info("[ORB-MAN] --------------------------------");
     }
 
 private:
-    SovereignOrbManager() = default;
+    SovereignOrbManager() {
+        for(int i=0; i<10; ++i) m_registry[i][0] = '\0';
+    }
     SovereignOrbManager(const SovereignOrbManager&) = delete;
     SovereignOrbManager& operator=(const SovereignOrbManager&) = delete;
 
+    char m_registry[10][64]; // Mock registry for rollback (PKG-003)
     sigma_u32 m_installed_orbs{0U}; /* Default member initializer (C++11) */
 };
 

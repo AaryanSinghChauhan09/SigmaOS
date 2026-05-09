@@ -33,9 +33,6 @@ int           sigma_wait(int* wstatus);
 int           sigma_dup(int oldfd);
 int           sigma_nanosleep(const void* req, void* rem);
 
-/* =========================================================================
- * STRING / MEMORY PRIMITIVES (implemented in SovereignLibC.asm)
- * ========================================================================= */
 sigma_size_t  sigma_strlen(const char* s);
 void*         sigma_memset(void* s, int c, sigma_size_t n);
 void*         sigma_memcpy(void* dest, const void* src, sigma_size_t n);
@@ -69,9 +66,14 @@ int   sigma_hardened_strncmp(const char* s1, const char* s2, sigma_size_t n);
 /* =========================================================================
  * SOVEREIGN MEMORY MANAGEMENT (bump-pointer slab, 128 MB shard)
  * ========================================================================= */
-void* sigma_slab_alloc_raw(sigma_size_t size);
 void* sigma_malloc(sigma_size_t size);
 void  sigma_free(void* ptr);
+
+/* =========================================================================
+ * LINUX KERNEL COMPATIBILITY SHIMS (ABI-001)
+ * ========================================================================= */
+static inline void* kmalloc(sigma_size_t size, int flags) { (void)flags; return sigma_malloc(size); }
+static inline void  kfree(void* ptr) { sigma_free(ptr); }
 
 #ifdef __cplusplus
 }
