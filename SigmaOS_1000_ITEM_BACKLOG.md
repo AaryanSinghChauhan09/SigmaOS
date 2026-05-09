@@ -6,7 +6,7 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 1.  **ABI-001**: Implement `kmalloc` / `kfree` shims for Linux compatibility. [Operational]
 2.  **ABI-002**: Map `sk_buff` structures to `SovereignNetStack`. [Operational]
 3.  **DRV-001**: Port Intel AX210 Wi-Fi 6E driver. [Operational]
-4.  **DRV-002**: Port Realtek RTL8821CE driver.
+4.  **DRV-002**: Port Realtek RTL8821CE driver. [Operational]
 5.  **DRV-003**: Implement generic USB Video Class (UVC) 1.5 support.
 6.  **DRV-004**: Port AMDGPU Southern Islands (SI) support.
 7.  **DRV-005**: Port Nouveau Maxwell/Pascal microcode mapping.
@@ -38,8 +38,8 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 27. **UPD-001**: Implement Ed25519 signature verification in the update daemon. [Operational]
 
 ## 🌐 Ecosystem Integration (Items 801-1000)
-28. **K8S-001**: Implement `SovereignKubelet` shim.
-29. **GAM-001**: Port Vulkan 1.3 loader to `SovereignGPU`.
+28. **K8S-001**: Implement `SovereignKubelet` shim. [Operational]
+29. **GAM-001**: Port Vulkan 1.3 loader to `SovereignGPU`. [Operational]
 30. **GAM-002**: Implement `SovereignProton` compatibility layer (Wine-based).
 31. **CLD-001**: Build SigmaOS AMI for AWS EC2 deployment.
 32. **SDK-001**: Release C++/Rust SDK for native SigmaOS Shard development.
