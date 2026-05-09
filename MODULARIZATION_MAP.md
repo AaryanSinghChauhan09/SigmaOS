@@ -104,11 +104,9 @@ Rather than using fragile relative paths, every shard `#include`s the canonical 
 
 ## 🛠 Key Stabilization Fixes Applied
 
-| `SovereignMonitor.cpp` | Integrated eBPF logic | Extracted tracing to `SovereignTelemetry.cpp` |
-| `SovereignHAL.cpp` | Inline driver loading | Extracted to `SovereignDriverLoader.cpp` |
-| `SovereignLiveBoot.cpp` | N/A | New shard for USB persistence (LATT-001) |
-| `SovereignVirtBridge.cpp` | N/A | New shard for Hypervisor guest shims (LATT-002) |
-| `SovereignPartitionManager.cpp` | N/A | New shard for dual-boot foundation (LATT-003) |
+| `SovereignAetherFirewall.cpp` | Monolithic neural logic | Extracted AI heuristics to `SovereignAetherNeural.cpp` |
+| `SovereignMarketplaceIndexer.cpp` | N/A | New shard for P2P/Distributed indexing (IDX-002) |
+| `SovereignDirectGPU.cpp` | N/A | New shard for bare-metal GPU access (GAM-003) |
 | `zenith.html` | Duplicate IDs & a11y violations | Renamed `command-input` and added `aria-label` to all inputs |
 
 ---
