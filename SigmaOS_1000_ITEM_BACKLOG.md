@@ -5,7 +5,7 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 ## ⚙️ Kernel & Hardware Shards (Items 1-200)
 1.  **ABI-001**: Implement `kmalloc` / `kfree` shims for Linux compatibility. [Operational]
 2.  **ABI-002**: Map `sk_buff` structures to `SovereignNetStack`. [Operational]
-3.  **DRV-001**: Port Intel AX210 Wi-Fi 6E driver.
+3.  **DRV-001**: Port Intel AX210 Wi-Fi 6E driver. [Operational]
 4.  **DRV-002**: Port Realtek RTL8821CE driver.
 5.  **DRV-003**: Implement generic USB Video Class (UVC) 1.5 support.
 6.  **DRV-004**: Port AMDGPU Southern Islands (SI) support.
@@ -20,7 +20,7 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 13. **PKG-003**: Implement `SovereignOrbRollback` for atomic state revert. [Operational]
 14. **REPRO-001**: Fix build-path entropy in `SovereignLibC` compilation. [Operational]
 15. **OCI-001**: Implement `SovereignPodman` shim for container execution. [Operational]
-16. **IDX-001**: Build P2P metadata indexer for the Sigma Marketplace.
+16. **IDX-001**: Build P2P metadata indexer for the Sigma Marketplace. [Operational]
 
 ## 🖥️ User Experience & Zenith (Items 401-600)
 17. **FHS-001**: Symlink `/usr/bin` to Sovereign binary lattice. [Operational]
@@ -31,7 +31,7 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 22. **WM-001**: Implement tiling layout engine (i3/sway style) in Zenith.
 
 ## 🛡️ Security & Compliance (Items 601-800)
-23. **SEC-001**: Audit `SovereignPQC` Kyber implementation vs NIST FIPS-203.
+23. **SEC-001**: Audit `SovereignPQC` Kyber implementation vs NIST FIPS-203. [Operational]
 24. **SEC-002**: Implement `SovereignAppArmor` mandatory access control (MAC). [Operational]
 25. **SEC-003**: Launch the SigmaOS Bug Bounty portal on GitHub. [Operational]
 26. **CVE-001**: Establish CVE triaging pipeline for Ring-0 vulnerabilities.
