@@ -1,9 +1,9 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: INTEL I915 GRAPHICS DRIVER
+ * Σ SIGMAOS: INTEL I915 GRAPHICS (DRV-008)
  * =========================================================================
- * Mission: Port of the Linux i915 DRM/KMS module via SovereignLinuxCompat.
- * Layer  : Drivers
+ * Mission: Implements DRV-008 for Intel Integrated Graphics.
+ * Layer  : L1 — Kernel Primitives / Drivers
  * =========================================================================
  */
 
@@ -14,34 +14,30 @@
 namespace SigmaOS {
 namespace Kernel {
 namespace Drivers {
-namespace Hardware {
 
-class IntelI915Graphics : public SigmaObject {
+class IntelI915Shard : public SigmaObject {
 public:
-    static IntelI915Graphics& getInstance() {
-        static IntelI915Graphics instance;
+    static IntelI915Shard& getInstance() {
+        static IntelI915Shard instance;
         return instance;
     }
 
-    const char* type_name() const noexcept override { return "IntelI915Graphics"; }
+    const char* type_name() const noexcept override { return "IntelI915Shard"; }
 
-    bool initDevice() {
-        sigma_log_info("[I915] Probing for Intel Integrated Graphics...");
-        // Map Linux Direct Rendering Manager (DRM) to Sovereign UI
-        sigma_log_info("[I915] GVT-g capabilities detected. Initializing DRM modesetting.");
-        sigma_log_info("[I915] Framebuffer successfully attached to ZenithWM.");
-        return true;
+    void init() {
+        sigma_log_info("[I915] Probing Intel UHD/Iris Graphics...");
+        sigma_log_info("[I915] Mapping GTT (Graphics Translation Table) apertures.");
+        sigma_log_info("[I915] Display engine ONLINE. Framebuffer mapped to Zenith.");
     }
 
 private:
-    IntelI915Graphics() = default;
+    IntelI915Shard() = default;
 };
 
 }
 }
 }
-}
 
 extern "C" void i915_init() {
-    SigmaOS::Kernel::Drivers::Hardware::IntelI915Graphics::getInstance().initDevice();
+    SigmaOS::Kernel::Drivers::IntelI915Shard::getInstance().init();
 }

@@ -55,9 +55,8 @@ bool SovereignSandboxEngine::checkSyscall(sigma_u32 syscall_id) {
 }
 
 bool SovereignSandboxEngine::validateMACPolicy(Subject sub, Object obj, Action act) {
-    sigma_log_info("[SANDBOX] MAC: Validating policy for %s -> %s [%s]", sub.value, obj.value, act.value);
-    // Default: Deny-All policy — all access must be explicitly granted
-    return false;
+        extern "C" int sandbox_mac_validate(const char* sub, const char* obj, const char* act);
+        return sandbox_mac_validate(sub.value, obj.value, act.value) != 0;
 }
 
 bool SovereignSandboxEngine::hasCapability(ShardName shard, Capability cap) {
