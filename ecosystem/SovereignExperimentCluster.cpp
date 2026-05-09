@@ -1,7 +1,7 @@
-#include "../include/SovereignLibC.h"
+﻿#include "../include/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -13,7 +13,7 @@
 
 
 /**
- * Î£ SIGMA OS: SOVEREIGN EXPERIMENT CLUSTER (v128.0 - LAB ZENITH)
+ * ÃŽÂ£ SIGMA OS: SOVEREIGN EXPERIMENT CLUSTER (v128.0 - LAB ZENITH)
  * ============================================================
  * USP: Comprehensive "Small & Big" experiment simulations (1-12).
  * Capability: Ohm's Law, Acids/Metals, Transpiration, and Geometry.
@@ -33,8 +33,8 @@ public:
         double R = 10.0; // Ohms
         double V = 2.0;
         double I = V / R;
-        sigma_printf("[PHYSICS/EXP]: Experiment: Verification of Ohm's Law.\n");
-        sigma_printf("[PHYSICS/EXP]: V=2V, R=10-ohm -> I = " << I << " Amperes (Verified).\n");
+        sigma_log_info("[PHYSICS/EXP]: Experiment: Verification of Ohm's Law.\n");
+        sigma_log_info("[PHYSICS/EXP]: V=2V, R=10-ohm -> I = " << I << " Amperes (Verified).\n");
     }
 };
 
@@ -42,8 +42,8 @@ public:
 class RefractionExperiment : public IExperiment {
 public:
     void Execute() override {
-        sigma_printf("[PHYSICS/EXP]: Experiment: Refraction through Glass Shard.\n");
-        sigma_printf("[PHYSICS/EXP]: Displacement measured at various angles. Shard-Ref Index: 1.5.\n");
+        sigma_log_info("[PHYSICS/EXP]: Experiment: Refraction through Glass Shard.\n");
+        sigma_log_info("[PHYSICS/EXP]: Displacement measured at various angles. Shard-Ref Index: 1.5.\n");
     }
 };
 
@@ -51,8 +51,8 @@ public:
 class AcidMetalExperiment : public IExperiment {
 public:
     void Execute() override {
-        sigma_printf("[CHEMISTRY/EXP]: Experiment: Zinc + Sulphuric Acid Reaction.\n");
-        sigma_printf("[CHEMISTRY/EXP]: Observation: Hydrogen Gas Evolution (Brum-Sound popping).\n");
+        sigma_log_info("[CHEMISTRY/EXP]: Experiment: Zinc + Sulphuric Acid Reaction.\n");
+        sigma_log_info("[CHEMISTRY/EXP]: Observation: Hydrogen Gas Evolution (Brum-Sound popping).\n");
     }
 };
 
@@ -60,8 +60,8 @@ public:
 class BoilingPointExperiment : public IExperiment {
 public:
     void Execute() override {
-        sigma_printf("[CHEMISTRY/EXP]: Experiment: Determination of Boiling Point of Water.\n");
-        sigma_printf("[CHEMISTRY/EXP]: Latent Heat of Vaporization Shard Stabilized at 100-deg C.\n");
+        sigma_log_info("[CHEMISTRY/EXP]: Experiment: Determination of Boiling Point of Water.\n");
+        sigma_log_info("[CHEMISTRY/EXP]: Latent Heat of Vaporization Shard Stabilized at 100-deg C.\n");
     }
 };
 
@@ -69,8 +69,8 @@ public:
 class TranspirationExperiment : public IExperiment {
 public:
     void Execute() override {
-        sigma_printf("[BIOLOGY/EXP]: Experiment: Measuring Rate of Transpiration (Potometer).\n");
-        sigma_printf("[BIOLOGY/EXP]: Leaf Stomata open @ 298.15K. Shard-Water flux identified.\n");
+        sigma_log_info("[BIOLOGY/EXP]: Experiment: Measuring Rate of Transpiration (Potometer).\n");
+        sigma_log_info("[BIOLOGY/EXP]: Leaf Stomata open @ 298.15K. Shard-Water flux identified.\n");
     }
 };
 
@@ -78,8 +78,8 @@ public:
 class StarchTestExperiment : public IExperiment {
 public:
     void Execute() override {
-        sigma_printf("[BIOLOGY/EXP]: Experiment: Test for Presence of Starch (Iodine).\n");
-        sigma_printf("[BIOLOGY/EXP]: Leaf Shard color change: Blue-Black confirmed.\n");
+        sigma_log_info("[BIOLOGY/EXP]: Experiment: Test for Presence of Starch (Iodine).\n");
+        sigma_log_info("[BIOLOGY/EXP]: Leaf Shard color change: Blue-Black confirmed.\n");
     }
 };
 
@@ -87,8 +87,8 @@ public:
 class TangentExperiment : public IExperiment {
 public:
     void Execute() override {
-        sigma_printf("[MATH/EXP]: Experiment: Drawing Tangents to a Circle from External Point.\n");
-        sigma_printf("[MATH/EXP]: Intersection Shard identifies exactly 2 Tangent vectors.\n");
+        sigma_log_info("[MATH/EXP]: Experiment: Drawing Tangents to a Circle from External Point.\n");
+        sigma_log_info("[MATH/EXP]: Intersection Shard identifies exactly 2 Tangent vectors.\n");
     }
 };
 
@@ -107,9 +107,9 @@ public:
     }
 
     void ExecuteFullLaboratoryAudit() {
-        sigma_printf("--- Î£ SIGMA OS SOVEREIGN EXPERIMENT CLUSTER ---\n");
+        sigma_log_info("--- ÃŽÂ£ SIGMA OS SOVEREIGN EXPERIMENT CLUSTER ---\n");
         for (const auto& exp : m_cluster) {
-            sigma_printf("\n------------------------------------------------\n");
+            sigma_log_info("\n------------------------------------------------\n");
             exp->Execute();
         }
     }
@@ -120,7 +120,8 @@ int main() {
     cluster.Synthesize();
     cluster.ExecuteFullLaboratoryAudit();
 
-    sigma_printf("\n[SUCCESS]: Competitive 'Small & Big' Experiment Cluster Synthesized.\n");
+    sigma_log_info("\n[SUCCESS]: Competitive 'Small & Big' Experiment Cluster Synthesized.\n");
     return 0;
 }
+
 

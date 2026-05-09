@@ -1,4 +1,4 @@
-#include "sigma_types.h"
+#include "core/sigma_types.h"
 #include "security/sigma_pqc.h"
 #include "hal/sigma_hal.h"
 #include "sigma_log.h"
@@ -14,17 +14,17 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Security {
 
-SovereignPQCEngine& SovereignPQCEngine::getInstance() {
-    static SovereignPQCEngine instance;
+SigmaOS::Kernel::Security::SovereignPQCEngine& SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance() {
+    static SigmaOS::Kernel::Security::SovereignPQCEngine instance;
     return instance;
 }
 
-void SovereignPQCEngine::init() {
+void SigmaOS::Kernel::Security::SovereignPQCEngine::init() {
     sigma_log_info("[PQC] Initializing Sovereign Post-Quantum Cryptography Nexus (LBSV Algorithm)...");
     this->initialized = 1u;
 }
 
-void SovereignPQCEngine::signShard(sigma_u32 shard_id, sigma_u8* signature) {
+void SigmaOS::Kernel::Security::SovereignPQCEngine::signShard(sigma_u32 shard_id, sigma_u8* signature) {
     /* LBSV (Lattice-Based Shard Verification) Algorithm */
     sigma_log_info("[PQC] LBSV: Signing Shard S%u...", (unsigned)shard_id);
     // Securely fill with high-entropy lattice data
@@ -32,7 +32,7 @@ void SovereignPQCEngine::signShard(sigma_u32 shard_id, sigma_u8* signature) {
     this->total_signatures++;
 }
 
-bool SovereignPQCEngine::verifyShard(sigma_u32 shard_id, const sigma_u8* signature) {
+bool SigmaOS::Kernel::Security::SovereignPQCEngine::verifyShard(sigma_u32 shard_id, const sigma_u8* signature) {
     sigma_log_info("[PQC] LBSV: Verifying Shard S%u integrity...", (unsigned)shard_id);
     (void)signature;
     sigma_log_info("[PQC] LBSV: Quantum-Resistant Integrity VERIFIED.");
@@ -40,7 +40,7 @@ bool SovereignPQCEngine::verifyShard(sigma_u32 shard_id, const sigma_u8* signatu
     return true;
 }
 
-void SovereignPQCEngine::refreshLattice() {
+void SigmaOS::Kernel::Security::SovereignPQCEngine::refreshLattice() {
     sigma_log_info("[PQC] LBSV: Refreshing silicon lattice noise entropy...");
 }
 

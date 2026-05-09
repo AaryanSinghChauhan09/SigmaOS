@@ -1,15 +1,12 @@
-/*
- * =========================================================================
- * S SIGMAOS: SOVEREIGN INSTALLER (UI-001)
- * =========================================================================
- * Mission: Implements a high-fidelity, industrial-grade graphical installer.
- * Layer  : L6 — Zenith UI / System Deployment
- * =========================================================================
+ï»¿/*
+ * SigmaOS: Sovereign Installer (UI-001)
+ * Layer: L6 - Zenith UI / System Deployment
  */
-
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 #include "core/SigmaOOP.hpp"
+
+extern "C" void partition_manager_scan();
 
 namespace SigmaOS {
 namespace Kernel {
@@ -21,32 +18,23 @@ public:
         static SovereignInstaller instance;
         return instance;
     }
-
     const char* type_name() const noexcept override { return "SovereignInstaller"; }
 
-    void startInstallation() {
+    static void startInstallation() {
         sigma_log_info("[INSTALLER] Initializing Zenith Morphic Installer...");
-        
-        // Step 1: Disk Discovery
-        extern "C" void partition_manager_scan();
         partition_manager_scan();
-        
-        // Step 2: Shard Selection
-        sigma_log_info("[INSTALLER] Selecting target shards: [Kernel, Drivers, Zenith-UI, AI-Nexus].");
-        
-        // Step 3: PQC Encryption of Root
-        sigma_log_info("[INSTALLER] Formatting target partition with PQC-LatticeFS...");
-        
-        // Step 4: Finalizing
-        sigma_log_info("[INSTALLER] Installation 100% COMPLETE. Please remove Live USB and reboot.");
+        sigma_log_info("[INSTALLER] Selecting shards: [Kernel, Drivers, Zenith-UI, AI-Nexus].");
+        sigma_log_info("[INSTALLER] Formatting partition with PQC-LatticeFS...");
+        sigma_log_info("[INSTALLER] Installation COMPLETE. Reboot to continue.");
     }
-
 private:
     SovereignInstaller() = default;
 };
+
 } // namespace Deployment
 } // namespace Kernel
 } // namespace SigmaOS
+
 extern "C" void installer_start() {
     SigmaOS::Kernel::Deployment::SovereignInstaller::startInstallation();
 }

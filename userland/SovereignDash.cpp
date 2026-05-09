@@ -1,4 +1,4 @@
-#include "../include/sigma_log.h"
+﻿#include "../include/sigma_log.h"
 #include "../include/SovereignLibC.h"
 #include "sigma_hal.h"
 #include "../include/sigma_types.h"
@@ -22,7 +22,7 @@ public:
     }
 
     void refreshTelemetry() {
-        sigma_printf("[S-DASH] Refreshing silicon telemetry (ID: %u)\n", 0x1337);
+        sigma_log_info("[S-DASH] Refreshing silicon telemetry (ID: %u)\n", 0x1337);
         /* Telemetry Engine: Fetches real-time lattice metrics. */
         this->refresh_count++;
     }
@@ -50,5 +50,6 @@ extern "C" void dash_refresh_telemetry() {
 extern "C" void dash_report_health() {
     SovereignDashEngine::getInstance().reportHealth();
 }
+
 
 

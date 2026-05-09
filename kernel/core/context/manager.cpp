@@ -1,3 +1,4 @@
+﻿#include "libc/SovereignLibC.h"
 #include "core/context/manager.hpp"
 
 namespace SigmaOS {
@@ -37,3 +38,4 @@ void ContextManager::registerModule(const char* module_id, void* instance) {
 } // namespace Context
 } // namespace Kernel
 } // namespace SigmaOS
+

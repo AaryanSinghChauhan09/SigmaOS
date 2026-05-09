@@ -9,9 +9,9 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Security {
 
-class SovereignPQCEngine {
+class SigmaOS::Kernel::Security::SovereignPQCEngine {
 public:
-    static SovereignPQCEngine& getInstance();
+    static SigmaOS::Kernel::Security::SovereignPQCEngine& getInstance();
 
     void init();
     void signShard(sigma_u32 shard_id, sigma_u8* signature);
@@ -22,9 +22,9 @@ public:
     sigma_u64 getVerifiedCount()  const { return verified_shards; }
 
 private:
-    SovereignPQCEngine() : initialized(0u), total_signatures(0ULL), verified_shards(0ULL) {}
-    SovereignPQCEngine(const SovereignPQCEngine&) = delete;
-    SovereignPQCEngine& operator=(const SovereignPQCEngine&) = delete;
+    SigmaOS::Kernel::Security::SovereignPQCEngine() : initialized(0u), total_signatures(0ULL), verified_shards(0ULL) {}
+    SigmaOS::Kernel::Security::SovereignPQCEngine(const SigmaOS::Kernel::Security::SovereignPQCEngine&) = delete;
+    SigmaOS::Kernel::Security::SovereignPQCEngine& operator=(const SigmaOS::Kernel::Security::SovereignPQCEngine&) = delete;
 
     sigma_u32 initialized;
     sigma_u64 total_signatures;

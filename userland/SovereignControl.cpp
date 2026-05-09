@@ -1,4 +1,4 @@
-#include "../include/sigma_log.h"
+﻿#include "../include/sigma_log.h"
 #include "../include/SovereignLibC.h"
 #include "sigma_hal.h"
 
@@ -17,7 +17,8 @@ extern "C" void control_reboot() {
 }
 
 extern "C" void control_power_cycle() {
-    sigma_printf("[S-CONTROL] Power cycle command RECEIVED.\n");
+    sigma_log_info("[S-CONTROL] Power cycle command RECEIVED.\n");
     sigma_log("[S-CONTROL] Sharding current state to SovereignSnap...");
 }
+
 

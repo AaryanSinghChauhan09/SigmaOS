@@ -35,10 +35,10 @@ namespace SigmaOS {
 namespace Kernel {
 namespace AI {
 
-class SovereignAISchedEngine {
+class SigmaOS::Kernel::AI::SovereignAISchedEngine {
 public:
-    static SovereignAISchedEngine& getInstance() {
-        static SovereignAISchedEngine instance;
+    static SigmaOS::Kernel::AI::SovereignAISchedEngine& getInstance() {
+        static SigmaOS::Kernel::AI::SovereignAISchedEngine instance;
         return instance;
     }
 
@@ -48,7 +48,7 @@ public:
     sigma_u64 getPredictionCount() const { return this->prediction_count; }
 
 private:
-    SovereignAISchedEngine() : m_current_mode(AISCHED_MODE_BALANCED), prediction_count(0), m_initialized(0) {}
+    SigmaOS::Kernel::AI::SovereignAISchedEngine() : m_current_mode(AISCHED_MODE_BALANCED), prediction_count(0), m_initialized(0) {}
     
     sigma_aisched_mode_t m_current_mode;
     sigma_u64            prediction_count;

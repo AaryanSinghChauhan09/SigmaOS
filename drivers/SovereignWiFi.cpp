@@ -1,4 +1,4 @@
-#include "../include/sigma_log.h"
+﻿#include "../include/sigma_log.h"
 #include "../include/SovereignLibC.h"
 #include "sigma_hal.h"
 
@@ -33,7 +33,7 @@ public:
 
     bool connect(const char* ssid, const char* password) {
         if (!ssid) return false;
-        sigma_printf("[WIFI] Attempting secure Zero-Trust handshake with '%s'...\n", ssid);
+        sigma_log_info("[WIFI] Attempting secure Zero-Trust handshake with '%s'...\n", ssid);
         
         // PQC key exchange logic here
         sigma_log("[WIFI] Quantum-safe connection established successfully.");
@@ -59,4 +59,5 @@ extern "C" void wifi_scan() {
 extern "C" int wifi_connect(const char* ssid, const char* pass) {
     return SovereignWiFi::connect(ssid, pass) ? 1 : 0;
 }
+
 

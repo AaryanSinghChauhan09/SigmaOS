@@ -1,4 +1,4 @@
-﻿#include "core/sigma_types.h"
+#include "core/sigma_types.h"
 #include "hal/sigma_hal.h"
 #include "sigma_log.h"
 #include "ai/sigma_aisched.h"
@@ -7,12 +7,12 @@ namespace SigmaOS {
 namespace Kernel {
 namespace AI {
 
-void SovereignAISchedEngine::init() {
+void SigmaOS::Kernel::AI::SovereignAISchedEngine::init() {
     sigma_log_info("[AISCHED] Initializing Sovereign AI-Optimized Scheduler (NPWO Algorithm)...");
     this->m_initialized = 1u;
 }
 
-void SovereignAISchedEngine::predictWorkload(sigma_u32 process_id) {
+void SigmaOS::Kernel::AI::SovereignAISchedEngine::predictWorkload(sigma_u32 process_id) {
     /* NPWO: Neural Predictive Workload Orchestration
      * Categorizes processes into scheduling classes via lightweight inference. */
     sigma_log_info("[AISCHED] NPWO: Analyzing workload patterns...");
@@ -37,7 +37,7 @@ void SovereignAISchedEngine::predictWorkload(sigma_u32 process_id) {
     }
 }
 
-void SovereignAISchedEngine::setMode(sigma_aisched_mode_t mode) {
+void SigmaOS::Kernel::AI::SovereignAISchedEngine::setMode(sigma_aisched_mode_t mode) {
     this->m_current_mode = mode;
     sigma_log_info("[AISCHED] Scheduler mode updated.");
 }

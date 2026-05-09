@@ -1,7 +1,7 @@
-#include "../include/SovereignLibC.h"
+﻿#include "../include/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -11,7 +11,7 @@
 #include "../include/SigmaOOP.hpp"
 
 /**
- * Î£ SIGMA OS: SOVEREIGN LAB UNIVERSAL (v128.0 - ZERO-STD NATIVE)
+ * ÃŽÂ£ SIGMA OS: SOVEREIGN LAB UNIVERSAL (v128.0 - ZERO-STD NATIVE)
  * ==============================================================
  * USP: Universal "Small & Big" experiment coverage for NCERT (1-12).
  * Capability: Bernoulli, Kinetics, Venn, and Germination Shards.
@@ -29,8 +29,8 @@ public:
 class BernoulliShard : public IUniversalExp {
 public:
     void Deploy() override {
-        sigma_printf("[PHYSICS/EXP]: Experiment: Verification of Bernoulli's Theorem.\n");
-        sigma_printf("[PHYSICS/EXP]: P + 0.5*rho*v^2 + rho*g*h = Constant [Verified].\n");
+        sigma_log_info("[PHYSICS/EXP]: Experiment: Verification of Bernoulli's Theorem.\n");
+        sigma_log_info("[PHYSICS/EXP]: P + 0.5*rho*v^2 + rho*g*h = Constant [Verified].\n");
     }
 };
 
@@ -38,8 +38,8 @@ public:
 class KineticsShard : public IUniversalExp {
 public:
     void Deploy() override {
-        sigma_printf("[CHEMISTRY/EXP]: Experiment: Effect of Temp on Rate of Reaction.\n");
-        sigma_printf("[CHEMISTRY/EXP]: Arrhenius Shard: Rate doubles every 10K increase.\n");
+        sigma_log_info("[CHEMISTRY/EXP]: Experiment: Effect of Temp on Rate of Reaction.\n");
+        sigma_log_info("[CHEMISTRY/EXP]: Arrhenius Shard: Rate doubles every 10K increase.\n");
     }
 };
 
@@ -47,8 +47,8 @@ public:
 class GerminationShard : public IUniversalExp {
 public:
     void Deploy() override {
-        sigma_printf("[BIOLOGY/EXP]: Experiment: Germination of Gram Seeds.\n");
-        sigma_printf("[BIOLOGY/EXP]: Water absorption -> Radicle emergence synchronized.\n");
+        sigma_log_info("[BIOLOGY/EXP]: Experiment: Germination of Gram Seeds.\n");
+        sigma_log_info("[BIOLOGY/EXP]: Water absorption -> Radicle emergence synchronized.\n");
     }
 };
 
@@ -56,8 +56,8 @@ public:
 class BloodGroupShard : public IUniversalExp {
 public:
     void Deploy() override {
-        sigma_printf("[BIOLOGY/EXP]: Experiment: ABO Blood Grouping & Rh Factor.\n");
-        sigma_printf("[BIOLOGY/EXP]: Agglutination detected for Antigen-A. Result: A+.\n");
+        sigma_log_info("[BIOLOGY/EXP]: Experiment: ABO Blood Grouping & Rh Factor.\n");
+        sigma_log_info("[BIOLOGY/EXP]: Agglutination detected for Antigen-A. Result: A+.\n");
     }
 };
 
@@ -65,8 +65,8 @@ public:
 class VennShard : public IUniversalExp {
 public:
     void Deploy() override {
-        sigma_printf("[MATH/EXP]: Experiment: Verification of De Morgan's Laws.\n");
-        sigma_printf("[MATH/EXP]: (A U B)' = A' n B' Shard confirmed via Venn Projection.\n");
+        sigma_log_info("[MATH/EXP]: Experiment: Verification of De Morgan's Laws.\n");
+        sigma_log_info("[MATH/EXP]: (A U B)' = A' n B' Shard confirmed via Venn Projection.\n");
     }
 };
 
@@ -84,9 +84,9 @@ public:
     }
 
     void ExecuteUniversalAudit() {
-        sigma_printf("--- Î£ SIGMA OS SOVEREIGN UNIVERSAL LABORATORY ---\n");
+        sigma_log_info("--- ÃŽÂ£ SIGMA OS SOVEREIGN UNIVERSAL LABORATORY ---\n");
         for (sigma_usize i = 0; i < m_count; i++) {
-            sigma_printf("\n------------------------------------------------\n");
+            sigma_log_info("\n------------------------------------------------\n");
             m_zenith[i]->Deploy();
         }
     }
@@ -97,7 +97,8 @@ extern "C" void _start(void) {
     lab.Synthesize();
     lab.ExecuteUniversalAudit();
 
-    sigma_printf("\n[SUCCESS]: Universal NCERT Experiment Cluster Active. 100%% Curricular Sovereignty.\n");
+    sigma_log_info("\n[SUCCESS]: Universal NCERT Experiment Cluster Active. 100%% Curricular Sovereignty.\n");
     sigma_exit(0);
 }
+
 

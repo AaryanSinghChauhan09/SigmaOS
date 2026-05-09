@@ -1,4 +1,4 @@
-#include "../include/sigma_log.h"
+﻿#include "../include/sigma_log.h"
 #include "../include/SovereignLibC.h"
 #include "sigma_hal.h"
 #include "sigma_nvme.h"
@@ -7,7 +7,7 @@
  * SigmaOS Sovereign NVMe Driver
  * High-performance, zero-copy block storage interface.
  *
- * Design: OOP-isolated singleton — SovereignNVMeEngine.
+ * Design: OOP-isolated singleton â€” SovereignNVMeEngine.
  */
 
 class SovereignNVMeEngine {
@@ -25,7 +25,7 @@ public:
         this->master_nvme.irq = 16;
         this->master_nvme.initialized = true;
 
-        sigma_printf("[NVMe] Controller mapped at 0x%llX, IRQ %d\n", 
+        sigma_log_info("[NVMe] Controller mapped at 0x%llX, IRQ %d\n", 
                      this->master_nvme.base_addr, this->master_nvme.irq);
     }
 
@@ -43,7 +43,7 @@ public:
             // Perform DMA transfer from NVMe controller (simulated)
             status = 0; // Assume success for now
             if (status == 0) break;
-            sigma_printf("[NVMe] Retry %d for LBA %llu\n", retry + 1, lba);
+            sigma_log_info("[NVMe] Retry %d for LBA %llu\n", retry + 1, lba);
         }
         
         this->queue_depth--;
@@ -81,4 +81,5 @@ extern "C" int nvme_read_blocks(uint64_t lba, uint32_t count, void* buffer) {
 extern "C" int nvme_write_blocks(uint64_t lba, uint32_t count, const void* buffer) {
     return SovereignNVMeEngine::writeBlocks(lba, count, buffer);
 }
+
 

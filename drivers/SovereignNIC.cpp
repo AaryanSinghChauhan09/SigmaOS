@@ -1,4 +1,4 @@
-#include "../include/sigma_log.h"
+﻿#include "../include/sigma_log.h"
 #include "../include/SovereignLibC.h"
 
 #include "sigma_hal.h"
@@ -33,7 +33,7 @@ public:
         this->master_nic.link_up = true;
         this->tx_quota = 0;
 
-        sigma_printf("[NIC] Link established. MAC: %02X:%02X:%02X:%02X:%02X:%02X\n",
+        sigma_log_info("[NIC] Link established. MAC: %02X:%02X:%02X:%02X:%02X:%02X\n",
                   this->master_nic.mac[0], this->master_nic.mac[1], this->master_nic.mac[2],
                   this->master_nic.mac[3], this->master_nic.mac[4], this->master_nic.mac[5]);
     }
@@ -51,7 +51,7 @@ public:
 
         /* Inject packet into lattice mesh */
         this->tx_quota++;
-        sigma_printf("[NIC] Transmitting packet (%d bytes)... [Quota: %d/%d]\n", len, this->tx_quota, MAX_TX_QUOTA);
+        sigma_log_info("[NIC] Transmitting packet (%d bytes)... [Quota: %d/%d]\n", len, this->tx_quota, MAX_TX_QUOTA);
         return 0;
     }
 
@@ -85,4 +85,5 @@ extern "C" int nic_transmit(const void* packet, uint32_t len) {
 extern "C" int nic_receive(void* buffer, uint32_t max_len) {
     return SovereignNICEngine::receive(buffer, max_len);
 }
+
 

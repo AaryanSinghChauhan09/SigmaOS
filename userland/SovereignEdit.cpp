@@ -1,4 +1,4 @@
-#include "../include/sigma_log.h"
+﻿#include "../include/sigma_log.h"
 #include "../include/SovereignLibC.h"
 #include "sigma_hal.h"
 #include "../include/sigma_types.h"
@@ -9,7 +9,7 @@
  * SigmaOS Sovereign Editor (v100.0 Zenith)
  * A zero-dependency, bare-metal text orchestration shard.
  *
- * Design: OOP-isolated singleton — SovereignEditEngine.
+ * Design: OOP-isolated singleton â€” SovereignEditEngine.
  */
 
 class SovereignEditEngine {
@@ -20,7 +20,7 @@ public:
     }
 
     void openFile(const char* path) {
-        sigma_printf("[S-EDIT] Opening file: %s\n", path);
+        sigma_log_info("[S-EDIT] Opening file: %s\n", path);
         sigma_log("[S-EDIT] File buffer mapped to SovereignVFS.");
         this->files_opened++;
     }
@@ -46,4 +46,5 @@ extern "C" void edit_open_file(const char* path) {
 extern "C" void edit_save_file() {
     SovereignEditEngine::getInstance().saveFile();
 }
+
 

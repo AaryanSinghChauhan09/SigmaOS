@@ -13,7 +13,7 @@
 #include "libc/SovereignLibC.h"
 #include "core/SigmaOOP.hpp"
 #include "sigma_log.h"
-#include "security/SovereignQKD.hpp"
+#include "../../../include/security/SovereignQKD.hpp"
 
 /**
  * SovereignOrbManager — Sovereign Orb Package Ecosystem
@@ -151,6 +151,8 @@ extern "C" void orb_rollback(const char* orb_name) {
 extern "C" void orb_list() {
     SigmaOS::Kernel::Industrial::SovereignOrbManager::listOrbs();
 }
+
+
 
 
 
