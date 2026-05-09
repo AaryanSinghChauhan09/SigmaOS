@@ -24,6 +24,14 @@ To fill technical gaps and ensure drivers work for almost every device, SigmaOS 
 | **Network** | `VirtIO_Net` / `E1000` | Testing |
 | **Audio** | `Intel_HDA` | Roadmap |
 
+## 🐧 Ported Linux Drivers (Compat Layer)
+
+| Component | Hardware | Driver Module | Status |
+| :--- | :--- | :--- | :--- |
+| **Network** | Realtek Ethernet | `RTL8111_Ethernet.cpp` | Operational |
+| **Network** | Intel Wi-Fi | `Intel_AX200_WiFi.cpp` | Operational |
+| **Graphics** | AMD Radeon | `AMDGPU_Graphics.cpp` | Beta |
+
 ## 🧪 Testing Environment
 
 We primarily validate SigmaOS using **QEMU 7.0+** with the following configuration:
