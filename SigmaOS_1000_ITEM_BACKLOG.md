@@ -14,7 +14,8 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 9.  **DRV-006**: Port Realtek RTL8111/8168 Ethernet drivers. [Operational]
 10. **BENCH-001**: Implement `sigma-bench` for kernel scheduling latency vs. Linux `sched_ext`. [Operational]
 11. **DRV-007**: Implement NVIDIA Tensor-core acceleration shards. [Operational]
-12. **ABI-003**: Implement `musl` libc shims for Alpine-level minimalism. [Operational]
+12. **DRV-008**: Port Intel i915 Graphics drivers. [Operational]
+13. **ABI-003**: Implement `musl` libc shims for Alpine-level minimalism. [Operational]
 
 ## 📦 Package Ecosystem & Orbs (Items 201-400)
 11. **PKG-001**: Implement `sigma-pkg` dependency graph resolver. [Operational]

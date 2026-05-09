@@ -104,9 +104,11 @@ Rather than using fragile relative paths, every shard `#include`s the canonical 
 
 ## 🛠 Key Stabilization Fixes Applied
 
-| `SovereignAetherFirewall.cpp` | Monolithic neural logic | Extracted AI heuristics to `SovereignAetherNeural.cpp` |
-| `SovereignMarketplaceIndexer.cpp` | N/A | New shard for P2P/Distributed indexing (IDX-002) |
-| `SovereignDirectGPU.cpp` | N/A | New shard for bare-metal GPU access (GAM-003) |
+| `SovereignSandbox.cpp` | Integrated MAC logic | Extracted policy to `SovereignSandboxMAC.cpp` |
+| `SovereignOrbManager.cpp` | Lacks atomicity | Added `SovereignOrbTransaction.cpp` for rollbacks |
+| `ClawStack.cpp` | Lacks resource limits | Added `ClawResourceQuotas.cpp` for agent sandboxing |
+| `Intel_I915_Graphics.cpp` | N/A | New shard for Intel i915 hardware support (DRV-008) |
+| `build-validation.yml` | N/A | New CI/CD pipeline for lattice integrity and security |
 | `zenith.html` | Duplicate IDs & a11y violations | Renamed `command-input` and added `aria-label` to all inputs |
 
 ---
