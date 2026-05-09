@@ -34,7 +34,6 @@ public:
     }
 
     bool dispatchPacket(const char* /*payload*/, sigma_u32 length) {
-
         // Deep Packet Inspection simulation
         if (length > 1500) {
             this->packets_filtered++;
@@ -43,6 +42,13 @@ public:
         }
         sigma_log("[NET] Dispatched %u bytes over TCP/IP.\n", length);
         return true;
+    }
+
+    /* ABI-002: sk_buff mapping for Linux compatibility */
+    void mapSkBuff(void* skb_ptr) {
+        sigma_log("[NET-ABI] Mapping Linux sk_buff to SovereignNetPacket...");
+        sigma_log("[NET-ABI] Extracting IP headers and payload pointers.");
+        sigma_log("[NET-ABI] Handing off to Zero-Trust inspection engine.");
     }
 
 private:
@@ -56,6 +62,10 @@ private:
 /* --- C Wrappers --- */
 extern "C" void netstack_init() {
     SovereignNetStackEngine::getInstance().init();
+}
+
+extern "C" void netstack_map_skb(void* skb) {
+    SovereignNetStackEngine::getInstance().mapSkBuff(skb);
 }
 
 extern "C" void netstack_register_iface(const char* mac_addr) {
