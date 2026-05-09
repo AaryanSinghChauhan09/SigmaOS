@@ -1,22 +1,4 @@
-# Contributing to SigmaOS
-
-We welcome contributors! As a meritocratic project, we value high-quality code, clear documentation, and a focus on sovereign computing.
-
-## 🛠 Setup
-1. Clone the repo.
-2. Ensure you have a C++20 compatible compiler (GCC 12+, Clang 15+).
-3. Follow the [Installation Guide](https://github.com/AaryanSinghChauhan09/SigmaOS.wiki/blob/master/INSTALLATION_GUIDE.md).
-
-## 🧭 Branching Strategy
-*   `main`: Stable, production-ready code.
-*   `develop`: Integration branch for new features.
-*   `feature/*`: Individual feature shards.
-*   `fix/*`: Bug fixes.
-
-## 📝 Coding Standards
-*   **OOP Isolation**: All new shards must inherit from `SigmaObject`.
-*   **No Raw Pointers**: Use Sovereign smart pointers or reference-counted objects.
-*   **Documentation**: Every public method must be documented in the header.
-
-## 🗳 Sovereign Council
-Major architectural changes require an RFC and approval from the [Sovereign Council](https://github.com/AaryanSinghChauhan09/SigmaOS.wiki/blob/master/GOVERNANCE_CHARTER.md).
+> **Migration Notice:** This document has been migrated to the SigmaOS Sovereign Wiki to ensure a Single Source of Truth.
+> 
+> Please view the full, updated document here:
+> [SigmaOS Wiki: CONTRIBUTING](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/CONTRIBUTING)
