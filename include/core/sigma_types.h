@@ -1,4 +1,3 @@
-#include "core/sigma_types.h"
 #ifndef SIGMA_TYPES_H
 #define SIGMA_TYPES_H
 

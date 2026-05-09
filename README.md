@@ -17,6 +17,7 @@
 Instead of "making Linux work," SigmaOS focuses on "making Linux feel futuristic." It is a **Sovereign environment** where the OS adapts to *you*.
 
 ## ⚔️ The Competitor Crusher
+
 SigmaOS is engineered to dominate and neutralize legacy distributions by solving their core weaknesses through sovereign AI-native governance.
 
 | Competitor | Neutralization Strategy | Status |
@@ -31,20 +32,22 @@ SigmaOS is engineered to dominate and neutralize legacy distributions by solving
 | **NixOS** | Reproducible Shard Builds | **Neutralized** |
 
 ### 🏗️ Sigma Layers Architecture
-1.  **Physical Layer**: Sovereign Silicon Tuning (RPi4/RPi5/Apple Silicon).
-2.  **HAL Layer**: Sovereign Driver Isolation (Vulkan, NVMe, NetStack).
-3.  **Lattice Layer**: Core Kernel Shards (Scheduler, Hypervisor, Watchdog).
-4.  **Governance Layer**: FIPS-140 Security & PQC (Sandbox, Audit, PQC).
-5.  **Automation Layer**: AI Orchestration (Containers, Agents, Tasks).
-6.  **Interface Layer**: Zenith UI (Themes, Accessibility, Layouts).
-7.  **Professional Layer**: 75+ Career-Centric Role Profiles.
+
+1. **Physical Layer**: Sovereign Silicon Tuning (RPi4/RPi5/Apple Silicon).
+2. **HAL Layer**: Sovereign Driver Isolation (Vulkan, NVMe, NetStack).
+3. **Lattice Layer**: Core Kernel Shards (Scheduler, Hypervisor, Watchdog).
+4. **Governance Layer**: FIPS-140 Security & PQC (Sandbox, Audit, PQC).
+5. **Automation Layer**: AI Orchestration (Containers, Agents, Tasks).
+6. **Interface Layer**: Zenith UI (Themes, Accessibility, Layouts).
+7. **Professional Layer**: 75+ Career-Centric Role Profiles.
 
 ### 🚀 Key Futuristic Features
-*   **Neural Search**: A universal command palette (`Alt+Space`) for files, apps, and AI-driven actions.
-*   **Sigma Profiles**: Instant environment optimization for Developers, Gamers, and AI Engineers.
-*   **AI Desktop Assistant**: A persistent sidebar assistant (`Alt+A`) that monitors lattice health and automates tasks.
-*   **Universal Package Layer**: One interface, three package managers. Seamlessly inject high-security shards.
-*   **Hardware Attestation**: Silicon-level verification of the physical lattice.
+
+* **Neural Search**: A universal command palette (`Alt+Space`) for files, apps, and AI-driven actions.
+* **Sigma Profiles**: Instant environment optimization for Developers, Gamers, and AI Engineers.
+* **AI Desktop Assistant**: A persistent sidebar assistant (`Alt+A`) that monitors lattice health and automates tasks.
+* **Universal Package Layer**: One interface, three package managers. Seamlessly inject high-security shards.
+* **Hardware Attestation**: Silicon-level verification of the physical lattice.
 
 ## 🏗️ The Sovereign Lattice Architecture
 
@@ -60,13 +63,14 @@ SigmaOS is built on a 7-layer modular architecture designed for high-assurance A
 
 ## 📚 Documentation
 
-*   [Architecture Overview](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/ARCHITECTURE)
-*   [Security & PQC Lattice](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SECURITY)
-*   [Profession-Based Profiles](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/PROFESSION-MAP)
-*   [Modularisation Strategy](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/MODULARIZATION_MAP)
-*   [Ultimate Advancement Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/ULTIMATE-ADVANCEMENT-STRATEGY)
+* [Architecture Overview](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/ARCHITECTURE)
+* [Security & PQC Lattice](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SECURITY)
+* [Profession-Based Profiles](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/PROFESSION-MAP)
+* [Modularisation Strategy](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/MODULARIZATION_MAP)
+* [Ultimate Advancement Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/ULTIMATE-ADVANCEMENT-STRATEGY)
 
 ## ⌨️ Hotkeys
+
 | Shortcut | Action |
 | :--- | :--- |
 | **Alt + Space** | **Neural Search** (Universal Command Center) |
@@ -75,6 +79,7 @@ SigmaOS is built on a 7-layer modular architecture designed for high-assurance A
 | **Esc** | Close Overlays & Modals |
 
 ## 🏗️ Architecture Map
+
 ```mermaid
 graph TD
     UserLand[User Space / Zenith UI] -->|Syscalls| Core[Sovereign Core Shards]
@@ -86,34 +91,45 @@ graph TD
 ## 📦 Technical Quickstart
 
 ### Prerequisites
+
 - `gcc-x86-64-linux-gnu` / `clang`
 - `nasm`, `make`, `cmake`
 - `qemu-system-x86`
 
 ### Build & Run
+
 ```bash
+
 # 1. Build the Sovereign Lattice
+
 make all
 
 # 2. Launch in QEMU (Headless with Serial Log)
+
 ./qemu-boot.sh
 
 # 3. View Kernel Logs
+
 tail -f serial.log
 ```
 
 ### Development Environment
+
 For a reproducible environment, use the provided **DevContainer** (VS Code) or the `Dockerfile` in the root directory.
 
 ## Contributions
+
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) and the [Official Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki).
 
 ## 🏛️ Governance & Standards
+
 SigmaOS adheres to strict industrial standards for lattice maintenance and security.
+
 - **[Maintenance Policy](MAINTENANCE_POLICY.md)**: Quality standards and review process.
 - **[Release Process](RELEASE_PROCESS.md)**: Preparation and cryptographic signing details.
 - **[Code of Conduct](CODE_OF_CONDUCT.md)**: Expectations for community behavior.
 - **[Security Policy](SECURITY.md)**: Vulnerability reporting and PQC disclosure.
 
 ## License
+
 MIT License - see [LICENSE](LICENSE).

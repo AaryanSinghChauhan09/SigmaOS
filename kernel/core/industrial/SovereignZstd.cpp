@@ -7,9 +7,9 @@
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -49,4 +49,5 @@ extern "C" sigma_size_t zstd_compress(const void* src, void* dst, sigma_size_t s
 extern "C" sigma_size_t zstd_decompress(const void* src, void* dst, sigma_size_t size) {
     return SigmaOS::Kernel::Industrial::SovereignZstd::decompressOrb(src, dst, size);
 }
+
 

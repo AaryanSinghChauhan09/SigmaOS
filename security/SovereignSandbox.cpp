@@ -1,8 +1,8 @@
-#include "../include/core/sigma_types.h"
-#include "../include/hal/sigma_hal.h"
-#include "../include/sigma_log.h"
-#include "../include/security/sigma_sandbox.h"
-#include "../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "security/sigma_sandbox.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SovereignSandbox — Sovereign Zero-Trust Container Engine
@@ -16,10 +16,7 @@ namespace Security {
 /* Policy Constants */
 static constexpr sigma_u32 SYSCALL_SIGMA_YIELD = 0x01U;
 
-SovereignSandboxEngine& SovereignSandboxEngine::getInstance() {
-    static SovereignSandboxEngine instance;
-    return instance;
-}
+
 
 const char* SovereignSandboxEngine::type_name() const noexcept {
     return "SovereignSandboxEngine";

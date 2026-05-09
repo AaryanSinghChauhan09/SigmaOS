@@ -7,9 +7,9 @@
  * =========================================================================
  */
 
-#include "../../include/core/sigma_types.h"
-#include "../../include/sigma_log.h"
-#include "../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -38,4 +38,5 @@ private:
 extern "C" void ux_ppe_predict() {
     SigmaOS::Kernel::UI::SovereignPPE::getInstance().predictAdaptation();
 }
+
 

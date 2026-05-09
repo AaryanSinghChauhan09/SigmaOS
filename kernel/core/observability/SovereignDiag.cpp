@@ -1,7 +1,7 @@
-﻿#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Diagnostics (SovereignDiag)
