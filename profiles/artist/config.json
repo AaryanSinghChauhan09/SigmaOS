@@ -8,5 +8,8 @@
         "video_editing)",
         "portfolio_manager",
         "media_export_tools"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

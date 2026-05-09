@@ -6,5 +6,8 @@
         "game_engines",
         "asset_pipelines",
         "gpu_orchestration"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

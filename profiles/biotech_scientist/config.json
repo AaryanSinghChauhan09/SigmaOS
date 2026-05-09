@@ -6,5 +6,8 @@
         "lab_management",
         "dna_analysis",
         "compliance"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

@@ -6,5 +6,8 @@
         "model_training",
         "dataset_management",
         "gpu_orchestration"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

@@ -6,5 +6,8 @@
         "molecular_modeling",
         "lab_notebooks",
         "compliance"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

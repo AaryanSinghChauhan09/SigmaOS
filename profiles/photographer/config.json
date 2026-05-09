@@ -6,5 +6,8 @@
         "photo_editing_suite",
         "portfolio_manager",
         "export_tools"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

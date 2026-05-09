@@ -6,5 +6,8 @@
         "campaign_dashboards",
         "analytics",
         "crm_integration"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

@@ -6,5 +6,8 @@
         "simulation",
         "hardware_integration",
         "ai_orchestration"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

@@ -6,5 +6,8 @@
         "crm_tools",
         "lead_tracking",
         "reporting_dashboards"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

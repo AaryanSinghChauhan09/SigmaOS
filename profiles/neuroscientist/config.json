@@ -6,5 +6,8 @@
         "brain_imaging_integration",
         "simulation",
         "compliance"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

@@ -7,5 +7,19 @@
         "lab_notebooks",
         "simulation_modules",
         "visualization_tools"
+    ],
+    "rules": [
+        "Research ethics",
+        "lab safety protocols"
+    ],
+    "calculators": [
+        "Statistical significance",
+        "molarity",
+        "physics constants"
+    ],
+    "algorithms": [
+        "Simulation engines",
+        "data visualization",
+        "AI model training"
     ]
 }

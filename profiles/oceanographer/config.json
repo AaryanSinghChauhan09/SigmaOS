@@ -5,5 +5,8 @@
     "modules": [
         "ocean_data_visualization",
         "simulation"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

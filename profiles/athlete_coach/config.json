@@ -6,5 +6,8 @@
         "training_planner",
         "performance_analytics",
         "health_monitoring"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

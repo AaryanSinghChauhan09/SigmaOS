@@ -6,5 +6,8 @@
         "video_editing_suite",
         "rendering_tools",
         "streaming_integration"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

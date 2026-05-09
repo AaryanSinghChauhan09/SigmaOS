@@ -6,5 +6,8 @@
         "climate_modeling",
         "sustainability_dashboards",
         "compliance"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

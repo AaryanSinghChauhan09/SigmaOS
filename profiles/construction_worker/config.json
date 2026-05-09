@@ -6,5 +6,8 @@
         "project_scheduling",
         "safety_compliance",
         "equipment_tracking"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

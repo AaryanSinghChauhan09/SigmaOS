@@ -6,5 +6,8 @@
         "hospital_management_dashboards",
         "compliance",
         "scheduling"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

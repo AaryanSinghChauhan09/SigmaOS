@@ -6,5 +6,8 @@
         "statistical_analysis_suite",
         "survey_tools",
         "visualization"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

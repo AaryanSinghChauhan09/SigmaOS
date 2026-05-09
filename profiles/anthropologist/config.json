@@ -5,5 +5,8 @@
     "modules": [
         "survey_tools",
         "cultural_data_visualization"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

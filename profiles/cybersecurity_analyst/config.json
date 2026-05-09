@@ -6,5 +6,8 @@
         "threat_detection",
         "penetration_testing",
         "compliance_dashboards"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

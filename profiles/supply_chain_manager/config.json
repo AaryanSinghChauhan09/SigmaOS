@@ -6,5 +6,8 @@
         "logistics_dashboards",
         "fleet_tracking",
         "warehouse_management"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

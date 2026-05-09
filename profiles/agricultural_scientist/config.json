@@ -6,5 +6,8 @@
         "crop_modeling",
         "iot_integration",
         "compliance"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

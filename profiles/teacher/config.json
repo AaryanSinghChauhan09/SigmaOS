@@ -7,5 +7,17 @@
         "grading_system",
         "student_records",
         "virtual_classroom_tools"
+    ],
+    "rules": [
+        "CBSE/NCERT curriculum",
+        "UGC guidelines"
+    ],
+    "calculators": [
+        "Grade average",
+        "attendance tracker"
+    ],
+    "algorithms": [
+        "Adaptive learning paths",
+        "exam paper generator"
     ]
 }

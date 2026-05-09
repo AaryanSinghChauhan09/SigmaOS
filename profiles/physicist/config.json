@@ -6,5 +6,8 @@
         "simulation_engines",
         "data_visualization",
         "research_notebooks"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

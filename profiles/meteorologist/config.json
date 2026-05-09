@@ -5,5 +5,8 @@
     "modules": [
         "weather_modeling",
         "forecasting_dashboards"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

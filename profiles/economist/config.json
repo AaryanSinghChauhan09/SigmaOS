@@ -6,5 +6,8 @@
         "market_modeling",
         "forecasting",
         "compliance"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

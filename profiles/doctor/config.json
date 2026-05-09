@@ -1,1 +1,25 @@
-{ "profession": "doctor", "active": true }
+{
+    "profession": "doctor",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "patient_records",
+        "prescription_management",
+        "lab_results_integration",
+        "telemedicine_tools"
+    ],
+    "rules": [
+        "Medical Council of India guidelines",
+        "Ayushman Bharat protocols"
+    ],
+    "calculators": [
+        "Dosage",
+        "BMI",
+        "medical billing"
+    ],
+    "algorithms": [
+        "Patient record indexing",
+        "diagnostic prediction",
+        "lab result interpretation"
+    ]
+}

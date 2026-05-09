@@ -6,5 +6,8 @@
         "jupyter_notebooks",
         "ml_libraries",
         "visualization_dashboards"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

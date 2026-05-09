@@ -6,5 +6,8 @@
         "simulation",
         "modeling",
         "compliance"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

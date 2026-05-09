@@ -6,5 +6,18 @@
         "policy_tools",
         "compliance",
         "citizen_records"
+    ],
+    "rules": [
+        "Service rules",
+        "policy drafting guidelines"
+    ],
+    "calculators": [
+        "Budget allocation",
+        "pension",
+        "pay scale"
+    ],
+    "algorithms": [
+        "Policy impact simulation",
+        "citizen data indexing"
     ]
 }

@@ -6,5 +6,8 @@
         "ocean_data_integration",
         "visualization",
         "compliance"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

@@ -6,5 +6,19 @@
         "loan_management",
         "compliance",
         "transaction_dashboards"
+    ],
+    "rules": [
+        "RBI guidelines",
+        "Basel norms"
+    ],
+    "calculators": [
+        "EMI",
+        "loan interest",
+        "NPA provisioning"
+    ],
+    "algorithms": [
+        "Risk scoring",
+        "fraud detection",
+        "portfolio optimization"
     ]
 }

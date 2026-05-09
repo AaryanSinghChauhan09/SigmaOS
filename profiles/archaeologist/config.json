@@ -6,5 +6,8 @@
         "artifact_cataloging",
         "gis_mapping",
         "compliance"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

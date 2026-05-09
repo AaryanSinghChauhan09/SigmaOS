@@ -7,5 +7,8 @@
         "3d_modeling",
         "project_management",
         "simulation"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

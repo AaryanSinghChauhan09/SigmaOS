@@ -6,5 +6,8 @@
         "circuit_design_tools",
         "simulation",
         "compliance_testing"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

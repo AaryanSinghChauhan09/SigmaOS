@@ -6,5 +6,8 @@
         "wireframing_tools",
         "prototyping",
         "accessibility_testing"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

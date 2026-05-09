@@ -1,1 +1,26 @@
-{ "profession": "lawyer", "active": true }
+{
+    "profession": "lawyer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "case_indexing",
+        "legal_references",
+        "compliance_document_management",
+        "secure_communication"
+    ],
+    "rules": [
+        "IPC",
+        "CrPC",
+        "Contract Act",
+        "Evidence Act"
+    ],
+    "calculators": [
+        "Court fee",
+        "stamp duty"
+    ],
+    "algorithms": [
+        "Case law search",
+        "compliance checker",
+        "automated legal drafting"
+    ]
+}

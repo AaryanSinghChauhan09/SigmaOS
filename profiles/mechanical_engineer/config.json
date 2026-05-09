@@ -6,5 +6,8 @@
         "simulation_engines",
         "cad",
         "manufacturing_workflow_integration"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

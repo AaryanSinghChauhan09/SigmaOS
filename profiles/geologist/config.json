@@ -6,5 +6,8 @@
         "mapping_tools",
         "seismic_data_analysis",
         "visualization"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

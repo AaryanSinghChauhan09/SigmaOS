@@ -6,5 +6,8 @@
         "experiment_management",
         "patient_records",
         "compliance"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

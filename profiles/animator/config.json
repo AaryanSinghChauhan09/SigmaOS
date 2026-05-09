@@ -6,5 +6,8 @@
         "animation_suite",
         "rendering_tools",
         "storyboard_manager"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

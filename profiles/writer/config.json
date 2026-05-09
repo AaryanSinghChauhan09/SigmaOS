@@ -6,5 +6,8 @@
         "manuscript_editor",
         "publishing_tools",
         "citation/reference_manager"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

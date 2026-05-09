@@ -2,18 +2,82 @@ const fs = require('fs');
 const path = require('path');
 
 const professions = [
+    { 
+        name: 'accountant', 
+        tools: 'Ledger system, tax compliance modules, balance sheet generator, audit tools',
+        rules: 'Ind-AS, GST, Income Tax Act, Companies Act',
+        calculators: 'GST, TDS, depreciation, advance tax',
+        algorithms: 'Automated ledger balancing, audit trail generation, tax filing optimization'
+    },
+    { 
+        name: 'doctor', 
+        tools: 'Patient records, prescription management, lab results integration, telemedicine tools',
+        rules: 'Medical Council of India guidelines, Ayushman Bharat protocols',
+        calculators: 'Dosage, BMI, medical billing',
+        algorithms: 'Patient record indexing, diagnostic prediction, lab result interpretation'
+    },
+    { 
+        name: 'lawyer', 
+        tools: 'Case indexing, legal references, compliance document management, secure communication',
+        rules: 'IPC, CrPC, Contract Act, Evidence Act',
+        calculators: 'Court fee, stamp duty',
+        algorithms: 'Case law search, compliance checker, automated legal drafting'
+    },
+    { 
+        name: 'engineer', 
+        tools: 'Compilers, CAD tools, simulation engines, project management dashboards',
+        rules: 'Bureau of Indian Standards (BIS), IS codes',
+        calculators: 'Structural load, electrical circuit, fluid mechanics',
+        algorithms: 'CAD simulation, stress analysis, project scheduling'
+    },
+    { 
+        name: 'farmer', 
+        tools: 'Crop management, weather forecasting, supply chain integration, IoT sensor sync',
+        rules: 'PM-Kisan, crop insurance, subsidy schemes',
+        calculators: 'Fertilizer, irrigation water, yield cost',
+        algorithms: 'Yield prediction, weather forecasting, supply chain optimization'
+    },
+    { 
+        name: 'teacher', 
+        tools: 'Lesson planning, grading system, student records, virtual classroom tools',
+        rules: 'CBSE/NCERT curriculum, UGC guidelines',
+        calculators: 'Grade average, attendance tracker',
+        algorithms: 'Adaptive learning paths, exam paper generator'
+    },
+    { 
+        name: 'banker', 
+        tools: 'Loan management, compliance, transaction dashboards',
+        rules: 'RBI guidelines, Basel norms',
+        calculators: 'EMI, loan interest, NPA provisioning',
+        algorithms: 'Risk scoring, fraud detection, portfolio optimization'
+    },
+    { 
+        name: 'civil_servant', 
+        tools: 'Policy tools, compliance, citizen records',
+        rules: 'Service rules, policy drafting guidelines',
+        calculators: 'Budget allocation, pension, pay scale',
+        algorithms: 'Policy impact simulation, citizen data indexing'
+    },
+    { 
+        name: 'entrepreneur', 
+        tools: 'Business planning, financial dashboards, CRM tools',
+        rules: 'Startup India compliance, MCA rules',
+        calculators: 'Break-even, ROI, funding valuation',
+        algorithms: 'Business plan optimizer, CRM automation'
+    },
+    { 
+        name: 'scientist', 
+        tools: 'Data analysis suite, lab notebooks, simulation modules, visualization tools',
+        rules: 'Research ethics, lab safety protocols',
+        calculators: 'Statistical significance, molarity, physics constants',
+        algorithms: 'Simulation engines, data visualization, AI model training'
+    },
+    // Standard professions
     { name: 'cashier', tools: 'POS interface, barcode scanner integration, receipt printing, inventory sync, daily reconciliation' },
-    { name: 'accountant', tools: 'Ledger system, tax compliance modules, balance sheet generator, audit tools' },
-    { name: 'doctor', tools: 'Patient records, prescription management, lab results integration, telemedicine tools' },
-    { name: 'engineer', tools: 'Compilers, CAD tools, simulation engines, project management dashboards' },
-    { name: 'lawyer', tools: 'Case indexing, legal references, compliance document management, secure communication' },
-    { name: 'teacher', tools: 'Lesson planning, grading system, student records, virtual classroom tools' },
     { name: 'student', tools: 'Study planner, flashcards, assignment tracker, research tools' },
-    { name: 'scientist', tools: 'Data analysis suite, lab notebooks, simulation modules, visualization tools' },
     { name: 'artist', tools: 'Creative suite (drawing, design, video editing), portfolio manager, media export tools' },
     { name: 'journalist', tools: 'Research tools, publishing suite, compliance checks, transcription tools' },
     { name: 'pilot', tools: 'Flight logs, navigation systems, simulation modules, weather sync' },
-    { name: 'farmer', tools: 'Crop management, weather forecasting, supply chain integration, IoT sensor sync' },
     { name: 'software_dev', tools: 'IDE, version control (Git), CI/CD pipelines, debugging tools' },
     { name: 'researcher', tools: 'Data mining, citation management, analytics dashboards, visualization' },
     { name: 'retail_manager', tools: 'Inventory management, staff scheduling, sales dashboards, supply chain tools' },
@@ -28,7 +92,6 @@ const professions = [
     { name: 'writer', tools: 'Manuscript editor, publishing tools, citation/reference manager' },
     { name: 'designer', tools: 'Wireframing tools, prototyping, accessibility testing' },
     { name: 'data_analyst', tools: 'Data visualization, statistical analysis, machine learning integration' },
-    { name: 'entrepreneur', tools: 'Business planning, financial dashboards, CRM tools' },
     { name: 'hr_manager', tools: 'Employee records, payroll, compliance, recruitment tools' },
     { name: 'healthcare_admin', tools: 'Hospital management dashboards, compliance, scheduling' },
     { name: 'ai_ml_scientist', tools: 'Model training, dataset management, GPU orchestration' },
@@ -36,8 +99,6 @@ const professions = [
     { name: 'videographer', tools: 'Video editing suite, rendering tools, streaming integration' },
     { name: 'athlete_coach', tools: 'Training planner, performance analytics, health monitoring' },
     { name: 'event_planner', tools: 'Scheduling, resource allocation, ticketing, communication tools' },
-    { name: 'banker', tools: 'Loan management, compliance, transaction dashboards' },
-    { name: 'civil_servant', tools: 'Policy tools, compliance, citizen records' },
     { name: 'biotech_scientist', tools: 'Lab management, DNA analysis, compliance' },
     { name: 'physicist', tools: 'Simulation engines, data visualization, research notebooks' },
     { name: 'chemist', tools: 'Molecular modeling, lab notebooks, compliance' },
@@ -68,7 +129,6 @@ const professions = [
     { name: 'archaeologist', tools: 'Artifact cataloging, GIS mapping, compliance' },
     { name: 'anthropologist', tools: 'Survey tools, cultural data visualization' },
     { name: 'linguist', tools: 'Corpus analysis, visualization, compliance' },
-    // New professions
     { name: 'dentist', tools: 'Dental charting, X-ray viewer, appointment scheduler, medical compliance' },
     { name: 'pharmacist', tools: 'Prescription management, drug interaction checker, inventory control, compliance' },
     { name: 'veterinarian', tools: 'Animal patient records, lab results, scheduling, veterinary standards' },
@@ -91,14 +151,22 @@ professions.forEach(prof => {
     }
 
     // tools.md
-    fs.writeFileSync(path.join(profDir, 'tools.md'), `# 🛠 ${prof.name.toUpperCase()} Tools\n\nRequired Tools & Functions:\n- ${prof.tools.split(', ').join('\n- ')}`);
+    let toolsMd = `# 🛠 ${prof.name.toUpperCase()} Tools\n\nRequired Tools & Functions:\n- ${prof.tools.split(', ').join('\n- ')}`;
+    if (prof.rules) toolsMd += `\n\n## 📜 Compliance Rules\n- ${prof.rules.split(', ').join('\n- ')}`;
+    if (prof.calculators) toolsMd += `\n\n## 🧮 Professional Calculators\n- ${prof.calculators.split(', ').join('\n- ')}`;
+    if (prof.algorithms) toolsMd += `\n\n## 🧬 Core Algorithms\n- ${prof.algorithms.split(', ').join('\n- ')}`;
+    
+    fs.writeFileSync(path.join(profDir, 'tools.md'), toolsMd);
 
     // config.json
     const config = {
         profession: prof.name,
         compliance_level: 'sovereign-high',
         resource_priority: 'adaptive',
-        modules: prof.tools.split(', ').map(t => t.toLowerCase().replace(/ /g, '_'))
+        modules: prof.tools.split(', ').map(t => t.toLowerCase().replace(/ /g, '_')),
+        rules: prof.rules ? prof.rules.split(', ') : [],
+        calculators: prof.calculators ? prof.calculators.split(', ') : [],
+        algorithms: prof.algorithms ? prof.algorithms.split(', ') : []
     };
     fs.writeFileSync(path.join(profDir, 'config.json'), JSON.stringify(config, null, 4));
 });

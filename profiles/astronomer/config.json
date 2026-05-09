@@ -6,5 +6,8 @@
         "telescope_data_integration",
         "simulation",
         "visualization"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }

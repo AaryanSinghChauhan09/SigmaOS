@@ -6,5 +6,8 @@
         "booking_systems",
         "staff_scheduling",
         "customer_service_dashboards"
-    ]
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
 }
