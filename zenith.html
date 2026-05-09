@@ -1,16 +1,17 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Σ SIGMAOS: SOVEREIGN ZENITH</title>
+    <title>Î£ SIGMAOS: SOVEREIGN ZENITH</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="zenith_desktop.css">
+<link rel="stylesheet" href="ui/themes/zenith_inline.css">
     <style>
         @keyframes shatter {
             0% { transform: scale(1) rotate(0); opacity: 1; filter: blur(0); }
@@ -83,7 +84,7 @@
         }
     </style>
     <script>
-        /* Σ Neural UI Layout Engine (NeuralWM) */
+        /* Î£ Neural UI Layout Engine (NeuralWM) */
         class NeuralLayoutEngine {
             constructor() {
                 this.interactions = {};
@@ -102,12 +103,12 @@
             }
             setMindfulness(active) {
                 document.body.classList.toggle('focus-mode-active', active);
-                addLog(active ? 'Î£ [NEURAL]: Mindfulness Mode ACTIVE. Filtering noise...' : 'Î£ [NEURAL]: Mindfulness Mode DISABLED.');
+                addLog(active ? 'ÃŽÂ£ [NEURAL]: Mindfulness Mode ACTIVE. Filtering noise...' : 'ÃŽÂ£ [NEURAL]: Mindfulness Mode DISABLED.');
             }
         }
         const neural = new NeuralLayoutEngine();
 
-        /* Σ Personalization & Theme Orchestration */
+        /* Î£ Personalization & Theme Orchestration */
         class PersonalizationEngine {
             constructor() {
                 this.registry = JSON.parse(localStorage.getItem('sigma_registry') || '{}');
@@ -124,7 +125,7 @@
             apply() {
                 const theme = this.registry.theme || 'cyan';
                 document.body.setAttribute('data-theme', theme);
-                addLog(`Σ [PERSONAL]: Shifting lattice hue to ${theme}...`, 'success');
+                addLog(`Î£ [PERSONAL]: Shifting lattice hue to ${theme}...`, 'success');
             }
         }
         const persona = new PersonalizationEngine();
@@ -143,7 +144,7 @@
             setTimeout(() => win.remove(), 400);
         }
 
-        /* Σ Zenith Window Manager (ZenithWM) Logic */
+        /* Î£ Zenith Window Manager (ZenithWM) Logic */
         class ZenithWM {
             constructor() {
                 this.windows = [];
@@ -176,7 +177,7 @@
     <!-- Start Menu -->
     <div class="start-menu" id="start-menu">
         <div class="start-header">
-            <div class="user-avatar">Σ</div>
+            <div class="user-avatar">Î£</div>
             <div class="user-info">
                 <div class="user-name" id="menu-user-name">Sovereign_User</div>
                 <div class="user-status">Authorized Shard Master</div>
@@ -184,26 +185,26 @@
             <div class="window-controls">
                 </div>
                 <div class="start-item" onclick="launchApp('Utility Nexus')">
-                    <span class="icon">🛠️</span>
+                    <span class="icon">ðŸ› ï¸</span>
                     <span>Utility Nexus</span>
                 </div>
             </div>
             <div class="start-section">
                 <div class="section-title">System Shards</div>
                 <div class="start-item">
-                    <span class="icon">⚙️</span>
+                    <span class="icon">âš™ï¸</span>
                     <span>Lattice Settings</span>
                 </div>
                 <div class="start-item">
-                    <span class="icon">📈</span>
+                    <span class="icon">ðŸ“ˆ</span>
                     <span>Performance Matrix</span>
                 </div>
                 <div class="start-item" onclick="toggleStart()">
-                    <span class="icon">🚀</span>
+                    <span class="icon">ðŸš€</span>
                     <span>Live Boot Nexus</span>
                 </div>
                 <div class="start-item" onclick="toggleStart()">
-                    <span class="icon">☁️</span>
+                    <span class="icon">â˜ï¸</span>
                     <span>Hypervisor Shard</span>
                 </div>
             </div>
@@ -216,14 +217,14 @@
     <!-- Universal Search System (Futuristic) -->
     <div class="command-palette hidden" id="command-center">
         <div class="palette-header">
-            <span class="icon">🔍</span>
+            <span class="icon">ðŸ”</span>
             <input type="text" class="command-input" placeholder="Neural Search: Files, Apps, AI Prompts..." id="universal-search-input" aria-label="Universal Search">
         </div>
         <div class="command-results" id="command-results">
             <!-- Results dynamically injected -->
         </div>
         <div class="palette-footer">
-            <span>↑↓ to Navigate</span>
+            <span>â†‘â†“ to Navigate</span>
             <span>Enter to Execute</span>
             <span>Esc to Dismiss</span>
         </div>
@@ -242,7 +243,7 @@
             <div id="clock-date">Tuesday, April 28</div>
         </div>
         <div class="persona-indicator" onclick="launchApp('Lattice Settings')">
-            <div class="persona-avatar">Σ</div>
+            <div class="persona-avatar">Î£</div>
             <span id="top-user-name">Sovereign_User</span>
         </div>
     </div>
@@ -255,19 +256,19 @@
     <!-- Sigma AI Assistant Sidebar -->
     <div class="sidebar hidden" id="sigma-sidebar">
         <div class="sidebar-header">
-            <h3>🦞 CLAW GATEWAY</h3>
-            <button class="close-btn" onclick="toggleSidebar()">×</button>
+            <h3>ðŸ¦ž CLAW GATEWAY</h3>
+            <button class="close-btn" onclick="toggleSidebar()">Ã—</button>
         </div>
         <div class="sidebar-content" id="ai-assistant-log">
             <div class="ai-chat-line bot">Sovereign Claw Gateway initialized. Sandboxed AI Automation is standing by.</div>
         </div>
         <!-- Live Canvas Area -->
-        <div class="live-canvas-area" id="live-canvas-area" style="min-height: 150px; background: rgba(0,0,0,0.5); border-top: 1px solid rgba(0,255,255,0.2); border-bottom: 1px solid rgba(0,255,255,0.2); padding: 10px; font-size: 0.85em; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-            <div style="color: var(--text-muted);">[ Live Canvas - Awaiting Agent Tools ]</div>
+        <div class="live-canvas-area" id="live-canvas-area" class="zen-live-canvas-inner">
+            <div class="zen-text-muted-label">[ Live Canvas - Awaiting Agent Tools ]</div>
         </div>
         <div class="sidebar-footer">
             <input type="text" id="ai-chat-input" placeholder="Execute AI workflow..." aria-label="AI Chat Input">
-            <button onclick="sendAiChat()">→</button>
+            <button onclick="sendAiChat()">â†’</button>
         </div>
     </div>
 
@@ -290,7 +291,7 @@
                 <div class="thermal-shard ts-7"></div>
                 <div class="thermal-shard ts-8"></div>
             </div>
-            <div class="stat-label">Avg Temp: 34°C (Optimal)</div>
+            <div class="stat-label">Avg Temp: 34Â°C (Optimal)</div>
         </div>
 
         <!-- Sovereign Trust Fabric Widget -->
@@ -313,14 +314,14 @@
                 <span>Orb Marketplace</span>
                 <span class="accent">Mesh-Live</span>
             </div>
-            <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
-                <div class="market-item" style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; font-size: 0.8em; display: flex; justify-content: space-between; align-items: center;">
+            <div class="zen-shard-list">
+                <div class="market-item" class="zen-market-item-inner">
                     <span>NeuralVisualizer-v2</span>
-                    <button class="cyber-btn small-btn primary" onclick="addLog('Σ [MARKET]: Summoning Shard...')">SUMMON</button>
+                    <button class="cyber-btn small-btn primary" onclick="addLog('Î£ [MARKET]: Summoning Shard...')">SUMMON</button>
                 </div>
-                <div class="market-item" style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; font-size: 0.8em; display: flex; justify-content: space-between; align-items: center;">
+                <div class="market-item" class="zen-market-item-inner">
                     <span>BioFS-DNA-Module</span>
-                    <button class="cyber-btn small-btn primary" onclick="addLog('Σ [MARKET]: Summoning Shard...')">SUMMON</button>
+                    <button class="cyber-btn small-btn primary" onclick="addLog('Î£ [MARKET]: Summoning Shard...')">SUMMON</button>
                 </div>
             </div>
             <div class="audit-info">Trending: QuantumSieve-PQC</div>
@@ -332,23 +333,23 @@
                 <span>App Sharding Matrix</span>
                 <span class="accent">Lattice-Dist</span>
             </div>
-            <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
-                <div class="app-shard-item" style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; font-size: 0.8em;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+            <div class="zen-shard-list">
+                <div class="app-shard-item" class="zen-app-shard-inner">
+                    <div class="zen-shard-row">
                         <span>OmniShell-v5</span>
                         <span class="accent">4 Shards</span>
                     </div>
-                    <div class="stat-bar" style="height: 4px;">
-                        <div class="stat-progress primary" style="width: 100%;"></div>
+                    <div class="stat-bar" class="zen-stat-bar-thin">
+                        <div class="stat-progress primary" class="zen-stat-full"></div>
                     </div>
                 </div>
-                <div class="app-shard-item" style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; font-size: 0.8em;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <div class="app-shard-item" class="zen-app-shard-inner">
+                    <div class="zen-shard-row">
                         <span>Zenith-Desktop-Pro</span>
                         <span class="accent">12 Shards</span>
                     </div>
-                    <div class="stat-bar" style="height: 4px;">
-                        <div class="stat-progress primary" style="width: 85%;"></div>
+                    <div class="stat-bar" class="zen-stat-bar-thin">
+                        <div class="stat-progress primary" class="zen-stat-85"></div>
                     </div>
                 </div>
             </div>
@@ -356,23 +357,23 @@
         </div>
 
         <!-- Live Kernel Console Shard -->
-        <div class="kernel-console-shard" id="kernel-console" style="position: fixed; bottom: 60px; right: 20px; width: 350px; height: 220px; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); border: 1px solid rgba(0,255,255,0.2); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000;">
-            <div style="background: rgba(255,255,255,0.05); padding: 8px 12px; font-size: 0.7em; color: var(--accent); display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <div class="kernel-console-shard" id="kernel-console" class="zen-kernel-console-panel">
+            <div class="zen-console-header-bar">
                 <span>LIVE KERNEL TELEMETRY</span>
                 <span>SHARD-ID: 0x8F2</span>
             </div>
-            <div id="console-output" style="flex: 1; padding: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.75em; color: rgba(255,255,255,0.8); overflow-y: auto;">
-                <div>[0.000] Σ [ORCHESTRATOR]: Sharding Foundation...</div>
-                <div>[0.012] Σ [PMM]: Silicon Memory Shard ONLINE.</div>
-                <div>[0.045] Σ [VMM]: PML4 Tables Orchestrated.</div>
-                <div>[0.102] Σ [SEL]: Zero-Trust Policy Active.</div>
-                <div>[0.158] Σ [SYSBRIDGE]: POSIX-lite Shards Ready.</div>
-                <div>[0.210] Σ [LATTICE]: Heartbeat Sync Active.</div>
-                <div>[0.255] Σ [QKD]: BB84 Quantum Lattice Established.</div>
-                <div>[0.312] Σ [TRUST]: Fabric Unified & Sealed.</div>
-                <div>[0.380] Σ [APP-SHARD]: OmniShell Partitioned (4 Shards).</div>
-                <div>[0.445] Σ [PREDICT]: Shard Dispatch -> Node-0x8F (2ms).</div>
-                <div>[0.512] Σ [LATTICE]: Application Fabric ONLINE.</div>
+            <div id="console-output" class="zen-console-output-area">
+                <div>[0.000] Î£ [ORCHESTRATOR]: Sharding Foundation...</div>
+                <div>[0.012] Î£ [PMM]: Silicon Memory Shard ONLINE.</div>
+                <div>[0.045] Î£ [VMM]: PML4 Tables Orchestrated.</div>
+                <div>[0.102] Î£ [SEL]: Zero-Trust Policy Active.</div>
+                <div>[0.158] Î£ [SYSBRIDGE]: POSIX-lite Shards Ready.</div>
+                <div>[0.210] Î£ [LATTICE]: Heartbeat Sync Active.</div>
+                <div>[0.255] Î£ [QKD]: BB84 Quantum Lattice Established.</div>
+                <div>[0.312] Î£ [TRUST]: Fabric Unified & Sealed.</div>
+                <div>[0.380] Î£ [APP-SHARD]: OmniShell Partitioned (4 Shards).</div>
+                <div>[0.445] Î£ [PREDICT]: Shard Dispatch -> Node-0x8F (2ms).</div>
+                <div>[0.512] Î£ [LATTICE]: Application Fabric ONLINE.</div>
             </div>
         </div>
 
@@ -672,10 +673,10 @@
             </div>
             <div class="stat-value" id="auto-task-count">0 Tasks Active</div>
             <div class="stat-label" id="auto-current-task">Next: Idle</div>
-            <div class="cognitive-queue" id="cognitive-queue" style="margin-top: 10px; max-height: 40px; overflow: hidden; font-size: 0.8em; color: var(--accent);">
+            <div class="cognitive-queue" id="cognitive-queue" class="zen-cognitive-queue-inner">
                 <!-- Tasks generated by JS -->
             </div>
-            <div class="stat-bar"><div class="stat-progress stat-progress--automator" id="auto-progress" style="width: 0%;"></div></div>
+            <div class="stat-bar"><div class="stat-progress stat-progress--automator" id="auto-progress" class="zen-stat-zero"></div></div>
         </div>
 
         <div class="widget voice">
@@ -711,7 +712,7 @@
                 <span class="accent">P2P Discovery</span>
             </div>
             <div class="mesh-topology-view" id="mesh-view">
-                <svg id="mesh-svg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></svg>
+                <svg id="mesh-svg" class="zen-mesh-overlay-svg"></svg>
                 <!-- Nodes generated by JS -->
             </div>
             <div class="stat-label mt-10">Nodes Discovered: <span class="accent" id="peer-count">0</span></div>
@@ -727,7 +728,7 @@
             <div class="stat-value" id="dna-savings">0 MB</div>
             <div class="stat-label">SELF-HEALING: <span class="accent">ACTIVE</span></div>
             <div class="stat-bar">
-                <div class="stat-progress" style="width: 75%; background: var(--success); box-shadow: 0 0 10px var(--success);"></div>
+                <div class="stat-progress" class="zen-auto-1"></div>
             </div>
         </div>
 
@@ -740,7 +741,7 @@
             <div class="stat-value" id="qkd-status">Entangled</div>
             <div class="stat-label">EAVESDROP DETECT: <span class="accent">ENABLED</span></div>
             <div class="stat-bar">
-                <div class="stat-progress" style="width: 100%; background: var(--accent); box-shadow: 0 0 15px var(--accent-glow);"></div>
+                <div class="stat-progress" class="zen-auto-2"></div>
             </div>
         </div>
 
@@ -753,7 +754,7 @@
             <div class="stat-value" id="silicon-isa">RISC-V (RV64GC)</div>
             <div class="stat-label">Driver Transpilation: <span class="accent" id="transpiled-count">0</span> Active</div>
             <div class="stat-bar">
-                <div class="stat-progress" style="width: 100%; background: var(--success); box-shadow: 0 0 10px var(--success);"></div>
+                <div class="stat-progress" class="zen-auto-3"></div>
             </div>
         </div>
 
@@ -766,7 +767,7 @@
             <div class="stat-value" id="orb-active">Idle</div>
             <div class="stat-label">Trust Status: <span class="status-success" id="orb-trust">QKD-VERIFIED</span></div>
             <div class="stat-bar">
-                <div class="stat-progress" id="orb-progress" style="width: 0%; background: var(--accent); box-shadow: 0 0 10px var(--accent-glow);"></div>
+                <div class="stat-progress" id="orb-progress" class="zen-auto-4"></div>
             </div>
         </div>
 
@@ -779,7 +780,7 @@
             <div class="stat-value" id="gov-active">0 Active Proposals</div>
             <div class="stat-label">Last Vote: <span class="status-success" id="gov-vote">YEA (QKD-VERIFIED)</span></div>
             <div class="stat-bar">
-                <div class="stat-progress" id="gov-progress" style="width: 50%; background: var(--success); box-shadow: 0 0 10px var(--success);"></div>
+                <div class="stat-progress" id="gov-progress" class="zen-auto-5"></div>
             </div>
         </div>
 
@@ -804,7 +805,7 @@
             <div class="stat-label">Lattice Parallelism: <span class="status-success">OPTIMIZED (APIC)</span></div>
             <div class="stat-label">IPI Latency: <span class="accent">~150ns</span></div>
             <div class="stat-bar">
-                <div class="stat-progress" style="width: 100%; background: linear-gradient(90deg, var(--accent), var(--success)); box-shadow: 0 0 10px var(--accent-glow);"></div>
+                <div class="stat-progress" class="zen-auto-6"></div>
             </div>
         </div>
 
@@ -815,10 +816,10 @@
                 <span class="accent">Lattice-IP</span>
             </div>
             <div class="stat-value" id="net-status">CONNECTED</div>
-            <div class="stat-label">Lattice-IP: <span class="accent">10.0.0.Σ</span></div>
+            <div class="stat-label">Lattice-IP: <span class="accent">10.0.0.Î£</span></div>
             <div class="stat-label">Protocols: <span class="accent">TCP, UDP, ICMP</span></div>
             <div class="stat-bar">
-                <div class="stat-progress primary" style="width: 100%;"></div>
+                <div class="stat-progress primary" class="zen-stat-full"></div>
             </div>
         </div>
 
@@ -832,7 +833,7 @@
             <div class="stat-label">Identity: <span class="accent">Sovereign_User</span></div>
             <div class="stat-label">Auth Mode: <span class="accent">Secure Element</span></div>
             <div class="stat-bar">
-                <div class="stat-progress security" style="width: 100%;"></div>
+                <div class="stat-progress security" class="zen-stat-full"></div>
             </div>
         </div>
     </div>
@@ -840,7 +841,7 @@
     <!-- Utility Nexus Window -->
     <div class="window" id="utility-nexus-win">
         <div class="window-header">
-            <div class="window-title">Σ Utility Nexus v2.0</div>
+            <div class="window-title">Î£ Utility Nexus v2.0</div>
             <div class="window-controls">
                 <div class="win-btn minimize" onclick="minimizeWindow('utility-nexus-win')"></div>
                 <div class="win-btn close" onclick="closeWindow('utility-nexus-win')"></div>
@@ -963,8 +964,8 @@
                 </div>
                 <div id="util-broadcaster" class="hidden-shard">
                     <h3>Prompt Broadcaster</h3>
-                    <textarea id="util-broadcast-prompt" class="util-input" placeholder="Enter prompt to broadcast..." style="height: 100px !important;"></textarea>
-                    <textarea id="util-broadcast-sites" class="util-input" placeholder="Enter site URLs (one per line, use {{prompt}} as placeholder)..." style="height: 120px !important;">https://www.perplexity.ai/search?q={{prompt}}
+                    <textarea id="util-broadcast-prompt" class="util-input" placeholder="Enter prompt to broadcast..." class="zen-auto-7"></textarea>
+                    <textarea id="util-broadcast-sites" class="util-input" placeholder="Enter site URLs (one per line, use {{prompt}} as placeholder)..." class="zen-auto-8">https://www.perplexity.ai/search?q={{prompt}}
 https://www.google.com/search?q={{prompt}}
 https://chatgpt.com/?q={{prompt}}</textarea>
                     <div class="util-actions">
@@ -974,17 +975,17 @@ https://chatgpt.com/?q={{prompt}}</textarea>
                 <div id="util-firewall" class="hidden-shard">
                     <h3>Aether Firewall (Site Blocker)</h3>
                     <p class="stat-label">Block domains at the lattice level to preserve focus.</p>
-                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                        <input type="text" id="firewall-input" class="util-input" placeholder="Enter domain (e.g. twitter.com)..." style="height: 45px !important; margin: 0;">
-                        <button class="util-btn" onclick="addBlockRule()" style="height: 45px;">BLOCK</button>
+                    <div class="zen-auto-9">
+                        <input type="text" id="firewall-input" class="util-input" placeholder="Enter domain (e.g. twitter.com)..." class="zen-auto-10">
+                        <button class="util-btn" onclick="addBlockRule()" class="zen-auto-11">BLOCK</button>
                     </div>
-                    <ul id="blocked-list" class="workflow-list" style="max-height: 200px; overflow-y: auto;">
+                    <ul id="blocked-list" class="workflow-list" class="zen-auto-12">
                         <li class="routine-item routine-border-magenta"><strong>facebook.com</strong> <button class="cyber-btn small-btn" onclick="this.parentElement.remove()">UNBLOCK</button></li>
                     </ul>
 
                 <div id="util-neural-hub" class="hidden-shard">
                     <h3>Zero-Configuration AI Hub</h3>
-                    <p class="stat-label">Local-only LLM Shard (1.2B Parameters) — Sovereign Intelligence.</p>
+                    <p class="stat-label">Local-only LLM Shard (1.2B Parameters) â€” Sovereign Intelligence.</p>
                     <div class="ai-hub-container">
 
                         <div class="ai-search-box">
@@ -1019,7 +1020,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
     <!-- Markup Forge Window -->
     <div class="window" id="markup-forge-win">
         <div class="window-header">
-            <div class="window-title">Σ Markup Forge v1.0</div>
+            <div class="window-title">Î£ Markup Forge v1.0</div>
             <div class="window-controls">
                 <div class="win-btn minimize" onclick="minimizeWindow('markup-forge-win')"></div>
                 <div class="win-btn close" onclick="closeWindow('markup-forge-win')"></div>
@@ -1043,7 +1044,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
     <!-- Sovereign Terminal Window -->
     <div class="window" id="terminal-win">
         <div class="window-header">
-            <div class="window-title">Σ Sovereign Terminal v5.1</div>
+            <div class="window-title">Î£ Sovereign Terminal v5.1</div>
             <div class="window-controls">
                 <div class="win-btn minimize" onclick="minimizeWindow('terminal-win')"></div>
                 <div class="win-btn close" onclick="closeWindow('terminal-win')"></div>
@@ -1063,7 +1064,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
     <!-- File Manager Window -->
     <div class="window" id="file-manager-win">
         <div class="window-header">
-            <div class="window-title">Σ Sovereign File Manager</div>
+            <div class="window-title">Î£ Sovereign File Manager</div>
             <div class="window-controls">
                 <div class="win-btn minimize" onclick="minimizeWindow('file-manager-win')"></div>
                 <div class="win-btn close" onclick="closeWindow('file-manager-win')"></div>
@@ -1072,9 +1073,9 @@ https://chatgpt.com/?q={{prompt}}</textarea>
         <div class="window-content">
             <div class="fm-container">
                 <div class="fm-toolbar">
-                    <button class="util-btn" onclick="fmBack()">← BACK</button>
+                    <button class="util-btn" onclick="fmBack()">â† BACK</button>
                     <div class="fm-breadcrumbs" id="fm-breadcrumbs">/home/sovereign</div>
-                    <button class="util-btn" onclick="vfs.save(); addLog('Σ [FS]: Manual Sync Complete.', 'success')">SYNC</button>
+                    <button class="util-btn" onclick="vfs.save(); addLog('Î£ [FS]: Manual Sync Complete.', 'success')">SYNC</button>
                 </div>
                 <div class="fm-grid" id="fm-grid">
                     <!-- Files will be injected here -->
@@ -1087,7 +1088,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
 
     <div class="window" id="marketplace-win">
         <div class="window-header">
-            <div class="window-title">Σ Sovereign Marketplace</div>
+            <div class="window-title">Î£ Sovereign Marketplace</div>
             <div class="window-controls">
                 <div class="win-btn minimize" onclick="minimizeWindow('marketplace-win')"></div>
                 <div class="win-btn close" onclick="closeWindow('marketplace-win')"></div>
@@ -1098,19 +1099,19 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             <p class="stat-label">Verified PQC bundles ready for lattice injection.</p>
             <div class="mkt-grid">
                 <div class="mkt-item">
-                    <div class="mkt-icon">🚀</div>
+                    <div class="mkt-icon">ðŸš€</div>
                     <div class="mkt-name">HyperBoost</div>
                     <div class="mkt-desc">Sub-10ms context switching shard.</div>
                     <button class="util-btn" onclick="installShard('HyperBoost')">INJECT</button>
                 </div>
                 <div class="mkt-item">
-                    <div class="mkt-icon">🛡️</div>
+                    <div class="mkt-icon">ðŸ›¡ï¸</div>
                     <div class="mkt-name">Amnesic-X</div>
                     <div class="mkt-desc">Zero-trace artifact scrubbing engine.</div>
                     <button class="util-btn" onclick="installShard('Amnesic-X')">INJECT</button>
                 </div>
                 <div class="mkt-item">
-                    <div class="mkt-icon">🎨</div>
+                    <div class="mkt-icon">ðŸŽ¨</div>
                     <div class="mkt-name">Glass-Pro</div>
                     <div class="mkt-desc">Advanced HSL-tailored blurring.</div>
                     <button class="util-btn" onclick="installShard('Glass-Pro')">INJECT</button>
@@ -1122,7 +1123,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
     <!-- Customization Window -->
     <div class="window" id="customization-win">
         <div class="window-header">
-            <div class="window-title">✨ Quantum Customization</div>
+            <div class="window-title">âœ¨ Quantum Customization</div>
             <div class="window-controls">
                 <div class="win-btn minimize" onclick="minimizeWindow('customization-win')"></div>
                 <div class="win-btn close" onclick="closeWindow('customization-win')"></div>
@@ -1133,39 +1134,39 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             <p class="stat-label">Tune the lattice AI-driven aesthetics and automation.</p>
             <div class="mkt-grid">
                 <div class="mkt-item" onclick="setTheme('gold')">
-                    <div class="mkt-icon">🌞</div>
+                    <div class="mkt-icon">ðŸŒž</div>
                     <div class="mkt-name">Solar Zenith</div>
                     <div class="mkt-desc">Daylight-adaptive energetic UI.</div>
                 </div>
                 <div class="mkt-item" onclick="setTheme('cyan')">
-                    <div class="mkt-icon">🌌</div>
+                    <div class="mkt-icon">ðŸŒŒ</div>
                     <div class="mkt-name">Neon Cyber</div>
                     <div class="mkt-desc">Deep-focus cyan glassmorphism.</div>
                 </div>
                 <div class="mkt-item" onclick="setTheme('crimson')">
-                    <div class="mkt-icon">🩸</div>
+                    <div class="mkt-icon">ðŸ©¸</div>
                     <div class="mkt-name">Crimson Shard</div>
                     <div class="mkt-desc">High-alert, performance-driven red.</div>
                 </div>
             </div>
 
-            <h3 style="margin-top: 30px;">Adaptive Workflow Engine</h3>
+            <h3 class="zen-auto-13">Adaptive Workflow Engine</h3>
             <p class="stat-label">Select a mode to optimize the lattice for specific workloads.</p>
 
 
 
             <div class="workflow-selector">
-                <button class="util-btn" onclick="setWorkflowMode('Gamer')">🎮 GAMER</button>
-                <button class="util-btn" onclick="setWorkflowMode('Creator')">🎨 CREATOR</button>
-                <button class="util-btn" onclick="setWorkflowMode('Streamer')">🎥 STREAMER</button>
-                <button class="util-btn" onclick="setWorkflowMode('Red Team')">🧨 RED TEAM</button>
-                <button class="util-btn" onclick="setWorkflowMode('Coding')">💻 CODING</button>
-                <button class="util-btn" onclick="setWorkflowMode('Minimal')">🍃 MINIMAL</button>
+                <button class="util-btn" onclick="setWorkflowMode('Gamer')">ðŸŽ® GAMER</button>
+                <button class="util-btn" onclick="setWorkflowMode('Creator')">ðŸŽ¨ CREATOR</button>
+                <button class="util-btn" onclick="setWorkflowMode('Streamer')">ðŸŽ¥ STREAMER</button>
+                <button class="util-btn" onclick="setWorkflowMode('Red Team')">ðŸ§¨ RED TEAM</button>
+                <button class="util-btn" onclick="setWorkflowMode('Coding')">ðŸ’» CODING</button>
+                <button class="util-btn" onclick="setWorkflowMode('Minimal')">ðŸƒ MINIMAL</button>
             </div>
 
 
 
-            <h3 style="margin-top: 30px;">Live Desktop Editor</h3>
+            <h3 class="zen-auto-13">Live Desktop Editor</h3>
             <div class="style-editor">
                 <div class="param-row">
                     <label for="live-blur">Glass Blur</label>
@@ -1191,7 +1192,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             <div class="ai-segment personalization-segment health-audit-view">
                 <div class="stat-label">Shard Integrity (999+ Units)</div>
                 <div class="health-bar-container">
-                    <div class="health-bar-fill" style="width: 100%;"></div>
+                    <div class="health-bar-fill" class="zen-stat-full"></div>
                 </div>
                 <div class="stat-label mt-10">Silicon-Direct Latency: <span class="accent">0.8ms</span></div>
             </div>
@@ -1232,34 +1233,34 @@ https://chatgpt.com/?q={{prompt}}</textarea>
     <!-- Desktop Icons -->
     <div class="desktop-icons">
         <div class="app-icon">
-            <div class="app-img">📚</div>
+            <div class="app-img">ðŸ“š</div>
             <div class="app-label">Scholar Zenith</div>
         </div>
         <div class="app-icon">
-            <div class="app-img">🛡️</div>
+            <div class="app-img">ðŸ›¡ï¸</div>
             <div class="app-label">Lattice Security</div>
         </div>
         <div class="app-icon">
-            <div class="app-img">☁️</div>
+            <div class="app-img">â˜ï¸</div>
             <div class="app-label">Cloud Maestro</div>
         </div>
         <div class="app-icon" onclick="launchApp('Markup Forge')">
-            <div class="app-img">📄</div>
+            <div class="app-img">ðŸ“„</div>
             <div class="app-label">Markup Forge</div>
         </div>
         <div class="app-icon">
-            <div class="app-img">⚙️</div>
+            <div class="app-img">âš™ï¸</div>
             <div class="app-label">Core Orchestrator</div>
         </div>
     </div>
 
-    <canvas id="zenith-framebuffer" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none;"></canvas>
+    <canvas id="zenith-framebuffer" class="zen-auto-14"></canvas>
     <div id="mouse-glow"></div>
 
     <!-- Sigma Command Center (Universal Palette) -->
     <div id="command-center" class="command-palette hidden">
         <div class="command-input-container">
-            <span class="command-prefix">Σ</span>
+            <span class="command-prefix">Î£</span>
             <input type="text" id="command-input" placeholder="Search files, apps, or AI actions... (Alt+Space)" autocomplete="off">
         </div>
         <div id="command-results" class="command-results">
@@ -1288,8 +1289,8 @@ https://chatgpt.com/?q={{prompt}}</textarea>
     <!-- Sigma Sidebar (Slide-out) -->
     <div id="sigma-sidebar" class="sidebar hidden">
         <div class="sidebar-header">
-            <h3>Σ Sovereign Companion</h3>
-            <button class="sidebar-close" onclick="toggleSidebar()">×</button>
+            <h3>Î£ Sovereign Companion</h3>
+            <button class="sidebar-close" onclick="toggleSidebar()">Ã—</button>
         </div>
         <div class="sidebar-content">
             <div class="sidebar-widget">
@@ -1325,13 +1326,13 @@ https://chatgpt.com/?q={{prompt}}</textarea>
     <!-- Sigma Settings Hub Window -->
     <div class="window" id="sigma-settings-win">
         <div class="window-header">
-            <div class="window-title">Σ Sigma Settings Hub</div>
+            <div class="window-title">Î£ Sigma Settings Hub</div>
             <div class="window-controls">
                 <div class="win-btn minimize" onclick="minimizeWindow('sigma-settings-win')"></div>
                 <div class="win-btn close" onclick="closeWindow('sigma-settings-win')"></div>
             </div>
         </div>
-        <div class="window-content" style="padding: 0;">
+        <div class="window-content" class="zen-auto-15">
             <div class="settings-container">
                 <div class="settings-sidebar">
                     <div class="settings-nav active" onclick="switchSettings('general')">General</div>
@@ -1363,30 +1364,30 @@ https://chatgpt.com/?q={{prompt}}</textarea>
     <!-- Sigma Capsule Library Window -->
     <div class="window" id="sigma-capsule-win">
         <div class="window-header">
-            <div class="window-title">Σ Sigma Capsule Library</div>
+            <div class="window-title">Î£ Sigma Capsule Library</div>
             <div class="window-controls">
                 <div class="win-btn minimize" onclick="minimizeWindow('sigma-capsule-win')"></div>
                 <div class="win-btn close" onclick="closeWindow('sigma-capsule-win')"></div>
             </div>
         </div>
-        <div class="window-content" style="padding: 20px;">
+        <div class="window-content" class="zen-auto-16">
             <div class="capsule-grid">
                 <div class="capsule-card" onclick="deployCapsule('AI Research')">
-                    <div class="capsule-icon">🧠</div>
+                    <div class="capsule-icon">ðŸ§ </div>
                     <div class="capsule-info">
                         <div class="capsule-name">AI Research</div>
                         <div class="capsule-desc">Jupyter, Ollama, Neural Hub</div>
                     </div>
                 </div>
                 <div class="capsule-card" onclick="deployCapsule('Hacker Lab')">
-                    <div class="capsule-icon">🧨</div>
+                    <div class="capsule-icon">ðŸ§¨</div>
                     <div class="capsule-info">
                         <div class="capsule-name">Hacker Lab</div>
                         <div class="capsule-desc">Metasploit, Nmap, OmniShell</div>
                     </div>
                 </div>
                 <div class="capsule-card" onclick="deployCapsule('Cyberpunk Dev')">
-                    <div class="capsule-icon">💻</div>
+                    <div class="capsule-icon">ðŸ’»</div>
                     <div class="capsule-info">
                         <div class="capsule-name">Cyberpunk Dev</div>
                         <div class="capsule-desc">VS Code, Docker, GitHub Desktop</div>
@@ -1400,20 +1401,20 @@ https://chatgpt.com/?q={{prompt}}</textarea>
 
 
     <div class="taskbar">
-        <div class="task-icon active" onclick="toggleStart()">Σ</div>
-        <div class="task-icon" onclick="launchApp('File Manager')">📂</div>
-        <div class="task-icon" onclick="launchApp('Sigma Browser')">🌐</div>
-        <div class="task-icon" onclick="launchApp('AI Assistant')">🧠</div>
-        <div class="task-icon" onclick="launchApp('OmniShell')">🖥️</div>
-        <div class="task-icon" onclick="launchApp('Markup Forge')">📄</div>
-        <div class="task-icon" onclick="launchApp('Utility Nexus')">🛠️</div>
-        <div class="task-icon" onclick="launchApp('Marketplace')">🛒</div>
+        <div class="task-icon active" onclick="toggleStart()">Î£</div>
+        <div class="task-icon" onclick="launchApp('File Manager')">ðŸ“‚</div>
+        <div class="task-icon" onclick="launchApp('Sigma Browser')">ðŸŒ</div>
+        <div class="task-icon" onclick="launchApp('AI Assistant')">ðŸ§ </div>
+        <div class="task-icon" onclick="launchApp('OmniShell')">ðŸ–¥ï¸</div>
+        <div class="task-icon" onclick="launchApp('Markup Forge')">ðŸ“„</div>
+        <div class="task-icon" onclick="launchApp('Utility Nexus')">ðŸ› ï¸</div>
+        <div class="task-icon" onclick="launchApp('Marketplace')">ðŸ›’</div>
         <div class="taskbar-divider"></div>
-        <div class="task-icon" id="turbo-toggle" onclick="toggleTurboMode()" title="Turbo Mode (NPWO)">🚀</div>
+        <div class="task-icon" id="turbo-toggle" onclick="toggleTurboMode()" title="Turbo Mode (NPWO)">ðŸš€</div>
         <div class="taskbar-divider"></div>
-        <div class="task-icon" onclick="toggleNotifications()">🔔</div>
-        <div class="task-icon" onclick="toggleHelp()">❓</div>
-        <div class="task-icon" onclick="toggleBatteryPanel()">🔋</div>
+        <div class="task-icon" onclick="toggleNotifications()">ðŸ””</div>
+        <div class="task-icon" onclick="toggleHelp()">â“</div>
+        <div class="task-icon" onclick="toggleBatteryPanel()">ðŸ”‹</div>
         <div class="taskbar-divider"></div>
         <div class="status-indicator-wasm" title="Silicon-WASM Nexus">
             <div class="pulse-dot"></div>
@@ -1451,7 +1452,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
         function setTheme(name) {
             document.body.className = name === 'cyan' ? '' : 'theme-' + name;
             const status = name.toUpperCase();
-            addLog(`Σ [CONFIG]: Shard Theme switched to ${status}.`, 'success');
+            addLog(`Î£ [CONFIG]: Shard Theme switched to ${status}.`, 'success');
             
             // Sync Persona Indicator
             const personaLabel = document.getElementById('persona-theme');
@@ -1474,14 +1475,14 @@ https://chatgpt.com/?q={{prompt}}</textarea>
         // Simulate Kernel Logs
         const logContainer = document.getElementById('kernel-logs');
         const logs = [
-            { t: "Σ [BOOT]: Sovereign Lattice Online.", c: "" },
-            { t: "Σ [SECURE]: PQC Shard Initialized (Lattice-V5).", c: "success" },
-            { t: "Σ [AUTO]: Neural Personalization active.", c: "" },
-            { t: "Σ [NET]: Cloud Maestro projected to EU-WEST-1.", c: "" },
-            { t: "Σ [KERN]: Memory Slab Shard mapped (64MB).", c: "success" },
-            { t: "Σ [AUDIT]: CPU Silicon Discovery: 16 Zenith Cores.", c: "" },
-            { t: "Σ [VGA]: Direct Framebuffer Projector Online.", c: "success" },
-            { t: "Σ [ZENITH]: Command Palette (Ctrl+K) ready.", c: "success" }
+            { t: "Î£ [BOOT]: Sovereign Lattice Online.", c: "" },
+            { t: "Î£ [SECURE]: PQC Shard Initialized (Lattice-V5).", c: "success" },
+            { t: "Î£ [AUTO]: Neural Personalization active.", c: "" },
+            { t: "Î£ [NET]: Cloud Maestro projected to EU-WEST-1.", c: "" },
+            { t: "Î£ [KERN]: Memory Slab Shard mapped (64MB).", c: "success" },
+            { t: "Î£ [AUDIT]: CPU Silicon Discovery: 16 Zenith Cores.", c: "" },
+            { t: "Î£ [VGA]: Direct Framebuffer Projector Online.", c: "success" },
+            { t: "Î£ [ZENITH]: Command Palette (Ctrl+K) ready.", c: "success" }
         ];
 
         function addLog(text, type) {
@@ -1508,12 +1509,12 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             const menu = document.getElementById('start-menu');
             menu.classList.toggle('active');
             if (menu.classList.contains('active')) {
-                addLog("Σ [ZENITH]: Start Menu Shard ACTIVE.", "success");
+                addLog("Î£ [ZENITH]: Start Menu Shard ACTIVE.", "success");
             }
         }
 
         function launchApp(app) {
-            addLog(`Σ [ZENITH]: Launching ${app} Shard...`, "success");
+            addLog(`Î£ [ZENITH]: Launching ${app} Shard...`, "success");
             if (app === 'Markup Forge') {
                 const win = document.getElementById('markup-forge-win');
                 win.style.display = 'block';
@@ -1548,12 +1549,12 @@ https://chatgpt.com/?q={{prompt}}</textarea>
 
         // Marketplace Logic
         function installShard(name) {
-            addLog(`Σ [PKG]: Fetching ${name} bundle...`, "success");
+            addLog(`Î£ [PKG]: Fetching ${name} bundle...`, "success");
             setTimeout(() => {
-                addLog(`Σ [PKG]: ${name} injected into lattice.`, "success");
+                addLog(`Î£ [PKG]: ${name} injected into lattice.`, "success");
                 if (name === 'Glass-Pro') {
                     document.body.style.backdropFilter = 'blur(40px)';
-                    addLog("Σ [CONFIG]: AVX-512 Shard Preempted for Glass-Pro.", "success");
+                    addLog("Î£ [CONFIG]: AVX-512 Shard Preempted for Glass-Pro.", "success");
                 }
             }, 1000);
         }
@@ -1564,7 +1565,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             event.currentTarget.classList.add('selected');
             document.getElementById('top-user-name').textContent = p + '_User';
             document.getElementById('menu-user-name').textContent = p + '_User';
-            addLog(`Σ [IDENTITY]: Persona set to ${p}.`, "success");
+            addLog(`Î£ [IDENTITY]: Persona set to ${p}.`, "success");
         }
 
         function nextStep(s) {
@@ -1574,7 +1575,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
 
         function completeWizard() {
             document.getElementById('wizard-overlay').style.display = 'none';
-            addLog("Σ [ZENITH]: Zenith Singularity Fully Initialized.", "success");
+            addLog("Î£ [ZENITH]: Zenith Singularity Fully Initialized.", "success");
         }
 
         // Auto-show wizard if not shown
@@ -1588,10 +1589,10 @@ https://chatgpt.com/?q={{prompt}}</textarea>
         function checkStatus() {
             const url = document.getElementById('status-url').value;
             const output = document.getElementById('status-output');
-            output.innerHTML = '<span style="color: var(--accent);">Checking silicon route to ' + url + '...</span>';
+            output.innerHTML = '<span class="zen-auto-17">Checking silicon route to ' + url + '...</span>';
             setTimeout(() => {
-                output.innerHTML = '<span style="color: var(--success);">✔ ' + url + ' is UP and responsive in the lattice.</span>';
-                addLog("Σ [UTILITY]: Route check complete for " + url, "success");
+                output.innerHTML = '<span class="zen-auto-18">âœ” ' + url + ' is UP and responsive in the lattice.</span>';
+                addLog("Î£ [UTILITY]: Route check complete for " + url, "success");
             }, 1500);
         }
 
@@ -1606,7 +1607,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
                 bar.style.width = progress + '%';
                 if (progress >= 100) {
                     clearInterval(interval);
-                    addLog("Σ [FLASH]: Bootable shard written successfully.", "success");
+                    addLog("Î£ [FLASH]: Bootable shard written successfully.", "success");
                 }
             }, 100);
         }
@@ -1614,17 +1615,17 @@ https://chatgpt.com/?q={{prompt}}</textarea>
         function convertTable() {
             const csv = document.getElementById('table-input').value;
             const rows = csv.split('\n');
-            let html = '<table style="width: 100%; border-collapse: collapse; font-size: 0.8em; color: white;">';
+            let html = '<table class="zen-auto-19">';
             rows.forEach((row, i) => {
                 html += '<tr>';
                 row.split(',').forEach(col => {
-                    html += `<td style="border: 1px solid rgba(255,255,255,0.1); padding: 8px; ${i===0?'background: rgba(0,255,255,0.1); font-weight: 800;':''}">${col.trim()}</td>`;
+                    html += `<td class="zen-auto-20">${col.trim()}</td>`;
                 });
                 html += '</tr>';
             });
             html += '</table>';
             document.getElementById('table-output').innerHTML = html;
-            addLog("Σ [UTILITY]: CSV-to-Table conversion complete.", "success");
+            addLog("Î£ [UTILITY]: CSV-to-Table conversion complete.", "success");
         }
 
         function switchUtil(utilId) {
@@ -1642,7 +1643,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
                 event.target.classList.add('active');
             }
             
-            addLog(`Σ [UTILITY]: Switching to ${utilId} module.`, "success");
+            addLog(`Î£ [UTILITY]: Switching to ${utilId} module.`, "success");
         }
 
         function findDuplicates() {
@@ -1652,7 +1653,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             words.forEach(w => counts[w] = (counts[w] || 0) + 1);
             const dups = Object.keys(counts).filter(w => counts[w] > 1);
             document.getElementById('dup-output').innerText = dups.length > 0 ? "Duplicates: " + dups.join(', ') : "No duplicates found.";
-            addLog("Σ [UTILITY]: Duplicate scan complete.", "success");
+            addLog("Î£ [UTILITY]: Duplicate scan complete.", "success");
         }
 
         function broadcastPromptUtility() {
@@ -1660,7 +1661,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             const sitesInput = document.getElementById('util-broadcast-sites');
             
             if (!promptInput.value.trim()) {
-                addLog("Σ [ERR]: Broadcast failed - No prompt.", "error");
+                addLog("Î£ [ERR]: Broadcast failed - No prompt.", "error");
                 return;
             }
 
@@ -1668,11 +1669,11 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             const sites = sitesInput.value.split('\n').map(s => s.trim()).filter(s => s.length > 0);
 
             if (sites.length === 0) {
-                addLog("Σ [ERR]: Broadcast failed - No sites.", "error");
+                addLog("Î£ [ERR]: Broadcast failed - No sites.", "error");
                 return;
             }
 
-            addLog(`Σ [ZENITH]: Broadcasting to ${sites.length} shards...`, "success");
+            addLog(`Î£ [ZENITH]: Broadcasting to ${sites.length} shards...`, "success");
             
             sites.forEach(site => {
                 const url = site.replace('{{prompt}}', prompt);
@@ -1689,7 +1690,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             li.className = "routine-item routine-border-magenta";
             li.innerHTML = `<strong>${input.value.trim()}</strong> <button class="cyber-btn small-btn" onclick="this.parentElement.remove()">UNBLOCK</button>`;
             list.prepend(li);
-            addLog(`Σ [FIREWALL]: Blocked access to ${input.value.trim()}.`, "error");
+            addLog(`Î£ [FIREWALL]: Blocked access to ${input.value.trim()}.`, "error");
             input.value = '';
         }
 
@@ -1700,7 +1701,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
 
         function updateGlassBlur(val) {
             document.documentElement.style.setProperty('--glass-blur', `blur(${val}px)`);
-            addLog(`Σ [CONFIG]: Glass Intensity set to ${val}px.`, "success");
+            addLog(`Î£ [CONFIG]: Glass Intensity set to ${val}px.`, "success");
         }
 
         function setWallpaper(src) {
@@ -1710,7 +1711,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             } else {
                 document.body.style.backgroundImage = `url('${src}')`;
             }
-            addLog(`Σ [CONFIG]: Wallpaper Shard updated.`, "success");
+            addLog(`Î£ [CONFIG]: Wallpaper Shard updated.`, "success");
         }
 
         window.addEventListener('keydown', (e) => {
@@ -1719,7 +1720,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             if (keyDisplay && document.getElementById('util-key-test').style.display !== 'none') {
                 keyDisplay.innerText = e.key.toUpperCase();
                 codeDisplay.innerText = "CODE: " + e.code;
-                addLog(`Σ [KEY-TEST]: Input detected: ${e.key}`, "success");
+                addLog(`Î£ [KEY-TEST]: Input detected: ${e.key}`, "success");
             }
         });
 
@@ -1733,7 +1734,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             }, 100);
             setTimeout(() => {
                 clearInterval(interval);
-                addLog(`Σ [SPEED]: Test complete. Result: ${speed} MBPS.`, "success");
+                addLog(`Î£ [SPEED]: Test complete. Result: ${speed} MBPS.`, "success");
             }, 3000);
         }
 
@@ -1745,13 +1746,13 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             } else {
                 output.innerText = "[{ \"data\": \"" + input + "\" }]";
             }
-            addLog(`Σ [UTILITY]: Data conversion complete.`, "success");
+            addLog(`Î£ [UTILITY]: Data conversion complete.`, "success");
         }
 
         function renderCode() {
             const code = document.getElementById('util-code-input').value;
             document.getElementById('code-render-box').innerText = code;
-            addLog("Σ [UTILITY]: Code-to-Image preview rendered.", "success");
+            addLog("Î£ [UTILITY]: Code-to-Image preview rendered.", "success");
         }
 
         function compareText() {
@@ -1760,11 +1761,11 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             const output = document.getElementById('diff-output');
             
             if (left === right) {
-                output.innerHTML = '<span style="color: var(--success);">✔ Shards are bit-perfect matches.</span>';
+                output.innerHTML = '<span class="zen-auto-18">âœ” Shards are bit-perfect matches.</span>';
             } else {
-                output.innerHTML = '<span style="color: var(--error);">✘ Shard mismatch detected. Diff reconciliation required.</span>';
+                output.innerHTML = '<span class="zen-auto-21">âœ˜ Shard mismatch detected. Diff reconciliation required.</span>';
             }
-            addLog("Σ [UTILITY]: Text comparison complete.", "success");
+            addLog("Î£ [UTILITY]: Text comparison complete.", "success");
         }
 
         function textAction(action) {
@@ -1783,7 +1784,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             }
             else if (action === 'clear-lines') output.innerText = input.replace(/\n/g, ' ');
             
-            addLog(`Σ [UTILITY]: Executed ${action} on text buffer.`, "success");
+            addLog(`Î£ [UTILITY]: Executed ${action} on text buffer.`, "success");
         }
 
         function forgeHTML() {
@@ -1800,16 +1801,16 @@ https://chatgpt.com/?q={{prompt}}</textarea>
                 .replace(/\n/g, "<br>\n");
             
             // Add some "sovereign" tags
-            html = html.replace(/Σ/g, '<span style="color: cyan;">Σ</span>');
+            html = html.replace(/Î£/g, '<span class="zen-auto-22">Î£</span>');
             
             output.innerText = html;
-            addLog("Σ [MARKUP]: HTML Shard forged successfully.", "success");
+            addLog("Î£ [MARKUP]: HTML Shard forged successfully.", "success");
         }
 
         function clearMarkup() {
             document.getElementById('markup-input').value = '';
             document.getElementById('markup-output').innerText = '';
-            addLog("Σ [MARKUP]: Buffer purged.", "success");
+            addLog("Î£ [MARKUP]: Buffer purged.", "success");
         }
 
         document.addEventListener('keydown', (e) => {
@@ -1843,7 +1844,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             if (Math.random() > 0.98) {
                 document.getElementById('voice-status').textContent = "Listening...";
                 document.getElementById('voice-status').style.color = "var(--success)";
-                addLog("Σ [VOICE]: Wake-word 'Sigma' detected. Listening...", "success");
+                addLog("Î£ [VOICE]: Wake-word 'Sigma' detected. Listening...", "success");
 
                 setTimeout(() => {
                     document.getElementById('voice-status').textContent = "Processing";
@@ -1851,7 +1852,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
                     setTimeout(() => {
                         document.getElementById('voice-status').textContent = "Idle";
                         document.getElementById('voice-status').style.color = "var(--text-muted)";
-                        addLog("Σ [VOICE]: Transcription: 'Initialize neural lattice'. Executing...", "success");
+                        addLog("Î£ [VOICE]: Transcription: 'Initialize neural lattice'. Executing...", "success");
                     }, 1500);
                 }, 2000);
             }
@@ -1865,12 +1866,12 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             if (Math.random() > 0.99) {
                 document.getElementById('vault-status').textContent = "Syncing";
                 document.getElementById('vault-status').style.color = "var(--accent)";
-                addLog("Σ [STORAGE]: Synchronizing state with decentralized lattice...", "success");
+                addLog("Î£ [STORAGE]: Synchronizing state with decentralized lattice...", "success");
 
                 setTimeout(() => {
                     document.getElementById('vault-status').textContent = "Pinned";
                     document.getElementById('vault-status').style.color = "var(--text-muted)";
-                    addLog("Σ [STORAGE]: State Shard pinned. CID: Qm... finalized.", "success");
+                    addLog("Î£ [STORAGE]: State Shard pinned. CID: Qm... finalized.", "success");
                 }, 2500);
             }
             document.getElementById('vault-progress').style.width = (60 + Math.random() * 10) + "%";
@@ -1879,7 +1880,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             if (Math.random() > 0.96) {
                 const nodes = Math.floor(Math.random() * 5) + 10;
                 document.getElementById('vfs-nodes').textContent = `${nodes} Nodes`;
-                addLog(`Σ [VFS]: Registered ${nodes} active shard nodes.`, "success");
+                addLog(`Î£ [VFS]: Registered ${nodes} active shard nodes.`, "success");
             }
             document.getElementById('vfs-progress').style.width = (75 + Math.random() * 10) + "%";
 
@@ -1892,7 +1893,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             if (Math.random() > 0.95) {
                 const latency = (5 + Math.random() * 15).toFixed(0);
                 document.getElementById('sync-latency').textContent = `${latency}ms Latency`;
-                addLog(`Σ [SYNC]: Distributed lock cycle complete. Latency: ${latency}ms.`, "success");
+                addLog(`Î£ [SYNC]: Distributed lock cycle complete. Latency: ${latency}ms.`, "success");
             }
             document.getElementById('sync-progress').style.width = (90 + Math.random() * 10) + "%";
 
@@ -1906,7 +1907,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
                 const bus = Math.floor(Math.random() * 10).toString().padStart(2, '0');
                 const slot = Math.floor(Math.random() * 32).toString().padStart(2, '0');
                 document.getElementById('pci-devices').textContent = `Bus: ${bus} | Slot: ${slot}`;
-                addLog(`Σ [PCI]: Hardware Shard detected on Bus ${bus}, Slot ${slot}. Auditing...`, "success");
+                addLog(`Î£ [PCI]: Hardware Shard detected on Bus ${bus}, Slot ${slot}. Auditing...`, "success");
             }
             document.getElementById('silicon-progress').style.width = "100%";
 
@@ -1915,7 +1916,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             if (Math.random() > 0.95) {
                 const lab = labs[Math.floor(Math.random() * labs.length)];
                 document.getElementById('lab-active').textContent = lab;
-                addLog(`Σ [SCHOLAR]: Executing Virtual Lab Shard: ${lab}. Procedure synced.`, "success");
+                addLog(`Î£ [SCHOLAR]: Executing Virtual Lab Shard: ${lab}. Procedure synced.`, "success");
             }
             document.getElementById('scholar-progress').style.width = (95 + Math.random() * 5) + "%";
 
@@ -1925,7 +1926,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
                 const name = names[Math.floor(Math.random() * names.length)];
                 document.getElementById('persona-name').textContent = name;
                 document.getElementById('menu-user-name').textContent = name;
-                addLog(`Σ [PERSONA]: Identity Shard adapted. New Alias: ${name}.`, "success");
+                addLog(`Î£ [PERSONA]: Identity Shard adapted. New Alias: ${name}.`, "success");
             }
             document.getElementById('persona-progress').style.width = "100%";
 
@@ -1933,7 +1934,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             if (Math.random() > 0.94) {
                 const scrubs = Math.floor(Math.random() * 20) + 10;
                 document.getElementById('log-scrubs').textContent = `${scrubs} Scrubs`;
-                addLog(`Σ [SENTINEL]: Amnesic audit complete. ${scrubs} traces neutralized.`, "success");
+                addLog(`Î£ [SENTINEL]: Amnesic audit complete. ${scrubs} traces neutralized.`, "success");
             }
             document.getElementById('amnesic-progress').style.width = (80 + Math.random() * 20) + "%";
 
@@ -1941,12 +1942,12 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             if (Math.random() > 0.98) {
                 document.getElementById('legal-status').textContent = "AUDITING";
                 document.getElementById('legal-status').style.color = "var(--accent)";
-                addLog("Σ [LEGAL]: Performing BNSS/BNS/BSA silicon-to-statute audit...", "success");
+                addLog("Î£ [LEGAL]: Performing BNSS/BNS/BSA silicon-to-statute audit...", "success");
 
                 setTimeout(() => {
                     document.getElementById('legal-status').textContent = "Compliant";
                     document.getElementById('legal-status').style.color = "var(--success)";
-                    addLog("Σ [LEGAL]: Judicial integrity verified. Compliance: 100%.", "success");
+                    addLog("Î£ [LEGAL]: Judicial integrity verified. Compliance: 100%.", "success");
                 }, 2000);
             }
             document.getElementById('legal-progress').style.width = "100%";
@@ -1955,7 +1956,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             if (Math.random() > 0.99) {
                 const nodes = parseInt(document.getElementById('node-count').textContent) + 1;
                 document.getElementById('node-count').textContent = `${nodes} Nodes`;
-                addLog(`Σ [COLONIZER]: Shard projection successful. New node colonized in the mesh.`, "success");
+                addLog(`Î£ [COLONIZER]: Shard projection successful. New node colonized in the mesh.`, "success");
             }
             document.getElementById('mesh-progress').style.width = (40 + Math.random() * 60) + "%";
 
@@ -1971,12 +1972,12 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             if (Math.random() > 0.97) {
                 document.getElementById('test-status').textContent = "Auditing";
                 document.getElementById('test-status').style.color = "var(--accent)";
-                addLog("Σ [AUDIT]: Running 500-shard integrity verification...", "success");
+                addLog("Î£ [AUDIT]: Running 500-shard integrity verification...", "success");
 
                 setTimeout(() => {
                     document.getElementById('test-status').textContent = "Verified";
                     document.getElementById('test-status').style.color = "var(--success)";
-                    addLog("Σ [AUDIT]: All shards verified. Integrity: BIT-PERFECT.", "success");
+                    addLog("Î£ [AUDIT]: All shards verified. Integrity: BIT-PERFECT.", "success");
                 }, 1800);
             }
             document.getElementById('test-progress').style.width = "100%";
@@ -1996,11 +1997,11 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             if (Math.random() > 0.95) {
                 document.getElementById('healing-status').textContent = "RESTORING";
                 document.getElementById('healing-status').style.color = "var(--error)";
-                addLog("Σ [SELF-HEAL]: Entropy spike detected in VFS shard. Restoring...", "error");
+                addLog("Î£ [SELF-HEAL]: Entropy spike detected in VFS shard. Restoring...", "error");
                 setTimeout(() => {
                     document.getElementById('healing-status').textContent = "OPTIMAL";
                     document.getElementById('healing-status').style.color = "var(--success)";
-                    addLog("Σ [SELF-HEAL]: VFS Shard restored to bit-perfect state.", "success");
+                    addLog("Î£ [SELF-HEAL]: VFS Shard restored to bit-perfect state.", "success");
                 }, 1500);
             }
 
@@ -2010,13 +2011,13 @@ https://chatgpt.com/?q={{prompt}}</textarea>
                 document.getElementById('security-progress').style.width = "0%";
                 document.getElementById('security-info').textContent = "Scanning Lattice...";
                 if (Math.random() > 0.8) {
-                    addLog("Σ [SEC-AUDIT]: Architectural drift detected. Hardening lattice...", "error");
+                    addLog("Î£ [SEC-AUDIT]: Architectural drift detected. Hardening lattice...", "error");
                     document.getElementById('security-status').textContent = "HARDENING";
                     document.getElementById('security-status').style.color = "var(--error)";
                     setTimeout(() => {
                         document.getElementById('security-status').textContent = "SHIELDED";
                         document.getElementById('security-status').style.color = "var(--accent)";
-                        addLog("Σ [SEC-AUDIT]: Lattice-PQC parity restored.", "success");
+                        addLog("Î£ [SEC-AUDIT]: Lattice-PQC parity restored.", "success");
                     }, 2000);
                 }
             } else {
@@ -2032,7 +2033,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
                 document.getElementById('col-progress').style.width = "0%";
                 const newIp = `192.168.1.${Math.floor(Math.random() * 254) + 1}`;
                 document.getElementById('col-target').textContent = `Target: ${newIp}`;
-                addLog(`Σ [COLONIZER]: Shard projected to ${newIp}. Node synchronized.`, "success");
+                addLog(`Î£ [COLONIZER]: Shard projected to ${newIp}. Node synchronized.`, "success");
             } else {
                 document.getElementById('col-progress').style.width = colProgress + "%";
             }
@@ -2255,19 +2256,19 @@ https://chatgpt.com/?q={{prompt}}</textarea>
 </html>
 
     <!-- Sovereign Context Menu -->
-    <div id="context-menu" class="context-menu" style="display: none; position: absolute; min-width: 180px; background: rgba(15, 15, 25, 0.9); backdrop-filter: blur(15px); border: 1px solid rgba(0, 255, 136, 0.3); border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
-        <div class="context-item" onclick="contextAction('refresh')" style="padding: 10px 15px; cursor: pointer; color: #fff; transition: background 0.2s;">? Refresh Lattice</div>
-        <div class="context-item" onclick="contextAction('optimize')" style="padding: 10px 15px; cursor: pointer; color: #fff; transition: background 0.2s;">? Optimize Shards</div>
-        <div class="context-item" onclick="contextAction('terminal')" style="padding: 10px 15px; cursor: pointer; color: #fff; transition: background 0.2s;">??? OmniShell Here</div>
-        <div class="context-divider" style="height: 1px; background: rgba(255,255,255,0.1); margin: 5px 0;"></div>
-        <div class="context-item" onclick="contextAction('settings')" style="padding: 10px 15px; cursor: pointer; color: #fff; transition: background 0.2s;">?? System Settings</div>
+    <div id="context-menu" class="context-menu" class="zen-auto-23">
+        <div class="context-item" onclick="contextAction('refresh')" class="zen-auto-24">? Refresh Lattice</div>
+        <div class="context-item" onclick="contextAction('optimize')" class="zen-auto-24">? Optimize Shards</div>
+        <div class="context-item" onclick="contextAction('terminal')" class="zen-auto-24">??? OmniShell Here</div>
+        <div class="context-divider" class="zen-auto-25"></div>
+        <div class="context-item" onclick="contextAction('settings')" class="zen-auto-24">?? System Settings</div>
     </div>
 
     <!-- Sovereign Help Overlay -->
     <div id="help-overlay" class="wizard-overlay wizard-overlay--hidden">
-        <div class="wizard-box" style="max-width: 600px;">
+        <div class="wizard-box" class="zen-auto-26">
             <div class="wizard-title">S Sovereign Help Matrix</div>
-            <div class="wizard-text" style="text-align: left; max-height: 400px; overflow-y: auto;">
+            <div class="wizard-text" class="zen-auto-27">
                 <h4>Keyboard Shortcuts</h4>
                 <ul>
                     <li><strong>Alt + Space</strong>: Summon Command Center</li>
@@ -2297,24 +2298,27 @@ https://chatgpt.com/?q={{prompt}}</textarea>
                 <div class="win-btn close" onclick="closeWindow('sigma-market-win')"></div>
             </div>
         </div>
-        <div class="window-content" style="padding: 20px;">
-            <div class="market-grid" style="display: grid; gap: 15px;">
-                <div class="market-item" style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
-                    <div class="market-icon" style="font-size: 2rem;">???</div>
-                    <div class="market-info" style="flex: 1;">
-                        <strong style="display: block; color: #00ff88;">Neural Firewall v2.0</strong>
-                        <p style="font-size: 0.85rem; opacity: 0.7;">Advanced packet sharding for the 600-shard core.</p>
+        <div class="window-content" class="zen-auto-16">
+            <div class="market-grid" class="zen-auto-28">
+                <div class="market-item" class="zen-auto-29">
+                    <div class="market-icon" class="zen-auto-30">???</div>
+                    <div class="market-info" class="zen-auto-31">
+                        <strong class="zen-auto-32">Neural Firewall v2.0</strong>
+                        <p class="zen-auto-33">Advanced packet sharding for the 600-shard core.</p>
                     </div>
                     <button class="util-btn" onclick="addLog('S [MARKET]: Shard deployed.', 'success')">INSTALL</button>
                 </div>
-                <div class="market-item" style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
-                    <div class="market-icon" style="font-size: 2rem;">??</div>
-                    <div class="market-info" style="flex: 1;">
-                        <strong style="display: block; color: #00ff88;">Cyberpunk Theme Pack</strong>
-                        <p style="font-size: 0.85rem; opacity: 0.7;">High-contrast neon aesthetics for Zenith.</p>
+                <div class="market-item" class="zen-auto-29">
+                    <div class="market-icon" class="zen-auto-30">??</div>
+                    <div class="market-info" class="zen-auto-31">
+                        <strong class="zen-auto-32">Cyberpunk Theme Pack</strong>
+                        <p class="zen-auto-33">High-contrast neon aesthetics for Zenith.</p>
                     </div>
                     <button class="util-btn" onclick="addLog('S [MARKET]: Theme applied.', 'success')">GET</button>
                 </div>
             </div>
         </div>
     </div>
+
+
+
