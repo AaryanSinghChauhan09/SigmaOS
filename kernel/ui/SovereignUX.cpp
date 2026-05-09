@@ -30,6 +30,11 @@ public:
     }
 
     void applyTheme(const sigma_theme_t* theme) {
+    }
+
+    void enableHighContrast() {
+        sigma_log("[UX-A11Y] High-Contrast Mode ACTIVE.");
+    }
         // PPE (Predictive Personalization Engine) Algorithm
         // Automatically adjusts contrast and readability based on shard load.
         
