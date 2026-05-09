@@ -38,6 +38,9 @@ To fill technical gaps and ensure drivers work for almost every device, SigmaOS 
 | **Input/Bus**| USB 3.0 (xHCI) | `USB_XHCI.cpp` | Operational |
 | **Input** | Synaptics Touchpad | `Synaptics_Input.cpp` | Operational |
 | **Audio** | Realtek HDA | `Realtek_HDA_Audio.cpp` | Operational |
+| **Connectivity**| Intel Bluetooth | `Intel_Bluetooth.cpp` | Operational |
+| **Multimedia** | USB UVC Webcam | `USB_UVC_Camera.cpp` | Operational |
+| **Storage** | SD/MMC Reader | `SDHCI_CardReader.cpp` | Operational |
 
 ## 🧪 Testing Environment
 
