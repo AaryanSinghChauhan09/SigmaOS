@@ -89,6 +89,20 @@ SigmaOS adapts to every professional role, loading only the necessary tools and 
 - **Role-Based Governance**: Access control and resource quotas are automatically adjusted based on the professional role.
 - **Immutable Configuration**: Profile-specific toolsets are kept in immutable shards to prevent cross-contamination.
 
+## 🧮 Sovereign Job Calculator Shard
+Integrated via `kernel/shell/sigma_job_calc.c`, SigmaOS provides zero-dependency, sub-millisecond calculation primitives tailored for every profession above.
+- **Finance & Accounting**: ROI, Depreciation, Break-even, Working Capital, Simple Interest.
+- **Healthcare**: BMI, IV Drip Rates, Pediatric Dosage, Fluid Resuscitation.
+- **Engineering & Architecture**: Concrete Volume, Voltage Drop, Mechanical Torque, Gear Ratios.
+- **Agriculture**: Crop Yield, Plant Population.
+- **Aviation**: Descent Rates, Fuel Burn.
+- **Logistics & Retail**: Inventory Turnover, Volumetric Weight, Retail Margins.
+- **IT & Cybersecurity**: Network Transfer Times, RAID Capacity.
+- **HR & Marketing**: Turnover Rates, Customer Acquisition Costs.
+- **Culinary**: Baker's Percentage, Recipe Scaling.
+
+All calculations use 64-bit integer algebra for deterministic performance across all hardware platforms.
+
 ## 🛡️ Synchronization Strategy
 - **Centralized Shared Modules**: Common tools (e.g., text editors, file managers) are stored in `/packages/` and shared across profiles via symbolic shortcuts.
 - **Dynamic Adaptation**: The Zenith UI adjusts its layout and command grammar to prioritize professional tools (e.g., CAD shortcuts for engineers).
