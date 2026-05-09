@@ -41,6 +41,12 @@ public:
         else if (sigma_hardened_strncmp(command, "agent.gaming engage", 19) == 0) {
             sigma_log("[ORCHESTRATOR] Engaging Vulkan/Proton gaming stack (Neutralizing SteamOS)...");
         }
+        else if (sigma_hardened_strncmp(command, "agent.forensics scan", 20) == 0) {
+            sigma_log("[ORCHESTRATOR] Launching sovereign forensic analysis (Neutralizing CAINE)...");
+        }
+        else if (sigma_hardened_strncmp(command, "agent.pkg reproduce=", 20) == 0) {
+            sigma_log("[ORCHESTRATOR] Enforcing NixOS-style reproducible build state...");
+        }
         else {
             sigma_log("[ORCHESTRATOR] Unknown command. Fallback to recovery.");
         }
