@@ -19,9 +19,9 @@ const professions = [
     { 
         name: 'lawyer', 
         tools: 'Case indexing, legal references, compliance document management, secure communication',
-        rules: 'IPC, CrPC, Contract Act, Evidence Act',
-        calculators: 'Court fee, stamp duty',
-        algorithms: 'Case law search, compliance checker, automated legal drafting'
+        rules: 'Bharatiya Nyaya Sanhita (BNS) 2023, Bharatiya Nagarik Suraksha Sanhita (BNSS) 2023, Bharatiya Sakshya Adhiniyam (BSA) 2023, Constitution of India',
+        calculators: 'Court fee, stamp duty, Limitation Period Calc, Alimony Estimator',
+        algorithms: 'Case law search, compliance checker, automated legal drafting, BNS-IPC cross-mapper'
     },
     { 
         name: 'engineer', 

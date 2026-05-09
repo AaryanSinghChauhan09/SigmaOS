@@ -9,18 +9,21 @@
         "secure_communication"
     ],
     "rules": [
-        "IPC",
-        "CrPC",
-        "Contract Act",
-        "Evidence Act"
+        "Bharatiya Nyaya Sanhita (BNS) 2023",
+        "Bharatiya Nagarik Suraksha Sanhita (BNSS) 2023",
+        "Bharatiya Sakshya Adhiniyam (BSA) 2023",
+        "Constitution of India"
     ],
     "calculators": [
         "Court fee",
-        "stamp duty"
+        "stamp duty",
+        "Limitation Period Calc",
+        "Alimony Estimator"
     ],
     "algorithms": [
         "Case law search",
         "compliance checker",
-        "automated legal drafting"
+        "automated legal drafting",
+        "BNS-IPC cross-mapper"
     ]
 }
