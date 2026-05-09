@@ -1,29 +1,5 @@
 
-class ErrorHandler {
-    static handle(error, context = '') {
-        console.error(`[ERROR] ${context}:`, error);
-        if (typeof addLog === 'function') {
-            addLog(`Σ [ERR]: ${context} - ${error.message}`, 'error');
-        }
-    }
 
-    static async safely(fn, context = 'Unknown') {
-        try {
-            return await fn();
-        } catch (error) {
-            this.handle(error, context);
-            return null;
-        }
-    }
-}
-
-window.addEventListener('error', (event) => {
-    ErrorHandler.handle(event.error, 'Uncaught exception');
-});
-
-window.addEventListener('unhandledrejection', (event) => {
-    ErrorHandler.handle(event.reason, 'Unhandled Promise rejection');
-});
 
 
 class ErrorHandler {

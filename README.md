@@ -3,8 +3,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-v100.2_Futuristic-blue.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/releases)
 [![Build Status](https://github.com/AaryanSinghChauhan09/SigmaOS/actions/workflows/ci.yml/badge.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/actions)
-[![Security](https://img.shields.io/badge/Security-Post--Quantum-green.svg)](SECURITY.md)
-[![Maintainability](https://img.shields.io/badge/Maintainability-Industrial-orange.svg)](MAINTENANCE_POLICY.md)
+[![Security](https://img.shields.io/badge/Security-Post--Quantum-green.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SECURITY)
+[![Maintainability](https://img.shields.io/badge/Maintainability-Industrial-orange.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Maintenance-Policy)
 
 > **SigmaOS** is an intelligent, AI-native adaptive operating system built on a hardened Linux foundation. It represents a paradigm shift from traditional distributions, focusing on **visual excellence**, **intelligent automation**, and **seamless workflow optimization**.
 
@@ -119,16 +119,16 @@ For a reproducible environment, use the provided **DevContainer** (VS Code) or t
 
 ## Contributions
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) and the [Official Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki).
+Contributions are welcome! Please see the [Contribution Guide](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Contribution-Guide) and the [Official Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki).
 
 ## 🏛️ Governance & Standards
 
 SigmaOS adheres to strict industrial standards for lattice maintenance and security.
 
-- **[Maintenance Policy](MAINTENANCE_POLICY.md)**: Quality standards and review process.
-- **[Release Process](RELEASE_PROCESS.md)**: Preparation and cryptographic signing details.
-- **[Code of Conduct](CODE_OF_CONDUCT.md)**: Expectations for community behavior.
-- **[Security Policy](SECURITY.md)**: Vulnerability reporting and PQC disclosure.
+- **[Maintenance Policy](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Maintenance-Policy)**: Quality standards and review process.
+- **[Release Process](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Release-Process)**: Preparation and cryptographic signing details.
+- **[Code of Conduct](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/CODE_OF_CONDUCT)**: Expectations for community behavior.
+- **[Security Policy](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SECURITY)**: Vulnerability reporting and PQC disclosure.
 
 ## License
 
