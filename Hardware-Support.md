@@ -31,6 +31,10 @@ To fill technical gaps and ensure drivers work for almost every device, SigmaOS 
 | **Network** | Realtek Ethernet | `RTL8111_Ethernet.cpp` | Operational |
 | **Network** | Intel Wi-Fi | `Intel_AX200_WiFi.cpp` | Operational |
 | **Graphics** | AMD Radeon | `AMDGPU_Graphics.cpp` | Beta |
+| **Graphics** | NVIDIA (Open) | `Nouveau_Graphics.cpp` | Beta |
+| **Graphics** | Intel Integrated | `Intel_I915_Graphics.cpp` | Operational |
+| **Storage** | NVMe SSDs | `NVMe_Core.cpp` | Operational |
+| **Input/Bus**| USB 3.0 (xHCI) | `USB_XHCI.cpp` | Operational |
 
 ## 🧪 Testing Environment
 
