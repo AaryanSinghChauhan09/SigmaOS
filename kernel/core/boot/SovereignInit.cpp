@@ -31,7 +31,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[INIT] Initializing Sovereign Asynchronous Init Engine (ASI Algorithm)...");
         this->m_initialized = 1u;
     }
@@ -84,6 +84,7 @@ extern "C" void sinit_execute_plan() {
 extern "C" void sinit_report_status() {
     SigmaOS::Kernel::Boot::SovereignInitEngine::reportStatus();
 }
+
 
 
 

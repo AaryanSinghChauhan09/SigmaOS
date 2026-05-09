@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignVirtIO"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [VIRTIO]: Initializing Sovereign Virtualization Interface...");
         sigma_log("Σ [VIRTIO]: High-performance ring-buffer orchestration ACTIVE.");
     }
@@ -56,6 +56,7 @@ extern "C" void virtio_init() {
 extern "C" void virtio_notify(sigma_u32 qid) {
     SigmaOS::Kernel::Virtualization::SovereignVirtIO::processQueue(qid);
 }
+
 
 
 

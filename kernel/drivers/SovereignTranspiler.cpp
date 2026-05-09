@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[TRANSPILER] Initializing Self-Learning Hardware Transpiler (v27.5)...");
         sigma_hardened_strcpy(this->state.target_architecture, "x86_64", 16);
         this->state.transpilation_active = true;
@@ -47,3 +47,4 @@ extern "C" void transpiler_init() {
 extern "C" void transpiler_auto_map(sigma_u32 device_id) {
     SovereignTranspilerEngine::autoMap(device_id);
 }
+

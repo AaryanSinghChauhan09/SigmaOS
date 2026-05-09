@@ -22,7 +22,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignHACore"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [HA-CORE]: Initializing Sovereign High-Availability Cluster Nexus...");
         sigma_log("Σ [HA-CORE]: Active-Active state replication ACTIVE.");
     }
@@ -57,6 +57,7 @@ extern "C" void ha_core_init() {
 extern "C" void ha_core_failover(const char* node) {
     SigmaOS::Kernel::Cloud::SovereignHACore::handleFailover(node);
 }
+
 
 
 

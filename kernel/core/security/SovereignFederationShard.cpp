@@ -22,7 +22,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignFederationShard"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [FEDERATION]: Initializing Sovereign Identity Federation Nexus...");
         sigma_log("Σ [FEDERATION]: Cross-domain trust handshaking ACTIVE.");
     }
@@ -58,6 +58,7 @@ extern "C" void federation_init() {
 extern "C" bool federation_sso(const char* dom, const char* prot) {
     return SigmaOS::Kernel::Security::SovereignFederationShard::performSSO(dom, prot);
 }
+
 
 
 

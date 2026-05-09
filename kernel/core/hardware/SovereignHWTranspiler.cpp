@@ -22,7 +22,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignHWTranspiler"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [SILICON-DIRECT]: Initializing Driver Transpiler...");
         m_transpiled_drivers = 0;
         sigma_log("Σ [SILICON-DIRECT]: Scanning Silicon Topology...");
@@ -76,6 +76,7 @@ extern "C" void silicon_init_transpiler() {
 extern "C" void silicon_transpile(const char* id, const char* spec, const char* arch) {
     SigmaOS::Kernel::Hardware::SovereignHWTranspiler::transpileDriver(id, spec, arch);
 }
+
 
 
 

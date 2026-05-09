@@ -18,7 +18,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [WEB-BRIDGE]: Initializing WebSocket Lattice Connector...");
         this->connection_active = false;
         this->initialized = true;
@@ -54,6 +54,7 @@ extern "C" void web_bridge_init() {
 extern "C" void web_bridge_connect(const char* url) {
     SigmaOS::Kernel::Network::SovereignWebBridge::connect(url);
 }
+
 
 
 

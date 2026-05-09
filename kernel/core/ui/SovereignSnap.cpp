@@ -25,7 +25,7 @@ public:
     /* Strong-type wrappers for industrial safety */
     struct WindowID { sigma_u32 value; };
 
-    void init() {
+    static void init() {
         sigma_log_info("[SNAP] Initializing Sovereign Window Snapping Engine (PLE Algorithm)...");
     }
 
@@ -67,3 +67,4 @@ extern "C" void snap_window_to_zone(sigma_u32 window_id, sigma_snap_zone_t zone)
 extern "C" void snap_auto_arrange() {
     SigmaOS::Kernel::UI::SovereignSnapEngine::autoArrange();
 }
+

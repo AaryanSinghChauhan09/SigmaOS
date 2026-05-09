@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignStorageAI"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [STORAGE-AI]: Initializing Sovereign AI Storage Optimizer...");
         sigma_log("Σ [STORAGE-AI]: Predictive caching and DNA compression routing ACTIVE.");
     }
@@ -60,6 +60,7 @@ extern "C" void storage_ai_init() {
 extern "C" void storage_ai_optimize(const char* vol) {
     SigmaOS::Kernel::FS::SovereignStorageAI::optimizeVolume(vol);
 }
+
 
 
 

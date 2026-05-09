@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[NIC] Probing Sovereign Network Interface...");
 
         this->master_nic.mac[0] = 0xDE;
@@ -84,3 +84,4 @@ extern "C" int nic_transmit(const void* packet, uint32_t len) {
 extern "C" int nic_receive(void* buffer, uint32_t max_len) {
     return SovereignNICEngine::receive(buffer, max_len);
 }
+

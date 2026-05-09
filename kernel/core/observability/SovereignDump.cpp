@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[DUMP] Initializing Sovereign Silicon-State Preservation (SSP) Shard...");
         this->m_initialized = 1u;
     }
@@ -50,6 +50,7 @@ extern "C" void dump_init() {
 extern "C" void dump_trigger(const char* reason) {
     SigmaOS::Kernel::Observability::SovereignDumpEngine::trigger(reason);
 }
+
 
 
 

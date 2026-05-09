@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[PAGING] Initializing Sovereign Predictive Paging Engine...");
         this->active_pages = 0;
         this->page_faults_averted = 0;
@@ -58,6 +58,7 @@ extern "C" void paging_map(void* virtual_addr, void* physical_addr, sigma_u32 fl
 extern "C" void paging_prefetch() {
     SovereignPagingEngine::predictAndPrefetch();
 }
+
 
 
 

@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[TELEMETRY-UI] Initializing Sovereign System Activity Monitor...");
         this->ui_visible = false;
         this->metrics_collected = 0;
@@ -61,6 +61,7 @@ extern "C" void telemetry_ui_toggle() {
 extern "C" void telemetry_ui_update(sigma_u32 net, sigma_u32 numa) {
     SovereignTelemetryUIEngine::updateDashboardMetrics(net, numa);
 }
+
 
 
 

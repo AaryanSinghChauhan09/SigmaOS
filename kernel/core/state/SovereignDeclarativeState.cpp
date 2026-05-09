@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignDeclarativeState"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [DECLARATIVE]: Initializing Sovereign Declarative State Manager...");
         sigma_log("Σ [DECLARATIVE]: Pure, reproducible Lattice configuration ACTIVE.");
     }
@@ -60,6 +60,7 @@ extern "C" void declarative_state_init() {
 extern "C" void declarative_build(const char* hash) {
     SigmaOS::Kernel::System::SovereignDeclarativeState::buildState(hash);
 }
+
 
 
 

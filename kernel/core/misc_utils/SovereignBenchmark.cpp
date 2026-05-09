@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[BENCH] Initializing Silicon Sovereignty Benchmark Suite...");
         this->benchmarks_run = 0;
     }
@@ -67,6 +67,7 @@ extern "C" void bench_memory_throughput(sigma_u32 buffer_mb) {
 extern "C" void bench_publish() {
     SovereignBenchmarkEngine::publishResults();
 }
+
 
 
 

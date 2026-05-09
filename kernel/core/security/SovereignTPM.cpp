@@ -17,7 +17,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log_info("[TPM] Initializing Measured Boot & Attestation Shard...");
         this->pcr_extend(0, "SIGMAOS_BOOT_V1");
     }
@@ -45,3 +45,4 @@ extern "C" void sigma_tpm_init() {
 extern "C" int sigma_tpm_verify() {
     return SigmaOS::Kernel::Security::SovereignTPMEngine::verifyLatticeIntegrity() ? 1 : 0;
 }
+

@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignGPGPUManager"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [GPGPU-MAN]: Initializing Sovereign High-Performance Compute Nexus...");
         sigma_log("Σ [GPGPU-MAN]: Zero-copy unified memory orchestration ACTIVE.");
     }
@@ -59,6 +59,7 @@ extern "C" void gpgpu_init() {
 extern "C" void gpgpu_dispatch(const char* name, sigma_u32 t, sigma_u32 b) {
     SigmaOS::Kernel::Hardware::SovereignGPGPUManager::dispatchKernel(name, t, b);
 }
+
 
 
 

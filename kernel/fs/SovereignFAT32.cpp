@@ -16,7 +16,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[FAT32] Initializing Sovereign FAT32 Driver...");
         this->mounted = false;
         this->root_cluster = 0;
@@ -80,3 +80,4 @@ extern "C" void fat32_unmount() {
 extern "C" int fat32_read_file(const char* path, void* buffer, sigma_u32 size) { (void)buffer;
     return SovereignFAT32Engine::readFile(path, buffer, size);
 }
+

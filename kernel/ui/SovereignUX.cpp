@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[UX] Initializing Sovereign Personalization Engine...");
         
         // Default Industrial Dark Theme
@@ -84,3 +84,4 @@ extern "C" void ux_render_dashboard() {
 extern "C" void ux_predict_adaptation() {
     SovereignUXEngine::predictAdaptation();
 }
+

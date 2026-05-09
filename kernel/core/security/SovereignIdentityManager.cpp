@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignIdentityManager"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [IDENTITY]: Initializing Sovereign IAM Lattice...");
         sigma_log("Σ [IDENTITY]: Self-Sovereign Identity (SSI) verification ACTIVE.");
     }
@@ -61,6 +61,7 @@ extern "C" void identity_init() {
 extern "C" bool identity_verify(const char* id, sigma_u32 mask) {
     return SigmaOS::Kernel::Security::SovereignIdentityManager::verifyAccess(id, mask);
 }
+
 
 
 

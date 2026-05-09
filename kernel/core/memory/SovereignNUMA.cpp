@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[NUMA] Initializing Silicon-Native NUMA Optimizer...");
         this->active_nodes = 0;
         this->pages_migrated = 0;
@@ -64,6 +64,7 @@ extern "C" void numa_register_node(sigma_u32 node_id, sigma_u32 memory_mb) {
 extern "C" void numa_optimize_thread(sigma_u32 thread_id) {
     SovereignNUMAEngine::optimizeThreadLocality(thread_id);
 }
+
 
 
 

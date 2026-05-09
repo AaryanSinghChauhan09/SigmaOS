@@ -26,7 +26,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[STORAGE] Probing block storage devices...");
         this->storage_type = STORAGE_UNKNOWN;
         this->total_sectors = 0;
@@ -86,6 +86,7 @@ extern "C" bool storage_read(sigma_u32 lba, sigma_u32 count, void* buf) {
 extern "C" bool storage_write(sigma_u32 lba, sigma_u32 count, const void* data) {
     return SovereignStorageDriverEngine::writeSectors(lba, count, data);
 }
+
 
 
 

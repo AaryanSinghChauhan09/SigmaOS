@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignWatchdog"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [WATCHDOG]: Initializing Sovereign Kernel Watchdog...");
         sigma_log("Σ [WATCHDOG]: Continuous heartbeat and hang detection ACTIVE.");
     }
@@ -63,6 +63,7 @@ extern "C" void watchdog_init() {
 extern "C" void watchdog_pet(sigma_u32 id) {
     SigmaOS::Kernel::System::SovereignWatchdog::petWatchdog(id);
 }
+
 
 
 

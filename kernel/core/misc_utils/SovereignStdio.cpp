@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[STDIO] Initializing Sovereign I/O Multiplexer...");
         this->echo_to_serial = true;
         this->echo_to_framebuffer = true;
@@ -53,6 +53,7 @@ extern "C" void stdio_init() {
 extern "C" void stdio_route_write(const char* buffer, sigma_u32 length) {
     SovereignStdioEngine::routeWrite(buffer, length);
 }
+
 
 
 

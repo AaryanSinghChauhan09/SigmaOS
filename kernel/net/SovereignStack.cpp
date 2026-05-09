@@ -18,7 +18,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[NETSTACK] Initializing Sovereign Zero-Buffer Network Stack (ZBPA)...");
         this->link_active = 1u;
         this->initialized = 1u;
@@ -77,4 +77,5 @@ extern "C" void netstack_send_packet(const void* buffer, sigma_u32 size) {
 extern "C" sigma_u32 netstack_is_link_active() {
     return SovereignPacketArbiter::isLinkActive();
 }
+
 

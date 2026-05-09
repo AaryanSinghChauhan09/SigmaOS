@@ -15,7 +15,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[S-DASH] Initializing Sovereign Dashboard Shard...");
         this->initialized = 1u;
     }
@@ -49,4 +49,5 @@ extern "C" void dash_refresh_telemetry() {
 extern "C" void dash_report_health() {
     SovereignDashEngine::getInstance().reportHealth();
 }
+
 

@@ -25,7 +25,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[S-INSTALL] Initializing Bare-Metal Autonomous Deployment Engine...");
     }
 
@@ -70,3 +70,4 @@ extern "C" void sinstall_init() {
 extern "C" void sinstall_ignite(const char* target_disk) {
     SovereignDeploymentEngine::ignite(target_disk);
 }
+

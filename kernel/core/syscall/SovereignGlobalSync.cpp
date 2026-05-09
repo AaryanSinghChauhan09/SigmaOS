@@ -18,7 +18,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[SYNC] Initializing Sovereign Global Lattice Sync (SCR Algorithm)...");
         this->initialized = 1u;
     }
@@ -90,6 +90,7 @@ extern "C" void sync_reconcile_all() {
 extern "C" const sigma_sync_state_t* sync_get_state() {
     return SovereignSyncEngine::getState();
 }
+
 
 
 

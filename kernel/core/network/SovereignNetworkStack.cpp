@@ -22,7 +22,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignNetworkStack"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [NETSTACK]: Initializing Sovereign TCP/IP/Lattice Stack...");
         sigma_log("Σ [NETSTACK]: ARP/IP/UDP/TCP Shards mapping to Distributed Lattice ACTIVE.");
     }
@@ -56,6 +56,7 @@ extern "C" void netstack_init() {
 extern "C" void netstack_receive(void* pkt, sigma_usize sz) {
     SigmaOS::Kernel::Network::SovereignNetworkStack::handlePacket(pkt, sz);
 }
+
 
 
 

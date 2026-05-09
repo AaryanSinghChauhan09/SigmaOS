@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignTime"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [TIME]: Initializing Sovereign Silicon Timekeeper...");
         m_start_ticks = cpu_rdtsc();
         sigma_log("Σ [TIME]: Time Lattice SYNCHRONIZED.");
@@ -59,6 +59,7 @@ extern "C" sigma_time_t time_now() {
     t.silicon_ticks = SigmaOS::Kernel::System::SovereignTime::getUptimeMs();
     return t;
 }
+
 
 
 

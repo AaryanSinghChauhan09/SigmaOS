@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignLatticeConfigurator"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [CONFIGURATOR]: Initializing Sovereign AI Lattice Configurator...");
         sigma_log("Σ [CONFIGURATOR]: Unified enterprise system management ACTIVE.");
     }
@@ -60,6 +60,7 @@ extern "C" void configurator_init() {
 extern "C" void configurator_apply(const char* policy) {
     SigmaOS::Kernel::System::SovereignLatticeConfigurator::applyPolicy(policy);
 }
+
 
 
 

@@ -18,7 +18,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log_info("[PAGER] Initializing Demand Paging Engine...");
         this->initialized = true;
     }
@@ -56,3 +56,4 @@ extern "C" void sigma_pager_init() {
 extern "C" void sigma_page_fault_handler(unsigned long long addr, unsigned int code) {
     SigmaOS::Kernel::Memory::SovereignPager::handlePageFault(addr, code);
 }
+

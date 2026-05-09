@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignContainerManager"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [CONTAINER]: Initializing Sovereign Alpine-Style Container Manager...");
         sigma_log("Σ [CONTAINER]: Immutable, sub-megabyte orchestration ACTIVE.");
     }
@@ -60,6 +60,7 @@ extern "C" void container_manager_init() {
 extern "C" void container_deploy(const char* hash) {
     SigmaOS::Kernel::Cloud::SovereignContainerManager::deployContainer(hash);
 }
+
 
 
 

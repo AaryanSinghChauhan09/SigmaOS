@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignAnalytics"; }
 
-    void init() {
+    static void init() {
         sigma_log("Î£ [ANALYTICS]: Orchestrating Silicon Telemetry Shard...");
         m_events_tracked = 0;
         sigma_log("Î£ [ANALYTICS]: Real-time Performance Audit ACTIVE.");
@@ -59,6 +59,7 @@ extern "C" void diag_analytics_init() {
 extern "C" void diag_track_shard(const char* id, const char* type) {
     SigmaOS::Kernel::Diag::SovereignAnalytics::trackEvent(id, type);
 }
+
 
 
 

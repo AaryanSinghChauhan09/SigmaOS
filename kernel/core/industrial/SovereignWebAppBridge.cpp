@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignWebAppBridge"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [WEBAPP-BRIDGE]: Initializing Orbital Injection Shard...");
         m_active_webapps = 0;
         sigma_log("Σ [WEBAPP-BRIDGE]: SSB isolation fabric ACTIVE.");
@@ -62,6 +62,7 @@ extern "C" void webapp_bridge_init() {
 extern "C" void webapp_bridge_inject(const char* name, const char* url) {
     SigmaOS::Kernel::Industrial::SovereignWebAppBridge::injectWebApp(name, url);
 }
+
 
 
 

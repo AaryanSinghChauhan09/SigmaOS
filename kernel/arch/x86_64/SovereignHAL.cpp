@@ -22,7 +22,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignHAL"; }
 
-    void init() {
+    static void init() {
         sigma_log("[HAL] Orchestrating Hardware Lattice Shards...");
         serial_init();
         sigma_log("[HAL] Serial IO Shard ONLINE.");
@@ -60,3 +60,4 @@ extern "C" void hal_init() {
 extern "C" void hal_reboot() {
     SigmaOS::Kernel::HAL::SovereignHAL::reboot();
 }
+

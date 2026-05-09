@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[LAZY] Initializing Sovereign Lazy Allocation Engine...");
         this->m_initialized = 1u;
         this->m_pending_allocs = 0u;
@@ -61,6 +61,7 @@ extern "C" void* lazy_alloc(sigma_size_t size) {
 extern "C" void lazy_resolve(void* ptr) {
     SigmaOS::Kernel::Misc::SovereignLazyManager::resolveFault(ptr);
 }
+
 
 
 

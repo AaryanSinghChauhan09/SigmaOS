@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[MEMCOMPRESS] Initializing Sovereign Memory Compression Engine...");
         this->compressed_pages = 0;
         this->bytes_saved = 0;
@@ -51,6 +51,7 @@ private:
 extern "C" void memcompress_init() { SovereignMemCompressEngine::init(); }
 extern "C" sigma_u32 memcompress_compress(sigma_u32 pages) { return SovereignMemCompressEngine::compressColdPages(pages); }
 extern "C" void memcompress_stats() { SovereignMemCompressEngine::printStats(); }
+
 
 
 

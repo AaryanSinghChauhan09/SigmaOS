@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignNeuralAutomator"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [NEURAL-AUTO]: Initializing Sovereign Neural AI Task Automator...");
         sigma_log("Σ [NEURAL-AUTO]: Cognitive task queues and workflow inference ACTIVE.");
     }
@@ -60,6 +60,7 @@ extern "C" void neural_automator_init() {
 extern "C" void neural_automator_execute(const char* intent) {
     SigmaOS::Kernel::AI::SovereignNeuralAutomator::inferAndExecute(intent);
 }
+
 
 
 

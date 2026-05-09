@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[BT] Initializing Sovereign Bluetooth Stack (HCI Ring-0)...");
         this->paired_devices = 0;
         this->controller_active = false;
@@ -51,6 +51,7 @@ private:
 extern "C" void bt_init() { SovereignBluetoothEngine::init(); }
 extern "C" bool bt_probe(sigma_u32 vid, sigma_u32 pid) { return SovereignBluetoothEngine::probeController(vid, pid); }
 extern "C" bool bt_pair(const char* addr, const char* name) { return SovereignBluetoothEngine::pairDevice(addr, name); }
+
 
 
 

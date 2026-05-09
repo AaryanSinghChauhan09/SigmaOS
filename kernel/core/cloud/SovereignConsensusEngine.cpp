@@ -22,7 +22,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignConsensusEngine"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [CONSENSUS]: Initializing Sovereign Lattice-Paxos Engine...");
         sigma_log("Σ [CONSENSUS]: Quantum-proof quorum orchestration ACTIVE.");
     }
@@ -59,6 +59,7 @@ extern "C" void consensus_init() {
 extern "C" bool consensus_propose(const char* key, const void* data, sigma_usize sz) {
     return SigmaOS::Kernel::Cloud::SovereignConsensusEngine::propose(key, data, sz);
 }
+
 
 
 

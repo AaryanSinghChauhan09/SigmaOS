@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignCompartmentalization"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [COMPARTMENT]: Initializing Sovereign Security Compartmentalization...");
         sigma_log("Σ [COMPARTMENT]: Hardware-backed hypervisor isolation ACTIVE.");
     }
@@ -60,6 +60,7 @@ extern "C" void compartmentalization_init() {
 extern "C" void compartment_isolate(const char* domain) {
     SigmaOS::Kernel::Security::SovereignCompartmentalization::isolateDomain(domain);
 }
+
 
 
 

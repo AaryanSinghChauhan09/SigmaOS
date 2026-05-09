@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignCloudBridge"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [CLOUD]: Orchestrating Sovereign Cloud Extension...");
         m_remote_nodes = 0;
         sigma_log("Σ [CLOUD]: Lattice-to-Cloud Tunnel (PQC-Encrypted) ONLINE.");
@@ -60,6 +60,7 @@ extern "C" void cloud_init_shard() {
 extern "C" void cloud_sync_shard() {
     SigmaOS::Kernel::Cloud::SovereignCloudBridge::syncLattice();
 }
+
 
 
 

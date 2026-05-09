@@ -22,7 +22,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignSpatialStreamer"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [STREAMER]: Initializing Sovereign Spatial Streaming Nexus...");
         sigma_log("Σ [STREAMER]: Low-latency 3D-aware buffering ACTIVE.");
     }
@@ -56,6 +56,7 @@ extern "C" void streamer_init() {
 extern "C" void streamer_push_frame(void* buf, sigma_usize sz) {
     SigmaOS::Kernel::Multimedia::SovereignSpatialStreamer::streamFrame(buf, sz);
 }
+
 
 
 

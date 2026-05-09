@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignSnapshotManager"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [SNAPSHOT]: Initializing Sovereign CoW Snapshot Manager...");
         sigma_log("Σ [SNAPSHOT]: Zero-latency B-Tree cloning ACTIVE.");
         m_active_snapshots = 0;
@@ -66,6 +66,7 @@ extern "C" void snapshot_init() {
 extern "C" void snapshot_take(const char* vol, const char* snap) {
     SigmaOS::Kernel::FS::SovereignSnapshotManager::takeSnapshot(vol, snap);
 }
+
 
 
 

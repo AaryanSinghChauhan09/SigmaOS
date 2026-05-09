@@ -28,7 +28,7 @@ public:
         return instance;
     }
 
-    void init();
+    static void init();
     void triggerHealing(sigma_u32 shard_id);
     sigma_recovery_state_t getLatticeState() const;
     void setLatticeState(sigma_recovery_state_t state);
@@ -104,6 +104,7 @@ extern "C" void recover_trigger_healing(sigma_u32 shard_id) {
 extern "C" sigma_recovery_state_t recover_get_lattice_state() {
     return SovereignRecover::getLatticeState();
 }
+
 
 
 

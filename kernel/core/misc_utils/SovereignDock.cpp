@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[DOCK] Initializing Sovereign Smart Dock...");
         this->item_count = 0;
         this->dock_scale = 1.0f;
@@ -71,6 +71,7 @@ extern "C" void dock_add_app(const char* app_name) {
 extern "C" void dock_configure(const char* pos, bool hide, float scale) {
     SovereignDockEngine::configureDock(pos, hide, scale);
 }
+
 
 
 

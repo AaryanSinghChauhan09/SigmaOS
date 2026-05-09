@@ -22,7 +22,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignHILSimulator"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [HIL-SIM]: Initializing Sovereign Hardware-In-The-Loop Simulator...");
         sigma_log("Σ [HIL-SIM]: Deterministic microsecond-granularity sensor emulation ACTIVE.");
     }
@@ -56,6 +56,7 @@ extern "C" void hil_sim_init() {
 extern "C" void hil_inject_data(const char* id, const void* data, sigma_usize sz) {
     SigmaOS::Kernel::Hardware::SovereignHILSimulator::injectSensorData(id, data, sz);
 }
+
 
 
 

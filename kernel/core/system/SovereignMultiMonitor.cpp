@@ -30,7 +30,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[MULTIMON] Initializing Sovereign Multi-Monitor Display Engine...");
         this->display_count = 0;
     }
@@ -69,6 +69,7 @@ extern "C" void multimon_init() { SovereignMultiMonitorEngine::init(); }
 extern "C" sigma_u32 multimon_add(const char* conn, sigma_u32 w, sigma_u32 h, sigma_u32 hz) { return SovereignMultiMonitorEngine::addDisplay(conn, w, h, hz); }
 extern "C" void multimon_arrange(sigma_u32 primary, const char* layout) { SovereignMultiMonitorEngine::setDisplayArrangement(primary, layout); }
 extern "C" void multimon_mirror(sigma_u32 src, sigma_u32 dst) { SovereignMultiMonitorEngine::mirrorDisplays(src, dst); }
+
 
 
 

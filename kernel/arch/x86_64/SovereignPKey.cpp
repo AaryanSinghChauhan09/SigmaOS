@@ -18,7 +18,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [PKEY]: Initializing Hardware Memory Protection Keys (MPK)...");
         // Enable CR4.PKE bit
         this->active_keys = 0;
@@ -59,3 +59,4 @@ extern "C" int pkey_alloc() {
 extern "C" void pkey_set(int key, sigma_u32 rights) {
     SigmaOS::Kernel::HAL::SovereignPKeyManager::setProtection(key, rights);
 }
+

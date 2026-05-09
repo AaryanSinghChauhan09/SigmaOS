@@ -28,7 +28,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log_info("[SYSCALL] Initializing Sovereign FPST Gate...");
         this->m_initialized  = 1u;
         this->m_total_calls  = 0u;
@@ -104,3 +104,4 @@ extern "C" void syscall_handler_asm() {
 extern "C" unsigned long long syscall_get_total_calls() {
     return (unsigned long long)SigmaOS::Kernel::Syscall::SovereignSyscallEngine::getTotalCalls();
 }
+

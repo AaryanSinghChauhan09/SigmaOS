@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [UXSRV]: Orchestrating Sovereign Workflow Engine...");
         this->active_sessions = 0;
         this->initialized = true;
@@ -51,6 +51,7 @@ extern "C" void uxsrv_init() {
 extern "C" void uxsrv_handle_workflow(const char* id) {
     SigmaOS::Kernel::UI::SovereignUXSrv::handleWorkflow(id);
 }
+
 
 
 

@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[KUBE] Initializing Sovereign Kubernetes Native Operator...");
         this->m_initialized = 1u;
         this->m_active_pods = 0u;
@@ -60,6 +60,7 @@ extern "C" void kube_reconcile() {
 extern "C" void kube_deploy_pod(const char* name) {
     SigmaOS::Kernel::Deployment::SovereignKubeOperator::deployShardPod(name);
 }
+
 
 
 

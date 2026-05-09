@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[CORES] Initializing Sovereign Neural Core Scaling Nexus...");
         this->m_initialized = 1u;
         this->m_active_cores = 8u; // Default industrial set
@@ -59,6 +59,7 @@ extern "C" void cores_scale(sigma_u32 count) {
 extern "C" void cores_status() {
     SigmaOS::Kernel::HAL::SovereignCoreManager::listCoreStatus();
 }
+
 
 
 

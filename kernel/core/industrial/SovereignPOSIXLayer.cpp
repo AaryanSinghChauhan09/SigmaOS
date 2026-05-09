@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignPOSIXLayer"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [POSIX]: Initializing Sovereign POSIX Emulation Layer...");
         sigma_log("Σ [POSIX]: Signal Mapping (SIGKILL, SIGTERM, SIGSEGV) established.");
     }
@@ -69,6 +69,7 @@ extern "C" void posix_init() {
 extern "C" void posix_signal_shard(sigma_u32 sig, sigma_u32 shard) {
     SigmaOS::Kernel::Industrial::SovereignPOSIXLayer::mapSignal(sig, shard);
 }
+
 
 
 

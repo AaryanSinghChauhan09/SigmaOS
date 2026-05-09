@@ -18,7 +18,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[MICRO] Initializing Sovereign Micro-Orchestrator (ISM Algorithm)...");
     }
 
@@ -58,6 +58,7 @@ extern "C" bool micro_spawn_isolated_shard(sigma_u32 shard_id, sigma_micro_conte
 extern "C" void micro_mediate_ipc(sigma_u32 source_id, sigma_u32 target_id, void* msg) {
     SovereignMicroEngine::mediateIPC(source_id, target_id, msg);
 }
+
 
 
 

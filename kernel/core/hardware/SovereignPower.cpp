@@ -18,7 +18,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[POWER] Initializing Sovereign Power Management (IEO Algorithm)...");
         this->profile = SIGMA_POWER_BALANCED;
     }
@@ -66,6 +66,7 @@ extern "C" sigma_u32 power_get_battery_pct() {
 extern "C" void power_reboot() {
     SovereignPowerEngine::reboot();
 }
+
 
 
 

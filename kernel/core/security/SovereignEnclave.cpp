@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[ENCLAVE] Initializing Sovereign TEE Enclave Manager...");
         this->m_initialized = 1u;
         this->m_active_enclaves = 0u;
@@ -61,6 +61,7 @@ extern "C" void* enclave_create(sigma_size_t size) {
 extern "C" void enclave_enter(void* ptr) {
     SigmaOS::Kernel::Security::SovereignEnclaveManager::enterEnclave(ptr);
 }
+
 
 
 

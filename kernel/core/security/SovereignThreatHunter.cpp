@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignThreatHunter"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [THREAT-HUNTER]: Initializing Sovereign Offensive Security Suite...");
         sigma_log("Σ [THREAT-HUNTER]: Continuous lattice penetration testing ACTIVE.");
     }
@@ -60,6 +60,7 @@ extern "C" void threat_hunter_init() {
 extern "C" void threat_hunter_audit(const char* target) {
     SigmaOS::Kernel::Security::SovereignThreatHunter::executeAudit(target);
 }
+
 
 
 

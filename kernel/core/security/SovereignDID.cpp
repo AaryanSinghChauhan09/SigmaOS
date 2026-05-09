@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[DID] Initializing Sovereign Decentralized Identifier Shard...");
         this->m_initialized = 1u;
         this->m_total_dids = 0u;
@@ -61,6 +61,7 @@ extern "C" void did_create(const char* subject) {
 extern "C" bool did_verify(const char* did) {
     return SigmaOS::Kernel::Security::SovereignDIDManager::verifyDID(did);
 }
+
 
 
 

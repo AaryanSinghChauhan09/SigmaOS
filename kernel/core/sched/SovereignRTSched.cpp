@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log_info("[RT-SCHED] Initializing Real-Time Policy (EDF/FIFO)...");
     }
 
@@ -46,3 +46,4 @@ extern "C" void sigma_rt_sched_init() {
 extern "C" void sigma_rt_schedule(unsigned int id, unsigned int prio, unsigned long long deadline) {
     SigmaOS::Kernel::Sched::SovereignRTScheduler::scheduleRT(id, prio, deadline);
 }
+

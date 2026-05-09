@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[AETHER] Initializing Sovereign Aether-Net Stealth Nexus...");
         this->m_initialized = 1u;
         this->m_stealth_active = 0u;
@@ -54,6 +54,7 @@ extern "C" void aether_init() {
 extern "C" void aether_set_stealth(bool active) {
     SigmaOS::Kernel::Network::SovereignAetherNet::setStealthMode(active);
 }
+
 
 
 

@@ -15,7 +15,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[WIFI] Initializing Sovereign Wi-Fi Lattice...");
         this->connected = false;
         this->scan_in_progress = false;
@@ -58,3 +58,4 @@ extern "C" void wifi_scan() {
 extern "C" int wifi_connect(const char* ssid, const char* pass) {
     return SovereignWiFi::connect(ssid, pass) ? 1 : 0;
 }
+

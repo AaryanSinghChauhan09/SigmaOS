@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignSEL"; }
 
-    void init() {
+    static void init() {
         sigma_log("[SEL] Initializing Security Enforcement Lattice...");
         m_active_sandboxes = 0;
         sigma_log("[SEL] Micro-VM Isolation Shards (Intel VT-x) READY.");
@@ -74,6 +74,7 @@ extern "C" void sel_init_shard() {
 extern "C" void sel_spawn_sandbox(const char* name) {
     SigmaOS::Kernel::Security::SovereignSEL::spawnSandbox(name);
 }
+
 
 
 

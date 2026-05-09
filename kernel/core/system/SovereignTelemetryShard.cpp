@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignTelemetryShard"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [TELEMETRY]: Initializing Sovereign Bare-Metal Telemetry Nexus...");
         sigma_log("Σ [TELEMETRY]: Zero-overhead silicon metrics ACTIVE.");
     }
@@ -57,6 +57,7 @@ extern "C" void telemetry_init() {
 extern "C" void telemetry_record(const char* name, sigma_u64 val) {
     SigmaOS::Kernel::System::SovereignTelemetryShard::recordMetric(name, val);
 }
+
 
 
 

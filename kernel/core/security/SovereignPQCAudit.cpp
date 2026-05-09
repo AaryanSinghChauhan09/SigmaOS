@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignPQCAudit"; }
 
-    void performAudit() {
+    static void performAudit() {
         sigma_log_info("[PQC-AUDIT] Audit: Kyber implementation verified against NIST test vectors.");
         sigma_log_info("[PQC-AUDIT] Compliance: [FIPS-203 READY].");
     }
@@ -38,3 +38,4 @@ private:
 extern "C" void pqc_audit_fips() {
     SigmaOS::Kernel::Security::SovereignPQCAudit::performAudit();
 }
+

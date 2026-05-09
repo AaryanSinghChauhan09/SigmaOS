@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignThreadOrchestrator"; }
 
-    void init() {
+    static void init() {
         sigma_log("Î£ [THREAD-ORCH]: Initializing Concurrency Shard...");
         m_active_threads = 0;
         sigma_log("Î£ [THREAD-ORCH]: Lattice Concurrency Fabric ONLINE.");
@@ -61,6 +61,7 @@ extern "C" void thread_orch_init() {
 extern "C" void thread_orch_spawn(const char* id, sigma_u32 p) {
     SigmaOS::Kernel::Process::SovereignThreadOrchestrator::spawnThread(id, p);
 }
+
 
 
 

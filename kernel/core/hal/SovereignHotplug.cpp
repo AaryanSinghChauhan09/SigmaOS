@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[HOTPLUG] Initializing Sovereign Dynamic Silicon Enumerator (DSE)...");
         this->m_initialized = 1u;
         this->m_device_count = 0u;
@@ -56,6 +56,7 @@ extern "C" void hotplug_init() {
 extern "C" void hotplug_handle_event() {
     SigmaOS::Kernel::HAL::SovereignHotplugManager::handleInterrupt();
 }
+
 
 
 

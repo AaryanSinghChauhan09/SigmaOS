@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[WIDGETS] Initializing Sovereign Interactive Widget Engine...");
         this->active_widgets = 0;
         sigma_log("[WIDGETS] 120fps hardware-accelerated morphic rendering ACTIVE.");
@@ -60,6 +60,7 @@ extern "C" void widgets_spawn(const char* widget_type, sigma_u32 x, sigma_u32 y)
 extern "C" void widgets_interact(sigma_u32 id, const char* interaction) {
     SovereignWidgetEngine::interactWidget(id, interaction);
 }
+
 
 
 

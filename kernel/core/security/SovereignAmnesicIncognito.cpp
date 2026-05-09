@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignAmnesicIncognito"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [INCOGNITO]: Initializing Sovereign Amnesic Incognito Subsystem...");
         sigma_log("Σ [INCOGNITO]: Zero-footprint, memory-only execution ACTIVE.");
     }
@@ -60,6 +60,7 @@ extern "C" void incognito_init() {
 extern "C" void incognito_launch(const char* shard) {
     SigmaOS::Kernel::Security::SovereignAmnesicIncognito::launchUntraceableShard(shard);
 }
+
 
 
 

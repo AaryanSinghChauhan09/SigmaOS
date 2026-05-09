@@ -21,7 +21,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignScheduler"; }
 
-    void init() {
+    static void init() {
         sigma_log("[SCHED] Initializing Sovereign Multitasking Shard...");
         m_tasks = new SigmaVector<SovereignTask*>();
         sigma_log("[SCHED] Silicon Orchestration READY.");
@@ -77,6 +77,7 @@ extern "C" void scheduler_init_shard() {
 extern "C" void scheduler_spawn(const char* name, void (*entry)()) {
     SigmaOS::Kernel::Scheduling::SovereignScheduler::createTask(name, entry);
 }
+
 
 
 

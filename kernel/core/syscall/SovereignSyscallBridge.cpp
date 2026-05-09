@@ -22,7 +22,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignSyscallBridge"; }
 
-    void init() {
+    static void init() {
         sigma_log("[SYSBRIDGE] Orchestrating POSIX-lite Syscall Shards...");
         m_calls_handled = 0;
         sigma_log("[SYSBRIDGE] Syscall Entry (INT 0x80 / SYSCALL) Active.");
@@ -67,6 +67,7 @@ extern "C" void sysbridge_init_shard() {
 extern "C" sigma_u64 sysbridge_handle_shard(sigma_u64 n, sigma_u64 a1, sigma_u64 a2, sigma_u64 a3) {
     return SigmaOS::Kernel::Syscall::SovereignSyscallBridge::handle(n, a1, a2, a3);
 }
+
 
 
 

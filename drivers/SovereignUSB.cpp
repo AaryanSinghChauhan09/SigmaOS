@@ -13,7 +13,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[USB] Initializing Sovereign Universal Lattice Bus...");
         for(int i=0; i<4; i++) {
             this->ports[i].port_id = i;
@@ -72,3 +72,4 @@ extern "C" void usb_poll() {
 extern "C" int usb_send_control(uint8_t port, void* setup_packet) {
     return SovereignUSBStack::sendControl(port, setup_packet);
 }
+

@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[HOTSWAP] Initializing Dynamic Shard Hot-Swapping Engine...");
         this->m_initialized = 1u;
     }
@@ -61,6 +61,7 @@ extern "C" void hotswap_init() {
 extern "C" bool hotswap_execute(const char* id, const void* logic, sigma_size_t size) {
     return SigmaOS::Kernel::System::SovereignHotSwap::swapShard(id, logic, size);
 }
+
 
 
 

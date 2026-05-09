@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "PredictiveScheduler"; }
 
-    void init() {
+    static void init() {
         sigma_log("Î£ [PREDICT-SCHED]: Orchestrating Silicon Predictive Engine...");
         m_optimizations = 0;
         sigma_log("Î£ [PREDICT-SCHED]: Neural Workload Profiler READY.");
@@ -61,6 +61,7 @@ extern "C" void predict_sched_init() {
 extern "C" void predict_sched_dispatch(const char* id, sigma_u32 prio) {
     SigmaOS::Kernel::Scheduling::PredictiveScheduler::scheduleShard(id, prio);
 }
+
 
 
 

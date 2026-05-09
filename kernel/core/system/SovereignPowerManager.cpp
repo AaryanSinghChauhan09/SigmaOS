@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignPowerManager"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [POWER]: Initializing Sovereign ACPI-lite Orchestrator...");
         sigma_log("Σ [POWER]: Silicon Sleep States (S0-S5) mapping READY.");
     }
@@ -68,6 +68,7 @@ extern "C" void power_init() {
 extern "C" void power_set_state(sigma_u32 s) {
     SigmaOS::Kernel::System::SovereignPowerManager::setSleepState(s);
 }
+
 
 
 

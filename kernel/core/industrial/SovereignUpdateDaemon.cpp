@@ -34,7 +34,7 @@ public:
         return true;
     }
 
-    void checkForUpdates() {
+    static void checkForUpdates() {
         sigma_log_info("[UPD-DAEMON] Querying P2P SovereignNetMesh for new system shards...");
         sigma_log_info("[UPD-DAEMON] No updates available at this time.");
     }
@@ -53,3 +53,4 @@ extern "C" int update_verify(const char* path, const sigma_u8* sig) {
     return SigmaOS::Kernel::Industrial::SovereignUpdateDaemon::getInstance()
         .verifyUpdatePackage(path, sig) ? 1 : 0;
 }
+

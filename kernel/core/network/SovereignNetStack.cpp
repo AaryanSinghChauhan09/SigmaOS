@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[NET] Initializing Sovereign TCP/IP Stack...");
         this->interfaces_active = 0;
         this->packets_filtered = 0;
@@ -64,6 +64,7 @@ extern "C" void netstack_register_iface(const char* mac_addr) {
 extern "C" bool netstack_dispatch(const char* payload, sigma_u32 length) {
     return SovereignNetStackEngine::dispatchPacket(payload, length);
 }
+
 
 
 

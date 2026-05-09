@@ -24,7 +24,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [VIRTIO]: Initializing Universal Virtio Bus...");
         this->device_count = 0;
         this->initialized = true;
@@ -57,3 +57,4 @@ extern "C" void virtio_init() {
 extern "C" void virtio_register(sigma_u32 id) {
     SigmaOS::Kernel::Drivers::SovereignVirtio::registerDevice(id);
 }
+

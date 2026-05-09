@@ -17,7 +17,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[INSTALL] Initializing Sovereign Autonomous Deployment Engine (ABMD)...");
         this->initialized = 1u;
     }
@@ -59,6 +59,7 @@ extern "C" void install_execute() {
 extern "C" sigma_u32 install_get_progress() {
     return SovereignInstallerEngine::getProgress();
 }
+
 
 
 

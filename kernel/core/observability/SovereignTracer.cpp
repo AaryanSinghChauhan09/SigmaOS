@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignTracer"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [TRACER]: Initializing Sovereign Silicon Tracer...");
         sigma_log("Σ [TRACER]: Non-intrusive instruction-level hooks ACTIVE.");
     }
@@ -56,6 +56,7 @@ extern "C" void tracer_init() {
 extern "C" void tracer_log_instr(sigma_u64 rip, const char* mnemonic) {
     SigmaOS::Kernel::System::SovereignTracer::traceInstruction(rip, mnemonic);
 }
+
 
 
 

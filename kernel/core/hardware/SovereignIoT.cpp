@@ -27,7 +27,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[IOT] Initializing Sovereign IoT Orchestration Engine...");
         this->device_count = 0;
         sigma_log("[IOT] SovereignProtocol mesh ARMED for IoT telemetry streaming.");
@@ -64,6 +64,7 @@ extern "C" void iot_init() { SovereignIoTEngine::init(); }
 extern "C" sigma_u32 iot_register_device(const char* type, sigma_u32 id) { return SovereignIoTEngine::registerDevice(type, id); }
 extern "C" void iot_publish_telemetry(sigma_u32 id, sigma_u32 val, sigma_u32 tick) { SovereignIoTEngine::publishTelemetry(id, val, tick); }
 extern "C" void iot_push_ota(sigma_u32 id, const char* fw) { SovereignIoTEngine::pushFirmwareOTA(id, fw); }
+
 
 
 

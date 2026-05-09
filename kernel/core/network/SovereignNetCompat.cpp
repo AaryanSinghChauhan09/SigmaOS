@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignNetCompat"; }
 
-    void mapSkBuff(void* skb_ptr) {
+    static void mapSkBuff(void* skb_ptr) {
         sigma_log_info("[NET-ABI] Mapping Linux sk_buff to SovereignNetPacket...");
         sigma_log_info("[NET-ABI] Extracting IP headers and payload pointers.");
         sigma_log_info("[NET-ABI] Handing off to Zero-Trust inspection engine.");
@@ -39,3 +39,4 @@ private:
 extern "C" void netstack_map_skb(void* skb) {
     SigmaOS::Kernel::Network::SovereignNetCompat::mapSkBuff(skb);
 }
+

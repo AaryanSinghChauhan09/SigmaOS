@@ -21,7 +21,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[LOG] Initializing Sovereign System Logging Nexus...");
         this->initialized = 1u;
     }
@@ -96,6 +96,7 @@ extern "C" void log_dump_lattice() {
 extern "C" sigma_u64 log_get_total_emitted() {
     return SovereignLogEngine::getTotalEmitted();
 }
+
 
 
 

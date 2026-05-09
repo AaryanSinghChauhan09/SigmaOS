@@ -22,7 +22,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignMediaEngine"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [MEDIA]: Initializing Sovereign Media Pipeline...");
         sigma_log("Σ [MEDIA]: Hardware-accelerated (AV1/H265) silicon-mapping ACTIVE.");
     }
@@ -56,6 +56,7 @@ extern "C" void media_init() {
 extern "C" void media_process_frame(void* buf, sigma_usize sz) {
     SigmaOS::Kernel::Multimedia::SovereignMediaEngine::processFrame(buf, sz);
 }
+
 
 
 

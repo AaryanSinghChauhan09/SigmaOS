@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[ENTROPY] Initializing Sovereign Neural Entropy Nexus...");
         this->m_initialized = 1u;
         this->m_pool_bits = 0u;
@@ -60,6 +60,7 @@ extern "C" void entropy_init() {
 extern "C" sigma_u64 entropy_get() {
     return SigmaOS::Kernel::Security::SovereignEntropySource::harvestEntropy();
 }
+
 
 
 

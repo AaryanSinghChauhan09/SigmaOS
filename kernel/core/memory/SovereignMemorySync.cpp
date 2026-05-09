@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[MEM-SYNC] Initializing Cross-ISA Memory Synchronization Fabric...");
         this->active_fences = 0;
         this->coherence_faults = 0;
@@ -63,6 +63,7 @@ extern "C" void memsync_fence(const char* src, const char* tgt) {
 extern "C" bool memsync_cas(sigma_u32* addr, sigma_u32 expected, sigma_u32 new_val) {
     return SovereignMemorySyncEngine::compareAndSwapCrossISA(addr, expected, new_val);
 }
+
 
 
 

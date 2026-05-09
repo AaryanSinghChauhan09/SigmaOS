@@ -26,7 +26,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[NIC] Probing PCIe bus for network interface...");
         this->nic_type = NIC_TYPE_UNKNOWN;
         this->tx_packets = 0;
@@ -86,6 +86,7 @@ extern "C" bool nic_transmit(const char* payload, sigma_u32 length) {
 extern "C" void nic_rx_interrupt() {
     SovereignNICDriverEngine::receiveInterrupt();
 }
+
 
 
 

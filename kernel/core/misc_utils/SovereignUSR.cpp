@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[USR] Initializing Unified Shard Registry...");
         this->active_services = 0;
         sigma_log("[USR] Quantum-Safe Service Orchestrator ACTIVE.");
@@ -64,6 +64,7 @@ extern "C" void usr_register_shard(const char* name, sigma_u32 id) {
 extern "C" sigma_u32 usr_discover_shard(const char* name) {
     return SovereignUSREngine::discoverShard(name);
 }
+
 
 
 

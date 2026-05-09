@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignNeuralEngine"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [NEURAL]: Initializing Sovereign Neural Nexus (S-NPU Orchestrator)...");
         this->npu_available = this->probeNPUHardware();
     if (this->npu_available) {
@@ -125,6 +125,7 @@ extern "C" void neural_predict(const void* input_tensor, void* output_tensor) {
 extern "C" void neural_report_status() {
     SigmaOS::Kernel::AI::SovereignNeuralEngine::reportStatus();
 }
+
 
 
 

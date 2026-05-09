@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[GESTURE] Initializing Hardware-Accelerated Gesture Recognition...");
         this->gestures_detected = 0;
     }
@@ -48,6 +48,7 @@ extern "C" void gesture_init() {
 extern "C" void gesture_process_touch(sigma_u32 fingers, sigma_u32 dx, sigma_u32 dy) {
     SovereignGestureEngine::processMultiTouch(fingers, dx, dy);
 }
+
 
 
 

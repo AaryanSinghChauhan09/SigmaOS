@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init(sigma_u32 fb_width, sigma_u32 fb_height) {
+    static void init(sigma_u32 fb_width, sigma_u32 fb_height) {
         this->fb_w = fb_width;
         this->fb_h = fb_height;
         this->progress = 0;
@@ -50,6 +50,7 @@ extern "C" void bootsplash_init(sigma_u32 w, sigma_u32 h) { SovereignBootSplashE
 extern "C" void bootsplash_progress(sigma_u32 pct, const char* stage) { SovereignBootSplashEngine::updateProgress(pct, stage); }
 extern "C" void bootsplash_set_theme(const char* theme) { SovereignBootSplashEngine::setTheme(theme); }
 extern "C" void bootsplash_dismiss() { SovereignBootSplashEngine::dismiss(); }
+
 
 
 

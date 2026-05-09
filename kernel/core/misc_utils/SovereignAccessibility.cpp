@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[ACCESSIBILITY] Initializing Smart Defaults Engine...");
         this->font_scale = 1.0f;
         this->high_contrast = false;
@@ -61,6 +61,7 @@ extern "C" void access_set_colorblind(const char* mode) {
 extern "C" void access_set_font_scale(float scale) {
     SovereignAccessibilityEngine::adjustFontScaling(scale);
 }
+
 
 
 

@@ -26,7 +26,7 @@ public:
     struct ShardID { const char* value; };
     struct AnomalyDesc { const char* value; };
 
-    void init() {
+    static void init() {
         sigma_log_info("[DIAG] Initializing Sovereign Silicon Health Monitor...");
         m_initialized = 1U;
         m_fault_count = 0U;
@@ -83,3 +83,4 @@ extern "C" void diag_report(const char* shard, const char* desc) {
         SigmaOS::Kernel::Observability::SovereignDiagEngine::ShardID{shard},
         SigmaOS::Kernel::Observability::SovereignDiagEngine::AnomalyDesc{desc});
 }
+

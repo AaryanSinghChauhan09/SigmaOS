@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [VFS-BROWSER]: Initializing Browser Storage Mapping...");
         this->storage_mounted = true;
     }
@@ -57,6 +57,7 @@ extern "C" sigma_ssize_t vfs_browser_read(int fd, void* buf, sigma_size_t count)
 extern "C" sigma_ssize_t vfs_browser_write(int fd, const void* buf, sigma_size_t count) {
     return SigmaOS::Kernel::Runtime::SovereignVFSBrowser::mock_write(fd, buf, count);
 }
+
 
 
 

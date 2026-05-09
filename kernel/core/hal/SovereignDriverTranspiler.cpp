@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignDriverTranspiler"; }
 
-    void init() {
+    static void init() {
         sigma_log("Î£ [TRANSPILER]: Orchestrating Driver Transpilation Shard...");
         m_transpiled_drivers = 0;
         sigma_log("Î£ [TRANSPILER]: Multi-Platform Silicon Compatibility ONLINE.");
@@ -61,6 +61,7 @@ extern "C" void transpiler_init_shard() {
 extern "C" void transpiler_run_shard(const char* id, const char* arch) {
     SigmaOS::Kernel::HAL::SovereignDriverTranspiler::transpile(id, arch);
 }
+
 
 
 

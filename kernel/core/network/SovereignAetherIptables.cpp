@@ -34,7 +34,7 @@ public:
         return true;
     }
 
-    void init() {
+    static void init() {
         sigma_log_info("[IPTABLES-COMPAT] Iptables/Nftables Shim ONLINE.");
     }
 
@@ -51,3 +51,4 @@ extern "C" void iptables_init() {
 extern "C" void iptables_apply(const char* rule) {
     SigmaOS::Kernel::Network::SovereignAetherIptables::applyLinuxRule(rule);
 }
+

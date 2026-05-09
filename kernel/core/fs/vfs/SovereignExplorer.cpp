@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignExplorer"; }
 
-    void init() {
+    static void init() {
         sigma_log("Î£ [EXPLORER]: Initializing Sovereign File Explorer Shard...");
         m_active_path = "/";
         sigma_log("Î£ [EXPLORER]: Lattice Navigation Engine ONLINE.");
@@ -61,6 +61,7 @@ extern "C" void explorer_init_shard() {
 extern "C" void explorer_nav_shard(const char* path) {
     SigmaOS::Kernel::FS::SovereignExplorer::navigate(path);
 }
+
 
 
 

@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[TELEMETRY-EX] Initializing External Observability Hooks...");
         this->endpoint_configured = false;
     }
@@ -55,6 +55,7 @@ extern "C" void telemetry_ex_configure(const char* ip) {
 extern "C" void telemetry_ex_export(sigma_u32 cpu, sigma_u32 mem) {
     SovereignTelemetryExporter::exportMetrics(cpu, mem);
 }
+
 
 
 

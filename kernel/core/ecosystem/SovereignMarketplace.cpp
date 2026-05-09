@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignMarketplace"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [MARKETPLACE]: Initializing Sovereign Orb Exchange...");
         sigma_log("Σ [MARKETPLACE]: Decentralized package distribution economy ACTIVE.");
         m_available_orbs = 1;
@@ -66,6 +66,7 @@ extern "C" void marketplace_init() {
 extern "C" void marketplace_publish(const char* orb, const char* author) {
     SigmaOS::Kernel::Ecosystem::SovereignMarketplace::publishOrb(orb, author);
 }
+
 
 
 

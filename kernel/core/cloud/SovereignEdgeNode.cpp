@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignEdgeNode"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [EDGE]: Initializing Sovereign Edge Node Orchestrator...");
         sigma_log("Σ [EDGE]: Distributed execution and local sovereign autonomy ACTIVE.");
     }
@@ -60,6 +60,7 @@ extern "C" void edge_node_init() {
 extern "C" void edge_deploy(const char* workload) {
     SigmaOS::Kernel::Cloud::SovereignEdgeNode::deployWorkload(workload);
 }
+
 
 
 

@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignCI"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [CI-CD]: Initializing Sovereign CI/CD Pipeline Nexus...");
         sigma_log("Σ [CI-CD]: Automated build verification and GitHub sync ACTIVE.");
     }
@@ -60,6 +60,7 @@ extern "C" void ci_pipeline_init() {
 extern "C" void ci_trigger(const char* hash) {
     SigmaOS::Kernel::Development::SovereignCI::triggerPipeline(hash);
 }
+
 
 
 

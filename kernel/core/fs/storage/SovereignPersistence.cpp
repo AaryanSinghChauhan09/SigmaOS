@@ -25,7 +25,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignPersistence"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [PERSISTENCE]: Initializing Decentralized Persistence Lattice...");
         m_snapshots_stored = 0;
         sigma_log("Σ [PERSISTENCE]: DNA-Backed Storage Backend ACTIVE.");
@@ -71,6 +71,7 @@ extern "C" void persistence_snapshot(const char* component) {
 extern "C" void persistence_restore(const char* component) {
     SigmaOS::Kernel::FS::SovereignPersistence::restoreState(component);
 }
+
 
 
 

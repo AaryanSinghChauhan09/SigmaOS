@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignRollingRelease"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [ROLLING]: Initializing Sovereign Rolling Release Orchestrator...");
         sigma_log("Σ [ROLLING]: Frictionless bleeding-edge updates ACTIVE.");
     }
@@ -60,6 +60,7 @@ extern "C" void rolling_release_init() {
 extern "C" void rolling_sync() {
     SigmaOS::Kernel::System::SovereignRollingRelease::syncBleedingEdge();
 }
+
 
 
 

@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignGovernance"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [GOVERNANCE]: Initializing Decentralized Contributor Registry...");
         m_active_proposals = 0;
         m_total_votes = 0;
@@ -82,6 +82,7 @@ extern "C" void governance_submit(const char* prop) {
 extern "C" void governance_vote(const char* node, const char* prop, bool support) {
     SigmaOS::Kernel::Community::SovereignGovernance::castVote(node, prop, support);
 }
+
 
 
 

@@ -22,7 +22,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignZeroTrustEnforcer"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [ZERO-TRUST]: Initializing Sovereign Zero-Trust Enforcer...");
         sigma_log("Σ [ZERO-TRUST]: Continuous authentication and micro-segmentation ACTIVE.");
     }
@@ -58,6 +58,7 @@ extern "C" void zta_enforcer_init() {
 extern "C" bool zta_verify_access(const char* id, const char* res) {
     return SigmaOS::Kernel::Security::SovereignZeroTrustEnforcer::verifyAccess(id, res);
 }
+
 
 
 

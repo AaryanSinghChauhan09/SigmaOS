@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[ORB-REG] Initializing Sovereign Global Shard Registry...");
         this->m_initialized = 1u;
         this->m_registered_orbs = 100u; // Initial industrial set
@@ -66,6 +66,7 @@ extern "C" bool orbreg_register(const char* name, const char* cid) {
 extern "C" void orbreg_list() {
     SigmaOS::Kernel::Industrial::SovereignOrbRegistry::listOrbs();
 }
+
 
 
 

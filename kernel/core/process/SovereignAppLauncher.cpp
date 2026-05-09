@@ -26,7 +26,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[LAUNCHER] Initializing Sovereign App Launcher...");
         this->app_count = 0;
     }
@@ -69,6 +69,7 @@ extern "C" void launcher_init() { SovereignAppLauncherEngine::init(); }
 extern "C" void launcher_register(const char* id, const char* name) { SovereignAppLauncherEngine::registerApp(id, name); }
 extern "C" void launcher_launch(const char* query) { SovereignAppLauncherEngine::launch(query); }
 extern "C" void launcher_list_top(sigma_u32 n) { SovereignAppLauncherEngine::listTop(n); }
+
 
 
 

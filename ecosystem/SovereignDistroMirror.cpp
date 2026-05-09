@@ -40,7 +40,7 @@ public:
     }
 
     // USP: Checksum Validation (usp: Pacman)
-    void ValidateShardIntegrity(const const char*& shard_id) {
+    static void validateShardIntegrity(const const char*& shard_id) {
         sigma_printf("[MIRROR_VERIFY]: VALIDATING SHA-256 SUM FOR '" << shard_id << "'...\n");
         sigma_printf("[MIRROR_VERIFY]: 100% Match. Shard verified and secure.\n");
     }
@@ -55,4 +55,5 @@ int main() {
     sigma_printf("\n[SUCCESS]: Competitive Distro Mirror Online. Absolute Package Sovereignty.\n");
     return 0;
 }
+
 

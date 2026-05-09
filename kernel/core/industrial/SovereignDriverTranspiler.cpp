@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignDriverTranspiler"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [DRIVER-TRANS]: Initializing Legacy Driver Translation Engine...");
         sigma_log("Σ [DRIVER-TRANS]: Translation Map: [Linux-KO] -> [Sovereign-Shard] ARMED.");
     }
@@ -59,6 +59,7 @@ extern "C" void driver_transpiler_init() {
 extern "C" void driver_transpiler_map(const char* name, sigma_u32 ev) {
     SigmaOS::Kernel::Industrial::SovereignDriverTranspiler::translateEvent(name, ev);
 }
+
 
 
 

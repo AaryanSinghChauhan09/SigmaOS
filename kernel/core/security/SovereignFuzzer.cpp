@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignFuzzer"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [FUZZER]: Initializing Sovereign ML-Driven Kernel Fuzzer...");
         sigma_log("Σ [FUZZER]: Continuous silicon-level fault injection ACTIVE.");
     }
@@ -60,6 +60,7 @@ extern "C" void fuzzer_init() {
 extern "C" void fuzzer_inject(const char* target, sigma_u32 iters) {
     SigmaOS::Kernel::Security::SovereignFuzzer::injectFault(target, iters);
 }
+
 
 
 

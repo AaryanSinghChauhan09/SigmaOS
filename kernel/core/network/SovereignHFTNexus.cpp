@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[HFT-NEXUS] Initializing Ultra-Low Latency Silicon Networking...");
         this->m_initialized = 1u;
         this->m_bypass_active = 1u;
@@ -50,6 +50,7 @@ extern "C" void hft_init() {
 extern "C" void hft_process(const void* data, sigma_size_t size) {
     SigmaOS::Kernel::Network::SovereignHFTNexus::processTradePacket(data, size);
 }
+
 
 
 

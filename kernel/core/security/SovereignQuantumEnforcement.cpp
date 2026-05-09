@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignQuantumEnforcement"; }
 
-    void init() {
+    static void init() {
         sigma_log("Î£ [QE-SHARD]: Orchestrating Quantum Enforcement Layer...");
         m_enforced_policies = 0;
         sigma_log("Î£ [QE-SHARD]: Real-time Quantum Trust Monitoring ACTIVE.");
@@ -61,6 +61,7 @@ extern "C" void qe_init_shard() {
 extern "C" void qe_enforce_shard(const char* id) {
     SigmaOS::Kernel::Security::SovereignQuantumEnforcement::enforcePolicy(id);
 }
+
 
 
 

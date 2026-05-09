@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[SCP] Initializing Sovereign Custom Protocol Engine...");
         this->active_mesh_peers = 0;
         sigma_log("[SCP] Post-quantum mesh networking routing ARMED.");
@@ -58,6 +58,7 @@ extern "C" void scp_add_peer(const char* peer) {
 extern "C" void scp_broadcast(const char* data) {
     SovereignProtocolEngine::broadcast(data);
 }
+
 
 
 

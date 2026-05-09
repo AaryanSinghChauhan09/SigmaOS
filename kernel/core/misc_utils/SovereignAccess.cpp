@@ -16,7 +16,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[ACCESS] Initializing Sovereign Accessibility Core (UIT Algorithm)...");
     }
 
@@ -53,6 +53,7 @@ extern "C" void access_enable_mode(sigma_access_mode_t mode) {
 extern "C" void access_announce_ui_element(const char* element_desc) {
     SovereignAccess::announceUIElement(element_desc);
 }
+
 
 
 

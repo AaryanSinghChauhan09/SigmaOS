@@ -18,7 +18,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[COMPAT] Initializing Sovereign Compatibility Nexus (BIT Algorithm)...");
     }
 
@@ -60,6 +60,7 @@ extern "C" bool compat_load_binary(const char* path, sigma_compat_mode_t mode) {
 extern "C" void compat_mediate_syscall(sigma_u32 foreign_id, void* args) {
     SovereignCompatEngine::mediateSyscall(foreign_id, args);
 }
+
 
 
 

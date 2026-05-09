@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[DASHBOARD] Initializing Zenith System Settings Dashboard...");
         this->dashboard_open = false;
     }
@@ -56,6 +56,7 @@ extern "C" void settings_toggle() {
 extern "C" void settings_apply(const char* category, const char* value) {
     SovereignSettingsDashboard::applyUserPreference(category, value);
 }
+
 
 
 

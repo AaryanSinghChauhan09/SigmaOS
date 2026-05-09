@@ -23,7 +23,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[CONTAINER] Initializing Sovereign Container Layer (Micro-VMs)...");
         this->m_active_containers = 0;
         this->m_initialized = true;
@@ -73,6 +73,7 @@ extern "C" sigma_u32 container_spawn(const char* image_name) {
 extern "C" void container_destroy(sigma_u32 container_id) {
     SigmaOS::Kernel::Container::SovereignContainerEngine::destroyContainer(container_id);
 }
+
 
 
 

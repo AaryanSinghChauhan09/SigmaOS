@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[TASK-AUTO] Initializing Sovereign NLP-Driven Task Orchestrator...");
         this->m_initialized = 1u;
     }
@@ -56,6 +56,7 @@ extern "C" void task_automator_init() {
 extern "C" void task_automator_execute(const char* prompt) {
     SigmaOS::Kernel::AI::SovereignTaskAutomator::processRequest(prompt);
 }
+
 
 
 

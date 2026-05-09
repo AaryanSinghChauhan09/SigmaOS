@@ -27,7 +27,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[SETTINGS-SEARCH] Initializing Sovereign Predictive Settings Search...");
         this->settings_count = 0;
     }
@@ -67,6 +67,7 @@ private:
 extern "C" void settings_search_init() { SovereignSettingsSearchEngine::init(); }
 extern "C" void settings_search_register(const char* key, const char* label, const char* cat) { SovereignSettingsSearchEngine::registerSetting(key, label, cat); }
 extern "C" void settings_search_query(const char* query) { SovereignSettingsSearchEngine::search(query); }
+
 
 
 

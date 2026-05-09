@@ -18,7 +18,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [AI-PREDICT]: Initializing Neural Resource Prefetcher...");
     }
 
@@ -40,6 +40,7 @@ private:
 extern "C" void predictor_init() {
     SigmaOS::Kernel::AI::SovereignPredictor::init();
 }
+
 
 
 

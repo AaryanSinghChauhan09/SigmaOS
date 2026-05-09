@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[MICROKERNEL] Initializing Sovereign Microkernel Architecture...");
         this->microkernel_mode = false;
         this->ipc_channels_active = 0;
@@ -73,6 +73,7 @@ extern "C" void microkernel_disable() {
 extern "C" sigma_u32 microkernel_allocate_ipc(sigma_u32 service_a, sigma_u32 service_b) {
     return SovereignMicrokernelEngine::allocateIPCChannel(service_a, service_b);
 }
+
 
 
 

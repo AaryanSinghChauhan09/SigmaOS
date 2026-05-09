@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignVPN"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [VPN]: Initializing Sovereign VPN Nexus...");
         sigma_log("Σ [VPN]: Quantum-encrypted Mesh routing ACTIVE.");
     }
@@ -60,6 +60,7 @@ extern "C" void vpn_init() {
 extern "C" void vpn_connect(const char* peer) {
     SigmaOS::Kernel::Network::SovereignVPN::establishTunnel(peer);
 }
+
 
 
 

@@ -21,7 +21,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[UPDATER] Initializing Sovereign Atomic Deployment Engine...");
         this->m_initialized = 1u;
         this->m_current_generation = 100u; // Zenith v100
@@ -71,6 +71,7 @@ extern "C" bool updater_commit_update() {
 extern "C" void updater_rollback() {
     SigmaOS::Kernel::Deployment::SovereignAtomicUpdater::rollback();
 }
+
 
 
 

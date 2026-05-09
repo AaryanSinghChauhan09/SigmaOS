@@ -22,7 +22,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignFormalVerifier"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [VERIFIER]: Initializing Sovereign Formal Verification Engine...");
         sigma_log("Σ [VERIFIER]: Model-based runtime assurance ACTIVE.");
     }
@@ -59,6 +59,7 @@ extern "C" void verifier_init() {
 extern "C" bool verifier_verify_shard(const char* id, void* ptr) {
     return SigmaOS::Kernel::Security::SovereignFormalVerifier::verifyShard(id, ptr);
 }
+
 
 
 

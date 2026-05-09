@@ -12,7 +12,7 @@ namespace Userland {
 
 class UpdateAgent {
 public:
-    void checkForUpdates() {
+    static void checkForUpdates() {
         sigma_log_info("[UPDATE] Synchronizing manifest with remote repository...");
         // Fetch new SHARDS.manifest
     }
@@ -38,3 +38,4 @@ extern "C" void sigma_update_check() {
     SigmaOS::Userland::UpdateAgent agent;
     agent.checkForUpdates();
 }
+

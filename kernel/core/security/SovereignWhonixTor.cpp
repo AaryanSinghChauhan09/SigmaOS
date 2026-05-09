@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignWhonixTor"; }
 
-    void forceTorRouting() {
+    static void forceTorRouting() {
         sigma_log_info("[WHONIX-SHIM] Enforcing Privacy-First Tor Routing for all User Shards...");
         sigma_log_info("[WHONIX-SHIM] Neutralizing non-Tor IP traffic via Aether Firewall.");
         sigma_log_info("[WHONIX-SHIM] Privacy level: [MAXIMUM - ANONYMOUS].");
@@ -39,3 +39,4 @@ private:
 extern "C" void privacy_enforce_tor() {
     SigmaOS::Kernel::Security::SovereignWhonixTor::forceTorRouting();
 }
+

@@ -21,7 +21,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[TUNER] Probing silicon for performance USPs (Clear Linux Parity)...");
 
         /* CPUID-direct silicon profiling would go here in a real kernel. */
@@ -57,3 +57,4 @@ extern "C" void tuner_init() {
 extern "C" void tuner_apply_performance_governor() {
     SovereignTunerEngine::applyPerformanceGovernor();
 }
+

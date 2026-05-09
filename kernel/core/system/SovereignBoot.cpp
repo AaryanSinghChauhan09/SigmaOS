@@ -18,7 +18,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[BOOT] Initializing Sovereign System Boot Nexus (SSB Algorithm)...");
         this->current_stage = SIGMA_BOOT_STAGE_INIT;
         this->initialized = 1u;
@@ -70,6 +70,7 @@ extern "C" sigma_boot_stage_t boot_get_current_stage() {
 extern "C" sigma_u32 boot_get_ignited_count() {
     return SovereignBootEngine::getIgnitedCount();
 }
+
 
 
 

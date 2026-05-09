@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[SCRIPT-NEXUS] Initializing Sovereign Visual Node Orchestrator...");
         this->m_initialized = 1u;
         this->m_active_graphs = 0u;
@@ -55,6 +55,7 @@ extern "C" void script_nexus_init() {
 extern "C" void script_nexus_execute(const char* graph) {
     SigmaOS::Kernel::AI::SovereignScriptNexus::executeGraph(graph);
 }
+
 
 
 

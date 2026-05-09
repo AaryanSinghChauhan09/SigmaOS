@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[DEDUP] Initializing Sovereign Storage Deduplication Engine...");
         this->dedup_hits = 0;
         this->bytes_saved = 0;
@@ -61,6 +61,7 @@ private:
 extern "C" void dedup_init() { SovereignStorageDedupEngine::init(); }
 extern "C" bool dedup_check_block(sigma_u32 hash, sigma_u32 size) { return SovereignStorageDedupEngine::checkAndDedup(hash, size); }
 extern "C" void dedup_stats() { SovereignStorageDedupEngine::printStats(); }
+
 
 
 

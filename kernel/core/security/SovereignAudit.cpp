@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[AUDIT] Initializing Sovereign Immutable Audit Nexus...");
         this->m_initialized = 1u;
         this->m_audit_entries = 0u;
@@ -59,6 +59,7 @@ extern "C" void audit_log(const char* shard, const char* desc) {
 extern "C" void audit_verify() {
     SigmaOS::Kernel::Security::SovereignAuditEngine::performIntegrityCheck();
 }
+
 
 
 

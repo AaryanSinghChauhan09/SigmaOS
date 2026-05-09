@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[RBAC] Initializing Sovereign Role-Based Access Control Shard...");
         this->m_initialized = 1u;
     }
@@ -54,6 +54,7 @@ extern "C" void rbac_init() {
 extern "C" bool rbac_check(const char* role, const char* resource, const char* action) {
     return SigmaOS::Kernel::Security::SovereignRBAC::checkPermission(role, resource, action);
 }
+
 
 
 

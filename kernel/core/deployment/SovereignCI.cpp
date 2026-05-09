@@ -21,7 +21,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[SOVEREIGN-CI] Initializing Industrial Source-to-Shard Pipeline...");
         this->m_initialized = 1u;
         this->m_pipelines_executed = 0u;
@@ -69,6 +69,7 @@ extern "C" bool sci_trigger_pipeline(const char* source_path, const char* target
 extern "C" sigma_u64 sci_get_executed_count() {
     return SigmaOS::Kernel::Deployment::SovereignCIEngine::getExecutedCount();
 }
+
 
 
 

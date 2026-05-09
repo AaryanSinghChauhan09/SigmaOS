@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignPerf"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [PERF]: Initializing Sovereign Lattice Profiler...");
         sigma_log("Σ [PERF]: Shard Cycle Tracking ACTIVE.");
     }
@@ -60,6 +60,7 @@ extern "C" void perf_profile_shard(sigma_u32 id) {
 extern "C" void perf_report() {
     SigmaOS::Kernel::System::SovereignPerf::reportHotspots();
 }
+
 
 
 

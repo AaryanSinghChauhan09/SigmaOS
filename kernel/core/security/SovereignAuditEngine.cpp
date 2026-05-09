@@ -22,7 +22,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignAuditEngine"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [AUDIT]: Initializing Sovereign Tamper-Proof Audit Lattice...");
         sigma_log("Σ [AUDIT]: PQC-Signing Engine ACTIVE for kernel event streams.");
     }
@@ -55,6 +55,7 @@ extern "C" void audit_init() {
 extern "C" void audit_log_shard_event(const char* shard, const char* ev) {
     SigmaOS::Kernel::Security::SovereignAuditEngine::logEvent(shard, ev);
 }
+
 
 
 

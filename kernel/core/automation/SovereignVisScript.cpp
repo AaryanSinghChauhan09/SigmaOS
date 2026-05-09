@@ -18,7 +18,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[VISSCRIPT] Initializing Sovereign Visual Scripting Nexus (NGE Algorithm)...");
     }
 
@@ -55,6 +55,7 @@ extern "C" void visscript_init() {
 extern "C" void visscript_execute_graph(const sigma_visscript_node_t* start_node) {
     SovereignVisScriptEngine::executeGraph(start_node);
 }
+
 
 
 

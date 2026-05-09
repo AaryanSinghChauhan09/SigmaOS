@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignZenithDesktop"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [ZENITH-UI]: Initializing Sovereign Zenith Desktop...");
         sigma_log("Σ [ZENITH-UI]: Neural layouts and adaptive personalization ACTIVE.");
     }
@@ -60,6 +60,7 @@ extern "C" void zenith_desktop_init() {
 extern "C" void zenith_render(const char* context) {
     SigmaOS::Kernel::UI::SovereignZenithDesktop::renderWorkspace(context);
 }
+
 
 
 

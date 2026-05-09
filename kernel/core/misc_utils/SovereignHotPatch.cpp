@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[HOTPATCH] Initializing Sovereign Hot-Patch Engine...");
         this->patches_applied = 0;
     }
@@ -46,6 +46,7 @@ extern "C" void hotpatch_init() {
 extern "C" void hotpatch_apply(const char* shard, sigma_u32 patch_id) {
     SovereignHotPatchEngine::applyPatch(shard, patch_id);
 }
+
 
 
 

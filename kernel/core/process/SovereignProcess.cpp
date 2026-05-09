@@ -22,7 +22,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[PROC] Initializing Sovereign Scheduler (PATS Algorithm)...");
         // Spawn PID 0: Sovereign Genesis Task
         this->spawn("SovereignGenesis", 0u);
@@ -126,6 +126,7 @@ extern "C" sigma_process_t* proc_get_current() {
 extern "C" sigma_u64 proc_get_switch_count() {
     return SigmaOS::Kernel::Process::SovereignProcessEngine::getSwitchCount();
 }
+
 
 
 

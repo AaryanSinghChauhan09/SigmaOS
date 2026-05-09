@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignForensics"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [FORENSICS]: Initializing Sovereign Digital Forensics and Recovery Suite...");
         sigma_log("Σ [FORENSICS]: Cryptographic memory analysis and read-only mounting ACTIVE.");
     }
@@ -60,6 +60,7 @@ extern "C" void forensics_init() {
 extern "C" void forensics_scan(const char* vol) {
     SigmaOS::Kernel::System::SovereignForensics::executeDeepScan(vol);
 }
+
 
 
 

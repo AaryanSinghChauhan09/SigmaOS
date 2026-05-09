@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[CONTAINER-STORAGE] Initializing Sovereign Container Storage bridge...");
         this->active_mounts = 0;
     }
@@ -48,6 +48,7 @@ extern "C" void container_storage_init() {
 extern "C" void container_storage_mount(const char* container, const char* path) {
     SovereignContainerStorageEngine::mountVFSVolume(container, path);
 }
+
 
 
 

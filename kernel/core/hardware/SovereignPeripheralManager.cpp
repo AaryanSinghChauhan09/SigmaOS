@@ -22,7 +22,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignPeripheralManager"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [PERIPHERAL]: Initializing Sovereign Hot-Swap Orchestrator...");
         sigma_log("Σ [PERIPHERAL]: Dynamic device rule lattice ACTIVE.");
     }
@@ -56,6 +56,7 @@ extern "C" void peripheral_init() {
 extern "C" void peripheral_event(const char* id, bool plug) {
     SigmaOS::Kernel::Hardware::SovereignPeripheralManager::handleHotSwap(id, plug);
 }
+
 
 
 

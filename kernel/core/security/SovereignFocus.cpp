@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[FOCUS] Initializing Sovereign Focus-Lock Shard...");
         this->m_initialized = 1u;
         this->m_focus_active = 0u;
@@ -60,6 +60,7 @@ extern "C" void focus_activate(sigma_u32 level) {
 extern "C" void focus_deactivate() {
     SigmaOS::Kernel::Security::SovereignFocus::deactivateFocusLock();
 }
+
 
 
 

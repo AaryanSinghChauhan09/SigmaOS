@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignDriverTranspiler"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [TRANSPILER]: Initializing Sovereign Silicon-Direct Driver Transpiler...");
         sigma_log("Σ [TRANSPILER]: JIT translation for RISC-V and ARM architectures ACTIVE.");
     }
@@ -60,6 +60,7 @@ extern "C" void driver_transpiler_init() {
 extern "C" void driver_transpiler_compile(const char* driver, const char* arch) {
     SigmaOS::Kernel::Hardware::SovereignDriverTranspiler::transpileDriver(driver, arch);
 }
+
 
 
 

@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[TUNER] Initializing Micro-Architectural Tuner...");
         this->avx512_enabled = false;
         this->amx_enabled = false;
@@ -60,6 +60,7 @@ extern "C" void tuner_probe() {
 extern "C" void tuner_exec(const char* workload) {
     SovereignTunerEngine::executeAcceleratedWorkload(workload);
 }
+
 
 
 

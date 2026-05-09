@@ -22,7 +22,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignBPF"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [eBPF-NEXUS]: Initializing Sovereign Dynamic Tracing Nexus...");
         sigma_log("Σ [eBPF-NEXUS]: Sandboxed silicon interception ACTIVE.");
     }
@@ -57,6 +57,7 @@ extern "C" void ebpf_init() {
 extern "C" void ebpf_load_prog(const char* name, const void* code, sigma_usize sz) {
     SigmaOS::Kernel::System::SovereignBPF::loadProgram(name, code, sz);
 }
+
 
 
 

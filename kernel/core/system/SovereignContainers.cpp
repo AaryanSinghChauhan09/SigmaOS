@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[CONTAINER] Initializing Sovereign Micro-VM Containerization...");
         this->active_containers = 0;
         sigma_log("[CONTAINER] Bare-metal isolation namespaces ACTIVE.");
@@ -54,6 +54,7 @@ extern "C" void container_init() {
 extern "C" void container_spawn(const char* name, const char* entrypoint) {
     SovereignContainerEngine::spawnContainer(name, entrypoint);
 }
+
 
 
 

@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignDNS"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [DNS]: Initializing Sovereign Decentralized Naming System...");
         sigma_log("Σ [DNS]: Mesh-first resolution and cryptographic naming ACTIVE.");
     }
@@ -60,6 +60,7 @@ extern "C" void sovereign_dns_init() {
 extern "C" void sovereign_dns_resolve(const char* domain) {
     SigmaOS::Kernel::Network::SovereignDNS::resolveName(domain);
 }
+
 
 
 

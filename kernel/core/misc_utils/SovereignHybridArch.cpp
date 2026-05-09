@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[HYBRID-ARCH] Initializing ARM/RISC-V Universal Compute Bridge...");
         this->arm_cores_detected = 0;
         this->riscv_cores_detected = 0;
@@ -64,6 +64,7 @@ extern "C" void hybridarch_register_core(sigma_u32 core_id, const char* isa_type
 extern "C" bool hybridarch_dispatch_task(void* task_ptr) {
     return SovereignHybridArchEngine::dispatchHeterogeneousTask(task_ptr);
 }
+
 
 
 

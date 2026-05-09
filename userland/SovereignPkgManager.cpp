@@ -16,7 +16,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[S-PKG] Initializing Sovereign Package Manager...");
         this->installed_packages = 0;
     }
@@ -62,4 +62,5 @@ extern "C" bool spkg_install(const char* sab_file_path) {
 extern "C" void spkg_list() {
     SovereignPackageManager::getInstance().listPackages();
 }
+
 

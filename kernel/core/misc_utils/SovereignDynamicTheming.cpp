@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[THEME] Initializing Sovereign Dynamic Theming Engine...");
         this->current_mode = 0; // 0 = Auto, 1 = Dark, 2 = Light
         sigma_log("[THEME] Adaptive ambient tracking ENABLED.");
@@ -49,6 +49,7 @@ extern "C" void theme_init() {
 extern "C" void theme_update_ambient(sigma_u32 lux) {
     SovereignThemeEngine::updateAmbientContext(lux);
 }
+
 
 
 

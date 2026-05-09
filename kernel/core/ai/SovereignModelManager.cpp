@@ -22,7 +22,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignModelManager"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [MODEL-MAN]: Initializing Sovereign AI Model Orchestrator...");
         sigma_log("Σ [MODEL-MAN]: PQC-Signed model verification ACTIVE.");
     }
@@ -57,6 +57,7 @@ extern "C" void model_man_init() {
 extern "C" void model_man_load(const char* id) {
     SigmaOS::Kernel::AI::SovereignModelManager::loadModel(id);
 }
+
 
 
 

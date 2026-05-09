@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignTelemetry"; }
 
-    void executeTracing(const void* bytecode, sigma_usize size) {
+    static void executeTracing(const void* bytecode, sigma_usize size) {
         (void)bytecode; (void)size;
         sigma_log_info("[TELEMETRY-SHARD] eBPF: Injecting tracing program into the silicon bus...");
         sigma_log_info("[TELEMETRY-SHARD] eBPF: Attaching kprobe to 'sigma_syscall_gate'...");
@@ -40,3 +40,4 @@ private:
 extern "C" void telemetry_execute_ebpf(const void* bytecode, sigma_usize size) {
     SigmaOS::Kernel::Observability::SovereignTelemetry::executeTracing(bytecode, size);
 }
+

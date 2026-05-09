@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignCloudOrchestrator"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [CLOUD-ORCH]: Initializing Multi-Node Orchestrator...");
         m_coordinated_nodes = 0;
         sigma_log("Σ [CLOUD-ORCH]: Cloud-to-Lattice Handshake Protocol ACTIVE.");
@@ -61,6 +61,7 @@ extern "C" void cloud_orch_init() {
 extern "C" void cloud_orch_deploy(const char* task) {
     SigmaOS::Kernel::Cloud::SovereignCloudOrchestrator::orchestrate(task);
 }
+
 
 
 

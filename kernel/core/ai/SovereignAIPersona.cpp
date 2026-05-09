@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignAIPersona"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [AI-PERSONA]: Initializing Neural Adaptation Shard...");
         m_adaptation_level = 100;
         sigma_log("Σ [AI-PERSONA]: Cognitive Sync Established. Persona: SOVEREIGN-ZENITH.");
@@ -60,6 +60,7 @@ extern "C" void ai_persona_init() {
 extern "C" void ai_persona_adapt(const char* ctx) {
     SigmaOS::Kernel::AI::SovereignAIPersona::adapt(ctx);
 }
+
 
 
 

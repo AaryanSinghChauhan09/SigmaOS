@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[PERSONALIZE] Initializing Sovereign Personalization Engine...");
         this->telemetry_events_processed = 0;
         sigma_log("[PERSONALIZE] AI-driven local workflow prediction ACTIVE.");
@@ -60,6 +60,7 @@ extern "C" void personalize_process_event(sigma_u32 event_id, const char* contex
 extern "C" void personalize_suggest_theme(sigma_u32 ambient_light_lux) {
     SovereignPersonalizationEngine::suggestThemeForEnvironment(ambient_light_lux);
 }
+
 
 
 

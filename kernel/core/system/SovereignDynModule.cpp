@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[DYNMODULE] Initializing Sovereign Dynamic Module Loader (AHSL Algorithm)...");
     }
 
@@ -77,6 +77,7 @@ extern "C" bool dynmodule_load(const char* module_path) {
 extern "C" bool dynmodule_unload(sigma_u32 module_id) {
     return SovereignDynModuleEngine::unload(module_id);
 }
+
 
 
 

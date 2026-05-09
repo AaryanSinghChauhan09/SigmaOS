@@ -26,7 +26,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignContainerRuntime"; }
 
-    void init() {
+    static void init() {
         sigma_log_info("[CONTAINER] Initializing Sovereign OCI-Compliant Runtime...");
         sigma_log_info("[CONTAINER] Docker/Kubernetes Interoperability ONLINE.");
     }
@@ -61,3 +61,4 @@ extern "C" void container_runtime_init() {
 extern "C" void container_runtime_spawn(const char* image) {
     SigmaOS::Kernel::Industrial::SovereignContainerRuntime::spawnOCIContainer(image);
 }
+

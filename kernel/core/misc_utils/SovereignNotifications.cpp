@@ -28,7 +28,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[NOTIF] Initializing Sovereign Notification Center...");
         this->notif_count = 0;
         this->next_id = 1;
@@ -80,6 +80,7 @@ extern "C" void notif_init() { SovereignNotificationEngine::init(); }
 extern "C" sigma_u32 notif_push(const char* src, const char* msg, sigma_u32 sound) { return SovereignNotificationEngine::push(src, msg, sound); }
 extern "C" void notif_dismiss(sigma_u32 id) { SovereignNotificationEngine::dismiss(id); }
 extern "C" void notif_set_sound(bool enabled) { SovereignNotificationEngine::setSoundEnabled(enabled); }
+
 
 
 

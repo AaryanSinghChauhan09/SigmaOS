@@ -22,7 +22,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[NET] Initializing Sovereign Silicon-Direct Networking...");
         
         // Configure local NIC
@@ -90,6 +90,7 @@ extern "C" bool net_transmit_shard(sigma_u32 target_ip, sigma_u32 shard_id) {
 extern "C" void net_optimize_routes() {
     SovereignNetEngine::optimizeRoutes();
 }
+
 
 
 

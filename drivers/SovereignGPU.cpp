@@ -15,7 +15,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[GPU] Initializing Sovereign Graphics Lattice...");
         
         this->config.vram_base = 0xE0000000;
@@ -72,4 +72,5 @@ extern "C" void gpu_swap_buffers() {
 extern "C" void gpu_apply_motion_shader(void* shader_blob) {
     SovereignGPU::applyMotionShader(shader_blob);
 }
+
 

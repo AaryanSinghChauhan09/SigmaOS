@@ -17,7 +17,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[S-SPOT] Initializing Sovereign Spotlight Engine...");
         std::thread([this]() { this->reindexLattice(); }).detach();
     }
@@ -59,4 +59,5 @@ extern "C" void spotlight_search(const char* query) {
 extern "C" void spotlight_reindex() {
     SovereignSpotlightEngine::getInstance().reindexLattice();
 }
+
 

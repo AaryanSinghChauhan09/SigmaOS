@@ -37,7 +37,7 @@ public:
         return true;
     }
 
-    void init() {
+    static void init() {
         sigma_log_info("[APPARMOR] Sovereign Mandatory Access Control [ACTIVE].");
     }
 
@@ -55,3 +55,4 @@ extern "C" int apparmor_enforce(const char* proc, const char* profile) {
     return SigmaOS::Kernel::Security::SovereignAppArmor::getInstance()
         .enforceProfile(proc, profile) ? 1 : 0;
 }
+

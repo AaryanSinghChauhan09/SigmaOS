@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignCryptoAccelerator"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [CRYPTO-ACCEL]: Initializing Sovereign Hardware Crypto Accelerator...");
         sigma_log("Σ [CRYPTO-ACCEL]: Silicon-direct offloading ACTIVE.");
     }
@@ -61,6 +61,7 @@ extern "C" void crypto_accel_init() {
 extern "C" void crypto_accel_encrypt(const void* data, sigma_usize size) {
     SigmaOS::Kernel::Security::SovereignCryptoAccelerator::offloadEncryption(data, size);
 }
+
 
 
 

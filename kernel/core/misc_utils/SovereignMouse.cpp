@@ -17,7 +17,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[MOUSE] Initializing Sovereign HID Mouse Orchestration (HMO)...");
         this->initialized = 1u;
     }
@@ -50,6 +50,7 @@ extern "C" void mouse_init() {
 extern "C" void mouse_handle_report(const sigma_u8* report) {
     SovereignMouseEngine::handleReport(report);
 }
+
 
 
 

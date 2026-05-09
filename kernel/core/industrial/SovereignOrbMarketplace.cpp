@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[MARKET] Initializing Sovereign Decentralized Orb Marketplace...");
         this->m_initialized = 1u;
         this->m_listed_orbs = 500u;
@@ -59,6 +59,7 @@ extern "C" void market_browse(const char* cat) {
 extern "C" bool market_download(const char* id) {
     return SigmaOS::Kernel::Industrial::SovereignOrbMarketplace::downloadOrb(id);
 }
+
 
 
 

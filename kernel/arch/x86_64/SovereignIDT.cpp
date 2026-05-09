@@ -32,7 +32,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [IDT]: Initializing Sovereign Interrupt Descriptor Table...");
         
         // Zero-fill the IDT
@@ -79,3 +79,4 @@ private:
 extern "C" void idt_init() {
     SigmaOS::Kernel::Arch::SovereignIDT::init();
 }
+

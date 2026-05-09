@@ -21,7 +21,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[PSE] Initializing Sovereign WASM-Native Shard Execution Environment...");
         this->m_initialized = 1u;
         this->m_active_wasm_threads = 0u;
@@ -75,6 +75,7 @@ extern "C" sigma_u32 pse_execute_wasm(const void* bytecode, sigma_size_t size) {
 extern "C" void pse_terminate_wasm(sigma_u32 thread_id) {
     SigmaOS::Kernel::Process::SovereignPSEEngine::terminateWasm(thread_id);
 }
+
 
 
 

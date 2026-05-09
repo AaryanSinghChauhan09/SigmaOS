@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[AUTOMATOR] Initializing Workflow Automation Engine...");
         this->active_macros = 0;
         sigma_log("[AUTOMATOR] Predictive task flows ACTIVE.");
@@ -61,6 +61,7 @@ extern "C" void automator_register_macro(const char* trigger, const char* action
 extern "C" void automator_context_tick(const char* context) {
     SovereignAutomatorEngine::processContext(context);
 }
+
 
 
 

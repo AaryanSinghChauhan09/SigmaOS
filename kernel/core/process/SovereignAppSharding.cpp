@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignAppSharding"; }
 
-    void init() {
+    static void init() {
         sigma_log("Î£ [APP-SHARDING]: Initializing Application Sharding Layer...");
         m_active_apps = 0;
         m_total_shards = 0;
@@ -65,6 +65,7 @@ extern "C" void app_sharding_init() {
 extern "C" void app_shard_spawn(const char* name, sigma_u32 count) {
     SigmaOS::Kernel::Process::SovereignAppSharding::shardApp(name, count);
 }
+
 
 
 

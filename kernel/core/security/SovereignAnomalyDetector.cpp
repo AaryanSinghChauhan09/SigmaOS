@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignAnomalyDetector"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [ANOMALY-DETECT]: Initializing Sovereign AI Threat Hunter...");
         sigma_log("Σ [ANOMALY-DETECT]: Behavioral heuristics and zero-day prevention ACTIVE.");
     }
@@ -64,6 +64,7 @@ extern "C" void anomaly_detector_init() {
 extern "C" void anomaly_analyze(const char* proc, sigma_u32 sys_rate, sigma_u32 mem) {
     SigmaOS::Kernel::Security::SovereignAnomalyDetector::analyzeBehavior(proc, sys_rate, mem);
 }
+
 
 
 

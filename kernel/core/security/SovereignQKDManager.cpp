@@ -22,7 +22,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignQKDManager"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [QKD]: Initializing Sovereign Quantum Key Distribution Manager...");
         sigma_log("Σ [QKD]: Entanglement-based trust fabric ACTIVE.");
     }
@@ -57,6 +57,7 @@ extern "C" void qkd_init() {
 extern "C" void qkd_handshake(const char* node) {
     SigmaOS::Kernel::Security::SovereignQKDManager::performHandshake(node);
 }
+
 
 
 

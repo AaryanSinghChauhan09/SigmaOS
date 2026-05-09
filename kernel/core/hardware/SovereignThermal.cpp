@@ -18,7 +18,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[THERMAL] Initializing Sovereign ThermalIQ (ACO Algorithm)...");
         this->state.cpu_temp_avg = 35; // Celsius
         this->state.gpu_temp_avg = 32;
@@ -65,6 +65,7 @@ extern "C" void thermaliq_update() {
 extern "C" const sigma_thermal_state_t* thermaliq_get_state() {
     return SovereignThermalEngine::getState();
 }
+
 
 
 

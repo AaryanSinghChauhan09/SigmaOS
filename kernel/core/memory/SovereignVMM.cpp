@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[VMM] Initializing Sovereign Virtual Memory Shard (PML4)...");
         this->m_initialized = 1u;
         this->m_swap_enabled = 1u;
@@ -71,6 +71,7 @@ extern "C" void vmm_map(sigma_u64 virt, sigma_u64 phys, sigma_u32 flags) {
 extern "C" void vmm_set_swap(bool enable) {
     SigmaOS::Kernel::Memory::SovereignVMM::setSwap(enable);
 }
+
 
 
 

@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignRoutingManager"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [ROUTING]: Initializing Sovereign Routing Manager...");
         sigma_log("Σ [ROUTING]: Mesh-aware cryptographic routing tables ACTIVE.");
     }
@@ -60,6 +60,7 @@ extern "C" void routing_init() {
 extern "C" void routing_update(const char* dest, const char* next) {
     SigmaOS::Kernel::Network::SovereignRoutingManager::updateRoute(dest, next);
 }
+
 
 
 

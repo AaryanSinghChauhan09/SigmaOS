@@ -30,7 +30,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [CAP-VAULT]: Initializing Capability-Based Access Control (CBAC)...");
         this->tokens_issued = 0;
         this->initialized = true;
@@ -75,6 +75,7 @@ extern "C" sigma_u64 cap_vault_issue(sigma_u32 res, sigma_u32 perm) {
 extern "C" int cap_vault_validate(sigma_u64 token, sigma_u32 res, sigma_u32 perm) {
     return SigmaOS::Kernel::Security::SovereignCapabilityVault::validate(token, res, perm) ? 1 : 0;
 }
+
 
 
 

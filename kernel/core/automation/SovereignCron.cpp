@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignCron"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [CRON]: Initializing Sovereign Task Automation Nexus...");
         sigma_log("Σ [CRON]: Adaptive triggers and distributed scheduling ACTIVE.");
     }
@@ -58,6 +58,7 @@ extern "C" void cron_init() {
 extern "C" void cron_schedule(const char* task, sigma_u32 ms) {
     SigmaOS::Kernel::Automation::SovereignCron::scheduleTask(task, ms);
 }
+
 
 
 

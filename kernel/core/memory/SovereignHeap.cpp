@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init(void* start, sigma_size_t size) {
+    static void init(void* start, sigma_size_t size) {
         this->base = start;
         this->total_size = size;
         this->current_offset = 0u;
@@ -113,6 +113,7 @@ extern "C" sigma_u64 heap_get_total_allocations() {
 extern "C" sigma_u32 heap_get_active_allocations() {
     return SovereignHeapEngine::getActiveAllocations();
 }
+
 
 
 

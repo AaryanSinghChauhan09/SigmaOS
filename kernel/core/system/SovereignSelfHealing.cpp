@@ -29,7 +29,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log_info("[HEAL] Initializing Lattice Immune System...");
         
         // Subscribe to critical system events
@@ -66,3 +66,4 @@ private:
 extern "C" void sigma_self_healing_init() {
     SigmaOS::Kernel::Resilience::SovereignSelfHealingEngine::init();
 }
+

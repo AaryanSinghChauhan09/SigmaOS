@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignGamingPerformance"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [GAMING]: Initializing Sovereign Gaming & Rendering Optimizer...");
         sigma_log("Σ [GAMING]: Real-time frame pacing and extreme hardware acceleration ACTIVE.");
     }
@@ -60,6 +60,7 @@ extern "C" void gaming_perf_init() {
 extern "C" void gaming_perf_optimize() {
     SigmaOS::Kernel::Hardware::SovereignGamingPerformance::optimizeSession();
 }
+
 
 
 

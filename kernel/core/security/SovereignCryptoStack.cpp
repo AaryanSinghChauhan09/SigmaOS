@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignCryptoStack"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [CRYPTO]: Initializing Sovereign Legacy Crypto Stack...");
         sigma_log("Σ [CRYPTO]: RSA/ECC/AES Silicon-Direct mapping ACTIVE.");
     }
@@ -57,6 +57,7 @@ extern "C" void cryptostack_init() {
 extern "C" void cryptostack_encrypt(void* data, sigma_usize sz, sigma_u32 algo) {
     SigmaOS::Kernel::Security::SovereignCryptoStack::encrypt(data, sz, algo);
 }
+
 
 
 

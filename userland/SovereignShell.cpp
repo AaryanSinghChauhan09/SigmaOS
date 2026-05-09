@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_printf("\n--- SigmaOS Sovereign Shell (sigma_sh) ---\n");
         sigma_printf("Type 'help' for a list of commands.\n");
     }
@@ -56,3 +56,4 @@ extern "C" void shell_init() {
 extern "C" void shell_exec(const char* cmd) {
     SovereignShell::getInstance().executeCommand(cmd);
 }
+

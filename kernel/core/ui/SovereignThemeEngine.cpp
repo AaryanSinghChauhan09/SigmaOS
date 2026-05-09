@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[THEME] Initializing Sovereign Adaptive Theme Engine...");
         
         this->active_theme.accent_color = 0x00A0FF; // Sigma Blue
@@ -90,6 +90,7 @@ extern "C" void theme_toggle_dark_mode() {
 extern "C" void theme_evaluate_adaptive() {
     SovereignThemeEngine::evaluateAdaptiveTheme();
 }
+
 
 
 

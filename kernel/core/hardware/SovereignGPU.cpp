@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[GPU] Initializing Modular GPU Driver Framework...");
         this->active_gpus = 0;
         this->ai_workloads_dispatched = 0;
@@ -66,6 +66,7 @@ extern "C" void gpu_register(const char* vendor_id, sigma_u32 vram_mb) {
 extern "C" bool gpu_dispatch(const char* workload_type) {
     return SovereignGPUEngine::dispatchComputeKernel(workload_type);
 }
+
 
 
 

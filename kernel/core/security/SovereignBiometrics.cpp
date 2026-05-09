@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[BIOMETRICS] Initializing Sovereign Biometric Identity Shard...");
         this->m_initialized = 1u;
         this->m_verified_identities = 0u;
@@ -55,6 +55,7 @@ extern "C" void biometrics_init() {
 extern "C" bool biometrics_verify(const char* type, const void* data, sigma_size_t size) {
     return SigmaOS::Kernel::Security::SovereignBiometrics::verifyUser(type, data, size);
 }
+
 
 
 

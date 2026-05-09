@@ -16,7 +16,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[NVMe] Initializing Sovereign Storage Controller...");
         
         // Scan PCI bus for NVMe class devices (Stub for now)
@@ -80,3 +80,4 @@ extern "C" int nvme_read_blocks(uint64_t lba, uint32_t count, void* buffer) {
 extern "C" int nvme_write_blocks(uint64_t lba, uint32_t count, const void* buffer) {
     return SovereignNVMeEngine::writeBlocks(lba, count, buffer);
 }
+

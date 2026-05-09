@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignLivePatcher"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [LIVE-PATCH]: Initializing Sovereign Live Patcher...");
         sigma_log("Σ [LIVE-PATCH]: Zero-downtime function trampolines ACTIVE.");
     }
@@ -61,6 +61,7 @@ extern "C" void live_patch_init() {
 extern "C" void live_patch_apply(const char* func, const void* payload) {
     SigmaOS::Kernel::System::SovereignLivePatcher::applyLivePatch(func, payload);
 }
+
 
 
 

@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[MESH] Initializing Sovereign P2P Mesh Lattice (Aether-Net)...");
         this->m_initialized = 1u;
         this->m_peer_count = 0u;
@@ -60,6 +60,7 @@ extern "C" void mesh_discover() {
 extern "C" void mesh_send(sigma_u32 node, const char* shard, const void* data, sigma_size_t size) {
     SigmaOS::Kernel::Network::SovereignMeshLattice::sendShardMessage(node, shard, data, size);
 }
+
 
 
 

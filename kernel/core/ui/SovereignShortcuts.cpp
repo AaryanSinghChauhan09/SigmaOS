@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[SHORTCUTS] Initializing Contextual Quick Actions Engine...");
     }
 
@@ -40,6 +40,7 @@ extern "C" void shortcuts_init() {
 extern "C" void shortcuts_suggest(const char* context, const char* suggestion) {
     SovereignShortcutsEngine::pushContextShortcut(context, suggestion);
 }
+
 
 
 

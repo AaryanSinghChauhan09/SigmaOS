@@ -23,7 +23,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignAtomicUpdater"; }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [ATOMIC-OS]: Initializing Sovereign Atomic Updater...");
         sigma_log("Σ [ATOMIC-OS]: Declarative state and immutable snapshotting ACTIVE.");
         m_current_generation = 1;
@@ -75,6 +75,7 @@ extern "C" void atomic_deploy(const char* hash) {
 extern "C" void atomic_rollback() {
     SigmaOS::Kernel::System::SovereignAtomicUpdater::rollback();
 }
+
 
 
 

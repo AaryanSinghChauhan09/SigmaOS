@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[AUDIO] Initializing Sovereign Audio Stack (Zero-Copy DMA)...");
         this->active_streams = 0;
         this->sample_rate = 48000;
@@ -58,6 +58,7 @@ extern "C" sigma_u32 audio_open_stream(const char* app, sigma_u32 channels) {
 extern "C" void audio_close_stream(sigma_u32 id) {
     SovereignAudioEngine::closeStream(id);
 }
+
 
 
 

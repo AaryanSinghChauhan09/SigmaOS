@@ -16,7 +16,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[NEURAL] Initializing Neural Hardware Acceleration Shard...");
         this->state.npu_engaged = true;
     }
@@ -44,6 +44,7 @@ extern "C" void neural_init() {
 extern "C" void neural_morph_ui(sigma_u32 widget_id, sigma_u32 cognitive_load) {
     SovereignNeuralAccelEngine::morphUI(widget_id, cognitive_load);
 }
+
 
 
 

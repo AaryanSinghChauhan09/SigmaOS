@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[TRUST] Initializing Sovereign Decentralized Trust Fabric...");
         this->m_initialized = 1u;
         this->m_trusted_nodes = 1u; // Self
@@ -67,6 +67,7 @@ extern "C" bool trust_verify(const char* shard, const char* sig) {
 extern "C" void trust_add_node(sigma_u32 id) {
     SigmaOS::Kernel::Security::SovereignTrustFabric::addTrustedNode(id);
 }
+
 
 
 

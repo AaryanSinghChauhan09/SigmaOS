@@ -25,7 +25,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[TILING] Initializing Sovereign Tiling Window Manager...");
         this->tile_count = 0;
         this->screen_w = 1920;
@@ -62,6 +62,7 @@ private:
 extern "C" void tiling_init() { SovereignTilingEngine::init(); }
 extern "C" void tiling_add_app(const char* id) { SovereignTilingEngine::tileApp(id); }
 extern "C" void tiling_set_layout(const char* layout) { SovereignTilingEngine::setLayout(layout); }
+
 
 
 

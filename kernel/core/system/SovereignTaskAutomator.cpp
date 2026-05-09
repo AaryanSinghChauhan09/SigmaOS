@@ -26,7 +26,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[AUTOMATION] Initializing Sovereign Automation Engine (SEP Algorithm)...");
         this->rule_count = 0;
         this->macro_recording = false;
@@ -93,6 +93,7 @@ extern "C" void taskautomator_start_macro() {
 extern "C" void taskautomator_stop_macro() {
     SovereignAutomationEngine::stopMacroRecording();
 }
+
 
 
 

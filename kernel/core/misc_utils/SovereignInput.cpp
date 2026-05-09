@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[INPUT] Sovereign SII Initialized. Interrupt vectors mapped.");
     }
 
@@ -68,6 +68,7 @@ extern "C" void input_push_event(sigma_key_event_t* event) {
 extern "C" bool input_pop_event(sigma_key_event_t* out_event) {
     return SovereignInputEngine::popEvent(out_event);
 }
+
 
 
 

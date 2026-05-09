@@ -20,7 +20,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[SEARCH] Initializing Sovereign Cross-Shard Search Engine...");
         this->m_initialized = 1u;
         this->m_indexed_nodes = 5000u;
@@ -54,6 +54,7 @@ extern "C" void search_init() {
 extern "C" void search_query(const char* term) {
     SigmaOS::Kernel::Misc::SovereignSearchEngine::query(term);
 }
+
 
 
 

@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("[SCHEDULER] Initializing O(1) Predictive Scheduler...");
         this->active_threads = 0;
         this->quantum_ms = 10;
@@ -63,6 +63,7 @@ extern "C" void sched_enqueue(sigma_u32 thread_id, sigma_u32 priority) {
 extern "C" sigma_u32 sched_predict_next() {
     return SovereignScheduler::predictNextThread();
 }
+
 
 
 

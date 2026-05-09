@@ -37,7 +37,7 @@ public:
         return true;
     }
 
-    void init() {
+    static void init() {
         sigma_log_info("[PODMAN-SHIM] Sovereign Container Execution Engine [READY].");
     }
 
@@ -55,3 +55,4 @@ extern "C" int podman_run(const char* img, const char* cmd) {
     return SigmaOS::Kernel::Industrial::SovereignPodman::getInstance()
         .runContainer(img, cmd) ? 1 : 0;
 }
+

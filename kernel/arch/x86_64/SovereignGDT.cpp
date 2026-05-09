@@ -31,7 +31,7 @@ public:
         return instance;
     }
 
-    void init() {
+    static void init() {
         sigma_log("Σ [GDT]: Initializing Sovereign Global Descriptor Table...");
         
         // Null Segment
@@ -97,3 +97,4 @@ private:
 extern "C" void gdt_init() {
     SigmaOS::Kernel::Arch::SovereignGDT::init();
 }
+
