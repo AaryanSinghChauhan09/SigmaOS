@@ -2,6 +2,10 @@
 
 SigmaOS aims for broad hardware compatibility through its specialized **Hardware Abstraction Layer (HAL)** shards.
 
+## 🐧 Universal Linux Driver Compatibility
+
+To fill technical gaps and ensure drivers work for almost every device, SigmaOS features a [Universal Linux Driver Compatibility Layer](Linux-Driver-Compat.md). This allows SigmaOS to seamlessly load and execute drivers packaged for various Linux distros (Debian, Fedora, Arch, etc.) by wrapping the Linux kernel ABI natively.
+
 ## 💻 Supported Architectures
 
 | Architecture | Status | Support Level |
@@ -10,7 +14,7 @@ SigmaOS aims for broad hardware compatibility through its specialized **Hardware
 | **ARM64** | **Experimental** | Raspberry Pi 4 / Apple Silicon (Virtual) |
 | **RISC-V** | **Roadmap** | T-Head C906 (Conceptual) |
 
-## 🔌 Driver Matrix
+## 🔌 Native Driver Matrix
 
 | Component | Driver Shard | Status |
 | :--- | :--- | :--- |
