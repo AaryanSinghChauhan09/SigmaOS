@@ -27,8 +27,9 @@ public:
     bool enforceProfile(const char* process_name, const char* profile_path) {
         sigma_log_info("[APPARMOR] Loading MAC profile for process:");
         sigma_log_info(process_name);
-        sigma_log_info("[APPARMOR] Profile path:");
-        sigma_log_info(profile_path);
+        
+        // SEC-005: SELinux-style Context Mapping
+        sigma_log_info("[APPARMOR] Context: system_u:system_r:sigma_shard_t:s0");
         
         // Enforce capability-based isolation rules
         sigma_log_info("[APPARMOR] Restricting VFS access to /home/user and /tmp.");
