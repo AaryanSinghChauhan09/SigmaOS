@@ -26,15 +26,22 @@ public:
         } 
         else if (sigma_hardened_strncmp(command, "agent.quota set=", 16) == 0) {
             // e.g. agent.quota set=GPU:80%
-            sigma_log("[ORCHESTRATOR] Assigning quota...");
+            sigma_log("[ORCHESTRATOR] Assigning resource quota...");
         } 
         else if (sigma_hardened_strncmp(command, "agent.task run=", 15) == 0) {
-            sigma_log("[ORCHESTRATOR] Executing task...");
+            sigma_log("[ORCHESTRATOR] Executing sovereign task...");
         } 
         else if (sigma_hardened_strncmp(command, "agent.sync", 10) == 0) {
             sigma_log("[ORCHESTRATOR] Triggering Emergency Lattice Sync...");
             trigger_emergency_sync();
-        } else {
+        }
+        else if (sigma_hardened_strncmp(command, "agent.container deploy=", 23) == 0) {
+            sigma_log("[ORCHESTRATOR] Deploying sovereign immutable container (Neutralizing CoreOS)...");
+        }
+        else if (sigma_hardened_strncmp(command, "agent.gaming engage", 19) == 0) {
+            sigma_log("[ORCHESTRATOR] Engaging Vulkan/Proton gaming stack (Neutralizing SteamOS)...");
+        }
+        else {
             sigma_log("[ORCHESTRATOR] Unknown command. Fallback to recovery.");
         }
     }
