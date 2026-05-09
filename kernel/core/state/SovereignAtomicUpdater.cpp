@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Atomic Updater Shard
@@ -25,30 +25,30 @@ public:
     const char* type_name() const noexcept override { return "SovereignAtomicUpdater"; }
 
     static void init() {
-        sigma_log("Σ [ATOMIC-OS]: Initializing Sovereign Atomic Updater...");
-        sigma_log("Σ [ATOMIC-OS]: Declarative state and immutable snapshotting ACTIVE.");
+        sigma_log("S [ATOMIC-OS]: Initializing Sovereign Atomic Updater...");
+        sigma_log("S [ATOMIC-OS]: Declarative state and immutable snapshotting ACTIVE.");
         m_current_generation = 1;
     }
 
     void deployUpdate(const char* image_hash) {
-        sigma_log("Σ [ATOMIC-OS]: Staging immutable system image '%s'...\n", image_hash);
+        sigma_log("S [ATOMIC-OS]: Staging immutable system image '%s'...\n", image_hash);
         // Stage update in secondary partition
         m_current_generation++;
-        sigma_log("Σ [ATOMIC-OS]: Update staged. Rebooting into Generation + 1 via A/B partition flip.");
+        sigma_log("S [ATOMIC-OS]: Update staged. Rebooting into Generation + 1 via A/B partition flip.");
     }
 
     void rollback() {
         if (m_current_generation > 1) {
             m_current_generation--;
-            sigma_log("Σ [ATOMIC-OS]: Rolling back to Generation %u...\n", m_current_generation);
-            sigma_log("Σ [ATOMIC-OS]: Rollback complete. System state restored flawlessly.");
+            sigma_log("S [ATOMIC-OS]: Rolling back to Generation %u...\n", m_current_generation);
+            sigma_log("S [ATOMIC-OS]: Rollback complete. System state restored flawlessly.");
         } else {
-            sigma_log("Σ [ATOMIC-OS]: [ERROR] Already at Genesis generation.");
+            sigma_log("S [ATOMIC-OS]: [ERROR] Already at Genesis generation.");
         }
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN ATOMIC OS AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN ATOMIC OS AUDIT ---\n");
         sigma_log("| Generation     : %u\n", m_current_generation);
         sigma_log("| State Model    : DECLARATIVE IMMUTABLE\n");
         sigma_log("| Update Mode    : A/B FLIP (OSTree Parity)\n");

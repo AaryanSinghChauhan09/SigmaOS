@@ -1,15 +1,15 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN TELEMETRY (eBPF Shard)
+ * S SIGMAOS: SOVEREIGN TELEMETRY (eBPF Shard)
  * =========================================================================
  * Mission: Isolated shard for real-time telemetry and eBPF tracing.
- * Layer  : L2 — System Services / Observability
+ * Layer  : L2 � System Services / Observability
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

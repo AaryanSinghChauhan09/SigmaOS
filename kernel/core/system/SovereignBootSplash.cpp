@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Boot Splash Engine
@@ -9,9 +9,9 @@
  *
  * USP: Unlike Plymouth's userland daemon, the Sovereign Boot Splash writes
  * pixels directly to the framebuffer before the kernel has even mounted VFS.
- * Fully customizable via .sab theme bundles — zero runtime dependencies.
+ * Fully customizable via .sab theme bundles � zero runtime dependencies.
  *
- * Design: OOP-isolated singleton — SovereignBootSplashEngine.
+ * Design: OOP-isolated singleton � SovereignBootSplashEngine.
  */
 
 class SovereignBootSplashEngine {
@@ -25,7 +25,7 @@ public:
         this->fb_w = fb_width;
         this->fb_h = fb_height;
         this->progress = 0;
-        sigma_log("[BOOT-SPLASH] Framebuffer acquired (%ux%u). Rendering Σ SIGMAOS splash...\n",
+        sigma_log("[BOOT-SPLASH] Framebuffer acquired (%ux%u). Rendering S SIGMAOS splash...\n",
                      fb_width, fb_height);
     }
 

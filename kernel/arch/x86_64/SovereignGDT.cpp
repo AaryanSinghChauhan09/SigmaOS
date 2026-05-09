@@ -1,6 +1,6 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 /**
  * SigmaOS Sovereign Global Descriptor Table (GDT)
@@ -33,7 +33,7 @@ public:
     }
 
     static void init() {
-        sigma_log("Σ [GDT]: Initializing Sovereign Global Descriptor Table...");
+        sigma_log("S [GDT]: Initializing Sovereign Global Descriptor Table...");
         
         // Null Segment
         this->setEntry(0, 0, 0, 0, 0);
@@ -50,7 +50,7 @@ public:
         this->ptr.base = (sigma_u64)&this->gdt;
         
         this->load();
-        sigma_log("Σ [GDT]: GDT Loaded. Segments standardized.");
+        sigma_log("S [GDT]: GDT Loaded. Segments standardized.");
     }
 
     void setEntry(int num, sigma_u32 base, sigma_u32 limit, sigma_u8 access, sigma_u8 gran) {

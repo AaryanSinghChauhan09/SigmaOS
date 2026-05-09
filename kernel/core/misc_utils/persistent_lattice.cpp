@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "persistent_lattice.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -20,7 +20,7 @@ void SovereignPersistentLattice::SyncWithGlobalNexus() {
 }
 
 void SovereignPersistentLattice::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN PERSISTENT LATTICE AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN PERSISTENT LATTICE AUDIT ---\n");
     sigma_log("| Sync Operations  : %llu\n", m_sync_count);
     sigma_log("| Redundancy Level : %d (High-Reliability)\n", m_redundancy_factor);
     sigma_log("| Persistence Node : DECENTRALIZED (Nexus-V5)\n");

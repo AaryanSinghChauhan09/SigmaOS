@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "predictive_scheduler.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -21,7 +21,7 @@ void SovereignPredictiveScheduler::AdjustSiliconDrift() {
 }
 
 void SovereignPredictiveScheduler::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN PREDICTIVE SCHEDULER AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN PREDICTIVE SCHEDULER AUDIT ---\n");
     sigma_log("| Active Tasks      : %d\n", m_active_tasks);
     sigma_log("| Predicted Cycles  : %llu\n", m_total_cycles_predicted);
     sigma_log("| AI Optimization   : %s\n", m_ai_optimization_active ? "ACTIVE" : "OFF");

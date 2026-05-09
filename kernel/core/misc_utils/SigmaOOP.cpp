@@ -1,7 +1,7 @@
-﻿#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 void* operator new(sigma_size_t size) {
     return sigma_malloc(size);

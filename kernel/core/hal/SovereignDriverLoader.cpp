@@ -1,15 +1,15 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN DRIVER LOADER (HAL Shard)
+ * S SIGMAOS: SOVEREIGN DRIVER LOADER (HAL Shard)
  * =========================================================================
  * Mission: Isolated shard for driver initialization and registry.
- * Layer  : L1 — Kernel Primitives / HAL
+ * Layer  : L1 � Kernel Primitives / HAL
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

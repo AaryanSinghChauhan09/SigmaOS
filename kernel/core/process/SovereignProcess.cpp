@@ -1,15 +1,15 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "sigma_proc.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Process Manager
  * Implements a Priority-Aware Task Switching (PATS) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal process orchestration.
  *
- * Design: OOP-isolated singleton — SovereignProcessEngine.
+ * Design: OOP-isolated singleton � SovereignProcessEngine.
  */
 
 namespace SigmaOS {

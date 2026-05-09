@@ -1,9 +1,9 @@
-﻿#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
 
 /**
- * SovereignChain — AI Component Orchestration and Flow Engine.
+ * SovereignChain � AI Component Orchestration and Flow Engine.
  * Inspired by github.com/langchain-ai/langchain and Langflow.
  * Provides modular chaining of AI agents, tools, and memory shards.
  */

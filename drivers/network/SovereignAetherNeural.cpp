@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "sigma_types.h"
+#include "../../include/sigma_types.h"
 #include "../../include/sigma_log.h"
 #include "../../include/core/SigmaOOP.hpp"
 

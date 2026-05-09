@@ -1,15 +1,15 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN NCERT ZENITH (v128.0 - SCHOLAR ZENITH)
+ * Σ SIGMAOS: SOVEREIGN NCERT ZENITH (v128.0 - SCHOLAR ZENITH)
  * =========================================================================
  * Refactored into modular shards for industrial educational dominance.
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 #include "userland/apps/scholar_zenith/ncert_base.hpp"
 #include "userland/apps/scholar_zenith/ncert_physics.hpp"
 #include "userland/apps/scholar_zenith/ncert_chemistry.hpp"
@@ -17,7 +17,7 @@
 #include "userland/apps/scholar_zenith/ncert_math.hpp"
 
 int main() {
-    sigma_log("--- Î£ SIGMA OS SOVEREIGN NCERT ZENITH SHARD ENGINE (v128.0) ---\n");
+    sigma_log("--- Σ SIGMA OS SOVEREIGN NCERT ZENITH SHARD ENGINE (v128.0) ---\n");
     
     INCERTSim* simulations[] = { 
         new GravitationSim(), 

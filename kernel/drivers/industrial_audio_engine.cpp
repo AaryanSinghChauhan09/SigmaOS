@@ -1,8 +1,8 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
 #include "industrial_audio_engine.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Media {
@@ -21,7 +21,7 @@ void SovereignAudioEngine::MapAcousticLattice() {
 }
 
 void SovereignAudioEngine::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN AUDIO AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN AUDIO AUDIT ---\n");
     sigma_log("| Active Channels    : %d\n", m_active_channels);
     sigma_log("| Samples Processed  : %llu\n", m_samples_processed);
     sigma_log("| Spatial Audio      : ACTIVE (SILICON-NATIVE)\n");

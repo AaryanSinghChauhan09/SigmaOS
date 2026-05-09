@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign AI Model Manager Shard
@@ -24,18 +24,18 @@ public:
     const char* type_name() const noexcept override { return "SovereignModelManager"; }
 
     static void init() {
-        sigma_log("Σ [MODEL-MAN]: Initializing Sovereign AI Model Orchestrator...");
-        sigma_log("Σ [MODEL-MAN]: PQC-Signed model verification ACTIVE.");
+        sigma_log("S [MODEL-MAN]: Initializing Sovereign AI Model Orchestrator...");
+        sigma_log("S [MODEL-MAN]: PQC-Signed model verification ACTIVE.");
     }
 
     void loadModel(const char* model_id) {
-        sigma_log("Σ [MODEL-MAN]: Loading Sharded Model '%s' into NeuralNexus...\n", model_id);
+        sigma_log("S [MODEL-MAN]: Loading Sharded Model '%s' into NeuralNexus...\n", model_id);
         // Verify model integrity via Secure Element
-        sigma_log("Σ [MODEL-MAN]: Model Signature VERIFIED. Ready for Inference.");
+        sigma_log("S [MODEL-MAN]: Model Signature VERIFIED. Ready for Inference.");
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN MODEL AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN MODEL AUDIT ---\n");
         sigma_log("| Active Models   : 1 (NeuralPersona-Base)\n");
         sigma_log("| Weight Security : KYBER-1024 Encrypted\n");
         sigma_log("| Runtime Lattice : Silicon-Native (S-NPU)\n");

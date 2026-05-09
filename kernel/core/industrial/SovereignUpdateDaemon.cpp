@@ -1,15 +1,15 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN UPDATE DAEMON (Ed25519 Verification)
+ * S SIGMAOS: SOVEREIGN UPDATE DAEMON (Ed25519 Verification)
  * =========================================================================
  * Mission: Implements UPD-001 for cryptographically signed system updates.
- * Layer  : L5 — Industrial Ecosystem / Security
+ * Layer  : L5 � Industrial Ecosystem / Security
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

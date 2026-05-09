@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "device_manager.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -18,7 +18,7 @@ void SovereignDeviceManager::RouteInterrupt(sigma_u32 irq_shard) {
 }
 
 void SovereignDeviceManager::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN DEVICE MANAGER AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN DEVICE MANAGER AUDIT ---\n");
     sigma_log("| Active Devices    : %d\n", m_device_count);
     sigma_log("| I/O Throughput    : %llu MB/s\n", m_io_throughput);
     sigma_log("| Bus Status        : SILICON-NATIVE (PCIe/NVMe Nexus)\n");

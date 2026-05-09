@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Media Engine Shard
@@ -24,17 +24,17 @@ public:
     const char* type_name() const noexcept override { return "SovereignMediaEngine"; }
 
     static void init() {
-        sigma_log("Σ [MEDIA]: Initializing Sovereign Media Pipeline...");
-        sigma_log("Σ [MEDIA]: Hardware-accelerated (AV1/H265) silicon-mapping ACTIVE.");
+        sigma_log("S [MEDIA]: Initializing Sovereign Media Pipeline...");
+        sigma_log("S [MEDIA]: Hardware-accelerated (AV1/H265) silicon-mapping ACTIVE.");
     }
 
     void processFrame(void* frame_buffer, sigma_usize size) {
         (void)frame_buffer; (void)size;
-        sigma_log("Σ [MEDIA]: Synchronizing video frame with Spatial-UI lattice.");
+        sigma_log("S [MEDIA]: Synchronizing video frame with Spatial-UI lattice.");
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN MEDIA AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN MEDIA AUDIT ---\n");
         sigma_log("| Codecs Supported: AV1, H.265, Opus, FLAC\n");
         sigma_log("| Hardware Accel  : Silicon-Native (GPU-UVD)\n");
         sigma_log("| Frame Sync      : Zero-Latency (Lattice-Vsync)\n");

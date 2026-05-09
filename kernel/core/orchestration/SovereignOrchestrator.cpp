@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /* --- External Shard Endpoints --- */
 extern "C" {
@@ -115,11 +115,11 @@ public:
 
     void onShardEvent(const char* s) {
         (void)s;
-        sigma_log("Σ [ORCHESTRATOR]: Processing Shard State Event...");
+        sigma_log("S [ORCHESTRATOR]: Processing Shard State Event...");
     }
 
     void bootstrap() {
-        sigma_log("Σ [ORCHESTRATOR]: Initiating Lattice Phase 1 (Foundation)...");
+        sigma_log("S [ORCHESTRATOR]: Initiating Lattice Phase 1 (Foundation)...");
         
         // FOUNDATION
         hal_init();
@@ -136,7 +136,7 @@ public:
         pmm_init_shard(128 * 1024 * 1024); 
         vmm_init_shard();
         
-        sigma_log("Σ [ORCHESTRATOR]: Initiating Lattice Phase 2 (Interaction)...");
+        sigma_log("S [ORCHESTRATOR]: Initiating Lattice Phase 2 (Interaction)...");
         vfs_init();
         sched_init();
         aisched_init();
@@ -161,7 +161,7 @@ public:
         monitor_init(); // Initialize System Monitor
         neural_automator_init(); // Activate Cognitive Task Queue
         
-        sigma_log("Σ [ORCHESTRATOR]: Initiating Lattice Phase 3 (Security)...");
+        sigma_log("S [ORCHESTRATOR]: Initiating Lattice Phase 3 (Security)...");
         vault_init();
         sel_init_shard();
         sechardener_init();
@@ -188,7 +188,7 @@ public:
         ha_core_init(); // High-Availability Active-Active Cluster active
         mesh_init(); // Mesh-First Protocol active
         
-        sigma_log("Σ [ORCHESTRATOR]: Initiating Lattice Phase 4 (Ecosystem)...");
+        sigma_log("S [ORCHESTRATOR]: Initiating Lattice Phase 4 (Ecosystem)...");
         marketplace_init(); // Decentralized Orb Registry active
         ci_pipeline_init(); // Native CI/CD Pipeline active
         market_init_shard(); // Decentralized Orb Exchange active
@@ -214,7 +214,7 @@ public:
         snap_init(); // Dynamic Shard-Snapping active
         governance_init_shard(); // Community Contributor Registry active
         
-        sigma_log("Σ [ORCHESTRATOR]: Lattice Singularity Achieved. System LIVE.");
+        sigma_log("S [ORCHESTRATOR]: Lattice Singularity Achieved. System LIVE.");
     }
 
 private:

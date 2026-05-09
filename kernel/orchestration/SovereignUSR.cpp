@@ -1,7 +1,7 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/core/sigma_types.h"
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
 #include "sigma_usr.h"
 
 /**
@@ -9,7 +9,7 @@
  * Implements a Quantum-Safe Shard Orchestrator for dynamic discovery.
  * ZERO-DEPENDENCY: Strictly bare-metal shard registry.
  *
- * Design: OOP-isolated singleton — SovereignUSRManager.
+ * Design: OOP-isolated singleton � SovereignUSRManager.
  */
 
 /* --- Sovereign USR Implementation --- */

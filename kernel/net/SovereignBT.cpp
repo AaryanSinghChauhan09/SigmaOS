@@ -1,15 +1,15 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/core/sigma_types.h"
-#include "../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 #include "drivers/sigma_bluetooth.h"
-#include "../../include/hal/sigma_hal.h"
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Bluetooth Stack (v100.0 Zenith)
  * Implements a Direct HCI Orchestration (DHO) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal silicon-native Bluetooth.
  *
- * Design: OOP-isolated singleton — SovereignBTEngine.
+ * Design: OOP-isolated singleton � SovereignBTEngine.
  */
 
 /* --- Sovereign Bluetooth Engine (OOP Isolation) --- */

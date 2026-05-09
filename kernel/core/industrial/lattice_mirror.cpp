@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "lattice_mirror.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -26,7 +26,7 @@ void SovereignLatticeMirror::InitiateFailover() {
 }
 
 void SovereignLatticeMirror::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN LATTICE MIRROR AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN LATTICE MIRROR AUDIT ---\n");
     sigma_log("| Shadow ID         : %x\n", m_mirror_id);
     sigma_log("| Parity Status     : %s\n", m_parity_valid ? "STABLE" : "DEGRADED");
     sigma_log("| Sync Precision    : SILICON-ACCURATE\n");

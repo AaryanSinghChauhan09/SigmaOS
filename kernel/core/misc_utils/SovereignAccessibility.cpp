@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Accessibility Engine
@@ -10,7 +10,7 @@
  * USP: Analyzes user interaction patterns to automatically adjust contrast, 
  * font scaling, and color-blind modes without requiring manual configuration.
  *
- * Design: OOP-isolated singleton — SovereignAccessibilityEngine.
+ * Design: OOP-isolated singleton � SovereignAccessibilityEngine.
  */
 
 class SovereignAccessibilityEngine {

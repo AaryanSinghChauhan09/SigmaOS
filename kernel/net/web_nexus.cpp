@@ -1,7 +1,7 @@
-﻿#include "../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
 #include "web_nexus.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Net {
@@ -17,7 +17,7 @@ void SovereignWebNexus::DeliverViaHTTP() {
 }
 
 void SovereignWebNexus::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN WEB NEXUS AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN WEB NEXUS AUDIT ---\n");
     sigma_log("| Payloads Ready    : %d\n", m_payload_count);
     sigma_log("| Compression       : LATTICE-Z (90%% Efficiency)\n");
     sigma_log("| Delivery Path     : BROWSER-NATIVE\n");

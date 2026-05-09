@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Driver Transpiler Shard
@@ -25,20 +25,20 @@ public:
     const char* type_name() const noexcept override { return "SovereignDriverTranspiler"; }
 
     static void init() {
-        sigma_log("Î£ [TRANSPILER]: Orchestrating Driver Transpilation Shard...");
+        sigma_log("Σ [TRANSPILER]: Orchestrating Driver Transpilation Shard...");
         m_transpiled_drivers = 0;
-        sigma_log("Î£ [TRANSPILER]: Multi-Platform Silicon Compatibility ONLINE.");
+        sigma_log("Σ [TRANSPILER]: Multi-Platform Silicon Compatibility ONLINE.");
     }
 
     void transpile(const char* driver_id, const char* target_arch) {
-        sigma_log("Î£ [TRANSPILER]: Transpiling driver '%s' for target silicon: %s...\n", driver_id, target_arch);
+        sigma_log("Σ [TRANSPILER]: Transpiling driver '%s' for target silicon: %s...\n", driver_id, target_arch);
         // Logic to rewrite register-level access into Sovereign HAL calls
         m_transpiled_drivers++;
-        sigma_log("Î£ [TRANSPILER]: Driver successfully sharded and integrated.");
+        sigma_log("Σ [TRANSPILER]: Driver successfully sharded and integrated.");
     }
 
     void audit() {
-        sigma_log("\n--- Î£ SOVEREIGN TRANSPILER AUDIT ---\n");
+        sigma_log("\n--- Σ SOVEREIGN TRANSPILER AUDIT ---\n");
         sigma_log("| Drivers Active  : %u\n", m_transpiled_drivers);
         sigma_log("| Tech Mode       : ZERO-DEPENDENCY-HAL\n");
         sigma_log("| Parity Level    : INDUSTRIAL-GRADE\n");

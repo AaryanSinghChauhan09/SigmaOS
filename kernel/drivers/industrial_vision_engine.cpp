@@ -1,8 +1,8 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
 #include "industrial_vision_engine.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace AI {
@@ -21,7 +21,7 @@ void SovereignVisionEngine::MapSpatialLattice() {
 }
 
 void SovereignVisionEngine::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN VISION AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN VISION AUDIT ---\n");
     sigma_log("| Active Tensors     : %d\n", m_active_tensors);
     sigma_log("| Frames Processed   : %llu\n", m_frames_processed);
     sigma_log("| Spatial Sharding   : ACTIVE (SILICON-NATIVE)\n");

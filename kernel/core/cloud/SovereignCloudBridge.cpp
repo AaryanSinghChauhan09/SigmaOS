@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Cloud Bridge Shard
@@ -25,19 +25,19 @@ public:
     const char* type_name() const noexcept override { return "SovereignCloudBridge"; }
 
     static void init() {
-        sigma_log("Σ [CLOUD]: Orchestrating Sovereign Cloud Extension...");
+        sigma_log("S [CLOUD]: Orchestrating Sovereign Cloud Extension...");
         m_remote_nodes = 0;
-        sigma_log("Σ [CLOUD]: Lattice-to-Cloud Tunnel (PQC-Encrypted) ONLINE.");
+        sigma_log("S [CLOUD]: Lattice-to-Cloud Tunnel (PQC-Encrypted) ONLINE.");
     }
 
     void syncLattice() {
-        sigma_log("Σ [CLOUD]: Synchronizing amnesic state shards with Sovereign Cloud...");
+        sigma_log("S [CLOUD]: Synchronizing amnesic state shards with Sovereign Cloud...");
         // Simulated IPFS/Arweave/Lattice-Mesh backup
-        sigma_log("Σ [CLOUD]: 128 Shards successfully persisted to Cloud-Lattice.");
+        sigma_log("S [CLOUD]: 128 Shards successfully persisted to Cloud-Lattice.");
     }
 
     void audit() {
-        sigma_log("\n--- Î£ SOVEREIGN CLOUD AUDIT ---\n");
+        sigma_log("\n--- Σ SOVEREIGN CLOUD AUDIT ---\n");
         sigma_log("| Cloud Status    : CONNECTED\n");
         sigma_log("| Remote Nodes    : %u\n", m_remote_nodes);
         sigma_log("| Encryption      : KYBER-1024 / AES-GCM\n");

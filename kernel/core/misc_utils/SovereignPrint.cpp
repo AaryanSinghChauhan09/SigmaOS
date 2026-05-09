@@ -1,7 +1,7 @@
-ï»¿#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "sigma_print.h"
 
 /**
@@ -10,7 +10,7 @@
  * ZERO-DEPENDENCY: Direct IPP/RAW socket dispatch; no CUPS daemon.
  * Competitor parity: Linux CUPS, Windows Print Spooler, macOS AirPrint.
  *
- * Design: OOP-isolated singleton â€” SovereignPrintSpooler.
+ * Design: OOP-isolated singleton — SovereignPrintSpooler.
  *         Ring-queue job scheduling with priority arbitration.
  */
 
@@ -63,7 +63,7 @@ extern "C" sigma_u32 print_submit_job(sigma_u32 format, sigma_u32 priority,
                                        const char* description) {
     /* ZDPS Algorithm: Inserts job into priority-ordered ring queue.
      * High-priority jobs are reordered ahead of pending lower-priority jobs.
-     * Direct socket dispatch occurs at flush time â€” no daemon overhead.       */
+     * Direct socket dispatch occurs at flush time — no daemon overhead.       */
     (void)data;
 
     if (SovereignPrintSpooler.state.jobs_queued >= SIGMA_PRINT_JOB_MAX) {
@@ -89,7 +89,7 @@ extern "C" sigma_u32 print_submit_job(sigma_u32 format, sigma_u32 priority,
 
     SovereignPrintSpooler.state.jobs_queued++;
 
-    sigma_log("[PRINT] ZDPS: Job #%d queued â€” fmt=%s pri=%s pages~%d (%d bytes).\n",
+    sigma_log("[PRINT] ZDPS: Job #%d queued — fmt=%s pri=%s pages~%d (%d bytes).\n",
                  (int)job->job_id,
                  _print_fmt_name(format),
                  _print_pri_name(priority),
@@ -113,7 +113,7 @@ extern "C" void print_cancel_job(sigma_u32 job_id) {
 extern "C" void print_flush_spooler() {
     /* ZDPS Algorithm: Dispatches all queued jobs over direct IPP socket.
      * Jobs are reordered by priority before dispatch.                   */
-    sigma_log("[PRINT] ZDPS: Flushing spooler â€” dispatching jobs by priority...");
+    sigma_log("[PRINT] ZDPS: Flushing spooler — dispatching jobs by priority...");
     for (sigma_u32 i = 0u; i < SovereignPrintSpooler.state.jobs_queued; i++) {
         sigma_print_job_t* job = &SovereignPrintSpooler.jobs[i];
         if (!job->completed) {

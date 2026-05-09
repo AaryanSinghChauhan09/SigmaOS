@@ -1,17 +1,17 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN POWER (Power Management Shard)
+ * S SIGMAOS: SOVEREIGN POWER (Power Management Shard)
  * =========================================================================
  * Mission: Implementing ACPI Sleep States and Laptop Power Optimization.
- * Layer  : L5 — Industrial Ecosystem
+ * Layer  : L5 � Industrial Ecosystem
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
-#include "../../../include/sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
+#include "sigma_log.h"
 
 namespace SigmaOS {
 namespace Kernel {

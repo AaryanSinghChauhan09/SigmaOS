@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Workflow Automation Engine
@@ -10,7 +10,7 @@
  * USP: Analyzes Zenith UI behavior patterns to predictively execute scriptable macros 
  * and trigger workflow shortcuts seamlessly without user intervention.
  *
- * Design: OOP-isolated singleton — SovereignAutomatorEngine.
+ * Design: OOP-isolated singleton � SovereignAutomatorEngine.
  */
 
 class SovereignAutomatorEngine {

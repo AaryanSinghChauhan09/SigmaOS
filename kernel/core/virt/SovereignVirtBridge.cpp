@@ -1,15 +1,15 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN VIRT BRIDGE (Hypervisor Guest Shims)
+ * S SIGMAOS: SOVEREIGN VIRT BRIDGE (Hypervisor Guest Shims)
  * =========================================================================
  * Mission: Implements LATT-002 for VMware/VirtualBox/Hyper-V/KVM.
- * Layer  : L1 — Kernel Primitives
+ * Layer  : L1 � Kernel Primitives
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

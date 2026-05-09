@@ -1,12 +1,12 @@
-﻿#include "../../../include/core/SigmaOOP.hpp"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 #include "Lattice.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 
 /**
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN KERNEL BRIDGE (v1.0 - AI SYSTEM TELEMETRY)
+ * S SIGMAOS: SOVEREIGN KERNEL BRIDGE (v1.0 - AI SYSTEM TELEMETRY)
  * =========================================================================
  * Purpose: Secure, read-only bridge for AI agents to query system state.
  * Interfaces: CPU Load, Memory Pressure, Shard Health, Network Vitals.

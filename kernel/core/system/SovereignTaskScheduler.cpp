@@ -1,17 +1,17 @@
-ï»¿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Task Scheduler
  * Macro recording and scriptable UI automation engine.
  *
  * USP: Schedules kernel-level recurring tasks and records macro sequences
- * that can be replayed on triggers â€” replacing cron, systemd timers, and 
+ * that can be replayed on triggers — replacing cron, systemd timers, and 
  * scripting engines with a zero-overhead Ring-0 scheduler.
  *
- * Design: OOP-isolated singleton â€” SovereignTaskScheduler.
+ * Design: OOP-isolated singleton — SovereignTaskScheduler.
  */
 
 class SovereignTaskScheduler {

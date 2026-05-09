@@ -1,9 +1,9 @@
-﻿#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
 
 /**
- * SovereignSMP (Arch x86_64) — APIC + IPI Multicore Controller
+ * SovereignSMP (Arch x86_64) � APIC + IPI Multicore Controller
  * Boots Application Processors and manages Inter-Processor Interrupts.
  */
 

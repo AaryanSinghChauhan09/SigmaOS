@@ -28,8 +28,8 @@ public:
 
     static void init() {
         sigma_log_info("[DIAG] Initializing Sovereign Silicon Health Monitor...");
-        m_initialized = 1U;
-        m_fault_count = 0U;
+        getInstance().m_initialized = 1U;
+        getInstance().m_fault_count = 0U;
     }
 
     static void performScan() {

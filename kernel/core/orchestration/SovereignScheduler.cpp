@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 #include "system/sigma_scheduler.h"
 
 namespace SigmaOS {
@@ -14,7 +14,7 @@ SovereignScheduler& SovereignScheduler::getInstance() {
 }
 
 void SovereignScheduler::init() {
-    sigma_log("Σ [SCHEDULER]: Initializing Lattice-Aware Scheduler...");
+    sigma_log("S [SCHEDULER]: Initializing Lattice-Aware Scheduler...");
     this->active_tasks = 0;
     this->initialized = true;
 }
@@ -36,7 +36,7 @@ void SovereignScheduler::schedule(void (*task)(), sigma_u32 priority) {
         new_task.silicon_affinity = new_task.id % 8; 
     }
     
-    sigma_log("Σ [SCHEDULER]: Scheduled Task %u [Priority: %u] on Core %u (Silicon Thermal: %uC)\n", 
+    sigma_log("S [SCHEDULER]: Scheduled Task %u [Priority: %u] on Core %u (Silicon Thermal: %uC)\n", 
                  new_task.id, priority, new_task.silicon_affinity, core_temp);
 }
 

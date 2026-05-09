@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Memory Paging Orchestrator
@@ -10,7 +10,7 @@
  * USP: Utilizes predictive pre-fetching to swap pages into cache before a 
  * page fault ever occurs, eliminating stutter in heavy workloads.
  *
- * Design: OOP-isolated singleton — SovereignPagingEngine.
+ * Design: OOP-isolated singleton � SovereignPagingEngine.
  */
 
 class SovereignPagingEngine {

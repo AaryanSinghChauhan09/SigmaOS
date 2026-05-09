@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Spatial Streamer Shard
@@ -24,17 +24,17 @@ public:
     const char* type_name() const noexcept override { return "SovereignSpatialStreamer"; }
 
     static void init() {
-        sigma_log("Σ [STREAMER]: Initializing Sovereign Spatial Streaming Nexus...");
-        sigma_log("Σ [STREAMER]: Low-latency 3D-aware buffering ACTIVE.");
+        sigma_log("S [STREAMER]: Initializing Sovereign Spatial Streaming Nexus...");
+        sigma_log("S [STREAMER]: Low-latency 3D-aware buffering ACTIVE.");
     }
 
     void streamFrame(void* frame_buffer, sigma_usize size) {
         (void)frame_buffer; (void)size;
-        sigma_log("Σ [STREAMER]: Distributing orbital lattice frame to remote nodes.");
+        sigma_log("S [STREAMER]: Distributing orbital lattice frame to remote nodes.");
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN STREAMING AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN STREAMING AUDIT ---\n");
         sigma_log("| Streaming Mode : SPATIAL-SYNC\n");
         sigma_log("| Latency Target : < 5ms (Orbital-Direct)\n");
         sigma_log("| Security       : PQC-ENCRYPTED\n");

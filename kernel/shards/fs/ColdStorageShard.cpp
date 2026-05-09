@@ -1,17 +1,17 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
 /*
  * =========================================================================
- * Σ SIGMAOS: COLD STORAGE PERSISTENT LATTICE (v1.0 - INDUSTRIAL SHARD)
+ * S SIGMAOS: COLD STORAGE PERSISTENT LATTICE (v1.0 - INDUSTRIAL SHARD)
  * =========================================================================
  * Mission: Amnesic-resistant state persistence via decentralized mesh.
  * Principles: Zero-Dependency, IPFS-Native, Quantum-Resistant.
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Storage {

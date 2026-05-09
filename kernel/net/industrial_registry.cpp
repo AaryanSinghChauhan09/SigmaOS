@@ -1,7 +1,7 @@
-﻿#include "../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
 #include "industrial_registry.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Net {
@@ -18,7 +18,7 @@ void SovereignRegistry::SearchShard(const char* query) {
 }
 
 void SovereignRegistry::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN REGISTRY AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN REGISTRY AUDIT ---\n");
     sigma_log("| Indexed Shards    : %d\n", m_indexed_shards);
     sigma_log("| Mesh Sync State   : ACTIVE\n");
     sigma_log("| Discovery Protocol: DECENTRALIZED-LATTICE\n");

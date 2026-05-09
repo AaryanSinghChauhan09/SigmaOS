@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
 #include "sigma_allocator.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Test Suite (v1.0)
@@ -37,14 +37,14 @@ static void test_libc_hardening() {
 
 extern "C" void run_sovereign_tests() {
     sigma_log("==================================================");
-    sigma_log("⚡ IGNITING SOVEREIGN TEST LATTICE...");
+    sigma_log("? IGNITING SOVEREIGN TEST LATTICE...");
     sigma_log("==================================================");
     
     test_allocator();
     test_libc_hardening();
     
     sigma_log("==================================================");
-    sigma_log("✅ ALL CORE TESTS PASSED. SYSTEM STABLE.");
+    sigma_log("? ALL CORE TESTS PASSED. SYSTEM STABLE.");
     sigma_log("==================================================");
 }
 

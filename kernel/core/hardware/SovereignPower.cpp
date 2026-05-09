@@ -1,15 +1,15 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 #include "sigma_power.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Power Management (SPM)
  * Implements an Intelligent Energy Orchestration (IEO) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal ACPI/APM orchestration.
  *
- * Design: OOP-isolated singleton — SovereignPowerEngine.
+ * Design: OOP-isolated singleton � SovereignPowerEngine.
  */
 
 class SovereignPowerEngine {

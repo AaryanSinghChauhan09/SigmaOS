@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "power_manager.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -40,7 +40,7 @@ void SovereignPowerManager::PredictiveThrottling() {
 }
 
 void SovereignPowerManager::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN POWER AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN POWER AUDIT ---\n");
     sigma_log("| Voltage           : %d mV\n", m_voltage_mv);
     sigma_log("| Frequency         : %d MHz\n", m_frequency_mhz);
     sigma_log("| State             : %s\n", (m_current_state == PowerState::PEAK_PERFORMANCE) ? "PEAK" : 

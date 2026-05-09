@@ -1,7 +1,7 @@
-ï»¿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Predictive Settings Search
@@ -11,7 +11,7 @@
  * query. The engine ranks settings by usage history (from SovereignPersonalization)
  * and fuzzy-matches setting names at Ring-0 speed.
  *
- * Design: OOP-isolated singleton â€” SovereignSettingsSearchEngine.
+ * Design: OOP-isolated singleton — SovereignSettingsSearchEngine.
  */
 
 typedef struct {
@@ -46,7 +46,7 @@ public:
         sigma_log("[SETTINGS-SEARCH] Searching for '%s'...\n", query);
         sigma_u32 results = 0;
         for (sigma_u32 i = 0; i < this->settings_count; i++) {
-            // Naive prefix match â€” real impl would use Levenshtein distance
+            // Naive prefix match — real impl would use Levenshtein distance
             if (sigma_hardened_strncmp(this->settings[i].label, query, 4) == 0 ||
                 sigma_hardened_strncmp(this->settings[i].category, query, 4) == 0) {
                 sigma_log("  -> [%s] %s (%u accesses)\n",

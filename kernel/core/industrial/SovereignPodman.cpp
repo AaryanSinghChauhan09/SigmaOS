@@ -1,16 +1,16 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN PODMAN (Container Execution Shim)
+ * S SIGMAOS: SOVEREIGN PODMAN (Container Execution Shim)
  * =========================================================================
  * Mission: Implements OCI-001 to provide Podman/Docker-parity container
  *          orchestration within the Sovereign Lattice.
- * Layer  : L5 — Industrial Ecosystem
+ * Layer  : L5 � Industrial Ecosystem
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

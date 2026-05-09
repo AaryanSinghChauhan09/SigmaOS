@@ -1,8 +1,8 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
 #include "protocol_shard.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Net {
@@ -16,7 +16,7 @@ void SovereignProtocolShard::ProcessPacket(const void* data, sigma_size_t size) 
 }
 
 void SovereignProtocolShard::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN PROTOCOL AUDIT [%s] ---\n", m_protocol_name);
+    sigma_log("\n--- S SOVEREIGN PROTOCOL AUDIT [%s] ---\n", m_protocol_name);
     sigma_log("| Nexus Port        : %d\n", m_port_nexus);
     sigma_log("| PQC Security      : ENABLED\n");
     sigma_log("| Protocol State    : IMMUTABLE-SOVEREIGN\n");

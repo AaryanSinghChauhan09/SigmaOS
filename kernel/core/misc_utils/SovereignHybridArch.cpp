@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Hybrid Architecture Bridge (ARM/RISC-V)
@@ -10,7 +10,7 @@
  * USP: Enables seamless execution scaling across heterogenous compute clusters 
  * mixing ARM Cortex and RISC-V cores via Universal Binary Translation (UBT).
  *
- * Design: OOP-isolated singleton — SovereignHybridArchEngine.
+ * Design: OOP-isolated singleton � SovereignHybridArchEngine.
  */
 
 class SovereignHybridArchEngine {

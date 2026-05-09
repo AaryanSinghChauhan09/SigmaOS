@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "shard_orchestrator.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -47,7 +47,7 @@ sigma_bool SovereignShardOrchestrator::VerifyLatticeIntegrity() {
 }
 
 void SovereignShardOrchestrator::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN LATTICE ORCHESTRATION AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN LATTICE ORCHESTRATION AUDIT ---\n");
     sigma_log("| Total Shards   : %d\n", m_shard_count);
     for (sigma_u32 i = 0; i < m_shard_count; ++i) {
         sigma_log("| [%s] %-20s | v%d.%-5d | Addr: %p\n", 

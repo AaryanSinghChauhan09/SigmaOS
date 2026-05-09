@@ -1,6 +1,6 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 extern "C" void hal_load_drivers();
 
@@ -9,29 +9,29 @@ namespace Kernel {
 namespace HAL {
 
 void SovereignHAL::init() {
-    sigma_log("Σ [HAL]: Initializing Universal Hardware Abstraction Shard...");
+    sigma_log("S [HAL]: Initializing Universal Hardware Abstraction Shard...");
     
     // Mandatory Driver Initialization via Loader Shard
     hal_load_drivers();
     
-    sigma_log("Σ [HAL]: Device Tree lattice active.");
+    sigma_log("S [HAL]: Device Tree lattice active.");
 }
 
 void SovereignHAL::probeBus() {
-    sigma_log("Σ [HAL]: Probing Silicon Lattice for peripheral nodes...");
+    sigma_log("S [HAL]: Probing Silicon Lattice for peripheral nodes...");
     
     // Simulate finding a few devices (inspired by Linux PCI probing)
     m_device_count = 3;
     
-    sigma_log("Σ [HAL]: Found 00:01.0 - Network Controller [8086:1533]\n");
-    sigma_log("Σ [HAL]: Found 00:02.0 - Storage Controller [10ec:8168]\n");
-    sigma_log("Σ [HAL]: Found 00:03.0 - Display Adapter [10de:1c03]\n");
+    sigma_log("S [HAL]: Found 00:01.0 - Network Controller [8086:1533]\n");
+    sigma_log("S [HAL]: Found 00:02.0 - Storage Controller [10ec:8168]\n");
+    sigma_log("S [HAL]: Found 00:03.0 - Display Adapter [10de:1c03]\n");
     
-    sigma_log("Σ [HAL]: All hardware shards mapped to Sovereign drivers.");
+    sigma_log("S [HAL]: All hardware shards mapped to Sovereign drivers.");
 }
 
 void SovereignHAL::registerDriver(const char* name, DeviceType type) {
-    sigma_log("Σ [HAL]: Registering Driver '%s' for Shard-Type %d\n", name, (int)type);
+    sigma_log("S [HAL]: Registering Driver '%s' for Shard-Type %d\n", name, (int)type);
 }
 
 } // namespace HAL

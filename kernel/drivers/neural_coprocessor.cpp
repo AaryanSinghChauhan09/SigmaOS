@@ -1,8 +1,8 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
 #include "neural_coprocessor.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Drivers {
@@ -19,7 +19,7 @@ void SovereignNeuralCoprocessor::OptimizeKernelLattice() {
 }
 
 void SovereignNeuralCoprocessor::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN NEURAL COPROCESSOR AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN NEURAL COPROCESSOR AUDIT ---\n");
     sigma_log("| TPU Shards        : %d\n", m_tpu_shards);
     sigma_log("| FLOPS Nexus       : 1.0 TFLOPS\n");
     sigma_log("| Acceleration      : SILICON-DIRECT\n");

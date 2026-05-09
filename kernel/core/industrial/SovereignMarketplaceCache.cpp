@@ -1,15 +1,15 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN MARKETPLACE CACHE (IDX-003)
+ * S SIGMAOS: SOVEREIGN MARKETPLACE CACHE (IDX-003)
  * =========================================================================
  * Mission: Implements caching and fallback mirrors for the P2P indexer.
- * Layer  : L5 — Industrial Ecosystem / Marketplace
+ * Layer  : L5 � Industrial Ecosystem / Marketplace
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

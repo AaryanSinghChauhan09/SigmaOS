@@ -1,16 +1,16 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN MICRO-EDITION (MIN-001)
+ * S SIGMAOS: SOVEREIGN MICRO-EDITION (MIN-001)
  * =========================================================================
  * Mission: Zero-bloat, minimal lattice configuration for edge/containers.
  * Target : Neutralizes Alpine and Gentoo requirements for extreme minimalism.
- * Layer  : L5 — Industrial Ecosystem
+ * Layer  : L5 � Industrial Ecosystem
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

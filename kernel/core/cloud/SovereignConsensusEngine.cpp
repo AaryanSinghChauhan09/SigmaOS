@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Consensus Engine Shard
@@ -24,20 +24,20 @@ public:
     const char* type_name() const noexcept override { return "SovereignConsensusEngine"; }
 
     static void init() {
-        sigma_log("Σ [CONSENSUS]: Initializing Sovereign Lattice-Paxos Engine...");
-        sigma_log("Σ [CONSENSUS]: Quantum-proof quorum orchestration ACTIVE.");
+        sigma_log("S [CONSENSUS]: Initializing Sovereign Lattice-Paxos Engine...");
+        sigma_log("S [CONSENSUS]: Quantum-proof quorum orchestration ACTIVE.");
     }
 
     bool propose(const char* state_key, const void* data, sigma_usize size) {
         (void)data; (void)size;
-        sigma_log("Σ [CONSENSUS]: Proposing state update for '%s' to lattice nodes...\n", state_key);
+        sigma_log("S [CONSENSUS]: Proposing state update for '%s' to lattice nodes...\n", state_key);
         // Execute Lattice-Paxos handshake
-        sigma_log("Σ [CONSENSUS]: Consensus ACHIEVED. State committed to distributed lattice.");
+        sigma_log("S [CONSENSUS]: Consensus ACHIEVED. State committed to distributed lattice.");
         return true;
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN CONSENSUS AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN CONSENSUS AUDIT ---\n");
         sigma_log("| Consensus Algorithm : LATTICE-PAXOS\n");
         sigma_log("| Quorum Type        : BYZANTINE-FAULT-TOLERANT\n");
         sigma_log("| Security Status     : QUANTUM-VERIFIED\n");

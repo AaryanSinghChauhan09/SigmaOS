@@ -1,15 +1,15 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN PROBLEM SOLVER (v128.0 - SCHOLASTIC SOLVER)
+ * Σ SIGMAOS: SOVEREIGN PROBLEM SOLVER (v128.0 - SCHOLASTIC SOLVER)
  * =========================================================================
  * Refactored into modular solvers for industrial analytical dominance.
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 #include "userland/apps/scholar_zenith/solvers.hpp"
 
 using namespace SigmaOS;
@@ -27,7 +27,7 @@ public:
     }
 
     void ExecuteSolverAudit() {
-        sigma_log("--- Î£ SIGMA OS MASTER SCHOLASTIC PROBLEM SOLVER ---\n");
+        sigma_log("--- Σ SIGMA OS MASTER SCHOLASTIC PROBLEM SOLVER ---\n");
         for (int i = 0; i < m_count; i++) {
             sigma_log("\n[SOLVE-SHADING]: Executing Solution Shard: %s...\n", m_solvers[i]->type_name());
             m_solvers[i]->Solve();

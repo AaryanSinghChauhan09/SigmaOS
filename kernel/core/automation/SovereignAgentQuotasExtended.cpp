@@ -1,15 +1,15 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN AGENT QUOTAS EXTENDED (CLAW-004)
+ * S SIGMAOS: SOVEREIGN AGENT QUOTAS EXTENDED (CLAW-004)
  * =========================================================================
  * Mission: Multi-dimensional AI scalability and governance.
- * Layer  : L4 — AI & Automation
+ * Layer  : L4 � AI & Automation
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

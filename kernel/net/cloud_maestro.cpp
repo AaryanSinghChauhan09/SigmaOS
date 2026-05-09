@@ -1,7 +1,7 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "cloud_maestro.hpp"
 
 namespace SigmaOS {
@@ -33,7 +33,7 @@ void CloudMaestro::DeployToCloud(const SigmaString& shardName) {
 }
 
 void CloudMaestro::ShowCloudMatrix() const {
-    sigma_log("\n--- Î£ SIGMA OS SOVEREIGN CLOUD SHARD MATRIX ---\n");
+    sigma_log("\n--- Σ SIGMA OS SOVEREIGN CLOUD SHARD MATRIX ---\n");
     sigma_log("%-30s | %-15s | %-15s | %s\n", "Shard ID", "Region", "Node IP", "Status");
     sigma_log("---------------------------------------------------------------------------\n");
     

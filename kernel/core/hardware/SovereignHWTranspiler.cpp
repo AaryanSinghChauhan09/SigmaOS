@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -24,37 +24,37 @@ public:
     const char* type_name() const noexcept override { return "SovereignHWTranspiler"; }
 
     static void init() {
-        sigma_log("Σ [SILICON-DIRECT]: Initializing Driver Transpiler...");
+        sigma_log("S [SILICON-DIRECT]: Initializing Driver Transpiler...");
         m_transpiled_drivers = 0;
-        sigma_log("Σ [SILICON-DIRECT]: Scanning Silicon Topology...");
+        sigma_log("S [SILICON-DIRECT]: Scanning Silicon Topology...");
     }
 
     void transpileDriver(const char* chip_id, const char* spec_shard, const char* arch) {
         (void)spec_shard;
-        sigma_log("Σ [SILICON-DIRECT]: Transpiling driver for Chip ID: %s (%s)...\n", chip_id, arch);
+        sigma_log("S [SILICON-DIRECT]: Transpiling driver for Chip ID: %s (%s)...\n", chip_id, arch);
         
         if (sigma_strcmp(arch, "RISC-V") == 0) {
             transpileRISCV();
         } else if (sigma_strcmp(arch, "ARM") == 0) {
             transpileARM();
         } else {
-            sigma_log("Σ [SILICON-DIRECT]: Emitting generic x86_64 fallback blob.");
+            sigma_log("S [SILICON-DIRECT]: Emitting generic x86_64 fallback blob.");
         }
         
         m_transpiled_drivers++;
-        sigma_log("Σ [SILICON-DIRECT]: Driver '%s' ONLINE (Zero-Binary-Bloat).\n", chip_id);
+        sigma_log("S [SILICON-DIRECT]: Driver '%s' ONLINE (Zero-Binary-Bloat).\n", chip_id);
     }
 
     void transpileRISCV() {
-        sigma_log("Σ [SILICON-DIRECT]: Emitting RV64GC Machine Code... [SUCCESS]");
+        sigma_log("S [SILICON-DIRECT]: Emitting RV64GC Machine Code... [SUCCESS]");
     }
 
     void transpileARM() {
-        sigma_log("Σ [SILICON-DIRECT]: Emitting AArch64 Machine Code... [SUCCESS]");
+        sigma_log("S [SILICON-DIRECT]: Emitting AArch64 Machine Code... [SUCCESS]");
     }
 
     void audit() {
-        sigma_log("\n--- Σ SILICON-DIRECT AUDIT ---\n");
+        sigma_log("\n--- S SILICON-DIRECT AUDIT ---\n");
         sigma_log("| Active Drivers    : %u\n", m_transpiled_drivers);
         sigma_log("| HW Sovereignty    : ABSOLUTE\n");
         sigma_log("------------------------------\n");

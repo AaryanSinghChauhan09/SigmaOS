@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "ai/sigma_cognitive.h"
 #include "ai/sigma_neural.h"
 
@@ -10,7 +10,7 @@
  * Implements a Neural Lattice Optimization (NLO) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal neural orchestration.
  *
- * Design: OOP-isolated singleton — SovereignCognitiveEngine.
+ * Design: OOP-isolated singleton � SovereignCognitiveEngine.
  */
 
 /* --- Sovereign Cognitive Engine (OOP Isolation) --- */

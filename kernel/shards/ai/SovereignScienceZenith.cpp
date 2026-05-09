@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -16,7 +16,7 @@
 
 
 /**
- * Î£ SIGMA OS: SOVEREIGN SCIENCE ZENITH (v128.0 - DISCOVERY ZENITH)
+ * Σ SIGMA OS: SOVEREIGN SCIENCE ZENITH (v128.0 - DISCOVERY ZENITH)
  * ==============================================================
  * USP: Deep-Dive simulations for Radioactivity, Polymers, and Calculus.
  * Capability: Absolute analytical parity with NCERT Higher Secondary.
@@ -81,7 +81,7 @@ public:
     }
 
     void ExecuteApexAudit() {
-        sigma_log("--- Î£ SIGMA OS SOVEREIGN SCIENCE ZENITH ---\n");
+        sigma_log("--- Σ SIGMA OS SOVEREIGN SCIENCE ZENITH ---\n");
         for (const auto& shard : m_shards) {
             sigma_log("\n------------------------------------------------\n");
             shard->ProjectSimulation();

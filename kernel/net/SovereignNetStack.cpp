@@ -1,15 +1,15 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
 #include "sigma_net.h"
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 
 /**
  * SigmaOS Sovereign Network Stack (S-NET)
  * Implements a Zero-Copy Lattice Networking (ZCLN) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal network orchestration.
  *
- * Design: OOP-isolated singleton — SovereignNetStackEngine.
+ * Design: OOP-isolated singleton � SovereignNetStackEngine.
  */
 
 /* --- Sovereign Network Stack Implementation --- */

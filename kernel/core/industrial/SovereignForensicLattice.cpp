@@ -1,16 +1,16 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN FORENSIC LATTICE (FOR-001)
+ * S SIGMAOS: SOVEREIGN FORENSIC LATTICE (FOR-001)
  * =========================================================================
  * Mission: Port of high-end forensic and recovery tools into a single shard.
  * Target : Neutralizes CAINE and Rescuezilla requirements for investigation.
- * Layer  : L5 — Industrial Ecosystem
+ * Layer  : L5 � Industrial Ecosystem
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

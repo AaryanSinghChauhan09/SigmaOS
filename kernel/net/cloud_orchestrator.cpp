@@ -1,7 +1,7 @@
-﻿#include "../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
 #include "cloud_orchestrator.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Net {
@@ -17,7 +17,7 @@ void SovereignCloudOrchestrator::BalanceGlobalWorkload() {
 }
 
 void SovereignCloudOrchestrator::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN CLOUD AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN CLOUD AUDIT ---\n");
     sigma_log("| Active Nodes      : %d\n", m_active_nodes);
     sigma_log("| Inter-Cloud Sync  : ENCRYPTED-LATTICE-PQC\n");
     sigma_log("| Global Throughput : %llu TB/s\n", m_global_throughput);

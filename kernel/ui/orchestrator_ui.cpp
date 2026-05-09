@@ -1,7 +1,7 @@
-﻿#include "../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
 #include "orchestrator_ui.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace UI {
@@ -22,7 +22,7 @@ void SovereignOrchestratorUI::SyncLatticeToCloud() {
 }
 
 void SovereignOrchestratorUI::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN ORCHESTRATION AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN ORCHESTRATION AUDIT ---\n");
     sigma_log("| Active Containers : %d\n", m_active_containers);
     sigma_log("| Virtualized Shards: %d\n", m_active_vms);
     sigma_log("| Cloud Sync Status : OPTIMAL\n");

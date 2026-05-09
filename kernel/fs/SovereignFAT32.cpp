@@ -1,13 +1,13 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
 /**
  * SigmaOS Sovereign FAT32 Filesystem
- * v29.0 Zenith Foundation — Minimal Filesystem
+ * v29.0 Zenith Foundation � Minimal Filesystem
  * ZERO-DEPENDENCY: Strictly bare-metal FAT32 parsing.
  */
 
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "fs/sigma_vfs.h"
 
 class SovereignFAT32Engine {

@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "industrial_energy_manager.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Power {
@@ -18,7 +18,7 @@ void SovereignEnergyManager::ReportEfficiency() {
 }
 
 void SovereignEnergyManager::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN ENERGY AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN ENERGY AUDIT ---\n");
     sigma_log("| Active Power Shards: %d\n", m_power_shards_active);
     sigma_log("| Energy Saved (Est) : %llu Joules\n", m_joules_saved);
     sigma_log("| Neural Throttling  : ACTIVE\n");

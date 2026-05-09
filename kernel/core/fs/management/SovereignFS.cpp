@@ -1,8 +1,8 @@
-﻿#include "../../../../include/sigma_log.h"
-#include "../../../../include/libc/SovereignLibC.h"
-#include "../../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 #include "fs/sigma_fs.h"
-#include "../../../../include/hal/sigma_hal.h"
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign File System Implementation
@@ -17,7 +17,7 @@
  * Implements an Atomic Journaled Commit (AJC) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal data persistence.
  *
- * Design: OOP-isolated singleton — SovereignFSEngine.
+ * Design: OOP-isolated singleton � SovereignFSEngine.
  */
 
 /* --- Sovereign FS Engine (OOP Isolation) --- */

@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "industrial_deployer.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 extern "C" void gatekeeper_init();
 extern "C" void assistant_init();
@@ -37,7 +37,7 @@ void SovereignDeployer::ActivateGamingMode() {
 }
 
 void SovereignDeployer::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN DEPLOYMENT AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN DEPLOYMENT AUDIT ---\n");
     sigma_log("| Active Nodes       : %d\n", m_active_nodes);
     sigma_log("| Shards Deployed    : %llu\n", m_shards_deployed);
     sigma_log("| Cloud Parity       : 100%% (MULTI-PROVIDER)\n");

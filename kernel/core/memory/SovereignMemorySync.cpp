@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Memory Synchronization Engine
@@ -10,7 +10,7 @@
  * USP: Enables true heterogeneous computing by bridging the memory models of 
  * ARM (Weakly Ordered) and RISC-V (RVWMO) in real-time.
  *
- * Design: OOP-isolated singleton — SovereignMemorySyncEngine.
+ * Design: OOP-isolated singleton � SovereignMemorySyncEngine.
  */
 
 class SovereignMemorySyncEngine {

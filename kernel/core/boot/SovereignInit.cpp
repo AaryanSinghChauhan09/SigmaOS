@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
 #include "ai/sigma_aisched.h"
 #include "SovereignNeuralNexus.hpp"
 #include "fs/SovereignVFS.hpp"
@@ -18,7 +18,7 @@ extern "C" void allocator_init();
  * Implements an Asynchronous Shard Ignition (ASI) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal machine-state ignition.
  *
- * Design: OOP-isolated singleton — SovereignInitEngine.
+ * Design: OOP-isolated singleton � SovereignInitEngine.
  */
 
 namespace SigmaOS {

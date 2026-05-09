@@ -1,7 +1,7 @@
-ï»¿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Benchmark Engine
@@ -10,7 +10,7 @@
  * USP: Publishes bare-metal micro-benchmarks comparing SigmaOS context switching,
  * memory throughput, and IPC latency directly against Linux, macOS, and Windows.
  *
- * Design: OOP-isolated singleton â€” SovereignBenchmarkEngine.
+ * Design: OOP-isolated singleton — SovereignBenchmarkEngine.
  */
 
 class SovereignBenchmarkEngine {
@@ -29,7 +29,7 @@ public:
         sigma_log("[BENCH] Context Switch Benchmark: %u iterations...\n", iterations);
         // Simulate bare-metal cycle counter
         sigma_u32 simulated_ns = 42; // SigmaOS: ~42ns vs Linux ~1200ns
-        sigma_log("[BENCH] Result: %u ns/switch â€” %.1fx faster than Linux.\n",
+        sigma_log("[BENCH] Result: %u ns/switch — %.1fx faster than Linux.\n",
                      simulated_ns, 1200.0f / simulated_ns);
         this->benchmarks_run++;
     }
@@ -37,7 +37,7 @@ public:
     void runMemoryThroughputBenchmark(sigma_u32 buffer_mb) {
         sigma_log("[BENCH] Memory Throughput Benchmark: %u MB buffer...\n", buffer_mb);
         sigma_u32 simulated_gbps = 98; // SigmaOS NUMA-pinned throughput
-        sigma_log("[BENCH] Result: %u GB/s â€” NUMA-optimal bandwidth achieved.\n", simulated_gbps);
+        sigma_log("[BENCH] Result: %u GB/s — NUMA-optimal bandwidth achieved.\n", simulated_gbps);
         this->benchmarks_run++;
     }
 

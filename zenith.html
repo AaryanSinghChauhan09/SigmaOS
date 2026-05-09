@@ -1168,12 +1168,12 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             <h3 style="margin-top: 30px;">Live Desktop Editor</h3>
             <div class="style-editor">
                 <div class="param-row">
-                    <label>Glass Blur</label>
-                    <input type="range" min="0" max="50" value="20" oninput="updateLiveStyle('blur', this.value)">
+                    <label for="live-blur">Glass Blur</label>
+                    <input type="range" id="live-blur" min="0" max="50" value="20" oninput="updateLiveStyle('blur', this.value)">
                 </div>
                 <div class="param-row">
-                    <label>Saturation</label>
-                    <input type="range" min="50" max="250" value="150" oninput="updateLiveStyle('saturate', this.value)">
+                    <label for="live-saturate">Saturation</label>
+                    <input type="range" id="live-saturate" min="50" max="250" value="150" oninput="updateLiveStyle('saturate', this.value)">
                 </div>
             </div>
 
@@ -1352,8 +1352,8 @@ https://chatgpt.com/?q={{prompt}}</textarea>
                         <button class="util-btn" onclick="toggleOverlay()">TOGGLE HUD</button>
                     </div>
                     <div class="settings-group">
-                        <label>Desktop Transparency</label>
-                        <input type="range" min="0" max="100" value="95" oninput="sigmaConfig.update('desktop.opacity', this.value)">
+                        <label for="desktop-opacity">Desktop Transparency</label>
+                        <input type="range" id="desktop-opacity" min="0" max="100" value="95" oninput="sigmaConfig.update('desktop.opacity', this.value)">
                     </div>
                 </div>
             </div>

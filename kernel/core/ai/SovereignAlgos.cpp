@@ -1,9 +1,9 @@
-﻿#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
 
 /**
- * SovereignAlgos — High-performance algorithmic primitives for SigmaOS.
+ * SovereignAlgos � High-performance algorithmic primitives for SigmaOS.
  * Inspired by github.com/TheAlgorithms.
  * Provides zero-STL, kernel-safe implementations of core algorithms.
  */

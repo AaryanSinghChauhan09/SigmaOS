@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign GPGPU Manager Shard
@@ -25,19 +25,19 @@ public:
     const char* type_name() const noexcept override { return "SovereignGPGPUManager"; }
 
     static void init() {
-        sigma_log("Σ [GPGPU-MAN]: Initializing Sovereign High-Performance Compute Nexus...");
-        sigma_log("Σ [GPGPU-MAN]: Zero-copy unified memory orchestration ACTIVE.");
+        sigma_log("S [GPGPU-MAN]: Initializing Sovereign High-Performance Compute Nexus...");
+        sigma_log("S [GPGPU-MAN]: Zero-copy unified memory orchestration ACTIVE.");
     }
 
     void dispatchKernel(const char* kernel_name, sigma_u32 threads, sigma_u32 blocks) {
-        sigma_log("Σ [GPGPU-MAN]: Dispatching Compute Kernel '%s' [%ux%u] to Silicon...\n", 
+        sigma_log("S [GPGPU-MAN]: Dispatching Compute Kernel '%s' [%ux%u] to Silicon...\n", 
                      kernel_name, blocks, threads);
         // Map payload to GPGPU queues
-        sigma_log("Σ [GPGPU-MAN]: Compute Kernel EXECUTED. Memory synchronized.");
+        sigma_log("S [GPGPU-MAN]: Compute Kernel EXECUTED. Memory synchronized.");
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN GPGPU AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN GPGPU AUDIT ---\n");
         sigma_log("| Compute Targets : CUDA/PTX, ROCm/HSA\n");
         sigma_log("| Dispatch Mode   : DIRECT-SILICON (No-Driver)\n");
         sigma_log("| Isolation       : CIB-SECURED\n");

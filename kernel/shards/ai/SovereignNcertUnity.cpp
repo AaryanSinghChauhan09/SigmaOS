@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -17,7 +17,7 @@
 
 
 /**
- * Î£ SIGMA OS: SOVEREIGN NCERT UNITY (v128.0 - SCHOLAR UNITY)
+ * Σ SIGMA OS: SOVEREIGN NCERT UNITY (v128.0 - SCHOLAR UNITY)
  * =========================================================
  * USP: Comprehensive K-12 educational debt eradication (Science & Math).
  * Capability: Advanced Shards for Trig, Prob, Thermo, and Semiconductors.
@@ -94,7 +94,7 @@ public:
     }
 
     void ExecuteFullAudit() {
-        sigma_log("--- Î£ SIGMA OS SOVEREIGN NCERT UNITY (SCIENCE & MATH ZENITH) ---\n");
+        sigma_log("--- Σ SIGMA OS SOVEREIGN NCERT UNITY (SCIENCE & MATH ZENITH) ---\n");
         for (const auto& shard : m_shards) {
             std::cout << "\n[LEVEL]: " << shard->GetLevel() << std::endl;
             shard->ExecuteSimulation();

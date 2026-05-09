@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "firmware_nexus.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -19,7 +19,7 @@ void SovereignFirmwareNexus::CommitSiliconTransition() {
 }
 
 void SovereignFirmwareNexus::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN FIRMWARE AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN FIRMWARE AUDIT ---\n");
     sigma_log("| Firmware Version : %d.%d\n", m_current_version >> 8, m_current_version & 0xFF);
     sigma_log("| Security State    : PQC-SIGNED\n");
     sigma_log("| Transition Status: STABLE\n");

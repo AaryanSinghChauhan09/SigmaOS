@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Tuner
@@ -10,7 +10,7 @@
  * USP: Actively detects and leverages silicon-specific extensions like 
  * Intel AMX, AVX-512, and Apple Silicon Neural Engines for matrix workloads.
  *
- * Design: OOP-isolated singleton — SovereignTunerEngine.
+ * Design: OOP-isolated singleton � SovereignTunerEngine.
  */
 
 class SovereignTunerEngine {

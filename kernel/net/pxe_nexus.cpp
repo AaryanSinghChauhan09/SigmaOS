@@ -1,7 +1,7 @@
-﻿#include "../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
 #include "pxe_nexus.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Net {
@@ -21,7 +21,7 @@ void SovereignPXENexus::StreamLatticeShards() {
 }
 
 void SovereignPXENexus::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN PXE NEXUS AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN PXE NEXUS AUDIT ---\n");
     sigma_log("| Boot Nexus ID     : %x\n", m_boot_id);
     sigma_log("| Bytes Streamed    : %llu MB\n", m_bytes_fetched / (1024*1024));
     sigma_log("| Security Status    : PQC-HARDENED\n");

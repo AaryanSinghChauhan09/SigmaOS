@@ -1,7 +1,7 @@
-﻿#include "../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
 #include "neural_interface.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace UI {
@@ -18,7 +18,7 @@ void SovereignNeuralInterface::TriggerAccessibilityEvent(const char* event_type)
 }
 
 void SovereignNeuralInterface::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN NEURAL UI AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN NEURAL UI AUDIT ---\n");
     sigma_log("| Trained Patterns  : %d\n", m_trained_patterns);
     sigma_log("| Voice Engine      : ACTIVE (Low-Latency)\n");
     sigma_log("| Accessibility Mode: DEEP-LATTICE-ADAPTIVE\n");

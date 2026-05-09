@@ -1,15 +1,15 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ORB INDEXER (P2P Metadata Indexer)
+ * S SIGMAOS: SOVEREIGN ORB INDEXER (P2P Metadata Indexer)
  * =========================================================================
  * Mission: Implements IDX-001 to provide decentralized Orb discovery.
- * Layer  : L5 — Industrial Ecosystem
+ * Layer  : L5 � Industrial Ecosystem
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "industrial_vfs.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Storage {
@@ -21,7 +21,7 @@ void SovereignVFS::FetchShard(const char* cid, void* buffer, sigma_size_t size) 
 }
 
 void SovereignVFS::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN VFS AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN VFS AUDIT ---\n");
     sigma_log("| Total Blocks      : %llu\n", m_total_blocks);
     sigma_log("| Active Mounts     : %d\n", m_active_mounts);
     sigma_log("| Deduplication     : ACTIVE (LATTICE-CID)\n");

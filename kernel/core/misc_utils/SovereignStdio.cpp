@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Standard I/O Router
@@ -10,7 +10,7 @@
  * USP: Routes `sigma_write` and `sigma_read` simultaneously across COM1 serial, 
  * the hardware framebuffer, and IPC socket pipes with zero-copy.
  *
- * Design: OOP-isolated singleton — SovereignStdioEngine.
+ * Design: OOP-isolated singleton � SovereignStdioEngine.
  */
 
 class SovereignStdioEngine {

@@ -1,9 +1,9 @@
-ï»¿#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
 
 /**
- * SovereignSyscall â€” Fast-Path Shard Transition (FPST) System Call Gate
+ * SovereignSyscall — Fast-Path Shard Transition (FPST) System Call Gate
  * Dispatches kernel services with minimum context switch overhead.
  * Self-healing: unknown syscall IDs are rerouted to the SovereignFallback shard.
  */
@@ -59,7 +59,7 @@ public:
                 return SIGMA_OK;
 
             default:
-                sigma_log_warn("[SYSCALL] Unknown ID â€” triggering SELF-HEAL redirection.");
+                sigma_log_warn("[SYSCALL] Unknown ID — triggering SELF-HEAL redirection.");
                 return attemptSelfHealing(id, arg1, arg2, arg3);
         }
     }

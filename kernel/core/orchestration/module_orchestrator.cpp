@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "module_orchestrator.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Core {
@@ -18,7 +18,7 @@ void SovereignModuleOrchestrator::IgniteLattice() {
 }
 
 void SovereignModuleOrchestrator::AuditAllShards() {
-    sigma_log("\n--- Σ SOVEREIGN SHARD AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN SHARD AUDIT ---\n");
     sigma_log("| Active Shards     : %d\n", m_active_shards);
     sigma_log("| Lattice Status    : STABLE\n");
     sigma_log("| Modular Integrity : 100%% (OOP-ENCAPSULATED)\n");

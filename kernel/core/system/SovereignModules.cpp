@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 #include "sigma_modules.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "hal/sigma_hal.h"
 
 
 
@@ -48,7 +48,7 @@ extern "C" void modules_unload_shard(sigma_u32 module_id) {
 }
 
 extern "C" void modules_list_active() {
-    sigma_log("\n--- Σ ACTIVE SOVEREIGN SHARDS ---");
+    sigma_log("\n--- S ACTIVE SOVEREIGN SHARDS ---");
     for (sigma_u32 i = 0; i < active_module_count; i++) {
         if (module_table[i].is_active) {
             sigma_log("[%02d] %-20s (DSL-Linked)\n", module_table[i].module_id, module_table[i].module_name);

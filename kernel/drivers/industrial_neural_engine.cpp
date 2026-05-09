@@ -1,8 +1,8 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
 #include "industrial_neural_engine.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace AI {
@@ -20,7 +20,7 @@ void SovereignNeuralEngine::TrainLatticeModel(const void* data, sigma_size_t siz
 }
 
 void SovereignNeuralEngine::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN NEURAL ENGINE AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN NEURAL ENGINE AUDIT ---\n");
     sigma_log("| Neuron Count      : %d\n", m_neuron_count);
     sigma_log("| Synaptic Updates  : %llu\n", m_synaptic_updates);
     sigma_log("| Learning Mode     : REINFORCEMENT-LATTICE\n");

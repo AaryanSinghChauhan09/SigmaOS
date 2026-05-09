@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -17,7 +17,7 @@
 
 
 /**
- * Î£ SIGMA OS: SOVEREIGN SCHOLASTIC DATABASE (v128.0 - KNOWLEDGE ZENITH)
+ * Σ SIGMA OS: SOVEREIGN SCHOLASTIC DATABASE (v128.0 - KNOWLEDGE ZENITH)
  * ===================================================================
  * USP: Universal "Every Concept" Shard Database for NCERT (1-12).
  * Feature: 100% Native, Zero-Dependency, Process-Synchronized.

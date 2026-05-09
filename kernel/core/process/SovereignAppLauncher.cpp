@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign App Launcher
@@ -11,7 +11,7 @@
  * app launcher that ranks results by SovereignPersonalization usage scores
  * and pre-warms the process image via SovereignVFS read-ahead.
  *
- * Design: OOP-isolated singleton — SovereignAppLauncherEngine.
+ * Design: OOP-isolated singleton � SovereignAppLauncherEngine.
  */
 
 typedef struct {

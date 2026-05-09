@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -16,7 +16,7 @@
 
 
 /**
- * Î£ SIGMA OS: SOVEREIGN SHARD KERNEL (v128.0 - KERNEL ZENITH)
+ * Σ SIGMA OS: SOVEREIGN SHARD KERNEL (v128.0 - KERNEL ZENITH)
  * ==========================================================
  * USP: Real-time Shard Scheduling, Memory Isolation, and NCERT execution.
  * Principle: OOPS, SOLID, Process Management, Memory Sovereignty.
@@ -79,7 +79,7 @@ public:
     }
 
     void ExecuteAll() {
-        sigma_log("--- Î£ SIGMA OS KERNEL SCHEDULER INITIATED ---\n");
+        sigma_log("--- Σ SIGMA OS KERNEL SCHEDULER INITIATED ---\n");
         for (auto& shard : m_queue) {
             std::cout << "\n[SCHEDULER]: Dispatching Shard-Process: " << shard->GetName() << std::endl;
             shard->SetState(ShardState::RUNNING);

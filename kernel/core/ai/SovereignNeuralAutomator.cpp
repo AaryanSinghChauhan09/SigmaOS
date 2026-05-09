@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Neural Automator Shard
@@ -25,19 +25,19 @@ public:
     const char* type_name() const noexcept override { return "SovereignNeuralAutomator"; }
 
     static void init() {
-        sigma_log("Σ [NEURAL-AUTO]: Initializing Sovereign Neural AI Task Automator...");
-        sigma_log("Σ [NEURAL-AUTO]: Cognitive task queues and workflow inference ACTIVE.");
+        sigma_log("S [NEURAL-AUTO]: Initializing Sovereign Neural AI Task Automator...");
+        sigma_log("S [NEURAL-AUTO]: Cognitive task queues and workflow inference ACTIVE.");
     }
 
     void inferAndExecute(const char* user_intent) {
-        sigma_log("Σ [NEURAL-AUTO]: Analyzing user intent: '%s'...\n", user_intent);
+        sigma_log("S [NEURAL-AUTO]: Analyzing user intent: '%s'...\n", user_intent);
         // Dispatch intent to local LLM shard
-        sigma_log("Σ [NEURAL-AUTO]: Intent inferred. Assembling dynamic shard pipeline for execution.");
+        sigma_log("S [NEURAL-AUTO]: Intent inferred. Assembling dynamic shard pipeline for execution.");
         m_automated_tasks++;
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN NEURAL AUTOMATOR AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN NEURAL AUTOMATOR AUDIT ---\n");
         sigma_log("| Tasks Automated : %u\n", m_automated_tasks);
         sigma_log("| Inference Engine: LOCAL-LLM SHARD\n");
         sigma_log("| Desktop Anchor  : ZENITH\n");

@@ -1,11 +1,11 @@
-ï»¿/**
- * SovereignPager â€” Sovereign Lattice Virtual Memory Paging Shard
+/**
+ * SovereignPager — Sovereign Lattice Virtual Memory Paging Shard
  * Implements high-performance demand paging and swapping for the micro-sharded kernel.
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -40,7 +40,7 @@ private:
     bool initialized;
 
     bool isValidAddress(sigma_u64 addr) {
-        // Basic range check â€” replaced by shard segment tree in production
+        // Basic range check — replaced by shard segment tree in production
         return (addr < 0xFFFFFFFFFFFFFFFFULL);
     }
 };

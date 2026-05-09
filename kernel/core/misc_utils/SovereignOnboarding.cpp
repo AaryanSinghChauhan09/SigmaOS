@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "SovereignOnboarding.hpp"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 SovereignOnboardingEngine& SovereignOnboardingEngine::getInstance() {
     static SovereignOnboardingEngine instance;
@@ -10,7 +10,7 @@ SovereignOnboardingEngine& SovereignOnboardingEngine::getInstance() {
 
 void SovereignOnboardingEngine::startWizard() {
     sigma_log("[ONBOARDING] Initiating Sovereign Setup Wizard...");
-    sigma_log("Welcome to Σ SigmaOS. Please select your operational persona:\n");
+    sigma_log("Welcome to S SigmaOS. Please select your operational persona:\n");
     sigma_log("1. Sovereign (Standard)\n2. Amnesic (Zero-Persistence)\n3. Industrial (Production)\n");
 }
 

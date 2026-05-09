@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "digital_twin.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -18,7 +18,7 @@ void SovereignDigitalTwin::RunPredictiveAnalysis() {
 }
 
 void SovereignDigitalTwin::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN DIGITAL TWIN AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN DIGITAL TWIN AUDIT ---\n");
     sigma_log("| Twin ID         : %llx\n", m_mirror_id);
     sigma_log("| Synced Shards   : %d\n", m_synced_shards);
     sigma_log("| Prediction Engine: HEURISTIC-SILICON-ANALYSIS\n");

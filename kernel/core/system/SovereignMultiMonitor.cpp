@@ -1,7 +1,7 @@
-ï»¿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Multi-Monitor Engine
@@ -9,9 +9,9 @@
  *
  * USP: Replaces X11 RandR / Wayland output management with a Ring-0 display
  * topology engine. Each monitor is a first-class framebuffer object managed by
- * the Zenith MLC compositor directly â€” zero userland round-trips.
+ * the Zenith MLC compositor directly — zero userland round-trips.
  *
- * Design: OOP-isolated singleton â€” SovereignMultiMonitorEngine.
+ * Design: OOP-isolated singleton — SovereignMultiMonitorEngine.
  */
 
 typedef struct {

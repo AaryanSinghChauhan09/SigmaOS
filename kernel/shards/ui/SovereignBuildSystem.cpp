@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN BUILD SYSTEM (v128.0 - ZERO-STD NATIVE)
+ * Σ SIGMAOS: SOVEREIGN BUILD SYSTEM (v128.0 - ZERO-STD NATIVE)
  * =========================================================================
  * Refactored into modular build shards for industrial silicon affinity.
  * =========================================================================
@@ -12,7 +12,7 @@
 #include "kernel/core/silicon_audit.hpp"
 
 extern "C" void _start(void) {
-    sigma_log("--- Î£ SIGMA OS SOVEREIGN BUILD SYSTEM (ZENITH) ---\n");
+    sigma_log("--- Σ SIGMA OS SOVEREIGN BUILD SYSTEM (ZENITH) ---\n");
     SigmaOS::Build::SovereignSiliconAudit audit;
     audit.DetectFeatures();
     

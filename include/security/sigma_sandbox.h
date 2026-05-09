@@ -23,14 +23,14 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Security {
 
-class SovereignSandboxEngine {
+class SigmaOS::Kernel::Security::SovereignSandboxEngine {
 public:
-    static SovereignSandboxEngine& getInstance() {
-        static SovereignSandboxEngine instance;
+    static SigmaOS::Kernel::Security::SovereignSandboxEngine& getInstance() {
+        static SigmaOS::Kernel::Security::SovereignSandboxEngine instance;
         return instance;
     }
 
-    const char* type_name() const noexcept { return "SovereignSandboxEngine"; }
+    const char* type_name() const noexcept { return "SigmaOS::Kernel::Security::SovereignSandboxEngine"; }
 
     void init();
     sigma_u32 createContainer(const sigma_sandbox_config_t* config);
@@ -41,7 +41,7 @@ public:
     bool validateMACPolicy(const char* sub, const char* obj, const char* act);
 
 private:
-    SovereignSandboxEngine() : next_container_id(1U), initialized(0U) {}
+    SigmaOS::Kernel::Security::SovereignSandboxEngine() : next_container_id(1U), initialized(0U) {}
     sigma_u32 next_container_id;
     sigma_u32 initialized;
 };

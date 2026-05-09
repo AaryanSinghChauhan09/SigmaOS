@@ -1,15 +1,15 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: RASPBERRY PI 5 TUNING (BCM2712 HAL Shard)
+ * S SIGMAOS: RASPBERRY PI 5 TUNING (BCM2712 HAL Shard)
  * =========================================================================
  * Mission: Implements ARM-002 (RPi5 hardware-specific tuning).
  * Layer  : HAL
  * =========================================================================
  */
 
-#include "../../include/core/sigma_types.h"
-#include "../../include/sigma_log.h"
-#include "../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

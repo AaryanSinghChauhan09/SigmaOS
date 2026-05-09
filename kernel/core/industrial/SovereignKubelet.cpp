@@ -1,15 +1,15 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN KUBELET (Kubernetes Integration Shim)
+ * S SIGMAOS: SOVEREIGN KUBELET (Kubernetes Integration Shim)
  * =========================================================================
  * Mission: Implements K8S-001 to provide native K8s orchestration.
- * Layer  : L6 — Cloud-Native Integration
+ * Layer  : L6 � Cloud-Native Integration
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

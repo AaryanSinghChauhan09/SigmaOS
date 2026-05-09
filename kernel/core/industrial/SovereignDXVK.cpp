@@ -1,15 +1,15 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN DXVK (Vulkan Translation Shard)
+ * S SIGMAOS: SOVEREIGN DXVK (Vulkan Translation Shard)
  * =========================================================================
  * Mission: Isolated shard for D3D-to-Vulkan translation.
- * Layer  : L5 — Industrial Ecosystem / Multimedia
+ * Layer  : L5 � Industrial Ecosystem / Multimedia
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

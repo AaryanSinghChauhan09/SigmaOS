@@ -1,15 +1,15 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/core/sigma_types.h"
-#include "../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
-#include "../../include/hal/sigma_hal.h"
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Silicon-Native Network Stack (Zenith v100.0)
  * Implements a Zero-Buffer Packet Arbitration (ZBPA) algorithm.
  * ZERO-DEPENDENCY: Directly orchestrates hardware NICs.
  *
- * Design: OOP-isolated singleton — SovereignPacketArbiter.
+ * Design: OOP-isolated singleton � SovereignPacketArbiter.
  */
 
 class SovereignPacketArbiter {

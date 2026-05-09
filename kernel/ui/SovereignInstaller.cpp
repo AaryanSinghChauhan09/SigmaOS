@@ -1,15 +1,15 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN INSTALLER (UI-001)
+ * S SIGMAOS: SOVEREIGN INSTALLER (UI-001)
  * =========================================================================
  * Mission: Implements a high-fidelity, industrial-grade graphical installer.
- * Layer  : L6 — Zenith UI / System Deployment
+ * Layer  : L6 � Zenith UI / System Deployment
  * =========================================================================
  */
 
-#include "../../include/core/sigma_types.h"
-#include "../../include/sigma_log.h"
-#include "../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

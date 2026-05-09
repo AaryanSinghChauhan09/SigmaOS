@@ -1,10 +1,10 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -13,7 +13,7 @@
 
 /*
  * =========================================================================
- * Î£ SIGMAOS: NATIVE PERSONALIZER ZENITH (v14.0 - THE CUSTOMIZER)
+ * Σ SIGMAOS: NATIVE PERSONALIZER ZENITH (v14.0 - THE CUSTOMIZER)
  * =========================================================================
  * Mission: Absolute Visual Sovereignty over all modern UI/UX paradigms.
  * Capability: Ring-3 direct-to-pixel personality mapping.
@@ -21,7 +21,7 @@
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Personality {
@@ -59,7 +59,7 @@ public:
     }
 
     void audit() {
-        sigma_log("\n--- Î£ SOVEREIGN PERSONALITY AUDIT (v14.0) ---\n");
+        sigma_log("\n--- Σ SOVEREIGN PERSONALITY AUDIT (v14.0) ---\n");
         sigma_log("| Active Persona : %d\n", (int)m_mode);
         sigma_log("| Accent Shard   : Pulse-Stabilized\n");
         sigma_log("| Competitors    : GNOME Themes / Windows Aero neutralized.\n");

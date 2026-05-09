@@ -1,15 +1,15 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: K8S CONTROL PLANE SHIELD (Enterprise Orchestration)
+ * S SIGMAOS: K8S CONTROL PLANE SHIELD (Enterprise Orchestration)
  * =========================================================================
  * Mission: Implements K8S-002 for industrial container management.
- * Layer  : L6 — Cloud-Native Integration
+ * Layer  : L6 � Cloud-Native Integration
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

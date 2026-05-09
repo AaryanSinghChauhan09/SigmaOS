@@ -1,14 +1,14 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 
 /**
  * SigmaOS Self-Learning Hardware Transpiler (v100.0 Zenith)
  * Implements a Universal Machine-State Mapping (UMSM) algorithm.
  * ZERO-DEPENDENCY: Transpiles hardware interrupts/registers into sovereign shards.
  *
- * Design: OOP-isolated singleton — SovereignTranspilerEngine.
+ * Design: OOP-isolated singleton � SovereignTranspilerEngine.
  */
 
 /* --- Sovereign Transpiler Engine (OOP Isolation) --- */

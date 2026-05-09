@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "sigma_healthcheck.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "hal/sigma_hal.h"
 #include "sigma_batteryiq.h"
 #include "sigma_thermaliq.h"
 #include "sigma_sentinel.h"
@@ -33,7 +33,7 @@ extern "C" sigma_health_report_t healthcheck_run_full_audit() {
         .security_posture_ok = true
     };
     
-    sigma_log("[HEALTHCHECK] HSI: Health Score: %d/100. Shards: %d. Thermal: %d°C. Battery: %d%%.\n",
+    sigma_log("[HEALTHCHECK] HSI: Health Score: %d/100. Shards: %d. Thermal: %d�C. Battery: %d%%.\n",
                  report.health_score, report.active_shards, report.thermal_celsius, report.battery_percent);
     
     return report;

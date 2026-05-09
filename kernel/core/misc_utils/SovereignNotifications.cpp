@@ -1,17 +1,17 @@
-ï»¿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Notification Center
  * Ring-0 notification dispatch with customizable sound profiles.
  *
  * USP: Replaces dbus-based notification daemons with a direct Ring-0 event bus.
- * Sound profiles are stored as PCM waveform refs rendered by SovereignAudio â€” 
+ * Sound profiles are stored as PCM waveform refs rendered by SovereignAudio — 
  * zero latency between notification trigger and audible/visual feedback.
  *
- * Design: OOP-isolated singleton â€” SovereignNotificationEngine.
+ * Design: OOP-isolated singleton — SovereignNotificationEngine.
  */
 
 typedef struct {

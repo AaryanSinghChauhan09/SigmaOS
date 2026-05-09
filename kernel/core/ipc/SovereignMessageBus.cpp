@@ -1,20 +1,20 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
 #include "system/sigma_ipc.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
 namespace IPC {
 
 void SovereignMessageBus::init() {
-    sigma_log("Σ [IPC-BUS]: Ignite Lattice Message Bus (LMB)...");
-    sigma_log("Σ [IPC-BUS]: Distributed State-Sharing protocol ACTIVE.");
+    sigma_log("S [IPC-BUS]: Ignite Lattice Message Bus (LMB)...");
+    sigma_log("S [IPC-BUS]: Distributed State-Sharing protocol ACTIVE.");
 }
 
 void SovereignMessageBus::sendMessage(sigma_u32 target_id, const void* data, sigma_usize size) {
-    sigma_log("Σ [IPC-BUS]: Dispatching message to Shard %u (%lu bytes)...\n", target_id, size);
+    sigma_log("S [IPC-BUS]: Dispatching message to Shard %u (%lu bytes)...\n", target_id, size);
     (void)data;
     // Logic: Map-and-Swap zero-copy message delivery
 }

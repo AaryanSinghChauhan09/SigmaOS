@@ -1,7 +1,7 @@
-﻿#include "../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 #include "system/sigma_shard_manager.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -16,25 +16,25 @@ SovereignShardManager::SovereignShardManager() : m_shard_count(600) {
 }
 
 void SovereignShardManager::init() {
-    log_emit(LOG_INFO, "Σ [SHARD]: Initializing Sovereign Shard Lifecycle Orchestrator...");
-    log_emit_f(LOG_INFO, "Σ [SHARD]: Managed Lattice Shard Count: %u", (unsigned)m_shard_count);
+    log_emit(LOG_INFO, "S [SHARD]: Initializing Sovereign Shard Lifecycle Orchestrator...");
+    log_emit_f(LOG_INFO, "S [SHARD]: Managed Lattice Shard Count: %u", (unsigned)m_shard_count);
 }
 
 bool SovereignShardManager::reloadShard(sigma_u32 shard_id, const void* new_bytecode, sigma_usize size) {
     (void)new_bytecode; (void)size;
-    log_emit_f(LOG_INFO, "Σ [SHARD]: Hot-Reloading Shard S%03u (Live Update)...", (unsigned)shard_id);
-    log_emit(LOG_INFO, "Σ [SHARD]: Integrity check verified. Redirecting silicon bus traffic.");
+    log_emit_f(LOG_INFO, "S [SHARD]: Hot-Reloading Shard S%03u (Live Update)...", (unsigned)shard_id);
+    log_emit(LOG_INFO, "S [SHARD]: Integrity check verified. Redirecting silicon bus traffic.");
     return true;
 }
 
 void SovereignShardManager::performHealthCheck() {
-    log_emit(LOG_INFO, "Σ [SHARD]: Initiating Lattice-wide Self-Healing Pulse...");
+    log_emit(LOG_INFO, "S [SHARD]: Initiating Lattice-wide Self-Healing Pulse...");
     // Simulated scan and correction
-    log_emit(LOG_INFO, "Σ [SHARD]: S014 bit-flip corrected. All 600 shards NOMINAL.");
+    log_emit(LOG_INFO, "S [SHARD]: S014 bit-flip corrected. All 600 shards NOMINAL.");
 }
 
 void SovereignShardManager::setCapabilities(sigma_u32 shard_id, sigma_u64 caps) {
-    log_emit_f(LOG_INFO, "Σ [SHARD]: Applying Fine-Grained Capability Mask to S%03u: 0x%016llX", 
+    log_emit_f(LOG_INFO, "S [SHARD]: Applying Fine-Grained Capability Mask to S%03u: 0x%016llX", 
               (unsigned)shard_id, (unsigned long long)caps);
 }
 

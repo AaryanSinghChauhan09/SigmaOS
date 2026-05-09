@@ -1,15 +1,15 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN FHS (Filesystem Hierarchy Shard)
+ * S SIGMAOS: SOVEREIGN FHS (Filesystem Hierarchy Shard)
  * =========================================================================
  * Mission: Implements FHS-001 (FHS Compliance).
- * Layer  : L4 — Persistence & VFS
+ * Layer  : L4 � Persistence & VFS
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

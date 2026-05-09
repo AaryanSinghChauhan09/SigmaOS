@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign System Settings Dashboard
@@ -10,7 +10,7 @@
  * USP: Hardware-accelerated glassmorphism overlay that allows users to instantly
  * tweak adaptive themes, font scaling, and automation workflows without rebooting.
  *
- * Design: OOP-isolated singleton — SovereignSettingsDashboard.
+ * Design: OOP-isolated singleton � SovereignSettingsDashboard.
  */
 
 class SovereignSettingsDashboard {

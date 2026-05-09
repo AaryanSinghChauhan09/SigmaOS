@@ -32,7 +32,6 @@ SigmaOS is engineered to dominate and neutralize legacy distributions by solving
 | **NixOS** | Reproducible Shard Builds | **Neutralized** |
 
 ### 🏗️ Sigma Layers Architecture
-
 1. **Physical Layer**: Sovereign Silicon Tuning (RPi4/RPi5/Apple Silicon).
 2. **HAL Layer**: Sovereign Driver Isolation (Vulkan, NVMe, NetStack).
 3. **Lattice Layer**: Core Kernel Shards (Scheduler, Hypervisor, Watchdog).
@@ -42,7 +41,6 @@ SigmaOS is engineered to dominate and neutralize legacy distributions by solving
 7. **Professional Layer**: 75+ Career-Centric Role Profiles.
 
 ### 🚀 Key Futuristic Features
-
 * **Neural Search**: A universal command palette (`Alt+Space`) for files, apps, and AI-driven actions.
 * **Sigma Profiles**: Instant environment optimization for Developers, Gamers, and AI Engineers.
 * **AI Desktop Assistant**: A persistent sidebar assistant (`Alt+A`) that monitors lattice health and automates tasks.
@@ -52,7 +50,6 @@ SigmaOS is engineered to dominate and neutralize legacy distributions by solving
 ## 🏗️ The Sovereign Lattice Architecture
 
 SigmaOS is built on a 7-layer modular architecture designed for high-assurance AI automation:
-
 1. **Layer 0: Silicon Ignition** (HAL, PMM, VMM)
 2. **Layer 1: Lattice Foundation** (IPC, Scheduler)
 3. **Layer 2: Core Services** (FS, Net, Self-Healing)
@@ -62,7 +59,6 @@ SigmaOS is built on a 7-layer modular architecture designed for high-assurance A
 7. **Layer 6: Zenith Interface** (Compositor, Dashboard)
 
 ## 📚 Documentation
-
 * [Architecture Overview](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/ARCHITECTURE)
 * [Security & PQC Lattice](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SECURITY)
 * [Profession-Based Profiles](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/PROFESSION-MAP)
@@ -91,7 +87,6 @@ graph TD
 ## 📦 Technical Quickstart
 
 ### Prerequisites
-
 - `gcc-x86-64-linux-gnu` / `clang`
 - `nasm`, `make`, `cmake`
 - `qemu-system-x86`
@@ -124,7 +119,6 @@ Contributions are welcome! Please see the [Contribution Guide](https://github.co
 ## 🏛️ Governance & Standards
 
 SigmaOS adheres to strict industrial standards for lattice maintenance and security.
-
 - **[Maintenance Policy](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Maintenance-Policy)**: Quality standards and review process.
 - **[Release Process](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Release-Process)**: Preparation and cryptographic signing details.
 - **[Code of Conduct](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/CODE_OF_CONDUCT)**: Expectations for community behavior.

@@ -1,15 +1,15 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 #include "sigma_visscript.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Visual Scripting (S-VisScript)
  * Implements a Node-Graph Execution (NGE) algorithm.
  * ZERO-DEPENDENCY: Directly orchestrates automation nodes at the kernel level.
  *
- * Design: OOP-isolated singleton — SovereignVisScriptEngine.
+ * Design: OOP-isolated singleton � SovereignVisScriptEngine.
  */
 
 class SovereignVisScriptEngine {

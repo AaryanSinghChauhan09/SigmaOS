@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
-#include "../../../include/core/SigmaOOP.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Audio {
@@ -77,7 +77,7 @@ extern "C" void start_voice_zenith() {
     SigmaOS::Audio::SovereignHIDBridge hid;
     SigmaOS::Audio::SovereignVoiceShard voiceShard(&hid);
     
-    sigma_log("--- Î£ SIGMA OS VOICE-TO-TYPE SOVEREIGN INITIALIZED ---\n");
+    sigma_log("--- Σ SIGMA OS VOICE-TO-TYPE SOVEREIGN INITIALIZED ---\n");
     voiceShard.ActivateGlobalWakeKey();
     
     sigma_log("\n[EVENT]: Global Wake-Key Triggered (User Action Simulation)\n");

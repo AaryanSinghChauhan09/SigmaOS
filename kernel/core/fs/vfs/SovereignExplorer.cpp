@@ -1,8 +1,8 @@
-﻿#include "../../../../include/sigma_log.h"
-#include "../../../../include/hal/sigma_hal.h"
-#include "../../../../include/core/sigma_kernel_types.h"
-#include "../../../../include/libc/SovereignLibC.h"
-#include "../../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign File Explorer Shard
@@ -25,20 +25,20 @@ public:
     const char* type_name() const noexcept override { return "SovereignExplorer"; }
 
     static void init() {
-        sigma_log("Î£ [EXPLORER]: Initializing Sovereign File Explorer Shard...");
+        sigma_log("Σ [EXPLORER]: Initializing Sovereign File Explorer Shard...");
         m_active_path = "/";
-        sigma_log("Î£ [EXPLORER]: Lattice Navigation Engine ONLINE.");
+        sigma_log("Σ [EXPLORER]: Lattice Navigation Engine ONLINE.");
     }
 
     void navigate(const char* path) {
-        sigma_log("Î£ [EXPLORER]: Navigating to Lattice Path: %s...\n", path);
+        sigma_log("Σ [EXPLORER]: Navigating to Lattice Path: %s...\n", path);
         m_active_path = path;
         // Simulated directory listing
-        sigma_log("Î£ [EXPLORER]: Populating sharded node list...");
+        sigma_log("Σ [EXPLORER]: Populating sharded node list...");
     }
 
     void audit() {
-        sigma_log("\n--- Î£ SOVEREIGN EXPLORER AUDIT ---\n");
+        sigma_log("\n--- Σ SOVEREIGN EXPLORER AUDIT ---\n");
         sigma_log("| Active Path     : %s\n", m_active_path);
         sigma_log("| View Mode       : SHARDED-GRID\n");
         sigma_log("| FS Integrity    : QUANTUM-VERIFIED\n");

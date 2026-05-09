@@ -1,8 +1,8 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
 #include "vfs.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace FS {
@@ -21,7 +21,7 @@ void SovereignVFS::MountShard(const char* path, sigma_bool is_dir) {
 }
 
 void SovereignVFS::ListLattice() {
-    sigma_log("\n--- Σ SOVEREIGN LATTICE DIRECTORY ---\n");
+    sigma_log("\n--- S SOVEREIGN LATTICE DIRECTORY ---\n");
     for (sigma_u32 i = 0; i < m_node_count; ++i) {
         sigma_log("| %s %s\n", m_root[i]->is_directory ? "[DIR] " : "[SHARD]", m_root[i]->name);
     }

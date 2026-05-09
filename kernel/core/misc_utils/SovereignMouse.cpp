@@ -1,14 +1,14 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign USB Mouse Shard (v100.0 Zenith)
  * Implements a HID Mouse Orchestration (HMO) algorithm.
  * ZERO-DEPENDENCY: Direct HID report parsing from S-USB.
  *
- * Design: OOP-isolated singleton — SovereignMouseEngine.
+ * Design: OOP-isolated singleton � SovereignMouseEngine.
  */
 
 class SovereignMouseEngine {

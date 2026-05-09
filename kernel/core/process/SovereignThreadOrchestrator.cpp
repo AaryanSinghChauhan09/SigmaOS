@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Thread Orchestrator Shard
@@ -25,20 +25,20 @@ public:
     const char* type_name() const noexcept override { return "SovereignThreadOrchestrator"; }
 
     static void init() {
-        sigma_log("Î£ [THREAD-ORCH]: Initializing Concurrency Shard...");
+        sigma_log("Σ [THREAD-ORCH]: Initializing Concurrency Shard...");
         m_active_threads = 0;
-        sigma_log("Î£ [THREAD-ORCH]: Lattice Concurrency Fabric ONLINE.");
+        sigma_log("Σ [THREAD-ORCH]: Lattice Concurrency Fabric ONLINE.");
     }
 
     void spawnThread(const char* task_id, sigma_u32 priority) {
-        sigma_log("Î£ [THREAD-ORCH]: Spawning Sovereign Thread for task '%s' (Prio: %u)...\n", task_id, priority);
+        sigma_log("Σ [THREAD-ORCH]: Spawning Sovereign Thread for task '%s' (Prio: %u)...\n", task_id, priority);
         // Bind thread to silicon node via PredictiveScheduler
         m_active_threads++;
-        sigma_log("Î£ [THREAD-ORCH]: Thread successfully orchestrated.");
+        sigma_log("Σ [THREAD-ORCH]: Thread successfully orchestrated.");
     }
 
     void audit() {
-        sigma_log("\n--- Î£ SOVEREIGN THREAD AUDIT ---\n");
+        sigma_log("\n--- Σ SOVEREIGN THREAD AUDIT ---\n");
         sigma_log("| Active Threads  : %u\n", m_active_threads);
         sigma_log("| Concurrency Mode: REAL-TIME-LATTICE\n");
         sigma_log("| Sync Integrity  : VERIFIED\n");

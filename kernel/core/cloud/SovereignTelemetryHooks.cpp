@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Telemetry Exporter Hooks
@@ -10,7 +10,7 @@
  * USP: securely exports real-time metrics (e.g., to Prometheus/Grafana) using
  * SovereignNetStack without exposing the Ring-0 memory space.
  *
- * Design: OOP-isolated singleton — SovereignTelemetryExporter.
+ * Design: OOP-isolated singleton � SovereignTelemetryExporter.
  */
 
 class SovereignTelemetryExporter {

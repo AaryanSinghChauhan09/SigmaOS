@@ -1,14 +1,14 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 
 /**
  * SigmaOS Sovereign Lua Scripting Engine (v100.0 Zenith)
  * Implements a Light-Weight Automation (LWA) algorithm.
  * ZERO-DEPENDENCY: Integrated for user personalization and assistant tasks.
  *
- * Design: OOP-isolated singleton — SovereignLuaEngine.
+ * Design: OOP-isolated singleton � SovereignLuaEngine.
  */
 
 /* --- Sovereign Lua Engine (OOP Isolation) --- */

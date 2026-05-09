@@ -1,15 +1,15 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: EMERGENCY LATTICE SYNC (RECOV-001)
+ * S SIGMAOS: EMERGENCY LATTICE SYNC (RECOV-001)
  * =========================================================================
  * Mission: Self-healing disaster recovery mechanism.
- * Layer  : L2 — System Services / Reliability
+ * Layer  : L2 � System Services / Reliability
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

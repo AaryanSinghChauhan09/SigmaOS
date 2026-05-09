@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Application Sharding Manager
@@ -25,23 +25,23 @@ public:
     const char* type_name() const noexcept override { return "SovereignAppSharding"; }
 
     static void init() {
-        sigma_log("Î£ [APP-SHARDING]: Initializing Application Sharding Layer...");
+        sigma_log("Σ [APP-SHARDING]: Initializing Application Sharding Layer...");
         m_active_apps = 0;
         m_total_shards = 0;
-        sigma_log("Î£ [APP-SHARDING]: Distributed Application Fabric ONLINE.");
+        sigma_log("Σ [APP-SHARDING]: Distributed Application Fabric ONLINE.");
     }
 
     void shardApp(const char* app_name, sigma_u32 shard_count) {
-        sigma_log("Î£ [APP-SHARDING]: Partitioning application '%s' into %u shards...\n", app_name, shard_count);
+        sigma_log("Σ [APP-SHARDING]: Partitioning application '%s' into %u shards...\n", app_name, shard_count);
         // Bind shards to the Mesh Lattice and Orb Manager
         m_active_apps++;
         m_total_shards += shard_count;
         
-        sigma_log("Î£ [APP-SHARDING]: Application '%s' successfully distributed across %u nodes.\n", app_name, shard_count);
+        sigma_log("Σ [APP-SHARDING]: Application '%s' successfully distributed across %u nodes.\n", app_name, shard_count);
     }
 
     void audit() {
-        sigma_log("\n--- Î£ SOVEREIGN APP-SHARDING AUDIT ---\n");
+        sigma_log("\n--- Σ SOVEREIGN APP-SHARDING AUDIT ---\n");
         sigma_log("| Active Apps     : %u\n", m_active_apps);
         sigma_log("| Total Shards    : %u\n", m_total_shards);
         sigma_log("| Fabric Status   : ORCHESTRATED\n");

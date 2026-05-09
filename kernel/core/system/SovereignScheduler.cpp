@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Predictive Scheduler (S-Sched)
@@ -10,7 +10,7 @@
  * USP: Instantly predicts shard execution paths and pre-allocates CPU time slices.
  * Ensures zero-latency context switches for real-time and UI threads.
  *
- * Design: OOP-isolated singleton — SovereignScheduler.
+ * Design: OOP-isolated singleton � SovereignScheduler.
  */
 
 class SovereignScheduler {

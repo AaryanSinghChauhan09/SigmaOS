@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "hardware_transpiler.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -24,7 +24,7 @@ void SovereignHardwareTranspiler::ObserveExecution(sigma_u64 silicon_cycles) {
 }
 
 void SovereignHardwareTranspiler::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN HARDWARE TRANSPILER AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN HARDWARE TRANSPILER AUDIT ---\n");
     sigma_log("| Optimization Passes : %llu\n", m_optimization_passes);
     sigma_log("| Learned Patterns    : %d\n", m_learned_patterns);
     sigma_log("| Silicon Compatibility: UNIVERSAL (x86/ARM/RISC-V)\n");

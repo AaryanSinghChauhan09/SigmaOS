@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Tracer Shard
@@ -25,16 +25,16 @@ public:
     const char* type_name() const noexcept override { return "SovereignTracer"; }
 
     static void init() {
-        sigma_log("Σ [TRACER]: Initializing Sovereign Silicon Tracer...");
-        sigma_log("Σ [TRACER]: Non-intrusive instruction-level hooks ACTIVE.");
+        sigma_log("S [TRACER]: Initializing Sovereign Silicon Tracer...");
+        sigma_log("S [TRACER]: Non-intrusive instruction-level hooks ACTIVE.");
     }
 
     void traceInstruction(sigma_u64 rip, const char* mnemonic) {
-        sigma_log("Σ [TRACER]: TRACE [0x%016llX] -> %s\n", rip, mnemonic);
+        sigma_log("S [TRACER]: TRACE [0x%016llX] -> %s\n", rip, mnemonic);
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN TRACER AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN TRACER AUDIT ---\n");
         sigma_log("| Active Hooks    : 0\n");
         sigma_log("| Trace Mode      : HARDWARE-ACCELERATED\n");
         sigma_log("| Safety Boundary : Lattice-Isolation\n");

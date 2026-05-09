@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Container Manager Shard
@@ -25,19 +25,19 @@ public:
     const char* type_name() const noexcept override { return "SovereignContainerManager"; }
 
     static void init() {
-        sigma_log("Σ [CONTAINER]: Initializing Sovereign Alpine-Style Container Manager...");
-        sigma_log("Σ [CONTAINER]: Immutable, sub-megabyte orchestration ACTIVE.");
+        sigma_log("S [CONTAINER]: Initializing Sovereign Alpine-Style Container Manager...");
+        sigma_log("S [CONTAINER]: Immutable, sub-megabyte orchestration ACTIVE.");
     }
 
     void deployContainer(const char* image_hash) {
-        sigma_log("Σ [CONTAINER]: Deploying lightweight execution environment from hash '%s'...\n", image_hash);
+        sigma_log("S [CONTAINER]: Deploying lightweight execution environment from hash '%s'...\n", image_hash);
         // Execute chroot/cgroup isolation natively
-        sigma_log("Σ [CONTAINER]: Container DEPLOYED. Sandboxed environment operational with zero overhead.");
+        sigma_log("S [CONTAINER]: Container DEPLOYED. Sandboxed environment operational with zero overhead.");
         m_active_containers++;
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN CONTAINER AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN CONTAINER AUDIT ---\n");
         sigma_log("| Active Containers: %u\n", m_active_containers);
         sigma_log("| Ideology Absorbed: ALPINE LINUX / TALOS OS\n");
         sigma_log("| State Model      : IMMUTABLE EXECUTION\n");

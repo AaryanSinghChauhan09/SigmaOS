@@ -1,8 +1,8 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
 #include "industrial_net_stack.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Net {
@@ -20,7 +20,7 @@ void SovereignNetStack::EstablishPQCTunnel(const char* target_node) {
 }
 
 void SovereignNetStack::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN NETWORKING AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN NETWORKING AUDIT ---\n");
     sigma_log("| Total Packets     : %llu\n", m_total_packets);
     sigma_log("| Nominal Bandwidth : 100 Gbps\n");
     sigma_log("| Security Status    : PQC-TUNNELED\n");

@@ -1,7 +1,7 @@
-ï»¿#include "../../../../include/sigma_log.h"
-#include "../../../../include/core/sigma_types.h"
-#include "../../../../include/hal/sigma_hal.h"
-#include "../../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Storage Deduplication Engine
@@ -9,9 +9,9 @@
  *
  * USP: Uses a rolling SHA-256-equivalent fingerprint to detect duplicate
  * 4KB blocks before writing to disk, eliminating redundant storage at Ring-0
- * speed â€” no filesystem-level overhead like Linux's btrfs dedup.
+ * speed — no filesystem-level overhead like Linux's btrfs dedup.
  *
- * Design: OOP-isolated singleton â€” SovereignStorageDedupEngine.
+ * Design: OOP-isolated singleton — SovereignStorageDedupEngine.
  */
 
 class SovereignStorageDedupEngine {
@@ -36,7 +36,7 @@ public:
                 this->bytes_saved += block_size_bytes;
                 sigma_log("[DEDUP] Duplicate block detected (hash 0x%08X). %u bytes saved. Total saved: %u KB.\n",
                              block_hash, block_size_bytes, this->bytes_saved / 1024);
-                return true; // Skip write â€” use existing reference
+                return true; // Skip write — use existing reference
             }
         }
         // Register new unique block

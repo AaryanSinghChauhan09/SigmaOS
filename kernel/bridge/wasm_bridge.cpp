@@ -1,8 +1,8 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
 #include "wasm_bridge.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Bridge {
@@ -19,7 +19,7 @@ void SovereignWASMBridge::HandleBrowserInterrupt(sigma_u32 event_id) {
 }
 
 void SovereignWASMBridge::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN WASM BRIDGE AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN WASM BRIDGE AUDIT ---\n");
     sigma_log("| WASM Pages        : %d\n", m_wasm_page_count);
     sigma_log("| SIMD Acceleration : ENABLED (Silicon-Speed)\n");
     sigma_log("| Parity Status     : 100%% BARE-METAL-EQUIVALENT\n");

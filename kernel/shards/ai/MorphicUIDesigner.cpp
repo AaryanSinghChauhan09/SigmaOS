@@ -1,17 +1,17 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
 /*
  * =========================================================================
- * Σ SIGMAOS: MORPHIC UI DESIGNER (v1.0 - INDUSTRIAL SHARD)
+ * S SIGMAOS: MORPHIC UI DESIGNER (v1.0 - INDUSTRIAL SHARD)
  * =========================================================================
  * Mission: Real-time UI rasterization and glassmorphism design.
  * Principles: Zero-Dependency, Vector-Native, VRAM-Direct.
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Design {

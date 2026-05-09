@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "recovery_agent.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Core {
@@ -19,7 +19,7 @@ void SovereignRecoveryAgent::VerifyPostRecoveryIntegrity() {
 }
 
 void SovereignRecoveryAgent::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN RECOVERY AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN RECOVERY AUDIT ---\n");
     sigma_log("| Restorations      : %d\n", m_restorations_completed);
     sigma_log("| Shadow Parity     : ACTIVE\n");
     sigma_log("| Self-Healing State: OPTIMAL\n");

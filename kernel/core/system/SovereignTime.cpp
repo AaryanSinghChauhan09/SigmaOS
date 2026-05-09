@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
 #include "sigma_time.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Time Engine
@@ -25,9 +25,9 @@ public:
     const char* type_name() const noexcept override { return "SovereignTime"; }
 
     static void init() {
-        sigma_log("Σ [TIME]: Initializing Sovereign Silicon Timekeeper...");
+        sigma_log("S [TIME]: Initializing Sovereign Silicon Timekeeper...");
         m_start_ticks = cpu_rdtsc();
-        sigma_log("Σ [TIME]: Time Lattice SYNCHRONIZED.");
+        sigma_log("S [TIME]: Time Lattice SYNCHRONIZED.");
     }
 
     sigma_u64 getUptimeMs() {

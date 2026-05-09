@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Dynamic Theming Engine
@@ -11,7 +11,7 @@
  * seamlessly transition Zenith UI between High-Contrast, Dark, and Light 
  * modes in real-time with zero latency.
  *
- * Design: OOP-isolated singleton — SovereignThemeEngine.
+ * Design: OOP-isolated singleton � SovereignThemeEngine.
  */
 
 class SovereignThemeEngine {

@@ -1,10 +1,10 @@
-﻿#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
 #include "sigma_snap_types.h"
 #include "SovereignSnap.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 
 
 
@@ -23,16 +23,16 @@ SovereignSnapEngine::SovereignSnapEngine() : initialized(0), active_zone_count(0
 }
 
 void SovereignSnapEngine::init() {
-    log_emit(LOG_INFO, "Σ [SNAP]: Initializing Sovereign Dynamic Shard-Snapping (DSS)...");
+    log_emit(LOG_INFO, "S [SNAP]: Initializing Sovereign Dynamic Shard-Snapping (DSS)...");
     this->active_zone_count = 0u;
     this->initialized       = 1u;
-    log_emit(LOG_INFO, "Σ [SNAP]: DSS Multi-window spatial lattice ONLINE.");
+    log_emit(LOG_INFO, "S [SNAP]: DSS Multi-window spatial lattice ONLINE.");
 }
 
 void SovereignSnapEngine::applyLayout(sigma_u32 layout_id) {
     (void)layout_id;
     log_emit(LOG_INFO, "[SNAP]: Applying spatial layout.");
-    log_emit(LOG_INFO, "Σ [SNAP]: Viewport reconciliation complete.");
+    log_emit(LOG_INFO, "S [SNAP]: Viewport reconciliation complete.");
 }
 
 void SovereignSnapEngine::registerZone(sigma_u32 x, sigma_u32 y,
@@ -45,7 +45,7 @@ void SovereignSnapEngine::registerZone(sigma_u32 x, sigma_u32 y,
         zone->w        = w;
         zone->h        = h;
         zone->capacity = w * h;
-        log_emit(LOG_INFO, "Σ [SNAP]: Zone registered and calibrated.");
+        log_emit(LOG_INFO, "S [SNAP]: Zone registered and calibrated.");
     }
 }
 

@@ -1,7 +1,7 @@
-ï»¿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign IoT Engine
@@ -11,7 +11,7 @@
  * with a 12KB kernel footprint. The IoT Engine manages device telemetry, MQTT-like 
  * pub/sub, and firmware OTA updates through the SovereignProtocol mesh.
  *
- * Design: OOP-isolated singleton â€” SovereignIoTEngine.
+ * Design: OOP-isolated singleton — SovereignIoTEngine.
  */
 
 typedef struct {
@@ -41,12 +41,12 @@ public:
         sigma_hardened_strcpy(d->device_type, device_type, 24);
         d->last_telemetry_tick = 0;
         d->online = true;
-        sigma_log("[IOT] Registered: %s (ID: 0x%04X) â€” online.\n", device_type, device_id);
+        sigma_log("[IOT] Registered: %s (ID: 0x%04X) — online.\n", device_type, device_id);
         return device_id;
     }
 
     void publishTelemetry(sigma_u32 device_id, sigma_u32 value, sigma_u32 tick) {
-        sigma_log("[IOT] Telemetry from 0x%04X: value=%u at tick %u â€” routing via SCP mesh.\n",
+        sigma_log("[IOT] Telemetry from 0x%04X: value=%u at tick %u — routing via SCP mesh.\n",
                      device_id, value, tick);
     }
 

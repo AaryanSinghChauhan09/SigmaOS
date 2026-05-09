@@ -1,15 +1,15 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 #include "sigma_micro.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Micro Implementation
  * Implements an Isolated Service Mediation (ISM) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal micro-service isolation.
  *
- * Design: OOP-isolated singleton — SovereignMicroEngine.
+ * Design: OOP-isolated singleton � SovereignMicroEngine.
  */
 
 class SovereignMicroEngine {

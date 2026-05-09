@@ -1,19 +1,19 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 /**
- * Î£ SIGMA OS: SOVEREIGN LAB UNIVERSAL (v128.0 - ZERO-STD NATIVE)
+ * Σ SIGMA OS: SOVEREIGN LAB UNIVERSAL (v128.0 - ZERO-STD NATIVE)
  * ==============================================================
  * USP: Universal "Small & Big" experiment coverage for NCERT (1-12).
  * Capability: Bernoulli, Kinetics, Venn, and Germination Shards.
@@ -86,7 +86,7 @@ public:
     }
 
     void ExecuteUniversalAudit() {
-        sigma_log("--- Î£ SIGMA OS SOVEREIGN UNIVERSAL LABORATORY ---\n");
+        sigma_log("--- Σ SIGMA OS SOVEREIGN UNIVERSAL LABORATORY ---\n");
         for (sigma_usize i = 0; i < m_count; i++) {
             sigma_log("\n------------------------------------------------\n");
             m_zenith[i]->Deploy();

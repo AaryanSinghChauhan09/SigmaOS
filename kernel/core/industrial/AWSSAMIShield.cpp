@@ -1,15 +1,15 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: AWS AMI SHIELD (Cloud-Native Security Shard)
+ * S SIGMAOS: AWS AMI SHIELD (Cloud-Native Security Shard)
  * =========================================================================
  * Mission: Implements CLD-001 for secure AWS EC2 deployments.
- * Layer  : L6 — Cloud-Native Integration
+ * Layer  : L6 � Cloud-Native Integration
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

@@ -1,6 +1,6 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 /**
  * SigmaOS Sovereign Virtio Driver Layer
@@ -26,7 +26,7 @@ public:
     }
 
     static void init() {
-        sigma_log("Σ [VIRTIO]: Initializing Universal Virtio Bus...");
+        sigma_log("S [VIRTIO]: Initializing Universal Virtio Bus...");
         this->device_count = 0;
         this->initialized = true;
     }
@@ -36,7 +36,7 @@ public:
         this->devices[this->device_count].device_id = id;
         this->devices[this->device_count].status = 1; // ACK
         this->device_count++;
-        sigma_log("Σ [VIRTIO]: Registered Generic Device Type %u\n", id);
+        sigma_log("S [VIRTIO]: Registered Generic Device Type %u\n", id);
     }
 
 private:

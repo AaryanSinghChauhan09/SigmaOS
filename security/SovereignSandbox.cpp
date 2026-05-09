@@ -18,9 +18,7 @@ static constexpr sigma_u32 SYSCALL_SIGMA_YIELD = 0x01U;
 
 
 
-const char* SovereignSandboxEngine::type_name() const noexcept {
-    return "SovereignSandboxEngine";
-}
+
 
 void SovereignSandboxEngine::init() {
     sigma_log_info("[SANDBOX] Initializing Sovereign Zero-Trust Sandbox Isolation...");

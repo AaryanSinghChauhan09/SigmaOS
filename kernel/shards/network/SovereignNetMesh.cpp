@@ -1,10 +1,10 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 #include "Lattice.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN NET-MESH (v25.0 - SOLID FINALITY)
+ * Σ SIGMAOS: SOVEREIGN NET-MESH (v25.0 - SOLID FINALITY)
  * =========================================================================
  * Mission: Absolute Network Sovereignty. P2P Mesh, Silicon-Direct Sockets.
  * Capability: TCP/UDP Sharding, P2P Tunneling (Lattice-PQC-Secured).
@@ -12,7 +12,7 @@
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Net {
@@ -75,7 +75,7 @@ public:
     }
 
     void audit() {
-        sigma_print("\n--- Î£ SOVEREIGN NETWORK AUDIT (v25.0) ---\n");
+        sigma_print("\n--- Σ SOVEREIGN NETWORK AUDIT (v25.0) ---\n");
         sigma_print("| TX Shards      : "); sigma_print_num(m_tx_shards); sigma_print("\n");
         sigma_print("| RX Shards      : "); sigma_print_num(m_rx_shards); sigma_print("\n");
         sigma_print("| P2P Mesh       : [ACTIVE/LATTICE-PQC-V5 SECURED]\n");

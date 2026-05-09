@@ -1,10 +1,10 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 #include "Lattice.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN OMNI-TOOL ZENITH (v26.0 - THE ULTIMATE ABSORPTION)
+ * Σ SIGMAOS: SOVEREIGN OMNI-TOOL ZENITH (v26.0 - THE ULTIMATE ABSORPTION)
  * =========================================================================
  * Mission: Absorb EVERY competitor USP (Windows, Mac, Linux, Specialized).
  * Capability: Computational Knowledge, Workflow Automation, AR, Financials.
@@ -12,7 +12,7 @@
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Omni {
@@ -94,7 +94,7 @@ public:
     }
 
     void audit() {
-        sigma_print("\n--- Î£ SOVEREIGN OMNI-AUDIT (v94.0) ---\n");
+        sigma_print("\n--- Σ SOVEREIGN OMNI-AUDIT (v94.0) ---\n");
         sigma_print("---------------------------------------\n");
     }
 };

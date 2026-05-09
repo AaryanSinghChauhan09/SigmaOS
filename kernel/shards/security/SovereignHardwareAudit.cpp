@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN HARDWARE AUDIT (v128.0 - ZERO-STD NATIVE)
+ * Σ SIGMAOS: SOVEREIGN HARDWARE AUDIT (v128.0 - ZERO-STD NATIVE)
  * =========================================================================
  * Refactored into modular hardware shards for industrial silicon mapping.
  * =========================================================================
@@ -12,7 +12,7 @@
 #include "kernel/diagnostics/hardware_audit.hpp"
 
 extern "C" void _start(void) {
-    sigma_log("--- Î£ SIGMA OS SOVEREIGN HARDWARE AUDIT (ZENITH) ---\n");
+    sigma_log("--- Σ SIGMA OS SOVEREIGN HARDWARE AUDIT (ZENITH) ---\n");
     SigmaOS::Diagnostics::SovereignHardwareAudit audit;
     audit.AuditProcessors();
     audit.AuditMemory();

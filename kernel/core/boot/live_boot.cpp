@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "live_boot.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -24,7 +24,7 @@ void SovereignLiveBoot::CleanLegacyArtifacts() {
 }
 
 void SovereignLiveBoot::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN LIVE BOOT AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN LIVE BOOT AUDIT ---\n");
     sigma_log("| Boot Stage        : %d (Ignited)\n", m_boot_stage);
     sigma_log("| Execution Mode    : RAM-PHANTOM\n");
     sigma_log("| Trace Status      : ZERO-FOOTPRINT\n");

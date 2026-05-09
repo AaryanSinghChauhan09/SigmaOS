@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Predictive Scheduler
@@ -25,20 +25,20 @@ public:
     const char* type_name() const noexcept override { return "PredictiveScheduler"; }
 
     static void init() {
-        sigma_log("Î£ [PREDICT-SCHED]: Orchestrating Silicon Predictive Engine...");
+        sigma_log("Σ [PREDICT-SCHED]: Orchestrating Silicon Predictive Engine...");
         m_optimizations = 0;
-        sigma_log("Î£ [PREDICT-SCHED]: Neural Workload Profiler READY.");
+        sigma_log("Σ [PREDICT-SCHED]: Neural Workload Profiler READY.");
     }
 
     void scheduleShard(const char* shard_id, sigma_u32 priority) {
-        sigma_log("Î£ [PREDICT-SCHED]: Analyzing silicon density for Shard: %s...\n", shard_id);
+        sigma_log("Σ [PREDICT-SCHED]: Analyzing silicon density for Shard: %s...\n", shard_id);
         // Simulated Predictive placement based on thermal/latency metrics
         m_optimizations++;
-        sigma_log("Î£ [PREDICT-SCHED]: Shard '%s' dispatched to Optimal Silicon Node (Latency: 2ms).\n", shard_id);
+        sigma_log("Σ [PREDICT-SCHED]: Shard '%s' dispatched to Optimal Silicon Node (Latency: 2ms).\n", shard_id);
     }
 
     void audit() {
-        sigma_log("\n--- Î£ SOVEREIGN PREDICTIVE AUDIT ---\n");
+        sigma_log("\n--- Σ SOVEREIGN PREDICTIVE AUDIT ---\n");
         sigma_log("| Optimizations   : %u\n", m_optimizations);
         sigma_log("| Efficiency      : 98.4%%\n");
         sigma_log("| Dispatch Mode   : NEURAL-AWARE\n");

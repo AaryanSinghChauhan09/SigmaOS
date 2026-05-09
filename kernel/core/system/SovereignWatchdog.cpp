@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Watchdog Shard
@@ -25,22 +25,22 @@ public:
     const char* type_name() const noexcept override { return "SovereignWatchdog"; }
 
     static void init() {
-        sigma_log("Σ [WATCHDOG]: Initializing Sovereign Kernel Watchdog...");
-        sigma_log("Σ [WATCHDOG]: Continuous heartbeat and hang detection ACTIVE.");
+        sigma_log("S [WATCHDOG]: Initializing Sovereign Kernel Watchdog...");
+        sigma_log("S [WATCHDOG]: Continuous heartbeat and hang detection ACTIVE.");
     }
 
     void petWatchdog(sigma_u32 shard_id) {
-        sigma_log("Σ [WATCHDOG]: Heartbeat received from Shard %u.\n", shard_id);
+        sigma_log("S [WATCHDOG]: Heartbeat received from Shard %u.\n", shard_id);
     }
 
     void triggerRecovery(sigma_u32 shard_id) {
-        sigma_log("Σ [WATCHDOG]: [CRITICAL] Shard %u unresponsive. Triggering Self-Healing Restart...\n", shard_id);
-        sigma_log("Σ [WATCHDOG]: Recovery COMPLETE. Subsystem re-initialized.");
+        sigma_log("S [WATCHDOG]: [CRITICAL] Shard %u unresponsive. Triggering Self-Healing Restart...\n", shard_id);
+        sigma_log("S [WATCHDOG]: Recovery COMPLETE. Subsystem re-initialized.");
         m_recovery_events++;
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN WATCHDOG AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN WATCHDOG AUDIT ---\n");
         sigma_log("| Recovery Events : %u\n", m_recovery_events);
         sigma_log("| Detection Mode  : LATTICE-HEARTBEAT\n");
         sigma_log("| Action          : AUTO-RESTART\n");

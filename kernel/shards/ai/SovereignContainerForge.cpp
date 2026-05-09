@@ -1,19 +1,19 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 /**
- * Î£ SIGMA OS: SOVEREIGN CONTAINER FORGE (v3.0 - ZERO-STD NATIVE)
+ * Σ SIGMA OS: SOVEREIGN CONTAINER FORGE (v3.0 - ZERO-STD NATIVE)
  * ========================================================
  * USP Absorbed: Docker (OCI Images), Buildah (Daemonless Build), Podman (Rootless).
  * Capability: Silicon-to-OCI Shard Synthesis, Layered Filesystem Forge.

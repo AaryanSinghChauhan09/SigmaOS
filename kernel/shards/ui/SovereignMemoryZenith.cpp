@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -12,7 +12,7 @@
 
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN MEMORY ZENITH (v10.0 - ZERO-DEPENDENCY)
+ * Σ SIGMAOS: SOVEREIGN MEMORY ZENITH (v10.0 - ZERO-DEPENDENCY)
  * =========================================================================
  * Mission: Absolute Memory Sovereignty via Direct Hardware Control.
  * Principles: 
@@ -23,8 +23,8 @@
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -80,7 +80,7 @@ public:
     }
 
     void audit() {
-        sigma_log("\n--- Î£ SOVEREIGN MEMORY AUDIT ---\n");
+        sigma_log("\n--- Σ SOVEREIGN MEMORY AUDIT ---\n");
         sigma_log("| Total Pool : %u MB\n", (unsigned int)(INITIAL_POOL_SIZE / 1024 / 1024));
         sigma_log("| Used Space : %u KB\n", (unsigned int)(m_used / 1024));
         sigma_log("| Managed Shards: %u\n", (unsigned int)m_segment_count);

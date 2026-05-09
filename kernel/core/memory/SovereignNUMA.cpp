@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign NUMA Architecture Optimizer
@@ -10,7 +10,7 @@
  * USP: Preemptively calculates thread distance to physical memory banks and
  * migrates pages locally to prevent cross-die latency spikes in heavy workloads.
  *
- * Design: OOP-isolated singleton — SovereignNUMAEngine.
+ * Design: OOP-isolated singleton � SovereignNUMAEngine.
  */
 
 class SovereignNUMAEngine {

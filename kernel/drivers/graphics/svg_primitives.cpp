@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /* 
  * =========================================================================
@@ -14,7 +14,7 @@ namespace Graphics {
 
 extern "C" void sigma_graphics_rasterize_bezier_lowlevel(const char* path) {
     // Low-level bezier math (simulated)
-    sigma_log("[LOWLEVEL-SVG]: Computing Bézier Spline Shards for: %s\n", path);
+    sigma_log("[LOWLEVEL-SVG]: Computing B�zier Spline Shards for: %s\n", path);
 }
 
 } // namespace Graphics

@@ -1,16 +1,16 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /* =========================================================================
- * Σ SIGMAOS: COLONIZATION SHARD (v1.0 - SOVEREIGN EXPANSION)
+ * S SIGMAOS: COLONIZATION SHARD (v1.0 - SOVEREIGN EXPANSION)
  * =========================================================================
  * Mission: Self-propagating deployment of the SigmaOS lattice across nodes.
  * Principle: Absolute Growth. Zero-Trace Deployment. Silicon Sovereignty.
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Expansion {

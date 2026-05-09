@@ -1,9 +1,9 @@
-﻿#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
 
 /**
- * SovereignSMP — Symmetric Multi-Processing Engine
+ * SovereignSMP � Symmetric Multi-Processing Engine
  * Handles AP ignition, IPI dispatch, and ticket-lock synchronization.
  */
 

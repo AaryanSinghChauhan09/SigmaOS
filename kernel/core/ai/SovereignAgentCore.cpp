@@ -1,9 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include <map>
-#include <string>
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * =========================================================================
@@ -26,8 +24,8 @@ enum class AgentState {
 };
 
 struct AgentContext {
-    std::string id;
-    std::string goal;
+    SigmaString id;
+    SigmaString goal;
     AgentState state;
 };
 
@@ -43,19 +41,19 @@ public:
     /**
      * @brief Spawn a new autonomous agent with a specific goal.
      */
-    void spawnAgent(const std::string& id, const std::string& goal) {
-        sigma_log("[AGENT-CORE]: Spawning Agent [%s] with Goal: %s\n", id.c_str(), goal.c_str());
-        m_active_agents[id] = { id, goal, AgentState::PLANNING };
+    void spawnAgent(const char* id, const char* goal) {
+        sigma_log("[AGENT-CORE]: Spawning Agent [%s] with Goal: %s\n", id, goal);
+        m_active_agents.insert(SigmaString(id), { SigmaString(id), SigmaString(goal), AgentState::PLANNING });
         
         // Initiate planning sequence
-        sigma_log("[AGENT-CORE]: Agent [%s] entering PLANNING phase.\n", id.c_str());
+        sigma_log("[AGENT-CORE]: Agent [%s] entering PLANNING phase.\n", id);
     }
 
     /**
      * @brief Monitor agent health and progress.
      */
     void auditAgents() {
-        sigma_log("[AGENT-CORE]: Auditing 3 active agents. All operating within safe parameters.");
+        sigma_log("[AGENT-CORE]: Auditing %d active agents. All operating within safe parameters.", (int)m_active_agents.size());
     }
 
 private:
@@ -63,7 +61,7 @@ private:
         sigma_log("Sovereign Agent Core Online. Autonomous Runtime [ACTIVE].");
     }
 
-    std::map<std::string, AgentContext> m_active_agents;
+    SigmaMap<SigmaString, AgentContext> m_active_agents;
 };
 
 } // namespace AI
@@ -71,9 +69,9 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void agent_spawn(const char* id, const char* goal) {
-    SigmaOS::AI::SovereignAgentCore::spawnAgent(id, goal);
+    SigmaOS::AI::SovereignAgentCore::getInstance().spawnAgent(id, goal);
 }
 
 extern "C" void agent_audit() {
-    SigmaOS::AI::SovereignAgentCore::auditAgents();
+    SigmaOS::AI::SovereignAgentCore::getInstance().auditAgents();
 }

@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Containerization Engine
@@ -11,7 +11,7 @@
  * mathematically isolated micro-VMs without the overhead of Docker or KVM.
  * Allows bare-metal speed while executing untrusted userland code.
  *
- * Design: OOP-isolated singleton — SovereignContainerEngine.
+ * Design: OOP-isolated singleton � SovereignContainerEngine.
  */
 
 class SovereignContainerEngine {

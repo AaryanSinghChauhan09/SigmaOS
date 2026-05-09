@@ -1,17 +1,17 @@
-ï»¿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Hot-Patch Engine
  * Live kernel update without rebooting.
  *
  * USP: Applies binary patches to running kernel shards by swapping out
- * function pointers atomically without requiring a system restart â€”
+ * function pointers atomically without requiring a system restart —
  * a capability unmatched by legacy Linux distributions.
  *
- * Design: OOP-isolated singleton â€” SovereignHotPatchEngine.
+ * Design: OOP-isolated singleton — SovereignHotPatchEngine.
  */
 
 class SovereignHotPatchEngine {

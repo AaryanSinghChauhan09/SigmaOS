@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Modular GPU Driver Framework
@@ -11,7 +11,7 @@
  * Dynamically binds to the Sovereign NUMA node closest to the GPU die, 
  * delivering O(1) latency data pipelines to the SovereignTelemetryUI.
  *
- * Design: OOP-isolated singleton — SovereignGPUEngine.
+ * Design: OOP-isolated singleton � SovereignGPUEngine.
  */
 
 class SovereignGPUEngine {

@@ -1,17 +1,17 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
 /*
  * =========================================================================
- * Σ SIGMAOS: THEME PERSONALIZER SHARD (v1.0 - INDUSTRIAL SHARD)
+ * S SIGMAOS: THEME PERSONALIZER SHARD (v1.0 - INDUSTRIAL SHARD)
  * =========================================================================
  * Mission: Real-time aesthetic sharding and color palette orchestration.
  * Principles: Zero-Dependency, Aesthetic-Native, Zenith-Sync.
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace UI {

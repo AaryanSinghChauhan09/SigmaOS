@@ -1,7 +1,7 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/core/sigma_types.h"
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
 #include "sigma_transpiler.h"
 
 
@@ -10,7 +10,7 @@
  * Automatically maps generic driver logic to specific hardware silicon.
  * ZERO-DEPENDENCY: Universal hardware sharding for x86_64, ARM, RISC-V.
  *
- * Design: OOP-isolated singleton — SovereignTranspilerEngine.
+ * Design: OOP-isolated singleton � SovereignTranspilerEngine.
  */
 
 class SovereignTranspilerEngine {

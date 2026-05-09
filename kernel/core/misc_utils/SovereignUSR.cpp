@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Unified Shard Registry (USR)
@@ -10,7 +10,7 @@
  * USP: Replaces bloated Linux dbus/systemctl with a mathematically verified,
  * amnesic-protected registry for dynamic service (shard) discovery and IPC.
  *
- * Design: OOP-isolated singleton — SovereignUSREngine.
+ * Design: OOP-isolated singleton � SovereignUSREngine.
  */
 
 class SovereignUSREngine {

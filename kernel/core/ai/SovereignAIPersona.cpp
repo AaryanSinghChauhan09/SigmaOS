@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign AI Persona Shard
@@ -25,22 +25,22 @@ public:
     const char* type_name() const noexcept override { return "SovereignAIPersona"; }
 
     static void init() {
-        sigma_log("Σ [AI-PERSONA]: Initializing Neural Adaptation Shard...");
+        sigma_log("S [AI-PERSONA]: Initializing Neural Adaptation Shard...");
         m_adaptation_level = 100;
-        sigma_log("Σ [AI-PERSONA]: Cognitive Sync Established. Persona: SOVEREIGN-ZENITH.");
+        sigma_log("S [AI-PERSONA]: Cognitive Sync Established. Persona: SOVEREIGN-ZENITH.");
     }
 
     void adapt(const char* context) {
-        sigma_log("Σ [AI-PERSONA]: Adapting UI lattice to context: %s...\n", context);
+        sigma_log("S [AI-PERSONA]: Adapting UI lattice to context: %s...\n", context);
         // Logic to shift UI hues, layout density, and focus mode
         m_adaptation_level++;
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN AI-PERSONA AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN AI-PERSONA AUDIT ---\n");
         sigma_log("| Adaptation Lvl : %u%%\n", m_adaptation_level);
         sigma_log("| Neural Mode     : COGNITIVE-FLOW\n");
-        sigma_log("| Persona ID      : Σ-0x8F2\n");
+        sigma_log("| Persona ID      : S-0x8F2\n");
         sigma_log("------------------------------------\n");
     }
 

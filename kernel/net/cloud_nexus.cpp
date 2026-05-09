@@ -1,8 +1,8 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
 #include "cloud_nexus.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Net {
@@ -20,7 +20,7 @@ void SovereignCloudNexus::DiscoverNodes() {
 }
 
 void SovereignCloudNexus::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN CLOUD NEXUS AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN CLOUD NEXUS AUDIT ---\n");
     sigma_log("| Connected Nodes   : %d\n", m_node_count);
     sigma_log("| Data Orchestrated : %llu KB\n", m_total_synced_bytes / 1024);
     sigma_log("| Edge Acceleration : ENABLED (Silicon-Direct)\n");

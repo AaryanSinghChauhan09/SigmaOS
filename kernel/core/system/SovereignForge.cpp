@@ -1,9 +1,9 @@
-﻿#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
 
 /**
- * SovereignForge — Native Development and Shard Construction Environment.
+ * SovereignForge � Native Development and Shard Construction Environment.
  * Inspired by github.com/codecrafters-io/build-your-own-x.
  * Allows users to build their own OS shards and apps from within SigmaOS.
  */

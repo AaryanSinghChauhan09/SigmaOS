@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Multiboot2 Integration
@@ -10,7 +10,7 @@
  * USP: Allows SigmaOS to be natively recognized by GRUB2, passing vital memory
  * maps and hardware telemetry safely into the ring-0 orchestrator before execution.
  *
- * Design: OOP-isolated singleton — SovereignMultibootEngine.
+ * Design: OOP-isolated singleton � SovereignMultibootEngine.
  */
 
 class SovereignMultibootEngine {

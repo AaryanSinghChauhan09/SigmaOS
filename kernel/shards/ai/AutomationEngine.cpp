@@ -1,17 +1,17 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
 /*
  * =========================================================================
- * Σ SIGMAOS: MORPHIC AUTOMATION ENGINE (v1.0 - INDUSTRIAL SHARD)
+ * S SIGMAOS: MORPHIC AUTOMATION ENGINE (v1.0 - INDUSTRIAL SHARD)
  * =========================================================================
  * Mission: Declarative automation and "Aether" recipe execution.
  * Principles: Zero-Dependency, Real-Time, Neural-Sync ready.
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Automation {

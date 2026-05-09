@@ -1,10 +1,10 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -13,7 +13,7 @@
 
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN AI KERNEL (v12.0 - ZERO-DEPENDENCY)
+ * Σ SIGMAOS: SOVEREIGN AI KERNEL (v12.0 - ZERO-DEPENDENCY)
  * =========================================================================
  * Mission: Predictive Scheduling & Real-Time Intent Sharding.
  * Capability: Native AI (no PyTorch/TF). Linear-Regression Shards.
@@ -21,7 +21,7 @@
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -48,7 +48,7 @@ public:
     }
 
     void audit() {
-        sigma_log("\n--- Î£ SOVEREIGN AI AUDIT (v12.0) ---\n");
+        sigma_log("\n--- Σ SOVEREIGN AI AUDIT (v12.0) ---\n");
         sigma_log("| Predictions    : %llu\n", m_predictions);
         sigma_log("| Confidence     : %f%%\n", m_confidence * 100);
         sigma_log("| Competitors    : Legacy schedulers (BFS/CFS) neutralized.\n");

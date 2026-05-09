@@ -1,15 +1,15 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN BENCH (Performance Profiler)
+ * S SIGMAOS: SOVEREIGN BENCH (Performance Profiler)
  * =========================================================================
  * Mission: Implements BENCH-001 to benchmark kernel latency vs. Linux.
- * Layer  : L5 — Industrial Ecosystem / Observability
+ * Layer  : L5 � Industrial Ecosystem / Observability
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

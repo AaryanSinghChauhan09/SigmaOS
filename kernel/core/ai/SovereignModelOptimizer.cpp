@@ -1,9 +1,9 @@
-﻿#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
 
 /**
- * SovereignModelOptimizer — Local Model Inference and Weight Management.
+ * SovereignModelOptimizer � Local Model Inference and Weight Management.
  * Inspired by github.com/ollama/ollama and DeepSeek-V3.
  * Optimized for silicon-native inference with amnesic memory management.
  */

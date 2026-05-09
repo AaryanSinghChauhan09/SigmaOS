@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Hardware-In-The-Loop (HIL) Simulator Shard
@@ -24,17 +24,17 @@ public:
     const char* type_name() const noexcept override { return "SovereignHILSimulator"; }
 
     static void init() {
-        sigma_log("Σ [HIL-SIM]: Initializing Sovereign Hardware-In-The-Loop Simulator...");
-        sigma_log("Σ [HIL-SIM]: Deterministic microsecond-granularity sensor emulation ACTIVE.");
+        sigma_log("S [HIL-SIM]: Initializing Sovereign Hardware-In-The-Loop Simulator...");
+        sigma_log("S [HIL-SIM]: Deterministic microsecond-granularity sensor emulation ACTIVE.");
     }
 
     void injectSensorData(const char* sensor_id, const void* payload, sigma_usize size) {
         (void)payload; (void)size;
-        sigma_log("Σ [HIL-SIM]: Injecting emulated telemetry for sensor '%s' (Zero-Latency).\n", sensor_id);
+        sigma_log("S [HIL-SIM]: Injecting emulated telemetry for sensor '%s' (Zero-Latency).\n", sensor_id);
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN HIL SIMULATOR AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN HIL SIMULATOR AUDIT ---\n");
         sigma_log("| Timing Model   : DETERMINISTIC\n");
         sigma_log("| Resolution     : MICROSECOND\n");
         sigma_log("| Target Domain  : AEROSPACE & ROBOTICS\n");

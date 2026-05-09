@@ -1,15 +1,15 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN AGENT GOVERNANCE (CLAW-003)
+ * S SIGMAOS: SOVEREIGN AGENT GOVERNANCE (CLAW-003)
  * =========================================================================
  * Mission: Advanced resource governance for autonomous Claw agents.
- * Layer  : L4 — AI & Automation
+ * Layer  : L4 � AI & Automation
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

@@ -1,10 +1,10 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -13,7 +13,7 @@
 
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN PROCESS ZENITH (v10.0 - ZERO-DEPENDENCY)
+ * Σ SIGMAOS: SOVEREIGN PROCESS ZENITH (v10.0 - ZERO-DEPENDENCY)
  * =========================================================================
  * Mission: Absolute Process Sovereignty via Ring-0 Native Logic.
  * Principles: 
@@ -25,7 +25,7 @@
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -106,7 +106,7 @@ public:
     }
 
     void audit_all() {
-        sigma_log("\n--- Î£ SOVEREIGN PROCESS AUDIT ---\n");
+        sigma_log("\n--- Σ SOVEREIGN PROCESS AUDIT ---\n");
         for (auto& proc : m_process_table) {
             sigma_log("| PID: %-8llu | NAME: %-20s | STATUS: %d\n", 
                 proc->pid(), proc->name(), (int)proc->status());

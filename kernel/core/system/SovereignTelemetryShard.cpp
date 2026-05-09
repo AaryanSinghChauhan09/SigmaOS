@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Telemetry Shard
@@ -25,17 +25,17 @@ public:
     const char* type_name() const noexcept override { return "SovereignTelemetryShard"; }
 
     static void init() {
-        sigma_log("Σ [TELEMETRY]: Initializing Sovereign Bare-Metal Telemetry Nexus...");
-        sigma_log("Σ [TELEMETRY]: Zero-overhead silicon metrics ACTIVE.");
+        sigma_log("S [TELEMETRY]: Initializing Sovereign Bare-Metal Telemetry Nexus...");
+        sigma_log("S [TELEMETRY]: Zero-overhead silicon metrics ACTIVE.");
     }
 
     void recordMetric(const char* metric_name, sigma_u64 value) {
         // High-speed, lockless ring-buffer telemetry logging
-        sigma_log("Σ [TELEMETRY]: METRIC_UPDATE -> %s : %llu\n", metric_name, value);
+        sigma_log("S [TELEMETRY]: METRIC_UPDATE -> %s : %llu\n", metric_name, value);
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN TELEMETRY AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN TELEMETRY AUDIT ---\n");
         sigma_log("| Resolution     : SUB-MICROSECOND\n");
         sigma_log("| Overhead Target: < 1%%\n");
         sigma_log("| Mode           : SILICON-DIRECT\n");

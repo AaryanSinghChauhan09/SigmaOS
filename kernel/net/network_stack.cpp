@@ -1,8 +1,8 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
 #include "network_stack.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Net {
@@ -26,7 +26,7 @@ void SovereignNetMesh::ReceiveShard() {
 }
 
 void SovereignNetMesh::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN NETWORK AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN NETWORK AUDIT ---\n");
     sigma_log("| Packets Sent      : %llu\n", m_packets_sent);
     sigma_log("| Packets Received  : %llu\n", m_packets_received);
     sigma_log("| Encryption Level  : LATTICE-PQC (INDUSTRIAL)\n");

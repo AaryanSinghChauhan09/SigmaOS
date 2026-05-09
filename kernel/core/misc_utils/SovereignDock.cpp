@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Dock Engine
@@ -10,7 +10,7 @@
  * USP: A hardware-accelerated, zero-dependency smart dock that intelligently 
  * clusters running micro-VM containers and shards based on predictive ML models.
  *
- * Design: OOP-isolated singleton — SovereignDockEngine.
+ * Design: OOP-isolated singleton � SovereignDockEngine.
  */
 
 class SovereignDockEngine {

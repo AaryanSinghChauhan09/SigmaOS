@@ -1,9 +1,9 @@
-﻿#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
 
 /**
- * SovereignPredictiveUX — Anticipatory UI adjustment and user behavior modeling.
+ * SovereignPredictiveUX � Anticipatory UI adjustment and user behavior modeling.
  * Part of Part 3: Advanced Intelligence.
  * Inspired by github.com/donnemartin/system-design-primer (Scalability/Modeling).
  */

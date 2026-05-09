@@ -1,14 +1,14 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include <map>
 #include <memory>
 #include <string>
 #include <iostream>
 
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -21,7 +21,7 @@
 
 
 /**
- * Î£ SIGMA OS: SOVEREIGN SCHOLASTIC REPOSITORY (v128.0 - MASTER ZENITH)
+ * Σ SIGMA OS: SOVEREIGN SCHOLASTIC REPOSITORY (v128.0 - MASTER ZENITH)
  * ===================================================================
  * USP: Exhaustive "Every Concept" Shard Repository for NCERT (1-12).
  * Capability: Relativity, Genetics, Stoichiometry, and Calculus.
@@ -98,7 +98,7 @@ public:
     }
 
     void ExecuteMasterAudit() {
-        sigma_log("--- Σ SIGMA OS MASTER SCHOLASTIC REPOSITORY ---\n");
+        sigma_log("--- S SIGMA OS MASTER SCHOLASTIC REPOSITORY ---\n");
         for (auto const& [name, shard] : m_repo) {
             std::cout << "\n[REPOSHADING]: " << name << std::endl;
             shard->Execute();

@@ -1,15 +1,15 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN COSMIC GOVERNANCE (v1.0 - GALAXY POLICY)
+ * Σ SIGMAOS: SOVEREIGN COSMIC GOVERNANCE (v1.0 - GALAXY POLICY)
  * =========================================================================
  * Refactored into modular policies for industrial galactic order.
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 #include "userland/apps/cosmic_governance/policies.hpp"
 
 using namespace SigmaOS;
@@ -29,7 +29,7 @@ public:
     }
 
     void ExecuteGovernanceAudit() {
-        sigma_log("\n--- Î£ COSMIC GOVERNANCE COMPLIANCE AUDIT ---\n");
+        sigma_log("\n--- Σ COSMIC GOVERNANCE COMPLIANCE AUDIT ---\n");
         for (int i = 0; i < m_count; i++) {
             sigma_log("[AUDIT]: Verifying %s...\n", m_policies[i]->PolicyID());
             m_policies[i]->Enforce();
@@ -43,7 +43,7 @@ public:
 };
 
 int main() {
-    sigma_log("--- Î£ SIGMA OS SOVEREIGN COSMIC GOVERNANCE (v1.0) ---\n");
+    sigma_log("--- Σ SIGMA OS SOVEREIGN COSMIC GOVERNANCE (v1.0) ---\n");
     
     SovereignCosmicGovernance governance;
     governance.RatifyPolicy(new EthicalProtocolModule());

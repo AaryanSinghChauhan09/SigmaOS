@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 #include "sigma_dynmodule.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "hal/sigma_hal.h"
 
 
 /**
@@ -10,7 +10,7 @@
  * Implements an Atomic Hot-Swap Linker (AHSL) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal module loading.
  *
- * Design: OOP-isolated singleton — SovereignDynModuleEngine.
+ * Design: OOP-isolated singleton � SovereignDynModuleEngine.
  */
 
 class SovereignDynModuleEngine {

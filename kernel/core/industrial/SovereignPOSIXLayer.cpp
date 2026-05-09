@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign POSIX Emulation Shard
@@ -25,30 +25,30 @@ public:
     const char* type_name() const noexcept override { return "SovereignPOSIXLayer"; }
 
     static void init() {
-        sigma_log("Σ [POSIX]: Initializing Sovereign POSIX Emulation Layer...");
-        sigma_log("Σ [POSIX]: Signal Mapping (SIGKILL, SIGTERM, SIGSEGV) established.");
+        sigma_log("S [POSIX]: Initializing Sovereign POSIX Emulation Layer...");
+        sigma_log("S [POSIX]: Signal Mapping (SIGKILL, SIGTERM, SIGSEGV) established.");
     }
 
     void mapSignal(sigma_u32 posix_signal, sigma_u32 target_shard_id) {
-        sigma_log("Σ [POSIX]: Mapping POSIX Signal %u to Shard S%02u event...\n", 
+        sigma_log("S [POSIX]: Mapping POSIX Signal %u to Shard S%02u event...\n", 
                      posix_signal, target_shard_id);
         
         // Translate POSIX signal to Sovereign Shard Event
         switch (posix_signal) {
             case 9: // SIGKILL
-                sigma_log("Σ [POSIX]: Translating SIGKILL -> SHARD_FORCE_TERMINATE.");
+                sigma_log("S [POSIX]: Translating SIGKILL -> SHARD_FORCE_TERMINATE.");
                 break;
             case 11: // SIGSEGV
-                sigma_log("Σ [POSIX]: Translating SIGSEGV -> SHARD_MEMORY_ISOLATION_FAULT.");
+                sigma_log("S [POSIX]: Translating SIGSEGV -> SHARD_MEMORY_ISOLATION_FAULT.");
                 break;
             default:
-                sigma_log("Σ [POSIX]: Generic signal forwarded to Shard Event Lattice.");
+                sigma_log("S [POSIX]: Generic signal forwarded to Shard Event Lattice.");
                 break;
         }
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN POSIX AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN POSIX AUDIT ---\n");
         sigma_log("| Signal Maps Active: 3\n");
         sigma_log("| ABI Compatibility : POSIX.1-2017 (Simulated)\n");
         sigma_log("-------------------------------\n");

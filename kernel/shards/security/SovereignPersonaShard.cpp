@@ -1,16 +1,16 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /* =========================================================================
- * Σ SIGMAOS: PERSONA SHARD (v1.0 - DECLARATIVE PERSONALIZATION)
+ * S SIGMAOS: PERSONA SHARD (v1.0 - DECLARATIVE PERSONALIZATION)
  * =========================================================================
  * Mission: AI-driven system personalization and identity management.
  * Principle: Absolute Customization. Declarative Identity.
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Personalization {

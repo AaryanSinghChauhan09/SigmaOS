@@ -1,6 +1,6 @@
-﻿/**
+/**
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SELF-HEALING (v1.0 - LATTICE RESILIENCE)
+ * S SIGMAOS: SOVEREIGN SELF-HEALING (v1.0 - LATTICE RESILIENCE)
  * =========================================================================
  * Inspired by: Solaris Fault Management Architecture (FMA) + Linux eBPF
  * Purpose: Detect and automatically remediate kernel-level faults and
@@ -9,8 +9,8 @@
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
 #include "ipc/SovereignEventBus.h"
 
 namespace SigmaOS {
@@ -20,7 +20,7 @@ namespace Resilience {
 using namespace SigmaOS::Kernel::IPC;
 
 /**
- * @brief SovereignSelfHealingEngine — the immune system of the lattice.
+ * @brief SovereignSelfHealingEngine � the immune system of the lattice.
  */
 class SovereignSelfHealingEngine {
 public:

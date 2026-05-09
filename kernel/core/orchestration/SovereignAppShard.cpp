@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
 #include "SovereignAppShard.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -13,24 +13,24 @@ SovereignAppShard& SovereignAppShard::getInstance() {
 }
 
 void SovereignAppShard::init() {
-    sigma_log("Σ [APP-SHARD]: Orchestrating Application Sharding Layer...");
+    sigma_log("S [APP-SHARD]: Orchestrating Application Sharding Layer...");
     m_active_shards = 0;
-    sigma_log("Σ [APP-SHARD]: Lattice Orchestrator ONLINE.");
+    sigma_log("S [APP-SHARD]: Lattice Orchestrator ONLINE.");
 }
 
 void SovereignAppShard::orchestrate(const char* shard_id) {
-    sigma_log("Σ [APP-SHARD]: Orchestrating Shard '%s' across silicon lattice...\n", shard_id);
+    sigma_log("S [APP-SHARD]: Orchestrating Shard '%s' across silicon lattice...\n", shard_id);
     m_active_shards++;
     // Logic for distributed execution mapping
 }
 
 void SovereignAppShard::de_shard(const char* shard_id) {
-    sigma_log("Σ [APP-SHARD]: De-orchestrating Shard '%s'...\n", shard_id);
+    sigma_log("S [APP-SHARD]: De-orchestrating Shard '%s'...\n", shard_id);
     if (m_active_shards > 0) m_active_shards--;
 }
 
 void SovereignAppShard::listActiveShards() {
-    sigma_log("\n--- Σ ACTIVE APP SHARDS ---\n");
+    sigma_log("\n--- S ACTIVE APP SHARDS ---\n");
     sigma_log("| Active Shards : %u\n", m_active_shards);
     sigma_log("---------------------------\n");
 }

@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -16,7 +16,7 @@
 
 
 /**
- * Î£ SIGMA OS: SOVEREIGN LAB ZENITH (v128.0 - ANIMATION PARITY)
+ * Σ SIGMA OS: SOVEREIGN LAB ZENITH (v128.0 - ANIMATION PARITY)
  * ==========================================================
  * USP: Comprehensive "Small & Big" experiment simulations (1-12).
  * Capability: Electrolysis, Displacement, Pythagoras, and Pollen Shards.
@@ -89,7 +89,7 @@ public:
     }
 
     void ExecuteFinalAudit() {
-        sigma_log("--- Î£ SIGMA OS SOVEREIGN LABORATORY ZENITH ---\n");
+        sigma_log("--- Σ SIGMA OS SOVEREIGN LABORATORY ZENITH ---\n");
         for (const auto& exp : m_lab) {
             sigma_log("\n------------------------------------------------\n");
             exp->Project();

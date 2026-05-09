@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
 #include "sigma_mem.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "hal/sigma_hal.h"
 
 
 /**
@@ -10,7 +10,7 @@
  * Implements an Industrial Buddy Allocation (IBA) algorithm.
  * ZERO-DEPENDENCY: No external malloc, free, or stdlib.
  *
- * Design: OOP-isolated singleton — SovereignHeapEngine.
+ * Design: OOP-isolated singleton � SovereignHeapEngine.
  */
 
 class SovereignHeapEngine {

@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Forensics Shard
@@ -25,19 +25,19 @@ public:
     const char* type_name() const noexcept override { return "SovereignForensics"; }
 
     static void init() {
-        sigma_log("Σ [FORENSICS]: Initializing Sovereign Digital Forensics and Recovery Suite...");
-        sigma_log("Σ [FORENSICS]: Cryptographic memory analysis and read-only mounting ACTIVE.");
+        sigma_log("S [FORENSICS]: Initializing Sovereign Digital Forensics and Recovery Suite...");
+        sigma_log("S [FORENSICS]: Cryptographic memory analysis and read-only mounting ACTIVE.");
     }
 
     void executeDeepScan(const char* target_volume) {
-        sigma_log("Σ [FORENSICS]: Launching deep cryptographic scan on volume '%s'...\n", target_volume);
+        sigma_log("S [FORENSICS]: Launching deep cryptographic scan on volume '%s'...\n", target_volume);
         // Dispatch forensic memory algorithms and lattice reconstruction
-        sigma_log("Σ [FORENSICS]: Scan COMPLETE. Immutable forensic timeline generated and signed.");
+        sigma_log("S [FORENSICS]: Scan COMPLETE. Immutable forensic timeline generated and signed.");
         m_scans_performed++;
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN FORENSICS AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN FORENSICS AUDIT ---\n");
         sigma_log("| Forensic Scans   : %u\n", m_scans_performed);
         sigma_log("| Ideology Absorbed: CAINE / SYSTEMRESCUE\n");
         sigma_log("| Analysis Model   : CRYPTOGRAPHIC READ-ONLY\n");

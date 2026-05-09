@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign VirtIO Shard
@@ -25,16 +25,16 @@ public:
     const char* type_name() const noexcept override { return "SovereignVirtIO"; }
 
     static void init() {
-        sigma_log("Σ [VIRTIO]: Initializing Sovereign Virtualization Interface...");
-        sigma_log("Σ [VIRTIO]: High-performance ring-buffer orchestration ACTIVE.");
+        sigma_log("S [VIRTIO]: Initializing Sovereign Virtualization Interface...");
+        sigma_log("S [VIRTIO]: High-performance ring-buffer orchestration ACTIVE.");
     }
 
     void processQueue(sigma_u32 queue_id) {
-        sigma_log("Σ [VIRTIO]: Processing Virtual Queue %u (Zero-Copy Frame Transfer)...\n", queue_id);
+        sigma_log("S [VIRTIO]: Processing Virtual Queue %u (Zero-Copy Frame Transfer)...\n", queue_id);
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN VIRTIO AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN VIRTIO AUDIT ---\n");
         sigma_log("| Devices Emulated : Net, Block, Console\n");
         sigma_log("| Interface Mode   : SILICON-DIRECT (PASSTHROUGH)\n");
         sigma_log("| Performance      : 99%% Bare-Metal Parity\n");

@@ -1,8 +1,8 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
 #include "consensus_shard.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Net {
@@ -27,7 +27,7 @@ void SovereignConsensus::CommitLatticeState() {
 }
 
 void SovereignConsensus::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN CONSENSUS AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN CONSENSUS AUDIT ---\n");
     sigma_log("| Proposal Nexus ID : %d\n", m_proposal_id);
     sigma_log("| Quorum Density    : %d\n", m_quorum_size);
     sigma_log("| Consensus Mode    : LATTICE-AGREEMENT-V2\n");

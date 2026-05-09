@@ -1,9 +1,9 @@
-﻿#include "../../../../include/sigma_log.h"
-#include "../../../../include/core/sigma_types.h"
-#include "../../../../include/hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
 #include "fs/sigma_dna.h"
-#include "../../../../include/core/sigma_kernel_types.h"
-#include "../../../../include/libc/SovereignLibC.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -15,20 +15,20 @@ SovereignDNACompression& SovereignDNACompression::getInstance() {
 }
 
 void SovereignDNACompression::init() {
-    sigma_log("Σ [DNA-COMP]: Initializing Biologically Inspired Compression Shard...");
+    sigma_log("S [DNA-COMP]: Initializing Biologically Inspired Compression Shard...");
     m_compression_ratio = 0;
-    sigma_log("Σ [DNA-COMP]: Nucleotide Encoding (A:00, C:01, G:10, T:11) ACTIVE.");
+    sigma_log("S [DNA-COMP]: Nucleotide Encoding (A:00, C:01, G:10, T:11) ACTIVE.");
 }
 
 sigma_status SovereignDNACompression::decode(const void* input, sigma_usize size, void* output, sigma_usize* out_size) {
     (void)input; (void)output; (void)size;
-    sigma_log("Σ [DNA-COMP]: Deciphering DNA Shard back to Silicon instructions...");
+    sigma_log("S [DNA-COMP]: Deciphering DNA Shard back to Silicon instructions...");
     if (out_size) *out_size = size * 4;
     return SIGMA_OK;
 }
 
 sigma_size_t SovereignDNACompression::encode(const void* input, sigma_size_t in_size, void* output, sigma_usize* out_size) {
-    sigma_log("Σ [DNA-COMP]: Sequencing data into nucleotide shards...");
+    sigma_log("S [DNA-COMP]: Sequencing data into nucleotide shards...");
     // Simulated DNA-encoding (4:1 compression ratio)
     sigma_size_t res = in_size / 4;
     if (output) sigma_memcpy(output, input, res); 
@@ -37,13 +37,13 @@ sigma_size_t SovereignDNACompression::encode(const void* input, sigma_size_t in_
 }
 
 void SovereignDNACompression::verifyAndRepair(const char* shard_id) {
-    sigma_log("Σ [DNA-COMP]: Auditing Shard '%s' for pattern drift...\n", shard_id);
+    sigma_log("S [DNA-COMP]: Auditing Shard '%s' for pattern drift...\n", shard_id);
     // Biological Parity Check logic
-    sigma_log("Σ [DNA-COMP]: Integrity Verified. Shard is 100.0% Sovereign.");
+    sigma_log("S [DNA-COMP]: Integrity Verified. Shard is 100.0% Sovereign.");
 }
 
 void SovereignDNACompression::audit() {
-    sigma_log("\n--- Σ SOVEREIGN DNA-COMP AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN DNA-COMP AUDIT ---\n");
     sigma_log("| Encoding Mode   : NUCLEOTIDE-4x\n");
     sigma_log("| Shard Integrity : BIOMETRIC-VERIFIED\n");
     sigma_log("----------------------------------\n");

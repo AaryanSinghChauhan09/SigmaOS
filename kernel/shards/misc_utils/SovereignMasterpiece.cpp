@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -17,7 +17,7 @@
 
 
 /**
- * Î£ SIGMA OS: SOVEREIGN MASTERPIECE (v128.0 - UNIFIED SCHOLASTIC THEORY)
+ * Σ SIGMA OS: SOVEREIGN MASTERPIECE (v128.0 - UNIFIED SCHOLASTIC THEORY)
  * ======================================================================
  * USP: Exhaustive "Every Concept" Shard Repository for NCERT (1-12).
  * Capability: Optics, Thermo, Photoelectric, IUPAC, Baye's, Central Dogma.
@@ -94,7 +94,7 @@ public:
     }
 
     void ExecuteMasterpieceAudit() {
-        sigma_log("--- Î£ SIGMA OS MASTER SCHOLASTIC MASTERPIECE ---\n");
+        sigma_log("--- Σ SIGMA OS MASTER SCHOLASTIC MASTERPIECE ---\n");
         for (auto it = m_mastery.begin(); it != m_mastery.end(); ++it) {
             std::cout << "\n[MASTER-SHADING]: Executing Mastery Shard: " << it->first << std::endl;
             it->second->Execute();

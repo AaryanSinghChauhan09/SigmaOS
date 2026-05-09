@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Cloud Orchestrator Shard
@@ -25,20 +25,20 @@ public:
     const char* type_name() const noexcept override { return "SovereignCloudOrchestrator"; }
 
     static void init() {
-        sigma_log("Σ [CLOUD-ORCH]: Initializing Multi-Node Orchestrator...");
+        sigma_log("S [CLOUD-ORCH]: Initializing Multi-Node Orchestrator...");
         m_coordinated_nodes = 0;
-        sigma_log("Σ [CLOUD-ORCH]: Cloud-to-Lattice Handshake Protocol ACTIVE.");
+        sigma_log("S [CLOUD-ORCH]: Cloud-to-Lattice Handshake Protocol ACTIVE.");
     }
 
     void orchestrate(const char* task_id) {
-        sigma_log("Σ [CLOUD-ORCH]: Distributing task '%s' across Cloud-Lattice nodes...\n", task_id);
+        sigma_log("S [CLOUD-ORCH]: Distributing task '%s' across Cloud-Lattice nodes...\n", task_id);
         // Delegate to CloudBridge and MeshLattice
         m_coordinated_nodes++;
-        sigma_log("Σ [CLOUD-ORCH]: Task distribution consensus achieved.");
+        sigma_log("S [CLOUD-ORCH]: Task distribution consensus achieved.");
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN CLOUD ORCHESTRATION AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN CLOUD ORCHESTRATION AUDIT ---\n");
         sigma_log("| Coordinated Nodes : %u\n", m_coordinated_nodes);
         sigma_log("| Consensus Mode    : LATTICE-RAFT\n");
         sigma_log("| Sync Integrity    : QUANTUM-VERIFIED\n");

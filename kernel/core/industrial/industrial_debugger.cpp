@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "industrial_debugger.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Debug {
@@ -18,7 +18,7 @@ void SovereignDebugger::TraceSiliconShard(const char* shard_id) {
 }
 
 void SovereignDebugger::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN DEBUGGER AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN DEBUGGER AUDIT ---\n");
     sigma_log("| Active Breakpoints : %d\n", m_active_breakpoints);
     sigma_log("| Trace Buffer       : 64 MB\n");
     sigma_log("| Real-Time Tracing  : ACTIVE\n");

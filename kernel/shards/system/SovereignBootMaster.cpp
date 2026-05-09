@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -11,12 +11,12 @@
  */
 
 /*
- * Î£ SIGMA OS: SOVEREIGN BOOT MASTER (v5.0 - MILITARY HARDENED)
+ * Σ SIGMA OS: SOVEREIGN BOOT MASTER (v5.0 - MILITARY HARDENED)
  * ======================================================
  * Mission: sub-second boot, hardware-skip, shard-init.
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 class SovereignBootMaster : public SigmaObject {
 public:

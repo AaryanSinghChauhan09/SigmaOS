@@ -1,15 +1,15 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN COLLECTIVE CONSCIOUS (v1.0 - NEURAL SYNC)
+ * Σ SIGMAOS: SOVEREIGN COLLECTIVE CONSCIOUS (v1.0 - NEURAL SYNC)
  * =========================================================================
  * Refactored into modular agents for industrial neural coordination.
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 #include "userland/apps/collective_conscious/agents.hpp"
 
 using namespace SigmaOS;
@@ -36,7 +36,7 @@ public:
     }
 
     void OrchestratePulse() {
-        sigma_log("--- Î£ COLLECTIVE CONSCIOUS PULSE (State: %s) ---\n", m_last_global_intent);
+        sigma_log("--- Σ COLLECTIVE CONSCIOUS PULSE (State: %s) ---\n", m_last_global_intent);
         for (int i = 0; i < m_agent_count; i++) {
             m_agents[i]->Pulse();
         }
@@ -48,7 +48,7 @@ public:
 };
 
 int main() {
-    sigma_log("--- Î£ SIGMA OS SOVEREIGN COLLECTIVE CONSCIOUS (v1.0) ---\n");
+    sigma_log("--- Σ SIGMA OS SOVEREIGN COLLECTIVE CONSCIOUS (v1.0) ---\n");
     
     SovereignCollectiveConscious collective;
     collective.RegisterAgent(new SecurityConsciousAgent());

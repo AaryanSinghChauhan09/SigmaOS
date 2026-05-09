@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign eBPF Nexus Shard
@@ -24,18 +24,18 @@ public:
     const char* type_name() const noexcept override { return "SovereignBPF"; }
 
     static void init() {
-        sigma_log("Σ [eBPF-NEXUS]: Initializing Sovereign Dynamic Tracing Nexus...");
-        sigma_log("Σ [eBPF-NEXUS]: Sandboxed silicon interception ACTIVE.");
+        sigma_log("S [eBPF-NEXUS]: Initializing Sovereign Dynamic Tracing Nexus...");
+        sigma_log("S [eBPF-NEXUS]: Sandboxed silicon interception ACTIVE.");
     }
 
     void loadProgram(const char* prog_name, const void* bytecode, sigma_usize size) {
         (void)bytecode; (void)size;
-        sigma_log("Σ [eBPF-NEXUS]: Verifying and JIT-compiling tracing program '%s'...\n", prog_name);
-        sigma_log("Σ [eBPF-NEXUS]: Verification PASSED. Program attached to Lattice hook.");
+        sigma_log("S [eBPF-NEXUS]: Verifying and JIT-compiling tracing program '%s'...\n", prog_name);
+        sigma_log("S [eBPF-NEXUS]: Verification PASSED. Program attached to Lattice hook.");
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN eBPF AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN eBPF AUDIT ---\n");
         sigma_log("| Verification Model : FORMAL-PROOFS\n");
         sigma_log("| Execution Mode     : JIT-COMPILED\n");
         sigma_log("| Hook Injection     : ZERO-LATENCY\n");

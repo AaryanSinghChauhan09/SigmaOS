@@ -1,6 +1,6 @@
-﻿#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "process_manager.hpp"
 
 namespace SigmaOS {
@@ -72,7 +72,7 @@ void SovereignProcessManager::isolate_vfs(const char* ns) {
 }
 
 void SovereignProcessManager::audit() {
-    sigma_print("\n--- Î£ SOVEREIGN PROCESS AUDIT (v25.0) ---\n");
+    sigma_print("\n--- Σ SOVEREIGN PROCESS AUDIT (v25.0) ---\n");
     sigma_print("| Active Shards  : "); sigma_print_num(m_active_count); sigma_print("\n");
     sigma_print("| Virtualization : [VT-x/SVM SHARDED ACTIVE]\n");
     sigma_print("| Isolation      : [CAPABILITY-BASED]\n");

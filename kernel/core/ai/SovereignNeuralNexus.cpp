@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 #include "SovereignNeuralNexus.hpp"
 
 namespace SigmaOS {
@@ -25,7 +25,7 @@ public:
     const char* type_name() const noexcept override { return "SovereignNeuralEngine"; }
 
     static void init() {
-        sigma_log("Σ [NEURAL]: Initializing Sovereign Neural Nexus (S-NPU Orchestrator)...");
+        sigma_log("S [NEURAL]: Initializing Sovereign Neural Nexus (S-NPU Orchestrator)...");
         this->npu_available = this->probeNPUHardware();
     if (this->npu_available) {
         sigma_log("[NEURAL] NPU Hardware Detected. Allocating Zero-Copy Memory Pages.");

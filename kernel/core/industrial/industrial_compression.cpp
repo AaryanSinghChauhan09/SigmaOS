@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "industrial_compression.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Storage {
@@ -20,7 +20,7 @@ void SovereignCompression::DecompressShard(const void* src, void* dst, sigma_siz
 }
 
 void SovereignCompression::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN COMPRESSION AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN COMPRESSION AUDIT ---\n");
     sigma_log("| Bytes Compressed   : %llu\n", m_bytes_compressed);
     sigma_log("| Acceleration Mode  : HARDWARE-DIRECT\n");
     sigma_log("| Entropy Protocol   : LATTICE-SHARD-v1.0\n");

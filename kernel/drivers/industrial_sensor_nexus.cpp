@@ -1,8 +1,8 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
 #include "industrial_sensor_nexus.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Drivers {
@@ -17,7 +17,7 @@ void SovereignSensorNexus::BroadcastTelemetry() {
 }
 
 void SovereignSensorNexus::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN SENSOR AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN SENSOR AUDIT ---\n");
     sigma_log("| Active Sensors     : %d\n", m_active_sensors);
     sigma_log("| Telemetry Shards   : %llu\n", m_telemetry_shards);
     sigma_log("| Environmental Mode : AI-AUTONOMOUS\n");

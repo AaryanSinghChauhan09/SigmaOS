@@ -1,16 +1,16 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /* =========================================================================
- * Σ SIGMAOS: SELF-HEALING SHARD (v1.0 - INDUSTRIAL FINALITY)
+ * S SIGMAOS: SELF-HEALING SHARD (v1.0 - INDUSTRIAL FINALITY)
  * =========================================================================
  * Mission: Autonomous lattice monitoring and shard-level restoration.
  * Principle: Zero-Failure. Silicon-Direct. Self-Propagating.
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Healing {

@@ -1,19 +1,19 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/SigmaOOP.hpp"
 
 /**
- * Î£ SIGMA OS: SOVEREIGN CONCEPT GENERATOR (v128.0 - ZERO-STD NATIVE)
+ * Σ SIGMA OS: SOVEREIGN CONCEPT GENERATOR (v128.0 - ZERO-STD NATIVE)
  * =================================================================
  * USP: Universal Sharding of every NCERT Concept (PCM+B).
  * Capability: Advanced simulations for Relativity, Enthalpy, and 3D Geometry.
@@ -99,7 +99,7 @@ public:
     }
 
     void RunFullScholasticAudit() {
-        sigma_log("--- Î£ SIGMA OS SOVEREIGN KNOWLEDGE ZENITH ---\n");
+        sigma_log("--- Σ SIGMA OS SOVEREIGN KNOWLEDGE ZENITH ---\n");
         for (sigma_usize i = 0; i < m_registry.size(); i++) {
             sigma_log("\n------------------------------------------------\n");
             m_registry.at_index(i)->Simulate();

@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "industrial_vito.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Virtualization {
@@ -17,7 +17,7 @@ void SovereignVito::MapGuestI/O(sigma_u32 guest_id, sigma_u32 port) {
 }
 
 void SovereignVito::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN VIRTUALIZATION AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN VIRTUALIZATION AUDIT ---\n");
     sigma_log("| Active Guests      : %d\n", m_active_guests);
     sigma_log("| Hardware Passthru : ACTIVE (ZERO-LATENCY)\n");
     sigma_log("| Isolation Mode     : LATTICE-PQC-SHARDED\n");

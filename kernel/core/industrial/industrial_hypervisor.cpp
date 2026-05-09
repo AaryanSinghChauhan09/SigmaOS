@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "industrial_hypervisor.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Core {
@@ -19,7 +19,7 @@ void SovereignHypervisor::IgniteGuestShard(sigma_u32 guest_id) {
 }
 
 void SovereignHypervisor::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN HYPERVISOR AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN HYPERVISOR AUDIT ---\n");
     sigma_log("| Active Guests     : %d\n", m_active_guests);
     sigma_log("| Virtual Bandwidth : 10 GB/s\n");
     sigma_log("| Passthrough State : HARDWARE-DIRECT\n");

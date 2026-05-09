@@ -1,8 +1,8 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
 #include "browser_renderer.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Bridge {
@@ -18,7 +18,7 @@ void SovereignBrowserRenderer::SyncWithHardwareVsync() {
 }
 
 void SovereignBrowserRenderer::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN BROWSER RENDER AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN BROWSER RENDER AUDIT ---\n");
     sigma_log("| Frame Nexus ID    : %llx\n", (sigma_u64)m_frame_nexus_id);
     sigma_log("| GPU Acceleration  : ENABLED (WebGPU-Native)\n");
     sigma_log("| Visual Fidelity   : SOVEREIGN-PIXEL-PERFECT\n");

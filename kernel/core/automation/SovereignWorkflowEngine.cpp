@@ -1,9 +1,9 @@
-ï»¿#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
 
 /**
- * SovereignWorkflowEngine â€” AI-Native Automation Rule Engine
+ * SovereignWorkflowEngine — AI-Native Automation Rule Engine
  * Executes IF/THEN automation rules bridging system events to kernel actions.
  * Zero-STL: uses a fixed-capacity rule table for kernel compatibility.
  */
@@ -40,7 +40,7 @@ public:
 
     void registerRule(const char* trigger, const char* condition, sigma_action_fn action) {
         if (m_rule_count >= SIGMA_MAX_RULES) {
-            sigma_log_warn("[AUTO] Rule table full â€” cannot register new rule.");
+            sigma_log_warn("[AUTO] Rule table full — cannot register new rule.");
             return;
         }
         m_rules[m_rule_count].trigger   = trigger;
@@ -63,7 +63,7 @@ public:
                 a++; b++;
             }
             if (match && *a == '\0' && *b == '\0') {
-                sigma_log_info("[AUTO] Event dispatched â€” executing rule action.");
+                sigma_log_info("[AUTO] Event dispatched — executing rule action.");
                 if (m_rules[i].action) m_rules[i].action();
 } // namespace Automation
 } // namespace Kernel
@@ -71,7 +71,7 @@ public:
     void update(sigma_u64 uptime_ms) {
         for (sigma_u32 i = 0u; i < m_schedule_count; i++) {
             if (m_schedule[i].next_run_ms <= uptime_ms) {
-                sigma_log_info("[AUTO] Scheduled task triggered â€” executing action.");
+                sigma_log_info("[AUTO] Scheduled task triggered — executing action.");
                 if (m_schedule[i].action) m_schedule[i].action();
                 m_schedule[i].next_run_ms = uptime_ms + m_schedule[i].interval_ms;
 } // namespace Automation

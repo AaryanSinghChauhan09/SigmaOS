@@ -1,9 +1,9 @@
-﻿#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
 
 /**
- * SovereignKeybind — Dynamic keybinding and shortcut orchestration.
+ * SovereignKeybind � Dynamic keybinding and shortcut orchestration.
  * Part of Part 2: Deep Customization & Personalization.
  */
 

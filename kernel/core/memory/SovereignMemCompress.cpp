@@ -1,17 +1,17 @@
-ï»¿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Memory Compression Engine
  * Zero-overhead RAM compression using silicon-native ZSTD-like algorithm.
  *
  * USP: Compresses cold memory pages in Ring-0 without any userland latency.
- * On embedded ARM targets this doubles effective RAM capacity â€” critical
+ * On embedded ARM targets this doubles effective RAM capacity — critical
  * for IoT sovereignty with constrained DRAM budgets.
  *
- * Design: OOP-isolated singleton â€” SovereignMemCompressEngine.
+ * Design: OOP-isolated singleton — SovereignMemCompressEngine.
  */
 
 class SovereignMemCompressEngine {

@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "sigma_taskautomator.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Automation Engine
@@ -11,7 +11,7 @@
  * USP: Instantly automate any system UI or CLI action natively via 
  * semantic event parsing. No external tools like AutoHotkey needed.
  *
- * Design: OOP-isolated singleton — SovereignAutomationEngine.
+ * Design: OOP-isolated singleton � SovereignAutomationEngine.
  */
 
 typedef struct {

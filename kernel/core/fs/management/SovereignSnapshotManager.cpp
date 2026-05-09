@@ -1,9 +1,9 @@
-﻿#include "../../../../include/sigma_log.h"
-#include "../../../../include/core/sigma_types.h"
-#include "../../../../include/hal/sigma_hal.h"
-#include "../../../../include/core/sigma_kernel_types.h"
-#include "../../../../include/libc/SovereignLibC.h"
-#include "../../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Snapshot Manager Shard
@@ -25,25 +25,25 @@ public:
     const char* type_name() const noexcept override { return "SovereignSnapshotManager"; }
 
     static void init() {
-        sigma_log("Σ [SNAPSHOT]: Initializing Sovereign CoW Snapshot Manager...");
-        sigma_log("Σ [SNAPSHOT]: Zero-latency B-Tree cloning ACTIVE.");
+        sigma_log("S [SNAPSHOT]: Initializing Sovereign CoW Snapshot Manager...");
+        sigma_log("S [SNAPSHOT]: Zero-latency B-Tree cloning ACTIVE.");
         m_active_snapshots = 0;
     }
 
     void takeSnapshot(const char* volume_name, const char* snap_name) {
-        sigma_log("Σ [SNAPSHOT]: Freezing volume '%s' for CoW snapshot '%s'...\n", volume_name, snap_name);
+        sigma_log("S [SNAPSHOT]: Freezing volume '%s' for CoW snapshot '%s'...\n", volume_name, snap_name);
         // Execute O(1) B-tree root duplication
-        sigma_log("Σ [SNAPSHOT]: Snapshot CREATED. State is now immutable and point-in-time recoverable.");
+        sigma_log("S [SNAPSHOT]: Snapshot CREATED. State is now immutable and point-in-time recoverable.");
         m_active_snapshots++;
     }
 
     void rollbackSnapshot(const char* volume_name, const char* snap_name) {
-        sigma_log("Σ [SNAPSHOT]: [WARNING] Rolling back volume '%s' to snapshot '%s'...\n", volume_name, snap_name);
-        sigma_log("Σ [SNAPSHOT]: Rollback COMPLETE. VFS pointers restored.");
+        sigma_log("S [SNAPSHOT]: [WARNING] Rolling back volume '%s' to snapshot '%s'...\n", volume_name, snap_name);
+        sigma_log("S [SNAPSHOT]: Rollback COMPLETE. VFS pointers restored.");
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN SNAPSHOT AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN SNAPSHOT AUDIT ---\n");
         sigma_log("| Active Snapshots : %u\n", m_active_snapshots);
         sigma_log("| Subsystem Type   : COPY-ON-WRITE (CoW)\n");
         sigma_log("| Latency Overhead : O(1)\n");

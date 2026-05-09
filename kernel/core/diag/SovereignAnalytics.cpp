@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Kernel Analytics Shard
@@ -25,18 +25,18 @@ public:
     const char* type_name() const noexcept override { return "SovereignAnalytics"; }
 
     static void init() {
-        sigma_log("Î£ [ANALYTICS]: Orchestrating Silicon Telemetry Shard...");
+        sigma_log("Σ [ANALYTICS]: Orchestrating Silicon Telemetry Shard...");
         m_events_tracked = 0;
-        sigma_log("Î£ [ANALYTICS]: Real-time Performance Audit ACTIVE.");
+        sigma_log("Σ [ANALYTICS]: Real-time Performance Audit ACTIVE.");
     }
 
     void trackEvent(const char* shard_id, const char* event_type) {
-        sigma_log("Î£ [ANALYTICS]: Tracking [%s] Event for Shard: %s...\n", event_type, shard_id);
+        sigma_log("Σ [ANALYTICS]: Tracking [%s] Event for Shard: %s...\n", event_type, shard_id);
         m_events_tracked++;
     }
 
     void audit() {
-        sigma_log("\n--- Î£ SOVEREIGN ANALYTICS AUDIT ---\n");
+        sigma_log("\n--- Σ SOVEREIGN ANALYTICS AUDIT ---\n");
         sigma_log("| Events Tracked  : %u\n", m_events_tracked);
         sigma_log("| Telemetry Mode  : SILICON-DIRECT\n");
         sigma_log("| Lattice Health  : 100%%\n");

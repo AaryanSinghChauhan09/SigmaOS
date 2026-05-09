@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "shard_manager.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Core {
@@ -27,7 +27,7 @@ void SovereignShardManager::HotLoadShard(const char* shard_id) {
 }
 
 void SovereignShardManager::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN SHARD MANAGER AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN SHARD MANAGER AUDIT ---\n");
     sigma_log("| Installed Shards  : %d\n", m_installed_shards);
     sigma_log("| Storage Nexus     : 64 GB\n", m_total_shard_storage / (1024ULL * 1024 * 1024));
     sigma_log("| Verification      : PQC-AUTO-ACTIVE\n");

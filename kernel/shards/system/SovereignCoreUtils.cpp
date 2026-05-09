@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "SovereignCoreUtils.h"
 
 namespace SigmaOS {
@@ -59,7 +59,7 @@ namespace CoreUtils {
 
     const char* SovereignProcessMonitor::type_name() const noexcept { return "SovereignProcessMonitor"; }
     void SovereignProcessMonitor::Execute() { 
-        sigma_log("\n--- Î£ SOVEREIGN CPU AUDIT ---\n");
+        sigma_log("\n--- Σ SOVEREIGN CPU AUDIT ---\n");
         sigma_log("| ARCH : x86_64 ZENITH SHARD\n");
         sigma_log("| STATE: DIRECT HARDWARE HANDSHAKE\n");
         sigma_log("| LOAD : 0.0004%% (WAIT-FREE)\n");

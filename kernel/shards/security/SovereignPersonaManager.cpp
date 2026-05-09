@@ -1,9 +1,9 @@
-﻿#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN PERSONA MANAGER (v21.0)
+ * Σ SIGMAOS: SOVEREIGN PERSONA MANAGER (v21.0)
  * =========================================================================
  * Refactored into modular personalization shards for ease of use.
  * =========================================================================

@@ -1,6 +1,6 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 /**
  * SigmaOS Sovereign Interrupt Descriptor Table (IDT)
@@ -34,7 +34,7 @@ public:
     }
 
     static void init() {
-        sigma_log("Σ [IDT]: Initializing Sovereign Interrupt Descriptor Table...");
+        sigma_log("S [IDT]: Initializing Sovereign Interrupt Descriptor Table...");
         
         // Zero-fill the IDT
         sigma_memset(this->idt, 0, sizeof(this->idt));
@@ -48,7 +48,7 @@ public:
         }
         
         this->load();
-        sigma_log("Σ [IDT]: IDT Loaded. Exceptions mapped.");
+        sigma_log("S [IDT]: IDT Loaded. Exceptions mapped.");
     }
 
     void setEntry(sigma_u8 vector, sigma_u64 handler, sigma_u16 selector, sigma_u8 flags) {

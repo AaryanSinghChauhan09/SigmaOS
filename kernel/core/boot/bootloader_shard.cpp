@@ -1,8 +1,8 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_types.h"
 #include "bootloader_shard.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -27,7 +27,7 @@ void SovereignBootloader::JumpToLattice() {
 }
 
 void SovereignBootloader::Audit() {
-    sigma_log("\n--- Σ SOVEREIGN BOOTLOADER AUDIT ---\n");
+    sigma_log("\n--- S SOVEREIGN BOOTLOADER AUDIT ---\n");
     sigma_log("| Boot Status       : %x (Success)\n", m_boot_status);
     sigma_log("| Memory Map Address: %llx\n", m_memory_map_addr);
     sigma_log("| Stage             : SILICON-READY\n");

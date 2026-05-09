@@ -1,15 +1,15 @@
-﻿/*
+/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN RESCUE (Recovery & Forensics Shard)
+ * S SIGMAOS: SOVEREIGN RESCUE (Recovery & Forensics Shard)
  * =========================================================================
  * Mission: Implements REC-001 (Rescuezilla/SystemRescue absorption).
- * Layer  : L5 — Industrial Ecosystem / Utilities
+ * Layer  : L5 � Industrial Ecosystem / Utilities
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

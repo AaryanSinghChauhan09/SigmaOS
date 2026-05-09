@@ -1,17 +1,17 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "Lattice.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Education {
@@ -97,7 +97,7 @@ public:
     }
 
     void RunExhaustiveAudit() {
-        sigma_log("--- Î£ SIGMA OS SOVEREIGN VIRTUAL LABS (NCERT ZENITH) ---\n");
+        sigma_log("--- Σ SIGMA OS SOVEREIGN VIRTUAL LABS (NCERT ZENITH) ---\n");
         for (sigma_size_t i = 0; i < m_labs.size(); i++) {
             IVirtualExperiment* lab = m_labs[i];
             sigma_log("\n[LAB]: %s\n", lab->GetTitle());
