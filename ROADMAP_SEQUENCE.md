@@ -11,3 +11,4 @@
 3.  **Modularisation & OOP refactor** ? fix @current_problems by enforcing encapsulation, abstraction, modular drivers, and reducing coupling.
 4.  **Compliance + LTS orchestration** ? enterprise trust parity with AlmaLinux/CentOS.
 5.  **Gaming stack integration** ? neutralize SteamOS advantage.
+6.  **UI polish + accessibility** ? surpass elementary’s design reputation.
