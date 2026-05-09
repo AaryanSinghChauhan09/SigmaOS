@@ -34,7 +34,10 @@ To fill technical gaps and ensure drivers work for almost every device, SigmaOS 
 | **Graphics** | NVIDIA (Open) | `Nouveau_Graphics.cpp` | Beta |
 | **Graphics** | Intel Integrated | `Intel_I915_Graphics.cpp` | Operational |
 | **Storage** | NVMe SSDs | `NVMe_Core.cpp` | Operational |
+| **Storage** | USB Mass Storage | `USB_Mass_Storage.cpp` | Operational |
 | **Input/Bus**| USB 3.0 (xHCI) | `USB_XHCI.cpp` | Operational |
+| **Input** | Synaptics Touchpad | `Synaptics_Input.cpp` | Operational |
+| **Audio** | Realtek HDA | `Realtek_HDA_Audio.cpp` | Operational |
 
 ## 🧪 Testing Environment
 
