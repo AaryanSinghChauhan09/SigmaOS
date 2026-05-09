@@ -104,11 +104,11 @@ Rather than using fragile relative paths, every shard `#include`s the canonical 
 
 ## 🛠 Key Stabilization Fixes Applied
 
+| `SovereignInstaller.cpp` | N/A | New shard for graphical deployment (UI-001) |
+| `zenith_installer.html` | N/A | High-fidelity installer UI mockup |
+| `SovereignMarketplaceCache.cpp` | N/A | New shard for P2P caching & fallback mirrors (IDX-003) |
+| `AMDGPU_Modern.cpp` | N/A | New shard for modern RDNA/CDNA support (DRV-009) |
 | `SovereignSandbox.cpp` | Integrated MAC logic | Extracted policy to `SovereignSandboxMAC.cpp` |
-| `SovereignOrbManager.cpp` | Lacks atomicity | Added `SovereignOrbTransaction.cpp` for rollbacks |
-| `ClawStack.cpp` | Lacks resource limits | Added `ClawResourceQuotas.cpp` for agent sandboxing |
-| `Intel_I915_Graphics.cpp` | N/A | New shard for Intel i915 hardware support (DRV-008) |
-| `build-validation.yml` | N/A | New CI/CD pipeline for lattice integrity and security |
 | `zenith.html` | Duplicate IDs & a11y violations | Renamed `command-input` and added `aria-label` to all inputs |
 
 ---
