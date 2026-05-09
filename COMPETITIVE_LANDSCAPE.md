@@ -9,6 +9,7 @@
 ## 🏹 Absorption Strategy: Making Competitors Irrelevant
 To transcend its niche status, SigmaOS is actively "absorbing" the core strengths of established distributions while maintaining its futuristic AI-native identity:
 
+*   **From Alpine Linux**: Matching minimalism by providing a **SigmaOS Micro-Edition** (musl-libc + `SovereignBusyBox`) for container workloads, while adding post-quantum security as a differentiator.
 *   **From Debian/Ubuntu**: Adopting meritocratic governance transparency, rigorous reproducible builds, and long-term support (LTS) shard maintenance.
 *   **From Fedora/CoreOS**: Integrating cutting-edge kernel tuning, container-native workflows (via `SovereignPodman`), and enterprise-grade compliance.
 *   **From Arch/EndeavourOS**: Embracing rolling release agility and community-driven, shard-specific documentation.

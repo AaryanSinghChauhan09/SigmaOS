@@ -13,6 +13,7 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 8.  **PWR-001**: Implement ACPI Sleep States (S3/S4) in `SovereignPower`. [Operational]
 9.  **PWR-002**: Optimize CPU C-states for Intel Tiger Lake.
 10. **BENCH-001**: Implement `sigma-bench` for kernel scheduling latency vs. Linux `sched_ext`. [Operational]
+11. **ABI-003**: Implement `musl` libc shims for Alpine-level minimalism. [Operational]
 
 ## 📦 Package Ecosystem & Orbs (Items 201-400)
 11. **PKG-001**: Implement `sigma-pkg` dependency graph resolver. [Operational]
@@ -21,6 +22,7 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 14. **REPRO-001**: Fix build-path entropy in `SovereignLibC` compilation. [Operational]
 15. **OCI-001**: Implement `SovereignPodman` shim for container execution. [Operational]
 16. **IDX-001**: Build P2P metadata indexer for the Sigma Marketplace. [Operational]
+17. **PKG-004**: Implement `SovereignBusyBox` multi-call utility shard. [Operational]
 
 ## 🖥️ User Experience & Zenith (Items 401-600)
 17. **FHS-001**: Symlink `/usr/bin` to Sovereign binary lattice. [Operational]
