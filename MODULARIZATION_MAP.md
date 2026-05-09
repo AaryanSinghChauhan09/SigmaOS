@@ -107,6 +107,9 @@ Rather than using fragile relative paths, every shard `#include`s the canonical 
 | `SovereignNetStack.cpp` | Monolithic net stack | Extracted `sk_buff` mapping to `SovereignNetCompat.cpp` |
 | `SovereignOrbManager.cpp` | Dependency logic in manager | Extracted recursive resolution to `SovereignOrbResolver.cpp` |
 | `SovereignInit.cpp` | FHS mapping in init | Extracted FHS virtualization to `SovereignFHS.cpp` |
+| `SovereignProton.cpp` | Integrated DXVK logic | Extracted Vulkan translation to `SovereignDXVK.cpp` |
+| `SovereignUX.cpp` | PPE adaptation logic | Extracted predictive engine to `SovereignPPE.cpp` |
+| `SovereignPQC.cpp` | FIPS audit in core | Extracted compliance audit to `SovereignPQCAudit.cpp` |
 | `zenith.html` | Duplicate IDs & a11y violations | Renamed `command-input` and added `aria-label` to all inputs |
 
 ---
