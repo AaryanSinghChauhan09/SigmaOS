@@ -3,27 +3,27 @@
 This backlog expands the foundational "Distro Mastery" categories into thousands of actionable technical shards, documentation tasks, and community milestones.
 
 ## ⚙️ Kernel & Hardware Shards (Items 1-200)
-1.  **ABI-001**: Implement `kmalloc` / `kfree` shims for Linux compatibility.
+1.  **ABI-001**: Implement `kmalloc` / `kfree` shims for Linux compatibility. [Operational]
 2.  **ABI-002**: Map `sk_buff` structures to `SovereignNetStack`.
 3.  **DRV-001**: Port Intel AX210 Wi-Fi 6E driver.
 4.  **DRV-002**: Port Realtek RTL8821CE driver.
 5.  **DRV-003**: Implement generic USB Video Class (UVC) 1.5 support.
 6.  **DRV-004**: Port AMDGPU Southern Islands (SI) support.
 7.  **DRV-005**: Port Nouveau Maxwell/Pascal microcode mapping.
-8.  **PWR-001**: Implement ACPI Sleep States (S3/S4) in `SovereignPower`.
+8.  **PWR-001**: Implement ACPI Sleep States (S3/S4) in `SovereignPower`. [Operational]
 9.  **PWR-002**: Optimize CPU C-states for Intel Tiger Lake.
 10. **BENCH-001**: Implement `sigma-bench` for kernel scheduling latency vs. Linux `sched_ext`.
 
 ## 📦 Package Ecosystem & Orbs (Items 201-400)
 11. **PKG-001**: Implement `sigma-pkg` dependency graph resolver.
 12. **PKG-002**: Add native Zstd compression to Orb packages.
-13. **PKG-003**: Implement `SovereignOrbRollback` for atomic state revert.
+13. **PKG-003**: Implement `SovereignOrbRollback` for atomic state revert. [Operational]
 14. **REPRO-001**: Fix build-path entropy in `SovereignLibC` compilation.
 15. **OCI-001**: Implement `SovereignPodman` shim for container execution.
 16. **IDX-001**: Build P2P metadata indexer for the Sigma Marketplace.
 
 ## 🖥️ User Experience & Zenith (Items 401-600)
-17. **FHS-001**: Symlink `/usr/bin` to Sovereign binary lattice.
+17. **FHS-001**: Symlink `/usr/bin` to Sovereign binary lattice. [Operational]
 18. **UX-001**: Port GTK4 backend to Zenith Morphic Engine.
 19. **UX-002**: Port Qt6 QPA plugin for Zenith hardware acceleration.
 20. **A11Y-001**: Implement `SovereignScreenReader` (Text-to-Speech shard).
