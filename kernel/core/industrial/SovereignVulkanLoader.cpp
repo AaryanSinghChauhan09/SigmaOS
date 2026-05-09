@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignVulkanLoader"; }
 
-    static static bool loadVulkan13() {
+    static bool loadVulkan13() {
         sigma_log_info("[VULKAN-SHIM] Initializing Vulkan 1.3 ICD Loader...");
         sigma_log_info("[VULKAN-SHIM] Mapping SovereignGPU shards to VkPhysicalDevices...");
         sigma_log_info("[VULKAN-SHIM] Vulkan 1.3 [ACTIVE]. Pipelining Ray-Tracing shards.");
