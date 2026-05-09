@@ -1,0 +1,10 @@
+{
+    "profession": "mechanical_engineer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "simulation_engines",
+        "cad",
+        "manufacturing_workflow_integration"
+    ]
+}

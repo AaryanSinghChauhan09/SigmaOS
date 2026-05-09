@@ -1,0 +1,10 @@
+{
+    "profession": "statistician",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "statistical_analysis_suite",
+        "survey_tools",
+        "visualization"
+    ]
+}

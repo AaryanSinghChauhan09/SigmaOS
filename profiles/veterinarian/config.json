@@ -1,0 +1,11 @@
+{
+    "profession": "veterinarian",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "animal_patient_records",
+        "lab_results",
+        "scheduling",
+        "veterinary_standards"
+    ]
+}

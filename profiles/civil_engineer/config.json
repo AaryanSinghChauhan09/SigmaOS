@@ -1,0 +1,11 @@
+{
+    "profession": "civil_engineer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "cad_tools",
+        "structural_simulation",
+        "project_management",
+        "safety_compliance"
+    ]
+}

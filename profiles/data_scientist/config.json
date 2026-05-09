@@ -1,0 +1,10 @@
+{
+    "profession": "data_scientist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "jupyter_notebooks",
+        "ml_libraries",
+        "visualization_dashboards"
+    ]
+}
