@@ -104,10 +104,10 @@ Rather than using fragile relative paths, every shard `#include`s the canonical 
 
 ## 🛠 Key Stabilization Fixes Applied
 
+| `SovereignARM64.cpp` | N/A | New shard for RPi5/ARM64 hardware tuning (ARM-003) |
+| `SovereignAgentQuotasExtended.cpp` | N/A | New shard for multi-dimensional AI scalability (CLAW-004) |
 | `SovereignFIPS.cpp` | N/A | New shard for FIPS-140 compliance auditing (SEC-005) |
 | `SovereignLTS.cpp` | N/A | New shard for LTS channel orchestration (REL-001) |
-| `SovereignCloudImage.cpp` | N/A | New shard for production cloud image generation (CLD-002) |
-| `SovereignEmergencySync.cpp` | N/A | New shard for self-healing disaster recovery (RECOV-001) |
 | `zenith.html` | Duplicate IDs & a11y violations | Renamed `command-input` and added `aria-label` to all inputs |
 
 ---
