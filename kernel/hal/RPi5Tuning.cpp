@@ -1,4 +1,4 @@
-/*
+﻿/*
  * =========================================================================
  * Σ SIGMAOS: RASPBERRY PI 5 TUNING (BCM2712 HAL Shard)
  * =========================================================================
@@ -7,9 +7,9 @@
  * =========================================================================
  */
 
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -37,5 +37,5 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 extern "C" void rpi5_tune() {
-    SigmaOS::Kernel::HAL::RPi5Tuning::applyRPi5Optimizations();
+    SigmaOS::Kernel::HAL::RPi5Tuning::getInstance().applyRPi5Optimizations();
 }

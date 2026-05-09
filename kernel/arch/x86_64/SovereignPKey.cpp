@@ -1,5 +1,6 @@
-#include "libc/SovereignLibC.h"
-#include "core/sigma_types.h"
+﻿#include "../../../include/sigma_log.h"
+#include "../../../include/libc/SovereignLibC.h"
+#include "../../../include/core/sigma_types.h"
 
 /**
  * SigmaOS Sovereign Protection Key (PKey) Manager

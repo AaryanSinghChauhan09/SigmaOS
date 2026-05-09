@@ -1,5 +1,6 @@
+﻿#include "../../../include/sigma_log.h"
 #include "Lattice.h"
-#include "libc/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Desktop {

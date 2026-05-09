@@ -1,6 +1,6 @@
 #include "sigma_types.h"
 #include "sigma_hal.h"
-#include "sigma_log.h"
+#include "../../include/sigma_log.h"
 
 /**
  * SovereignAOT Compiler — Ahead-of-Time WASM-to-Native Translator

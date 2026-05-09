@@ -7,6 +7,7 @@
  * =========================================================================
  */
 
+#include "../../include/sigma_log.h"
 #include "../../include/SovereignLibC.h"
 #include "../../include/sigma_types.h"
 

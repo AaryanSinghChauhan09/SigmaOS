@@ -1,8 +1,10 @@
-#include "core/sigma_types.h"
-#include "libc/SovereignLibC.h"
-#include "sigma_ux.h"
-#include "ui/sigma_gui.h"
-#include "hal/sigma_hal.h"
+#include "../../include/core/sigma_types.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_ux.h"
+#include "../../include/ui/sigma_gui.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "../../include/core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign UX Implementation
@@ -12,40 +14,43 @@
  * Design: OOP-isolated singleton — SovereignUXEngine.
  */
 
-class SovereignUXEngine {
+class SovereignUXEngine : public SigmaOS::Kernel::SigmaObject {
 public:
     static SovereignUXEngine& getInstance() {
         static SovereignUXEngine instance;
         return instance;
     }
 
+    const char* type_name() const noexcept override { return "SovereignUXEngine"; }
+
     static void init() {
-        sigma_log("[UX] Initializing Sovereign Personalization Engine...");
+        sigma_log_info("[UX] Initializing Sovereign Personalization Engine...\n");
         
         // Default Industrial Dark Theme
-        this->active_theme.primary_color = 0x1A1A1A;
-        this->active_theme.secondary_color = 0x00FF00;
-        this->active_theme.transparency_level = 80;
-        this->active_theme.blur_enabled = SIGMA_TRUE;
+        auto& inst = getInstance();
+        inst.active_theme.primary_color = 0x1A1A1A;
+        inst.active_theme.secondary_color = 0x00FF00;
+        inst.active_theme.transparency_level = 80;
+        inst.active_theme.blur_enabled = SIGMA_TRUE;
     }
 
     void applyTheme(const sigma_theme_t* theme) {
-    }
-
-    void enableHighContrast() {
-        sigma_log("[UX-A11Y] High-Contrast Mode ACTIVE.");
-    }
+        if (!theme) return;
         // PPE (Predictive Personalization Engine) Algorithm
         // Automatically adjusts contrast and readability based on shard load.
         
         this->active_theme = *theme;
-        sigma_log("[UX] Theme Applied: Primary %06X, Blur: %d\n", 
+        sigma_log_info("[UX] Theme Applied: Primary %06X, Blur: %d\n", 
                      theme->primary_color, theme->blur_enabled);
+    }
+
+    void enableHighContrast() {
+        sigma_log_info("[UX-A11Y] High-Contrast Mode ACTIVE.\n");
     }
 
     void renderDashboard() {
         // High-Fidelity Morphic Dashboard Rendering
-        sigma_log("[UX] Rendering Sovereign Zenith Dashboard...");
+        sigma_log_info("[UX] Rendering Sovereign Zenith Dashboard...\n");
         
         // Draw background
         for(sigma_u32 y=0; y<100; y++) {
@@ -54,11 +59,11 @@ public:
             }
         }
         
-        sigma_log("[UX] Zenith Dashboard: LATTICE STATUS: 100% OPERATIONAL.");
+        sigma_log_info("[UX] Zenith Dashboard: LATTICE STATUS: 100%% OPERATIONAL.\n");
     }
 
     void predictAdaptation() {
-        extern "C" void ux_ppe_predict();
+        extern void ux_ppe_predict();
         ux_ppe_predict();
         // Logic to shift UI tone based on system energy state
     }
@@ -74,14 +79,14 @@ extern "C" void ux_init() {
 }
 
 extern "C" void ux_apply_theme(sigma_theme_t* theme) {
-    SovereignUXEngine::applyTheme(theme);
+    SovereignUXEngine::getInstance().applyTheme(theme);
 }
 
 extern "C" void ux_render_dashboard() {
-    SovereignUXEngine::renderDashboard();
+    SovereignUXEngine::getInstance().renderDashboard();
 }
 
 extern "C" void ux_predict_adaptation() {
-    SovereignUXEngine::predictAdaptation();
+    SovereignUXEngine::getInstance().predictAdaptation();
 }
 

@@ -14,7 +14,7 @@ extern "C" {
 #endif
 
 /* Standard I/O & Logging (kernel-internal implementations in SovereignLog.cpp) */
-void sigma_printf(const char* fmt, ...);
+void sigma_log(const char* fmt, ...);
 void kprintf(const char* fmt, ...);
 void log_emit(unsigned int severity, const char* msg);
 void log_emit_f(unsigned int severity, const char* fmt, ...);
@@ -45,10 +45,10 @@ struct SovereignTicketLock {
     volatile sigma_u32 m_now_serving = 0u;
 };
 
-class SovereignSMPEngine {
+class SigmaOS::Kernel::HAL::SovereignSMPEngine {
 public:
-    static SovereignSMPEngine& getInstance() {
-        static SovereignSMPEngine instance;
+    static SigmaOS::Kernel::HAL::SovereignSMPEngine& getInstance() {
+        static SigmaOS::Kernel::HAL::SovereignSMPEngine instance;
         return instance;
     }
 
@@ -58,11 +58,11 @@ public:
     sigma_u32 getCoreCount() const { return m_active_cores; }
 
 private:
-    SovereignSMPEngine()
+    SigmaOS::Kernel::HAL::SovereignSMPEngine()
         : m_active_cores(0u), m_bsp_id(0u), m_initialized(0u) {}
 
-    SovereignSMPEngine(const SovereignSMPEngine&) = delete;
-    SovereignSMPEngine& operator=(const SovereignSMPEngine&) = delete;
+    SigmaOS::Kernel::HAL::SovereignSMPEngine(const SigmaOS::Kernel::HAL::SovereignSMPEngine&) = delete;
+    SigmaOS::Kernel::HAL::SovereignSMPEngine& operator=(const SigmaOS::Kernel::HAL::SovereignSMPEngine&) = delete;
 
     sigma_u32 m_active_cores;
     sigma_u32 m_bsp_id;

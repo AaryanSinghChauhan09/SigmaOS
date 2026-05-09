@@ -1,6 +1,7 @@
-#include "core/sigma_types.h"
-#include "libc/SovereignLibC.h"
-#include "hal/sigma_hal.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/libc/SovereignLibC.h"
+#include "../../../include/hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Network Stack
@@ -18,9 +19,9 @@ public:
         sigma_log("[NET] Initializing sovereign interface: %s", ifname);
     }
 
-    void transmitPacket(const void* data, size_t len) {
-        // Optimized DMA transmit
-        sigma_log("[NET] Transmitting sovereign packet (%zu bytes).", len);
+    void transmitPacket(const void* data, sigma_size_t len) {
+        // Optimized DMA transmit — sigma_size_t, no stdlib
+        sigma_log("[NET] Transmitting sovereign packet (%llu bytes).", (sigma_u64)len);
     }
 
     void enableP2PDiscovery() {

@@ -1,6 +1,7 @@
-#include "libc/SovereignLibC.h"
-#include "hal/sigma_hal.h"
-#include "core/sigma_types.h"
+#include "../include/sigma_log.h"
+#include "../include/libc/SovereignLibC.h"
+#include "../include/hal/sigma_hal.h"
+#include "../include/core/sigma_types.h"
 /**
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN SECURITY HARDENER (S-SECHARDENER) — SHARD #500
@@ -15,7 +16,7 @@
  */
 
 #include "sigma_sechardener.h"
-#include "hal/sigma_hal.h"
+#include "../include/hal/sigma_hal.h"
 #include "libc/sigma_libc.h"
 
 /**

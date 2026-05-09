@@ -7,9 +7,9 @@
  * =========================================================================
  */
 
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -24,14 +24,14 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignZstd"; }
 
-    sigma_size_t compressOrb(const void* src, void* dst, sigma_size_t src_size) {
+    static sigma_size_t compressOrb(const void* src, void* dst, sigma_size_t src_size) {
         sigma_log_info("[ZSTD] Compressing Orb payload using Zstandard v1.5.x...");
         // Mock compression logic
         sigma_log_info("[ZSTD] Ratio: 3.4:1. Optimization: [LEVEL-19]");
         return src_size / 3;
     }
 
-    sigma_size_t decompressOrb(const void* src, void* dst, sigma_size_t src_size) {
+    static sigma_size_t decompressOrb(const void* src, void* dst, sigma_size_t src_size) {
         sigma_log_info("[ZSTD] Decompressing Orb payload...");
         return src_size * 3;
     }
@@ -49,3 +49,4 @@ extern "C" sigma_size_t zstd_compress(const void* src, void* dst, sigma_size_t s
 extern "C" sigma_size_t zstd_decompress(const void* src, void* dst, sigma_size_t size) {
     return SigmaOS::Kernel::Industrial::SovereignZstd::decompressOrb(src, dst, size);
 }
+

@@ -1,6 +1,6 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "sigma_log.h"
+﻿#include "../../../include/core/sigma_types.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SovereignSyscall — Fast-Path Shard Transition (FPST) System Call Gate
@@ -21,10 +21,10 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Syscall {
 
-class SovereignSyscallEngine {
+class SigmaOS::Kernel::Syscall::SovereignSyscallEngine {
 public:
-    static SovereignSyscallEngine& getInstance() {
-        static SovereignSyscallEngine instance;
+    static SigmaOS::Kernel::Syscall::SovereignSyscallEngine& getInstance() {
+        static SigmaOS::Kernel::Syscall::SovereignSyscallEngine instance;
         return instance;
     }
 
@@ -67,11 +67,11 @@ public:
     sigma_u64 getTotalCalls() const { return m_total_calls; }
 
 private:
-    SovereignSyscallEngine()
+    SigmaOS::Kernel::Syscall::SovereignSyscallEngine()
         : m_initialized(0u), m_total_calls(0u) {}
 
-    SovereignSyscallEngine(const SovereignSyscallEngine&) = delete;
-    SovereignSyscallEngine& operator=(const SovereignSyscallEngine&) = delete;
+    SigmaOS::Kernel::Syscall::SovereignSyscallEngine(const SigmaOS::Kernel::Syscall::SovereignSyscallEngine&) = delete;
+    SigmaOS::Kernel::Syscall::SovereignSyscallEngine& operator=(const SigmaOS::Kernel::Syscall::SovereignSyscallEngine&) = delete;
 
     sigma_u32 attemptSelfHealing(sigma_syscall_id_t id, sigma_u32 a1, sigma_u32 a2, sigma_u32 a3) {
         (void)id; (void)a1; (void)a2; (void)a3;

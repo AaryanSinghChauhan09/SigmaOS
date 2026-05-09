@@ -4,7 +4,7 @@
  */
 
 #include "sigma_types.h"
-#include "sigma_log.h"
+#include "../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Kernel {

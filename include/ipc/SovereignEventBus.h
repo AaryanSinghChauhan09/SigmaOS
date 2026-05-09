@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "sigma_types.h"
+#include "core/sigma_types.h"
 #include "sigma_log.h"
 
 #define SIGMA_BUS_MAX_SUBSCRIBERS 128u

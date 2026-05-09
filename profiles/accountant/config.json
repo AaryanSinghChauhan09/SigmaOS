@@ -1,11 +1,1 @@
-{
-    "profession": "accountant",
-    "compliance_level": "sovereign-high",
-    "resource_priority": "adaptive",
-    "modules": [
-        "ledger_system",
-        "tax_compliance_modules",
-        "balance_sheet_generator",
-        "audit_tools"
-    ]
-}
+{ "profession": "accountant", "active": true }

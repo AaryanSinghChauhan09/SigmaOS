@@ -1,12 +1,1 @@
-{
-    "profession": "cashier",
-    "compliance_level": "sovereign-high",
-    "resource_priority": "adaptive",
-    "modules": [
-        "pos_interface",
-        "barcode_scanner_integration",
-        "receipt_printing",
-        "inventory_sync",
-        "daily_reconciliation"
-    ]
-}
+{ "profession": "cashier", "active": true }

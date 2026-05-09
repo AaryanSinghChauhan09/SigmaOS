@@ -19,8 +19,8 @@
  * =========================================================================
  */
 
-#include "core/SigmaOOP.hpp"
-#include "sigma_log.h"
+#include "../include/core/SigmaOOP.hpp"
+#include "../include/sigma_log.h"
 
 
 namespace SigmaOS {

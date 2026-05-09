@@ -1,6 +1,7 @@
-#include "hal/sigma_hal.h"
+﻿#include "../../../include/sigma_log.h"
+#include "../../../include/hal/sigma_hal.h"
 #include "sigma_main.h"
-#include "libc/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 // Engine Initialisers (Extern C)
 extern "C" void sigma_bootstrap_lattice();

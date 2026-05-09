@@ -1,7 +1,7 @@
 #ifndef SIGMA_ABI_H
 #define SIGMA_ABI_H
 
-#include "sigma_types.h"
+#include "core/sigma_types.h"
 
 /**
  * @file sigma_abi.h

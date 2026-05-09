@@ -1,5 +1,6 @@
+﻿#include "../../../include/sigma_log.h"
 #include "Lattice.h"
-#include "libc/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN COLLECTIVE CONSCIOUS (v1.0 - NEURAL SYNC)
@@ -8,7 +9,7 @@
  * =========================================================================
  */
 
-#include "core/SigmaOOP.hpp"
+#include "../../../include/core/SigmaOOP.hpp"
 #include "userland/apps/collective_conscious/agents.hpp"
 
 using namespace SigmaOS;

@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SANDBOX CONTAINER (S-SANDBOX)
+ * SIGMAOS: SOVEREIGN SANDBOX CONTAINER (S-SANDBOX)
  * =========================================================================
  * Mission: Isolated, zero-trust execution environments for all applications.
  * =========================================================================
@@ -23,24 +23,25 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Security {
 
-class SigmaOS::Kernel::Security::SovereignSandboxEngine {
+class SovereignSandboxEngine {
 public:
-    static SigmaOS::Kernel::Security::SovereignSandboxEngine& getInstance() {
-        static SigmaOS::Kernel::Security::SovereignSandboxEngine instance;
+    static SovereignSandboxEngine& getInstance() {
+        static SovereignSandboxEngine instance;
         return instance;
     }
+
+    const char* type_name() const noexcept { return "SovereignSandboxEngine"; }
 
     void init();
     sigma_u32 createContainer(const sigma_sandbox_config_t* config);
     bool execute(sigma_u32 container_id, const char* binary_path);
     void destroyContainer(sigma_u32 container_id);
-
     bool checkSyscall(sigma_u32 syscall_id);
     bool hasCapability(const char* shard_name, const char* capability);
+    bool validateMACPolicy(const char* sub, const char* obj, const char* act);
 
 private:
-    SigmaOS::Kernel::Security::SovereignSandboxEngine() : next_container_id(1), initialized(0) {}
-    
+    SovereignSandboxEngine() : next_container_id(1U), initialized(0U) {}
     sigma_u32 next_container_id;
     sigma_u32 initialized;
 };
@@ -48,20 +49,19 @@ private:
 } // namespace Security
 } // namespace Kernel
 } // namespace SigmaOS
-#endif
+#endif /* __cplusplus */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* --- Sandbox Primitives --- */
 void      sandbox_init(void);
 sigma_u32 sandbox_create_container(const sigma_sandbox_config_t* config);
-bool      sandbox_execute(sigma_u32 container_id, const char* binary_path);
+int       sandbox_execute(sigma_u32 container_id, const char* binary_path);
 void      sandbox_destroy_container(sigma_u32 container_id);
-
-bool      sandbox_check_syscall(sigma_u32 syscall_id);
-bool      sandbox_has_capability(const char* shard_name, const char* capability);
+int       sandbox_check_syscall(sigma_u32 syscall_id);
+int       sandbox_has_capability(const char* shard_name, const char* capability);
+int       sandbox_validate_mac(const char* subject, const char* object, const char* action);
 
 #ifdef __cplusplus
 }

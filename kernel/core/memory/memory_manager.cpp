@@ -1,12 +1,13 @@
-#include "hal/sigma_hal.h"
-#include "core/sigma_types.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/core/sigma_types.h"
 #include "memory_manager.hpp"
-#include "libc/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
 
-SovereignMemoryManager::SovereignMemoryManager() : m_pool(reinterpret_cast<sigma_u8*>(SIGMA_NULL)), m_used(0), m_segment_count(0) {
+SovereignMemoryManager::SovereignMemoryManager() : m_pool(static_cast<sigma_u8*>(nullptr)), m_used(0), m_segment_count(0) {
     // Industrial Slab Initialization
     m_pool = (sigma_u8*)sigma_malloc(INITIAL_POOL_SIZE);
     if (m_pool) {
@@ -97,6 +98,7 @@ void SovereignMemoryManager::audit() {
 
 } // namespace Kernel
 } // namespace SigmaOS
+
 
 
 

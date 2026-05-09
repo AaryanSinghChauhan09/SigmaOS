@@ -1,7 +1,8 @@
-#include "libc/SovereignLibC.h"
-#include "core/sigma_types.h"
+﻿#include "../../../include/sigma_log.h"
+#include "../../../include/libc/SovereignLibC.h"
+#include "../../../include/core/sigma_types.h"
 #include "sigma_emotion.h"
-#include "hal/sigma_hal.h"
+#include "../../../include/hal/sigma_hal.h"
 #include "sigma_universal_ui.h"
 #include "sigma_focus.h"
 

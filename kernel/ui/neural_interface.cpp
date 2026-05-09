@@ -1,6 +1,7 @@
+﻿#include "../../include/sigma_log.h"
 #include "Lattice.h"
 #include "neural_interface.hpp"
-#include "libc/SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace UI {

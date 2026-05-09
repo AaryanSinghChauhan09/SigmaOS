@@ -1,7 +1,8 @@
-#include "core/sigma_types.h"
+﻿#include "../../include/sigma_log.h"
+#include "../../include/core/sigma_types.h"
 #include "Lattice.h"
 #include "industrial_neural_engine.hpp"
-#include "libc/SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace AI {

@@ -1,11 +1,1 @@
-{
-    "profession": "farmer",
-    "compliance_level": "sovereign-high",
-    "resource_priority": "adaptive",
-    "modules": [
-        "crop_management",
-        "weather_forecasting",
-        "supply_chain_integration",
-        "iot_sensor_sync"
-    ]
-}
+{ "profession": "farmer", "active": true }

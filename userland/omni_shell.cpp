@@ -8,6 +8,7 @@
  * =========================================================================
  */
 
+#include "../include/sigma_log.h"
 #include "../include/SigmaOOP.hpp"
 #include "../include/SovereignLibC.h"
 #include "SovereignDistroForge.h"

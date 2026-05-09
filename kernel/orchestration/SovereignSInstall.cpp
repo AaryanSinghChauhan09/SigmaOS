@@ -1,4 +1,5 @@
-#include "core/sigma_types.h"
+﻿#include "../../include/sigma_log.h"
+#include "../../include/core/sigma_types.h"
 /*
  * =========================================================================
  * SIGMAOS: SOVEREIGN S-INSTALL (SovereignDeploymentEngine)
@@ -12,7 +13,7 @@
  */
 
 #include "sigma_sinstall.h"
-#include "libc/SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 
 /* =========================================================================
  * SovereignDeploymentEngine Method Implementations

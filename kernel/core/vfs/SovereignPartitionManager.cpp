@@ -7,9 +7,9 @@
  * =========================================================================
  */
 
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -37,5 +37,6 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 extern "C" void partition_manager_scan() {
-    SigmaOS::Kernel::VFS::SovereignPartitionManager::scanPartitions();
+    SigmaOS::Kernel::VFS::SovereignPartitionManager::getInstance().scanPartitions();
 }
+

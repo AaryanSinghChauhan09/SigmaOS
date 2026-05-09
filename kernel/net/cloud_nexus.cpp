@@ -1,7 +1,8 @@
-#include "core/sigma_types.h"
+﻿#include "../../include/sigma_log.h"
+#include "../../include/core/sigma_types.h"
 #include "Lattice.h"
 #include "cloud_nexus.hpp"
-#include "libc/SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Net {

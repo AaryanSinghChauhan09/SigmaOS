@@ -8,6 +8,7 @@
  * =========================================================================
  */
 
+#include "../include/sigma_log.h"
 #include "../include/SigmaOOP.hpp"
 
 namespace SigmaOS {

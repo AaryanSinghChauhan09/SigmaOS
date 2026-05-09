@@ -1,6 +1,6 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "sigma_log.h"
+﻿#include "../../../include/core/sigma_types.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SovereignSMP — Symmetric Multi-Processing Engine
@@ -24,9 +24,9 @@ void SovereignTicketLock::unlock() {
     __atomic_fetch_add(&m_now_serving, 1u, __ATOMIC_SEQ_CST);
 }
 
-/* --- SovereignSMPEngine Implementation --- */
+/* --- SigmaOS::Kernel::HAL::SovereignSMPEngine Implementation --- */
 
-void SovereignSMPEngine::init() {
+void SigmaOS::Kernel::HAL::SovereignSMPEngine::init() {
     sigma_log_info("[SMP] Initializing Sovereign Silicon-Parallel Execution (SPE)...");
     this->m_active_cores = 1u;
     this->m_bsp_id       = 0u;
@@ -34,13 +34,13 @@ void SovereignSMPEngine::init() {
     sigma_log_info("[SMP] Industrial Primitives: Ticket Locks ARMED.");
 }
 
-void SovereignSMPEngine::igniteCores() {
+void SigmaOS::Kernel::HAL::SovereignSMPEngine::igniteCores() {
     sigma_log_info("[SMP] SPE: Broadcasting Startup IPI (SIPI) to all silicon cores...");
     this->m_active_cores = 16u;
     sigma_log_info("[SMP] SPE: 16 cores successfully synchronized in the lattice.");
 }
 
-void SovereignSMPEngine::broadcastIPI(sigma_u32 vector) {
+void SigmaOS::Kernel::HAL::SovereignSMPEngine::broadcastIPI(sigma_u32 vector) {
     (void)vector;
     sigma_log_info("[SMP] SPE: Dispatching Inter-Processor Interrupt.");
 }

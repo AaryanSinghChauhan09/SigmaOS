@@ -1,4 +1,4 @@
-/*
+﻿/*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN INIT (Service Orchestration Shard)
  * =========================================================================
@@ -8,9 +8,9 @@
  * =========================================================================
  */
 
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/core/SigmaOOP.hpp"
 
 extern "C" void fhs_init();
 

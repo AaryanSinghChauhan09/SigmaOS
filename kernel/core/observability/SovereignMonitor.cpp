@@ -1,8 +1,8 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "sigma_log.h"
-#include "observability/sigma_monitor.h"
-#include "core/SigmaOOP.hpp"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/observability/sigma_monitor.h"
+#include "../../../include/core/SigmaOOP.hpp"
 
 extern "C" void telemetry_execute_ebpf(const void* bytecode, sigma_usize size);
 
@@ -11,8 +11,8 @@ namespace Kernel {
 namespace Observability {
 
 /* Industrial Constants */
-static constexpr sigma_u32 SIMULATED_CPU_LOAD    = 12U;
-static constexpr sigma_u32 SIMULATED_MEM_PRESSURE = 45U;
+static constexpr sigma_u32 SIMULATED_CPU_LOAD       = 12U;
+static constexpr sigma_u32 SIMULATED_MEM_PRESSURE   = 45U;
 static constexpr sigma_u32 SIMULATED_NET_THROUGHPUT = 850U;
 static constexpr sigma_u32 SIMULATED_MIGRATION_RATE = 2U;
 
@@ -52,19 +52,19 @@ void SovereignObservabilityMonitor::rebalanceLattice() {
 } // namespace Kernel
 } // namespace SigmaOS
 
-/* --- C Bridge --- */
+/* --- C Bridge (all use getInstance()) --- */
 extern "C" void monitor_init() {
-    SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::init();
+    SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().init();
 }
 
 extern "C" sigma_system_load_t monitor_get_load_matrix() {
-    return SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getLoadMatrix();
+    return SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().getLoadMatrix();
 }
 
 extern "C" void monitor_execute_ebpf(const void* bytecode, sigma_usize size) {
-    SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::executeEbpfProgram(bytecode, size);
+    SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().executeEbpfProgram(bytecode, size);
 }
 
 extern "C" void monitor_rebalance_lattice() {
-    SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::rebalanceLattice();
+    SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().rebalanceLattice();
 }

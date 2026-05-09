@@ -1,7 +1,7 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+﻿#include "../../../include/core/sigma_types.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Diagnostics (SovereignDiag)
@@ -79,7 +79,7 @@ extern "C" void diag_auto_repair() {
 }
 
 extern "C" void diag_report(const char* shard, const char* desc) {
-    SigmaOS::Kernel::Observability::SovereignDiagEngine::reportAnomaly(
+    SigmaOS::Kernel::Observability::SovereignDiagEngine::getInstance().reportAnomaly(
         SigmaOS::Kernel::Observability::SovereignDiagEngine::ShardID{shard},
         SigmaOS::Kernel::Observability::SovereignDiagEngine::AnomalyDesc{desc});
 }

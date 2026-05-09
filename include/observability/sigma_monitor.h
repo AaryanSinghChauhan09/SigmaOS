@@ -19,14 +19,15 @@ class SovereignObservabilityMonitor {
 public:
     static SovereignObservabilityMonitor& getInstance();
 
+    const char* type_name() const noexcept;
+
     void init();
     sigma_system_load_t getLoadMatrix();
-    void executeEbpfProgram(const void* bytecode, sigma_size_t size);
+    void executeEbpfProgram(const void* bytecode, sigma_usize size);
     void rebalanceLattice();
 
-
-
     virtual ~SovereignObservabilityMonitor() {}
+
 private:
     SovereignObservabilityMonitor() : m_initialized(false) {}
     bool m_initialized;
@@ -35,7 +36,7 @@ private:
 } // namespace Observability
 } // namespace Kernel
 } // namespace SigmaOS
-#endif
+#endif /* __cplusplus */
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,5 +50,4 @@ void monitor_rebalance_lattice(void);
 }
 #endif
 
-#endif
-
+#endif /* SIGMA_MONITOR_H */

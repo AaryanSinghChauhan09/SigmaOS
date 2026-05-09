@@ -1,11 +1,1 @@
-{
-    "profession": "lawyer",
-    "compliance_level": "sovereign-high",
-    "resource_priority": "adaptive",
-    "modules": [
-        "case_indexing",
-        "legal_references",
-        "compliance_document_management",
-        "secure_communication"
-    ]
-}
+{ "profession": "lawyer", "active": true }

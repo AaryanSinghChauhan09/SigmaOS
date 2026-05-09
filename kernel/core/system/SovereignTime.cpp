@@ -1,8 +1,9 @@
-#include "core/sigma_types.h"
-#include "hal/sigma_hal.h"
+﻿#include "../../../include/sigma_log.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/hal/sigma_hal.h"
 #include "sigma_time.h"
-#include "libc/SovereignLibC.h"
-#include "core/SigmaOOP.hpp"
+#include "../../../include/libc/SovereignLibC.h"
+#include "../../../include/core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Time Engine

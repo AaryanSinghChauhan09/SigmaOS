@@ -1,4 +1,4 @@
-/**
+﻿/**
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN RESEARCH MATRIX (v2.0 - INDUSTRIAL ZENITH)
  * =========================================================================
@@ -7,8 +7,9 @@
  * =========================================================================
  */
 
+#include "../../../include/sigma_log.h"
 #include "Lattice.h"
-#include "libc/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 #include <map>
 #include <string>
@@ -49,7 +50,7 @@ public:
      * @param source The URI or label of the data source.
      */
     void MineData(const std::string& source) override {
-        sigma_printf("[RESEARCH/MINER]: Enqueueing scrape for: %s\n", source.c_str());
+        sigma_log("[RESEARCH/MINER]: Enqueueing scrape for: %s\n", source.c_str());
 
         std::thread([this, source]() {
             // Real I/O or incremental indexing would happen here.
@@ -58,7 +59,7 @@ public:
                 std::lock_guard<std::mutex> lock(m_kb_mutex);
                 m_knowledge_base.push_back(entry);
             }
-            sigma_printf("[RESEARCH/MINER]: Scrape complete for %s\n", source.c_str());
+            sigma_log("[RESEARCH/MINER]: Scrape complete for %s\n", source.c_str());
         }).detach();
     }
 

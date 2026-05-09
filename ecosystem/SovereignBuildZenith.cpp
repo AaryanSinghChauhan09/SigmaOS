@@ -1,3 +1,4 @@
+#include "../include/sigma_log.h"
 #include "../../../include/SovereignLibC.h"
 /*
  * =========================================================================

@@ -1,6 +1,7 @@
-#include "core/SigmaOOP.hpp"
-#include "core/sigma_types.h"
-#include "libc/SovereignLibC.h"
+﻿#include "../../../include/sigma_log.h"
+#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/libc/SovereignLibC.h"
 #include <map>
 #include <string>
 
@@ -43,11 +44,11 @@ public:
      * @brief Spawn a new autonomous agent with a specific goal.
      */
     void spawnAgent(const std::string& id, const std::string& goal) {
-        sigma_printf("[AGENT-CORE]: Spawning Agent [%s] with Goal: %s\n", id.c_str(), goal.c_str());
+        sigma_log("[AGENT-CORE]: Spawning Agent [%s] with Goal: %s\n", id.c_str(), goal.c_str());
         m_active_agents[id] = { id, goal, AgentState::PLANNING };
         
         // Initiate planning sequence
-        sigma_printf("[AGENT-CORE]: Agent [%s] entering PLANNING phase.\n", id.c_str());
+        sigma_log("[AGENT-CORE]: Agent [%s] entering PLANNING phase.\n", id.c_str());
     }
 
     /**

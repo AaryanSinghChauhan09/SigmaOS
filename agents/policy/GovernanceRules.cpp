@@ -1,6 +1,8 @@
-#include "core/sigma_types.h"
-#include "libc/SovereignLibC.h"
-#include "hal/sigma_hal.h"
+#include "../../include/core/sigma_types.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "../../include/core/context/manager.hpp"
 
 /**
  * SigmaOS AI Governance Rules
@@ -11,7 +13,9 @@ class GovernanceRules {
 private:
     bool execution_allowed;
 
-    GovernanceRules() : execution_allowed(true) {}
+    GovernanceRules() : execution_allowed(true) {
+        SigmaOS::Kernel::Context::ContextManager::getInstance().registerModule("agent.policy", this);
+    }
 
 public:
     static GovernanceRules& getInstance() {
@@ -25,11 +29,15 @@ public:
 
     void enforceComplianceMode(bool strict) {
         if (strict) {
-            sigma_log("[GOVERNANCE] Strict compliance mode enforced.");
+            sigma_log("[GOVERNANCE] Strict compliance mode enforced.\n");
         }
     }
 };
 
 extern "C" bool check_governance_policy() {
-    return GovernanceRules::getInstance().isExecutionAllowed();
+    GovernanceRules* policyModule = (GovernanceRules*) SigmaOS::Kernel::Context::ContextManager::getInstance().resolve("agent.policy");
+    if (!policyModule) {
+        policyModule = &GovernanceRules::getInstance();
+    }
+    return policyModule->isExecutionAllowed();
 }
