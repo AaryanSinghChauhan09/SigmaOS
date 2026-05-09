@@ -41,6 +41,9 @@ To fill technical gaps and ensure drivers work for almost every device, SigmaOS 
 | **Connectivity**| Intel Bluetooth | `Intel_Bluetooth.cpp` | Operational |
 | **Multimedia** | USB UVC Webcam | `USB_UVC_Camera.cpp` | Operational |
 | **Storage** | SD/MMC Reader | `SDHCI_CardReader.cpp` | Operational |
+| **Security** | Fingerprint Reader | `USB_Fingerprint.cpp` | Operational |
+| **Video** | Backlight Control | `ACPI_Backlight.cpp` | Operational |
+| **System** | Thermal Management | `Intel_Thermal.cpp` | Operational |
 
 ## 🧪 Testing Environment
 
