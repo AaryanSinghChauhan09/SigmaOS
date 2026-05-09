@@ -69,6 +69,14 @@ int   sigma_hardened_strncmp(const char* s1, const char* s2, sigma_size_t n);
 void* sigma_malloc(sigma_size_t size);
 void  sigma_free(void* ptr);
 
+// ABI-001/003: musl-libc compatible shims
+void* kmalloc(size_t size);
+void  kfree(void* ptr);
+
+// musl-compatible syscall wrappers
+long sigma_musl_syscall(long num, ...);
+void sigma_musl_init_stack(void* stack_top);
+
 /* =========================================================================
  * LINUX KERNEL COMPATIBILITY SHIMS (ABI-001)
  * ========================================================================= */
