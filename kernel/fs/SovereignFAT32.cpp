@@ -66,17 +66,17 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void fat32_init() {
-    SovereignFAT32Engine::getInstance().init();
+    SovereignFAT32Engine::init();
 }
 
 extern "C" bool fat32_mount(sigma_u32 partition_offset) {
-    return SovereignFAT32Engine::getInstance().mount(partition_offset);
+    return SovereignFAT32Engine::mount(partition_offset);
 }
 
 extern "C" void fat32_unmount() {
-    SovereignFAT32Engine::getInstance().unmount();
+    SovereignFAT32Engine::unmount();
 }
 
 extern "C" int fat32_read_file(const char* path, void* buffer, sigma_u32 size) { (void)buffer;
-    return SovereignFAT32Engine::getInstance().readFile(path, buffer, size);
+    return SovereignFAT32Engine::readFile(path, buffer, size);
 }

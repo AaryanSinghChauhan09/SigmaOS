@@ -53,15 +53,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void sched_init() {
-    SovereignScheduler::getInstance().init();
+    SovereignScheduler::init();
 }
 
 extern "C" void sched_enqueue(sigma_u32 thread_id, sigma_u32 priority) {
-    SovereignScheduler::getInstance().enqueueThread(thread_id, priority);
+    SovereignScheduler::enqueueThread(thread_id, priority);
 }
 
 extern "C" sigma_u32 sched_predict_next() {
-    return SovereignScheduler::getInstance().predictNextThread();
+    return SovereignScheduler::predictNextThread();
 }
 
 

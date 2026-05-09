@@ -60,11 +60,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void marketplace_init() {
-    SigmaOS::Kernel::Ecosystem::SovereignMarketplace::getInstance().init();
+    SigmaOS::Kernel::Ecosystem::SovereignMarketplace::init();
 }
 
 extern "C" void marketplace_publish(const char* orb, const char* author) {
-    SigmaOS::Kernel::Ecosystem::SovereignMarketplace::getInstance().publishOrb(orb, author);
+    SigmaOS::Kernel::Ecosystem::SovereignMarketplace::publishOrb(orb, author);
 }
 
 

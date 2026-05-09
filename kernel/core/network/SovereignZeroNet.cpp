@@ -30,15 +30,15 @@ bool SovereignZeroNet::establishConnection(sigma_u32 source, sigma_u32 target) {
 
 /* --- C Bridge --- */
 extern "C" void zeronet_init() {
-    SigmaOS::Kernel::Network::SovereignZeroNet::getInstance().init();
+    SigmaOS::Kernel::Network::SovereignZeroNet::init();
 }
 
 extern "C" void zeronet_transfer(void* data, sigma_size_t len, const char* dest) {
-    SigmaOS::Kernel::Network::SovereignZeroNet::getInstance().transfer(data, len, dest);
+    SigmaOS::Kernel::Network::SovereignZeroNet::transfer(data, len, dest);
 }
 
 extern "C" bool zeronet_establish_connection(sigma_u32 source, sigma_u32 target) {
-    return SigmaOS::Kernel::Network::SovereignZeroNet::getInstance().establishConnection(source, target);
+    return SigmaOS::Kernel::Network::SovereignZeroNet::establishConnection(source, target);
 }
 
 extern "C" void zeronet_verify_traffic(sigma_u32 conn_id, const void* payload, sigma_u32 size) {

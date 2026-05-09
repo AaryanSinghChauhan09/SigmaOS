@@ -49,17 +49,17 @@ void SovereignCryptoEngine::signShard(sigma_u32 shard_id, sigma_integrity_token_
 
 /* --- C Wrappers --- */
 extern "C" void crypto_init() {
-    SovereignCryptoEngine::getInstance().init();
+    SovereignCryptoEngine::init();
 }
 
 extern "C" sigma_integrity_token_t crypto_verify_shard(sigma_u32 shard_id,
                                                         const void* data,
                                                         sigma_size_t size) {
-    return SovereignCryptoEngine::getInstance().verifyShard(shard_id, data, size);
+    return SovereignCryptoEngine::verifyShard(shard_id, data, size);
 }
 
 extern "C" void crypto_sign_shard(sigma_u32 shard_id, sigma_integrity_token_t* token) {
-    SovereignCryptoEngine::getInstance().signShard(shard_id, token);
+    SovereignCryptoEngine::signShard(shard_id, token);
 }
 
 

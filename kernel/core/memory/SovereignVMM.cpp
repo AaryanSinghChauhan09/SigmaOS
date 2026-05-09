@@ -57,19 +57,19 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void vmm_init() {
-    SigmaOS::Kernel::Memory::SovereignVMM::getInstance().init();
+    SigmaOS::Kernel::Memory::SovereignVMM::init();
 }
 
 extern "C" void vmm_handle_fault(sigma_u64 addr) {
-    SigmaOS::Kernel::Memory::SovereignVMM::getInstance().handlePageFault(addr);
+    SigmaOS::Kernel::Memory::SovereignVMM::handlePageFault(addr);
 }
 
 extern "C" void vmm_map(sigma_u64 virt, sigma_u64 phys, sigma_u32 flags) {
-    SigmaOS::Kernel::Memory::SovereignVMM::getInstance().mapAddress(virt, phys, flags);
+    SigmaOS::Kernel::Memory::SovereignVMM::mapAddress(virt, phys, flags);
 }
 
 extern "C" void vmm_set_swap(bool enable) {
-    SigmaOS::Kernel::Memory::SovereignVMM::getInstance().setSwap(enable);
+    SigmaOS::Kernel::Memory::SovereignVMM::setSwap(enable);
 }
 
 

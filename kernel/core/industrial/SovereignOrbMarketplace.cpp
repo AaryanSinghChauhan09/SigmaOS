@@ -49,15 +49,15 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void market_init() {
-    SigmaOS::Kernel::Industrial::SovereignOrbMarketplace::getInstance().init();
+    SigmaOS::Kernel::Industrial::SovereignOrbMarketplace::init();
 }
 
 extern "C" void market_browse(const char* cat) {
-    SigmaOS::Kernel::Industrial::SovereignOrbMarketplace::getInstance().browseOrbs(cat);
+    SigmaOS::Kernel::Industrial::SovereignOrbMarketplace::browseOrbs(cat);
 }
 
 extern "C" bool market_download(const char* id) {
-    return SigmaOS::Kernel::Industrial::SovereignOrbMarketplace::getInstance().downloadOrb(id);
+    return SigmaOS::Kernel::Industrial::SovereignOrbMarketplace::downloadOrb(id);
 }
 
 

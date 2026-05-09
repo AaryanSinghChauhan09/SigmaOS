@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "K8sControlPlaneShield"; }
 
-    void secureControlPlane() {
+    static void secureControlPlane() {
         sigma_log_info("[K8S-SHIELD] Enforcing Etcd encryption with SovereignPQC...");
         sigma_log_info("[K8S-SHIELD] Auditing API-Server calls via SovereignAppArmor.");
         sigma_log_info("[K8S-SHIELD] Enterprise Kubernetes: [SECURE]. Parity: [Rancher/Flatcar].");
@@ -33,11 +33,9 @@ public:
 private:
     K8sControlPlaneShield() = default;
 };
-
-}
-}
-}
-
+} // namespace Industrial
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void k8s_shield_init() {
-    SigmaOS::Kernel::Industrial::K8sControlPlaneShield::getInstance().secureControlPlane();
+    SigmaOS::Kernel::Industrial::K8sControlPlaneShield::secureControlPlane();
 }

@@ -49,15 +49,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void install_init() {
-    SovereignInstallerEngine::getInstance().init();
+    SovereignInstallerEngine::init();
 }
 
 extern "C" void install_execute() {
-    SovereignInstallerEngine::getInstance().execute();
+    SovereignInstallerEngine::execute();
 }
 
 extern "C" sigma_u32 install_get_progress() {
-    return SovereignInstallerEngine::getInstance().getProgress();
+    return SovereignInstallerEngine::getProgress();
 }
 
 

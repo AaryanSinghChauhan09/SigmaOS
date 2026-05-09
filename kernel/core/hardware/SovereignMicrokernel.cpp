@@ -59,19 +59,19 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void microkernel_init() {
-    SovereignMicrokernelEngine::getInstance().init();
+    SovereignMicrokernelEngine::init();
 }
 
 extern "C" void microkernel_enable() {
-    SovereignMicrokernelEngine::getInstance().enableMicrokernelMode();
+    SovereignMicrokernelEngine::enableMicrokernelMode();
 }
 
 extern "C" void microkernel_disable() {
-    SovereignMicrokernelEngine::getInstance().disableMicrokernelMode();
+    SovereignMicrokernelEngine::disableMicrokernelMode();
 }
 
 extern "C" sigma_u32 microkernel_allocate_ipc(sigma_u32 service_a, sigma_u32 service_b) {
-    return SovereignMicrokernelEngine::getInstance().allocateIPCChannel(service_a, service_b);
+    return SovereignMicrokernelEngine::allocateIPCChannel(service_a, service_b);
 }
 
 

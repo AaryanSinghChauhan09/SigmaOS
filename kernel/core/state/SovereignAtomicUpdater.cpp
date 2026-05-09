@@ -65,15 +65,15 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void atomic_os_init() {
-    SigmaOS::Kernel::System::SovereignAtomicUpdater::getInstance().init();
+    SigmaOS::Kernel::System::SovereignAtomicUpdater::init();
 }
 
 extern "C" void atomic_deploy(const char* hash) {
-    SigmaOS::Kernel::System::SovereignAtomicUpdater::getInstance().deployUpdate(hash);
+    SigmaOS::Kernel::System::SovereignAtomicUpdater::deployUpdate(hash);
 }
 
 extern "C" void atomic_rollback() {
-    SigmaOS::Kernel::System::SovereignAtomicUpdater::getInstance().rollback();
+    SigmaOS::Kernel::System::SovereignAtomicUpdater::rollback();
 }
 
 

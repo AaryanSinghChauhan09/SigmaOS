@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "NvmeCoreShard"; }
 
-    void initNvme() {
+    static void initNvme() {
         sigma_log_info("[NVME] Probing for NVMe PCIe controllers...");
         sigma_log_info("[NVME] Mapping Submission/Completion queues to SovereignLattice.");
         sigma_log_info("[NVME] Storage active: [Samsung 990 Pro Detected]. Throughput: 7GB/s.");
@@ -34,10 +34,10 @@ private:
     NvmeCoreShard() = default;
 };
 
-}
-}
-}
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" void nvme_core_init() {
-    SigmaOS::Kernel::Drivers::NvmeCoreShard::getInstance().initNvme();
+    SigmaOS::Kernel::Drivers::NvmeCoreShard::initNvme();
 }

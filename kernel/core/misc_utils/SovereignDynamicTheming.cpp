@@ -43,11 +43,11 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void theme_init() {
-    SovereignThemeEngine::getInstance().init();
+    SovereignThemeEngine::init();
 }
 
 extern "C" void theme_update_ambient(sigma_u32 lux) {
-    SovereignThemeEngine::getInstance().updateAmbientContext(lux);
+    SovereignThemeEngine::updateAmbientContext(lux);
 }
 
 

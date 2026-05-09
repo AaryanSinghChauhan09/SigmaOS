@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignEmergencySync"; }
 
-    void initiateSync() {
+    static void initiateSync() {
         sigma_log_warn("[EMERGENCY-SYNC] Critical lattice corruption detected!");
         sigma_log_info("[EMERGENCY-SYNC] Initiating peer-to-peer shard recovery via Aether-Mesh...");
         
@@ -39,10 +39,10 @@ private:
     SovereignEmergencySync() = default;
 };
 
-}
-}
-}
+} // namespace Reliability
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" void emergency_sync_start() {
-    SigmaOS::Kernel::Reliability::SovereignEmergencySync::getInstance().initiateSync();
+    SigmaOS::Kernel::Reliability::SovereignEmergencySync::initiateSync();
 }

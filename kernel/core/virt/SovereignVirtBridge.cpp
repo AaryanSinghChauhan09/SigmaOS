@@ -34,11 +34,9 @@ public:
 private:
     SovereignVirtBridge() = default;
 };
-
-}
-}
-}
-
+} // namespace Virt
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void virt_bridge_init() {
-    SigmaOS::Kernel::Virt::SovereignVirtBridge::getInstance().detectHypervisor();
+    SigmaOS::Kernel::Virt::SovereignVirtBridge::detectHypervisor();
 }

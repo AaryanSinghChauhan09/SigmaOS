@@ -48,11 +48,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void web_bridge_init() {
-    SigmaOS::Kernel::Network::SovereignWebBridge::getInstance().init();
+    SigmaOS::Kernel::Network::SovereignWebBridge::init();
 }
 
 extern "C" void web_bridge_connect(const char* url) {
-    SigmaOS::Kernel::Network::SovereignWebBridge::getInstance().connect(url);
+    SigmaOS::Kernel::Network::SovereignWebBridge::connect(url);
 }
 
 

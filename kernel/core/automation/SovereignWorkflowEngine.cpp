@@ -65,20 +65,18 @@ public:
             if (match && *a == '\0' && *b == '\0') {
                 sigma_log_info("[AUTO] Event dispatched — executing rule action.");
                 if (m_rules[i].action) m_rules[i].action();
-            }
-        }
-    }
-
+} // namespace Automation
+} // namespace Kernel
+} // namespace SigmaOS
     void update(sigma_u64 uptime_ms) {
         for (sigma_u32 i = 0u; i < m_schedule_count; i++) {
             if (m_schedule[i].next_run_ms <= uptime_ms) {
                 sigma_log_info("[AUTO] Scheduled task triggered — executing action.");
                 if (m_schedule[i].action) m_schedule[i].action();
                 m_schedule[i].next_run_ms = uptime_ms + m_schedule[i].interval_ms;
-            }
-        }
-    }
-
+} // namespace Automation
+} // namespace Kernel
+} // namespace SigmaOS
     void scheduleTask(sigma_u64 interval_ms, sigma_action_fn action) {
         if (m_schedule_count >= SIGMA_MAX_RULES) return;
         m_schedule[m_schedule_count].interval_ms = interval_ms;
@@ -126,13 +124,13 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void sigma_workflow_init() {
-    SigmaOS::Kernel::Automation::SovereignWorkflowEngineShard::getInstance().initialize();
+    SigmaOS::Kernel::Automation::SovereignWorkflowEngineShard::initialize();
 }
 
 extern "C" void sigma_workflow_dispatch(const char* trigger, const char* data) {
-    SigmaOS::Kernel::Automation::SovereignWorkflowEngineShard::getInstance().dispatchEvent(trigger, data);
+    SigmaOS::Kernel::Automation::SovereignWorkflowEngineShard::dispatchEvent(trigger, data);
 }
 
 extern "C" void sigma_workflow_update(unsigned long long uptime_ms) {
-    SigmaOS::Kernel::Automation::SovereignWorkflowEngineShard::getInstance().update(uptime_ms);
+    SigmaOS::Kernel::Automation::SovereignWorkflowEngineShard::update(uptime_ms);
 }

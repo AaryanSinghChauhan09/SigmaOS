@@ -72,23 +72,23 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void sync_init() {
-    SovereignSyncEngine::getInstance().init();
+    SovereignSyncEngine::init();
 }
 
 extern "C" void sync_lattice_push(sigma_u32 shard_id, const void* data, sigma_size_t size) {
-    SovereignSyncEngine::getInstance().push(shard_id, data, size);
+    SovereignSyncEngine::push(shard_id, data, size);
 }
 
 extern "C" void sync_lattice_pull(sigma_u32 shard_id, void* out_data, sigma_size_t size) {
-    SovereignSyncEngine::getInstance().pull(shard_id, out_data, size);
+    SovereignSyncEngine::pull(shard_id, out_data, size);
 }
 
 extern "C" void sync_reconcile_all() {
-    SovereignSyncEngine::getInstance().reconcileAll();
+    SovereignSyncEngine::reconcileAll();
 }
 
 extern "C" const sigma_sync_state_t* sync_get_state() {
-    return SovereignSyncEngine::getInstance().getState();
+    return SovereignSyncEngine::getState();
 }
 
 

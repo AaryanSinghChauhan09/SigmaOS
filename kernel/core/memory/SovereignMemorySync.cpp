@@ -53,15 +53,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void memsync_init() {
-    SovereignMemorySyncEngine::getInstance().init();
+    SovereignMemorySyncEngine::init();
 }
 
 extern "C" void memsync_fence(const char* src, const char* tgt) {
-    SovereignMemorySyncEngine::getInstance().emitMemoryFence(src, tgt);
+    SovereignMemorySyncEngine::emitMemoryFence(src, tgt);
 }
 
 extern "C" bool memsync_cas(sigma_u32* addr, sigma_u32 expected, sigma_u32 new_val) {
-    return SovereignMemorySyncEngine::getInstance().compareAndSwapCrossISA(addr, expected, new_val);
+    return SovereignMemorySyncEngine::compareAndSwapCrossISA(addr, expected, new_val);
 }
 
 

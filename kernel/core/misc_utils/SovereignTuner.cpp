@@ -50,15 +50,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void tuner_init() {
-    SovereignTunerEngine::getInstance().init();
+    SovereignTunerEngine::init();
 }
 
 extern "C" void tuner_probe() {
-    SovereignTunerEngine::getInstance().probeSiliconExtensions();
+    SovereignTunerEngine::probeSiliconExtensions();
 }
 
 extern "C" void tuner_exec(const char* workload) {
-    SovereignTunerEngine::getInstance().executeAcceleratedWorkload(workload);
+    SovereignTunerEngine::executeAcceleratedWorkload(workload);
 }
 
 

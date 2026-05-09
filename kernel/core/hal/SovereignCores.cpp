@@ -49,15 +49,15 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void cores_init() {
-    SigmaOS::Kernel::HAL::SovereignCoreManager::getInstance().init();
+    SigmaOS::Kernel::HAL::SovereignCoreManager::init();
 }
 
 extern "C" void cores_scale(sigma_u32 count) {
-    SigmaOS::Kernel::HAL::SovereignCoreManager::getInstance().scaleCores(count);
+    SigmaOS::Kernel::HAL::SovereignCoreManager::scaleCores(count);
 }
 
 extern "C" void cores_status() {
-    SigmaOS::Kernel::HAL::SovereignCoreManager::getInstance().listCoreStatus();
+    SigmaOS::Kernel::HAL::SovereignCoreManager::listCoreStatus();
 }
 
 

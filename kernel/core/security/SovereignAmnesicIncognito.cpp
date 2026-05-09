@@ -54,11 +54,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void incognito_init() {
-    SigmaOS::Kernel::Security::SovereignAmnesicIncognito::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignAmnesicIncognito::init();
 }
 
 extern "C" void incognito_launch(const char* shard) {
-    SigmaOS::Kernel::Security::SovereignAmnesicIncognito::getInstance().launchUntraceableShard(shard);
+    SigmaOS::Kernel::Security::SovereignAmnesicIncognito::launchUntraceableShard(shard);
 }
 
 

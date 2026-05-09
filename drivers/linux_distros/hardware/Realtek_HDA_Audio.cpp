@@ -25,7 +25,7 @@ public:
 
     const char* type_name() const noexcept override { return "RealtekHDAAudio"; }
 
-    bool initDevice() {
+    static bool initDevice() {
         sigma_log_info("[HDA-AUDIO] Probing for Realtek High Definition Audio Controller...");
         // Map ALSA kernel structures to Sovereign Audio Shard
         sigma_log_info("[HDA-AUDIO] PCM streams initialized. Mixer levels normalized.");
@@ -36,12 +36,10 @@ public:
 private:
     RealtekHDAAudio() = default;
 };
-
-}
-}
-}
-}
-
+} // namespace Hardware
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void hda_audio_init() {
-    SigmaOS::Kernel::Drivers::Hardware::RealtekHDAAudio::getInstance().initDevice();
+    SigmaOS::Kernel::Drivers::Hardware::RealtekHDAAudio::initDevice();
 }

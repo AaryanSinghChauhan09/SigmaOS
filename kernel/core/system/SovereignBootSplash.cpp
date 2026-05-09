@@ -46,10 +46,10 @@ private:
     sigma_u32 fb_w, fb_h, progress;
 };
 
-extern "C" void bootsplash_init(sigma_u32 w, sigma_u32 h) { SovereignBootSplashEngine::getInstance().init(w, h); }
-extern "C" void bootsplash_progress(sigma_u32 pct, const char* stage) { SovereignBootSplashEngine::getInstance().updateProgress(pct, stage); }
-extern "C" void bootsplash_set_theme(const char* theme) { SovereignBootSplashEngine::getInstance().setTheme(theme); }
-extern "C" void bootsplash_dismiss() { SovereignBootSplashEngine::getInstance().dismiss(); }
+extern "C" void bootsplash_init(sigma_u32 w, sigma_u32 h) { SovereignBootSplashEngine::init(w, h); }
+extern "C" void bootsplash_progress(sigma_u32 pct, const char* stage) { SovereignBootSplashEngine::updateProgress(pct, stage); }
+extern "C" void bootsplash_set_theme(const char* theme) { SovereignBootSplashEngine::setTheme(theme); }
+extern "C" void bootsplash_dismiss() { SovereignBootSplashEngine::dismiss(); }
 
 
 

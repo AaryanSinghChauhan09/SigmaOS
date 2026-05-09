@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignAgentGovernance"; }
 
-    void setQuotas(const char* agent_id, sigma_u32 cpu_limit, sigma_u32 mem_limit, sigma_u32 gpu_weight) {
+    static void setQuotas(const char* agent_id, sigma_u32 cpu_limit, sigma_u32 mem_limit, sigma_u32 gpu_weight) {
         sigma_log_info("[AGENT-GOV] Setting multi-dimensional quotas for agent:");
         sigma_log_info(agent_id);
         
@@ -33,7 +33,7 @@ public:
         sigma_log_info("[AGENT-GOV] GPU Weight: %u (Priority Acceleration)", gpu_weight);
     }
 
-    void monitorCompliance() {
+    static void monitorCompliance() {
         sigma_log_info("[AGENT-GOV] Auditing agent resource consumption...");
         sigma_log_info("[AGENT-GOV] Compliance: [100%]. All agents within lattice boundaries.");
     }
@@ -41,15 +41,13 @@ public:
 private:
     SovereignAgentGovernance() = default;
 };
-
-}
-}
-}
-
+} // namespace Automation
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void agent_gov_set_quotas(const char* id, sigma_u32 cpu, sigma_u32 mem, sigma_u32 gpu) {
-    SigmaOS::Kernel::Automation::SovereignAgentGovernance::getInstance().setQuotas(id, cpu, mem, gpu);
+    SigmaOS::Kernel::Automation::SovereignAgentGovernance::setQuotas(id, cpu, mem, gpu);
 }
 
 extern "C" void agent_gov_audit() {
-    SigmaOS::Kernel::Automation::SovereignAgentGovernance::getInstance().monitorCompliance();
+    SigmaOS::Kernel::Automation::SovereignAgentGovernance::monitorCompliance();
 }

@@ -48,11 +48,11 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void container_init() {
-    SovereignContainerEngine::getInstance().init();
+    SovereignContainerEngine::init();
 }
 
 extern "C" void container_spawn(const char* name, const char* entrypoint) {
-    SovereignContainerEngine::getInstance().spawnContainer(name, entrypoint);
+    SovereignContainerEngine::spawnContainer(name, entrypoint);
 }
 
 

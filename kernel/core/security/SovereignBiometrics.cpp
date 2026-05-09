@@ -49,11 +49,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void biometrics_init() {
-    SigmaOS::Kernel::Security::SovereignBiometrics::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignBiometrics::init();
 }
 
 extern "C" bool biometrics_verify(const char* type, const void* data, sigma_size_t size) {
-    return SigmaOS::Kernel::Security::SovereignBiometrics::getInstance().verifyUser(type, data, size);
+    return SigmaOS::Kernel::Security::SovereignBiometrics::verifyUser(type, data, size);
 }
 
 

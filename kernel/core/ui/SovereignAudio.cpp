@@ -48,15 +48,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void audio_init() {
-    SovereignAudioEngine::getInstance().init();
+    SovereignAudioEngine::init();
 }
 
 extern "C" sigma_u32 audio_open_stream(const char* app, sigma_u32 channels) {
-    return SovereignAudioEngine::getInstance().openStream(app, channels);
+    return SovereignAudioEngine::openStream(app, channels);
 }
 
 extern "C" void audio_close_stream(sigma_u32 id) {
-    SovereignAudioEngine::getInstance().closeStream(id);
+    SovereignAudioEngine::closeStream(id);
 }
 
 

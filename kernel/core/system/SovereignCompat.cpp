@@ -50,15 +50,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void compat_init() {
-    SovereignCompatEngine::getInstance().init();
+    SovereignCompatEngine::init();
 }
 
 extern "C" bool compat_load_binary(const char* path, sigma_compat_mode_t mode) {
-    return SovereignCompatEngine::getInstance().loadBinary(path, mode);
+    return SovereignCompatEngine::loadBinary(path, mode);
 }
 
 extern "C" void compat_mediate_syscall(sigma_u32 foreign_id, void* args) {
-    SovereignCompatEngine::getInstance().mediateSyscall(foreign_id, args);
+    SovereignCompatEngine::mediateSyscall(foreign_id, args);
 }
 
 

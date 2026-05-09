@@ -38,7 +38,7 @@ public:
 
     void castVote(const char* node_id, const char* proposal_id, bool support) {
         // Enforce QKD verification for voting rights
-        if (!Security::SovereignQKD::getInstance().verifyQuantumIntegrity()) {
+        if (!Security::SovereignQKD::verifyQuantumIntegrity()) {
             sigma_log("Σ [GOVERNANCE]: [ERROR] Node '%s' rejected. Invalid Quantum Signature.\n", node_id);
             return;
         }
@@ -72,15 +72,15 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void governance_init_shard() {
-    SigmaOS::Kernel::Community::SovereignGovernance::getInstance().init();
+    SigmaOS::Kernel::Community::SovereignGovernance::init();
 }
 
 extern "C" void governance_submit(const char* prop) {
-    SigmaOS::Kernel::Community::SovereignGovernance::getInstance().submitProposal(prop);
+    SigmaOS::Kernel::Community::SovereignGovernance::submitProposal(prop);
 }
 
 extern "C" void governance_vote(const char* node, const char* prop, bool support) {
-    SigmaOS::Kernel::Community::SovereignGovernance::getInstance().castVote(node, prop, support);
+    SigmaOS::Kernel::Community::SovereignGovernance::castVote(node, prop, support);
 }
 
 

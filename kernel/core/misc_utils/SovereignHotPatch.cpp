@@ -40,11 +40,11 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void hotpatch_init() {
-    SovereignHotPatchEngine::getInstance().init();
+    SovereignHotPatchEngine::init();
 }
 
 extern "C" void hotpatch_apply(const char* shard, sigma_u32 patch_id) {
-    SovereignHotPatchEngine::getInstance().applyPatch(shard, patch_id);
+    SovereignHotPatchEngine::applyPatch(shard, patch_id);
 }
 
 

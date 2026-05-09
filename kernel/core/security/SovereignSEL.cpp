@@ -33,7 +33,7 @@ public:
     bool verifyShardTrust(const char* shard_id) {
         (void)shard_id;
         // Cross-reference with SovereignQKD trust fabric
-        return SovereignQKD::getInstance().verifyQuantumIntegrity();
+        return SovereignQKD::verifyQuantumIntegrity();
     }
 
     void spawnSandbox(const char* name) {
@@ -68,11 +68,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void sel_init_shard() {
-    SigmaOS::Kernel::Security::SovereignSEL::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignSEL::init();
 }
 
 extern "C" void sel_spawn_sandbox(const char* name) {
-    SigmaOS::Kernel::Security::SovereignSEL::getInstance().spawnSandbox(name);
+    SigmaOS::Kernel::Security::SovereignSEL::spawnSandbox(name);
 }
 
 

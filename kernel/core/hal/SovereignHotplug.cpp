@@ -50,11 +50,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void hotplug_init() {
-    SigmaOS::Kernel::HAL::SovereignHotplugManager::getInstance().init();
+    SigmaOS::Kernel::HAL::SovereignHotplugManager::init();
 }
 
 extern "C" void hotplug_handle_event() {
-    SigmaOS::Kernel::HAL::SovereignHotplugManager::getInstance().handleInterrupt();
+    SigmaOS::Kernel::HAL::SovereignHotplugManager::handleInterrupt();
 }
 
 

@@ -49,11 +49,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void audit_init() {
-    SigmaOS::Kernel::Security::SovereignAuditEngine::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignAuditEngine::init();
 }
 
 extern "C" void audit_log_shard_event(const char* shard, const char* ev) {
-    SigmaOS::Kernel::Security::SovereignAuditEngine::getInstance().logEvent(shard, ev);
+    SigmaOS::Kernel::Security::SovereignAuditEngine::logEvent(shard, ev);
 }
 
 

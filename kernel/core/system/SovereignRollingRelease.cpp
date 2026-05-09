@@ -54,11 +54,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void rolling_release_init() {
-    SigmaOS::Kernel::System::SovereignRollingRelease::getInstance().init();
+    SigmaOS::Kernel::System::SovereignRollingRelease::init();
 }
 
 extern "C" void rolling_sync() {
-    SigmaOS::Kernel::System::SovereignRollingRelease::getInstance().syncBleedingEdge();
+    SigmaOS::Kernel::System::SovereignRollingRelease::syncBleedingEdge();
 }
 
 

@@ -53,19 +53,19 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void bench_init() {
-    SovereignBenchmarkEngine::getInstance().init();
+    SovereignBenchmarkEngine::init();
 }
 
 extern "C" void bench_context_switch(sigma_u32 iterations) {
-    SovereignBenchmarkEngine::getInstance().runContextSwitchBenchmark(iterations);
+    SovereignBenchmarkEngine::runContextSwitchBenchmark(iterations);
 }
 
 extern "C" void bench_memory_throughput(sigma_u32 buffer_mb) {
-    SovereignBenchmarkEngine::getInstance().runMemoryThroughputBenchmark(buffer_mb);
+    SovereignBenchmarkEngine::runMemoryThroughputBenchmark(buffer_mb);
 }
 
 extern "C" void bench_publish() {
-    SovereignBenchmarkEngine::getInstance().publishResults();
+    SovereignBenchmarkEngine::publishResults();
 }
 
 

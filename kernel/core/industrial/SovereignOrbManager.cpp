@@ -26,6 +26,7 @@
  *   Layer 3 Security shard (SovereignQKD) only via its public C++ interface.
  *   It must never access kernel memory directly.
  */
+extern "C" int orb_resolve_deps(const char* name);
 
 namespace SigmaOS {
 namespace Kernel {
@@ -44,15 +45,14 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignOrbManager"; }
 
-    void init() {
+    static void init() {
         sigma_log_info("[ORB-MAN] Initializing Sovereign Package Ecosystem...");
         /* m_installed_orbs is default-initialized to 0 via member initializer */
         sigma_log_info("[ORB-MAN] Orb-Lattice Registry ONLINE (Zero-Dependency).");
     }
 
-    bool resolveDependencies(OrbName name) {
+    static bool resolveDependencies(OrbName name) {
         // Now handled by SovereignOrbResolver shard
-        extern "C" int orb_resolve_deps(const char* name);
         return orb_resolve_deps(name.value) != 0;
     }
 
@@ -63,7 +63,7 @@ public:
      * Using strong-type wrappers OrbName/OrbSig prevents the two adjacent
      * `const char*` parameters from being accidentally swapped.
      */
-    void installOrb(OrbName name, OrbSig sig) {
+    static void installOrb(OrbName name, OrbSig sig) {
         if (!resolveDependencies(name)) {
             sigma_log_err("[ORB-MAN] Dependency resolution FAILED. Aborting install.");
             return;
@@ -78,24 +78,26 @@ public:
 
         if (verified) {
             sigma_log_info("[ORB-MAN] Orb INTEGRATED into Lattice.");
-            if (m_installed_orbs < 10) {
-                sigma_strncpy(m_registry[m_installed_orbs], name.value, 63);
-                m_installed_orbs++;
+            auto& self = getInstance();
+            if (self.m_installed_orbs < 10) {
+                sigma_strncpy(self.m_registry[self.m_installed_orbs], name.value, 63);
+                self.m_installed_orbs++;
             }
         } else {
             sigma_log_err("[ORB-MAN] SIGNATURE MISMATCH — Orb rejected by QKD Core.");
         }
     }
 
-    void rollbackOrb(OrbName name) {
+    static void rollbackOrb(OrbName name) {
         sigma_log_info("[ORB-MAN] Initiating rollback for Orb...");
         bool found = false;
-        for (sigma_u32 i = 0; i < m_installed_orbs; ++i) {
-            if (sigma_streq(m_registry[i], name.value)) {
+        auto& self = getInstance();
+        for (sigma_u32 i = 0; i < self.m_installed_orbs; ++i) {
+            if (sigma_streq(self.m_registry[i], name.value)) {
                 sigma_log_info("[ORB-MAN] Rollback SUCCESSFUL. System state reverted for:");
                 sigma_log_info(name.value);
-                m_registry[i][0] = '\0'; // Simple mock removal
-                m_installed_orbs--;
+                self.m_registry[i][0] = '\0'; // Simple mock removal
+                self.m_installed_orbs--;
                 found = true;
                 break;
             }
@@ -105,11 +107,12 @@ public:
         }
     }
 
-    void listOrbs() const {
+    static void listOrbs() {
         sigma_log_info("[ORB-MAN] --- Σ SOVEREIGN ORB REGISTRY ---");
+        auto& self = getInstance();
         for (sigma_u32 i = 0; i < 10; ++i) {
-            if (m_registry[i][0] != '\0') {
-                sigma_log_info(m_registry[i]);
+            if (self.m_registry[i][0] != '\0') {
+                sigma_log_info(self.m_registry[i]);
             }
         }
         sigma_log_info("[ORB-MAN] --------------------------------");
@@ -132,20 +135,20 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void orb_manager_init() {
-    SigmaOS::Kernel::Industrial::SovereignOrbManager::getInstance().init();
+    SigmaOS::Kernel::Industrial::SovereignOrbManager::init();
 }
 
 extern "C" void orb_install(const char* orb_name, const char* orb_sig) {
-    SigmaOS::Kernel::Industrial::SovereignOrbManager::getInstance().installOrb(
+    SigmaOS::Kernel::Industrial::SovereignOrbManager::installOrb(
         SigmaOS::Kernel::Industrial::OrbName{orb_name},
         SigmaOS::Kernel::Industrial::OrbSig{orb_sig});
 }
 
 extern "C" void orb_rollback(const char* orb_name) {
-    SigmaOS::Kernel::Industrial::SovereignOrbManager::getInstance().rollbackOrb(
+    SigmaOS::Kernel::Industrial::SovereignOrbManager::rollbackOrb(
         SigmaOS::Kernel::Industrial::OrbName{orb_name});
 }
 
 extern "C" void orb_list() {
-    SigmaOS::Kernel::Industrial::SovereignOrbManager::getInstance().listOrbs();
+    SigmaOS::Kernel::Industrial::SovereignOrbManager::listOrbs();
 }

@@ -50,9 +50,9 @@ private:
 } // namespace SigmaOS
 
 extern "C" void sigma_smp_init() {
-    SigmaOS::Arch::SovereignSMP::getInstance().bootAPs();
+    SigmaOS::Arch::SovereignSMP::bootAPs();
 }
 
 extern "C" void sigma_smp_send_ipi(unsigned int core_id, unsigned int vector) {
-    SigmaOS::Arch::SovereignSMP::getInstance().sendIPI((sigma_u32)core_id, (sigma_u32)vector);
+    SigmaOS::Arch::SovereignSMP::sendIPI((sigma_u32)core_id, (sigma_u32)vector);
 }

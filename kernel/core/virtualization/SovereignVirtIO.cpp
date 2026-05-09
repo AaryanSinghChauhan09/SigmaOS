@@ -50,11 +50,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void virtio_init() {
-    SigmaOS::Kernel::Virtualization::SovereignVirtIO::getInstance().init();
+    SigmaOS::Kernel::Virtualization::SovereignVirtIO::init();
 }
 
 extern "C" void virtio_notify(sigma_u32 qid) {
-    SigmaOS::Kernel::Virtualization::SovereignVirtIO::getInstance().processQueue(qid);
+    SigmaOS::Kernel::Virtualization::SovereignVirtIO::processQueue(qid);
 }
 
 

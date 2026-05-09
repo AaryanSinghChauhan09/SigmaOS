@@ -40,11 +40,11 @@ void SovereignAppShard::listActiveShards() {
 
 /* --- C Bridge --- */
 extern "C" void shard_layer_init() {
-    SigmaOS::Kernel::Core::SovereignAppShard::getInstance().init();
+    SigmaOS::Kernel::Core::SovereignAppShard::init();
 }
 
 extern "C" void shard_orchestrate(const char* id) {
-    SigmaOS::Kernel::Core::SovereignAppShard::getInstance().orchestrate(id);
+    SigmaOS::Kernel::Core::SovereignAppShard::orchestrate(id);
 }
 
 

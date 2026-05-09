@@ -42,11 +42,11 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void container_storage_init() {
-    SovereignContainerStorageEngine::getInstance().init();
+    SovereignContainerStorageEngine::init();
 }
 
 extern "C" void container_storage_mount(const char* container, const char* path) {
-    SovereignContainerStorageEngine::getInstance().mountVFSVolume(container, path);
+    SovereignContainerStorageEngine::mountVFSVolume(container, path);
 }
 
 

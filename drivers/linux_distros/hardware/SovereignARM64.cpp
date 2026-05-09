@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignARM64RPi5"; }
 
-    void initBroadcom() {
+    static void initBroadcom() {
         sigma_log_info("[ARM-RPi5] Probing Broadcom BCM2712 SoC...");
         
         // 1. Mailbox Interface
@@ -43,10 +43,10 @@ private:
     SovereignARM64RPi5() = default;
 };
 
-}
-}
-}
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" void arm64_rpi5_init() {
-    SigmaOS::Kernel::Drivers::SovereignARM64RPi5::getInstance().initBroadcom();
+    SigmaOS::Kernel::Drivers::SovereignARM64RPi5::initBroadcom();
 }

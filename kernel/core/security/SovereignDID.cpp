@@ -51,15 +51,15 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void did_init() {
-    SigmaOS::Kernel::Security::SovereignDIDManager::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignDIDManager::init();
 }
 
 extern "C" void did_create(const char* subject) {
-    SigmaOS::Kernel::Security::SovereignDIDManager::getInstance().createDID(subject);
+    SigmaOS::Kernel::Security::SovereignDIDManager::createDID(subject);
 }
 
 extern "C" bool did_verify(const char* did) {
-    return SigmaOS::Kernel::Security::SovereignDIDManager::getInstance().verifyDID(did);
+    return SigmaOS::Kernel::Security::SovereignDIDManager::verifyDID(did);
 }
 
 

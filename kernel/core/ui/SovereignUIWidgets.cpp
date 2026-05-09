@@ -50,15 +50,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void widgets_init() {
-    SovereignWidgetEngine::getInstance().init();
+    SovereignWidgetEngine::init();
 }
 
 extern "C" void widgets_spawn(const char* widget_type, sigma_u32 x, sigma_u32 y) {
-    SovereignWidgetEngine::getInstance().spawnWidget(widget_type, x, y);
+    SovereignWidgetEngine::spawnWidget(widget_type, x, y);
 }
 
 extern "C" void widgets_interact(sigma_u32 id, const char* interaction) {
-    SovereignWidgetEngine::getInstance().interactWidget(id, interaction);
+    SovereignWidgetEngine::interactWidget(id, interaction);
 }
 
 

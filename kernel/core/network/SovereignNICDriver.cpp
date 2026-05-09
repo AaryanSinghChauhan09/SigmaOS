@@ -72,19 +72,19 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void nic_init() {
-    SovereignNICDriverEngine::getInstance().init();
+    SovereignNICDriverEngine::init();
 }
 
 extern "C" bool nic_probe(sigma_u32 vendor_id, sigma_u32 device_id) {
-    return SovereignNICDriverEngine::getInstance().probe(vendor_id, device_id);
+    return SovereignNICDriverEngine::probe(vendor_id, device_id);
 }
 
 extern "C" bool nic_transmit(const char* payload, sigma_u32 length) {
-    return SovereignNICDriverEngine::getInstance().transmit(payload, length);
+    return SovereignNICDriverEngine::transmit(payload, length);
 }
 
 extern "C" void nic_rx_interrupt() {
-    SovereignNICDriverEngine::getInstance().receiveInterrupt();
+    SovereignNICDriverEngine::receiveInterrupt();
 }
 
 

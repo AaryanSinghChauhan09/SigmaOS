@@ -46,15 +46,15 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void config_init() {
-    SigmaOS::Kernel::System::SovereignConfigManager::getInstance().init();
+    SigmaOS::Kernel::System::SovereignConfigManager::init();
 }
 
 extern "C" void config_set(const char* key, const char* value) {
-    SigmaOS::Kernel::System::SovereignConfigManager::getInstance().setParameter(key, value);
+    SigmaOS::Kernel::System::SovereignConfigManager::setParameter(key, value);
 }
 
 extern "C" const char* config_get(const char* key) {
-    return SigmaOS::Kernel::System::SovereignConfigManager::getInstance().getParameter(key);
+    return SigmaOS::Kernel::System::SovereignConfigManager::getParameter(key);
 }
 
 

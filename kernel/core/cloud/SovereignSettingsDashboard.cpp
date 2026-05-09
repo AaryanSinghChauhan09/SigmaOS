@@ -46,15 +46,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void settings_init() {
-    SovereignSettingsDashboard::getInstance().init();
+    SovereignSettingsDashboard::init();
 }
 
 extern "C" void settings_toggle() {
-    SovereignSettingsDashboard::getInstance().toggleDashboard();
+    SovereignSettingsDashboard::toggleDashboard();
 }
 
 extern "C" void settings_apply(const char* category, const char* value) {
-    SovereignSettingsDashboard::getInstance().applyUserPreference(category, value);
+    SovereignSettingsDashboard::applyUserPreference(category, value);
 }
 
 

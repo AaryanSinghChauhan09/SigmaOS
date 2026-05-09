@@ -54,11 +54,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void vpn_init() {
-    SigmaOS::Kernel::Network::SovereignVPN::getInstance().init();
+    SigmaOS::Kernel::Network::SovereignVPN::init();
 }
 
 extern "C" void vpn_connect(const char* peer) {
-    SigmaOS::Kernel::Network::SovereignVPN::getInstance().establishTunnel(peer);
+    SigmaOS::Kernel::Network::SovereignVPN::establishTunnel(peer);
 }
 
 

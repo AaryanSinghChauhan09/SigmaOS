@@ -40,11 +40,11 @@ public:
 
 /* --- C Bridge --- */
 extern "C" void sigma_forge_scaffold(const char* name) {
-    SigmaOS::Kernel::System::SovereignForge::getInstance().scaffoldShard(name);
+    SigmaOS::Kernel::System::SovereignForge::scaffoldShard(name);
 }
 
 extern "C" void sigma_forge_build(const char* name) {
-    if (SigmaOS::Kernel::System::SovereignForge::getInstance().compileShard(name)) {
-        SigmaOS::Kernel::System::SovereignForge::getInstance().integrateShard(name);
+    if (SigmaOS::Kernel::System::SovereignForge::compileShard(name)) {
+        SigmaOS::Kernel::System::SovereignForge::integrateShard(name);
     }
 }

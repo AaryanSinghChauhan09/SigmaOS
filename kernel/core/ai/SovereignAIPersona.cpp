@@ -54,11 +54,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void ai_persona_init() {
-    SigmaOS::Kernel::AI::SovereignAIPersona::getInstance().init();
+    SigmaOS::Kernel::AI::SovereignAIPersona::init();
 }
 
 extern "C" void ai_persona_adapt(const char* ctx) {
-    SigmaOS::Kernel::AI::SovereignAIPersona::getInstance().adapt(ctx);
+    SigmaOS::Kernel::AI::SovereignAIPersona::adapt(ctx);
 }
 
 

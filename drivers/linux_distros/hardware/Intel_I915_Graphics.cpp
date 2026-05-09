@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "IntelI915Shard"; }
 
-    void init() {
+    static void init() {
         sigma_log_info("[I915] Probing Intel UHD/Iris Graphics...");
         sigma_log_info("[I915] Mapping GTT (Graphics Translation Table) apertures.");
         sigma_log_info("[I915] Display engine ONLINE. Framebuffer mapped to Zenith.");
@@ -34,10 +34,10 @@ private:
     IntelI915Shard() = default;
 };
 
-}
-}
-}
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" void i915_init() {
-    SigmaOS::Kernel::Drivers::IntelI915Shard::getInstance().init();
+    SigmaOS::Kernel::Drivers::IntelI915Shard::init();
 }

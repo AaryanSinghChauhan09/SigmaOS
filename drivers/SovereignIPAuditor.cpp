@@ -26,22 +26,22 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignIPAuditor"; }
 
-    bool verifyDriverCompliance(const char* driver_name, const char* license_tag) {
+    static bool verifyDriverCompliance(const char* driver_name, const char* license_tag) {
         sigma_log_info("[IP-AUDIT] Verifying IP compliance for driver:");
-        sigma_log_info(driver_name);
+        sigma_log_info("%s", driver_name);
 
         // Acceptable open-source licenses that allow integration
-        if (sigma_strstr(license_tag, "GPL") || 
-            sigma_strstr(license_tag, "MIT") || 
-            sigma_strstr(license_tag, "Apache") ||
-            sigma_strstr(license_tag, "Dual MIT/GPL")) {
+        if (sigma_strstr(license_tag, "GPL") != SIGMA_NULL || 
+            sigma_strstr(license_tag, "MIT") != SIGMA_NULL || 
+            sigma_strstr(license_tag, "Apache") != SIGMA_NULL ||
+            sigma_strstr(license_tag, "Dual MIT/GPL") != SIGMA_NULL) {
             
             sigma_log_info("[IP-AUDIT] License ACCEPTED. Driver is IP-compliant.");
             return true;
         }
 
         // Reject proprietary blobs without explicit legal agreements
-        if (sigma_strstr(license_tag, "Proprietary") || sigma_strstr(license_tag, "Closed")) {
+        if (sigma_strstr(license_tag, "Proprietary") != SIGMA_NULL || sigma_strstr(license_tag, "Closed") != SIGMA_NULL) {
             sigma_log_err("[IP-AUDIT] 🚨 LICENSE REJECTED: Proprietary driver blocked to prevent IP breach.");
             return false;
         }
@@ -54,11 +54,10 @@ private:
     SovereignIPAuditor() = default;
 };
 
-}
-}
-}
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" int ip_audit_verify(const char* name, const char* license) {
-    return SigmaOS::Kernel::Drivers::SovereignIPAuditor::getInstance()
-        .verifyDriverCompliance(name, license) ? 1 : 0;
+    return SigmaOS::Kernel::Drivers::SovereignIPAuditor::verifyDriverCompliance(name, license) ? 1 : 0;
 }

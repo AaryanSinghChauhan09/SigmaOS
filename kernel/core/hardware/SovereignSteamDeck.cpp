@@ -54,11 +54,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void gaming_perf_init() {
-    SigmaOS::Kernel::Hardware::SovereignGamingPerformance::getInstance().init();
+    SigmaOS::Kernel::Hardware::SovereignGamingPerformance::init();
 }
 
 extern "C" void gaming_perf_optimize() {
-    SigmaOS::Kernel::Hardware::SovereignGamingPerformance::getInstance().optimizeSession();
+    SigmaOS::Kernel::Hardware::SovereignGamingPerformance::optimizeSession();
 }
 
 

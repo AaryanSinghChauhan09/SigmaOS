@@ -39,9 +39,9 @@ public:
 } // namespace SigmaOS
 
 extern "C" void sigma_tpm_init() {
-    SigmaOS::Kernel::Security::SovereignTPMEngine::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignTPMEngine::init();
 }
 
 extern "C" int sigma_tpm_verify() {
-    return SigmaOS::Kernel::Security::SovereignTPMEngine::getInstance().verifyLatticeIntegrity() ? 1 : 0;
+    return SigmaOS::Kernel::Security::SovereignTPMEngine::verifyLatticeIntegrity() ? 1 : 0;
 }

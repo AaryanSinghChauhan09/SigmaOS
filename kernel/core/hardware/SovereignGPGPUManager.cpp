@@ -53,11 +53,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void gpgpu_init() {
-    SigmaOS::Kernel::Hardware::SovereignGPGPUManager::getInstance().init();
+    SigmaOS::Kernel::Hardware::SovereignGPGPUManager::init();
 }
 
 extern "C" void gpgpu_dispatch(const char* name, sigma_u32 t, sigma_u32 b) {
-    SigmaOS::Kernel::Hardware::SovereignGPGPUManager::getInstance().dispatchKernel(name, t, b);
+    SigmaOS::Kernel::Hardware::SovereignGPGPUManager::dispatchKernel(name, t, b);
 }
 
 

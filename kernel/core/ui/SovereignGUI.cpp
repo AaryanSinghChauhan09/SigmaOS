@@ -39,15 +39,15 @@ void SovereignGUIEngine::flush() {
 
 /* --- C Wrappers --- */
 extern "C" void gui_init(sigma_fb_config_t* config) {
-    SovereignGUIEngine::getInstance().init(config);
+    SovereignGUIEngine::init(config);
 }
 
 extern "C" void gui_draw_pixel(sigma_u32 x, sigma_u32 y, sigma_u32 color) {
-    SovereignGUIEngine::getInstance().drawPixel(x, y, color);
+    SovereignGUIEngine::drawPixel(x, y, color);
 }
 
 extern "C" void gui_flush() {
-    SovereignGUIEngine::getInstance().flush();
+    SovereignGUIEngine::flush();
 }
 
 

@@ -47,16 +47,16 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void time_init() {
-    SigmaOS::Kernel::System::SovereignTime::getInstance().init();
+    SigmaOS::Kernel::System::SovereignTime::init();
 }
 
 extern "C" sigma_u64 time_get_uptime_ms() {
-    return SigmaOS::Kernel::System::SovereignTime::getInstance().getUptimeMs();
+    return SigmaOS::Kernel::System::SovereignTime::getUptimeMs();
 }
 
 extern "C" sigma_time_t time_now() {
     sigma_time_t t = {0, 0, 0, 0, 0, 0, 0};
-    t.silicon_ticks = SigmaOS::Kernel::System::SovereignTime::getInstance().getUptimeMs();
+    t.silicon_ticks = SigmaOS::Kernel::System::SovereignTime::getUptimeMs();
     return t;
 }
 

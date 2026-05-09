@@ -42,9 +42,9 @@ private:
 } // namespace SigmaOS
 
 extern "C" void sigma_maint_cleanup() {
-    SigmaOS::Kernel::System::SovereignMaintenanceShard::getInstance().performCleanup();
+    SigmaOS::Kernel::System::SovereignMaintenanceShard::performCleanup();
 }
 
 extern "C" void sigma_maint_power(bool low) {
-    SigmaOS::Kernel::System::SovereignMaintenanceShard::getInstance().optimizePower(low);
+    SigmaOS::Kernel::System::SovereignMaintenanceShard::optimizePower(low);
 }

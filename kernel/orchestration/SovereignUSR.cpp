@@ -49,13 +49,13 @@ bool SovereignUSRManager::activateShard(sigma_u32 shard_id) {
 
 /* --- C Wrappers --- */
 extern "C" void usr_init() {
-    SovereignUSRManager::getInstance().init();
+    SovereignUSRManager::init();
 }
 
 extern "C" sigma_u32 usr_register_shard(const char* name, sigma_u32 quantum_key) {
-    return SovereignUSRManager::getInstance().registerShard(name, quantum_key);
+    return SovereignUSRManager::registerShard(name, quantum_key);
 }
 
 extern "C" bool usr_activate_shard(sigma_u32 shard_id) {
-    return SovereignUSRManager::getInstance().activateShard(shard_id);
+    return SovereignUSRManager::activateShard(shard_id);
 }

@@ -50,11 +50,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void peripheral_init() {
-    SigmaOS::Kernel::Hardware::SovereignPeripheralManager::getInstance().init();
+    SigmaOS::Kernel::Hardware::SovereignPeripheralManager::init();
 }
 
 extern "C" void peripheral_event(const char* id, bool plug) {
-    SigmaOS::Kernel::Hardware::SovereignPeripheralManager::getInstance().handleHotSwap(id, plug);
+    SigmaOS::Kernel::Hardware::SovereignPeripheralManager::handleHotSwap(id, plug);
 }
 
 

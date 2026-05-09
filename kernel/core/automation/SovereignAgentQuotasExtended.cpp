@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignAgentQuotasExtended"; }
 
-    void setExtendedQuotas(const char* agent_id) {
+    static void setExtendedQuotas(const char* agent_id) {
         sigma_log_info("[AGENT-QUOTA-EXT] Setting AI scalability boundaries for agent:");
         sigma_log_info(agent_id);
         
@@ -40,10 +40,10 @@ private:
     SovereignAgentQuotasExtended() = default;
 };
 
-}
-}
-}
+} // namespace Automation
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" void agent_quota_extend(const char* id) {
-    SigmaOS::Kernel::Automation::SovereignAgentQuotasExtended::getInstance().setExtendedQuotas(id);
+    SigmaOS::Kernel::Automation::SovereignAgentQuotasExtended::setExtendedQuotas(id);
 }

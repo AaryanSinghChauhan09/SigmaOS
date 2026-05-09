@@ -50,11 +50,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void streamer_init() {
-    SigmaOS::Kernel::Multimedia::SovereignSpatialStreamer::getInstance().init();
+    SigmaOS::Kernel::Multimedia::SovereignSpatialStreamer::init();
 }
 
 extern "C" void streamer_push_frame(void* buf, sigma_usize sz) {
-    SigmaOS::Kernel::Multimedia::SovereignSpatialStreamer::getInstance().streamFrame(buf, sz);
+    SigmaOS::Kernel::Multimedia::SovereignSpatialStreamer::streamFrame(buf, sz);
 }
 
 

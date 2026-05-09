@@ -54,11 +54,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void entropy_init() {
-    SigmaOS::Kernel::Security::SovereignEntropySource::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignEntropySource::init();
 }
 
 extern "C" sigma_u64 entropy_get() {
-    return SigmaOS::Kernel::Security::SovereignEntropySource::getInstance().harvestEntropy();
+    return SigmaOS::Kernel::Security::SovereignEntropySource::harvestEntropy();
 }
 
 

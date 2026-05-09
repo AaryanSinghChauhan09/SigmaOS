@@ -56,19 +56,19 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void boot_init() {
-    SovereignBootEngine::getInstance().init();
+    SovereignBootEngine::init();
 }
 
 extern "C" void boot_ignite_lattice() {
-    SovereignBootEngine::getInstance().igniteLattice();
+    SovereignBootEngine::igniteLattice();
 }
 
 extern "C" sigma_boot_stage_t boot_get_current_stage() {
-    return SovereignBootEngine::getInstance().getCurrentStage();
+    return SovereignBootEngine::getCurrentStage();
 }
 
 extern "C" sigma_u32 boot_get_ignited_count() {
-    return SovereignBootEngine::getInstance().getIgnitedCount();
+    return SovereignBootEngine::getIgnitedCount();
 }
 
 

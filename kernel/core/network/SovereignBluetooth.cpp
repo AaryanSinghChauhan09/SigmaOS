@@ -48,9 +48,9 @@ private:
     bool controller_active;
 };
 
-extern "C" void bt_init() { SovereignBluetoothEngine::getInstance().init(); }
-extern "C" bool bt_probe(sigma_u32 vid, sigma_u32 pid) { return SovereignBluetoothEngine::getInstance().probeController(vid, pid); }
-extern "C" bool bt_pair(const char* addr, const char* name) { return SovereignBluetoothEngine::getInstance().pairDevice(addr, name); }
+extern "C" void bt_init() { SovereignBluetoothEngine::init(); }
+extern "C" bool bt_probe(sigma_u32 vid, sigma_u32 pid) { return SovereignBluetoothEngine::probeController(vid, pid); }
+extern "C" bool bt_pair(const char* addr, const char* name) { return SovereignBluetoothEngine::pairDevice(addr, name); }
 
 
 

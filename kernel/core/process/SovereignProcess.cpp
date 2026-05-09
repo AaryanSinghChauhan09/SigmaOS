@@ -108,23 +108,23 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void proc_init() {
-    SigmaOS::Kernel::Process::SovereignProcessEngine::getInstance().init();
+    SigmaOS::Kernel::Process::SovereignProcessEngine::init();
 }
 
 extern "C" sigma_u32 proc_spawn(const char* name, sigma_u32 priority) {
-    return SigmaOS::Kernel::Process::SovereignProcessEngine::getInstance().spawn(name, priority);
+    return SigmaOS::Kernel::Process::SovereignProcessEngine::spawn(name, priority);
 }
 
 extern "C" void proc_yield() {
-    SigmaOS::Kernel::Process::SovereignProcessEngine::getInstance().yield();
+    SigmaOS::Kernel::Process::SovereignProcessEngine::yield();
 }
 
 extern "C" sigma_process_t* proc_get_current() {
-    return SigmaOS::Kernel::Process::SovereignProcessEngine::getInstance().getCurrent();
+    return SigmaOS::Kernel::Process::SovereignProcessEngine::getCurrent();
 }
 
 extern "C" sigma_u64 proc_get_switch_count() {
-    return SigmaOS::Kernel::Process::SovereignProcessEngine::getInstance().getSwitchCount();
+    return SigmaOS::Kernel::Process::SovereignProcessEngine::getSwitchCount();
 }
 
 

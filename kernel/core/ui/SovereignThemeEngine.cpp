@@ -76,19 +76,19 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void theme_init() {
-    SovereignThemeEngine::getInstance().init();
+    SovereignThemeEngine::init();
 }
 
 extern "C" void theme_apply_accent(sigma_u32 color) {
-    SovereignThemeEngine::getInstance().applyAccent(color);
+    SovereignThemeEngine::applyAccent(color);
 }
 
 extern "C" void theme_toggle_dark_mode() {
-    SovereignThemeEngine::getInstance().toggleDarkMode();
+    SovereignThemeEngine::toggleDarkMode();
 }
 
 extern "C" void theme_evaluate_adaptive() {
-    SovereignThemeEngine::getInstance().evaluateAdaptiveTheme();
+    SovereignThemeEngine::evaluateAdaptiveTheme();
 }
 
 

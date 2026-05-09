@@ -55,19 +55,19 @@ void SovereignThermalIQ::emergencyThrottle(sigma_u32 threshold_celsius) {
 
 /* --- C Bridge --- */
 extern "C" void thermaliq_init() {
-    SigmaOS::Kernel::Hardware::SovereignThermalIQ::getInstance().init();
+    SigmaOS::Kernel::Hardware::SovereignThermalIQ::init();
 }
 
 extern "C" sigma_u32 thermaliq_get_package_temp() {
-    return SigmaOS::Kernel::Hardware::SovereignThermalIQ::getInstance().getPackageTemp();
+    return SigmaOS::Kernel::Hardware::SovereignThermalIQ::getPackageTemp();
 }
 
 extern "C" void thermaliq_apply_thermal_policy() {
-    SigmaOS::Kernel::Hardware::SovereignThermalIQ::getInstance().applyThermalPolicy();
+    SigmaOS::Kernel::Hardware::SovereignThermalIQ::applyThermalPolicy();
 }
 
 extern "C" void thermaliq_emergency_throttle(sigma_u32 threshold_celsius) {
-    SigmaOS::Kernel::Hardware::SovereignThermalIQ::getInstance().emergencyThrottle(threshold_celsius);
+    SigmaOS::Kernel::Hardware::SovereignThermalIQ::emergencyThrottle(threshold_celsius);
 }
 
 

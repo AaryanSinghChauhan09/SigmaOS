@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignDependencyGraph"; }
 
-    bool validateGraph(const char* orb_name) {
+    static bool validateGraph(const char* orb_name) {
         sigma_log_info("[DEP-GRAPH] Analyzing cross-ecosystem dependencies for:");
         sigma_log_info(orb_name);
         
@@ -34,7 +34,7 @@ public:
         return true;
     }
 
-    void visualizeLattice() {
+    static void visualizeLattice() {
         sigma_log_info("[DEP-GRAPH] Visualizing Sovereign Package Lattice...");
         sigma_log_info("[DEP-GRAPH] Shards: 1,422. Links: 4,891. State: [REPRODUCIBLE].");
     }
@@ -43,14 +43,14 @@ private:
     SovereignDependencyGraph() = default;
 };
 
-}
-}
-}
+} // namespace Industrial
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" int dep_graph_validate(const char* name) {
-    return SigmaOS::Kernel::Industrial::SovereignDependencyGraph::getInstance().validateGraph(name) ? 1 : 0;
+    return SigmaOS::Kernel::Industrial::SovereignDependencyGraph::validateGraph(name) ? 1 : 0;
 }
 
 extern "C" void dep_graph_visualize() {
-    SigmaOS::Kernel::Industrial::SovereignDependencyGraph::getInstance().visualizeLattice();
+    SigmaOS::Kernel::Industrial::SovereignDependencyGraph::visualizeLattice();
 }

@@ -62,19 +62,19 @@ bool SovereignIPCManager::receiveOptimized(sigma_ipc_msg_t* out_msg) {
 
 /* --- C Wrappers --- */
 extern "C" void ipc_init() {
-    SigmaOS::Kernel::IPC::SovereignIPCManager::getInstance().init();
+    SigmaOS::Kernel::IPC::SovereignIPCManager::init();
 }
 
 extern "C" bool ipc_send_optimized(sigma_u32 target, sigma_u32 type, sigma_u32* data) {
-    return SigmaOS::Kernel::IPC::SovereignIPCManager::getInstance().sendOptimized(target, type, data);
+    return SigmaOS::Kernel::IPC::SovereignIPCManager::sendOptimized(target, type, data);
 }
 
 extern "C" bool ipc_receive_optimized(sigma_ipc_msg_t* out_msg) {
-    return SigmaOS::Kernel::IPC::SovereignIPCManager::getInstance().receiveOptimized(out_msg);
+    return SigmaOS::Kernel::IPC::SovereignIPCManager::receiveOptimized(out_msg);
 }
 
 extern "C" sigma_u64 ipc_get_dispatched_count() {
-    return SigmaOS::Kernel::IPC::SovereignIPCManager::getInstance().getDispatchedCount();
+    return SigmaOS::Kernel::IPC::SovereignIPCManager::getDispatchedCount();
 }
 
 

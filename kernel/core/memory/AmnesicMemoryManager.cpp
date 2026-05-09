@@ -41,9 +41,9 @@ private:
 } // namespace SigmaOS
 
 extern "C" void* sigma_alloc_amnesic(sigma_size_t size) {
-    return SigmaOS::Kernel::Memory::AmnesicMemoryManager::getInstance().allocateAmnesic(size);
+    return SigmaOS::Kernel::Memory::AmnesicMemoryManager::allocateAmnesic(size);
 }
 
 extern "C" void sigma_free_amnesic(void* ptr, sigma_size_t size) {
-    SigmaOS::Kernel::Memory::AmnesicMemoryManager::getInstance().scrub(ptr, size);
+    SigmaOS::Kernel::Memory::AmnesicMemoryManager::scrub(ptr, size);
 }

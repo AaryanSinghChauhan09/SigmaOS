@@ -54,11 +54,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void threat_hunter_init() {
-    SigmaOS::Kernel::Security::SovereignThreatHunter::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignThreatHunter::init();
 }
 
 extern "C" void threat_hunter_audit(const char* target) {
-    SigmaOS::Kernel::Security::SovereignThreatHunter::getInstance().executeAudit(target);
+    SigmaOS::Kernel::Security::SovereignThreatHunter::executeAudit(target);
 }
 
 

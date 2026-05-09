@@ -50,11 +50,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void task_automator_init() {
-    SigmaOS::Kernel::AI::SovereignTaskAutomator::getInstance().init();
+    SigmaOS::Kernel::AI::SovereignTaskAutomator::init();
 }
 
 extern "C" void task_automator_execute(const char* prompt) {
-    SigmaOS::Kernel::AI::SovereignTaskAutomator::getInstance().processRequest(prompt);
+    SigmaOS::Kernel::AI::SovereignTaskAutomator::processRequest(prompt);
 }
 
 

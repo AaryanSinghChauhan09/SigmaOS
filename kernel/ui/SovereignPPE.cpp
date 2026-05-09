@@ -32,11 +32,9 @@ public:
 private:
     SovereignPPE() = default;
 };
-
-}
-}
-}
-
+} // namespace UI
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void ux_ppe_predict() {
-    SigmaOS::Kernel::UI::SovereignPPE::getInstance().predictAdaptation();
+    SigmaOS::Kernel::UI::SovereignPPE::predictAdaptation();
 }

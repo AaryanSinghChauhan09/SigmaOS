@@ -54,11 +54,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void declarative_state_init() {
-    SigmaOS::Kernel::System::SovereignDeclarativeState::getInstance().init();
+    SigmaOS::Kernel::System::SovereignDeclarativeState::init();
 }
 
 extern "C" void declarative_build(const char* hash) {
-    SigmaOS::Kernel::System::SovereignDeclarativeState::getInstance().buildState(hash);
+    SigmaOS::Kernel::System::SovereignDeclarativeState::buildState(hash);
 }
 
 

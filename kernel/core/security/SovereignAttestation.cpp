@@ -38,7 +38,7 @@ public:
         sigma_log_info("[ATTEST]: Running PQC-based integrity audit...");
 
         sigma_u8 mockSignature[64] = {0};
-        bool isValid = SovereignPQCEngine::getInstance().verifyShard(0xDEADBEEFu, mockSignature);
+        bool isValid = SovereignPQCEngine::verifyShard(0xDEADBEEFu, mockSignature);
 
         if (isValid) {
             currentState = AttestationState::TRUSTED;
@@ -74,10 +74,10 @@ private:
 /* --- C Bridge --- */
 extern "C" {
     void sigma_attestation_init() {
-        SigmaOS::Kernel::Security::SovereignAttestationShard::getInstance().initialize();
+        SigmaOS::Kernel::Security::SovereignAttestationShard::initialize();
     }
 
     int sigma_attestation_verify() {
-        return SigmaOS::Kernel::Security::SovereignAttestationShard::getInstance().verifyIntegrity() ? 1 : 0;
+        return SigmaOS::Kernel::Security::SovereignAttestationShard::verifyIntegrity() ? 1 : 0;
     }
 }

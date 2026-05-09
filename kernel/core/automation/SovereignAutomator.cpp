@@ -51,15 +51,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void automator_init() {
-    SovereignAutomatorEngine::getInstance().init();
+    SovereignAutomatorEngine::init();
 }
 
 extern "C" void automator_register_macro(const char* trigger, const char* action) {
-    SovereignAutomatorEngine::getInstance().registerMacro(trigger, action);
+    SovereignAutomatorEngine::registerMacro(trigger, action);
 }
 
 extern "C" void automator_context_tick(const char* context) {
-    SovereignAutomatorEngine::getInstance().processContext(context);
+    SovereignAutomatorEngine::processContext(context);
 }
 
 

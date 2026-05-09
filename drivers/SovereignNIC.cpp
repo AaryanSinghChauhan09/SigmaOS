@@ -74,13 +74,13 @@ private:
 };
 
 extern "C" void nic_init() {
-    SovereignNICEngine::getInstance().init();
+    SovereignNICEngine::init();
 }
 
 extern "C" int nic_transmit(const void* packet, uint32_t len) {
-    return SovereignNICEngine::getInstance().transmit(packet, len);
+    return SovereignNICEngine::transmit(packet, len);
 }
 
 extern "C" int nic_receive(void* buffer, uint32_t max_len) {
-    return SovereignNICEngine::getInstance().receive(buffer, max_len);
+    return SovereignNICEngine::receive(buffer, max_len);
 }

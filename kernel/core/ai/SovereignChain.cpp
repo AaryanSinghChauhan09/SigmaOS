@@ -44,5 +44,5 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void sigma_chain_execute(const char* flow) {
-    SigmaOS::Kernel::AI::SovereignChain::getInstance().executeFlow(flow);
+    SigmaOS::Kernel::AI::SovereignChain::executeFlow(flow);
 }

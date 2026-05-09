@@ -70,11 +70,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void silicon_init_transpiler() {
-    SigmaOS::Kernel::Hardware::SovereignHWTranspiler::getInstance().init();
+    SigmaOS::Kernel::Hardware::SovereignHWTranspiler::init();
 }
 
 extern "C" void silicon_transpile(const char* id, const char* spec, const char* arch) {
-    SigmaOS::Kernel::Hardware::SovereignHWTranspiler::getInstance().transpileDriver(id, spec, arch);
+    SigmaOS::Kernel::Hardware::SovereignHWTranspiler::transpileDriver(id, spec, arch);
 }
 
 

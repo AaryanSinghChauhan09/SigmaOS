@@ -25,7 +25,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignPodman"; }
 
-    bool runContainer(const char* image_name, const char* command) {
+    static bool runContainer(const char* image_name, const char* command) {
         sigma_log_info("[PODMAN-SHIM] Deploying OCI container from image:");
         sigma_log_info(image_name);
         
@@ -44,13 +44,11 @@ public:
 private:
     SovereignPodman() = default;
 };
-
-}
-}
-}
-
+} // namespace Industrial
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void podman_init() {
-    SigmaOS::Kernel::Industrial::SovereignPodman::getInstance().init();
+    SigmaOS::Kernel::Industrial::SovereignPodman::init();
 }
 
 extern "C" int podman_run(const char* img, const char* cmd) {

@@ -48,13 +48,13 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void wifi_init() {
-    SovereignWiFi::getInstance().init();
+    SovereignWiFi::init();
 }
 
 extern "C" void wifi_scan() {
-    SovereignWiFi::getInstance().scanNetworks();
+    SovereignWiFi::scanNetworks();
 }
 
 extern "C" int wifi_connect(const char* ssid, const char* pass) {
-    return SovereignWiFi::getInstance().connect(ssid, pass) ? 1 : 0;
+    return SovereignWiFi::connect(ssid, pass) ? 1 : 0;
 }

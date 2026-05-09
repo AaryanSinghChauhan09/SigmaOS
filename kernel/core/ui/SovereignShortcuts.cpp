@@ -34,11 +34,11 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void shortcuts_init() {
-    SovereignShortcutsEngine::getInstance().init();
+    SovereignShortcutsEngine::init();
 }
 
 extern "C" void shortcuts_suggest(const char* context, const char* suggestion) {
-    SovereignShortcutsEngine::getInstance().pushContextShortcut(context, suggestion);
+    SovereignShortcutsEngine::pushContextShortcut(context, suggestion);
 }
 
 

@@ -48,11 +48,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void aether_init() {
-    SigmaOS::Kernel::Network::SovereignAetherNet::getInstance().init();
+    SigmaOS::Kernel::Network::SovereignAetherNet::init();
 }
 
 extern "C" void aether_set_stealth(bool active) {
-    SigmaOS::Kernel::Network::SovereignAetherNet::getInstance().setStealthMode(active);
+    SigmaOS::Kernel::Network::SovereignAetherNet::setStealthMode(active);
 }
 
 

@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignProton"; }
 
-    bool runExecutable(const char* exe_path) {
+    static bool runExecutable(const char* exe_path) {
         extern "C" void proton_dxvk_init();
         proton_dxvk_init();
         
@@ -40,11 +40,9 @@ public:
 private:
     SovereignProton() = default;
 };
-
-}
-}
-}
-
+} // namespace Multimedia
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" int proton_run(const char* path) {
-    return SigmaOS::Kernel::Multimedia::SovereignProton::getInstance().runExecutable(path) ? 1 : 0;
+    return SigmaOS::Kernel::Multimedia::SovereignProton::runExecutable(path) ? 1 : 0;
 }

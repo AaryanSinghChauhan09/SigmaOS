@@ -32,11 +32,9 @@ public:
 private:
     SovereignPQCAudit() = default;
 };
-
-}
-}
-}
-
+} // namespace Security
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void pqc_audit_fips() {
-    SigmaOS::Kernel::Security::SovereignPQCAudit::getInstance().performAudit();
+    SigmaOS::Kernel::Security::SovereignPQCAudit::performAudit();
 }

@@ -67,21 +67,21 @@ void SovereignPQCEngine::refreshLattice() {
 
 /* --- C Bridge --- */
 extern "C" void pqc_init() {
-    SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignPQCEngine::init();
 }
 
 extern "C" void pqc_sign_shard(sigma_u32 shard_id, sigma_u8* signature) {
-    SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().signShard(shard_id, signature);
+    SigmaOS::Kernel::Security::SovereignPQCEngine::signShard(shard_id, signature);
 }
 
 extern "C" int pqc_verify_shard(sigma_u32 shard_id, const sigma_u8* signature) {
-    return SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().verifyShard(shard_id, signature) ? 1 : 0;
+    return SigmaOS::Kernel::Security::SovereignPQCEngine::verifyShard(shard_id, signature) ? 1 : 0;
 }
 
 extern "C" sigma_u64 pqc_get_signature_count() {
-    return SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().getSignatureCount();
+    return SigmaOS::Kernel::Security::SovereignPQCEngine::getSignatureCount();
 }
 
 extern "C" void pqc_refresh_lattice() {
-    SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().refreshLattice();
+    SigmaOS::Kernel::Security::SovereignPQCEngine::refreshLattice();
 }

@@ -89,31 +89,31 @@ void SovereignHyperEngine::getState(sigma_hypervisor_state_t* out_state) const {
 
 /* --- C Wrappers --- */
 extern "C" void hyper_init() {
-    SigmaOS::Kernel::Virtualization::SovereignHyperEngine::getInstance().init();
+    SigmaOS::Kernel::Virtualization::SovereignHyperEngine::init();
 }
 
 extern "C" sigma_u32 hyper_create_vm(sigma_u32 vcpus, sigma_u64 memory_mb) {
-    return SigmaOS::Kernel::Virtualization::SovereignHyperEngine::getInstance().createVM(vcpus, memory_mb);
+    return SigmaOS::Kernel::Virtualization::SovereignHyperEngine::createVM(vcpus, memory_mb);
 }
 
 extern "C" void hyper_start_vm(sigma_u32 vm_id) {
-    SigmaOS::Kernel::Virtualization::SovereignHyperEngine::getInstance().startVM(vm_id);
+    SigmaOS::Kernel::Virtualization::SovereignHyperEngine::startVM(vm_id);
 }
 
 extern "C" void hyper_handle_vmexit() {
-    SigmaOS::Kernel::Virtualization::SovereignHyperEngine::getInstance().handleVMExit();
+    SigmaOS::Kernel::Virtualization::SovereignHyperEngine::handleVMExit();
 }
 
 extern "C" void hyper_stop_vm(sigma_u32 vm_id) {
-    SigmaOS::Kernel::Virtualization::SovereignHyperEngine::getInstance().stopVM(vm_id);
+    SigmaOS::Kernel::Virtualization::SovereignHyperEngine::stopVM(vm_id);
 }
 
 extern "C" void hyper_get_state(sigma_hypervisor_state_t* out_state) {
-    SigmaOS::Kernel::Virtualization::SovereignHyperEngine::getInstance().getState(out_state);
+    SigmaOS::Kernel::Virtualization::SovereignHyperEngine::getState(out_state);
 }
 
 extern "C" sigma_u64 hypervisor_get_exit_count() {
-    return SigmaOS::Kernel::Virtualization::SovereignHyperEngine::getInstance().getExitCount();
+    return SigmaOS::Kernel::Virtualization::SovereignHyperEngine::getExitCount();
 }
 
 

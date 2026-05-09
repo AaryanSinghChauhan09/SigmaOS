@@ -46,11 +46,11 @@ void SovereignDataForge::reportStatus() {
 
 /* --- C Bridge --- */
 extern "C" void forge_init() {
-    SigmaOS::Kernel::Data::SovereignDataForge::getInstance().init();
+    SigmaOS::Kernel::Data::SovereignDataForge::init();
 }
 
 extern "C" void forge_dispatch_parallel(sigma_forge_op_t op, const void* dataset, sigma_size_t size) {
-    SigmaOS::Kernel::Data::SovereignDataForge::getInstance().dispatch(op, dataset, size);
+    SigmaOS::Kernel::Data::SovereignDataForge::dispatch(op, dataset, size);
 }
 
 extern "C" void forge_wait_all() {

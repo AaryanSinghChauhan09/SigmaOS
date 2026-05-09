@@ -51,11 +51,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void cryptostack_init() {
-    SigmaOS::Kernel::Security::SovereignCryptoStack::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignCryptoStack::init();
 }
 
 extern "C" void cryptostack_encrypt(void* data, sigma_usize sz, sigma_u32 algo) {
-    SigmaOS::Kernel::Security::SovereignCryptoStack::getInstance().encrypt(data, sz, algo);
+    SigmaOS::Kernel::Security::SovereignCryptoStack::encrypt(data, sz, algo);
 }
 
 

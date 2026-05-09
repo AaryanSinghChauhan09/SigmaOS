@@ -25,7 +25,7 @@ public:
 
     const char* type_name() const noexcept override { return "USBVideoClass15"; }
 
-    bool initDevice() {
+    static bool initDevice() {
         sigma_log_info("[UVC-1.5] Probing for USB Video Class compatible webcam...");
         // Map Linux uvcvideo descriptors
         sigma_log_info("[UVC-1.5] Negotiating stream parameters: 1080p @ 60fps (MJPEG).");
@@ -36,12 +36,10 @@ public:
 private:
     USBVideoClass15() = default;
 };
-
-}
-}
-}
-}
-
+} // namespace Hardware
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void uvc_init() {
-    SigmaOS::Kernel::Drivers::Hardware::USBVideoClass15::getInstance().initDevice();
+    SigmaOS::Kernel::Drivers::Hardware::USBVideoClass15::initDevice();
 }

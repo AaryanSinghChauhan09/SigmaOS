@@ -50,15 +50,15 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void kube_init() {
-    SigmaOS::Kernel::Deployment::SovereignKubeOperator::getInstance().init();
+    SigmaOS::Kernel::Deployment::SovereignKubeOperator::init();
 }
 
 extern "C" void kube_reconcile() {
-    SigmaOS::Kernel::Deployment::SovereignKubeOperator::getInstance().reconcileLatticeState();
+    SigmaOS::Kernel::Deployment::SovereignKubeOperator::reconcileLatticeState();
 }
 
 extern "C" void kube_deploy_pod(const char* name) {
-    SigmaOS::Kernel::Deployment::SovereignKubeOperator::getInstance().deployShardPod(name);
+    SigmaOS::Kernel::Deployment::SovereignKubeOperator::deployShardPod(name);
 }
 
 

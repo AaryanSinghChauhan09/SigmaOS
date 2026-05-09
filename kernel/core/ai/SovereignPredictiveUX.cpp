@@ -41,13 +41,13 @@ public:
 
 /* --- C Bridge --- */
 extern "C" void sigma_ux_record(const char* el) {
-    SigmaOS::Kernel::AI::SovereignPredictiveUX::getInstance().recordInteraction(el);
+    SigmaOS::Kernel::AI::SovereignPredictiveUX::recordInteraction(el);
 }
 
 extern "C" const char* sigma_ux_predict() {
-    return SigmaOS::Kernel::AI::SovereignPredictiveUX::getInstance().suggestNextAction();
+    return SigmaOS::Kernel::AI::SovereignPredictiveUX::suggestNextAction();
 }
 
 extern "C" void sigma_ux_immersion(const char* mode) {
-    SigmaOS::Kernel::AI::SovereignPredictiveUX::getInstance().applyImmersionMode(mode);
+    SigmaOS::Kernel::AI::SovereignPredictiveUX::applyImmersionMode(mode);
 }

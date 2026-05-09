@@ -55,11 +55,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void thread_orch_init() {
-    SigmaOS::Kernel::Process::SovereignThreadOrchestrator::getInstance().init();
+    SigmaOS::Kernel::Process::SovereignThreadOrchestrator::init();
 }
 
 extern "C" void thread_orch_spawn(const char* id, sigma_u32 p) {
-    SigmaOS::Kernel::Process::SovereignThreadOrchestrator::getInstance().spawnThread(id, p);
+    SigmaOS::Kernel::Process::SovereignThreadOrchestrator::spawnThread(id, p);
 }
 
 

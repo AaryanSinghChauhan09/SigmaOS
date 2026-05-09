@@ -54,11 +54,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void forensics_init() {
-    SigmaOS::Kernel::System::SovereignForensics::getInstance().init();
+    SigmaOS::Kernel::System::SovereignForensics::init();
 }
 
 extern "C" void forensics_scan(const char* vol) {
-    SigmaOS::Kernel::System::SovereignForensics::getInstance().executeDeepScan(vol);
+    SigmaOS::Kernel::System::SovereignForensics::executeDeepScan(vol);
 }
 
 

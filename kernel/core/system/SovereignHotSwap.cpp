@@ -55,11 +55,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void hotswap_init() {
-    SigmaOS::Kernel::System::SovereignHotSwap::getInstance().init();
+    SigmaOS::Kernel::System::SovereignHotSwap::init();
 }
 
 extern "C" bool hotswap_execute(const char* id, const void* logic, sigma_size_t size) {
-    return SigmaOS::Kernel::System::SovereignHotSwap::getInstance().swapShard(id, logic, size);
+    return SigmaOS::Kernel::System::SovereignHotSwap::swapShard(id, logic, size);
 }
 
 

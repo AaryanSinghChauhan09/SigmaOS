@@ -18,6 +18,4 @@ jobs:
         uses: Andrew-Chen-Wang/github-wiki-action@v4
         with:
           path: docs/
-          owner: AaryanSinghChauhan09
-          repository: SigmaOS.wiki
-          token: ${{ secrets.WIKI_SYNC_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}

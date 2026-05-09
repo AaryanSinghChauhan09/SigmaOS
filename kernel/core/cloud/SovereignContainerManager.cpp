@@ -54,11 +54,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void container_manager_init() {
-    SigmaOS::Kernel::Cloud::SovereignContainerManager::getInstance().init();
+    SigmaOS::Kernel::Cloud::SovereignContainerManager::init();
 }
 
 extern "C" void container_deploy(const char* hash) {
-    SigmaOS::Kernel::Cloud::SovereignContainerManager::getInstance().deployContainer(hash);
+    SigmaOS::Kernel::Cloud::SovereignContainerManager::deployContainer(hash);
 }
 
 

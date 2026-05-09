@@ -44,19 +44,19 @@ void SovereignMMUEngine::handleFault(sigma_u64 faulting_addr) {
 
 /* --- C Wrappers --- */
 extern "C" void mmu_init() {
-    SovereignMMUEngine::getInstance().init();
+    SovereignMMUEngine::init();
 }
 
 extern "C" bool mmu_map_shard(sigma_u32 shard_id, sigma_u64 vaddr, sigma_u64 paddr, sigma_u32 flags) {
-    return SovereignMMUEngine::getInstance().mapShard(shard_id, vaddr, paddr, flags);
+    return SovereignMMUEngine::mapShard(shard_id, vaddr, paddr, flags);
 }
 
 extern "C" void mmu_handle_fault(sigma_u64 faulting_addr) {
-    SovereignMMUEngine::getInstance().handleFault(faulting_addr);
+    SovereignMMUEngine::handleFault(faulting_addr);
 }
 
 extern "C" sigma_u64 mmu_get_fault_count() {
-    return SovereignMMUEngine::getInstance().getFaultCount();
+    return SovereignMMUEngine::getFaultCount();
 }
 
 

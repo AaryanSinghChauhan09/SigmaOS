@@ -75,23 +75,23 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void taskautomator_init() {
-    SovereignAutomationEngine::getInstance().init();
+    SovereignAutomationEngine::init();
 }
 
 extern "C" void taskautomator_create_rule(const char* nlp_trigger, const char* action) {
-    SovereignAutomationEngine::getInstance().createRule(nlp_trigger, action);
+    SovereignAutomationEngine::createRule(nlp_trigger, action);
 }
 
 extern "C" void taskautomator_evaluate_rules() {
-    SovereignAutomationEngine::getInstance().evaluateRules();
+    SovereignAutomationEngine::evaluateRules();
 }
 
 extern "C" void taskautomator_start_macro() {
-    SovereignAutomationEngine::getInstance().startMacroRecording();
+    SovereignAutomationEngine::startMacroRecording();
 }
 
 extern "C" void taskautomator_stop_macro() {
-    SovereignAutomationEngine::getInstance().stopMacroRecording();
+    SovereignAutomationEngine::stopMacroRecording();
 }
 
 

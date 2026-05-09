@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignDirectGPU"; }
 
-    void bypassAbstraction() {
+    static void bypassAbstraction() {
         sigma_log_info("[DIRECT-GPU] Bypassing virtualized GPU shims for bare-metal access...");
         sigma_log_info("[DIRECT-GPU] Mapping PCIe memory apertures directly to SovereignLattice.");
         sigma_log_info("[DIRECT-GPU] Latency: <1µs. Full CUDA/Tensor-Core parity ACTIVE.");
@@ -33,11 +33,9 @@ public:
 private:
     SovereignDirectGPU() = default;
 };
-
-}
-}
-}
-
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void gpu_direct_access_init() {
-    SigmaOS::Kernel::Drivers::SovereignDirectGPU::getInstance().bypassAbstraction();
+    SigmaOS::Kernel::Drivers::SovereignDirectGPU::bypassAbstraction();
 }

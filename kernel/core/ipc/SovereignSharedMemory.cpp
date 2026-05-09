@@ -31,15 +31,15 @@ void SovereignSharedMemory::audit() {
 
 /* --- C Bridge --- */
 extern "C" void shmem_init() {
-    SigmaOS::Kernel::IPC::SovereignSharedMemory::getInstance().init();
+    SigmaOS::Kernel::IPC::SovereignSharedMemory::init();
 }
 
 extern "C" void* shmem_create(const char* id, sigma_usize sz) {
-    return SigmaOS::Kernel::IPC::SovereignSharedMemory::getInstance().createSegment(id, sz);
+    return SigmaOS::Kernel::IPC::SovereignSharedMemory::createSegment(id, sz);
 }
 
 extern "C" void shmem_audit() {
-    SigmaOS::Kernel::IPC::SovereignSharedMemory::getInstance().audit();
+    SigmaOS::Kernel::IPC::SovereignSharedMemory::audit();
 }
 
 

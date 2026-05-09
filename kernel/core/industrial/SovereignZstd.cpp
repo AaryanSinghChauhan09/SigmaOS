@@ -39,15 +39,13 @@ public:
 private:
     SovereignZstd() = default;
 };
-
-}
-}
-}
-
+} // namespace Industrial
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" sigma_size_t zstd_compress(const void* src, void* dst, sigma_size_t size) {
-    return SigmaOS::Kernel::Industrial::SovereignZstd::getInstance().compressOrb(src, dst, size);
+    return SigmaOS::Kernel::Industrial::SovereignZstd::compressOrb(src, dst, size);
 }
 
 extern "C" sigma_size_t zstd_decompress(const void* src, void* dst, sigma_size_t size) {
-    return SigmaOS::Kernel::Industrial::SovereignZstd::getInstance().decompressOrb(src, dst, size);
+    return SigmaOS::Kernel::Industrial::SovereignZstd::decompressOrb(src, dst, size);
 }

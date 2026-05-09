@@ -12,6 +12,8 @@
 #include "sigma_log.h"
 #include "core/SigmaOOP.hpp"
 
+extern "C" void fhs_init();
+
 namespace SigmaOS {
 namespace Kernel {
 namespace Orchestration {
@@ -25,21 +27,20 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignInit"; }
 
-    void startService(const char* service_name) {
+    static void startService(const char* service_name) {
         sigma_log_info("[INIT] Starting Lattice Service:");
         sigma_log_info(service_name);
         
         // Dependency resolution for services
         sigma_log_info("[INIT] Resolving shard dependencies...");
         sigma_log_info("[INIT] Service spawned and monitored by SovereignMonitor.");
-        m_active_services++;
+        getInstance().m_active_services++;
     }
 
-    void init() {
+    static void init() {
         sigma_log_info("[INIT] Sovereign Init System (systemd-parity) ONLINE.");
         
         // FHS-001: Virtualize standard filesystem hierarchy via FHS Shard
-        extern "C" void fhs_init();
         fhs_init();
     }
 
@@ -48,14 +49,14 @@ private:
     sigma_u32 m_active_services{0U};
 };
 
-}
-}
-}
+} // namespace Orchestration
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" void init_system_start() {
-    SigmaOS::Kernel::Orchestration::SovereignInit::getInstance().init();
+    SigmaOS::Kernel::Orchestration::SovereignInit::init();
 }
 
 extern "C" void init_service_spawn(const char* name) {
-    SigmaOS::Kernel::Orchestration::SovereignInit::getInstance().startService(name);
+    SigmaOS::Kernel::Orchestration::SovereignInit::startService(name);
 }

@@ -55,11 +55,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void qe_init_shard() {
-    SigmaOS::Kernel::Security::SovereignQuantumEnforcement::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignQuantumEnforcement::init();
 }
 
 extern "C" void qe_enforce_shard(const char* id) {
-    SigmaOS::Kernel::Security::SovereignQuantumEnforcement::getInstance().enforcePolicy(id);
+    SigmaOS::Kernel::Security::SovereignQuantumEnforcement::enforcePolicy(id);
 }
 
 

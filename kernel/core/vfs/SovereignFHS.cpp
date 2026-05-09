@@ -34,11 +34,9 @@ public:
 private:
     SovereignFHS() = default;
 };
-
-}
-}
-}
-
+} // namespace VFS
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void fhs_init() {
-    SigmaOS::Kernel::VFS::SovereignFHS::getInstance().virtualizeHierarchy();
+    SigmaOS::Kernel::VFS::SovereignFHS::virtualizeHierarchy();
 }

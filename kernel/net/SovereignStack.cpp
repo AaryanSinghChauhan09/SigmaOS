@@ -63,18 +63,18 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void netstack_init() {
-    SovereignPacketArbiter::getInstance().init();
+    SovereignPacketArbiter::init();
 }
 
 extern "C" void netstack_process_packet(const void* buffer, sigma_u32 size) {
-    SovereignPacketArbiter::getInstance().processPacket(buffer, size);
+    SovereignPacketArbiter::processPacket(buffer, size);
 }
 
 extern "C" void netstack_send_packet(const void* buffer, sigma_u32 size) {
-    SovereignPacketArbiter::getInstance().sendPacket(buffer, size);
+    SovereignPacketArbiter::sendPacket(buffer, size);
 }
 
 extern "C" sigma_u32 netstack_is_link_active() {
-    return SovereignPacketArbiter::getInstance().isLinkActive();
+    return SovereignPacketArbiter::isLinkActive();
 }
 

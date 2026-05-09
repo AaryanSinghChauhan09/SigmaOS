@@ -38,11 +38,11 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void neural_init() {
-    SovereignNeuralAccelEngine::getInstance().init();
+    SovereignNeuralAccelEngine::init();
 }
 
 extern "C" void neural_morph_ui(sigma_u32 widget_id, sigma_u32 cognitive_load) {
-    SovereignNeuralAccelEngine::getInstance().morphUI(widget_id, cognitive_load);
+    SovereignNeuralAccelEngine::morphUI(widget_id, cognitive_load);
 }
 
 

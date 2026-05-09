@@ -77,5 +77,5 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void idt_init() {
-    SigmaOS::Kernel::Arch::SovereignIDT::getInstance().init();
+    SigmaOS::Kernel::Arch::SovereignIDT::init();
 }

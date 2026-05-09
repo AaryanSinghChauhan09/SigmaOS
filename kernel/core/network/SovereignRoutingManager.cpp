@@ -54,11 +54,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void routing_init() {
-    SigmaOS::Kernel::Network::SovereignRoutingManager::getInstance().init();
+    SigmaOS::Kernel::Network::SovereignRoutingManager::init();
 }
 
 extern "C" void routing_update(const char* dest, const char* next) {
-    SigmaOS::Kernel::Network::SovereignRoutingManager::getInstance().updateRoute(dest, next);
+    SigmaOS::Kernel::Network::SovereignRoutingManager::updateRoute(dest, next);
 }
 
 

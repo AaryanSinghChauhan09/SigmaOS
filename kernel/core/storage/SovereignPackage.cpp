@@ -24,11 +24,11 @@ bool SovereignPackageEngine::installPackage(const char* pkg_name) {
 }
 
 extern "C" void package_manager_init() {
-    SovereignPackageEngine::getInstance().init();
+    SovereignPackageEngine::init();
 }
 
 extern "C" bool package_manager_install(const char* name) {
-    return SovereignPackageEngine::getInstance().installPackage(name);
+    return SovereignPackageEngine::installPackage(name);
 }
 
 

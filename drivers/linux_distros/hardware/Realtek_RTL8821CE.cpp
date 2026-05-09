@@ -25,7 +25,7 @@ public:
 
     const char* type_name() const noexcept override { return "RealtekRTL8821CE"; }
 
-    bool initDevice() {
+    static bool initDevice() {
         sigma_log_info("[RTL8821CE] Probing for Realtek 802.11ac Wi-Fi adapter...");
         // Map Linux rtw88 firmware
         sigma_log_info("[RTL8821CE] Loading rtw88_8821ce.bin...");
@@ -36,12 +36,10 @@ public:
 private:
     RealtekRTL8821CE() = default;
 };
-
-}
-}
-}
-}
-
+} // namespace Hardware
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void rtl8821ce_init() {
-    SigmaOS::Kernel::Drivers::Hardware::RealtekRTL8821CE::getInstance().initDevice();
+    SigmaOS::Kernel::Drivers::Hardware::RealtekRTL8821CE::initDevice();
 }

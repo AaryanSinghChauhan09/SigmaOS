@@ -30,9 +30,9 @@ void* SovereignPMM::allocatePage() {
                     sigma_u64 addr = (sigma_u64)(i * 32 + j) * PAGE_SIZE;
                     lockPage(addr);
                     return (void*)addr;
-                }
-            }
-        }
+} // namespace Memory
+} // namespace Kernel
+} // namespace SigmaOS
     }
     sigma_log("Σ [PMM]: ERR: Physical Out of Memory Shard!");
     return SIGMA_NULL;
@@ -71,23 +71,23 @@ sigma_u64 SovereignPMM::getUsedMemory() const {
 
 /* --- C Bridge --- */
 extern "C" void pmm_init_shard(sigma_u64 mem_size) {
-    SigmaOS::Kernel::Memory::SovereignPMM::getInstance().init(mem_size);
+    SigmaOS::Kernel::Memory::SovereignPMM::init(mem_size);
 }
 
 extern "C" void* pmm_alloc_shard() {
-    return SigmaOS::Kernel::Memory::SovereignPMM::getInstance().allocatePage();
+    return SigmaOS::Kernel::Memory::SovereignPMM::allocatePage();
 }
 
 extern "C" void pmm_free_shard(void* addr) {
-    SigmaOS::Kernel::Memory::SovereignPMM::getInstance().unlockPage((sigma_u64)addr);
+    SigmaOS::Kernel::Memory::SovereignPMM::unlockPage((sigma_u64)addr);
 }
 
 extern "C" void pmm_compact_shard() {
-    SigmaOS::Kernel::Memory::SovereignPMM::getInstance().compactMemory();
+    SigmaOS::Kernel::Memory::SovereignPMM::compactMemory();
 }
 
 extern "C" sigma_u64 pmm_get_used_shard() {
-    return SigmaOS::Kernel::Memory::SovereignPMM::getInstance().getUsedMemory();
+    return SigmaOS::Kernel::Memory::SovereignPMM::getUsedMemory();
 }
 
 

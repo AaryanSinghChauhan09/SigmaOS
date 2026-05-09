@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignMarketplaceIndexer"; }
 
-    void syncDistributedLattice() {
+    static void syncDistributedLattice() {
         sigma_log_info("[P2P-INDEXER] Syncing distributed marketplace lattice via Aether-Mesh...");
         sigma_log_info("[P2P-INDEXER] Found 142 new verified Orbs. Integrity: [PQC-SIGNED].");
         sigma_log_info("[P2P-INDEXER] Decentralized consensus reached for shard registry.");
@@ -34,10 +34,10 @@ private:
     SovereignMarketplaceIndexer() = default;
 };
 
-}
-}
-}
+} // namespace Industrial
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" void marketplace_indexer_sync() {
-    SigmaOS::Kernel::Industrial::SovereignMarketplaceIndexer::getInstance().syncDistributedLattice();
+    SigmaOS::Kernel::Industrial::SovereignMarketplaceIndexer::syncDistributedLattice();
 }

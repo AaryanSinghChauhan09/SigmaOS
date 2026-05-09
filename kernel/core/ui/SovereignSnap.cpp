@@ -56,7 +56,7 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void snap_init() {
-    SigmaOS::Kernel::UI::SovereignSnapEngine::getInstance().init();
+    SigmaOS::Kernel::UI::SovereignSnapEngine::init();
 }
 
 extern "C" void snap_window_to_zone(sigma_u32 window_id, sigma_snap_zone_t zone) {

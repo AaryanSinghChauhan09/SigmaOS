@@ -39,15 +39,13 @@ public:
 private:
     SovereignRescue() = default;
 };
-
-}
-}
-}
-
+} // namespace Industrial
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void rescue_init() {
-    SigmaOS::Kernel::Industrial::SovereignRescue::getInstance().startRecoveryEnvironment();
+    SigmaOS::Kernel::Industrial::SovereignRescue::startRecoveryEnvironment();
 }
 
 extern "C" void rescue_image(const char* path) {
-    SigmaOS::Kernel::Industrial::SovereignRescue::getInstance().cloneLattice(path);
+    SigmaOS::Kernel::Industrial::SovereignRescue::cloneLattice(path);
 }

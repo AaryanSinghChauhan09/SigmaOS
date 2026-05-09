@@ -60,11 +60,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void snapshot_init() {
-    SigmaOS::Kernel::FS::SovereignSnapshotManager::getInstance().init();
+    SigmaOS::Kernel::FS::SovereignSnapshotManager::init();
 }
 
 extern "C" void snapshot_take(const char* vol, const char* snap) {
-    SigmaOS::Kernel::FS::SovereignSnapshotManager::getInstance().takeSnapshot(vol, snap);
+    SigmaOS::Kernel::FS::SovereignSnapshotManager::takeSnapshot(vol, snap);
 }
 
 

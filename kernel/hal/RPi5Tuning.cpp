@@ -33,11 +33,9 @@ public:
 private:
     RPi5Tuning() = default;
 };
-
-}
-}
-}
-
+} // namespace HAL
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void rpi5_tune() {
-    SigmaOS::Kernel::HAL::RPi5Tuning::getInstance().applyRPi5Optimizations();
+    SigmaOS::Kernel::HAL::RPi5Tuning::applyRPi5Optimizations();
 }

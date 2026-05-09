@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "ClawResourceQuotas"; }
 
-    void enforceQuotas(const char* agent_id) {
+    static void enforceQuotas(const char* agent_id) {
         sigma_log_info("[CLAW-QUOTA] Enforcing resource boundaries for agent:");
         sigma_log_info(agent_id);
         sigma_log_info("[CLAW-QUOTA] CPU: 20%, MEM: 512MB, IO: 10MB/s. Restricted by Sandbox.");
@@ -33,11 +33,9 @@ public:
 private:
     ClawResourceQuotas() = default;
 };
-
-}
-}
-}
-
+} // namespace Automation
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void claw_quota_enforce(const char* id) {
-    SigmaOS::Kernel::Automation::ClawResourceQuotas::getInstance().enforceQuotas(id);
+    SigmaOS::Kernel::Automation::ClawResourceQuotas::enforceQuotas(id);
 }

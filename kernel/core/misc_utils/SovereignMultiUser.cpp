@@ -41,15 +41,15 @@ bool SovereignMultiUserEngine::authenticate(sigma_u32 uid, const char* username)
 }
 
 extern "C" void multiuser_init() {
-    SovereignMultiUserEngine::getInstance().init();
+    SovereignMultiUserEngine::init();
 }
 
 extern "C" sigma_u32 multiuser_register(sigma_u32 uid, sigma_u32 gid, const char* username, sigma_u64 caps) {
-    return SovereignMultiUserEngine::getInstance().registerUser(uid, gid, username, caps);
+    return SovereignMultiUserEngine::registerUser(uid, gid, username, caps);
 }
 
 extern "C" bool multiuser_authenticate(sigma_u32 uid, const char* username) {
-    return SovereignMultiUserEngine::getInstance().authenticate(uid, username);
+    return SovereignMultiUserEngine::authenticate(uid, username);
 }
 
 

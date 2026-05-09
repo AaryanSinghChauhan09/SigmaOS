@@ -95,23 +95,23 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void heap_init(void* start, sigma_size_t size) {
-    SovereignHeapEngine::getInstance().init(start, size);
+    SovereignHeapEngine::init(start, size);
 }
 
 extern "C" void* sigma_malloc(sigma_size_t size) {
-    return SovereignHeapEngine::getInstance().allocate(size);
+    return SovereignHeapEngine::allocate(size);
 }
 
 extern "C" void sigma_free(void* ptr) {
-    SovereignHeapEngine::getInstance().release(ptr);
+    SovereignHeapEngine::release(ptr);
 }
 
 extern "C" sigma_u64 heap_get_total_allocations() {
-    return SovereignHeapEngine::getInstance().getTotalAllocations();
+    return SovereignHeapEngine::getTotalAllocations();
 }
 
 extern "C" sigma_u32 heap_get_active_allocations() {
-    return SovereignHeapEngine::getInstance().getActiveAllocations();
+    return SovereignHeapEngine::getActiveAllocations();
 }
 
 

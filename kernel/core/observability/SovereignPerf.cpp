@@ -50,15 +50,15 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void perf_init() {
-    SigmaOS::Kernel::System::SovereignPerf::getInstance().init();
+    SigmaOS::Kernel::System::SovereignPerf::init();
 }
 
 extern "C" void perf_profile_shard(sigma_u32 id) {
-    SigmaOS::Kernel::System::SovereignPerf::getInstance().profileShard(id);
+    SigmaOS::Kernel::System::SovereignPerf::profileShard(id);
 }
 
 extern "C" void perf_report() {
-    SigmaOS::Kernel::System::SovereignPerf::getInstance().reportHotspots();
+    SigmaOS::Kernel::System::SovereignPerf::reportHotspots();
 }
 
 

@@ -76,19 +76,19 @@ private:
 /* --- C Wrappers --- */
 extern "C" void net_init(const sigma_net_config_t* config) {
     (void)config;
-    SovereignNetEngine::getInstance().init();
+    SovereignNetEngine::init();
 }
 
 extern "C" void net_process_packet(sigma_packet_t* pkt) {
-    SovereignNetEngine::getInstance().processPacket(pkt);
+    SovereignNetEngine::processPacket(pkt);
 }
 
 extern "C" bool net_transmit_shard(sigma_u32 target_ip, sigma_u32 shard_id) {
-    return SovereignNetEngine::getInstance().transmitShard(target_ip, shard_id);
+    return SovereignNetEngine::transmitShard(target_ip, shard_id);
 }
 
 extern "C" void net_optimize_routes() {
-    SovereignNetEngine::getInstance().optimizeRoutes();
+    SovereignNetEngine::optimizeRoutes();
 }
 
 

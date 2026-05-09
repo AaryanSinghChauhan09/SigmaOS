@@ -51,9 +51,9 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void virtio_init() {
-    SigmaOS::Kernel::Drivers::SovereignVirtio::getInstance().init();
+    SigmaOS::Kernel::Drivers::SovereignVirtio::init();
 }
 
 extern "C" void virtio_register(sigma_u32 id) {
-    SigmaOS::Kernel::Drivers::SovereignVirtio::getInstance().registerDevice(id);
+    SigmaOS::Kernel::Drivers::SovereignVirtio::registerDevice(id);
 }

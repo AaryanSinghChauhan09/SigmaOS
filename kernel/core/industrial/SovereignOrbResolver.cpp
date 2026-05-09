@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignOrbResolver"; }
 
-    bool resolve(const char* name) {
+    static bool resolve(const char* name) {
         sigma_log_info("[ORB-RESOLVER] Analyzing dependency graph for:");
         sigma_log_info(name);
         
@@ -37,10 +37,10 @@ private:
     SovereignOrbResolver() = default;
 };
 
-}
-}
-}
+} // namespace Industrial
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" int orb_resolve_deps(const char* name) {
-    return SigmaOS::Kernel::Industrial::SovereignOrbResolver::getInstance().resolve(name) ? 1 : 0;
+    return SigmaOS::Kernel::Industrial::SovereignOrbResolver::resolve(name) ? 1 : 0;
 }

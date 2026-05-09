@@ -57,15 +57,15 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void trust_init() {
-    SigmaOS::Kernel::Security::SovereignTrustFabric::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignTrustFabric::init();
 }
 
 extern "C" bool trust_verify(const char* shard, const char* sig) {
-    return SigmaOS::Kernel::Security::SovereignTrustFabric::getInstance().verifyShardTrust(shard, sig);
+    return SigmaOS::Kernel::Security::SovereignTrustFabric::verifyShardTrust(shard, sig);
 }
 
 extern "C" void trust_add_node(sigma_u32 id) {
-    SigmaOS::Kernel::Security::SovereignTrustFabric::getInstance().addTrustedNode(id);
+    SigmaOS::Kernel::Security::SovereignTrustFabric::addTrustedNode(id);
 }
 
 

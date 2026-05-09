@@ -25,7 +25,7 @@ public:
 
     const char* type_name() const noexcept override { return "AMDGPUGraphics"; }
 
-    bool initDevice() {
+    static bool initDevice() {
         sigma_log_info("[AMDGPU] Probing for AMD Radeon Graphics Controller...");
         // Map Linux Direct Rendering Manager (DRM) to Sovereign UI Ring Buffer
         sigma_log_info("[AMDGPU] Initializing modesetting and hardware acceleration.");
@@ -37,11 +37,11 @@ private:
     AMDGPUGraphics() = default;
 };
 
-}
-}
-}
-}
+} // namespace Hardware
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" void amdgpu_init() {
-    SigmaOS::Kernel::Drivers::Hardware::AMDGPUGraphics::getInstance().initDevice();
+    SigmaOS::Kernel::Drivers::Hardware::AMDGPUGraphics::initDevice();
 }

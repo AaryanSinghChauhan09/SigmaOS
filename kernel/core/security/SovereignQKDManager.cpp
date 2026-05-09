@@ -51,11 +51,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void qkd_init() {
-    SigmaOS::Kernel::Security::SovereignQKDManager::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignQKDManager::init();
 }
 
 extern "C" void qkd_handshake(const char* node) {
-    SigmaOS::Kernel::Security::SovereignQKDManager::getInstance().performHandshake(node);
+    SigmaOS::Kernel::Security::SovereignQKDManager::performHandshake(node);
 }
 
 

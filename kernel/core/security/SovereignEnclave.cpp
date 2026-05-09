@@ -51,15 +51,15 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void enclave_init() {
-    SigmaOS::Kernel::Security::SovereignEnclaveManager::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignEnclaveManager::init();
 }
 
 extern "C" void* enclave_create(sigma_size_t size) {
-    return SigmaOS::Kernel::Security::SovereignEnclaveManager::getInstance().createEnclave(size);
+    return SigmaOS::Kernel::Security::SovereignEnclaveManager::createEnclave(size);
 }
 
 extern "C" void enclave_enter(void* ptr) {
-    SigmaOS::Kernel::Security::SovereignEnclaveManager::getInstance().enterEnclave(ptr);
+    SigmaOS::Kernel::Security::SovereignEnclaveManager::enterEnclave(ptr);
 }
 
 

@@ -33,35 +33,30 @@ int           sigma_wait(int* wstatus);
 int           sigma_dup(int oldfd);
 int           sigma_nanosleep(const void* req, void* rem);
 
-sigma_size_t  sigma_strlen(const char* s);
-void*         sigma_memset(void* s, int c, sigma_size_t n);
-void*         sigma_memcpy(void* dest, const void* src, sigma_size_t n);
+// Removed redundant string and memory functions already in sigma_kernel_types.h
 
 /* =========================================================================
  * HIGH-LEVEL PRIMITIVES (implemented in SovereignLibC.c - pure C11)
  * ========================================================================= */
-int   sigma_streq(const char* s1, const char* s2);
-int   sigma_compare(const char* s1, const char* s2);
+int   sigma_streq(const char* str1, const char* str2);
+int   sigma_compare(const char* str1, const char* str2);
 void  sigma_strcat(char* dest, const char* src);
 void  sigma_strncat(char* dest, const char* src, sigma_size_t n);
 void  sigma_strcpy(char* dest, const char* src, sigma_size_t n);
-void  sigma_strncpy(char* dest, const char* src, sigma_size_t n);
-int   sigma_strcmp(const char* s1, const char* s2);
 char* sigma_strstr(const char* haystack, const char* needle);
 int   sigma_atoi(const char* s);
 
 void  sigma_print(const char* str);
 void  sigma_print_num(sigma_u64 val);
 void  sigma_print_hex(sigma_u64 val);
-void  sigma_log(const char* format, ...);
 /* =========================================================================
  * SECURITY-HARDENED PRIMITIVES (Inspired by Alpine/musl)
  * ========================================================================= */
-void* sigma_secure_memset(void* s, int c, sigma_size_t n); // Prevents compiler optimization removals
+void* sigma_secure_memset(void* ptr, int ch, sigma_size_t n); // Prevents compiler optimization removals
 void  sigma_hardened_strcpy(char* dest, const char* src, sigma_size_t dest_size); // Bounds-checked strcpy
-int   sigma_hardened_strcmp(const char* s1, const char* s2);
+int   sigma_hardened_strcmp(const char* str1, const char* str2);
 char* sigma_hardened_strstr(const char* haystack, const char* needle);
-int   sigma_hardened_strncmp(const char* s1, const char* s2, sigma_size_t n);
+int   sigma_hardened_strncmp(const char* str1, const char* str2, sigma_size_t n);
 
 /* =========================================================================
  * SOVEREIGN MEMORY MANAGEMENT (bump-pointer slab, 128 MB shard)
@@ -70,12 +65,12 @@ void* sigma_malloc(sigma_size_t size);
 void  sigma_free(void* ptr);
 
 // ABI-001/003: musl-libc compatible shims
-void* kmalloc(size_t size);
-void  kfree(void* ptr);
+void* sigma_musl_malloc(sigma_size_t size);
+void  sigma_musl_free(void* ptr);
 
 // musl-compatible syscall wrappers
-long sigma_musl_syscall(long num, ...);
-void sigma_musl_init_stack(void* stack_top);
+sigma_i64 sigma_musl_syscall(sigma_i64 num, ...);
+void      sigma_musl_init_stack(void* stack_top);
 
 /* =========================================================================
  * LINUX KERNEL COMPATIBILITY SHIMS (ABI-001)

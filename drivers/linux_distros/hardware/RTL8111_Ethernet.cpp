@@ -25,7 +25,7 @@ public:
 
     const char* type_name() const noexcept override { return "RealtekRTL8111"; }
 
-    bool initDevice() {
+    static bool initDevice() {
         sigma_log_info("[RTL8111] Probing for Realtek Gigabit Ethernet controller...");
         // Map Linux r8169 firmware
         sigma_log_info("[RTL8111] Loading r8169-v2.bin firmware...");
@@ -36,12 +36,10 @@ public:
 private:
     RealtekRTL8111() = default;
 };
-
-}
-}
-}
-}
-
+} // namespace Hardware
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void rtl8111_init() {
-    SigmaOS::Kernel::Drivers::Hardware::RealtekRTL8111::getInstance().initDevice();
+    SigmaOS::Kernel::Drivers::Hardware::RealtekRTL8111::initDevice();
 }

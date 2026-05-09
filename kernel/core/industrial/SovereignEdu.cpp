@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignEdu"; }
 
-    void solvePhysicsProblem(const char* problem) {
+    static void solvePhysicsProblem(const char* problem) {
         sigma_log_info("[EDU-SHARD] Solving NCERT Physics Problem using Neural Engine...");
         sigma_log_info(problem);
         sigma_log_info("[EDU-SHARD] Result: F = ma verified. Shard solution deployed.");
@@ -33,11 +33,9 @@ public:
 private:
     SovereignEdu() = default;
 };
-
-}
-}
-}
-
+} // namespace Industrial
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void edu_solve_ncert(const char* p) {
-    SigmaOS::Kernel::Industrial::SovereidgnEdu::getInstance().solvePhysicsProblem(p);
+    SigmaOS::Kernel::Industrial::SovereidgnEdu::solvePhysicsProblem(p);
 }

@@ -54,11 +54,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void compartmentalization_init() {
-    SigmaOS::Kernel::Security::SovereignCompartmentalization::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignCompartmentalization::init();
 }
 
 extern "C" void compartment_isolate(const char* domain) {
-    SigmaOS::Kernel::Security::SovereignCompartmentalization::getInstance().isolateDomain(domain);
+    SigmaOS::Kernel::Security::SovereignCompartmentalization::isolateDomain(domain);
 }
 
 

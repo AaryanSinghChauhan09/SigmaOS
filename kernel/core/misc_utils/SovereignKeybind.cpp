@@ -39,10 +39,9 @@ public:
             if (m_binds[i].key_code == code && m_binds[i].modifiers == mods) {
                 sigma_log_info("[KB] Keybind matched: executing %s", m_binds[i].action_name);
                 // Dispatch to workflow engine or UI
-            }
-        }
-    }
-
+} // namespace UI
+} // namespace Kernel
+} // namespace SigmaOS
 private:
     SovereignKeybindShard() : m_count(0) {}
     Keybind m_binds[MAX_KEYBINDS];
@@ -55,9 +54,9 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void sigma_keybind_add(unsigned int code, unsigned int mods, const char* action) {
-    SigmaOS::Kernel::UI::SovereignKeybindShard::getInstance().registerBind(code, mods, action);
+    SigmaOS::Kernel::UI::SovereignKeybindShard::registerBind(code, mods, action);
 }
 
 extern "C" void sigma_keybind_trigger(unsigned int code, unsigned int mods) {
-    SigmaOS::Kernel::UI::SovereignKeybindShard::getInstance().executeBind(code, mods);
+    SigmaOS::Kernel::UI::SovereignKeybindShard::executeBind(code, mods);
 }

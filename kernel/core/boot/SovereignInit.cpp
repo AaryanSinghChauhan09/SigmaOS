@@ -48,12 +48,12 @@ public:
         sigma_log("[INIT] ASI: Igniting Sovereign Neural Nexus...");
         neural_init();
         char morphic_shard[64];
-        SigmaOS::Kernel::AI::SovereignNeuralEngine::getInstance().transpileUI("zenith_desktop.css", morphic_shard);
+        SigmaOS::Kernel::AI::SovereignNeuralEngine::transpileUI("zenith_desktop.css", morphic_shard);
         
         // Stage 3: Distributed VFS
         sigma_log("[INIT] ASI: Syncing Distributed VFS Shards...");
         vfs_init();
-        SigmaOS::Kernel::FS::SovereignDistributedVFS::getInstance().atomicSync();
+        SigmaOS::Kernel::FS::SovereignDistributedVFS::atomicSync();
         
         sigma_log("[INIT] ASI: Parallel Group Ignited. 600 Shards Active.\n");
     }
@@ -74,15 +74,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void sinit_init() {
-    SigmaOS::Kernel::Boot::SovereignInitEngine::getInstance().init();
+    SigmaOS::Kernel::Boot::SovereignInitEngine::init();
 }
 
 extern "C" void sinit_execute_plan() {
-    SigmaOS::Kernel::Boot::SovereignInitEngine::getInstance().executePlan();
+    SigmaOS::Kernel::Boot::SovereignInitEngine::executePlan();
 }
 
 extern "C" void sinit_report_status() {
-    SigmaOS::Kernel::Boot::SovereignInitEngine::getInstance().reportStatus();
+    SigmaOS::Kernel::Boot::SovereignInitEngine::reportStatus();
 }
 
 

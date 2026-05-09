@@ -48,9 +48,9 @@ private:
     sigma_u32 bytes_saved;
 };
 
-extern "C" void memcompress_init() { SovereignMemCompressEngine::getInstance().init(); }
-extern "C" sigma_u32 memcompress_compress(sigma_u32 pages) { return SovereignMemCompressEngine::getInstance().compressColdPages(pages); }
-extern "C" void memcompress_stats() { SovereignMemCompressEngine::getInstance().printStats(); }
+extern "C" void memcompress_init() { SovereignMemCompressEngine::init(); }
+extern "C" sigma_u32 memcompress_compress(sigma_u32 pages) { return SovereignMemCompressEngine::compressColdPages(pages); }
+extern "C" void memcompress_stats() { SovereignMemCompressEngine::printStats(); }
 
 
 

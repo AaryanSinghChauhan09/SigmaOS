@@ -36,11 +36,11 @@ void SovereignVirtio::resetDevice(sigma_u32 device_id) {
 
 /* --- C Bridge --- */
 extern "C" void virtio_init() {
-    SigmaOS::Kernel::HAL::SovereignVirtio::getInstance().init();
+    SigmaOS::Kernel::HAL::SovereignVirtio::init();
 }
 
 extern "C" bool virtio_probe(sigma_u32 id) {
-    return SigmaOS::Kernel::HAL::SovereignVirtio::getInstance().probeDevice(id);
+    return SigmaOS::Kernel::HAL::SovereignVirtio::probeDevice(id);
 }
 
 

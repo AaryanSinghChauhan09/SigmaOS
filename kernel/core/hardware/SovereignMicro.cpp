@@ -48,15 +48,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void micro_init() {
-    SovereignMicroEngine::getInstance().init();
+    SovereignMicroEngine::init();
 }
 
 extern "C" bool micro_spawn_isolated_shard(sigma_u32 shard_id, sigma_micro_context_t context) {
-    return SovereignMicroEngine::getInstance().spawnIsolatedShard(shard_id, context);
+    return SovereignMicroEngine::spawnIsolatedShard(shard_id, context);
 }
 
 extern "C" void micro_mediate_ipc(sigma_u32 source_id, sigma_u32 target_id, void* msg) {
-    SovereignMicroEngine::getInstance().mediateIPC(source_id, target_id, msg);
+    SovereignMicroEngine::mediateIPC(source_id, target_id, msg);
 }
 
 

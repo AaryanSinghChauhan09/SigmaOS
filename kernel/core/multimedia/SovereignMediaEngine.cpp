@@ -50,11 +50,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void media_init() {
-    SigmaOS::Kernel::Multimedia::SovereignMediaEngine::getInstance().init();
+    SigmaOS::Kernel::Multimedia::SovereignMediaEngine::init();
 }
 
 extern "C" void media_process_frame(void* buf, sigma_usize sz) {
-    SigmaOS::Kernel::Multimedia::SovereignMediaEngine::getInstance().processFrame(buf, sz);
+    SigmaOS::Kernel::Multimedia::SovereignMediaEngine::processFrame(buf, sz);
 }
 
 

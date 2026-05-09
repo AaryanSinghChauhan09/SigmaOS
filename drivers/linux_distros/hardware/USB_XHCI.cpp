@@ -25,7 +25,7 @@ public:
 
     const char* type_name() const noexcept override { return "USBXHCIController"; }
 
-    bool initDevice() {
+    static bool initDevice() {
         sigma_log_info("[XHCI] Probing for USB 3.0 Host Controllers...");
         // Map Linux usbcore endpoints to Sovereign Kernel ABI
         sigma_log_info("[XHCI] Ring buffers initialized. Roothub operational.");
@@ -36,12 +36,10 @@ public:
 private:
     USBXHCIController() = default;
 };
-
-}
-}
-}
-}
-
+} // namespace Hardware
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void xhci_init() {
-    SigmaOS::Kernel::Drivers::Hardware::USBXHCIController::getInstance().initDevice();
+    SigmaOS::Kernel::Drivers::Hardware::USBXHCIController::initDevice();
 }

@@ -51,17 +51,17 @@ void SovereignSMPEngine::broadcastIPI(sigma_u32 vector) {
 
 /* --- C Bridge --- */
 extern "C" void smp_init() {
-    SigmaOS::Kernel::HAL::SovereignSMPEngine::getInstance().init();
+    SigmaOS::Kernel::HAL::SovereignSMPEngine::init();
 }
 
 extern "C" void smp_ignite_cores() {
-    SigmaOS::Kernel::HAL::SovereignSMPEngine::getInstance().igniteCores();
+    SigmaOS::Kernel::HAL::SovereignSMPEngine::igniteCores();
 }
 
 extern "C" void smp_broadcast_ipi(unsigned int vector) {
-    SigmaOS::Kernel::HAL::SovereignSMPEngine::getInstance().broadcastIPI((sigma_u32)vector);
+    SigmaOS::Kernel::HAL::SovereignSMPEngine::broadcastIPI((sigma_u32)vector);
 }
 
 extern "C" unsigned int smp_get_core_count() {
-    return (unsigned int)SigmaOS::Kernel::HAL::SovereignSMPEngine::getInstance().getCoreCount();
+    return (unsigned int)SigmaOS::Kernel::HAL::SovereignSMPEngine::getCoreCount();
 }

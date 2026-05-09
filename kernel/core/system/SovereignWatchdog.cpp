@@ -57,11 +57,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void watchdog_init() {
-    SigmaOS::Kernel::System::SovereignWatchdog::getInstance().init();
+    SigmaOS::Kernel::System::SovereignWatchdog::init();
 }
 
 extern "C" void watchdog_pet(sigma_u32 id) {
-    SigmaOS::Kernel::System::SovereignWatchdog::getInstance().petWatchdog(id);
+    SigmaOS::Kernel::System::SovereignWatchdog::petWatchdog(id);
 }
 
 

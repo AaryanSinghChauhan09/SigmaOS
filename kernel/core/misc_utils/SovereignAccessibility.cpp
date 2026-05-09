@@ -51,15 +51,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void access_init() {
-    SovereignAccessibilityEngine::getInstance().init();
+    SovereignAccessibilityEngine::init();
 }
 
 extern "C" void access_set_colorblind(const char* mode) {
-    SovereignAccessibilityEngine::getInstance().enableColorBlindMode(mode);
+    SovereignAccessibilityEngine::enableColorBlindMode(mode);
 }
 
 extern "C" void access_set_font_scale(float scale) {
-    SovereignAccessibilityEngine::getInstance().adjustFontScaling(scale);
+    SovereignAccessibilityEngine::adjustFontScaling(scale);
 }
 
 

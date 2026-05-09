@@ -54,15 +54,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void numa_init() {
-    SovereignNUMAEngine::getInstance().init();
+    SovereignNUMAEngine::init();
 }
 
 extern "C" void numa_register_node(sigma_u32 node_id, sigma_u32 memory_mb) {
-    SovereignNUMAEngine::getInstance().registerNode(node_id, memory_mb);
+    SovereignNUMAEngine::registerNode(node_id, memory_mb);
 }
 
 extern "C" void numa_optimize_thread(sigma_u32 thread_id) {
-    SovereignNUMAEngine::getInstance().optimizeThreadLocality(thread_id);
+    SovereignNUMAEngine::optimizeThreadLocality(thread_id);
 }
 
 

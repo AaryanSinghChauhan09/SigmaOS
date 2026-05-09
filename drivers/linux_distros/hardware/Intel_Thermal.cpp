@@ -25,7 +25,7 @@ public:
 
     const char* type_name() const noexcept override { return "IntelThermalManager"; }
 
-    bool initDevice() {
+    static bool initDevice() {
         sigma_log_info("[THERMAL] Probing for Intel Thermal management zones...");
         // Map Linux thermal sysfs to Sovereign Monitor
         sigma_log_info("[THERMAL] Passive cooling trip points ACTIVE.");
@@ -36,12 +36,10 @@ public:
 private:
     IntelThermalManager() = default;
 };
-
-}
-}
-}
-}
-
+} // namespace Hardware
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void thermal_init() {
-    SigmaOS::Kernel::Drivers::Hardware::IntelThermalManager::getInstance().initDevice();
+    SigmaOS::Kernel::Drivers::Hardware::IntelThermalManager::initDevice();
 }

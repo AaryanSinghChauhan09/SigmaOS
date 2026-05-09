@@ -48,17 +48,17 @@ void SovereignAISchedEngine::setMode(sigma_aisched_mode_t mode) {
 
 /* --- C Bridge --- */
 extern "C" void aisched_init() {
-    SigmaOS::Kernel::AI::SovereignAISchedEngine::getInstance().init();
+    SigmaOS::Kernel::AI::SovereignAISchedEngine::init();
 }
 
 extern "C" void aisched_predict_workload(unsigned int process_id) {
-    SigmaOS::Kernel::AI::SovereignAISchedEngine::getInstance().predictWorkload((sigma_u32)process_id);
+    SigmaOS::Kernel::AI::SovereignAISchedEngine::predictWorkload((sigma_u32)process_id);
 }
 
 extern "C" void aisched_set_mode(sigma_aisched_mode_t mode) {
-    SigmaOS::Kernel::AI::SovereignAISchedEngine::getInstance().setMode(mode);
+    SigmaOS::Kernel::AI::SovereignAISchedEngine::setMode(mode);
 }
 
 extern "C" unsigned long long aisched_get_prediction_count() {
-    return (unsigned long long)SigmaOS::Kernel::AI::SovereignAISchedEngine::getInstance().getPredictionCount();
+    return (unsigned long long)SigmaOS::Kernel::AI::SovereignAISchedEngine::getPredictionCount();
 }

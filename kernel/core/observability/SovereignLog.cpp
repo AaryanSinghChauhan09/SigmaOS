@@ -69,11 +69,11 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void log_init() {
-    SovereignLogEngine::getInstance().init();
+    SovereignLogEngine::init();
 }
 
 extern "C" void log_emit(sigma_u32 severity, const char* message) {
-    SovereignLogEngine::getInstance().emit(severity, message);
+    SovereignLogEngine::emit(severity, message);
 }
 
 extern "C" void log_emit_f(sigma_u32 severity, const char* format, ...) {
@@ -90,11 +90,11 @@ extern "C" void log_emit_f(sigma_u32 severity, const char* format, ...) {
 }
 
 extern "C" void log_dump_lattice() {
-    SovereignLogEngine::getInstance().dumpLattice();
+    SovereignLogEngine::dumpLattice();
 }
 
 extern "C" sigma_u64 log_get_total_emitted() {
-    return SovereignLogEngine::getInstance().getTotalEmitted();
+    return SovereignLogEngine::getTotalEmitted();
 }
 
 

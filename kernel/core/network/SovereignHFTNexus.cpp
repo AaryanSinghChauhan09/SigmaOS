@@ -44,11 +44,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void hft_init() {
-    SigmaOS::Kernel::Network::SovereignHFTNexus::getInstance().init();
+    SigmaOS::Kernel::Network::SovereignHFTNexus::init();
 }
 
 extern "C" void hft_process(const void* data, sigma_size_t size) {
-    SigmaOS::Kernel::Network::SovereignHFTNexus::getInstance().processTradePacket(data, size);
+    SigmaOS::Kernel::Network::SovereignHFTNexus::processTradePacket(data, size);
 }
 
 

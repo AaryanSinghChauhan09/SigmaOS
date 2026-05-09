@@ -38,7 +38,7 @@ public:
         
         // Connect to DNA Compression
         sigma_usize compressed_size = 0;
-        SovereignDNACompression::getInstance().encode(component_name, 1024, SIGMA_NULL, &compressed_size);
+        SovereignDNACompression::encode(component_name, 1024, SIGMA_NULL, &compressed_size);
 
         sigma_log("Σ [PERSISTENCE]: State snapshot of '%s' compressed via DNA and committed to lattice.\n",
                      component_name);
@@ -61,15 +61,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void persistence_init() {
-    SigmaOS::Kernel::FS::SovereignPersistence::getInstance().init();
+    SigmaOS::Kernel::FS::SovereignPersistence::init();
 }
 
 extern "C" void persistence_snapshot(const char* component) {
-    SigmaOS::Kernel::FS::SovereignPersistence::getInstance().snapshotState(component);
+    SigmaOS::Kernel::FS::SovereignPersistence::snapshotState(component);
 }
 
 extern "C" void persistence_restore(const char* component) {
-    SigmaOS::Kernel::FS::SovereignPersistence::getInstance().restoreState(component);
+    SigmaOS::Kernel::FS::SovereignPersistence::restoreState(component);
 }
 
 

@@ -38,7 +38,7 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void predictor_init() {
-    SigmaOS::Kernel::AI::SovereignPredictor::getInstance().init();
+    SigmaOS::Kernel::AI::SovereignPredictor::init();
 }
 
 

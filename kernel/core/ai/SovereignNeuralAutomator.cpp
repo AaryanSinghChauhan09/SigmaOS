@@ -54,11 +54,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void neural_automator_init() {
-    SigmaOS::Kernel::AI::SovereignNeuralAutomator::getInstance().init();
+    SigmaOS::Kernel::AI::SovereignNeuralAutomator::init();
 }
 
 extern "C" void neural_automator_execute(const char* intent) {
-    SigmaOS::Kernel::AI::SovereignNeuralAutomator::getInstance().inferAndExecute(intent);
+    SigmaOS::Kernel::AI::SovereignNeuralAutomator::inferAndExecute(intent);
 }
 
 

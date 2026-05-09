@@ -51,11 +51,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void model_man_init() {
-    SigmaOS::Kernel::AI::SovereignModelManager::getInstance().init();
+    SigmaOS::Kernel::AI::SovereignModelManager::init();
 }
 
 extern "C" void model_man_load(const char* id) {
-    SigmaOS::Kernel::AI::SovereignModelManager::getInstance().loadModel(id);
+    SigmaOS::Kernel::AI::SovereignModelManager::loadModel(id);
 }
 
 

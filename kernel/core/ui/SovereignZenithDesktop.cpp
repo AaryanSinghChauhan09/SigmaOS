@@ -54,11 +54,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void zenith_desktop_init() {
-    SigmaOS::Kernel::UI::SovereignZenithDesktop::getInstance().init();
+    SigmaOS::Kernel::UI::SovereignZenithDesktop::init();
 }
 
 extern "C" void zenith_render(const char* context) {
-    SigmaOS::Kernel::UI::SovereignZenithDesktop::getInstance().renderWorkspace(context);
+    SigmaOS::Kernel::UI::SovereignZenithDesktop::renderWorkspace(context);
 }
 
 

@@ -50,15 +50,15 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void sasos_init() {
-    SigmaOS::Kernel::Memory::SovereignSASOS::getInstance().init();
+    SigmaOS::Kernel::Memory::SovereignSASOS::init();
 }
 
 extern "C" sigma_u32 sasos_register(const char* shard) {
-    return SigmaOS::Kernel::Memory::SovereignSASOS::getInstance().registerShardDomain(shard);
+    return SigmaOS::Kernel::Memory::SovereignSASOS::registerShardDomain(shard);
 }
 
 extern "C" void sasos_switch(sigma_u32 pkey) {
-    SigmaOS::Kernel::Memory::SovereignSASOS::getInstance().switchDomain(pkey);
+    SigmaOS::Kernel::Memory::SovereignSASOS::switchDomain(pkey);
 }
 
 

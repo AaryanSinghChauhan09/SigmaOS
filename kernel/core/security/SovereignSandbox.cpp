@@ -71,33 +71,33 @@ bool SovereignSandboxEngine::hasCapability(ShardName shard, Capability cap) {
 
 /* --- C Bridge --- */
 extern "C" void sandbox_init() {
-    SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignSandboxEngine::init();
 }
 
 extern "C" sigma_u32 sandbox_create_container(const sigma_sandbox_config_t* config) {
-    return SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().createContainer(config);
+    return SigmaOS::Kernel::Security::SovereignSandboxEngine::createContainer(config);
 }
 
 extern "C" int sandbox_execute(sigma_u32 container_id, const char* binary_path) {
-    return SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().execute(container_id, binary_path) ? 1 : 0;
+    return SigmaOS::Kernel::Security::SovereignSandboxEngine::execute(container_id, binary_path) ? 1 : 0;
 }
 
 extern "C" void sandbox_destroy_container(sigma_u32 container_id) {
-    SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().destroyContainer(container_id);
+    SigmaOS::Kernel::Security::SovereignSandboxEngine::destroyContainer(container_id);
 }
 
 extern "C" int sandbox_check_syscall(sigma_u32 syscall_id) {
-    return SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().checkSyscall(syscall_id) ? 1 : 0;
+    return SigmaOS::Kernel::Security::SovereignSandboxEngine::checkSyscall(syscall_id) ? 1 : 0;
 }
 
 extern "C" int sandbox_has_capability(const char* shard_name, const char* capability) {
-    return SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().hasCapability(
+    return SigmaOS::Kernel::Security::SovereignSandboxEngine::hasCapability(
         SigmaOS::Kernel::Security::SovereignSandboxEngine::ShardName{shard_name},
         SigmaOS::Kernel::Security::SovereignSandboxEngine::Capability{capability}) ? 1 : 0;
 }
 
 extern "C" int sandbox_validate_mac(const char* subject, const char* object, const char* action) {
-    return SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().validateMACPolicy(
+    return SigmaOS::Kernel::Security::SovereignSandboxEngine::validateMACPolicy(
         SigmaOS::Kernel::Security::SovereignSandboxEngine::Subject{subject},
         SigmaOS::Kernel::Security::SovereignSandboxEngine::Object{object},
         SigmaOS::Kernel::Security::SovereignSandboxEngine::Action{action}) ? 1 : 0;

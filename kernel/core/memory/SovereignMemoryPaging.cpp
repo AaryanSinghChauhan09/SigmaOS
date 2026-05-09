@@ -48,15 +48,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void paging_init() {
-    SovereignPagingEngine::getInstance().init();
+    SovereignPagingEngine::init();
 }
 
 extern "C" void paging_map(void* virtual_addr, void* physical_addr, sigma_u32 flags) {
-    SovereignPagingEngine::getInstance().mapVirtualToPhysical(virtual_addr, physical_addr, flags);
+    SovereignPagingEngine::mapVirtualToPhysical(virtual_addr, physical_addr, flags);
 }
 
 extern "C" void paging_prefetch() {
-    SovereignPagingEngine::getInstance().predictAndPrefetch();
+    SovereignPagingEngine::predictAndPrefetch();
 }
 
 

@@ -25,7 +25,7 @@ public:
 
     const char* type_name() const noexcept override { return "IntelAX210WiFi6E"; }
 
-    bool initDevice() {
+    static bool initDevice() {
         sigma_log_info("[AX210-6E] Probing for Intel Wi-Fi 6E (6GHz) adapter...");
         // Map Linux iwlwifi microcode for AX210
         sigma_log_info("[AX210-6E] Loading AX210-6E firmware v22.x...");
@@ -37,11 +37,11 @@ private:
     IntelAX210WiFi6E() = default;
 };
 
-}
-}
-}
-}
+} // namespace Hardware
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" void ax210_init() {
-    SigmaOS::Kernel::Drivers::Hardware::IntelAX210WiFi6E::getInstance().initDevice();
+    SigmaOS::Kernel::Drivers::Hardware::IntelAX210WiFi6E::initDevice();
 }

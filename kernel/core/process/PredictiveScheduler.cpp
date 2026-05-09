@@ -55,11 +55,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void predict_sched_init() {
-    SigmaOS::Kernel::Scheduling::PredictiveScheduler::getInstance().init();
+    SigmaOS::Kernel::Scheduling::PredictiveScheduler::init();
 }
 
 extern "C" void predict_sched_dispatch(const char* id, sigma_u32 prio) {
-    SigmaOS::Kernel::Scheduling::PredictiveScheduler::getInstance().scheduleShard(id, prio);
+    SigmaOS::Kernel::Scheduling::PredictiveScheduler::scheduleShard(id, prio);
 }
 
 

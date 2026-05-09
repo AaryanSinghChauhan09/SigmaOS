@@ -44,10 +44,10 @@ void SovereignThemeMarketEngine::listThemes() {
     }
 }
 
-extern "C" void theme_market_init() { SovereignThemeMarketEngine::getInstance().init(); }
-extern "C" void theme_market_publish(const char* name, const char* author) { SovereignThemeMarketEngine::getInstance().publishTheme(name, author); }
-extern "C" bool theme_market_apply(const char* name) { return SovereignThemeMarketEngine::getInstance().applyTheme(name); }
-extern "C" void theme_market_list() { SovereignThemeMarketEngine::getInstance().listThemes(); }
+extern "C" void theme_market_init() { SovereignThemeMarketEngine::init(); }
+extern "C" void theme_market_publish(const char* name, const char* author) { SovereignThemeMarketEngine::publishTheme(name, author); }
+extern "C" bool theme_market_apply(const char* name) { return SovereignThemeMarketEngine::applyTheme(name); }
+extern "C" void theme_market_list() { SovereignThemeMarketEngine::listThemes(); }
 
 
 

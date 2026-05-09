@@ -65,15 +65,15 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void cap_vault_init() {
-    SigmaOS::Kernel::Security::SovereignCapabilityVault::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignCapabilityVault::init();
 }
 
 extern "C" sigma_u64 cap_vault_issue(sigma_u32 res, sigma_u32 perm) {
-    return SigmaOS::Kernel::Security::SovereignCapabilityVault::getInstance().issueToken(res, perm);
+    return SigmaOS::Kernel::Security::SovereignCapabilityVault::issueToken(res, perm);
 }
 
 extern "C" int cap_vault_validate(sigma_u64 token, sigma_u32 res, sigma_u32 perm) {
-    return SigmaOS::Kernel::Security::SovereignCapabilityVault::getInstance().validate(token, res, perm) ? 1 : 0;
+    return SigmaOS::Kernel::Security::SovereignCapabilityVault::validate(token, res, perm) ? 1 : 0;
 }
 
 

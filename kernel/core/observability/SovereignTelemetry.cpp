@@ -34,11 +34,9 @@ public:
 private:
     SovereignTelemetry() = default;
 };
-
-}
-}
-}
-
+} // namespace Observability
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void telemetry_execute_ebpf(const void* bytecode, sigma_usize size) {
-    SigmaOS::Kernel::Observability::SovereignTelemetry::getInstance().executeTracing(bytecode, size);
+    SigmaOS::Kernel::Observability::SovereignTelemetry::executeTracing(bytecode, size);
 }

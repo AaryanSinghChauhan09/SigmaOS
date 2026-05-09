@@ -25,7 +25,7 @@ public:
 
     const char* type_name() const noexcept override { return "SynapticsInput"; }
 
-    bool initDevice() {
+    static bool initDevice() {
         sigma_log_info("[SYNAPTICS] Probing I2C/PS2 bus for Synaptics Touchpad...");
         // Map evdev events to Sovereign Zenith UI input queue
         sigma_log_info("[SYNAPTICS] Multitouch gestures enabled. Palm rejection ACTIVE.");
@@ -36,12 +36,10 @@ public:
 private:
     SynapticsInput() = default;
 };
-
-}
-}
-}
-}
-
+} // namespace Hardware
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void synaptics_input_init() {
-    SigmaOS::Kernel::Drivers::Hardware::SynapticsInput::getInstance().initDevice();
+    SigmaOS::Kernel::Drivers::Hardware::SynapticsInput::initDevice();
 }

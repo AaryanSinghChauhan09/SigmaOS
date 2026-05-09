@@ -51,11 +51,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void ebpf_init() {
-    SigmaOS::Kernel::System::SovereignBPF::getInstance().init();
+    SigmaOS::Kernel::System::SovereignBPF::init();
 }
 
 extern "C" void ebpf_load_prog(const char* name, const void* code, sigma_usize sz) {
-    SigmaOS::Kernel::System::SovereignBPF::getInstance().loadProgram(name, code, sz);
+    SigmaOS::Kernel::System::SovereignBPF::loadProgram(name, code, sz);
 }
 
 

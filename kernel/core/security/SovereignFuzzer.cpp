@@ -54,11 +54,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void fuzzer_init() {
-    SigmaOS::Kernel::Security::SovereignFuzzer::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignFuzzer::init();
 }
 
 extern "C" void fuzzer_inject(const char* target, sigma_u32 iters) {
-    SigmaOS::Kernel::Security::SovereignFuzzer::getInstance().injectFault(target, iters);
+    SigmaOS::Kernel::Security::SovereignFuzzer::injectFault(target, iters);
 }
 
 

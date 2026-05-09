@@ -57,19 +57,19 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void updater_init() {
-    SigmaOS::Kernel::Deployment::SovereignAtomicUpdater::getInstance().init();
+    SigmaOS::Kernel::Deployment::SovereignAtomicUpdater::init();
 }
 
 extern "C" bool updater_stage_update(const char* shard_id, const void* new_data, sigma_size_t size) {
-    return SigmaOS::Kernel::Deployment::SovereignAtomicUpdater::getInstance().stageUpdate(shard_id, new_data, size);
+    return SigmaOS::Kernel::Deployment::SovereignAtomicUpdater::stageUpdate(shard_id, new_data, size);
 }
 
 extern "C" bool updater_commit_update() {
-    return SigmaOS::Kernel::Deployment::SovereignAtomicUpdater::getInstance().commitUpdate();
+    return SigmaOS::Kernel::Deployment::SovereignAtomicUpdater::commitUpdate();
 }
 
 extern "C" void updater_rollback() {
-    SigmaOS::Kernel::Deployment::SovereignAtomicUpdater::getInstance().rollback();
+    SigmaOS::Kernel::Deployment::SovereignAtomicUpdater::rollback();
 }
 
 

@@ -53,11 +53,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void diag_analytics_init() {
-    SigmaOS::Kernel::Diag::SovereignAnalytics::getInstance().init();
+    SigmaOS::Kernel::Diag::SovereignAnalytics::init();
 }
 
 extern "C" void diag_track_shard(const char* id, const char* type) {
-    SigmaOS::Kernel::Diag::SovereignAnalytics::getInstance().trackEvent(id, type);
+    SigmaOS::Kernel::Diag::SovereignAnalytics::trackEvent(id, type);
 }
 
 

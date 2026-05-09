@@ -50,15 +50,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void scheduler_init() {
-    SovereignTaskScheduler::getInstance().init();
+    SovereignTaskScheduler::init();
 }
 
 extern "C" void scheduler_add_task(const char* name, sigma_u32 interval_ms) {
-    SovereignTaskScheduler::getInstance().scheduleTask(name, interval_ms);
+    SovereignTaskScheduler::scheduleTask(name, interval_ms);
 }
 
 extern "C" void scheduler_tick(sigma_u32 elapsed_ms) {
-    SovereignTaskScheduler::getInstance().tick(elapsed_ms);
+    SovereignTaskScheduler::tick(elapsed_ms);
 }
 
 

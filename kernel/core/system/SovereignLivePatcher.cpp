@@ -55,11 +55,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void live_patch_init() {
-    SigmaOS::Kernel::System::SovereignLivePatcher::getInstance().init();
+    SigmaOS::Kernel::System::SovereignLivePatcher::init();
 }
 
 extern "C" void live_patch_apply(const char* func, const void* payload) {
-    SigmaOS::Kernel::System::SovereignLivePatcher::getInstance().applyLivePatch(func, payload);
+    SigmaOS::Kernel::System::SovereignLivePatcher::applyLivePatch(func, payload);
 }
 
 

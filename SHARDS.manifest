@@ -68,9 +68,48 @@ userland/SovereignSpotlight.cpp
 kernel/core/ui/SovereignSnap.cpp
 iso_root/installer/install.sh
 ecosystem/packager/sigma-pkg.sh
+kernel/core/industrial/SovereignCloudImage.cpp
+kernel/core/industrial/SovereignLTS.cpp
+kernel/core/industrial/SovereignInit.cpp
+kernel/core/industrial/SovereignOrbResolver.cpp
+kernel/core/industrial/SovereignForensicLattice.cpp
+kernel/core/industrial/SovereignMicroEdition.cpp
+kernel/core/security/SovereignFIPS.cpp
+kernel/core/security/SovereignAnonymity.cpp
+kernel/core/observability/SovereignEmergencySync.cpp
+kernel/core/automation/SovereignAgentQuotasExtended.cpp
+kernel/core/system/SovereignContainerOrchestrator.cpp
+kernel/core/ui/ZenithAccessibility.cpp
 
 # ═══════════════════════════════════════════════════════════════════════
-# LAYER 6: AI RESEARCH SHARDS (kernel/shards/)
+# LAYER 6: HARDWARE COMPATIBILITY (Linux Distro Ports)
+# ═══════════════════════════════════════════════════════════════════════
+drivers/linux_distros/hardware/ACPI_Backlight.cpp
+drivers/linux_distros/hardware/AMDGPU_Graphics.cpp
+drivers/linux_distros/hardware/AMDGPU_Modern.cpp
+drivers/linux_distros/hardware/AMDGPU_SI.cpp
+drivers/linux_distros/hardware/Intel_AX200_WiFi.cpp
+drivers/linux_distros/hardware/Intel_AX210_WiFi6E.cpp
+drivers/linux_distros/hardware/Intel_Bluetooth.cpp
+drivers/linux_distros/hardware/Intel_I915_Graphics.cpp
+drivers/linux_distros/hardware/Intel_Thermal.cpp
+drivers/linux_distros/hardware/NVMe_Core.cpp
+drivers/linux_distros/hardware/Nouveau_Graphics.cpp
+drivers/linux_distros/hardware/Nvidia_TensorCore.cpp
+drivers/linux_distros/hardware/RTL8111_Ethernet.cpp
+drivers/linux_distros/hardware/Realtek_HDA_Audio.cpp
+drivers/linux_distros/hardware/Realtek_RTL8821CE.cpp
+drivers/linux_distros/hardware/SDHCI_CardReader.cpp
+drivers/linux_distros/hardware/SovereignARM64.cpp
+drivers/linux_distros/hardware/Synaptics_Input.cpp
+drivers/linux_distros/hardware/USB_Fingerprint.cpp
+drivers/linux_distros/hardware/USB_Mass_Storage.cpp
+drivers/linux_distros/hardware/USB_UVC_15.cpp
+drivers/linux_distros/hardware/USB_UVC_Camera.cpp
+drivers/linux_distros/hardware/USB_XHCI.cpp
+
+# ═══════════════════════════════════════════════════════════════════════
+# LAYER 7: AI RESEARCH SHARDS (kernel/shards/)
 # ═══════════════════════════════════════════════════════════════════════
 kernel/shards/ai/SovereignResearchMatrix.cpp
 kernel/shards/ai/SovereignScholasticRepo.cpp

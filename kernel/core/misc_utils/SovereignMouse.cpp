@@ -44,11 +44,11 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void mouse_init() {
-    SovereignMouseEngine::getInstance().init();
+    SovereignMouseEngine::init();
 }
 
 extern "C" void mouse_handle_report(const sigma_u8* report) {
-    SovereignMouseEngine::getInstance().handleReport(report);
+    SovereignMouseEngine::handleReport(report);
 }
 
 

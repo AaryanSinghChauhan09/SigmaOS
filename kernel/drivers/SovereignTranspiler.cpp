@@ -41,9 +41,9 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void transpiler_init() {
-    SovereignTranspilerEngine::getInstance().init();
+    SovereignTranspilerEngine::init();
 }
 
 extern "C" void transpiler_auto_map(sigma_u32 device_id) {
-    SovereignTranspilerEngine::getInstance().autoMap(device_id);
+    SovereignTranspilerEngine::autoMap(device_id);
 }

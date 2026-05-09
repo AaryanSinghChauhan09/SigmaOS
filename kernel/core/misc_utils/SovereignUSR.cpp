@@ -54,15 +54,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void usr_init() {
-    SovereignUSREngine::getInstance().init();
+    SovereignUSREngine::init();
 }
 
 extern "C" void usr_register_shard(const char* name, sigma_u32 id) {
-    SovereignUSREngine::getInstance().registerShard(name, id);
+    SovereignUSREngine::registerShard(name, id);
 }
 
 extern "C" sigma_u32 usr_discover_shard(const char* name) {
-    return SovereignUSREngine::getInstance().discoverShard(name);
+    return SovereignUSREngine::discoverShard(name);
 }
 
 

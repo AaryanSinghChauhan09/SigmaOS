@@ -58,11 +58,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void anomaly_detector_init() {
-    SigmaOS::Kernel::Security::SovereignAnomalyDetector::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignAnomalyDetector::init();
 }
 
 extern "C" void anomaly_analyze(const char* proc, sigma_u32 sys_rate, sigma_u32 mem) {
-    SigmaOS::Kernel::Security::SovereignAnomalyDetector::getInstance().analyzeBehavior(proc, sys_rate, mem);
+    SigmaOS::Kernel::Security::SovereignAnomalyDetector::analyzeBehavior(proc, sys_rate, mem);
 }
 
 

@@ -45,11 +45,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void uxsrv_init() {
-    SigmaOS::Kernel::UI::SovereignUXSrv::getInstance().init();
+    SigmaOS::Kernel::UI::SovereignUXSrv::init();
 }
 
 extern "C" void uxsrv_handle_workflow(const char* id) {
-    SigmaOS::Kernel::UI::SovereignUXSrv::getInstance().handleWorkflow(id);
+    SigmaOS::Kernel::UI::SovereignUXSrv::handleWorkflow(id);
 }
 
 

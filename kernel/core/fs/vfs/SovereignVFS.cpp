@@ -25,15 +25,15 @@ void SovereignVFS::listFiles(const char* path) {
 
 /* --- C Bridge --- */
 extern "C" void vfs_init() {
-    SigmaOS::Kernel::FS::SovereignVFS::getInstance().init();
+    SigmaOS::Kernel::FS::SovereignVFS::init();
 }
 
 extern "C" void vfs_mount(const char* source, const char* target) {
-    SigmaOS::Kernel::FS::SovereignVFS::getInstance().mount(source, target);
+    SigmaOS::Kernel::FS::SovereignVFS::mount(source, target);
 }
 
 extern "C" void vfs_list_files(const char* path) {
-    SigmaOS::Kernel::FS::SovereignVFS::getInstance().listFiles(path);
+    SigmaOS::Kernel::FS::SovereignVFS::listFiles(path);
 }
 
 

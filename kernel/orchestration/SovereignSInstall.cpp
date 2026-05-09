@@ -64,9 +64,9 @@ private:
  * ========================================================================= */
 
 extern "C" void sinstall_init() {
-    SovereignDeploymentEngine::getInstance().init();
+    SovereignDeploymentEngine::init();
 }
 
 extern "C" void sinstall_ignite(const char* target_disk) {
-    SovereignDeploymentEngine::getInstance().ignite(target_disk);
+    SovereignDeploymentEngine::ignite(target_disk);
 }

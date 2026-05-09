@@ -24,17 +24,17 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignOrbTransaction"; }
 
-    void beginTransaction(const char* orb_name) {
+    static void beginTransaction(const char* orb_name) {
         sigma_log_info("[ORB-TX] Atomic transaction STARTED for:");
         sigma_log_info(orb_name);
         sigma_log_info("[ORB-TX] Creating Lattice snapshot for possible rollback...");
     }
 
-    void commitTransaction() {
+    static void commitTransaction() {
         sigma_log_info("[ORB-TX] Transaction COMMITTED. Lattice state finalized.");
     }
 
-    void rollbackTransaction() {
+    static void rollbackTransaction() {
         sigma_log_warn("[ORB-TX] ROLLBACK triggered! Reverting Lattice state to snapshot...");
         sigma_log_info("[ORB-TX] Restoration complete. System integrity preserved.");
     }
@@ -42,19 +42,17 @@ public:
 private:
     SovereignOrbTransaction() = default;
 };
-
-}
-}
-}
-
+} // namespace Industrial
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void orb_tx_begin(const char* name) {
-    SigmaOS::Kernel::Industrial::SovereignOrbTransaction::getInstance().beginTransaction(name);
+    SigmaOS::Kernel::Industrial::SovereignOrbTransaction::beginTransaction(name);
 }
 
 extern "C" void orb_tx_commit() {
-    SigmaOS::Kernel::Industrial::SovereignOrbTransaction::getInstance().commitTransaction();
+    SigmaOS::Kernel::Industrial::SovereignOrbTransaction::commitTransaction();
 }
 
 extern "C" void orb_tx_rollback() {
-    SigmaOS::Kernel::Industrial::SovereignOrbTransaction::getInstance().rollbackTransaction();
+    SigmaOS::Kernel::Industrial::SovereignOrbTransaction::rollbackTransaction();
 }

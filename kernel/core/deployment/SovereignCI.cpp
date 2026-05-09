@@ -59,15 +59,15 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void sci_init() {
-    SigmaOS::Kernel::Deployment::SovereignCIEngine::getInstance().init();
+    SigmaOS::Kernel::Deployment::SovereignCIEngine::init();
 }
 
 extern "C" bool sci_trigger_pipeline(const char* source_path, const char* target_shard_name) {
-    return SigmaOS::Kernel::Deployment::SovereignCIEngine::getInstance().triggerPipeline(source_path, target_shard_name);
+    return SigmaOS::Kernel::Deployment::SovereignCIEngine::triggerPipeline(source_path, target_shard_name);
 }
 
 extern "C" sigma_u64 sci_get_executed_count() {
-    return SigmaOS::Kernel::Deployment::SovereignCIEngine::getInstance().getExecutedCount();
+    return SigmaOS::Kernel::Deployment::SovereignCIEngine::getExecutedCount();
 }
 
 

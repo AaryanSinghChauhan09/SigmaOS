@@ -49,11 +49,11 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void visscript_init() {
-    SovereignVisScriptEngine::getInstance().init();
+    SovereignVisScriptEngine::init();
 }
 
 extern "C" void visscript_execute_graph(const sigma_visscript_node_t* start_node) {
-    SovereignVisScriptEngine::getInstance().executeGraph(start_node);
+    SovereignVisScriptEngine::executeGraph(start_node);
 }
 
 

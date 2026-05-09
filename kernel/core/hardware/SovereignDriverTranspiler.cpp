@@ -54,11 +54,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void driver_transpiler_init() {
-    SigmaOS::Kernel::Hardware::SovereignDriverTranspiler::getInstance().init();
+    SigmaOS::Kernel::Hardware::SovereignDriverTranspiler::init();
 }
 
 extern "C" void driver_transpiler_compile(const char* driver, const char* arch) {
-    SigmaOS::Kernel::Hardware::SovereignDriverTranspiler::getInstance().transpileDriver(driver, arch);
+    SigmaOS::Kernel::Hardware::SovereignDriverTranspiler::transpileDriver(driver, arch);
 }
 
 

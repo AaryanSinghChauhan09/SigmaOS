@@ -46,11 +46,11 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void multiboot_init(sigma_u32 magic, void* addr) {
-    SovereignMultibootEngine::getInstance().parseBootInfo(magic, addr);
+    SovereignMultibootEngine::parseBootInfo(magic, addr);
 }
 
 extern "C" bool multiboot_is_secure() {
-    return SovereignMultibootEngine::getInstance().isBootSecure();
+    return SovereignMultibootEngine::isBootSecure();
 }
 
 

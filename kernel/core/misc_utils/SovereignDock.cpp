@@ -61,15 +61,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void dock_init() {
-    SovereignDockEngine::getInstance().init();
+    SovereignDockEngine::init();
 }
 
 extern "C" void dock_add_app(const char* app_name) {
-    SovereignDockEngine::getInstance().addAppToDock(app_name);
+    SovereignDockEngine::addAppToDock(app_name);
 }
 
 extern "C" void dock_configure(const char* pos, bool hide, float scale) {
-    SovereignDockEngine::getInstance().configureDock(pos, hide, scale);
+    SovereignDockEngine::configureDock(pos, hide, scale);
 }
 
 

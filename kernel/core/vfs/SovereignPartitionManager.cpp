@@ -33,11 +33,9 @@ public:
 private:
     SovereignPartitionManager() = default;
 };
-
-}
-}
-}
-
+} // namespace VFS
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void partition_manager_scan() {
-    SigmaOS::Kernel::VFS::SovereignPartitionManager::getInstance().scanPartitions();
+    SigmaOS::Kernel::VFS::SovereignPartitionManager::scanPartitions();
 }

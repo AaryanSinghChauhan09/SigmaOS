@@ -67,7 +67,7 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void diag_init() {
-    SigmaOS::Kernel::Observability::SovereignDiagEngine::getInstance().init();
+    SigmaOS::Kernel::Observability::SovereignDiagEngine::init();
 }
 
 extern "C" void diag_scan() {
@@ -79,7 +79,7 @@ extern "C" void diag_auto_repair() {
 }
 
 extern "C" void diag_report(const char* shard, const char* desc) {
-    SigmaOS::Kernel::Observability::SovereignDiagEngine::getInstance().reportAnomaly(
+    SigmaOS::Kernel::Observability::SovereignDiagEngine::reportAnomaly(
         SigmaOS::Kernel::Observability::SovereignDiagEngine::ShardID{shard},
         SigmaOS::Kernel::Observability::SovereignDiagEngine::AnomalyDesc{desc});
 }

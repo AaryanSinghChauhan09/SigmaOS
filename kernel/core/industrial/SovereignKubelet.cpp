@@ -24,13 +24,13 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignKubelet"; }
 
-    void startWorkerNode() {
+    static void startWorkerNode() {
         sigma_log_info("[KUBELET-SHIM] Initializing Sovereign Worker Node...");
         sigma_log_info("[KUBELET-SHIM] Registering with Control Plane via PQC-TLS...");
         sigma_log_info("[KUBELET-SHIM] Node Status: [READY]. Shards available for Pod deployment.");
     }
 
-    void reconcilePodState() {
+    static void reconcilePodState() {
         sigma_log_info("[KUBELET-SHIM] Reconciling Pod state with SovereignPodman...");
     }
 
@@ -38,10 +38,10 @@ private:
     SovereignKubelet() = default;
 };
 
-}
-}
-}
+} // namespace Industrial
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" void kubelet_init() {
-    SigmaOS::Kernel::Industrial::SovereignKubelet::getInstance().startWorkerNode();
+    SigmaOS::Kernel::Industrial::SovereignKubelet::startWorkerNode();
 }

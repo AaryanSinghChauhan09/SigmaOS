@@ -65,15 +65,15 @@ void SovereignAllocatorEngine::free(void* ptr) {
 
 /* --- C Wrappers --- */
 extern "C" void allocator_init() {
-    SovereignAllocatorEngine::getInstance().init();
+    SovereignAllocatorEngine::init();
 }
 
 extern "C" void* allocator_malloc(sigma_u32 size) {
-    return SovereignAllocatorEngine::getInstance().malloc(size);
+    return SovereignAllocatorEngine::malloc(size);
 }
 
 extern "C" void allocator_free(void* ptr) {
-    SovereignAllocatorEngine::getInstance().free(ptr);
+    SovereignAllocatorEngine::free(ptr);
 }
 
 

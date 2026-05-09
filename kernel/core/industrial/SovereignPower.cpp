@@ -26,7 +26,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignPower"; }
 
-    void setSleepState(sigma_u8 state) {
+    static void setSleepState(sigma_u8 state) {
         sigma_log_info("[POWER] Transitioning to ACPI Sleep State:");
         sigma_print_num(state);
         
@@ -38,7 +38,7 @@ public:
         }
     }
 
-    void optimizeForBattery() {
+    static void optimizeForBattery() {
         sigma_log_info("[POWER] Optimizing C-states and P-states for Battery efficiency.");
         sigma_log_info("[POWER] Scaling back Neural Coprocessor duty cycle.");
     }
@@ -46,15 +46,13 @@ public:
 private:
     SovereignPower() = default;
 };
-
-}
-}
-}
-
+} // namespace Industrial
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void power_set_state(sigma_u8 state) {
-    SigmaOS::Kernel::Industrial::SovereignPower::getInstance().setSleepState(state);
+    SigmaOS::Kernel::Industrial::SovereignPower::setSleepState(state);
 }
 
 extern "C" void power_optimize() {
-    SigmaOS::Kernel::Industrial::SovereignPower::getInstance().optimizeForBattery();
+    SigmaOS::Kernel::Industrial::SovereignPower::optimizeForBattery();
 }

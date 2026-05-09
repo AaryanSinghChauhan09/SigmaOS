@@ -52,19 +52,19 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void power_init() {
-    SovereignPowerEngine::getInstance().init();
+    SovereignPowerEngine::init();
 }
 
 extern "C" void power_set_profile(sigma_power_profile_t profile) {
-    SovereignPowerEngine::getInstance().setProfile(profile);
+    SovereignPowerEngine::setProfile(profile);
 }
 
 extern "C" sigma_u32 power_get_battery_pct() {
-    return SovereignPowerEngine::getInstance().getBatteryPct();
+    return SovereignPowerEngine::getBatteryPct();
 }
 
 extern "C" void power_reboot() {
-    SovereignPowerEngine::getInstance().reboot();
+    SovereignPowerEngine::reboot();
 }
 
 

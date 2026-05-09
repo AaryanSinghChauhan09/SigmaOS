@@ -49,11 +49,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void script_nexus_init() {
-    SigmaOS::Kernel::AI::SovereignScriptNexus::getInstance().init();
+    SigmaOS::Kernel::AI::SovereignScriptNexus::init();
 }
 
 extern "C" void script_nexus_execute(const char* graph) {
-    SigmaOS::Kernel::AI::SovereignScriptNexus::getInstance().executeGraph(graph);
+    SigmaOS::Kernel::AI::SovereignScriptNexus::executeGraph(graph);
 }
 
 

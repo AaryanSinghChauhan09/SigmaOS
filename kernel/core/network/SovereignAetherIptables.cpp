@@ -41,15 +41,13 @@ public:
 private:
     SovereignAetherIptables() = default;
 };
-
-}
-}
-}
-
+} // namespace Network
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void iptables_init() {
-    SigmaOS::Kernel::Network::SovereignAetherIptables::getInstance().init();
+    SigmaOS::Kernel::Network::SovereignAetherIptables::init();
 }
 
 extern "C" void iptables_apply(const char* rule) {
-    SigmaOS::Kernel::Network::SovereignAetherIptables::getInstance().applyLinuxRule(rule);
+    SigmaOS::Kernel::Network::SovereignAetherIptables::applyLinuxRule(rule);
 }

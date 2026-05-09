@@ -14,6 +14,8 @@
 #include "core/SigmaOOP.hpp"
 #include "sigma_log.h"
 
+extern "C" int ip_audit_verify(const char* name, const char* license);
+
 namespace SigmaOS {
 namespace Kernel {
 namespace Drivers {
@@ -27,17 +29,16 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignLinuxCompat"; }
 
-    void init() {
+    static void init() {
         sigma_log_info("[LINUX-COMPAT] Initializing Universal Driver Compat Layer...");
         sigma_log_info("[LINUX-COMPAT] Abstracting Linux ABI for SigmaOS HAL...");
     }
 
-    bool loadLinuxDriver(const char* driver_path, const char* license_tag = "GPL") {
+    static bool loadLinuxDriver(const char* driver_path, const char* license_tag = "GPL") {
         sigma_log_info("[LINUX-COMPAT] Attempting to load Linux Driver:");
         sigma_log_info(driver_path);
         
         // --- IP COMPLIANCE ENFORCEMENT ---
-        extern "C" int ip_audit_verify(const char* name, const char* license);
         if (!ip_audit_verify(driver_path, license_tag)) {
             sigma_log_err("[LINUX-COMPAT] ABORT: Driver rejected due to Intellectual Property / Licensing laws.");
             return false;
@@ -45,16 +46,13 @@ public:
         // ---------------------------------
 
         // Placeholder for ELF loading and ABI wrapping logic
-        // We simulate a successful mapping of Linux kernel structures (sk_buff, etc.)
-        // to SigmaOS native structs.
-        
         sigma_log_info("[LINUX-COMPAT] Driver ABI wrapped successfully.");
         sigma_log_info("[LINUX-COMPAT] Hardware mapped via VFS.");
-        m_loaded_drivers++;
+        getInstance().m_loaded_drivers++;
         return true;
     }
 
-    void listLoadedDrivers() const {
+    static void listLoadedDrivers() {
         sigma_log_info("[LINUX-COMPAT] --- LOADED LINUX DRIVERS ---");
         // Detailed log would display individual driver names here
         sigma_log_info("[LINUX-COMPAT] Status: ACTIVE");
@@ -74,13 +72,13 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void linux_compat_init() {
-    SigmaOS::Kernel::Drivers::SovereignLinuxCompat::getInstance().init();
+    SigmaOS::Kernel::Drivers::SovereignLinuxCompat::init();
 }
 
 extern "C" void linux_compat_load(const char* driver_path) {
-    SigmaOS::Kernel::Drivers::SovereignLinuxCompat::getInstance().loadLinuxDriver(driver_path);
+    SigmaOS::Kernel::Drivers::SovereignLinuxCompat::loadLinuxDriver(driver_path);
 }
 
 extern "C" void linux_compat_list() {
-    SigmaOS::Kernel::Drivers::SovereignLinuxCompat::getInstance().listLoadedDrivers();
+    SigmaOS::Kernel::Drivers::SovereignLinuxCompat::listLoadedDrivers();
 }

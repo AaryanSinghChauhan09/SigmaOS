@@ -25,7 +25,7 @@ public:
 
     const char* type_name() const noexcept override { return "ACPIBacklight"; }
 
-    bool initDevice() {
+    static bool initDevice() {
         sigma_log_info("[BACKLIGHT] Probing ACPI for video backlight controls...");
         // Map Linux backlight class to Zenith UI brightness engine
         sigma_log_info("[BACKLIGHT] ACPI methods detected. PWM levels initialized.");
@@ -37,11 +37,11 @@ private:
     ACPIBacklight() = default;
 };
 
-}
-}
-}
-}
+} // namespace Hardware
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" void backlight_init() {
-    SigmaOS::Kernel::Drivers::Hardware::ACPIBacklight::getInstance().initDevice();
+    SigmaOS::Kernel::Drivers::Hardware::ACPIBacklight::initDevice();
 }

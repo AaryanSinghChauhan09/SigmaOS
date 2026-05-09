@@ -45,15 +45,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void telemetry_ex_init() {
-    SovereignTelemetryExporter::getInstance().init();
+    SovereignTelemetryExporter::init();
 }
 
 extern "C" void telemetry_ex_configure(const char* ip) {
-    SovereignTelemetryExporter::getInstance().configureEndpoint(ip);
+    SovereignTelemetryExporter::configureEndpoint(ip);
 }
 
 extern "C" void telemetry_ex_export(sigma_u32 cpu, sigma_u32 mem) {
-    SovereignTelemetryExporter::getInstance().exportMetrics(cpu, mem);
+    SovereignTelemetryExporter::exportMetrics(cpu, mem);
 }
 
 

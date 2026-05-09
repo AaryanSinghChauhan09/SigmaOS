@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignFIPSAuditor"; }
 
-    bool runComplianceAudit() {
+    static bool runComplianceAudit() {
         sigma_log_info("[FIPS-AUDIT] Starting FIPS-140-3 Self-Test sequence...");
         
         // 1. Known Answer Tests (KAT)
@@ -45,10 +45,10 @@ private:
     SovereignFIPSAuditor() = default;
 };
 
-}
-}
-}
+} // namespace Security
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" int security_fips_audit() {
-    return SigmaOS::Kernel::Security::SovereignFIPSAuditor::getInstance().runComplianceAudit() ? 1 : 0;
+    return SigmaOS::Kernel::Security::SovereignFIPSAuditor::runComplianceAudit() ? 1 : 0;
 }

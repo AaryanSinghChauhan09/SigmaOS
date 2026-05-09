@@ -47,15 +47,15 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void vfs_browser_init() {
-    SigmaOS::Kernel::Runtime::SovereignVFSBrowser::getInstance().init();
+    SigmaOS::Kernel::Runtime::SovereignVFSBrowser::init();
 }
 
 extern "C" sigma_ssize_t vfs_browser_read(int fd, void* buf, sigma_size_t count) {
-    return SigmaOS::Kernel::Runtime::SovereignVFSBrowser::getInstance().mock_read(fd, buf, count);
+    return SigmaOS::Kernel::Runtime::SovereignVFSBrowser::mock_read(fd, buf, count);
 }
 
 extern "C" sigma_ssize_t vfs_browser_write(int fd, const void* buf, sigma_size_t count) {
-    return SigmaOS::Kernel::Runtime::SovereignVFSBrowser::getInstance().mock_write(fd, buf, count);
+    return SigmaOS::Kernel::Runtime::SovereignVFSBrowser::mock_write(fd, buf, count);
 }
 
 

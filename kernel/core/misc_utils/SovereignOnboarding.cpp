@@ -23,7 +23,7 @@ void SovereignOnboardingEngine::setPersona(const char* persona_name) {
 }
 
 extern "C" void onboarding_start() {
-    SovereignOnboardingEngine::getInstance().startWizard();
+    SovereignOnboardingEngine::startWizard();
 }
 
 

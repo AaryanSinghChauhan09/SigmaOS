@@ -47,15 +47,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void realtime_init() {
-    SovereignRealTimeManager::getInstance().init();
+    SovereignRealTimeManager::init();
 }
 
 extern "C" bool realtime_schedule_task(const sigma_realtime_task_t* task, void (*task_func)(void)) {
-    return SovereignRealTimeManager::getInstance().scheduleTask(task, task_func);
+    return SovereignRealTimeManager::scheduleTask(task, task_func);
 }
 
 extern "C" void realtime_execute_critical_path() {
-    SovereignRealTimeManager::getInstance().executeCriticalPath();
+    SovereignRealTimeManager::executeCriticalPath();
 }
 
 

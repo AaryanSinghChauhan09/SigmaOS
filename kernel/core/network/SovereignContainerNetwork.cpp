@@ -40,11 +40,11 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void container_net_init() {
-    SovereignContainerNetEngine::getInstance().init();
+    SovereignContainerNetEngine::init();
 }
 
 extern "C" void container_net_attach(const char* container, const char* mac) {
-    SovereignContainerNetEngine::getInstance().attachContainerNetwork(container, mac);
+    SovereignContainerNetEngine::attachContainerNetwork(container, mac);
 }
 
 

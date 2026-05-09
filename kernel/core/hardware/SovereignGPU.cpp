@@ -56,15 +56,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void gpu_init() {
-    SovereignGPUEngine::getInstance().init();
+    SovereignGPUEngine::init();
 }
 
 extern "C" void gpu_register(const char* vendor_id, sigma_u32 vram_mb) {
-    SovereignGPUEngine::getInstance().registerGPU(vendor_id, vram_mb);
+    SovereignGPUEngine::registerGPU(vendor_id, vram_mb);
 }
 
 extern "C" bool gpu_dispatch(const char* workload_type) {
-    return SovereignGPUEngine::getInstance().dispatchComputeKernel(workload_type);
+    return SovereignGPUEngine::dispatchComputeKernel(workload_type);
 }
 
 

@@ -63,11 +63,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void posix_init() {
-    SigmaOS::Kernel::Industrial::SovereignPOSIXLayer::getInstance().init();
+    SigmaOS::Kernel::Industrial::SovereignPOSIXLayer::init();
 }
 
 extern "C" void posix_signal_shard(sigma_u32 sig, sigma_u32 shard) {
-    SigmaOS::Kernel::Industrial::SovereignPOSIXLayer::getInstance().mapSignal(sig, shard);
+    SigmaOS::Kernel::Industrial::SovereignPOSIXLayer::mapSignal(sig, shard);
 }
 
 

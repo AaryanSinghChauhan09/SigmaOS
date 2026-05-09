@@ -70,13 +70,13 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void nvme_init() {
-    SovereignNVMeEngine::getInstance().init();
+    SovereignNVMeEngine::init();
 }
 
 extern "C" int nvme_read_blocks(uint64_t lba, uint32_t count, void* buffer) {
-    return SovereignNVMeEngine::getInstance().readBlocks(lba, count, buffer);
+    return SovereignNVMeEngine::readBlocks(lba, count, buffer);
 }
 
 extern "C" int nvme_write_blocks(uint64_t lba, uint32_t count, const void* buffer) {
-    return SovereignNVMeEngine::getInstance().writeBlocks(lba, count, buffer);
+    return SovereignNVMeEngine::writeBlocks(lba, count, buffer);
 }

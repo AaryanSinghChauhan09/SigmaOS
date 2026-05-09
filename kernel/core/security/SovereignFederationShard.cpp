@@ -52,11 +52,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void federation_init() {
-    SigmaOS::Kernel::Security::SovereignFederationShard::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignFederationShard::init();
 }
 
 extern "C" bool federation_sso(const char* dom, const char* prot) {
-    return SigmaOS::Kernel::Security::SovereignFederationShard::getInstance().performSSO(dom, prot);
+    return SigmaOS::Kernel::Security::SovereignFederationShard::performSSO(dom, prot);
 }
 
 

@@ -54,11 +54,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void configurator_init() {
-    SigmaOS::Kernel::System::SovereignLatticeConfigurator::getInstance().init();
+    SigmaOS::Kernel::System::SovereignLatticeConfigurator::init();
 }
 
 extern "C" void configurator_apply(const char* policy) {
-    SigmaOS::Kernel::System::SovereignLatticeConfigurator::getInstance().applyPolicy(policy);
+    SigmaOS::Kernel::System::SovereignLatticeConfigurator::applyPolicy(policy);
 }
 
 

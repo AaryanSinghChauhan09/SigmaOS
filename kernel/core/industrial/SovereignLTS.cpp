@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignLTSOrchestrator"; }
 
-    void initializeLTSChannel(const char* version_name) {
+    static void initializeLTSChannel(const char* version_name) {
         sigma_log_info("[LTS] Initializing Long-Term Support channel:");
         sigma_log_info(version_name);
         
@@ -32,7 +32,7 @@ public:
         sigma_log_info("[LTS] Update Strategy: Sovereign Atomic Shard Sync only.");
     }
 
-    void auditLifecycle() {
+    static void auditLifecycle() {
         sigma_log_info("[LTS] Auditing release lifecycle stability...");
         sigma_log_info("[LTS] State: STABLE. No breaking ABI changes detected.");
     }
@@ -41,14 +41,14 @@ private:
     SovereignLTSOrchestrator() = default;
 };
 
-}
-}
-}
+} // namespace Deployment
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" void lts_init(const char* version) {
-    SigmaOS::Kernel::Deployment::SovereignLTSOrchestrator::getInstance().initializeLTSChannel(version);
+    SigmaOS::Kernel::Deployment::SovereignLTSOrchestrator::initializeLTSChannel(version);
 }
 
 extern "C" void lts_audit() {
-    SigmaOS::Kernel::Deployment::SovereignLTSOrchestrator::getInstance().auditLifecycle();
+    SigmaOS::Kernel::Deployment::SovereignLTSOrchestrator::auditLifecycle();
 }

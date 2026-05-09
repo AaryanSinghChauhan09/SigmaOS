@@ -24,12 +24,12 @@ public:
 
     const char* type_name() const noexcept override { return "DebianDriverCompat"; }
 
-    bool loadDebianDriver(const char* deb_firmware_path) {
+    static bool loadDebianDriver(const char* deb_firmware_path) {
         sigma_log_info("[DEBIAN-COMPAT] Loading .deb derived firmware...");
         // 1. Unpack dpkg layout if necessary
         // 2. Map standard Ubuntu/Debian /lib/firmware paths
         // 3. Inject standard Linux ABI symbols expected by Debian drivers
-        sigma_log_info(deb_firmware_path);
+        sigma_log_info("%s", deb_firmware_path);
         sigma_log_info("[DEBIAN-COMPAT] Debian driver successfully hooked into HAL.");
         return true;
     }
@@ -38,10 +38,10 @@ private:
     DebianDriverCompat() = default;
 };
 
-}
-}
-}
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" void debian_driver_load(const char* path) {
-    SigmaOS::Kernel::Drivers::DebianDriverCompat::getInstance().loadDebianDriver(path);
+    SigmaOS::Kernel::Drivers::DebianDriverCompat::loadDebianDriver(path);
 }

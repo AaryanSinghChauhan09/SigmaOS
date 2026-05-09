@@ -54,15 +54,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void netstack_init() {
-    SovereignNetStackEngine::getInstance().init();
+    SovereignNetStackEngine::init();
 }
 
 extern "C" void netstack_register_iface(const char* mac_addr) {
-    SovereignNetStackEngine::getInstance().registerInterface(mac_addr);
+    SovereignNetStackEngine::registerInterface(mac_addr);
 }
 
 extern "C" bool netstack_dispatch(const char* payload, sigma_u32 length) {
-    return SovereignNetStackEngine::getInstance().dispatchPacket(payload, length);
+    return SovereignNetStackEngine::dispatchPacket(payload, length);
 }
 
 

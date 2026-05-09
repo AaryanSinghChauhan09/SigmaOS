@@ -33,11 +33,9 @@ public:
 private:
     SovereignWhonixTor() = default;
 };
-
-}
-}
-}
-
+} // namespace Security
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void privacy_enforce_tor() {
-    SigmaOS::Kernel::Security::SovereignWhonixTor::getInstance().forceTorRouting();
+    SigmaOS::Kernel::Security::SovereignWhonixTor::forceTorRouting();
 }

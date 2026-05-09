@@ -54,11 +54,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void storage_ai_init() {
-    SigmaOS::Kernel::FS::SovereignStorageAI::getInstance().init();
+    SigmaOS::Kernel::FS::SovereignStorageAI::init();
 }
 
 extern "C" void storage_ai_optimize(const char* vol) {
-    SigmaOS::Kernel::FS::SovereignStorageAI::getInstance().optimizeVolume(vol);
+    SigmaOS::Kernel::FS::SovereignStorageAI::optimizeVolume(vol);
 }
 
 

@@ -25,7 +25,7 @@ public:
 
     const char* type_name() const noexcept override { return "IntelAX200WiFi"; }
 
-    bool initDevice() {
+    static bool initDevice() {
         sigma_log_info("[AX200] Probing for Intel AX200 Wireless adapter...");
         // Map mac80211 wireless stack from Linux
         sigma_log_info("[AX200] Intel firmware microcode mapped to HAL.");
@@ -37,11 +37,11 @@ private:
     IntelAX200WiFi() = default;
 };
 
-}
-}
-}
-}
+} // namespace Hardware
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" void ax200_wifi_init() {
-    SigmaOS::Kernel::Drivers::Hardware::IntelAX200WiFi::getInstance().initDevice();
+    SigmaOS::Kernel::Drivers::Hardware::IntelAX200WiFi::initDevice();
 }

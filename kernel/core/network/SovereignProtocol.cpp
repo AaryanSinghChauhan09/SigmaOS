@@ -48,15 +48,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void scp_init() {
-    SovereignProtocolEngine::getInstance().init();
+    SovereignProtocolEngine::init();
 }
 
 extern "C" void scp_add_peer(const char* peer) {
-    SovereignProtocolEngine::getInstance().addMeshPeer(peer);
+    SovereignProtocolEngine::addMeshPeer(peer);
 }
 
 extern "C" void scp_broadcast(const char* data) {
-    SovereignProtocolEngine::getInstance().broadcast(data);
+    SovereignProtocolEngine::broadcast(data);
 }
 
 

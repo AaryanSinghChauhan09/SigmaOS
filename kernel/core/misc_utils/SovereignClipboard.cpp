@@ -43,15 +43,15 @@ void* SovereignClipboardEngine::paste(sigma_clip_type_t* out_type, sigma_u32* ou
 
 /* --- C Wrappers --- */
 extern "C" void clipboard_init() {
-    SovereignClipboardEngine::getInstance().init();
+    SovereignClipboardEngine::init();
 }
 
 extern "C" void clipboard_copy(sigma_clip_type_t type, const void* data, sigma_u32 size) {
-    SovereignClipboardEngine::getInstance().copy(type, data, size);
+    SovereignClipboardEngine::copy(type, data, size);
 }
 
 extern "C" void* clipboard_paste(sigma_clip_type_t* out_type, sigma_u32* out_size) {
-    return SovereignClipboardEngine::getInstance().paste(out_type, out_size);
+    return SovereignClipboardEngine::paste(out_type, out_size);
 }
 
 

@@ -58,15 +58,15 @@ private:
 };
 
 extern "C" void input_init() {
-    SovereignInputEngine::getInstance().init();
+    SovereignInputEngine::init();
 }
 
 extern "C" void input_push_event(sigma_key_event_t* event) {
-    SovereignInputEngine::getInstance().pushEvent(event);
+    SovereignInputEngine::pushEvent(event);
 }
 
 extern "C" bool input_pop_event(sigma_key_event_t* out_event) {
-    return SovereignInputEngine::getInstance().popEvent(out_event);
+    return SovereignInputEngine::popEvent(out_event);
 }
 
 

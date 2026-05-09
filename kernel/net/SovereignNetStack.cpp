@@ -59,17 +59,17 @@ void SovereignNetStackEngine::reportStats() const {
 
 /* --- C Wrappers --- */
 extern "C" void net_init(const sigma_net_config_t* config) {
-    SovereignNetStackEngine::getInstance().init(config);
+    SovereignNetStackEngine::init(config);
 }
 
 extern "C" void net_send_packet(const void* data, sigma_u32 len) { (void)data;
-    SovereignNetStackEngine::getInstance().sendPacket(data, len);
+    SovereignNetStackEngine::sendPacket(data, len);
 }
 
 extern "C" void net_receive_packet(void* buffer, sigma_u32* len) { (void)buffer;
-    SovereignNetStackEngine::getInstance().receivePacket(buffer, len);
+    SovereignNetStackEngine::receivePacket(buffer, len);
 }
 
 extern "C" void net_report_stats() {
-    SovereignNetStackEngine::getInstance().reportStats();
+    SovereignNetStackEngine::reportStats();
 }

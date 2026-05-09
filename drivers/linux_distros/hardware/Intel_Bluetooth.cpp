@@ -25,7 +25,7 @@ public:
 
     const char* type_name() const noexcept override { return "IntelBluetooth"; }
 
-    bool initDevice() {
+    static bool initDevice() {
         sigma_log_info("[BT-INTEL] Probing USB/PCI for Intel Bluetooth controller...");
         // Map BlueZ kernel structures to Sovereign Connectivity Shard
         sigma_log_info("[BT-INTEL] Firmware patches applied. HCI interface online.");
@@ -36,12 +36,10 @@ public:
 private:
     IntelBluetooth() = default;
 };
-
-}
-}
-}
-}
-
+} // namespace Hardware
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void intel_bluetooth_init() {
-    SigmaOS::Kernel::Drivers::Hardware::IntelBluetooth::getInstance().initDevice();
+    SigmaOS::Kernel::Drivers::Hardware::IntelBluetooth::initDevice();
 }

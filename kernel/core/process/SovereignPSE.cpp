@@ -65,15 +65,15 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void pse_init() {
-    SigmaOS::Kernel::Process::SovereignPSEEngine::getInstance().init();
+    SigmaOS::Kernel::Process::SovereignPSEEngine::init();
 }
 
 extern "C" sigma_u32 pse_execute_wasm(const void* bytecode, sigma_size_t size) {
-    return SigmaOS::Kernel::Process::SovereignPSEEngine::getInstance().executeWasm(bytecode, size);
+    return SigmaOS::Kernel::Process::SovereignPSEEngine::executeWasm(bytecode, size);
 }
 
 extern "C" void pse_terminate_wasm(sigma_u32 thread_id) {
-    SigmaOS::Kernel::Process::SovereignPSEEngine::getInstance().terminateWasm(thread_id);
+    SigmaOS::Kernel::Process::SovereignPSEEngine::terminateWasm(thread_id);
 }
 
 

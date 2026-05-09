@@ -51,11 +51,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void ha_core_init() {
-    SigmaOS::Kernel::Cloud::SovereignHACore::getInstance().init();
+    SigmaOS::Kernel::Cloud::SovereignHACore::init();
 }
 
 extern "C" void ha_core_failover(const char* node) {
-    SigmaOS::Kernel::Cloud::SovereignHACore::getInstance().handleFailover(node);
+    SigmaOS::Kernel::Cloud::SovereignHACore::handleFailover(node);
 }
 
 

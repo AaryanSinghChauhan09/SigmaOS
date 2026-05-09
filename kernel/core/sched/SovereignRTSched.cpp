@@ -40,9 +40,9 @@ public:
 } // namespace SigmaOS
 
 extern "C" void sigma_rt_sched_init() {
-    SigmaOS::Kernel::Sched::SovereignRTScheduler::getInstance().init();
+    SigmaOS::Kernel::Sched::SovereignRTScheduler::init();
 }
 
 extern "C" void sigma_rt_schedule(unsigned int id, unsigned int prio, unsigned long long deadline) {
-    SigmaOS::Kernel::Sched::SovereignRTScheduler::getInstance().scheduleRT(id, prio, deadline);
+    SigmaOS::Kernel::Sched::SovereignRTScheduler::scheduleRT(id, prio, deadline);
 }

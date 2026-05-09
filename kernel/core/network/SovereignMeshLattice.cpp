@@ -50,15 +50,15 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void mesh_init() {
-    SigmaOS::Kernel::Network::SovereignMeshLattice::getInstance().init();
+    SigmaOS::Kernel::Network::SovereignMeshLattice::init();
 }
 
 extern "C" void mesh_discover() {
-    SigmaOS::Kernel::Network::SovereignMeshLattice::getInstance().discoverPeers();
+    SigmaOS::Kernel::Network::SovereignMeshLattice::discoverPeers();
 }
 
 extern "C" void mesh_send(sigma_u32 node, const char* shard, const void* data, sigma_size_t size) {
-    SigmaOS::Kernel::Network::SovereignMeshLattice::getInstance().sendShardMessage(node, shard, data, size);
+    SigmaOS::Kernel::Network::SovereignMeshLattice::sendShardMessage(node, shard, data, size);
 }
 
 

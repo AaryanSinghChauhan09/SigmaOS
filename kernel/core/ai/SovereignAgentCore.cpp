@@ -70,9 +70,9 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void agent_spawn(const char* id, const char* goal) {
-    SigmaOS::AI::SovereignAgentCore::getInstance().spawnAgent(id, goal);
+    SigmaOS::AI::SovereignAgentCore::spawnAgent(id, goal);
 }
 
 extern "C" void agent_audit() {
-    SigmaOS::AI::SovereignAgentCore::getInstance().auditAgents();
+    SigmaOS::AI::SovereignAgentCore::auditAgents();
 }

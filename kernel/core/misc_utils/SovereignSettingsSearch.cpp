@@ -64,9 +64,9 @@ private:
     sigma_u32 settings_count;
 };
 
-extern "C" void settings_search_init() { SovereignSettingsSearchEngine::getInstance().init(); }
-extern "C" void settings_search_register(const char* key, const char* label, const char* cat) { SovereignSettingsSearchEngine::getInstance().registerSetting(key, label, cat); }
-extern "C" void settings_search_query(const char* query) { SovereignSettingsSearchEngine::getInstance().search(query); }
+extern "C" void settings_search_init() { SovereignSettingsSearchEngine::init(); }
+extern "C" void settings_search_register(const char* key, const char* label, const char* cat) { SovereignSettingsSearchEngine::registerSetting(key, label, cat); }
+extern "C" void settings_search_query(const char* query) { SovereignSettingsSearchEngine::search(query); }
 
 
 

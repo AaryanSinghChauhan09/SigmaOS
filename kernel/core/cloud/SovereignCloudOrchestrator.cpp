@@ -55,11 +55,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void cloud_orch_init() {
-    SigmaOS::Kernel::Cloud::SovereignCloudOrchestrator::getInstance().init();
+    SigmaOS::Kernel::Cloud::SovereignCloudOrchestrator::init();
 }
 
 extern "C" void cloud_orch_deploy(const char* task) {
-    SigmaOS::Kernel::Cloud::SovereignCloudOrchestrator::getInstance().orchestrate(task);
+    SigmaOS::Kernel::Cloud::SovereignCloudOrchestrator::orchestrate(task);
 }
 
 

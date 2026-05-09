@@ -44,11 +44,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void dump_init() {
-    SigmaOS::Kernel::Observability::SovereignDumpEngine::getInstance().init();
+    SigmaOS::Kernel::Observability::SovereignDumpEngine::init();
 }
 
 extern "C" void dump_trigger(const char* reason) {
-    SigmaOS::Kernel::Observability::SovereignDumpEngine::getInstance().trigger(reason);
+    SigmaOS::Kernel::Observability::SovereignDumpEngine::trigger(reason);
 }
 
 

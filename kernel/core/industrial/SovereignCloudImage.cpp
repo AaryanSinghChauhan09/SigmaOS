@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignCloudImage"; }
 
-    void generateMetadata(const char* provider) {
+    static void generateMetadata(const char* provider) {
         sigma_log_info("[CLOUD-IMAGE] Generating metadata for provider:");
         sigma_log_info(provider);
         
@@ -33,7 +33,7 @@ public:
         sigma_log_info("[CLOUD-IMAGE] Mapping secure SSH-PQC keys to root authorized_keys.");
     }
 
-    void finalizeImage() {
+    static void finalizeImage() {
         sigma_log_info("[CLOUD-IMAGE] Finalizing VHDX/Raw image for cloud marketplace.");
         sigma_log_info("[CLOUD-IMAGE] Image status: [READY FOR PUBLICATION].");
     }
@@ -42,11 +42,11 @@ private:
     SovereignCloudImage() = default;
 };
 
-}
-}
-}
+} // namespace Deployment
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" void cloud_image_generate(const char* provider) {
-    SigmaOS::Kernel::Deployment::SovereignCloudImage::getInstance().generateMetadata(provider);
-    SigmaOS::Kernel::Deployment::SovereignCloudImage::getInstance().finalizeImage();
+    SigmaOS::Kernel::Deployment::SovereignCloudImage::generateMetadata(provider);
+    SigmaOS::Kernel::Deployment::SovereignCloudImage::finalizeImage();
 }

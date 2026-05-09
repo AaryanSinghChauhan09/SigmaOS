@@ -54,11 +54,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void edge_node_init() {
-    SigmaOS::Kernel::Cloud::SovereignEdgeNode::getInstance().init();
+    SigmaOS::Kernel::Cloud::SovereignEdgeNode::init();
 }
 
 extern "C" void edge_deploy(const char* workload) {
-    SigmaOS::Kernel::Cloud::SovereignEdgeNode::getInstance().deployWorkload(workload);
+    SigmaOS::Kernel::Cloud::SovereignEdgeNode::deployWorkload(workload);
 }
 
 

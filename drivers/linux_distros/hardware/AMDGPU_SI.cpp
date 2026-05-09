@@ -25,7 +25,7 @@ public:
 
     const char* type_name() const noexcept override { return "AMDGPUSouthernIslands"; }
 
-    bool initDevice() {
+    static bool initDevice() {
         sigma_log_info("[AMDGPU-SI] Probing for AMD Southern Islands (GCN 1.0) GPU...");
         // Map Linux amdgpu microcode
         sigma_log_info("[AMDGPU-SI] Loading SI firmware (verde_mc.bin, verde_pfp.bin)...");
@@ -36,12 +36,10 @@ public:
 private:
     AMDGPUSouthernIslands() = default;
 };
-
-}
-}
-}
-}
-
+} // namespace Hardware
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void amdgpu_si_init() {
-    SigmaOS::Kernel::Drivers::Hardware::AMDGPUSouthernIslands::getInstance().initDevice();
+    SigmaOS::Kernel::Drivers::Hardware::AMDGPUSouthernIslands::initDevice();
 }

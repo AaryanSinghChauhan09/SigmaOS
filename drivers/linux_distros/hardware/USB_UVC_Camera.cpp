@@ -25,7 +25,7 @@ public:
 
     const char* type_name() const noexcept override { return "USBWebcamUVC"; }
 
-    bool initDevice() {
+    static bool initDevice() {
         sigma_log_info("[USB-UVC] Probing USB bus for UVC-compliant webcams...");
         // Map V4L2 (Video4Linux2) structures to Sovereign Camera Shard
         sigma_log_info("[USB-UVC] Frame descriptors parsed. Video stream mapped.");
@@ -36,12 +36,10 @@ public:
 private:
     USBWebcamUVC() = default;
 };
-
-}
-}
-}
-}
-
+} // namespace Hardware
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void uvc_webcam_init() {
-    SigmaOS::Kernel::Drivers::Hardware::USBWebcamUVC::getInstance().initDevice();
+    SigmaOS::Kernel::Drivers::Hardware::USBWebcamUVC::initDevice();
 }

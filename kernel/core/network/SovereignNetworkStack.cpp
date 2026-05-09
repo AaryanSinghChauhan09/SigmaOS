@@ -50,11 +50,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void netstack_init() {
-    SigmaOS::Kernel::Network::SovereignNetworkStack::getInstance().init();
+    SigmaOS::Kernel::Network::SovereignNetworkStack::init();
 }
 
 extern "C" void netstack_receive(void* pkt, sigma_usize sz) {
-    SigmaOS::Kernel::Network::SovereignNetworkStack::getInstance().handlePacket(pkt, sz);
+    SigmaOS::Kernel::Network::SovereignNetworkStack::handlePacket(pkt, sz);
 }
 
 

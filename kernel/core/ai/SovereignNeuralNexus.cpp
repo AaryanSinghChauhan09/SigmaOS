@@ -107,23 +107,23 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void neural_init() {
-    SigmaOS::Kernel::AI::SovereignNeuralEngine::getInstance().init();
+    SigmaOS::Kernel::AI::SovereignNeuralEngine::init();
 }
 
 extern "C" bool neural_load_model(const char* model_name, sigma_u32 parameters_mb) {
-    return SigmaOS::Kernel::AI::SovereignNeuralEngine::getInstance().loadModel(model_name, parameters_mb);
+    return SigmaOS::Kernel::AI::SovereignNeuralEngine::loadModel(model_name, parameters_mb);
 }
 
 extern "C" void neural_infer_anomaly(const void* system_telemetry, sigma_u32 size) {
-    SigmaOS::Kernel::AI::SovereignNeuralEngine::getInstance().inferAnomaly(system_telemetry, size);
+    SigmaOS::Kernel::AI::SovereignNeuralEngine::inferAnomaly(system_telemetry, size);
 }
 
 extern "C" void neural_predict(const void* input_tensor, void* output_tensor) {
-    SigmaOS::Kernel::AI::SovereignNeuralEngine::getInstance().predict(input_tensor, output_tensor);
+    SigmaOS::Kernel::AI::SovereignNeuralEngine::predict(input_tensor, output_tensor);
 }
 
 extern "C" void neural_report_status() {
-    SigmaOS::Kernel::AI::SovereignNeuralEngine::getInstance().reportStatus();
+    SigmaOS::Kernel::AI::SovereignNeuralEngine::reportStatus();
 }
 
 

@@ -95,5 +95,5 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void gdt_init() {
-    SigmaOS::Kernel::Arch::SovereignGDT::getInstance().init();
+    SigmaOS::Kernel::Arch::SovereignGDT::init();
 }

@@ -54,11 +54,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void ci_pipeline_init() {
-    SigmaOS::Kernel::Development::SovereignCI::getInstance().init();
+    SigmaOS::Kernel::Development::SovereignCI::init();
 }
 
 extern "C" void ci_trigger(const char* hash) {
-    SigmaOS::Kernel::Development::SovereignCI::getInstance().triggerPipeline(hash);
+    SigmaOS::Kernel::Development::SovereignCI::triggerPipeline(hash);
 }
 
 

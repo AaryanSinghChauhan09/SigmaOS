@@ -51,15 +51,15 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void lazy_init() {
-    SigmaOS::Kernel::Misc::SovereignLazyManager::getInstance().init();
+    SigmaOS::Kernel::Misc::SovereignLazyManager::init();
 }
 
 extern "C" void* lazy_alloc(sigma_size_t size) {
-    return SigmaOS::Kernel::Misc::SovereignLazyManager::getInstance().deferAllocation(size);
+    return SigmaOS::Kernel::Misc::SovereignLazyManager::deferAllocation(size);
 }
 
 extern "C" void lazy_resolve(void* ptr) {
-    SigmaOS::Kernel::Misc::SovereignLazyManager::getInstance().resolveFault(ptr);
+    SigmaOS::Kernel::Misc::SovereignLazyManager::resolveFault(ptr);
 }
 
 

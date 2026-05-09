@@ -53,11 +53,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void verifier_init() {
-    SigmaOS::Kernel::Security::SovereignFormalVerifier::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignFormalVerifier::init();
 }
 
 extern "C" bool verifier_verify_shard(const char* id, void* ptr) {
-    return SigmaOS::Kernel::Security::SovereignFormalVerifier::getInstance().verifyShard(id, ptr);
+    return SigmaOS::Kernel::Security::SovereignFormalVerifier::verifyShard(id, ptr);
 }
 
 

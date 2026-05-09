@@ -50,9 +50,9 @@ private:
 } // namespace SigmaOS
 
 extern "C" void sigma_pager_init() {
-    SigmaOS::Kernel::Memory::SovereignPager::getInstance().init();
+    SigmaOS::Kernel::Memory::SovereignPager::init();
 }
 
 extern "C" void sigma_page_fault_handler(unsigned long long addr, unsigned int code) {
-    SigmaOS::Kernel::Memory::SovereignPager::getInstance().handlePageFault(addr, code);
+    SigmaOS::Kernel::Memory::SovereignPager::handlePageFault(addr, code);
 }

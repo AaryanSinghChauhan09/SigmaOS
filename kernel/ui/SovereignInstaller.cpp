@@ -44,11 +44,9 @@ public:
 private:
     SovereignInstaller() = default;
 };
-
-}
-}
-}
-
+} // namespace Deployment
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void installer_start() {
-    SigmaOS::Kernel::Deployment::SovereignInstaller::getInstance().startInstallation();
+    SigmaOS::Kernel::Deployment::SovereignInstaller::startInstallation();
 }

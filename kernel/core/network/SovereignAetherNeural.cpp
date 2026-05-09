@@ -37,11 +37,9 @@ public:
 private:
     SovereignAetherNeural() = default;
 };
-
-}
-}
-}
-
+} // namespace Network
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" int aether_neural_inspect(const char* src) {
-    return SigmaOS::Kernel::Network::SovereignAetherNeural::getInstance().detectThreat(src) ? 1 : 0;
+    return SigmaOS::Kernel::Network::SovereignAetherNeural::detectThreat(src) ? 1 : 0;
 }

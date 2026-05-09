@@ -71,11 +71,11 @@ private:
 
 /* --- C Interface --- */
 extern "C" void scheduler_init_shard() {
-    SigmaOS::Kernel::Scheduling::SovereignScheduler::getInstance().init();
+    SigmaOS::Kernel::Scheduling::SovereignScheduler::init();
 }
 
 extern "C" void scheduler_spawn(const char* name, void (*entry)()) {
-    SigmaOS::Kernel::Scheduling::SovereignScheduler::getInstance().createTask(name, entry);
+    SigmaOS::Kernel::Scheduling::SovereignScheduler::createTask(name, entry);
 }
 
 

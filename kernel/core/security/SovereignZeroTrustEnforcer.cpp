@@ -52,11 +52,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void zta_enforcer_init() {
-    SigmaOS::Kernel::Security::SovereignZeroTrustEnforcer::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignZeroTrustEnforcer::init();
 }
 
 extern "C" bool zta_verify_access(const char* id, const char* res) {
-    return SigmaOS::Kernel::Security::SovereignZeroTrustEnforcer::getInstance().verifyAccess(id, res);
+    return SigmaOS::Kernel::Security::SovereignZeroTrustEnforcer::verifyAccess(id, res);
 }
 
 

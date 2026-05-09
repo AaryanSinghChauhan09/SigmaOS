@@ -39,10 +39,10 @@ public:
 
 /* --- C Bridge --- */
 extern "C" void sigma_model_optimize(const char* model) {
-    SigmaOS::Kernel::AI::SovereignModelOptimizer::getInstance().loadWeights(model);
-    SigmaOS::Kernel::AI::SovereignModelOptimizer::getInstance().quantizeWeights();
+    SigmaOS::Kernel::AI::SovereignModelOptimizer::loadWeights(model);
+    SigmaOS::Kernel::AI::SovereignModelOptimizer::quantizeWeights();
 }
 
 extern "C" void sigma_model_infer() {
-    SigmaOS::Kernel::AI::SovereignModelOptimizer::getInstance().runInference();
+    SigmaOS::Kernel::AI::SovereignModelOptimizer::runInference();
 }

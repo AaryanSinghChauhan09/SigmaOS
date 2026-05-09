@@ -28,7 +28,7 @@ public:
         sigma_log("Σ [POWER]: Silicon Sleep States (S0-S5) mapping READY.");
     }
 
-    void setSleepState(sigma_u32 state) {
+    static void setSleepState(sigma_u32 state) {
         sigma_log("Σ [POWER]: Transitioning Silicon Lattice to State S%u...\n", state);
         
         switch (state) {
@@ -62,11 +62,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void power_init() {
-    SigmaOS::Kernel::System::SovereignPowerManager::getInstance().init();
+    SigmaOS::Kernel::System::SovereignPowerManager::init();
 }
 
 extern "C" void power_set_state(sigma_u32 s) {
-    SigmaOS::Kernel::System::SovereignPowerManager::getInstance().setSleepState(s);
+    SigmaOS::Kernel::System::SovereignPowerManager::setSleepState(s);
 }
 
 

@@ -54,11 +54,11 @@ void SovereignDNACompression::audit() {
 
 /* --- C Bridge --- */
 extern "C" void dna_init() {
-    SigmaOS::Kernel::FS::SovereignDNACompression::getInstance().init();
+    SigmaOS::Kernel::FS::SovereignDNACompression::init();
 }
 
 extern "C" sigma_size_t dna_compress(const void* in, sigma_size_t sz, void* out) {
-    return SigmaOS::Kernel::FS::SovereignDNACompression::getInstance().encode(in, sz, out, SIGMA_NULL);
+    return SigmaOS::Kernel::FS::SovereignDNACompression::encode(in, sz, out, SIGMA_NULL);
 }
 
 

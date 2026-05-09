@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignDXVK"; }
 
-    void initializeDXVK() {
+    static void initializeDXVK() {
         sigma_log_info("[DXVK-SHARD] Initializing DXVK/VKD3D translation layer...");
         sigma_log_info("[DXVK-SHARD] Vulkan 1.3 descriptors mapped for D3D11/12.");
     }
@@ -32,11 +32,9 @@ public:
 private:
     SovereignDXVK() = default;
 };
-
-}
-}
-}
-
+} // namespace Multimedia
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void proton_dxvk_init() {
-    SigmaOS::Kernel::Multimedia::SovereignDXVK::getInstance().initializeDXVK();
+    SigmaOS::Kernel::Multimedia::SovereignDXVK::initializeDXVK();
 }

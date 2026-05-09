@@ -48,11 +48,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void search_init() {
-    SigmaOS::Kernel::Misc::SovereignSearchEngine::getInstance().init();
+    SigmaOS::Kernel::Misc::SovereignSearchEngine::init();
 }
 
 extern "C" void search_query(const char* term) {
-    SigmaOS::Kernel::Misc::SovereignSearchEngine::getInstance().query(term);
+    SigmaOS::Kernel::Misc::SovereignSearchEngine::query(term);
 }
 
 

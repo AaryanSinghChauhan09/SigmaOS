@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignDriverLoader"; }
 
-    void loadAll() {
+    static void loadAll() {
         sigma_log_info("[DRIVER-LOADER] Loading required hardware drivers...");
         extern "C" void gpu_init(); gpu_init();
         extern "C" void nvme_init(); nvme_init();
@@ -36,11 +36,9 @@ public:
 private:
     SovereignDriverLoader() = default;
 };
-
-}
-}
-}
-
+} // namespace HAL
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void hal_load_drivers() {
-    SigmaOS::Kernel::HAL::SovereignDriverLoader::getInstance().loadAll();
+    SigmaOS::Kernel::HAL::SovereignDriverLoader::loadAll();
 }

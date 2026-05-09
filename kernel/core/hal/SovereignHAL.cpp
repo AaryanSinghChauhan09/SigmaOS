@@ -1,6 +1,8 @@
 #include "hal/sigma_hal.h"
 #include "libc/SovereignLibC.h"
 
+extern "C" void hal_load_drivers();
+
 namespace SigmaOS {
 namespace Kernel {
 namespace HAL {
@@ -9,7 +11,6 @@ void SovereignHAL::init() {
     sigma_log("Σ [HAL]: Initializing Universal Hardware Abstraction Shard...");
     
     // Mandatory Driver Initialization via Loader Shard
-    extern "C" void hal_load_drivers();
     hal_load_drivers();
     
     sigma_log("Σ [HAL]: Device Tree lattice active.");
@@ -38,11 +39,11 @@ void SovereignHAL::registerDriver(const char* name, DeviceType type) {
 
 /* --- C Bridge --- */
 extern "C" void hal_init() {
-    SigmaOS::Kernel::HAL::SovereignHAL::getInstance().init();
+    SigmaOS::Kernel::HAL::SovereignHAL::init();
 }
 
 extern "C" void hal_probe() {
-    SigmaOS::Kernel::HAL::SovereignHAL::getInstance().probeBus();
+    SigmaOS::Kernel::HAL::SovereignHAL::probeBus();
 }
 
 

@@ -54,9 +54,9 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void hal_init() {
-    SigmaOS::Kernel::HAL::SovereignHAL::getInstance().init();
+    SigmaOS::Kernel::HAL::SovereignHAL::init();
 }
 
 extern "C" void hal_reboot() {
-    SigmaOS::Kernel::HAL::SovereignHAL::getInstance().reboot();
+    SigmaOS::Kernel::HAL::SovereignHAL::reboot();
 }

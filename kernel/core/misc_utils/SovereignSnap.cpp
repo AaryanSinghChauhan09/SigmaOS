@@ -56,20 +56,20 @@ void SovereignSnapEngine::registerZone(sigma_u32 x, sigma_u32 y,
 
 /* --- C Wrappers --- */
 extern "C" void snap_init() {
-    SigmaOS::Kernel::UI::SovereignSnapEngine::getInstance().init();
+    SigmaOS::Kernel::UI::SovereignSnapEngine::init();
 }
 
 extern "C" void snap_window_to_zone(sigma_u32 window_id, sigma_snap_zone_id_t zone) {
     (void)window_id;
-    SigmaOS::Kernel::UI::SovereignSnapEngine::getInstance().applyLayout((sigma_u32)zone);
+    SigmaOS::Kernel::UI::SovereignSnapEngine::applyLayout((sigma_u32)zone);
 }
 
 extern "C" void snap_auto_arrange() {
-    SigmaOS::Kernel::UI::SovereignSnapEngine::getInstance().applyLayout(0u);
+    SigmaOS::Kernel::UI::SovereignSnapEngine::applyLayout(0u);
 }
 
 extern "C" void snap_register_zone(sigma_u32 x, sigma_u32 y, sigma_u32 w, sigma_u32 h) {
-    SigmaOS::Kernel::UI::SovereignSnapEngine::getInstance().registerZone(x, y, w, h);
+    SigmaOS::Kernel::UI::SovereignSnapEngine::registerZone(x, y, w, h);
 }
 
 

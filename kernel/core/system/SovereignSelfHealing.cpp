@@ -64,5 +64,5 @@ private:
 } // namespace SigmaOS
 
 extern "C" void sigma_self_healing_init() {
-    SigmaOS::Kernel::Resilience::SovereignSelfHealingEngine::getInstance().init();
+    SigmaOS::Kernel::Resilience::SovereignSelfHealingEngine::init();
 }

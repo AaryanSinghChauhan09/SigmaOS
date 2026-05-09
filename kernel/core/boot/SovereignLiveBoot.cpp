@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignLiveBoot"; }
 
-    void initializePersistence() {
+    static void initializePersistence() {
         sigma_log_info("[LIVE-BOOT] Probing for persistence overlay on USB...");
         // Check for 'casper-rw' or 'sigma-persistence' labels
         sigma_log_info("[LIVE-BOOT] Persistence found: [LatticeFS Overlay].");
@@ -34,11 +34,9 @@ public:
 private:
     SovereignLiveBoot() = default;
 };
-
-}
-}
-}
-
+} // namespace Boot
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void live_boot_init() {
-    SigmaOS::Kernel::Boot::SovereignLiveBoot::getInstance().initializePersistence();
+    SigmaOS::Kernel::Boot::SovereignLiveBoot::initializePersistence();
 }

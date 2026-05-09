@@ -24,13 +24,13 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignOrbIndexer"; }
 
-    void buildMetadataIndex() {
+    static void buildMetadataIndex() {
         sigma_log_info("[IDX-MAN] Scanning local lattice for Orbs...");
         sigma_log_info("[IDX-MAN] Indexing metadata: [Name, Version, SHA256, Quantum-Sig].");
         sigma_log_info("[IDX-MAN] Broadcasting local index to P2P SovereignNetMesh.");
     }
 
-    void queryOrb(const char* query) {
+    static void queryOrb(const char* query) {
         sigma_log_info("[IDX-MAN] Querying marketplace for:");
         sigma_log_info(query);
         sigma_log_info("[IDX-MAN] Match found: 'Zenith-Desktop-v2.0' (99.9% integrity).");
@@ -40,14 +40,14 @@ private:
     SovereignOrbIndexer() = default;
 };
 
-}
-}
-}
+} // namespace Industrial
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" void orb_indexer_init() {
-    SigmaOS::Kernel::Industrial::SovereignOrbIndexer::getInstance().buildMetadataIndex();
+    SigmaOS::Kernel::Industrial::SovereignOrbIndexer::buildMetadataIndex();
 }
 
 extern "C" void orb_indexer_query(const char* q) {
-    SigmaOS::Kernel::Industrial::SovereignOrbIndexer::getInstance().queryOrb(q);
+    SigmaOS::Kernel::Industrial::SovereignOrbIndexer::queryOrb(q);
 }

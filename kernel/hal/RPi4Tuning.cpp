@@ -33,11 +33,9 @@ public:
 private:
     RPi4Tuning() = default;
 };
-
-}
-}
-}
-
+} // namespace HAL
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void rpi4_tune() {
-    SigmaOS::Kernel::HAL::RPi4Tuning::getInstance().applyOptimization();
+    SigmaOS::Kernel::HAL::RPi4Tuning::applyOptimization();
 }

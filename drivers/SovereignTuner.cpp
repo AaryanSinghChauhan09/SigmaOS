@@ -51,9 +51,9 @@ private:
 };
 
 extern "C" void tuner_init() {
-    SovereignTunerEngine::getInstance().init();
+    SovereignTunerEngine::init();
 }
 
 extern "C" void tuner_apply_performance_governor() {
-    SovereignTunerEngine::getInstance().applyPerformanceGovernor();
+    SovereignTunerEngine::applyPerformanceGovernor();
 }

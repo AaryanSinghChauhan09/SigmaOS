@@ -48,11 +48,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void rbac_init() {
-    SigmaOS::Kernel::Security::SovereignRBAC::getInstance().init();
+    SigmaOS::Kernel::Security::SovereignRBAC::init();
 }
 
 extern "C" bool rbac_check(const char* role, const char* resource, const char* action) {
-    return SigmaOS::Kernel::Security::SovereignRBAC::getInstance().checkPermission(role, resource, action);
+    return SigmaOS::Kernel::Security::SovereignRBAC::checkPermission(role, resource, action);
 }
 
 

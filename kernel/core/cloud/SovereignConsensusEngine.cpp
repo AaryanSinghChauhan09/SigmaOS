@@ -53,11 +53,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void consensus_init() {
-    SigmaOS::Kernel::Cloud::SovereignConsensusEngine::getInstance().init();
+    SigmaOS::Kernel::Cloud::SovereignConsensusEngine::init();
 }
 
 extern "C" bool consensus_propose(const char* key, const void* data, sigma_usize sz) {
-    return SigmaOS::Kernel::Cloud::SovereignConsensusEngine::getInstance().propose(key, data, sz);
+    return SigmaOS::Kernel::Cloud::SovereignConsensusEngine::propose(key, data, sz);
 }
 
 

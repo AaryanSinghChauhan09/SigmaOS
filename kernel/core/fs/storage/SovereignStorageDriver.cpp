@@ -72,19 +72,19 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void storage_init() {
-    SovereignStorageDriverEngine::getInstance().init();
+    SovereignStorageDriverEngine::init();
 }
 
 extern "C" bool storage_probe(sigma_u32 vendor_id, sigma_u32 device_id) {
-    return SovereignStorageDriverEngine::getInstance().probe(vendor_id, device_id);
+    return SovereignStorageDriverEngine::probe(vendor_id, device_id);
 }
 
 extern "C" bool storage_read(sigma_u32 lba, sigma_u32 count, void* buf) {
-    return SovereignStorageDriverEngine::getInstance().readSectors(lba, count, buf);
+    return SovereignStorageDriverEngine::readSectors(lba, count, buf);
 }
 
 extern "C" bool storage_write(sigma_u32 lba, sigma_u32 count, const void* data) {
-    return SovereignStorageDriverEngine::getInstance().writeSectors(lba, count, data);
+    return SovereignStorageDriverEngine::writeSectors(lba, count, data);
 }
 
 

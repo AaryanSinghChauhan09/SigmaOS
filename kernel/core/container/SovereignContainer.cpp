@@ -63,15 +63,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void container_init() {
-    SigmaOS::Kernel::Container::SovereignContainerEngine::getInstance().init();
+    SigmaOS::Kernel::Container::SovereignContainerEngine::init();
 }
 
 extern "C" sigma_u32 container_spawn(const char* image_name) {
-    return SigmaOS::Kernel::Container::SovereignContainerEngine::getInstance().spawnContainer(image_name);
+    return SigmaOS::Kernel::Container::SovereignContainerEngine::spawnContainer(image_name);
 }
 
 extern "C" void container_destroy(sigma_u32 container_id) {
-    SigmaOS::Kernel::Container::SovereignContainerEngine::getInstance().destroyContainer(container_id);
+    SigmaOS::Kernel::Container::SovereignContainerEngine::destroyContainer(container_id);
 }
 
 

@@ -47,11 +47,11 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void stdio_init() {
-    SovereignStdioEngine::getInstance().init();
+    SovereignStdioEngine::init();
 }
 
 extern "C" void stdio_route_write(const char* buffer, sigma_u32 length) {
-    SovereignStdioEngine::getInstance().routeWrite(buffer, length);
+    SovereignStdioEngine::routeWrite(buffer, length);
 }
 
 

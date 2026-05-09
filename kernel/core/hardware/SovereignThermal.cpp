@@ -55,15 +55,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void thermaliq_init() {
-    SovereignThermalEngine::getInstance().init();
+    SovereignThermalEngine::init();
 }
 
 extern "C" void thermaliq_update() {
-    SovereignThermalEngine::getInstance().update();
+    SovereignThermalEngine::update();
 }
 
 extern "C" const sigma_thermal_state_t* thermaliq_get_state() {
-    return SovereignThermalEngine::getInstance().getState();
+    return SovereignThermalEngine::getState();
 }
 
 

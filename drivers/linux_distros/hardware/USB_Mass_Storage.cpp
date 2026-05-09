@@ -25,7 +25,7 @@ public:
 
     const char* type_name() const noexcept override { return "USBMassStorage"; }
 
-    bool initDevice() {
+    static bool initDevice() {
         sigma_log_info("[USB-STORAGE] Probing USB bus for Mass Storage devices...");
         // Map SCSI commands via USB-over-SCSI (UAS) protocol
         sigma_log_info("[USB-STORAGE] Bulk-only transport initialized.");
@@ -36,12 +36,10 @@ public:
 private:
     USBMassStorage() = default;
 };
-
-}
-}
-}
-}
-
+} // namespace Hardware
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void usb_storage_init() {
-    SigmaOS::Kernel::Drivers::Hardware::USBMassStorage::getInstance().initDevice();
+    SigmaOS::Kernel::Drivers::Hardware::USBMassStorage::initDevice();
 }

@@ -67,15 +67,15 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void dynmodule_init() {
-    SovereignDynModuleEngine::getInstance().init();
+    SovereignDynModuleEngine::init();
 }
 
 extern "C" bool dynmodule_load(const char* module_path) {
-    return SovereignDynModuleEngine::getInstance().load(module_path);
+    return SovereignDynModuleEngine::load(module_path);
 }
 
 extern "C" bool dynmodule_unload(sigma_u32 module_id) {
-    return SovereignDynModuleEngine::getInstance().unload(module_id);
+    return SovereignDynModuleEngine::unload(module_id);
 }
 
 

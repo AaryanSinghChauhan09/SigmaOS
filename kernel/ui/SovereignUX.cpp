@@ -70,17 +70,17 @@ private:
 
 /* --- C Wrappers --- */
 extern "C" void ux_init() {
-    SovereignUXEngine::getInstance().init();
+    SovereignUXEngine::init();
 }
 
 extern "C" void ux_apply_theme(sigma_theme_t* theme) {
-    SovereignUXEngine::getInstance().applyTheme(theme);
+    SovereignUXEngine::applyTheme(theme);
 }
 
 extern "C" void ux_render_dashboard() {
-    SovereignUXEngine::getInstance().renderDashboard();
+    SovereignUXEngine::renderDashboard();
 }
 
 extern "C" void ux_predict_adaptation() {
-    SovereignUXEngine::getInstance().predictAdaptation();
+    SovereignUXEngine::predictAdaptation();
 }

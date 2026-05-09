@@ -25,7 +25,7 @@ public:
 
     const char* type_name() const noexcept override { return "NouveauGraphics"; }
 
-    bool initDevice() {
+    static bool initDevice() {
         sigma_log_info("[NOUVEAU] Probing for NVIDIA (Maxwell/Pascal) GPU...");
         // Map Linux nouveau firmware
         sigma_log_info("[NOUVEAU] Loading firmware: nvdec, nvenc, gr_fuc...");
@@ -36,12 +36,10 @@ public:
 private:
     NouveauGraphics() = default;
 };
-
-}
-}
-}
-}
-
+} // namespace Hardware
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void nouveau_init() {
-    SigmaOS::Kernel::Drivers::Hardware::NouveauGraphics::getInstance().initDevice();
+    SigmaOS::Kernel::Drivers::Hardware::NouveauGraphics::initDevice();
 }

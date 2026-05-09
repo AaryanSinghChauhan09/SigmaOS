@@ -25,7 +25,7 @@ public:
 
     const char* type_name() const noexcept override { return "NvidiaTensorCoreShard"; }
 
-    bool initCores() {
+    static bool initCores() {
         sigma_log_info("[TENSOR-CORE] Probing for NVIDIA AI-Acceleration hardware...");
         // Map Linux nvidia-uvm capabilities
         sigma_log_info("[TENSOR-CORE] Initializing FP16/BF16 Matrix Multiply units...");
@@ -33,7 +33,13 @@ public:
         return true;
     }
 
-    void executeKernel(void* input, void* output, sigma_size_t size) {
+    struct KernelInput  { void* ptr; };
+    struct KernelOutput { void* ptr; };
+
+    static void executeKernel(KernelInput input, KernelOutput output, sigma_size_t data_size) {
+        (void)input;
+        (void)output;
+        (void)data_size;
         sigma_log_info("[TENSOR-CORE] Offloading neural inference to silicon...");
     }
 
@@ -41,11 +47,11 @@ private:
     NvidiaTensorCoreShard() = default;
 };
 
-}
-}
-}
-}
+} // namespace AI
+} // namespace Drivers
+} // namespace Kernel
+} // namespace SigmaOS
 
 extern "C" void tensor_core_init() {
-    SigmaOS::Kernel::Drivers::AI::NvidiaTensorCoreShard::getInstance().initCores();
+    SigmaOS::Kernel::Drivers::AI::NvidiaTensorCoreShard::initCores();
 }

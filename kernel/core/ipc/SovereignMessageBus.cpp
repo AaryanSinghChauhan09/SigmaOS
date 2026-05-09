@@ -28,11 +28,11 @@ void SovereignMessageBus::receiveMessage(void* buffer, sigma_usize max_size) {
 
 /* --- C Bridge --- */
 extern "C" void ipc_bus_init() {
-    SigmaOS::Kernel::IPC::SovereignMessageBus::getInstance().init();
+    SigmaOS::Kernel::IPC::SovereignMessageBus::init();
 }
 
 extern "C" void ipc_bus_send(sigma_u32 target, const void* data, sigma_usize sz) {
-    SigmaOS::Kernel::IPC::SovereignMessageBus::getInstance().sendMessage(target, data, sz);
+    SigmaOS::Kernel::IPC::SovereignMessageBus::sendMessage(target, data, sz);
 }
 
 

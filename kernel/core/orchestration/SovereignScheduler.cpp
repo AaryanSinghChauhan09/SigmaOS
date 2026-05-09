@@ -45,11 +45,11 @@ void SovereignScheduler::schedule(void (*task)(), sigma_u32 priority) {
 
 /* --- C Bridge --- */
 extern "C" void scheduler_init() {
-    SigmaOS::Kernel::Orchestration::SovereignScheduler::getInstance().init();
+    SigmaOS::Kernel::Orchestration::SovereignScheduler::init();
 }
 
 extern "C" void scheduler_push(void (*task)(), sigma_u32 priority) {
-    SigmaOS::Kernel::Orchestration::SovereignScheduler::getInstance().schedule(task, priority);
+    SigmaOS::Kernel::Orchestration::SovereignScheduler::schedule(task, priority);
 }
 
 

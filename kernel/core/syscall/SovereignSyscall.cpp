@@ -89,11 +89,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void syscall_init() {
-    SigmaOS::Kernel::Syscall::SovereignSyscallEngine::getInstance().init();
+    SigmaOS::Kernel::Syscall::SovereignSyscallEngine::init();
 }
 
 extern "C" unsigned int sigma_syscall(unsigned int id, unsigned int arg1, unsigned int arg2, unsigned int arg3) {
-    return (unsigned int)SigmaOS::Kernel::Syscall::SovereignSyscallEngine::getInstance().dispatch(
+    return (unsigned int)SigmaOS::Kernel::Syscall::SovereignSyscallEngine::dispatch(
         (sigma_u32)id, (sigma_u32)arg1, (sigma_u32)arg2, (sigma_u32)arg3);
 }
 
@@ -102,5 +102,5 @@ extern "C" void syscall_handler_asm() {
 }
 
 extern "C" unsigned long long syscall_get_total_calls() {
-    return (unsigned long long)SigmaOS::Kernel::Syscall::SovereignSyscallEngine::getInstance().getTotalCalls();
+    return (unsigned long long)SigmaOS::Kernel::Syscall::SovereignSyscallEngine::getTotalCalls();
 }

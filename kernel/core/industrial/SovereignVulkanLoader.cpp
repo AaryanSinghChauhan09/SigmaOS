@@ -34,11 +34,9 @@ public:
 private:
     SovereignVulkanLoader() = default;
 };
-
-}
-}
-}
-
+} // namespace Multimedia
+} // namespace Kernel
+} // namespace SigmaOS
 extern "C" void vulkan_loader_init() {
-    SigmaOS::Kernel::Multimedia::SovereignVulkanLoader::getInstance().loadVulkan13();
+    SigmaOS::Kernel::Multimedia::SovereignVulkanLoader::loadVulkan13();
 }

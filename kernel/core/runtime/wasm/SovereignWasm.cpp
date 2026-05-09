@@ -27,13 +27,13 @@ bool SovereignWasmRuntime::invoke(const char* funcName) {
 
 /* --- C Bridge --- */
 extern "C" void wasm_init() {
-    SigmaOS::Runtime::SovereignWasmRuntime::getInstance().init();
+    SigmaOS::Runtime::SovereignWasmRuntime::init();
 }
 
 extern "C" bool wasm_load_module(const void* bytecode, sigma_size_t size) {
-    return SigmaOS::Runtime::SovereignWasmRuntime::getInstance().loadModule(bytecode, size);
+    return SigmaOS::Runtime::SovereignWasmRuntime::loadModule(bytecode, size);
 }
 
 extern "C" bool wasm_invoke(const char* funcName) {
-    return SigmaOS::Runtime::SovereignWasmRuntime::getInstance().invoke(funcName);
+    return SigmaOS::Runtime::SovereignWasmRuntime::invoke(funcName);
 }

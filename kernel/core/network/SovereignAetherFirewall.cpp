@@ -76,14 +76,14 @@ class SovereignAetherFirewall {
 
 /* --- C Bridge --- */
 extern "C" void firewall_init() {
-    SigmaOS::Kernel::Network::SovereignAetherFirewall::getInstance().init();
+    SigmaOS::Kernel::Network::SovereignAetherFirewall::init();
 }
 
 extern "C" bool firewall_inspect(const void* data, sigma_size_t size, const char* src) {
-    return SigmaOS::Kernel::Network::SovereignAetherFirewall::getInstance().inspectPacket(
+    return SigmaOS::Kernel::Network::SovereignAetherFirewall::inspectPacket(
         data, size, src);
 }
 
 extern "C" void firewall_audit() {
-    SigmaOS::Kernel::Network::SovereignAetherFirewall::getInstance().auditFirewall();
+    SigmaOS::Kernel::Network::SovereignAetherFirewall::auditFirewall();
 }

@@ -59,11 +59,11 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void app_sharding_init() {
-    SigmaOS::Kernel::Process::SovereignAppSharding::getInstance().init();
+    SigmaOS::Kernel::Process::SovereignAppSharding::init();
 }
 
 extern "C" void app_shard_spawn(const char* name, sigma_u32 count) {
-    SigmaOS::Kernel::Process::SovereignAppSharding::getInstance().shardApp(name, count);
+    SigmaOS::Kernel::Process::SovereignAppSharding::shardApp(name, count);
 }
 
 
