@@ -1,77 +1,56 @@
 # SigmaOS Sovereign Lattice — Modularization Map
 
-This page is the **single source of truth** for how SigmaOS code is organized into its 7-layer Sovereign Lattice. Every shard must belong to exactly one layer and communicate with other layers only through the defined interfaces.
+This page is the **single source of truth** for the SigmaOS 600-shard Sovereign Lattice. Every shard belongs to exactly one layer, resides in a specific directory location, and communicates purely via **Zero-Dependency OOP Singleton** interfaces (no C++ stdlib, glibc, or external dependencies).
 
 ---
 
-## 🗺️ Architecture Overview
+## 🗺️ Lattice Architecture & Directory Map
 
-```text
-┌──────────────────────────────────────────────────────────────────┐
-│  L6 ·· Zenith UI / Display Server                                │
-│         zenith.html  SovereignZenithDesktop  ZenithAccessibility │
-├──────────────────────────────────────────────────────────────────┤
-│  L5 ·· Industrial Ecosystem / Deployment                         │
-│         SovereignOrbManager  SovereignCloudImage  SovereignLTS    │
-│         SovereignDependencyGraph  SovereignKubelet               │
-│         SovereignMicroEdition  SovereignForensicLattice          │
-├──────────────────────────────────────────────────────────────────┤
-│  L4 ·· AI & Automation                                           │
-│         SovereignClawGateway  SovereignAgentQuotasExtended       │
-│         SovereignAgentGovernance                                 │
-├──────────────────────────────────────────────────────────────────┤
-│  L3 ·· Security Fabric                                           │
-│         SovereignPQC  SovereignFIPS  SovereignAnonymity          │
-│         SovereignSandbox  SovereignTPM                           │
-├──────────────────────────────────────────────────────────────────┤
-│  L2 ·· System Services / Reliability                             │
-│         VFS  SovereignEmergencySync  SovereignMonitor            │
-│         SovereignContainerOrchestrator                           │
-├──────────────────────────────────────────────────────────────────┤
-│  L1 ·· Kernel Primitives / Drivers                               │
-│         Scheduler  MemoryManager  SovereignLibC  SovereignHAL    │
-│         SovereignARM64  NVMeCore  AMDGPUGraphics                 │
-├──────────────────────────────────────────────────────────────────┤
-│  L0 ·· Silicon / Boot                                            │
-│         SovereignInit  SovereignCores  sigma_types  sigma_hal    │
-└──────────────────────────────────────────────────────────────────┘
-```
+### 1. 🖥️ Layer 6: Zenith UI / Display Server
+**Location**: `kernel/core/ui/`
+*   **`SovereignZenithDesktop.cpp`**: Core display manager providing an AI-driven, glassmorphic UI.
+*   **`ZenithAccessibility.cpp`**: Native usability layers, crushing elementary OS's reliance on external GTK A11Y daemons.
+*   **`zenith.html` / `index.css`**: Rendered UI components in WebGL/HTML5, wrapped by the Morphic Engine.
 
----
+### 2. 🏭 Layer 5: Industrial Ecosystem / Deployment
+**Location**: `kernel/core/industrial/` & `drivers/linux_distros/`
+*   **`SovereignCloudImage.cpp`**: Generates automated AMI/GCP/Azure production shards. Crushes Clear Linux cloud optimizations.
+*   **`SovereignMicroEdition.cpp`**: Provides extreme minimalism (<16MB RAM footprint) for CI runners. Crushes Alpine & Gentoo.
+*   **`SovereignLTS.cpp`**: Orchestrates 10-year stable release delta-syncs over the P2P lattice. Crushes CoreOS update channels.
+*   **`SovereignForensicLattice.cpp`**: Read-only forensic mounts and state hashing. Crushes CAINE forensics.
+*   **`ArchDriverCompat.cpp`, `DebianDriverCompat.cpp`**: Abstract package/ABI definitions for specific ecosystems without relying on python or bash package managers.
 
-## 🚀 Competitive Absorption Matrix (The Crushers)
+### 3. 🤖 Layer 4: AI & Automation
+**Location**: `kernel/core/automation/`
+*   **`SovereignAgentGovernance.cpp`**: AI oversight module acting as an automated SysAdmin.
+*   **`SovereignClawGateway.cpp` / `ClawResourceQuotas.cpp`**: Automated capability orchestration and hardware assignment.
 
-| Distro Target | SigmaOS Feature Shard | Mission Result |
-|:---|:---|:---|
-| **Whonix** | `SovereignAnonymity` | Hardened P2P network cloaking & anonymity. |
-| **elementary** | `ZenithAccessibility` | Polished accessibility layers & high-contrast elegance. |
-| **Clear Linux** | `SovereignCloudImage` | Automated AMI/GCP/Azure production sharding. |
-| **Gentoo/Alpine** | `SovereignMicroEdition` | Zero-bloat minimal lattice config (<16MB RAM). |
-| **RancherOS** | `SovereignContainerOrch` | Integrated OS-level container orchestration. |
-| **CAINE** | `SovereignForensicLattice` | Read-only investigation and integrity auditing. |
-| **AlmaLinux** | `SovereignFIPS` / `LTS` | FIPS-140 compliance and 10-year release support. |
+### 4. 🛡️ Layer 3: Security Fabric
+**Location**: `kernel/core/security/`
+*   **`SovereignPQC.cpp`**: Post-quantum lattice-based cryptography for internal kernel RPCs.
+*   **`SovereignAnonymity.cpp`**: P2P network cloaking and routing, providing Tor-like isolation without Tor binaries. Crushes Whonix.
+*   **`SovereignFIPS.cpp`**: FIPS-140 compliance checker, crushing AlmaLinux/RHEL security requirements.
+
+### 5. ⚙️ Layer 2: System Services / Reliability
+**Location**: `kernel/core/system/` & `kernel/core/observability/`
+*   **`SovereignContainerOrchestrator.cpp`**: Native container management operating as a direct ring-0 control plane. Crushes RancherOS.
+*   **`SovereignMonitor.cpp`**: eBPF nexus for real-time observability and load balancing.
+*   **`SovereignDAL.cpp`**: Data Access Layer providing zero-dependency serialization and data graphs.
+
+### 6. 🔌 Layer 1: Kernel Primitives & Drivers
+**Location**: `drivers/hardware/` & `drivers/`
+*   **`SovereignDirectGPU.cpp` / `Nvidia_TensorCore.cpp`**: Silicon-direct offloading and rendering, bypassing traditional DRM. Crushes SteamOS.
+*   **`SovereignIPAuditor.cpp`**: Audits loaded drivers for GPL/MIT licensing in real-time.
+*   **`SovereignLibC.h` / `.c`**: Custom C11 zero-dependency primitive library overriding libc/glibc.
+
+### 7. 💻 Layer 0: Silicon / Boot
+**Location**: `kernel/core/industrial/SovereignInit.cpp`
+*   **`SovereignInit.cpp`**: Replaces SystemD/OpenRC with a static initialization path natively mapped to bare-metal.
 
 ---
 
-## 🏗️ Layer 5: Industrial Evolution (2026-2027)
-
-| Shard | Purpose | Status |
-|:---|:---|:---|
-| `SovereignCloudImage` | Automated AMI/GCP/Azure production image generation. | **OPERATIONAL** |
-| `SovereignLTS` | 10-year stable release orchestration and ABI stability. | **OPERATIONAL** |
-| `SovereignForensic` | Read-only forensic mount and integrity auditing. | **OPERATIONAL** |
-| `SovereignMicro` | Extreme minimalism (Alpine/Gentoo parity). | **OPERATIONAL** |
-
-## 🛡️ Layer 3: Security & Compliance
-
-| Shard | Purpose | Status |
-|:---|:---|:---|
-| `SovereignAnonymity` | Network isolation and PQC-Tor circuit building. | **OPERATIONAL** |
-| `SovereignFIPS` | Post-quantum cryptographic self-audit (FIPS-140-3). | **OPERATIONAL** |
-
-## 🔌 Layer 1: Hardware Sovereignty
-
-| Shard | Purpose | Status |
-|:---|:---|:---|
-| `SovereignARM64` | Deep tuning for RPi5 (BCM2712) in Sovereign Mode. | **OPERATIONAL** |
-| `NvidiaTensorCore` | Silicon-direct offloading for neural inference. | **OPERATIONAL** |
+## 🚀 The Zero-Dependency Guarantee
+Every single shard in this map adheres strictly to:
+1. **No External Interpreters**: No Python, Perl, Bash, or Ruby allowed in the core lattice.
+2. **No Monolithic Libraries**: Glibc, stdlib, and OpenSSL are strictly prohibited. The system uses `SovereignLibC` and `SovereignPQC`.
+3. **OOP Singletons**: Hardware abstractions and modular features are accessed exclusively via C++ `static` singletons (`ModuleName::method()`), ensuring memory safety and preventing instantiation state drift.
