@@ -1,19 +1,23 @@
-# 🛠 TEACHER Tools
+﻿# ðŸ›  TEACHER Tools
 
 Required Tools & Functions:
+
 - Lesson planning
 - grading system
 - student records
 - virtual classroom tools
 
-## 📜 Compliance Rules
+## ðŸ“œ Compliance Rules
+
 - CBSE/NCERT curriculum
 - UGC guidelines
 
-## 🧮 Professional Calculators
+## ðŸ§® Professional Calculators
+
 - Grade average
 - attendance tracker
 
-## 🧬 Core Algorithms
+## ðŸ§¬ Core Algorithms
+
 - Adaptive learning paths
 - exam paper generator

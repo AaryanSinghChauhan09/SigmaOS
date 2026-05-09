@@ -1,4 +1,5 @@
-# SigmaOS Documentation
+﻿# SigmaOS Documentation
+
 * [Introduction](Introduction)
 * [Installation](Installation)
 * [Architecture](Architecture)

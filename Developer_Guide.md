@@ -1,4 +1,4 @@
-# SigmaOS Developer Guide
+﻿# SigmaOS Developer Guide
 
 Welcome to the SigmaOS Sovereign Repository.
 
@@ -21,4 +21,3 @@ This will automatically resolve dependencies, parse the `SovereignEnclave` const
 ## Binary Instruction Translation (BIT)
 
 SigmaOS supports unmodified Linux ELF binaries through the `SovereignCompat` shard. You do not need to recompile userland Linux apps; simply drop the binary onto the `SovereignVFS` and the BIT engine will dynamically translate the POSIX syscalls into native Sovereign API hooks.
-

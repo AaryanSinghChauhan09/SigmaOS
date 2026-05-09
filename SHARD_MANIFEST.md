@@ -1,10 +1,11 @@
-# Σ SIGMAOS: THE SOVEREIGN LATTICE MANIFEST (500 FEATURES)
+﻿# Î£ SIGMAOS: THE SOVEREIGN LATTICE MANIFEST (500 FEATURES)
 
 This manifest outlines the 500 individual features and functional shards that define the SigmaOS ecosystem, categorized into 50 thematic clusters.
 
 ## I. The Sovereign Kernel (Modular Lattice Core)
 
 *Organized into: /arch/x86_64, /runtime, /observability, /orchestration, /state, /security, /mem, /hal*
+
 1. **Lattice-Aware Scheduler**: AI-Native predictive allocation.
 2. **Sovereign GDT / IDT**: Standardized segments and exception landing zones (/arch).
 3. **Bitmap Physical Memory Manager**: Single source of truth for page allocation (/mem).
@@ -17,7 +18,7 @@ This manifest outlines the 500 individual features and functional shards that de
 10. **Lattice IPC Bridge**: Low-latency zero-copy messaging bus.
 
 ## II. Morphic Zenith (UI & Graphics)
+
 1. **Vector-Only Compositor**: Perfect scaling from 4K to 16K.
 
 ...
-

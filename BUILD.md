@@ -1,6 +1,7 @@
-# SigmaOS Build Guide
+﻿# SigmaOS Build Guide
 
 ## Prerequisites
+
 - `aarch64-linux-gnu-g++` (cross-compiler for ARM64)
 - `make`
 - QEMU (for emulation testing)
@@ -11,17 +12,10 @@
 make all
 ```
 
-## Architecture Matrix Builds
-
-| Target    | Command                      | Output              |
-|-----------|------------------------------|---------------------|
-| ARM64 RPi | `make ARCH=aarch64`          | `sigma_os.elf`      |
-| x86_64    | `make ARCH=x86_64`           | `sigma_os_x64.elf`  |
-| RISC-V    | `make ARCH=riscv64`          | `sigma_os_rv.elf`   |
-
-## Shard Manifest
+## Architecture Matrix Builds | Target | Command | Output | |-----------|------------------------------|---------------------| | ARM64 RPi | `make ARCH=aarch64` | `sigma_os.elf` | | x86_64 | `make ARCH=x86_64` | `sigma_os_x64.elf` | | RISC-V | `make ARCH=riscv64` | `sigma_os_rv.elf` | ## Shard Manifest
 
 The `SHARDS.manifest` file lists all 600+ shard `.cpp` files compiled by the Makefile. To add a new shard:
+
 1. Create your `.cpp` file under the appropriate module directory.
 2. Add its path to `SHARDS.manifest`.
 3. Run `make`.

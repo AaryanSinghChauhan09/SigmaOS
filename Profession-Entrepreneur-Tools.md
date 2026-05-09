@@ -1,19 +1,23 @@
-# 🛠 ENTREPRENEUR Tools
+﻿# ðŸ›  ENTREPRENEUR Tools
 
 Required Tools & Functions:
+
 - Business planning
 - financial dashboards
 - CRM tools
 
-## 📜 Compliance Rules
+## ðŸ“œ Compliance Rules
+
 - Startup India compliance
 - MCA rules
 
-## 🧮 Professional Calculators
+## ðŸ§® Professional Calculators
+
 - Break-even
 - ROI
 - funding valuation
 
-## 🧬 Core Algorithms
+## ðŸ§¬ Core Algorithms
+
 - Business plan optimizer
 - CRM automation

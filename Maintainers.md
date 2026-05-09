@@ -1,19 +1,23 @@
-# SigmaOS Maintainers
+﻿# SigmaOS Maintainers
 
 This document lists the primary maintainers and subsystem owners of the SigmaOS Sovereign Lattice.
 
 ## Core Architecture Team
+
 - **Aaryan Singh Chauhan** (@AaryanSinghChauhan09) - Project Lead & Core Architect
 
 ## Subsystem Maintainers
 
-### 🤖 AI & Automation
+### ðŸ¤– AI & Automation
+
 - **Aaryan Singh Chauhan** - `SovereignClawGateway`, `SovereignWorkflowEngine`, `SovereignAgentCore`
 
-### 🛡️ Security & PQC
+### ðŸ›¡ï¸ Security & PQC
+
 - **Aaryan Singh Chauhan** - `SovereignPQC`, `SovereignSandbox`, `SovereignAttestation`
 
-### 🖥️ Zenith UI
+### ðŸ–¥ï¸ Zenith UI
+
 - **Aaryan Singh Chauhan** - Morphic Layout Engine, ZenithWM
 
 ---

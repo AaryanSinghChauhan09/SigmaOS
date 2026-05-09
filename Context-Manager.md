@@ -1,4 +1,4 @@
-# SigmaOS Context Manager
+﻿# SigmaOS Context Manager
 
 ## Overview
 
@@ -8,9 +8,7 @@ The **Context Manager** (`/core/context/manager.cpp`) is the backbone of SigmaOS
 
 ```
 [Module A]  --registerModule("agent.quota", this)-->  [ContextManager Registry]
-[Module B]  --resolve("agent.quota")              -->  [ContextManager Registry]
-                                                          |
-                                                    returns void* to Module A
+[Module B]  --resolve("agent.quota")              -->  [ContextManager Registry] | returns void* to Module A
 ```
 
 ## API Reference
@@ -19,7 +17,7 @@ The **Context Manager** (`/core/context/manager.cpp`) is the backbone of SigmaOS
 
 Registers a module (or sub-system) with the Context Manager by a unique string key.
 
-### Example:
+### Example
 
 ```cpp
 SigmaOS::Kernel::Context::ContextManager::getInstance()
@@ -30,7 +28,7 @@ SigmaOS::Kernel::Context::ContextManager::getInstance()
 
 Dynamically resolves and returns a pointer to the registered module instance.
 
-### Example:
+### Example
 
 ```cpp
 QuotaManager* qm = (QuotaManager*)
@@ -38,25 +36,14 @@ QuotaManager* qm = (QuotaManager*)
     .resolve("agent.quota");
 ```
 
-## Module Registry (Sovereign Map)
+## Module Registry (Sovereign Map) | Module ID | Registered By | Consumers | |-----------------|---------------------------|-------------------------------| | `agent.quota` | `QuotaManager` | `CommandInterpreter` | | `agent.policy` | `GovernanceRules` | `CommandInterpreter`, Sandbox | | `cashier` | Profile loader | `CommandInterpreter` | | `accountant` | Profile loader | `CommandInterpreter` | | `doctor` | Profile loader | `CommandInterpreter` | | `engineer` | Profile loader | `CommandInterpreter` | | `lawyer` | Profile loader | `CommandInterpreter` | | `farmer` | Profile loader | `CommandInterpreter` | ## Design Principles
 
-| Module ID        | Registered By              | Consumers                     |
-|-----------------|---------------------------|-------------------------------|
-| `agent.quota`   | `QuotaManager`            | `CommandInterpreter`          |
-| `agent.policy`  | `GovernanceRules`         | `CommandInterpreter`, Sandbox |
-| `cashier`       | Profile loader            | `CommandInterpreter`          |
-| `accountant`    | Profile loader            | `CommandInterpreter`          |
-| `doctor`        | Profile loader            | `CommandInterpreter`          |
-| `engineer`      | Profile loader            | `CommandInterpreter`          |
-| `lawyer`        | Profile loader            | `CommandInterpreter`          |
-| `farmer`        | Profile loader            | `CommandInterpreter`          |
-
-## Design Principles
 - **Zero-coupling**: No module imports another module directly. All communication is via the registry.
 - **No stdlib**: Uses `SigmaString` and `SigmaMap` from `SigmaOOP.hpp`.
-- **Singleton**: The `ContextManager` itself is a `SigmaSingleton` — one instance per kernel boot.
+- **Singleton**: The `ContextManager` itself is a `SigmaSingleton` â€” one instance per kernel boot.
 - **Fail-safe**: `resolve()` returns `nullptr` on miss; callers must handle gracefully.
 
 ## Implementation Files
+
 - Header: `/include/core/context/manager.hpp`
 - Source:  `/kernel/core/context/manager.cpp`

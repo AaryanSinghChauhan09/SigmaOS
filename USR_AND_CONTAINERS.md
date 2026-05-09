@@ -1,4 +1,4 @@
-# SigmaOS Containerization & USR Guide
+﻿# SigmaOS Containerization & USR Guide
 
 ## Unified Shard Registry (USR)
 
@@ -48,4 +48,3 @@ persistence_snapshot("SovereignSEL");
 persistence_restore("SovereignSEL");
 
 ```
-

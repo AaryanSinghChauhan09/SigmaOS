@@ -1,6 +1,7 @@
-# 🛠 DENTIST Tools
+﻿# ðŸ›  DENTIST Tools
 
 Required Tools & Functions:
+
 - Dental charting
 - X-ray viewer
 - appointment scheduler

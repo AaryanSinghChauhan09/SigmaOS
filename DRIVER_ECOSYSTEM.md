@@ -1,20 +1,12 @@
-# SigmaOS Driver Ecosystem
+﻿# SigmaOS Driver Ecosystem
 
-SigmaOS ships hardware drivers as sovereign kernel shards — zero binary blobs, zero kernel-update breakage.
+SigmaOS ships hardware drivers as sovereign kernel shards â€” zero binary blobs, zero kernel-update breakage.
 
 ## Network Drivers
 
 ### SovereignNICDriver
 
-Auto-detects and programs the NIC at boot via PCIe endpoint analysis:
-
-| Hardware | PCIe ID | Mode |
-|---|---|---|
-| VirtIO-Net (QEMU) | `1AF4:1000` | DMA ring buffer |
-
-| RTL8139 (bare-metal) | `10EC:8139` | BMCR register programming |
-
-```c
+Auto-detects and programs the NIC at boot via PCIe endpoint analysis: | Hardware | PCIe ID | Mode | |---|---|---| | VirtIO-Net (QEMU) | `1AF4:1000` | DMA ring buffer | | RTL8139 (bare-metal) | `10EC:8139` | BMCR register programming | ```c
 
 nic_init();
 nic_probe(0x1AF4, 0x1000); // VirtIO-Net
@@ -71,4 +63,3 @@ hw_transpiler_profile(vendor_id, device_id);
 // -> Sovereign driver shim generated automatically
 
 ```
-

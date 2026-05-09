@@ -1,24 +1,28 @@
-# 🛠 LAWYER Tools
+﻿# ðŸ›  LAWYER Tools
 
 Required Tools & Functions:
+
 - Case indexing
 - legal references
 - compliance document management
 - secure communication
 
-## 📜 Compliance Rules
+## ðŸ“œ Compliance Rules
+
 - Bharatiya Nyaya Sanhita (BNS) 2023
 - Bharatiya Nagarik Suraksha Sanhita (BNSS) 2023
 - Bharatiya Sakshya Adhiniyam (BSA) 2023
 - Constitution of India
 
-## 🧮 Professional Calculators
+## ðŸ§® Professional Calculators
+
 - Court fee
 - stamp duty
 - Limitation Period Calc
 - Alimony Estimator
 
-## 🧬 Core Algorithms
+## ðŸ§¬ Core Algorithms
+
 - Case law search
 - compliance checker
 - automated legal drafting

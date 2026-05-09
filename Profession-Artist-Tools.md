@@ -1,6 +1,7 @@
-# 🛠 ARTIST Tools
+﻿# ðŸ›  ARTIST Tools
 
 Required Tools & Functions:
+
 - Creative suite (drawing
 - design
 - video editing)

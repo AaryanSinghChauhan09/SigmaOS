@@ -1,6 +1,7 @@
 # 🌟 Ultimate Distro-Level Features
 
-### Inspired by industry-leading Linux distributions.
+### Inspired by industry-leading Linux distributions
+
 - **Privacy Gatekeeper (Whonix-inspired):** Enforces zero-trust shard communication.
 - **Intelligent Lattice Assistant (Deepin-inspired):** AI-native lattice configuration.
 - **Automated Auto-Tiling (Pop!_OS-inspired):** Keyboard-driven layout management.
@@ -16,4 +17,3 @@
 - **Amnesic Memory (Tails-inspired):** Zero-artifact wiping.
 - **Isolated Sandboxing (Qubes-inspired):** Silicon-level sandboxing.
 - **Security-Hardened LibC (Alpine/musl-inspired):** Sovereign Musl layer.
-

@@ -1,10 +1,11 @@
-# SovereignVFS Deployment Architecture
+﻿# SovereignVFS Deployment Architecture
 
 As the first command of the Sovereign Expansion Phase, SigmaOS has deployed `SovereignVFS` across a hybrid cluster.
 
 ## Hybrid Silicon Cluster
 
 The Sovereign Lattice dynamically unites heterogeneous silicon:
+
 - **Node Alpha:** RISC-V compute backend.
 - **Node Beta:** ARM64 neural acceleration node.
 - **Node Gamma:** x86_64 visualization node.
@@ -22,4 +23,3 @@ Run the orchestrator:
 python3 tools/sovereign-deploy.py
 
 ```
-

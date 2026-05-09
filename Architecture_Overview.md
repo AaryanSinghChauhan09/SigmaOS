@@ -1,4 +1,4 @@
-# SigmaOS Architecture Overview
+﻿# SigmaOS Architecture Overview
 
 ## Sovereign Lattice Design
 
@@ -27,4 +27,3 @@ Supports dynamic dispatch across heterogeneous silicon, including ARM and RISC-V
 ### 6. Containerization
 
 `SovereignContainers` use the Sovereign Enforcement Layer (SEL) to spawn secure micro-VMs.
-

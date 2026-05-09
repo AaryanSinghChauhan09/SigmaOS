@@ -1,6 +1,7 @@
-# 🛠 CASHIER Tools
+﻿# ðŸ›  CASHIER Tools
 
 Required Tools & Functions:
+
 - POS interface
 - barcode scanner integration
 - receipt printing
