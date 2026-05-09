@@ -21,14 +21,24 @@
 * [Workflow Engine](SHARD_ORCHESTRATION)
 * [Predictive UX](Phase_4_UX)
 
-## 🛡️ Security & Assurance
+## 🏗️ Industrialization & Maturity
+* [**📈 Core Improvements**](CORE_IMPROVEMENTS)
+* [**🧩 Competitive Gaps Phase 2**](COMPETITIVE_GAPS_PHASE_2)
+* [**🐧 Linux Driver Compat**](Linux-Driver-Compat)
+* [**🛠️ Driver Porting Pipeline**](DRIVER_PORTING_PIPELINE)
+* [**⚖️ IP Compliance**](IP-Compliance)
+* [**📂 FHS Compliance**](FHS_COMPLIANCE)
+
+## 🛡️ Security & Governance
+* [**🏛️ Governance Charter**](GOVERNANCE_CHARTER)
+* [**🔒 Security Roadmap**](SECURITY_ROADMAP)
 * [Security Policy](SECURITY)
 * [Verified Boot](Security-Posture)
 * [Sandbox Hardening](Sandbox-Hardening)
-* [Security Issues & Fixes](Security-Issues-And-Fixes) ⚠️
 
 ## 📦 Packaging & Distribution
 * [Packaging Spec](LATTICE_MANIFEST)
+* [Orb Ecosystem](Orb-Ecosystem)
 * [CLI Reference](CLI_Reference)
 * [WASM Runtime](WASM-Runtime)
 
