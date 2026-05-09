@@ -74,9 +74,7 @@ touch suites/S37_SovereignWire/sigma_vpn.h
 ### 2. Write the module
 
 Follow the **Atomic Module Contract** (see Developer Guide):
-
 - One `#ifndef` guard
-
 - One primary struct + 3–5 static inline functions
 - Zero external includes
 

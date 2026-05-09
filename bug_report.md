@@ -1,3 +1,5 @@
+# bug report
+
 ---
 name: 🐛 Bug Report
 about: Report a bug or unexpected behavior in the SigmaOS Lattice
@@ -7,29 +9,31 @@ assignees: AaryanSinghChauhan09
 ---
 
 ## 🐛 Bug Description
+
 <!-- A clear and concise description of the bug -->
 
 ## 🔄 Steps to Reproduce
-1. 
-2. 
-3. 
+1. 2.
+3. ## ✅ Expected Behavior
 
-## ✅ Expected Behavior
 <!-- What should have happened -->
 
 ## ❌ Actual Behavior
+
 <!-- What actually happened -->
 
 ## 🖥️ Environment
-- **SigmaOS Version**: 
+- **SigmaOS Version**:
 - **Host Architecture**: (x86_64 / arm64)
-- **Kernel Shard Affected**: 
-- **QEMU / Bare Metal**: 
+- **Kernel Shard Affected**:
+- **QEMU / Bare Metal**:
 
 ## 📋 Logs / Stack Trace
+
 ```
 Paste logs here
 ```
 
 ## 📎 Additional Context
+
 <!-- Any other relevant info, screenshots, etc. -->

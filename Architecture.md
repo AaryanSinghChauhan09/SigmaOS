@@ -3,6 +3,7 @@
 SigmaOS is built on a 7-layer modular architecture designed for high-assurance AI automation and hardware independence. This architecture ensures that SigmaOS remains the only "true" sovereign OS by eliminating all external dependencies.
 
 ## 🏗 Modularization Map
+
 The core repository is organized into strict OOP-isolated modules (shards) to ensure industrial stability and sub-millisecond latency.
 
 | Module Path | Purpose | Key Components |
@@ -32,4 +33,5 @@ The core repository is organized into strict OOP-isolated modules (shards) to en
 7. **Social Layer**: Decentralized identity and P2P synchronization.
 
 ## 🛡 Sovereign Lattice Kernel
+
 Unlike the upstream Linux kernel, the SigmaOS Lattice Kernel ensures total independence through zero-dependency implementation of critical syscalls. This eliminates "upstream authority" bottlenecks and ensures total ownership of the system state.

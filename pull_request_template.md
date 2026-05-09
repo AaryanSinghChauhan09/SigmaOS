@@ -1,4 +1,5 @@
-## 📋 Pull Request Summary
+# 📋 Pull Request Summary
+
 <!-- What does this PR do? One paragraph max. -->
 
 ## 🏗️ Type of Change
@@ -31,6 +32,7 @@
 - [ ] MAC policy updated if new capabilities are introduced
 
 ## 📎 Related Issues
+
 Closes # <!-- issue number -->
 
 ## 📝 Wiki / Docs Updated?

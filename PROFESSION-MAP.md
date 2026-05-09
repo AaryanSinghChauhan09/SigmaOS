@@ -3,6 +3,7 @@
 SigmaOS adapts to every professional role, loading only the necessary tools and compliance modules at login. This eliminates the need for specialized Linux distributions (e.g., **Kali** for security, **Ubuntu Studio** for creative).
 
 ## 🧩 Profession Profiles
+
 | Profile Path | Profession | Key Tools & Functions |
 |--------------|------------|-----------------------|
 | `/profiles/cashier/` | Cashier | POS interface, inventory sync, reconciliation |

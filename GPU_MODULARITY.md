@@ -5,14 +5,12 @@ SigmaOS achieves heterogeneous compute sovereignty via the `SovereignGPUEngine` 
 ## The Problem with Legacy GPU Drivers
 
 Traditional OS kernels (Linux, Windows) rely on massive proprietary binary blobs supplied by NVIDIA, AMD, and Intel. These blobs:
-
 - Operate with root-level trust but zero kernel-level isolation
 - Cannot be audited or patched for security vulnerabilities
 
 ## Sovereign Solution: Abstracted Vendor Execution
 
 `SovereignGPUEngine` implements a PCIe endpoint analysis framework via `SovereignHAL`. Instead of depending on vendor blobs, it:
-
 1. Probes the GPU's PCIe BAR registers at boot
 
 ```c

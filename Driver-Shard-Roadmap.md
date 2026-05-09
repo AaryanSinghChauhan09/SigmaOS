@@ -33,4 +33,5 @@ This document tracks the development status of hardware drivers within the Sover
 All drivers must run within the **L2 System Shard** layer, meaning they are isolated from the kernel core and require explicit `SovereignHAL` bridges for hardware register access.
 
 ---
-*To contribute a driver, see [Contributing](CONTRIBUTING.md).*
+
+### To contribute a driver, see [Contributing](CONTRIBUTING.md).

@@ -3,6 +3,7 @@
 SigmaOS adopts a highly specialized, intent-driven OS model through its **Profession Profiles**. Instead of a generic desktop environment, the OS dynamically adapts its UI, underlying kernel policies, toolchain, and shortcuts based on the active profession profile.
 
 ## The Profile Architecture
+
 The repository's `/profiles/` directory structure dictates the available configurations:
 - `/profiles/cashier/`
 - `/profiles/accountant/`

@@ -1,11 +1,12 @@
 # Competitive Landscape: SigmaOS vs. Mainstream Linux
 
 ## 🔑 Why SigmaOS Feels Different
-*   **Focus on Futurism**: SigmaOS emphasizes AI automation, cyberpunk UI (Zenith), and lattice orchestration, whereas traditional Linux distros prioritize stability, familiarity, and convention.
-*   **Architecture**: SigmaOS uses a 7-layer modular lattice with post-quantum cryptography and integrated AI agents.
-*   **AI-Native Acceleration**: Features like **NVIDIA Tensor-core shards** (DRV-007) provide hardware-native AI performance beyond standard distros.
+* **Focus on Futurism**: SigmaOS emphasizes AI automation, cyberpunk UI (Zenith), and lattice orchestration, whereas traditional Linux distros prioritize stability, familiarity, and convention.
+* **Architecture**: SigmaOS uses a 7-layer modular lattice with post-quantum cryptography and integrated AI agents.
+* **AI-Native Acceleration**: Features like **NVIDIA Tensor-core shards** (DRV-007) provide hardware-native AI performance beyond standard distros.
 
 ## 🏹 Competitive Absorption Matrix
+
 SigmaOS systematically "absorbs" the strengths of established distributions to make them less relevant:
 
 | Distro | Core Strengths | SigmaOS Countermove (Status) |
@@ -23,10 +24,11 @@ SigmaOS systematically "absorbs" the strengths of established distributions to m
 | **Alpine** | Minimalism, Musl | **Sigma Micro-Edition** (Musl/BusyBox) [Operational] |
 
 ## 🚀 SigmaOS Differentiators
-1.  **AI-Native Workflows**: Deeply integrated assistants (L-Stream) and automation.
-2.  **Post-Quantum Security**: `SovereignPQC` (Kyber/FIPS-203) at the core.
-3.  **Unified Package Layer**: Pacman + Flatpak + Nix in one seamless system (Orbs).
-4.  **Decentralized Sovereignty**: P2P marketplace and metadata indexing.
+1. **AI-Native Workflows**: Deeply integrated assistants (L-Stream) and automation.
+2. **Post-Quantum Security**: `SovereignPQC` (Kyber/FIPS-203) at the core.
+3. **Unified Package Layer**: Pacman + Flatpak + Nix in one seamless system (Orbs).
+4. **Decentralized Sovereignty**: P2P marketplace and metadata indexing.
 
 ---
-*Last Updated: 2026-05-09*
+
+### Last Updated: 2026-05-09

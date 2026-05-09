@@ -14,11 +14,12 @@ SigmaOS is dedicated to providing a **Sovereign Experience for All**. We priorit
 - **Predictive Typing**: AI-driven predictive text entry for OmniShell and editor shards.
 
 ## 🏗️ Developer Guidelines
+
 When building new shards for SigmaOS, please adhere to:
-1.  **Contrast Ratios**: Ensure a minimum 4.5:1 ratio for text.
-2.  **Focus States**: All interactive elements must have a visible focal glow.
-3.  **Semantic Sharding**: Use standard UI primitives to ensure screen reader compatibility.
-4.  **ARIA Labels**: Every `<input>` or interactive component must have a descriptive `aria-label`.
+1. **Contrast Ratios**: Ensure a minimum 4.5:1 ratio for text.
+2. **Focus States**: All interactive elements must have a visible focal glow.
+3. **Semantic Sharding**: Use standard UI primitives to ensure screen reader compatibility.
+4. **ARIA Labels**: Every `<input>` or interactive component must have a descriptive `aria-label`.
 
 ## 🛠️ Implementation Status
 - **SovereignAccessibility Shard**: Operational (Layer 6).
@@ -27,4 +28,5 @@ When building new shards for SigmaOS, please adhere to:
 - **Zenith Compliance**: 100% ARIA-compliant as of industrial evolution Batch 2.
 
 ---
-*For technical implementation details, see [Architecture.md](Architecture.md).*
+
+### For technical implementation details, see [Architecture.md](Architecture.md).

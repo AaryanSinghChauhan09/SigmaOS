@@ -3,13 +3,11 @@
 The **Sovereign Legal Engine** is a specialized diagnostic shard designed to orchestrate judicial compliance and procedural integrity directly within the kernel lattice.
 
 ## ⚖️ Sharding Principles
-
 - **Direct Silicon-to-Statute**: Translating legal code into declarative checklist shards.
 - **Zero-Dependency Compliance**: Legal logic is implemented without reliance on high-level language runtimes.
 - **Amnesic Persistence**: Audit results are stored in transient memory shards, adhering to strict privacy protocols.
 
 ## 📂 Active Shards
-
 - **BNSS_2023**: Procedural sentinel for criminal procedure (Zero FIR, Electronic Evidence).
 - **BNS_2023**: Substantive law shard for offense definitions and self-defense logic.
 - **BSA_2023**: Evidence law shard for digital forensics certification.

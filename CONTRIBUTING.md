@@ -8,15 +8,16 @@ We welcome contributors! As a meritocratic project, we value high-quality code, 
 3. Follow the [Installation Guide](https://github.com/AaryanSinghChauhan09/SigmaOS.wiki/blob/master/INSTALLATION_GUIDE.md).
 
 ## 🧭 Branching Strategy
-*   `main`: Stable, production-ready code.
-*   `develop`: Integration branch for new features.
-*   `feature/*`: Individual feature shards.
-*   `fix/*`: Bug fixes.
+* `main`: Stable, production-ready code.
+* `develop`: Integration branch for new features.
+* `feature/*`: Individual feature shards.
+* `fix/*`: Bug fixes.
 
 ## 📝 Coding Standards
-*   **OOP Isolation**: All new shards must inherit from `SigmaObject`.
-*   **No Raw Pointers**: Use Sovereign smart pointers or reference-counted objects.
-*   **Documentation**: Every public method must be documented in the header.
+* **OOP Isolation**: All new shards must inherit from `SigmaObject`.
+* **No Raw Pointers**: Use Sovereign smart pointers or reference-counted objects.
+* **Documentation**: Every public method must be documented in the header.
 
 ## 🗳 Sovereign Council
+
 Major architectural changes require an RFC and approval from the [Sovereign Council](https://github.com/AaryanSinghChauhan09/SigmaOS.wiki/blob/master/GOVERNANCE_CHARTER.md).

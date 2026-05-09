@@ -9,9 +9,10 @@ This document records the migration of hardcoded dependencies and unresolved ref
 4. **Header Normalization**: Adjusted `#include` statements in `SovereignARM64.cpp` to correctly resolve `sigma_kernel_types.h` and the OOP framework.
 
 ## API Hooks Usage
+
 Direct hardcoded instantiations of agents have been refactored to:
 ```cpp
 void* module = SigmaOS::Kernel::Context::ContextManager::getInstance().resolve("problem_id_or_module_name");
 ```
 
-*(This file will be migrated to the GitHub Wiki and deleted upon validation.)*
+### (This file will be migrated to the GitHub Wiki and deleted upon validation.)

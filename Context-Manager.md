@@ -1,9 +1,11 @@
 # SigmaOS Context Manager
 
 ## Overview
+
 The **Context Manager** (`/core/context/manager.cpp`) is the backbone of SigmaOS's zero-dependency, loosely-coupled architecture. It replaces all direct inter-module dependencies with a runtime-resolved API hook system.
 
 ## Architecture
+
 ```
 [Module A]  --registerModule("agent.quota", this)-->  [ContextManager Registry]
 [Module B]  --resolve("agent.quota")              -->  [ContextManager Registry]
@@ -14,18 +16,22 @@ The **Context Manager** (`/core/context/manager.cpp`) is the backbone of SigmaOS
 ## API Reference
 
 ### `void registerModule(const char* module_id, void* instance)`
+
 Registers a module (or sub-system) with the Context Manager by a unique string key.
 
-**Example:**
+### Example:
+
 ```cpp
 SigmaOS::Kernel::Context::ContextManager::getInstance()
     .registerModule("agent.quota", this);
 ```
 
 ### `void* resolve(const char* problem_id)`
+
 Dynamically resolves and returns a pointer to the registered module instance.
 
-**Example:**
+### Example:
+
 ```cpp
 QuotaManager* qm = (QuotaManager*)
     SigmaOS::Kernel::Context::ContextManager::getInstance()

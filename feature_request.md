@@ -1,3 +1,5 @@
+# feature request
+
 ---
 name: 🚀 Feature Request
 about: Propose a new shard, capability, or improvement for SigmaOS
@@ -7,12 +9,15 @@ assignees: AaryanSinghChauhan09
 ---
 
 ## 🚀 Feature Summary
+
 <!-- One-line description of what you want -->
 
 ## 🎯 Motivation / Problem Statement
+
 <!-- Why is this needed? What problem does it solve? -->
 
 ## 🛠️ Proposed Implementation
+
 <!-- How could this be implemented? Which shards / layers are involved? -->
 
 ## 🏗️ Affected Architecture Layers
@@ -25,9 +30,10 @@ assignees: AaryanSinghChauhan09
 - [ ] L6 — Zenith UI / Web
 
 ## ✅ Acceptance Criteria
-- [ ] 
-- [ ] 
-- [ ] 
+- [ ]
+- [ ]
+- [ ]
 
 ## 📎 References / Inspiration
+
 <!-- Link to upstream Linux, Fuchsia, seL4, OpenClaw, etc. -->

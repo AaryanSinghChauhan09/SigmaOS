@@ -1,7 +1,6 @@
 # 🎨 Optional Shards (151-300)
 
 ### Like Linux desktop environments (GNOME/KDE) or optional utility packages.
-
 * **Shard Range:** 151 - 300.
 * **Key Modules:**
 * **Learning Tools:** AI-native educational environments and skill synthesis.

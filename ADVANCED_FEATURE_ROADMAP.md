@@ -23,7 +23,6 @@ This document outlines the extensive strategic roadmap for automation, customiza
 - [x] **Accessibility Core**: Font scaling, high-contrast palettes, and screen reader support (Accessibility Shard).
 - [ ] **Dual-Pane File Manager**: High-efficiency file operations with git status integration.
 - [x] **Unified Command Palette**: Fuzzy-search across apps, files, settings, and shell commands.
-
 - **Real-Time Notification Center**: Grouped notifications with priority levels and action hooks.
 
 ## 🐧 Part 5: Linux Distro Integration
@@ -38,4 +37,4 @@ This document outlines the extensive strategic roadmap for automation, customiza
 
 ---
 
-*The Lattice is Infinite. The Evolution is Eternal.*
+### The Lattice is Infinite. The Evolution is Eternal.

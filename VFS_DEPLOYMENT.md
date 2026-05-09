@@ -5,7 +5,6 @@ As the first command of the Sovereign Expansion Phase, SigmaOS has deployed `Sov
 ## Hybrid Silicon Cluster
 
 The Sovereign Lattice dynamically unites heterogeneous silicon:
-
 - **Node Alpha:** RISC-V compute backend.
 - **Node Beta:** ARM64 neural acceleration node.
 - **Node Gamma:** x86_64 visualization node.

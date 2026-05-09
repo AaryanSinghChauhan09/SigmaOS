@@ -5,11 +5,10 @@ The **Sovereign Packaging Specification** defines the industrial standard for cr
 ## 📦 Package Structure (.spkg)
 
 A SigmaOS package is a PQC-sealed archive containing:
-
-1.  **manifest.json**: Shard metadata, dependencies, and capability requirements.
-2.  **binary.wasm / source.cpp**: The functional payload.
-3.  **resources/**: Assets, icons, and localized strings.
-4.  **signature.sig**: Dilithium-based PQC signature.
+1. **manifest.json**: Shard metadata, dependencies, and capability requirements.
+2. **binary.wasm / source.cpp**: The functional payload.
+3. **resources/**: Assets, icons, and localized strings.
+4. **signature.sig**: Dilithium-based PQC signature.
 
 ## 📝 manifest.json Example
 
@@ -32,10 +31,10 @@ Packages must specify their isolation level:
 - **TRUSTED**: Full hardware access (Official shards only).
 
 ## 🖋️ Verification Flow
-
-1.  The `SovereignMarketplace` fetches the `.spkg`.
-2.  `SovereignAttestation` verifies the PQC signature against the developer's public key.
-3.  `SovereignShardManager` staged the binary and executes it within a `SovereignSandbox` matching the requested capabilities.
+1. The `SovereignMarketplace` fetches the `.spkg`.
+2. `SovereignAttestation` verifies the PQC signature against the developer's public key.
+3. `SovereignShardManager` staged the binary and executes it within a `SovereignSandbox` matching the requested capabilities.
 
 ---
-*For development tools, see [Getting Started](Getting-Started.md).*
+
+### For development tools, see [Getting Started](Getting-Started.md).

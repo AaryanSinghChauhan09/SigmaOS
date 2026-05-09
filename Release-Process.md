@@ -17,10 +17,12 @@ This document describes how official SigmaOS releases are prepared, signed, and 
 - Documentation and Wiki are updated to match the release version.
 
 ## 🛡️ 4. Verification
+
 Users can verify the integrity of a release using the following command:
 ```bash
 sigma-verify --artifact sigmaos.iso --signature sigmaos.iso.sig
 ```
 
 ---
-*For security reporting during the release cycle, see [Security Policy](Security-Policy.md).*
+
+### For security reporting during the release cycle, see [Security Policy](Security-Policy.md).

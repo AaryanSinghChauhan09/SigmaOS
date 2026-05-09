@@ -21,7 +21,6 @@ Implements **Portable Shard Execution** using WebAssembly, allowing "procs" to b
 Focus is placed on "Lattice-level" resource management, treating distributed machine clusters as a single unified system.
 
 ## 🚀 Advanced Capabilities
-
 * **Predictive Prefetching**: AI-driven CPU/RAM allocation based on historical telemetry.
 * **eBPF Observability**: Low-overhead network and syscall profiling for distributed debugging.
 * **Hardware Attestation**: Support for Intel SGX and AMD SEV to cryptographically verify "Secure Realms."

@@ -13,7 +13,6 @@ graph LR
 ```
 
 ## Core Features
-
 - **JIT & AOT Compilation**: Shards are pre-compiled to native machine code (AVX-512/RISC-V) for zero-latency execution.
 - **Linear Memory Isolation**: Each WASM instance is confined to a strictly bounded memory region, preventing cross-shard data leaks.
 - **Capability-Based I/O**: Access to system resources (network, storage) is governed by tokenized permissions.
@@ -35,7 +34,6 @@ private:
 ```
 
 ## Security & Compliance
-
 - **WASI Compliance**: Adheres to the WebAssembly System Interface for cross-platform compatibility.
 - **Amnesic Cleanup**: All linear memory is scrubbed upon shard termination.
 - **LBSV Verification**: WASM bundles must be signed by the `SovereignPQCEngine`.

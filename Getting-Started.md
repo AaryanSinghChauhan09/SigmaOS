@@ -5,7 +5,6 @@ Welcome to the SigmaOS Sovereign Lattice. This guide will help you set up your d
 ## 🛠️ Prerequisites
 
 Before you begin, ensure you have the following installed:
-
 - **Build Tools**: `gcc-x86-64-linux-gnu`, `nasm`, `make`, `cmake`.
 - **Emulator**: `qemu-system-x86`.
 - **Node.js**: Version 16+ (for UI serving).
@@ -22,7 +21,9 @@ cd SigmaOS
 The SigmaOS build system is modular and shard-based.
 
 ```bash
+
 # Build the entire sovereign lattice
+
 make all
 ```
 
@@ -31,7 +32,9 @@ make all
 We provide a specialized boot script that handles ISO creation and QEMU orchestration.
 
 ```bash
+
 # Launch SigmaOS headlessly with serial output
+
 ./qemu-boot.sh
 ```
 
@@ -47,14 +50,16 @@ If you want to interact with the experimental web-based UI:
 ```bash
 npm install
 node server.js
+
 # Open http://localhost:5000 in your browser
+
 ```
 
 ## ⚠️ Common Pitfalls
-
 - **Architecture Mismatch**: Ensure you are using the `x86_64` toolchain for kernel builds.
 - **QEMU Permissions**: If QEMU fails to launch, check your user permissions for `/dev/kvm`.
 - **Missing NASM**: The bootloader requires NASM for assembly compilation.
 
 ---
-*For advanced configuration, see [Architecture.md](Architecture.md).*
+
+### For advanced configuration, see [Architecture.md](Architecture.md).

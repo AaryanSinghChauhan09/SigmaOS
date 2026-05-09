@@ -39,4 +39,4 @@ This master document outlines the complete vision for SigmaOS, integrating indus
 
 ---
 
-*The Lattice is Infinite. The Evolution is Eternal.*
+### The Lattice is Infinite. The Evolution is Eternal.

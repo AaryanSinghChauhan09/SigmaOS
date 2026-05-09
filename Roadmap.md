@@ -26,4 +26,5 @@ The path to becoming the ultimate Linux competitor crusher. SigmaOS follows a ri
 - [ ] **CentOS/AlmaLinux**: Target: FIPS-140-3 Compliance for Enterprise Sovereignty.
 
 ## 🚀 The 100 Strategic Pillars
+
 See the [Ultimate Advancement Strategy](ULTIMATE-ADVANCEMENT-STRATEGY.md) for the full 100-step blueprint across architecture, performance, security, and governance.
