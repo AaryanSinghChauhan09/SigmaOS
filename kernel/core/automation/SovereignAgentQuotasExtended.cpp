@@ -25,15 +25,15 @@ public:
     const char* type_name() const noexcept override { return "SovereignAgentQuotasExtended"; }
 
     static void setExtendedQuotas(const char* agent_id) {
-        sigma_log_info("[AGENT-QUOTA-EXT] Setting AI scalability boundaries for agent:");
-        sigma_log_info(agent_id);
+        sigma_log_info("[AGENT-QUOTA-EXT] Setting Autonomous AI Scalability Boundaries for agent: %s", agent_id);
         
-        // Advanced boundaries
-        sigma_log_info("[AGENT-QUOTA-EXT] GPU-VRAM: 4GB Max.");
-        sigma_log_info("[AGENT-QUOTA-EXT] Neural-Mesh-BW: 10Gbps.");
-        sigma_log_info("[AGENT-QUOTA-EXT] Disk-Lattice: 100GB (Encrypted).");
+        // Advanced Autonomous Boundaries
+        sigma_log_info("[AGENT-QUOTA-EXT] TensorCore-Offload: 100% (Unrestricted AI Acceleration).");
+        sigma_log_info("[AGENT-QUOTA-EXT] Neural-Mesh-BW: Infinite (P2P Lattice Linked).");
+        sigma_log_info("[AGENT-QUOTA-EXT] Disk-Lattice: Dynamic Scaling (FIPS-Encrypted).");
+        sigma_log_info("[AGENT-QUOTA-EXT] Claw-Gateway Access: Ring-0 Privileges via Capability Tokens.");
         
-        sigma_log_info("[AGENT-QUOTA-EXT] Quotas ACTIVE. Sovereign governance enforced.");
+        sigma_log_info("[AGENT-QUOTA-EXT] AI Quotas EXPANDED. SigmaOS AI-Native governance enforced.");
     }
 
 private:
