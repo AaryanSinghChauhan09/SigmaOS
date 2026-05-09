@@ -16,8 +16,9 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 11. **DRV-007**: Implement NVIDIA Tensor-core acceleration shards. [Operational]
 12. **DRV-008**: Port Intel i915 Graphics drivers. [Operational]
 13. **DRV-009**: Implement AMDGPU RDNA/CDNA modern support. [Operational]
-14. **UI-001**: Implement Zenith Graphical Installer. [Operational]
-15. **ABI-003**: Implement `musl` libc shims for Alpine-level minimalism. [Operational]
+14. **DRV-010**: Implement NVMe core storage driver. [Operational]
+15. **UI-001**: Implement Zenith Graphical Installer. [Operational]
+16. **ABI-003**: Implement `musl` libc shims for Alpine-level minimalism. [Operational]
 
 ## 📦 Package Ecosystem & Orbs (Items 201-400)
 11. **PKG-001**: Implement `sigma-pkg` dependency graph resolver. [Operational]
@@ -44,6 +45,8 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 38: 27. **UPD-001**: Implement Ed25519 signature verification in the update daemon. [Operational]
 39: 28. **SEC-004**: Implement `SovereignWhonixTor` privacy shim. [Operational]
 40: 29. **IDX-003**: Implement P2P Marketplace Cache & Fallback mirrors. [Operational]
+41: 30. **PKG-005**: Implement Universal Package Dependency Graph. [Operational]
+42: 31. **CLAW-003**: Implement Sovereign Agent Governance (Advanced Quotas). [Operational]
 
 ## 🌐 Ecosystem Integration (Items 801-1000)
 28. **K8S-001**: Implement `SovereignKubelet` shim. [Operational]

@@ -104,11 +104,10 @@ Rather than using fragile relative paths, every shard `#include`s the canonical 
 
 ## 🛠 Key Stabilization Fixes Applied
 
+| `SovereignDependencyGraph.cpp` | N/A | New shard for cross-ecosystem dependency resolution (PKG-005) |
+| `SovereignAgentGovernance.cpp` | N/A | New shard for multi-dimensional AI quotas (CLAW-003) |
+| `NVMe_Core.cpp` | N/A | New shard for high-speed storage support (DRV-010) |
 | `SovereignInstaller.cpp` | N/A | New shard for graphical deployment (UI-001) |
-| `zenith_installer.html` | N/A | High-fidelity installer UI mockup |
-| `SovereignMarketplaceCache.cpp` | N/A | New shard for P2P caching & fallback mirrors (IDX-003) |
-| `AMDGPU_Modern.cpp` | N/A | New shard for modern RDNA/CDNA support (DRV-009) |
-| `SovereignSandbox.cpp` | Integrated MAC logic | Extracted policy to `SovereignSandboxMAC.cpp` |
 | `zenith.html` | Duplicate IDs & a11y violations | Renamed `command-input` and added `aria-label` to all inputs |
 
 ---
