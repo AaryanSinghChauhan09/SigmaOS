@@ -32,6 +32,7 @@
 ## 🛡️ Security & Governance
 * [**🏛️ Governance Charter**](GOVERNANCE_CHARTER)
 * [**🔒 Security Roadmap**](SECURITY_ROADMAP)
+* [**🛡️ Bug Bounty Program**](BUG_BOUNTY)
 * [Security Policy](SECURITY)
 * [Verified Boot](Security-Posture)
 * [Sandbox Hardening](Sandbox-Hardening)

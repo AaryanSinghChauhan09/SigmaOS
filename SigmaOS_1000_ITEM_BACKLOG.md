@@ -12,14 +12,14 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 7.  **DRV-005**: Port Nouveau Maxwell/Pascal microcode mapping.
 8.  **PWR-001**: Implement ACPI Sleep States (S3/S4) in `SovereignPower`. [Operational]
 9.  **PWR-002**: Optimize CPU C-states for Intel Tiger Lake.
-10. **BENCH-001**: Implement `sigma-bench` for kernel scheduling latency vs. Linux `sched_ext`.
+10. **BENCH-001**: Implement `sigma-bench` for kernel scheduling latency vs. Linux `sched_ext`. [Operational]
 
 ## 📦 Package Ecosystem & Orbs (Items 201-400)
-11. **PKG-001**: Implement `sigma-pkg` dependency graph resolver.
+11. **PKG-001**: Implement `sigma-pkg` dependency graph resolver. [Operational]
 12. **PKG-002**: Add native Zstd compression to Orb packages. [Operational]
 13. **PKG-003**: Implement `SovereignOrbRollback` for atomic state revert. [Operational]
 14. **REPRO-001**: Fix build-path entropy in `SovereignLibC` compilation. [Operational]
-15. **OCI-001**: Implement `SovereignPodman` shim for container execution.
+15. **OCI-001**: Implement `SovereignPodman` shim for container execution. [Operational]
 16. **IDX-001**: Build P2P metadata indexer for the Sigma Marketplace.
 
 ## 🖥️ User Experience & Zenith (Items 401-600)
@@ -33,7 +33,7 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 ## 🛡️ Security & Compliance (Items 601-800)
 23. **SEC-001**: Audit `SovereignPQC` Kyber implementation vs NIST FIPS-203.
 24. **SEC-002**: Implement `SovereignAppArmor` mandatory access control (MAC). [Operational]
-25. **SEC-003**: Launch the SigmaOS Bug Bounty portal on GitHub.
+25. **SEC-003**: Launch the SigmaOS Bug Bounty portal on GitHub. [Operational]
 26. **CVE-001**: Establish CVE triaging pipeline for Ring-0 vulnerabilities.
 27. **UPD-001**: Implement Ed25519 signature verification in the update daemon.
 
