@@ -5,6 +5,7 @@
 *   [Architecture](Architecture)
 *   [Security](Security)
 *   [Drivers](Drivers)
+*   [UI](UI)
 *   [Recovery](Recovery)
 *   [AI Governance](AI-Governance)
 *   [ARM64 Optimization](ARM64-Optimization)
