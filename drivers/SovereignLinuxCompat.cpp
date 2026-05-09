@@ -32,10 +32,18 @@ public:
         sigma_log_info("[LINUX-COMPAT] Abstracting Linux ABI for SigmaOS HAL...");
     }
 
-    bool loadLinuxDriver(const char* driver_path) {
+    bool loadLinuxDriver(const char* driver_path, const char* license_tag = "GPL") {
         sigma_log_info("[LINUX-COMPAT] Attempting to load Linux Driver:");
         sigma_log_info(driver_path);
         
+        // --- IP COMPLIANCE ENFORCEMENT ---
+        extern "C" int ip_audit_verify(const char* name, const char* license);
+        if (!ip_audit_verify(driver_path, license_tag)) {
+            sigma_log_err("[LINUX-COMPAT] ABORT: Driver rejected due to Intellectual Property / Licensing laws.");
+            return false;
+        }
+        // ---------------------------------
+
         // Placeholder for ELF loading and ABI wrapping logic
         // We simulate a successful mapping of Linux kernel structures (sk_buff, etc.)
         // to SigmaOS native structs.
