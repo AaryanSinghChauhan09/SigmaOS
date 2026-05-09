@@ -104,19 +104,9 @@ Rather than using fragile relative paths, every shard `#include`s the canonical 
 
 ## 🛠 Key Stabilization Fixes Applied
 
-| Shard | Problem | Fix |
-|:---|:---|:---|
-| `SovereignOrbManager.cpp` | `SovereignQKD.hpp` not found; `Security` undeclared | Fixed include path to `security/SovereignQKD.hpp`; used fully-qualified namespace |
-| `SovereignOrbManager.cpp` | Two adjacent `const char*` params easily swapped | Added strong-type wrappers `OrbName{}` / `OrbSig{}` |
-| `SovereignOrbManager.cpp` | C-style vararg logging (`sigma_printf`) | Replaced with `sigma_log_info()` macros throughout |
-| `SovereignOrbManager.cpp` | `listOrbs()` not `const` | Marked method `const` |
-| `SovereignOrbManager.cpp` | `m_installed_orbs` uninitialized | Default member initializer `{0u}` |
-| `SovereignHAL.cpp` | Drivers not required at boot | Added mandatory `gpu_init`, `nvme_init`, `nic_init`, `usb_init`, `wifi_init` calls |
-| `SovereignClawGateway.cpp` | AI parameter swap risk | Implemented strong-type wrappers `WorkflowID` / `AgentType` |
-| `SovereignPQC.cpp` | C-style casts & magic numbers | Migrated to `static_cast` and lattice constants |
-| `SovereignSandbox.cpp` | Missing aria-labels & labels | Hardened security policy and added Zenith UI accessibility markers |
-| `SovereignMonitor.cpp` | Magic numbers in telemetry | Replaced with constexpr industrial constants |
-| `SovereignSnap.cpp` | Pure C-style implementation | Refactored to `SigmaObject` singleton in UI namespace |
+| `SovereignNetStack.cpp` | Monolithic net stack | Extracted `sk_buff` mapping to `SovereignNetCompat.cpp` |
+| `SovereignOrbManager.cpp` | Dependency logic in manager | Extracted recursive resolution to `SovereignOrbResolver.cpp` |
+| `SovereignInit.cpp` | FHS mapping in init | Extracted FHS virtualization to `SovereignFHS.cpp` |
 | `zenith.html` | Duplicate IDs & a11y violations | Renamed `command-input` and added `aria-label` to all inputs |
 
 ---
