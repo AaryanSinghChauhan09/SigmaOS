@@ -38,10 +38,8 @@ sigma_system_load_t SovereignObservabilityMonitor::getLoadMatrix() {
 }
 
 void SovereignObservabilityMonitor::executeEbpfProgram(const void* bytecode, sigma_usize size) {
-    (void)bytecode; (void)size;
-    sigma_log_info("[MONITOR] eBPF: Injecting tracing program into the silicon bus...");
-    sigma_log_info("[MONITOR] eBPF: Attaching kprobe to 'sigma_syscall_gate'...");
-    sigma_log_info("[MONITOR] eBPF: Real-time telemetry collection STARTED.");
+        extern "C" void telemetry_execute_ebpf(const void* bytecode, sigma_usize size);
+        telemetry_execute_ebpf(bytecode, size);
 }
 
 void SovereignObservabilityMonitor::rebalanceLattice() {

@@ -8,13 +8,9 @@ namespace HAL {
 void SovereignHAL::init() {
     sigma_log("Σ [HAL]: Initializing Universal Hardware Abstraction Shard...");
     
-    // Mandatory Driver Initialization
-    sigma_log("Σ [HAL]: Loading required hardware drivers...");
-    extern void gpu_init(); gpu_init();
-    extern void nvme_init(); nvme_init();
-    extern void nic_init(); nic_init();
-    extern void usb_init(); usb_init();
-    extern void wifi_init(); wifi_init();
+    // Mandatory Driver Initialization via Loader Shard
+    extern "C" void hal_load_drivers();
+    hal_load_drivers();
     
     sigma_log("Σ [HAL]: Device Tree lattice active.");
 }
