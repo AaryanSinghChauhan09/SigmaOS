@@ -33,6 +33,7 @@
 * [**🏛️ Governance Charter**](GOVERNANCE_CHARTER)
 * [**🔒 Security Roadmap**](SECURITY_ROADMAP)
 * [**🛡️ Bug Bounty Program**](BUG_BOUNTY)
+* [**🚨 CVE Triage Pipeline**](CVE_TRIAGE)
 * [Security Policy](SECURITY)
 * [Verified Boot](Security-Posture)
 * [Sandbox Hardening](Sandbox-Hardening)

@@ -34,8 +34,8 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 23. **SEC-001**: Audit `SovereignPQC` Kyber implementation vs NIST FIPS-203. [Operational]
 24. **SEC-002**: Implement `SovereignAppArmor` mandatory access control (MAC). [Operational]
 25. **SEC-003**: Launch the SigmaOS Bug Bounty portal on GitHub. [Operational]
-26. **CVE-001**: Establish CVE triaging pipeline for Ring-0 vulnerabilities.
-27. **UPD-001**: Implement Ed25519 signature verification in the update daemon.
+26. **CVE-001**: Establish CVE triaging pipeline for Ring-0 vulnerabilities. [Operational]
+27. **UPD-001**: Implement Ed25519 signature verification in the update daemon. [Operational]
 
 ## 🌐 Ecosystem Integration (Items 801-1000)
 28. **K8S-001**: Implement `SovereignKubelet` shim.
