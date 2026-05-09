@@ -23,3 +23,7 @@ To ensure high maintainability and industrial stability, SigmaOS is organized in
 - **Single Source of Truth**: Documentation lives in the GitHub Wiki. Repository `.md` files are migrated and purged upon completion.
 - **No Duplication**: Files exist in only one location. Symbolic shortcuts are used for multiple access points.
 - **Zero Dependencies**: Core modules use `SovereignLibC` and `SovereignHAL` to ensure independence from upstream Linux kernel changes.
+
+## Profiles Structure
+
+- /profiles/`n  - /cashier/`n  - /accountant/`n  - /doctor/`n  - /engineer/`n  - /lawyer/`n  - /farmer/`n
