@@ -1,15 +1,15 @@
-# Σ SigmaOS Security Model
+# Σ SIGMAOS: SECURITY POLICY
 
-SigmaOS is designed for the post-quantum era, absorbing strengths from Whonix, Tails, and Fedora CoreOS.
+## 🛡️ Sovereign Security Model
+SigmaOS utilizes a Zero-Trust architecture where every shard is cryptographically signed and executed in an isolated environment.
 
-## 🔐 Core Security Features
-*   **Post-Quantum Crypto**: `SovereignPQC` (Kyber/FIPS-203) integrated at Ring 0.
-*   **Mandatory Access Control**: `SovereignAppArmor` capability-based isolation.
-*   **Hardened Networking**: `SovereignWhonixTor` privacy-first routing.
-*   **Reproducible Builds**: SHA256 parity for all system-critical shards.
+### Threat Model
+*   **Lattice Isolation**: Preventing side-channel attacks between shards.
+*   **Quantum Resistance**: All communication is secured via Post-Quantum Cryptography (PQC).
+*   **Agent Sandboxing**: Autonomous agents are restricted by mandatory access controls.
 
-## 🚨 CVE Disclosure Process
-Follow the official [**CVE Triage Pipeline**](CVE_TRIAGE) for vulnerability reporting and disclosure.
+## 🩹 Vulnerability Disclosure
+If you find a security bug, please email `security@sigmaos.internal` or open a private issue.
 
-## 🛡️ Reproducibility
-Every SigmaOS shard is built deterministically. Use `reproducible_build.ps1` to verify your local binaries against the official marketplace signatures.
+## 📜 Patching Process
+Critical security patches are delivered via the **Emergency Lattice Sync** and take priority over all other updates.

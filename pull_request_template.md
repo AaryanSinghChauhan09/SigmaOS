@@ -1,53 +1,39 @@
-# pull request template
+## 📋 Pull Request Summary
+<!-- What does this PR do? One paragraph max. -->
 
----
-name: Pull Request
-about: Submit a new Sovereign Shard or bug fix
----
+## 🏗️ Type of Change
+- [ ] 🐛 Bug fix (correctness / safety / UB)
+- [ ] ✨ New shard / feature
+- [ ] ♻️ Refactor / modularization
+- [ ] 📝 Documentation / Wiki
+- [ ] ⚙️ CI / Build system
+- [ ] 🛡️ Security hardening
+- [ ] ⚡ Performance improvement
 
-# Pull Request
+## 🧪 Testing
+- [ ] New unit tests added
+- [ ] Existing tests pass (`ctest`)
+- [ ] QEMU smoke test passes
+- [ ] Tested on: x86_64 / arm64 _(circle one)_
 
-## Summary
+## 🔍 Code Quality Checklist
+- [ ] `clang-format` passes with no diff
+- [ ] `clang-tidy` reports no new warnings
+- [ ] No raw machine opcodes or unsafe `void*` containers
+- [ ] All new shards registered in `SHARDS.manifest`
+- [ ] New public APIs documented with Doxygen `@brief`
+- [ ] No blocking sleeps on the main thread
 
-<!-- One-line description of what this PR does -->
+## 🛡️ Security Checklist
+- [ ] No new unsafe casts or `reinterpret_cast` without justification
+- [ ] AI-executing code runs within `SovereignSandbox` (level ≥ `STRICT`)
+- [ ] New IPC uses `SovereignEventBus` (not direct shard calls)
+- [ ] MAC policy updated if new capabilities are introduced
 
-## Type
+## 📎 Related Issues
+Closes # <!-- issue number -->
 
-- [ ] New Shard
-- [ ] Bug Fix
-- [ ] Documentation Update
-- [ ] GitHub Actions / CI improvement
-
-## Closes
-
-<!-- Reference the ROADMAP.md milestone, IDEAS_BACKLOG.md item, or issue number -->
-Closes #
-
-## Shard Checklist (New Shards Only)
-
-- [ ] C++ OOP Singleton with `getInstance()`
-
-- [ ] `extern "C"` wrappers for all public functions
-
-- [ ] Registered in `SovereignUSR` via `usr_register_shard()`
-
-- [ ] `cppcheck` passes with zero warnings
-
-- [ ] Wiki page created or updated in `SigmaOS.wiki/`
-
-- [ ] `IDEAS_BACKLOG.md` or `MISSING_COMPONENTS.md` updated
-
-## Bug Fix Checklist
-
-- [ ] Root cause identified and documented
-- [ ] Regression test described
-- [ ] No new `cppcheck` warnings introduced
-
-## Testing
-
-<!-- Describe how you tested this change -->
-
-## Screenshots / Serial Output
-
-<!-- Paste sigma_log output or screenshots if applicable -->
-
+## 📝 Wiki / Docs Updated?
+- [ ] `SHARDS.manifest` updated
+- [ ] `CHANGELOG.md` entry added
+- [ ] Wiki page updated (if applicable)

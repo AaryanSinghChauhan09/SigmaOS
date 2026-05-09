@@ -1,17 +1,22 @@
 # Contributing to SigmaOS
 
-Join the meritocratic Sovereign Council and help build the future of computing.
+We welcome contributors! As a meritocratic project, we value high-quality code, clear documentation, and a focus on sovereign computing.
 
-## 🏁 Coding Standards
-*   **Language**: C++20 for core shards, Rust for industrial tooling.
-*   **Patterns**: OOP Singleton for shard state, RAII for resource management.
-*   **Linter**: Must pass `clang-tidy` and `reproducible_build.ps1` validation.
+## 🛠 Setup
+1. Clone the repo.
+2. Ensure you have a C++20 compatible compiler (GCC 12+, Clang 15+).
+3. Follow the [Installation Guide](https://github.com/AaryanSinghChauhan09/SigmaOS.wiki/blob/master/INSTALLATION_GUIDE.md).
 
-## 🔄 PR Workflow
-1.  **Fork & Branch**: Create a feature branch (e.g., `feat/new-driver`).
-2.  **Lint & Test**: Run `tests/run_all.ps1`.
-3.  **Submit**: Open a PR with a detailed shard manifest entry.
-4.  **Audit**: Pass security review and IP audit (`SovereignIPAuditor`).
+## 🧭 Branching Strategy
+*   `main`: Stable, production-ready code.
+*   `develop`: Integration branch for new features.
+*   `feature/*`: Individual feature shards.
+*   `fix/*`: Bug fixes.
 
-## ⚖️ Code of Conduct
-Respect, Transparency, and Sovereignty. No harassment or proprietary "dark" shards allowed.
+## 📝 Coding Standards
+*   **OOP Isolation**: All new shards must inherit from `SigmaObject`.
+*   **No Raw Pointers**: Use Sovereign smart pointers or reference-counted objects.
+*   **Documentation**: Every public method must be documented in the header.
+
+## 🗳 Sovereign Council
+Major architectural changes require an RFC and approval from the [Sovereign Council](https://github.com/AaryanSinghChauhan09/SigmaOS.wiki/blob/master/GOVERNANCE_CHARTER.md).

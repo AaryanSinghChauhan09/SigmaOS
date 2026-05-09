@@ -1,17 +1,38 @@
-# Σ SigmaOS Architecture (7-Layer Lattice)
+# Σ SIGMAOS: ARCHITECTURE (Sovereign Lattice)
 
-SigmaOS diverges from traditional monolithic kernels by employing a futuristic, AI-native **7-Layer Sovereign Lattice**.
+## 🌌 The 7-Layer Modular Lattice
+SigmaOS is not a monolithic OS. It is a **Sovereign Lattice** composed of independent, cryptographically-isolated "shards".
 
-## 🏗️ The 7 Layers
-1.  **L0: Silicon HAL**: Direct hardware abstraction (RPi4Tuning, Intel-HAL).
-2.  **L1: Memory & Compute**: SovereignPMM, Real-time Scheduler.
-3.  **L2: Security Sovereignty**: SovereignPQC, SovereignSandbox (AppArmor).
-4.  **L3: AI & Automation**: ClawGateway, SovereignWhonixTor.
-5.  **L4: Persistence & VFS**: LatticeFS, FHS Virtualization.
-6.  **L5: Industrial Ecosystem**: SovereignOrbManager, SovereignProton, SovereignVulkan.
-7.  **L6: Cloud-Native**: SovereignKubelet, AWS-AMI-Shield.
+### Layer 0: Silicon / Boot
+*   **Init**: `SovereignInit` orchestrates early bring-up.
+*   **Live Boot**: `SovereignLiveBoot` provides USB persistence.
+*   **HAL**: `SovereignHAL` maps the device tree.
 
-## 📊 Benchmarks
-*   **Context Switch Latency**: 0.8µs (vs Linux 1.2µs).
-*   **PQC Signature Overhead**: <5% (Kyber-1024).
-*   **Pod Initialization**: 15ms (via SovereignPodman).
+### Layer 1: Kernel Primitives
+*   **Memory**: PMM/VMM logic.
+*   **Sched**: Lattice-aware scheduler.
+*   **Drivers**: Bare-metal GPU (SovereignDirectGPU), NVMe, etc.
+
+### Layer 2: System Services
+*   **VFS**: Sovereign Partition Manager.
+*   **IPC**: Sovereign Bus.
+*   **Observability**: eBPF Telemetry.
+
+### Layer 3: Security Fabric
+*   **PQC**: Lattice-based post-quantum cryptography.
+*   **Sandbox**: `SovereignSandbox` for agent isolation.
+*   **MAC**: SELinux-style mandatory access controls.
+
+### Layer 4: AI & Automation
+*   **Claw Stack**: Agent core and workflow orchestration.
+*   **Neural Nexus**: Aether Firewall heuristics.
+
+### Layer 5: Industrial Ecosystem
+*   **Orb Manager**: Unified package dispatch (Pacman/Flatpak/Nix).
+*   **Marketplace**: P2P Indexing and verification.
+
+### Layer 6: Zenith UI
+*   **Zenith**: Cyberpunk-morphic display server and UI.
+
+---
+*For a detailed map of source files to layers, see the [Modularization Map](https://github.com/AaryanSinghChauhan09/SigmaOS.wiki/blob/master/MODULARIZATION_MAP.md).*

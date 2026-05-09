@@ -1,44 +1,35 @@
-# bug report
-
 ---
-name: Bug Report
-about: Report a kernel shard malfunction or build failure
-title: "[BUG] <shard_name>: <short description>"
-labels: bug, triage
-assignees: ''
+name: 🐛 Bug Report
+about: Report a bug or unexpected behavior in the SigmaOS Lattice
+title: "[BUG] "
+labels: ["bug", "needs-triage"]
+assignees: AaryanSinghChauhan09
 ---
 
-## Affected Shard
+## 🐛 Bug Description
+<!-- A clear and concise description of the bug -->
 
-<!-- Which kernel shard is affected? e.g. SovereignNetStack, SovereignGPU -->
+## 🔄 Steps to Reproduce
+1. 
+2. 
+3. 
 
-## Description
+## ✅ Expected Behavior
+<!-- What should have happened -->
 
-<!-- A clear description of the bug -->
+## ❌ Actual Behavior
+<!-- What actually happened -->
 
-## Reproduction Steps
+## 🖥️ Environment
+- **SigmaOS Version**: 
+- **Host Architecture**: (x86_64 / arm64)
+- **Kernel Shard Affected**: 
+- **QEMU / Bare Metal**: 
 
-1. Step one
-
-## Expected Behavior
-
-<!-- What should happen -->
-
-## Actual Behavior
-
-<!-- What actually happens -->
-
-## Build Environment
-
-- Architecture: `[ ] x86_64  [ ] ARM64  [ ] RISC-V
-
- sigma-build output: paste here
-
-## Logs
-
-```text
-
-<!-- Paste sigma_log / serial output here -->
-
+## 📋 Logs / Stack Trace
+```
+Paste logs here
 ```
 
+## 📎 Additional Context
+<!-- Any other relevant info, screenshots, etc. -->
