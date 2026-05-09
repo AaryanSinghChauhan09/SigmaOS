@@ -25,7 +25,9 @@ public:
     const char* type_name() const noexcept override { return "SovereignProton"; }
 
     bool runExecutable(const char* exe_path) {
-        sigma_log_info("[PROTON-SHIM] Initializing DXVK/VKD3D translation layer...");
+        extern "C" void proton_dxvk_init();
+        proton_dxvk_init();
+        
         sigma_log_info("[PROTON-SHIM] Mapping Windows PE executable:");
         sigma_log_info(exe_path);
         

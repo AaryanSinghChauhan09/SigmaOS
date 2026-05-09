@@ -26,9 +26,9 @@ const char* SovereignPQCEngine::type_name() const noexcept {
 void SovereignPQCEngine::init() {
     sigma_log_info("[PQC] Initializing Sovereign Post-Quantum Cryptography Nexus (LBSV Algorithm)...");
     
-    // SEC-001: Audit vs NIST FIPS-203 (ML-KEM/Kyber)
-    sigma_log_info("[PQC] Audit: Kyber implementation verified against NIST test vectors.");
-    sigma_log_info("[PQC] Compliance: [FIPS-203 READY].");
+    // SEC-001: Audit vs NIST FIPS-203 via Audit Shard
+    extern "C" void pqc_audit_fips();
+    pqc_audit_fips();
 
     this->initialized = 1U;
 }

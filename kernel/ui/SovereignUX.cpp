@@ -58,7 +58,8 @@ public:
     }
 
     void predictAdaptation() {
-        sigma_log("[UX] PPE: Analyzing ambient shard luminosity for predictive adaptation...");
+        extern "C" void ux_ppe_predict();
+        ux_ppe_predict();
         // Logic to shift UI tone based on system energy state
     }
 
