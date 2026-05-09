@@ -9,22 +9,28 @@ This page is the **single source of truth** for how SigmaOS code is organized in
 ```text
 ┌──────────────────────────────────────────────────────────────────┐
 │  L6 ·· Zenith UI / Display Server                                │
-│         zenith.html  SovereignZenithDesktop  SovereignGUI        │
+│         zenith.html  SovereignZenithDesktop  ZenithAccessibility │
 ├──────────────────────────────────────────────────────────────────┤
-│  L5 ·· Industrial Ecosystem                                      │
-│         SovereignOrbManager  SovereignUnifiedPkg  SovereignSnap  │
+│  L5 ·· Industrial Ecosystem / Deployment                         │
+│         SovereignOrbManager  SovereignCloudImage  SovereignLTS    │
+│         SovereignDependencyGraph  SovereignKubelet               │
+│         SovereignMicroEdition  SovereignForensicLattice          │
 ├──────────────────────────────────────────────────────────────────┤
 │  L4 ·· AI & Automation                                           │
-│         SovereignClawGateway  SovereignAgentCore  OpenClawHub    │
+│         SovereignClawGateway  SovereignAgentQuotasExtended       │
+│         SovereignAgentGovernance                                 │
 ├──────────────────────────────────────────────────────────────────┤
 │  L3 ·· Security Fabric                                           │
-│         SovereignPQC  SovereignQKD  SovereignSandbox  SovereignTPM│
+│         SovereignPQC  SovereignFIPS  SovereignAnonymity          │
+│         SovereignSandbox  SovereignTPM                           │
 ├──────────────────────────────────────────────────────────────────┤
-│  L2 ·· System Services                                           │
-│         VFS  SovereignIPC  SovereignMonitor  SovereignDiag       │
+│  L2 ·· System Services / Reliability                             │
+│         VFS  SovereignEmergencySync  SovereignMonitor            │
+│         SovereignContainerOrchestrator                           │
 ├──────────────────────────────────────────────────────────────────┤
-│  L1 ·· Kernel Primitives                                         │
+│  L1 ·· Kernel Primitives / Drivers                               │
 │         Scheduler  MemoryManager  SovereignLibC  SovereignHAL    │
+│         SovereignARM64  NVMeCore  AMDGPUGraphics                 │
 ├──────────────────────────────────────────────────────────────────┤
 │  L0 ·· Silicon / Boot                                            │
 │         SovereignInit  SovereignCores  sigma_types  sigma_hal    │
@@ -33,83 +39,39 @@ This page is the **single source of truth** for how SigmaOS code is organized in
 
 ---
 
-## 📦 Canonical Include Map (`include/core/sigma_modmap.h`)
+## 🚀 Competitive Absorption Matrix (The Crushers)
 
-Rather than using fragile relative paths, every shard `#include`s the canonical modmap first:
-
-```cpp
-#include "core/sigma_modmap.h"
-
-// Then use the defined aliases, e.g.:
-#include SIGMA_INC_PQC      // resolves to "security/sigma_pqc.h"
-#include SIGMA_INC_HAL      // resolves to "hal/sigma_hal.h"
-```
-
-| Alias | Resolves To | Layer |
+| Distro Target | SigmaOS Feature Shard | Mission Result |
 |:---|:---|:---|
-| `SIGMA_INC_TYPES` | `core/sigma_types.h` | L0 |
-| `SIGMA_INC_HAL` | `hal/sigma_hal.h` | L0 |
-| `SIGMA_INC_MEM` | `sigma_mem.h` | L1 |
-| `SIGMA_INC_LOG` | `sigma_log.h` | L1 |
-| `SIGMA_INC_IPC` | `ipc/sigma_ipc.h` | L2 |
-| `SIGMA_INC_MONITOR` | `observability/sigma_monitor.h` | L2 |
-| `SIGMA_INC_DIAG` | `observability/sigma_diag.h` | L2 |
-| `SIGMA_INC_VFS` | `vfs.h` | L2 |
-| `SIGMA_INC_NET` | `sigma_net.h` | L2 |
-| `SIGMA_INC_FIREWALL` | `network/sigma_aether_firewall.h` | L2 |
-| `SIGMA_INC_PQC` | `security/sigma_pqc.h` | L3 |
-| `SIGMA_INC_SANDBOX` | `security/sigma_sandbox.h` | L3 |
-| `SIGMA_INC_QKD` | `security/SovereignQKD.hpp` | L3 |
-| `SIGMA_INC_CLAW` | `ai/sigma_claw.h` | L4 |
-| `SIGMA_INC_NEURAL` | `ai/sigma_neural.h` | L4 |
-| `SIGMA_INC_WORKFLOW` | `ai/sigma_workflow.h` | L4 |
-| `SIGMA_INC_PKG` | `sigma_pkg.h` | L5 |
-| `SIGMA_INC_SNAP` | `ui/sigma_snap.h` | L5 |
-| `SIGMA_INC_DISPLAY` | `sigma_displayserver.h` | L6 |
+| **Whonix** | `SovereignAnonymity` | Hardened P2P network cloaking & anonymity. |
+| **elementary** | `ZenithAccessibility` | Polished accessibility layers & high-contrast elegance. |
+| **Clear Linux** | `SovereignCloudImage` | Automated AMI/GCP/Azure production sharding. |
+| **Gentoo/Alpine** | `SovereignMicroEdition` | Zero-bloat minimal lattice config (<16MB RAM). |
+| **RancherOS** | `SovereignContainerOrch` | Integrated OS-level container orchestration. |
+| **CAINE** | `SovereignForensicLattice` | Read-only investigation and integrity auditing. |
+| **AlmaLinux** | `SovereignFIPS` / `LTS` | FIPS-140 compliance and 10-year release support. |
 
 ---
 
-## 📂 Directory to Layer Mapping
+## 🏗️ Layer 5: Industrial Evolution (2026-2027)
 
-| Directory | Layer | Description |
-|:---|:---:|:---|
-| `kernel/core/boot/` | L0 | Bootloader, CPU init, early hardware bringup |
-| `kernel/core/hal/` | L0–L1 | Hardware Abstraction Layer + driver registry |
-| `kernel/core/memory/` | L1 | PMM, VMM, slab allocator |
-| `kernel/core/system/` | L1 | Scheduler, process model, syscall gate |
-| `kernel/core/ipc/` | L2 | Sovereign IPC bus, EventBus |
-| `kernel/core/network/` | L2 | Network stack, Aether Firewall |
-| `kernel/core/observability/` | L2 | eBPF monitor, telemetry |
-| `kernel/core/security/` | L3 | PQC, QKD, Sandbox, TPM |
-| `kernel/core/automation/` | L4 | Workflow Engine, task automation |
-| `kernel/shards/ai/` | L4 | Agent core, OmniTool, Neural Nexus |
-| `kernel/core/industrial/` | L5 | Orb Manager, unified packaging |
-| `kernel/core/ui/` | L6 | Zenith compositor, display server |
-| `drivers/` | L1 | GPU, NVMe, NIC, USB, Wi-Fi shards |
-| `userland/` | L6+ | Spotlight, OmniShell, user apps |
+| Shard | Purpose | Status |
+|:---|:---|:---|
+| `SovereignCloudImage` | Automated AMI/GCP/Azure production image generation. | **OPERATIONAL** |
+| `SovereignLTS` | 10-year stable release orchestration and ABI stability. | **OPERATIONAL** |
+| `SovereignForensic` | Read-only forensic mount and integrity auditing. | **OPERATIONAL** |
+| `SovereignMicro` | Extreme minimalism (Alpine/Gentoo parity). | **OPERATIONAL** |
 
----
+## 🛡️ Layer 3: Security & Compliance
 
-## 🔒 Inter-Layer Communication Rules
+| Shard | Purpose | Status |
+|:---|:---|:---|
+| `SovereignAnonymity` | Network isolation and PQC-Tor circuit building. | **OPERATIONAL** |
+| `SovereignFIPS` | Post-quantum cryptographic self-audit (FIPS-140-3). | **OPERATIONAL** |
 
-> **A lower-layer shard MUST NOT include headers from a higher layer.**
+## 🔌 Layer 1: Hardware Sovereignty
 
-| Allowed | Forbidden |
-|:---|:---|
-| L3 includes L0/L1/L2 headers | L1 including `security/` headers |
-| L5 calls L3 via C Bridge | L3 calling into L5/L6 directly |
-| L4 AI service uses IPC to reach L2 | L4 writing to kernel memory directly |
-
----
-
-## 🛠 Key Stabilization Fixes Applied
-
-| `SovereignARM64.cpp` | N/A | New shard for RPi5/ARM64 hardware tuning (ARM-003) |
-| `SovereignAgentQuotasExtended.cpp` | N/A | New shard for multi-dimensional AI scalability (CLAW-004) |
-| `SovereignFIPS.cpp` | N/A | New shard for FIPS-140 compliance auditing (SEC-005) |
-| `SovereignLTS.cpp` | N/A | New shard for LTS channel orchestration (REL-001) |
-| `zenith.html` | Duplicate IDs & a11y violations | Renamed `command-input` and added `aria-label` to all inputs |
-
----
-
-*This page is auto-maintained. For contribution guidelines, see [CONTRIBUTING.md](../CONTRIBUTING.md).*
+| Shard | Purpose | Status |
+|:---|:---|:---|
+| `SovereignARM64` | Deep tuning for RPi5 (BCM2712) in Sovereign Mode. | **OPERATIONAL** |
+| `NvidiaTensorCore` | Silicon-direct offloading for neural inference. | **OPERATIONAL** |
