@@ -11,7 +11,7 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 6.  **DRV-004**: Port AMDGPU Southern Islands (SI) support. [Operational]
 7.  **DRV-005**: Port Nouveau Maxwell/Pascal microcode mapping. [Operational]
 8.  **PWR-001**: Implement ACPI Sleep States (S3/S4) in `SovereignPower`. [Operational]
-9.  **PWR-002**: Optimize CPU C-states for Intel Tiger Lake.
+9.  **DRV-006**: Port Realtek RTL8111/8168 Ethernet drivers. [Operational]
 10. **BENCH-001**: Implement `sigma-bench` for kernel scheduling latency vs. Linux `sched_ext`. [Operational]
 11. **ABI-003**: Implement `musl` libc shims for Alpine-level minimalism. [Operational]
 
@@ -44,8 +44,10 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 28. **K8S-001**: Implement `SovereignKubelet` shim. [Operational]
 29. **GAM-001**: Port Vulkan 1.3 loader to `SovereignGPU`. [Operational]
 30. **GAM-002**: Implement `SovereignProton` compatibility layer (Wine-based). [Operational]
-31. **CLD-001**: Build SigmaOS AMI for AWS EC2 deployment.
-32. **SDK-001**: Release C++/Rust SDK for native SigmaOS Shard development.
+31. **CLD-001**: Build SigmaOS AMI for AWS EC2 deployment. [Operational]
+32. **K8S-002**: Implement `K8sControlPlaneShield`. [Operational]
+33. **EDU-001**: Implement NCERT Solver shard. [Operational]
+34. **ARM-002**: Implement RPi5 hardware tuning shard. [Operational]
 
 ---
 *This list is expanded dynamically by the Sovereign Council as technical gaps are identified.*
