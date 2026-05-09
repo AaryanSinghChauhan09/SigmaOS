@@ -1,0 +1,10 @@
+{
+    "profession": "healthcare_admin",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "hospital_management_dashboards",
+        "compliance",
+        "scheduling"
+    ]
+}

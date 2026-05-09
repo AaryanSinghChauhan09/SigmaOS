@@ -1,0 +1,10 @@
+{
+    "profession": "civil_servant",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "policy_tools",
+        "compliance",
+        "citizen_records"
+    ]
+}

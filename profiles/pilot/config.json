@@ -1,0 +1,11 @@
+{
+    "profession": "pilot",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "flight_logs",
+        "navigation_systems",
+        "simulation_modules",
+        "weather_sync"
+    ]
+}

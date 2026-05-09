@@ -1,0 +1,10 @@
+{
+    "profession": "nurse",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "patient_monitoring",
+        "medication_schedules",
+        "compliance_with_medical_protocols"
+    ]
+}

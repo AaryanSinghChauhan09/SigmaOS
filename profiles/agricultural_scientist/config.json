@@ -1,0 +1,10 @@
+{
+    "profession": "agricultural_scientist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "crop_modeling",
+        "iot_integration",
+        "compliance"
+    ]
+}

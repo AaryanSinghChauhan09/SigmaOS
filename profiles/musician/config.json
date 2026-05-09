@@ -1,0 +1,10 @@
+{
+    "profession": "musician",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "digital_audio_workstation",
+        "sheet_music_manager",
+        "recording_tools"
+    ]
+}

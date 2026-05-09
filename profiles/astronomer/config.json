@@ -1,0 +1,10 @@
+{
+    "profession": "astronomer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "telescope_data_integration",
+        "simulation",
+        "visualization"
+    ]
+}

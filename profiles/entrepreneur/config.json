@@ -1,0 +1,10 @@
+{
+    "profession": "entrepreneur",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "business_planning",
+        "financial_dashboards",
+        "crm_tools"
+    ]
+}

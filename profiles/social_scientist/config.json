@@ -1,0 +1,10 @@
+{
+    "profession": "social_scientist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "survey_tools",
+        "statistical_analysis",
+        "visualization"
+    ]
+}

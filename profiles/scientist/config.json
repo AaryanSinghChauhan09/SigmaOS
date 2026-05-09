@@ -1,0 +1,11 @@
+{
+    "profession": "scientist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "data_analysis_suite",
+        "lab_notebooks",
+        "simulation_modules",
+        "visualization_tools"
+    ]
+}

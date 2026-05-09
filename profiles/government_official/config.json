@@ -1,0 +1,11 @@
+{
+    "profession": "government_official",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "policy_drafting",
+        "compliance_modules",
+        "secure_communication",
+        "citizen_data_management"
+    ]
+}

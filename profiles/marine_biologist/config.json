@@ -1,0 +1,10 @@
+{
+    "profession": "marine_biologist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "ocean_data_integration",
+        "visualization",
+        "compliance"
+    ]
+}

@@ -1,0 +1,11 @@
+{
+    "profession": "event_planner",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "scheduling",
+        "resource_allocation",
+        "ticketing",
+        "communication_tools"
+    ]
+}

@@ -1,0 +1,9 @@
+{
+    "profession": "meteorologist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "weather_modeling",
+        "forecasting_dashboards"
+    ]
+}

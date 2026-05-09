@@ -1,0 +1,10 @@
+{
+    "profession": "archaeologist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "artifact_cataloging",
+        "gis_mapping",
+        "compliance"
+    ]
+}

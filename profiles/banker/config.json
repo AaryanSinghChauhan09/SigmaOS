@@ -1,0 +1,10 @@
+{
+    "profession": "banker",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "loan_management",
+        "compliance",
+        "transaction_dashboards"
+    ]
+}

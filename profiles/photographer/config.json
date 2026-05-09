@@ -1,0 +1,10 @@
+{
+    "profession": "photographer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "photo_editing_suite",
+        "portfolio_manager",
+        "export_tools"
+    ]
+}

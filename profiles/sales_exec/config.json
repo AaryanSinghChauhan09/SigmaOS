@@ -1,0 +1,10 @@
+{
+    "profession": "sales_exec",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "crm_tools",
+        "lead_tracking",
+        "reporting_dashboards"
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "profession": "cybersecurity_analyst",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "threat_detection",
+        "penetration_testing",
+        "compliance_dashboards"
+    ]
+}

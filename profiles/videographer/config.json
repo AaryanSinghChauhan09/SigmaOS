@@ -1,0 +1,10 @@
+{
+    "profession": "videographer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "video_editing_suite",
+        "rendering_tools",
+        "streaming_integration"
+    ]
+}

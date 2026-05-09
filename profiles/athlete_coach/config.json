@@ -1,0 +1,10 @@
+{
+    "profession": "athlete_coach",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "training_planner",
+        "performance_analytics",
+        "health_monitoring"
+    ]
+}

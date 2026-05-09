@@ -1,0 +1,10 @@
+{
+    "profession": "chemist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "molecular_modeling",
+        "lab_notebooks",
+        "compliance"
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "profession": "genomics_scientist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "dna_sequencing_tools",
+        "visualization",
+        "compliance"
+    ]
+}

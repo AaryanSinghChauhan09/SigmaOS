@@ -1,0 +1,10 @@
+{
+    "profession": "marketing_pro",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "campaign_dashboards",
+        "analytics",
+        "crm_integration"
+    ]
+}

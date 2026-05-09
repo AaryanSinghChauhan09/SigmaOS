@@ -1,0 +1,10 @@
+{
+    "profession": "neuroscientist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "brain_imaging_integration",
+        "simulation",
+        "compliance"
+    ]
+}

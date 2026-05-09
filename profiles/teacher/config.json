@@ -1,0 +1,11 @@
+{
+    "profession": "teacher",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "lesson_planning",
+        "grading_system",
+        "student_records",
+        "virtual_classroom_tools"
+    ]
+}

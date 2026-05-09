@@ -1,0 +1,11 @@
+{
+    "profession": "researcher",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "data_mining",
+        "citation_management",
+        "analytics_dashboards",
+        "visualization"
+    ]
+}

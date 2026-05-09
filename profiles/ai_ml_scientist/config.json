@@ -1,0 +1,10 @@
+{
+    "profession": "ai_ml_scientist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "model_training",
+        "dataset_management",
+        "gpu_orchestration"
+    ]
+}

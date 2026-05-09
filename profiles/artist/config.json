@@ -1,0 +1,12 @@
+{
+    "profession": "artist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "creative_suite_(drawing",
+        "design",
+        "video_editing)",
+        "portfolio_manager",
+        "media_export_tools"
+    ]
+}

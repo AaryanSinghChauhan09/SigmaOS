@@ -1,0 +1,10 @@
+{
+    "profession": "logistics_manager",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "fleet_tracking",
+        "supply_chain_dashboards",
+        "warehouse_management"
+    ]
+}
