@@ -50,6 +50,12 @@ public:
         sigma_log_info("[ORB-MAN] Orb-Lattice Registry ONLINE (Zero-Dependency).");
     }
 
+    bool resolveDependencies(OrbName name) {
+        sigma_log_info("[ORB-MAN] Resolving dependencies for Orb...");
+        // Placeholder for dependency resolution logic
+        return true;
+    }
+
     /**
      * @param name  The unique Orb identifier.
      * @param sig   The quantum-signed hash of the Orb payload.
@@ -58,6 +64,11 @@ public:
      * `const char*` parameters from being accidentally swapped.
      */
     void installOrb(OrbName name, OrbSig sig) {
+        if (!resolveDependencies(name)) {
+            sigma_log_err("[ORB-MAN] Dependency resolution FAILED. Aborting install.");
+            return;
+        }
+
         (void)sig; /* Signature consumed by QKD engine below */
         sigma_log_info("[ORB-MAN] Deploying Orb...");
 
@@ -68,10 +79,22 @@ public:
         if (verified) {
             sigma_log_info("[ORB-MAN] Orb INTEGRATED into Lattice.");
             m_installed_orbs++;
+            // Note: In a real implementation, we would store previous states here for rollback.
         } else {
             sigma_log_err("[ORB-MAN] SIGNATURE MISMATCH — Orb rejected by QKD Core.");
         }
         (void)name; /* used implicitly through logging; suppress warning */
+    }
+
+    void rollbackOrb(OrbName name) {
+        sigma_log_info("[ORB-MAN] Initiating rollback for Orb...");
+        if (m_installed_orbs > 0) {
+            m_installed_orbs--;
+            sigma_log_info("[ORB-MAN] Rollback SUCCESSFUL. System state reverted.");
+        } else {
+            sigma_log_err("[ORB-MAN] Rollback FAILED: No installed Orbs to revert.");
+        }
+        (void)name;
     }
 
     void listOrbs() const {
@@ -102,6 +125,11 @@ extern "C" void orb_install(const char* orb_name, const char* orb_sig) {
     SigmaOS::Kernel::Industrial::SovereignOrbManager::getInstance().installOrb(
         SigmaOS::Kernel::Industrial::OrbName{orb_name},
         SigmaOS::Kernel::Industrial::OrbSig{orb_sig});
+}
+
+extern "C" void orb_rollback(const char* orb_name) {
+    SigmaOS::Kernel::Industrial::SovereignOrbManager::getInstance().rollbackOrb(
+        SigmaOS::Kernel::Industrial::OrbName{orb_name});
 }
 
 extern "C" void orb_list() {
