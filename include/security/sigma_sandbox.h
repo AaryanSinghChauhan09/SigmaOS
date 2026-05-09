@@ -1,4 +1,4 @@
-/*
+﻿/*
  * =========================================================================
  * SIGMAOS: SOVEREIGN SANDBOX CONTAINER (S-SANDBOX)
  * =========================================================================
@@ -68,3 +68,4 @@ int       sandbox_validate_mac(const char* subject, const char* object, const ch
 #endif
 
 #endif /* SIGMA_SANDBOX_H */
+

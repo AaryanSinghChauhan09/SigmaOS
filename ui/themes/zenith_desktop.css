@@ -1,4 +1,4 @@
-﻿:root {
+:root {
     --accent: #00ffa3;
     --accent-glow: rgba(0, 255, 163, 0.4);
     --bg: #050507;
@@ -2146,9 +2146,3 @@ input, textarea, [contenteditable], .command-input, .browser-url, .ai-chat-input
     user-select: text;
     cursor: text;
 }
-
-to {
-    stroke-dashoffset: 0;
-}
-
-

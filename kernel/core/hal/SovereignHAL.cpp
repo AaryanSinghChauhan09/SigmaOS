@@ -1,4 +1,4 @@
-#include "sigma_log.h"
+﻿#include "sigma_log.h"
 #include "hal/sigma_hal.h"
 #include "libc/SovereignLibC.h"
 
@@ -40,12 +40,13 @@ void SovereignHAL::registerDriver(const char* name, DeviceType type) {
 
 /* --- C Bridge --- */
 extern "C" void hal_init() {
-    SigmaOS::Kernel::HAL::SovereignHAL::init();
+    SigmaOS::Kernel::HAL::SovereignHAL::getInstance().init();
 }
 
 extern "C" void hal_probe() {
-    SigmaOS::Kernel::HAL::SovereignHAL::probeBus();
+    SigmaOS::Kernel::HAL::SovereignHAL::getInstance().probeBus();
 }
+
 
 
 

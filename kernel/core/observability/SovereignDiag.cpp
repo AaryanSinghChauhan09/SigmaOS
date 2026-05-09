@@ -28,8 +28,8 @@ public:
 
     static void init() {
         sigma_log_info("[DIAG] Initializing Sovereign Silicon Health Monitor...");
-        getInstance().getInstance().m_initialized = 1U;
-        getInstance().getInstance().m_fault_count = 0U;
+        getInstance().m_initialized = 1U;
+        getInstance().m_fault_count = 0U;
     }
 
     static void performScan() {
@@ -83,5 +83,6 @@ extern "C" void diag_report(const char* shard, const char* desc) {
         SigmaOS::Kernel::Observability::SovereignDiagEngine::ShardID{shard},
         SigmaOS::Kernel::Observability::SovereignDiagEngine::AnomalyDesc{desc});
 }
+
 
 

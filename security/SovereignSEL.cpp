@@ -70,12 +70,13 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void sel_init_shard() {
-    SigmaOS::Kernel::Security::SovereignSEL::init();
+    SigmaOS::Kernel::Security::SovereignSEL::getInstance().init();
 }
 
 extern "C" void sel_spawn_sandbox(const char* name) {
     SigmaOS::Kernel::Security::SovereignSEL::spawnSandbox(name);
 }
+
 
 
 

@@ -1,9 +1,9 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ZSTD (Compression Shard)
+ * Î£ SIGMAOS: SOVEREIGN ZSTD (Compression Shard)
  * =========================================================================
  * Mission: Implements PKG-002 for industrial-grade Orb package compression.
- * Layer  : L5 — Industrial Ecosystem
+ * Layer  : L5 â€” Industrial Ecosystem
  * =========================================================================
  */
 
@@ -24,14 +24,14 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignZstd"; }
 
-    static static sigma_size_t compressOrb(const void* src, void* dst, sigma_size_t src_size) {
+    static sigma_size_t compressOrb(const void* src, void* dst, sigma_size_t src_size) {
         sigma_log_info("[ZSTD] Compressing Orb payload using Zstandard v1.5.x...");
         // Mock compression logic
         sigma_log_info("[ZSTD] Ratio: 3.4:1. Optimization: [LEVEL-19]");
         return src_size / 3;
     }
 
-    static static sigma_size_t decompressOrb(const void* src, void* dst, sigma_size_t src_size) {
+    static sigma_size_t decompressOrb(const void* src, void* dst, sigma_size_t src_size) {
         sigma_log_info("[ZSTD] Decompressing Orb payload...");
         return src_size * 3;
     }
@@ -49,6 +49,7 @@ extern "C" sigma_size_t zstd_compress(const void* src, void* dst, sigma_size_t s
 extern "C" sigma_size_t zstd_decompress(const void* src, void* dst, sigma_size_t size) {
     return SigmaOS::Kernel::Industrial::SovereignZstd::decompressOrb(src, dst, size);
 }
+
 
 
 

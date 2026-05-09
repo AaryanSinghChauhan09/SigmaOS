@@ -1,9 +1,9 @@
-/*
+﻿/*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN FHS (Filesystem Hierarchy Shard)
  * =========================================================================
  * Mission: Implements FHS-001 (FHS Compliance).
- * Layer  : L4 � Persistence & VFS
+ * Layer  : L4 — Persistence & VFS
  * =========================================================================
  */
 
@@ -38,5 +38,6 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 extern "C" void fhs_init() {
-    SigmaOS::Kernel::VFS::SovereignFHS::virtualizeHierarchy();
+    SigmaOS::Kernel::VFS::SovereignFHS::getInstance().virtualizeHierarchy();
 }
+

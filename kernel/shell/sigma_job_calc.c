@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =============================================================================
- * Σ SIGMAOS SHELL: SOVEREIGN JOB CALCULATOR SHARD (v3.0)
+ * Î£ SIGMAOS SHELL: SOVEREIGN JOB CALCULATOR SHARD (v3.0)
  * =============================================================================
  * Comprehensive calculation primitives for SigmaOS Profession Profiles.
  * Covers Finance, Engineering, Healthcare, Agriculture, Aviation, Logistics,
@@ -171,5 +171,6 @@ sigma_u64 calc_recipe_conversion_factor(sigma_u64 desired_yield, sigma_u64 origi
 }
 
 void sigma_job_calc_init() {
-    kprintf("Σ [JOB-CALC]: Sovereign Job Calculators active for 40+ professions.\n");
+    kprintf("Î£ [JOB-CALC]: Sovereign Job Calculators active for 40+ professions.\n");
 }
+

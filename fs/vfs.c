@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Î£ SIGMAOS ZENITH SUPREME: VIRTUAL FILE SYSTEM (VFS) SHARD
+ * ÃŽÂ£ SIGMAOS ZENITH SUPREME: VIRTUAL FILE SYSTEM (VFS) SHARD
  * =========================================================================
  * Mission: Abstract storage and sharding for modular filesystem support.
  * Capability: Inodes, File Descriptors, Mount Points, Path Resolution.
@@ -50,7 +50,7 @@ void sigma_vfs_init() {
     sigma_memcpy(vfs_root.name, "/", 2);
     vfs_root.type = VFS_TYPE_DIRECTORY;
     current_vfs_mount = &vfs_root;
-    sigma_printf("[KERNEL] VFS initialized at mount point '/'\n");
+    kprintf("[KERNEL] VFS initialized at mount point '/'\n");
 }
 
 vfs_node_t* sigma_vfs_create_node(const char* name, vfs_node_type_t type, vfs_node_t* parent) {
@@ -73,7 +73,7 @@ vfs_node_t* sigma_vfs_create_node(const char* name, vfs_node_type_t type, vfs_no
 sigma_err_t sigma_vfs_mount(const char* path, vfs_node_t* device_node) {
     SIGMA_UNUSED(path);
     SIGMA_UNUSED(device_node);
-    sigma_printf("[KERNEL] Mounting device to VFS...\n");
+    kprintf("[KERNEL] Mounting device to VFS...\n");
     return SIGMA_OK;
 }
 
@@ -83,3 +83,4 @@ sigma_ssize_t sigma_vfs_read(vfs_node_t* node, void* buffer, sigma_size_t size) 
     }
     return (sigma_ssize_t)SIGMA_EIO;
 }
+

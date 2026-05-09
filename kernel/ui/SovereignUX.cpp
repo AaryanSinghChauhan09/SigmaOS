@@ -1,4 +1,4 @@
-#include "core/sigma_types.h"
+﻿#include "core/sigma_types.h"
 #include "libc/SovereignLibC.h"
 #include "sigma_ux.h"
 #include "ui/sigma_gui.h"
@@ -11,7 +11,7 @@
  * Implements a Predictive Personalization Engine (PPE) algorithm.
  * Mission: Automate silicon-native aesthetics.
  *
- * Design: OOP-isolated singleton — SovereignUXEngine.
+ * Design: OOP-isolated singleton â€” SovereignUXEngine.
  */
 
 class SovereignUXEngine : public SigmaOS::Kernel::SigmaObject {
@@ -89,6 +89,7 @@ extern "C" void ux_render_dashboard() {
 extern "C" void ux_predict_adaptation() {
     SovereignUXEngine::getInstance().predictAdaptation();
 }
+
 
 
 

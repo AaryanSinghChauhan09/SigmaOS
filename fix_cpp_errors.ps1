@@ -1,12 +1,12 @@
-
+﻿
 # ============================================================
-# SigmaOS — Master C++ Error Remediation Script
+# SigmaOS â€” Master C++ Error Remediation Script
 # Fixes all known IDE error patterns across the shard lattice
 # ============================================================
 
 $repo = $PSScriptRoot
 
-function Fix-File {
+function Repair-File {
     param([string]$path, [scriptblock]$fixBlock)
     if (-not (Test-Path $path)) { Write-Warning "SKIP (not found): $path"; return }
     $content = Get-Content $path -Raw
@@ -17,12 +17,12 @@ function Fix-File {
     }
 }
 
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # 1. FIX: SovereignDriverLoader.cpp
 #    `extern "C" void xxx(); xxx();` inside method body triggers
-#    "Expected unqualified-id" — move externs to file scope as
+#    "Expected unqualified-id" â€” move externs to file scope as
 #    forward-declarations.
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $driverLoader = Join-Path $repo "kernel\core\hal\SovereignDriverLoader.cpp"
 Set-Content $driverLoader -Encoding UTF8 -Value @'
 /*
@@ -74,10 +74,10 @@ extern "C" void hal_load_drivers() {
 '@
 Write-Host "[FIXED] kernel/core/hal/SovereignDriverLoader.cpp"
 
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # 2. FIX: SovereignProton.cpp (drivers/gpu)
-#    Same pattern — extern "C" inside function body
-# ──────────────────────────────────────────────────────────────
+#    Same pattern â€” extern "C" inside function body
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $proton = Join-Path $repo "drivers\gpu\SovereignProton.cpp"
 Set-Content $proton -Encoding UTF8 -Value @'
 /*
@@ -124,10 +124,10 @@ extern "C" int proton_run(const char* path) {
 '@
 Write-Host "[FIXED] drivers/gpu/SovereignProton.cpp"
 
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # 3. FIX: kernel/ui/SovereignInstaller.cpp
 #    extern "C" inside method + non-static member call issue
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $installer = Join-Path $repo "kernel\ui\SovereignInstaller.cpp"
 Set-Content $installer -Encoding UTF8 -Value @'
 /*
@@ -173,19 +173,19 @@ extern "C" void installer_start() {
 '@
 Write-Host "[FIXED] kernel/ui/SovereignInstaller.cpp"
 
-# ──────────────────────────────────────────────────────────────
-# 4. FIX: SovereignEdu.cpp — typo "SovereidgnEdu"
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 4. FIX: SovereignEdu.cpp â€” typo "SovereidgnEdu"
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $eduPath = Join-Path $repo "kernel\core\industrial\SovereignEdu.cpp"
-Fix-File $eduPath {
+Repair-File $eduPath {
     param($c)
     $c -replace 'SovereidgnEdu', 'SovereignEdu'
 }
 
-# ──────────────────────────────────────────────────────────────
-# 5. FIX: SovereignDiag.cpp (observability) — non-static member
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 5. FIX: SovereignDiag.cpp (observability) â€” non-static member
 #    used in static method. Convert to singleton instance pattern.
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $diagPath = Join-Path $repo "kernel\core\observability\SovereignDiag.cpp"
 if (Test-Path $diagPath) {
     $c = Get-Content $diagPath -Raw
@@ -196,23 +196,23 @@ if (Test-Path $diagPath) {
     Write-Host "[FIXED] kernel/core/observability/SovereignDiag.cpp"
 }
 
-# ──────────────────────────────────────────────────────────────
-# 6. FIX: kernel/core/SovereignDiag.cpp — standalone old file
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 6. FIX: kernel/core/SovereignDiag.cpp â€” standalone old file
 #    Replace sigma_printf with sigma_log_info
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $oldDiag = Join-Path $repo "kernel\core\SovereignDiag.cpp"
-Fix-File $oldDiag {
+Repair-File $oldDiag {
     param($c)
     $c = $c -replace 'sigma_printf', 'sigma_log_info'
     $c = $c -replace '#include "sigma_types.h"', '#include "core/sigma_types.h"'
     $c
 }
 
-# ──────────────────────────────────────────────────────────────
-# 7. FIX: SovereignPQC.cpp (kernel/core) — unknown types + sigma_printf
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 7. FIX: SovereignPQC.cpp (kernel/core) â€” unknown types + sigma_printf
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $oldPQC = Join-Path $repo "kernel\core\SovereignPQC.cpp"
-Fix-File $oldPQC {
+Repair-File $oldPQC {
     param($c)
     $c = $c -replace 'sigma_printf', 'sigma_log_info'
     $c = $c -replace '#include "sigma_types.h"', '#include "core/sigma_types.h"'
@@ -220,22 +220,22 @@ Fix-File $oldPQC {
     $c
 }
 
-# ──────────────────────────────────────────────────────────────
-# 8. FIX: SovereignSandbox.cpp (kernel/core) — sigma_printf + type
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 8. FIX: SovereignSandbox.cpp (kernel/core) â€” sigma_printf + type
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $oldSandbox = Join-Path $repo "kernel\core\SovereignSandbox.cpp"
-Fix-File $oldSandbox {
+Repair-File $oldSandbox {
     param($c)
     $c = $c -replace 'sigma_printf', 'sigma_log_info'
     $c = $c -replace '#include "sigma_types.h"', '#include "core/sigma_types.h"'
     $c
 }
 
-# ──────────────────────────────────────────────────────────────
-# 9. FIX: SovereignSnap.cpp (kernel/core) — bad include + type
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 9. FIX: SovereignSnap.cpp (kernel/core) â€” bad include + type
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $oldSnap = Join-Path $repo "kernel\core\SovereignSnap.cpp"
-Fix-File $oldSnap {
+Repair-File $oldSnap {
     param($c)
     $c = $c -replace 'sigma_printf', 'sigma_log_info'
     $c = $c -replace '#include "sigma_types.h"', '#include "core/sigma_types.h"'
@@ -243,24 +243,24 @@ Fix-File $oldSnap {
     $c
 }
 
-# ──────────────────────────────────────────────────────────────
-# 10. FIX: SovereignMonitor.cpp (kernel/core) — missing sigma_monitor.h
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 10. FIX: SovereignMonitor.cpp (kernel/core) â€” missing sigma_monitor.h
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $oldMonitor = Join-Path $repo "kernel\core\SovereignMonitor.cpp"
-Fix-File $oldMonitor {
+Repair-File $oldMonitor {
     param($c)
     $c = $c -replace '#include "sigma_monitor.h"', '#include "core/sigma_types.h"'
     $c = $c -replace '#include "sigma_types.h"', '#include "core/sigma_types.h"'
     $c
 }
 
-# ──────────────────────────────────────────────────────────────
-# 11. FIX: kernel/core/ui/SovereignSnap.cpp — member name mismatch
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 11. FIX: kernel/core/ui/SovereignSnap.cpp â€” member name mismatch
 #     Initializer uses m_initialized/m_active_zone_count but header
 #     uses initialized/active_zone_count
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $uiSnap = Join-Path $repo "kernel\core\ui\SovereignSnap.cpp"
-Fix-File $uiSnap {
+Repair-File $uiSnap {
     param($c)
     # Fix constructor initializer list member names
     $c = $c -replace '\bm_initialized\b', 'initialized'
@@ -271,23 +271,23 @@ Fix-File $uiSnap {
     $c
 }
 
-# ──────────────────────────────────────────────────────────────
-# 12. FIX: SovereignDAL.cpp — out-of-line definition mismatch
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 12. FIX: SovereignDAL.cpp â€” out-of-line definition mismatch
 #     installPackage/removePackage signature differs from header
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $dalPath = Join-Path $repo "kernel\core\system\SovereignDAL.cpp"
-Fix-File $dalPath {
+Repair-File $dalPath {
     param($c)
     # Fix non-static calls: use getInstance() for member function calls
     $c = $c -replace '(?m)^(\s*)SovereignDAL::(\w+)\(', '$1SovereignDAL::getInstance().$2('
     $c
 }
 
-# ──────────────────────────────────────────────────────────────
-# 13. FIX: SovereignHAL.cpp — non-static member call in static context
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 13. FIX: SovereignHAL.cpp â€” non-static member call in static context
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $halCpp = Join-Path $repo "kernel\core\hal\SovereignHAL.cpp"
-Fix-File $halCpp {
+Repair-File $halCpp {
     param($c)
     # In static methods, prefix non-static calls with getInstance()
     $c = [regex]::Replace($c, '(?m)(static [^\{]+\{(?:[^\}]|\n)*?)\b(load|probe|init)\(', {
@@ -296,11 +296,11 @@ Fix-File $halCpp {
     $c
 }
 
-# ──────────────────────────────────────────────────────────────
-# 14. FIX: SovereignVulkanLoader.cpp — include loop causes type failures
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 14. FIX: SovereignVulkanLoader.cpp â€” include loop causes type failures
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $vulkan = Join-Path $repo "kernel\core\industrial\SovereignVulkanLoader.cpp"
-Fix-File $vulkan {
+Repair-File $vulkan {
     param($c)
     # Replace any include that causes nested loop with direct kernel types
     $c = $c -replace '#include "core/SigmaOOP.hpp"', '#include "core/sigma_kernel_types.h"' + "`n#include `"core/SigmaOOP.hpp`""
@@ -308,13 +308,13 @@ Fix-File $vulkan {
     $c
 }
 
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # 15. FIX: SovereignFHS.cpp and SovereignVirtBridge.cpp
 #     Non-static member function call without object in static context
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 foreach ($f in @("kernel\core\vfs\SovereignFHS.cpp", "kernel\core\virt\SovereignVirtBridge.cpp")) {
     $fp = Join-Path $repo $f
-    Fix-File $fp {
+    Repair-File $fp {
         param($c)
         # Wrap bare non-static calls inside static methods with getInstance()
         $c = $c -replace '(?m)(static [^\{]+\{(?:[^\}]|\n)*?)\b(mount|create|bridge|init)\(', {
@@ -324,42 +324,42 @@ foreach ($f in @("kernel\core\vfs\SovereignFHS.cpp", "kernel\core\virt\Sovereign
     }
 }
 
-# ──────────────────────────────────────────────────────────────
-# 16. FIX: SovereignLatticePQC.cpp — SigmaString not qualified
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 16. FIX: SovereignLatticePQC.cpp â€” SigmaString not qualified
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $lattice = Join-Path $repo "kernel\shards\security\SovereignLatticePQC.cpp"
-Fix-File $lattice {
+Repair-File $lattice {
     param($c)
     $c = $c -replace '\bSigmaString\b', 'SigmaOS::SigmaString'
     $c
 }
 
-# ──────────────────────────────────────────────────────────────
-# 17. FIX: kernel/ui/SovereignUX.cpp — SigmaObject not qualified
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 17. FIX: kernel/ui/SovereignUX.cpp â€” SigmaObject not qualified
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $ux = Join-Path $repo "kernel\ui\SovereignUX.cpp"
-Fix-File $ux {
+Repair-File $ux {
     param($c)
     $c = $c -replace '\bclass (\w+)\s*:\s*public SigmaObject\b', 'class $1 : public SigmaOS::SigmaObject'
     $c
 }
 
-# ──────────────────────────────────────────────────────────────
-# 18. FIX: security/SovereignSEL.cpp — static method using instance member
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 18. FIX: security/SovereignSEL.cpp â€” static method using instance member
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $sel = Join-Path $repo "security\SovereignSEL.cpp"
-Fix-File $sel {
+Repair-File $sel {
     param($c)
     $c = $c -replace '(?m)(static [^\{]+\{(?:[^\}]|\n)*?)\bm_active_sandboxes\b', '$1getInstance().m_active_sandboxes'
     $c = $c -replace '(?m)(static [^\{]+\{(?:[^\}]|\n)*?)\b(enforce|validate|check)\(', '$1getInstance().$2('
     $c
 }
 
-# ──────────────────────────────────────────────────────────────
-# 19. FIX: scripts/reproducible_build.ps1 — bad date token
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 19. FIX: scripts/reproducible_build.ps1 â€” bad date token
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $buildScript = Join-Path $repo "scripts\reproducible_build.ps1"
-Fix-File $buildScript {
+Repair-File $buildScript {
     param($c)
     # Fix broken date like `Jan 1 2024` literal to use proper PS syntax
     $c = $c -replace 'Jan \d+ \d{4}', '(Get-Date -Format "yyyy-MM-dd")'
@@ -367,12 +367,12 @@ Fix-File $buildScript {
     $c
 }
 
-# ──────────────────────────────────────────────────────────────
-# 20. FIX: manager.cpp — sigma_strlen undeclared
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 20. FIX: manager.cpp â€” sigma_strlen undeclared
 #     Ensure SovereignLibC.h or sigma_kernel_types.h is included
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $managerCpp = Join-Path $repo "kernel\core\context\manager.cpp"
-Fix-File $managerCpp {
+Repair-File $managerCpp {
     param($c)
     if ($c -notmatch 'SovereignLibC.h') {
         $c = $c -replace '(#include "core/context/manager.hpp")', "#include `"libc/SovereignLibC.h`"`n`$1"
@@ -380,9 +380,9 @@ Fix-File $managerCpp {
     $c
 }
 
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # 21. GLOBAL: Fix any remaining sigma_printf -> sigma_log_info
-# ──────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 Get-ChildItem -Recurse -Filter "*.cpp" -Path $repo | ForEach-Object {
     $c = Get-Content $_.FullName -Raw
     if ($c -match 'sigma_printf') {
@@ -394,3 +394,4 @@ Get-ChildItem -Recurse -Filter "*.cpp" -Path $repo | ForEach-Object {
 
 Write-Host ""
 Write-Host "=== All C++ error remediations complete. ==="
+

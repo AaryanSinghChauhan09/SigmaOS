@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN BUSYBOX (Multi-call Utility Shard)
+ * Î£ SIGMAOS: SOVEREIGN BUSYBOX (Multi-call Utility Shard)
  * =========================================================================
  * Mission: Implements PKG-004 (BusyBox-style minimalism from Alpine).
  * Layer  : Userland / Utilities
@@ -49,3 +49,4 @@ private:
 extern "C" void busybox_main(const char* cmd, int argc, char** argv) {
     SigmaOS::Userland::SovereignBusyBox::getInstance().execute(cmd, argc, argv);
 }
+

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Î£ SIGMAOS ZENITH SUPREME: RUST-PARITY SAFETY SHARD (v1.0)
+ * ÃŽÂ£ SIGMAOS ZENITH SUPREME: RUST-PARITY SAFETY SHARD (v1.0)
  * =========================================================================
  * Mission: Zero-Vulnerability Industrial Logic (Rust style).
  * Based on: Industrial safety-critical OS sharding.
@@ -29,18 +29,19 @@ sigma_result_t sigma_safe_shard_access(const char* shard_id) {
 }
 
 void sigma_safety_audit() {
-    sigma_printf("\nÎ£ SOVEREIGN RUST-PARITY SAFETY AUDIT\n");
-    sigma_printf("-------------------------------------------\n");
+    kprintf("\nÃŽÂ£ SOVEREIGN RUST-PARITY SAFETY AUDIT\n");
+    kprintf("-------------------------------------------\n");
     sigma_result_t check = sigma_safe_shard_access("Sovereign-Core-01");
     if (check.is_error) {
-        sigma_printf("[PANIC] %s\n", check.data);
+        kprintf("[PANIC] %s\n", check.data);
     } else {
-        sigma_printf("[SAFE] %s\n", check.data);
+        kprintf("[SAFE] %s\n", check.data);
     }
-    sigma_printf("-------------------------------------------\n\n");
+    kprintf("-------------------------------------------\n\n");
 }
 
 void sigma_safety_shard_init() {
-    sigma_printf("[SAFETY] Initializing Rust-Parity Logic Shards (ENABLED)...\n");
-    sigma_printf("[SAFETY] Memory Isolation & Bounds Checking: ACTIVE\n");
+    kprintf("[SAFETY] Initializing Rust-Parity Logic Shards (ENABLED)...\n");
+    kprintf("[SAFETY] Memory Isolation & Bounds Checking: ACTIVE\n");
 }
+

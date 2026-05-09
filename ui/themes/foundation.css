@@ -1,4 +1,4 @@
-/* foundation.css — SigmaOS Zenith Design System Primitives */
+﻿/* foundation.css â€” SigmaOS Zenith Design System Primitives */
 :root {
     --accent: #00ffa3;
     --accent-glow: rgba(0, 255, 163, 0.4);
@@ -24,3 +24,4 @@
 .accent-glow {
     box-shadow: 0 0 15px var(--accent-glow);
 }
+
