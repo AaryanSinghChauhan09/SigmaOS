@@ -14,6 +14,8 @@ SigmaOS executes tasks via short, sovereign commands. This grammar is optimized 
 | `agent.quota` | Assign resource quotas | `agent.quota set=GPU:80%` |
 | `agent.task` | Execute a kernel build or task | `agent.task run=compile_kernel` |
 | `agent.sync` | Trigger Emergency Lattice Sync | `agent.sync` |
+| `agent.container` | Deploy sovereign immutable containers | `agent.container deploy=nginx` |
+| `agent.gaming` | Engage Vulkan/Proton gaming stack | `agent.gaming engage` |
 
 ### 🏗️ Agent Class Hierarchy (OOP)
 Implemented in `/agents/` using strict C++ OOP principles:
