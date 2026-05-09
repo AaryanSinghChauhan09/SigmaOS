@@ -31,8 +31,9 @@ class SovereignAetherFirewall {
         (void)size;
         sigma_log("[FIREWALL] Inspecting packet from %s via Neural Heuristics...\n", source);
 
-        // Simulated AI threat detection
-        if (sigma_strstr(source, "MALICIOUS") || sigma_strstr(source, "EXFIL")) {
+        // Simulated AI threat detection via Neural Shard
+        extern "C" int aether_neural_inspect(const char* src);
+        if (aether_neural_inspect(source)) {
             sigma_log("[FIREWALL] [ALERT]: Threat detected! Ghosting protocol and nulling sink.");
             this->m_blocked_threats++;
 
