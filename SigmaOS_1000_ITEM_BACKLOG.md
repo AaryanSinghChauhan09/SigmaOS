@@ -39,14 +39,16 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 
 ## 🛡️ Security & Compliance (Items 601-800)
 23. **SEC-001**: Audit `SovereignPQC` Kyber implementation vs NIST FIPS-203. [Operational]
-35: 24. **SEC-002**: Implement `SovereignAppArmor` mandatory access control (MAC). [Operational/SEC-005 Enabled]
+24. **SEC-002**: Implement `SovereignAppArmor` mandatory access control (MAC). [Operational/SEC-005 Enabled]
 25. **SEC-003**: Launch the SigmaOS Bug Bounty portal on GitHub. [Operational]
-37: 26. **CVE-001**: Establish CVE triaging pipeline for Ring-0 vulnerabilities. [Operational]
-38: 27. **UPD-001**: Implement Ed25519 signature verification in the update daemon. [Operational]
-39: 28. **SEC-004**: Implement `SovereignWhonixTor` privacy shim. [Operational]
-40: 29. **IDX-003**: Implement P2P Marketplace Cache & Fallback mirrors. [Operational]
-41: 30. **PKG-005**: Implement Universal Package Dependency Graph. [Operational]
-42: 31. **CLAW-003**: Implement Sovereign Agent Governance (Advanced Quotas). [Operational]
+26. **SEC-005**: Implement `SovereignFIPS` compliance auditor. [Operational]
+27. **REL-001**: Implement `SovereignLTS` release channel orchestrator. [Operational]
+26. **CVE-001**: Establish CVE triaging pipeline for Ring-0 vulnerabilities. [Operational]
+27. **UPD-001**: Implement Ed25519 signature verification in the update daemon. [Operational]
+28. **SEC-004**: Implement `SovereignWhonixTor` privacy shim. [Operational]
+29. **IDX-003**: Implement P2P Marketplace Cache & Fallback mirrors. [Operational]
+30. **PKG-005**: Implement Universal Package Dependency Graph. [Operational]
+31. **CLAW-003**: Implement Sovereign Agent Governance (Advanced Quotas). [Operational]
 
 ## 🌐 Ecosystem Integration (Items 801-1000)
 28. **K8S-001**: Implement `SovereignKubelet` shim. [Operational]
