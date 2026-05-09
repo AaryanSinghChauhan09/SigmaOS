@@ -51,14 +51,9 @@ public:
     }
 
     bool resolveDependencies(OrbName name) {
-        sigma_log_info("[ORB-MAN] Resolving dependency graph for Orb:");
-        sigma_log_info(name.value);
-        
-        // Mock recursive dependency check
-        sigma_log_info("[ORB-MAN] Scanning Sovereign Lattice for shared shards...");
-        sigma_log_info("[ORB-MAN] Dependencies: [SovereignLibC, SovereignPQC, SovereignNetStack].");
-        sigma_log_info("[ORB-MAN] Graph VALIDATED. All dependencies satisfied.");
-        return true;
+        // Now handled by SovereignOrbResolver shard
+        extern "C" int orb_resolve_deps(const char* name);
+        return orb_resolve_deps(name.value) != 0;
     }
 
     /**
