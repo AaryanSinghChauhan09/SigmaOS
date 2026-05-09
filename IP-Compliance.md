@@ -1,6 +1,6 @@
 # Intellectual Property & Licensing Compliance
 
-To guarantee that SigmaOS expands its hardware compatibility without breaching Intellectual Property (IP) laws, the OS employs the **Sovereign IP Auditor** (`SovereignIPAuditor.cpp`).
+To guarantee that SigmaOS expands its hardware compatibility without breaching Intellectual Property (IP) laws, the OS employs the **Sovereign IP Auditor** (`SovereignIPAuditor.cpp`). [**STATUS: OPERATIONAL**]
 
 ## ⚖️ Strict License Enforcement
 

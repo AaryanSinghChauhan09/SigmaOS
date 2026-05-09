@@ -1,6 +1,6 @@
 # SigmaOS Filesystem Hierarchy Standard (FHS) Compliance
 
-To provide "shared identity" and familiarity for Linux users, SigmaOS maps its decentralized Sovereign Lattice to the traditional **Filesystem Hierarchy Standard (FHS)**.
+To provide "shared identity" and familiarity for Linux users, SigmaOS maps its decentralized Sovereign Lattice to the traditional **Filesystem Hierarchy Standard (FHS)**. [**STATUS: OPERATIONAL**]
 
 ## 📂 Mapping the Lattice to FHS
 
