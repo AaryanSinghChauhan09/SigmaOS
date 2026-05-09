@@ -24,17 +24,20 @@ SigmaOS is engineered to dominate and neutralize legacy distributions by solving
 | **Gentoo / NixOS** | Universal Package Dependency Graph + Modular Configs | **Neutralized** |
 | **elementary / Solus** | Zenith UI CSS Engine + AI Governance | **Neutralized** |
 | **Clear Linux** | Sovereign Silicon Optimizations | **Crushing** |
-| **SteamOS** | GPU Driver Ports + Vulkan Integration | **In Progress** |
-| **AlmaLinux / CentOS** | FIPS-140 Lattice Compliance | **In Progress** |
-| **Fedora CoreOS** | Sovereign K8s Orchestration | **In Progress** |
+| **SteamOS** | GPU Driver Ports + Vulkan Integration | **Neutralized** |
+| **AlmaLinux / CentOS** | FIPS-140 Lattice Compliance | **Neutralized** |
+| **Fedora CoreOS** | Sovereign Container/K8s Orchestration | **Neutralized** |
+| **Gentoo** | Extreme Customization Parity | **Neutralized** |
+| **NixOS** | Reproducible Shard Builds | **Neutralized** |
 
 ### 🏗️ Sigma Layers Architecture
-1.  **Linux Base**: Hardened host kernel (LTS) for maximum hardware compatibility.
-2.  **Sigma Core**: C++ Sovereign Lattice shards for high-performance orchestration.
-3.  **Sigma UI**: The Zenith Desktop — a cyberpunk-inspired, CSS-extensible interface.
-4.  **Sigma AI**: Integrated Neural Assistant for real-time optimization and troubleshooting.
-5.  **Sigma Automations**: The Workflow Engine (IF/THEN) for contextual system responses.
-6.  **Sigma Marketplace**: Universal Package Layer dispatching to Pacman, Flatpak, and Nix.
+1.  **Physical Layer**: Sovereign Silicon Tuning (RPi4/RPi5/Apple Silicon).
+2.  **HAL Layer**: Sovereign Driver Isolation (Vulkan, NVMe, NetStack).
+3.  **Lattice Layer**: Core Kernel Shards (Scheduler, Hypervisor, Watchdog).
+4.  **Governance Layer**: FIPS-140 Security & PQC (Sandbox, Audit, PQC).
+5.  **Automation Layer**: AI Orchestration (Containers, Agents, Tasks).
+6.  **Interface Layer**: Zenith UI (Themes, Accessibility, Layouts).
+7.  **Professional Layer**: 75+ Career-Centric Role Profiles.
 
 ### 🚀 Key Futuristic Features
 *   **Neural Search**: A universal command palette (`Alt+Space`) for files, apps, and AI-driven actions.
@@ -57,10 +60,11 @@ SigmaOS is built on a 7-layer modular architecture designed for high-assurance A
 
 ## 📚 Documentation
 
-*   [Architecture Overview](docs/ARCHITECTURE.md)
-*   [Build Guide](docs/BUILD.md)
-*   [Modularization Roadmap](docs/wiki/Modularization-Roadmap.md)
-*   [Shard Manifest](SHARDS.manifest)
+*   [Architecture Overview](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/ARCHITECTURE)
+*   [Security & PQC Lattice](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SECURITY)
+*   [Profession-Based Profiles](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/PROFESSION-MAP)
+*   [Modularisation Strategy](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/MODULARIZATION_MAP)
+*   [Ultimate Advancement Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/ULTIMATE-ADVANCEMENT-STRATEGY)
 
 ## ⌨️ Hotkeys
 | Shortcut | Action |
