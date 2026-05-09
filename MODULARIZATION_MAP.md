@@ -104,12 +104,11 @@ Rather than using fragile relative paths, every shard `#include`s the canonical 
 
 ## 🛠 Key Stabilization Fixes Applied
 
-| `SovereignNetStack.cpp` | Monolithic net stack | Extracted `sk_buff` mapping to `SovereignNetCompat.cpp` |
-| `SovereignOrbManager.cpp` | Dependency logic in manager | Extracted recursive resolution to `SovereignOrbResolver.cpp` |
-| `SovereignInit.cpp` | FHS mapping in init | Extracted FHS virtualization to `SovereignFHS.cpp` |
-| `SovereignProton.cpp` | Integrated DXVK logic | Extracted Vulkan translation to `SovereignDXVK.cpp` |
-| `SovereignUX.cpp` | PPE adaptation logic | Extracted predictive engine to `SovereignPPE.cpp` |
-| `SovereignPQC.cpp` | FIPS audit in core | Extracted compliance audit to `SovereignPQCAudit.cpp` |
+| `SovereignMonitor.cpp` | Integrated eBPF logic | Extracted tracing to `SovereignTelemetry.cpp` |
+| `SovereignHAL.cpp` | Inline driver loading | Extracted to `SovereignDriverLoader.cpp` |
+| `SovereignLiveBoot.cpp` | N/A | New shard for USB persistence (LATT-001) |
+| `SovereignVirtBridge.cpp` | N/A | New shard for Hypervisor guest shims (LATT-002) |
+| `SovereignPartitionManager.cpp` | N/A | New shard for dual-boot foundation (LATT-003) |
 | `zenith.html` | Duplicate IDs & a11y violations | Renamed `command-input` and added `aria-label` to all inputs |
 
 ---
