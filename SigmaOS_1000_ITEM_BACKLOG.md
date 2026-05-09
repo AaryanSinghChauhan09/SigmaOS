@@ -54,8 +54,10 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 30. **GAM-002**: Implement `SovereignProton` compatibility layer (Wine-based). [Operational]
 31. **CLD-001**: Build SigmaOS AMI for AWS EC2 deployment. [Operational]
 32. **K8S-002**: Implement `K8sControlPlaneShield`. [Operational]
-33. **EDU-001**: Implement NCERT Solver shard. [Operational]
-34. **ARM-002**: Implement RPi5 hardware tuning shard. [Operational]
+33. **CLD-002**: Implement automated Cloud Image Publication (AMI/GCP). [Operational]
+34. **RECOV-001**: Implement Emergency Lattice Sync (Self-Healing). [Operational]
+35. **EDU-001**: Implement NCERT Solver shard. [Operational]
+36. **ARM-002**: Implement RPi5 hardware tuning shard. [Operational]
 
 ---
 *This list is expanded dynamically by the Sovereign Council as technical gaps are identified.*
