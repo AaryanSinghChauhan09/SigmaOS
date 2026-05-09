@@ -8,7 +8,7 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 3.  **DRV-001**: Port Intel AX210 Wi-Fi 6E driver. [Operational]
 4.  **DRV-002**: Port Realtek RTL8821CE driver. [Operational]
 5.  **DRV-003**: Implement generic USB Video Class (UVC) 1.5 support. [Operational]
-6.  **DRV-004**: Port AMDGPU Southern Islands (SI) support.
+6.  **DRV-004**: Port AMDGPU Southern Islands (SI) support. [Operational]
 7.  **DRV-005**: Port Nouveau Maxwell/Pascal microcode mapping.
 8.  **PWR-001**: Implement ACPI Sleep States (S3/S4) in `SovereignPower`. [Operational]
 9.  **PWR-002**: Optimize CPU C-states for Intel Tiger Lake.
@@ -41,7 +41,7 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 ## 🌐 Ecosystem Integration (Items 801-1000)
 28. **K8S-001**: Implement `SovereignKubelet` shim. [Operational]
 29. **GAM-001**: Port Vulkan 1.3 loader to `SovereignGPU`. [Operational]
-30. **GAM-002**: Implement `SovereignProton` compatibility layer (Wine-based).
+30. **GAM-002**: Implement `SovereignProton` compatibility layer (Wine-based). [Operational]
 31. **CLD-001**: Build SigmaOS AMI for AWS EC2 deployment.
 32. **SDK-001**: Release C++/Rust SDK for native SigmaOS Shard development.
 

@@ -1,41 +1,15 @@
-# Security Policy
+# Σ SigmaOS Security Model
 
-## Reporting a Vulnerability
+SigmaOS is designed for the post-quantum era, absorbing strengths from Whonix, Tails, and Fedora CoreOS.
 
-**Do not open a public issue.** Please report security vulnerabilities privately to the maintainers at `security@sigmaos.lattice`.
+## 🔐 Core Security Features
+*   **Post-Quantum Crypto**: `SovereignPQC` (Kyber/FIPS-203) integrated at Ring 0.
+*   **Mandatory Access Control**: `SovereignAppArmor` capability-based isolation.
+*   **Hardened Networking**: `SovereignWhonixTor` privacy-first routing.
+*   **Reproducible Builds**: SHA256 parity for all system-critical shards.
 
-We follow a 90-day disclosure policy. We will acknowledge your report within 48 hours and provide a status update within 7 days.
+## 🚨 CVE Disclosure Process
+Follow the official [**CVE Triage Pipeline**](CVE_TRIAGE) for vulnerability reporting and disclosure.
 
-## Supported Versions
-
-| Version | Supported |
-| :--- | :--- |
-| Zenith v100.x | ✅ |
-| Sovereign v2.x | ✅ |
-| Legacy v1.x | ❌ |
-
-## Industrial Hardening Standards
-
-SigmaOS adheres to the following security principles:
-
-### 1. Shard Isolation (Lattice-Level)
-
-No shard can access the matrix without explicit `SovereignEventBus` authorization. The 600-shard architecture ensures that a compromise in one subsystem (e.g., UI) cannot escalate to the kernel core.
-
-### 2. Post-Quantum Cryptography (PQC)
-
-We utilize Lattice-Based Shard Verification (LBSV) for all internal communication. This ensures that the system is resistant to future quantum computing-based decryption threats.
-
-### 3. Hardware-Assisted Attestation
-
-Critical kernel shards are verified via silicon-native trust chains (TEE). The `SovereignAttestation` engine performs real-time measurement of the execution environment.
-
-### 4. Memory Safety & Path Sanitization
-
-- All filesystem requests are strictly validated by the `PathValidator`.
-- The `Heap` primitives include active allocation tracking and overflow protection.
-- Subscribers must cleanly unmount to prevent event-registry memory leaks.
-
----
-
-### The Work of Sovereignty is never complete
+## 🛡️ Reproducibility
+Every SigmaOS shard is built deterministically. Use `reproducible_build.ps1` to verify your local binaries against the official marketplace signatures.

@@ -28,6 +28,9 @@
 * [**🛠️ Driver Porting Pipeline**](DRIVER_PORTING_PIPELINE)
 * [**⚖️ IP Compliance**](IP-Compliance)
 * [**📂 FHS Compliance**](FHS_COMPLIANCE)
+* [**🚀 Installation Guide**](Installation)
+* [**🏛️ Roadmap**](ROADMAP)
+* [**🔌 Drivers Ecosystem**](DRIVERS)
 
 ## 🛡️ Security & Governance
 * [**🏛️ Governance Charter**](GOVERNANCE_CHARTER)
