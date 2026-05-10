@@ -1,0 +1,13 @@
+{
+    "profession": "geologist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "mapping_tools",
+        "seismic_data_analysis",
+        "visualization"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

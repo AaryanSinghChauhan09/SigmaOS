@@ -1,0 +1,13 @@
+{
+    "name": "NeuralVisualizer",
+    "version": "1.0.0",
+    "type": "app",
+    "entry": "main.wasm",
+    "capabilities": [
+        "FRAMEBUFFER_WRITE",
+        "LATTICE_NET_P2P",
+        "STORAGE_READ_HOME"
+    ],
+    "author": "Sovereign_Dev",
+    "description": "High-performance neural lattice visualizer shard."
+}

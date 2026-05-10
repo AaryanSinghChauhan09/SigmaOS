@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "SigmaOS Sovereign Dev Container",
   "image": "ubuntu:22.04",
   "features": {
@@ -41,4 +42,24 @@
     }
   },
   "remoteUser": "sigma"
+=======
+    "name": "SigmaOS Development Environment",
+    "build": {
+        "dockerfile": "../Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cmake-tools",
+                "llvm-vs-code-extensions.vscode-clangd",
+                "xaver.clang-format"
+            ]
+        }
+    },
+    "remoteUser": "vscode",
+    "features": {
+        "ghcr.io/devcontainers/features/github-cli:1": {}
+    }
+>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645
 }

@@ -1,0 +1,14 @@
+{
+    "profession": "student",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "study_planner",
+        "flashcards",
+        "assignment_tracker",
+        "research_tools"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

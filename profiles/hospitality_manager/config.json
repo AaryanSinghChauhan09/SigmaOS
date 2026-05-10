@@ -1,0 +1,13 @@
+{
+    "profession": "hospitality_manager",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "booking_systems",
+        "staff_scheduling",
+        "customer_service_dashboards"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

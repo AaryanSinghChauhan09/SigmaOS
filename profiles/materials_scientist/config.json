@@ -1,0 +1,13 @@
+{
+    "profession": "materials_scientist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "simulation",
+        "modeling",
+        "compliance"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

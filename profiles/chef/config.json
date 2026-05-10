@@ -1,0 +1,14 @@
+{
+    "profession": "chef",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "recipe_management",
+        "supply_chain_integration",
+        "scheduling",
+        "nutritional_analysis"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

@@ -1,0 +1,7 @@
+---
+Checks: '-*,clang-analyzer-*,bugprone-*,performance-*,portability-*,readability-*,-cppcoreguidelines-pro-type-vararg,-hicpp-vararg,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-modernize-avoid-c-arrays,-cppcoreguidelines-pro-type-cstyle-cast'
+WarningsAsErrors: ''
+HeaderFilterRegex: ''
+AnalyzeTemporaryDtors: false
+FormatStyle: none
+...

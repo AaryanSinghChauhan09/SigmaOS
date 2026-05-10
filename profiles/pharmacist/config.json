@@ -1,0 +1,14 @@
+{
+    "profession": "pharmacist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "prescription_management",
+        "drug_interaction_checker",
+        "inventory_control",
+        "compliance"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

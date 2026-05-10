@@ -1,6 +1,7 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: ATA/IDE DISK DRIVER (v1.0 - PURE C11)
+ * Î£ SIGMAOS KERNEL: ATA/IDE DISK DRIVER (v1.0 - PURE C11)
  * =============================================================================
  * Interface: PIO-mode ATA (no DMA required for initial boot)
  * Channels: Primary (0x1F0-0x1F7) + Secondary (0x170-0x177)
@@ -14,7 +15,7 @@
  * =============================================================================
  */
 
-#include "../sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 /* =========================================================================
  * ATA I/O Port Maps
@@ -68,49 +69,49 @@
 #define ATA_MAX_DRIVES 4
 
 typedef struct ATADrive {
-    u8     channel;     /* 0=primary, 1=secondary */
-    u8     drive;       /* 0=master, 1=slave */
-    u8     type;        /* 0=PATA, 1=PATAPI */
-    bool_t lba48;
-    bool_t present;
-    u64    sectors;     /* total LBA sectors */
+    sigma_u8     channel;     /* 0=primary, 1=secondary */
+    sigma_u8     drive;       /* 0=master, 1=slave */
+    sigma_u8     type;        /* 0=PATA, 1=PATAPI */
+    sigma_bool lba48;
+    sigma_bool present;
+    sigma_u64    sectors;     /* total LBA sectors */
     char   model[41];
-    u16    base;        /* I/O base port */
-    u16    ctrl;        /* Control port */
+    sigma_u16    base;        /* I/O base port */
+    sigma_u16    ctrl;        /* Control port */
 } ATADrive;
 
 static ATADrive g_drives[ATA_MAX_DRIVES];
-static u32      g_drive_count = 0;
+static sigma_u32      g_drive_count = 0;
 
 /* =========================================================================
  * Low-level I/O helpers
  * ========================================================================= */
-static u8 ata_read8(const ATADrive* d, u8 reg) {
-    if (reg < 8)  return port_inb((u16)(d->base + reg));
-    if (reg < 12) return port_inb((u16)(d->ctrl + reg - 8));
+static sigma_u8 ata_read8(const ATADrive* d, sigma_u8 reg) {
+    if (reg < 8)  return port_inb((sigma_u16)(d->base + reg));
+    if (reg < 12) return port_inb((sigma_u16)(d->ctrl + reg - 8));
     return 0;
 }
 
-static void ata_write8(const ATADrive* d, u8 reg, u8 val) {
-    if (reg < 8)  port_outb((u16)(d->base + reg), val);
-    else if (reg < 12) port_outb((u16)(d->ctrl + reg - 8), val);
+static void ata_write8(const ATADrive* d, sigma_u8 reg, sigma_u8 val) {
+    if (reg < 8)  port_outb((sigma_u16)(d->base + reg), val);
+    else if (reg < 12) port_outb((sigma_u16)(d->ctrl + reg - 8), val);
 }
 
-static u16 ata_read16(const ATADrive* d) {
-    return (u16)(port_inb(d->base) | ((u16)port_inb((u16)(d->base + 1)) << 8));
+static sigma_u16 ata_read16(const ATADrive* d) {
+    return (sigma_u16)(port_inb(d->base) | ((sigma_u16)port_inb((sigma_u16)(d->base + 1)) << 8));
 }
 
-/* 400ns delay — read alt-status 4 times */
+/* 400ns delay â€ read alt-status 4 times */
 static void ata_delay400ns(const ATADrive* d) {
-    u8 i;
+    sigma_u8 i;
     for (i = 0; i < 4; i++) ata_read8(d, ATA_REG_ALTSTATUS);
 }
 
 /* Poll until BSY clears (with timeout) */
-static k_status ata_poll(const ATADrive* d, bool_t check_drq) {
-    u32 timeout = 100000u;
+static sigma_status ata_poll(const ATADrive* d, sigma_bool check_drq) {
+    sigma_u32 timeout = 100000u;
     while (timeout--) {
-        u8 st = ata_read8(d, ATA_REG_STATUS);
+        sigma_u8 st = ata_read8(d, ATA_REG_STATUS);
         if (st & ATA_SR_ERR) return K_ERR_INVAL;
         if (st & ATA_SR_DF)  return K_ERR_BUSY;
         if (!(st & ATA_SR_BSY)) {
@@ -123,11 +124,11 @@ static k_status ata_poll(const ATADrive* d, bool_t check_drq) {
 }
 
 /* =========================================================================
- * ATA IDENTIFY — detect and characterize a drive
+ * ATA IDENTIFY â€ detect and characterize a drive
  * ========================================================================= */
-static bool_t ata_identify(ATADrive* d) {
+static sigma_bool ata_identify(ATADrive* d) {
     /* Select drive */
-    ata_write8(d, ATA_REG_HDDEVSEL, (u8)(0xA0 | (d->drive << 4)));
+    ata_write8(d, ATA_REG_HDDEVSEL, (sigma_u8)(0xA0 | (d->drive << 4)));
     ata_delay400ns(d);
 
     /* Zero LBA registers */
@@ -140,24 +141,24 @@ static bool_t ata_identify(ATADrive* d) {
     ata_write8(d, ATA_REG_COMMAND, ATA_CMD_IDENTIFY);
     ata_delay400ns(d);
 
-    if (ata_read8(d, ATA_REG_STATUS) == 0) return FALSE; /* no drive */
+    if (ata_read8(d, ATA_REG_STATUS) == 0) return SIGMA_FALSE; /* no drive */
 
-    if (ata_poll(d, TRUE) != K_OK) return FALSE;
+    if (ata_poll(d, SIGMA_TRUE) != K_OK) return SIGMA_FALSE;
 
-    /* Read 256 × u16 IDENTIFY data */
-    u16 id[256];
-    u32 i;
-    for (i = 0; i < 256; i++) id[i] = (u16)(port_inb(d->base) | ((u16)port_inb((u16)(d->base+1)) << 8));
+    /* Read 256 Ã— sigma_u16 IDENTIFY data */
+    sigma_u16 id[256];
+    sigma_u32 i;
+    for (i = 0; i < 256; i++) id[i] = (sigma_u16)(port_inb(d->base) | ((sigma_u16)port_inb((sigma_u16)(d->base+1)) << 8));
 
     /* LBA48 support: word 83 bit 10 */
     d->lba48 = !!(id[83] & BIT(10));
 
     /* Total sectors */
     if (d->lba48) {
-        d->sectors = ((u64)id[103] << 48) | ((u64)id[102] << 32) |
-                     ((u64)id[101] << 16) | (u64)id[100];
+        d->sectors = ((sigma_u64)id[103] << 48) | ((sigma_u64)id[102] << 32) |
+                     ((sigma_u64)id[101] << 16) | (sigma_u64)id[100];
     } else {
-        d->sectors = ((u32)id[61] << 16) | id[60];
+        d->sectors = ((sigma_u32)id[61] << 16) | id[60];
     }
 
     /* Model string: words 27-46, byte-swapped */
@@ -170,54 +171,54 @@ static bool_t ata_identify(ATADrive* d) {
     i = 39;
     while (i > 0 && d->model[i] == ' ') { d->model[i] = '\0'; i--; }
 
-    d->present = TRUE;
-    return TRUE;
+    d->present = SIGMA_TRUE;
+    return SIGMA_TRUE;
 }
 
 /* =========================================================================
  * LBA28 Sector Read (PIO)
  * ========================================================================= */
-k_status ata_read_sectors(u32 drive_idx, u64 lba, u32 count, void* buf) {
+sigma_status ata_read_sectors(sigma_u32 drive_idx, sigma_u64 lba, sigma_u32 count, void* buf) {
     if (drive_idx >= g_drive_count) return K_ERR_INVAL;
     ATADrive* d = &g_drives[drive_idx];
     if (!d->present) return K_ERR_INVAL;
 
     /* Wait for drive not busy */
-    if (ata_poll(d, FALSE) != K_OK) return K_ERR_BUSY;
+    if (ata_poll(d, SIGMA_FALSE) != K_OK) return K_ERR_BUSY;
 
     if (d->lba48) {
         /* LBA48: send high bytes first, then low bytes */
-        ata_write8(d, ATA_REG_HDDEVSEL, (u8)(0x40 | (d->drive << 4)));
-        ata_write8(d, ATA_REG_SECCOUNT1, (u8)(count >> 8));
-        ata_write8(d, ATA_REG_LBA3, (u8)(lba >> 24));
-        ata_write8(d, ATA_REG_LBA4, (u8)(lba >> 32));
-        ata_write8(d, ATA_REG_LBA5, (u8)(lba >> 40));
-        ata_write8(d, ATA_REG_SECCOUNT0, (u8)count);
-        ata_write8(d, ATA_REG_LBA0, (u8)lba);
-        ata_write8(d, ATA_REG_LBA1, (u8)(lba >> 8));
-        ata_write8(d, ATA_REG_LBA2, (u8)(lba >> 16));
+        ata_write8(d, ATA_REG_HDDEVSEL, (sigma_u8)(0x40 | (d->drive << 4)));
+        ata_write8(d, ATA_REG_SECCOUNT1, (sigma_u8)(count >> 8));
+        ata_write8(d, ATA_REG_LBA3, (sigma_u8)(lba >> 24));
+        ata_write8(d, ATA_REG_LBA4, (sigma_u8)(lba >> 32));
+        ata_write8(d, ATA_REG_LBA5, (sigma_u8)(lba >> 40));
+        ata_write8(d, ATA_REG_SECCOUNT0, (sigma_u8)count);
+        ata_write8(d, ATA_REG_LBA0, (sigma_u8)lba);
+        ata_write8(d, ATA_REG_LBA1, (sigma_u8)(lba >> 8));
+        ata_write8(d, ATA_REG_LBA2, (sigma_u8)(lba >> 16));
         ata_write8(d, ATA_REG_COMMAND, ATA_CMD_READ_PIO_EXT);
     } else {
         ata_write8(d, ATA_REG_HDDEVSEL,
-                   (u8)(0xE0 | (d->drive << 4) | ((lba >> 24) & 0x0F)));
-        ata_write8(d, ATA_REG_SECCOUNT0, (u8)count);
-        ata_write8(d, ATA_REG_LBA0, (u8)lba);
-        ata_write8(d, ATA_REG_LBA1, (u8)(lba >> 8));
-        ata_write8(d, ATA_REG_LBA2, (u8)(lba >> 16));
+                   (sigma_u8)(0xE0 | (d->drive << 4) | ((lba >> 24) & 0x0F)));
+        ata_write8(d, ATA_REG_SECCOUNT0, (sigma_u8)count);
+        ata_write8(d, ATA_REG_LBA0, (sigma_u8)lba);
+        ata_write8(d, ATA_REG_LBA1, (sigma_u8)(lba >> 8));
+        ata_write8(d, ATA_REG_LBA2, (sigma_u8)(lba >> 16));
         ata_write8(d, ATA_REG_COMMAND, ATA_CMD_READ_PIO);
     }
 
-    u8* dst   = (u8*)buf;
-    u32 sec;
+    sigma_u8* dst   = (sigma_u8*)buf;
+    sigma_u32 sec;
     for (sec = 0; sec < count; sec++) {
-        k_status s = ata_poll(d, TRUE);
+        sigma_status s = ata_poll(d, SIGMA_TRUE);
         if (s != K_OK) return s;
         /* Read 256 words (512 bytes) via INW */
-        u16 i;
+        sigma_u16 i;
         for (i = 0; i < 256; i++) {
-            u16 word = (u16)(port_inb(d->base) | ((u16)port_inb((u16)(d->base+1)) << 8));
-            *dst++ = (u8)(word & 0xFF);
-            *dst++ = (u8)(word >> 8);
+            sigma_u16 word = (sigma_u16)(port_inb(d->base) | ((sigma_u16)port_inb((sigma_u16)(d->base+1)) << 8));
+            *dst++ = (sigma_u8)(word & 0xFF);
+            *dst++ = (sigma_u8)(word >> 8);
         }
         ata_delay400ns(d);
     }
@@ -227,42 +228,42 @@ k_status ata_read_sectors(u32 drive_idx, u64 lba, u32 count, void* buf) {
 /* =========================================================================
  * LBA28/48 Sector Write (PIO)
  * ========================================================================= */
-k_status ata_write_sectors(u32 drive_idx, u64 lba, u32 count, const void* buf) {
+sigma_status ata_write_sectors(sigma_u32 drive_idx, sigma_u64 lba, sigma_u32 count, const void* buf) {
     if (drive_idx >= g_drive_count) return K_ERR_INVAL;
     ATADrive* d = &g_drives[drive_idx];
     if (!d->present) return K_ERR_INVAL;
 
-    if (ata_poll(d, FALSE) != K_OK) return K_ERR_BUSY;
+    if (ata_poll(d, SIGMA_FALSE) != K_OK) return K_ERR_BUSY;
 
     if (d->lba48) {
-        ata_write8(d, ATA_REG_HDDEVSEL, (u8)(0x40 | (d->drive << 4)));
-        ata_write8(d, ATA_REG_SECCOUNT1, (u8)(count >> 8));
-        ata_write8(d, ATA_REG_LBA3, (u8)(lba >> 24));
-        ata_write8(d, ATA_REG_LBA4, (u8)(lba >> 32));
-        ata_write8(d, ATA_REG_LBA5, (u8)(lba >> 40));
-        ata_write8(d, ATA_REG_SECCOUNT0, (u8)count);
-        ata_write8(d, ATA_REG_LBA0, (u8)lba);
-        ata_write8(d, ATA_REG_LBA1, (u8)(lba >> 8));
-        ata_write8(d, ATA_REG_LBA2, (u8)(lba >> 16));
+        ata_write8(d, ATA_REG_HDDEVSEL, (sigma_u8)(0x40 | (d->drive << 4)));
+        ata_write8(d, ATA_REG_SECCOUNT1, (sigma_u8)(count >> 8));
+        ata_write8(d, ATA_REG_LBA3, (sigma_u8)(lba >> 24));
+        ata_write8(d, ATA_REG_LBA4, (sigma_u8)(lba >> 32));
+        ata_write8(d, ATA_REG_LBA5, (sigma_u8)(lba >> 40));
+        ata_write8(d, ATA_REG_SECCOUNT0, (sigma_u8)count);
+        ata_write8(d, ATA_REG_LBA0, (sigma_u8)lba);
+        ata_write8(d, ATA_REG_LBA1, (sigma_u8)(lba >> 8));
+        ata_write8(d, ATA_REG_LBA2, (sigma_u8)(lba >> 16));
         ata_write8(d, ATA_REG_COMMAND, ATA_CMD_WRITE_PIO_EXT);
     } else {
         ata_write8(d, ATA_REG_HDDEVSEL,
-                   (u8)(0xE0 | (d->drive << 4) | ((lba >> 24) & 0x0F)));
-        ata_write8(d, ATA_REG_SECCOUNT0, (u8)count);
-        ata_write8(d, ATA_REG_LBA0, (u8)lba);
-        ata_write8(d, ATA_REG_LBA1, (u8)(lba >> 8));
-        ata_write8(d, ATA_REG_LBA2, (u8)(lba >> 16));
+                   (sigma_u8)(0xE0 | (d->drive << 4) | ((lba >> 24) & 0x0F)));
+        ata_write8(d, ATA_REG_SECCOUNT0, (sigma_u8)count);
+        ata_write8(d, ATA_REG_LBA0, (sigma_u8)lba);
+        ata_write8(d, ATA_REG_LBA1, (sigma_u8)(lba >> 8));
+        ata_write8(d, ATA_REG_LBA2, (sigma_u8)(lba >> 16));
         ata_write8(d, ATA_REG_COMMAND, ATA_CMD_WRITE_PIO);
     }
 
-    const u8* src = (const u8*)buf;
-    u32 sec;
+    const sigma_u8* src = (const sigma_u8*)buf;
+    sigma_u32 sec;
     for (sec = 0; sec < count; sec++) {
-        k_status s = ata_poll(d, TRUE);
+        sigma_status s = ata_poll(d, SIGMA_TRUE);
         if (s != K_OK) return s;
-        u16 i;
+        sigma_u16 i;
         for (i = 0; i < 256; i++) {
-            u16 word = (u16)src[0] | ((u16)src[1] << 8);
+            sigma_u16 word = (sigma_u16)src[0] | ((sigma_u16)src[1] << 8);
             port_outw(d->base, word);
             src += 2;
         }
@@ -271,22 +272,22 @@ k_status ata_write_sectors(u32 drive_idx, u64 lba, u32 count, const void* buf) {
     /* Flush write cache */
     ata_write8(d, ATA_REG_COMMAND,
                d->lba48 ? ATA_CMD_CACHE_FLUSH_EXT : ATA_CMD_CACHE_FLUSH);
-    ata_poll(d, FALSE);
+    ata_poll(d, SIGMA_FALSE);
     return K_OK;
 }
 
 /* =========================================================================
- * Driver Init — probe all 4 drive slots
+ * Driver Init â€ probe all 4 drive slots
  * ========================================================================= */
 void ata_init(void) {
     extern void ksigma_printf(const char* fmt, ...);
 
-    u16  channels[2][2] = {
+    sigma_u16  channels[2][2] = {
         {ATA_PRIMARY_BASE,   ATA_PRIMARY_CTRL},
         {ATA_SECONDARY_BASE, ATA_SECONDARY_CTRL}
     };
 
-    u8 ch, dr;
+    sigma_u8 ch, dr;
     for (ch = 0; ch < 2; ch++) {
         for (dr = 0; dr < 2; dr++) {
             ATADrive* d = &g_drives[g_drive_count];
@@ -294,7 +295,7 @@ void ata_init(void) {
             d->drive   = dr;
             d->base    = channels[ch][0];
             d->ctrl    = channels[ch][1];
-            d->present = FALSE;
+            d->present = SIGMA_FALSE;
 
             if (ata_identify(d)) {
                 ksigma_printf("[ATA]: Drive %u: %s | %llu sectors (%llu MB) | LBA%s\n",
@@ -312,4 +313,4 @@ void ata_init(void) {
         ksigma_printf("[ATA]: %u drive(s) probed. PIO mode active.\n", g_drive_count);
 }
 
-u32 ata_drive_count(void) { return g_drive_count; }
+sigma_u32 ata_drive_count(void) { return g_drive_count; }

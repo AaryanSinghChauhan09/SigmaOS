@@ -1,6 +1,7 @@
+﻿#include "../include/SovereignLibC.h"
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -14,7 +15,7 @@
 
 
 /**
- * Σ SIGMA OS: SOVEREIGN SCHOLASTIC DATABASE (v128.0 - KNOWLEDGE ZENITH)
+ * ÃŽÂ£ SIGMA OS: SOVEREIGN SCHOLASTIC DATABASE (v128.0 - KNOWLEDGE ZENITH)
  * ===================================================================
  * USP: Universal "Every Concept" Shard Database for NCERT (1-12).
  * Feature: 100% Native, Zero-Dependency, Process-Synchronized.
@@ -32,7 +33,7 @@ class ForceShard : public IAcademicShard {
 public:
     void Execute() override {
         double pressure = 100.0 / 0.5; // F/A
-        sigma_printf("[PHYSICS/KNOWLEDGE]: Concept: Pressure Shard. Result: " << pressure << " Pa.\n");
+        sigma_log_info("[PHYSICS/KNOWLEDGE]: Concept: Pressure Shard. Result: " << pressure << " Pa.\n");
     }
 };
 
@@ -40,8 +41,8 @@ public:
 class PeriodicShard : public IAcademicShard {
 public:
     void Execute() override {
-        sigma_printf("[CHEMISTRY/KNOWLEDGE]: Concept: Periodic Classification Shard.\n");
-        sigma_printf("[CHEMISTRY/KNOWLEDGE]: Periodicity of Valency & Atomic Radius verified.\n");
+        sigma_log_info("[CHEMISTRY/KNOWLEDGE]: Concept: Periodic Classification Shard.\n");
+        sigma_log_info("[CHEMISTRY/KNOWLEDGE]: Periodicity of Valency & Atomic Radius verified.\n");
     }
 };
 
@@ -49,8 +50,8 @@ public:
 class ReproductionShard : public IAcademicShard {
 public:
     void Execute() override {
-        sigma_printf("[BIOLOGY/KNOWLEDGE]: Concept: Pollen-Pistil Interaction Shard.\n");
-        sigma_printf("[BIOLOGY/KNOWLEDGE]: Chemotropism vectors for Pollen Tube identified.\n");
+        sigma_log_info("[BIOLOGY/KNOWLEDGE]: Concept: Pollen-Pistil Interaction Shard.\n");
+        sigma_log_info("[BIOLOGY/KNOWLEDGE]: Chemotropism vectors for Pollen Tube identified.\n");
     }
 };
 
@@ -58,8 +59,8 @@ public:
 class ComplexShard : public IAcademicShard {
 public:
     void Execute() override {
-        sigma_printf("[MATH/KNOWLEDGE]: Concept: Complex Shard: z = a + ib.\n");
-        sigma_printf("[MATH/KNOWLEDGE]: Argand Plane Projection: Magnitude = sqrt(a^2 + b^2).\n");
+        sigma_log_info("[MATH/KNOWLEDGE]: Concept: Complex Shard: z = a + ib.\n");
+        sigma_log_info("[MATH/KNOWLEDGE]: Argand Plane Projection: Magnitude = sqrt(a^2 + b^2).\n");
     }
 };
 
@@ -81,7 +82,7 @@ public:
         if (m_db.count(name)) {
             m_db[name]->Execute();
         } else {
-            sigma_printf("[!] KNOWLEDGE GAPS IDENTIFIED. SYNCING SHARD: " << name << "...\n");
+            sigma_log_info("[!] KNOWLEDGE GAPS IDENTIFIED. SYNCING SHARD: " << name << "...\n");
         }
     }
 
@@ -98,7 +99,8 @@ int main() {
     db.Synthesize();
     db.RunFullScholasticAudit();
 
-    sigma_printf("\n[SUCCESS]: Universal Scholastic Database Online. NCERT Sovereignty Confirmed.\n");
+    sigma_log_info("\n[SUCCESS]: Universal Scholastic Database Online. NCERT Sovereignty Confirmed.\n");
     return 0;
 }
+
 

@@ -1,0 +1,13 @@
+{
+    "profession": "electrical_engineer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "circuit_design_tools",
+        "simulation",
+        "compliance_testing"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

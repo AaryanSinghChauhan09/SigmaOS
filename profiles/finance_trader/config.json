@@ -1,0 +1,14 @@
+{
+    "profession": "finance_trader",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "market_dashboards",
+        "risk_analysis_tools",
+        "compliance_modules",
+        "ai_forecasting"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

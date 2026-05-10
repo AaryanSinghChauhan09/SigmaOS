@@ -1,0 +1,35 @@
+name: Wiki Sync
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - '*.md'
+
+jobs:
+  sync-wiki:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Checkout Wiki
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}.wiki
+          path: wiki
+
+      - name: Sync Markdown files to Wiki
+        run: |
+          # Copy docs/*.md to wiki root
+          cp docs/*.md wiki/ 2>/dev/null || true
+          # Copy root *.md (except README) to wiki
+          find . -maxdepth 1 -name "*.md" ! -name "README.md" -exec cp {} wiki/ \;
+          cd wiki
+          git config user.name "SigmaOS Bot"
+          git config user.email "bot@sigmaos.sovereign"
+          git add .
+          git commit -m "Sync documentation from main repository" || exit 0
+          git push

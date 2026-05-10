@@ -1,0 +1,25 @@
+# SigmaOS Sovereign Code Owners
+
+# Core Kernel & HAL
+/kernel/core/hal/ @sigmaos-core
+/kernel/include/ @sigmaos-core
+
+# Security & PQC
+/kernel/core/security/ @sigmaos-core
+
+# AI & Automation
+/kernel/core/ai/ @sigmaos-core
+/kernel/core/automation/ @sigmaos-core
+
+# Zenith UI & Experience
+/zenith_desktop/ @sigmaos-core
+/web_ui/ @sigmaos-core
+/zenith.html @sigmaos-core
+
+# Documentation & Wiki
+/docs/ @sigmaos-core
+/README.md @sigmaos-core
+
+# Infrastructure & CI/CD
+/.github/workflows/ @sigmaos-core
+/Makefile @sigmaos-core

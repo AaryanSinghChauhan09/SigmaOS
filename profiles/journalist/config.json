@@ -1,0 +1,14 @@
+{
+    "profession": "journalist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "research_tools",
+        "publishing_suite",
+        "compliance_checks",
+        "transcription_tools"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

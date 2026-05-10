@@ -1,0 +1,13 @@
+{
+    "profession": "animator",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "animation_suite",
+        "rendering_tools",
+        "storyboard_manager"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

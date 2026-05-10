@@ -1,14 +1,14 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS ZENITH SUPREME: SOVEREIGN THEME STORE (v1.0)
+ * ÃŽÂ£ SIGMAOS ZENITH SUPREME: SOVEREIGN THEME STORE (v1.0)
  * =========================================================================
  * Absorbing Aesthetics from: LupusOS, EzLinux, and Plasma.
  * Mission: Universal Aesthetic Sharding & Personalization.
  * =========================================================================
  */
 
-#include "../../libc/sigma_libc.h"
-#include "../../libc/sigma_types.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/sigma_types.h"
 
 typedef struct {
     char name[32];
@@ -26,25 +26,26 @@ static sigma_theme_t themes[] = {
 };
 
 void sigma_theme_apply(const char* name) {
-    sigma_printf("[THEME] Applying Sovereign Aesthetic: %s... ", name);
+    sigma_log_info("[THEME] Applying Sovereign Aesthetic: %s... ", name);
     for (int i = 0; i < 5; i++) {
         if (sigma_streq(themes[i].name, name)) {
-            sigma_printf("OK\n");
-            sigma_printf("[THEME] Injecting CSS Variables: %s Shard... COMPLETE\n", themes[i].primary_color);
+            sigma_log_info("OK\n");
+            sigma_log_info("[THEME] Injecting CSS Variables: %s Shard... COMPLETE\n", themes[i].primary_color);
             return;
         }
     }
-    sigma_printf("ERROR (THEME NOT FOUND)\n");
+    sigma_log_info("ERROR (THEME NOT FOUND)\n");
 }
 
 void sigma_theme_list() {
-    sigma_printf("\nΣ SOVEREIGN THEME & PERSONALIZATION STORE\n");
-    sigma_printf("-------------------------------------------\n");
+    sigma_log_info("\nÃŽÂ£ SOVEREIGN THEME & PERSONALIZATION STORE\n");
+    sigma_log_info("-------------------------------------------\n");
     for (int i = 0; i < 5; i++) {
-        sigma_printf("%-17s %-12s %s\n", 
+        sigma_log_info("%-17s %-12s %s\n", 
             themes[i].name, 
             themes[i].primary_color, 
             themes[i].premium ? "(PREMIUM)" : "");
     }
-    sigma_printf("-------------------------------------------\n\n");
+    sigma_log_info("-------------------------------------------\n\n");
 }
+

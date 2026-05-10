@@ -1,6 +1,8 @@
+#include "../include/sigma_log.h"
+#include "../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN BUILD ZENITH (v36.0 - THE FORGE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN BUILD ZENITH (v36.0 - THE FORGE FINALITY)
  * =========================================================================
  * Mission: Bit-Perfect Forge & Shard Audit. Zero-Dependency.
  * Capability: Automated Linting, Verification, and x86_64 Shard Generation.
@@ -8,7 +10,7 @@
  * =========================================================================
  */
 
-#include "SigmaOOP.hpp"
+#include "../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Forge {
@@ -40,7 +42,7 @@ public:
     }
 
     void audit() {
-        sigma_print("\n--- Σ SOVEREIGN BUILD AUDIT (v36.0) ---\n");
+        sigma_print("\n--- Î£ SOVEREIGN BUILD AUDIT (v36.0) ---\n");
         sigma_print("| Shards Verified : "); sigma_print_num(m_shards_verified); sigma_print("\n");
         sigma_print("| Forge Status    : RING-0 SOVEREIGN\n");
         sigma_print("| Compliance      : 100% Zero-Dependency. 0% Python.\n");
@@ -72,3 +74,4 @@ int main() {
     start_build_zenith();
     return 0;
 }
+

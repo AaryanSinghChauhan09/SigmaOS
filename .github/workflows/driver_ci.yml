@@ -1,0 +1,34 @@
+name: SigmaOS Driver Porting CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'drivers/linux_distros/**'
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Build Environment
+      run: sudo apt-get install -y build-essential qemu-system-x86 nasm gcc-multilib g++-multilib
+
+    - name: Compile SigmaOS Kernel & Driver Shims
+      run: make kernel drivers
+
+    - name: Virtualized Regression Test (QEMU)
+      run: ./scripts/run_driver_tests.sh
+
+    - name: Build Driver Packages (DKMS format)
+      run: make package-drivers
+
+    - name: Upload Signed Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: sigmaos-drivers
+        path: build/packages/*.smd

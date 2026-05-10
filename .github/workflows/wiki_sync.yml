@@ -1,0 +1,38 @@
+name: Wiki Sync Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.md'
+
+jobs:
+  sync-wiki:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          path: main-repo
+
+      - name: Checkout Wiki
+        uses: actions/checkout@v3
+        with:
+          repository: $\{{ github.repository }}.wiki
+          path: wiki-repo
+          token: $\{{ secrets.WIKI_SYNC_TOKEN }}
+
+      - name: Migrate .MD Files to Wiki
+        run: |
+          # Copy any complete .md files over to the wiki
+          find main-repo -name "*.md" ! -name "README.md" -type f -exec cp {} wiki-repo/ \;
+          
+          # Force the single source of truth by replacing the original with a shortcut
+          # (This step assumes a script would commit the shortcut back to the main repo, or it simply enforces Wiki primacy)
+          cd wiki-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "docs: automated sync from main repository" || echo "No changes to commit"
+          git push

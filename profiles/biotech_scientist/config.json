@@ -1,0 +1,13 @@
+{
+    "profession": "biotech_scientist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "lab_management",
+        "dna_analysis",
+        "compliance"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

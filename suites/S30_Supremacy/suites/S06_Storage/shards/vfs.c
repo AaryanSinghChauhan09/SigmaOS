@@ -1,14 +1,23 @@
-/*
+﻿/*
  * =========================================================================
+<<<<<<< HEAD:suites/S30_Supremacy/suites/S06_Storage/shards/vfs.c
  * S SIGMAOS ZENITH SUPREME: VIRTUAL FILE SYSTEM (VFS) SHARD
+=======
+ * ÃŽÂ£ SIGMAOS ZENITH SUPREME: VIRTUAL FILE SYSTEM (VFS) SHARD
+>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:fs/vfs.c
  * =========================================================================
  * Mission: Abstract storage and sharding for modular filesystem support.
  * Capability: Inodes, File Descriptors, Mount Points, Path Resolution.
  * =========================================================================
  */
 
+<<<<<<< HEAD:suites/S30_Supremacy/suites/S06_Storage/shards/vfs.c
 #include "sigma_libc.h"
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
+=======
+#include "../include/SovereignLibC.h"
+#include "../include/sigma_types.h"
+>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:fs/vfs.c
 
 #define MAX_FILES 128
 #define MAX_PATH_LEN 256
@@ -50,7 +59,11 @@ void sigma_vfs_init() {
     sigma_sigma_memcpy(vfs_root.name, "/", 2);
     vfs_root.type = VFS_TYPE_DIRECTORY;
     current_vfs_mount = &vfs_root;
+<<<<<<< HEAD:suites/S30_Supremacy/suites/S06_Storage/shards/vfs.c
     sigma_sigma_printf("[KERNEL] VFS initialized at mount point '/'\n");
+=======
+    kprintf("[KERNEL] VFS initialized at mount point '/'\n");
+>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:fs/vfs.c
 }
 
 vfs_node_t* sigma_vfs_create_node(const char* name, vfs_node_type_t type, vfs_node_t* parent) {
@@ -76,7 +89,11 @@ vfs_node_t* sigma_vfs_create_node(const char* name, vfs_node_type_t type, vfs_no
 sigma_err_t sigma_vfs_mount(const char* path, vfs_node_t* device_node) {
     SIGMA_UNUSED(path);
     SIGMA_UNUSED(device_node);
+<<<<<<< HEAD:suites/S30_Supremacy/suites/S06_Storage/shards/vfs.c
     sigma_sigma_printf("[KERNEL] Mounting device to VFS...\n");
+=======
+    kprintf("[KERNEL] Mounting device to VFS...\n");
+>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:fs/vfs.c
     return SIGMA_OK;
 }
 
@@ -87,7 +104,10 @@ sigma_ssz_t sigma_vfs_read(vfs_node_t* node, void* buffer, sigma_sz_t size) {
     return (sigma_ssz_t)SIGMA_EIO;
 }
 
+<<<<<<< HEAD:suites/S30_Supremacy/suites/S06_Storage/shards/vfs.c
 
 
 
 
+=======
+>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:fs/vfs.c

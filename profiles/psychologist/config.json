@@ -1,0 +1,13 @@
+{
+    "profession": "psychologist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "experiment_management",
+        "patient_records",
+        "compliance"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

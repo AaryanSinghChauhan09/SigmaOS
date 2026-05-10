@@ -1,0 +1,14 @@
+{
+    "profession": "architect",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "cad_tools",
+        "3d_modeling",
+        "project_management",
+        "simulation"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

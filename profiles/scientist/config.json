@@ -1,0 +1,25 @@
+{
+    "profession": "scientist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "data_analysis_suite",
+        "lab_notebooks",
+        "simulation_modules",
+        "visualization_tools"
+    ],
+    "rules": [
+        "Research ethics",
+        "lab safety protocols"
+    ],
+    "calculators": [
+        "Statistical significance",
+        "molarity",
+        "physics constants"
+    ],
+    "algorithms": [
+        "Simulation engines",
+        "data visualization",
+        "AI model training"
+    ]
+}

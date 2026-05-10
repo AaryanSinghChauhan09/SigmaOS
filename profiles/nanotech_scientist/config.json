@@ -1,0 +1,13 @@
+{
+    "profession": "nanotech_scientist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "simulation",
+        "visualization",
+        "compliance"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

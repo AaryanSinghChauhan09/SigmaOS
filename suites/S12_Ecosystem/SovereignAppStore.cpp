@@ -1,13 +1,17 @@
 /*
  * =========================================================================
+<<<<<<< HEAD:suites/S12_Ecosystem/SovereignAppStore.cpp
  * S SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+=======
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:userland/SovereignAppStore.cpp
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
  * =========================================================================
  */
 
-#include "SigmaOOP.hpp"
+#include "../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace PackageForge {

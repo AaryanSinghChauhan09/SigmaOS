@@ -1,0 +1,37 @@
+name: Driver Request
+description: Request a port for a specific hardware driver
+title: "[DRIVER]: <Device Name>"
+labels: ["enhancement", "driver-request"]
+body:
+  - type: input
+    id: device_model
+    attributes:
+      label: Hardware Model / Chipset
+      description: What is the exact name and model of the hardware? (e.g., Realtek RTL8822CE)
+      placeholder: Realtek RTL8822CE
+    validations:
+      required: true
+  - type: dropdown
+    id: hw_category
+    attributes:
+      label: Hardware Category
+      options:
+        - Network (Wi-Fi/Ethernet)
+        - Graphics (GPU)
+        - Storage (NVMe, SATA)
+        - Audio
+        - Input (Keyboard/Mouse)
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: linux_module
+    attributes:
+      label: Equivalent Linux Kernel Module (if known)
+      description: Do you know the name of the LKM in Linux? (e.g., rtw88_8822ce)
+      placeholder: rtw88_8822ce
+  - type: textarea
+    id: logs
+    attributes:
+      label: lspci or lsusb output
+      description: Please paste the relevant hardware ID string from a Linux environment.

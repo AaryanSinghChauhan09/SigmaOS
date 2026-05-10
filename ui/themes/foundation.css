@@ -1,0 +1,27 @@
+/* foundation.css â€” SigmaOS Zenith Design System Primitives */
+:root {
+    --accent: #00ffa3;
+    --accent-glow: rgba(0, 255, 163, 0.4);
+    --bg: #050507;
+    --text: #e0e0e0;
+    --muted: #64748b;
+    --border: rgba(255,255,255,0.1);
+    --glass: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-blur: 20px;
+    --border-radius: 18px;
+    --transition: 0.3s ease;
+    --panel-bg: rgba(15, 15, 20, 0.6);
+}
+
+.glass-morphism {
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+}
+
+.accent-glow {
+    box-shadow: 0 0 15px var(--accent-glow);
+}
+

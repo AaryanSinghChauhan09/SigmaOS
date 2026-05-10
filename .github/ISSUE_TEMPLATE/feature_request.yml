@@ -1,4 +1,5 @@
 name: Feature Request
+<<<<<<< HEAD
 description: Suggest an idea for SigmaOS
 title: "[Feature]: "
 labels: ["enhancement", "triage"]
@@ -30,3 +31,15 @@ body:
       description: A clear and concise description of any alternative solutions or features you've considered.
     validations:
       required: false
+=======
+description: Suggest an idea for this project
+labels: enhancement
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of what you want to achieve.
+    validations:
+      required: true
+>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645

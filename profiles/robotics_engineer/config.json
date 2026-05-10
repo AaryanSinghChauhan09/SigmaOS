@@ -1,0 +1,13 @@
+{
+    "profession": "robotics_engineer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "simulation",
+        "hardware_integration",
+        "ai_orchestration"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

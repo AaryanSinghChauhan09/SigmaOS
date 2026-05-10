@@ -1,11 +1,47 @@
 version: 2
+<<<<<<< HEAD
 updates:
   # Maintain dependencies for GitHub Actions
+=======
+
+updates:
+  # ─── npm/JS dependencies ────────────────────────────────────────────────────
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+      timezone: "Asia/Kolkata"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "javascript"
+    commit-message:
+      prefix: "chore(deps)"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
+
+  # ─── GitHub Actions ──────────────────────────────────────────────────────────
+>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+<<<<<<< HEAD
     groups:
       actions:
         patterns:
           - "*"
+=======
+      day: "monday"
+      time: "04:00"
+      timezone: "Asia/Kolkata"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore(ci)"
+>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645

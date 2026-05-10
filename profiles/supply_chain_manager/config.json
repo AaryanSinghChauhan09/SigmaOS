@@ -1,0 +1,13 @@
+{
+    "profession": "supply_chain_manager",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "logistics_dashboards",
+        "fleet_tracking",
+        "warehouse_management"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

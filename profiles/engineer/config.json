@@ -1,0 +1,25 @@
+{
+    "profession": "engineer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "compilers",
+        "cad_tools",
+        "simulation_engines",
+        "project_management_dashboards"
+    ],
+    "rules": [
+        "Bureau of Indian Standards (BIS)",
+        "IS codes"
+    ],
+    "calculators": [
+        "Structural load",
+        "electrical circuit",
+        "fluid mechanics"
+    ],
+    "algorithms": [
+        "CAD simulation",
+        "stress analysis",
+        "project scheduling"
+    ]
+}

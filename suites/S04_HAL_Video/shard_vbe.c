@@ -1,6 +1,7 @@
+#include "core/sigma_types.h"
 /*
  * =============================================================================
- * Σ SIGMAOS KERNEL: SOVEREIGN GRAPHICS ZEN (v1.0 - PURE C11)
+ * Î£ SIGMAOS KERNEL: SOVEREIGN GRAPHICS ZEN (v1.0 - PURE C11)
  * =============================================================================
  * Interface: VBE/LFB (Linear Framebuffer) via Multiboot2 or VESA BIOS
  * Features:
@@ -13,48 +14,53 @@
  * =============================================================================
  */
 
-#include "../sigma_kernel_types.h"
+#include "core/sigma_kernel_types.h"
 
 /* =========================================================================
  * VBE State
  * ========================================================================= */
 typedef struct SigmaFB {
-    u32* addr;        /* Front buffer */
-    u32* back;        /* Back buffer (kernel-heap allocated) */
-    u32  width;
-    u32  height;
-    u32  pitch;       /* bytes per scanline */
-    u8   bpp;         /* 32 recommended */
-    u32  size;        /* total pixel count */
+    sigma_u32* addr;        /* Front buffer */
+    sigma_u32* back;        /* Back buffer (kernel-heap allocated) */
+    sigma_u32  width;
+    sigma_u32  height;
+    sigma_u32  pitch;       /* bytes per scanline */
+    sigma_u8   bpp;         /* 32 recommended */
+    sigma_u32  size;        /* total pixel count */
 } SigmaFB;
 
 static SigmaFB g_fb;
 
+<<<<<<< HEAD:suites/S04_HAL_Video/shard_vbe.c
 extern void* sigma_malloc(usize size);
 extern void  ksigma_printf(const char* fmt, ...);
+=======
+extern void* sigma_malloc(sigma_usize size);
+extern void  kprintf(const char* fmt, ...);
+>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/drivers/vbe.c
 
 /* =========================================================================
  * Blitting & Drawing
  * ========================================================================= */
-void fb_put_pixel(u32 x, u32 y, u32 color) {
+void fb_put_pixel(sigma_u32 x, sigma_u32 y, sigma_u32 color) {
     if (x >= g_fb.width || y >= g_fb.height) return;
     g_fb.back[y * g_fb.width + x] = color;
 }
 
 /* Alpha Blend: dst = (src * alpha + dst * (255 - alpha)) / 255 */
-static inline u32 blend(u32 src, u32 dst, u8 alpha) {
-    u32 rb = (((src & 0xFF00FF) * alpha) + ((dst & 0xFF00FF) * (256 - alpha))) >> 8;
-    u32 g  = (((src & 0x00FF00) * alpha) + ((dst & 0x00FF00) * (256 - alpha))) >> 8;
+static inline sigma_u32 blend(sigma_u32 src, sigma_u32 dst, sigma_u8 alpha) {
+    sigma_u32 rb = (((src & 0xFF00FF) * alpha) + ((dst & 0xFF00FF) * (256 - alpha))) >> 8;
+    sigma_u32 g  = (((src & 0x00FF00) * alpha) + ((dst & 0x00FF00) * (256 - alpha))) >> 8;
     return (rb & 0xFF00FF) | (g & 0x00FF00);
 }
 
-void fb_draw_rect(u32 x, u32 y, u32 w, u32 h, u32 color, u8 alpha) {
-    u32 i, j;
+void fb_draw_rect(sigma_u32 x, sigma_u32 y, sigma_u32 w, sigma_u32 h, sigma_u32 color, sigma_u8 alpha) {
+    sigma_u32 i, j;
     for (i = 0; i < h; i++) {
         for (j = 0; j < w; j++) {
             if (alpha == 255) fb_put_pixel(x + j, y + i, color);
             else {
-                u32 current = g_fb.back[(y + i) * g_fb.width + (x + j)];
+                sigma_u32 current = g_fb.back[(y + i) * g_fb.width + (x + j)];
                 fb_put_pixel(x + j, y + i, blend(color, current, alpha));
             }
         }
@@ -66,9 +72,9 @@ void fb_draw_rect(u32 x, u32 y, u32 w, u32 h, u32 color, u8 alpha) {
  * ========================================================================= */
 void fb_flip(void) {
     // Optimization: Use REP MOVSD (x86 assembly) for the block copy
-    u32* dst = g_fb.addr;
-    u32* src = g_fb.back;
-    u32  cnt = g_fb.size;
+    sigma_u32* dst = g_fb.addr;
+    sigma_u32* src = g_fb.back;
+    sigma_u32  cnt = g_fb.size;
 
     __asm__ __volatile__ (
         "rep movsd"
@@ -83,15 +89,15 @@ void fb_flip(void) {
  * ========================================================================= */
 extern unsigned char sigma_font_data[256][16]; // Placeholder
 
-void fb_draw_char(char c, u32 x, u32 y, u32 color) {
+void fb_draw_char(char c, sigma_u32 x, sigma_u32 y, sigma_u32 color) {
     // Simplified 8x16 font rendering logic
     // In a real implementation, we would access sigma_font_data[c]
 }
 
 /* =========================================================================
- * Init — called after MB2 header parsing
+ * Init â€ called after MB2 header parsing
  * ========================================================================= */
-void fb_init(u32* lfb, u32 w, u32 h, u32 p) {
+void fb_init(sigma_u32* lfb, sigma_u32 w, sigma_u32 h, sigma_u32 p) {
     g_fb.addr   = lfb;
     g_fb.width  = w;
     g_fb.height = h;
@@ -99,8 +105,8 @@ void fb_init(u32* lfb, u32 w, u32 h, u32 p) {
     g_fb.bpp    = 32;
     g_fb.size   = w * h;
 
-    /* Allocate back buffer — essential for non-flicker glassmorphism */
-    g_fb.back = (u32*)sigma_malloc(g_fb.size * sizeof(u32));
+    /* Allocate back buffer â€ essential for non-flicker glassmorphism */
+    g_fb.back = (sigma_u32*)sigma_malloc(g_fb.size * sizeof(sigma_u32));
     if (!g_fb.back) {
         ksigma_printf("[FB]: Failed to allocate backbuffer. Falling back to single-buffer.\n");
         g_fb.back = lfb;
@@ -109,7 +115,7 @@ void fb_init(u32* lfb, u32 w, u32 h, u32 p) {
     }
 
     /* Clear screen to Sigma Deep Space (Dark Gradient-like base) */
-    u32 i;
+    sigma_u32 i;
     for (i = 0; i < g_fb.size; i++) g_fb.back[i] = 0x0A0A10; // Dark midnight blue
     fb_flip();
 }

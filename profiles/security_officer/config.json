@@ -1,0 +1,14 @@
+{
+    "profession": "security_officer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "surveillance_integration",
+        "compliance_monitoring",
+        "audit_logs",
+        "incident_response_tools"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

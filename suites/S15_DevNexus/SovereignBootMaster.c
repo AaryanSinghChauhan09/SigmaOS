@@ -1,6 +1,7 @@
+﻿#include "../include/SovereignLibC.h"
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -8,29 +9,29 @@
  */
 
 /*
- * Σ SIGMA OS: SOVEREIGN BOOT MASTER (v5.0 - MILITARY HARDENED)
+ * ÃŽÂ£ SIGMA OS: SOVEREIGN BOOT MASTER (v5.0 - MILITARY HARDENED)
  * ======================================================
  * Mission: sub-second boot, hardware-skip, shard-init.
  */
 
-#include "SigmaOOP.hpp"
+#include "../include/SigmaOOP.hpp"
 
 class SovereignBootMaster : public SigmaObject {
 public:
     SovereignBootMaster() {
-        sigma_printf("[BOOT_MASTER]: Initializing Sovereign Boot Logic.\n");
+        sigma_log_info("[BOOT_MASTER]: Initializing Sovereign Boot Logic.\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignBootMaster"; }
 
     void FastInit() {
-        sigma_printf("[BOOT_INIT]: SKIPPING SLOW HARDWARE PROBES...\n");
-        sigma_printf("[BOOT_INIT]: USING PREDICTIVE RAM CACHE MAPPING...\n");
+        sigma_log_info("[BOOT_INIT]: SKIPPING SLOW HARDWARE PROBES...\n");
+        sigma_log_info("[BOOT_INIT]: USING PREDICTIVE RAM CACHE MAPPING...\n");
     }
 
     void LaunchKernel() {
-        sigma_printf("[BOOT_LOAD]: LOADING SOVEREIGN KERNEL AT 0x100000...\n");
-        sigma_printf("[BOOT_LOAD]: PARALLEL SHARD INITIALIZATION COMMENCING...\n");
+        sigma_log_info("[BOOT_LOAD]: LOADING SOVEREIGN KERNEL AT 0x100000...\n");
+        sigma_log_info("[BOOT_LOAD]: PARALLEL SHARD INITIALIZATION COMMENCING...\n");
     }
 };
 
@@ -39,7 +40,8 @@ extern "C" void _start(void) {
     master.FastInit();
     master.LaunchKernel();
 
-    sigma_printf("\n[SUCCESS]: Sovereign Boot Sequence Completed. Control Handed to Kernel.\n");
+    sigma_log_info("\n[SUCCESS]: Sovereign Boot Sequence Completed. Control Handed to Kernel.\n");
     sigma_exit(0);
 }
+
 

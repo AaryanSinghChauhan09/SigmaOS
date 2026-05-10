@@ -1,0 +1,23 @@
+{
+    "profession": "civil_servant",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "policy_tools",
+        "compliance",
+        "citizen_records"
+    ],
+    "rules": [
+        "Service rules",
+        "policy drafting guidelines"
+    ],
+    "calculators": [
+        "Budget allocation",
+        "pension",
+        "pay scale"
+    ],
+    "algorithms": [
+        "Policy impact simulation",
+        "citizen data indexing"
+    ]
+}

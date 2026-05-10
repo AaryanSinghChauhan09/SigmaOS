@@ -1,0 +1,72 @@
+#!/bin/bash
+# =========================================================================
+# Σ SIGMAOS: UNIVERSAL PACKAGE WRAPPER (sigma-pkg)
+# =========================================================================
+# Detects host distro (apt, dnf, pacman) and delegates package commands.
+# Implements the Universal Package Manager concept.
+# =========================================================================
+
+set -e
+
+if [ $# -lt 1 ]; then
+    echo "Usage: sigma-pkg <install|remove|update|search> [package]"
+    exit 1
+fi
+
+ACTION=$1
+PACKAGE=$2
+
+# Detect Package Manager
+if command -v apt-get >/dev/null 2>&1; then
+    PM="apt"
+    INSTALL_CMD="sudo apt-get install -y"
+    REMOVE_CMD="sudo apt-get remove -y"
+    UPDATE_CMD="sudo apt-get update && sudo apt-get upgrade -y"
+    SEARCH_CMD="apt-cache search"
+elif command -v dnf >/dev/null 2>&1; then
+    PM="dnf"
+    INSTALL_CMD="sudo dnf install -y"
+    REMOVE_CMD="sudo dnf remove -y"
+    UPDATE_CMD="sudo dnf upgrade -y"
+    SEARCH_CMD="dnf search"
+elif command -v pacman >/dev/null 2>&1; then
+    PM="pacman"
+    INSTALL_CMD="sudo pacman -S --noconfirm"
+    REMOVE_CMD="sudo pacman -Rs --noconfirm"
+    UPDATE_CMD="sudo pacman -Syu --noconfirm"
+    SEARCH_CMD="pacman -Ss"
+else
+    echo "[ERROR] No supported package manager found (apt, dnf, pacman)."
+    exit 1
+fi
+
+echo "[Σ] Detected Package Manager: $PM"
+
+case $ACTION in
+    install)
+        if [ -z "$PACKAGE" ]; then echo "Missing package name."; exit 1; fi
+        echo "[Σ] Installing $PACKAGE..."
+        $INSTALL_CMD "$PACKAGE"
+        ;;
+    remove)
+        if [ -z "$PACKAGE" ]; then echo "Missing package name."; exit 1; fi
+        echo "[Σ] Removing $PACKAGE..."
+        $REMOVE_CMD "$PACKAGE"
+        ;;
+    update)
+        echo "[Σ] System Update Initiated..."
+        $UPDATE_CMD
+        ;;
+    search)
+        if [ -z "$PACKAGE" ]; then echo "Missing package name."; exit 1; fi
+        echo "[Σ] Searching for $PACKAGE..."
+        $SEARCH_CMD "$PACKAGE"
+        ;;
+    *)
+        echo "[ERROR] Unknown action: $ACTION"
+        echo "Valid actions: install, remove, update, search"
+        exit 1
+        ;;
+esac
+
+echo "[Σ] Operation completed successfully."

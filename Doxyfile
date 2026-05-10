@@ -1,0 +1,13 @@
+PROJECT_NAME           = "SigmaOS Sovereign Lattice"
+PROJECT_NUMBER         = "v100.2"
+OUTPUT_DIRECTORY       = docs/api
+INPUT                  = kernel/ include/ userland/
+RECURSIVE              = YES
+GENERATE_LATEX         = NO
+GENERATE_HTML          = YES
+EXTRACT_ALL            = YES
+CLASS_DIAGRAMS         = YES
+HAVE_DOT               = YES
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+OPTIMIZE_OUTPUT_FOR_C  = YES

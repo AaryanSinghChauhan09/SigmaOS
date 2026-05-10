@@ -1,0 +1,13 @@
+{
+    "profession": "game_developer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "game_engines",
+        "asset_pipelines",
+        "gpu_orchestration"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

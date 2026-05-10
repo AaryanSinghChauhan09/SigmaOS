@@ -1,6 +1,7 @@
+﻿#include "../include/SovereignLibC.h"
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -14,7 +15,7 @@
 
 
 /**
- * Σ SIGMA OS: SOVEREIGN VOICE-TO-TYPE SHARD (v128.0 - VOICE ZENITH)
+ * ÃŽÂ£ SIGMA OS: SOVEREIGN VOICE-TO-TYPE SHARD (v128.0 - VOICE ZENITH)
  * ===============================================================
  * USP: 100% Offline Whisper transcription with global HID injection.
  * Capability: Zero-edit accuracy, low latency, silicon-direct audio capture.
@@ -50,7 +51,7 @@ public:
 class WindowsHIDBridge : public IHIDBridge {
 public:
     void InjectText(const const char*& text) override {
-        sigma_printf("[VOICE/HID]: Injecting transcribed text into active window...\n");
+        sigma_log_info("[VOICE/HID]: Injecting transcribed text into active window...\n");
         
         // Simulating Win32 SendInput logic
         for (char c : text) {
@@ -61,7 +62,7 @@ public:
             input.ki.dwFlags = KEYEVENTF_UNICODE;
             // SendInput(1, &input, sizeof(INPUT));
         }
-        sigma_printf("[VOICE/HID]: Injection complete: \"" << text << "\"\n");
+        sigma_log_info("[VOICE/HID]: Injection complete: \"" << text << "\"\n");
     }
 };
 #else
@@ -84,13 +85,13 @@ public:
     SovereignVoiceShard(IHIDBridge* hb) : hidBridge(hb), isRecording(false) {}
 
     void ActivateGlobalWakeKey() {
-        sigma_printf("[VOICE/KERNEL]: Monitoring for Global Wake-Key (Caps Lock)...\n");
+        sigma_log_info("[VOICE/KERNEL]: Monitoring for Global Wake-Key (Caps Lock)...\n");
         // Logic for Global Hooking (SetWindowsHookEx or libevdev)
     }
 
     void ProcessVoiceEvent() {
         isRecording = true;
-        sigma_printf("[VOICE/CORE]: Recording... Listening for Offline Context...\n");
+        sigma_log_info("[VOICE/CORE]: Recording... Listening for Offline Context...\n");
         
         // Simulating transcription delay
         std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -110,7 +111,7 @@ public:
             text[0] = toupper(text[0]);
             if (text.back() != '.') text += ".";
         }
-        sigma_printf("[VOICE/CLEANUP]: Applied 'Zero-Edit' post-processing logic.\n");
+        sigma_log_info("[VOICE/CLEANUP]: Applied 'Zero-Edit' post-processing logic.\n");
     }
 };
 
@@ -122,13 +123,14 @@ int main() {
 #endif
     SovereignVoiceShard voiceShard(&hid);
     
-    sigma_printf("--- Σ SIGMA OS VOICE-TO-TYPE SOVEREIGN INITIALIZED ---\n");
+    sigma_log_info("--- ÃŽÂ£ SIGMA OS VOICE-TO-TYPE SOVEREIGN INITIALIZED ---\n");
     voiceShard.ActivateGlobalWakeKey();
     
     // Simulate a wake-key trigger
-    sigma_printf("\n[EVENT]: Global Wake-Key Triggered (User Action Simulation)\n");
+    sigma_log_info("\n[EVENT]: Global Wake-Key Triggered (User Action Simulation)\n");
     voiceShard.ProcessVoiceEvent();
     
     return 0;
 }
+
 

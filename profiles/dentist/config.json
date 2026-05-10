@@ -1,0 +1,14 @@
+{
+    "profession": "dentist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "dental_charting",
+        "x-ray_viewer",
+        "appointment_scheduler",
+        "medical_compliance"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

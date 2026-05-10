@@ -1,0 +1,13 @@
+{
+    "profession": "writer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "manuscript_editor",
+        "publishing_tools",
+        "citation/reference_manager"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

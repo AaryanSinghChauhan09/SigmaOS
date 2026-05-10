@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ---
 CompileFlags:
   Add:
@@ -7,3 +8,17 @@ CompileFlags:
     - "-Wextra"
 Diagnostics:
   UnusedIncludes: Strict
+=======
+﻿CompileFlags:
+  Add:
+    - -I./include
+    - -ffreestanding
+    - -std=c++17
+    - -fno-exceptions
+    - -fno-rtti
+  Remove:
+    - -mno-red-zone
+
+Diagnostics:
+  UnusedIncludes: None
+>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645

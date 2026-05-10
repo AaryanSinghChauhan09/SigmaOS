@@ -1,0 +1,14 @@
+{
+    "profession": "hr_manager",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "employee_records",
+        "payroll",
+        "compliance",
+        "recruitment_tools"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

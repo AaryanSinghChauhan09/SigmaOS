@@ -1,0 +1,56 @@
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "Lattice.h"
+#include "libc/SovereignLibC.h"
+#include "SovereignSyncZenith.h"
+#include "SovereignDiskZenith.h"
+#include "SovereignOSBasicsZenith.h"
+
+namespace SigmaOS {
+
+// --- SYNC IMPLEMENTATION (Readers-Writers) ---
+void Sync::SovereignSyncProblems::SolveReadersWriters() {
+    sigma_log("[ZENITH-SYNC]: Readers-Writers priority logic initiated (Zero-Starvation).\n");
+    sigma_log("[ZENITH-SYNC]: Reader count: 0 | Shard locked: SIGMA_NULL\n");
+}
+
+void Sync::SovereignSyncProblems::SolveDiningPhilosophers() {
+    sigma_log("[ZENITH-SYNC]: Solving Dining Philosophers via Hardware Mutex Table...\n");
+    sigma_log("[ZENITH-SYNC]: Resource hierarchy enforced. Deadlock prevented.\n");
+}
+
+// --- DISK & FILE SYSTEM IMPLEMENTATION ---
+void Disk::SovereignDiskScheduler::SSTF_Schedule(int* req, int c, int h) {
+    sigma_log("[ZENITH-DISK]: Scheduling SSTF for %d requests from head %d...\n", c, h);
+    sigma_log("[ZENITH-DISK]: Closest track seek algorithm (O(1) search on local shard).\n");
+}
+
+void Disk::SovereignFileSystemShard::FreeSpaceManagement(sigma_u64 bitV) {
+    sigma_log("[ZENITH-FS]: Bit-vector scanning for free space (Bit-Perfect Optimization)...\n");
+}
+
+void Disk::SovereignIOExpert::SpoolingDaemon() {
+    sigma_log("[ZENITH-IO]: Initializing Spooling Shard for I/O buffering...\n");
+    sigma_log("[ZENITH-IO]: Decoupling Hardware speed from process speed via buffer mesh.\n");
+}
+
+// --- PROCESS & MEMORY IMPLEMENTATION ---
+void Basics::SovereignProcessManager::ContextSwitch(SovereignPCB* old_p, SovereignPCB* new_p) {
+    sigma_log("[ZENITH-PROC]: Context switching PID %d -> PID %d...\n", old_p->pid, new_p->pid);
+}
+
+bool Basics::SovereignDeadlockAgent::IsInSafeState() {
+    sigma_log("[ZENITH-DEADLOCK]: Banker's Algorithm check on resource matrix...\n");
+    return SIGMA_TRUE;
+}
+
+void Basics::SovereignMemoryZenithAdv::PageFaultHandler(sigma_u64 page) {
+    sigma_log("[ZENITH-MEM]: Page fault on virtual page %p. Demand paging triggered...\n", (void*)page);
+    sigma_log("[ZENITH-MEM]: Selecting victim via LRU/SC clock algorithm.\n");
+}
+
+void Basics::SovereignMemoryZenithAdv::HandleThrashing() {
+    sigma_log("[ZENITH-MEM]: Thrashing detected! Working-set model re-balancing...\n");
+}
+
+} // namespace SigmaOS

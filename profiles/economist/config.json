@@ -1,0 +1,13 @@
+{
+    "profession": "economist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "market_modeling",
+        "forecasting",
+        "compliance"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

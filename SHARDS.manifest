@@ -1,0 +1,116 @@
+# Σ SIGMAOS: SOVEREIGN LATTICE SHARDS MANIFEST
+# Format: <Relative Path to Shard Source>
+# Purpose: Single source of truth for all modular OS components.
+# Standard: Every file listed here must be buildable by the root Makefile/CMake.
+
+# ═══════════════════════════════════════════════════════════════════════
+# LAYER 0: HAL & BOOT
+# ═══════════════════════════════════════════════════════════════════════
+kernel/core/hal/SovereignHAL.cpp
+kernel/core/hal/SovereignPMM.cpp
+kernel/core/hal/SovereignVMM.cpp
+kernel/core/hal/SovereignISR.cpp
+kernel/core/hal/SovereignPCI.cpp
+kernel/core/hal/SovereignACPI.cpp
+kernel/core/hal/SovereignPager.cpp
+
+# ═══════════════════════════════════════════════════════════════════════
+# LAYER 1: KERNEL CORE (IPC, SCHEDULER, MEMORY)
+# ═══════════════════════════════════════════════════════════════════════
+# Headers (zero-STL, kernel-safe)
+include/ipc/SovereignEventBus.h
+include/sched/SovereignScheduler.h
+kernel/core/sched/SovereignRTSched.cpp
+
+# ═══════════════════════════════════════════════════════════════════════
+# LAYER 2: SYSTEM SERVICES
+# ═══════════════════════════════════════════════════════════════════════
+kernel/core/observability/SovereignMonitor.cpp
+kernel/core/observability/SovereignDiag.cpp
+kernel/core/system/SovereignFS.cpp
+kernel/core/system/SovereignNet.cpp
+kernel/core/system/SovereignIPC.cpp
+kernel/core/system/SovereignForge.cpp
+kernel/core/system/SovereignSelfHealing.cpp
+
+# ═══════════════════════════════════════════════════════════════════════
+# LAYER 3: SECURITY & PQC
+# ═══════════════════════════════════════════════════════════════════════
+kernel/core/security/SovereignPQC.cpp
+kernel/core/security/SovereignSandbox.cpp
+kernel/core/security/SovereignAttestation.cpp
+kernel/core/security/SovereignTPM.cpp
+
+# ═══════════════════════════════════════════════════════════════════════
+# LAYER 4: AI & AUTOMATION (CLAW STACK)
+# ═══════════════════════════════════════════════════════════════════════
+kernel/core/ai/SovereignNeural.cpp
+kernel/core/ai/SovereignCognitive.cpp
+kernel/core/ai/SovereignAIPersona.cpp
+kernel/core/ai/SovereignClawGateway.cpp
+kernel/core/ai/SovereignAgentCore.cpp
+kernel/core/ai/SovereignKernelBridge.cpp
+kernel/core/ai/SovereignNeuralAccel.cpp
+kernel/core/ai/SovereignNeuralNexus.cpp
+kernel/core/ai/SovereignModelManager.cpp
+kernel/core/ai/SovereignModelOptimizer.cpp
+kernel/core/automation/SovereignWorkflowEngine.cpp
+kernel/core/automation/SovereignAuto.cpp
+kernel/core/automation/SovereignCron.cpp
+
+# ═══════════════════════════════════════════════════════════════════════
+# LAYER 5: INDUSTRIAL ECOSYSTEM & USERLAND
+# ═══════════════════════════════════════════════════════════════════════
+userland/update-agent.cpp
+kernel/core/system/SovereignDAL.cpp
+userland/logd.cpp
+userland/SovereignSpotlight.cpp
+kernel/core/ui/SovereignSnap.cpp
+iso_root/installer/install.sh
+ecosystem/packager/sigma-pkg.sh
+kernel/core/industrial/SovereignCloudImage.cpp
+kernel/core/industrial/SovereignLTS.cpp
+kernel/core/industrial/SovereignInit.cpp
+kernel/core/industrial/SovereignOrbResolver.cpp
+kernel/core/industrial/SovereignForensicLattice.cpp
+kernel/core/industrial/SovereignMicroEdition.cpp
+kernel/core/security/SovereignFIPS.cpp
+kernel/core/security/SovereignAnonymity.cpp
+kernel/core/observability/SovereignEmergencySync.cpp
+kernel/core/automation/SovereignAgentQuotasExtended.cpp
+kernel/core/system/SovereignContainerOrchestrator.cpp
+kernel/core/ui/ZenithAccessibility.cpp
+
+# ═══════════════════════════════════════════════════════════════════════
+# LAYER 6: HARDWARE COMPATIBILITY (Linux Distro Ports)
+# ═══════════════════════════════════════════════════════════════════════
+drivers/linux_distros/hardware/ACPI_Backlight.cpp
+drivers/linux_distros/hardware/AMDGPU_Graphics.cpp
+drivers/linux_distros/hardware/AMDGPU_Modern.cpp
+drivers/linux_distros/hardware/AMDGPU_SI.cpp
+drivers/linux_distros/hardware/Intel_AX200_WiFi.cpp
+drivers/linux_distros/hardware/Intel_AX210_WiFi6E.cpp
+drivers/linux_distros/hardware/Intel_Bluetooth.cpp
+drivers/linux_distros/hardware/Intel_I915_Graphics.cpp
+drivers/linux_distros/hardware/Intel_Thermal.cpp
+drivers/linux_distros/hardware/NVMe_Core.cpp
+drivers/linux_distros/hardware/Nouveau_Graphics.cpp
+drivers/linux_distros/hardware/Nvidia_TensorCore.cpp
+drivers/linux_distros/hardware/RTL8111_Ethernet.cpp
+drivers/linux_distros/hardware/Realtek_HDA_Audio.cpp
+drivers/linux_distros/hardware/Realtek_RTL8821CE.cpp
+drivers/linux_distros/hardware/SDHCI_CardReader.cpp
+drivers/linux_distros/hardware/SovereignARM64.cpp
+drivers/linux_distros/hardware/Synaptics_Input.cpp
+drivers/linux_distros/hardware/USB_Fingerprint.cpp
+drivers/linux_distros/hardware/USB_Mass_Storage.cpp
+drivers/linux_distros/hardware/USB_UVC_15.cpp
+drivers/linux_distros/hardware/USB_UVC_Camera.cpp
+drivers/linux_distros/hardware/USB_XHCI.cpp
+
+# ═══════════════════════════════════════════════════════════════════════
+# LAYER 7: AI RESEARCH SHARDS (kernel/shards/)
+# ═══════════════════════════════════════════════════════════════════════
+kernel/shards/ai/SovereignResearchMatrix.cpp
+kernel/shards/ai/SovereignScholasticRepo.cpp
+kernel/shards/ai/SovereignOmniTool.cpp
