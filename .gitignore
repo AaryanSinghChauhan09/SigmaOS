@@ -5,18 +5,14 @@
 build/
 dist/
 .DS_Store
-<<<<<<< HEAD
-=======
 .vscode/
 .idea/
 *.log
 tmp/
 *.tmp
-.cache/
 *.idx
 node_modules/  
 package-lock.json  
 patch_zenith.js  
 patch_zenith.py  
-patch_zenith_error.cjs  
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645
+patch_zenith_error.cjs
