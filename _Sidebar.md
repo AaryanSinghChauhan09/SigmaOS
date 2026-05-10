@@ -1,5 +1,6 @@
-## 🧭 Sovereign Navigation
+﻿# SigmaOS Documentation
 
+<<<<<<< HEAD
 
 * **[🏠 Home](Home)**
 * **[🧠 Neural Bridge AI](SOVEREIGN_AI_ROADMAP)**
@@ -23,3 +24,16 @@
 
 ---
 *Absolute Machine Sovereignty Achieved.*
+=======
+* [Introduction](Introduction)
+* [Installation](Installation)
+* [Architecture](Architecture)
+* [Security](Security)
+* [Drivers](Drivers)
+* [UI](UI)
+* [Recovery](Recovery)
+* [AI Governance](AI-Governance)
+* [ARM64 Optimization](ARM64-Optimization)
+* [Roadmap](Roadmap)
+* [Competitor Matrix](DISTROS_ABOVE_SIGMAOS)
+>>>>>>> 7759f274e222d74141c499a7b379a060016fe9a1

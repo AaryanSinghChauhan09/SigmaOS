@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🌌 SigmaOS Sovereign Wiki: The Singularity Portal
 
 Welcome to the official documentation for **SigmaOS** — the "Sigma" of all Operating Systems. SigmaOS is an industrial-grade, bare-metal ecosystem built from 1000+ atomic shards, aggregating the world's most powerful features into a single **universally sovereign, AI-native lattice**.
@@ -38,3 +39,18 @@ SigmaOS is the supreme alternative to Microsoft, Google, Oracle, and Salesforce:
 
 ---
 **Core Values:** Atomic Integrity | Zero External Linkage | Silicon Sovereignty | Intent-Driven Interaction
+=======
+﻿# SigmaOS Documentation
+
+* [Introduction](Introduction)
+* [Installation](Installation)
+* [Architecture](Architecture)
+* [Security](Security)
+* [Drivers](Drivers)
+* [UI](UI)
+* [Recovery](Recovery)
+* [AI Governance](AI-Governance)
+* [ARM64 Optimization](ARM64-Optimization)
+* [Roadmap](Roadmap)
+* [Competitor Matrix](DISTROS_ABOVE_SIGMAOS)
+>>>>>>> 7759f274e222d74141c499a7b379a060016fe9a1
