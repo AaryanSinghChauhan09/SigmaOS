@@ -1,4 +1,5 @@
 #include "industrial/SovereignNexus.hpp"
+#include "industrial/SovereignGlobalEcosystem.hpp"
 #include "sigma_log.h"
 
 namespace SigmaOS {
@@ -7,6 +8,10 @@ namespace Industrial {
 
 void SovereignNexusEngine::init() {
     sigma_log_info("[NEXUS] Initializing Sovereign Nexus (Layer 100 Orchestrator)...");
+    
+    /* Initialize Global Ecosystem (600-Shard Mode) */
+    SovereignGlobalEcosystem::getInstance().init();
+    
     this->loadEnterpriseShards();
 }
 

@@ -21,8 +21,8 @@ SovereignDiagEngine& SovereignDiagEngine::getInstance() {
 }
 
 void SovereignDiagEngine::init() {
-    sigma_log_info("[DIAG] Initializing Sovereign Silicon Health Monitor...");
-    m_initialized = 1U;
+    sigma_log_info("[DIAG] Initializing Sovereign Diagnostic Nexus...");
+    this->m_initialized = true;
     m_fault_count = 0U;
 }
 
