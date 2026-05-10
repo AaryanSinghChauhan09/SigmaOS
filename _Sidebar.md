@@ -18,6 +18,7 @@
 
 ### 🛠️ **Development**
 *   [SDK Guide](Development-Guide)
+*   [Hacking Guide](Hacking-Guide)
 *   [CI/CD Pipelines](Industrial-Pipelines)
 *   [System Registry](Sovereign-Registry)
 
