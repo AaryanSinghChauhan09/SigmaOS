@@ -21,8 +21,11 @@ graph TD
 ```
 
 ## IPC Flow & Scheduling
+
 Communication between layers is enforced by the **Sovereign IPC Bus**. No driver can directly access the kernel space without an encrypted capability token.
+
 - **Example Flow**: The AI Daemon (L5) requests CPU metrics. It sends an IPC request to the Sandbox (L4), which authenticates it and forwards it to the Kernel (L3). The Kernel reads from HAL (L2) and replies.
 
 ## Hardware Abstraction
+
 The `SovereignHAL` provides a strict interface for hardware interaction. Direct I/O port mapping is prohibited unless verified by the Hardware Attestation TPM driver during boot.
