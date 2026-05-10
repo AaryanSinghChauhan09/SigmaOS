@@ -1,22 +1,62 @@
-# Σ Sovereign Security Policy
+# Security Policy
 
-## 1. Security Philosophy
-SigmaOS is built on the principle of **Absolute Digital Sovereignty**. Security is not a feature; it is the fundamental lattice layer upon which all shards reside.
+## Supported Versions
 
-## 2. Vulnerability Management
-We maintain a zero-day tolerance policy for critical lattice vulnerabilities.
-* **Isolation Breaches**: Any failure in the Sovereign Sandbox is considered a Priority 1 emergency.
-* **PQC Weakness**: Any identified degradation in Post-Quantum Cryptographic throughput or security is addressed immediately.
+| Version | Supported |
+|---------|-----------|
+| v1.2.5-BEYOND (main) | ✅ Active |
+| v1.1.0-APEX-SINGULARITY | ⚠️ Critical fixes only |
+| < v1.0 | ❌ No longer supported |
 
-## 3. Reporting a Vulnerability
-We encourage responsible disclosure. Please report vulnerabilities through the following channels:
-1. **GitHub Advisory**: Use the "Report a Security Vulnerability" feature on the main repository.
-2. **Encrypted Disclosure**: For critical lattice-scale bugs, submit reports signed with your PGP key to the maintainer's public endpoint.
+## Reporting a Vulnerability
 
-## 4. Disclosure Policy
-* **Triage**: Reports are acknowledged within 24 hours.
-* **Remediation**: We aim to release a **Nexus Hotfix** within 72 hours for confirmed critical bugs.
-* **Disclosure**: Vulnerabilities are publicly disclosed only after a remediation shard is available to the global ecosystem.
+**Please do NOT report security vulnerabilities via public GitHub Issues.**
 
----
-[**← Back to Home**](Home)
+To report a security vulnerability in SigmaOS:
+
+
+1. **Email**: [Sovereign-OS0305@gmail.com](mailto:Sovereign-OS0305@gmail.com)
+2. **Or**: Open a private [Security Advisory](https://github.com/Sovereign-OS/SigmaOS/security/advisories/new) on GitHub
+
+3. **Include**:
+
+   * A description of the vulnerability
+   * Steps to reproduce (PoC if possible)
+
+   * The affected shard(s) or component
+   * Potential impact assessment
+
+4. **Response time**: We aim to acknowledge reports within **72 hours** and provide a fix timeline within **7 days**
+
+## Security Architecture
+
+SigmaOS enforces sovereign security through:
+
+
+* **Capability-Based IPC (S-Zircon)**: All inter-shard communication uses unforgeable capability handles
+* **Hardware-Backed Isolation**: Each suite runs in isolated shard domains with hardware compartmentalization
+
+* **Neural Firewall (S08_Security)**: AI-driven anomaly detection at the kernel level
+* **Zero-Trust Network (S07_Network)**: All mesh communications use HMAC-authenticated gossip
+
+* **Privacy Shard (S31_Privacy)**: Native Tor routing and amnesic memory for sensitive operations
+* **Quantum-Resistant Design**: Post-quantum cryptography planned for Phase 7 (CRYSTALS-Kyber)
+
+## Scope
+
+The following are **in scope** for security reports:
+
+* Kernel privilege escalation via shard boundaries
+* Memory corruption in `suites/S01_Genesis/` (core kernel)
+
+* Bypass of capability-based access controls
+* Cryptographic weaknesses in Lattice Mesh (S33) HMAC implementation
+
+* Buffer overflows in any `sigma_*` LibC function
+
+The following are **out of scope**:
+
+* Issues in userland shards that don't affect kernel integrity
+* Performance degradation without security impact
+
+* Issues requiring physical hardware access
