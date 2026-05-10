@@ -26,17 +26,21 @@ correctness claims of the SigmaOS Sovereign Lattice.
 ## Running Kani Proofs
 
 ```bash
+
 # Install Kani
+
 cargo install --locked kani-verifier
 cargo kani setup
 
 # Run all IPC/DMA proofs
+
 cargo kani \
   --harness ipc_dma_proofs::verify_dma_ipc_non_interference \
   --harness ipc_dma_proofs::verify_dispatch_capability_ownership \
   --harness ipc_dma_proofs::verify_sequence_number_monotonicity \
   --harness ipc_dma_proofs::verify_rollback_atomic_removal \
   suites/S08_Security/formal_proofs/ipc_dma_kani.rs
+
 ```
 
 ## CI Integration

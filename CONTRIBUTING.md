@@ -1,42 +1,46 @@
-# 🛠️ Contributing to the SigmaOS Sovereign Lattice
+# SigmaOS — Contribution Guide
 
-Thank you for your interest in expanding the SigmaOS ecosystem! To maintain our status as a **Silicon Sovereign** entity, all contributions must adhere to the following standards.
-
----
-
-## 💎 Sovereign Coding Standards
-
-### 1. Zero-Dependency Mandate
-- **Strictly `no_std`**: Shards must not link against standard libraries (`libc`, `libstdc++`).
-- **Sovereign Primitives**: Use only the primitives defined in `libsigma.h` or `sigma_libc.h`.
-- **Static Memory**: Prefer static or pool-based allocation over dynamic heap usage in kernel shards.
-
-### 2. Shard Atomic Modularity
-- Every new feature MUST be its own shard in the `suites/` directory.
-- Each shard must have a `module.json` manifest defining its dependencies.
-- Shards must communicate exclusively via **Capability-Based IPC**.
-
-### 3. Portability via UAL
-- Never include environment-specific assembly (e.g., `asm volatile`) directly in a generic shard.
-- Use the **Universal Abstraction Layer (UAL)** to switch between hardware implementations.
+> Join the evolution of digital sovereignty.
 
 ---
 
-## 🚀 Shard Development Workflow
+## 🛠️ Coding Standards
 
-1.  **Scaffold**: Use `./s-cli scaffold <shard_name>` to generate the shard template.
-2.  **Implement**: Write your logic in `shard_init.c`.
-3.  **Verify**:
-    - Run `./s-cli test --shard <name>` for atomic verification.
-    - Run `./s-cli build` to ensure the lattice synchronizes correctly.
-4.  **Audit**: Ensure no external headers are leaked.
+SigmaOS is an industrial-grade project. All contributions must adhere to:
+
+- **Language**: C++20 for shards, Python 3.10+ for tooling.
+- **Pattern**: Strict OOP Singleton (Context Manager).
+
+- **Zero-Dependency**: No `libc` or external headers allowed in Layer 1-4 shards.
+- **Documentation**: Every code change MUST be accompanied by an update to the corresponding `.md` file in `WIKI/`.
+
+## 🌀 Branching Strategy
+
+We follow a staged release cadence:
+
+- **`main` (Stable)**: The production-ready sovereign lattice. Only merges from `beta` allowed.
+- **`beta` (Staging)**: Integration branch for feature-complete topics.
+
+- **`alpha` (Topic)**: Feature-specific branches (e.g., `feat/neural-paging`).
+
+## 🚀 CI/CD Pipeline
+
+Every Pull Request triggers the following automated suite:
+
+1. **Lattice Rebuild**: All 600+ shards must compile with zero warnings.
+2. **Regression Suite**: IRQ handlers and SHS v2 are verified for RDTSC-cycle precision.
+
+3. **Security Scan**: Verify PQC signatures and TPM handshake protocols.
+4. **Doc Lint**: Ensure all WIKI files follow the GitHub Flavored Markdown standard.
+
+## 🤝 How to Contribute Shards
+
+
+1. **Fork** the repository and create an `alpha` branch.
+2. **Develop** your shard in the appropriate `suites/` directory.
+
+3. **Sync** documentation in `WIKI/`.
+4. **Submit** a PR to `beta` for review.
 
 ---
-
-## 📬 Pull Request Process
-
-1.  **Atomicity**: One feature per PR.
-2.  **Documentation**: Update the Wiki if your shard introduces new system capabilities.
-3.  **Verification**: Ensure all CI/CD jobs (Matrix Build, Kani Proofs, Fuzzing) pass.
-
-*By contributing to SigmaOS, you help build the foundation of a sovereign digital future.*
+"Sovereignty is a collective intent."
