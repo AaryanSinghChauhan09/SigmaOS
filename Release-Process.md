@@ -1,32 +1,58 @@
-﻿# SigmaOS Release Process
+﻿1
+
 
 This document describes how official SigmaOS releases are prepared, signed, and distributed.
 
-## ðŸ“¦ 1. Preparation
 
-- Finalize the `CHANGELOG.md` with all new features and fixes.
-- Tag the release in Git (e.g., `v100.2_Futuristic`).
-- Trigger the **Release Pipeline** in GitHub Actions.
+1
 
-## ðŸ–‹ï¸ 2. Cryptographic Signing
 
-- Release artifacts (`sigmaos.iso`, `shards.tar.gz`) are signed using the Sovereign PQC key.
-- Hashes (SHA-256) are generated for all binaries.
 
-## ðŸš€ 3. Distribution
+1
 
-- Signed binaries are uploaded to GitHub Releases.
-- The `SHARDS.manifest` is updated to reflect the new lattice state.
-- Documentation and Wiki are updated to match the release version.
 
-## ðŸ›¡ï¸ 4. Verification
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
 
 Users can verify the integrity of a release using the following command:
 
-```bash
+
+1
+
+
 sigma-verify --artifact sigmaos.iso --signature sigmaos.iso.sig
-```
+
+
+1
+
 
 ---
 
-### For security reporting during the release cycle, see [Security Policy](Security-Policy.md)
+
+1
+

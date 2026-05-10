@@ -1,7 +1,12 @@
-﻿# ðŸ›  STATISTICIAN Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- Statistical analysis suite
-- survey tools
-- visualization
+
+1
+
+
+
+1
+

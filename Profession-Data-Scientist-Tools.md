@@ -1,7 +1,12 @@
-﻿# ðŸ›  DATA_SCIENTIST Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- Jupyter notebooks
-- ML libraries
-- visualization dashboards
+
+1
+
+
+
+1
+

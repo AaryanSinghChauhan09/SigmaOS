@@ -1,9 +1,16 @@
-﻿# ðŸ›  ARTIST Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- Creative suite (drawing
-- design
-- video editing)
-- portfolio manager
-- media export tools
+
+1
+
+
+
+1
+
+
+
+1
+

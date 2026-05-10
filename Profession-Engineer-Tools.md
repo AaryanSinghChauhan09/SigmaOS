@@ -1,25 +1,44 @@
-﻿# ðŸ›  ENGINEER Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- Compilers
-- CAD tools
-- simulation engines
-- project management dashboards
 
-## ðŸ“œ Compliance Rules
+1
 
-- Bureau of Indian Standards (BIS)
-- IS codes
 
-## ðŸ§® Professional Calculators
 
-- Structural load
-- electrical circuit
-- fluid mechanics
+1
 
-## ðŸ§¬ Core Algorithms
 
-- CAD simulation
-- stress analysis
-- project scheduling
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+

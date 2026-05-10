@@ -1,7 +1,12 @@
-﻿# ðŸ›  BIOTECH_SCIENTIST Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- Lab management
-- DNA analysis
-- compliance
+
+1
+
+
+
+1
+

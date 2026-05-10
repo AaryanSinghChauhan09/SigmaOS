@@ -1,7 +1,12 @@
-﻿# ðŸ›  ECONOMIST Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- Market modeling
-- forecasting
-- compliance
+
+1
+
+
+
+1
+

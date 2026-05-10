@@ -1,8 +1,12 @@
-﻿# ðŸ›  EVENT_PLANNER Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- Scheduling
-- resource allocation
-- ticketing
-- communication tools
+
+1
+
+
+
+1
+

@@ -1,6 +1,8 @@
-﻿# ðŸ›  ANTHROPOLOGIST Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- Survey tools
-- cultural data visualization
+
+1
+

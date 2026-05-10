@@ -1,7 +1,12 @@
-﻿# ðŸ›  LINGUIST Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- Corpus analysis
-- visualization
-- compliance
+
+1
+
+
+
+1
+

@@ -1,8 +1,11 @@
-﻿# Î£ SIGMAOS WIKI RESTORATION GUIDE
+﻿1
+
 
 The SigmaOS Wiki currently suffers from broken navigation and missing pages. Follow these instructions to restore the Sovereign Documentation.
 
-## ðŸ”— Fixing Broken Links
+
+1
+
 
 The GitHub Wiki uses a specific slug format. All relative links must point to the Wiki page name, not the file path.
 
@@ -10,21 +13,37 @@ The GitHub Wiki uses a specific slug format. All relative links must point to th
 
 **Correct**: `[API Reference](API-Reference)`
 
-### Action Plan
+
+1
+
+
+
 
 1. Navigate to the `Home` page of the Wiki.
 2. Update the Sidebar and Table of Contents to use the Wiki slug format (no extension, no directory prefix).
+
+
+
 3. Ensure the following pages are populated with content from the `docs/` directory in the main repo.
 
-## ðŸ“„ Page Population Matrix | Wiki Page Name | Source File (Main Repo) | | :------------------- | :------------------------ | | **Home** | `README.md` (Modularized) | | **API Reference** | `docs/API_REFERENCE.md` | | **CI Pipeline** | `docs/CI_PIPELINE.md` | | **Sovereign Shards** | `os_guide.md` | ## ðŸš€ Automation Shard
+
+1
+
 
 To automate Wiki synchronization, use the following GitHub Action pattern in your `.github/workflows/wiki-sync.yml`:
 
-```yaml
-- name: Push to Wiki
+
+1
+
+
+
+1
+
   uses: Andrew-Chen-Wang/github-wiki-action@v4
   with:
     path: docs/
     token: ${{ secrets.GITHUB_TOKEN }}
 
-```
+
+1
+

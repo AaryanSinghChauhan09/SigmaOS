@@ -1,7 +1,12 @@
-﻿# ðŸ›  NANOTECH_SCIENTIST Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- Simulation
-- visualization
-- compliance
+
+1
+
+
+
+1
+

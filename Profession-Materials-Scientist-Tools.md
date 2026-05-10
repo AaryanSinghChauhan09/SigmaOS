@@ -1,7 +1,12 @@
-﻿# ðŸ›  MATERIALS_SCIENTIST Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- Simulation
-- modeling
-- compliance
+
+1
+
+
+
+1
+

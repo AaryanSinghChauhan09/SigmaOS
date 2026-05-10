@@ -1,8 +1,12 @@
-﻿# ðŸ›  SOFTWARE_DEV Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- IDE
-- version control (Git)
-- CI/CD pipelines
-- debugging tools
+
+1
+
+
+
+1
+

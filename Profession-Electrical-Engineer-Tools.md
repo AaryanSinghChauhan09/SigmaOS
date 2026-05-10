@@ -1,7 +1,12 @@
-﻿# ðŸ›  ELECTRICAL_ENGINEER Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- Circuit design tools
-- simulation
-- compliance testing
+
+1
+
+
+
+1
+

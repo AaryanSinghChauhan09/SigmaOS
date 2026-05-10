@@ -1,7 +1,12 @@
-﻿# ðŸ›  MECHANICAL_ENGINEER Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- Simulation engines
-- CAD
-- manufacturing workflow integration
+
+1
+
+
+
+1
+

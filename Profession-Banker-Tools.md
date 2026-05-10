@@ -1,24 +1,44 @@
-﻿# ðŸ›  BANKER Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- Loan management
-- compliance
-- transaction dashboards
 
-## ðŸ“œ Compliance Rules
+1
 
-- RBI guidelines
-- Basel norms
 
-## ðŸ§® Professional Calculators
 
-- EMI
-- loan interest
-- NPA provisioning
+1
 
-## ðŸ§¬ Core Algorithms
 
-- Risk scoring
-- fraud detection
-- portfolio optimization
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+

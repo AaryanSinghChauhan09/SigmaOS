@@ -1,8 +1,12 @@
-﻿# ðŸ›  HR_MANAGER Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- Employee records
-- payroll
-- compliance
-- recruitment tools
+
+1
+
+
+
+1
+

@@ -1,7 +1,12 @@
-﻿# ðŸ›  DATA_ANALYST Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- Data visualization
-- statistical analysis
-- machine learning integration
+
+1
+
+
+
+1
+

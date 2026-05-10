@@ -1,8 +1,12 @@
-﻿# ðŸ›  CHEF Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- Recipe management
-- supply chain integration
-- scheduling
-- nutritional analysis
+
+1
+
+
+
+1
+

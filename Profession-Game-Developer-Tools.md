@@ -1,7 +1,12 @@
-﻿# ðŸ›  GAME_DEVELOPER Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- Game engines
-- asset pipelines
-- GPU orchestration
+
+1
+
+
+
+1
+

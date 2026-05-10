@@ -1,8 +1,12 @@
-﻿# ðŸ›  RESEARCHER Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- Data mining
-- citation management
-- analytics dashboards
-- visualization
+
+1
+
+
+
+1
+

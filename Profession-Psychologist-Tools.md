@@ -1,7 +1,12 @@
-﻿# ðŸ›  PSYCHOLOGIST Tools
+﻿1
+
 
 Required Tools & Functions:
 
-- Experiment management
-- patient records
-- compliance
+
+1
+
+
+
+1
+
