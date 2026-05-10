@@ -1,4 +1,4 @@
-﻿# Î£ SIGMAOS: THE ULTIMATE EVOLUTION (1000+ IMPROVEMENTS)
+# Σ SIGMAOS: THE ULTIMATE EVOLUTION (1000+ IMPROVEMENTS)
 
 This document outlines 100 critical improvements across 10 strategic domains, totaling 1000+ functional aspirations for the SigmaOS Sovereign Lattice.
 
@@ -134,4 +134,4 @@ This document outlines 100 critical improvements across 10 strategic domains, to
 9. **AVX Compositor Shard**: UI rendering offloaded to vector units.
 10. **Lattice Telemetry Graphing**: Visualizing hardware health in 4K.
 
-# Î£ Sovereignty is Absolute. The Work Continues
+# Σ Sovereignty is Absolute. The Work Continues

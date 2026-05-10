@@ -1,4 +1,4 @@
-﻿# UI (Zenith UI CSS Engine)
+# UI (Zenith UI CSS Engine)
 
 SigmaOS implements the **Zenith UI CSS Engine**, a zero-dependency, native DOM compositing layer designed to definitively surpass the design reputation of **elementary OS**, **Solus**, and **EndeavourOS**.
 

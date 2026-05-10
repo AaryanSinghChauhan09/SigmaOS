@@ -1,7 +1,7 @@
-﻿# ðŸ›  NURSE Tools
+# 🛠 NURSE Tools
 
 Required Tools & Functions:
 
-- Patient monitoring
-- medication schedules
-- compliance with medical protocols
+* Patient monitoring
+* medication schedules
+* compliance with medical protocols

@@ -7,11 +7,11 @@ This certificate verifies that **SigmaOS** has achieved the state of **Sovereign
 ## 🏛️ Achievement Logs
 
 
-- **Modularity**: 33 Master Suites / 1.4 Million Crystal-Granular Shards.
-- **Leadership**: Empirically verified supremacy over Windows, macOS, and Linux.
+* **Modularity**: 33 Master Suites / 1.4 Million Crystal-Granular Shards.
+* **Leadership**: Empirically verified supremacy over Windows, macOS, and Linux.
 
-- **Intelligence**: Fully integrated S13-S33 Neural Fabric directing all 33 suites.
-- **Persistence**: Ghost-Mesh immortality established across the Hive.
+* **Intelligence**: Fully integrated S13-S33 Neural Fabric directing all 33 suites.
+* **Persistence**: Ghost-Mesh immortality established across the Hive.
 
 ## 🚀 Final Registry Key
 

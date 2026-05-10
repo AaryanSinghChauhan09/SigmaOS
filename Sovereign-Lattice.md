@@ -15,8 +15,8 @@ Shards are organized into functional tiers for optimal orchestration:
 
 ## 3. Communication Protocol
 Shards communicate via the **Sovereign Intent Bus (SIB)**, a zero-copy, capability-gated IPC mechanism.
-- **Synchronous**: High-priority kernel transitions.
-- **Asynchronous**: Non-blocking userland service requests.
+* **Synchronous**: High-priority kernel transitions.
+* **Asynchronous**: Non-blocking userland service requests.
 
 ## 4. Hardening & Isolation
 Every shard operates within a **Zero-Trust Sandbox**. Shards possess only the capabilities explicitly granted in the Sovereign Registry, preventing lateral movement during a security breach.

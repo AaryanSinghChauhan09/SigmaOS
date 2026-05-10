@@ -1,28 +1,28 @@
-﻿# ðŸ›  ACCOUNTANT Tools
+# 🛠 ACCOUNTANT Tools
 
 Required Tools & Functions:
 
-- Ledger system
-- tax compliance modules
-- balance sheet generator
-- audit tools
+* Ledger system
+* tax compliance modules
+* balance sheet generator
+* audit tools
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
-- Ind-AS
-- GST
-- Income Tax Act
-- Companies Act
+* Ind-AS
+* GST
+* Income Tax Act
+* Companies Act
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
-- GST
-- TDS
-- depreciation
-- advance tax
+* GST
+* TDS
+* depreciation
+* advance tax
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
-- Automated ledger balancing
-- audit trail generation
-- tax filing optimization
+* Automated ledger balancing
+* audit trail generation
+* tax filing optimization

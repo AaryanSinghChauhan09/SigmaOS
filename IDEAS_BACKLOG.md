@@ -1,4 +1,4 @@
-﻿# SigmaOS Ideas Backlog
+# SigmaOS Ideas Backlog
 
 This document tracks speculative and future ideas for the SigmaOS Sovereign Lattice.
 

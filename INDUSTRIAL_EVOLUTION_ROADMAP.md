@@ -1,4 +1,4 @@
-﻿# Î£ SIGMAOS: DISTRO ABSORPTION ROADMAP
+# Σ SIGMAOS: DISTRO ABSORPTION ROADMAP
 
 ## Crushing Legacy Paradigms via the Sovereign Shard Ecosystem
 

@@ -1,10 +1,10 @@
-﻿# SigmaOS Filesystem Hierarchy Standard (FHS) Compliance
+# SigmaOS Filesystem Hierarchy Standard (FHS) Compliance
 
 To provide "shared identity" and familiarity for Linux users, SigmaOS maps its decentralized Sovereign Lattice to the traditional **Filesystem Hierarchy Standard (FHS)**. [**STATUS: OPERATIONAL**]
 
-## ðŸ“‚ Mapping the Lattice to FHS
+## 📂 Mapping the Lattice to FHS
 
-While SigmaOS is amnesic and shard-based, it provides a Virtual File System (VFS) layer that presents a standard Linux directory structure: | FHS Path | SigmaOS Lattice Shard / Role | | :--- | :--- | | `/bin` / `/sbin` | **Core Shard Binaries**: Immutable system-level execution shards. | | `/etc` | **SovereignPersonalization**: Configuration shards persisted via `LatticeFS`. | | `/dev` | **HAL Shards**: Direct hardware abstraction layer device mappings. | | `/lib` / `/lib64` | **SovereignLibC** / **LinuxDriverCompat**: Shared shims and compatibility ABIs. | | `/mnt` | **LatticeMount**: Dynamic attachment points for external storage shards (NVMe, USB). | | `/proc` / `/sys` | **SovereignTelemetry**: Real-time kernel state and hardware metrics. | | `/var` | **SovereignLog**: Persistent logging and ephemeral shard state. | | `/home` | **User Workspaces**: Cryptographically isolated per-user sandboxes. | ## ðŸ“¦ Convention Over Configuration
+While SigmaOS is amnesic and shard-based, it provides a Virtual File System (VFS) layer that presents a standard Linux directory structure: | FHS Path | SigmaOS Lattice Shard / Role | | :--- | :--- | | `/bin` / `/sbin` | **Core Shard Binaries**: Immutable system-level execution shards. | | `/etc` | **SovereignPersonalization**: Configuration shards persisted via `LatticeFS`. | | `/dev` | **HAL Shards**: Direct hardware abstraction layer device mappings. | | `/lib` / `/lib64` | **SovereignLibC** / **LinuxDriverCompat**: Shared shims and compatibility ABIs. | | `/mnt` | **LatticeMount**: Dynamic attachment points for external storage shards (NVMe, USB). | | `/proc` / `/sys` | **SovereignTelemetry**: Real-time kernel state and hardware metrics. | | `/var` | **SovereignLog**: Persistent logging and ephemeral shard state. | | `/home` | **User Workspaces**: Cryptographically isolated per-user sandboxes. | ## 📦 Convention Over Configuration
 
 By adhering to these paths, SigmaOS ensures that:
 

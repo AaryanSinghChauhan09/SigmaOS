@@ -1,8 +1,8 @@
-﻿# ðŸ›  VETERINARIAN Tools
+# 🛠 VETERINARIAN Tools
 
 Required Tools & Functions:
 
-- Animal patient records
-- lab results
-- scheduling
-- veterinary standards
+* Animal patient records
+* lab results
+* scheduling
+* veterinary standards

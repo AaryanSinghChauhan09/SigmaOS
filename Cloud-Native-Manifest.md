@@ -1,8 +1,8 @@
-﻿# SigmaOS Cloud-Native Manifest
+# SigmaOS Cloud-Native Manifest
 
 SigmaOS is a **Cloud-Native Operating System** designed for high-performance distributed computing. It manages distributed "procs" (processes) across machine clusters with absolute technical sovereignty.
 
-## ðŸ›ï¸ Core Architectural Pillars
+## 🏛️ Core Architectural Pillars
 
 ### 1. Cloud-First Design
 
@@ -20,13 +20,13 @@ Implements **Portable Shard Execution** using WebAssembly, allowing "procs" to b
 
 Focus is placed on "Lattice-level" resource management, treating distributed machine clusters as a single unified system.
 
-## ðŸš€ Advanced Capabilities
+## 🚀 Advanced Capabilities
 
 * **Predictive Prefetching**: AI-driven CPU/RAM allocation based on historical telemetry.
 * **eBPF Observability**: Low-overhead network and syscall profiling for distributed debugging.
 * **Hardware Attestation**: Support for Intel SGX and AMD SEV to cryptographically verify "Secure Realms."
 * **Kubernetes Operator**: Native management of SigmaOS realms within existing K8s pipelines.
 
-## ðŸŒ Universal Deployment (Any Device) | Platform | Implementation | | :--- | :--- | | **Bare-Metal** | Virtio Universal Bus + UEFI/GRUB Boot | | **Edge/IoT** | Ultra-lightweight nameserver & mobile targets | | **Browser** | WASM/WASI Native Port + Web-Bridge (WebRTC) | | **Mobile** | PWA Wrapper for "Installable" dashboard access | ---
+## 🌍 Universal Deployment (Any Device) | Platform | Implementation | | :--- | :--- | | **Bare-Metal** | Virtio Universal Bus + UEFI/GRUB Boot | | **Edge/IoT** | Ultra-lightweight nameserver & mobile targets | | **Browser** | WASM/WASI Native Port + Web-Bridge (WebRTC) | | **Mobile** | PWA Wrapper for "Installable" dashboard access | ---
 
-### Î£ Sovereignty is Distributed. The Lattice is One
+### Σ Sovereignty is Distributed. The Lattice is One

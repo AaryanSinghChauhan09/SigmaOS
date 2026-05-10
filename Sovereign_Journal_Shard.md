@@ -45,10 +45,10 @@ Boot Entries (pre-seeded):
 ## Design Philosophy
 
 
-- **Lock-Free Ring**: Circular overwrite eliminates allocation and mutex overhead.
-- **CRIT+ Immediate**: `EMERG`, `ALERT`, `CRIT` entries bypass the buffer and print immediately.
+* **Lock-Free Ring**: Circular overwrite eliminates allocation and mutex overhead.
+* **CRIT+ Immediate**: `EMERG`, `ALERT`, `CRIT` entries bypass the buffer and print immediately.
 
-- **Structured Fields**: Every entry carries `seq`, `timestamp_us`, `unit`, and `message` for machine-readable analysis.
+* **Structured Fields**: Every entry carries `seq`, `timestamp_us`, `unit`, and `message` for machine-readable analysis.
 
 ---
 

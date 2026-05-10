@@ -1,8 +1,8 @@
-﻿# SigmaOS Sovereign Packaging Specification (SPS)
+# SigmaOS Sovereign Packaging Specification (SPS)
 
 The **Sovereign Packaging Specification** defines the industrial standard for creating, signing, and distributing shards within the SigmaOS lattice.
 
-## ðŸ“¦ Package Structure (.spkg)
+## 📦 Package Structure (.spkg)
 
 A SigmaOS package is a PQC-sealed archive containing:
 
@@ -11,7 +11,7 @@ A SigmaOS package is a PQC-sealed archive containing:
 3. **resources/**: Assets, icons, and localized strings.
 4. **signature.sig**: Dilithium-based PQC signature.
 
-## ðŸ“ manifest.json Example
+## 📝 manifest.json Example
 
 ```json
 {
@@ -24,15 +24,15 @@ A SigmaOS package is a PQC-sealed archive containing:
 }
 ```
 
-## ðŸ›¡ï¸ Sandboxing Policies
+## 🛡️ Sandboxing Policies
 
 Packages must specify their isolation level:
 
-- **STRICT**: No hardware access; amnesic memory only.
-- **SYSTEM**: Access to kernel bridges (requires attestation).
-- **TRUSTED**: Full hardware access (Official shards only).
+* **STRICT**: No hardware access; amnesic memory only.
+* **SYSTEM**: Access to kernel bridges (requires attestation).
+* **TRUSTED**: Full hardware access (Official shards only).
 
-## ðŸ–‹ï¸ Verification Flow
+## 🖋️ Verification Flow
 
 1. The `SovereignMarketplace` fetches the `.spkg`.
 2. `SovereignAttestation` verifies the PQC signature against the developer's public key.

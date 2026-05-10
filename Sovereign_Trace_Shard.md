@@ -54,10 +54,10 @@ Workflow:
 ## Design Philosophy
 
 
-- **Zero External Dependency**: No ptrace syscall, no LD_PRELOAD tricks — pure C11 intercept table.
-- **Per-PID or Global**: Attach to a single mission or trace all silicon missions simultaneously.
+* **Zero External Dependency**: No ptrace syscall, no LD_PRELOAD tricks — pure C11 intercept table.
+* **Per-PID or Global**: Attach to a single mission or trace all silicon missions simultaneously.
 
-- **Ns-Accurate Timing**: Every event records elapsed nanoseconds for latency forensics.
+* **Ns-Accurate Timing**: Every event records elapsed nanoseconds for latency forensics.
 
 ---
 

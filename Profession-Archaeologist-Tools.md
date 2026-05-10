@@ -1,7 +1,7 @@
-﻿# ðŸ›  ARCHAEOLOGIST Tools
+# 🛠 ARCHAEOLOGIST Tools
 
 Required Tools & Functions:
 
-- Artifact cataloging
-- GIS mapping
-- compliance
+* Artifact cataloging
+* GIS mapping
+* compliance

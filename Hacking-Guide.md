@@ -43,9 +43,9 @@ extern "C" void myshard_init() {
 
 ## 3. Validation & Compliance
 Before submission, every shard must undergo the **Sovereign Audit**:
-- **Static Analysis**: Must pass `clang-tidy` with zero warnings.
-- **Cycle Budget**: Must initialize within 5,000 RDTSC cycles.
-- **Capability Check**: Must declare minimum required capabilities in the Sovereign Registry.
+* **Static Analysis**: Must pass `clang-tidy` with zero warnings.
+* **Cycle Budget**: Must initialize within 5,000 RDTSC cycles.
+* **Capability Check**: Must declare minimum required capabilities in the Sovereign Registry.
 
 ## 4. Submission
 1. Create a `feature/` branch.

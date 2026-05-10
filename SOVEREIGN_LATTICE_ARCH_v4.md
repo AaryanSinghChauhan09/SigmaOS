@@ -7,13 +7,13 @@ The SigmaOS Sovereign Lattice is a 33-suite hierarchical structure designed for 
 ### Core Structure
 
 
-- **S01 Genesis**: The bedrock of the system. Contains `sigma_types.h`, `sigma_libc.h`, and the master boot registry.
-- **S02 Boot**: Multi-stage bootstrap nexus.
+* **S01 Genesis**: The bedrock of the system. Contains `sigma_types.h`, `sigma_libc.h`, and the master boot registry.
+* **S02 Boot**: Multi-stage bootstrap nexus.
 
-- **S03 Orchestrator**: Kernel-level VTable management and task dispatching.
-- **S10 Registry**: Central authority for shard lifecycle management and custom UDF orchestration.
+* **S03 Orchestrator**: Kernel-level VTable management and task dispatching.
+* **S10 Registry**: Central authority for shard lifecycle management and custom UDF orchestration.
 
-- **S25 ZeroKernel**: The innermost security ring, enforcing the Sovereign Purity contract.
+* **S25 ZeroKernel**: The innermost security ring, enforcing the Sovereign Purity contract.
 
 ### Inclusion Principle: Suite-Relative Paths
 

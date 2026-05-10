@@ -8,8 +8,8 @@ SigmaOS is built upon the "Sovereign Lattice" architecture, a highly modular, sh
 
 The operating system functionality is divided into 33 Sovereign Suites (S01 to S33). 
 
-- **S01 (Genesis):** The foundational boot and core initialization suite.
-- **S33 (Terminal Fulfillment):** The highest-level user-facing environment (Zenith UI, CLI).
+* **S01 (Genesis):** The foundational boot and core initialization suite.
+* **S33 (Terminal Fulfillment):** The highest-level user-facing environment (Zenith UI, CLI).
 
 ### Visualizing the Lattice
 

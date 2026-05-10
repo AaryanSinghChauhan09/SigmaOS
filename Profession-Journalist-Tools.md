@@ -1,8 +1,8 @@
-﻿# ðŸ›  JOURNALIST Tools
+# 🛠 JOURNALIST Tools
 
 Required Tools & Functions:
 
-- Research tools
-- publishing suite
-- compliance checks
-- transcription tools
+* Research tools
+* publishing suite
+* compliance checks
+* transcription tools

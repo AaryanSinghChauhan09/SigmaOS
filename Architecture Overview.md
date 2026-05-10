@@ -54,26 +54,26 @@ The Nexus layer (S100) aggregates and enhances the USPs of the world's leading e
 ### 📄 Sovereign Office (Microsoft/Google/LibreOffice)
 
 
-- **Collaborative Shard-Locking**: Real-time multi-user editing with kernel-level data integrity.
-- **Universal Compatibility**: Native support for `.docx`, `.xlsx`, `.pptx`, and `.odt` via translation shards.
+* **Collaborative Shard-Locking**: Real-time multi-user editing with kernel-level data integrity.
+* **Universal Compatibility**: Native support for `.docx`, `.xlsx`, `.pptx`, and `.odt` via translation shards.
 
 ### 📊 Sovereign BI & Data Science (Tableau/PowerBI)
 
 
-- **Lattice Visualization**: Real-time rendering of system and business metrics via Zenith Morphic Shaders.
-- **Predictive Intelligence**: Uses Layer 7 AI to forecast business trends and resource usage.
+* **Lattice Visualization**: Real-time rendering of system and business metrics via Zenith Morphic Shaders.
+* **Predictive Intelligence**: Uses Layer 7 AI to forecast business trends and resource usage.
 
 ### 💼 Sovereign ERP & CRM (Odoo/Oracle/Salesforce/Zoho/Bitrix24)
 
 
-- **Modular Business Logic**: Shards for Inventory, Payroll, and Sales that can be hot-swapped.
-- **Unified Communication**: Bitrix24-style integration of mail, chat, and task management directly into the OS shell.
+* **Modular Business Logic**: Shards for Inventory, Payroll, and Sales that can be hot-swapped.
+* **Unified Communication**: Bitrix24-style integration of mail, chat, and task management directly into the OS shell.
 
 ### 🎨 Sovereign Creative Suite (Adobe/Apple Pro)
 
 
-- **Direct-Silicon Rendering**: 120Hz GPU-accelerated media processing with zero-copy buffer transfers.
-- **Pro-Level Color Lattice**: System-wide color management for designers and filmmakers.
+* **Direct-Silicon Rendering**: 120Hz GPU-accelerated media processing with zero-copy buffer transfers.
+* **Pro-Level Color Lattice**: System-wide color management for designers and filmmakers.
 
 ---
 
@@ -83,14 +83,14 @@ The Nexus layer (S100) aggregates and enhances the USPs of the world's leading e
 
 SHS merges the **stability of Fedora's CFS** with the **priority-based preemptive scheduling of Windows**. 
 
-- **Predictive Quantum**: AI predicts workload spikes to adjust time slices.
-- **Priority Boosting**: Critical real-time threads (Zenith UI, Security) receive instant context switches (42-cycle latency).
+* **Predictive Quantum**: AI predicts workload spikes to adjust time slices.
+* **Priority Boosting**: Critical real-time threads (Zenith UI, Security) receive instant context switches (42-cycle latency).
 
 ### Memory: Adaptive Buddy & Slab Lattice
 
 
-- **Buddy/Slab (Linux style)**: High-efficiency physical memory management.
-- **Demand Paging (Windows style)**: Optimized virtual memory that swaps shards based on AI-predicted usage patterns.
+* **Buddy/Slab (Linux style)**: High-efficiency physical memory management.
+* **Demand Paging (Windows style)**: Optimized virtual memory that swaps shards based on AI-predicted usage patterns.
 
 ### Resilience: Apex Rollback
 
@@ -100,10 +100,10 @@ Combines **openSUSE Snapper-style CoW snapshots** with **Windows-style System Re
 
 All Inter-Shard communication in v11.0 is **Zero-Trust**. Every packet is:
 
-- **Capability-Gated**: Requires a valid token.
-- **PQC-Encrypted**: Encrypted via Kyber-1024 at the micro-packet level.
+* **Capability-Gated**: Requires a valid token.
+* **PQC-Encrypted**: Encrypted via Kyber-1024 at the micro-packet level.
 
-- **Audit-Logged**: Automatically logged to the Sovereign Data Science shard.
+* **Audit-Logged**: Automatically logged to the Sovereign Data Science shard.
 
 ---
 
@@ -150,10 +150,10 @@ The **HAL** (S04) implements plug-and-play detection. Drivers are loaded as atom
 
 Inspired by the Windows Registry but reimagined for sovereignty, the **Sovereign Registry** is a centralized, hierarchical configuration lattice. 
 
-- **Format**: Plain-text / YAML-based for human readability.
-- **Backend**: Version-controlled via internal Git shards for perfect auditability.
+* **Format**: Plain-text / YAML-based for human readability.
+* **Backend**: Version-controlled via internal Git shards for perfect auditability.
 
-- **Access**: Gated by capability-based security tokens.
+* **Access**: Gated by capability-based security tokens.
 
 ---
 
@@ -162,16 +162,16 @@ Inspired by the Windows Registry but reimagined for sovereignty, the **Sovereign
 ### CI/CD & Automated Testing
 
 
-- **Lattice Verification**: PRs trigger full shard rebuilds and unit tests.
-- **Regression Suite**: IRQ handlers and the SHS are verified against timing models.
+* **Lattice Verification**: PRs trigger full shard rebuilds and unit tests.
+* **Regression Suite**: IRQ handlers and the SHS are verified against timing models.
 
 ### Release Cadence
 
 
-- **Alpha**: Experimental shards.
-- **Beta**: Feature-complete lattice staging.
+* **Alpha**: Experimental shards.
+* **Beta**: Feature-complete lattice staging.
 
-- **Stable**: Long-Term Support (LTS) builds.
+* **Stable**: Long-Term Support (LTS) builds.
 
 ### Stabilization Path
 

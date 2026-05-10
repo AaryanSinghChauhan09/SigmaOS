@@ -1,8 +1,8 @@
-﻿# Î£ SIGMAOS: THE 1000-ITEM INDUSTRIAL BACKLOG
+# Σ SIGMAOS: THE 1000-ITEM INDUSTRIAL BACKLOG
 
 This backlog expands the foundational "Distro Mastery" categories into thousands of actionable technical shards, documentation tasks, and community milestones.
 
-## âš™ï¸ Kernel & Hardware Shards (Items 1-200)
+## ⚙️ Kernel & Hardware Shards (Items 1-200)
 
 1. **ABI-001**: Implement `kmalloc` / `kfree` shims for Linux compatibility. [Operational]
 2. **ABI-002**: Map `sk_buff` structures to `SovereignNetStack`. [Operational]
@@ -22,7 +22,7 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 16. **UI-001**: Implement Zenith Graphical Installer. [Operational]
 17. **ABI-003**: Implement `musl` libc shims for Alpine-level minimalism. [Operational]
 
-## ðŸ“¦ Package Ecosystem & Orbs (Items 201-400)
+## 📦 Package Ecosystem & Orbs (Items 201-400)
 
 1. **PKG-001**: Implement `sigma-pkg` dependency graph resolver. [Operational]
 2. **PKG-002**: Add native Zstd compression to Orb packages. [Operational]
@@ -32,7 +32,7 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 6. **IDX-001**: Build P2P metadata indexer for the Sigma Marketplace. [Operational]
 7. **PKG-004**: Implement `SovereignBusyBox` multi-call utility shard. [Operational]
 
-## ðŸ–¥ï¸ User Experience & Zenith (Items 401-600)
+## 🖥️ User Experience & Zenith (Items 401-600)
 
 1. **FHS-001**: Symlink `/usr/bin` to Sovereign binary lattice. [Operational]
 2. **UX-001**: Port GTK4 backend to Zenith Morphic Engine.
@@ -41,7 +41,7 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 5. **A11Y-002**: Add high-contrast "Matrix-Green" and "Neon-White" themes.
 6. **WM-001**: Implement tiling layout engine (i3/sway style) in Zenith.
 
-## ðŸ›¡ï¸ Security & Compliance (Items 601-800)
+## 🛡️ Security & Compliance (Items 601-800)
 
 1. **SEC-001**: Audit `SovereignPQC` Kyber implementation vs NIST FIPS-203. [Operational]
 2. **SEC-002**: Implement `SovereignAppArmor` mandatory access control (MAC). [Operational/SEC-005 Enabled]
@@ -56,7 +56,7 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 11. **CLAW-003**: Implement Sovereign Agent Governance (Advanced Quotas). [Operational]
 12. **CLAW-004**: Implement Sovereign Agent Quotas Extended (AI Scalability). [Operational]
 
-## ðŸŒ Ecosystem Integration (Items 801-1000)
+## 🌐 Ecosystem Integration (Items 801-1000)
 
 1. **K8S-001**: Implement `SovereignKubelet` shim. [Operational]
 2. **GAM-001**: Port Vulkan 1.3 loader to `SovereignGPU`. [Operational]

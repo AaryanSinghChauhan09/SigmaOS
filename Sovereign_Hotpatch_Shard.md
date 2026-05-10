@@ -44,10 +44,10 @@ Trampoline Engine
 ## Design Philosophy
 
 
-- **Zero Reboot**: Kernel updates are applied while all missions continue running.
-- **Ref-Count Safety**: A patch refuses to revert while missions are using the patched path.
+* **Zero Reboot**: Kernel updates are applied while all missions continue running.
+* **Ref-Count Safety**: A patch refuses to revert while missions are using the patched path.
 
-- **CVE-First**: Boot patch `CVE-SIGMA-001_null_deref` is pre-seeded at init.
+* **CVE-First**: Boot patch `CVE-SIGMA-001_null_deref` is pre-seeded at init.
 
 ---
 

@@ -1,7 +1,7 @@
-﻿# ðŸ›  ENERGY_SCIENTIST Tools
+# 🛠 ENERGY_SCIENTIST Tools
 
 Required Tools & Functions:
 
-- Grid modeling
-- sustainability dashboards
-- compliance
+* Grid modeling
+* sustainability dashboards
+* compliance

@@ -43,11 +43,11 @@ Latency Histogram Engine
 ## Design Philosophy
 
 
-- **Zero External Dependency**: No BPF JIT, no perf system calls — all logic is pure C11.
-- **Zenith Accuracy**: Histogram buckets operate at 64ns granularity.
+* **Zero External Dependency**: No BPF JIT, no perf system calls — all logic is pure C11.
+* **Zenith Accuracy**: Histogram buckets operate at 64ns granularity.
 
-- **Dynamic Arming**: Any kernel address can be probed at any mission time.
-- **Deterministic Flushing**: Histogram flush is atomic and non-blocking.
+* **Dynamic Arming**: Any kernel address can be probed at any mission time.
+* **Deterministic Flushing**: Histogram flush is atomic and non-blocking.
 
 ---
 

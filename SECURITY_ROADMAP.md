@@ -1,8 +1,8 @@
-﻿# SigmaOS Security & Compliance Roadmap
+# SigmaOS Security & Compliance Roadmap
 
 To achieve parity with enterprise Linux distributions, SigmaOS is implementing a rigorous security and compliance infrastructure. While our Post-Quantum Cryptography (PQC) integration provides next-generation security, we must establish standard enterprise compliance pipelines.
 
-## ðŸ”’ 1. Reproducible Builds
+## 🔒 1. Reproducible Builds
 
 To prevent supply chain attacks and ensure the integrity of the Sovereign Lattice:
 
@@ -10,19 +10,19 @@ To prevent supply chain attacks and ensure the integrity of the Sovereign Lattic
 * **Independent Auditing**: Publish build manifests so third parties can independently verify the ISO generation process.
 * *(Status: Implementation in Progress via GitHub Actions)*
 
-## ðŸ“¦ 2. Signed Update Infrastructure
+## 📦 2. Signed Update Infrastructure
 
 * **Cryptographic Signatures**: All updates via `SovereignOrbManager` will require Ed25519 or Post-Quantum Lattice-based signatures.
 * **Key Rotation**: Implement a robust key rotation and revocation strategy.
 * **Rollback Prevention**: Ensure the update manager rejects downgraded binaries to prevent exploit reintroduction.
 
-## ðŸ›¡ï¸ 3. Vulnerability Disclosure & CVEs
+## 🛡️ 3. Vulnerability Disclosure & CVEs
 
 * **Bug Bounty Program**: Launch a structured bug bounty program for critical Ring-0 vulnerabilities.
 * **Security Advisory Board**: A dedicated team to triage incoming security reports privately before public disclosure.
 * **CVE Integration**: Register as a CVE Numbering Authority (CNA) to issue CVEs for vulnerabilities specific to the SigmaOS kernel and `SovereignSandbox`.
 
-## ðŸ“œ 4. Enterprise Compliance Certifications
+## 📜 4. Enterprise Compliance Certifications
 
 Long-term, SigmaOS will target the following compliance standards to allow adoption in government and highly regulated industries:
 

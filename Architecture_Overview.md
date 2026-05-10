@@ -24,7 +24,7 @@ graph TD
 
 Communication between layers is enforced by the **Sovereign IPC Bus**. No driver can directly access the kernel space without an encrypted capability token.
 
-- **Example Flow**: The AI Daemon (L5) requests CPU metrics. It sends an IPC request to the Sandbox (L4), which authenticates it and forwards it to the Kernel (L3). The Kernel reads from HAL (L2) and replies.
+* **Example Flow**: The AI Daemon (L5) requests CPU metrics. It sends an IPC request to the Sandbox (L4), which authenticates it and forwards it to the Kernel (L3). The Kernel reads from HAL (L2) and replies.
 
 ## Hardware Abstraction
 

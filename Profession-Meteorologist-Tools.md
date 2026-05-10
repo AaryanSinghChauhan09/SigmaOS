@@ -1,6 +1,6 @@
-﻿# ðŸ›  METEOROLOGIST Tools
+# 🛠 METEOROLOGIST Tools
 
 Required Tools & Functions:
 
-- Weather modeling
-- forecasting dashboards
+* Weather modeling
+* forecasting dashboards

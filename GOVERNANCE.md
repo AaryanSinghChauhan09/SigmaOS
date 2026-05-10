@@ -1,6 +1,6 @@
-﻿# ðŸ›ï¸ SigmaOS Governance Model
+# 🏛️ SigmaOS Governance Model
 
-## ðŸŒŒ Sovereign Stewardship
+## 🌌 Sovereign Stewardship
 
 SigmaOS is governed by the **Sovereign Maintainers Collective**. Unlike
 
@@ -28,4 +28,4 @@ isolation.
 
 ---
 
-### Î£ SIGMAOS: Beyond Linux. Absolute Sovereignty
+### Σ SIGMAOS: Beyond Linux. Absolute Sovereignty

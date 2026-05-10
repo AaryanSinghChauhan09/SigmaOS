@@ -1,4 +1,4 @@
-﻿# Shard Development Guide
+# Shard Development Guide
 
 SigmaOS is built on **Atomic Shards**. Follow these rules to build new modules.
 

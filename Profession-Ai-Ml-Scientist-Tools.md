@@ -1,7 +1,7 @@
-﻿# ðŸ›  AI_ML_SCIENTIST Tools
+# 🛠 AI_ML_SCIENTIST Tools
 
 Required Tools & Functions:
 
-- Model training
-- dataset management
-- GPU orchestration
+* Model training
+* dataset management
+* GPU orchestration

@@ -1,6 +1,6 @@
-﻿# ðŸ›  OCEANOGRAPHER Tools
+# 🛠 OCEANOGRAPHER Tools
 
 Required Tools & Functions:
 
-- Ocean data visualization
-- simulation
+* Ocean data visualization
+* simulation

@@ -1,4 +1,4 @@
-﻿# SigmaOS Developer Guide
+# SigmaOS Developer Guide
 
 Welcome to the SigmaOS Sovereign Repository.
 

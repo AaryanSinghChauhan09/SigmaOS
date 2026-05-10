@@ -1,7 +1,7 @@
-﻿# ðŸ›  ATHLETE_COACH Tools
+# 🛠 ATHLETE_COACH Tools
 
 Required Tools & Functions:
 
-- Training planner
-- performance analytics
-- health monitoring
+* Training planner
+* performance analytics
+* health monitoring

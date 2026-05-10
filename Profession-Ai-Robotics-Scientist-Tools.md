@@ -1,7 +1,7 @@
-﻿# ðŸ›  AI_ROBOTICS_SCIENTIST Tools
+# 🛠 AI_ROBOTICS_SCIENTIST Tools
 
 Required Tools & Functions:
 
-- Hardware integration
-- simulation
-- AI orchestration
+* Hardware integration
+* simulation
+* AI orchestration

@@ -1,7 +1,7 @@
-﻿# ðŸ›  SOCIAL_SCIENTIST Tools
+# 🛠 SOCIAL_SCIENTIST Tools
 
 Required Tools & Functions:
 
-- Survey tools
-- statistical analysis
-- visualization
+* Survey tools
+* statistical analysis
+* visualization

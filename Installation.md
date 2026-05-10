@@ -1,4 +1,4 @@
-﻿# SigmaOS Installation Guide
+# SigmaOS Installation Guide
 
 Welcome to the SigmaOS Installation Guide. This document provides a step-by-step procedure to deploy the SigmaOS Sovereign Lattice onto physical hardware or a virtualized environment.
 

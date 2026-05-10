@@ -9,18 +9,18 @@ The Neural Bridge (S09/S27) shunts natural language prompts directly into the So
 ## 🚀 Capabilities
 
 
-- **System Analysis**: Real-time auditing of shard health and memory compaction.
-- **Natural Language CLI**: Execute complex OS operations (e.g., "Fix broken shards" or "Optimize memory") using standard English.
+* **System Analysis**: Real-time auditing of shard health and memory compaction.
+* **Natural Language CLI**: Execute complex OS operations (e.g., "Fix broken shards" or "Optimize memory") using standard English.
 
-- **VFS Intelligence**: Automated categorization and security auditing of virtual file system assets.
+* **VFS Intelligence**: Automated categorization and security auditing of virtual file system assets.
 
 ## 📅 Roadmap
 
 
-- **Phase 1**: Natural Language Command Mapping (v33.0.4) - **[ACTIVE]**
-- **Phase 2**: Local Inference Shard Integration (WASM-based LLM).
+* **Phase 1**: Natural Language Command Mapping (v33.0.4) - **[ACTIVE]**
+* **Phase 2**: Local Inference Shard Integration (WASM-based LLM).
 
-- **Phase 3**: Predictive Lattice Optimization (Self-Evolving Code).
+* **Phase 3**: Predictive Lattice Optimization (Self-Evolving Code).
 
 ---
 *The OS is no longer a tool. It is a partner.*

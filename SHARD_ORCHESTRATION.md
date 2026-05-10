@@ -1,4 +1,4 @@
-﻿# SigmaOS: Shard Orchestration & Self-Healing
+# SigmaOS: Shard Orchestration & Self-Healing
 
 ## The 600-Shard Lattice
 
@@ -32,5 +32,5 @@ public:
 
 ## Future Roadmap
 
-- **Neural Orchestration**: AI-driven predictive shard migration based on workload telemetry.
-- **Global Lattice Sync**: Synchronizing shards across geographically distributed SigmaOS nodes.
+* **Neural Orchestration**: AI-driven predictive shard migration based on workload telemetry.
+* **Global Lattice Sync**: Synchronizing shards across geographically distributed SigmaOS nodes.

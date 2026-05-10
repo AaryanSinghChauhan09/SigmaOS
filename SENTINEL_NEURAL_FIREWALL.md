@@ -6,8 +6,8 @@ The **Sentinel Neural Firewall** defines SigmaOS’s approach to absolute Cyber 
 
 Rather than relying on massive cloud-trained tensor networks, the S08 matrix employs a localized **Perceptron Heuristic Model**. 
 
-- **Algorithm**: `Sigmoid( Sum(Weight * FeatureCount) + Bias )`
-- **Theory**: The engine counts specific string occurrences (representing known heuristic vulnerabilities like executing code, encoded blobs, etc.) within the content. These feature counts are multiplied by pre-defined threshold weights and passed through a Sigmoid activation function to generate a normalized threat probability `P(t)`.
+* **Algorithm**: `Sigmoid( Sum(Weight * FeatureCount) + Bias )`
+* **Theory**: The engine counts specific string occurrences (representing known heuristic vulnerabilities like executing code, encoded blobs, etc.) within the content. These feature counts are multiplied by pre-defined threshold weights and passed through a Sigmoid activation function to generate a normalized threat probability `P(t)`.
 
 ## 💻 OS and Sandboxing Integration
 

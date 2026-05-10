@@ -1,4 +1,4 @@
-﻿# Core Improvements for SigmaOS
+# Core Improvements for SigmaOS
 
 ## Stability & Reliability
 
@@ -20,7 +20,7 @@ SigmaOS already integrates Pacman, Flatpak, and Nix. To match Linux distros:
 * Provide tutorials for common workflows (developer setup, gaming, AI engineering).
 * Offer reproducible environments (Docker, DevContainers) with preconfigured profiles.
 
-## ðŸŒ Community & Governance
+## 🌐 Community & Governance
 
 ### Community Contributions
 
@@ -34,7 +34,7 @@ SigmaOS already integrates Pacman, Flatpak, and Nix. To match Linux distros:
 * Establish a CVE disclosure process and bug bounty program.
 * Provide reproducible builds with cryptographic signing.
 
-## ðŸ–¥ï¸ User Experience
+## 🖥️ User Experience
 
 ### Desktop Environment
 
@@ -46,9 +46,9 @@ The Zenith cyberpunk-inspired UI is unique, but polish is key:
 
 ### AI Integration
 
-SigmaOSâ€™s neural assistant and workflow automation are differentiators.
+SigmaOS’s neural assistant and workflow automation are differentiators.
 
 * To gain trust, make AI features optional and transparent.
 * Document privacy policies and data handling clearly.
 
-> **ðŸ‘‰ In short:** stability, ecosystem, documentation, and community governance are the pillars that will elevate SigmaOS to Linux distro-level maturity. Its futuristic AI-driven vision is compelling, but without the reliability and trust Linux users expect, adoption will remain niche.
+> **👉 In short:** stability, ecosystem, documentation, and community governance are the pillars that will elevate SigmaOS to Linux distro-level maturity. Its futuristic AI-driven vision is compelling, but without the reliability and trust Linux users expect, adoption will remain niche.

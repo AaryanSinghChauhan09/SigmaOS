@@ -1,4 +1,4 @@
-﻿# SigmaOS Competitive Gap Analysis
+# SigmaOS Competitive Gap Analysis
 
 This document identifies the critical areas where the SigmaOS Sovereign Lattice currently lags behind mature, industrial-grade competitors (such as Linux, Windows NT, and macOS/XNU). It serves as a prioritization guide for the engineering team.
 

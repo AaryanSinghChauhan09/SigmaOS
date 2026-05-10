@@ -1,7 +1,7 @@
-﻿# ðŸ›  SALES_EXEC Tools
+# 🛠 SALES_EXEC Tools
 
 Required Tools & Functions:
 
-- CRM tools
-- lead tracking
-- reporting dashboards
+* CRM tools
+* lead tracking
+* reporting dashboards

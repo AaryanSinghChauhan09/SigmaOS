@@ -53,11 +53,11 @@ Context Switch Engine
 ## Design Philosophy
 
 
-- **Zero External Dependency**: No PAM modules, no dbus, no uid-map userspace tools.
-- **Atomic Context Switching**: Single-instruction deactivate/activate cycle.
+* **Zero External Dependency**: No PAM modules, no dbus, no uid-map userspace tools.
+* **Atomic Context Switching**: Single-instruction deactivate/activate cycle.
 
-- **Capability Federation**: Each persona's accessible shard commands are governed by its bitmask.
-- **Aesthetic Sovereignty**: Per-persona ANSI themes are applied at the silicon shell layer.
+* **Capability Federation**: Each persona's accessible shard commands are governed by its bitmask.
+* **Aesthetic Sovereignty**: Per-persona ANSI themes are applied at the silicon shell layer.
 
 ---
 

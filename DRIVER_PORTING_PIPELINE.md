@@ -1,8 +1,8 @@
-﻿# SigmaOS Driver Porting Pipeline
+# SigmaOS Driver Porting Pipeline
 
 To rapidly expand hardware compatibility, SigmaOS employs a structured driver porting pipeline that leverages our [Universal Linux Driver Compatibility Layer](Linux-Driver-Compat.md).
 
-## ðŸ”§ Practical Strategy
+## 🔧 Practical Strategy
 
 ### 1. Identify Target Hardware
 
@@ -30,7 +30,7 @@ Instead of rewriting complex drivers from scratch (which can take years), we use
 * **Signed Binaries**: Drivers are cryptographically signed by the `SovereignQKD` shard.
 * **Auto-Update**: Users receive driver updates automatically via the `SovereignOrbManager`.
 
-## ðŸ¤ Contribution
+## 🤝 Contribution
 
 We strongly encourage developers to submit patches for unsupported hardware!
 

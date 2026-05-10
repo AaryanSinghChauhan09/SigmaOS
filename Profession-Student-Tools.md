@@ -1,8 +1,8 @@
-﻿# ðŸ›  STUDENT Tools
+# 🛠 STUDENT Tools
 
 Required Tools & Functions:
 
-- Study planner
-- flashcards
-- assignment tracker
-- research tools
+* Study planner
+* flashcards
+* assignment tracker
+* research tools

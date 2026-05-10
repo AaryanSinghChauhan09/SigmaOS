@@ -5,10 +5,10 @@ SigmaOS supports industrial-grade session isolation through the Sovereign Multi-
 ## 🏛️ Session Model
 
 
-- **Lattice-Level Isolation**: Each session is sharded within the S01 Scheduler, ensuring that Guest background processes cannot influence Root execution.
-- **Dynamic VFS Mounting**: Upon switching users, the VFS dynamically remounts the corresponding `/home/user` path using Sovereign HAL hooks.
+* **Lattice-Level Isolation**: Each session is sharded within the S01 Scheduler, ensuring that Guest background processes cannot influence Root execution.
+* **Dynamic VFS Mounting**: Upon switching users, the VFS dynamically remounts the corresponding `/home/user` path using Sovereign HAL hooks.
 
-- **Shared Memory Pools**: Global read-only assets are shared via memory redirection to minimize footprint.
+* **Shared Memory Pools**: Global read-only assets are shared via memory redirection to minimize footprint.
 
 ## 🚀 Native Switching
 
@@ -17,10 +17,10 @@ Sessions can be managed directly via the Terminal or the Zenith Dashboard Accoun
 ## 📅 Roadmap
 
 
-- **Phase 1**: Profile Switching (v33.0.4) - **[ACTIVE]**
-- **Phase 2**: Concurrent Headless Sessions (multi-seat).
+* **Phase 1**: Profile Switching (v33.0.4) - **[ACTIVE]**
+* **Phase 2**: Concurrent Headless Sessions (multi-seat).
 
-- **Phase 3**: Cross-Network Handoff of Active User State.
+* **Phase 3**: Cross-Network Handoff of Active User State.
 
 ---
 *Computing is personal. Sovereignty is shared.*

@@ -49,11 +49,11 @@ SigmaOS has surpassed all industrial competitors by modularizing every kernel fe
 ## ⚙️ Universal Technical Fact-Parity
 
 
-- **Concurrency**: Deadlock-aware Sovereign Mutexes provide industrial thread safety.
-- **Scheduling**: Multi-Level Feedback Queue (MLFQ) ensures nanosecond responsiveness.
+* **Concurrency**: Deadlock-aware Sovereign Mutexes provide industrial thread safety.
+* **Scheduling**: Multi-Level Feedback Queue (MLFQ) ensures nanosecond responsiveness.
 
-- **Database**: Native ACID SQL support integrated into the storage grid.
-- **Audio**: Low-latency Spatial Audio Engine (CoreAudio parity) materialized in S31.
+* **Database**: Native ACID SQL support integrated into the storage grid.
+* **Audio**: Low-latency Spatial Audio Engine (CoreAudio parity) materialized in S31.
 
 ---
 

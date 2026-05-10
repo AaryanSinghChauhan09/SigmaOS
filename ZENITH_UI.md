@@ -1,6 +1,6 @@
-﻿# Zenith Dashboard & Telemetry UI
+# Zenith Dashboard & Telemetry UI
 
-SigmaOS ships with the **Zenith UI Dashboard**â€”a production-grade, hardware-accelerated orchestration interface for the Sovereign Lattice.
+SigmaOS ships with the **Zenith UI Dashboard**—a production-grade, hardware-accelerated orchestration interface for the Sovereign Lattice.
 
 ## Hardware-Accelerated Compositing
 

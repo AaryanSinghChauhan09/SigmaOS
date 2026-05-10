@@ -1,6 +1,6 @@
-﻿# SigmaOS Driver Ecosystem
+# SigmaOS Driver Ecosystem
 
-SigmaOS ships hardware drivers as sovereign kernel shards â€” zero binary blobs, zero kernel-update breakage.
+SigmaOS ships hardware drivers as sovereign kernel shards — zero binary blobs, zero kernel-update breakage.
 
 ## Network Drivers
 

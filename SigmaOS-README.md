@@ -1,114 +1,46 @@
-# Σ SIGMAOS: THE SOVEREIGN LATTICE (v14.0 [NEXUS-SUPREME])
+# SigmaOS — Contribution Guide
 
-> **The "Sigma" of all Operating Systems.**  
-> A supreme fusion of Linux’s ecosystem, Windows’ performance, and **Enterprise-Grade Productivity** (Layer 10: Sovereign Nexus)—reimagined for absolute Digital Sovereignty.
-
----
-
-## 💎 The Vision
-
-SigmaOS is not just a Linux distribution; it is a **Sovereign Lattice** of 600+ atomic shards designed for total hardware-to-userland autonomy. By neutralizing foreign dependencies (`libc`) and implementing silicon-direct orchestration, SigmaOS provides a high-performance environment for the AI-native era.
-
-## 🚀 Technical Pillars
-
-### 🧮 Sovereign Kernel (S01-S07)
-
-
-- **Precise Scheduling**: Sovereign-Fair Scheduler (SFS) with RDTSC-cycle precision.
-- **Atomic Memory**: Buddy & Slab allocation lattice for zero fragmentation.
-
-- **Hardware Abstraction**: Clean IRQ/IDT handling for bare-metal silicon integrity.
-
-### 🛡️ Post-Quantum Security (S08)
-
-
-- **PQC Mesh**: Kyber and Dilithium algorithms integrated into the core IPC.
-- **Hardware Attestation**: Mandatory TPM 2.0 handshake for boot-time integrity.
-
-- **Lattice Policy**: Capability-gated access control across all shards.
-
-### 🧠 AI-Native Autonomy (S09)
-
-
-- **Predictive Resilience**: AI Watchdog that triggers rollbacks before system failure.
-- **Adaptive UI**: Zenith compositor with neural layout optimization.
-
-- **Sovereign Assistant**: Integrated CLI and sidebar for system-wide automation.
-
-### 🔄 Self-Healing Resilience (S41)
-
-
-- **Atomic Snapshots**: Copy-on-Write (CoW) snapshots of the lattice state.
-- **Rollback Daemon**: Automatic recovery to the last known good state on instability.
+> Join the evolution of digital sovereignty.
 
 ---
 
-## 💻 The Sovereign CLI (`s-cli`)
+## 🛠️ Coding Standards
 
-SigmaOS provides a unified namespace for all lattice operations:
+SigmaOS is an industrial-grade project. All contributions must adhere to:
 
-```bash
+* **Language**: C++20 for shards, Python 3.10+ for tooling.
+* **Pattern**: Strict OOP Singleton (Context Manager).
 
-# System & Management
+* **Zero-Dependency**: No `libc` or external headers allowed in Layer 1-4 shards.
+* **Documentation**: Every code change MUST be accompanied by an update to the corresponding `.md` file in `WIKI/`.
 
-s-cli sigma-init     # Manage services
+## 🌀 Branching Strategy
 
-s-cli sigma-top      # Real-time monitor
+We follow a staged release cadence:
 
-s-cli sigma-health   # Full system audit
+* **`main` (Stable)**: The production-ready sovereign lattice. Only merges from `beta` allowed.
+* **`beta` (Staging)**: Integration branch for feature-complete topics.
 
-# Packages & Resilience
+* **`alpha` (Topic)**: Feature-specific branches (e.g., `feat/neural-paging`).
 
-s-cli sigma-pkg install <shard>  # Atomic install with auto-snapshot
+## 🚀 CI/CD Pipeline
 
-s-cli sigma-snap rollback <id>    # Restore previous state
+Every Pull Request triggers the following automated suite:
 
-# Security & AI
+1. **Lattice Rebuild**: All 600+ shards must compile with zero warnings.
+2. **Regression Suite**: IRQ handlers and SHS v2 are verified for RDTSC-cycle precision.
 
-s-cli sigma-sec attest           # TPM 2.0 handshake
+3. **Security Scan**: Verify PQC signatures and TPM handshake protocols.
+4. **Doc Lint**: Ensure all WIKI files follow the GitHub Flavored Markdown standard.
 
-s-cli sigma-ai query "Optimize latency"
-
-```
-
----
-
-## 🛠️ Getting Started
-
-### Prerequisites
+## 🤝 How to Contribute Shards
 
 
-- `gcc` / `clang` (C++20 recommended)
-- `python3` (for `sigma-pkg` and automation)
+1. **Fork** the repository and create an `alpha` branch.
+2. **Develop** your shard in the appropriate `suites/` directory.
 
-- `nasm` (for kernel assembly)
-- `qemu` (for emulation)
-
-### Build the Lattice
-
-```bash
-
-make build
-s-cli sigma-init
-
-```
+3. **Sync** documentation in `WIKI/`.
+4. **Submit** a PR to `beta` for review.
 
 ---
-
-## 📚 Documentation
-
-
-- [Architecture Overview.md](file:///Architecture%20Overview.md)
-- [CLI Reference.md](file:///CLI%20Reference.md)
-
-- [Personalization Profiles.md](file:///Personalization%20Profiles.md)
-- [Security & PQC.md](file:///Security%20&%20PQC.md)
-
-- [Modularization Guide.md](file:///Modularization%20Guide.md)
-- [Roadmap.md](file:///Roadmap.md)
-
-- [Contribution Guide.md](file:///Contribution%20Guide.md)
-- [Competitor Matrix.md](file:///Competitor%20Matrix.md)
-
----
-"Sovereignty is the ultimate efficiency."
+"Sovereignty is a collective intent."

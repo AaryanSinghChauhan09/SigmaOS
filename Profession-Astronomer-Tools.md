@@ -1,7 +1,7 @@
-﻿# ðŸ›  ASTRONOMER Tools
+# 🛠 ASTRONOMER Tools
 
 Required Tools & Functions:
 
-- Telescope data integration
-- simulation
-- visualization
+* Telescope data integration
+* simulation
+* visualization

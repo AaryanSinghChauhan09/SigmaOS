@@ -54,10 +54,10 @@ Auto-Governor Engine (called by Zen Scheduler every tick)
 ## Design Philosophy
 
 
-- **Zero External Dependency**: No cgroupfs, no systemd-cgtop — all logic is pure C11.
-- **Automatic Throttle**: Governor runs every scheduler tick without citizen intervention.
+* **Zero External Dependency**: No cgroupfs, no systemd-cgtop — all logic is pure C11.
+* **Automatic Throttle**: Governor runs every scheduler tick without citizen intervention.
 
-- **Hierarchical**: Groups can be nested for multi-level resource isolation.
+* **Hierarchical**: Groups can be nested for multi-level resource isolation.
 
 ---
 

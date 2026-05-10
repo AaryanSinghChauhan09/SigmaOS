@@ -1,4 +1,4 @@
-﻿# ?? Next Objectives
+# ?? Next Objectives
 
 * **ARM64 optimization for RPi5** ? crush hardware sovereignty requirements.
 * **Autonomous Agent Quota expansion** ? differentiate SigmaOS as the AI-native sovereign OS.

@@ -1,7 +1,7 @@
-﻿# ðŸ›  GENOMICS_SCIENTIST Tools
+# 🛠 GENOMICS_SCIENTIST Tools
 
 Required Tools & Functions:
 
-- DNA sequencing tools
-- visualization
-- compliance
+* DNA sequencing tools
+* visualization
+* compliance

@@ -5,10 +5,10 @@ SigmaOS aims to provide an unparalleled distraction-free environment for profess
 ## 🏛️ Core Mechanics
 
 
-- **Notification Suppression**: When enabled, the OS suppresses all non-critical notifications from userland components.
-- **Visual Dimming**: Peripheral telemetry panes and system widgets are visually muted to emphasize the active focal zone.
+* **Notification Suppression**: When enabled, the OS suppresses all non-critical notifications from userland components.
+* **Visual Dimming**: Peripheral telemetry panes and system widgets are visually muted to emphasize the active focal zone.
 
-- **Architectural Purity**: The Focus Mode orchestrator uses raw silicon iteration flows, completely bypassing high-level JavaScript `.forEach()` loops to maintain minimal battery and CPU impedance.
+* **Architectural Purity**: The Focus Mode orchestrator uses raw silicon iteration flows, completely bypassing high-level JavaScript `.forEach()` loops to maintain minimal battery and CPU impedance.
 
 ## 🚀 Activation
 

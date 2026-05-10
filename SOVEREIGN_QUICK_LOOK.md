@@ -5,10 +5,10 @@ The **Sovereign Quick Look Matrix** provides instantaneous visibility into the s
 ## 🏛️ Core Mechanics
 
 
-- **Zero-Launch Execution**: File data and memory payloads are rendered directly on the Zenith UI composite overlay, avoiding sub-process creation.
-- **Hardware Agnostic Parsing**: Supports rendering raw Hex, Base64 imagery, and decoded text immediately out of the Sovereign Heap memory allocations.
+* **Zero-Launch Execution**: File data and memory payloads are rendered directly on the Zenith UI composite overlay, avoiding sub-process creation.
+* **Hardware Agnostic Parsing**: Supports rendering raw Hex, Base64 imagery, and decoded text immediately out of the Sovereign Heap memory allocations.
 
-- **Silicon Driven Lookup**: Quick Look completely bypasses slow prototypical functions (e.g., recursive Array iterations) by crawling tree paths procedurally via silicon primitives.
+* **Silicon Driven Lookup**: Quick Look completely bypasses slow prototypical functions (e.g., recursive Array iterations) by crawling tree paths procedurally via silicon primitives.
 
 ## 🚀 Activation
 

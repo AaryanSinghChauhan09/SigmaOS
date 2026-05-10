@@ -1,23 +1,23 @@
-﻿# ðŸ›  CIVIL_SERVANT Tools
+# 🛠 CIVIL_SERVANT Tools
 
 Required Tools & Functions:
 
-- Policy tools
-- compliance
-- citizen records
+* Policy tools
+* compliance
+* citizen records
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
-- Service rules
-- policy drafting guidelines
+* Service rules
+* policy drafting guidelines
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
-- Budget allocation
-- pension
-- pay scale
+* Budget allocation
+* pension
+* pay scale
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
-- Policy impact simulation
-- citizen data indexing
+* Policy impact simulation
+* citizen data indexing

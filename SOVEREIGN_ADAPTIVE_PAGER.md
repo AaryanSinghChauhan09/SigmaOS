@@ -11,10 +11,10 @@ Instead of trusting the browser's Garbage Collector or high-level JS Array manip
 
 Sigma builds upon this primitive CS foundation by applying a localized **Markov Chain model**.
 
-- The OS probabilistically tracks page transition patterns (e.g., how often navigating from `Terminal` mathematically leads to `Telemetry`).
-- These weights inhabit a local prediction matrix (`markovMatrix`).
+* The OS probabilistically tracks page transition patterns (e.g., how often navigating from `Terminal` mathematically leads to `Telemetry`).
+* These weights inhabit a local prediction matrix (`markovMatrix`).
 
-- Before the user even invokes a page jump, the Pager silently executes a background `_predictNext()` loop and pulls the highest probability target directly into hot Cache.
+* Before the user even invokes a page jump, the Pager silently executes a background `_predictNext()` loop and pulls the highest probability target directly into hot Cache.
 
 ## 🚀 Native Integration
 

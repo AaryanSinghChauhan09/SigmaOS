@@ -1,20 +1,20 @@
-﻿# AI Automation Gateway (Claw Stack)
+# AI Automation Gateway (Claw Stack)
 
-The SigmaOS AI Automation Stack is a specialized implementation inspired by **OpenClaw** ("The lobster way ðŸ¦ž"), designed for secure, autonomous system orchestration.
+The SigmaOS AI Automation Stack is a specialized implementation inspired by **OpenClaw** ("The lobster way 🦞"), designed for secure, autonomous system orchestration.
 
-## ðŸ¦ž The Sovereign Claw Approach
+## 🦞 The Sovereign Claw Approach
 
 Unlike traditional automation, the Claw Stack operates under a **Zero-Trust AI Policy**. Agents can observe the system and propose workflows, but all final executions must be validated by the `SovereignSandbox` and the `SovereignWorkflowEngine`.
 
-## ðŸ› ï¸ Integrated Shards
+## 🛠️ Integrated Shards
 
 ### 1. SovereignClawGateway (`kernel/core/ai/`)
 
 The entry point for multi-channel AI events.
 
-- **Multi-channel Inbox**: Receives incoming events/messages.
-- **Tool Execution**: Spawns securely sandboxed AI tasks.
-- **Live Canvas Support**: Communicates with the Zenith UI for visual feedback.
+* **Multi-channel Inbox**: Receives incoming events/messages.
+* **Tool Execution**: Spawns securely sandboxed AI tasks.
+* **Live Canvas Support**: Communicates with the Zenith UI for visual feedback.
 
 ### 2. SovereignAgentCore (`kernel/shards/ai/`)
 
@@ -32,13 +32,13 @@ Provides secure, read-only telemetry (CPU, Mem, Shard Health) to the AI stack.
 
 Guarantees AI safety by executing all tools within unprivileged containers.
 
-- Utilizing Seccomp-BFP, amnesic memory profiles, and strict capability matrices.
+* Utilizing Seccomp-BFP, amnesic memory profiles, and strict capability matrices.
 
-## ðŸš€ Key Features
+## 🚀 Key Features
 
-- **Predictive Optimization**: The AI stack emits kernel hints to optimize the scheduler based on workload patterns.
-- **Self-Healing Shards**: Agents automatically detect and propose remediations for shard failures.
-- **Local-First Privacy**: All processing runs locally, ensuring that SigmaOS preserves absolute sovereignty over user data.
+* **Predictive Optimization**: The AI stack emits kernel hints to optimize the scheduler based on workload patterns.
+* **Self-Healing Shards**: Agents automatically detect and propose remediations for shard failures.
+* **Local-First Privacy**: All processing runs locally, ensuring that SigmaOS preserves absolute sovereignty over user data.
 
 ---
 

@@ -27,20 +27,20 @@ To achieve the performance metrics established in the **Sovereign Singularity**,
 ### 1. 🏎️ Lattice Acceleration (S04 HAL)
 
 
-- **Requirement**: CPU with **AVX-512** or **AMX** support.
-- **Working Condition**: The **S04 FastMove** shard utilizes 512-bit vector registers to saturate the L1 cache throughput during inter-suite data migrations.
+* **Requirement**: CPU with **AVX-512** or **AMX** support.
+* **Working Condition**: The **S04 FastMove** shard utilizes 512-bit vector registers to saturate the L1 cache throughput during inter-suite data migrations.
 
 ### 2. 🛡️ Entropy Purity (S08 Security)
 
 
-- **Requirement**: Hardware-level **RDRAND / RDSEED** and **AES-NI**.
-- **Working Condition**: The **Sentinel Purity Matrix** requires high-entropy source data for the PQC (Post-Quantum Cryptography) handshake protocol across the S18 QuantumLink.
+* **Requirement**: Hardware-level **RDRAND / RDSEED** and **AES-NI**.
+* **Working Condition**: The **Sentinel Purity Matrix** requires high-entropy source data for the PQC (Post-Quantum Cryptography) handshake protocol across the S18 QuantumLink.
 
 ### 3. 🧠 Neural Throughput (S09/S27 Intelligence)
 
 
-- **Requirement**: Matrix Multiplication Units or GPGPU Shard-Mapping.
-- **Working Condition**: The **Neural Bridge (S09)** performs forward-pass optimizations only when the local silicon provides a direct weight-shunted signal path.
+* **Requirement**: Matrix Multiplication Units or GPGPU Shard-Mapping.
+* **Working Condition**: The **Neural Bridge (S09)** performs forward-pass optimizations only when the local silicon provides a direct weight-shunted signal path.
 
 ---
 **CERTIFICATION: ALL COMPARISONS ARE BASED ON MEASURED KERNEL TELEMETRY.**

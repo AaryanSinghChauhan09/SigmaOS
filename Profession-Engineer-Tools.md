@@ -1,25 +1,25 @@
-﻿# ðŸ›  ENGINEER Tools
+# 🛠 ENGINEER Tools
 
 Required Tools & Functions:
 
-- Compilers
-- CAD tools
-- simulation engines
-- project management dashboards
+* Compilers
+* CAD tools
+* simulation engines
+* project management dashboards
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
-- Bureau of Indian Standards (BIS)
-- IS codes
+* Bureau of Indian Standards (BIS)
+* IS codes
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
-- Structural load
-- electrical circuit
-- fluid mechanics
+* Structural load
+* electrical circuit
+* fluid mechanics
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
-- CAD simulation
-- stress analysis
-- project scheduling
+* CAD simulation
+* stress analysis
+* project scheduling

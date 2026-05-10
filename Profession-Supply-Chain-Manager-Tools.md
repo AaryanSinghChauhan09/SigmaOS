@@ -1,7 +1,7 @@
-﻿# ðŸ›  SUPPLY_CHAIN_MANAGER Tools
+# 🛠 SUPPLY_CHAIN_MANAGER Tools
 
 Required Tools & Functions:
 
-- Logistics dashboards
-- fleet tracking
-- warehouse management
+* Logistics dashboards
+* fleet tracking
+* warehouse management

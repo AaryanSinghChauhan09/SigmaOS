@@ -41,11 +41,11 @@ By leveraging an atomic A/B slot system and a dedicated rollback daemon, SigmaOS
 ## 🎯 Target Use Cases
 
 
-- **Sovereign Individuals**: Complete control over data and execution.
-- **Critical Infrastructure**: Quantum-safe security for high-stakes environments.
+* **Sovereign Individuals**: Complete control over data and execution.
+* **Critical Infrastructure**: Quantum-safe security for high-stakes environments.
 
-- **AI Researchers**: Hardware-native performance for local model execution.
-- **Industrial Systems**: Resilience via self-healing and minimal TCB.
+* **AI Researchers**: Hardware-native performance for local model execution.
+* **Industrial Systems**: Resilience via self-healing and minimal TCB.
 
 ---
 

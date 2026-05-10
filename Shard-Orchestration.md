@@ -10,8 +10,8 @@ Every shard in the SigmaOS lattice follows a strict lifecycle managed by the **S
 
 ## 2. Dynamic Scheduling
 The **Sovereign-Fair Scheduler (SFS)** uses machine learning to predict shard resource needs.
-- **Quantum Scaling**: Adjusts time slices based on real-time task urgency.
-- **Affinity**: Keeps related shards on the same physical silicon core to minimize cache misses.
+* **Quantum Scaling**: Adjusts time slices based on real-time task urgency.
+* **Affinity**: Keeps related shards on the same physical silicon core to minimize cache misses.
 
 ## 3. Resilience & Self-Healing
 If a shard enters a **FAILED** state:

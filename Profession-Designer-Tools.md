@@ -1,7 +1,7 @@
-﻿# ðŸ›  DESIGNER Tools
+# 🛠 DESIGNER Tools
 
 Required Tools & Functions:
 
-- Wireframing tools
-- prototyping
-- accessibility testing
+* Wireframing tools
+* prototyping
+* accessibility testing

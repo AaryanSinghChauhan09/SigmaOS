@@ -1,7 +1,7 @@
-﻿# ðŸ›  LOGISTICS_MANAGER Tools
+# 🛠 LOGISTICS_MANAGER Tools
 
 Required Tools & Functions:
 
-- Fleet tracking
-- supply chain dashboards
-- warehouse management
+* Fleet tracking
+* supply chain dashboards
+* warehouse management

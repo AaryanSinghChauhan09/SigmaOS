@@ -1,10 +1,10 @@
-﻿# SigmaOS Build Guide
+# SigmaOS Build Guide
 
 ## Prerequisites
 
-- `aarch64-linux-gnu-g++` (cross-compiler for ARM64)
-- `make`
-- QEMU (for emulation testing)
+* `aarch64-linux-gnu-g++` (cross-compiler for ARM64)
+* `make`
+* QEMU (for emulation testing)
 
 ## Quick Build
 

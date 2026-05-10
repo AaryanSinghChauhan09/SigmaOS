@@ -1,4 +1,4 @@
-﻿# Hacking SigmaOS Zenith
+# Hacking SigmaOS Zenith
 
 SigmaOS is an HTML/JS-based sovereign simulation.
 

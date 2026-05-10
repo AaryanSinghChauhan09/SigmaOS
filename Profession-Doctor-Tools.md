@@ -1,25 +1,25 @@
-﻿# ðŸ›  DOCTOR Tools
+# 🛠 DOCTOR Tools
 
 Required Tools & Functions:
 
-- Patient records
-- prescription management
-- lab results integration
-- telemedicine tools
+* Patient records
+* prescription management
+* lab results integration
+* telemedicine tools
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
-- Medical Council of India guidelines
-- Ayushman Bharat protocols
+* Medical Council of India guidelines
+* Ayushman Bharat protocols
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
-- Dosage
-- BMI
-- medical billing
+* Dosage
+* BMI
+* medical billing
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
-- Patient record indexing
-- diagnostic prediction
-- lab result interpretation
+* Patient record indexing
+* diagnostic prediction
+* lab result interpretation

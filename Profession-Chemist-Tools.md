@@ -1,7 +1,7 @@
-﻿# ðŸ›  CHEMIST Tools
+# 🛠 CHEMIST Tools
 
 Required Tools & Functions:
 
-- Molecular modeling
-- lab notebooks
-- compliance
+* Molecular modeling
+* lab notebooks
+* compliance

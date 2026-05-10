@@ -5,10 +5,10 @@ The SigmaOS Sovereign Profiler is a high-frequency observability suite that moni
 ## 🏛️ Monitoring Model
 
 
-- **Non-Invasive Instrumentation**: The Profiler shunts data directly from the S01 Scheduler using a lock-free ring-buffer, ensuring sub-1ms overhead.
-- **Resource Quantification**: CPU time is measured in 12ns intervals; memory is tracked at the slab-allocator level via the S05 PMM.
+* **Non-Invasive Instrumentation**: The Profiler shunts data directly from the S01 Scheduler using a lock-free ring-buffer, ensuring sub-1ms overhead.
+* **Resource Quantification**: CPU time is measured in 12ns intervals; memory is tracked at the slab-allocator level via the S05 PMM.
 
-- **Micro-Audit Capability**: Users can drill down into individual shard sub-processes to identify "lattice congestion" points.
+* **Micro-Audit Capability**: Users can drill down into individual shard sub-processes to identify "lattice congestion" points.
 
 ## 🚀 Native Integration
 

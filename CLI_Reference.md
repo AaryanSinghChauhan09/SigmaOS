@@ -1,10 +1,10 @@
-﻿# SigmaOS Command Line Interface (CLI) Reference
+# SigmaOS Command Line Interface (CLI) Reference
 
 The SigmaOS CLI (`s-cli`) is built on a scalable namespace architecture. Instead of flat lists of commands, every operation is categorized into logical subsystems. This ensures the environment remains modular, intuitive, and completely free of bloat.
 
 ---
 
-## ðŸ§  `s-assist` (Intelligence & AI)
+## 🧠 `s-assist` (Intelligence & AI)
 
 Interact directly with the Sigma Assistant for system insights and dynamic optimization.
 
@@ -13,7 +13,7 @@ Interact directly with the Sigma Assistant for system insights and dynamic optim
 * `s-assist optimize <task>` - Auto-tunes the system for specific workloads (e.g., `gaming`, `video editing`).
 * `s-assist explain` - Provides transparency logs explaining why the AI made a specific system adjustment.
 
-## ðŸ”§ `s-func`, `s-lib`, `s-comp`, `s-driver` (Modularisation)
+## 🔧 `s-func`, `s-lib`, `s-comp`, `s-driver` (Modularisation)
 
 Manage predefined functions, libraries, components, and hardware drivers.
 
@@ -26,7 +26,7 @@ Manage predefined functions, libraries, components, and hardware drivers.
 * `s-driver load <device>` - Load a driver on-demand.
 * `s-driver audit` - Check driver dependencies.
 
-## âš™ï¸ `s-auto` (Automations)
+## ⚙️ `s-auto` (Automations)
 
 * `s-auto backup nightly` - Schedule automated nightly snapshots.
 * `s-auto prune weekly` - Auto-remove unused dependencies.
@@ -34,7 +34,7 @@ Manage predefined functions, libraries, components, and hardware drivers.
 * `s-auto rollback detect` - Auto-rollback on crash detection.
 * `s-auto monitor <component>` - Watchdog for third-party modules.
 
-## ðŸ“¦ `s-deps` (Dependency Management)
+## 📦 `s-deps` (Dependency Management)
 
 Ensure the OS remains free of dependency bloat.
 
@@ -43,21 +43,21 @@ Ensure the OS remains free of dependency bloat.
 * `s-deps explain <package>` - Explain why a specific dependency is required.
 * `s-deps reduce <lib>` - Replace a heavy library with a modular equivalent.
 
-## âš¡ `s-perf` (Performance Tuning)
+## ⚡ `s-perf` (Performance Tuning)
 
 * `s-perf boost` - Temporarily maximize performance for heavy workloads.
 * `s-perf cache adaptive` - Enable predictive app pre-loading.
 * `s-perf isolate <process>` - Isolate a resource-heavy process in a micro-VM.
 * `s-perf profile gaming` - Fast boot with minimal background services.
 
-## ðŸŒ `s-net` & `s-sec` (Networking & Security)
+## 🌐 `s-net` & `s-sec` (Networking & Security)
 
 * `s-net secure` - Enforce internal Zero-Trust subsystem authentication.
 * `s-sec audit` - Run a comprehensive security audit.
 * `s-sec encrypt <file>` - Encrypt a file with Quantum-Safe keys.
 * `s-sec firewall enable` - Enable strict firewall rules.
 
-## ðŸŽ¨ `s-theme`, `s-dash`, `s-profile`, `s-ui` (Personalization)
+## 🎨 `s-theme`, `s-dash`, `s-profile`, `s-ui` (Personalization)
 
 * `s-theme set dark` - Switch aesthetic theme.
 * `s-theme dynamic` - Enable time-based environmental themes.
@@ -65,7 +65,7 @@ Ensure the OS remains free of dependency bloat.
 * `s-profile switch work` - Instantly swap to the Work profile.
 * `s-ui adaptive` - Enable adaptive UI formatting based on device type (desktop, tablet, VR).
 
-## ðŸš€ `s-install` & `s-access` (Ease of Use)
+## 🚀 `s-install` & `s-access` (Ease of Use)
 
 * `s-help <command>` - Contextual help.
 * `s-onboard wizard` - Guided setup for new users.
@@ -74,13 +74,13 @@ Ensure the OS remains free of dependency bloat.
 * `s-access voice enable` - Enable voice commands.
 * `s-access shortcut list` - List accessibility shortcuts.
 
-## ðŸž `s-dev` (Developer Tools)
+## 🐞 `s-dev` (Developer Tools)
 
 * `s-dev test <module>` - Run unit tests on a specific module.
 * `s-dev lint` - Check coding style consistency.
 * `s-dev ci` - Trigger the CI/CD pipeline locally.
 
-## ðŸ‘¥ `s-community` (Community & Governance)
+## 👥 `s-community` (Community & Governance)
 
 * `s-community share <theme>` - Share a theme or profile with the Sovereign Lattice.
 * `s-community fetch` - Download community-curated templates.

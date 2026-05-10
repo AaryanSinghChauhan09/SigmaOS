@@ -9,8 +9,8 @@ All feature branches for the upcoming milestone are merged into `develop`. No ne
 
 ### Phase 2: Lattice Hardening
 The `develop` branch undergoes rigorous stress testing in QEMU and bare-metal environments.
-- **PQC Validation**: Verifying Kyber/Dilithium throughput under load.
-- **Self-Healing Audit**: Forcing shard failures to verify `S41` rollback resilience.
+* **PQC Validation**: Verifying Kyber/Dilithium throughput under load.
+* **Self-Healing Audit**: Forcing shard failures to verify `S41` rollback resilience.
 
 ### Phase 3: Cryptographic Signing
 The finalized lattice image is cryptographically signed using the project's **Industrial Master Key**. Every shard binary is hashed and verified against the Sovereign Registry.
@@ -20,9 +20,9 @@ The signed image is pushed to the [Official Release Channel](https://github.com/
 
 ## 3. Versioning Strategy
 We adhere to **Sovereign Semantic Versioning**:
-- **Major**: Architectural shifts in the Sovereign Lattice (e.g., v14.0).
-- **Minor**: New shard additions or USP integrations.
-- **Patch**: Security remediations and minor bug fixes.
+* **Major**: Architectural shifts in the Sovereign Lattice (e.g., v14.0).
+* **Minor**: New shard additions or USP integrations.
+* **Patch**: Security remediations and minor bug fixes.
 
 ---
 [**← Back to Home**](Home)

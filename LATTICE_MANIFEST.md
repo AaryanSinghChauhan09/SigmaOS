@@ -1,4 +1,4 @@
-﻿# Î£ SIGMAOS: THE SOVEREIGN LATTICE MANIFEST (500 FEATURES)
+# Σ SIGMAOS: THE SOVEREIGN LATTICE MANIFEST (500 FEATURES)
 
 This manifest outlines the 500 individual features and functional shards that define the SigmaOS ecosystem, categorized into 50 thematic clusters.
 
@@ -71,12 +71,12 @@ This manifest outlines the 500 individual features and functional shards that de
 
 ## VI - L. The Extended Lattice (Future Shards)
 
-- **Multimedia Shards (51â€“100)**: 8K Decoders, Spatial Audio Engines.
-- **Security & Red-Teaming (101â€“150)**: Port Scanners, Honeypots, Intrusion Wiping.
-- **AI Integration (151â€“200)**: On-device LLM Shards, Predictive Typing.
-- **IoT & Hardware Interop (201â€“250)**: RISC-V, GPIO, Robotics.
-- **Legal & Compliance (251â€“300)**: Automated Licensing, Residency Enforcement.
-- **Gaming & High Performance (301â€“350)**: Vulkan Drivers, Low-Latency Input.
-- **Userland Productivity (351â€“400)**: Document Shards, Browser Engines.
-- **Legacy Support (401â€“450)**: x86 Emulation, BIOS Layers.
-- **The Zenith Layer (451â€“500)**: Custom Boot Anims, Amnesic Privacy Modes.
+* **Multimedia Shards (51–100)**: 8K Decoders, Spatial Audio Engines.
+* **Security & Red-Teaming (101–150)**: Port Scanners, Honeypots, Intrusion Wiping.
+* **AI Integration (151–200)**: On-device LLM Shards, Predictive Typing.
+* **IoT & Hardware Interop (201–250)**: RISC-V, GPIO, Robotics.
+* **Legal & Compliance (251–300)**: Automated Licensing, Residency Enforcement.
+* **Gaming & High Performance (301–350)**: Vulkan Drivers, Low-Latency Input.
+* **Userland Productivity (351–400)**: Document Shards, Browser Engines.
+* **Legacy Support (401–450)**: x86 Emulation, BIOS Layers.
+* **The Zenith Layer (451–500)**: Custom Boot Anims, Amnesic Privacy Modes.

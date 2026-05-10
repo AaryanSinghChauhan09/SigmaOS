@@ -1,7 +1,7 @@
-﻿# ðŸ›  VIDEOGRAPHER Tools
+# 🛠 VIDEOGRAPHER Tools
 
 Required Tools & Functions:
 
-- Video editing suite
-- rendering tools
-- streaming integration
+* Video editing suite
+* rendering tools
+* streaming integration

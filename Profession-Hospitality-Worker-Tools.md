@@ -1,7 +1,7 @@
-﻿# ðŸ›  HOSPITALITY_WORKER Tools
+# 🛠 HOSPITALITY_WORKER Tools
 
 Required Tools & Functions:
 
-- Booking systems
-- customer service dashboards
-- scheduling
+* Booking systems
+* customer service dashboards
+* scheduling

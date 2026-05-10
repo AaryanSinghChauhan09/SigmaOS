@@ -1,7 +1,7 @@
-﻿# ðŸ›  WRITER Tools
+# 🛠 WRITER Tools
 
 Required Tools & Functions:
 
-- Manuscript editor
-- publishing tools
-- citation/reference manager
+* Manuscript editor
+* publishing tools
+* citation/reference manager

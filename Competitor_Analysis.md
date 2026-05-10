@@ -10,6 +10,6 @@
 
 ## Key Differentiators
 
-- **AI-Native**: SigmaOS doesn't just run AI tools; it relies on an embedded AI daemon for self-healing and proactive optimization.
-- **Post-Quantum Ready**: We are integrating `liboqs` directly into the kernel for immediate protection against future quantum attacks.
-- **Zenith UI**: A built-from-scratch compositor designed for futuristic, adaptive aesthetics rather than legacy X11/Wayland paradigms.
+* **AI-Native**: SigmaOS doesn't just run AI tools; it relies on an embedded AI daemon for self-healing and proactive optimization.
+* **Post-Quantum Ready**: We are integrating `liboqs` directly into the kernel for immediate protection against future quantum attacks.
+* **Zenith UI**: A built-from-scratch compositor designed for futuristic, adaptive aesthetics rather than legacy X11/Wayland paradigms.

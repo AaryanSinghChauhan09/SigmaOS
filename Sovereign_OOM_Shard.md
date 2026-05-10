@@ -43,10 +43,10 @@ Thresholds:
 ## Design Philosophy
 
 
-- **Protected Shards**: `oom_score < 0` + `protected=true` means the shard is never a cull target.
-- **Score-Based Priority**: Higher score = culled first (matches Linux oom_score_adj semantics).
+* **Protected Shards**: `oom_score < 0` + `protected=true` means the shard is never a cull target.
+* **Score-Based Priority**: Higher score = culled first (matches Linux oom_score_adj semantics).
 
-- **Compaction**: Culled entries are removed by O(1) table compaction.
+* **Compaction**: Culled entries are removed by O(1) table compaction.
 
 ---
 

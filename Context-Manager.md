@@ -1,4 +1,4 @@
-﻿# SigmaOS Context Manager
+# SigmaOS Context Manager
 
 ## Overview
 
@@ -38,12 +38,12 @@ QuotaManager* qm = (QuotaManager*)
 
 ## Module Registry (Sovereign Map) | Module ID | Registered By | Consumers | |-----------------|---------------------------|-------------------------------| | `agent.quota` | `QuotaManager` | `CommandInterpreter` | | `agent.policy` | `GovernanceRules` | `CommandInterpreter`, Sandbox | | `cashier` | Profile loader | `CommandInterpreter` | | `accountant` | Profile loader | `CommandInterpreter` | | `doctor` | Profile loader | `CommandInterpreter` | | `engineer` | Profile loader | `CommandInterpreter` | | `lawyer` | Profile loader | `CommandInterpreter` | | `farmer` | Profile loader | `CommandInterpreter` | ## Design Principles
 
-- **Zero-coupling**: No module imports another module directly. All communication is via the registry.
-- **No stdlib**: Uses `SigmaString` and `SigmaMap` from `SigmaOOP.hpp`.
-- **Singleton**: The `ContextManager` itself is a `SigmaSingleton` â€” one instance per kernel boot.
-- **Fail-safe**: `resolve()` returns `nullptr` on miss; callers must handle gracefully.
+* **Zero-coupling**: No module imports another module directly. All communication is via the registry.
+* **No stdlib**: Uses `SigmaString` and `SigmaMap` from `SigmaOOP.hpp`.
+* **Singleton**: The `ContextManager` itself is a `SigmaSingleton` — one instance per kernel boot.
+* **Fail-safe**: `resolve()` returns `nullptr` on miss; callers must handle gracefully.
 
 ## Implementation Files
 
-- Header: `/include/core/context/manager.hpp`
-- Source:  `/kernel/core/context/manager.cpp`
+* Header: `/include/core/context/manager.hpp`
+* Source:  `/kernel/core/context/manager.cpp`

@@ -1,8 +1,8 @@
-﻿# SigmaOS: Industrial Orb & Shard Ecosystem
+# SigmaOS: Industrial Orb & Shard Ecosystem
 
 The SigmaOS Sovereign Lattice is built on a modular "Orb" architecture, enabling high-performance extensibility without kernel bloat.
 
-## ðŸ›ï¸ The Orb Registry
+## 🏛️ The Orb Registry
 
 Orbs are industrial-grade kernel modules that encapsulate specific logic, from device drivers to AI-driven schedulers.
 
@@ -11,7 +11,7 @@ Orbs are industrial-grade kernel modules that encapsulate specific logic, from d
 * **Security Orbs**: Sovereignty enforcers (PQC, AppArmor, Attestation).
 * **UI Orbs**: Zenith dashboard and Zenith compositing shards.
 
-## ðŸ“¦ Distribution & Packaging
+## 📦 Distribution & Packaging
 
 SigmaOS utilizes a decentralized distribution model where Orbs can be downloaded and hot-swapped at runtime via the `SovereignOrbManager`.
 
@@ -20,7 +20,7 @@ SigmaOS utilizes a decentralized distribution model where Orbs can be downloaded
 3. **Mounting**: Inject the Orb into the running lattice without rebooting.
 4. **Scaling**: Automatically mirror critical Orbs across distributed nodes.
 
-## ðŸ› ï¸ Contributor SDK
+## 🛠️ Contributor SDK
 
 Developers can build custom Orbs using the SigmaOS Shard SDK (C++/Rust/WASM).
 
@@ -30,4 +30,4 @@ Developers can build custom Orbs using the SigmaOS Shard SDK (C++/Rust/WASM).
 
 ---
 
-### Î£ Sovereignty is Modular. The Lattice is the Orchestrator
+### Σ Sovereignty is Modular. The Lattice is the Orchestrator

@@ -23,20 +23,20 @@ sigma_err_t SovereignRegistry_Register(const char* name,
 ### 2. Shard Categories
 
 
-- **CAT_CORE**: Genesis, Orchestration, Scheduling.
-- **CAT_SECURITY**: Zero-Trust, LSM, MAC.
+* **CAT_CORE**: Genesis, Orchestration, Scheduling.
+* **CAT_SECURITY**: Zero-Trust, LSM, MAC.
 
-- **CAT_IO**: Drivers, VFS, Network.
-- **CAT_USER**: Apps, UDFs, Dashboards.
+* **CAT_IO**: Drivers, VFS, Network.
+* **CAT_USER**: Apps, UDFs, Dashboards.
 
 ### 3. Verification Protocol (GIV)
 
 Each registration triggers a **Global Integration Verification (GIV)** sequence:
 
-- **Hashing**: Verify shard BLAKE3 signature.
-- **Purity**: Check for host-leakage (#include <stdio.h>).
+* **Hashing**: Verify shard BLAKE3 signature.
+* **Purity**: Check for host-leakage (#include <stdio.h>).
 
-- **Isolation**: Assign the shard to a Parallel-Universe Sandbox.
+* **Isolation**: Assign the shard to a Parallel-Universe Sandbox.
 
 ---
 **STATUTORY RECORD. ENFORCED BY S01 GENESIS.**

@@ -1,14 +1,14 @@
-﻿# Î£ SIGMAOS MILESTONE 1: BOOTABLE ISO BUILD GUIDE
+# Σ SIGMAOS MILESTONE 1: BOOTABLE ISO BUILD GUIDE
 
 This document provides a technical guide for generating the first bootable SigmaOS ISO based on Arch Linux.
 
-## ðŸ› ï¸ Toolchain
+## 🛠️ Toolchain
 
 * **archiso**: The official tool for building Arch Linux live media.
 * **Calamares**: The universal framework for system installers.
 * **Zenith-ISO-Profile**: Custom configuration for the live environment.
 
-## ðŸ“‹ Steps to Generation
+## 📋 Steps to Generation
 
 ### 1. Environment Setup
 
@@ -52,7 +52,7 @@ Execute the build script:
 sudo mkarchiso -v -w /tmp/archiso-tmp -o ~/iso-output ~/sigmaos-iso
 ```
 
-## âœ… Success Criteria
+## ✅ Success Criteria
 
 * ISO boots successfully in **QEMU**.
 * Network connectivity is established automatically.

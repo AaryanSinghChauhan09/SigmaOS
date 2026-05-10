@@ -1,25 +1,25 @@
-﻿# ðŸ›  SCIENTIST Tools
+# 🛠 SCIENTIST Tools
 
 Required Tools & Functions:
 
-- Data analysis suite
-- lab notebooks
-- simulation modules
-- visualization tools
+* Data analysis suite
+* lab notebooks
+* simulation modules
+* visualization tools
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
-- Research ethics
-- lab safety protocols
+* Research ethics
+* lab safety protocols
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
-- Statistical significance
-- molarity
-- physics constants
+* Statistical significance
+* molarity
+* physics constants
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
-- Simulation engines
-- data visualization
-- AI model training
+* Simulation engines
+* data visualization
+* AI model training

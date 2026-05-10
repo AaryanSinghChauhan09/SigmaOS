@@ -1,8 +1,8 @@
-﻿# ðŸ›  GOVERNMENT_OFFICIAL Tools
+# 🛠 GOVERNMENT_OFFICIAL Tools
 
 Required Tools & Functions:
 
-- Policy drafting
-- compliance modules
-- secure communication
-- citizen data management
+* Policy drafting
+* compliance modules
+* secure communication
+* citizen data management

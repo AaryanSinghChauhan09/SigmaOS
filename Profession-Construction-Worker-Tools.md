@@ -1,7 +1,7 @@
-﻿# ðŸ›  CONSTRUCTION_WORKER Tools
+# 🛠 CONSTRUCTION_WORKER Tools
 
 Required Tools & Functions:
 
-- Project scheduling
-- safety compliance
-- equipment tracking
+* Project scheduling
+* safety compliance
+* equipment tracking
