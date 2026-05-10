@@ -1,7 +1,8 @@
-# 🛠 MARINE_BIOLOGIST Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* Ocean data integration
-* visualization
-* compliance
+
+1
+

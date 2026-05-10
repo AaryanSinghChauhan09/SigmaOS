@@ -1,23 +1,32 @@
-# 🛠 CIVIL_SERVANT Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* Policy tools
-* compliance
-* citizen records
 
-## 📜 Compliance Rules
+1
 
-* Service rules
-* policy drafting guidelines
 
-## 🧮 Professional Calculators
 
-* Budget allocation
-* pension
-* pay scale
+1
 
-## 🧬 Core Algorithms
 
-* Policy impact simulation
-* citizen data indexing
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+

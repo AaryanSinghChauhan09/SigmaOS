@@ -1,55 +1,80 @@
-# Σ SIGMAOS: THE SOVEREIGN LATTICE (v14.0 [NEXUS-SUPREME])
+﻿1
 
-> **The "Sigma" of all Operating Systems.**  
+
+> **The "Sigma" of all Operating Systems.**
 > A supreme fusion of Linux’s ecosystem, Windows’ performance, and **Enterprise-Grade Productivity** (Layer 10: Sovereign Nexus)—reimagined for absolute Digital Sovereignty.
 
 ---
 
-## 💎 The Vision
+
+1
+
 
 SigmaOS is not just a Linux distribution; it is a **Sovereign Lattice** of 600+ atomic shards designed for total hardware-to-userland autonomy. By neutralizing foreign dependencies (`libc`) and implementing silicon-direct orchestration, SigmaOS provides a high-performance environment for the AI-native era.
 
-## 🚀 Technical Pillars
 
-### 🧮 Sovereign Kernel (S01-S07)
-
-
-* **Precise Scheduling**: Sovereign-Fair Scheduler (SFS) with RDTSC-cycle precision.
-* **Atomic Memory**: Buddy & Slab allocation lattice for zero fragmentation.
-
-* **Hardware Abstraction**: Clean IRQ/IDT handling for bare-metal silicon integrity.
-
-### 🛡️ Post-Quantum Security (S08)
+1
 
 
-* **PQC Mesh**: Kyber and Dilithium algorithms integrated into the core IPC.
-* **Hardware Attestation**: Mandatory TPM 2.0 handshake for boot-time integrity.
 
-* **Lattice Policy**: Capability-gated access control across all shards.
-
-### 🧠 AI-Native Autonomy (S09)
+1
 
 
-* **Predictive Resilience**: AI Watchdog that triggers rollbacks before system failure.
-* **Adaptive UI**: Zenith compositor with neural layout optimization.
 
-* **Sovereign Assistant**: Integrated CLI and sidebar for system-wide automation.
-
-### 🔄 Self-Healing Resilience (S41)
+1
 
 
-* **Atomic Snapshots**: Copy-on-Write (CoW) snapshots of the lattice state.
-* **Rollback Daemon**: Automatic recovery to the last known good state on instability.
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
 
 ---
 
-## 💻 The Sovereign CLI (`s-cli`)
+
+1
+
 
 SigmaOS provides a unified namespace for all lattice operations:
 
-```bash
 
-# System & Management
+1
+
+
+
+1
+
 
 s-cli sigma-init     # Manage services
 
@@ -57,58 +82,81 @@ s-cli sigma-top      # Real-time monitor
 
 s-cli sigma-health   # Full system audit
 
-# Packages & Resilience
+
+1
+
 
 s-cli sigma-pkg install <shard>  # Atomic install with auto-snapshot
 
 s-cli sigma-snap rollback <id>    # Restore previous state
 
-# Security & AI
+
+1
+
 
 s-cli sigma-sec attest           # TPM 2.0 handshake
 
 s-cli sigma-ai query "Optimize latency"
 
-```
+
+1
+
 
 ---
 
-## 🛠️ Getting Started
 
-### Prerequisites
+1
 
 
-* `gcc` / `clang` (C++20 recommended)
-* `python3` (for `sigma-pkg` and automation)
 
-* `nasm` (for kernel assembly)
-* `qemu` (for emulation)
+1
 
-### Build the Lattice
 
-```bash
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
 
 make build
 s-cli sigma-init
 
-```
+
+1
+
 
 ---
 
-## 📚 Documentation
+
+1
 
 
-* [Architecture Overview.md](file:///Architecture%20Overview.md)
-* [CLI Reference.md](file:///CLI%20Reference.md)
 
-* [Personalization Profiles.md](file:///Personalization%20Profiles.md)
-* [Security & PQC.md](file:///Security%20&%20PQC.md)
+1
 
-* [Modularization Guide.md](file:///Modularization%20Guide.md)
-* [Roadmap.md](file:///Roadmap.md)
 
-* [Contribution Guide.md](file:///Contribution%20Guide.md)
-* [Competitor Matrix.md](file:///Competitor%20Matrix.md)
+
+1
+
+
+
+1
+
+
+
+1
+
 
 ---
 "Sovereignty is the ultimate efficiency."
+

@@ -1,6 +1,9 @@
-# Security Policy
+﻿1
 
-## Supported Versions
+
+
+1
+
 
 | Version | Supported |
 |---------|-----------|
@@ -8,9 +11,13 @@
 | v1.1.0-APEX-SINGULARITY | ⚠️ Critical fixes only |
 | < v1.0 | ❌ No longer supported |
 
-## Reporting a Vulnerability
 
-### Please do NOT report security vulnerabilities via public GitHub Issues.
+1
+
+
+
+1
+
 
 To report a security vulnerability in SigmaOS:
 
@@ -19,42 +26,58 @@ To report a security vulnerability in SigmaOS:
 
 3. **Include**:
 
-   * A description of the vulnerability
-   * Steps to reproduce (PoC if possible)
 
-   * The affected shard(s) or component
-   * Potential impact assessment
+1
+
+
+
+1
+
 
 4. **Response time**: We aim to acknowledge reports within **72 hours** and provide a fix timeline within **7 days**
 
-## Security Architecture
+
+1
+
 
 SigmaOS enforces sovereign security through:
 
-* **Capability-Based IPC (S-Zircon)**: All inter-shard communication uses unforgeable capability handles
-* **Hardware-Backed Isolation**: Each suite runs in isolated shard domains with hardware compartmentalization
 
-* **Neural Firewall (S08_Security)**: AI-driven anomaly detection at the kernel level
-* **Zero-Trust Network (S07_Network)**: All mesh communications use HMAC-authenticated gossip
+1
 
-* **Privacy Shard (S31_Privacy)**: Native Tor routing and amnesic memory for sensitive operations
-* **Quantum-Resistant Design**: Post-quantum cryptography planned for Phase 7 (CRYSTALS-Kyber)
 
-## Scope
+
+1
+
+
+
+1
+
+
+
+1
+
 
 The following are **in scope** for security reports:
 
-* Kernel privilege escalation via shard boundaries
-* Memory corruption in `suites/S01_Genesis/` (core kernel)
 
-* Bypass of capability-based access controls
-* Cryptographic weaknesses in Lattice Mesh (S33) HMAC implementation
+1
 
-* Buffer overflows in any `sigma_*` LibC function
+
+
+1
+
+
+
+1
+
 
 The following are **out of scope**:
 
-* Issues in userland shards that don't affect kernel integrity
-* Performance degradation without security impact
 
-* Issues requiring physical hardware access
+1
+
+
+
+1
+

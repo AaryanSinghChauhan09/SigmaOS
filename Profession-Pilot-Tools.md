@@ -1,8 +1,8 @@
-# 🛠 PILOT Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* Flight logs
-* navigation systems
-* simulation modules
-* weather sync
+
+1
+

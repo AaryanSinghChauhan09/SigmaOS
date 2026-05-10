@@ -1,8 +1,8 @@
-# 🛠 CIVIL_ENGINEER Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* CAD tools
-* structural simulation
-* project management
-* safety compliance
+
+1
+

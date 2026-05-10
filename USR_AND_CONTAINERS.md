@@ -1,50 +1,79 @@
-# SigmaOS Containerization & USR Guide
+﻿1
 
-## Unified Shard Registry (USR)
+
+
+1
+
 
 SigmaOS replaces `systemctl`, `dbus`, and `apt` with the **Sovereign Unified Shard Registry (USR)**. It provides amnesic-protected, quantum-safe service discovery and inter-process communication between all 600 kernel shards.
 
-### Registering a Shard Service
 
-```c
+1
+
+
+
+1
+
 
 usr_register_shard("SovereignNetStack", 0x00A1);
 usr_register_shard("SovereignVFS", 0x00A2);
 
-```
 
-### Discovering a Shard at Runtime
+1
 
-```c
+
+
+1
+
+
+
+1
+
 
 sigma_u32 id = usr_discover_shard("SovereignVFS");
 
-```
+
+1
+
 
 ---
 
-## Container Networking (CNI)
+
+1
+
 
 SovereignOS containers are automatically provisioned with sovereign veth interfaces routed through the `SovereignNetStack`.
 
-### Mounting Storage into a Container
 
-```c
+1
+
+
+
+1
+
 
 container_net_attach("app-container-01", "AA:BB:CC:DD:EE:FF");
 container_storage_mount("app-container-01", "/data");
 
-```
+
+1
+
 
 ---
 
-## Decentralized Persistence
+
+1
+
 
 State snapshots survive hardware resets by being sharded across the distributed VFS lattice:
 
-```c
+
+1
+
 
 persistence_snapshot("SovereignSEL");
 persistence_restore("SovereignSEL");
 
-```
+
+1
+

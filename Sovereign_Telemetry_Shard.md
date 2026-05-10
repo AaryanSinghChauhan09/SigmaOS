@@ -1,20 +1,27 @@
-# Sovereign Telemetry Shard
+﻿1
 
-**Parity:** eBPF · DTrace · Linux `perf` · macOS Instruments  
-**Location:** `kernel/modules/core/SovereignTelemetryShard.c`  
+
+**Parity:** eBPF · DTrace · Linux `perf` · macOS Instruments
+**Location:** `kernel/modules/core/SovereignTelemetryShard.c`
 **Standard:** Zenith Industrial Sovereignty v1.0
 
 ---
 
-## Overview
+
+1
+
 
 The Sovereign Telemetry Shard provides native, zero-dependency silicon observability for SigmaOS. It absorbs the defining USPs of `eBPF`, `DTrace`, and `perf` by enabling kernel probe arming, live sampling, and nanosecond-resolution latency histograms — all without any external toolchain dependency.
 
 ---
 
-## Architecture
 
-```
+1
+
+
+
+1
+
 
 Silicon Probe Matrix
   ├── Kernel Probes (kprobe)      — Attach to kernel function entry/exit
@@ -25,11 +32,15 @@ Silicon Probe Matrix
 Latency Histogram Engine
   └── 8 × 64ns buckets — CycleClock-accurate distribution
 
-```
+
+1
+
 
 ---
 
-## CLI Reference — `sigma-tele`
+
+1
+
 
 | Sub-command | Action |
 |---|---|
@@ -40,17 +51,23 @@ Latency Histogram Engine
 
 ---
 
-## Design Philosophy
+
+1
 
 
-* **Zero External Dependency**: No BPF JIT, no perf system calls — all logic is pure C11.
-* **Zenith Accuracy**: Histogram buckets operate at 64ns granularity.
 
-* **Dynamic Arming**: Any kernel address can be probed at any mission time.
-* **Deterministic Flushing**: Histogram flush is atomic and non-blocking.
+1
+
+
+
+1
+
 
 ---
 
-## Synchronization State
+
+1
+
 
 `GLOBAL MESH ACTIVE` — Synchronized with `AaryanSinghChauhan09/SigmaOS`.
+

@@ -1,18 +1,24 @@
-# SigmaOS Installation Guide
+﻿1
+
 
 Welcome to the SigmaOS Installation Guide. This document provides a step-by-step procedure to deploy the SigmaOS Sovereign Lattice onto physical hardware or a virtualized environment.
 
-## Supported Hardware
+
+1
+
 
 1. **Raspberry Pi 5 (BCM2712)** - *Tier 1 Supported (Hardware-Optimized)*
 2. **Raspberry Pi 4 (BCM2711)** - *Tier 1 Supported*
 3. **x86_64 Systems (Intel/AMD)** - *Tier 2 Supported*
 4. **RISC-V Generic** - *Experimental*
 
-## Method 1: Bare-Metal Flashing (Recommended)
+
+1
+
 
 1. **Download the Official Image**
    Download the latest `sigmaos_aarch64.img` from the release page.
+
 1. **Flash to SD Card / NVMe**
    Use `dd` or a tool like BalenaEtcher to flash the image.
 
@@ -23,12 +29,15 @@ Welcome to the SigmaOS Installation Guide. This document provides a step-by-step
 1. **Booting**
    Insert the drive into your device and power it on. The Sovereign Boot Manager will initialize the context manager and load the lattice.
 
-## Method 2: QEMU Virtualization
+
+1
+
 
 If you want to test SigmaOS without physical hardware, you can use QEMU.
 
 1. **Build the Kernel**
    Follow the instructions in the `Build.md` to compile `sigma_os.elf`.
+
 1. **Run QEMU**
 
    ```bash
@@ -40,7 +49,9 @@ If you want to test SigmaOS without physical hardware, you can use QEMU.
        -serial stdio
    ```
 
-## Method 3: Dual-Boot via Systemd-Boot (x86_64 Only)
+
+1
+
 
 The `SovereignPartitionManager` supports scanning existing GPT partitions and bridging with systemd-boot.
 
@@ -60,6 +71,9 @@ The `SovereignPartitionManager` supports scanning existing GPT partitions and br
    options root=PARTUUID=XXXX-XXXX rw
    ```
 
-## Post-Installation Setup
+
+1
+
 
 Upon first boot, the OS will automatically detect your profession profile and initialize the Zenith UI Dashboard. Use the Context Manager hooks to override defaults if needed.
+

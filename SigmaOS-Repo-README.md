@@ -1,4 +1,5 @@
-# yocto-queue [![](https://badgen.net/bundlephobia/minzip/yocto-queue)](https://bundlephobia.com/result?p=yocto-queue)
+﻿1
+
 
 > Tiny queue data structure
 
@@ -6,17 +7,27 @@ You should use this package instead of an array if you do a lot of `Array#push()
 
 > A [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)) is an ordered list of elements where an element is inserted at the end of the queue and is removed from the front of the queue. A queue works based on the first-in, first-out ([FIFO](https://en.wikipedia.org/wiki/FIFO_(computing_and_electronics))) principle.
 
-## Install
 
-```
+1
+
+
+
+1
+
 
 npm install yocto-queue
 
-```
 
-## Usage
+1
 
-```js
+
+
+1
+
+
+
+1
+
 
 const Queue = require('yocto-queue');
 
@@ -37,33 +48,50 @@ console.log(queue.dequeue());
 console.log(queue.dequeue());
 //=> '🌈'
 
-```
 
-## API
+1
 
-### `queue = new Queue()`
+
+
+1
+
+
+
+1
+
 
 The instance is an [`Iterable`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols), which means you can iterate over the queue front to back with a “for…of” loop, or use spreading to convert the queue to an array. Don't do this unless you really need to though, since it's slow.
 
-#### `.enqueue(value)`
+
+1
+
 
 Add a value to the queue.
 
-#### `.dequeue()`
+
+1
+
 
 Remove the next value in the queue.
 
 Returns the removed value or `undefined` if the queue is empty.
 
-#### `.clear()`
+
+1
+
 
 Clear the queue.
 
-#### `.size`
+
+1
+
 
 The size of the queue.
 
-## Related
+
+1
 
 
-* [quick-lru](https://github.com/sindresorhus/quick-lru) - Simple “Least Recently Used” (LRU) cache
+
+1
+

@@ -1,20 +1,27 @@
-# Sovereign Hotpatch Shard
+﻿1
 
-**Parity:** kpatch · ksplice · Linux `livepatch` · Oracle Ksplice  
-**Location:** `kernel/modules/system/SovereignHotpatchShard.c`  
+
+**Parity:** kpatch · ksplice · Linux `livepatch` · Oracle Ksplice
+**Location:** `kernel/modules/system/SovereignHotpatchShard.c`
 **Standard:** Zenith Industrial Sovereignty v1.0
 
 ---
 
-## Overview
+
+1
+
 
 The Sovereign Hotpatch Shard provides native, zero-dependency live kernel patching for SigmaOS. It absorbs the defining USPs of `kpatch`, `ksplice`, and Linux `livepatch` by enabling atomic 5-byte JMP trampoline installation at any target silicon function address — achieving zero downtime and zero reboot for any kernel update.
 
 ---
 
-## Architecture
 
-```
+1
+
+
+
+1
+
 
 Patch Matrix (up to 16 concurrent patches)
   ├── PENDING   — Loaded, awaiting quiesce
@@ -27,11 +34,15 @@ Trampoline Engine
   Step 2: Install 5-byte JMP at target_func → patch_func
   Step 3: Resume missions — zero downtime achieved
 
-```
+
+1
+
 
 ---
 
-## CLI Reference — `sigma-hotpatch`
+
+1
+
 
 | Sub-command | Action |
 |---|---|
@@ -41,16 +52,23 @@ Trampoline Engine
 
 ---
 
-## Design Philosophy
+
+1
 
 
-* **Zero Reboot**: Kernel updates are applied while all missions continue running.
-* **Ref-Count Safety**: A patch refuses to revert while missions are using the patched path.
 
-* **CVE-First**: Boot patch `CVE-SIGMA-001_null_deref` is pre-seeded at init.
+1
+
+
+
+1
+
 
 ---
 
-## Synchronization State
+
+1
+
 
 `GLOBAL MESH ACTIVE` — Synchronized with `AaryanSinghChauhan09/SigmaOS`.
+

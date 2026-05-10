@@ -1,7 +1,8 @@
-# 🛠 WRITER Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* Manuscript editor
-* publishing tools
-* citation/reference manager
+
+1
+

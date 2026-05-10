@@ -1,7 +1,8 @@
-# 🛠 PHOTOGRAPHER Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* Photo editing suite
-* portfolio manager
-* export tools
+
+1
+

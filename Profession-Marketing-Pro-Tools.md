@@ -1,7 +1,8 @@
-# 🛠 MARKETING_PRO Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* Campaign dashboards
-* analytics
-* CRM integration
+
+1
+

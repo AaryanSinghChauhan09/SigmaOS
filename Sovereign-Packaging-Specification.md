@@ -1,8 +1,11 @@
-# SigmaOS Sovereign Packaging Specification (SPS)
+﻿1
+
 
 The **Sovereign Packaging Specification** defines the industrial standard for creating, signing, and distributing shards within the SigmaOS lattice.
 
-## 📦 Package Structure (.spkg)
+
+1
+
 
 A SigmaOS package is a PQC-sealed archive containing:
 
@@ -11,9 +14,13 @@ A SigmaOS package is a PQC-sealed archive containing:
 3. **resources/**: Assets, icons, and localized strings.
 4. **signature.sig**: Dilithium-based PQC signature.
 
-## 📝 manifest.json Example
 
-```json
+1
+
+
+
+1
+
 {
   "shard_id": "com.sigma.browser.firefox",
   "version": "128.0.1-sov",
@@ -22,17 +29,23 @@ A SigmaOS package is a PQC-sealed archive containing:
   "dependencies": ["libsigma-ui-v2", "pqc-toolkit-v0.9"],
   "maintainer": "Mozilla Shard Masters"
 }
-```
 
-## 🛡️ Sandboxing Policies
+1
+
+
+
+1
+
 
 Packages must specify their isolation level:
 
-* **STRICT**: No hardware access; amnesic memory only.
-* **SYSTEM**: Access to kernel bridges (requires attestation).
-* **TRUSTED**: Full hardware access (Official shards only).
 
-## 🖋️ Verification Flow
+1
+
+
+
+1
+
 
 1. The `SovereignMarketplace` fetches the `.spkg`.
 2. `SovereignAttestation` verifies the PQC signature against the developer's public key.
@@ -40,4 +53,6 @@ Packages must specify their isolation level:
 
 ---
 
-### For development tools, see [Getting Started](Getting-Started.md)
+
+1
+

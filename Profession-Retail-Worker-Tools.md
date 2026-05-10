@@ -1,7 +1,8 @@
-# 🛠 RETAIL_WORKER Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* POS
-* stock management
-* customer service tools
+
+1
+

@@ -1,8 +1,8 @@
-# 🛠 ARCHITECT Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* CAD tools
-* 3D modeling
-* project management
-* simulation
+
+1
+

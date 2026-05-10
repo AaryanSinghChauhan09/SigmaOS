@@ -1,7 +1,8 @@
-# 🛠 ANIMATOR Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* Animation suite
-* rendering tools
-* storyboard manager
+
+1
+

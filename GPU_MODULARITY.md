@@ -1,21 +1,29 @@
-# Modular GPU Sovereignty
+﻿1
+
 
 SigmaOS achieves heterogeneous compute sovereignty via the `SovereignGPUEngine` — a vendor-agnostic, NUMA-aware hardware acceleration framework operating natively in Ring-0.
 
-## The Problem with Legacy GPU Drivers
+
+1
+
 
 Traditional OS kernels (Linux, Windows) rely on massive proprietary binary blobs supplied by NVIDIA, AMD, and Intel. These blobs:
 
-* Operate with root-level trust but zero kernel-level isolation
-* Cannot be audited or patched for security vulnerabilities
 
-## Sovereign Solution: Abstracted Vendor Execution
+1
+
+
+
+1
+
 
 `SovereignGPUEngine` implements a PCIe endpoint analysis framework via `SovereignHAL`. Instead of depending on vendor blobs, it:
 
 1. Probes the GPU's PCIe BAR registers at boot
 
-```c
+
+1
+
 
 // Register a GPU with the sovereign framework
 gpu_register("NVIDIA:10DE:2684", 24576); // RTX 4090, 24GB VRAM
@@ -24,31 +32,47 @@ gpu_register("NVIDIA:10DE:2684", 24576); // RTX 4090, 24GB VRAM
 gpu_dispatch("AI_INFERENCE");
 gpu_dispatch("MATRIX_MULTIPLY");
 
-```
 
-## NUMA-Aware Memory Binding
+1
+
+
+
+1
+
 
 Every GPU workload is bound to the NUMA node physically closest to the GPU die:
 
-```text
+
+1
+
 
 [SovereignNUMA] Node 0 (ARM64) -> CPU workloads
 [SovereignNUMA] Node 1 (x86_64) -> GPU-adjacent memory
 [SovereignGPU]  VRAM DMA routed via Node 1 -- O(1) latency
 
-```
 
-## Container GPU Passthrough
+1
+
+
+
+1
+
 
 When a micro-VM is spawned via `SovereignContainers`, the GPU Engine automatically exposes safe hardware passthrough:
 
-```c
+
+1
+
 
 // Inside a container spawn sequence:
 container_spawn("ai-workload", "/usr/bin/inference");
 // -> SovereignGPU automatically maps VRAM slice to container namespace
 // -> SovereignSEL enforces GPU resource quotas via MAC policy
 
-```
 
-## Supported Compute Workloads | Workload Type | Dispatch Mode | NUMA Binding | |---------------------|------------------|-----------------| | AI Inference | Tensor Block | Automatic | | HPC Simulation | SIMD Pipeline | Pinned to Node | | Visualization | Framebuffer DMA | GPU-Adjacent | | Matrix Math (AMX) | Intel AMX Tiles | x86_64 Node | ## Performance: SigmaOS vs Legacy | Metric | Linux (Proprietary Blob) | SigmaOS (Sovereign GPU) | |---------------------------|---------------------------|-------------------------------| | Driver Init Time | ~2800ms | ~12ms (Ring-0 HAL probe) | | Kernel Update Breakage | Yes (binary blob) | Never (hardware-abstracted) | | Security Auditability | None | Full (open sovereign shard) | | NUMA Awareness | Manual (numactl) | Automatic (SovereignNUMA) |
+1
+
+
+
+1
+

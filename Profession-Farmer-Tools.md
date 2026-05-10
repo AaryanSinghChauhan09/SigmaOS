@@ -1,26 +1,32 @@
-# 🛠 FARMER Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* Crop management
-* weather forecasting
-* supply chain integration
-* IoT sensor sync
 
-## 📜 Compliance Rules
+1
 
-* PM-Kisan
-* crop insurance
-* subsidy schemes
 
-## 🧮 Professional Calculators
 
-* Fertilizer
-* irrigation water
-* yield cost
+1
 
-## 🧬 Core Algorithms
 
-* Yield prediction
-* weather forecasting
-* supply chain optimization
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+

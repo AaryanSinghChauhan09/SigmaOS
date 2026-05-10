@@ -1,8 +1,8 @@
-# 🛠 PHARMACIST Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* Prescription management
-* drug interaction checker
-* inventory control
-* compliance
+
+1
+

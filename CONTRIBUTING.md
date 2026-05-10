@@ -1,29 +1,41 @@
-# SigmaOS — Contribution Guide
+﻿1
+
 
 > Join the evolution of digital sovereignty.
 
 ---
 
-## 🛠️ Coding Standards
+
+1
+
 
 SigmaOS is an industrial-grade project. All contributions must adhere to:
 
-* **Language**: C++20 for shards, Python 3.10+ for tooling.
-* **Pattern**: Strict OOP Singleton (Context Manager).
 
-* **Zero-Dependency**: No `libc` or external headers allowed in Layer 1-4 shards.
-* **Documentation**: Every code change MUST be accompanied by an update to the corresponding `.md` file in `WIKI/`.
+1
 
-## 🌀 Branching Strategy
+
+
+1
+
+
+
+1
+
 
 We follow a staged release cadence:
 
-* **`main` (Stable)**: The production-ready sovereign lattice. Only merges from `beta` allowed.
-* **`beta` (Staging)**: Integration branch for feature-complete topics.
 
-* **`alpha` (Topic)**: Feature-specific branches (e.g., `feat/neural-paging`).
+1
 
-## 🚀 CI/CD Pipeline
+
+
+1
+
+
+
+1
+
 
 Every Pull Request triggers the following automated suite:
 
@@ -33,7 +45,9 @@ Every Pull Request triggers the following automated suite:
 3. **Security Scan**: Verify PQC signatures and TPM handshake protocols.
 4. **Doc Lint**: Ensure all WIKI files follow the GitHub Flavored Markdown standard.
 
-## 🤝 How to Contribute Shards
+
+1
+
 
 1. **Fork** the repository and create an `alpha` branch.
 2. **Develop** your shard in the appropriate `suites/` directory.
@@ -43,3 +57,4 @@ Every Pull Request triggers the following automated suite:
 
 ---
 "Sovereignty is a collective intent."
+

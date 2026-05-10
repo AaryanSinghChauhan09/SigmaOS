@@ -1,7 +1,8 @@
-# 🛠 ENVIRONMENTAL_SCIENTIST Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* Climate modeling
-* sustainability dashboards
-* compliance
+
+1
+

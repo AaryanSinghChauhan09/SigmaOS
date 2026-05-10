@@ -1,195 +1,296 @@
-# SigmaOS API Reference
+﻿1
+
 
 Complete API mapping for all Sovereign Singleton shards.
 
-## Core Security
+
+1
+
 
 <<<<<<< HEAD
-### Master Types (`SovereignCommon.h`)
 
 
-* `sigma_sz_t`: Unified 64-bit size type.
-* `sigma_err_t`: Standard error return type (`SIGMA_OK`, etc.).
-
-### Registry API (`SovereignRegistry.h`)
+1
 
 
-* `SovereignRegistry_Init()`: Bootstraps the master silicon registry.
-* `SovereignRegistry_Register(name, category, init_fn)`: Binds a Sovereign Shard to the lattice.
 
-* `SovereignRegistry_Audit()`: Verifies the integrity of all active shards via hashing.
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
 =======
-### `SovereignCapabilityEngine`
+
+
+1
+
 
 Per-process syscall gating with bitmask precision.
 >>>>>>> 7759f274e222d74141c499a7b379a060016fe9a1
 
-* `void capability_grant(sigma_u32 pid, sigma_u64 caps);`
-* `bool capability_check(sigma_u32 pid, sigma_u64 required);`
+
+1
+
 
 <<<<<<< HEAD
-### Neural Inference (`SovereignNeuralShard.c`)
 
 
-* `sigma_neural_load(name, in_dim, hidden, out_dim)`: Loads a neural model into the kernel.
-* `sigma_neural_infer(input, output, in_dim, hidden, out_dim)`: Performs a 2-layer forward pass.
-
-### Data Science (`SovereignDataframeMatrix.c`)
+1
 
 
-* `sigma_df_create(name)`: Initializes a new columnar dataframe.
-* `sigma_df_add_column(df, name, values, count)`: Binds data to a dataframe.
 
-* `sigma_df_mean(df, col_idx)`: Returns the arithmetic mean of a column.
-* `sigma_df_describe(df)`: Prints a statistical summary (Pandas-style).
-
-### UDF Engine (`SovereignUDFEngine.c`)
+1
 
 
-* `sigma_udf_register(name, func, perms, budget)`: Registers a sandboxed user function.
-* `sigma_udf_execute(name, data)`: Dispatches a UDF within the sandbox enclosure.
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
 =======
-### `SovereignEnclaveEngine`
+
+
+1
+
 
 Hardware-level PQC key isolation.
 
-* `void enclave_provision(sigma_u32 id);`
-* `void enclave_store_key(sigma_u32 id, const char* key);`
+
+1
+
 >>>>>>> 7759f274e222d74141c499a7b379a060016fe9a1
 
-### `SovereignMultiUserEngine`
+
+1
+
 
 <<<<<<< HEAD
-### ACID Engine (`SovereignACIDEngine.c`)
 
 
-* `sigma_txn_begin()`: Starts a new WAL-backed transaction.
-* `sigma_txn_commit(txn_id)`: Finalizes and flushes transaction changes.
+1
 
-* `sigma_txn_rollback(txn_id)`: Discards changes and aborts transaction.
+
+
+1
+
+
+
+1
+
 =======
 UID/GID process identity with PQC attestation.
 >>>>>>> 7759f274e222d74141c499a7b379a060016fe9a1
 
-* `sigma_u32 multiuser_register(sigma_u32 uid, sigma_u32 gid, const char* user, sigma_u64 caps);`
-* `bool multiuser_authenticate(sigma_u32 uid, const char* username);`
+
+1
+
 
 <<<<<<< HEAD
-### Sync Primitives (`SovereignConcurrencyEngine.c`)
 
 
-* `sigma_spinlock_acquire(lock)`: Busy-wait for a spinlock.
-* `sigma_semaphore_wait(sem)`: Atomic wait on a counting semaphore.
+1
 
-* `sigma_ring_push(rb, value)`: Lock-free push into a ring buffer.
+
+
+1
+
+
+
+1
+
 =======
-## Package & Automation
+
+
+1
+
+
 >>>>>>> 7759f274e222d74141c499a7b379a060016fe9a1
 
-### `SovereignPackageEngine`
+
+1
+
 
 <<<<<<< HEAD
-### Raft Consensus (`SovereignConsensusShard.c`)
 
 
-* `sigma_raft_elect()`: Initiates a leader election cycle.
-* `sigma_raft_heartbeat(tick)`: Leader suppression of follower elections.
+1
+
+
+
+1
+
 =======
 S-PKG: Sovereign App Bundle installer.
 >>>>>>> 7759f274e222d74141c499a7b379a060016fe9a1
 
-* `bool spkg_install(const char* name, sigma_u32 version);
+
+1
+
 
 <<<<<<< HEAD
-### Green Power (`SovereignGreenShard.c`)
 
 
-* `sigma_green_transition(state)`: Changes DVFS p-state (Turbo/Eco/Idle).
-* `sigma_green_thermal_check(temp)`: Automatic thermal throttling trigger.
+1
+
+
+
+1
+
 =======
  `bool spkg_remove(const char* name);`
 >>>>>>> 7759f274e222d74141c499a7b379a060016fe9a1
 
-### `SovereignTaskScheduler`
+
+1
+
 
 Ring-0 cron replacement with macro recording.
 
-* `void scheduler_add_task(const char* name, sigma_u32 interval_ms);`
-* `void scheduler_tick(sigma_u32 elapsed_ms);`
 
-### `SovereignAutomatorEngine`
+1
+
+
+
+1
+
 
 AI-driven predictive workflow macro engine.
 
-* `void automator_register_macro(const char* trigger, const char* action);`
-* `void automator_context_tick(const char* context);`
 
-## Compute & Hardware
+1
 
-### `SovereignGPUEngine`
+
+
+1
+
+
+
+1
+
 
 Vendor-agnostic GPU compute dispatcher.
 
-* `void gpu_register(const char* vendor_id, sigma_u32 vram_mb);`
-* `bool gpu_dispatch(const char* workload_type);`
 
-### `SovereignHWTranspilerEngine`
+1
+
+
+
+1
+
 
 Self-learning PCIe driver shim generator.
 
-* `void hw_transpiler_profile(sigma_u32 vendor_id, sigma_u32 device_id);`
 
-### `SovereignWatchdogEngine`
+1
+
+
+
+1
+
 
 Hardware hang recovery timer.
 
-* `void watchdog_init(sigma_u32 timeout_ms);`
-* `void watchdog_service(sigma_u32 tick_ms);`
 
-## Networking & Storage
+1
 
-### `SovereignNetStackEngine`
+
+
+1
+
+
+
+1
+
 
 Zero-trust Ring-0 TCP/IP stack.
 
-* `void netstack_register_interface(const char* mac_addr);`
-* `bool netstack_dispatch_packet(const char* payload, sigma_u32 length);`
 
-### `SovereignVFSEngine`
+1
+
+
+
+1
+
 
 Distributed, multi-node replicated filesystem.
 
-* `void vfs_mount_node(const char* node_address);`
-* `void vfs_write_file(const char* filepath, const char* data);`
 
-### `SovereignContainerStorageEngine`
+1
+
+
+
+1
+
 
 SovereignVFS bridging for Micro-VM containers.
 
-* `void container_storage_mount(const char* container, const char* path);`
 
-## UI & Personalization
+1
 
-### `SovereignThemeEngine`
+
+
+1
+
+
+
+1
+
 
 Adaptive ambient-aware UI theme switcher.
 
-* `void theme_update_ambient(sigma_u32 lux);`
 
-### `SovereignGestureEngine`
+1
+
+
+
+1
+
 
 Ring-0 hardware-accelerated gesture recognition.
 
-* `void gesture_process_touch(sigma_u32 fingers, sigma_u32 dx, sigma_u32 dy);`
 
-### `SovereignOnboardingEngine`
+1
+
+
+
+1
+
 
 Persona-driven sovereign setup wizard.
 
-* `void onboarding_apply_persona(const char* type);`
 
-### `SovereignShortcutsEngine`
+1
+
+
+
+1
+
 
 Contextual predictive quick-action engine.
 
-* `void shortcuts_suggest(const char* context, const char* suggestion);`
+
+1
+

@@ -1,7 +1,8 @@
-# 🛠 PHYSICIST Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* Simulation engines
-* data visualization
-* research notebooks
+
+1
+

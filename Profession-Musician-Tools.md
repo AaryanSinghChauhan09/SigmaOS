@@ -1,7 +1,8 @@
-# 🛠 MUSICIAN Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* Digital audio workstation
-* sheet music manager
-* recording tools
+
+1
+

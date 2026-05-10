@@ -1,26 +1,40 @@
-# 🛡️ Sovereign Sandbox Specification
+﻿1
+
 
 The SigmaOS Sovereign Sandbox provides a high-performance, security-hardened execution environment for modular shards. It represents the pinnacle of application isolation, surpassing tradition containerization (Docker/Flatpak) in both overhead and security.
 
-## 🏛️ Security Model
+
+1
 
 
-* **Zero-Trust Resource Allocation**: Sub-processes have no direct access to the 33-suite Lattice unless explicitly bridged.
-* **WASM Isolation**: Shards are executed within strict memory bounds (default: 128MB).
 
-* **Resource Capping**: CPU and network throughput are throttled at the kernel level via the S08 Sentinel Matrix.
+1
 
-## 🚀 Native Integration
+
+
+1
+
+
+
+1
+
 
 The Sovereign Sandbox is directly integrated into the Zenith GUI and CLI, allowing users to "jail" untrusted processes with a single command.
 
-## 📅 Roadmap
+
+1
 
 
-* **Phase 1**: Virtual Memory Sharding (v33.0.4) - **[ACTIVE]**
-* **Phase 2**: Direct Hardware Passthrough (VirtIO sharding).
 
-* **Phase 3**: Collaborative Multi-Tenant Sandboxing.
+1
+
+
+
+1
+
 
 ---
-*Isolation is the foundation of Sovereignty.*
+
+
+1
+

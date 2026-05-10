@@ -1,8 +1,8 @@
-# 🛠 RETAIL_MANAGER Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* Inventory management
-* staff scheduling
-* sales dashboards
-* supply chain tools
+
+1
+

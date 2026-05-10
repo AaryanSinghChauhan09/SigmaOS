@@ -1,7 +1,8 @@
-# 🛠 HEALTHCARE_ADMIN Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* Hospital management dashboards
-* compliance
-* scheduling
+
+1
+

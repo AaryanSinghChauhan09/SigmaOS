@@ -1,7 +1,8 @@
-# 🛠 NEUROSCIENTIST Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* Brain imaging integration
-* simulation
-* compliance
+
+1
+

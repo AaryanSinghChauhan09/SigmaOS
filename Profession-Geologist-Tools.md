@@ -1,7 +1,8 @@
-# 🛠 GEOLOGIST Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* Mapping tools
-* seismic data analysis
-* visualization
+
+1
+

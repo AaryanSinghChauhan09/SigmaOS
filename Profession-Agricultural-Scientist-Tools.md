@@ -1,7 +1,8 @@
-# 🛠 AGRICULTURAL_SCIENTIST Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* Crop modeling
-* IoT integration
-* compliance
+
+1
+

@@ -1,7 +1,8 @@
-# 🛠 ROBOTICS_ENGINEER Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* Simulation
-* hardware integration
-* AI orchestration
+
+1
+

@@ -1,68 +1,109 @@
-# Getting Started with SigmaOS
+﻿1
+
 
 Welcome to the SigmaOS Sovereign Lattice. This guide will help you set up your development environment and run your first SigmaOS instance.
 
-## 🛠️ Prerequisites
+
+1
+
 
 Before you begin, ensure you have the following installed:
 
-* **Build Tools**: `gcc-x86-64-linux-gnu`, `nasm`, `make`, `cmake`.
-* **Emulator**: `qemu-system-x86`.
-* **Node.js**: Version 16+ (for UI serving).
 
-## 🚀 Step 1: Clone the Repository
+1
 
-```bash
+
+
+1
+
+
+
+1
+
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
-```
 
-## 🏗️ Step 2: Build the Kernel
+1
+
+
+
+1
+
 
 The SigmaOS build system is modular and shard-based.
 
-```bash
 
-# Build the entire sovereign lattice
+1
+
+
+
+1
+
 
 make all
-```
 
-## 🦞 Step 3: Run in QEMU
+1
+
+
+
+1
+
 
 We provide a specialized boot script that handles ISO creation and QEMU orchestration.
 
-```bash
 
-# Launch SigmaOS headlessly with serial output
+1
+
+
+
+1
+
 
 ./qemu-boot.sh
-```
+
+1
+
 
 To view the kernel logs in real-time:
 
-```bash
-tail -f serial.log
-```
 
-## 🖥️ Step 4: Access the Zenith UI
+1
+
+tail -f serial.log
+
+1
+
+
+
+1
+
 
 If you want to interact with the experimental web-based UI:
 
-```bash
+
+1
+
 npm install
 node server.js
 
-# Open http://localhost:5000 in your browser
 
-```
+1
 
-## ⚠️ Common Pitfalls
 
-* **Architecture Mismatch**: Ensure you are using the `x86_64` toolchain for kernel builds.
-* **QEMU Permissions**: If QEMU fails to launch, check your user permissions for `/dev/kvm`.
-* **Missing NASM**: The bootloader requires NASM for assembly compilation.
+
+1
+
+
+
+1
+
+
+
+1
+
 
 ---
 
-### For advanced configuration, see [Architecture.md](Architecture.md)
+
+1
+

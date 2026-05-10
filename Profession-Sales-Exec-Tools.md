@@ -1,7 +1,8 @@
-# 🛠 SALES_EXEC Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* CRM tools
-* lead tracking
-* reporting dashboards
+
+1
+

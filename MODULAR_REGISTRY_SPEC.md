@@ -1,42 +1,64 @@
-# Modular Registry Specification (Sovereign v4.0)
+﻿1
 
-## Overview
+
+
+1
+
 
 The Sovereign Registry is the central orchestration nexus for the 33-suite lattice. It manages the lifecycle, attestation, and dispatching of all Sovereign Shards.
 
-## 🏗️ Structure
+
+1
+
 
 All registries are located in: `kernel/suites/S10_Registry/shards/`
 
-### 1. Global Shard Registration
+
+1
+
 
 Shards must use the `SovereignRegistry_Register` API to bind to the lattice during stage-3 boot:
 
-```c
+
+1
+
 
 sigma_err_t SovereignRegistry_Register(const char* name,
                                        shard_category_t cat,
                                        shard_init_fn init);
 
-```
 
-### 2. Shard Categories
+1
 
 
-* **CAT_CORE**: Genesis, Orchestration, Scheduling.
-* **CAT_SECURITY**: Zero-Trust, LSM, MAC.
 
-* **CAT_IO**: Drivers, VFS, Network.
-* **CAT_USER**: Apps, UDFs, Dashboards.
+1
 
-### 3. Verification Protocol (GIV)
+
+
+1
+
+
+
+1
+
+
+
+1
+
 
 Each registration triggers a **Global Integration Verification (GIV)** sequence:
 
-* **Hashing**: Verify shard BLAKE3 signature.
-* **Purity**: Check for host-leakage (#include <stdio.h>).
 
-* **Isolation**: Assign the shard to a Parallel-Universe Sandbox.
+1
+
+
+
+1
+
 
 ---
-**STATUTORY RECORD. ENFORCED BY S01 GENESIS.**
+
+
+1
+

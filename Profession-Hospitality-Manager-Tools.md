@@ -1,7 +1,8 @@
-# 🛠 HOSPITALITY_MANAGER Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* Booking systems
-* staff scheduling
-* customer service dashboards
+
+1
+

@@ -1,15 +1,21 @@
-# 🛡️ Sentinel Neural Firewall (S08 Matrix)
+﻿1
+
 
 The **Sentinel Neural Firewall** defines SigmaOS’s approach to absolute Cyber Security by integrating fundamental algorithms, data science logic, and machine learning methodologies directly into the Sovereign OS kernel layer without heavy external library dependencies.
 
-## 🧠 Data Science & Machine Learning Foundations
 
-Rather than relying on massive cloud-trained tensor networks, the S08 matrix employs a localized **Perceptron Heuristic Model**. 
+1
 
-* **Algorithm**: `Sigmoid( Sum(Weight * FeatureCount) + Bias )`
-* **Theory**: The engine counts specific string occurrences (representing known heuristic vulnerabilities like executing code, encoded blobs, etc.) within the content. These feature counts are multiplied by pre-defined threshold weights and passed through a Sigmoid activation function to generate a normalized threat probability `P(t)`.
 
-## 💻 OS and Sandboxing Integration
+Rather than relying on massive cloud-trained tensor networks, the S08 matrix employs a localized **Perceptron Heuristic Model**.
+
+
+1
+
+
+
+1
+
 
 When the Firewall audits the Virtual File System or intercepts a process:
 
@@ -18,9 +24,14 @@ When the Firewall audits the Virtual File System or intercepts a process:
 
 3. A notification is synchronously emitted to the UI/UX layer via the `NotificationCenter`.
 
-## 🚀 Activation
+
+1
+
 
 Pro users and system administrators can manually invoke the heuristic scan across the entire system via the CLI command: `audit`
 
 ---
-*Absolute security requires no outside observers.*
+
+
+1
+

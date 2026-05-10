@@ -1,7 +1,8 @@
-# 🛠 CYBERSECURITY_ANALYST Tools
+﻿1
+
 
 Required Tools & Functions:
 
-* Threat detection
-* penetration testing
-* compliance dashboards
+
+1
+

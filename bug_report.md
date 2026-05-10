@@ -1,4 +1,5 @@
-# bug report
+﻿1
+
 
 ---
 
@@ -9,11 +10,15 @@ labels: ["bug", "needs-triage"]
 assignees: AaryanSinghChauhan09
 ---
 
-## 🐛 Bug Description
+
+1
+
 
 <!-- A clear and concise description of the bug -->
 
-## 🔄 Steps to Reproduce
+
+1
+
 
 1. 1.
 
@@ -21,23 +26,35 @@ assignees: AaryanSinghChauhan09
 
 <!-- What should have happened -->
 
-## ❌ Actual Behavior
+
+1
+
 
 <!-- What actually happened -->
 
-## 🖥️ Environment
 
-* **SigmaOS Version**:
-* **Host Architecture**: (x86_64 / arm64)
-* **Kernel Shard Affected**:
-* **QEMU / Bare Metal**:
+1
 
-## 📋 Logs / Stack Trace
 
-```
+
+1
+
+
+
+1
+
+
+
+1
+
 Paste logs here
-```
 
-## 📎 Additional Context
+1
+
+
+
+1
+
 
 <!-- Any other relevant info, screenshots, etc. -->
+

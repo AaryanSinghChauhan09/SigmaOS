@@ -1,10 +1,15 @@
-# Security Policy
+﻿1
 
-## Supported Versions
+
+
+1
+
 
 Currently, only the `main` branch (EXTINCTION-1 APEX) receives active security patches.
 
-## Zero-Trust Architecture Guidelines
+
+1
+
 
 SigmaOS employs a "Zero-Trust shard namespacing" model. When contributing or modifying suites:
 
@@ -13,7 +18,10 @@ SigmaOS employs a "Zero-Trust shard namespacing" model. When contributing or mod
 
 3. **Memory Safety:** Avoid raw pointers outside of the `S05_Memory` suite. Use the native `sigma_sdk_malloc` and bounds-checked wrappers.
 
-## Reporting a Vulnerability
+
+1
+
 
 Do not report security vulnerabilities via public GitHub issues.
 Please email `security@sigmaos.dev` with a detailed description, PoC (if available), and potential mitigation. We aim to acknowledge reports within 48 hours.
+
