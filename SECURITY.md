@@ -10,10 +10,9 @@
 
 ## Reporting a Vulnerability
 
-**Please do NOT report security vulnerabilities via public GitHub Issues.**
+### Please do NOT report security vulnerabilities via public GitHub Issues.
 
 To report a security vulnerability in SigmaOS:
-
 
 1. **Email**: [Sovereign-OS0305@gmail.com](mailto:Sovereign-OS0305@gmail.com)
 2. **Or**: Open a private [Security Advisory](https://github.com/Sovereign-OS/SigmaOS/security/advisories/new) on GitHub
@@ -31,7 +30,6 @@ To report a security vulnerability in SigmaOS:
 ## Security Architecture
 
 SigmaOS enforces sovereign security through:
-
 
 * **Capability-Based IPC (S-Zircon)**: All inter-shard communication uses unforgeable capability handles
 * **Hardware-Backed Isolation**: Each suite runs in isolated shard domains with hardware compartmentalization

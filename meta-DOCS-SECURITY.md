@@ -15,5 +15,5 @@ SigmaOS employs a "Zero-Trust shard namespacing" model. When contributing or mod
 
 ## Reporting a Vulnerability
 
-Do not report security vulnerabilities via public GitHub issues. 
+Do not report security vulnerabilities via public GitHub issues.
 Please email `security@sigmaos.dev` with a detailed description, PoC (if available), and potential mitigation. We aim to acknowledge reports within 48 hours.

@@ -35,7 +35,6 @@ Every Pull Request triggers the following automated suite:
 
 ## 🤝 How to Contribute Shards
 
-
 1. **Fork** the repository and create an `alpha` branch.
 2. **Develop** your shard in the appropriate `suites/` directory.
 
