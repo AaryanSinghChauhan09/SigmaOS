@@ -1,26 +1,21 @@
-﻿# Contributing to SigmaOS
+# Contribution Guide
 
-We welcome contributors! As a meritocratic project, we value high-quality code, clear documentation, and a focus on sovereign computing.
+## Coding Standards
+- **C/C++**: We enforce strict `clang-format` compliance and zero-warnings via `clang-tidy`. OOP patterns must be maintained.
+- **No Global State**: All drivers and services must be encapsulated inside Sovereign classes.
+- **Linting**: Ensure all Markdown files comply with standard Markdown linting rules.
 
-## ðŸ›  Setup
+## Branching Strategy
+- `main`: The stable core. Do not push directly to `main`.
+- `feature/*`: For new additions.
+- `fix/*`: For bug fixes and refactors.
 
-1. Clone the repo.
-2. Ensure you have a C++20 compatible compiler (GCC 12+, Clang 15+).
-3. Follow the [Installation Guide](https://github.com/AaryanSinghChauhan09/SigmaOS.wiki/blob/master/INSTALLATION_GUIDE.md).
+## CI/CD Pipeline
+- **Automated Tests**: All PRs must pass `make test` before merging.
+- **Commit Messages**: Use semantic commits (`feat:`, `fix:`, `docs:`).
 
-## ðŸ§­ Branching Strategy
-
-* `main`: Stable, production-ready code.
-* `develop`: Integration branch for new features.
-* `feature/*`: Individual feature shards.
-* `fix/*`: Bug fixes.
-
-## ðŸ“ Coding Standards
-
-* **OOP Isolation**: All new shards must inherit from `SigmaObject`.
-* **No Raw Pointers**: Use Sovereign smart pointers or reference-counted objects.
-* **Documentation**: Every public method must be documented in the header.
-
-## ðŸ—³ Sovereign Council
-
-Major architectural changes require an RFC and approval from the [Sovereign Council](https://github.com/AaryanSinghChauhan09/SigmaOS.wiki/blob/master/GOVERNANCE_CHARTER.md).
+## How to Submit
+1. Fork the repo and create a branch.
+2. Implement your changes.
+3. Run `make rebuild` and ensure it compiles via QEMU.
+4. Submit a Pull Request.

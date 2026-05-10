@@ -21,9 +21,18 @@ KERNEL_SHARDS    = $(patsubst %.cpp,%.o,$(filter %.cpp,$(MANIFEST_SOURCES))) \
                    $(patsubst %.c,%.o,$(filter %.c,$(MANIFEST_SOURCES))) \
                    $(patsubst %.asm,%.o,$(filter %.asm,$(MANIFEST_SOURCES)))
 
-.PHONY: all singularity zenith-iso qemu clean rebuild test
+.PHONY: all kernel drivers ui singularity zenith-iso qemu clean rebuild test
 
-all: singularity
+all: kernel drivers ui singularity
+
+kernel:
+	@echo "[MODULE] Building Kernel (Sovereign Core)..."
+
+drivers:
+	@echo "[MODULE] Building Drivers (Hardware/GPU/Network)..."
+
+ui:
+	@echo "[MODULE] Building UI (Zenith Compositor)..."
 
 test:
 	@echo "[TEST] Building and running GTest host suite..."

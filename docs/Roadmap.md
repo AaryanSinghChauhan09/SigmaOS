@@ -1,34 +1,19 @@
-﻿# ðŸ§­ SigmaOS Roadmap: The 100 Advancement Strategies
+# Roadmap
 
-The path to becoming the ultimate Linux competitor crusher. SigmaOS follows a rigorous, multi-phase evolution to ensure total market dominance.
+## Short-Term: Kernel & Core UI (Q3 2026)
+- [x] Kernel interrupts and basic timer handlers.
+- [x] Universal package wrapper (`sigma-pkg`).
+- [ ] Implement Zenith UI Wayland compositor rendering pipeline.
+- [ ] Hardware Attestation (TPM 2.0 handshake) driver.
+- [ ] Full FIPS-140 compliance tests.
 
-## ðŸ“… 2026: The Year of Sovereignty (Industrialization)
+## Mid-Term: Security & AI Integration (Q4 2026)
+- [x] Integrate `liboqs` (Kyber, Dilithium) into `SovereignPQC`.
+- [ ] Build a functioning AI Assistant (Alt+A) daemon hooked into `sysfs`.
+- [ ] Implement capability-based process isolation.
+- [ ] BTRFS-based Self-Healing OS snapshot and rollback scripts.
 
-- **Q2: ARM64 Zenith**: Finalize RPi5 and Apple Silicon optimizations (Silicon Sovereignty).
-- **Q3: AI Governance**: Expand Autonomous Agent Quotas and Command Grammar (Agentic Sovereignty).
-- **Q4: FIPS-140 Integration**: Complete industrial compliance for enterprise and government markets.
-
-## ðŸ“… 2027: The Global Lattice (Expansion)
-
-- **P2P Marketplace**: Launch a decentralized, sovereign application marketplace.
-- **Universal Container Orchestration**: Neutralize **Flatcar** and **Fedora CoreOS** with sovereign K8s integration.
-- **Zenith UI 3.0**: Introduce holographic and AR-native interface layers.
-
-## ðŸ“… 2028: Autonomous Evolution (Transcendence)
-
-- **Self-Generating Shards**: AI-driven creation of new OS functions based on user needs.
-- **Quantum-Native Lattice**: Total migration to quantum-safe primitives.
-- **Sovereign Cloud Hubs**: Peer-to-peer cloud infrastructure that eliminates AWS/Azure dependency.
-
-## ðŸ† Competitive Kill List
-
-- [x] **Gentoo/NixOS**: Neutralized via Universal Package Dependency Graph.
-- [x] **elementary/Solus**: Surpassed via Zenith UI CSS Engine.
-- [x] **RPi-Distro/Alpine**: Dominated via SovereignARM64 optimizations.
-- [ ] **SteamOS**: Target: Full GPU/Proton Integration for Gaming Sovereignty.
-- [ ] **Clear Linux**: Target: Sovereign Silicon Optimizations for Performance Sovereignty.
-- [ ] **CentOS/AlmaLinux**: Target: FIPS-140-3 Compliance for Enterprise Sovereignty.
-
-## ðŸš€ The 100 Strategic Pillars
-
-See the [Ultimate Advancement Strategy](ULTIMATE-ADVANCEMENT-STRATEGY.md) for the full 100-step blueprint across architecture, performance, security, and governance.
+## Long-Term: Cloud & Gaming (Q1 2027)
+- [ ] Kubernetes-native node layer out-of-the-box.
+- [ ] Native Vulkan rendering pipeline acceleration.
+- [ ] Sigma Profiles: pre-configured UI/Kernel settings for gamers & devs.
