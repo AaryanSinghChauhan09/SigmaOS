@@ -91,6 +91,7 @@ graph TD
 ## 📦 Technical Quickstart
 
 ### Prerequisites
+
 * `gcc-x86-64-linux-gnu` / `clang`
 * `nasm`, `make`, `cmake`
 * `qemu-system-x86`
@@ -123,6 +124,7 @@ Contributions are welcome! Please see the [Contribution Guide](https://github.co
 ## 🏛️ Governance & Standards
 
 SigmaOS adheres to strict industrial standards for lattice maintenance and security.
+
 * **[Maintenance Policy](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Maintenance-Policy)**: Quality standards and review process.
 * **[Release Process](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Release-Process)**: Preparation and cryptographic signing details.
 * **[Code of Conduct](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/CODE_OF_CONDUCT)**: Expectations for community behavior.
