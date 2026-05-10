@@ -1,29 +1,28 @@
-﻿# SigmaOS Architecture Overview
+# Architecture Overview
 
-## Sovereign Lattice Design
+## The 7-Layer Sovereign Lattice
 
-SigmaOS is built upon a 600-shard modular Object-Oriented C++ architecture.
+```mermaid
+graph TD
+    L1[Layer 1: Bare-Metal Silicon & TPM]
+    L2[Layer 2: HAL & Quantum Watchdog]
+    L3[Layer 3: Sovereign Core Kernel]
+    L4[Layer 4: Shard Orchestrator & Sandbox]
+    L5[Layer 5: Sovereign Package Manager & AI Daemon]
+    L6[Layer 6: Zenith Wayland Compositor]
+    L7[Layer 7: Sovereign Applications & ML Hub]
+    
+    L1 --> L2
+    L2 --> L3
+    L3 --> L4
+    L4 --> L5
+    L5 --> L6
+    L6 --> L7
+```
 
-### 1. Hybrid Compute Bridge
+## IPC Flow & Scheduling
+Communication between layers is enforced by the **Sovereign IPC Bus**. No driver can directly access the kernel space without an encrypted capability token.
+- **Example Flow**: The AI Daemon (L5) requests CPU metrics. It sends an IPC request to the Sandbox (L4), which authenticates it and forwards it to the Kernel (L3). The Kernel reads from HAL (L2) and replies.
 
-Supports dynamic dispatch across heterogeneous silicon, including ARM and RISC-V via `SovereignHybridArch`.
-
-### 2. Networking Sovereignty
-
-`SovereignNetStack` implements a bare-metal TCP/IP protocol with Deep Packet Inspection natively in Ring-0.
-
-### 3. Distributed Storage
-
-`SovereignVFS` shards file data across nodes, granting resilience against physical hardware failures.
-
-### 4. Hardware Acceleration
-
-`SovereignGPU` interacts directly with NUMA nodes to provide O(1) visualization and compute rendering for AI inference.
-
-### 5. Zenith Desktop UI
-
-`SovereignSettingsDashboard` and `SovereignTelemetryUI` provide 120fps hardware-accelerated monitoring and customization.
-
-### 6. Containerization
-
-`SovereignContainers` use the Sovereign Enforcement Layer (SEL) to spawn secure micro-VMs.
+## Hardware Abstraction
+The `SovereignHAL` provides a strict interface for hardware interaction. Direct I/O port mapping is prohibited unless verified by the Hardware Attestation TPM driver during boot.
