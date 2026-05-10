@@ -17,7 +17,7 @@ assignees: AaryanSinghChauhan09
 
 1. 1.
 
-3. ## âœ… Expected Behavior
+2. ## âœ… Expected Behavior
 
 <!-- What should have happened -->
 

@@ -8,6 +8,7 @@ The SigmaOS CI pipeline is an industrial-grade, automated sentinel that ensures 
 
 - **CodeQL / Cppcheck**: Deep static analysis for industrial safety.
 - **Zero-Dependency Audit**: Verifies that no standard libraries are linked.
+
 1. **Shard Test Nexus**: Runs the autonomous `SovereignUnitTestShard` to verify kernel-level primitives (Memory, Security, PQC).
 2. **Package Nexus (Deploy)**: Orchestrates the distribution of verified silicon shards to the global lattice.
 
