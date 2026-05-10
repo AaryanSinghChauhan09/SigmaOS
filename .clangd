@@ -1,24 +1,16 @@
-<<<<<<< HEAD
----
 CompileFlags:
   Add:
-    - "-I."
-    - "-std=c99"
-    - "-Wall"
-    - "-Wextra"
-Diagnostics:
-  UnusedIncludes: Strict
-=======
-﻿CompileFlags:
-  Add:
     - -I./include
+    - -I./kernel/core/include
+    - -I.
     - -ffreestanding
     - -std=c++17
     - -fno-exceptions
     - -fno-rtti
+    - -Wall
+    - -Wextra
   Remove:
     - -mno-red-zone
 
 Diagnostics:
   UnusedIncludes: None
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645
