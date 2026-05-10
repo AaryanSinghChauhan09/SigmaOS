@@ -15,6 +15,7 @@ The Sovereign Hotpatch Shard provides native, zero-dependency live kernel patchi
 ## Architecture
 
 ```
+
 Patch Matrix (up to 16 concurrent patches)
   ├── PENDING   — Loaded, awaiting quiesce
   ├── APPLIED   — Trampoline active; calls redirected to patch_func
@@ -25,6 +26,7 @@ Trampoline Engine
   Step 1: Quiesce silicon missions using target function
   Step 2: Install 5-byte JMP at target_func → patch_func
   Step 3: Resume missions — zero downtime achieved
+
 ```
 
 ---
@@ -41,8 +43,10 @@ Trampoline Engine
 
 ## Design Philosophy
 
+
 - **Zero Reboot**: Kernel updates are applied while all missions continue running.
 - **Ref-Count Safety**: A patch refuses to revert while missions are using the patched path.
+
 - **CVE-First**: Boot patch `CVE-SIGMA-001_null_deref` is pre-seeded at init.
 
 ---

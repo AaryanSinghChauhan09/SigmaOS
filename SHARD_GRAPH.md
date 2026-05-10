@@ -1,6 +1,7 @@
 # 📊 SigmaOS Shard Dependency Graph (v4.0 Finality)
 
 ```mermaid
+
 graph TD
     S01_Genesis --> S03_Orchestrator
     S01_Genesis --> S05_Memory
@@ -22,5 +23,6 @@ graph TD
         SovereignRegistry.c
         SOVEREIGN_MANIFEST.json
     end
+
 ```
 

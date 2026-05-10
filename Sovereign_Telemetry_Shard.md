@@ -15,6 +15,7 @@ The Sovereign Telemetry Shard provides native, zero-dependency silicon observabi
 ## Architecture
 
 ```
+
 Silicon Probe Matrix
   ├── Kernel Probes (kprobe)      — Attach to kernel function entry/exit
   ├── User Probes (uprobe)        — Attach to citizen-mission entry points
@@ -23,6 +24,7 @@ Silicon Probe Matrix
 
 Latency Histogram Engine
   └── 8 × 64ns buckets — CycleClock-accurate distribution
+
 ```
 
 ---
@@ -40,8 +42,10 @@ Latency Histogram Engine
 
 ## Design Philosophy
 
+
 - **Zero External Dependency**: No BPF JIT, no perf system calls — all logic is pure C11.
 - **Zenith Accuracy**: Histogram buckets operate at 64ns granularity.
+
 - **Dynamic Arming**: Any kernel address can be probed at any mission time.
 - **Deterministic Flushing**: Histogram flush is atomic and non-blocking.
 

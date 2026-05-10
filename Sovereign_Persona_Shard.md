@@ -15,6 +15,7 @@ The Sovereign Persona Shard provides native, zero-dependency multi-user personal
 ## Architecture
 
 ```
+
 Sovereign Persona Matrix (up to 8 concurrent contexts)
   ├── Zenith_Admin   — Full capability ring (0xFFFFFFFF) | Obsidian theme
   ├── Citizen_Dev    — Developer sandbox ring            | Aurora theme
@@ -24,6 +25,7 @@ Context Switch Engine
   └── Atomic deactivation of previous context → activation of target
       — No process restart required
       — Capability mask enforced at dispatch time
+
 ```
 
 ---
@@ -50,8 +52,10 @@ Context Switch Engine
 
 ## Design Philosophy
 
+
 - **Zero External Dependency**: No PAM modules, no dbus, no uid-map userspace tools.
 - **Atomic Context Switching**: Single-instruction deactivate/activate cycle.
+
 - **Capability Federation**: Each persona's accessible shard commands are governed by its bitmask.
 - **Aesthetic Sovereignty**: Per-persona ANSI themes are applied at the silicon shell layer.
 

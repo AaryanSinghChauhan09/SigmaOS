@@ -1,63 +1,40 @@
-* **[Sovereign Architecture](Sovereign-Architecture)**: Absolute machine finality and zero-std primitives.
+# 🌌 SigmaOS Sovereign Wiki: The Singularity Portal
 
-# 🌀 Welcome to the SigmaOS Sovereign Wiki
+Welcome to the official documentation for **SigmaOS** — the "Sigma" of all Operating Systems. SigmaOS is an industrial-grade, bare-metal ecosystem built from 1000+ atomic shards, aggregating the world's most powerful features into a single **universally sovereign, AI-native lattice**.
 
-SigmaOS is a next-generation, industrial-grade operating system designed for speed, modularity, and innovation. Unlike traditional Linux distros, SigmaOS bypasses POSIX and legacy layers to deliver bare-metal performance with direct silicon memory flows.
+## 🏗️ The 10-Layer Sovereign Lattice
 
-## 🏛️ Project Vision
-SigmaOS aims to be the fastest and most secure platform for browser-centric computing, blending the purity of a 33-suite Sovereign Lattice with the flexibility of a Chromium-native ecosystem.
+Explore the technical architecture and philosophy behind the most advanced OS ever forged:
 
-## 📖 Wiki Contents
-- **[Shard Index](AUTO_SOVEREIGN_WIKI.md)**: A complete technical breakdown of all 2,191 shards.
-- **Getting Started**:
-  - [Installation Guide](#installation-guide)
-  - [Developer Setup](#developer-setup)
-- **Features**:
-  - [Sovereign 33-Suite Lattice](AUTO_SOVEREIGN_WIKI.md)
-  - [Zenith Dashboard v33.0.4](Home.md)
-  - **[Sigma Vault]**: Centralized WASM Shard Marketplace.
-  - **[Snapshot Engine]**: Declarative System Rollback (NixOS-grade).
-  - **[Tiling Engine]**: Advanced Window Management (i3/Sway style).
-  - **[Sovereign Handoff]**: Universal State Continuity.
-- **Roadmap**: [Strategic Feature Trajectory](../README.md#roadmap)
+- **[Architecture Overview](Architecture_Overview.md)**: Deep-dive into the 10-layer lattice (HAL to Nexus).
+- **[Security & PQC](Security_and_PQC.md)**: Quantum-safe security, TPM attestation, and Zero-Trust IPC.
 
-## 💻 Installation Guide
-### Bare-Metal (Recommended)
-1. Clone the unified repository (Primary Branch: `main`):
-   ```bash
-   git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git -b main
-   cd SigmaOS
-   ```
-2. Build the modularized kernel:
-   ```bash
-   make all
-   ```
-3. Generate the 33-suite Sovereign ISO:
-   ```bash
-   make iso
-   ```
-4. Flash to a USB drive or boot in QEMU.
+- **[Modularization Guide](Modularization_Guide.md)**: Principles of atomic shard development.
 
-### Web Engine (Simulated Mode)
-1. Build the engine:
-   ```bash
-   make web-engine
-   ```
-2. Launch the local portal:
-   ```bash
-   ./sigma_web_engine
-   ```
+## 🏢 Sovereign Nexus (Enterprise & Productivity)
 
-## 🛠 Developer Setup
-1. Install **GCC 13+**, **NASM**, and **Node.js**.
-2. Explore the **33-Suite Sovereign Lattice** in the `suites/` directory.
-3. Build the system using the unified orchestrator:
-   ```bash
-   make kernel
-   ```
-4. Launch the **Zenith Dashboard** via `index.html` in the root.
+SigmaOS is the supreme alternative to Microsoft, Google, Oracle, and Salesforce:
 
-3. Use the **Sovereign Shard Builder** to create new suites.
+- **[Sovereign Office](CLI_Reference.md#office)**: Collaborative Docs, Sheets, and Slides.
+- **[Sovereign ERP & CRM](CLI_Reference.md#nexus)**: Modular business management and lead scoring.
+
+- **[Sovereign Creative](Architecture_Overview.md#creative)**: Direct-Silicon media processing and GPU acceleration.
+
+## 🚀 Strategic Milestones
+
+
+- **[Master Feature Manifest](Master_Feature_Manifest.md)**: The mapping of all absorbed USPs.
+- **[Strategic Roadmap](Roadmap.md)**: From stabilization to autonomous sovereignty.
+
+- **[Competitor Matrix](Competitor_Matrix.md)**: Why SigmaOS transcends Linux and Windows.
+
+## 🛠️ Developer & CLI Resources
+
+
+- **[CLI Reference](CLI_Reference.md)**: Manual for the `s-cli` v14.0 [NEXUS-SUPREME] suite.
+- **[Contribution Guide](Contributing.md)**: Branching, CI/CD, and coding standards.
+
+- **[Kernel Module Reference](Kernel_Module_Reference.md)**: The full shard registry.
 
 ---
-*Sovereignty is Absolute. The Work continues.*
+**Core Values:** Atomic Integrity | Zero External Linkage | Silicon Sovereignty | Intent-Driven Interaction

@@ -15,6 +15,7 @@ The Sovereign Journal Shard provides native, zero-dependency structured kernel e
 ## Architecture
 
 ```
+
 Ring Buffer: 64 entries (circular, auto-overwrite oldest)
   Entry: seq | timestamp_us | level | unit | message
 
@@ -26,6 +27,7 @@ Boot Entries (pre-seeded):
   [NOTICE]  sigma_sched    "Zen Scheduler armed and ready."
   [INFO]    sigma_tele     "eBPF probes seated."
   [WARNING] sigma_oom      "Memory pressure elevated at boot."
+
 ```
 
 ---
@@ -42,8 +44,10 @@ Boot Entries (pre-seeded):
 
 ## Design Philosophy
 
+
 - **Lock-Free Ring**: Circular overwrite eliminates allocation and mutex overhead.
 - **CRIT+ Immediate**: `EMERG`, `ALERT`, `CRIT` entries bypass the buffer and print immediately.
+
 - **Structured Fields**: Every entry carries `seq`, `timestamp_us`, `unit`, and `message` for machine-readable analysis.
 
 ---

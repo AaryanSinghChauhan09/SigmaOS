@@ -15,6 +15,7 @@ The Sovereign OOM Shard provides native, zero-dependency memory-pressure governa
 ## Architecture
 
 ```
+
 OOM Score Table (24 entries max)
   sigma_kernel_core   PID:1  score:-500  [PROTECTED]   ← never culled
   sigma_wm_compositor PID:2  score:+100
@@ -24,6 +25,7 @@ OOM Score Table (24 entries max)
 Thresholds:
   WARN     < 512 MB free — sweep with logging
   CRITICAL < 128 MB free — aggressive cull, highest-score victim selected
+
 ```
 
 ---
@@ -40,8 +42,10 @@ Thresholds:
 
 ## Design Philosophy
 
+
 - **Protected Shards**: `oom_score < 0` + `protected=true` means the shard is never a cull target.
 - **Score-Based Priority**: Higher score = culled first (matches Linux oom_score_adj semantics).
+
 - **Compaction**: Culled entries are removed by O(1) table compaction.
 
 ---

@@ -16,9 +16,12 @@ SigmaOS has transcendently finalized its architecture for **Peak Performance See
 ---
 
 ## 🏛️ On-Demand Materialization
+
 Unlike traditional operating systems that run everything at once, SigmaOS treats every functional capability as a **Cold-Shard**.
+
 - **Stage 1**: User/Request triggers `S03_DemandEngine`.
 - **Stage 2**: Specific shard is materialized into `S05_MeshNuma`.
+
 - **Stage 3**: Task executes at full silicon-speed with 0% OS contention.
 - **Stage 4**: Shard dissolves into the Ghost-Mesh; system returns to 0% usage.
 

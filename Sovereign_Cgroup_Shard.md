@@ -15,6 +15,7 @@ The Sovereign Cgroup Shard provides native, zero-dependency silicon resource acc
 ## Architecture
 
 ```
+
 Cgroup Matrix (up to 12 resource groups)
   ├── zenith_kernel   — 80% CPU | 4 GB  MEM | IO:900 (High)
   ├── citizen_apps    — 60% CPU | 2 GB  MEM | IO:500 (Mid)
@@ -25,6 +26,7 @@ Auto-Governor Engine (called by Zen Scheduler every tick)
       ├── Sample current CPU + MEM usage
       ├── Compare against quota limits
       └── Apply silicon throttle if over-quota
+
 ```
 
 ---
@@ -51,8 +53,10 @@ Auto-Governor Engine (called by Zen Scheduler every tick)
 
 ## Design Philosophy
 
+
 - **Zero External Dependency**: No cgroupfs, no systemd-cgtop — all logic is pure C11.
 - **Automatic Throttle**: Governor runs every scheduler tick without citizen intervention.
+
 - **Hierarchical**: Groups can be nested for multi-level resource isolation.
 
 ---

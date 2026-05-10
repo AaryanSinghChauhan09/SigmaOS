@@ -9,21 +9,27 @@
 // =============================================================================
 
 ALLOWED LANGUAGES (kernel):
+
   - C11       (primary — all sovereign shards)
   - Assembly  (boot, interrupt, CPUID primitives only)
+
   - Rust       (memory safety wrappers via #![no_std] — no std crates)
 
 ALLOWED LANGUAGES (userland tools — in tools/):
+
   - C11 only  (all Python/JS scripts must migrate → tools/**/*.c)
 
 FORBIDDEN IN KERNEL SUITES (S01–S10):
+
   - Python     → replace with equivalent .c in tools/
   - JavaScript → replace with WebAssembly or remove; UI-only JS
                  is isolated to S02_ZenithUI and must have a native path
+
   - Shell      → replace with C build harness (Makefile / tools/*.c)
   - glibc      → use sigma_libc (libc/ dir) or S05 Rust allocator
 
 ALLOWED EXTERNAL DEPS (vendored only, no network fetch):
+
   - Rust crates: only #[no_std] crates vendored into kernel/suites/S05_Memory/
   - No npm, no pip, no cargo registry access at build time
 

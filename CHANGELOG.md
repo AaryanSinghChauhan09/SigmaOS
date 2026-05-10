@@ -1,220 +1,137 @@
-# SigmaOS — Sovereign Open Source Architecture Changelog
+# SigmaOS CHANGELOG
 
-## [v4.0-SINGULARITY] - The Modularization Singularity (Absolute Lattice Harmonization)
-**Date**: 2026-04-15
-
-### 🏛️ Absolute Architectural Modularization
-- **Lattice Purge**: Achieved 100% root purification. The `include/` and `kernel/` roots are now devoid of individual files, with all assets migrated to specialized **Sovereign Suites**.
-- **Suite-Relative Includes**: Harmonized the entire repository (900+ files) to use project-relative include paths (e.g., `#include "suites/S01_Genesis/shards/sigma_types.h"`).
-- **Genesis Consolidation**: Centralized foundational types, LibC stubs, and core kernel entry points in **S01 Genesis** to ensure absolute type integrity.
-- **Registry Harmonization**: Migrated the master silicon registry and UDF engine to **S10 Registry**.
-
-### 🛠️ Industrial Component Fixes
-- **Freestanding Type Purity**: Resolved the long-standing `sigma_size_t` error by implementing a unified alias in `SovereignCommon.h` and purging legacy shadow-type definitions.
-- **Toolchain Hardening**: Eliminated recursive preamble errors in `stdint.h` by modularizing shadow headers in `libc/` and enforcing a strictly freestanding header hierarchy.
-- **Unified Build System**: Modernized the `Makefile` with recursive suite discovery logic, enabling autonomous compilation of nested shards.
-- **Userland & LibC Sync**: Extended modular standards to the `libc/` and `userland/` layers, achieving architectural parity across the entire OS stack.
-
-### 📖 Documentation Supremacy
-- **Lattice Architecture Guide**: Launched the **SOVEREIGN_LATTICE_ARCH_v4.md** wiki page as the definitive map of the 33-suite modular system.
-- **Wiki Overhaul**: Updated the **Home**, **API Reference**, and **Technical Specifications** to reflect the v4.0 industrial standards and final shard counts (1.7M+).
-
----
-
-
-## [v33.1-SINGULARITY] - Terminal Sovereign Enclosure (33 Suites)
-**Date**: 2026-04-14
-
-### 🏛️ 33-Suite Modularization (Lattice Finality)
-- **Architectural Sharding**: Deconstructed the 10-suite hybrid core into 33 independent, zero-dependency Sovereign Suites (S01–S33).
-- **Registration Shards**: Materialized 33 unique `_Register.c` shards to resolve all remaining linker collisions and satisfy the "Seal of Supremacy".
-- **Master Aggregator**: Refined `sigma_kernel.h` into a terminal orchestration sequence for 1:1 shard-to-silicon mapping.
-
-### 🛠️ Industrial Hardening
-- **IDE Sovereignty**: Fixed `clangd` recursive preamble errors by hardening `.clangd` and providing `libc/stdint.h` wrappers.
-- **Panic Lattice**: Harmonized `SIGMA_ASSERT` for dual-mode freestanding/hosted operation across the entire project.
-- **Master Auditor**: Implemented the S13 `LatticeAuditor` to provide a factual, 100% pure system integrity metric.
-
-### 📖 Factual Synchronization
-- **Wiki Absolute**: Purged all speculative content. Every record in the `WIKI/` directory is now an empirical fact of the v33.1 state.
-- **CI/CD Supremacy**: Expanded `sovereign_ci.yml` to validate the full 33-suite grid, ensuring 0% host leakage and 100% C11 purity.
-- **README Terminal**: Updated master specifications to reflect 1.4 Million granular shards and 33-suite dominance.
-
----
-
-## [v3150.0-SINGULARITY] - Universal Principle Finality & 10 Suite Convergence
-**Date**: 2026-04-13
-
-### 🟢 Sovereign Shards (Universal Extension)
-- **SovereignUDFEngine**: High-velocity User Defined Function engine — dynamic registry, sandboxed execution, and context-manager for AI/DS/DB workflows.
-- **SovereignParadigmGuard (Universal)**: Ultimate architectural enforcer — auditing 18+ domains including OS, AI, ML, DS, DSA, DB (ACID), Cyber (Zero-Trust), NET (OSI), AUTO, CUSTOM, PERS, UDF, and Post-Quantum Bio-Computation.
-- **SovereignDatabaseShard**: Kernel-level industrial storage — ACID guarantees (Atomicity, Consistency, Isolation, Durability) with Write-Ahead Logging (WAL).
-- **SovereignCyberDefense**: Zero-Trust security mesh — real-time intrusion detection (IDS), MAC enforcement, and cryptographic shard verification.
-- **SovereignNetworkStack (v2)**: OSI-compliant networking — 7-layer abstraction model, packet routing, and flow control.
-- **SovereignPersonalization**: Identity sovereignty — hot-swappable Sentient-Chroma themes and atomic configuration logic.
-- **SovereignAutomation**: Autonomous self-healing — background health audits, Cron-dispatch, and resource optimization.
-
-### 🏛️ Master Architecture (Phase 2)
-- **Suite Consolidation**: Successfully modularized 434 functional shards into **10 Master Sovereign Suites** (Genesis to Orchestration).
-- **Verification**: **Universal Auditor (v9)** pass — certified 100% adherence to core mathematical and engineering paradigms.
-- **Repository**: Finalized project documentation (README MASTERSPEC) and synchronized with GitHub main branch.
-
----
-**Date**: 2026-04-12
-
-### 🟢 Sovereign Shards
-- **SovereignIPCShard**: Native D-Bus/Binder/Mach IPC/COM silicon message bus — typed channels, 16-deep FIFO, METHOD_CALL/SIGNAL/REPLY/ERROR dispatch. CLI: `sigma-ipc`.
-- **SovereignCryptoShard**: Native hardware-accelerated crypto (AES-NI/SHA/BoringSSL parity) — FIPS 180-4 SHA-256 with self-test at init, AES-128-ECB with AES-NI intrinsics path. CLI: `sigma-crypto sha256`.
-- **SovereignAuditShard**: Tamper-evident SHA-256 hash-chained audit ring (auditd/BSM/EVTX parity) — 9 event types, chain integrity verification, immediate ALERT for SUSPICIOUS/PRIV_ESC events. CLI: `sigma-audit`.
-
-### 🔥 CLI Milestone
-- **47+ commands** registered in the master `SovereignCLI` dispatcher.
-- Sync: GLOBAL MESH ACTIVE — commit `901a9cec1`.
-
----
-
-## [v3009.0-Phase49] - DMA/Power/Config + Signal/VFS/NUMA Sovereignty
-**Date**: 2026-04-12
-
-### 🟢 Sovereign Shards
-- **SovereignDMAShard**: Intel VT-d/AMD-Vi/ARM SMMU — IOMMU domain isolation, quarantine. CLI: `sigma-dma`.
-- **SovereignPowerShard**: ACPI/cpufreq/TLP/Windows Plans — 4 power plans, P-state array, schedutil auto-governor. CLI: `sigma-power`.
-- **SovereignConfigShard**: NixOS/Registry/macOS defaults — 128-key typed register bank, atomic commit+rollback. CLI: `sigma-cfg`.
-- **SovereignSignalShard**: POSIX/Mach/SEH — handler-table dispatch, TERM/KILL/SEGV/USR defaults. CLI: `sigma-signal`.
-- **SovereignVFSShard**: Linux VFS/FUSE/APFS/Plan9 — pluggable backend op-table, SigmaExt4 built-in. CLI: `sigma-vfs`.
-- **SovereignNUMAShard**: Linux NUMA/libnuma/Windows NUMA — node latency matrix, local-first alloc, auto-balance. CLI: `sigma-numa`.
-
----
-
-## [v3008.0-Phase48] - OOM + Journal + Trace + IRQ + Rollback + Firewall
-**Date**: 2026-04-12
-
-### 🟢 Sovereign Shards
-- **SovereignOOMShard**: Linux OOM Killer/Jetsam — score-based culling, 512MB/128MB thresholds. CLI: `sigma-oom`.
-- **SovereignJournalShard**: systemd-journal/syslog/EventLog — 64-entry lock-free ring, 8-level ANSI priority. CLI: `sigma-journal`.
-- **SovereignTraceShard**: strace/ptrace/DTrace/Frida/ETW — 128-event syscall ring, ns-timing, histogram. CLI: `sigma-trace`.
-- **SovereignIRQShard**: APIC/MSI-X/irqbalance — per-IRQ affinity + auto round-robin rebalance. CLI: `sigma-irq`.
-- **SovereignRollbackShard**: Btrfs/ZFS/NixOS/Time Machine — COW snapshot chain, zero-downtime rollback. CLI: `sigma-rollback`.
-- **SovereignFirewallShard**: nftables/iptables/pf/WFP — deny-by-default, ACCEPT/DROP/REJECT/LOG+ACCEPT. CLI: `sigma-fw`.
-
----
-
-## [v3007.0-Phase47] - Native DSA Sharding & HLL Modularization
-**Date**: 2026-04-12
-
-
-### 🟢 Sovereign Shards (DSA & Visualizer Absorption)
-- **SovereignDSAShard**: Absorbed HLL JavaScript DSA visualizers into native C11/Assembly kernels. Implemented high-performance Quicksort with inline assembly `xchg` swap logic for absolute silicon sovereignty.
-- **Architectural Shifting**: Decentralized `SigmaDSA.js` logic into the `ds_ai` industrial territory. Established pure-C virtual method tables for algorithm auditing.
-
-
-## [v3006.0-Phase46] - RTOS Subsystems & BeOS/Haiku Application Matrices
-**Date**: 2026-04-09
-
-### 🟢 Sovereign Shards (FreeRTOS & Haiku OS Parity)
-- **SovereignFreeRTOS**: Absorbed industry embedded standards natively. Deployed zero-dependency parity for `xTaskCreate` priority preemptive tasks, `xQueue` intra-state communication, and hardware ticking logic.
-- **SovereignHaiku**: Implemented pure `BApplication`, `BWindow`, and `BMessage` API wrappers simulating the highly threaded application model of BeOS/Haiku OS within SigmaOS C11 constraints.
-
-## [v3005.0-Phase45] - Core Asynchronous I/O, GUI Modularization & Code Remediation
-**Date**: 2026-04-09
-
-### 🟢 Sovereign Shards (Linux & SerenityOS Parity)
-- **SovereignLinuxIoUring**: Absorbed Linux Kernel `io_uring` methodologies to deliver zero-syscall, lockless asynchronous IO patterns utilising SQ (Submission Queue) and CQ (Completion Queue) ring buffers directly in C11.
-- **SovereignSerenityGUI**: Absorbed SerenityOS WindowServer architectures bringing core libgui primitives, rect validations, and window creation natively into the kernel layer.
-
-### 🛠️ Core Optimization & Remediation
-- **SovereignUniversalPackaging**: Resolved implicit C99 undeclared method errors by standardizing output via `sigma_libc.h` (e.g. tracking `sigma_print_info` strictly to `sigma_printf`).
-- **Dependency Strictness**: Fixed extraneous unlinked head mapping across `SovereignBootMaster.c` and `SovereignPythonVM.c` dynamically resolving IDE linter analysis failures. Modularity is absolute.
-
-## [v3004.0-Phase44] - Mobile & macOS IPC Parity
-**Date**: 2026-04-09
-
-### 🟢 Sovereign Shards (AOSP & macOS XNU Absorption)
-- **SovereignAndroidBinder**: Absorbed Android Open Source Project (AOSP) Binder IPC mechanics natively mapped into SigmaOS, enabling high-performance IPC Transaction nodes, Parcel marshalling, and Context Manager Service deployments.
-- **SovereignDarwinXNU**: Absorbed Apple Darwin XNU capabilities featuring Mach Ports and Mach Msg subsystems. Emulated Grand Central Dispatch (GCD) `libdispatch` queuing methodologies directly into the base structure.
-
-## [v3003.0-Phase43] - Windows Enterprise Parity & Security Dominance
-**Date**: 2026-04-09
-
-### 🟢 Sovereign Shards (Windows Security & Enterprise Integration)
-- **SovereignDefender**: Absorbed Windows Defender parity, featuring real-time file shielding, YARA-bytecode parsing limits, heuristic scanning, and an EICAR response module.
-- **SovereignActiveDirectory**: Emulated Windows Server Active Directory features, implementing Lightweight Directory Access Protocol (LDAP) emulation, Kerberos KDC Ticket-Granting simulations, Domain Join capabilities, and hierarchical Group Policy Object (GPO) propagation mechanisms.
-
-## [v3002.0-Phase42] - Competitor Absorption & Cloud/Virtualization Dominance
-**Date**: 2026-04-09
-
-### 🟢 Sovereign Shards (Competitor Parity)
-- **SovereignJail**: Absorbed FreeBSD Jails and Capsicum capability-mode.
-- **SovereignZFS**: Absorbed OpenZFS (`zpool`, datasets, snapshots, ARC).
-- **SovereignMediaCodec**: Absorbed VLC media engine and OBS Studio Compositor (scene/source injection & hardware encoding).
-- **SovereignWineCompat**: Absorbed Wine, Proton, and DXVK (PE Loading, Registry emulation, D3D11->Vulkan map).
-- **SovereignDTrace**: Absorbed FreeBSD DTrace (dynamic probe firing) and `pf` Packet Filter (stateful NAT/block).
-- **SovereignBrowserCloud**: Absorbed Puter OS cloud engine, Chromium multi-process isolation, and Firefox privacy isolation.
-- **SovereignVirtualBox**: Absorbed Portable-VirtualBox (Seamless mode, VDI mount, Kernel VT-x).
-- **SovereignBandicam**: Absorbed Bandicam screen recording overlay APIs.
-
-## [v3001.0-Phase41] - 2026-04-09 (Core Sovereignty — Basic Components Hardening)
-### Added
-- **SovereignInitSystem** (`SovereignInitSystem.h` / `.c`): Full PID-1 service supervisor — `sigma_svc_register`, `sigma_svc_start/stop/restart/status`, `sigma_init_reap` (zombie collection + auto-restart), `sigma_init_switch_runlevel`. Inspired by OpenRC, runit, s6, and systemd. 5 system services bootstrapped on first boot.
-- **SovereignEnvManager** (`SovereignEnvManager.h` / `.c`): POSIX-parity environment variable store — `sigma_env_set/get/unset/dump/inherit`. djb2 linear-probed hash table (256-slot). `g_sigma_env` global block seeded with 10 standard POSIX variables (PATH, HOME, SHELL, TERM, LANG…).
-- **SovereignUserManager** (`SovereignUserManager.h` / `.c`): Multi-user UID/GID management — `sigma_user_add/del/passwd/lock/unlock/lookup`, `sigma_group_add/add_user`, `sigma_userdb_dump`, `sigma_auth_verify` (PAM parity). Sovereign PBKDF2-SHA256 stub. Inspired by Linux passwd/shadow, macOS DirectoryService, FreeBSD pw(8).
-- **SovereignDmesg** (`SovereignDmesg.h` / `.c`): Kernel ring buffer / `sigma_printk` — 8 log levels (EMERG→DEBUG), 128-message circular ring with power-of-2 overwrite, `sigma_dmesg_dump`, `sigma_dmesg_clear` (-c), `sigma_dmesg_set_level` (-n). `SIGMA_KERN_*` macro family. Inspired by Linux printk / FreeBSD dmesg / macOS OSLog.
-- **SovereignShell** (`SovereignShell.c`): Full sigma-sh interactive shell — POSIX-parity tokeniser (quotes, escapes, pipes `|`, redirections `>/</>>`), built-ins: `cd`, `pwd`, `exit`, `export`, `unset`, `alias`, `history`, `jobs`, `true`, `false`. $VAR expansion. Command history ring (64 entries). Pipeline dispatcher. Inspired by bash/zsh/fish/dash.
-- **SovereignCLI** (`SovereignCLI.h` / `.c`): Unified sigma-* CLI dispatcher — 25 commands registered: `sigma-ls`, `sigma-cat`, `sigma-cp`, `sigma-mv`, `sigma-rm`, `sigma-mkdir`, `sigma-stat`, `sigma-find`, `sigma-echo`, `sigma-env`, `sigma-ps`, `sigma-kill`, `sigma-top`, `sigma-uname`, `sigma-dmesg`, `sigma-pkg`, `sigma-net`, `sigma-user`, `sigma-svc`, `sigma-df`, `sigma-du`, `sigma-mount`, `sigma-ctl`, `sigma-hash`, `sigma-help`. Full argc/argv tokeniser with quoted-string support.
-- **SovereignOmniCLI_DistroAbsorber.c**: Implementation file for the distro absorber — moved definition of `g_omnicli_absorption_table` out of header (ODR fix). Extended to 33 entries covering Arch, Debian, SUSE, RHEL, Gentoo, Alpine, NixOS, Void, Slackware, Bedrock, Tails, Qubes, macOS Homebrew, Windows WinGet/Chocolatey/Scoop.
-- **sigma_kernel.h v2.0**: Kernel aggregator updated to include all new v2.0 system service shards in a dedicated §3 section.
-
-### Fixed
-- **SovereignProcessManager.c (CRITICAL)**: Removed all raw stack-allocated opcode buffers cast to function pointers. These invoked C11 undefined behaviour and crash any system with W^X/NX-bit enforcement. Replaced with correct process table (`SigmaProcEntry_t[1024]`), safe context-switch (struct assignment), and proper namespace isolation model using documented `clone(2)` flags.
-- **SovereignNetworkStack.c**: Added missing exported `sigma_network_shard_init()` entry point. Removed incorrectly-placed `#ifndef` header guard from a `.c` file.
-- **SovereignOmniCLI_DistroAbsorber.h**: Fixed ODR multiple-definition link error (mutable global array defined in a header). Fixed `sigma_strcmp` → `sigma_streq` (correct SigmaOS LibC name). Fixed undefined `sigma_print_info`/`sigma_print_warn` → `sigma_printf`.
-- **SovereignPythonVM.c**: Added exported `sigma_python_vm_init()` to eliminate cppcheck unused-function warning on `create_python_vm`.
-- **Sovereign_Master_Sync.ps1**: Wrapped `make` and `cppcheck` in availability guards to prevent hard-fail on environments without cross-compilation toolchain. Fixed invalid `ForegroundColor Gold` → `Yellow`.
-
-### Changed
-- **sigma_kernel.h**: Bumped to v2.0. Added §3 system services section with 6 new includes.
-
+## [v1.2.6-STABILIZED] - 2026-05-10
 
 ### Added
-- **SovereignNixReproducibility**: Content-addressed derivation store, `sigma_nix_build()`, generation management (`sigma_nix_new_generation`, `sigma_nix_rollback`). Pure C11 NixOS parity.
-- **SovereignGentooUSEFlags**: Portage USE-flag system — `sigma_use_define`, `sigma_use_query`, `sigma_emerge`, `sigma_portage_sync`. Source-based optimisation sovereignty.
-- **SovereignVoidRunit**: runit PID1 service supervisor — `sigma_runit_register`, stage-2 parallel boot, `sigma_runit_supervise_all`, status tree print.
-- **SovereignPledgeUnveil**: OpenBSD `pledge(2)`/`unveil(2)` sandbox — monotone promise reduction, per-process syscall capability masks, FS path visibility control.
-- **SovereignPopAutoTile**: Pop!_OS COSMIC auto-tiling — `sigma_workspace_create`, `sigma_window_open`, 2-column grid layout, float exceptions, workspace switching.
-- **SovereignSilverblueOSTree**: Fedora Silverblue/OSTree immutable OS — content-addressed object graph, ref-tracked commits, atomic upgrade pipeline, Toolbox container-first support.
-- **SovereignArchRolling**: Arch Linux rolling-release — mirror reflector latency ranking, PKGBUILD definitions, `sigma_pacman_install`, `sigma_mkinitcpio` 7-hook pipeline.
-- **Phase 40 Test Suite** (7 new tests): `test_nix_reproducibility`, `test_gentoo_use_flags`, `test_void_runit_supervision`, `test_openbsd_pledge_unveil`, `test_pop_autotile`, `test_silverblue_ostree`, `test_arch_rolling_release` → **51 total tests**.
 
-### Fixed
-- **Duplicate `execScript`** in `index.js` — unified into single animated multi-step implementation.
-- **Missing `main()` calls** in master test suite — wired all PowerBI/Tableau/Python/R test functions that were defined but never invoked.
-- **CI workflow** (`sigma_zenith_supreme.yml`) — complete rewrite: adds hosted-stub compilation step that *actually executes* all 51 tests on GitHub Actions, proper `-I./include` path, Phase 40 shard presence check.
-- **COMMAND_RESPONSES** in `index.js` — updated `SYSTEM_STATUS` to reflect v3000.0 / 380+ shards; added 7 new terminal commands (NIX_BUILD, EMERGE, SV_STATUS, PLEDGE, TILE, OSTREE_UPGRADE, PACMAN_SYNC).
+
+- **Kernel**: Implemented x86_64 IDT/IRQ handling with base Timer (IRQ0) and Keyboard (IRQ1) routines.
+- **UI**: Delivered minimal Wayland-inspired Zenith compositor with software fallback rendering.
+
+- **Package Manager**: Introduced `sigma-pkg` Python wrapper with SQLite-backed dependency resolution.
+- **Resilience**: Added Sovereign Rollback Daemon with hardware-timestamped snapshot support.
+
+- **Security**: Integrated TPM 2.0 attestation handshake and expanded PQC Kyber/Dilithium headers.
+- **CI/CD**: New `Stabilization_Audit.yml` workflow for automated kernel and package verification.
 
 ### Changed
-- **OmniShard header** (`SovereignOmniShard.h`) — Phase 40 section with 7 new `_Init()` declarations.
 
----
 
-## [v1.0-RC1] - 2026-04-08 (The Sovereign Apex)
-### Added
-- **Universal ABI Master Shard**: Native execution of ELF, Mach-O, and PE binaries.
-- **Sovereign Forensic Matrix**: Bit-perfect DMA sharding and memory analysis.
-- **Sovereign Law Shard**: Native BNS/BNSS/BSA legal logic grid.
-- **Quantum Security Enclaves**: RAII-based memory isolation shards.
-- **Sovereign LibC Implementation**: Decentralized sharding of core C utilities.
-- **Modular UI Orchestrator**: Sharded JS rendering, metrics, and auditing components.
+- **Documentation**: Overhauled entire Wiki and root `.md` files to meet industrial standards.
+- **Architecture**: Formalized the 7-layer Sovereign Lattice structure.
 
-### Changed
-- **Absolute HLL Purge**: Migrated 100% of the kernel from C++ to pure C11.
-- **Territorial Refactor**: Consolidated structural headers and modules into industrial territories.
-- **Master Test Suite Expansion**: Comprehensive verification of Apex v190.0 logic.
+- **Contribution**: Established strict zero-dependency and atomic modularity standards.
 
-### Fixed
-- **Sync Logic**: Implemented atomic hardware mutexes and semaphores.
-- **Memory Management**: Finalized self-healing eviction policy.
-- **Boot Master Logic**: Liquidated fast-init and hardware-skip placeholders.
+## [v1.0.0] - Sovereign Release
 
----
-**S SIGMAOS: EVOLUTION IS CONTINUOUS. SOVEREIGNTY IS ABSOLUTE.**
+SigmaOS v1 is officially deployed, establishing a modular, automated, customizable, personalized, high‑performance OS with minimal dependency overhead.
 
+### 🔧 Modularisation
+
+**Subsystem Splitting**
+
+- Networking: `sigma-net-wifi`, `sigma-net-vpn`, `sigma-net-bluetooth`.
+- Multimedia: `sigma-media-audio`, `sigma-media-video`, `sigma-media-codecs`.
+
+- Security: `sigma-sec-auth`, `sigma-sec-crypto`, `sigma-sec-audit`.
+
+**Predefined Functions**
+
+- Break core utilities (logging, error handling, I/O) into micro‑functions for independent upgrades.
+- Modular math/crypto functions instead of monolithic libraries.
+
+**Libraries**
+
+- Replace heavy frameworks with lightweight equivalents.
+- Provide modular wrappers so libraries can be swapped without breaking compatibility.
+
+**Third‑Party Components**
+
+- Sandbox third‑party libraries in containers to isolate risks.
+- Introduce “shim” layers for compatibility, allowing easy replacement.
+
+**Drivers & Components**
+
+- Load drivers only when hardware is detected.
+- Optional modules (VR, AI acceleration) instead of bundling by default.
+
+### ⚙️ Automations
+
+
+- **Self‑Healing Updates:** Rollback if instability detected.
+- **Predictive Maintenance:** AI monitors SSD wear, battery cycles, hardware alerts.
+
+- **Adaptive Networking:** Prioritize bandwidth for critical apps.
+- **Energy Optimization:** Balance performance vs. battery life dynamically.
+
+- **Workflow Bundles:** One‑click install + configure stacks (DevOps, Creative, Gaming).
+- **Dependency Auto‑Pruning:** Automatically remove unused libraries and functions.
+
+- **Component Watchdog:** Monitor third‑party modules for vulnerabilities and auto‑patch.
+- **Profile‑Based Automations:** Switch between Work, Gaming, Study profiles automatically.
+
+### 🎨 Customisation & Personalisation
+
+
+- **Dynamic Themes:** Wallpapers and UI elements change with time of day or activity.
+- **User Dashboards:** Profiles for Work, Gaming, Study, Accessibility.
+
+- **Community Sharing:** Publish/share themes, automation templates, profiles.
+- **Adaptive UI:** Interface morphs depending on device (desktop, tablet, VR).
+
+- **Voice‑Driven Customisation:** “Switch to dark mode,” “Launch gaming profile.”
+- **Minimalist Mode:** Strip UI to essentials for focus and speed.
+
+- **AI‑Driven Personalisation:** Sigma Assistant tailors layouts, app suggestions, and optimizations.
+
+### 💻 Command Line Interface (CLI)
+
+
+- `s-assist status` → system health dashboard.
+- `s-assist suggest` → AI recommendations.
+
+- `s-profile switch work` → instant profile swap.
+- `s-net secure` → enable zero‑trust networking.
+
+- `s-media codecs list` → manage codecs.
+- `s-rollback last` → revert snapshot.
+
+- `s-assist optimize <task>` → auto‑tune system for gaming, video editing, coding.
+- `s-assist explain` → transparency on AI suggestions.
+
+- `s-deps prune` → remove unused dependencies.
+- `s-perf boost` → maximize performance temporarily.
+
+- `s-lib audit` → scan predefined/third‑party libraries for bloat or vulnerabilities.
+
+### 🚀 Ease of Use
+
+
+- **Unified Control Center:** GUI + CLI parity for all features.
+- **Accessibility Shortcuts:** Voice commands, hotkeys, gesture support.
+
+- **Simplified Installers:** One‑click app + dependency installation.
+- **Onboarding Wizard:** Guided setup for new users (profiles, themes, automations).
+
+- **Contextual Help:** Inline tips in CLI and GUI.
+- **Dependency Transparency:** Show users exactly what’s being installed.
+
+### ⚡ Performance & Dependency Reduction
+
+
+- **AI‑Driven Scheduler:** Optimize CPU/GPU allocation dynamically.
+- **Adaptive Caching:** Pre‑load frequently used apps for instant launch.
+
+- **Fast Boot Profiles:** Minimal services for quick startup (e.g., “Gaming Boot”).
+- **Lightweight Containers:** Run subsystems in micro‑VMs for speed + isolation.
+
+- **Resource Isolation:** Prevent background tasks from slowing down critical apps.
+- **Telemetry‑Driven Optimization:** Learn usage patterns to fine‑tune performance.
+
+- **Dependency Reduction:**
+  - Predefined functions: consolidate redundant utilities.
+
+  - Predefined libraries: replace heavy frameworks with modular equivalents.
+  - Third‑party libraries: sandbox + prune unused modules.
+
+  - Components: modular drivers, load only what’s needed.
