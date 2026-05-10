@@ -1,18 +1,22 @@
-# Security & PQC
+# Σ Sovereign Security Policy
 
-## Post-Quantum Cryptography (PQC) Algorithms
+## 1. Security Philosophy
+SigmaOS is built on the principle of **Absolute Digital Sovereignty**. Security is not a feature; it is the fundamental lattice layer upon which all shards reside.
 
-SigmaOS integrates cutting-edge quantum-resistant algorithms via `liboqs`:
+## 2. Vulnerability Management
+We maintain a zero-day tolerance policy for critical lattice vulnerabilities.
+- **Isolation Breaches**: Any failure in the Sovereign Sandbox is considered a Priority 1 emergency.
+- **PQC Weakness**: Any identified degradation in Post-Quantum Cryptographic throughput or security is addressed immediately.
 
-- **CRYSTALS-Kyber**: Used for Key Encapsulation Mechanisms (KEM) to secure the Sovereign IPC Bus and re-seed the entropy pool.
-- **CRYSTALS-Dilithium**: Used for digital signatures to verify kernel shard integrity (Lattice-Based Shard Verification) at boot.
+## 3. Reporting a Vulnerability
+We encourage responsible disclosure. Please report vulnerabilities through the following channels:
+1. **GitHub Advisory**: Use the "Report a Security Vulnerability" feature on the main repository.
+2. **Encrypted Disclosure**: For critical lattice-scale bugs, submit reports signed with your PGP key to the maintainer's public endpoint.
 
-## Integration Points
+## 4. Disclosure Policy
+- **Triage**: Reports are acknowledged within 24 hours.
+- **Remediation**: We aim to release a **Nexus Hotfix** within 72 hours for confirmed critical bugs.
+- **Disclosure**: Vulnerabilities are publicly disclosed only after a remediation shard is available to the global ecosystem.
 
-- **Kernel Hooks**: `SovereignPQC.cpp` exposes `pqc_sign_shard()` and `pqc_verify_shard()` which the kernel automatically invokes when loading a new module.
-- **Userland Verification**: Userland applications can verify signed binaries via the `sigma-pkg` distribution layer before execution.
-
-## Compliance
-
-- **FIPS-140**: (Targeted) All cryptographic modules are designed to be submitted for FIPS validation.
-- **Hardware Attestation**: TPM 2.0 validates the bootloader and kernel hash before executing the `init` process.
+---
+[**← Back to Home**](Home)

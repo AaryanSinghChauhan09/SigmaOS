@@ -1,32 +1,28 @@
-﻿# SigmaOS Release Process
+# Σ Sovereign Release Process
 
-This document describes how official SigmaOS releases are prepared, signed, and distributed.
+## 1. Release Philosophy
+SigmaOS releases are orchestrated as **Atomic Lattice Transitions**. We prioritize system integrity and digital sovereignty over rapid, unverified deployments.
 
-## ðŸ“¦ 1. Preparation
+## 2. Release Lifecycle
+### Phase 1: Shard Freezing
+All feature branches for the upcoming milestone are merged into `develop`. No new shards are accepted during the freezing period.
 
-- Finalize the `CHANGELOG.md` with all new features and fixes.
-- Tag the release in Git (e.g., `v100.2_Futuristic`).
-- Trigger the **Release Pipeline** in GitHub Actions.
+### Phase 2: Lattice Hardening
+The `develop` branch undergoes rigorous stress testing in QEMU and bare-metal environments.
+- **PQC Validation**: Verifying Kyber/Dilithium throughput under load.
+- **Self-Healing Audit**: Forcing shard failures to verify `S41` rollback resilience.
 
-## ðŸ–‹ï¸ 2. Cryptographic Signing
+### Phase 3: Cryptographic Signing
+The finalized lattice image is cryptographically signed using the project's **Industrial Master Key**. Every shard binary is hashed and verified against the Sovereign Registry.
 
-- Release artifacts (`sigmaos.iso`, `shards.tar.gz`) are signed using the Sovereign PQC key.
-- Hashes (SHA-256) are generated for all binaries.
+### Phase 4: Nexus Deployment
+The signed image is pushed to the [Official Release Channel](https://github.com/AaryanSinghChauhan09/SigmaOS/releases). Rolling updates are signaled to the `sigma-eco` CLI tool.
 
-## ðŸš€ 3. Distribution
-
-- Signed binaries are uploaded to GitHub Releases.
-- The `SHARDS.manifest` is updated to reflect the new lattice state.
-- Documentation and Wiki are updated to match the release version.
-
-## ðŸ›¡ï¸ 4. Verification
-
-Users can verify the integrity of a release using the following command:
-
-```bash
-sigma-verify --artifact sigmaos.iso --signature sigmaos.iso.sig
-```
+## 3. Versioning Strategy
+We adhere to **Sovereign Semantic Versioning**:
+- **Major**: Architectural shifts in the Sovereign Lattice (e.g., v14.0).
+- **Minor**: New shard additions or USP integrations.
+- **Patch**: Security remediations and minor bug fixes.
 
 ---
-
-### For security reporting during the release cycle, see [Security Policy](Security-Policy.md)
+[**← Back to Home**](Home)
