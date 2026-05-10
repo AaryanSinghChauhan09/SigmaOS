@@ -8,20 +8,20 @@
 
 SigmaOS is an industrial-grade project. All contributions must adhere to:
 
-- **Language**: C++20 for shards, Python 3.10+ for tooling.
-- **Pattern**: Strict OOP Singleton (Context Manager).
+* **Language**: C++20 for shards, Python 3.10+ for tooling.
+* **Pattern**: Strict OOP Singleton (Context Manager).
 
-- **Zero-Dependency**: No `libc` or external headers allowed in Layer 1-4 shards.
-- **Documentation**: Every code change MUST be accompanied by an update to the corresponding `.md` file in `WIKI/`.
+* **Zero-Dependency**: No `libc` or external headers allowed in Layer 1-4 shards.
+* **Documentation**: Every code change MUST be accompanied by an update to the corresponding `.md` file in `WIKI/`.
 
 ## 🌀 Branching Strategy
 
 We follow a staged release cadence:
 
-- **`main` (Stable)**: The production-ready sovereign lattice. Only merges from `beta` allowed.
-- **`beta` (Staging)**: Integration branch for feature-complete topics.
+* **`main` (Stable)**: The production-ready sovereign lattice. Only merges from `beta` allowed.
+* **`beta` (Staging)**: Integration branch for feature-complete topics.
 
-- **`alpha` (Topic)**: Feature-specific branches (e.g., `feat/neural-paging`).
+* **`alpha` (Topic)**: Feature-specific branches (e.g., `feat/neural-paging`).
 
 ## 🚀 CI/CD Pipeline
 
