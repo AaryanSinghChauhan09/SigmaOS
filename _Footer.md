@@ -1,9 +1,3 @@
-﻿# _Footer
-
 ---
-
-# SigmaOS: The Sovereign Lattice
-
-Built by the [Sovereign-OS Team](https://github.com/AaryanSinghChauhan09/SigmaOS)
-
-### Atomic. Zero-Dependency. Bare-Metal
+© 2026 SigmaOS Sovereign Project. Industrial Release v14.0.
+[Main Repository](https://github.com/AaryanSinghChauhan09/SigmaOS) | [Sovereign Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)
