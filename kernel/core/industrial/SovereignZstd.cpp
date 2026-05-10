@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZSTD (Compression Shard)
  * =========================================================================
@@ -25,6 +25,7 @@ public:
     const char* type_name() const noexcept override { return "SovereignZstd"; }
 
     static sigma_size_t compressOrb(const void* src, void* dst, sigma_size_t src_size) {
+        (void)src; (void)dst;
         sigma_log_info("[ZSTD] Compressing Orb payload using Zstandard v1.5.x...");
         // Mock compression logic
         sigma_log_info("[ZSTD] Ratio: 3.4:1. Optimization: [LEVEL-19]");
@@ -32,6 +33,7 @@ public:
     }
 
     static sigma_size_t decompressOrb(const void* src, void* dst, sigma_size_t src_size) {
+        (void)src; (void)dst;
         sigma_log_info("[ZSTD] Decompressing Orb payload...");
         return src_size * 3;
     }

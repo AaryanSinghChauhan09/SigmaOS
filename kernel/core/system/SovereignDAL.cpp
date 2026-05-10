@@ -1,4 +1,4 @@
-﻿#include "system/SovereignDAL.h"
+#include "system/SovereignDAL.h"
 #include "hal/sigma_hal.h"
 #include "sigma_log.h"
 
@@ -11,14 +11,14 @@ SovereignDAL& SovereignDAL::getInstance() {
     return instance;
 }
 
-SovereignDAL::getInstance().SovereignDAL() : m_provider(PackageProvider::UNKNOWN) {}
+SovereignDAL::SovereignDAL() : m_provider(PackageProvider::UNKNOWN) {}
 
-void SovereignDAL::getInstance().initialize() {
+void SovereignDAL::initialize() {
     detectProvider();
     sigma_log_info("[DAL] Distro Abstraction Layer initialized.");
 }
 
-void SovereignDAL::getInstance().detectProvider() {
+void SovereignDAL::detectProvider() {
     sigma_log_info("[DAL] Probing host distro for package management signatures...");
     m_provider = PackageProvider::PACMAN; 
     sigma_log_info("[DAL] Package provider: pacman (Arch/SigmaOS).");
@@ -60,11 +60,11 @@ extern "C" void sigma_dal_init() {
 }
 
 extern "C" int sigma_dal_install(const char* pkg) {
-    return SigmaOS::Kernel::System::SovereignDAL::installPackage(pkg ? pkg : "") ? 1 : 0;
+    return SigmaOS::Kernel::System::SovereignDAL::getInstance().installPackage(pkg ? pkg : "") ? 1 : 0;
 }
 
 extern "C" int sigma_dal_remove(const char* pkg) {
-    return SigmaOS::Kernel::System::SovereignDAL::removePackage(pkg ? pkg : "") ? 1 : 0;
+    return SigmaOS::Kernel::System::SovereignDAL::getInstance().removePackage(pkg ? pkg : "") ? 1 : 0;
 }
 
 

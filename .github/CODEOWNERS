@@ -1,25 +1,25 @@
 # SigmaOS Sovereign Code Owners
 
 # Core Kernel & HAL
-/kernel/core/hal/ @AaryanSinghChauhan09
-/kernel/include/ @AaryanSinghChauhan09
+/kernel/core/hal/ @sigmaos-core
+/kernel/include/ @sigmaos-core
 
 # Security & PQC
-/kernel/core/security/ @AaryanSinghChauhan09
+/kernel/core/security/ @sigmaos-core
 
 # AI & Automation
-/kernel/core/ai/ @AaryanSinghChauhan09
-/kernel/core/automation/ @AaryanSinghChauhan09
+/kernel/core/ai/ @sigmaos-core
+/kernel/core/automation/ @sigmaos-core
 
 # Zenith UI & Experience
-/zenith_desktop/ @AaryanSinghChauhan09
-/web_ui/ @AaryanSinghChauhan09
-/zenith.html @AaryanSinghChauhan09
+/zenith_desktop/ @sigmaos-core
+/web_ui/ @sigmaos-core
+/zenith.html @sigmaos-core
 
 # Documentation & Wiki
-/docs/ @AaryanSinghChauhan09
-/README.md @AaryanSinghChauhan09
+/docs/ @sigmaos-core
+/README.md @sigmaos-core
 
 # Infrastructure & CI/CD
-/.github/workflows/ @AaryanSinghChauhan09
-/Makefile @AaryanSinghChauhan09
+/.github/workflows/ @sigmaos-core
+/Makefile @sigmaos-core

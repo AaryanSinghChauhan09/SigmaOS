@@ -14,12 +14,12 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Security {
 
-SigmaOS::Kernel::Security::SovereignPQCEngine& SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance() {
-    static SigmaOS::Kernel::Security::SovereignPQCEngine instance;
+SovereignPQCEngine& SovereignPQCEngine::getInstance() {
+    static SovereignPQCEngine instance;
     return instance;
 }
 
-void SigmaOS::Kernel::Security::SovereignPQCEngine::init() {
+void SovereignPQCEngine::init() {
     sigma_log_info("[PQC] Initializing Sovereign Post-Quantum Cryptography Nexus...");
 #ifdef USE_LIBOQS
     sigma_log_info("[PQC] liboqs integration active: Enabling CRYSTALS-Kyber (KEM) and CRYSTALS-Dilithium (Sig).");
@@ -29,7 +29,7 @@ void SigmaOS::Kernel::Security::SovereignPQCEngine::init() {
     this->initialized = 1u;
 }
 
-void SigmaOS::Kernel::Security::SovereignPQCEngine::signShard(sigma_u32 shard_id, sigma_u8* signature) {
+void SovereignPQCEngine::signShard(sigma_u32 shard_id, sigma_u8* signature) {
     sigma_log_info("[PQC] Signing Shard S%u...", (unsigned)shard_id);
 #ifdef USE_LIBOQS
     // Stub for OQS_SIG_dilithium_2
@@ -42,7 +42,7 @@ void SigmaOS::Kernel::Security::SovereignPQCEngine::signShard(sigma_u32 shard_id
     this->total_signatures++;
 }
 
-bool SigmaOS::Kernel::Security::SovereignPQCEngine::verifyShard(sigma_u32 shard_id, const sigma_u8* signature) {
+bool SovereignPQCEngine::verifyShard(sigma_u32 shard_id, const sigma_u8* signature) {
     sigma_log_info("[PQC] Verifying Shard S%u integrity...", (unsigned)shard_id);
     (void)signature;
 #ifdef USE_LIBOQS
@@ -55,7 +55,7 @@ bool SigmaOS::Kernel::Security::SovereignPQCEngine::verifyShard(sigma_u32 shard_
     return true;
 }
 
-void SigmaOS::Kernel::Security::SovereignPQCEngine::refreshLattice() {
+void SovereignPQCEngine::refreshLattice() {
     sigma_log_info("[PQC] Refreshing silicon lattice noise entropy...");
 #ifdef USE_LIBOQS
     sigma_log_info("[PQC] Re-seeding Kyber KEM lattice parameters.");

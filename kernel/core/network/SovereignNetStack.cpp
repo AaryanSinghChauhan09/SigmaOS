@@ -1,4 +1,4 @@
-﻿#include "sigma_log.h"
+#include "sigma_log.h"
 #include "core/sigma_types.h"
 #include "libc/SovereignLibC.h"
 #include "hal/sigma_hal.h"
@@ -20,6 +20,7 @@ public:
     }
 
     void transmitPacket(const void* data, sigma_size_t len) {
+        (void)data;
         // Optimized DMA transmit â€” sigma_size_t, no stdlib
         sigma_log("[NET] Transmitting sovereign packet (%llu bytes).", (sigma_u64)len);
     }

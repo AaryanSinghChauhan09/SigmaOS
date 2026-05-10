@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * ÃŽÂ£ SIGMAOS ZENITH SUPREME: SOVEREIGN PACKAGE MANAGER (v1.0)
  * =========================================================================
@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "../include/SovereignLibC.h"
-#include "../include/sigma_types.h"
+#include "../include/libc/SovereignLibC.h"
+#include "../include/core/sigma_types.h"
 
 typedef struct {
     char name[64];
@@ -29,7 +29,7 @@ static sigma_pkg_t sigma_repository[PKG_REPO_SIZE] = {
 void sigma_pkg_install(const char* name) {
     kprintf("[PKG] Searching repository for: %s... ", name);
     for (int i = 0; i < PKG_REPO_SIZE; i++) {
-        if (sigma_streq(sigma_repository[i].name, name)) {
+        if (sigma_strcmp(sigma_repository[i].name, name) == 0) {
             kprintf("FOUND (v%s)\n", sigma_repository[i].version);
             kprintf("[PKG] Downloading binary sharding (%d KB)... ", sigma_repository[i].size / 1024);
             sigma_repository[i].installed = SIGMA_TRUE;

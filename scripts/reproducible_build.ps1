@@ -1,4 +1,4 @@
-﻿# Î£ SIGMAOS REPRODUCIBLE BUILD PIPELINE
+# Î£ SIGMAOS REPRODUCIBLE BUILD PIPELINE
 # ---------------------------------------------------------
 # Mission: Ensure that binaries match source code exactly (Debian/Arch parity).
 
@@ -10,7 +10,8 @@ Write-Host "[REPRO-BUILD] Fixing Build-ID to static entropy hash..."
 
 # 2. Execute cross-compiler with deterministic flags
 # REPRO-001: Fixing build-path entropy and timestamp injection
-$DET_FLAGS = "-frandom-seed=sigmaos -Wl,--build-id=none -D__DATE__='\"(Get-Date -Format "yyyy-MM-dd")\"' -D__TIME__='\"00:00:00\"'"
+$DATE_STR = Get-Date -Format "yyyy-MM-dd"
+$DET_FLAGS = "-frandom-seed=sigmaos -Wl,--build-id=none -D__DATE__='`"$DATE_STR`"' -D__TIME__='`"00:00:00`"'"
 Write-Host "[REPRO-BUILD] Compiling Kernel Shards with deterministic flags: $DET_FLAGS"
 
 # 3. Verify Binary Parity

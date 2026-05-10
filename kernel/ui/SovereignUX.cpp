@@ -1,4 +1,4 @@
-﻿#include "core/sigma_types.h"
+#include "core/sigma_types.h"
 #include "libc/SovereignLibC.h"
 #include "sigma_ux.h"
 #include "ui/sigma_gui.h"
@@ -14,7 +14,7 @@
  * Design: OOP-isolated singleton â€” SovereignUXEngine.
  */
 
-class SovereignUXEngine : public SigmaOS::Kernel::SigmaObject {
+class SovereignUXEngine : public SigmaOS::SigmaObject {
 public:
     static SovereignUXEngine& getInstance() {
         static SovereignUXEngine instance;

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN BUSYBOX (Multi-call Utility Shard)
  * =========================================================================
@@ -25,6 +25,7 @@ public:
     const char* type_name() const noexcept override { return "SovereignBusyBox"; }
 
     void execute(const char* cmd, int argc, char** argv) {
+        (void)argc; (void)argv;
         sigma_log_info("[BUSYBOX-SHARD] Multi-call execution for:");
         sigma_log_info(cmd);
 

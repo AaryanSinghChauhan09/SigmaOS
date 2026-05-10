@@ -37,7 +37,7 @@ public:
         // Stub: In a real system, probe the TPM CRB or TIS interface via ACPI/Memory-Mapped I/O
         bool tpm_found = probeInterface();
         if (!tpm_found) {
-            sigma_log_error("[TPM 2.0] CRITICAL: No TPM 2.0 device found. Sovereignty degraded.");
+            sigma_log_err("[TPM 2.0] CRITICAL: No TPM 2.0 device found. Sovereignty degraded.");
             return;
         }
 
@@ -65,7 +65,7 @@ public:
             sigma_log_info("[TPM 2.0] Attestation PASSED: Hardware authenticity verified.");
             attestation_passed = true;
         } else {
-            sigma_log_error("[TPM 2.0] Attestation FAILED: Hardware footprint mismatch!");
+            sigma_log_err("[TPM 2.0] Attestation FAILED: Hardware footprint mismatch!");
         }
 
         return attestation_passed;

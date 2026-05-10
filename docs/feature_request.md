@@ -1,12 +1,9 @@
-﻿# feature request
-
 ---
 
 name: ðŸš€ Feature Request
 about: Propose a new shard, capability, or improvement for SigmaOS
 title: "[FEATURE] "
 labels: ["enhancement", "needs-triage"]
-assignees: AaryanSinghChauhan09
 ---
 
 ## ðŸš€ Feature Summary

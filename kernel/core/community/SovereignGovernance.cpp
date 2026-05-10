@@ -4,7 +4,7 @@
 #include "core/sigma_kernel_types.h"
 #include "libc/SovereignLibC.h"
 #include "core/SigmaOOP.hpp"
-#include "../security/SovereignQKD.hpp"
+#include "security/SovereignQKD.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -26,8 +26,8 @@ public:
 
     static void init() {
         sigma_log("S [GOVERNANCE]: Initializing Decentralized Contributor Registry...");
-        m_active_proposals = 0;
-        m_total_votes = 0;
+        getInstance().m_active_proposals = 0;
+        getInstance().m_total_votes = 0;
         sigma_log("S [GOVERNANCE]: Node-Weighted Consensus Engine ACTIVE.");
     }
 
@@ -77,11 +77,11 @@ extern "C" void governance_init_shard() {
 }
 
 extern "C" void governance_submit(const char* prop) {
-    SigmaOS::Kernel::Community::SovereignGovernance::submitProposal(prop);
+    SigmaOS::Kernel::Community::SovereignGovernance::getInstance().submitProposal(prop);
 }
 
 extern "C" void governance_vote(const char* node, const char* prop, bool support) {
-    SigmaOS::Kernel::Community::SovereignGovernance::castVote(node, prop, support);
+    SigmaOS::Kernel::Community::SovereignGovernance::getInstance().castVote(node, prop, support);
 }
 
 

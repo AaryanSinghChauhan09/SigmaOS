@@ -1,4 +1,4 @@
-﻿#include "../include/sigma_log.h"
+#include "../include/sigma_log.h"
 #include "../include/core/sigma_types.h"
 #include "../include/hal/sigma_hal.h"
 #include "../include/core/sigma_kernel_types.h"
@@ -74,7 +74,7 @@ extern "C" void sel_init_shard() {
 }
 
 extern "C" void sel_spawn_sandbox(const char* name) {
-    SigmaOS::Kernel::Security::SovereignSEL::spawnSandbox(name);
+    SigmaOS::Kernel::Security::SovereignSEL::getInstance().spawnSandbox(name);
 }
 
 

@@ -1,4 +1,4 @@
-﻿/* foundation.css â€” SigmaOS Zenith Design System Primitives */
+/* foundation.css â€” SigmaOS Zenith Design System Primitives */
 :root {
     --accent: #00ffa3;
     --accent-glow: rgba(0, 255, 163, 0.4);
@@ -16,8 +16,8 @@
 
 .glass-morphism {
     background: var(--glass);
-    backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--glass-border);
 }
 

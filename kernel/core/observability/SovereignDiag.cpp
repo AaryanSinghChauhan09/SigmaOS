@@ -1,4 +1,4 @@
-﻿#include "core/sigma_types.h"
+#include "core/sigma_types.h"
 #include "hal/sigma_hal.h"
 #include "sigma_log.h"
 #include "core/SigmaOOP.hpp"
@@ -26,13 +26,13 @@ public:
     struct ShardID { const char* value; };
     struct AnomalyDesc { const char* value; };
 
-    static void init() {
+    void init() {
         sigma_log_info("[DIAG] Initializing Sovereign Silicon Health Monitor...");
-        getInstance().m_initialized = 1U;
-        getInstance().m_fault_count = 0U;
+        m_initialized = 1U;
+        m_fault_count = 0U;
     }
 
-    static void performScan() {
+    void performScan() {
         sigma_log_info("[DIAG] Scanning silicon cores for thermal anomalies...");
         sigma_log_info("[DIAG] Verifying L1/L2 cache integrity across the lattice...");
         sigma_log_info("[DIAG] Silicon Health: 99.99%%. 0 predicted faults in next 24h.");
@@ -44,7 +44,7 @@ public:
         m_fault_count++;
     }
 
-    static void autoRepair() {
+    void autoRepair() {
         sigma_log_info("[DIAG] [HEAL] Analyzing lattice for inconsistencies...");
         sigma_log_info("[DIAG] [HEAL] Repairing corrupted shard descriptors in VFS...");
         sigma_log_info("[DIAG] [HEAL] All lattice nodes stabilized. Zero-trust maintained.");
@@ -67,15 +67,15 @@ private:
 
 /* --- C Bridge --- */
 extern "C" void diag_init() {
-    SigmaOS::Kernel::Observability::SovereignDiagEngine::init();
+    SigmaOS::Kernel::Observability::SovereignDiagEngine::getInstance().init();
 }
 
 extern "C" void diag_scan() {
-    SigmaOS::Kernel::Observability::SovereignDiagEngine::performScan();
+    SigmaOS::Kernel::Observability::SovereignDiagEngine::getInstance().performScan();
 }
 
 extern "C" void diag_auto_repair() {
-    SigmaOS::Kernel::Observability::SovereignDiagEngine::autoRepair();
+    SigmaOS::Kernel::Observability::SovereignDiagEngine::getInstance().autoRepair();
 }
 
 extern "C" void diag_report(const char* shard, const char* desc) {

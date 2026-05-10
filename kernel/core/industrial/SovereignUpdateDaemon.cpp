@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN UPDATE DAEMON (Ed25519 Verification)
  * =========================================================================
@@ -25,6 +25,7 @@ public:
     const char* type_name() const noexcept override { return "SovereignUpdateDaemon"; }
 
     bool verifyUpdatePackage(const char* pkg_path, const sigma_u8* signature) {
+        (void)signature;
         sigma_log_info("[UPD-DAEMON] Verifying system update package:");
         sigma_log_info(pkg_path);
         

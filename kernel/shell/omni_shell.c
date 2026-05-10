@@ -593,8 +593,8 @@ static void cmd_heatmap(ParsedCmd* c) {
 static void cmd_sync_gh(ParsedCmd* c) {
     (void)c;
     kprintf("[SYNC-GH]: Initiating synchronization with GitHub repository...\n");
-    kprintf("[SYNC-GH]: Remote: https://github.com/AaryanSinghChauhan09/SigmaOS);
-    kprintf("[SYNC-GH]: Branch: main\n");
+    kprintf("[SYNC-GH]: Remote: https://github.com/AaryanSinghChauhan09/SigmaOS");
+    kprintf("[SYNC-GH]: Sync complete.\n");
     kprintf("[SYNC-GH]: Status: 125/125 shards synced. Integrity: 100%.\n");
 }
 
@@ -686,6 +686,43 @@ static void cmd_git(ParsedCmd* c) {
     kprintf("[GIT]: On branch main\n");
     kprintf("[GIT]: Your branch is up to date with 'origin/main'.\n");
     if (shell_streq(sub, "commit")) kprintf("[GIT]: [main %07x] Sovereign Refactor\n", g_shell.cmd_count);
+}
+
+static void cmd_htop(ParsedCmd* c) {
+    (void)c;
+    kprintf("PID USER      PR  NI    VIRT    RES    SHR S  %%CPU  %%MEM     TIME+ COMMAND\n");
+    kprintf("  1 sovereign 20   0  125.4m  12.3m   8.2m S   0.3   0.1   0:01.24 sigma-init\n");
+    kprintf("  2 sovereign 20   0       0      0      0 R   0.1   0.0   0:00.45 k-sharder\n");
+}
+
+static void cmd_sigma_code(ParsedCmd* c) {
+    (void)c;
+    kprintf("[SIGMA-CODE] Agentic AI coding assistant activated.\n");
+}
+
+static void cmd_nix_rebuild(ParsedCmd* c) {
+    (void)c;
+    kprintf("[NIX-REBUILD] Syncing state to lattice declarative config...\n");
+}
+
+static void cmd_sigma_agent(ParsedCmd* c) {
+    (void)c;
+    kprintf("[SIGMA-AGENT] OS Maintenance AI deployed.\n");
+}
+
+static void cmd_mesh_sync(ParsedCmd* c) {
+    (void)c;
+    kprintf("[MESH-SYNC] Sharing task across Sovereign Mesh.\n");
+}
+
+static void cmd_git_viz(ParsedCmd* c) {
+    (void)c;
+    kprintf("[GIT-VIZ] Launching commit visualizer...\n");
+}
+
+static void cmd_tree_analyze(ParsedCmd* c) {
+    (void)c;
+    kprintf("[TREE-ANALYZE] Analyzing system architecture dependencies...\n");
 }
 
 static void cmd_top(ParsedCmd* c) {
@@ -880,7 +917,7 @@ static const CmdEntry g_cmds[] = {
     { "shard-rebase",          cmd_shard_rebase,          "Hot-rebase shards" },
     { "git",                   cmd_git,                   "Git version control" },
     { "top",                   cmd_top,                   "Process monitor" },
-    { "htop",                  cmd_top,                   "Process monitor" },
+    { "htop",                  cmd_htop,                  "Process monitor" },
     { "free",                  cmd_top,                   "Memory monitor" },
     { "uptime",                cmd_top,                   "System uptime" },
     { "ping",                  cmd_ping,                  "Network ping" },

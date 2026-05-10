@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * SIGMAOS: SOVEREIGN SANDBOX CONTAINER (S-SANDBOX)
  * =========================================================================
@@ -23,7 +23,7 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Security {
 
-class SigmaOS::Kernel::Security::SovereignSandboxEngine {
+class SovereignSandboxEngine {
 public:
     static SigmaOS::Kernel::Security::SovereignSandboxEngine& getInstance() {
         static SigmaOS::Kernel::Security::SovereignSandboxEngine instance;
@@ -41,7 +41,7 @@ public:
     bool validateMACPolicy(const char* sub, const char* obj, const char* act);
 
 private:
-    SigmaOS::Kernel::Security::SovereignSandboxEngine() : next_container_id(1U), initialized(0U) {}
+    SovereignSandboxEngine() : next_container_id(1U), initialized(0U) {}
     sigma_u32 next_container_id;
     sigma_u32 initialized;
 };
