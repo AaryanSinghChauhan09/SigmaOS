@@ -1,54 +1,45 @@
-#include "core/sigma_types.h"
-#include "hal/sigma_hal.h"
-#include "sigma_log.h"
-#include "security/sigma_sandbox.h"
-#include "core/SigmaOOP.hpp"
-
-/**
- * SovereignSandbox — Sovereign Zero-Trust Container Engine
- * Implements capability-based isolation with Seccomp-BFP enforcement.
- */
+#include "security/SovereignSandbox.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Security {
 
-void SigmaOS::Kernel::Security::SovereignSandboxEngine::init() {
+void SovereignSandboxEngine::init() {
     sigma_log_info("[SANDBOX] Initializing Sovereign Zero-Trust Sandbox Isolation...");
     this->initialized = 1U;
 }
 
-sigma_u32 SigmaOS::Kernel::Security::SovereignSandboxEngine::createContainer(const sigma_sandbox_config_t* config) {
+sigma_u32 SovereignSandboxEngine::createContainer(const sigma_sandbox_config_t* config) {
     (void)config;
     sigma_u32 id = this->next_container_id++;
     sigma_log_info("[SANDBOX] Container created with sealed amnesic profile.");
     return id;
 }
 
-bool SigmaOS::Kernel::Security::SovereignSandboxEngine::execute(sigma_u32 container_id, const char* binary_path) {
+bool SovereignSandboxEngine::execute(sigma_u32 container_id, const char* binary_path) {
     (void)container_id; (void)binary_path;
     sigma_log_info("[SANDBOX] Executing shard in container.");
     sigma_log_info("[SANDBOX] Runtime: Seccomp-BFP filter applied. Resource caps locked.");
     return true;
 }
 
-void SigmaOS::Kernel::Security::SovereignSandboxEngine::destroyContainer(sigma_u32 container_id) {
+void SovereignSandboxEngine::destroyContainer(sigma_u32 container_id) {
     (void)container_id;
     sigma_log_info("[SANDBOX] Container terminated. Scrubbing amnesic memory artifacts...");
 }
 
-bool SigmaOS::Kernel::Security::SovereignSandboxEngine::checkSyscall(sigma_u32 syscall_id) {
+bool SovereignSandboxEngine::checkSyscall(sigma_u32 syscall_id) {
     /* Basic policy: 0x01 is globally permitted (sigma_yield) */
     return (syscall_id == 0x01U);
 }
 
-bool SigmaOS::Kernel::Security::SovereignSandboxEngine::validateMACPolicy(const char* sub, const char* obj, const char* act) {
+bool SovereignSandboxEngine::validateMACPolicy(const char* sub, const char* obj, const char* act) {
     /* MAC validation logic - mapped to kernel-native policies */
     (void)sub; (void)obj; (void)act;
     return true; 
 }
 
-bool SigmaOS::Kernel::Security::SovereignSandboxEngine::hasCapability(const char* shard_name, const char* capability) {
+bool SovereignSandboxEngine::hasCapability(const char* shard_name, const char* capability) {
     sigma_log_info("[SANDBOX] CAP: Checking if %s possesses %s", shard_name, capability);
     return false;
 }

@@ -1,14 +1,4 @@
-#include "core/sigma_types.h"
-#include "security/sigma_pqc.h"
-#include "hal/sigma_hal.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
-
-/**
- * SigmaOS Sovereign PQC Implementation
- * Implements a Lattice-Based Shard Verification (LBSV) algorithm.
- * ZERO-DEPENDENCY: Strictly bare-metal quantum resistance.
- */
+#include "security/SovereignPQC.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

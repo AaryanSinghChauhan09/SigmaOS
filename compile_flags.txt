@@ -1,9 +1,8 @@
--Ic:/Users/Sovereign/.gemini/antigravity/scratch/SigmaOS-Repo/include
+-std=c++11
+-ISigmaOS-Repo/include
+-Ikernel/core/include
 -Iinclude
--Ikernel/core
--Ikernel/drivers
--Ikernel/orchestration
--Ikernel/shards
+-I.
 -m64
 -ffreestanding
 -fno-stack-protector

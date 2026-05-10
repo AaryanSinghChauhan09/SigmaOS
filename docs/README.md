@@ -6,10 +6,13 @@ SigmaOS is an experimental, bare-metal operating system kernel built to explore 
 
 SigmaOS is **not** a daily-driver operating system. Currently, the kernel can:
 
+
 - **Boot reliably in QEMU:** Using a Multiboot2 compliant binary and GRUB.
 - **Initialize Hardware:** Basic probing of the CPU and establishing serial output (COM1) for debugging.
+
 - **Allocate Memory:** A simple bare-metal bump allocator (QBMP) with basic guard checks.
 - **Execute Minimal Userland:** A barebones interactive shell (`sigma_sh`) is in development to provide basic I/O.
+
 - **Demonstrate Architecture:** The entire kernel is divided into isolated C++ singletons ("Shards") that communicate via strict C-linkage interfaces.
 
 SigmaOS currently lacks a fully functional filesystem, robust device drivers (e.g., USB, GPU), and a mature networking stack, though stubs exist.
@@ -18,10 +21,13 @@ SigmaOS currently lacks a fully functional filesystem, robust device drivers (e.
 
 ### Dependencies
 
+
 - `make`
 - `nasm`
+
 - `g++` (multilib / cross-compiler)
 - `qemu-system-x86_64`
+
 - `grub-mkrescue` and `xorriso` (for ISO generation)
 
 ### 1. Build the Kernel
@@ -61,14 +67,17 @@ SigmaOS uses unique terminology for its architectural concepts. Here is what the
 
 We welcome contributions to help evolve SigmaOS from an experimental kernel into a fully usable distribution.
 
+
 - Please read [CONTRIBUTING.md](CONTRIBUTING) for our PR process and coding standards.
 
 ## ðŸš€ Current Status (Zenith Supreme: Singularity Complete)
 
 SigmaOS has reached its architectural zenith. The kernel is now:
 
+
 - **600-Shard Modular Lattice:** Fully transitioned to OOP-isolated singletons.
 - **Neural UI Transpilation:** AVX-512 accelerated Morphic Zenith UI.
+
 - **Atomic Lattice Sync:** Zero-drift distributed filesystem state.
 - **Amnesic Security:** Zero-trace execution and quantum-safe identity vaults.
 
