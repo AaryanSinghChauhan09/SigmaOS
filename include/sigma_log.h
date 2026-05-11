@@ -41,10 +41,11 @@ extern "C"
 void kprintf(const char* fmt, ...);
 
 /* --- Industrial Logging Macros --- */
-#define sigma_log(fmt, ...)      kprintf((fmt), ##__VA_ARGS__)
-#define sigma_log_info(fmt, ...) log_emit_f(LOG_INFO, (fmt), ##__VA_ARGS__)
-#define sigma_log_warn(fmt, ...) log_emit_f(LOG_WARN, (fmt), ##__VA_ARGS__)
-#define sigma_log_err(fmt, ...)  log_emit_f(LOG_ERROR, (fmt), ##__VA_ARGS__)
+#define sigma_log_debug(fmt, ...) log_emit_f(LOG_DEBUG, (fmt), ##__VA_ARGS__)
+#define sigma_log_info(fmt, ...)  log_emit_f(LOG_INFO, (fmt), ##__VA_ARGS__)
+#define sigma_log_warn(fmt, ...)  log_emit_f(LOG_WARN, (fmt), ##__VA_ARGS__)
+#define sigma_log_err(fmt, ...)   log_emit_f(LOG_ERROR, (fmt), ##__VA_ARGS__)
+#define sigma_log_crit(fmt, ...)  log_emit_f(LOG_CRITICAL, (fmt), ##__VA_ARGS__)
 
 
 #ifdef __cplusplus

@@ -1,64 +1,27 @@
-name: Bug Report
-<<<<<<< HEAD
-description: Report a bug in the SigmaOS kernel or shards
-title: "[Bug]: "
-labels: ["bug", "triage"]
-assignees: []
-
+name: Bug report
+description: Create a report to help us improve the Sovereign Lattice.
+labels: ["bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
+        Thanks for reporting a bug! Please provide as much detail as possible.
   - type: input
-    id: component
+    id: shard_id
     attributes:
-      label: Affected Component / Shard
-      description: Which shard or subsystem is affected? (e.g., S01_Genesis, S04_HAL)
-    validations:
-      required: true
-=======
-description: Create a report to help us improve
-labels: bug
-body:
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645
-  - type: textarea
-    id: description
-    attributes:
-      label: Description
-      description: A clear and concise description of what the bug is.
+      label: Affected Shard
+      description: Which shard (e.g., S01-HAL, S09-AI) is failing?
     validations:
       required: true
   - type: textarea
-<<<<<<< HEAD
     id: reproduction
-=======
-    id: reproduce
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645
     attributes:
       label: Steps to Reproduce
-      description: Steps to reproduce the behavior.
+      description: How can we trigger this fault in QEMU?
     validations:
       required: true
   - type: textarea
-    id: expected
+    id: logs
     attributes:
-      label: Expected Behavior
-      description: A clear and concise description of what you expected to happen.
-    validations:
-      required: true
-<<<<<<< HEAD
-  - type: input
-    id: version
-    attributes:
-      label: SigmaOS Version
-      description: Which version or commit hash of SigmaOS are you using?
-=======
-  - type: textarea
-    id: environment
-    attributes:
-      label: Environment
-      description: OS, Architecture, Compiler version, etc.
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645
-    validations:
-      required: true
+      label: System Logs
+      description: Please paste the S-LOG output (serial console).
