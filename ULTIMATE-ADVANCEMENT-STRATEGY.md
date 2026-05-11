@@ -87,14 +87,14 @@ This document outlines the 100 strategic advancements required to make SigmaOS t
 
 61. **Zenith Desktop**: Premium glassmorphic UI with sub-pixel animations. (**v14.3 Hardened**)
 62. **Profession Profiles**: Role-specific system adaptation (Doctor, Lawyer, etc.). (**v14.3 Hardened**)
-63. **Sovereign App Store**: PQC-verified distribution for professional tools. (**v14.3 In Progress**)
+63. **Sovereign App Store**: PQC-verified distribution for professional tools. (**v14.4 Implemented**)
 64. **Universal Translation**: System-wide, low-latency neural translation.
 65. **Voice-Direct Kernel**: Controlling system tasks via secure voice hooks.
 66. **Morphic Layering**: UI that physically adapts its layout to your workload. (**v14.3 Implemented**)
 67. **Predictive UI**: Anticipating the next tool the user will need. (**v14.3 Implemented**)
 68. **One-Click Industrialization**: Automated setup for enterprise deployment. (**v14.3 Implemented**)
-69. **Cross-Platform Bridge**: Seamlessly running Linux apps in sovereign sandboxes.
-70. **Sovereign Search**: Privacy-first, local-only AI indexing of all data.
+69. **Cross-Platform Bridge**: Seamlessly running Linux apps in sovereign sandboxes. (**v14.4 Implemented**)
+70. **Sovereign Search**: Privacy-first, local-only AI indexing of all data. (**v14.4 Implemented**)
 71. **Knowledge Lattice**: System-wide graph database of user documentation.
 72. **Collaborative Shards**: Secure, end-to-end encrypted team collaboration.
 73. **Hardware Transparency**: Real-time visualization of all silicon activity.
