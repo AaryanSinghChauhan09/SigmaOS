@@ -129,6 +129,7 @@ kernel/core/industrial/SovereignDataMatrix.cpp
 kernel/core/industrial/SovereignSheet.cpp
 kernel/core/industrial/SovereignCommerce.cpp
 kernel/core/industrial/SovereignProvenance.cpp
+kernel/shards/industrial/SovereignFactory.cpp
 kernel/core/industrial/SovereignDigitalTwin.cpp
 kernel/core/industrial/SovereignDashboard.cpp
 kernel/core/industrial/SovereignMicroEdition.cpp
