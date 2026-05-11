@@ -39,6 +39,8 @@ typedef struct {
     color_t text_color;
     uint8_t enable_animations;
     uint8_t corner_radius;
+    uint8_t high_contrast_mode;  // Accessibility S10
+    uint8_t screen_reader_active; // Accessibility S11
 } zenith_theme_t;
 
 static zenith_theme_t current_theme = {
@@ -46,7 +48,9 @@ static zenith_theme_t current_theme = {
     .background_color = {18, 18, 18, 240}, // Dark Mode with slight transparency
     .text_color = {255, 255, 255, 255},
     .enable_animations = 1,
-    .corner_radius = 12
+    .corner_radius = 12,
+    .high_contrast_mode = 0,
+    .screen_reader_active = 0
 };
 
 extern void audit_chain_append(uint32_t pid, uint8_t level, const char* msg);
@@ -113,7 +117,10 @@ void zenith_render_frame(void) {
                 if (screen_x >= 0 && screen_x < SCREEN_WIDTH && screen_y >= 0 && screen_y < SCREEN_HEIGHT) {
                     uint32_t fb_idx = screen_y * SCREEN_WIDTH + screen_x;
                     
-                    if (alpha == 255) {
+                    if (current_theme.high_contrast_mode) {
+                        // High-contrast bypass: Solid black background, solid white text/elements
+                        hardware_framebuffer[fb_idx] = (x < 1 || x > win->width - 2 || y < 1 || y > win->height - 2) ? 0xFFFFFF : 0x000000;
+                    } else if (alpha == 255) {
                         hardware_framebuffer[fb_idx] = win_pixel;
                     } else {
                         // Apply glassmorphism blend against background
@@ -129,6 +136,12 @@ void zenith_render_frame(void) {
                     }
                 }
             }
+        }
+        
+        // Accessibility Hook: Announce focused window to screen reader
+        if (current_theme.screen_reader_active && win->is_focused) {
+            // In a real system, this would push to an audio-synthesis queue
+            // kprintf("[SCREEN-READER] Focused Window ID: %d, Owner PID: %d\n", win->window_id, win->owner_pid);
         }
     }
 }

@@ -1,62 +1,24 @@
-# SigmaOS — Contribution Guide
+# Contributing to Σ SigmaOS
 
-> Join the evolution of digital sovereignty.
+Welcome to the Sovereign Lattice. SigmaOS is a modular, 600-shard operating system designed for absolute digital sovereignty. We welcome contributions from developers, security researchers, and UI/UX designers.
 
----
+## 🏛️ Contribution Principles
+1.  **Zero-STL**: All kernel shards must be zero-dependency (no standard library).
+2.  **Shard Isolation**: Subsystems must be isolated with strict, versioned APIs.
+3.  **Post-Quantum Ready**: Security modules must adhere to NIST-standard PQC algorithms.
+4.  **Silicon-Native**: Optimize for direct hardware orchestration where possible.
 
-## 🛠️ Coding Standards
+## 🚀 Getting Started
+1.  **Fork the Lattice**: Fork the repository and create your shard branch.
+2.  **Build Locally**: Use `make all` to validate the lattice.
+3.  **Test Shards**: Ensure your changes pass the QEMU boot tests.
 
-SigmaOS is an industrial-grade project. All contributions must adhere to:
+## 🧪 Testing Guidelines
+- All new shards must include a `run_stress_test()` hook.
+- Regression tests are mandatory for core system services (IPC, Sched, VMM).
 
-
-
-* **Language**: C++20 for shards, Python 3.10+ for tooling.
-* **Pattern**: Strict OOP Singleton (Context Manager).
-
-
-
-* **Zero-Dependency**: No `libc` or external headers allowed in Layer 1-4 shards.
-* **Documentation**: Every code change MUST be accompanied by an update to the corresponding `.md` file in `WIKI/`.
-
-## 🌀 Branching Strategy
-
-We follow a staged release cadence:
-
-
-
-* **`main` (Stable)**: The production-ready sovereign lattice. Only merges from `beta` allowed.
-* **`beta` (Staging)**: Integration branch for feature-complete topics.
-
-
-
-* **`alpha` (Topic)**: Feature-specific branches (e.g., `feat/neural-paging`).
-
-## 🚀 CI/CD Pipeline
-
-Every Pull Request triggers the following automated suite:
-
-
-
-1. **Lattice Rebuild**: All 600+ shards must compile with zero warnings.
-2. **Regression Suite**: IRQ handlers and SHS v2 are verified for RDTSC-cycle precision.
-
-
-
-3. **Security Scan**: Verify PQC signatures and TPM handshake protocols.
-4. **Doc Lint**: Ensure all WIKI files follow the GitHub Flavored Markdown standard.
-
-## 🤝 How to Contribute Shards
-
-
-
-
-1. **Fork** the repository and create an `alpha` branch.
-2. **Develop** your shard in the appropriate `suites/` directory.
-
-
-
-3. **Sync** documentation in `WIKI/`.
-4. **Submit** a PR to `beta` for review.
+## 🛡️ Code of Conduct
+We maintain a professional, inclusive, and mission-oriented environment. Please refer to `CODE_OF_CONDUCT.md` for details.
 
 ---
-"Sovereignty is a collective intent."
+*Join us in achieving Digital Sovereignty.*
