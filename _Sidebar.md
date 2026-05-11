@@ -17,6 +17,8 @@
 - [Kernel Modularization](MODULARIZATION_MAP.md)
 - [Post-Quantum Security](Verified-Boot.md)
 - [Zenith UI](ZENITH_UI.md)
+- [Self-Healing Engine](Sovereign_Self_Healing.md)
+- [Trust Graph UI](Trust_Graph.md)
 - [AI Orchestration](AGENTS.md)
 
 **Community & Contribution**
