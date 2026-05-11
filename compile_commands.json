@@ -27,3 +27,15 @@
         "command": "g++ -std=c++17 -ffreestanding -I./include -I./kernel/core/include -c kernel/core/ipc/SovereignBridge.cpp"
     }
 ]
+,
+    {
+        "directory": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\kernel\\core\\deployment\\SovereignPackageGraph.cpp",
+        "command": "g++ -std=c++17 -ffreestanding -I./include -I./kernel/core/include -c kernel/core/deployment/SovereignPackageGraph.cpp"
+    },
+    {
+        "directory": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\zenith\\trust_graph.c",
+        "command": "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c modules/ui/zenith/trust_graph.c"
+    }
+]

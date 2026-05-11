@@ -30,6 +30,7 @@ kernel/core/sched/SovereignRTSched.cpp
 kernel/core/observability/SovereignMonitor.cpp
 kernel/core/observability/SovereignDiag.cpp
 kernel/core/system/SovereignFS.cpp
+kernel/core/deployment/SovereignPackageGraph.cpp
 kernel/core/system/SovereignNet.cpp
 kernel/core/system/SovereignRollbackShard.cpp
 kernel/core/system/SovereignIPC.cpp
@@ -85,6 +86,7 @@ kernel/core/observability/SovereignEmergencySync.cpp
 kernel/core/automation/SovereignAgentQuotasExtended.cpp
 kernel/core/system/SovereignContainerOrchestrator.cpp
 kernel/core/ui/ZenithAccessibility.cpp
+modules/ui/zenith/trust_graph.c
 
 # ═══════════════════════════════════════════════════════════════════════
 # LAYER 6: HARDWARE COMPATIBILITY (Linux Distro Ports)
