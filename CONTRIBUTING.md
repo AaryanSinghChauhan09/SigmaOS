@@ -1,107 +1,44 @@
-1
-<<<<<<< HEAD
+# 🤝 Contributing to SigmaOS
 
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
-
-
-<<<<<<< HEAD
-
-1
-
-
-
-
-1. Clone the repo.
-2. Ensure you have a C++20 compatible compiler (GCC 12+, Clang 15+).
-
-
-
-3. Follow the [Installation Guide](https://github.com/AaryanSinghChauhan09/SigmaOS.wiki/blob/master/INSTALLATION_GUIDE.md).
-=======
-> Join the evolution of digital sovereignty.
+Thank you for your interest in contributing to **SigmaOS Sovereign Lattice**. We are building a high-performance, AI-native ecosystem and we welcome contributions that align with our vision of absolute digital sovereignty.
 
 ---
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
-
-1
-
-
-<<<<<<< HEAD
-
-1
-
-
-
-1
-
-
-
-1
-
-
-
-1
-
-
-
-1
-
-
-
-1
-
-
-Major architectural changes require an RFC and approval from the [Sovereign Council](https://github.com/AaryanSinghChauhan09/SigmaOS.wiki/blob/master/GOVERNANCE_CHARTER.md).
-=======
-SigmaOS is an industrial-grade project. All contributions must adhere to:
-
-
-1
-
-
-
-1
-
-
-
-1
-
-
-We follow a staged release cadence:
-
-
-1
-
-
-
-1
-
-
-
-1
-
-
-Every Pull Request triggers the following automated suite:
-
-1. **Lattice Rebuild**: All 600+ shards must compile with zero warnings.
-2. **Regression Suite**: IRQ handlers and SHS v2 are verified for RDTSC-cycle precision.
-
-3. **Security Scan**: Verify PQC signatures and TPM handshake protocols.
-4. **Doc Lint**: Ensure all WIKI files follow the GitHub Flavored Markdown standard.
-
-
-1
-
-
-1. **Fork** the repository and create an `alpha` branch.
-2. **Develop** your shard in the appropriate `suites/` directory.
-
-3. **Sync** documentation in `WIKI/`.
-4. **Submit** a PR to `beta` for review.
+## 🏛️ Contribution Philosophy
+SigmaOS is built on a **600-Shard Modular Architecture**. Every contribution should be:
+1. **Atomic**: Focus on a single shard or functional cluster.
+2. **Zero-Dependency**: Do not introduce external libraries unless absolutely necessary.
+3. **PQC-Ready**: Consider security and attestation in every line of code.
 
 ---
-"Sovereignty is a collective intent."
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
+## 🛠️ How to Contribute
+
+1. **Fork the Repository**: Create your own fork and clone it locally.
+2. **Create a Shard Branch**:
+   ```bash
+   git checkout -b shard/your-feature-name
+   ```
+3. **Implement & Document**: 
+   - Add your logic to the appropriate directory (`/kernel`, `/drivers`, `/ui`).
+   - Update the corresponding `.md` file in the wiki if the architecture changes.
+4. **Validation**:
+   - Run the build system: `make all`.
+   - Test in QEMU: `./qemu-boot.sh`.
+   - Ensure `sigma-heal` reports no technical debt.
+5. **Submit a PR**: Provide a clear description of the shard's purpose and any capability requirements.
+
+---
+
+## 🎨 Code Style
+- Use **OOP-Isolated Singletons** for core engines.
+- Follow the `sigma_` naming convention for kernel-level primitives.
+- Maintain strict **C++11/14** standards for hardware compatibility.
+
+---
+
+## 🛡️ Security First
+If you find a security vulnerability, please follow our **[Security Policy](SECURITY.md)**. Do NOT open a public issue for security bugs.
+
+---
+*Build the lattice. Command the future.*

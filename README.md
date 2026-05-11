@@ -1,55 +1,133 @@
+﻿1
 
-# 🧱 SigmaOS: The Sovereign Lattice
 
-SigmaOS is an industrialized, bare-metal operating system kernel built on a **600-Shard Modular Architecture**. It provides a clean, zero-dependency alternative to legacy monolithic kernels, prioritizing absolute digital sovereignty and AI-native automation.
+SigmaOS is an experimental, bare-metal operating system kernel built to explore extreme modularity using C++ singleton patterns. While currently in a conceptual phase (v100.0), its goal is to provide a clean, zero-dependency alternative to legacy monolithic kernels.
+
+
+1
+
+
+SigmaOS is **not** a daily-driver operating system. Currently, the kernel can:
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+SigmaOS currently lacks a fully functional filesystem, robust device drivers (e.g., USB, GPU), and a mature networking stack, though stubs exist.
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+make clean
+make singularity
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+make zenith-iso
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+make qemu
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+SigmaOS uses unique terminology for its architectural concepts. Here is what they mean in standard OS engineering terms: | SigmaOS Term | Standard Technical Meaning | | :------------------------------- | :----------------------------------------------------------------------------------------------- | | **Sovereign Lattice** | The operating system architecture as a whole. | | **Shard** | A distinct subsystem or driver encapsulated as a C++ Singleton class. | | **Amnesic Memory** | Stateless RAM allocation; memory buffers that are eagerly zeroed out after use to prevent leaks. | | **Zenith** | The target milestone version denoting a stable, complete foundation. | | **ZCLN (Zero-Copy Lattice Net)** | A zero-copy networking stack (bypassing redundant buffer copies between kernel and userland). | ## 🤝 Contributing
+
+We welcome contributions to help evolve SigmaOS from an experimental kernel into a fully usable distribution.
+
+
+1
+
+
+
+1
+
+
+SigmaOS has reached its architectural zenith. The kernel is now:
+
+
+1
+
+
+
+1
+
+
+For a detailed look at our implementation history, refer to the project Wiki and GitHub Insights.
 
 ---
 
 
-## 🚀 Current Capabilities (v14.0)
+1
 
-SigmaOS has evolved from a conceptual kernel into a functional environment with the following hardened shards:
-1. **SovereignNetStack**: A high-performance, PQC-hardened networking subsystem.
-2. **Zenith UI Compositor**: A premium glassmorphic interface with morphic layer composition.
-3. **Personalization Engine**: AI-driven profession profiles for Doctors, Lawyers, and Engineers.
-4. **Sovereign Diag**: Real-time silicon monitoring and automated self-healing diagnostics.
-
----
-
-
-## 🛠️ Build & Deployment
-
-
-### Environment
-- **Toolchain**: `gcc-aarch64-none-elf` / `clang`
-- **Build System**: `make`
-- **Target Hardware**: Raspberry Pi 4/5, x86_64 UEFI
-
-
-### Quick Start
-```bash
-make all            # Build the 600-shard core
-./qemu-boot.sh      # Launch in QEMU (Raspi4 Machine)
-```
-
----
-
-
-## 🗺️ Architectural Terminology
-
-| SigmaOS Term | Technical Meaning |
-| :--- | :--- |
-| **Sovereign Lattice** | The OS architecture as a modular grid of shards. |
-| **Shard** | An encapsulated subsystem (C++ Singleton) with strict isolation. |
-| **Amnesic Memory** | Stateless allocation; eager zeroing of buffers for privacy. |
-| **Zenith UI** | The premium, hardware-accelerated interface shard. |
-| **PQC-Attestation** | Post-Quantum Cryptographic verification of system integrity. |
-
----
-
-
-## 🤝 Contributing
-We welcome contributions that align with our vision of sovereign computing. Please refer to our **[Contributing Guide](CONTRIBUTING.md)** and **[Security Policy](SECURITY.md)** for more details.
-
----
-*v14.0 [NEXUS-SUPREME]*

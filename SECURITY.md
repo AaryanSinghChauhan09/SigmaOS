@@ -1,99 +1,86 @@
-1
-<<<<<<< HEAD
+# Security Policy
 
-
-
-1
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
-
-
-
-<<<<<<< HEAD
-
-1
-
-=======
-1
-
+## Supported Versions
 
 | Version | Supported |
 |---------|-----------|
-| v1.2.5-BEYOND (main) | ? Active |
-| v1.1.0-APEX-SINGULARITY | ?? Critical fixes only |
-| < v1.0 | ? No longer supported |
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
+| v1.2.5-BEYOND (main) | ✅ Active |
+| v1.1.0-APEX-SINGULARITY | ⚠️ Critical fixes only |
+| < v1.0 | ❌ No longer supported |
 
+## Reporting a Vulnerability
 
-1
+### Please do NOT report security vulnerabilities via public GitHub Issues.
 
-
-
-1
-
-
-<<<<<<< HEAD
-=======
 To report a security vulnerability in SigmaOS:
+
+
 
 1. **Email**: [Sovereign-OS0305@gmail.com](mailto:Sovereign-OS0305@gmail.com)
 2. **Or**: Open a private [Security Advisory](https://github.com/Sovereign-OS/SigmaOS/security/advisories/new) on GitHub
 
+
+
 3. **Include**:
 
 
-1
+
+   * A description of the vulnerability
+   * Steps to reproduce (PoC if possible)
 
 
 
-1
+   * The affected shard(s) or component
+   * Potential impact assessment
+
 
 
 4. **Response time**: We aim to acknowledge reports within **72 hours** and provide a fix timeline within **7 days**
 
-
-1
-
+## Security Architecture
 
 SigmaOS enforces sovereign security through:
 
 
-1
+
+* **Capability-Based IPC (S-Zircon)**: All inter-shard communication uses unforgeable capability handles
+* **Hardware-Backed Isolation**: Each suite runs in isolated shard domains with hardware compartmentalization
 
 
 
-1
+* **Neural Firewall (S08_Security)**: AI-driven anomaly detection at the kernel level
+* **Zero-Trust Network (S07_Network)**: All mesh communications use HMAC-authenticated gossip
 
 
 
-1
+* **Privacy Shard (S31_Privacy)**: Native Tor routing and amnesic memory for sensitive operations
+* **Quantum-Resistant Design**: Post-quantum cryptography planned for Phase 7 (CRYSTALS-Kyber)
 
-
-
-1
-
+## Scope
 
 The following are **in scope** for security reports:
 
 
-1
+
+* Kernel privilege escalation via shard boundaries
+* Memory corruption in `suites/S01_Genesis/` (core kernel)
 
 
 
-1
+* Bypass of capability-based access controls
+* Cryptographic weaknesses in Lattice Mesh (S33) HMAC implementation
 
 
 
-1
-
+* Buffer overflows in any `sigma_*` LibC function
 
 The following are **out of scope**:
 
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
-
-1
 
 
+* Issues in userland shards that don't affect kernel integrity
+* Performance degradation without security impact
 
-1
 
+
+* Issues requiring physical hardware access
