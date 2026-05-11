@@ -141,6 +141,10 @@ kernel/shards/security/SovereignCybersecurity.cpp
 kernel/shards/data-warehousing/SovereignWarehouse.cpp
 kernel/shards/data-mining/SovereignMiner.cpp
 kernel/shards/orchestration/SovereignContainerOrchestrator.cpp
+kernel/shards/userland/SovereignShell.cpp
+kernel/shards/userland/SovereignTerminal.cpp
+kernel/shards/userland/ZenithWindowManager.cpp
+kernel/shards/ecosystem/SovereignWikiEngine.cpp
 kernel/shards/ecosystem/SovereignWikiEngine.cpp
 kernel/shards/industrial/SovereignSmartGrid.cpp
 kernel/shards/industrial/SovereignSupplyChain.cpp
