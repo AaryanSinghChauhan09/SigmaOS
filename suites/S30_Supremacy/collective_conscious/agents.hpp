@@ -1,9 +1,9 @@
 #ifndef AGENTS_HPP
 #define AGENTS_HPP
 
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "../../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 class IConsciousAgent : public SigmaOS::SigmaObject {
 public:

@@ -13,7 +13,7 @@
 #include "sigma_libc.h"
 
 void SovereignBench_SyscallLatency(void) {
-    sigma_sigma_printf("S [BENCH]: Measuring Null-Syscall Latency (getpid dummy)...\n");
+    sigma_sigma_printf("S [BENCH]: Measuring SIGMA_NULL-Syscall Latency (getpid dummy)...\n");
     sigma_sigma_printf("  S [RESULT]: 42 cycles (Avg over 1M iterations).\n");
 }
 

@@ -1,4 +1,4 @@
-#include "../../include/sigma_vfs.h"
+#include "sigma_vfs.h"
 #include "suites/S01_Genesis/shards/sigma_libc.h"
 #include "suites/S01_Genesis/shards/sigma_libc.h"
 #include "suites/S01_Genesis/shards/sigma_libc.h"
@@ -9,7 +9,7 @@
  * ========================================================================= */
 
 const char* sigma_vfs_resolve_path(const char* request_path, char* resolved_buffer, int buffer_size) {
-    if (buffer_size < 1024) return NULL;
+    if (buffer_size < 1024) return SIGMA_NULL;
     
     sigma_strcpy(resolved_buffer, "../web_ui/");
     int len = 0; while (resolved_buffer[len]) len++;
@@ -26,7 +26,7 @@ char* sigma_vfs_read_file(const char* path, long* out_size) {
     FILE* file = fopen(path, "rb");
     if (!file) {
         *out_size = 0;
-        return NULL;
+        return SIGMA_NULL;
     }
 
     fseek(file, 0, SEEK_END);
@@ -36,18 +36,18 @@ char* sigma_vfs_read_file(const char* path, long* out_size) {
     if (*out_size < 0) {
         fclose(file);
         *out_size = 0;
-        return NULL;
+        return SIGMA_NULL;
     }
 
     char* content = (char*)sigma_malloc(*out_size + 1);
     if (!content) {
         fclose(file);
         *out_size = 0;
-        return NULL;
+        return SIGMA_NULL;
     }
 
     fread(content, 1, *out_size, file);
-    content[*out_size] = '\0'; // Null-terminate safely
+    content[*out_size] = '\0'; // SIGMA_NULL-terminate safely
     fclose(file);
     
     return content;

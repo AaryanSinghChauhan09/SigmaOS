@@ -1,5 +1,5 @@
-#include "../../../include/sigma_process.h"
-#include "../../../include/sigma_pmm.h"
+#include "sigma_process.h"
+#include "sigma_pmm.h"
 #include "suites/S01_Genesis/shards/sigma_libc.h"
 
 /* =========================================================================

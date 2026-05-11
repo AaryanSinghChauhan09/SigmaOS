@@ -8,7 +8,7 @@
  * - Alpine: Minimal footprint allocation.
  */
 
-#include "../include/SovereignInit.h"
+#include "SovereignInit.h"
 #include "sigma_libc.h"
 #include "suites/S01_Genesis/shards/SigmaC11.h"
 

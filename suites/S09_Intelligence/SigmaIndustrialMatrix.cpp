@@ -1,13 +1,13 @@
-﻿/*
+/*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS ZENITH SUPREME: INDUSTRIAL MASTER MATRIX (v1.0)
+ * Î£ SIGMAOS ZENITH SUPREME: INDUSTRIAL MASTER MATRIX (v1.0)
  * =========================================================================
  * Absorbing Features from: XClicker, AutoKey, EZLinux, Linux Practice Commands, etc.
  * Logic: Macros, Automation, CLI Utilities, and Educational Sharding.
  * =========================================================================
  */
 
-#include "../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 // --- Macro Automation (XClicker / AutoKey style) ---
 void sigma_macro_trigger(const char* name) {
@@ -16,7 +16,7 @@ void sigma_macro_trigger(const char* name) {
 
 // --- CLI Practice & Training (Command Practice style) ---
 void sigma_cli_training() {
-    sigma_log_info("\nÃŽÂ£ SOVEREIGN COMMAND TRAINING MODULE\n");
+    sigma_log_info("\nÎ£ SOVEREIGN COMMAND TRAINING MODULE\n");
     sigma_log_info("-------------------------------------------\n");
     sigma_log_info("1. ls: Shard directory listing\n");
     sigma_log_info("2. pkg: Deploy industrial software shards\n");

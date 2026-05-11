@@ -1,12 +1,12 @@
-﻿#include "../include/sigma_log.h"
-#include "../include/SovereignLibC.h"
+#include "sigma_log.h"
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
 
 /**
  * SigmaOS Sovereign GPU Driver (v100.0 Zenith)
  * Zero-copy graphics acceleration and silicon-native compositing.
  *
- * Design: OOP-isolated singleton â€” SovereignGPU.
+ * Design: OOP-isolated singleton — SovereignGPU.
  */
 
 class SovereignGPU {

@@ -1,7 +1,7 @@
-﻿#include "../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -10,7 +10,7 @@
 
 /*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS: SOVEREIGN TRANSPILER ZENITH (v11.0 - THE PYTHON KILLER)
+ * Î£ SIGMAOS: SOVEREIGN TRANSPILER ZENITH (v11.0 - THE PYTHON KILLER)
  * =========================================================================
  * Mission: Neutralize high-level interpreted languages (Python/JS).
  * Capability: Transpiles SigmaScript (High-level intent) into Native C++.
@@ -18,7 +18,7 @@
  * =========================================================================
  */
 
-#include "../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Dev {
@@ -56,7 +56,7 @@ public:
     }
 
     void audit() {
-        sigma_log_info("\n--- ÃŽÂ£ SOVEREIGN TRANSPILER AUDIT ---\n");
+        sigma_log_info("\n--- Î£ SOVEREIGN TRANSPILER AUDIT ---\n");
         sigma_log_info("| Shards Emitted : %llu\n", m_shards_emitted);
         sigma_log_info("| Status         : ALL INTERPRETERS NEUTRALIZED\n");
         sigma_log_info("--------------------------------------\n");

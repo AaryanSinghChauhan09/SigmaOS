@@ -27,6 +27,6 @@ void Sovereign_Heartbeat_Step(void) {
 }
 
 void S03_Orchestrator_Register(void) {
-    SovereignRegistry_Register("S03_Orchestrator", 0, NULL);
+    SovereignRegistry_Register("S03_Orchestrator", 0, SIGMA_NULL);
     sigma_sigma_printf("S [S03]: Master Orchestrator Heartbeat synchronized.\n");
 }

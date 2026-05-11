@@ -1,7 +1,7 @@
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 #include "SovereignCLI_Core.h"
-#include "../../include/SovereignCLI.h"
+#include "SovereignCLI.h"
 
 void SovereignCLI_Register(void) {
     /* 1. Seat Core Shell Logic */

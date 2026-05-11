@@ -3,6 +3,6 @@
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 void S19_SelfEvolution_Register(void) {
-    SovereignRegistry_Register("S19_SelfEvolution", 0, NULL);
+    SovereignRegistry_Register("S19_SelfEvolution", 0, SIGMA_NULL);
     sigma_sigma_printf("S [S19_SelfEvolution]: Materialized.\n");
 }

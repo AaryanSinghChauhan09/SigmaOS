@@ -88,12 +88,12 @@ char* sigma_strstr(const char* haystack, const char* needle) {
         while (*h && *n && *h == *n) { h++; n++; }
         if (!*n) return (char*)haystack;
     }
-    return NULL;
+    return SIGMA_NULL;
 }
 
 char* sigma_strchr(const char* s, int c) {
     while (*s) { if (*s == (char)c) return (char*)s; s++; }
-    return (c == '\0') ? (char*)s : NULL;
+    return (c == '\0') ? (char*)s : SIGMA_NULL;
 }
 
 // ── Number Conversion ─────────────────────────────────────────────────────────

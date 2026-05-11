@@ -87,7 +87,7 @@ static void walk_suite(const char* suite_path, const char* suite_name) {
     DIR* dir = opendir(suite_path);
     if (!dir) return;
     struct dirent* entry;
-    while ((entry = readdir(dir)) != NULL) {
+    while ((entry = readdir(dir)) != SIGMA_NULL) {
         if (entry->d_name[0] == '.') continue;
         const char* ext = strrchr(entry->d_name, '.');
         if (!ext) continue;
@@ -138,7 +138,7 @@ int main(int argc, char* argv[]) {
     }
 
     struct dirent* suite_entry;
-    while ((suite_entry = readdir(root_dir)) != NULL) {
+    while ((suite_entry = readdir(root_dir)) != SIGMA_NULL) {
         if (suite_entry->d_name[0] == '.') continue;
         
         char suite_path[MAX_PATH_LEN];

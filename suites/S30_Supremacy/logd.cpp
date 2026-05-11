@@ -1,6 +1,6 @@
-#include "../include/sigma_types.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../include/sigma_log.h"
+#include "sigma_log.h"
 
 /**
  * SovereignLogD — Centralized Logging and Observability Daemon.

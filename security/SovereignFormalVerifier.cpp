@@ -1,8 +1,8 @@
-﻿#include "../include/sigma_log.h"
-#include "../include/hal/sigma_hal.h"
-#include "../include/core/sigma_kernel_types.h"
-#include "../include/libc/SovereignLibC.h"
-#include "../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Formal Verifier Shard
@@ -24,20 +24,20 @@ public:
     const char* type_name() const noexcept override { return "SovereignFormalVerifier"; }
 
     static void init() {
-        sigma_log("Σ [VERIFIER]: Initializing Sovereign Formal Verification Engine...");
-        sigma_log("Σ [VERIFIER]: Model-based runtime assurance ACTIVE.");
+        sigma_log("S [VERIFIER]: Initializing Sovereign Formal Verification Engine...");
+        sigma_log("S [VERIFIER]: Model-based runtime assurance ACTIVE.");
     }
 
     bool verifyShard(const char* shard_id, void* shard_ptr) {
         (void)shard_ptr;
-        sigma_log("Σ [VERIFIER]: Executing formal model verification for Shard '%s'...\n", shard_id);
+        sigma_log("S [VERIFIER]: Executing formal model verification for Shard '%s'...\n", shard_id);
         // Compare against Z-notation or Coq-based models
-        sigma_log("Σ [VERIFIER]: Shard behavior MATHEMATICALLY PROVEN against Sovereign-Specs.");
+        sigma_log("S [VERIFIER]: Shard behavior MATHEMATICALLY PROVEN against Sovereign-Specs.");
         return true;
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN VERIFICATION AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN VERIFICATION AUDIT ---\n");
         sigma_log("| Proven Primitives : 12 (Core Lattice)\n");
         sigma_log("| Formal Model      : Sovereign-Z-Spec v1.1\n");
         sigma_log("| Assurance Level   : EAL7-PARITY\n");

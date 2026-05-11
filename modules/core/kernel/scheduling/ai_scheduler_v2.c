@@ -75,7 +75,7 @@ uint32_t ai_scheduler_pick_next(uint32_t* runqueue, uint32_t queue_len,
     uint32_t next_pid = runqueue[0];
     
     // Find AI state
-    ai_proc_state_t* p = NULL;
+    ai_proc_state_t* p = SIGMA_NULL;
     for (int i = 0; i < MAX_PROCESSES; i++) {
         if (ai_state_table[i].pid == next_pid) { p = &ai_state_table[i]; break; }
     }

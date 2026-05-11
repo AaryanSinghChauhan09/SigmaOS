@@ -57,5 +57,5 @@ const char* hw_get_driver(uint32_t vendor, uint32_t device) {
             return device_database[i].compatible_module;
         }
     }
-    return NULL;
+    return SIGMA_NULL;
 }

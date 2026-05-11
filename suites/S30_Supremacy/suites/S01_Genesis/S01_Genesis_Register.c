@@ -6,6 +6,6 @@ extern void SovereignSyscall_Init(void);
 
 void S01_Genesis_Register(void) {
     SovereignSyscall_Init();
-    SovereignRegistry_Register("S01_Genesis", 0, NULL);
+    SovereignRegistry_Register("S01_Genesis", 0, SIGMA_NULL);
     sigma_sigma_printf("S [S01_Genesis]: Syscall Dispatcher integrated.\n");
 }

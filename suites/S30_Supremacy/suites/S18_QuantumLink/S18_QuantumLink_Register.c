@@ -3,6 +3,6 @@
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 void S18_QuantumLink_Register(void) {
-    SovereignRegistry_Register("S18_QuantumLink", 0, NULL);
+    SovereignRegistry_Register("S18_QuantumLink", 0, SIGMA_NULL);
     sigma_sigma_printf("S [S18_QuantumLink]: Materialized.\n");
 }

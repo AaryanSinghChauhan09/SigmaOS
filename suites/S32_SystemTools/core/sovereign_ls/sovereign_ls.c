@@ -28,7 +28,7 @@ void sovereign_ls(const char* path) {
     DIR* d = opendir(path);
     if (!d) return;
     struct dirent* dir;
-    while ((dir = readdir(d)) != NULL) {
+    while ((dir = readdir(d)) != SIGMA_NULL) {
         if (dir->d_name[0] == '.') continue;
         sigma_printf("%-20s ", dir->d_name);
     }

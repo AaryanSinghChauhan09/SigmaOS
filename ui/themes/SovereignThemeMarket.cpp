@@ -1,8 +1,8 @@
-#include "../../include/sigma_log.h"
-#include "../../include/core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 #include "SovereignThemeMarket.hpp"
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 SovereignThemeMarketEngine& SovereignThemeMarketEngine::getInstance() {
     static SovereignThemeMarketEngine instance;

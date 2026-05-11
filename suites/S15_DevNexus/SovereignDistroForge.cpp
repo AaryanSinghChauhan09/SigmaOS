@@ -1,4 +1,4 @@
-﻿#include "../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include "SovereignDistroForge.h"
 
 namespace SigmaOS {

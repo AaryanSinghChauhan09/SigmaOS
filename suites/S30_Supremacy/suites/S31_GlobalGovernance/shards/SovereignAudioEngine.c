@@ -42,5 +42,5 @@ void Sovereign_Audio_Process(void) {
 
 void Sovereign_Audio_Register(void) {
     Sovereign_Audio_Init();
-    SovereignRegistry_Register("S31_Audio", SHARD_CAT_CORE, NULL);
+    SovereignRegistry_Register("S31_Audio", SHARD_CAT_CORE, SIGMA_NULL);
 }

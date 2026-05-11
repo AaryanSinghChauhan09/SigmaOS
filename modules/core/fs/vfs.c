@@ -24,7 +24,7 @@ typedef struct vfs_node {
     struct vfs_node* next;     // Sibling pointer
 } vfs_node_t;
 
-static vfs_node_t* root_directory = NULL;
+static vfs_node_t* root_directory = SIGMA_NULL;
 
 // Initialize VFS
 void vfs_init() {
@@ -40,7 +40,7 @@ vfs_node_t* vfs_read_dir(vfs_node_t* dir) {
     if (dir && dir->type == NODE_DIRECTORY) {
         return dir->children;
     }
-    return NULL;
+    return SIGMA_NULL;
 }
 
 // Abstract function to open a file

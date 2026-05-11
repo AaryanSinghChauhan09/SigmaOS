@@ -6,6 +6,6 @@ extern void vfs_init(void);
 
 void S20_Interconnect_Register(void) {
     vfs_init();
-    SovereignRegistry_Register("S20_Interconnect", 0, NULL);
+    SovereignRegistry_Register("S20_Interconnect", 0, SIGMA_NULL);
     sigma_sigma_printf("S [S20_Interconnect]: Unified Node Interconnect integrated.\n");
 }

@@ -22,7 +22,7 @@ void temporal_journal_init(void) {
 }
 
 void temporal_journal_append(const char* command) {
-    uint64_t ts = (uint64_t)time(NULL);
+    uint64_t ts = (uint64_t)time(SIGMA_NULL);
     sigma_printf("S [TIME]: Journaling entry -> [%llu] %s\n", ts, command);
     // Hash chaining logic to ensure immutability
 }

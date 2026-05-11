@@ -3,6 +3,6 @@
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 void S27_NeuralLink_Register(void) {
-    SovereignRegistry_Register("S27_NeuralLink", 0, NULL);
+    SovereignRegistry_Register("S27_NeuralLink", 0, SIGMA_NULL);
     sigma_sigma_printf("S [S27_NeuralLink]: Materialized.\n");
 }

@@ -3,8 +3,8 @@
  * Manages platform configuration registers (PCRs) and hardware-backed attestation.
  */
 
-#include "../include/sigma_types.h"
-#include "../include/sigma_log.h"
+#include "sigma_types.h"
+#include "sigma_log.h"
 
 namespace SigmaOS {
 namespace Kernel {

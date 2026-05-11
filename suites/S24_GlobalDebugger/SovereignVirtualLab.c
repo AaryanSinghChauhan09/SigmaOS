@@ -1,7 +1,7 @@
-﻿#include "../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -14,7 +14,7 @@
 
 
 /**
- * ÃŽÂ£ SIGMA OS: SOVEREIGN VIRTUAL LAB ENGINE (v128.0 - LAB ZENITH)
+ * Î£ SIGMA OS: SOVEREIGN VIRTUAL LAB ENGINE (v128.0 - LAB ZENITH)
  * ============================================================
  * USP: Native C++ implementation of NCERT Science & Math Labs (1-12).
  * Principle: OOPS, Encapsulation, No 3rd-party dependencies.
@@ -96,7 +96,7 @@ public:
     }
 
     void RunExhaustiveAudit() {
-        sigma_log_info("--- ÃŽÂ£ SIGMA OS SOVEREIGN VIRTUAL LABS (NCERT ZENITH) ---\n");
+        sigma_log_info("--- Î£ SIGMA OS SOVEREIGN VIRTUAL LABS (NCERT ZENITH) ---\n");
         for (const auto& lab : m_labs) {
             std::cout << "\n[LAB]: " << lab->GetTitle() << std::endl;
             lab->RunProcedure();

@@ -81,7 +81,7 @@ void rcu_init_core(void) {
     g_rcu.grace_period_start = 0;
     g_rcu.quiescent_mask = 0;
 <<<<<<<< HEAD:suites/S14_Transcendence/quantum_rcu.c
-    g_rcu.pending_reclaim = NULL;
+    g_rcu.pending_reclaim = SIGMA_NULL;
     // ksigma_printf("[RCU]: Quantum RCU Lock-Free Sync Layer Online.\n");
 ========
     g_rcu.pending_reclaim = SIGMA_NULL;

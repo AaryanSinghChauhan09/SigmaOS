@@ -2,7 +2,7 @@
 #include "SovereignDesktopZenith.h"
 #include "sigma_libc.h"
 =======
-﻿#include "../include/SovereignLibC.h"
+﻿#include "SovereignLibC.h"
 >>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:userland/SovereignDesktopZenith.cpp
 
 namespace SigmaOS {

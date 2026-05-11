@@ -1,4 +1,4 @@
-#include "../../include/SovereignCommon.h"
+#include "SovereignCommon.h"
 
 // SigmaBPF (Extended Berkeley Packet Filter Alternative)
 // Inspired by Linux torvalds/linux eBPF

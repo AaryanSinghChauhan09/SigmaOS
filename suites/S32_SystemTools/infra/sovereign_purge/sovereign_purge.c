@@ -37,9 +37,9 @@ static PurgeTarget targets[MAX_TARGETS];
 static uint32_t    target_count = 0;
 
 // ── Artifact patterns to purge ────────────────────────────────────────────────
-static const char* artifact_exts[]  = { ".o", ".a", ".out", ".bin", ".elf", NULL };
-static const char* artifact_dirs[]  = { "build", "release", "__pycache__", NULL };
-static const char* orphan_patterns[]= { "fix_lints", "sigma_wiki_temp", NULL };
+static const char* artifact_exts[]  = { ".o", ".a", ".out", ".bin", ".elf", SIGMA_NULL };
+static const char* artifact_dirs[]  = { "build", "release", "__pycache__", SIGMA_NULL };
+static const char* orphan_patterns[]= { "fix_lints", "sigma_wiki_temp", SIGMA_NULL };
 
 static bool matches_artifact(const char* name) {
     const char* ext = strrchr(name, '.');
@@ -55,7 +55,7 @@ static void scan_dir(const char* path) {
     if (!dir) return;
 
     struct dirent* e;
-    while ((e = readdir(dir)) != NULL) {
+    while ((e = readdir(dir)) != SIGMA_NULL) {
         if (e->d_name[0] == '.') continue;
 
         char full[MAX_PATH];

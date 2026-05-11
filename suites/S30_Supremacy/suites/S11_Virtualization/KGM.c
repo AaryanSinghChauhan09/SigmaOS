@@ -1,4 +1,4 @@
-#include "../../include/SovereignCommon.h"
+#include "SovereignCommon.h"
 
 // Kernel Global Machine (KGM)
 // Inspired by Linux KVM (Kernel-based Virtual Machine) from torvalds/linux

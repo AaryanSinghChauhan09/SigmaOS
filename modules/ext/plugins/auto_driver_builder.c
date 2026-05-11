@@ -65,8 +65,8 @@ int build_autonomous_driver(const hw_metadata_t* metadata) {
         drv->write_hook = generic_mmio_write;
     } else {
         // Bind generic Port I/O functions
-        drv->read_hook = NULL; // Port I/O read
-        drv->write_hook = NULL; // Port I/O write
+        drv->read_hook = SIGMA_NULL; // Port I/O read
+        drv->write_hook = SIGMA_NULL; // Port I/O write
     }
     
     // Bind generic IRQ handler

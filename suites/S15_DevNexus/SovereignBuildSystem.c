@@ -1,17 +1,17 @@
-﻿#include "../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
  * =========================================================================
  */
 
-#include "../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 /**
- * ÃŽÂ£ SIGMA OS: SOVEREIGN BUILD SYSTEM (v128.0 - ZERO-STD NATIVE)
+ * Î£ SIGMA OS: SOVEREIGN BUILD SYSTEM (v128.0 - ZERO-STD NATIVE)
  * =========================================================
  * USP: Silicon-Direct optimization (Gentoo-Style) for Apex Shards.
  * Capability: CPU Feature Detection (AVX-512, SSE4.2) & Hardware-Level Tuning.
@@ -66,7 +66,7 @@ public:
 };
 
 extern "C" void _start(void) {
-    sigma_log_info("--- ÃŽÂ£ SIGMA OS SOVEREIGN BUILD SYSTEM (ZENITH) ---\n");
+    sigma_log_info("--- Î£ SIGMA OS SOVEREIGN BUILD SYSTEM (ZENITH) ---\n");
     SovereignSiliconAudit audit;
     audit.DetectFeatures();
     

@@ -7,7 +7,7 @@ namespace SigmaOS {
 // --- SYNC IMPLEMENTATION (Readers-Writers) ---
 void Sync::SovereignSyncProblems::SolveReadersWriters() {
     sigma_printf("[ZENITH-SYNC]: Readers-Writers priority logic initiated (Zero-Starvation).\n");
-    sigma_printf("[ZENITH-SYNC]: Reader count: 0 | Shard locked: NULL\n");
+    sigma_printf("[ZENITH-SYNC]: Reader count: 0 | Shard locked: SIGMA_NULL\n");
 }
 
 void Sync::SovereignSyncProblems::SolveDiningPhilosophers() {

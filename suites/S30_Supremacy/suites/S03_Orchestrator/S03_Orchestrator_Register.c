@@ -6,6 +6,6 @@ extern void dag_init(void);
 
 void S03_Orchestrator_Register(void) {
     dag_init();
-    SovereignRegistry_Register("S03_Orchestrator", 0, NULL);
+    SovereignRegistry_Register("S03_Orchestrator", 0, SIGMA_NULL);
     sigma_sigma_printf("S [S03_Orchestrator]: SigmaFlow DAG Engine integrated.\n");
 }

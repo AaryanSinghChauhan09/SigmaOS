@@ -1,7 +1,7 @@
-﻿#include "../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -15,7 +15,7 @@
 
 
 /**
- * ÃŽÂ£ SIGMA OS: SOVEREIGN VOICE-TO-TYPE SHARD (v128.0 - VOICE ZENITH)
+ * Î£ SIGMA OS: SOVEREIGN VOICE-TO-TYPE SHARD (v128.0 - VOICE ZENITH)
  * ===============================================================
  * USP: 100% Offline Whisper transcription with global HID injection.
  * Capability: Zero-edit accuracy, low latency, silicon-direct audio capture.
@@ -123,7 +123,7 @@ int main() {
 #endif
     SovereignVoiceShard voiceShard(&hid);
     
-    sigma_log_info("--- ÃŽÂ£ SIGMA OS VOICE-TO-TYPE SOVEREIGN INITIALIZED ---\n");
+    sigma_log_info("--- Î£ SIGMA OS VOICE-TO-TYPE SOVEREIGN INITIALIZED ---\n");
     voiceShard.ActivateGlobalWakeKey();
     
     // Simulate a wake-key trigger

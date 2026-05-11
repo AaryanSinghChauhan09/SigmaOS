@@ -1,17 +1,17 @@
-﻿#include "../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
  * =========================================================================
  */
 
-#include "../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 /**
- * ÃŽÂ£ SIGMA OS: SOVEREIGN DATA PREPROCESSOR (v128.0 - ZERO-STD NATIVE)
+ * Î£ SIGMA OS: SOVEREIGN DATA PREPROCESSOR (v128.0 - ZERO-STD NATIVE)
  * =============================================================
  * USP: Pre-processing manual data shards into silicon-direct inputs.
  * Capability: Cleaning, Integration, Reduction, Transformation (CIRT-CORE).
@@ -76,7 +76,7 @@ public:
 };
 
 extern "C" void _start(void) {
-    sigma_log_info("--- ÃŽÂ£ SIGMA OS SOVEREIGN DATA PREPROCESSOR (ZENITH) ---\n");
+    sigma_log_info("--- Î£ SIGMA OS SOVEREIGN DATA PREPROCESSOR (ZENITH) ---\n");
     
     // Simulate a large data shard
     static float sample_shard[1024];

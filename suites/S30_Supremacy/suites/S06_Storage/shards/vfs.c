@@ -1,9 +1,9 @@
-﻿/*
+/*
  * =========================================================================
 <<<<<<< HEAD:suites/S30_Supremacy/suites/S06_Storage/shards/vfs.c
  * S SIGMAOS ZENITH SUPREME: VIRTUAL FILE SYSTEM (VFS) SHARD
 =======
- * ÃŽÂ£ SIGMAOS ZENITH SUPREME: VIRTUAL FILE SYSTEM (VFS) SHARD
+ * Î£ SIGMAOS ZENITH SUPREME: VIRTUAL FILE SYSTEM (VFS) SHARD
 >>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:fs/vfs.c
  * =========================================================================
  * Mission: Abstract storage and sharding for modular filesystem support.
@@ -15,8 +15,8 @@
 #include "sigma_libc.h"
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 =======
-#include "../include/SovereignLibC.h"
-#include "../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 >>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:fs/vfs.c
 
 #define MAX_FILES 128

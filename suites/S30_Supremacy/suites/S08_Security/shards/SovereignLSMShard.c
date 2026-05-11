@@ -16,7 +16,7 @@ typedef struct {
     int (*file_open)(const char* path);
 } SigmaLSM_Ops_t;
 
-static SigmaLSM_Ops_t* s_lsm_active = NULL;
+static SigmaLSM_Ops_t* s_lsm_active = SIGMA_NULL;
 
 /**
  * sigma_security_lsm_hook: Mediates access via the active security module.

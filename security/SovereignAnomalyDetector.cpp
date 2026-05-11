@@ -1,9 +1,9 @@
-﻿#include "../include/sigma_log.h"
-#include "../include/core/sigma_types.h"
-#include "../include/hal/sigma_hal.h"
-#include "../include/core/sigma_kernel_types.h"
-#include "../include/libc/SovereignLibC.h"
-#include "../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Anomaly Detector Shard
@@ -25,24 +25,24 @@ public:
     const char* type_name() const noexcept override { return "SovereignAnomalyDetector"; }
 
     static void init() {
-        sigma_log("Σ [ANOMALY-DETECT]: Initializing Sovereign AI Threat Hunter...");
-        sigma_log("Σ [ANOMALY-DETECT]: Behavioral heuristics and zero-day prevention ACTIVE.");
+        sigma_log("S [ANOMALY-DETECT]: Initializing Sovereign AI Threat Hunter...");
+        sigma_log("S [ANOMALY-DETECT]: Behavioral heuristics and zero-day prevention ACTIVE.");
     }
 
     void analyzeBehavior(const char* process_name, sigma_u32 syscall_rate, sigma_u32 mem_allocs) {
-        sigma_log("Σ [ANOMALY-DETECT]: Analyzing behavior of '%s' (Syscalls: %u/s, Mem: %u)...\n", 
+        sigma_log("S [ANOMALY-DETECT]: Analyzing behavior of '%s' (Syscalls: %u/s, Mem: %u)...\n", 
                      process_name, syscall_rate, mem_allocs);
         
         if (syscall_rate > 100000) {
-            sigma_log("Σ [ANOMALY-DETECT]: [CRITICAL] Anomaly detected! High syscall rate indicative of exploitation.");
+            sigma_log("S [ANOMALY-DETECT]: [CRITICAL] Anomaly detected! High syscall rate indicative of exploitation.");
             // Enforce quarantine via Zero-Trust
         } else {
-            sigma_log("Σ [ANOMALY-DETECT]: Behavior normal. Threat level: 0%.");
+            sigma_log("S [ANOMALY-DETECT]: Behavior normal. Threat level: 0%.");
         }
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN ANOMALY DETECTOR AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN ANOMALY DETECTOR AUDIT ---\n");
         sigma_log("| Engine Type     : NEURAL-HEURISTIC\n");
         sigma_log("| Mitigation      : AUTO-QUARANTINE\n");
         sigma_log("| Zero-Day Def    : ACTIVE\n");

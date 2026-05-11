@@ -1,8 +1,8 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/core/sigma_kernel_types.h"
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Network Stack Shard
@@ -24,19 +24,19 @@ public:
     const char* type_name() const noexcept override { return "SovereignNetworkStack"; }
 
     static void init() {
-        sigma_log("Σ [NETSTACK]: Initializing Sovereign TCP/IP/Lattice Stack...");
-        sigma_log("Σ [NETSTACK]: ARP/IP/UDP/TCP Shards mapping to Distributed Lattice ACTIVE.");
+        sigma_log("S [NETSTACK]: Initializing Sovereign TCP/IP/Lattice Stack...");
+        sigma_log("S [NETSTACK]: ARP/IP/UDP/TCP Shards mapping to Distributed Lattice ACTIVE.");
     }
 
     void handlePacket(void* packet, sigma_usize size) {
         (void)packet; (void)size;
-        sigma_log("Σ [NETSTACK]: Processing incoming shard-packet via Zero-Copy Lattice.");
+        sigma_log("S [NETSTACK]: Processing incoming shard-packet via Zero-Copy Lattice.");
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN NETSTACK AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN NETSTACK AUDIT ---\n");
         sigma_log("| Active Streams  : 0 (Baseline Phase)\n");
-        sigma_log("| Lattice-IP      : 10.0.0.Σ\n");
+        sigma_log("| Lattice-IP      : 10.0.0.S\n");
         sigma_log("| Protocol Parity : TCP/IP, UDP, ICMP\n");
         sigma_log("----------------------------------\n");
     }

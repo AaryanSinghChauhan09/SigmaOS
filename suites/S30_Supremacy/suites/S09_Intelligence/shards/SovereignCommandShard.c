@@ -44,7 +44,7 @@ void sigma_cli_execute(char* raw_cmd) {
     char* token = sigma_strtok(raw_cmd, " ");
     while (token && argc < MAX_ARGS) {
         argv[argc++] = token;
-        token = sigma_strtok(NULL, " ");
+        token = sigma_strtok(SIGMA_NULL, " ");
     }
     
     if (argc == 0) return;

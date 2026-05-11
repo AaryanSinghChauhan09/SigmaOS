@@ -1,9 +1,9 @@
-﻿#include "../include/sigma_log.h"
-#include "../include/core/sigma_types.h"
-#include "../include/hal/sigma_hal.h"
-#include "../include/core/sigma_kernel_types.h"
-#include "../include/libc/SovereignLibC.h"
-#include "../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Zenith Desktop Shard
@@ -25,19 +25,19 @@ public:
     const char* type_name() const noexcept override { return "SovereignZenithDesktop"; }
 
     static void init() {
-        sigma_log("Σ [ZENITH-UI]: Initializing Sovereign Zenith Desktop...");
-        sigma_log("Σ [ZENITH-UI]: Neural layouts and adaptive personalization ACTIVE.");
+        sigma_log("S [ZENITH-UI]: Initializing Sovereign Zenith Desktop...");
+        sigma_log("S [ZENITH-UI]: Neural layouts and adaptive personalization ACTIVE.");
     }
 
     void renderWorkspace(const char* user_context) {
-        sigma_log("Σ [ZENITH-UI]: Rendering AI-adaptive workspace for context '%s'...\n", user_context);
+        sigma_log("S [ZENITH-UI]: Rendering AI-adaptive workspace for context '%s'...\n", user_context);
         // Execute dynamic widget placement and theme adaptation
-        sigma_log("Σ [ZENITH-UI]: Workspace rendered. Sub-millisecond glassmorphic compositing complete.");
+        sigma_log("S [ZENITH-UI]: Workspace rendered. Sub-millisecond glassmorphic compositing complete.");
         m_rendered_frames++;
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN ZENITH AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN ZENITH AUDIT ---\n");
         sigma_log("| Rendered Frames : %llu\n", m_rendered_frames);
         sigma_log("| Layout Engine   : NEURAL-ADAPTIVE\n");
         sigma_log("| Compositor      : SILICON-DIRECT\n");

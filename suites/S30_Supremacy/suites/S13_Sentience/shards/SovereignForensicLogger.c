@@ -16,7 +16,7 @@ typedef enum {
 } SovereignAuditEvent;
 
 void forensic_log(SovereignAuditEvent event, const char* details) {
-    uint64_t timestamp = (uint64_t)time(NULL);
+    uint64_t timestamp = (uint64_t)time(SIGMA_NULL);
     const char* type_str = "UNKNOWN";
     
     switch (event) {

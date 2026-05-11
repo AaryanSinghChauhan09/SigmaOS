@@ -53,7 +53,7 @@ void* numa_alloc_page(uint32_t preferred_node) {
             if (pass == 0) break; // Only try preferred node on first pass
         }
     }
-    return NULL; // Out of memory
+    return SIGMA_NULL; // Out of memory
 }
 
 void numa_free_page(void* addr) {

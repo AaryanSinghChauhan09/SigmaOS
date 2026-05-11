@@ -131,7 +131,7 @@ void idt_init(void) {
     for (i = 0; i < IDT_ENTRIES; i++) {
         u8 attr = (i == 128) ? IDT_GATE_USER : IDT_GATE_INT;
         idt_set_gate(i, isr_stub_table[i], attr, 0);
-        g_handlers[i] = NULL;
+        g_handlers[i] = SIGMA_NULL;
     }
 
     /* IDTR */

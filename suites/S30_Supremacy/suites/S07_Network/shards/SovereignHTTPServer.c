@@ -7,8 +7,8 @@
 
 #include "suites/S01_Genesis/shards/sigma_libc.h"
 #include "suites/S01_Genesis/shards/sigma_libc.h"
-#include "../include/sigma_network.h"
-#include "../include/sigma_http.h"
+#include "sigma_network.h"
+#include "sigma_http.h"
 
 #ifdef _WIN32
     #include <winsock2.h>

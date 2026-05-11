@@ -3,6 +3,6 @@
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 void S06_Storage_Register(void) {
-    SovereignRegistry_Register("S06_Storage", 0, NULL);
+    SovereignRegistry_Register("S06_Storage", 0, SIGMA_NULL);
     sigma_sigma_printf("S [S06_Storage]: Materialized.\n");
 }

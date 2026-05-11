@@ -1,7 +1,7 @@
-﻿#include "../include/sigma_log.h"
-#include "../include/sigma_types.h"
+#include "sigma_log.h"
+#include "sigma_types.h"
 #include "sigma_hal.h"
-#include "../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Shell (sigma_sh)
@@ -10,7 +10,7 @@
  * USP: Executable directly on bare metal without standard libraries, 
  * communicating directly with the Sovereign Kernel via IPC and syscalls.
  *
- * Design: OOP-isolated singleton â€” SovereignShell.
+ * Design: OOP-isolated singleton — SovereignShell.
  */
 
 class SovereignShell {

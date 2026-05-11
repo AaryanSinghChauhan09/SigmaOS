@@ -46,7 +46,7 @@ void* pmm_alloc_page(void) {
             return addr;
         }
     }
-    return NULL; /* S Lattice Exhaustion */
+    return SIGMA_NULL; /* S Lattice Exhaustion */
 }
 
 void pmm_free_page(void* addr) {

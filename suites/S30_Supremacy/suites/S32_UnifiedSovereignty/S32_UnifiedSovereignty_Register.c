@@ -3,6 +3,6 @@
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 void S32_UnifiedSovereignty_Register(void) {
-    SovereignRegistry_Register("S32_UnifiedSovereignty", 0, NULL);
+    SovereignRegistry_Register("S32_UnifiedSovereignty", 0, SIGMA_NULL);
     sigma_sigma_printf("S [S32_UnifiedSovereignty]: Materialized.\n");
 }

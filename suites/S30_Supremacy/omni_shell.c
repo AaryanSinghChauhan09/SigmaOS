@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS: SOVEREIGN OMNI-SHELL ZENITH (v27.0 - PURE C11)
+ * Î£ SIGMAOS: SOVEREIGN OMNI-SHELL ZENITH (v27.0 - PURE C11)
  * =========================================================================
  * Converted from C++ OOP / namespaces / complex includes to ISO C11.
  * Mission: Absolute Mastery. Everything is a Shell Command.
@@ -9,8 +9,8 @@
  * =========================================================================
  */
 
-#include "../include/SovereignLibC.h"
-#include "../include/SovereignLibC.h"   /* C11 scheduler/cloud/ui/net structs */
+#include "SovereignLibC.h"
+#include "SovereignLibC.h"   /* C11 scheduler/cloud/ui/net structs */
 #include "SovereignPersona.h"     /* C11 Persona/Dashboard structs */
 
 /* =========================================================================
@@ -42,7 +42,7 @@ typedef struct OmniShellZenith {
 } OmniShellZenith;
 
 /* =========================================================================
- * Built-in command implementations (static functions Ã¢â‚¬ replaces C++ methods)
+ * Built-in command implementations (static functions â€ replaces C++ methods)
  * ========================================================================= */
 static void cmd_shard_rebuild(void* ctx) {
     (void)ctx;
@@ -160,7 +160,7 @@ static void cmd_persona_auto(void* ctx) {
 
 static void cmd_history(void* ctx) {
     OmniShellZenith* sh = (OmniShellZenith*)ctx;
-    kprintf("\n--- ÃŽÂ£ SHELL HISTORY (%u / %u) ---\n", sh->history_count, SHELL_HISTORY_MAX);
+    kprintf("\n--- Î£ SHELL HISTORY (%u / %u) ---\n", sh->history_count, SHELL_HISTORY_MAX);
     for (sigma_u32 i = 0; i < sh->history_count; i++) {
         kprintf("[%u]: %s\n", i + 1, sh->history[i]);
     }
@@ -174,7 +174,7 @@ static void cmd_sched_audit(void* ctx) {
 static void cmd_clear(void* ctx) {
     (void)ctx;
     kprintf("\033[2J\033[H");
-    kprintf("--- ÃŽÂ£ SIGMAOS OMNI-SHELL ZENITH (CLEARED) ---\n");
+    kprintf("--- Î£ SIGMAOS OMNI-SHELL ZENITH (CLEARED) ---\n");
 }
 
 static void cmd_notify(void* ctx) {
@@ -199,7 +199,7 @@ static void cmd_ui_audit(void* ctx) {
 
 static void cmd_shard_audit(void* ctx) {
     (void)ctx;
-    kprintf("\n--- ÃŽÂ£ SOVEREIGN SHARD AUDIT ---\n");
+    kprintf("\n--- Î£ SOVEREIGN SHARD AUDIT ---\n");
     kprintf("| Active Shards  : 512 / 512\n");
     kprintf("| Integrity      : BIT-PERFECT\n");
     kprintf("| PQC Shunt      : VERIFIED\n");
@@ -208,7 +208,7 @@ static void cmd_shard_audit(void* ctx) {
 
 static void cmd_gpu_audit(void* ctx) {
     (void)ctx;
-    kprintf("\n--- ÃŽÂ£ SOVEREIGN GPU AUDIT ---\n");
+    kprintf("\n--- Î£ SOVEREIGN GPU AUDIT ---\n");
     kprintf("| VRAM Usage     : 4.2 GB / 16 GB\n");
     kprintf("| Compute Shards : 4096 ACTIVE\n");
     kprintf("| Neural Intent  : SNAPCHAT-MATRIX-V5\n");
@@ -217,7 +217,7 @@ static void cmd_gpu_audit(void* ctx) {
 
 static void cmd_device_audit(void* ctx) {
     (void)ctx;
-    kprintf("\n--- ÃŽÂ£ SOVEREIGN DEVICE AUDIT ---\n");
+    kprintf("\n--- Î£ SOVEREIGN DEVICE AUDIT ---\n");
     kprintf("| Bus Count      : 256 [FULLY ENUMERATED]\n");
     kprintf("| Active Shards  : NVMe, GPU, NIC, RDMA\n");
     kprintf("| Bridge Status  : BIT-PERFECT\n");
@@ -226,7 +226,7 @@ static void cmd_device_audit(void* ctx) {
 
 static void cmd_power_audit(void* ctx) {
     (void)ctx;
-    kprintf("\n--- ÃŽÂ£ SOVEREIGN POWER AUDIT ---\n");
+    kprintf("\n--- Î£ SOVEREIGN POWER AUDIT ---\n");
     kprintf("| Energy State   : S0 ACTIVE\n");
     kprintf("| Battery Shard  : 100%% CHARGED\n");
     kprintf("| Thermal Shunt  : 42 C [OPTIMAL]\n");
@@ -235,7 +235,7 @@ static void cmd_power_audit(void* ctx) {
 
 static void cmd_clock_audit(void* ctx) {
     (void)ctx;
-    kprintf("\n--- ÃŽÂ£ SOVEREIGN CLOCK AUDIT ---\n");
+    kprintf("\n--- Î£ SOVEREIGN CLOCK AUDIT ---\n");
     kprintf("| Clock Source   : CMOS SILICON\n");
     kprintf("| Drift Mode     : ZERO-PPM ACTIVE\n");
     kprintf("| Sync Integrity : BIT-PERFECT\n");
@@ -244,7 +244,7 @@ static void cmd_clock_audit(void* ctx) {
 
 static void cmd_video_audit(void* ctx) {
     (void)ctx;
-    kprintf("\n--- ÃŽÂ£ SOVEREIGN VIDEO AUDIT ---\n");
+    kprintf("\n--- Î£ SOVEREIGN VIDEO AUDIT ---\n");
     kprintf("| Display Mode   : BGA SHARDED\n");
     kprintf("| VRAM Aperture  : 16 MB LFB\n");
     kprintf("| Shard Flips    : 60 FPS SYNC\n");
@@ -253,7 +253,7 @@ static void cmd_video_audit(void* ctx) {
 
 static void cmd_log_audit(void* ctx) {
     (void)ctx;
-    kprintf("\n--- ÃŽÂ£ SOVEREIGN LOGGING AUDIT ---\n");
+    kprintf("\n--- Î£ SOVEREIGN LOGGING AUDIT ---\n");
     kprintf("| Storage Mode   : AMNESIC ACTIVE\n");
     kprintf("| Scrubbing      : PII-SHARD ENABLED\n");
     kprintf("| Traces         : ZERO-PERSISTENCE\n");
@@ -262,7 +262,7 @@ static void cmd_log_audit(void* ctx) {
 
 static void cmd_time_sync(void* ctx) {
     (void)ctx;
-    kprintf("\n--- ÃŽÂ£ SOVEREIGN TIME SYNC ---\n");
+    kprintf("\n--- Î£ SOVEREIGN TIME SYNC ---\n");
     kprintf("[SYNC]: Calibrating Relativistic Shards...\n");
     kprintf("[OK]: Quantum Clock phase coherent (0.001fs precision).\n");
     kprintf("-------------------------------\n");
@@ -270,7 +270,7 @@ static void cmd_time_sync(void* ctx) {
 
 static void cmd_job_audit(void* ctx) {
     (void)ctx;
-    kprintf("\n--- ÃŽÂ£ SOVEREIGN JOB AUDIT ---\n");
+    kprintf("\n--- Î£ SOVEREIGN JOB AUDIT ---\n");
     kprintf("| Active Sessions: 4 ACTIVE\n");
     kprintf("| Process Groups : 12 SHARDED\n");
     kprintf("| Terminal Shunt : ZENITH-CONSOLE\n");
@@ -279,7 +279,7 @@ static void cmd_job_audit(void* ctx) {
 
 static void cmd_core_audit(void* ctx) {
     (void)ctx;
-    kprintf("\n--- ÃŽÂ£ SOVEREIGN CORE AUDIT ---\n");
+    kprintf("\n--- Î£ SOVEREIGN CORE AUDIT ---\n");
     kprintf("| CPU Frequency  : 5.2 GHz [TURBO]\n");
     kprintf("| Core Temp      : 42 C\n");
     kprintf("| Silicon Health : OPTIMAL\n");
@@ -288,7 +288,7 @@ static void cmd_core_audit(void* ctx) {
 
 static void cmd_mem_audit(void* ctx) {
     (void)ctx;
-    kprintf("\n--- ÃŽÂ£ SOVEREIGN MEMORY AUDIT ---\n");
+    kprintf("\n--- Î£ SOVEREIGN MEMORY AUDIT ---\n");
     kprintf("| Slab Usage     : 128 MB / 512 MB\n");
     kprintf("| Paging Mode    : 4-LEVEL SHARDED\n");
     kprintf("| TLB Integrity  : BIT-PERFECT\n");
@@ -297,7 +297,7 @@ static void cmd_mem_audit(void* ctx) {
 
 static void cmd_repair(void* ctx) {
     (void)ctx;
-    kprintf("\n--- ÃŽÂ£ SOVEREIGN AUTO-REPAIR ---\n");
+    kprintf("\n--- Î£ SOVEREIGN AUTO-REPAIR ---\n");
     kprintf("[REPAIR]: Probing for Technical Blockers...\n");
     kprintf("[OK]: Shard integrity stabilized via Silicon-Cache sync.\n");
     kprintf("-------------------------------\n");
@@ -305,7 +305,7 @@ static void cmd_repair(void* ctx) {
 
 static void cmd_silicon_sync(void* ctx) {
     (void)ctx;
-    kprintf("\n--- ÃŽÂ£ SOVEREIGN SILICON SYNC ---\n");
+    kprintf("\n--- Î£ SOVEREIGN SILICON SYNC ---\n");
     kprintf("[SYNC]: Calibrating Shard Lattice with Silicon Frequency...\n");
     kprintf("[OK]: Hardware-Software alignment secured in lock-step.\n");
     kprintf("-------------------------------\n");
@@ -313,7 +313,7 @@ static void cmd_silicon_sync(void* ctx) {
 
 static void cmd_shard_forge(void* ctx) {
     (void)ctx;
-    kprintf("\n--- ÃŽÂ£ SOVEREIGN SHARD FORGE ---\n");
+    kprintf("\n--- Î£ SOVEREIGN SHARD FORGE ---\n");
     kprintf("[FORGE]: Ignition Sequence ACTIVE.\n");
     kprintf("[FORGE]: Ready to summon NEW kernel-level shards.\n");
     kprintf("-------------------------------\n");
@@ -321,7 +321,7 @@ static void cmd_shard_forge(void* ctx) {
 
 static void cmd_cache_audit(void* ctx) {
     (void)ctx;
-    kprintf("\n--- ÃŽÂ£ SOVEREIGN CACHE AUDIT ---\n");
+    kprintf("\n--- Î£ SOVEREIGN CACHE AUDIT ---\n");
     kprintf("| L1-L3 Lattice  : 16 MB SHARDED\n");
     kprintf("| Flush Strategy : WBINVD ACTIVE\n");
     kprintf("| Prefetching    : T0/T1/T2 ENGAGED\n");
@@ -378,7 +378,7 @@ static const SigmaCommand SIGMA_COMMANDS[] = {
 
 static void cmd_help(void* ctx) {
     (void)ctx;
-    kprintf("\n--- ÃŽÂ£ OMNI-SHELL COMMANDS (v27.0) ---\n");
+    kprintf("\n--- Î£ OMNI-SHELL COMMANDS (v27.0) ---\n");
     sigma_size_t i;
     for (i = 0; i < SIGMA_CMD_COUNT; i++) {
         kprintf("  %-18s  %s\n",
@@ -407,7 +407,7 @@ static void shell_init(OmniShellZenith* sh) {
  * ========================================================================= */
 static void shell_execute(OmniShellZenith* sh, const char* cmd) {
     if (!cmd || !cmd[0]) return;
-    kprintf("\nÃŽÂ£ [OMNI-SHELL]: '%s'\n", cmd);
+    kprintf("\nÎ£ [OMNI-SHELL]: '%s'\n", cmd);
 
     /* Record in history with strict bounds check */
     if (sh->history_count < SHELL_HISTORY_MAX) {
@@ -448,7 +448,7 @@ static void shell_execute(OmniShellZenith* sh, const char* cmd) {
  * Audit
  * ========================================================================= */
 static void shell_audit(const OmniShellZenith* sh) {
-    kprintf("\n--- ÃŽÂ£ SOVEREIGN SHELL AUDIT (v27.0) ---\n");
+    kprintf("\n--- Î£ SOVEREIGN SHELL AUDIT (v27.0) ---\n");
     kprintf("| Commands Sharded: %llu\n", sh->commands_sharded);
     kprintf("| History Entries : %u\n",   sh->history_count);
     kprintf("| Prompt Status   : RING-0 SOVEREIGN\n");

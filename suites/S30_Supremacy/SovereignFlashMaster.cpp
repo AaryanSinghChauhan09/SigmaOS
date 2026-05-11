@@ -1,7 +1,7 @@
-﻿#include "../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -12,7 +12,7 @@
 
 
 /**
- * ÃŽÂ£ SIGMA OS: SOVEREIGN FLASH MASTER (v3.0 - UNIVERSAL DEPLOYER)
+ * Î£ SIGMA OS: SOVEREIGN FLASH MASTER (v3.0 - UNIVERSAL DEPLOYER)
  * =============================================================
  * USP Absorbed: Rufus (Direct-to-Disk), BalenaEtcher (Validation), Ventoy (Multiboot).
  * Capability: Block-level Shard flashing, GPT/MBR Parity, Verification pass.

@@ -1,15 +1,15 @@
-﻿/*
+/*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS ZENITH SUPREME: SOVEREIGN LOGIC AUTOMATOR (v1.0)
+ * Î£ SIGMAOS ZENITH SUPREME: SOVEREIGN LOGIC AUTOMATOR (v1.0)
  * =========================================================================
  * Mission: Custom automation sharding and script execution (USP: Ansible/Puppet style).
  * Capability: Task sharding, Conditional logic, Concurrent automation.
  * =========================================================================
  */
 
-#include "../../include/sigma_log.h"
-#include "../../include/SovereignLibC.h"
-#include "../../include/sigma_types.h"
+#include "sigma_log.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 typedef struct {
     char name[64];
@@ -35,7 +35,7 @@ void sigma_logic_register(const char* name, const char* cmd, sigma_bool concurre
 }
 
 void sigma_logic_run_all() {
-    sigma_log_info("\nÃŽÂ£ RUNNING SOVEREIGNTY AUTOMATION PLAYBOOK\n");
+    sigma_log_info("\nÎ£ RUNNING SOVEREIGNTY AUTOMATION PLAYBOOK\n");
     sigma_log_info("-------------------------------------------\n");
     for (sigma_u32 i = 0; i < task_count; i++) {
         sigma_log_info("[STEP %d/%d] %-20s ... ", i+1, task_count, sigma_tasks[i].name);

@@ -124,7 +124,7 @@ void sigma_log(const char* format, ...) {
         if (!*f) break;
         if (*f == 's') {
             const char* s = va_arg(ap, const char*);
-            if (!s) s = "(null)";
+            if (!s) s = "(SIGMA_NULL)";
             while (*s && bi < 510) buf[bi++] = *s++;
         } else if (*f == 'd' || *f == 'i') {
             sigma_i64 v = va_arg(ap, int);

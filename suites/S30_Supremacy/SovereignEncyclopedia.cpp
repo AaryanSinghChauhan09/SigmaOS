@@ -1,17 +1,17 @@
-﻿#include "../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
  * =========================================================================
  */
 
-#include "../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 /**
- * ÃŽÂ£ SIGMA OS: SOVEREIGN ENCYCLOPEDIA (v128.0 - ZERO-STD NATIVE)
+ * Î£ SIGMA OS: SOVEREIGN ENCYCLOPEDIA (v128.0 - ZERO-STD NATIVE)
  * ===================================================================
  * USP: Exhaustive "Every Concept" Shard Encyclopedia for NCERT (1-12).
  * Capability: Magnetism, Projectiles, Evolution, and Power Sets.
@@ -91,7 +91,7 @@ public:
     }
 
     void ExecuteEncycloAudit() {
-        sigma_log_info("--- ÃŽÂ£ SIGMA OS MASTER SCHOLASTIC ENCYCLOPEDIA ---\n");
+        sigma_log_info("--- Î£ SIGMA OS MASTER SCHOLASTIC ENCYCLOPEDIA ---\n");
         for (sigma_usize i = 0; i < m_ency.size(); i++) {
             sigma_log_info("\n[ENCY-SHADING]: Executing Shard\n");
             m_ency.at_index(i)->Project();

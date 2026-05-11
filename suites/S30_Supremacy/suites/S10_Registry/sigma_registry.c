@@ -1,4 +1,4 @@
-#include "../../../include/sigma_registry.h"
+#include "sigma_registry.h"
 #include "suites/S01_Genesis/shards/sigma_libc.h"
 #include "suites/S01_Genesis/shards/sigma_libc.h"
 
@@ -28,7 +28,7 @@ static sigma_reg_entry_t* find_entry(const char* key) {
     for (uint32_t i = 0; i < reg_count; i++)
         if (registry[i].active && strncmp(registry[i].key, key, MAX_KEY_LEN - 1) == 0)
             return &registry[i];
-    return NULL;
+    return SIGMA_NULL;
 }
 
 int sigma_registry_set_int(const char* key, int64_t val) {

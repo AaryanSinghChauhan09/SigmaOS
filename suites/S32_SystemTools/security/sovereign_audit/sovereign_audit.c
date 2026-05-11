@@ -35,12 +35,12 @@ static uint32_t          foreign_count = 0;
 // ── Detect language from extension ───────────────────────────────────────────
 static const char* detect_lang(const char* filename) {
     const char* ext = strrchr(filename, '.');
-    if (!ext) return NULL;
+    if (!ext) return SIGMA_NULL;
     if (sigma_strcmp(ext, ".py")  == 0) return "python";
     if (sigma_strcmp(ext, ".js")  == 0) return "javascript";
     if (sigma_strcmp(ext, ".ts")  == 0) return "typescript";
     if (sigma_strcmp(ext, ".sh")  == 0) return "shell";
-    return NULL;
+    return SIGMA_NULL;
 }
 
 // ── Recursive directory walker ────────────────────────────────────────────────
@@ -49,7 +49,7 @@ static void walk_dir(const char* base_path) {
     if (!dir) return;
 
     struct dirent* entry;
-    while ((entry = readdir(dir)) != NULL) {
+    while ((entry = readdir(dir)) != SIGMA_NULL) {
         if (entry->d_name[0] == '.') continue;
 
         char full_path[MAX_PATH_LEN];

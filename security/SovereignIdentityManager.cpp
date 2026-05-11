@@ -1,9 +1,9 @@
-﻿#include "../include/sigma_log.h"
-#include "../include/core/sigma_types.h"
-#include "../include/hal/sigma_hal.h"
-#include "../include/core/sigma_kernel_types.h"
-#include "../include/libc/SovereignLibC.h"
-#include "../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Identity Manager (Sovereign-IAM)
@@ -25,21 +25,21 @@ public:
     const char* type_name() const noexcept override { return "SovereignIdentityManager"; }
 
     static void init() {
-        sigma_log("Σ [IDENTITY]: Initializing Sovereign IAM Lattice...");
-        sigma_log("Σ [IDENTITY]: Self-Sovereign Identity (SSI) verification ACTIVE.");
+        sigma_log("S [IDENTITY]: Initializing Sovereign IAM Lattice...");
+        sigma_log("S [IDENTITY]: Self-Sovereign Identity (SSI) verification ACTIVE.");
     }
 
     bool verifyAccess(const char* identity_orb_id, sigma_u32 capability_mask) {
-        sigma_log("Σ [IDENTITY]: Verifying Access for Identity '%s' (Mask: 0x%X)...\n", 
+        sigma_log("S [IDENTITY]: Verifying Access for Identity '%s' (Mask: 0x%X)...\n", 
                      identity_orb_id, capability_mask);
         
         // Zero-Trust: Always verify against local Secure Element
-        sigma_log("Σ [IDENTITY]: SSI Signature VERIFIED. Access GRANTED.");
+        sigma_log("S [IDENTITY]: SSI Signature VERIFIED. Access GRANTED.");
         return true;
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN IAM AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN IAM AUDIT ---\n");
         sigma_log("| Identities Active : 1 (Primary Sovereign)\n");
         sigma_log("| IAM Model         : ZERO-TRUST-SSI\n");
         sigma_log("| Enterprise Parity : LDAP-EQUIVALENT (Lattice-Bound)\n");

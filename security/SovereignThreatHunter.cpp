@@ -1,9 +1,9 @@
-﻿#include "../include/sigma_log.h"
-#include "../include/core/sigma_types.h"
-#include "../include/hal/sigma_hal.h"
-#include "../include/core/sigma_kernel_types.h"
-#include "../include/libc/SovereignLibC.h"
-#include "../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Threat Hunter Shard
@@ -25,19 +25,19 @@ public:
     const char* type_name() const noexcept override { return "SovereignThreatHunter"; }
 
     static void init() {
-        sigma_log("Σ [THREAT-HUNTER]: Initializing Sovereign Offensive Security Suite...");
-        sigma_log("Σ [THREAT-HUNTER]: Continuous lattice penetration testing ACTIVE.");
+        sigma_log("S [THREAT-HUNTER]: Initializing Sovereign Offensive Security Suite...");
+        sigma_log("S [THREAT-HUNTER]: Continuous lattice penetration testing ACTIVE.");
     }
 
     void executeAudit(const char* target_subsystem) {
-        sigma_log("Σ [THREAT-HUNTER]: Launching zero-trust penetration audit against '%s'...\n", target_subsystem);
+        sigma_log("S [THREAT-HUNTER]: Launching zero-trust penetration audit against '%s'...\n", target_subsystem);
         // Dispatch autonomous vulnerability scanners
-        sigma_log("Σ [THREAT-HUNTER]: Audit COMPLETE. Subsystem hardened against known attack vectors.");
+        sigma_log("S [THREAT-HUNTER]: Audit COMPLETE. Subsystem hardened against known attack vectors.");
         m_audits_performed++;
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN THREAT HUNTER AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN THREAT HUNTER AUDIT ---\n");
         sigma_log("| Audits Executed : %u\n", m_audits_performed);
         sigma_log("| Ideology Absorbed: KALI LINUX / PARROT OS\n");
         sigma_log("| Defense Model    : OFFENSIVE VALIDATION\n");

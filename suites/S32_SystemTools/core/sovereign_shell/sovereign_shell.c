@@ -75,19 +75,19 @@ static const ShellBuiltin builtins[] = {
     { "env",     "Show environment variables",  builtin_env     },
     { "pwd",     "Print working directory",     builtin_pwd     },
     // External commands routed to tools/ binaries:
-    { "shardctl","Manage sovereign shards",     NULL },
-    { "sigmatop","Real-time process monitor",   NULL },
-    { "netmesh", "Network topology explorer",   NULL },
-    { "siglist", "List files (VFS-aware)",      NULL },
-    { "audittrail","Zero-trust audit log",      NULL },
-    { "sigmacrypt","Encrypt/decrypt files",     NULL },
-    { "sigpkg",  "Package manager",             NULL },
-    { "vbox",    "Container/VM manager",        NULL },
-    { "handoff", "Cross-device continuity",     NULL },
-    { "sql",     "Sovereign Database Query",    NULL },
-    { "audio",   "Spatial Audio Mixer",         NULL },
-    { "task",    "Orchestrate execution shards",NULL },
-    { NULL, NULL, NULL }
+    { "shardctl","Manage sovereign shards",     SIGMA_NULL },
+    { "sigmatop","Real-time process monitor",   SIGMA_NULL },
+    { "netmesh", "Network topology explorer",   SIGMA_NULL },
+    { "siglist", "List files (VFS-aware)",      SIGMA_NULL },
+    { "audittrail","Zero-trust audit log",      SIGMA_NULL },
+    { "sigmacrypt","Encrypt/decrypt files",     SIGMA_NULL },
+    { "sigpkg",  "Package manager",             SIGMA_NULL },
+    { "vbox",    "Container/VM manager",        SIGMA_NULL },
+    { "handoff", "Cross-device continuity",     SIGMA_NULL },
+    { "sql",     "Sovereign Database Query",    SIGMA_NULL },
+    { "audio",   "Spatial Audio Mixer",         SIGMA_NULL },
+    { "task",    "Orchestrate execution shards",SIGMA_NULL },
+    { SIGMA_NULL, SIGMA_NULL, SIGMA_NULL }
 };
 
 static int builtin_help(int argc, char** argv) {
@@ -146,9 +146,9 @@ static int tokenize(char* line, char** argv, int max_args) {
     char* tok = strtok(line, " \t\r\n");
     while (tok && argc < max_args - 1) {
         argv[argc++] = tok;
-        tok = strtok(NULL, " \t\r\n");
+        tok = strtok(SIGMA_NULL, " \t\r\n");
     }
-    argv[argc] = NULL;
+    argv[argc] = SIGMA_NULL;
     return argc;
 }
 

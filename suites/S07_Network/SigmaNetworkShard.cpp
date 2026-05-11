@@ -1,14 +1,14 @@
-﻿/*
+/*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS ZENITH SUPREME: SOVEREIGN NETWORK SHARD (v1.0)
+ * Î£ SIGMAOS ZENITH SUPREME: SOVEREIGN NETWORK SHARD (v1.0)
  * =========================================================================
  * Absorbing Features from: Transmission-VPN-Automation and Merlin-IA Net.
  * Mission: Autonomous VPN Management & Network Sovereignty.
  * =========================================================================
  */
 
-#include "../../include/SovereignLibC.h"
-#include "../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 
 typedef struct {
     char name[32];
@@ -36,7 +36,7 @@ void sigma_net_vpn_connect(const char* name) {
 }
 
 void sigma_net_vpn_status() {
-    sigma_log_info("\nÃŽÂ£ SOVEREIGN NETWORK & VPN REGISTRY\n");
+    sigma_log_info("\nÎ£ SOVEREIGN NETWORK & VPN REGISTRY\n");
     sigma_log_info("-------------------------------------------\n");
     for (int i = 0; i < 3; i++) {
             sigma_log_info("[%s] %-15s v%s  %d ms\n", 

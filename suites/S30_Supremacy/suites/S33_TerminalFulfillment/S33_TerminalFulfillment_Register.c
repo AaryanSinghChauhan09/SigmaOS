@@ -4,6 +4,6 @@
 
 void S33_TerminalFulfillment_Register(void) {
     sigma_sigma_printf("S [S33]: Executing Sovereign Global Integration Test...\n");
-    SovereignRegistry_Register("S33_TerminalFulfillment", 0, NULL);
+    SovereignRegistry_Register("S33_TerminalFulfillment", 0, SIGMA_NULL);
     sigma_sigma_printf("S [S33]: 33/33 Suites SEALED. Integrity: 100%.\n");
 }

@@ -6,6 +6,6 @@ extern void tcp_fsm_init(void);
 
 void S07_Network_Register(void) {
     tcp_fsm_init();
-    SovereignRegistry_Register("S07_Network", 0, NULL);
+    SovereignRegistry_Register("S07_Network", 0, SIGMA_NULL);
     sigma_sigma_printf("S [S07_Network]: TCP Protocol Grid integrated.\n");
 }

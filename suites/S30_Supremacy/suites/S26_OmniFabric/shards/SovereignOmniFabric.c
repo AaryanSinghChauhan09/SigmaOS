@@ -59,5 +59,5 @@ sigma_bool OmniFabric_Poll(OmniMessage* out_msg) {
 
 void S26_OmniFabric_Register(void) {
     OmniFabric_Init();
-    SovereignRegistry_Register("S26_OmniFabric", 0, NULL);
+    SovereignRegistry_Register("S26_OmniFabric", 0, SIGMA_NULL);
 }

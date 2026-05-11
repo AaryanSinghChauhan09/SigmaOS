@@ -1,7 +1,7 @@
-﻿#include "../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -14,7 +14,7 @@
 
 
 /**
- * ÃŽÂ£ SIGMA OS: SOVEREIGN PERSONA MANAGER (v3.0 - INDIVIDUAL ZENITH)
+ * Î£ SIGMA OS: SOVEREIGN PERSONA MANAGER (v3.0 - INDIVIDUAL ZENITH)
  * ===============================================================
  * USP Absorbed: Windows Profiles (AD), Linux Users/Groups, Android User Profiles.
  * Capability: Unique identity shards, Personalized Shard-Data, Custom Themes.

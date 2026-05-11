@@ -480,14 +480,14 @@ static void cmd_bsa_cert(ParsedCmd* c) {
 static void cmd_cam_cap(ParsedCmd* c) {
     (void)c;
     extern k_status camera_capture_frame(void*);
-    k_status s = camera_capture_frame(NULL);
+    k_status s = camera_capture_frame(SIGMA_NULL);
     ksigma_printf("[CAM-CAP]: %s\n", s == K_OK ? "Frame captured. BSA hash recorded." : "FAIL");
 }
 
 static void cmd_cam_filt(ParsedCmd* c) {
     extern k_status camera_apply_filter(void*, const char*);
     const char* filter = (c->argc > 1) ? c->args[1] : "SEPIA_ZENITH";
-    camera_apply_filter(NULL, filter);
+    camera_apply_filter(SIGMA_NULL, filter);
 }
 
 static void cmd_cam_filters(ParsedCmd* c) {
@@ -704,7 +704,7 @@ static const CmdEntry g_cmds[] = {
     { "clear",                 cmd_clear,                 "Clear screen" },
     { "cls",                   cmd_clear,                 "Clear screen" },
     { "exit",                  cmd_exit_shell,            "Exit shell" },
-    { NULL, NULL, NULL }
+    { SIGMA_NULL, SIGMA_NULL, SIGMA_NULL }
 };
 
 /* =========================================================================

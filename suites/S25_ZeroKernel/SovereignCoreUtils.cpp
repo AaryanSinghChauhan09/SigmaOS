@@ -1,4 +1,4 @@
-﻿#include "../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include "SovereignCoreUtils.h"
 
 namespace SigmaOS {
@@ -56,7 +56,7 @@ namespace CoreUtils {
 
     const char* SovereignProcessMonitor::type_name() const noexcept { return "SovereignProcessMonitor"; }
     void SovereignProcessMonitor::Execute() { 
-        sigma_log_info("\n--- ÃŽÂ£ SOVEREIGN CPU AUDIT ---\n");
+        sigma_log_info("\n--- Î£ SOVEREIGN CPU AUDIT ---\n");
         sigma_log_info("| ARCH : x86_64 ZENITH SHARD\n");
         sigma_log_info("| STATE: DIRECT HARDWARE HANDSHAKE\n");
         sigma_log_info("| LOAD : 0.0004%% (WAIT-FREE)\n");

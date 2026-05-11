@@ -1,9 +1,9 @@
-﻿/*
+/*
  * =========================================================================
 <<<<<<< HEAD:suites/S30_Supremacy/suites/S04_HAL/shards/paging.c
  * S SIGMAOS ZENITH SUPREME: ARCH-DEPENDENT PAGING (x86_64)
 =======
- * ÃŽÂ£ SIGMAOS ZENITH SUPREME: ARCH-DEPENDENT PAGING (x86_64)
+ * Î£ SIGMAOS ZENITH SUPREME: ARCH-DEPENDENT PAGING (x86_64)
 >>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:arch/x86_64/paging.c
  * =========================================================================
  * Mission: Virtual-to-physical mapping with high-performance sharding.
@@ -15,8 +15,8 @@
 #include "sigma_libc.h"
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 =======
-#include "../../include/SovereignLibC.h"
-#include "../../include/sigma_types.h"
+#include "SovereignLibC.h"
+#include "sigma_types.h"
 >>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:arch/x86_64/paging.c
 
 #define PAGE_SIZE 4096

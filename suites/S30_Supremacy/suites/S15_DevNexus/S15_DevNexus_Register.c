@@ -6,6 +6,6 @@ extern void compiler_frontend_init(void);
 
 void S15_DevNexus_Register(void) {
     compiler_frontend_init();
-    SovereignRegistry_Register("S15_DevNexus", 0, NULL);
+    SovereignRegistry_Register("S15_DevNexus", 0, SIGMA_NULL);
     sigma_sigma_printf("S [S15_DevNexus]: SigmaCC Compiler Frontend integrated.\n");
 }

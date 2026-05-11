@@ -8,6 +8,6 @@ extern void pqc_init(void);
 void S08_Security_Register(void) {
     crypto_engine_init();
     pqc_init();
-    SovereignRegistry_Register("S08_Security", 0, NULL);
+    SovereignRegistry_Register("S08_Security", 0, SIGMA_NULL);
     sigma_sigma_printf("S [S08_Security]: SHA-256 & Post-Quantum Crypto Engines integrated.\n");
 }

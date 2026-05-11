@@ -1,18 +1,18 @@
-﻿#include "Lattice.h"
-#include "../include/SovereignLibC.h"
+#include "Lattice.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
  * =========================================================================
  */
 
-#include "../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 /**
- * ÃŽÂ£ SIGMA OS: SOVEREIGN HARDWARE AUDIT (v128.0 - ZERO-STD NATIVE)
+ * Î£ SIGMA OS: SOVEREIGN HARDWARE AUDIT (v128.0 - ZERO-STD NATIVE)
  * ============================================================
  * USP: Real-time Silicon Mapping without Simulation.
  * Capability: Direct OS-Level Hardware Identification.
@@ -49,7 +49,7 @@ public:
 };
 
 extern "C" void _start(void) {
-    sigma_log_info("--- ÃŽÂ£ SIGMA OS SOVEREIGN HARDWARE AUDIT (ZENITH) ---\n");
+    sigma_log_info("--- Î£ SIGMA OS SOVEREIGN HARDWARE AUDIT (ZENITH) ---\n");
     SovereignHardwareAudit audit;
     audit.AuditProcessors();
     audit.AuditMemory();

@@ -1,10 +1,10 @@
-﻿#include "../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
 <<<<<<< HEAD:suites/S30_Supremacy/SovereignLauncherZenith.cpp
  * S SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
 =======
- * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
 >>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:userland/SovereignLauncherZenith.cpp
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
@@ -17,7 +17,7 @@
 <<<<<<< HEAD:suites/S30_Supremacy/SovereignLauncherZenith.cpp
  * S SIGMAOS: SOVEREIGN LAUNCHER ZENITH (v14.0 - THE FINAL ENTRY)
 =======
- * ÃŽÂ£ SIGMAOS: SOVEREIGN LAUNCHER ZENITH (v14.0 - THE FINAL ENTRY)
+ * Î£ SIGMAOS: SOVEREIGN LAUNCHER ZENITH (v14.0 - THE FINAL ENTRY)
 >>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:userland/SovereignLauncherZenith.cpp
  * =========================================================================
  * Mission: Bootstrapping and Sharding the Sovereign OS Finality.
@@ -26,7 +26,7 @@
  * =========================================================================
  */
 
-#include "../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Boot {

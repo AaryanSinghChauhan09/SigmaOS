@@ -127,13 +127,13 @@ uint32_t policy_schedule_next(uint32_t* runqueue, uint32_t len) {
 // Boot-time registration of built-in policies
 void policy_init(void) {
     uint32_t strict_id = policy_register("strict_security",  POLICY_SECURITY,
-        strict_can_access, strict_on_violation, NULL, NULL, NULL);
+        strict_can_access, strict_on_violation, SIGMA_NULL, SIGMA_NULL, SIGMA_NULL);
     policy_register("permissive_security", POLICY_SECURITY,
-        permissive_can_access, permissive_on_violation, NULL, NULL, NULL);
+        permissive_can_access, permissive_on_violation, SIGMA_NULL, SIGMA_NULL, SIGMA_NULL);
     uint32_t rr_id = policy_register("round_robin_scheduler", POLICY_SCHEDULING,
-        NULL, NULL, rr_pick_next, rr_timeslice_ms, NULL);
+        SIGMA_NULL, SIGMA_NULL, rr_pick_next, rr_timeslice_ms, SIGMA_NULL);
     policy_register("priority_scheduler", POLICY_SCHEDULING,
-        NULL, NULL, prio_pick_next, prio_timeslice_ms, NULL);
+        SIGMA_NULL, SIGMA_NULL, prio_pick_next, prio_timeslice_ms, SIGMA_NULL);
 
     // Activate defaults
     policy_activate(strict_id);

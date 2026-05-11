@@ -91,8 +91,8 @@ k_status pmm_init(paddr_t mem_start, paddr_t mem_end) {
     u32 i;
     /* Init free-list sentinels */
     for (i = 0; i <= PMM_MAX_ORDER; i++) {
-        g_pmm.free_lists[i].prev = NULL;
-        g_pmm.free_lists[i].next = NULL;
+        g_pmm.free_lists[i].prev = SIGMA_NULL;
+        g_pmm.free_lists[i].next = SIGMA_NULL;
     }
     /* Clear bitmap (all allocated by default) */
     for (i = 0; i < PMM_BITMAP_WORDS; i++) g_pmm.bitmap[i] = ~0ULL;

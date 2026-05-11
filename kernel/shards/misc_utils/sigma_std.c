@@ -79,7 +79,7 @@ int sigma_memcmp(const void* a, const void* b, sigma_usize n) {
     return 0;
 }
 
-/* Safe bounded string copy â€ always null-terminates destination */
+/* Safe bounded string copy â€ always SIGMA_NULL-terminates destination */
 void sigma_strcpy_safe(char* dst, const char* src, sigma_usize max) {
     sigma_usize i;
     for (i = 0; i < max - 1 && src[i]; i++) dst[i] = src[i];

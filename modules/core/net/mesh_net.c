@@ -64,7 +64,7 @@ int mesh_add_route(const uint8_t* dest, const uint8_t* via, uint32_t metric) {
 // Route a packet to a destination node (Dijkstra-stub — returns next hop)
 const mesh_peer_t* mesh_route_to(const uint8_t* dest_node) {
     uint32_t best_metric = UINT32_MAX;
-    const uint8_t* best_via = NULL;
+    const uint8_t* best_via = SIGMA_NULL;
 
     for (uint32_t i = 0; i < route_count; i++) {
         if (memcmp(routes[i].dest_node, dest_node, NODE_ID_LEN) == 0) {
@@ -74,11 +74,11 @@ const mesh_peer_t* mesh_route_to(const uint8_t* dest_node) {
             }
         }
     }
-    if (!best_via) return NULL;
+    if (!best_via) return SIGMA_NULL;
 
     for (uint32_t i = 0; i < peer_count; i++) {
         if (memcmp(peers[i].node_id, best_via, NODE_ID_LEN) == 0)
             return &peers[i];
     }
-    return NULL;
+    return SIGMA_NULL;
 }

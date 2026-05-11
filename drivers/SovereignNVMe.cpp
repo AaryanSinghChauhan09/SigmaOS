@@ -1,5 +1,5 @@
-﻿#include "../include/sigma_log.h"
-#include "../include/SovereignLibC.h"
+#include "sigma_log.h"
+#include "SovereignLibC.h"
 #include "sigma_hal.h"
 #include "sigma_nvme.h"
 
@@ -7,7 +7,7 @@
  * SigmaOS Sovereign NVMe Driver
  * High-performance, zero-copy block storage interface.
  *
- * Design: OOP-isolated singleton â€” SovereignNVMeEngine.
+ * Design: OOP-isolated singleton — SovereignNVMeEngine.
  */
 
 class SovereignNVMeEngine {

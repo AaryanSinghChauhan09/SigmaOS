@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS: SOVEREIGN OMNI-SHELL ZENITH (v27.0 - THE ULTIMATE COMMAND-ZENITH)
+ * Î£ SIGMAOS: SOVEREIGN OMNI-SHELL ZENITH (v27.0 - THE ULTIMATE COMMAND-ZENITH)
  * =========================================================================
  * Mission: Absolute Mastery. Everything is a Shell Command.
  * Capability: Kernel Management, Shard Forge, PQC Audit, USP Absorption.
@@ -12,13 +12,13 @@
 #include "SigmaOOP.hpp"
 #include "sigma_libc.h"
 =======
-#include "../include/sigma_log.h"
-#include "../include/SigmaOOP.hpp"
-#include "../include/SovereignLibC.h"
+#include "sigma_log.h"
+#include "SigmaOOP.hpp"
+#include "SovereignLibC.h"
 >>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:userland/omni_shell.cpp
 #include "SovereignDistroForge.h"
 #include "SovereignCoreUtils.h"
-#include "../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include "SovereignSyncZenith.h"
 #include "SovereignDiskZenith.h"
 #include "SovereignOSBasicsZenith.h"
@@ -60,7 +60,7 @@ public:
     const char* type_name() const noexcept override { return "OmniShellZenith"; }
 
     void execute_omni_command(const char* cmd) {
-        sigma_log_info("\nÃŽÂ£ [OMNI-SHELL]: Interpreting Command Shard: '%s'\n", cmd);
+        sigma_log_info("\nÎ£ [OMNI-SHELL]: Interpreting Command Shard: '%s'\n", cmd);
 
         if (sigma_strlen(cmd) == 0) return;
 
@@ -137,7 +137,7 @@ public:
     }
 
     void audit() {
-        sigma_print("\n--- ÃŽÂ£ SOVEREIGN SHELL AUDIT (v27.0) ---\n");
+        sigma_print("\n--- Î£ SOVEREIGN SHELL AUDIT (v27.0) ---\n");
         sigma_print("| Command Shards : "); sigma_print_num(m_commands_sharded); sigma_print("\n");
         sigma_print("| Prompt Status   : RING-0 SOVEREIGN\n");
         sigma_print("| Mastery         : Total System Control Secured.\n");

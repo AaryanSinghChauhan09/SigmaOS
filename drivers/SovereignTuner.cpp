@@ -1,6 +1,6 @@
-﻿#include "../include/sigma_log.h"
+#include "sigma_log.h"
 #include "sigma_hal.h"
-#include "../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Silicon Tuner

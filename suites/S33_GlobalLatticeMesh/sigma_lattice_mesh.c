@@ -42,7 +42,7 @@ k_status sigma_mesh_init(sigma_lattice_node_t* node) {
     sigma_mesh_gen_node_id(&node->self_id, 0x53494741ULL); /* "SIGA" */
     node->peer_count        = 0;
     node->local_shard_count = 0;
-    node->shard_table       = NULL;
+    node->shard_table       = SIGMA_NULL;
     node->flags             = 0x1; /* bootstrap mode */
     node->epoch_ns          = 0;
 

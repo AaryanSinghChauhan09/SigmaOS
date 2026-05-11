@@ -55,9 +55,9 @@ int s_ext_register(const char* name, uint32_t pid, uint32_t cap_token) {
     ext->capability_token = cap_token;
     ext->active = 1;
     
-    ext->ui_render_cb = NULL;
-    ext->automation_cb = NULL;
-    ext->sched_reward_cb = NULL;
+    ext->ui_render_cb = SIGMA_NULL;
+    ext->automation_cb = SIGMA_NULL;
+    ext->sched_reward_cb = SIGMA_NULL;
 
     audit_chain_append(pid, 1, "EXTENSION_REGISTERED");
     return ext->ext_id;

@@ -97,7 +97,7 @@ extern void   ksigma_printf(const char* fmt, ...);
  * Internal: inode allocation
  * ========================================================================= */
 static VInode* inode_alloc(InodeType type, u32 mode) {
-    if (g_vfs.next_ino >= VFS_MAX_INODES) return NULL;
+    if (g_vfs.next_ino >= VFS_MAX_INODES) return SIGMA_NULL;
     VInode* in = &g_vfs.inodes[g_vfs.next_ino];
     in->ino       = g_vfs.next_ino++;
     in->type      = type;
@@ -106,15 +106,15 @@ static VInode* inode_alloc(InodeType type, u32 mode) {
     in->mtime     = in->ctime;
     in->mode      = mode;
     in->nlinks    = 1;
-    in->data      = NULL;
+    in->data      = SIGMA_NULL;
     in->data_cap  = 0;
     in->valid     = TRUE;
     return in;
 }
 
 static VInode* inode_get(u64 ino) {
-    if (ino >= VFS_MAX_INODES) return NULL;
-    if (!g_vfs.inodes[ino].valid) return NULL;
+    if (ino >= VFS_MAX_INODES) return SIGMA_NULL;
+    if (!g_vfs.inodes[ino].valid) return SIGMA_NULL;
     return &g_vfs.inodes[ino];
 }
 
@@ -122,7 +122,7 @@ static VInode* inode_get(u64 ino) {
  * Internal: dentry operations
  * ========================================================================= */
 static VDentry* dentry_add(u64 parent_ino, const char* name, u64 child_ino) {
-    if (g_vfs.dentry_count >= VFS_MAX_DENTRIES) return NULL;
+    if (g_vfs.dentry_count >= VFS_MAX_DENTRIES) return SIGMA_NULL;
     VDentry* d = &g_vfs.dentries[g_vfs.dentry_count++];
     usize i = 0;
     while (i < VFS_NAME_MAX - 1 && name[i]) { d->name[i] = name[i]; i++; }

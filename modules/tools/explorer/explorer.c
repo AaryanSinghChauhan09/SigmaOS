@@ -19,7 +19,7 @@ void print_directory_contents(vfs_node_stub* first_child) {
     vfs_node_stub* current = first_child;
     printf("Type\tSize\tName\n");
     printf("------------------------------------\n");
-    while (current != NULL) {
+    while (current != SIGMA_NULL) {
         if (current->type == NODE_DIRECTORY) {
             printf("[DIR]\t-\t%s/\n", current->name);
         } else if (current->type == NODE_FILE) {
@@ -37,7 +37,7 @@ void cmd_ls(const char* path) {
     // For prototype, we mock some directory contents
     printf("Listing contents for: %s\n", path);
     
-    vfs_node_stub file1 = { "kernel.bin", NODE_FILE, 1048576, NULL };
+    vfs_node_stub file1 = { "kernel.bin", NODE_FILE, 1048576, SIGMA_NULL };
     vfs_node_stub dir1 = { "home", NODE_DIRECTORY, 0, &file1 };
     vfs_node_stub file2 = { "readme.txt", NODE_FILE, 256, &dir1 };
     

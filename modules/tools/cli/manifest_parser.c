@@ -39,7 +39,7 @@ void manifest_auto_wire(const app_manifest_t* manifest) {
     // 3. Automate UX Hotkeys
     if (manifest->registers_hotkey_ctrl_shift_a) {
         // Automatically bind CTRL+SHIFT+A to focus this app (Ease of Use)
-        // input_register_hotkey(CTRL|SHIFT, 'A', ACTION_FOCUS_APP, pid, NULL);
+        // input_register_hotkey(CTRL|SHIFT, 'A', ACTION_FOCUS_APP, pid, SIGMA_NULL);
         audit_chain_append(0, 1, "AUTOMATION: UX Hotkey auto-registered");
     }
 

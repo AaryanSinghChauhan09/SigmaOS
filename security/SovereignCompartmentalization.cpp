@@ -1,9 +1,9 @@
-﻿#include "../include/sigma_log.h"
-#include "../include/core/sigma_types.h"
-#include "../include/hal/sigma_hal.h"
-#include "../include/core/sigma_kernel_types.h"
-#include "../include/libc/SovereignLibC.h"
-#include "../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Compartmentalization Shard
@@ -25,19 +25,19 @@ public:
     const char* type_name() const noexcept override { return "SovereignCompartmentalization"; }
 
     static void init() {
-        sigma_log("Σ [COMPARTMENT]: Initializing Sovereign Security Compartmentalization...");
-        sigma_log("Σ [COMPARTMENT]: Hardware-backed hypervisor isolation ACTIVE.");
+        sigma_log("S [COMPARTMENT]: Initializing Sovereign Security Compartmentalization...");
+        sigma_log("S [COMPARTMENT]: Hardware-backed hypervisor isolation ACTIVE.");
     }
 
     void isolateDomain(const char* domain_name) {
-        sigma_log("Σ [COMPARTMENT]: Spinning up heavily isolated hardware VM for domain '%s'...\n", domain_name);
+        sigma_log("S [COMPARTMENT]: Spinning up heavily isolated hardware VM for domain '%s'...\n", domain_name);
         // Dispatch to Hypervisor for strict ring-level and IOMMU isolation
-        sigma_log("Σ [COMPARTMENT]: Domain ISOLATED. Compromise in this domain cannot traverse the Lattice.");
+        sigma_log("S [COMPARTMENT]: Domain ISOLATED. Compromise in this domain cannot traverse the Lattice.");
         m_isolated_domains++;
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN COMPARTMENTALIZATION AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN COMPARTMENTALIZATION AUDIT ---\n");
         sigma_log("| Isolated Domains : %u\n", m_isolated_domains);
         sigma_log("| Ideology Absorbed: QUBES OS\n");
         sigma_log("| Security Model   : HARDWARE VIRTUALIZATION\n");

@@ -1,11 +1,11 @@
-#include "../../../include/sigma_cpu.h"
+#include "sigma_cpu.h"
 
 /* =========================================================================
  * SIGMA OS: GLOBAL DESCRIPTOR TABLE (GDT) KERNEL SHARD
  * Defines memory protection rings for Kernel Mode vs User Mode.
  * ========================================================================= */
 
-// We define 5 standard tables: Null, Kernel Code, Kernel Data, User Code, User Data.
+// We define 5 standard tables: SIGMA_NULL, Kernel Code, Kernel Data, User Code, User Data.
 gdt_entry_t gdt_entries[5];
 gdt_ptr_t   gdt_ptr;
 
@@ -25,7 +25,7 @@ void sigma_cpu_init_gdt() {
     gdt_ptr.limit = (sizeof(gdt_entry_t) * 5) - 1;
     gdt_ptr.base  = (uintptr_t)&gdt_entries;
 
-    // 0: Null segment
+    // 0: SIGMA_NULL segment
     gdt_set_gate(0, 0, 0, 0, 0);
     // 1: Kernel Code segment (Ring 0)
     gdt_set_gate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);

@@ -13,7 +13,7 @@
 #include "libc/SovereignLibC.h"
 #include "core/SigmaOOP.hpp"
 #include "sigma_log.h"
-#include "../../../include/security/SovereignQKD.hpp"
+#include "security/SovereignQKD.hpp"
 
 /**
  * SovereignOrbManager — Sovereign Orb Package Ecosystem

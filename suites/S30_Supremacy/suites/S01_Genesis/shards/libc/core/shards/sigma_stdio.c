@@ -23,7 +23,7 @@ void sigma_sigma_printf(const char* format, ...) {
             switch (*p) {
                 case 's': {
                     const char* s = sigma_va_arg(args, const char*);
-                    sigma_print(s ? s : "(null)"); break;
+                    sigma_print(s ? s : "(SIGMA_NULL)"); break;
                 }
                 case 'd': case 'i': sigma_print_num((sigma_u64)sigma_va_arg(args, int)); break;
                 case 'u': sigma_print_num(sigma_va_arg(args, sigma_u64)); break;

@@ -1,9 +1,9 @@
 #ifndef SOLVERS_HPP
 #define SOLVERS_HPP
 
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "../../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 // Simple math primitives for Zero-Dependency environment
 static inline double sigma_sqrt(double x) {

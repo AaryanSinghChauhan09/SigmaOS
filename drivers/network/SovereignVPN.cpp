@@ -1,9 +1,9 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../include/core/sigma_types.h"
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/core/sigma_kernel_types.h"
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign VPN Shard
@@ -25,19 +25,19 @@ public:
     const char* type_name() const noexcept override { return "SovereignVPN"; }
 
     static void init() {
-        sigma_log("Σ [VPN]: Initializing Sovereign VPN Nexus...");
-        sigma_log("Σ [VPN]: Quantum-encrypted Mesh routing ACTIVE.");
+        sigma_log("S [VPN]: Initializing Sovereign VPN Nexus...");
+        sigma_log("S [VPN]: Quantum-encrypted Mesh routing ACTIVE.");
     }
 
     void establishTunnel(const char* peer_address) {
-        sigma_log("Σ [VPN]: Establishing Zero-Trust tunnel to %s...\n", peer_address);
+        sigma_log("S [VPN]: Establishing Zero-Trust tunnel to %s...\n", peer_address);
         // Integrate with QKD and Mesh Lattice
-        sigma_log("Σ [VPN]: Tunnel ESTABLISHED. Traffic is now encrypted and routed via Lattice.");
+        sigma_log("S [VPN]: Tunnel ESTABLISHED. Traffic is now encrypted and routed via Lattice.");
         m_active_tunnels++;
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN VPN AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN VPN AUDIT ---\n");
         sigma_log("| Active Tunnels : %u\n", m_active_tunnels);
         sigma_log("| Protocol       : SOVEREIGN-WG (WireGuard Parity)\n");
         sigma_log("| Security       : PQC-ENCRYPTED\n");

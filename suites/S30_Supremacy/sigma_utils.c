@@ -80,7 +80,7 @@ const char *sigma_cfg_get(const SigmaConfig *cfg, const char *key) {
         if (sigma_strcmp(cfg->entries[i].key, key) == 0)
             return cfg->entries[i].value;
     }
-    return (const char*)0; /* NULL */
+    return (const char*)0; /* SIGMA_NULL */
 }
 
 #ifdef SIGMA_HOSTED_BUILD

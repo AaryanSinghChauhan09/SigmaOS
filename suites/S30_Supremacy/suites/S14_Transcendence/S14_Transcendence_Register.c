@@ -3,6 +3,6 @@
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 void S14_Transcendence_Register(void) {
-    SovereignRegistry_Register("S14_Transcendence", 0, NULL);
+    SovereignRegistry_Register("S14_Transcendence", 0, SIGMA_NULL);
     sigma_sigma_printf("S [S14_Transcendence]: Materialized.\n");
 }

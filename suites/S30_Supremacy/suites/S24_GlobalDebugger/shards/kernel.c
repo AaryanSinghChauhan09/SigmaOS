@@ -17,7 +17,7 @@ void f_validate_memory_allocation_edge_cases() {
 }
 
 void f_add_null_pointer_checks_in_system_calls() {
-    // [HARDENING] Null pointer check injected into syscall dispatcher table.
+    // [HARDENING] SIGMA_NULL pointer check injected into syscall dispatcher table.
     __asm__ volatile("test %eax, %eax; jz 1f; 1: nop");
 }
 

@@ -1,6 +1,6 @@
-#include "../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 #include "sigma_universal_ui.h" // Assume UI API
-#include "../include/sigma_log.h"
+#include "sigma_log.h"
 #include "ai/sigma_claw.h"
 
 /**

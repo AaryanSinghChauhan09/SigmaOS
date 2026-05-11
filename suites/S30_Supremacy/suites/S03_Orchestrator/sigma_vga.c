@@ -1,4 +1,4 @@
-#include "../../../include/sigma_vga.h"
+#include "sigma_vga.h"
 
 /* =========================================================================
  * SIGMA OS: PHYSICAL VGA DISPLAY DRIVER

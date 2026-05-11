@@ -36,7 +36,7 @@ void* pmm_alloc_page(void) {
             return (void*)((uint64_t)i * PAGE_SIZE);
         }
     }
-    return NULL; // OOM
+    return SIGMA_NULL; // OOM
 }
 
 void pmm_free_page(void* addr) {

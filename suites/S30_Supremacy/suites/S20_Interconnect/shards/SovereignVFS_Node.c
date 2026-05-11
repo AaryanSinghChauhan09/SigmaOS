@@ -32,7 +32,7 @@ void vfs_init(void) {
 }
 
 SovereignVfsNode* vfs_mount(const char* name, VfsNodeType type) {
-    if (g_vfs_count >= MAX_VFS_NODES) return NULL;
+    if (g_vfs_count >= MAX_VFS_NODES) return SIGMA_NULL;
     
     SovereignVfsNode* node = &g_vfs_root[g_vfs_count++];
     sigma_strncpy(node->name, name, 63);

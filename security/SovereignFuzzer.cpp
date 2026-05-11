@@ -1,9 +1,9 @@
-﻿#include "../include/sigma_log.h"
-#include "../include/core/sigma_types.h"
-#include "../include/hal/sigma_hal.h"
-#include "../include/core/sigma_kernel_types.h"
-#include "../include/libc/SovereignLibC.h"
-#include "../include/core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "hal/sigma_hal.h"
+#include "core/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Fuzzer Shard
@@ -25,19 +25,19 @@ public:
     const char* type_name() const noexcept override { return "SovereignFuzzer"; }
 
     static void init() {
-        sigma_log("Σ [FUZZER]: Initializing Sovereign ML-Driven Kernel Fuzzer...");
-        sigma_log("Σ [FUZZER]: Continuous silicon-level fault injection ACTIVE.");
+        sigma_log("S [FUZZER]: Initializing Sovereign ML-Driven Kernel Fuzzer...");
+        sigma_log("S [FUZZER]: Continuous silicon-level fault injection ACTIVE.");
     }
 
     void injectFault(const char* target_shard, sigma_u32 iterations) {
-        sigma_log("Σ [FUZZER]: Injecting %u malformed mutations into Shard '%s'...\n", iterations, target_shard);
+        sigma_log("S [FUZZER]: Injecting %u malformed mutations into Shard '%s'...\n", iterations, target_shard);
         // Execute coverage-guided fuzzing
-        sigma_log("Σ [FUZZER]: Injection COMPLETE. No panics detected. Shard resilience verified.");
+        sigma_log("S [FUZZER]: Injection COMPLETE. No panics detected. Shard resilience verified.");
         m_total_mutations += iterations;
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN FUZZER AUDIT ---\n");
+        sigma_log("\n--- S SOVEREIGN FUZZER AUDIT ---\n");
         sigma_log("| Total Mutations : %u\n", m_total_mutations);
         sigma_log("| Fuzzing Mode    : COVERAGE-GUIDED (ML)\n");
         sigma_log("| Target Domain   : LATTICE SHARDS\n");

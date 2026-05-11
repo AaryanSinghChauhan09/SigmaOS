@@ -3,6 +3,6 @@
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 
 void S11_Virtualization_Register(void) {
-    SovereignRegistry_Register("S11_Virtualization", 0, NULL);
+    SovereignRegistry_Register("S11_Virtualization", 0, SIGMA_NULL);
     sigma_sigma_printf("S [S11_Virtualization]: Materialized.\n");
 }

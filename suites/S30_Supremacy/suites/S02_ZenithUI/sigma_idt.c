@@ -1,4 +1,4 @@
-#include "../../../include/sigma_idt.h"
+#include "sigma_idt.h"
 #include "suites/S01_Genesis/shards/sigma_types.h"
 #include "suites/S01_Genesis/shards/sigma_libc.h"
 

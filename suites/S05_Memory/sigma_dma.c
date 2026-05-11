@@ -80,7 +80,7 @@ k_status sigma_dma_init(void) {
  * 
  * @param size_bytes Requested size in bytes.
  * @param out_paddr  Pointer to receive the physical address (for hardware registers).
- * @return Virtual address pointer for CPU access, or NULL if out of memory.
+ * @return Virtual address pointer for CPU access, or SIGMA_NULL if out of memory.
  */
 void* sigma_dma_alloc(u64 size_bytes, paddr_t* out_paddr) {
     if (size_bytes == 0 || !out_paddr) return (void*)0;

@@ -41,7 +41,7 @@ void caps_init() {
 
 // Kernel function to mint a new capability (e.g., when a process allocates a page)
 capability_t* cap_mint(uint32_t pid, object_type_t type, uint64_t ref, uint8_t rights) {
-    if (cap_count >= MAX_CAPABILITIES) return NULL;
+    if (cap_count >= MAX_CAPABILITIES) return SIGMA_NULL;
     
     capability_t* new_cap = &cap_pool[cap_count++];
     new_cap->cap_id = 0xCAFEBABE ^ cap_count; // Mock unforgeable ID generation

@@ -35,5 +35,5 @@ void SelfEvolution_Step(void) {
 
 void S19_SelfEvolution_Register(void) {
     SelfEvolution_Init();
-    SovereignRegistry_Register("S19_SelfEvolution", 0, NULL);
+    SovereignRegistry_Register("S19_SelfEvolution", 0, SIGMA_NULL);
 }

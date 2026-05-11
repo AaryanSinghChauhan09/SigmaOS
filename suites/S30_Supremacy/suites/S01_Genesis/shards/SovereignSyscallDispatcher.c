@@ -25,7 +25,7 @@ static uint64_t sys_yield(uint64_t a, uint64_t b, uint64_t c, uint64_t d, uint64
 
 void syscall_dispatcher_init(void) {
     for (int i = 0; i < MAX_SYSCALLS; i++) {
-        g_syscall_table[i] = NULL;
+        g_syscall_table[i] = SIGMA_NULL;
     }
     
     g_syscall_table[0] = sys_yield;

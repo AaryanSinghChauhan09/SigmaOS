@@ -1,5 +1,5 @@
-#include "../include/sigma_log.h"
-#include "../../../include/SovereignLibC.h"
+#include "sigma_log.h"
+#include "SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN BUILD ZENITH (v36.0 - THE FORGE FINALITY)
@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Forge {
