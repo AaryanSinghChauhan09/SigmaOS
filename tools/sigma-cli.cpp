@@ -18,6 +18,12 @@ void print_help() {
     sigma_log_info("  sys-status     - View real-time load matrix");
     sigma_log_info("  rebalance      - Trigger lattice load rebalancing");
     sigma_log_info("  doctor         - Run autonomous health diagnostics");
+    sigma_log_info("  eng-sim        - Run structural engineering simulation");
+    sigma_log_info("  med-dicom      - Initialize DICOM volumetric rendering");
+    sigma_log_info("  airgap-on      - Engage physical silicon air-gap");
+    sigma_log_info("  airgap-off     - Disengage air-gap and restore NICs");
+    sigma_log_info("  sql <query>    - Run bare-metal DataMatrix query");
+    sigma_log_info("  cert <hash>    - Certify legal document hash");
 }
 
 int main(int argc, char** argv) {
@@ -43,6 +49,20 @@ int main(int argc, char** argv) {
         monitor_rebalance_lattice();
     } else if (sigma_strcmp(cmd, "doctor") == 0) {
         heal_diagnostic_report();
+    } else if (sigma_strcmp(cmd, "eng-sim") == 0) {
+        engineer_run_simulation();
+    } else if (sigma_strcmp(cmd, "med-dicom") == 0) {
+        medical_load_image(SIGMA_NULL, 0);
+    } else if (sigma_strcmp(cmd, "airgap-on") == 0) {
+        airgap_engage();
+    } else if (sigma_strcmp(cmd, "airgap-off") == 0) {
+        airgap_disengage();
+    } else if (sigma_strcmp(cmd, "sql") == 0) {
+        if (argc < 3) return -1;
+        data_matrix_query(argv[2]);
+    } else if (sigma_strcmp(cmd, "cert") == 0) {
+        if (argc < 3) return -1;
+        pro_suite_certify_doc(argv[2]);
     } else {
         sigma_log_err("Unknown command: %s", cmd);
     }

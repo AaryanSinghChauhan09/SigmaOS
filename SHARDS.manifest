@@ -46,6 +46,7 @@ kernel/core/system/SovereignWASM.cpp
 # LAYER 3: SECURITY & PQC
 # ═══════════════════════════════════════════════════════════════════════
 kernel/core/security/SovereignPQC.cpp
+kernel/core/security/SovereignAirGap.cpp
 kernel/core/security/SovereignSandbox.cpp
 kernel/core/security/SovereignAttestation.cpp
 kernel/core/security/SovereignTPM.cpp
@@ -84,6 +85,10 @@ kernel/core/industrial/SovereignLTS.cpp
 kernel/core/industrial/SovereignInit.cpp
 kernel/core/industrial/SovereignOrbResolver.cpp
 kernel/core/industrial/SovereignForensicLattice.cpp
+kernel/core/industrial/SovereignEngineer.cpp
+kernel/core/industrial/SovereignMedical.cpp
+kernel/core/industrial/SovereignProSuite.cpp
+kernel/core/industrial/SovereignDataMatrix.cpp
 kernel/core/industrial/SovereignDigitalTwin.cpp
 kernel/core/industrial/SovereignDashboard.cpp
 kernel/core/industrial/SovereignMicroEdition.cpp
