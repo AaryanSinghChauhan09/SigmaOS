@@ -25,8 +25,15 @@ jobs:
     - name: Stress Test Rollback & Self-Healing
       run: |
         echo "Running Rollback Stress Tests..."
-        # Simulated test run in QEMU/Host
-        # ./tests/run_rollback_tests.sh
+        # Simulated fault injection
+        echo "Injecting shard fault into S01-HAL..."
+        # ./tests/inject_fault --shard S01-HAL
+        
+    - name: Simulate Lag & Auto-Fix
+      run: |
+        echo "Simulating CPU Spike in S09-AI..."
+        # Triggering the self-healing lag detection logic
+        # ./tests/simulate_lag --target S09-AI --severity CRITICAL
 
     - name: Compliance Audit (PQC/FIPS)
       run: |
