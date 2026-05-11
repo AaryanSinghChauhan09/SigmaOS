@@ -36,6 +36,7 @@ kernel/core/system/SovereignProfiles.cpp
 kernel/core/system/SovereignRollbackShard.cpp
 kernel/core/system/SovereignIPC.cpp
 kernel/core/system/SovereignProfileNexus.cpp
+kernel/core/system/AdaptiveDebugMode.cpp
 kernel/core/system/SovereignForge.cpp
 kernel/core/system/SovereignSelfHealing.cpp
 kernel/core/system/SovereignRegistry.cpp
@@ -87,12 +88,15 @@ kernel/core/ui/SovereignAccess.cpp
 tools/sigma-cli.cpp
 tools/sigma-debug.cpp
 tools/sigma-fix.cpp
+tools/sigma-log.cpp
 tools/sigma-pkg.sh
 iso_root/installer/install.sh
 ecosystem/packager/sigma-pkg.sh
 # ═══════════════════════════════════════════════════════════════════════
 # LAYER 7: PROFESSIONAL & INDUSTRIAL SHARDS (MODULAR)
 # ═══════════════════════════════════════════════════════════════════════
+kernel/shards/cybersecurity/SovereignIDS.cpp
+kernel/shards/cybersecurity/SovereignThreatModeler.cpp
 kernel/shards/forensics/SovereignForensics.cpp
 kernel/shards/engineering/SovereignEngineer.cpp
 kernel/shards/medical/SovereignMedical.cpp
@@ -104,6 +108,7 @@ kernel/shards/gov/SovereignGov.cpp
 kernel/shards/prosuite/SovereignProSuite.cpp
 kernel/shards/data-warehousing/SovereignWarehouse.cpp
 kernel/shards/data-mining/SovereignMiner.cpp
+kernel/shards/orchestration/SovereignContainerOrchestrator.cpp
 kernel/core/industrial/SovereignDataMatrix.cpp
 kernel/core/industrial/SovereignSheet.cpp
 kernel/core/industrial/SovereignCommerce.cpp
