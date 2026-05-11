@@ -1,4 +1,4 @@
-[
+﻿[
     {
         "directory": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
         "file": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\kernel\\core\\ai\\SovereignNeural.cpp",
@@ -13,5 +13,17 @@
         "directory": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
         "file": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\kernel\\core\\industrial\\SovereignDigitalTwin.cpp",
         "command": "g++ -std=c++17 -ffreestanding -I./include -I./kernel/core/include -c kernel/core/industrial/SovereignDigitalTwin.cpp"
+    }
+]
+,
+    {
+        "directory": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\kernel\\core\\hal\\SovereignEntropy.cpp",
+        "command": "g++ -std=c++17 -ffreestanding -I./include -I./kernel/core/include -c kernel/core/hal/SovereignEntropy.cpp"
+    },
+    {
+        "directory": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\kernel\\core\\ipc\\SovereignBridge.cpp",
+        "command": "g++ -std=c++17 -ffreestanding -I./include -I./kernel/core/include -c kernel/core/ipc/SovereignBridge.cpp"
     }
 ]

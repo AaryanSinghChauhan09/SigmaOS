@@ -13,6 +13,7 @@ kernel/core/hal/SovereignISR.cpp
 kernel/core/hal/SovereignPCI.cpp
 kernel/core/hal/SovereignACPI.cpp
 kernel/core/hal/SovereignPager.cpp
+kernel/core/hal/SovereignEntropy.cpp
 
 # ═══════════════════════════════════════════════════════════════════════
 # LAYER 1: KERNEL CORE (IPC, SCHEDULER, MEMORY)
@@ -20,6 +21,7 @@ kernel/core/hal/SovereignPager.cpp
 # Headers (zero-STL, kernel-safe)
 include/ipc/SovereignEventBus.h
 include/sched/SovereignScheduler.h
+kernel/core/ipc/SovereignBridge.cpp
 kernel/core/sched/SovereignRTSched.cpp
 
 # ═══════════════════════════════════════════════════════════════════════
