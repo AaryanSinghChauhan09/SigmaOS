@@ -1,44 +1,61 @@
-# 🤝 Contributing to SigmaOS
+# SigmaOS — Contribution Guide
 
-Thank you for your interest in contributing to **SigmaOS Sovereign Lattice**. We are building a high-performance, AI-native ecosystem and we welcome contributions that align with our vision of absolute digital sovereignty.
-
----
-
-## 🏛️ Contribution Philosophy
-SigmaOS is built on a **600-Shard Modular Architecture**. Every contribution should be:
-1. **Atomic**: Focus on a single shard or functional cluster.
-2. **Zero-Dependency**: Do not introduce external libraries unless absolutely necessary.
-3. **PQC-Ready**: Consider security and attestation in every line of code.
+> Join the evolution of digital sovereignty.
 
 ---
 
-## 🛠️ How to Contribute
+## 🛠️ Coding Standards
 
-1. **Fork the Repository**: Create your own fork and clone it locally.
-2. **Create a Shard Branch**:
-   ```bash
-   git checkout -b shard/your-feature-name
-   ```
-3. **Implement & Document**: 
-   - Add your logic to the appropriate directory (`/kernel`, `/drivers`, `/ui`).
-   - Update the corresponding `.md` file in the wiki if the architecture changes.
-4. **Validation**:
-   - Run the build system: `make all`.
-   - Test in QEMU: `./qemu-boot.sh`.
-   - Ensure `sigma-heal` reports no technical debt.
-5. **Submit a PR**: Provide a clear description of the shard's purpose and any capability requirements.
+SigmaOS is an industrial-grade project. All contributions must adhere to:
+
+
+
+* **Language**: C++20 for shards, Python 3.10+ for tooling.
+* **Pattern**: Strict OOP Singleton (Context Manager).
+
+
+
+* **Zero-Dependency**: No `libc` or external headers allowed in Layer 1-4 shards.
+* **Documentation**: Every code change MUST be accompanied by an update to the corresponding `.md` file in `WIKI/`.
+
+## 🌀 Branching Strategy
+
+We follow a staged release cadence:
+
+
+
+* **`main` (Stable)**: The production-ready sovereign lattice. Only merges from `beta` allowed.
+* **`beta` (Staging)**: Integration branch for feature-complete topics.
+
+
+
+* **`alpha` (Topic)**: Feature-specific branches (e.g., `feat/neural-paging`).
+
+## 🚀 CI/CD Pipeline
+
+Every Pull Request triggers the following automated suite:
+
+
+
+1. **Lattice Rebuild**: All 600+ shards must compile with zero warnings.
+2. **Regression Suite**: IRQ handlers and SHS v2 are verified for RDTSC-cycle precision.
+
+
+
+3. **Security Scan**: Verify PQC signatures and TPM handshake protocols.
+4. **Doc Lint**: Ensure all WIKI files follow the GitHub Flavored Markdown standard.
+
+## 🤝 How to Contribute Shards
+
+
+
+1. **Fork** the repository and create an `alpha` branch.
+2. **Develop** your shard in the appropriate `suites/` directory.
+
+
+
+3. **Sync** documentation in `WIKI/`.
+4. **Submit** a PR to `beta` for review.
 
 ---
-
-## 🎨 Code Style
-- Use **OOP-Isolated Singletons** for core engines.
-- Follow the `sigma_` naming convention for kernel-level primitives.
-- Maintain strict **C++11/14** standards for hardware compatibility.
-
----
-
-## 🛡️ Security First
-If you find a security vulnerability, please follow our **[Security Policy](SECURITY.md)**. Do NOT open a public issue for security bugs.
-
----
-*Build the lattice. Command the future.*
+"Sovereignty is a collective intent."
