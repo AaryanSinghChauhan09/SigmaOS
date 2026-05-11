@@ -35,6 +35,7 @@ kernel/core/system/SovereignNet.cpp
 kernel/core/system/SovereignProfiles.cpp
 kernel/core/system/SovereignRollbackShard.cpp
 kernel/core/system/SovereignIPC.cpp
+kernel/core/system/SovereignProfileNexus.cpp
 kernel/core/system/SovereignForge.cpp
 kernel/core/system/SovereignSelfHealing.cpp
 kernel/core/system/SovereignRegistry.cpp
@@ -93,6 +94,9 @@ kernel/core/industrial/SovereignOrbResolver.cpp
 kernel/core/industrial/SovereignForensicLattice.cpp
 kernel/core/industrial/SovereignEngineer.cpp
 kernel/core/industrial/SovereignMedical.cpp
+kernel/core/industrial/SovereignCreative.cpp
+kernel/core/industrial/SovereignAcademic.cpp
+kernel/core/industrial/SovereignGov.cpp
 kernel/core/industrial/SovereignProSuite.cpp
 kernel/core/industrial/SovereignDataMatrix.cpp
 kernel/core/industrial/SovereignDigitalTwin.cpp
