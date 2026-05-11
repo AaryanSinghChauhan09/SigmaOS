@@ -93,6 +93,8 @@ kernel/core/industrial/SovereignLTS.cpp
 kernel/core/industrial/SovereignInit.cpp
 kernel/core/industrial/SovereignOrbResolver.cpp
 kernel/core/industrial/SovereignForensicLattice.cpp
+kernel/core/industrial/SovereignForensics.cpp
+kernel/core/industrial/SovereignEcoMatrix.cpp
 kernel/core/industrial/SovereignEngineer.cpp
 kernel/core/industrial/SovereignMedical.cpp
 kernel/core/industrial/SovereignCreative.cpp
@@ -103,6 +105,7 @@ kernel/core/industrial/SovereignDataMatrix.cpp
 kernel/core/industrial/SovereignCommerce.cpp
 kernel/core/industrial/SovereignProvenance.cpp
 kernel/core/industrial/SovereignDesign.cpp
+kernel/core/industrial/SovereignEduMatrix.cpp
 kernel/core/industrial/SovereignDigitalTwin.cpp
 kernel/core/industrial/SovereignDashboard.cpp
 kernel/core/industrial/SovereignMicroEdition.cpp

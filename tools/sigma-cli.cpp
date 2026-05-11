@@ -26,6 +26,8 @@ void print_help() {
     sigma_log_info("  cert <hash>    - Certify legal document hash");
     sigma_log_info("  search-astar   - Run A* search simulation");
     sigma_log_info("  pos-transact   - Process a POS transaction");
+    sigma_log_info("  forensic-scan  - Audit shard for security anomalies");
+    sigma_log_info("  eco-optimize   - Optimize grid for sustainability");
 }
 
 int main(int argc, char** argv) {
@@ -69,6 +71,10 @@ int main(int argc, char** argv) {
         search_sim_run_astar(SIGMA_NULL);
     } else if (sigma_strcmp(cmd, "pos-transact") == 0) {
         commerce_transact(1, "ITEM-001");
+    } else if (sigma_strcmp(cmd, "forensic-scan") == 0) {
+        forensics_scan(0);
+    } else if (sigma_strcmp(cmd, "eco-optimize") == 0) {
+        eco_optimize();
     } else {
         sigma_log_err("Unknown command: %s", cmd);
     }
