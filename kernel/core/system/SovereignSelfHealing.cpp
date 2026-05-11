@@ -9,9 +9,9 @@
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/ipc/SovereignEventBus.h"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "ipc/SovereignEventBus.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -37,7 +37,7 @@ public:
         bus.subscribe(EventType::SHARD_FAULT,      onShardFault,      "SelfHealingEngine");
         bus.subscribe(EventType::SECURITY_ALERT,   onSecurityAlert,   "SelfHealingEngine");
         bus.subscribe(EventType::THERMAL_CRITICAL, onThermalCritical, "SelfHealingEngine");
-        bus.subscribe(EventType::CPU_HIGH,         onCPUSpike,        "SelfHealingEngine");
+        bus.subscribe(EventType::CPU_SPIKE,        onCPUSpike,        "SelfHealingEngine");
     }
 
     static void onShardFault(const SovereignEvent& ev) {
@@ -76,8 +76,6 @@ public:
     void monitor_heartbeat(sigma_u64 current_time) {
         (void)current_time;
         // Watchdog timer to detect kernel hangs
-        // static sigma_u64 last_heartbeat = 0;
-        // if (current_time - last_heartbeat > 5000) trigger_reboot();
     }
 
 private:

@@ -1,5 +1,5 @@
-#include "../../../sigma_libc.h"
-#include "../../../include/core/sigma_types.h"
+#include "sigma_libc.h"
+#include "core/sigma_types.h"
 
 // ---------------------------------------------------------
 // SigmaOS Zenith UI Compositor
@@ -30,7 +30,7 @@ typedef struct {
 
 static zenith_window_t windows[MAX_WINDOWS];
 static uint32_t window_count = 0;
-static uint32_t* hardware_framebuffer = NULL; // Mapped from Bootloader
+static uint32_t* hardware_framebuffer = SIGMA_NULL; // Mapped from Bootloader
 
 // Theme Engine (Personalisation)
 typedef struct {
