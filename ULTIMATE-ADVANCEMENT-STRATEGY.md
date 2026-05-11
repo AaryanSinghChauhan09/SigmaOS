@@ -59,12 +59,12 @@ This document outlines the 100 strategic advancements required to make SigmaOS t
 ## 🛡️ Phase 3: Security & Sovereignty (41-60)
 *Focus: Verifiable security and post-quantum readiness.*
 
-41. **FIPS-140-3 Compliance**: Hardened crypto modules with audit logs.
-42. **PQC Everywhere**: Kyber/Dilithium integration in all system shards.
+41. **FIPS-140-3 Compliance**: Hardened crypto modules with audit logs. (**v14.2 Implemented**)
+42. **PQC Everywhere**: Kyber/Dilithium integration in all system shards. (**v14.2 Implemented**)
 43. **AI Intrusion Detection**: Real-time threat hunting via kernel agents.
 44. **Zero-Trust Networking**: Micro-segmentation of all network traffic.
 45. **Biometric Kernel Auth**: Native support for secure enclave biometrics.
-46. **Hardware Root of Trust**: TPM 2.0 / Secure Enclave binding for all boots.
+46. **Hardware Root of Trust**: TPM 2.0 / Secure Enclave binding for all boots. (**v14.2 Implemented**)
 47. **Encrypted RAM**: AES-NI based memory encryption at the hardware level.
 48. **Sovereign VPN**: Kernel-native, WireGuard-based secure tunnel shard.
 49. **Anti-Forensic Mode**: Rapid memory zeroing and trace elimination.

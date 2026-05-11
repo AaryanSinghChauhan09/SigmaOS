@@ -12,7 +12,7 @@ The core repository is organized into strict OOP-isolated modules (shards) to en
 | :--- | :--- | :--- |
 | `/kernel/` | Sovereign lattice kernel | Scheduler, Hypervisor, Watchdog |
 | `/drivers/` | Hardware shards (OOP) | Vulkan, Proton, NVMe |
-| `/security/` | FIPS-140-3 lattice | SovereignPQC, RBAC, MAC Policies |
+| `/security/` | FIPS-140-3 lattice | SovereignPQC, SovereignCompliance, RBAC |
 | `/industrial/` | Performance & Power | SovereignPower, SovereignVulkanLoader |
 | `/observability/`| Real-time Telemetry | SovereignDiag, SovereignMonitor |
 | `/automation/` | Ease of Use | SovereignAutomation, SmartShortcuts |
