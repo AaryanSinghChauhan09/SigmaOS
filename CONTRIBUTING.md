@@ -26,4 +26,4 @@ We maintain a professional, inclusive, and mission-oriented environment. Please 
 
 ---
 
-*Join us in achieving Digital Sovereignty.*
+### Join us in achieving Digital Sovereignty.

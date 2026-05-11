@@ -66,16 +66,20 @@ SigmaOS is engineered to dominate and neutralize legacy distributions by solving
 SigmaOS provides a unified namespace for all lattice operations:
 
 ```bash
+
 # System Orchestration
+
 s-cli sigma-init     # Initialize system services
 s-cli sigma-eco      # Monitor Global Ecosystem USPs
 s-cli sigma-top      # Real-time shard performance monitor
 
 # Automation & AI
+
 s-cli sigma-claw     # Intent-based task orchestration
 s-cli sigma-ai       # Query the Sovereign Assistant
 
 # Security & Resilience
+
 s-cli sigma-sec      # Perform hardware attestation
 s-cli sigma-snap     # Manage system snapshots and rollbacks
 ```

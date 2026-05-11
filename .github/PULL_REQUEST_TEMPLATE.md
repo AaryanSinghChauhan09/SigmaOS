@@ -1,4 +1,4 @@
-## Description
+# Description
 
 <!-- Describe your changes in detail here. -->
 
@@ -22,18 +22,11 @@
 
 ## Checklist:
 
-
-
-
 - [ ] My code follows the strict C11/Assembly zero-dependency guidelines (for kernel).
 - [ ] I have updated/inherited `sigma_obj_t` correctly for new kernel constructs.
 
-
-
 - [ ] I have read the **CONTRIBUTING** document.
 - [ ] My changes generate no new Clang-Tidy warnings/errors.
-
-
 
 - [ ] I have added/updated tests to cover my changes.
 - [ ] All new and existing tests passed natively.
