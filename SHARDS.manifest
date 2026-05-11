@@ -121,6 +121,10 @@ kernel/shards/finance/SovereignMarketSim.cpp
 kernel/shards/creative/SovereignAssetManager.cpp
 kernel/shards/legal/SovereignComplianceAuditor.cpp
 kernel/shards/resilience/SovereignNodeReplicator.cpp
+kernel/shards/network/SovereignNetStack.cpp
+kernel/shards/storage/SovereignStorageManager.cpp
+kernel/shards/virtualization/SovereignVirtualizationEngine.cpp
+kernel/shards/ecosystem/SovereignPackageAuditor.cpp
 kernel/shards/ai/SovereignOrchestrator.cpp
 kernel/shards/userland/SovereignDesktop.cpp
 kernel/shards/security/SovereignRuntimeEnforcement.cpp
