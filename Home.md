@@ -8,9 +8,17 @@
 
 - **[Architecture Overview](Architecture.md)**: Deep dive into the 600-shard modular kernel.
 - **[Strategic Leapfrog](Leapfrog-Strategy.md)**: How SigmaOS outperforms industrial competitors.
+- **[Profession Center](PROFESSION-MAP.md)**: Explore role-specific tools and system profiles.
 - **[Linux Competitive Edge](Linux-Competitive-Edge.md)**: Our strategy to dominate the open-source landscape.
 - **[100 Strategic Advancements](ULTIMATE-ADVANCEMENT-STRATEGY.md)**: The long-term roadmap to sovereign dominance.
 - **[Security & PQC](Verified-Boot.md)**: Hardening the lattice against quantum threats.
+
+---
+
+## 🛠️ The Profession Matrix
+SigmaOS adapts to your role instantly. Select your path to explore tailored documentation:
+- **[Lawyer](Profession-Lawyer-Tools.md)** | **[Doctor](Profession-Doctor-Tools.md)** | **[Engineer](Profession-Engineer-Tools.md)**
+- **[Developer](Profession-Software-Dev-Tools.md)** | **[Artist](Profession-Artist-Tools.md)** | **[Scientist](Profession-Scientist-Tools.md)**
 
 ---
 

@@ -8,6 +8,7 @@
 **Strategic Vision**
 - [Linux Competitive Edge](Linux-Competitive-Edge.md)
 - [Leapfrog Strategy](Leapfrog-Strategy.md)
+- [Profession Center](PROFESSION-MAP.md)
 - [100-Step Roadmap](ULTIMATE-ADVANCEMENT-STRATEGY.md)
 - [SigmaOS vs The World](SigmaOS_vs_The_World.md)
 

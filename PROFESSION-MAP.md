@@ -6,14 +6,15 @@ SigmaOS is the first operating system that adapts its entire core to your specif
 
 ## 🏛️ The Profession Matrix
 
-| Profession | Key Shards | Resource Quota | Zenith Persona |
-| :--- | :--- | :--- | :--- |
-| **Lawyer** | CaseLaw AI, EvidenceFS, LegalTimer | Security Priority | Clean/Minimal |
-| **Doctor** | PatientLattice, DICOM Viewer, HealthAudit | Privacy Priority | High-Contrast |
-| **Engineer** | CAD-Sim, MathLattice, StressTester | Compute Priority | Geometric |
-| **Developer** | ShardTracer, PQC-SDK, GitLattice | Low-Latency | Cyber/Terminal |
-| **Accountant** | Ledger-S3, TaxCalc-Sov, AuditLog | Integrity Priority | Organized |
-| **Artist** | Color-PQC, ZenithRender, WacomLink | GPU Priority | Vibrant/Glass |
+| Profession | Key Shards | Resource Quota | Zenith Persona | Documentation |
+| :--- | :--- | :--- | :--- | :--- |
+| **Lawyer** | CaseLaw AI, EvidenceFS, LegalTimer | Security Priority | Clean/Minimal | [Details](Profession-Lawyer-Tools.md) |
+| **Doctor** | PatientLattice, DICOM Viewer, HealthAudit | Privacy Priority | High-Contrast | [Details](Profession-Doctor-Tools.md) |
+| **Engineer** | CAD-Sim, MathLattice, StressTester | Compute Priority | Geometric | [Details](Profession-Engineer-Tools.md) |
+| **Developer** | ShardTracer, PQC-SDK, GitLattice | Low-Latency | Cyber/Terminal | [Details](Profession-Software-Dev-Tools.md) |
+| **Accountant** | Ledger-S3, TaxCalc-Sov, AuditLog | Integrity Priority | Organized | [Details](Profession-Accountant-Tools.md) |
+| **Artist** | Color-PQC, ZenithRender, WacomLink | GPU Priority | Vibrant/Glass | [Details](Profession-Artist-Tools.md) |
+| **Scientist** | Data-Forge, ML-Hub, L-Stream | High-Throughput | Data-Dense | [Details](Profession-Scientist-Tools.md) |
 
 ---
 
