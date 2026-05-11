@@ -141,6 +141,10 @@ kernel/shards/security/SovereignCybersecurity.cpp
 kernel/shards/data-warehousing/SovereignWarehouse.cpp
 kernel/shards/data-mining/SovereignMiner.cpp
 kernel/shards/orchestration/SovereignContainerOrchestrator.cpp
+kernel/shards/core/SovereignFairScheduler.cpp
+kernel/shards/core/SovereignSystemd.cpp
+kernel/shards/security/SovereignAppArmor.cpp
+kernel/shards/industrial/SovereignBioFabrication.cpp
 kernel/shards/industrial/SovereignBioFabrication.cpp
 kernel/shards/industrial/SovereignAeroDynamics.cpp
 kernel/shards/finance/SovereignFinancialAuditor.cpp
