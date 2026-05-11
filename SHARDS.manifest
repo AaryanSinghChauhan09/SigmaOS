@@ -141,6 +141,10 @@ kernel/shards/security/SovereignCybersecurity.cpp
 kernel/shards/data-warehousing/SovereignWarehouse.cpp
 kernel/shards/data-mining/SovereignMiner.cpp
 kernel/shards/orchestration/SovereignContainerOrchestrator.cpp
+kernel/shards/industrial/SovereignPLC.cpp
+kernel/shards/industrial/SovereignOrbitalDynamics.cpp
+kernel/shards/industrial/SovereignSubmersibleEngine.cpp
+kernel/shards/hardware/SovereignPrinter.cpp
 kernel/shards/hardware/SovereignPrinter.cpp
 kernel/shards/hardware/SovereignCamera.cpp
 kernel/shards/hardware/SovereignKVM.cpp
