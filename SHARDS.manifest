@@ -90,25 +90,24 @@ tools/sigma-fix.cpp
 tools/sigma-pkg.sh
 iso_root/installer/install.sh
 ecosystem/packager/sigma-pkg.sh
-kernel/core/industrial/SovereignCloudImage.cpp
-kernel/core/industrial/SovereignLTS.cpp
-kernel/core/industrial/SovereignInit.cpp
-kernel/core/industrial/SovereignOrbResolver.cpp
-kernel/core/industrial/SovereignForensicLattice.cpp
-kernel/core/industrial/SovereignForensics.cpp
-kernel/core/industrial/SovereignEcoMatrix.cpp
-kernel/core/industrial/SovereignEngineer.cpp
-kernel/core/industrial/SovereignMedical.cpp
-kernel/core/industrial/SovereignCreative.cpp
-kernel/core/industrial/SovereignAcademic.cpp
-kernel/core/industrial/SovereignGov.cpp
-kernel/core/industrial/SovereignProSuite.cpp
+# ═══════════════════════════════════════════════════════════════════════
+# LAYER 7: PROFESSIONAL & INDUSTRIAL SHARDS (MODULAR)
+# ═══════════════════════════════════════════════════════════════════════
+kernel/shards/forensics/SovereignForensics.cpp
+kernel/shards/engineering/SovereignEngineer.cpp
+kernel/shards/medical/SovereignMedical.cpp
+kernel/shards/creative/SovereignCreative.cpp
+kernel/shards/creative/SovereignDesign.cpp
+kernel/shards/academic/SovereignAcademic.cpp
+kernel/shards/academic/SovereignEduMatrix.cpp
+kernel/shards/gov/SovereignGov.cpp
+kernel/shards/prosuite/SovereignProSuite.cpp
+kernel/shards/data-warehousing/SovereignWarehouse.cpp
+kernel/shards/data-mining/SovereignMiner.cpp
 kernel/core/industrial/SovereignDataMatrix.cpp
 kernel/core/industrial/SovereignSheet.cpp
 kernel/core/industrial/SovereignCommerce.cpp
 kernel/core/industrial/SovereignProvenance.cpp
-kernel/core/industrial/SovereignDesign.cpp
-kernel/core/industrial/SovereignEduMatrix.cpp
 kernel/core/industrial/SovereignDigitalTwin.cpp
 kernel/core/industrial/SovereignDashboard.cpp
 kernel/core/industrial/SovereignMicroEdition.cpp
