@@ -1,29 +1,3 @@
-<<<<<<< HEAD
-# SigmaOS Sovereign Makefile
-# Proving sovereignty through deterministic builds.
-
-CC = gcc
-CFLAGS = -Wall -Wextra -I. -Imodules/core/include -ffreestanding -nostdlib
-
-# Shards
-DRIVER_SHARDS = $(wildcard modules/core/drivers/*.c)
-KERNEL_SHARDS = $(wildcard modules/core/kernel/*.c) $(wildcard modules/core/kernel/*/*.c)
-NET_SHARDS = $(wildcard modules/core/net/*.c)
-PERF_SHARDS = $(wildcard modules/perf/*.c)
-UI_SHARDS = $(wildcard modules/ui/*.c)
-CLOUD_SHARDS = $(wildcard modules/cloud/*.c)
-
-ALL_SHARDS = $(DRIVER_SHARDS) $(KERNEL_SHARDS) $(NET_SHARDS) $(PERF_SHARDS) $(UI_SHARDS) $(CLOUD_SHARDS)
-
-all: $(ALL_SHARDS)
-	@echo "All Sovereign Shards Validated."
-
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-clean:
-	rm -f $(ALL_SHARDS:.c=.o)
-=======
 # =============================================================================
 # Σ SIGMAOS: SOVEREIGN LATTICE BUILD SYSTEM (ZENITH)
 # =============================================================================
@@ -35,7 +9,7 @@ CXX      = g++
 AS       = nasm
 QEMU     = qemu-system-x86_64
 CXXFLAGS = -ffreestanding -O2 -Wall -Wextra -Werror -fno-exceptions -fno-rtti -std=c++17 \
-           -I./include -fno-stack-protector -mno-red-zone -MMD -MP
+           -I./include -I./kernel/core/include -fno-stack-protector -mno-red-zone -MMD -MP
 ASFLAGS  = -f elf64
 
 # Dependency files
@@ -103,4 +77,4 @@ rebuild: clean all
 	@mkdir -p $(dir $@)
 	@echo "[AS] $<"
 	@$(AS) $(ASFLAGS) $< -o $@
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645
+

@@ -73,6 +73,8 @@ kernel/core/industrial/SovereignLTS.cpp
 kernel/core/industrial/SovereignInit.cpp
 kernel/core/industrial/SovereignOrbResolver.cpp
 kernel/core/industrial/SovereignForensicLattice.cpp
+kernel/core/industrial/SovereignDigitalTwin.cpp
+kernel/core/industrial/SovereignDashboard.cpp
 kernel/core/industrial/SovereignMicroEdition.cpp
 kernel/core/security/SovereignFIPS.cpp
 kernel/core/security/SovereignAnonymity.cpp

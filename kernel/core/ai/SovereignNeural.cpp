@@ -1,5 +1,5 @@
 #include "sigma_log.h"
-#include "libc/SovereignLibC.h"
+#include "core/sigma_libc.h"
 #include "hal/sigma_hal.h"
 #include "core/sigma_types.h"
 #include "ai/sigma_neural.h"
