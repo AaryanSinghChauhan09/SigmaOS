@@ -25,6 +25,7 @@ namespace IPC {
 enum class EventType : sigma_u32 {
     BATTERY_LOW       = 0x01,
     CPU_HIGH          = 0x02,
+    CPU_SPIKE         = 0x02, // Alias for self-healing
     MEMORY_PRESSURE   = 0x03,
     SHARD_FAULT       = 0x04,
     NETWORK_UP        = 0x05,

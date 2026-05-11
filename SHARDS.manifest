@@ -32,6 +32,7 @@ kernel/core/observability/SovereignDiag.cpp
 kernel/core/system/SovereignFS.cpp
 kernel/core/deployment/SovereignPackageGraph.cpp
 kernel/core/system/SovereignNet.cpp
+kernel/core/system/SovereignProfiles.cpp
 kernel/core/system/SovereignRollbackShard.cpp
 kernel/core/system/SovereignIPC.cpp
 kernel/core/system/SovereignForge.cpp

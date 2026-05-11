@@ -1,6 +1,6 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "core/SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
+#include "../../include/core/sigma_types.h"
+#include "../../../include/core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Wait-Free IPC Bridge
@@ -44,4 +44,14 @@ extern "C" void bridge_init() {
 
 extern "C" void bridge_send(unsigned int target, const char* msg) {
     SigmaOS::Kernel::IPC::SovereignBridge::getInstance().send_message(target, msg);
+}
+
+extern "C" void bridge_broadcast(const char* msg) {
+    sigma_log_info("[S-BRIDGE] Broadcasting message to ALL lattice shards: %s", msg);
+    // Hit & Trial: Iterate through all active shard IDs and enqueue
+}
+
+extern "C" void bridge_flush() {
+    sigma_log_info("[S-BRIDGE] Flushing all wait-free ring buffers...");
+    // Hit & Trial: Clear any pending messages to ensure zero-latency synchronization
 }

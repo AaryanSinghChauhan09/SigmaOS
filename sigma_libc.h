@@ -10,7 +10,12 @@ typedef unsigned char      uint8_t;
 typedef unsigned short     uint16_t;
 typedef unsigned int       uint32_t;
 typedef unsigned long long uint64_t;
+typedef int                int32_t;
 typedef long long          int64_t;
+
+#ifndef NULL
+#define NULL ((void*)0)
+#endif
 
 // Use compiler-provided size_t if possible, or fallback to 64-bit
 #ifdef __SIZE_TYPE__
