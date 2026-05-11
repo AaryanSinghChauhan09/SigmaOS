@@ -41,12 +41,15 @@ kernel/core/system/SovereignRegistry.cpp
 kernel/core/system/SovereignZFS.cpp
 kernel/core/system/SovereignNix.cpp
 kernel/core/system/SovereignWASM.cpp
+kernel/core/system/SovereignGit.cpp
 
 # ═══════════════════════════════════════════════════════════════════════
 # LAYER 3: SECURITY & PQC
 # ═══════════════════════════════════════════════════════════════════════
 kernel/core/security/SovereignPQC.cpp
 kernel/core/security/SovereignAirGap.cpp
+kernel/core/security/SovereignPolicy.cpp
+kernel/core/security/SovereignAudit.cpp
 kernel/core/security/SovereignSandbox.cpp
 kernel/core/security/SovereignAttestation.cpp
 kernel/core/security/SovereignTPM.cpp
@@ -55,6 +58,7 @@ kernel/core/security/SovereignTPM.cpp
 # LAYER 4: AI & AUTOMATION (CLAW STACK)
 # ═══════════════════════════════════════════════════════════════════════
 kernel/core/ai/SovereignNeural.cpp
+kernel/core/ai/SovereignMLFlow.cpp
 kernel/core/ai/SovereignCognitive.cpp
 kernel/core/ai/SovereignAIPersona.cpp
 kernel/core/ai/SovereignClawGateway.cpp
@@ -76,6 +80,8 @@ kernel/core/system/SovereignDAL.cpp
 userland/logd.cpp
 userland/SovereignSpotlight.cpp
 kernel/core/ui/SovereignSnap.cpp
+kernel/core/ui/SovereignViz.cpp
+kernel/core/ui/SovereignAccess.cpp
 tools/sigma-cli.cpp
 tools/sigma-pkg.sh
 iso_root/installer/install.sh
