@@ -111,6 +111,9 @@ kernel/shards/enterprise/SovereignLogistics.cpp
 kernel/shards/industrial/SovereignTwin.cpp
 kernel/shards/finance/SovereignAccountant.cpp
 kernel/shards/legal/SovereignVakil.cpp
+kernel/shards/finance/SovereignAccountant.cpp
+kernel/shards/dev/SovereignGame.cpp
+kernel/shards/dev/SovereignEmbedded.cpp
 kernel/shards/security/SovereignCybersecurity.cpp
 kernel/shards/data-warehousing/SovereignWarehouse.cpp
 kernel/shards/data-mining/SovereignMiner.cpp
