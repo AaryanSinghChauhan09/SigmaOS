@@ -37,6 +37,10 @@ kernel/core/system/SovereignRollbackShard.cpp
 kernel/core/system/SovereignIPC.cpp
 kernel/core/system/SovereignForge.cpp
 kernel/core/system/SovereignSelfHealing.cpp
+kernel/core/system/SovereignRegistry.cpp
+kernel/core/system/SovereignZFS.cpp
+kernel/core/system/SovereignNix.cpp
+kernel/core/system/SovereignWASM.cpp
 
 # ═══════════════════════════════════════════════════════════════════════
 # LAYER 3: SECURITY & PQC
@@ -71,6 +75,8 @@ kernel/core/system/SovereignDAL.cpp
 userland/logd.cpp
 userland/SovereignSpotlight.cpp
 kernel/core/ui/SovereignSnap.cpp
+tools/sigma-cli.cpp
+tools/sigma-pkg.sh
 iso_root/installer/install.sh
 ecosystem/packager/sigma-pkg.sh
 kernel/core/industrial/SovereignCloudImage.cpp

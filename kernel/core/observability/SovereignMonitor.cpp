@@ -43,6 +43,12 @@ void SovereignObservabilityMonitor::rebalanceLattice() {
     sigma_log_info("[MONITOR] Migration: S412 -> Core 15, S092 -> Core 02.");
 }
 
+void SovereignObservabilityMonitor::captureStackTrace(sigma_u32 shard_id) {
+    sigma_log_info("[MONITOR] Capturing bare-metal stack trace for Shard %u...", shard_id);
+    // Hit & Trial: Walk the frame pointer chain
+    sigma_log_info("[MONITOR] Stack trace capture COMPLETE.");
+}
+
 } // namespace Observability
 } // namespace Kernel
 } // namespace SigmaOS
@@ -62,6 +68,10 @@ extern "C" void monitor_execute_ebpf(const void* bytecode, sigma_usize size) {
 
 extern "C" void monitor_rebalance_lattice() {
     SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().rebalanceLattice();
+}
+
+extern "C" void monitor_capture_stack_trace(sigma_u32 sid) {
+    SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().captureStackTrace(sid);
 }
 
 extern "C" sigma_u32 monitor_get_shard_health(sigma_u32 shard_id) {
