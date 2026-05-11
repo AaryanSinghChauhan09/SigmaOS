@@ -113,6 +113,10 @@ kernel/shards/finance/SovereignAccountant.cpp
 kernel/shards/legal/SovereignVakil.cpp
 kernel/shards/finance/SovereignAccountant.cpp
 kernel/shards/finance/SovereignRisk.cpp
+kernel/shards/ai/SovereignOrchestrator.cpp
+kernel/shards/userland/SovereignDesktop.cpp
+kernel/shards/security/SovereignRuntimeEnforcement.cpp
+kernel/shards/ecosystem/SovereignPackageMapper.cpp
 kernel/shards/creative/SovereignBrand.cpp
 kernel/shards/academic/SovereignReview.cpp
 kernel/shards/enterprise/SovereignOps.cpp
