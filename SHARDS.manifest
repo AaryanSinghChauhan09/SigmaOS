@@ -112,6 +112,9 @@ kernel/shards/industrial/SovereignTwin.cpp
 kernel/shards/finance/SovereignAccountant.cpp
 kernel/shards/legal/SovereignVakil.cpp
 kernel/shards/finance/SovereignAccountant.cpp
+kernel/shards/finance/SovereignRisk.cpp
+kernel/shards/creative/SovereignBrand.cpp
+kernel/shards/academic/SovereignReview.cpp
 kernel/shards/enterprise/SovereignOps.cpp
 kernel/shards/enterprise/SovereignHR.cpp
 kernel/shards/enterprise/SovereignOps.cpp
