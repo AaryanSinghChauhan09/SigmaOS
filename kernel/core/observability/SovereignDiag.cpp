@@ -22,7 +22,7 @@ SovereignDiagEngine& SovereignDiagEngine::getInstance() {
 
 void SovereignDiagEngine::init() {
     sigma_log_info("[DIAG] Initializing Sovereign Diagnostic Nexus...");
-    this->m_initialized = true;
+    this->m_initialized = 1U;
     m_fault_count = 0U;
 }
 

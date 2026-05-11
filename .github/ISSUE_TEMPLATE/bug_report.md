@@ -12,8 +12,12 @@ A clear and concise description of what the bug is.
 **To Reproduce**
 Steps to reproduce the behavior:
 
+
+
 1. Go to '...'
 2. Execute '....'
+
+
 
 3. See error
 
@@ -25,7 +29,11 @@ If applicable, add terminal logs or screenshots of the Zenith UI.
 
 **System Information:**
 
+
+
  - OS: [e.g. Ubuntu 22.04 / Windows 11]
  - Build Environment: [e.g. Docker, Native]
+
+
 
  - Version: [e.g. EXTINCTION-1 (APEX)]
