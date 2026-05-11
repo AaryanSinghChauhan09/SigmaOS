@@ -1,85 +1,43 @@
-1
+ï»¿# Sovereign Persona Shard (persona.shard)
 
+## Overview
+The **Persona Shard** is a core modular component of the SigmaOS Sovereign Lattice responsible for identity isolation, deep personalization, and secure context switching. It ensures that user identities are strictly siloed at the silicon level.
 
-**Parity:** macOS Configuration Profiles · Android Work Profiles · Linux PAM
-**Location:** `kernel/modules/core/SovereignPersonaShard.c`
-**Standard:** Zenith Industrial Sovereignty v1.0
+## Architecture
+- **Shard ID**: persona.shard
+- **Namespace**: SigmaOS::Shards::Persona
+- **Pattern**: Industrial Singleton
+- **Inheritance**: SigmaOS::SigmaObject
 
----
+## Key Features
+### 1. Atomic Context Switching
+Persona transitions are handled atomically. When a user switches from one persona to another (e.g., Work to Private), the shard triggers a mandatory security purge:
+- **L1/L2 Cache Flushing**: Prevents cross-persona data leakage.
+- **Register Scrubbing**: Clears general-purpose registers before the new context takes control.
 
+### 2. Deep Personalization Mapping
+Each persona context contains:
+- **Identity Shard**: Canonical ID for the user context.
+- **Visual Theme**: Dynamic mapping to Zenith UI profiles (e.g., Industrial Dark, Frost, Aurora).
+- **Capability Mask**: Bitmask defining allowed kernel-level operations for that specific identity.
 
-1
+## API Reference (C++ Shard)
+`cpp
+namespace SigmaOS::Shards::Persona {
+    class SovereignPersonaShard {
+        void init();
+        sigma_status switchContext(const char* persona_id);
+        void updateVisuals(const char* theme_id);
+        const PersonaContext& getActiveContext() const;
+    };
+}
+`
 
-
-The Sovereign Persona Shard provides native, zero-dependency multi-user personalisation for SigmaOS. Each Persona is a full silicon context — encompassing a unique `UID`, capability bitmask, aesthetic theme, and ANSI shell prompt — that can be atomically switched without process restart. This absorbs the USPs of macOS Configuration Profiles, Android Work Profiles, and Linux PAM.
-
----
-
-
-1
-
-
-
-1
-
-
-Sovereign Persona Matrix (up to 8 concurrent contexts)
-  +-- Zenith_Admin   — Full capability ring (0xFFFFFFFF) | Obsidian theme
-  +-- Citizen_Dev    — Developer sandbox ring            | Aurora theme
-  +-- Guest_Secure   — Read-only minimal ring            | Frost theme
-
-Context Switch Engine
-  +-- Atomic deactivation of previous context ? activation of target
-      — No process restart required
-      — Capability mask enforced at dispatch time
-
-
-1
-
-
----
-
-
-1
-
-
-| Sub-command | Action |
-|---|---|
-| `sigma-persona create <name> <theme> <uid> <cap_mask>` | Create a new silicon persona context |
-| `sigma-persona switch <name>` | Atomically switch the active persona |
-| `sigma-persona audit` | Display all personas with UID, theme, cap-mask, and state |
+## C Bridge Integration
+For low-level kernel and driver access:
+- void persona_shard_init()
+- void persona_shard_switch(const char* id)
 
 ---
-
-
-1
-
-
-| Name | UID | Theme | Cap Mask |
-|---|---|---|---|
-| `Zenith_Admin` | 0 | Obsidian | `0xFFFFFFFF` |
-| `Citizen_Dev` | 1000 | Aurora | `0x0FFF0000` |
-| `Guest_Secure` | 9999 | Frost | `0x00000001` |
-
----
-
-
-1
-
-
-
-1
-
-
-
-1
-
-
----
-
-
-1
-
-
-`GLOBAL MESH ACTIVE` — Synchronized with `AaryanSinghChauhan09/SigmaOS`.
-
+*Status: MODULARIZED [ACTIVE]*
+*Lattice Integration: Phase 47*
