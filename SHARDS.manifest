@@ -141,6 +141,14 @@ kernel/shards/security/SovereignCybersecurity.cpp
 kernel/shards/data-warehousing/SovereignWarehouse.cpp
 kernel/shards/data-mining/SovereignMiner.cpp
 kernel/shards/orchestration/SovereignContainerOrchestrator.cpp
+kernel/shards/hardware/SovereignUSB.cpp
+kernel/shards/hardware/SovereignAudio.cpp
+kernel/shards/hardware/SovereignHID.cpp
+kernel/shards/hardware/SovereignHID.cpp
+kernel/shards/hardware/SovereignPowerManager.cpp
+kernel/shards/hardware/SovereignGPUCompute.cpp
+kernel/shards/ecosystem/SovereignSDK.cpp
+kernel/shards/medical/SovereignTelemedicine.cpp
 kernel/shards/medical/SovereignTelemedicine.cpp
 kernel/shards/gov/SovereignPolicyEngine.cpp
 kernel/shards/industrial/SovereignPredictiveMaintenance.cpp
