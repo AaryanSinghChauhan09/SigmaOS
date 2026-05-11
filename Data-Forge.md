@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 The Sovereign Data Forge is the industrial-grade data processing engine of SigmaOS. It enables massive-scale analytics directly on the silicon lattice.
@@ -13,10 +13,13 @@ The Sovereign Data Forge is the industrial-grade data processing engine of Sigma
 
 
 1
+<<<<<<< HEAD
 
 
 
 1
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 
 The Forge operates on a **Map-Shuffle-Reduce** model optimized for high-affinity silicon.

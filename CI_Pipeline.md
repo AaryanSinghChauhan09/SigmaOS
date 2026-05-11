@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 This document outlines the industrial-grade CI/CD infrastructure for the **SigmaOS Sovereign Lattice**.
@@ -31,6 +31,7 @@ The SigmaOS CI/CD pipeline is designed for absolute bit-perfect parity across he
 
 
 1
+<<<<<<< HEAD
 
 
 
@@ -39,6 +40,8 @@ The SigmaOS CI/CD pipeline is designed for absolute bit-perfect parity across he
 
 
 1
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 
 ---
@@ -50,6 +53,7 @@ The SigmaOS CI/CD pipeline is designed for absolute bit-perfect parity across he
 
 1
 
+<<<<<<< HEAD
 
 
 1
@@ -58,6 +62,8 @@ The SigmaOS CI/CD pipeline is designed for absolute bit-perfect parity across he
 
 1
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 ---
 

@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 Required Tools & Functions:

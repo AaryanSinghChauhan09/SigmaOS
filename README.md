@@ -1,8 +1,10 @@
+
 # 🧱 SigmaOS: The Sovereign Lattice
 
 SigmaOS is an industrialized, bare-metal operating system kernel built on a **600-Shard Modular Architecture**. It provides a clean, zero-dependency alternative to legacy monolithic kernels, prioritizing absolute digital sovereignty and AI-native automation.
 
 ---
+
 
 ## 🚀 Current Capabilities (v14.0)
 
@@ -14,12 +16,15 @@ SigmaOS has evolved from a conceptual kernel into a functional environment with 
 
 ---
 
+
 ## 🛠️ Build & Deployment
+
 
 ### Environment
 - **Toolchain**: `gcc-aarch64-none-elf` / `clang`
 - **Build System**: `make`
 - **Target Hardware**: Raspberry Pi 4/5, x86_64 UEFI
+
 
 ### Quick Start
 ```bash
@@ -28,6 +33,7 @@ make all            # Build the 600-shard core
 ```
 
 ---
+
 
 ## 🗺️ Architectural Terminology
 
@@ -40,6 +46,7 @@ make all            # Build the 600-shard core
 | **PQC-Attestation** | Post-Quantum Cryptographic verification of system integrity. |
 
 ---
+
 
 ## 🤝 Contributing
 We welcome contributions that align with our vision of sovereign computing. Please refer to our **[Contributing Guide](CONTRIBUTING.md)** and **[Security Policy](SECURITY.md)** for more details.

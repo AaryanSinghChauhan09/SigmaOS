@@ -1,19 +1,19 @@
-Ôªø1
+1
 
 
-This document frames why SigmaOS can feel ‚Äúbehind‚Äù established systems (Linux, BSD, commercial OSes) and how to close the gap without overstating what the repository currently proves. It complements `FEATURE_BACKLOG_100.md` and existing strategy docs in this folder.
+This document frames why SigmaOS can feel ìbehindî established systems (Linux, BSD, commercial OSes) and how to close the gap without overstating what the repository currently proves. It complements `FEATURE_BACKLOG_100.md` and existing strategy docs in this folder.
 
-**Observation:** Mature OS kernels ship production-grade memory management, scheduling, multi-filesystem support, and broad driver coverage. SigmaOS‚Äôs tree mixes exploratory kernel/userland code with demo UX (e.g. Zenith web shell); many subsystems are not yet provably equivalent to Linux/BSD in completeness or hardware coverage.
+**Observation:** Mature OS kernels ship production-grade memory management, scheduling, multi-filesystem support, and broad driver coverage. SigmaOSís tree mixes exploratory kernel/userland code with demo UX (e.g. Zenith web shell); many subsystems are not yet provably equivalent to Linux/BSD in completeness or hardware coverage.
 
 **Implication:** Prioritize demonstrable milestones: paging model, scheduler policy, one production-minded FS integration path, and a driver/model story (even if initially narrow).
 
-**Observation:** Enterprise-grade OS trust rests on access control (RBAC/MAC), sandboxing, signed updates, and verified boot paths. Marketing language (‚Äúsovereign,‚Äù ‚Äúquantum-safe‚Äù) must map to auditable mechanisms (tests, threat model, update signing).
+**Observation:** Enterprise-grade OS trust rests on access control (RBAC/MAC), sandboxing, signed updates, and verified boot paths. Marketing language (ìsovereign,î ìquantum-safeî) must map to auditable mechanisms (tests, threat model, update signing).
 
 **Implication:** A secure update pipeline and integrity story (measured boot or signed artifacts) matter before advanced crypto buzzwords.
 
 **Observation:** Competitors publish benchmarks, profiling workflows, and power strategies. Without repeatable benchmarks and profiling hooks, performance claims are hard to defend.
 
-**Implication:** Add benchmark harnesses and kernel/userland profiling early‚Äîeven if numbers start small.
+**Implication:** Add benchmark harnesses and kernel/userland profiling earlyóeven if numbers start small.
 
 **Observation:** Adoption follows packaging, docs, SDK clarity, and CI that contributors trust.
 
@@ -21,7 +21,7 @@ This document frames why SigmaOS can feel ‚Äúbehind‚Äù established systems (Linu
 
 **Observation:** Many users expect at least an optional GUI path. SigmaOS includes a Zenith web desktop demo; deeper parity means accessibility, i18n, session model, and installer/onboarding tied to real system behavior.
 
-**Implication:** Align UX milestones with what the kernel actually runs so demos don‚Äôt outrun reality.
+**Implication:** Align UX milestones with what the kernel actually runs so demos donít outrun reality.
 
 **Observation:** There is a naming coincidence with the *SigmaOS browser* (productivity-focused macOS app). Our SigmaOS is a **Cloud-Native Operating System** for high-performance distributed computing. It is built using a hybrid of C/C++ and Rust (with gVisor-inspired safety primitives) to manage distributed "procs" across clusters.
 
@@ -29,7 +29,7 @@ This document frames why SigmaOS can feel ‚Äúbehind‚Äù established systems (Linu
 
 **Observation:** Large ecosystems win on contributor onboarding, issue hygiene, and predictable releases.
 
-**Implication:** Good-first-issues, architecture docs, and release notes‚Äîeven quarterly‚Äîhelp bootstrap contributors.
+**Implication:** Good-first-issues, architecture docs, and release notesóeven quarterlyóhelp bootstrap contributors.
 
 SigmaOS is ambitious; closing the gap with incumbents means foundations first (core OS behavior, security/update integrity, developer ergonomics, measured UX), then advanced features from the 100-item backlog as dependencies allow.
 

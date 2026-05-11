@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 SigmaOS is not a fork of Linux. It is a ground-up, sovereign lattice built on bare-metal C++ and orchestrated by Python. However, we have absorbed the most successful paradigms from the greatest Linux distributions in history to create an uncompromising hybrid OS.

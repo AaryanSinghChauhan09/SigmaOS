@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 Welcome to SigmaOS. This guide provides practical steps for building, running, and deploying the Sovereign Silicon Entity on physical hardware or a virtual machine.

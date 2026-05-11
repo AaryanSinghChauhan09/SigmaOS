@@ -1,11 +1,25 @@
+<<<<<<< HEAD
+
 # 🤖 Autonomous Agents: The Intelligence Layer
+=======
+﻿1
+
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 SigmaOS replaces traditional background daemons and systemd services with **Autonomous Agents**. These agents are self-healing, goal-oriented shards that orchestrate the system based on the **Context Manager**.
 
+<<<<<<< HEAD
 ---
+=======
+
+1
+
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
+
 
 ## 🏛️ Agent Hierarchy
 
+<<<<<<< HEAD
 The agent ecosystem is modularized into specialized tiers:
 
 1. **Governance Agents**: Enforce security policies and resource quotas.
@@ -16,18 +30,23 @@ The agent ecosystem is modularized into specialized tiers:
 
 ---
 
+
 ## 🏗️ Design Patterns
+
 
 ### 1. Goal-Based Execution
 Agents are not just scripts; they are given "Intents" (e.g., "Minimize latency for gaming"). The agent then orchestrates kernel parameters, resource quotas, and background shards to achieve the goal.
 
+
 ### 2. Event-Driven Communication
 All agents communicate via the **Sovereign Event Bus**. This ensures loose coupling—an agent can be swapped or updated without affecting the rest of the lattice.
+
 
 ### 3. Self-Healing Watchdogs
 Each agent is monitored by a **Watchdog Shard**. If an agent crashes or consumes excessive resources, the watchdog restarts it and rolls back its state to the last known good configuration.
 
 ---
+
 
 ## 🛠️ Developer SDK
 
@@ -46,3 +65,35 @@ All agents must adhere to the **Capability-Gated Security** model and report sta
 
 ---
 *Autonomous agents: The brain of the Sovereign Lattice.*
+=======
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+Developers can add new agents by subclassing `AgentBase`. All agents must communicate exclusively via the `SovereignEventBus` or through the `ContextManager` to avoid hardcoded dependency coupling.
+
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f

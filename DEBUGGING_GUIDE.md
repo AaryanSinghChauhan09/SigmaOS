@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 Welcome to the SigmaOS debugging guide! Since SigmaOS targets bare-metal execution with a unique 600-shard modular architecture, standard debugging requires a slightly tailored approach.
@@ -26,10 +26,13 @@ Every shard should use the lightweight logging framework.
 
 1
 
+<<<<<<< HEAD
 
 
 1
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 We strictly enforce `clang-tidy` to catch C++ object lifecycle bugs and potential concurrency issues.
 

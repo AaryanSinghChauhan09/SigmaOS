@@ -1,7 +1,7 @@
-﻿1
+1
 
 
-SigmaOS ships hardware drivers as sovereign kernel shards — zero binary blobs, zero kernel-update breakage.
+SigmaOS ships hardware drivers as sovereign kernel shards � zero binary blobs, zero kernel-update breakage.
 
 
 1

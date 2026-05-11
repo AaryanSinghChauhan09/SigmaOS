@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 This document tracks the current stability of SigmaOS components, our strategy for isolating unstable code, and our zero-dependency initiative.
@@ -38,6 +38,7 @@ To ensure SigmaOS remains a high-assurance **Sovereign Lattice**, unstable compo
 
 1
 
+<<<<<<< HEAD
 
 
 1
@@ -46,3 +47,5 @@ To ensure SigmaOS remains a high-assurance **Sovereign Lattice**, unstable compo
 
 1
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f

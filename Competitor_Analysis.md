@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 | Feature / OS | SigmaOS | Fedora | Ubuntu | SteamOS | Clear Linux |
@@ -16,7 +16,10 @@
 
 1
 
+<<<<<<< HEAD
 
 
 1
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f

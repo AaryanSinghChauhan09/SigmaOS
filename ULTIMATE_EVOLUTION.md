@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 This master document outlines the complete vision for SigmaOS, integrating industrial automation, deep personalization, and advanced system management.
@@ -49,6 +49,7 @@ This master document outlines the complete vision for SigmaOS, integrating indus
 
 
 1
+<<<<<<< HEAD
 
 
 
@@ -73,6 +74,8 @@ This master document outlines the complete vision for SigmaOS, integrating indus
 
 
 1
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 
 ---

@@ -1,7 +1,3 @@
-﻿1
-
-
-
 1
 
 
@@ -15,6 +11,11 @@
 
 
 1
+
+
+
+1
+<<<<<<< HEAD
 
 
 
@@ -24,6 +25,11 @@
 make all
 
 
+=======
+
+make all
+
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 1
 
 
@@ -49,12 +55,18 @@ The `SHARDS.manifest` file lists all 600+ shard `.cpp` files compiled by the Mak
 
 1
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 -std=c++17 -ffreestanding -fno-exceptions -fno-rtti
 -nostdlib -nostdinc++ -Wall -Wextra -Wpedantic
 -I include -I include/core -I include/libc
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 1
 
 
@@ -68,10 +80,15 @@ The `SHARDS.manifest` file lists all 600+ shard `.cpp` files compiled by the Mak
 
 1
 
+<<<<<<< HEAD
 
 qemu-system-aarch64 -machine raspi4b -kernel sigma_os.elf -serial stdio
 
 
+=======
+qemu-system-aarch64 -machine raspi4b -kernel sigma_os.elf -serial stdio
+
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 1
 
 

@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 Complete API mapping for all Sovereign Singleton shards.
@@ -7,16 +7,77 @@ Complete API mapping for all Sovereign Singleton shards.
 1
 
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+=======
+
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 1
 
 
 Per-process syscall gating with bitmask precision.
+>>>>>>> 7759f274e222d74141c499a7b379a060016fe9a1
 
 
 1
 
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+=======
+
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 1
 
@@ -25,13 +86,54 @@ Hardware-level PQC key isolation.
 
 
 1
+<<<<<<< HEAD
+
+
+
+1
+
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
+
+>>>>>>> 7759f274e222d74141c499a7b379a060016fe9a1
+
+
+1
+
+
+<<<<<<< HEAD
+
+
+1
 
 
 
 1
 
 
+
+1
+
+=======
 UID/GID process identity with PQC attestation.
+>>>>>>> 7759f274e222d74141c499a7b379a060016fe9a1
+
+
+1
+<<<<<<< HEAD
+
+
+
+1
+
+
+
+1
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
+
+
+<<<<<<< HEAD
 
 
 1
@@ -44,18 +146,63 @@ UID/GID process identity with PQC attestation.
 
 1
 
+=======
 
+
+1
+
+
+>>>>>>> 7759f274e222d74141c499a7b379a060016fe9a1
+
+
+1
+
+
+<<<<<<< HEAD
+
+
+1
+
+
+
+1
+
+=======
 S-PKG: Sovereign App Bundle installer.
+>>>>>>> 7759f274e222d74141c499a7b379a060016fe9a1
+
+<<<<<<< HEAD
+
+1
+
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
+
+1
+
+
+<<<<<<< HEAD
 
 
 1
 
 
+
+1
+
+=======
  `bool spkg_remove(const char* name);`
+>>>>>>> 7759f274e222d74141c499a7b379a060016fe9a1
 
 
 1
 
+<<<<<<< HEAD
+
+1
+
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 Ring-0 cron replacement with macro recording.
 

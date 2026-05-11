@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 With Phase One complete, SigmaOS transitions from a hardware-accelerated, silicon-native singularity into a fully scaled Sovereign Ecosystem.
@@ -34,6 +34,7 @@ With Phase One complete, SigmaOS transitions from a hardware-accelerated, silico
 
 1
 
+<<<<<<< HEAD
 
 
 1
@@ -50,3 +51,5 @@ With Phase One complete, SigmaOS transitions from a hardware-accelerated, silico
 
 1
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f

@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 To ensure the security and integrity of the Sovereign Lattice, the SigmaOS community invites security researchers to participate in our formal **Bug Bounty Program**.
@@ -13,10 +13,13 @@ To ensure the security and integrity of the Sovereign Lattice, the SigmaOS commu
 
 
 1
+<<<<<<< HEAD
 
 
 
 1
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 
 Rewards are tiered based on severity as determined by the Sovereign Council:
@@ -28,12 +31,15 @@ Rewards are tiered based on severity as determined by the Sovereign Council:
 
 1
 
+<<<<<<< HEAD
 
 
 1
 
 
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 1. Submit reports privately via the GitHub "Security" tab or our encrypted mailing list.
 2. Provide a clear Proof of Concept (PoC).

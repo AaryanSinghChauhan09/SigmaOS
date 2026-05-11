@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 This document tracks the integration of high-fidelity, web-native desktop features inspired by [daedalOS](https://github.com/DustinBrett/daedalOS).

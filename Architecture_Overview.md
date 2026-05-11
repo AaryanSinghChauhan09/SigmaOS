@@ -1,4 +1,5 @@
-﻿1
+1
+<<<<<<< HEAD
 
 
 
@@ -9,6 +10,17 @@
 1
 
 
+=======
+
+
+
+1
+
+
+
+1
+
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 graph TD
     L1[Layer 1: Bare-Metal Silicon & TPM]
     L2[Layer 2: HAL & Quantum Watchdog]
@@ -25,7 +37,10 @@ graph TD
     L5 --> L6
     L6 --> L7
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 1
 
 

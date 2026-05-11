@@ -1,7 +1,7 @@
-﻿1
+1
 
 
-The SigmaOS AI Automation Stack is a specialized implementation inspired by **OpenClaw** ("The lobster way 🦞"), designed for secure, autonomous system orchestration.
+The SigmaOS AI Automation Stack is a specialized implementation inspired by **OpenClaw** ("The lobster way ??"), designed for secure, autonomous system orchestration.
 
 
 1
@@ -26,10 +26,13 @@ The entry point for multi-channel AI events.
 
 1
 
+<<<<<<< HEAD
 
 
 1
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 Manages the lifecycle of autonomous agents, including planning and tool dispatch.
 
@@ -61,10 +64,13 @@ Guarantees AI safety by executing all tools within unprivileged containers.
 
 
 1
+<<<<<<< HEAD
 
 
 
 1
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 
 ---

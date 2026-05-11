@@ -1,8 +1,16 @@
+<<<<<<< HEAD
+
 # ⚕️ Doctor Profile
+=======
+﻿1
+
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 The Doctor Profile is designed for HIPAA-compliant data handling, high-fidelity imaging, and real-time diagnostic assistance.
 
+<<<<<<< HEAD
 ---
+
 
 ## 🛠️ Integrated Shards
 - **PatientLattice**: Decentralized, encrypted patient record management.
@@ -12,6 +20,7 @@ The Doctor Profile is designed for HIPAA-compliant data handling, high-fidelity 
 
 ---
 
+
 ## 🎨 Zenith Configuration
 - **Theme**: Clinical White (High Contrast)
 - **Layout**: Diagnostic Dashboard (Vital Stats, Imaging, Records)
@@ -19,8 +28,38 @@ The Doctor Profile is designed for HIPAA-compliant data handling, high-fidelity 
 
 ---
 
+
 ## 🔒 Compliance & Integrity
 SigmaOS ensures 100% data residency and zero-leakage through the **Medical Sandbox**. All clinical decisions are logged in an immutable, PQC-signed audit trail.
 
 ---
 *Precision care, sovereign data.*
+=======
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+
+
+1
+
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f

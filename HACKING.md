@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 SigmaOS is an HTML/JS-based sovereign simulation.

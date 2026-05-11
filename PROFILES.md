@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 SigmaOS adopts a highly specialized, intent-driven OS model through its **Profession Profiles**. Instead of a generic desktop environment, the OS dynamically adapts its UI, underlying kernel policies, toolchain, and shortcuts based on the active profession profile.
@@ -12,6 +12,7 @@ The repository's `/profiles/` directory structure dictates the available configu
 
 1
 
+<<<<<<< HEAD
 
 
 1
@@ -20,6 +21,8 @@ The repository's `/profiles/` directory structure dictates the available configu
 
 1
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 Each directory contains:
 
@@ -81,6 +84,7 @@ Each directory contains:
 
 
 1
+<<<<<<< HEAD
 
 
 
@@ -111,6 +115,8 @@ Each directory contains:
 1
 
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 
 1. **Create a new folder** under `/profiles/` (e.g., `/profiles/architect/`).

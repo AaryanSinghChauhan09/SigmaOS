@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 This manifest outlines the 500 individual features and functional shards that define the SigmaOS ecosystem, categorized into 50 thematic clusters.
@@ -37,8 +37,11 @@ This manifest outlines the 500 individual features and functional shards that de
 
 1
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 1. **Vector-Only Compositor**: Perfect scaling from 4K to 16K.
 2. **Sub-Pixel Fluidity**: 240Hz+ refresh rate optimization.
@@ -66,8 +69,11 @@ This manifest outlines the 500 individual features and functional shards that de
 
 1
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 1. **Zero-Trust Networking Shard**: Per-packet session key encryption. [ACTIVE]
 2. **Mesh-Lattice Protocol**: P2P OS updates and shard sharing.
@@ -95,8 +101,11 @@ This manifest outlines the 500 individual features and functional shards that de
 
 1
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 1. **Infinite Snapshotting**: Sub-second OS state restoration.
 2. **DNA-Inspired Compression**: Ultra-high-density storage. [ACTIVE]
@@ -124,8 +133,11 @@ This manifest outlines the 500 individual features and functional shards that de
 
 1
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 1. **Integrated Lattice IDE**: Bare-metal editor within the shell.
 2. **Live Shard Debugger**: Runtime inspection of C++ singletons.
@@ -157,6 +169,7 @@ This manifest outlines the 500 individual features and functional shards that de
 
 1
 
+<<<<<<< HEAD
 
 
 1
@@ -173,3 +186,5 @@ This manifest outlines the 500 individual features and functional shards that de
 
 1
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f

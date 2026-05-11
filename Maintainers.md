@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 This document lists the primary maintainers and subsystem owners of the SigmaOS Sovereign Lattice.

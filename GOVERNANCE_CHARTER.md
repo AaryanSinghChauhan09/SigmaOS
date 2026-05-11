@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 To establish institutional trust and manage a scaling community of contributors, SigmaOS is adopting a transparent governance model inspired by the success of the Debian and Fedora projects.
@@ -24,6 +24,7 @@ The Sovereign Council is the steering committee responsible for the long-term vi
 
 1
 
+<<<<<<< HEAD
 
 
 1
@@ -32,6 +33,8 @@ The Sovereign Council is the steering committee responsible for the long-term vi
 
 1
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 SigmaOS enforces a strict [Code of Conduct](CODE_OF_CONDUCT.md). We prioritize inclusivity, technical excellence, and constructive feedback.
 

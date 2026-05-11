@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 
@@ -41,6 +41,7 @@ This document serves as the immutable single source of truth for the industrial-
 
 
 1
+<<<<<<< HEAD
 
 
 
@@ -57,6 +58,8 @@ This document serves as the immutable single source of truth for the industrial-
 
 
 1
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 
 ---

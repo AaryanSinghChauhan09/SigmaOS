@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 This document formalizes the architectural and philosophical principles governing the SigmaOS Sovereign Lattice.
@@ -16,10 +16,13 @@ Unlike monolithic procedural kernels, SigmaOS treats every system component as a
 
 1
 
+<<<<<<< HEAD
 
 
 1
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 Security is not an afterthought; it is the substrate.
 
@@ -30,10 +33,13 @@ Security is not an afterthought; it is the substrate.
 
 1
 
+<<<<<<< HEAD
 
 
 1
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 SigmaOS is not a local OS; it is a node in a global distributed lattice.
 
@@ -50,10 +56,13 @@ The interface should feel alive, adaptive, and futuristic.
 
 1
 
+<<<<<<< HEAD
 
 
 1
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 ---
 

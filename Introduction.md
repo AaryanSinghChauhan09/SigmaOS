@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 **SigmaOS** is the sovereign Linux competitor crusher.

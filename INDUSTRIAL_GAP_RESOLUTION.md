@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 This document outlines how SigmaOS has closed the functional and strategic gaps with established operating systems (Linux, BSD, commercial OSes).
@@ -40,6 +40,7 @@ SigmaOS has transitioned from a "personal desktop" narrative to a **"Distributed
 
 1
 
+<<<<<<< HEAD
 
 
 1
@@ -56,6 +57,8 @@ SigmaOS has transitioned from a "personal desktop" narrative to a **"Distributed
 
 1
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 ---
 

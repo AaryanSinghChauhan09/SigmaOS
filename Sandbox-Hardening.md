@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 This document outlines the security policies and hardening techniques applied to the SigmaOS Sovereign Sandbox.

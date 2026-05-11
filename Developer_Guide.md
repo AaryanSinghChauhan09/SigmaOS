@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 Welcome to the SigmaOS Sovereign Repository.

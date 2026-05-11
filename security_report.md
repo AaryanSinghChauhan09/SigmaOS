@@ -1,16 +1,16 @@
-﻿1
+1
 
 
 ---
 
-name: 🛡️ Security Vulnerability
+name: ??? Security Vulnerability
 about: Report a security vulnerability (use only for non-critical issues; for critical issues use SECURITY.md)
 title: "[SECURITY] "
 labels: ["security", "needs-triage"]
 assignees: AaryanSinghChauhan09
 ---
 
-> **⚠️ CRITICAL VULNERABILITIES**: For critical security issues, do NOT use this public template.
+> **?? CRITICAL VULNERABILITIES**: For critical security issues, do NOT use this public template.
 > Instead, email directly or use [GitHub Private Security Reporting](https://github.com/AaryanSinghChauhan09/SigmaOS/security/advisories/new).
 
 
@@ -38,6 +38,7 @@ assignees: AaryanSinghChauhan09
 
 1
 
+<<<<<<< HEAD
 
 
 1
@@ -50,6 +51,8 @@ assignees: AaryanSinghChauhan09
 
 1
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 <!-- Only include steps that do not expose a working exploit -->
 

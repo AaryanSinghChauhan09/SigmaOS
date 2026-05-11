@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 SigmaOS provides an unparalleled level of system-level customization through its **Zenith Persona** and **Morphic Dashboard** shards.
@@ -14,10 +14,13 @@ User profiles are not just accounts; they are complete system states.
 
 1
 
+<<<<<<< HEAD
 
 
 1
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 ---
 
@@ -30,10 +33,13 @@ The **Dashboard Generator** shard rasterizes SVG widgets directly into VRAM for 
 
 1
 
+<<<<<<< HEAD
 
 
 1
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 ---
 
@@ -46,10 +52,13 @@ The Omni-Shell provides several features to improve the user experience:
 
 1
 
+<<<<<<< HEAD
 
 
 1
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 ---
 

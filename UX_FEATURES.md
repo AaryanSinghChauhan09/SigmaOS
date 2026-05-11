@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 Complete guide to SigmaOS's sovereign UI/UX interaction systems.
@@ -14,8 +14,8 @@ Ring-0 hardware-accelerated multi-touch gesture engine:
 
 
 gesture_init();
-gesture_process_touch(3, 0, 80);  // 3-finger swipe down → Zenith Dashboard
-gesture_process_touch(4, 60, 0);  // 4-finger swipe right → Switch workspace
+gesture_process_touch(3, 0, 80);  // 3-finger swipe down ? Zenith Dashboard
+gesture_process_touch(4, 60, 0);  // 4-finger swipe right ? Switch workspace
 
 
 1
@@ -149,8 +149,8 @@ Automatic ambient light-driven theme switching:
 
 
 theme_init();
-theme_update_ambient(20);   // < 50 lux → Dark Mode + Glow Effects
-theme_update_ambient(800);  // > 50 lux → Light Mode + Anti-Glare
+theme_update_ambient(20);   // < 50 lux ? Dark Mode + Glow Effects
+theme_update_ambient(800);  // > 50 lux ? Light Mode + Anti-Glare
 
 
 1

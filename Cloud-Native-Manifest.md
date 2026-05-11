@@ -1,4 +1,4 @@
-﻿1
+1
 
 
 SigmaOS is a **Cloud-Native Operating System** designed for high-performance distributed computing. It manages distributed "procs" (processes) across machine clusters with absolute technical sovereignty.
@@ -46,7 +46,10 @@ Focus is placed on "Lattice-level" resource management, treating distributed mac
 
 1
 
+<<<<<<< HEAD
 
 
 1
 
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
