@@ -85,6 +85,8 @@ kernel/core/ui/SovereignSnap.cpp
 kernel/core/ui/SovereignViz.cpp
 kernel/core/ui/SovereignAccess.cpp
 tools/sigma-cli.cpp
+tools/sigma-debug.cpp
+tools/sigma-fix.cpp
 tools/sigma-pkg.sh
 iso_root/installer/install.sh
 ecosystem/packager/sigma-pkg.sh
@@ -102,6 +104,7 @@ kernel/core/industrial/SovereignAcademic.cpp
 kernel/core/industrial/SovereignGov.cpp
 kernel/core/industrial/SovereignProSuite.cpp
 kernel/core/industrial/SovereignDataMatrix.cpp
+kernel/core/industrial/SovereignSheet.cpp
 kernel/core/industrial/SovereignCommerce.cpp
 kernel/core/industrial/SovereignProvenance.cpp
 kernel/core/industrial/SovereignDesign.cpp
