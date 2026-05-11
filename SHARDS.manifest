@@ -108,6 +108,8 @@ kernel/shards/gov/SovereignGov.cpp
 kernel/shards/prosuite/SovereignProSuite.cpp
 kernel/shards/enterprise/SovereignHR.cpp
 kernel/shards/enterprise/SovereignLogistics.cpp
+kernel/shards/industrial/SovereignTwin.cpp
+kernel/shards/finance/SovereignAccountant.cpp
 kernel/shards/data-warehousing/SovereignWarehouse.cpp
 kernel/shards/data-mining/SovereignMiner.cpp
 kernel/shards/orchestration/SovereignContainerOrchestrator.cpp
