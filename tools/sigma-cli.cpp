@@ -24,6 +24,8 @@ void print_help() {
     sigma_log_info("  airgap-off     - Disengage air-gap and restore NICs");
     sigma_log_info("  sql <query>    - Run bare-metal DataMatrix query");
     sigma_log_info("  cert <hash>    - Certify legal document hash");
+    sigma_log_info("  search-astar   - Run A* search simulation");
+    sigma_log_info("  pos-transact   - Process a POS transaction");
 }
 
 int main(int argc, char** argv) {
@@ -63,6 +65,10 @@ int main(int argc, char** argv) {
     } else if (sigma_strcmp(cmd, "cert") == 0) {
         if (argc < 3) return -1;
         pro_suite_certify_doc(argv[2]);
+    } else if (sigma_strcmp(cmd, "search-astar") == 0) {
+        search_sim_run_astar(SIGMA_NULL);
+    } else if (sigma_strcmp(cmd, "pos-transact") == 0) {
+        commerce_transact(1, "ITEM-001");
     } else {
         sigma_log_err("Unknown command: %s", cmd);
     }
