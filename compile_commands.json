@@ -1,4 +1,4 @@
-﻿[
+[
     {
         "directory": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
         "file": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\kernel\\core\\ai\\SovereignNeural.cpp",
@@ -13,9 +13,7 @@
         "directory": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
         "file": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\kernel\\core\\industrial\\SovereignDigitalTwin.cpp",
         "command": "g++ -std=c++17 -ffreestanding -I./include -I./kernel/core/include -c kernel/core/industrial/SovereignDigitalTwin.cpp"
-    }
-]
-,
+    },
     {
         "directory": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
         "file": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\kernel\\core\\hal\\SovereignEntropy.cpp",
@@ -25,9 +23,7 @@
         "directory": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
         "file": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\kernel\\core\\ipc\\SovereignBridge.cpp",
         "command": "g++ -std=c++17 -ffreestanding -I./include -I./kernel/core/include -c kernel/core/ipc/SovereignBridge.cpp"
-    }
-]
-,
+    },
     {
         "directory": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
         "file": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\kernel\\core\\deployment\\SovereignPackageGraph.cpp",
@@ -36,13 +32,26 @@
     {
         "directory": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
         "file": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\zenith\\trust_graph.c",
-        "command": "gcc -Imodules/core/include -I. -ffreestanding -nostdlib -c modules/ui/zenith/trust_graph.c"
-    }
-]
-,
+        "command": "gcc -I./include -I. -ffreestanding -nostdlib -c modules/ui/zenith/trust_graph.c"
+    },
     {
         "directory": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
         "file": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\kernel\\core\\system\\SovereignProfiles.cpp",
         "command": "g++ -std=c++17 -ffreestanding -I./include -I./kernel/core/include -c kernel/core/system/SovereignProfiles.cpp"
+    },
+    {
+        "directory": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\kernel\\core\\system\\SovereignSelfHealing.cpp",
+        "command": "g++ -std=c++17 -ffreestanding -I./include -I./kernel/core/include -c kernel/core/system/SovereignSelfHealing.cpp"
+    },
+    {
+        "directory": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\kernel\\core\\security\\SovereignPQC.cpp",
+        "command": "g++ -std=c++17 -ffreestanding -I./include -I./kernel/core/include -c kernel/core/security/SovereignPQC.cpp"
+    },
+    {
+        "directory": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS",
+        "file": "C:\\Users\\Aaryan\\.gemini\\antigravity\\scratch\\SigmaOS\\modules\\ui\\zenith\\zenith_compositor.c",
+        "command": "gcc -I./include -I. -ffreestanding -nostdlib -c modules/ui/zenith/zenith_compositor.c"
     }
 ]
