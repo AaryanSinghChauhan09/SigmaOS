@@ -138,49 +138,49 @@ const professions = [
         rollback: 'Planetary state snapshots, bio-injection phase rollback'
     },
     {
-        name: 'erp_consultant',
-        tools: 'Odoo-Lattice, SAP-Sovereign-Bridge, business process modeler, ERP-migration-nexus, module-optimizer',
-        rules: 'Business logic standards, ERP-best-practices, compliance-frameworks',
-        calculators: 'TCO (Total Cost of Ownership), ROI-estimator, process-latency-calc',
-        algorithms: 'Automated workflow mapping, database schema normalization, inventory-prediction',
-        self_healing: 'ERP-database consistency check, module-dependency validation',
-        rollback: 'ERP-state snapshots, transactional-history restoration'
+        name: 'particle_physicist',
+        tools: 'CERN-Lattice-link, collider-event analyzer, Higgs-boson-search-nexus, muon-chamber monitor',
+        rules: 'Open-science protocols, high-energy safety standards',
+        calculators: 'Energy-to-mass delta, collision-luminosity, decay-width',
+        algorithms: 'Automated track reconstruction, dark-matter candidate search',
+        self_healing: 'Sensor-lattice calibration, data-stream consistency check',
+        rollback: 'Experiment-state snapshots, baseline-simulation restoration'
     },
     {
-        name: 'chartered_accountant',
-        tools: 'Tally-Lattice, GST-Nexus, Income Tax Auditor, balance-sheet-lattice, audit-trail-engine',
-        rules: 'ICAI standards, Income Tax Act, GST laws, Companies Act',
-        calculators: 'Tax-liability, TDS-estimator, capital-gains-calc, depreciation-lattice',
-        algorithms: 'Anomaly detection in ledgers, tax-optimization modeling, automated-audit-sampling',
-        self_healing: 'Tally-data-integrity scan, GST-reconciliation verification',
-        rollback: 'Fiscal-year snapshots, historical ledger restoration'
+        name: 'submarine_navigator',
+        tools: 'SONAR-Lattice, pressure-hull monitor, bathymetric-map-engine, silent-running-nexus',
+        rules: 'Maritime law, deep-sea exploration protocols',
+        calculators: 'Buoyancy-delta, acoustic-range, pressure-limit-calc',
+        algorithms: 'Sub-surface obstacle avoidance, passive sonar triangulation',
+        self_healing: 'Acoustic-link verification, hull-sensor-integrity scan',
+        rollback: 'Dive-log snapshots, ballast-configuration restoration'
     },
     {
-        name: 'crm_administrator',
-        tools: 'Salesforce-Lattice, HubSpot-Bridge, lead-scoring-engine, customer-journey-mapper',
-        rules: 'GDPR, CCPA, CRM data-privacy standards',
-        calculators: 'CLV (Customer Lifetime Value), churn-rate, conversion-delta',
-        algorithms: 'Lead prioritization modeling, automated-marketing-pathing',
-        self_healing: 'Lead-data consistency check, automation-workflow validation',
-        rollback: 'Customer-record snapshots, marketing-campaign rollback'
+        name: 'smart_materials_engineer',
+        tools: 'Nano-lattice modeler, shape-memory-alloy simulator, self-healing-polymer monitor',
+        rules: 'Material safety standards, nano-tech regulations',
+        calculators: 'Young\'s modulus delta, phase-transition temp, molecular-strain',
+        algorithms: 'Generative material design, micro-structure simulation',
+        self_healing: 'Material-property-sync, molecular-model validation',
+        rollback: 'Material-iteration snapshots, chemical-baseline restoration'
     },
     {
-        name: 'ecommerce_developer',
-        tools: 'Shopify-Lattice, Magento-Sovereign-Core, inventory-sync-nexus, payment-gateway-bridge',
-        rules: 'PCI-DSS, e-commerce consumer laws',
-        calculators: 'AOV (Average Order Value), cart-abandonment rate, shipping-cost-delta',
-        algorithms: 'Inventory-replenishment prediction, personalized-recommendation engine',
-        self_healing: 'Inventory-sync verification, payment-link validation',
-        rollback: 'Store-state snapshots, order-history restoration'
+        name: 'hyperloop_operator',
+        tools: 'Vacuum-tube monitor, maglev-alignment-nexus, pod-telemetry-mesh, capsule-life-support',
+        rules: 'High-speed transit safety protocols',
+        calculators: 'G-force delta, braking-distance, pod-spacing-minima',
+        algorithms: 'Pod-dispatch optimization, vacuum-pressure regulation',
+        self_healing: 'Track-alignment verification, pod-telemetry-sync',
+        rollback: 'Transit-state snapshots, pod-dispatch-baseline restoration'
     },
     {
-        name: 'digital_marketer',
-        tools: 'SERP-Lattice, SEM-Analyzer, crawl-budget-optimizer, backlink-auditor, conversion-pixel-nexus',
-        rules: 'Search engine guidelines, advertising ethics',
-        calculators: 'CPC/CPM, ROAS, keyword-density, domain-authority-score',
-        algorithms: 'Keyword-ranking prediction, automated-bidding optimization',
-        self_healing: 'Pixel-tracking verification, backlink-integrity scan',
-        rollback: 'SEO-state snapshots, campaign-history restoration'
+        name: 'foley_artist',
+        tools: 'Sound-lattice, spectral-layering-engine, Foley-prop-index, real-time-resynthesizer',
+        rules: 'Audio post-production standards',
+        calculators: 'Sample-rate delta, reverb-tail-calc, sync-offset',
+        algorithms: 'Automated footstep matching, textural sound synthesis',
+        self_healing: 'Audio-buffer consistency, Prop-Lattice sync',
+        rollback: 'Mix-state snapshots, sound-design-history restoration'
     }
 ];
 
@@ -215,7 +215,10 @@ const additionalProfessions = [
     'Xeno-Biologist', 'Prosthetics Engineer', 'Cyber-Insurance Underwriter', 'OSINT Investigator',
     'Underwater Architect', 'Master Sommelier', 'Yacht Designer', 'Private Island Manager',
     'Computational Linguist', 'Cultural Heritage Guardian', 'Odoo Developer', 'Tally Operator', 'SAP Consultant',
-    'Salesforce Developer', 'Shopify Expert', 'E-commerce Manager'
+    'Salesforce Developer', 'Shopify Expert', 'E-commerce Manager',
+    'Seismologist', 'Tunneling Expert', 'Urban Agriculture Designer', 'Myrologist', 'Astrobiologist',
+    'Colorist', 'Calligrapher', 'Signal Jammer', 'EOD Technician', 'Hyperloop Operator',
+    'Maglev Engineer', 'Vexillologist', 'Numismatist', 'Particle Physicist'
 ];
 
 additionalProfessions.forEach(name => {
