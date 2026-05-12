@@ -17,7 +17,9 @@ SigmaOS takes security and sovereign integrity seriously. If you discover a vuln
 Please do not open a public issue. We will respond within 24 hours to coordinate a coordinated disclosure and provide an atomic rollback/patch for all industrial silicon nodes.
 
 ## Security Lattice Architecture
+
 SigmaOS uses **Post-Quantum Cryptography (PQC)** by default. All system-level shards are verified using CRYSTALS-Kyber and CRYSTALS-Dilithium.
 
 ---
-*Stay Sovereign.*
+
+### Stay Sovereign.

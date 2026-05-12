@@ -16,19 +16,25 @@ SigmaOS is the world's first **Industrial-Grade, Profession-Aware Operating Syst
 ## 🛠 Quick Start
 
 ### Prerequisites
+
 - LLVM / Clang (C++20 compliant)
 - QEMU (for emulation)
 - Node.js (for manifest generation)
 
 ### Build Instructions
+
 ```bash
+
 # Generate professional profiles
+
 node populate_profiles.cjs
 
 # Compile the Sovereign Kernel
+
 make all
 
 # Boot in QEMU
+
 make run
 ```
 See [BUILD.md](BUILD.md) for detailed hardware deployment guides.
@@ -47,9 +53,11 @@ We welcome contributions from the industrial and open-source communities. Please
 ## 🔒 Security & Reliability
 
 SigmaOS is designed for absolute reliability.
+
 - **Memory Safety**: Strict adherence to `SigmaOOP` patterns and zero-allocation kernel primitives.
 - **Self-Healing**: Autonomous `S-AUTO` shard for real-time fault detection and atomic rollback.
 - **Sandboxing**: `S-WASM` runtime for isolated professional tool execution.
 
 ---
-*SigmaOS: Sovereignty over your workspace.*
+
+### SigmaOS: Sovereignty over your workspace.

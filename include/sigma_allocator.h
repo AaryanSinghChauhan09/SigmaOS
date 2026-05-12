@@ -27,6 +27,10 @@ void allocator_defrag(void);
 
 #define SIGMA_HEAP_SIZE (1024u * 1024u * 16u) /* 16MB Heap */
 
+namespace SigmaOS {
+namespace Kernel {
+namespace Memory {
+
 class SovereignAllocatorEngine {
 public:
     static SovereignAllocatorEngine& getInstance() {
@@ -37,6 +41,8 @@ public:
     void init();
     void* malloc(sigma_u32 size);
     void free(void* ptr);
+    void compact();
+    void garbageCollect();
 
 private:
     SovereignAllocatorEngine() : heap_offset(0) {}
@@ -44,6 +50,10 @@ private:
     sigma_u8  heap[SIGMA_HEAP_SIZE];
     sigma_u32 heap_offset;
 };
+
+} // namespace Memory
+} // namespace Kernel
+} // namespace SigmaOS
 #endif
 
 #endif /* SIGMA_ALLOCATOR_H */

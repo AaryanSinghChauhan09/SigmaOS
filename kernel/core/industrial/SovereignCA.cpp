@@ -22,19 +22,19 @@ static const sigma_u32 GST_SLAB_28 = 280;  // 28%
 
 // TDS rates per Section (per-mille)
 struct TDSRate {
-    sigma_u32 section;
+    const char* section;
     sigma_u32 rate_permille; // e.g. 100 = 10%
     const char* description;
 };
 
 static const TDSRate TDS_TABLE[] = {
-    {192,  100, "Salary"},
-    {194,   10, "Dividend"},
-    {194A,  100, "Interest (other than securities)"},
-    {194B,  300, "Lottery / Crossword winnings"},
-    {194C,   10, "Contractor / Sub-contractor"},
-    {194J,  100, "Professional / Technical services"},
-    {194I,  100, "Rent (land/building)"},
+    {"192",  100, "Salary"},
+    {"194",   10, "Dividend"},
+    {"194A", 100, "Interest (other than securities)"},
+    {"194B", 300, "Lottery / Crossword winnings"},
+    {"194C",  10, "Contractor / Sub-contractor"},
+    {"194J", 100, "Professional / Technical services"},
+    {"194I", 100, "Rent (land/building)"},
 };
 static const sigma_u32 TDS_TABLE_LEN = sizeof(TDS_TABLE) / sizeof(TDS_TABLE[0]);
 
@@ -52,6 +52,9 @@ public:
     void init() {
         sigma_log_info("[S-CA] Initializing Indian Chartered Accountant Nexus...");
         sigma_log_info("[S-CA] Standards: Income Tax Act 1961 | GST 2017 | Companies Act 2013");
+        // Log supported GST slabs to ensure constants are 'used' and user is informed
+        sigma_log_info("[S-CA] Supported GST Slabs (per-mille): %u, %u, %u, %u, %u",
+                       GST_EXEMPT, GST_SLAB_5, GST_SLAB_12, GST_SLAB_18, GST_SLAB_28);
     }
 
     /**
@@ -82,22 +85,30 @@ public:
      * Compute TDS amount for a given section and payment.
      * Also checks ₹50,000 threshold (Section 194C) and prints PAN warning if needed.
      */
-    void calcTDS(sigma_u32 section_code, sigma_u64 payment_paise, bool has_pan) {
+    void calcTDS(const char* section_code, sigma_u64 payment_paise, bool has_pan) {
         for (sigma_u32 i = 0; i < TDS_TABLE_LEN; ++i) {
-            if (TDS_TABLE[i].section == section_code) {
+            // Simple string comparison logic
+            bool match = true;
+            for (sigma_u32 j = 0; TDS_TABLE[i].section[j] || section_code[j]; ++j) {
+                if (TDS_TABLE[i].section[j] != section_code[j]) {
+                    match = false;
+                    break;
+                }
+            }
+            if (match) {
                 sigma_u32 rate = has_pan ? TDS_TABLE[i].rate_permille : TDS_TABLE[i].rate_permille * 2;
                 if (!has_pan) {
                     sigma_log_info("[S-CA] ⚠️  No PAN — TDS rate doubled per Section 206AA.");
                 }
                 sigma_u64 tds = (payment_paise * rate) / 1000ULL;
-                sigma_log_info("[S-CA] TDS u/s %u (%s): ₹%llu.%02llu on payment ₹%llu.%02llu",
+                sigma_log_info("[S-CA] TDS u/s %s (%s): ₹%llu.%02llu on payment ₹%llu.%02llu",
                                section_code, TDS_TABLE[i].description,
                                tds/100, tds%100,
                                payment_paise/100, payment_paise%100);
                 return;
             }
         }
-        sigma_log_err("[S-CA] TDS section %u not found in table.", section_code);
+        sigma_log_err("[S-CA] TDS section %s not found in table.", section_code);
     }
 
     /**
@@ -139,7 +150,7 @@ void ca_gst(sigma_u64 base_paise, sigma_u32 slab, bool interstate) {
     SigmaOS::Kernel::Finance::SovereignCA::getInstance().calcGST(base_paise, slab, interstate);
 }
 
-void ca_tds(sigma_u32 section, sigma_u64 payment_paise, bool has_pan) {
+void ca_tds(const char* section, sigma_u64 payment_paise, bool has_pan) {
     SigmaOS::Kernel::Finance::SovereignCA::getInstance().calcTDS(section, payment_paise, has_pan);
 }
 

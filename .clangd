@@ -4,13 +4,21 @@ CompileFlags:
     - -I./kernel/core/include
     - -I.
     - -ffreestanding
-    - -std=c++17
-    - -fno-exceptions
-    - -fno-rtti
+    - -fno-stack-protector
     - -Wall
     - -Wextra
   Remove:
     - -mno-red-zone
+
+If:
+  PathMatch: .*\.cpp
+CompileFlags:
+  Add: [-std=c++17, -fno-exceptions, -fno-rtti]
+
+If:
+  PathMatch: .*\.c
+CompileFlags:
+  Add: [-std=c11]
 
 Diagnostics:
   UnusedIncludes: None

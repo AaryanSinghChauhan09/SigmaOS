@@ -1,17 +1,6 @@
-<<<<<<< HEAD
-# compile_flags.txt
-# Tells clangd (the IDE language server) to add the root directory
-# to the include search path, so that #include "sigma_libc.h" resolves
-# correctly from all subdirectories.
--I.
--std=c99
--Wall
--Wextra
-=======
--std=c++11
--ISigmaOS-Repo/include
--Ikernel/core/include
--Iinclude
+-std=c++17
+-I./include
+-I./kernel/core/include
 -I.
 -m64
 -ffreestanding
@@ -19,4 +8,5 @@
 -nostdlib
 -fno-exceptions
 -fno-rtti
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645
+-Wall
+-Wextra

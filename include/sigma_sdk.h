@@ -57,6 +57,11 @@ void commerce_transact(sigma_u32 item_id, const char* sku);
 void forensics_scan(sigma_u32 sid);
 void eco_optimize(void);
 
+/* --- Package Management Bridging --- */
+void sigma_pkg_install(const char* id);
+void sigma_pkg_list(void);
+void sigma_pkg_sync(void);
+
 /* --- New Professional Tools (Zenith v14.0) --- */
 void vakil_search(const char* query);
 void vakil_certify(const char* hash);

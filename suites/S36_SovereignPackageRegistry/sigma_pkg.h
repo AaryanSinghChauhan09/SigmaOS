@@ -6,7 +6,8 @@
 #ifndef SIGMA_PKG_H
 #define SIGMA_PKG_H
 
-#include "sigma_caps.h"
+#include "../../kernel/core/include/core/sigma_types.h"
+#include "../S43_SovereignCaps/sigma_caps.h"
 
 #define SIGMA_PKG_MAX        128
 #define SIGMA_PKG_NAME_LEN   32
@@ -22,7 +23,7 @@ typedef enum SigmaPkgState {
 typedef struct SigmaPkg {
     char          name[SIGMA_PKG_NAME_LEN];
     char          version[SIGMA_PKG_VER_LEN];
-    unsigned long content_hash;   // FNV-1a of package content
+    sigma_u64     content_hash;   // FNV-1a of package content
     SigmaPkgState state;
     unsigned char requires_cap;   // SIGMA_CAP_* flags
 } SigmaPkg;
@@ -33,9 +34,9 @@ typedef struct SigmaPkgDB {
 } SigmaPkgDB;
 
 // FNV-1a hash (reused from journal)
-static inline unsigned long pkg_fnv1a(const unsigned char* d, unsigned long n) {
-    unsigned long h = 14695981039346656037UL, p = 1099511628211UL;
-    for (unsigned long i = 0; i < n; i++) { h ^= d[i]; h *= p; }
+static inline sigma_u64 pkg_fnv1a(const unsigned char* d, sigma_u64 n) {
+    sigma_u64 h = 14695981039346656037ULL, p = 1099511628211ULL;
+    for (sigma_u64 i = 0; i < n; i++) { h ^= d[i]; h *= p; }
     return h;
 }
 
@@ -43,7 +44,7 @@ static inline void pkgdb_init(SigmaPkgDB* db) { db->count = 0; }
 
 // Register a package into the DB
 static inline int pkg_register(SigmaPkgDB* db, const char* name,
-                                 const char* ver, unsigned long hash,
+                                 const char* ver, sigma_u64 hash,
                                  unsigned char cap_req) {
     if (db->count >= SIGMA_PKG_MAX) return -1;
     SigmaPkg* p = &db->packages[db->count++];
@@ -59,11 +60,11 @@ static inline int pkg_register(SigmaPkgDB* db, const char* name,
 // Install a package — verified by capability token
 static inline int pkg_install(SigmaPkgDB* db, unsigned int pkg_id,
                                 SigmaCapToken* tok,
-                                const unsigned char* data, unsigned long len) {
+                                const unsigned char* data, sigma_u64 len) {
     if (pkg_id >= db->count) return -1;
     SigmaPkg* p = &db->packages[pkg_id];
     if (!cap_check(tok, p->requires_cap)) return -2; // permission denied
-    unsigned long actual = pkg_fnv1a(data, len);
+    sigma_u64 actual = pkg_fnv1a(data, len);
     if (actual != p->content_hash) return -3; // integrity violation
     p->state = PKG_INSTALLED;
     return 0;

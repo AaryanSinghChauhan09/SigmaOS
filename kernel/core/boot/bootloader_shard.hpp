@@ -1,3 +1,4 @@
+#include "sigma_log.h"
 #include "hal/sigma_hal.h"
 #ifndef BOOTLOADER_SHARD_HPP
 #define BOOTLOADER_SHARD_HPP
@@ -23,9 +24,11 @@ private:
     sigma_u32 m_boot_status;
     sigma_u64 m_memory_map_addr;
 
+    bool detectUEFI();
+
 public:
     SovereignBootloader() : m_boot_status(0), m_memory_map_addr(0x1000) {
-        sigma_log("[BOOTLOADER]: Stage-1 Sovereign Ignition [READY].\n");
+        sigma_log_info("[BOOTLOADER]: Stage-1 Sovereign Ignition [READY].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignBootloader"; }

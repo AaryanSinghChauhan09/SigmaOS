@@ -1,7 +1,7 @@
+#include "../include/sigma_sdk.h"
 #include <iostream>
 #include <string>
 #include <vector>
-#include "sigma_sdk.h"
 
 /**
  * SigmaOS Package Manager CLI (sigma-pkg)

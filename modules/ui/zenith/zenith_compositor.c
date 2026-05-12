@@ -74,8 +74,6 @@ static sigma_u32 blend_colors(sigma_u32 fg, sigma_u32 bg, sigma_u8 alpha) {
     return (r << 16) | (g << 8) | b;
 }
 
-extern "C" {
-
 // Initialize the UI Compositor
 void zenith_init(sigma_u64 fb_phys_addr) {
     (void)fb_phys_addr;
@@ -154,7 +152,7 @@ sigma_u32 zenith_get_window_count(void) {
 }
 
 void zenith_reorder_windows(sigma_u32* order_array, sigma_u32 count) {
-    (void)order_array; (void)count;
+    (void)order_array;
     if (count > window_count) count = window_count;
     sigma_log_info("[ZENITH] Reordering windows for optimal Z-depth...");
     audit_chain_append(0, 1, "ZENITH_WINDOW_REORDER_COMPLETE");
@@ -170,5 +168,3 @@ void zenith_apply_blur(sigma_u32 x, sigma_u32 y, sigma_u32 w, sigma_u32 h) {
     sigma_log_info("[ZENITH] Applying Gaussian blur to region (%u, %u, %u, %u)...", x, y, w, h);
     sigma_log_info("[ZENITH] Blur applied SUCCESS.");
 }
-
-} // extern "C"

@@ -9,13 +9,13 @@ namespace Kernel {
 
 void SovereignBootloader::MapSiliconMemory() {
     if (this->detectUEFI()) {
-        sigma_log("[BOOTLOADER]: UEFI detected. Mapping High-Resolution Memory Map...");
+        sigma_log_info("[BOOTLOADER]: UEFI detected. Mapping High-Resolution Memory Map...");
         // Hit & Trial: Use UEFI GetMemoryMap services to populate the lattice
     } else {
-        sigma_log("[BOOTLOADER]: BIOS detected. Falling back to Legacy E820 Map.");
+        sigma_log_info("[BOOTLOADER]: BIOS detected. Falling back to Legacy E820 Map.");
     }
-    sigma_log("[BOOTLOADER]: Mapping Silicon Memory Shards (Address Space: 0x%llx)...\n", m_memory_map_addr);
-    sigma_log("[BOOTLOADER]: Lattice Memory Layout established (64-bit Flat Nexus).\n");
+    sigma_log_info("[BOOTLOADER]: Mapping Silicon Memory Shards (Address Space: 0x%llx)...\n", m_memory_map_addr);
+    sigma_log_info("[BOOTLOADER]: Lattice Memory Layout established (64-bit Flat Nexus).\n");
     m_boot_status |= 0x01;
 }
 
@@ -25,24 +25,24 @@ bool SovereignBootloader::detectUEFI() {
 }
 
 void SovereignBootloader::VerifyCoreIntegrity() {
-    sigma_log("[BOOTLOADER]: Performing Lattice-PQC Signature Verification on Core Shards...\n");
-    sigma_log("[BOOTLOADER]: Integrity Verified. No Tampering Detected.\n");
+    sigma_log_info("[BOOTLOADER]: Performing Lattice-PQC Signature Verification on Core Shards...\n");
+    sigma_log_info("[BOOTLOADER]: Integrity Verified. No Tampering Detected.\n");
     m_boot_status |= 0x02;
 }
 
 void SovereignBootloader::JumpToLattice() {
     if (m_boot_status == 0x03) {
-        sigma_log("[BOOTLOADER]: Handing over control to Sovereign Shard Orchestrator...\n");
-        sigma_log("[BOOTLOADER]: ASCENDING TO SOVEREIGNTY.\n");
+        sigma_log_info("[BOOTLOADER]: Handing over control to Sovereign Shard Orchestrator...\n");
+        sigma_log_info("[BOOTLOADER]: ASCENDING TO SOVEREIGNTY.\n");
     }
 }
 
 void SovereignBootloader::Audit() {
-    sigma_log("\n--- S SOVEREIGN BOOTLOADER AUDIT ---\n");
-    sigma_log("| Boot Status       : %x (Success)\n", m_boot_status);
-    sigma_log("| Memory Map Address: %llx\n", m_memory_map_addr);
-    sigma_log("| Stage             : SILICON-READY\n");
-    sigma_log("------------------------------------\n");
+    sigma_log_info("\n--- S SOVEREIGN BOOTLOADER AUDIT ---\n");
+    sigma_log_info("| Boot Status       : %x (Success)\n", m_boot_status);
+    sigma_log_info("| Memory Map Address: %llx\n", m_memory_map_addr);
+    sigma_log_info("| Stage             : SILICON-READY\n");
+    sigma_log_info("------------------------------------\n");
 }
 
 } // namespace Kernel
