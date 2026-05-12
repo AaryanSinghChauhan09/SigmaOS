@@ -19,11 +19,10 @@ All notable changes to **SigmaOS** will be documented in this file.
 - **S-FIRE**: Industrial firewall with nftables-parity.
 - **S-LUKS**: Volume encryption for data-at-rest protection.
 - **S-PROTON**: Compatibility bridge for mainstream Linux/Windows applications.
-- **S-MIND**: Integrated Sovereign Mind Map tool (industrial alternative to Nicemind) into the Zenith Environment.
-- **S-BACKUP**: Atomic system snapshots and PQC-attested recovery.
-- **S-CONTAINER**: OCI-compliant container runtime (Docker-parity).
-- **S-SSH**: Secure remote administration lattice.
 - **S-LOG**: Structured industrial journaling (Journald-parity).
+- **S-ALLOC**: High-performance 16MB bump-pointer allocator for bare-metal memory orchestration.
+- **S-CRC32**: Industrial-grade checksumming for shard-state verification and CSS recovery.
+- **S-MIND**: Sovereign Lattice Mapper for interactive shard topology auditing.
 
 ### 🔧 Fixed
 - **Architectural Normalization**: Unified kernel types and eliminated high-level language dependencies across 600 shards.
