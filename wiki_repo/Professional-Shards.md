@@ -46,3 +46,18 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 - **Primary Tool**: Peer-Review Mesh.
 - **Security**: Knowledge-Graph integrity verification.
 - **Resilience**: Decentralized research sharding.
+
+## 🏛️ S-GOV: Government & Policy Shard
+- **Primary Tool**: PQC-Encrypted Voting Lattice.
+- **Security**: Transparent budget auditing mesh.
+- **Resilience**: Policy-state reconciliation.
+
+## ⚙️ S-ENGINEER: Industrial Engineering Shard
+- **Primary Tool**: Real-time Stress-Analysis Nexus.
+- **Security**: PQC-signed design blueprints.
+- **Resilience**: PLM-lattice failover.
+
+## 🧬 S-BIO: Biotechnology & Genetics Shard
+- **Primary Tool**: Genomic Sequencing Lattice.
+- **Security**: PQC-encrypted bio-silos.
+- **Resilience**: Real-time protein-folding simulation.
