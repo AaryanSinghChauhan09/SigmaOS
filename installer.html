@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SigmaOS | Sovereign Installer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .installer-container {
+            max-width: 1000px;
+            margin: 50px auto;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            display: flex;
+            height: 600px;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+        .sidebar {
+            width: 250px;
+            background: rgba(0,0,0,0.3);
+            border-right: 1px solid var(--glass-border);
+            padding: 40px 20px;
+        }
+        .sidebar-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            color: #888;
+            font-weight: 700;
+        }
+        .sidebar-item.active {
+            color: var(--accent);
+            background: rgba(0, 242, 255, 0.05);
+            border-left: 4px solid var(--accent);
+        }
+        .content {
+            flex: 1;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .partition-map {
+            height: 100px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            gap: 5px;
+        }
+        .partition {
+            height: 60px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: #000;
+            font-weight: 700;
+        }
+        .partition.system { background: var(--accent); width: 60%; }
+        .partition.home { background: var(--accent-glow); width: 30%; }
+        .partition.swap { background: #555; width: 10%; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="installer-container">
+        <div class="sidebar">
+            <div class="sidebar-item">Welcome</div>
+            <div class="sidebar-item">Location</div>
+            <div class="sidebar-item">Keyboard</div>
+            <div class="sidebar-item active">Partitions</div>
+            <div class="sidebar-item">Users</div>
+            <div class="sidebar-item">Summary</div>
+            <div class="sidebar-item">Install</div>
+        </div>
+        <div class="content">
+            <div>
+                <h2>Guided Partitioning</h2>
+                <p>Select how you want to decant SigmaOS onto your silicon.</p>
+                <div class="partition-map">
+                    <div class="partition system">SIGMA_SYS (ext4)</div>
+                    <div class="partition home">SIGMA_HOME</div>
+                    <div class="partition swap">SWAP</div>
+                </div>
+                <div class="hero-actions" style="justify-content: flex-start; margin-top: 30px;">
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input type="radio" name="mode" checked> Erase disk and install SigmaOS
+                    </label>
+                    <label style="display: block;">
+                        <input type="radio" name="mode"> Install alongside Windows (Dual-boot)
+                    </label>
+                </div>
+            </div>
+            <div class="hero-actions" style="justify-content: flex-end;">
+                <a href="index.html" class="btn btn-secondary">Cancel</a>
+                <a href="#" class="btn btn-primary">Next ❯</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

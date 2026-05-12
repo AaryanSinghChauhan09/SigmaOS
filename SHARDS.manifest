@@ -33,6 +33,7 @@ kernel/core/security/SovereignMAC.cpp
 kernel/core/system/SovereignFS.cpp
 kernel/core/deployment/SovereignPackageGraph.cpp
 kernel/core/system/SovereignNet.cpp
+kernel/core/network/SovereignSSH.cpp
 kernel/core/system/SovereignProfiles.cpp
 kernel/core/system/SovereignRollbackShard.cpp
 kernel/core/system/SovereignIPC.cpp

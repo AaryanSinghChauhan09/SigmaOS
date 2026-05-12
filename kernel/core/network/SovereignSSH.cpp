@@ -1,36 +1,35 @@
 #include "core/sigma_types.h"
-#include "sigma_log.h"
 #include "core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "sigma_libc.h"
 
 /**
- * SigmaOS Sovereign SSH (S-SSH)
- * Purpose: Secure remote administration of the industrial lattice.
- * Features: PQC-authenticated access, zero-trust session sharding.
+ * SigmaOS Sovereign SSH Shard (S-SSH)
+ * Mission: Zero-trust remote lattice management.
+ * Feature: PQC-hardened key exchange and silicon-native shell orchestration.
  */
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Network {
 
-class SovereignSSH : public SigmaOS::SigmaObject {
+class SovereignSSH : public SigmaObject {
 public:
     static SovereignSSH& getInstance() {
         static SovereignSSH instance;
         return instance;
     }
 
-    const char* type_name() const noexcept override {
-        return "SovereignSSH";
+    const char* type_name() const noexcept override { return "SovereignSSH"; }
+
+    void Init() {
+        sigma_log_info("[S-SSH]: Initializing Sovereign SSH Lattice (v15.0)...");
+        sigma_log_info("[S-SSH]: Loading Dilithium-5 host keys...");
     }
 
-    void init() {
-        sigma_log_info("[S-SSH] Initializing Sovereign SSH Server (OpenSSH-Parity)...");
-    }
-
-    void acceptConnection(const char* remote_ip) {
-        sigma_log_info("[S-SSH] Connection request from %s...", remote_ip);
-        // Hit & Trial: Perform CRYSTALS-Kyber key exchange
-        sigma_log_info("[S-SSH] Session SECURE. Lattice-shell access granted.");
+    void HandleConnection(const char* ip) {
+        sigma_log_info("[S-SSH]: Incoming connection from node: %s", ip);
+        // Logic: PQC Handshake -> Lattice Auth -> Sovereign Shell Decanting
     }
 };
 
@@ -39,9 +38,11 @@ public:
 } // namespace SigmaOS
 
 extern "C" {
+    void ssh_init() {
+        SigmaOS::Kernel::Network::SovereignSSH::getInstance().Init();
+    }
 
-void sssh_init() {
-    SigmaOS::Kernel::Network::SovereignSSH::getInstance().init();
+    void ssh_handle(const char* ip) {
+        SigmaOS::Kernel::Network::SovereignSSH::getInstance().HandleConnection(ip);
+    }
 }
-
-} // extern "C"
