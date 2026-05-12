@@ -48,14 +48,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern \"C\" void prov_init() {
+extern "C" void prov_init() {
     SigmaOS::Kernel::Data::SovereignProvenance::getInstance().init();
 }
 
-extern \"C\" void prov_log(const char* ds_id, const char* op) {
+extern "C" void prov_log(const char* ds_id, const char* op) {
     SigmaOS::Kernel::Data::SovereignProvenance::getInstance().logTransformation(ds_id, op);
 }
 
-extern \"C\" void prov_verify(const char* ds_id) {
+extern "C" void prov_verify(const char* ds_id) {
     SigmaOS::Kernel::Data::SovereignProvenance::getInstance().verifyLineage(ds_id);
 }

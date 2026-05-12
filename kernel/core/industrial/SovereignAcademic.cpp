@@ -48,14 +48,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern \"C\" void academic_init() {
+extern "C" void academic_init() {
     SigmaOS::Kernel::Academic::SovereignAcademic::getInstance().init();
 }
 
-extern \"C\" void academic_render_graph(const char* json) {
+extern "C" void academic_render_graph(const char* json) {
     SigmaOS::Kernel::Academic::SovereignAcademic::getInstance().renderResearchGraph(json);
 }
 
-extern \"C\" void academic_seal_draft(const char* title) {
+extern "C" void academic_seal_draft(const char* title) {
     SigmaOS::Kernel::Academic::SovereignAcademic::getInstance().lockThesisDraft(title);
 }

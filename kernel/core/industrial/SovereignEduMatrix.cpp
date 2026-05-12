@@ -48,10 +48,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern \"C\" void edu_init() {
+extern "C" void edu_init() {
     SigmaOS::Kernel::Education::SovereignEduMatrix::getInstance().init();
 }
 
-extern \"C\" void edu_generate(const char* hash) {
+extern "C" void edu_generate(const char* hash) {
     SigmaOS::Kernel::Education::SovereignEduMatrix::getInstance().generateFlashcards(hash);
 }

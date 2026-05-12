@@ -47,14 +47,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern \"C\" void access_init() {
+extern "C" void access_init() {
     SigmaOS::Kernel::UI::SovereignAccess::getInstance().init();
 }
 
-extern \"C\" void access_toggle_high_contrast(sigma_u32 enable) {
+extern "C" void access_toggle_high_contrast(sigma_u32 enable) {
     SigmaOS::Kernel::UI::SovereignAccess::getInstance().enableHighContrast(enable != 0);
 }
 
-extern \"C\" void access_read_element(const char* text) {
+extern "C" void access_read_element(const char* text) {
     SigmaOS::Kernel::UI::SovereignAccess::getInstance().readScreen(text);
 }

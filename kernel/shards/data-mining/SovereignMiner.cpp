@@ -50,10 +50,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern \"C\" void miner_init() {
+extern "C" void miner_init() {
     SigmaOS::Kernel::Data::SovereignMiner::getInstance().init();
 }
 
-extern \"C\" void miner_run_job(const char* id) {
+extern "C" void miner_run_job(const char* id) {
     SigmaOS::Kernel::Data::SovereignMiner::getInstance().mapReduce(id);
 }

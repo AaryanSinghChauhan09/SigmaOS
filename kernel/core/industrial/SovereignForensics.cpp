@@ -48,14 +48,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern \"C\" void forensics_init() {
+extern "C" void forensics_init() {
     SigmaOS::Kernel::Security::SovereignForensics::getInstance().init();
 }
 
-extern \"C\" void forensics_log(const char* id, const char* hash) {
+extern "C" void forensics_log(const char* id, const char* hash) {
     SigmaOS::Kernel::Security::SovereignForensics::getInstance().logEvidence(id, hash);
 }
 
-extern \"C\" void forensics_scan(sigma_u32 sid) {
+extern "C" void forensics_scan(sigma_u32 sid) {
     SigmaOS::Kernel::Security::SovereignForensics::getInstance().scanVulnerability(sid);
 }

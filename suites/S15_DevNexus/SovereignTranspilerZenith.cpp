@@ -46,7 +46,7 @@ public:
         
         if (input.contains("print")) {
             sigma_log_info("[TRANSPILER-ZENITH]: Mapping 'print' -> 'sigma_log_info'\n");
-            output.append("extern \"C\" void sigma_main() { sigma_log_info(\"Transpiled Shard Active.\\n\"); }\n");
+            output.append("extern "C" void sigma_main() { sigma_log_info(\"Transpiled Shard Active.\\n\"); }\n");
         }
 
         if (input.contains("mesh_broadcast")) {

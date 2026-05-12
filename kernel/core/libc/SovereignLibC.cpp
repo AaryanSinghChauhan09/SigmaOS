@@ -19,10 +19,21 @@ void* sigma_memcpy(void* dest, const void* src, sigma_size_t n) {
     return dest;
 }
 
-void* sigma_memset(void* s, int c, sigma_size_t n) {
-    sigma_u8* p = (sigma_u8*)s;
-    while (n--) *p++ = (sigma_u8)c;
-    return s;
+int sigma_strcmp(const char* s1, const char* s2) {
+    while (*s1 && (*s1 == *s2)) {
+        s1++;
+        s2++;
+    }
+    return *(const unsigned char*)s1 - *(const unsigned char*)s2;
+}
+
+int sigma_atoi(const char* str) {
+    int res = 0;
+    while (*str >= '0' && *str <= '9') {
+        res = res * 10 + (*str - '0');
+        str++;
+    }
+    return res;
 }
 
 }

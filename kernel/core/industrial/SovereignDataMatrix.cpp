@@ -47,14 +47,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern \"C\" void data_matrix_init() {
+extern "C" void data_matrix_init() {
     SigmaOS::Kernel::Data::SovereignDataMatrix::getInstance().init();
 }
 
-extern \"C\" void data_matrix_query(const char* sql) {
+extern "C" void data_matrix_query(const char* sql) {
     SigmaOS::Kernel::Data::SovereignDataMatrix::getInstance().runQuery(sql);
 }
 
-extern \"C\" void data_matrix_optimize(const char* id) {
+extern "C" void data_matrix_optimize(const char* id) {
     SigmaOS::Kernel::Data::SovereignDataMatrix::getInstance().optimizePipeline(id);
 }

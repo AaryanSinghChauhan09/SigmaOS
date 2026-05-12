@@ -1,0 +1,1811 @@
+[
+    {
+        "name": "accountant",
+        "tools": "Ledger system, tax compliance modules, balance sheet generator, audit tools, Tally-lattice integration",
+        "rules": "Ind-AS, GST, Income Tax Act, Companies Act",
+        "calculators": "GST, TDS, depreciation, advance tax, annuity",
+        "algorithms": "Automated ledger balancing, audit trail generation, tax filing optimization",
+        "self_healing": "Continuous audit log integrity check, transaction consistency validation",
+        "rollback": "Snapshot-per-transaction, daily fiscal state preservation"
+    },
+    {
+        "name": "doctor",
+        "tools": "Patient records, prescription management, lab results integration, telemedicine tools, DICOM viewer",
+        "rules": "Medical Council of India guidelines, Ayushman Bharat protocols, HIPAA, GDPR",
+        "calculators": "Dosage, BMI, medical billing, glomerular filtration rate",
+        "algorithms": "Patient record indexing, diagnostic prediction, lab result interpretation",
+        "self_healing": "Medical data integrity scan, prescription conflict detection",
+        "rollback": "Patient record versioning, emergency state restoration"
+    },
+    {
+        "name": "lawyer",
+        "tools": "Case indexing, legal references, compliance document management, secure communication, BNS-IPC cross-mapper",
+        "rules": "Bharatiya Nyaya Sanhita (BNS) 2023, Bharatiya Nagarik Suraksha Sanhita (BNSS) 2023, Bharatiya Sakshya Adhiniyam (BSA) 2023, Constitution of India",
+        "calculators": "Court fee, stamp duty, Limitation Period Calc, Alimony Estimator",
+        "algorithms": "Case law search, compliance checker, automated legal drafting",
+        "self_healing": "Legal reference sync, document authenticity verification",
+        "rollback": "Case history snapshots, immutable filing records"
+    },
+    {
+        "name": "terraforming_engineer",
+        "tools": "Atmospheric modeler, lithosphere stabilizer, bio-sphere injector, planetary thermal monitor",
+        "rules": "Planetary protection protocols, ethical terraforming guidelines",
+        "calculators": "Atmospheric pressure delta, solar radiation shielding, oxygen-cycle rate",
+        "algorithms": "Climate engineering simulation, ecosystem stability prediction",
+        "self_healing": "Atmospheric probe calibration, bio-dome integrity monitoring",
+        "rollback": "Planetary state snapshots, bio-injection phase rollback"
+    },
+    {
+        "name": "fusion_reactor_technician",
+        "tools": "Tokamak-monitor, magnetic-containment-nexus, plasma-density-Lattice, tritium-breeder-auditor",
+        "rules": "IAEA fusion safety standards, high-energy-physics protocols",
+        "calculators": "Plasma-beta-ratio, Lawson-criterion-delta, neutron-flux-calc",
+        "algorithms": "Automated plasma stability control, ELM-suppression orchestration",
+        "self_healing": "Magnetic-field-calibration sync, containment-integrity verify",
+        "rollback": "Reactor-state snapshots, baseline-plasma-parameters"
+    },
+    {
+        "name": "quantum_battery_chemist",
+        "tools": "Ion-transport-simulator, anode-cathode-Lattice, charge-density-mapper, SEI-layer-auditor",
+        "rules": "Material safety data, quantum-chemistry standards",
+        "calculators": "Energy-density-delta, cycle-life-predictor, thermal-runaway-risk",
+        "algorithms": "Generative electrolyte design, molecular-structure optimization",
+        "self_healing": "Charge-balance verification, thermal-sensor-sync",
+        "rollback": "Chemical-state snapshots, battery-configuration history"
+    },
+    {
+        "name": "geo_engineering_analyst",
+        "tools": "Albedo-monitor, stratospheric-aerosol-Lattice, carbon-cycle-modeler",
+        "rules": "UN Environmental protocols, SRM-governance guidelines",
+        "calculators": "Radiative-forcing-delta, aerosol-depth-ratio, precipitation-impact",
+        "algorithms": "Climate-impact simulation, unintended-consequence modeling",
+        "self_healing": "Aerosol-delivery-sync, atmospheric-probe verification",
+        "rollback": "Geo-state snapshots, atmospheric-baseline restoration"
+    },
+    {
+        "name": "carbon_sequestration_engineer",
+        "tools": "CCS-nexus, geological-storage-Lattice, plume-migration-monitor",
+        "rules": "EPA CCS regulations, carbon-capture standards",
+        "calculators": "Injection-pressure-delta, storage-capacity-ratio, leakage-probability",
+        "algorithms": "Plume-migration prediction, sequestration-efficiency optimization",
+        "self_healing": "Well-integrity verification, plume-sensor-sync",
+        "rollback": "Injection-state snapshots, geological-baseline restoration"
+    },
+    {
+        "name": "erp_consultant",
+        "tools": "Odoo-Lattice, SAP-Sovereign-Bridge, business process modeler, ERP-migration-nexus, module-optimizer",
+        "rules": "Business logic standards, ERP-best-practices, compliance-frameworks",
+        "calculators": "TCO (Total Cost of Ownership), ROI-estimator, process-latency-calc",
+        "algorithms": "Automated workflow mapping, database schema normalization, inventory-prediction",
+        "self_healing": "ERP-database consistency check, module-dependency validation",
+        "rollback": "ERP-state snapshots, transactional-history restoration"
+    },
+    {
+        "name": "chartered_accountant",
+        "tools": "Tally-Lattice, GST-Nexus, Income Tax Auditor, balance-sheet-lattice, audit-trail-engine",
+        "rules": "ICAI standards, Income Tax Act, GST laws, Companies Act",
+        "calculators": "Tax-liability, TDS-estimator, capital-gains-calc, depreciation-lattice",
+        "algorithms": "Anomaly detection in ledgers, tax-optimization modeling, automated-audit-sampling",
+        "self_healing": "Tally-data-integrity scan, GST-reconciliation verification",
+        "rollback": "Fiscal-year snapshots, historical ledger restoration"
+    },
+    {
+        "name": "crm_administrator",
+        "tools": "Salesforce-Lattice, HubSpot-Bridge, lead-scoring-engine, customer-journey-mapper",
+        "rules": "GDPR, CCPA, CRM data-privacy standards",
+        "calculators": "CLV (Customer Lifetime Value), churn-rate, conversion-delta",
+        "algorithms": "Lead prioritization modeling, automated-marketing-pathing",
+        "self_healing": "Lead-data consistency check, automation-workflow validation",
+        "rollback": "Customer-record snapshots, marketing-campaign rollback"
+    },
+    {
+        "name": "ecommerce_developer",
+        "tools": "Shopify-Lattice, Magento-Sovereign-Core, inventory-sync-nexus, payment-gateway-bridge",
+        "rules": "PCI-DSS, e-commerce consumer laws",
+        "calculators": "AOV (Average Order Value), cart-abandonment rate, shipping-cost-delta",
+        "algorithms": "Inventory-replenishment prediction, personalized-recommendation engine",
+        "self_healing": "Inventory-sync verification, payment-link validation",
+        "rollback": "Store-state snapshots, order-history restoration"
+    },
+    {
+        "name": "digital_marketer",
+        "tools": "SERP-Lattice, SEM-Analyzer, crawl-budget-optimizer, backlink-auditor, conversion-pixel-nexus",
+        "rules": "Search engine guidelines, advertising ethics",
+        "calculators": "CPC/CPM, ROAS, keyword-density, domain-authority-score",
+        "algorithms": "Keyword-ranking prediction, automated-bidding optimization",
+        "self_healing": "Pixel-tracking verification, backlink-integrity scan",
+        "rollback": "SEO-state snapshots, campaign-history restoration"
+    },
+    {
+        "name": "defi_architect",
+        "tools": "Liquidity-Lattice, AMM-simulator, yield-curve-nexus, flash-loan-auditor",
+        "rules": "Smart-contract security standards, DeFi-governance protocols",
+        "calculators": "Impermanent loss, slippage-delta, TVL-ratio, gas-optimization",
+        "algorithms": "Automated market making, risk-tranche simulation",
+        "self_healing": "Contract-state verification, liquidity-mesh sync",
+        "rollback": "Vault-state snapshots, protocol-baseline restoration"
+    },
+    {
+        "name": "digital_evidence_analyst",
+        "tools": "Chain-of-custody-Lattice, hash-nexus, cold-storage-bridge, metadata-carver",
+        "rules": "BSA 2023 evidence standards, digital-forensics protocols",
+        "calculators": "Entropy-density, file-integrity-score, timeline-delta",
+        "algorithms": "Automated artifact correlation, encrypted-volume detection",
+        "self_healing": "Evidence-seal verification, hash-lattice integrity check",
+        "rollback": "Analysis-state snapshots, evidence-baseline restoration"
+    },
+    {
+        "name": "generative_art_curator",
+        "tools": "Latent-space-navigator, GAN-monitor, NFT-lattice-bridge, style-transfer-engine",
+        "rules": "AI-ethics in art, digital-provenance standards",
+        "calculators": "Visual-entropy, stylistic-divergence, aesthetic-score",
+        "algorithms": "Prompt-optimization, latent-walk orchestration",
+        "self_healing": "Art-lattice integrity check, provenance-seal verification",
+        "rollback": "Curation-state snapshots, aesthetic-baseline restoration"
+    },
+    {
+        "name": "virtual_world_historian",
+        "tools": "Metaverse-archiver, avatar-ancestry-Lattice, world-state-tracer",
+        "rules": "Digital-preservation ethics, virtual-heritage standards",
+        "calculators": "World-age, social-graph-density, event-epoch-delta",
+        "algorithms": "Cross-world event correlation, virtual-evolution mapping",
+        "self_healing": "Archival-sync verification, world-state integrity check",
+        "rollback": "Historical-state snapshots, timeline-baseline restoration"
+    },
+    {
+        "name": "particle_physicist",
+        "tools": "CERN-Lattice-link, collider-event analyzer, Higgs-boson-search-nexus, muon-chamber monitor",
+        "rules": "Open-science protocols, high-energy safety standards",
+        "calculators": "Energy-to-mass delta, collision-luminosity, decay-width",
+        "algorithms": "Automated track reconstruction, dark-matter candidate search",
+        "self_healing": "Sensor-lattice calibration, data-stream consistency check",
+        "rollback": "Experiment-state snapshots, baseline-simulation restoration"
+    },
+    {
+        "name": "submarine_navigator",
+        "tools": "SONAR-Lattice, pressure-hull monitor, bathymetric-map-engine, silent-running-nexus",
+        "rules": "Maritime law, deep-sea exploration protocols",
+        "calculators": "Buoyancy-delta, acoustic-range, pressure-limit-calc",
+        "algorithms": "Sub-surface obstacle avoidance, passive sonar triangulation",
+        "self_healing": "Acoustic-link verification, hull-sensor-integrity scan",
+        "rollback": "Dive-log snapshots, ballast-configuration restoration"
+    },
+    {
+        "name": "smart_materials_engineer",
+        "tools": "Nano-lattice modeler, shape-memory-alloy simulator, self-healing-polymer monitor",
+        "rules": "Material safety standards, nano-tech regulations",
+        "calculators": "Young's modulus delta, phase-transition temp, molecular-strain",
+        "algorithms": "Generative material design, micro-structure simulation",
+        "self_healing": "Material-property-sync, molecular-model validation",
+        "rollback": "Material-iteration snapshots, chemical-baseline restoration"
+    },
+    {
+        "name": "hyperloop_operator",
+        "tools": "Vacuum-tube monitor, maglev-alignment-nexus, pod-telemetry-mesh, capsule-life-support",
+        "rules": "High-speed transit safety protocols",
+        "calculators": "G-force delta, braking-distance, pod-spacing-minima",
+        "algorithms": "Pod-dispatch optimization, vacuum-pressure regulation",
+        "self_healing": "Track-alignment verification, pod-telemetry-sync",
+        "rollback": "Transit-state snapshots, pod-dispatch-baseline restoration"
+    },
+    {
+        "name": "foley_artist",
+        "tools": "Sound-lattice, spectral-layering-engine, Foley-prop-index, real-time-resynthesizer",
+        "rules": "Audio post-production standards",
+        "calculators": "Sample-rate delta, reverb-tail-calc, sync-offset",
+        "algorithms": "Automated footstep matching, textural sound synthesis",
+        "self_healing": "Audio-buffer consistency, Prop-Lattice sync",
+        "rollback": "Mix-state snapshots, sound-design-history restoration"
+    },
+    {
+        "name": "asteroid_miner",
+        "tools": "Spectroscopic analyzer, drill-bit thermal monitor, low-gravity navigation, ore-density mapper",
+        "rules": "Outer Space Treaty compliance, resource extraction protocols",
+        "calculators": "Delta-V, ore-yield probability, trajectory-delta",
+        "algorithms": "Autonomous excavation pathing, structural stability prediction in vacuum",
+        "self_healing": "Thruster-link verification, drill-head cooling sync",
+        "rollback": "Excavation state snapshots, orbital-return baseline restoration"
+    },
+    {
+        "name": "bio_ethicist",
+        "tools": "Genetic-modification auditor, bio-risk modeler, ethical-compliance dashboard, CRISPR-log-Lattice",
+        "rules": "Declaration of Helsinki, Belmont Report, bio-ethics guidelines",
+        "calculators": "Risk-benefit ratio, genetic-diversity index",
+        "algorithms": "Ethical-dilemma simulation, long-term impact analysis",
+        "self_healing": "Compliance-log integrity check, ethical-seal verification",
+        "rollback": "Decision-state snapshots, protocol baseline restoration"
+    },
+    {
+        "name": "digital_archaeologist",
+        "tools": "Data-carving suite, legacy-system emulator, bit-rot detector, archival-lattice",
+        "rules": "Digital preservation standards, copyright-fair-use protocols",
+        "calculators": "Data-integrity-hash, bit-error rate, compression-ratio",
+        "algorithms": "Fragmented data reconstruction, legacy-format detection",
+        "self_healing": "Bit-rot correction, archival-sync verification",
+        "rollback": "Data-state snapshots, archival-integrity restoration"
+    },
+    {
+        "name": "orbital_debris_manager",
+        "tools": "Debris-tracking radar, laser-ablation monitor, collision-avoidance nexus, TLE-Lattice",
+        "rules": "IADC space debris mitigation guidelines",
+        "calculators": "Probability of collision (Pc), orbital-decay rate, delta-V for de-orbit",
+        "algorithms": "Cascading collision prediction, debris-cloud propagation",
+        "self_healing": "Radar-link consistency, laser-aiming-calibration verification",
+        "rollback": "Orbital-map state snapshots, de-orbit sequence logs"
+    },
+    {
+        "name": "pqc_auditor",
+        "tools": "Lattice-based-crypto analyzer, quantum-threat-modeler, PQC-seal-validator, entropy-mesh",
+        "rules": "NIST PQC standards, FIPS 140-3",
+        "calculators": "Quantum-resistance-score, entropy-density, key-strength delta",
+        "algorithms": "Post-quantum signature verification, cryptographic-mesh auditing",
+        "self_healing": "Key-lattice integrity check, PQC-seal validation",
+        "rollback": "Security-state snapshots, PQC-baseline restoration"
+    },
+    {
+        "name": "grid_resilience_engineer",
+        "tools": "Smart-grid monitor, load balancer-Lattice, phase-angle sync, SCADA-shield",
+        "rules": "IEEE standards, FERC regulations, NERC CIP compliance",
+        "calculators": "Frequency stability, reactive power, peak-load predictor",
+        "algorithms": "Dynamic line rating, islanding detection, black-start optimization",
+        "self_healing": "Automatic breaker re-closing, load-shedding lattice priority",
+        "rollback": "Pre-fault grid state restoration, historical load profiles"
+    },
+    {
+        "name": "viticulturist",
+        "tools": "Soil-moisture mesh, brix-analyzer, phenolic-maturity monitor, weather-Lattice",
+        "rules": "Appellation d'origine contrôlée (AOC) standards, organic certification rules",
+        "calculators": "Pruning density, irrigation delta, fermentation heat-rate",
+        "algorithms": "Harvest-window prediction, yield-estimation simulation",
+        "self_healing": "Micro-climate sensor sync, pest-pressure verification",
+        "rollback": "Seasonal growth logs, irrigation state history"
+    },
+    {
+        "name": "actuary",
+        "tools": "Risk-modeling lattice, mortality-table engine, solvency-check nexus, monte-carlo-sim",
+        "rules": "IFRS 17, Solvency II, actuarial standards",
+        "calculators": "Net present value (NPV), liability-duration, loss-ratio",
+        "algorithms": "Stochastic modeling, predictive claim analytics",
+        "self_healing": "Data consistency verification, model-drift detection",
+        "rollback": "Policy-state snapshots, historical loss development"
+    },
+    {
+        "name": "crisis_negotiator",
+        "tools": "Voice-stress analyzer, semantic sentiment engine, hostage-link bridge, secure-comms",
+        "rules": "Negotiation protocols, de-escalation guidelines",
+        "calculators": "Time-elapsed risk, psychological profile score",
+        "algorithms": "Behavioral change staircase model, automated sentiment tracking",
+        "self_healing": "Communication-link stability check, secure-line verification",
+        "rollback": "Negotiation log history, previous incident case-restoration"
+    },
+    {
+        "name": "luthier",
+        "tools": "Acoustic-frequency analyzer, wood-density scanner, micro-planer, resonance-Lattice",
+        "rules": "CITES wood-usage regs, traditional craft standards",
+        "calculators": "String-tension, bridge-pressure, vibrational-mode delta",
+        "algorithms": "Resonance-box simulation, structural-vibration analysis",
+        "self_healing": "Workshop-climate sync, resonance-profile verification",
+        "rollback": "Instrument-design snapshots, vibrational-history restoration"
+    },
+    {
+        "name": "biometric_identity_guardian",
+        "tools": "Retinal-lattice-vault, iris-mesh-attestor, gait-analysis-nexus, liveness-probe",
+        "rules": "Privacy laws (GDPR/BIPA), biometric-security standards",
+        "calculators": "False-match-rate (FMR), biometric-entropy, template-aging-delta",
+        "algorithms": "Privacy-preserving biometric matching, cancelable biometric generation",
+        "self_healing": "Template-integrity verify, sensor-liveness-sync",
+        "rollback": "Vault-state snapshots, identity-baseline restoration"
+    },
+    {
+        "name": "deepfake_forensic_auditor",
+        "tools": "Spatial-temporal-consistency-mesh, frequency-domain-nexus, lip-sync-auditor, eye-blink-monitor",
+        "rules": "Media ethics, digital-authenticity standards",
+        "calculators": "Artifact-density, GAN-fingerprint-score, emotional-inconsistency-delta",
+        "algorithms": "Deepfake detection ensemble, synthetic-voice attribution",
+        "self_healing": "Auditor-lattice integrity, model-weight-sync",
+        "rollback": "Analysis-state snapshots, authenticity-baseline"
+    },
+    {
+        "name": "fusion_reactor_technician",
+        "tools": "Tokamak-monitor, magnetic-containment-nexus, plasma-density-Lattice, tritium-breeder-auditor",
+        "rules": "IAEA fusion safety standards, high-energy-physics protocols",
+        "calculators": "Plasma-beta-ratio, Lawson-criterion-delta, neutron-flux-calc",
+        "algorithms": "Automated plasma stability control, ELM-suppression orchestration",
+        "self_healing": "Magnetic-field-calibration sync, containment-integrity verify",
+        "rollback": "Reactor-state snapshots, baseline-plasma-parameters"
+    },
+    {
+        "name": "software_developer",
+        "tools": "Software Developer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Software Developer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "data_engineer",
+        "tools": "Data Engineer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Data Engineer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "machine_learning_developer",
+        "tools": "Machine Learning Developer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Machine Learning Developer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "ai_trainer",
+        "tools": "AI Trainer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for AI Trainer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "cloud_architect",
+        "tools": "Cloud Architect workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Cloud Architect tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "devops_engineer",
+        "tools": "DevOps Engineer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for DevOps Engineer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "embedded_systems_engineer",
+        "tools": "Embedded Systems Engineer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Embedded Systems Engineer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "game_developer",
+        "tools": "Game Developer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Game Developer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "web_developer",
+        "tools": "Web Developer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Web Developer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "mobile_app_developer",
+        "tools": "Mobile App Developer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Mobile App Developer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "project_manager",
+        "tools": "Project Manager workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Project Manager tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "business_analyst",
+        "tools": "Business Analyst workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Business Analyst tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "product_manager",
+        "tools": "Product Manager workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Product Manager tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "financial_analyst",
+        "tools": "Financial Analyst workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Financial Analyst tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "hr_manager",
+        "tools": "HR Manager workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for HR Manager tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "operations_manager",
+        "tools": "Operations Manager workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Operations Manager tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "supply_chain_analyst",
+        "tools": "Supply Chain Analyst workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Supply Chain Analyst tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "compliance_officer",
+        "tools": "Compliance Officer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Compliance Officer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "medical_researcher",
+        "tools": "Medical Researcher workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Medical Researcher tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "biotechnologist",
+        "tools": "Biotechnologist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Biotechnologist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "geneticist",
+        "tools": "Geneticist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Geneticist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "radiologist",
+        "tools": "Radiologist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Radiologist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "public_health_official",
+        "tools": "Public Health Official workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Public Health Official tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "clinical_trial_manager",
+        "tools": "Clinical Trial Manager workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Clinical Trial Manager tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "healthcare_administrator",
+        "tools": "Healthcare Administrator workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Healthcare Administrator tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "graphic_designer",
+        "tools": "Graphic Designer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Graphic Designer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "video_editor",
+        "tools": "Video Editor workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Video Editor tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "animator",
+        "tools": "Animator workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Animator tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "photographer",
+        "tools": "Photographer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Photographer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "music_producer",
+        "tools": "Music Producer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Music Producer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "writer",
+        "tools": "Writer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Writer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "journalist",
+        "tools": "Journalist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Journalist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "content_creator",
+        "tools": "Content Creator workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Content Creator tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "ux_ui_designer",
+        "tools": "UX/UI Designer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for UX/UI Designer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "marketing_specialist",
+        "tools": "Marketing Specialist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Marketing Specialist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "physicist",
+        "tools": "Physicist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Physicist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "chemist",
+        "tools": "Chemist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Chemist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "mathematician",
+        "tools": "Mathematician workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Mathematician tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "statistician",
+        "tools": "Statistician workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Statistician tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "astronomer",
+        "tools": "Astronomer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Astronomer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "environmental_scientist",
+        "tools": "Environmental Scientist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Environmental Scientist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "geologist",
+        "tools": "Geologist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Geologist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "oceanographer",
+        "tools": "Oceanographer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Oceanographer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "social_scientist",
+        "tools": "Social Scientist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Social Scientist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "economist",
+        "tools": "Economist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Economist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "policymaker",
+        "tools": "Policymaker workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Policymaker tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "civil_servant",
+        "tools": "Civil Servant workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Civil Servant tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "diplomat",
+        "tools": "Diplomat workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Diplomat tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "military_officer",
+        "tools": "Military Officer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Military Officer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "intelligence_analyst",
+        "tools": "Intelligence Analyst workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Intelligence Analyst tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "forensic_expert",
+        "tools": "Forensic Expert workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Forensic Expert tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "tax_official",
+        "tools": "Tax Official workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Tax Official tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "urban_planner",
+        "tools": "Urban Planner workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Urban Planner tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "professor",
+        "tools": "Professor workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Professor tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "curriculum_designer",
+        "tools": "Curriculum Designer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Curriculum Designer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "educational_researcher",
+        "tools": "Educational Researcher workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Educational Researcher tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "instructioner_designer",
+        "tools": "Instructioner Designer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Instructioner Designer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "e_learning_specialist",
+        "tools": "E-Learning Specialist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for E-Learning Specialist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "school_administrator",
+        "tools": "School Administrator workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for School Administrator tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "librarian",
+        "tools": "Librarian workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Librarian tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "language_instructor",
+        "tools": "Language Instructor workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Language Instructor tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "vocational_trainer",
+        "tools": "Vocational Trainer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Vocational Trainer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "mechanical_engineer",
+        "tools": "Mechanical Engineer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Mechanical Engineer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "electrical_engineer",
+        "tools": "Electrical Engineer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Electrical Engineer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "civil_engineer",
+        "tools": "Civil Engineer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Civil Engineer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "chemical_engineer",
+        "tools": "Chemical Engineer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Chemical Engineer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "industrial_designer",
+        "tools": "Industrial Designer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Industrial Designer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "quality_assurance_specialist",
+        "tools": "Quality Assurance Specialist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Quality Assurance Specialist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "robotics_engineer",
+        "tools": "Robotics Engineer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Robotics Engineer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "automotive_engineer",
+        "tools": "Automotive Engineer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Automotive Engineer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "aerospace_engineer",
+        "tools": "Aerospace Engineer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Aerospace Engineer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "energy_analyst",
+        "tools": "Energy Analyst workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Energy Analyst tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "blockchain_developer",
+        "tools": "Blockchain Developer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Blockchain Developer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "iot_specialist",
+        "tools": "IoT Specialist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for IoT Specialist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "ar_vr_developer",
+        "tools": "AR/VR Developer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for AR/VR Developer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "drone_operator",
+        "tools": "Drone Operator workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Drone Operator tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "ethical_hacker",
+        "tools": "Ethical Hacker workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Ethical Hacker tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "sustainability_consultant",
+        "tools": "Sustainability Consultant workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Sustainability Consultant tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "climate_change_analyst",
+        "tools": "Climate Change Analyst workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Climate Change Analyst tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "smart_city_planner",
+        "tools": "Smart City Planner workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Smart City Planner tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "digital_twin_engineer",
+        "tools": "Digital Twin Engineer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Digital Twin Engineer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "customer_support_specialist",
+        "tools": "Customer Support Specialist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Customer Support Specialist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "sales_executive",
+        "tools": "Sales Executive workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Sales Executive tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "event_manager",
+        "tools": "Event Manager workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Event Manager tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "travel_agent",
+        "tools": "Travel Agent workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Travel Agent tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "logistics_coordinator",
+        "tools": "Logistics Coordinator workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Logistics Coordinator tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "real_estate_analyst",
+        "tools": "Real Estate Analyst workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Real Estate Analyst tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "insurance_underwriter",
+        "tools": "Insurance Underwriter workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Insurance Underwriter tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "retail_manager",
+        "tools": "Retail Manager workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Retail Manager tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "hospitality_manager",
+        "tools": "Hospitality Manager workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Hospitality Manager tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "ngo_worker",
+        "tools": "NGO Worker workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for NGO Worker tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "gemologist",
+        "tools": "Gemologist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Gemologist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "horologist",
+        "tools": "Horologist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Horologist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "carpenter",
+        "tools": "Carpenter workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Carpenter tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "fire_chief",
+        "tools": "Fire Chief workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Fire Chief tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "emergency_dispatcher",
+        "tools": "Emergency Dispatcher workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Emergency Dispatcher tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "vr_director",
+        "tools": "VR Director workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for VR Director tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "podcaster",
+        "tools": "Podcaster workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Podcaster tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "synthetic_biologist",
+        "tools": "Synthetic Biologist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Synthetic Biologist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "philatelist",
+        "tools": "Philatelist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Philatelist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "genealogist",
+        "tools": "Genealogist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Genealogist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "astronaut",
+        "tools": "Astronaut workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Astronaut tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "mission_controller",
+        "tools": "Mission Controller workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Mission Controller tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "cryptographer",
+        "tools": "Cryptographer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Cryptographer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "ballistics_expert",
+        "tools": "Ballistics Expert workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Ballistics Expert tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "special_ops_coordinator",
+        "tools": "Special Ops Coordinator workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Special Ops Coordinator tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "cybercrime_investigator",
+        "tools": "Cybercrime Investigator workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Cybercrime Investigator tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "detective",
+        "tools": "Detective workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Detective tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "csi",
+        "tools": "CSI workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for CSI tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "railway_signaling_engineer",
+        "tools": "Railway Signaling Engineer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Railway Signaling Engineer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "autonomous_fleet_manager",
+        "tools": "Autonomous Fleet Manager workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Autonomous Fleet Manager tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "audio_engineer",
+        "tools": "Audio Engineer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Audio Engineer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "cinematographer",
+        "tools": "Cinematographer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Cinematographer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "restoration_artist",
+        "tools": "Restoration Artist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Restoration Artist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "sociologist",
+        "tools": "Sociologist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Sociologist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "political_campaign_manager",
+        "tools": "Political Campaign Manager workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Political Campaign Manager tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "archivist",
+        "tools": "Archivist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Archivist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "botanist",
+        "tools": "Botanist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Botanist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "zoologist",
+        "tools": "Zoologist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Zoologist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "soil_scientist",
+        "tools": "Soil Scientist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Soil Scientist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "transhumanist_researcher",
+        "tools": "Transhumanist Researcher workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Transhumanist Researcher tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "behavioral_economist",
+        "tools": "Behavioral Economist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Behavioral Economist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "crypto_asset_auditor",
+        "tools": "Crypto-Asset Auditor workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Crypto-Asset Auditor tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "sports_psychologist",
+        "tools": "Sports Psychologist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Sports Psychologist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "physiotherapist",
+        "tools": "Physiotherapist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Physiotherapist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "set_designer",
+        "tools": "Set Designer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Set Designer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "pyrotechnician",
+        "tools": "Pyrotechnician workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Pyrotechnician tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "ethnomusicologist",
+        "tools": "Ethnomusicologist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Ethnomusicologist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "philologist",
+        "tools": "Philologist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Philologist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "blacksmith",
+        "tools": "Blacksmith workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Blacksmith tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "glassblower",
+        "tools": "Glassblower workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Glassblower tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "bodyguard",
+        "tools": "Bodyguard workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Bodyguard tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "cyber_warfare_tactician",
+        "tools": "Cyber-Warfare Tactician workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Cyber-Warfare Tactician tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "water_treatment_manager",
+        "tools": "Water Treatment Manager workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Water Treatment Manager tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "xeno_biologist",
+        "tools": "Xeno-Biologist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Xeno-Biologist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "prosthetics_engineer",
+        "tools": "Prosthetics Engineer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Prosthetics Engineer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "cyber_insurance_underwriter",
+        "tools": "Cyber-Insurance Underwriter workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Cyber-Insurance Underwriter tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "osint_investigator",
+        "tools": "OSINT Investigator workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for OSINT Investigator tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "underwater_architect",
+        "tools": "Underwater Architect workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Underwater Architect tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "master_sommelier",
+        "tools": "Master Sommelier workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Master Sommelier tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "yacht_designer",
+        "tools": "Yacht Designer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Yacht Designer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "private_island_manager",
+        "tools": "Private Island Manager workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Private Island Manager tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "computational_linguist",
+        "tools": "Computational Linguist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Computational Linguist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "cultural_heritage_guardian",
+        "tools": "Cultural Heritage Guardian workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Cultural Heritage Guardian tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "odoo_developer",
+        "tools": "Odoo Developer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Odoo Developer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "tally_operator",
+        "tools": "Tally Operator workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Tally Operator tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "sap_consultant",
+        "tools": "SAP Consultant workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for SAP Consultant tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "salesforce_developer",
+        "tools": "Salesforce Developer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Salesforce Developer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "shopify_expert",
+        "tools": "Shopify Expert workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Shopify Expert tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "e_commerce_manager",
+        "tools": "E-commerce Manager workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for E-commerce Manager tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "seismologist",
+        "tools": "Seismologist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Seismologist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "tunneling_expert",
+        "tools": "Tunneling Expert workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Tunneling Expert tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "urban_agriculture_designer",
+        "tools": "Urban Agriculture Designer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Urban Agriculture Designer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "myrologist",
+        "tools": "Myrologist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Myrologist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "astrobiologist",
+        "tools": "Astrobiologist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Astrobiologist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "colorist",
+        "tools": "Colorist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Colorist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "calligrapher",
+        "tools": "Calligrapher workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Calligrapher tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "signal_jammer",
+        "tools": "Signal Jammer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Signal Jammer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "eod_technician",
+        "tools": "EOD Technician workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for EOD Technician tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "maglev_engineer",
+        "tools": "Maglev Engineer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Maglev Engineer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "vexillologist",
+        "tools": "Vexillologist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Vexillologist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "numismatist",
+        "tools": "Numismatist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Numismatist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "predictive_policing_strategist",
+        "tools": "Predictive Policing Strategist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Predictive Policing Strategist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "cbdc_developer",
+        "tools": "CBDC Developer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for CBDC Developer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "key_custodian",
+        "tools": "Key Custodian workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Key Custodian tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "digital_legacy_manager",
+        "tools": "Digital Legacy Manager workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Digital Legacy Manager tools",
+        "rollback": "Automatic state snapshots"
+    }
+]

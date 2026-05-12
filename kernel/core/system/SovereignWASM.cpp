@@ -50,14 +50,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern \"C\" void wasm_init() {
+extern "C" void wasm_init() {
     SigmaOS::Kernel::Runtime::SovereignWASM::getInstance().init();
 }
 
-extern \"C\" void wasm_load(const void* code, sigma_usize size) {
+extern "C" void wasm_load(const void* code, sigma_usize size) {
     SigmaOS::Kernel::Runtime::SovereignWASM::getInstance().loadModule(code, size);
 }
 
-extern \"C\" void wasm_run(const char* func) {
+extern "C" void wasm_run(const char* func) {
     SigmaOS::Kernel::Runtime::SovereignWASM::getInstance().execute(func);
 }

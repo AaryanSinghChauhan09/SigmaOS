@@ -289,6 +289,33 @@ const professions = [
         algorithms: 'Resonance-box simulation, structural-vibration analysis',
         self_healing: 'Workshop-climate sync, resonance-profile verification',
         rollback: 'Instrument-design snapshots, vibrational-history restoration'
+    },
+    {
+        name: 'biometric_identity_guardian',
+        tools: 'Retinal-lattice-vault, iris-mesh-attestor, gait-analysis-nexus, liveness-probe',
+        rules: 'Privacy laws (GDPR/BIPA), biometric-security standards',
+        calculators: 'False-match-rate (FMR), biometric-entropy, template-aging-delta',
+        algorithms: 'Privacy-preserving biometric matching, cancelable biometric generation',
+        self_healing: 'Template-integrity verify, sensor-liveness-sync',
+        rollback: 'Vault-state snapshots, identity-baseline restoration'
+    },
+    {
+        name: 'deepfake_forensic_auditor',
+        tools: 'Spatial-temporal-consistency-mesh, frequency-domain-nexus, lip-sync-auditor, eye-blink-monitor',
+        rules: 'Media ethics, digital-authenticity standards',
+        calculators: 'Artifact-density, GAN-fingerprint-score, emotional-inconsistency-delta',
+        algorithms: 'Deepfake detection ensemble, synthetic-voice attribution',
+        self_healing: 'Auditor-lattice integrity, model-weight-sync',
+        rollback: 'Analysis-state snapshots, authenticity-baseline'
+    },
+    {
+        name: 'fusion_reactor_technician',
+        tools: 'Tokamak-monitor, magnetic-containment-nexus, plasma-density-Lattice, tritium-breeder-auditor',
+        rules: 'IAEA fusion safety standards, high-energy-physics protocols',
+        calculators: 'Plasma-beta-ratio, Lawson-criterion-delta, neutron-flux-calc',
+        algorithms: 'Automated plasma stability control, ELM-suppression orchestration',
+        self_healing: 'Magnetic-field-calibration sync, containment-integrity verify',
+        rollback: 'Reactor-state snapshots, baseline-plasma-parameters'
     }
 ];
 
@@ -328,7 +355,9 @@ const additionalProfessions = [
     'Colorist', 'Calligrapher', 'Signal Jammer', 'EOD Technician', 'Hyperloop Operator',
     'Maglev Engineer', 'Vexillologist', 'Numismatist', 'Particle Physicist',
     'DeFi Architect', 'Digital Evidence Analyst', 'Generative Art Curator', 'Virtual World Historian',
-    'Predictive Policing Strategist', 'CBDC Developer', 'Key Custodian', 'Digital Legacy Manager'
+    'Predictive Policing Strategist', 'CBDC Developer', 'Key Custodian', 'Digital Legacy Manager',
+    'Fusion Reactor Technician', 'Quantum Battery Chemist', 'Geo-engineering Analyst', 'Carbon Sequestration Engineer',
+    'Biometric Identity Guardian', 'Deepfake Forensic Auditor'
 ];
 
 additionalProfessions.forEach(name => {
@@ -354,13 +383,15 @@ professions.forEach(prof => {
         fs.mkdirSync(profDir, { recursive: true });
     }
 
+    const splitJoin = (str) => (str ? str.split(', ').join('\n- ') : 'N/A');
+
     // tools.md
     let toolsMd = `# 🛠 ${prof.name.toUpperCase()} Profile\n\n`;
-    toolsMd += `## Required Tools & Functions\n- ${prof.tools.split(', ').join('\n- ')}\n\n`;
-    if (prof.rules) toolsMd += `## 📜 Compliance Rules\n- ${prof.rules.split(', ').join('\n- ')}\n\n`;
-    if (prof.calculators) toolsMd += `## 🧮 Professional Calculators\n- ${prof.calculators.split(', ').join('\n- ')}\n\n`;
-    if (prof.algorithms) toolsMd += `## 🧬 Core Algorithms\n- ${prof.algorithms.split(', ').join('\n- ')}\n\n`;
-    toolsMd += `## 🛡 Self-Healing Strategy\n- ${prof_healing = prof.self_healing}\n\n`;
+    toolsMd += `## Required Tools & Functions\n- ${splitJoin(prof.tools)}\n\n`;
+    if (prof.rules) toolsMd += `## 📜 Compliance Rules\n- ${splitJoin(prof.rules)}\n\n`;
+    if (prof.calculators) toolsMd += `## 🧮 Professional Calculators\n- ${splitJoin(prof.calculators)}\n\n`;
+    if (prof.algorithms) toolsMd += `## 🧬 Core Algorithms\n- ${splitJoin(prof.algorithms)}\n\n`;
+    toolsMd += `## 🛡 Self-Healing Strategy\n- ${prof.self_healing}\n\n`;
     toolsMd += `## 🔄 Rollback Strategy\n- ${prof.rollback}\n`;
     
     fs.writeFileSync(path.join(profDir, 'tools.md'), toolsMd);
@@ -370,7 +401,7 @@ professions.forEach(prof => {
         profession: prof.name,
         compliance_level: 'sovereign-high',
         resource_priority: 'adaptive',
-        modules: prof.tools.split(', ').map(t => t.toLowerCase().replace(/ /g, '_')),
+        modules: prof.tools ? prof.tools.split(', ').map(t => t.toLowerCase().replace(/ /g, '_')) : [],
         rules: prof.rules ? prof.rules.split(', ') : [],
         calculators: prof.calculators ? prof.calculators.split(', ') : [],
         algorithms: prof.algorithms ? prof.algorithms.split(', ') : [],
@@ -382,4 +413,5 @@ professions.forEach(prof => {
     fs.writeFileSync(path.join(profDir, 'config.json'), JSON.stringify(config, null, 4));
 });
 
+fs.writeFileSync(path.join(__dirname, 'profiles', 'professions.json'), JSON.stringify(professions, null, 4));
 console.log(`Profession profiles updated successfully (${professions.length} profiles).`);

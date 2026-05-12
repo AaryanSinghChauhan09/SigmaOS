@@ -5,9 +5,12 @@
 # Parity: Industrial Parity with GNU Make / CMake ecosystems.
 # =============================================================================
 
+CC       = gcc
 CXX      = g++
 AS       = nasm
 QEMU     = qemu-system-x86_64
+CFLAGS   = -ffreestanding -O2 -Wall -Wextra -Werror -std=c11 \
+           -I./include -I./kernel/core/include -fno-stack-protector -mno-red-zone -MMD -MP
 CXXFLAGS = -ffreestanding -O2 -Wall -Wextra -Werror -fno-exceptions -fno-rtti -std=c++17 \
            -I./include -I./kernel/core/include -fno-stack-protector -mno-red-zone -MMD -MP
 ASFLAGS  = -f elf64
@@ -71,7 +74,7 @@ rebuild: clean all
 %.o: %.c
 	@mkdir -p $(dir $@)
 	@echo "[CC] $<"
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 %.o: %.asm
 	@mkdir -p $(dir $@)

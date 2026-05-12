@@ -47,10 +47,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern \"C\" void search_sim_init() {
+extern "C" void search_sim_init() {
     SigmaOS::Kernel::AI::SovereignSearchSim::getInstance().init();
 }
 
-extern \"C\" void search_sim_run_astar(const char* json) {
+extern "C" void search_sim_run_astar(const char* json) {
     SigmaOS::Kernel::AI::SovereignSearchSim::getInstance().simulateAStar(json);
 }

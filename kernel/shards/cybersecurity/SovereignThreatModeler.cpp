@@ -43,10 +43,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern \"C\" void threat_init() {
+extern "C" void threat_init() {
     SigmaOS::Kernel::Security::SovereignThreatModeler::getInstance().init();
 }
 
-extern \"C\" void threat_analyze(const char* name) {
+extern "C" void threat_analyze(const char* name) {
     SigmaOS::Kernel::Security::SovereignThreatModeler::getInstance().analyzeShard(name);
 }

@@ -60,14 +60,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern \"C\" void pod_init() {
+extern "C" void pod_init() {
     SigmaOS::Kernel::Runtime::SovereignPod::getInstance().init();
 }
 
-extern \"C\" void pod_create(const char* image, sigma_u64 mem) {
+extern "C" void pod_create(const char* image, sigma_u64 mem) {
     SigmaOS::Kernel::Runtime::SovereignPod::getInstance().createPod(image, mem);
 }
 
-extern \"C\" void pod_kill(sigma_u32 id) {
+extern "C" void pod_kill(sigma_u32 id) {
     SigmaOS::Kernel::Runtime::SovereignPod::getInstance().killPod(id);
 }

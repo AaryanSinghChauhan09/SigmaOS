@@ -58,10 +58,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern \"C\" void policy_init() {
+extern "C" void policy_init() {
     SigmaOS::Kernel::Security::SovereignPolicy::getInstance().init();
 }
 
-extern \"C\" void policy_enforce(sigma_u32 sid, sigma_u32 cpu, sigma_u64 mem) {
+extern "C" void policy_enforce(sigma_u32 sid, sigma_u32 cpu, sigma_u64 mem) {
     SigmaOS::Kernel::Security::SovereignPolicy::getInstance().enforceQuotas(sid, cpu, mem);
 }

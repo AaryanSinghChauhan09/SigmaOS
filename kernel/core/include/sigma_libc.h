@@ -8,6 +8,8 @@ extern "C" {
     void  sigma_print(const char* msg);
     void* sigma_memcpy(void* dest, const void* src, sigma_size_t n);
     void* sigma_memset(void* s, int c, sigma_size_t n);
+    int   sigma_strcmp(const char* s1, const char* s2);
+    int   sigma_atoi(const char* str);
 }
 
 #endif

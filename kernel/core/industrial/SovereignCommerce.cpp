@@ -47,10 +47,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern \"C\" void commerce_init() {
+extern "C" void commerce_init() {
     SigmaOS::Kernel::Commerce::SovereignCommerce::getInstance().init();
 }
 
-extern \"C\" void commerce_transact(sigma_u64 val, const char* id) {
+extern "C" void commerce_transact(sigma_u64 val, const char* id) {
     SigmaOS::Kernel::Commerce::SovereignCommerce::getInstance().processTransaction(val, id);
 }

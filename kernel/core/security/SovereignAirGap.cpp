@@ -52,14 +52,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern \"C\" void airgap_init() {
+extern "C" void airgap_init() {
     SigmaOS::Kernel::Security::SovereignAirGap::getInstance().init();
 }
 
-extern \"C\" void airgap_engage() {
+extern "C" void airgap_engage() {
     SigmaOS::Kernel::Security::SovereignAirGap::getInstance().engage();
 }
 
-extern \"C\" void airgap_disengage() {
+extern "C" void airgap_disengage() {
     SigmaOS::Kernel::Security::SovereignAirGap::getInstance().disengage();
 }

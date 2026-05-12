@@ -32,8 +32,37 @@ public:
 } // namespace SDK
 } // namespace SigmaOS
 
-/* --- SDK Utility Macros --- */
-#define REGISTER_SHARD(ClassName) \
-    extern "C" ClassName* create_shard() { return new ClassName(); }
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* --- Core Shard Bridging --- */
+void registry_verify_all(void);
+void heal_force_reset_shard(sigma_u32 sid);
+void heal_diagnostic_report(void);
+void pqc_audit_lattice(void);
+void pqc_audit_entropy(void);
+void neural_report_status(void);
+void monitor_rebalance_lattice(void);
+
+/* --- Industrial Shard Bridging --- */
+void engineer_run_simulation(void);
+void medical_load_image(void* data, sigma_u32 size);
+void airgap_engage(void);
+void airgap_disengage(void);
+void data_matrix_query(const char* query);
+void pro_suite_certify_doc(const char* hash);
+void search_sim_run_astar(const char* graph_json);
+void commerce_transact(sigma_u32 item_id, const char* sku);
+void forensics_scan(sigma_u32 sid);
+void eco_optimize(void);
+
+/* --- LibC Wrappers --- */
+int  sigma_strcmp(const char* s1, const char* s2);
+int  sigma_atoi(const char* str);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SIGMA_SDK_H */
