@@ -52,7 +52,15 @@ qemu-system-x86_64 -kernel sigma_kernel.bin -m 2G -serial stdio
 2. Copy `sigma_kernel.bin` to the root.
 3. Use the **SigmaBoot** (provided in `boot/`) to initialize the UEFI handoff.
 
-## 🔍 Troubleshooting
+## 📊 Professional Tools
+ 
+ ### S-MIND (Lattice Mapper)
+ Use the `S-MIND` application within the Zenith Environment to visualize shard dependencies and export lattice manifests. Access it via the desktop icon or `zenith.html`.
+ 
+ ### Scholastic Audit
+ Run the `execute_problem_audit()` hook to verify the numerical integrity of the scholastic shards (Physics/Chem/Math).
+62: ## 🔍 Troubleshooting
+63: 
 
 - **Undeclared Identifiers**: Ensure `include/` is in your compiler's search path.
 - **Linker Errors**: Check `sigma_sdk.h` for missing `extern "C"` wrappers.
