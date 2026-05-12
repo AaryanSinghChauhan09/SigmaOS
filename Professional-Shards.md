@@ -61,3 +61,18 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 - **Primary Tool**: Genomic Sequencing Lattice.
 - **Security**: PQC-encrypted bio-silos.
 - **Resilience**: Real-time protein-folding simulation.
+
+## 🧮 S-MATH: Mathematical Research Shard
+- **Primary Tool**: Symbolic Computation Nexus.
+- **Security**: PQC-proof verification.
+- **Resilience**: Arbitrary-precision state recovery.
+
+## 🧪 S-CHEM: Chemical Engineering Shard
+- **Primary Tool**: Molecular Dynamics Lattice.
+- **Security**: PQC-encrypted formula silos.
+- **Resilience**: Quantum-mechanical state stability.
+
+## 🏺 S-ARCH: Archaeology & Heritage Shard
+- **Primary Tool**: LiDAR Point-Cloud Lattice.
+- **Security**: PQC-signed artifact registries.
+- **Resilience**: 3D site-reconstruction failover.
