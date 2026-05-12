@@ -1,25 +1,25 @@
-name: 🚀 Professional Shard Request
-description: Propose a new industrial or professional shard for the Sovereign Lattice.
-labels: ["enhancement", "new-profession"]
+name: 🚀 Industrial Shard Proposal (Feature Request)
+description: Suggest a new industry USP to absorb into the Lattice.
+labels: ["industrial-usp", "strategic-expansion"]
 body:
-  - type: input
-    id: profession
+  - type: textarea
+    id: usp-desc
     attributes:
-      label: Profession Name
-      description: e.g., Quantum Physicist, Deep-Sea Archaeologist
+      label: USP Description
+      placeholder: What industry-standard tool or workflow should we absorb?
     validations:
       required: true
   - type: textarea
-    id: tools
+    id: profession-impact
     attributes:
-      label: Essential Tools
-      description: What specific professional tools should this shard provide?
+      label: Profession Impact
+      placeholder: Which industrial roles will benefit from this shard?
     validations:
       required: true
   - type: textarea
-    id: resilience
+    id: implementation-path
     attributes:
-      label: Resilience Strategy
-      description: How should this shard behave during a lattice-failover event?
+      label: Implementation Path
+      placeholder: How can we bridge this tool into the Sovereign Lattice?
     validations:
       required: true

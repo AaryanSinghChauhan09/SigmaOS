@@ -1,29 +1,36 @@
-name: 🐞 Shard Bug Report
-description: Report a necrotic or malfunctioning shard in the SigmaOS lattice.
-labels: ["bug", "lattice-necrosis"]
+name: 🐛 Industrial Bug Report
+description: Report an anomaly in the Sovereign Lattice.
+labels: ["anomaly", "industrial-debt"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for reporting! Please ensure your shard health is verified by `sigma-cli doctor` before submitting.
-  - type: input
-    id: shard_id
+        Please provide a detailed report of the lattice anomaly.
+  - type: textarea
+    id: anomaly-desc
     attributes:
-      label: Shard Identifier
-      description: e.g., S-MED, S-VAKIL, S-CAD
+      label: Anomaly Description
+      placeholder: What part of the Lattice is failing? (e.g., S-AI, S-SCHED)
     validations:
       required: true
   - type: textarea
-    id: behavior
+    id: steps
     attributes:
-      label: Malfunction Description
-      description: What is the shard doing incorrectly?
+      label: Steps to Reproduce
+      placeholder: |
+        1. Boot SigmaOS in QEMU
+        2. Trigger shard X...
     validations:
       required: true
   - type: textarea
-    id: logs
+    id: log-output
     attributes:
       label: S-LOG Output
-      description: Please provide relevant output from the Sovereign Journal.
+      placeholder: Paste output from SovereignLog or S-DIAG here.
     validations:
       required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Industrial Environment
+      placeholder: e.g., x86_64, ARM64, RISC-V, QEMU 7.0+

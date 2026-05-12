@@ -1,21 +1,25 @@
-# Contributing to SigmaOS
+# Σ SigmaOS Contributing Guidelines
 
-Welcome, Sovereign. SigmaOS is an industrial-grade operating system lattice built on the principles of **Silicon Sovereignty**, **Neural Intelligence**, and **Zero-Dependency** engineering.
+Welcome to the **Sovereign Lattice™** development ecosystem. We are building the world's most stable, profession-aware operating system, and we value industrial-grade contributions.
 
-## 🏛 The Sovereign Principles
-1. **Zero-STL**: We do not use the standard library. All primitives must be defined in `sigma_libc.h` or `sigma_kernel_types.h`.
-2. **Shard Isolation**: Every feature must be a "shard" with a strict interface. No circular dependencies.
-3. **PQC-Native**: All inter-shard communication and binary distribution must be Post-Quantum Cryptography attested.
+## 🛠 Development Philosophy
+- **Zero-Dependency**: Every shard must be self-contained or use strictly audited Lattice bridges.
+- **PQC-First**: All cryptographic routines must use Post-Quantum algorithms (Dilithium-5, Kyber).
+- **Industrial Stability**: Code must be deterministic, deadlock-free, and pass S-REGRESS testing.
 
-## 🛠 Development Workflow
-1. **Sharding**: Identify the resource you are managing. Create a new shard in the appropriate layer.
-2. **Registration**: Add your shard source path to `SHARDS.manifest`.
-3. **Audit**: Ensure your shard uses `SigmaObject` for OOP parity.
+## 📦 Shard Development
+1. **Define the Shard**: Create a new `.cpp` file in the appropriate layer.
+2. **Implement SigmaSingleton**: Follow the `SigmaSingleton<T>` pattern for kernel shards.
+3. **Attestation**: Every shard must be signed with a PQC-attested GPG key before merging.
+4. **Registration**: Add the shard to `SHARDS.manifest`.
 
-## 🚀 Pull Request Process
-- Ensure the build passes locally using `s-cli build`.
-- Update the relevant Wiki page (Logic, API, etc.) to reflect your changes.
-- Submit your PR with a clear "Industrial USP" (Unique Selling Point) explanation.
+## 🧪 Testing Requirements
+- Every pull request must pass the **QEMU Regression Suite**.
+- Fuzz testing is required for new memory allocators or security shards.
+- Benchmark your code against industrial baselines (BusyBox, Linux-Minimal).
+
+## 🏛 Governance
+SigmaOS follows the **Sovereign Industrial Governance** model. Maintainers act as "Shard Wardens" to ensure the integrity of the Lattice.
 
 ---
 *Stay Sovereign.*

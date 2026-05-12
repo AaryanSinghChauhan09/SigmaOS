@@ -34,6 +34,7 @@ kernel/core/profiles/SovereignProfile.cpp
 # LAYER 6: SYSTEM UTILITIES
 kernel/core/system/SigmaPkg.cpp
 kernel/core/testing/SovereignRegression.cpp
+kernel/core/security/SovereignMAC.cpp
 kernel/core/security/SovereignWatchdog.cpp
 kernel/core/observability/SovereignDump.cpp
 kernel/core/network/SovereignNetServer.cpp

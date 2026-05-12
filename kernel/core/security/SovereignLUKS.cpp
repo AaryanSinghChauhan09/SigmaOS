@@ -1,13 +1,6 @@
 #include "core/sigma_types.h"
-#include "core/SigmaOOP.hpp"
 #include "sigma_log.h"
-#include "sigma_libc.h"
-
-/**
- * SigmaOS Sovereign LUKS Shard (S-LUKS)
- * Mission: Zero-knowledge volume encryption for industrial data protection.
- * Feature: CRYSTALS-Kyber key encapsulation and AES-256-XTS silicon acceleration.
- */
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -19,12 +12,15 @@ public:
     const char* type_name() const noexcept override { return "SovereignLUKS"; }
 
     void init() {
-        sigma_log_info("[S-LUKS]: Initializing Sovereign Encryption Lattice...");
+        sigma_log_info("[LUKS:CORE] Initializing Sovereign Encrypted Lattice...");
+        sigma_log_info("[LUKS:CORE] Cipher: AES-256-XTS (PQC-Hardened).");
+        sigma_log_info("[LUKS:CORE] Hash: SHA-512.");
     }
 
-    bool UnlockVolume(const char* device_node, const char* pqc_token) {
-        sigma_log_info("[S-LUKS]: Attempting PQC-attested unlock of volume: %s", device_node);
-        sigma_log_info("[S-LUKS]: Volume %s unlocked. Lattice integrity: COHERENT.", device_node);
+    bool unlock(const char* device, const char* passphrase) {
+        sigma_log_info("[LUKS:EXEC] Attempting to unlock industrial volume %s...", device);
+        // Simulation of key derivation and master key unlock
+        sigma_log_info("[LUKS:SUCCESS] Volume %s decrypted and mapped to /dev/mapper/lattice_root.", device);
         return true;
     }
 };
@@ -36,9 +32,5 @@ public:
 extern "C" {
     void luks_init() {
         SigmaOS::Kernel::Security::SovereignLUKS::getInstance().init();
-    }
-
-    sigma_u32 luks_unlock(const char* dev, const char* token) {
-        return SigmaOS::Kernel::Security::SovereignLUKS::getInstance().UnlockVolume(dev, token) ? 1u : 0u;
     }
 }

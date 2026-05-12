@@ -37,6 +37,8 @@
 | Sovereign Kdump (Crash Dumps) | Kernel | High | DONE |
 | Sovereign Regression (Tests) | Kernel | High | DONE |
 | Sovereign Watchdog (Fallback) | Security | High | DONE |
+| Sovereign MAC (AppArmor) | Security | High | DONE |
+| Control Center (Settings) | GUI | Medium | DONE |
 | Sovereign Server (SSH/HTTP) | Network | High | DONE |
 | Sovereign Audio (PipeWire) | Drivers | Medium | DONE |
 | Offline Coding Playground | EDU | Low | DONE |

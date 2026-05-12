@@ -6,6 +6,22 @@
 
 SigmaOS is the world's first **Industrial-Grade, Profession-Aware Operating System**. Built on the **Sovereign Lattice™** architecture, it provides a high-assurance, zero-dependency environment for mission-critical professional workflows.
 
+## 🏛 Industrial Architecture
+
+```mermaid
+graph TD
+    User((Professional User)) --> Zenith[Zenith UI / Control Center]
+    Zenith --> Lattice[Sovereign Lattice Core]
+    Lattice --> Shards{Industrial Shards}
+    Shards --> AI[S-AI: CUDA/ONNX]
+    Shards --> Cyber[S-CYBER: Metasploit/Audit]
+    Shards --> Cloud[S-CLOUD: Docker/K8s]
+    Shards --> Sys[S-PKG: Dilithium-5 Verified]
+    Lattice --> Micro[Hardened Microkernel]
+    Micro --> PQC[PQC Memory Model]
+    Micro --> Sched[Real-time S-SCHED]
+```
+
 ## 🚀 Key Unique Selling Points (USPs)
 
 - **The Sovereign Lattice™**: A 600-shard modular kernel where every system service is a self-contained, high-assurance unit.
