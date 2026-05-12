@@ -1,4 +1,5 @@
 #include "security/SovereignSandbox.hpp"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Kernel {

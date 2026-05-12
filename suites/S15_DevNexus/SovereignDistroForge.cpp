@@ -1,5 +1,7 @@
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignDistroForge.h"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace DistroForge {
@@ -23,4 +25,5 @@ void SovereignDistroForge::ForgeNewDistro(const char* name) {
 
 } // namespace DistroForge
 } // namespace SigmaOS
+
 

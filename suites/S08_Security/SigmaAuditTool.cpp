@@ -8,6 +8,7 @@
  */
 
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 typedef struct {
     char audit_id[32];
@@ -40,4 +41,5 @@ void sigma_audit_init() {
     sigma_log_info("[AUDIT] Initializing Sovereign Compliance Shards...\n");
     sigma_log_info("[AUDIT] Baseline Compliance: Linux CIS L2 Sharding (ENABLED)\n");
 }
+
 

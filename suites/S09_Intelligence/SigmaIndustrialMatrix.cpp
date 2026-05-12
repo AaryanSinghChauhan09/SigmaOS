@@ -8,6 +8,7 @@
  */
 
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 // --- Macro Automation (XClicker / AutoKey style) ---
 void sigma_macro_trigger(const char* name) {
@@ -53,4 +54,5 @@ void sigma_matrix_init() {
     sigma_log_info("[MATRIX] Remote Shard ... SYNCED (Bot Comandos)\n");
     sigma_log_info("[MATRIX] Infrastructure ... MAPPED (vSphere/Nginx)\n");
 }
+
 

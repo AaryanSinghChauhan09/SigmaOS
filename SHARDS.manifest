@@ -36,6 +36,7 @@ kernel/core/system/SovereignProfiles.cpp
 kernel/core/system/SovereignRollbackShard.cpp
 kernel/core/system/SovereignIPC.cpp
 kernel/core/system/SovereignProfileNexus.cpp
+kernel/core/system/SovereignProfessionalBootstrap.cpp
 kernel/core/system/AdaptiveDebugMode.cpp
 kernel/core/system/SovereignForge.cpp
 kernel/core/system/SovereignSelfHealing.cpp

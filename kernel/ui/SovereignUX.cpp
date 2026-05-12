@@ -1,8 +1,8 @@
-#include "core/sigma_types.h"
-#include "libc/SovereignLibC.h"
-#include "sigma_ux.h"
-#include "ui/sigma_gui.h"
-#include "hal/sigma_hal.h"
+#include "../../include/core/sigma_types.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_ux.h"
+#include "../../include/ui/sigma_gui.h"
+#include "../../include/hal/sigma_hal.h"
 #include "sigma_log.h"
 #include "core/SigmaOOP.hpp"
 
@@ -89,6 +89,7 @@ extern "C" void ux_render_dashboard() {
 extern "C" void ux_predict_adaptation() {
     SovereignUXEngine::getInstance().predictAdaptation();
 }
+
 
 
 

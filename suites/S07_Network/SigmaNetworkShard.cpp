@@ -8,7 +8,9 @@
  */
 
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 typedef struct {
     char name[32];
@@ -47,4 +49,5 @@ void sigma_net_vpn_status() {
     }
     sigma_log_info("-------------------------------------------\n\n");
 }
+
 

@@ -1,4 +1,5 @@
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -103,5 +104,6 @@ int main() {
     sigma_log_info("\n[SUCCESS]: Competitive Laboratory Zenith Shards (with Animation parity) Active.\n");
     return 0;
 }
+
 
 

@@ -5,9 +5,24 @@
     "modules": [
         "jupyter_notebooks",
         "ml_libraries",
-        "visualization_dashboards"
+        "visualization_dashboards",
+        "data_lake_access"
     ],
-    "rules": [],
-    "calculators": [],
-    "algorithms": []
+    "rules": [
+        "GDPR",
+        "Data Protection Act (DPDP)"
+    ],
+    "calculators": [
+        "Statistical confidence",
+        "model accuracy",
+        "feature importance"
+    ],
+    "algorithms": [
+        "Neural architecture search",
+        "automated feature engineering"
+    ],
+    "automation": {
+        "self_healing": "Data drift detection, model weight integrity check",
+        "rollback": "Training checkpoint restoration, dataset versioning"
+    }
 }

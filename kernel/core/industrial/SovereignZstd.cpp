@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "core/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 #include "sigma_log.h"
 #include "core/SigmaOOP.hpp"
 
@@ -24,7 +24,7 @@ public:
 
     const char* type_name() const noexcept override { return "SovereignZstd"; }
 
-    static sigma_size_t compressOrb(const void* src, void* dst, sigma_size_t src_size) {
+    static static sigma_size_t compressOrb(const void* src, void* dst, sigma_size_t src_size) {
         (void)src; (void)dst;
         sigma_log_info("[ZSTD] Compressing Orb payload using Zstandard v1.5.x...");
         // Mock compression logic
@@ -32,7 +32,7 @@ public:
         return src_size / 3;
     }
 
-    static sigma_size_t decompressOrb(const void* src, void* dst, sigma_size_t src_size) {
+    static static sigma_size_t decompressOrb(const void* src, void* dst, sigma_size_t src_size) {
         (void)src; (void)dst;
         sigma_log_info("[ZSTD] Decompressing Orb payload...");
         return src_size * 3;
@@ -51,6 +51,7 @@ extern "C" sigma_size_t zstd_compress(const void* src, void* dst, sigma_size_t s
 extern "C" sigma_size_t zstd_decompress(const void* src, void* dst, sigma_size_t size) {
     return SigmaOS::Kernel::Industrial::SovereignZstd::decompressOrb(src, dst, size);
 }
+
 
 
 

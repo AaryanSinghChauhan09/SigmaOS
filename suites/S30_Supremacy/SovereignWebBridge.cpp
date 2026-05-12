@@ -1,4 +1,5 @@
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN WEB BRIDGE (v15.5 - EXTREME FINALITY)
@@ -10,6 +11,7 @@
  */
 
 #include "SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Net {
@@ -55,4 +57,5 @@ int main() {
     start_web_zenith();
     return 0;
 }
+
 

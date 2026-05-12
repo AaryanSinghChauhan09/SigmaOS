@@ -5,9 +5,25 @@
     "modules": [
         "threat_detection",
         "penetration_testing",
-        "compliance_dashboards"
+        "compliance_dashboards",
+        "ids/ips"
     ],
-    "rules": [],
-    "calculators": [],
-    "algorithms": []
+    "rules": [
+        "ISO 27001",
+        "NIST framework",
+        "CERT-In guidelines"
+    ],
+    "calculators": [
+        "Risk score",
+        "CVSS",
+        "entropy check"
+    ],
+    "algorithms": [
+        "Anomaly detection",
+        "heuristic threat hunting"
+    ],
+    "automation": {
+        "self_healing": "Automated firewall rules, sandboxed malware containment",
+        "rollback": "Immutable audit logs, system-wide security baseline restoration"
+    }
 }

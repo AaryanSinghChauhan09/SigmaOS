@@ -1,4 +1,5 @@
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -54,5 +55,6 @@ int main() {
     sigma_log_info("\n[SUCCESS]: Military-Grade Privacy Search achieved. Tracker-Free.\n");
     return 0;
 }
+
 
 

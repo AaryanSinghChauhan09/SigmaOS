@@ -8,7 +8,9 @@
  */
 
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 typedef struct {
     char username[32];
@@ -35,4 +37,5 @@ void sigma_user_list() {
     sigma_log_info("1024   guest       GUEST   NO\n");
     sigma_log_info("-------------------------------------------\n");
 }
+
 

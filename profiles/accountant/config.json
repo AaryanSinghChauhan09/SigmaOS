@@ -24,5 +24,9 @@
         "Automated ledger balancing",
         "audit trail generation",
         "tax filing optimization"
-    ]
+    ],
+    "automation": {
+        "self_healing": "Continuous audit log integrity check, transaction consistency validation",
+        "rollback": "Snapshot-per-transaction, daily fiscal state preservation"
+    }
 }

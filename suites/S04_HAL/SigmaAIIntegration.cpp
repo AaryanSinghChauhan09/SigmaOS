@@ -8,7 +8,9 @@
  */
 
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 typedef struct {
     char model_name[32];
@@ -28,4 +30,5 @@ void sigma_ai_audit_system() {
     sigma_log_info("[SOVEREIGN AI] Userland Stability: 99.8%% CONFIDENCE\n");
     sigma_log_info("[SOVEREIGN AI] Advice: Shift workloads to Level-0 shards to reduce context switching.\n");
 }
+
 

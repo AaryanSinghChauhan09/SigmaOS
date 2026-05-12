@@ -21,5 +21,9 @@
         "CAD simulation",
         "stress analysis",
         "project scheduling"
-    ]
+    ],
+    "automation": {
+        "self_healing": "Simulation state verification, build-cache integrity check",
+        "rollback": "Project-wide git-lattice rollback, CAD design versioning"
+    }
 }

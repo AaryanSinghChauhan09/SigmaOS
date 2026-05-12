@@ -1,4 +1,5 @@
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -102,5 +103,6 @@ int main() {
     sigma_log_info("\n[SUCCESS]: Universal Scholastic Database Online. NCERT Sovereignty Confirmed.\n");
     return 0;
 }
+
 
 

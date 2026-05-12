@@ -1,0 +1,27 @@
+{
+    "profession": "forensic_scientist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "evidence_indexing",
+        "chain_of_custody_manager",
+        "dna_analysis",
+        "bit-stream_imaging"
+    ],
+    "rules": [
+        "Evidence Act",
+        "BNSS forensic protocols"
+    ],
+    "calculators": [
+        "Probability of match",
+        "decomposition rate"
+    ],
+    "algorithms": [
+        "Pattern recognition",
+        "digital fingerprinting"
+    ],
+    "automation": {
+        "self_healing": "Hash-based integrity check for evidence files",
+        "rollback": "Chain-of-custody immutable state restoration"
+    }
+}

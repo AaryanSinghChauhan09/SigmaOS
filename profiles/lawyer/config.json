@@ -25,5 +25,9 @@
         "compliance checker",
         "automated legal drafting",
         "BNS-IPC cross-mapper"
-    ]
+    ],
+    "automation": {
+        "self_healing": "Legal reference sync, document authenticity verification",
+        "rollback": "Case history snapshots, immutable filing records"
+    }
 }

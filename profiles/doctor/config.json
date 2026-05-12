@@ -10,7 +10,8 @@
     ],
     "rules": [
         "Medical Council of India guidelines",
-        "Ayushman Bharat protocols"
+        "Ayushman Bharat protocols",
+        "HIPAA"
     ],
     "calculators": [
         "Dosage",
@@ -21,5 +22,9 @@
         "Patient record indexing",
         "diagnostic prediction",
         "lab result interpretation"
-    ]
+    ],
+    "automation": {
+        "self_healing": "Medical data integrity scan, prescription conflict detection",
+        "rollback": "Patient record versioning, emergency state restoration"
+    }
 }

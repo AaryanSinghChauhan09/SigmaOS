@@ -10,7 +10,7 @@
     ],
     "rules": [
         "CBSE/NCERT curriculum",
-        "UGC guidelines"
+        "NEP 2020 guidelines"
     ],
     "calculators": [
         "Grade average",
@@ -19,5 +19,9 @@
     "algorithms": [
         "Adaptive learning paths",
         "exam paper generator"
-    ]
+    ],
+    "automation": {
+        "self_healing": "Student data sync, curriculum update validation",
+        "rollback": "Gradebook versioning, lesson plan history"
+    }
 }

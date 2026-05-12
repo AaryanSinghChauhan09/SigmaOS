@@ -8,6 +8,7 @@
  */
 
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 void sigma_academy_lesson_list() {
     sigma_log_info("\nÎ£ SOVEREIGN ACADEMY: COMMAND MASTERY\n");
@@ -29,4 +30,5 @@ void sigma_academy_start_lesson(int id) {
         sigma_log_info("[ACADEMY] SUCCESS: Industrial Sharding Logic Learned.\n");
     }
 }
+
 

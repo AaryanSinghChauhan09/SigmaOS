@@ -1,4 +1,5 @@
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -9,6 +10,7 @@
  */
 
 #include "SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
 
 /**
  * Î£ SIGMA OS: SOVEREIGN FORENSIC MATRIX (v3.0 - ZERO-STD NATIVE)
@@ -54,5 +56,6 @@ extern "C" void _start(void) {
     sigma_log_info("\n[SUCCESS]: Military-Grade Forensic Matrix Online. Audit Sovereignty achieved.\n");
     sigma_exit(0);
 }
+
 
 

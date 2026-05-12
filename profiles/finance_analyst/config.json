@@ -1,0 +1,28 @@
+{
+    "profession": "finance_analyst",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "market_dashboards",
+        "risk_analysis_tools",
+        "ai_forecasting",
+        "bloomberg-lattice_integration"
+    ],
+    "rules": [
+        "SEBI guidelines",
+        "Basel III"
+    ],
+    "calculators": [
+        "VaR",
+        "Sharpe ratio",
+        "Monte Carlo sims"
+    ],
+    "algorithms": [
+        "Algorithmic trading models",
+        "sentiment analysis"
+    ],
+    "automation": {
+        "self_healing": "Portfolio exposure verification, feed latency correction",
+        "rollback": "Pre-trade state restoration, historical data reconciliation"
+    }
+}

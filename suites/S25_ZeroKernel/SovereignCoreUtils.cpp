@@ -1,5 +1,7 @@
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignCoreUtils.h"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace CoreUtils {
@@ -85,4 +87,5 @@ namespace CoreUtils {
 
 } // namespace CoreUtils
 } // namespace SigmaOS
+
 

@@ -3,12 +3,26 @@
     "compliance_level": "sovereign-high",
     "resource_priority": "adaptive",
     "modules": [
-        "cad_tools",
+        "bim_software",
         "3d_modeling",
-        "project_management",
-        "simulation"
+        "site_analysis_tools",
+        "rendering_engines"
     ],
-    "rules": [],
-    "calculators": [],
-    "algorithms": []
+    "rules": [
+        "Building bye-laws",
+        "National Building Code (NBC)"
+    ],
+    "calculators": [
+        "FSI/FAR",
+        "structural stability",
+        "lighting/ventilation"
+    ],
+    "algorithms": [
+        "Generative design",
+        "urban density simulation"
+    ],
+    "automation": {
+        "self_healing": "BIM model consistency check, asset link validation",
+        "rollback": "Iterative design snapshots, client approval state rollback"
+    }
 }

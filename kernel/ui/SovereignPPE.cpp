@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "core/sigma_types.h"
+#include "../../include/core/sigma_types.h"
 #include "sigma_log.h"
 #include "core/SigmaOOP.hpp"
 
@@ -38,6 +38,7 @@ private:
 extern "C" void ux_ppe_predict() {
     SigmaOS::Kernel::UI::SovereignPPE::getInstance().predictAdaptation();
 }
+
 
 
 

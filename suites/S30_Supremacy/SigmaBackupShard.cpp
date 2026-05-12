@@ -8,6 +8,7 @@
  */
 
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 void sigma_backup_media(const char* source_url) {
     sigma_log_info("[BACKUP] Initializing Media Scraper (source: %s)... OK\n", source_url);
@@ -22,4 +23,5 @@ void sigma_backup_system() {
     sigma_log_info("[BACKUP] Transferring archive to Mirror-Shard... OK\n");
     sigma_log_info("[BACKUP] SYSTEM BACKUP COMPLETE (v94.0.0.snapshot)\n");
 }
+
 

@@ -8,7 +8,9 @@
  */
 
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 typedef struct {
     char node_id[32];
@@ -41,4 +43,5 @@ void sigma_remote_init() {
     sigma_log_info("[REMOTE] Initializing Shard Nodes (Bot Style)...\n");
     sigma_log_info("[REMOTE] Secure Routing Mesh: ACTIVE\n");
 }
+
 

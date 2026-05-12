@@ -1,4 +1,5 @@
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -9,6 +10,7 @@
  */
 
 #include "SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
 
 /**
  * Î£ SIGMA OS: SOVEREIGN ENCYCLOPEDIA (v128.0 - ZERO-STD NATIVE)
@@ -107,5 +109,6 @@ extern "C" void _start(void) {
     sigma_log_info("\n[SUCCESS]: Competitive Scholastic Encyclopedia Online. NCERT Sovereignty 100%%.\n");
     sigma_exit(0);
 }
+
 
 

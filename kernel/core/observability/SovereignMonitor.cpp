@@ -1,5 +1,10 @@
-#include "observability/SovereignMonitor.hpp"
-#include "sigma_log.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/observability/sigma_monitor.h"
+#include "../../../include/core/SigmaOOP.hpp"
+
+extern "C" void telemetry_execute_ebpf(const void* bytecode, sigma_usize size);
 
 namespace SigmaOS {
 namespace Kernel {
@@ -43,12 +48,6 @@ void SovereignObservabilityMonitor::rebalanceLattice() {
     sigma_log_info("[MONITOR] Migration: S412 -> Core 15, S092 -> Core 02.");
 }
 
-void SovereignObservabilityMonitor::captureStackTrace(sigma_u32 shard_id) {
-    sigma_log_info("[MONITOR] Capturing bare-metal stack trace for Shard %u...", shard_id);
-    // Hit & Trial: Walk the frame pointer chain
-    sigma_log_info("[MONITOR] Stack trace capture COMPLETE.");
-}
-
 } // namespace Observability
 } // namespace Kernel
 } // namespace SigmaOS
@@ -68,37 +67,4 @@ extern "C" void monitor_execute_ebpf(const void* bytecode, sigma_usize size) {
 
 extern "C" void monitor_rebalance_lattice() {
     SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().rebalanceLattice();
-}
-
-extern "C" void monitor_capture_stack_trace(sigma_u32 sid) {
-    SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().captureStackTrace(sid);
-}
-
-extern "C" sigma_u32 monitor_get_shard_health(sigma_u32 shard_id) {
-    (void)shard_id; // Fix unused parameter
-    sigma_log_info("[MONITOR] Probing health for Shard %u...", shard_id);
-    // Hit & Trial: Check if heartbeats are within threshold
-    return 100U; // Industrial Grade Health
-}
-extern "C" void monitor_generate_report() {
-    sigma_log_info("[MONITOR] Generating comprehensive lattice health report...");
-    // Hit & Trial: Aggregate metrics from all shards
-    sigma_log_info("[MONITOR] Report generated: LATTICE_HEALTH_OPTIMAL. (Log ID: 0xDEADBEEF)");
-}
-
-extern "C" void monitor_clear_history() {
-    sigma_log_warn("[MONITOR] Clearing historical telemetry data...");
-    // Hit & Trial: Flush ring buffers
-    sigma_log_info("[MONITOR] Telemetry history cleared.");
-}
-
-extern "C" void monitor_log_anomaly(const char* anomaly_type) {
-    sigma_log_warn("[MONITOR] ANOMALY DETECTED: %s", anomaly_type);
-    // Hit & Trial: Append to persistent anomaly log
-}
-
-extern "C" void monitor_audit_probes() {
-    sigma_log_info("[MONITOR] Auditing eBPF lattice probes...");
-    // Hit & Trial: Verify probe hooks are active and non-intrusive
-    sigma_log_info("[MONITOR] Audit COMPLETE: All probes NOMINAL.");
 }

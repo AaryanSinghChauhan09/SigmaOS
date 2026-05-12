@@ -8,6 +8,7 @@
  */
 
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 // --- Sys-Info Sharding ---
 void sigma_tool_sysinfo() {
@@ -31,4 +32,5 @@ void sigma_terminal_utils_init() {
     sigma_log_info("[TOOLS] Initializing Industrial Shards (Ubuntu/Bash style)...\n");
     sigma_log_info("[TOOLS] Sharding Sysinfo & Benchmark: ACTIVE\n");
 }
+
 

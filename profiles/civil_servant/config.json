@@ -3,21 +3,24 @@
     "compliance_level": "sovereign-high",
     "resource_priority": "adaptive",
     "modules": [
-        "policy_tools",
-        "compliance",
-        "citizen_records"
+        "civil_servant_workspace",
+        "specialized_analytics",
+        "compliance_manager"
     ],
     "rules": [
-        "Service rules",
-        "policy drafting guidelines"
+        "Industry standards",
+        "professional ethics"
     ],
     "calculators": [
-        "Budget allocation",
-        "pension",
-        "pay scale"
+        "Efficiency metrics",
+        "cost analysis"
     ],
     "algorithms": [
-        "Policy impact simulation",
-        "citizen data indexing"
-    ]
+        "Workflow optimization",
+        "adaptive assistance"
+    ],
+    "automation": {
+        "self_healing": "Continuous health check for Civil Servant tools",
+        "rollback": "Automatic state snapshots"
+    }
 }

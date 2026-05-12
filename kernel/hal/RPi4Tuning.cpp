@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "core/sigma_types.h"
+#include "../../include/core/sigma_types.h"
 #include "sigma_log.h"
 #include "core/SigmaOOP.hpp"
 
@@ -46,6 +46,7 @@ private:
 extern "C" void rpi4_tune() {
     SigmaOS::Kernel::HAL::RPi4Tuning::getInstance().applyOptimization();
 }
+
 
 
 

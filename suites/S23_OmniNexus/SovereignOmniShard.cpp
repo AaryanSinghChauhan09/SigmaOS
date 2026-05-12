@@ -1,4 +1,5 @@
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Omni {
@@ -50,4 +51,5 @@ void SovereignNetZenith::RecursiveDNSNode(const char* domain) {
 
 } // namespace Omni
 } // namespace SigmaOS
+
 
