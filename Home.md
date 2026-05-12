@@ -11,6 +11,7 @@ Welcome to the central knowledge hub for **SigmaOS**, the world's first industri
 
 ## 🚀 Industrial Strategy
 
+- **[Sovereign Strategy vs Linux](STRATEGIC_COMPARISON.md)**: How SigmaOS outperforms mainstream distributions (Ubuntu, Fedora).
 - **[Unique Selling Points (USP)](USP.md)**: What makes SigmaOS different from generic operating systems.
 - **[Profession Lattice Map](PROFESSION-MAP.md)**: A complete mapping of tools and resilience strategies for 350+ roles.
 - **[Professionalization Plan](PROFESSIONALIZATION_PLAN.md)**: The roadmap for transforming SigmaOS into a turnkey professional workstation.
