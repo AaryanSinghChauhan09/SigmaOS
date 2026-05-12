@@ -47,7 +47,8 @@ kernel/core/system/SovereignZFS.cpp
 kernel/core/system/SovereignNix.cpp
 kernel/core/system/SovereignWASM.cpp
 kernel/core/system/SovereignGit.cpp
-# LAYER 3: SECURITY & PQC
+# LAYER 3: COMPATIBILITY & SECURITY
+kernel/core/compat/SovereignProton.cpp
 kernel/core/security/SovereignPQC.cpp
 kernel/core/security/SovereignAirGap.cpp
 kernel/core/security/SovereignPolicy.cpp
