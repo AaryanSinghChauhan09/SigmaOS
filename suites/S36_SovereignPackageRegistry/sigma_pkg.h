@@ -26,6 +26,7 @@ typedef struct SigmaPkg {
     sigma_u64     content_hash;   // FNV-1a of package content
     SigmaPkgState state;
     unsigned char requires_cap;   // SIGMA_CAP_* flags
+    int           depends_on;     // pkg_id of dependency, or -1
 } SigmaPkg;
 
 typedef struct SigmaPkgDB {
@@ -54,7 +55,16 @@ static inline int pkg_register(SigmaPkgDB* db, const char* name,
     p->content_hash = hash;
     p->state        = PKG_UNINSTALLED;
     p->requires_cap = cap_req;
+    p->depends_on   = -1;
     return (int)(db->count - 1);
+}
+
+static inline int pkg_register_with_dep(SigmaPkgDB* db, const char* name,
+                                 const char* ver, sigma_u64 hash,
+                                 unsigned char cap_req, int dep_id) {
+    int id = pkg_register(db, name, ver, hash, cap_req);
+    if (id >= 0) db->packages[id].depends_on = dep_id;
+    return id;
 }
 
 // Install a package — verified by capability token
@@ -63,6 +73,12 @@ static inline int pkg_install(SigmaPkgDB* db, unsigned int pkg_id,
                                 const unsigned char* data, sigma_u64 len) {
     if (pkg_id >= db->count) return -1;
     SigmaPkg* p = &db->packages[pkg_id];
+
+    // Dependency Check
+    if (p->depends_on >= 0) {
+        if (db->packages[p->depends_on].state != PKG_INSTALLED) return -4; // dependency missing
+    }
+
     if (!cap_check(tok, p->requires_cap)) return -2; // permission denied
     sigma_u64 actual = pkg_fnv1a(data, len);
     if (actual != p->content_hash) return -3; // integrity violation

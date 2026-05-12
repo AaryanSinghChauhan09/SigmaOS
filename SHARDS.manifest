@@ -61,6 +61,7 @@ kernel/core/security/SovereignPolicy.cpp
 kernel/core/security/SovereignMAC.cpp
 kernel/core/security/SovereignSandbox.cpp
 kernel/core/security/SovereignLUKS.cpp
+kernel/core/security/SovereignGPG.cpp
 kernel/core/security/SovereignAttestation.cpp
 kernel/core/security/SovereignTPM.cpp
 drivers/SovereignLinuxCompat.cpp
