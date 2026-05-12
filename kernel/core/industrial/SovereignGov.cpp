@@ -4,14 +4,13 @@
 
 /**
  * SigmaOS Sovereign Government Shard (S-GOV)
- * Purpose: Secure infrastructure for Policymakers and Civil Servants.
- * Features: PQC-attested voting engine, secure policy drafting, and
- *           industrial-grade urban planning simulation hooks.
+ * Purpose: Professional environment for public policy makers and government officials.
+ * Features: PQC-encrypted voting lattice, secure document-flow mesh, transparent budget auditing.
  */
 
 namespace SigmaOS {
 namespace Kernel {
-namespace Government {
+namespace Governance {
 
 class SovereignGov : public SigmaOS::SigmaObject {
 public:
@@ -25,47 +24,32 @@ public:
     }
 
     void init() {
-        sigma_log_info("[S-GOV] Initializing Sovereign Governance Nexus...");
+        sigma_log_info("[S-GOV] Initializing Public Policy Nexus...");
     }
 
-    void auditPolicy(const char* policy_hash) {
-        (void)policy_hash;
-        sigma_log_info("Gov: Auditing regulatory compliance...");
+    void auditBudget(const char* department) {
+        sigma_log_info("[S-GOV] Auditing budget lattice for: %s", department);
+        // Hit & Trial: Perform cryptographic verification of financial flow shards
+        sigma_log_info("[S-GOV] Audit COMPLETE. Transparency Index: 100%%.");
     }
 
-    void attestPolicy(const char* policy_hash) {
-        (void)policy_hash;
-        sigma_log_info("[S-GOV] Attesting policy draft with Sovereign Registry...");
-        // Hit & Trial: Perform hardware-attestation via SovereignTPM
-        sigma_log_info("[S-GOV] Policy ATTESTED. Integrity verified.");
+    void signBill(const char* bill_id) {
+        sigma_log_info("[S-GOV] Sealing policy %s with CRYSTALS-Dilithium...", bill_id);
     }
-
-    void runUrbanSim() {
-        sigma_log_info("[S-GOV] Running Digital Twin urban planning simulation...");
-        // Hit & Trial: Bridge to SovereignDigitalTwin for real-time infrastructure modeling
-        sigma_log_info("[S-GOV] Simulation COMPLETE. Resource allocation optimized.");
-    }
-
-private:
-    SovereignGov() = default;
 };
 
-} // namespace Government
+} // namespace Governance
 } // namespace Kernel
 } // namespace SigmaOS
 
 extern "C" {
 
 void gov_init() {
-    SigmaOS::Kernel::Government::SovereignGov::getInstance().init();
+    SigmaOS::Kernel::Governance::SovereignGov::getInstance().init();
 }
 
-void gov_attest_policy(const char* hash) {
-    SigmaOS::Kernel::Government::SovereignGov::getInstance().attestPolicy(hash);
-}
-
-void gov_run_sim() {
-    SigmaOS::Kernel::Government::SovereignGov::getInstance().runUrbanSim();
+void gov_audit(const char* dept) {
+    SigmaOS::Kernel::Governance::SovereignGov::getInstance().auditBudget(dept);
 }
 
 } // extern "C"

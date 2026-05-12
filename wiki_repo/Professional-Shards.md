@@ -31,3 +31,18 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 - **Primary Tool**: Parametric Sharder.
 - **Security**: Atomic blueprint verification.
 - **Resilience**: State-reconciliation for BIM models.
+
+## 🌾 S-AGRIC: Agricultural Scientist Shard
+- **Primary Tool**: IoT Soil-Lattice Monitor.
+- **Security**: PQC-encrypted land records.
+- **Resilience**: Real-time harvest failover.
+
+## 🎨 S-ART: Creative Studio Shard
+- **Primary Tool**: High-Bit-Depth Color Lattice.
+- **Security**: PQC-signed asset authorship.
+- **Resilience**: Low-latency GPU context restoration.
+
+## 🎓 S-EDU: Academic & Researcher Shard
+- **Primary Tool**: Peer-Review Mesh.
+- **Security**: Knowledge-Graph integrity verification.
+- **Resilience**: Decentralized research sharding.
