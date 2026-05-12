@@ -19,8 +19,7 @@
 // =============================================================================
 
 #include "sigma_libc.h"
-#include "sigma_libc.h"
-#include "sigma_libc.h"
+#include "sigma_log.h"
 #include "sigma_types.h"
 
 #include <ctype.h>
@@ -87,6 +86,7 @@ static const ShellBuiltin builtins[] = {
     { "sql",     "Sovereign Database Query",    SIGMA_NULL },
     { "audio",   "Spatial Audio Mixer",         SIGMA_NULL },
     { "task",    "Orchestrate execution shards",SIGMA_NULL },
+    { "s-mind",  "Launch Sovereign Lattice Mapper",SIGMA_NULL },
     { SIGMA_NULL, SIGMA_NULL, SIGMA_NULL }
 };
 
