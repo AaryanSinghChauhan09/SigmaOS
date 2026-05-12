@@ -19,6 +19,7 @@ All notable changes to **SigmaOS** will be documented in this file.
 - **S-FIRE**: Industrial firewall with nftables-parity.
 - **S-LUKS**: Volume encryption for data-at-rest protection.
 - **S-PROTON**: Compatibility bridge for mainstream Linux/Windows applications.
+- **S-MIND**: Integrated Sovereign Mind Map tool (industrial alternative to Nicemind) into the Zenith Environment.
 - **S-BACKUP**: Atomic system snapshots and PQC-attested recovery.
 - **S-CONTAINER**: OCI-compliant container runtime (Docker-parity).
 - **S-SSH**: Secure remote administration lattice.
@@ -29,6 +30,7 @@ All notable changes to **SigmaOS** will be documented in this file.
 - **Include Path Hardening**: Resolved 600+ brittle include path errors by enforcing root-relative addressing.
 - **Boot Singularity**: Restored missing boot shards to `SHARDS.manifest`, ensuring a complete system singularity build.
 - **Sovereign Tooling**: Refactored `sigma-pkg` to use the zero-dependency Sovereign OOP framework.
+- **Wiki Navigation & Integrity**: Resolved 170+ committed merge conflicts and standardized navigation to slug-based linking for GitHub Wiki parity.
 - **Documentation Parity**: Synced the finalized "Logic" and "Roadmap" matrices with the GitHub Wiki.
 - **UI Aesthetics**: Professionalized the landing page and Zenith Desktop with a premium glassmorphic design.
 
