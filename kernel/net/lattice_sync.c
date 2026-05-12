@@ -1,4 +1,3 @@
-#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: LATTICE-SYNC (v1.0 - PQC PROTECTED NETWORK SYNC)
@@ -12,7 +11,7 @@
  * =============================================================================
  */
 
-#include "core/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 typedef struct LatticePacket {
     sigma_u64  seq_id;
@@ -26,7 +25,7 @@ typedef struct LatticePacket {
  * ========================================================================= */
 
 void lattice_sync_init(void) {
-    // ksigma_printf("[LATTICE-SYNC]: Sovereign Post-Quantum Network Sync Shard Online.\n");
+    // kprintf("[LATTICE-SYNC]: Sovereign Post-Quantum Network Sync Shard Online.\n");
 }
 
 sigma_status lattice_sync_send_shard(sigma_u32 shard_id, const void* buffer, sigma_u32 len) {
@@ -34,14 +33,14 @@ sigma_status lattice_sync_send_shard(sigma_u32 shard_id, const void* buffer, sig
     extern void pqc_encrypt_buffer(sigma_u32, void*, sigma_u32);
     pqc_encrypt_buffer(shard_id, (void*)buffer, len);
     
-    // ksigma_printf("[LATTICE-SYNC]: Shard [%u] Encrypted and Signed for Sovereignty.\n", shard_id);
-    // ksigma_printf("[LATTICE-SYNC]: Syncing to Lattice Node: 0x93\n");
+    // kprintf("[LATTICE-SYNC]: Shard [%u] Encrypted and Signed for Sovereignty.\n", shard_id);
+    // kprintf("[LATTICE-SYNC]: Syncing to Lattice Node: 0x93\n");
     
     return K_OK;
 }
 
 sigma_status lattice_sync_process_packet(LatticePacket* pkt) {
     /* Verify signature and decrypt payload */
-    // ksigma_printf("[LATTICE-SYNC]: Processing Inbound Sovereign Packet: ID %llu\n", pkt->seq_id);
+    // kprintf("[LATTICE-SYNC]: Processing Inbound Sovereign Packet: ID %llu\n", pkt->seq_id);
     return K_OK;
 }

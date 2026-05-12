@@ -1,5 +1,3 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
 /*
  * =========================================================================
  * SIGMAOS: SOVEREIGN S-INSTALL (SovereignDeploymentEngine)
@@ -13,7 +11,7 @@
  */
 
 #include "sigma_sinstall.h"
-#include "libc/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /* =========================================================================
  * SovereignDeploymentEngine Method Implementations
@@ -26,12 +24,12 @@ public:
         return instance;
     }
 
-    static void init() {
+    void init() {
         sigma_log("[S-INSTALL] Initializing Bare-Metal Autonomous Deployment Engine...");
     }
 
     void ignite(const char* target_disk) {
-        sigma_log("[S-INSTALL] Igniting Sovereign Lattice on %s...\n", target_disk);
+        sigma_printf("[S-INSTALL] Igniting Sovereign Lattice on %s...\n", target_disk);
         sigma_hardened_strcpy(this->session.target_disk, target_disk, 32u);
         this->session.progress_percent = 0u;
 
@@ -64,13 +62,10 @@ private:
  * C-Linkage Wrappers (ABI compatibility)
  * ========================================================================= */
 
-void sinstall_init() {
-    SovereignDeploymentEngine::init();
+extern "C" void sinstall_init() {
+    SovereignDeploymentEngine::getInstance().init();
 }
 
-void sinstall_ignite(const char* target_disk) {
-    SovereignDeploymentEngine::ignite(target_disk);
+extern "C" void sinstall_ignite(const char* target_disk) {
+    SovereignDeploymentEngine::getInstance().ignite(target_disk);
 }
-
-
-} // extern "C"

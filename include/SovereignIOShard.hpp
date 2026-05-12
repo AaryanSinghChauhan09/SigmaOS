@@ -1,7 +1,7 @@
 #ifndef IO_SHARD_HPP
 #define IO_SHARD_HPP
 
-#include "core/sigma_types.h"
+#include "../../include/sigma_types.h"
 
 namespace SigmaOS {
 namespace Kernel {

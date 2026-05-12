@@ -1,4 +1,3 @@
-#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: INTRUSION DETECTION SHARD (v1.0)
@@ -6,7 +5,7 @@
  * Principles: Syscall Pattern Analysis & Shard Integrity Auditing.
  * =============================================================================
  */
-#include "core/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 typedef struct SyscallLog {
     sigma_u64 syscall_id;

@@ -1,32 +1,53 @@
-# bug report
-
 ---
 name: Bug Report
-about: Create a report to help us improve
-title: '[BUG] '
-labels: bug
+about: Report a kernel shard malfunction or build failure
+title: "[BUG] <shard_name>: <short description>"
+labels: bug, triage
 assignees: ''
-
 ---
 
-### Describe the bug
+## Affected Shard
 
-A clear and concise description of what the bug is.
+<!-- Which kernel shard is affected? e.g. SovereignNetStack, SovereignGPU -->
 
-### To Reproduce
+## Description
 
-Steps to reproduce the behavior.
+<!-- A clear description of the bug -->
 
-### Expected behavior
+## Reproduction Steps
 
-A clear and concise description of what you expected to happen.
 
-### Screenshots
 
-If applicable, add screenshots to help explain your problem.
 
-### Environment
+1. Step one
+2. Step two
 
-- Hardware (e.g., QEMU, Bare-metal)
-- Architecture (x86_64, ARM64)
-- Active Professional Profile
+
+
+3. Step three
+
+## Expected Behavior
+
+<!-- What should happen -->
+
+## Actual Behavior
+
+<!-- What actually happens -->
+
+## Build Environment
+
+
+
+
+- Architecture: `[ ] x86_64  [ ] ARM64  [ ] RISC-V
+
+ sigma-build output: paste here
+
+## Logs
+
+```text
+
+<!-- Paste sigma_log / serial output here -->
+
+```
+

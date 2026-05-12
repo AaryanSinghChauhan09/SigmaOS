@@ -4,6 +4,8 @@
 
 * [Home](Home)
 * [Architecture](Architecture)
+* [Lattice Subsystems](Subsystems)
+* [AI/ML Intelligence Nexus](AI-ML-Nexus)
 * [Sovereign Principles](SOVEREIGN_PRINCIPLES)
 
 ## 🚀 Strategic Vision

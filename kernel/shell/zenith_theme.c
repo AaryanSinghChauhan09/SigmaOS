@@ -1,4 +1,3 @@
-#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS SHELL: ZENITH GUI THEME ENGINE (v1.0)
@@ -6,7 +5,7 @@
  * Principles: Glassmorphism & High-Contrast Aesthetics.
  * =============================================================================
  */
-#include "core/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 typedef struct Theme {
     sigma_u8      primary_color;

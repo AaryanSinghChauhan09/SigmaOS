@@ -1,80 +1,117 @@
-# Σ SigmaOS: The Sovereign Lattice (Zenith v15.0)
+# 🏛️ SigmaOS: A Modular, Experimental Operating System
 
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![License](https://img.shields.io/badge/license-Industrial%20Sovereign-blue)
-![Architecture](https://img.shields.io/badge/architecture-x86__64%20%7C%20ARM64%20%7C%20RISC--V-orange)
+SigmaOS is an experimental, bare-metal operating system kernel built to explore extreme modularity using C++ singleton patterns. While currently in a conceptual phase (v29.0), its goal is to provide a clean, zero-dependency alternative to legacy monolithic kernels.
 
-SigmaOS is the world's first **Industrial-Grade, Profession-Aware Operating System**. Built on the **Sovereign Lattice™** architecture, it provides a high-assurance, zero-dependency environment for mission-critical professional workflows.
+## 🚀 Current Status (What SigmaOS Does Today)
 
-## 🏛 Industrial Architecture
+SigmaOS is **not** a daily-driver operating system. Currently, the kernel can:
 
-```mermaid
-graph TD
-    User((Professional User)) --> Zenith[Zenith UI / Control Center]
-    Zenith --> Lattice[Sovereign Lattice Core]
-    Lattice --> Shards{Industrial Shards}
-    Shards --> AI[S-AI: CUDA/ONNX]
-    Shards --> Cyber[S-CYBER: Metasploit/Audit]
-    Shards --> Cloud[S-CLOUD: Docker/K8s]
-    Shards --> Sys[S-PKG: Dilithium-5 Verified]
-    Lattice --> Micro[Hardened Microkernel]
-    Micro --> PQC[PQC Memory Model]
-    Micro --> Sched[Real-time S-SCHED]
-```
 
-## 🚀 Key Unique Selling Points (USPs)
 
-- **The Sovereign Lattice™**: A 600-shard modular kernel where every system service is a self-contained, high-assurance unit.
-- **Profession-Aware Architecture**: Dynamically orchestrates kernel shards based on your profession (Doctor, Lawyer, Architect, etc.).
-- **PQC-First Security**: Native Post-Quantum Cryptography for all data at rest and in transit.
-- **Life-OS Integration**: Personal AI Infrastructure (PAI) for managing current vs. desired user state.
 
-## 🛠 Quick Start
+* **Boot reliably in QEMU:** Using a Multiboot2 compliant binary and GRUB.
+* **Initialize Hardware:** Basic probing of the CPU and establishing serial output (COM1) for debugging.
 
-### Prerequisites
 
-- LLVM / Clang (C++20 compliant)
-- QEMU (for emulation)
-- Node.js (for manifest generation)
 
-### Build Instructions
+* **Allocate Memory:** A simple bare-metal bump allocator (QBMP) with basic guard checks.
+* **Execute Minimal Userland:** A barebones interactive shell (`sigma_sh`) is in development to provide basic I/O.
+
+
+
+* **Demonstrate Architecture:** The entire kernel is divided into isolated C++ singletons ("Shards") that communicate via strict C-linkage interfaces.
+
+SigmaOS currently lacks a fully functional filesystem, robust device drivers (e.g., USB, GPU), and a mature networking stack, though stubs exist.
+
+## 🛠️ Building & Running
+
+### Dependencies
+
+
+
+
+* `make`
+* `nasm`
+
+
+
+* `g++` (multilib / cross-compiler)
+* `qemu-system-x86_64`
+
+
+
+* `grub-mkrescue` and `xorriso` (for ISO generation)
+
+### 1. Build the Kernel
 
 ```bash
 
-# Generate professional profiles
+make clean
+make singularity
 
-node populate_profiles.cjs
-
-# Compile the Sovereign Kernel
-
-make all
-
-# Boot in QEMU
-
-make run
 ```
-See [BUILD.md](BUILD.md) for detailed hardware deployment guides.
 
-## 📚 Documentation & Resources
+_This generates `sigmaos.bin`, the core Multiboot2 executable._
 
-- **Wiki**: [SigmaOS Sovereign Wiki](WIKI/Home.md)
-- **Support**: [Sovereign Support Nexus](SUPPORT.md)
-- **Architecture**: [Kernel Design](WIKI/Architecture.md)
-- **API Reference**: [Sovereign SDK](include/sigma_sdk.h)
-- **Roadmap**: [The Zenith Path](ROADMAP.md)
+### 2. Generate a Bootable ISO
+
+```bash
+
+make zenith-iso
+
+```
+
+_Creates a GRUB-bootable ISO image for testing on hardware or VMs._
+
+### 3. Run in Emulator
+
+```bash
+
+make qemu
+
+```
+
+_Boots the kernel in QEMU and pipes the internal kernel logs directly to your terminal._
+
+## 📚 Glossary: Translating the Vision
+
+SigmaOS uses unique terminology for its architectural concepts. Here is what they mean in standard OS engineering terms:
+
+| SigmaOS Term                     | Standard Technical Meaning                                                                       |
+| :------------------------------- | :----------------------------------------------------------------------------------------------- |
+| **Sovereign Lattice**            | The operating system architecture as a whole.                                                    |
+| **Shard**                        | A distinct subsystem or driver encapsulated as a C++ Singleton class.                            |
+| **Amnesic Memory**               | Stateless RAM allocation; memory buffers that are eagerly zeroed out after use to prevent leaks. |
+| **Zenith**                       | The target milestone version denoting a stable, complete foundation.                             |
+| **ZCLN (Zero-Copy Lattice Net)** | A zero-copy networking stack (bypassing redundant buffer copies between kernel and userland).    |
 
 ## 🤝 Contributing
 
-We welcome contributions from the industrial and open-source communities. Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on code style, shard modularization, and PQC-attestation requirements.
+We welcome contributions to help evolve SigmaOS from an experimental kernel into a fully usable distribution.
 
-## 🔒 Security & Reliability
 
-SigmaOS is designed for absolute reliability.
 
-- **Memory Safety**: Strict adherence to `SigmaOOP` patterns and zero-allocation kernel primitives.
-- **Self-Healing**: Autonomous `S-AUTO` shard for real-time fault detection and atomic rollback.
-- **Sandboxing**: `S-WASM` runtime for isolated professional tool execution.
+
+* Please read [CONTRIBUTING.md](CONTRIBUTING.md) for our PR process and coding standards.
+
+## 🚀 Current Status (Zenith Supreme: Singularity Complete)
+
+SigmaOS has reached its architectural zenith. The kernel is now:
+
+
+
+
+* **600-Shard Modular Lattice:** Fully transitioned to OOP-isolated singletons.
+* **Neural UI Transpilation:** AVX-512 accelerated Morphic Zenith UI.
+
+
+
+* **Atomic Lattice Sync:** Zero-drift distributed filesystem state.
+* **Amnesic Security:** Zero-trace execution and quantum-safe identity vaults.
+
+For a detailed look at our implementation history, refer to the project Wiki and GitHub Insights.
 
 ---
 
-### SigmaOS: Sovereignty over your workspace.
+_Σ SIGMAOS: Absolute Sovereignty. Singularity Achieved._
+

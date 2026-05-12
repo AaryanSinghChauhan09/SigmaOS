@@ -1,0 +1,43 @@
+name: "Code Quality & Linting"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  lint:
+    name: C++ Static Analysis & Linting
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install clang-tidy and markdownlint
+      run: |
+        sudo apt-get install -y clang-tidy npm
+        sudo npm install -g markdownlint-cli
+
+    - name: Run clang-tidy
+      run: |
+        clang-tidy kernel/core/*.cpp userland/*.cpp -- -I./include -std=c++17
+
+    - name: Run cppcheck on kernel shards
+      run: |
+        cppcheck --enable=all --inconclusive --library=std \
+                 --suppress=missingIncludeSystem \
+                 --error-exitcode=1 \
+                 kernel/core/ kernel/shards/ userland/ \
+                 2>&1 | tee cppcheck_report.txt
+
+    - name: Check Markdown linting
+      run: |
+        markdownlint docs/*.md *.md
+
+    - name: Upload cppcheck report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: cppcheck-report
+        path: cppcheck_report.txt

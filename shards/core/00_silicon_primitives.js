@@ -28,23 +28,12 @@ const Ʃ = {
         constructor(size) {
             this.p = new Array(size);
             this.i = 0;
-            this.active = 0; // Track active allocations
             console.log('Σ://HEAP> Allocated ' + size + ' UI slots.');
         }
         alloc(o) {
-            if (this.active >= this.p.length) {
-                console.warn('Σ://HEAP> HEAP OVERFLOW — object loss risk!');
-                this.i = 0; // Force wrap with warning
-            }
+            if (this.i >= this.p.length) this.i = 0;
             this.p[this.i++] = o;
-            this.active++;
             return this.i - 1;
-        }
-        free(idx) {
-            if (idx >= 0 && idx < this.p.length) {
-                this.p[idx] = null;
-                this.active--;
-            }
         }
     },
 

@@ -1,8 +1,8 @@
 #ifndef VFS_HPP
 #define VFS_HPP
 
-#include "core/sigma_types.h"
-#include "core/SigmaOOP.hpp"
+#include "sigma_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace FS {

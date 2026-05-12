@@ -1,7 +1,6 @@
-#include "core/sigma_types.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SIGMA C11 FOUNDATION (v100.0 - PURE C11 REPLACEMENT)
+ * Î£ SIGMAOS: SIGMA C11 FOUNDATION (v20.0 - PURE C11 REPLACEMENT)
  * =========================================================================
  * Replaces SigmaOOP.hpp â€� all C++ OOP constructs eliminated.
  * Provides: core types, sigma_status, sigma_log, fundamental macros.
@@ -18,7 +17,7 @@
 #ifndef SIGMA_C11_H
 #define SIGMA_C11_H
 
-#include "libc/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 /* =========================================================================
  * Common typedefs used across shards
@@ -88,4 +87,3 @@ static inline void sigma_dealloc(void* ptr) {
 #define SIGMA_BARRIER() __asm__ __volatile__("" ::: "memory")
 
 #endif /* SIGMA_C11_H */
-

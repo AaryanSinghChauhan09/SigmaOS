@@ -1,7 +1,4 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "libc/SovereignLibC.h"
-#include "hal/sigma_hal.h"
+#include "sigma_hal.h"
 #include "sigma_usr.h"
 
 /**
@@ -9,7 +6,7 @@
  * Implements a Quantum-Safe Shard Orchestrator for dynamic discovery.
  * ZERO-DEPENDENCY: Strictly bare-metal shard registry.
  *
- * Design: OOP-isolated singleton � SovereignUSRManager.
+ * Design: OOP-isolated singleton — SovereignUSRManager.
  */
 
 /* --- Sovereign USR Implementation --- */
@@ -18,10 +15,10 @@ void SovereignUSRManager::init() {
     sigma_log("[USR] Initializing Sovereign Unified Shard Registry...");
 }
 
-sigma_u32 SovereignUSRManager::registerShard(const char* name, sigma_u32 quantum_key) {
+uint32_t SovereignUSRManager::registerShard(const char* name, uint32_t quantum_key) {
     if (this->count >= 512) return 0;
 
-    sigma_u32 id = ++this->count;
+    uint32_t id = ++this->count;
     sigma_usr_entry_t* entry = &this->registry[id - 1];
 
     entry->shard_id    = id;
@@ -29,36 +26,34 @@ sigma_u32 SovereignUSRManager::registerShard(const char* name, sigma_u32 quantum
     entry->quantum_key = quantum_key;
 
     /* Hardened string copy: bounded, null-terminated */
-    sigma_u32 i = 0;
+    uint32_t i = 0;
     while (i < 63 && name[i] != '\0') {
         entry->name[i] = name[i];
         i++;
     }
     entry->name[i] = '\0';
 
-    sigma_log("[USR] Registered Shard: %s (ID: %d, Key: 0x%08X)\n",
+    sigma_printf("[USR] Registered Shard: %s (ID: %d, Key: 0x%08X)\n",
                  entry->name, id, quantum_key);
     return id;
 }
 
-bool SovereignUSRManager::activateShard(sigma_u32 shard_id) {
+bool SovereignUSRManager::activateShard(uint32_t shard_id) {
     if (shard_id == 0 || shard_id > this->count) return false;
     this->registry[shard_id - 1].is_active = true;
-    sigma_log("[USR] Shard S%02d Activated.\n", shard_id);
+    sigma_printf("[USR] Shard S%02d Activated.\n", shard_id);
     return true;
 }
 
 /* --- C Wrappers --- */
-void usr_init() {
-    SovereignUSRManager::init();
+extern "C" void usr_init() {
+    SovereignUSRManager::getInstance().init();
 }
 
-extern "C" sigma_u32 usr_register_shard(const char* name, sigma_u32 quantum_key) {
-    return SovereignUSRManager::registerShard(name, quantum_key);
+extern "C" uint32_t usr_register_shard(const char* name, uint32_t quantum_key) {
+    return SovereignUSRManager::getInstance().registerShard(name, quantum_key);
 }
 
-extern "C" bool usr_activate_shard(sigma_u32 shard_id) {
-    return SovereignUSRManager::activateShard(shard_id);
+extern "C" bool usr_activate_shard(uint32_t shard_id) {
+    return SovereignUSRManager::getInstance().activateShard(shard_id);
 }
-
-} // extern "C"

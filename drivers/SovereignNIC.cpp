@@ -1,5 +1,3 @@
-#include "sigma_log.h"
-#include "SovereignLibC.h"
 
 #include "sigma_hal.h"
 
@@ -21,7 +19,7 @@ public:
         return instance;
     }
 
-    static void init() {
+    void init() {
         sigma_log("[NIC] Probing Sovereign Network Interface...");
 
         this->master_nic.mac[0] = 0xDE;
@@ -33,7 +31,7 @@ public:
         this->master_nic.link_up = true;
         this->tx_quota = 0;
 
-        sigma_log_info("[NIC] Link established. MAC: %02X:%02X:%02X:%02X:%02X:%02X\n",
+        sigma_printf("[NIC] Link established. MAC: %02X:%02X:%02X:%02X:%02X:%02X\n",
                   this->master_nic.mac[0], this->master_nic.mac[1], this->master_nic.mac[2],
                   this->master_nic.mac[3], this->master_nic.mac[4], this->master_nic.mac[5]);
     }
@@ -51,7 +49,7 @@ public:
 
         /* Inject packet into lattice mesh */
         this->tx_quota++;
-        sigma_log_info("[NIC] Transmitting packet (%d bytes)... [Quota: %d/%d]\n", len, this->tx_quota, MAX_TX_QUOTA);
+        sigma_printf("[NIC] Transmitting packet (%d bytes)... [Quota: %d/%d]\n", len, this->tx_quota, MAX_TX_QUOTA);
         return 0;
     }
 
@@ -74,18 +72,14 @@ private:
     uint32_t tx_quota;
 };
 
-void nic_init() {
-    SovereignNICEngine::init();
+extern "C" void nic_init() {
+    SovereignNICEngine::getInstance().init();
 }
 
 extern "C" int nic_transmit(const void* packet, uint32_t len) {
-    return SovereignNICEngine::transmit(packet, len);
+    return SovereignNICEngine::getInstance().transmit(packet, len);
 }
 
 extern "C" int nic_receive(void* buffer, uint32_t max_len) {
-    return SovereignNICEngine::receive(buffer, max_len);
+    return SovereignNICEngine::getInstance().receive(buffer, max_len);
 }
-
-
-
-} // extern "C"

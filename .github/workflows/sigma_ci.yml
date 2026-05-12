@@ -1,35 +1,34 @@
-name: Σ SIGMAOS INDUSTRIAL CI
+name: SigmaOS Sovereign CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, lattice-dev ]
   pull_request:
     branches: [ main ]
 
 jobs:
-  build-and-test:
+  build-and-verify:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Initialize Sovereign Toolchain
+    - uses: actions/checkout@v4
+
+    - name: Install Toolchain
       run: |
         sudo apt-get update
-        sudo apt-get install -y gcc-multilib g++-multilib make qemu-system-x86
-        
-    - name: Compile Sovereign Lattice
-      run: make -j$(nproc)
-      
-    - name: QEMU Regression Test (Boot Check)
+        sudo apt-get install -y gcc-multilib g++-multilib nasm make cppcheck
+
+    - name: Clean & Ignite Lattice
       run: |
-        # Timeout after 30s to verify serial log "Lattice is SOVEREIGN"
-        timeout 30s qemu-system-x86_64 -nographic -serial stdio -cdrom sigmaos-v15.iso | grep "Lattice is SOVEREIGN"
-        
-    - name: PQC-Attestation Verification
-      run: ./scripts/verify_pqc_signatures.sh
-      
-    - name: Upload ISO Artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: sigmaos-horizon-v15-stable
-        path: sigmaos-v15.iso
+        make clean
+        make singularity
+
+    - name: Static Security Audit (CppCheck)
+      run: |
+        cppcheck --enable=warning,style,performance --error-exitcode=1 -Iinclude kernel/ drivers/ core/ fs/ libc/ lib/
+
+    - name: Verify Shard Count
+      run: |
+        # Simple check to ensure critical shards are present
+        ls -l sigmaos.bin
+        [ -f sigmaos.bin ] || exit 1

@@ -1,10 +1,10 @@
 #ifndef NEURAL_INTERFACE_HPP
 #define NEURAL_INTERFACE_HPP
 
-#include "libc/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "core/sigma_types.h"
-#include "core/SigmaOOP.hpp"
+#include "sigma_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace UI {
@@ -23,7 +23,7 @@ private:
 
 public:
     SovereignNeuralInterface() : m_trained_patterns(4096), m_voice_active(SIGMA_TRUE) {
-        sigma_log("[NEURAL-UI]: Sovereign Linguistic Shard [ACTIVE].\n");
+        sigma_printf("[NEURAL-UI]: Sovereign Linguistic Shard [ACTIVE].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignNeuralInterface"; }

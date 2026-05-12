@@ -1,4 +1,3 @@
-#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: NEURAL-LATTICE ORCHESTRATOR (v1.0)
@@ -6,7 +5,7 @@
  * Principles: Predictive Resource Allocation & AI-Native Scheduling.
  * =============================================================================
  */
-#include "core/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 typedef struct NeuralState {
     sigma_u32     last_cpu_load;

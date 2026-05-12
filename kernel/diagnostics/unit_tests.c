@@ -1,4 +1,3 @@
-#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN UNIT TEST RUNNER (v1.0)
@@ -6,7 +5,7 @@
  * Principles: Shard Validation & Silicon-Native Regression Testing.
  * =============================================================================
  */
-#include "core/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 typedef struct TestCase {
     const char* name;

@@ -5,17 +5,8 @@
 
 const EnvEngine = {
     init() {
-        // Wait for DOM ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.updateEnvironment());
-        } else {
-            this.updateEnvironment();
-        }
-        this.intervalId = setInterval(() => this.updateEnvironment(), 60000);
-    },
-
-    destroy() {
-        if (this.intervalId) clearInterval(this.intervalId);
+        this.updateEnvironment();
+        setInterval(() => this.updateEnvironment(), 60000);
     },
 
     updateEnvironment() {

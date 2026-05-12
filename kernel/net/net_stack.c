@@ -1,4 +1,3 @@
-#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-UDP-STACK (v1.0)
@@ -6,7 +5,7 @@
  * Principles: Zero-Abstract Communication Onion.
  * =============================================================================
  */
-#include "core/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 typedef struct {
     sigma_u16 src_port;

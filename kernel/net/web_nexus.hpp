@@ -1,10 +1,10 @@
 #ifndef WEB_NEXUS_HPP
 #define WEB_NEXUS_HPP
 
-#include "libc/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "core/sigma_types.h"
-#include "core/SigmaOOP.hpp"
+#include "sigma_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Net {
@@ -24,7 +24,7 @@ private:
 
 public:
     SovereignWebNexus() : m_payload_count(0), m_compression_active(SIGMA_TRUE) {
-        sigma_log("[WEB-NEXUS]: Sovereign Web Packaging Nexus [READY].\n");
+        sigma_printf("[WEB-NEXUS]: Sovereign Web Packaging Nexus [READY].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignWebNexus"; }

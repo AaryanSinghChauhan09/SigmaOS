@@ -1,4 +1,3 @@
-#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SMART FS CACHE SHARD (v1.0)
@@ -6,7 +5,7 @@
  * Principles: LRU Block Caching & Zero-Downtime Data Retrieval.
  * =============================================================================
  */
-#include "core/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 #define CACHE_SIZE 256
 #define BLOCK_SIZE 512

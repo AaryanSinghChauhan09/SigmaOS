@@ -1,32 +1,67 @@
-# Description
+---
+name: Pull Request
+about: Submit a new Sovereign Shard or bug fix
+---
 
-<!-- Describe your changes in detail here. -->
+# Pull Request
 
-## Related Issue
+## Summary
 
-<!-- Link the issue this PR resolves: e.g. Fixes #123 -->
+<!-- One-line description of what this PR does -->
 
-## Motivation and Context
+## Type
 
-<!-- Why is this change required? What problem does it solve? -->
 
-## Architecture & Shard Changes
 
-<!-- Did you modify the Sovereign Object-Oriented Foundation (SOOF) or any specific shards? Explain the pattern used. -->
 
-## How Has This Been Tested?
+- [ ] New Shard
+- [ ] Bug Fix
 
-<!-- Describe the tests that you ran to verify your changes. Include OS environment (Linux/Windows/macOS wrapper). -->
 
-## Screenshots (if applicable):
 
-## Checklist:
+- [ ] Documentation Update
+- [ ] GitHub Actions / CI improvement
 
-- [ ] My code follows the strict C11/Assembly zero-dependency guidelines (for kernel).
-- [ ] I have updated/inherited `sigma_obj_t` correctly for new kernel constructs.
+## Closes
 
-- [ ] I have read the **CONTRIBUTING** document.
-- [ ] My changes generate no new Clang-Tidy warnings/errors.
+<!-- Reference the ROADMAP.md milestone, IDEAS_BACKLOG.md item, or issue number -->
+Closes #
 
-- [ ] I have added/updated tests to cover my changes.
-- [ ] All new and existing tests passed natively.
+## Shard Checklist (New Shards Only)
+
+
+
+
+- [ ] C++ OOP Singleton with `getInstance()`
+- [ ] `extern "C"` wrappers for all public functions
+
+
+
+- [ ] Registered in `SovereignUSR` via `usr_register_shard()`
+- [ ] `cppcheck` passes with zero warnings
+
+
+
+- [ ] Wiki page created or updated in `SigmaOS.wiki/`
+- [ ] `IDEAS_BACKLOG.md` or `MISSING_COMPONENTS.md` updated
+
+## Bug Fix Checklist
+
+
+
+
+- [ ] Root cause identified and documented
+- [ ] Regression test described
+
+
+
+- [ ] No new `cppcheck` warnings introduced
+
+## Testing
+
+<!-- Describe how you tested this change -->
+
+## Screenshots / Serial Output
+
+<!-- Paste sigma_log output or screenshots if applicable -->
+

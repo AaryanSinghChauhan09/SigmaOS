@@ -1,4 +1,3 @@
-#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SHARD-ORCHESTRATOR (v4.0)
@@ -10,7 +9,7 @@
  *   - Atomic shard hot-swapping.
  * =============================================================================
  */
-#include "core/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 typedef struct ShardMetadata {
     sigma_u32     shard_id;

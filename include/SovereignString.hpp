@@ -1,8 +1,8 @@
 #ifndef SOVEREIGN_STRING_HPP
 #define SOVEREIGN_STRING_HPP
 
-#include "core/sigma_types.h"
-#include "libc/SovereignLibC.h"
+#include "sigma_types.h"
+#include "SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Core {

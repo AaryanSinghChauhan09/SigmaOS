@@ -1,4 +1,3 @@
-#include "sigma_log.h"
 #include "sigma_hal.h"
 #include "SovereignLibC.h"
 
@@ -22,7 +21,7 @@ public:
         return instance;
     }
 
-    static void init() {
+    void init() {
         sigma_log("[TUNER] Probing silicon for performance USPs (Clear Linux Parity)...");
 
         /* CPUID-direct silicon profiling would go here in a real kernel. */
@@ -32,7 +31,7 @@ public:
         this->current_silicon.amx_supported    = true;
         this->current_silicon.thermal_ceiling  = 100u; /* Celsius */
 
-        sigma_log_info("[TUNER] Detected %s. Activating Silicon-Specific Optimization Lattice.\n",
+        sigma_printf("[TUNER] Detected %s. Activating Silicon-Specific Optimization Lattice.\n",
                      this->current_silicon.cpu_model);
     }
 
@@ -51,14 +50,10 @@ private:
     silicon_profile_t current_silicon;
 };
 
-void tuner_init() {
-    SovereignTunerEngine::init();
+extern "C" void tuner_init() {
+    SovereignTunerEngine::getInstance().init();
 }
 
-void tuner_apply_performance_governor() {
-    SovereignTunerEngine::applyPerformanceGovernor();
+extern "C" void tuner_apply_performance_governor() {
+    SovereignTunerEngine::getInstance().applyPerformanceGovernor();
 }
-
-
-
-} // extern "C"

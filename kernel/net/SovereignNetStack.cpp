@@ -1,15 +1,13 @@
-#include "sigma_log.h"
-#include "libc/SovereignLibC.h"
 #include "sigma_net.h"
-#include "hal/sigma_hal.h"
-#include "core/sigma_types.h"
+#include "sigma_hal.h"
+#include "sigma_types.h"
 
 /**
  * SigmaOS Sovereign Network Stack (S-NET)
  * Implements a Zero-Copy Lattice Networking (ZCLN) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal network orchestration.
  *
- * Design: OOP-isolated singleton � SovereignNetStackEngine.
+ * Design: OOP-isolated singleton — SovereignNetStackEngine.
  */
 
 /* --- Sovereign Network Stack Implementation --- */
@@ -31,7 +29,7 @@ void SovereignNetStackEngine::sendPacket(const void* data, sigma_u32 len) { (voi
     sigma_log("[NET] TCP/IP: Encapsulating data into TCP segment...");
     sigma_log("[NET] TCP/IP: Attaching IPv4 headers...");
     
-    sigma_log("[NET] ZCLN: Sending packet (%u bytes) to SovereignNIC...\n", len);
+    sigma_printf("[NET] ZCLN: Sending packet (%u bytes) to SovereignNIC...\n", len);
     this->packets_sent++;
 }
 
@@ -54,25 +52,23 @@ void SovereignNetStackEngine::receivePacket(void* buffer, sigma_u32* len) { (voi
 }
 
 void SovereignNetStackEngine::reportStats() const {
-    sigma_log("[NET] TCP/IP Stats: Sent=%u, Received=%u, Firewall=ACTIVE.\n", 
+    sigma_printf("[NET] TCP/IP Stats: Sent=%u, Received=%u, Firewall=ACTIVE.\n", 
                  this->packets_sent, this->packets_received);
 }
 
 /* --- C Wrappers --- */
-void net_init(const sigma_net_config_t* config) {
-    SovereignNetStackEngine::init(config);
+extern "C" void net_init(const sigma_net_config_t* config) {
+    SovereignNetStackEngine::getInstance().init(config);
 }
 
-void net_send_packet(const void* data, sigma_u32 len) { (void)data;
-    SovereignNetStackEngine::sendPacket(data, len);
+extern "C" void net_send_packet(const void* data, sigma_u32 len) { (void)data;
+    SovereignNetStackEngine::getInstance().sendPacket(data, len);
 }
 
-void net_receive_packet(void* buffer, sigma_u32* len) { (void)buffer;
-    SovereignNetStackEngine::receivePacket(buffer, len);
+extern "C" void net_receive_packet(void* buffer, sigma_u32* len) { (void)buffer;
+    SovereignNetStackEngine::getInstance().receivePacket(buffer, len);
 }
 
-void net_report_stats() {
-    SovereignNetStackEngine::reportStats();
+extern "C" void net_report_stats() {
+    SovereignNetStackEngine::getInstance().reportStats();
 }
-
-} // extern "C"

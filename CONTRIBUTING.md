@@ -1,25 +1,55 @@
-# Σ SigmaOS Contributing Guidelines
+# Contributing to SigmaOS
 
-Welcome to the **Sovereign Lattice™** development ecosystem. We are building the world's most stable, profession-aware operating system, and we value industrial-grade contributions.
+Thank you for considering a contribution to the **SigmaOS Sovereign Lattice**!
 
-## 🛠 Development Philosophy
-- **Zero-Dependency**: Every shard must be self-contained or use strictly audited Lattice bridges.
-- **PQC-First**: All cryptographic routines must use Post-Quantum algorithms (Dilithium-5, Kyber).
-- **Industrial Stability**: Code must be deterministic, deadlock-free, and pass S-REGRESS testing.
+## Getting Started
 
-## 📦 Shard Development
-1. **Define the Shard**: Create a new `.cpp` file in the appropriate layer.
-2. **Implement SigmaSingleton**: Follow the `SigmaSingleton<T>` pattern for kernel shards.
-3. **Attestation**: Every shard must be signed with a PQC-attested GPG key before merging.
-4. **Registration**: Add the shard to `SHARDS.manifest`.
 
-## 🧪 Testing Requirements
-- Every pull request must pass the **QEMU Regression Suite**.
-- Fuzz testing is required for new memory allocators or security shards.
-- Benchmark your code against industrial baselines (BusyBox, Linux-Minimal).
 
-## 🏛 Governance
-SigmaOS follows the **Sovereign Industrial Governance** model. Maintainers act as "Shard Wardens" to ensure the integrity of the Lattice.
 
----
-*Stay Sovereign.*
+1. **Fork** the repository and create a branch from `main`.
+2. **Build** the project using the deterministic build pipeline:
+
+   ```bash
+
+   python3 tools/sigma-build.py
+   ```
+
+
+
+
+3. **Run static analysis** before submitting:
+
+   ```bash
+
+   cppcheck --enable=warning,style,performance kernel/core/
+   ```
+
+## Code Standards
+
+All contributions must adhere to the **Sovereign Shard Standard**:
+
+
+
+
+* ✅ Every new kernel component must be a **C++ OOP Singleton** with `extern "C"` wrappers
+
+ ✅ All functions must emit structured log output via `sigma_log()` / `sigma_printf()`
+
+ ✅ New shards must be registered in `SovereignUSR` at init.
+
+## Pull Request Checklist
+
+
+
+
+* [ ] Code compiles with `-Wall -Wextra -Werror
+
+ [ ] New shard has a `_init()`, at least one primary function, and C wrapper
+
+ [ ] `MISSING_COMPONENTS.md` updated if a gap is closed
+
+## Security Issues
+
+Please **do not** open public issues for security vulnerabilities. Read [SECURITY.md](../SECURITY.md) for responsible disclosure guidelines.
+

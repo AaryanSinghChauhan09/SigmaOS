@@ -1,4 +1,3 @@
-#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SHARD SUMMONER (Dynamic Module Loader) (v1.0)
@@ -6,7 +5,7 @@
  * Principles: Lazy Shard Activation & Hot-Swappable Silicon Services.
  * =============================================================================
  */
-#include "core/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 extern void kprintf(const char* fmt, ...);
 

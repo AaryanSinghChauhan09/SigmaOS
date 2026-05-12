@@ -1,8 +1,8 @@
 #ifndef NETWORK_STACK_HPP
 #define NETWORK_STACK_HPP
 
-#include "core/sigma_types.h"
-#include "core/SigmaOOP.hpp"
+#include "sigma_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Net {

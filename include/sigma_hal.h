@@ -1,78 +1,83 @@
+/*
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN HARDWARE ABSTRACTION LAYER (HAL)
+ * =========================================================================
+ * Mission: Zero-dependency silicon orchestration.
+ * =========================================================================
+ */
+
 #ifndef SIGMA_HAL_H
 #define SIGMA_HAL_H
 
-/**
- * SIGMAOS: SOVEREIGN HARDWARE ABSTRACTION LAYER (HAL)
- * Central bridge for silicon-level orchestration, interrupt management,
- * and system observability types.
- */
-
-#include "core/sigma_types.h"
+#include "sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Standard I/O & Logging (kernel-internal implementations in SovereignLog.cpp) */
-void sigma_log(const char* fmt, ...);
-void kprintf(const char* fmt, ...);
-void log_emit(unsigned int severity, const char* msg);
-void log_emit_f(unsigned int severity, const char* fmt, ...);
+/* --- Silicon Lifecycle --- */
+void hal_init(void);
+void hal_shutdown(void);
 
-/* CPU identifiers */
-sigma_u32 cpu_get_id(void);
+/* --- Industrial Logging --- */
+void sigma_log(const char* msg);
+void sigma_printf(const char* format, ...);
 
-/* System load telemetry type */
-typedef struct {
-    sigma_u32 cpu_utilization;      /* 0-100 percent */
-    sigma_u32 memory_pressure;      /* 0-100 percent */
-    sigma_u32 network_throughput;   /* Mbps */
-    sigma_u32 shard_migration_rate; /* shards/sec */
-} sigma_system_load_t;
+/* --- CPU Control --- */
+static inline void cpu_pause(void) {
+    __asm__ __volatile__("pause" ::: "memory");
+}
+
+static inline void cpu_halt(void) {
+    __asm__ __volatile__("hlt" ::: "memory");
+}
+
+/* --- Port I/O --- */
+static inline void port_outb(sigma_u16 port, sigma_u8 val) {
+    __asm__ __volatile__("outb %0, %1" : : "a"(val), "Nd"(port));
+}
+
+static inline sigma_u8 port_inb(sigma_u16 port) {
+    sigma_u8 ret;
+    __asm__ __volatile__("inb %1, %0" : "=a"(ret) : "Nd"(port));
+    return ret;
+}
+
+/* --- Serial I/O (Step 3: Kernel Debugging) --- */
+#define COM1 0x3F8
+
+static inline void serial_init(void) {
+    port_outb(COM1 + 1, 0x00);    // Disable all interrupts
+    port_outb(COM1 + 3, 0x80);    // Enable DLAB (set baud rate divisor)
+    port_outb(COM1 + 0, 0x03);    // Set divisor to 3 (38400 baud)
+    port_outb(COM1 + 1, 0x00);    //                  hi byte
+    port_outb(COM1 + 3, 0x03);    // 8 bits, no parity, one stop bit
+    port_outb(COM1 + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
+    port_outb(COM1 + 4, 0x0B);    // IRQs enabled, RTS/DSR set
+}
+
+static inline int is_transmit_empty(void) {
+    return port_inb(COM1 + 5) & 0x20;
+}
+
+static inline void serial_putc(char c) {
+    while (is_transmit_empty() == 0);
+    port_outb(COM1, c);
+}
+
+/* --- Assertions (Step 3: Kernel Debugging) --- */
+#define sigma_assert(condition) \
+    if (!(condition)) { \
+        sigma_printf("[PANIC] ASSERTION FAILED: %s at %s:%d\n", #condition, __FILE__, __LINE__); \
+        hal_shutdown(); \
+    }
 
 #ifdef __cplusplus
 }
+#endif
 
-/* C++ OOP Singleton interfaces for HAL engines */
-namespace SigmaOS {
-namespace Kernel {
-namespace HAL {
 
-struct SovereignTicketLock {
-    void lock();
-    void unlock();
-    volatile sigma_u32 m_next_ticket = 0u;
-    volatile sigma_u32 m_now_serving = 0u;
-};
-
-class SigmaOS::Kernel::HAL::SovereignSMPEngine {
-public:
-    static SigmaOS::Kernel::HAL::SovereignSMPEngine& getInstance() {
-        static SigmaOS::Kernel::HAL::SovereignSMPEngine instance;
-        return instance;
-    }
-
-    void init();
-    void igniteCores();
-    void broadcastIPI(sigma_u32 vector);
-    sigma_u32 getCoreCount() const { return m_active_cores; }
-
-private:
-    SigmaOS::Kernel::HAL::SovereignSMPEngine()
-        : m_active_cores(0u), m_bsp_id(0u), m_initialized(0u) {}
-
-    SigmaOS::Kernel::HAL::SovereignSMPEngine(const SigmaOS::Kernel::HAL::SovereignSMPEngine&) = delete;
-    SigmaOS::Kernel::HAL::SovereignSMPEngine& operator=(const SigmaOS::Kernel::HAL::SovereignSMPEngine&) = delete;
-
-    sigma_u32 m_active_cores;
-    sigma_u32 m_bsp_id;
-    sigma_u32 m_initialized;
-};
-
-} // namespace HAL
-} // namespace Kernel
-} // namespace SigmaOS
-
-#endif /* __cplusplus */
 
 #endif /* SIGMA_HAL_H */
+
+

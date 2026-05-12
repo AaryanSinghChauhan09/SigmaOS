@@ -1,4 +1,3 @@
-#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN SHARD CORE (v1.0 - ABSOLUTE ISOLATION)
@@ -13,7 +12,7 @@
  * =============================================================================
  */
 
-#include "core/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 #define MAX_SYSTEM_SHARDS 256
 #define SHARD_MAGIC       0x53485244 // "SHRD"
@@ -49,7 +48,7 @@ void shard_init_core(void) {
     for (int i = 0; i < MAX_SYSTEM_SHARDS; i++) {
         g_shards[i].active = SIGMA_FALSE;
     }
-    // ksigma_printf("[SHARD-CORE]: Sovereign Shard Partitioning Online.\n");
+    // kprintf("[SHARD-CORE]: Sovereign Shard Partitioning Online.\n");
 }
 
 sigma_u64 shard_create(const char* name, ShardType type, sigma_u64 base, sigma_u64 limit) {
@@ -69,7 +68,7 @@ sigma_u64 shard_create(const char* name, ShardType type, sigma_u64 base, sigma_u
         s->name[i] = name[i];
     }
     
-    // ksigma_printf("[SHARD-CORE]: Created Shard [%llu]: %s (Base: 0x%llx)\n", s->shard_id, s->name, s->base_addr);
+    // kprintf("[SHARD-CORE]: Created Shard [%llu]: %s (Base: 0x%llx)\n", s->shard_id, s->name, s->base_addr);
     return s->shard_id;
 }
 
@@ -108,9 +107,5 @@ void shard_amnesic_destroy(sigma_u64 shard_id) {
     
     // 3. Trigger silicon-level memory wipe of the shard segment
     // sigma_memset((void*)s->base_addr, 0, s->limit_addr - s->base_addr);
-<<<<<<<< HEAD:suites/S25_ZeroKernel/shard_core.c
-    // ksigma_printf("[SHARD-CORE]: Shard %s destroyed with Amnesic Wipe [SUCCESS]\n", s->name);
-========
     // kprintf("[SHARD-CORE]: Shard %s destroyed with Amnesic Wipe [SUCCESS]\n", s->name);
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/orchestration/shard_core.c
 }

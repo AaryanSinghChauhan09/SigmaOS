@@ -10,7 +10,7 @@
 #ifndef SIGMA_LIVEKERNEL_H
 #define SIGMA_LIVEKERNEL_H
 
-#include "core/sigma_types.h"
+#include "sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * SIGMAOS: SOVEREIGN OMNI-SHARD (v100.0 - PURE C11 FINALITY)
+ * SIGMAOS: SOVEREIGN OMNI-SHARD (v20.0 - PURE C11 FINALITY)
  * =========================================================================
  * Domains: OS Kernel, Cloud, Web UI, Networking
  * Principle: Zero OOP runtime. Zero vtable overhead.
@@ -10,12 +10,8 @@
 #ifndef SOVEREIGN_OMNI_SHARD_H
 #define SOVEREIGN_OMNI_SHARD_H
 
-<<<<<<<< HEAD:suites/S23_OmniNexus/sigma_omni.h
-#include "sigma_libc.h"
-========
-#include "libc/SovereignLibC.h"
+#include "SovereignLibC.h"
 #include "sigma_system_shards.h"
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:include/SovereignOmniShard.h
 
 /* =========================================================================
  * DOMAIN: OS KERNEL & ADVANCED SCHEDULING
@@ -51,4 +47,3 @@ void SovereignNet_RecursiveDNSNode(SovereignNetZenith* n, const char* domain);
 void SovereignNet_audit(const SovereignNetZenith* n);
 
 #endif /* SOVEREIGN_OMNI_SHARD_H */
-

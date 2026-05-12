@@ -1,10 +1,10 @@
 #ifndef PXE_NEXUS_HPP
 #define PXE_NEXUS_HPP
 
-#include "libc/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "core/sigma_types.h"
-#include "core/SigmaOOP.hpp"
+#include "sigma_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Net {
@@ -25,7 +25,7 @@ private:
 
 public:
     SovereignPXENexus() : m_boot_id(0xBEBE), m_bytes_fetched(0), m_pqc_handshake_done(SIGMA_FALSE) {
-        sigma_log("[PXE-NEXUS]: Sovereign Network Ignition [ARMED].\n");
+        sigma_printf("[PXE-NEXUS]: Sovereign Network Ignition [ARMED].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignPXENexus"; }

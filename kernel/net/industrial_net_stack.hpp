@@ -1,10 +1,10 @@
 #ifndef SOVEREIGN_NET_STACK_HPP
 #define SOVEREIGN_NET_STACK_HPP
 
-#include "libc/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "core/sigma_types.h"
-#include "core/SigmaOOP.hpp"
+#include "sigma_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Net {
@@ -25,7 +25,7 @@ private:
 
 public:
     SovereignNetStack() : m_total_packets(0), m_throughput_bps(100ULL * 1024 * 1024 * 1024), m_pqc_tunnel_active(SIGMA_TRUE) {
-        sigma_log("[NET-STACK]: Sovereign RDMA Nexus [IGNITED].\n");
+        sigma_printf("[NET-STACK]: Sovereign RDMA Nexus [IGNITED].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignNetStack"; }

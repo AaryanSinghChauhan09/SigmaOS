@@ -1,18 +1,12 @@
-.cache/
-*.o
-*.iso
-*.bin
+# Σ SIGMAOS: SOVEREIGN GITIGNORE
 build/
-dist/
+*.o
+*.a
+*.bin
+*.iso
 .DS_Store
 .vscode/
 .idea/
 *.log
 tmp/
 *.tmp
-*.idx
-node_modules/  
-package-lock.json  
-patch_zenith.js  
-patch_zenith.py  
-patch_zenith_error.cjs

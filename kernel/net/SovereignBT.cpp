@@ -1,15 +1,12 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "libc/SovereignLibC.h"
-#include "drivers/sigma_bluetooth.h"
-#include "hal/sigma_hal.h"
+#include "sigma_bluetooth.h"
+#include "sigma_hal.h"
 
 /**
- * SigmaOS Sovereign Bluetooth Stack (v100.0 Zenith)
+ * SigmaOS Sovereign Bluetooth Stack (v28.0 Zenith)
  * Implements a Direct HCI Orchestration (DHO) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal silicon-native Bluetooth.
  *
- * Design: OOP-isolated singleton � SovereignBTEngine.
+ * Design: OOP-isolated singleton — SovereignBTEngine.
  */
 
 /* --- Sovereign Bluetooth Engine (OOP Isolation) --- */
@@ -28,29 +25,29 @@ static struct {
     .initialized = 0u
 };
 
-void bt_init() {
+extern "C" void bt_init() {
     sigma_log("[BT] Initializing Sovereign Bluetooth Stack (DHO Algorithm)...");
     SovereignBTEngine.initialized = 1u;
 }
 
-void bt_enable() {
+extern "C" void bt_enable() {
     SovereignBTEngine.config.controller_state = SIGMA_BT_SCANNING;
     sigma_log("[BT] DHO: Controller POWERED ON. Scanning for low-energy shards...");
 }
 
-void bt_disable() {
+extern "C" void bt_disable() {
     SovereignBTEngine.config.controller_state = SIGMA_BT_OFF;
     sigma_log("[BT] DHO: Controller POWERED OFF.");
 }
 
-void bt_start_scan(sigma_u32 duration_ms) {
-    sigma_log("[BT] DHO: Starting silicon-native scan (%ums)...\n", (unsigned)duration_ms);
+extern "C" void bt_start_scan(sigma_u32 duration_ms) {
+    sigma_printf("[BT] DHO: Starting silicon-native scan (%ums)...\n", (unsigned)duration_ms);
     sigma_log("[BT] DHO: Scan results streaming to Sovereign Lattice.");
 }
 
-void bt_pair(const sigma_u8* addr) {
+extern "C" void bt_pair(const sigma_u8* addr) {
     if (!addr) return;
-    sigma_log("[BT] DHO: Pairing with device %02X:%02X:%02X...\n", addr[0], addr[1], addr[2]);
+    sigma_printf("[BT] DHO: Pairing with device %02X:%02X:%02X...\n", addr[0], addr[1], addr[2]);
     SovereignBTEngine.config.paired_count++;
     sigma_log("[BT] DHO: Cryptographic pairing SUCCESS.");
 }
@@ -62,6 +59,3 @@ extern "C" sigma_u32 bt_get_paired_count() {
 extern "C" const sigma_bt_config_t* bt_get_config() {
     return &SovereignBTEngine.config;
 }
-
-
-} // extern "C"

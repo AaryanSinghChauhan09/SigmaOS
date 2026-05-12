@@ -1,10 +1,10 @@
 #ifndef WASM_BRIDGE_HPP
 #define WASM_BRIDGE_HPP
 
-#include "libc/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "core/sigma_types.h"
-#include "core/SigmaOOP.hpp"
+#include "sigma_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Bridge {
@@ -24,7 +24,7 @@ private:
 
 public:
     SovereignWASMBridge() : m_wasm_page_count(1024), m_simd_active(SIGMA_TRUE) {
-        sigma_log("[WASM-BRIDGE]: Sovereign Web-Silicon Nexus [ACTIVE].\n");
+        sigma_printf("[WASM-BRIDGE]: Sovereign Web-Silicon Nexus [ACTIVE].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignWASMBridge"; }

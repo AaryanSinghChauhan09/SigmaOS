@@ -1,4 +1,3 @@
-#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-FIREWALL-SHARD (v1.0 - NETFILTER PARITY)
@@ -12,7 +11,7 @@
  * =============================================================================
  */
 
-#include "core/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 #define MAX_FIREWALL_RULES 64
 
@@ -40,13 +39,8 @@ static sigma_u32 g_rule_count = 0;
  * ========================================================================= */
 
 void firewall_init(void) {
-<<<<<<<< HEAD:suites/S07_Network/net_firewall.c
-    for (int i = 0; i < MAX_FIREWALL_RULES; i++) g_rules[i].active = FALSE;
-    // ksigma_printf("[FIREWALL]: Sovereign Netfilter-Parity Sentry Online.\n");
-========
     for (int i = 0; i < MAX_FIREWALL_RULES; i++) g_rules[i].active = SIGMA_FALSE;
     // kprintf("[FIREWALL]: Sovereign Netfilter-Parity Sentry Online.\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/net/net_firewall.c
     
     /* Default Sovereignty Rule: Deny all legacy-userland incoming */
     // firewall_add_rule(0, 0, 80, 6, RULE_ACCEPT); /* Allow Web-Bridge Shard Access */
@@ -59,7 +53,7 @@ sigma_status firewall_add_rule(sigma_u32 src, sigma_u16 sport, sigma_u16 dport, 
     r->src_ip = src; r->src_port = sport; r->dst_port = dport;
     r->protocol = proto; r->action = act; r->active = SIGMA_TRUE;
     
-    // ksigma_printf("[FIREWALL]: Industrial Rule Injected -> Port: %u\n", dport);
+    // kprintf("[FIREWALL]: Industrial Rule Injected -> Port: %u\n", dport);
     return K_OK;
 }
 

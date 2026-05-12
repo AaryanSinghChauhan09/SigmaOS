@@ -3,98 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="SigmaOS: The world's first sovereign, AI-native, and quantum-hardened operating system lattice.">
-    <title>Σ SigmaOS | Sovereign Silicon Supremacy</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title>Σ SigmaOS | The Sovereign Industrial Lattice</title>
+    <style>
+        :root {
+            --bg: #050505;
+            --surface: #0a0a0c;
+            --primary: #00f2ff;
+            --accent: #7000ff;
+            --text: #e0e0e6;
+            --muted: #80808a;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(112, 0, 255, 0.1) 0%, transparent 70%);
+        }
+
+        h1 { font-size: 5rem; margin: 0; background: linear-gradient(to right, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -2px; }
+        .tagline { font-size: 1.5rem; color: var(--muted); margin-top: 1rem; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 4rem; }
+        .card { background: var(--surface); border: 1px solid rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 16px; transition: 0.3s; }
+        .card:hover { border-color: var(--primary); transform: translateY(-5px); }
+
+        .section-title { font-size: 2.5rem; margin-top: 6rem; text-align: center; }
+
+        .showcase { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin-top: 2rem; }
+        .pill { background: rgba(255, 255, 255, 0.05); padding: 0.5rem 1.2rem; border-radius: 100px; font-size: 0.9rem; border: 1px solid rgba(255, 255, 255, 0.1); }
+
+        .cta { margin-top: 4rem; padding: 1.2rem 3rem; font-size: 1.2rem; background: linear-gradient(45deg, var(--primary), var(--accent)); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        footer { text-align: center; padding: 4rem; color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.05); margin-top: 6rem; }
+    </style>
 </head>
 <body>
-
     <header>
-        <div class="logo">Σ <span>SIGMAOS</span></div>
-        <nav>
-            <a href="#features">Architecture</a>
-            <a href="roadmap.html">Roadmap</a>
-            <a href="#zenith">Zenith UI</a>
-            <a href="https://github.com/AaryanSinghChauhan09/SigmaOS/wiki" target="_blank" rel="noopener">Wiki</a>
-            <a href="https://github.com/AaryanSinghChauhan09/SigmaOS" target="_blank" rel="noopener">GitHub</a>
-        </nav>
+        <h1>Σ SigmaOS</h1>
+        <div class="tagline">The world's first industrial-grade, profession-aware operating singularity.</div>
+        <button class="cta">Download v15.0 Horizon ISO</button>
     </header>
 
-    <main>
-        <section class="hero">
-            <div class="badge">ZENITH v15.0 HORIZON RELEASE</div>
-            <h1>Sovereign Silicon.<br>Neural Intelligence.</h1>
-            <p>SigmaOS v15.0 "Horizon" is now stable. Experience the first production-grade, zero-dependency operating system lattice.</p>
-            <div class="hero-actions">
-                <a href="installer.html" class="btn btn-primary">Try SigmaOS ❯</a>
-                <a href="RELEASES.md" class="btn btn-secondary">Release Notes</a>
-                <a href="zenith.html" class="btn btn-secondary">Zenith Demo</a>
+    <div class="container">
+        <h2 class="section-title">Industrial Subsystems</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Sovereign AI</h3>
+                <p>Native CUDA/ONNX absorption for zero-latency industrial compute. Post-quantum attested models only.</p>
             </div>
-        </section>
+            <div class="card">
+                <h3>S-PKG Shard Nexus</h3>
+                <p>Dilithium-5 verified package distribution with atomic lattice rollbacks and zero-dependency resolution.</p>
+            </div>
+            <div class="card">
+                <h3>Cyber Security</h3>
+                <p>Industrial parity for Metasploit, Nmap, and auditd. Hardened via SovereignMAC and S-AUDIT.</p>
+            </div>
+        </div>
 
-        <section class="features" id="features">
-            <div class="feature-card">
-                <h3>Sovereign Lattice</h3>
-                <p>A modular 600-shard architecture where every component is isolated, PQC-attested, and formally verified. No standard library bloat—just silicon-direct power.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Zenith UI</h3>
-                <p>Experience the sub-millisecond response of a GPU-accelerated, glassmorphic compositor designed for the next generation of professional workflows.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Quantum Shield</h3>
-                <p>Military-grade security featuring Post-Quantum Cryptography (PQC) and Zero-Trust Mesh routing at the kernel level. Data privacy is the law.</p>
-            </div>
-            <div class="feature-card">
-                <h3>AI Automation</h3>
-                <p>The CLAW stack integrates neural automation directly into the kernel, providing intent-based task orchestration and predictive resource management.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Industrial Shards</h3>
-                <p>Pre-tuned profiles for Medical, Finance, Engineering, and Research. SigmaOS adapts to your profession natively.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Hardware Sovereignty</h3>
-                <p>Universal driver translation for RISC-V, ARM64, and x86_64. Your hardware, your rules, your OS.</p>
-            </div>
-        </section>
+        <h2 class="section-title">Absorbed Industry USPs</h2>
+        <div class="showcase">
+            <div class="pill">PyTorch</div>
+            <div class="pill">TensorFlow</div>
+            <div class="pill">Docker</div>
+            <div class="pill">Kubernetes</div>
+            <div class="pill">Nginx</div>
+            <div class="pill">Rust</div>
+            <div class="pill">Metasploit</div>
+            <div class="pill">Mesa GPU</div>
+            <div class="pill">PipeWire</div>
+            <div class="pill">OpenSSH</div>
+        </div>
 
-        <section class="industrial-showcase">
-            <h2>Industrial Personas</h2>
-            <p>SigmaOS adapts its core lattice for specialized high-stakes environments.</p>
-            <div class="persona-grid">
-                <div class="persona-card">
-                    <h4>Medical</h4>
-                    <p>HIPAA-compliant memory sharding and clinical-teal Zenith UI skin.</p>
-                </div>
-                <div class="persona-card">
-                    <h4>Finance</h4>
-                    <p>Zero-trust ledger integrity and sub-microsecond trading prioritization.</p>
-                </div>
-                <div class="persona-card">
-                    <h4>Aerospace</h4>
-                    <p>Real-time CFD telemetry and radiation-hardened kernel scheduling.</p>
-                </div>
+        <h2 class="section-title">Industrial Roadmap</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>ALPHA (Current)</h3>
+                <p>Lattice hardening, PQC-GPG attestation, and core driver sharding (Mesa/CUPS).</p>
             </div>
-        </section>
+            <div class="card">
+                <h3>BETA (Q3 2026)</h3>
+                <p>Zenith Desktop port, Guided Dual-Boot Installer, and AI-ML Nexus stabilization.</p>
+            </div>
+            <div class="card">
+                <h3>STABLE (2027)</h3>
+                <p>FIPS-140-3 Compliance, Sovereign Cloud Mesh, and LTS Release Channel.</p>
+            </div>
+        </div>
 
-        <section class="zenith-demo" id="zenith">
-            <h2>The Zenith Experience</h2>
-            <p>Interactive browser-based simulation of the Sovereign Desktop.</p>
-            <div class="demo-window">
-                <iframe src="zenith.html" title="Zenith Desktop Simulation"></iframe>
-            </div>
-        </section>
-    </main>
+        <h2 class="section-title">Installation Guide</h2>
+        <div class="card" style="max-width: 800px; margin: 2rem auto;">
+            <ol>
+                <li>Flash the <strong>SigmaOS Industrial ISO</strong> to a PQC-attested USB drive.</li>
+                <li>Boot in UEFI mode with <strong>Secure Boot</strong> enabled (attested by S-GPG).</li>
+                <li>Follow the <strong>Zenith Guided Installer</strong> for dual-boot or dedicated partitioning.</li>
+                <li>Initialize your <strong>Profession Profile</strong> to orchestrate your shard bundle.</li>
+            </ol>
+        </div>
+    </div>
 
     <footer>
-        <p>© 2026 SigmaOS Sovereign Lattice. Distributed under the Sovereign Silicon License.</p>
-        <p style="margin-top: 1rem; opacity: 0.5; font-size: 0.7rem;">ABSORB. ADAPT. OUTCLASS.</p>
+        &copy; 2026 SigmaOS Industrial Collective. Stay Sovereign.
     </footer>
-
 </body>
 </html>
-

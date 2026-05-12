@@ -10,7 +10,7 @@
 #ifndef SIGMA_TELEPATHTYPE_H
 #define SIGMA_TELEPATHTYPE_H
 
-#include "core/sigma_types.h"
+#include "sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

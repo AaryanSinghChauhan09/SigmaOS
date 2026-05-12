@@ -1,8 +1,7 @@
-#include "core/sigma_types.h"
 #ifndef AETHER_ORCHESTRATOR_HPP
 #define AETHER_ORCHESTRATOR_HPP
 
-#include "core/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Automation {

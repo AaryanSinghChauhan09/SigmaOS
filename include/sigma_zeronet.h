@@ -9,42 +9,21 @@
 #ifndef SIGMA_ZERONET_H
 #define SIGMA_ZERONET_H
 
-#include "core/sigma_types.h"
-
-#ifdef __cplusplus
-namespace SigmaOS {
-namespace Kernel {
-namespace Network {
-
-class SovereignZeroNet {
-public:
-    static SovereignZeroNet& getInstance() {
-        static SovereignZeroNet instance;
-        return instance;
-    }
-
-    void init();
-    void transfer(void* data, sigma_size_t len, const char* destination);
-    bool establishConnection(uint32_t source, uint32_t target);
-    void verifyTraffic(uint32_t conn_id, const void* payload, uint32_t size);
-
-private:
-    SovereignZeroNet() : packets_processed(0), initialized(false) {}
-    sigma_u64 packets_processed;
-    bool initialized;
-};
-
-} // namespace Network
-} // namespace Kernel
-} // namespace SigmaOS
-#endif
+#include "sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+typedef struct {
+    uint32_t connection_id;
+    uint32_t source_shard;
+    uint32_t target_shard;
+    bool is_verified;
+} sigma_zeronet_conn_t;
+
+/* --- Zero-Trust Network Primitives --- */
 void zeronet_init(void);
-void zeronet_transfer(void* data, sigma_size_t len, const char* dest);
 bool zeronet_establish_connection(uint32_t source, uint32_t target);
 void zeronet_verify_traffic(uint32_t conn_id, const void* payload, uint32_t size);
 

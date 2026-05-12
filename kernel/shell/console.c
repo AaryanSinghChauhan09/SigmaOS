@@ -8,8 +8,8 @@
  * =============================================================================
  */
 
-#include "core/sigma_kernel_types.h"
-#include "core/sigma_types.h"   /* compiler built-in â€ no libc */
+#include "sigma_kernel_types.h"
+#include "sigma_types.h"   /* compiler built-in â€ no libc */
 
 /* =========================================================================
  * COM1 Port Map
@@ -143,7 +143,7 @@ static void kprint_char(char c) {
     vga_putc(c);
 }
 
-void ksigma_printf(const char* fmt, ...) {
+void kprintf(const char* fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
     for (; *fmt; fmt++) {
@@ -179,19 +179,10 @@ void ksigma_printf(const char* fmt, ...) {
 void console_init(void) {
     serial_init();
     vga_init();
-<<<<<<<< HEAD:suites/S30_Supremacy/console.c
-    ksigma_printf("\n");
-    ksigma_printf("Σ ============================================================ Σ\n");
-    ksigma_printf("  SigmaOS Sovereign Kernel v1.0 — Pure C11 + x86_64 Assembly\n");
-    ksigma_printf("  Serial: COM1 @ 115200 baud | VGA: 80x25 Text Mode\n");
-    ksigma_printf("  Language: C11(98%%) | ASM(0.7%%) | Rust(0.3%%)\n");
-    ksigma_printf("Σ ============================================================ Σ\n\n");
-========
     kprintf("\n");
     kprintf("Î£ ============================================================ Î£\n");
     kprintf("  SigmaOS Sovereign Kernel v1.0 â€ Pure C11 + x86_64 Assembly\n");
     kprintf("  Serial: COM1 @ 115200 baud | VGA: 80x25 Text Mode\n");
     kprintf("  Language: C11(98%%) | ASM(0.7%%) | Rust(0.3%%)\n");
     kprintf("Î£ ============================================================ Î£\n\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shell/console.c
 }

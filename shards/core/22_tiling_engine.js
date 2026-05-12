@@ -33,22 +33,16 @@ class TilingEngine extends ZenithComponent {
         const cols = Math.ceil(Math.sqrt(windows.length));
         const rows = Math.ceil(windows.length / cols);
         
-        const container = document.querySelector('.desktop');
-        const cWidth = container?.clientWidth || window.innerWidth;
-        const cHeight = container?.clientHeight || window.innerHeight;
-        
-        const w = Math.floor(cWidth / cols);
-        const h = Math.floor(cHeight / rows);
-        const minW = 200; // Minimum window width
-        const minH = 150; // Minimum window height
+        const w = 100 / cols;
+        const h = 100 / rows;
 
         windows.forEach((win, i) => {
             const col = i % cols;
             const row = Math.floor(i / cols);
-            win.style.left = `${col * w}px`;
-            win.style.top = `${row * h}px`;
-            win.style.width = `${Math.max(w - 5, minW)}px`;
-            win.style.height = `${Math.max(h - 5, minH)}px`;
+            win.style.left = `${col * w}%`;
+            win.style.top = `${row * h}%`;
+            win.style.width = `${w}%`;
+            win.style.height = `${h}%`;
             win.classList.add('tiling-active');
         });
     }

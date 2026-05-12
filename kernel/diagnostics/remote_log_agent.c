@@ -1,4 +1,3 @@
-#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: REMOTE-LOG-AGENT (v1.0)
@@ -6,7 +5,7 @@
  * Principles: Autonomous Telemetry & Distributed Persistence.
  * =============================================================================
  */
-#include "core/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 extern void net_send_udp(sigma_u32 dst_ip, sigma_u16 dst_port, void* data, sigma_u16 len);
 extern void sigmafs_append(const char* name, sigma_u8* data, sigma_u32 len);

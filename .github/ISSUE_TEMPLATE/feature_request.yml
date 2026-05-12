@@ -1,25 +1,11 @@
-name: 🚀 Industrial Shard Proposal (Feature Request)
-description: Suggest a new industry USP to absorb into the Lattice.
-labels: ["industrial-usp", "strategic-expansion"]
+name: Feature Request
+description: Suggest an idea for this project
+labels: enhancement
 body:
   - type: textarea
-    id: usp-desc
+    id: description
     attributes:
-      label: USP Description
-      placeholder: What industry-standard tool or workflow should we absorb?
-    validations:
-      required: true
-  - type: textarea
-    id: profession-impact
-    attributes:
-      label: Profession Impact
-      placeholder: Which industrial roles will benefit from this shard?
-    validations:
-      required: true
-  - type: textarea
-    id: implementation-path
-    attributes:
-      label: Implementation Path
-      placeholder: How can we bridge this tool into the Sovereign Lattice?
+      label: Description
+      description: A clear and concise description of what you want to achieve.
     validations:
       required: true

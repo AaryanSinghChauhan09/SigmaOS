@@ -1,12 +1,10 @@
-#include "sigma_log.h"
-#include "SovereignLibC.h"
 #include "sigma_hal.h"
 
 /**
- * SigmaOS Sovereign GPU Driver (v100.0 Zenith)
+ * SigmaOS Sovereign GPU Driver (v28.0 Zenith)
  * Zero-copy graphics acceleration and silicon-native compositing.
  *
- * Design: OOP-isolated singleton â€" SovereignGPU.
+ * Design: OOP-isolated singleton â€” SovereignGPU.
  */
 
 class SovereignGPU {
@@ -16,7 +14,7 @@ public:
         return instance;
     }
 
-    static void init() {
+    void init() {
         sigma_log("[GPU] Initializing Sovereign Graphics Lattice...");
         
         this->config.vram_base = 0xE0000000;
@@ -24,7 +22,7 @@ public:
         this->config.height = 1080;
         this->config.bpp = 32;
 
-        sigma_log_info("[GPU] Framebuffer mapped at 0x%llX (%dx%d@%dbpp)\n", 
+        sigma_printf("[GPU] Framebuffer mapped at 0x%llX (%dx%d@%dbpp)\n", 
                   this->config.vram_base, this->config.width, this->config.height, this->config.bpp);
     }
 
@@ -45,7 +43,7 @@ public:
         }
 
         // Memory Sanitizer: Ensure shader doesn't touch system memory
-        sigma_log_info("[GPU] Injecting motion primitives... [Watchdog: %d]\n", this->shader_watchdog);
+        sigma_printf("[GPU] Injecting motion primitives... [Watchdog: %d]\n", this->shader_watchdog);
     }
 
 private:
@@ -62,19 +60,14 @@ private:
 };
 
 /* --- C Wrappers --- */
-void gpu_init() {
-    SovereignGPU::init();
+extern "C" void gpu_init() {
+    SovereignGPU::getInstance().init();
 }
 
-void gpu_swap_buffers() {
-    SovereignGPU::swapBuffers();
+extern "C" void gpu_swap_buffers() {
+    SovereignGPU::getInstance().swapBuffers();
 }
 
-void gpu_apply_motion_shader(void* shader_blob) {
-    SovereignGPU::applyMotionShader(shader_blob);
+extern "C" void gpu_apply_motion_shader(void* shader_blob) {
+    SovereignGPU::getInstance().applyMotionShader(shader_blob);
 }
-
-
-
-
-} // extern "C"

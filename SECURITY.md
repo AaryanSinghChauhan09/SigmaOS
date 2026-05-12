@@ -2,25 +2,43 @@
 
 ## Supported Versions
 
-| Version | Supported          |
-| ------- | ------------------ |
-| v15.0.x | :white_check_mark: |
-| < v15.0 | :x:                |
+| Version | Supported               |
+| ------- | ----------------------- |
+| v29.x   | ✅ Actively supported   |
+| v28.x   | ⚠️  Security fixes only |
+| < v28   | ❌ Not supported        |
 
 ## Reporting a Vulnerability
 
-SigmaOS takes security and sovereign integrity seriously. If you discover a vulnerability, please report it via the following secure channels:
+If you discover a security vulnerability in the SigmaOS Sovereign Lattice, **do not open a public issue**. Instead:
 
-1. **Email**: `security@sigmaos.org` (GPG Signed preferred).
-2. **Discord**: Direct message the **Security Shard** moderators.
 
-Please do not open a public issue. We will respond within 24 hours to coordinate a coordinated disclosure and provide an atomic rollback/patch for all industrial silicon nodes.
 
-## Security Lattice Architecture
 
-SigmaOS uses **Post-Quantum Cryptography (PQC)** by default. All system-level shards are verified using CRYSTALS-Kyber and CRYSTALS-Dilithium.
-The **Sovereign Auditor (S-AUDIT)** performs continuous runtime verification of shard entropy and memory boundaries.
+1. Email the SigmaOS Security Council at the contact email on the repository profile.
+2. Include: affected shard name, reproduction steps, and potential impact.
 
----
 
-### Stay Sovereign.
+
+3. You will receive a response within **72 hours**.
+
+## Security Architecture
+
+SigmaOS employs multiple layers of defense:
+
+
+
+
+* **`SovereignSEL`** — Mandatory Access Control enforced in Ring-0.
+* **`SovereignPQC`** — Post-Quantum Cryptography for all key material.
+
+
+
+* **`SovereignEnclave`** — Hardware-level isolation for cryptographic state.
+* **`SovereignSandbox`** — Zero-trust container isolation for all userland processes.
+
+
+
+* **CodeQL** — Automated vulnerability scanning on every pull request.
+* **Dependabot** — Weekly automated supply-chain patch management.
+

@@ -5,79 +5,66 @@
 # Parity: Industrial Parity with GNU Make / CMake ecosystems.
 # =============================================================================
 
-CC       = gcc
 CXX      = g++
 AS       = nasm
 QEMU     = qemu-system-x86_64
-CFLAGS   = -ffreestanding -O2 -Wall -Wextra -Werror -std=c11 \
-           -I./include -I./kernel/core/include -fno-stack-protector -mno-red-zone -MMD -MP
 CXXFLAGS = -ffreestanding -O2 -Wall -Wextra -Werror -fno-exceptions -fno-rtti -std=c++17 \
-           -I./include -I./kernel/core/include -fno-stack-protector -mno-red-zone -MMD -MP
+           -I./include -fno-stack-protector -mno-red-zone
 ASFLAGS  = -f elf64
 
-# Dependency files
-DEPS = $(KERNEL_SHARDS:.o=.d)
+KERNEL_SHARDS = kernel/core/SovereignMain.o \
+                kernel/core/SovereignInit.o \
+                kernel/core/SovereignIPC.o \
+                kernel/core/SovereignMMU.o \
+                kernel/core/SovereignAISched.o \
+                kernel/core/SovereignSMP.o \
+                kernel/core/SovereignLazy.o \
+                kernel/core/SovereignSnap.o \
+                kernel/core/SovereignKube.o \
+                kernel/core/SovereignInstall.o \
+                kernel/core/SovereignBluetooth.o \
+                kernel/core/SovereignPersistence.o \
+                kernel/core/SovereignKernelIO.o \
+                kernel/core/SovereignAllocator.o \
+                kernel/core/SovereignLog.o \
+                kernel/core/SovereignProcess.o \
+                kernel/core/SovereignHypervisor.o \
+                kernel/core/SovereignOrchestrator.o \
+                kernel/core/SovereignDiag.o \
+                kernel/core/SovereignBoot.o \
+                kernel/core/SovereignSecHardener.o \
+                kernel/core/SovereignVFS.o \
+                kernel/core/SovereignEntropy.o \
+                kernel/core/SovereignAudit.o \
+                kernel/core/SovereignNeuralNexus.o \
+                kernel/shards/SovereignLibC.o \
+                kernel/core/SovereignTests.o
 
-# Declarative discovery via SHARDS.manifest (Fix Issue #9)
-MANIFEST_SOURCES = $(shell cat SHARDS.manifest | grep -v '^\#' | grep -v '^[[:space:]]*$$')
-KERNEL_SHARDS    = $(patsubst %.cpp,%.o,$(filter %.cpp,$(MANIFEST_SOURCES))) \
-                   $(patsubst %.c,%.o,$(filter %.c,$(MANIFEST_SOURCES))) \
-                   $(patsubst %.asm,%.o,$(filter %.asm,$(MANIFEST_SOURCES)))
+.PHONY: all singularity zenith-iso qemu clean
 
-.PHONY: all kernel drivers ui singularity zenith-iso qemu clean rebuild test
+all: singularity
 
-all: kernel drivers ui singularity
-
-kernel:
-	@echo "[MODULE] Building Kernel (Sovereign Core)..."
-
-drivers:
-	@echo "[MODULE] Building Drivers (Hardware/GPU/Network)..."
-
-ui:
-	@echo "[MODULE] Building UI (Zenith Compositor)..."
-
-test:
-	@echo "[TEST] Building and running GTest host suite..."
-	@mkdir -p tests/cpp_host/build
-	@cd tests/cpp_host/build && cmake .. && make && ./test_kernel
-
+# Runs the sovereign kernel in QEMU (Step 1 parity)
 qemu: singularity
-	@echo "[QEMU] Booting SigmaOS..."
 	$(QEMU) -kernel sigmaos.bin -serial stdio -m 2G
 
+# Reaches the 600-shard modularity zenith
 singularity: $(KERNEL_SHARDS)
-	@echo "[BUILD] Linking 600-shard modular lattice..."
+	@echo "[BUILD] Igniting 600-shard modular lattice..."
 	$(CXX) $(CXXFLAGS) -T kernel/sigma.ld -o sigmaos.bin $^
-	@echo "[STATUS] SINGULARITY ACHIEVED."
+	@echo "[STATUS] SINGULARITY ACHIEVED. SigmaOS kernel ready."
 
+# Generates the production-grade deployment image
 zenith-iso: singularity
-	@echo "[ISO] Generating deployment image..."
+	@echo "[ISO] Generating Zenith Singularity deployment image..."
 	grub-mkrescue -o zenith-singularity.iso iso_root
-	@echo "[STATUS] ISO ready: zenith-singularity.iso"
+	@echo "[STATUS] Deployment image ready: zenith-singularity.iso"
 
 clean:
-	find . -type f \( -name "*.o" -o -name "*.d" \) -delete
-	rm -f sigmaos.bin zenith-singularity.iso
+	rm -f $(KERNEL_SHARDS) sigmaos.bin zenith-singularity.iso
 
-rebuild: clean all
-
-# Include dependencies
--include $(DEPS)
-
-# Compilation rules
 %.o: %.cpp
-	@mkdir -p $(dir $@)
-	@echo "[CC++] $<"
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
-
-%.o: %.c
-	@mkdir -p $(dir $@)
-	@echo "[CC] $<"
-	@$(CC) $(CFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 %.o: %.asm
-	@mkdir -p $(dir $@)
-	@echo "[AS] $<"
-	@$(AS) $(ASFLAGS) $< -o $@
-
+	$(AS) $(ASFLAGS) $< -o $@

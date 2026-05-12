@@ -1,46 +1,57 @@
-# Changelog
+# 📜 SigmaOS Change Log
 
-All notable changes to **SigmaOS** will be documented in this file.
+All notable changes to the SigmaOS Sovereign Lattice will be documented in this file.
 
-## [15.0.0-Horizon] - 2026-05-12
+## [v28.0 Zenith] - 2026-04-30
 
-### 🚀 Industrial Dominance Phase
+### Added
 
-- **Sovereign Lattice™**: Transitioned to a 600-shard industrial architecture.
-- **PQC-Native Security**: Integrated CRYSTALS-Kyber and Dilithium across the kernel and storage layers.
-- **Lattice Allocator**: Benchmarked at 7x faster than standard heap allocators.
 
-### ✨ Added
 
-- **S-PKG**: Professional package manager with PQC-signed distribution.
-- **S-INSTALL**: Bare-metal graphical installer with dual-boot detection.
-- **Z-DESK**: Zenith Desktop Environment with profession-aware tiling and telemetry.
-- **S-MAC**: Mandatory Access Control for shard-level isolation.
-- **S-FIRE**: Industrial firewall with nftables-parity.
-- **S-LUKS**: Volume encryption for data-at-rest protection.
-- **S-PROTON**: Compatibility bridge for mainstream Linux/Windows applications.
-- **S-LOG**: Structured industrial journaling (Journald-parity).
-- **S-ALLOC**: High-performance 16MB bump-pointer allocator for bare-metal memory orchestration.
-- **S-CRC32**: Industrial-grade checksumming for shard-state verification and CSS recovery.
-- **S-MIND**: Sovereign Lattice Mapper for interactive shard topology auditing.
 
-### 🔧 Fixed
+* **QEMU Emulation Support**: Added `make qemu` target for kernel verification.
+* **Serial Boot Tracing**: Direct silicon logging to COM1 for kernel-level debugging.
 
-- **Architectural Normalization**: Unified kernel types and eliminated high-level language dependencies across 600 shards.
-- **Include Path Hardening**: Resolved 600+ brittle include path errors by enforcing root-relative addressing.
-- **Boot Singularity**: Restored missing boot shards to `SHARDS.manifest`, ensuring a complete system singularity build.
-- **Sovereign Tooling**: Refactored `sigma-pkg` to use the zero-dependency Sovereign OOP framework.
-- **Wiki Navigation & Integrity**: Resolved 170+ committed merge conflicts and standardized navigation to slug-based linking for GitHub Wiki parity.
-- **Documentation Parity**: Synced the finalized "Logic" and "Roadmap" matrices with the GitHub Wiki.
-- **UI Aesthetics**: Professionalized the landing page and Zenith Desktop with a premium glassmorphic design.
 
-### 🏛 Infrastructure
 
-- **ROADMAP.md**: Established a 3-year plan for Linux parity and dominance.
-- **SECURITY.md**: Formally launched the vulnerability disclosure policy.
-- **CONTRIBUTING.md**: established guidelines for professional shard development.
-- **CI/CD**: Fully automated regression testing via GitHub Actions.
+* **QBMP Allocator**: Functional bump allocator with 8-byte alignment and assertions.
+* **CI/CD Pipeline**: GitHub Actions workflow for automated build and security auditing.
+
+
+
+* **Architecture Documentation**: New `docs/architecture.md` explaining the lattice sharding model.
+* **Verification Assertions**: Added `sigma_assert` for kernel-level sanity checks.
+
+### Changed
+
+
+
+
+* **Build System**: Standardized on `kernel/sigma.ld` and enabled `-Werror` for strict compilation.
+* **Documentation**: Updated README with boot instructions and architecture diagrams.
+
+
+
+* **Include Strategy**: Consolidated include paths to use flat `include/` directory.
+* **Modularization**: Refactored core subsystems to the `SovereignEngine` singleton pattern for enhanced state isolation and ABI stability. Newly hardened engines: `SovereignSyscallEngine`, `SovereignEntropyEngine`, `SovereignAuditEngine`, `SovereignCryptoEngine`, `SovereignGUIEngine`, `SovereignEditEngine`, `SovereignDashEngine`, `SovereignTunerEngine`, `SovereignAllocatorEngine` — eliminating all static global state from these critical shards.
+
+
+
+* **CI/CD Hardening**: Corrected GitHub Actions audit paths and synchronized the Makefile with the expanded 600-shard modular lattice to ensure production-grade build stability.
+
+### Fixed
+
+
+
+
+* Resolved `sigma_hardened_strcpy` undeclared error in `SovereignTuner.cpp`.
+* Fixed various markdown linting violations (MD012, MD022, MD058) in developer guides.
+
+
+
+* Removed stale/unused header includes across 15+ kernel files.
 
 ---
 
-### Stay Sovereign
+_Σ SIGMAOS: Sovereign Versioning. Absolute Continuity._
+

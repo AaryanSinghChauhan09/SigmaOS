@@ -1,11 +1,13 @@
-﻿#pragma once
-/* sigma_monitor.h - Sovereign Monitor Shard API */
-#include "core/sigma_types.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
-void sigma_monitor_init(void);
-void sigma_monitor_poll(void);
-#ifdef __cplusplus
-}
+#ifndef SIGMA_MONITOR_H
+#define SIGMA_MONITOR_H
+
+#include "sigma_types.h"
+
+typedef struct {
+    sigma_u32 cpu_utilization;
+    sigma_u32 memory_pressure;
+    sigma_u32 network_throughput;
+    sigma_u32 shard_migration_rate;
+} sigma_system_load_t;
+
 #endif

@@ -1,4 +1,3 @@
-#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS SHELL: SIGMAPM PACKAGE MANAGER (v1.0)
@@ -6,7 +5,7 @@
  * Principles: Shard-Native Packages & Dependency Integrity.
  * =============================================================================
  */
-#include "core/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 typedef struct Package {
     char    name[32];

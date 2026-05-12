@@ -1,10 +1,10 @@
 #ifndef CONSENSUS_SHARD_HPP
 #define CONSENSUS_SHARD_HPP
 
-#include "libc/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "core/sigma_types.h"
-#include "core/SigmaOOP.hpp"
+#include "sigma_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Net {
@@ -25,7 +25,7 @@ private:
 
 public:
     SovereignConsensus(sigma_u32 quorum) : m_proposal_id(0), m_quorum_size(quorum), m_agreement_reached(SIGMA_FALSE) {
-        sigma_log("[CONSENSUS]: Sovereign Agreement Nexus [ONLINE]. Quorum: %d\n", m_quorum_size);
+        sigma_printf("[CONSENSUS]: Sovereign Agreement Nexus [ONLINE]. Quorum: %d\n", m_quorum_size);
     }
 
     const char* type_name() const noexcept override { return "SovereignConsensus"; }

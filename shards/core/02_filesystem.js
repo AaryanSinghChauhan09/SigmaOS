@@ -3,15 +3,6 @@
  * Module 02: Sovereign Matrix access and file buffering.
  */
 
-class PathValidator {
-    static validate(path) {
-        if (!path) throw new Error('Empty path');
-        // Prevent directory traversal and normalize
-        const normalized = path.split('/').filter(p => p && p !== '..' && p !== '.').join('/');
-        return '/' + normalized;
-    }
-}
-
 const SovereignFS = {
     currentPath: '/',
 
@@ -20,16 +11,11 @@ const SovereignFS = {
         const display = document.getElementById(pathDisplayId);
         
         try {
-            const validated = PathValidator.validate(targetPath);
-            if (!list) {
-                console.error(`Σ://FS> List container not found: ${listContainerId}`);
-                return;
-            }
-            if (display) display.textContent = validated;
-            this.currentPath = validated;
+            if (display) display.textContent = targetPath;
+            this.currentPath = targetPath;
             list.innerHTML = '<div style="color:var(--text-muted); padding:10px;">Accessing Matrix...</div>';
             
-            const res = await fetch(`/api/fs?path=${encodeURIComponent(validated)}`);
+            const res = await fetch(`/api/fs?path=${encodeURIComponent(targetPath)}`);
             if (!res.ok) throw new Error('Path access denied');
             const data = await res.json();
             

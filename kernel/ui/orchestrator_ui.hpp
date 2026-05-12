@@ -1,10 +1,10 @@
 #ifndef ORCHESTRATOR_UI_HPP
 #define ORCHESTRATOR_UI_HPP
 
-#include "libc/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "core/sigma_types.h"
-#include "core/SigmaOOP.hpp"
+#include "sigma_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace UI {
@@ -25,7 +25,7 @@ private:
 
 public:
     SovereignOrchestratorUI() : m_active_containers(0), m_active_vms(0), m_cloud_sync_active(SIGMA_TRUE) {
-        sigma_log("[ZENITH-ORCH]: Orchestration Control Shard [IGNITED].\n");
+        sigma_printf("[ZENITH-ORCH]: Orchestration Control Shard [IGNITED].\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignOrchestratorUI"; }

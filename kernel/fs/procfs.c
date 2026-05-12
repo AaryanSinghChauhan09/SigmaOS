@@ -1,4 +1,3 @@
-#include "core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-PROCFS (v1.0 - LINUX OBSERVABILITY)
@@ -11,31 +10,31 @@
  * =============================================================================
  */
 
-#include "core/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 /* =========================================================================
  * PROCFS Engine (The Linux Status Monitor)
  * ========================================================================= */
 
 void procfs_init(void) {
-    // ksigma_printf("[PROCFS]: Sovereign Linux-Observability ProcFS Shard Online.\n");
-    // ksigma_printf("[PROCFS]: Filesystem mounted at /proc\n");
+    // kprintf("[PROCFS]: Sovereign Linux-Observability ProcFS Shard Online.\n");
+    // kprintf("[PROCFS]: Filesystem mounted at /proc\n");
 }
 
 sigma_i64 proc_read_stat(void* buffer, sigma_u32 len) {
     /* Write process statistics in Linux format */
-    // ksigma_printf("[PROCFS]: Generating /proc/stat snapshot...\n");
+    // kprintf("[PROCFS]: Generating /proc/stat snapshot...\n");
     return 0;
 }
 
 sigma_i64 proc_read_meminfo(void* buffer, sigma_u32 len) {
     /* Write memory info in Linux format */
-    // ksigma_printf("[PROCFS]: Generating /proc/meminfo snapshot...\n");
+    // kprintf("[PROCFS]: Generating /proc/meminfo snapshot...\n");
     return 0;
 }
 
 sigma_status proc_register_node(const char* name, sigma_i64 (*read_fn)(void*, sigma_u32)) {
     /* Map a new virtual node in ProcFS */
-    // ksigma_printf("[PROCFS]: Registered Sovereign node: /proc/%s\n", name);
+    // kprintf("[PROCFS]: Registered Sovereign node: /proc/%s\n", name);
     return K_OK;
 }
