@@ -76,6 +76,8 @@ drivers/printing/SovereignCUPS.cpp
 # LAYER 4: AI & AUTOMATION (CLAW STACK)
 kernel/core/network/SovereignVPN.cpp
 kernel/core/ai/SovereignAI.cpp
+kernel/core/cloud/SovereignCloud.cpp
+kernel/core/vis/SovereignVis.cpp
 kernel/core/ai/SovereignNeural.cpp
 kernel/core/ai/SovereignMLFlow.cpp
 kernel/core/ai/SovereignCognitive.cpp

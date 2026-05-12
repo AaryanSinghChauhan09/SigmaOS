@@ -30,6 +30,8 @@
 | Implement S-GPG Verification | Security | High | DONE |
 | Redesign Installer UI | UX | Medium | DONE |
 | Port PyTorch to Sovereign AI | AI/ML | High | IN-PROGRESS |
+| Sovereign Cloud (Docker/K8s) | DevOps | High | DONE |
+| Sovereign Vis (D3/Graphviz) | VIS | Medium | DONE |
 | Offline Coding Playground | EDU | Low | DONE |
 | QEMU Regression Actions | CI/CD | Medium | DONE |
 
