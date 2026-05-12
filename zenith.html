@@ -1248,8 +1248,12 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             <div class="app-img">ðŸ“„</div>
             <div class="app-label">Markup Forge</div>
         </div>
+        <div class="app-icon" onclick="launchApp('S-MIND')">
+            <div class="app-img">🧠</div>
+            <div class="app-label">S-MIND</div>
+        </div>
         <div class="app-icon">
-            <div class="app-img">âš™ï¸</div>
+            <div class="app-img">âš™ï¸ </div>
             <div class="app-label">Core Orchestrator</div>
         </div>
     </div>
@@ -1400,6 +1404,26 @@ https://chatgpt.com/?q={{prompt}}</textarea>
     <!-- Taskbar -->
 
 
+    <!-- S-MIND Window -->
+    <div class="window" id="s-mind-win" style="display:none; flex-direction:column; width:800px; height:600px; left:100px; top:100px;">
+        <div class="window-header">
+            <div class="window-title">Σ S-MIND: Sovereign Lattice Mapper</div>
+            <div class="window-controls">
+                <div class="win-btn minimize" onclick="minimizeWindow('s-mind-win')"></div>
+                <div class="win-btn close" onclick="closeWindow('s-mind-win')"></div>
+            </div>
+        </div>
+        <div class="window-content" style="padding:0; flex-grow:1; background: #000; overflow: hidden; position: relative;">
+            <div id="mind-canvas-container" style="width:100%; height:100%; position: relative;">
+                <canvas id="mind-canvas" style="cursor: crosshair;"></canvas>
+            </div>
+            <div class="mind-controls" style="position: absolute; bottom: 20px; left: 20px; display: flex; gap: 10px;">
+                <button class="util-btn" onclick="addMindNode()">ADD SHARD NODE</button>
+                <button class="util-btn" onclick="exportMindLattice()">EXPORT MANIFEST</button>
+            </div>
+        </div>
+    </div>
+
     <div class="taskbar">
         <div class="task-icon active" onclick="toggleStart()">Î£</div>
         <div class="task-icon" onclick="launchApp('File Manager')">ðŸ“‚</div>
@@ -1541,6 +1565,11 @@ https://chatgpt.com/?q={{prompt}}</textarea>
                 const win = document.getElementById('sigma-capsule-win');
                 win.style.display = 'block';
                 win.style.zIndex = '2000';
+            } else if (app === 'S-MIND') {
+                const win = document.getElementById('s-mind-win');
+                win.style.display = 'flex';
+                win.style.zIndex = '2000';
+                initMindMap();
             }
 
 
@@ -2258,6 +2287,99 @@ https://chatgpt.com/?q={{prompt}}</textarea>
         function speak(text) {
             console.log("[S-ACCESSIBILITY]: " + text);
             document.getElementById('s-accessibility').innerText = text;
+        }
+        // S-MIND Logic
+        const mindCanvas = document.getElementById('mind-canvas');
+        const mindCtx = mindCanvas.getContext('2d');
+        let mindNodes = [];
+
+        function initMindMap() {
+            const container = document.getElementById('mind-canvas-container');
+            mindCanvas.width = container.clientWidth;
+            mindCanvas.height = container.clientHeight;
+            mindNodes = [
+                { x: mindCanvas.width / 2, y: mindCanvas.height / 2, label: 'CENTRAL LATTICE', isRoot: true },
+                { x: mindCanvas.width / 2 - 150, y: mindCanvas.height / 2 - 50, label: 'CORE SHARDS', parentIdx: 0 },
+                { x: mindCanvas.width / 2 + 150, y: mindCanvas.height / 2 + 50, label: 'INDUSTRIAL SUITES', parentIdx: 0 }
+            ];
+            
+            function animate() {
+                if (document.getElementById('s-mind-win').style.display === 'flex') {
+                    drawMindMap();
+                    requestAnimationFrame(animate);
+                }
+            }
+            animate();
+        }
+
+        function addMindNode() {
+            const label = prompt("Enter Shard Name:", "New Shard");
+            if (!label) return;
+            const parentIdx = Math.floor(Math.random() * mindNodes.length);
+            const parent = mindNodes[parentIdx];
+            const angle = Math.random() * Math.PI * 2;
+            const dist = 120 + Math.random() * 60;
+            mindNodes.push({
+                x: parent.x + Math.cos(angle) * dist,
+                y: parent.y + Math.sin(angle) * dist,
+                label: label.toUpperCase(),
+                parentIdx: parentIdx
+            });
+            drawMindMap();
+            addLog(`Σ [S-MIND]: Shard "${label}" mapped to lattice.`, "success");
+        }
+
+        function drawMindMap() {
+            mindCtx.clearRect(0, 0, mindCanvas.width, mindCanvas.height);
+            const time = Date.now() / 1000;
+            
+            // Draw connections
+            mindCtx.shadowBlur = 10;
+            mindCtx.shadowColor = 'rgba(0, 242, 255, 0.5)';
+            mindCtx.lineWidth = 2;
+            mindNodes.forEach(node => {
+                if (node.parentIdx !== undefined) {
+                    const parent = mindNodes[node.parentIdx];
+                    const pulse = Math.abs(Math.sin(time * 2 + node.x)) * 0.5 + 0.5;
+                    mindCtx.strokeStyle = `rgba(0, 242, 255, ${0.3 * pulse})`;
+                    mindCtx.beginPath();
+                    mindCtx.moveTo(node.x, node.y);
+                    mindCtx.lineTo(parent.x, parent.y);
+                    mindCtx.stroke();
+                }
+            });
+
+            // Draw nodes
+            mindNodes.forEach(node => {
+                mindCtx.shadowBlur = 15;
+                mindCtx.shadowColor = node.isRoot ? '#00f2ff' : 'rgba(0, 242, 255, 0.5)';
+                
+                const grad = mindCtx.createRadialGradient(node.x, node.y, 0, node.x, node.y, node.isRoot ? 20 : 15);
+                grad.addColorStop(0, node.isRoot ? '#00f2ff' : 'rgba(0, 242, 255, 0.4)');
+                grad.addColorStop(1, 'transparent');
+                
+                mindCtx.fillStyle = grad;
+                mindCtx.beginPath();
+                mindCtx.arc(node.x, node.y, node.isRoot ? 20 : 15, 0, Math.PI * 2);
+                mindCtx.fill();
+
+                mindCtx.strokeStyle = '#00f2ff';
+                mindCtx.lineWidth = 1;
+                mindCtx.stroke();
+
+                mindCtx.shadowBlur = 0;
+                mindCtx.fillStyle = '#fff';
+                mindCtx.font = 'bold 11px Outfit';
+                mindCtx.textAlign = 'center';
+                mindCtx.fillText(node.label, node.x, node.y + 35);
+            });
+        }
+
+        function exportMindLattice() {
+            addLog("Σ [S-MIND]: Encrypting lattice manifest with Dilithium-5...", "success");
+            setTimeout(() => {
+                addLog("Σ [S-MIND]: Exporting SHARDS.manifest.pqc to /home/sovereign/", "success");
+            }, 1500);
         }
     </script>
 </body>
