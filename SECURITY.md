@@ -19,6 +19,7 @@ Please do not open a public issue. We will respond within 24 hours to coordinate
 ## Security Lattice Architecture
 
 SigmaOS uses **Post-Quantum Cryptography (PQC)** by default. All system-level shards are verified using CRYSTALS-Kyber and CRYSTALS-Dilithium.
+The **Sovereign Auditor (S-AUDIT)** performs continuous runtime verification of shard entropy and memory boundaries.
 
 ---
 
