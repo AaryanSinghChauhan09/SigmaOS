@@ -76,3 +76,23 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 - **Primary Tool**: LiDAR Point-Cloud Lattice.
 - **Security**: PQC-signed artifact registries.
 - **Resilience**: 3D site-reconstruction failover.
+
+## 🚚 S-LOGIST: Logistics & Supply Chain Shard
+- **Primary Tool**: Route-Optimization Lattice.
+- **Calculators**: Traveling Salesman Efficiency Nexus.
+- **Resilience**: PQC-signed manifest verification.
+
+## ⚡ S-ENERGY: Energy Grid & Renewables Shard
+- **Primary Tool**: Grid-Stability Lattice.
+- **Calculators**: Transient Stability / Load Balancing Nexus.
+- **Resilience**: PQC-encrypted utility telemetry.
+
+## 🌊 S-OCEAN: Oceanography & Marine Research Shard
+- **Primary Tool**: Tidal-Pressure Lattice.
+- **Calculators**: Hydrostatic Pressure / Fluid Dynamic Nexus.
+- **Resilience**: Underwater telemetry failover.
+
+## 🌤️ S-METEO: Meteorology & Climate Research Shard
+- **Primary Tool**: Atmospheric-Dynamic Lattice.
+- **Functions**: 48-Hour Atmospheric Simulation.
+- **Resilience**: PQC-signed climate record integrity.
