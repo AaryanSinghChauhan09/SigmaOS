@@ -1,42 +1,21 @@
 # Contributing to SigmaOS
 
-Welcome to the **Sovereign Lattice™**! We are building the world's first industrial-grade, profession-aware operating system, and we need your help to scale the lattice.
+Welcome, Sovereign. SigmaOS is an industrial-grade operating system lattice built on the principles of **Silicon Sovereignty**, **Neural Intelligence**, and **Zero-Dependency** engineering.
 
-## 🏛 How to Contribute
+## 🏛 The Sovereign Principles
+1. **Zero-STL**: We do not use the standard library. All primitives must be defined in `sigma_libc.h` or `sigma_kernel_types.h`.
+2. **Shard Isolation**: Every feature must be a "shard" with a strict interface. No circular dependencies.
+3. **PQC-Native**: All inter-shard communication and binary distribution must be Post-Quantum Cryptography attested.
 
-### 1. Developing Shards
+## 🛠 Development Workflow
+1. **Sharding**: Identify the resource you are managing. Create a new shard in the appropriate layer.
+2. **Registration**: Add your shard source path to `SHARDS.manifest`.
+3. **Audit**: Ensure your shard uses `SigmaObject` for OOP parity.
 
-SigmaOS is modular. All features must be implemented as isolated **shards** within the lattice.
-
-- Use the **Sovereign SDK** for all kernel interactions.
-- Ensure zero-dependency APIs.
-- All code must be C++17 compliant.
-
-### 2. Professional Profiles
-
-We aim to support 600+ professions. If your profession is missing from `PROFESSION-MAP.md`, please submit a PR with:
-
-- A new tool manifest.
-- Resilience strategies for your specific role.
-- Integration tests for your professional tools.
-
-### 3. Hardware Drivers
-
-Hardware drivers are implemented as HAL shards.
-
-- Follow the `SovereignDriverFramework` guidelines.
-- Use software fallbacks whenever possible to ensure universal "Zenith" compatibility.
-
-## 🔒 Security Requirements
-
-- All commits must be signed.
-- New shards must include PQC-attestation metadata.
-- No legacy C libraries are allowed; use `SovereignLibC`.
-
-## 🤝 Community
-
-- **Discord**: [Join the SigmaOS Shard](https://discord.gg/sigmaos)
-- **Mailing List**: `dev@sigmaos.org`
+## 🚀 Pull Request Process
+- Ensure the build passes locally using `s-cli build`.
+- Update the relevant Wiki page (Logic, API, etc.) to reflect your changes.
+- Submit your PR with a clear "Industrial USP" (Unique Selling Point) explanation.
 
 ---
-*By contributing, you agree that your code will be licensed under the Sovereign Open Source License.*
+*Stay Sovereign.*
