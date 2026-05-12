@@ -1,17 +1,14 @@
-1
+# Hacking-Guide
 
+1
 
 This guide defines the industrial workflow for developing, registering, and validating new **Sovereign Shards** within the SigmaOS lattice.
 
-
 1
-
 
 All core shards must adhere to the **Singleton Pattern** to ensure a single source of truth for system state.
 
-
 1
-
 
 #include "core/sigma_types.h"
 
@@ -40,13 +37,9 @@ private:
 
 1
 
-
-
 1
 
-
 Expose your shard to the C-based kernel initialization sequence via a bridge.
-
 
 1
 
@@ -57,20 +50,13 @@ extern "C" void myshard_init() {
 
 1
 
-
-
 1
-
 
 Before submission, every shard must undergo the **Sovereign Audit**:
 
-
 1
 
-
-
 1
-
 
 1. Create a `feature/` branch.
 2. Submit a Pull Request targeting the `main` branch.

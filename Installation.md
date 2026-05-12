@@ -1,3 +1,5 @@
+# Installation
+
 <<<<<<< HEAD
 
 # 🚀 SigmaOS Installation Guide
@@ -8,14 +10,11 @@ Welcome to the SigmaOS Installation Guide. This document provides a step-by-step
 =======
 ﻿1
 
-
 Welcome to the SigmaOS Installation Guide. This document provides a step-by-step procedure to deploy the SigmaOS Sovereign Lattice onto physical hardware or a virtualized environment.
-
 
 1
 
 >>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
-
 
 ## 💻 Supported Hardware
 
@@ -29,7 +28,6 @@ Welcome to the SigmaOS Installation Guide. This document provides a step-by-step
 
 ---
 
-
 ## ⚡ Quick Deployment (Physical Hardware)
 
 1. **Download the Official Image**
@@ -38,7 +36,6 @@ Welcome to the SigmaOS Installation Guide. This document provides a step-by-step
 
 1
 
-
 1. **Download the Official Image**
    Download the latest `sigmaos_aarch64.img` from the release page.
 
@@ -46,13 +43,13 @@ Welcome to the SigmaOS Installation Guide. This document provides a step-by-step
    Use `dd` or a tool like BalenaEtcher to flash the image.
 >>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
-2. **Flash to SD Card / NVMe**
+1. **Flash to SD Card / NVMe**
    Use `dd` or a tool like BalenaEtcher to flash the image.
    ```bash
    sudo dd if=sigmaos_aarch64.img of=/dev/sdX bs=4M status=progress
    ```
 
-3. **Booting**
+1. **Booting**
    Insert the drive and power on. The Sovereign Boot Manager will initialize the lattice shards and launch the Zenith UI automatically.
 
 <<<<<<< HEAD
@@ -62,7 +59,6 @@ Welcome to the SigmaOS Installation Guide. This document provides a step-by-step
 1
 
 >>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
-
 
 ## 🔬 Virtualization (QEMU)
 
@@ -77,7 +73,7 @@ If you want to test SigmaOS without physical hardware, use the QEMU target.
 1. **Run QEMU**
 >>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
-2. **Run QEMU**
+1. **Run QEMU**
    ```bash
    qemu-system-aarch64 \
        -machine raspi4b \
@@ -90,8 +86,8 @@ If you want to test SigmaOS without physical hardware, use the QEMU target.
 <<<<<<< HEAD
 ---
 
-
 ## 🌓 Dual-Boot Configuration
+
 =======
 
 1
@@ -106,7 +102,7 @@ The `SovereignPartitionManager` supports scanning existing GPT partitions and br
    sudo cp sigma_os_x64.elf /boot/efi/EFI/sigmaos/
    ```
 
-2. **Add Boot Entry**
+1. **Add Boot Entry**
    Create `/boot/efi/loader/entries/sigmaos.conf`:
    ```ini
    title   SigmaOS Sovereign Lattice
@@ -117,20 +113,21 @@ The `SovereignPartitionManager` supports scanning existing GPT partitions and br
 <<<<<<< HEAD
 ---
 
-
 ## 🎯 Post-Installation
 
 Upon first boot, the **Onboarding Wizard** will launch to:
+
 - Detect your hardware and apply **Smart Defaults**.
 - Prompt for your **Profession Profile** (Lawyer, Doctor, Engineer, etc.).
 - Configure **Verified Boot** and PQC security levels.
 
 ---
-*Welcome to the future of sovereign computing.*
+
+### Welcome to the future of sovereign computing.
+
 =======
 
 1
-
 
 Upon first boot, the OS will automatically detect your profession profile and initialize the Zenith UI Dashboard. Use the Context Manager hooks to override defaults if needed.
 

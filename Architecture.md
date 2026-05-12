@@ -1,49 +1,39 @@
-# 🏗️ SigmaOS Sovereign Architecture
+# SigmaOS Kernel Architecture: The Sovereign Lattice
 
-SigmaOS is built on a 7-layer modular architecture designed for high-assurance AI automation and hardware independence. By eliminating all external dependencies and implementing a **Sovereign Lattice** of 600+ atomic shards, SigmaOS provides absolute digital sovereignty.
+SigmaOS uses a unique **Lattice-based microkernel** design, where system functionality is fragmented into independent, high-assurance "shards".
 
----
+## 🏗 System Layers
 
-## 🗺️ Module Hierarchy
+```mermaid
+graph TD
+    User[Professional User] --> UI[Zenith Compositor]
+    UI --> Shards[Sovereign Shards]
+    subgraph "Sovereign Lattice"
+        Shards --> PAI[S-PAI AI Orchestrator]
+        Shards --> VIZ[S-VIZ Visualization]
+        Shards --> VAKIL[S-VAKIL Legal]
+        Shards --> AUTO[S-AUTO Self-Healing]
+    end
+    Shards --> HAL[S-HAL Hardware Abstraction]
+    HAL --> Hardware[Physical Silicon]
+```
 
-The core repository is organized into strict OOP-isolated modules (shards) to ensure industrial stability and sub-millisecond latency.
+## 🧠 Key Design Principles
 
-| Module Path | Purpose | Key Components |
-| :--- | :--- | :--- |
-| `/kernel/` | Sovereign lattice kernel | Scheduler, Hypervisor, Watchdog |
-| `/drivers/` | Hardware shards (OOP) | Vulkan, Proton, NVMe |
-| `/security/` | FIPS-140-3 lattice | SovereignPQC, SovereignCompliance, RBAC |
-| `/industrial/` | Performance & Power | SovereignPower, SovereignVulkanLoader |
-| `/observability/`| Real-time Telemetry | SovereignDiag, SovereignMonitor |
-| `/automation/` | Ease of Use | SovereignAutomation, SmartShortcuts |
-| `/ui/` | Zenith Morphic Engine | Themes, Accessibility, Layouts |
-| `/agents/` | Autonomous Governance | Quota Manager, Orchestrator |
+### 1. Shard Isolation
+Every service (NetStack, Storage, UI) runs in its own isolated memory region. A fault in one shard does not compromise the entire system.
 
----
+### 2. Zero-Dependency Primitives
+The core kernel does not rely on external libraries. It uses a custom `SovereignLibC` and `SigmaOOP` to ensure absolute predictability and security.
 
-## 🧩 Architectural Principles
+### 3. PQC-First Memory
+Post-Quantum Cryptography is integrated into the memory allocator, ensuring that even if physical memory is dumped, the data remains unintelligible without attestation.
 
-### 1. Atomic Modularization
-Every system component is a **Shard**. Shards are OOP-isolated singletons that communicate via a wait-free IPC bridge, ensuring that a failure in one shard cannot compromise the lattice.
+### 4. Wait-Free IPC
+Inter-shard communication is handled via lock-free circular buffers, ensuring zero-latency handoffs between professional tools.
 
-### 2. Zero-Trust Execution
-Drivers and userland applications run in isolated sandboxes with capability-gated access to silicon resources. There is no "root" user; only cryptographic capabilities verified via **SovereignPQC**.
-
-### 3. Silicon-Direct Orchestration
-SigmaOS bypasses legacy abstraction layers to communicate directly with hardware registers, achieving RDTSC-precision scheduling and sub-millisecond latency.
-
----
-
-## 🏛️ The 7-Layer Lattice
-
-1. **Physical Layer**: Silicon tuning and ARM64/x86_64 micro-optimizations.
-2. **HAL Layer**: Shard-based hardware abstraction and driver isolation.
-3. **Lattice Layer**: Core kernel primitives and inter-shard communication.
-4. **Governance Layer**: Security, compliance audits, and PQC attestation.
-5. **Automation Layer**: Autonomous agents and polymorphic command grammar.
-6. **Interface Layer**: Zenith UI and profession-centric toolsets.
-7. **Sovereignty Layer**: Decentralized identity (DIDs) and P2P state sync.
+## ⚙️ Scheduling & Execution
+SigmaOS uses a **Priority-Aware Lattice Scheduler**. Shards are scheduled based on the user's active professional profile. If a Doctor is performing surgery, the `S-VIZ` and `S-HAL` shards receive the highest execution priority.
 
 ---
-*Architecture is the foundation of sovereignty.*
-v14.1 [ZENITH-EXPANSION]
+*Next: [Driver Framework](Driver-Framework.md)*

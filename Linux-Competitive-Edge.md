@@ -18,6 +18,7 @@ In 2026, mainstream Linux distributions like **Pop!_OS**, **CachyOS**, and **Lin
 ## ⚖️ The "Certification Gap"
 
 Mainstream Linux distributions are often fragmented and rely on massive community-driven package repositories where provenance is difficult to verify at a granular level. SigmaOS differentiates here:
+
 1. **FIPS-140-3 Lattice**: Every cryptographic module is NIST-validated.
 2. **PQC Attestation**: All 600 shards are signed with Dilithium-L5 proofs.
 3. **Silicon-Direct Trust**: Root of trust starts at the hardware gate, not the OS loader.
@@ -27,10 +28,13 @@ Mainstream Linux distributions are often fragmented and rely on massive communit
 ## 💡 Strategic Takeaway for SigmaOS
 
 To surpass the competition, SigmaOS does not compete on "popularity" but on **Indisputable Trust**.
+
 - **Focus**: Own the security, sovereignty, and personalization niches.
 - **Automation**: Deliver what Linux leaves to manual configuration (e.g., auto-tuning, self-healing).
 - **Personalization**: Transition from "Generic OS" to "Profession-Aware Lattice".
 
 ---
-*Sovereignty is the ultimate differentiator.*
+
+### Sovereignty is the ultimate differentiator.
+
 v14.3 [LEAPFROG-STRATEGY]

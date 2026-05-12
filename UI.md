@@ -1,24 +1,19 @@
-1
+# UI
 
+1
 
 SigmaOS implements the **Zenith UI CSS Engine**, a zero-dependency, native DOM compositing layer designed to definitively surpass the design reputation of **elementary OS**, **Solus**, and **EndeavourOS**.
 
-
 1
 
-
 Located in the /ui/ module of the codebase, the Zenith engine achieves its competitive edge without relying on heavy external dependencies like GTK or Qt:
-
-
 
 1. **Sovereign Rendering Pipelines**: Utilizes core CSS custom properties (--zenith-*) to establish a dynamic, glassmorphism-based compositor (.zenith-window).
 2. **Native Accessibility Layers**:
 
-
 1
 
 <<<<<<< HEAD
-
 
 =======
 >>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f

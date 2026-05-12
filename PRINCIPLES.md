@@ -1,5 +1,6 @@
-1
+# PRINCIPLES
 
+1
 
 This matrix confirms the structural enforcement of all 45 core engineering principles within the **SigmaOS Zenith Supreme (v3250.4)** kernel.
 
@@ -51,20 +52,13 @@ This matrix confirms the structural enforcement of all 45 core engineering princ
 | **Vector Engine** | `SovereignVectorShard.c` | **Bezier Curves**, Path Rasterization |
 | **PCI Discovery** | `SovereignBusShard.c` | **Configuration Space Scan**, Vendor ID |
 
+1
 
 1
 
-
-
 1
-
-
-
-1
-
 
 ---
-
 
 1
 

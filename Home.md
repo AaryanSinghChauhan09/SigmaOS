@@ -1,36 +1,26 @@
+# Σ SigmaOS: The Sovereign Wiki
 
-# 🏛️ Welcome to the SigmaOS Sovereign Wiki
+Welcome to the central knowledge hub for **SigmaOS**, the world's first industrial-grade, profession-aware operating system. SigmaOS is built on the **Sovereign Lattice™** architecture, designed to provide absolute sovereignty over professional workspaces.
 
-**SigmaOS** is a revolutionary operating system designed as a **Sovereign Lattice** of 600+ atomic shards. It combines the raw power of Linux with the architectural polish of a premium ecosystem, prioritizing absolute digital sovereignty and professional automation.
+## 🏛 Core Technical Documentation
 
----
+- **[Architecture & Design](Architecture.md)**: Detailed breakdown of the microkernel shard lattice and PQC memory model.
+- **[Sovereign Driver Framework](Driver-Framework.md)**: Guide and templates for developing hardware-level drivers.
+- **[Security & Reliability](Security-Safety.md)**: Overview of self-healing (S-AUTO) and process isolation (S-WASM).
+- **[API Reference](API-Reference.md)**: Technical documentation for the Sovereign SDK and Zenith UI.
 
+## 🚀 Industrial Strategy
 
-## 🚀 Quick Navigation
+- **[Unique Selling Points (USP)](USP.md)**: What makes SigmaOS different from generic operating systems.
+- **[Profession Lattice Map](PROFESSION-MAP.md)**: A complete mapping of tools and resilience strategies for 350+ roles.
+- **[Professionalization Plan](PROFESSIONALIZATION_PLAN.md)**: The roadmap for transforming SigmaOS into a turnkey professional workstation.
 
-- **[Architecture Overview](Architecture.md)**: Deep dive into the 600-shard modular kernel.
-- **[Strategic Leapfrog](Leapfrog-Strategy.md)**: How SigmaOS outperforms industrial competitors.
-- **[Profession Center](PROFESSION-MAP.md)**: Explore role-specific tools and system profiles.
-- **[Linux Competitive Edge](Linux-Competitive-Edge.md)**: Our strategy to dominate the open-source landscape.
-- **[100 Strategic Advancements](ULTIMATE-ADVANCEMENT-STRATEGY.md)**: The long-term roadmap to sovereign dominance.
-- **[Security & PQC](Verified-Boot.md)**: Hardening the lattice against quantum threats.
+## 🛠 Project Lifecycle
 
----
-
-
-## 🛠️ The Profession Matrix
-SigmaOS adapts to your role instantly. Select your path to explore tailored documentation:
-- **[Lawyer](Profession-Lawyer-Tools.md)** | **[Doctor](Profession-Doctor-Tools.md)** | **[Engineer](Profession-Engineer-Tools.md)**
-- **[Developer](Profession-Software-Dev-Tools.md)** | **[Artist](Profession-Artist-Tools.md)** | **[Scientist](Profession-Scientist-Tools.md)**
-
----
-
-
-## 🛡️ The Sovereign Manifesto
-> "Sovereignty is not just about independence; it is about the ultimate efficiency of a system that answers only to its user."
-
-SigmaOS eliminates foreign technical debt, implements silicon-direct orchestration, and provides an AI-native environment that adapts to your **Profession Profile**.
+- **[README](../README.md)**: Main project landing page and build status.
+- **[CONTRIBUTING](../CONTRIBUTING.md)**: Guidelines for contributing to the Sovereign Lattice.
+- **[BUILD](../BUILD.md)**: Instructions for compiling and deploying SigmaOS.
+- **[ROADMAP](../ROADMAP.md)**: The future of SigmaOS across Horizon cycles.
 
 ---
-*The Official Immutable Source of Truth for SigmaOS Industrialization.*
-v14.0 [NEXUS-SUPREME]
+*For real-time support, access the S-LOG shard or the Sovereign AI (S-PAI) assistant within the kernel.*

@@ -1,12 +1,10 @@
-1
-
-
+# WASM-Runtime
 
 1
 
+1
 
 The SigmaOS WASM Runtime provides a high-performance, sandboxed execution environment for userland applications and isolated kernel tasks. Leveraging the **Sovereign PSE (Portable Shard Execution)** model, WASM modules can run natively on the silicon bus without traditional instruction set translation overhead.
-
 
 1
 
@@ -24,41 +22,26 @@ graph LR
 
 1
 
-
+1
 
 1
 
-
-
 1
-
-
-
-1
-
-
 
 1
 
 =======
 1
 
-
-
 1
 
-
-
 1
-
-
 
 1
 
 >>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 The runtime is implemented as a modular C++ singleton:
-
 
 1
 
@@ -79,26 +62,16 @@ private:
 
 1
 
-
-
 1
 
-
-
 1
-
-
 
 1
 
 =======
 1
 
-
-
 1
-
-
 
 1
 

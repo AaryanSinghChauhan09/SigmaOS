@@ -1,11 +1,9 @@
+# NEXT OBJECTIVES
+
 1
-
-
 
 1
 <<<<<<< HEAD
-
-
 
 1
 =======

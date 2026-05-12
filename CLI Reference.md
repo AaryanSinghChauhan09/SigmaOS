@@ -1,13 +1,12 @@
-1
+# CLI Reference
 
+1
 
 > The sovereign command-line interface for the 7-layer lattice.
 
 ---
 
-
 1
-
 
 | Command | Action | Description |
 |---------|--------|-------------|
@@ -17,9 +16,7 @@
 | **`sigma-reg`** | **Configure** | **Query/Edit the Sovereign Registry (Git-backed).** |
 | `sigma-driver`| Manage | Load, list, and auto-detect modular kernel drivers. |
 
-
 1
-
 
 | Command | Action | Description |
 |---------|--------|-------------|
@@ -28,9 +25,7 @@
 | `sigma-ai status` | Monitor | Check the health of the local AI assistant. |
 | `sigma-ai query` | Interact | Send a natural language command to the OS. |
 
-
 1
-
 
 | Command | Action | Description |
 |---------|--------|-------------|
@@ -43,9 +38,7 @@
 | `sigma-dev`   | Toolkit| Debugging, profiling, and tracing utilities for shards. |
 | `sigma-recover`| Rollback | Boot into the last known good Apex checkpoint. |
 
-
 1
-
 
 | Command | Action | Description |
 |---------|--------|-------------|
@@ -55,9 +48,7 @@
 | `sigma-update`| Update | Unified updater with automatic snapshot rollback protection. |
 | `sigma-health`| Audit | Comprehensive system health check (Kernel, UI, Sec, AI). |
 
-
 1
-
 
 | Command | Action | Description |
 |---------|--------|-------------|
@@ -66,9 +57,7 @@
 | `sigma-pkg list` | List | View all installed sovereign shards and their versions. |
 | `sigma-pkg graph` | Visualize | Generate a dependency DAG of the current system. |
 
-
 1
-
 
 | Command | Action | Description |
 |---------|--------|-------------|
@@ -77,9 +66,7 @@
 | `zenith-theme` | Style | Apply a new visual theme (Dark, Cyber, Paper). |
 | `zenith-status` | Health | Monitor surface health and GPU fallback status. |
 
-
 1
-
 
 | Command | Action | Description |
 |---------|--------|-------------|
@@ -87,9 +74,7 @@
 | `sigma-sec audit` | Verify | Run PQC compliance audit on all active shards. |
 | `sigma-sec enforce`| Policy | Apply strict security policies to the kernel lattice. |
 
-
 1
-
 
 | Command | Action | Description |
 |---------|--------|-------------|
@@ -97,9 +82,7 @@
 | `sigma-ai query` | Interact | Send a natural language command to the OS orchestrator. |
 | `sigma-ai adapt` | Optimize | Enable AI-driven UI and resource optimization. |
 
-
 1
-
 
 | Command | Action | Description |
 |---------|--------|-------------|
@@ -110,21 +93,14 @@
 
 ---
 
+1
 
 1
 
-
-
 1
-
-
-
-1
-
 
 s-cli sigma-pkg install sigma-pqc-kyber
 s-cli sigma-sec audit
-
 
 1
 

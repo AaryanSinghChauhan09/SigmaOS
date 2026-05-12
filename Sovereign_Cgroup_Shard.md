@@ -1,5 +1,6 @@
-1
+# Sovereign Cgroup Shard
 
+1
 
 **Parity:** Linux cgroups v2 · Windows Job Objects · Kubernetes ResourceQuota
 **Location:** `kernel/modules/system/SovereignCgroupShard.c`
@@ -7,21 +8,15 @@
 
 ---
 
-
 1
-
 
 The Sovereign Cgroup Shard provides native, zero-dependency silicon resource accounting and auto-throttle governance for SigmaOS. It absorbs the defining USPs of Linux cgroups v2, Windows Job Objects, and Kubernetes ResourceQuota by providing per-group CPU quota, memory limit, and I/O weight enforcement with a built-in automatic governor sweep.
 
 ---
 
-
 1
 
-
-
 1
-
 
 Cgroup Matrix (up to 12 resource groups)
   +-- zenith_kernel   — 80% CPU | 4 GB  MEM | IO:900 (High)
@@ -34,15 +29,11 @@ Auto-Governor Engine (called by Zen Scheduler every tick)
       +-- Compare against quota limits
       +-- Apply silicon throttle if over-quota
 
-
 1
-
 
 ---
 
-
 1
-
 
 | Sub-command | Action |
 |---|---|
@@ -52,9 +43,7 @@ Auto-Governor Engine (called by Zen Scheduler every tick)
 
 ---
 
-
 1
-
 
 | Group | CPU Quota | MEM Limit | IO Weight |
 |---|---|---|---|
@@ -64,23 +53,15 @@ Auto-Governor Engine (called by Zen Scheduler every tick)
 
 ---
 
+1
 
 1
 
-
-
 1
-
-
-
-1
-
 
 ---
 
-
 1
-
 
 `GLOBAL MESH ACTIVE` — Synchronized with `AaryanSinghChauhan09/SigmaOS`.
 

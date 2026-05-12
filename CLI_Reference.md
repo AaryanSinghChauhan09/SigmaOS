@@ -1,25 +1,20 @@
-1
+# CLI Reference
 
+1
 
 The SigmaOS CLI (`s-cli`) is built on a scalable namespace architecture. Instead of flat lists of commands, every operation is categorized into logical subsystems. This ensures the environment remains modular, intuitive, and completely free of bloat.
 
 ---
 
-
 1
-
 
 Interact directly with the Sigma Assistant for system insights and dynamic optimization.
 
-
 1
-
-
 
 1
 
 <<<<<<< HEAD
-
 
 1
 
@@ -28,39 +23,23 @@ Interact directly with the Sigma Assistant for system insights and dynamic optim
 
 Manage predefined functions, libraries, components, and hardware drivers.
 
+1
 
 1
 
-
-
 1
-
-
-
-1
-
-
 
 1
 
 <<<<<<< HEAD
 
+1
 
 1
 
-
-
 1
 
-
-
 1
-
-
-
-1
-
-
 
 1
 
@@ -69,91 +48,49 @@ Manage predefined functions, libraries, components, and hardware drivers.
 
 Ensure the OS remains free of dependency bloat.
 
+1
 
 1
 
-
+1
 
 1
 
-
+1
 
 1
 
-
+1
 
 1
 
-
+1
 
 1
 
-
-
 1
 
-
-
 1
-
-
-
-1
-
-
-
-1
-
-
-
-1
-
-
-
-1
-
-
-
-1
-
-
 
 1
 
 <<<<<<< HEAD
 
+1
 
 1
 
-
+1
 
 1
 
-
+1
 
 1
 
-
-
 1
 
-
-
 1
-
-
-
-1
-
-
-
-1
-
-
-
-1
-
-
 
 1
 

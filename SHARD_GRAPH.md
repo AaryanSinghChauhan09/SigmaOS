@@ -1,9 +1,8 @@
-1
-
-
+# SHARD GRAPH
 
 1
 
+1
 
 graph TD
     S01_Genesis --> S03_Orchestrator
@@ -26,7 +25,6 @@ graph TD
         SovereignRegistry.c
         SOVEREIGN_MANIFEST.json
     end
-
 
 1
 

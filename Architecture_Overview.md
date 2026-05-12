@@ -1,22 +1,15 @@
+# Architecture Overview
+
 1
 <<<<<<< HEAD
 
-
-
 1
 
-
-
 1
-
 
 =======
 
-
-
 1
-
-
 
 1
 
@@ -43,20 +36,13 @@ graph TD
 >>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 1
 
-
-
 1
-
 
 Communication between layers is enforced by the **Sovereign IPC Bus**. No driver can directly access the kernel space without an encrypted capability token.
 
-
 1
 
-
-
 1
-
 
 The `SovereignHAL` provides a strict interface for hardware interaction. Direct I/O port mapping is prohibited unless verified by the Hardware Attestation TPM driver during boot.
 

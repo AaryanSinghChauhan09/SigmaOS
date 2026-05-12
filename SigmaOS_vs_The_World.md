@@ -19,6 +19,7 @@ This document breaks down how SigmaOS compares to the dominant operating systems
 ## 🏗️ Closing the Maturity Gap (Phase 4)
 
 To reach the same level of industrial trust as Ubuntu, SigmaOS is implementing:
+
 1. **Universal SDK**: Allowing any developer to contribute shards easily.
 2. **Package Submission Pipeline**: Automated PQC-signing of all community shards.
 3. **OEM Partnerships**: Working with sovereign hardware vendors for pre-installs.
@@ -36,5 +37,7 @@ To reach the same level of industrial trust as Ubuntu, SigmaOS is implementing:
 | **Quantum-Ready** | No | No | **Yes** (Kyber/Dilithium) |
 
 ---
-*The SigmaOS Zenith is the end of the legacy OS era.*
+
+### The SigmaOS Zenith is the end of the legacy OS era.
+
 v14.3 [LEAPFROG-STRATEGY]
