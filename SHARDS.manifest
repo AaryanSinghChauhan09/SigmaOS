@@ -27,6 +27,7 @@ kernel/core/sched/SovereignRTSched.cpp
 # LAYER 2: SYSTEM SERVICES
 kernel/core/observability/SovereignMonitor.cpp
 kernel/core/observability/SovereignDiag.cpp
+kernel/core/security/SovereignMAC.cpp
 kernel/core/system/SovereignFS.cpp
 kernel/core/deployment/SovereignPackageGraph.cpp
 kernel/core/system/SovereignNet.cpp
