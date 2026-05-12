@@ -17,23 +17,22 @@ public:
     }
 
     void init() {
-        sigma_log_info("[HAL] Initializing Hardware Abstraction Shard (Race-Safe)...");
-        this->m_lock = 0u;
+        sigma_log_info("[HAL:ISR] Initializing Sovereign ISR Dispatcher (Wait-Free)...");
+        this->m_head = 0;
+        this->m_tail = 0;
     }
 
     void dispatchISR(sigma_u8 vector) {
-        // Fine-grained spinlock for interrupt dispatch
-        while (__sync_lock_test_and_set(&this->m_lock, 1));
-        
-        sigma_log_info("[HAL] ISR Dispatch: Vector 0x%02X locked for execution.", vector);
-        // Hit & Trial: Invoke the shard-specific handler registered for this vector
-        
-        __sync_lock_release(&this->m_lock);
+        sigma_log_info("[HAL:ISR] High-Priority ISR: 0x%02X. Queuing for lock-free deferred processing.", vector);
+        sigma_u32 pos = __sync_fetch_and_add(&this->m_tail, 1) % 256;
+        this->m_pending_irqs[pos] = vector;
     }
 
 private:
-    SovereignISR() : m_lock(0) {}
-    volatile sigma_u32 m_lock;
+    SovereignISR() : m_head(0), m_tail(0) {}
+    volatile sigma_u32 m_head;
+    volatile sigma_u32 m_tail;
+    sigma_u8 m_pending_irqs[256];
 };
 
 } // namespace Kernel

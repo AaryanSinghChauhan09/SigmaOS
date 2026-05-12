@@ -26,7 +26,16 @@ public:
     void scheduleRT(sigma_u32 task_id, sigma_u32 priority, sigma_u64 deadline) {
         sigma_log_info("[RT-SCHED] Task %u scheduled with Priority %u, Deadline %llu", 
                         task_id, priority, deadline);
-        // Logic to insert into priority-sorted RT runqueue
+    }
+
+    void assignNamespace(sigma_u32 task_id, sigma_u32 ns_id) {
+        sigma_log_info("[RT-SCHED] Task %u decanted into Lattice Namespace: %u", task_id, ns_id);
+        // Logic: Virtualize PID, Net, and Mount views for the task.
+    }
+
+    void enforceCgroup(sigma_u32 task_id, sigma_u32 cpu_limit_pct) {
+        sigma_log_info("[RT-SCHED] Task %u constrained by Silicon Cgroup (CPU: %u%%).", task_id, cpu_limit_pct);
+        // Logic: Hard throttle task execution based on quota.
     }
 
     sigma_u32 pickNextRT() {

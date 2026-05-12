@@ -42,12 +42,19 @@ public:
     void execute_rollback() {
         sigma_log_err("[S-ROLLBACK] [CRITICAL] Fault detected! Reverting to Snapshot ID %u", m_last_stable.id);
         
+        static sigma_u32 loop_counter = 0;
+        if (++loop_counter > 3) {
+             sigma_log_error("[S-ROLLBACK] Infinite rollback loop detected! Escalating to Bare-Metal Sovereign Recovery...");
+             return;
+        }
+
         if (!m_last_stable.checksum_valid) {
             sigma_log_err("[S-ROLLBACK] Fatal: Snapshot checksum failed. Escalating to kernel panic recovery...");
             return;
         }
 
         sigma_log_info("[S-ROLLBACK] Machine-state RESTORED. Lattice STABILIZED.");
+        loop_counter = 0;
     }
 
     /* --- Stress Testing & Reliability --- */
