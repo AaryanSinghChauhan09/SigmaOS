@@ -3,105 +3,299 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SigmaOS | Sovereign Installer</title>
+    <title>SigmaOS Horizon | Sovereign Installer</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
     <style>
-        .installer-container {
-            max-width: 1000px;
-            margin: 50px auto;
-            background: var(--bg-card);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
+        :root {
+            --bg: #050505;
+            --sidebar-bg: #0a0a0a;
+            --accent: #00f2ff;
+            --accent-glow: rgba(0, 242, 255, 0.3);
+            --text: #ffffff;
+            --text-dim: #888888;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            height: 100vh;
             display: flex;
-            height: 600px;
+            align-items: center;
+            justify-content: center;
             overflow: hidden;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
         }
+
+        .installer-window {
+            width: 1000px;
+            height: 650px;
+            background: var(--sidebar-bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            display: flex;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        /* Sidebar */
         .sidebar {
-            width: 250px;
-            background: rgba(0,0,0,0.3);
-            border-right: 1px solid var(--glass-border);
-            padding: 40px 20px;
+            width: 280px;
+            background: rgba(0,0,0,0.4);
+            border-right: 1px solid var(--border);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
         }
-        .sidebar-item {
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            color: #888;
+
+        .brand {
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 50px;
+            background: linear-gradient(to right, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 0;
+            color: var(--text-dim);
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            color: var(--accent);
             font-weight: 700;
         }
-        .sidebar-item.active {
-            color: var(--accent);
-            background: rgba(0, 242, 255, 0.05);
-            border-left: 4px solid var(--accent);
+
+        .step-num {
+            width: 24px;
+            height: 24px;
+            border: 1px solid var(--text-dim);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
         }
-        .content {
+
+        .step.active .step-num {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* Main Content */
+        .main-content {
             flex: 1;
             padding: 50px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
         }
-        .partition-map {
-            height: 100px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            margin: 20px 0;
+
+        .view {
+            display: none;
+            flex: 1;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .view.active {
             display: flex;
-            align-items: center;
-            padding: 0 10px;
-            gap: 5px;
+            flex-direction: column;
         }
-        .partition {
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { font-size: 32px; margin-bottom: 20px; }
+        p { color: var(--text-dim); line-height: 1.6; margin-bottom: 30px; }
+
+        /* Partitioning UI */
+        .disk-map {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
             height: 60px;
-            border-radius: 5px;
+            border-radius: 12px;
+            margin-bottom: 20px;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            color: #000;
-            font-weight: 700;
+            overflow: hidden;
         }
-        .partition.system { background: var(--accent); width: 60%; }
-        .partition.home { background: var(--accent-glow); width: 30%; }
-        .partition.swap { background: #555; width: 10%; color: #fff; }
+
+        .partition { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+        .part-efi { background: #555; width: 5%; border-right: 1px solid #000; }
+        .part-swap { background: #333; width: 10%; border-right: 1px solid #000; }
+        .part-root { background: var(--accent); color: #000; width: 85%; }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: auto;
+        }
+
+        button {
+            padding: 12px 30px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary { background: var(--card-bg); color: #fff; border: 1px solid var(--border); }
+        .btn-primary { background: var(--accent); color: #000; box-shadow: 0 10px 30px var(--accent-glow); }
+
+        button:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+        /* Progress View */
+        .progress-container { width: 100%; height: 6px; background: var(--card-bg); border-radius: 3px; margin-top: 40px; }
+        .progress-bar { width: 0%; height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.1s linear; box-shadow: 0 0 20px var(--accent); }
     </style>
 </head>
 <body>
-    <div class="installer-container">
-        <div class="sidebar">
-            <div class="sidebar-item">Welcome</div>
-            <div class="sidebar-item">Location</div>
-            <div class="sidebar-item">Keyboard</div>
-            <div class="sidebar-item active">Partitions</div>
-            <div class="sidebar-item">Users</div>
-            <div class="sidebar-item">Summary</div>
-            <div class="sidebar-item">Install</div>
+
+<div class="installer-window">
+    <div class="sidebar">
+        <div class="brand">Σ SigmaOS Horizon</div>
+        <div class="step active" id="s1"><div class="step-num">1</div> Welcome</div>
+        <div class="step" id="s2"><div class="step-num">2</div> Location</div>
+        <div class="step" id="s3"><div class="step-num">3</div> Keyboard</div>
+        <div class="step" id="s4"><div class="step-num">4</div> Partitions</div>
+        <div class="step" id="s5"><div class="step-num">5</div> Users</div>
+        <div class="step" id="s6"><div class="step-num">6</div> Install</div>
+    </div>
+
+    <div class="main-content">
+        <!-- Step 1: Welcome -->
+        <div class="view active" id="v1">
+            <h1>Welcome to SigmaOS</h1>
+            <p>You are about to install the world's first Sovereign Lattice-based Operating System. SigmaOS v15.0 "Horizon" is designed for absolute industrial stability and PQC-hardened security.</p>
+            <div style="background: var(--card-bg); padding: 25px; border-radius: 16px; border: 1px solid var(--border);">
+                <h3 style="color: var(--accent); margin-bottom: 10px;">Industrial Features:</h3>
+                <ul style="color: var(--text-dim); font-size: 14px; list-style: none;">
+                    <li>• Sovereign Lattice Sharding (600 Shards)</li>
+                    <li>• PQC-GPG Dilithium-5 Attestation</li>
+                    <li>• Real-Time S-SCHED Kernel</li>
+                    <li>• Zero-Trust AppArmor Profiles</li>
+                </ul>
+            </div>
         </div>
-        <div class="content">
-            <div>
-                <h2>Guided Partitioning</h2>
-                <p>Select how you want to decant SigmaOS onto your silicon.</p>
-                <div class="partition-map">
-                    <div class="partition system">SIGMA_SYS (ext4)</div>
-                    <div class="partition home">SIGMA_HOME</div>
-                    <div class="partition swap">SWAP</div>
-                </div>
-                <div class="hero-actions" style="justify-content: flex-start; margin-top: 30px;">
-                    <label style="display: block; margin-bottom: 10px;">
-                        <input type="radio" name="mode" checked> Erase disk and install SigmaOS
-                    </label>
-                    <label style="display: block;">
-                        <input type="radio" name="mode"> Install alongside Windows (Dual-boot)
-                    </label>
+
+        <!-- Step 4: Partitions -->
+        <div class="view" id="v4">
+            <h1>Partitioning</h1>
+            <p>Select how you would like to allocate space on your silicon disk. SigmaOS recommends the industrial layout for automatic snapshot integrity.</p>
+            
+            <div style="margin-bottom: 30px;">
+                <label style="display: block; margin-bottom: 10px; font-weight: 700;">Proposed Layout: /dev/nvme0n1</label>
+                <div class="disk-map">
+                    <div class="partition part-efi">EFI</div>
+                    <div class="partition part-swap">SWAP</div>
+                    <div class="partition part-root">SIGMA_LATTICE (Ext4/Journaled)</div>
                 </div>
             </div>
-            <div class="hero-actions" style="justify-content: flex-end;">
-                <a href="index.html" class="btn btn-secondary">Cancel</a>
-                <a href="#" class="btn btn-primary">Next ❯</a>
+
+            <div style="background: rgba(0,242,255,0.05); border: 1px solid var(--accent-glow); padding: 20px; border-radius: 12px;">
+                <span style="color: var(--accent); font-weight: 700;">PRO TIP:</span>
+                <span style="color: var(--text-dim); font-size: 14px;"> SovereignRollback shards require at least 20GB of unallocated space for atomic state snapshots.</span>
             </div>
+        </div>
+
+        <!-- Step 6: Progress -->
+        <div class="view" id="v6">
+            <h1>Installing SigmaOS Horizon...</h1>
+            <p id="status-text">Unpacking Sovereign Core Shards...</p>
+            <div class="progress-container">
+                <div class="progress-bar" id="pb"></div>
+            </div>
+            <div style="margin-top: 50px; font-family: 'JetBrains Mono'; font-size: 12px; color: #444;" id="log-view">
+                [INFO] Mounting /dev/nvme0n1p3 to /mnt/sigma...<br>
+                [INFO] Synchronizing PQC entropy pool...
+            </div>
+        </div>
+
+        <div class="controls" id="ctrl">
+            <button class="btn-secondary" onclick="nextStep(-1)">Back</button>
+            <button class="btn-primary" onclick="nextStep(1)">Next</button>
         </div>
     </div>
+</div>
+
+<script>
+    let current = 1;
+    const total = 6;
+
+    function nextStep(dir) {
+        if (current === 6 && dir === 1) return;
+        
+        document.getElementById(`v${current}`).classList.remove('active');
+        document.getElementById(`s${current}`).classList.remove('active');
+        
+        current += dir;
+        if (current < 1) current = 1;
+        if (current > total) current = total;
+
+        document.getElementById(`v${current}`).classList.add('active');
+        document.getElementById(`s${current}`).classList.add('active');
+
+        if (current === 6) {
+            startInstall();
+        }
+    }
+
+    function startInstall() {
+        document.getElementById('ctrl').style.display = 'none';
+        let prog = 0;
+        const pb = document.getElementById('pb');
+        const st = document.getElementById('status-text');
+        const lv = document.getElementById('log-view');
+        
+        const logs = [
+            "Synchronizing GPG trust store...",
+            "Expanding /boot/S-LATTICE.EFI...",
+            "Injecting Sovereign Watchdog...",
+            "Finalizing Mesa Transpiler...",
+            "Attesting Dilithium-5 Identity...",
+            "Cleaning up industrial artifacts...",
+            "Lattice is SOVEREIGN. Ready to boot."
+        ];
+
+        const interval = setInterval(() => {
+            prog += 0.5;
+            pb.style.width = prog + '%';
+            
+            if (Math.floor(prog) % 15 === 0) {
+                const logIdx = Math.floor(prog / 15);
+                if (logs[logIdx]) {
+                    st.innerText = logs[logIdx];
+                    lv.innerHTML += `<br>[DONE] ${logs[logIdx]}`;
+                }
+            }
+
+            if (prog >= 100) {
+                clearInterval(interval);
+                st.innerHTML = "<span style='color: var(--accent)'>Installation Complete! Restarting in 5s...</span>";
+                setTimeout(() => location.href = 'zenith.html', 5000);
+            }
+        }, 50);
+    }
+</script>
+
 </body>
 </html>

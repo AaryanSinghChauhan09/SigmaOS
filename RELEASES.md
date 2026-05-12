@@ -2,9 +2,10 @@
 
 This document tracks the official industrial artifacts for SigmaOS.
 
-## [v15.0.0-Horizon] - Stable Singularity
+## [v15.0.0] - Horizon (STABLE)
 **Release Date:** 2026-05-12
-**Integrity:** SOVEREIGN (PQC-Attested)
+**Integrity:** SOVEREIGN (PQC-Attested - DILITHIUM-5)
+**Status:** PRODUCTION-READY / INDUSTRIAL-GRADE
 
 ### 💿 ISO Images (Bootable)
 | Artifact | Architecture | Target | Signature |
