@@ -360,7 +360,12 @@ const additionalProfessions = [
     'Biometric Identity Guardian', 'Deepfake Forensic Auditor',
     'Exoplanet Geologist', 'Cyber-Kinetic Surgeon', 'Micro-Plastic Remediation Specialist', 'Interstellar Communications Officer',
     'Cryo-Preservation Technician', 'Holographic Experience Architect', 'Nanoscale Material Scientist',
-    'Quantum Algorithmic Auditor', 'Vertical Farming Systems Engineer', 'Space Traffic Controller'
+    'Quantum Algorithmic Auditor', 'Vertical Farming Systems Engineer', 'Space Traffic Controller',
+    'Orbital Habitat Architect', 'Neural-Link Security Auditor', 'Deep-Sea Mining Coordinator', 'Asteroid Prospector',
+    'Synthetic Biology Ethicist', 'Smart-City Traffic Optimizer', 'Climate Migration Strategist', 'Digital Consciousness Preserver',
+    'Quantum Entanglement Engineer', 'Sub-Surface Lunar Farmer', 'Graphene Lattice Fabricator', 'Autonomous Swarm Choreographer',
+    'Trans-Humanist Policy Advisor', 'Data-Vault Archaeologist', 'Biodiversity Restoration Ecologist', 'Haptic Simulation Engineer',
+    'Bio-Luminescent Lighting Designer', 'Fusion Waste Manager', 'Interplanetary Legal Consultant'
 ];
 
 additionalProfessions.forEach(name => {
