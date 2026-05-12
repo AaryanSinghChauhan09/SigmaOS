@@ -21,6 +21,7 @@ kernel/core/hal/SovereignEntropy.cpp
 kernel/core/hal/SovereignUSB.cpp
 kernel/core/hal/SovereignWiFiTranspiler.cpp
 kernel/core/hal/SovereignMesaTranspiler.cpp
+kernel/core/mem/SovereignAllocator.cpp
 # LAYER 1: KERNEL CORE (IPC, SCHEDULER, MEMORY)
 # Headers (zero-STL, kernel-safe)
 include/ipc/SovereignEventBus.h

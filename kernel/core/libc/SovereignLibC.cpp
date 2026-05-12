@@ -52,9 +52,19 @@ void sigma_printf(const char* format, ...) {
     sigma_log_info(format); 
 }
 
-void sigma_exit(int status) {
-    sigma_log_info("[LIBC]: Process terminating with status %d", status);
-    // Logic: Halt CPU or return to orchestrator
+sigma_u32 sigma_crc32(const void* data, sigma_size_t n) {
+    const sigma_u8* p = (const sigma_u8*)data;
+    sigma_u32 crc = 0xFFFFFFFF;
+    for (sigma_size_t i = 0; i < n; i++) {
+        sigma_u8 ch = p[i];
+        for (int j = 0; j < 8; j++) {
+            sigma_u32 b = (sigma_u32)((ch ^ crc) & 1);
+            crc >>= 1;
+            if (b) crc ^= 0xEDB88320;
+            ch >>= 1;
+        }
+    }
+    return ~crc;
 }
 
 } // extern "C"

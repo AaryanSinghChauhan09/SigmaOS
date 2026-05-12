@@ -15,13 +15,9 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Config {
 
-class SovereignNix : public SigmaOS::SigmaObject {
+class SovereignNix : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignNix> {
+    friend class SigmaOS::SigmaSingleton<SovereignNix>;
 public:
-    static SovereignNix& getInstance() {
-        static SovereignNix instance;
-        return instance;
-    }
-
     const char* type_name() const noexcept override {
         return "SovereignNix";
     }

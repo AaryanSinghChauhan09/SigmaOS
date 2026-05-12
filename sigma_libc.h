@@ -40,6 +40,7 @@ int sigma_atoi(const char* str);
 /* Terminal I/O */
 void sigma_printf(const char* format, ...);
 void sigma_exit(int status);
+sigma_u32 sigma_crc32(const void* data, sigma_size_t n);
 
 #ifdef __cplusplus
 }

@@ -27,16 +27,16 @@ void allocator_defrag(void);
 
 #define SIGMA_HEAP_SIZE (1024u * 1024u * 16u) /* 16MB Heap */
 
+#include "core/SigmaOOP.hpp"
+
 namespace SigmaOS {
 namespace Kernel {
 namespace Memory {
 
-class SovereignAllocatorEngine {
+class SovereignAllocatorEngine : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignAllocatorEngine> {
+    friend class SigmaOS::SigmaSingleton<SovereignAllocatorEngine>;
 public:
-    static SovereignAllocatorEngine& getInstance() {
-        static SovereignAllocatorEngine instance;
-        return instance;
-    }
+    const char* type_name() const noexcept override { return "SovereignAllocatorEngine"; }
 
     void init();
     void* malloc(sigma_u32 size);

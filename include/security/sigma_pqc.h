@@ -9,9 +9,16 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Security {
 
-class SovereignPQCEngine {
+#include "core/SigmaOOP.hpp"
+
+namespace SigmaOS {
+namespace Kernel {
+namespace Security {
+
+class SovereignPQCEngine : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignPQCEngine> {
+    friend class SigmaOS::SigmaSingleton<SovereignPQCEngine>;
 public:
-    static SovereignPQCEngine& getInstance();
+    const char* type_name() const noexcept override { return "SovereignPQCEngine"; }
 
     void init();
     void signShard(sigma_u32 shard_id, sigma_u8* signature);

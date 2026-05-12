@@ -13,13 +13,9 @@ namespace SigmaOS {
 namespace Kernel {
 namespace HAL {
 
-class SovereignUSB : public SigmaObject {
+class SovereignUSB : public SigmaObject, public SigmaSingleton<SovereignUSB> {
+    friend class SigmaSingleton<SovereignUSB>;
 public:
-    static SovereignUSB& getInstance() {
-        static SovereignUSB instance;
-        return instance;
-    }
-
     const char* type_name() const noexcept override { return "SovereignUSB"; }
 
     void Init() {

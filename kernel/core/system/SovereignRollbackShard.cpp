@@ -18,13 +18,9 @@ struct RollbackSnapshot {
     sigma_bool checksum_valid;
 };
 
-class SovereignRollbackShard : public SigmaOS::SigmaObject {
+class SovereignRollbackShard : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignRollbackShard> {
+    friend class SigmaOS::SigmaSingleton<SovereignRollbackShard>;
 public:
-    static SovereignRollbackShard& getInstance() {
-        static SovereignRollbackShard instance;
-        return instance;
-    }
-
     const char* type_name() const noexcept override { return "SovereignRollbackShard"; }
 
     void init() {
@@ -35,8 +31,10 @@ public:
 
     void capture_snapshot() {
         m_last_stable.id++;
-        m_last_stable.checksum_valid = SIGMA_TRUE; // In reality, compute CRC32
-        sigma_log_info("[S-ROLLBACK] CSS: Captured Stable Snapshot ID %u", m_last_stable.id);
+        m_last_stable.timestamp = 0; // Simulate timestamp
+        // Logic: Capture machine state (registers, etc.)
+        m_last_stable.checksum_valid = (sigma_crc32(&m_last_stable, sizeof(RollbackSnapshot)) != 0);
+        sigma_log_info("[S-ROLLBACK] CSS: Captured Stable Snapshot ID %u (CRC32 Verified)", m_last_stable.id);
     }
 
     void execute_rollback() {

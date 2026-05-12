@@ -14,13 +14,9 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Storage {
 
-class SovereignZFS : public SigmaOS::SigmaObject {
+class SovereignZFS : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignZFS> {
+    friend class SigmaOS::SigmaSingleton<SovereignZFS>;
 public:
-    static SovereignZFS& getInstance() {
-        static SovereignZFS instance;
-        return instance;
-    }
-
     const char* type_name() const noexcept override {
         return "SovereignZFS";
     }

@@ -1,15 +1,10 @@
-#include "security/SovereignPQC.hpp"
+#include "security/sigma_pqc.h"
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Security {
-
-SovereignPQCEngine& SovereignPQCEngine::getInstance() {
-    static SovereignPQCEngine instance;
-    return instance;
-}
 
 void SovereignPQCEngine::init() {
     sigma_log_info("[PQC] Initializing Sovereign Post-Quantum Cryptography Nexus...");
