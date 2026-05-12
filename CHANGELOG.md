@@ -25,10 +25,12 @@ All notable changes to **SigmaOS** will be documented in this file.
 - **S-LOG**: Structured industrial journaling (Journald-parity).
 
 ### 🔧 Fixed
-
-- **Medical Bridge**: Fixed namespace qualification in the `SovereignMedical` shard.
-- **Observability Matrix**: Resolved extraneous syntax and brace mismatches in `SovereignMonitor`.
-- **Toolchain**: Standardized build environment via Docker for reproducible lattice compilation.
+- **Architectural Normalization**: Unified kernel types and eliminated high-level language dependencies across 600 shards.
+- **Include Path Hardening**: Resolved 600+ brittle include path errors by enforcing root-relative addressing.
+- **Boot Singularity**: Restored missing boot shards to `SHARDS.manifest`, ensuring a complete system singularity build.
+- **Sovereign Tooling**: Refactored `sigma-pkg` to use the zero-dependency Sovereign OOP framework.
+- **Documentation Parity**: Synced the finalized "Logic" and "Roadmap" matrices with the GitHub Wiki.
+- **UI Aesthetics**: Professionalized the landing page and Zenith Desktop with a premium glassmorphic design.
 
 ### 🏛 Infrastructure
 
