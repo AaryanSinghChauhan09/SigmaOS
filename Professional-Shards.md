@@ -96,3 +96,73 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 - **Primary Tool**: Atmospheric-Dynamic Lattice.
 - **Functions**: 48-Hour Atmospheric Simulation.
 - **Resilience**: PQC-signed climate record integrity.
+
+## ☢️ S-NUKE: Nuclear Engineering Shard
+- **Standards**: AERB Safety Code, ANS-5.1 Decay Heat.
+- **Calculators**: Neutron-flux assessor, Decay-heat (ANS-5.1), SCRAM state machine.
+- **Resilience**: Hardware interlocked failsafe.
+
+## 🏗️ S-CIVIL: Civil & Structural Engineering Shard
+- **Standards**: IS 456:2000, IS 875:1987, IS 1893:2016, NBC 2016.
+- **Calculators**: Beam deflection, Terzaghi soil bearing, Seismic base shear, IS 875 wind load.
+- **Resilience**: PLM-lattice failover with PQC-signed reports.
+
+## 💊 S-PHARMA: Pharmacology Shard
+- **Standards**: Drugs & Cosmetics Act 1940, Schedule H/X.
+- **Calculators**: PK clearance & Css, drug-interaction detector.
+- **Resilience**: PQC-sealed prescription records.
+
+## 🩺 S-MBBS: Indian Doctor Clinical Decision Support
+- **Standards**: NMC, ICMR, WHO-Asia BMI cutoffs, JSSK/NHM.
+- **Calculators**: BMI (Asian), CKD-EPI eGFR, Clark/Young paed dose, Antenatal risk.
+- **Resilience**: Real-time life-sync.
+
+## ⚖️ S-ADVOCATE: Indian Advocate & Legal Research
+- **Standards**: BNS 2023, BNSS 2023, CPC 1908, Limitation Act 1963, CP Act 2019.
+- **Calculators**: IPC→BNS mapper, Limitation lookup, RTI deadline, Bail check, Consumer forum.
+- **Resilience**: PQC-sealed case history.
+
+## 🏠 S-REALTY: Real Estate & Property Shard
+- **Standards**: RERA 2016, Stamp Duty (10 states), Registration Act 1908.
+- **Calculators**: State-wise stamp duty, EMI (fixed-point), RERA compliance check.
+- **Resilience**: PQC-signed title documents.
+
+## 🧾 S-CA: Chartered Accountant Shard
+- **Standards**: Income Tax Act 1961, GST 2017, Companies Act 2013.
+- **Calculators**: GST (CGST/SGST/IGST), TDS (Sec 206AA), Advance Tax (Sec 208/211).
+- **Resilience**: PQC-audited financial ledger.
+
+## 💰 S-TAX: Indian Income Tax Shard
+- **Standards**: IT Act 1961, AY 2025-26 New & Old Regime.
+- **Calculators**: Slab-based tax, Sec 87A rebate, surcharge tiers, 4% H&E Cess.
+- **Resilience**: Immutable audit trail.
+
+## 👔 S-HR: Indian HR & Labour Compliance Shard
+- **Standards**: PF Act 1952, ESI Act 1948, Gratuity Act 1972, Bonus Act 1965.
+- **Calculators**: EPF (EE/ER/EPS/EDLI), ESI, Gratuity, Statutory Bonus, Net-pay breakdown.
+- **Resilience**: PQC-signed payslip registry.
+
+## 🏢 S-IS: Indian IS-Code Engineering Shard
+- **Standards**: IS 456:2000, IS 875-3:1987, IS 1893:2016.
+- **Calculators**: Wind pressure (10 cities), Seismic base shear, RCC minimum steel.
+- **Resilience**: NBC 2016 compliance attestation.
+
+## 📊 S-SEBI: Capital Markets & Stockbroker Shard
+- **Standards**: SEBI Act 1992, LODR 2015, PIT 2015, PMLA 2002.
+- **Calculators**: CAGR (Newton-method), SIP FV, F&O margin (SPAN+Exposure), PIT insider window.
+- **Resilience**: T+1 settlement audit trail.
+
+## 🛡️ S-ACTUARY: Insurance & Risk Shard
+- **Standards**: IRDAI Act 1999, Insurance Act 1938, LIC IAM 94-96 mortality tables.
+- **Calculators**: Gross premium (with loading), IRDAI Sec 64VA solvency margin.
+- **Resilience**: IAI-compliant valuation attestation.
+
+## 🚔 S-POLICE: Indian Law Enforcement Shard
+- **Standards**: BNS 2023, BNSS 2023, IEA 2023, NDPS Act 1985, PC Act 1988.
+- **Calculators**: FIR cognizability triager, Remand calendar, NDPS quantity classifier, PC Act lookup.
+- **Resilience**: PQC-signed case dossier.
+
+## 📚 S-TEACH: Indian Teacher & Educator Shard
+- **Standards**: NEP 2020, CBSE grading, UGC 7th Pay Commission, RTE Act 2009, NAAC.
+- **Calculators**: CBSE 10-pt grade, CGPA (best-5), Attendance %, UGC pay level, RTE PTR check.
+- **Resilience**: NAAC criterion evidence archival.
