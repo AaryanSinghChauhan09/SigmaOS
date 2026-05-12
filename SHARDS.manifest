@@ -33,6 +33,9 @@ kernel/core/sched/SovereignRTSched.cpp
 kernel/core/profiles/SovereignProfile.cpp
 # LAYER 6: SYSTEM UTILITIES
 kernel/core/system/SigmaPkg.cpp
+kernel/core/toolchain/SovereignToolchain.cpp
+kernel/core/security/SovereignAudit.cpp
+kernel/core/ds/SovereignDS.cpp
 kernel/core/testing/SovereignFuzz.cpp
 kernel/core/observability/SigmaBenchmark.cpp
 kernel/core/testing/SovereignRegression.cpp
