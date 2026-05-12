@@ -20,6 +20,8 @@ Welcome to the central knowledge hub for **SigmaOS**, the world's first industri
 ## 🏛 Industrial Pillars
 
 - **[S-NET: Sovereign Networking](Network-Stack.md)**: High-performance, PQC-encrypted communication.
+- **[S-SERVER: Industrial Server Pillars](Server-Pillars.md)**: SSH, Containers, and Web Lattices.
+- **[S-HAL: Hardware Driver Framework](Hardware-Drivers.md)**: GPU, Audio, and Connectivity.
 - **[S-MAC: Mandatory Access Control](Security-MAC.md)**: Shard-level zero-trust enforcement.
 - **[Z-DESK: Zenith Desktop](Zenith-Desktop.md)**: The profession-aware graphical environment.
 - **[S-PKG: Lattice Package Nexus](Package-Nexus.md)**: Decentralized shard distribution.
