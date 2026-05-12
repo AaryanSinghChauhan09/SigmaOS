@@ -8,6 +8,7 @@ Welcome to the central knowledge hub for **SigmaOS**, the world's first industri
 - **[Sovereign Driver Framework](Driver-Framework.md)**: Guide and templates for developing hardware-level drivers.
 - **[Security & Reliability](Security-Safety.md)**: Overview of self-healing (S-AUTO) and process isolation (S-WASM).
 - **[API Reference](API-Reference.md)**: Technical documentation for the Sovereign SDK and Zenith UI.
+- **[S-SHARDS: Professional Shard Registry](Professional-Shards.md)**: Overview of MED, CYBER, FIN, and SPACE shards.
 
 ## 🚀 Industrial Strategy
 
