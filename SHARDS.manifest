@@ -59,6 +59,7 @@ kernel/core/security/SovereignPQC.cpp
 kernel/core/security/SovereignAirGap.cpp
 kernel/core/security/SovereignPolicy.cpp
 kernel/core/security/SovereignMAC.cpp
+kernel/core/security/SovereignCyber.cpp
 kernel/core/security/SovereignSandbox.cpp
 kernel/core/security/SovereignLUKS.cpp
 kernel/core/security/SovereignGPG.cpp
