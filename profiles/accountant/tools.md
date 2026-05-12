@@ -5,6 +5,7 @@
 - tax compliance modules
 - balance sheet generator
 - audit tools
+- Tally-lattice integration
 
 ## 📜 Compliance Rules
 - Ind-AS
@@ -17,6 +18,7 @@
 - TDS
 - depreciation
 - advance tax
+- annuity
 
 ## 🧬 Core Algorithms
 - Automated ledger balancing

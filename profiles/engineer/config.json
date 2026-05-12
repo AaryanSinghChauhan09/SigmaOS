@@ -6,16 +6,19 @@
         "compilers",
         "cad_tools",
         "simulation_engines",
-        "project_management_dashboards"
+        "project_management_dashboards",
+        "finite_element_analysis_(fea)"
     ],
     "rules": [
         "Bureau of Indian Standards (BIS)",
-        "IS codes"
+        "IS codes",
+        "Eurocodes"
     ],
     "calculators": [
         "Structural load",
         "electrical circuit",
-        "fluid mechanics"
+        "fluid mechanics",
+        "thermal stress"
     ],
     "algorithms": [
         "CAD simulation",

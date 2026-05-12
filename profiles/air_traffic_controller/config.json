@@ -1,0 +1,28 @@
+{
+    "profession": "air_traffic_controller",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "radar-lattice",
+        "flight_path_predictor",
+        "collision_alert_nexus",
+        "comm-link_bridge"
+    ],
+    "rules": [
+        "ICAO standards",
+        "FAA protocols"
+    ],
+    "calculators": [
+        "Separation minima",
+        "fuel-to-weight ratio",
+        "descent rate"
+    ],
+    "algorithms": [
+        "Conflict detection and resolution (CD&R)",
+        "4D trajectory prediction"
+    ],
+    "automation": {
+        "self_healing": "Redundant radar link verification, comms-failover automation",
+        "rollback": "Flight state historical restoration, sequence logs"
+    }
+}

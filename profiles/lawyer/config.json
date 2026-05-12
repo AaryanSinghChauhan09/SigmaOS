@@ -6,7 +6,8 @@
         "case_indexing",
         "legal_references",
         "compliance_document_management",
-        "secure_communication"
+        "secure_communication",
+        "bns-ipc_cross-mapper"
     ],
     "rules": [
         "Bharatiya Nyaya Sanhita (BNS) 2023",
@@ -23,8 +24,7 @@
     "algorithms": [
         "Case law search",
         "compliance checker",
-        "automated legal drafting",
-        "BNS-IPC cross-mapper"
+        "automated legal drafting"
     ],
     "automation": {
         "self_healing": "Legal reference sync, document authenticity verification",

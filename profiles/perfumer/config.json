@@ -1,0 +1,28 @@
+{
+    "profession": "perfumer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "scent-molecule_database",
+        "gc-ms_analyzer_link",
+        "formula_optimizer",
+        "olfactory_sim"
+    ],
+    "rules": [
+        "IFRA standards",
+        "allergen compliance"
+    ],
+    "calculators": [
+        "Concentration ratio",
+        "evaporation rate",
+        "sillage estimator"
+    ],
+    "algorithms": [
+        "Scent-chord generator",
+        "molecular stability prediction"
+    ],
+    "automation": {
+        "self_healing": "Formula consistency check, component availability sync",
+        "rollback": "Iterative scent-state restoration, allergen safety baseline"
+    }
+}

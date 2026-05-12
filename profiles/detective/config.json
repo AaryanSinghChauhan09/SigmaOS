@@ -1,0 +1,27 @@
+{
+    "profession": "detective",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "evidence_timeline_manager",
+        "witness_statement_index",
+        "facial_recognition-lattice",
+        "case-link_visualizer"
+    ],
+    "rules": [
+        "Miranda rights protocols",
+        "evidence chain-of-custody"
+    ],
+    "calculators": [
+        "Probability of occurrence",
+        "forensic time-delta"
+    ],
+    "algorithms": [
+        "Behavioral pattern analysis",
+        "link-graph traversal"
+    ],
+    "automation": {
+        "self_healing": "Evidence database sync, case file integrity check",
+        "rollback": "Investigation state snapshots, immutable evidence log restoration"
+    }
+}

@@ -1,0 +1,29 @@
+{
+    "profession": "actuary",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "risk-modeling_lattice",
+        "mortality-table_engine",
+        "solvency-check_nexus",
+        "monte-carlo-sim"
+    ],
+    "rules": [
+        "IFRS 17",
+        "Solvency II",
+        "actuarial standards"
+    ],
+    "calculators": [
+        "Net present value (NPV)",
+        "liability-duration",
+        "loss-ratio"
+    ],
+    "algorithms": [
+        "Stochastic modeling",
+        "predictive claim analytics"
+    ],
+    "automation": {
+        "self_healing": "Data consistency verification, model-drift detection",
+        "rollback": "Policy-state snapshots, historical loss development"
+    }
+}

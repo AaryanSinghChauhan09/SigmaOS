@@ -6,16 +6,19 @@
         "bim_software",
         "3d_modeling",
         "site_analysis_tools",
-        "rendering_engines"
+        "rendering_engines",
+        "gis_mapping"
     ],
     "rules": [
         "Building bye-laws",
-        "National Building Code (NBC)"
+        "National Building Code (NBC)",
+        "sustainability standards"
     ],
     "calculators": [
         "FSI/FAR",
         "structural stability",
-        "lighting/ventilation"
+        "lighting/ventilation",
+        "carbon footprint"
     ],
     "algorithms": [
         "Generative design",

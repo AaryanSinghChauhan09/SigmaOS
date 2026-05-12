@@ -1,0 +1,28 @@
+{
+    "profession": "museologist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "artifact_cataloging",
+        "environmental_monitoring",
+        "digital_archiving",
+        "provenance_tracer"
+    ],
+    "rules": [
+        "UNESCO conventions",
+        "ICOM ethics"
+    ],
+    "calculators": [
+        "Carbon dating calibration",
+        "humidity/temp delta",
+        "lux hours"
+    ],
+    "algorithms": [
+        "Provenance verification",
+        "archival restoration prediction"
+    ],
+    "automation": {
+        "self_healing": "Archive integrity scan, provenance link validation",
+        "rollback": "Collection state snapshots, provenance history restoration"
+    }
+}

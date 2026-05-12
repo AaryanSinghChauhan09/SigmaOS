@@ -5,16 +5,19 @@
 - prescription management
 - lab results integration
 - telemedicine tools
+- DICOM viewer
 
 ## 📜 Compliance Rules
 - Medical Council of India guidelines
 - Ayushman Bharat protocols
 - HIPAA
+- GDPR
 
 ## 🧮 Professional Calculators
 - Dosage
 - BMI
 - medical billing
+- glomerular filtration rate
 
 ## 🧬 Core Algorithms
 - Patient record indexing

@@ -5,6 +5,7 @@
 - legal references
 - compliance document management
 - secure communication
+- BNS-IPC cross-mapper
 
 ## 📜 Compliance Rules
 - Bharatiya Nyaya Sanhita (BNS) 2023
@@ -22,7 +23,6 @@
 - Case law search
 - compliance checker
 - automated legal drafting
-- BNS-IPC cross-mapper
 
 ## 🛡 Self-Healing Strategy
 - Legal reference sync, document authenticity verification

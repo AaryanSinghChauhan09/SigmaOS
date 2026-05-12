@@ -5,15 +5,18 @@
 - 3D modeling
 - site analysis tools
 - rendering engines
+- GIS mapping
 
 ## 📜 Compliance Rules
 - Building bye-laws
 - National Building Code (NBC)
+- sustainability standards
 
 ## 🧮 Professional Calculators
 - FSI/FAR
 - structural stability
 - lighting/ventilation
+- carbon footprint
 
 ## 🧬 Core Algorithms
 - Generative design

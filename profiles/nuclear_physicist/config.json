@@ -1,0 +1,28 @@
+{
+    "profession": "nuclear_physicist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "reactor_core_monitor",
+        "neutron_flux_analyzer",
+        "isotope_tracking",
+        "scada-lattice"
+    ],
+    "rules": [
+        "IAEA safety standards",
+        "NRC protocols"
+    ],
+    "calculators": [
+        "Half-life",
+        "criticality index",
+        "radiation dose"
+    ],
+    "algorithms": [
+        "Monte Carlo N-Particle (MCNP)",
+        "fission rate simulation"
+    ],
+    "automation": {
+        "self_healing": "Fail-safe core monitoring, containment integrity scan",
+        "rollback": "Reactor state snapshot, safety protocol baseline restoration"
+    }
+}

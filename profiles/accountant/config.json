@@ -6,7 +6,8 @@
         "ledger_system",
         "tax_compliance_modules",
         "balance_sheet_generator",
-        "audit_tools"
+        "audit_tools",
+        "tally-lattice_integration"
     ],
     "rules": [
         "Ind-AS",
@@ -18,7 +19,8 @@
         "GST",
         "TDS",
         "depreciation",
-        "advance tax"
+        "advance tax",
+        "annuity"
     ],
     "algorithms": [
         "Automated ledger balancing",

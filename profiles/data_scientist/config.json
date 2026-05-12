@@ -6,20 +6,24 @@
         "jupyter_notebooks",
         "ml_libraries",
         "visualization_dashboards",
-        "data_lake_access"
+        "data_lake_access",
+        "gpu-lattice"
     ],
     "rules": [
         "GDPR",
-        "Data Protection Act (DPDP)"
+        "Data Protection Act (DPDP)",
+        "AI Ethics guidelines"
     ],
     "calculators": [
         "Statistical confidence",
         "model accuracy",
-        "feature importance"
+        "feature importance",
+        "TPU allocation"
     ],
     "algorithms": [
         "Neural architecture search",
-        "automated feature engineering"
+        "automated feature engineering",
+        "hyperparameter tuning"
     ],
     "automation": {
         "self_healing": "Data drift detection, model weight integrity check",
