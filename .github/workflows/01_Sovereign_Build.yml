@@ -8,7 +8,7 @@ on:
 
 jobs:
   native-lattice:
-    name: Build & Modular Test (${{ matrix.os }})
+    name: Industrial Build (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:
