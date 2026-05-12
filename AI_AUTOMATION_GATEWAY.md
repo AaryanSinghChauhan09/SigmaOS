@@ -18,12 +18,9 @@ The entry point for multi-channel AI events.
 
 1
 
-<<<<<<< HEAD
 
 1
 
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 Manages the lifecycle of autonomous agents, including planning and tool dispatch.
 
@@ -44,11 +41,8 @@ Guarantees AI safety by executing all tools within unprivileged containers.
 1
 
 1
-<<<<<<< HEAD
 
 1
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 ---
 

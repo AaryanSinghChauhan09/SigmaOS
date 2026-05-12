@@ -14,14 +14,11 @@ SigmaOS is dedicated to providing a **Sovereign Experience for All**. We priorit
 
 1
 
-<<<<<<< HEAD
 
 1
 
 1
 
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 When building new shards for SigmaOS, please adhere to:
 
@@ -35,12 +32,9 @@ When building new shards for SigmaOS, please adhere to:
 
 1
 
-<<<<<<< HEAD
 
 1
 
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 ---
 

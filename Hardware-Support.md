@@ -14,12 +14,9 @@ We primarily validate SigmaOS using **QEMU 7.0+** with the following configurati
 
 1
 
-<<<<<<< HEAD
 
 1
 
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 ---
 *To report hardware issues, please use the [Bug Report template](.github/ISSUE_TEMPLATE/bug_report.yml).*

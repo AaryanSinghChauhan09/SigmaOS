@@ -22,14 +22,11 @@ Implemented in `/agents/` using strict C++ OOP principles:
 
 1
 
-<<<<<<< HEAD
 
 1
 
 1
 
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 The `/agents/orchestration/CommandInterpreter.cpp` parses sovereign commands and maps them directly to system calls, bypassing the overhead of traditional shell interpreters.
 

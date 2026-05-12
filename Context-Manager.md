@@ -10,7 +10,6 @@ The **Context Manager** (`/core/context/manager.cpp`) is the backbone of SigmaOS
 
 1
 
-<<<<<<< HEAD
 
 [Module A]  --registerModule("agent.quota", this)-->  [ContextManager Registry]
 [Module B]  --resolve("agent.quota")              -->  [ContextManager Registry] | returns void* to Module A
@@ -21,17 +20,6 @@ The **Context Manager** (`/core/context/manager.cpp`) is the backbone of SigmaOS
 
 1
 
-=======
-[Module A]  --registerModule("agent.quota", this)-->  [ContextManager Registry]
-[Module B]  --resolve("agent.quota")              -->  [ContextManager Registry] | returns void* to Module A
-
-1
-
-1
-
-1
-
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 Registers a module (or sub-system) with the Context Manager by a unique string key.
 
@@ -39,16 +27,10 @@ Registers a module (or sub-system) with the Context Manager by a unique string k
 
 1
 
-<<<<<<< HEAD
 
 SigmaOS::Kernel::Context::ContextManager::getInstance()
     .registerModule("agent.quota", this);
 
-=======
-SigmaOS::Kernel::Context::ContextManager::getInstance()
-    .registerModule("agent.quota", this);
-
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 1
 
 1
@@ -59,24 +41,16 @@ Dynamically resolves and returns a pointer to the registered module instance.
 
 1
 
-<<<<<<< HEAD
 
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 QuotaManager* qm = (QuotaManager*)
     SigmaOS::Kernel::Context::ContextManager::getInstance()
     .resolve("agent.quota");
 
-<<<<<<< HEAD
 
 1
 
 1
 
-=======
-1
-
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 1
 
 1

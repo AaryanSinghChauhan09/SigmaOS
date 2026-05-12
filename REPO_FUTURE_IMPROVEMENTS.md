@@ -38,7 +38,6 @@ Structured suggestions beyond the numbered [FEATURE_ROADMAP_100.md](./FEATURE_RO
 
 1
 
-<<<<<<< HEAD
 
 1
 
@@ -54,8 +53,6 @@ Structured suggestions beyond the numbered [FEATURE_ROADMAP_100.md](./FEATURE_RO
 
 1
 
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 ---
 

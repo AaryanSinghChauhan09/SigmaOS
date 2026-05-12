@@ -13,10 +13,7 @@ Located in the /ui/ module of the codebase, the Zenith engine achieves its compe
 
 1
 
-<<<<<<< HEAD
 
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 1. **Dynamic Customization**: Implements modern typography (Inter), subtle micro-animations (cubic-bezier transitions), and accent glows to deliver a premium, fluid desktop experience.
 

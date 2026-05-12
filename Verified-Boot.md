@@ -1,27 +1,15 @@
 # Verified-Boot
 
-<<<<<<< HEAD
 
 # 🛡️ Sovereign Verified Boot & PQC Security
 
-=======
-﻿1
-
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 To ensure the **Sovereignty** of the lattice, SigmaOS implements a multi-stage chain of trust that extends from the hardware root up to the userland Zenith UI.
 
-<<<<<<< HEAD
 ---
-=======
-
-1
-
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 ## 🏗️ The Chain of Trust
 
-<<<<<<< HEAD
 
 1. **S-ROM (Silicon Root of Trust)**: Immutable silicon-level public key hash embedded during manufacture.
 2. **S-BOOT (Sovereign Bootloader)**: The bootloader is verified against the S-ROM key before execution.
@@ -32,15 +20,6 @@ To ensure the **Sovereignty** of the lattice, SigmaOS implements a multi-stage c
 
 ## 🔐 Post-Quantum Hardening
 
-=======
-
-1
-
-1
-
-1
-
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 SigmaOS utilizes **Lattice-Based Shard Verification (LBSV)** to protect against future quantum computing threats. This ensures that even with a quantum advantage, an attacker cannot forge system shards or bypass security gates.
 
@@ -55,7 +34,6 @@ SigmaOS utilizes **Lattice-Based Shard Verification (LBSV)** to protect against 
 
 Developers can sign their custom shards using the `sigma-sign` tool provided in the SDK:
 
-<<<<<<< HEAD
 The resulting `.shard` file contains the PQC signature required for the kernel to bind the driver.
 
 ---
@@ -72,21 +50,3 @@ The `SovereignInit` shard enforces a strict boot policy:
 
 ### Verified boot is the foundation of digital sovereignty.
 
-=======
-1
-
-sigma-sign --key my_identity.key --shard custom_driver.cpp
-
-1
-
-1
-
-The `SovereignInit` shard enforces the boot policy:
-
-1
-
----
-
-1
-
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f

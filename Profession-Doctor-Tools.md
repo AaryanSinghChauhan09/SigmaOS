@@ -1,17 +1,11 @@
 # Profession-Doctor-Tools
 
-<<<<<<< HEAD
 
 # ⚕️ Doctor Profile
 
-=======
-﻿1
-
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 The Doctor Profile is designed for HIPAA-compliant data handling, high-fidelity imaging, and real-time diagnostic assistance.
 
-<<<<<<< HEAD
 ---
 
 ## 🛠️ Integrated Shards
@@ -39,20 +33,3 @@ SigmaOS ensures 100% data residency and zero-leakage through the **Medical Sandb
 
 ### Precision care, sovereign data.
 
-=======
-
-1
-
-1
-
-1
-
-1
-
-1
-
-1
-
-1
-
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f

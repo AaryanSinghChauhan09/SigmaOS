@@ -50,12 +50,9 @@ Follow the **Atomic Module Contract** (see Developer Guide):
 
 1
 
-<<<<<<< HEAD
 
 1
 
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 Edit `orchestrator/main.cpp`, find `TestCommand::run_subsystem_test()`:
 
