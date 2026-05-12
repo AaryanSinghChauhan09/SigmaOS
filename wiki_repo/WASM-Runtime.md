@@ -8,17 +8,13 @@ The SigmaOS WASM Runtime provides a high-performance, sandboxed execution enviro
 
 1
 
-<<<<<<< HEAD
 
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 graph LR
     Shard[WASM Shard] --> Engine[SovereignWasmEngine]
     Engine --> LinearMem[Isolated Linear Memory]
     Engine --> Syscalls[Sovereign Syscall Bridge]
     LinearMem --> PMM[SovereignPMM]
 
-<<<<<<< HEAD
 
 1
 
@@ -30,25 +26,12 @@ graph LR
 
 1
 
-=======
-1
-
-1
-
-1
-
-1
-
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 The runtime is implemented as a modular C++ singleton:
 
 1
 
-<<<<<<< HEAD
 
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 class SovereignWasmEngine {
 public:
     static SovereignWasmEngine& getInstance();
@@ -58,7 +41,6 @@ private:
     // ...
 };
 
-<<<<<<< HEAD
 
 1
 
@@ -68,11 +50,3 @@ private:
 
 1
 
-=======
-1
-
-1
-
-1
-
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f

@@ -10,10 +10,7 @@ Vulnerabilities should be reported via the [**Bug Bounty Program**](BUG_BOUNTY).
 
 1
 
-<<<<<<< HEAD
 
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 1. **Ingestion**: Vulnerability received and acknowledged within 24 hours.
 2. **Assessment**: Subsystem owners evaluate the CVSS score (Severity, Impact, Exploitability).
@@ -28,11 +25,8 @@ Vulnerabilities should be reported via the [**Bug Bounty Program**](BUG_BOUNTY).
 1
 
 1
-<<<<<<< HEAD
 
 1
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 All security patches are released as **Atomic Orb Shards**. Users can apply patches without a full system reboot by swapping the affected kernel shard in the Lattice.
 

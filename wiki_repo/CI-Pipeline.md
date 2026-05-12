@@ -6,19 +6,13 @@ The SigmaOS CI pipeline is an industrial-grade, automated sentinel that ensures 
 
 1
 
-<<<<<<< HEAD
 
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 1. **Shard Forge (Build)**: Cross-compiles the 500-shard lattice for x86_64, ARM, and RISC-V.
 
 1
 
-<<<<<<< HEAD
 
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 1. **Shard Test Nexus**: Runs the autonomous `SovereignUnitTestShard` to verify kernel-level primitives (Memory, Security, PQC).
 2. **Package Nexus (Deploy)**: Orchestrates the distribution of verified silicon shards to the global lattice.

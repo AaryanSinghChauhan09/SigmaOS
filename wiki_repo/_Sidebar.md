@@ -2,33 +2,34 @@
 
 ## 🏛️ Core Concepts
 
-* [Home](Home.md)
-* [Architecture](Architecture.md)
-* [Sovereign Principles](SOVEREIGN_PRINCIPLES.md)
+* [Home](Home)
+* [Architecture](Architecture)
+* [Sovereign Principles](SOVEREIGN_PRINCIPLES)
 
 ## 🚀 Strategic Vision
 
-* [Linux Competitive Edge](Linux-Competitive-Edge.md)
-* [Leapfrog Strategy](Leapfrog-Strategy.md)
-* [Profession Center](PROFESSION-MAP.md)
-* [100-Step Roadmap](ULTIMATE-ADVANCEMENT-STRATEGY.md)
-* [SigmaOS vs The World](SigmaOS_vs_The_World.md)
+* [Linux Competitive Edge](Linux-Competitive-Edge)
+* [Leapfrog Strategy](Leapfrog-Strategy)
+* [Profession Center](PROFESSION-MAP)
+* [100-Step Roadmap](ULTIMATE-ADVANCEMENT-STRATEGY)
+* [SigmaOS vs The World](SigmaOS_vs_The_World)
 
 ## ⚙️ Technical Shards
 
-* [Kernel Modularization](MODULARIZATION_MAP.md)
-* [Post-Quantum Security](Verified-Boot.md)
-* [Zenith UI](ZENITH_UI.md)
-* [Self-Healing Engine](Sovereign_Self_Healing.md)
-* [Doctor Tool](Doctor_Tool.md)
-* [Trust Graph UI](Trust_Graph.md)
-* [AI Orchestration](AGENTS.md)
+* [Kernel Modularization](MODULARIZATION_MAP)
+* [Post-Quantum Security](Verified-Boot)
+* [Zenith UI](ZENITH_UI)
+* [Self-Healing Engine](Sovereign_Self_Healing)
+* [Doctor Tool](Doctor_Tool)
+* [Trust Graph UI](Trust_Graph)
+* [AI Orchestration](AGENTS)
 
 ## 👥 Community & Contribution
 
-* [Getting Started](Getting-Started.md)
-* [Contributing](CONTRIBUTING.md)
-* [Code of Conduct](CODE_OF_CONDUCT.md)
+* [Getting Started](Getting-Started)
+* [Contributing](CONTRIBUTING)
+* [Code of Conduct](CODE_OF_CONDUCT)
+
 
 ---
 

@@ -1,7 +1,6 @@
 # ROADMAP SEQUENCE
 
 1
-<<<<<<< HEAD
 
 1
 
@@ -11,13 +10,6 @@
 
 1
 
-=======
-
-1
-
-1
-
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 1. **ARM64 optimization for RPi5** ? crush hardware sovereignty requirements.
 2. **Autonomous Agent Quota expansion** ? differentiate SigmaOS as the AI-native sovereign OS.

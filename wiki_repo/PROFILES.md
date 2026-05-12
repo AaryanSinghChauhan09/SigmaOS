@@ -10,14 +10,11 @@ The repository's `/profiles/` directory structure dictates the available configu
 
 1
 
-<<<<<<< HEAD
 
 1
 
 1
 
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 Each directory contains:
 
@@ -50,7 +47,6 @@ Each directory contains:
 1
 
 1
-<<<<<<< HEAD
 
 1
 
@@ -66,8 +62,6 @@ Each directory contains:
 
 1
 
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 1. **Create a new folder** under `/profiles/` (e.g., `/profiles/architect/`).
 2. **Add `config.json`**: Define the profession name and active status.

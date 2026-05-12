@@ -16,14 +16,11 @@ The Sovereign Council is the steering committee responsible for the long-term vi
 
 1
 
-<<<<<<< HEAD
 
 1
 
 1
 
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 SigmaOS enforces a strict [Code of Conduct](CODE_OF_CONDUCT.md). We prioritize inclusivity, technical excellence, and constructive feedback.
 

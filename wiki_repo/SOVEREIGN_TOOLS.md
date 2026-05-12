@@ -26,7 +26,6 @@ SigmaOS v100.0 Zenith incorporates a unified index of 1000+ industrial-grade uti
 
 1
 
-<<<<<<< HEAD
 
 1
 
@@ -42,8 +41,6 @@ SigmaOS v100.0 Zenith incorporates a unified index of 1000+ industrial-grade uti
 
 1
 
-=======
->>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
 
 ---
 
