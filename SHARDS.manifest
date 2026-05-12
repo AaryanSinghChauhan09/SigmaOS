@@ -62,6 +62,7 @@ kernel/core/security/SovereignMAC.cpp
 kernel/core/security/SovereignSandbox.cpp
 kernel/core/security/SovereignLUKS.cpp
 kernel/core/security/SovereignGPG.cpp
+kernel/core/security/SovereignAppArmor.cpp
 kernel/core/security/SovereignAttestation.cpp
 kernel/core/security/SovereignTPM.cpp
 drivers/SovereignLinuxCompat.cpp
@@ -73,6 +74,7 @@ drivers/gpu/SovereignMesa.cpp
 drivers/network/SovereignBlueZ.cpp
 drivers/printing/SovereignCUPS.cpp
 # LAYER 4: AI & AUTOMATION (CLAW STACK)
+kernel/core/network/SovereignVPN.cpp
 kernel/core/ai/SovereignNeural.cpp
 kernel/core/ai/SovereignMLFlow.cpp
 kernel/core/ai/SovereignCognitive.cpp
