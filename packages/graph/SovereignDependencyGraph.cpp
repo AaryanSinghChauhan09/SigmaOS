@@ -47,10 +47,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 extern "C" int dep_graph_validate(const char* name) {
     return SigmaOS::Kernel::Industrial::SovereignDependencyGraph::validateGraph(name) ? 1 : 0;
 }
 
-extern "C" void dep_graph_visualize() {
+void dep_graph_visualize() {
     SigmaOS::Kernel::Industrial::SovereignDependencyGraph::visualizeLattice();
 }
+
+} // extern "C"

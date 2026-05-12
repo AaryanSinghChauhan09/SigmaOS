@@ -52,15 +52,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void gpgpu_init() {
+void gpgpu_init() {
     SigmaOS::Kernel::Hardware::SovereignGPGPUManager::init();
 }
 
-extern "C" void gpgpu_dispatch(const char* name, sigma_u32 t, sigma_u32 b) {
+void gpgpu_dispatch(const char* name, sigma_u32 t, sigma_u32 b) {
     SigmaOS::Kernel::Hardware::SovereignGPGPUManager::dispatchKernel(name, t, b);
 }
 
 
 
 
+
+} // extern "C"

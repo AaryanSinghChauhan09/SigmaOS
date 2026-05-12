@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void tele_init() {
+extern "C" {
+
+void tele_init() {
     SigmaOS::Kernel::Medical::SovereignTelemedicine::getInstance().init();
 }
+
+} // extern "C"

@@ -49,15 +49,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void virtio_init() {
+void virtio_init() {
     SigmaOS::Kernel::Virtualization::SovereignVirtIO::init();
 }
 
-extern "C" void virtio_notify(sigma_u32 qid) {
+void virtio_notify(sigma_u32 qid) {
     SigmaOS::Kernel::Virtualization::SovereignVirtIO::processQueue(qid);
 }
 
 
 
 
+
+} // extern "C"

@@ -36,7 +36,12 @@ private:
 } // namespace Security
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void privacy_enforce_tor() {
+
+extern "C" {
+
+void privacy_enforce_tor() {
     SigmaOS::Kernel::Security::SovereignWhonixTor::forceTorRouting();
 }
 
+
+} // extern "C"

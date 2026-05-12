@@ -32,7 +32,9 @@ public:
     }
 };
 
-extern "C" void forensic_scan_full() {
+void forensic_scan_full() {
     ForensicEngine::getInstance().scanMemory();
     ForensicEngine::getInstance().generateReport();
 }
+
+} // extern "C"

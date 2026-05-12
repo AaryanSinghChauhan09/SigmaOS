@@ -14,22 +14,22 @@ static struct {
     sigma_u32 initialized;
 } SovereignTimeEngine = {0, 0};
 
-extern "C" void time_init() {
+void time_init() {
     sigma_log("[S-TIME] Initializing Sovereign temporal sync...");
     SovereignTimeEngine.initialized = 1;
 }
 
-extern "C" void time_update() {
+void time_update() {
     SovereignTimeEngine.lattice_uptime++;
 }
 
-extern "C" void time_get_uptime(sigma_u64* uptime) {
+void time_get_uptime(sigma_u64* uptime) {
     if (uptime) {
         *uptime = SovereignTimeEngine.lattice_uptime;
     }
 }
 
-extern "C" void time_report_status() {
+void time_report_status() {
     sigma_log("[S-TIME] Lattice Uptime: %llu cycles\n", SovereignTimeEngine.lattice_uptime);
     sigma_log("[S-TIME] Synchronization status: NOMINAL");
 }
@@ -37,3 +37,5 @@ extern "C" void time_report_status() {
 
 
 
+
+} // extern "C"

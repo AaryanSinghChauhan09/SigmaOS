@@ -44,10 +44,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void entropy_init() {
+extern "C" {
+
+void entropy_init() {
     SigmaOS::Kernel::HAL::SovereignEntropy::getInstance().init();
 }
 
 extern "C" unsigned long long entropy_get_random() {
     return SigmaOS::Kernel::HAL::SovereignEntropy::getInstance().get_random();
 }
+
+} // extern "C"

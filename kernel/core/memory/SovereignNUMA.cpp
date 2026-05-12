@@ -10,7 +10,7 @@
  * USP: Preemptively calculates thread distance to physical memory banks and
  * migrates pages locally to prevent cross-die latency spikes in heavy workloads.
  *
- * Design: OOP-isolated singleton — SovereignNUMAEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignNUMAEngine.
  */
 
 class SovereignNUMAEngine {
@@ -54,18 +54,20 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void numa_init() {
+void numa_init() {
     SovereignNUMAEngine::init();
 }
 
-extern "C" void numa_register_node(sigma_u32 node_id, sigma_u32 memory_mb) {
+void numa_register_node(sigma_u32 node_id, sigma_u32 memory_mb) {
     SovereignNUMAEngine::registerNode(node_id, memory_mb);
 }
 
-extern "C" void numa_optimize_thread(sigma_u32 thread_id) {
+void numa_optimize_thread(sigma_u32 thread_id) {
     SovereignNUMAEngine::optimizeThreadLocality(thread_id);
 }
 
 
 
 
+
+} // extern "C"

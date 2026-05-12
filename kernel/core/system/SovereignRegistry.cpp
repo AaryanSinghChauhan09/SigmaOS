@@ -65,14 +65,18 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void registry_init() {
+extern "C" {
+
+void registry_init() {
     SigmaOS::Kernel::Registry::SovereignRegistry::getInstance().init();
 }
 
-extern "C" void registry_register(sigma_u32 id, const char* name, sigma_u32 ver) {
+void registry_register(sigma_u32 id, const char* name, sigma_u32 ver) {
     SigmaOS::Kernel::Registry::SovereignRegistry::getInstance().registerShard(id, name, ver);
 }
 
-extern "C" void registry_verify_all() {
+void registry_verify_all() {
     SigmaOS::Kernel::Registry::SovereignRegistry::getInstance().verifyAllShards();
 }
+
+} // extern "C"

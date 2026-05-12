@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void compartmentalization_init() {
+void compartmentalization_init() {
     SigmaOS::Kernel::Security::SovereignCompartmentalization::init();
 }
 
-extern "C" void compartment_isolate(const char* domain) {
+void compartment_isolate(const char* domain) {
     SigmaOS::Kernel::Security::SovereignCompartmentalization::isolateDomain(domain);
 }
 
 
 
 
+
+} // extern "C"

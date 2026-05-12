@@ -10,7 +10,7 @@
  * USP: Hardware-accelerated glassmorphism overlay that allows users to instantly
  * tweak adaptive themes, font scaling, and automation workflows without rebooting.
  *
- * Design: OOP-isolated singleton — SovereignSettingsDashboard.
+ * Design: OOP-isolated singleton ï¿½ SovereignSettingsDashboard.
  */
 
 class SovereignSettingsDashboard {
@@ -46,18 +46,20 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void settings_init() {
+void settings_init() {
     SovereignSettingsDashboard::init();
 }
 
-extern "C" void settings_toggle() {
+void settings_toggle() {
     SovereignSettingsDashboard::toggleDashboard();
 }
 
-extern "C" void settings_apply(const char* category, const char* value) {
+void settings_apply(const char* category, const char* value) {
     SovereignSettingsDashboard::applyUserPreference(category, value);
 }
 
 
 
 
+
+} // extern "C"

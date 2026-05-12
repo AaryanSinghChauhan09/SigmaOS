@@ -54,14 +54,18 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void orbit_init() {
+extern "C" {
+
+void orbit_init() {
     SigmaOS::Kernel::Industrial::SovereignOrbitalDynamics::getInstance().init();
 }
 
-extern "C" void orbit_heal() {
+void orbit_heal() {
     SigmaOS::Kernel::Industrial::SovereignOrbitalDynamics::getInstance().selfHeal();
 }
 
-extern "C" void orbit_rollback() {
+void orbit_rollback() {
     SigmaOS::Kernel::Industrial::SovereignOrbitalDynamics::getInstance().rollback();
 }
+
+} // extern "C"

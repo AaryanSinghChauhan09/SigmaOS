@@ -11,7 +11,7 @@
  * execution models based on security requirements. In microkernel mode,
  * drivers and filesystems are pushed to user space, orchestrated by IPC.
  *
- * Design: OOP-isolated singleton — SovereignMicrokernelEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignMicrokernelEngine.
  */
 
 class SovereignMicrokernelEngine {
@@ -59,15 +59,15 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void microkernel_init() {
+void microkernel_init() {
     SovereignMicrokernelEngine::init();
 }
 
-extern "C" void microkernel_enable() {
+void microkernel_enable() {
     SovereignMicrokernelEngine::enableMicrokernelMode();
 }
 
-extern "C" void microkernel_disable() {
+void microkernel_disable() {
     SovereignMicrokernelEngine::disableMicrokernelMode();
 }
 
@@ -78,3 +78,5 @@ extern "C" sigma_u32 microkernel_allocate_ipc(sigma_u32 service_a, sigma_u32 ser
 
 
 
+
+} // extern "C"

@@ -74,19 +74,19 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void ux_init() {
+void ux_init() {
     SovereignUXEngine::init();
 }
 
-extern "C" void ux_apply_theme(sigma_theme_t* theme) {
+void ux_apply_theme(sigma_theme_t* theme) {
     SovereignUXEngine::getInstance().applyTheme(theme);
 }
 
-extern "C" void ux_render_dashboard() {
+void ux_render_dashboard() {
     SovereignUXEngine::getInstance().renderDashboard();
 }
 
-extern "C" void ux_predict_adaptation() {
+void ux_predict_adaptation() {
     SovereignUXEngine::getInstance().predictAdaptation();
 }
 
@@ -94,3 +94,5 @@ extern "C" void ux_predict_adaptation() {
 
 
 
+
+} // extern "C"

@@ -55,7 +55,9 @@ public:
 } // namespace Forge
 } // namespace SigmaOS
 
-extern "C" void start_build_zenith() {
+extern "C" {
+
+void start_build_zenith() {
     SigmaOS::Forge::SovereignBuildZenith forge;
 
     // Auditing the Core Shard Matrix (v36.0)
@@ -77,3 +79,5 @@ int main() {
     return 0;
 }
 
+
+} // extern "C"

@@ -50,15 +50,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void telemetry_init() {
+void telemetry_init() {
     SigmaOS::Kernel::System::SovereignTelemetryShard::init();
 }
 
-extern "C" void telemetry_record(const char* name, sigma_u64 val) {
+void telemetry_record(const char* name, sigma_u64 val) {
     SigmaOS::Kernel::System::SovereignTelemetryShard::recordMetric(name, val);
 }
 
 
 
 
+
+} // extern "C"

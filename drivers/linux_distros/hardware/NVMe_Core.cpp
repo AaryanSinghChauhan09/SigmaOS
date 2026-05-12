@@ -38,6 +38,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void nvme_core_init() {
+extern "C" {
+
+void nvme_core_init() {
     SigmaOS::Kernel::Drivers::NvmeCoreShard::initNvme();
 }
+
+} // extern "C"

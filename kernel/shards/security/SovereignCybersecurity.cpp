@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void cyber_init() {
+extern "C" {
+
+void cyber_init() {
     SigmaOS::Kernel::Security::SovereignCybersecurity::getInstance().init();
 }
+
+} // extern "C"

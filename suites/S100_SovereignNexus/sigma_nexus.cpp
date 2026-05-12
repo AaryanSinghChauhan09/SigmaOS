@@ -48,6 +48,8 @@ public:
 
 } // namespace sigma
 
-extern "C" void nexus_suite_init() {
+void nexus_suite_init() {
     sigma_print("[S100] Sovereign Nexus Enterprise Gateway Online.\n");
 }
+
+} // extern "C"

@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void mesh_init() {
+extern "C" {
+
+void mesh_init() {
     SigmaOS::Kernel::Security::SovereignTrustMesh::getInstance().init();
 }
+
+} // extern "C"

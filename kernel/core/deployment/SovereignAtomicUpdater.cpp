@@ -56,8 +56,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void updater_init() {
+void updater_init() {
     SigmaOS::Kernel::Deployment::SovereignAtomicUpdater::init();
 }
 
@@ -69,10 +71,12 @@ extern "C" bool updater_commit_update() {
     return SigmaOS::Kernel::Deployment::SovereignAtomicUpdater::commitUpdate();
 }
 
-extern "C" void updater_rollback() {
+void updater_rollback() {
     SigmaOS::Kernel::Deployment::SovereignAtomicUpdater::rollback();
 }
 
 
 
 
+
+} // extern "C"

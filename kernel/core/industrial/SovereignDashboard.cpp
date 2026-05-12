@@ -38,6 +38,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void dashboard_render() {
+extern "C" {
+
+void dashboard_render() {
     SigmaOS::Kernel::Industrial::SovereignDashboard::getInstance().render_telemetry();
 }
+
+} // extern "C"

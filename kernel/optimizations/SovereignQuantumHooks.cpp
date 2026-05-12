@@ -29,3 +29,5 @@ public:
 extern "C" bool sigma_quantum_verify(const void* d, size_t s) {
     return SovereignQuantumHooks::getInstance().verifyQuantumSignature(d, s);
 }
+
+} // extern "C"

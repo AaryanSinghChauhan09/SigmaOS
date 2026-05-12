@@ -4,7 +4,7 @@
  * =========================================================================
  * Mission: Port of high-end forensic and recovery tools into a single shard.
  * Target : Neutralizes CAINE and Rescuezilla requirements for investigation.
- * Layer  : L5 — Industrial Ecosystem
+ * Layer  : L5 ï¿½ Industrial Ecosystem
  * =========================================================================
  */
 
@@ -45,10 +45,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void forensic_mount_ro(const char* device) {
+extern "C" {
+
+void forensic_mount_ro(const char* device) {
     SigmaOS::Kernel::Industrial::SovereignForensicLattice::mountReadOnly(device);
 }
 
-extern "C" void forensic_audit() {
+void forensic_audit() {
     SigmaOS::Kernel::Industrial::SovereignForensicLattice::runIntegrityAudit();
 }
+
+} // extern "C"

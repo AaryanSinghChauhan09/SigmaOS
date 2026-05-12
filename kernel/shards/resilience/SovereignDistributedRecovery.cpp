@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void dr_init() {
+extern "C" {
+
+void dr_init() {
     SigmaOS::Kernel::Resilience::SovereignDistributedRecovery::getInstance().init();
 }
+
+} // extern "C"

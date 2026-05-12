@@ -70,7 +70,7 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void nvme_init() {
+void nvme_init() {
     SovereignNVMeEngine::init();
 }
 
@@ -83,3 +83,5 @@ extern "C" int nvme_write_blocks(uint64_t lba, uint32_t count, const void* buffe
 }
 
 
+
+} // extern "C"

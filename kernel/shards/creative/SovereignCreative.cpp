@@ -24,6 +24,10 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sovereigncreative_init() {
+extern "C" {
+
+void sovereigncreative_init() {
     SigmaOS::Kernel::SovereignCreative::getInstance().init();
 }
+
+} // extern "C"

@@ -24,6 +24,10 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sovereignspotlight_init() {
+extern "C" {
+
+void sovereignspotlight_init() {
     SigmaOS::Kernel::SovereignSpotlight::getInstance().init();
 }
+
+} // extern "C"

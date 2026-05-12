@@ -3,7 +3,7 @@
  * S SIGMAOS: SOVEREIGN POWER (Power Management Shard)
  * =========================================================================
  * Mission: Implementing ACPI Sleep States and Laptop Power Optimization.
- * Layer  : L5 — Industrial Ecosystem
+ * Layer  : L5 ï¿½ Industrial Ecosystem
  * =========================================================================
  */
 
@@ -49,10 +49,15 @@ private:
 } // namespace Industrial
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void power_set_state(sigma_u8 state) {
+
+extern "C" {
+
+void power_set_state(sigma_u8 state) {
     SigmaOS::Kernel::Industrial::SovereignPower::setSleepState(state);
 }
 
-extern "C" void power_optimize() {
+void power_optimize() {
     SigmaOS::Kernel::Industrial::SovereignPower::optimizeForBattery();
 }
+
+} // extern "C"

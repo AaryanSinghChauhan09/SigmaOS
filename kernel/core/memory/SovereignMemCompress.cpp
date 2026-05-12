@@ -8,10 +8,10 @@
  * Zero-overhead RAM compression using silicon-native ZSTD-like algorithm.
  *
  * USP: Compresses cold memory pages in Ring-0 without any userland latency.
- * On embedded ARM targets this doubles effective RAM capacity — critical
+ * On embedded ARM targets this doubles effective RAM capacity ï¿½ critical
  * for IoT sovereignty with constrained DRAM budgets.
  *
- * Design: OOP-isolated singleton — SovereignMemCompressEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignMemCompressEngine.
  */
 
 class SovereignMemCompressEngine {
@@ -49,10 +49,12 @@ private:
     sigma_u32 bytes_saved;
 };
 
-extern "C" void memcompress_init() { SovereignMemCompressEngine::init(); }
+void memcompress_init() { SovereignMemCompressEngine::init(); }
 extern "C" sigma_u32 memcompress_compress(sigma_u32 pages) { return SovereignMemCompressEngine::compressColdPages(pages); }
-extern "C" void memcompress_stats() { SovereignMemCompressEngine::printStats(); }
+void memcompress_stats() { SovereignMemCompressEngine::printStats(); }
 
 
 
 
+
+} // extern "C"

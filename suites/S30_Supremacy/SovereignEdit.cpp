@@ -39,12 +39,14 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void edit_open_file(const char* path) {
+void edit_open_file(const char* path) {
     SovereignEditEngine::getInstance().openFile(path);
 }
 
-extern "C" void edit_save_file() {
+void edit_save_file() {
     SovereignEditEngine::getInstance().saveFile();
 }
 
 
+
+} // extern "C"

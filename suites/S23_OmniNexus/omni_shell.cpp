@@ -165,7 +165,9 @@ private:
 } // namespace Shell
 } // namespace SigmaOS
 
-extern "C" void start_shell_zenith() {
+extern "C" {
+
+void start_shell_zenith() {
     SigmaOS::Shell::OmniShellZenith shell;
 
     shell.execute_omni_command("DISTRO_FORGE");
@@ -181,3 +183,5 @@ int main() {
     return 0;
 }
 
+
+} // extern "C"

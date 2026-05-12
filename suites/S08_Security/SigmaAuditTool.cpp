@@ -43,3 +43,5 @@ void sigma_audit_init() {
 }
 
 
+
+} // extern "C"

@@ -13,7 +13,7 @@
  * ZERO-DEPENDENCY: Strictly bare-metal application lifecycle management.
  */
 
-extern "C" void appeco_init() {
+void appeco_init() {
     sigma_log("[APPECO] Initializing Sovereign App Ecosystem (UAV Algorithm)...");
 }
 
@@ -36,9 +36,11 @@ extern "C" bool appeco_launch(const char* app_name) {
     return true;
 }
 
-extern "C" void appeco_uninstall(const char* app_name) {
+void appeco_uninstall(const char* app_name) {
     sigma_log("[APPECO] UAV: Atomically removing '%s' and all associated state.\n", app_name);
 }
 
 
 
+
+} // extern "C"

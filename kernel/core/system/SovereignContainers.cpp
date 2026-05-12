@@ -11,7 +11,7 @@
  * mathematically isolated micro-VMs without the overhead of Docker or KVM.
  * Allows bare-metal speed while executing untrusted userland code.
  *
- * Design: OOP-isolated singleton — SovereignContainerEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignContainerEngine.
  */
 
 class SovereignContainerEngine {
@@ -48,14 +48,16 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void container_init() {
+void container_init() {
     SovereignContainerEngine::init();
 }
 
-extern "C" void container_spawn(const char* name, const char* entrypoint) {
+void container_spawn(const char* name, const char* entrypoint) {
     SovereignContainerEngine::spawnContainer(name, entrypoint);
 }
 
 
 
 
+
+} // extern "C"

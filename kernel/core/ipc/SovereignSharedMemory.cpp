@@ -30,18 +30,24 @@ void SovereignSharedMemory::audit() {
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void shmem_init() {
+void shmem_init() {
     SigmaOS::Kernel::IPC::SovereignSharedMemory::init();
 }
 
-extern "C" void* shmem_create(const char* id, sigma_usize sz) {
+void* shmem_create(const char* id, sigma_usize sz) {
     return SigmaOS::Kernel::IPC::SovereignSharedMemory::createSegment(id, sz);
 }
 
-extern "C" void shmem_audit() {
+void shmem_audit() {
     SigmaOS::Kernel::IPC::SovereignSharedMemory::audit();
 }
 
 
 
+
+} // extern "C"
+
+} // extern "C"

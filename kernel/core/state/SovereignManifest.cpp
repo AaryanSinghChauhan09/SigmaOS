@@ -15,7 +15,7 @@
 static sigma_shard_config_t active_lattice[600];
 static sigma_shard_config_t rollback_buffer[600];
 
-extern "C" void manifest_init() {
+void manifest_init() {
     sigma_log("[MANIFEST] Initializing Sovereign Declarative Nexus...");
     // Default config: All shards enabled by default
     for(int i=0; i<600; i++) {
@@ -24,7 +24,7 @@ extern "C" void manifest_init() {
     }
 }
 
-extern "C" void manifest_apply_state(const char* declarative_blob) {
+void manifest_apply_state(const char* declarative_blob) {
     // ASS (Atomic State Swap) Algorithm
     // Performs a double-buffered swap of the lattice configuration to ensure zero-latency rollback.
     
@@ -39,7 +39,7 @@ extern "C" void manifest_apply_state(const char* declarative_blob) {
     sigma_log("[MANIFEST] ASS: Transition COMPLETE. New lattice state IGNITED.");
 }
 
-extern "C" void manifest_rollback_atomic() {
+void manifest_rollback_atomic() {
     sigma_log("[MANIFEST] [CRITICAL] Rollback triggered! Reverting to last stable state...");
     sigma_memcpy(active_lattice, rollback_buffer, sizeof(active_lattice));
     sigma_log("[MANIFEST] Rollback SUCCESSFUL. Stability restored.");
@@ -52,3 +52,5 @@ extern "C" sigma_shard_config_t* manifest_get_config(sigma_u32 shard_id) {
 
 
 
+
+} // extern "C"

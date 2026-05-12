@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void market_init() {
+extern "C" {
+
+void market_init() {
     SigmaOS::Kernel::Finance::SovereignMarketSim::getInstance().init();
 }
+
+} // extern "C"

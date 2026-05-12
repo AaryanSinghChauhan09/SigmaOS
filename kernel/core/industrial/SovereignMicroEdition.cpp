@@ -4,7 +4,7 @@
  * =========================================================================
  * Mission: Zero-bloat, minimal lattice configuration for edge/containers.
  * Target : Neutralizes Alpine and Gentoo requirements for extreme minimalism.
- * Layer  : L5 — Industrial Ecosystem
+ * Layer  : L5 ï¿½ Industrial Ecosystem
  * =========================================================================
  */
 
@@ -45,10 +45,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void industrial_micro_prune() {
+extern "C" {
+
+void industrial_micro_prune() {
     SigmaOS::Kernel::Industrial::SovereignMicroEdition::stripNonEssentialShards();
 }
 
-extern "C" void industrial_micro_optimize() {
+void industrial_micro_optimize() {
     SigmaOS::Kernel::Industrial::SovereignMicroEdition::optimizeForBinarySize();
 }
+
+} // extern "C"

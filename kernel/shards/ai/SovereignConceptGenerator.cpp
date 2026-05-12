@@ -107,7 +107,7 @@ public:
     }
 };
 
-extern "C" void _start(void) {
+void _start(void) {
     SovereignConceptGenerator gen;
     gen.GenerateAll();
     gen.RunFullScholasticAudit();
@@ -116,3 +116,5 @@ extern "C" void _start(void) {
     sigma_exit(0);
 }
 
+
+} // extern "C"

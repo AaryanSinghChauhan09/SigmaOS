@@ -20,7 +20,7 @@ static struct {
     .pod_count = 0
 };
 
-extern "C" void cloud_init() {
+void cloud_init() {
     sigma_log("[CLOUD] Initializing Sovereign Cloud Orchestrator (OOPS Isolation)...");
 }
 
@@ -37,7 +37,7 @@ extern "C" bool cloud_deploy_pod(const sigma_cloud_pod_t* pod_config) {
     return true;
 }
 
-extern "C" void cloud_monitor_health() {
+void cloud_monitor_health() {
     for (sigma_u32 i = 0; i < SovereignCloudManager.pod_count; i++) {
         if (!SovereignCloudManager.active_pods[i].is_healthy) {
             sigma_log("[CLOUD] [ALERT] Pod ID %d unhealthy. Restarting...\n", SovereignCloudManager.active_pods[i].pod_id);
@@ -48,3 +48,5 @@ extern "C" void cloud_monitor_health() {
 
 
 
+
+} // extern "C"

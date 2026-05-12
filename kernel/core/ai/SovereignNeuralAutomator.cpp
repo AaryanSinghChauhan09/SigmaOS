@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void neural_automator_init() {
+void neural_automator_init() {
     SigmaOS::Kernel::AI::SovereignNeuralAutomator::init();
 }
 
-extern "C" void neural_automator_execute(const char* intent) {
+void neural_automator_execute(const char* intent) {
     SigmaOS::Kernel::AI::SovereignNeuralAutomator::inferAndExecute(intent);
 }
 
 
 
 
+
+} // extern "C"

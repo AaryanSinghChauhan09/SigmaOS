@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void rolling_release_init() {
+void rolling_release_init() {
     SigmaOS::Kernel::System::SovereignRollingRelease::init();
 }
 
-extern "C" void rolling_sync() {
+void rolling_sync() {
     SigmaOS::Kernel::System::SovereignRollingRelease::syncBleedingEdge();
 }
 
 
 
 
+
+} // extern "C"

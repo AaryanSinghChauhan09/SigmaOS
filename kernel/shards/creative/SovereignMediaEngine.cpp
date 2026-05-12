@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void media_init() {
+extern "C" {
+
+void media_init() {
     SigmaOS::Kernel::Creative::SovereignMediaEngine::getInstance().init();
 }
+
+} // extern "C"

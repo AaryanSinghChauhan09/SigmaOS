@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void diag_init() {
+extern "C" {
+
+void diag_init() {
     SigmaOS::Kernel::Resilience::SovereignDiagnosticEngine::getInstance().init();
 }
+
+} // extern "C"

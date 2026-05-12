@@ -13,11 +13,11 @@
  * ZERO-DEPENDENCY: Strictly bare-metal network observability.
  */
 
-extern "C" void netmonitor_init() {
+void netmonitor_init() {
     sigma_log("[NETMONITOR] Initializing Sovereign Network Monitor (PSTT Algorithm)...");
 }
 
-extern "C" void netmonitor_poll_traffic() {
+void netmonitor_poll_traffic() {
     // PSTT (Per-Shard Traffic Telemetry) Algorithm
     // Intercepts all S-ZeroNet data flows and attributes bytes to each shard.
     
@@ -28,10 +28,12 @@ extern "C" void netmonitor_poll_traffic() {
     sigma_log("[NETMONITOR] PSTT: Anomaly scan complete. No suspicious exfiltration detected.");
 }
 
-extern "C" void netmonitor_throttle_shard(sigma_u32 shard_id, sigma_u32 max_kbps) {
+void netmonitor_throttle_shard(sigma_u32 shard_id, sigma_u32 max_kbps) {
     sigma_log("[NETMONITOR] PSTT: Throttling Shard %d to %d KB/s max bandwidth.\n",
                  shard_id, max_kbps);
 }
 
 
 
+
+} // extern "C"

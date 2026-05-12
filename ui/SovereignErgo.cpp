@@ -12,16 +12,16 @@
  * ZERO-DEPENDENCY: Strictly bare-metal ergonomic management.
  */
 
-extern "C" void ergo_init() {
+void ergo_init() {
     sigma_log("[ERGO] Initializing Sovereign Adaptive Ergonomics (CDS Algorithm)...");
 }
 
-extern "C" void ergo_update_screen_temperature(sigma_u32 kelvin) {
+void ergo_update_screen_temperature(sigma_u32 kelvin) {
     sigma_log("[ERGO] CDS: Adjusting global display temperature to %dK.\n", kelvin);
     // Direct GPU LUT adjustment
 }
 
-extern "C" void ergo_evaluate_fatigue(sigma_u32 active_minutes) {
+void ergo_evaluate_fatigue(sigma_u32 active_minutes) {
     // CDS (Circadian Display Sync) Algorithm
     
     if (active_minutes > 120) {
@@ -34,3 +34,5 @@ extern "C" void ergo_evaluate_fatigue(sigma_u32 active_minutes) {
 
 
 
+
+} // extern "C"

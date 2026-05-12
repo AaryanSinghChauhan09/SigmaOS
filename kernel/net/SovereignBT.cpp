@@ -9,7 +9,7 @@
  * Implements a Direct HCI Orchestration (DHO) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal silicon-native Bluetooth.
  *
- * Design: OOP-isolated singleton — SovereignBTEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignBTEngine.
  */
 
 /* --- Sovereign Bluetooth Engine (OOP Isolation) --- */
@@ -28,27 +28,27 @@ static struct {
     .initialized = 0u
 };
 
-extern "C" void bt_init() {
+void bt_init() {
     sigma_log("[BT] Initializing Sovereign Bluetooth Stack (DHO Algorithm)...");
     SovereignBTEngine.initialized = 1u;
 }
 
-extern "C" void bt_enable() {
+void bt_enable() {
     SovereignBTEngine.config.controller_state = SIGMA_BT_SCANNING;
     sigma_log("[BT] DHO: Controller POWERED ON. Scanning for low-energy shards...");
 }
 
-extern "C" void bt_disable() {
+void bt_disable() {
     SovereignBTEngine.config.controller_state = SIGMA_BT_OFF;
     sigma_log("[BT] DHO: Controller POWERED OFF.");
 }
 
-extern "C" void bt_start_scan(sigma_u32 duration_ms) {
+void bt_start_scan(sigma_u32 duration_ms) {
     sigma_log("[BT] DHO: Starting silicon-native scan (%ums)...\n", (unsigned)duration_ms);
     sigma_log("[BT] DHO: Scan results streaming to Sovereign Lattice.");
 }
 
-extern "C" void bt_pair(const sigma_u8* addr) {
+void bt_pair(const sigma_u8* addr) {
     if (!addr) return;
     sigma_log("[BT] DHO: Pairing with device %02X:%02X:%02X...\n", addr[0], addr[1], addr[2]);
     SovereignBTEngine.config.paired_count++;
@@ -63,3 +63,5 @@ extern "C" const sigma_bt_config_t* bt_get_config() {
     return &SovereignBTEngine.config;
 }
 
+
+} // extern "C"

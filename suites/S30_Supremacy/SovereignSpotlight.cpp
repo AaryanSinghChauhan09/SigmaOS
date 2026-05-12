@@ -49,17 +49,19 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void spotlight_init() {
+void spotlight_init() {
     SovereignSpotlightEngine::getInstance().init();
 }
 
-extern "C" void spotlight_search(const char* query) {
+void spotlight_search(const char* query) {
     SovereignSpotlightEngine::getInstance().search(query);
 }
 
-extern "C" void spotlight_reindex() {
+void spotlight_reindex() {
     SovereignSpotlightEngine::getInstance().reindexLattice();
 }
 
 
 
+
+} // extern "C"

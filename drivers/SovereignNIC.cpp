@@ -74,7 +74,7 @@ private:
     uint32_t tx_quota;
 };
 
-extern "C" void nic_init() {
+void nic_init() {
     SovereignNICEngine::init();
 }
 
@@ -87,3 +87,5 @@ extern "C" int nic_receive(void* buffer, uint32_t max_len) {
 }
 
 
+
+} // extern "C"

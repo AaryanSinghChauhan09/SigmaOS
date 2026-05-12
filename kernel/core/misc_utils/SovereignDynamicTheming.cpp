@@ -11,7 +11,7 @@
  * seamlessly transition Zenith UI between High-Contrast, Dark, and Light 
  * modes in real-time with zero latency.
  *
- * Design: OOP-isolated singleton — SovereignThemeEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignThemeEngine.
  */
 
 class SovereignThemeEngine {
@@ -43,14 +43,16 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void theme_init() {
+void theme_init() {
     SovereignThemeEngine::init();
 }
 
-extern "C" void theme_update_ambient(sigma_u32 lux) {
+void theme_update_ambient(sigma_u32 lux) {
     SovereignThemeEngine::updateAmbientContext(lux);
 }
 
 
 
 
+
+} // extern "C"

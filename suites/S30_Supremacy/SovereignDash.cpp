@@ -39,17 +39,19 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void dash_init() {
+void dash_init() {
     SovereignDashEngine::getInstance().init();
 }
 
-extern "C" void dash_refresh_telemetry() {
+void dash_refresh_telemetry() {
     SovereignDashEngine::getInstance().refreshTelemetry();
 }
 
-extern "C" void dash_report_health() {
+void dash_report_health() {
     SovereignDashEngine::getInstance().reportHealth();
 }
 
 
 
+
+} // extern "C"

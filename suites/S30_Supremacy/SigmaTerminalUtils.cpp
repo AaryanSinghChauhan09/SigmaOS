@@ -34,3 +34,5 @@ void sigma_terminal_utils_init() {
 }
 
 
+
+} // extern "C"

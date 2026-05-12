@@ -57,18 +57,22 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void zfs_init() {
+extern "C" {
+
+void zfs_init() {
     SigmaOS::Kernel::Storage::SovereignZFS::getInstance().init();
 }
 
-extern "C" void zfs_create_pool(const char* name) {
+void zfs_create_pool(const char* name) {
     SigmaOS::Kernel::Storage::SovereignZFS::getInstance().createPool(name);
 }
 
-extern "C" void zfs_snapshot(const char* dataset) {
+void zfs_snapshot(const char* dataset) {
     SigmaOS::Kernel::Storage::SovereignZFS::getInstance().snapshot(dataset);
 }
 
-extern "C" void zfs_scrub() {
+void zfs_scrub() {
     SigmaOS::Kernel::Storage::SovereignZFS::getInstance().scrub();
 }
+
+} // extern "C"

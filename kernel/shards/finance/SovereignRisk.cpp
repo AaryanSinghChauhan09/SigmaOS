@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void risk_init() {
+extern "C" {
+
+void risk_init() {
     SigmaOS::Kernel::Finance::SovereignRisk::getInstance().init();
 }
+
+} // extern "C"

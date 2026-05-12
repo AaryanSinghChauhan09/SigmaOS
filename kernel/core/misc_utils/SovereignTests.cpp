@@ -35,7 +35,7 @@ static void test_libc_hardening() {
     sigma_log("[TEST] LibC: Hardened strcpy bounds enforced.");
 }
 
-extern "C" void run_sovereign_tests() {
+void run_sovereign_tests() {
     sigma_log("==================================================");
     sigma_log("? IGNITING SOVEREIGN TEST LATTICE...");
     sigma_log("==================================================");
@@ -50,3 +50,5 @@ extern "C" void run_sovereign_tests() {
 
 
 
+
+} // extern "C"

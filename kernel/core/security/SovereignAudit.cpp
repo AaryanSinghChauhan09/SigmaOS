@@ -64,19 +64,23 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void audit_init() {
+extern "C" {
+
+void audit_init() {
     SigmaOS::Kernel::Compliance::SovereignAudit::getInstance().init();
 }
 
-extern "C" void audit_shard(sigma_u32 id) {
+void audit_shard(sigma_u32 id) {
     using C = SigmaOS::Kernel::Compliance::ComplianceStandard;
     SigmaOS::Kernel::Compliance::SovereignAudit::getInstance().auditShard(id, C::PQC_SOVEREIGN);
 }
 
-extern "C" void audit_report() {
+void audit_report() {
     SigmaOS::Kernel::Compliance::SovereignAudit::getInstance().generateComplianceReport();
 }
 
-extern "C" void audit_watchdog() {
+void audit_watchdog() {
     SigmaOS::Kernel::Compliance::SovereignAudit::getInstance().watchdogScan();
 }
+
+} // extern "C"

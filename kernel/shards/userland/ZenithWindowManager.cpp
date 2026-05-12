@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void wm_init() {
+extern "C" {
+
+void wm_init() {
     SigmaOS::Kernel::Userland::ZenithWindowManager::getInstance().init();
 }
+
+} // extern "C"

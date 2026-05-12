@@ -54,11 +54,15 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void container_runtime_init() {
+extern "C" {
+
+void container_runtime_init() {
     SigmaOS::Kernel::Industrial::SovereignContainerRuntime::init();
 }
 
-extern "C" void container_runtime_spawn(const char* image) {
+void container_runtime_spawn(const char* image) {
     SigmaOS::Kernel::Industrial::SovereignContainerRuntime::spawnOCIContainer(image);
 }
 
+
+} // extern "C"

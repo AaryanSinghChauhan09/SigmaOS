@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void node_init() {
+extern "C" {
+
+void node_init() {
     SigmaOS::Kernel::Resilience::SovereignNodeReplicator::getInstance().init();
 }
+
+} // extern "C"

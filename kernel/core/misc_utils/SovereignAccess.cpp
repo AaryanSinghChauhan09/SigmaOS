@@ -43,18 +43,20 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void access_init() {
+void access_init() {
     SovereignAccess::init();
 }
 
-extern "C" void access_enable_mode(sigma_access_mode_t mode) {
+void access_enable_mode(sigma_access_mode_t mode) {
     SovereignAccess::enableMode(mode);
 }
 
-extern "C" void access_announce_ui_element(const char* element_desc) {
+void access_announce_ui_element(const char* element_desc) {
     SovereignAccess::announceUIElement(element_desc);
 }
 
 
 
 
+
+} // extern "C"

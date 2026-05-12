@@ -14,15 +14,15 @@
 
 static float listener_x = 0.0f, listener_y = 0.0f, listener_z = 0.0f;
 
-extern "C" void spatialaudio_init() {
+void spatialaudio_init() {
     sigma_log("[SPATIALAUDIO] Initializing Sovereign Spatial Audio (HRTF Algorithm)...");
 }
 
-extern "C" void spatialaudio_set_listener_position(float x, float y, float z) {
+void spatialaudio_set_listener_position(float x, float y, float z) {
     listener_x = x; listener_y = y; listener_z = z;
 }
 
-extern "C" void spatialaudio_play_source(sigma_u32 source_id, float x, float y, float z) {
+void spatialaudio_play_source(sigma_u32 source_id, float x, float y, float z) {
     // HRTF (Head-Related Transfer Function) Algorithm
     // Computes interaural time and level differences for binaural rendering.
     
@@ -37,3 +37,5 @@ extern "C" void spatialaudio_play_source(sigma_u32 source_id, float x, float y, 
 
 
 
+
+} // extern "C"

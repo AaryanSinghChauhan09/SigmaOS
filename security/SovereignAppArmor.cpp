@@ -49,7 +49,10 @@ private:
 } // namespace Security
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void apparmor_init() {
+
+extern "C" {
+
+void apparmor_init() {
     SigmaOS::Kernel::Security::SovereignAppArmor::init();
 }
 
@@ -58,3 +61,5 @@ extern "C" int apparmor_enforce(const char* proc, const char* profile) {
         .enforceProfile(proc, profile) ? 1 : 0;
 }
 
+
+} // extern "C"

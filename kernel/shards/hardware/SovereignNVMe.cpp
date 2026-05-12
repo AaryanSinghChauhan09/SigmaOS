@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void nvme_init() {
+extern "C" {
+
+void nvme_init() {
     SigmaOS::Kernel::Hardware::SovereignNVMe::getInstance().init();
 }
+
+} // extern "C"

@@ -11,7 +11,7 @@
  * Commands: agent.start, agent.quota set=..., agent.task run=..., agent.sync
  */
 
-extern "C" void trigger_emergency_sync();
+void trigger_emergency_sync();
 
 class CommandInterpreter {
 public:
@@ -62,6 +62,10 @@ public:
     }
 };
 
-extern "C" void execute_agent_command(const char* command) {
+void execute_agent_command(const char* command) {
     CommandInterpreter::getInstance().parseAndExecute(command);
 }
+
+} // extern "C"
+
+} // extern "C"

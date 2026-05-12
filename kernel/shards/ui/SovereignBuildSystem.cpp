@@ -11,7 +11,7 @@
 
 #include "kernel/core/silicon_audit.hpp"
 
-extern "C" void _start(void) {
+void _start(void) {
     sigma_log("--- Σ SIGMA OS SOVEREIGN BUILD SYSTEM (ZENITH) ---\n");
     SigmaOS::Build::SovereignSiliconAudit audit;
     audit.DetectFeatures();
@@ -22,3 +22,5 @@ extern "C" void _start(void) {
 
     sigma_exit(0);
 }
+
+} // extern "C"

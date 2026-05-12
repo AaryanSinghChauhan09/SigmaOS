@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void ledger_init() {
+extern "C" {
+
+void ledger_init() {
     SigmaOS::Kernel::Finance::SovereignBlockchainLedger::getInstance().init();
 }
+
+} // extern "C"

@@ -11,7 +11,7 @@
  * query. The engine ranks settings by usage history (from SovereignPersonalization)
  * and fuzzy-matches setting names at Ring-0 speed.
  *
- * Design: OOP-isolated singleton — SovereignSettingsSearchEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignSettingsSearchEngine.
  */
 
 typedef struct {
@@ -46,7 +46,7 @@ public:
         sigma_log("[SETTINGS-SEARCH] Searching for '%s'...\n", query);
         sigma_u32 results = 0;
         for (sigma_u32 i = 0; i < this->settings_count; i++) {
-            // Naive prefix match — real impl would use Levenshtein distance
+            // Naive prefix match ï¿½ real impl would use Levenshtein distance
             if (sigma_hardened_strncmp(this->settings[i].label, query, 4) == 0 ||
                 sigma_hardened_strncmp(this->settings[i].category, query, 4) == 0) {
                 sigma_log("  -> [%s] %s (%u accesses)\n",
@@ -65,10 +65,12 @@ private:
     sigma_u32 settings_count;
 };
 
-extern "C" void settings_search_init() { SovereignSettingsSearchEngine::init(); }
-extern "C" void settings_search_register(const char* key, const char* label, const char* cat) { SovereignSettingsSearchEngine::registerSetting(key, label, cat); }
-extern "C" void settings_search_query(const char* query) { SovereignSettingsSearchEngine::search(query); }
+void settings_search_init() { SovereignSettingsSearchEngine::init(); }
+void settings_search_register(const char* key, const char* label, const char* cat) { SovereignSettingsSearchEngine::registerSetting(key, label, cat); }
+void settings_search_query(const char* query) { SovereignSettingsSearchEngine::search(query); }
 
 
 
 
+
+} // extern "C"

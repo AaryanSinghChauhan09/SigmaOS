@@ -3,7 +3,7 @@
  * S SIGMAOS: SOVEREIGN BENCH (Performance Profiler)
  * =========================================================================
  * Mission: Implements BENCH-001 to benchmark kernel latency vs. Linux.
- * Layer  : L5 — Industrial Ecosystem / Observability
+ * Layer  : L5 ï¿½ Industrial Ecosystem / Observability
  * =========================================================================
  */
 
@@ -44,10 +44,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sigma_bench_run_sched() {
+extern "C" {
+
+void sigma_bench_run_sched() {
     SigmaOS::Kernel::Observability::SovereignBench::runSchedulingBenchmark();
 }
 
-extern "C" void sigma_bench_run_mem() {
+void sigma_bench_run_mem() {
     SigmaOS::Kernel::Observability::SovereignBench::runMemoryBenchmark();
 }
+
+} // extern "C"

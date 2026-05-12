@@ -50,12 +50,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void did_init() {
+void did_init() {
     SigmaOS::Kernel::Security::SovereignDIDManager::init();
 }
 
-extern "C" void did_create(const char* subject) {
+void did_create(const char* subject) {
     SigmaOS::Kernel::Security::SovereignDIDManager::createDID(subject);
 }
 
@@ -66,3 +68,5 @@ extern "C" bool did_verify(const char* did) {
 
 
 
+
+} // extern "C"

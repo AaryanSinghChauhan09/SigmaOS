@@ -51,7 +51,7 @@ public:
     }
 };
 
-extern "C" void _start(void) {
+void _start(void) {
     sigma_log_info("--- Î£ SIGMA OS SOVEREIGN HARDWARE AUDIT (ZENITH) ---\n");
     SovereignHardwareAudit audit;
     audit.AuditProcessors();
@@ -63,3 +63,5 @@ extern "C" void _start(void) {
 
 
 
+
+} // extern "C"

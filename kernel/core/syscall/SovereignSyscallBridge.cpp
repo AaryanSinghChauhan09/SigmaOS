@@ -60,8 +60,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void sysbridge_init_shard() {
+void sysbridge_init_shard() {
     SigmaOS::Kernel::Syscall::SovereignSyscallBridge::init();
 }
 
@@ -72,3 +74,5 @@ extern "C" sigma_u64 sysbridge_handle_shard(sigma_u64 n, sigma_u64 a1, sigma_u64
 
 
 
+
+} // extern "C"

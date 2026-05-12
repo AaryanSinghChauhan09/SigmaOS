@@ -94,7 +94,7 @@ public:
     }
 };
 
-extern "C" void _start(void) {
+void _start(void) {
     SovereignLabUniversal lab;
     lab.Synthesize();
     lab.ExecuteUniversalAudit();
@@ -105,3 +105,5 @@ extern "C" void _start(void) {
 
 
 
+
+} // extern "C"

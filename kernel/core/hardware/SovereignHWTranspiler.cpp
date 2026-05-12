@@ -69,15 +69,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void silicon_init_transpiler() {
+void silicon_init_transpiler() {
     SigmaOS::Kernel::Hardware::SovereignHWTranspiler::init();
 }
 
-extern "C" void silicon_transpile(const char* id, const char* spec, const char* arch) {
+void silicon_transpile(const char* id, const char* spec, const char* arch) {
     SigmaOS::Kernel::Hardware::SovereignHWTranspiler::transpileDriver(id, spec, arch);
 }
 
 
 
 
+
+} // extern "C"

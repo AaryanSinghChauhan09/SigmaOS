@@ -10,7 +10,7 @@
  * USP: Replaces bloated Linux dbus/systemctl with a mathematically verified,
  * amnesic-protected registry for dynamic service (shard) discovery and IPC.
  *
- * Design: OOP-isolated singleton — SovereignUSREngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignUSREngine.
  */
 
 class SovereignUSREngine {
@@ -54,11 +54,11 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void usr_init() {
+void usr_init() {
     SovereignUSREngine::init();
 }
 
-extern "C" void usr_register_shard(const char* name, sigma_u32 id) {
+void usr_register_shard(const char* name, sigma_u32 id) {
     SovereignUSREngine::registerShard(name, id);
 }
 
@@ -69,3 +69,5 @@ extern "C" sigma_u32 usr_discover_shard(const char* name) {
 
 
 
+
+} // extern "C"

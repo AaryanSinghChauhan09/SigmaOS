@@ -47,6 +47,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void geo_init() {
+extern "C" {
+
+void geo_init() {
     SigmaOS::Kernel::Industrial::SovereignGeoIntelligence::getInstance().init();
 }
+
+} // extern "C"

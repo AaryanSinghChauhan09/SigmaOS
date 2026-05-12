@@ -13,12 +13,12 @@
 
 static bool interceptor_map[256];
 
-extern "C" void trace_init() {
+void trace_init() {
     sigma_log("[TRACE] Initializing Sovereign System Call Tracing (S-Trace)...");
     for(int i=0; i<256; i++) interceptor_map[i] = SIGMA_FALSE;
 }
 
-extern "C" void trace_log_syscall(sigma_u32 id, sigma_u32 shard_id) {
+void trace_log_syscall(sigma_u32 id, sigma_u32 shard_id) {
     // PSI (Predictive Syscall Interception) Algorithm
     // Intercepts syscalls based on behavioral patterns before they reach the SSG.
     
@@ -30,7 +30,7 @@ extern "C" void trace_log_syscall(sigma_u32 id, sigma_u32 shard_id) {
     }
 }
 
-extern "C" void trace_set_interceptor(sigma_u32 syscall_id, bool active) {
+void trace_set_interceptor(sigma_u32 syscall_id, bool active) {
     if (syscall_id < 256) {
         interceptor_map[syscall_id] = active;
         sigma_log("[TRACE] Interceptor for 0x%02X set to %d\n", syscall_id, active);
@@ -39,3 +39,5 @@ extern "C" void trace_set_interceptor(sigma_u32 syscall_id, bool active) {
 
 
 
+
+} // extern "C"

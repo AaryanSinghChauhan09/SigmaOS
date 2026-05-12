@@ -24,7 +24,9 @@ public:
     }
 };
 
-extern "C" void start_ai_watchdog() {
+void start_ai_watchdog() {
     AIWatchdog watchdog;
     watchdog.monitor_lattice();
 }
+
+} // extern "C"

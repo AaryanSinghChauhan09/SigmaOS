@@ -9,7 +9,7 @@
  * Implements a Secure Shard Bootstrapping (SSB) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal system ignition.
  *
- * Design: OOP-isolated singleton — SovereignBootEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignBootEngine.
  */
 
 class SovereignBootEngine {
@@ -56,11 +56,11 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void boot_init() {
+void boot_init() {
     SovereignBootEngine::init();
 }
 
-extern "C" void boot_ignite_lattice() {
+void boot_ignite_lattice() {
     SovereignBootEngine::igniteLattice();
 }
 
@@ -75,3 +75,5 @@ extern "C" sigma_u32 boot_get_ignited_count() {
 
 
 
+
+} // extern "C"

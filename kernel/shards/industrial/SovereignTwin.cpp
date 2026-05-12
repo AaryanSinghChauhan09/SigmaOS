@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void twin_init() {
+extern "C" {
+
+void twin_init() {
     SigmaOS::Kernel::Industrial::SovereignTwin::getInstance().init();
 }
+
+} // extern "C"

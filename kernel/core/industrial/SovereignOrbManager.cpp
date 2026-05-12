@@ -132,23 +132,25 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void orb_manager_init() {
+void orb_manager_init() {
     SigmaOS::Kernel::Industrial::SovereignOrbManager::init();
 }
 
-extern "C" void orb_install(const char* orb_name, const char* orb_sig) {
+void orb_install(const char* orb_name, const char* orb_sig) {
     SigmaOS::Kernel::Industrial::SovereignOrbManager::installOrb(
         SigmaOS::Kernel::Industrial::OrbName{orb_name},
         SigmaOS::Kernel::Industrial::OrbSig{orb_sig});
 }
 
-extern "C" void orb_rollback(const char* orb_name) {
+void orb_rollback(const char* orb_name) {
     SigmaOS::Kernel::Industrial::SovereignOrbManager::rollbackOrb(
         SigmaOS::Kernel::Industrial::OrbName{orb_name});
 }
 
-extern "C" void orb_list() {
+void orb_list() {
     SigmaOS::Kernel::Industrial::SovereignOrbManager::listOrbs();
 }
 
@@ -160,3 +162,5 @@ extern "C" void orb_list() {
 
 
 
+
+} // extern "C"

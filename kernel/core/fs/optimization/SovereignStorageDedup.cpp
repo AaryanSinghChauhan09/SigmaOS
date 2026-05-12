@@ -9,9 +9,9 @@
  *
  * USP: Uses a rolling SHA-256-equivalent fingerprint to detect duplicate
  * 4KB blocks before writing to disk, eliminating redundant storage at Ring-0
- * speed — no filesystem-level overhead like Linux's btrfs dedup.
+ * speed ï¿½ no filesystem-level overhead like Linux's btrfs dedup.
  *
- * Design: OOP-isolated singleton — SovereignStorageDedupEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignStorageDedupEngine.
  */
 
 class SovereignStorageDedupEngine {
@@ -36,7 +36,7 @@ public:
                 this->bytes_saved += block_size_bytes;
                 sigma_log("[DEDUP] Duplicate block detected (hash 0x%08X). %u bytes saved. Total saved: %u KB.\n",
                              block_hash, block_size_bytes, this->bytes_saved / 1024);
-                return true; // Skip write — use existing reference
+                return true; // Skip write ï¿½ use existing reference
             }
         }
         // Register new unique block
@@ -59,10 +59,12 @@ private:
     sigma_u32 blocks_tracked;
 };
 
-extern "C" void dedup_init() { SovereignStorageDedupEngine::init(); }
+void dedup_init() { SovereignStorageDedupEngine::init(); }
 extern "C" bool dedup_check_block(sigma_u32 hash, sigma_u32 size) { return SovereignStorageDedupEngine::checkAndDedup(hash, size); }
-extern "C" void dedup_stats() { SovereignStorageDedupEngine::printStats(); }
+void dedup_stats() { SovereignStorageDedupEngine::printStats(); }
 
 
 
 
+
+} // extern "C"

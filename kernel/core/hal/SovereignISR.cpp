@@ -24,6 +24,10 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sovereignisr_init() {
+extern "C" {
+
+void sovereignisr_init() {
     SigmaOS::Kernel::SovereignISR::getInstance().init();
 }
+
+} // extern "C"

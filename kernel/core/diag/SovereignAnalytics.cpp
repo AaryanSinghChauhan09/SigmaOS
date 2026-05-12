@@ -52,15 +52,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void diag_analytics_init() {
+void diag_analytics_init() {
     SigmaOS::Kernel::Diag::SovereignAnalytics::init();
 }
 
-extern "C" void diag_track_shard(const char* id, const char* type) {
+void diag_track_shard(const char* id, const char* type) {
     SigmaOS::Kernel::Diag::SovereignAnalytics::trackEvent(id, type);
 }
 
 
 
 
+
+} // extern "C"

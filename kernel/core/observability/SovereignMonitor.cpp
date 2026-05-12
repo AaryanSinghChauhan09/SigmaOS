@@ -4,7 +4,7 @@
 #include "../../../include/observability/sigma_monitor.h"
 #include "../../../include/core/SigmaOOP.hpp"
 
-extern "C" void telemetry_execute_ebpf(const void* bytecode, sigma_usize size);
+void telemetry_execute_ebpf(const void* bytecode, sigma_usize size);
 
 namespace SigmaOS {
 namespace Kernel {
@@ -52,8 +52,10 @@ void SovereignObservabilityMonitor::rebalanceLattice() {
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge (all use getInstance()) --- */
-extern "C" void monitor_init() {
+void monitor_init() {
     SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().init();
 }
 
@@ -61,10 +63,14 @@ extern "C" sigma_system_load_t monitor_get_load_matrix() {
     return SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().getLoadMatrix();
 }
 
-extern "C" void monitor_execute_ebpf(const void* bytecode, sigma_usize size) {
+void monitor_execute_ebpf(const void* bytecode, sigma_usize size) {
     SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().executeEbpfProgram(bytecode, size);
 }
 
-extern "C" void monitor_rebalance_lattice() {
+void monitor_rebalance_lattice() {
     SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().rebalanceLattice();
 }
+
+} // extern "C"
+
+} // extern "C"

@@ -56,10 +56,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void k8s_init() {
+extern "C" {
+
+void k8s_init() {
     SigmaOS::Kernel::Orchestration::SovereignContainerOrchestrator::getInstance().init();
 }
 
-extern "C" void k8s_schedule(const char* path, sigma_u32 count) {
+void k8s_schedule(const char* path, sigma_u32 count) {
     SigmaOS::Kernel::Orchestration::SovereignContainerOrchestrator::getInstance().schedulePod(path, count);
 }
+
+} // extern "C"

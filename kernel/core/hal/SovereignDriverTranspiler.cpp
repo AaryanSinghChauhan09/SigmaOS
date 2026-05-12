@@ -54,15 +54,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void transpiler_init_shard() {
+void transpiler_init_shard() {
     SigmaOS::Kernel::HAL::SovereignDriverTranspiler::init();
 }
 
-extern "C" void transpiler_run_shard(const char* id, const char* arch) {
+void transpiler_run_shard(const char* id, const char* arch) {
     SigmaOS::Kernel::HAL::SovereignDriverTranspiler::transpile(id, arch);
 }
 
 
 
 
+
+} // extern "C"

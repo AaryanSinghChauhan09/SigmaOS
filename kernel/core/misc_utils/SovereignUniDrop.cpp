@@ -16,18 +16,18 @@
 static void* active_drag_payload = nullptr;
 static sigma_clip_type_t active_drag_type;
 
-extern "C" void unidrop_init() {
+void unidrop_init() {
     sigma_log("[UNIDROP] Initializing Sovereign Universal Drag & Drop (CBPT Algorithm)...");
 }
 
-extern "C" void unidrop_begin_drag(sigma_u32 source_app_id, sigma_clip_type_t data_type, const void* data_ptr, sigma_u32 size) {
+void unidrop_begin_drag(sigma_u32 source_app_id, sigma_clip_type_t data_type, const void* data_ptr, sigma_u32 size) {
     active_drag_type = data_type;
     active_drag_payload = (void*)data_ptr;
     sigma_log("[UNIDROP] CBPT: Drag initiated from App %d (Type: %d, Size: %d).\n", 
                  source_app_id, (int)data_type, size);
 }
 
-extern "C" void unidrop_update_cursor(sigma_u32 x, sigma_u32 y) {
+void unidrop_update_cursor(sigma_u32 x, sigma_u32 y) {
     // Render visual feedback representing the drag state
 }
 
@@ -49,3 +49,5 @@ extern "C" bool unidrop_commit_drop(sigma_u32 target_app_id) {
 
 
 
+
+} // extern "C"

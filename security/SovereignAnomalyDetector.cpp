@@ -57,15 +57,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void anomaly_detector_init() {
+void anomaly_detector_init() {
     SigmaOS::Kernel::Security::SovereignAnomalyDetector::init();
 }
 
-extern "C" void anomaly_analyze(const char* proc, sigma_u32 sys_rate, sigma_u32 mem) {
+void anomaly_analyze(const char* proc, sigma_u32 sys_rate, sigma_u32 mem) {
     SigmaOS::Kernel::Security::SovereignAnomalyDetector::analyzeBehavior(proc, sys_rate, mem);
 }
 
 
 
 
+
+} // extern "C"

@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void raid_init() {
+extern "C" {
+
+void raid_init() {
     SigmaOS::Kernel::Storage::SovereignRAID::getInstance().init();
 }
+
+} // extern "C"

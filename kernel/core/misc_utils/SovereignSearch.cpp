@@ -47,15 +47,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void search_init() {
+void search_init() {
     SigmaOS::Kernel::Misc::SovereignSearchEngine::init();
 }
 
-extern "C" void search_query(const char* term) {
+void search_query(const char* term) {
     SigmaOS::Kernel::Misc::SovereignSearchEngine::query(term);
 }
 
 
 
 
+
+} // extern "C"

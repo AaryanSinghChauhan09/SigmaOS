@@ -59,7 +59,9 @@ private:
 } // namespace Wizard
 } // namespace SigmaOS
 
-extern "C" void start_wizard_zenith() {
+extern "C" {
+
+void start_wizard_zenith() {
     SigmaOS::Wizard::SovereignBootWizard wizard;
     wizard.execute_setup();
 }
@@ -70,3 +72,5 @@ int main() {
     return 0;
 }
 
+
+} // extern "C"

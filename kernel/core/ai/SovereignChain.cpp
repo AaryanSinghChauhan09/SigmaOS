@@ -3,7 +3,7 @@
 #include "sigma_log.h"
 
 /**
- * SovereignChain — AI Component Orchestration and Flow Engine.
+ * SovereignChain ï¿½ AI Component Orchestration and Flow Engine.
  * Inspired by github.com/langchain-ai/langchain and Langflow.
  * Provides modular chaining of AI agents, tools, and memory shards.
  */
@@ -42,7 +42,11 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void sigma_chain_execute(const char* flow) {
+void sigma_chain_execute(const char* flow) {
     SigmaOS::Kernel::AI::SovereignChain::executeFlow(flow);
 }
+
+} // extern "C"

@@ -49,15 +49,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void hil_sim_init() {
+void hil_sim_init() {
     SigmaOS::Kernel::Hardware::SovereignHILSimulator::init();
 }
 
-extern "C" void hil_inject_data(const char* id, const void* data, sigma_usize sz) {
+void hil_inject_data(const char* id, const void* data, sigma_usize sz) {
     SigmaOS::Kernel::Hardware::SovereignHILSimulator::injectSensorData(id, data, sz);
 }
 
 
 
 
+
+} // extern "C"

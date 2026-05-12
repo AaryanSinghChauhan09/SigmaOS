@@ -62,11 +62,11 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void usb_init() {
+void usb_init() {
     SovereignUSBStack::init();
 }
 
-extern "C" void usb_poll() {
+void usb_poll() {
     SovereignUSBStack::poll();
 }
 
@@ -75,3 +75,5 @@ extern "C" int usb_send_control(uint8_t port, void* setup_packet) {
 }
 
 
+
+} // extern "C"

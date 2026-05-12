@@ -59,15 +59,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void snapshot_init() {
+void snapshot_init() {
     SigmaOS::Kernel::FS::SovereignSnapshotManager::init();
 }
 
-extern "C" void snapshot_take(const char* vol, const char* snap) {
+void snapshot_take(const char* vol, const char* snap) {
     SigmaOS::Kernel::FS::SovereignSnapshotManager::takeSnapshot(vol, snap);
 }
 
 
 
 
+
+} // extern "C"

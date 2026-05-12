@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void quic_init() {
+extern "C" {
+
+void quic_init() {
     SigmaOS::Kernel::Network::SovereignQUICStack::getInstance().init();
 }
+
+} // extern "C"

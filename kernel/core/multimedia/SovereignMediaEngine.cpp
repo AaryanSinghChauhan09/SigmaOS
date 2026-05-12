@@ -49,15 +49,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void media_init() {
+void media_init() {
     SigmaOS::Kernel::Multimedia::SovereignMediaEngine::init();
 }
 
-extern "C" void media_process_frame(void* buf, sigma_usize sz) {
+void media_process_frame(void* buf, sigma_usize sz) {
     SigmaOS::Kernel::Multimedia::SovereignMediaEngine::processFrame(buf, sz);
 }
 
 
 
 
+
+} // extern "C"

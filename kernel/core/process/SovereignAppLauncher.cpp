@@ -11,7 +11,7 @@
  * app launcher that ranks results by SovereignPersonalization usage scores
  * and pre-warms the process image via SovereignVFS read-ahead.
  *
- * Design: OOP-isolated singleton — SovereignAppLauncherEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignAppLauncherEngine.
  */
 
 typedef struct {
@@ -66,11 +66,13 @@ private:
     sigma_u32 app_count;
 };
 
-extern "C" void launcher_init() { SovereignAppLauncherEngine::init(); }
-extern "C" void launcher_register(const char* id, const char* name) { SovereignAppLauncherEngine::registerApp(id, name); }
-extern "C" void launcher_launch(const char* query) { SovereignAppLauncherEngine::launch(query); }
-extern "C" void launcher_list_top(sigma_u32 n) { SovereignAppLauncherEngine::listTop(n); }
+void launcher_init() { SovereignAppLauncherEngine::init(); }
+void launcher_register(const char* id, const char* name) { SovereignAppLauncherEngine::registerApp(id, name); }
+void launcher_launch(const char* query) { SovereignAppLauncherEngine::launch(query); }
+void launcher_list_top(sigma_u32 n) { SovereignAppLauncherEngine::listTop(n); }
 
 
 
 
+
+} // extern "C"

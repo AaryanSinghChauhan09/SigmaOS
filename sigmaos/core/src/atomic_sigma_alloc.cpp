@@ -33,3 +33,5 @@ void sigma_free(void* ptr) {
 }
 
 }
+
+} // extern "C"

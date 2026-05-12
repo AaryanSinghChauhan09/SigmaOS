@@ -51,18 +51,20 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void telemetry_ui_init() {
+void telemetry_ui_init() {
     SovereignTelemetryUIEngine::init();
 }
 
-extern "C" void telemetry_ui_toggle() {
+void telemetry_ui_toggle() {
     SovereignTelemetryUIEngine::toggleMonitor();
 }
 
-extern "C" void telemetry_ui_update(sigma_u32 net, sigma_u32 numa) {
+void telemetry_ui_update(sigma_u32 net, sigma_u32 numa) {
     SovereignTelemetryUIEngine::updateDashboardMetrics(net, numa);
 }
 
 
 
 
+
+} // extern "C"

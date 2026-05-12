@@ -8,7 +8,7 @@
  * Implements a Universal Machine-State Mapping (UMSM) algorithm.
  * ZERO-DEPENDENCY: Transpiles hardware interrupts/registers into sovereign shards.
  *
- * Design: OOP-isolated singleton — SovereignTranspilerEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignTranspilerEngine.
  */
 
 /* --- Sovereign Transpiler Engine (OOP Isolation) --- */
@@ -22,12 +22,12 @@ static struct {
     .initialized = 0u
 };
 
-extern "C" void transpiler_init() {
+void transpiler_init() {
     sigma_log("[TRANSPILER] Initializing Self-Learning Hardware Transpiler (UMSM)...");
     SovereignTranspilerEngine.initialized = 1u;
 }
 
-extern "C" void transpiler_map_hardware() {
+void transpiler_map_hardware() {
     sigma_log("[TRANSPILER] UMSM: Scanning silicon architecture...");
     sigma_log("[TRANSPILER] UMSM: Architecture %u detected. Mapping IA32/AMD64 registers to shards...\n", 
                  SovereignTranspilerEngine.architecture_id);
@@ -36,7 +36,7 @@ extern "C" void transpiler_map_hardware() {
     sigma_log("[TRANSPILER] UMSM: 256 physical registers successfully virtualized as amnesic shards.");
 }
 
-extern "C" void transpiler_cross_transpile(sigma_u32 target_arch) {
+void transpiler_cross_transpile(sigma_u32 target_arch) {
     sigma_log("[TRANSPILER] UMSM: Initiating cross-transpilation to Arch %u...\n", target_arch);
     sigma_log("[TRANSPILER] UMSM: Shard logic successfully decoupled from physical silicon.");
 }
@@ -44,3 +44,5 @@ extern "C" void transpiler_cross_transpile(sigma_u32 target_arch) {
 
 
 
+
+} // extern "C"

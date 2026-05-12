@@ -77,7 +77,7 @@ public:
     }
 };
 
-extern "C" void _start(void) {
+void _start(void) {
     sigma_log("--- Σ SIGMA OS SOVEREIGN DATA PREPROCESSOR (ZENITH) ---\n");
     
     // Simulate a large data shard
@@ -95,3 +95,5 @@ extern "C" void _start(void) {
     sigma_exit(0);
 }
 
+
+} // extern "C"

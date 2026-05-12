@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void vpn_init() {
+void vpn_init() {
     SigmaOS::Kernel::Network::SovereignVPN::init();
 }
 
-extern "C" void vpn_connect(const char* peer) {
+void vpn_connect(const char* peer) {
     SigmaOS::Kernel::Network::SovereignVPN::establishTunnel(peer);
 }
 
 
 
 
+
+} // extern "C"

@@ -52,6 +52,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void tensor_core_init() {
+extern "C" {
+
+void tensor_core_init() {
     SigmaOS::Kernel::Drivers::AI::NvidiaTensorCoreShard::initCores();
 }
+
+} // extern "C"

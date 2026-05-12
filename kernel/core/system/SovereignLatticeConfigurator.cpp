@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void configurator_init() {
+void configurator_init() {
     SigmaOS::Kernel::System::SovereignLatticeConfigurator::init();
 }
 
-extern "C" void configurator_apply(const char* policy) {
+void configurator_apply(const char* policy) {
     SigmaOS::Kernel::System::SovereignLatticeConfigurator::applyPolicy(policy);
 }
 
 
 
 
+
+} // extern "C"

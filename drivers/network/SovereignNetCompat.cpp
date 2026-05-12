@@ -36,7 +36,12 @@ private:
 } // namespace Network
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void netstack_map_skb(void* skb) {
+
+extern "C" {
+
+void netstack_map_skb(void* skb) {
     SigmaOS::Kernel::Network::SovereignNetCompat::mapSkBuff(skb);
 }
 
+
+} // extern "C"

@@ -12,7 +12,7 @@
  * ZERO-DEPENDENCY: Strictly bare-metal on-device neural translation.
  */
 
-extern "C" void livetranslate_init() {
+void livetranslate_init() {
     sigma_log("[LIVETRANSLATE] Initializing Sovereign Live Translate (CSS2S Algorithm)...");
 }
 
@@ -26,10 +26,12 @@ extern "C" const char* livetranslate_text(const char* input, const char* from_la
     return "[translated output]";
 }
 
-extern "C" void livetranslate_overlay_ui(const char* target_lang) {
+void livetranslate_overlay_ui(const char* target_lang) {
     // Seamlessly overlays translated labels atop the Universal UI in real-time.
     sigma_log("[LIVETRANSLATE] CSS2S: Overlaying full UI translation to '%s'.\n", target_lang);
 }
 
 
 
+
+} // extern "C"

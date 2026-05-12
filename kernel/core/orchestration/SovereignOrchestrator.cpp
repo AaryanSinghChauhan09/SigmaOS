@@ -225,11 +225,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
 
 /* --- C Bridge --- */
-extern "C" void sigma_bootstrap_lattice() {
+void sigma_bootstrap_lattice() {
     SigmaOS::Kernel::System::SovereignOrchestrator::bootstrap();
 }
 
 
 
+
+} // extern "C"

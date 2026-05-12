@@ -3,7 +3,7 @@
  * S SIGMAOS: SOVEREIGN RESCUE (Recovery & Forensics Shard)
  * =========================================================================
  * Mission: Implements REC-001 (Rescuezilla/SystemRescue absorption).
- * Layer  : L5 — Industrial Ecosystem / Utilities
+ * Layer  : L5 ï¿½ Industrial Ecosystem / Utilities
  * =========================================================================
  */
 
@@ -42,11 +42,16 @@ private:
 } // namespace Industrial
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void rescue_init() {
+
+extern "C" {
+
+void rescue_init() {
     SigmaOS::Kernel::Industrial::SovereignRescue::startRecoveryEnvironment();
 }
 
-extern "C" void rescue_image(const char* path) {
+void rescue_image(const char* path) {
     SigmaOS::Kernel::Industrial::SovereignRescue::cloneLattice(path);
 }
 
+
+} // extern "C"

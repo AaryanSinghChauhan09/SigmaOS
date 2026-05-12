@@ -47,6 +47,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void mem_init() {
+extern "C" {
+
+void mem_init() {
     SigmaOS::Kernel::Core::SovereignMemoryManager::getInstance().init();
 }
+
+} // extern "C"

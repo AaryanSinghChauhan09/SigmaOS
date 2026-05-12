@@ -1,10 +1,10 @@
-﻿#include "sigma_log.h"
+#include "sigma_log.h"
 #include "core/sigma_types.h"
 #include "core/SigmaOOP.hpp"
 #include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -13,7 +13,7 @@
 
 /*
  * =========================================================================
- * ÃŽÂ£ SIGMAOS: SOVEREIGN LATTICE-PQC (v11.0 - THE SECURITY SHARD)
+ * Î£ SIGMAOS: SOVEREIGN LATTICE-PQC (v11.0 - THE SECURITY SHARD)
  * =========================================================================
  * Mission: Neutralize classical and modular encryption standards.
  * Capability: Lattice-based Post-Quantum Cryptography (PQC).
@@ -54,7 +54,7 @@ public:
     }
 
     void audit() {
-        sigma_log("\n--- ÃŽÂ£ SOVEREIGN SECURITY AUDIT ---\n");
+        sigma_log("\n--- Î£ SOVEREIGN SECURITY AUDIT ---\n");
         sigma_log("| PQC Status     : %s\n", m_quantum_shield_active ? "ACTIVE (SHIELDED)" : "IDLE");
         sigma_log("| Key Strength   : 4096-bit Native Lattice\n");
         sigma_log("| Competitor-Defeat : AES-256 neutralized in front of PQC.\n");
@@ -65,7 +65,9 @@ public:
 } // namespace Security
 } // namespace SigmaOS
 
-extern "C" void start_security_zenith() {
+extern "C" {
+
+void start_security_zenith() {
     SigmaOS::Security::SovereignLatticePQC pqc;
 
     pqc.generate_sovereign_key();
@@ -82,3 +84,5 @@ int main() {
 }
 
 
+
+} // extern "C"

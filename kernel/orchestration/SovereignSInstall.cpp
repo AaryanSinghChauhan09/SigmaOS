@@ -64,11 +64,13 @@ private:
  * C-Linkage Wrappers (ABI compatibility)
  * ========================================================================= */
 
-extern "C" void sinstall_init() {
+void sinstall_init() {
     SovereignDeploymentEngine::init();
 }
 
-extern "C" void sinstall_ignite(const char* target_disk) {
+void sinstall_ignite(const char* target_disk) {
     SovereignDeploymentEngine::ignite(target_disk);
 }
 
+
+} // extern "C"

@@ -19,19 +19,21 @@ typedef enum {
 
 static tiling_mode_t current_mode = TILING_BSP;
 
-extern "C" void tiling_init() {
+void tiling_init() {
     sigma_log("[TILING] Initializing Sovereign Auto-Tiling Engine (Pop!_OS Parity)...");
 }
 
-extern "C" void tiling_arrange_shards() {
+void tiling_arrange_shards() {
     sigma_log("[TILING] Automatically arranging active shards in BSP lattice...");
     // Logic for golden ratio shard placement
 }
 
-extern "C" void tiling_switch_mode(tiling_mode_t mode) {
+void tiling_switch_mode(tiling_mode_t mode) {
     current_mode = mode;
     sigma_log("[TILING] Mode switched to %d.", mode);
 }
 
 
 
+
+} // extern "C"

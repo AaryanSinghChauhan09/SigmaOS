@@ -10,7 +10,7 @@
  * USP: Enables true heterogeneous computing by bridging the memory models of 
  * ARM (Weakly Ordered) and RISC-V (RVWMO) in real-time.
  *
- * Design: OOP-isolated singleton — SovereignMemorySyncEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignMemorySyncEngine.
  */
 
 class SovereignMemorySyncEngine {
@@ -53,11 +53,11 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void memsync_init() {
+void memsync_init() {
     SovereignMemorySyncEngine::init();
 }
 
-extern "C" void memsync_fence(const char* src, const char* tgt) {
+void memsync_fence(const char* src, const char* tgt) {
     SovereignMemorySyncEngine::emitMemoryFence(src, tgt);
 }
 
@@ -68,3 +68,5 @@ extern "C" bool memsync_cas(sigma_u32* addr, sigma_u32 expected, sigma_u32 new_v
 
 
 
+
+} // extern "C"

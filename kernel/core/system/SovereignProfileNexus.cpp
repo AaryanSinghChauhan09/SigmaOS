@@ -9,30 +9,7 @@
  *      visible shards, UI persona) based on the active professional role.
  */
 
-namespace SigmaOS {
-namespace Kernel {
-namespace Profiles {
-
-enum class ProfessionRole {
-    DEVELOPER,
-    CREATIVE,
-    HEALTHCARE,
-    INDUSTRIAL,
-    GOVERNMENT,
-    ACADEMIC,
-    FINANCE,
-    LEGAL,
-    FORENSICS,
-    ENGINEERING,
-    DATA_SCIENCE,
-    CYBERSECURITY
-};
-
-struct ProfessionStrategy {
-    ProfessionRole role;
-    void (*heal_fn)();
-    void (*rollback_fn)();
-};
+ "C" {
 
 class SovereignProfileNexus : public SigmaOS::SigmaObject {
 public:
@@ -108,18 +85,24 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void nexus_init() {
+extern "C" {
+
+void nexus_init() {
     SigmaOS::Kernel::Profiles::SovereignProfileNexus::getInstance().init();
 }
 
-extern "C" void nexus_switch_profile(sigma_u32 role_id) {
+void nexus_switch_profile(sigma_u32 role_id) {
     SigmaOS::Kernel::Profiles::SovereignProfileNexus::getInstance().switchProfile((SigmaOS::Kernel::Profiles::ProfessionRole)role_id);
 }
 
-extern "C" void nexus_register_strategy(sigma_u32 role_id, void (*heal)(), void (*rollback)()) {
+void nexus_register_strategy(sigma_u32 role_id, void (*heal)(), void (*rollback)()) {
     SigmaOS::Kernel::Profiles::SovereignProfileNexus::getInstance().registerStrategy((SigmaOS::Kernel::Profiles::ProfessionRole)role_id, heal, rollback);
 }
 
-extern "C" void nexus_trigger_resilience() {
+void nexus_trigger_resilience() {
     SigmaOS::Kernel::Profiles::SovereignProfileNexus::getInstance().triggerResilience();
 }
+
+} // extern "C"
+
+} // extern "C"

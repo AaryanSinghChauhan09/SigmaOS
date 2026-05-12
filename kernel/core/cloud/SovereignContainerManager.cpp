@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void container_manager_init() {
+void container_manager_init() {
     SigmaOS::Kernel::Cloud::SovereignContainerManager::init();
 }
 
-extern "C" void container_deploy(const char* hash) {
+void container_deploy(const char* hash) {
     SigmaOS::Kernel::Cloud::SovereignContainerManager::deployContainer(hash);
 }
 
 
 
 
+
+} // extern "C"

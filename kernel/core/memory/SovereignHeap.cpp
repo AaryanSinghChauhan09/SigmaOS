@@ -10,7 +10,7 @@
  * Implements an Industrial Buddy Allocation (IBA) algorithm.
  * ZERO-DEPENDENCY: No external malloc, free, or stdlib.
  *
- * Design: OOP-isolated singleton — SovereignHeapEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignHeapEngine.
  */
 
 class SovereignHeapEngine {
@@ -95,15 +95,15 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void heap_init(void* start, sigma_size_t size) {
+void heap_init(void* start, sigma_size_t size) {
     SovereignHeapEngine::init(start, size);
 }
 
-extern "C" void* sigma_malloc(sigma_size_t size) {
+void* sigma_malloc(sigma_size_t size) {
     return SovereignHeapEngine::allocate(size);
 }
 
-extern "C" void sigma_free(void* ptr) {
+void sigma_free(void* ptr) {
     SovereignHeapEngine::release(ptr);
 }
 
@@ -118,3 +118,7 @@ extern "C" sigma_u32 heap_get_active_allocations() {
 
 
 
+
+} // extern "C"
+
+} // extern "C"

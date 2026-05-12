@@ -10,7 +10,7 @@
  * USP: Routes `sigma_write` and `sigma_read` simultaneously across COM1 serial, 
  * the hardware framebuffer, and IPC socket pipes with zero-copy.
  *
- * Design: OOP-isolated singleton — SovereignStdioEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignStdioEngine.
  */
 
 class SovereignStdioEngine {
@@ -47,14 +47,16 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void stdio_init() {
+void stdio_init() {
     SovereignStdioEngine::init();
 }
 
-extern "C" void stdio_route_write(const char* buffer, sigma_u32 length) {
+void stdio_route_write(const char* buffer, sigma_u32 length) {
     SovereignStdioEngine::routeWrite(buffer, length);
 }
 
 
 
 
+
+} // extern "C"

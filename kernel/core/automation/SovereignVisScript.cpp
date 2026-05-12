@@ -9,7 +9,7 @@
  * Implements a Node-Graph Execution (NGE) algorithm.
  * ZERO-DEPENDENCY: Directly orchestrates automation nodes at the kernel level.
  *
- * Design: OOP-isolated singleton — SovereignVisScriptEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignVisScriptEngine.
  */
 
 class SovereignVisScriptEngine {
@@ -49,14 +49,16 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void visscript_init() {
+void visscript_init() {
     SovereignVisScriptEngine::init();
 }
 
-extern "C" void visscript_execute_graph(const sigma_visscript_node_t* start_node) {
+void visscript_execute_graph(const sigma_visscript_node_t* start_node) {
     SovereignVisScriptEngine::executeGraph(start_node);
 }
 
 
 
 
+
+} // extern "C"

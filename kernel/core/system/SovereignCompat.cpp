@@ -9,7 +9,7 @@
  * Implements a Binary Instruction Translation (BIT) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal foreign binary execution.
  *
- * Design: OOP-isolated singleton — SovereignCompatEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignCompatEngine.
  */
 
 class SovereignCompatEngine {
@@ -50,7 +50,7 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void compat_init() {
+void compat_init() {
     SovereignCompatEngine::init();
 }
 
@@ -58,10 +58,12 @@ extern "C" bool compat_load_binary(const char* path, sigma_compat_mode_t mode) {
     return SovereignCompatEngine::loadBinary(path, mode);
 }
 
-extern "C" void compat_mediate_syscall(sigma_u32 foreign_id, void* args) {
+void compat_mediate_syscall(sigma_u32 foreign_id, void* args) {
     SovereignCompatEngine::mediateSyscall(foreign_id, args);
 }
 
 
 
 
+
+} // extern "C"

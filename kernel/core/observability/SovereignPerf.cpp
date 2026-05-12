@@ -49,19 +49,23 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void perf_init() {
+void perf_init() {
     SigmaOS::Kernel::System::SovereignPerf::init();
 }
 
-extern "C" void perf_profile_shard(sigma_u32 id) {
+void perf_profile_shard(sigma_u32 id) {
     SigmaOS::Kernel::System::SovereignPerf::profileShard(id);
 }
 
-extern "C" void perf_report() {
+void perf_report() {
     SigmaOS::Kernel::System::SovereignPerf::reportHotspots();
 }
 
 
 
 
+
+} // extern "C"

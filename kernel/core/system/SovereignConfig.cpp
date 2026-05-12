@@ -45,12 +45,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void config_init() {
+void config_init() {
     SigmaOS::Kernel::System::SovereignConfigManager::init();
 }
 
-extern "C" void config_set(const char* key, const char* value) {
+void config_set(const char* key, const char* value) {
     SigmaOS::Kernel::System::SovereignConfigManager::setParameter(key, value);
 }
 
@@ -61,3 +63,5 @@ extern "C" const char* config_get(const char* key) {
 
 
 
+
+} // extern "C"

@@ -55,15 +55,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void webapp_bridge_init() {
+void webapp_bridge_init() {
     SigmaOS::Kernel::Industrial::SovereignWebAppBridge::init();
 }
 
-extern "C" void webapp_bridge_inject(const char* name, const char* url) {
+void webapp_bridge_inject(const char* name, const char* url) {
     SigmaOS::Kernel::Industrial::SovereignWebAppBridge::injectWebApp(name, url);
 }
 
 
 
 
+
+} // extern "C"

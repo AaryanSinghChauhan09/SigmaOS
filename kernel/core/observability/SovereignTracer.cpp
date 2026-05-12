@@ -49,15 +49,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void tracer_init() {
+void tracer_init() {
     SigmaOS::Kernel::System::SovereignTracer::init();
 }
 
-extern "C" void tracer_log_instr(sigma_u64 rip, const char* mnemonic) {
+void tracer_log_instr(sigma_u64 rip, const char* mnemonic) {
     SigmaOS::Kernel::System::SovereignTracer::traceInstruction(rip, mnemonic);
 }
 
 
 
 
+
+} // extern "C"

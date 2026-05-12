@@ -24,19 +24,23 @@ void SovereignVFS::listFiles(const char* path) {
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void vfs_init() {
+void vfs_init() {
     SigmaOS::Kernel::FS::SovereignVFS::init();
 }
 
-extern "C" void vfs_mount(const char* source, const char* target) {
+void vfs_mount(const char* source, const char* target) {
     SigmaOS::Kernel::FS::SovereignVFS::mount(source, target);
 }
 
-extern "C" void vfs_list_files(const char* path) {
+void vfs_list_files(const char* path) {
     SigmaOS::Kernel::FS::SovereignVFS::listFiles(path);
 }
 
 
 
 
+
+} // extern "C"

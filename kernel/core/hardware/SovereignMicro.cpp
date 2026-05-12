@@ -9,7 +9,7 @@
  * Implements an Isolated Service Mediation (ISM) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal micro-service isolation.
  *
- * Design: OOP-isolated singleton — SovereignMicroEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignMicroEngine.
  */
 
 class SovereignMicroEngine {
@@ -48,7 +48,7 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void micro_init() {
+void micro_init() {
     SovereignMicroEngine::init();
 }
 
@@ -56,10 +56,12 @@ extern "C" bool micro_spawn_isolated_shard(sigma_u32 shard_id, sigma_micro_conte
     return SovereignMicroEngine::spawnIsolatedShard(shard_id, context);
 }
 
-extern "C" void micro_mediate_ipc(sigma_u32 source_id, sigma_u32 target_id, void* msg) {
+void micro_mediate_ipc(sigma_u32 source_id, sigma_u32 target_id, void* msg) {
     SovereignMicroEngine::mediateIPC(source_id, target_id, msg);
 }
 
 
 
 
+
+} // extern "C"

@@ -26,11 +26,11 @@ static struct {
     .dsi_count = 0
 };
 
-extern "C" void lazyload_init() {
+void lazyload_init() {
     sigma_log("[LAZYLOAD] Initializing Sovereign Lazy-Load Activator (OOPS Isolation)...");
 }
 
-extern "C" void lazyload_register_service(sigma_u32 shard_id, sigma_trigger_type_t trigger) {
+void lazyload_register_service(sigma_u32 shard_id, sigma_trigger_type_t trigger) {
     if (SovereignLazyLoadManager.dsi_count < 32) {
         SovereignLazyLoadManager.dsi_table[SovereignLazyLoadManager.dsi_count++] = {shard_id, trigger, false};
         sigma_log("[LAZYLOAD] DSI: Service Shard S%02d registered for trigger %d.\n", 
@@ -38,7 +38,7 @@ extern "C" void lazyload_register_service(sigma_u32 shard_id, sigma_trigger_type
     }
 }
 
-extern "C" void lazyload_trigger_event(sigma_trigger_type_t trigger, sigma_u32 context_id) {
+void lazyload_trigger_event(sigma_trigger_type_t trigger, sigma_u32 context_id) {
     // DSI (Deferred State Ignition) Algorithm
     // Instantly maps the required service into memory only when its specific event fires.
     
@@ -56,3 +56,5 @@ extern "C" void lazyload_trigger_event(sigma_trigger_type_t trigger, sigma_u32 c
 
 
 
+
+} // extern "C"

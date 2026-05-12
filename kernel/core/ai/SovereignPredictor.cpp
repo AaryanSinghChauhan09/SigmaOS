@@ -37,11 +37,15 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void predictor_init() {
+void predictor_init() {
     SigmaOS::Kernel::AI::SovereignPredictor::init();
 }
 
 
 
 
+
+} // extern "C"

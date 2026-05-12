@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void bt_init() {
+extern "C" {
+
+void bt_init() {
     SigmaOS::Kernel::Hardware::SovereignBluetooth::getInstance().init();
 }
+
+} // extern "C"

@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void amdgpu_init() {
+extern "C" {
+
+void amdgpu_init() {
     SigmaOS::Kernel::Drivers::Hardware::AMDGPUGraphics::initDevice();
 }
+
+} // extern "C"

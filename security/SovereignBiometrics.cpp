@@ -48,8 +48,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void biometrics_init() {
+void biometrics_init() {
     SigmaOS::Kernel::Security::SovereignBiometrics::init();
 }
 
@@ -60,3 +62,5 @@ extern "C" bool biometrics_verify(const char* type, const void* data, sigma_size
 
 
 
+
+} // extern "C"

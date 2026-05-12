@@ -12,17 +12,17 @@
  * ZERO-DEPENDENCY: Strictly bare-metal Rust FFI bridging.
  */
 
-extern "C" void rust_interop_init() {
+void rust_interop_init() {
     sigma_log("[RUST] Initializing Sovereign Rust Interop (SMB Algorithm)...");
 }
 
-extern "C" void* rust_alloc_safe_buffer(sigma_u32 size) {
+void* rust_alloc_safe_buffer(sigma_u32 size) {
     sigma_log("[RUST] SMB: Allocating memory-safe buffer of size %d...\n", size);
     // Simulate safe allocation that Rust FFI expects
     return (void*)0x80000000;
 }
 
-extern "C" void rust_free_safe_buffer(void* ptr) {
+void rust_free_safe_buffer(void* ptr) {
     sigma_log("[RUST] SMB: Releasing memory-safe buffer.");
 }
 
@@ -38,3 +38,7 @@ extern "C" bool rust_execute_safe_driver(sigma_u32 driver_id) {
 
 
 
+
+} // extern "C"
+
+} // extern "C"

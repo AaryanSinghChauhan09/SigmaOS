@@ -3,7 +3,7 @@
  * S SIGMAOS: SOVEREIGN MARKETPLACE INDEXER (P2P Shard)
  * =========================================================================
  * Mission: Implements IDX-002 (Distributed/P2P Marketplace indexing).
- * Layer  : L5 — Industrial Ecosystem / Marketplace
+ * Layer  : L5 ï¿½ Industrial Ecosystem / Marketplace
  * =========================================================================
  */
 
@@ -38,6 +38,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void marketplace_indexer_sync() {
+extern "C" {
+
+void marketplace_indexer_sync() {
     SigmaOS::Kernel::Industrial::SovereignMarketplaceIndexer::syncDistributedLattice();
 }
+
+} // extern "C"

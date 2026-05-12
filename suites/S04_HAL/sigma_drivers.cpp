@@ -41,7 +41,9 @@ public:
 
 } // namespace sigma
 
-extern "C" void start_hal_probe() {
+void start_hal_probe() {
     sigma::DriverLattice drivers;
     drivers.probe_pci_bus();
 }
+
+} // extern "C"

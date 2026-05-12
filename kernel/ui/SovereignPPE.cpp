@@ -35,10 +35,15 @@ private:
 } // namespace UI
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void ux_ppe_predict() {
+
+extern "C" {
+
+void ux_ppe_predict() {
     SigmaOS::Kernel::UI::SovereignPPE::getInstance().predictAdaptation();
 }
 
 
 
 
+
+} // extern "C"

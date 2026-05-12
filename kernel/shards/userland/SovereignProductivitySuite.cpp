@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void prod_init() {
+extern "C" {
+
+void prod_init() {
     SigmaOS::Kernel::Userland::SovereignProductivitySuite::getInstance().init();
 }
+
+} // extern "C"

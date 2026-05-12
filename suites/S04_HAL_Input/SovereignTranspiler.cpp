@@ -10,7 +10,7 @@
  * Automatically maps generic driver logic to specific hardware silicon.
  * ZERO-DEPENDENCY: Universal hardware sharding for x86_64, ARM, RISC-V.
  *
- * Design: OOP-isolated singleton — SovereignTranspilerEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignTranspilerEngine.
  */
 
 class SovereignTranspilerEngine {
@@ -41,11 +41,13 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void transpiler_init() {
+void transpiler_init() {
     SovereignTranspilerEngine::init();
 }
 
-extern "C" void transpiler_auto_map(sigma_u32 device_id) {
+void transpiler_auto_map(sigma_u32 device_id) {
     SovereignTranspilerEngine::autoMap(device_id);
 }
 
+
+} // extern "C"

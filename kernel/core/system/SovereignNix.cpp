@@ -50,14 +50,18 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void nix_init() {
+extern "C" {
+
+void nix_init() {
     SigmaOS::Kernel::Config::SovereignNix::getInstance().init();
 }
 
-extern "C" void nix_apply(const char* path) {
+void nix_apply(const char* path) {
     SigmaOS::Kernel::Config::SovereignNix::getInstance().applyManifest(path);
 }
 
-extern "C" void nix_rollback(sigma_u32 gen) {
+void nix_rollback(sigma_u32 gen) {
     SigmaOS::Kernel::Config::SovereignNix::getInstance().rollback(gen);
 }
+
+} // extern "C"

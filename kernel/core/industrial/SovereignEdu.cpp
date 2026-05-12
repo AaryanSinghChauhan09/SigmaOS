@@ -1,9 +1,9 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN EDU (NCERT Solver Shard)
  * =========================================================================
  * Mission: Implements EDU-001 (Educational absorption from Debian Edu).
- * Layer  : L5 — Industrial Ecosystem / Educational
+ * Layer  : L5 � Industrial Ecosystem / Educational
  * =========================================================================
  */
 
@@ -36,7 +36,12 @@ private:
 } // namespace Industrial
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void edu_solve_ncert(const char* p) {
+
+extern "C" {
+
+void edu_solve_ncert(const char* p) {
     SigmaOS::Kernel::Industrial::SovereignEdu::solvePhysicsProblem(p);
 }
 
+
+} // extern "C"

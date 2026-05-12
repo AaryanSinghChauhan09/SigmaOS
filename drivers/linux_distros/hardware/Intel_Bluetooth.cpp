@@ -40,6 +40,11 @@ private:
 } // namespace Drivers
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void intel_bluetooth_init() {
+
+extern "C" {
+
+void intel_bluetooth_init() {
     SigmaOS::Kernel::Drivers::Hardware::IntelBluetooth::initDevice();
 }
+
+} // extern "C"

@@ -9,9 +9,9 @@
  *
  * USP: Replaces X11 RandR / Wayland output management with a Ring-0 display
  * topology engine. Each monitor is a first-class framebuffer object managed by
- * the Zenith MLC compositor directly — zero userland round-trips.
+ * the Zenith MLC compositor directly ï¿½ zero userland round-trips.
  *
- * Design: OOP-isolated singleton — SovereignMultiMonitorEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignMultiMonitorEngine.
  */
 
 typedef struct {
@@ -66,11 +66,13 @@ private:
     sigma_u32 display_count;
 };
 
-extern "C" void multimon_init() { SovereignMultiMonitorEngine::init(); }
+void multimon_init() { SovereignMultiMonitorEngine::init(); }
 extern "C" sigma_u32 multimon_add(const char* conn, sigma_u32 w, sigma_u32 h, sigma_u32 hz) { return SovereignMultiMonitorEngine::addDisplay(conn, w, h, hz); }
-extern "C" void multimon_arrange(sigma_u32 primary, const char* layout) { SovereignMultiMonitorEngine::setDisplayArrangement(primary, layout); }
-extern "C" void multimon_mirror(sigma_u32 src, sigma_u32 dst) { SovereignMultiMonitorEngine::mirrorDisplays(src, dst); }
+void multimon_arrange(sigma_u32 primary, const char* layout) { SovereignMultiMonitorEngine::setDisplayArrangement(primary, layout); }
+void multimon_mirror(sigma_u32 src, sigma_u32 dst) { SovereignMultiMonitorEngine::mirrorDisplays(src, dst); }
 
 
 
 
+
+} // extern "C"

@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void virt_init() {
+extern "C" {
+
+void virt_init() {
     SigmaOS::Kernel::Virtualization::SovereignVirtualizationEngine::getInstance().init();
 }
+
+} // extern "C"

@@ -10,3 +10,5 @@ void sec_encrypt_file(const char* filename) {
 }
 
 }
+
+} // extern "C"

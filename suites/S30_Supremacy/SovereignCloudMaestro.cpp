@@ -80,7 +80,7 @@ public:
     }
 };
 
-extern "C" void _start(void) {
+void _start(void) {
     CloudMaestro maestro;
     maestro.DeployToCloud("SOVEREIGN_KERNEL_ZENITH");
     maestro.DeployToCloud("APEX_AI_FUSION");
@@ -90,3 +90,5 @@ extern "C" void _start(void) {
     sigma_exit(0);
 }
 
+
+} // extern "C"

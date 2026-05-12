@@ -3,7 +3,7 @@
  * S SIGMAOS: SOVEREIGN DXVK (Vulkan Translation Shard)
  * =========================================================================
  * Mission: Isolated shard for D3D-to-Vulkan translation.
- * Layer  : L5 — Industrial Ecosystem / Multimedia
+ * Layer  : L5 ï¿½ Industrial Ecosystem / Multimedia
  * =========================================================================
  */
 
@@ -35,6 +35,11 @@ private:
 } // namespace Multimedia
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void proton_dxvk_init() {
+
+extern "C" {
+
+void proton_dxvk_init() {
     SigmaOS::Kernel::Multimedia::SovereignDXVK::initializeDXVK();
 }
+
+} // extern "C"

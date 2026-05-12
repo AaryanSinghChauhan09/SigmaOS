@@ -40,10 +40,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sigma_ui_high_contrast(bool enable) {
+extern "C" {
+
+void sigma_ui_high_contrast(bool enable) {
     SigmaOS::Kernel::UI::SovereignAccessibilityShard::enableHighContrast(enable);
 }
 
-extern "C" void sigma_ui_speak(const char* text) {
+void sigma_ui_speak(const char* text) {
     SigmaOS::Kernel::UI::SovereignAccessibilityShard::speakText(text);
 }
+
+} // extern "C"

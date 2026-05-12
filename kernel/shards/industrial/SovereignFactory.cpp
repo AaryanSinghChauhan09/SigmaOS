@@ -48,6 +48,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void factory_init() {
+extern "C" {
+
+void factory_init() {
     SigmaOS::Kernel::Industrial::SovereignFactory::getInstance().init();
 }
+
+} // extern "C"

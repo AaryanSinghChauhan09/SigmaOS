@@ -112,7 +112,9 @@ namespace Multimedia {
 } // namespace Multimedia
 } // namespace SigmaOS
 
-extern "C" void start_camera_zenith() {
+extern "C" {
+
+void start_camera_zenith() {
     unsigned int mmio_base = 0xDEADBEEF;
     SigmaOS::Multimedia::WaitFreeCameraFeed camera(&mmio_base);
     SigmaOS::Multimedia::SnapchatNeuralMesh snap_filter;
@@ -126,3 +128,5 @@ int main() {
     start_camera_zenith();
     return 0;
 }
+
+} // extern "C"

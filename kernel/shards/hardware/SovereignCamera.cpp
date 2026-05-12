@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void cam_init() {
+extern "C" {
+
+void cam_init() {
     SigmaOS::Kernel::Hardware::SovereignCamera::getInstance().init();
 }
+
+} // extern "C"

@@ -59,7 +59,9 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void start_aikernel_zenith() {
+extern "C" {
+
+void start_aikernel_zenith() {
     SigmaOS::Kernel::SovereignAIKernel ai;
 
     ai.predict_user_intent("Double-Click Launcher");
@@ -73,3 +75,5 @@ int main() {
     return 0;
 }
 
+
+} // extern "C"

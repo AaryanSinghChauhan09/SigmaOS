@@ -3,7 +3,7 @@
  * S SIGMAOS: SOVEREIGN CLOUD IMAGE (CLD-002)
  * =========================================================================
  * Mission: Generates production-ready cloud images (AMI/GCP/Azure).
- * Layer  : L5 — Industrial Ecosystem / Deployment
+ * Layer  : L5 ï¿½ Industrial Ecosystem / Deployment
  * =========================================================================
  */
 
@@ -46,7 +46,11 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void cloud_image_generate(const char* provider) {
+extern "C" {
+
+void cloud_image_generate(const char* provider) {
     SigmaOS::Kernel::Deployment::SovereignCloudImage::generateMetadata(provider);
     SigmaOS::Kernel::Deployment::SovereignCloudImage::finalizeImage();
 }
+
+} // extern "C"

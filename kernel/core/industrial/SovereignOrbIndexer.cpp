@@ -3,7 +3,7 @@
  * S SIGMAOS: SOVEREIGN ORB INDEXER (P2P Metadata Indexer)
  * =========================================================================
  * Mission: Implements IDX-001 to provide decentralized Orb discovery.
- * Layer  : L5 — Industrial Ecosystem
+ * Layer  : L5 ï¿½ Industrial Ecosystem
  * =========================================================================
  */
 
@@ -44,10 +44,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void orb_indexer_init() {
+extern "C" {
+
+void orb_indexer_init() {
     SigmaOS::Kernel::Industrial::SovereignOrbIndexer::buildMetadataIndex();
 }
 
-extern "C" void orb_indexer_query(const char* q) {
+void orb_indexer_query(const char* q) {
     SigmaOS::Kernel::Industrial::SovereignOrbIndexer::queryOrb(q);
 }
+
+} // extern "C"

@@ -44,10 +44,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void zenith_a11y_contrast_toggle() {
+extern "C" {
+
+void zenith_a11y_contrast_toggle() {
     SigmaOS::Kernel::UI::ZenithAccessibility::enableHighContrast();
 }
 
-extern "C" void zenith_a11y_reader_start() {
+void zenith_a11y_reader_start() {
     SigmaOS::Kernel::UI::ZenithAccessibility::initializeScreenReader();
 }
+
+} // extern "C"

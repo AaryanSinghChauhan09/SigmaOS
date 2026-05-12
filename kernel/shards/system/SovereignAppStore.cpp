@@ -9,7 +9,7 @@
 
 #include "kernel/core/package_nexus.hpp"
 
-extern "C" void start_package_zenith() {
+void start_package_zenith() {
     SigmaOS::PackageForge::SovereignPackageNexus store;
     store.VetHardwareSignature("ZENITH_PHYSICS_IMPROVED");
     store.InstallSandboxedShard("ZENITH_PHYSICS_IMPROVED");
@@ -20,3 +20,5 @@ int main() {
     start_package_zenith();
     return 0;
 }
+
+} // extern "C"

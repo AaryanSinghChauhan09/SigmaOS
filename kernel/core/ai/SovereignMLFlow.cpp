@@ -55,14 +55,18 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void ml_flow_init() {
+extern "C" {
+
+void ml_flow_init() {
     SigmaOS::Kernel::AI::SovereignMLFlow::getInstance().init();
 }
 
-extern "C" void ml_flow_log_metric(sigma_u32 id, const char* name, float val) {
+void ml_flow_log_metric(sigma_u32 id, const char* name, float val) {
     SigmaOS::Kernel::AI::SovereignMLFlow::getInstance().logMetric(id, name, val);
 }
 
-extern "C" void ml_flow_save(const char* name) {
+void ml_flow_save(const char* name) {
     SigmaOS::Kernel::AI::SovereignMLFlow::getInstance().saveExperiment(name);
 }
+
+} // extern "C"

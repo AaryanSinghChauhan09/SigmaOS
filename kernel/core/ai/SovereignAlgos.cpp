@@ -3,7 +3,7 @@
 #include "sigma_log.h"
 
 /**
- * SovereignAlgos — High-performance algorithmic primitives for SigmaOS.
+ * SovereignAlgos ï¿½ High-performance algorithmic primitives for SigmaOS.
  * Inspired by github.com/TheAlgorithms.
  * Provides zero-STL, kernel-safe implementations of core algorithms.
  */
@@ -53,11 +53,15 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void sigma_algo_fft(float* data, unsigned long count) {
+void sigma_algo_fft(float* data, unsigned long count) {
     SigmaOS::Kernel::AI::SovereignAlgos::computeFFT(data, count);
 }
 
-extern "C" void sigma_algo_sort(unsigned int* arr, int count) {
+void sigma_algo_sort(unsigned int* arr, int count) {
     SigmaOS::Kernel::AI::SovereignAlgos::quickSort(arr, 0, count - 1);
 }
+
+} // extern "C"

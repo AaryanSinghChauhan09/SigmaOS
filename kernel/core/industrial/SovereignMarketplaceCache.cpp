@@ -3,7 +3,7 @@
  * S SIGMAOS: SOVEREIGN MARKETPLACE CACHE (IDX-003)
  * =========================================================================
  * Mission: Implements caching and fallback mirrors for the P2P indexer.
- * Layer  : L5 — Industrial Ecosystem / Marketplace
+ * Layer  : L5 ï¿½ Industrial Ecosystem / Marketplace
  * =========================================================================
  */
 
@@ -44,10 +44,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void marketplace_cache_init() {
+extern "C" {
+
+void marketplace_cache_init() {
     SigmaOS::Kernel::Industrial::SovereignMarketplaceCache::refreshCache();
 }
 
 extern "C" int marketplace_fetch_fallback(const char* name) {
     return SigmaOS::Kernel::Industrial::SovereignMarketplaceCache::fetchFromMirror(name) ? 1 : 0;
 }
+
+} // extern "C"

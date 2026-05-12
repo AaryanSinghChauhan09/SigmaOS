@@ -47,15 +47,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void web_bridge_init() {
+void web_bridge_init() {
     SigmaOS::Kernel::Network::SovereignWebBridge::init();
 }
 
-extern "C" void web_bridge_connect(const char* url) {
+void web_bridge_connect(const char* url) {
     SigmaOS::Kernel::Network::SovereignWebBridge::connect(url);
 }
 
 
 
 
+
+} // extern "C"

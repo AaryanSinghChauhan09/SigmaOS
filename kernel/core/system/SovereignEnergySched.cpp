@@ -14,12 +14,12 @@
 
 static sigma_energy_state_t shard_energy_states[600];
 
-extern "C" void energysched_init() {
+void energysched_init() {
     sigma_log("[ENERGYSCHED] Initializing Sovereign Energy-Aware Scheduler (DST Algorithm)...");
     for(int i=0; i<600; i++) shard_energy_states[i] = ENERGY_STATE_ACTIVE;
 }
 
-extern "C" void energysched_evaluate_power() {
+void energysched_evaluate_power() {
     // DST (Dynamic Silicon Throttling) Algorithm
     // Evaluates current power draw and aggressively throttles non-critical shards.
     
@@ -35,7 +35,7 @@ extern "C" void energysched_evaluate_power() {
     sigma_log("[ENERGYSCHED] DST: Power optimization COMPLETE. Energy profile is GREEN.");
 }
 
-extern "C" void energysched_set_shard_state(sigma_u32 shard_id, sigma_energy_state_t state) {
+void energysched_set_shard_state(sigma_u32 shard_id, sigma_energy_state_t state) {
     if (shard_id < 600) {
         shard_energy_states[shard_id] = state;
         sigma_log("[ENERGYSCHED] Shard S%02d energy state set to %d.\n", shard_id, (int)state);
@@ -44,3 +44,5 @@ extern "C" void energysched_set_shard_state(sigma_u32 shard_id, sigma_energy_sta
 
 
 
+
+} // extern "C"

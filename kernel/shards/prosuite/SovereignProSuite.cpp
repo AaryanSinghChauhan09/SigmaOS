@@ -24,6 +24,10 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sovereignprosuite_init() {
+extern "C" {
+
+void sovereignprosuite_init() {
     SigmaOS::Kernel::SovereignProSuite::getInstance().init();
 }
+
+} // extern "C"

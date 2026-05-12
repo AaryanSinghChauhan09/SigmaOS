@@ -51,15 +51,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void cron_init() {
+void cron_init() {
     SigmaOS::Kernel::Automation::SovereignCron::init();
 }
 
-extern "C" void cron_schedule(const char* task, sigma_u32 ms) {
+void cron_schedule(const char* task, sigma_u32 ms) {
     SigmaOS::Kernel::Automation::SovereignCron::scheduleTask(task, ms);
 }
 
 
 
 
+
+} // extern "C"

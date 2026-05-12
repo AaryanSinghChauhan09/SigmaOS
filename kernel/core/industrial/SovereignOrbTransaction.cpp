@@ -3,7 +3,7 @@
  * S SIGMAOS: SOVEREIGN ORB TRANSACTION (Rollback Shard)
  * =========================================================================
  * Mission: Implements atomic transactions and rollbacks for Orbs.
- * Layer  : L5 — Industrial Ecosystem
+ * Layer  : L5 ï¿½ Industrial Ecosystem
  * =========================================================================
  */
 
@@ -45,14 +45,19 @@ private:
 } // namespace Industrial
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void orb_tx_begin(const char* name) {
+
+extern "C" {
+
+void orb_tx_begin(const char* name) {
     SigmaOS::Kernel::Industrial::SovereignOrbTransaction::beginTransaction(name);
 }
 
-extern "C" void orb_tx_commit() {
+void orb_tx_commit() {
     SigmaOS::Kernel::Industrial::SovereignOrbTransaction::commitTransaction();
 }
 
-extern "C" void orb_tx_rollback() {
+void orb_tx_rollback() {
     SigmaOS::Kernel::Industrial::SovereignOrbTransaction::rollbackTransaction();
 }
+
+} // extern "C"

@@ -24,6 +24,10 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sovereignvmm_init() {
+extern "C" {
+
+void sovereignvmm_init() {
     SigmaOS::Kernel::SovereignVMM::getInstance().init();
 }
+
+} // extern "C"

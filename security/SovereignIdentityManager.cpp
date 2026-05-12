@@ -54,8 +54,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void identity_init() {
+void identity_init() {
     SigmaOS::Kernel::Security::SovereignIdentityManager::init();
 }
 
@@ -66,3 +68,5 @@ extern "C" bool identity_verify(const char* id, sigma_u32 mask) {
 
 
 
+
+} // extern "C"

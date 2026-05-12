@@ -71,6 +71,8 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
 extern "C" {
     void sigma_attestation_init() {
@@ -81,3 +83,5 @@ extern "C" {
         return SigmaOS::Kernel::Security::SovereignAttestationShard::verifyIntegrity() ? 1 : 0;
     }
 }
+
+} // extern "C"

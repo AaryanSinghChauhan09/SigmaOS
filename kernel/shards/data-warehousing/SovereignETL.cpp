@@ -69,18 +69,22 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void etl_init() {
+extern "C" {
+
+void etl_init() {
     SigmaOS::Kernel::Data::SovereignETL::getInstance().init();
 }
 
-extern "C" void etl_enqueue(const char* id, const char* src, const char* dst) {
+void etl_enqueue(const char* id, const char* src, const char* dst) {
     SigmaOS::Kernel::Data::SovereignETL::getInstance().enqueueJob(id, src, dst);
 }
 
-extern "C" void etl_run() {
+void etl_run() {
     SigmaOS::Kernel::Data::SovereignETL::getInstance().runPipeline();
 }
 
-extern "C" void etl_check(const char* ds_id) {
+void etl_check(const char* ds_id) {
     SigmaOS::Kernel::Data::SovereignETL::getInstance().checkIntegrity(ds_id);
 }
+
+} // extern "C"

@@ -52,8 +52,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void verifier_init() {
+void verifier_init() {
     SigmaOS::Kernel::Security::SovereignFormalVerifier::init();
 }
 
@@ -64,3 +66,5 @@ extern "C" bool verifier_verify_shard(const char* id, void* ptr) {
 
 
 
+
+} // extern "C"

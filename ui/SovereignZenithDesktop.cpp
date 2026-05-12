@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void zenith_desktop_init() {
+void zenith_desktop_init() {
     SigmaOS::Kernel::UI::SovereignZenithDesktop::init();
 }
 
-extern "C" void zenith_render(const char* context) {
+void zenith_render(const char* context) {
     SigmaOS::Kernel::UI::SovereignZenithDesktop::renderWorkspace(context);
 }
 
 
 
 
+
+} // extern "C"

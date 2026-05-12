@@ -11,7 +11,7 @@
 
 #include "kernel/diagnostics/hardware_audit.hpp"
 
-extern "C" void _start(void) {
+void _start(void) {
     sigma_log("--- Σ SIGMA OS SOVEREIGN HARDWARE AUDIT (ZENITH) ---\n");
     SigmaOS::Diagnostics::SovereignHardwareAudit audit;
     audit.AuditProcessors();
@@ -20,3 +20,5 @@ extern "C" void _start(void) {
     sigma_log("[SUCCESS]: All Hardware Shards mapped via Silicon-Direct APEX-API.\n");
     sigma_exit(0);
 }
+
+} // extern "C"

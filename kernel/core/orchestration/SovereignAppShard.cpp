@@ -39,14 +39,18 @@ void SovereignAppShard::listActiveShards() {
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void shard_layer_init() {
+void shard_layer_init() {
     SigmaOS::Kernel::Core::SovereignAppShard::init();
 }
 
-extern "C" void shard_orchestrate(const char* id) {
+void shard_orchestrate(const char* id) {
     SigmaOS::Kernel::Core::SovereignAppShard::orchestrate(id);
 }
 
 
 
+
+} // extern "C"

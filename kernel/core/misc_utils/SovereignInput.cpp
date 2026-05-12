@@ -58,11 +58,11 @@ private:
     sigma_u32 queue_tail;
 };
 
-extern "C" void input_init() {
+void input_init() {
     SovereignInputEngine::init();
 }
 
-extern "C" void input_push_event(sigma_key_event_t* event) {
+void input_push_event(sigma_key_event_t* event) {
     SovereignInputEngine::pushEvent(event);
 }
 
@@ -73,3 +73,5 @@ extern "C" bool input_pop_event(sigma_key_event_t* out_event) {
 
 
 
+
+} // extern "C"

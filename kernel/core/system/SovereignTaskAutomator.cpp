@@ -11,7 +11,7 @@
  * USP: Instantly automate any system UI or CLI action natively via 
  * semantic event parsing. No external tools like AutoHotkey needed.
  *
- * Design: OOP-isolated singleton — SovereignAutomationEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignAutomationEngine.
  */
 
 typedef struct {
@@ -75,26 +75,28 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void taskautomator_init() {
+void taskautomator_init() {
     SovereignAutomationEngine::init();
 }
 
-extern "C" void taskautomator_create_rule(const char* nlp_trigger, const char* action) {
+void taskautomator_create_rule(const char* nlp_trigger, const char* action) {
     SovereignAutomationEngine::createRule(nlp_trigger, action);
 }
 
-extern "C" void taskautomator_evaluate_rules() {
+void taskautomator_evaluate_rules() {
     SovereignAutomationEngine::evaluateRules();
 }
 
-extern "C" void taskautomator_start_macro() {
+void taskautomator_start_macro() {
     SovereignAutomationEngine::startMacroRecording();
 }
 
-extern "C" void taskautomator_stop_macro() {
+void taskautomator_stop_macro() {
     SovereignAutomationEngine::stopMacroRecording();
 }
 
 
 
 
+
+} // extern "C"

@@ -54,15 +54,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void explorer_init_shard() {
+void explorer_init_shard() {
     SigmaOS::Kernel::FS::SovereignExplorer::init();
 }
 
-extern "C" void explorer_nav_shard(const char* path) {
+void explorer_nav_shard(const char* path) {
     SigmaOS::Kernel::FS::SovereignExplorer::navigate(path);
 }
 
 
 
 
+
+} // extern "C"

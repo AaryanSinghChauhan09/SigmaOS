@@ -47,7 +47,7 @@ public:
     }
 };
 
-extern "C" void _start(void) {
+void _start(void) {
     SovereignForensicMatrix forensics;
     forensics.CreateDMAShardImage("NVME_SHARD_R0");
     forensics.AnalyzeMemoryShard("RAM_DUMP_01");
@@ -59,3 +59,5 @@ extern "C" void _start(void) {
 
 
 
+
+} // extern "C"

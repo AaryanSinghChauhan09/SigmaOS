@@ -65,11 +65,13 @@ private:
     sigma_u32 networks_scanned;
 };
 
-extern "C" void wifi_init() { SovereignWiFiEngine::init(); }
+void wifi_init() { SovereignWiFiEngine::init(); }
 extern "C" sigma_u32 wifi_scan() { return SovereignWiFiEngine::scan(); }
 extern "C" bool wifi_connect(const char* ssid, const char* pass, sigma_u32 sec) { return SovereignWiFiEngine::connect(ssid, pass, (sigma_wifi_security_t)sec); }
-extern "C" void wifi_disconnect() { SovereignWiFiEngine::disconnect(); }
+void wifi_disconnect() { SovereignWiFiEngine::disconnect(); }
 
 
 
 
+
+} // extern "C"

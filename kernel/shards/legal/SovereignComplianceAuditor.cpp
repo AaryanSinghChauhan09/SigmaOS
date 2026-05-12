@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void comply_init() {
+extern "C" {
+
+void comply_init() {
     SigmaOS::Kernel::Legal::SovereignComplianceAuditor::getInstance().init();
 }
+
+} // extern "C"

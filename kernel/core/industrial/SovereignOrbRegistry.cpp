@@ -55,8 +55,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void orbreg_init() {
+void orbreg_init() {
     SigmaOS::Kernel::Industrial::SovereignOrbRegistry::init();
 }
 
@@ -64,10 +66,12 @@ extern "C" bool orbreg_register(const char* name, const char* cid) {
     return SigmaOS::Kernel::Industrial::SovereignOrbRegistry::registerOrb(name, cid);
 }
 
-extern "C" void orbreg_list() {
+void orbreg_list() {
     SigmaOS::Kernel::Industrial::SovereignOrbRegistry::listOrbs();
 }
 
 
 
 
+
+} // extern "C"

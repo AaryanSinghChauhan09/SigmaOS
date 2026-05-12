@@ -44,6 +44,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void nuclear_init() {
+extern "C" {
+
+void nuclear_init() {
     SigmaOS::Kernel::Industrial::SovereignNuclearReactor::getInstance().init();
 }
+
+} // extern "C"

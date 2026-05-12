@@ -23,7 +23,7 @@
  * sigma_hardened_strcpy — CWE-119 fix for unsafe strcpy usage.
  * All string copies in the lattice MUST use this instead of strcpy.
  */
-extern "C" void sigma_hardened_strcpy(char* dest, const char* src, sigma_size_t max_len) {
+void sigma_hardened_strcpy(char* dest, const char* src, sigma_size_t max_len) {
     if (!dest || !src || max_len == 0) return;  /* CWE-20: Input validation */
 
     sigma_size_t i = 0;
@@ -45,12 +45,12 @@ extern "C" int sigma_hardened_snprintf(char* dest, sigma_size_t max_len, const c
     return 0;
 }
 
-extern "C" void sechardener_init() {
+void sechardener_init() {
     sigma_log("[SECHARDENER] *** SHARD #500 ONLINE *** Sovereign Security Hardener (PLPE Algorithm)...");
     sigma_log("[SECHARDENER] PLPE: Enforcing Principle of Least Privilege across all 500 shards.");
 }
 
-extern "C" void sechardener_apply_to_shard(sigma_u32 shard_id, sigma_harden_level_t level) {
+void sechardener_apply_to_shard(sigma_u32 shard_id, sigma_harden_level_t level) {
     /**
      * PLPE (Principle of Least Privilege Enforcement) Algorithm:
      * Level 0 — BASELINE: ASLR randomization + stack canary injection.
@@ -70,7 +70,7 @@ extern "C" void sechardener_apply_to_shard(sigma_u32 shard_id, sigma_harden_leve
     }
 }
 
-extern "C" void sechardener_validate_buffer(const void* buf, sigma_u32 claimed_size, sigma_u32 actual_capacity) {
+void sechardener_validate_buffer(const void* buf, sigma_u32 claimed_size, sigma_u32 actual_capacity) {
     /* CWE-119 runtime guard — called at every shard public API boundary */
     if (!buf) {
         sigma_log("[SECHARDENER] ❌ PLPE: NULL buffer passed to public API. REJECTED.");
@@ -84,7 +84,7 @@ extern "C" void sechardener_validate_buffer(const void* buf, sigma_u32 claimed_s
     sigma_log("[SECHARDENER] ✅ PLPE: Buffer validation passed.");
 }
 
-extern "C" void sechardener_audit_all_shards() {
+void sechardener_audit_all_shards() {
     /* PLPE full-lattice security posture sweep */
     sigma_log("[SECHARDENER] PLPE: Initiating full 500-shard security posture audit...");
     sigma_log("[SECHARDENER] PLPE: Checking S-ZeroNet ICT boundaries...");
@@ -96,3 +96,5 @@ extern "C" void sechardener_audit_all_shards() {
 
 
 
+
+} // extern "C"

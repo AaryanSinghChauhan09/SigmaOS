@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void studio_init() {
+extern "C" {
+
+void studio_init() {
     SigmaOS::Kernel::Userland::SovereignAppStudio::getInstance().init();
 }
+
+} // extern "C"

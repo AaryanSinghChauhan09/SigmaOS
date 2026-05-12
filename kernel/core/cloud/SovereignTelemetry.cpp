@@ -10,7 +10,7 @@
  * ZERO-DEPENDENCY: Strictly bare-metal silicon observability.
  */
 
-extern "C" void telemetry_init() {
+void telemetry_init() {
     sigma_log("[TELEMETRY] Initializing Sovereign System Telemetry...");
 }
 
@@ -30,9 +30,11 @@ extern "C" sigma_telemetry_data_t telemetry_get_snapshot() {
     return data;
 }
 
-extern "C" void telemetry_log_shard_event(sigma_u32 shard_id, const char* event) {
+void telemetry_log_shard_event(sigma_u32 shard_id, const char* event) {
     sigma_log("[TELEMETRY] Shard S%02d Event: %s\n", shard_id, event);
 }
 
 
 
+
+} // extern "C"

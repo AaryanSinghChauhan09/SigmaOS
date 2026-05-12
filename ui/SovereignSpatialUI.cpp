@@ -55,11 +55,13 @@ private:
     char corner_actions[4][32];
 };
 
-extern "C" void spatial_ui_init() { SovereignSpatialUIEngine::init(); }
-extern "C" void spatial_ui_set_corner(sigma_u32 corner, const char* action) { SovereignSpatialUIEngine::setHotCorner((sigma_corner_t)corner, action); }
-extern "C" void spatial_ui_trigger_corner(sigma_u32 corner) { SovereignSpatialUIEngine::triggerCorner((sigma_corner_t)corner); }
-extern "C" void spatial_ui_snap_window(sigma_u32 wid, const char* zone) { SovereignSpatialUIEngine::snapWindow(wid, zone); }
+void spatial_ui_init() { SovereignSpatialUIEngine::init(); }
+void spatial_ui_set_corner(sigma_u32 corner, const char* action) { SovereignSpatialUIEngine::setHotCorner((sigma_corner_t)corner, action); }
+void spatial_ui_trigger_corner(sigma_u32 corner) { SovereignSpatialUIEngine::triggerCorner((sigma_corner_t)corner); }
+void spatial_ui_snap_window(sigma_u32 wid, const char* zone) { SovereignSpatialUIEngine::snapWindow(wid, zone); }
 
 
 
 
+
+} // extern "C"

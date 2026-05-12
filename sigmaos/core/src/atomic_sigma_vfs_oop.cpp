@@ -83,3 +83,5 @@ extern "C" {
         vfs.shutdown();
     }
 }
+
+} // extern "C"

@@ -49,8 +49,10 @@ bool SovereignSandboxEngine::hasCapability(const char* shard_name, const char* c
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void sandbox_init() {
+void sandbox_init() {
     SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().init();
 }
 
@@ -62,7 +64,7 @@ extern "C" int sandbox_execute(sigma_u32 container_id, const char* binary_path) 
     return SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().execute(container_id, binary_path) ? 1 : 0;
 }
 
-extern "C" void sandbox_destroy_container(sigma_u32 container_id) {
+void sandbox_destroy_container(sigma_u32 container_id) {
     SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().destroyContainer(container_id);
 }
 
@@ -77,3 +79,5 @@ extern "C" int sandbox_has_capability(const char* shard_name, const char* capabi
 extern "C" int sandbox_validate_mac(const char* subject, const char* object, const char* action) {
     return SigmaOS::Kernel::Security::SovereignSandboxEngine::getInstance().validateMACPolicy(subject, object, action) ? 1 : 0;
 }
+
+} // extern "C"

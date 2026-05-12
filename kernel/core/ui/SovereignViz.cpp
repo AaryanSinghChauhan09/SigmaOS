@@ -47,14 +47,18 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void viz_init() {
+extern "C" {
+
+void viz_init() {
     SigmaOS::Kernel::Visualization::SovereignViz::getInstance().init();
 }
 
-extern "C" void viz_render_er(const char* json) {
+void viz_render_er(const char* json) {
     SigmaOS::Kernel::Visualization::SovereignViz::getInstance().renderERDiagram(json);
 }
 
-extern "C" void viz_plot(const float* data, sigma_usize len) {
+void viz_plot(const float* data, sigma_usize len) {
     SigmaOS::Kernel::Visualization::SovereignViz::getInstance().plotTimeseries(data, len);
 }
+
+} // extern "C"

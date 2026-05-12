@@ -24,6 +24,10 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sovereignanonymity_init() {
+extern "C" {
+
+void sovereignanonymity_init() {
     SigmaOS::Kernel::SovereignAnonymity::getInstance().init();
 }
+
+} // extern "C"

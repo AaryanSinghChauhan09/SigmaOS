@@ -12,7 +12,7 @@
  * ZERO-DEPENDENCY: Strictly bare-metal integrity auditing.
  */
 
-extern "C" void sic_init() {
+void sic_init() {
     sigma_log("[SIC] Initializing Sovereign Integrity Checksum Nexus...");
 }
 
@@ -51,3 +51,5 @@ extern "C" bool sic_verify_token(sigma_u32 shard_id, sigma_sic_token_t token) {
 
 
 
+
+} // extern "C"

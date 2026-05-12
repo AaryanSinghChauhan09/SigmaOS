@@ -64,8 +64,10 @@ private:
 } // namespace AI
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void bridge_get_snapshot() {
+void bridge_get_snapshot() {
     SigmaOS::AI::SovereignKernelBridge::getSystemSnapshot();
 }
 
@@ -74,8 +76,10 @@ extern "C" int bridge_verify_shard(const char* path) {
         SigmaOS::AI::SovereignKernelBridge::ShardPath{path}) ? 1 : 0;
 }
 
-extern "C" void bridge_emit_hint(const char* type, const char* data) {
+void bridge_emit_hint(const char* type, const char* data) {
     SigmaOS::AI::SovereignKernelBridge::emitHint(
         SigmaOS::AI::SovereignKernelBridge::HintType{type},
         SigmaOS::AI::SovereignKernelBridge::HintData{data});
 }
+
+} // extern "C"

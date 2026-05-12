@@ -10,3 +10,5 @@ void comp_split(const char* component_name) {
 }
 
 }
+
+} // extern "C"

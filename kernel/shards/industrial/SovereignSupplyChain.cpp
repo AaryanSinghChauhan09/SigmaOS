@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void chain_init() {
+extern "C" {
+
+void chain_init() {
     SigmaOS::Kernel::Industrial::SovereignSupplyChain::getInstance().init();
 }
+
+} // extern "C"

@@ -50,15 +50,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void ha_core_init() {
+void ha_core_init() {
     SigmaOS::Kernel::Cloud::SovereignHACore::init();
 }
 
-extern "C" void ha_core_failover(const char* node) {
+void ha_core_failover(const char* node) {
     SigmaOS::Kernel::Cloud::SovereignHACore::handleFailover(node);
 }
 
 
 
 
+
+} // extern "C"

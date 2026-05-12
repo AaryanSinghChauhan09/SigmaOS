@@ -4,7 +4,7 @@
  * =========================================================================
  * Mission: Absorbs the service management maturity of systemd/OpenRC
  *          into a decentralized, AI-driven Lattice Orchestrator.
- * Layer  : L3 — System Orchestration
+ * Layer  : L3 ï¿½ System Orchestration
  * =========================================================================
  */
 
@@ -12,7 +12,7 @@
 #include "sigma_log.h"
 #include "core/SigmaOOP.hpp"
 
-extern "C" void fhs_init();
+void fhs_init();
 
 namespace SigmaOS {
 namespace Kernel {
@@ -53,10 +53,16 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void init_system_start() {
+extern "C" {
+
+void init_system_start() {
     SigmaOS::Kernel::Orchestration::SovereignInit::init();
 }
 
-extern "C" void init_service_spawn(const char* name) {
+void init_service_spawn(const char* name) {
     SigmaOS::Kernel::Orchestration::SovereignInit::startService(name);
 }
+
+} // extern "C"
+
+} // extern "C"

@@ -50,12 +50,14 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void shell_init() {
+void shell_init() {
     SovereignShell::getInstance().init();
 }
 
-extern "C" void shell_exec(const char* cmd) {
+void shell_exec(const char* cmd) {
     SovereignShell::getInstance().executeCommand(cmd);
 }
 
 
+
+} // extern "C"

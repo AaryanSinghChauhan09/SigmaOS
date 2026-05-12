@@ -49,8 +49,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void sasos_init() {
+void sasos_init() {
     SigmaOS::Kernel::Memory::SovereignSASOS::init();
 }
 
@@ -58,10 +60,12 @@ extern "C" sigma_u32 sasos_register(const char* shard) {
     return SigmaOS::Kernel::Memory::SovereignSASOS::registerShardDomain(shard);
 }
 
-extern "C" void sasos_switch(sigma_u32 pkey) {
+void sasos_switch(sigma_u32 pkey) {
     SigmaOS::Kernel::Memory::SovereignSASOS::switchDomain(pkey);
 }
 
 
 
 
+
+} // extern "C"

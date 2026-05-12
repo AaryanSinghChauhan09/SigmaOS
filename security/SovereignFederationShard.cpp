@@ -51,8 +51,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void federation_init() {
+void federation_init() {
     SigmaOS::Kernel::Security::SovereignFederationShard::init();
 }
 
@@ -63,3 +65,5 @@ extern "C" bool federation_sso(const char* dom, const char* prot) {
 
 
 
+
+} // extern "C"

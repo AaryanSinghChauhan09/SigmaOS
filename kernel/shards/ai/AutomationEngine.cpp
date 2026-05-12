@@ -66,7 +66,9 @@ public:
 } // namespace Automation
 } // namespace SigmaOS
 
-extern "C" void start_automation_engine() {
+extern "C" {
+
+void start_automation_engine() {
     SigmaOS::Automation::MorphicAutomationEngine engine;
     
     engine.register_recipe("Thermal-Balance", "CPU > 80C", "Fan-Sharding-Max");
@@ -79,3 +81,5 @@ extern "C" void start_automation_engine() {
 
     engine.audit_performance();
 }
+
+} // extern "C"

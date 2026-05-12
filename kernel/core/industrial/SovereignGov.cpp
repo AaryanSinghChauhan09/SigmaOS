@@ -48,14 +48,18 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void gov_init() {
+extern "C" {
+
+void gov_init() {
     SigmaOS::Kernel::Government::SovereignGov::getInstance().init();
 }
 
-extern "C" void gov_attest_policy(const char* hash) {
+void gov_attest_policy(const char* hash) {
     SigmaOS::Kernel::Government::SovereignGov::getInstance().attestPolicy(hash);
 }
 
-extern "C" void gov_run_sim() {
+void gov_run_sim() {
     SigmaOS::Kernel::Government::SovereignGov::getInstance().runUrbanSim();
 }
+
+} // extern "C"

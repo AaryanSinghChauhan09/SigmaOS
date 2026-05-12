@@ -54,8 +54,10 @@ bool SovereignDAL::removePackage(const char* name) {
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void sigma_dal_init() {
+void sigma_dal_init() {
     SigmaOS::Kernel::System::SovereignDAL::getInstance().initialize();
 }
 
@@ -68,3 +70,5 @@ extern "C" int sigma_dal_remove(const char* pkg) {
 }
 
 
+
+} // extern "C"

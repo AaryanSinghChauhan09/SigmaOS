@@ -22,23 +22,23 @@ public:
     }
 
     void init() {
-        sigma_log("[AUDIO] Initializing Sovereign Audio Stack (Zero-Copy DMA)...");
+        sigma_log_info("[AUDIO] Initializing Sovereign Audio Stack (Zero-Copy DMA)...");
         this->active_streams = 0;
         this->sample_rate = 48000;
-        sigma_log("[AUDIO] DMA audio pipeline ARMED. Latency < 1ms.");
+        sigma_log_info("[AUDIO] DMA audio pipeline ARMED. Latency < 1ms.");
     }
 
     sigma_u32 openStream(const char* app_name, sigma_u32 channels) {
         if (this->active_streams >= 16) return 0;
         this->active_streams++;
-        sigma_log("[AUDIO] Stream opened for '%s' (%u ch @ %u Hz). Active: %u\n",
+        sigma_log_info("[AUDIO] Stream opened for '%s' (%u ch @ %u Hz). Active: %u",
                      app_name, channels, this->sample_rate, this->active_streams);
         return this->active_streams;
     }
 
     void closeStream(sigma_u32 stream_id) {
         if (this->active_streams > 0) this->active_streams--;
-        sigma_log("[AUDIO] Stream %u closed. Active: %u\n", stream_id, this->active_streams);
+        sigma_log_info("[AUDIO] Stream %u closed. Active: %u", stream_id, this->active_streams);
     }
 
 private:
@@ -48,7 +48,7 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void audio_init() {
+void audio_init() {
     SovereignAudioEngine::getInstance().init();
 }
 
@@ -56,10 +56,12 @@ extern "C" sigma_u32 audio_open_stream(const char* app, sigma_u32 channels) {
     return SovereignAudioEngine::getInstance().openStream(app, channels);
 }
 
-extern "C" void audio_close_stream(sigma_u32 id) {
+void audio_close_stream(sigma_u32 id) {
     SovereignAudioEngine::getInstance().closeStream(id);
 }
 
 
 
 
+
+} // extern "C"

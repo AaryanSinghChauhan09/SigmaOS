@@ -63,6 +63,12 @@ private:
 } // namespace Runtime
 } // namespace SigmaOS
 
-extern "C" void* sigma_aot_compile(const void* buffer, sigma_usize size) {
+extern "C" {
+
+void* sigma_aot_compile(const void* buffer, sigma_usize size) {
     return SigmaOS::Runtime::AOTCompiler::getInstance().compile(buffer, size);
 }
+
+} // extern "C"
+
+} // extern "C"

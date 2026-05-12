@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void threat_hunter_init() {
+void threat_hunter_init() {
     SigmaOS::Kernel::Security::SovereignThreatHunter::init();
 }
 
-extern "C" void threat_hunter_audit(const char* target) {
+void threat_hunter_audit(const char* target) {
     SigmaOS::Kernel::Security::SovereignThreatHunter::executeAudit(target);
 }
 
 
 
 
+
+} // extern "C"

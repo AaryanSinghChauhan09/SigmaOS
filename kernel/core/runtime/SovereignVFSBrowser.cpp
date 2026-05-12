@@ -46,8 +46,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void vfs_browser_init() {
+void vfs_browser_init() {
     SigmaOS::Kernel::Runtime::SovereignVFSBrowser::init();
 }
 
@@ -62,3 +64,5 @@ extern "C" sigma_ssize_t vfs_browser_write(int fd, const void* buf, sigma_size_t
 
 
 
+
+} // extern "C"

@@ -24,6 +24,10 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sovereigncontainerorchestrator_init() {
+extern "C" {
+
+void sovereigncontainerorchestrator_init() {
     SigmaOS::Kernel::SovereignContainerOrchestrator::getInstance().init();
 }
+
+} // extern "C"

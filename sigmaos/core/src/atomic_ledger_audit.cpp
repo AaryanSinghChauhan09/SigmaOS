@@ -9,3 +9,5 @@ void ledger_audit() {
 }
 
 }
+
+} // extern "C"

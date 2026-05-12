@@ -38,6 +38,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void i915_init() {
+extern "C" {
+
+void i915_init() {
     SigmaOS::Kernel::Drivers::IntelI915Shard::init();
 }
+
+} // extern "C"

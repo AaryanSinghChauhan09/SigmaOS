@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void review_init() {
+extern "C" {
+
+void review_init() {
     SigmaOS::Kernel::Academic::SovereignReview::getInstance().init();
 }
+
+} // extern "C"

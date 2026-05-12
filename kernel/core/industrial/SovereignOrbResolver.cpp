@@ -3,7 +3,7 @@
  * S SIGMAOS: SOVEREIGN ORB RESOLVER (Dependency Shard)
  * =========================================================================
  * Mission: Isolated shard for recursive dependency resolution.
- * Layer  : L5 — Industrial Ecosystem
+ * Layer  : L5 ï¿½ Industrial Ecosystem
  * =========================================================================
  */
 
@@ -41,6 +41,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 extern "C" int orb_resolve_deps(const char* name) {
     return SigmaOS::Kernel::Industrial::SovereignOrbResolver::resolve(name) ? 1 : 0;
 }
+
+} // extern "C"

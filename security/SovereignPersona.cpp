@@ -15,11 +15,11 @@
 
 static sigma_persona_mode_t active_persona = PERSONA_MODE_DEVELOPER;
 
-extern "C" void persona_init() {
+void persona_init() {
     sigma_log("[PERSONA] Initializing Sovereign Persona Engine (HHA Algorithm)...");
 }
 
-extern "C" void persona_set_mode(sigma_persona_mode_t mode) {
+void persona_set_mode(sigma_persona_mode_t mode) {
     active_persona = mode;
     sigma_log("[PERSONA] HHA: Persona mode shifted to %d. Reconfiguring workspace...\n", (int)mode);
     
@@ -44,7 +44,7 @@ static persona_heuristic_rule_t hha_rules[32] = {
     {0x12, 0xA2, 45}  // Low confidence
 };
 
-extern "C" void persona_automate_workflow(sigma_u32 trigger_id) {
+void persona_automate_workflow(sigma_u32 trigger_id) {
     // HHA (Habitual Heuristic Automation) Algorithm
     // Uses lightweight ML to predict and automate user actions based on historical triggers.
     
@@ -62,3 +62,5 @@ extern "C" void persona_automate_workflow(sigma_u32 trigger_id) {
 
 
 
+
+} // extern "C"

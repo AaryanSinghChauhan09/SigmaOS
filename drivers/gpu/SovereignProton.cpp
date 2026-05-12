@@ -1,4 +1,4 @@
-﻿/*
+/*
  * SigmaOS: Sovereign Proton (Gaming Compatibility Layer)
  * Layer: L5 - Industrial Ecosystem / Multimedia
  */
@@ -6,7 +6,7 @@
 #include "sigma_log.h"
 #include "core/SigmaOOP.hpp"
 
-extern "C" void proton_dxvk_init();
+void proton_dxvk_init();
 
 namespace SigmaOS {
 namespace Kernel {
@@ -36,6 +36,12 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 extern "C" int proton_run(const char* path) {
     return SigmaOS::Kernel::Multimedia::SovereignProton::runExecutable(path) ? 1 : 0;
 }
+
+} // extern "C"
+
+} // extern "C"

@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void fw_init() {
+extern "C" {
+
+void fw_init() {
     SigmaOS::Kernel::Security::SovereignFirewall::getInstance().init();
 }
+
+} // extern "C"

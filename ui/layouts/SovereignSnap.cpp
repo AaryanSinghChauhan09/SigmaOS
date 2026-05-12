@@ -54,17 +54,21 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void snap_init() {
+void snap_init() {
     SigmaOS::Kernel::UI::SovereignSnapEngine::init();
 }
 
-extern "C" void snap_window_to_zone(sigma_u32 window_id, sigma_snap_zone_t zone) {
+void snap_window_to_zone(sigma_u32 window_id, sigma_snap_zone_t zone) {
     SigmaOS::Kernel::UI::SovereignSnapEngine::windowToZone(
         SigmaOS::Kernel::UI::SovereignSnapEngine::WindowID{window_id}, zone);
 }
 
-extern "C" void snap_auto_arrange() {
+void snap_auto_arrange() {
     SigmaOS::Kernel::UI::SovereignSnapEngine::autoArrange();
 }
 
+
+} // extern "C"

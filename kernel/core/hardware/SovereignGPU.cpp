@@ -11,7 +11,7 @@
  * Dynamically binds to the Sovereign NUMA node closest to the GPU die, 
  * delivering O(1) latency data pipelines to the SovereignTelemetryUI.
  *
- * Design: OOP-isolated singleton — SovereignGPUEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignGPUEngine.
  */
 
 class SovereignGPUEngine {
@@ -56,11 +56,11 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void gpu_init() {
+void gpu_init() {
     SovereignGPUEngine::init();
 }
 
-extern "C" void gpu_register(const char* vendor_id, sigma_u32 vram_mb) {
+void gpu_register(const char* vendor_id, sigma_u32 vram_mb) {
     SovereignGPUEngine::registerGPU(vendor_id, vram_mb);
 }
 
@@ -71,3 +71,5 @@ extern "C" bool gpu_dispatch(const char* workload_type) {
 
 
 
+
+} // extern "C"

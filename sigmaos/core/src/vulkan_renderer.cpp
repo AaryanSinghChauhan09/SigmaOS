@@ -48,3 +48,5 @@ extern "C" {
 }
 
 #endif // SIGMA_VULKAN_RENDERER_H
+
+} // extern "C"

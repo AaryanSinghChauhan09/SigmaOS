@@ -3,7 +3,7 @@
  * S SIGMAOS: SOVEREIGN KUBELET (Kubernetes Integration Shim)
  * =========================================================================
  * Mission: Implements K8S-001 to provide native K8s orchestration.
- * Layer  : L6 — Cloud-Native Integration
+ * Layer  : L6 ï¿½ Cloud-Native Integration
  * =========================================================================
  */
 
@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void kubelet_init() {
+extern "C" {
+
+void kubelet_init() {
     SigmaOS::Kernel::Industrial::SovereignKubelet::startWorkerNode();
 }
+
+} // extern "C"

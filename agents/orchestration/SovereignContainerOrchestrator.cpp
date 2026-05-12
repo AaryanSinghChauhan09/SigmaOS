@@ -47,10 +47,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void industrial_container_deploy(const char* image) {
+extern "C" {
+
+void industrial_container_deploy(const char* image) {
     SigmaOS::Kernel::Industrial::SovereignContainerOrchestrator::deployContainer(image);
 }
 
-extern "C" void industrial_cluster_sync() {
+void industrial_cluster_sync() {
     SigmaOS::Kernel::Industrial::SovereignContainerOrchestrator::reconcileCluster();
 }
+
+} // extern "C"

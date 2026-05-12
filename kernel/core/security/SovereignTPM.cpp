@@ -91,11 +91,15 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C API Wrappers for the Kernel --- */
-extern "C" void tpm_init() {
+void tpm_init() {
     SigmaOS::Kernel::Security::SovereignTPM::getInstance().init();
 }
 
 extern "C" int tpm_attest_bootloader(const unsigned char* expected_hash) {
     return SigmaOS::Kernel::Security::SovereignTPM::getInstance().performAttestation(expected_hash) ? 1 : 0;
 }
+
+} // extern "C"

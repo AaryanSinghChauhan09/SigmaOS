@@ -44,6 +44,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sub_init() {
+extern "C" {
+
+void sub_init() {
     SigmaOS::Kernel::Industrial::SovereignSubmersibleEngine::getInstance().init();
 }
+
+} // extern "C"

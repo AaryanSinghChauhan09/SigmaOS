@@ -46,7 +46,10 @@ private:
 } // namespace Industrial
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void update_daemon_init() {
+
+extern "C" {
+
+void update_daemon_init() {
     SigmaOS::Kernel::Industrial::SovereignUpdateDaemon::checkForUpdates();
 }
 
@@ -56,3 +59,5 @@ extern "C" int update_verify(const char* path, const sigma_u8* sig) {
 }
 
 
+
+} // extern "C"

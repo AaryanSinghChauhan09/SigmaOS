@@ -12,11 +12,14 @@
 namespace SigmaOS {
 namespace Graphics {
 
-extern "C" void sigma_graphics_rasterize_bezier_lowlevel(const char* path) {
+void sigma_graphics_rasterize_bezier_lowlevel(const char* path) {
     // Low-level bezier math (simulated)
-    sigma_log("[LOWLEVEL-SVG]: Computing Bézier Spline Shards for: %s\n", path);
+    sigma_log("[LOWLEVEL-SVG]: Computing Bï¿½zier Spline Shards for: %s\n", path);
 }
 
 } // namespace Graphics
 } // namespace SigmaOS
 
+extern "C" {
+
+} // extern "C"

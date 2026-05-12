@@ -19,7 +19,7 @@ typedef struct {
 
 static gatekeeper_config_t sovereign_gatekeeper;
 
-extern "C" void gatekeeper_init() {
+void gatekeeper_init() {
     sigma_log("[GATEKEEPER] Initializing Sovereign Privacy Gatekeeper (Whonix Parity)...");
     
     sovereign_gatekeeper.tor_routing_active = true;
@@ -29,7 +29,7 @@ extern "C" void gatekeeper_init() {
     sigma_log("[GATEKEEPER] Direct Silicon-to-Mesh Privacy Tunnel Established.");
 }
 
-extern "C" void gatekeeper_scrub_traffic() {
+void gatekeeper_scrub_traffic() {
     sigma_log("[GATEKEEPER] Scrubbing lattice metadata for anonymity...");
     // Logic for metadata stripping and shard-level routing
 }
@@ -41,3 +41,5 @@ extern "C" bool gatekeeper_verify_shard_access(sigma_u32 shard_id) {
 
 
 
+
+} // extern "C"

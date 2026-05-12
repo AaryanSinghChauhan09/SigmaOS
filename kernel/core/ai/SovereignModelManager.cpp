@@ -50,15 +50,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void model_man_init() {
+void model_man_init() {
     SigmaOS::Kernel::AI::SovereignModelManager::init();
 }
 
-extern "C" void model_man_load(const char* id) {
+void model_man_load(const char* id) {
     SigmaOS::Kernel::AI::SovereignModelManager::loadModel(id);
 }
 
 
 
 
+
+} // extern "C"

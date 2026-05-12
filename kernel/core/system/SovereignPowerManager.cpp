@@ -61,15 +61,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void power_init() {
+void power_init() {
     SigmaOS::Kernel::System::SovereignPowerManager::init();
 }
 
-extern "C" void power_set_state(sigma_u32 s) {
+void power_set_state(sigma_u32 s) {
     SigmaOS::Kernel::System::SovereignPowerManager::setSleepState(s);
 }
 
 
 
 
+
+} // extern "C"

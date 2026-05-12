@@ -49,15 +49,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void netstack_init() {
+void netstack_init() {
     SigmaOS::Kernel::Network::SovereignNetworkStack::init();
 }
 
-extern "C" void netstack_receive(void* pkt, sigma_usize sz) {
+void netstack_receive(void* pkt, sigma_usize sz) {
     SigmaOS::Kernel::Network::SovereignNetworkStack::handlePacket(pkt, sz);
 }
 
 
 
 
+
+} // extern "C"

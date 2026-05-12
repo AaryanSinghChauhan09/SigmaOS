@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void ops_init() {
+extern "C" {
+
+void ops_init() {
     SigmaOS::Kernel::Enterprise::SovereignOps::getInstance().init();
 }
+
+} // extern "C"

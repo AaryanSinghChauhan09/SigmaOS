@@ -15,7 +15,7 @@
 static sigma_unified_pkg_t package_db[1024];
 static sigma_u32 installed_packages = 0;
 
-extern "C" void unifiedpkg_init() {
+void unifiedpkg_init() {
     sigma_log("[UNIFIEDPKG] Initializing Sovereign Unified Package System (UCPG Algorithm)...");
 }
 
@@ -47,7 +47,7 @@ extern "C" bool unifiedpkg_install(const char* package_url, bool system_level) {
     return true;
 }
 
-extern "C" void unifiedpkg_list_installed() {
+void unifiedpkg_list_installed() {
     sigma_log("[UNIFIEDPKG] Installed Packages:");
     for (sigma_u32 i = 0; i < installed_packages; i++) {
         sigma_log("  - %s (System: %d)\n", package_db[i].package_name, package_db[i].is_system_critical);
@@ -56,3 +56,5 @@ extern "C" void unifiedpkg_list_installed() {
 
 
 
+
+} // extern "C"

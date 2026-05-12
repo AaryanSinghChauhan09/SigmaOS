@@ -48,10 +48,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void design_init() {
+extern "C" {
+
+void design_init() {
     SigmaOS::Kernel::Design::SovereignDesign::getInstance().init();
 }
 
-extern "C" void design_render(const char* svg) {
+void design_render(const char* svg) {
     SigmaOS::Kernel::Design::SovereignDesign::getInstance().renderVector(svg);
 }
+
+} // extern "C"

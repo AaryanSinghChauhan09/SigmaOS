@@ -29,10 +29,12 @@ public:
 
 } // namespace sigma
 
-extern "C" void start_memory_lattice() {
+void start_memory_lattice() {
     sigma::BuddyAllocator buddy;
     sigma::SlabAllocator slab;
     
     buddy.allocate(4096);
     slab.alloc_object("SigmaTask");
 }
+
+} // extern "C"

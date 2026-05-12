@@ -24,6 +24,10 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void persona_init() {
+extern "C" {
+
+void persona_init() {
     SigmaOS::Kernel::SovereignPersona::getInstance().init();
 }
+
+} // extern "C"

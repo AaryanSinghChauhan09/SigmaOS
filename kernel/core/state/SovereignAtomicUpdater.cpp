@@ -64,19 +64,23 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void atomic_os_init() {
+void atomic_os_init() {
     SigmaOS::Kernel::System::SovereignAtomicUpdater::init();
 }
 
-extern "C" void atomic_deploy(const char* hash) {
+void atomic_deploy(const char* hash) {
     SigmaOS::Kernel::System::SovereignAtomicUpdater::deployUpdate(hash);
 }
 
-extern "C" void atomic_rollback() {
+void atomic_rollback() {
     SigmaOS::Kernel::System::SovereignAtomicUpdater::rollback();
 }
 
 
 
 
+
+} // extern "C"

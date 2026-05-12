@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void fs_init() {
+extern "C" {
+
+void fs_init() {
     SigmaOS::Kernel::Storage::SovereignFileSystem::getInstance().init();
 }
+
+} // extern "C"

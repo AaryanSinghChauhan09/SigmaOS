@@ -19,11 +19,11 @@ typedef enum {
 
 static desktop_layout_t current_layout = LAYOUT_ZENITH;
 
-extern "C" void layout_init() {
+void layout_init() {
     sigma_log("[LAYOUT] Initializing Sovereign Layout Paradigm Manager (Zorin OS Parity)...");
 }
 
-extern "C" void layout_switch(desktop_layout_t layout) {
+void layout_switch(desktop_layout_t layout) {
     current_layout = layout;
     
     switch(layout) {
@@ -44,3 +44,5 @@ extern "C" void layout_switch(desktop_layout_t layout) {
 
 
 
+
+} // extern "C"

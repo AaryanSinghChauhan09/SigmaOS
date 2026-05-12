@@ -86,7 +86,9 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void start_memory_zenith() {
+extern "C" {
+
+void start_memory_zenith() {
     SigmaOS::Kernel::SovereignMemoryManager manager;
 
     // Allocate some native buffers
@@ -103,3 +105,5 @@ int main() {
     return 0;
 }
 
+
+} // extern "C"

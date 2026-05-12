@@ -49,14 +49,18 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void engineer_init() {
+extern "C" {
+
+void engineer_init() {
     SigmaOS::Kernel::Engineering::SovereignEngineer::getInstance().init();
 }
 
-extern "C" void engineer_execute_gcode(const char* code) {
+void engineer_execute_gcode(const char* code) {
     SigmaOS::Kernel::Engineering::SovereignEngineer::getInstance().processGCode(code);
 }
 
-extern "C" void engineer_run_simulation() {
+void engineer_run_simulation() {
     SigmaOS::Kernel::Engineering::SovereignEngineer::getInstance().runStressSimulation();
 }
+
+} // extern "C"

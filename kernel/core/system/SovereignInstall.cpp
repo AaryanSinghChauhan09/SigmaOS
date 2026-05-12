@@ -8,7 +8,7 @@
  * Implements an Autonomous Bare-Metal Deployment (ABMD) algorithm.
  * ZERO-DEPENDENCY: No external shell or installation environment.
  *
- * Design: OOP-isolated singleton — SovereignInstallerEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignInstallerEngine.
  */
 
 class SovereignInstallerEngine {
@@ -49,11 +49,11 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void install_init() {
+void install_init() {
     SovereignInstallerEngine::init();
 }
 
-extern "C" void install_execute() {
+void install_execute() {
     SovereignInstallerEngine::execute();
 }
 
@@ -65,3 +65,5 @@ extern "C" sigma_u32 install_get_progress() {
 
 
 
+
+} // extern "C"

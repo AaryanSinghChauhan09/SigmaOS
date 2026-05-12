@@ -9,7 +9,7 @@
 
 #include "kernel/orchestration/aether_orchestrator.hpp"
 
-extern "C" void start_aether_zenith() {
+void start_aether_zenith() {
     SigmaOS::Automation::SovereignAetherOrchestrator orchestrator;
 
     orchestrator.register_hardware_interrupt("HPET_TICK_10MS", "SHARD_GARBAGE_COLLECT_BYPASS");
@@ -26,3 +26,5 @@ int main() {
     start_aether_zenith();
     return 0;
 }
+
+} // extern "C"

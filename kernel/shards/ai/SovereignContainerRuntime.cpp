@@ -41,7 +41,7 @@ public:
     }
 };
 
-extern "C" void _start(void) {
+void _start(void) {
     sigma_log("--- Σ SIGMA OS SOVEREIGN CONTAINER RUNTIME (ZENITH) ---\n");
     SovereignContainer container;
     
@@ -53,3 +53,5 @@ extern "C" void _start(void) {
     sigma_exit(0);
 }
 
+
+} // extern "C"

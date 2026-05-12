@@ -75,8 +75,10 @@ class SovereignAetherFirewall {
 }  // namespace Kernel
 }  // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void firewall_init() {
+void firewall_init() {
     SigmaOS::Kernel::Network::SovereignAetherFirewall::init();
 }
 
@@ -85,7 +87,9 @@ extern "C" bool firewall_inspect(const void* data, sigma_size_t size, const char
         data, size, src);
 }
 
-extern "C" void firewall_audit() {
+void firewall_audit() {
     SigmaOS::Kernel::Network::SovereignAetherFirewall::auditFirewall();
 }
 
+
+} // extern "C"

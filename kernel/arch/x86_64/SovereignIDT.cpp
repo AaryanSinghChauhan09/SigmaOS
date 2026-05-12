@@ -76,8 +76,12 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void idt_init() {
+void idt_init() {
     SigmaOS::Kernel::Arch::SovereignIDT::init();
 }
 
+
+} // extern "C"

@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void power_init() {
+extern "C" {
+
+void power_init() {
     SigmaOS::Kernel::Hardware::SovereignPowerManager::getInstance().init();
 }
+
+} // extern "C"

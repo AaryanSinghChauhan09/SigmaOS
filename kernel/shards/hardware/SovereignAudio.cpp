@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void audio_init() {
+extern "C" {
+
+void audio_init() {
     SigmaOS::Kernel::Hardware::SovereignAudio::getInstance().init();
 }
+
+} // extern "C"

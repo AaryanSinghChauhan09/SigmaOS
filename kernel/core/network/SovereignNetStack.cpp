@@ -30,7 +30,9 @@ public:
     }
 };
 
-extern "C" void sigma_net_init(const char* dev) {
+void sigma_net_init(const char* dev) {
     SovereignNetStack::getInstance().initInterface(dev);
 }
 
+
+} // extern "C"

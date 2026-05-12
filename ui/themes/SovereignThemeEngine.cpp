@@ -76,22 +76,24 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void theme_init() {
+void theme_init() {
     SovereignThemeEngine::init();
 }
 
-extern "C" void theme_apply_accent(sigma_u32 color) {
+void theme_apply_accent(sigma_u32 color) {
     SovereignThemeEngine::applyAccent(color);
 }
 
-extern "C" void theme_toggle_dark_mode() {
+void theme_toggle_dark_mode() {
     SovereignThemeEngine::toggleDarkMode();
 }
 
-extern "C" void theme_evaluate_adaptive() {
+void theme_evaluate_adaptive() {
     SovereignThemeEngine::evaluateAdaptiveTheme();
 }
 
 
 
 
+
+} // extern "C"

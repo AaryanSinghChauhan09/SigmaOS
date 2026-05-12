@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void storage_ai_init() {
+void storage_ai_init() {
     SigmaOS::Kernel::FS::SovereignStorageAI::init();
 }
 
-extern "C" void storage_ai_optimize(const char* vol) {
+void storage_ai_optimize(const char* vol) {
     SigmaOS::Kernel::FS::SovereignStorageAI::optimizeVolume(vol);
 }
 
 
 
 
+
+} // extern "C"

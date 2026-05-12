@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void plc_init() {
+extern "C" {
+
+void plc_init() {
     SigmaOS::Kernel::Industrial::SovereignPLC::getInstance().init();
 }
+
+} // extern "C"

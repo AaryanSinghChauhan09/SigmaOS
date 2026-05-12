@@ -4,8 +4,8 @@
 #include "industrial_deployer.hpp"
 #include "libc/SovereignLibC.h"
 
-extern "C" void gatekeeper_init();
-extern "C" void assistant_init();
+void gatekeeper_init();
+void assistant_init();
 
 namespace SigmaOS {
 namespace Deployment {
@@ -51,5 +51,8 @@ void SovereignDeployer::Audit() {
 } // namespace Deployment
 } // namespace SigmaOS
 
+extern "C" {
 
+} // extern "C"
 
+} // extern "C"

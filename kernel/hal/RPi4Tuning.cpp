@@ -43,10 +43,15 @@ private:
 } // namespace HAL
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void rpi4_tune() {
+
+extern "C" {
+
+void rpi4_tune() {
     SigmaOS::Kernel::HAL::RPi4Tuning::getInstance().applyOptimization();
 }
 
 
 
 
+
+} // extern "C"

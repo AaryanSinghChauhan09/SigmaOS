@@ -43,6 +43,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void c4isr_init() {
+extern "C" {
+
+void c4isr_init() {
     SigmaOS::Kernel::Defense::SovereignC4ISR::getInstance().init();
 }
+
+} // extern "C"

@@ -52,8 +52,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void consensus_init() {
+void consensus_init() {
     SigmaOS::Kernel::Cloud::SovereignConsensusEngine::init();
 }
 
@@ -64,3 +66,5 @@ extern "C" bool consensus_propose(const char* key, const void* data, sigma_usize
 
 
 
+
+} // extern "C"

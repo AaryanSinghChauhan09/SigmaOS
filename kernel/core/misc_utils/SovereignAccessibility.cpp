@@ -10,7 +10,7 @@
  * USP: Analyzes user interaction patterns to automatically adjust contrast, 
  * font scaling, and color-blind modes without requiring manual configuration.
  *
- * Design: OOP-isolated singleton — SovereignAccessibilityEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignAccessibilityEngine.
  */
 
 class SovereignAccessibilityEngine {
@@ -51,18 +51,20 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void access_init() {
+void access_init() {
     SovereignAccessibilityEngine::init();
 }
 
-extern "C" void access_set_colorblind(const char* mode) {
+void access_set_colorblind(const char* mode) {
     SovereignAccessibilityEngine::enableColorBlindMode(mode);
 }
 
-extern "C" void access_set_font_scale(float scale) {
+void access_set_font_scale(float scale) {
     SovereignAccessibilityEngine::adjustFontScaling(scale);
 }
 
 
 
 
+
+} // extern "C"

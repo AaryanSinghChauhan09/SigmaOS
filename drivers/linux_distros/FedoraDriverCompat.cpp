@@ -41,6 +41,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void fedora_driver_load(const char* path) {
+extern "C" {
+
+void fedora_driver_load(const char* path) {
     SigmaOS::Kernel::Drivers::FedoraDriverCompat::loadFedoraDriver(path);
 }
+
+} // extern "C"

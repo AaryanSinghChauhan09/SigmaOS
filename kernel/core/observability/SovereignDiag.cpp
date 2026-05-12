@@ -48,20 +48,22 @@ void SovereignDiagEngine::autoRepair() {
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void diag_init() {
+void diag_init() {
     SigmaOS::Kernel::Observability::SovereignDiagEngine::getInstance().init();
 }
 
-extern "C" void diag_scan() {
+void diag_scan() {
     SigmaOS::Kernel::Observability::SovereignDiagEngine::getInstance().performScan();
 }
 
-extern "C" void diag_auto_repair() {
+void diag_auto_repair() {
     SigmaOS::Kernel::Observability::SovereignDiagEngine::getInstance().autoRepair();
 }
 
-extern "C" void diag_report(const char* shard, const char* desc) {
+void diag_report(const char* shard, const char* desc) {
     SigmaOS::Kernel::Observability::SovereignDiagEngine::getInstance().reportAnomaly(
         SigmaOS::Kernel::Observability::SovereignDiagEngine::ShardID{shard},
         SigmaOS::Kernel::Observability::SovereignDiagEngine::AnomalyDesc{desc});
@@ -69,3 +71,5 @@ extern "C" void diag_report(const char* shard, const char* desc) {
 
 
 
+
+} // extern "C"

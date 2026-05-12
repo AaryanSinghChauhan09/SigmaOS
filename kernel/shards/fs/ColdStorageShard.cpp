@@ -64,7 +64,9 @@ public:
 } // namespace Storage
 } // namespace SigmaOS
 
-extern "C" void start_cold_storage() {
+extern "C" {
+
+void start_cold_storage() {
     SigmaOS::Storage::ColdStorageShard vault;
     
     vault.persist_state("QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco", 1024);
@@ -73,3 +75,5 @@ extern "C" void start_cold_storage() {
     vault.audit_vault();
     vault.wipe_local_cache();
 }
+
+} // extern "C"

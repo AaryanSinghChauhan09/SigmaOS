@@ -8,7 +8,7 @@
  * Implements a HID Mouse Orchestration (HMO) algorithm.
  * ZERO-DEPENDENCY: Direct HID report parsing from S-USB.
  *
- * Design: OOP-isolated singleton — SovereignMouseEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignMouseEngine.
  */
 
 class SovereignMouseEngine {
@@ -44,11 +44,11 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void mouse_init() {
+void mouse_init() {
     SovereignMouseEngine::init();
 }
 
-extern "C" void mouse_handle_report(const sigma_u8* report) {
+void mouse_handle_report(const sigma_u8* report) {
     SovereignMouseEngine::handleReport(report);
 }
 
@@ -56,3 +56,5 @@ extern "C" void mouse_handle_report(const sigma_u8* report) {
 
 
 
+
+} // extern "C"

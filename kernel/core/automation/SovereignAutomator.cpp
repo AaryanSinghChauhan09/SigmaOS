@@ -10,7 +10,7 @@
  * USP: Analyzes Zenith UI behavior patterns to predictively execute scriptable macros 
  * and trigger workflow shortcuts seamlessly without user intervention.
  *
- * Design: OOP-isolated singleton — SovereignAutomatorEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignAutomatorEngine.
  */
 
 class SovereignAutomatorEngine {
@@ -51,18 +51,20 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void automator_init() {
+void automator_init() {
     SovereignAutomatorEngine::init();
 }
 
-extern "C" void automator_register_macro(const char* trigger, const char* action) {
+void automator_register_macro(const char* trigger, const char* action) {
     SovereignAutomatorEngine::registerMacro(trigger, action);
 }
 
-extern "C" void automator_context_tick(const char* context) {
+void automator_context_tick(const char* context) {
     SovereignAutomatorEngine::processContext(context);
 }
 
 
 
 
+
+} // extern "C"

@@ -40,6 +40,11 @@ private:
 } // namespace Drivers
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void uvc_webcam_init() {
+
+extern "C" {
+
+void uvc_webcam_init() {
     SigmaOS::Kernel::Drivers::Hardware::USBWebcamUVC::initDevice();
 }
+
+} // extern "C"

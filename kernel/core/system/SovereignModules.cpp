@@ -16,7 +16,7 @@
 static sigma_module_t module_table[128];
 static sigma_u32 active_module_count = 0;
 
-extern "C" void modules_init() {
+void modules_init() {
     sigma_log("[MODULES] Initializing Sovereign Module Loader (DSL Algorithm)...");
     sigma_memset(module_table, 0, sizeof(module_table));
 }
@@ -40,14 +40,14 @@ extern "C" bool modules_load_shard(const char* name, void* binary_blob, sigma_u3
     return SIGMA_TRUE;
 }
 
-extern "C" void modules_unload_shard(sigma_u32 module_id) {
+void modules_unload_shard(sigma_u32 module_id) {
     if (module_id > 0 && module_id <= 128) {
         sigma_log("[MODULES] DSL: Deactivating Shard ID %d...\n", module_id);
         module_table[module_id - 1].is_active = SIGMA_FALSE;
     }
 }
 
-extern "C" void modules_list_active() {
+void modules_list_active() {
     sigma_log("\n--- S ACTIVE SOVEREIGN SHARDS ---");
     for (sigma_u32 i = 0; i < active_module_count; i++) {
         if (module_table[i].is_active) {
@@ -59,3 +59,5 @@ extern "C" void modules_list_active() {
 
 
 
+
+} // extern "C"

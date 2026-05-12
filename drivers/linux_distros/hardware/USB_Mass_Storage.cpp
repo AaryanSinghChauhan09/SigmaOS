@@ -40,6 +40,11 @@ private:
 } // namespace Drivers
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void usb_storage_init() {
+
+extern "C" {
+
+void usb_storage_init() {
     SigmaOS::Kernel::Drivers::Hardware::USBMassStorage::initDevice();
 }
+
+} // extern "C"

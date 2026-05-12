@@ -9,7 +9,7 @@
  * Implements a Quantum-Safe Shard Orchestrator for dynamic discovery.
  * ZERO-DEPENDENCY: Strictly bare-metal shard registry.
  *
- * Design: OOP-isolated singleton — SovereignUSRManager.
+ * Design: OOP-isolated singleton ï¿½ SovereignUSRManager.
  */
 
 /* --- Sovereign USR Implementation --- */
@@ -49,7 +49,7 @@ bool SovereignUSRManager::activateShard(sigma_u32 shard_id) {
 }
 
 /* --- C Wrappers --- */
-extern "C" void usr_init() {
+void usr_init() {
     SovereignUSRManager::init();
 }
 
@@ -60,3 +60,5 @@ extern "C" sigma_u32 usr_register_shard(const char* name, sigma_u32 quantum_key)
 extern "C" bool usr_activate_shard(sigma_u32 shard_id) {
     return SovereignUSRManager::activateShard(shard_id);
 }
+
+} // extern "C"

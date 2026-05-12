@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void asset_init() {
+extern "C" {
+
+void asset_init() {
     SigmaOS::Kernel::Creative::SovereignAssetManager::getInstance().init();
 }
+
+} // extern "C"

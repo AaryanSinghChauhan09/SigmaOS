@@ -46,6 +46,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void scada_init() {
+extern "C" {
+
+void scada_init() {
     SigmaOS::Kernel::Industrial::SovereignSCADABridge::getInstance().init();
 }
+
+} // extern "C"

@@ -49,15 +49,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void task_automator_init() {
+void task_automator_init() {
     SigmaOS::Kernel::AI::SovereignTaskAutomator::init();
 }
 
-extern "C" void task_automator_execute(const char* prompt) {
+void task_automator_execute(const char* prompt) {
     SigmaOS::Kernel::AI::SovereignTaskAutomator::processRequest(prompt);
 }
 
 
 
 
+
+} // extern "C"

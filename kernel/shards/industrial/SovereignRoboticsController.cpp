@@ -46,6 +46,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void robot_init() {
+extern "C" {
+
+void robot_init() {
     SigmaOS::Kernel::Industrial::SovereignRoboticsController::getInstance().init();
 }
+
+} // extern "C"

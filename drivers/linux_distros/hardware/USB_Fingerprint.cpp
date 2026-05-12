@@ -40,6 +40,11 @@ private:
 } // namespace Drivers
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void fingerprint_init() {
+
+extern "C" {
+
+void fingerprint_init() {
     SigmaOS::Kernel::Drivers::Hardware::USBFingerprintReader::initDevice();
 }
+
+} // extern "C"

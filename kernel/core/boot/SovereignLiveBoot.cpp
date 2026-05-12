@@ -3,7 +3,7 @@
  * S SIGMAOS: SOVEREIGN LIVE BOOT (Persistence Shard)
  * =========================================================================
  * Mission: Implements LATT-001 for Live USB environments.
- * Layer  : L0 — Silicon / Boot
+ * Layer  : L0 ï¿½ Silicon / Boot
  * =========================================================================
  */
 
@@ -37,6 +37,11 @@ private:
 } // namespace Boot
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void live_boot_init() {
+
+extern "C" {
+
+void live_boot_init() {
     SigmaOS::Kernel::Boot::SovereignLiveBoot::initializePersistence();
 }
+
+} // extern "C"

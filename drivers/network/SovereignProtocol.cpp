@@ -48,18 +48,20 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void scp_init() {
+void scp_init() {
     SovereignProtocolEngine::init();
 }
 
-extern "C" void scp_add_peer(const char* peer) {
+void scp_add_peer(const char* peer) {
     SovereignProtocolEngine::addMeshPeer(peer);
 }
 
-extern "C" void scp_broadcast(const char* data) {
+void scp_broadcast(const char* data) {
     SovereignProtocolEngine::broadcast(data);
 }
 
 
 
 
+
+} // extern "C"

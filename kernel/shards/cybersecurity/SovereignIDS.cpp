@@ -49,14 +49,18 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void ids_init() {
+extern "C" {
+
+void ids_init() {
     SigmaOS::Kernel::Security::SovereignIDS::getInstance().init();
 }
 
-extern "C" void ids_monitor(sigma_u32 sid) {
+void ids_monitor(sigma_u32 sid) {
     SigmaOS::Kernel::Security::SovereignIDS::getInstance().monitorShardBehavior(sid);
 }
 
-extern "C" void ids_fingerprint(const char* hash) {
+void ids_fingerprint(const char* hash) {
     SigmaOS::Kernel::Security::SovereignIDS::getInstance().fingerprintThreat(hash);
 }
+
+} // extern "C"

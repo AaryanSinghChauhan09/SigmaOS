@@ -14,12 +14,12 @@
 
 static sigma_rollback_token_t stable_snapshot;
 
-extern "C" void rollback_init() {
+void rollback_init() {
     sigma_log("[ROLLBACK] Initializing Sovereign Automated Rollback Nexus...");
     stable_snapshot.snapshot_id = 0;
 }
 
-extern "C" void rollback_capture_snapshot() {
+void rollback_capture_snapshot() {
     // CSS (Continuous State Snapshotting) Algorithm
     // Captures an atomic machine-state root for zero-latency rollback.
     
@@ -30,7 +30,7 @@ extern "C" void rollback_capture_snapshot() {
                  stable_snapshot.snapshot_id, stable_snapshot.timestamp);
 }
 
-extern "C" void rollback_execute_to_last_stable() {
+void rollback_execute_to_last_stable() {
     sigma_log("[ROLLBACK] [CRITICAL] Fault detected! Executing Automated Rollback...");
     
     sigma_log("[ROLLBACK] Reverting machine-state to Snapshot ID %d...\n", 
@@ -42,3 +42,5 @@ extern "C" void rollback_execute_to_last_stable() {
 
 
 
+
+} // extern "C"

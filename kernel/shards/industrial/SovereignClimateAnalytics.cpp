@@ -47,6 +47,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void clim_init() {
+extern "C" {
+
+void clim_init() {
     SigmaOS::Kernel::Industrial::SovereignClimateAnalytics::getInstance().init();
 }
+
+} // extern "C"

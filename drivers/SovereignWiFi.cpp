@@ -48,11 +48,11 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void wifi_init() {
+void wifi_init() {
     SovereignWiFi::init();
 }
 
-extern "C" void wifi_scan() {
+void wifi_scan() {
     SovereignWiFi::scanNetworks();
 }
 
@@ -61,3 +61,5 @@ extern "C" int wifi_connect(const char* ssid, const char* pass) {
 }
 
 
+
+} // extern "C"

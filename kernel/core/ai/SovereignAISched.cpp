@@ -46,19 +46,23 @@ void SigmaOS::Kernel::AI::SovereignAISchedEngine::setMode(sigma_aisched_mode_t m
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void aisched_init() {
+void aisched_init() {
     SigmaOS::Kernel::AI::SovereignAISchedEngine::getInstance().init();
 }
 
-extern "C" void aisched_predict_workload(unsigned int process_id) {
+void aisched_predict_workload(unsigned int process_id) {
     SigmaOS::Kernel::AI::SovereignAISchedEngine::getInstance().predictWorkload((sigma_u32)process_id);
 }
 
-extern "C" void aisched_set_mode(sigma_aisched_mode_t mode) {
+void aisched_set_mode(sigma_aisched_mode_t mode) {
     SigmaOS::Kernel::AI::SovereignAISchedEngine::getInstance().setMode(mode);
 }
 
 extern "C" unsigned long long aisched_get_prediction_count() {
     return (unsigned long long)SigmaOS::Kernel::AI::SovereignAISchedEngine::getInstance().getPredictionCount();
 }
+
+} // extern "C"

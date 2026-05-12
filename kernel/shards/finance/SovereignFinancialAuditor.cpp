@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void fin_init() {
+extern "C" {
+
+void fin_init() {
     SigmaOS::Kernel::Finance::SovereignFinancialAuditor::getInstance().init();
 }
+
+} // extern "C"

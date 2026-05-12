@@ -40,6 +40,11 @@ private:
 } // namespace Drivers
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void synaptics_input_init() {
+
+extern "C" {
+
+void synaptics_input_init() {
     SigmaOS::Kernel::Drivers::Hardware::SynapticsInput::initDevice();
 }
+
+} // extern "C"

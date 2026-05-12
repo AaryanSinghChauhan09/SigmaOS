@@ -20,7 +20,7 @@ static struct {
     .active_shards = 600
 };
 
-extern "C" void sentinel_init() {
+void sentinel_init() {
     sigma_log("[SENTINEL] Initializing Sovereign Sentinel (OOPS Isolation)...");
     
     // Default: Shard S01 (Genesis) has ALL capabilities
@@ -40,14 +40,16 @@ extern "C" bool sentinel_check_capability(sigma_u32 shard_id, sigma_capability_t
     return allowed;
 }
 
-extern "C" void sentinel_grant_capability(sigma_u32 shard_id, sigma_capability_t cap) {
+void sentinel_grant_capability(sigma_u32 shard_id, sigma_capability_t cap) {
     if (shard_id > 0 && shard_id < SovereignSentinelManager.active_shards) {
         SovereignSentinelManager.shard_capabilities[shard_id] |= (1 << (sigma_u32)cap);
         sigma_log("[SENTINEL] ZTCM: Granted CAP %d to S%02d.\n", (int)cap, shard_id);
     }
 }
 
-extern "C" void sentinel_enforce_policy(const char* policy_blob) {
+void sentinel_enforce_policy(const char* policy_blob) {
     sigma_log("[SENTINEL] ZTCM: Compiling and hot-loading silicon-native security policy...");
     sigma_log("[SENTINEL] Policy enforced. All 600 lattice nodes mediated.");
 }
+
+} // extern "C"

@@ -42,10 +42,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sigma_auto_record(const char* action, const char* ctx) {
+extern "C" {
+
+void sigma_auto_record(const char* action, const char* ctx) {
     SigmaOS::Kernel::Automation::SovereignAutomationShard::recordAction(action, ctx);
 }
 
-extern "C" void sigma_auto_schedule(const char* name, sigma_u64 ms) {
+void sigma_auto_schedule(const char* name, sigma_u64 ms) {
     SigmaOS::Kernel::Automation::SovereignAutomationShard::scheduleTask(name, ms);
 }
+
+} // extern "C"

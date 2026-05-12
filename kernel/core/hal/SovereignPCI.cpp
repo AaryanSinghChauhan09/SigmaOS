@@ -24,6 +24,10 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sovereignpci_init() {
+extern "C" {
+
+void sovereignpci_init() {
     SigmaOS::Kernel::SovereignPCI::getInstance().init();
 }
+
+} // extern "C"

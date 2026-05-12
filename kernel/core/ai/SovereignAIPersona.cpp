@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void ai_persona_init() {
+void ai_persona_init() {
     SigmaOS::Kernel::AI::SovereignAIPersona::init();
 }
 
-extern "C" void ai_persona_adapt(const char* ctx) {
+void ai_persona_adapt(const char* ctx) {
     SigmaOS::Kernel::AI::SovereignAIPersona::adapt(ctx);
 }
 
 
 
 
+
+} // extern "C"

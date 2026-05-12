@@ -23,9 +23,11 @@ void SovereignOnboardingEngine::setPersona(const char* persona_name) {
     }
 }
 
-extern "C" void onboarding_start() {
+void onboarding_start() {
     SovereignOnboardingEngine::startWizard();
 }
 
 
 
+
+} // extern "C"

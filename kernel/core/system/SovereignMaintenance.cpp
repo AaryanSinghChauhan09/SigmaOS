@@ -41,10 +41,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sigma_maint_cleanup() {
+extern "C" {
+
+void sigma_maint_cleanup() {
     SigmaOS::Kernel::System::SovereignMaintenanceShard::performCleanup();
 }
 
-extern "C" void sigma_maint_power(bool low) {
+void sigma_maint_power(bool low) {
     SigmaOS::Kernel::System::SovereignMaintenanceShard::optimizePower(low);
 }
+
+} // extern "C"

@@ -24,7 +24,7 @@ bool SovereignPackageEngine::installPackage(const char* pkg_name) {
     return true;
 }
 
-extern "C" void package_manager_init() {
+void package_manager_init() {
     SovereignPackageEngine::init();
 }
 
@@ -34,3 +34,5 @@ extern "C" bool package_manager_install(const char* name) {
 
 
 
+
+} // extern "C"

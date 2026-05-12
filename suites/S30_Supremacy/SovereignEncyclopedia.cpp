@@ -101,7 +101,7 @@ public:
     }
 };
 
-extern "C" void _start(void) {
+void _start(void) {
     SovereignEncyclopedia ency;
     ency.Synthesize();
     ency.ExecuteEncycloAudit();
@@ -112,3 +112,5 @@ extern "C" void _start(void) {
 
 
 
+
+} // extern "C"

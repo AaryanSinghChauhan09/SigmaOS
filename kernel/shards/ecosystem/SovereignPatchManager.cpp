@@ -47,6 +47,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void patch_init() {
+extern "C" {
+
+void patch_init() {
     SigmaOS::Kernel::Ecosystem::SovereignPatchManager::getInstance().init();
 }
+
+} // extern "C"

@@ -45,11 +45,15 @@ void SovereignNexusEngine::syncLatticeStatus() {
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void nexus_init() {
+void nexus_init() {
     SigmaOS::Kernel::Industrial::SovereignNexusEngine::getInstance().init();
 }
 
-extern "C" void nexus_sync() {
+void nexus_sync() {
     SigmaOS::Kernel::Industrial::SovereignNexusEngine::getInstance().syncLatticeStatus();
 }
+
+} // extern "C"

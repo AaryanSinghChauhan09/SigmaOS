@@ -5,8 +5,6 @@
  * Σ SIGMAOS: SOVEREIGN MODULE LATTICE (INDUSTRIAL IMPLEMENTATION)
  */
 
-extern "C" {
-
 /* --- Security Modules --- */
 
 void init_security_secure_boot() {
@@ -59,5 +57,3 @@ void init_tools_verification() {
     sigma_print("[VERIFICATION] Running lattice-wide parity checks...\n");
     sigma_print("[✓] All 600 shards report OPTIMAL status.\n");
 }
-
-} // extern "C"

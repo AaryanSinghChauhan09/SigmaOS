@@ -12,7 +12,7 @@
 #include "kernel/drivers/graphics/compositor.hpp"
 #include "kernel/drivers/graphics/widget_orchestrator.hpp"
 
-extern "C" void _start(void) {
+void _start(void) {
     SigmaOS::Graphics::SovereignGraphicsCompositor compositor;
     SigmaOS::Graphics::SovereignWidgetOrchestrator widgets;
 
@@ -31,3 +31,5 @@ int main() {
     _start();
     return 0;
 }
+
+} // extern "C"

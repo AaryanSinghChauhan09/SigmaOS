@@ -68,12 +68,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void sel_init_shard() {
+void sel_init_shard() {
     SigmaOS::Kernel::Security::SovereignSEL::getInstance().init();
 }
 
-extern "C" void sel_spawn_sandbox(const char* name) {
+void sel_spawn_sandbox(const char* name) {
     SigmaOS::Kernel::Security::SovereignSEL::getInstance().spawnSandbox(name);
 }
 
@@ -82,3 +84,5 @@ extern "C" void sel_spawn_sandbox(const char* name) {
 
 
 
+
+} // extern "C"

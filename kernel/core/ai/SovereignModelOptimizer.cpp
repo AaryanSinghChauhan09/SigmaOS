@@ -3,7 +3,7 @@
 #include "sigma_log.h"
 
 /**
- * SovereignModelOptimizer — Local Model Inference and Weight Management.
+ * SovereignModelOptimizer ï¿½ Local Model Inference and Weight Management.
  * Inspired by github.com/ollama/ollama and DeepSeek-V3.
  * Optimized for silicon-native inference with amnesic memory management.
  */
@@ -37,12 +37,16 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void sigma_model_optimize(const char* model) {
+void sigma_model_optimize(const char* model) {
     SigmaOS::Kernel::AI::SovereignModelOptimizer::loadWeights(model);
     SigmaOS::Kernel::AI::SovereignModelOptimizer::quantizeWeights();
 }
 
-extern "C" void sigma_model_infer() {
+void sigma_model_infer() {
     SigmaOS::Kernel::AI::SovereignModelOptimizer::runInference();
 }
+
+} // extern "C"

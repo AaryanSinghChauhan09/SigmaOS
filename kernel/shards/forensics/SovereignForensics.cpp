@@ -24,6 +24,10 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sovereignforensics_init() {
+extern "C" {
+
+void sovereignforensics_init() {
     SigmaOS::Kernel::SovereignForensics::getInstance().init();
 }
+
+} // extern "C"

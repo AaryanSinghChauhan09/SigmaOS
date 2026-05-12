@@ -24,6 +24,10 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sovereignfips_init() {
+extern "C" {
+
+void sovereignfips_init() {
     SigmaOS::Kernel::SovereignFIPS::getInstance().init();
 }
+
+} // extern "C"

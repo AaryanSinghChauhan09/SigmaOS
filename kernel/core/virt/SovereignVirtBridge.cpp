@@ -1,9 +1,9 @@
-﻿/*
+/*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN VIRT BRIDGE (Hypervisor Guest Shims)
  * =========================================================================
  * Mission: Implements LATT-002 for VMware/VirtualBox/Hyper-V/KVM.
- * Layer  : L1 — Kernel Primitives
+ * Layer  : L1 � Kernel Primitives
  * =========================================================================
  */
 
@@ -37,7 +37,12 @@ private:
 } // namespace Virt
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void virt_bridge_init() {
+
+extern "C" {
+
+void virt_bridge_init() {
     SigmaOS::Kernel::Virt::SovereignVirtBridge::getInstance().detectHypervisor();
 }
 
+
+} // extern "C"

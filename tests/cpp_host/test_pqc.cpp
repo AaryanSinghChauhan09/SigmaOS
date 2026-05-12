@@ -52,3 +52,8 @@ TEST_F(PQCTest, ShardVerification) {
 } // namespace Security
 } // namespace Kernel
 } // namespace SigmaOS
+
+extern "C" {
+
+
+} // extern "C"

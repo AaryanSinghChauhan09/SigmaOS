@@ -46,7 +46,7 @@ public:
         
         if (input.contains("print")) {
             sigma_log_info("[TRANSPILER-ZENITH]: Mapping 'print' -> 'sigma_log_info'\n");
-            output.append("extern "C" void sigma_main() { sigma_log_info(\"Transpiled Shard Active.\\n\"); }\n");
+            output.append("void sigma_main() { sigma_log_info(\"Transpiled Shard Active.\\n\"); }\n");
         }
 
         if (input.contains("mesh_broadcast")) {
@@ -69,7 +69,9 @@ public:
 } // namespace Dev
 } // namespace SigmaOS
 
-extern "C" void start_transpiler_demo() {
+extern "C" {
+
+void start_transpiler_demo() {
     SigmaOS::Dev::SovereignTranspiler transpiler;
 
     const char* script = "print('Hello Sovereign Zenith'); mesh_broadcast('ALIVE');";
@@ -87,3 +89,5 @@ int main() {
 
 
 
+
+} // extern "C"

@@ -47,7 +47,7 @@ static struct {
     .initialized = 0u
 };
 
-extern "C" void locale_init() {
+void locale_init() {
     sigma_log("[LOCALE] Initializing Sovereign Static Cultural Data Map (SCDM)...");
     SovereignLocaleManager.initialized = 1u;
     sigma_log("[LOCALE] SCDM: Active locale='%s' TZ='%s' UTC%+d.\n",
@@ -56,14 +56,14 @@ extern "C" void locale_init() {
                  (int)(SovereignLocaleManager.active.utc_offset_minutes / 60));
 }
 
-extern "C" void locale_set(const char* locale_code) {
+void locale_set(const char* locale_code) {
     if (!locale_code) return;
     _locale_strncpy(SovereignLocaleManager.active.locale_code,
                     locale_code, SIGMA_LOCALE_CODE_LEN);
     sigma_log("[LOCALE] SCDM: Locale set to '%s'.\n", locale_code);
 }
 
-extern "C" void locale_set_timezone(const char* tz_name, sigma_i32 utc_offset_minutes) {
+void locale_set_timezone(const char* tz_name, sigma_i32 utc_offset_minutes) {
     if (!tz_name) return;
     _locale_strncpy(SovereignLocaleManager.active.tz_name,
                     tz_name, SIGMA_TZ_NAME_LEN);
@@ -80,7 +80,7 @@ extern "C" sigma_i32 locale_get_utc_offset() {
     return SovereignLocaleManager.active.utc_offset_minutes;
 }
 
-extern "C" void locale_format_number(sigma_i64 value, char* out_buf, sigma_u32 buf_len) {
+void locale_format_number(sigma_i64 value, char* out_buf, sigma_u32 buf_len) {
     // SCDM Algorithm: Formats integer with locale-specific thousand separators.
     if (!out_buf || buf_len == 0u) return;
     const char* sep = SovereignLocaleManager.active.thousands_sep;
@@ -108,3 +108,5 @@ extern "C" void locale_format_number(sigma_i64 value, char* out_buf, sigma_u32 b
 
 
 
+
+} // extern "C"

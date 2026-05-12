@@ -22,10 +22,12 @@ extern "C" sigma_ssize_t sigma_write(int fd, const void* buf, sigma_size_t count
 }
 
 // Ensure serial is initialized before first print
-extern "C" void kernel_io_init() {
+void kernel_io_init() {
     serial_init();
     sigma_log("[KERNEL-IO] COM1 Serial Shard Active (115200 8N1).");
 }
 
 
 
+
+} // extern "C"

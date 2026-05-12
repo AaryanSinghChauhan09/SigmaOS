@@ -24,6 +24,10 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sovereignacpi_init() {
+extern "C" {
+
+void sovereignacpi_init() {
     SigmaOS::Kernel::SovereignACPI::getInstance().init();
 }
+
+} // extern "C"

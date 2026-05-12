@@ -42,7 +42,7 @@ public:
     }
 };
 
-extern "C" void _start(void) {
+void _start(void) {
     SovereignContainerForge forge;
     forge.CreateOCIShardImage("/shards/sigma_browser_v4");
     forge.RunRootlessShard("SIGMA_BROWSER_V4");
@@ -51,3 +51,5 @@ extern "C" void _start(void) {
     sigma_exit(0);
 }
 
+
+} // extern "C"

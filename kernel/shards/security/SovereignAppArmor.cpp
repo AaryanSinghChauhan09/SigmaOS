@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void armor_init() {
+extern "C" {
+
+void armor_init() {
     SigmaOS::Kernel::Security::SovereignAppArmor::getInstance().init();
 }
+
+} // extern "C"

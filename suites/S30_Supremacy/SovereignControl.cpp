@@ -7,18 +7,20 @@
  * Centralized singleton for system orchestration.
  */
 
-extern "C" void control_init() {
+void control_init() {
     sigma_log("[S-CONTROL] Initializing Sovereign Control Shard...");
 }
 
-extern "C" void control_reboot() {
+void control_reboot() {
     sigma_log("[S-CONTROL] Initiating Sovereign Reboot Sequence...");
     hal_shutdown();
 }
 
-extern "C" void control_power_cycle() {
+void control_power_cycle() {
     sigma_log_info("[S-CONTROL] Power cycle command RECEIVED.\n");
     sigma_log("[S-CONTROL] Sharding current state to SovereignSnap...");
 }
 
 
+
+} // extern "C"

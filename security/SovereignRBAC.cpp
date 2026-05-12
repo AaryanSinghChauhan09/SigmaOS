@@ -47,8 +47,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void rbac_init() {
+void rbac_init() {
     SigmaOS::Kernel::Security::SovereignRBAC::init();
 }
 
@@ -59,3 +61,5 @@ extern "C" bool rbac_check(const char* role, const char* resource, const char* a
 
 
 
+
+} // extern "C"

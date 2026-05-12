@@ -40,6 +40,11 @@ private:
 } // namespace Drivers
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void xhci_init() {
+
+extern "C" {
+
+void xhci_init() {
     SigmaOS::Kernel::Drivers::Hardware::USBXHCIController::initDevice();
 }
+
+} // extern "C"

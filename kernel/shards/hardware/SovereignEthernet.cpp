@@ -41,6 +41,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void eth_init() {
+extern "C" {
+
+void eth_init() {
     SigmaOS::Kernel::Hardware::SovereignEthernet::getInstance().init();
 }
+
+} // extern "C"

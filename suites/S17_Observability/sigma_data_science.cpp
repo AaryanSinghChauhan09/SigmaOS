@@ -48,10 +48,12 @@ public:
 
 } // namespace sigma
 
-extern "C" void start_data_science() {
+void start_data_science() {
     static sigma::DataScienceShard ds;
     ds.collect_metric("S01_Genesis", 5, 2);
     ds.collect_metric("S02_ZenithUI", 15, 10);
     ds.predictive_analytics();
     ds.export_json();
 }
+
+} // extern "C"

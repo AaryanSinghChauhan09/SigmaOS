@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void ci_pipeline_init() {
+void ci_pipeline_init() {
     SigmaOS::Kernel::Development::SovereignCI::init();
 }
 
-extern "C" void ci_trigger(const char* hash) {
+void ci_trigger(const char* hash) {
     SigmaOS::Kernel::Development::SovereignCI::triggerPipeline(hash);
 }
 
 
 
 
+
+} // extern "C"

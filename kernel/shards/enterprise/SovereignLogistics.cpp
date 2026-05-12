@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void logistics_init() {
+extern "C" {
+
+void logistics_init() {
     SigmaOS::Kernel::Enterprise::SovereignLogistics::getInstance().init();
 }
+
+} // extern "C"

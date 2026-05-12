@@ -9,9 +9,9 @@
  *
  * USP: Unlike Plymouth's userland daemon, the Sovereign Boot Splash writes
  * pixels directly to the framebuffer before the kernel has even mounted VFS.
- * Fully customizable via .sab theme bundles — zero runtime dependencies.
+ * Fully customizable via .sab theme bundles ï¿½ zero runtime dependencies.
  *
- * Design: OOP-isolated singleton — SovereignBootSplashEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignBootSplashEngine.
  */
 
 class SovereignBootSplashEngine {
@@ -47,11 +47,13 @@ private:
     sigma_u32 fb_w, fb_h, progress;
 };
 
-extern "C" void bootsplash_init(sigma_u32 w, sigma_u32 h) { SovereignBootSplashEngine::init(w, h); }
-extern "C" void bootsplash_progress(sigma_u32 pct, const char* stage) { SovereignBootSplashEngine::updateProgress(pct, stage); }
-extern "C" void bootsplash_set_theme(const char* theme) { SovereignBootSplashEngine::setTheme(theme); }
-extern "C" void bootsplash_dismiss() { SovereignBootSplashEngine::dismiss(); }
+void bootsplash_init(sigma_u32 w, sigma_u32 h) { SovereignBootSplashEngine::init(w, h); }
+void bootsplash_progress(sigma_u32 pct, const char* stage) { SovereignBootSplashEngine::updateProgress(pct, stage); }
+void bootsplash_set_theme(const char* theme) { SovereignBootSplashEngine::setTheme(theme); }
+void bootsplash_dismiss() { SovereignBootSplashEngine::dismiss(); }
 
 
 
 
+
+} // extern "C"

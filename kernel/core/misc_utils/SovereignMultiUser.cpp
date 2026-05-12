@@ -41,7 +41,7 @@ bool SovereignMultiUserEngine::authenticate(sigma_u32 uid, const char* username)
     return false;
 }
 
-extern "C" void multiuser_init() {
+void multiuser_init() {
     SovereignMultiUserEngine::init();
 }
 
@@ -55,3 +55,5 @@ extern "C" bool multiuser_authenticate(sigma_u32 uid, const char* username) {
 
 
 
+
+} // extern "C"

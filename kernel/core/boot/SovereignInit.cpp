@@ -6,11 +6,11 @@
 #include "SovereignNeuralNexus.hpp"
 #include "fs/SovereignVFS.hpp"
 
-extern "C" void neural_init();
-extern "C" void vfs_init();
+void neural_init();
+void vfs_init();
 
 
-extern "C" void allocator_init();
+void allocator_init();
 
 
 /**
@@ -18,7 +18,7 @@ extern "C" void allocator_init();
  * Implements an Asynchronous Shard Ignition (ASI) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal machine-state ignition.
  *
- * Design: OOP-isolated singleton — SovereignInitEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignInitEngine.
  */
 
 namespace SigmaOS {
@@ -73,16 +73,18 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Wrappers --- */
-extern "C" void sinit_init() {
+void sinit_init() {
     SigmaOS::Kernel::Boot::SovereignInitEngine::init();
 }
 
-extern "C" void sinit_execute_plan() {
+void sinit_execute_plan() {
     SigmaOS::Kernel::Boot::SovereignInitEngine::executePlan();
 }
 
-extern "C" void sinit_report_status() {
+void sinit_report_status() {
     SigmaOS::Kernel::Boot::SovereignInitEngine::reportStatus();
 }
 
@@ -90,3 +92,7 @@ extern "C" void sinit_report_status() {
 
 
 
+
+} // extern "C"
+
+} // extern "C"

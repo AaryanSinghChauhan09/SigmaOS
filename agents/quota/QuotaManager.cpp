@@ -47,10 +47,12 @@ public:
     }
 };
 
-extern "C" void agent_quota_set(const char* resource, int percentage) {
+void agent_quota_set(const char* resource, int percentage) {
     QuotaManager* quotaManager = (QuotaManager*) SigmaOS::Kernel::Context::ContextManager::getInstance().resolve("agent.quota");
     if (!quotaManager) {
         quotaManager = &QuotaManager::getInstance();
     }
     quotaManager->setQuota(resource, percentage);
 }
+
+} // extern "C"

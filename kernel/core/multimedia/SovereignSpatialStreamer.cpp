@@ -49,15 +49,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void streamer_init() {
+void streamer_init() {
     SigmaOS::Kernel::Multimedia::SovereignSpatialStreamer::init();
 }
 
-extern "C" void streamer_push_frame(void* buf, sigma_usize sz) {
+void streamer_push_frame(void* buf, sigma_usize sz) {
     SigmaOS::Kernel::Multimedia::SovereignSpatialStreamer::streamFrame(buf, sz);
 }
 
 
 
 
+
+} // extern "C"

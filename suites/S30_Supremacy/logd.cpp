@@ -30,7 +30,11 @@ public:
 } // namespace Userland
 } // namespace SigmaOS
 
-extern "C" void sigma_logd_init() {
+extern "C" {
+
+void sigma_logd_init() {
     SigmaOS::Userland::LogDaemon logd;
     logd.listen();
 }
+
+} // extern "C"

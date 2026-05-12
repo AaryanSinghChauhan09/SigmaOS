@@ -12,7 +12,7 @@
  * ZERO-DEPENDENCY: Strictly bare-metal power management.
  */
 
-extern "C" void batteryiq_init() {
+void batteryiq_init() {
     sigma_log("[BATTERYIQ] Initializing Sovereign Battery Intelligence (PCL Algorithm)...");
 }
 
@@ -22,7 +22,7 @@ extern "C" sigma_u32 batteryiq_get_health_percent() {
     return 94; // 94% health
 }
 
-extern "C" void batteryiq_optimize_charge() {
+void batteryiq_optimize_charge() {
     // PCL (Predictive Charge Lifecycle) Algorithm
     // Caps charge at 80% during sustained plugged-in periods to extend battery lifespan.
     
@@ -30,9 +30,11 @@ extern "C" void batteryiq_optimize_charge() {
     sigma_log("[BATTERYIQ] PCL: Estimated lifespan extension: +18 months.");
 }
 
-extern "C" void batteryiq_render_report() {
+void batteryiq_render_report() {
     sigma_log("[BATTERYIQ] PCL: Battery Health: 94%. Cycles: 247. Est. Remaining: 3.2 years.");
 }
 
 
 
+
+} // extern "C"

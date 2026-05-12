@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void infer_init() {
+extern "C" {
+
+void infer_init() {
     SigmaOS::Kernel::AI::SovereignInferenceEngine::getInstance().init();
 }
+
+} // extern "C"

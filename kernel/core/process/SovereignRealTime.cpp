@@ -9,7 +9,7 @@
  * Implements an Earliest-Deadline-First Critical (EDFC) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal deterministic execution.
  *
- * Design: OOP-isolated singleton — SovereignRealTimeManager.
+ * Design: OOP-isolated singleton ï¿½ SovereignRealTimeManager.
  */
 
 class SovereignRealTimeManager {
@@ -47,7 +47,7 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void realtime_init() {
+void realtime_init() {
     SovereignRealTimeManager::init();
 }
 
@@ -55,10 +55,12 @@ extern "C" bool realtime_schedule_task(const sigma_realtime_task_t* task, void (
     return SovereignRealTimeManager::scheduleTask(task, task_func);
 }
 
-extern "C" void realtime_execute_critical_path() {
+void realtime_execute_critical_path() {
     SovereignRealTimeManager::executeCriticalPath();
 }
 
 
 
 
+
+} // extern "C"

@@ -71,10 +71,12 @@ InitManager* InitManager::s_instance = nullptr;
 
 } // namespace sigma
 
-extern "C" void sigma_kernel_init() {
+void sigma_kernel_init() {
     auto& im = sigma::InitManager::get();
     im.register_service("S04_HAL", nullptr);
     im.register_service("S08_Security", nullptr);
     im.register_service("S02_ZenithUI", nullptr);
     im.start_all();
 }
+
+} // extern "C"

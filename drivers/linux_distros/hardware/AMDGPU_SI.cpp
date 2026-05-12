@@ -40,6 +40,11 @@ private:
 } // namespace Drivers
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void amdgpu_si_init() {
+
+extern "C" {
+
+void amdgpu_si_init() {
     SigmaOS::Kernel::Drivers::Hardware::AMDGPUSouthernIslands::initDevice();
 }
+
+} // extern "C"

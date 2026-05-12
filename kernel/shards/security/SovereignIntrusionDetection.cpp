@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void ids_init() {
+extern "C" {
+
+void ids_init() {
     SigmaOS::Kernel::Security::SovereignIntrusionDetection::getInstance().init();
 }
+
+} // extern "C"

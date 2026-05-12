@@ -2,13 +2,13 @@
 #include "sigma_log.h"
 
 /* Forward declarations of professional healers */
-extern "C" void vakil_heal();
-extern "C" void vakil_rollback();
-extern "C" void acct_heal();
-extern "C" void acct_rollback();
+void vakil_heal();
+void vakil_rollback();
+void acct_heal();
+void acct_rollback();
 
 /* Nexus registration */
-extern "C" void nexus_register_strategy(sigma_u32 role_id, void (*heal)(), void (*rollback)());
+void nexus_register_strategy(sigma_u32 role_id, void (*heal)(), void (*rollback)());
 
 /**
  * SigmaOS Sovereign Professional Bootstrap
@@ -35,6 +35,12 @@ void bootstrap_professional_lattice() {
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sigma_professional_bootstrap() {
+extern "C" {
+
+void sigma_professional_bootstrap() {
     SigmaOS::Kernel::System::bootstrap_professional_lattice();
 }
+
+} // extern "C"
+
+} // extern "C"

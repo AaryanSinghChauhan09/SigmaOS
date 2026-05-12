@@ -13,7 +13,7 @@
  * ZERO-DEPENDENCY: Strictly bare-metal live patching.
  */
 
-extern "C" void livekernel_init() {
+void livekernel_init() {
     sigma_log("[LIVEKERNEL] Initializing Sovereign Live Kernel Patch (AFR Algorithm)...");
 }
 
@@ -28,10 +28,12 @@ extern "C" bool livekernel_apply_patch(const void* patch_data, sigma_u32 patch_s
     return true;
 }
 
-extern "C" void livekernel_verify_integrity() {
+void livekernel_verify_integrity() {
     sigma_log("[LIVEKERNEL] AFR: Verifying kernel text segment integrity post-patch...");
     sigma_log("[LIVEKERNEL] AFR: All 500 sovereign shards verified. Lattice INTACT.");
 }
 
 
 
+
+} // extern "C"

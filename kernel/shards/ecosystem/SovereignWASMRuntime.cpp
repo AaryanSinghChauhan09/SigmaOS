@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void wasm_init() {
+extern "C" {
+
+void wasm_init() {
     SigmaOS::Kernel::Ecosystem::SovereignWASMRuntime::getInstance().init();
 }
+
+} // extern "C"

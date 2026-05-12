@@ -13,11 +13,11 @@
  * ZERO-DEPENDENCY: Strictly bare-metal sensor orchestration.
  */
 
-extern "C" void omnisense_init() {
+void omnisense_init() {
     sigma_log("[OMNISENSE] Initializing Sovereign Omni-Sense Hub (REF Algorithm)...");
 }
 
-extern "C" void omnisense_poll_sensors() {
+void omnisense_poll_sensors() {
     sigma_log("[OMNISENSE] REF: Polling integrated silicon sensor matrix...");
     
     sigma_omnisense_data_t current_data = {
@@ -29,7 +29,7 @@ extern "C" void omnisense_poll_sensors() {
     omnisense_adapt_system(&current_data);
 }
 
-extern "C" void omnisense_adapt_system(const sigma_omnisense_data_t* data) {
+void omnisense_adapt_system(const sigma_omnisense_data_t* data) {
     // REF (Reactive Environmental Fusion) Algorithm
     
     if (!data->user_presence_detected) {
@@ -48,3 +48,5 @@ extern "C" void omnisense_adapt_system(const sigma_omnisense_data_t* data) {
 
 
 
+
+} // extern "C"

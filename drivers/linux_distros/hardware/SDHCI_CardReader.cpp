@@ -40,6 +40,11 @@ private:
 } // namespace Drivers
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void sdhci_init() {
+
+extern "C" {
+
+void sdhci_init() {
     SigmaOS::Kernel::Drivers::Hardware::SDHCICardReader::initDevice();
 }
+
+} // extern "C"

@@ -87,7 +87,9 @@ public:
 } // namespace Net
 } // namespace SigmaOS
 
-extern "C" void start_net_zenith() {
+extern "C" {
+
+void start_net_zenith() {
     SigmaOS::Net::SovereignEthernet nic;
 
     const char* data = "SIGMA_PULSE_ZENITH";
@@ -101,3 +103,5 @@ int main() {
     return 0;
 }
 
+
+} // extern "C"

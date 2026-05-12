@@ -40,10 +40,16 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void* sigma_alloc_amnesic(sigma_size_t size) {
+extern "C" {
+
+void* sigma_alloc_amnesic(sigma_size_t size) {
     return SigmaOS::Kernel::Memory::AmnesicMemoryManager::allocateAmnesic(size);
 }
 
-extern "C" void sigma_free_amnesic(void* ptr, sigma_size_t size) {
+void sigma_free_amnesic(void* ptr, sigma_size_t size) {
     SigmaOS::Kernel::Memory::AmnesicMemoryManager::scrub(ptr, size);
 }
+
+} // extern "C"
+
+} // extern "C"

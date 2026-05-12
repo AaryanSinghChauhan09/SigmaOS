@@ -2,7 +2,7 @@
 #include "libc/SovereignLibC.h"
 /**
  * SigmaOS Sovereign FAT32 Filesystem
- * v29.0 Zenith Foundation — Minimal Filesystem
+ * v29.0 Zenith Foundation ï¿½ Minimal Filesystem
  * ZERO-DEPENDENCY: Strictly bare-metal FAT32 parsing.
  */
 
@@ -66,7 +66,7 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void fat32_init() {
+void fat32_init() {
     SovereignFAT32Engine::init();
 }
 
@@ -74,7 +74,7 @@ extern "C" bool fat32_mount(sigma_u32 partition_offset) {
     return SovereignFAT32Engine::mount(partition_offset);
 }
 
-extern "C" void fat32_unmount() {
+void fat32_unmount() {
     SovereignFAT32Engine::unmount();
 }
 
@@ -82,3 +82,5 @@ extern "C" int fat32_read_file(const char* path, void* buffer, sigma_u32 size) {
     return SovereignFAT32Engine::readFile(path, buffer, size);
 }
 
+
+} // extern "C"

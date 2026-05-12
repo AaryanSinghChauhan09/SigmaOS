@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void routing_init() {
+void routing_init() {
     SigmaOS::Kernel::Network::SovereignRoutingManager::init();
 }
 
-extern "C" void routing_update(const char* dest, const char* next) {
+void routing_update(const char* dest, const char* next) {
     SigmaOS::Kernel::Network::SovereignRoutingManager::updateRoute(dest, next);
 }
 
 
 
 
+
+} // extern "C"

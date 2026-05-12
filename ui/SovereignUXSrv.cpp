@@ -44,15 +44,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void uxsrv_init() {
+void uxsrv_init() {
     SigmaOS::Kernel::UI::SovereignUXSrv::init();
 }
 
-extern "C" void uxsrv_handle_workflow(const char* id) {
+void uxsrv_handle_workflow(const char* id) {
     SigmaOS::Kernel::UI::SovereignUXSrv::handleWorkflow(id);
 }
 
 
 
 
+
+} // extern "C"

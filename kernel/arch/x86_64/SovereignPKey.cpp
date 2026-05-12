@@ -48,8 +48,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void pkey_init() {
+void pkey_init() {
     SigmaOS::Kernel::HAL::SovereignPKeyManager::init();
 }
 
@@ -57,7 +59,9 @@ extern "C" int pkey_alloc() {
     return SigmaOS::Kernel::HAL::SovereignPKeyManager::allocateKey();
 }
 
-extern "C" void pkey_set(int key, sigma_u32 rights) {
+void pkey_set(int key, sigma_u32 rights) {
     SigmaOS::Kernel::HAL::SovereignPKeyManager::setProtection(key, rights);
 }
 
+
+} // extern "C"

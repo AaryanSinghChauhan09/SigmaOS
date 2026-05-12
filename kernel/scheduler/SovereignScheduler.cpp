@@ -36,6 +36,8 @@ public:
     }
 };
 
-extern "C" void sigma_schedule(const char* task, int prio) {
+void sigma_schedule(const char* task, int prio) {
     SovereignScheduler::getInstance().scheduleTask(task, prio);
 }
+
+} // extern "C"

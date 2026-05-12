@@ -12,7 +12,7 @@
  * ZERO-DEPENDENCY: Strictly bare-metal resource representation.
  */
 
-extern "C" void namespace_init() {
+void namespace_init() {
     sigma_log("[NAMESPACE] Initializing Sovereign Universal Namespace (ORM Algorithm)...");
 }
 
@@ -45,7 +45,7 @@ extern "C" bool namespace_mount(const char* mount_point, sigma_namespace_type_t 
     return false;
 }
 
-extern "C" void* namespace_resolve_path(const char* path) {
+void* namespace_resolve_path(const char* path) {
     sigma_log("[NAMESPACE] ORM: Resolving universal path '%s'...\n", path);
     
     for (int i = 0; i < 128; i++) {
@@ -61,3 +61,7 @@ extern "C" void* namespace_resolve_path(const char* path) {
 
 
 
+
+} // extern "C"
+
+} // extern "C"

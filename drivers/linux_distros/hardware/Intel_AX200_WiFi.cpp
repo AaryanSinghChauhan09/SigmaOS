@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void ax200_wifi_init() {
+extern "C" {
+
+void ax200_wifi_init() {
     SigmaOS::Kernel::Drivers::Hardware::IntelAX200WiFi::initDevice();
 }
+
+} // extern "C"

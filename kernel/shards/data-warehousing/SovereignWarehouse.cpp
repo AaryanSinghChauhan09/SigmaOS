@@ -49,10 +49,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void warehouse_init() {
+extern "C" {
+
+void warehouse_init() {
     SigmaOS::Kernel::Data::SovereignWarehouse::getInstance().init();
 }
 
-extern "C" void warehouse_scan(const char* col) {
+void warehouse_scan(const char* col) {
     SigmaOS::Kernel::Data::SovereignWarehouse::getInstance().scanColumn(col);
 }
+
+} // extern "C"

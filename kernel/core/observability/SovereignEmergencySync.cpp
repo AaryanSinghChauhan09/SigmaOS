@@ -3,7 +3,7 @@
  * S SIGMAOS: EMERGENCY LATTICE SYNC (RECOV-001)
  * =========================================================================
  * Mission: Self-healing disaster recovery mechanism.
- * Layer  : L2 — System Services / Reliability
+ * Layer  : L2 ï¿½ System Services / Reliability
  * =========================================================================
  */
 
@@ -43,6 +43,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void emergency_sync_start() {
+extern "C" {
+
+void emergency_sync_start() {
     SigmaOS::Kernel::Reliability::SovereignEmergencySync::initiateSync();
 }
+
+} // extern "C"

@@ -11,7 +11,7 @@
  * with a 12KB kernel footprint. The IoT Engine manages device telemetry, MQTT-like 
  * pub/sub, and firmware OTA updates through the SovereignProtocol mesh.
  *
- * Design: OOP-isolated singleton — SovereignIoTEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignIoTEngine.
  */
 
 typedef struct {
@@ -41,12 +41,12 @@ public:
         sigma_hardened_strcpy(d->device_type, device_type, 24);
         d->last_telemetry_tick = 0;
         d->online = true;
-        sigma_log("[IOT] Registered: %s (ID: 0x%04X) — online.\n", device_type, device_id);
+        sigma_log("[IOT] Registered: %s (ID: 0x%04X) ï¿½ online.\n", device_type, device_id);
         return device_id;
     }
 
     void publishTelemetry(sigma_u32 device_id, sigma_u32 value, sigma_u32 tick) {
-        sigma_log("[IOT] Telemetry from 0x%04X: value=%u at tick %u — routing via SCP mesh.\n",
+        sigma_log("[IOT] Telemetry from 0x%04X: value=%u at tick %u ï¿½ routing via SCP mesh.\n",
                      device_id, value, tick);
     }
 
@@ -61,11 +61,13 @@ private:
     sigma_u32 device_count;
 };
 
-extern "C" void iot_init() { SovereignIoTEngine::init(); }
+void iot_init() { SovereignIoTEngine::init(); }
 extern "C" sigma_u32 iot_register_device(const char* type, sigma_u32 id) { return SovereignIoTEngine::registerDevice(type, id); }
-extern "C" void iot_publish_telemetry(sigma_u32 id, sigma_u32 val, sigma_u32 tick) { SovereignIoTEngine::publishTelemetry(id, val, tick); }
-extern "C" void iot_push_ota(sigma_u32 id, const char* fw) { SovereignIoTEngine::pushFirmwareOTA(id, fw); }
+void iot_publish_telemetry(sigma_u32 id, sigma_u32 val, sigma_u32 tick) { SovereignIoTEngine::publishTelemetry(id, val, tick); }
+void iot_push_ota(sigma_u32 id, const char* fw) { SovereignIoTEngine::pushFirmwareOTA(id, fw); }
 
 
 
 
+
+} // extern "C"

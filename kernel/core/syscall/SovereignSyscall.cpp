@@ -3,7 +3,7 @@
 #include "sigma_log.h"
 
 /**
- * SovereignSyscall — Fast-Path Shard Transition (FPST) System Call Gate
+ * SovereignSyscall ï¿½ Fast-Path Shard Transition (FPST) System Call Gate
  * Dispatches kernel services with minimum context switch overhead.
  * Self-healing: unknown syscall IDs are rerouted to the SovereignFallback shard.
  */
@@ -59,7 +59,7 @@ public:
                 return SIGMA_OK;
 
             default:
-                sigma_log_warn("[SYSCALL] Unknown ID — triggering SELF-HEAL redirection.");
+                sigma_log_warn("[SYSCALL] Unknown ID ï¿½ triggering SELF-HEAL redirection.");
                 return attemptSelfHealing(id, arg1, arg2, arg3);
         }
     }
@@ -87,8 +87,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void syscall_init() {
+void syscall_init() {
     SigmaOS::Kernel::Syscall::SovereignSyscallEngine::init();
 }
 
@@ -97,7 +99,7 @@ extern "C" unsigned int sigma_syscall(unsigned int id, unsigned int arg1, unsign
         (sigma_u32)id, (sigma_u32)arg1, (sigma_u32)arg2, (sigma_u32)arg3);
 }
 
-extern "C" void syscall_handler_asm() {
+void syscall_handler_asm() {
     sigma_log_info("[SYSCALL] ASM Gate Transition: USER -> KERNEL Shard.");
 }
 
@@ -105,3 +107,5 @@ extern "C" unsigned long long syscall_get_total_calls() {
     return (unsigned long long)SigmaOS::Kernel::Syscall::SovereignSyscallEngine::getTotalCalls();
 }
 
+
+} // extern "C"

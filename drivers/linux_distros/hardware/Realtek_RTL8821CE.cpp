@@ -40,6 +40,11 @@ private:
 } // namespace Drivers
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void rtl8821ce_init() {
+
+extern "C" {
+
+void rtl8821ce_init() {
     SigmaOS::Kernel::Drivers::Hardware::RealtekRTL8821CE::initDevice();
 }
+
+} // extern "C"

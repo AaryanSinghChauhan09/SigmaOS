@@ -37,3 +37,5 @@ int sigma_atoi(const char* str) {
 }
 
 }
+
+} // extern "C"

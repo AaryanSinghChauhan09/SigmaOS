@@ -33,3 +33,5 @@ TEST_F(SovereignSandboxTest, ShardSpecificCapabilityAllowed) {
     bool has_cap = sandbox_has_capability("SovereignMonitor", "EBPF_INJECT");
     EXPECT_TRUE(has_cap);
 }
+
+} // extern "C"

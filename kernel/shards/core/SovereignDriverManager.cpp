@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void drv_init() {
+extern "C" {
+
+void drv_init() {
     SigmaOS::Kernel::Core::SovereignDriverManager::getInstance().init();
 }
+
+} // extern "C"

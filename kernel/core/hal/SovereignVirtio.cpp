@@ -35,8 +35,10 @@ void SovereignVirtio::resetDevice(sigma_u32 device_id) {
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void virtio_init() {
+void virtio_init() {
     SigmaOS::Kernel::HAL::SovereignVirtio::init();
 }
 
@@ -46,3 +48,5 @@ extern "C" bool virtio_probe(sigma_u32 id) {
 
 
 
+
+} // extern "C"

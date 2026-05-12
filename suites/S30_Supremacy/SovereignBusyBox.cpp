@@ -47,7 +47,9 @@ private:
 }
 }
 
-extern "C" void busybox_main(const char* cmd, int argc, char** argv) {
+void busybox_main(const char* cmd, int argc, char** argv) {
     SigmaOS::Userland::SovereignBusyBox::getInstance().execute(cmd, argc, argv);
 }
 
+
+} // extern "C"

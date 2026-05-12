@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void fab_init() {
+extern "C" {
+
+void fab_init() {
     SigmaOS::Kernel::Industrial::SovereignBioFabrication::getInstance().init();
 }
+
+} // extern "C"

@@ -10,7 +10,7 @@
  * Implements an Atomic Hot-Swap Linker (AHSL) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal module loading.
  *
- * Design: OOP-isolated singleton — SovereignDynModuleEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignDynModuleEngine.
  */
 
 class SovereignDynModuleEngine {
@@ -67,7 +67,7 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void dynmodule_init() {
+void dynmodule_init() {
     SovereignDynModuleEngine::init();
 }
 
@@ -82,3 +82,5 @@ extern "C" bool dynmodule_unload(sigma_u32 module_id) {
 
 
 
+
+} // extern "C"

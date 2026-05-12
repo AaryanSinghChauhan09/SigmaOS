@@ -49,19 +49,23 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void kube_init() {
+void kube_init() {
     SigmaOS::Kernel::Deployment::SovereignKubeOperator::init();
 }
 
-extern "C" void kube_reconcile() {
+void kube_reconcile() {
     SigmaOS::Kernel::Deployment::SovereignKubeOperator::reconcileLatticeState();
 }
 
-extern "C" void kube_deploy_pod(const char* name) {
+void kube_deploy_pod(const char* name) {
     SigmaOS::Kernel::Deployment::SovereignKubeOperator::deployShardPod(name);
 }
 
 
 
 
+
+} // extern "C"

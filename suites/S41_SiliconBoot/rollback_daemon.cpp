@@ -46,7 +46,7 @@ public:
     }
 };
 
-extern "C" void start_rollback_daemon() {
+void start_rollback_daemon() {
     static SigmaRollbackManager global_rm;
     rollback_init(&global_rm);
     
@@ -56,3 +56,5 @@ extern "C" void start_rollback_daemon() {
     // Simulate a stability check
     daemon.mark_boot_stable();
 }
+
+} // extern "C"

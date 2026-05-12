@@ -12,15 +12,15 @@
  * ZERO-DEPENDENCY: Strictly bare-metal background synchronization.
  */
 
-extern "C" void omnisync_init() {
+void omnisync_init() {
     sigma_log("[OMNISYNC] Initializing Sovereign Omni-Sync Engine (CDR Algorithm)...");
 }
 
-extern "C" void omnisync_register_directory(const char* dir_path) {
+void omnisync_register_directory(const char* dir_path) {
     sigma_log("[OMNISYNC] CDR: Directory '%s' registered for continuous replication.\n", dir_path);
 }
 
-extern "C" void omnisync_trigger_sync() {
+void omnisync_trigger_sync() {
     // CDR (Continuous Delta Replication) Algorithm
     // Computes block-level diffs and securely transmits them over S-ZeroNet.
     
@@ -31,3 +31,5 @@ extern "C" void omnisync_trigger_sync() {
 
 
 
+
+} // extern "C"

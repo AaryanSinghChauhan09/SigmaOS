@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void debian_driver_load(const char* path) {
+extern "C" {
+
+void debian_driver_load(const char* path) {
     SigmaOS::Kernel::Drivers::DebianDriverCompat::loadDebianDriver(path);
 }
+
+} // extern "C"

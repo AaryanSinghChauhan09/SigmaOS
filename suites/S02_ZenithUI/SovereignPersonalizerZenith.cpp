@@ -69,7 +69,9 @@ public:
 } // namespace Personality
 } // namespace SigmaOS
 
-extern "C" void start_personalizer_demo() {
+extern "C" {
+
+void start_personalizer_demo() {
     SigmaOS::Personality::SovereignPersonalizer personalizer;
     
     personalizer.set_mode(SigmaOS::Personality::Mode::DARK_ZENITH);
@@ -85,3 +87,5 @@ int main() {
 
 
 
+
+} // extern "C"

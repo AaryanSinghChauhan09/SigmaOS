@@ -47,10 +47,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void security_anonymity_enable() {
+extern "C" {
+
+void security_anonymity_enable() {
     SigmaOS::Kernel::Security::SovereignAnonymity::enableIsolatedMode();
 }
 
 extern "C" int security_anonymity_status() {
     return SigmaOS::Kernel::Security::SovereignAnonymity::verifyCircuit() ? 1 : 0;
 }
+
+} // extern "C"

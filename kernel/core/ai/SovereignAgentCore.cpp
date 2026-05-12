@@ -67,11 +67,15 @@ private:
 } // namespace AI
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void agent_spawn(const char* id, const char* goal) {
+void agent_spawn(const char* id, const char* goal) {
     SigmaOS::AI::SovereignAgentCore::getInstance().spawnAgent(id, goal);
 }
 
-extern "C" void agent_audit() {
+void agent_audit() {
     SigmaOS::AI::SovereignAgentCore::getInstance().auditAgents();
 }
+
+} // extern "C"

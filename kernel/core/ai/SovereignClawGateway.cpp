@@ -68,19 +68,23 @@ private:
 } // namespace AI
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge for Multi-Shard Interop --- */
-extern "C" void claw_register_workflow(const char* workflow_id, const char* manifest) {
+void claw_register_workflow(const char* workflow_id, const char* manifest) {
     SigmaOS::AI::SovereignClawGateway::registerWorkflow(
         SigmaOS::AI::SovereignClawGateway::WorkflowID{workflow_id},
         SigmaOS::AI::SovereignClawGateway::ManifestJSON{manifest});
 }
 
-extern "C" void claw_dispatch_agent(const char* agent_type, const char* task_intent) {
+void claw_dispatch_agent(const char* agent_type, const char* task_intent) {
     SigmaOS::AI::SovereignClawGateway::dispatchAgent(
         SigmaOS::AI::SovereignClawGateway::AgentType{agent_type},
         SigmaOS::AI::SovereignClawGateway::TaskIntent{task_intent});
 }
 
-extern "C" void claw_telemetry() {
+void claw_telemetry() {
     SigmaOS::AI::SovereignClawGateway::getAutomationTelemetry();
 }
+
+} // extern "C"

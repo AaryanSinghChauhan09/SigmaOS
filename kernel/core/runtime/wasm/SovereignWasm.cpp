@@ -25,8 +25,10 @@ bool SovereignWasmRuntime::invoke(const char* funcName) {
 } // namespace Runtime
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void wasm_init() {
+void wasm_init() {
     SigmaOS::Runtime::SovereignWasmRuntime::init();
 }
 
@@ -37,3 +39,5 @@ extern "C" bool wasm_load_module(const void* bytecode, sigma_size_t size) {
 extern "C" bool wasm_invoke(const char* funcName) {
     return SigmaOS::Runtime::SovereignWasmRuntime::invoke(funcName);
 }
+
+} // extern "C"

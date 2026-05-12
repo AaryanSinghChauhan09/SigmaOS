@@ -36,6 +36,11 @@ private:
 } // namespace Automation
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void claw_quota_enforce(const char* id) {
+
+extern "C" {
+
+void claw_quota_enforce(const char* id) {
     SigmaOS::Kernel::Automation::ClawResourceQuotas::enforceQuotas(id);
 }
+
+} // extern "C"

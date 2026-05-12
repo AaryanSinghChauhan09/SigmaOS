@@ -49,14 +49,18 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void medical_init() {
+extern "C" {
+
+void medical_init() {
     SigmaOS::Kernel::Medical::SovereignMedical::getInstance().init();
 }
 
-extern "C" void medical_load_image(const void* data, sigma_usize size) {
+void medical_load_image(const void* data, sigma_usize size) {
     SigmaOS::Kernel::Medical::SovereignMedical::getInstance().loadDicomImage(data, size);
 }
 
-extern "C" void medical_seal_record(const char* id) {
+void medical_seal_record(const char* id) {
     SigmaOS::Kernel::Medical::SovereignMedical::getInstance().sealPatientRecord(id);
 }
+
+} // extern "C"

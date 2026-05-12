@@ -9,7 +9,7 @@
  * Implements a Priority-Aware Task Switching (PATS) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal process orchestration.
  *
- * Design: OOP-isolated singleton — SovereignProcessEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignProcessEngine.
  */
 
 namespace SigmaOS {
@@ -107,8 +107,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Wrappers --- */
-extern "C" void proc_init() {
+void proc_init() {
     SigmaOS::Kernel::Process::SovereignProcessEngine::init();
 }
 
@@ -116,7 +118,7 @@ extern "C" sigma_u32 proc_spawn(const char* name, sigma_u32 priority) {
     return SigmaOS::Kernel::Process::SovereignProcessEngine::spawn(name, priority);
 }
 
-extern "C" void proc_yield() {
+void proc_yield() {
     SigmaOS::Kernel::Process::SovereignProcessEngine::yield();
 }
 
@@ -131,3 +133,5 @@ extern "C" sigma_u64 proc_get_switch_count() {
 
 
 
+
+} // extern "C"

@@ -36,6 +36,11 @@ private:
 } // namespace Security
 } // namespace Kernel
 } // namespace SigmaOS
+
+extern "C" {
+
 extern "C" int sandbox_mac_validate(const char* sub, const char* obj, const char* act) {
     return SigmaOS::Kernel::Security::SovereignSandboxMAC::getInstance().validate(sub, obj, act) ? 1 : 0;
 }
+
+} // extern "C"

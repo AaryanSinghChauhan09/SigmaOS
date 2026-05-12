@@ -49,15 +49,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void peripheral_init() {
+void peripheral_init() {
     SigmaOS::Kernel::Hardware::SovereignPeripheralManager::init();
 }
 
-extern "C" void peripheral_event(const char* id, bool plug) {
+void peripheral_event(const char* id, bool plug) {
     SigmaOS::Kernel::Hardware::SovereignPeripheralManager::handleHotSwap(id, plug);
 }
 
 
 
 
+
+} // extern "C"

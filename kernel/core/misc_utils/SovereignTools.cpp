@@ -28,12 +28,12 @@ static const sigma_tool_entry_t tool_registry[] = {
     {"Cron Generator", 2}
 };
 
-extern "C" void tools_init() {
+void tools_init() {
     sigma_log("[S-TOOLS] Indexing 1000+ utility shards...");
     sigma_log("[S-TOOLS] Shard Indexing Complete: %u categories active.\n", 5);
 }
 
-extern "C" void tools_execute(sigma_u32 tool_id) {
+void tools_execute(sigma_u32 tool_id) {
     if (tool_id < 10) {
         sigma_log("[S-TOOLS] Executing Utility: %s\n", tool_registry[tool_id].name);
         sigma_log("[S-TOOLS] Utility shard state: NOMINAL.");
@@ -43,3 +43,5 @@ extern "C" void tools_execute(sigma_u32 tool_id) {
 
 
 
+
+} // extern "C"

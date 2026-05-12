@@ -24,6 +24,10 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sovereignmedical_init() {
+extern "C" {
+
+void sovereignmedical_init() {
     SigmaOS::Kernel::SovereignMedical::getInstance().init();
 }
+
+} // extern "C"

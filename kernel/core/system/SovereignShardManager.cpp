@@ -42,10 +42,14 @@ void SovereignShardManager::setCapabilities(sigma_u32 shard_id, sigma_u64 caps) 
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void shard_manager_init() {
+extern "C" {
+
+void shard_manager_init() {
     SigmaOS::Kernel::System::SovereignShardManager::init();
 }
 
 extern "C" bool shard_manager_reload(sigma_u32 id, const void* data, sigma_usize size) {
     return SigmaOS::Kernel::System::SovereignShardManager::reloadShard(id, data, size);
 }
+
+} // extern "C"

@@ -53,12 +53,16 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void hal_init() {
+void hal_init() {
     SigmaOS::Kernel::HAL::SovereignHAL::init();
 }
 
-extern "C" void hal_reboot() {
+void hal_reboot() {
     SigmaOS::Kernel::HAL::SovereignHAL::reboot();
 }
 
+
+} // extern "C"

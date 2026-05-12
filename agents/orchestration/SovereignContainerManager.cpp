@@ -31,6 +31,8 @@ public:
     }
 };
 
-extern "C" void sigma_container_deploy(const char* img, int cpu, int ram) {
+void sigma_container_deploy(const char* img, int cpu, int ram) {
     SovereignContainerManager::getInstance().deployContainer(img, cpu, ram);
 }
+
+} // extern "C"

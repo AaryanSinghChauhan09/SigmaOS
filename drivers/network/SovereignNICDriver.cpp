@@ -72,7 +72,7 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void nic_init() {
+void nic_init() {
     SovereignNICDriverEngine::init();
 }
 
@@ -84,10 +84,12 @@ extern "C" bool nic_transmit(const char* payload, sigma_u32 length) {
     return SovereignNICDriverEngine::transmit(payload, length);
 }
 
-extern "C" void nic_rx_interrupt() {
+void nic_rx_interrupt() {
     SovereignNICDriverEngine::receiveInterrupt();
 }
 
 
 
 
+
+} // extern "C"

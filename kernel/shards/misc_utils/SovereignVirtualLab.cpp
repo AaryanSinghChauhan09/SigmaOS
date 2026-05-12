@@ -110,7 +110,9 @@ public:
 } // namespace Education
 } // namespace SigmaOS
 
-extern "C" void start_lab_zenith() {
+extern "C" {
+
+void start_lab_zenith() {
     SigmaOS::Education::SovereignLabManager manager;
     manager.LoadNcertLabs();
     manager.RunExhaustiveAudit();
@@ -122,3 +124,5 @@ int main() {
     start_lab_zenith();
     return 0;
 }
+
+} // extern "C"

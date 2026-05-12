@@ -45,3 +45,5 @@ void sigma_remote_init() {
 }
 
 
+
+} // extern "C"

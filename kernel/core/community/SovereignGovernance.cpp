@@ -71,19 +71,23 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void governance_init_shard() {
+void governance_init_shard() {
     SigmaOS::Kernel::Community::SovereignGovernance::init();
 }
 
-extern "C" void governance_submit(const char* prop) {
+void governance_submit(const char* prop) {
     SigmaOS::Kernel::Community::SovereignGovernance::getInstance().submitProposal(prop);
 }
 
-extern "C" void governance_vote(const char* node, const char* prop, bool support) {
+void governance_vote(const char* node, const char* prop, bool support) {
     SigmaOS::Kernel::Community::SovereignGovernance::getInstance().castVote(node, prop, support);
 }
 
 
 
 
+
+} // extern "C"

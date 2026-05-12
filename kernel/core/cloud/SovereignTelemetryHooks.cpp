@@ -10,7 +10,7 @@
  * USP: securely exports real-time metrics (e.g., to Prometheus/Grafana) using
  * SovereignNetStack without exposing the Ring-0 memory space.
  *
- * Design: OOP-isolated singleton — SovereignTelemetryExporter.
+ * Design: OOP-isolated singleton ï¿½ SovereignTelemetryExporter.
  */
 
 class SovereignTelemetryExporter {
@@ -45,18 +45,20 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void telemetry_ex_init() {
+void telemetry_ex_init() {
     SovereignTelemetryExporter::init();
 }
 
-extern "C" void telemetry_ex_configure(const char* ip) {
+void telemetry_ex_configure(const char* ip) {
     SovereignTelemetryExporter::configureEndpoint(ip);
 }
 
-extern "C" void telemetry_ex_export(sigma_u32 cpu, sigma_u32 mem) {
+void telemetry_ex_export(sigma_u32 cpu, sigma_u32 mem) {
     SovereignTelemetryExporter::exportMetrics(cpu, mem);
 }
 
 
 
 
+
+} // extern "C"

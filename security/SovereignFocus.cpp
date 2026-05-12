@@ -49,19 +49,23 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void focus_init() {
+void focus_init() {
     SigmaOS::Kernel::Security::SovereignFocus::init();
 }
 
-extern "C" void focus_activate(sigma_u32 level) {
+void focus_activate(sigma_u32 level) {
     SigmaOS::Kernel::Security::SovereignFocus::activateFocusLock(level);
 }
 
-extern "C" void focus_deactivate() {
+void focus_deactivate() {
     SigmaOS::Kernel::Security::SovereignFocus::deactivateFocusLock();
 }
 
 
 
 
+
+} // extern "C"

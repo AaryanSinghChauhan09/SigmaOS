@@ -9,7 +9,7 @@
  * Implements a Zero-Buffer Packet Arbitration (ZBPA) algorithm.
  * ZERO-DEPENDENCY: Directly orchestrates hardware NICs.
  *
- * Design: OOP-isolated singleton — SovereignPacketArbiter.
+ * Design: OOP-isolated singleton ï¿½ SovereignPacketArbiter.
  */
 
 class SovereignPacketArbiter {
@@ -63,15 +63,15 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void netstack_init() {
+void netstack_init() {
     SovereignPacketArbiter::init();
 }
 
-extern "C" void netstack_process_packet(const void* buffer, sigma_u32 size) {
+void netstack_process_packet(const void* buffer, sigma_u32 size) {
     SovereignPacketArbiter::processPacket(buffer, size);
 }
 
-extern "C" void netstack_send_packet(const void* buffer, sigma_u32 size) {
+void netstack_send_packet(const void* buffer, sigma_u32 size) {
     SovereignPacketArbiter::sendPacket(buffer, size);
 }
 
@@ -80,3 +80,5 @@ extern "C" sigma_u32 netstack_is_link_active() {
 }
 
 
+
+} // extern "C"

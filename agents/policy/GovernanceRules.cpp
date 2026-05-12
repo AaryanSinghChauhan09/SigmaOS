@@ -41,3 +41,5 @@ extern "C" bool check_governance_policy() {
     }
     return policyModule->isExecutionAllowed();
 }
+
+} // extern "C"

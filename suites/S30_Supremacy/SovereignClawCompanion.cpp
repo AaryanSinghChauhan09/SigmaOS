@@ -8,7 +8,7 @@
  * Provides the interactive "Live Canvas" and multi-channel conversational UI.
  */
 
-extern "C" void claw_companion_launch(void) {
+void claw_companion_launch(void) {
     sigma_log_info("[CLAW-UI] Launching Sovereign Claw Companion App...");
     
     // Initialize connection to the kernel-side Claw Gateway
@@ -21,9 +21,11 @@ extern "C" void claw_companion_launch(void) {
     sigma_log_info("[CLAW-UI] Voice Wake listener activated (Talk Mode ready).");
 }
 
-extern "C" void claw_companion_handle_input(const char* user_input) {
+void claw_companion_handle_input(const char* user_input) {
     sigma_log_info("[CLAW-UI] User Input Received: %s", user_input);
     
     // Route local input through the gateway
     claw_route_message("Local-LiveCanvas", user_input);
 }
+
+} // extern "C"

@@ -50,19 +50,25 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void lazy_init() {
+void lazy_init() {
     SigmaOS::Kernel::Misc::SovereignLazyManager::init();
 }
 
-extern "C" void* lazy_alloc(sigma_size_t size) {
+void* lazy_alloc(sigma_size_t size) {
     return SigmaOS::Kernel::Misc::SovereignLazyManager::deferAllocation(size);
 }
 
-extern "C" void lazy_resolve(void* ptr) {
+void lazy_resolve(void* ptr) {
     SigmaOS::Kernel::Misc::SovereignLazyManager::resolveFault(ptr);
 }
 
 
 
 
+
+} // extern "C"
+
+} // extern "C"

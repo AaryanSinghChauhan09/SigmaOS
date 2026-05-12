@@ -10,7 +10,7 @@
  * USP: Actively detects and leverages silicon-specific extensions like 
  * Intel AMX, AVX-512, and Apple Silicon Neural Engines for matrix workloads.
  *
- * Design: OOP-isolated singleton — SovereignTunerEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignTunerEngine.
  */
 
 class SovereignTunerEngine {
@@ -50,18 +50,20 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void tuner_init() {
+void tuner_init() {
     SovereignTunerEngine::init();
 }
 
-extern "C" void tuner_probe() {
+void tuner_probe() {
     SovereignTunerEngine::probeSiliconExtensions();
 }
 
-extern "C" void tuner_exec(const char* workload) {
+void tuner_exec(const char* workload) {
     SovereignTunerEngine::executeAcceleratedWorkload(workload);
 }
 
 
 
 
+
+} // extern "C"

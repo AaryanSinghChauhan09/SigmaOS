@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void forensics_init() {
+void forensics_init() {
     SigmaOS::Kernel::System::SovereignForensics::init();
 }
 
-extern "C" void forensics_scan(const char* vol) {
+void forensics_scan(const char* vol) {
     SigmaOS::Kernel::System::SovereignForensics::executeDeepScan(vol);
 }
 
 
 
 
+
+} // extern "C"

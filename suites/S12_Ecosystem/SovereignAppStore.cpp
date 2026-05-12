@@ -62,7 +62,9 @@ public:
 } // namespace PackageForge
 } // namespace SigmaOS
 
-extern "C" void start_package_zenith() {
+extern "C" {
+
+void start_package_zenith() {
     SigmaOS::PackageForge::SovereignPackageNexus store;
     store.VetHardwareSignature("ZENITH_PHYSICS_IMPROVED");
     store.InstallSandboxedShard("ZENITH_PHYSICS_IMPROVED");
@@ -75,3 +77,5 @@ int main() {
 }
 
 
+
+} // extern "C"

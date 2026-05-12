@@ -48,10 +48,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sheet_init() {
+extern "C" {
+
+void sheet_init() {
     SigmaOS::Kernel::Data::SovereignSheet::getInstance().init();
 }
 
-extern "C" void sheet_import_ocr(const char* path) {
+void sheet_import_ocr(const char* path) {
     SigmaOS::Kernel::Data::SovereignSheet::getInstance().importOCR(path);
 }
+
+} // extern "C"

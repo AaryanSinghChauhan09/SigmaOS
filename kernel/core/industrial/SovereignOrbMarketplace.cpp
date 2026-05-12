@@ -48,12 +48,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void market_init() {
+void market_init() {
     SigmaOS::Kernel::Industrial::SovereignOrbMarketplace::init();
 }
 
-extern "C" void market_browse(const char* cat) {
+void market_browse(const char* cat) {
     SigmaOS::Kernel::Industrial::SovereignOrbMarketplace::browseOrbs(cat);
 }
 
@@ -64,3 +66,5 @@ extern "C" bool market_download(const char* id) {
 
 
 
+
+} // extern "C"

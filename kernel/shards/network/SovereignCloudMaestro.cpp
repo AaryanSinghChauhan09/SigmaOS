@@ -11,7 +11,7 @@
 
 #include "kernel/net/cloud_maestro.hpp"
 
-extern "C" void _start(void) {
+void _start(void) {
     SigmaOS::Net::CloudMaestro maestro;
     maestro.DeployToCloud("SOVEREIGN_KERNEL_ZENITH");
     maestro.DeployToCloud("APEX_AI_FUSION");
@@ -20,3 +20,5 @@ extern "C" void _start(void) {
     sigma_log("\n[SUCCESS]: Competitive Cloud Maestro Online. Zero-STL Sovereignty 100%%.\n");
     sigma_exit(0);
 }
+
+} // extern "C"

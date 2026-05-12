@@ -40,6 +40,11 @@ private:
 } // namespace Drivers
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void uvc_init() {
+
+extern "C" {
+
+void uvc_init() {
     SigmaOS::Kernel::Drivers::Hardware::USBVideoClass15::initDevice();
 }
+
+} // extern "C"

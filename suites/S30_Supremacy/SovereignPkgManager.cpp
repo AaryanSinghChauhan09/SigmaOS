@@ -52,7 +52,7 @@ private:
 };
 
 /* --- C Wrappers for Userland --- */
-extern "C" void spkg_init() {
+void spkg_init() {
     SovereignPackageManager::getInstance().init();
 }
 
@@ -60,9 +60,11 @@ extern "C" bool spkg_install(const char* sab_file_path) {
     return SovereignPackageManager::getInstance().installPackage(sab_file_path);
 }
 
-extern "C" void spkg_list() {
+void spkg_list() {
     SovereignPackageManager::getInstance().listPackages();
 }
 
 
 
+
+} // extern "C"

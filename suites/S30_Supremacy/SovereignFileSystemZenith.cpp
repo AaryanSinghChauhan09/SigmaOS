@@ -93,7 +93,9 @@ public:
 } // namespace Storage
 } // namespace SigmaOS
 
-extern "C" void start_vfs_zenith() {
+extern "C" {
+
+void start_vfs_zenith() {
     SigmaOS::Storage::SovereignFileSystemZenith vfs;
 
     vfs.mount_silicon_shard("boot.sys", (void*)0x7C00, 512);
@@ -109,3 +111,5 @@ int main() {
     return 0;
 }
 
+
+} // extern "C"

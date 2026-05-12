@@ -22,7 +22,7 @@ typedef struct {
 
 static vm_context_t vm_registry[64];
 
-extern "C" void microvm_init() {
+void microvm_init() {
     sigma_log("[MICROVM] Initializing Sovereign MicroVM Engine (HBC Algorithm)...");
 }
 
@@ -42,7 +42,7 @@ extern "C" sigma_u32 microvm_spawn(const sigma_microvm_config_t* config) {
     return id;
 }
 
-extern "C" void microvm_terminate(sigma_u32 vm_id) {
+void microvm_terminate(sigma_u32 vm_id) {
     if (vm_id > 0 && vm_id <= 64 && vm_registry[vm_id - 1].is_running) {
         vm_registry[vm_id - 1].is_running = false;
         sigma_log("[MICROVM] HBC: Terminating MicroVM %d and flushing EPT mappings.\n", vm_id);
@@ -51,3 +51,5 @@ extern "C" void microvm_terminate(sigma_u32 vm_id) {
 
 
 
+
+} // extern "C"

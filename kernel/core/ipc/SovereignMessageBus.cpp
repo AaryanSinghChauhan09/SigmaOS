@@ -27,14 +27,18 @@ void SovereignMessageBus::receiveMessage(void* buffer, sigma_usize max_size) {
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void ipc_bus_init() {
+void ipc_bus_init() {
     SigmaOS::Kernel::IPC::SovereignMessageBus::init();
 }
 
-extern "C" void ipc_bus_send(sigma_u32 target, const void* data, sigma_usize sz) {
+void ipc_bus_send(sigma_u32 target, const void* data, sigma_usize sz) {
     SigmaOS::Kernel::IPC::SovereignMessageBus::sendMessage(target, data, sz);
 }
 
 
 
+
+} // extern "C"

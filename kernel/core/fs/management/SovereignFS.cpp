@@ -17,7 +17,7 @@
  * Implements an Atomic Journaled Commit (AJC) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal data persistence.
  *
- * Design: OOP-isolated singleton — SovereignFSEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignFSEngine.
  */
 
 /* --- Sovereign FS Engine (OOP Isolation) --- */
@@ -29,7 +29,7 @@ static struct {
     .initialized = 0u
 };
 
-extern "C" void fs_init() {
+void fs_init() {
     sigma_log("[FS] Initializing Sovereign Self-Healing File System (AJC Algorithm)...");
     SovereignFSEngine.initialized = 1u;
 }
@@ -48,11 +48,11 @@ extern "C" bool fs_write_atomic(const char* path, const void* data, sigma_u32 si
     return true;
 }
 
-extern "C" void fs_verify_integrity() {
+void fs_verify_integrity() {
     sigma_log("[FS] AJC: Performing global lattice-storage integrity audit...");
 }
 
-extern "C" void fs_repair_corruption() {
+void fs_repair_corruption() {
     sigma_log("[FS] [ALERT] Corruption detected in block 0xAF42. Initiating SHSR-Repair...");
     sigma_log("[FS] AJC: Block restored from journal. Integrity RE-ESTABLISHED.");
 }
@@ -63,3 +63,5 @@ extern "C" sigma_u64 fs_get_total_writes() {
 
 
 
+
+} // extern "C"

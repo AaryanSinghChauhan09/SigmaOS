@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void llm_init() {
+extern "C" {
+
+void llm_init() {
     SigmaOS::Kernel::AI::SovereignLLMRuntime::getInstance().init();
 }
+
+} // extern "C"

@@ -84,7 +84,9 @@ public:
 } // namespace Science
 } // namespace SigmaOS
 
-extern "C" void start_calc_zenith() {
+extern "C" {
+
+void start_calc_zenith() {
     SigmaOS::Science::SovereignSuperCalculator calc;
     
     double g = calc.calculate_gst(100.0);
@@ -101,3 +103,5 @@ int main() {
     return 0;
 }
 
+
+} // extern "C"

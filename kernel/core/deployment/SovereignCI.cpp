@@ -58,8 +58,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void sci_init() {
+void sci_init() {
     SigmaOS::Kernel::Deployment::SovereignCIEngine::init();
 }
 
@@ -74,3 +76,5 @@ extern "C" sigma_u64 sci_get_executed_count() {
 
 
 
+
+} // extern "C"

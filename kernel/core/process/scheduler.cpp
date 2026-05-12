@@ -70,15 +70,21 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Interface --- */
-extern "C" void scheduler_init_shard() {
+void scheduler_init_shard() {
     SigmaOS::Kernel::Scheduling::SovereignScheduler::init();
 }
 
-extern "C" void scheduler_spawn(const char* name, void (*entry)()) {
+void scheduler_spawn(const char* name, void (*entry)()) {
     SigmaOS::Kernel::Scheduling::SovereignScheduler::createTask(name, entry);
 }
 
 
 
 
+
+} // extern "C"
+
+} // extern "C"

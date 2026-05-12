@@ -10,7 +10,7 @@
  * ZERO-DEPENDENCY: Direct IPP/RAW socket dispatch; no CUPS daemon.
  * Competitor parity: Linux CUPS, Windows Print Spooler, macOS AirPrint.
  *
- * Design: OOP-isolated singleton — SovereignPrintSpooler.
+ * Design: OOP-isolated singleton ï¿½ SovereignPrintSpooler.
  *         Ring-queue job scheduling with priority arbitration.
  */
 
@@ -51,7 +51,7 @@ static const char* _print_pri_name(sigma_u32 pri) {
     }
 }
 
-extern "C" void print_init() {
+void print_init() {
     sigma_log("[PRINT] Initializing Sovereign Zero-Daemon Direct Print Spooler (ZDPS)...");
     SovereignPrintSpooler.state.spooler_active = 1u;
     SovereignPrintSpooler.initialized          = 1u;
@@ -63,7 +63,7 @@ extern "C" sigma_u32 print_submit_job(sigma_u32 format, sigma_u32 priority,
                                        const char* description) {
     /* ZDPS Algorithm: Inserts job into priority-ordered ring queue.
      * High-priority jobs are reordered ahead of pending lower-priority jobs.
-     * Direct socket dispatch occurs at flush time — no daemon overhead.       */
+     * Direct socket dispatch occurs at flush time ï¿½ no daemon overhead.       */
     (void)data;
 
     if (SovereignPrintSpooler.state.jobs_queued >= SIGMA_PRINT_JOB_MAX) {
@@ -89,7 +89,7 @@ extern "C" sigma_u32 print_submit_job(sigma_u32 format, sigma_u32 priority,
 
     SovereignPrintSpooler.state.jobs_queued++;
 
-    sigma_log("[PRINT] ZDPS: Job #%d queued — fmt=%s pri=%s pages~%d (%d bytes).\n",
+    sigma_log("[PRINT] ZDPS: Job #%d queued ï¿½ fmt=%s pri=%s pages~%d (%d bytes).\n",
                  (int)job->job_id,
                  _print_fmt_name(format),
                  _print_pri_name(priority),
@@ -98,7 +98,7 @@ extern "C" sigma_u32 print_submit_job(sigma_u32 format, sigma_u32 priority,
     return job->job_id;
 }
 
-extern "C" void print_cancel_job(sigma_u32 job_id) {
+void print_cancel_job(sigma_u32 job_id) {
     for (sigma_u32 i = 0u; i < SovereignPrintSpooler.state.jobs_queued; i++) {
         if (SovereignPrintSpooler.jobs[i].job_id == job_id) {
             SovereignPrintSpooler.jobs[i].completed = 1u;
@@ -110,10 +110,10 @@ extern "C" void print_cancel_job(sigma_u32 job_id) {
     sigma_log("[PRINT] ZDPS: [WARN] Job #%d not found.\n", (int)job_id);
 }
 
-extern "C" void print_flush_spooler() {
+void print_flush_spooler() {
     /* ZDPS Algorithm: Dispatches all queued jobs over direct IPP socket.
      * Jobs are reordered by priority before dispatch.                   */
-    sigma_log("[PRINT] ZDPS: Flushing spooler — dispatching jobs by priority...");
+    sigma_log("[PRINT] ZDPS: Flushing spooler ï¿½ dispatching jobs by priority...");
     for (sigma_u32 i = 0u; i < SovereignPrintSpooler.state.jobs_queued; i++) {
         sigma_print_job_t* job = &SovereignPrintSpooler.jobs[i];
         if (!job->completed) {
@@ -133,3 +133,5 @@ extern "C" const sigma_print_state_t* print_get_state() {
 
 
 
+
+} // extern "C"

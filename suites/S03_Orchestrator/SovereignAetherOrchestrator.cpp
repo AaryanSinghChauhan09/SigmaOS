@@ -88,7 +88,9 @@ public:
 } // namespace Automation
 } // namespace SigmaOS
 
-extern "C" void start_aether_zenith() {
+extern "C" {
+
+void start_aether_zenith() {
     SigmaOS::Automation::SovereignAetherOrchestrator orchestrator;
 
     orchestrator.register_hardware_interrupt("HPET_TICK_10MS", "SHARD_GARBAGE_COLLECT_BYPASS");
@@ -105,3 +107,5 @@ int main() {
     return 0;
 }
 
+
+} // extern "C"

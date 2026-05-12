@@ -37,7 +37,7 @@ public:
     }
 };
 
-extern "C" void _start(void) {
+void _start(void) {
     SovereignBootMaster master;
     master.FastInit();
     master.LaunchKernel();
@@ -46,3 +46,5 @@ extern "C" void _start(void) {
     sigma_exit(0);
 }
 
+
+} // extern "C"

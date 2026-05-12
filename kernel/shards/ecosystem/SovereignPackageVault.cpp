@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void vault_init() {
+extern "C" {
+
+void vault_init() {
     SigmaOS::Kernel::Ecosystem::SovereignPackageVault::getInstance().init();
 }
+
+} // extern "C"

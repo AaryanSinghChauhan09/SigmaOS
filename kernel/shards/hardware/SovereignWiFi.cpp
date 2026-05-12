@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void wifi_init() {
+extern "C" {
+
+void wifi_init() {
     SigmaOS::Kernel::Hardware::SovereignWiFi::getInstance().init();
 }
+
+} // extern "C"

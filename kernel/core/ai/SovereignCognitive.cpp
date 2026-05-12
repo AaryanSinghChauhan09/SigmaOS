@@ -10,7 +10,7 @@
  * Implements a Neural Lattice Optimization (NLO) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal neural orchestration.
  *
- * Design: OOP-isolated singleton — SovereignCognitiveEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignCognitiveEngine.
  */
 
 /* --- Sovereign Cognitive Engine (OOP Isolation) --- */
@@ -27,13 +27,13 @@ static struct {
     .initialized = 0u
 };
 
-extern "C" void cognitive_init() {
+void cognitive_init() {
     sigma_log("[COGNITIVE] Initializing Sovereign Cognitive Shard Orchestrator (NLO Algorithm)...");
     SovereignCognitiveEngine.initialized = 1u;
     SovereignCognitiveEngine.state.active_agents = 4u;
 }
 
-extern "C" void cognitive_optimize_lattice() {
+void cognitive_optimize_lattice() {
     /* NLO (Neural Lattice Optimization) Algorithm
      * Evaluates shard telemetry and re-allocates core affinity for efficiency. */
     sigma_log("[COGNITIVE] NLO: Commencing neural lattice optimization sweep...");
@@ -44,7 +44,7 @@ extern "C" void cognitive_optimize_lattice() {
     sigma_log("[COGNITIVE] NLO: Optimization COMPLETE. Lattice efficiency increased by 8.4%.");
 }
 
-extern "C" void cognitive_auto_heal() {
+void cognitive_auto_heal() {
     /* NLO self-healing: detects shard degradation via neural entropy analysis. */
     sigma_log("[COGNITIVE] NLO: Initiating neural self-healing cycle...");
     
@@ -58,3 +58,5 @@ extern "C" const sigma_cognitive_state_t* cognitive_get_state() {
 
 
 
+
+} // extern "C"

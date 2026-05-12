@@ -50,3 +50,5 @@ void sigma_kprint_int(int val) {
 }
 
 }
+
+} // extern "C"

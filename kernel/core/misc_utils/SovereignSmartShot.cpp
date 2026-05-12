@@ -14,11 +14,11 @@
  * ZERO-DEPENDENCY: Strictly bare-metal screen capture and analysis.
  */
 
-extern "C" void smartshot_init() {
+void smartshot_init() {
     sigma_log("[SMARTSHOT] Initializing Sovereign Smart Screenshot (CCA Algorithm)...");
 }
 
-extern "C" void smartshot_capture_region(sigma_u32 x, sigma_u32 y, sigma_u32 w, sigma_u32 h) {
+void smartshot_capture_region(sigma_u32 x, sigma_u32 y, sigma_u32 w, sigma_u32 h) {
     // CCA (Contextual Capture Analysis) Algorithm
     // Captures framebuffer region, immediately runs S-VisSearch NPE for OCR/object tagging.
     
@@ -37,10 +37,12 @@ extern "C" void smartshot_capture_region(sigma_u32 x, sigma_u32 y, sigma_u32 w, 
     sigma_log("[SMARTSHOT] CCA: Screenshot captured, indexed, and copied to clipboard.");
 }
 
-extern "C" void smartshot_capture_fullscreen() {
+void smartshot_capture_fullscreen() {
     sigma_log("[SMARTSHOT] CCA: Initiating fullscreen framebuffer capture...");
     smartshot_capture_region(0, 0, 1920, 1080);
 }
 
 
 
+
+} // extern "C"

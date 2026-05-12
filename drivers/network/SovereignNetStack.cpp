@@ -54,11 +54,11 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void netstack_init() {
+void netstack_init() {
     SovereignNetStackEngine::init();
 }
 
-extern "C" void netstack_register_iface(const char* mac_addr) {
+void netstack_register_iface(const char* mac_addr) {
     SovereignNetStackEngine::registerInterface(mac_addr);
 }
 
@@ -69,3 +69,5 @@ extern "C" bool netstack_dispatch(const char* payload, sigma_u32 length) {
 
 
 
+
+} // extern "C"

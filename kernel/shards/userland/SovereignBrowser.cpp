@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void browser_init() {
+extern "C" {
+
+void browser_init() {
     SigmaOS::Kernel::Userland::SovereignBrowser::getInstance().init();
 }
+
+} // extern "C"

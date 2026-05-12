@@ -8,3 +8,5 @@ void net_secure_connect() {
 }
 
 }
+
+} // extern "C"

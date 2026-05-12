@@ -43,11 +43,11 @@ public:
 };
 
 /* --- C Wrappers --- */
-extern "C" void panicrecov_init() {
+void panicrecov_init() {
     SovereignPanicRecov::init();
 }
 
-extern "C" void panicrecov_handle_panic(sigma_u32 fault_code, const void* register_state) {
+void panicrecov_handle_panic(sigma_u32 fault_code, const void* register_state) {
     SovereignPanicRecov::handlePanic(fault_code, register_state);
 }
 
@@ -57,3 +57,5 @@ extern "C" bool panicrecov_attempt_recovery() {
 
 
 
+
+} // extern "C"

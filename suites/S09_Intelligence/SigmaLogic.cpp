@@ -55,3 +55,5 @@ void sigma_logic_init() {
     sigma_logic_run_all();
 }
 
+
+} // extern "C"

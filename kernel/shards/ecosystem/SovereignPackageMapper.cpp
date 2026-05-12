@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void smap_init() {
+extern "C" {
+
+void smap_init() {
     SigmaOS::Kernel::Ecosystem::SovereignPackageMapper::getInstance().init();
 }
+
+} // extern "C"

@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void grid_init() {
+extern "C" {
+
+void grid_init() {
     SigmaOS::Kernel::Industrial::SovereignSmartGrid::getInstance().init();
 }
+
+} // extern "C"

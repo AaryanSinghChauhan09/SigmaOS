@@ -1,8 +1,8 @@
-﻿#include "sigma_log.h"
+#include "sigma_log.h"
 #include "hal/sigma_hal.h"
 #include "libc/SovereignLibC.h"
 
-extern "C" void hal_load_drivers();
+void hal_load_drivers();
 
 namespace SigmaOS {
 namespace Kernel {
@@ -38,15 +38,21 @@ void SovereignHAL::registerDriver(const char* name, DeviceType type) {
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void hal_init() {
+void hal_init() {
     SigmaOS::Kernel::HAL::SovereignHAL::getInstance().init();
 }
 
-extern "C" void hal_probe() {
+void hal_probe() {
     SigmaOS::Kernel::HAL::SovereignHAL::getInstance().probeBus();
 }
 
 
 
 
+
+} // extern "C"
+
+} // extern "C"

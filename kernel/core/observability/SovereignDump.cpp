@@ -43,15 +43,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void dump_init() {
+void dump_init() {
     SigmaOS::Kernel::Observability::SovereignDumpEngine::init();
 }
 
-extern "C" void dump_trigger(const char* reason) {
+void dump_trigger(const char* reason) {
     SigmaOS::Kernel::Observability::SovereignDumpEngine::trigger(reason);
 }
 
 
 
 
+
+} // extern "C"

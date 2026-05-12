@@ -98,7 +98,9 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void start_diagnostic_zenith() {
+extern "C" {
+
+void start_diagnostic_zenith() {
     SigmaOS::Kernel::SovereignDiagnosticsZenith diag;
     diag.audit_all();
 }
@@ -109,3 +111,5 @@ int main() {
     return 0;
 }
 
+
+} // extern "C"

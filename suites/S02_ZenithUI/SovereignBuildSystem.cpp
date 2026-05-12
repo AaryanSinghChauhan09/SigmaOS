@@ -64,7 +64,7 @@ public:
     }
 };
 
-extern "C" void _start(void) {
+void _start(void) {
     sigma_printf("--- Σ SIGMA OS SOVEREIGN BUILD SYSTEM (ZENITH) ---\n");
     SovereignSiliconAudit audit;
     audit.DetectFeatures();
@@ -76,3 +76,5 @@ extern "C" void _start(void) {
     sigma_exit(0);
 }
 
+
+} // extern "C"

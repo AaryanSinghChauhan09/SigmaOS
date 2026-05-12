@@ -68,7 +68,9 @@ public:
 } // namespace Virt
 } // namespace SigmaOS
 
-extern "C" void start_hypervisor_zenith() {
+extern "C" {
+
+void start_hypervisor_zenith() {
     SigmaOS::Virt::SovereignHypervisor vmm;
 
     vmm.swallow_guest(SigmaOS::Virt::GuestType::LINUX);
@@ -82,3 +84,5 @@ int main() {
     return 0;
 }
 
+
+} // extern "C"

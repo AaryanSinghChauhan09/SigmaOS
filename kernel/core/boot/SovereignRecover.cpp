@@ -94,11 +94,11 @@ void SovereignRecover::setLatticeState(sigma_recovery_state_t state) {
 }
 
 /* --- C Wrappers --- */
-extern "C" void recover_init() {
+void recover_init() {
     SovereignRecover::init();
 }
 
-extern "C" void recover_trigger_healing(sigma_u32 shard_id) {
+void recover_trigger_healing(sigma_u32 shard_id) {
     SovereignRecover::triggerHealing(shard_id);
 }
 
@@ -109,3 +109,5 @@ extern "C" sigma_recovery_state_t recover_get_lattice_state() {
 
 
 
+
+} // extern "C"

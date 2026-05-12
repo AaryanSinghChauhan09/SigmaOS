@@ -10,7 +10,7 @@
  * USP: Instantly predicts shard execution paths and pre-allocates CPU time slices.
  * Ensures zero-latency context switches for real-time and UI threads.
  *
- * Design: OOP-isolated singleton — SovereignScheduler.
+ * Design: OOP-isolated singleton ï¿½ SovereignScheduler.
  */
 
 class SovereignScheduler {
@@ -53,11 +53,11 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void sched_init() {
+void sched_init() {
     SovereignScheduler::init();
 }
 
-extern "C" void sched_enqueue(sigma_u32 thread_id, sigma_u32 priority) {
+void sched_enqueue(sigma_u32 thread_id, sigma_u32 priority) {
     SovereignScheduler::enqueueThread(thread_id, priority);
 }
 
@@ -68,3 +68,5 @@ extern "C" sigma_u32 sched_predict_next() {
 
 
 
+
+} // extern "C"

@@ -9,3 +9,5 @@ void sec_audit() {
 }
 
 }
+
+} // extern "C"

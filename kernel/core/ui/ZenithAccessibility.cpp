@@ -24,6 +24,10 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void zenithaccessibility_init() {
+extern "C" {
+
+void zenithaccessibility_init() {
     SigmaOS::Kernel::SovereignZenithAccessibility::getInstance().init();
 }
+
+} // extern "C"

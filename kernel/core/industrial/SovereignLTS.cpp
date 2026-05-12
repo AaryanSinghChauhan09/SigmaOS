@@ -3,7 +3,7 @@
  * S SIGMAOS: SOVEREIGN LTS ORCHESTRATOR (REL-001)
  * =========================================================================
  * Mission: Manages Long-Term Support release channels and lifecycles.
- * Layer  : L5 — Industrial Ecosystem
+ * Layer  : L5 ï¿½ Industrial Ecosystem
  * =========================================================================
  */
 
@@ -45,10 +45,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void lts_init(const char* version) {
+extern "C" {
+
+void lts_init(const char* version) {
     SigmaOS::Kernel::Deployment::SovereignLTSOrchestrator::initializeLTSChannel(version);
 }
 
-extern "C" void lts_audit() {
+void lts_audit() {
     SigmaOS::Kernel::Deployment::SovereignLTSOrchestrator::auditLifecycle();
 }
+
+} // extern "C"

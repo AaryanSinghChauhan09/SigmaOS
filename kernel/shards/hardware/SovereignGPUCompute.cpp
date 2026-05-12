@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void gpu_init() {
+extern "C" {
+
+void gpu_init() {
     SigmaOS::Kernel::Hardware::SovereignGPUCompute::getInstance().init();
 }
+
+} // extern "C"

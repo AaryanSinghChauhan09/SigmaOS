@@ -25,11 +25,11 @@ typedef struct {
 
 static sovereign_service_t services[600];
 
-extern "C" void runit_init() {
+void runit_init() {
     sigma_log("[RUNIT] Initializing Sovereign Shard Lifecycle Manager (Void Linux Parity)...");
 }
 
-extern "C" void runit_supervise(sigma_u32 shard_id, void (*entry)()) {
+void runit_supervise(sigma_u32 shard_id, void (*entry)()) {
     if (shard_id >= 600) return;
     
     services[shard_id].shard_id = shard_id;
@@ -42,7 +42,7 @@ extern "C" void runit_supervise(sigma_u32 shard_id, void (*entry)()) {
     // entry();
 }
 
-extern "C" void runit_stop(sigma_u32 shard_id) {
+void runit_stop(sigma_u32 shard_id) {
     if (shard_id >= 600) return;
     services[shard_id].status = SHARD_DOWN;
     sigma_log("[RUNIT] Shard %d signal: TERMINATE.", shard_id);
@@ -50,3 +50,7 @@ extern "C" void runit_stop(sigma_u32 shard_id) {
 
 
 
+
+} // extern "C"
+
+} // extern "C"

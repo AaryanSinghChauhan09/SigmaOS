@@ -8,10 +8,10 @@
  * Ring-0 notification dispatch with customizable sound profiles.
  *
  * USP: Replaces dbus-based notification daemons with a direct Ring-0 event bus.
- * Sound profiles are stored as PCM waveform refs rendered by SovereignAudio — 
+ * Sound profiles are stored as PCM waveform refs rendered by SovereignAudio ï¿½ 
  * zero latency between notification trigger and audible/visual feedback.
  *
- * Design: OOP-isolated singleton — SovereignNotificationEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignNotificationEngine.
  */
 
 typedef struct {
@@ -77,11 +77,13 @@ private:
     bool sound_enabled;
 };
 
-extern "C" void notif_init() { SovereignNotificationEngine::init(); }
+void notif_init() { SovereignNotificationEngine::init(); }
 extern "C" sigma_u32 notif_push(const char* src, const char* msg, sigma_u32 sound) { return SovereignNotificationEngine::push(src, msg, sound); }
-extern "C" void notif_dismiss(sigma_u32 id) { SovereignNotificationEngine::dismiss(id); }
-extern "C" void notif_set_sound(bool enabled) { SovereignNotificationEngine::setSoundEnabled(enabled); }
+void notif_dismiss(sigma_u32 id) { SovereignNotificationEngine::dismiss(id); }
+void notif_set_sound(bool enabled) { SovereignNotificationEngine::setSoundEnabled(enabled); }
 
 
 
 
+
+} // extern "C"

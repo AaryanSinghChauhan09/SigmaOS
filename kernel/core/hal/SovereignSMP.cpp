@@ -1,4 +1,4 @@
-﻿#include "core/sigma_types.h"
+#include "core/sigma_types.h"
 #include "hal/sigma_hal.h"
 #include "sigma_log.h"
 #include "hal/SovereignSMP.hpp"
@@ -45,19 +45,23 @@ void SovereignSMPEngine::broadcastIPI(sigma_u32 vector) {
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void smp_init() {
+void smp_init() {
     SigmaOS::Kernel::HAL::SovereignSMPEngine::init();
 }
 
-extern "C" void smp_ignite_cores() {
+void smp_ignite_cores() {
     SigmaOS::Kernel::HAL::SovereignSMPEngine::igniteCores();
 }
 
-extern "C" void smp_broadcast_ipi(unsigned int vector) {
+void smp_broadcast_ipi(unsigned int vector) {
     SigmaOS::Kernel::HAL::SovereignSMPEngine::broadcastIPI((sigma_u32)vector);
 }
 
 extern "C" unsigned int smp_get_core_count() {
     return (unsigned int)SigmaOS::Kernel::HAL::SovereignSMPEngine::getCoreCount();
 }
+
+} // extern "C"

@@ -24,6 +24,10 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void logd_init() {
+extern "C" {
+
+void logd_init() {
     SigmaOS::Kernel::Sovereignlogd::getInstance().init();
 }
+
+} // extern "C"

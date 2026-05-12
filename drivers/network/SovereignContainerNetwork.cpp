@@ -40,14 +40,16 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void container_net_init() {
+void container_net_init() {
     SovereignContainerNetEngine::init();
 }
 
-extern "C" void container_net_attach(const char* container, const char* mac) {
+void container_net_attach(const char* container, const char* mac) {
     SovereignContainerNetEngine::attachContainerNetwork(container, mac);
 }
 
 
 
 
+
+} // extern "C"

@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void net_init() {
+extern "C" {
+
+void net_init() {
     SigmaOS::Kernel::Network::SovereignNetStack::getInstance().init();
 }
+
+} // extern "C"

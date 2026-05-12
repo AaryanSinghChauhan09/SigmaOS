@@ -14,11 +14,11 @@
 
 static sigma_hybrid_mode_t current_mode = HYBRID_MODE_MICRO;
 
-extern "C" void hybrid_init() {
+void hybrid_init() {
     sigma_log("[HYBRID] Initializing Sovereign Hybrid Kernel (DCS Algorithm)...");
 }
 
-extern "C" void hybrid_set_mode(sigma_hybrid_mode_t mode) {
+void hybrid_set_mode(sigma_hybrid_mode_t mode) {
     current_mode = mode;
     sigma_log("[HYBRID] DCS: Kernel mode shifted to %s\n", mode == HYBRID_MODE_MICRO ? "MICRO" : "MONOLITHIC");
 }
@@ -40,3 +40,5 @@ extern "C" bool hybrid_execute_syscall(sigma_u32 syscall_id, void* args) {
 
 
 
+
+} // extern "C"

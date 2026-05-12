@@ -46,7 +46,9 @@ public:
 } // namespace Net
 } // namespace SigmaOS
 
-extern "C" void start_web_zenith() {
+extern "C" {
+
+void start_web_zenith() {
     SigmaOS::Net::SovereignWebBridge bridge;
 
     bridge.fetch_url("https://sovereign.sigma");
@@ -58,3 +60,5 @@ int main() {
     start_web_zenith();
     return 0;
 }
+
+} // extern "C"

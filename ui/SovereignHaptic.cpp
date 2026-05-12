@@ -11,11 +11,11 @@
  * ZERO-DEPENDENCY: Strictly bare-metal haptic orchestration.
  */
 
-extern "C" void haptic_init() {
+void haptic_init() {
     sigma_log("[HAPTIC] Initializing Sovereign Haptic Engine (HFTA Algorithm)...");
 }
 
-extern "C" void haptic_play_pattern(sigma_haptic_pattern_t pattern, float intensity) {
+void haptic_play_pattern(sigma_haptic_pattern_t pattern, float intensity) {
     // HFTA (High-Fidelity Tactile Actuation) Algorithm
     // Direct synthesis of waveforms to linear resonant actuators (LRAs).
     
@@ -33,3 +33,5 @@ extern "C" void haptic_play_pattern(sigma_haptic_pattern_t pattern, float intens
 
 
 
+
+} // extern "C"

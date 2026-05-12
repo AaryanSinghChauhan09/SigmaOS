@@ -4,7 +4,7 @@
 #include "sigma_thermaliq.h"
 #include "libc/SovereignLibC.h"
 
-extern "C" void energysched_set_shard_state(sigma_u32 shard_id, sigma_u32 state);
+void energysched_set_shard_state(sigma_u32 shard_id, sigma_u32 state);
 
 namespace SigmaOS {
 namespace Kernel {
@@ -54,8 +54,10 @@ void SovereignThermalIQ::emergencyThrottle(sigma_u32 threshold_celsius) {
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void thermaliq_init() {
+void thermaliq_init() {
     SigmaOS::Kernel::Hardware::SovereignThermalIQ::init();
 }
 
@@ -63,14 +65,18 @@ extern "C" sigma_u32 thermaliq_get_package_temp() {
     return SigmaOS::Kernel::Hardware::SovereignThermalIQ::getPackageTemp();
 }
 
-extern "C" void thermaliq_apply_thermal_policy() {
+void thermaliq_apply_thermal_policy() {
     SigmaOS::Kernel::Hardware::SovereignThermalIQ::applyThermalPolicy();
 }
 
-extern "C" void thermaliq_emergency_throttle(sigma_u32 threshold_celsius) {
+void thermaliq_emergency_throttle(sigma_u32 threshold_celsius) {
     SigmaOS::Kernel::Hardware::SovereignThermalIQ::emergencyThrottle(threshold_celsius);
 }
 
 
 
 
+
+} // extern "C"
+
+} // extern "C"

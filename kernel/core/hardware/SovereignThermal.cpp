@@ -9,7 +9,7 @@
  * Implements an Adaptive Cooling Orchestration (ACO) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal silicon thermal management.
  *
- * Design: OOP-isolated singleton — SovereignThermalEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignThermalEngine.
  */
 
 class SovereignThermalEngine {
@@ -55,11 +55,11 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void thermaliq_init() {
+void thermaliq_init() {
     SovereignThermalEngine::init();
 }
 
-extern "C" void thermaliq_update() {
+void thermaliq_update() {
     SovereignThermalEngine::update();
 }
 
@@ -70,3 +70,5 @@ extern "C" const sigma_thermal_state_t* thermaliq_get_state() {
 
 
 
+
+} // extern "C"

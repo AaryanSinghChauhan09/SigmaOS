@@ -45,16 +45,18 @@ void SovereignDataForge::reportStatus() {
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void forge_init() {
+void forge_init() {
     SigmaOS::Kernel::Data::SovereignDataForge::init();
 }
 
-extern "C" void forge_dispatch_parallel(sigma_forge_op_t op, const void* dataset, sigma_size_t size) {
+void forge_dispatch_parallel(sigma_forge_op_t op, const void* dataset, sigma_size_t size) {
     SigmaOS::Kernel::Data::SovereignDataForge::dispatch(op, dataset, size);
 }
 
-extern "C" void forge_wait_all() {
+void forge_wait_all() {
     sigma_log("[DATAFORGE] Waiting for all shard-level data pipelines to reach consensus...");
 }
 
@@ -65,3 +67,5 @@ extern "C" sigma_u64 forge_get_processed_bytes() {
 
 
 
+
+} // extern "C"

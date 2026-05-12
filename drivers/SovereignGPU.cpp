@@ -62,17 +62,19 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void gpu_init() {
+void gpu_init() {
     SovereignGPU::init();
 }
 
-extern "C" void gpu_swap_buffers() {
+void gpu_swap_buffers() {
     SovereignGPU::swapBuffers();
 }
 
-extern "C" void gpu_apply_motion_shader(void* shader_blob) {
+void gpu_apply_motion_shader(void* shader_blob) {
     SovereignGPU::applyMotionShader(shader_blob);
 }
 
 
 
+
+} // extern "C"

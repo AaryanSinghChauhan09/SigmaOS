@@ -50,14 +50,18 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void creative_init() {
+extern "C" {
+
+void creative_init() {
     SigmaOS::Kernel::Creative::SovereignCreative::getInstance().init();
 }
 
-extern "C" void creative_optimize_video() {
+void creative_optimize_video() {
     SigmaOS::Kernel::Creative::SovereignCreative::getInstance().optimizeForVideoEditing();
 }
 
-extern "C" void creative_sync_tablet() {
+void creative_sync_tablet() {
     SigmaOS::Kernel::Creative::SovereignCreative::getInstance().syncDesignTablet();
 }
+
+} // extern "C"

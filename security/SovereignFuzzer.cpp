@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void fuzzer_init() {
+void fuzzer_init() {
     SigmaOS::Kernel::Security::SovereignFuzzer::init();
 }
 
-extern "C" void fuzzer_inject(const char* target, sigma_u32 iters) {
+void fuzzer_inject(const char* target, sigma_u32 iters) {
     SigmaOS::Kernel::Security::SovereignFuzzer::injectFault(target, iters);
 }
 
 
 
 
+
+} // extern "C"

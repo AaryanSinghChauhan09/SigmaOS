@@ -50,19 +50,25 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void enclave_init() {
+void enclave_init() {
     SigmaOS::Kernel::Security::SovereignEnclaveManager::init();
 }
 
-extern "C" void* enclave_create(sigma_size_t size) {
+void* enclave_create(sigma_size_t size) {
     return SigmaOS::Kernel::Security::SovereignEnclaveManager::createEnclave(size);
 }
 
-extern "C" void enclave_enter(void* ptr) {
+void enclave_enter(void* ptr) {
     SigmaOS::Kernel::Security::SovereignEnclaveManager::enterEnclave(ptr);
 }
 
 
 
 
+
+} // extern "C"
+
+} // extern "C"

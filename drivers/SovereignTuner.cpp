@@ -51,12 +51,14 @@ private:
     silicon_profile_t current_silicon;
 };
 
-extern "C" void tuner_init() {
+void tuner_init() {
     SovereignTunerEngine::init();
 }
 
-extern "C" void tuner_apply_performance_governor() {
+void tuner_apply_performance_governor() {
     SovereignTunerEngine::applyPerformanceGovernor();
 }
 
 
+
+} // extern "C"

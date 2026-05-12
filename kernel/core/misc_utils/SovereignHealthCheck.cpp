@@ -15,7 +15,7 @@
  * ZERO-DEPENDENCY: Strictly bare-metal system diagnostics.
  */
 
-extern "C" void healthcheck_init() {
+void healthcheck_init() {
     sigma_log("[HEALTHCHECK] Initializing Sovereign System Health Check (HSI Algorithm)...");
 }
 
@@ -33,16 +33,18 @@ extern "C" sigma_health_report_t healthcheck_run_full_audit() {
         .security_posture_ok = true
     };
     
-    sigma_log("[HEALTHCHECK] HSI: Health Score: %d/100. Shards: %d. Thermal: %d°C. Battery: %d%%.\n",
+    sigma_log("[HEALTHCHECK] HSI: Health Score: %d/100. Shards: %d. Thermal: %dï¿½C. Battery: %d%%.\n",
                  report.health_score, report.active_shards, report.thermal_celsius, report.battery_percent);
     
     return report;
 }
 
-extern "C" void healthcheck_render_dashboard() {
+void healthcheck_render_dashboard() {
     sigma_health_report_t r = healthcheck_run_full_audit();
     sigma_log("[HEALTHCHECK] HSI: Live health dashboard rendered on Zenith Dashboard.");
 }
 
 
 
+
+} // extern "C"

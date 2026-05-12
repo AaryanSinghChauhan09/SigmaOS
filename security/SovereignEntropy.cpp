@@ -53,8 +53,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void entropy_init() {
+void entropy_init() {
     SigmaOS::Kernel::Security::SovereignEntropySource::init();
 }
 
@@ -65,3 +67,5 @@ extern "C" sigma_u64 entropy_get() {
 
 
 
+
+} // extern "C"

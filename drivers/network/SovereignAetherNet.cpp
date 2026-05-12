@@ -47,15 +47,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void aether_init() {
+void aether_init() {
     SigmaOS::Kernel::Network::SovereignAetherNet::init();
 }
 
-extern "C" void aether_set_stealth(bool active) {
+void aether_set_stealth(bool active) {
     SigmaOS::Kernel::Network::SovereignAetherNet::setStealthMode(active);
 }
 
 
 
 
+
+} // extern "C"

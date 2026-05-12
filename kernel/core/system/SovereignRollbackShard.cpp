@@ -69,18 +69,22 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void rollback_init() {
+extern "C" {
+
+void rollback_init() {
     SigmaOS::Kernel::System::SovereignRollbackShard::getInstance().init();
 }
 
-extern "C" void rollback_capture() {
+void rollback_capture() {
     SigmaOS::Kernel::System::SovereignRollbackShard::getInstance().capture_snapshot();
 }
 
-extern "C" void rollback_execute() {
+void rollback_execute() {
     SigmaOS::Kernel::System::SovereignRollbackShard::getInstance().execute_rollback();
 }
 
-extern "C" void rollback_stress_test() {
+void rollback_stress_test() {
     SigmaOS::Kernel::System::SovereignRollbackShard::getInstance().run_stress_test();
 }
+
+} // extern "C"

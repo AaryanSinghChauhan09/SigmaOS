@@ -45,10 +45,12 @@ void SovereignThemeMarketEngine::listThemes() {
     }
 }
 
-extern "C" void theme_market_init() { SovereignThemeMarketEngine::init(); }
-extern "C" void theme_market_publish(const char* name, const char* author) { SovereignThemeMarketEngine::publishTheme(name, author); }
+void theme_market_init() { SovereignThemeMarketEngine::init(); }
+void theme_market_publish(const char* name, const char* author) { SovereignThemeMarketEngine::publishTheme(name, author); }
 extern "C" bool theme_market_apply(const char* name) { return SovereignThemeMarketEngine::applyTheme(name); }
-extern "C" void theme_market_list() { SovereignThemeMarketEngine::listThemes(); }
+void theme_market_list() { SovereignThemeMarketEngine::listThemes(); }
 
 
 
+
+} // extern "C"

@@ -118,7 +118,9 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sigma_kernel_entry() {
+extern "C" {
+
+void sigma_kernel_entry() {
     SigmaOS::Kernel::SovereignProcessManager pm;
 
     pm.spawn("Metal-Nexus-UI");
@@ -132,3 +134,5 @@ int main() {
     sigma_kernel_entry();
     return 0;
 }
+
+} // extern "C"

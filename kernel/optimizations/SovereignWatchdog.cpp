@@ -39,6 +39,8 @@ public:
     sigma_u64 getHealCount() const { return heal_count; }
 };
 
-extern "C" void sigma_watchdog_tick() {
+void sigma_watchdog_tick() {
     SovereignWatchdog::getInstance().monitorSystem();
 }
+
+} // extern "C"

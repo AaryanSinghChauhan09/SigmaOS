@@ -11,3 +11,5 @@ void mem_prune(int days_old) {
 }
 
 }
+
+} // extern "C"

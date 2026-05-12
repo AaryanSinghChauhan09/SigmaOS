@@ -1,4 +1,4 @@
-﻿/*
+/*
  * SigmaOS: Sovereign Driver Loader (HAL Shard)
  * Layer: L1 - Kernel Primitives / HAL
  */
@@ -7,11 +7,11 @@
 #include "core/SigmaOOP.hpp"
 
 /* Forward-declare all driver entry points at file scope */
-extern "C" void gpu_init();
-extern "C" void nvme_init();
-extern "C" void nic_init();
-extern "C" void usb_init();
-extern "C" void wifi_init();
+void gpu_init();
+void nvme_init();
+void nic_init();
+void usb_init();
+void wifi_init();
 
 namespace SigmaOS {
 namespace Kernel {
@@ -41,6 +41,12 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void hal_load_drivers() {
+extern "C" {
+
+void hal_load_drivers() {
     SigmaOS::Kernel::HAL::SovereignDriverLoader::loadAll();
 }
+
+} // extern "C"
+
+} // extern "C"

@@ -55,6 +55,8 @@ private:
 
 } // namespace sigma
 
-extern "C" void start_linux_translation() {
+void start_linux_translation() {
     sigma_print("[S99] Linux-Native Translation Layer ACTIVE.\n");
 }
+
+} // extern "C"

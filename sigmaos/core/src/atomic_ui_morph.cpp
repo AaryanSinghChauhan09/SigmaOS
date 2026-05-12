@@ -10,3 +10,5 @@ void ui_set_morph_profile(const char* profile) {
 }
 
 }
+
+} // extern "C"

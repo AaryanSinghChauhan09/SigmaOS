@@ -49,15 +49,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void hotplug_init() {
+void hotplug_init() {
     SigmaOS::Kernel::HAL::SovereignHotplugManager::init();
 }
 
-extern "C" void hotplug_handle_event() {
+void hotplug_handle_event() {
     SigmaOS::Kernel::HAL::SovereignHotplugManager::handleInterrupt();
 }
 
 
 
 
+
+} // extern "C"

@@ -47,6 +47,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void bio_init() {
+extern "C" {
+
+void bio_init() {
     SigmaOS::Kernel::Medical::SovereignBioinformatics::getInstance().init();
 }
+
+} // extern "C"

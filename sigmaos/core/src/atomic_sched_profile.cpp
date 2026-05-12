@@ -15,3 +15,5 @@ void sched_profile() {
 }
 
 }
+
+} // extern "C"

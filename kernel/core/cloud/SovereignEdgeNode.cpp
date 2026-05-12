@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void edge_node_init() {
+void edge_node_init() {
     SigmaOS::Kernel::Cloud::SovereignEdgeNode::init();
 }
 
-extern "C" void edge_deploy(const char* workload) {
+void edge_deploy(const char* workload) {
     SigmaOS::Kernel::Cloud::SovereignEdgeNode::deployWorkload(workload);
 }
 
 
 
 
+
+} // extern "C"

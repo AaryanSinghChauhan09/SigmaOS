@@ -57,3 +57,5 @@ extern "C" {
         driver.shutdown();
     }
 }
+
+} // extern "C"

@@ -3,7 +3,7 @@
  * S SIGMAOS: SOVEREIGN AGENT QUOTAS EXTENDED (CLAW-004)
  * =========================================================================
  * Mission: Multi-dimensional AI scalability and governance.
- * Layer  : L4 — AI & Automation
+ * Layer  : L4 ï¿½ AI & Automation
  * =========================================================================
  */
 
@@ -44,6 +44,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void agent_quota_extend(const char* id) {
+extern "C" {
+
+void agent_quota_extend(const char* id) {
     SigmaOS::Kernel::Automation::SovereignAgentQuotasExtended::setExtendedQuotas(id);
 }
+
+} // extern "C"

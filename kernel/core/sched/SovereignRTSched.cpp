@@ -1,5 +1,5 @@
 /**
- * SovereignRTSched — Real-Time Scheduling Policy for SigmaOS
+ * SovereignRTSched ï¿½ Real-Time Scheduling Policy for SigmaOS
  * Implements Earliest Deadline First (EDF) and Fixed Priority (FIFO) policies
  * for high-assurance real-time shards (e.g., HAL, PQC).
  */
@@ -39,11 +39,15 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sigma_rt_sched_init() {
+extern "C" {
+
+void sigma_rt_sched_init() {
     SigmaOS::Kernel::Sched::SovereignRTScheduler::init();
 }
 
-extern "C" void sigma_rt_schedule(unsigned int id, unsigned int prio, unsigned long long deadline) {
+void sigma_rt_schedule(unsigned int id, unsigned int prio, unsigned long long deadline) {
     SigmaOS::Kernel::Sched::SovereignRTScheduler::scheduleRT(id, prio, deadline);
 }
 
+
+} // extern "C"

@@ -3,7 +3,7 @@
  * S SIGMAOS: SOVEREIGN TELEMETRY (eBPF Shard)
  * =========================================================================
  * Mission: Isolated shard for real-time telemetry and eBPF tracing.
- * Layer  : L2 — System Services / Observability
+ * Layer  : L2 ï¿½ System Services / Observability
  * =========================================================================
  */
 
@@ -37,7 +37,12 @@ private:
 } // namespace Observability
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void telemetry_execute_ebpf(const void* bytecode, sigma_usize size) {
+
+extern "C" {
+
+void telemetry_execute_ebpf(const void* bytecode, sigma_usize size) {
     SigmaOS::Kernel::Observability::SovereignTelemetry::executeTracing(bytecode, size);
 }
 
+
+} // extern "C"

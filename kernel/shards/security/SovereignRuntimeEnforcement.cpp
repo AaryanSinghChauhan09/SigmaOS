@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void re_init() {
+extern "C" {
+
+void re_init() {
     SigmaOS::Kernel::Security::SovereignRuntimeEnforcement::getInstance().init();
 }
+
+} // extern "C"

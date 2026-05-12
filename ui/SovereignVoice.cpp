@@ -12,11 +12,11 @@
  * ZERO-DEPENDENCY: Strictly bare-metal acoustic processing.
  */
 
-extern "C" void voice_init() {
+void voice_init() {
     sigma_log("[VOICE] Initializing Sovereign Voice Orchestrator (NLI Algorithm)...");
 }
 
-extern "C" void voice_process_audio_stream(const void* audio_buffer, sigma_u32 size) {
+void voice_process_audio_stream(const void* audio_buffer, sigma_u32 size) {
     // NLI (Natural Language Inference) Algorithm
     // Directly processes raw audio streams through the Sovereign Neural Engine.
     
@@ -27,9 +27,11 @@ extern "C" void voice_process_audio_stream(const void* audio_buffer, sigma_u32 s
     voice_execute_intent("OPEN_ZENITH_DASHBOARD");
 }
 
-extern "C" void voice_execute_intent(const char* intent) {
+void voice_execute_intent(const char* intent) {
     sigma_log("[VOICE] NLI: Executing user intent '%s' with zero latency.\n", intent);
 }
 
 
 
+
+} // extern "C"

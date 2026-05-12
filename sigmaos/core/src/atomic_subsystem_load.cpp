@@ -11,3 +11,5 @@ void subsystem_load(const char* name) {
 }
 
 }
+
+} // extern "C"

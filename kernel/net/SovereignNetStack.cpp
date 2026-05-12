@@ -9,7 +9,7 @@
  * Implements a Zero-Copy Lattice Networking (ZCLN) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal network orchestration.
  *
- * Design: OOP-isolated singleton — SovereignNetStackEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignNetStackEngine.
  */
 
 /* --- Sovereign Network Stack Implementation --- */
@@ -59,18 +59,20 @@ void SovereignNetStackEngine::reportStats() const {
 }
 
 /* --- C Wrappers --- */
-extern "C" void net_init(const sigma_net_config_t* config) {
+void net_init(const sigma_net_config_t* config) {
     SovereignNetStackEngine::init(config);
 }
 
-extern "C" void net_send_packet(const void* data, sigma_u32 len) { (void)data;
+void net_send_packet(const void* data, sigma_u32 len) { (void)data;
     SovereignNetStackEngine::sendPacket(data, len);
 }
 
-extern "C" void net_receive_packet(void* buffer, sigma_u32* len) { (void)buffer;
+void net_receive_packet(void* buffer, sigma_u32* len) { (void)buffer;
     SovereignNetStackEngine::receivePacket(buffer, len);
 }
 
-extern "C" void net_report_stats() {
+void net_report_stats() {
     SovereignNetStackEngine::reportStats();
 }
+
+} // extern "C"

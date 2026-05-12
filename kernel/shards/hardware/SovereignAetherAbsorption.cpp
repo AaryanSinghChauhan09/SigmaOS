@@ -11,7 +11,7 @@
 
 #include "kernel/core/absorption_engine.hpp"
 
-extern "C" void _start(void) {
+void _start(void) {
     SigmaOS::SovereignAetherAbsorber absorber;
     absorber.DeploySovereignUnity();
     sigma_exit(0);
@@ -22,3 +22,5 @@ int main() {
     _start();
     return 0;
 }
+
+} // extern "C"

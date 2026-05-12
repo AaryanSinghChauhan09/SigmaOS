@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void predict_init() {
+extern "C" {
+
+void predict_init() {
     SigmaOS::Kernel::Industrial::SovereignPredictiveMaintenance::getInstance().init();
 }
+
+} // extern "C"

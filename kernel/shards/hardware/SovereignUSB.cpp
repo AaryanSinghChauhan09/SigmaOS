@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void usb_init() {
+extern "C" {
+
+void usb_init() {
     SigmaOS::Kernel::Hardware::SovereignUSB::getInstance().init();
 }
+
+} // extern "C"

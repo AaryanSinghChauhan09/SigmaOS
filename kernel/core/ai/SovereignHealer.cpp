@@ -8,7 +8,7 @@
  * Implements an Autonomous Shard Recovery (ASR) algorithm.
  * ZERO-DEPENDENCY: Directly monitors shard integrity and repairs memory state.
  *
- * Design: OOP-isolated singleton — SovereignHealerEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignHealerEngine.
  */
 
 /* --- Sovereign Healer Engine (OOP Isolation) --- */
@@ -22,18 +22,18 @@ static struct {
     .initialized = 0u
 };
 
-extern "C" void healer_init() {
+void healer_init() {
     sigma_log("[HEALER] Initializing Sovereign Autonomous Shard Recovery (ASR)...");
     SovereignHealerEngine.initialized = 1u;
 }
 
-extern "C" void healer_audit_lattice() {
+void healer_audit_lattice() {
     sigma_log("[HEALER] ASR: Commencing lattice-wide integrity audit...");
     /* ASR Algorithm: Checksums every shard memory boundary */
     sigma_log("[HEALER] ASR: Audit COMPLETE. Lattice integrity: 100%.");
 }
 
-extern "C" void healer_repair_shard(sigma_u32 shard_id) {
+void healer_repair_shard(sigma_u32 shard_id) {
     sigma_log("[HEALER] ASR: [CRITICAL] Shard S%02u corruption detected! Repairing...\n", shard_id);
     /* ASR Algorithm: Hot-reloads shard from DSP persistence */
     SovereignHealerEngine.total_repairs++;
@@ -43,3 +43,5 @@ extern "C" void healer_repair_shard(sigma_u32 shard_id) {
 
 
 
+
+} // extern "C"

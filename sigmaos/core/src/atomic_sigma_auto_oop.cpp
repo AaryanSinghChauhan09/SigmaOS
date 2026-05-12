@@ -53,3 +53,5 @@ extern "C" {
         manager.trigger();
     }
 }
+
+} // extern "C"

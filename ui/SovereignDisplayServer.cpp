@@ -33,7 +33,7 @@ static struct {
     .initialized = 0u
 };
 
-extern "C" void display_server_init() {
+void display_server_init() {
     sigma_log("[DISPLAY] Initializing Sovereign Zero-Compositor Display Server (ZCSR)...");
     SovereignDisplayManager.initialized = 1u;
     sigma_log("[DISPLAY] ZCSR: Framebuffer @ 0x%08X — %dx%d @ %dHz ONLINE.\n",
@@ -43,7 +43,7 @@ extern "C" void display_server_init() {
                  (int)SovereignDisplayManager.state.active_mode.refresh_hz);
 }
 
-extern "C" void display_server_set_mode(const sigma_display_mode_t* mode) {
+void display_server_set_mode(const sigma_display_mode_t* mode) {
     if (!mode) return;
     SovereignDisplayManager.state.active_mode = *mode;
     sigma_log("[DISPLAY] ZCSR: Mode set — %dx%d@%dHz depth=%dbpp.\n",
@@ -51,12 +51,12 @@ extern "C" void display_server_set_mode(const sigma_display_mode_t* mode) {
                  (int)mode->refresh_hz, (int)mode->depth);
 }
 
-extern "C" void display_server_vsync_enable(sigma_u32 enable) {
+void display_server_vsync_enable(sigma_u32 enable) {
     SovereignDisplayManager.state.vsync_active = enable;
     sigma_log("[DISPLAY] ZCSR: VSync %s.\n", enable ? "ENABLED" : "DISABLED");
 }
 
-extern "C" void display_server_blit(sigma_u32 x, sigma_u32 y,
+void display_server_blit(sigma_u32 x, sigma_u32 y,
                                      sigma_u32 w, sigma_u32 h,
                                      const void* pixels) {
     // ZCSR Algorithm: Directly DMA-maps pixel region into the framebuffer.
@@ -66,7 +66,7 @@ extern "C" void display_server_blit(sigma_u32 x, sigma_u32 y,
                  (int)w, (int)h, (int)x, (int)y);
 }
 
-extern "C" void display_server_flush() {
+void display_server_flush() {
     sigma_log("[DISPLAY] ZCSR: Scanout flush — framebuffer committed to display.");
 }
 
@@ -76,3 +76,5 @@ extern "C" const sigma_display_state_t* display_server_get_state() {
 
 
 
+
+} // extern "C"

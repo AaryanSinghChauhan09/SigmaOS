@@ -54,15 +54,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void predict_sched_init() {
+void predict_sched_init() {
     SigmaOS::Kernel::Scheduling::PredictiveScheduler::init();
 }
 
-extern "C" void predict_sched_dispatch(const char* id, sigma_u32 prio) {
+void predict_sched_dispatch(const char* id, sigma_u32 prio) {
     SigmaOS::Kernel::Scheduling::PredictiveScheduler::scheduleShard(id, prio);
 }
 
 
 
 
+
+} // extern "C"

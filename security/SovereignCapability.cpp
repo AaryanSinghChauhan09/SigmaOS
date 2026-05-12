@@ -64,8 +64,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void cap_vault_init() {
+void cap_vault_init() {
     SigmaOS::Kernel::Security::SovereignCapabilityVault::init();
 }
 
@@ -80,3 +82,5 @@ extern "C" int cap_vault_validate(sigma_u64 token, sigma_u32 res, sigma_u32 perm
 
 
 
+
+} // extern "C"

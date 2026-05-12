@@ -46,8 +46,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void time_init() {
+void time_init() {
     SigmaOS::Kernel::System::SovereignTime::init();
 }
 
@@ -64,3 +66,5 @@ extern "C" sigma_time_t time_now() {
 
 
 
+
+} // extern "C"

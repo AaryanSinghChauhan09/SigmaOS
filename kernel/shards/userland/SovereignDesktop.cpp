@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void desktop_init() {
+extern "C" {
+
+void desktop_init() {
     SigmaOS::Kernel::Userland::SovereignDesktop::getInstance().init();
 }
+
+} // extern "C"

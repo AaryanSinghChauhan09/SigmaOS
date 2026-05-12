@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void declarative_state_init() {
+void declarative_state_init() {
     SigmaOS::Kernel::System::SovereignDeclarativeState::init();
 }
 
-extern "C" void declarative_build(const char* hash) {
+void declarative_build(const char* hash) {
     SigmaOS::Kernel::System::SovereignDeclarativeState::buildState(hash);
 }
 
 
 
 
+
+} // extern "C"

@@ -9,3 +9,5 @@ void ui_init() {
 }
 
 }
+
+} // extern "C"

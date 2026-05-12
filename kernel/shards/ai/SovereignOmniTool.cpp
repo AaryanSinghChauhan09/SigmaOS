@@ -102,7 +102,9 @@ public:
 } // namespace Omni
 } // namespace SigmaOS
 
-extern "C" void start_omni_zenith() {
+extern "C" {
+
+void start_omni_zenith() {
     SigmaOS::Omni::SovereignOmniTool tool;
 
     tool.solve_computation("Divergence of Riemann Shards");
@@ -120,3 +122,5 @@ int main() {
     return 0;
 }
 
+
+} // extern "C"

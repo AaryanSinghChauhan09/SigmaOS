@@ -13,7 +13,7 @@
  * ZERO-DEPENDENCY: Strictly bare-metal URI routing.
  */
 
-extern "C" void deeplink_init() {
+void deeplink_init() {
     sigma_log("[DEEPLINK] Initializing Sovereign Deep Linking Engine (USL Algorithm)...");
 }
 
@@ -23,7 +23,7 @@ extern "C" const char* deeplink_generate(sigma_u32 target_app_id, const char* st
     return "sigma://generated_uri";
 }
 
-extern "C" void deeplink_execute(const char* sigma_uri) {
+void deeplink_execute(const char* sigma_uri) {
     // USL (Universal State Locator) Algorithm
     // Parses the URI, wakes up or launches the target app, and injects the state.
     
@@ -38,3 +38,5 @@ extern "C" void deeplink_execute(const char* sigma_uri) {
 
 
 
+
+} // extern "C"

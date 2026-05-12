@@ -9,7 +9,7 @@
  * Implements a Wait-Free Circular Shard Logging (WFCSL) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal machine-state tracing.
  *
- * Design: OOP-isolated singleton — SovereignLogEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignLogEngine.
  */
 
 #define LOG_BUFFER_SIZE 256u
@@ -68,15 +68,15 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void log_init() {
+void log_init() {
     SovereignLogEngine::init();
 }
 
-extern "C" void log_emit(sigma_u32 severity, const char* message) {
+void log_emit(sigma_u32 severity, const char* message) {
     SovereignLogEngine::emit(severity, message);
 }
 
-extern "C" void log_emit_f(sigma_u32 severity, const char* format, ...) {
+void log_emit_f(sigma_u32 severity, const char* format, ...) {
     // In a real kernel, we would format to a buffer. 
     // Here we delegate to the C-bridge printf for immediate observability.
     __builtin_va_list args;
@@ -89,7 +89,7 @@ extern "C" void log_emit_f(sigma_u32 severity, const char* format, ...) {
     __builtin_va_end(args);
 }
 
-extern "C" void log_dump_lattice() {
+void log_dump_lattice() {
     SovereignLogEngine::dumpLattice();
 }
 
@@ -101,3 +101,5 @@ extern "C" sigma_u64 log_get_total_emitted() {
 
 
 
+
+} // extern "C"

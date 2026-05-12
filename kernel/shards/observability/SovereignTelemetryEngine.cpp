@@ -47,6 +47,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void telem_init() {
+extern "C" {
+
+void telem_init() {
     SigmaOS::Kernel::Observability::SovereignTelemetryEngine::getInstance().init();
 }
+
+} // extern "C"

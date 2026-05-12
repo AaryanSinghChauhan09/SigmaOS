@@ -40,6 +40,11 @@ private:
 } // namespace Drivers
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void nouveau_init() {
+
+extern "C" {
+
+void nouveau_init() {
     SigmaOS::Kernel::Drivers::Hardware::NouveauGraphics::initDevice();
 }
+
+} // extern "C"

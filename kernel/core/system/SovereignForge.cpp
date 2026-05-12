@@ -3,7 +3,7 @@
 #include "sigma_log.h"
 
 /**
- * SovereignForge — Native Development and Shard Construction Environment.
+ * SovereignForge ï¿½ Native Development and Shard Construction Environment.
  * Inspired by github.com/codecrafters-io/build-your-own-x.
  * Allows users to build their own OS shards and apps from within SigmaOS.
  */
@@ -38,13 +38,17 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void sigma_forge_scaffold(const char* name) {
+void sigma_forge_scaffold(const char* name) {
     SigmaOS::Kernel::System::SovereignForge::scaffoldShard(name);
 }
 
-extern "C" void sigma_forge_build(const char* name) {
+void sigma_forge_build(const char* name) {
     if (SigmaOS::Kernel::System::SovereignForge::compileShard(name)) {
         SigmaOS::Kernel::System::SovereignForge::integrateShard(name);
     }
 }
+
+} // extern "C"

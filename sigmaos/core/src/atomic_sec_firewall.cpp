@@ -10,3 +10,5 @@ void sec_firewall_enable(int adaptive_mode) {
 }
 
 }
+
+} // extern "C"

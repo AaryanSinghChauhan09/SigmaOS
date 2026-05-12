@@ -14,11 +14,11 @@
  * ZERO-DEPENDENCY: Strictly bare-metal first-boot orchestration.
  */
 
-extern "C" void onboard_init() {
+void onboard_init() {
     sigma_log("[ONBOARD] Initializing Sovereign Onboarding Wizard (GSP Algorithm)...");
 }
 
-extern "C" void onboard_start_wizard() {
+void onboard_start_wizard() {
     // GSP (Guided Sovereign Provisioning) Algorithm
     // Walks the user through a beautiful, animated step-by-step OS configuration.
     
@@ -31,9 +31,11 @@ extern "C" void onboard_start_wizard() {
     sigma_log("[ONBOARD] GSP: Step 6/6: Network & Privacy Configuration...");
 }
 
-extern "C" void onboard_complete_step(sigma_u32 step_id) {
+void onboard_complete_step(sigma_u32 step_id) {
     sigma_log("[ONBOARD] GSP: Step %d completed successfully.\n", step_id);
 }
 
 
 
+
+} // extern "C"

@@ -40,6 +40,11 @@ private:
 } // namespace Drivers
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void hda_audio_init() {
+
+extern "C" {
+
+void hda_audio_init() {
     SigmaOS::Kernel::Drivers::Hardware::RealtekHDAAudio::initDevice();
 }
+
+} // extern "C"

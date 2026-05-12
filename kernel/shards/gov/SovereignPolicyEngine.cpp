@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void policy_init() {
+extern "C" {
+
+void policy_init() {
     SigmaOS::Kernel::Gov::SovereignPolicyEngine::getInstance().init();
 }
+
+} // extern "C"

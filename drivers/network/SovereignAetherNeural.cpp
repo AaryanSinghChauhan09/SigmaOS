@@ -40,6 +40,11 @@ private:
 } // namespace Network
 } // namespace Kernel
 } // namespace SigmaOS
+
+extern "C" {
+
 extern "C" int aether_neural_inspect(const char* src) {
     return SigmaOS::Kernel::Network::SovereignAetherNeural::detectThreat(src) ? 1 : 0;
 }
+
+} // extern "C"

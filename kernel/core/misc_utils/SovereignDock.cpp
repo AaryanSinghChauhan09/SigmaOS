@@ -10,7 +10,7 @@
  * USP: A hardware-accelerated, zero-dependency smart dock that intelligently 
  * clusters running micro-VM containers and shards based on predictive ML models.
  *
- * Design: OOP-isolated singleton — SovereignDockEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignDockEngine.
  */
 
 class SovereignDockEngine {
@@ -61,18 +61,20 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void dock_init() {
+void dock_init() {
     SovereignDockEngine::init();
 }
 
-extern "C" void dock_add_app(const char* app_name) {
+void dock_add_app(const char* app_name) {
     SovereignDockEngine::addAppToDock(app_name);
 }
 
-extern "C" void dock_configure(const char* pos, bool hide, float scale) {
+void dock_configure(const char* pos, bool hide, float scale) {
     SovereignDockEngine::configureDock(pos, hide, scale);
 }
 
 
 
 
+
+} // extern "C"

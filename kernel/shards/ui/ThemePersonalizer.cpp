@@ -61,10 +61,14 @@ public:
 } // namespace UI
 } // namespace SigmaOS
 
-extern "C" void start_theme_personalizer() {
+extern "C" {
+
+void start_theme_personalizer() {
     SigmaOS::UI::ThemePersonalizer personalizer;
     
     personalizer.apply_palette("Zenith-Neon", 0x000000, 0x111111, 0x00d2ff);
     personalizer.toggle_dark_mode();
     personalizer.sync_with_dashboard();
 }
+
+} // extern "C"

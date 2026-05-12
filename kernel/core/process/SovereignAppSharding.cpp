@@ -58,15 +58,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void app_sharding_init() {
+void app_sharding_init() {
     SigmaOS::Kernel::Process::SovereignAppSharding::init();
 }
 
-extern "C" void app_shard_spawn(const char* name, sigma_u32 count) {
+void app_shard_spawn(const char* name, sigma_u32 count) {
     SigmaOS::Kernel::Process::SovereignAppSharding::shardApp(name, count);
 }
 
 
 
 
+
+} // extern "C"

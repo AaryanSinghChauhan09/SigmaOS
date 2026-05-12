@@ -1,8 +1,6 @@
 #include "sigma_types.h"
 #include "sigma_libc.h"
 
-extern "C" {
-
 // IDT Entry Structure (x86_64)
 struct idt_entry {
     sigma_u16 base_low;

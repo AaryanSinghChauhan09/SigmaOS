@@ -24,6 +24,10 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sovereignpmm_init() {
+extern "C" {
+
+void sovereignpmm_init() {
     SigmaOS::Kernel::SovereignPMM::getInstance().init();
 }
+
+} // extern "C"

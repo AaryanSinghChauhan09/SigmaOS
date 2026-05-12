@@ -50,7 +50,9 @@ public:
 } // namespace Boot
 } // namespace SigmaOS
 
-extern "C" void start_launcher_zenith() {
+extern "C" {
+
+void start_launcher_zenith() {
     SigmaOS::Boot::SovereignLauncher launcher;
 
     launcher.ignite_silicon();
@@ -63,3 +65,5 @@ int main() {
     return 0;
 }
 
+
+} // extern "C"

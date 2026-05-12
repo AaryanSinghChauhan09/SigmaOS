@@ -34,8 +34,12 @@ public:
 } // namespace Userland
 } // namespace SigmaOS
 
-extern "C" void sigma_update_check() {
+extern "C" {
+
+void sigma_update_check() {
     SigmaOS::Userland::UpdateAgent agent;
     agent.checkForUpdates();
 }
 
+
+} // extern "C"

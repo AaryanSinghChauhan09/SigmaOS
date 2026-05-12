@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void systemd_init() {
+extern "C" {
+
+void systemd_init() {
     SigmaOS::Kernel::Core::SovereignSystemd::getInstance().init();
 }
+
+} // extern "C"

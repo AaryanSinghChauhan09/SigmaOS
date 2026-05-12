@@ -24,3 +24,5 @@ void sec_crypto_quantum_parse(const sigma_u8* packet, sigma_size_t len) {
 }
 
 }
+
+} // extern "C"

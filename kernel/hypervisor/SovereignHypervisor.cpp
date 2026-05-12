@@ -28,6 +28,8 @@ public:
     }
 };
 
-extern "C" void sigma_guest_start(const char* id, int cpus, sigma_u64 mem) {
+void sigma_guest_start(const char* id, int cpus, sigma_u64 mem) {
     SovereignHypervisor::getInstance().launchGuest(id, cpus, mem);
 }
+
+} // extern "C"

@@ -9,3 +9,5 @@ void sigma_build_link() {
 }
 
 }
+
+} // extern "C"

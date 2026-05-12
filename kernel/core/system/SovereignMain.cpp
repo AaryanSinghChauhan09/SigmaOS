@@ -4,7 +4,7 @@
 #include "libc/SovereignLibC.h"
 
 // Engine Initialisers (Extern C)
-extern "C" void sigma_bootstrap_lattice();
+void sigma_bootstrap_lattice();
 
 namespace SigmaOS {
 namespace Kernel {
@@ -30,9 +30,15 @@ void SovereignKernelMain::ignite() {
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sigma_kernel_main() {
+extern "C" {
+
+void sigma_kernel_main() {
     SigmaOS::Kernel::System::SovereignKernelMain::ignite();
 }
 
 
 
+
+} // extern "C"
+
+} // extern "C"

@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void irq_init() {
+extern "C" {
+
+void irq_init() {
     SigmaOS::Kernel::Core::SovereignInterruptController::getInstance().init();
 }
+
+} // extern "C"

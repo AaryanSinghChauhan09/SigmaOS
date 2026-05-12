@@ -54,14 +54,18 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void git_init_sovereign() {
+extern "C" {
+
+void git_init_sovereign() {
     SigmaOS::Kernel::DevTools::SovereignGit::getInstance().init();
 }
 
-extern "C" void git_commit(const char* msg, const char* author) {
+void git_commit(const char* msg, const char* author) {
     SigmaOS::Kernel::DevTools::SovereignGit::getInstance().commit(msg, author);
 }
 
-extern "C" void git_push(const char* url) {
+void git_push(const char* url) {
     SigmaOS::Kernel::DevTools::SovereignGit::getInstance().pushToRemote(url);
 }
+
+} // extern "C"

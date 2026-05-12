@@ -46,10 +46,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void pkg_graph_init() {
+extern "C" {
+
+void pkg_graph_init() {
     SigmaOS::Kernel::Deployment::SovereignPackageGraph::getInstance().init();
 }
 
-extern "C" void pkg_verify(const char* name) {
+void pkg_verify(const char* name) {
     SigmaOS::Kernel::Deployment::SovereignPackageGraph::getInstance().verify_shard_origin(name);
 }
+
+} // extern "C"

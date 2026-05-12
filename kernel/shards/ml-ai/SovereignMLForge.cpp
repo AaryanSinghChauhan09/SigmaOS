@@ -55,14 +55,18 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void mlforge_init() {
+extern "C" {
+
+void mlforge_init() {
     SigmaOS::Kernel::AI::SovereignMLForge::getInstance().init();
 }
 
-extern "C" void mlforge_drift(const char* id) {
+void mlforge_drift(const char* id) {
     SigmaOS::Kernel::AI::SovereignMLForge::getInstance().detectModelDrift(id);
 }
 
-extern "C" void mlforge_explain(const char* model, const char* sample) {
+void mlforge_explain(const char* model, const char* sample) {
     SigmaOS::Kernel::AI::SovereignMLForge::getInstance().explainPrediction(model, sample);
 }
+
+} // extern "C"

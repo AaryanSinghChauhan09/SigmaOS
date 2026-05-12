@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void hr_init() {
+extern "C" {
+
+void hr_init() {
     SigmaOS::Kernel::Enterprise::SovereignHR::getInstance().init();
 }
+
+} // extern "C"

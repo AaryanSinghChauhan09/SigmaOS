@@ -62,15 +62,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void posix_init() {
+void posix_init() {
     SigmaOS::Kernel::Industrial::SovereignPOSIXLayer::init();
 }
 
-extern "C" void posix_signal_shard(sigma_u32 sig, sigma_u32 shard) {
+void posix_signal_shard(sigma_u32 sig, sigma_u32 shard) {
     SigmaOS::Kernel::Industrial::SovereignPOSIXLayer::mapSignal(sig, shard);
 }
 
 
 
 
+
+} // extern "C"

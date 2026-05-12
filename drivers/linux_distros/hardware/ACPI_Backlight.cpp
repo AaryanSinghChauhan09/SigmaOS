@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void backlight_init() {
+extern "C" {
+
+void backlight_init() {
     SigmaOS::Kernel::Drivers::Hardware::ACPIBacklight::initDevice();
 }
+
+} // extern "C"

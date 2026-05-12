@@ -53,8 +53,10 @@ void SovereignDNACompression::audit() {
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void dna_init() {
+void dna_init() {
     SigmaOS::Kernel::FS::SovereignDNACompression::init();
 }
 
@@ -64,3 +66,5 @@ extern "C" sigma_size_t dna_compress(const void* in, sigma_size_t sz, void* out)
 
 
 
+
+} // extern "C"

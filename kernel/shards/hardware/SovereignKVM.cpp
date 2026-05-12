@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void kvm_init() {
+extern "C" {
+
+void kvm_init() {
     SigmaOS::Kernel::Hardware::SovereignKVM::getInstance().init();
 }
+
+} // extern "C"

@@ -12,7 +12,7 @@
  * ZERO-DEPENDENCY: Strictly bare-metal linguistic prediction.
  */
 
-extern "C" void telepathtype_init() {
+void telepathtype_init() {
     sigma_log("[TELEPATHTYPE] Initializing Sovereign Telepathic Typing (CNGP Algorithm)...");
 }
 
@@ -27,9 +27,11 @@ extern "C" const char* telepathtype_predict_completion(const char* current_conte
     return " predicted completion chain.";
 }
 
-extern "C" void telepathtype_commit_prediction() {
+void telepathtype_commit_prediction() {
     sigma_log("[TELEPATHTYPE] CNGP: Prediction committed to standard input buffer.");
 }
 
 
 
+
+} // extern "C"

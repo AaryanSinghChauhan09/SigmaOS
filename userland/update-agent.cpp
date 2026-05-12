@@ -24,6 +24,12 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void update-agent_init() {
+extern "C" {
+
+void update-agent_init() {
     SigmaOS::Kernel::Sovereignupdate-agent::getInstance().init();
 }
+
+} // extern "C"
+
+} // extern "C"

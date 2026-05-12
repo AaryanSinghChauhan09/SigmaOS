@@ -3,7 +3,7 @@
  * S SIGMAOS: SOVEREIGN AGENT GOVERNANCE (CLAW-003)
  * =========================================================================
  * Mission: Advanced resource governance for autonomous Claw agents.
- * Layer  : L4 — AI & Automation
+ * Layer  : L4 ï¿½ AI & Automation
  * =========================================================================
  */
 
@@ -44,10 +44,15 @@ private:
 } // namespace Automation
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void agent_gov_set_quotas(const char* id, sigma_u32 cpu, sigma_u32 mem, sigma_u32 gpu) {
+
+extern "C" {
+
+void agent_gov_set_quotas(const char* id, sigma_u32 cpu, sigma_u32 mem, sigma_u32 gpu) {
     SigmaOS::Kernel::Automation::SovereignAgentGovernance::setQuotas(id, cpu, mem, gpu);
 }
 
-extern "C" void agent_gov_audit() {
+void agent_gov_audit() {
     SigmaOS::Kernel::Automation::SovereignAgentGovernance::monitorCompliance();
 }
+
+} // extern "C"

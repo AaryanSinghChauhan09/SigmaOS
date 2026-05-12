@@ -54,8 +54,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void hotswap_init() {
+void hotswap_init() {
     SigmaOS::Kernel::System::SovereignHotSwap::init();
 }
 
@@ -66,3 +68,5 @@ extern "C" bool hotswap_execute(const char* id, const void* logic, sigma_size_t 
 
 
 
+
+} // extern "C"

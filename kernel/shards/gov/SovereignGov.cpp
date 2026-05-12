@@ -24,6 +24,10 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sovereigngov_init() {
+extern "C" {
+
+void sovereigngov_init() {
     SigmaOS::Kernel::SovereignGov::getInstance().init();
 }
+
+} // extern "C"

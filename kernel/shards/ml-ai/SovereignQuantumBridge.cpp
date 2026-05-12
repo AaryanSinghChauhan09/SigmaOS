@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void qbridge_init() {
+extern "C" {
+
+void qbridge_init() {
     SigmaOS::Kernel::AI::SovereignQuantumBridge::getInstance().init();
 }
+
+} // extern "C"

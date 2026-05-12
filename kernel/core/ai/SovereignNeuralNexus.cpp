@@ -106,8 +106,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Wrappers --- */
-extern "C" void neural_init() {
+void neural_init() {
     SigmaOS::Kernel::AI::SovereignNeuralEngine::init();
 }
 
@@ -115,18 +117,20 @@ extern "C" bool neural_load_model(const char* model_name, sigma_u32 parameters_m
     return SigmaOS::Kernel::AI::SovereignNeuralEngine::loadModel(model_name, parameters_mb);
 }
 
-extern "C" void neural_infer_anomaly(const void* system_telemetry, sigma_u32 size) {
+void neural_infer_anomaly(const void* system_telemetry, sigma_u32 size) {
     SigmaOS::Kernel::AI::SovereignNeuralEngine::inferAnomaly(system_telemetry, size);
 }
 
-extern "C" void neural_predict(const void* input_tensor, void* output_tensor) {
+void neural_predict(const void* input_tensor, void* output_tensor) {
     SigmaOS::Kernel::AI::SovereignNeuralEngine::predict(input_tensor, output_tensor);
 }
 
-extern "C" void neural_report_status() {
+void neural_report_status() {
     SigmaOS::Kernel::AI::SovereignNeuralEngine::reportStatus();
 }
 
 
 
 
+
+} // extern "C"

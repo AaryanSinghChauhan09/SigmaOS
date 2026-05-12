@@ -30,7 +30,7 @@ static struct {
     .initialized     = 0u
 };
 
-extern "C" void zenith_init() {
+void zenith_init() {
     sigma_log("[ZENITH] Initializing Sovereign Morphic Layer Compositor (MLC)...");
     SovereignZenithEngine.initialized = 1u;
     sigma_log("[ZENITH] MLC: Zenith UI Engine ONLINE. Morphic shaders ARMED.");
@@ -67,7 +67,7 @@ extern "C" sigma_u32 zenith_create_element(const char* name, sigma_u32 type,
     return el->id;
 }
 
-extern "C" void zenith_set_flags(sigma_u32 id, sigma_u32 flags) {
+void zenith_set_flags(sigma_u32 id, sigma_u32 flags) {
     for (sigma_u32 i = 0u; i < SovereignZenithEngine.state.count; i++) {
         if (SovereignZenithEngine.state.elements[i].id == id) {
             SovereignZenithEngine.state.elements[i].flags = flags;
@@ -78,7 +78,7 @@ extern "C" void zenith_set_flags(sigma_u32 id, sigma_u32 flags) {
     }
 }
 
-extern "C" void zenith_set_geometry(sigma_u32 id, sigma_u32 x, sigma_u32 y, sigma_u32 w, sigma_u32 h) {
+void zenith_set_geometry(sigma_u32 id, sigma_u32 x, sigma_u32 y, sigma_u32 w, sigma_u32 h) {
     for (sigma_u32 i = 0u; i < SovereignZenithEngine.state.count; i++) {
         if (SovereignZenithEngine.state.elements[i].id == id) {
             SovereignZenithEngine.state.elements[i].x = x;
@@ -117,18 +117,18 @@ private:
     }
 };
 
-extern "C" void zenith_init() {
+void zenith_init() {
     sigma_log("[ZENITH] Initializing Sovereign Morphic Layer Compositor (MLC)...");
     SovereignZenithEngine.initialized = 1u;
     sigma_log("[ZENITH] MLC: Zenith UI Engine ONLINE. Morphic shaders ARMED.");
 }
 
-extern "C" void zenith_set_theme_premium(const char* theme) {
+void zenith_set_theme_premium(const char* theme) {
     // In a real impl, this would update the global HSL palette
     sigma_log("[ZENITH] MLC: Theme set to '%s'.\n", theme);
 }
 
-extern "C" void zenith_render_frame() {
+void zenith_render_frame() {
     /* Simulate the singleton call */
     static struct {
         void render() {
@@ -149,3 +149,5 @@ extern "C" const sigma_zenith_state_t* zenith_get_state() {
 
 
 
+
+} // extern "C"

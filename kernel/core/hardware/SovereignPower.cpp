@@ -9,7 +9,7 @@
  * Implements an Intelligent Energy Orchestration (IEO) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal ACPI/APM orchestration.
  *
- * Design: OOP-isolated singleton — SovereignPowerEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignPowerEngine.
  */
 
 class SovereignPowerEngine {
@@ -52,11 +52,11 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void power_init() {
+void power_init() {
     SovereignPowerEngine::init();
 }
 
-extern "C" void power_set_profile(sigma_power_profile_t profile) {
+void power_set_profile(sigma_power_profile_t profile) {
     SovereignPowerEngine::setProfile(profile);
 }
 
@@ -64,10 +64,12 @@ extern "C" sigma_u32 power_get_battery_pct() {
     return SovereignPowerEngine::getBatteryPct();
 }
 
-extern "C" void power_reboot() {
+void power_reboot() {
     SovereignPowerEngine::reboot();
 }
 
 
 
 
+
+} // extern "C"

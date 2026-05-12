@@ -19,7 +19,7 @@ typedef struct {
 static audit_record_t security_log[100];
 static sigma_u32 log_index = 0;
 
-extern "C" void security_audit_init() {
+void security_audit_init() {
     sigma_log("[SECURITY] Initializing Sovereign Auditor (Zero-Trust Enforcement)...");
 }
 
@@ -46,8 +46,10 @@ extern "C" bool security_verify_shard(sigma_u32 shard_id, const char* expected_s
     return is_valid;
 }
 
-extern "C" void security_report() {
+void security_report() {
     sigma_log("[SECURITY] Generating Global Lattice Audit Report...");
     sigma_log("[SECURITY] Total Shards Audited: %d\n", log_index);
     sigma_log("[SECURITY] Integrity Level: 100% Sovereign.");
 }
+
+} // extern "C"

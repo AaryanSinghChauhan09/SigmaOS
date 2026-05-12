@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sdk_init() {
+extern "C" {
+
+void sdk_init() {
     SigmaOS::Kernel::Ecosystem::SovereignSDK::getInstance().init();
 }
+
+} // extern "C"

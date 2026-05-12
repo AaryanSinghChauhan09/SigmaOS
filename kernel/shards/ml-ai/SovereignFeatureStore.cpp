@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void feat_init() {
+extern "C" {
+
+void feat_init() {
     SigmaOS::Kernel::AI::SovereignFeatureStore::getInstance().init();
 }
+
+} // extern "C"

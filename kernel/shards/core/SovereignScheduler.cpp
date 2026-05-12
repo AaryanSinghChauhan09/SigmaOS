@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sched_init() {
+extern "C" {
+
+void sched_init() {
     SigmaOS::Kernel::Core::SovereignScheduler::getInstance().init();
 }
+
+} // extern "C"

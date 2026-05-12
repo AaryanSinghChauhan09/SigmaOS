@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void sovereign_dns_init() {
+void sovereign_dns_init() {
     SigmaOS::Kernel::Network::SovereignDNS::init();
 }
 
-extern "C" void sovereign_dns_resolve(const char* domain) {
+void sovereign_dns_resolve(const char* domain) {
     SigmaOS::Kernel::Network::SovereignDNS::resolveName(domain);
 }
 
 
 
 
+
+} // extern "C"

@@ -50,18 +50,20 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void personalize_init() {
+void personalize_init() {
     SovereignPersonalizationEngine::init();
 }
 
-extern "C" void personalize_process_event(sigma_u32 event_id, const char* context) {
+void personalize_process_event(sigma_u32 event_id, const char* context) {
     SovereignPersonalizationEngine::processUserEvent(event_id, context);
 }
 
-extern "C" void personalize_suggest_theme(sigma_u32 ambient_light_lux) {
+void personalize_suggest_theme(sigma_u32 ambient_light_lux) {
     SovereignPersonalizationEngine::suggestThemeForEnvironment(ambient_light_lux);
 }
 
 
 
 
+
+} // extern "C"

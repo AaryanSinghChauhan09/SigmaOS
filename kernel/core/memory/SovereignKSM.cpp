@@ -19,11 +19,11 @@ typedef struct {
 
 static ksm_node_t memory_lattice[600];
 
-extern "C" void ksm_init() {
+void ksm_init() {
     sigma_log("[KSM] Initializing Sovereign Memory Deduplication (Linux KSM Parity)...");
 }
 
-extern "C" void ksm_scan_and_merge() {
+void ksm_scan_and_merge() {
     sigma_log("[KSM] Initiating Deep Scan of 600-shard memory lattice...");
     
     sigma_u32 merged_count = 0;
@@ -46,10 +46,14 @@ extern "C" void ksm_scan_and_merge() {
     sigma_log("[KSM] Merged %d redundant shards. Sovereign memory pressure optimized.\n", merged_count);
 }
 
-extern "C" void* ksm_access_shard(sigma_u32 shard_id) {
+void* ksm_access_shard(sigma_u32 shard_id) {
     if (shard_id >= 600) return SIGMA_NULL;
     return memory_lattice[shard_id].actual_ptr;
 }
 
 
 
+
+} // extern "C"
+
+} // extern "C"

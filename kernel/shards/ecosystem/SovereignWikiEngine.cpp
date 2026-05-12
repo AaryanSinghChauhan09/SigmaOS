@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void wiki_init() {
+extern "C" {
+
+void wiki_init() {
     SigmaOS::Kernel::Ecosystem::SovereignWikiEngine::getInstance().init();
 }
+
+} // extern "C"

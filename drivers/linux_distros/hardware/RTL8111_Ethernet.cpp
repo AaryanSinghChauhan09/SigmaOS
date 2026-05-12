@@ -40,6 +40,11 @@ private:
 } // namespace Drivers
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void rtl8111_init() {
+
+extern "C" {
+
+void rtl8111_init() {
     SigmaOS::Kernel::Drivers::Hardware::RealtekRTL8111::initDevice();
 }
+
+} // extern "C"

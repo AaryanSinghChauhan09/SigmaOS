@@ -119,7 +119,7 @@ public:
     }
 };
 
-extern "C" void kernel_main() {
+void kernel_main() {
     SovereignScheduler scheduler;
     
     // In a zero-dependency kernel, we allocate manually or use static instances
@@ -145,3 +145,5 @@ int main() {
     return 0;
 }
 
+
+} // extern "C"

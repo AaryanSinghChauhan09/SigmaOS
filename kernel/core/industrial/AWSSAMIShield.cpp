@@ -3,7 +3,7 @@
  * S SIGMAOS: AWS AMI SHIELD (Cloud-Native Security Shard)
  * =========================================================================
  * Mission: Implements CLD-001 for secure AWS EC2 deployments.
- * Layer  : L6 — Cloud-Native Integration
+ * Layer  : L6 ï¿½ Cloud-Native Integration
  * =========================================================================
  */
 
@@ -36,6 +36,11 @@ private:
 } // namespace Cloud
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void aws_shield_init() {
+
+extern "C" {
+
+void aws_shield_init() {
     SigmaOS::Kernel::Cloud::AWSSAMIShield::secureBootAMI();
 }
+
+} // extern "C"

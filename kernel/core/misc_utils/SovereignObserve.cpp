@@ -15,7 +15,7 @@
 static sigma_observe_probe_t active_probes[128];
 static sigma_u32 probe_count = 0;
 
-extern "C" void observe_init() {
+void observe_init() {
     sigma_log("[OBSERVE] Initializing Sovereign Observability Matrix (DSI Algorithm)...");
 }
 
@@ -34,7 +34,7 @@ extern "C" bool observe_attach_probe(const char* symbol, void (*callback)(void))
     return true;
 }
 
-extern "C" void observe_trigger_probe(sigma_u32 probe_id) {
+void observe_trigger_probe(sigma_u32 probe_id) {
     if (probe_id > 0 && probe_id <= probe_count && active_probes[probe_id - 1].is_active) {
         sigma_log("[OBSERVE] DSI: Probe %d triggered on '%s'. Capturing registers...\n", 
                      probe_id, active_probes[probe_id - 1].target_symbol);
@@ -43,3 +43,5 @@ extern "C" void observe_trigger_probe(sigma_u32 probe_id) {
 
 
 
+
+} // extern "C"

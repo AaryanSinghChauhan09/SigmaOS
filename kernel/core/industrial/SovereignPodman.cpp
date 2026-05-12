@@ -4,7 +4,7 @@
  * =========================================================================
  * Mission: Implements OCI-001 to provide Podman/Docker-parity container
  *          orchestration within the Sovereign Lattice.
- * Layer  : L5 — Industrial Ecosystem
+ * Layer  : L5 ï¿½ Industrial Ecosystem
  * =========================================================================
  */
 
@@ -47,7 +47,10 @@ private:
 } // namespace Industrial
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void podman_init() {
+
+extern "C" {
+
+void podman_init() {
     SigmaOS::Kernel::Industrial::SovereignPodman::init();
 }
 
@@ -56,3 +59,5 @@ extern "C" int podman_run(const char* img, const char* cmd) {
         .runContainer(img, cmd) ? 1 : 0;
 }
 
+
+} // extern "C"

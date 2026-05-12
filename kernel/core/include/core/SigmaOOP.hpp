@@ -5,8 +5,12 @@
 #include "sigma_libc.h"
 namespace SigmaOS {
 typedef sigma_u32 sigma_status;
+#ifndef SIGMA_OK
 #define SIGMA_OK    0x00000000U
+#endif
+#ifndef SIGMA_ERROR
 #define SIGMA_ERROR 0xFFFFFFFFU
+#endif
 class SigmaMemory {
 public:
     static void* allocate(sigma_u64 length) {

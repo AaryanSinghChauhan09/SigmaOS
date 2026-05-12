@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void cloud_init() {
+extern "C" {
+
+void cloud_init() {
     SigmaOS::Kernel::Ecosystem::SovereignCloudIntegrator::getInstance().init();
 }
+
+} // extern "C"

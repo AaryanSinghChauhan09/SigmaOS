@@ -48,14 +48,18 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void pro_suite_init() {
+extern "C" {
+
+void pro_suite_init() {
     SigmaOS::Kernel::ProSuite::SovereignProSuite::getInstance().init();
 }
 
-extern "C" void pro_suite_certify_doc(const char* hash) {
+void pro_suite_certify_doc(const char* hash) {
     SigmaOS::Kernel::ProSuite::SovereignProSuite::getInstance().certifyDocument(hash);
 }
 
-extern "C" void pro_suite_verify_ledger(const char* id) {
+void pro_suite_verify_ledger(const char* id) {
     SigmaOS::Kernel::ProSuite::SovereignProSuite::getInstance().verifyLedger(id);
 }
+
+} // extern "C"

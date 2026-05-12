@@ -62,14 +62,18 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void vakil_init() {
+extern "C" {
+
+void vakil_init() {
     SigmaOS::Kernel::Legal::SovereignVakil::getInstance().init();
 }
 
-extern "C" void vakil_heal() {
+void vakil_heal() {
     SigmaOS::Kernel::Legal::SovereignVakil::getInstance().selfHeal();
 }
 
-extern "C" void vakil_rollback() {
+void vakil_rollback() {
     SigmaOS::Kernel::Legal::SovereignVakil::getInstance().rollback();
 }
+
+} // extern "C"

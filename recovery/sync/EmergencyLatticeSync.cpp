@@ -27,6 +27,8 @@ public:
     }
 };
 
-extern "C" void trigger_emergency_sync() {
+void trigger_emergency_sync() {
     EmergencyLatticeSync::getInstance().triggerSync();
 }
+
+} // extern "C"

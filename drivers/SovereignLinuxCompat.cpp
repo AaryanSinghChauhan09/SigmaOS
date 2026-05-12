@@ -70,15 +70,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void linux_compat_init() {
+void linux_compat_init() {
     SigmaOS::Kernel::Drivers::SovereignLinuxCompat::init();
 }
 
-extern "C" void linux_compat_load(const char* driver_path) {
+void linux_compat_load(const char* driver_path) {
     SigmaOS::Kernel::Drivers::SovereignLinuxCompat::loadLinuxDriver(driver_path);
 }
 
-extern "C" void linux_compat_list() {
+void linux_compat_list() {
     SigmaOS::Kernel::Drivers::SovereignLinuxCompat::listLoadedDrivers();
 }
+
+} // extern "C"

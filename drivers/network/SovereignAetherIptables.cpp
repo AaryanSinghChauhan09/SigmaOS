@@ -44,11 +44,16 @@ private:
 } // namespace Network
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void iptables_init() {
+
+extern "C" {
+
+void iptables_init() {
     SigmaOS::Kernel::Network::SovereignAetherIptables::init();
 }
 
-extern "C" void iptables_apply(const char* rule) {
+void iptables_apply(const char* rule) {
     SigmaOS::Kernel::Network::SovereignAetherIptables::applyLinuxRule(rule);
 }
 
+
+} // extern "C"

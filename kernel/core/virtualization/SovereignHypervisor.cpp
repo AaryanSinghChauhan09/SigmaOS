@@ -10,7 +10,7 @@
  * ZERO-DEPENDENCY: Direct VT-x/AMD-V hooks for silicon-native guests.
  * Competitor parity: KVM, Xen, ESXi, Hyper-V.
  *
- * Design: OOP-isolated singleton — SovereignHyperEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignHyperEngine.
  */
 
 namespace SigmaOS {
@@ -88,8 +88,10 @@ void SovereignHyperEngine::getState(sigma_hypervisor_state_t* out_state) const {
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Wrappers --- */
-extern "C" void hyper_init() {
+void hyper_init() {
     SigmaOS::Kernel::Virtualization::SovereignHyperEngine::init();
 }
 
@@ -97,19 +99,19 @@ extern "C" sigma_u32 hyper_create_vm(sigma_u32 vcpus, sigma_u64 memory_mb) {
     return SigmaOS::Kernel::Virtualization::SovereignHyperEngine::createVM(vcpus, memory_mb);
 }
 
-extern "C" void hyper_start_vm(sigma_u32 vm_id) {
+void hyper_start_vm(sigma_u32 vm_id) {
     SigmaOS::Kernel::Virtualization::SovereignHyperEngine::startVM(vm_id);
 }
 
-extern "C" void hyper_handle_vmexit() {
+void hyper_handle_vmexit() {
     SigmaOS::Kernel::Virtualization::SovereignHyperEngine::handleVMExit();
 }
 
-extern "C" void hyper_stop_vm(sigma_u32 vm_id) {
+void hyper_stop_vm(sigma_u32 vm_id) {
     SigmaOS::Kernel::Virtualization::SovereignHyperEngine::stopVM(vm_id);
 }
 
-extern "C" void hyper_get_state(sigma_hypervisor_state_t* out_state) {
+void hyper_get_state(sigma_hypervisor_state_t* out_state) {
     SigmaOS::Kernel::Virtualization::SovereignHyperEngine::getState(out_state);
 }
 
@@ -120,3 +122,5 @@ extern "C" sigma_u64 hypervisor_get_exit_count() {
 
 
 
+
+} // extern "C"

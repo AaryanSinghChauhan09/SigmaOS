@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void game_init() {
+extern "C" {
+
+void game_init() {
     SigmaOS::Kernel::Dev::SovereignGame::getInstance().init();
 }
+
+} // extern "C"

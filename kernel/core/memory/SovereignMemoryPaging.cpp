@@ -10,7 +10,7 @@
  * USP: Utilizes predictive pre-fetching to swap pages into cache before a 
  * page fault ever occurs, eliminating stutter in heavy workloads.
  *
- * Design: OOP-isolated singleton — SovereignPagingEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignPagingEngine.
  */
 
 class SovereignPagingEngine {
@@ -48,18 +48,20 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void paging_init() {
+void paging_init() {
     SovereignPagingEngine::init();
 }
 
-extern "C" void paging_map(void* virtual_addr, void* physical_addr, sigma_u32 flags) {
+void paging_map(void* virtual_addr, void* physical_addr, sigma_u32 flags) {
     SovereignPagingEngine::mapVirtualToPhysical(virtual_addr, physical_addr, flags);
 }
 
-extern "C" void paging_prefetch() {
+void paging_prefetch() {
     SovereignPagingEngine::predictAndPrefetch();
 }
 
 
 
 
+
+} // extern "C"

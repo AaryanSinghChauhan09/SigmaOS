@@ -8,10 +8,10 @@
  * Live kernel update without rebooting.
  *
  * USP: Applies binary patches to running kernel shards by swapping out
- * function pointers atomically without requiring a system restart —
+ * function pointers atomically without requiring a system restart ï¿½
  * a capability unmatched by legacy Linux distributions.
  *
- * Design: OOP-isolated singleton — SovereignHotPatchEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignHotPatchEngine.
  */
 
 class SovereignHotPatchEngine {
@@ -40,14 +40,16 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void hotpatch_init() {
+void hotpatch_init() {
     SovereignHotPatchEngine::init();
 }
 
-extern "C" void hotpatch_apply(const char* shard, sigma_u32 patch_id) {
+void hotpatch_apply(const char* shard, sigma_u32 patch_id) {
     SovereignHotPatchEngine::applyPatch(shard, patch_id);
 }
 
 
 
 
+
+} // extern "C"

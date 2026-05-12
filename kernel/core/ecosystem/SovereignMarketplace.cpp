@@ -59,15 +59,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void marketplace_init() {
+void marketplace_init() {
     SigmaOS::Kernel::Ecosystem::SovereignMarketplace::init();
 }
 
-extern "C" void marketplace_publish(const char* orb, const char* author) {
+void marketplace_publish(const char* orb, const char* author) {
     SigmaOS::Kernel::Ecosystem::SovereignMarketplace::publishOrb(orb, author);
 }
 
 
 
 
+
+} // extern "C"

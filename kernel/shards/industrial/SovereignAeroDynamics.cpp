@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void aero_init() {
+extern "C" {
+
+void aero_init() {
     SigmaOS::Kernel::Industrial::SovereignAeroDynamics::getInstance().init();
 }
+
+} // extern "C"

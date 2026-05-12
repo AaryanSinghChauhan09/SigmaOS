@@ -13,11 +13,11 @@
  * ZERO-DEPENDENCY: Strictly bare-metal accessibility navigation.
  */
 
-extern "C" void eyetrack_init() {
+void eyetrack_init() {
     sigma_log("[EYETRACK] Initializing Sovereign Eye Tracking Engine (OKM Algorithm)...");
 }
 
-extern "C" void eyetrack_process_frame(const void* frame_data) {
+void eyetrack_process_frame(const void* frame_data) {
     // OKM (Ocular Kinematic Mapping) Algorithm
     // Direct hardware parsing of optical sensors to update the global cursor position.
     
@@ -25,9 +25,11 @@ extern "C" void eyetrack_process_frame(const void* frame_data) {
     // universalui_update_cursor_pos(x, y);
 }
 
-extern "C" void eyetrack_calibrate() {
+void eyetrack_calibrate() {
     sigma_log("[EYETRACK] OKM: Initiating multi-point optical calibration sequence...");
 }
 
 
 
+
+} // extern "C"

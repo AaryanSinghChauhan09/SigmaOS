@@ -74,7 +74,11 @@ void SovereignGlobalEcosystem::initProtocols() {
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void ecosystem_init() {
+void ecosystem_init() {
     SigmaOS::Kernel::Industrial::SovereignGlobalEcosystem::getInstance().init();
 }
+
+} // extern "C"

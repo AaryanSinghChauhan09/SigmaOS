@@ -12,11 +12,11 @@
  * ZERO-DEPENDENCY: Strictly bare-metal semantic search.
  */
 
-extern "C" void neuralsearch_init() {
+void neuralsearch_init() {
     sigma_log("[NEURALSEARCH] Initializing Sovereign Neural Search (OITR Algorithm)...");
 }
 
-extern "C" void neuralsearch_query(const char* natural_language_query) {
+void neuralsearch_query(const char* natural_language_query) {
     // OITR (Omni-Index Tensor Retrieval) Algorithm
     // Embeds the query and computes cosine similarity against all active shard vectors instantly.
     
@@ -27,9 +27,11 @@ extern "C" void neuralsearch_query(const char* natural_language_query) {
     sigma_log("[NEURALSEARCH] OITR: Result rendered in Universal UI.");
 }
 
-extern "C" void neuralsearch_index_shard(sigma_u32 shard_id) {
+void neuralsearch_index_shard(sigma_u32 shard_id) {
     sigma_log("[NEURALSEARCH] OITR: Calculating semantic embeddings for Shard %d...\n", shard_id);
 }
 
 
 
+
+} // extern "C"

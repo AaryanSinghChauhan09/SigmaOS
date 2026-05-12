@@ -51,8 +51,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void zta_enforcer_init() {
+void zta_enforcer_init() {
     SigmaOS::Kernel::Security::SovereignZeroTrustEnforcer::init();
 }
 
@@ -63,3 +65,5 @@ extern "C" bool zta_verify_access(const char* id, const char* res) {
 
 
 
+
+} // extern "C"

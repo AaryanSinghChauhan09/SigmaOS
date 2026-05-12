@@ -1807,5 +1807,95 @@
         "algorithms": "Workflow optimization, adaptive assistance",
         "self_healing": "Continuous health check for Digital Legacy Manager tools",
         "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "exoplanet_geologist",
+        "tools": "Exoplanet Geologist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Exoplanet Geologist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "cyber_kinetic_surgeon",
+        "tools": "Cyber-Kinetic Surgeon workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Cyber-Kinetic Surgeon tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "micro_plastic_remediation_specialist",
+        "tools": "Micro-Plastic Remediation Specialist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Micro-Plastic Remediation Specialist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "interstellar_communications_officer",
+        "tools": "Interstellar Communications Officer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Interstellar Communications Officer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "cryo_preservation_technician",
+        "tools": "Cryo-Preservation Technician workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Cryo-Preservation Technician tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "holographic_experience_architect",
+        "tools": "Holographic Experience Architect workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Holographic Experience Architect tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "nanoscale_material_scientist",
+        "tools": "Nanoscale Material Scientist workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Nanoscale Material Scientist tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "quantum_algorithmic_auditor",
+        "tools": "Quantum Algorithmic Auditor workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Quantum Algorithmic Auditor tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "vertical_farming_systems_engineer",
+        "tools": "Vertical Farming Systems Engineer workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Vertical Farming Systems Engineer tools",
+        "rollback": "Automatic state snapshots"
+    },
+    {
+        "name": "space_traffic_controller",
+        "tools": "Space Traffic Controller workspace, specialized analytics, compliance manager",
+        "rules": "Industry standards, professional ethics",
+        "calculators": "Efficiency metrics, cost analysis",
+        "algorithms": "Workflow optimization, adaptive assistance",
+        "self_healing": "Continuous health check for Space Traffic Controller tools",
+        "rollback": "Automatic state snapshots"
     }
 ]

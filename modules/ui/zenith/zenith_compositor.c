@@ -1,4 +1,5 @@
 #include "sigma_libc.h"
+#include "sigma_log.h"
 #include "core/sigma_types.h"
 
 // ---------------------------------------------------------

@@ -118,7 +118,9 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void start_process_zenith() {
+extern "C" {
+
+void start_process_zenith() {
     SigmaOS::Kernel::ZenithProcessManager manager;
 
     manager.create_process("Zenith-HUD", 100);
@@ -134,3 +136,5 @@ int main() {
     return 0;
 }
 
+
+} // extern "C"

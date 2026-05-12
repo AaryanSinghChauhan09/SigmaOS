@@ -8,10 +8,10 @@
  * Macro recording and scriptable UI automation engine.
  *
  * USP: Schedules kernel-level recurring tasks and records macro sequences
- * that can be replayed on triggers — replacing cron, systemd timers, and 
+ * that can be replayed on triggers ï¿½ replacing cron, systemd timers, and 
  * scripting engines with a zero-overhead Ring-0 scheduler.
  *
- * Design: OOP-isolated singleton — SovereignTaskScheduler.
+ * Design: OOP-isolated singleton ï¿½ SovereignTaskScheduler.
  */
 
 class SovereignTaskScheduler {
@@ -50,18 +50,20 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void scheduler_init() {
+void scheduler_init() {
     SovereignTaskScheduler::init();
 }
 
-extern "C" void scheduler_add_task(const char* name, sigma_u32 interval_ms) {
+void scheduler_add_task(const char* name, sigma_u32 interval_ms) {
     SovereignTaskScheduler::scheduleTask(name, interval_ms);
 }
 
-extern "C" void scheduler_tick(sigma_u32 elapsed_ms) {
+void scheduler_tick(sigma_u32 elapsed_ms) {
     SovereignTaskScheduler::tick(elapsed_ms);
 }
 
 
 
 
+
+} // extern "C"

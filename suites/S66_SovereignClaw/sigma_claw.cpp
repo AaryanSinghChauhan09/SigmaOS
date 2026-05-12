@@ -55,6 +55,8 @@ public:
 
 } // namespace sigma
 
-extern "C" void claw_daemon_init() {
+void claw_daemon_init() {
     sigma_print("[S66] Sovereign Claw Gateway Online.\n");
 }
+
+} // extern "C"

@@ -3,7 +3,7 @@
 #include "sigma_log.h"
 
 /**
- * SovereignKeybind — Dynamic keybinding and shortcut orchestration.
+ * SovereignKeybind ï¿½ Dynamic keybinding and shortcut orchestration.
  * Part of Part 2: Deep Customization & Personalization.
  */
 
@@ -42,6 +42,9 @@ public:
 } // namespace UI
 } // namespace Kernel
 } // namespace SigmaOS
+
+extern "C" {
+
 private:
     SovereignKeybindShard() : m_count(0) {}
     Keybind m_binds[MAX_KEYBINDS];
@@ -53,10 +56,12 @@ private:
 } // namespace SigmaOS
 
 /* --- C Bridge --- */
-extern "C" void sigma_keybind_add(unsigned int code, unsigned int mods, const char* action) {
+void sigma_keybind_add(unsigned int code, unsigned int mods, const char* action) {
     SigmaOS::Kernel::UI::SovereignKeybindShard::registerBind(code, mods, action);
 }
 
-extern "C" void sigma_keybind_trigger(unsigned int code, unsigned int mods) {
+void sigma_keybind_trigger(unsigned int code, unsigned int mods) {
     SigmaOS::Kernel::UI::SovereignKeybindShard::executeBind(code, mods);
 }
+
+} // extern "C"

@@ -24,3 +24,5 @@ void scheduler_process(void* ptr) {
 }
 
 }
+
+} // extern "C"

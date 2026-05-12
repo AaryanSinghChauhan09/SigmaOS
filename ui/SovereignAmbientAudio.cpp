@@ -12,11 +12,11 @@
  * ZERO-DEPENDENCY: Strictly bare-metal audio generation.
  */
 
-extern "C" void ambientaudio_init() {
+void ambientaudio_init() {
     sigma_log("[AMBIENTAUDIO] Initializing Sovereign Ambient Audio Engine (PAS Algorithm)...");
 }
 
-extern "C" void ambientaudio_set_theme(sigma_ambient_theme_t theme) {
+void ambientaudio_set_theme(sigma_ambient_theme_t theme) {
     // PAS (Procedural Acoustic Synthesis) Algorithm
     // Generates continuous, non-looping audio directly via mathematical functions.
     
@@ -24,9 +24,11 @@ extern "C" void ambientaudio_set_theme(sigma_ambient_theme_t theme) {
     sigma_log("[AMBIENTAUDIO] PAS: Synthesizer locked to silicon DAC.");
 }
 
-extern "C" void ambientaudio_adjust_intensity(float intensity) {
+void ambientaudio_adjust_intensity(float intensity) {
     sigma_log("[AMBIENTAUDIO] PAS: Modulating acoustic intensity to %.2f.\n", intensity);
 }
 
 
 
+
+} // extern "C"

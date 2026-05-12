@@ -8,7 +8,7 @@
  * Implements a Light-Weight Automation (LWA) algorithm.
  * ZERO-DEPENDENCY: Integrated for user personalization and assistant tasks.
  *
- * Design: OOP-isolated singleton — SovereignLuaEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignLuaEngine.
  */
 
 /* --- Sovereign Lua Engine (OOP Isolation) --- */
@@ -20,12 +20,12 @@ static struct {
     .initialized = 0u
 };
 
-extern "C" void lua_init() {
+void lua_init() {
     sigma_log("[LUA] Initializing Sovereign Light-Weight Automation (LWA)...");
     SovereignLuaEngine.initialized = 1u;
 }
 
-extern "C" void lua_execute_personalization(const char* script_shard) {
+void lua_execute_personalization(const char* script_shard) {
     sigma_log("[LUA] LWA: Executing personalization shard '%s'...\n", script_shard);
     /* LWA Algorithm: Safe execution of user-defined automation logic */
     SovereignLuaEngine.scripts_loaded++;
@@ -39,3 +39,5 @@ extern "C" sigma_u32 lua_get_script_count() {
 
 
 
+
+} // extern "C"

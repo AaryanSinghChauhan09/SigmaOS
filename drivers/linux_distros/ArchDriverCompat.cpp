@@ -41,6 +41,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void arch_driver_load(const char* path) {
+extern "C" {
+
+void arch_driver_load(const char* path) {
     SigmaOS::Kernel::Drivers::ArchDriverCompat::loadArchDriver(path);
 }
+
+} // extern "C"

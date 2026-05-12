@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void cfs_init() {
+extern "C" {
+
+void cfs_init() {
     SigmaOS::Kernel::Core::SovereignFairScheduler::getInstance().init();
 }
+
+} // extern "C"

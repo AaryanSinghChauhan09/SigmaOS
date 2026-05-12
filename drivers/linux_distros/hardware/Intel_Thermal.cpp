@@ -40,6 +40,11 @@ private:
 } // namespace Drivers
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void thermal_init() {
+
+extern "C" {
+
+void thermal_init() {
     SigmaOS::Kernel::Drivers::Hardware::IntelThermalManager::initDevice();
 }
+
+} // extern "C"

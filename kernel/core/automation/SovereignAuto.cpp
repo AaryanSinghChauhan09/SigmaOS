@@ -15,11 +15,11 @@
 static sigma_automation_rule_t rule_lattice[128];
 static sigma_u32 rule_count = 0;
 
-extern "C" void auto_init() {
+void auto_init() {
     sigma_log("[AUTO] Initializing Sovereign System Automation Nexus...");
 }
 
-extern "C" void auto_register_rule(sigma_u32 event_id, sigma_u32 shard_id, sigma_u32 action) {
+void auto_register_rule(sigma_u32 event_id, sigma_u32 shard_id, sigma_u32 action) {
     if (rule_count >= 128) return;
     
     sigma_automation_rule_t* rule = &rule_lattice[rule_count++];
@@ -32,7 +32,7 @@ extern "C" void auto_register_rule(sigma_u32 event_id, sigma_u32 shard_id, sigma
                  event_id, shard_id, action);
 }
 
-extern "C" void auto_trigger_event(sigma_u32 event_id) {
+void auto_trigger_event(sigma_u32 event_id) {
     // EDSA (Event-Driven Shard Automation) Algorithm
     // Dispatches automated actions to target shards based on incoming event IDs.
     
@@ -48,3 +48,5 @@ extern "C" void auto_trigger_event(sigma_u32 event_id) {
 
 
 
+
+} // extern "C"

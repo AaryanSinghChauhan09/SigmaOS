@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void gaming_perf_init() {
+void gaming_perf_init() {
     SigmaOS::Kernel::Hardware::SovereignGamingPerformance::init();
 }
 
-extern "C" void gaming_perf_optimize() {
+void gaming_perf_optimize() {
     SigmaOS::Kernel::Hardware::SovereignGamingPerformance::optimizeSession();
 }
 
 
 
 
+
+} // extern "C"

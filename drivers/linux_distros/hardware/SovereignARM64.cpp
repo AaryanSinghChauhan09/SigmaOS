@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void init_arm64_hal() {
+extern "C" {
+
+void init_arm64_hal() {
     SigmaOS::Kernel::Hardware::SovereignARM64::initBroadcom();
 }
+
+} // extern "C"

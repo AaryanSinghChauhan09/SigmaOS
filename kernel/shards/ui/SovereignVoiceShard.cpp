@@ -73,7 +73,9 @@ public:
 } // namespace Audio
 } // namespace SigmaOS
 
-extern "C" void start_voice_zenith() {
+extern "C" {
+
+void start_voice_zenith() {
     SigmaOS::Audio::SovereignHIDBridge hid;
     SigmaOS::Audio::SovereignVoiceShard voiceShard(&hid);
     
@@ -88,3 +90,5 @@ int main() {
     start_voice_zenith();
     return 0;
 }
+
+} // extern "C"

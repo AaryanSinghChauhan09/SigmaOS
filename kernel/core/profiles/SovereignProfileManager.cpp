@@ -69,6 +69,10 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void sigma_load_profile(int role_id) {
+extern "C" {
+
+void sigma_load_profile(int role_id) {
     SigmaOS::Kernel::Core::ProfileManager::getInstance().loadProfile(static_cast<SigmaOS::Kernel::Core::Profession>(role_id));
 }
+
+} // extern "C"

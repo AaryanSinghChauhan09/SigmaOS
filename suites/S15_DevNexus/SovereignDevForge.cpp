@@ -67,7 +67,9 @@ public:
 } // namespace Dev
 } // namespace SigmaOS
 
-extern "C" void start_devforge_demo() {
+extern "C" {
+
+void start_devforge_demo() {
     SigmaOS::Dev::SovereignDevForge forge;
 
     forge.forge_native_binary("SovereignProcessManager");
@@ -85,3 +87,5 @@ int main() {
 
 
 
+
+} // extern "C"

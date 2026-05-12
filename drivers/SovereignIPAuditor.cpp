@@ -58,6 +58,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 extern "C" int ip_audit_verify(const char* name, const char* license) {
     return SigmaOS::Kernel::Drivers::SovereignIPAuditor::verifyDriverCompliance(name, license) ? 1 : 0;
 }
+
+} // extern "C"

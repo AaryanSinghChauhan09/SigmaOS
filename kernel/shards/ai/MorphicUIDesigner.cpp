@@ -68,7 +68,9 @@ public:
 } // namespace Design
 } // namespace SigmaOS
 
-extern "C" void start_morphic_designer() {
+extern "C" {
+
+void start_morphic_designer() {
     SigmaOS::Design::MorphicUIDesigner designer;
     
     designer.add_widget("Core-Dashboard", 50, 50, 800, 600);
@@ -83,3 +85,5 @@ int main() {
     start_morphic_designer();
     return 0;
 }
+
+} // extern "C"

@@ -60,14 +60,18 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void acct_init() {
+extern "C" {
+
+void acct_init() {
     SigmaOS::Kernel::Finance::SovereignAccountant::getInstance().init();
 }
 
-extern "C" void acct_heal() {
+void acct_heal() {
     SigmaOS::Kernel::Finance::SovereignAccountant::getInstance().selfHeal();
 }
 
-extern "C" void acct_rollback() {
+void acct_rollback() {
     SigmaOS::Kernel::Finance::SovereignAccountant::getInstance().rollback();
 }
+
+} // extern "C"

@@ -41,6 +41,10 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void profiles_apply(int type_id) {
+extern "C" {
+
+void profiles_apply(int type_id) {
     SigmaOS::Kernel::System::SovereignProfiles::apply((SigmaOS::Kernel::System::ProfileType)type_id);
 }
+
+} // extern "C"

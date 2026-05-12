@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void embedded_init() {
+extern "C" {
+
+void embedded_init() {
     SigmaOS::Kernel::Dev::SovereignEmbedded::getInstance().init();
 }
+
+} // extern "C"

@@ -10,3 +10,5 @@ void media_load_codec(const char* codec) {
 }
 
 }
+
+} // extern "C"

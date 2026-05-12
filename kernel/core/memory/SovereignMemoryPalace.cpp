@@ -12,15 +12,15 @@
  * ZERO-DEPENDENCY: Strictly bare-metal file association.
  */
 
-extern "C" void memorypalace_init() {
+void memorypalace_init() {
     sigma_log("[MEMORYPALACE] Initializing Sovereign Memory Palace (CCG Algorithm)...");
 }
 
-extern "C" void memorypalace_record_file_access(sigma_u32 file_id, sigma_u64 timestamp) {
+void memorypalace_record_file_access(sigma_u32 file_id, sigma_u64 timestamp) {
     sigma_log("[MEMORYPALACE] CCG: File %d access recorded at T=%llu.\n", file_id, timestamp);
 }
 
-extern "C" void memorypalace_query_timeline(sigma_u64 start_time, sigma_u64 end_time) {
+void memorypalace_query_timeline(sigma_u64 start_time, sigma_u64 end_time) {
     // CCG (Chronological Context Graph) Algorithm
     // Retrieves files not by path, but by the exact slice of time they were relevant.
     
@@ -30,3 +30,5 @@ extern "C" void memorypalace_query_timeline(sigma_u64 start_time, sigma_u64 end_
 
 
 
+
+} // extern "C"

@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void term_init() {
+extern "C" {
+
+void term_init() {
     SigmaOS::Kernel::Userland::SovereignTerminal::getInstance().init();
 }
+
+} // extern "C"

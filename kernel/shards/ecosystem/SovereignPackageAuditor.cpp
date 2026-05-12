@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void auditor_init() {
+extern "C" {
+
+void auditor_init() {
     SigmaOS::Kernel::Ecosystem::SovereignPackageAuditor::getInstance().init();
 }
+
+} // extern "C"

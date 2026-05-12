@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void brand_init() {
+extern "C" {
+
+void brand_init() {
     SigmaOS::Kernel::Creative::SovereignBrand::getInstance().init();
 }
+
+} // extern "C"

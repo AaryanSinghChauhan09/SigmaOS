@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void cloud_init_shard() {
+void cloud_init_shard() {
     SigmaOS::Kernel::Cloud::SovereignCloudBridge::init();
 }
 
-extern "C" void cloud_sync_shard() {
+void cloud_sync_shard() {
     SigmaOS::Kernel::Cloud::SovereignCloudBridge::syncLattice();
 }
 
 
 
 
+
+} // extern "C"

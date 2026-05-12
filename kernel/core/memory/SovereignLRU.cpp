@@ -14,11 +14,11 @@
 
 static sigma_lru_state_t current_lru_state = LRU_IDLE;
 
-extern "C" void lru_init() {
+void lru_init() {
     sigma_log("[LRU] Initializing Sovereign Lattice Rolling Update Engine...");
 }
 
-extern "C" void lru_trigger_update(sigma_u32 shard_id, void* new_binary, sigma_u32 size) {
+void lru_trigger_update(sigma_u32 shard_id, void* new_binary, sigma_u32 size) {
     // ZDSM (Zero-Downtime Shard Migration) Algorithm
     // Hot-swaps shard binaries while preserving machine-state context.
     
@@ -40,3 +40,5 @@ extern "C" sigma_lru_state_t lru_get_state() {
 
 
 
+
+} // extern "C"

@@ -9,3 +9,5 @@ void mem_trace() {
 }
 
 }
+
+} // extern "C"

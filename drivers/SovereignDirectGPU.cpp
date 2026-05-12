@@ -36,6 +36,11 @@ private:
 } // namespace Drivers
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void gpu_direct_access_init() {
+
+extern "C" {
+
+void gpu_direct_access_init() {
     SigmaOS::Kernel::Drivers::SovereignDirectGPU::bypassAbstraction();
 }
+
+} // extern "C"

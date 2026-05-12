@@ -50,12 +50,16 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void virtio_init() {
+void virtio_init() {
     SigmaOS::Kernel::Drivers::SovereignVirtio::init();
 }
 
-extern "C" void virtio_register(sigma_u32 id) {
+void virtio_register(sigma_u32 id) {
     SigmaOS::Kernel::Drivers::SovereignVirtio::registerDevice(id);
 }
 
+
+} // extern "C"

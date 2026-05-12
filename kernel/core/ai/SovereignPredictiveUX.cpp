@@ -3,7 +3,7 @@
 #include "sigma_log.h"
 
 /**
- * SovereignPredictiveUX — Anticipatory UI adjustment and user behavior modeling.
+ * SovereignPredictiveUX ï¿½ Anticipatory UI adjustment and user behavior modeling.
  * Part of Part 3: Advanced Intelligence.
  * Inspired by github.com/donnemartin/system-design-primer (Scalability/Modeling).
  */
@@ -39,8 +39,10 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void sigma_ux_record(const char* el) {
+void sigma_ux_record(const char* el) {
     SigmaOS::Kernel::AI::SovereignPredictiveUX::recordInteraction(el);
 }
 
@@ -48,6 +50,8 @@ extern "C" const char* sigma_ux_predict() {
     return SigmaOS::Kernel::AI::SovereignPredictiveUX::suggestNextAction();
 }
 
-extern "C" void sigma_ux_immersion(const char* mode) {
+void sigma_ux_immersion(const char* mode) {
     SigmaOS::Kernel::AI::SovereignPredictiveUX::applyImmersionMode(mode);
 }
+
+} // extern "C"

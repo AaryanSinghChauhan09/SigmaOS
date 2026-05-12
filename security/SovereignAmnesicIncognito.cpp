@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void incognito_init() {
+void incognito_init() {
     SigmaOS::Kernel::Security::SovereignAmnesicIncognito::init();
 }
 
-extern "C" void incognito_launch(const char* shard) {
+void incognito_launch(const char* shard) {
     SigmaOS::Kernel::Security::SovereignAmnesicIncognito::launchUntraceableShard(shard);
 }
 
 
 
 
+
+} // extern "C"

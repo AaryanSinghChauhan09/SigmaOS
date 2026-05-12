@@ -10,7 +10,7 @@
  * USP: Enables seamless execution scaling across heterogenous compute clusters 
  * mixing ARM Cortex and RISC-V cores via Universal Binary Translation (UBT).
  *
- * Design: OOP-isolated singleton — SovereignHybridArchEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignHybridArchEngine.
  */
 
 class SovereignHybridArchEngine {
@@ -54,11 +54,11 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void hybridarch_init() {
+void hybridarch_init() {
     SovereignHybridArchEngine::init();
 }
 
-extern "C" void hybridarch_register_core(sigma_u32 core_id, const char* isa_type) {
+void hybridarch_register_core(sigma_u32 core_id, const char* isa_type) {
     SovereignHybridArchEngine::registerCore(core_id, isa_type);
 }
 
@@ -69,3 +69,5 @@ extern "C" bool hybridarch_dispatch_task(void* task_ptr) {
 
 
 
+
+} // extern "C"

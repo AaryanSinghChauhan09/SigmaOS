@@ -56,3 +56,5 @@ void sigma_matrix_init() {
 }
 
 
+
+} // extern "C"

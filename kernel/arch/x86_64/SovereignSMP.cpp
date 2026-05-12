@@ -3,7 +3,7 @@
 #include "sigma_log.h"
 
 /**
- * SovereignSMP (Arch x86_64) — APIC + IPI Multicore Controller
+ * SovereignSMP (Arch x86_64) ï¿½ APIC + IPI Multicore Controller
  * Boots Application Processors and manages Inter-Processor Interrupts.
  */
 
@@ -49,10 +49,14 @@ private:
 } // namespace Arch
 } // namespace SigmaOS
 
-extern "C" void sigma_smp_init() {
+extern "C" {
+
+void sigma_smp_init() {
     SigmaOS::Arch::SovereignSMP::bootAPs();
 }
 
-extern "C" void sigma_smp_send_ipi(unsigned int core_id, unsigned int vector) {
+void sigma_smp_send_ipi(unsigned int core_id, unsigned int vector) {
     SigmaOS::Arch::SovereignSMP::sendIPI((sigma_u32)core_id, (sigma_u32)vector);
 }
+
+} // extern "C"

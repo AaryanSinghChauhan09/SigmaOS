@@ -23,11 +23,11 @@ static struct {
     .dwell_threshold = 5
 };
 
-extern "C" void emotion_init() {
+void emotion_init() {
     sigma_log("[EMOTION] Initializing Sovereign Emotion UX Engine (OOPS Isolation)...");
 }
 
-extern "C" void emotion_update_state(sigma_emotion_state_t new_state) {
+void emotion_update_state(sigma_emotion_state_t new_state) {
     if (SovereignEmotionManager.current_state == new_state) {
         SovereignEmotionManager.state_dwell_time = 0;
         return;
@@ -55,3 +55,5 @@ extern "C" sigma_emotion_state_t emotion_get_current_state() {
 
 
 
+
+} // extern "C"

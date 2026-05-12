@@ -13,11 +13,11 @@
  * ZERO-DEPENDENCY: Strictly bare-metal GUI generation.
  */
 
-extern "C" void contextmenu_init() {
+void contextmenu_init() {
     sigma_log("[CONTEXTMENU] Initializing Sovereign Context Menu Engine (IDR Algorithm)...");
 }
 
-extern "C" void contextmenu_invoke(sigma_u32 target_id, sigma_u32 x, sigma_u32 y) {
+void contextmenu_invoke(sigma_u32 target_id, sigma_u32 x, sigma_u32 y) {
     // IDR (Intent-Driven Radial) Algorithm
     // Uses the neural engine to prune legacy bloat from menus, showing only highly probable actions.
     
@@ -26,9 +26,11 @@ extern "C" void contextmenu_invoke(sigma_u32 target_id, sigma_u32 x, sigma_u32 y
     sigma_log("[CONTEXTMENU] IDR: Rendering adaptive radial menu.");
 }
 
-extern "C" void contextmenu_dismiss() {
+void contextmenu_dismiss() {
     sigma_log("[CONTEXTMENU] IDR: Radial menu dismissed.");
 }
 
 
 
+
+} // extern "C"

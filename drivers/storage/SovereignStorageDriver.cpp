@@ -72,7 +72,7 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void storage_init() {
+void storage_init() {
     SovereignStorageDriverEngine::init();
 }
 
@@ -91,3 +91,5 @@ extern "C" bool storage_write(sigma_u32 lba, sigma_u32 count, const void* data) 
 
 
 
+
+} // extern "C"

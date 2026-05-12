@@ -43,15 +43,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void hft_init() {
+void hft_init() {
     SigmaOS::Kernel::Network::SovereignHFTNexus::init();
 }
 
-extern "C" void hft_process(const void* data, sigma_size_t size) {
+void hft_process(const void* data, sigma_size_t size) {
     SigmaOS::Kernel::Network::SovereignHFTNexus::processTradePacket(data, size);
 }
 
 
 
 
+
+} // extern "C"

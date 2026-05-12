@@ -3,7 +3,7 @@
  * S SIGMAOS: K8S CONTROL PLANE SHIELD (Enterprise Orchestration)
  * =========================================================================
  * Mission: Implements K8S-002 for industrial container management.
- * Layer  : L6 — Cloud-Native Integration
+ * Layer  : L6 ï¿½ Cloud-Native Integration
  * =========================================================================
  */
 
@@ -36,6 +36,11 @@ private:
 } // namespace Industrial
 } // namespace Kernel
 } // namespace SigmaOS
-extern "C" void k8s_shield_init() {
+
+extern "C" {
+
+void k8s_shield_init() {
     SigmaOS::Kernel::Industrial::K8sControlPlaneShield::secureControlPlane();
 }
+
+} // extern "C"

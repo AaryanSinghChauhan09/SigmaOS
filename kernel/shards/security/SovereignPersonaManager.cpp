@@ -11,7 +11,7 @@
 
 #include "kernel/core/persona_manager.hpp"
 
-extern "C" void _start(void) {
+void _start(void) {
     SigmaOS::Core::SovereignPersonaManager persona;
     
     persona.ApplyProfile("ZENITH_ULTRA_PREMIUM");
@@ -25,3 +25,5 @@ int main() {
     _start();
     return 0;
 }
+
+} // extern "C"

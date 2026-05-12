@@ -60,19 +60,23 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Wrappers --- */
-extern "C" void persistence_init() {
+void persistence_init() {
     SigmaOS::Kernel::FS::SovereignPersistence::init();
 }
 
-extern "C" void persistence_snapshot(const char* component) {
+void persistence_snapshot(const char* component) {
     SigmaOS::Kernel::FS::SovereignPersistence::snapshotState(component);
 }
 
-extern "C" void persistence_restore(const char* component) {
+void persistence_restore(const char* component) {
     SigmaOS::Kernel::FS::SovereignPersistence::restoreState(component);
 }
 
 
 
 
+
+} // extern "C"

@@ -60,10 +60,12 @@ private:
     sigma_u32 screen_w, screen_h;
 };
 
-extern "C" void tiling_init() { SovereignTilingEngine::init(); }
-extern "C" void tiling_add_app(const char* id) { SovereignTilingEngine::tileApp(id); }
-extern "C" void tiling_set_layout(const char* layout) { SovereignTilingEngine::setLayout(layout); }
+void tiling_init() { SovereignTilingEngine::init(); }
+void tiling_add_app(const char* id) { SovereignTilingEngine::tileApp(id); }
+void tiling_set_layout(const char* layout) { SovereignTilingEngine::setLayout(layout); }
 
 
 
 
+
+} // extern "C"

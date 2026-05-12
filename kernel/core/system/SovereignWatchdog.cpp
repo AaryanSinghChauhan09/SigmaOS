@@ -56,15 +56,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void watchdog_init() {
+void watchdog_init() {
     SigmaOS::Kernel::System::SovereignWatchdog::init();
 }
 
-extern "C" void watchdog_pet(sigma_u32 id) {
+void watchdog_pet(sigma_u32 id) {
     SigmaOS::Kernel::System::SovereignWatchdog::petWatchdog(id);
 }
 
 
 
 
+
+} // extern "C"

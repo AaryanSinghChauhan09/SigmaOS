@@ -53,15 +53,19 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void driver_transpiler_init() {
+void driver_transpiler_init() {
     SigmaOS::Kernel::Hardware::SovereignDriverTranspiler::init();
 }
 
-extern "C" void driver_transpiler_compile(const char* driver, const char* arch) {
+void driver_transpiler_compile(const char* driver, const char* arch) {
     SigmaOS::Kernel::Hardware::SovereignDriverTranspiler::transpileDriver(driver, arch);
 }
 
 
 
 
+
+} // extern "C"

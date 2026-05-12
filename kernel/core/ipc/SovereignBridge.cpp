@@ -38,31 +38,35 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void bridge_init() {
+extern "C" {
+
+void bridge_init() {
     SigmaOS::Kernel::IPC::SovereignBridge::getInstance().init();
 }
 
-extern "C" void bridge_send(unsigned int target, const char* msg) {
+void bridge_send(unsigned int target, const char* msg) {
     SigmaOS::Kernel::IPC::SovereignBridge::getInstance().send_message(target, msg);
 }
 
-extern "C" void bridge_broadcast(const char* msg) {
+void bridge_broadcast(const char* msg) {
     sigma_log_info("[S-BRIDGE] Broadcasting message to ALL lattice shards: %s", msg);
     // Hit & Trial: Iterate through all active shard IDs and enqueue
 }
 
-extern "C" void bridge_flush() {
+void bridge_flush() {
     sigma_log_info("[S-BRIDGE] Flushing all wait-free ring buffers...");
     // Hit & Trial: Clear any pending messages to ensure zero-latency synchronization
 }
-extern "C" void bridge_inspect_load() {
+void bridge_inspect_load() {
     sigma_log_info("[S-BRIDGE] Inspecting IPC lattice load distribution...");
     // Hit & Trial: Check ring buffer occupancy levels
     sigma_log_info("[S-BRIDGE] Current IPC load: 5%% (Optimal).");
 }
 
-extern "C" void bridge_reset_stats() {
+void bridge_reset_stats() {
     sigma_log_warn("[S-BRIDGE] Resetting IPC bridge statistics...");
     // Hit & Trial: Zero out transaction counters
     sigma_log_info("[S-BRIDGE] Statistics RESET.");
 }
+
+} // extern "C"

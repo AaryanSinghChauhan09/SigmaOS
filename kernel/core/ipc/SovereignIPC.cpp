@@ -9,7 +9,7 @@
  * Implements a Wait-Free Atomic Exchange (WFAE) algorithm for zero-lock message passing.
  * ZERO-DEPENDENCY: Strictly bare-metal silicon-native communication.
  *
- * Design: OOP-isolated singleton — SovereignIPCManager.
+ * Design: OOP-isolated singleton ï¿½ SovereignIPCManager.
  */
 
 namespace SigmaOS {
@@ -61,8 +61,10 @@ bool SovereignIPCManager::receiveOptimized(sigma_ipc_msg_t* out_msg) {
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Wrappers --- */
-extern "C" void ipc_init() {
+void ipc_init() {
     SigmaOS::Kernel::IPC::SovereignIPCManager::init();
 }
 
@@ -80,3 +82,5 @@ extern "C" sigma_u64 ipc_get_dispatched_count() {
 
 
 
+
+} // extern "C"

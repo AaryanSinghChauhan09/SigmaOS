@@ -10,7 +10,7 @@
  * USP: Allows SigmaOS to be natively recognized by GRUB2, passing vital memory
  * maps and hardware telemetry safely into the ring-0 orchestrator before execution.
  *
- * Design: OOP-isolated singleton — SovereignMultibootEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignMultibootEngine.
  */
 
 class SovereignMultibootEngine {
@@ -46,7 +46,7 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void multiboot_init(sigma_u32 magic, void* addr) {
+void multiboot_init(sigma_u32 magic, void* addr) {
     SovereignMultibootEngine::parseBootInfo(magic, addr);
 }
 
@@ -56,3 +56,5 @@ extern "C" bool multiboot_is_secure() {
 
 
 
+
+} // extern "C"

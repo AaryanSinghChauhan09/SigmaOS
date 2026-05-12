@@ -48,10 +48,14 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void orch_init() {
+extern "C" {
+
+void orch_init() {
     SigmaOS::Kernel::AI::SovereignOrchestrator::getInstance().init();
 }
 
-extern "C" void orch_balance() {
+void orch_balance() {
     SigmaOS::Kernel::AI::SovereignOrchestrator::getInstance().balanceLattice();
 }
+
+} // extern "C"

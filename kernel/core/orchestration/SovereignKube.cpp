@@ -106,8 +106,10 @@ sigma_kube_deployment_t* SovereignKubeEngine::findDeployment(sigma_u32 id) {
 } // namespace Kernel
 } // namespace SigmaOS
 
+extern "C" {
+
 /* --- C Bridge --- */
-extern "C" void kube_init() {
+void kube_init() {
     SigmaOS::Kernel::Orchestration::SovereignKubeEngine::init();
 }
 
@@ -116,15 +118,15 @@ extern "C" sigma_u32 kube_create_deployment(const char* name, sigma_u32 containe
     return SigmaOS::Kernel::Orchestration::SovereignKubeEngine::createDeployment(name, container_id, pattern, replicas);
 }
 
-extern "C" void kube_scale_deployment(sigma_u32 deployment_id, sigma_u32 replicas) {
+void kube_scale_deployment(sigma_u32 deployment_id, sigma_u32 replicas) {
     SigmaOS::Kernel::Orchestration::SovereignKubeEngine::scaleDeployment(deployment_id, replicas);
 }
 
-extern "C" void kube_delete_deployment(sigma_u32 deployment_id) {
+void kube_delete_deployment(sigma_u32 deployment_id) {
     SigmaOS::Kernel::Orchestration::SovereignKubeEngine::deleteDeployment(deployment_id);
 }
 
-extern "C" void kube_reconcile_lattice() {
+void kube_reconcile_lattice() {
     SigmaOS::Kernel::Orchestration::SovereignKubeEngine::reconcileLattice();
 }
 
@@ -135,3 +137,5 @@ extern "C" const sigma_kube_state_t* kube_get_state() {
 
 
 
+
+} // extern "C"

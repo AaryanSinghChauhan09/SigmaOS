@@ -9,3 +9,5 @@ void perf_balance() {
 }
 
 }
+
+} // extern "C"

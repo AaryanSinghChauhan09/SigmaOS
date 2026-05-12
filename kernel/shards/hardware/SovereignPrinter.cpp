@@ -42,6 +42,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void print_init() {
+extern "C" {
+
+void print_init() {
     SigmaOS::Kernel::Hardware::SovereignPrinter::getInstance().init();
 }
+
+} // extern "C"
