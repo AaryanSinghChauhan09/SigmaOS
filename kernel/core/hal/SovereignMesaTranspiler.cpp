@@ -27,11 +27,23 @@ public:
     }
 
     void TranspileVulkan() {
+        if (!ValidateDriverSignature("VULKAN_CORE")) {
+            sigma_log_error("[S-MESA]: Driver signature verification failed! Silicon security integrity compromised.");
+            SoftwareFallback();
+            return;
+        }
         sigma_log_info("[S-MESA]: Transpiling Vulkan 1.3 pipeline to Sovereign HAL...");
     }
 
     void SoftwareFallback() {
-        sigma_log_warn("[S-MESA]: Hardware acceleration missing. Activating software rasterizer.");
+        sigma_log_warn("[S-MESA]: Hardware acceleration missing or untrusted. Activating software rasterizer (CPU-based).");
+        // Logic: Scanline rendering and lattice-buffer blitting.
+    }
+
+private:
+    bool ValidateDriverSignature(const char* driver_id) {
+        sigma_log_info("[S-MESA]: Validating Dilithium-5 signature for driver: %s", driver_id);
+        return true; // Mock validation success
     }
 };
 

@@ -18,6 +18,7 @@ kernel/core/hal/SovereignPCI.cpp
 kernel/core/hal/SovereignACPI.cpp
 kernel/core/hal/SovereignPager.cpp
 kernel/core/hal/SovereignEntropy.cpp
+kernel/core/hal/SovereignUSB.cpp
 kernel/core/hal/SovereignWiFiTranspiler.cpp
 kernel/core/hal/SovereignMesaTranspiler.cpp
 # LAYER 1: KERNEL CORE (IPC, SCHEDULER, MEMORY)
@@ -31,9 +32,11 @@ kernel/core/observability/SovereignMonitor.cpp
 kernel/core/observability/SovereignDiag.cpp
 kernel/core/security/SovereignMAC.cpp
 kernel/core/system/SovereignFS.cpp
+kernel/core/storage/SovereignDatabase.cpp
 kernel/core/deployment/SovereignPackageGraph.cpp
 kernel/core/system/SovereignNet.cpp
 kernel/core/network/SovereignSSH.cpp
+kernel/core/network/SovereignHTTP.cpp
 kernel/core/system/SovereignProfiles.cpp
 kernel/core/system/SovereignRollbackShard.cpp
 kernel/core/system/SovereignIPC.cpp

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -2251,6 +2251,14 @@ https://chatgpt.com/?q={{prompt}}</textarea>
             }
         }, 8000);
 
+    </script>
+    <!-- Sovereign Accessibility Layer -->
+    <div id="s-accessibility" aria-live="polite" style="display:none;"></div>
+    <script>
+        function speak(text) {
+            console.log("[S-ACCESSIBILITY]: " + text);
+            document.getElementById('s-accessibility').innerText = text;
+        }
     </script>
 </body>
 </html>
