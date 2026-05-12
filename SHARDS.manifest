@@ -5,7 +5,6 @@
 
 # ═══════════════════════════════════════════════════════════════════════
 # LAYER 0: HAL & BOOT
-# ═══════════════════════════════════════════════════════════════════════
 kernel/core/hal/SovereignHAL.cpp
 kernel/core/hal/SovereignPMM.cpp
 kernel/core/hal/SovereignVMM.cpp
@@ -14,19 +13,13 @@ kernel/core/hal/SovereignPCI.cpp
 kernel/core/hal/SovereignACPI.cpp
 kernel/core/hal/SovereignPager.cpp
 kernel/core/hal/SovereignEntropy.cpp
-
-# ═══════════════════════════════════════════════════════════════════════
 # LAYER 1: KERNEL CORE (IPC, SCHEDULER, MEMORY)
-# ═══════════════════════════════════════════════════════════════════════
 # Headers (zero-STL, kernel-safe)
 include/ipc/SovereignEventBus.h
 include/sched/SovereignScheduler.h
 kernel/core/ipc/SovereignBridge.cpp
 kernel/core/sched/SovereignRTSched.cpp
-
-# ═══════════════════════════════════════════════════════════════════════
 # LAYER 2: SYSTEM SERVICES
-# ═══════════════════════════════════════════════════════════════════════
 kernel/core/observability/SovereignMonitor.cpp
 kernel/core/observability/SovereignDiag.cpp
 kernel/core/system/SovereignFS.cpp
@@ -45,10 +38,7 @@ kernel/core/system/SovereignZFS.cpp
 kernel/core/system/SovereignNix.cpp
 kernel/core/system/SovereignWASM.cpp
 kernel/core/system/SovereignGit.cpp
-
-# ═══════════════════════════════════════════════════════════════════════
 # LAYER 3: SECURITY & PQC
-# ═══════════════════════════════════════════════════════════════════════
 kernel/core/security/SovereignPQC.cpp
 kernel/core/security/SovereignAirGap.cpp
 kernel/core/security/SovereignPolicy.cpp
@@ -56,10 +46,7 @@ kernel/core/security/SovereignAudit.cpp
 kernel/core/security/SovereignSandbox.cpp
 kernel/core/security/SovereignAttestation.cpp
 kernel/core/security/SovereignTPM.cpp
-
-# ═══════════════════════════════════════════════════════════════════════
 # LAYER 4: AI & AUTOMATION (CLAW STACK)
-# ═══════════════════════════════════════════════════════════════════════
 kernel/core/ai/SovereignNeural.cpp
 kernel/core/ai/SovereignMLFlow.cpp
 kernel/core/ai/SovereignCognitive.cpp
@@ -75,10 +62,7 @@ kernel/core/ai/SovereignModelOptimizer.cpp
 kernel/core/automation/SovereignWorkflowEngine.cpp
 kernel/core/automation/SovereignAuto.cpp
 kernel/core/automation/SovereignCron.cpp
-
-# ═══════════════════════════════════════════════════════════════════════
 # LAYER 5: INDUSTRIAL ECOSYSTEM & USERLAND
-# ═══════════════════════════════════════════════════════════════════════
 userland/update-agent.cpp
 kernel/core/system/SovereignDAL.cpp
 userland/logd.cpp
@@ -93,9 +77,7 @@ tools/sigma-log.cpp
 tools/sigma-pkg.sh
 iso_root/installer/install.sh
 ecosystem/packager/sigma-pkg.sh
-# ═══════════════════════════════════════════════════════════════════════
 # LAYER 7: PROFESSIONAL & INDUSTRIAL SHARDS (MODULAR)
-# ═══════════════════════════════════════════════════════════════════════
 kernel/shards/cybersecurity/SovereignIDS.cpp
 kernel/shards/cybersecurity/SovereignThreatModeler.cpp
 kernel/shards/forensics/SovereignForensics.cpp
@@ -112,12 +94,10 @@ kernel/shards/enterprise/SovereignLogistics.cpp
 kernel/shards/industrial/SovereignTwin.cpp
 kernel/shards/finance/SovereignAccountant.cpp
 kernel/shards/legal/SovereignVakil.cpp
-kernel/shards/finance/SovereignAccountant.cpp
 kernel/shards/finance/SovereignRisk.cpp
 kernel/shards/resilience/SovereignDistributedRecovery.cpp
 kernel/shards/ecosystem/SovereignCloudIntegrator.cpp
 kernel/shards/userland/SovereignAppStudio.cpp
-kernel/shards/finance/SovereignRisk.cpp
 kernel/shards/finance/SovereignMarketSim.cpp
 kernel/shards/creative/SovereignAssetManager.cpp
 kernel/shards/legal/SovereignComplianceAuditor.cpp
@@ -133,8 +113,6 @@ kernel/shards/ecosystem/SovereignPackageMapper.cpp
 kernel/shards/creative/SovereignBrand.cpp
 kernel/shards/academic/SovereignReview.cpp
 kernel/shards/enterprise/SovereignOps.cpp
-kernel/shards/enterprise/SovereignHR.cpp
-kernel/shards/enterprise/SovereignOps.cpp
 kernel/shards/enterprise/SovereignAuditor.cpp
 kernel/shards/dev/SovereignGame.cpp
 kernel/shards/dev/SovereignEmbedded.cpp
@@ -146,33 +124,25 @@ kernel/shards/industrial/SovereignPLC.cpp
 kernel/shards/industrial/SovereignOrbitalDynamics.cpp
 kernel/shards/industrial/SovereignSubmersibleEngine.cpp
 kernel/shards/hardware/SovereignPrinter.cpp
-kernel/shards/hardware/SovereignPrinter.cpp
 kernel/shards/hardware/SovereignCamera.cpp
 kernel/shards/hardware/SovereignKVM.cpp
-kernel/shards/core/SovereignFairScheduler.cpp
 kernel/shards/core/SovereignFairScheduler.cpp
 kernel/shards/core/SovereignSystemd.cpp
 kernel/shards/security/SovereignAppArmor.cpp
 kernel/shards/industrial/SovereignBioFabrication.cpp
-kernel/shards/industrial/SovereignBioFabrication.cpp
 kernel/shards/industrial/SovereignAeroDynamics.cpp
 kernel/shards/finance/SovereignFinancialAuditor.cpp
-kernel/shards/ecosystem/SovereignPatchManager.cpp
 kernel/shards/ecosystem/SovereignPatchManager.cpp
 kernel/shards/industrial/SovereignNuclearReactor.cpp
 kernel/shards/defense/SovereignC4ISR.cpp
 kernel/shards/network/SovereignQUICStack.cpp
-kernel/shards/network/SovereignQUICStack.cpp
 kernel/shards/resilience/SovereignDiagnosticEngine.cpp
-kernel/shards/userland/SovereignShell.cpp
 kernel/shards/userland/SovereignShell.cpp
 kernel/shards/userland/SovereignTerminal.cpp
 kernel/shards/userland/ZenithWindowManager.cpp
 kernel/shards/ecosystem/SovereignWikiEngine.cpp
-kernel/shards/ecosystem/SovereignWikiEngine.cpp
 kernel/shards/industrial/SovereignSmartGrid.cpp
 kernel/shards/industrial/SovereignSupplyChain.cpp
-kernel/shards/hardware/SovereignWiFi.cpp
 kernel/shards/hardware/SovereignWiFi.cpp
 kernel/shards/hardware/SovereignBluetooth.cpp
 kernel/shards/storage/SovereignFileSystem.cpp
@@ -180,23 +150,18 @@ kernel/shards/storage/SovereignRAID.cpp
 kernel/shards/userland/SovereignBrowser.cpp
 kernel/shards/security/SovereignIntrusionDetection.cpp
 kernel/shards/hardware/SovereignEthernet.cpp
-kernel/shards/hardware/SovereignEthernet.cpp
 kernel/shards/hardware/SovereignNVMe.cpp
 kernel/shards/security/SovereignSecureBoot.cpp
 kernel/shards/ecosystem/SovereignPackageVault.cpp
 kernel/shards/hardware/SovereignUSB.cpp
-kernel/shards/hardware/SovereignUSB.cpp
 kernel/shards/hardware/SovereignAudio.cpp
-kernel/shards/hardware/SovereignHID.cpp
 kernel/shards/hardware/SovereignHID.cpp
 kernel/shards/hardware/SovereignPowerManager.cpp
 kernel/shards/hardware/SovereignGPUCompute.cpp
 kernel/shards/ecosystem/SovereignSDK.cpp
 kernel/shards/medical/SovereignTelemedicine.cpp
-kernel/shards/medical/SovereignTelemedicine.cpp
 kernel/shards/gov/SovereignPolicyEngine.cpp
 kernel/shards/industrial/SovereignPredictiveMaintenance.cpp
-kernel/shards/core/SovereignScheduler.cpp
 kernel/shards/core/SovereignScheduler.cpp
 kernel/shards/core/SovereignMemoryManager.cpp
 kernel/shards/core/SovereignInterruptController.cpp
@@ -231,10 +196,7 @@ kernel/core/automation/SovereignAgentQuotasExtended.cpp
 kernel/core/system/SovereignContainerOrchestrator.cpp
 kernel/core/ui/ZenithAccessibility.cpp
 modules/ui/zenith/trust_graph.c
-
-# ═══════════════════════════════════════════════════════════════════════
 # LAYER 6: HARDWARE COMPATIBILITY (Linux Distro Ports)
-# ═══════════════════════════════════════════════════════════════════════
 drivers/linux_distros/hardware/ACPI_Backlight.cpp
 drivers/linux_distros/hardware/AMDGPU_Graphics.cpp
 drivers/linux_distros/hardware/AMDGPU_Modern.cpp
@@ -258,10 +220,7 @@ drivers/linux_distros/hardware/USB_Mass_Storage.cpp
 drivers/linux_distros/hardware/USB_UVC_15.cpp
 drivers/linux_distros/hardware/USB_UVC_Camera.cpp
 drivers/linux_distros/hardware/USB_XHCI.cpp
-
-# ═══════════════════════════════════════════════════════════════════════
 # LAYER 7: AI RESEARCH SHARDS (kernel/shards/)
-# ═══════════════════════════════════════════════════════════════════════
 kernel/shards/ai/SovereignResearchMatrix.cpp
 kernel/shards/ai/SovereignScholasticRepo.cpp
 kernel/shards/ai/SovereignOmniTool.cpp

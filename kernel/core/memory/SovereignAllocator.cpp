@@ -1,7 +1,7 @@
 #include "sigma_log.h"
 #include "libc/SovereignLibC.h"
 #include "core/sigma_types.h"
-#include "../../../include/sigma_allocator.h"
+#include "sigma_allocator.h"
 #include "hal/sigma_hal.h"
 
 /**

@@ -1,42 +1,39 @@
 #ifndef SIGMA_LIBC_H
 #define SIGMA_LIBC_H
 
-// ---------------------------------------------------------
-// SigmaOS Sovereign LibC (Industrial Grade)
-// ---------------------------------------------------------
+/*
+ * =========================================================
+ * SIGMAOS: SOVEREIGN LIBC (INDUSTRIAL GRADE)
+ * =========================================================
+ * Zero-dependency, bare-metal C library for the Lattice.
+ * =========================================================
+ */
 
-// Standard integer equivalents for Sovereign Silicon
-typedef unsigned char      uint8_t;
-typedef unsigned short     uint16_t;
-typedef unsigned int       uint32_t;
-typedef unsigned long long uint64_t;
-typedef int                int32_t;
-typedef long long          int64_t;
+#include "core/sigma_kernel_types.h"
 
-#ifndef NULL
-#define NULL ((void*)0)
+#define SIGMA_LIBC_VERSION 0x09
+
+/* Initialization & Bootstrap */
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-// Use compiler-provided size_t if possible, or fallback to 64-bit
-#ifdef __SIZE_TYPE__
-typedef __SIZE_TYPE__ size_t;
-#else
-typedef unsigned long long size_t;
-#endif
-
-#define SIGMA_LIBC_VERSION 0x08
-
-// Modular Initialization Declarations
-extern const uint32_t SIGMA_CORE_READY;
 void sigma_core_init(void);
 
-// Industrial Shard Initialization (Static Inline)
-// Use a macro to ensure visibility and satisfaction of strict linters
+/* Industrial Shard Initialization */
 static inline void sigma_shard_init_internal(void) {
-    (void)SIGMA_CORE_READY;
     sigma_core_init();
 }
 
 #define SIGMA_SHARD_INIT() sigma_shard_init_internal()
 
+/* Memory Orchestration (Delegated to Kernel Intrinsics) */
+#define sigma_mem_copy(d, s, n)  sigma_memcpy(d, s, n)
+#define sigma_mem_set(s, c, n)   sigma_memset(s, c, n)
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // SIGMA_LIBC_H
+

@@ -1,4 +1,4 @@
-#include "../include/sigma_sdk.h"
+#include "sigma_sdk.h"
 #include <iostream>
 #include <string>
 #include <vector>

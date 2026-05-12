@@ -8,7 +8,7 @@
  */
 
 #include "SovereignLibC.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 
 typedef struct {
     char audit_id[32];

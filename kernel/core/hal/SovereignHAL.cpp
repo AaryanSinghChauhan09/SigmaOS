@@ -55,4 +55,3 @@ void hal_probe() {
 
 } // extern "C"
 
-} // extern "C"
