@@ -4,6 +4,7 @@ Welcome to the central knowledge hub for **SigmaOS**, the world's first industri
 
 ## 🏛 Core Technical Documentation
 
+- **[Industrial Roadmap](ROADMAP.md)**: The strategic path from Alpha to Stable.
 - **[Architecture & Design](Architecture)**: Detailed breakdown of the microkernel shard lattice and PQC memory model.
 - **[Sovereign Driver Framework](Driver-Framework)**: Guide and templates for developing hardware-level drivers.
 - **[Security & Reliability](Security-Safety)**: Overview of self-healing (S-AUTO) and process isolation (S-WASM).

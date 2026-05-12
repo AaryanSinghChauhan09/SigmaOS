@@ -113,5 +113,12 @@ For a detailed look at our implementation history, refer to the project Wiki and
 
 ---
 
+## 🎯 Strategic Roadmap
+The full strategic evolution is documented in the **[Industrial Roadmap](ROADMAP.md)**.
+
+- **ALPHA (v15.0 - DONE)**: Industrial Foundation & Shard Hardening.
+- **BETA (v15.1 - DONE)**: Zenith Desktop Port & Guided Dual-Boot Installer.
+- **STABLE (v16.0 - CURRENT)**: Global Ecosystem & LTS Channel Initialization.
+
 _Σ SIGMAOS: Absolute Sovereignty. Singularity Achieved._
 

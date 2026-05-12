@@ -3,6 +3,7 @@
 ## 🏛️ Core Concepts
 
 * [Home](Home)
+* [Industrial Roadmap](ROADMAP.md)
 * [Architecture](Architecture)
 * [Lattice Subsystems](Subsystems)
 * [AI/ML Intelligence Nexus](AI-ML-Nexus)

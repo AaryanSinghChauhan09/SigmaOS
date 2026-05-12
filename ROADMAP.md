@@ -1,37 +1,24 @@
-# 🏆 SigmaOS Industrial Roadmap (Zenith v15.0 - Horizon)
+# Σ SIGMAOS INDUSTRIAL ROADMAP
 
-This roadmap outlines the path for SigmaOS to reach full functional parity and strategic dominance over mainstream Linux distributions.
+This roadmap defines the strategic path for the **Sovereign Lattice™** as it transitions from an industrial foundation to a global professional ecosystem.
 
-## 🏛 Completed Industrial Pillars
+## 🔴 ALPHA: Industrial Foundation (v15.0 - DONE)
+- [x] **Kernel Hardening**: Lattice PMM and S-SCHED real-time primitives.
+- [x] **PQC-GPG Attestation**: Dilithium-5 verification of all system shards.
+- [x] **Driver Absorption**: Mesa GPU, Realtek/Broadcom Wifi, and PipeWire Audio.
+- [x] **Core Security**: SovereignMAC (AppArmor parity) and S-WATCHDOG fallback.
 
-- **S-PKG**: Professional package manager with PQC-signed shard distribution.
-- **S-INSTALL**: Bare-metal graphical installer with dual-boot detection.
-- **Z-DESK**: Profession-aware Zenith Desktop Environment.
-- **S-MAC**: Mandatory Access Control (Zero-Trust) security lattice.
-- **S-NET**: High-performance industrial network stack (PQC-encrypted).
-- **S-CI**: Automated GitHub Actions CI/CD for regression testing.
+## 🟡 BETA: Usability & AI (v15.1 - Q3 2026)
+- [x] **Zenith Desktop**: Industrial port of XFCE/LXQt with glassmorphism logic.
+- [x] **Guided Installer**: Calamares-style UI with dual-boot partitioning.
+- [x] **Package Nexus**: Decentralized distribution via `sigma-pkg`.
+- [x] **Intelligence Nexus**: Native PyTorch, TensorFlow, and ONNX absorption.
 
-## 🚀 Year 1: Usability & Hardware
-
-- [x] Port core utility shards (Shell, Editor, Compiler).
-- [ ] Implement CUPS-parity printer support.
-- [ ] Expand GPU support (Full Mesa/Vulkan acceleration).
-- [ ] Launch Community Forum and Discord channels.
-
-## 🚀 Year 2: Reliability & Scaling
-
-- [ ] Live Kernel Patching (S-AUTO expansion).
-- [ ] OCI-compliant container orchestration (S-CONTAINER).
-- [ ] Hardware-attested Secure Boot (UEFI + CRYSTALS-Dilithium).
-- [ ] Enterprise LTS Release candidate.
-
-## 🚀 Year 3: Dominance & Ecosystem
-
-- [ ] Full S-PROTON compatibility for mainstream Linux/Windows apps.
-- [ ] Native S-PAI (Personal AI) OS orchestration.
-- [ ] Global Sovereign Repository with 600+ professional shards.
-- [ ] Aerospace and Defense sector certification (FIPS/DO-178C).
+## 🟢 STABLE: Global Ecosystem (v16.0 - 2027)
+- [ ] **FIPS-140-3 Compliance**: Full cryptographic certification for industrial use.
+- [ ] **Sovereign Cloud Lattice**: Mesh networking for distributed professional workloads.
+- [ ] **Rust-Hardened Drivers**: 100% memory-safe hardware tree.
+- [ ] **LTS Channel**: Long-term support (5 years) for corporate professionals.
 
 ---
-
-### Last Updated: May 2026
+*Stay Sovereign.*
