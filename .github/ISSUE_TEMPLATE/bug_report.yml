@@ -1,27 +1,29 @@
-name: Bug report
-description: Create a report to help us improve the Sovereign Lattice.
-labels: ["bug"]
+name: 🐞 Shard Bug Report
+description: Report a necrotic or malfunctioning shard in the SigmaOS lattice.
+labels: ["bug", "lattice-necrosis"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for reporting a bug! Please provide as much detail as possible.
+        Thanks for reporting! Please ensure your shard health is verified by `sigma-cli doctor` before submitting.
   - type: input
     id: shard_id
     attributes:
-      label: Affected Shard
-      description: Which shard (e.g., S01-HAL, S09-AI) is failing?
+      label: Shard Identifier
+      description: e.g., S-MED, S-VAKIL, S-CAD
     validations:
       required: true
   - type: textarea
-    id: reproduction
+    id: behavior
     attributes:
-      label: Steps to Reproduce
-      description: How can we trigger this fault in QEMU?
+      label: Malfunction Description
+      description: What is the shard doing incorrectly?
     validations:
       required: true
   - type: textarea
     id: logs
     attributes:
-      label: System Logs
-      description: Please paste the S-LOG output (serial console).
+      label: S-LOG Output
+      description: Please provide relevant output from the Sovereign Journal.
+    validations:
+      required: true

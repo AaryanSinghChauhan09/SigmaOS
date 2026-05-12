@@ -1,45 +1,25 @@
-name: Feature Request
-<<<<<<< HEAD
-description: Suggest an idea for SigmaOS
-title: "[Feature]: "
-labels: ["enhancement", "triage"]
-assignees: []
-
+name: 🚀 Professional Shard Request
+description: Propose a new industrial or professional shard for the Sovereign Lattice.
+labels: ["enhancement", "new-profession"]
 body:
-  - type: markdown
+  - type: input
+    id: profession
     attributes:
-      value: |
-        Thanks for helping improve the Sovereign Silicon Entity!
-  - type: textarea
-    id: problem
-    attributes:
-      label: Is your feature request related to a problem? Please describe.
-      description: A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+      label: Profession Name
+      description: e.g., Quantum Physicist, Deep-Sea Archaeologist
     validations:
       required: true
   - type: textarea
-    id: solution
+    id: tools
     attributes:
-      label: Describe the solution you'd like
-      description: A clear and concise description of what you want to happen.
+      label: Essential Tools
+      description: What specific professional tools should this shard provide?
     validations:
       required: true
   - type: textarea
-    id: alternatives
+    id: resilience
     attributes:
-      label: Describe alternatives you've considered
-      description: A clear and concise description of any alternative solutions or features you've considered.
-    validations:
-      required: false
-=======
-description: Suggest an idea for this project
-labels: enhancement
-body:
-  - type: textarea
-    id: description
-    attributes:
-      label: Description
-      description: A clear and concise description of what you want to achieve.
+      label: Resilience Strategy
+      description: How should this shard behave during a lattice-failover event?
     validations:
       required: true
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645
