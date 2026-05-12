@@ -33,15 +33,29 @@ int sigma_strcmp(const char* s1, const char* s2) {
     return *(const sigma_u8*)s1 - *(const sigma_u8*)s2;
 }
 
-int sigma_atoi(const char* str) {
-    int res = 0;
-    if (!str) return 0;
-    while (*str >= '0' && *str <= '9') {
-        res = res * 10 + (*str - '0');
-        str++;
-    }
-    return res;
+sigma_size_t sigma_strlen(const char* s) {
+    sigma_size_t len = 0;
+    while (s && s[len]) len++;
+    return len;
 }
 
+void sigma_strncpy(char* dest, const char* src, sigma_size_t n) {
+    sigma_size_t i;
+    for (i = 0; i < n && src[i] != '\0'; i++)
+        dest[i] = src[i];
+    for (; i < n; i++)
+        dest[i] = '\0';
 }
+
+void sigma_printf(const char* format, ...) {
+    // Industrial implementation routes to kernel console
+    sigma_log_info(format); 
+}
+
+void sigma_exit(int status) {
+    sigma_log_info("[LIBC]: Process terminating with status %d", status);
+    // Logic: Halt CPU or return to orchestrator
+}
+
+} // extern "C"
 
