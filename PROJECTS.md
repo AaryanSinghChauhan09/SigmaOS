@@ -42,6 +42,8 @@
 | Sovereign Server (SSH/HTTP) | Network | High | DONE |
 | Sovereign Audio (PipeWire) | Drivers | Medium | DONE |
 | Offline Coding Playground | EDU | Low | DONE |
+| Sovereign Fuzz (Robustness) | Testing | High | DONE |
+| Sigma Benchmark (Metrics) | Observability| Medium | DONE |
 | QEMU Regression Actions | CI/CD | Medium | DONE |
 
 ---

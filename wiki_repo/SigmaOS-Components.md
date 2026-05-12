@@ -39,6 +39,8 @@ This page lists the industry-standard products and technologies absorbed into th
 - **S-DUMP**: Kernel crash dump parity (Kdump).
 - **S-REGRESS**: Industrial regression testing engine.
 - **S-WATCHDOG**: Atomic fallback and heartbeat monitor.
+- **S-FUZZ**: Industrial fuzz-testing engine.
+- **S-BENCH**: Performance benchmarking suite.
 - **S-PLAY**: Offline coding playground and REPL.
 - **Boost / NetworkX**: High-performance algorithm libraries.
 - **Interactive Tutorials**: Built-in pedagogical shards.
