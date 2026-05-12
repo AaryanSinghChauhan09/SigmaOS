@@ -83,6 +83,7 @@ Below is a non-exhaustive list of critical shards and their relationships to the
 
 | File Path | Role | Logic |
 | :--- | :--- | :--- |
+| `kernel/core/automation/SovereignAutomation.cpp` | Automation Nexus | Orchestrates industrial-specific healing and rollback logic. |
 | `kernel/core/hal/SovereignHAL.cpp` | Hardware Entry | Orchestrates bus probing and driver registration. |
 | `kernel/core/hal/SovereignPMM.cpp` | Physical Memory | Managed Silicon-Direct page allocation (Bitmap-based). |
 | `kernel/core/ipc/SovereignBridge.cpp` | IPC Gateway | The primary bus for inter-shard communication. |
