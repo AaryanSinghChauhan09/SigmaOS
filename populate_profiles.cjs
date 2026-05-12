@@ -370,7 +370,20 @@ const additionalProfessions = [
     'Sub-Atomic Particle Physicist', 'Virtual Reality Ethographer', 'Bio-Metric Security Architect', 'Exo-Skeleton Ergonomist',
     'Solar Flare Forecaster', 'Hydro-Thermal Energy Engineer', 'Orbital Debris Salvager', 'Lunar Logistics Coordinator',
     'Quantum Curation Specialist', 'Synthetic Organ Fabricator', 'Space-Time Synchronization Clerk', 'Neuro-Symbolic AI Trainer',
-    'Atmospheric Water Harvester', 'Vertical Cemetery Manager', 'Micro-Sat Cluster Controller', 'Post-Quantum Cryptographer'
+    'Atmospheric Water Harvester', 'Vertical Cemetery Manager', 'Micro-Sat Cluster Controller', 'Post-Quantum Cryptographer',
+    'Neural-Network Architect', 'Blockchain Auditor', 'Autonomous Vehicle Safety Engineer', 'Remote Robotic Surgeon',
+    'Deep-Learning Optimizator', 'Cyber-Security Threat Hunter', 'Cloud Infrastructure Orchestrator', 'Edge Computing Specialist',
+    'AR-VR Content Developer', 'Biotech Research Scientist', 'Renewable Energy Consultant', 'Smart-City Planner',
+    'Digital Marketing Strategist', 'E-commerce Platform Architect', 'Fintech Solutions Developer', 'Health-Informatics Specialist',
+    'Educational Technology Designer', 'Sustainable Supply-Chain Manager', 'UX-UI Interaction Designer', 'Data Privacy Compliance Officer',
+    'Logistics Drone Operator', 'Precision Agriculture Specialist', 'Remote Sensing Technician', 'Wind-Turbine Service Technician',
+    'Solar-Array Maintenance Engineer', 'Battery-Storage System Architect', 'Carbon-Credit Verifier', 'Water-Desalination Plant Operator',
+    'Vertical-Farm Nutritionist', 'Hydroponic System Designer', 'Aquaponics Specialist', 'Waste-to-Energy Plant Manager',
+    'Recycling Process Engineer', 'Circular Economy Consultant', 'Urban Forester', 'Reforestation Coordinator',
+    'Wildfire Prevention Specialist', 'Ocean Cleanup Coordinator', 'Marine Biologist', 'Aquaculture Manager',
+    'Coral Reef Restoration Specialist', 'Ethical Hacker', 'Incident Response Specialist', 'Digital Forensics Investigator',
+    'Identity and Access Management Engineer', 'Network Security Administrator', 'Security Operations Center Analyst', 'Vulnerability Assessment Specialist',
+    'Penetration Tester', 'Compliance Auditor'
 ];
 
 additionalProfessions.forEach(name => {

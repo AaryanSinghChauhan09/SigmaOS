@@ -1,9 +1,9 @@
 {
-    "profession": "marine_biologist",
+    "profession": "coral_reef_restoration_specialist",
     "compliance_level": "sovereign-high",
     "resource_priority": "adaptive",
     "modules": [
-        "marine_biologist_workspace",
+        "coral_reef_restoration_specialist_workspace",
         "specialized_analytics",
         "compliance_manager"
     ],
@@ -20,7 +20,7 @@
         "adaptive assistance"
     ],
     "automation": {
-        "self_healing": "Continuous health check for Marine Biologist tools",
+        "self_healing": "Continuous health check for Coral Reef Restoration Specialist tools",
         "rollback": "Automatic state snapshots"
     }
 }

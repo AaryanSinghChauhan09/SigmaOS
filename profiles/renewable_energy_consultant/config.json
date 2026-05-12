@@ -1,9 +1,9 @@
 {
-    "profession": "marine_biologist",
+    "profession": "renewable_energy_consultant",
     "compliance_level": "sovereign-high",
     "resource_priority": "adaptive",
     "modules": [
-        "marine_biologist_workspace",
+        "renewable_energy_consultant_workspace",
         "specialized_analytics",
         "compliance_manager"
     ],
@@ -20,7 +20,7 @@
         "adaptive assistance"
     ],
     "automation": {
-        "self_healing": "Continuous health check for Marine Biologist tools",
+        "self_healing": "Continuous health check for Renewable Energy Consultant tools",
         "rollback": "Automatic state snapshots"
     }
 }

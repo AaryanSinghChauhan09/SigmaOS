@@ -1,9 +1,9 @@
 {
-    "profession": "marine_biologist",
+    "profession": "wind_turbine_service_technician",
     "compliance_level": "sovereign-high",
     "resource_priority": "adaptive",
     "modules": [
-        "marine_biologist_workspace",
+        "wind-turbine_service_technician_workspace",
         "specialized_analytics",
         "compliance_manager"
     ],
@@ -20,7 +20,7 @@
         "adaptive assistance"
     ],
     "automation": {
-        "self_healing": "Continuous health check for Marine Biologist tools",
+        "self_healing": "Continuous health check for Wind-Turbine Service Technician tools",
         "rollback": "Automatic state snapshots"
     }
 }

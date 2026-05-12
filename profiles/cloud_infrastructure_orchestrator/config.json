@@ -1,9 +1,9 @@
 {
-    "profession": "marine_biologist",
+    "profession": "cloud_infrastructure_orchestrator",
     "compliance_level": "sovereign-high",
     "resource_priority": "adaptive",
     "modules": [
-        "marine_biologist_workspace",
+        "cloud_infrastructure_orchestrator_workspace",
         "specialized_analytics",
         "compliance_manager"
     ],
@@ -20,7 +20,7 @@
         "adaptive assistance"
     ],
     "automation": {
-        "self_healing": "Continuous health check for Marine Biologist tools",
+        "self_healing": "Continuous health check for Cloud Infrastructure Orchestrator tools",
         "rollback": "Automatic state snapshots"
     }
 }

@@ -1,9 +1,9 @@
 {
-    "profession": "marine_biologist",
+    "profession": "fintech_solutions_developer",
     "compliance_level": "sovereign-high",
     "resource_priority": "adaptive",
     "modules": [
-        "marine_biologist_workspace",
+        "fintech_solutions_developer_workspace",
         "specialized_analytics",
         "compliance_manager"
     ],
@@ -20,7 +20,7 @@
         "adaptive assistance"
     ],
     "automation": {
-        "self_healing": "Continuous health check for Marine Biologist tools",
+        "self_healing": "Continuous health check for Fintech Solutions Developer tools",
         "rollback": "Automatic state snapshots"
     }
 }

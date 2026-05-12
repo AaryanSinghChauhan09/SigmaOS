@@ -1,9 +1,9 @@
 {
-    "profession": "marine_biologist",
+    "profession": "autonomous_vehicle_safety_engineer",
     "compliance_level": "sovereign-high",
     "resource_priority": "adaptive",
     "modules": [
-        "marine_biologist_workspace",
+        "autonomous_vehicle_safety_engineer_workspace",
         "specialized_analytics",
         "compliance_manager"
     ],
@@ -20,7 +20,7 @@
         "adaptive assistance"
     ],
     "automation": {
-        "self_healing": "Continuous health check for Marine Biologist tools",
+        "self_healing": "Continuous health check for Autonomous Vehicle Safety Engineer tools",
         "rollback": "Automatic state snapshots"
     }
 }

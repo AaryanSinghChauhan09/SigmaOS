@@ -1,9 +1,9 @@
 {
-    "profession": "marine_biologist",
+    "profession": "data_privacy_compliance_officer",
     "compliance_level": "sovereign-high",
     "resource_priority": "adaptive",
     "modules": [
-        "marine_biologist_workspace",
+        "data_privacy_compliance_officer_workspace",
         "specialized_analytics",
         "compliance_manager"
     ],
@@ -20,7 +20,7 @@
         "adaptive assistance"
     ],
     "automation": {
-        "self_healing": "Continuous health check for Marine Biologist tools",
+        "self_healing": "Continuous health check for Data Privacy Compliance Officer tools",
         "rollback": "Automatic state snapshots"
     }
 }
