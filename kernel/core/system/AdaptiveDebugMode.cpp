@@ -50,10 +50,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern \"C\" void adapt_init() {
+extern "C" void adapt_init() {
     SigmaOS::Kernel::Debug::AdaptiveDebugMode::getInstance().init();
 }
 
-extern \"C\" void adapt_run_trial(sigma_u32 sid) {
+extern "C" void adapt_run_trial(sigma_u32 sid) {
     SigmaOS::Kernel::Debug::AdaptiveDebugMode::getInstance().executeHitAndTrial(sid);
 }

@@ -1,0 +1,28 @@
+{
+    "profession": "quantum_battery_chemist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "ion-transport-simulator",
+        "anode-cathode-lattice",
+        "charge-density-mapper",
+        "sei-layer-auditor"
+    ],
+    "rules": [
+        "Material safety data",
+        "quantum-chemistry standards"
+    ],
+    "calculators": [
+        "Energy-density-delta",
+        "cycle-life-predictor",
+        "thermal-runaway-risk"
+    ],
+    "algorithms": [
+        "Generative electrolyte design",
+        "molecular-structure optimization"
+    ],
+    "automation": {
+        "self_healing": "Charge-balance verification, thermal-sensor-sync",
+        "rollback": "Chemical-state snapshots, battery-configuration history"
+    }
+}

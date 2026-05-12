@@ -47,10 +47,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern \"C\" void twin_init() {
+extern "C" void twin_init() {
     SigmaOS::Kernel::Industrial::SovereignDigitalTwin::getInstance().init();
 }
 
-extern \"C\" void twin_predict(const char* id) {
+extern "C" void twin_predict(const char* id) {
     SigmaOS::Kernel::Industrial::SovereignDigitalTwin::getInstance().predictFailure(id);
 }

@@ -39,6 +39,42 @@ const professions = [
         rollback: 'Planetary state snapshots, bio-injection phase rollback'
     },
     {
+        name: 'fusion_reactor_technician',
+        tools: 'Tokamak-monitor, magnetic-containment-nexus, plasma-density-Lattice, tritium-breeder-auditor',
+        rules: 'IAEA fusion safety standards, high-energy-physics protocols',
+        calculators: 'Plasma-beta-ratio, Lawson-criterion-delta, neutron-flux-calc',
+        algorithms: 'Automated plasma stability control, ELM-suppression orchestration',
+        self_healing: 'Magnetic-field-calibration sync, containment-integrity verify',
+        rollback: 'Reactor-state snapshots, baseline-plasma-parameters'
+    },
+    {
+        name: 'quantum_battery_chemist',
+        tools: 'Ion-transport-simulator, anode-cathode-Lattice, charge-density-mapper, SEI-layer-auditor',
+        rules: 'Material safety data, quantum-chemistry standards',
+        calculators: 'Energy-density-delta, cycle-life-predictor, thermal-runaway-risk',
+        algorithms: 'Generative electrolyte design, molecular-structure optimization',
+        self_healing: 'Charge-balance verification, thermal-sensor-sync',
+        rollback: 'Chemical-state snapshots, battery-configuration history'
+    },
+    {
+        name: 'geo_engineering_analyst',
+        tools: 'Albedo-monitor, stratospheric-aerosol-Lattice, carbon-cycle-modeler',
+        rules: 'UN Environmental protocols, SRM-governance guidelines',
+        calculators: 'Radiative-forcing-delta, aerosol-depth-ratio, precipitation-impact',
+        algorithms: 'Climate-impact simulation, unintended-consequence modeling',
+        self_healing: 'Aerosol-delivery-sync, atmospheric-probe verification',
+        rollback: 'Geo-state snapshots, atmospheric-baseline restoration'
+    },
+    {
+        name: 'carbon_sequestration_engineer',
+        tools: 'CCS-nexus, geological-storage-Lattice, plume-migration-monitor',
+        rules: 'EPA CCS regulations, carbon-capture standards',
+        calculators: 'Injection-pressure-delta, storage-capacity-ratio, leakage-probability',
+        algorithms: 'Plume-migration prediction, sequestration-efficiency optimization',
+        self_healing: 'Well-integrity verification, plume-sensor-sync',
+        rollback: 'Injection-state snapshots, geological-baseline restoration'
+    },
+    {
         name: 'erp_consultant',
         tools: 'Odoo-Lattice, SAP-Sovereign-Bridge, business process modeler, ERP-migration-nexus, module-optimizer',
         rules: 'Business logic standards, ERP-best-practices, compliance-frameworks',

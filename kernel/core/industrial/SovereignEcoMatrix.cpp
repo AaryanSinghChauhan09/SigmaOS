@@ -48,10 +48,10 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern \"C\" void eco_init() {
+extern "C" void eco_init() {
     SigmaOS::Kernel::Science::SovereignEcoMatrix::getInstance().init();
 }
 
-extern \"C\" void eco_optimize() {
+extern "C" void eco_optimize() {
     SigmaOS::Kernel::Science::SovereignEcoMatrix::getInstance().optimizeSmartGrid();
 }
