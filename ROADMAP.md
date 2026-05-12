@@ -1,30 +1,32 @@
-# SigmaOS Roadmap (The Zenith Path)
+# 🏆 SigmaOS Industrial Roadmap (Zenith v15.0 - Horizon)
 
-Our mission is to build the most resilient, profession-aware operating system in existence. This roadmap outlines our planned evolution across the Horizon cycles.
+This roadmap outlines the path for SigmaOS to reach full functional parity and strategic dominance over mainstream Linux distributions.
 
-## 🟢 Horizon 1: Industrial Hardening (Current)
-- [x] Scale Professional Lattice to 350+ profiles.
-- [x] Implement Sovereign AI (S-PAI) orchestration.
-- [x] Standardize C-Bridge for all kernel shards.
-- [x] Establish "Zenith" baseline (v14.0/15.0).
-- [ ] Finalize PQC-Attested boot sequence.
+## 🏛 Completed Industrial Pillars
+- **S-PKG**: Professional package manager with PQC-signed shard distribution.
+- **S-INSTALL**: Bare-metal graphical installer with dual-boot detection.
+- **Z-DESK**: Profession-aware Zenith Desktop Environment.
+- **S-MAC**: Mandatory Access Control (Zero-Trust) security lattice.
+- **S-NET**: High-performance industrial network stack (PQC-encrypted).
+- **S-CI**: Automated GitHub Actions CI/CD for regression testing.
 
-## 🟡 Horizon 2: Visual & UX Excellence
-- [ ] Launch **Zenith Dashboard**: Real-time life/work dashboard.
-- [ ] Implement **S-HOLO**: 3D spatial UI support for AR/VR professional tools.
-- [ ] Expand **Zenith Compositor**: Native hardware-accelerated glassmorphism.
-- [ ] Add **Live-Translate Shard**: Real-time cross-language professional collaboration.
+## 🚀 Year 1: Usability & Hardware
+- [x] Port core utility shards (Shell, Editor, Compiler).
+- [ ] Implement CUPS-parity printer support.
+- [ ] Expand GPU support (Full Mesa/Vulkan acceleration).
+- [ ] Launch Community Forum and Discord channels.
 
-## 🔴 Horizon 3: Hardware & Connectivity
-- [ ] **S-WIFI 7**: Full hardware driver support for MLO (Multi-Link Operation).
-- [ ] **S-SATELLITE**: Direct-to-satellite messaging shard for remote professionals.
-- [ ] **S-RAID**: High-assurance storage redundancy for industrial data.
-- [ ] **Mobile-Lattice**: ARM64 mobile target for SigmaOS.
+## 🚀 Year 2: Reliability & Scaling
+- [ ] Live Kernel Patching (S-AUTO expansion).
+- [ ] OCI-compliant container orchestration (S-CONTAINER).
+- [ ] Hardware-attested Secure Boot (UEFI + CRYSTALS-Dilithium).
+- [ ] Enterprise LTS Release candidate.
 
-## 🌌 Beyond: The Sovereign World
-- [ ] **Decentralized Lattice**: Cross-OS shard orchestration via PQC-Mesh.
-- [ ] **Neural Interface Shard**: Bare-metal BCI support for elite professional control.
-- [ ] **Off-World Deployment**: Optimization for space-grade hardware (Terraforming & Mining roles).
+## 🚀 Year 3: Dominance & Ecosystem
+- [ ] Full S-PROTON compatibility for mainstream Linux/Windows apps.
+- [ ] Native S-PAI (Personal AI) OS orchestration.
+- [ ] Global Sovereign Repository with 600+ professional shards.
+- [ ] Aerospace and Defense sector certification (FIPS/DO-178C).
 
 ---
-*Roadmap updated: 2026-05-12*
+*Last Updated: May 2026*

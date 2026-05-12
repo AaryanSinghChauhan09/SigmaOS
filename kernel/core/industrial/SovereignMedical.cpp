@@ -57,7 +57,7 @@ void medical_init() {
 }
 
 void medical_load_image(const void* data, sigma_usize size) {
-    SigmaOS::Kernel::Medical::SovereignMedical::getInstance().loadDicomImage(data, size);
+    ::SigmaOS::Kernel::Medical::SovereignMedical::getInstance().loadDicomImage(data, size);
 }
 
 void medical_seal_record(const char* id) {
