@@ -1,22 +1,27 @@
-# Security & Reliability in SigmaOS
+# Security & Privacy: The Sovereign Shield
 
-SigmaOS is engineered for high-assurance environments where failure is not an option.
+SigmaOS provides industrial-grade protection for professional data and network communications.
 
-## 🔒 Memory Safety & Efficiency
-- **Bounds Enforcement**: Use `sigma_size_t` for all buffer operations.
-- **Zero-Trust Allocation**: Shards must request memory from the `SovereignMemoryManager` with a valid capability token.
-- **Compaction Lattice**: Zenith v15.0 introduces the **Compaction Lattice**, which periodically shifts active heap segments to eliminate fragmentation holes in long-running professional workloads.
-- **PQC Attestation**: All sensitive memory regions are attestation-locked using lattice-based crypto.
+## 🔒 Mandatory Access Control (S-MAC)
+- **Zero-Trust**: Shards are isolated at the silicon level.
+- **Capability Tokens**: Every resource access is validated against a PQC-signed lattice.
 
-## 🛡 Fault Tolerance (Self-Healing)
-The `S-AUTO` shard monitors the heartbeat of all active shards.
-- **Watchdog Lattices**: Autonomous monitors that trigger `auto_heal()` if a shard stops responding.
-- **Atomic Rollback**: Every professional action is recorded in a transactional log, allowing the system to revert to a stable state within 10ms of a fault.
-- **Race-Safe ISRs**: Interrupt dispatch is protected by fine-grained atomic spinlocks to prevent race conditions during high-concurrency industrial events.
+## 🛡️ Network Security (S-FIRE)
+- **Industrial Firewall**: Nftables-parity packet filtering with shard-level granular rules.
+- **Anti-DDoS**: Automated lattice-rebalancing to mitigate network-level attacks.
 
-## 🧬 Process Isolation (Sandboxing)
-- **S-WASM**: Professional tools run in a WebAssembly sandbox, preventing them from accessing kernel space directly.
-- **Syscall Filtering**: Shards can only invoke syscalls registered in their `manifest.json`.
+## 🔐 Data-at-Rest (S-LUKS)
+- **Kyber-Encryption**: Volumes are encrypted using Post-Quantum (PQC) primitives.
+- **Isolated Mounts**: Professional shards only see their own encrypted data silos.
+
+## 📋 Security Auditing (S-AUDIT)
+- **Live Forensic Trace**: Every security event is logged to a write-only, PQC-signed audit lattice.
+- **Self-Healing**: S-AUTO triggers atomic rollbacks if the audit lattice detects a security breach.
 
 ---
-*Next: [API Reference](API-Reference.md)*
+| Component | Function | Linux Equivalent |
+| :--- | :--- | :--- |
+| **S-MAC** | Access Control | SELinux / AppArmor |
+| **S-FIRE** | Firewall | Iptables / Nftables |
+| **S-LUKS** | Disk Encryption | LUKS / dm-crypt |
+| **S-AUDIT** | Auditing | Auditd |
