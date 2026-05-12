@@ -29,105 +29,6 @@ const professions = [
         self_healing: 'Legal reference sync, document authenticity verification',
         rollback: 'Case history snapshots, immutable filing records'
     },
-    { 
-        name: 'engineer', 
-        tools: 'Compilers, CAD tools, simulation engines, project management dashboards, Finite Element Analysis (FEA)',
-        rules: 'Bureau of Indian Standards (BIS), IS codes, Eurocodes',
-        calculators: 'Structural load, electrical circuit, fluid mechanics, thermal stress',
-        algorithms: 'CAD simulation, stress analysis, project scheduling',
-        self_healing: 'Simulation state verification, build-cache integrity check',
-        rollback: 'Project-wide git-lattice rollback, CAD design versioning'
-    },
-    {
-        name: 'architect',
-        tools: 'BIM software, 3D modeling, site analysis tools, rendering engines, GIS mapping',
-        rules: 'Building bye-laws, National Building Code (NBC), sustainability standards',
-        calculators: 'FSI/FAR, structural stability, lighting/ventilation, carbon footprint',
-        algorithms: 'Generative design, urban density simulation',
-        self_healing: 'BIM model consistency check, asset link validation',
-        rollback: 'Iterative design snapshots, client approval state rollback'
-    },
-    {
-        name: 'data_scientist',
-        tools: 'Jupyter notebooks, ML libraries, visualization dashboards, data lake access, GPU-Lattice',
-        rules: 'GDPR, Data Protection Act (DPDP), AI Ethics guidelines',
-        calculators: 'Statistical confidence, model accuracy, feature importance, TPU allocation',
-        algorithms: 'Neural architecture search, automated feature engineering, hyperparameter tuning',
-        self_healing: 'Data drift detection, model weight integrity check',
-        rollback: 'Training checkpoint restoration, dataset versioning'
-    },
-    {
-        name: 'quantum_algorithm_researcher',
-        tools: 'Qiskit-Lattice, QuIP interpreter, cryogenic state monitor, entanglement analyzer',
-        rules: 'Quantum supremacy protocols, error correction standards',
-        calculators: 'Qubit fidelity, decoherence rate, gate-error probability',
-        algorithms: 'Shor\'s optimization, Grover\'s search, Quantum Fourier Transform',
-        self_healing: 'Continuous decoherence correction, qubit state validation',
-        rollback: 'Quantum state checkpointing, entanglement-graph restoration'
-    },
-    {
-        name: 'nuclear_physicist',
-        tools: 'Reactor core monitor, neutron flux analyzer, isotope tracking, SCADA-Lattice',
-        rules: 'IAEA safety standards, NRC protocols',
-        calculators: 'Half-life, criticality index, radiation dose',
-        algorithms: 'Monte Carlo N-Particle (MCNP), fission rate simulation',
-        self_healing: 'Fail-safe core monitoring, containment integrity scan',
-        rollback: 'Reactor state snapshot, safety protocol baseline restoration'
-    },
-    {
-        name: 'ship_captain',
-        tools: 'ECDIS navigation, AIS-Lattice, weather routing, ballast manager',
-        rules: 'SOLAS, MARPOL, STCW',
-        calculators: 'Fuel consumption, eta, cargo stability (GM)',
-        algorithms: 'Route optimization, collision avoidance, tidal prediction',
-        self_healing: 'Navigational data sync, engine diagnostic monitoring',
-        rollback: 'Voyage log snapshots, autopilot calibration restoration'
-    },
-    {
-        name: 'disaster_recovery_coordinator',
-        tools: 'Real-time hazard mapping, resource allocation mesh, secure satellite comms',
-        rules: 'NDMA guidelines, FEMA protocols',
-        calculators: 'Casualty estimation, resource burn rate, logistics pathing',
-        algorithms: 'Multi-agent evacuation routing, supply chain optimization',
-        self_healing: 'Communication mesh integrity, sensor network validation',
-        rollback: 'Incident command state restoration, resource map versioning'
-    },
-    {
-        name: 'intelligence_officer',
-        tools: 'Signals intelligence (SIGINT) analyzer, OSINT-Lattice, secure satellite uplink, steganography detector',
-        rules: 'Classified protocols, zero-trust communication',
-        calculators: 'Encryption strength, signal-to-noise ratio, geolocation triangulator',
-        algorithms: 'Heuristic pattern matching, semantic link analysis',
-        self_healing: 'Secure channel re-establishment, payload sanitization',
-        rollback: 'Redaction-safe state restoration, operational security (OPSEC) baseline'
-    },
-    {
-        name: 'detective',
-        tools: 'Evidence timeline manager, witness statement index, facial recognition-Lattice, case-link visualizer',
-        rules: 'Miranda rights protocols, evidence chain-of-custody',
-        calculators: 'Probability of occurrence, forensic time-delta',
-        algorithms: 'Behavioral pattern analysis, link-graph traversal',
-        self_healing: 'Evidence database sync, case file integrity check',
-        rollback: 'Investigation state snapshots, immutable evidence log restoration'
-    },
-    {
-        name: 'air_traffic_controller',
-        tools: 'Radar-Lattice, flight path predictor, collision alert nexus, comm-link bridge',
-        rules: 'ICAO standards, FAA protocols',
-        calculators: 'Separation minima, fuel-to-weight ratio, descent rate',
-        algorithms: 'Conflict detection and resolution (CD&R), 4D trajectory prediction',
-        self_healing: 'Redundant radar link verification, comms-failover automation',
-        rollback: 'Flight state historical restoration, sequence logs'
-    },
-    {
-        name: 'perfumer',
-        tools: 'Scent-molecule database, GC-MS analyzer link, formula optimizer, olfactory sim',
-        rules: 'IFRA standards, allergen compliance',
-        calculators: 'Concentration ratio, evaporation rate, sillage estimator',
-        algorithms: 'Scent-chord generator, molecular stability prediction',
-        self_healing: 'Formula consistency check, component availability sync',
-        rollback: 'Iterative scent-state restoration, allergen safety baseline'
-    },
     {
         name: 'terraforming_engineer',
         tools: 'Atmospheric modeler, lithosphere stabilizer, bio-sphere injector, planetary thermal monitor',
@@ -136,6 +37,87 @@ const professions = [
         algorithms: 'Climate engineering simulation, ecosystem stability prediction',
         self_healing: 'Atmospheric probe calibration, bio-dome integrity monitoring',
         rollback: 'Planetary state snapshots, bio-injection phase rollback'
+    },
+    {
+        name: 'erp_consultant',
+        tools: 'Odoo-Lattice, SAP-Sovereign-Bridge, business process modeler, ERP-migration-nexus, module-optimizer',
+        rules: 'Business logic standards, ERP-best-practices, compliance-frameworks',
+        calculators: 'TCO (Total Cost of Ownership), ROI-estimator, process-latency-calc',
+        algorithms: 'Automated workflow mapping, database schema normalization, inventory-prediction',
+        self_healing: 'ERP-database consistency check, module-dependency validation',
+        rollback: 'ERP-state snapshots, transactional-history restoration'
+    },
+    {
+        name: 'chartered_accountant',
+        tools: 'Tally-Lattice, GST-Nexus, Income Tax Auditor, balance-sheet-lattice, audit-trail-engine',
+        rules: 'ICAI standards, Income Tax Act, GST laws, Companies Act',
+        calculators: 'Tax-liability, TDS-estimator, capital-gains-calc, depreciation-lattice',
+        algorithms: 'Anomaly detection in ledgers, tax-optimization modeling, automated-audit-sampling',
+        self_healing: 'Tally-data-integrity scan, GST-reconciliation verification',
+        rollback: 'Fiscal-year snapshots, historical ledger restoration'
+    },
+    {
+        name: 'crm_administrator',
+        tools: 'Salesforce-Lattice, HubSpot-Bridge, lead-scoring-engine, customer-journey-mapper',
+        rules: 'GDPR, CCPA, CRM data-privacy standards',
+        calculators: 'CLV (Customer Lifetime Value), churn-rate, conversion-delta',
+        algorithms: 'Lead prioritization modeling, automated-marketing-pathing',
+        self_healing: 'Lead-data consistency check, automation-workflow validation',
+        rollback: 'Customer-record snapshots, marketing-campaign rollback'
+    },
+    {
+        name: 'ecommerce_developer',
+        tools: 'Shopify-Lattice, Magento-Sovereign-Core, inventory-sync-nexus, payment-gateway-bridge',
+        rules: 'PCI-DSS, e-commerce consumer laws',
+        calculators: 'AOV (Average Order Value), cart-abandonment rate, shipping-cost-delta',
+        algorithms: 'Inventory-replenishment prediction, personalized-recommendation engine',
+        self_healing: 'Inventory-sync verification, payment-link validation',
+        rollback: 'Store-state snapshots, order-history restoration'
+    },
+    {
+        name: 'digital_marketer',
+        tools: 'SERP-Lattice, SEM-Analyzer, crawl-budget-optimizer, backlink-auditor, conversion-pixel-nexus',
+        rules: 'Search engine guidelines, advertising ethics',
+        calculators: 'CPC/CPM, ROAS, keyword-density, domain-authority-score',
+        algorithms: 'Keyword-ranking prediction, automated-bidding optimization',
+        self_healing: 'Pixel-tracking verification, backlink-integrity scan',
+        rollback: 'SEO-state snapshots, campaign-history restoration'
+    },
+    {
+        name: 'defi_architect',
+        tools: 'Liquidity-Lattice, AMM-simulator, yield-curve-nexus, flash-loan-auditor',
+        rules: 'Smart-contract security standards, DeFi-governance protocols',
+        calculators: 'Impermanent loss, slippage-delta, TVL-ratio, gas-optimization',
+        algorithms: 'Automated market making, risk-tranche simulation',
+        self_healing: 'Contract-state verification, liquidity-mesh sync',
+        rollback: 'Vault-state snapshots, protocol-baseline restoration'
+    },
+    {
+        name: 'digital_evidence_analyst',
+        tools: 'Chain-of-custody-Lattice, hash-nexus, cold-storage-bridge, metadata-carver',
+        rules: 'BSA 2023 evidence standards, digital-forensics protocols',
+        calculators: 'Entropy-density, file-integrity-score, timeline-delta',
+        algorithms: 'Automated artifact correlation, encrypted-volume detection',
+        self_healing: 'Evidence-seal verification, hash-lattice integrity check',
+        rollback: 'Analysis-state snapshots, evidence-baseline restoration'
+    },
+    {
+        name: 'generative_art_curator',
+        tools: 'Latent-space-navigator, GAN-monitor, NFT-lattice-bridge, style-transfer-engine',
+        rules: 'AI-ethics in art, digital-provenance standards',
+        calculators: 'Visual-entropy, stylistic-divergence, aesthetic-score',
+        algorithms: 'Prompt-optimization, latent-walk orchestration',
+        self_healing: 'Art-lattice integrity check, provenance-seal verification',
+        rollback: 'Curation-state snapshots, aesthetic-baseline restoration'
+    },
+    {
+        name: 'virtual_world_historian',
+        tools: 'Metaverse-archiver, avatar-ancestry-Lattice, world-state-tracer',
+        rules: 'Digital-preservation ethics, virtual-heritage standards',
+        calculators: 'World-age, social-graph-density, event-epoch-delta',
+        algorithms: 'Cross-world event correlation, virtual-evolution mapping',
+        self_healing: 'Archival-sync verification, world-state integrity check',
+        rollback: 'Historical-state snapshots, timeline-baseline restoration'
     },
     {
         name: 'particle_physicist',
@@ -181,6 +163,96 @@ const professions = [
         algorithms: 'Automated footstep matching, textural sound synthesis',
         self_healing: 'Audio-buffer consistency, Prop-Lattice sync',
         rollback: 'Mix-state snapshots, sound-design-history restoration'
+    },
+    {
+        name: 'asteroid_miner',
+        tools: 'Spectroscopic analyzer, drill-bit thermal monitor, low-gravity navigation, ore-density mapper',
+        rules: 'Outer Space Treaty compliance, resource extraction protocols',
+        calculators: 'Delta-V, ore-yield probability, trajectory-delta',
+        algorithms: 'Autonomous excavation pathing, structural stability prediction in vacuum',
+        self_healing: 'Thruster-link verification, drill-head cooling sync',
+        rollback: 'Excavation state snapshots, orbital-return baseline restoration'
+    },
+    {
+        name: 'bio_ethicist',
+        tools: 'Genetic-modification auditor, bio-risk modeler, ethical-compliance dashboard, CRISPR-log-Lattice',
+        rules: 'Declaration of Helsinki, Belmont Report, bio-ethics guidelines',
+        calculators: 'Risk-benefit ratio, genetic-diversity index',
+        algorithms: 'Ethical-dilemma simulation, long-term impact analysis',
+        self_healing: 'Compliance-log integrity check, ethical-seal verification',
+        rollback: 'Decision-state snapshots, protocol baseline restoration'
+    },
+    {
+        name: 'digital_archaeologist',
+        tools: 'Data-carving suite, legacy-system emulator, bit-rot detector, archival-lattice',
+        rules: 'Digital preservation standards, copyright-fair-use protocols',
+        calculators: 'Data-integrity-hash, bit-error rate, compression-ratio',
+        algorithms: 'Fragmented data reconstruction, legacy-format detection',
+        self_healing: 'Bit-rot correction, archival-sync verification',
+        rollback: 'Data-state snapshots, archival-integrity restoration'
+    },
+    {
+        name: 'orbital_debris_manager',
+        tools: 'Debris-tracking radar, laser-ablation monitor, collision-avoidance nexus, TLE-Lattice',
+        rules: 'IADC space debris mitigation guidelines',
+        calculators: 'Probability of collision (Pc), orbital-decay rate, delta-V for de-orbit',
+        algorithms: 'Cascading collision prediction, debris-cloud propagation',
+        self_healing: 'Radar-link consistency, laser-aiming-calibration verification',
+        rollback: 'Orbital-map state snapshots, de-orbit sequence logs'
+    },
+    {
+        name: 'pqc_auditor',
+        tools: 'Lattice-based-crypto analyzer, quantum-threat-modeler, PQC-seal-validator, entropy-mesh',
+        rules: 'NIST PQC standards, FIPS 140-3',
+        calculators: 'Quantum-resistance-score, entropy-density, key-strength delta',
+        algorithms: 'Post-quantum signature verification, cryptographic-mesh auditing',
+        self_healing: 'Key-lattice integrity check, PQC-seal validation',
+        rollback: 'Security-state snapshots, PQC-baseline restoration'
+    },
+    {
+        name: 'grid_resilience_engineer',
+        tools: 'Smart-grid monitor, load balancer-Lattice, phase-angle sync, SCADA-shield',
+        rules: 'IEEE standards, FERC regulations, NERC CIP compliance',
+        calculators: 'Frequency stability, reactive power, peak-load predictor',
+        algorithms: 'Dynamic line rating, islanding detection, black-start optimization',
+        self_healing: 'Automatic breaker re-closing, load-shedding lattice priority',
+        rollback: 'Pre-fault grid state restoration, historical load profiles'
+    },
+    {
+        name: 'viticulturist',
+        tools: 'Soil-moisture mesh, brix-analyzer, phenolic-maturity monitor, weather-Lattice',
+        rules: 'Appellation d\'origine contrôlée (AOC) standards, organic certification rules',
+        calculators: 'Pruning density, irrigation delta, fermentation heat-rate',
+        algorithms: 'Harvest-window prediction, yield-estimation simulation',
+        self_healing: 'Micro-climate sensor sync, pest-pressure verification',
+        rollback: 'Seasonal growth logs, irrigation state history'
+    },
+    {
+        name: 'actuary',
+        tools: 'Risk-modeling lattice, mortality-table engine, solvency-check nexus, monte-carlo-sim',
+        rules: 'IFRS 17, Solvency II, actuarial standards',
+        calculators: 'Net present value (NPV), liability-duration, loss-ratio',
+        algorithms: 'Stochastic modeling, predictive claim analytics',
+        self_healing: 'Data consistency verification, model-drift detection',
+        rollback: 'Policy-state snapshots, historical loss development'
+    },
+    {
+        name: 'crisis_negotiator',
+        tools: 'Voice-stress analyzer, semantic sentiment engine, hostage-link bridge, secure-comms',
+        rules: 'Negotiation protocols, de-escalation guidelines',
+        calculators: 'Time-elapsed risk, psychological profile score',
+        algorithms: 'Behavioral change staircase model, automated sentiment tracking',
+        self_healing: 'Communication-link stability check, secure-line verification',
+        rollback: 'Negotiation log history, previous incident case-restoration'
+    },
+    {
+        name: 'luthier',
+        tools: 'Acoustic-frequency analyzer, wood-density scanner, micro-planer, resonance-Lattice',
+        rules: 'CITES wood-usage regs, traditional craft standards',
+        calculators: 'String-tension, bridge-pressure, vibrational-mode delta',
+        algorithms: 'Resonance-box simulation, structural-vibration analysis',
+        self_healing: 'Workshop-climate sync, resonance-profile verification',
+        rollback: 'Instrument-design snapshots, vibrational-history restoration'
     }
 ];
 
@@ -218,7 +290,9 @@ const additionalProfessions = [
     'Salesforce Developer', 'Shopify Expert', 'E-commerce Manager',
     'Seismologist', 'Tunneling Expert', 'Urban Agriculture Designer', 'Myrologist', 'Astrobiologist',
     'Colorist', 'Calligrapher', 'Signal Jammer', 'EOD Technician', 'Hyperloop Operator',
-    'Maglev Engineer', 'Vexillologist', 'Numismatist', 'Particle Physicist'
+    'Maglev Engineer', 'Vexillologist', 'Numismatist', 'Particle Physicist',
+    'DeFi Architect', 'Digital Evidence Analyst', 'Generative Art Curator', 'Virtual World Historian',
+    'Predictive Policing Strategist', 'CBDC Developer', 'Key Custodian', 'Digital Legacy Manager'
 ];
 
 additionalProfessions.forEach(name => {
@@ -250,7 +324,7 @@ professions.forEach(prof => {
     if (prof.rules) toolsMd += `## 📜 Compliance Rules\n- ${prof.rules.split(', ').join('\n- ')}\n\n`;
     if (prof.calculators) toolsMd += `## 🧮 Professional Calculators\n- ${prof.calculators.split(', ').join('\n- ')}\n\n`;
     if (prof.algorithms) toolsMd += `## 🧬 Core Algorithms\n- ${prof.algorithms.split(', ').join('\n- ')}\n\n`;
-    toolsMd += `## 🛡 Self-Healing Strategy\n- ${prof.self_healing}\n\n`;
+    toolsMd += `## 🛡 Self-Healing Strategy\n- ${prof_healing = prof.self_healing}\n\n`;
     toolsMd += `## 🔄 Rollback Strategy\n- ${prof.rollback}\n`;
     
     fs.writeFileSync(path.join(profDir, 'tools.md'), toolsMd);

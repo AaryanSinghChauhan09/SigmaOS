@@ -1,0 +1,28 @@
+{
+    "profession": "generative_art_curator",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "latent-space-navigator",
+        "gan-monitor",
+        "nft-lattice-bridge",
+        "style-transfer-engine"
+    ],
+    "rules": [
+        "AI-ethics in art",
+        "digital-provenance standards"
+    ],
+    "calculators": [
+        "Visual-entropy",
+        "stylistic-divergence",
+        "aesthetic-score"
+    ],
+    "algorithms": [
+        "Prompt-optimization",
+        "latent-walk orchestration"
+    ],
+    "automation": {
+        "self_healing": "Art-lattice integrity check, provenance-seal verification",
+        "rollback": "Curation-state snapshots, aesthetic-baseline restoration"
+    }
+}

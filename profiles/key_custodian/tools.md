@@ -1,7 +1,7 @@
-# 🛠 DETECTIVE Profile
+# 🛠 KEY_CUSTODIAN Profile
 
 ## Required Tools & Functions
-- Detective workspace
+- Key Custodian workspace
 - specialized analytics
 - compliance manager
 
@@ -18,7 +18,7 @@
 - adaptive assistance
 
 ## 🛡 Self-Healing Strategy
-- Continuous health check for Detective tools
+- Continuous health check for Key Custodian tools
 
 ## 🔄 Rollback Strategy
 - Automatic state snapshots

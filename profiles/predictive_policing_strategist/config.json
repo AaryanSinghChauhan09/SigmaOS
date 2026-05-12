@@ -1,9 +1,9 @@
 {
-    "profession": "detective",
+    "profession": "predictive_policing_strategist",
     "compliance_level": "sovereign-high",
     "resource_priority": "adaptive",
     "modules": [
-        "detective_workspace",
+        "predictive_policing_strategist_workspace",
         "specialized_analytics",
         "compliance_manager"
     ],
@@ -20,7 +20,7 @@
         "adaptive assistance"
     ],
     "automation": {
-        "self_healing": "Continuous health check for Detective tools",
+        "self_healing": "Continuous health check for Predictive Policing Strategist tools",
         "rollback": "Automatic state snapshots"
     }
 }

@@ -1,7 +1,7 @@
-# 🛠 DETECTIVE Profile
+# 🛠 DIGITAL_LEGACY_MANAGER Profile
 
 ## Required Tools & Functions
-- Detective workspace
+- Digital Legacy Manager workspace
 - specialized analytics
 - compliance manager
 
@@ -18,7 +18,7 @@
 - adaptive assistance
 
 ## 🛡 Self-Healing Strategy
-- Continuous health check for Detective tools
+- Continuous health check for Digital Legacy Manager tools
 
 ## 🔄 Rollback Strategy
 - Automatic state snapshots

@@ -1,7 +1,7 @@
-# 🛠 DETECTIVE Profile
+# 🛠 CBDC_DEVELOPER Profile
 
 ## Required Tools & Functions
-- Detective workspace
+- CBDC Developer workspace
 - specialized analytics
 - compliance manager
 
@@ -18,7 +18,7 @@
 - adaptive assistance
 
 ## 🛡 Self-Healing Strategy
-- Continuous health check for Detective tools
+- Continuous health check for CBDC Developer tools
 
 ## 🔄 Rollback Strategy
 - Automatic state snapshots

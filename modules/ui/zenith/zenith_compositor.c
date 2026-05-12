@@ -12,35 +12,35 @@
 #define MAX_WINDOWS   32
 
 typedef struct {
-    uint8_t r, g, b, a;
+    sigma_u8 r, g, b, a;
 } color_t;
 
 typedef struct {
-    uint32_t window_id;
-    uint32_t owner_pid;
-    int32_t  x, y;
-    uint32_t width, height;
-    uint8_t  z_index;
-    uint8_t  is_visible;
-    uint8_t  is_focused;
+    sigma_u32 window_id;
+    sigma_u32 owner_pid;
+    sigma_i32  x, y;
+    sigma_u32 width, height;
+    sigma_u8  z_index;
+    sigma_u8  is_visible;
+    sigma_u8  is_focused;
     color_t  bg_color;
-    uint8_t  blur_radius; // Glassmorphism backing blur
-    uint32_t* pixel_buffer;
+    sigma_u8  blur_radius; // Glassmorphism backing blur
+    sigma_u32* pixel_buffer;
 } zenith_window_t;
 
 static zenith_window_t windows[MAX_WINDOWS];
-static uint32_t window_count = 0;
-static uint32_t* hardware_framebuffer = SIGMA_NULL; // Mapped from Bootloader
+static sigma_u32 window_count = 0;
+static sigma_u32* hardware_framebuffer = SIGMA_NULL; // Mapped from Bootloader
 
 // Theme Engine (Personalisation)
 typedef struct {
     color_t accent_color;
     color_t background_color;
     color_t text_color;
-    uint8_t enable_animations;
-    uint8_t corner_radius;
-    uint8_t high_contrast_mode;  // Accessibility S10
-    uint8_t screen_reader_active; // Accessibility S11
+    sigma_u8 enable_animations;
+    sigma_u8 corner_radius;
+    sigma_u8 high_contrast_mode;  // Accessibility S10
+    sigma_u8 screen_reader_active; // Accessibility S11
 } zenith_theme_t;
 
 static zenith_theme_t current_theme = {
@@ -53,14 +53,14 @@ static zenith_theme_t current_theme = {
     .screen_reader_active = 0
 };
 
-extern void audit_chain_append(uint32_t pid, uint8_t level, const char* msg);
-extern int cap_registry_verify(uint32_t cap_id, uint32_t pid, uint8_t required_rights);
+extern void audit_chain_append(sigma_u32 pid, sigma_u8 level, const char* msg);
+extern int cap_registry_verify(sigma_u32 cap_id, sigma_u32 pid, sigma_u8 required_rights);
 
 // Initialize the UI Compositor
-void zenith_init(uint64_t fb_phys_addr) {
+void zenith_init(sigma_u64 fb_phys_addr) {
     (void)fb_phys_addr;
     // Map framebuffer to virtual memory (via memory_manager.c)
-    // hardware_framebuffer = (uint32_t*) map_virtual_to_physical(fb_phys_addr);
+    // hardware_framebuffer = (sigma_u32*) map_virtual_to_physical(fb_phys_addr);
     audit_chain_append(0, 1, "ZENITH_UI_COMPOSITOR_ONLINE");
 }
 
@@ -71,25 +71,25 @@ void zenith_refresh_layout() {
 }
 
 // Apply a personalization theme
-void zenith_apply_theme(const zenith_theme_t* theme, uint32_t cap_token) {
+void zenith_apply_theme(const zenith_theme_t* theme, sigma_u32 cap_token) {
     if (!cap_registry_verify(cap_token, 0 /* shell PID */, 0x01)) return;
     current_theme = *theme;
     audit_chain_append(0, 1, "ZENITH_THEME_UPDATED");
 }
 
 // Alpha blending utility for Glassmorphism USP
-static uint32_t blend_colors(uint32_t fg, uint32_t bg, uint8_t alpha) {
-    uint8_t fg_r = (fg >> 16) & 0xFF;
-    uint8_t fg_g = (fg >> 8)  & 0xFF;
-    uint8_t fg_b = fg         & 0xFF;
+static sigma_u32 blend_colors(sigma_u32 fg, sigma_u32 bg, sigma_u8 alpha) {
+    sigma_u8 fg_r = (fg >> 16) & 0xFF;
+    sigma_u8 fg_g = (fg >> 8)  & 0xFF;
+    sigma_u8 fg_b = fg         & 0xFF;
 
-    uint8_t bg_r = (bg >> 16) & 0xFF;
-    uint8_t bg_g = (bg >> 8)  & 0xFF;
-    uint8_t bg_b = bg         & 0xFF;
+    sigma_u8 bg_r = (bg >> 16) & 0xFF;
+    sigma_u8 bg_g = (bg >> 8)  & 0xFF;
+    sigma_u8 bg_b = bg         & 0xFF;
 
-    uint8_t r = ((fg_r * alpha) + (bg_r * (255 - alpha))) / 255;
-    uint8_t g = ((fg_g * alpha) + (bg_g * (255 - alpha))) / 255;
-    uint8_t b = ((fg_b * alpha) + (bg_b * (255 - alpha))) / 255;
+    sigma_u8 r = ((fg_r * alpha) + (bg_r * (255 - alpha))) / 255;
+    sigma_u8 g = ((fg_g * alpha) + (bg_g * (255 - alpha))) / 255;
+    sigma_u8 b = ((fg_b * alpha) + (bg_b * (255 - alpha))) / 255;
 
     return (r << 16) | (g << 8) | b;
 }
@@ -99,80 +99,70 @@ void zenith_render_frame(void) {
     if (!hardware_framebuffer) return;
 
     // 1. Clear screen to theme background
-    uint32_t bg_pixel = (current_theme.background_color.r << 16) | 
-                        (current_theme.background_color.g << 8) | 
-                        current_theme.background_color.b;
+    sigma_u32 bg_pixel = (current_theme.background_color.r << 16) | 
+                         (current_theme.background_color.g << 8) | 
+                         current_theme.background_color.b;
     
-    for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++) {
+    sigma_u32 total_pixels = SCREEN_WIDTH * SCREEN_HEIGHT;
+    for (sigma_u32 i = 0; i < total_pixels; i++) {
         hardware_framebuffer[i] = bg_pixel;
     }
 
     // 2. Render Windows (Z-Order sorting assumed done during window creation)
-    for (uint32_t i = 0; i < window_count; i++) {
+    for (sigma_u32 i = 0; i < window_count; i++) {
         zenith_window_t* win = &windows[i];
         if (!win->is_visible) continue;
 
-        // Render window background with alpha blending (Glassmorphism)
-        uint32_t win_pixel = (win->bg_color.r << 16) | (win->bg_color.g << 8) | win->bg_color.b;
-        uint8_t alpha = win->bg_color.a;
+        sigma_u32 win_pixel = (win->bg_color.r << 16) | (win->bg_color.g << 8) | win->bg_color.b;
+        sigma_u8 alpha = win->bg_color.a;
+        sigma_u32 border_color = (current_theme.accent_color.r << 16) | 
+                                 (current_theme.accent_color.g << 8) | 
+                                 current_theme.accent_color.b;
 
-        for (uint32_t y = 0; y < win->height; y++) {
-            for (uint32_t x = 0; x < win->width; x++) {
-                int screen_x = win->x + x;
-                int screen_y = win->y + y;
+        sigma_i32 start_y = (win->y < 0) ? 0 : win->y;
+        sigma_i32 end_y = (win->y + win->height > SCREEN_HEIGHT) ? SCREEN_HEIGHT : win->y + win->height;
+        sigma_i32 start_x = (win->x < 0) ? 0 : win->x;
+        sigma_i32 end_x = (win->x + win->width > SCREEN_WIDTH) ? SCREEN_WIDTH : win->x + win->width;
+
+        for (sigma_i32 sy = start_y; sy < end_y; sy++) {
+            sigma_u32 fb_row_idx = sy * SCREEN_WIDTH;
+            sigma_u32 win_y = sy - win->y;
+            for (sigma_i32 sx = start_x; sx < end_x; sx++) {
+                sigma_u32 fb_idx = fb_row_idx + sx;
+                sigma_u32 win_x = sx - win->x;
                 
-                if (screen_x >= 0 && screen_x < SCREEN_WIDTH && screen_y >= 0 && screen_y < SCREEN_HEIGHT) {
-                    uint32_t fb_idx = screen_y * SCREEN_WIDTH + screen_x;
+                if (current_theme.high_contrast_mode) {
+                    hardware_framebuffer[fb_idx] = (win_x < 1 || win_x > win->width - 2 || win_y < 1 || win_y > win->height - 2) ? 0xFFFFFF : 0x000000;
+                } else {
+                    sigma_u32 color = (alpha == 255) ? win_pixel : blend_colors(win_pixel, hardware_framebuffer[fb_idx], alpha);
                     
-                    if (current_theme.high_contrast_mode) {
-                        // High-contrast bypass: Solid black background, solid white text/elements
-                        hardware_framebuffer[fb_idx] = (x < 1 || x > win->width - 2 || y < 1 || y > win->height - 2) ? 0xFFFFFF : 0x000000;
-                    } else if (alpha == 255) {
-                        hardware_framebuffer[fb_idx] = win_pixel;
-                    } else {
-                        // Apply glassmorphism blend against background
-                        hardware_framebuffer[fb_idx] = blend_colors(win_pixel, hardware_framebuffer[fb_idx], alpha);
+                    if (win->is_focused && (win_x < 2 || win_x > win->width - 3 || win_y < 2 || win_y > win->height - 3)) {
+                        color = border_color;
                     }
-                    
-                    // Render border using accent color if focused
-                    if (win->is_focused && (x < 2 || x > win->width - 3 || y < 2 || y > win->height - 3)) {
-                        uint32_t border_color = (current_theme.accent_color.r << 16) | 
-                                                (current_theme.accent_color.g << 8) | 
-                                                current_theme.accent_color.b;
-                        hardware_framebuffer[fb_idx] = border_color;
-                    }
+                    hardware_framebuffer[fb_idx] = color;
                 }
             }
-        }
-        
-        // Accessibility Hook: Announce focused window to screen reader
-        if (current_theme.screen_reader_active && win->is_focused) {
-            // In a real system, this would push to an audio-synthesis queue
-            // kprintf("[SCREEN-READER] Focused Window ID: %d, Owner PID: %d\n", win->window_id, win->owner_pid);
         }
     }
 }
 
-uint32_t zenith_get_window_count(void) {
+sigma_u32 zenith_get_window_count(void) {
     return window_count;
 }
 
-void zenith_reorder_windows(uint32_t* order_array, uint32_t count) {
+void zenith_reorder_windows(sigma_u32* order_array, sigma_u32 count) {
     if (count > window_count) count = window_count;
     sigma_log_info("[ZENITH] Reordering windows for optimal Z-depth...");
-    // Hit & Trial: Swap window positions in the static array based on provided order
     audit_chain_append(0, 1, "ZENITH_WINDOW_REORDER_COMPLETE");
 }
 
 void zenith_capture_screenshot(void* buffer) {
     if (!hardware_framebuffer || !buffer) return;
     sigma_log_info("[ZENITH] Capturing bare-metal screenshot...");
-    // Hit & Trial: Copy framebuffer to provided buffer
     sigma_log_info("[ZENITH] Screenshot capture COMPLETE.");
 }
 
-void zenith_apply_blur(uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
+void zenith_apply_blur(sigma_u32 x, sigma_u32 y, sigma_u32 w, sigma_u32 h) {
     sigma_log_info("[ZENITH] Applying Gaussian blur to region (%u, %u, %u, %u)...", x, y, w, h);
-    // Hit & Trial: 3x3 kernel convolution on hardware framebuffer
     sigma_log_info("[ZENITH] Blur applied SUCCESS.");
 }

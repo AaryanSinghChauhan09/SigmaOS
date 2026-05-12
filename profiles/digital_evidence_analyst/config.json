@@ -1,0 +1,28 @@
+{
+    "profession": "digital_evidence_analyst",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "chain-of-custody-lattice",
+        "hash-nexus",
+        "cold-storage-bridge",
+        "metadata-carver"
+    ],
+    "rules": [
+        "BSA 2023 evidence standards",
+        "digital-forensics protocols"
+    ],
+    "calculators": [
+        "Entropy-density",
+        "file-integrity-score",
+        "timeline-delta"
+    ],
+    "algorithms": [
+        "Automated artifact correlation",
+        "encrypted-volume detection"
+    ],
+    "automation": {
+        "self_healing": "Evidence-seal verification, hash-lattice integrity check",
+        "rollback": "Analysis-state snapshots, evidence-baseline restoration"
+    }
+}

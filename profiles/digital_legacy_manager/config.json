@@ -1,9 +1,9 @@
 {
-    "profession": "detective",
+    "profession": "digital_legacy_manager",
     "compliance_level": "sovereign-high",
     "resource_priority": "adaptive",
     "modules": [
-        "detective_workspace",
+        "digital_legacy_manager_workspace",
         "specialized_analytics",
         "compliance_manager"
     ],
@@ -20,7 +20,7 @@
         "adaptive assistance"
     ],
     "automation": {
-        "self_healing": "Continuous health check for Detective tools",
+        "self_healing": "Continuous health check for Digital Legacy Manager tools",
         "rollback": "Automatic state snapshots"
     }
 }

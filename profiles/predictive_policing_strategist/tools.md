@@ -1,7 +1,7 @@
-# 🛠 DETECTIVE Profile
+# 🛠 PREDICTIVE_POLICING_STRATEGIST Profile
 
 ## Required Tools & Functions
-- Detective workspace
+- Predictive Policing Strategist workspace
 - specialized analytics
 - compliance manager
 
@@ -18,7 +18,7 @@
 - adaptive assistance
 
 ## 🛡 Self-Healing Strategy
-- Continuous health check for Detective tools
+- Continuous health check for Predictive Policing Strategist tools
 
 ## 🔄 Rollback Strategy
 - Automatic state snapshots
