@@ -16,6 +16,13 @@ Welcome to the central knowledge hub for **SigmaOS**, the world's first industri
 - **[Profession Lattice Map](PROFESSION-MAP.md)**: A complete mapping of tools and resilience strategies for 350+ roles.
 - **[Professionalization Plan](PROFESSIONALIZATION_PLAN.md)**: The roadmap for transforming SigmaOS into a turnkey professional workstation.
 
+## 🏛 Industrial Pillars
+
+- **[S-NET: Sovereign Networking](Network-Stack.md)**: High-performance, PQC-encrypted communication.
+- **[S-MAC: Mandatory Access Control](Security-MAC.md)**: Shard-level zero-trust enforcement.
+- **[Z-DESK: Zenith Desktop](Zenith-Desktop.md)**: The profession-aware graphical environment.
+- **[S-PKG: Lattice Package Nexus](Package-Nexus.md)**: Decentralized shard distribution.
+
 ## 🛠 Project Lifecycle
 
 - **[README](../README.md)**: Main project landing page and build status.
