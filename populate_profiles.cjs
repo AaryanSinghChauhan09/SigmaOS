@@ -222,7 +222,7 @@ const additionalProfessions = [
 ];
 
 additionalProfessions.forEach(name => {
-    const slug = name.toLowerCase().replace(/ /g, '_').replace(/-/g, '_');
+    const slug = name.toLowerCase().replace(/[\s\/\-\.]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
     if (!professions.find(p => p.name === slug)) {
         professions.push({
             name: slug,

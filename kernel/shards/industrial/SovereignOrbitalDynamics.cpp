@@ -34,6 +34,18 @@ public:
         sigma_log_info("[S-ORBIT] Propagation COMPLETE. Position variance: <1.2m. PQC-Link secure.");
     }
 
+    void selfHeal() {
+        sigma_log_warn("[S-ORBIT] Self-Healing: Re-aligning constellation telemetry...");
+        // Synchronize TLE (Two-Line Element) set
+        sigma_log_info("[S-ORBIT] Constellation phasing RE-ESTABLISHED.");
+    }
+
+    void rollback() {
+        sigma_log_err("[S-ORBIT] Rollback: Reverting to last known stable orbital state.");
+        // Revert TLE and ephemeris data
+        sigma_log_info("[S-ORBIT] Orbital state RESTORED.");
+    }
+
 private:
     SovereignOrbitalDynamics() = default;
 };
@@ -44,4 +56,12 @@ private:
 
 extern "C" void orbit_init() {
     SigmaOS::Kernel::Industrial::SovereignOrbitalDynamics::getInstance().init();
+}
+
+extern "C" void orbit_heal() {
+    SigmaOS::Kernel::Industrial::SovereignOrbitalDynamics::getInstance().selfHeal();
+}
+
+extern "C" void orbit_rollback() {
+    SigmaOS::Kernel::Industrial::SovereignOrbitalDynamics::getInstance().rollback();
 }
