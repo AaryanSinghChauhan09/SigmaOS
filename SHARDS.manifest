@@ -18,6 +18,7 @@ kernel/core/hal/SovereignPCI.cpp
 kernel/core/hal/SovereignACPI.cpp
 kernel/core/hal/SovereignPager.cpp
 kernel/core/hal/SovereignEntropy.cpp
+kernel/core/hal/SovereignWiFiTranspiler.cpp
 # LAYER 1: KERNEL CORE (IPC, SCHEDULER, MEMORY)
 # Headers (zero-STL, kernel-safe)
 include/ipc/SovereignEventBus.h
