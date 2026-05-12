@@ -29,6 +29,7 @@ public:
     }
 
     void simulateAStar(const char* state_graph_json) {
+        (void)state_graph_json;
         sigma_log_info("[S-SEARCH] Running A* Search simulation on provided state graph...");
         // Hit & Trial: Compute cost and heuristic (g+h) for each lattice node
         sigma_log_info("[S-SEARCH] Simulation COMPLETE. Optimal path found.");

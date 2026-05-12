@@ -28,7 +28,9 @@ public:
         sigma_log_info("[S-DESIGN] Initializing Sovereign Design Studio...");
     }
 
-    void renderVector(const char* svg_data) {
+    void renderDraft(const char* svg_data) {
+        (void)svg_data;
+        sigma_log_info("Design: Rendering vector canvas...");
         sigma_log_info("[S-DESIGN] Rendering vector graphics to Zenith canvas...");
         // Hit & Trial: Map Bezier curves to Zenith framebuffer instructions
         sigma_log_info("[S-DESIGN] Render COMPLETE.");

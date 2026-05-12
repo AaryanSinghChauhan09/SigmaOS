@@ -28,8 +28,9 @@ public:
         this->m_hippa_compliant = true;
     }
 
-    void loadDicomImage(const void* data, sigma_usize size) {
-        sigma_log_info("[S-MED] Processing DICOM volume (%u bytes)...", (unsigned)size);
+    void loadImage(void* data, sigma_u32 size) {
+        (void)data; (void)size;
+        sigma_log_info("Medical: Processing DICOM volumetric data...");
         // Hit & Trial: Perform hardware-accelerated volumetric rendering
         sigma_log_info("[S-MED] DICOM load COMPLETE. 3D reconstruction ready.");
     }

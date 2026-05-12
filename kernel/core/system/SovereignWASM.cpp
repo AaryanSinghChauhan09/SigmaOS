@@ -30,6 +30,11 @@ public:
         sigma_log_info("[S-WASM] Initializing Sovereign WASM Runtime (JIT-Native)...");
     }
 
+    void executeBytecode(void* bytecode, sigma_u32 size) {
+        (void)bytecode; (void)size;
+        sigma_log_info("WASM: Spawning isolated execution pod...");
+    }
+
     void loadModule(const void* bytecode, sigma_usize size) {
         sigma_log_info("[S-WASM] Loading WASM module (Size: %u bytes)...", (unsigned)size);
         // Hit & Trial: Validate WASM header and magic bits

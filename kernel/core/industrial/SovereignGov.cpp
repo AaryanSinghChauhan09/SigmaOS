@@ -28,6 +28,11 @@ public:
         sigma_log_info("[S-GOV] Initializing Sovereign Governance Nexus...");
     }
 
+    void auditPolicy(const char* policy_hash) {
+        (void)policy_hash;
+        sigma_log_info("Gov: Auditing regulatory compliance...");
+    }
+
     void attestPolicy(const char* policy_hash) {
         sigma_log_info("[S-GOV] Attesting policy draft with Sovereign Registry...");
         // Hit & Trial: Perform hardware-attestation via SovereignTPM

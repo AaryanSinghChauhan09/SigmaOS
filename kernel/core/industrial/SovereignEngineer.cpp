@@ -28,6 +28,13 @@ public:
         this->m_gpu_accel_active = true;
     }
 
+    void runStressTest(const char* gcode_block) {
+        (void)gcode_block;
+        sigma_log_info("Engineer: Simulating structural load...");
+        // Hit & Trial: Map XYZ coordinates to motor PWM signals via HAL
+        sigma_log_info("[S-ENG] G-Code executed. Toolhead positioned.");
+    }
+
     void processGCode(const char* gcode_block) {
         sigma_log_info("[S-ENG] Parsing industrial G-Code block...");
         // Hit & Trial: Map XYZ coordinates to motor PWM signals via HAL

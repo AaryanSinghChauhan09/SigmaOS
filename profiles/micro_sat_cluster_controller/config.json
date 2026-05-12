@@ -1,0 +1,26 @@
+{
+    "profession": "micro_sat_cluster_controller",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "micro-sat_cluster_controller_workspace",
+        "specialized_analytics",
+        "compliance_manager"
+    ],
+    "rules": [
+        "Industry standards",
+        "professional ethics"
+    ],
+    "calculators": [
+        "Efficiency metrics",
+        "cost analysis"
+    ],
+    "algorithms": [
+        "Workflow optimization",
+        "adaptive assistance"
+    ],
+    "automation": {
+        "self_healing": "Continuous health check for Micro-Sat Cluster Controller tools",
+        "rollback": "Automatic state snapshots"
+    }
+}

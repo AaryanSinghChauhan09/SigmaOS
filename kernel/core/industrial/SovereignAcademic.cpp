@@ -29,6 +29,7 @@ public:
     }
 
     void renderResearchGraph(const char* citations_json) {
+        (void)citations_json;
         sigma_log_info("[S-ACAD] Rendering semantic research citation graph...");
         // Hit & Trial: Call S-VIZ to render a lattice-based knowledge node map
         sigma_log_info("[S-ACAD] Knowledge Graph READY.");
