@@ -5,6 +5,11 @@
 
 # ═══════════════════════════════════════════════════════════════════════
 # LAYER 0: HAL & BOOT
+kernel/core/boot/bootloader_shard.cpp
+kernel/core/boot/SovereignInit.cpp
+kernel/core/boot/SovereignInstaller.cpp
+kernel/core/boot/SovereignRecover.cpp
+kernel/core/boot/SovereignLiveBoot.cpp
 kernel/core/hal/SovereignHAL.cpp
 kernel/core/hal/SovereignPMM.cpp
 kernel/core/hal/SovereignVMM.cpp

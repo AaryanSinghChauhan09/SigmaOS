@@ -45,3 +45,7 @@ void zenith_theme_load_industrial(const char* shard_name) {
 zenith_theme_spec_t* zenith_theme_get_current() {
     return &current_spec;
 }
+void personalization_sync_ui(const char* profile_name) {
+    sigma_log_info("[THEME] Synchronizing UI with kernel profile: %s", profile_name);
+    zenith_theme_load_industrial(profile_name);
+}

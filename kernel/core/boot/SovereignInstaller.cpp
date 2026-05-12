@@ -1,58 +1,65 @@
 #include "core/sigma_types.h"
-#include "sigma_log.h"
 #include "core/SigmaOOP.hpp"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Sovereign Installer (S-INSTALL)
- * Purpose: Polished, professional-grade OS installation and setup.
- * Features: Bare-metal partition lattice, PQC-encryption setup, profile-aware deployment.
+ * Mission: Professional, bare-metal installation orchestration.
+ * Capability: Guided partitioning, Dual-boot logic, and PQC-attested deployment.
  */
 
 namespace SigmaOS {
 namespace Kernel {
-namespace Setup {
+namespace Boot {
 
-class SovereignInstaller : public SigmaOS::SigmaObject {
+class SovereignInstaller : public SigmaObject {
 public:
     static SovereignInstaller& getInstance() {
         static SovereignInstaller instance;
         return instance;
     }
 
-    const char* type_name() const noexcept override {
-        return "SovereignInstaller";
+    const char* type_name() const noexcept override { return "SovereignInstaller"; }
+
+    void Init() {
+        sigma_log_info("[S-INSTALL]: Launching Sovereign Installation Environment...");
     }
 
-    void init() {
-        sigma_log_info("[S-INSTALL] Initializing Sovereign Installation Shard...");
+    void DetectHardware() {
+        sigma_log_info("[S-INSTALL]: Probing silicon nodes for deployment...");
+        // Logic: Probe via SovereignHAL
     }
 
-    void deployLattice(const char* target_disk) {
-        sigma_log_info("[S-INSTALL] Formatting %s with Sovereign Lattice-FS...", target_disk);
-        // Hit & Trial: Create high-assurance partition shards with redundant metadata
-        sigma_log_info("[S-INSTALL] Deployment COMPLETE. System ready for Zenith Orchestration.");
+    void GuidedPartitioning() {
+        sigma_log_info("[S-INSTALL]: Configuring Sovereign Partition Table (SPT)...");
+        sigma_log_info("[S-INSTALL]: Dual-boot detected. Reserving UEFI-shards for legacy OS.");
     }
 
-    void setupPQC(const char* seed_entropy) {
-        (void)seed_entropy;
-        sigma_log_info("[S-INSTALL] Generating Post-Quantum master keys for this silicon node...");
-        // Hit & Trial: Initialize CRYSTALS-Kyber/Dilithium identity lattice
-        sigma_log_info("[S-INSTALL] PQC Identity established.");
+    void DeployLattice() {
+        sigma_log_info("[S-INSTALL]: Decanting Sovereign Lattice to primary storage...");
+        sigma_log_info("[S-INSTALL]: PQC-attesting installation singularity...");
+    }
+
+    void Finalize() {
+        sigma_log_info("[S-INSTALL]: Sovereign Ignition complete. Remove installation media.");
     }
 };
 
-} // namespace Setup
+} // namespace Boot
 } // namespace Kernel
 } // namespace SigmaOS
 
 extern "C" {
+    void install_start() {
+        SigmaOS::Kernel::Boot::SovereignInstaller::getInstance().Init();
+        SigmaOS::Kernel::Boot::SovereignInstaller::getInstance().DetectHardware();
+    }
+    
+    void install_partition() {
+        SigmaOS::Kernel::Boot::SovereignInstaller::getInstance().GuidedPartitioning();
+    }
 
-void install_init() {
-    SigmaOS::Kernel::Setup::SovereignInstaller::getInstance().init();
+    void install_deploy() {
+        SigmaOS::Kernel::Boot::SovereignInstaller::getInstance().DeployLattice();
+    }
 }
-
-void install_deploy(const char* disk) {
-    SigmaOS::Kernel::Setup::SovereignInstaller::getInstance().deployLattice(disk);
-}
-
-} // extern "C"

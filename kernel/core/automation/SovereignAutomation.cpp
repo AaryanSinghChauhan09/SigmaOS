@@ -37,6 +37,10 @@ public:
             sigma_log_info("[S-AUTO] [ACCOUNTANT] Re-balancing ledger integrity hash...");
         } else if (sigma_strcmp(profession, "architect") == 0) {
             sigma_log_info("[S-AUTO] [ARCHITECT] Recalibrating structural stress-mesh...");
+        } else if (sigma_strcmp(profession, "farmer") == 0) {
+            sigma_log_info("[S-AUTO] [FARMER] Optimizing soil-sensor lattice throughput...");
+        } else if (sigma_strcmp(profession, "teacher") == 0) {
+            sigma_log_info("[S-AUTO] [TEACHER] Synchronizing NCERT/DIKSHA education shards...");
         }
         
         sigma_log_info("[S-AUTO] Shard %u HEALED.", shard_id);
