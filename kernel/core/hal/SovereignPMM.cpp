@@ -47,4 +47,8 @@ void sovereignpmm_init() {
     SigmaOS::Kernel::HAL::SovereignPMM::getInstance().init();
 }
 
+void sovereignpmm_compact() {
+    SigmaOS::Kernel::HAL::SovereignPMM::getInstance().performCompaction();
+}
+
 } // extern "C"
