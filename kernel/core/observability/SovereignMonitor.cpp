@@ -1,10 +1,10 @@
-#include "core/sigma_types.h"
-#include "hal/sigma_hal.h"
-#include "sigma_log.h"
-#include "observability/sigma_monitor.h"
-#include "core/SigmaOOP.hpp"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/observability/sigma_monitor.h"
+#include "../../../include/core/SigmaOOP.hpp"
 
-void telemetry_execute_ebpf(const void* bytecode, sigma_usize size);
+extern "C" void telemetry_execute_ebpf(const void* bytecode, sigma_usize size);
 
 namespace SigmaOS {
 namespace Kernel {
@@ -52,10 +52,8 @@ void SovereignObservabilityMonitor::rebalanceLattice() {
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" {
-
 /* --- C Bridge (all use getInstance()) --- */
-void monitor_init() {
+extern "C" void monitor_init() {
     SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().init();
 }
 
@@ -63,13 +61,10 @@ extern "C" sigma_system_load_t monitor_get_load_matrix() {
     return SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().getLoadMatrix();
 }
 
-void monitor_execute_ebpf(const void* bytecode, sigma_usize size) {
+extern "C" void monitor_execute_ebpf(const void* bytecode, sigma_usize size) {
     SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().executeEbpfProgram(bytecode, size);
 }
 
-void monitor_rebalance_lattice() {
+extern "C" void monitor_rebalance_lattice() {
     SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().rebalanceLattice();
 }
-
-} // extern "C"
- 

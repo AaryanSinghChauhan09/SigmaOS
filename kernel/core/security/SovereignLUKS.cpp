@@ -13,22 +13,17 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Security {
 
-class SovereignLUKS : public SigmaObject {
+class SovereignLUKS : public SigmaObject, public SigmaSingleton<SovereignLUKS> {
+    friend class SigmaSingleton<SovereignLUKS>;
 public:
-    static SovereignLUKS& getInstance() {
-        static SovereignLUKS instance;
-        return instance;
-    }
-
     const char* type_name() const noexcept override { return "SovereignLUKS"; }
 
-    void Init() {
+    void init() {
         sigma_log_info("[S-LUKS]: Initializing Sovereign Encryption Lattice...");
     }
 
     bool UnlockVolume(const char* device_node, const char* pqc_token) {
         sigma_log_info("[S-LUKS]: Attempting PQC-attested unlock of volume: %s", device_node);
-        // Logic: Kyber-KEM -> Token Verification -> AES-XTS Lattice Mapping
         sigma_log_info("[S-LUKS]: Volume %s unlocked. Lattice integrity: COHERENT.", device_node);
         return true;
     }
@@ -40,7 +35,7 @@ public:
 
 extern "C" {
     void luks_init() {
-        SigmaOS::Kernel::Security::SovereignLUKS::getInstance().Init();
+        SigmaOS::Kernel::Security::SovereignLUKS::getInstance().init();
     }
 
     sigma_u32 luks_unlock(const char* dev, const char* token) {

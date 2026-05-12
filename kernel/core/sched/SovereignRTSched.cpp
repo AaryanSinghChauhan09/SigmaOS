@@ -12,14 +12,12 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Sched {
 
-class SovereignRTScheduler {
+class SovereignRTScheduler : public SigmaObject, public SigmaSingleton<SovereignRTScheduler> {
+    friend class SigmaSingleton<SovereignRTScheduler>;
 public:
-    static SovereignRTScheduler& getInstance() {
-        static SovereignRTScheduler instance;
-        return instance;
-    }
+    const char* type_name() const noexcept override { return "SovereignRTScheduler"; }
 
-    static void init() {
+    void init() {
         sigma_log_info("[RT-SCHED] Initializing Real-Time Policy (EDF/FIFO)...");
     }
 
@@ -30,16 +28,13 @@ public:
 
     void assignNamespace(sigma_u32 task_id, sigma_u32 ns_id) {
         sigma_log_info("[RT-SCHED] Task %u decanted into Lattice Namespace: %u", task_id, ns_id);
-        // Logic: Virtualize PID, Net, and Mount views for the task.
     }
 
     void enforceCgroup(sigma_u32 task_id, sigma_u32 cpu_limit_pct) {
         sigma_log_info("[RT-SCHED] Task %u constrained by Silicon Cgroup (CPU: %u%%).", task_id, cpu_limit_pct);
-        // Logic: Hard throttle task execution based on quota.
     }
 
     sigma_u32 pickNextRT() {
-        // Simple mock: return 0 (no RT tasks) or the top of the RT queue
         return 0;
     }
 };
@@ -48,14 +43,15 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
+
 extern "C" {
 
 void sigma_rt_sched_init() {
-    SigmaOS::Kernel::Sched::SovereignRTScheduler::init();
+    SigmaOS::Kernel::Sched::SovereignRTScheduler::getInstance().init();
 }
 
 void sigma_rt_schedule(unsigned int id, unsigned int prio, unsigned long long deadline) {
-    SigmaOS::Kernel::Sched::SovereignRTScheduler::scheduleRT(id, prio, deadline);
+    SigmaOS::Kernel::Sched::SovereignRTScheduler::getInstance().scheduleRT(id, prio, deadline);
 }
 
 

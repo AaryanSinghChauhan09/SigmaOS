@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "core/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 #include "sigma_log.h"
 #include "core/SigmaOOP.hpp"
 
@@ -48,3 +48,4 @@ void partition_manager_scan() {
 
 
 } // extern "C"
+

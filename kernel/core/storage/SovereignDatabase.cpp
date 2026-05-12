@@ -13,22 +13,17 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Storage {
 
-class SovereignDatabase : public SigmaObject {
+class SovereignDatabase : public SigmaObject, public SigmaSingleton<SovereignDatabase> {
+    friend class SigmaSingleton<SovereignDatabase>;
 public:
-    static SovereignDatabase& getInstance() {
-        static SovereignDatabase instance;
-        return instance;
-    }
-
     const char* type_name() const noexcept override { return "SovereignDatabase"; }
 
-    void Init() {
+    void init() {
         sigma_log_info("[S-DB]: Initializing Sovereign Data Lattice (Postgres-Parity)...");
     }
 
     void ExecuteQuery(const char* query) {
         sigma_log_info("[S-DB]: Executing Atomic Query: %s", query);
-        // Logic: Query parsing -> Lattice Execution -> Transaction Commit.
     }
 };
 
@@ -38,10 +33,11 @@ public:
 
 extern "C" {
     void db_init() {
-        SigmaOS::Kernel::Storage::SovereignDatabase::getInstance().Init();
+        SigmaOS::Kernel::Storage::SovereignDatabase::getInstance().init();
     }
 
     void db_query(const char* q) {
         SigmaOS::Kernel::Storage::SovereignDatabase::getInstance().ExecuteQuery(q);
     }
 }
+

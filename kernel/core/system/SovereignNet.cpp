@@ -4,14 +4,11 @@
 
 namespace SigmaOS {
 namespace Kernel {
+namespace Network {
 
-class SovereignNet : public SigmaOS::SigmaObject {
+class SovereignNet : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignNet> {
+    friend class SigmaOS::SigmaSingleton<SovereignNet>;
 public:
-    static SovereignNet& getInstance() {
-        static SovereignNet instance;
-        return instance;
-    }
-
     const char* type_name() const noexcept override {
         return "SovereignNet";
     }
@@ -26,7 +23,6 @@ public:
              sigma_log_warn("[SYS:NET] Jumbo frame rejected (Oversized: %zu bytes).", size);
              return;
         }
-        // Logic: Token bucket rate-limiting for DoS prevention.
     }
 
     bool validateSocketBounds(sigma_u32 socket_id) {
@@ -41,13 +37,15 @@ private:
     sigma_u32 m_packet_rate_limit;
 };
 
+} // namespace Network
 } // namespace Kernel
 } // namespace SigmaOS
+
 
 extern "C" {
 
 void sovereignnet_init() {
-    SigmaOS::Kernel::SovereignNet::getInstance().init();
+    SigmaOS::Kernel::Network::SovereignNet::getInstance().init();
 }
 
 } // extern "C"

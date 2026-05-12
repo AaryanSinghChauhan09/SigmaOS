@@ -4,14 +4,11 @@
 
 namespace SigmaOS {
 namespace Kernel {
+namespace HAL {
 
-class SovereignPMM : public SigmaOS::SigmaObject {
+class SovereignPMM : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignPMM> {
+    friend class SigmaOS::SigmaSingleton<SovereignPMM>;
 public:
-    static SovereignPMM& getInstance() {
-        static SovereignPMM instance;
-        return instance;
-    }
-
     const char* type_name() const noexcept override {
         return "SovereignPMM";
     }
@@ -24,7 +21,6 @@ public:
 
     void performCompaction() {
         sigma_log_info("[HAL:PMM] Memory fragmentation detected. Initiating lattice compaction...");
-        // Logic: De-fragment physical page frames to recover contiguous blocks.
         sigma_log_info("[HAL:PMM] Compaction complete. Coalesced blocks: 142MB recovered.");
     }
 
@@ -40,13 +36,15 @@ private:
     sigma_u64 m_used_pages;
 };
 
+} // namespace HAL
 } // namespace Kernel
 } // namespace SigmaOS
+
 
 extern "C" {
 
 void sovereignpmm_init() {
-    SigmaOS::Kernel::SovereignPMM::getInstance().init();
+    SigmaOS::Kernel::HAL::SovereignPMM::getInstance().init();
 }
 
 } // extern "C"

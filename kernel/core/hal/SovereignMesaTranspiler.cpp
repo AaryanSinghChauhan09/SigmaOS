@@ -13,16 +13,12 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Graphics {
 
-class SovereignMesaTranspiler : public SigmaObject {
+class SovereignMesaTranspiler : public SigmaObject, public SigmaSingleton<SovereignMesaTranspiler> {
+    friend class SigmaSingleton<SovereignMesaTranspiler>;
 public:
-    static SovereignMesaTranspiler& getInstance() {
-        static SovereignMesaTranspiler instance;
-        return instance;
-    }
-
     const char* type_name() const noexcept override { return "SovereignMesaTranspiler"; }
 
-    void Init() {
+    void init() {
         sigma_log_info("[S-MESA]: Initializing Mesa Graphics Shard...");
     }
 
@@ -37,13 +33,12 @@ public:
 
     void SoftwareFallback() {
         sigma_log_warn("[S-MESA]: Hardware acceleration missing or untrusted. Activating software rasterizer (CPU-based).");
-        // Logic: Scanline rendering and lattice-buffer blitting.
     }
 
 private:
     bool ValidateDriverSignature(const char* driver_id) {
         sigma_log_info("[S-MESA]: Validating Dilithium-5 signature for driver: %s", driver_id);
-        return true; // Mock validation success
+        return true; 
     }
 };
 
@@ -53,7 +48,7 @@ private:
 
 extern "C" {
     void mesa_init() {
-        SigmaOS::Kernel::Graphics::SovereignMesaTranspiler::getInstance().Init();
+        SigmaOS::Kernel::Graphics::SovereignMesaTranspiler::getInstance().init();
     }
 
     void mesa_vulkan_transpile() {

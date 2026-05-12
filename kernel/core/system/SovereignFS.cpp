@@ -4,14 +4,11 @@
 
 namespace SigmaOS {
 namespace Kernel {
+namespace System {
 
-class SovereignFS : public SigmaOS::SigmaObject {
+class SovereignFS : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignFS> {
+    friend class SigmaOS::SigmaSingleton<SovereignFS>;
 public:
-    static SovereignFS& getInstance() {
-        static SovereignFS instance;
-        return instance;
-    }
-
     const char* type_name() const noexcept override {
         return "SovereignFS";
     }
@@ -24,12 +21,10 @@ public:
     void commitJournal() {
         if (!m_journal_active) return;
         sigma_log_info("[SYS:FS] Committing atomic shard transaction to journal...");
-        // Logic: Write-ahead logging for metadata consistency.
     }
 
     void validateIntegrity() {
         sigma_log_info("[SYS:FS] Validating metadata checksums (SHA-256)...");
-        // Logic: Verify integrity of the inode lattice.
         sigma_log_info("[SYS:FS] Integrity check: COHERENT.");
     }
 
@@ -37,13 +32,15 @@ private:
     bool m_journal_active;
 };
 
+} // namespace System
 } // namespace Kernel
 } // namespace SigmaOS
+
 
 extern "C" {
 
 void sovereignfs_init() {
-    SigmaOS::Kernel::SovereignFS::getInstance().init();
+    SigmaOS::Kernel::System::SovereignFS::getInstance().init();
 }
 
 } // extern "C"

@@ -2,6 +2,7 @@
 #define SIGMA_HAL_H
 
 #include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 #ifdef __cplusplus
 namespace SigmaOS {
@@ -23,12 +24,10 @@ struct DeviceDescriptor {
     sigma_u32 device_id;
 };
 
-class SovereignHAL {
+class SovereignHAL : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignHAL> {
+    friend class SigmaOS::SigmaSingleton<SovereignHAL>;
 public:
-    static SovereignHAL& getInstance() {
-        static SovereignHAL instance;
-        return instance;
-    }
+    const char* type_name() const noexcept override { return "SovereignHAL"; }
 
     void init();
     void probeBus();

@@ -7,13 +7,13 @@
  * =========================================================================
  */
 
-#include "core/sigma_types.h"
-#include "hal/sigma_hal.h"
-#include "core/sigma_kernel_types.h"
-#include "libc/SovereignLibC.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/core/sigma_kernel_types.h"
+#include "../../../include/libc/SovereignLibC.h"
 #include "core/SigmaOOP.hpp"
 #include "sigma_log.h"
-#include "security/SovereignQKD.hpp"
+#include "../../../include/security/SovereignQKD.hpp"
 
 /**
  * SovereignOrbManager â€" Sovereign Orb Package Ecosystem
@@ -164,3 +164,5 @@ void orb_list() {
 
 
 } // extern "C"
+
+
