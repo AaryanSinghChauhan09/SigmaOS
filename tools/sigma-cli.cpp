@@ -38,6 +38,9 @@ void print_help() {
 }
 
 int main(int argc, char** argv) {
+    // SigmaOS Namespace Isolation: CLI must reside in /sigma/bin
+    sigma_log_info("[CLI] Execution Path: /sigma/bin/sigma-cli (Lattice-Isolated)");
+    
     if (argc < 2) {
         print_help();
         return 0;

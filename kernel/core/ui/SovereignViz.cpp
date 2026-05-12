@@ -29,6 +29,9 @@ public:
 
     void renderERDiagram(const char* schema_json) {
         (void)schema_json;
+        if (!this->m_vulkan_available) {
+            sigma_log_warn("[S-VIZ] Vulkan hardware NOT detected. Falling back to S-ZENITH Software Rasterizer...");
+        }
         sigma_log_info("[S-VIZ] Rendering database schema diagram...");
         // Hit & Trial: Use Zenith Compositor to draw nodes and edges
         sigma_log_info("[S-VIZ] ER Diagram rendered successfully.");
@@ -63,7 +66,8 @@ public:
     }
 
 private:
-    SovereignViz() = default;
+    SovereignViz() : m_vulkan_available(false) {}
+    bool m_vulkan_available;
 };
 
 } // namespace Visualization

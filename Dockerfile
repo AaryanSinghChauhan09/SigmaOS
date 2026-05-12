@@ -1,28 +1,30 @@
-# SigmaOS Sovereign Native Toolchain Build Environment
-# Enables cross-platform compilation of the C11/Assembly Lattice
+# SigmaOS Industrial Build Environment (Zenith v15.0)
+FROM ubuntu:24.04
 
-FROM ubuntu:22.04
-
-ENV DEBIAN_FRONTEND=noninteractive
-
+# Install Industrial Toolchain
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    gcc-x86-64-linux-gnu \
+    clang-18 \
+    lld-18 \
+    llvm-18 \
     nasm \
     make \
-    python3 \
-    git \
-    clang-tidy \
-    cppcheck \
+    cmake \
+    nodejs \
+    npm \
     qemu-system-x86 \
-    valgrind \
-    linux-tools-common \
-    linux-tools-generic \
-    rustc \
-    cargo \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /sigmaos
+# Set Clang 18 as default compiler
+RUN ln -s /usr/bin/clang-18 /usr/bin/clang++ && \
+    ln -s /usr/bin/clang-18 /usr/bin/clang
 
-# Command to build the OS
+# Workspace Configuration
+WORKDIR /sigmaos
+COPY . .
+
+# Generate Professional Shards
+RUN node populate_profiles.cjs
+
+# Build System Baseline
 CMD ["make", "all"]
