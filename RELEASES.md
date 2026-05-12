@@ -19,6 +19,7 @@ This document tracks the official industrial artifacts for SigmaOS.
 | `sigma-pkg` | v2.1.0 | Package Manager (Zero-Dependency) |
 | `sigma-cc` | v1.4.2 | Sovereign C Compiler (Lattice-Native) |
 | `s-cli` | v0.9.0 | Project Management CLI |
+| `s-mind` | v1.0.0 | Sovereign Lattice Mapper (Mind Map) |
 
 ### 📜 Checksums (SHA-512)
 - `sigmaos-v15-desktop.iso`: `8a1826...`

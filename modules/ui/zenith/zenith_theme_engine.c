@@ -31,6 +31,14 @@ void zenith_theme_load_industrial(const char* shard_name) {
         current_spec.accent = (zenith_color_t){255, 215, 0, 255}; // Gold
         current_spec.background = (zenith_color_t){10, 10, 20, 255}; // Deep Navy
         current_spec.glass_alpha = 180;
+    } else if (sigma_strcmp(shard_name, "Cyber") == 0) {
+        current_spec.accent = (zenith_color_t){0, 255, 255, 255}; // Neon Cyan
+        current_spec.background = (zenith_color_t){5, 5, 5, 255}; // OLED Black
+        current_spec.glass_alpha = 120;
+    } else if (sigma_strcmp(shard_name, "Space") == 0) {
+        current_spec.accent = (zenith_color_t){200, 100, 255, 255}; // Cosmic Purple
+        current_spec.background = (zenith_color_t){2, 0, 15, 255}; // Deep Space
+        current_spec.glass_alpha = 200;
     } else {
         // Default Sovereign Dark
         current_spec.accent = (zenith_color_t){0, 120, 215, 255};
