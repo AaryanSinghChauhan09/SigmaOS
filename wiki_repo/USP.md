@@ -1,4 +1,6 @@
+
 # SigmaOS: The Sovereign USP (Unique Selling Points)
+
 
 SigmaOS is not a generic operating system. It is a **Profession-Aware Industrial Lattice** designed for high-assurance specialized workflows.
 

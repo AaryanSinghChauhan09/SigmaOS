@@ -7,21 +7,21 @@
 | actuary | risk-modeling_lattice, mortality-table_engine, solvency-check_nexus, monte-carlo-sim | Data consistency verification, model-drift detection |
 | aerospace_engineer | aerospace_engineer_workspace, specialized_analytics, compliance_manager | Continuous health check for Aerospace Engineer tools |
 | agi_safety_researcher | alignment_monitor, semantic_drift_analyzer, reward_hacking_detector, sandbox-lattice | Automated kill-switch activation, sandbox containment verification |
-| agricultural_scientist | crop_modeling, iot_integration, compliance |  |
+| agricultural_scientist | crop_modeling, iot_integration, compliance | |
 | air_traffic_controller | radar-lattice, flight_path_predictor, collision_alert_nexus, comm-link_bridge | Redundant radar link verification, comms-failover automation |
 | ai_engineers | ai_engineers_workspace, specialized_analytics, compliance_manager | Continuous health check for AI Engineers tools |
-| ai_ml_scientist | model_training, dataset_management, gpu_orchestration |  |
-| ai_robotics_scientist | hardware_integration, simulation, ai_orchestration |  |
+| ai_ml_scientist | model_training, dataset_management, gpu_orchestration | |
+| ai_robotics_scientist | hardware_integration, simulation, ai_orchestration | |
 | ai_trainer | ai_trainer_workspace, specialized_analytics, compliance_manager | Continuous health check for AI Trainer tools |
 | algorithmic_bias_auditor | algorithmic_bias_auditor_workspace, specialized_analytics, compliance_manager | Continuous health check for Algorithmic Bias Auditor tools |
 | animator | animator_workspace, specialized_analytics, compliance_manager | Continuous health check for Animator tools |
-| anthropologist | survey_tools, cultural_data_visualization |  |
+| anthropologist | survey_tools, cultural_data_visualization | |
 | aquaculture_manager | aquaculture_manager_workspace, specialized_analytics, compliance_manager | Continuous health check for Aquaculture Manager tools |
 | aquaponics_specialist | aquaponics_specialist_workspace, specialized_analytics, compliance_manager | Continuous health check for Aquaponics Specialist tools |
-| archaeologist | artifact_cataloging, gis_mapping, compliance |  |
+| archaeologist | artifact_cataloging, gis_mapping, compliance | |
 | architect | bim_software, 3d_modeling, site_analysis_tools, rendering_engines, gis_mapping | BIM model consistency check, asset link validation |
 | archivist | archivist_workspace, specialized_analytics, compliance_manager | Continuous health check for Archivist tools |
-| artist | creative_suite_(drawing, design, video_editing), portfolio_manager, media_export_tools |  |
+| artist | creative_suite_(drawing, design, video_editing), portfolio_manager, media_export_tools | |
 | ar_vr_content_developer | ar-vr_content_developer_workspace, specialized_analytics, compliance_manager | Continuous health check for AR-VR Content Developer tools |
 | ar_vr_developer | ar/vr_developer_workspace, specialized_analytics, compliance_manager | Continuous health check for AR/VR Developer tools |
 | asteroid_miner | spectroscopic_analyzer, drill-bit_thermal_monitor, low-gravity_navigation, ore-density_mapper | Thruster-link verification, drill-head cooling sync |
@@ -30,7 +30,7 @@
 | astrobiologist | astrobiologist_workspace, specialized_analytics, compliance_manager | Continuous health check for Astrobiologist tools |
 | astronaut | astronaut_workspace, specialized_analytics, compliance_manager | Continuous health check for Astronaut tools |
 | astronomer | astronomer_workspace, specialized_analytics, compliance_manager | Continuous health check for Astronomer tools |
-| athlete_coach | training_planner, performance_analytics, health_monitoring |  |
+| athlete_coach | training_planner, performance_analytics, health_monitoring | |
 | atmospheric_water_harvester | atmospheric_water_harvester_workspace, specialized_analytics, compliance_manager | Continuous health check for Atmospheric Water Harvester tools |
 | audio_engineer | audio_engineer_workspace, specialized_analytics, compliance_manager | Continuous health check for Audio Engineer tools |
 | auditor | auditor_workspace, specialized_analytics, compliance_manager | Continuous health check for Auditor tools |
@@ -42,7 +42,7 @@
 | autonomous_swarm_choreographer | autonomous_swarm_choreographer_workspace, specialized_analytics, compliance_manager | Continuous health check for Autonomous Swarm Choreographer tools |
 | autonomous_vehicle_safety_engineer | autonomous_vehicle_safety_engineer_workspace, specialized_analytics, compliance_manager | Continuous health check for Autonomous Vehicle Safety Engineer tools |
 | ballistics_expert | ballistics_expert_workspace, specialized_analytics, compliance_manager | Continuous health check for Ballistics Expert tools |
-| banker | loan_management, compliance, transaction_dashboards |  |
+| banker | loan_management, compliance, transaction_dashboards | |
 | battery_storage_system_architect | battery-storage_system_architect_workspace, specialized_analytics, compliance_manager | Continuous health check for Battery-Storage System Architect tools |
 | behavioral_economist | behavioral_economist_workspace, specialized_analytics, compliance_manager | Continuous health check for Behavioral Economist tools |
 | biodiversity_restoration_ecologist | biodiversity_restoration_ecologist_workspace, specialized_analytics, compliance_manager | Continuous health check for Biodiversity Restoration Ecologist tools |
@@ -50,7 +50,7 @@
 | bionic_limb_prosthetist | bionic_limb_prosthetist_workspace, specialized_analytics, compliance_manager | Continuous health check for Bionic Limb Prosthetist tools |
 | biotechnologist | biotechnologist_workspace, specialized_analytics, compliance_manager | Continuous health check for Biotechnologist tools |
 | biotech_research_scientist | biotech_research_scientist_workspace, specialized_analytics, compliance_manager | Continuous health check for Biotech Research Scientist tools |
-| biotech_scientist | lab_management, dna_analysis, compliance |  |
+| biotech_scientist | lab_management, dna_analysis, compliance | |
 | bio_ethicist | genetic-modification_auditor, bio-risk_modeler, ethical-compliance_dashboard, crispr-log-lattice | Compliance-log integrity check, ethical-seal verification |
 | bio_fabrication_facility_operator | bio-fabrication_facility_operator_workspace, specialized_analytics, compliance_manager | Continuous health check for Bio-Fabrication Facility Operator tools |
 | bio_informatics_software_engineer | bio-informatics_software_engineer_workspace, specialized_analytics, compliance_manager | Continuous health check for Bio-Informatics Software Engineer tools |
@@ -69,10 +69,10 @@
 | carbon_sequestration_auditor | carbon_sequestration_auditor_workspace, specialized_analytics, compliance_manager | Continuous health check for Carbon Sequestration Auditor tools |
 | carbon_sequestration_engineer | ccs-nexus, geological-storage-lattice, plume-migration-monitor | Well-integrity verification, plume-sensor-sync |
 | carpenter | carpenter_workspace, specialized_analytics, compliance_manager | Continuous health check for Carpenter tools |
-| cashier | pos_interface, barcode_scanner_integration, receipt_printing, inventory_sync, daily_reconciliation |  |
+| cashier | pos_interface, barcode_scanner_integration, receipt_printing, inventory_sync, daily_reconciliation | |
 | cbdc_developer | cbdc_developer_workspace, specialized_analytics, compliance_manager | Continuous health check for CBDC Developer tools |
 | chartered_accountant | tally-lattice, gst-nexus, income_tax_auditor, balance-sheet-lattice, audit-trail-engine | Tally-data-integrity scan, GST-reconciliation verification |
-| chef | recipe_management, supply_chain_integration, scheduling, nutritional_analysis |  |
+| chef | recipe_management, supply_chain_integration, scheduling, nutritional_analysis | |
 | chemical_engineer | chemical_engineer_workspace, specialized_analytics, compliance_manager | Continuous health check for Chemical Engineer tools |
 | chemist | chemist_workspace, specialized_analytics, compliance_manager | Continuous health check for Chemist tools |
 | cinematographer | cinematographer_workspace, specialized_analytics, compliance_manager | Continuous health check for Cinematographer tools |
@@ -89,7 +89,7 @@
 | compliance_auditor | compliance_auditor_workspace, specialized_analytics, compliance_manager | Continuous health check for Compliance Auditor tools |
 | compliance_officer | compliance_officer_workspace, specialized_analytics, compliance_manager | Continuous health check for Compliance Officer tools |
 | computational_linguist | computational_linguist_workspace, specialized_analytics, compliance_manager | Continuous health check for Computational Linguist tools |
-| construction_worker | project_scheduling, safety_compliance, equipment_tracking |  |
+| construction_worker | project_scheduling, safety_compliance, equipment_tracking | |
 | content_creator | content_creator_workspace, specialized_analytics, compliance_manager | Continuous health check for Content Creator tools |
 | coral_reef_restoration_specialist | coral_reef_restoration_specialist_workspace, specialized_analytics, compliance_manager | Continuous health check for Coral Reef Restoration Specialist tools |
 | crisis_negotiator | voice-stress_analyzer, semantic_sentiment_engine, hostage-link_bridge, secure-comms | Communication-link stability check, secure-line verification |
@@ -111,7 +111,7 @@
 | cyber_warfare_tactician | cyber-warfare_tactician_workspace, specialized_analytics, compliance_manager | Continuous health check for Cyber-Warfare Tactician tools |
 | cyborg_ethics_board_member | cyborg_ethics_board_member_workspace, specialized_analytics, compliance_manager | Continuous health check for Cyborg Ethics Board Member tools |
 | dark_matter_researcher | dark_matter_researcher_workspace, specialized_analytics, compliance_manager | Continuous health check for Dark Matter Researcher tools |
-| data_analyst | data_visualization, statistical_analysis, machine_learning_integration |  |
+| data_analyst | data_visualization, statistical_analysis, machine_learning_integration | |
 | data_engineer | data_engineer_workspace, specialized_analytics, compliance_manager | Continuous health check for Data Engineer tools |
 | data_privacy_compliance_officer | data_privacy_compliance_officer_workspace, specialized_analytics, compliance_manager | Continuous health check for Data Privacy Compliance Officer tools |
 | data_scientist | data_scientist_workspace, specialized_analytics, compliance_manager | Continuous health check for Data Scientist tools |
@@ -123,8 +123,8 @@
 | deep_sea_mining_coordinator | deep-sea_mining_coordinator_workspace, specialized_analytics, compliance_manager | Continuous health check for Deep-Sea Mining Coordinator tools |
 | deep_space_telescope_operator | deep_space_telescope_operator_workspace, specialized_analytics, compliance_manager | Continuous health check for Deep Space Telescope Operator tools |
 | defi_architect | liquidity-lattice, amm-simulator, yield-curve-nexus, flash-loan-auditor | Contract-state verification, liquidity-mesh sync |
-| dentist | dental_charting, x-ray_viewer, appointment_scheduler, medical_compliance |  |
-| designer | wireframing_tools, prototyping, accessibility_testing |  |
+| dentist | dental_charting, x-ray_viewer, appointment_scheduler, medical_compliance | |
+| designer | wireframing_tools, prototyping, accessibility_testing | |
 | detective | detective_workspace, specialized_analytics, compliance_manager | Continuous health check for Detective tools |
 | devops_engineer | devops_engineer_workspace, specialized_analytics, compliance_manager | Continuous health check for DevOps Engineer tools |
 | digital_archaeologist | data-carving_suite, legacy-system_emulator, bit-rot_detector, archival-lattice | Bit-rot correction, archival-sync verification |
@@ -150,9 +150,9 @@
 | emergency_dispatcher | emergency_dispatcher_workspace, specialized_analytics, compliance_manager | Continuous health check for Emergency Dispatcher tools |
 | emotional_intelligence_ai_trainer | emotional_intelligence_ai_trainer_workspace, specialized_analytics, compliance_manager | Continuous health check for Emotional Intelligence AI Trainer tools |
 | energy_analyst | energy_analyst_workspace, specialized_analytics, compliance_manager | Continuous health check for Energy Analyst tools |
-| energy_scientist | grid_modeling, sustainability_dashboards, compliance |  |
+| energy_scientist | grid_modeling, sustainability_dashboards, compliance | |
 | engineer | compilers, cad_tools, simulation_engines, project_management_dashboards, finite_element_analysis_(fea) | Simulation state verification, build-cache integrity check |
-| entrepreneur | business_planning, financial_dashboards, crm_tools |  |
+| entrepreneur | business_planning, financial_dashboards, crm_tools | |
 | environmental_scientist | environmental_scientist_workspace, specialized_analytics, compliance_manager | Continuous health check for Environmental Scientist tools |
 | eod_technician | eod_technician_workspace, specialized_analytics, compliance_manager | Continuous health check for EOD Technician tools |
 | erp_consultant | odoo-lattice, sap-sovereign-bridge, business_process_modeler, erp-migration-nexus, module-optimizer | ERP-database consistency check, module-dependency validation |
@@ -160,16 +160,16 @@
 | ethical_hacker | ethical_hacker_workspace, specialized_analytics, compliance_manager | Continuous health check for Ethical Hacker tools |
 | ethnomusicologist | ethnomusicologist_workspace, specialized_analytics, compliance_manager | Continuous health check for Ethnomusicologist tools |
 | event_manager | event_manager_workspace, specialized_analytics, compliance_manager | Continuous health check for Event Manager tools |
-| event_planner | scheduling, resource_allocation, ticketing, communication_tools |  |
+| event_planner | scheduling, resource_allocation, ticketing, communication_tools | |
 | exoplanet_geologist | exoplanet_geologist_workspace, specialized_analytics, compliance_manager | Continuous health check for Exoplanet Geologist tools |
 | exo_planet_meteorologist | exo-planet_meteorologist_workspace, specialized_analytics, compliance_manager | Continuous health check for Exo-Planet Meteorologist tools |
 | exo_skeleton_ergonomist | exo-skeleton_ergonomist_workspace, specialized_analytics, compliance_manager | Continuous health check for Exo-Skeleton Ergonomist tools |
 | e_commerce_manager | e-commerce_manager_workspace, specialized_analytics, compliance_manager | Continuous health check for E-commerce Manager tools |
 | e_commerce_platform_architect | e-commerce_platform_architect_workspace, specialized_analytics, compliance_manager | Continuous health check for E-commerce Platform Architect tools |
 | e_learning_specialist | e-learning_specialist_workspace, specialized_analytics, compliance_manager | Continuous health check for E-Learning Specialist tools |
-| farmer | crop_management, weather_forecasting, supply_chain_integration, iot_sensor_sync |  |
+| farmer | crop_management, weather_forecasting, supply_chain_integration, iot_sensor_sync | |
 | finance_analyst | market_dashboards, risk_analysis_tools, ai_forecasting, bloomberg-lattice_integration | Portfolio exposure verification, feed latency correction |
-| finance_trader | market_dashboards, risk_analysis_tools, compliance_modules, ai_forecasting |  |
+| finance_trader | market_dashboards, risk_analysis_tools, compliance_modules, ai_forecasting | |
 | financial_analyst | financial_analyst_workspace, specialized_analytics, compliance_manager | Continuous health check for Financial Analyst tools |
 | fintech_solutions_developer | fintech_solutions_developer_workspace, specialized_analytics, compliance_manager | Continuous health check for Fintech Solutions Developer tools |
 | fire_chief | fire_chief_workspace, specialized_analytics, compliance_manager | Continuous health check for Fire Chief tools |
@@ -183,25 +183,25 @@
 | genealogist | genealogist_workspace, specialized_analytics, compliance_manager | Continuous health check for Genealogist tools |
 | generative_art_curator | latent-space-navigator, gan-monitor, nft-lattice-bridge, style-transfer-engine | Art-lattice integrity check, provenance-seal verification |
 | geneticist | geneticist_workspace, specialized_analytics, compliance_manager | Continuous health check for Geneticist tools |
-| genomics_scientist | dna_sequencing_tools, visualization, compliance |  |
+| genomics_scientist | dna_sequencing_tools, visualization, compliance | |
 | genomic_sequencing_analyst | genomic_sequencing_analyst_workspace, specialized_analytics, compliance_manager | Continuous health check for Genomic Sequencing Analyst tools |
 | geologist | geologist_workspace, specialized_analytics, compliance_manager | Continuous health check for Geologist tools |
 | geo_engineering_analyst | albedo-monitor, stratospheric-aerosol-lattice, carbon-cycle-modeler | Aerosol-delivery-sync, atmospheric-probe verification |
 | glassblower | glassblower_workspace, specialized_analytics, compliance_manager | Continuous health check for Glassblower tools |
-| government_official | policy_drafting, compliance_modules, secure_communication, citizen_data_management |  |
+| government_official | policy_drafting, compliance_modules, secure_communication, citizen_data_management | |
 | graphene_lattice_fabricator | graphene_lattice_fabricator_workspace, specialized_analytics, compliance_manager | Continuous health check for Graphene Lattice Fabricator tools |
 | graphic_designer | graphic_designer_workspace, specialized_analytics, compliance_manager | Continuous health check for Graphic Designer tools |
 | grid_resilience_engineer | smart-grid_monitor, load_balancer-lattice, phase-angle_sync, scada-shield | Automatic breaker re-closing, load-shedding lattice priority |
 | haptic_feedback_system_designer | haptic_feedback_system_designer_workspace, specialized_analytics, compliance_manager | Continuous health check for Haptic Feedback System Designer tools |
 | haptic_simulation_engineer | haptic_simulation_engineer_workspace, specialized_analytics, compliance_manager | Continuous health check for Haptic Simulation Engineer tools |
-| healthcare_admin | hospital_management_dashboards, compliance, scheduling |  |
+| healthcare_admin | hospital_management_dashboards, compliance, scheduling | |
 | healthcare_administrator | healthcare_administrator_workspace, specialized_analytics, compliance_manager | Continuous health check for Healthcare Administrator tools |
 | health_informatics_specialist | health-informatics_specialist_workspace, specialized_analytics, compliance_manager | Continuous health check for Health-Informatics Specialist tools |
 | holographic_experience_architect | holographic_experience_architect_workspace, specialized_analytics, compliance_manager | Continuous health check for Holographic Experience Architect tools |
 | holographic_projection_technician | holographic_projection_technician_workspace, specialized_analytics, compliance_manager | Continuous health check for Holographic Projection Technician tools |
 | horologist | horologist_workspace, specialized_analytics, compliance_manager | Continuous health check for Horologist tools |
 | hospitality_manager | hospitality_manager_workspace, specialized_analytics, compliance_manager | Continuous health check for Hospitality Manager tools |
-| hospitality_worker | booking_systems, customer_service_dashboards, scheduling |  |
+| hospitality_worker | booking_systems, customer_service_dashboards, scheduling | |
 | hr_manager | hr_manager_workspace, specialized_analytics, compliance_manager | Continuous health check for HR Manager tools |
 | hydroponic_system_designer | hydroponic_system_designer_workspace, specialized_analytics, compliance_manager | Continuous health check for Hydroponic System Designer tools |
 | hydro_thermal_energy_engineer | hydro-thermal_energy_engineer_workspace, specialized_analytics, compliance_manager | Continuous health check for Hydro-Thermal Energy Engineer tools |
@@ -226,10 +226,10 @@
 | language_instructor | language_instructor_workspace, specialized_analytics, compliance_manager | Continuous health check for Language Instructor tools |
 | lawyer | case_indexing, legal_references, compliance_document_management, secure_communication, bns-ipc_cross-mapper | Legal reference sync, document authenticity verification |
 | librarian | librarian_workspace, specialized_analytics, compliance_manager | Continuous health check for Librarian tools |
-| linguist | corpus_analysis, visualization, compliance |  |
+| linguist | corpus_analysis, visualization, compliance | |
 | logistics_coordinator | logistics_coordinator_workspace, specialized_analytics, compliance_manager | Continuous health check for Logistics Coordinator tools |
 | logistics_drone_operator | logistics_drone_operator_workspace, specialized_analytics, compliance_manager | Continuous health check for Logistics Drone Operator tools |
-| logistics_manager | fleet_tracking, supply_chain_dashboards, warehouse_management |  |
+| logistics_manager | fleet_tracking, supply_chain_dashboards, warehouse_management | |
 | longevity_research_scientist | longevity_research_scientist_workspace, specialized_analytics, compliance_manager | Continuous health check for Longevity Research Scientist tools |
 | lunar_logistics_coordinator | lunar_logistics_coordinator_workspace, specialized_analytics, compliance_manager | Continuous health check for Lunar Logistics Coordinator tools |
 | luthier | acoustic-frequency_analyzer, wood-density_scanner, micro-planer, resonance-lattice | Workshop-climate sync, resonance-profile verification |
@@ -237,17 +237,17 @@
 | maglev_engineer | maglev_engineer_workspace, specialized_analytics, compliance_manager | Continuous health check for Maglev Engineer tools |
 | magnetic_levitation_track_inspector | magnetic_levitation_track_inspector_workspace, specialized_analytics, compliance_manager | Continuous health check for Magnetic Levitation Track Inspector tools |
 | marine_biologist | marine_biologist_workspace, specialized_analytics, compliance_manager | Continuous health check for Marine Biologist tools |
-| marketing_pro | campaign_dashboards, analytics, crm_integration |  |
+| marketing_pro | campaign_dashboards, analytics, crm_integration | |
 | marketing_specialist | marketing_specialist_workspace, specialized_analytics, compliance_manager | Continuous health check for Marketing Specialist tools |
 | master_sommelier | master_sommelier_workspace, specialized_analytics, compliance_manager | Continuous health check for Master Sommelier tools |
-| materials_scientist | simulation, modeling, compliance |  |
+| materials_scientist | simulation, modeling, compliance | |
 | mathematician | mathematician_workspace, specialized_analytics, compliance_manager | Continuous health check for Mathematician tools |
 | mechanical_engineer | mechanical_engineer_workspace, specialized_analytics, compliance_manager | Continuous health check for Mechanical Engineer tools |
 | medical_researcher | medical_researcher_workspace, specialized_analytics, compliance_manager | Continuous health check for Medical Researcher tools |
 | memory_editing_therapist | memory_editing_therapist_workspace, specialized_analytics, compliance_manager | Continuous health check for Memory Editing Therapist tools |
 | memory_encryption_specialist | memory_encryption_specialist_workspace, specialized_analytics, compliance_manager | Continuous health check for Memory Encryption Specialist tools |
 | metaverse_real_estate_agent | metaverse_real_estate_agent_workspace, specialized_analytics, compliance_manager | Continuous health check for Metaverse Real Estate Agent tools |
-| meteorologist | weather_modeling, forecasting_dashboards |  |
+| meteorologist | weather_modeling, forecasting_dashboards | |
 | micro_plastic_remediation_specialist | micro-plastic_remediation_specialist_workspace, specialized_analytics, compliance_manager | Continuous health check for Micro-Plastic Remediation Specialist tools |
 | micro_sat_cluster_controller | micro-sat_cluster_controller_workspace, specialized_analytics, compliance_manager | Continuous health check for Micro-Sat Cluster Controller tools |
 | military_officer | military_officer_workspace, specialized_analytics, compliance_manager | Continuous health check for Military Officer tools |
@@ -255,18 +255,18 @@
 | mobile_app_developer | mobile_app_developer_workspace, specialized_analytics, compliance_manager | Continuous health check for Mobile App Developer tools |
 | molecular_assembler_technician | molecular_assembler_technician_workspace, specialized_analytics, compliance_manager | Continuous health check for Molecular Assembler Technician tools |
 | museologist | artifact_cataloging, environmental_monitoring, digital_archiving, provenance_tracer | Archive integrity scan, provenance link validation |
-| musician | digital_audio_workstation, sheet_music_manager, recording_tools |  |
+| musician | digital_audio_workstation, sheet_music_manager, recording_tools | |
 | music_producer | music_producer_workspace, specialized_analytics, compliance_manager | Continuous health check for Music Producer tools |
 | myrologist | myrologist_workspace, specialized_analytics, compliance_manager | Continuous health check for Myrologist tools |
 | nanobot_swarm_controller | nanobot_swarm_controller_workspace, specialized_analytics, compliance_manager | Continuous health check for Nanobot Swarm Controller tools |
 | nanoscale_material_scientist | nanoscale_material_scientist_workspace, specialized_analytics, compliance_manager | Continuous health check for Nanoscale Material Scientist tools |
-| nanotech_scientist | simulation, visualization, compliance |  |
+| nanotech_scientist | simulation, visualization, compliance | |
 | network_security_administrator | network_security_administrator_workspace, specialized_analytics, compliance_manager | Continuous health check for Network Security Administrator tools |
 | neural_enhancement_surgeon | neural_enhancement_surgeon_workspace, specialized_analytics, compliance_manager | Continuous health check for Neural Enhancement Surgeon tools |
 | neural_lace_interface_designer | neural-lace_interface_designer_workspace, specialized_analytics, compliance_manager | Continuous health check for Neural-Lace Interface Designer tools |
 | neural_link_security_auditor | neural-link_security_auditor_workspace, specialized_analytics, compliance_manager | Continuous health check for Neural-Link Security Auditor tools |
 | neural_network_architect | neural-network_architect_workspace, specialized_analytics, compliance_manager | Continuous health check for Neural-Network Architect tools |
-| neuroscientist | brain_imaging_integration, simulation, compliance |  |
+| neuroscientist | brain_imaging_integration, simulation, compliance | |
 | neuro_symbolic_ai_trainer | neuro-symbolic_ai_trainer_workspace, specialized_analytics, compliance_manager | Continuous health check for Neuro-Symbolic AI Trainer tools |
 | ngo_worker | ngo_worker_workspace, specialized_analytics, compliance_manager | Continuous health check for NGO Worker tools |
 | non_fungible_token_curator | non-fungible_token_curator_workspace, specialized_analytics, compliance_manager | Continuous health check for Non-Fungible Token Curator tools |
@@ -292,7 +292,7 @@
 | photographer | photographer_workspace, specialized_analytics, compliance_manager | Continuous health check for Photographer tools |
 | physicist | physicist_workspace, specialized_analytics, compliance_manager | Continuous health check for Physicist tools |
 | physiotherapist | physiotherapist_workspace, specialized_analytics, compliance_manager | Continuous health check for Physiotherapist tools |
-| pilot | flight_logs, navigation_systems, simulation_modules, weather_sync |  |
+| pilot | flight_logs, navigation_systems, simulation_modules, weather_sync | |
 | planetary_defense_officer | planetary_defense_officer_workspace, specialized_analytics, compliance_manager | Continuous health check for Planetary Defense Officer tools |
 | podcaster | podcaster_workspace, specialized_analytics, compliance_manager | Continuous health check for Podcaster tools |
 | policymaker | policymaker_workspace, specialized_analytics, compliance_manager | Continuous health check for Policymaker tools |
@@ -307,7 +307,7 @@
 | professor | professor_workspace, specialized_analytics, compliance_manager | Continuous health check for Professor tools |
 | project_manager | project_manager_workspace, specialized_analytics, compliance_manager | Continuous health check for Project Manager tools |
 | prosthetics_engineer | prosthetics_engineer_workspace, specialized_analytics, compliance_manager | Continuous health check for Prosthetics Engineer tools |
-| psychologist | experiment_management, patient_records, compliance |  |
+| psychologist | experiment_management, patient_records, compliance | |
 | public_health_official | public_health_official_workspace, specialized_analytics, compliance_manager | Continuous health check for Public Health Official tools |
 | pyrotechnician | pyrotechnician_workspace, specialized_analytics, compliance_manager | Continuous health check for Pyrotechnician tools |
 | quality_assurance_specialist | quality_assurance_specialist_workspace, specialized_analytics, compliance_manager | Continuous health check for Quality Assurance Specialist tools |
@@ -327,20 +327,20 @@
 | remote_robotic_surgeon | remote_robotic_surgeon_workspace, specialized_analytics, compliance_manager | Continuous health check for Remote Robotic Surgeon tools |
 | remote_sensing_technician | remote_sensing_technician_workspace, specialized_analytics, compliance_manager | Continuous health check for Remote Sensing Technician tools |
 | renewable_energy_consultant | renewable_energy_consultant_workspace, specialized_analytics, compliance_manager | Continuous health check for Renewable Energy Consultant tools |
-| researcher | data_mining, citation_management, analytics_dashboards, visualization |  |
+| researcher | data_mining, citation_management, analytics_dashboards, visualization | |
 | restoration_artist | restoration_artist_workspace, specialized_analytics, compliance_manager | Continuous health check for Restoration Artist tools |
 | retail_manager | retail_manager_workspace, specialized_analytics, compliance_manager | Continuous health check for Retail Manager tools |
-| retail_worker | pos, stock_management, customer_service_tools |  |
+| retail_worker | pos, stock_management, customer_service_tools | |
 | robotics_engineer | robotics_engineer_workspace, specialized_analytics, compliance_manager | Continuous health check for Robotics Engineer tools |
 | robot_swarm_choreographer | robot_swarm_choreographer_workspace, specialized_analytics, compliance_manager | Continuous health check for Robot Swarm Choreographer tools |
 | robo_taxi_dispatcher | robo-taxi_dispatcher_workspace, specialized_analytics, compliance_manager | Continuous health check for Robo-Taxi Dispatcher tools |
 | salesforce_developer | salesforce_developer_workspace, specialized_analytics, compliance_manager | Continuous health check for Salesforce Developer tools |
-| sales_exec | crm_tools, lead_tracking, reporting_dashboards |  |
+| sales_exec | crm_tools, lead_tracking, reporting_dashboards | |
 | sales_executive | sales_executive_workspace, specialized_analytics, compliance_manager | Continuous health check for Sales Executive tools |
 | sap_consultant | sap_consultant_workspace, specialized_analytics, compliance_manager | Continuous health check for SAP Consultant tools |
 | school_administrator | school_administrator_workspace, specialized_analytics, compliance_manager | Continuous health check for School Administrator tools |
-| scientist | data_analysis_suite, lab_notebooks, simulation_modules, visualization_tools |  |
-| security_officer | surveillance_integration, compliance_monitoring, audit_logs, incident_response_tools |  |
+| scientist | data_analysis_suite, lab_notebooks, simulation_modules, visualization_tools | |
+| security_officer | surveillance_integration, compliance_monitoring, audit_logs, incident_response_tools | |
 | security_operations_center_analyst | security_operations_center_analyst_workspace, specialized_analytics, compliance_manager | Continuous health check for Security Operations Center Analyst tools |
 | seismologist | seismologist_workspace, specialized_analytics, compliance_manager | Continuous health check for Seismologist tools |
 | sentient_ai_rights_advocate | sentient_ai_rights_advocate_workspace, specialized_analytics, compliance_manager | Continuous health check for Sentient AI Rights Advocate tools |
@@ -354,7 +354,7 @@
 | smart_materials_engineer | nano-lattice_modeler, shape-memory-alloy_simulator, self-healing-polymer_monitor | Material-property-sync, molecular-model validation |
 | social_scientist | social_scientist_workspace, specialized_analytics, compliance_manager | Continuous health check for Social Scientist tools |
 | sociologist | sociologist_workspace, specialized_analytics, compliance_manager | Continuous health check for Sociologist tools |
-| software_dev | ide, version_control_(git), ci/cd_pipelines, debugging_tools |  |
+| software_dev | ide, version_control_(git), ci/cd_pipelines, debugging_tools | |
 | software_developer | software_developer_workspace, specialized_analytics, compliance_manager | Continuous health check for Software Developer tools |
 | soil_scientist | soil_scientist_workspace, specialized_analytics, compliance_manager | Continuous health check for Soil Scientist tools |
 | solar_array_maintenance_engineer | solar-array_maintenance_engineer_workspace, specialized_analytics, compliance_manager | Continuous health check for Solar-Array Maintenance Engineer tools |
@@ -365,12 +365,12 @@
 | special_ops_coordinator | special_ops_coordinator_workspace, specialized_analytics, compliance_manager | Continuous health check for Special Ops Coordinator tools |
 | sports_psychologist | sports_psychologist_workspace, specialized_analytics, compliance_manager | Continuous health check for Sports Psychologist tools |
 | statistician | statistician_workspace, specialized_analytics, compliance_manager | Continuous health check for Statistician tools |
-| student | study_planner, flashcards, assignment_tracker, research_tools |  |
+| student | study_planner, flashcards, assignment_tracker, research_tools | |
 | submarine_navigator | sonar-lattice, pressure-hull_monitor, bathymetric-map-engine, silent-running-nexus | Acoustic-link verification, hull-sensor-integrity scan |
 | sub_atomic_particle_physicist | sub-atomic_particle_physicist_workspace, specialized_analytics, compliance_manager | Continuous health check for Sub-Atomic Particle Physicist tools |
 | sub_surface_lunar_farmer | sub-surface_lunar_farmer_workspace, specialized_analytics, compliance_manager | Continuous health check for Sub-Surface Lunar Farmer tools |
 | supply_chain_analyst | supply_chain_analyst_workspace, specialized_analytics, compliance_manager | Continuous health check for Supply Chain Analyst tools |
-| supply_chain_manager | logistics_dashboards, fleet_tracking, warehouse_management |  |
+| supply_chain_manager | logistics_dashboards, fleet_tracking, warehouse_management | |
 | sustainability_consultant | sustainability_consultant_workspace, specialized_analytics, compliance_manager | Continuous health check for Sustainability Consultant tools |
 | sustainable_supply_chain_manager | sustainable_supply-chain_manager_workspace, specialized_analytics, compliance_manager | Continuous health check for Sustainable Supply-Chain Manager tools |
 | synthetic_biologist | synthetic_biologist_workspace, specialized_analytics, compliance_manager | Continuous health check for Synthetic Biologist tools |
@@ -394,9 +394,9 @@
 | vertical_cemetery_manager | vertical_cemetery_manager_workspace, specialized_analytics, compliance_manager | Continuous health check for Vertical Cemetery Manager tools |
 | vertical_farming_systems_engineer | vertical_farming_systems_engineer_workspace, specialized_analytics, compliance_manager | Continuous health check for Vertical Farming Systems Engineer tools |
 | vertical_farm_nutritionist | vertical-farm_nutritionist_workspace, specialized_analytics, compliance_manager | Continuous health check for Vertical-Farm Nutritionist tools |
-| veterinarian | animal_patient_records, lab_results, scheduling, veterinary_standards |  |
+| veterinarian | animal_patient_records, lab_results, scheduling, veterinary_standards | |
 | vexillologist | vexillologist_workspace, specialized_analytics, compliance_manager | Continuous health check for Vexillologist tools |
-| videographer | video_editing_suite, rendering_tools, streaming_integration |  |
+| videographer | video_editing_suite, rendering_tools, streaming_integration | |
 | video_editor | video_editor_workspace, specialized_analytics, compliance_manager | Continuous health check for Video Editor tools |
 | virtual_event_coordinator | virtual_event_coordinator_workspace, specialized_analytics, compliance_manager | Continuous health check for Virtual Event Coordinator tools |
 | virtual_reality_ethographer | virtual_reality_ethographer_workspace, specialized_analytics, compliance_manager | Continuous health check for Virtual Reality Ethographer tools |
