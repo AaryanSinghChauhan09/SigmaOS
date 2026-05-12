@@ -1,0 +1,222 @@
+# API REFERENCE
+
+1
+
+Complete API mapping for all Sovereign Singleton shards.
+
+1
+
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+
+1
+
+1
+
+1
+
+1
+
+1
+
+=======
+
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
+
+1
+
+Per-process syscall gating with bitmask precision.
+>>>>>>> 7759f274e222d74141c499a7b379a060016fe9a1
+
+1
+
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+
+1
+
+1
+
+1
+
+1
+
+1
+
+1
+
+1
+
+=======
+
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
+
+1
+
+Hardware-level PQC key isolation.
+
+1
+<<<<<<< HEAD
+
+1
+
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
+
+>>>>>>> 7759f274e222d74141c499a7b379a060016fe9a1
+
+1
+
+<<<<<<< HEAD
+
+1
+
+1
+
+1
+
+=======
+UID/GID process identity with PQC attestation.
+>>>>>>> 7759f274e222d74141c499a7b379a060016fe9a1
+
+1
+<<<<<<< HEAD
+
+1
+
+1
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
+
+<<<<<<< HEAD
+
+1
+
+1
+
+1
+
+=======
+
+1
+
+>>>>>>> 7759f274e222d74141c499a7b379a060016fe9a1
+
+1
+
+<<<<<<< HEAD
+
+1
+
+1
+
+=======
+S-PKG: Sovereign App Bundle installer.
+>>>>>>> 7759f274e222d74141c499a7b379a060016fe9a1
+
+<<<<<<< HEAD
+
+1
+
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
+
+1
+
+<<<<<<< HEAD
+
+1
+
+1
+
+=======
+ `bool spkg_remove(const char* name);`
+>>>>>>> 7759f274e222d74141c499a7b379a060016fe9a1
+
+1
+
+<<<<<<< HEAD
+
+1
+
+=======
+>>>>>>> c682b9ae193869d405d851dfbeb13314cb964f9f
+
+Ring-0 cron replacement with macro recording.
+
+1
+
+1
+
+AI-driven predictive workflow macro engine.
+
+1
+
+1
+
+1
+
+Vendor-agnostic GPU compute dispatcher.
+
+1
+
+1
+
+Self-learning PCIe driver shim generator.
+
+1
+
+1
+
+Hardware hang recovery timer.
+
+1
+
+1
+
+1
+
+Zero-trust Ring-0 TCP/IP stack.
+
+1
+
+1
+
+Distributed, multi-node replicated filesystem.
+
+1
+
+1
+
+SovereignVFS bridging for Micro-VM containers.
+
+1
+
+1
+
+1
+
+Adaptive ambient-aware UI theme switcher.
+
+1
+
+1
+
+Ring-0 hardware-accelerated gesture recognition.
+
+1
+
+1
+
+Persona-driven sovereign setup wizard.
+
+1
+
+1
+
+Contextual predictive quick-action engine.
+
+1
+
