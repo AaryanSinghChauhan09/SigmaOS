@@ -23,6 +23,8 @@ Welcome to the central knowledge hub for **SigmaOS**, the world's first industri
 - **[S-MAC: Mandatory Access Control](Security-MAC.md)**: Shard-level zero-trust enforcement.
 - **[Z-DESK: Zenith Desktop](Zenith-Desktop.md)**: The profession-aware graphical environment.
 - **[S-PKG: Lattice Package Nexus](Package-Nexus.md)**: Decentralized shard distribution.
+- **[S-CONTAINER: Sovereign Containers](Container-Runtime.md)**: OCI-compliant application sharding.
+- **[S-LOG: Sovereign Journaling](Sovereign-Journal.md)**: Structured industrial telemetry.
 
 ## 🛠 Project Lifecycle
 
