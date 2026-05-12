@@ -1,0 +1,35 @@
+name: Σ SIGMAOS INDUSTRIAL CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Initialize Sovereign Toolchain
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-multilib g++-multilib make qemu-system-x86
+        
+    - name: Compile Sovereign Lattice
+      run: make -j$(nproc)
+      
+    - name: QEMU Regression Test (Boot Check)
+      run: |
+        # Timeout after 30s to verify serial log "Lattice is SOVEREIGN"
+        timeout 30s qemu-system-x86_64 -nographic -serial stdio -cdrom sigmaos-v15.iso | grep "Lattice is SOVEREIGN"
+        
+    - name: PQC-Attestation Verification
+      run: ./scripts/verify_pqc_signatures.sh
+      
+    - name: Upload ISO Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: sigmaos-horizon-v15-stable
+        path: sigmaos-v15.iso

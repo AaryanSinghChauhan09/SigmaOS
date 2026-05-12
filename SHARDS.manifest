@@ -75,9 +75,12 @@ drivers/network/SovereignBlueZ.cpp
 drivers/printing/SovereignCUPS.cpp
 # LAYER 4: AI & AUTOMATION (CLAW STACK)
 kernel/core/network/SovereignVPN.cpp
+kernel/core/ai/SovereignAI.cpp
 kernel/core/ai/SovereignNeural.cpp
 kernel/core/ai/SovereignMLFlow.cpp
 kernel/core/ai/SovereignCognitive.cpp
+# LAYER 5: USERLAND & EDUCATION
+suites/S32_SystemTools/core/sovereign_playground/SovereignPlayground.cpp
 kernel/core/ai/SovereignAIPersona.cpp
 kernel/core/ai/SovereignClawGateway.cpp
 kernel/core/ai/SovereignAgentCore.cpp
