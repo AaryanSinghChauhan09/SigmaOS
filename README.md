@@ -42,6 +42,7 @@ See [BUILD.md](BUILD.md) for detailed hardware deployment guides.
 ## 📚 Documentation & Resources
 
 - **Wiki**: [SigmaOS Sovereign Wiki](WIKI/Home.md)
+- **Support**: [Sovereign Support Nexus](SUPPORT.md)
 - **Architecture**: [Kernel Design](WIKI/Architecture.md)
 - **API Reference**: [Sovereign SDK](include/sigma_sdk.h)
 - **Roadmap**: [The Zenith Path](ROADMAP.md)
