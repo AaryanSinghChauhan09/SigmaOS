@@ -17,12 +17,9 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Drivers {
 
-class SovereignIPAuditor : public SigmaObject {
+class SovereignIPAuditor : public SigmaObject, public SigmaSingleton<SovereignIPAuditor> {
+    friend class SigmaSingleton<SovereignIPAuditor>;
 public:
-    static SovereignIPAuditor& getInstance() {
-        static SovereignIPAuditor instance;
-        return instance;
-    }
 
     const char* type_name() const noexcept override { return "SovereignIPAuditor"; }
 

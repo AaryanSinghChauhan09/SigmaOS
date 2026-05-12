@@ -66,6 +66,9 @@ drivers/linux_distros/ArchDriverCompat.cpp
 drivers/linux_distros/DebianDriverCompat.cpp
 drivers/linux_distros/FedoraDriverCompat.cpp
 drivers/linux_distros/UbuntuDriverCompat.cpp
+drivers/gpu/SovereignMesa.cpp
+drivers/network/SovereignBlueZ.cpp
+drivers/printing/SovereignCUPS.cpp
 # LAYER 4: AI & AUTOMATION (CLAW STACK)
 kernel/core/ai/SovereignNeural.cpp
 kernel/core/ai/SovereignMLFlow.cpp
