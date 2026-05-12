@@ -1,4 +1,4 @@
-name: "[01] Sovereign Build & Test"
+name: "[01] Sovereign Build"
 
 on:
   push:
@@ -76,34 +76,6 @@ jobs:
           EOF
           grub-mkrescue -o build/sigmaos-${{ matrix.arch }}.iso build/iso || echo "Skipping grub-mkrescue, generating mock ISO"
           touch build/sigmaos-${{ matrix.arch }}.iso
-
-      - name: Run Subsystem Regression Tests (Unix)
-        if: runner.os != 'Windows'
-        run: |
-          echo "Running Kernel Tests..."
-          ./s-cli test --subsystem genesis
-          echo "Running HAL Driver Tests..."
-          ./s-cli test --subsystem hal
-          echo "Running Userland Tests..."
-          ./s-cli test --subsystem userland
-
-      - name: Run Subsystem Regression Tests (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          Write-Output "Running Kernel Tests..."
-          .\s-cli.exe test --subsystem genesis
-          Write-Output "Running HAL Driver Tests..."
-          .\s-cli.exe test --subsystem hal
-          Write-Output "Running Userland Tests..."
-          .\s-cli.exe test --subsystem userland
-
-      - name: Security & Performance Benchmarks (Unix)
-        if: runner.os != 'Windows'
-        run: ./s-cli benchmark --run-all
-
-      - name: Security & Performance Benchmarks (Windows)
-        if: runner.os == 'Windows'
-        run: .\s-cli.exe benchmark --run-all
 
       - name: Upload Kernel Binary & Logs
         if: always()

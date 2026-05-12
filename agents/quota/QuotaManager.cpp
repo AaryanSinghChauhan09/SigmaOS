@@ -1,24 +1,27 @@
 #include "core/sigma_types.h"
-#include "libc/SovereignLibC.h"
-#include "hal/sigma_hal.h"
+#include "core/SigmaOOP.hpp"
+#include "sigma_libc.h"
 #include "sigma_log.h"
-#include "core/context/manager.hpp"
 
 /**
- * SigmaOS Autonomous Agent Quota Manager
- * Encapsulation: Each agent manages its own quota.
+ * SigmaOS Autonomous Agent Quota Manager (S-QUOTA)
+ * Mission: AI-native resource orchestration and neural workload balancing.
+ * Principle: Modular. Encapsulated. Sovereign.
  */
 
-class QuotaManager {
-private:
-    int gpu_quota;
-    int cpu_quota;
-    int mem_quota;
+namespace SigmaOS {
+namespace Kernel {
+namespace Agents {
 
-    QuotaManager() : gpu_quota(0), cpu_quota(0), mem_quota(0) {
-        // Register this module via Context Manager instead of relying on hardcoded singleton
-        SigmaOS::Kernel::Context::ContextManager::getInstance().registerModule("agent.quota", this);
-    }
+class QuotaManager : public SigmaObject {
+private:
+    sigma_u32 m_gpu_quota;
+    sigma_u32 m_cpu_quota;
+    sigma_u32 m_mem_quota;
+    sigma_u32 m_neural_quota;
+    sigma_u32 m_lattice_quota;
+
+    QuotaManager() : m_gpu_quota(0), m_cpu_quota(0), m_mem_quota(0), m_neural_quota(0), m_lattice_quota(0) {}
 
 public:
     static QuotaManager& getInstance() {
@@ -26,33 +29,46 @@ public:
         return instance;
     }
 
-    void setQuota(const char* resource, int percentage) {
-        if (sigma_hardened_strcmp(resource, "GPU") == 0) {
-            gpu_quota = percentage;
-            sigma_log("[AGENT] GPU Quota set to %d%%\n", percentage);
-        } else if (sigma_hardened_strcmp(resource, "CPU") == 0) {
-            cpu_quota = percentage;
-            sigma_log("[AGENT] CPU Quota set to %d%%\n", percentage);
-        } else if (sigma_hardened_strcmp(resource, "MEM") == 0) {
-            mem_quota = percentage;
-            sigma_log("[AGENT] MEM Quota set to %d%%\n", percentage);
+    const char* type_name() const noexcept override { return "QuotaManager"; }
+
+    void setQuota(const char* resource, sigma_u32 percentage) {
+        if (sigma_strcmp(resource, "GPU") == 0) {
+            m_gpu_quota = percentage;
+        } else if (sigma_strcmp(resource, "CPU") == 0) {
+            m_cpu_quota = percentage;
+        } else if (sigma_strcmp(resource, "MEM") == 0) {
+            m_mem_quota = percentage;
+        } else if (sigma_strcmp(resource, "NEURAL") == 0) {
+            m_neural_quota = percentage;
+        } else if (sigma_strcmp(resource, "LATTICE") == 0) {
+            m_lattice_quota = percentage;
         }
+        sigma_log_info("[S-QUOTA] %s Quota recalibrated to %u%%", resource, percentage);
     }
 
-    int getQuota(const char* resource) {
-        if (sigma_hardened_strcmp(resource, "GPU") == 0) return gpu_quota;
-        if (sigma_hardened_strcmp(resource, "CPU") == 0) return cpu_quota;
-        if (sigma_hardened_strcmp(resource, "MEM") == 0) return mem_quota;
+    sigma_u32 getQuota(const char* resource) {
+        if (sigma_strcmp(resource, "GPU") == 0) return m_gpu_quota;
+        if (sigma_strcmp(resource, "CPU") == 0) return m_cpu_quota;
+        if (sigma_strcmp(resource, "MEM") == 0) return m_mem_quota;
+        if (sigma_strcmp(resource, "NEURAL") == 0) return m_neural_quota;
+        if (sigma_strcmp(resource, "LATTICE") == 0) return m_lattice_quota;
         return 0;
     }
 };
 
-void agent_quota_set(const char* resource, int percentage) {
-    QuotaManager* quotaManager = (QuotaManager*) SigmaOS::Kernel::Context::ContextManager::getInstance().resolve("agent.quota");
-    if (!quotaManager) {
-        quotaManager = &QuotaManager::getInstance();
-    }
-    quotaManager->setQuota(resource, percentage);
+} // namespace Agents
+} // namespace Kernel
+} // namespace SigmaOS
+
+extern "C" {
+
+void agent_quota_set(const char* resource, sigma_u32 percentage) {
+    SigmaOS::Kernel::Agents::QuotaManager::getInstance().setQuota(resource, percentage);
+}
+
+sigma_u32 agent_quota_get(const char* resource) {
+    return SigmaOS::Kernel::Agents::QuotaManager::getInstance().getQuota(resource);
 }
 
 } // extern "C"
+
