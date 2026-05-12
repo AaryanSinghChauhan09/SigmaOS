@@ -4,11 +4,6 @@
 #include "core/sigma_types.h"
 
 #ifdef __cplusplus
-
-namespace SigmaOS {
-namespace Kernel {
-namespace Security {
-
 #include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
@@ -41,7 +36,9 @@ private:
 } // namespace Security
 } // namespace Kernel
 } // namespace SigmaOS
+#endif
 
+#ifdef __cplusplus
 extern "C" {
 #endif
 

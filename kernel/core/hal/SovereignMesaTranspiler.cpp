@@ -24,7 +24,7 @@ public:
 
     void TranspileVulkan() {
         if (!ValidateDriverSignature("VULKAN_CORE")) {
-            sigma_log_error("[S-MESA]: Driver signature verification failed! Silicon security integrity compromised.");
+            sigma_log_err("[S-MESA]: Driver signature verification failed! Silicon security integrity compromised.");
             SoftwareFallback();
             return;
         }

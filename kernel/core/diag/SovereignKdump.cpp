@@ -17,7 +17,7 @@ public:
     }
 
     void captureCrash(const char* fault_reason) {
-        sigma_log_error("[DIAG:KDUMP] CRITICAL FAULT: %s", fault_reason);
+        sigma_log_err("[DIAG:KDUMP] CRITICAL FAULT: %s", fault_reason);
         sigma_log_info("[DIAG:KDUMP] Dumping industrial state to /var/crash/sigma_vmcore.pqc...");
         sigma_log_info("[DIAG:KDUMP] PQC-Attestation complete. System rebooting via S-AUTO.");
     }

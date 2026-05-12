@@ -23,8 +23,9 @@ Welcome to the central knowledge hub for **SigmaOS**, the world's first industri
 - **[S-NET: Sovereign Networking](Network-Stack)**: High-performance, PQC-encrypted communication.
 - **[S-SERVER: Industrial Server Pillars](Server-Pillars)**: SSH, Containers, and Web Lattices.
 - **[S-HAL: Hardware Driver Framework](Hardware-Drivers)**: GPU, Audio, and Connectivity.
-- **[S-MAC: Mandatory Access Control](Security-MAC)**: Shard-level zero-trust enforcement.
-- **[Z-DESK: Zenith Desktop](Zenith-Desktop)**: The profession-aware graphical environment.
+- [S-MAC: Mandatory Access Control](Security-MAC): Shard-level zero-trust enforcement via Sovereign AppArmor.
+- [S-VPN: Sovereign WireGuard](Network-Stack): PQC-encrypted industrial networking.
+- [Z-DESK: Zenith Desktop](Zenith-Desktop): The profession-aware graphical environment.
 - [S-MIND: Sovereign Lattice Mapper](Sovereign-Lattice-Mapper): Interactive shard visualization and topology auditing.
 - [S-MESA: Industrial GPU Stack](GPU-Stack): High-performance 3D acceleration via Mesa integration.
 - [S-BLUEZ: Bluetooth Lattice](Bluetooth-Stack): Secure peripheral orchestration.

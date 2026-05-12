@@ -27,7 +27,7 @@ public:
 
     bool validateSocketBounds(sigma_u32 socket_id) {
         if (socket_id >= 1024) {
-            sigma_log_error("[SYS:NET] Socket ID %u out of bounds. Possible exhaustion attack.", socket_id);
+            sigma_log_err("[SYS:NET] Socket ID %u out of bounds. Possible exhaustion attack.", socket_id);
             return false;
         }
         return true;

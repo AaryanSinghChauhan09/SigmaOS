@@ -33,7 +33,7 @@ public:
                  return;
             }
         }
-        sigma_log_error("[S-USB]: Failed to bind device on Port %u after 3 retries.", port);
+        sigma_log_err("[S-USB]: Failed to bind device on Port %u after 3 retries.", port);
     }
 };
 

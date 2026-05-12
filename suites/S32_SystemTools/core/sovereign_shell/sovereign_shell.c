@@ -18,11 +18,11 @@
 //   • Tab-completion hooked into VFS readdir + command table
 // =============================================================================
 
-#include "sigma_libc.h"
+#include "libc/SovereignLibC.h"
 #include "sigma_log.h"
-#include "sigma_types.h"
-
-#include <ctype.h>
+#include "core/sigma_types.h"
+#include <string.h>
+#include <stdio.h>
 
 #define SIGMA_SHELL_VERSION   "2.0.0"
 #define SIGMA_HISTORY_SIZE     256
@@ -45,7 +45,7 @@ static uint32_t history_head = 0;
 static uint32_t history_len  = 0;
 
 static void history_push(const char* line) {
-    sigma_strncpy(history[history_head % SIGMA_HISTORY_SIZE], line, SIGMA_LINE_MAX - 1);
+    strncpy(history[history_head % SIGMA_HISTORY_SIZE], line, SIGMA_LINE_MAX - 1);
     history_head++;
     if (history_len < SIGMA_HISTORY_SIZE) history_len++;
 }
@@ -136,7 +136,7 @@ static int builtin_env(int argc, char** argv) {
 static int builtin_pwd(int argc, char** argv) {
     (void)argc; (void)argv;
     char buf[SIGMA_LINE_MAX];
-    if (sigma_getcwd(buf, sizeof(buf))) sigma_printf("  %s\n", buf);
+    if (getcwd(buf, sizeof(buf))) sigma_printf("  %s\n", buf);
     return 0;
 }
 
@@ -156,7 +156,7 @@ static int tokenize(char* line, char** argv, int max_args) {
 static int dispatch(int argc, char** argv) {
     if (argc == 0) return 0;
     for (int i = 0; builtins[i].name; i++) {
-        if (sigma_strcmp(argv[0], builtins[i].name) == 0) {
+        if (strcmp(argv[0], builtins[i].name) == 0) {
             if (builtins[i].handler) return builtins[i].handler(argc, argv);
             // External: spawn from tools/ PATH (static binaries)
             sigma_printf(VT_YELLOW "  [sigma] Routing to external: %s\n" VT_RESET, argv[0]);
@@ -191,13 +191,13 @@ int main(void) {
         if (!fgets(line, sizeof(line), stdin)) break;
 
         // Strip trailing newline
-        size_t len = sigma_strlen(line);
+        size_t len = strlen(line);
         if (len > 0 && line[len - 1] == '\n') line[len - 1] = '\0';
         if (sigma_strlen(line) == 0) continue;
 
         history_push(line);
         char line_copy[SIGMA_LINE_MAX];
-        sigma_strncpy(line_copy, line, sizeof(line_copy) - 1);
+        strncpy(line_copy, line, sizeof(line_copy) - 1);
 
         int argc = tokenize(line_copy, argv, SIGMA_MAX_ARGS);
         dispatch(argc, argv);
