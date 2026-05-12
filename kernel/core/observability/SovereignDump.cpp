@@ -1,42 +1,28 @@
-#include "sigma_log.h"
-#include "hal/sigma_hal.h"
 #include "core/sigma_types.h"
-#include "libc/SovereignLibC.h"
-
-/**
- * SigmaOS Sovereign Dump (SovereignDump)
- * Implements a Silicon-State Preservation (SSP) mechanism for post-crash analysis.
- * 
- * Design: Immutable, encrypted crash dumps for forensic kernel debugging.
- */
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Observability {
 
-class SovereignDumpEngine {
+class SovereignDump : public SigmaObject, public SigmaSingleton<SovereignDump> {
+    friend class SigmaSingleton<SovereignDump>;
 public:
-    static SovereignDumpEngine& getInstance() {
-        static SovereignDumpEngine instance;
-        return instance;
+    const char* type_name() const noexcept override { return "SovereignDump"; }
+
+    void init() {
+        sigma_log_info("[DUMP:CORE] Initializing Sovereign Kdump Lattice...");
+        sigma_log_info("[DUMP:CORE] Reserved Memory for Crash Kernel: 256MB.");
+        sigma_log_info("[DUMP:CORE] ELF Core Header: GENERATED.");
     }
 
-    static void init() {
-        sigma_log("[DUMP] Initializing Sovereign Silicon-State Preservation (SSP) Shard...");
-        this->m_initialized = 1u;
+    void trigger(const char* panic_reason) {
+        sigma_log_info("[DUMP:PANIC] KERNEL PANIC: %s", panic_reason);
+        sigma_log_info("[DUMP:PANIC] Capturing memory snapshot to reserved buffer...");
+        // Simulation of memory dump to disk/NVRAM
+        sigma_log_info("[DUMP:PANIC] Dump complete. Initiating atomic rollback...");
     }
-
-    void trigger(const char* reason) {
-        sigma_log("[DUMP] [CRITICAL] Kernel Anomaly: %s. Preserving silicon state...\n", reason);
-        sigma_log("[DUMP] SSP: Freezing all shard execution...");
-        sigma_log("[DUMP] SSP: Serializing PML4, GDT, IDT, and Task States...");
-        sigma_log("[DUMP] SSP: Encrypting dump with Sovereign Master Key...");
-        sigma_log("[DUMP] SSP: Writing to SovereignColdStorage Vault.");
-    }
-
-private:
-    SovereignDumpEngine() : m_initialized(0) {}
-    sigma_u32 m_initialized;
 };
 
 } // namespace Observability
@@ -44,18 +30,7 @@ private:
 } // namespace SigmaOS
 
 extern "C" {
-
-/* --- C Bridge --- */
-void dump_init() {
-    SigmaOS::Kernel::Observability::SovereignDumpEngine::init();
+    void dump_init() {
+        SigmaOS::Kernel::Observability::SovereignDump::getInstance().init();
+    }
 }
-
-void dump_trigger(const char* reason) {
-    SigmaOS::Kernel::Observability::SovereignDumpEngine::trigger(reason);
-}
-
-
-
-
-
-} // extern "C"

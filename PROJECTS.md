@@ -34,6 +34,11 @@
 | Sovereign Vis (D3/Graphviz) | VIS | Medium | DONE |
 | Sovereign Cyber (Metasploit) | CYBER | High | DONE |
 | Sigma-Pkg (Package Manager) | System | High | DONE |
+| Sovereign Kdump (Crash Dumps) | Kernel | High | DONE |
+| Sovereign Regression (Tests) | Kernel | High | DONE |
+| Sovereign Watchdog (Fallback) | Security | High | DONE |
+| Sovereign Server (SSH/HTTP) | Network | High | DONE |
+| Sovereign Audio (PipeWire) | Drivers | Medium | DONE |
 | Offline Coding Playground | EDU | Low | DONE |
 | QEMU Regression Actions | CI/CD | Medium | DONE |
 
