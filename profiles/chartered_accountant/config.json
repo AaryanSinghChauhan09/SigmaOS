@@ -1,0 +1,33 @@
+{
+    "profession": "chartered_accountant",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "tally-lattice",
+        "gst-nexus",
+        "income_tax_auditor",
+        "balance-sheet-lattice",
+        "audit-trail-engine"
+    ],
+    "rules": [
+        "ICAI standards",
+        "Income Tax Act",
+        "GST laws",
+        "Companies Act"
+    ],
+    "calculators": [
+        "Tax-liability",
+        "TDS-estimator",
+        "capital-gains-calc",
+        "depreciation-lattice"
+    ],
+    "algorithms": [
+        "Anomaly detection in ledgers",
+        "tax-optimization modeling",
+        "automated-audit-sampling"
+    ],
+    "automation": {
+        "self_healing": "Tally-data-integrity scan, GST-reconciliation verification",
+        "rollback": "Fiscal-year snapshots, historical ledger restoration"
+    }
+}

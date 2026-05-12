@@ -138,49 +138,49 @@ const professions = [
         rollback: 'Planetary state snapshots, bio-injection phase rollback'
     },
     {
-        name: 'asteroid_miner',
-        tools: 'Spectroscopic analyzer, drill-bit thermal monitor, low-gravity navigation, ore-density mapper',
-        rules: 'Outer Space Treaty compliance, resource extraction protocols',
-        calculators: 'Delta-V, ore-yield probability, trajectory-delta',
-        algorithms: 'Autonomous excavation pathing, structural stability prediction in vacuum',
-        self_healing: 'Thruster-link verification, drill-head cooling sync',
-        rollback: 'Excavation state snapshots, orbital-return baseline restoration'
+        name: 'erp_consultant',
+        tools: 'Odoo-Lattice, SAP-Sovereign-Bridge, business process modeler, ERP-migration-nexus, module-optimizer',
+        rules: 'Business logic standards, ERP-best-practices, compliance-frameworks',
+        calculators: 'TCO (Total Cost of Ownership), ROI-estimator, process-latency-calc',
+        algorithms: 'Automated workflow mapping, database schema normalization, inventory-prediction',
+        self_healing: 'ERP-database consistency check, module-dependency validation',
+        rollback: 'ERP-state snapshots, transactional-history restoration'
     },
     {
-        name: 'bio_ethicist',
-        tools: 'Genetic-modification auditor, bio-risk modeler, ethical-compliance dashboard, CRISPR-log-Lattice',
-        rules: 'Declaration of Helsinki, Belmont Report, bio-ethics guidelines',
-        calculators: 'Risk-benefit ratio, genetic-diversity index',
-        algorithms: 'Ethical-dilemma simulation, long-term impact analysis',
-        self_healing: 'Compliance-log integrity check, ethical-seal verification',
-        rollback: 'Decision-state snapshots, protocol baseline restoration'
+        name: 'chartered_accountant',
+        tools: 'Tally-Lattice, GST-Nexus, Income Tax Auditor, balance-sheet-lattice, audit-trail-engine',
+        rules: 'ICAI standards, Income Tax Act, GST laws, Companies Act',
+        calculators: 'Tax-liability, TDS-estimator, capital-gains-calc, depreciation-lattice',
+        algorithms: 'Anomaly detection in ledgers, tax-optimization modeling, automated-audit-sampling',
+        self_healing: 'Tally-data-integrity scan, GST-reconciliation verification',
+        rollback: 'Fiscal-year snapshots, historical ledger restoration'
     },
     {
-        name: 'digital_archaeologist',
-        tools: 'Data-carving suite, legacy-system emulator, bit-rot detector, archival-lattice',
-        rules: 'Digital preservation standards, copyright-fair-use protocols',
-        calculators: 'Data-integrity-hash, bit-error rate, compression-ratio',
-        algorithms: 'Fragmented data reconstruction, legacy-format detection',
-        self_healing: 'Bit-rot correction, archival-sync verification',
-        rollback: 'Data-state snapshots, archival-integrity restoration'
+        name: 'crm_administrator',
+        tools: 'Salesforce-Lattice, HubSpot-Bridge, lead-scoring-engine, customer-journey-mapper',
+        rules: 'GDPR, CCPA, CRM data-privacy standards',
+        calculators: 'CLV (Customer Lifetime Value), churn-rate, conversion-delta',
+        algorithms: 'Lead prioritization modeling, automated-marketing-pathing',
+        self_healing: 'Lead-data consistency check, automation-workflow validation',
+        rollback: 'Customer-record snapshots, marketing-campaign rollback'
     },
     {
-        name: 'orbital_debris_manager',
-        tools: 'Debris-tracking radar, laser-ablation monitor, collision-avoidance nexus, TLE-Lattice',
-        rules: 'IADC space debris mitigation guidelines',
-        calculators: 'Probability of collision (Pc), orbital-decay rate, delta-V for de-orbit',
-        algorithms: 'Cascading collision prediction, debris-cloud propagation',
-        self_healing: 'Radar-link consistency, laser-aiming-calibration verification',
-        rollback: 'Orbital-map state snapshots, de-orbit sequence logs'
+        name: 'ecommerce_developer',
+        tools: 'Shopify-Lattice, Magento-Sovereign-Core, inventory-sync-nexus, payment-gateway-bridge',
+        rules: 'PCI-DSS, e-commerce consumer laws',
+        calculators: 'AOV (Average Order Value), cart-abandonment rate, shipping-cost-delta',
+        algorithms: 'Inventory-replenishment prediction, personalized-recommendation engine',
+        self_healing: 'Inventory-sync verification, payment-link validation',
+        rollback: 'Store-state snapshots, order-history restoration'
     },
     {
-        name: 'pqc_auditor',
-        tools: 'Lattice-based-crypto analyzer, quantum-threat-modeler, PQC-seal-validator, entropy-mesh',
-        rules: 'NIST PQC standards, FIPS 140-3',
-        calculators: 'Quantum-resistance-score, entropy-density, key-strength delta',
-        algorithms: 'Post-quantum signature verification, cryptographic-mesh auditing',
-        self_healing: 'Key-lattice integrity check, PQC-seal validation',
-        rollback: 'Security-state snapshots, PQC-baseline restoration'
+        name: 'digital_marketer',
+        tools: 'SERP-Lattice, SEM-Analyzer, crawl-budget-optimizer, backlink-auditor, conversion-pixel-nexus',
+        rules: 'Search engine guidelines, advertising ethics',
+        calculators: 'CPC/CPM, ROAS, keyword-density, domain-authority-score',
+        algorithms: 'Keyword-ranking prediction, automated-bidding optimization',
+        self_healing: 'Pixel-tracking verification, backlink-integrity scan',
+        rollback: 'SEO-state snapshots, campaign-history restoration'
     }
 ];
 
@@ -214,7 +214,8 @@ const additionalProfessions = [
     'Philologist', 'Blacksmith', 'Glassblower', 'Bodyguard', 'Cyber-Warfare Tactician', 'Water Treatment Manager',
     'Xeno-Biologist', 'Prosthetics Engineer', 'Cyber-Insurance Underwriter', 'OSINT Investigator',
     'Underwater Architect', 'Master Sommelier', 'Yacht Designer', 'Private Island Manager',
-    'Computational Linguist', 'Cultural Heritage Guardian'
+    'Computational Linguist', 'Cultural Heritage Guardian', 'Odoo Developer', 'Tally Operator', 'SAP Consultant',
+    'Salesforce Developer', 'Shopify Expert', 'E-commerce Manager'
 ];
 
 additionalProfessions.forEach(name => {

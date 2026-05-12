@@ -1,0 +1,29 @@
+{
+    "profession": "crm_administrator",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "salesforce-lattice",
+        "hubspot-bridge",
+        "lead-scoring-engine",
+        "customer-journey-mapper"
+    ],
+    "rules": [
+        "GDPR",
+        "CCPA",
+        "CRM data-privacy standards"
+    ],
+    "calculators": [
+        "CLV (Customer Lifetime Value)",
+        "churn-rate",
+        "conversion-delta"
+    ],
+    "algorithms": [
+        "Lead prioritization modeling",
+        "automated-marketing-pathing"
+    ],
+    "automation": {
+        "self_healing": "Lead-data consistency check, automation-workflow validation",
+        "rollback": "Customer-record snapshots, marketing-campaign rollback"
+    }
+}
