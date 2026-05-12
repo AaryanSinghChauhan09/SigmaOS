@@ -3,7 +3,7 @@
 #include "sigma_log.h"
 
 /**
- * SovereignLogD â€” Centralized Logging and Observability Daemon.
+ * SovereignLogD â€" Centralized Logging and Observability Daemon.
  * Aggregates logs from kernel shards, drivers, and userland.
  */
 

@@ -41,8 +41,8 @@ public:
 
     void predictive_analytics() {
         sigma_print("[DATA-SCIENCE] Running resource usage forecasting (ARIMA/RNN mock)...\n");
-        sigma_print("[âœ“] Prediction: CPU spike expected on S02_ZenithUI in T-minus 400ms.\n");
-        sigma_print("[âœ“] Recommendation: Pre-warm GPU cache and scale S28_Performance.\n");
+        sigma_print("[âœ"] Prediction: CPU spike expected on S02_ZenithUI in T-minus 400ms.\n");
+        sigma_print("[âœ"] Recommendation: Pre-warm GPU cache and scale S28_Performance.\n");
     }
 };
 

@@ -8,27 +8,23 @@
  * USP: Profession-based modularisation. Loads tools based on user role.
  */
 
+extern "C" {
+    void auto_heal(sigma_u32 sid, const char* prof);
+    void viz_render_dicom(void* data, sigma_u32 size);
+    void viz_render_bim(void* data, sigma_u32 size);
+}
+
 namespace SigmaOS {
 namespace Kernel {
 namespace Core {
 
-enum class Profession {
-    NONE,
-    CASHIER,
-    ACCOUNTANT,
-    DOCTOR,
-    ENGINEER,
-    LAWYER,
-    TEACHER,
-    FARMER,
-    SOFTWARE_DEV
-};
-
 class ProfileManager {
 private:
-    Profession current_role;
+    char current_prof[64];
 
-    ProfileManager() : current_role(Profession::NONE) {}
+    ProfileManager() {
+        sigma_memcpy(current_prof, "default", 8);
+    }
 
 public:
     static ProfileManager& getInstance() {
@@ -36,32 +32,26 @@ public:
         return instance;
     }
 
-    void loadProfile(Profession role) {
-        current_role = role;
-        sigma_log("[PROFILE] Loading profession-specific shards for role ID: %d", static_cast<int>(role));
+    void loadProfile(const char* profession) {
+        sigma_log_info("[PROFILE] Loading dynamic lattice for: %s", profession);
         
-        switch(role) {
-            case Profession::DOCTOR:
-                sigma_log("[PROFILE] HIPAA compliance modules [ACTIVE]. Patient record shards loaded.");
-                break;
-            case Profession::ACCOUNTANT:
-                sigma_log("[PROFILE] Financial auditing shards [ACTIVE]. Ledger tools loaded.");
-                break;
-            case Profession::CASHIER:
-                sigma_log("[PROFILE] POS interface shards [ACTIVE]. Inventory sync enabled.");
-                break;
-            case Profession::FARMER:
-                sigma_log("[PROFILE] Crop yield predictive shards [ACTIVE]. Weather sync enabled.");
-                break;
-            default:
-                sigma_log("[PROFILE] Default sovereign profile loaded.");
-                break;
+        // In a real implementation, we would parse config.json from the VFS
+        // Here we simulate the profile activation
+        sigma_u32 len = 0;
+        while(profession[len] && len < 63) {
+            current_prof[len] = profession[len];
+            len++;
         }
+        current_prof[len] = '\0';
+
+        sigma_log_info("[PROFILE] Shard manifests synchronized for %s.", current_prof);
+        
+        // Trigger self-healing on boot for high-assurance profiles
+        auto_heal(0, current_prof);
     }
 
-    void triggerRoleAction(const char* action) {
-        sigma_log("[PROFILE] Executing role-specific action: %s", action);
-        // Polymorphism: same command adapts to profession
+    const char* getCurrentProfession() const {
+        return current_prof;
     }
 };
 
@@ -71,8 +61,8 @@ public:
 
 extern "C" {
 
-void sigma_load_profile(int role_id) {
-    SigmaOS::Kernel::Core::ProfileManager::getInstance().loadProfile(static_cast<SigmaOS::Kernel::Core::Profession>(role_id));
+void sigma_load_profile_name(const char* name) {
+    SigmaOS::Kernel::Core::ProfileManager::getInstance().loadProfile(name);
 }
 
 } // extern "C"

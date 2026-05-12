@@ -10,7 +10,7 @@
  * USP: Predictively surfaces OS-level shortcuts inside Zenith based on 
  * the user's active workflow (e.g. surfacing IDE tools when compiling).
  *
- * Design: OOP-isolated singleton â€” SovereignShortcutsEngine.
+ * Design: OOP-isolated singleton â€" SovereignShortcutsEngine.
  */
 
 class SovereignShortcutsEngine {

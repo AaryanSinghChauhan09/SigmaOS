@@ -29,6 +29,7 @@ public:
     }
 
     void writeData(const char* data_id, const char* buffer) {
+        (void)buffer;
         sigma_log_info("[S-STORAGE] Writing industrial data: %s", data_id);
         // Hit & Trial: PQC-encrypt at rest and record provenance to the audit ledger
         sigma_log_info("[S-STORAGE] Data WRITTEN and SEALED. Integrity check: PASS.");

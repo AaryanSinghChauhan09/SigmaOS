@@ -3,7 +3,7 @@
  * Σ SIGMAOS: SOVEREIGN NET COMPATIBILITY (ABI-002)
  * =========================================================================
  * Mission: Isolated shard for Linux sk_buff mapping.
- * Layer  : L3 — Security / Network Compatibility
+ * Layer  : L3 �" Security / Network Compatibility
  * =========================================================================
  */
 

@@ -10,7 +10,7 @@
  * USP: Predicts and adapts the OS workflow, themes, and layouts specifically
  * to the user's daily habits, completely processed on-device (zero cloud).
  *
- * Design: OOP-isolated singleton â€” SovereignPersonalizationEngine.
+ * Design: OOP-isolated singleton â€" SovereignPersonalizationEngine.
  */
 
 class SovereignPersonalizationEngine {

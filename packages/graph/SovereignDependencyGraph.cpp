@@ -3,7 +3,7 @@
  * Σ SIGMAOS: UNIVERSAL PACKAGE DEPENDENCY GRAPH (PKG-005)
  * =========================================================================
  * Mission: Enforces a unified dependency graph across Pacman, Flatpak, and Nix.
- * Layer  : L5 — Industrial Ecosystem
+ * Layer  : L5 �" Industrial Ecosystem
  * =========================================================================
  */
 

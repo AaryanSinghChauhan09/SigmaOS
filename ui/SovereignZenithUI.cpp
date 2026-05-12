@@ -10,7 +10,7 @@
  * ZERO-DEPENDENCY: Direct framebuffer manipulation; no external GPU libraries.
  * Competitor parity: Windows DWM, macOS WindowServer, Wayland.
  *
- * Design: OOP-isolated singleton â€” SovereignZenithEngine.
+ * Design: OOP-isolated singleton â€" SovereignZenithEngine.
  *         Morphic glassmorphism and depth shadows at the kernel level.
  */
 

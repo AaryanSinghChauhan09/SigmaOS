@@ -34,6 +34,7 @@ public:
     }
 
     void attestPolicy(const char* policy_hash) {
+        (void)policy_hash;
         sigma_log_info("[S-GOV] Attesting policy draft with Sovereign Registry...");
         // Hit & Trial: Perform hardware-attestation via SovereignTPM
         sigma_log_info("[S-GOV] Policy ATTESTED. Integrity verified.");

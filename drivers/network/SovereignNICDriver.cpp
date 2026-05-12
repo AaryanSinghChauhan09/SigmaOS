@@ -11,7 +11,7 @@
  * VirtIO-net (for QEMU) or RTL8139 (for bare-metal) at boot via PCIe probing
  * and programs the DMA descriptor rings directly with zero abstraction overhead.
  *
- * Design: OOP-isolated singleton â€” SovereignNICDriverEngine.
+ * Design: OOP-isolated singleton â€" SovereignNICDriverEngine.
  */
 
 typedef enum {

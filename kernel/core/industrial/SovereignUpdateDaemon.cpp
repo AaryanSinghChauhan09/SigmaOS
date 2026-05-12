@@ -3,7 +3,7 @@
  * S SIGMAOS: SOVEREIGN UPDATE DAEMON (Ed25519 Verification)
  * =========================================================================
  * Mission: Implements UPD-001 for cryptographically signed system updates.
- * Layer  : L5 â€” Industrial Ecosystem / Security
+ * Layer  : L5 â€" Industrial Ecosystem / Security
  * =========================================================================
  */
 

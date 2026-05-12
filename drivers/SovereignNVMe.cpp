@@ -7,7 +7,7 @@
  * SigmaOS Sovereign NVMe Driver
  * High-performance, zero-copy block storage interface.
  *
- * Design: OOP-isolated singleton â€” SovereignNVMeEngine.
+ * Design: OOP-isolated singleton â€" SovereignNVMeEngine.
  */
 
 class SovereignNVMeEngine {

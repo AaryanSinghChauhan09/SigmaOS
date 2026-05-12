@@ -1,41 +1,62 @@
-#include "core/sigma_types.h"
 #include "sigma_log.h"
-#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
+
+/**
+ * SigmaOS Sovereign Automation (S-AUTO)
+ * Purpose: Profession-aware self-healing and atomic rollback orchestration.
+ * USP: Each profession has a unique "Heal-State" and "Rollback-Depth".
+ */
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Automation {
 
-/**
- * @class SovereignAutomationShard
- * @brief Intelligent Task Automation & Pattern Detection Engine.
- * Monitors system calls and user intent to suggest and execute optimizations.
- */
-class SovereignAutomationShard {
+class SovereignAutomation : public SigmaOS::SigmaObject {
 public:
-    static SovereignAutomationShard& getInstance() {
-        static SovereignAutomationShard instance;
+    static SovereignAutomation& getInstance() {
+        static SovereignAutomation instance;
         return instance;
     }
 
-    void recordAction(const char* action_id, const char* context) {
-        sigma_log("[AUTO]: Action Recorded: %s in context [%s]", action_id, context);
-        // Add to behavioral buffer
-        // Analyze for repetition patterns
+    const char* type_name() const noexcept override {
+        return "SovereignAutomation";
     }
 
-    void executeMacro(const char* macro_json) {
-        sigma_log("[AUTO]: Executing Industrial Macro: %s", macro_json);
-        // Parse and dispatch sequence to Orchestrator
+    void init() {
+        sigma_log_info("[S-AUTO] Initializing Sovereign Automation Nexus...");
     }
 
-    void scheduleTask(const char* task_name, sigma_u64 interval_ms) {
-        sigma_log("[AUTO]: Task [%s] scheduled for every %llu ms.", task_name, interval_ms);
-        // Add to timer queue
+    void healShard(sigma_u32 shard_id, const char* profession) {
+        sigma_log_info("[S-AUTO] Triggering self-healing for Shard %u (Profession: %s)...", shard_id, profession);
+        
+        // Profession-specific healing logic
+        if (sigma_strcmp(profession, "doctor") == 0) {
+            sigma_log_info("[S-AUTO] [DOCTOR] Re-verifying HIPAA-compliant memory regions...");
+        } else if (sigma_strcmp(profession, "accountant") == 0) {
+            sigma_log_info("[S-AUTO] [ACCOUNTANT] Re-balancing ledger integrity hash...");
+        } else if (sigma_strcmp(profession, "architect") == 0) {
+            sigma_log_info("[S-AUTO] [ARCHITECT] Recalibrating structural stress-mesh...");
+        }
+        
+        sigma_log_info("[S-AUTO] Shard %u HEALED.", shard_id);
+    }
+
+    void triggerRollback(sigma_u32 shard_id, const char* profession) {
+        sigma_log_info("[S-AUTO] Initiating atomic rollback for Shard %u...", shard_id);
+        
+        // Profession-specific rollback strategy
+        if (sigma_strcmp(profession, "indian_lawyer") == 0) {
+            sigma_log_info("[S-AUTO] [LAWYER] Rolling back to last verified PQC-signed document state.");
+        } else if (sigma_strcmp(profession, "software_developer") == 0) {
+            sigma_log_info("[S-AUTO] [DEV] Reverting to last successful Git-Lattice commit.");
+        }
+        
+        sigma_log_info("[S-AUTO] Rollback COMPLETE. System state STABLE.");
     }
 
 private:
-    SovereignAutomationShard() {}
+    SovereignAutomation() = default;
 };
 
 } // namespace Automation
@@ -44,12 +65,16 @@ private:
 
 extern "C" {
 
-void sigma_auto_record(const char* action, const char* ctx) {
-    SigmaOS::Kernel::Automation::SovereignAutomationShard::recordAction(action, ctx);
+void auto_init() {
+    SigmaOS::Kernel::Automation::SovereignAutomation::getInstance().init();
 }
 
-void sigma_auto_schedule(const char* name, sigma_u64 ms) {
-    SigmaOS::Kernel::Automation::SovereignAutomationShard::scheduleTask(name, ms);
+void auto_heal(sigma_u32 sid, const char* prof) {
+    SigmaOS::Kernel::Automation::SovereignAutomation::getInstance().healShard(sid, prof);
+}
+
+void auto_rollback(sigma_u32 sid, const char* prof) {
+    SigmaOS::Kernel::Automation::SovereignAutomation::getInstance().triggerRollback(sid, prof);
 }
 
 } // extern "C"

@@ -3,7 +3,7 @@
  * Σ SIGMAOS: SOVEREIGN PARTITION MANAGER (Dual-Boot Foundation)
  * =========================================================================
  * Mission: Implements LATT-003 for GPT/MBR lattice partitioning.
- * Layer  : L2 — System Services / VFS
+ * Layer  : L2 �" System Services / VFS
  * =========================================================================
  */
 

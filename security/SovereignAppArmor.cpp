@@ -3,7 +3,7 @@
  * Σ SIGMAOS: SOVEREIGN APPARMOR (Mandatory Access Control Shard)
  * =========================================================================
  * Mission: Implements SEC-002 (MAC) to provide Linux-parity sandboxing.
- * Layer  : L3 — Security
+ * Layer  : L3 �" Security
  * =========================================================================
  */
 

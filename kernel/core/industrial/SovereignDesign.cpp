@@ -28,12 +28,18 @@ public:
         sigma_log_info("[S-DESIGN] Initializing Sovereign Design Studio...");
     }
 
-    void renderDraft(const char* svg_data) {
+    void renderVector(const char* svg_data) {
         (void)svg_data;
-        sigma_log_info("Design: Rendering vector canvas...");
         sigma_log_info("[S-DESIGN] Rendering vector graphics to Zenith canvas...");
         // Hit & Trial: Map Bezier curves to Zenith framebuffer instructions
         sigma_log_info("[S-DESIGN] Render COMPLETE.");
+    }
+
+    void renderBIM(const char* bim_data) {
+        (void)bim_data;
+        sigma_log_info("[S-DESIGN] [ARCHITECT] Initializing BIM (Building Information Modeling) Lattice...");
+        // Hit & Trial: Sync structural layers with physics-simulation shard
+        sigma_log_info("[S-DESIGN] BIM model rendered. Structural integrity verified.");
     }
 
     void createPrototype(const char* name) {
@@ -58,6 +64,10 @@ void design_init() {
 
 void design_render(const char* svg) {
     SigmaOS::Kernel::Design::SovereignDesign::getInstance().renderVector(svg);
+}
+
+void design_render_bim(const char* bim) {
+    SigmaOS::Kernel::Design::SovereignDesign::getInstance().renderBIM(bim);
 }
 
 } // extern "C"

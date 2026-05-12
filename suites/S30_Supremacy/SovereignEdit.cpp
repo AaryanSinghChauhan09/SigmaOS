@@ -9,7 +9,7 @@
  * SigmaOS Sovereign Editor (v100.0 Zenith)
  * A zero-dependency, bare-metal text orchestration shard.
  *
- * Design: OOP-isolated singleton â€” SovereignEditEngine.
+ * Design: OOP-isolated singleton â€" SovereignEditEngine.
  */
 
 class SovereignEditEngine {

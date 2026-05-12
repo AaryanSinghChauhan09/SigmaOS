@@ -9,9 +9,9 @@
  *
  * USP: Unlike i3/Sway running in userland, the Sovereign Tiler operates
  * via direct framebuffer geometry commands through the Zenith MLC compositor.
- * Layout decisions are O(1) â€” no redraw overhead, no compositor round-trips.
+ * Layout decisions are O(1) â€" no redraw overhead, no compositor round-trips.
  *
- * Design: OOP-isolated singleton â€” SovereignTilingEngine.
+ * Design: OOP-isolated singleton â€" SovereignTilingEngine.
  */
 
 typedef struct {

@@ -6,7 +6,7 @@
  * SigmaOS Sovereign GPU Driver (v100.0 Zenith)
  * Zero-copy graphics acceleration and silicon-native compositing.
  *
- * Design: OOP-isolated singleton â€” SovereignGPU.
+ * Design: OOP-isolated singleton â€" SovereignGPU.
  */
 
 class SovereignGPU {

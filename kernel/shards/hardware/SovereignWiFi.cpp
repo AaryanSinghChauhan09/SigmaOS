@@ -29,6 +29,7 @@ public:
     }
 
     void connect(const char* ssid, const char* psk) {
+        (void)psk;
         sigma_log_info("[S-WIFI] Connecting to SSID: %s...", ssid);
         // Hit & Trial: Negotiate PQC-WPA3-Sov session keys via S-MESH
         sigma_log_info("[S-WIFI] Connection SUCCESS. Signal: -42dBm. Encryption: PQC-AES-GCM.");

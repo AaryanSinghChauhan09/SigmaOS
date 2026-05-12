@@ -5,7 +5,7 @@
 /**
  * SigmaOS Sovereign Audit Engine (S-AUDIT)
  * Inspired by: OpenSCAP / OSSEC
- * Purpose: Real-time compliance auditing â€” FIPS 140-3, PQC, GDPR, HIPAA.
+ * Purpose: Real-time compliance auditing â€" FIPS 140-3, PQC, GDPR, HIPAA.
  * Features: Automated evidence collection, tamper-proof audit log with ZFS.
  */
 

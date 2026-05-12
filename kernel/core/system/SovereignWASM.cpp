@@ -36,6 +36,7 @@ public:
     }
 
     void loadModule(const void* bytecode, sigma_usize size) {
+        (void)bytecode; (void)size;
         sigma_log_info("[S-WASM] Loading WASM module (Size: %u bytes)...", (unsigned)size);
         // Hit & Trial: Validate WASM header and magic bits
         sigma_log_info("[S-WASM] Module VALIDATED. Ready for execution.");

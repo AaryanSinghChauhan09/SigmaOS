@@ -4,7 +4,7 @@
  * =========================================================================
  * Mission: Integrated, zero-dependency container orchestration.
  * Target : Neutralizes RancherOS/Flatcar requirements for immutable workflows.
- * Layer  : L5 â€” Industrial Ecosystem
+ * Layer  : L5 â€" Industrial Ecosystem
  * =========================================================================
  */
 

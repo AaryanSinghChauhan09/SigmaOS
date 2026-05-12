@@ -3,25 +3,24 @@
     "compliance_level": "sovereign-high",
     "resource_priority": "adaptive",
     "modules": [
-        "lesson_planning",
-        "grading_system",
-        "student_records",
-        "virtual_classroom_tools"
+        "teacher_workspace",
+        "specialized_analytics",
+        "compliance_manager"
     ],
     "rules": [
-        "CBSE/NCERT curriculum",
-        "NEP 2020 guidelines"
+        "Industry standards",
+        "professional ethics"
     ],
     "calculators": [
-        "Grade average",
-        "attendance tracker"
+        "Efficiency metrics",
+        "cost analysis"
     ],
     "algorithms": [
-        "Adaptive learning paths",
-        "exam paper generator"
+        "Workflow optimization",
+        "adaptive assistance"
     ],
     "automation": {
-        "self_healing": "Student data sync, curriculum update validation",
-        "rollback": "Gradebook versioning, lesson plan history"
+        "self_healing": "Continuous health check for Teacher tools",
+        "rollback": "Automatic state snapshots"
     }
 }

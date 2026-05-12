@@ -9,34 +9,34 @@
 
 void init_security_secure_boot() {
     sigma_print("[SECURE-BOOT] Verifying silicon-direct kernel signature...\n");
-    sigma_print("[âœ“] Boot integrity verified (FIPS-140-3 Mode).\n");
+    sigma_print("[âœ"] Boot integrity verified (FIPS-140-3 Mode).\n");
 }
 
 void init_security_access_control() {
     sigma_print("[ACCESS-CONTROL] Loading Lattice-Scale Capability Gates...\n");
-    sigma_print("[âœ“] Access policies synchronized with Sovereign Registry.\n");
+    sigma_print("[âœ"] Access policies synchronized with Sovereign Registry.\n");
 }
 
 void init_security_isolation() {
     sigma_print("[ISOLATION] Initializing zero-trust shard boundaries...\n");
-    sigma_print("[âœ“] Shard-pod namespaces isolated (L4 Gating).\n");
+    sigma_print("[âœ"] Shard-pod namespaces isolated (L4 Gating).\n");
 }
 
 /* --- Performance Modules --- */
 
 void init_perf_scheduler() {
     sigma_print("[SCHEDULER] Engaging Sovereign-Fair Scheduler (SFS)...\n");
-    sigma_print("[âœ“] ML-Prediction engine active for quantum pre-calculation.\n");
+    sigma_print("[âœ"] ML-Prediction engine active for quantum pre-calculation.\n");
 }
 
 void init_perf_mm() {
     sigma_print("[MM] Initializing Sovereign Buddy/Slab Allocator Lattice...\n");
-    sigma_print("[âœ“] Memory maps verified. Industrial-grade stability online.\n");
+    sigma_print("[âœ"] Memory maps verified. Industrial-grade stability online.\n");
 }
 
 void init_perf_bench() {
     sigma_print("[BENCH] Running Sovereign Lattice Performance Audit...\n");
-    sigma_print("[âœ“] CPU Context Switch: 45 cycles | Memory Latency: O(1).\n");
+    sigma_print("[âœ"] CPU Context Switch: 45 cycles | Memory Latency: O(1).\n");
 }
 
 /* --- Toolkit Modules --- */
@@ -55,5 +55,5 @@ void init_tools_sandbox() {
 
 void init_tools_verification() {
     sigma_print("[VERIFICATION] Running lattice-wide parity checks...\n");
-    sigma_print("[âœ“] All 600 shards report OPTIMAL status.\n");
+    sigma_print("[âœ"] All 600 shards report OPTIMAL status.\n");
 }

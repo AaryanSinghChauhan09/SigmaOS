@@ -4,7 +4,7 @@
 #include "ai/sigma_claw.h"
 
 /**
- * SovereignClawCompanion â€” Userland app for the Claw Gateway
+ * SovereignClawCompanion â€" Userland app for the Claw Gateway
  * Provides the interactive "Live Canvas" and multi-channel conversational UI.
  */
 

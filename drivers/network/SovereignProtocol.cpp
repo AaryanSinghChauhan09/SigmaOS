@@ -11,7 +11,7 @@
  * ultra-low latency mesh networking between Sovereign nodes. It bypasses traditional 
  * OSI constraints for raw silicon-to-silicon data transfers.
  *
- * Design: OOP-isolated singleton â€” SovereignProtocolEngine.
+ * Design: OOP-isolated singleton â€" SovereignProtocolEngine.
  */
 
 class SovereignProtocolEngine {

@@ -4,11 +4,13 @@
 extern "C" {
 
 void* sigma_mmap(void* addr, sigma_u64 length, int prot, int flags, int fd, sigma_u64 offset) {
+    (void)addr; (void)length; (void)prot; (void)flags; (void)fd; (void)offset;
     // Stub for sovereign memory mapping
     return (void*)0xDEADBEEF; 
 }
 
 void sigma_print(const char* msg) {
+    (void)msg;
     // Stub for sovereign console output
 }
 
@@ -37,5 +39,3 @@ int sigma_atoi(const char* str) {
 }
 
 }
-
-} // extern "C"

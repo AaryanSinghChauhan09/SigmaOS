@@ -1,114 +1,55 @@
-# Σ SIGMAOS: THE SOVEREIGN LATTICE (v14.0 [NEXUS-SUPREME])
+# Σ SigmaOS: The Sovereign Lattice (Zenith v15.0)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Security](https://img.shields.io/badge/Security-Post--Quantum-green.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SECURITY)
-[![Maintainability](https://img.shields.io/badge/Maintainability-Industrial-orange.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Maintenance-Policy)
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+![License](https://img.shields.io/badge/license-Industrial%20Sovereign-blue)
+![Architecture](https://img.shields.io/badge/architecture-x86__64%20%7C%20ARM64%20%7C%20RISC--V-orange)
 
-> **The "Sigma" of all Operating Systems.**
-> A supreme fusion of Linux’s ecosystem, Windows’ performance, and **Enterprise-Grade Productivity**—reimagined for absolute Digital Sovereignty through a 600-shard modular architecture.
+SigmaOS is the world's first **Industrial-Grade, Profession-Aware Operating System**. Built on the **Sovereign Lattice™** architecture, it provides a high-assurance, zero-dependency environment for mission-critical professional workflows.
 
----
+## 🚀 Key Unique Selling Points (USPs)
 
-## 💎 The Vision
+- **The Sovereign Lattice™**: A 600-shard modular kernel where every system service is a self-contained, high-assurance unit.
+- **Profession-Aware Architecture**: Dynamically orchestrates kernel shards based on your profession (Doctor, Lawyer, Architect, etc.).
+- **PQC-First Security**: Native Post-Quantum Cryptography for all data at rest and in transit.
+- **Life-OS Integration**: Personal AI Infrastructure (PAI) for managing current vs. desired user state.
 
-SigmaOS is not just a Linux distribution; it is a **Sovereign Lattice** of 600+ atomic shards designed for total hardware-to-userland autonomy. By neutralizing foreign dependencies and implementing silicon-direct orchestration, SigmaOS provides a high-performance, AI-native environment.
-
-### 🏭 Industrial Shards (v2.0)
-
-* **Sovereign Digital Twin**: Real-time silicon mirroring for predictive health and zero-downtime rollbacks.
-* **Industrial Dashboard**: Bare-metal telemetry nexus and system health visualization.
-* **Vulkan Sovereign Loader**: Silicon-direct GPU MMIO mapping and Zenith-RT (Ray Tracing) hardware probing.
-* **Neural PTO Engine**: High-throughput AI routing to silicon-native NPUs and tensor accelerators.
-
-## 🚀 Technical Pillars
-
-### 🧮 Sovereign Kernel (S01-S07)
-
-* **Precise Scheduling**: Sovereign-Fair Scheduler (SFS) with RDTSC-cycle precision and ML-prediction.
-* **Atomic Memory**: Buddy & Slab allocation lattice for zero-fragmentation industrial stability.
-* **Hardware Abstraction**: Clean IRQ/IDT handling for bare-metal silicon integrity.
-
-### 🛡️ Post-Quantum Security (S08)
-
-* **PQC Mesh**: Kyber and Dilithium algorithms integrated into the core IPC.
-* **Hardware Attestation**: Mandatory TPM 2.0 handshake for boot-time integrity.
-* **Lattice Policy**: Capability-gated access control across all 600 shards.
-
-### 🧠 AI-Native Autonomy (S09)
-
-* **Sovereign Claw**: Autonomous intent-based orchestration gateway.
-* **Predictive Resilience**: AI Watchdog that triggers rollbacks before system failure.
-* **Zenith UI**: Compositor with neural layout optimization and fluid motion rendering.
-
-### 🔄 Self-Healing Resilience (S41)
-
-* **Atomic Snapshots**: Copy-on-Write (CoW) snapshots of the entire lattice state.
-* **Rollback Daemon**: Automatic recovery to the last known good state on instability.
-
----
-
-## ⚔️ The Competitor Matrix
-
-SigmaOS is engineered to dominate and neutralize legacy distributions by solving their core weaknesses through sovereign AI-native governance.
-
-| Competitor | Neutralization Strategy | Status |
-| :--- | :--- | :--- |
-| **NixOS** | Transactional Shard Rollbacks & Declarative State | **Neutralized** |
-| **Arch Linux** | Continuous Shard-Level Rolling Synchronization | **Neutralized** |
-| **QubesOS** | Hardened Shard-Pod Namespace Isolation | **Neutralized** |
-| **Clear Linux** | Intel-Optimized Silicon Execution Paths | **Crushing** |
-| **SteamOS** | Native Vulkan Shard & Shader Pre-Caching | **Neutralized** |
-
----
-
-## 💻 The Sovereign CLI (`s-cli`)
-
-SigmaOS provides a unified namespace for all lattice operations:
-
-```bash
-
-# System Orchestration
-
-s-cli sigma-init     # Initialize system services
-s-cli sigma-eco      # Monitor Global Ecosystem USPs
-s-cli sigma-top      # Real-time shard performance monitor
-
-# Automation & AI
-
-s-cli sigma-claw     # Intent-based task orchestration
-s-cli sigma-ai       # Query the Sovereign Assistant
-
-# Security & Resilience
-
-s-cli sigma-sec      # Perform hardware attestation
-s-cli sigma-snap     # Manage system snapshots and rollbacks
-```
-
----
-
-## 🛠️ Getting Started
+## 🛠 Quick Start
 
 ### Prerequisites
+- LLVM / Clang (C++20 compliant)
+- QEMU (for emulation)
+- Node.js (for manifest generation)
 
-* `gcc` / `clang` (C++11/14 required for kernel shards)
-* `nasm` (for boot-sector assembly)
-* `qemu-system-x86` (for emulation and testing)
-
-### Build the Lattice
-
+### Build Instructions
 ```bash
-make all            # Build the 600-shard core
-./qemu-boot.sh      # Launch the Sovereign Lattice
+# Generate professional profiles
+node populate_profiles.cjs
+
+# Compile the Sovereign Kernel
+make all
+
+# Boot in QEMU
+make run
 ```
+See [BUILD.md](BUILD.md) for detailed hardware deployment guides.
+
+## 📚 Documentation & Resources
+
+- **Wiki**: [SigmaOS Sovereign Wiki](WIKI/Home.md)
+- **Architecture**: [Kernel Design](WIKI/Architecture.md)
+- **API Reference**: [Sovereign SDK](include/sigma_sdk.h)
+- **Roadmap**: [The Zenith Path](ROADMAP.md)
+
+## 🤝 Contributing
+
+We welcome contributions from the industrial and open-source communities. Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on code style, shard modularization, and PQC-attestation requirements.
+
+## 🔒 Security & Reliability
+
+SigmaOS is designed for absolute reliability.
+- **Memory Safety**: Strict adherence to `SigmaOOP` patterns and zero-allocation kernel primitives.
+- **Self-Healing**: Autonomous `S-AUTO` shard for real-time fault detection and atomic rollback.
+- **Sandboxing**: `S-WASM` runtime for isolated professional tool execution.
 
 ---
-
-## 📚 Documentation
-
-* [Official Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki) (The Immutable Source of Truth)
-* [Architecture Overview](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Sovereign-Lattice)
-* [Contribution Guide](docs/CONTRIBUTING.md)
-
----
-
-"Sovereignty is the ultimate efficiency."
+*SigmaOS: Sovereignty over your workspace.*

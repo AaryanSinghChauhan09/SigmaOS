@@ -4,7 +4,7 @@
  * =========================================================================
  * Mission: Bridges the maturity gap with Linux networking by mapping
  *          standard iptables/nftables rules into the Aether Firewall.
- * Layer  : L2 â€” System Services / Network
+ * Layer  : L2 â€" System Services / Network
  * =========================================================================
  */
 

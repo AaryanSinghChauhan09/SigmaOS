@@ -11,7 +11,7 @@
  * the isolated container namespace. Containers interact with POSIX file APIs, 
  * but reads/writes are actually mathematically striped across the hybrid silicon cluster.
  *
- * Design: OOP-isolated singleton â€” SovereignContainerStorageEngine.
+ * Design: OOP-isolated singleton â€" SovereignContainerStorageEngine.
  */
 
 class SovereignContainerStorageEngine {

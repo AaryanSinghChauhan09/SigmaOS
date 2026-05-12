@@ -10,7 +10,7 @@
  * USP: Automatically provisions virtual network interfaces (veth) and routes 
  * container traffic through the SovereignNetStack's deep packet inspection.
  *
- * Design: OOP-isolated singleton â€” SovereignContainerNetEngine.
+ * Design: OOP-isolated singleton â€" SovereignContainerNetEngine.
  */
 
 class SovereignContainerNetEngine {

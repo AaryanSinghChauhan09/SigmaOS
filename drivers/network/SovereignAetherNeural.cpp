@@ -3,7 +3,7 @@
  * Σ SIGMAOS: SOVEREIGN AETHER NEURAL (Heuristic Shard)
  * =========================================================================
  * Mission: Isolated shard for AI-driven packet inspection.
- * Layer  : L2 — System Services / Network
+ * Layer  : L2 �" System Services / Network
  * =========================================================================
  */
 

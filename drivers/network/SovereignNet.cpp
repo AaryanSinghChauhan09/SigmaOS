@@ -8,7 +8,7 @@
  * SigmaOS Sovereign Networking Implementation
  * Implements a Predictive Packet Routing (PPR) algorithm for zero-buffer flow.
  *
- * Design: OOP-isolated singleton â€” SovereignNetEngine.
+ * Design: OOP-isolated singleton â€" SovereignNetEngine.
  */
 
 typedef struct {

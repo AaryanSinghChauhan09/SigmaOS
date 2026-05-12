@@ -3,7 +3,7 @@
  * Σ SIGMAOS: AMDGPU RDNA/CDNA SHARD (DRV-009)
  * =========================================================================
  * Mission: Implements modern AMD GPU support (SteamOS parity).
- * Layer  : L1 — Kernel Primitives / Drivers
+ * Layer  : L1 �" Kernel Primitives / Drivers
  * =========================================================================
  */
 

@@ -4,7 +4,7 @@
  * =========================================================================
  * Mission: Bridges interoperability gaps with Docker, Kubernetes, and 
  *          enterprise OCI (Open Container Initiative) ecosystems.
- * Layer  : L5 â€” Industrial Ecosystem
+ * Layer  : L5 â€" Industrial Ecosystem
  * =========================================================================
  */
 

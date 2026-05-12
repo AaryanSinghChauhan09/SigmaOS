@@ -11,7 +11,7 @@
  * for absolutely zero-latency UI manipulation. Feeds directly into the 
  * Zenith Morphic Compositor.
  *
- * Design: OOP-isolated singleton â€” SovereignGestureEngine.
+ * Design: OOP-isolated singleton â€" SovereignGestureEngine.
  */
 
 class SovereignGestureEngine {

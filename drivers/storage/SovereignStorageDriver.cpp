@@ -11,7 +11,7 @@
  * Block I/O is performed via DMA scatter-gather, integrated directly 
  * with SovereignVFS for atomic file writes.
  *
- * Design: OOP-isolated singleton â€” SovereignStorageDriverEngine.
+ * Design: OOP-isolated singleton â€" SovereignStorageDriverEngine.
  */
 
 typedef enum {

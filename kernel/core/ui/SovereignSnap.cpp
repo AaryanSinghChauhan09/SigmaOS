@@ -5,7 +5,7 @@
 #include "core/SigmaOOP.hpp"
 
 /**
- * SovereignSnap â€” Sovereign Window Snapping Engine
+ * SovereignSnap â€" Sovereign Window Snapping Engine
  * Implements a Predictive Layout Engine (PLE) algorithm for adaptive tiling.
  */
 

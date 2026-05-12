@@ -29,6 +29,7 @@ public:
     }
 
     void handlePacket(const char* packet_data, sigma_u32 length) {
+        (void)packet_data;
         sigma_log_info("[S-NET] Processing industrial packet (Len: %u)...", length);
         // Hit & Trial: Decrypt via PQC-Mesh and scan for behavioral anomalies
         sigma_log_info("[S-NET] Packet SEALED and VERIFIED. Routing to application layer.");

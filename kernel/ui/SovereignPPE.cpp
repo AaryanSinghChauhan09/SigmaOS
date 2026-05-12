@@ -3,7 +3,7 @@
  * Σ SIGMAOS: SOVEREIGN PPE (Predictive Personalization Engine)
  * =========================================================================
  * Mission: Isolated shard for UI adaptation algorithms.
- * Layer  : L6 — Zenith UI / Personalization
+ * Layer  : L6 �" Zenith UI / Personalization
  * =========================================================================
  */
 

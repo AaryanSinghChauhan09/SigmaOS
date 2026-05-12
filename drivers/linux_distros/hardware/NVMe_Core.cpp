@@ -3,7 +3,7 @@
  * Σ SIGMAOS: NVME CORE STORAGE (DRV-010)
  * =========================================================================
  * Mission: Implements DRV-010 for high-speed NVMe storage access.
- * Layer  : L1 — Kernel Primitives / Drivers
+ * Layer  : L1 �" Kernel Primitives / Drivers
  * =========================================================================
  */
 

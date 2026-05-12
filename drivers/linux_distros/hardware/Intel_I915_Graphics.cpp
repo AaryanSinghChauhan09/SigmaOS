@@ -3,7 +3,7 @@
  * Σ SIGMAOS: INTEL I915 GRAPHICS (DRV-008)
  * =========================================================================
  * Mission: Implements DRV-008 for Intel Integrated Graphics.
- * Layer  : L1 — Kernel Primitives / Drivers
+ * Layer  : L1 �" Kernel Primitives / Drivers
  * =========================================================================
  */
 

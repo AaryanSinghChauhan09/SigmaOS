@@ -70,7 +70,7 @@ void sigma_idt_init() {
     
     // Load IDT
     asm volatile("lidt %0" : : "m"(idtr_ptr));
-    sigma_print("[âœ“] IDT Loaded at 0x%p\n", idtr_ptr.base);
+    sigma_print("[âœ"] IDT Loaded at 0x%p\n", idtr_ptr.base);
 }
 
 } // extern "C"

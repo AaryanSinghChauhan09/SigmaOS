@@ -10,7 +10,7 @@
  * USP: Widgets run natively on the GPU pipeline directly orchestrated by the kernel,
  * allowing 120fps smooth animations and interactive drag-and-drop mechanics.
  *
- * Design: OOP-isolated singleton â€” SovereignWidgetEngine.
+ * Design: OOP-isolated singleton â€" SovereignWidgetEngine.
  */
 
 class SovereignWidgetEngine {

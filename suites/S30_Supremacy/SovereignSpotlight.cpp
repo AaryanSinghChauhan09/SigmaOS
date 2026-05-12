@@ -8,7 +8,7 @@
  * S-SPOT: Sovereign Spotlight (v100.0 Zenith)
  * Fast, indexed search across the entire lattice.
  *
- * Design: OOP-isolated singleton â€” SovereignSpotlightEngine.
+ * Design: OOP-isolated singleton â€" SovereignSpotlightEngine.
  */
 
 class SovereignSpotlightEngine {

@@ -11,7 +11,7 @@
  * WPA3-SAE authentication uses SovereignPQC entropy for secure key derivation.
  * Mesh roaming via SovereignProtocol enables seamless multi-AP sovereignty.
  *
- * Design: OOP-isolated singleton â€” SovereignWiFiEngine.
+ * Design: OOP-isolated singleton â€" SovereignWiFiEngine.
  */
 
 typedef enum {
@@ -44,7 +44,7 @@ public:
     bool connect(const char* ssid, const char* passphrase, sigma_wifi_security_t security) {
         sigma_log("[WIFI] Connecting to '%s' (WPA%u)...\n", ssid, security + 1);
         if (security == WIFI_WPA3) {
-            sigma_log("[WIFI] WPA3-SAE handshake using SovereignPQC entropy â€” FORWARD SECRECY GUARANTEED.");
+            sigma_log("[WIFI] WPA3-SAE handshake using SovereignPQC entropy â€" FORWARD SECRECY GUARANTEED.");
         }
         this->connected = true;
         this->signal_dbm = -45; // Strong signal simulated

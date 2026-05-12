@@ -34,7 +34,7 @@ void SovereignDiagEngine::performScan() {
 
 void SovereignDiagEngine::reportAnomaly(ShardID shard_id, AnomalyDesc description) {
     (void)shard_id; (void)description;
-    sigma_log_err("[DIAG] [CRITICAL] Shard anomaly detected â€” triggering self-heal.");
+    sigma_log_err("[DIAG] [CRITICAL] Shard anomaly detected â€" triggering self-heal.");
     m_fault_count++;
 }
 

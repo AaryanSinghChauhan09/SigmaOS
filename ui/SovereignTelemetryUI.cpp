@@ -10,7 +10,7 @@
  * USP: Hardware-accelerated, real-time visualization of SovereignNetStack throughput,
  * NUMA node latency, and SovereignVFS replication status at 120fps.
  *
- * Design: OOP-isolated singleton â€” SovereignTelemetryUIEngine.
+ * Design: OOP-isolated singleton â€" SovereignTelemetryUIEngine.
  */
 
 class SovereignTelemetryUIEngine {

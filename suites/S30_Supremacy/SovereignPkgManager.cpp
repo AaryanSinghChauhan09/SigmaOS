@@ -2,7 +2,7 @@
 #include "SovereignLibC.h"
 /**
  * SigmaOS Sovereign Package Manager (S-PKG)
- * v29.0 Zenith Foundation â€” Minimal Software Distribution
+ * v29.0 Zenith Foundation â€" Minimal Software Distribution
  * ZERO-DEPENDENCY: Strictly bare-metal package extraction.
  */
 

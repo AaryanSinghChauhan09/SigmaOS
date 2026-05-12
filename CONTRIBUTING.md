@@ -1,29 +1,29 @@
-# Contributing to Σ SigmaOS
+# Contributing to SigmaOS
 
-Welcome to the Sovereign Lattice. SigmaOS is a modular, 600-shard operating system designed for absolute digital sovereignty. We welcome contributions from developers, security researchers, and UI/UX designers.
+Thank you for your interest in contributing to the Sovereign Lattice! As an industrial-grade project, we maintain high standards for code quality, modularity, and security.
 
-## 🏛️ Contribution Principles
+## 🏛 Shard-First Architecture
+SigmaOS is built as a collection of **shards**. Every new feature should be implemented as an isolated shard with:
+1.  **Zero External Dependencies**: Use only `SovereignLibC` and `SigmaOOP` primitives.
+2.  **Strict Namespacing**: Follow the `SigmaOS::Kernel::<Subsystem>` pattern.
+3.  **C-Bridge Integration**: Expose functions via `extern "C"` for kernel/userland interoperability.
 
-1. **Zero-STL**: All kernel shards must be zero-dependency (no standard library).
-2. **Shard Isolation**: Subsystems must be isolated with strict, versioned APIs.
-3. **Post-Quantum Ready**: Security modules must adhere to NIST-standard PQC algorithms.
-4. **Silicon-Native**: Optimize for direct hardware orchestration where possible.
+## 🛠 Development Workflow
+1.  **Fork & Clone**: Pull the latest `main` branch.
+2.  **Modularize**: Ensure your changes don't tightly couple shards.
+3.  **Audit**: Run `sigma-cli pqc-audit` and `forensic-scan` if applicable.
+4.  **Lint**: Ensure Markdown files follow the repo standards (no MD025, MD060).
+5.  **PR**: Submit your PR with a clear explanation of the "Industrial USP" your change provides.
 
-## 🚀 Getting Started
+## 📝 Coding Style
+- **Naming**: `CamelCase` for classes, `snake_case` for functions and variables.
+- **Macros**: Prefix with `SIGMA_` or `LOG_`.
+- **Comments**: Every shard must have a header comment explaining its Purpose, USP, and Features.
 
-1. **Fork the Lattice**: Fork the repository and create your shard branch.
-2. **Build Locally**: Use `make all` to validate the lattice.
-3. **Test Shards**: Ensure your changes pass the QEMU boot tests.
-
-## 🧪 Testing Guidelines
-
-* All new shards must include a `run_stress_test()` hook.
-* Regression tests are mandatory for core system services (IPC, Sched, VMM).
-
-## 🛡️ Code of Conduct
-
-We maintain a professional, inclusive, and mission-oriented environment. Please refer to `CODE_OF_CONDUCT.md` for details.
+## 🛡 Security Requirements
+- All data-handling logic must consider Post-Quantum Cryptography (PQC) attestation.
+- Avoid raw pointers where possible; use the `SigmaObject` lifecycle.
+- Zero buffer overflows: use `sigma_strncpy` and `sigma_memcpy` with explicit bounds.
 
 ---
-
-### Join us in achieving Digital Sovereignty.
+*By contributing, you agree to license your work under the Sovereign Lattice License.*

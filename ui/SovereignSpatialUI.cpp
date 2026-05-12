@@ -8,10 +8,10 @@
  * Hardware-accelerated spatial UI interaction engine.
  *
  * USP: Hot corners and split snapping are processed by the kernel-level
- * gesture subsystem â€” no userland compositor polling. Corner triggers 
+ * gesture subsystem â€" no userland compositor polling. Corner triggers 
  * are acted on within one display refresh cycle (~8ms at 120Hz).
  *
- * Design: OOP-isolated singleton â€” SovereignSpatialUIEngine.
+ * Design: OOP-isolated singleton â€" SovereignSpatialUIEngine.
  */
 
 typedef enum {

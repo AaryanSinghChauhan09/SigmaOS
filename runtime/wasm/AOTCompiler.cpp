@@ -3,7 +3,7 @@
 #include "sigma_log.h"
 
 /**
- * SovereignAOT Compiler â€” Ahead-of-Time WASM-to-Native Translator
+ * SovereignAOT Compiler â€" Ahead-of-Time WASM-to-Native Translator
  * Compiles WASM shard bytecode to native x86_64 at load-time.
  * Zero runtime overhead: all JIT is eliminated at the entry gate.
  */

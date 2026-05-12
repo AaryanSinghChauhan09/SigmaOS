@@ -3,7 +3,7 @@
  * Σ SIGMAOS: SOVEREIGN WHONIX TOR (Privacy Networking Shim)
  * =========================================================================
  * Mission: Implements SEC-004 (Privacy-first defaults from Whonix/Tails).
- * Layer  : L3 — Security / Network
+ * Layer  : L3 �" Security / Network
  * =========================================================================
  */
 

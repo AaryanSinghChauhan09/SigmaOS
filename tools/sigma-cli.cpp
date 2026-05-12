@@ -28,6 +28,13 @@ void print_help() {
     sigma_log_info("  pos-transact   - Process a POS transaction");
     sigma_log_info("  forensic-scan  - Audit shard for security anomalies");
     sigma_log_info("  eco-optimize   - Optimize grid for sustainability");
+    sigma_log_info("  vakil-search   - Search Indian Legislation (BNS)");
+    sigma_log_info("  auto-heal      - Trigger profession-aware self-healing");
+    sigma_log_info("  viz-dicom      - Render medical DICOM image");
+    sigma_log_info("  design-bim     - Render architectural BIM model");
+    sigma_log_info("  audio-midi     - Process MIDI lattice events");
+    sigma_log_info("  pai-skill <id> - Execute a Sovereign AI skill");
+    sigma_log_info("  pulse          - Show real-time Life-OS dashboard");
 }
 
 int main(int argc, char** argv) {
@@ -55,8 +62,8 @@ int main(int argc, char** argv) {
         heal_diagnostic_report();
     } else if (sigma_strcmp(cmd, "eng-sim") == 0) {
         engineer_run_simulation();
-    } else if (sigma_strcmp(cmd, "med-dicom") == 0) {
-        medical_load_image(SIGMA_NULL, 0);
+    } else if (sigma_strcmp(cmd, "med-dicom") == 0 || sigma_strcmp(cmd, "viz-dicom") == 0) {
+        viz_render_dicom(SIGMA_NULL, 0);
     } else if (sigma_strcmp(cmd, "airgap-on") == 0) {
         airgap_engage();
     } else if (sigma_strcmp(cmd, "airgap-off") == 0) {
@@ -75,6 +82,20 @@ int main(int argc, char** argv) {
         forensics_scan(0);
     } else if (sigma_strcmp(cmd, "eco-optimize") == 0) {
         eco_optimize();
+    } else if (sigma_strcmp(cmd, "vakil-search") == 0) {
+        if (argc < 3) return -1;
+        vakil_search(argv[2]);
+    } else if (sigma_strcmp(cmd, "auto-heal") == 0) {
+        auto_heal(0, "default");
+    } else if (sigma_strcmp(cmd, "design-bim") == 0) {
+        design_render_bim(SIGMA_NULL);
+    } else if (sigma_strcmp(cmd, "audio-midi") == 0) {
+        audio_process_midi(SIGMA_NULL, 0);
+    } else if (sigma_strcmp(cmd, "pai-skill") == 0) {
+        if (argc < 3) return -1;
+        pai_skill(argv[2], "");
+    } else if (sigma_strcmp(cmd, "pulse") == 0) {
+        pulse_report();
     } else {
         sigma_log_err("Unknown command: %s", cmd);
     }

@@ -10,7 +10,7 @@
  * USP: Instantly spins up hardware-isolated micro-containers for applications
  * without needing Docker or LXC. Native integration means zero overhead.
  *
- * Design: OOP-isolated singleton â€” SovereignContainerEngine.
+ * Design: OOP-isolated singleton â€" SovereignContainerEngine.
  */
 
 namespace SigmaOS {

@@ -10,7 +10,7 @@
  * USP: Executable directly on bare metal without standard libraries, 
  * communicating directly with the Sovereign Kernel via IPC and syscalls.
  *
- * Design: OOP-isolated singleton â€” SovereignShell.
+ * Design: OOP-isolated singleton â€" SovereignShell.
  */
 
 class SovereignShell {

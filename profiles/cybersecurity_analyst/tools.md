@@ -1,27 +1,24 @@
 # 🛠 CYBERSECURITY_ANALYST Profile
 
 ## Required Tools & Functions
-- Threat detection
-- penetration testing
-- compliance dashboards
-- IDS/IPS
+- Cybersecurity Analyst workspace
+- specialized analytics
+- compliance manager
 
 ## 📜 Compliance Rules
-- ISO 27001
-- NIST framework
-- CERT-In guidelines
+- Industry standards
+- professional ethics
 
 ## 🧮 Professional Calculators
-- Risk score
-- CVSS
-- entropy check
+- Efficiency metrics
+- cost analysis
 
 ## 🧬 Core Algorithms
-- Anomaly detection
-- heuristic threat hunting
+- Workflow optimization
+- adaptive assistance
 
 ## 🛡 Self-Healing Strategy
-- Automated firewall rules, sandboxed malware containment
+- Continuous health check for Cybersecurity Analyst tools
 
 ## 🔄 Rollback Strategy
-- Immutable audit logs, system-wide security baseline restoration
+- Automatic state snapshots

@@ -11,7 +11,7 @@
  * USP: Hardware-accelerated glassmorphism with Adaptive auto-dark switching 
  * natively embedded in the OS kernel.
  *
- * Design: OOP-isolated singleton â€” SovereignThemeEngine.
+ * Design: OOP-isolated singleton â€" SovereignThemeEngine.
  */
 
 class SovereignThemeEngine {

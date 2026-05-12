@@ -3,7 +3,7 @@
  * Σ SIGMAOS: SOVEREIGN DIRECT GPU (Bare-Metal Shard)
  * =========================================================================
  * Mission: Implements GAM-003 (Direct hardware access for Gaming/AI).
- * Layer  : L1 — Kernel Primitives / Drivers
+ * Layer  : L1 �" Kernel Primitives / Drivers
  * =========================================================================
  */
 

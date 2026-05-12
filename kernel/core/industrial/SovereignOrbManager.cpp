@@ -3,7 +3,7 @@
  * Î£ SIGMAOS: SOVEREIGN ORB MANAGER (Package Management Shard)
  * =========================================================================
  * Mission: Cryptographically signed, zero-latency Orb deployment.
- * Layer  : L5 â€” Industrial Ecosystem
+ * Layer  : L5 â€" Industrial Ecosystem
  * =========================================================================
  */
 
@@ -16,7 +16,7 @@
 #include "../../../include/security/SovereignQKD.hpp"
 
 /**
- * SovereignOrbManager â€” Sovereign Orb Package Ecosystem
+ * SovereignOrbManager â€" Sovereign Orb Package Ecosystem
  * Principles: Cryptographically Signed Orbs, Zero-Latency Deployment.
  * Mission: Filling the industrial gap for a robust package ecosystem.
  *
@@ -83,7 +83,7 @@ public:
                 self.m_installed_orbs++;
             }
         } else {
-            sigma_log("[ORB-MAN] SIGNATURE MISMATCH â€” Orb rejected by QKD Core.\n");
+            sigma_log("[ORB-MAN] SIGNATURE MISMATCH â€" Orb rejected by QKD Core.\n");
         }
     }
 

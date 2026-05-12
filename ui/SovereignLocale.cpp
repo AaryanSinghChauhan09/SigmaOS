@@ -10,7 +10,7 @@
  * ZERO-DEPENDENCY: Inline CLDR-derived data; no glibc/ICU/tzdata daemon.
  * Competitor parity: Linux glibc locale, Windows NLS, macOS CFLocale.
  *
- * Design: OOP-isolated singleton â€” SovereignLocaleManager.
+ * Design: OOP-isolated singleton â€" SovereignLocaleManager.
  */
 
 /* Internal helper: sovereign bare-metal strlen (avoids libc dependency) */

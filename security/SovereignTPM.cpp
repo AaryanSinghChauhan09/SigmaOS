@@ -1,5 +1,5 @@
 /**
- * SovereignTPM â€” Measured Boot & TPM Shard
+ * SovereignTPM â€" Measured Boot & TPM Shard
  * Manages platform configuration registers (PCRs) and hardware-backed attestation.
  */
 

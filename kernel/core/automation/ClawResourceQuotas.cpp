@@ -3,7 +3,7 @@
  * Σ SIGMAOS: CLAW RESOURCE QUOTAS (Agent Sandboxing Shard)
  * =========================================================================
  * Mission: Enforces resource limits (CPU/MEM/IO) on Claw agents.
- * Layer  : L4 — AI & Automation
+ * Layer  : L4 �" AI & Automation
  * =========================================================================
  */
 

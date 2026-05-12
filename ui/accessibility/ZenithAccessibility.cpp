@@ -4,7 +4,7 @@
  * =========================================================================
  * Mission: Polished accessibility layers for the futuristic Zenith UI.
  * Target : Neutralizes elementary OS requirement for user-friendly elegance.
- * Layer  : L6 â€” Zenith UI / Display Server
+ * Layer  : L6 â€" Zenith UI / Display Server
  * =========================================================================
  */
 

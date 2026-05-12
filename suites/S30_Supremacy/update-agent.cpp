@@ -3,7 +3,7 @@
 #include "sigma_log.h"
 
 /**
- * SovereignUpdateAgent â€” Atomic System Updates and Rollbacks.
+ * SovereignUpdateAgent â€" Atomic System Updates and Rollbacks.
  * Ensures the integrity of the lattice during shard migrations.
  */
 

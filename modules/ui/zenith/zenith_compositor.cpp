@@ -57,6 +57,25 @@ static zenith_theme_t current_theme = {
 extern void audit_chain_append(sigma_u32 pid, sigma_u8 level, const char* msg);
 extern int cap_registry_verify(sigma_u32 cap_id, sigma_u32 pid, sigma_u8 required_rights);
 
+// Alpha blending utility for Glassmorphism USP
+static sigma_u32 blend_colors(sigma_u32 fg, sigma_u32 bg, sigma_u8 alpha) {
+    sigma_u8 fg_r = (fg >> 16) & 0xFF;
+    sigma_u8 fg_g = (fg >> 8)  & 0xFF;
+    sigma_u8 fg_b = fg         & 0xFF;
+
+    sigma_u8 bg_r = (bg >> 16) & 0xFF;
+    sigma_u8 bg_g = (bg >> 8)  & 0xFF;
+    sigma_u8 bg_b = bg         & 0xFF;
+
+    sigma_u8 r = ((fg_r * alpha) + (bg_r * (255 - alpha))) / 255;
+    sigma_u8 g = ((fg_g * alpha) + (bg_g * (255 - alpha))) / 255;
+    sigma_u8 b = ((fg_b * alpha) + (bg_b * (255 - alpha))) / 255;
+
+    return (r << 16) | (g << 8) | b;
+}
+
+extern "C" {
+
 // Initialize the UI Compositor
 void zenith_init(sigma_u64 fb_phys_addr) {
     (void)fb_phys_addr;
@@ -76,23 +95,6 @@ void zenith_apply_theme(const zenith_theme_t* theme, sigma_u32 cap_token) {
     if (!cap_registry_verify(cap_token, 0 /* shell PID */, 0x01)) return;
     current_theme = *theme;
     audit_chain_append(0, 1, "ZENITH_THEME_UPDATED");
-}
-
-// Alpha blending utility for Glassmorphism USP
-static sigma_u32 blend_colors(sigma_u32 fg, sigma_u32 bg, sigma_u8 alpha) {
-    sigma_u8 fg_r = (fg >> 16) & 0xFF;
-    sigma_u8 fg_g = (fg >> 8)  & 0xFF;
-    sigma_u8 fg_b = fg         & 0xFF;
-
-    sigma_u8 bg_r = (bg >> 16) & 0xFF;
-    sigma_u8 bg_g = (bg >> 8)  & 0xFF;
-    sigma_u8 bg_b = bg         & 0xFF;
-
-    sigma_u8 r = ((fg_r * alpha) + (bg_r * (255 - alpha))) / 255;
-    sigma_u8 g = ((fg_g * alpha) + (bg_g * (255 - alpha))) / 255;
-    sigma_u8 b = ((fg_b * alpha) + (bg_b * (255 - alpha))) / 255;
-
-    return (r << 16) | (g << 8) | b;
 }
 
 // Master Render Loop (Triggered via VSync Interrupt)
@@ -152,6 +154,7 @@ sigma_u32 zenith_get_window_count(void) {
 }
 
 void zenith_reorder_windows(sigma_u32* order_array, sigma_u32 count) {
+    (void)order_array; (void)count;
     if (count > window_count) count = window_count;
     sigma_log_info("[ZENITH] Reordering windows for optimal Z-depth...");
     audit_chain_append(0, 1, "ZENITH_WINDOW_REORDER_COMPLETE");
@@ -167,3 +170,5 @@ void zenith_apply_blur(sigma_u32 x, sigma_u32 y, sigma_u32 w, sigma_u32 h) {
     sigma_log_info("[ZENITH] Applying Gaussian blur to region (%u, %u, %u, %u)...", x, y, w, h);
     sigma_log_info("[ZENITH] Blur applied SUCCESS.");
 }
+
+} // extern "C"

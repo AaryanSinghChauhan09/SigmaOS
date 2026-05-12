@@ -4,7 +4,7 @@
 #include "core/sigma_types.h"
 /**
  * =========================================================================
- * Œ£ SIGMAOS: SOVEREIGN SECURITY HARDENER (S-SECHARDENER) ‚Äî SHARD #500
+ * Œ£ SIGMAOS: SOVEREIGN SECURITY HARDENER (S-SECHARDENER) ‚Ä" SHARD #500
  * =========================================================================
  * Implements a Principle of Least Privilege Enforcement (PLPE) algorithm.
  *
@@ -20,7 +20,7 @@
 #include "libc/sigma_libc.h"
 
 /**
- * sigma_hardened_strcpy ‚Äî CWE-119 fix for unsafe strcpy usage.
+ * sigma_hardened_strcpy ‚Ä" CWE-119 fix for unsafe strcpy usage.
  * All string copies in the lattice MUST use this instead of strcpy.
  */
 void sigma_hardened_strcpy(char* dest, const char* src, sigma_size_t max_len) {
@@ -31,11 +31,11 @@ void sigma_hardened_strcpy(char* dest, const char* src, sigma_size_t max_len) {
         dest[i] = src[i];
         ++i;
     }
-    dest[i] = '\0'; /* Always null-terminate ‚Äî prevents buffer overread */
+    dest[i] = '\0'; /* Always null-terminate ‚Ä" prevents buffer overread */
 }
 
 /**
- * sigma_hardened_snprintf ‚Äî CWE-119 fix for unsafe sprintf/printf patterns.
+ * sigma_hardened_snprintf ‚Ä" CWE-119 fix for unsafe sprintf/printf patterns.
  */
 extern "C" int sigma_hardened_snprintf(char* dest, sigma_size_t max_len, const char* fmt, ...) {
     if (!dest || max_len == 0 || !fmt) return -1; /* CWE-20: Input validation */
@@ -53,9 +53,9 @@ void sechardener_init() {
 void sechardener_apply_to_shard(sigma_u32 shard_id, sigma_harden_level_t level) {
     /**
      * PLPE (Principle of Least Privilege Enforcement) Algorithm:
-     * Level 0 ‚Äî BASELINE: ASLR randomization + stack canary injection.
-     * Level 1 ‚Äî STRICT:   + seccomp-style syscall allow-list filtering.
-     * Level 2 ‚Äî SOVEREIGN: + full Cryptographic Isolation Boundary (from S-Sandbox).
+     * Level 0 ‚Ä" BASELINE: ASLR randomization + stack canary injection.
+     * Level 1 ‚Ä" STRICT:   + seccomp-style syscall allow-list filtering.
+     * Level 2 ‚Ä" SOVEREIGN: + full Cryptographic Isolation Boundary (from S-Sandbox).
      */
     sigma_log("[SECHARDENER] PLPE: Applying harden level %d to Shard %d.\n", (int)level, shard_id);
 
@@ -71,7 +71,7 @@ void sechardener_apply_to_shard(sigma_u32 shard_id, sigma_harden_level_t level) 
 }
 
 void sechardener_validate_buffer(const void* buf, sigma_u32 claimed_size, sigma_u32 actual_capacity) {
-    /* CWE-119 runtime guard ‚Äî called at every shard public API boundary */
+    /* CWE-119 runtime guard ‚Ä" called at every shard public API boundary */
     if (!buf) {
         sigma_log("[SECHARDENER] ‚ùå PLPE: NULL buffer passed to public API. REJECTED.");
         return;

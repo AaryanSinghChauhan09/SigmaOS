@@ -10,7 +10,7 @@
  * USP: Completely bypasses legacy POSIX networking overhead. Implements a
  * hardened IPv4/IPv6 stack with inherent packet filtering at the data-link layer.
  *
- * Design: OOP-isolated singleton â€” SovereignNetStackEngine.
+ * Design: OOP-isolated singleton â€" SovereignNetStackEngine.
  */
 
 class SovereignNetStackEngine {

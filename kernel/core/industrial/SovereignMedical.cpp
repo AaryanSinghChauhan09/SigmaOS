@@ -28,7 +28,7 @@ public:
         this->m_hippa_compliant = true;
     }
 
-    void loadImage(void* data, sigma_u32 size) {
+    void loadDicomImage(const void* data, sigma_usize size) {
         (void)data; (void)size;
         sigma_log_info("Medical: Processing DICOM volumetric data...");
         // Hit & Trial: Perform hardware-accelerated volumetric rendering
@@ -42,7 +42,7 @@ public:
     }
 
 private:
-    SovereignMedical() = default;
+    SovereignMedical() : m_hippa_compliant(false) {}
     bool m_hippa_compliant;
 };
 

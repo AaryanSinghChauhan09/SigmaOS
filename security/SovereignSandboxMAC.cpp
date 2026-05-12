@@ -3,7 +3,7 @@
  * Î£ SIGMAOS: SOVEREIGN SANDBOX MAC (Policy Shard)
  * =========================================================================
  * Mission: Isolated shard for SELinux-style MAC policy enforcement.
- * Layer  : L3 â€” Security
+ * Layer  : L3 â€" Security
  * =========================================================================
  */
 
@@ -26,7 +26,7 @@ public:
 
     bool validate(const char* sub, const char* obj, const char* act) {
         sigma_log_info("[SANDBOX-MAC] Validating policy for %s -> %s [%s]", sub, obj, act);
-        // Default: Deny-All policy â€” all access must be explicitly granted
+        // Default: Deny-All policy â€" all access must be explicitly granted
         return false;
     }
 
