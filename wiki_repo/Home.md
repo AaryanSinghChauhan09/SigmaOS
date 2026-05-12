@@ -27,9 +27,10 @@ Welcome to the central knowledge hub for **SigmaOS**, the world's first industri
 - [S-VPN: Sovereign WireGuard](Network-Stack): PQC-encrypted industrial networking.
 - [Z-DESK: Zenith Desktop](Zenith-Desktop): The profession-aware graphical environment.
 - [S-MIND: Sovereign Lattice Mapper](Sovereign-Lattice-Mapper): Interactive shard visualization and topology auditing.
-- [S-MESA: Industrial GPU Stack](GPU-Stack): High-performance 3D acceleration via Mesa integration.
-- [S-BLUEZ: Bluetooth Lattice](Bluetooth-Stack): Secure peripheral orchestration.
-- [S-CUPS: Printing Nexus](Printing-Subsystem): High-assurance industrial spooling.
+- [S-AI: Intelligence Nexus](AI-ML-Nexus): GPU-accelerated compute shards (CUDA/ONNX).
+- [S-PLAY: Coding Playground](Education-Playground): Offline REPL and DSA libraries.
+- [S-CI: Industrial Automation](CI-CD-Automation): GitHub Actions and QEMU regression lattice.
+- [S-ROADMAP: Strategic Horizon](Project-Roadmap): The path to v16.0 Stable.
 - **[S-PKG: Lattice Package Nexus](Package-Nexus)**: Decentralized shard distribution.
 - **[S-CONTAINER: Sovereign Containers](Container-Runtime)**: OCI-compliant application sharding.
 - **[S-LOG: Sovereign Journaling](Sovereign-Journal)**: Structured industrial telemetry.
