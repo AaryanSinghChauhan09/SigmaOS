@@ -33,6 +33,7 @@
 | Sovereign Cloud (Docker/K8s) | DevOps | High | DONE |
 | Sovereign Vis (D3/Graphviz) | VIS | Medium | DONE |
 | Sovereign Cyber (Metasploit) | CYBER | High | DONE |
+| Sigma-Pkg (Package Manager) | System | High | DONE |
 | Offline Coding Playground | EDU | Low | DONE |
 | QEMU Regression Actions | CI/CD | Medium | DONE |
 

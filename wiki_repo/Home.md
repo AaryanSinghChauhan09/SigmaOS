@@ -8,6 +8,7 @@ Welcome to the central knowledge hub for **SigmaOS**, the world's first industri
 - **[Sovereign Driver Framework](Driver-Framework)**: Guide and templates for developing hardware-level drivers.
 - **[Security & Reliability](Security-Safety)**: Overview of self-healing (S-AUTO) and process isolation (S-WASM).
 - **[API Reference](API-Reference)**: Technical documentation for the Sovereign SDK and Zenith UI.
+- **[S-COMPONENTS: Industrial Component Registry](SigmaOS-Components)**: List of all absorbed industry USPs.
 - **[S-SHARDS: Professional Shard Registry](Professional-Shards)**: Overview of MED, CYBER, FIN, and SPACE shards.
 
 ## 🚀 Industrial Strategy
@@ -32,8 +33,8 @@ Welcome to the central knowledge hub for **SigmaOS**, the world's first industri
 - [S-PLAY: Coding Playground](Education-Playground): Offline REPL and DSA libraries.
 - [S-CI: Industrial Automation](CI-CD-Automation): GitHub Actions and QEMU regression lattice.
 - [S-ROADMAP: Strategic Horizon](Project-Roadmap): The path to v16.0 Stable.
-- **[S-PKG: Lattice Package Nexus](Package-Nexus)**: Decentralized shard distribution.
-- **[S-CONTAINER: Sovereign Containers](Container-Runtime)**: OCI-compliant application sharding.
+- [S-PKG: Lattice Package Nexus](SIGMA_PKG): Decentralized shard distribution and PQC-verification.
+- [S-CONTAINER: Sovereign Containers](Container-Runtime): OCI-compliant application sharding.
 - **[S-LOG: Sovereign Journaling](Sovereign-Journal)**: Structured industrial telemetry.
 
 ## 🛠 Project Lifecycle
