@@ -15,12 +15,9 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Drivers {
 
-class ArchDriverCompat : public SigmaObject {
+class ArchDriverCompat : public SigmaObject, public SigmaSingleton<ArchDriverCompat> {
+    friend class SigmaSingleton<ArchDriverCompat>;
 public:
-    static ArchDriverCompat& getInstance() {
-        static ArchDriverCompat instance;
-        return instance;
-    }
 
     const char* type_name() const noexcept override { return "ArchDriverCompat"; }
 

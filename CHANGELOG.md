@@ -25,6 +25,7 @@ All notable changes to **SigmaOS** will be documented in this file.
 - **S-MIND**: Sovereign Lattice Mapper for interactive shard topology auditing.
 
 ### 🔧 Fixed
+
 - **Architectural Normalization**: Unified kernel types and eliminated high-level language dependencies across 600 shards.
 - **Include Path Hardening**: Resolved 600+ brittle include path errors by enforcing root-relative addressing.
 - **Boot Singularity**: Restored missing boot shards to `SHARDS.manifest`, ensuring a complete system singularity build.
@@ -42,4 +43,4 @@ All notable changes to **SigmaOS** will be documented in this file.
 
 ---
 
-### Stay Sovereign.
+### Stay Sovereign

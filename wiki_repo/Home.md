@@ -25,6 +25,7 @@ Welcome to the central knowledge hub for **SigmaOS**, the world's first industri
 - **[S-HAL: Hardware Driver Framework](Hardware-Drivers)**: GPU, Audio, and Connectivity.
 - **[S-MAC: Mandatory Access Control](Security-MAC)**: Shard-level zero-trust enforcement.
 - **[Z-DESK: Zenith Desktop](Zenith-Desktop)**: The profession-aware graphical environment.
+- **[S-MIND: Sovereign Lattice Mapper](Sovereign-Lattice-Mapper)**: Interactive shard visualization and topology auditing.
 - **[S-PKG: Lattice Package Nexus](Package-Nexus)**: Decentralized shard distribution.
 - **[S-CONTAINER: Sovereign Containers](Container-Runtime)**: OCI-compliant application sharding.
 - **[S-LOG: Sovereign Journaling](Sovereign-Journal)**: Structured industrial telemetry.

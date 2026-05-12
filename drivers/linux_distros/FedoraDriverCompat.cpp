@@ -15,12 +15,9 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Drivers {
 
-class FedoraDriverCompat : public SigmaObject {
+class FedoraDriverCompat : public SigmaObject, public SigmaSingleton<FedoraDriverCompat> {
+    friend class SigmaSingleton<FedoraDriverCompat>;
 public:
-    static FedoraDriverCompat& getInstance() {
-        static FedoraDriverCompat instance;
-        return instance;
-    }
 
     const char* type_name() const noexcept override { return "FedoraDriverCompat"; }
 

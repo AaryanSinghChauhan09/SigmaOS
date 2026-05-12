@@ -61,6 +61,11 @@ kernel/core/security/SovereignSandbox.cpp
 kernel/core/security/SovereignLUKS.cpp
 kernel/core/security/SovereignAttestation.cpp
 kernel/core/security/SovereignTPM.cpp
+drivers/SovereignLinuxCompat.cpp
+drivers/linux_distros/ArchDriverCompat.cpp
+drivers/linux_distros/DebianDriverCompat.cpp
+drivers/linux_distros/FedoraDriverCompat.cpp
+drivers/linux_distros/UbuntuDriverCompat.cpp
 # LAYER 4: AI & AUTOMATION (CLAW STACK)
 kernel/core/ai/SovereignNeural.cpp
 kernel/core/ai/SovereignMLFlow.cpp

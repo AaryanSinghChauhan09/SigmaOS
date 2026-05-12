@@ -20,12 +20,9 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Drivers {
 
-class SovereignLinuxCompat : public SigmaObject {
+class SovereignLinuxCompat : public SigmaObject, public SigmaSingleton<SovereignLinuxCompat> {
+    friend class SigmaSingleton<SovereignLinuxCompat>;
 public:
-    static SovereignLinuxCompat& getInstance() {
-        static SovereignLinuxCompat instance;
-        return instance;
-    }
 
     const char* type_name() const noexcept override { return "SovereignLinuxCompat"; }
 

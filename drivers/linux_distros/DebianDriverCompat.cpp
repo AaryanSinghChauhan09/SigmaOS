@@ -15,12 +15,9 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Drivers {
 
-class DebianDriverCompat : public SigmaObject {
+class DebianDriverCompat : public SigmaObject, public SigmaSingleton<DebianDriverCompat> {
+    friend class SigmaSingleton<DebianDriverCompat>;
 public:
-    static DebianDriverCompat& getInstance() {
-        static DebianDriverCompat instance;
-        return instance;
-    }
 
     const char* type_name() const noexcept override { return "DebianDriverCompat"; }
 
