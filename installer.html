@@ -166,6 +166,15 @@
         /* Progress View */
         .progress-container { width: 100%; height: 6px; background: var(--card-bg); border-radius: 3px; margin-top: 40px; }
         .progress-bar { width: 0%; height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.1s linear; box-shadow: 0 0 20px var(--accent); }
+        .step-feature-box { background: var(--card-bg); padding: 25px; border-radius: 16px; border: 1px solid var(--border); }
+        .step-feature-title { color: var(--accent); margin-bottom: 10px; }
+        .step-feature-list { color: var(--text-dim); font-size: 14px; list-style: none; }
+        .partition-box { margin-bottom: 30px; }
+        .partition-label { display: block; margin-bottom: 10px; font-weight: 700; }
+        .tip-box { background: rgba(0,242,255,0.05); border: 1px solid var(--accent-glow); padding: 20px; border-radius: 12px; }
+        .tip-title { color: var(--accent); font-weight: 700; }
+        .tip-content { color: var(--text-dim); font-size: 14px; }
+        .log-footer { margin-top: 50px; font-family: 'JetBrains Mono'; font-size: 12px; color: #444; }
     </style>
 </head>
 <body>
@@ -186,9 +195,9 @@
         <div class="view active" id="v1">
             <h1>Welcome to SigmaOS</h1>
             <p>You are about to install the world's first Sovereign Lattice-based Operating System. SigmaOS v15.0 "Horizon" is designed for absolute industrial stability and PQC-hardened security.</p>
-            <div style="background: var(--card-bg); padding: 25px; border-radius: 16px; border: 1px solid var(--border);">
-                <h3 style="color: var(--accent); margin-bottom: 10px;">Industrial Features:</h3>
-                <ul style="color: var(--text-dim); font-size: 14px; list-style: none;">
+            <div class="step-feature-box">
+                <h3 class="step-feature-title">Industrial Features:</h3>
+                <ul class="step-feature-list">
                     <li>• Sovereign Lattice Sharding (600 Shards)</li>
                     <li>• PQC-GPG Dilithium-5 Attestation</li>
                     <li>• Real-Time S-SCHED Kernel</li>
@@ -202,8 +211,8 @@
             <h1>Partitioning</h1>
             <p>Select how you would like to allocate space on your silicon disk. SigmaOS recommends the industrial layout for automatic snapshot integrity.</p>
             
-            <div style="margin-bottom: 30px;">
-                <label style="display: block; margin-bottom: 10px; font-weight: 700;">Proposed Layout: /dev/nvme0n1</label>
+            <div class="partition-box">
+                <label class="partition-label">Proposed Layout: /dev/nvme0n1</label>
                 <div class="disk-map">
                     <div class="partition part-efi">EFI</div>
                     <div class="partition part-swap">SWAP</div>
@@ -211,9 +220,9 @@
                 </div>
             </div>
 
-            <div style="background: rgba(0,242,255,0.05); border: 1px solid var(--accent-glow); padding: 20px; border-radius: 12px;">
-                <span style="color: var(--accent); font-weight: 700;">PRO TIP:</span>
-                <span style="color: var(--text-dim); font-size: 14px;"> SovereignRollback shards require at least 20GB of unallocated space for atomic state snapshots.</span>
+            <div class="tip-box">
+                <span class="tip-title">PRO TIP:</span>
+                <span class="tip-content"> SovereignRollback shards require at least 20GB of unallocated space for atomic state snapshots.</span>
             </div>
         </div>
 
@@ -224,7 +233,7 @@
             <div class="progress-container">
                 <div class="progress-bar" id="pb"></div>
             </div>
-            <div style="margin-top: 50px; font-family: 'JetBrains Mono'; font-size: 12px; color: #444;" id="log-view">
+            <div class="log-footer" id="log-view">
                 [INFO] Mounting /dev/nvme0n1p3 to /mnt/sigma...<br>
                 [INFO] Synchronizing PQC entropy pool...
             </div>

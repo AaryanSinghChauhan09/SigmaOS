@@ -18,9 +18,10 @@
 //   â€¢ Tab-completion hooked into VFS readdir + command table
 // =============================================================================
 
-#include "../../../../include/libc/SovereignLibC.h"
-#include "../../../../include/sigma_log.h"
-#include "../../../../include/core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "core/SovereignLatticeFS.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -50,7 +51,7 @@ static sigma_u32 history_head = 0;
 static sigma_u32 history_len  = 0;
 
 static void history_push(const char* line) {
-    strncpy(history[history_head % SIGMA_HISTORY_SIZE], line, SIGMA_LINE_MAX - 1);
+    sigma_strcpy(history[history_head % SIGMA_HISTORY_SIZE], line, SIGMA_LINE_MAX - 1);
     history_head++;
     if (history_len < SIGMA_HISTORY_SIZE) history_len++;
 }
@@ -69,6 +70,7 @@ static int builtin_clear(int argc, char** argv);
 static int builtin_echo(int argc, char** argv);
 static int builtin_env(int argc, char** argv);
 static int builtin_pwd(int argc, char** argv);
+static int builtin_slfs(int argc, char** argv);
 
 static const ShellBuiltin builtins[] = {
     { "help",    "List all commands",           builtin_help    },
@@ -78,6 +80,7 @@ static const ShellBuiltin builtins[] = {
     { "echo",    "Print arguments",             builtin_echo    },
     { "env",     "Show environment variables",  builtin_env     },
     { "pwd",     "Print working directory",     builtin_pwd     },
+    { "slfs",    "Sovereign Lattice Filesystem",builtin_slfs    },
     // External commands routed to tools/ binaries:
     { "shardctl","Manage sovereign shards",     SIGMA_NULL },
     { "sigmatop","Real-time process monitor",   SIGMA_NULL },
@@ -142,6 +145,23 @@ static int builtin_pwd(int argc, char** argv) {
     (void)argc; (void)argv;
     char buf[SIGMA_LINE_MAX];
     if (getcwd(buf, sizeof(buf))) sigma_log_info("  %s\n", buf);
+    return 0;
+}
+
+static int builtin_slfs(int argc, char** argv) {
+    if (argc < 2) {
+        sigma_log_info("Usage: slfs <create|write|mount> [args]\n");
+        return 1;
+    }
+    if (sigma_streq(argv[1], "mount")) {
+        slfs_mount(argc > 2 ? argv[2] : "/dev/nvme0n1");
+    } else if (sigma_streq(argv[1], "create")) {
+        if (argc < 3) return 1;
+        slfs_create(argv[2], 1);
+    } else if (sigma_streq(argv[1], "write")) {
+        if (argc < 4) return 1;
+        slfs_write(sigma_atoi(argv[2]), argv[3], sigma_strlen(argv[3]));
+    }
     return 0;
 }
 

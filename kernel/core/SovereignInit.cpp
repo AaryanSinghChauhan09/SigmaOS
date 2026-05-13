@@ -1,9 +1,8 @@
 #include "sigma_hal.h"
 #include "../../../include/sigma_log.h"
 #include "SovereignNeuralNexus.hpp"
-#include "../../../include/sigma_log.h"
 #include "SovereignVFS.hpp"
-#include "../../../include/sigma_log.h"
+#include "../../../include/core/SovereignLatticeFS.h"
 
 extern "C" void allocator_init();
 
@@ -11,8 +10,6 @@ extern "C" void allocator_init();
  * SigmaOS Sovereign Init Implementation
  * Implements an Asynchronous Shard Ignition (ASI) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal machine-state ignition.
- *
- * Design: OOP-isolated singleton — SovereignInitEngine.
  */
 
 class SovereignInitEngine {
@@ -45,6 +42,12 @@ public:
         sigma_log("[INIT] ASI: Syncing Distributed VFS Shards...");
         vfs_init();
         SovereignDistributedVFS::getInstance().atomicSync();
+
+        // Stage 4: Persistent Lattice Filesystem
+        sigma_log("[INIT] ASI: Initializing Persistent SovereignLatticeFS...");
+        slfs_init();
+        slfs_mount("/dev/nvme0n1");
+        slfs_create("/etc/sigmaos/config.pqc", 1);
         
         sigma_log_info("[INIT] ASI: Parallel Group Ignited. 600 Shards Active.\n");
     }
@@ -70,5 +73,3 @@ extern "C" void sinit_execute_plan() {
 extern "C" void sinit_report_status() {
     SovereignInitEngine::getInstance().reportStatus();
 }
-
-

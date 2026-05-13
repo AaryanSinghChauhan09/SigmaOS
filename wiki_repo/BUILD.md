@@ -1,56 +1,66 @@
-# BUILD
+# 🏗️ Building and Running SigmaOS
 
-1
+This guide provides instructions for building the SigmaOS Sovereign Lattice and running it in an emulator.
 
-1
+## 📋 Prerequisites
 
-1
+To build and run SigmaOS, you need the following tools:
 
-1
+* **GCC / G++**: Cross-compiler for `x86_64-elf` (or local `g++` if building for simulation).
+* **NASM**: Assembly compiler for low-level silicon.
+* **Make**: Build orchestration tool.
+* **QEMU**: Hardware emulator for kernel verification.
+* **grub-mkrescue**: Required for generating bootable ISO images.
+* **xorriso**: Dependency for `grub-mkrescue`.
 
-1
+## 🛠️ Build Instructions
 
-1
+### 1. Clean previous builds
 
-make all
+```bash
+make clean
+```
 
-1
+### 2. Build the kernel singularity
 
-1
+```bash
+make singularity
+```
 
-The `SHARDS.manifest` file lists all 600+ shard `.cpp` files compiled by the Makefile. To add a new shard:
+This will generate `sigmaos.bin` in the root directory.
 
-1. Create your `.cpp` file under the appropriate module directory.
-2. Add its path to `SHARDS.manifest`.
+### 3. Generate a bootable ISO
 
-3. Run `make`.
+```bash
+make zenith-iso
+```
 
-1
+This requires an `iso_root` directory with the appropriate GRUB configuration.
 
-1
+## 🚀 Running in Emulation
 
--std=c++17 -ffreestanding -fno-exceptions -fno-rtti
--nostdlib -nostdinc++ -Wall -Wextra -Wpedantic
--I include -I include/core -I include/libc
+To boot the kernel in QEMU and trace execution via serial output:
 
-1
+```bash
+make qemu
+```
 
-> [!IMPORTANT]
-> **No stdlib allowed.** Never `#include <iostream>`, `<string>`, or any STL header. Use `SovereignLibC.h` and `SigmaOOP.hpp` exclusively.
+### Serial Debugging
 
-1
+Kernel logs are piped to `stdio` (serial port 0). You can monitor the boot sequence and shard initialization directly in your terminal.
 
-1
+## 🔍 Static Analysis
 
-qemu-system-aarch64 -machine raspi4b -kernel sigma_os.elf -serial stdio
+We recommend running `cppcheck` before submitting any PRs:
 
-1
+```bash
+cppcheck --enable=warning,style,performance -Iinclude kernel/
+```
 
-1
+## Troubleshooting
 
-The GitHub Actions matrix build runs `make ARCH=aarch64` and `make ARCH=x86_64` on every push to `main`. See `.github/workflows/` for full configuration.
+If you encounter errors during the PQC attestation phase, ensure your hardware RNG is accessible and the GPG trust store is initialized.
 
-1
+---
 
-The `compile_flags.txt` passes `-nostdinc++` to clangd, ensuring the IDE also enforces the zero-stdlib rule during development.
-
+### Σ SIGMAOS: Sovereign Build System. Absolute Integrity

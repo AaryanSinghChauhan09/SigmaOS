@@ -14,7 +14,6 @@ The **SigmaOS Industrial Collective** is proud to announce the first production-
 - **S-MAC**: Mandatory Access Control (AppArmor/SELinux parity).
 - **S-PKG**: Cryptographically verified lattice package manager.
 - **S-VPN**: WireGuard-native secure tunneling engine.
-- **S-FS**: Sovereign Lattice Filesystem — Persistent, PQC-hardened storage lattice.
 - **Zenith Control Center**: Unified industrial settings lattice.
 
 ## 🛠 Stability Improvements
