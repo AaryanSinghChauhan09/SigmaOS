@@ -39,6 +39,7 @@ Welcome to the central knowledge hub for **SigmaOS**, the world's first industri
 - **[S-LOG: Sovereign Journaling](Sovereign-Journal)**: Structured industrial telemetry.
 - [Sovereign-Lattice-Filesystem](Sovereign-Lattice-Filesystem)
 - [Sovereign-Memory-Management](Sovereign-Memory-Management)
+- [Sovereign-Industrial-Scheduler](Sovereign-Industrial-Scheduler)
 
 ## 🛠 Project Lifecycle
 
