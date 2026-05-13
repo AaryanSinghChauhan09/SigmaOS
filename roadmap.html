@@ -46,6 +46,9 @@
             color: var(--accent);
             float: right;
         }
+        main { padding: 100px 5% 50px; }
+        .hero-left { text-align: left; align-items: flex-start; padding: 0; }
+        .roadmap-desc { max-width: 600px; }
     </style>
 </head>
 <body>
@@ -59,11 +62,11 @@
         </nav>
     </header>
 
-    <main style="padding: 100px 5% 50px;">
-        <section class="hero" style="text-align: left; align-items: flex-start; padding: 0;">
+    <main>
+        <section class="hero hero-left">
             <div class="badge">INDUSTRIAL EVOLUTION</div>
             <h1>The Path to<br>Silicon Supremacy</h1>
-            <p style="max-width: 600px;">Our mission is to bridge the gap between experimental sovereign code and mature industrial ecosystems. This is the sequence of SigmaOS evolution.</p>
+            <p class="roadmap-desc">Our mission is to bridge the gap between experimental sovereign code and mature industrial ecosystems. This is the sequence of SigmaOS evolution.</p>
         </section>
 
         <div class="roadmap-grid">
