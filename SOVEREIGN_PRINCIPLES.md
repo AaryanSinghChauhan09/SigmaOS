@@ -12,9 +12,7 @@ Unlike monolithic procedural kernels, SigmaOS treats every system component as a
 
 1
 
-
 1
-
 
 Security is not an afterthought; it is the substrate.
 
@@ -22,9 +20,7 @@ Security is not an afterthought; it is the substrate.
 
 1
 
-
 1
-
 
 SigmaOS is not a local OS; it is a node in a global distributed lattice.
 
@@ -36,9 +32,7 @@ The interface should feel alive, adaptive, and futuristic.
 
 1
 
-
 1
-
 
 ---
 

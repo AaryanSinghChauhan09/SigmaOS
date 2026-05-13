@@ -8,9 +8,7 @@
 
 1
 
-
 1
-
 
 SigmaOS already integrates Pacman, Flatpak, and Nix. To match Linux distros:
 
@@ -34,7 +32,6 @@ SigmaOS already integrates Pacman, Flatpak, and Nix. To match Linux distros:
 
 1
 
-
 1
 
 1
@@ -42,14 +39,12 @@ SigmaOS already integrates Pacman, Flatpak, and Nix. To match Linux distros:
 1
 
 1
-
 
 The Zenith cyberpunk-inspired UI is unique, but polish is key:
 
 1
 
 1
-
 
 1
 

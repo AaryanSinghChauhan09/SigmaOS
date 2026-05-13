@@ -10,11 +10,9 @@ The repository's `/profiles/` directory structure dictates the available configu
 
 1
 
-
 1
 
 1
-
 
 Each directory contains:
 
@@ -61,7 +59,6 @@ Each directory contains:
 1
 
 1
-
 
 1. **Create a new folder** under `/profiles/` (e.g., `/profiles/architect/`).
 2. **Add `config.json`**: Define the profession name and active status.

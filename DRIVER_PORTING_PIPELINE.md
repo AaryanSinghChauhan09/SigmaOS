@@ -22,8 +22,6 @@ Instead of rewriting complex drivers from scratch (which can take years), we use
 
 1
 
-
-
 1. **Request**: Users submit a hardware request using the [Driver Request Issue Template](https://github.com/AaryanSinghChauhan09/SigmaOS/issues/new/choose).
 2. **Branching**: We maintain branches per hardware family (e.g., `feature/hw-realtek-wifi`).
 

@@ -6,13 +6,11 @@ Complete API mapping for all Sovereign Singleton shards.
 
 1
 
-
 1
 
 Per-process syscall gating with bitmask precision.
 
 1
-
 
 1
 
@@ -22,10 +20,7 @@ Hardware-level PQC key isolation.
 
 1
 
-
-
 1
-
 
 1
 
@@ -33,6 +28,11 @@ Hardware-level PQC key isolation.
 
 1
 
+1
+
+1
+
+1
 
 1
 
@@ -40,6 +40,11 @@ Hardware-level PQC key isolation.
 
 1
 
+1
+
+1
+
+1
 
 1
 
@@ -47,32 +52,11 @@ Hardware-level PQC key isolation.
 
 1
 
-
-1
-
-
 1
 
 1
 
-
-
 1
-
-
-1
-
-
-1
-
-1
-
-
-1
-
-
-1
-
 
 Ring-0 cron replacement with macro recording.
 

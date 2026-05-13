@@ -1,6 +1,5 @@
 # Sovereign-Packaging-Specification
 
-
 # 📦 Sovereign Packaging Specification (.spkg)
 
 The **Sovereign Packaging Specification** defines the industrial standard for creating, signing, and distributing shards within the SigmaOS lattice.
@@ -19,7 +18,6 @@ A SigmaOS package (`.spkg`) is a PQC-sealed archive containing:
 ---
 
 ## 📄 Manifest Specification
-
 
 1
 

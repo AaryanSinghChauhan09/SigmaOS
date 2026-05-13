@@ -14,11 +14,9 @@ The **Sovereign Legal Engine** is a specialized diagnostic shard designed to orc
 
 1
 
-
 1
 
 1
-
 
 The engine is initialized via the `checklist_init()` interface, which hot-loads the sharded law templates into the Zenith kernel.
 
@@ -54,9 +52,7 @@ The same shard provides deterministic calculation capabilities for the Student &
 
 1
 
-
 1
-
 
 *All legal and educational calculators operate without dependency on heavy floating-point math, relying on 64-bit integer algebra for perfect kernel stability.*
 

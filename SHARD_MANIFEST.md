@@ -1,8 +1,6 @@
 # SHARD MANIFEST
 
-
 # 🧱 SigmaOS Shard Manifest
-
 
 This manifest outlines the core functional shards that define the SigmaOS ecosystem. SigmaOS is composed of 600+ atomic shards, ensuring that no single component can destabilize the system.
 
@@ -19,7 +17,6 @@ This manifest outlines the core functional shards that define the SigmaOS ecosys
 ---
 
 ## 🛡️ Security & Observability Shards (/kernel/security)
-
 
 1. **Sovereign Sandbox**: Capability-gated isolation for Ring 3 applications.
 2. **Lattice Watchdog**: Self-healing daemon that detects and repairs shard corruption.

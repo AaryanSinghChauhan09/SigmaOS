@@ -36,13 +36,11 @@ This document provides a tenth-round audit of the SigmaOS Sovereign Lattice, foc
 
 1
 
-
 1
 
 1
 
 1
-
 
 ---
 

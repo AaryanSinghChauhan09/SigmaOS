@@ -1,6 +1,5 @@
 # ZENITH UI
 
-
 # 🎨 Zenith UI: The Sovereign Interface
 
 SigmaOS ships with the **Zenith UI Dashboard**—a production-grade, hardware-accelerated orchestration interface for the Sovereign Lattice. Zenith is designed to provide "Apple-like simplicity" for power users.
@@ -17,7 +16,6 @@ Zenith utilizes the **MLC Algorithm**, natively implemented in the `SovereignZen
 
 ---
 
-
 ## 🛠️ Utility-Class Architecture
 
 As of the current stabilization phase, Zenith has migrated to a **Strict Utility-Class Architecture**. Themes and layouts are defined using a modular CSS engine that allows users to swap aesthetics without breaking functional components.
@@ -30,9 +28,7 @@ As of the current stabilization phase, Zenith has migrated to a **Strict Utility
 
 ---
 
-
 ## 📊 Sovereign Telemetry UI
-
 
 The `SovereignTelemetryUI` exposes deep kernel insights with sub-millisecond latency, correlating data from across the lattice:
 

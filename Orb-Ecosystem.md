@@ -12,9 +12,7 @@ Orbs are industrial-grade kernel modules that encapsulate specific logic, from d
 
 1
 
-
 1
-
 
 SigmaOS utilizes a decentralized distribution model where Orbs can be downloaded and hot-swapped at runtime via the `SovereignOrbManager`.
 
@@ -30,9 +28,7 @@ Developers can build custom Orbs using the SigmaOS Shard SDK (C++/Rust/WASM).
 
 1
 
-
 1
-
 
 ---
 

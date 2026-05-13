@@ -3,7 +3,10 @@
 ## 🏛️ Core Concepts
 
 * [Home](Home)
+* [Industrial Roadmap](ROADMAP.md)
 * [Architecture](Architecture)
+* [Lattice Subsystems](Subsystems)
+* [AI/ML Intelligence Nexus](AI-ML-Nexus)
 * [Sovereign Principles](SOVEREIGN_PRINCIPLES)
 
 ## 🚀 Strategic Vision
@@ -29,7 +32,6 @@
 * [Getting Started](Getting-Started)
 * [Contributing](CONTRIBUTING)
 * [Code of Conduct](CODE_OF_CONDUCT)
-
 
 ---
 

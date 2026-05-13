@@ -18,9 +18,7 @@ Rewards are tiered based on severity as determined by the Sovereign Council:
 
 1
 
-
 1
-
 
 1. Submit reports privately via the GitHub "Security" tab or our encrypted mailing list.
 2. Provide a clear Proof of Concept (PoC).

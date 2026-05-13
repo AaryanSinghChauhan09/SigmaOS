@@ -24,7 +24,6 @@ This roadmap outlines the strategic direction for making the SigmaOS Sovereign L
 
 1
 
-
 1
 
 1
@@ -34,7 +33,6 @@ This roadmap outlines the strategic direction for making the SigmaOS Sovereign L
 1
 
 1
-
 
 ---
 

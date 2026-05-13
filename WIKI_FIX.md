@@ -14,8 +14,6 @@ The GitHub Wiki uses a specific slug format. All relative links must point to th
 
 1
 
-
-
 1. Navigate to the `Home` page of the Wiki.
 2. Update the Sidebar and Table of Contents to use the Wiki slug format (no extension, no directory prefix).
 

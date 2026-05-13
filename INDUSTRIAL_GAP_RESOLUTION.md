@@ -24,7 +24,6 @@ SigmaOS has transitioned from a "personal desktop" narrative to a **"Distributed
 
 1
 
-
 1
 
 1
@@ -32,7 +31,6 @@ SigmaOS has transitioned from a "personal desktop" narrative to a **"Distributed
 1
 
 1
-
 
 ---
 

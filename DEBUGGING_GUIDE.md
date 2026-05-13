@@ -18,9 +18,7 @@ Every shard should use the lightweight logging framework.
 
 1
 
-
 1
-
 
 We strictly enforce `clang-tidy` to catch C++ object lifecycle bugs and potential concurrency issues.
 

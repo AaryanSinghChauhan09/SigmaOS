@@ -29,11 +29,9 @@ The `SHARDS.manifest` file lists all 600+ shard `.cpp` files compiled by the Mak
 
 1
 
-
 -std=c++17 -ffreestanding -fno-exceptions -fno-rtti
 -nostdlib -nostdinc++ -Wall -Wextra -Wpedantic
 -I include -I include/core -I include/libc
-
 
 1
 
@@ -43,7 +41,6 @@ The `SHARDS.manifest` file lists all 600+ shard `.cpp` files compiled by the Mak
 1
 
 1
-
 
 qemu-system-aarch64 -machine raspi4b -kernel sigma_os.elf -serial stdio
 

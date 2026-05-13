@@ -7,6 +7,7 @@ This page explains the core architectural logic, file relationships, and the "So
 SigmaOS is an **Industrial-Grade, AI-Native Sovereign Operating System**. It follows a **Modular Sharding** strategy to ensure stability, security, and hardware sovereignty.
 
 ### Universal Principles:
+
 - **Zero-Dependency**: No reliance on standard libraries (`libc`, `libstdc++`). All primitives are silicon-direct.
 - **Sovereign Lattice**: A modular mesh of "shards" where each component is an isolated, PQC-attested singleton.
 - **Formal Verification Ready**: Code is structured to allow mathematical proof of correctness in critical shards.
@@ -43,27 +44,33 @@ To prevent circular dependencies, SigmaOS uses a strictly ordered header lattice
 Each directory in the SigmaOS repository serves a distinct logical purpose:
 
 ### `kernel/` (The Sovereign Brain)
+
 - **`core/`**: Essential services: HAL, PMM/VMM, IPC, AI (Claw Stack), and Security.
 - **`shards/`**: Industrial and professional modules (e.g., `medical/`, `finance/`, `engineering/`).
 - **`hal/`**: Hardware Abstraction Layer for x86_64, ARM64 (RPi5), and RISC-V.
 
 ### `drivers/` (Hardware Sovereignty)
+
 - **`linux_distros/`**: Ported and hardened drivers from the Linux ecosystem to ensure hardware parity.
 - **`gpu/`**: Custom Vulkan-native drivers for high-performance Zenith UI.
 
 ### `modules/ui/zenith/` (The UX Layer)
+
 - **Logic**: A C-native, GPU-accelerated compositor.
 - **Relationship**: Connects the `SovereignSnap` application logic to the physical display via Vulkan.
 
 ### `userland/` (The Sovereign Ecosystem)
+
 - **Logic**: System-level agents and utilities (e.g., `update-agent`, `logd`).
 - **Relationship**: Operates in the `SovereignSandbox` to ensure kernel-space protection.
 
 ### `tools/` (The Industrial Toolchain)
+
 - **Logic**: Custom tools for packaging (`sigma-pkg`), fixing (`sigma-fix`), and debugging.
 - **Relationship**: Used by developers to maintain the repository and deploy the OS.
 
 ### `WIKI/` & `docs/` (The Knowledge Graph)
+
 - **Logic**: Comprehensive documentation ensuring the system remains professional and accessible.
 - **Relationship**: Syncs with GitHub Wiki and Pages to provide a global source of truth.
 
@@ -107,6 +114,5 @@ Below is a non-exhaustive list of critical shards and their relationships to the
 
 ---
 
-*Document Version: 15.0.4 - Stabilized*
-
+### Document Version: 15.0.4 - Stabilized
 

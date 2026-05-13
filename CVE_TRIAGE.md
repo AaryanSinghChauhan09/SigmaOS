@@ -10,8 +10,6 @@ Vulnerabilities should be reported via the [**Bug Bounty Program**](BUG_BOUNTY).
 
 1
 
-
-
 1. **Ingestion**: Vulnerability received and acknowledged within 24 hours.
 2. **Assessment**: Subsystem owners evaluate the CVSS score (Severity, Impact, Exploitability).
 

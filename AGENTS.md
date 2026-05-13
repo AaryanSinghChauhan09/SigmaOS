@@ -1,8 +1,6 @@
 # AGENTS
 
-
 # 🤖 Autonomous Agents: The Intelligence Layer
-
 
 SigmaOS replaces traditional background daemons and systemd services with **Autonomous Agents**. These agents are self-healing, goal-oriented shards that orchestrate the system based on the **Context Manager**.
 

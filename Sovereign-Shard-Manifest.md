@@ -36,7 +36,6 @@ This manifest provides a comprehensive registry of the functional shards that co
 
 1
 
-
 1
 
 1
@@ -66,7 +65,6 @@ This manifest provides a comprehensive registry of the functional shards that co
 1
 
 1
-
 
 ---
 
