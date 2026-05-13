@@ -5,6 +5,8 @@
 #include "../../../include/core/SovereignLatticeFS.h"
 
 extern "C" void allocator_init();
+extern "C" void sched_init();
+extern "C" void sched_spawn(sigma_u32 id, sigma_u32 priority);
 
 /**
  * SigmaOS Sovereign Init Implementation
@@ -48,6 +50,13 @@ public:
         slfs_init();
         slfs_mount("/dev/nvme0n1");
         slfs_create("/etc/sigmaos/config.pqc", 1);
+        
+        // Stage 5: Industrial Multi-Tasking (Scheduling)
+        sigma_log("[INIT] ASI: Initializing Industrial Scheduler...");
+        sched_init();
+        sched_spawn(0x1001, 10); // Sovereign Shell Thread
+        sched_spawn(0x2001, 20); // Sovereign Watchdog Thread
+        sched_spawn(0x3001, 5);  // Sovereign AI Background Shard
         
         sigma_log_info("[INIT] ASI: Parallel Group Ignited. 600 Shards Active.\n");
     }
