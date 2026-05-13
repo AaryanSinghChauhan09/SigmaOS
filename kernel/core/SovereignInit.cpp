@@ -7,6 +7,11 @@
 extern "C" void allocator_init();
 extern "C" void sched_init();
 extern "C" void sched_spawn(sigma_u32 id, sigma_u32 priority);
+extern "C" void driver_manager_init();
+extern "C" void driver_register_gpu();
+extern "C" void driver_register_net();
+extern "C" void driver_register_usb();
+extern "C" void driver_start_all();
 
 /**
  * SigmaOS Sovereign Init Implementation
@@ -57,6 +62,14 @@ public:
         sched_spawn(0x1001, 10); // Sovereign Shell Thread
         sched_spawn(0x2001, 20); // Sovereign Watchdog Thread
         sched_spawn(0x3001, 5);  // Sovereign AI Background Shard
+        
+        // Stage 6: Hardware Shard Ignition (Drivers)
+        sigma_log("[INIT] ASI: Igniting Sovereign Driver Framework...");
+        driver_manager_init();
+        driver_register_gpu();
+        driver_register_net();
+        driver_register_usb();
+        driver_start_all();
         
         sigma_log_info("[INIT] ASI: Parallel Group Ignited. 600 Shards Active.\n");
     }

@@ -17,6 +17,7 @@ The **SigmaOS Industrial Collective** is proud to announce the first production-
 - **S-FS**: Sovereign Lattice Filesystem — Persistent, PQC-hardened storage lattice.
 - **S-MM**: Sovereign Memory Manager — Industrial Slab & Paging backend for Ring-0 multitasking.
 - **S-SCHED**: Sovereign Industrial Scheduler — Priority-based Round Robin for zero-latency orchestration.
+- **SDF**: Sovereign Driver Framework — Unified hardware shard orchestration for GPU, Net, and USB.
 - **Zenith Control Center**: Unified industrial settings lattice.
 
 ## 🛠 Stability Improvements

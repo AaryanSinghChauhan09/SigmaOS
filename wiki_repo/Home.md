@@ -40,6 +40,7 @@ Welcome to the central knowledge hub for **SigmaOS**, the world's first industri
 - [Sovereign-Lattice-Filesystem](Sovereign-Lattice-Filesystem)
 - [Sovereign-Memory-Management](Sovereign-Memory-Management)
 - [Sovereign-Industrial-Scheduler](Sovereign-Industrial-Scheduler)
+- [Sovereign-Driver-Framework](Sovereign-Driver-Framework)
 
 ## 🛠 Project Lifecycle
 
