@@ -18,6 +18,7 @@ The **SigmaOS Industrial Collective** is proud to announce the first production-
 - **S-MM**: Sovereign Memory Manager — Industrial Slab & Paging backend for Ring-0 multitasking.
 - **S-SCHED**: Sovereign Industrial Scheduler — Priority-based Round Robin for zero-latency orchestration.
 - **SDF**: Sovereign Driver Framework — Unified hardware shard orchestration for GPU, Net, and USB.
+- **S-NET**: Sovereign Network Stack — TCP/UDP/IP with S-VPN (WireGuard-PQC) and Lattice-Guard firewall.
 - **Zenith Control Center**: Unified industrial settings lattice.
 
 ## 🛠 Stability Improvements

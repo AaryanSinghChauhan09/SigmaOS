@@ -71,6 +71,10 @@ public:
         driver_register_usb();
         driver_start_all();
         
+        // Stage 7: Industrial Networking (S-NET)
+        sigma_log("[INIT] ASI: Igniting Sovereign Network Stack...");
+        net_init();
+        
         sigma_log_info("[INIT] ASI: Parallel Group Ignited. 600 Shards Active.\n");
     }
 
