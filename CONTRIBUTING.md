@@ -1,45 +1,38 @@
-# SigmaOS — Contribution Guide
+# Contributing to SigmaOS
 
-> Join the evolution of digital sovereignty.
+Thank you for considering a contribution to the **SigmaOS Sovereign Lattice**!
 
----
+## Getting Started
 
-## 🛠️ Coding Standards
+1. Fork the repository.
+2. Implement your feature or bug fix.
+3. Add tests for your changes.
+4. **Build** the project using the deterministic build pipeline:
 
-SigmaOS is an industrial-grade project. All contributions must adhere to:
+   ```bash
+   python3 tools/sigma-build.py
+   ```
 
-* **Language**: C++20 for shards, Python 3.10+ for tooling.
-* **Pattern**: Strict OOP Singleton (Context Manager).
+5. **Run static analysis** before submitting:
 
-* **Zero-Dependency**: No `libc` or external headers allowed in Layer 1-4 shards.
-* **Documentation**: Every code change MUST be accompanied by an update to the corresponding `.md` file in `WIKI/`.
+   ```bash
+   cppcheck --enable=warning,style,performance kernel/core/
+   ```
 
-## 🌀 Branching Strategy
+## Code Standards
 
-We follow a staged release cadence:
+All contributions must adhere to the **Sovereign Shard Standard**:
 
-* **`main` (Stable)**: The production-ready sovereign lattice. Only merges from `beta` allowed.
-* **`beta` (Staging)**: Integration branch for feature-complete topics.
+* ✅ Every new kernel component must be a **C++ OOP Singleton** with `extern "C"` wrappers
+* ✅ All functions must emit structured log output via `sigma_log()` / `sigma_printf()`
+* ✅ New shards must be registered in `SovereignUSR` at init.
 
-* **`alpha` (Topic)**: Feature-specific branches (e.g., `feat/neural-paging`).
+## Pull Request Checklist
 
-## 🚀 CI/CD Pipeline
+* [ ] Code compiles with `-Wall -Wextra -Werror`
+* [ ] New shard has a `_init()`, at least one primary function, and C wrapper
+* [ ] `MISSING_COMPONENTS.md` updated if a gap is closed
 
-Every Pull Request triggers the following automated suite:
+## Security Issues
 
-1. **Lattice Rebuild**: All 600+ shards must compile with zero warnings.
-2. **Regression Suite**: IRQ handlers and SHS v2 are verified for RDTSC-cycle precision.
-
-3. **Security Scan**: Verify PQC signatures and TPM handshake protocols.
-4. **Doc Lint**: Ensure all WIKI files follow the GitHub Flavored Markdown standard.
-
-## 🤝 How to Contribute Shards
-
-1. **Fork** the repository and create an `alpha` branch.
-2. **Develop** your shard in the appropriate `suites/` directory.
-
-3. **Sync** documentation in `WIKI/`.
-4. **Submit** a PR to `beta` for review.
-
----
-"Sovereignty is a collective intent."
+Please **do not** open public issues for security vulnerabilities. Read [SECURITY.md](../SECURITY.md) for responsible disclosure guidelines.
