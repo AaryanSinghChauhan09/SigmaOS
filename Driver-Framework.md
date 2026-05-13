@@ -1,36 +1,41 @@
-# Sovereign Driver Framework (S-DF)
+# Sovereign Driver Framework (SDF)
 
-The S-DF provides a standardized way to write device drivers that are compatible with the Sovereign Lattice.
+The **Sovereign Driver Framework (SDF)** is the unified hardware orchestration layer for **SigmaOS v15.0 "Horizon"**. It provides a professional, object-oriented interface for sharding physical hardware into the microkernel lattice.
 
-## 🛠 Driver Structure
+## 🏛 Architecture
 
-A Sovereign Driver is a specialized shard that inherits from `SigmaOS::Kernel::Hardware::SovereignDriver`.
+SDF abstracts hardware interactions into **Professional Shards**, allowing the kernel to manage GPU, Network, and USB controllers with zero-dependency isolation.
 
-```cpp
-#include "hal/sigma_hal.h"
+### Key Components
+- **DriverManager**: The central registry and lifecycle orchestrator for all industrial drivers.
+- **SovereignDriver Base**: An abstract interface for `init()`, `start()`, and `stop()` lifecycle events.
+- **Hardware Sharding**: Direct mapping of physical registers and interrupts into Ring-0 memory space.
 
-class MyDriver : public SovereignDriver {
-public:
-    void init() override {
-        // Initialize MMIO, IRQs, etc.
-    }
+## 🔌 Industrial Driver Shards
 
-    void handle_irq() override {
-        // High-priority interrupt logic
-    }
-};
-```
+SDF currently supports the following professional shards:
 
-## 🔌 Supported Interfaces
+### 1. Sovereign GPU (Mesa/Vulkan)
+- **Purpose**: Silicon-direct rendering acceleration.
+- **Implementation**: Bridges native Vulkan commands to hardware execution units with sub-millisecond latency.
 
-- **PCIe-Sov**: High-speed peripheral interconnect with PQC-attestation.
-- **USB-Lattice**: Generic driver class for HID, Mass Storage, and Professional peripherals (e.g., DICOM scanners).
-- **I2C/SPI**: Low-level sensor bridges for Industrial IoT shards.
+### 2. Sovereign Lattice-Net
+- **Purpose**: PQC-signed network orchestration.
+- **Support**: Universal Wi-Fi 6 and 10GbE sharding with built-in S-VPN tunneling.
 
-## 🧪 Template Example
+### 3. Sovereign USB (XHCI)
+- **Purpose**: Zero-latency hotplug management.
+- **Compliance**: XHCI v3.2 compatible shard orchestration.
 
-See `kernel/shards/hardware/SovereignWiFi.cpp` for a production example of a network driver shard.
+## 🛠 Implementation Details
+
+Drivers are implemented in `kernel/core/drivers/SovereignDriverFramework.cpp`.
+
+### API Bridge
+- `driver_manager_init()`: Ignites the SDF registry.
+- `driver_register_gpu()`: Links the high-performance GPU shard.
+- `driver_register_net()`: Links the PQC network shard.
+- `driver_start_all()`: Atomically ignites all registered hardware shards during **Stage 6** of the ASI plan.
 
 ---
-
-### Next: [Security & Reliability](Security-Safety.md)
+*Stay Sovereign.*
