@@ -1,5 +1,7 @@
 #include "Lattice.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN AETHER ABSORPTION (v94.0)
@@ -9,6 +11,7 @@
  */
 
 #include "kernel/core/absorption_engine.hpp"
+#include "../../../include/sigma_log.h"
 
 extern "C" void _start(void) {
     SigmaOS::SovereignAetherAbsorber absorber;
@@ -17,7 +20,9 @@ extern "C" void _start(void) {
 }
 
 int main() {
-    sigma_printf("[SIGMA_ABSORPTION]: Initiating Sovereign System Convergence...\n");
+    sigma_log_info("[SIGMA_ABSORPTION]: Initiating Sovereign System Convergence...\n");
     _start();
     return 0;
 }
+
+

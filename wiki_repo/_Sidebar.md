@@ -33,7 +33,6 @@
 * [Contributing](CONTRIBUTING)
 * [Code of Conduct](CODE_OF_CONDUCT)
 
-
 ---
 
 ### v14.0 [NEXUS-SUPREME]

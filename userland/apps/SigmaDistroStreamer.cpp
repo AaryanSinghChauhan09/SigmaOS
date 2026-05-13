@@ -9,7 +9,9 @@
  */
 
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 typedef struct {
     char name[32];
@@ -32,33 +34,35 @@ static sigma_distro_t distro_shards[] = {
 #define DISTRO_COUNT 7
 
 void sigma_distro_stream(const char* name) {
-    sigma_printf("[STREAM] Initiating Sovereign Link for: %s... ", name);
+    sigma_log_info("[STREAM] Initiating Sovereign Link for: %s... ", name);
     for (int i = 0; i < DISTRO_COUNT; i++) {
         if (sigma_streq(distro_shards[i].name, name)) {
-            sigma_printf("OK\n");
-            sigma_printf("[STREAM] Sharding WASM Binary Context (Parity: %s)... ", distro_shards[i].parity_version);
-            sigma_printf("COMPLETE\n");
-            sigma_printf("[STREAM] Allocating %d MB industrial memory... ", (int)distro_shards[i].ram_requirement);
-            sigma_printf("SUCCESS\n");
-            sigma_printf("[STREAM] Local Execution Shard: %s\n", distro_shards[i].stream_url);
-            sigma_printf("[STREAM] System Sovereignty: DISTRIBUTION MIRRORED.\n");
+            sigma_log_info("OK\n");
+            sigma_log_info("[STREAM] Sharding WASM Binary Context (Parity: %s)... ", distro_shards[i].parity_version);
+            sigma_log_info("COMPLETE\n");
+            sigma_log_info("[STREAM] Allocating %d MB industrial memory... ", (int)distro_shards[i].ram_requirement);
+            sigma_log_info("SUCCESS\n");
+            sigma_log_info("[STREAM] Local Execution Shard: %s\n", distro_shards[i].stream_url);
+            sigma_log_info("[STREAM] System Sovereignty: DISTRIBUTION MIRRORED.\n");
             return;
         }
     }
-    sigma_printf("ERROR (UNSUPPORTED DISTRO)\n");
+    sigma_log_info("ERROR (UNSUPPORTED DISTRO)\n");
 }
 
 void sigma_distro_list() {
-    sigma_printf("\nÎ£ SOVEREIGN DISTRO-STREAM REPOSITORY (Industrial Mirror)\n");
-    sigma_printf("-----------------------------------------------------------------------\n");
-    sigma_printf("NAME              PARITY        WASM-READY   MEM REQ (MB)\n");
-    sigma_printf("-----------------------------------------------------------------------\n");
+    sigma_log_info("\nÎ£ SOVEREIGN DISTRO-STREAM REPOSITORY (Industrial Mirror)\n");
+    sigma_log_info("-----------------------------------------------------------------------\n");
+    sigma_log_info("NAME              PARITY        WASM-READY   MEM REQ (MB)\n");
+    sigma_log_info("-----------------------------------------------------------------------\n");
     for (int i = 0; i < DISTRO_COUNT; i++) {
-        sigma_printf("%-17s %-13s %-12s %d\n", 
+        sigma_log_info("%-17s %-13s %-12s %d\n", 
             distro_shards[i].name, 
             distro_shards[i].parity_version,
             distro_shards[i].wasm_ready ? "YES" : "NO", 
             (int)distro_shards[i].ram_requirement);
     }
-    sigma_printf("-----------------------------------------------------------------------\n\n");
+    sigma_log_info("-----------------------------------------------------------------------\n\n");
 }
+
+

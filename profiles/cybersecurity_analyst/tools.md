@@ -2,9 +2,12 @@
 
 ## Required Tools & Functions
 
-- Cybersecurity Analyst workspace
-- specialized analytics
-- compliance manager
+- Wireshark
+- Nmap
+- Metasploit
+- OpenVAS
+- Sovereign Audit
+- PQC-Vault
 
 ## 📜 Compliance Rules
 

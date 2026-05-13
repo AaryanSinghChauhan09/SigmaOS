@@ -6,7 +6,7 @@ namespace SigmaOS {
 namespace Kernel {
 namespace AI {
 
-class SovereignAI : public SigmaObject, public SigmaSingleton<SovereignAI> {
+class SovereignAI : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignAI> {
     friend class SigmaSingleton<SovereignAI>;
 public:
     const char* type_name() const noexcept override { return "SovereignAI"; }

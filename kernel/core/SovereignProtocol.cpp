@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Custom Protocol (SCP)
@@ -30,12 +33,12 @@ public:
         if (this->active_mesh_peers >= 128) return;
         sigma_hardened_strcpy(this->mesh_peers[this->active_mesh_peers], peer_id, 32);
         this->active_mesh_peers++;
-        sigma_printf("[SCP] Mesh peer '%s' authenticated and joined the Sovereign Lattice.\n", peer_id);
+        sigma_log_info("[SCP] Mesh peer '%s' authenticated and joined the Sovereign Lattice.\n", peer_id);
     }
 
     void broadcast(const char* payload) {
         (void)payload;
-        sigma_printf("[SCP] Broadcasting SCP payload to %u active mesh peers.\n", this->active_mesh_peers);
+        sigma_log_info("[SCP] Broadcasting SCP payload to %u active mesh peers.\n", this->active_mesh_peers);
         // Emulate ultra-low latency UDP broadcast
     }
 
@@ -58,3 +61,5 @@ extern "C" void scp_add_peer(const char* peer) {
 extern "C" void scp_broadcast(const char* data) {
     SovereignProtocolEngine::getInstance().broadcast(data);
 }
+
+

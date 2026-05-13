@@ -1,5 +1,7 @@
 #include "Lattice.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -10,6 +12,7 @@
  */
 
 #include "SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
 
 /**
  * Î£ SIGMA OS: SOVEREIGN HARDWARE AUDIT (v128.0 - ZERO-STD NATIVE)
@@ -31,30 +34,32 @@ class SovereignHardwareAudit : public IHardwareAudit {
 public:
     void AuditProcessors() override {
 #if defined(SIGMA_ARCH_X86_64)
-        sigma_printf("[HARDWARE/CPU]: Probing silicon shards (x86_64)...\n");
+        sigma_log_info("[HARDWARE/CPU]: Probing silicon shards (x86_64)...\n");
         // In bare-metal, we would use cpuid or read from ACPI/MADT.
         // For now, we simulate the discovery of 16 logical cores.
-        sigma_printf("[HARDWARE/CPU]: Total Logical Shards (Processors): 16\n");
-        sigma_printf("[HARDWARE/CPU]: Shard Page Size: 4096 Bytes (Silicon-Direct).\n");
+        sigma_log_info("[HARDWARE/CPU]: Total Logical Shards (Processors): 16\n");
+        sigma_log_info("[HARDWARE/CPU]: Shard Page Size: 4096 Bytes (Silicon-Direct).\n");
 #else
-        sigma_printf("[HARDWARE/CPU]: Probing generic silicon shards...\n");
+        sigma_log_info("[HARDWARE/CPU]: Probing generic silicon shards...\n");
 #endif
     }
 
     void AuditMemory() override {
-        sigma_printf("[HARDWARE/RAM]: Total Physical Shard-Buffer: 32768 MB.\n");
-        sigma_printf("[HARDWARE/RAM]: Available Shard-Buffer: 16384 MB.\n");
-        sigma_printf("[HARDWARE/RAM]: Load Level: 50%% [OK].\n");
+        sigma_log_info("[HARDWARE/RAM]: Total Physical Shard-Buffer: 32768 MB.\n");
+        sigma_log_info("[HARDWARE/RAM]: Available Shard-Buffer: 16384 MB.\n");
+        sigma_log_info("[HARDWARE/RAM]: Load Level: 50%% [OK].\n");
     }
 };
 
 extern "C" void _start(void) {
-    sigma_printf("--- Î£ SIGMA OS SOVEREIGN HARDWARE AUDIT (ZENITH) ---\n");
+    sigma_log_info("--- Î£ SIGMA OS SOVEREIGN HARDWARE AUDIT (ZENITH) ---\n");
     SovereignHardwareAudit audit;
     audit.AuditProcessors();
     audit.AuditMemory();
     
-    sigma_printf("[SUCCESS]: All Hardware Shards mapped via Silicon-Direct APEX-API.\n");
+    sigma_log_info("[SUCCESS]: All Hardware Shards mapped via Silicon-Direct APEX-API.\n");
     sigma_exit(0);
 }
+
+
 

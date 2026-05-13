@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Symmetric Multi-Processing (SMP) Orchestrator (v28.0 Zenith)
@@ -28,12 +31,12 @@ public:
         sigma_log("[SMP] SPE: Broadcasting Startup IPI (SIPI) to all silicon cores...");
         /* SPE Algorithm: Parallel ignition of APs (Application Processors) */
         this->active_cores = 16u; // Simulated 16-core ignition
-        sigma_printf("[SMP] SPE: %u cores successfully synchronized in the lattice.\n", 
+        sigma_log_info("[SMP] SPE: %u cores successfully synchronized in the lattice.\n", 
                      this->active_cores);
     }
 
     void broadcastIPI(sigma_u32 vector) {
-        sigma_printf("[SMP] SPE: Dispatching Inter-Processor Interrupt (Vector: 0x%02X).\n", vector);
+        sigma_log_info("[SMP] SPE: Dispatching Inter-Processor Interrupt (Vector: 0x%02X).\n", vector);
     }
 
     sigma_u32 getCoreCount() const { return this->active_cores; }
@@ -62,3 +65,5 @@ extern "C" void smp_broadcast_ipi(sigma_u32 vector) {
 extern "C" sigma_u32 smp_get_core_count() {
     return SovereignSMPEngine::getInstance().getCoreCount();
 }
+
+

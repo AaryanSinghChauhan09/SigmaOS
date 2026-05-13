@@ -1,9 +1,13 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_vault.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_biometrics.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Vault
@@ -32,11 +36,13 @@ extern "C" bool vault_unlock() {
 
 extern "C" void vault_store_secret(const char* key, const void* secret, uint32_t size) {
     if (!vault_is_unlocked) return;
-    sigma_printf("[VAULT] ZKEP: Encrypting and persisting secret '%s' (%d bytes).\n", key, size);
+    sigma_log_info("[VAULT] ZKEP: Encrypting and persisting secret '%s' (%d bytes).\n", key, size);
 }
 
 extern "C" const void* vault_retrieve_secret(const char* key, uint32_t* out_size) {
     if (!vault_is_unlocked) return nullptr;
-    sigma_printf("[VAULT] ZKEP: Decrypting secret '%s' from secure enclave.\n", key);
+    sigma_log_info("[VAULT] ZKEP: Decrypting secret '%s' from secure enclave.\n", key);
     return nullptr;
 }
+
+

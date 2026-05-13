@@ -3,9 +3,15 @@
     "compliance_level": "sovereign-high",
     "resource_priority": "adaptive",
     "modules": [
-        "ar-vr_content_developer_workspace",
-        "specialized_analytics",
-        "compliance_manager"
+        "gcc",
+        "clang",
+        "python",
+        "java",
+        "rust",
+        "go",
+        "node.js",
+        "vs_code",
+        "git-lattice"
     ],
     "rules": [
         "Industry standards",

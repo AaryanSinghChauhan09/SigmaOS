@@ -1,5 +1,7 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 /**
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN SECURITY HARDENER (S-SECHARDENER) — SHARD #500
@@ -14,8 +16,11 @@
  */
 
 #include "sigma_sechardener.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_libc.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * sigma_hardened_strcpy — CWE-119 fix for unsafe strcpy usage.
@@ -55,7 +60,7 @@ extern "C" void sechardener_apply_to_shard(uint32_t shard_id, sigma_harden_level
      * Level 1 — STRICT:   + seccomp-style syscall allow-list filtering.
      * Level 2 — SOVEREIGN: + full Cryptographic Isolation Boundary (from S-Sandbox).
      */
-    sigma_printf("[SECHARDENER] PLPE: Applying harden level %d to Shard %d.\n", (int)level, shard_id);
+    sigma_log_info("[SECHARDENER] PLPE: Applying harden level %d to Shard %d.\n", (int)level, shard_id);
 
     if (level >= HARDEN_LEVEL_BASELINE) {
         sigma_log("[SECHARDENER] PLPE: ASLR randomization applied. Stack canary injected.");
@@ -75,7 +80,7 @@ extern "C" void sechardener_validate_buffer(const void* buf, uint32_t claimed_si
         return;
     }
     if (claimed_size > actual_capacity) {
-        sigma_printf("[SECHARDENER] ❌ PLPE: Buffer overflow attempt blocked! Claimed=%d, Actual=%d.\n",
+        sigma_log_info("[SECHARDENER] ❌ PLPE: Buffer overflow attempt blocked! Claimed=%d, Actual=%d.\n",
                      claimed_size, actual_capacity);
         return;
     }
@@ -91,3 +96,5 @@ extern "C" void sechardener_audit_all_shards() {
     sigma_log("[SECHARDENER] PLPE: Checking S-Vault ZKEP enclave integrity...");
     sigma_log("[SECHARDENER] PLPE: ✅ Security posture: SOVEREIGN. All 500 shards HARDENED.");
 }
+
+

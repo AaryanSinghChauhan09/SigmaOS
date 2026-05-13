@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign App Launcher
@@ -44,18 +47,18 @@ public:
         for (sigma_u32 i = 0; i < this->app_count; i++) {
             if (sigma_hardened_strcmp(this->apps[i].app_id, query) == 0) {
                 this->apps[i].launch_count++;
-                sigma_printf("[LAUNCHER] Launching '%s' (ranked #1, %u prior launches).\n",
+                sigma_log_info("[LAUNCHER] Launching '%s' (ranked #1, %u prior launches).\n",
                              this->apps[i].display_name, this->apps[i].launch_count);
                 return;
             }
         }
-        sigma_printf("[LAUNCHER] No match for '%s'. Falling back to sigma_sh exec.\n", query);
+        sigma_log_info("[LAUNCHER] No match for '%s'. Falling back to sigma_sh exec.\n", query);
     }
 
     void listTop(sigma_u32 count) {
-        sigma_printf("[LAUNCHER] Top %u apps by usage:\n", count);
+        sigma_log_info("[LAUNCHER] Top %u apps by usage:\n", count);
         for (sigma_u32 i = 0; i < count && i < this->app_count; i++) {
-            sigma_printf("  %u. %s (%u launches)\n", i+1, this->apps[i].display_name, this->apps[i].launch_count);
+            sigma_log_info("  %u. %s (%u launches)\n", i+1, this->apps[i].display_name, this->apps[i].launch_count);
         }
     }
 
@@ -69,3 +72,5 @@ extern "C" void launcher_init() { SovereignAppLauncherEngine::getInstance().init
 extern "C" void launcher_register(const char* id, const char* name) { SovereignAppLauncherEngine::getInstance().registerApp(id, name); }
 extern "C" void launcher_launch(const char* query) { SovereignAppLauncherEngine::getInstance().launch(query); }
 extern "C" void launcher_list_top(sigma_u32 n) { SovereignAppLauncherEngine::getInstance().listTop(n); }
+
+

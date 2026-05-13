@@ -1,9 +1,15 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_privdash.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_telemetry.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_sentinel.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Privacy Dashboard
@@ -24,6 +30,8 @@ extern "C" void privdash_list_active_permissions() {
 }
 
 extern "C" void privdash_revoke_permission(uint32_t shard_id, const char* permission_name) {
-    sigma_printf("[PRIVDASH] TDFA: Revoking permission '%s' from Shard %d.\n", permission_name, shard_id);
+    sigma_log_info("[PRIVDASH] TDFA: Revoking permission '%s' from Shard %d.\n", permission_name, shard_id);
     sigma_log("[PRIVDASH] TDFA: Permission revoked. Shard sandboxed per S-Sentinel policy.");
 }
+
+

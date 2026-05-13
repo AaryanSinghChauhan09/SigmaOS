@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_compat.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Compatibility Implementation
@@ -25,7 +28,7 @@ public:
         // BIT (Binary Instruction Translation) Algorithm
         // Natively translates unmodified Linux ELF binaries into Sovereign ABI.
         
-        sigma_printf("[COMPAT] BIT: Analyzing Linux ELF binary '%s' (Mode: %d)...\n", path, (int)mode);
+        sigma_log_info("[COMPAT] BIT: Analyzing Linux ELF binary '%s' (Mode: %d)...\n", path, (int)mode);
         
         this->active_elf_processes++;
         
@@ -38,7 +41,7 @@ public:
     void mediateSyscall(uint32_t foreign_id, void* args) {
         (void)args;
         // Mediates between foreign Linux syscall IDs (e.g., sys_read, sys_write) and native Sovereign kernel services.
-        sigma_printf("[COMPAT] BIT: Mediating Linux Syscall ID 0x%02X -> Sovereign Call.\n", foreign_id);
+        sigma_log_info("[COMPAT] BIT: Mediating Linux Syscall ID 0x%02X -> Sovereign Call.\n", foreign_id);
     }
 
 private:
@@ -59,3 +62,5 @@ extern "C" bool compat_load_binary(const char* path, sigma_compat_mode_t mode) {
 extern "C" void compat_mediate_syscall(uint32_t foreign_id, void* args) {
     SovereignCompatEngine::getInstance().mediateSyscall(foreign_id, args);
 }
+
+

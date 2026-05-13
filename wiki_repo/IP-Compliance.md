@@ -12,9 +12,7 @@ When the Universal Linux Driver Compatibility Layer attempts to load a Linux Ker
 
 1
 
-
 1
-
 
 By using the Compatibility Layer rather than blindly copying Linux source code into the SigmaOS tree, we maintain strict architectural boundaries. The LKM remains an isolated binary that interacts with our HAL, respecting the GPL boundaries of the Linux ecosystem while keeping the SigmaOS kernel pristine.
 

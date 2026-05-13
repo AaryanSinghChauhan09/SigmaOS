@@ -1,6 +1,9 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignNeuralNexus.hpp"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Neural Nexus (S-NPU)
@@ -39,7 +42,7 @@ bool SovereignNeuralEngine::loadModel(const char* model_name, sigma_u32 paramete
         return false;
     }
 
-    sigma_printf("[NEURAL] Loading Foundation Model '%s' (%u MB) into NPU VRAM...\n", model_name, parameters_mb);
+    sigma_log_info("[NEURAL] Loading Foundation Model '%s' (%u MB) into NPU VRAM...\n", model_name, parameters_mb);
     this->active_models++;
     sigma_log("[NEURAL] Model loaded. Zero-latency inference active.");
     return true;
@@ -49,7 +52,7 @@ void SovereignNeuralEngine::inferAnomaly(const void* system_telemetry, sigma_u32
     (void)system_telemetry;
     (void)size;
     if (!this->initialized) return;
-    sigma_printf("[NEURAL] Executing O(1) Anomaly Detection on %u bytes of telemetry...\n", size);
+    sigma_log_info("[NEURAL] Executing O(1) Anomaly Detection on %u bytes of telemetry...\n", size);
     /* Hardware accelerated tensor multiplication simulated here */
     sigma_log("[NEURAL] Inference Complete: 0 anomalies detected. System is 100% Sovereign.");
 }
@@ -62,7 +65,7 @@ void SovereignNeuralEngine::predict(const void* input_tensor, void* output_tenso
 }
 
 void SovereignNeuralEngine::reportStatus() {
-    sigma_printf("[NEURAL] Models: %u | Hardware: %s\n", 
+    sigma_log_info("[NEURAL] Models: %u | Hardware: %s\n", 
                  this->active_models, 
                  this->npu_available ? "ACTIVE" : "EMULATED");
 }
@@ -77,7 +80,7 @@ bool SovereignNeuralEngine::transpileUI(const char* css_shard, char* out_morphic
         this->avx512_busy = false; // Forced reset for high-priority UI task
     }
 
-    sigma_printf("[NEURAL] Neural UI (AVX-512 Dedicated): Optimising %s...\n", css_shard);
+    sigma_log_info("[NEURAL] Neural UI (AVX-512 Dedicated): Optimising %s...\n", css_shard);
     sigma_strcpy(out_morphic_shard, "morphic_zenith_v2.5_singularity", 64);
     
     sigma_log("[NEURAL] Transpilation Complete. Zero-latency Glassmorphism ACTIVE.");
@@ -111,3 +114,5 @@ extern "C" void neural_predict(const void* input_tensor, void* output_tensor) {
 extern "C" void neural_report_status() {
     SovereignNeuralEngine::getInstance().reportStatus();
 }
+
+

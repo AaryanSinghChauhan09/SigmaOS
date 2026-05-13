@@ -8,26 +8,29 @@
  */
 
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 // --- Sys-Info Sharding ---
 void sigma_tool_sysinfo() {
-    sigma_printf("\nÎ£ SOVEREIGN SYSTEM SHARD INFO\n");
-    sigma_printf("-------------------------------------------\n");
-    sigma_printf("OS: Î£ SIGMAOS ZENITH SUPREME (v94.0)\n");
-    sigma_printf("SILICON: x86_64 Industrial Shard\n");
-    sigma_printf("SOVEREIGNTY: 100%% (Zero-Dependency)\n");
-    sigma_printf("-------------------------------------------\n\n");
+    sigma_log_info("\nÎ£ SOVEREIGN SYSTEM SHARD INFO\n");
+    sigma_log_info("-------------------------------------------\n");
+    sigma_log_info("OS: Î£ SIGMAOS ZENITH SUPREME (v94.0)\n");
+    sigma_log_info("SILICON: x86_64 Industrial Shard\n");
+    sigma_log_info("SOVEREIGNTY: 100%% (Zero-Dependency)\n");
+    sigma_log_info("-------------------------------------------\n\n");
 }
 
 // --- Benchmark Sharding ---
 void sigma_tool_benchmark() {
-    sigma_printf("[BENCHMARK] Sharding Slab Performance... \n");
-    sigma_printf("[BENCHMARK] Performance Shard: 1.2M opts/sec\n");
-    sigma_printf("[BENCHMARK] Industrial Status: OPTIMAL\n");
+    sigma_log_info("[BENCHMARK] Sharding Slab Performance... \n");
+    sigma_log_info("[BENCHMARK] Performance Shard: 1.2M opts/sec\n");
+    sigma_log_info("[BENCHMARK] Industrial Status: OPTIMAL\n");
 }
 
 // --- Multi-Tool Orchestration ---
 void sigma_terminal_utils_init() {
-    sigma_printf("[TOOLS] Initializing Industrial Shards (Ubuntu/Bash style)...\n");
-    sigma_printf("[TOOLS] Sharding Sysinfo & Benchmark: ACTIVE\n");
+    sigma_log_info("[TOOLS] Initializing Industrial Shards (Ubuntu/Bash style)...\n");
+    sigma_log_info("[TOOLS] Sharding Sysinfo & Benchmark: ACTIVE\n");
 }
+
+

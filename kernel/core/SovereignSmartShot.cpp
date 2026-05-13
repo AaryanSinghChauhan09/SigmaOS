@@ -1,10 +1,16 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_smartshot.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_vissearch.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_memorypalace.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_clipboard.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Smart Screenshot
@@ -20,7 +26,7 @@ extern "C" void smartshot_capture_region(uint32_t x, uint32_t y, uint32_t w, uin
     // CCA (Contextual Capture Analysis) Algorithm
     // Captures framebuffer region, immediately runs S-VisSearch NPE for OCR/object tagging.
     
-    sigma_printf("[SMARTSHOT] CCA: Capturing region (%d,%d) %dx%d from active framebuffer.\n", x, y, w, h);
+    sigma_log_info("[SMARTSHOT] CCA: Capturing region (%d,%d) %dx%d from active framebuffer.\n", x, y, w, h);
     
     // Instant OCR via S-VisSearch
     sigma_log("[SMARTSHOT] CCA: Running Neural Pixel Extraction on capture...");
@@ -39,3 +45,5 @@ extern "C" void smartshot_capture_fullscreen() {
     sigma_log("[SMARTSHOT] CCA: Initiating fullscreen framebuffer capture...");
     smartshot_capture_region(0, 0, 1920, 1080);
 }
+
+

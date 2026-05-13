@@ -4,9 +4,6 @@ Thank you for considering a contribution to the **SigmaOS Sovereign Lattice**!
 
 ## Getting Started
 
-
-
-
 1. **Fork** the repository and create a branch from `main`.
 2. **Build** the project using the deterministic build pipeline:
 
@@ -15,10 +12,7 @@ Thank you for considering a contribution to the **SigmaOS Sovereign Lattice**!
    python3 tools/sigma-build.py
    ```
 
-
-
-
-3. **Run static analysis** before submitting:
+1. **Run static analysis** before submitting:
 
    ```bash
 
@@ -29,9 +23,6 @@ Thank you for considering a contribution to the **SigmaOS Sovereign Lattice**!
 
 All contributions must adhere to the **Sovereign Shard Standard**:
 
-
-
-
 * ✅ Every new kernel component must be a **C++ OOP Singleton** with `extern "C"` wrappers
 
  ✅ All functions must emit structured log output via `sigma_log()` / `sigma_printf()`
@@ -39,9 +30,6 @@ All contributions must adhere to the **Sovereign Shard Standard**:
  ✅ New shards must be registered in `SovereignUSR` at init.
 
 ## Pull Request Checklist
-
-
-
 
 * [ ] Code compiles with `-Wall -Wextra -Werror
 

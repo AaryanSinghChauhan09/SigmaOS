@@ -1,9 +1,15 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_deeplink.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_process.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_lazyload.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Deep Linking
@@ -17,7 +23,7 @@ extern "C" void deeplink_init() {
 
 extern "C" const char* deeplink_generate(uint32_t target_app_id, const char* state_metadata) {
     // Simulated generation of a sigma:// URI
-    sigma_printf("[DEEPLINK] USL: Generated deep link: sigma://app/%d?state=%s\n", target_app_id, state_metadata);
+    sigma_log_info("[DEEPLINK] USL: Generated deep link: sigma://app/%d?state=%s\n", target_app_id, state_metadata);
     return "sigma://generated_uri";
 }
 
@@ -25,7 +31,7 @@ extern "C" void deeplink_execute(const char* sigma_uri) {
     // USL (Universal State Locator) Algorithm
     // Parses the URI, wakes up or launches the target app, and injects the state.
     
-    sigma_printf("[DEEPLINK] USL: Executing URI: '%s'\n", sigma_uri);
+    sigma_log_info("[DEEPLINK] USL: Executing URI: '%s'\n", sigma_uri);
     
     // S-LazyLoad integration
     sigma_log("[DEEPLINK] USL: Target application not active. Triggering S-LazyLoad ignition...");
@@ -33,3 +39,5 @@ extern "C" void deeplink_execute(const char* sigma_uri) {
     
     sigma_log("[DEEPLINK] USL: App ignited. State successfully injected via IPC.");
 }
+
+

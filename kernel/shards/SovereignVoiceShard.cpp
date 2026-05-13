@@ -1,6 +1,9 @@
 #include "Lattice.h"
+#include "../../../include/sigma_log.h"
 #include "SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Audio {
@@ -34,8 +37,8 @@ public:
     const char* type_name() const noexcept override { return "SovereignHIDBridge"; }
     
     void InjectText(const char* text) override {
-        sigma_printf("[VOICE/HID]: Injecting transcribed text into active window...\n");
-        sigma_printf("[VOICE/HID]: Injection complete: \"%s\"\n", text);
+        sigma_log_info("[VOICE/HID]: Injecting transcribed text into active window...\n");
+        sigma_log_info("[VOICE/HID]: Injection complete: \"%s\"\n", text);
     }
 };
 
@@ -51,19 +54,19 @@ public:
     const char* type_name() const noexcept override { return "SovereignVoiceShard"; }
 
     void ActivateGlobalWakeKey() {
-        sigma_printf("[VOICE/KERNEL]: Monitoring for Global Wake-Key (Caps Lock)...\n");
+        sigma_log_info("[VOICE/KERNEL]: Monitoring for Global Wake-Key (Caps Lock)...\n");
     }
 
     void ProcessVoiceEvent() {
         m_isRecording = SIGMA_TRUE;
-        sigma_printf("[VOICE/CORE]: Recording... Listening for Offline Context...\n");
+        sigma_log_info("[VOICE/CORE]: Recording... Listening for Offline Context...\n");
         
         // Native kernel sleep (seconds)
         sigma_sleep(2);
         
         const char* transcribedText = "SigmaOS has achieved Sovereign Voice Sovereignty. No 3rd-party APIs needed.";
         
-        sigma_printf("[VOICE/CLEANUP]: Applied 'Zero-Edit' post-processing logic.\n");
+        sigma_log_info("[VOICE/CLEANUP]: Applied 'Zero-Edit' post-processing logic.\n");
         m_hidBridge->InjectText(transcribedText);
         m_isRecording = SIGMA_FALSE;
     }
@@ -76,10 +79,10 @@ extern "C" void start_voice_zenith() {
     SigmaOS::Audio::SovereignHIDBridge hid;
     SigmaOS::Audio::SovereignVoiceShard voiceShard(&hid);
     
-    sigma_printf("--- Î£ SIGMA OS VOICE-TO-TYPE SOVEREIGN INITIALIZED ---\n");
+    sigma_log_info("--- Î£ SIGMA OS VOICE-TO-TYPE SOVEREIGN INITIALIZED ---\n");
     voiceShard.ActivateGlobalWakeKey();
     
-    sigma_printf("\n[EVENT]: Global Wake-Key Triggered (User Action Simulation)\n");
+    sigma_log_info("\n[EVENT]: Global Wake-Key Triggered (User Action Simulation)\n");
     voiceShard.ProcessVoiceEvent();
 }
 
@@ -87,3 +90,5 @@ int main() {
     start_voice_zenith();
     return 0;
 }
+
+

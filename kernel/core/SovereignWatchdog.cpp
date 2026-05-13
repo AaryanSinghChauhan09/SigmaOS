@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Watchdog
@@ -23,7 +26,7 @@ public:
     void init(sigma_u32 timeout_ms) {
         this->timeout_ms = timeout_ms;
         this->last_service_tick = 0;
-        sigma_printf("[WATCHDOG] Hardware Watchdog armed. Timeout: %u ms.\n", timeout_ms);
+        sigma_log_info("[WATCHDOG] Hardware Watchdog armed. Timeout: %u ms.\n", timeout_ms);
     }
 
     void service(sigma_u32 current_tick_ms) {
@@ -56,3 +59,5 @@ extern "C" void watchdog_service(sigma_u32 tick_ms) {
 extern "C" void watchdog_check(sigma_u32 tick_ms) {
     SovereignWatchdogEngine::getInstance().checkExpiry(tick_ms);
 }
+
+

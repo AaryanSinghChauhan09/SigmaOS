@@ -1,4 +1,5 @@
 #include "Lattice.h"
+#include "../../../include/sigma_log.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: MORPHIC UI DESIGNER (v1.0 - INDUSTRIAL SHARD)
@@ -9,7 +10,9 @@
  */
 
 #include "SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Design {
@@ -28,7 +31,7 @@ private:
 
 public:
     MorphicUIDesigner() : m_active_layer(0) {
-        sigma_printf("[DESIGN-ZENITH]: Morphic UI Engine Initialized.\n");
+        sigma_log_info("[DESIGN-ZENITH]: Morphic UI Engine Initialized.\n");
     }
 
     const char* type_name() const noexcept override { return "MorphicUIDesigner"; }
@@ -44,21 +47,21 @@ public:
         widget.blur_radius = 20;
 
         m_widgets.push_back(widget);
-        sigma_printf("[DESIGN-ZENITH]: Widget '%s' summoned to lattice.\n", name);
+        sigma_log_info("[DESIGN-ZENITH]: Widget '%s' summoned to lattice.\n", name);
     }
 
     void rasterize_all() {
-        sigma_printf("[DESIGN-ZENITH]: Rasterizing %u Morphic Widgets...\n", (unsigned int)m_widgets.size());
+        sigma_log_info("[DESIGN-ZENITH]: Rasterizing %u Morphic Widgets...\n", (unsigned int)m_widgets.size());
         for (sigma_usize i = 0; i < m_widgets.size(); i++) {
             // In a real kernel, this would call the SVG renderer or DMA to VRAM
-            sigma_printf("  -> [%zu] %s: Pos(%u,%u) Dim(%u,%u) Glass(%u%%)\n", 
+            sigma_log_info("  -> [%zu] %s: Pos(%u,%u) Dim(%u,%u) Glass(%u%%)\n", 
                 i, m_widgets[i].name.c_str(), m_widgets[i].x, m_widgets[i].y, 
                 m_widgets[i].w, m_widgets[i].h, (unsigned int)(m_widgets[i].opacity * 100 / 255));
         }
     }
 
     void apply_glassmorphism(sigma_u8 level) {
-        sigma_printf("[DESIGN-ZENITH]: Hot-patching glassmorphism lattice to level %u...\n", level);
+        sigma_log_info("[DESIGN-ZENITH]: Hot-patching glassmorphism lattice to level %u...\n", level);
         // Logic to update shader parameters globally
     }
 };
@@ -81,3 +84,5 @@ int main() {
     start_morphic_designer();
     return 0;
 }
+
+

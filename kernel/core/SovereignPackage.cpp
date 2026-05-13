@@ -1,6 +1,9 @@
 #include "SovereignPackage.hpp"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 SovereignPackageEngine& SovereignPackageEngine::getInstance() {
     static SovereignPackageEngine instance;
@@ -13,7 +16,7 @@ void SovereignPackageEngine::init() {
 }
 
 bool SovereignPackageEngine::installPackage(const char* pkg_name) {
-    sigma_printf("[PKG-MGR] Fetching '%s' from Sovereign Distributed Mirror...\n", pkg_name);
+    sigma_log_info("[PKG-MGR] Fetching '%s' from Sovereign Distributed Mirror...\n", pkg_name);
     if (sigma_strcmp(pkg_name, "sigma-core-utils") == 0) {
         sigma_log("[PKG-MGR] Installing core utilities... OK");
     } else {
@@ -30,3 +33,5 @@ extern "C" void package_manager_init() {
 extern "C" bool package_manager_install(const char* name) {
     return SovereignPackageEngine::getInstance().installPackage(name);
 }
+
+

@@ -1,5 +1,7 @@
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 
 /**
@@ -22,7 +24,7 @@ public:
     }
 
     void search(const char* query) {
-        sigma_printf("[S-SPOT] Searching lattice for: %s\n", query);
+        sigma_log_info("[S-SPOT] Searching lattice for: %s\n", query);
         /* S-SPOT Algorithm: High-speed shard indexing and semantic matching. */
         
         // Simulated semantic matching
@@ -30,7 +32,7 @@ public:
             sigma_log("[S-SPOT] MATCH FOUND: S09_NEURAL_ACCEL (Kernel/Core)");
         }
 
-        sigma_printf("[S-SPOT] Search complete for: %s\n", query);
+        sigma_log_info("[S-SPOT] Search complete for: %s\n", query);
         sigma_log("[S-SPOT] Results streamed to Zenith viewport.");
     }
 
@@ -58,3 +60,5 @@ extern "C" void spotlight_search(const char* query) {
 extern "C" void spotlight_reindex() {
     SovereignSpotlightEngine::getInstance().reindexLattice();
 }
+
+

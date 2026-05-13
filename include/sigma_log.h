@@ -9,7 +9,7 @@
 #ifndef SIGMA_LOG_H
 #define SIGMA_LOG_H
 
-#include "sigma_types.h"
+#include "core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,6 +26,14 @@ void      log_init(void);
 void      log_emit(sigma_u32 severity, const char* message);
 void      log_dump_lattice(void);
 sigma_u64 log_get_total_emitted(void);
+
+extern int sigma_printf(const char* format, ...);
+
+#define sigma_log_info(...)  sigma_printf(__VA_ARGS__)
+#define sigma_log_warn(...)  sigma_printf(__VA_ARGS__)
+#define sigma_log_err(...)   sigma_printf(__VA_ARGS__)
+#define sigma_log_error(...) sigma_printf(__VA_ARGS__)
+#define sigma_log_crit(...)  sigma_printf(__VA_ARGS__)
 
 #ifdef __cplusplus
 }

@@ -1,14 +1,14 @@
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Drivers {
 namespace Printing {
 
-class SovereignCUPS : public SigmaObject, public SigmaSingleton<SovereignCUPS> {
-    friend class SigmaSingleton<SovereignCUPS>;
+class SovereignCUPS : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignCUPS> {
+    friend class SigmaOS::SigmaSingleton<SovereignCUPS>;
 public:
     const char* type_name() const noexcept override { return "SovereignCUPS"; }
 

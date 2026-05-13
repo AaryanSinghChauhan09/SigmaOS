@@ -1,8 +1,12 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_vissearch.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_neural.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Visual Search
@@ -28,6 +32,8 @@ extern "C" void vissearch_index_image(const void* pixel_data, uint32_t width, ui
 }
 
 extern "C" void vissearch_query_visual_data(const char* search_term) {
-    sigma_printf("[VISSEARCH] NPE: Searching visual vector space for '%s'...\n", search_term);
+    sigma_log_info("[VISSEARCH] NPE: Searching visual vector space for '%s'...\n", search_term);
     // Directly links with S-NeuralSearch
 }
+
+

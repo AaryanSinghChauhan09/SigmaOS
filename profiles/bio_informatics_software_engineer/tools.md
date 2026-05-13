@@ -2,9 +2,15 @@
 
 ## Required Tools & Functions
 
-- Bio-Informatics Software Engineer workspace
-- specialized analytics
-- compliance manager
+- GCC
+- Clang
+- Python
+- Java
+- Rust
+- Go
+- Node.js
+- VS Code
+- Git-Lattice
 
 ## 📜 Compliance Rules
 

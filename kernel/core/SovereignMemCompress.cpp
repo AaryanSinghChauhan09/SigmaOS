@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Memory Compression Engine
@@ -32,13 +35,13 @@ public:
         sigma_u32 saved = (page_count - pages_after) * 4096;
         this->compressed_pages += pages_after;
         this->bytes_saved += saved;
-        sigma_printf("[MEMCOMPRESS] Compressed %u cold pages -> %u pages. Saved %u KB.\n",
+        sigma_log_info("[MEMCOMPRESS] Compressed %u cold pages -> %u pages. Saved %u KB.\n",
                      page_count, pages_after, saved / 1024);
         return pages_after;
     }
 
     void printStats() {
-        sigma_printf("[MEMCOMPRESS] Total compressed: %u pages. Bytes recovered: %u MB.\n",
+        sigma_log_info("[MEMCOMPRESS] Total compressed: %u pages. Bytes recovered: %u MB.\n",
                      this->compressed_pages, this->bytes_saved / (1024 * 1024));
     }
 
@@ -51,3 +54,5 @@ private:
 extern "C" void memcompress_init() { SovereignMemCompressEngine::getInstance().init(); }
 extern "C" sigma_u32 memcompress_compress(sigma_u32 pages) { return SovereignMemCompressEngine::getInstance().compressColdPages(pages); }
 extern "C" void memcompress_stats() { SovereignMemCompressEngine::getInstance().printStats(); }
+
+

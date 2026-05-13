@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Container Networking (CNI)
@@ -28,7 +31,7 @@ public:
         if (this->active_routes >= 32) return;
         sigma_hardened_strcpy(this->container_macs[this->active_routes], veth_mac, 18);
         this->active_routes++;
-        sigma_printf("[CONTAINER-NET] Attached veth %s to Container '%s'.\n", veth_mac, container_name);
+        sigma_log_info("[CONTAINER-NET] Attached veth %s to Container '%s'.\n", veth_mac, container_name);
     }
 
 private:
@@ -46,3 +49,5 @@ extern "C" void container_net_init() {
 extern "C" void container_net_attach(const char* container, const char* mac) {
     SovereignContainerNetEngine::getInstance().attachContainerNetwork(container, mac);
 }
+
+

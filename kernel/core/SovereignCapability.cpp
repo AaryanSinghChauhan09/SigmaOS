@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Capability Engine
@@ -40,7 +43,7 @@ public:
         this->pids[this->process_count] = pid;
         this->caps[this->process_count] = caps;
         this->process_count++;
-        sigma_printf("[CAPABILITY] PID %u granted capability mask: 0x%016llX\n",
+        sigma_log_info("[CAPABILITY] PID %u granted capability mask: 0x%016llX\n",
                      pid, (unsigned long long)caps);
     }
 
@@ -49,13 +52,13 @@ public:
             if (this->pids[i] == pid) {
                 bool granted = (this->caps[i] & required_cap) != 0;
                 if (!granted) {
-                    sigma_printf("[CAPABILITY] ACCESS DENIED: PID %u lacks cap 0x%llX\n",
+                    sigma_log_info("[CAPABILITY] ACCESS DENIED: PID %u lacks cap 0x%llX\n",
                                  pid, (unsigned long long)required_cap);
                 }
                 return granted;
             }
         }
-        sigma_printf("[CAPABILITY] PID %u not registered — DENY ALL.\n", pid);
+        sigma_log_info("[CAPABILITY] PID %u not registered — DENY ALL.\n", pid);
         return false;
     }
 
@@ -78,3 +81,5 @@ extern "C" void capability_grant(sigma_u32 pid, sigma_u64 caps) {
 extern "C" bool capability_check(sigma_u32 pid, sigma_u64 required) {
     return SovereignCapabilityEngine::getInstance().checkCapability(pid, required);
 }
+
+

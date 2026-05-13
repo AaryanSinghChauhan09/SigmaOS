@@ -1,6 +1,9 @@
 #include "sigma_locale.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Locale & Timezone Service Implementation
@@ -48,7 +51,7 @@ static struct {
 extern "C" void locale_init() {
     sigma_log("[LOCALE] Initializing Sovereign Static Cultural Data Map (SCDM)...");
     SovereignLocaleManager.initialized = 1u;
-    sigma_printf("[LOCALE] SCDM: Active locale='%s' TZ='%s' UTC%+d.\n",
+    sigma_log_info("[LOCALE] SCDM: Active locale='%s' TZ='%s' UTC%+d.\n",
                  SovereignLocaleManager.active.locale_code,
                  SovereignLocaleManager.active.tz_name,
                  (int)(SovereignLocaleManager.active.utc_offset_minutes / 60));
@@ -58,7 +61,7 @@ extern "C" void locale_set(const char* locale_code) {
     if (!locale_code) return;
     _locale_strncpy(SovereignLocaleManager.active.locale_code,
                     locale_code, SIGMA_LOCALE_CODE_LEN);
-    sigma_printf("[LOCALE] SCDM: Locale set to '%s'.\n", locale_code);
+    sigma_log_info("[LOCALE] SCDM: Locale set to '%s'.\n", locale_code);
 }
 
 extern "C" void locale_set_timezone(const char* tz_name, sigma_i32 utc_offset_minutes) {
@@ -66,7 +69,7 @@ extern "C" void locale_set_timezone(const char* tz_name, sigma_i32 utc_offset_mi
     _locale_strncpy(SovereignLocaleManager.active.tz_name,
                     tz_name, SIGMA_TZ_NAME_LEN);
     SovereignLocaleManager.active.utc_offset_minutes = utc_offset_minutes;
-    sigma_printf("[LOCALE] SCDM: Timezone set to '%s' (UTC%+d).\n",
+    sigma_log_info("[LOCALE] SCDM: Timezone set to '%s' (UTC%+d).\n",
                  tz_name, (int)(utc_offset_minutes / 60));
 }
 
@@ -103,3 +106,5 @@ extern "C" void locale_format_number(sigma_i64 value, char* out_buf, sigma_u32 b
     out_buf[out_pos] = '\0';
     (void)_locale_strlen; /* suppress unused warning */
 }
+
+

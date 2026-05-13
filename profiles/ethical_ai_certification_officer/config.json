@@ -3,9 +3,12 @@
     "compliance_level": "sovereign-high",
     "resource_priority": "adaptive",
     "modules": [
-        "ethical_ai_certification_officer_workspace",
-        "specialized_analytics",
-        "compliance_manager"
+        "pytorch",
+        "tensorflow",
+        "onnx",
+        "hugging_face",
+        "cuda/rocm_shard",
+        "neural_nexus"
     ],
     "rules": [
         "Industry standards",

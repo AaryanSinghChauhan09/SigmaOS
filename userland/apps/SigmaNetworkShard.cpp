@@ -8,7 +8,9 @@
  */
 
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 typedef struct {
     char name[32];
@@ -24,26 +26,28 @@ static sigma_vpn_t vpn_shards[] = {
 };
 
 void sigma_net_vpn_connect(const char* name) {
-    sigma_printf("[NET] Sharding Secure Link: %s... ", name);
+    sigma_log_info("[NET] Sharding Secure Link: %s... ", name);
     for (int i = 0; i < 3; i++) {
         if (sigma_streq(vpn_shards[i].name, name)) {
-            sigma_printf("CONNECTED\n");
-            sigma_printf("[NET] Protocol: %s | Latency: %d ms | INTEGRITY: OK\n", vpn_shards[i].protocol, vpn_shards[i].latency);
+            sigma_log_info("CONNECTED\n");
+            sigma_log_info("[NET] Protocol: %s | Latency: %d ms | INTEGRITY: OK\n", vpn_shards[i].protocol, vpn_shards[i].latency);
             return;
         }
     }
-    sigma_printf("ERROR (LINK NOT FOUND)\n");
+    sigma_log_info("ERROR (LINK NOT FOUND)\n");
 }
 
 void sigma_net_vpn_status() {
-    sigma_printf("\nÎ£ SOVEREIGN NETWORK & VPN REGISTRY\n");
-    sigma_printf("-------------------------------------------\n");
+    sigma_log_info("\nÎ£ SOVEREIGN NETWORK & VPN REGISTRY\n");
+    sigma_log_info("-------------------------------------------\n");
     for (int i = 0; i < 3; i++) {
-            sigma_printf("[%s] %-15s v%s  %d ms\n", 
+            sigma_log_info("[%s] %-15s v%s  %d ms\n", 
             vpn_shards[i].active ? "ON" : "OFF",
             vpn_shards[i].name, 
             vpn_shards[i].protocol, 
             (int)vpn_shards[i].latency);
     }
-    sigma_printf("-------------------------------------------\n\n");
+    sigma_log_info("-------------------------------------------\n\n");
 }
+
+

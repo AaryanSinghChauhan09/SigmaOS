@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_ipc.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 
 /**
@@ -37,7 +40,7 @@ bool SovereignIPCManager::sendOptimized(sigma_u32 target, sigma_u32 type, sigma_
     __atomic_store_n(&this->head, next_head, __ATOMIC_SEQ_CST);
     this->messages_dispatched++;
     
-    sigma_printf("[IPC] WFAE: Message -> S%02u dispatched.\n", target);
+    sigma_log_info("[IPC] WFAE: Message -> S%02u dispatched.\n", target);
     return true;
 }
 
@@ -70,4 +73,6 @@ extern "C" bool ipc_receive_optimized(sigma_ipc_msg_t* out_msg) {
 extern "C" sigma_u64 ipc_get_dispatched_count() {
     return SovereignIPCManager::getInstance().getDispatchedCount();
 }
+
+
 

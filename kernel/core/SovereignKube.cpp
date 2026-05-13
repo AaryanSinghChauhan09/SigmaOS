@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_kube.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Kernel-Native Orchestrator (v28.0 Zenith)
@@ -48,7 +51,7 @@ public:
         }
         dep->name[i] = '\0';
 
-        sigma_printf("[KUBE] LRL: Deployment '%s' (ID=%u) CREATED. Desired replicas: %u.\n",
+        sigma_log_info("[KUBE] LRL: Deployment '%s' (ID=%u) CREATED. Desired replicas: %u.\n",
                      dep->name, dep->deployment_id, replicas);
         
         this->reconcileLattice();
@@ -60,7 +63,7 @@ public:
         if (!dep) return;
 
         dep->replicas = replicas;
-        sigma_printf("[KUBE] LRL: Scaling deployment '%s' to %u replicas.\n", dep->name, replicas);
+        sigma_log_info("[KUBE] LRL: Scaling deployment '%s' to %u replicas.\n", dep->name, replicas);
         this->reconcileLattice();
     }
 
@@ -68,7 +71,7 @@ public:
         sigma_kube_deployment_t* dep = this->findDeployment(deployment_id);
         if (!dep) return;
 
-        sigma_printf("[KUBE] LRL: Deleting deployment '%s'. Terminating shards...\n", dep->name);
+        sigma_log_info("[KUBE] LRL: Deleting deployment '%s'. Terminating shards...\n", dep->name);
         dep->replicas = 0u;
         this->reconcileLattice();
     }
@@ -82,11 +85,11 @@ public:
             
             if (dep->current_count < dep->replicas) {
                 sigma_u32 diff = dep->replicas - dep->current_count;
-                sigma_printf("[KUBE] LRL: Scaling UP '%s'. Spawning %u instances.\n", dep->name, diff);
+                sigma_log_info("[KUBE] LRL: Scaling UP '%s'. Spawning %u instances.\n", dep->name, diff);
                 dep->current_count = dep->replicas; /* Simulated immediate spawn */
             } else if (dep->current_count > dep->replicas) {
                 sigma_u32 diff = dep->current_count - dep->replicas;
-                sigma_printf("[KUBE] LRL: Scaling DOWN '%s'. Terminating %u instances.\n", dep->name, diff);
+                sigma_log_info("[KUBE] LRL: Scaling DOWN '%s'. Terminating %u instances.\n", dep->name, diff);
                 dep->current_count = dep->replicas; /* Simulated immediate term */
             }
             new_total_pods += dep->current_count;
@@ -143,4 +146,6 @@ extern "C" void kube_reconcile_lattice() {
 extern "C" const sigma_kube_state_t* kube_get_state() {
     return SovereignKubeEngine::getInstance().getState();
 }
+
+
 

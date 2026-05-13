@@ -1,5 +1,7 @@
 #include "Lattice.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 /* =========================================================================
  * Σ SIGMAOS: PERSONA SHARD (v1.0 - DECLARATIVE PERSONALIZATION)
  * =========================================================================
@@ -9,6 +11,7 @@
  */
 
 #include "SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Personalization {
@@ -33,7 +36,7 @@ private:
 
 public:
     SovereignPersona() {
-        sigma_printf("[PERSONA]: Initializing Sovereign Identity Shard...\n");
+        sigma_log_info("[PERSONA]: Initializing Sovereign Identity Shard...\n");
         sigma_strncpy(m_current.name, "Sovereign_User", 63);
         m_current.theme = THEME_ZENITH_GLASS;
         m_current.cognitive_latency = 5;
@@ -44,17 +47,19 @@ public:
 
     void UpdateTheme(ZenithTheme theme) {
         m_current.theme = theme;
-        sigma_printf("[PERSONA]: Declarative Theme Update: %u\n", (sigma_u32)theme);
+        sigma_log_info("[PERSONA]: Declarative Theme Update: %u\n", (sigma_u32)theme);
     }
 
     const UserPersona& GetProfile() const { return m_current; }
 
     void SyncWithLattice() {
-        sigma_printf("[PERSONA]: Synchronizing Identity with Lattice-PQC Mesh...\n");
+        sigma_log_info("[PERSONA]: Synchronizing Identity with Lattice-PQC Mesh...\n");
         // Simulated PQC sync
-        sigma_printf("[PERSONA]: SUCCESS: Identity synchronized across distributed shards.\n");
+        sigma_log_info("[PERSONA]: SUCCESS: Identity synchronized across distributed shards.\n");
     }
 };
 
 } // namespace Personalization
 } // namespace SigmaOS
+
+

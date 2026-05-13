@@ -1,4 +1,5 @@
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -19,6 +20,7 @@
  */
 
 #include "SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Virt {
@@ -37,7 +39,7 @@ private:
 
 public:
     SovereignHypervisor() : m_active_shards(0), m_ring_minus_1_active(SIGMA_TRUE) {
-        sigma_printf("[HYPERVISOR-ZENITH]: Sovereign Hypervisor Shard Online (v13.0).\n");
+        sigma_log_info("[HYPERVISOR-ZENITH]: Sovereign Hypervisor Shard Online (v13.0).\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignHypervisor"; }
@@ -48,17 +50,17 @@ public:
         if(type == GuestType::LINUX) guest_name = "Linux Distro";
         if(type == GuestType::WINDOWS) guest_name = "Windows Subsystem";
         
-        sigma_printf("[HYPERVISOR-ZENITH]: Swallowing %s Shard...\n", guest_name);
-        sigma_printf("[HYPERVISOR-ZENITH]: | Guest Ring-0 mapped to Sigma-Ring-3 (Isolated).\n");
+        sigma_log_info("[HYPERVISOR-ZENITH]: Swallowing %s Shard...\n", guest_name);
+        sigma_log_info("[HYPERVISOR-ZENITH]: | Guest Ring-0 mapped to Sigma-Ring-3 (Isolated).\n");
         m_active_shards++;
     }
 
     void audit() {
-        sigma_printf("\n--- Î£ SOVEREIGN HYPERVISOR AUDIT (v13.0) ---\n");
-        sigma_printf("| Guest Shards   : %u\n", m_active_shards);
-        sigma_printf("| Hardware VT-x  : [CAPTURED/ACTIVE]\n");
-        sigma_printf("| Competitors    : KVM/Xen/Hyper-V neutralized.\n");
-        sigma_printf("--------------------------------------------\n");
+        sigma_log_info("\n--- Î£ SOVEREIGN HYPERVISOR AUDIT (v13.0) ---\n");
+        sigma_log_info("| Guest Shards   : %u\n", m_active_shards);
+        sigma_log_info("| Hardware VT-x  : [CAPTURED/ACTIVE]\n");
+        sigma_log_info("| Competitors    : KVM/Xen/Hyper-V neutralized.\n");
+        sigma_log_info("--------------------------------------------\n");
     }
 };
 
@@ -74,8 +76,10 @@ extern "C" void start_hypervisor_zenith() {
 }
 
 int main() {
-    sigma_printf("[SIGMA_VMM]: Bootstrapping Hypervisor Zenith...\n");
+    sigma_log_info("[SIGMA_VMM]: Bootstrapping Hypervisor Zenith...\n");
     start_hypervisor_zenith();
     return 0;
 }
+
+
 

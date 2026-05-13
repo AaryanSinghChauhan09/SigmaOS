@@ -30,11 +30,9 @@ The SigmaOS CI/CD pipeline is designed for absolute bit-perfect parity across he
 
 1
 
-
 1
 
 1
-
 
 ---
 

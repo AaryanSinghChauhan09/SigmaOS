@@ -1,5 +1,7 @@
 #include "Lattice.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN CLOUD MAESTRO (v128.0 - ZERO-STD NATIVE)
@@ -9,6 +11,7 @@
  */
 
 #include "kernel/net/cloud_maestro.hpp"
+#include "../../../include/sigma_log.h"
 
 extern "C" void _start(void) {
     SigmaOS::Net::CloudMaestro maestro;
@@ -16,6 +19,8 @@ extern "C" void _start(void) {
     maestro.DeployToCloud("APEX_AI_FUSION");
     maestro.ShowCloudMatrix();
     
-    sigma_printf("\n[SUCCESS]: Competitive Cloud Maestro Online. Zero-STL Sovereignty 100%%.\n");
+    sigma_log_info("\n[SUCCESS]: Competitive Cloud Maestro Online. Zero-STL Sovereignty 100%%.\n");
     sigma_exit(0);
 }
+
+

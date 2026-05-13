@@ -1,7 +1,7 @@
-#include "SovereignLibC.h"
+﻿#include "SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -11,7 +11,7 @@
 #include "SigmaOOP.hpp"
 
 /**
- * Î£ SIGMA OS: SOVEREIGN BUILD SYSTEM (v128.0 - ZERO-STD NATIVE)
+ * ÃŽÂ£ SIGMA OS: SOVEREIGN BUILD SYSTEM (v128.0 - ZERO-STD NATIVE)
  * =========================================================
  * USP: Silicon-Direct optimization (Gentoo-Style) for Apex Shards.
  * Capability: CPU Feature Detection (AVX-512, SSE4.2) & Hardware-Level Tuning.
@@ -34,7 +34,7 @@ private:
 
 public:
     void DetectFeatures() override {
-        sigma_printf("[BUILD/DETECTION]: Probing CPUID for instructions...\n");
+        sigma_log_info("[BUILD/DETECTION]: Probing CPUID for instructions...\n");
         
 #if defined(SIGMA_ARCH_X86_64)
         unsigned int eax, ebx, ecx, edx;
@@ -52,9 +52,9 @@ public:
         m_has_sse42 = false; m_has_avx2 = false; m_has_avx512 = false;
 #endif
 
-        sigma_printf("[BUILD/CPU]: SSE4.2: %s\n", (m_has_sse42 ? "[YES]" : "[NO]"));
-        sigma_printf("[BUILD/CPU]: AVX2: %s\n", (m_has_avx2 ? "[YES]" : "[NO]"));
-        sigma_printf("[BUILD/CPU]: AVX-512: %s\n", (m_has_avx512 ? "[YES]" : "[NO]"));
+        sigma_log_info("[BUILD/CPU]: SSE4.2: %s\n", (m_has_sse42 ? "[YES]" : "[NO]"));
+        sigma_log_info("[BUILD/CPU]: AVX2: %s\n", (m_has_avx2 ? "[YES]" : "[NO]"));
+        sigma_log_info("[BUILD/CPU]: AVX-512: %s\n", (m_has_avx512 ? "[YES]" : "[NO]"));
     }
 
     SigmaString GetOptimizationFlags() override {
@@ -66,14 +66,15 @@ public:
 };
 
 extern "C" void _start(void) {
-    sigma_printf("--- Î£ SIGMA OS SOVEREIGN BUILD SYSTEM (ZENITH) ---\n");
+    sigma_log_info("--- ÃŽÂ£ SIGMA OS SOVEREIGN BUILD SYSTEM (ZENITH) ---\n");
     SovereignSiliconAudit audit;
     audit.DetectFeatures();
     
     SigmaString flags = audit.GetOptimizationFlags();
-    sigma_printf("[BUILD/ZENITH]: Applied Apex-Optimization: %s\n", flags.c_str());
-    sigma_printf("[SUCCESS]: Kernel Shards tuned for 100%% Silicon Affinity.\n");
+    sigma_log_info("[BUILD/ZENITH]: Applied Apex-Optimization: %s\n", flags.c_str());
+    sigma_log_info("[SUCCESS]: Kernel Shards tuned for 100%% Silicon Affinity.\n");
 
     sigma_exit(0);
 }
+
 

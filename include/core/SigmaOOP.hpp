@@ -11,8 +11,8 @@
 #ifndef SIGMA_OOP_HPP
 #define SIGMA_OOP_HPP
 
-#include "core/sigma_types.h"
-#include "libc/SovereignLibC.h"
+#include "sigma_types.h"
+#include "../libc/SovereignLibC.h"
 
 namespace SigmaOS {
 
@@ -127,10 +127,10 @@ public:
 } // namespace SigmaOS
 
 /* Global overrides for zero-dependency C++ support are handled in SigmaOOP.cpp */
-void* operator new(sigma_size_t size);
-void* operator new[](sigma_size_t size);
+void* operator new(size_t size);
+void* operator new[](size_t size);
 void  operator delete(void* ptr) noexcept;
-void  operator delete(void* ptr, sigma_size_t size) noexcept;
+void  operator delete(void* ptr, size_t size) noexcept;
 void  operator delete[](void* ptr) noexcept;
 
 #endif

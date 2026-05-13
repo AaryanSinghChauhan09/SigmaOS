@@ -1,7 +1,11 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_mem.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 
 /**
@@ -44,7 +48,7 @@ public:
             order++;
         }
         
-        sigma_printf("[HEAP] IBA: Allocating Order %u (%u bytes)...\n", (unsigned)order, (unsigned)alloc_size);
+        sigma_log_info("[HEAP] IBA: Allocating Order %u (%u bytes)...\n", (unsigned)order, (unsigned)alloc_size);
         
         if (this->current_offset + alloc_size > this->total_size) {
             sigma_log("[HEAP] [CRITICAL] Silicon out of memory.");
@@ -75,7 +79,7 @@ public:
             sigma_log("[HEAP] [SECURITY] Buffer overflow detected! Memory corruption at canary.");
         } else {
             if (this->active_allocations > 0u) this->active_allocations--;
-            sigma_printf("[HEAP] IBA: Released block. Active allocations: %u\n", (unsigned)this->active_allocations);
+            sigma_log_info("[HEAP] IBA: Released block. Active allocations: %u\n", (unsigned)this->active_allocations);
         }
     }
 
@@ -113,3 +117,5 @@ extern "C" sigma_u64 heap_get_total_allocations() {
 extern "C" sigma_u32 heap_get_active_allocations() {
     return SovereignHeapEngine::getInstance().getActiveAllocations();
 }
+
+

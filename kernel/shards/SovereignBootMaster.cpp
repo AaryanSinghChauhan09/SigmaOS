@@ -1,5 +1,7 @@
 #include "Lattice.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -16,23 +18,24 @@
  */
 
 #include "SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
 
 class SovereignBootMaster : public SigmaObject {
 public:
     SovereignBootMaster() {
-        sigma_printf("[BOOT_MASTER]: Initializing Sovereign Boot Logic.\n");
+        sigma_log_info("[BOOT_MASTER]: Initializing Sovereign Boot Logic.\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignBootMaster"; }
 
     void FastInit() {
-        sigma_printf("[BOOT_INIT]: SKIPPING SLOW HARDWARE PROBES...\n");
-        sigma_printf("[BOOT_INIT]: USING PREDICTIVE RAM CACHE MAPPING...\n");
+        sigma_log_info("[BOOT_INIT]: SKIPPING SLOW HARDWARE PROBES...\n");
+        sigma_log_info("[BOOT_INIT]: USING PREDICTIVE RAM CACHE MAPPING...\n");
     }
 
     void LaunchKernel() {
-        sigma_printf("[BOOT_LOAD]: LOADING SOVEREIGN KERNEL AT 0x100000...\n");
-        sigma_printf("[BOOT_LOAD]: PARALLEL SHARD INITIALIZATION COMMENCING...\n");
+        sigma_log_info("[BOOT_LOAD]: LOADING SOVEREIGN KERNEL AT 0x100000...\n");
+        sigma_log_info("[BOOT_LOAD]: PARALLEL SHARD INITIALIZATION COMMENCING...\n");
     }
 };
 
@@ -41,7 +44,9 @@ extern "C" void _start(void) {
     master.FastInit();
     master.LaunchKernel();
 
-    sigma_printf("\n[SUCCESS]: Sovereign Boot Sequence Completed. Control Handed to Kernel.\n");
+    sigma_log_info("\n[SUCCESS]: Sovereign Boot Sequence Completed. Control Handed to Kernel.\n");
     sigma_exit(0);
 }
+
+
 

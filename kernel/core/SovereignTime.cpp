@@ -1,6 +1,9 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_time.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Time Engine (v28.0 Zenith)
@@ -28,6 +31,8 @@ extern "C" void time_get_uptime(sigma_u64* uptime) {
 }
 
 extern "C" void time_report_status() {
-    sigma_printf("[S-TIME] Lattice Uptime: %llu cycles\n", SovereignTimeEngine.lattice_uptime);
+    sigma_log_info("[S-TIME] Lattice Uptime: %llu cycles\n", SovereignTimeEngine.lattice_uptime);
     sigma_log("[S-TIME] Synchronization status: NOMINAL");
 }
+
+

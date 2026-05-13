@@ -3,9 +3,12 @@
     "compliance_level": "sovereign-high",
     "resource_priority": "adaptive",
     "modules": [
-        "cybersecurity_analyst_workspace",
-        "specialized_analytics",
-        "compliance_manager"
+        "wireshark",
+        "nmap",
+        "metasploit",
+        "openvas",
+        "sovereign_audit",
+        "pqc-vault"
     ],
     "rules": [
         "Industry standards",

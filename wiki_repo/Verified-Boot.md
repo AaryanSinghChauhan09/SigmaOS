@@ -1,15 +1,12 @@
 # Verified-Boot
 
-
 # 🛡️ Sovereign Verified Boot & PQC Security
-
 
 To ensure the **Sovereignty** of the lattice, SigmaOS implements a multi-stage chain of trust that extends from the hardware root up to the userland Zenith UI.
 
 ---
 
 ## 🏗️ The Chain of Trust
-
 
 1. **S-ROM (Silicon Root of Trust)**: Immutable silicon-level public key hash embedded during manufacture.
 2. **S-BOOT (Sovereign Bootloader)**: The bootloader is verified against the S-ROM key before execution.
@@ -19,7 +16,6 @@ To ensure the **Sovereignty** of the lattice, SigmaOS implements a multi-stage c
 ---
 
 ## 🔐 Post-Quantum Hardening
-
 
 SigmaOS utilizes **Lattice-Based Shard Verification (LBSV)** to protect against future quantum computing threats. This ensures that even with a quantum advantage, an attacker cannot forge system shards or bypass security gates.
 

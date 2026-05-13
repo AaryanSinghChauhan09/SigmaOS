@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_zeronet.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Zero-Trust Network
@@ -23,7 +26,7 @@ extern "C" void zeronet_init() {
 extern "C" bool zeronet_establish_connection(uint32_t source, uint32_t target) {
     if (SovereignZeroNetManager.connection_count >= 256) return false;
     
-    sigma_printf("[ZERONET] ICT: Negotiating secure tunnel between S%02d and S%02d...\n", (int)source, (int)target);
+    sigma_log_info("[ZERONET] ICT: Negotiating secure tunnel between S%02d and S%02d...\n", (int)source, (int)target);
     
     uint32_t id = ++SovereignZeroNetManager.connection_count;
     SovereignZeroNetManager.active_connections[id - 1].connection_id = id;
@@ -44,5 +47,7 @@ extern "C" void zeronet_verify_traffic(uint32_t conn_id, const void* payload, ui
         return;
     }
     
-    sigma_printf("[ZERONET] ICT: Traffic on Conn %d validated (%d bytes).\n", (int)conn_id, (int)size);
+    sigma_log_info("[ZERONET] ICT: Traffic on Conn %d validated (%d bytes).\n", (int)conn_id, (int)size);
 }
+
+

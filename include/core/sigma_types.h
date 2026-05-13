@@ -6,31 +6,28 @@
  * Dependencies: sigma_kernel_types.h (Industrial Source of Truth)
  */
 
-#include "core/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Standard POSIX-like types parity - only if not already defined */
-#if !defined(SIGMA_STDINT_DECLARED) && !defined(_STDINT_H) && !defined(_SYS_TYPES_H)
-#define uint8_t  sigma_u8
-#define uint16_t sigma_u16
-#define uint32_t sigma_u32
-#define uint64_t sigma_u64
-
-#define int8_t   sigma_i8
-#define int16_t  sigma_i16
-#define int32_t  sigma_i32
-#define int64_t  sigma_i64
-
+/* Standard POSIX-like types parity */
+#ifndef SIGMA_STDINT_DECLARED
 #define SIGMA_STDINT_DECLARED
+typedef sigma_u8  uint8_t;
+typedef sigma_u16 uint16_t;
+typedef sigma_u32 uint32_t;
+typedef sigma_u64 uint64_t;
+
+typedef sigma_i8  int8_t;
+typedef sigma_i16 int16_t;
+typedef sigma_i32 int32_t;
+typedef sigma_i64 int64_t;
+
+typedef sigma_size_t  size_t;
+typedef sigma_ssize_t ssize_t;
 #endif
-
-
-typedef sigma_i64 sigma_ssize_t;
-typedef sigma_u64 sigma_size_t;
-typedef sigma_u64 sigma_addr_t;
 
 typedef float  sigma_f32;
 typedef double sigma_f64;
@@ -45,21 +42,6 @@ typedef sigma_i32 sigma_status;
 typedef unsigned char bool;
 #define true  1
 #define false 0
-#endif
-#endif
-
-/* Industrial Constants */
-#ifndef SIGMA_TRUE
-#define SIGMA_TRUE  1u
-#endif
-#ifndef SIGMA_FALSE
-#define SIGMA_FALSE 0u
-#endif
-#ifndef SIGMA_NULL
-#ifdef __cplusplus
-#define SIGMA_NULL  nullptr
-#else
-#define SIGMA_NULL  ((void*)0)
 #endif
 #endif
 

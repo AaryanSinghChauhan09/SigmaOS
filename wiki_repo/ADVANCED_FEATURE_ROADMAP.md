@@ -36,7 +36,6 @@ This document outlines the extensive strategic roadmap for automation, customiza
 
 1
 
-
 1. **Phase 1: Foundation**: Theme engine overhaul, Settings Hub redesign, Unified Search.
 2. **Phase 2: Automation**: Task scheduler, Macro recording, Auto-optimization.
 

@@ -1,4 +1,5 @@
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -34,8 +35,8 @@ public:
     void Execute() override {
         double u = -20.0, f = 10.0;
         double v = (f * u) / (f + u);
-        sigma_printf("[PHYSICS/OPTICS]: Lens Formula (u=-20, f=10)\n");
-        sigma_printf("[PHYSICS/OPTICS]: Image Distance (v): " << v << " cm\n");
+        sigma_log_info("[PHYSICS/OPTICS]: Lens Formula (u=-20, f=10)\n");
+        sigma_log_info("[PHYSICS/OPTICS]: Image Distance (v): " << v << " cm\n");
     }
 };
 
@@ -45,8 +46,8 @@ public:
     void Execute() override {
         double h = 6.626e-34, v = 1e15, phi = 2.0 * 1.6e-19;
         double Kmax = (h * v) - phi;
-        sigma_printf("[PHYSICS/PHOTO]: Photoelectric Effect (v=1e15, phi=2eV)\n");
-        sigma_printf("[PHYSICS/PHOTO]: Kmax Shard: " << Kmax << " Joules\n");
+        sigma_log_info("[PHYSICS/PHOTO]: Photoelectric Effect (v=1e15, phi=2eV)\n");
+        sigma_log_info("[PHYSICS/PHOTO]: Kmax Shard: " << Kmax << " Joules\n");
     }
 };
 
@@ -56,8 +57,8 @@ public:
     void Execute() override {
         double H_plus = 1e-5;
         double pH = -std::log10(H_plus);
-        sigma_printf("[CHEMISTRY/PH]: Concentration [H+] = 1e-5\n");
-        sigma_printf("[CHEMISTRY/PH]: Result: pH = " << pH << " (Acidic)\n");
+        sigma_log_info("[CHEMISTRY/PH]: Concentration [H+] = 1e-5\n");
+        sigma_log_info("[CHEMISTRY/PH]: Result: pH = " << pH << " (Acidic)\n");
     }
 };
 
@@ -65,8 +66,8 @@ public:
 class BayesShard : public IMasterShard {
 public:
     void Execute() override {
-        sigma_printf("[MATH/BAYES]: Theorem: P(A|B) = [P(B|A) * P(A)] / P(B).\n");
-        sigma_printf("[MATH/BAYES]: Posterior Probability Shard Synced.\n");
+        sigma_log_info("[MATH/BAYES]: Theorem: P(A|B) = [P(B|A) * P(A)] / P(B).\n");
+        sigma_log_info("[MATH/BAYES]: Posterior Probability Shard Synced.\n");
     }
 };
 
@@ -74,8 +75,8 @@ public:
 class DogmaShard : public IMasterShard {
 public:
     void Execute() override {
-        sigma_printf("[BIOLOGY/DOGMA]: Process: DNA -> (Transcription) -> mRNA -> (Translation) -> Protein.\n");
-        sigma_printf("[BIOLOGY/DOGMA]: Information Flow Shard Active.\n");
+        sigma_log_info("[BIOLOGY/DOGMA]: Process: DNA -> (Transcription) -> mRNA -> (Translation) -> Protein.\n");
+        sigma_log_info("[BIOLOGY/DOGMA]: Information Flow Shard Active.\n");
     }
 };
 
@@ -92,7 +93,7 @@ public:
     }
 
     void ExecuteMasterpieceAudit() {
-        sigma_printf("--- Î£ SIGMA OS MASTER SCHOLASTIC MASTERPIECE ---\n");
+        sigma_log_info("--- Î£ SIGMA OS MASTER SCHOLASTIC MASTERPIECE ---\n");
         for (auto it = m_mastery.begin(); it != m_mastery.end(); ++it) {
             std::cout << "\n[MASTER-SHADING]: Executing Mastery Shard: " << it->first << std::endl;
             it->second->Execute();
@@ -105,7 +106,9 @@ int main() {
     masterpiece.Synthesize();
     masterpiece.ExecuteMasterpieceAudit();
 
-    sigma_printf("\n[SUCCESS]: Competitive Scholastic Masterpiece Online. NCERT Sovereignty 100%.\n");
+    sigma_log_info("\n[SUCCESS]: Competitive Scholastic Masterpiece Online. NCERT Sovereignty 100%.\n");
     return 0;
 }
+
+
 

@@ -1,7 +1,11 @@
-#include "sigma_types.h"
+#include "core/sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_pqc.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign PQC Implementation
@@ -27,13 +31,13 @@ public:
         /* LBSV (Lattice-Based Shard Verification) Algorithm
          * Generates high-entropy signatures based on silicon-native lattice noise. */
         
-        sigma_printf("[PQC] LBSV: Signing Shard S%02u...\n", (unsigned)shard_id);
+        sigma_log_info("[PQC] LBSV: Signing Shard S%02u...\n", (unsigned)shard_id);
         sigma_secure_memset(signature, 0xA5, 64); // Simulated PQC signature
         this->total_signatures++;
     }
 
     bool verifyShard(sigma_u32 shard_id, const sigma_u8* signature) {
-        sigma_printf("[PQC] LBSV: Verifying Shard S%02u integrity...\n", (unsigned)shard_id);
+        sigma_log_info("[PQC] LBSV: Verifying Shard S%02u integrity...\n", (unsigned)shard_id);
         
         (void)signature;
         /* Simulate complex lattice-math verification */
@@ -76,3 +80,5 @@ extern "C" sigma_u64 pqc_get_signature_count() {
 extern "C" void pqc_refresh_lattice() {
     SovereignPQCEngine::getInstance().refreshLattice();
 }
+
+

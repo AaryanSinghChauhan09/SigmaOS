@@ -1,6 +1,9 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_identity.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Identity Engine (v28.0 Zenith)
@@ -18,12 +21,14 @@ extern "C" void identity_init() {
 }
 
 extern "C" void identity_verify_shard(const char* shard_id) {
-    sigma_printf("[S-IDENTITY] Verifying shard signature: %s\n", shard_id);
+    sigma_log_info("[S-IDENTITY] Verifying shard signature: %s\n", shard_id);
     /* Sovereign PQC Algorithm: Post-Quantum cryptographic verification. */
     SovereignIdentityEngine.verified_shards++;
     sigma_log("[S-IDENTITY] Shard integrity VERIFIED.");
 }
 
 extern "C" void identity_report_status() {
-    sigma_printf("[S-IDENTITY] Total Shards Verified: %u\n", SovereignIdentityEngine.verified_shards);
+    sigma_log_info("[S-IDENTITY] Total Shards Verified: %u\n", SovereignIdentityEngine.verified_shards);
 }
+
+

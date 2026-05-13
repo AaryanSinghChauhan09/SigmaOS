@@ -1,6 +1,9 @@
 #include "SovereignSnap.hpp"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Snap Layouts (SovereignSnapEngine)
@@ -16,7 +19,7 @@ void SovereignSnapEngine::init() {
 }
 
 void SovereignSnapEngine::applyLayout(sigma_u32 layout_id) {
-    sigma_printf("[SNAP] DSS: Applying spatial layout L%02u...\n", layout_id);
+    sigma_log_info("[SNAP] DSS: Applying spatial layout L%02u...\n", layout_id);
     /* DSS Algorithm: Recalculates shard viewports based on golden ratio
      * and intent-based priority.                                       */
     sigma_log("[SNAP] DSS: Viewport reconciliation complete.");
@@ -32,7 +35,7 @@ void SovereignSnapEngine::registerZone(sigma_u32 x, sigma_u32 y,
         zone->w        = w;
         zone->h        = h;
         zone->capacity = w * h;
-        sigma_printf("[SNAP] DSS: Zone %u registered (%u,%u,%u,%u).\n",
+        sigma_log_info("[SNAP] DSS: Zone %u registered (%u,%u,%u,%u).\n",
                      this->active_zone_count, x, y, w, h);
     }
 }
@@ -54,3 +57,5 @@ extern "C" void snap_auto_arrange() {
 extern "C" void snap_register_zone(sigma_u32 x, sigma_u32 y, sigma_u32 w, sigma_u32 h) {
     SovereignSnapEngine::getInstance().registerZone(x, y, w, h);
 }
+
+

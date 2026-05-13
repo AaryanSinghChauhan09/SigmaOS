@@ -24,7 +24,6 @@ This document tracks meta-development goals, process refinements, and engineerin
 
 1
 
-
 1
 
 1
@@ -32,7 +31,6 @@ This document tracks meta-development goals, process refinements, and engineerin
 1
 
 1
-
 
 ---
 

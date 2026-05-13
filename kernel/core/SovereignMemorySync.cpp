@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Memory Synchronization Engine
@@ -28,7 +31,7 @@ public:
 
     void emitMemoryFence(const char* isa_source, const char* isa_target) {
         this->active_fences++;
-        sigma_printf("[MEM-SYNC] Emitted hardware barrier: %s -> %s (Fence %u).\n", 
+        sigma_log_info("[MEM-SYNC] Emitted hardware barrier: %s -> %s (Fence %u).\n", 
                      isa_source, isa_target, this->active_fences);
     }
 
@@ -63,3 +66,5 @@ extern "C" void memsync_fence(const char* src, const char* tgt) {
 extern "C" bool memsync_cas(sigma_u32* addr, sigma_u32 expected, sigma_u32 new_val) {
     return SovereignMemorySyncEngine::getInstance().compareAndSwapCrossISA(addr, expected, new_val);
 }
+
+

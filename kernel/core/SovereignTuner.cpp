@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Tuner
@@ -35,9 +38,9 @@ public:
 
     void executeAcceleratedWorkload(const char* workload) {
         if (this->amx_enabled) {
-            sigma_printf("[TUNER] Accelerating '%s' via AMX Tensor blocks.\n", workload);
+            sigma_log_info("[TUNER] Accelerating '%s' via AMX Tensor blocks.\n", workload);
         } else {
-            sigma_printf("[TUNER] Executing '%s' on standard ALU.\n", workload);
+            sigma_log_info("[TUNER] Executing '%s' on standard ALU.\n", workload);
         }
     }
 
@@ -60,3 +63,5 @@ extern "C" void tuner_probe() {
 extern "C" void tuner_exec(const char* workload) {
     SovereignTunerEngine::getInstance().executeAcceleratedWorkload(workload);
 }
+
+

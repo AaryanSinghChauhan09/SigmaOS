@@ -1,4 +1,4 @@
-#include "sigma_types.h"
+﻿#include "sigma_types.h"
 #include "SovereignLibC.h"
 #include "sigma_log.h"
 #include "sigma_hal.h"
@@ -9,7 +9,7 @@
  * Implements a Wait-Free Circular Shard Logging (WFCSL) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal machine-state tracing.
  *
- * Design: OOP-isolated singleton — SovereignLogEngine.
+ * Design: OOP-isolated singleton â€” SovereignLogEngine.
  */
 
 #define LOG_BUFFER_SIZE 256u
@@ -44,7 +44,7 @@ public:
         else if (severity == 2u) tag = "WARN";
         else if (severity == 0u) tag = "DEBUG";
 
-        sigma_printf("[LOG] [%s] %s\n", tag, message);
+        sigma_log_info("[LOG] [%s] %s\n", tag, message);
     }
 
     void dumpLattice() {
@@ -52,7 +52,7 @@ public:
         sigma_u32 limit = (this->write_ptr > LOG_BUFFER_SIZE) ? LOG_BUFFER_SIZE : this->write_ptr;
         for(sigma_u32 i=0; i < limit; i++) {
             sigma_log_entry_t* entry = &this->circular_buffer[i];
-            sigma_printf("[TRACE] S%u: %s\n", entry->severity, entry->message);
+            sigma_log_info("[TRACE] S%u: %s\n", entry->severity, entry->message);
         }
     }
 
@@ -83,3 +83,4 @@ extern "C" void log_dump_lattice() {
 extern "C" sigma_u64 log_get_total_emitted() {
     return SovereignLogEngine::getInstance().getTotalEmitted();
 }
+

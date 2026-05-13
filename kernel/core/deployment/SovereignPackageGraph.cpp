@@ -38,8 +38,35 @@ public:
         sigma_log_info("[S-PKG-GRAPH] Shard '%s' verified via PQC Lattice Signature.", shard_name);
     }
 
+    void resolve_dependencies(const char* shard_id) {
+        sigma_log_info("[S-PKG-GRAPH] Resolving dependency lattice for: %s", shard_id);
+        
+        // Mock dependency graph resolution
+        if (sigma_strcmp(shard_id, "ai-researcher") == 0) {
+            sigma_log_info("[S-PKG-GRAPH] Found dependencies: S-CUDA, S-ROCm, S-NNFS");
+            verify_shard_origin("S-CUDA");
+            verify_shard_origin("S-ROCm");
+            verify_shard_origin("S-NNFS");
+        } else if (sigma_strcmp(shard_id, "cyber-analyst") == 0) {
+            sigma_log_info("[S-PKG-GRAPH] Found dependencies: S-PLOIT, S-MAP, S-AUDIT");
+            verify_shard_origin("S-PLOIT");
+            verify_shard_origin("S-MAP");
+            verify_shard_origin("S-AUDIT");
+        } else {
+            sigma_log_info("[S-PKG-GRAPH] No additional dependencies for: %s", shard_id);
+        }
+    }
+
 private:
     SovereignPackageGraph() = default;
+
+    int sigma_strcmp(const char* s1, const char* s2) {
+        while (*s1 && (*s1 == *s2)) {
+            s1++;
+            s2++;
+        }
+        return *(unsigned char*)s1 - *(unsigned char*)s2;
+    }
 };
 
 } // namespace Deployment
@@ -50,6 +77,10 @@ extern "C" {
 
 void pkg_graph_init() {
     SigmaOS::Kernel::Deployment::SovereignPackageGraph::getInstance().init();
+}
+
+void pkg_resolve(const char* name) {
+    SigmaOS::Kernel::Deployment::SovereignPackageGraph::getInstance().resolve_dependencies(name);
 }
 
 void pkg_verify(const char* name) {

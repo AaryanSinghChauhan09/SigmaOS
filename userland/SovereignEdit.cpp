@@ -1,7 +1,11 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_fs.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_zenithui.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Editor (v28.0 Zenith)
@@ -18,7 +22,7 @@ public:
     }
 
     void openFile(const char* path) {
-        sigma_printf("[S-EDIT] Opening file: %s\n", path);
+        sigma_log_info("[S-EDIT] Opening file: %s\n", path);
         sigma_log("[S-EDIT] File buffer mapped to SovereignVFS.");
         this->files_opened++;
     }
@@ -44,3 +48,5 @@ extern "C" void edit_open_file(const char* path) {
 extern "C" void edit_save_file() {
     SovereignEditEngine::getInstance().saveFile();
 }
+
+

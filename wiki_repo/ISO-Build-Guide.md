@@ -12,14 +12,11 @@ This document provides a technical guide for generating the first bootable Sigma
 
 1
 
-
 1
-
 
 Install `archiso` on an Arch-based host:
 
 1
-
 
 sudo pacman -S archiso
 cp -r /usr/share/archiso/configs/releng/ ~/sigmaos-iso
@@ -34,11 +31,9 @@ Add the core SigmaOS foundation packages to `packages.x86_64`:
 
 1
 
-
 1
 
 1
-
 
 Inject SigmaOS branding into the live environment:
 
@@ -56,7 +51,6 @@ Execute the build script:
 
 1
 
-
 sudo mkarchiso -v -w /tmp/archiso-tmp -o ~/iso-output ~/sigmaos-iso
 
 1
@@ -66,7 +60,6 @@ sudo mkarchiso -v -w /tmp/archiso-tmp -o ~/iso-output ~/sigmaos-iso
 1
 
 1
-
 
 ---
 

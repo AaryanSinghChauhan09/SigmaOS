@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Boot Splash Engine
@@ -24,17 +27,17 @@ public:
         this->fb_w = fb_width;
         this->fb_h = fb_height;
         this->progress = 0;
-        sigma_printf("[BOOT-SPLASH] Framebuffer acquired (%ux%u). Rendering Σ SIGMAOS splash...\n",
+        sigma_log_info("[BOOT-SPLASH] Framebuffer acquired (%ux%u). Rendering Σ SIGMAOS splash...\n",
                      fb_width, fb_height);
     }
 
     void updateProgress(sigma_u32 percent, const char* stage_name) {
         this->progress = percent;
-        sigma_printf("[BOOT-SPLASH] [%3u%%] %s\n", percent, stage_name);
+        sigma_log_info("[BOOT-SPLASH] [%3u%%] %s\n", percent, stage_name);
     }
 
     void setTheme(const char* theme_name) {
-        sigma_printf("[BOOT-SPLASH] Applying boot splash theme: '%s'.\n", theme_name);
+        sigma_log_info("[BOOT-SPLASH] Applying boot splash theme: '%s'.\n", theme_name);
     }
 
     void dismiss() {
@@ -50,3 +53,5 @@ extern "C" void bootsplash_init(sigma_u32 w, sigma_u32 h) { SovereignBootSplashE
 extern "C" void bootsplash_progress(sigma_u32 pct, const char* stage) { SovereignBootSplashEngine::getInstance().updateProgress(pct, stage); }
 extern "C" void bootsplash_set_theme(const char* theme) { SovereignBootSplashEngine::getInstance().setTheme(theme); }
 extern "C" void bootsplash_dismiss() { SovereignBootSplashEngine::getInstance().dismiss(); }
+
+

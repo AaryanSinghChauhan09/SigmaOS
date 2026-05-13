@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Dock Engine
@@ -36,7 +39,7 @@ public:
         
         sigma_hardened_strcpy(this->dock_items[this->item_count], app_name, 64);
         this->item_count++;
-        sigma_printf("[DOCK] Added '%s' to Sovereign Dock. Total items: %u\n", app_name, this->item_count);
+        sigma_log_info("[DOCK] Added '%s' to Sovereign Dock. Total items: %u\n", app_name, this->item_count);
     }
 
     void configureDock(const char* pos, bool hide, float scale) {
@@ -44,7 +47,7 @@ public:
         this->auto_hide = hide;
         this->dock_scale = scale;
         
-        sigma_printf("[DOCK] Configuration updated: Pos=%s, AutoHide=%d, Scale=%.2f\n", 
+        sigma_log_info("[DOCK] Configuration updated: Pos=%s, AutoHide=%d, Scale=%.2f\n", 
                      this->position, (int)this->auto_hide, this->dock_scale);
     }
 
@@ -71,3 +74,5 @@ extern "C" void dock_add_app(const char* app_name) {
 extern "C" void dock_configure(const char* pos, bool hide, float scale) {
     SovereignDockEngine::getInstance().configureDock(pos, hide, scale);
 }
+
+

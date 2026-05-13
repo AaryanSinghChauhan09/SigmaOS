@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Personalization Engine
@@ -30,7 +33,7 @@ public:
         this->telemetry_events_processed++;
         // Simulate local AI predicting the user's next action
         if (this->telemetry_events_processed % 10 == 0) {
-            sigma_printf("[PERSONALIZE] Heuristic Triggered: Suggesting new Workflow based on Context '%s'.\n", context);
+            sigma_log_info("[PERSONALIZE] Heuristic Triggered: Suggesting new Workflow based on Context '%s'.\n", context);
         }
     }
 
@@ -60,3 +63,5 @@ extern "C" void personalize_process_event(sigma_u32 event_id, const char* contex
 extern "C" void personalize_suggest_theme(sigma_u32 ambient_light_lux) {
     SovereignPersonalizationEngine::getInstance().suggestThemeForEnvironment(ambient_light_lux);
 }
+
+

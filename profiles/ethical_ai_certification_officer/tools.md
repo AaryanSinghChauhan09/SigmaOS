@@ -2,9 +2,12 @@
 
 ## Required Tools & Functions
 
-- Ethical AI Certification Officer workspace
-- specialized analytics
-- compliance manager
+- PyTorch
+- TensorFlow
+- ONNX
+- Hugging Face
+- CUDA/ROCm Shard
+- Neural Nexus
 
 ## 📜 Compliance Rules
 

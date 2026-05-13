@@ -64,11 +64,11 @@ void pqc_sign_shard(unsigned int shard_id, unsigned char* signature) {
     SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().signShard(shard_id, signature);
 }
 
-extern "C" int pqc_verify_shard(unsigned int shard_id, const unsigned char* signature) {
+int pqc_verify_shard(unsigned int shard_id, const unsigned char* signature) {
     return SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().verifyShard(shard_id, signature) ? 1 : 0;
 }
 
-extern "C" unsigned long long pqc_get_signature_count() {
+unsigned long long pqc_get_signature_count() {
     return SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().getSignatureCount();
 }
 

@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 // Engine Initialisers (Extern C)
 extern "C" void sinit_init();
@@ -22,15 +25,15 @@ public:
     }
 
     void ignite() {
-        sigma_printf("\nΣ SIGMAOS ZENITH SUPREME (v94.0) IGNITING...\n");
-        sigma_printf("--------------------------------------------------\n");
+        sigma_log_info("\nΣ SIGMAOS ZENITH SUPREME (v94.0) IGNITING...\n");
+        sigma_log_info("--------------------------------------------------\n");
 
         sinit_init();
         sinit_execute_plan();
         sinit_report_status();
 
-        sigma_printf("--------------------------------------------------\n");
-        sigma_printf("Σ SYSTEM SOVEREIGNTY ACHIEVED. LATTICE READY.\n\n");
+        sigma_log_info("--------------------------------------------------\n");
+        sigma_log_info("Σ SYSTEM SOVEREIGNTY ACHIEVED. LATTICE READY.\n\n");
     }
 
 private:
@@ -40,3 +43,5 @@ private:
 extern "C" void sigma_kernel_main() {
     SovereignKernelMain::getInstance().ignite();
 }
+
+

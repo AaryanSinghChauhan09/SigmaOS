@@ -1,13 +1,17 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 #include "silicon_audit.hpp"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Build {
 
 void SovereignSiliconAudit::DetectFeatures() {
-    sigma_printf("[BUILD/DETECTION]: Probing CPUID for instructions...\n");
+    sigma_log_info("[BUILD/DETECTION]: Probing CPUID for instructions...\n");
     
 #if defined(SIGMA_ARCH_X86_64)
     unsigned int eax, ebx, ecx, edx;
@@ -24,9 +28,9 @@ void SovereignSiliconAudit::DetectFeatures() {
     m_has_sse42 = false; m_has_avx2 = false; m_has_avx512 = false;
 #endif
 
-    sigma_printf("[BUILD/CPU]: SSE4.2: %s\n", (m_has_sse42 ? "[YES]" : "[NO]"));
-    sigma_printf("[BUILD/CPU]: AVX2: %s\n", (m_has_avx2 ? "[YES]" : "[NO]"));
-    sigma_printf("[BUILD/CPU]: AVX-512: %s\n", (m_has_avx512 ? "[YES]" : "[NO]"));
+    sigma_log_info("[BUILD/CPU]: SSE4.2: %s\n", (m_has_sse42 ? "[YES]" : "[NO]"));
+    sigma_log_info("[BUILD/CPU]: AVX2: %s\n", (m_has_avx2 ? "[YES]" : "[NO]"));
+    sigma_log_info("[BUILD/CPU]: AVX-512: %s\n", (m_has_avx512 ? "[YES]" : "[NO]"));
 }
 
 SigmaString SovereignSiliconAudit::GetOptimizationFlags() {
@@ -38,3 +42,5 @@ SigmaString SovereignSiliconAudit::GetOptimizationFlags() {
 
 } // namespace Build
 } // namespace SigmaOS
+
+

@@ -1,4 +1,4 @@
-#include "../S01_Genesis/sigma_libc.h"
+﻿#include "../S01_Genesis/sigma_libc.h"
 #include "sigma_log.h"
 #include "DependencyGraph.hpp"
 #include "CryptoSignatures.hpp"
@@ -66,7 +66,7 @@ public:
 
     void rollback(uint32_t transaction_id) {
         sigma_print("[s-pkg] Rolling back to transaction ID: ");
-        sigma_printf("%u", transaction_id);
+        sigma_log_info("%u", transaction_id);
         sigma_print("\n");
         sigma_log_info("[s-pkg] Rollback Complete. System state restored.");
     }
@@ -101,4 +101,5 @@ void sigma_pkg_sync() {
 }
 
 } // extern "C"
+
 

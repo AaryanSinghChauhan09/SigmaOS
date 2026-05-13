@@ -1,3 +1,5 @@
+# bug report
+
 ---
 name: Bug Report
 about: Report a kernel shard malfunction or build failure
@@ -16,13 +18,8 @@ assignees: ''
 
 ## Reproduction Steps
 
-
-
-
 1. Step one
 2. Step two
-
-
 
 3. Step three
 
@@ -35,9 +32,6 @@ assignees: ''
 <!-- What actually happens -->
 
 ## Build Environment
-
-
-
 
 - Architecture: `[ ] x86_64  [ ] ARM64  [ ] RISC-V
 

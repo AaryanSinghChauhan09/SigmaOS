@@ -1,9 +1,13 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_persona.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_universal_ui.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Persona Engine
@@ -19,7 +23,7 @@ extern "C" void persona_init() {
 
 extern "C" void persona_set_mode(sigma_persona_mode_t mode) {
     active_persona = mode;
-    sigma_printf("[PERSONA] HHA: Persona mode shifted to %d. Reconfiguring workspace...\n", (int)mode);
+    sigma_log_info("[PERSONA] HHA: Persona mode shifted to %d. Reconfiguring workspace...\n", (int)mode);
     
     if (mode == PERSONA_MODE_DEVELOPER) {
         sigma_log("[PERSONA] HHA: Activating Sovereign Native IDE, dropping CPU throttling.");
@@ -46,14 +50,16 @@ extern "C" void persona_automate_workflow(uint32_t trigger_id) {
     // HHA (Habitual Heuristic Automation) Algorithm
     // Uses lightweight ML to predict and automate user actions based on historical triggers.
     
-    sigma_printf("[PERSONA] HHA: Event Trigger 0x%02X detected. Searching heuristic rule-base...\n", trigger_id);
+    sigma_log_info("[PERSONA] HHA: Event Trigger 0x%02X detected. Searching heuristic rule-base...\n", trigger_id);
     
     for (int i = 0; i < 32; i++) {
         if (hha_rules[i].trigger_id == trigger_id && hha_rules[i].confidence > 80) {
-            sigma_printf("[PERSONA] HHA: High-confidence match! Executing Action 0x%02X.\n", hha_rules[i].action_id);
+            sigma_log_info("[PERSONA] HHA: High-confidence match! Executing Action 0x%02X.\n", hha_rules[i].action_id);
             return;
         }
     }
     
     sigma_log("[PERSONA] HHA: No high-confidence automation found for this trigger.");
 }
+
+

@@ -1,8 +1,12 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_ide.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 
 /**
@@ -20,7 +24,7 @@ extern "C" void ide_init() {
 }
 
 extern "C" void ide_open_shard(uint32_t shard_id) {
-    sigma_printf("[IDE] ISC: Loading Shard S%02d source into buffer...\n", shard_id);
+    sigma_log_info("[IDE] ISC: Loading Shard S%02d source into buffer...\n", shard_id);
     sigma_hardened_strcpy(ide_state.current_file, "SovereignNewShard.cpp", 64);
 }
 
@@ -40,3 +44,5 @@ extern "C" void ide_compile_active_shard() {
 extern "C" void ide_render_ui() {
     sigma_log("[IDE] Rendering ZenCode UI (Glassmorphism + Neon Syntax Highlighting).");
 }
+
+

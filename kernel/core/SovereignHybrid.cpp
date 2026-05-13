@@ -1,7 +1,10 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_hybrid.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 
 /**
@@ -18,14 +21,14 @@ extern "C" void hybrid_init() {
 
 extern "C" void hybrid_set_mode(sigma_hybrid_mode_t mode) {
     current_mode = mode;
-    sigma_printf("[HYBRID] DCS: Kernel mode shifted to %s\n", mode == HYBRID_MODE_MICRO ? "MICRO" : "MONOLITHIC");
+    sigma_log_info("[HYBRID] DCS: Kernel mode shifted to %s\n", mode == HYBRID_MODE_MICRO ? "MICRO" : "MONOLITHIC");
 }
 
 extern "C" bool hybrid_execute_syscall(uint32_t syscall_id, void* args) {
     // DCS (Dynamic Context Shifting) Algorithm
     // Routes syscalls based on the current hybrid mode.
     
-    sigma_printf("[HYBRID] DCS: Executing syscall 0x%02X...\n", syscall_id);
+    sigma_log_info("[HYBRID] DCS: Executing syscall 0x%02X...\n", syscall_id);
     
     if (current_mode == HYBRID_MODE_MICRO) {
         sigma_log("[HYBRID] DCS: Routing through isolated micro-services (Secure but overhead).");
@@ -35,3 +38,5 @@ extern "C" bool hybrid_execute_syscall(uint32_t syscall_id, void* args) {
     
     return true;
 }
+
+

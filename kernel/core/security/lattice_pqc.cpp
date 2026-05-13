@@ -1,6 +1,9 @@
 #include "Lattice.h"
+#include "../../../include/sigma_log.h"
 #include "lattice_pqc.hpp"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Security {
@@ -8,8 +11,8 @@ namespace Security {
 SovereignLatticePQC::SovereignLatticePQC() 
     : m_key_id(0), m_quantum_shield_active(SIGMA_TRUE), m_encryptions(0) {
     sigma_memset(&m_shard, 0, sizeof(LatticeShard));
-    sigma_printf("[PQC]: Sovereign Lattice Cryptography Engine Initialized.\n");
-    sigma_printf("[PQC]: Quantum Shield [ACTIVE] | Protocol: LATTICE-v12.0\n");
+    sigma_log_info("[PQC]: Sovereign Lattice Cryptography Engine Initialized.\n");
+    sigma_log_info("[PQC]: Quantum Shield [ACTIVE] | Protocol: LATTICE-v12.0\n");
 }
 
 sigma_u64 SovereignLatticePQC::get_entropy() {
@@ -18,7 +21,7 @@ sigma_u64 SovereignLatticePQC::get_entropy() {
 }
 
 void SovereignLatticePQC::generate_sovereign_key() {
-    sigma_printf("[PQC]: Generating Sovereign Key Shard via Ring-LWE...\n");
+    sigma_log_info("[PQC]: Generating Sovereign Key Shard via Ring-LWE...\n");
     
     sigma_u64 entropy = get_entropy();
     for(sigma_u32 i = 0; i < PQC_DIM; ++i) {
@@ -29,25 +32,27 @@ void SovereignLatticePQC::generate_sovereign_key() {
     
     m_shard.valid = SIGMA_TRUE;
     m_key_id = entropy;
-    sigma_printf("[PQC]: Sovereign Lattice Key Generated. ID: %llx\n", m_key_id);
+    sigma_log_info("[PQC]: Sovereign Lattice Key Generated. ID: %llx\n", m_key_id);
 }
 
 void SovereignLatticePQC::encrypt_shard(const void* data, sigma_size_t size) {
     if (!m_shard.valid) generate_sovereign_key();
     
-    sigma_printf("[PQC]: Encrypting Silicon Shard (%llu bytes) with Lattice-PQC...\n", size);
+    sigma_log_info("[PQC]: Encrypting Silicon Shard (%llu bytes) with Lattice-PQC...\n", size);
     // Polymorphic encryption logic would be here
     m_encryptions++;
 }
 
 void SovereignLatticePQC::audit() {
-    sigma_printf("\n--- Σ SOVEREIGN PQC AUDIT ---\n");
-    sigma_printf("| Encryption Engine : LATTICE-RING-LWE\n");
-    sigma_printf("| Key ID            : %llx\n", m_key_id);
-    sigma_printf("| Total Shards      : %llu\n", m_encryptions);
-    sigma_printf("| Quantum Resilience: 256-bit (POST-QUANTUM)\n");
-    sigma_printf("-----------------------------\n");
+    sigma_log_info("\n--- Σ SOVEREIGN PQC AUDIT ---\n");
+    sigma_log_info("| Encryption Engine : LATTICE-RING-LWE\n");
+    sigma_log_info("| Key ID            : %llx\n", m_key_id);
+    sigma_log_info("| Total Shards      : %llu\n", m_encryptions);
+    sigma_log_info("| Quantum Resilience: 256-bit (POST-QUANTUM)\n");
+    sigma_log_info("-----------------------------\n");
 }
 
 } // namespace Security
 } // namespace SigmaOS
+
+

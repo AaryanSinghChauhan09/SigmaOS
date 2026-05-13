@@ -1,5 +1,7 @@
 #include "sigma_libc.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 // --- sigma_print ---
 void sigma_print(const char* str) {
@@ -94,7 +96,7 @@ int sigma_pipe(int pipefd[2]) {
 
 unsigned int sigma_sleep(unsigned int seconds) {
     // x86_64 rax=35 (nanosleep) - implementation simplifies for seconds
-    sigma_printf("[ZENITH-LIBC]: Pulse sleep for %d seconds...\n", seconds);
+    sigma_log_info("[ZENITH-LIBC]: Pulse sleep for %d seconds...\n", seconds);
     return 0;
 }
 
@@ -117,8 +119,8 @@ int sigma_dup(int oldfd) {
     return (int)res;
 }
 
-// --- sigma_printf (v1.0 ZENITH) ---
-void sigma_printf(const char* format, ...) {
+// --- sigma_log_info (v1.0 ZENITH) ---
+void sigma_log_info(const char* format, ...) {
     va_list args;
     va_start(args, format);
     
@@ -181,3 +183,5 @@ void sigma_free(void* ptr) {
     // In this zero-latency shard, we do not reclaim small blocks yet.
     // Genuine SigmaOS memory management is per-process shard cleanup.
 }
+
+

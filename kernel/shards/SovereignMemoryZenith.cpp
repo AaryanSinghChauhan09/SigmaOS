@@ -1,4 +1,5 @@
 #include "Lattice.h"
+#include "../../../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -22,7 +23,9 @@
  */
 
 #include "SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -43,13 +46,13 @@ private:
 
 public:
     SovereignMemoryManager() : m_used(0), m_segment_count(0) {
-        sigma_printf("[KERNEL-SOVEREIGN]: Mapping Raw Silicon Stack (64MB Shard)...\n");
+        sigma_log_info("[KERNEL-SOVEREIGN]: Mapping Raw Silicon Stack (64MB Shard)...\n");
         m_pool = (sigma_u8*)sigma_slab_alloc_raw(INITIAL_POOL_SIZE);
         if (!m_pool) {
-            sigma_printf("[ERROR]: Failed to map sovereign heap.\n");
+            sigma_log_info("[ERROR]: Failed to map sovereign heap.\n");
             sigma_exit(1);
         }
-        sigma_printf("[KERNEL-SOVEREIGN]: Memory Shard Mapped at %p\n", m_pool);
+        sigma_log_info("[KERNEL-SOVEREIGN]: Memory Shard Mapped at %p\n", m_pool);
     }
 
     const char* type_name() const noexcept override { return "SovereignMemoryManager"; }
@@ -78,11 +81,11 @@ public:
     }
 
     void audit() {
-        sigma_printf("\n--- Î£ SOVEREIGN MEMORY AUDIT ---\n");
-        sigma_printf("| Total Pool : %u MB\n", (unsigned int)(INITIAL_POOL_SIZE / 1024 / 1024));
-        sigma_printf("| Used Space : %u KB\n", (unsigned int)(m_used / 1024));
-        sigma_printf("| Managed Shards: %u\n", (unsigned int)m_segment_count);
-        sigma_printf("----------------------------------\n");
+        sigma_log_info("\n--- Î£ SOVEREIGN MEMORY AUDIT ---\n");
+        sigma_log_info("| Total Pool : %u MB\n", (unsigned int)(INITIAL_POOL_SIZE / 1024 / 1024));
+        sigma_log_info("| Used Space : %u KB\n", (unsigned int)(m_used / 1024));
+        sigma_log_info("| Managed Shards: %u\n", (unsigned int)m_segment_count);
+        sigma_log_info("----------------------------------\n");
     }
 };
 
@@ -102,7 +105,9 @@ extern "C" void start_memory_zenith() {
 }
 
 int main() {
-    sigma_printf("[SIGMA_KERNEL]: Transitioning to Sovereign Memory Management...\n");
+    sigma_log_info("[SIGMA_KERNEL]: Transitioning to Sovereign Memory Management...\n");
     start_memory_zenith();
     return 0;
 }
+
+

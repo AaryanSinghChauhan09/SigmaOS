@@ -1,8 +1,12 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_rollback.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_time.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Rollback Implementation
@@ -24,16 +28,18 @@ extern "C" void rollback_capture_snapshot() {
     stable_snapshot.snapshot_id++;
     stable_snapshot.timestamp = (uint32_t)time_get_uptime_ms();
     
-    sigma_printf("[ROLLBACK] CSS: Captured Stable Snapshot ID %d at %d ms.\n", 
+    sigma_log_info("[ROLLBACK] CSS: Captured Stable Snapshot ID %d at %d ms.\n", 
                  stable_snapshot.snapshot_id, stable_snapshot.timestamp);
 }
 
 extern "C" void rollback_execute_to_last_stable() {
     sigma_log("[ROLLBACK] [CRITICAL] Fault detected! Executing Automated Rollback...");
     
-    sigma_printf("[ROLLBACK] Reverting machine-state to Snapshot ID %d...\n", 
+    sigma_log_info("[ROLLBACK] Reverting machine-state to Snapshot ID %d...\n", 
                  stable_snapshot.snapshot_id);
                  
     // Simulate silicon-native state restoration
     sigma_log("[ROLLBACK] State RESTORED. Shard Lattice STABILIZED.");
 }
+
+

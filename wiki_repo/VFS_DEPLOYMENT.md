@@ -12,9 +12,7 @@ The Sovereign Lattice dynamically unites heterogeneous silicon:
 
 1
 
-
 1
-
 
 `SovereignVFS` breaks away from traditional block storage. Utilizing the `SovereignNetStack`, it mathematically stripes file data across all three nodes. If the ARM64 node suffers a catastrophic failure, read requests are seamlessly rerouted to the RISC-V node with zero-latency data loss.
 

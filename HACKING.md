@@ -14,12 +14,8 @@ All shards live in `kernel/core/`. Create `SovereignMyFeature.cpp`:
 
 /**
 
-
-
  * SovereignMyFeature — What this shard does.
  * Algorithm: ALGORITHM_NAME
-
-
 
  * USP: What makes this sovereign vs. legacy Linux equivalent.
  */
@@ -75,13 +71,8 @@ python3 tools/sigma-build.py
 
 Ensure your PR description references:
 
-
-
-
 * The `IDEAS_BACKLOG.md` item or `ROADMAP.md` milestone it closes
 * The `cppcheck` output (zero warnings)
-
-
 
 * A wiki page update in `SigmaOS.wiki/`
 

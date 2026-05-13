@@ -1,7 +1,10 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_cloud.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 
 /**
@@ -30,7 +33,7 @@ extern "C" bool cloud_deploy_pod(const sigma_cloud_pod_t* pod_config) {
     SovereignCloudManager.active_pods[id - 1].pod_id = id;
     SovereignCloudManager.active_pods[id - 1].is_healthy = true;
     
-    sigma_printf("[CLOUD] NSO: Deployed Pod ID %d (Replicas: %d).\n", 
+    sigma_log_info("[CLOUD] NSO: Deployed Pod ID %d (Replicas: %d).\n", 
                  id, pod_config->replica_count);
     return true;
 }
@@ -38,8 +41,10 @@ extern "C" bool cloud_deploy_pod(const sigma_cloud_pod_t* pod_config) {
 extern "C" void cloud_monitor_health() {
     for (uint32_t i = 0; i < SovereignCloudManager.pod_count; i++) {
         if (!SovereignCloudManager.active_pods[i].is_healthy) {
-            sigma_printf("[CLOUD] [ALERT] Pod ID %d unhealthy. Restarting...\n", SovereignCloudManager.active_pods[i].pod_id);
+            sigma_log_info("[CLOUD] [ALERT] Pod ID %d unhealthy. Restarting...\n", SovereignCloudManager.active_pods[i].pod_id);
             SovereignCloudManager.active_pods[i].is_healthy = true;
         }
     }
 }
+
+

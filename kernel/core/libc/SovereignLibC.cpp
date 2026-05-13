@@ -1,4 +1,4 @@
-#include "sigma_libc.h"
+﻿#include "sigma_libc.h"
 #include "sigma_log.h"
 
 extern "C" {
@@ -47,7 +47,7 @@ void sigma_strncpy(char* dest, const char* src, sigma_size_t n) {
         dest[i] = '\0';
 }
 
-void sigma_printf(const char* format, ...) {
+void sigma_log_info(const char* format, ...) {
     // Industrial implementation routes to kernel console
     sigma_log_info(format); 
 }
@@ -68,4 +68,5 @@ sigma_u32 sigma_crc32(const void* data, sigma_size_t n) {
 }
 
 } // extern "C"
+
 

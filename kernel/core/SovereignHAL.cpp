@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Hardware Abstraction Layer (HAL)
@@ -23,7 +26,7 @@ public:
     }
 
     void mapHardwareIO(sigma_u32 device_id) {
-        sigma_printf("[HAL] Device IO dynamically mapped for hardware ID: 0x%04X.\n", device_id);
+        sigma_log_info("[HAL] Device IO dynamically mapped for hardware ID: 0x%04X.\n", device_id);
     }
 
 private:
@@ -38,3 +41,5 @@ extern "C" void hal_init() {
 extern "C" void hal_map_io(sigma_u32 id) {
     SovereignHALEngine::getInstance().mapHardwareIO(id);
 }
+
+

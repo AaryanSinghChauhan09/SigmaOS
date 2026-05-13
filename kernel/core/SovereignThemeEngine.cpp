@@ -1,7 +1,11 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_time.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Adaptive Theme Engine
@@ -33,7 +37,7 @@ public:
 
     void applyAccent(sigma_u32 color) {
         this->active_theme.accent_color = color;
-        sigma_printf("[THEME] Silicon Accent Color updated to 0x%06X.\n", (unsigned)color);
+        sigma_log_info("[THEME] Silicon Accent Color updated to 0x%06X.\n", (unsigned)color);
     }
 
     void toggleDarkMode() {
@@ -51,7 +55,7 @@ public:
         bool should_be_dark = (now.hour >= 18 || now.hour <= 6);
         
         if (should_be_dark != this->active_theme.dark_mode) {
-            sigma_printf("[THEME] Adaptive Trigger: Auto-switching theme due to time (%02d:%02d).\n", now.hour, now.minute);
+            sigma_log_info("[THEME] Adaptive Trigger: Auto-switching theme due to time (%02d:%02d).\n", now.hour, now.minute);
             this->toggleDarkMode();
         }
     }
@@ -90,3 +94,5 @@ extern "C" void theme_toggle_dark_mode() {
 extern "C" void theme_evaluate_adaptive() {
     SovereignThemeEngine::getInstance().evaluateAdaptiveTheme();
 }
+
+

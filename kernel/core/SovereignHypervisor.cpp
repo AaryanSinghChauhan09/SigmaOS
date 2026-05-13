@@ -1,6 +1,9 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hypervisor.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Hypervisor Implementation (Zenith Edition - v28.0)
@@ -32,7 +35,7 @@ sigma_u32 SovereignHyperEngine::createVM(sigma_u32 vcpus, sigma_u64 memory_mb) {
     vm->state      = SIGMA_VM_STATE_IDLE;
     vm->total_runtime_ms = 0u;
 
-    sigma_printf("[HYPER] SIV Zenith: VM #%u CREATED (%u vCPUs, %llu MB RAM).\n", 
+    sigma_log_info("[HYPER] SIV Zenith: VM #%u CREATED (%u vCPUs, %llu MB RAM).\n", 
                  vm->vm_id, vcpus, memory_mb);
     return vm->vm_id;
 }
@@ -42,7 +45,7 @@ void SovereignHyperEngine::startVM(sigma_u32 vm_id) {
     
     sigma_vm_t* vm = &this->vms[vm_id - 1u];
     vm->state = SIGMA_VM_STATE_RUNNING;
-    sigma_printf("[HYPER] SIV Zenith: VM #%u TRANSITION -> RUNNING. Launching guest shard.\n", vm_id);
+    sigma_log_info("[HYPER] SIV Zenith: VM #%u TRANSITION -> RUNNING. Launching guest shard.\n", vm_id);
 }
 
 void SovereignHyperEngine::handleVMExit() {
@@ -59,7 +62,7 @@ void SovereignHyperEngine::stopVM(sigma_u32 vm_id) {
     
     sigma_vm_t* vm = &this->vms[vm_id - 1u];
     vm->state = SIGMA_VM_STATE_IDLE;
-    sigma_printf("[HYPER] SIV Zenith: VM #%u TRANSITION -> IDLE.\n", vm_id);
+    sigma_log_info("[HYPER] SIV Zenith: VM #%u TRANSITION -> IDLE.\n", vm_id);
 }
 
 void SovereignHyperEngine::getState(sigma_hypervisor_state_t* out_state) const {
@@ -101,4 +104,6 @@ extern "C" void hyper_get_state(sigma_hypervisor_state_t* out_state) {
 extern "C" sigma_u64 hypervisor_get_exit_count() {
     return SovereignHyperEngine::getInstance().getExitCount();
 }
+
+
 

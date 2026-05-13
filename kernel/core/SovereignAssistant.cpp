@@ -1,6 +1,9 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_assistant.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Assistant Implementation (v28.0 Zenith)
@@ -19,15 +22,17 @@ extern "C" void assistant_init() {
 }
 
 extern "C" void assistant_query(const char* prompt) {
-    sigma_printf("[S-ASSISTANT] Processing Sovereign intent: %s\n", prompt);
+    sigma_log_info("[S-ASSISTANT] Processing Sovereign intent: %s\n", prompt);
     SovereignAssistantEngine.query_count++;
     sigma_log("[S-ASSISTANT] Intent reconciled with Lattice State.");
 }
 
 extern "C" void assistant_report_status() {
-    sigma_printf("[S-ASSISTANT] Queries handled: %u | System: NOMINAL\n", SovereignAssistantEngine.query_count);
+    sigma_log_info("[S-ASSISTANT] Queries handled: %u | System: NOMINAL\n", SovereignAssistantEngine.query_count);
 }
 
 extern "C" sigma_u32 assistant_get_query_count() {
     return SovereignAssistantEngine.query_count;
 }
+
+

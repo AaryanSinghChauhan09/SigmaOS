@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Enclave Engine
@@ -30,12 +33,12 @@ public:
         if (this->enclaves_active >= 4) return;
         this->enclave_ids[this->enclaves_active] = enclave_id;
         this->enclaves_active++;
-        sigma_printf("[ENCLAVE] Hardware Enclave %u provisioned.\n", enclave_id);
+        sigma_log_info("[ENCLAVE] Hardware Enclave %u provisioned.\n", enclave_id);
     }
 
     void storeSecureKey(sigma_u32 enclave_id, const char* key_material) {
         this->keys_secured++;
-        sigma_printf("[ENCLAVE] Secure key material sealed in Enclave %u.\n", enclave_id);
+        sigma_log_info("[ENCLAVE] Secure key material sealed in Enclave %u.\n", enclave_id);
     }
 
 private:
@@ -58,3 +61,5 @@ extern "C" void enclave_provision(sigma_u32 id) {
 extern "C" void enclave_store_key(sigma_u32 id, const char* key) {
     SovereignEnclaveEngine::getInstance().storeSecureKey(id, key);
 }
+
+

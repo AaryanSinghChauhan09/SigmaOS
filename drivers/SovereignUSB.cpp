@@ -1,4 +1,5 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign USB Stack
@@ -27,7 +28,7 @@ public:
             if (!this->ports[i].device_connected && i == 2) { // Simulate device plug in port 2
                 this->ports[i].device_connected = true;
                 sigma_hardened_strcpy(this->ports[i].device_name, "Sovereign Keyboard", 32);
-                sigma_printf("[USB] HOT-SWAP: Device '%s' discovered on Port %d.\n", 
+                sigma_log_info("[USB] HOT-SWAP: Device '%s' discovered on Port %d.\n", 
                              this->ports[i].device_name, i);
             }
         }
@@ -40,11 +41,11 @@ public:
         }
         
         if (!this->ports[port].device_connected) {
-            sigma_printf("[USB] [WARNING] Attempted control transfer to empty Port %d.\n", port);
+            sigma_log_info("[USB] [WARNING] Attempted control transfer to empty Port %d.\n", port);
             return -2;
         }
 
-        sigma_printf("[USB] Dispatching control packet to Port %d (%s)...\n", 
+        sigma_log_info("[USB] Dispatching control packet to Port %d (%s)...\n", 
                      port, this->ports[port].device_name);
         return 0;
     }
@@ -71,3 +72,5 @@ extern "C" void usb_poll() {
 extern "C" int usb_send_control(uint8_t port, void* setup_packet) {
     return SovereignUSBStack::getInstance().sendControl(port, setup_packet);
 }
+
+

@@ -1,8 +1,13 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_emotion.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_universal_ui.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_focus.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Emotion UX
@@ -36,7 +41,7 @@ extern "C" void emotion_update_state(sigma_emotion_state_t new_state) {
     
     SovereignEmotionManager.current_state = new_state;
     SovereignEmotionManager.state_dwell_time = 0;
-    sigma_printf("[EMOTION] CSE: Confirmed user state transition to %d.\n", (int)new_state);
+    sigma_log_info("[EMOTION] CSE: Confirmed user state transition to %d.\n", (int)new_state);
     
     if (new_state == EMOTION_STATE_FRUSTRATED) {
         sigma_log("[EMOTION] CSE: Stress threshold reached. Cooling UI palette.");
@@ -50,3 +55,5 @@ extern "C" void emotion_update_state(sigma_emotion_state_t new_state) {
 extern "C" sigma_emotion_state_t emotion_get_current_state() {
     return SovereignEmotionManager.current_state;
 }
+
+

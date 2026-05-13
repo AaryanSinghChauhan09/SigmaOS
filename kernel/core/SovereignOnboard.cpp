@@ -1,10 +1,17 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_onboard.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_persona.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_biometrics.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_access.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Onboarding Wizard
@@ -30,5 +37,7 @@ extern "C" void onboard_start_wizard() {
 }
 
 extern "C" void onboard_complete_step(uint32_t step_id) {
-    sigma_printf("[ONBOARD] GSP: Step %d completed successfully.\n", step_id);
+    sigma_log_info("[ONBOARD] GSP: Step %d completed successfully.\n", step_id);
 }
+
+

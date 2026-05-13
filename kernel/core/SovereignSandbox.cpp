@@ -1,6 +1,9 @@
-#include "sigma_types.h"
+#include "core/sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_sandbox.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Sandbox Container
@@ -26,7 +29,7 @@ public:
         this->active_containers[id - 1] = *config;
         this->active_containers[id - 1].container_id = id;
         
-        sigma_printf("[SANDBOX] CIB: Created isolated container ID %d.\n", (int)id);
+        sigma_log_info("[SANDBOX] CIB: Created isolated container ID %d.\n", (int)id);
         return id;
     }
 
@@ -36,8 +39,8 @@ public:
         sigma_sandbox_config_t* config = &this->active_containers[container_id - 1];
         if (config->container_id == 0) return false;
 
-        sigma_printf("[SANDBOX] CIB: Validating Enclave Key for Container %d...\n", (int)container_id);
-        sigma_printf("[SANDBOX] CIB: Executing '%s' within Container %d...\n", binary_path, (int)container_id);
+        sigma_log_info("[SANDBOX] CIB: Validating Enclave Key for Container %d...\n", (int)container_id);
+        sigma_log_info("[SANDBOX] CIB: Executing '%s' within Container %d...\n", binary_path, (int)container_id);
         
         if (!config->network_access) {
             sigma_log("[SANDBOX] CIB: Network access BLOCKED by container policy.");
@@ -49,7 +52,7 @@ public:
 
     void destroyContainer(uint32_t container_id) {
         if (container_id > 0 && container_id <= this->container_count) {
-            sigma_printf("[SANDBOX] CIB: Destroying container ID %d.\n", (int)container_id);
+            sigma_log_info("[SANDBOX] CIB: Destroying container ID %d.\n", (int)container_id);
             this->active_containers[container_id - 1].container_id = 0; 
         }
     }
@@ -77,3 +80,5 @@ extern "C" bool sandbox_execute(uint32_t container_id, const char* binary_path) 
 extern "C" void sandbox_destroy_container(uint32_t container_id) {
     SovereignSandboxManager::getInstance().destroyContainer(container_id);
 }
+
+

@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_globalsync.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Global Lattice Sync Implementation
@@ -25,7 +28,7 @@ public:
     void push(sigma_u32 shard_id, const void* data, sigma_size_t size) {
         /* SCR Algorithm: Pushes shard state to global lattice mirror. */
         this->state.sync_status = SIGMA_SYNC_PUSHING;
-        sigma_printf("[SYNC] SCR: Pushing Shard S%02u state (%u bytes) to global mirror.\n",
+        sigma_log_info("[SYNC] SCR: Pushing Shard S%02u state (%u bytes) to global mirror.\n",
                      shard_id, (unsigned)size);
         
         this->state.total_payload_bytes += size;
@@ -35,7 +38,7 @@ public:
     void pull(sigma_u32 shard_id, void* out_data, sigma_size_t size) {
         /* SCR Algorithm: Pulls shard state from global lattice mirror. */
         this->state.sync_status = SIGMA_SYNC_PULLING;
-        sigma_printf("[SYNC] SCR: Pulling Shard S%02u state (%u bytes) from global mirror.\n",
+        sigma_log_info("[SYNC] SCR: Pulling Shard S%02u state (%u bytes) from global mirror.\n",
                      shard_id, (unsigned)size);
         
         this->state.sync_status = SIGMA_SYNC_IDLE;
@@ -89,3 +92,5 @@ extern "C" void sync_reconcile_all() {
 extern "C" const sigma_sync_state_t* sync_get_state() {
     return SovereignSyncEngine::getInstance().getState();
 }
+
+

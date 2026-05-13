@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Hybrid Architecture Bridge (ARM/RISC-V)
@@ -32,7 +35,7 @@ public:
             this->riscv_cores_detected++;
         }
         
-        sigma_printf("[HYBRID-ARCH] Registered Core %u as '%s'. Total: %u ARM, %u RISC-V\n", 
+        sigma_log_info("[HYBRID-ARCH] Registered Core %u as '%s'. Total: %u ARM, %u RISC-V\n", 
                      core_id, isa_type, this->arm_cores_detected, this->riscv_cores_detected);
     }
 
@@ -64,3 +67,5 @@ extern "C" void hybridarch_register_core(sigma_u32 core_id, const char* isa_type
 extern "C" bool hybridarch_dispatch_task(void* task_ptr) {
     return SovereignHybridArchEngine::getInstance().dispatchHeterogeneousTask(task_ptr);
 }
+
+

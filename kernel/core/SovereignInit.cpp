@@ -1,6 +1,9 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignNeuralNexus.hpp"
+#include "../../../include/sigma_log.h"
 #include "SovereignVFS.hpp"
+#include "../../../include/sigma_log.h"
 
 extern "C" void allocator_init();
 
@@ -43,7 +46,7 @@ public:
         vfs_init();
         SovereignDistributedVFS::getInstance().atomicSync();
         
-        sigma_printf("[INIT] ASI: Parallel Group Ignited. 600 Shards Active.\n");
+        sigma_log_info("[INIT] ASI: Parallel Group Ignited. 600 Shards Active.\n");
     }
 
     void reportStatus() const {
@@ -67,3 +70,5 @@ extern "C" void sinit_execute_plan() {
 extern "C" void sinit_report_status() {
     SovereignInitEngine::getInstance().reportStatus();
 }
+
+

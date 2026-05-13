@@ -152,8 +152,10 @@
     width: 80px;
     height: 80px;
     background: var(--glass);
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
 
@@ -343,8 +345,10 @@
     transform: translateX(-50%);
     width: 600px;
     background: rgba(10, 10, 12, 0.95);
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
 
@@ -566,6 +570,8 @@
 .focus-mode-active .desktop-overlay {
     background: rgba(0,0,0,0.8);
        
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
+       
     -webkit-backdrop-filter: blur(var(--glass-blur));
        
     backdrop-filter: blur(var(--glass-blur));
@@ -651,8 +657,10 @@
     width: 350px;
     height: 220px;
     background: rgba(0,0,0,0.85);
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
 
@@ -679,8 +687,10 @@
 
 .log-item {
     background: rgba(0,0,0,0.4);
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
 
@@ -842,6 +852,7 @@
     width: 100%;
     padding: 20px 40px;
     background: var(--glass-bg);
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
     border-radius: 100px;
@@ -1417,6 +1428,7 @@
 
 .widget {
     background: var(--glass);
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
     border-radius: 20px;
@@ -1582,6 +1594,7 @@
     display: none;
     flex-direction: column;
     z-index: 5000;
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
 }
@@ -1747,6 +1760,7 @@
     top: 50px;
     right: 20px;
     background: rgba(0, 0, 0, 0.4);
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
     border-radius: 8px;
@@ -1794,6 +1808,7 @@
     bottom: 0;
     width: 300px;
     background: var(--glass);
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
     z-index: 2000;
@@ -1818,6 +1833,7 @@
     transform: translateX(-50%);
     width: 600px;
     background: rgba(10, 10, 15, 0.85);
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
     border-radius: 12px;
@@ -1834,6 +1850,7 @@
     width: 350px;
     height: calc(100vh - 80px);
     background: rgba(15, 15, 20, 0.8);
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
     z-index: 9000;
@@ -1850,6 +1867,7 @@
     left: 20px;
     width: 320px;
     background: var(--glass-bg);
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
     border-radius: 12px;
@@ -1876,6 +1894,7 @@
     min-width: 500px;
     height: 72px;
     background: rgba(15, 15, 20, 0.4);
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
     border-radius: 32px;
@@ -1983,6 +2002,7 @@
 
 /* Wizard Styles */
 .wizard-overlay {
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
 }
@@ -2100,6 +2120,7 @@
     position: absolute;
     z-index: 1000;
     background: rgba(15, 15, 20, 0.4);
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
     border-radius: 20px;

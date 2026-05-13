@@ -1,4 +1,4 @@
-﻿/* zenith_inline.css — extracted inline styles */
+/* zenith_inline.css � extracted inline styles */
 
 .zen-live-canvas-inner {
     min-height: 150px;
@@ -70,6 +70,7 @@
     width: 350px;
     height: 220px;
     background: rgba(0,0,0,0.85);
+    -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(0,255,255,0.2);
     border-radius: 12px;

@@ -1,4 +1,5 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign GPU Driver (v28.0 Zenith)
@@ -22,7 +23,7 @@ public:
         this->config.height = 1080;
         this->config.bpp = 32;
 
-        sigma_printf("[GPU] Framebuffer mapped at 0x%llX (%dx%d@%dbpp)\n", 
+        sigma_log_info("[GPU] Framebuffer mapped at 0x%llX (%dx%d@%dbpp)\n", 
                   this->config.vram_base, this->config.width, this->config.height, this->config.bpp);
     }
 
@@ -43,7 +44,7 @@ public:
         }
 
         // Memory Sanitizer: Ensure shader doesn't touch system memory
-        sigma_printf("[GPU] Injecting motion primitives... [Watchdog: %d]\n", this->shader_watchdog);
+        sigma_log_info("[GPU] Injecting motion primitives... [Watchdog: %d]\n", this->shader_watchdog);
     }
 
 private:
@@ -71,3 +72,5 @@ extern "C" void gpu_swap_buffers() {
 extern "C" void gpu_apply_motion_shader(void* shader_blob) {
     SovereignGPU::getInstance().applyMotionShader(shader_blob);
 }
+
+

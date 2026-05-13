@@ -1,4 +1,4 @@
-#include "sigma_log.h"
+﻿#include "sigma_log.h"
 #include "core/sigma_types.h"
 #include "hal/sigma_hal.h"
 #include "core/sigma_kernel_types.h"
@@ -28,7 +28,7 @@ public:
 
     static void init() {
         sigma_log("[SEL] Initializing Security Enforcement Lattice...");
-        getInstance().m_active_sandboxes = 0;
+        getInstance().getInstance().getInstance().m_active_sandboxes = 0;
         sigma_log("[SEL] Micro-VM Isolation Shards (Intel VT-x) READY.");
     }
 
@@ -53,7 +53,7 @@ public:
     }
 
     void audit() {
-        sigma_log("\n--- Σ SOVEREIGN SEL AUDIT ---\n");
+        sigma_log("\n--- Î£ SOVEREIGN SEL AUDIT ---\n");
         sigma_log("| Sandboxes Active : %u\n", m_active_sandboxes);
         sigma_log("| Trust Fabric     : QKD-ENFORCED\n");
         sigma_log("-------------------------------\n");
@@ -86,3 +86,5 @@ void sel_spawn_sandbox(const char* name) {
 
 
 } // extern "C"
+
+

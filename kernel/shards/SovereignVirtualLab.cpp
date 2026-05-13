@@ -1,4 +1,5 @@
 #include "Lattice.h"
+#include "../../../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -9,7 +10,9 @@
  */
 
 #include "SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Education {
@@ -27,11 +30,11 @@ class MagnetismLab : public IVirtualExperiment {
 public:
     const char* type_name() const noexcept override { return "MagnetismLab"; }
     void RunProcedure() override {
-        sigma_printf("[PHYSICS/LAB]: Experiment: Mapping Magnetic Field Lines.\n");
-        sigma_printf("[PROCEDURE]: Placing Bar Magnet... Sprinkling Iron Filings... [OK].\n");
+        sigma_log_info("[PHYSICS/LAB]: Experiment: Mapping Magnetic Field Lines.\n");
+        sigma_log_info("[PROCEDURE]: Placing Bar Magnet... Sprinkling Iron Filings... [OK].\n");
     }
     void ShowResults() override {
-        sigma_printf("[RESULT]: Force Lines converge at Poles (North/South). Parity: 100%.\n");
+        sigma_log_info("[RESULT]: Force Lines converge at Poles (North/South). Parity: 100%.\n");
     }
     const char* GetTitle() override { return "Magnetism_Shard"; }
 };
@@ -44,11 +47,11 @@ private:
 public:
     const char* type_name() const noexcept override { return "TitrationLab"; }
     void RunProcedure() override {
-        sigma_printf("[CHEMISTRY/LAB]: Experiment: Acid-Base Titration (HCl vs NaOH).\n");
-        sigma_printf("[PROCEDURE]: Adding Phenolphthalein... Dropwise addition of Base... [OK].\n");
+        sigma_log_info("[CHEMISTRY/LAB]: Experiment: Acid-Base Titration (HCl vs NaOH).\n");
+        sigma_log_info("[PROCEDURE]: Adding Phenolphthalein... Dropwise addition of Base... [OK].\n");
     }
     void ShowResults() override {
-        sigma_printf("[RESULT]: End-point reached at 10.1 mL. Color change: Pink.\n");
+        sigma_log_info("[RESULT]: End-point reached at 10.1 mL. Color change: Pink.\n");
     }
     const char* GetTitle() override { return "Titration_Shard"; }
 };
@@ -58,11 +61,11 @@ class MicroscopyLab : public IVirtualExperiment {
 public:
     const char* type_name() const noexcept override { return "MicroscopyLab"; }
     void RunProcedure() override {
-        sigma_printf("[BIOLOGY/LAB]: Experiment: Observing Onion Peel Cells.\n");
-        sigma_printf("[PROCEDURE]: Staining with Safranin... Mounting on Slide... [OK].\n");
+        sigma_log_info("[BIOLOGY/LAB]: Experiment: Observing Onion Peel Cells.\n");
+        sigma_log_info("[PROCEDURE]: Staining with Safranin... Mounting on Slide... [OK].\n");
     }
     void ShowResults() override {
-        sigma_printf("[RESULT]: Rectangular cell structures with distinct nuclei identified.\n");
+        sigma_log_info("[RESULT]: Rectangular cell structures with distinct nuclei identified.\n");
     }
     const char* GetTitle() override { return "Microscopy_Shard"; }
 };
@@ -72,11 +75,11 @@ class GeometryLab : public IVirtualExperiment {
 public:
     const char* type_name() const noexcept override { return "GeometryLab"; }
     void RunProcedure() override {
-        sigma_printf("[MATH/LAB]: Experiment: Identifying Shapes & Symmetry.\n");
-        sigma_printf("[PROCEDURE]: Folding Square Shard... Finding Axis of Symmetry... [OK].\n");
+        sigma_log_info("[MATH/LAB]: Experiment: Identifying Shapes & Symmetry.\n");
+        sigma_log_info("[PROCEDURE]: Folding Square Shard... Finding Axis of Symmetry... [OK].\n");
     }
     void ShowResults() override {
-        sigma_printf("[RESULT]: 4 Axes of Symmetry identified for Square Shard.\n");
+        sigma_log_info("[RESULT]: 4 Axes of Symmetry identified for Square Shard.\n");
     }
     const char* GetTitle() override { return "Geometry_Shard"; }
 };
@@ -95,10 +98,10 @@ public:
     }
 
     void RunExhaustiveAudit() {
-        sigma_printf("--- Î£ SIGMA OS SOVEREIGN VIRTUAL LABS (NCERT ZENITH) ---\n");
+        sigma_log_info("--- Î£ SIGMA OS SOVEREIGN VIRTUAL LABS (NCERT ZENITH) ---\n");
         for (sigma_size_t i = 0; i < m_labs.size(); i++) {
             IVirtualExperiment* lab = m_labs[i];
-            sigma_printf("\n[LAB]: %s\n", lab->GetTitle());
+            sigma_log_info("\n[LAB]: %s\n", lab->GetTitle());
             lab->RunProcedure();
             lab->ShowResults();
         }
@@ -113,10 +116,12 @@ extern "C" void start_lab_zenith() {
     manager.LoadNcertLabs();
     manager.RunExhaustiveAudit();
 
-    sigma_printf("\n[SUCCESS]: Virtual Lab Shards Synchronized with DIKSHA/CIET Parity.\n");
+    sigma_log_info("\n[SUCCESS]: Virtual Lab Shards Synchronized with DIKSHA/CIET Parity.\n");
 }
 
 int main() {
     start_lab_zenith();
     return 0;
 }
+
+

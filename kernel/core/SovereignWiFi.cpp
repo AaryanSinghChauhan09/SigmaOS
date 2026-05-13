@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Wi-Fi Stack
@@ -36,18 +39,18 @@ public:
     sigma_u32 scan() {
         sigma_log("[WIFI] Scanning 2.4GHz + 5GHz + 6GHz bands...");
         this->networks_scanned = 8; // Simulated
-        sigma_printf("[WIFI] Scan complete. %u networks found.\n", this->networks_scanned);
+        sigma_log_info("[WIFI] Scan complete. %u networks found.\n", this->networks_scanned);
         return this->networks_scanned;
     }
 
     bool connect(const char* ssid, const char* passphrase, sigma_wifi_security_t security) {
-        sigma_printf("[WIFI] Connecting to '%s' (WPA%u)...\n", ssid, security + 1);
+        sigma_log_info("[WIFI] Connecting to '%s' (WPA%u)...\n", ssid, security + 1);
         if (security == WIFI_WPA3) {
             sigma_log("[WIFI] WPA3-SAE handshake using SovereignPQC entropy — FORWARD SECRECY GUARANTEED.");
         }
         this->connected = true;
         this->signal_dbm = -45; // Strong signal simulated
-        sigma_printf("[WIFI] Connected to '%s'. Signal: %d dBm.\n", ssid, this->signal_dbm);
+        sigma_log_info("[WIFI] Connected to '%s'. Signal: %d dBm.\n", ssid, this->signal_dbm);
         return true;
     }
 
@@ -68,3 +71,5 @@ extern "C" void wifi_init() { SovereignWiFiEngine::getInstance().init(); }
 extern "C" sigma_u32 wifi_scan() { return SovereignWiFiEngine::getInstance().scan(); }
 extern "C" bool wifi_connect(const char* ssid, const char* pass, sigma_u32 sec) { return SovereignWiFiEngine::getInstance().connect(ssid, pass, (sigma_wifi_security_t)sec); }
 extern "C" void wifi_disconnect() { SovereignWiFiEngine::getInstance().disconnect(); }
+
+

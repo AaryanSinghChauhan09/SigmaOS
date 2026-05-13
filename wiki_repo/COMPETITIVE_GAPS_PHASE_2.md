@@ -20,7 +20,6 @@ Despite the visionary Sovereign Lattice architecture, SigmaOS currently faces se
 
 1
 
-
 1
 
 1

@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Predictive Scheduler (S-Sched)
@@ -32,7 +35,7 @@ public:
             return;
         }
 
-        sigma_printf("[SCHEDULER] Enqueueing Thread T%04X (Priority: %u)...\n", thread_id, priority);
+        sigma_log_info("[SCHEDULER] Enqueueing Thread T%04X (Priority: %u)...\n", thread_id, priority);
         this->active_threads++;
     }
 
@@ -63,3 +66,5 @@ extern "C" void sched_enqueue(sigma_u32 thread_id, sigma_u32 priority) {
 extern "C" sigma_u32 sched_predict_next() {
     return SovereignScheduler::getInstance().predictNextThread();
 }
+
+

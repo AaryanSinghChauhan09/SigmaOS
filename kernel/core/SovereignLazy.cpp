@@ -1,5 +1,7 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Lazy Shard Loader (v28.0 Zenith)
@@ -22,7 +24,7 @@ public:
     }
 
     void* igniteShard(const char* shard_name) {
-        sigma_printf("[LAZY] ODSI: Loading shard '%s' on-demand...\n", shard_name);
+        sigma_log_info("[LAZY] ODSI: Loading shard '%s' on-demand...\n", shard_name);
         /* ODSI Algorithm: Maps shard binary into memory only when accessed */
         this->lazy_shards_loaded++;
         sigma_log("[LAZY] ODSI: Shard successfully integrated into the active lattice.");
@@ -50,3 +52,5 @@ extern "C" void* lazy_ignite_shard(const char* shard_name) {
 extern "C" sigma_u32 lazy_get_load_count() {
     return SovereignLazyEngine::getInstance().getLoadCount();
 }
+
+

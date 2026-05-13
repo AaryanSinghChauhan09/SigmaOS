@@ -1,5 +1,7 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Decentralized Identity (DID) (v28.0 Zenith)
@@ -22,7 +24,7 @@ public:
     }
 
     void attestIdentity(const char* identity_shard) {
-        sigma_printf("[DID] SIL: Attesting sovereign identity for '%s'...\n", identity_shard);
+        sigma_log_info("[DID] SIL: Attesting sovereign identity for '%s'...\n", identity_shard);
         /* SIL Algorithm: Cryptographic proof of identity without centralized authority */
         this->total_attestations++;
         sigma_log("[DID] SIL: Attestation SUCCESS. Identity integrated into the lattice.");
@@ -43,3 +45,5 @@ extern "C" void did_init() {
 extern "C" void did_attest_identity(const char* identity_shard) {
     SovereignDIDEngine::getInstance().attestIdentity(identity_shard);
 }
+
+

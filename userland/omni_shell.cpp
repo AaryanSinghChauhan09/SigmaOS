@@ -9,18 +9,31 @@
  */
 
 #include "SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignDistroForge.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignCoreUtils.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignSyncZenith.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignDiskZenith.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignOSBasicsZenith.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignXV6Bridge.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignHardwareIOZenith.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignCoordinationZenith.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignDesktopZenith.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignAetherAbsorption.cpp"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Shell {
@@ -48,22 +61,22 @@ private:
 
 public:
     OmniShellZenith() : m_commands_sharded(0) {
-        sigma_printf("[SIGMA_SHELL]: Omni-Shell Zenith Online (v93.0). System-Master [ACTIVE].\n");
+        sigma_log_info("[SIGMA_SHELL]: Omni-Shell Zenith Online (v93.0). System-Master [ACTIVE].\n");
     }
 
     const char* type_name() const noexcept override { return "OmniShellZenith"; }
 
     void execute_omni_command(const char* cmd) {
-        sigma_printf("\nÎ£ [OMNI-SHELL]: Interpreting Command Shard: '%s'\n", cmd);
+        sigma_log_info("\nÎ£ [OMNI-SHELL]: Interpreting Command Shard: '%s'\n", cmd);
 
         if (sigma_strlen(cmd) == 0) return;
 
         if (sigma_compare(cmd, "SHARD_REBUILD")) {
-            sigma_printf("[OMNI-SHELL]: Igniting Sovereign Build System... [BIT-PERFECT FORGE].\n");
+            sigma_log_info("[OMNI-SHELL]: Igniting Sovereign Build System... [BIT-PERFECT FORGE].\n");
         } else if (sigma_compare(cmd, "DISTRO_FORGE")) {
             m_forge.AbsorbLinux();
         } else if (sigma_compare(cmd, "LATTICE_REKEY")) {
-            sigma_printf("[OMNI-SHELL]: Triggering Lattice-PQC Rekeying... [QUANTUM SECURED].\n");
+            sigma_log_info("[OMNI-SHELL]: Triggering Lattice-PQC Rekeying... [QUANTUM SECURED].\n");
         } else if (sigma_compare(cmd, "USP_ABSORB")) {
             m_forge.ForgeNewDistro("SigmaOS-Zenith");
         } else if (sigma_compare(cmd, "LS")) {
@@ -91,40 +104,40 @@ public:
         } else if (sigma_compare(cmd, "FORK_TEST")) {
             int pid = sigma_fork();
             if (pid == 0) {
-                sigma_printf("[CHILD]: I am the sovereign child. Executing XV6 Shard...\n");
+                sigma_log_info("[CHILD]: I am the sovereign child. Executing XV6 Shard...\n");
                 sigma_exit(0);
             } else if (pid > 0) {
-                sigma_printf("[PARENT]: Child spawned (PID: %d). Waiting for shard completion...\n", pid);
+                sigma_log_info("[PARENT]: Child spawned (PID: %d). Waiting for shard completion...\n", pid);
                 sigma_wait((int*)SIGMA_NULL);
-                sigma_printf("[PARENT]: Child shard re-absorbed.\n");
+                sigma_log_info("[PARENT]: Child shard re-absorbed.\n");
             } else {
-                sigma_printf("[ERROR]: Fork shard failed.\n");
+                sigma_log_info("[ERROR]: Fork shard failed.\n");
             }
         } else if (sigma_compare(cmd, "PIPE_TEST")) {
             m_pipe.CreatePipe();
         } else if (sigma_compare(cmd, "TEST_AND_SET")) {
              volatile bool lock = false;
              bool res = Coordination::SovereignAtomicOps::TestAndSet(&lock);
-             sigma_printf("[ZENITH-ATOMIC]: TestAndSet result: %d | New lock: %d\n", res, lock);
+             sigma_log_info("[ZENITH-ATOMIC]: TestAndSet result: %d | New lock: %d\n", res, lock);
         } else if (sigma_compare(cmd, "DMA_CMD")) {
              m_dma.TransferBlock(nullptr, nullptr, 4096);
         } else if (sigma_compare(cmd, "PETERSON")) {
              m_peterson.Entering(0);
-             sigma_printf("[ZENITH-PETERSON]: CRITICAL SECTION ENTRY (Thread 0).\n");
+             sigma_log_info("[ZENITH-PETERSON]: CRITICAL SECTION ENTRY (Thread 0).\n");
              m_peterson.Leaving(0);
         } else if (sigma_compare(cmd, "ABSORB_LEGACY")) {
-             sigma_printf("[ABSORB]: Initializing Ultra-Deep Legacy Feature Absorption (v1.0 -> v92.0)...\n");
+             sigma_log_info("[ABSORB]: Initializing Ultra-Deep Legacy Feature Absorption (v1.0 -> v92.0)...\n");
              m_absorber.DeploySovereignUnity();
         } else if (sigma_compare(cmd, "TOGGLE_GUI")) {
              m_desktop.ToggleGUI();
              if (m_desktop.IsGUIActive()) {
-                 sigma_printf("[SHIFT]: Transitioning CLI Shard to Native Desktop SHARD (v93.0)...\n");
+                 sigma_log_info("[SHIFT]: Transitioning CLI Shard to Native Desktop SHARD (v93.0)...\n");
                  m_desktop.RenderDesktop();
              } else {
-                 sigma_printf("[SHIFT]: Re-activating Omni-Shell Native Command Mode.\n");
+                 sigma_log_info("[SHIFT]: Re-activating Omni-Shell Native Command Mode.\n");
              }
         } else {
-            sigma_printf("[OMNI-SHELL]: Dispatching Intent to AI-Kernel Zenith... [SUCCESS].\n");
+            sigma_log_info("[OMNI-SHELL]: Dispatching Intent to AI-Kernel Zenith... [SUCCESS].\n");
         }
         
         m_commands_sharded++;
@@ -174,3 +187,5 @@ int main() {
     start_shell_zenith();
     return 0;
 }
+
+

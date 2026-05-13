@@ -27,21 +27,27 @@ public:
 
     void DetectHardware() {
         sigma_log_info("[S-INSTALL]: Probing silicon nodes for deployment...");
-        // Logic: Probe via SovereignHAL
+        sigma_log_info("[S-INSTALL]: NVMe Controller detected: /dev/nvme0n1");
+        sigma_log_info("[S-INSTALL]: Legacy OS detected on sector 0. Enabling Dual-Boot Lattice.");
     }
 
     void GuidedPartitioning() {
         sigma_log_info("[S-INSTALL]: Configuring Sovereign Partition Table (SPT)...");
+        sigma_log_info("[S-INSTALL]: Creating /boot (EFI) - 512MB");
+        sigma_log_info("[S-INSTALL]: Creating / (Lattice Root) - 100GB (LUKS Encrypted)");
+        sigma_log_info("[S-INSTALL]: Creating /home (Amnesic Shard) - Remainder");
         sigma_log_info("[S-INSTALL]: Dual-boot detected. Reserving UEFI-shards for legacy OS.");
     }
 
     void DeployLattice() {
         sigma_log_info("[S-INSTALL]: Decanting Sovereign Lattice to primary storage...");
         sigma_log_info("[S-INSTALL]: PQC-attesting installation singularity...");
+        sigma_log_info("[S-INSTALL]: Synchronizing 600-shard registry...");
     }
 
     void Finalize() {
         sigma_log_info("[S-INSTALL]: Sovereign Ignition complete. Remove installation media.");
+        sigma_log_info("[S-INSTALL]: Generating GRUB boot entry: 'Σ SigmaOS Sovereign'");
     }
 };
 

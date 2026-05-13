@@ -2,9 +2,13 @@
 
 ## Required Tools & Functions
 
-- Data Engineer workspace
-- specialized analytics
-- compliance manager
+- JupyterLab
+- pandas
+- NumPy
+- R
+- Julia
+- Apache Spark
+- Matplotlib
 
 ## 📜 Compliance Rules
 

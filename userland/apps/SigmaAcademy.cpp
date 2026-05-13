@@ -8,24 +8,27 @@
  */
 
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 void sigma_academy_lesson_list() {
-    sigma_printf("\nÎ£ SOVEREIGN ACADEMY: COMMAND MASTERY\n");
-    sigma_printf("-------------------------------------------\n");
-    sigma_printf("[1] Basic VFS Sharding (ls, cd, mkdir)\n");
-    sigma_printf("[2] Industrial Process Control (ps, kill)\n");
-    sigma_printf("[3] Network Sharding Mastery (ping, netstat)\n");
-    sigma_printf("[4] Sovereign Automation (sigma_auto, scripts)\n");
-    sigma_printf("-------------------------------------------\n");
+    sigma_log_info("\nÎ£ SOVEREIGN ACADEMY: COMMAND MASTERY\n");
+    sigma_log_info("-------------------------------------------\n");
+    sigma_log_info("[1] Basic VFS Sharding (ls, cd, mkdir)\n");
+    sigma_log_info("[2] Industrial Process Control (ps, kill)\n");
+    sigma_log_info("[3] Network Sharding Mastery (ping, netstat)\n");
+    sigma_log_info("[4] Sovereign Automation (sigma_auto, scripts)\n");
+    sigma_log_info("-------------------------------------------\n");
 }
 
 void sigma_academy_start_lesson(int id) {
-    sigma_printf("[ACADEMY] Initializing Lesson %d Sharding...\n", id);
+    sigma_log_info("[ACADEMY] Initializing Lesson %d Sharding...\n", id);
     if (id == 1) {
-        sigma_printf("[TASK] Create a directory named '/sigma_master' and shard its contents.\n");
+        sigma_log_info("[TASK] Create a directory named '/sigma_master' and shard its contents.\n");
     } else if (id == 2) {
-        sigma_printf("[TASK] Identify and terminate the 'rogue_process_shard' (PID: 999).\n");
+        sigma_log_info("[TASK] Identify and terminate the 'rogue_process_shard' (PID: 999).\n");
     } else {
-        sigma_printf("[ACADEMY] SUCCESS: Industrial Sharding Logic Learned.\n");
+        sigma_log_info("[ACADEMY] SUCCESS: Industrial Sharding Logic Learned.\n");
     }
 }
+
+

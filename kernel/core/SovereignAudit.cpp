@@ -1,7 +1,11 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_audit.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_time.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Audit Implementation (v28.0 Zenith)
@@ -33,7 +37,7 @@ public:
         for (sigma_u32 i = 1u; i <= 600u; i++) {
             // Simulate silicon-native verification
             if (i % 150u == 0u) {
-                sigma_printf("[AUDIT] CLA: Audited Shard Cluster S%03u-S%03u (Integrity: 100%%)\n", i-149u, i);
+                sigma_log_info("[AUDIT] CLA: Audited Shard Cluster S%03u-S%03u (Integrity: 100%%)\n", i-149u, i);
             }
         }
         
@@ -49,7 +53,7 @@ public:
         event->audit_tick = (sigma_u32)time_get_uptime_ms();
         event->is_validated = status;
         
-        sigma_printf("[AUDIT] Shard S%02u reported: %s at %u ms\n", 
+        sigma_log_info("[AUDIT] Shard S%02u reported: %s at %u ms\n", 
                      shard_id, status ? "VALIDATED" : "COMPROMISED", event->audit_tick);
     }
 
@@ -80,3 +84,5 @@ extern "C" void audit_report_shard(sigma_u32 shard_id, bool status) {
 extern "C" sigma_u64 audit_get_sweep_count() {
     return SovereignAuditEngine::getInstance().getSweepCount();
 }
+
+

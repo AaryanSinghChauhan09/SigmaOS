@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_power.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Power Management (SPM)
@@ -31,7 +34,7 @@ public:
             case SIGMA_POWER_HIBERNATE: profile_name = "HIBERNATE"; break;
             default: break;
         }
-        sigma_printf("[POWER] IEO: Switched to %s profile.\n", profile_name);
+        sigma_log_info("[POWER] IEO: Switched to %s profile.\n", profile_name);
     }
 
     sigma_u32 getBatteryPct() const {
@@ -65,3 +68,5 @@ extern "C" sigma_u32 power_get_battery_pct() {
 extern "C" void power_reboot() {
     SovereignPowerEngine::getInstance().reboot();
 }
+
+

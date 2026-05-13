@@ -1,5 +1,7 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Installer (S-Install) (v28.0 Zenith)
@@ -28,7 +30,7 @@ public:
         
         for (sigma_u32 i = 0u; i <= 100u; i += 25u) {
             this->progress = i;
-            sigma_printf("[INSTALL] ABMD: Shard deployment progress: %u%%\n", i);
+            sigma_log_info("[INSTALL] ABMD: Shard deployment progress: %u%%\n", i);
             // Simulate shard deployment
         }
         
@@ -58,3 +60,5 @@ extern "C" void install_execute() {
 extern "C" sigma_u32 install_get_progress() {
     return SovereignInstallerEngine::getInstance().getProgress();
 }
+
+

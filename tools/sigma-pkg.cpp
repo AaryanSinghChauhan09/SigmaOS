@@ -1,9 +1,7 @@
 #include "core/sigma_types.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "core/SigmaOOP.hpp"
-#include "../../../include/sigma_log.h"
 #include "sigma_sdk.h"
-#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Package Manager CLI (sigma-pkg) - Sovereign Edition
@@ -54,5 +52,3 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
-
-

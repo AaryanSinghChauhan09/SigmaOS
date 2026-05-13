@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_mmu.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign MMU Implementation
@@ -29,12 +32,12 @@ bool SovereignMMUEngine::mapShard(sigma_u32 shard_id, sigma_u64 vaddr, sigma_u64
     entry->flags = flags;
     entry->shard_owner = shard_id;
     
-    sigma_printf("[MMU] Mapped: V%016llX -> P%016llX (Shard S%02u)\n", vaddr, paddr, shard_id);
+    sigma_log_info("[MMU] Mapped: V%016llX -> P%016llX (Shard S%02u)\n", vaddr, paddr, shard_id);
     return SIGMA_TRUE;
 }
 
 void SovereignMMUEngine::handleFault(sigma_u64 faulting_addr) {
-    sigma_printf("[MMU] [FAULT] Access Violation at %016llX\n", faulting_addr);
+    sigma_log_info("[MMU] [FAULT] Access Violation at %016llX\n", faulting_addr);
     this->faults_resolved++;
     
     sigma_log("[MMU] APFR: Resolving fault via Shard Migration sequence...");
@@ -57,4 +60,6 @@ extern "C" void mmu_handle_fault(sigma_u64 faulting_addr) {
 extern "C" sigma_u64 mmu_get_fault_count() {
     return SovereignMMUEngine::getInstance().getFaultCount();
 }
+
+
 

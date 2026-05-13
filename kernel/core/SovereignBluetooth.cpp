@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Bluetooth Stack
@@ -26,7 +29,7 @@ public:
     }
 
     bool probeController(sigma_u32 usb_vendor, sigma_u32 usb_product) {
-        sigma_printf("[BT] HCI probe: USB %04X:%04X\n", usb_vendor, usb_product);
+        sigma_log_info("[BT] HCI probe: USB %04X:%04X\n", usb_vendor, usb_product);
         // Common BT controllers: Realtek, Intel, Broadcom
         this->controller_active = true;
         sigma_log("[BT] HCI Controller ONLINE. LE + Classic dual-mode ARMED.");
@@ -37,7 +40,7 @@ public:
         if (this->paired_devices >= 16 || !this->controller_active) return false;
         sigma_hardened_strcpy(this->paired_addrs[this->paired_devices], bt_addr, 18);
         this->paired_devices++;
-        sigma_printf("[BT] Paired: '%s' (%s) — PQC attestation verified.\n", device_name, bt_addr);
+        sigma_log_info("[BT] Paired: '%s' (%s) — PQC attestation verified.\n", device_name, bt_addr);
         return true;
     }
 
@@ -51,3 +54,5 @@ private:
 extern "C" void bt_init() { SovereignBluetoothEngine::getInstance().init(); }
 extern "C" bool bt_probe(sigma_u32 vid, sigma_u32 pid) { return SovereignBluetoothEngine::getInstance().probeController(vid, pid); }
 extern "C" bool bt_pair(const char* addr, const char* name) { return SovereignBluetoothEngine::getInstance().pairDevice(addr, name); }
+
+

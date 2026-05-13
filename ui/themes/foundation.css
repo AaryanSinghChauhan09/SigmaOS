@@ -16,6 +16,7 @@
 
 .glass-morphism {
     background: var(--glass);
+    -webkit--webkit-backdrop-filter: blur(var(--glass-blur));backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--glass-border);

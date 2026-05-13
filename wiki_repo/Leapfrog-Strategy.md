@@ -1,6 +1,5 @@
 # Leapfrog-Strategy
 
-
 # 🐸 SigmaOS Leapfrog Strategy
 
 To surpass industrial competitors and realize the full potential of the Sovereign Lattice, SigmaOS is prioritizing a strategic feature set that combines sovereignty, futuristic UX, and deep community engagement.
@@ -16,7 +15,6 @@ Based on architectural analysis, the following pillars are prioritized for immed
 3. **Sigma Marketplace for Themes & Profiles**: A curated community hub where users can remix Zenith desktop themes (using CSS) and share custom profile-driven workspaces.
 
 ---
-
 
 ## 🚀 Competitive Acceleration
 

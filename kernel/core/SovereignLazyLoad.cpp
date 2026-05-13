@@ -1,7 +1,10 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_lazyload.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 
 /**
@@ -31,7 +34,7 @@ extern "C" void lazyload_init() {
 extern "C" void lazyload_register_service(uint32_t shard_id, sigma_trigger_type_t trigger) {
     if (SovereignLazyLoadManager.dsi_count < 32) {
         SovereignLazyLoadManager.dsi_table[SovereignLazyLoadManager.dsi_count++] = {shard_id, trigger, false};
-        sigma_printf("[LAZYLOAD] DSI: Service Shard S%02d registered for trigger %d.\n", 
+        sigma_log_info("[LAZYLOAD] DSI: Service Shard S%02d registered for trigger %d.\n", 
                      shard_id, (int)trigger);
     }
 }
@@ -40,14 +43,16 @@ extern "C" void lazyload_trigger_event(sigma_trigger_type_t trigger, uint32_t co
     // DSI (Deferred State Ignition) Algorithm
     // Instantly maps the required service into memory only when its specific event fires.
     
-    sigma_printf("[LAZYLOAD] DSI: Event Trigger %d fired on context %d.\n", (int)trigger, context_id);
+    sigma_log_info("[LAZYLOAD] DSI: Event Trigger %d fired on context %d.\n", (int)trigger, context_id);
     
     for (uint32_t i = 0; i < SovereignLazyLoadManager.dsi_count; i++) {
         if (SovereignLazyLoadManager.dsi_table[i].trigger == trigger && !SovereignLazyLoadManager.dsi_table[i].is_ignited) {
-            sigma_printf("[LAZYLOAD] DSI: Hot-loading Service Shard S%02d...\n", SovereignLazyLoadManager.dsi_table[i].shard_id);
+            sigma_log_info("[LAZYLOAD] DSI: Hot-loading Service Shard S%02d...\n", SovereignLazyLoadManager.dsi_table[i].shard_id);
             SovereignLazyLoadManager.dsi_table[i].is_ignited = true;
         }
     }
     
     sigma_log("[LAZYLOAD] DSI: Services ignited. Routing traffic...");
 }
+
+

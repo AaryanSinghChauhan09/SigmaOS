@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Storage Deduplication Engine
@@ -33,7 +36,7 @@ public:
             if (this->fingerprints[i] == block_hash) {
                 this->dedup_hits++;
                 this->bytes_saved += block_size_bytes;
-                sigma_printf("[DEDUP] Duplicate block detected (hash 0x%08X). %u bytes saved. Total saved: %u KB.\n",
+                sigma_log_info("[DEDUP] Duplicate block detected (hash 0x%08X). %u bytes saved. Total saved: %u KB.\n",
                              block_hash, block_size_bytes, this->bytes_saved / 1024);
                 return true; // Skip write — use existing reference
             }
@@ -46,7 +49,7 @@ public:
     }
 
     void printStats() {
-        sigma_printf("[DEDUP] Stats: %u dedup hits, %u unique blocks, %u MB saved.\n",
+        sigma_log_info("[DEDUP] Stats: %u dedup hits, %u unique blocks, %u MB saved.\n",
                      this->dedup_hits, this->blocks_tracked, this->bytes_saved / (1024*1024));
     }
 
@@ -61,3 +64,5 @@ private:
 extern "C" void dedup_init() { SovereignStorageDedupEngine::getInstance().init(); }
 extern "C" bool dedup_check_block(sigma_u32 hash, sigma_u32 size) { return SovereignStorageDedupEngine::getInstance().checkAndDedup(hash, size); }
 extern "C" void dedup_stats() { SovereignStorageDedupEngine::getInstance().printStats(); }
+
+

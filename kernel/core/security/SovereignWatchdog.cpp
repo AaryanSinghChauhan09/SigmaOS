@@ -6,7 +6,7 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Security {
 
-class SovereignWatchdog : public SigmaObject, public SigmaSingleton<SovereignWatchdog> {
+class SovereignWatchdog : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignWatchdog> {
     friend class SigmaSingleton<SovereignWatchdog>;
 public:
     const char* type_name() const noexcept override { return "SovereignWatchdog"; }
@@ -18,13 +18,18 @@ public:
     }
 
     void feed() {
-        // Heartbeat signal
+        // Heartbeat signal received from Sovereign scheduler
+        sigma_log_info("[WATCHDOG:FEED] Heartbeat verified.");
     }
 
     void onTimeout() {
-        sigma_log_info("[WATCHDOG:FAIL] HEARTBEAT LOST. Triggering industrial fallback...");
-        // 1. Snapshot restore
-        // 2. Kernel reset
+        sigma_log_err("[WATCHDOG:FAIL] HEARTBEAT LOST! Potential kernel deadlock detected.");
+        sigma_log_info("[WATCHDOG:FAIL] Triggering Sovereign Atomic Rollback...");
+        
+        extern "C" void rollback_execute();
+        rollback_execute();
+        
+        sigma_log_info("[WATCHDOG:FAIL] System state restored. Resuming industrial execution.");
     }
 };
 

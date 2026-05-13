@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Storage Driver (VirtIO-Blk / ATA PIO)
@@ -37,7 +40,7 @@ public:
             this->storage_type = STORAGE_VIRTIO_BLK;
             this->total_sectors = 2097152; // 1GB simulated
             sigma_log("[STORAGE] VirtIO-Blk detected. DMA scatter-gather ARMED.");
-            sigma_printf("[STORAGE] Capacity: %u sectors (%.1f GB).\n",
+            sigma_log_info("[STORAGE] Capacity: %u sectors (%.1f GB).\n",
                          this->total_sectors, this->total_sectors / 2097152.0f);
             return true;
         }
@@ -52,14 +55,14 @@ public:
 
     bool readSectors(sigma_u32 lba, sigma_u32 count, void* buffer) {
         if (this->storage_type == STORAGE_UNKNOWN) return false;
-        sigma_printf("[STORAGE] READ: LBA %u, %u sectors -> buffer @ %p\n",
+        sigma_log_info("[STORAGE] READ: LBA %u, %u sectors -> buffer @ %p\n",
                      lba, count, buffer);
         return true;
     }
 
     bool writeSectors(sigma_u32 lba, sigma_u32 count, const void* data) {
         if (this->storage_type == STORAGE_UNKNOWN) return false;
-        sigma_printf("[STORAGE] WRITE: LBA %u, %u sectors <- data @ %p\n",
+        sigma_log_info("[STORAGE] WRITE: LBA %u, %u sectors <- data @ %p\n",
                      lba, count, data);
         return true;
     }
@@ -86,3 +89,5 @@ extern "C" bool storage_read(sigma_u32 lba, sigma_u32 count, void* buf) {
 extern "C" bool storage_write(sigma_u32 lba, sigma_u32 count, const void* data) {
     return SovereignStorageDriverEngine::getInstance().writeSectors(lba, count, data);
 }
+
+

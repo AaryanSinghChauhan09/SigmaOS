@@ -6,8 +6,6 @@ SigmaOS is built on **Atomic Shards**. Follow these rules to build new modules.
 
 1
 
-
-
 1. **No Standard Library**: Use `sigma_libc.h` only.
 2. **Single Functionality**: A shard should do one thing (e.g., `vmm.c` only handles virtual memory).
 
@@ -15,8 +13,6 @@ SigmaOS is built on **Atomic Shards**. Follow these rules to build new modules.
 4. **Header Consistency**: Every shard must include the local `sigma_libc.h`.
 
 1
-
-
 
 1. Place your `.c` file in the appropriate `modules/` subdirectory.
 2. Define your interface in a corresponding `.h` file.

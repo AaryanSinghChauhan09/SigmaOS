@@ -24,7 +24,6 @@ To ensure SigmaOS remains a high-assurance **Sovereign Lattice**, unstable compo
 
 1
 
-
 1
 
 1

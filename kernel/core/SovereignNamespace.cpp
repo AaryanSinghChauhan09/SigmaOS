@@ -1,7 +1,10 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_namespace.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 
 /**
@@ -27,7 +30,7 @@ extern "C" bool namespace_mount(const char* mount_point, sigma_namespace_type_t 
     // ORM (Omni-Resource Mapping) Algorithm
     // Attaches abstract resources to the global VFS tree natively.
     
-    sigma_printf("[NAMESPACE] ORM: Mounting resource of type %d at '%s'...\n", (int)type, mount_point);
+    sigma_log_info("[NAMESPACE] ORM: Mounting resource of type %d at '%s'...\n", (int)type, mount_point);
     
     for (int i = 0; i < 128; i++) {
         if (!global_namespace[i].active) {
@@ -44,7 +47,7 @@ extern "C" bool namespace_mount(const char* mount_point, sigma_namespace_type_t 
 }
 
 extern "C" void* namespace_resolve_path(const char* path) {
-    sigma_printf("[NAMESPACE] ORM: Resolving universal path '%s'...\n", path);
+    sigma_log_info("[NAMESPACE] ORM: Resolving universal path '%s'...\n", path);
     
     for (int i = 0; i < 128; i++) {
         if (global_namespace[i].active && sigma_strcmp(global_namespace[i].mount_point, path) == 0) {
@@ -56,3 +59,5 @@ extern "C" void* namespace_resolve_path(const char* path) {
     sigma_log("[NAMESPACE] ORM: Path resolution failed.");
     return SIGMA_NULL;
 }
+
+

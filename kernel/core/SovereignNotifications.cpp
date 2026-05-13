@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Notification Center
@@ -46,9 +49,9 @@ public:
         sigma_hardened_strcpy(n->source, source, 32);
         sigma_hardened_strcpy(n->message, message, 128);
 
-        sigma_printf("[NOTIF] #%u from '%s': %s\n", n->id, source, message);
+        sigma_log_info("[NOTIF] #%u from '%s': %s\n", n->id, source, message);
         if (this->sound_enabled && sound_id > 0) {
-            sigma_printf("[NOTIF] Playing sound profile %u via SovereignAudio DMA.\n", sound_id);
+            sigma_log_info("[NOTIF] Playing sound profile %u via SovereignAudio DMA.\n", sound_id);
         }
         return n->id;
     }
@@ -57,7 +60,7 @@ public:
         for (sigma_u32 i = 0; i < this->notif_count; i++) {
             if (this->notifications[i].id == notif_id) {
                 this->notifications[i].dismissed = true;
-                sigma_printf("[NOTIF] Dismissed notification #%u.\n", notif_id);
+                sigma_log_info("[NOTIF] Dismissed notification #%u.\n", notif_id);
                 return;
             }
         }
@@ -65,7 +68,7 @@ public:
 
     void setSoundEnabled(bool enabled) {
         this->sound_enabled = enabled;
-        sigma_printf("[NOTIF] Sound notifications: %s.\n", enabled ? "ON" : "OFF");
+        sigma_log_info("[NOTIF] Sound notifications: %s.\n", enabled ? "ON" : "OFF");
     }
 
 private:
@@ -80,3 +83,5 @@ extern "C" void notif_init() { SovereignNotificationEngine::getInstance().init()
 extern "C" sigma_u32 notif_push(const char* src, const char* msg, sigma_u32 sound) { return SovereignNotificationEngine::getInstance().push(src, msg, sound); }
 extern "C" void notif_dismiss(sigma_u32 id) { SovereignNotificationEngine::getInstance().dismiss(id); }
 extern "C" void notif_set_sound(bool enabled) { SovereignNotificationEngine::getInstance().setSoundEnabled(enabled); }
+
+

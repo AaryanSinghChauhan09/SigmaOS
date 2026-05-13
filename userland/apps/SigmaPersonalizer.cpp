@@ -8,7 +8,9 @@
  */
 
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 typedef struct {
     char name[32];
@@ -26,28 +28,30 @@ static sigma_theme_t theme_shards[] = {
 };
 
 void sigma_personalize_apply(const char* theme_name) {
-    sigma_printf("[CONFIG] Accessing Sovereign Registry for: %s... ", theme_name);
+    sigma_log_info("[CONFIG] Accessing Sovereign Registry for: %s... ", theme_name);
     for (int i = 0; i < 4; i++) {
         if (sigma_streq(theme_shards[i].name, theme_name)) {
-            sigma_printf("FOUND\n");
-            sigma_printf("[CONFIG] Applying silicon shard updates:\n");
-            sigma_printf("  - Primary:   %s\n", theme_shards[i].primary_color);
-            sigma_printf("  - Dark Mode: %s\n", theme_shards[i].dark_mode ? "YES" : "NO");
-            sigma_printf("  - Blur:      %dpx\n", theme_shards[i].glass_blur);
-            sigma_printf("[CONFIG] Theme orchestration successful.\n");
+            sigma_log_info("FOUND\n");
+            sigma_log_info("[CONFIG] Applying silicon shard updates:\n");
+            sigma_log_info("  - Primary:   %s\n", theme_shards[i].primary_color);
+            sigma_log_info("  - Dark Mode: %s\n", theme_shards[i].dark_mode ? "YES" : "NO");
+            sigma_log_info("  - Blur:      %dpx\n", theme_shards[i].glass_blur);
+            sigma_log_info("[CONFIG] Theme orchestration successful.\n");
             return;
         }
     }
-    sigma_printf("ERROR (THEME NOT FOUND)\n");
+    sigma_log_info("ERROR (THEME NOT FOUND)\n");
 }
 
 void sigma_personalize_list() {
-    sigma_printf("\nÎ£ SOVEREIGN THEME REPOSITORY\n");
-    sigma_printf("-------------------------------------------\n");
+    sigma_log_info("\nÎ£ SOVEREIGN THEME REPOSITORY\n");
+    sigma_log_info("-------------------------------------------\n");
     for (int i = 0; i < 4; i++) {
-        sigma_printf("[%d] %-15s (Blur: %dpx%s)\n", 
+        sigma_log_info("[%d] %-15s (Blur: %dpx%s)\n", 
             i+1, theme_shards[i].name, theme_shards[i].glass_blur,
             theme_shards[i].dark_mode ? " / DARK" : "");
     }
-    sigma_printf("-------------------------------------------\n\n");
+    sigma_log_info("-------------------------------------------\n\n");
 }
+
+

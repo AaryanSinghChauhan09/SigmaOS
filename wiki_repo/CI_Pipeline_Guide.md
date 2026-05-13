@@ -30,7 +30,6 @@ Scans `sigmaos/core/src/`, `suites/S01_Genesis/`, `suites/S04_HAL/`, `suites/S08
 
 1
 
-
 1
 
 > `continue-on-error: true` — warnings are reported but don't block the build
@@ -57,12 +56,10 @@ Builds `orchestrator/main.cpp` and fuzzes with profiles: `kali`, `tails`, `arch`
 
 1
 
-
 1. **cppcheck** — full static analysis on core + HAL + security
 2. **Atomic module count** — reports how many `atomic_*.cpp/.hpp` files exist
 
-
-1. **Sovereignty check** — scans for forbidden `#include <stdlib.h>` etc. in atomic modules
+3. **Sovereignty check** — scans for forbidden `#include <stdlib.h>` etc. in atomic modules
 
 ---
 

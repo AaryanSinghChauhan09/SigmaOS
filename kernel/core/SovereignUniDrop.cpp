@@ -1,9 +1,15 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_unidrop.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_ipc.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_continuity.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Universal Drag & Drop
@@ -21,7 +27,7 @@ extern "C" void unidrop_init() {
 extern "C" void unidrop_begin_drag(uint32_t source_app_id, sigma_clip_type_t data_type, const void* data_ptr, uint32_t size) {
     active_drag_type = data_type;
     active_drag_payload = (void*)data_ptr;
-    sigma_printf("[UNIDROP] CBPT: Drag initiated from App %d (Type: %d, Size: %d).\n", 
+    sigma_log_info("[UNIDROP] CBPT: Drag initiated from App %d (Type: %d, Size: %d).\n", 
                  source_app_id, (int)data_type, size);
 }
 
@@ -34,7 +40,7 @@ extern "C" bool unidrop_commit_drop(uint32_t target_app_id) {
     
     if (!active_drag_payload) return false;
     
-    sigma_printf("[UNIDROP] CBPT: Drop committed to App %d. Tunneling payload safely...\n", target_app_id);
+    sigma_log_info("[UNIDROP] CBPT: Drop committed to App %d. Tunneling payload safely...\n", target_app_id);
     
     // Determine if target is local, in a MicroVM, or on a remote device
     // If remote, route through S-Continuity
@@ -44,3 +50,5 @@ extern "C" bool unidrop_commit_drop(uint32_t target_app_id) {
     active_drag_payload = nullptr;
     return true;
 }
+
+

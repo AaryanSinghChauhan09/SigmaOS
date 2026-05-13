@@ -16,10 +16,8 @@ Before you begin, ensure you have the following installed:
 
 1
 
-
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
-
 
 1
 
@@ -33,7 +31,6 @@ The SigmaOS build system is modular and shard-based.
 
 make all
 
-
 1
 
 1
@@ -46,13 +43,11 @@ We provide a specialized boot script that handles ISO creation and QEMU orchestr
 
 ./qemu-boot.sh
 
-
 1
 
 To view the kernel logs in real-time:
 
 1
-
 
 tail -f serial.log
 
@@ -63,7 +58,6 @@ tail -f serial.log
 If you want to interact with the experimental web-based UI:
 
 1
-
 
 npm install
 node server.js
@@ -76,9 +70,7 @@ node server.js
 
 1
 
-
 1
-
 
 ---
 

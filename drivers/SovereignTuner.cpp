@@ -1,5 +1,7 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Silicon Tuner
@@ -31,7 +33,7 @@ public:
         this->current_silicon.amx_supported    = true;
         this->current_silicon.thermal_ceiling  = 100u; /* Celsius */
 
-        sigma_printf("[TUNER] Detected %s. Activating Silicon-Specific Optimization Lattice.\n",
+        sigma_log_info("[TUNER] Detected %s. Activating Silicon-Specific Optimization Lattice.\n",
                      this->current_silicon.cpu_model);
     }
 
@@ -57,3 +59,5 @@ extern "C" void tuner_init() {
 extern "C" void tuner_apply_performance_governor() {
     SovereignTunerEngine::getInstance().applyPerformanceGovernor();
 }
+
+

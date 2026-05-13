@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Networking Stack (NetStack)
@@ -30,7 +33,7 @@ public:
         if (this->interfaces_active >= 4) return;
         sigma_hardened_strcpy(this->interfaces[this->interfaces_active], mac_addr, 18);
         this->interfaces_active++;
-        sigma_printf("[NET] Network interface %s registered.\n", mac_addr);
+        sigma_log_info("[NET] Network interface %s registered.\n", mac_addr);
     }
 
     bool dispatchPacket(const char* /*payload*/, sigma_u32 length) {
@@ -41,7 +44,7 @@ public:
             sigma_log("[NET] [WARN] Oversized MTU packet dropped by sovereign firewall.");
             return false;
         }
-        sigma_printf("[NET] Dispatched %u bytes over TCP/IP.\n", length);
+        sigma_log_info("[NET] Dispatched %u bytes over TCP/IP.\n", length);
         return true;
     }
 
@@ -65,3 +68,5 @@ extern "C" void netstack_register_iface(const char* mac_addr) {
 extern "C" bool netstack_dispatch(const char* payload, sigma_u32 length) {
     return SovereignNetStackEngine::getInstance().dispatchPacket(payload, length);
 }
+
+

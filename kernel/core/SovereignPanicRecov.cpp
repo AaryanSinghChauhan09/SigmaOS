@@ -1,8 +1,13 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_panicrecov.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_rollback.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_recover.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Panic Recovery
@@ -21,7 +26,7 @@ public:
         // Captures full CPU context and attempts graceful recovery before cold reboot.
         
         SovereignRecover::getInstance().setLatticeState(SIGMA_RECOVER_CRITICAL);
-        sigma_printf("[PANICRECOV] RSR: !!! KERNEL PANIC INTERCEPTED (Fault: 0x%08X) !!!\n", fault_code);
+        sigma_log_info("[PANICRECOV] RSR: !!! KERNEL PANIC INTERCEPTED (Fault: 0x%08X) !!!\n", fault_code);
         sigma_log("[PANICRECOV] RSR: Capturing full register state to sovereign diagnostic log...");
         
         // Attempt auto-recovery
@@ -52,3 +57,5 @@ extern "C" void panicrecov_handle_panic(uint32_t fault_code, const void* registe
 extern "C" bool panicrecov_attempt_recovery() {
     return SovereignPanicRecov::attemptRecovery();
 }
+
+

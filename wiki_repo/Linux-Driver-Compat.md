@@ -1,8 +1,6 @@
 # Linux-Driver-Compat
 
-
 # 🔄 Linux Driver Compatibility Layer
-
 
 SigmaOS implements a robust **Sovereign Linux Compatibility Layer** (`SovereignLinuxCompat.cpp`) to ensure that hardware compatibility is not a bottleneck for user adoption. By wrapping the Linux kernel ABI, SigmaOS can seamlessly load and execute drivers packaged for popular Linux distributions.
 
@@ -19,7 +17,6 @@ Instead of rewriting every driver from scratch, SigmaOS intercepts calls from Li
 ---
 
 ## 📦 Supported Ecosystems
-
 
 SigmaOS's wrapper is tested against kernel drivers packaged for:
 

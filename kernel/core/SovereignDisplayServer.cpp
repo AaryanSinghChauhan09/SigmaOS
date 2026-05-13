@@ -1,6 +1,9 @@
 #include "sigma_displayserver.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Display Server Implementation
@@ -34,7 +37,7 @@ static struct {
 extern "C" void display_server_init() {
     sigma_log("[DISPLAY] Initializing Sovereign Zero-Compositor Display Server (ZCSR)...");
     SovereignDisplayManager.initialized = 1u;
-    sigma_printf("[DISPLAY] ZCSR: Framebuffer @ 0x%08X — %dx%d @ %dHz ONLINE.\n",
+    sigma_log_info("[DISPLAY] ZCSR: Framebuffer @ 0x%08X — %dx%d @ %dHz ONLINE.\n",
                  (sigma_u32)SovereignDisplayManager.state.active_mode.fb_addr,
                  (int)SovereignDisplayManager.state.active_mode.width,
                  (int)SovereignDisplayManager.state.active_mode.height,
@@ -44,14 +47,14 @@ extern "C" void display_server_init() {
 extern "C" void display_server_set_mode(const sigma_display_mode_t* mode) {
     if (!mode) return;
     SovereignDisplayManager.state.active_mode = *mode;
-    sigma_printf("[DISPLAY] ZCSR: Mode set — %dx%d@%dHz depth=%dbpp.\n",
+    sigma_log_info("[DISPLAY] ZCSR: Mode set — %dx%d@%dHz depth=%dbpp.\n",
                  (int)mode->width, (int)mode->height,
                  (int)mode->refresh_hz, (int)mode->depth);
 }
 
 extern "C" void display_server_vsync_enable(sigma_u32 enable) {
     SovereignDisplayManager.state.vsync_active = enable;
-    sigma_printf("[DISPLAY] ZCSR: VSync %s.\n", enable ? "ENABLED" : "DISABLED");
+    sigma_log_info("[DISPLAY] ZCSR: VSync %s.\n", enable ? "ENABLED" : "DISABLED");
 }
 
 extern "C" void display_server_blit(sigma_u32 x, sigma_u32 y,
@@ -60,7 +63,7 @@ extern "C" void display_server_blit(sigma_u32 x, sigma_u32 y,
     // ZCSR Algorithm: Directly DMA-maps pixel region into the framebuffer.
     // No compositor overhead — silicon-speed pixel push.
     (void)pixels;  /* In production: DMA copy to fb_addr + scanline offset */
-    sigma_printf("[DISPLAY] ZCSR: Blit %dx%d region at (%d,%d) — silicon DMA.\n",
+    sigma_log_info("[DISPLAY] ZCSR: Blit %dx%d region at (%d,%d) — silicon DMA.\n",
                  (int)w, (int)h, (int)x, (int)y);
 }
 
@@ -71,3 +74,5 @@ extern "C" void display_server_flush() {
 extern "C" const sigma_display_state_t* display_server_get_state() {
     return &SovereignDisplayManager.state;
 }
+
+

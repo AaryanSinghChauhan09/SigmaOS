@@ -10,7 +10,6 @@
 
 1
 
-
 1. **ARM64 optimization for RPi5** ? crush hardware sovereignty requirements.
 2. **Autonomous Agent Quota expansion** ? differentiate SigmaOS as the AI-native sovereign OS.
 

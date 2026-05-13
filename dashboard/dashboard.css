@@ -112,8 +112,9 @@ body.zenith-os {
 
 .glass-morphism {
     background: var(--bg-glass);
-    backdrop-filter: blur(28px) saturate(120%);
     -webkit-backdrop-filter: blur(28px) saturate(120%);
+    backdrop-filter: blur(28px) saturate(120%);
+    -webkit--webkit-backdrop-filter: blur(28px) saturate(120%);backdrop-filter: blur(28px) saturate(120%);
 }
 
 .window-header {

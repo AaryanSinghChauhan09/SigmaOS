@@ -1,5 +1,7 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_usr.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Unified Shard Registry (USR)
@@ -33,7 +35,7 @@ uint32_t SovereignUSRManager::registerShard(const char* name, uint32_t quantum_k
     }
     entry->name[i] = '\0';
 
-    sigma_printf("[USR] Registered Shard: %s (ID: %d, Key: 0x%08X)\n",
+    sigma_log_info("[USR] Registered Shard: %s (ID: %d, Key: 0x%08X)\n",
                  entry->name, id, quantum_key);
     return id;
 }
@@ -41,7 +43,7 @@ uint32_t SovereignUSRManager::registerShard(const char* name, uint32_t quantum_k
 bool SovereignUSRManager::activateShard(uint32_t shard_id) {
     if (shard_id == 0 || shard_id > this->count) return false;
     this->registry[shard_id - 1].is_active = true;
-    sigma_printf("[USR] Shard S%02d Activated.\n", shard_id);
+    sigma_log_info("[USR] Shard S%02d Activated.\n", shard_id);
     return true;
 }
 
@@ -57,3 +59,5 @@ extern "C" uint32_t usr_register_shard(const char* name, uint32_t quantum_key) {
 extern "C" bool usr_activate_shard(uint32_t shard_id) {
     return SovereignUSRManager::getInstance().activateShard(shard_id);
 }
+
+

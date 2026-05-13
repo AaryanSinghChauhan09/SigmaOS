@@ -1,8 +1,6 @@
 # Profession-Doctor-Tools
 
-
 # ⚕️ Doctor Profile
-
 
 The Doctor Profile is designed for HIPAA-compliant data handling, high-fidelity imaging, and real-time diagnostic assistance.
 

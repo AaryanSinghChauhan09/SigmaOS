@@ -8,8 +8,6 @@ SigmaOS is composed of 600+ independent functional units known as **Shards**. Th
 
 1
 
-
-
 1. **Isolation**: Every shard runs in its own hardware-protected address space.
 2. **Mobility**: Shards can be migrated between CPU cores or lattice nodes in real-time.
 
@@ -29,14 +27,12 @@ When a shard failure is detected by the `SovereignMonitor`, the following sequen
 
 1
 
-
 class SovereignShardManager {
 public:
     void registerShard(sigma_shard_id_t id, ShardMetadata meta);
     void migrateShard(sigma_shard_id_t id, sigma_u32 target_core);
     void restartShard(sigma_shard_id_t id);
 };
-
 
 1
 

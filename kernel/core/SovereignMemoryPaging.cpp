@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Memory Paging Orchestrator
@@ -29,7 +32,7 @@ public:
     void mapVirtualToPhysical(void* virtual_addr, void* physical_addr, sigma_u32 flags) {
         // Simulated mapping
         this->active_pages++;
-        sigma_printf("[PAGING] Mapped %p -> %p (Flags: %X). Total active: %u\n", 
+        sigma_log_info("[PAGING] Mapped %p -> %p (Flags: %X). Total active: %u\n", 
                      virtual_addr, physical_addr, flags, this->active_pages);
     }
 
@@ -58,3 +61,5 @@ extern "C" void paging_map(void* virtual_addr, void* physical_addr, sigma_u32 fl
 extern "C" void paging_prefetch() {
     SovereignPagingEngine::getInstance().predictAndPrefetch();
 }
+
+

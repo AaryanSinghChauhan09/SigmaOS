@@ -5,8 +5,11 @@
  */
 
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_vfs.h"
+#include "../../../include/sigma_log.h"
 
 class SovereignPackageManager {
 public:
@@ -22,11 +25,11 @@ public:
 
     bool installPackage(const char* sab_file_path) {
         if (this->installed_packages >= 64) {
-            sigma_printf("[S-PKG] ERROR: Package registry full.\n");
+            sigma_log_info("[S-PKG] ERROR: Package registry full.\n");
             return false;
         }
 
-        sigma_printf("[S-PKG] Extracting Sovereign App Bundle (.sab) from %s...\n", sab_file_path);
+        sigma_log_info("[S-PKG] Extracting Sovereign App Bundle (.sab) from %s...\n", sab_file_path);
         
         // Simulate extraction and registration
         sigma_log("[S-PKG] Validating PQC signature on bundle...");
@@ -34,14 +37,14 @@ public:
         sigma_log("[S-PKG] Registering application with SovereignOrchestrator...");
         
         this->installed_packages++;
-        sigma_printf("[S-PKG] SUCCESS: Package installed successfully. (Total: %d)\n", this->installed_packages);
+        sigma_log_info("[S-PKG] SUCCESS: Package installed successfully. (Total: %d)\n", this->installed_packages);
         return true;
     }
 
     void listPackages() const {
-        sigma_printf("[S-PKG] Installed Packages:\n");
-        sigma_printf("  - sigma_core_utils (v1.0.0)\n");
-        sigma_printf("  - zenith_dashboard (v28.0)\n");
+        sigma_log_info("[S-PKG] Installed Packages:\n");
+        sigma_log_info("  - sigma_core_utils (v1.0.0)\n");
+        sigma_log_info("  - zenith_dashboard (v28.0)\n");
     }
 
 private:
@@ -61,3 +64,5 @@ extern "C" bool spkg_install(const char* sab_file_path) {
 extern "C" void spkg_list() {
     SovereignPackageManager::getInstance().listPackages();
 }
+
+

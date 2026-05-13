@@ -1,6 +1,9 @@
 #include "sigma_net.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Network Stack (S-NET)
@@ -29,7 +32,7 @@ void SovereignNetStackEngine::sendPacket(const void* data, sigma_u32 len) { (voi
     sigma_log("[NET] TCP/IP: Encapsulating data into TCP segment...");
     sigma_log("[NET] TCP/IP: Attaching IPv4 headers...");
     
-    sigma_printf("[NET] ZCLN: Sending packet (%u bytes) to SovereignNIC...\n", len);
+    sigma_log_info("[NET] ZCLN: Sending packet (%u bytes) to SovereignNIC...\n", len);
     this->packets_sent++;
 }
 
@@ -52,7 +55,7 @@ void SovereignNetStackEngine::receivePacket(void* buffer, sigma_u32* len) { (voi
 }
 
 void SovereignNetStackEngine::reportStats() const {
-    sigma_printf("[NET] TCP/IP Stats: Sent=%u, Received=%u, Firewall=ACTIVE.\n", 
+    sigma_log_info("[NET] TCP/IP Stats: Sent=%u, Received=%u, Firewall=ACTIVE.\n", 
                  this->packets_sent, this->packets_received);
 }
 
@@ -72,3 +75,5 @@ extern "C" void net_receive_packet(void* buffer, sigma_u32* len) { (void)buffer;
 extern "C" void net_report_stats() {
     SovereignNetStackEngine::getInstance().reportStats();
 }
+
+

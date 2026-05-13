@@ -11,7 +11,9 @@
  */
 
 #include "sigma_sinstall.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /* =========================================================================
  * SovereignDeploymentEngine Method Implementations
@@ -29,7 +31,7 @@ public:
     }
 
     void ignite(const char* target_disk) {
-        sigma_printf("[S-INSTALL] Igniting Sovereign Lattice on %s...\n", target_disk);
+        sigma_log_info("[S-INSTALL] Igniting Sovereign Lattice on %s...\n", target_disk);
         sigma_hardened_strcpy(this->session.target_disk, target_disk, 32u);
         this->session.progress_percent = 0u;
 
@@ -69,3 +71,5 @@ extern "C" void sinstall_init() {
 extern "C" void sinstall_ignite(const char* target_disk) {
     SovereignDeploymentEngine::getInstance().ignite(target_disk);
 }
+
+

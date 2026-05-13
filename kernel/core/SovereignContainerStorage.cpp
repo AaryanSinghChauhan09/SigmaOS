@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Container Storage (CSI)
@@ -29,7 +32,7 @@ public:
         if (this->active_mounts >= 64) return;
         sigma_hardened_strcpy(this->mounts[this->active_mounts], mount_point, 64);
         this->active_mounts++;
-        sigma_printf("[CONTAINER-STORAGE] Mounted SovereignVFS volume to '%s' inside Container '%s'.\n", 
+        sigma_log_info("[CONTAINER-STORAGE] Mounted SovereignVFS volume to '%s' inside Container '%s'.\n", 
                      mount_point, container_name);
     }
 
@@ -48,3 +51,5 @@ extern "C" void container_storage_init() {
 extern "C" void container_storage_mount(const char* container, const char* path) {
     SovereignContainerStorageEngine::getInstance().mountVFSVolume(container, path);
 }
+
+

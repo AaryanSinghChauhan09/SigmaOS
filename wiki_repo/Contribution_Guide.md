@@ -50,9 +50,7 @@ Follow the **Atomic Module Contract** (see Developer Guide):
 
 1
 
-
 1
-
 
 Edit `orchestrator/main.cpp`, find `TestCommand::run_subsystem_test()`:
 

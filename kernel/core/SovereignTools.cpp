@@ -1,5 +1,7 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * S-TOOLS: Sovereign Utility Engine (v28.0 Zenith)
@@ -28,12 +30,14 @@ static const sigma_tool_entry_t tool_registry[] = {
 
 extern "C" void tools_init() {
     sigma_log("[S-TOOLS] Indexing 1000+ utility shards...");
-    sigma_printf("[S-TOOLS] Shard Indexing Complete: %u categories active.\n", 5);
+    sigma_log_info("[S-TOOLS] Shard Indexing Complete: %u categories active.\n", 5);
 }
 
 extern "C" void tools_execute(sigma_u32 tool_id) {
     if (tool_id < 10) {
-        sigma_printf("[S-TOOLS] Executing Utility: %s\n", tool_registry[tool_id].name);
+        sigma_log_info("[S-TOOLS] Executing Utility: %s\n", tool_registry[tool_id].name);
         sigma_log("[S-TOOLS] Utility shard state: NOMINAL.");
     }
 }
+
+

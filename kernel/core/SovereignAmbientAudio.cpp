@@ -1,8 +1,13 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_ambientaudio.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_audio.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Ambient Audio
@@ -18,10 +23,12 @@ extern "C" void ambientaudio_set_theme(sigma_ambient_theme_t theme) {
     // PAS (Procedural Acoustic Synthesis) Algorithm
     // Generates continuous, non-looping audio directly via mathematical functions.
     
-    sigma_printf("[AMBIENTAUDIO] PAS: Engaging generative acoustic theme %d.\n", (int)theme);
+    sigma_log_info("[AMBIENTAUDIO] PAS: Engaging generative acoustic theme %d.\n", (int)theme);
     sigma_log("[AMBIENTAUDIO] PAS: Synthesizer locked to silicon DAC.");
 }
 
 extern "C" void ambientaudio_adjust_intensity(float intensity) {
-    sigma_printf("[AMBIENTAUDIO] PAS: Modulating acoustic intensity to %.2f.\n", intensity);
+    sigma_log_info("[AMBIENTAUDIO] PAS: Modulating acoustic intensity to %.2f.\n", intensity);
 }
+
+

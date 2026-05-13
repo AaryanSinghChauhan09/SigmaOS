@@ -1,7 +1,10 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_observe.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 
 /**
@@ -28,13 +31,15 @@ extern "C" bool observe_attach_probe(const char* symbol, void (*callback)(void))
     sigma_hardened_strcpy(active_probes[id - 1].target_symbol, symbol, 64);
     active_probes[id - 1].is_active = true;
     
-    sigma_printf("[OBSERVE] DSI: Safely attached probe %d to symbol '%s'.\n", id, symbol);
+    sigma_log_info("[OBSERVE] DSI: Safely attached probe %d to symbol '%s'.\n", id, symbol);
     return true;
 }
 
 extern "C" void observe_trigger_probe(uint32_t probe_id) {
     if (probe_id > 0 && probe_id <= probe_count && active_probes[probe_id - 1].is_active) {
-        sigma_printf("[OBSERVE] DSI: Probe %d triggered on '%s'. Capturing registers...\n", 
+        sigma_log_info("[OBSERVE] DSI: Probe %d triggered on '%s'. Capturing registers...\n", 
                      probe_id, active_probes[probe_id - 1].target_symbol);
     }
 }
+
+

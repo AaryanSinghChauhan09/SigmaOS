@@ -1,7 +1,10 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_predictux.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 
 /**
@@ -15,7 +18,7 @@ extern "C" void predictux_init() {
 }
 
 extern "C" void predictux_record_interaction(uint32_t widget_id) {
-    sigma_printf("[PREDICTUX] NLP: Recorded user interaction with Widget %d.\n", widget_id);
+    sigma_log_info("[PREDICTUX] NLP: Recorded user interaction with Widget %d.\n", widget_id);
     // Update local neural model for future predictions
 }
 
@@ -27,3 +30,5 @@ extern "C" void predictux_preload_predicted_assets() {
     sigma_log("[PREDICTUX] NLP: Pre-fetching Sovereign VFS UI elements into L3 cache...");
     sigma_log("[PREDICTUX] NLP: UI assets staged. Zero-latency rendering ready.");
 }
+
+

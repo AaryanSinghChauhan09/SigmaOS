@@ -1,7 +1,10 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_ergo.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 
 /**
@@ -15,7 +18,7 @@ extern "C" void ergo_init() {
 }
 
 extern "C" void ergo_update_screen_temperature(uint32_t kelvin) {
-    sigma_printf("[ERGO] CDS: Adjusting global display temperature to %dK.\n", kelvin);
+    sigma_log_info("[ERGO] CDS: Adjusting global display temperature to %dK.\n", kelvin);
     // Direct GPU LUT adjustment
 }
 
@@ -29,3 +32,5 @@ extern "C" void ergo_evaluate_fatigue(uint32_t active_minutes) {
         sigma_log("[ERGO] CDS: Fatigue levels nominal.");
     }
 }
+
+

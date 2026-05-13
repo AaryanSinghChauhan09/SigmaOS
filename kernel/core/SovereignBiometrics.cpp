@@ -1,8 +1,12 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_biometrics.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_persona.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Biometrics Engine
@@ -20,7 +24,7 @@ extern "C" bool biometrics_authenticate(sigma_bio_type_t type, const void* senso
     // CIM (Cryptographic Identity Mapping) Algorithm
     // Matches raw sensor data directly against isolated hardware secure enclaves.
     
-    sigma_printf("[BIOMETRICS] CIM: Validating biometric signature type %d...\n", (int)type);
+    sigma_log_info("[BIOMETRICS] CIM: Validating biometric signature type %d...\n", (int)type);
     
     // Simulate secure hardware match
     if (sensor_data != SIGMA_NULL) {
@@ -37,5 +41,7 @@ extern "C" bool biometrics_authenticate(sigma_bio_type_t type, const void* senso
 }
 
 extern "C" void biometrics_enroll(sigma_bio_type_t type, const void* sensor_data) {
-    sigma_printf("[BIOMETRICS] CIM: Enrolling new biometric signature type %d securely.\n", (int)type);
+    sigma_log_info("[BIOMETRICS] CIM: Enrolling new biometric signature type %d securely.\n", (int)type);
 }
+
+

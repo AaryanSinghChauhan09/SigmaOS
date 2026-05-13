@@ -2,9 +2,12 @@
 
 ## Required Tools & Functions
 
-- Sentient AI Rights Advocate workspace
-- specialized analytics
-- compliance manager
+- PyTorch
+- TensorFlow
+- ONNX
+- Hugging Face
+- CUDA/ROCm Shard
+- Neural Nexus
 
 ## 📜 Compliance Rules
 

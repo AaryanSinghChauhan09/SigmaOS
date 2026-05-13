@@ -1,5 +1,7 @@
 #include "Lattice.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 /* =========================================================================
  * Σ SIGMAOS: SELF-HEALING SHARD (v1.0 - INDUSTRIAL FINALITY)
  * =========================================================================
@@ -9,6 +11,7 @@
  */
 
 #include "SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Healing {
@@ -34,7 +37,7 @@ private:
 
 public:
     SovereignSelfHealer() : m_shard_count(0) {
-        sigma_printf("[SELF-HEALING]: Initializing Shard-Sentinel Nexus...\n");
+        sigma_log_info("[SELF-HEALING]: Initializing Shard-Sentinel Nexus...\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignSelfHealer"; }
@@ -46,12 +49,12 @@ public:
             m_lattice[m_shard_count].uptime = 0;
             m_lattice[m_shard_count].restarts = 0;
             m_shard_count++;
-            sigma_printf("[SELF-HEALING]: Registered Shard: %s\n", name);
+            sigma_log_info("[SELF-HEALING]: Registered Shard: %s\n", name);
         }
     }
 
     void AuditLattice() {
-        sigma_printf("[SELF-HEALING]: Initiating Silicon Audit across %u shards...\n", m_shard_count);
+        sigma_log_info("[SELF-HEALING]: Initiating Silicon Audit across %u shards...\n", m_shard_count);
         for (sigma_u32 i = 0; i < m_shard_count; i++) {
             // Simulated entropy check / vtable integrity check
             sigma_u64 entropy = (sigma_u64)this % 100; 
@@ -63,14 +66,16 @@ public:
     }
 
     void RestoreShard(sigma_u32 index) {
-        sigma_printf("[SELF-HEALING]: CRITICAL: Shard '%s' FAILED. Initiating Restoration...\n", 
+        sigma_log_info("[SELF-HEALING]: CRITICAL: Shard '%s' FAILED. Initiating Restoration...\n", 
                      m_lattice[index].name);
         m_lattice[index].health = SHARD_HEALTH_OPTIMAL;
         m_lattice[index].restarts++;
-        sigma_printf("[SELF-HEALING]: SUCCESS: Shard '%s' restored to Optimal State (Restart Count: %u).\n",
+        sigma_log_info("[SELF-HEALING]: SUCCESS: Shard '%s' restored to Optimal State (Restart Count: %u).\n",
                      m_lattice[index].name, m_lattice[index].restarts);
     }
 };
 
 } // namespace Healing
 } // namespace SigmaOS
+
+

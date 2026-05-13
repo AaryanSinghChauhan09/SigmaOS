@@ -1,5 +1,7 @@
 #include "Lattice.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -35,8 +37,8 @@ class TrigShard : public IScholasticShard {
 public:
     void ExecuteSimulation() override {
         double angle = 30.0 * 3.14159 / 180.0;
-        sigma_printf("[MATH/NCERT]: Concept: Trigonometry (Class 10-11).\n");
-        sigma_printf("[MATH/NCERT]: sin(30) = " << std::sin(angle) << " (Apex Parity).\n");
+        sigma_log_info("[MATH/NCERT]: Concept: Trigonometry (Class 10-11).\n");
+        sigma_log_info("[MATH/NCERT]: sin(30) = " << std::sin(angle) << " (Apex Parity).\n");
     }
     const char* GetLevel() override { return "Class_10_11"; }
 };
@@ -44,8 +46,8 @@ public:
 class ProbabilityShard : public IScholasticShard {
 public:
     void ExecuteSimulation() override {
-        sigma_printf("[MATH/NCERT]: Concept: Probability (Class 12).\n");
-        sigma_printf("[MATH/NCERT]: P(A|B) Bayes' Theorem Shard Active.\n");
+        sigma_log_info("[MATH/NCERT]: Concept: Probability (Class 12).\n");
+        sigma_log_info("[MATH/NCERT]: P(A|B) Bayes' Theorem Shard Active.\n");
     }
     const char* GetLevel() override { return "Class_12"; }
 };
@@ -55,8 +57,8 @@ class SoundShard : public IScholasticShard {
 public:
     void ExecuteSimulation() override {
         double freq = 440.0; // A4 Note
-        sigma_printf("[SCIENCE/NCERT]: Concept: Sound & Waves (Class 9).\n");
-        sigma_printf("[SCIENCE/NCERT]: Longitudinal Wave Pulse: " << freq << " Hz.\n");
+        sigma_log_info("[SCIENCE/NCERT]: Concept: Sound & Waves (Class 9).\n");
+        sigma_log_info("[SCIENCE/NCERT]: Longitudinal Wave Pulse: " << freq << " Hz.\n");
     }
     const char* GetLevel() override { return "Class_9"; }
 };
@@ -64,8 +66,8 @@ public:
 class ThermoShard : public IScholasticShard {
 public:
     void ExecuteSimulation() override {
-        sigma_printf("[SCIENCE/NCERT]: Concept: Thermodynamics (Class 11).\n");
-        sigma_printf("[SCIENCE/NCERT]: First Law: dU = dQ - dW (Verified).\n");
+        sigma_log_info("[SCIENCE/NCERT]: Concept: Thermodynamics (Class 11).\n");
+        sigma_log_info("[SCIENCE/NCERT]: First Law: dU = dQ - dW (Verified).\n");
     }
     const char* GetLevel() override { return "Class_11"; }
 };
@@ -73,8 +75,8 @@ public:
 class SemiconductorShard : public IScholasticShard {
 public:
     void ExecuteSimulation() override {
-        sigma_printf("[SCIENCE/NCERT]: Concept: Semiconductor Electronics (Class 12).\n");
-        sigma_printf("[SCIENCE/NCERT]: p-n Junction Diode Forward Bias Shard Active.\n");
+        sigma_log_info("[SCIENCE/NCERT]: Concept: Semiconductor Electronics (Class 12).\n");
+        sigma_log_info("[SCIENCE/NCERT]: p-n Junction Diode Forward Bias Shard Active.\n");
     }
     const char* GetLevel() override { return "Class_12"; }
 };
@@ -93,7 +95,7 @@ public:
     }
 
     void ExecuteFullAudit() {
-        sigma_printf("--- Î£ SIGMA OS SOVEREIGN NCERT UNITY (SCIENCE & MATH ZENITH) ---\n");
+        sigma_log_info("--- Î£ SIGMA OS SOVEREIGN NCERT UNITY (SCIENCE & MATH ZENITH) ---\n");
         for (const auto& shard : m_shards) {
             std::cout << "\n[LEVEL]: " << shard->GetLevel() << std::endl;
             shard->ExecuteSimulation();
@@ -106,7 +108,9 @@ int main() {
     engine.LoadCurriculum();
     engine.ExecuteFullAudit();
 
-    sigma_printf("\n[SUCCESS]: Competitive Science & Math NCERT Curriculum Sharded.\n");
+    sigma_log_info("\n[SUCCESS]: Competitive Science & Math NCERT Curriculum Sharded.\n");
     return 0;
 }
+
+
 

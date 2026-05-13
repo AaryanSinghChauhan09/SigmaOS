@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Multi-Monitor Engine
@@ -43,19 +46,19 @@ public:
         d->pos_x = 0; d->pos_y = 0;
         sigma_hardened_strcpy(d->connector, connector, 16);
         this->display_count++;
-        sigma_printf("[MULTIMON] Display %u: %s @ %ux%u %uHz registered.\n",
+        sigma_log_info("[MULTIMON] Display %u: %s @ %ux%u %uHz registered.\n",
                      d->id, connector, w, h, hz);
         return d->id;
     }
 
     void setDisplayArrangement(sigma_u32 primary_id, const char* arrangement) {
-        sigma_printf("[MULTIMON] Display %u set as primary. Arrangement: '%s'.\n",
+        sigma_log_info("[MULTIMON] Display %u set as primary. Arrangement: '%s'.\n",
                      primary_id, arrangement);
         sigma_log("[MULTIMON] Zenith MLC compositor updated with new topology.");
     }
 
     void mirrorDisplays(sigma_u32 src_id, sigma_u32 dst_id) {
-        sigma_printf("[MULTIMON] Mirroring Display %u -> Display %u via DMA framebuffer copy.\n",
+        sigma_log_info("[MULTIMON] Mirroring Display %u -> Display %u via DMA framebuffer copy.\n",
                      src_id, dst_id);
     }
 
@@ -69,3 +72,5 @@ extern "C" void multimon_init() { SovereignMultiMonitorEngine::getInstance().ini
 extern "C" sigma_u32 multimon_add(const char* conn, sigma_u32 w, sigma_u32 h, sigma_u32 hz) { return SovereignMultiMonitorEngine::getInstance().addDisplay(conn, w, h, hz); }
 extern "C" void multimon_arrange(sigma_u32 primary, const char* layout) { SovereignMultiMonitorEngine::getInstance().setDisplayArrangement(primary, layout); }
 extern "C" void multimon_mirror(sigma_u32 src, sigma_u32 dst) { SovereignMultiMonitorEngine::getInstance().mirrorDisplays(src, dst); }
+
+

@@ -1,7 +1,10 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 
 /**
@@ -42,10 +45,12 @@ extern "C" void ksm_scan_and_merge() {
     }
     
     sigma_log("[KSM] Scan Complete.");
-    sigma_printf("[KSM] Merged %d redundant shards. Sovereign memory pressure optimized.\n", merged_count);
+    sigma_log_info("[KSM] Merged %d redundant shards. Sovereign memory pressure optimized.\n", merged_count);
 }
 
 extern "C" void* ksm_access_shard(uint32_t shard_id) {
     if (shard_id >= 600) return SIGMA_NULL;
     return memory_lattice[shard_id].actual_ptr;
 }
+
+

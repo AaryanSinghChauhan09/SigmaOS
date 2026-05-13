@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Audio Stack
@@ -30,14 +33,14 @@ public:
     sigma_u32 openStream(const char* app_name, sigma_u32 channels) {
         if (this->active_streams >= 16) return 0;
         this->active_streams++;
-        sigma_printf("[AUDIO] Stream opened for '%s' (%u ch @ %u Hz). Active: %u\n",
+        sigma_log_info("[AUDIO] Stream opened for '%s' (%u ch @ %u Hz). Active: %u\n",
                      app_name, channels, this->sample_rate, this->active_streams);
         return this->active_streams;
     }
 
     void closeStream(sigma_u32 stream_id) {
         if (this->active_streams > 0) this->active_streams--;
-        sigma_printf("[AUDIO] Stream %u closed. Active: %u\n", stream_id, this->active_streams);
+        sigma_log_info("[AUDIO] Stream %u closed. Active: %u\n", stream_id, this->active_streams);
     }
 
 private:
@@ -58,3 +61,5 @@ extern "C" sigma_u32 audio_open_stream(const char* app, sigma_u32 channels) {
 extern "C" void audio_close_stream(sigma_u32 id) {
     SovereignAudioEngine::getInstance().closeStream(id);
 }
+
+

@@ -1,7 +1,10 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_wellbeing.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 
 
@@ -16,7 +19,7 @@ extern "C" void wellbeing_init() {
 }
 
 extern "C" void wellbeing_log_app_usage(uint32_t app_id, uint32_t seconds) {
-    sigma_printf("[WELLBEING] BUA: App %d used for %d seconds this session.\n", app_id, seconds);
+    sigma_log_info("[WELLBEING] BUA: App %d used for %d seconds this session.\n", app_id, seconds);
 }
 
 extern "C" void wellbeing_render_daily_report() {
@@ -29,6 +32,8 @@ extern "C" void wellbeing_render_daily_report() {
 }
 
 extern "C" void wellbeing_set_daily_limit(uint32_t app_id, uint32_t max_minutes) {
-    sigma_printf("[WELLBEING] BUA: Daily limit for App %d set to %d minutes.\n", app_id, max_minutes);
+    sigma_log_info("[WELLBEING] BUA: Daily limit for App %d set to %d minutes.\n", app_id, max_minutes);
     sigma_log("[WELLBEING] BUA: S-NotifyIQ will alert when 80% of limit is reached.");
 }
+
+

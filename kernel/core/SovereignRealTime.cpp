@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_realtime.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Real-Time Core
@@ -26,7 +29,7 @@ public:
         if (this->active_tasks >= 16) return false;
         
         this->task_queue[this->active_tasks++] = *task;
-        sigma_printf("[REALTIME] EDFC: Scheduled Task %d (Priority: %d).\n", 
+        sigma_log_info("[REALTIME] EDFC: Scheduled Task %d (Priority: %d).\n", 
                      task->task_id, task->priority);
                      
         return true;
@@ -56,3 +59,5 @@ extern "C" bool realtime_schedule_task(const sigma_realtime_task_t* task, void (
 extern "C" void realtime_execute_critical_path() {
     SovereignRealTimeManager::getInstance().executeCriticalPath();
 }
+
+

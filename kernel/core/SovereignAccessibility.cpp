@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Accessibility Engine
@@ -28,17 +31,17 @@ public:
 
     void enableColorBlindMode(const char* mode) {
         sigma_hardened_strcpy(this->color_mode, mode, 16);
-        sigma_printf("[ACCESSIBILITY] UI Color Palette dynamically shifted to '%s'.\n", mode);
+        sigma_log_info("[ACCESSIBILITY] UI Color Palette dynamically shifted to '%s'.\n", mode);
     }
 
     void adjustFontScaling(float scale_factor) {
         this->font_scale = scale_factor;
-        sigma_printf("[ACCESSIBILITY] System-wide font scaling adjusted to %.2fx.\n", scale_factor);
+        sigma_log_info("[ACCESSIBILITY] System-wide font scaling adjusted to %.2fx.\n", scale_factor);
     }
 
     void toggleHighContrast() {
         this->high_contrast = !this->high_contrast;
-        sigma_printf("[ACCESSIBILITY] High Contrast Mode: %s\n", this->high_contrast ? "ENABLED" : "DISABLED");
+        sigma_log_info("[ACCESSIBILITY] High Contrast Mode: %s\n", this->high_contrast ? "ENABLED" : "DISABLED");
     }
 
 private:
@@ -61,3 +64,5 @@ extern "C" void access_set_colorblind(const char* mode) {
 extern "C" void access_set_font_scale(float scale) {
     SovereignAccessibilityEngine::getInstance().adjustFontScaling(scale);
 }
+
+

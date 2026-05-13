@@ -45,6 +45,5 @@ Welcome to the central knowledge hub for **SigmaOS**, the world's first industri
 - **[BUILD](BUILD)**: Instructions for compiling and deploying SigmaOS.
 - **[ROADMAP](ROADMAP)**: The future of SigmaOS across Horizon cycles.
 
-
 ---
 *For real-time support, access the S-LOG shard or the Sovereign AI (S-PAI) assistant within the kernel.*

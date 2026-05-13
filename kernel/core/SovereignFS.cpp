@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_fs.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign File System Implementation
@@ -9,6 +12,7 @@
  */
 
 #include "sigma_fs.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign File System Implementation
@@ -36,7 +40,7 @@ extern "C" bool fs_write_atomic(const char* path, const void* data, sigma_u32 si
     /* AJC (Atomic Journaled Commit) Algorithm
      * Writes to a temporary journal before committing to the main silicon storage. */
     
-    sigma_printf("[FS] AJC: Commencing atomic write to '%s' (%u bytes)...\n", path, size);
+    sigma_log_info("[FS] AJC: Commencing atomic write to '%s' (%u bytes)...\n", path, size);
     
     sigma_log("[FS] AJC: Journaling data blocks...");
     sigma_log("[FS] AJC: Checksum validation SUCCESS.");
@@ -58,3 +62,5 @@ extern "C" void fs_repair_corruption() {
 extern "C" sigma_u64 fs_get_total_writes() {
     return SovereignFSEngine.total_writes;
 }
+
+

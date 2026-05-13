@@ -20,7 +20,6 @@ With Phase One complete, SigmaOS transitions from a hardware-accelerated, silico
 
 1
 
-
 1
 
 1

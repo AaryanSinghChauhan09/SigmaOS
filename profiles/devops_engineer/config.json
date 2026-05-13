@@ -3,9 +3,13 @@
     "compliance_level": "sovereign-high",
     "resource_priority": "adaptive",
     "modules": [
-        "devops_engineer_workspace",
-        "specialized_analytics",
-        "compliance_manager"
+        "docker",
+        "podman",
+        "kubernetes",
+        "terraform",
+        "ansible",
+        "jenkins",
+        "oci-nexus"
     ],
     "rules": [
         "Industry standards",

@@ -1,6 +1,9 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_neural.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Neural Engine (v28.0 Zenith)
@@ -20,11 +23,13 @@ extern "C" void neural_init() {
 extern "C" void neural_predict(const void* input_tensor, void* output_tensor) {
     sigma_log("[S-NEURAL] Routing inference to silicon-native NPU...");
     SovereignNeuralEngine.inference_count++;
-    sigma_printf("[S-NEURAL] Inference complete (Total: %u)\n", SovereignNeuralEngine.inference_count);
+    sigma_log_info("[S-NEURAL] Inference complete (Total: %u)\n", SovereignNeuralEngine.inference_count);
 }
 
 extern "C" void neural_report_status() {
-    sigma_printf("[S-NEURAL] Inferences: %u | NPU: %s\n", 
+    sigma_log_info("[S-NEURAL] Inferences: %u | NPU: %s\n", 
                  SovereignNeuralEngine.inference_count, 
                  SovereignNeuralEngine.npu_active ? "ACTIVE" : "OFFLINE");
 }
+
+

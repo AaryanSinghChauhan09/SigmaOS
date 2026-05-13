@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Unified Shard Registry (USR)
@@ -30,13 +33,13 @@ public:
         sigma_hardened_strcpy(this->shard_names[this->active_services], shard_name, 32);
         this->shard_ids[this->active_services] = shard_id;
         this->active_services++;
-        sigma_printf("[USR] Shard Registered: '%s' (ID: 0x%04X).\n", shard_name, shard_id);
+        sigma_log_info("[USR] Shard Registered: '%s' (ID: 0x%04X).\n", shard_name, shard_id);
     }
 
     sigma_u32 discoverShard(const char* shard_name) {
         for (sigma_u32 i = 0; i < this->active_services; i++) {
             if (sigma_hardened_strcmp(this->shard_names[i], shard_name) == 0) {
-                sigma_printf("[USR] Shard Discovered: '%s' is active.\n", shard_name);
+                sigma_log_info("[USR] Shard Discovered: '%s' is active.\n", shard_name);
                 return this->shard_ids[i];
             }
         }
@@ -64,3 +67,5 @@ extern "C" void usr_register_shard(const char* name, sigma_u32 id) {
 extern "C" sigma_u32 usr_discover_shard(const char* name) {
     return SovereignUSREngine::getInstance().discoverShard(name);
 }
+
+

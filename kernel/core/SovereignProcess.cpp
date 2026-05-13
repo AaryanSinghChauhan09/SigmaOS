@@ -1,7 +1,11 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_proc.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Process Manager
@@ -36,7 +40,7 @@ public:
         proc->cpu_time = 0u;
         proc->capability_mask = 0xFFFFFFFFu; // Full sovereignty by default
         
-        sigma_printf("[PROC] Spawned Task: %s (PID: %u, Priority: %u)\n", name, (unsigned)proc->pid, (unsigned)priority);
+        sigma_log_info("[PROC] Spawned Task: %s (PID: %u, Priority: %u)\n", name, (unsigned)proc->pid, (unsigned)priority);
         return proc->pid;
     }
 
@@ -48,7 +52,7 @@ public:
             if (current->state == SIGMA_PROC_RUNNING) {
                 current->cpu_time++;
                 if (current->cpu_time > this->quantum_limit) {
-                    sigma_printf("[PROC] [WATCHDOG] PID %u ('%s') exceeded quota. Deprioritizing.\n", 
+                    sigma_log_info("[PROC] [WATCHDOG] PID %u ('%s') exceeded quota. Deprioritizing.\n", 
                                  (unsigned)current->pid, current->name);
                     current->priority++;
                     current->cpu_time = 0u;
@@ -72,7 +76,7 @@ public:
         }
         
         if (next) {
-            sigma_printf("[PROC] PATS Context Switch: PID %u -> PID %u (%s)\n", 
+            sigma_log_info("[PROC] PATS Context Switch: PID %u -> PID %u (%s)\n", 
                          (unsigned)this->current_pid, (unsigned)next->pid, next->name);
             this->current_pid = next->pid;
             next->state = SIGMA_PROC_RUNNING;
@@ -118,3 +122,5 @@ extern "C" sigma_process_t* proc_get_current() {
 extern "C" sigma_u64 proc_get_switch_count() {
     return SovereignProcessEngine::getInstance().getSwitchCount();
 }
+
+

@@ -3,9 +3,13 @@
     "compliance_level": "sovereign-high",
     "resource_priority": "adaptive",
     "modules": [
-        "data_scientist_workspace",
-        "specialized_analytics",
-        "compliance_manager"
+        "jupyterlab",
+        "pandas",
+        "numpy",
+        "r",
+        "julia",
+        "apache_spark",
+        "matplotlib"
     ],
     "rules": [
         "Industry standards",

@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Enforcement Layer (SEL)
@@ -30,7 +33,7 @@ public:
         // Simulated MAC policy check
         if (subject_id > 1000 && sigma_hardened_strcmp(action, "WRITE_RING0") == 0) {
             this->violations_caught++;
-            sigma_printf("[SEL] [BLOCK] Subject %u denied '%s' on Object %u. (Violations: %u)\n", 
+            sigma_log_info("[SEL] [BLOCK] Subject %u denied '%s' on Object %u. (Violations: %u)\n", 
                          subject_id, action, object_id, this->violations_caught);
             return false;
         }
@@ -53,3 +56,5 @@ extern "C" void sel_init() {
 extern "C" bool sel_check_access(sigma_u32 sub, sigma_u32 obj, const char* act) {
     return SovereignSELEngine::getInstance().checkAccess(sub, obj, act);
 }
+
+

@@ -12,9 +12,7 @@ User profiles are not just accounts; they are complete system states.
 
 1
 
-
 1
-
 
 ---
 
@@ -24,9 +22,7 @@ The **Dashboard Generator** shard rasterizes SVG widgets directly into VRAM for 
 
 1
 
-
 1
-
 
 ---
 
@@ -36,9 +32,7 @@ The Omni-Shell provides several features to improve the user experience:
 
 1
 
-
 1
-
 
 ---
 

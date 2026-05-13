@@ -1,5 +1,7 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign USB Mouse Shard (v28.0 Zenith)
@@ -28,7 +30,7 @@ public:
         this->y += (sigma_u32)report[2];
         this->buttons = report[0];
         
-        sigma_printf("[MOUSE] HMO: Position (%u, %u) | Buttons: 0x%02X\n", 
+        sigma_log_info("[MOUSE] HMO: Position (%u, %u) | Buttons: 0x%02X\n", 
                      this->x, this->y, this->buttons);
     }
 
@@ -49,3 +51,5 @@ extern "C" void mouse_init() {
 extern "C" void mouse_handle_report(const sigma_u8* report) {
     SovereignMouseEngine::getInstance().handleReport(report);
 }
+
+

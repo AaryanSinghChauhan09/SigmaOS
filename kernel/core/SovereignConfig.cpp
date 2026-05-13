@@ -1,8 +1,13 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_config.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_libc.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Config Implementation
@@ -25,7 +30,7 @@ bool SovereignConfigEngine::set(const char* key, const char* value, uint32_t sha
     entry->shard_id = shard_id;
     entry->is_immutable = SIGMA_FALSE;
 
-    sigma_printf("[CONFIG] Set: %s = %s (Shard S%02d)\n", key, value, shard_id);
+    sigma_log_info("[CONFIG] Set: %s = %s (Shard S%02d)\n", key, value, shard_id);
     return SIGMA_TRUE;
 }
 
@@ -61,3 +66,5 @@ extern "C" const char* config_get(const char* key) {
 extern "C" void config_atomic_swap() {
     SovereignConfigEngine::getInstance().atomicSwap();
 }
+
+

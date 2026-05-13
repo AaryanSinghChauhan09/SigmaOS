@@ -1,4 +1,5 @@
 #include "Lattice.h"
+#include "../../../include/sigma_log.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: MORPHIC AUTOMATION ENGINE (v1.0 - INDUSTRIAL SHARD)
@@ -9,7 +10,9 @@
  */
 
 #include "SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Automation {
@@ -28,7 +31,7 @@ private:
 
 public:
     MorphicAutomationEngine() : m_execution_count(0) {
-        sigma_printf("[AUTO-ZENITH]: Morphic Automation Engine Online.\n");
+        sigma_log_info("[AUTO-ZENITH]: Morphic Automation Engine Online.\n");
     }
 
     const char* type_name() const noexcept override { return "MorphicAutomationEngine"; }
@@ -41,22 +44,22 @@ public:
         recipe.is_active = SIGMA_TRUE;
 
         m_recipes.push_back(recipe);
-        sigma_printf("[AUTO-ZENITH]: Recipe '%s' synced to global lattice.\n", name);
+        sigma_log_info("[AUTO-ZENITH]: Recipe '%s' synced to global lattice.\n", name);
     }
 
     void run_cycle() {
         m_execution_count++;
-        // sigma_printf("[AUTO-ZENITH]: Execution Cycle #%u...\n", m_execution_count);
+        // sigma_log_info("[AUTO-ZENITH]: Execution Cycle #%u...\n", m_execution_count);
         for (sigma_usize i = 0; i < m_recipes.size(); i++) {
             if (m_recipes[i].is_active) {
                 // In a real kernel, this would check triggers and fire actions
-                // sigma_printf("  -> Executing Shard Action: %s\n", m_recipes[i].action.c_str());
+                // sigma_log_info("  -> Executing Shard Action: %s\n", m_recipes[i].action.c_str());
             }
         }
     }
 
     void audit_performance() {
-        sigma_printf("[AUTO-ZENITH]: Audit: %zu active recipes, %u cycles executed.\n", 
+        sigma_log_info("[AUTO-ZENITH]: Audit: %zu active recipes, %u cycles executed.\n", 
             m_recipes.size(), m_execution_count);
     }
 };
@@ -77,3 +80,5 @@ extern "C" void start_automation_engine() {
 
     engine.audit_performance();
 }
+
+

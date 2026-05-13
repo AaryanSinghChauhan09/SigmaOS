@@ -1,7 +1,11 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_taskautomator.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Automation Engine
@@ -40,7 +44,7 @@ public:
             this->rule_registry[this->rule_count].is_active = true;
             this->rule_count++;
             
-            sigma_printf("[AUTOMATION] SEP: Rule created. Trigger: '%s' -> Action: '%s'.\n", 
+            sigma_log_info("[AUTOMATION] SEP: Rule created. Trigger: '%s' -> Action: '%s'.\n", 
                          nlp_trigger, action);
         }
     }
@@ -49,7 +53,7 @@ public:
         sigma_log("[AUTOMATION] SEP: Evaluating global state against registered automation rules...");
         for (sigma_u32 i = 0; i < this->rule_count; i++) {
             if (this->rule_registry[i].is_active) {
-                sigma_printf("[AUTOMATION] SEP: Evaluating Rule %d: IF '%s' THEN '%s'\n", 
+                sigma_log_info("[AUTOMATION] SEP: Evaluating Rule %d: IF '%s' THEN '%s'\n", 
                              i, this->rule_registry[i].trigger, this->rule_registry[i].action);
             }
         }
@@ -93,3 +97,5 @@ extern "C" void taskautomator_start_macro() {
 extern "C" void taskautomator_stop_macro() {
     SovereignAutomationEngine::getInstance().stopMacroRecording();
 }
+
+

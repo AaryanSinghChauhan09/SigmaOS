@@ -1,9 +1,9 @@
-#include "sigma_log.h"
+﻿#include "sigma_log.h"
 #include "Lattice.h"
 #include "libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -14,7 +14,7 @@
 #include "../libc/SovereignLibC.h"
 
 /**
- * Σ SIGMA OS: SOVEREIGN SHARD KERNEL (v128.0 - KERNEL ZENITH)
+ * Î£ SIGMA OS: SOVEREIGN SHARD KERNEL (v128.0 - KERNEL ZENITH)
  * ==========================================================
  * USP: Real-time Shard Scheduling, Memory Isolation, and NCERT execution.
  * Principle: OOPS, SOLID, Process Management, Memory Sovereignty.
@@ -67,8 +67,8 @@ public:
     void Execute() override {
 <<<<<<<< HEAD:suites/S01_Genesis/SovereignShardKernel.c
         // Primitive printf doesn't support floating point easily, using fixed-point representation or just symbols
-        sigma_printf("[KERNEL/CHEM]: Validating PV = nRT Shard...\n");
-        sigma_printf("[KERNEL/CHEM]: Result: (P*V)/(n*T) = 0.0821 (R-Parity Confirmed).\n");
+        sigma_log_info("[KERNEL/CHEM]: Validating PV = nRT Shard...\n");
+        sigma_log_info("[KERNEL/CHEM]: Result: (P*V)/(n*T) = 0.0821 (R-Parity Confirmed).\n");
 ========
         double P=1.0, V=22.4, n=1.0, R=0.0821, T=273.15;
         sigma_log("[KERNEL/CHEM]: Validating PV = nRT Shard...\n");
@@ -100,15 +100,15 @@ public:
 
     void ExecuteAll() {
 <<<<<<<< HEAD:suites/S01_Genesis/SovereignShardKernel.c
-        sigma_printf("\n--- Σ SIGMA OS KERNEL SCHEDULER INITIATED ---\n");
+        sigma_log_info("\n--- Î£ SIGMA OS KERNEL SCHEDULER INITIATED ---\n");
         for (unsigned int i = 0; i < m_count; i++) {
             unsigned int idx = (m_head + i) % 32;
             IShardProcess* shard = m_queue[idx];
             
-            sigma_printf("\n[SCHEDULER]: Dispatching Shard-Process: %s\n", shard->GetName());
+            sigma_log_info("\n[SCHEDULER]: Dispatching Shard-Process: %s\n", shard->GetName());
             
 ========
-        sigma_log("--- Σ SIGMA OS KERNEL SCHEDULER INITIATED ---\n");
+        sigma_log("--- Î£ SIGMA OS KERNEL SCHEDULER INITIATED ---\n");
         for (auto& shard : m_queue) {
             std::cout << "\n[SCHEDULER]: Dispatching Shard-Process: " << shard->GetName() << std::endl;
 >>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/system/SovereignShardKernel.cpp
@@ -134,7 +134,7 @@ void kernel_main() {
     scheduler.ExecuteAll();
 
 <<<<<<<< HEAD:suites/S01_Genesis/SovereignShardKernel.c
-    sigma_printf("\n[SUCCESS]: Kernel Zenith Shards Executed. Zero Simulations detected.\n");
+    sigma_log_info("\n[SUCCESS]: Kernel Zenith Shards Executed. Zero Simulations detected.\n");
 }
 
 int main() {
@@ -147,3 +147,4 @@ int main() {
 
 
 } // extern "C"
+

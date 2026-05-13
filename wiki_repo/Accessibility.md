@@ -14,11 +14,9 @@ SigmaOS is dedicated to providing a **Sovereign Experience for All**. We priorit
 
 1
 
-
 1
 
 1
-
 
 When building new shards for SigmaOS, please adhere to:
 
@@ -32,9 +30,7 @@ When building new shards for SigmaOS, please adhere to:
 
 1
 
-
 1
-
 
 ---
 

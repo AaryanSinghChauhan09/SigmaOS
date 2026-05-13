@@ -1,8 +1,12 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_clipboard.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_continuity.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Smart Clipboard
@@ -23,7 +27,7 @@ void SovereignClipboardEngine::copy(sigma_clip_type_t type, const void* data, ui
     this->data = (void*)data; /* Simulated allocation/copy */
     this->size = size;
 
-    sigma_printf("[CLIPBOARD] USC: Copied %d bytes (Type: %d) to global buffer.\n",
+    sigma_log_info("[CLIPBOARD] USC: Copied %d bytes (Type: %d) to global buffer.\n",
                  size, (int)type);
 
     /* Auto-sync via continuity */
@@ -52,3 +56,5 @@ extern "C" void clipboard_copy(sigma_clip_type_t type, const void* data, uint32_
 extern "C" void* clipboard_paste(sigma_clip_type_t* out_type, uint32_t* out_size) {
     return SovereignClipboardEngine::getInstance().paste(out_type, out_size);
 }
+
+

@@ -1,9 +1,13 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_notifyiq.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_emotion.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Notification Intelligence
@@ -22,13 +26,15 @@ extern "C" void notifyiq_push(const char* source, const char* message, sigma_not
     sigma_emotion_state_t user_mood = emotion_get_current_state();
     
     if (user_mood == EMOTION_STATE_FOCUSED && priority > NOTIFY_PRIORITY_HIGH) {
-        sigma_printf("[NOTIFYIQ] APT: Silenced '%s' from '%s' (User is focused).\n", message, source);
+        sigma_log_info("[NOTIFYIQ] APT: Silenced '%s' from '%s' (User is focused).\n", message, source);
         return; // Silently batch
     }
     
-    sigma_printf("[NOTIFYIQ] APT: Delivering [P%d] from '%s': '%s'\n", (int)priority, source, message);
+    sigma_log_info("[NOTIFYIQ] APT: Delivering [P%d] from '%s': '%s'\n", (int)priority, source, message);
 }
 
 extern "C" void notifyiq_deliver_batch() {
     sigma_log("[NOTIFYIQ] APT: Delivering consolidated notification summary to Universal UI.");
 }
+
+

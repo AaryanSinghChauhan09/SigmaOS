@@ -316,7 +316,7 @@
     },
     {
         "name": "software_developer",
-        "tools": "Software Developer workspace, specialized analytics, compliance manager",
+        "tools": "GCC, Clang, Python, Java, Rust, Go, Node.js, VS Code, Git-Lattice",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -325,7 +325,7 @@
     },
     {
         "name": "data_engineer",
-        "tools": "Data Engineer workspace, specialized analytics, compliance manager",
+        "tools": "JupyterLab, pandas, NumPy, R, Julia, Apache Spark, Matplotlib",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -334,7 +334,7 @@
     },
     {
         "name": "machine_learning_developer",
-        "tools": "Machine Learning Developer workspace, specialized analytics, compliance manager",
+        "tools": "PyTorch, TensorFlow, ONNX, Hugging Face, CUDA/ROCm Shard, Neural Nexus",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -343,7 +343,7 @@
     },
     {
         "name": "ai_trainer",
-        "tools": "AI Trainer workspace, specialized analytics, compliance manager",
+        "tools": "PyTorch, TensorFlow, ONNX, Hugging Face, CUDA/ROCm Shard, Neural Nexus",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -352,7 +352,7 @@
     },
     {
         "name": "cloud_architect",
-        "tools": "Cloud Architect workspace, specialized analytics, compliance manager",
+        "tools": "Docker, Podman, Kubernetes, Terraform, Ansible, Jenkins, OCI-Nexus",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -361,7 +361,7 @@
     },
     {
         "name": "devops_engineer",
-        "tools": "DevOps Engineer workspace, specialized analytics, compliance manager",
+        "tools": "Docker, Podman, Kubernetes, Terraform, Ansible, Jenkins, OCI-Nexus",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -379,7 +379,7 @@
     },
     {
         "name": "game_developer",
-        "tools": "Game Developer workspace, specialized analytics, compliance manager",
+        "tools": "GCC, Clang, Python, Java, Rust, Go, Node.js, VS Code, Git-Lattice",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -388,7 +388,7 @@
     },
     {
         "name": "web_developer",
-        "tools": "Web Developer workspace, specialized analytics, compliance manager",
+        "tools": "GCC, Clang, Python, Java, Rust, Go, Node.js, VS Code, Git-Lattice",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -397,7 +397,7 @@
     },
     {
         "name": "mobile_app_developer",
-        "tools": "Mobile App Developer workspace, specialized analytics, compliance manager",
+        "tools": "GCC, Clang, Python, Java, Rust, Go, Node.js, VS Code, Git-Lattice",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -964,7 +964,7 @@
     },
     {
         "name": "blockchain_developer",
-        "tools": "Blockchain Developer workspace, specialized analytics, compliance manager",
+        "tools": "GCC, Clang, Python, Java, Rust, Go, Node.js, VS Code, Git-Lattice",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -982,7 +982,7 @@
     },
     {
         "name": "ar_vr_developer",
-        "tools": "AR/VR Developer workspace, specialized analytics, compliance manager",
+        "tools": "GCC, Clang, Python, Java, Rust, Go, Node.js, VS Code, Git-Lattice",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -1000,7 +1000,7 @@
     },
     {
         "name": "ethical_hacker",
-        "tools": "Ethical Hacker workspace, specialized analytics, compliance manager",
+        "tools": "Wireshark, Nmap, Metasploit, OpenVAS, Sovereign Audit, PQC-Vault",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -1612,7 +1612,7 @@
     },
     {
         "name": "odoo_developer",
-        "tools": "Odoo Developer workspace, specialized analytics, compliance manager",
+        "tools": "GCC, Clang, Python, Java, Rust, Go, Node.js, VS Code, Git-Lattice",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -1639,7 +1639,7 @@
     },
     {
         "name": "salesforce_developer",
-        "tools": "Salesforce Developer workspace, specialized analytics, compliance manager",
+        "tools": "GCC, Clang, Python, Java, Rust, Go, Node.js, VS Code, Git-Lattice",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -1783,7 +1783,7 @@
     },
     {
         "name": "cbdc_developer",
-        "tools": "CBDC Developer workspace, specialized analytics, compliance manager",
+        "tools": "GCC, Clang, Python, Java, Rust, Go, Node.js, VS Code, Git-Lattice",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -2206,7 +2206,7 @@
     },
     {
         "name": "neuro_symbolic_ai_trainer",
-        "tools": "Neuro-Symbolic AI Trainer workspace, specialized analytics, compliance manager",
+        "tools": "PyTorch, TensorFlow, ONNX, Hugging Face, CUDA/ROCm Shard, Neural Nexus",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -2305,7 +2305,7 @@
     },
     {
         "name": "cloud_infrastructure_orchestrator",
-        "tools": "Cloud Infrastructure Orchestrator workspace, specialized analytics, compliance manager",
+        "tools": "Docker, Podman, Kubernetes, Terraform, Ansible, Jenkins, OCI-Nexus",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -2323,7 +2323,7 @@
     },
     {
         "name": "ar_vr_content_developer",
-        "tools": "AR-VR Content Developer workspace, specialized analytics, compliance manager",
+        "tools": "GCC, Clang, Python, Java, Rust, Go, Node.js, VS Code, Git-Lattice",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -2368,7 +2368,7 @@
     },
     {
         "name": "fintech_solutions_developer",
-        "tools": "Fintech Solutions Developer workspace, specialized analytics, compliance manager",
+        "tools": "GCC, Clang, Python, Java, Rust, Go, Node.js, VS Code, Git-Lattice",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -2746,7 +2746,7 @@
     },
     {
         "name": "sentient_ai_rights_advocate",
-        "tools": "Sentient AI Rights Advocate workspace, specialized analytics, compliance manager",
+        "tools": "PyTorch, TensorFlow, ONNX, Hugging Face, CUDA/ROCm Shard, Neural Nexus",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -2872,7 +2872,7 @@
     },
     {
         "name": "bio_informatics_software_engineer",
-        "tools": "Bio-Informatics Software Engineer workspace, specialized analytics, compliance manager",
+        "tools": "GCC, Clang, Python, Java, Rust, Go, Node.js, VS Code, Git-Lattice",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -2944,7 +2944,7 @@
     },
     {
         "name": "blockchain_governance_protocol_developer",
-        "tools": "Blockchain Governance Protocol Developer workspace, specialized analytics, compliance manager",
+        "tools": "GCC, Clang, Python, Java, Rust, Go, Node.js, VS Code, Git-Lattice",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -3025,7 +3025,7 @@
     },
     {
         "name": "emotional_intelligence_ai_trainer",
-        "tools": "Emotional Intelligence AI Trainer workspace, specialized analytics, compliance manager",
+        "tools": "PyTorch, TensorFlow, ONNX, Hugging Face, CUDA/ROCm Shard, Neural Nexus",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -3070,7 +3070,7 @@
     },
     {
         "name": "ethical_ai_certification_officer",
-        "tools": "Ethical AI Certification Officer workspace, specialized analytics, compliance manager",
+        "tools": "PyTorch, TensorFlow, ONNX, Hugging Face, CUDA/ROCm Shard, Neural Nexus",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -3142,7 +3142,7 @@
     },
     {
         "name": "data_scientist",
-        "tools": "Data Scientist workspace, specialized analytics, compliance manager",
+        "tools": "JupyterLab, pandas, NumPy, R, Julia, Apache Spark, Matplotlib",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -3151,7 +3151,7 @@
     },
     {
         "name": "ai_engineers",
-        "tools": "AI Engineers workspace, specialized analytics, compliance manager",
+        "tools": "PyTorch, TensorFlow, ONNX, Hugging Face, CUDA/ROCm Shard, Neural Nexus",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",
@@ -3160,7 +3160,7 @@
     },
     {
         "name": "cybersecurity_analyst",
-        "tools": "Cybersecurity Analyst workspace, specialized analytics, compliance manager",
+        "tools": "Wireshark, Nmap, Metasploit, OpenVAS, Sovereign Audit, PQC-Vault",
         "rules": "Industry standards, professional ethics",
         "calculators": "Efficiency metrics, cost analysis",
         "algorithms": "Workflow optimization, adaptive assistance",

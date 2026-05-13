@@ -1,5 +1,7 @@
 #include "Lattice.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -20,6 +22,7 @@
  */
 
 #include "SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -31,26 +34,26 @@ private:
 
 public:
     SovereignAIKernel() : m_predictions(0), m_confidence(0.999) {
-        sigma_printf("[AI_KERNEL-ZENITH]: Sovereign Predictive Engine Online.\n");
+        sigma_log_info("[AI_KERNEL-ZENITH]: Sovereign Predictive Engine Online.\n");
     }
 
     const char* type_name() const noexcept override { return "SovereignAIKernel"; }
 
     void predict_user_intent(const char* action) {
-        sigma_printf("[AI_KERNEL-ZENITH]: Analyzing Intent: %s... Prediction [ZENITH_APP_LOAD]\n", action);
+        sigma_log_info("[AI_KERNEL-ZENITH]: Analyzing Intent: %s... Prediction [ZENITH_APP_LOAD]\n", action);
         m_predictions++;
     }
 
     void shard_resources() {
-        sigma_printf("[AI_KERNEL-ZENITH]: Predictive Resource Sharding... Allocation [OPTIMIZED]\n");
+        sigma_log_info("[AI_KERNEL-ZENITH]: Predictive Resource Sharding... Allocation [OPTIMIZED]\n");
     }
 
     void audit() {
-        sigma_printf("\n--- Î£ SOVEREIGN AI AUDIT (v12.0) ---\n");
-        sigma_printf("| Predictions    : %llu\n", m_predictions);
-        sigma_printf("| Confidence     : %f%%\n", m_confidence * 100);
-        sigma_printf("| Competitors    : Legacy schedulers (BFS/CFS) neutralized.\n");
-        sigma_printf("--------------------------------------\n");
+        sigma_log_info("\n--- Î£ SOVEREIGN AI AUDIT (v12.0) ---\n");
+        sigma_log_info("| Predictions    : %llu\n", m_predictions);
+        sigma_log_info("| Confidence     : %f%%\n", m_confidence * 100);
+        sigma_log_info("| Competitors    : Legacy schedulers (BFS/CFS) neutralized.\n");
+        sigma_log_info("--------------------------------------\n");
     }
 };
 
@@ -66,8 +69,10 @@ extern "C" void start_aikernel_zenith() {
 }
 
 int main() {
-    sigma_printf("[SIGMA_AI]: Bootstrapping AI Kernel Zenith...\n");
+    sigma_log_info("[SIGMA_AI]: Bootstrapping AI Kernel Zenith...\n");
     start_aikernel_zenith();
     return 0;
 }
+
+
 

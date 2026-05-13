@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Telemetry Exporter Hooks
@@ -27,12 +30,12 @@ public:
     void configureEndpoint(const char* ip_address) {
         sigma_hardened_strcpy(this->remote_ip, ip_address, 16);
         this->endpoint_configured = true;
-        sigma_printf("[TELEMETRY-EX] Remote telemetry endpoint bound to %s.\n", ip_address);
+        sigma_log_info("[TELEMETRY-EX] Remote telemetry endpoint bound to %s.\n", ip_address);
     }
 
     void exportMetrics(sigma_u32 cpu_load, sigma_u32 memory_pressure) {
         if (!this->endpoint_configured) return;
-        sigma_printf("[TELEMETRY-EX] Exporting metrics to %s -> CPU: %u%%, Mem: %u%%\n", 
+        sigma_log_info("[TELEMETRY-EX] Exporting metrics to %s -> CPU: %u%%, Mem: %u%%\n", 
                      this->remote_ip, cpu_load, memory_pressure);
     }
 
@@ -55,3 +58,5 @@ extern "C" void telemetry_ex_configure(const char* ip) {
 extern "C" void telemetry_ex_export(sigma_u32 cpu, sigma_u32 mem) {
     SovereignTelemetryExporter::getInstance().exportMetrics(cpu, mem);
 }
+
+

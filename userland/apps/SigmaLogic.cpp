@@ -8,7 +8,9 @@
  */
 
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 typedef struct {
     char name[64];
@@ -29,27 +31,29 @@ void sigma_logic_register(const char* name, const char* cmd, sigma_bool concurre
     sigma_tasks[task_count].concurrent = concurrent;
     sigma_tasks[task_count].completed = SIGMA_FALSE;
     
-    sigma_printf("[LOGIC] Registered Sovereignty Task: %s\n", name);
+    sigma_log_info("[LOGIC] Registered Sovereignty Task: %s\n", name);
     task_count++;
 }
 
 void sigma_logic_run_all() {
-    sigma_printf("\nÎ£ RUNNING SOVEREIGNTY AUTOMATION PLAYBOOK\n");
-    sigma_printf("-------------------------------------------\n");
+    sigma_log_info("\nÎ£ RUNNING SOVEREIGNTY AUTOMATION PLAYBOOK\n");
+    sigma_log_info("-------------------------------------------\n");
     for (sigma_u32 i = 0; i < task_count; i++) {
-        sigma_printf("[STEP %d/%d] %-20s ... ", i+1, task_count, sigma_tasks[i].name);
-        sigma_printf("DEPLOYING\n");
+        sigma_log_info("[STEP %d/%d] %-20s ... ", i+1, task_count, sigma_tasks[i].name);
+        sigma_log_info("DEPLOYING\n");
         // Simulated execution
         sigma_tasks[i].completed = SIGMA_TRUE;
     }
-    sigma_printf("-------------------------------------------\n");
-    sigma_printf("[LOGIC] All automation shards synchronized.\n\n");
+    sigma_log_info("-------------------------------------------\n");
+    sigma_log_info("[LOGIC] All automation shards synchronized.\n\n");
 }
 
 void sigma_logic_init() {
-    sigma_printf("[LOGIC] Initializing SigmaLogic v94.0...\n");
+    sigma_log_info("[LOGIC] Initializing SigmaLogic v94.0...\n");
     sigma_logic_register("Build-All-Shards", "make zenith", SIGMA_TRUE);
     sigma_logic_register("Audit-Sovereignty", "make verify", SIGMA_FALSE);
     sigma_logic_register("Sync-GitHub-Remote", "git push", SIGMA_TRUE);
     sigma_logic_run_all();
 }
+
+

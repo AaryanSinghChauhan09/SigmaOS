@@ -1,6 +1,9 @@
-#include "sigma_types.h"
-#include "sigma_monitor.h"
+#include "core/sigma_types.h"
+#include "../../../include/sigma_log.h"
+#include "core/sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Monitor Implementation
@@ -31,7 +34,7 @@ public:
         matrix.network_throughput = 450; // MB/s
         matrix.shard_migration_rate = 2; // Shards per sec
         
-        sigma_printf("[MONITOR] HALB: CPU %d%%, Mem %d%%, Net %d MB/s\n", 
+        sigma_log_info("[MONITOR] HALB: CPU %d%%, Mem %d%%, Net %d MB/s\n", 
                      matrix.cpu_utilization, matrix.memory_pressure, matrix.network_throughput);
                      
         return matrix;
@@ -58,3 +61,6 @@ extern "C" sigma_system_load_t monitor_get_load_matrix() {
 extern "C" void monitor_rebalance_lattice() {
     SovereignMonitorEngine::getInstance().rebalanceLattice();
 }
+
+
+

@@ -42,6 +42,5 @@ Closes # <!-- issue number -->
 
 1
 
-
 1
 

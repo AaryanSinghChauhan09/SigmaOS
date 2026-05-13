@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Hardware Transpiler
@@ -25,9 +28,9 @@ public:
     }
 
     void profileDevice(sigma_u32 pcie_vendor_id, sigma_u32 pcie_device_id) {
-        sigma_printf("[HW-TRANSPILER] UMSM: Probing PCIe device %04X:%04X...\n",
+        sigma_log_info("[HW-TRANSPILER] UMSM: Probing PCIe device %04X:%04X...\n",
                      pcie_vendor_id, pcie_device_id);
-        sigma_printf("[HW-TRANSPILER] UMSM: Register layout learned. Generating sovereign driver shim.\n");
+        sigma_log_info("[HW-TRANSPILER] UMSM: Register layout learned. Generating sovereign driver shim.\n");
         this->shims_generated++;
     }
 
@@ -44,3 +47,5 @@ extern "C" void hw_transpiler_init() {
 extern "C" void hw_transpiler_profile(sigma_u32 vendor_id, sigma_u32 device_id) {
     SovereignHWTranspilerEngine::getInstance().profileDevice(vendor_id, device_id);
 }
+
+

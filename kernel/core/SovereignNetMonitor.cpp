@@ -1,9 +1,15 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_netmonitor.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_zeronet.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_sentinel.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Network Monitor
@@ -27,6 +33,8 @@ extern "C" void netmonitor_poll_traffic() {
 }
 
 extern "C" void netmonitor_throttle_shard(uint32_t shard_id, uint32_t max_kbps) {
-    sigma_printf("[NETMONITOR] PSTT: Throttling Shard %d to %d KB/s max bandwidth.\n",
+    sigma_log_info("[NETMONITOR] PSTT: Throttling Shard %d to %d KB/s max bandwidth.\n",
                  shard_id, max_kbps);
 }
+
+

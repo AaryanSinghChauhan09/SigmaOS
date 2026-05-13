@@ -1,8 +1,13 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_lru.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_telemetry.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign LRU Implementation
@@ -21,7 +26,7 @@ extern "C" void lru_trigger_update(uint32_t shard_id, void* new_binary, uint32_t
     // Hot-swaps shard binaries while preserving machine-state context.
     
     current_lru_state = LRU_MIGRATING;
-    sigma_printf("[LRU] ZDSM: Migrating Shard S%02d to new binary (%d bytes)...\n", shard_id, size);
+    sigma_log_info("[LRU] ZDSM: Migrating Shard S%02d to new binary (%d bytes)...\n", shard_id, size);
     
     // Simulate state preservation
     sigma_log("[LRU] ZDSM: Capturing shard context registers...");
@@ -35,3 +40,5 @@ extern "C" void lru_trigger_update(uint32_t shard_id, void* new_binary, uint32_t
 extern "C" sigma_lru_state_t lru_get_state() {
     return current_lru_state;
 }
+
+

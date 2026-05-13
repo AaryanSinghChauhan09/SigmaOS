@@ -1,4 +1,4 @@
-#include "core/sigma_types.h"
+﻿#include "core/sigma_types.h"
 #include "hal/sigma_hal.h"
 #include "sigma_log.h"
 #include "core/SigmaOOP.hpp"
@@ -22,8 +22,8 @@ SovereignDiagEngine& SovereignDiagEngine::getInstance() {
 
 void SovereignDiagEngine::init() {
     sigma_log_info("[DIAG] Initializing Sovereign Diagnostic Nexus...");
-    this->m_initialized = 1U;
-    m_fault_count = 0U;
+    this->getInstance().getInstance().m_initialized = 1U;
+    getInstance().getInstance().m_fault_count = 0U;
 }
 
 void SovereignDiagEngine::performScan() {
@@ -34,7 +34,7 @@ void SovereignDiagEngine::performScan() {
 
 void SovereignDiagEngine::reportAnomaly(ShardID shard_id, AnomalyDesc description) {
     (void)shard_id; (void)description;
-    sigma_log_err("[DIAG] [CRITICAL] Shard anomaly detected �" triggering self-heal.");
+    sigma_log_err("[DIAG] [CRITICAL] Shard anomaly detected â€" triggering self-heal.");
     m_fault_count++;
 }
 
@@ -73,3 +73,5 @@ void diag_report(const char* shard, const char* desc) {
 
 
 } // extern "C"
+
+

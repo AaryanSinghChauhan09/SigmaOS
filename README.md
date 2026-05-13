@@ -6,18 +6,11 @@ SigmaOS is an experimental, bare-metal operating system kernel built to explore 
 
 SigmaOS is **not** a daily-driver operating system. Currently, the kernel can:
 
-
-
-
 * **Boot reliably in QEMU:** Using a Multiboot2 compliant binary and GRUB.
 * **Initialize Hardware:** Basic probing of the CPU and establishing serial output (COM1) for debugging.
 
-
-
 * **Allocate Memory:** A simple bare-metal bump allocator (QBMP) with basic guard checks.
 * **Execute Minimal Userland:** A barebones interactive shell (`sigma_sh`) is in development to provide basic I/O.
-
-
 
 * **Demonstrate Architecture:** The entire kernel is divided into isolated C++ singletons ("Shards") that communicate via strict C-linkage interfaces.
 
@@ -27,18 +20,11 @@ SigmaOS currently lacks a fully functional filesystem, robust device drivers (e.
 
 ### Dependencies
 
-
-
-
 * `make`
 * `nasm`
 
-
-
 * `g++` (multilib / cross-compiler)
 * `qemu-system-x86_64`
-
-
 
 * `grub-mkrescue` and `xorriso` (for ISO generation)
 
@@ -51,7 +37,7 @@ make singularity
 
 ```
 
-_This generates `sigmaos.bin`, the core Multiboot2 executable._
+### This generates `sigmaos.bin`, the core Multiboot2 executable.
 
 ### 2. Generate a Bootable ISO
 
@@ -61,7 +47,7 @@ make zenith-iso
 
 ```
 
-_Creates a GRUB-bootable ISO image for testing on hardware or VMs._
+### Creates a GRUB-bootable ISO image for testing on hardware or VMs.
 
 ### 3. Run in Emulator
 
@@ -71,7 +57,7 @@ make qemu
 
 ```
 
-_Boots the kernel in QEMU and pipes the internal kernel logs directly to your terminal._
+### Boots the kernel in QEMU and pipes the internal kernel logs directly to your terminal.
 
 ## 📚 Glossary: Translating the Vision
 
@@ -89,36 +75,27 @@ SigmaOS uses unique terminology for its architectural concepts. Here is what the
 
 We welcome contributions to help evolve SigmaOS from an experimental kernel into a fully usable distribution.
 
-
-
-
 * Please read [CONTRIBUTING.md](CONTRIBUTING.md) for our PR process and coding standards.
 
-## 🚀 Current Status (Zenith Supreme: Singularity Complete)
+## 🚀 Current Status (Zenith Stable: v1.0)
 
-SigmaOS has reached its architectural zenith. The kernel is now:
+SigmaOS has graduated from experimental kernel to a professional-grade distribution.
 
-
-
-
-* **600-Shard Modular Lattice:** Fully transitioned to OOP-isolated singletons.
-* **Neural UI Transpilation:** AVX-512 accelerated Morphic Zenith UI.
-
-
-
-* **Atomic Lattice Sync:** Zero-drift distributed filesystem state.
-* **Amnesic Security:** Zero-trace execution and quantum-safe identity vaults.
-
-For a detailed look at our implementation history, refer to the project Wiki and GitHub Insights.
+- **Sovereign Lattice™ v1.0**: Stable, 600-shard modular architecture.
+- **Professional Ecosystem Bundles**: Turnkey stacks for AI, DevOps, Cybersecurity, and 300+ other roles.
+- **Industrial Hardening**: PQC-GPG attestation, atomic rollback, and kernel crash dumps.
+- **Zenith Desktop**: Polished, glassmorphic UI with native industrial tool integration.
+- **Guided Installer**: Dual-boot capable, LUKS-encrypted, Calamares-style deployment.
 
 ---
 
 ## 🎯 Strategic Roadmap
+
 The full strategic evolution is documented in the **[Industrial Roadmap](ROADMAP.md)**.
 
 - **ALPHA (v15.0 - DONE)**: Industrial Foundation & Shard Hardening.
 - **BETA (v15.1 - DONE)**: Zenith Desktop Port & Guided Dual-Boot Installer.
-- **STABLE (v16.0 - CURRENT)**: Global Ecosystem & LTS Channel Initialization.
+- **STABLE (v1.0 - CURRENT)**: Global Ecosystem & LTS Channel Initialization.
 
-_Σ SIGMAOS: Absolute Sovereignty. Singularity Achieved._
+### Σ SIGMAOS: Absolute Sovereignty. Singularity Achieved.
 

@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_boot.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Boot Implementation
@@ -33,7 +36,7 @@ public:
         for (sigma_u32 i = 1u; i <= 600u; i++) {
             // Simulate silicon-native verification
             if (i % 100u == 0u) {
-                sigma_printf("[BOOT] SSB: Verified and Ignited Shard Cluster S%03u-S%03u\n", i-99u, i);
+                sigma_log_info("[BOOT] SSB: Verified and Ignited Shard Cluster S%03u-S%03u\n", i-99u, i);
             }
             this->ignited_shards++;
         }
@@ -69,3 +72,5 @@ extern "C" sigma_boot_stage_t boot_get_current_stage() {
 extern "C" sigma_u32 boot_get_ignited_count() {
     return SovereignBootEngine::getInstance().getIgnitedCount();
 }
+
+

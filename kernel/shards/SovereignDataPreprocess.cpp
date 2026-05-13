@@ -1,5 +1,7 @@
 #include "Lattice.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -10,6 +12,7 @@
  */
 
 #include "SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
 
 /**
  * Î£ SIGMA OS: SOVEREIGN DATA PREPROCESSOR (v128.0 - ZERO-STD NATIVE)
@@ -34,7 +37,7 @@ private:
 
 public:
     void Clean(float* data, sigma_usize& size) override {
-        sigma_printf("[DATA/CLEAN]: Identifying outliers in %u data points...\n", (unsigned int)size);
+        sigma_log_info("[DATA/CLEAN]: Identifying outliers in %u data points...\n", (unsigned int)size);
         sigma_usize new_size = 0;
         for (sigma_usize i = 0; i < size; i++) {
             float val = data[i];
@@ -44,11 +47,11 @@ public:
             }
         }
         size = new_size;
-        sigma_printf("[DATA/CLEAN]: Outliers purged. Silicon purity: 100%%.\n");
+        sigma_log_info("[DATA/CLEAN]: Outliers purged. Silicon purity: 100%%.\n");
     }
 
     void Transform(float* data, sigma_usize size) override {
-        sigma_printf("[DATA/TRANSFORM]: Applying Min-Max Scaling for neural-readiness...\n");
+        sigma_log_info("[DATA/TRANSFORM]: Applying Min-Max Scaling for neural-readiness...\n");
         if (size == 0) return;
         
         float min_val = data[0];
@@ -64,20 +67,20 @@ public:
                 data[i] = (data[i] - min_val) / r;
             }
         }
-        sigma_printf("[DATA/TRANSFORM]: Normalization COMPLETE. Shard ready for Oculus.\n");
+        sigma_log_info("[DATA/TRANSFORM]: Normalization COMPLETE. Shard ready for Oculus.\n");
     }
 
     void Reduce(float* data, sigma_usize& size, sigma_usize target_size) override {
-        sigma_printf("[DATA/REDUCE]: Applying Dimension Reduction...\n");
+        sigma_log_info("[DATA/REDUCE]: Applying Dimension Reduction...\n");
         if (size > target_size) {
             size = target_size;
         }
-        sigma_printf("[DATA/REDUCE]: Reduction complete. Target size: %u.\n", (unsigned int)target_size);
+        sigma_log_info("[DATA/REDUCE]: Reduction complete. Target size: %u.\n", (unsigned int)target_size);
     }
 };
 
 extern "C" void _start(void) {
-    sigma_printf("--- Î£ SIGMA OS SOVEREIGN DATA PREPROCESSOR (ZENITH) ---\n");
+    sigma_log_info("--- Î£ SIGMA OS SOVEREIGN DATA PREPROCESSOR (ZENITH) ---\n");
     
     // Simulate a large data shard
     static float sample_shard[1024];
@@ -90,7 +93,9 @@ extern "C" void _start(void) {
     dp.Transform(sample_shard, size);
     dp.Reduce(sample_shard, size, 512);
 
-    sigma_printf("\n[SUCCESS]: Competitive Data Preprocessing Online. Zero-STL Sovereignty 100%%.\n");
+    sigma_log_info("\n[SUCCESS]: Competitive Data Preprocessing Online. Zero-STL Sovereignty 100%%.\n");
     sigma_exit(0);
 }
+
+
 

@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Multiboot2 Integration
@@ -25,12 +28,12 @@ public:
             return;
         }
 
-        sigma_printf("[MULTIBOOT] Valid GRUB2 boot header found at %p.\n", addr);
+        sigma_log_info("[MULTIBOOT] Valid GRUB2 boot header found at %p.\n", addr);
         this->boot_info_parsed = true;
         
         // Simulate reading memory map
         this->available_ram_mb = 8192; // Simulated 8GB
-        sigma_printf("[MULTIBOOT] System topology parsed: %u MB RAM available.\n", this->available_ram_mb);
+        sigma_log_info("[MULTIBOOT] System topology parsed: %u MB RAM available.\n", this->available_ram_mb);
     }
 
     bool isBootSecure() {
@@ -52,3 +55,5 @@ extern "C" void multiboot_init(sigma_u32 magic, void* addr) {
 extern "C" bool multiboot_is_secure() {
     return SovereignMultibootEngine::getInstance().isBootSecure();
 }
+
+

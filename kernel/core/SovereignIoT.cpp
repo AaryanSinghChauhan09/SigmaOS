@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign IoT Engine
@@ -40,17 +43,17 @@ public:
         sigma_hardened_strcpy(d->device_type, device_type, 24);
         d->last_telemetry_tick = 0;
         d->online = true;
-        sigma_printf("[IOT] Registered: %s (ID: 0x%04X) — online.\n", device_type, device_id);
+        sigma_log_info("[IOT] Registered: %s (ID: 0x%04X) — online.\n", device_type, device_id);
         return device_id;
     }
 
     void publishTelemetry(sigma_u32 device_id, sigma_u32 value, sigma_u32 tick) {
-        sigma_printf("[IOT] Telemetry from 0x%04X: value=%u at tick %u — routing via SCP mesh.\n",
+        sigma_log_info("[IOT] Telemetry from 0x%04X: value=%u at tick %u — routing via SCP mesh.\n",
                      device_id, value, tick);
     }
 
     void pushFirmwareOTA(sigma_u32 device_id, const char* fw_version) {
-        sigma_printf("[IOT] OTA push to device 0x%04X: firmware v%s via SovereignProtocol.\n",
+        sigma_log_info("[IOT] OTA push to device 0x%04X: firmware v%s via SovereignProtocol.\n",
                      device_id, fw_version);
     }
 
@@ -64,3 +67,5 @@ extern "C" void iot_init() { SovereignIoTEngine::getInstance().init(); }
 extern "C" sigma_u32 iot_register_device(const char* type, sigma_u32 id) { return SovereignIoTEngine::getInstance().registerDevice(type, id); }
 extern "C" void iot_publish_telemetry(sigma_u32 id, sigma_u32 val, sigma_u32 tick) { SovereignIoTEngine::getInstance().publishTelemetry(id, val, tick); }
 extern "C" void iot_push_ota(sigma_u32 id, const char* fw) { SovereignIoTEngine::getInstance().pushFirmwareOTA(id, fw); }
+
+

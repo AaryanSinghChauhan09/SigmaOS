@@ -1,7 +1,10 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_energysched.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 
 /**
@@ -36,6 +39,8 @@ extern "C" void energysched_evaluate_power() {
 extern "C" void energysched_set_shard_state(uint32_t shard_id, sigma_energy_state_t state) {
     if (shard_id < 600) {
         shard_energy_states[shard_id] = state;
-        sigma_printf("[ENERGYSCHED] Shard S%02d energy state set to %d.\n", shard_id, (int)state);
+        sigma_log_info("[ENERGYSCHED] Shard S%02d energy state set to %d.\n", shard_id, (int)state);
     }
 }
+
+

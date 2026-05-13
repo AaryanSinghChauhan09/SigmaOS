@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_net.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Networking Implementation
@@ -40,12 +43,12 @@ public:
         // Directs packets to specific system shards based on port/IP patterns
         // without intermediate kernel buffers.
         
-        sigma_printf("[NET] PPR: Analyzing Packet: %08X -> %08X (Port %d)\n", 
+        sigma_log_info("[NET] PPR: Analyzing Packet: %08X -> %08X (Port %d)\n", 
                      pkt->src_ip, pkt->dst_ip, pkt->dst_port);
                      
         for (int i = 0; i < 8; i++) {
             if (this->ppr_routing_table[i].port == pkt->dst_port) {
-                sigma_printf("[NET] PPR: Direct-routing to Shard S%02d based on silicon-mapped port.\n", 
+                sigma_log_info("[NET] PPR: Direct-routing to Shard S%02d based on silicon-mapped port.\n", 
                              this->ppr_routing_table[i].shard_id);
                 return;
             }
@@ -55,7 +58,7 @@ public:
     }
 
     bool transmitShard(uint32_t target_ip, uint32_t shard_id) {
-        sigma_printf("[NET] Silicon-Direct Transmit: Shard S%02d -> %08X\n", shard_id, target_ip);
+        sigma_log_info("[NET] Silicon-Direct Transmit: Shard S%02d -> %08X\n", shard_id, target_ip);
         
         // Simulate bare-metal DMA transfer
         sigma_log("[NET] DMA Transfer COMPLETE. Shard delivered to wire.");
@@ -89,3 +92,5 @@ extern "C" bool net_transmit_shard(uint32_t target_ip, uint32_t shard_id) {
 extern "C" void net_optimize_routes() {
     SovereignNetEngine::getInstance().optimizeRoutes();
 }
+
+

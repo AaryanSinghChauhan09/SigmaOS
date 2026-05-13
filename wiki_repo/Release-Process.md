@@ -2,10 +2,6 @@
 
 1
 
-
-1
-
-
 1
 
 1
@@ -22,7 +18,7 @@
 
 1
 
-
+1
 
 1
 
@@ -32,7 +28,6 @@ sigma-verify --artifact sigmaos.iso --signature sigmaos.iso.sig
 
 ---
 [**? Back to Home**](Home)
-
 
 1
 

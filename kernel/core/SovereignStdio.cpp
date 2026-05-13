@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Standard I/O Router
@@ -30,11 +33,11 @@ public:
         (void)length;
         if (this->echo_to_serial) {
             // Simulated write to COM1
-            sigma_printf("[COM1] %s", buffer);
+            sigma_log_info("[COM1] %s", buffer);
         }
         if (this->echo_to_framebuffer) {
             // Simulated write to Zenith Framebuffer
-            sigma_printf("[FRAMEBUFFER] %s", buffer);
+            sigma_log_info("[FRAMEBUFFER] %s", buffer);
         }
     }
 
@@ -53,3 +56,5 @@ extern "C" void stdio_init() {
 extern "C" void stdio_route_write(const char* buffer, sigma_u32 length) {
     SovereignStdioEngine::getInstance().routeWrite(buffer, length);
 }
+
+

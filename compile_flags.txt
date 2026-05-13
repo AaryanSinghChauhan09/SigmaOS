@@ -1,5 +1,7 @@
--Ic:/Users/Sovereign/.gemini/antigravity/scratch/SigmaOS-Repo/include
+-std=c++17
 -Iinclude
+-Iinclude/core
+-Iinclude/libc
 -Ikernel/core
 -Ikernel/drivers
 -Ikernel/orchestration

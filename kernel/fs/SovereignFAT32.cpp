@@ -5,8 +5,11 @@
  */
 
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_vfs.h"
+#include "../../../include/sigma_log.h"
 
 class SovereignFAT32Engine {
 public:
@@ -22,7 +25,7 @@ public:
     }
 
     bool mount(uint32_t partition_offset) {
-        sigma_printf("[FAT32] Mounting volume at offset 0x%X...\n", partition_offset);
+        sigma_log_info("[FAT32] Mounting volume at offset 0x%X...\n", partition_offset);
         
         // Simulate reading Boot Sector (BPB)
         sigma_log("[FAT32] Parsing BIOS Parameter Block (BPB)...");
@@ -47,9 +50,9 @@ public:
             return -1;
         }
         
-        sigma_printf("[FAT32] Searching directory tree for: %s\n", path);
+        sigma_log_info("[FAT32] Searching directory tree for: %s\n", path);
         // Simulate file lookup and read
-        sigma_printf("[FAT32] File found. Reading %u bytes into buffer...\n", size);
+        sigma_log_info("[FAT32] File found. Reading %u bytes into buffer...\n", size);
         
         return size; // Simulate success
     }
@@ -79,3 +82,5 @@ extern "C" void fat32_unmount() {
 extern "C" int fat32_read_file(const char* path, void* buffer, uint32_t size) { (void)buffer;
     return SovereignFAT32Engine::getInstance().readFile(path, buffer, size);
 }
+
+

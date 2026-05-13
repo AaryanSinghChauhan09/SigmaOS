@@ -2,9 +2,13 @@
 
 ## Required Tools & Functions
 
-- Cloud Infrastructure Orchestrator workspace
-- specialized analytics
-- compliance manager
+- Docker
+- Podman
+- Kubernetes
+- Terraform
+- Ansible
+- Jenkins
+- OCI-Nexus
 
 ## 📜 Compliance Rules
 

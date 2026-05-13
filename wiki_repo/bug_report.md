@@ -17,8 +17,6 @@ assignees: AaryanSinghChauhan09
 
 1
 
-
-
 1. 1.
 
 2. ## ? Expected Behavior

@@ -1,6 +1,9 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Persistence Engine
@@ -28,12 +31,12 @@ public:
         if (this->snapshots_stored >= 64) return;
         sigma_hardened_strcpy(this->snapshot_ids[this->snapshots_stored], component_name, 32);
         this->snapshots_stored++;
-        sigma_printf("[PERSISTENCE] DSP: State snapshot of '%s' committed to distributed lattice.\n",
+        sigma_log_info("[PERSISTENCE] DSP: State snapshot of '%s' committed to distributed lattice.\n",
                      component_name);
     }
 
     void restoreState(const char* component_name) {
-        sigma_printf("[PERSISTENCE] DSP: Restoring '%s' from distributed lattice...\n", component_name);
+        sigma_log_info("[PERSISTENCE] DSP: Restoring '%s' from distributed lattice...\n", component_name);
     }
 
 private:
@@ -55,3 +58,5 @@ extern "C" void persistence_snapshot(const char* component) {
 extern "C" void persistence_restore(const char* component) {
     SovereignPersistenceEngine::getInstance().restoreState(component);
 }
+
+

@@ -1,5 +1,7 @@
 #include "SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignCoreUtils.h"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace CoreUtils {
@@ -8,7 +10,7 @@ namespace CoreUtils {
     void SovereignListDir::Execute(const char* path) { 
         int fd = sigma_open(path, 0x0000 | 0x0020, 0); // O_RDONLY | O_DIRECTORY
         if (fd < 0) {
-            sigma_printf("[ERROR]: Failed to open directory shard: %s\n", path);
+            sigma_log_info("[ERROR]: Failed to open directory shard: %s\n", path);
             return;
         }
 
@@ -25,7 +27,7 @@ namespace CoreUtils {
         while ((nread = sigma_getdents64(fd, buffer, sizeof(buffer))) > 0) {
             for (sigma_ssize_t bpos = 0; bpos < nread; ) {
                 struct sigma_dirent64* d = (struct sigma_dirent64*)(buffer + bpos);
-                sigma_printf("  [%s] %s\n", (d->d_type == 4 ? "DIR " : "FILE"), d->d_name);
+                sigma_log_info("  [%s] %s\n", (d->d_type == 4 ? "DIR " : "FILE"), d->d_name);
                 bpos += d->d_reclen;
             }
         }
@@ -36,7 +38,7 @@ namespace CoreUtils {
     void SovereignConcatenate::Execute(const char* file) { 
         int fd = sigma_open(file, 0, 0);
         if (fd < 0) {
-            sigma_printf("[ERROR]: Could not pulse file: %s\n", file);
+            sigma_log_info("[ERROR]: Could not pulse file: %s\n", file);
             return;
         }
 
@@ -50,38 +52,40 @@ namespace CoreUtils {
 
     const char* SovereignGrepSearch::type_name() const noexcept { return "SovereignGrepSearch"; }
     void SovereignGrepSearch::Execute(const char* pattern, const char* file) { 
-        sigma_printf("[GREP]: Rapid Intent Scan on %s for pattern '%s'...\n", file, pattern);
-        sigma_printf("[RESULT]: Found match at bit-offset 0xFA42.\n");
+        sigma_log_info("[GREP]: Rapid Intent Scan on %s for pattern '%s'...\n", file, pattern);
+        sigma_log_info("[RESULT]: Found match at bit-offset 0xFA42.\n");
     }
 
     const char* SovereignProcessMonitor::type_name() const noexcept { return "SovereignProcessMonitor"; }
     void SovereignProcessMonitor::Execute() { 
-        sigma_printf("\n--- Î£ SOVEREIGN CPU AUDIT ---\n");
-        sigma_printf("| ARCH : x86_64 ZENITH SHARD\n");
-        sigma_printf("| STATE: DIRECT HARDWARE HANDSHAKE\n");
-        sigma_printf("| LOAD : 0.0004%% (WAIT-FREE)\n");
-        sigma_printf("-----------------------------\n");
+        sigma_log_info("\n--- Î£ SOVEREIGN CPU AUDIT ---\n");
+        sigma_log_info("| ARCH : x86_64 ZENITH SHARD\n");
+        sigma_log_info("| STATE: DIRECT HARDWARE HANDSHAKE\n");
+        sigma_log_info("| LOAD : 0.0004%% (WAIT-FREE)\n");
+        sigma_log_info("-----------------------------\n");
     }
 
     const char* SovereignPermissionMod::type_name() const noexcept { return "SovereignPermissionMod"; }
     void SovereignPermissionMod::Execute(const char* permissions, const char* file) { 
-        sigma_printf("[PQC-V5]: Re-indexing cryptographic shard for %s to %s...\n", file, permissions);
-        sigma_printf("[OK]: Entanglement updated.\n");
+        sigma_log_info("[PQC-V5]: Re-indexing cryptographic shard for %s to %s...\n", file, permissions);
+        sigma_log_info("[OK]: Entanglement updated.\n");
     }
 
     const char* AutoAetherOrchestrator::type_name() const noexcept { return "AutoAetherOrchestrator"; }
     void AutoAetherOrchestrator::DispatchCron() { 
-        sigma_printf("[AETHER]: Cron intent recognized. Running background neural pulses...\n");
+        sigma_log_info("[AETHER]: Cron intent recognized. Running background neural pulses...\n");
     }
 
     const char* SovereignDataScienceForge::type_name() const noexcept { return "SovereignDataScienceForge"; }
     void SovereignDataScienceForge::TrainModel(const char* dataSet) { 
-        sigma_printf("[FORGE]: Training Newton-Raphson descent on %s...\n", dataSet);
-        sigma_printf("[FORGE]: Model trained in 0.02ms. Shard saved.\n");
+        sigma_log_info("[FORGE]: Training Newton-Raphson descent on %s...\n", dataSet);
+        sigma_log_info("[FORGE]: Model trained in 0.02ms. Shard saved.\n");
     }
     void SovereignDataScienceForge::PlotGraph(const char* metrics) { 
-        sigma_printf("[RACK]: GPU rasterizer plotting %s to Lattice-Nexus display...\n", metrics);
+        sigma_log_info("[RACK]: GPU rasterizer plotting %s to Lattice-Nexus display...\n", metrics);
     }
 
 } // namespace CoreUtils
 } // namespace SigmaOS
+
+

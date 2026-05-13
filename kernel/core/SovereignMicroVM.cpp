@@ -1,7 +1,10 @@
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 #include "sigma_microvm.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 
 
 /**
@@ -33,7 +36,7 @@ extern "C" uint32_t microvm_spawn(const sigma_microvm_config_t* config) {
     uint32_t id = ++active_vms;
     vm_registry[id - 1] = {id, true, config->memory_mb};
     
-    sigma_printf("[MICROVM] HBC: Spawning MicroVM %d (%d MB, Net: %d)...\n", 
+    sigma_log_info("[MICROVM] HBC: Spawning MicroVM %d (%d MB, Net: %d)...\n", 
                  id, config->memory_mb, config->has_network);
                  
     sigma_log("[MICROVM] HBC: Extended Page Tables (EPT) mapped. VM running.");
@@ -43,6 +46,8 @@ extern "C" uint32_t microvm_spawn(const sigma_microvm_config_t* config) {
 extern "C" void microvm_terminate(uint32_t vm_id) {
     if (vm_id > 0 && vm_id <= 64 && vm_registry[vm_id - 1].is_running) {
         vm_registry[vm_id - 1].is_running = false;
-        sigma_printf("[MICROVM] HBC: Terminating MicroVM %d and flushing EPT mappings.\n", vm_id);
+        sigma_log_info("[MICROVM] HBC: Terminating MicroVM %d and flushing EPT mappings.\n", vm_id);
     }
 }
+
+

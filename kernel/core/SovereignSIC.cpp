@@ -1,8 +1,13 @@
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_sic.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_libc.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign SIC Implementation
@@ -26,14 +31,14 @@ extern "C" sigma_sic_token_t sic_generate_token(uint32_t shard_id, const void* b
     token.checksum_lo = 0xFEEDFACE ^ shard_id;
     token.is_verified = true;
     
-    sigma_printf("[SIC] RSH: Generated Token for S%02d -> %08X%08X\n", 
+    sigma_log_info("[SIC] RSH: Generated Token for S%02d -> %08X%08X\n", 
                  shard_id, token.checksum_hi, token.checksum_lo);
                  
     return token;
 }
 
 extern "C" bool sic_verify_token(uint32_t shard_id, sigma_sic_token_t token) {
-    sigma_printf("[SIC] RSH: Verifying Shard S%02d integrity token...\n", shard_id);
+    sigma_log_info("[SIC] RSH: Verifying Shard S%02d integrity token...\n", shard_id);
     
     // In real implementation, this would re-hash the binary and compare
     bool success = token.is_verified;
@@ -46,3 +51,5 @@ extern "C" bool sic_verify_token(uint32_t shard_id, sigma_sic_token_t token) {
     
     return success;
 }
+
+

@@ -32,13 +32,11 @@ This document provides an eleventh-round audit of the SigmaOS Sovereign Lattice,
 
 1
 
-
 1
 
 1
 
 1
-
 
 ---
 

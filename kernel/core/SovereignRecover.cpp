@@ -1,6 +1,9 @@
 #include "sigma_recover.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Recover Implementation
@@ -69,14 +72,14 @@ void SovereignRecover::triggerHealing(uint32_t shard_id) {
     if(record) {
         record->heal_count++;
         if(record->heal_count > 3) {
-            sigma_printf("[RECOVER] SHSR: Shard S%02d reached CRITICAL failure threshold. Isolation engaged.\n", (int)shard_id);
+            sigma_log_info("[RECOVER] SHSR: Shard S%02d reached CRITICAL failure threshold. Isolation engaged.\n", (int)shard_id);
             record->permanent_failure = true;
             this->lattice_state = (sigma_recovery_state_t)SIGMA_RECOVER_CRITICAL;
             return;
         }
     }
 
-    sigma_printf("[RECOVER] SHSR: Corrupt Shard S%02d detected (Cycle %d). Restoring...\n", 
+    sigma_log_info("[RECOVER] SHSR: Corrupt Shard S%02d detected (Cycle %d). Restoring...\n", 
                  (int)shard_id, record ? (int)record->heal_count : 1);
     
     sigma_log("[RECOVER] SHSR: Shard binary parity verified. Hot-swap COMPLETE.");
@@ -103,3 +106,5 @@ extern "C" void recover_trigger_healing(uint32_t shard_id) {
 extern "C" sigma_recovery_state_t recover_get_lattice_state() {
     return SovereignRecover::getInstance().getLatticeState();
 }
+
+
