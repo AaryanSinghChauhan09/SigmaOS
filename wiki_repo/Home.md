@@ -37,7 +37,8 @@ Welcome to the central knowledge hub for **SigmaOS**, the world's first industri
 - [S-PKG: Lattice Package Nexus](SIGMA_PKG): Decentralized shard distribution and PQC-verification.
 - [S-CONTAINER: Sovereign Containers](Container-Runtime): OCI-compliant application sharding.
 - **[S-LOG: Sovereign Journaling](Sovereign-Journal)**: Structured industrial telemetry.
-- **[S-FS: Sovereign Lattice Filesystem](Sovereign-Lattice-Filesystem)**: Persistent, PQC-hardened storage lattice.
+- [Sovereign-Lattice-Filesystem](Sovereign-Lattice-Filesystem)
+- [Sovereign-Memory-Management](Sovereign-Memory-Management)
 
 ## 🛠 Project Lifecycle
 

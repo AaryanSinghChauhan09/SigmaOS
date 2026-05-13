@@ -15,6 +15,7 @@ The **SigmaOS Industrial Collective** is proud to announce the first production-
 - **S-PKG**: Cryptographically verified lattice package manager.
 - **S-VPN**: WireGuard-native secure tunneling engine.
 - **S-FS**: Sovereign Lattice Filesystem — Persistent, PQC-hardened storage lattice.
+- **S-MM**: Sovereign Memory Manager — Industrial Slab & Paging backend for Ring-0 multitasking.
 - **Zenith Control Center**: Unified industrial settings lattice.
 
 ## 🛠 Stability Improvements
