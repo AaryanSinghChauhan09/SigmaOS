@@ -1,13 +1,13 @@
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
 namespace AI {
 
 class SovereignAI : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignAI> {
-    friend class SigmaSingleton<SovereignAI>;
+    friend class SigmaOS::SigmaSingleton<SovereignAI>;
 public:
     const char* type_name() const noexcept override { return "SovereignAI"; }
 

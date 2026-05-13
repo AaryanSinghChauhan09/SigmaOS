@@ -11,6 +11,7 @@ The [GitHub Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki) is the p
 ### 2. S-LOG Telemetry
 
 If you encounter a shard failure, check the internal journal logs:
+
 ```bash
 
 # View real-time kernel telemetry

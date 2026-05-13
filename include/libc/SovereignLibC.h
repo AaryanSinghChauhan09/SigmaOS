@@ -33,7 +33,10 @@ int           sigma_wait(int* wstatus);
 int           sigma_dup(int oldfd);
 int           sigma_nanosleep(const void* req, void* rem);
 
-// Removed redundant string and memory functions already in sigma_kernel_types.h
+// ABI-001: String and Memory primitives
+sigma_size_t sigma_strlen(const char* s);
+void*        sigma_memcpy(void* dest, const void* src, sigma_size_t n);
+void*        sigma_memset(void* s, int c, sigma_size_t n);
 
 /* =========================================================================
  * HIGH-LEVEL PRIMITIVES (implemented in SovereignLibC.c - pure C11)

@@ -30,4 +30,4 @@ The **SigmaOS Industrial Collective** is proud to announce the first production-
 
 ---
 
-### Stay Sovereign.
+### Stay Sovereign

@@ -1,4 +1,4 @@
-﻿#define SIGMA_EXCLUDE_STD_ALIASES
+#define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS â€” tools/sovereign_shell â€” sovereign_shell.c
 // Native C Replacement for scripts/zenith_shell.py
@@ -18,9 +18,9 @@
 //   â€¢ Tab-completion hooked into VFS readdir + command table
 // =============================================================================
 
-#include "libc/SovereignLibC.h"
-#include "sigma_log.h"
-#include "core/sigma_types.h"
+#include "../../../../include/libc/SovereignLibC.h"
+#include "../../../../include/sigma_log.h"
+#include "../../../../include/core/sigma_types.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -46,8 +46,8 @@ extern "C" {
 
 // â”€â”€ History Ring â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 static char    history[SIGMA_HISTORY_SIZE][SIGMA_LINE_MAX];
-static uint32_t history_head = 0;
-static uint32_t history_len  = 0;
+static sigma_u32 history_head = 0;
+static sigma_u32 history_len  = 0;
 
 static void history_push(const char* line) {
     strncpy(history[history_head % SIGMA_HISTORY_SIZE], line, SIGMA_LINE_MAX - 1);
@@ -113,8 +113,8 @@ static int builtin_exit(int argc, char** argv) {
 
 static int builtin_history(int argc, char** argv) {
     (void)argc; (void)argv;
-    uint32_t start = (history_len < SIGMA_HISTORY_SIZE) ? 0 : history_head;
-    for (uint32_t i = 0; i < history_len; i++)
+    sigma_u32 start = (history_len < SIGMA_HISTORY_SIZE) ? 0 : history_head;
+    for (sigma_u32 i = 0; i < history_len; i++)
         sigma_log_info("  %4u  %s\n", i + 1, history[(start + i) % SIGMA_HISTORY_SIZE]);
     return 0;
 }

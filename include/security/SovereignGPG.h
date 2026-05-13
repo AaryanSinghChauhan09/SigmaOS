@@ -9,7 +9,7 @@
 #ifndef SOVEREIGN_GPG_H
 #define SOVEREIGN_GPG_H
 
-#include "core/sigma_types.h"
+#include "../core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

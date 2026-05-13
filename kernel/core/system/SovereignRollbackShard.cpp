@@ -1,6 +1,6 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "core/SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Rollback Shard
@@ -11,6 +11,11 @@
 namespace SigmaOS {
 namespace Kernel {
 namespace System {
+
+static inline sigma_u32 sigma_crc32(const void* data, sigma_size_t len) {
+    (void)data; (void)len;
+    return 0xDEADBEEF; // Mock for parity
+}
 
 struct RollbackSnapshot {
     sigma_u32 id;
