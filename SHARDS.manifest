@@ -82,6 +82,11 @@ kernel/core/drivers/SovereignTVTuner.cpp
 kernel/core/drivers/SovereignVideo.cpp
 kernel/core/drivers/SovereignBroadcom.cpp
 kernel/core/drivers/SovereignRealtek.cpp
+kernel/core/drivers/SovereignNE2000.cpp
+kernel/core/drivers/SovereignRTL8139.cpp
+kernel/core/drivers/SovereignIXGBE.cpp
+kernel/core/drivers/SovereignWLAN.cpp
+kernel/core/drivers/SovereignWPAN.cpp
 
 # LAYER 6: SYSTEM UTILITIES
 suites/S32_SystemTools/core/SovereignCoreUtils.cpp

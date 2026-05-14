@@ -28,6 +28,11 @@ extern "C" void ati_init();
 extern "C" void media_init();
 extern "C" void tuner_init();
 extern "C" void video_init();
+extern "C" void ne2000_init(sigma_u32 base);
+extern "C" void rtl8139_init(sigma_u64 base);
+extern "C" void ixgbe_init(sigma_u64 base);
+extern "C" void wlan_init();
+extern "C" void wpan_init();
 
 /**
  * SigmaOS Sovereign Init Implementation (v15.0 Zenith)
@@ -71,6 +76,11 @@ public:
         
         // Layer 3: Connectivity & Network
         e1000_init(0xFEB00000);
+        ne2000_init(0x0300);
+        rtl8139_init(0xFEC00000);
+        ixgbe_init(0xFEA00000);
+        wlan_init();
+        wpan_init();
         net_init();
         
         // Layer 4: Persistence & Userland
@@ -83,7 +93,7 @@ public:
         hyp_init();
         container_init();
 
-        sigma_log_info("[INIT] ASI: Total Singularity Achieved. 700+ Industrial Shards Active.\n");
+        sigma_log_info("[INIT] ASI: Total Singularity Achieved. 710+ Industrial Shards Active.\n");
     }
 
 private:

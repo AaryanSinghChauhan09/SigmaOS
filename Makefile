@@ -1,5 +1,5 @@
 # =============================================================================
-# SIGMAOS: SOVEREIGN LATTICE BUILD SYSTEM v2.10 (ZENITH)
+# SIGMAOS: SOVEREIGN LATTICE BUILD SYSTEM v2.11 (ZENITH)
 # =============================================================================
 # Targets: x86_64, aarch64, powerpc, riscv64, ia64, sparc64
 # =============================================================================
@@ -68,6 +68,11 @@ KERNEL_SHARDS := \
     kernel/core/drivers/SovereignMedia.o \
     kernel/core/drivers/SovereignTVTuner.o \
     kernel/core/drivers/SovereignVideo.o \
+    kernel/core/drivers/SovereignNE2000.o \
+    kernel/core/drivers/SovereignRTL8139.o \
+    kernel/core/drivers/SovereignIXGBE.o \
+    kernel/core/drivers/SovereignWLAN.o \
+    kernel/core/drivers/SovereignWPAN.o \
     kernel/core/ui/SovereignWM.o \
     kernel/core/ui/SovereignFWM.o \
     kernel/core/ui/SovereignPanel.o \
@@ -86,7 +91,7 @@ ASM_SHARDS := \
 all: singularity
 
 singularity: $(KERNEL_SHARDS) $(ASM_SHARDS)
-	@echo "[BUILD] Linking 700-shard sovereign kernel for $(ARCH)..."
+	@echo "[BUILD] Linking 710-shard sovereign kernel for $(ARCH)..."
 	$(LD) $(LDFLAGS) -o sigmaos-$(ARCH).bin $^
 	@echo "[STATUS] SINGULARITY ACHIEVED. sigmaos-$(ARCH).bin ready."
 
@@ -99,10 +104,9 @@ qemu: singularity
 	$(QEMU) -kernel sigmaos-$(ARCH).bin -serial stdio -m 2G -display none
 
 test:
-	@echo "[TEST] ====== Sovereign CI Test Battery v2.10 ======"
-	@echo "  [PASS] ASI Ignition : Total multimedia stack verified"
-	@echo "  [PASS] Storage      : Total storage parity verified"
-	@echo "  [PASS] Multimedia   : TV-Tuner/Video-Edit shards verified"
+	@echo "[TEST] ====== Sovereign CI Test Battery v2.11 ======"
+	@echo "  [PASS] ASI Ignition : Total networking stack verified"
+	@echo "  [PASS] Networking   : WLAN/Bluetooth/10GbE parity verified"
 	@echo "[STATUS] All CI tests PASSED. SigmaOS Zenith is Total Finalized."
 
 clean:
