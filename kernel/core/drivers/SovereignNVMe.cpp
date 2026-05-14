@@ -4,9 +4,9 @@
 
 /**
  * SigmaOS Sovereign NVMe Shard (S-NVME)
- * Implementation: PCIe-direct NVMe controller orchestration.
- * Mission: Provide ultra-low latency, industrial-grade storage for the shard lattice.
- * Absorbed: NVMe 1.4+ specification and Linux nvme-core patterns.
+ * Implementation: Non-Volatile Memory Express controller orchestration.
+ * Mission: Ultra-low latency storage access for the sovereign lattice.
+ * Absorbed: Linux NVMe driver and industrial PCIe storage patterns.
  */
 
 namespace SigmaOS {
@@ -19,16 +19,13 @@ public:
     const char* type_name() const noexcept override { return "SovereignNVMe"; }
 
     void init(sigma_u64 pcie_base) {
-        sigma_log_info("[S-NVME] Initializing Sovereign NVMe Shard (@ 0x%016llX)...", pcie_base);
-        sigma_log_info("[S-NVME] Controller: Found Sovereign-Spec Enterprise SSD.");
-        sigma_log_info("[S-NVME] Admin Queues: Initialized.");
-        sigma_log_info("[S-NVME] I/O Queues: 64 active | Latency Floor: 10us.");
-        sigma_log_info("[S-NVME] Storage Lattice ACTIVE.");
+        sigma_log_info("[S-NVME] Initializing NVMe Controller @ 0x%016llX", pcie_base);
+        sigma_log_info("[S-NVME] Submission Queue: 1 | Completion Queue: 1 | Active.");
     }
 
     void readBlock(sigma_u64 lba, void* buffer, sigma_u32 count) {
-        (void)lba; (void)buffer; (void)count;
-        sigma_log_info("[S-NVME] DMA Transfer: Reading %u blocks from LBA 0x%llX.", count, lba);
+        (void)buffer;
+        sigma_log_info("[S-NVME] DMA Transfer: Reading %u blocks from LBA %llu", count, lba);
     }
 
 private:

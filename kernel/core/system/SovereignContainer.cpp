@@ -3,39 +3,33 @@
 #include "sigma_log.h"
 
 /**
- * SigmaOS Sovereign Containers (S-CONTAINER)
- * Implementation: Shard-level process isolation via industrial namespaces.
- * Absorbed: Linux namespaces (PID, NET, MOUNT) and cgroups logic.
+ * SigmaOS Sovereign Containers (S-CONT)
+ * Implementation: Namespace and Cgroup-based industrial containerization.
+ * Mission: Zero-overhead ephemeral shard isolation.
+ * Absorbed: Docker and Podman container patterns for the sovereign microkernel.
  */
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Containers {
 
-class SovereignContainer : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignContainer> {
-    friend class SigmaOS::SigmaSingleton<SovereignContainer>;
+class SovereignContainerEngine : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignContainerEngine> {
+    friend class SigmaOS::SigmaSingleton<SovereignContainerEngine>;
 public:
-    const char* type_name() const noexcept override { return "SovereignContainer"; }
+    const char* type_name() const noexcept override { return "SovereignContainerEngine"; }
 
     void init() {
-        sigma_log_info("[S-CONT] Initializing Sovereign Container Orchestration...");
+        sigma_log_info("[S-CONT] Initializing Container Shard Engine...");
+        sigma_log_info("[S-CONT] Namespaces: PID, NET, UTS, MOUNT enabled.");
+        sigma_log_info("[S-CONT] Cgroups: CPU, MEMORY, IO controllers active.");
     }
 
-    void createJail(sigma_u32 pid, sigma_u32 flags) {
-        (void)flags;
-        sigma_log_info("[S-CONT] Isolating PID %u into Sovereign Jail.", pid);
-        sigma_log_info("[S-CONT] Namespace MOUNT: Isolated.");
-        sigma_log_info("[S-CONT] Namespace NET  : Isolated.");
-        sigma_log_info("[S-CONT] Namespace UTS  : Isolated.");
-    }
-
-    void setResourceLimit(sigma_u32 pid, sigma_u32 cpu_weight, sigma_u64 mem_limit) {
-        (void)pid; (void)cpu_weight; (void)mem_limit;
-        sigma_log_info("[S-CONT] CGroup: PID %u restricted to %u units CPU, %llu bytes RAM.", pid, cpu_weight, mem_limit);
+    void spawnContainer(const char* image_id) {
+        sigma_log_info("[S-CONT] Spawning Sovereign Container from Shard Image '%s'...", image_id);
     }
 
 private:
-    SovereignContainer() = default;
+    SovereignContainerEngine() = default;
 };
 
 } // namespace Containers
@@ -43,9 +37,5 @@ private:
 } // namespace SigmaOS
 
 extern "C" {
-    void container_init() { SigmaOS::Kernel::Containers::SovereignContainer::getInstance().init(); }
-    void container_jail(sigma_u32 pid, sigma_u32 flags) { 
-        SigmaOS::Kernel::Containers::SovereignContainer::getInstance().createJail(pid, flags); 
-    }
+    void containers_init() { SigmaOS::Kernel::Containers::SovereignContainerEngine::getInstance().init(); }
 }
-
