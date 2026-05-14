@@ -143,6 +143,11 @@ KERNEL_SHARDS := \
     kernel/core/boot/SovereignRecovery.o \
     kernel/core/system/SovereignCompatibility.o \
     kernel/core/hal/SovereignHypervisor.o \
+    kernel/core/cloud/SovereignCloud.o \
+    kernel/core/intelligence/SovereignAISched.o \
+    kernel/core/system/SovereignCorespace.o \
+    kernel/core/fs/SovereignVault.o \
+    kernel/core/network/SovereignEther.o \
     kernel/core/ui/SovereignWM.o \
     kernel/core/ui/SovereignFWM.o \
     kernel/core/ui/SovereignPanel.o \
