@@ -37,7 +37,7 @@ kernel/core/fs/SovereignLatticeFS.cpp
 kernel/core/fs/SovereignExt2.cpp
 kernel/core/fs/SovereignZFS.cpp
 kernel/core/network/SovereignNetStack.cpp
-kernel/core/system/SovereignSyscalls.cpp
+kernel/core/SovereignSyscall.cpp
 kernel/core/security/SovereignIdentity.cpp
 kernel/core/security/SovereignKali.cpp
 kernel/core/security/SovereignGPG.cpp
@@ -60,6 +60,8 @@ suites/S32_SystemTools/core/sovereign_playground/SovereignPlayground.cpp
 kernel/core/system/SigmaPkg.cpp
 kernel/core/observability/SovereignLogD.cpp
 kernel/core/ui/SovereignWM.cpp
+kernel/core/ui/SovereignFWM.cpp
+kernel/core/ui/SovereignPanel.cpp
 kernel/core/ds/SovereignDS.cpp
 
 # ... [Remaining layers maintained in lattice memory] ...
