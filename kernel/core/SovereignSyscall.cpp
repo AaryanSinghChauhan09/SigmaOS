@@ -1,9 +1,18 @@
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
 
-// IA32_LSTAR MSR-based SYSCALL/SYSRET dispatch engine
-// Provides POSIX-compliant system calls for SigmaOS Zenith
+// Forward declarations for shard entry points
+extern "C" void util_echo(const char* t);
+extern "C" char kbd_read();
+extern "C" sigma_i32 net_socket(sigma_i32 d, sigma_i32 t, sigma_i32 p);
+extern "C" void pkg_install(const char* name);
+
+/**
+ * SigmaOS Sovereign Syscall Engine (v15.0 Zenith)
+ * Implementation: IA32_LSTAR fast-path dispatch for the industrial lattice.
+ * Mission: Provide POSIX-compliant interaction for userland shards.
+ */
 
 namespace SigmaOS {
 namespace Kernel {
@@ -15,23 +24,29 @@ public:
     const char* type_name() const noexcept override { return "SovereignSyscallEngine"; }
 
     void init() {
-        sigma_log("[SYSCALL] Initializing Sovereign Fast-Path Syscall Gate (FPST)...");
-        this->initialized = true;
-        this->total_calls = 0;
+        sigma_log_info("[SYSCALL] Initializing Sovereign Fast-Path Syscall Gate (FPST)...");
     }
 
     sigma_u32 dispatch(sigma_u32 id, sigma_u32 a1, sigma_u32 a2, sigma_u32 a3) {
-        this->total_calls++;
-        sigma_log_info("[SYSCALL] id=0x%X args=[0x%X, 0x%X, 0x%X]", id, a1, a2, a3);
-        return 0; // Success
+        switch (id) {
+            case 0x01: // SYS_WRITE
+                util_echo((const char*)a1);
+                return 0;
+            case 0x02: // SYS_READ
+                return (sigma_u32)kbd_read();
+            case 0x05: // SYS_SOCKET
+                return (sigma_u32)net_socket((sigma_i32)a1, (sigma_i32)a2, (sigma_i32)a3);
+            case 0x06: // SYS_PKG_INSTALL
+                pkg_install((const char*)a1);
+                return 0;
+            default:
+                sigma_log_info("[SYSCALL] Unknown ID 0x%X dispatched.", id);
+                return 0xFFFFFFFF;
+        }
     }
 
-    sigma_u64 getTotalCalls() const { return total_calls; }
-
 private:
-    SovereignSyscallEngine() : initialized(false), total_calls(0) {}
-    bool initialized;
-    sigma_u64 total_calls;
+    SovereignSyscallEngine() = default;
 };
 
 } // namespace System
