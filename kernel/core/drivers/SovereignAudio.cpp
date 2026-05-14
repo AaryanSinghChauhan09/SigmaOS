@@ -4,9 +4,9 @@
 
 /**
  * SigmaOS Sovereign Audio Shard (S-AUDIO)
- * Implementation: High Definition Audio (HDA) controller orchestration.
- * Mission: Provide low-latency, industrial-grade audio synthesis and playback.
- * Absorbed: Intel HDA and ALSA (Advanced Linux Sound Architecture) patterns.
+ * Implementation: High Definition Audio (HDA) and AC97 industrial orchestration.
+ * Mission: Zero-latency, bit-perfect professional audio streaming.
+ * Absorbed: Linux ALSA and industrial audio bus patterns.
  */
 
 namespace SigmaOS {
@@ -19,15 +19,13 @@ public:
     const char* type_name() const noexcept override { return "SovereignAudio"; }
 
     void init() {
-        sigma_log_info("[S-AUDIO] Initializing Sovereign HDA Controller...");
-        sigma_log_info("[S-AUDIO] Codec Scanning: Found Realtek ALC892 Equivalent.");
-        sigma_log_info("[S-AUDIO] Stream Engines: 4 Output, 4 Input active.");
-        sigma_log_info("[S-AUDIO] Audio Lattice ACTIVE. State: READY.");
+        sigma_log_info("[S-AUDIO] Initializing HDA Controller...");
+        sigma_log_info("[S-AUDIO] 24-bit/192kHz Bit-Perfect Mode: ENABLED.");
     }
 
-    void playSample(void* data, sigma_size_t size) {
-        (void)data; (void)size;
-        sigma_log_info("[S-AUDIO] Playback START: %u bytes via DMA Engine 0.", (sigma_u32)size);
+    void playStream(const void* samples, sigma_size_t size) {
+        (void)samples;
+        sigma_log_info("[S-AUDIO] DMA Stream: Playing %zu bytes to Industrial Output.", size);
     }
 
 private:

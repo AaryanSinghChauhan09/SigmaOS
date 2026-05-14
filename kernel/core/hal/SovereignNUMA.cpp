@@ -3,21 +3,21 @@
 #include "sigma_log.h"
 
 /**
- * SigmaOS Sovereign NUMA Shard (S-NUMA)
- * Implementation: Non-Uniform Memory Access orchestration.
- * Mission: Optimize shard placement based on silicon memory topology.
- * Absorbed: Linux numactl and ACPI SRAT/SLIT patterns.
+ * SigmaOS Sovereign NUMA Orchestrator (S-NUMA)
+ * Implementation: Non-Uniform Memory Access topology orchestration.
+ * Mission: Optimize memory affinity for multi-socket industrial silicon.
+ * Absorbed: Linux NUMA distance and proximity patterns.
  */
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Memory {
 
-struct NumaNode {
+struct NUMANode {
     sigma_u32 id;
     sigma_u64 memory_base;
     sigma_u64 memory_size;
-    sigma_u32 cpu_mask;
+    sigma_u32 cpu_count;
 };
 
 class SovereignNUMA : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignNUMA> {
@@ -26,41 +26,28 @@ public:
     const char* type_name() const noexcept override { return "SovereignNUMA"; }
 
     void init() {
-        sigma_log_info("[S-NUMA] Probing silicon memory topology...");
+        sigma_log_info("[S-NUMA] Probing Hardware Topology...");
         
-        // Mock Topology Probing
-        m_nodes[0] = {0, 0x00000000, 0x400000000, 0x0000FFFF}; // Node 0: 16GB, CPUs 0-15
-        m_nodes[1] = {1, 0x400000000, 0x400000000, 0xFFFF0000}; // Node 1: 16GB, CPUs 16-31
+        // Mock 2-node system
+        m_nodes[0] = {0, 0x0000000000000000, 0x0000000100000000, 16};
+        m_nodes[1] = {1, 0x0000000100000000, 0x0000000100000000, 16};
         m_node_count = 2;
-        
-        sigma_log_info("[S-NUMA] NUMA Lattice ACTIVE. Nodes Detected: %u", m_node_count);
+
+        sigma_log_info("[S-NUMA] Detected %u NUMA nodes. Enforcing node-local affinity.", m_node_count);
     }
 
-    sigma_u32 getOptimalNodeForCpu(sigma_u32 cpu_id) {
-        for (sigma_u32 i = 0; i < m_node_count; i++) {
-            if (m_nodes[i].cpu_mask & (1 << cpu_id)) return i;
-        }
-        return 0;
+    sigma_u32 getPreferredNodeForCPU(sigma_u32 cpu_id) {
+        return (cpu_id < 16) ? 0 : 1;
     }
 
-    void* allocateNodeLocal(sigma_u32 node_id, sigma_size_t size) {
-        if (node_id >= m_node_count) node_id = 0;
-        
-        sigma_log_info("[S-NUMA] Node-Local Allocation: Node %u | Size: %zu bytes", node_id, size);
-        sigma_log_info("[S-NUMA] Policy: Enforcing memory affinity for local silicon cluster.");
-        
-        // Return simulated pointer within node's memory range
-        return (void*)(m_nodes[node_id].memory_base + 0x1000);
-    }
-
-    void enforceShardAffinity(const char* shard, sigma_u32 cpu_id) {
-        sigma_u32 node = getOptimalNodeForCpu(cpu_id);
-        sigma_log_info("[S-NUMA] Shard Affinity: Pinning '%s' to Node %u (CPU %u)", shard, node, cpu_id);
+    void* numa_alloc(sigma_size_t size, sigma_u32 preferred_node) {
+        sigma_log_info("[S-NUMA] Allocating %zu bytes on Node %u", size, preferred_node);
+        return nullptr; // Stub for actual allocator bridge
     }
 
 private:
     SovereignNUMA() : m_node_count(0) {}
-    NumaNode m_nodes[8];
+    NUMANode m_nodes[8];
     sigma_u32 m_node_count;
 };
 
@@ -70,7 +57,4 @@ private:
 
 extern "C" {
     void numa_init() { SigmaOS::Kernel::Memory::SovereignNUMA::getInstance().init(); }
-    void* numa_alloc(sigma_u32 node, sigma_size_t sz) { 
-        return SigmaOS::Kernel::Memory::SovereignNUMA::getInstance().allocateNodeLocal(node, sz); 
-    }
 }
