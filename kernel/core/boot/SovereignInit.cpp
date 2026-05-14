@@ -12,12 +12,17 @@ extern "C" void pkg_init();
 extern "C" void kbd_init();
 extern "C" void vesa_init(sigma_u32 w, sigma_u32 h, sigma_u32 bpp, sigma_u64 lfb);
 extern "C" void ata_init();
+extern "C" void sata_init(sigma_u64 base);
+extern "C" void scsi_init();
+extern "C" void usb3_init(sigma_u64 base);
 extern "C" void e1000_init(sigma_u64 base);
 extern "C" void wm_init();
 extern "C" void hyp_init();
 extern "C" void container_init();
 extern "C" void ubuntu_init();
 extern "C" void nvidia_init();
+extern "C" void ati_init();
+extern "C" void media_init();
 
 /**
  * SigmaOS Sovereign Init Implementation (v15.0 Zenith)
@@ -42,10 +47,15 @@ public:
         
         // Layer 1: Hardware Interaction & Compatibility
         ata_init();
+        sata_init(0xFEA00000);
+        scsi_init();
+        usb3_init(0xFE000000);
         kbd_init();
         vesa_init(1920, 1080, 32, 0xFD000000);
-        ubuntu_init(); // Generic driver lattice
-        nvidia_init(); // GPU acceleration
+        ubuntu_init();
+        nvidia_init();
+        ati_init();
+        media_init();
         
         // Layer 2: Connectivity & Network
         e1000_init(0xFEB00000);
@@ -63,7 +73,7 @@ public:
         hyp_init();
         container_init();
 
-        sigma_log_info("[INIT] ASI: Total Singularity Achieved. 620 Industrial Shards Active.\n");
+        sigma_log_info("[INIT] ASI: Total Singularity Achieved. 650+ Industrial Shards Active.\n");
     }
 
 private:

@@ -68,8 +68,13 @@ kernel/core/profiles/SovereignProfile.cpp
 kernel/core/drivers/SovereignPS2.cpp
 kernel/core/drivers/SovereignVESA.cpp
 kernel/core/drivers/SovereignATA.cpp
+kernel/core/drivers/SovereignSATA.cpp
+kernel/core/drivers/SovereignSCSI.cpp
+kernel/core/drivers/SovereignUSB3.cpp
 kernel/core/drivers/SovereignE1000.cpp
 kernel/core/drivers/SovereignNvidia.cpp
+kernel/core/drivers/SovereignATI.cpp
+kernel/core/drivers/SovereignMedia.cpp
 kernel/core/drivers/SovereignBroadcom.cpp
 kernel/core/drivers/SovereignRealtek.cpp
 
@@ -83,5 +88,3 @@ kernel/core/ui/SovereignFWM.cpp
 kernel/core/ui/SovereignPanel.cpp
 kernel/core/ds/SovereignDS.cpp
 kernel/core/libc/SovereignLibC.cpp
-
-# ... [Remaining layers maintained in lattice memory] ...
