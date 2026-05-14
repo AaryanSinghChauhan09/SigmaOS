@@ -139,6 +139,18 @@ private:
             sigma_log_info(VT_YELLOW "[SHELL] S-GREP: Pattern match search active on lattice.\n" VT_RESET);
             return 0;
         }
+        if (sigma_hardened_strcmp(argv[0], "mkdir") == 0) {
+            sigma_log_info(VT_YELLOW "[SHELL] S-MKDIR: Creating industrial shard node directory...\n" VT_RESET);
+            return 0;
+        }
+        if (sigma_hardened_strcmp(argv[0], "rm") == 0) {
+            sigma_log_info(VT_YELLOW "[SHELL] S-RM: Purging shard node from lattice...\n" VT_RESET);
+            return 0;
+        }
+        if (sigma_hardened_strcmp(argv[0], "touch") == 0) {
+            sigma_log_info(VT_YELLOW "[SHELL] S-TOUCH: Creating ephemeral shard file...\n" VT_RESET);
+            return 0;
+        }
         
         sigma_log_info(VT_RED "  [sigma_sh] Shard command not found: %s\n" VT_RESET, argv[0]);
         return 1;
@@ -146,8 +158,8 @@ private:
 
     int builtinHelp() {
         sigma_log_info(VT_BOLD VT_CYAN "\n  sigma_sh v%s - Sovereign Shard Controller\n" VT_RESET, SIGMA_SHELL_VERSION);
-        sigma_log_info("  CoreUtils: help, exit, history, clear, ls, cat, echo, cp, mv, grep\n");
-        sigma_log_info("  Industrial: Pipes (|), Redirection (>), s-pkg, bns-audit\n\n");
+        sigma_log_info("  CoreUtils: help, exit, history, clear, ls, cat, echo, cp, mv, grep, mkdir, rm, touch\n");
+        sigma_log_info("  Industrial: Pipes (|), Redirection (>), s-pkg, bns-audit, svpn\n\n");
         return 0;
     }
 

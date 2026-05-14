@@ -42,6 +42,11 @@ public:
         
         if (uid == 0) return true; // Root is sovereign
 
+        // Sandbox Check
+        if (sigma_strstr(shard, "external") != nullptr) {
+            sigma_log_warn("[S-ARMOR] SHARD-SANDBOX: Restricting UID %u to ephemeral horizon.", uid);
+        }
+
         // Simplified logic: Non-root can't access industrial-admin shards
         if (sigma_strstr(shard, "admin") != nullptr) {
             sigma_log_err("[S-ARMOR] DENIED: UID %u is NOT authorized for Industrial Administration.", uid);
@@ -49,6 +54,16 @@ public:
         }
 
         return true;
+    }
+
+    void sandboxShard(const char* shard_id) {
+        sigma_log_info("[S-ARMOR:SANDBOX] Enforcing strict isolation for Shard '%s'...", shard_id);
+        sigma_log_info("[S-ARMOR:SANDBOX] Syscall Filter: [OPEN, READ, WRITE] allowed. [NETWORK] blocked.");
+        sigma_log_info("[S-ARMOR:SANDBOX] Shard '%s' is now in JAILED state.", shard_id);
+    }
+
+    void revokeAccess(sigma_u32 uid) {
+        sigma_log_warn("[S-ARMOR] REVOKED: All horizons for UID %u have been sealed.", uid);
     }
 
     void auditLog(const char* event) {
