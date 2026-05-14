@@ -130,6 +130,13 @@ KERNEL_SHARDS := \
     kernel/core/absorption/SovereignCisco.o \
     kernel/core/absorption/SovereignSolaris.o \
     kernel/core/absorption/SovereignAmnesic.o \
+    kernel/core/absorption/SovereignGenera.o \
+    kernel/core/absorption/SovereignKeyKOS.o \
+    kernel/core/absorption/SovereignFlex.o \
+    kernel/core/absorption/SovereignVME.o \
+    kernel/core/absorption/SovereignHarmony.o \
+    kernel/core/absorption/SovereignAmoeba.o \
+    kernel/core/absorption/SovereignSingular.o \
     kernel/core/ui/SovereignWM.o \
     kernel/core/ui/SovereignFWM.o \
     kernel/core/ui/SovereignPanel.o \
