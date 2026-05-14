@@ -73,6 +73,12 @@ kernel/core/security/SovereignGPG.cpp
 kernel/core/security/SovereignPQC.cpp
 kernel/core/security/SovereignLUKS.cpp
 kernel/core/security/SovereignAppArmor.cpp
+kernel/core/security/SovereignSELinux.cpp
+kernel/core/security/SovereignNX.cpp
+kernel/core/security/SovereignASLR.cpp
+kernel/core/security/SovereignSeccomp.cpp
+kernel/core/security/SovereignAudit.cpp
+kernel/core/security/SovereignIMA.cpp
 kernel/core/config/SovereignDecl.cpp
 kernel/core/system/SovereignNexus.cpp
 kernel/core/system/SovereignStore.cpp
@@ -82,6 +88,8 @@ kernel/core/system/SovereignCoreUtils.cpp
 kernel/core/system/SovereignPkg.cpp
 kernel/core/system/SovereignContainer.cpp
 kernel/core/system/SovereignHypervisor.cpp
+kernel/core/system/SovereignKVM.cpp
+kernel/core/system/SovereignLXC.cpp
 kernel/core/observability/SovereignBPF.cpp
 kernel/core/observability/SovereignWiki.cpp
 kernel/core/profiles/SovereignProfile.cpp

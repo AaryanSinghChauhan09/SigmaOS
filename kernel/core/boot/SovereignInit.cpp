@@ -55,6 +55,14 @@ extern "C" void quota_init();
 extern "C" void acl_init();
 extern "C" void fscrypt_init();
 extern "C" void lvm_init();
+extern "C" void selinux_init();
+extern "C" void nx_init();
+extern "C" void aslr_init();
+extern "C" void seccomp_init();
+extern "C" void audit_init();
+extern "C" void ima_init();
+extern "C" void kvm_init();
+extern "C" void lxc_init();
 
 /**
  * SigmaOS Sovereign Init Implementation (v15.0 Zenith)
@@ -74,8 +82,10 @@ public:
     void ignite() {
         sigma_log_info("[INIT] ASI: Orchestrating Industrial Zenith Singularity...");
 
-        // Layer 0: Memory & Core HAL
+        // Layer 0: Memory & Core HAL (Hardware & Foundational Security)
         allocator_init();
+        nx_init();
+        aslr_init();
         
         // Layer 1: Hardware Interaction (Storage & Bus)
         ata_init();
@@ -134,14 +144,22 @@ public:
         
         ext2_mount("/dev/sda1"); // Root mount
         
+        // Layer 4.5: Userspace Security & Auditing
+        selinux_init();
+        seccomp_init();
+        audit_init();
+        ima_init();
+        
         pkg_init();
         wm_init();
         
         // Layer 5: Advanced Virtualization & Isolation
         hyp_init();
+        kvm_init();
         container_init();
+        lxc_init();
 
-        sigma_log_info("[INIT] ASI: Total Singularity Achieved. 740+ Industrial Shards Active.\n");
+        sigma_log_info("[INIT] ASI: Total Singularity Achieved. 750+ Industrial Shards Active.\n");
     }
 
 private:

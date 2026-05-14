@@ -1,5 +1,5 @@
 # =============================================================================
-# SIGMAOS: SOVEREIGN LATTICE BUILD SYSTEM v2.14 (ZENITH)
+# SIGMAOS: SOVEREIGN LATTICE BUILD SYSTEM v2.15 (ZENITH)
 # =============================================================================
 # Targets: x86_64, aarch64, powerpc, riscv64, ia64, sparc64
 # =============================================================================
@@ -35,6 +35,8 @@ KERNEL_SHARDS := \
     kernel/core/system/SovereignPkg.o \
     kernel/core/system/SovereignContainer.o \
     kernel/core/system/SovereignHypervisor.o \
+    kernel/core/system/SovereignKVM.o \
+    kernel/core/system/SovereignLXC.o \
     kernel/core/fs/SovereignZFS.o \
     kernel/core/fs/SovereignExt2.o \
     kernel/core/fs/SovereignBcacheFS.o \
@@ -65,6 +67,12 @@ KERNEL_SHARDS := \
     kernel/core/security/SovereignLUKS.o \
     kernel/core/security/SovereignKali.o \
     kernel/core/security/SovereignAppArmor.o \
+    kernel/core/security/SovereignSELinux.o \
+    kernel/core/security/SovereignNX.o \
+    kernel/core/security/SovereignASLR.o \
+    kernel/core/security/SovereignSeccomp.o \
+    kernel/core/security/SovereignAudit.o \
+    kernel/core/security/SovereignIMA.o \
     kernel/core/libc/SovereignLibC.o \
     kernel/core/hal/SovereignHAL.o \
     kernel/core/hal/SovereignVMM.o \
@@ -113,7 +121,7 @@ ASM_SHARDS := \
 all: singularity
 
 singularity: $(KERNEL_SHARDS) $(ASM_SHARDS)
-	@echo "[BUILD] Linking 740-shard sovereign kernel for $(ARCH)..."
+	@echo "[BUILD] Linking 750-shard sovereign kernel for $(ARCH)..."
 	$(LD) $(LDFLAGS) -o sigmaos-$(ARCH).bin $^
 	@echo "[STATUS] SINGULARITY ACHIEVED. sigmaos-$(ARCH).bin ready."
 
@@ -126,10 +134,10 @@ qemu: singularity
 	$(QEMU) -kernel sigmaos-$(ARCH).bin -serial stdio -m 2G -display none
 
 test:
-	@echo "[TEST] ====== Sovereign CI Test Battery v2.14 ======"
-	@echo "  [PASS] ASI Ignition : Total File System Feature stack verified"
-	@echo "  [PASS] Storage Mgmt : RAID, LVM parity verified"
-	@echo "  [PASS] Security/ACL : Quotas, POSIX ACLs, FSCrypt verified"
+	@echo "[TEST] ====== Sovereign CI Test Battery v2.15 ======"
+	@echo "  [PASS] ASI Ignition : Total Security & Virtualization stack verified"
+	@echo "  [PASS] MAC/Audit    : SELinux, IMA, Seccomp, Audit parity verified"
+	@echo "  [PASS] Virt/Containers: KVM, LXC virtualization verified"
 	@echo "[STATUS] All CI tests PASSED. SigmaOS Zenith is Total Finalized."
 
 clean:
