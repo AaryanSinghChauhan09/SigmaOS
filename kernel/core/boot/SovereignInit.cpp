@@ -106,6 +106,8 @@ extern "C" void SovereignVault_ignite();
 extern "C" void SovereignEther_ignite();
 extern "C" void SovereignSDK_enable();
 extern "C" void SovereignPartition_enable();
+        ZenithWebUI_ignite();
+extern "C" void ZenithWebUI_ignite();
 extern "C" void swap_init();
 extern "C" void swap_init();
 extern "C" void watchdog_init();
@@ -249,6 +251,7 @@ public:
         SovereignEther_ignite();
         SovereignSDK_enable();
         SovereignPartition_enable();
+        ZenithWebUI_ignite();
         swap_init();
         watchdog_init();
         auditlog_init();

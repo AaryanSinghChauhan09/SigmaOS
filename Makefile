@@ -150,6 +150,7 @@ KERNEL_SHARDS := \
     kernel/core/network/SovereignEther.o \
     kernel/core/hal/SovereignSDK.o \
     kernel/core/fs/SovereignPartition.o \
+    kernel/core/ui/ZenithWebUI.o \
     kernel/core/ui/SovereignWM.o \
     kernel/core/ui/SovereignFWM.o \
     kernel/core/ui/SovereignPanel.o \
