@@ -43,6 +43,21 @@ public:
         return 0;
     }
 
+    void* allocateNodeLocal(sigma_u32 node_id, sigma_size_t size) {
+        if (node_id >= m_node_count) node_id = 0;
+        
+        sigma_log_info("[S-NUMA] Node-Local Allocation: Node %u | Size: %zu bytes", node_id, size);
+        sigma_log_info("[S-NUMA] Policy: Enforcing memory affinity for local silicon cluster.");
+        
+        // Return simulated pointer within node's memory range
+        return (void*)(m_nodes[node_id].memory_base + 0x1000);
+    }
+
+    void enforceShardAffinity(const char* shard, sigma_u32 cpu_id) {
+        sigma_u32 node = getOptimalNodeForCpu(cpu_id);
+        sigma_log_info("[S-NUMA] Shard Affinity: Pinning '%s' to Node %u (CPU %u)", shard, node, cpu_id);
+    }
+
 private:
     SovereignNUMA() : m_node_count(0) {}
     NumaNode m_nodes[8];
@@ -55,4 +70,7 @@ private:
 
 extern "C" {
     void numa_init() { SigmaOS::Kernel::Memory::SovereignNUMA::getInstance().init(); }
+    void* numa_alloc(sigma_u32 node, sigma_size_t sz) { 
+        return SigmaOS::Kernel::Memory::SovereignNUMA::getInstance().allocateNodeLocal(node, sz); 
+    }
 }

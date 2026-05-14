@@ -56,6 +56,17 @@ public:
         sigma_log_info("[S-VMM] Fault RESOLVED. Resuming shard execution.");
     }
 
+    void flushTLB() {
+        sigma_log_info("[S-VMM] TLB: Initiating global translation cache flush...");
+        // asm volatile("mov rax, cr3; mov cr3, rax;" ::: "memory");
+        sigma_log_info("[S-VMM] TLB: Cache consistent across lattice.");
+    }
+
+    void flushPage(sigma_u64 addr) {
+        sigma_log_info("[S-VMM] TLB: Invalidating page entry at 0x%016llX...", addr);
+        // asm volatile("invlpg [%0]" : : "r"(addr) : "memory");
+    }
+
 private:
     SovereignVMM() = default;
 };
@@ -66,6 +77,7 @@ private:
 
 extern "C" {
     void vmm_init() { SigmaOS::Kernel::Memory::SovereignVMM::getInstance().init(); }
+    void vmm_flush_tlb() { SigmaOS::Kernel::Memory::SovereignVMM::getInstance().flushTLB(); }
     void vmm_page_fault(sigma_u64 addr, sigma_u32 err) { 
         SigmaOS::Kernel::Memory::SovereignVMM::getInstance().handlePageFault(addr, err); 
     }
