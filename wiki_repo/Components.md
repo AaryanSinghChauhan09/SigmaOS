@@ -17,9 +17,27 @@ SigmaOS v15.0 (Zenith) has reached industrial maturity through the implementatio
 - **Security**: Prevents resource exhaustion attacks at the silicon level.
 - **Compliance**: Industrial-grade sandboxing for untrusted shards.
 
-## 4. Sovereign Absorption Shards
-- **S-KALI**: Integrated security auditing and network penetration testing.
-- **S-DECL**: Pure-function declarative lattice configuration (Reproducible builds).
-- **S-NEXUS**: Global repository orchestration for 600,000+ shards.
+## 4. Sovereign Network Singularity (S-NET)
+- **Protocols**: IPv6 native stack with PQC-sealed packet integrity.
+- **Security**: S-VPN (Kyber-1024) and industrial S-ARMOR firewall rules.
+- **Connectivity**: High-throughput 802.11ax (Wi-Fi 6) and NVMe storage orchestration.
+
+## 5. Sovereign Graphics Engine (S-GPU)
+- **Acceleration**: Hardware-direct GPU orchestration (OpenGL/Vulkan).
+- **Interface**: Zenith Desktop with distraction-free, professional workspaces.
+- **Toolkit**: S-GUI GPU-accelerated industrial widget primitives.
+
+## 6. Sovereign Init Architecture (S-INIT)
+- **Resilience**: Asynchronous Shard Ignition (ASI) with service tracking and supervision.
+- **Recovery**: Automated shard rollback and watchdog-driven autonomous healing.
+
+## 7. Sovereign Security & Identity (S-ARMOR)
+- **Identity Matrix**: Industrial-grade UID/GID multi-tenant support.
+- **Compliance**: PQC-attestation for all 600 shards in the lattice.
+- **Audit**: Secure, PQC-sealed forensic audit trails for mission-critical operations.
+
+## 8. Sovereign Indian Professional Tools (S-IN-TOOLS)
+- **Finance**: GST and Income Tax (FY 2024-25) calculators (New Regime).
+- **Legal**: BNS 2023 (Bharatiya Nyaya Sanhita) legal mapping and cross-referencing.
 
 *"SigmaOS is not a project. It is the industrial single source of truth."*

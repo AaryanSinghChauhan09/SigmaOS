@@ -90,6 +90,19 @@ public:
         return tax;
     }
 
+    // --- BNS (Bharatiya Nyaya Sanhita) Legal Mapping ---
+    const char* lookupBNSSection(sigma_u32 ipc_section) {
+        sigma_log_info("[S-IN-TOOLS] Legal Audit: Mapping IPC %u to BNS 2023...", ipc_section);
+        
+        switch (ipc_section) {
+            case 302: return "BNS Section 101 (Murder)";
+            case 378: return "BNS Section 301 (Theft)";
+            case 420: return "BNS Section 316 (Cheating)";
+            case 124: return "BNS Section 150 (Acts endangering sovereignty/integrity)";
+            default:  return "BNS Mapping Pending (Industrial Shard Update Required)";
+        }
+    }
+
 private:
     SovereignIndianTools() = default;
 };
@@ -104,5 +117,8 @@ extern "C" {
     }
     void in_tools_calc_tax(sigma_u64 income) {
         SigmaOS::Kernel::Professional::SovereignIndianTools::getInstance().calculateIncomeTaxNewRegime(income);
+    }
+    const char* in_tools_lookup_bns(sigma_u32 ipc) {
+        return SigmaOS::Kernel::Professional::SovereignIndianTools::getInstance().lookupBNSSection(ipc);
     }
 }
