@@ -128,3 +128,21 @@ kernel/core/ui/SovereignFWM.cpp
 kernel/core/ui/SovereignPanel.cpp
 kernel/core/ds/SovereignDS.cpp
 kernel/core/libc/SovereignLibC.cpp
+
+# Linux-Parity Drivers & Userland
+kernel/core/drivers/gpu/SovereignAMDGPU.cpp
+kernel/core/drivers/gpu/SovereignIntelGMA.cpp
+kernel/core/drivers/gpu/SovereignNouveau.cpp
+kernel/core/drivers/wlan/SovereignAtheros.cpp
+kernel/core/drivers/wlan/SovereignRealtek.cpp
+kernel/core/drivers/wlan/SovereignIntelWIFI.cpp
+kernel/core/drivers/audio/SovereignHDAudio.cpp
+kernel/core/drivers/input/SovereignEvdev.cpp
+kernel/core/network/SovereignIPv6.cpp
+kernel/core/network/SovereignNftables.cpp
+kernel/core/userland/SovereignBusyBox.cpp
+kernel/core/userland/SovereignCoreUtils.cpp
+kernel/core/security/SovereignUserAccounts.cpp
+kernel/core/ui/SovereignDesktop.cpp
+kernel/core/drivers/network/SovereignBluetooth.cpp
+kernel/core/drivers/network/SovereignIrDA.cpp

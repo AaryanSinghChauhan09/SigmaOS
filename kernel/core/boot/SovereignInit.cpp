@@ -64,6 +64,21 @@ extern "C" void audit_init();
 extern "C" void ima_init();
 extern "C" void kvm_init();
 extern "C" void lxc_init();
+extern "C" void amdgpu_init();
+extern "C" void intelgma_init();
+extern "C" void nouveau_init();
+extern "C" void atheros_init();
+extern "C" void realtek_init();
+extern "C" void intelwifi_init();
+extern "C" void hdaudio_init();
+extern "C" void evdev_init();
+extern "C" void nftables_init();
+extern "C" void busybox_init();
+extern "C" void coreutils_init();
+extern "C" void useraccounts_init();
+extern "C" void desktop_init();
+extern "C" void bluetooth_init();
+extern "C" void irda_init();
 
 /**
  * SigmaOS Sovereign Init Implementation (v15.0 Zenith)
@@ -159,6 +174,22 @@ public:
         kvm_init();
         container_init();
         lxc_init();
+        
+        amdgpu_init();
+        intelgma_init();
+        nouveau_init();
+        atheros_init();
+        realtek_init();
+        intelwifi_init();
+        hdaudio_init();
+        evdev_init();
+        nftables_init();
+        busybox_init();
+        coreutils_init();
+        useraccounts_init();
+        desktop_init();
+        bluetooth_init();
+        irda_init();
 
         sigma_log_info("[INIT] ASI: Total Singularity Achieved. 750+ Industrial Shards Active.\n");
     }

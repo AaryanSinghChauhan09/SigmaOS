@@ -1,37 +1,24 @@
 #include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
-#include "sigma_log.h"
-
-/**
- * SigmaOS Sovereign IPv6 Shard (S-IPV6)
- * Implementation: Next-generation internet protocol.
- * Mission: Enable modern IPv6 connectivity and SLAAC.
- * Absorbed: Linux IPv6 stack patterns.
- */
+#include "observability/sigma_log.h"
 
 namespace SigmaOS {
 namespace Kernel {
-namespace Network {
+namespace Drivers {
 
-class SovereignIPv6 : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignIPv6> {
-    friend class SigmaOS::SigmaSingleton<SovereignIPv6>;
-public:
-    const char* type_name() const noexcept override { return "SovereignIPv6"; }
-
-    void init() {
-        sigma_log_info("[S-IPV6] Initializing IPv6 Stack...");
-        sigma_log_info("[S-IPV6] Link-local autoconfiguration (SLAAC) ACTIVE.");
+class SovereignIPv6 : public SigmaObject, public SigmaSingleton<SovereignIPv6> {
+    friend class SigmaSingleton<SovereignIPv6>;
+private:
+    SovereignIPv6() {
+        sigma_syslog("[SOVEREIGN] SovereignIPv6 Shard initialized in strict isolation.");
     }
 
-private:
-    SovereignIPv6() = default;
+public:
+    void Probe() {
+        sigma_syslog("[SOVEREIGN] SovereignIPv6: Probing hardware/subsystem...");
+    }
 };
 
-} // namespace Network
-} // namespace Kernel
-} // namespace SigmaOS
-
-extern "C" {
-    void ipv6_init() { SigmaOS::Kernel::Network::SovereignIPv6::getInstance().init(); }
-}
-
+} // Drivers
+} // Kernel
+} // SigmaOS

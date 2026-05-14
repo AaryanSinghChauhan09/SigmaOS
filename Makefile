@@ -103,6 +103,22 @@ KERNEL_SHARDS := \
     kernel/core/drivers/SovereignIXGBE.o \
     kernel/core/drivers/SovereignWLAN.o \
     kernel/core/drivers/SovereignWPAN.o \
+    kernel/core/drivers/gpu/SovereignAMDGPU.o \
+    kernel/core/drivers/gpu/SovereignIntelGMA.o \
+    kernel/core/drivers/gpu/SovereignNouveau.o \
+    kernel/core/drivers/wlan/SovereignAtheros.o \
+    kernel/core/drivers/wlan/SovereignRealtek.o \
+    kernel/core/drivers/wlan/SovereignIntelWIFI.o \
+    kernel/core/drivers/audio/SovereignHDAudio.o \
+    kernel/core/drivers/input/SovereignEvdev.o \
+    kernel/core/drivers/network/SovereignBluetooth.o \
+    kernel/core/drivers/network/SovereignIrDA.o \
+    kernel/core/network/SovereignIPv6.o \
+    kernel/core/network/SovereignNftables.o \
+    kernel/core/userland/SovereignBusyBox.o \
+    kernel/core/userland/SovereignCoreUtils.o \
+    kernel/core/security/SovereignUserAccounts.o \
+    kernel/core/ui/SovereignDesktop.o \
     kernel/core/ui/SovereignWM.o \
     kernel/core/ui/SovereignFWM.o \
     kernel/core/ui/SovereignPanel.o \
