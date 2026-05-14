@@ -1,7 +1,7 @@
 #include "sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "sigma_types.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 
 /**
  * S-TOOLS: Sovereign Utility Engine (v28.0 Zenith)

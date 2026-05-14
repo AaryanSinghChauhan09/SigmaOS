@@ -1,4 +1,4 @@
-#include "../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 #include <stdarg.h>
 
 extern "C" {

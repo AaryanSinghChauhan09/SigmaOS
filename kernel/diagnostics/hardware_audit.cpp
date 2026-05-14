@@ -1,9 +1,9 @@
 #include "Lattice.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "SovereignLibC.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "hardware_audit.hpp"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 
 namespace SigmaOS {
 namespace Diagnostics {

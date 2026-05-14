@@ -1,12 +1,12 @@
 #include "sigma_types.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 
 #include "sigma_quickact.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "sigma_neuralsearch.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 
 
 

@@ -1,9 +1,9 @@
-#include "../../include/sigma_ux.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_ux.h"
+#include "sigma_log.h"
 #include "sigma_gui.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Sovereign UX Implementation

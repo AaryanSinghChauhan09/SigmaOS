@@ -4,9 +4,9 @@
  * Context-aware Zenith UI personalisation for industrial shards
  * ============================================================
  */
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 
 typedef struct {
     sigma_u8 r, g, b, a;

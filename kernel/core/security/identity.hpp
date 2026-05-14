@@ -2,7 +2,7 @@
 #define SOVEREIGN_IDENTITY_HPP
 
 #include "sigma_types.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Security {

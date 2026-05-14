@@ -1,15 +1,15 @@
 #include "sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "sigma_types.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "sigma_deeplink.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "sigma_process.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "sigma_lazyload.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Sovereign Deep Linking

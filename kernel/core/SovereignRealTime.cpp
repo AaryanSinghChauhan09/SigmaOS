@@ -1,9 +1,9 @@
 #include "sigma_types.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "sigma_realtime.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Sovereign Real-Time Core

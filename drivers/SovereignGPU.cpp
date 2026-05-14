@@ -1,5 +1,5 @@
 #include "sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Sovereign GPU Driver (v28.0 Zenith)

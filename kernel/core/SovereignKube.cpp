@@ -1,9 +1,9 @@
 #include "sigma_types.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "sigma_kube.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Sovereign Kernel-Native Orchestrator (v28.0 Zenith)

@@ -1,6 +1,6 @@
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
 
 /**
  * Σ SIGMAOS: SOVEREIGN INTELLIGENCE (v15.0)

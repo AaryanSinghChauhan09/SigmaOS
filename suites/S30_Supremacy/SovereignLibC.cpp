@@ -1,7 +1,7 @@
 #include "sigma_libc.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "sigma_types.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 
 // --- sigma_print ---
 void sigma_print(const char* str) {

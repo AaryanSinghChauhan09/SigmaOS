@@ -1,8 +1,8 @@
-#include "../../../include/core/SigmaOOP.hpp"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "core/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
 
 /* Forward declarations for Zenith functional layers */
 extern "C" void allocator_init();
@@ -51,32 +51,34 @@ public:
         sigma_log_info("[S-INIT] ASI: Orchestrating Industrial Zenith Singularity...");
 
         // 1. Critical Core (No dependencies)
-        startService("Memory", allocator_init, nullptr);
-        startService("NUMA", numa_init, "Memory");
-        startService("NX-Security", nx_init, "Memory");
-        startService("ASLR", aslr_init, "NX-Security");
+        registerAndStart("Memory", allocator_init, nullptr);
+        registerAndStart("NUMA", numa_init, "Memory");
+        registerAndStart("NX-Security", nx_init, "Memory");
+        registerAndStart("ASLR", aslr_init, "NX-Security");
         
         // 2. Storage & Hardware
-        startService("ATA", ata_init, "Memory");
-        startService("SATA", [](){ sata_init(0xFEA00000); }, "ATA");
-        startService("NVMe", [](){ nvme_init(0xFD000000); }, "Memory");
-        startService("USB", [](){ usb_init(0xFE000000); }, "Memory");
-        startService("Audio", audio_init, "Memory");
-        startService("Input", kbd_init, "Memory");
+        registerAndStart("ATA", ata_init, "Memory");
+        registerAndStart("SATA", [](){ sata_init(0xFEA00000); }, "ATA");
+        registerAndStart("NVMe", [](){ nvme_init(0xFD000000); }, "Memory");
+        registerAndStart("USB", [](){ usb_init(0xFE000000); }, "Memory");
+        registerAndStart("Audio", audio_init, "Memory");
+        registerAndStart("Input", kbd_init, "Memory");
         
         // 3. Network & Persistence
-        startService("NetStack", net_init, "Memory");
-        startService("VFS", vfs_init, "SATA");
-        startService("RootFS", [](){ ext2_mount("/dev/sda1"); }, "VFS");
+        registerAndStart("NetStack", net_init, "Memory");
+        registerAndStart("VFS", vfs_init, "SATA");
+        registerAndStart("RootFS", [](){ ext2_mount("/dev/sda1"); }, "VFS");
         
         // 4. Userland & Management
-        startService("Identity", useraccounts_init, "RootFS");
-        startService("PkgManager", pkg_init, "RootFS");
-        startService("WindowMgr", wm_init, "Identity");
+        registerAndStart("Identity", useraccounts_init, "RootFS");
+        registerAndStart("PkgManager", pkg_init, "RootFS");
+        registerAndStart("WindowMgr", wm_init, "Identity");
         
         // 5. Watchdogs & Auditing
-        startService("Watchdog", watchdog_init, "Memory");
-        startService("AuditLog", auditlog_init, "RootFS");
+        registerAndStart("Watchdog", watchdog_init, "Memory");
+        registerAndStart("AuditLog", auditlog_init, "RootFS");
+
+        supervise();
 
         sigma_log_info("[S-INIT] ASI: Total Singularity Achieved. All dependencies resolved.\n");
     }
@@ -84,20 +86,44 @@ public:
 private:
     SovereignInitEngine() : m_service_count(0) {}
 
-    void startService(const char* name, void (*fn)(), const char* dep) {
-        sigma_log_info("[S-INIT] Starting Service: %s (Depends: %s)", name, dep ? dep : "NONE");
-        
-        // Dependency Check (Simulated)
-        if (dep) {
-            sigma_log_info("[S-INIT] Dependency '%s' satisfied.", dep);
+    bool isServiceActive(const char* name) {
+        if (!name) return true;
+        for (sigma_u32 i = 0; i < m_service_count; i++) {
+            if (sigma_strcmp(m_registry[i].name, name) == 0) return m_registry[i].active;
+        }
+        return false;
+    }
+
+    void registerAndStart(const char* name, void (*fn)(), const char* dep) {
+        if (m_service_count >= 128) return;
+
+        SovereignService& s = m_registry[m_service_count++];
+        s.name = name;
+        s.ignite_fn = fn;
+        s.depends_on = dep;
+        s.active = false;
+
+        if (!isServiceActive(dep)) {
+            sigma_log_error("[S-INIT] Cannot start '%s': Dependency '%s' MISSING.", name, dep);
+            return;
         }
 
-        try {
-            fn();
-            sigma_log_info("[S-INIT] Service '%s' ACTIVE.", name);
-        } catch (...) {
-            sigma_log_error("[S-INIT] Service '%s' FAILED. Triggering recovery routine...", name);
-            recoverService(name);
+        sigma_log_info("[S-INIT] Ignite: %s (Dep: %s OK)", name, dep ? dep : "NONE");
+        
+        // In kernel we don't use try/catch. We rely on hardware faults or status returns.
+        fn(); 
+        s.active = true;
+        sigma_log_info("[S-INIT] Service '%s' is now ACTIVE.", name);
+    }
+
+    void supervise() {
+        sigma_log_info("[S-INIT] Supervision: Shard watchdog active. Monitoring lattice health...");
+        for (sigma_u32 i = 0; i < m_service_count; i++) {
+            if (!m_registry[i].active) {
+                sigma_log_warn("[S-INIT] Supervision: Service '%s' is DOWN. Restarting...", m_registry[i].name);
+                m_registry[i].ignite_fn();
+                m_registry[i].active = true;
+            }
         }
     }
 

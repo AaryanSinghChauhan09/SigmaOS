@@ -1,7 +1,7 @@
 #ifndef NCERT_CHEMISTRY_HPP
 #define NCERT_CHEMISTRY_HPP
 
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 #include "ncert_base.hpp"
 

@@ -1,9 +1,9 @@
 #include "SovereignSyncZenith.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "SovereignDiskZenith.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "SovereignOSBasicsZenith.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 
 namespace SigmaOS {
 

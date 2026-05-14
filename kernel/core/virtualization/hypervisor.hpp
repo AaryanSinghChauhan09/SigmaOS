@@ -1,10 +1,10 @@
 #ifndef SOVEREIGN_HYPERVISOR_HPP
 #define SOVEREIGN_HYPERVISOR_HPP
 
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
 #include "sigma_types.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

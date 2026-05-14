@@ -1,7 +1,7 @@
 #include "Lattice.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "SovereignLibC.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN COSMIC GOVERNANCE (v1.0 - GALAXY POLICY)
@@ -11,9 +11,9 @@
  */
 
 #include "SigmaOOP.hpp"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "userland/apps/cosmic_governance/policies.hpp"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 
 using namespace SigmaOS;
 

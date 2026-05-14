@@ -1,9 +1,9 @@
 #ifndef AMNESIC_LOGGER_HPP
 #define AMNESIC_LOGGER_HPP
 
-#include "../../../include/SovereignLibC.h"
+#include "SovereignLibC.h"
 
-#include "../../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Security {
