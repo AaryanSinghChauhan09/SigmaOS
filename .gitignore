@@ -1,12 +1,19 @@
-# Σ SIGMAOS: SOVEREIGN GITIGNORE
-build/
+# Build artifacts
 *.o
-*.a
 *.bin
 *.iso
-.DS_Store
+*.elf
+
+# Editor/IDE
 .vscode/
-.idea/
-*.log
-tmp/
+.cache/
+*.swp
+*.swo
+
+# OS junk
+Thumbs.db
+.DS_Store
+
+# Temp scripts
+patch.py
 *.tmp

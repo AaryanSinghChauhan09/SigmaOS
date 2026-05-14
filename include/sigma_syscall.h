@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SYSTEM CALL GATE (SSG)
+ * SIGMAOS: SOVEREIGN SYSTEM CALL GATE (SSG) v2.0
  * =========================================================================
  * Mission: Zero-latency, interrupt-driven shard transitions.
  * =========================================================================
@@ -22,7 +22,19 @@ typedef enum {
     SIGMA_SYS_FREE     = 0x04,
     SIGMA_SYS_SEND     = 0x05,
     SIGMA_SYS_RECEIVE  = 0x06,
-    SIGMA_SYS_VFS_OPEN = 0x07
+    SIGMA_SYS_VFS_OPEN = 0x07,
+    /* FIX: Missing syscall IDs now defined */
+    SIGMA_SYS_EXIT     = 0x08,
+    SIGMA_SYS_READ     = 0x09,
+    SIGMA_SYS_WRITE    = 0x0A,
+    SIGMA_SYS_CLOSE    = 0x0B,
+    SIGMA_SYS_FORK     = 0x0C,
+    SIGMA_SYS_EXEC     = 0x0D,
+    SIGMA_SYS_WAIT     = 0x0E,
+    SIGMA_SYS_GETPID   = 0x0F,
+    SIGMA_SYS_KILL     = 0x10,
+    SIGMA_SYS_MMAP     = 0x11,
+    SIGMA_SYS_MUNMAP   = 0x12
 } sigma_syscall_id_t;
 
 /* --- System Call Primitives --- */

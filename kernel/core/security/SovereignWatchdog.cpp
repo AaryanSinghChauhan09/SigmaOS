@@ -1,35 +1,65 @@
+// =============================================================================
+// SigmaOS  kernel/core/security  SovereignWatchdog.cpp  v2.0
+// Hardware Watchdog + Atomic Rollback on kernel deadlock
+// =============================================================================
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 #include "core/SigmaOOP.hpp"
+
+/* Forward declaration of rollback (defined in SovereignRollback.cpp) */
+extern "C" void rollback_execute(void);
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Security {
 
-class SovereignWatchdog : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignWatchdog> {
+class SovereignWatchdog
+    : public SigmaOS::SigmaObject
+    , public SigmaOS::SigmaSingleton<SovereignWatchdog>
+{
     friend class SigmaOS::SigmaSingleton<SovereignWatchdog>;
 public:
     const char* type_name() const noexcept override { return "SovereignWatchdog"; }
 
-    void init() {
-        sigma_log_info("[WATCHDOG:CORE] Initializing Sovereign Industrial Watchdog...");
-        sigma_log_info("[WATCHDOG:CORE] Fallback State: ATOMIC ROLLBACK.");
-        sigma_log_info("[WATCHDOG:CORE] Heartbeat Monitoring: ACTIVE.");
+    void init(sigma_u32 timeout_ms = 5000) {
+        m_timeout_ms = timeout_ms;
+        m_counter    = 0;
+        m_triggered  = SIGMA_FALSE;
+        sigma_log("[WATCHDOG] Sovereign Industrial Watchdog v2.0 initialized.");
+        sigma_log_info("[WATCHDOG] Timeout: %u ms | Fallback: ATOMIC ROLLBACK\n", m_timeout_ms);
+        sigma_log("[WATCHDOG] Heartbeat monitoring ACTIVE.");
     }
 
+    /* Called periodically by the scheduler - resets the counter */
     void feed() {
-        // Heartbeat signal received from Sovereign scheduler
-        sigma_log_info("[WATCHDOG:FEED] Heartbeat verified.");
+        m_counter = 0;
+        sigma_log("[WATCHDOG] Heartbeat OK.");
     }
+
+    /* Called on each timer tick - increments counter, triggers on expiry */
+    void tick(sigma_u32 elapsed_ms) {
+        if (m_triggered) return;
+        m_counter += elapsed_ms;
+        if (m_counter >= m_timeout_ms) {
+            onTimeout();
+        }
+    }
+
+    bool isTriggered() const { return m_triggered != SIGMA_FALSE; }
+
+private:
+    sigma_u32 m_timeout_ms;
+    sigma_u32 m_counter;
+    sigma_bool m_triggered;
 
     void onTimeout() {
-        sigma_log_err("[WATCHDOG:FAIL] HEARTBEAT LOST! Potential kernel deadlock detected.");
-        sigma_log_info("[WATCHDOG:FAIL] Triggering Sovereign Atomic Rollback...");
-        
-        extern "C" void rollback_execute();
+        m_triggered = SIGMA_TRUE;
+        sigma_log_err("[WATCHDOG CRITICAL] HEARTBEAT LOST - kernel deadlock suspected!");
+        sigma_log("[WATCHDOG CRITICAL] Initiating Sovereign Atomic Rollback...");
         rollback_execute();
-        
-        sigma_log_info("[WATCHDOG:FAIL] System state restored. Resuming industrial execution.");
+        sigma_log("[WATCHDOG CRITICAL] Rollback complete. Resuming sovereign execution.");
+        m_triggered = SIGMA_FALSE;
+        m_counter   = 0;
     }
 };
 
@@ -37,8 +67,18 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
+/* --- C Bridge --- */
 extern "C" {
-    void watchdog_init() {
-        SigmaOS::Kernel::Security::SovereignWatchdog::getInstance().init();
+    void watchdog_init(sigma_u32 timeout_ms) {
+        SigmaOS::Kernel::Security::SovereignWatchdog::getInstance().init(timeout_ms);
+    }
+    void watchdog_feed() {
+        SigmaOS::Kernel::Security::SovereignWatchdog::getInstance().feed();
+    }
+    void watchdog_tick(sigma_u32 elapsed_ms) {
+        SigmaOS::Kernel::Security::SovereignWatchdog::getInstance().tick(elapsed_ms);
+    }
+    int watchdog_triggered() {
+        return SigmaOS::Kernel::Security::SovereignWatchdog::getInstance().isTriggered() ? 1 : 0;
     }
 }

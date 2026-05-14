@@ -1,59 +1,60 @@
 #ifndef MEMORY_MANAGER_HPP
 #define MEMORY_MANAGER_HPP
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
 
-/*
- * =========================================================================
- * SIGMAOS: CORE MEMORY ABSTRACTION (SOLID: Interface Segregation)
- * =========================================================================
- */
+/* =========================================================================
+ * SIGMAOS: SOVEREIGN MEMORY ABSTRACTION v2.0 (SOLID: ISP)
+ * ========================================================================= */
 class IAllocator : public SigmaObject {
 public:
     virtual void* allocate(sigma_size_t size) = 0;
-    virtual void deallocate(void* ptr) = 0;
-    virtual void audit() = 0;
+    virtual void  deallocate(void* ptr) = 0;
+    virtual void  audit() const = 0;
 };
 
 struct MemorySegment {
-    sigma_u64 start_addr;
+    sigma_u64    start_addr;
     sigma_size_t size;
-    sigma_bool allocated;
+    sigma_bool   allocated;
 };
 
-/*
- * =========================================================================
- * SOVEREIGN SLAB ALLOCATOR (Industrial-Grade, Amnesic-Enabled)
- * =========================================================================
- */
+/* =========================================================================
+ * SOVEREIGN SLAB ALLOCATOR v2.0
+ * - 8-byte aligned buddy splitting
+ * - Amnesic wipe on free (sigma_secure_memset)
+ * - Double-free detection with address tracking
+ * - Automatic coalescing of adjacent free blocks
+ * ========================================================================= */
 class SovereignMemoryManager : public IAllocator {
 private:
-    static constexpr sigma_size_t INITIAL_POOL_SIZE = 1024 * 1024 * 128; // 128 MB Shard
-    sigma_u8* m_pool;
+    static constexpr sigma_size_t INITIAL_POOL_SIZE = 1024ULL * 1024ULL * 128ULL; /* 128 MB */
+    static constexpr sigma_size_t MAX_SEGMENTS      = 2048;
+
+    sigma_u8*    m_pool;
     sigma_size_t m_used;
-    MemorySegment m_segments[2048]; // Increased capacity for industrial sharding
+    MemorySegment m_segments[MAX_SEGMENTS];
     sigma_size_t m_segment_count;
 
-    void coalesce(); // Internal optimization
+    void coalesce();
 
 public:
     SovereignMemoryManager();
     const char* type_name() const noexcept override { return "SovereignMemoryManager"; }
 
     void* allocate(sigma_size_t size) override;
-    void deallocate(void* ptr) override;
-    void audit() override;
-    
-    // Encapsulation: State accessors
-    sigma_size_t used_memory() const { return m_used; }
+    void  deallocate(void* ptr) override;
+    void  audit() const override;
+
+    sigma_size_t used_memory()          const { return m_used; }
     sigma_size_t fragmentation_factor() const;
 };
 
 } // namespace Kernel
 } // namespace SigmaOS
 
-#endif
+#endif /* MEMORY_MANAGER_HPP */

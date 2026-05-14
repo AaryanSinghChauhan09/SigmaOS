@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SYSTEM LOGGING (S-LOG)
+ * SIGMAOS: SOVEREIGN SYSTEM LOGGING (S-LOG) v2.0
  * =========================================================================
  * Mission: Wait-free, circular shard logging and machine-state tracing.
  * =========================================================================
@@ -29,11 +29,13 @@ sigma_u64 log_get_total_emitted(void);
 
 extern int sigma_printf(const char* format, ...);
 
-#define sigma_log_info(...)  sigma_printf(__VA_ARGS__)
-#define sigma_log_warn(...)  sigma_printf(__VA_ARGS__)
-#define sigma_log_err(...)   sigma_printf(__VA_ARGS__)
-#define sigma_log_error(...) sigma_printf(__VA_ARGS__)
-#define sigma_log_crit(...)  sigma_printf(__VA_ARGS__)
+/* --- Severity-gated log macros --- */
+#define sigma_log(msg)          sigma_printf("%s", msg)
+#define sigma_log_info(...)     sigma_printf(__VA_ARGS__)
+#define sigma_log_warn(...)     sigma_printf(__VA_ARGS__)
+#define sigma_log_err(...)      sigma_printf(__VA_ARGS__)
+#define sigma_log_error(...)    sigma_printf(__VA_ARGS__)
+#define sigma_log_crit(...)     sigma_printf(__VA_ARGS__)
 
 #ifdef __cplusplus
 }

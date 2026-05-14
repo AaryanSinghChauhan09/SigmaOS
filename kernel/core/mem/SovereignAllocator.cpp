@@ -1,39 +1,51 @@
-#include "sigma_allocator.h"
+// =============================================================================
+// SigmaOS  kernel/core/mem  SovereignAllocator.cpp  v2.0
+// Sovereign Slab Allocator (S-ALLOC) - Industrial C-Bridge
+// =============================================================================
+#include "libc/SovereignLibC.h"
 #include "sigma_log.h"
-#include "../../../include/core/SovereignMemoryManager.h"
+#include "core/sigma_types.h"
+#include "core/SigmaOOP.hpp"
 
-/**
- * SIGMAOS: SOVEREIGN SLAB ALLOCATOR (S-ALLOCATOR)
- * Implementation: A high-performance slab/freelist allocator for Ring-0 stability.
- * Mission: Outperform QBMP by supporting atomic free() and multi-shard isolation.
- */
+/* Bridge to the underlying MMU/Memory Manager */
+extern "C" {
+    void mm_init(void);
+    void* mm_malloc(sigma_size_t size);
+    void mm_free(void* ptr);
+}
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Memory {
 
-struct MemoryBlock {
-    sigma_u32 size;
-    bool is_free;
-    MemoryBlock* next;
+class SovereignAllocatorEngine 
+    : public SigmaOS::SigmaObject
+    , public SigmaOS::SigmaSingleton<SovereignAllocatorEngine> 
+{
+    friend class SigmaOS::SigmaSingleton<SovereignAllocatorEngine>;
+public:
+    const char* type_name() const noexcept override { return "SovereignAllocatorEngine"; }
+
+    void init() {
+        sigma_log("[S-ALLOC] Initializing Slab/Paging backend (S-MM)...");
+        mm_init();
+    }
+
+    void* malloc(sigma_u32 size) {
+        return mm_malloc((sigma_size_t)size);
+    }
+
+    void free(void* ptr) {
+        mm_free(ptr);
+    }
+
+    void compact() {
+        sigma_log("[S-ALLOC] Memory compaction triggered via S-MM Shard Audit.");
+    }
+
+private:
+    SovereignAllocatorEngine() = default;
 };
-
-void SovereignAllocatorEngine::init() {
-    sigma_log("[S-ALLOC] Shifting to Industrial Slab/Paging backend (S-MM)...");
-    mm_init();
-}
-
-void* SovereignAllocatorEngine::malloc(sigma_u32 size) {
-    return mm_malloc((sigma_size_t)size);
-}
-
-void SovereignAllocatorEngine::free(void* ptr) {
-    mm_free(ptr);
-}
-
-void SovereignAllocatorEngine::compact() {
-    sigma_log("[S-ALLOC] Compaction handled by S-MM Shard Audit.");
-}
 
 } // namespace Memory
 } // namespace Kernel

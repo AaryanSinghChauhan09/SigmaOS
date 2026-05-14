@@ -58,6 +58,9 @@ void  sigma_print_hex(sigma_u64 val);
 void* sigma_secure_memset(void* ptr, int ch, sigma_size_t n); // Prevents compiler optimization removals
 void  sigma_hardened_strcpy(char* dest, const char* src, sigma_size_t dest_size); // Bounds-checked strcpy
 int   sigma_hardened_strcmp(const char* str1, const char* str2);
+
+/* Convenience alias - maps to hardened implementation */
+static inline int sigma_strcmp(const char* a, const char* b) { return sigma_hardened_strcmp(a, b); }
 char* sigma_hardened_strstr(const char* haystack, const char* needle);
 int   sigma_hardened_strncmp(const char* str1, const char* str2, sigma_size_t n);
 
@@ -86,4 +89,5 @@ static inline void  kfree(void* ptr) { sigma_free(ptr); }
 #endif
 
 #endif /* SOVEREIGN_LIBC_H */
+
 

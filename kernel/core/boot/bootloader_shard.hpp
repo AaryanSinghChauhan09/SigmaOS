@@ -1,10 +1,9 @@
-#include "sigma_log.h"
-#include "hal/sigma_hal.h"
 #ifndef BOOTLOADER_SHARD_HPP
 #define BOOTLOADER_SHARD_HPP
 
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
 #include "libc/SovereignLibC.h"
-
 #include "core/sigma_types.h"
 #include "core/SigmaOOP.hpp"
 
@@ -43,4 +42,3 @@ public:
 } // namespace SigmaOS
 
 #endif
-
