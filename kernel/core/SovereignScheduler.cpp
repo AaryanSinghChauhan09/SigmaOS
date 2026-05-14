@@ -1,6 +1,6 @@
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "libc/SovereignLibC.h"
+#include "../include/core/sigma_types.h"
+#include "../include/sigma_log.h"
+#include "../include/libc/SovereignLibC.h"
 
 /* =========================================================================
  * SIGMAOS: SOVEREIGN PREDICTIVE SCHEDULER (S-Sched) v2.0
@@ -41,17 +41,17 @@ public:
     }
 
     void init() {
-        sigma_log("[SCHED] Initializing Sovereign Round-Robin Scheduler v2.0...");
+        sigma_log_info("[SCHED] Initializing Sovereign Round-Robin Scheduler v2.0...");
         this->total_procs = 0;
         this->current_idx = 0;
         this->context_switches = 0;
         sigma_memset(this->procs, 0, sizeof(this->procs));
-        sigma_log("[SCHED] Multi-priority queues ACTIVE. Process isolation: CR3-per-process.");
+        sigma_log_info("[SCHED] Multi-priority queues ACTIVE. Process isolation: CR3-per-process.");
     }
 
     sigma_u32 spawn(const char* name, SigmaPriority prio) {
         if (this->total_procs >= MAX_PROCS) {
-            sigma_log("[SCHED] WARN: Process table full.");
+            sigma_log_info("[SCHED] WARN: Process table full.");
             return SIGMA_ERROR;
         }
         sigma_u32 idx = this->total_procs++;

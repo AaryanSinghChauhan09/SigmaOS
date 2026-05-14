@@ -12,15 +12,13 @@ SigmaOS is not a derivative of Linux, Windows, or any existing monolithic archit
 - **Shard Autonomy:** Each system component is an independent, hot-swappable lattice shard.
 
 ### Core Pillars
-- **S-ROLLBACK:** Continuous state snapshotting for absolute resilience.
-- **S-WATCHDOG:** Atomic hardware-level deadlock recovery.
-- **S-PQC:** Post-Quantum Cryptographic sealing for all data and communications.
-- **S-INDIA:** Professional suites tailored for the Indian industrial landscape.
+- [Architecture Overview](Architecture.md)
+- [Sovereignty Declaration](../SOVEREIGNTY.md)
+- [Lattice Shard Manifest](SHARD_MANIFEST.md)
+- [Industrial Profiles](Industrial-Profiles.md)
 
 ### Navigation
-- [Architecture Overview](Architecture.md)
 - [Installation Guide](Installation.md)
-- [Lattice Shard Manifest](SHARD_MANIFEST.md)
 - [Sovereign Security Framework](Sovereign-Security-Framework.md)
 
 *"The future is not a distribution. The future is Sovereign."*
