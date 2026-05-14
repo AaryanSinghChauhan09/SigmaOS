@@ -43,6 +43,15 @@ kernel/core/system/SovereignSystemD.cpp
 kernel/core/fs/SovereignLatticeFS.cpp
 kernel/core/fs/SovereignExt2.cpp
 kernel/core/fs/SovereignZFS.cpp
+kernel/core/fs/SovereignBcacheFS.cpp
+kernel/core/fs/SovereignFAT.cpp
+kernel/core/fs/SovereignNTFS.cpp
+kernel/core/fs/SovereignExt4.cpp
+kernel/core/fs/SovereignXFS.cpp
+kernel/core/fs/SovereignLegacyFS.cpp
+kernel/core/fs/SovereignOpticalFS.cpp
+kernel/core/fs/SovereignNetFS.cpp
+kernel/core/fs/SovereignTmpFS.cpp
 kernel/core/network/SovereignNetStack.cpp
 kernel/core/network/SovereignTCPIP.cpp
 kernel/core/network/SovereignIPv6.cpp

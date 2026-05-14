@@ -41,6 +41,15 @@ extern "C" void ppp_init();
 extern "C" void dhcp_init();
 extern "C" void vnet_init();
 extern "C" void secnet_init();
+extern "C" void bcachefs_init();
+extern "C" void fat_init();
+extern "C" void ntfs_init();
+extern "C" void ext4_init();
+extern "C" void xfs_init();
+extern "C" void legacyfs_init();
+extern "C" void opticalfs_init();
+extern "C" void netfs_init();
+extern "C" void tmpfs_init();
 
 /**
  * SigmaOS Sovereign Init Implementation (v15.0 Zenith)
@@ -101,9 +110,19 @@ public:
         firewall_init();
         secnet_init();
         
-        // Layer 4: Persistence & Userland
+        // Layer 4: Persistence, File Systems & Userland
         vfs_init();
-        ext2_mount("/dev/sda1");
+        bcachefs_init();
+        fat_init();
+        ntfs_init();
+        ext4_init();
+        xfs_init();
+        legacyfs_init();
+        opticalfs_init();
+        netfs_init();
+        tmpfs_init();
+        ext2_mount("/dev/sda1"); // Root mount
+        
         pkg_init();
         wm_init();
         
@@ -111,7 +130,7 @@ public:
         hyp_init();
         container_init();
 
-        sigma_log_info("[INIT] ASI: Total Singularity Achieved. 720+ Industrial Shards Active.\n");
+        sigma_log_info("[INIT] ASI: Total Singularity Achieved. 730+ Industrial Shards Active.\n");
     }
 
 private:

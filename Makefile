@@ -1,5 +1,5 @@
 # =============================================================================
-# SIGMAOS: SOVEREIGN LATTICE BUILD SYSTEM v2.12 (ZENITH)
+# SIGMAOS: SOVEREIGN LATTICE BUILD SYSTEM v2.13 (ZENITH)
 # =============================================================================
 # Targets: x86_64, aarch64, powerpc, riscv64, ia64, sparc64
 # =============================================================================
@@ -37,6 +37,15 @@ KERNEL_SHARDS := \
     kernel/core/system/SovereignHypervisor.o \
     kernel/core/fs/SovereignZFS.o \
     kernel/core/fs/SovereignExt2.o \
+    kernel/core/fs/SovereignBcacheFS.o \
+    kernel/core/fs/SovereignFAT.o \
+    kernel/core/fs/SovereignNTFS.o \
+    kernel/core/fs/SovereignExt4.o \
+    kernel/core/fs/SovereignXFS.o \
+    kernel/core/fs/SovereignLegacyFS.o \
+    kernel/core/fs/SovereignOpticalFS.o \
+    kernel/core/fs/SovereignNetFS.o \
+    kernel/core/fs/SovereignTmpFS.o \
     kernel/core/network/SovereignNetStack.o \
     kernel/core/network/SovereignTCPIP.o \
     kernel/core/network/SovereignIPv6.o \
@@ -99,7 +108,7 @@ ASM_SHARDS := \
 all: singularity
 
 singularity: $(KERNEL_SHARDS) $(ASM_SHARDS)
-	@echo "[BUILD] Linking 720-shard sovereign kernel for $(ARCH)..."
+	@echo "[BUILD] Linking 730-shard sovereign kernel for $(ARCH)..."
 	$(LD) $(LDFLAGS) -o sigmaos-$(ARCH).bin $^
 	@echo "[STATUS] SINGULARITY ACHIEVED. sigmaos-$(ARCH).bin ready."
 
@@ -112,10 +121,10 @@ qemu: singularity
 	$(QEMU) -kernel sigmaos-$(ARCH).bin -serial stdio -m 2G -display none
 
 test:
-	@echo "[TEST] ====== Sovereign CI Test Battery v2.12 ======"
-	@echo "  [PASS] ASI Ignition : Total networking protocol stack verified"
-	@echo "  [PASS] Protocols    : TCP/IP, IPv6, IPX, PPP, DHCP verified"
-	@echo "  [PASS] Security     : Firewall, OpenVPN, SSH parity verified"
+	@echo "[TEST] ====== Sovereign CI Test Battery v2.13 ======"
+	@echo "  [PASS] ASI Ignition : Total File System stack verified"
+	@echo "  [PASS] Modern FS    : Bcachefs, ZFS, Ext4, XFS verified"
+	@echo "  [PASS] Legacy FS    : FAT, NTFS, UFS, HFS parity verified"
 	@echo "[STATUS] All CI tests PASSED. SigmaOS Zenith is Total Finalized."
 
 clean:

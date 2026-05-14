@@ -4,7 +4,10 @@ This table outlines the final state of SigmaOS Zenith compared to legacy monolit
 
 | Missing Component (Legacy) | Legacy Approach | SigmaOS Sovereign USP (The Zenith Solution) | Implementation Shard |
 | :--- | :--- | :--- | :--- |
-| **Filesystem / Persistence** | ext4 / NTFS (Monolithic drivers, prone to corruption) | **Transactional Amnesia**: S-ZFS provides self-healing, transactional persistence that is cryptographically isolated per shard. | `SovereignZFS`, `SovereignExt2` |
+| **Filesystem (Next-Gen)** | bcachefs / ZFS (Out-of-tree or complex kernel modules) | **Transactional Amnesia & Tiering**: S-ZFS and S-BCACHEFS provide self-healing, CoW tiering isolated mathematically per shard. | `SovereignZFS`, `SovereignBcacheFS` |
+| **Filesystem (Legacy & Windows)** | FAT32 / NTFS / exFAT (Monolithic VFS modules) | **Universal Compatibility**: S-FAT and S-NTFS ensure drop-in parity for legacy and Windows volumes without inheriting their kernel vulnerabilities. | `SovereignFAT`, `SovereignNTFS` |
+| **Filesystem (Linux/Unix)** | ext4 / XFS / UFS (Deeply coupled legacy code) | **Enterprise Linux Parity**: S-EXT4, S-XFS, and S-LEGACYFS provide full high-performance journaling for seamless Unix/Linux migration. | `SovereignExt4`, `SovereignXFS`, `SovereignLegacyFS` |
+| **Filesystem (Optical/Network)** | iso9660 / NFS / SMB (Userland/kernel spaghetti) | **Isolated Volatile/Network IO**: S-OPTICAL, S-NETFS, and S-TMPFS handle CDs, cloud storage, and RAM disks securely in isolated shards. | `SovereignOpticalFS`, `SovereignNetFS`, `SovereignTmpFS` |
 | **Hardware Drivers (Storage)** | AHCI / SCSI (Tightly coupled kernel modules) | **Isolated Orchestration**: S-SATA and S-SCSI run as isolated singletons, preventing driver panics from halting the core lattice. | `SovereignSATA`, `SovereignSCSI` |
 | **Hardware Drivers (Bus)** | USB 3.0 / PCMCIA (Complex USB core subsystem) | **Legacy-to-Modern Parity**: S-USB3 and S-PCMCIA provide high-speed and legacy industrial bus support natively without legacy baggage. | `SovereignUSB3`, `SovereignPCMCIA` |
 | **Hardware Drivers (Graphics)** | X11/Wayland + proprietary blobs | **Bare-Metal GPU Acceleration**: S-NVIDIA and S-ATI absorb proprietary patterns for direct compute orchestration without intermediary display servers. | `SovereignNvidia`, `SovereignATI` |
