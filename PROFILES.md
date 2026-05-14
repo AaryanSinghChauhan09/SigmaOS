@@ -2,84 +2,42 @@
 
 ## The Profile Paradigm
 
-SigmaOS Zenith v15.0 introduces **modular profession profiles**. Each profile is a cryptographically-attested "shard bundle" that pre-configures the kernel, userland, and toolchain for a specific industrial role. Every profile bundle is PQC-signed (Dilithium-5) before installation.
+SigmaOS Zenith v15.0 introduces **modular profession profiles**. Each profile is a cryptographically-attested "shard bundle" that pre-configures the kernel, userland, and toolchain for a specific industrial role. 
+
+## 🚀 Application Ecosystem (S-STORE)
+SigmaOS now features the **Sovereign Shard Store (S-STORE)**, providing one-click installation for specialized industrial suites, matching the "Ease of Use" of Ubuntu's Snap/Flatpak.
 
 ---
 
 ## Available Profiles (v15.0 Stable)
 
 ### [AI Researcher]
-
+- **Industrial Suite**: `AI_LAB v2.0` (One-Click)
 - **Kernel Shards**: `S-CUDA`, `S-ROCm`, `S-NNFS`, `S-TENSOR`
 - **Tools**: JupyterLab, PyTorch, TensorFlow, TensorBoard, ONNX Runtime
-- **Workflow**: Automated model attestation, GPU-shard orchestration, zero-copy inference
+- **USP**: Zero-copy lattice inference; Sub-millisecond tensor orchestration.
 
 ### [Cybersecurity Analyst]
-
-- **Kernel Shards**: `S-PLOIT`, `S-MAP`, `S-AUDIT`, `S-FORENSIC`
+- **Industrial Suite**: `CYBER_HUNT v3.1` (One-Click)
+- **Kernel Shards**: `S-KALI`, `S-MAP`, `S-AUDIT`, `S-FORENSIC`
 - **Tools**: Metasploit, Wireshark, Nmap, GPG, Volatility
-- **Workflow**: Zero-trust networking, silicon-level forensic auditing, PQC key management
+- **USP**: Silicon-level forensic auditing; PQC-sealed packet injection.
 
 ### [Data Scientist]
-
-- **Kernel Shards**: `S-PANDAS`, `S-JULIA`, `S-R`, `S-SPARK`
+- **Industrial Suite**: `DATA_NEXUS v1.5` (One-Click)
+- **Kernel Shards**: `S-PANDAS`, `S-JULIA`, `S-R`, `S-DS`
 - **Tools**: NumPy, matplotlib, scikit-learn, Apache Spark, DuckDB
-- **Workflow**: High-performance telemetry sharding, scientific compute, lattice streaming
+- **USP**: High-performance telemetry sharding; Lattice data streaming.
 
 ### [Software Engineer]
-
+- **Industrial Suite**: `DEV_SINGULARITY v4.0` (One-Click)
 - **Kernel Shards**: `S-CLOUD`, `S-GIT`, `S-WASM`, `S-DOCKER`
 - **Tools**: VS Code, GCC/Clang, Go, Rust, Node.js, Docker, Kubernetes
-- **Workflow**: OCI container orchestration, rapid lattice compilation, CI/CD sharding
-
-### [CS Educator]
-
-- **Kernel Shards**: `S-PLAY`, `S-DSA`, `S-SANDBOX`
-- **Tools**: Interactive REPL, DSA Libraries, Algorithm Visualizer
-- **Workflow**: Sandboxed student environments, sub-millisecond execution, curriculum shards
-
-### [Chartered Accountant / Finance]
-
-- **Kernel Shards**: `S-GST`, `S-TAX`, `S-AUDIT`, `S-TALLY`
-- **Tools**: GST Engine, Income Tax FY 2024-25, TDS Automator, Advance Tax Planner
-- **Workflow**: Indian-standards-compliant financial compute; GST Act 2017, IT Act 1961
-
-### [Doctor / Medical]
-
-- **Kernel Shards**: `S-DICOM`, `S-PHARMA`, `S-HEALTH`
-- **Tools**: DICOM Viewer, Drug Interaction Engine, Patient Record VFS
-- **Workflow**: NMC-compliant data handling, HIPAA-aligned audit trails
-
-### [Civil / Structural Engineer]
-
-- **Kernel Shards**: `S-CAD`, `S-FEM`, `S-BIM`
-- **Tools**: FEA Solver, CAD Renderer, BIM Lattice, IS-Code compliance checker
-- **Workflow**: Bureau of Indian Standards (BIS) compliance, structural simulation
-
-### [Lawyer / Legal]
-
-- **Kernel Shards**: `S-LEGAL`, `S-COURT`, `S-CONTRACT`
-- **Tools**: Indian Kanoon Search, Contract Drafting Engine, CPC/IPC reference
-- **Workflow**: Bar Council of India standards, digital stamp duty, e-court integration
-
-### [Farmer / Agri]
-
-- **Kernel Shards**: `S-AGRI`, `S-SOIL`, `S-MANDI`
-- **Tools**: Soil Health Monitor, MSP Calculator, Mandi Price Feed
-- **Workflow**: PM-KISAN scheme integration, eNAM market connectivity
-
-### [Teacher / Academic]
-
-- **Kernel Shards**: `S-EDU`, `S-LMS`, `S-GRADE`
-- **Tools**: LMS Dashboard, Grade Analyzer, NCERT Syllabus Engine
-- **Workflow**: NEP 2020 aligned, CBSE/ICSE compliance, DIKSHA integration
+- **USP**: OCI container orchestration; Rapid lattice compilation.
 
 ---
 
-## Expanding to 1000+ Professions
+## 🛠 Shard Orchestration
+New profession suites are added via the **S-NEXUS** global registry and installed via **S-STORE**. Every suite is Dilithium-5 attested before ignition.
 
-The Sovereign Lattice enables rapid new-profile creation (MED, FIN, SPACE, LAW) by combining existing shards with domain-specific USPs. New profiles are signed with Dilithium-5 and distributed via the S-PKG Sovereign Package Registry.
-
----
-
-*Stay Sovereign.*
+*"SigmaOS is the single source of truth for the professional age."*

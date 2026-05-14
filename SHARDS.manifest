@@ -41,8 +41,11 @@ kernel/core/system/SovereignSyscalls.cpp
 kernel/core/security/SovereignIdentity.cpp
 kernel/core/security/SovereignKali.cpp
 kernel/core/security/SovereignGPG.cpp
+kernel/core/security/SovereignPQC.cpp
+kernel/core/security/SovereignLUKS.cpp
 kernel/core/config/SovereignDecl.cpp
 kernel/core/system/SovereignNexus.cpp
+kernel/core/system/SovereignStore.cpp
 kernel/core/observability/SovereignBPF.cpp
 kernel/core/profiles/SovereignProfile.cpp
 
