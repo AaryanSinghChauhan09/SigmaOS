@@ -1,8 +1,8 @@
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "hal/sigma_hal.h"
+#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/hal/sigma_hal.h"
 #include "memory_manager.hpp"
-#include "libc/SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -15,9 +15,9 @@ SovereignMemoryManager::SovereignMemoryManager()
         sigma_memset(m_pool, 0, INITIAL_POOL_SIZE);
         m_segments[0] = { (sigma_u64)m_pool, INITIAL_POOL_SIZE, SIGMA_FALSE };
         m_segment_count = 1;
-        sigma_log("[MEM] Industrial Sovereign Slab Initialized (128MB Nexus).");
+        sigma_log_info("[MEM] Industrial Sovereign Slab Initialized (128MB Nexus).\n");
     } else {
-        sigma_log("[MEM] FATAL: Could not allocate memory pool.");
+        sigma_log_info("[MEM FATAL] Could not allocate memory pool.\n");
     }
 }
 
@@ -46,7 +46,7 @@ void* SovereignMemoryManager::allocate(sigma_size_t size) {
             return (void*)addr;
         }
     }
-    sigma_log("[MEM] WARN: Allocation failed - pool exhausted.");
+    sigma_log_info("[MEM WARN] Allocation failed - pool exhausted.\n");
     return SIGMA_NULL;
 }
 
@@ -56,7 +56,6 @@ void SovereignMemoryManager::deallocate(void* ptr) {
 
     for (sigma_size_t i = 0; i < m_segment_count; ++i) {
         if (m_segments[i].start_addr == addr) {
-            /* FIX: Double-free detection */
             if (!m_segments[i].allocated) {
                 sigma_log_info("[MEM FATAL] Double-Free detected at %p! Halting deallocation.\n", ptr);
                 return;

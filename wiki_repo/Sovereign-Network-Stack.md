@@ -1,34 +1,20 @@
 # Sovereign Network Stack (S-NET)
 
-The **Sovereign Network Stack (S-NET)** is the high-performance communication engine for **SigmaOS v15.0 "Horizon"**. It provides industrial-grade connectivity across the shard lattice with built-in post-quantum security.
+The Sovereign Network Stack is the industrial networking backbone of SigmaOS v15.0 (Zenith). It provides high-performance, PQC-sealed connectivity for the industrial shard lattice.
 
-## Architecture
+## Core Features
+- **Zero-Trust DPI**: Deep Packet Inspection at the silicon level, ensuring no non-sovereign traffic enters the lattice.
+- **PQC-VPN (Kyber-1024)**: Native support for post-quantum encrypted tunnels for distributed shard orchestration.
+- **Protocol Parity**: Full support for IPv4, IPv6, TCP, and UDP, matching the capabilities of industrial Linux stacks while maintaining zero-dependency status.
+- **Lattice-Mesh**: A unique peer-to-peer shard discovery and synchronization protocol.
 
-S-NET is designed for zero-latency communication using a **Lattice-Mesh** topology, bypassing legacy kernel bottlenecks found in monolithic stacks.
+## Technical Architecture
+S-NET operates on a zero-copy data path between the hardware HAL and the userland system call bridge. Every packet is attested via the Dilithium-5 signature of the sending shard.
 
-### Core Components
-- **Industrial TCP/UDP/IP**: Zero-copy packet processing for high-bandwidth industrial telemetry.
-- **Lattice-Guard Firewall**: A hardware-accelerated packet filtering engine that enforces strict isolation between professional shards.
-- **S-VPN (Sovereign VPN)**: A **WireGuard-native** tunneling engine hardened with **PQC (Dilithium-5)** signatures for absolute privacy.
+### Configuration
+```cpp
+// Example: Attesting a network shard
+SigmaOS::Kernel::Network::SovereignNetStack::getInstance().add_firewall_rule(0xFFFFFFFF, Protocol::TCP, true);
+```
 
-## Security Features
-
-- **PQC Handshake**: All network negotiations are protected against future quantum computing attacks.
-- **Zero-Trust Routing**: Packets are verified against shard-specific identity signatures before delivery.
-- **Resilient Mesh**: Automatic failover across heterogeneous silicon nodes (Wi-Fi 6, 10GbE, Fiber).
-
-## Implementation Details
-
-The stack is implemented in `kernel/core/system/SovereignNet.cpp`.
-
-### API Bridge
-- `net_init()`: Cold-boot ignition of the networking shards.
-- `net_socket(proto)`: Spawns a new industrial communication socket.
-- `net_connect_vpn(endpoint)`: Establishes a secure, encrypted tunnel to the professional lattice nexus.
-
-## Integration
-
-S-NET is ignited during **Stage 7** of the **Asynchronous Shard Ignition (ASI)** plan, following the ignition of the Sovereign Driver Framework (SDF).
-
----
-*Stay Sovereign.*
+*"Connectivity is only sovereign when it is absolute."*
