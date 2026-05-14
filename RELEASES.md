@@ -1,38 +1,21 @@
-# Σ SIGMAOS v15.0 "HORIZON" - STABLE RELEASE
+# SigmaOS Release Manifest
 
-The **SigmaOS Industrial Collective** is proud to announce the first production-grade release of the **Sovereign Lattice™** architecture.
+## [v15.0] - Horizon "Zenith Singularity"
+**Release Date: 2026-05-14**
+**Status: INDUSTRIAL STABLE**
 
-## 🚀 Key Highlights
+### Architectural Breakthroughs
+- **Shard Lattice (Ring-0)**: Modular microkernel with 600+ isolated shards.
+- **PQC-Native Core**: Kyber-1024 / Dilithium-5 integration (FIPS 203/204).
+- **Amnesic Memory**: Secure wiping of sensitive buffers via `sigma_secure_memset`.
+- **S-INDIA Suite**: Native compliance with GST Act 2017 and Income Tax Act 1961.
+- **Zero-Trust NetStack**: Hardware-level packet auditing and DPI.
 
-- **Industrial Stability**: 100% pass rate on S-REGRESS industrial testing.
-- **PQC-Hardened Security**: Dilithium-5 attested shard distribution via S-PKG.
-- **Zero-Latency AI**: Native CUDA/ROCm absorption with ONNX inference lattice.
-- **Professional Shard Bundles**: Modular turnkey deployments for 600+ industrial roles.
-
-## 📦 New Components
-
-- **S-MAC**: Mandatory Access Control (AppArmor/SELinux parity).
-- **S-PKG**: Cryptographically verified lattice package nexus (v15.0).
-- **S-VPN**: WireGuard-native secure tunneling engine.
-- **S-FS**: Sovereign Lattice Filesystem — Persistent, PQC-hardened storage lattice.
-- **S-MM**: Sovereign Memory Manager — Industrial Slab & Paging backend for Ring-0 multitasking.
-- **S-SCHED**: Sovereign Industrial Scheduler — Priority-based Round Robin for zero-latency orchestration.
-- **SDF**: Sovereign Driver Framework — Unified hardware shard orchestration for GPU, Net, and USB.
-- **S-NET**: Sovereign Network Stack — TCP/UDP/IP with S-VPN (WireGuard-PQC) and Lattice-Guard firewall.
-- **Zenith Control Center**: Unified industrial settings lattice.
-
-## 🛠 Stability Improvements
-
-- **Kdump Parity**: Industrial crash dump integration for kernel debugging.
-- **Watchdog L3**: Heartbeat-driven atomic fallback and self-healing.
-- **Driver Absorption**: Native support for Mesa (GPU), Realtek (Wifi), and PipeWire (Audio).
-
-## 🏛 Ecosystem Sync
-
-- **Wiki**: Comprehensive documentation for all 10 lattice layers.
-- **GitHub Pages**: New landing page with installation guide and benchmarks.
-- **CI/CD**: Automated QEMU regression suite and Fuzz testing.
+### Shard Updates
+- `S-MM`: Industrial buddy-allocator with double-free detection.
+- `S-SCHED`: Multi-priority predictive scheduler.
+- `sigma_sh`: Sovereign shell with Indian professional tools.
+- `S-WATCHDOG`: Atomic rollback on deadlock.
 
 ---
-
-### Stay Sovereign
+*Stay Sovereign.*
