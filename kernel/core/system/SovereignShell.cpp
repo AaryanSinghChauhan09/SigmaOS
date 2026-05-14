@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 #include "libc/SovereignLibC.h"
@@ -57,3 +58,4 @@ private:
 extern "C" {
     void shell_exec(const char* cmd) { SigmaOS::Kernel::Userland::SovereignShell::getInstance().execute(cmd); }
 }
+

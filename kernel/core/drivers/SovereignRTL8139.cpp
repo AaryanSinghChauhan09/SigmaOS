@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 
@@ -33,3 +34,4 @@ private:
 extern "C" {
     void rtl8139_init(sigma_u64 base) { SigmaOS::Kernel::Drivers::SovereignRTL8139::getInstance().init(base); }
 }
+

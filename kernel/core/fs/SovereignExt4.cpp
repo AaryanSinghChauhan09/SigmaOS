@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 
@@ -33,3 +34,4 @@ private:
 extern "C" {
     void ext4_init() { SigmaOS::Kernel::FS::SovereignExt4::getInstance().init(); }
 }
+

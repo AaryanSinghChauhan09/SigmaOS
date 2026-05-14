@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 
@@ -39,3 +40,4 @@ private:
 extern "C" {
     void hyp_init() { SigmaOS::Kernel::Virt::SovereignHypervisor::getInstance().init(); }
 }
+

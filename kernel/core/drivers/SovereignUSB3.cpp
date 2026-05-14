@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 
@@ -40,3 +41,4 @@ private:
 extern "C" {
     void usb3_init(sigma_u64 base) { SigmaOS::Kernel::Drivers::SovereignUSB3::getInstance().init(base); }
 }
+

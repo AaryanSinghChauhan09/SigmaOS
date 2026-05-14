@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 #include "libc/SovereignLibC.h"
@@ -26,7 +27,7 @@ public:
     void cat(const char* filename) {
         sigma_log_info("[UTILS] cat: %s", filename);
         sigma_log_info("--- CONTENT OF %s ---", filename);
-        sigma_log_info("Σ SIGMAOS ZENITH CONFIG v15.0");
+        sigma_log_info("?? SIGMAOS ZENITH CONFIG v15.0");
         sigma_log_info("SHARD_AUTONOMY=ACTIVE");
     }
 
@@ -51,3 +52,4 @@ extern "C" {
     void util_cat(const char* f) { SigmaOS::Kernel::Utilities::SovereignCoreUtils::getInstance().cat(f); }
     void util_echo(const char* t) { SigmaOS::Kernel::Utilities::SovereignCoreUtils::getInstance().echo(t); }
 }
+

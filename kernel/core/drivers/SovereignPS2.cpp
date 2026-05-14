@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 
@@ -51,3 +52,4 @@ extern "C" {
     void kbd_init() { SigmaOS::Kernel::Drivers::SovereignPS2::getInstance().init(); }
     char kbd_read() { return SigmaOS::Kernel::Drivers::SovereignPS2::getInstance().readScancode(); }
 }
+

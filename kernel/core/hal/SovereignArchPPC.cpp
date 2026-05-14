@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/SovereignArch.hpp"
 #include "sigma_log.h"
 
@@ -51,3 +52,4 @@ private:
 extern "C" {
     void arch_init_ppc() { SigmaOS::Kernel::Arch::SovereignArchPPC::getInstance().setupPaging(0x00000000); }
 }
+

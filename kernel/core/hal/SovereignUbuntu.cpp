@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 
@@ -42,3 +43,4 @@ private:
 extern "C" {
     void ubuntu_init() { SigmaOS::Kernel::Drivers::SovereignUbuntu::getInstance().init(); }
 }
+

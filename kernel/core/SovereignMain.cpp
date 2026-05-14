@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 #include "hal/sigma_hal.h"
@@ -26,7 +27,7 @@ public:
 
     void ignite() {
         serial_init(); // Boot-level I/O ignition
-        sigma_log_info("\nΣ SIGMAOS ZENITH SINGULARITY (v15.0) IGNITING...\n");
+        sigma_log_info("\n?? SIGMAOS ZENITH SINGULARITY (v15.0) IGNITING...\n");
         sigma_log_info("--------------------------------------------------\n");
 
         sinit_init();
@@ -34,7 +35,7 @@ public:
         sinit_report_status();
 
         sigma_log_info("--------------------------------------------------\n");
-        sigma_log_info("Σ SYSTEM SOVEREIGNTY ACHIEVED. LATTICE ACTIVE.\n\n");
+        sigma_log_info("?? SYSTEM SOVEREIGNTY ACHIEVED. LATTICE ACTIVE.\n\n");
     }
 
 private:
@@ -47,3 +48,4 @@ private:
 extern "C" void sigma_kernel_main() {
     SigmaOS::Kernel::SovereignKernelMain::getInstance().ignite();
 }
+

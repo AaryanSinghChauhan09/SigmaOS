@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 
@@ -34,3 +35,4 @@ private:
 extern "C" {
     void wpan_init() { SigmaOS::Kernel::Drivers::SovereignWPAN::getInstance().init(); }
 }
+

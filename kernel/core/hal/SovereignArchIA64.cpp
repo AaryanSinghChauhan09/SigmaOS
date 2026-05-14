@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/SovereignArch.hpp"
 #include "sigma_log.h"
 
@@ -49,3 +50,4 @@ private:
 extern "C" {
     void arch_init_ia64() { SigmaOS::Kernel::Arch::SovereignArchIA64::getInstance().setupPaging(0); }
 }
+

@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 #include "libc/SovereignLibC.h"
@@ -59,3 +60,4 @@ extern "C" {
         return SigmaOS::Kernel::System::SovereignSyscallEngine::getInstance().dispatch(id, a1, a2, a3);
     }
 }
+

@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 
@@ -49,3 +50,4 @@ extern "C" {
     void ata_init() { SigmaOS::Kernel::Drivers::SovereignATA::getInstance().init(); }
     void ata_read(sigma_u32 lba, void* buf) { SigmaOS::Kernel::Drivers::SovereignATA::getInstance().readSector(lba, buf); }
 }
+

@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "sigma_log.h"
 #include "core/sigma_types.h"
 #include "libc/SovereignLibC.h"
@@ -173,3 +174,4 @@ private:
 extern "C" {
     void sinit_ignite() { SigmaOS::Kernel::Boot::SovereignInitEngine::getInstance().ignite(); }
 }
+

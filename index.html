@@ -139,7 +139,8 @@
         .shard-id { color: var(--primary); font-weight: bold; }
         .shard-status { color: var(--success); font-size: 0.75rem; border: 1px solid; padding: 2px 6px; border-radius: 4px; }
 
-        h2 { font-size: 1.2rem; margin-top: 0; color: var(--muted); }
+        .zenith-text { color: var(--muted); letter-spacing: 2px; }
+        .desktop-title { font-weight: 800; font-size: 1.2rem; }
     </style>
 </head>
 <body>
@@ -147,14 +148,14 @@
     <div id="boot-overlay">
         <div class="logo-box">
             <h1>Σ SIGMA<span>OS</span></h1>
-            <p style="color: var(--muted); letter-spacing: 2px;">ZENITH SINGULARITY v15.0</p>
+            <p class="zenith-text">ZENITH SINGULARITY v15.0</p>
         </div>
         <div class="boot-log" id="boot-log"></div>
     </div>
 
     <main id="desktop">
         <header>
-            <div style="font-weight: 800; font-size: 1.2rem;">Σ ZENITH DESKTOP</div>
+            <div class="desktop-title">Σ ZENITH DESKTOP</div>
             <div class="status-bar">
                 <div class="status-item">LATTICE: <span>612 Shards</span></div>
                 <div class="status-item">CRYPT: <span>PQC-ACTIVE</span></div>
@@ -168,7 +169,7 @@
                 <div id="term-output"></div>
                 <div class="input-line">
                     <span>Σ ></span>
-                    <input type="text" id="shell-input" autofocus spellcheck="false">
+                    <input type="text" id="shell-input" autofocus spellcheck="false" title="Shell Command Input" placeholder="Enter command...">
                 </div>
             </div>
 

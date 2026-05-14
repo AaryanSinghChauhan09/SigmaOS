@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 
@@ -47,3 +48,4 @@ extern "C" {
         SigmaOS::Kernel::Containers::SovereignContainer::getInstance().createJail(pid, flags); 
     }
 }
+

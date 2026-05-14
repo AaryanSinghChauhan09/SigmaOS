@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 
@@ -39,3 +40,4 @@ private:
 extern "C" {
     void kali_init() { SigmaOS::Kernel::Security::SovereignKali::getInstance().init(); }
 }
+

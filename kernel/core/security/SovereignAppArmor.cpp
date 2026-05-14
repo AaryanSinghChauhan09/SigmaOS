@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 
@@ -40,3 +41,4 @@ extern "C" {
         return SigmaOS::Kernel::Security::SovereignAppArmor::getInstance().checkPermission(id, res, mask); 
     }
 }
+

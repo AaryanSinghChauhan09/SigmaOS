@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 
@@ -51,3 +52,4 @@ private:
 extern "C" {
     void ext2_mount(const char* dev) { SigmaOS::Kernel::FS::SovereignExt2::getInstance().mount(dev); }
 }
+

@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 
@@ -64,3 +65,4 @@ extern "C" {
         SigmaOS::Kernel::Drivers::SovereignVESA::getInstance().drawPixel(x, y, color);
     }
 }
+

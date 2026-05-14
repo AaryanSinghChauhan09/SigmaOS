@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 
@@ -33,3 +34,4 @@ private:
 extern "C" {
     void ne2000_init(sigma_u32 base) { SigmaOS::Kernel::Drivers::SovereignNE2000::getInstance().init(base); }
 }
+

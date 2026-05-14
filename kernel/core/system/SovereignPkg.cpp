@@ -1,3 +1,4 @@
+#include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
 #include "sigma_log.h"
 #include "libc/SovereignLibC.h"
@@ -63,3 +64,4 @@ extern "C" {
     void pkg_init() { SigmaOS::Kernel::Packaging::SigmaPkg::getInstance().init(); }
     void pkg_install(const char* name) { SigmaOS::Kernel::Packaging::SigmaPkg::getInstance().install(name); }
 }
+
