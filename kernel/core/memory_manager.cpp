@@ -54,7 +54,11 @@ void SovereignMemoryManager::deallocate(void* ptr) {
     sigma_u64 addr = (sigma_u64)ptr;
 
     for (sigma_size_t i = 0; i < m_segment_count; ++i) {
-        if (m_segments[i].start_addr == addr && m_segments[i].allocated) {
+        if (m_segments[i].start_addr == addr) {
+            if (!m_segments[i].allocated) {
+                sigma_log_info("[MEM FATAL]: Sovereign Double-Free Detected at %p!\n", ptr);
+                return;
+            }
             // Amnesic Security Wipe (Sovereign Principle)
             sigma_memset(ptr, 0, m_segments[i].size);
             

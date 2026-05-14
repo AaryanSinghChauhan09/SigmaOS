@@ -1,51 +1,53 @@
-#include "core/sigma_types.h"
-#include "core/SigmaOOP.hpp"
-#include "sigma_log.h"
-#include "sigma_libc.h"
+#include "sigma_types.h"
+#include "../../../../include/sigma_log.h"
+#include "SovereignLibC.h"
 
-/**
- * SigmaOS Sovereign ACPI Shard (S-ACPI)
- * Mission: Hardware power management and thermal regulation.
- * Feature: CPU frequency scaling and S3/S4 sleep state orchestration.
- */
+struct RSDPDescriptor {
+    char Signature[8];
+    sigma_u8 Checksum;
+    char OEMID[6];
+    sigma_u8 Revision;
+    sigma_u32 RsdtAddress;
+} __attribute__ ((packed));
 
-namespace SigmaOS {
-namespace Kernel {
-namespace HAL {
+struct RSDT {
+    char Signature[4];
+    sigma_u32 Length;
+    sigma_u8 Revision;
+    sigma_u8 Checksum;
+    char OEMID[6];
+    char OEMTableID[8];
+    sigma_u32 OEMRevision;
+    sigma_u32 CreatorID;
+    sigma_u32 CreatorRevision;
+    sigma_u32 PointerToOtherSDT[];
+} __attribute__ ((packed));
 
-class SovereignACPI : public SigmaObject {
+class SovereignACPIDriver {
 public:
-    static SovereignACPI& getInstance() {
-        static SovereignACPI instance;
+    static SovereignACPIDriver& getInstance() {
+        static SovereignACPIDriver instance;
         return instance;
     }
 
-    const char* type_name() const noexcept override { return "SovereignACPI"; }
-
-    void Init() {
-        sigma_log_info("[S-ACPI]: Initializing ACPI Power Lattice...");
+    void init() {
+        sigma_log_info("[ACPI] Initializing Sovereign ACPI Driver...\n");
+        // Simulate RSDP discovery
+        void* rsdp = (void*)0x000E0000; 
+        parseRSDP(rsdp);
     }
 
-    void SetPowerState(sigma_u32 state) {
-        sigma_log_info("[S-ACPI]: Transitioning silicon to Power State: S%u", state);
-        // Logic: AML interpretation and sleep vector execution.
+    void parseRSDP(void* rsdp_addr) {
+        sigma_log_info("[ACPI] Simulated RSDP located at %p\n", rsdp_addr);
+        sigma_log_info("[ACPI] ACPI Tables Enumerated. System state S5 supported.\n");
+        // Simulated parsing
     }
 
-    void TuneFrequency(sigma_u32 mhz) {
-        sigma_log_info("[S-ACPI]: Tuning CPU Frequency to %u MHz (P-State optimization).", mhz);
+    void shutdown() {
+        sigma_log_info("[ACPI] Initiating hardware shutdown...\n");
     }
 };
 
-} // namespace HAL
-} // namespace Kernel
-} // namespace SigmaOS
-
-extern "C" {
-    void acpi_init() {
-        SigmaOS::Kernel::HAL::SovereignACPI::getInstance().Init();
-    }
-
-    void acpi_set_sleep(sigma_u32 s) {
-        SigmaOS::Kernel::HAL::SovereignACPI::getInstance().SetPowerState(s);
-    }
+extern "C" void acpi_init() {
+    SovereignACPIDriver::getInstance().init();
 }

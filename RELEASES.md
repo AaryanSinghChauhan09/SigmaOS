@@ -12,7 +12,7 @@ The **SigmaOS Industrial Collective** is proud to announce the first production-
 ## 📦 New Components
 
 - **S-MAC**: Mandatory Access Control (AppArmor/SELinux parity).
-- **S-PKG**: Cryptographically verified lattice package manager.
+- **S-PKG**: Cryptographically verified lattice package nexus (v15.0).
 - **S-VPN**: WireGuard-native secure tunneling engine.
 - **S-FS**: Sovereign Lattice Filesystem — Persistent, PQC-hardened storage lattice.
 - **S-MM**: Sovereign Memory Manager — Industrial Slab & Paging backend for Ring-0 multitasking.
