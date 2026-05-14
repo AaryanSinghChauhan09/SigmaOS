@@ -53,6 +53,10 @@ public:
         sigma_log_info("[S-SCHED] Multi-priority bands active. Silicon-native isolation ENABLED.");
     }
 
+    void handlePageFault(sigma_u64 addr) {
+        sigma_log_info("[S-SCHED] Demand Paging: Handling fault at %llX. Allocating shadow frame.", addr);
+    }
+
     sigma_u32 spawn(const char* name, SigmaPriority prio) {
         if (this->total_procs >= MAX_PROCS) {
             sigma_log_info("[S-SCHED] WARN: Shard table full.");

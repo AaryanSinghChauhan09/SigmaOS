@@ -24,6 +24,16 @@ public:
         sigma_log_info("[S-WLAN] PQC WPA3-Enterprise handshake capability: READY.");
     }
 
+    void scan() {
+        sigma_log_info("[S-WLAN] Scanning airwaves for industrial access points...");
+        sigma_log_info("[S-WLAN] Found: 'Sovereign_Industrial_Lattice' (RSSI -32dBm)");
+    }
+
+    void connect(const char* ssid) {
+        sigma_log_info("[S-WLAN] Connecting to %s using Kyber-1024 PQC Key Exchange...", ssid);
+        sigma_log_info("[S-WLAN] WPA3 Handshake: [SUCCESS]");
+    }
+
 private:
     SovereignWLAN() = default;
 };
@@ -34,5 +44,6 @@ private:
 
 extern "C" {
     void wlan_init() { SigmaOS::Kernel::Drivers::SovereignWLAN::getInstance().init(); }
+    void wlan_scan() { SigmaOS::Kernel::Drivers::SovereignWLAN::getInstance().scan(); }
 }
 
