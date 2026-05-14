@@ -122,6 +122,14 @@ KERNEL_SHARDS := \
     kernel/core/system/SovereignWatchdog.o \
     kernel/core/system/SovereignSwap.o \
     kernel/core/security/SovereignAuditLog.o \
+    kernel/core/absorption/SovereignZOS.o \
+    kernel/core/absorption/SovereignQNX.o \
+    kernel/core/absorption/SovereignBeOS.o \
+    kernel/core/absorption/SovereignNeXT.o \
+    kernel/core/absorption/SovereignPlan9.o \
+    kernel/core/absorption/SovereignCisco.o \
+    kernel/core/absorption/SovereignSolaris.o \
+    kernel/core/absorption/SovereignAmnesic.o \
     kernel/core/ui/SovereignWM.o \
     kernel/core/ui/SovereignFWM.o \
     kernel/core/ui/SovereignPanel.o \
