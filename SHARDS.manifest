@@ -78,6 +78,8 @@ kernel/core/drivers/SovereignE1000.cpp
 kernel/core/drivers/SovereignNvidia.cpp
 kernel/core/drivers/SovereignATI.cpp
 kernel/core/drivers/SovereignMedia.cpp
+kernel/core/drivers/SovereignTVTuner.cpp
+kernel/core/drivers/SovereignVideo.cpp
 kernel/core/drivers/SovereignBroadcom.cpp
 kernel/core/drivers/SovereignRealtek.cpp
 

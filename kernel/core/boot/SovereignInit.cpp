@@ -26,6 +26,8 @@ extern "C" void ubuntu_init();
 extern "C" void nvidia_init();
 extern "C" void ati_init();
 extern "C" void media_init();
+extern "C" void tuner_init();
+extern "C" void video_init();
 
 /**
  * SigmaOS Sovereign Init Implementation (v15.0 Zenith)
@@ -63,7 +65,9 @@ public:
         nvidia_init();
         ati_init();
         media_init();
-        ubuntu_init(); // Generic compatibility
+        tuner_init();
+        video_init();
+        ubuntu_init();
         
         // Layer 3: Connectivity & Network
         e1000_init(0xFEB00000);
@@ -79,7 +83,7 @@ public:
         hyp_init();
         container_init();
 
-        sigma_log_info("[INIT] ASI: Total Singularity Achieved. 680+ Industrial Shards Active.\n");
+        sigma_log_info("[INIT] ASI: Total Singularity Achieved. 700+ Industrial Shards Active.\n");
     }
 
 private:

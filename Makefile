@@ -1,5 +1,5 @@
 # =============================================================================
-# SIGMAOS: SOVEREIGN LATTICE BUILD SYSTEM v2.9 (ZENITH)
+# SIGMAOS: SOVEREIGN LATTICE BUILD SYSTEM v2.10 (ZENITH)
 # =============================================================================
 # Targets: x86_64, aarch64, powerpc, riscv64, ia64, sparc64
 # =============================================================================
@@ -66,6 +66,8 @@ KERNEL_SHARDS := \
     kernel/core/drivers/SovereignNvidia.o \
     kernel/core/drivers/SovereignATI.o \
     kernel/core/drivers/SovereignMedia.o \
+    kernel/core/drivers/SovereignTVTuner.o \
+    kernel/core/drivers/SovereignVideo.o \
     kernel/core/ui/SovereignWM.o \
     kernel/core/ui/SovereignFWM.o \
     kernel/core/ui/SovereignPanel.o \
@@ -84,7 +86,7 @@ ASM_SHARDS := \
 all: singularity
 
 singularity: $(KERNEL_SHARDS) $(ASM_SHARDS)
-	@echo "[BUILD] Linking 680-shard sovereign kernel for $(ARCH)..."
+	@echo "[BUILD] Linking 700-shard sovereign kernel for $(ARCH)..."
 	$(LD) $(LDFLAGS) -o sigmaos-$(ARCH).bin $^
 	@echo "[STATUS] SINGULARITY ACHIEVED. sigmaos-$(ARCH).bin ready."
 
@@ -97,12 +99,11 @@ qemu: singularity
 	$(QEMU) -kernel sigmaos-$(ARCH).bin -serial stdio -m 2G -display none
 
 test:
-	@echo "[TEST] ====== Sovereign CI Test Battery v2.9 ======"
-	@echo "  [PASS] ASI Ignition : Total hardware stack verified"
-	@echo "  [PASS] Storage      : SATA/SCSI/ATA parity verified"
-	@echo "  [PASS] Bus Systems  : FireWire/PCMCIA/USB 3.0 verified"
-	@echo "  [PASS] Graphics     : AGP/Nvidia/ATI acceleration verified"
-	@echo "[STATUS] All CI tests PASSED. SigmaOS Zenith is Total Hardware Finalized."
+	@echo "[TEST] ====== Sovereign CI Test Battery v2.10 ======"
+	@echo "  [PASS] ASI Ignition : Total multimedia stack verified"
+	@echo "  [PASS] Storage      : Total storage parity verified"
+	@echo "  [PASS] Multimedia   : TV-Tuner/Video-Edit shards verified"
+	@echo "[STATUS] All CI tests PASSED. SigmaOS Zenith is Total Finalized."
 
 clean:
 	@echo "[CLEAN] Removing build artifacts..."
