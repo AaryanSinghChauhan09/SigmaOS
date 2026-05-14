@@ -22,9 +22,11 @@ kernel/core/hal/SovereignUSB.cpp
 kernel/core/hal/SovereignWiFiTranspiler.cpp
 kernel/core/hal/SovereignMesaTranspiler.cpp
 kernel/core/hal/SovereignWatchdog.cpp
+kernel/core/hal/SovereignSerial.cpp
 kernel/core/mem/SovereignAllocator.cpp
 
 # LAYER 1: KERNEL CORE (IPC, SCHEDULER, MEMORY, FS, NET)
+kernel/core/SovereignMain.cpp
 kernel/core/diag/SovereignKdump.cpp
 include/ipc/SovereignEventBus.h
 include/sched/SovereignScheduler.h
@@ -65,5 +67,6 @@ kernel/core/ui/SovereignWM.cpp
 kernel/core/ui/SovereignFWM.cpp
 kernel/core/ui/SovereignPanel.cpp
 kernel/core/ds/SovereignDS.cpp
+kernel/core/libc/SovereignLibC.cpp
 
 # ... [Remaining layers maintained in lattice memory] ...
