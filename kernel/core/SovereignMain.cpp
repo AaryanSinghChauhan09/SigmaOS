@@ -1,31 +1,32 @@
-#include "sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 #include "../../../include/sigma_log.h"
-#include "sigma_hal.h"
-#include "../../../include/sigma_log.h"
-#include "SovereignLibC.h"
-#include "../../../include/sigma_log.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 // Engine Initialisers (Extern C)
 extern "C" void sinit_init();
 extern "C" void sinit_execute_plan();
 extern "C" void sinit_report_status();
+extern "C" void serial_init();
 
 /**
  * SigmaOS Sovereign Main Entry Point
- * Implements the Zen-Modular ignition sequence.
+ * Implements the Zenith Singularity ignition sequence.
  * 
- * Design: OOP-isolated singleton — SovereignKernelMain.
+ * Principle: Parallel Shard Autonomy via ASI.
  */
 
-class SovereignKernelMain {
+namespace SigmaOS {
+namespace Kernel {
+
+class SovereignKernelMain : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignKernelMain> {
+    friend class SigmaOS::SigmaSingleton<SovereignKernelMain>;
 public:
-    static SovereignKernelMain& getInstance() {
-        static SovereignKernelMain instance;
-        return instance;
-    }
+    const char* type_name() const noexcept override { return "SovereignKernelMain"; }
 
     void ignite() {
-        sigma_log_info("\nΣ SIGMAOS ZENITH SUPREME (v94.0) IGNITING...\n");
+        serial_init(); // Boot-level I/O ignition
+        sigma_log_info("\nΣ SIGMAOS ZENITH SINGULARITY (v15.0) IGNITING...\n");
         sigma_log_info("--------------------------------------------------\n");
 
         sinit_init();
@@ -33,15 +34,16 @@ public:
         sinit_report_status();
 
         sigma_log_info("--------------------------------------------------\n");
-        sigma_log_info("Σ SYSTEM SOVEREIGNTY ACHIEVED. LATTICE READY.\n\n");
+        sigma_log_info("Σ SYSTEM SOVEREIGNTY ACHIEVED. LATTICE ACTIVE.\n\n");
     }
 
 private:
-    SovereignKernelMain() {}
+    SovereignKernelMain() = default;
 };
 
+} // namespace Kernel
+} // namespace SigmaOS
+
 extern "C" void sigma_kernel_main() {
-    SovereignKernelMain::getInstance().ignite();
+    SigmaOS::Kernel::SovereignKernelMain::getInstance().ignite();
 }
-
-

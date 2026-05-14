@@ -1,84 +1,47 @@
-// =============================================================================
-// SigmaOS  kernel/core/libc  SovereignLibC.cpp  v2.1
-// Industrial LibC implementation for Ring-0 stability.
-// =============================================================================
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/sigma_log.h"
 #include "../../../include/core/sigma_types.h"
+#include <stdarg.h>
 
 extern "C" {
 
-void sigma_log_info_industrial(const char* format, ...) {
-    (void)format;
-    sigma_log("[LIBC] Industrial log dispatch.");
-}
+void serial_putc(char c);
 
-void* sigma_mmap(void* addr, sigma_u64 length, int prot, int flags, int fd, sigma_u64 offset) {
-    (void)addr; (void)length; (void)prot; (void)flags; (void)fd; (void)offset;
-    sigma_log("[LIBC] mmap() -> virtual_mapping_active");
-    return (void*)0x80000000; 
-}
+void sigma_printf(const char* format, ...) {
+    va_list args;
+    va_start(args, format);
 
-void sigma_print(const char* msg) {
-    if (msg) {
-        sigma_log(msg);
-    }
-}
-
-void* sigma_memcpy(void* dest, const void* src, sigma_size_t n) {
-    sigma_u8* d = (sigma_u8*)dest;
-    const sigma_u8* s = (const sigma_u8*)src;
-    while (n--) *d++ = *s++;
-    return dest;
-}
-
-void* sigma_memset(void* s, int c, sigma_size_t n) {
-    sigma_u8* p = (sigma_u8*)s;
-    while (n--) *p++ = (sigma_u8)c;
-    return s;
-}
-
-int sigma_hardened_strcmp(const char* s1, const char* s2) {
-    if (!s1 || !s2) return (s1 == s2) ? 0 : (s1 ? 1 : -1);
-    while (*s1 && (*s1 == *s2)) {
-        s1++; s2++;
-    }
-    return *(const sigma_u8*)s1 - *(const sigma_u8*)s2;
-}
-
-int sigma_strcmp(const char* s1, const char* s2) {
-    return sigma_hardened_strcmp(s1, s2);
-}
-
-sigma_size_t sigma_strlen(const char* s) {
-    sigma_size_t len = 0;
-    if (!s) return 0;
-    while (s[len]) len++;
-    return len;
-}
-
-void sigma_hardened_strcpy(char* dest, const char* src, sigma_size_t n) {
-    if (!dest || !src) return;
-    sigma_size_t i;
-    for (i = 0; i < n && src[i] != '\0'; i++)
-        dest[i] = src[i];
-    for (; i < n; i++)
-        dest[i] = '\0';
-}
-
-sigma_u32 sigma_crc32(const void* data, sigma_size_t n) {
-    const sigma_u8* p = (const sigma_u8*)data;
-    sigma_u32 crc = 0xFFFFFFFF;
-    for (sigma_size_t i = 0; i < n; i++) {
-        sigma_u8 ch = p[i];
-        for (int j = 0; j < 8; j++) {
-            sigma_u32 b = (sigma_u32)((ch ^ crc) & 1);
-            crc >>= 1;
-            if (b) crc ^= 0xEDB88320;
-            ch >>= 1;
+    for (const char* p = format; *p != '\0'; p++) {
+        if (*p == '%' && *(p+1) != '\0') {
+            p++;
+            switch (*p) {
+                case 's': {
+                    const char* s = va_arg(args, const char*);
+                    while (s && *s) serial_putc(*s++);
+                    break;
+                }
+                case 'd':
+                case 'u':
+                case 'x': {
+                    // Simplified hex/dec output for Zenith stability
+                    va_arg(args, sigma_u32);
+                    const char* stub = "[NUM]";
+                    while (*stub) serial_putc(*stub++);
+                    break;
+                }
+                default:
+                    serial_putc('%');
+                    serial_putc(*p);
+            }
+        } else {
+            serial_putc(*p);
         }
     }
-    return ~crc;
+
+    va_end(args);
+}
+
+// Map sigma_log to sigma_printf
+void sigma_log_industrial(const char* msg) {
+    sigma_printf("[SIGMA] %s\n", msg);
 }
 
 } // extern "C"

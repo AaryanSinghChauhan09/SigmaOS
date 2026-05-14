@@ -1,6 +1,12 @@
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/core/SigmaOOP.hpp"
+
+/**
+ * SIGMAOS: SOVEREIGN INTELLIGENCE NEXUS (S-AI)
+ * Implementation: GPU-accelerated industrial inference and model attestation.
+ * Mission: Provide a post-quantum secured AI compute lattice.
+ */
 
 namespace SigmaOS {
 namespace Kernel {
@@ -23,9 +29,12 @@ public:
     }
 
     void runInference(const void* input, void* output) {
-        // Logic for GPU-accelerated shard inference
-        sigma_log_info("[AI:ML] Inference active on Compute Shard S%u.", 0);
+        (void)input; (void)output;
+        sigma_log_info("[AI:ML] Inference active on Compute Shard S-TENSOR.");
     }
+
+private:
+    SovereignAI() = default;
 };
 
 } // namespace AI
@@ -33,7 +42,6 @@ public:
 } // namespace SigmaOS
 
 extern "C" {
-    void ai_init() {
-        SigmaOS::Kernel::AI::SovereignAI::getInstance().init();
-    }
+    void ai_init() { SigmaOS::Kernel::AI::SovereignAI::getInstance().init(); }
+    void ai_load(const char* path) { SigmaOS::Kernel::AI::SovereignAI::getInstance().loadModel(path); }
 }

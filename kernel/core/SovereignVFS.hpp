@@ -1,15 +1,15 @@
 #ifndef SOVEREIGN_VFS_HPP
 #define SOVEREIGN_VFS_HPP
 
-#include "core/sigma_types.h"
-#include "core/SigmaOOP.hpp"
+#include "../include/core/sigma_types.h"
+#include "../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
 namespace FS {
 
-class SovereignDistributedVFS : public SigmaObject, public SigmaSingleton<SovereignDistributedVFS> {
-    friend class SigmaSingleton<SovereignDistributedVFS>;
+class SovereignDistributedVFS : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignDistributedVFS> {
+    friend class SigmaOS::SigmaSingleton<SovereignDistributedVFS>;
 public:
     const char* type_name() const noexcept override { return "SovereignDistributedVFS"; }
 
