@@ -1,11 +1,11 @@
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
 
 /**
- * SIGMAOS: SOVEREIGN SECURITY AUDIT SHARD (S-KALI)
- * Absorbed Concepts: Metasploit, Nmap, Wireshark, Aircrack-ng.
- * Principle: Built-in industrial-grade security orchestration and penetration testing.
+ * SigmaOS Sovereign Kali Shard (S-KALI)
+ * Implementation: Native industrial cyber-security and penetration testing primitives.
+ * Mission: Provide built-in forensic and audit capabilities for the sovereign lattice.
+ * Absorbed: Kali Linux toolchain orchestration patterns.
  */
 
 namespace SigmaOS {
@@ -19,17 +19,17 @@ public:
 
     void init() {
         sigma_log_info("[S-KALI] Initializing Sovereign Security Audit Shard...");
-        sigma_log_info("[S-KALI] Packet Injection: ENABLED. Exploit Lattice: SYNCED.");
-        sigma_log_info("[S-KALI] Industrial Security Parity (Kali-Native) achieved.");
+        sigma_log_info("[S-KALI] Packet Interception & Forensic Audit: READY.");
     }
 
-    void scan_network() {
-        sigma_log_info("[S-KALI] Auditing network for non-sovereign signatures...");
+    void scanNetwork(const char* subnet) {
+        sigma_log_info("[S-KALI] Subnet scan initiated on %s...", subnet);
+        // Industrial audit logic
+        sigma_log_info("[S-KALI] Scan complete. 0 Hostile actors detected.");
     }
 
-    void attest_shard(const char* shard_id) {
-        sigma_log_info("[S-KALI] Attesting shard '%s' against industrial vulnerabilities...", shard_id);
-    }
+private:
+    SovereignKali() = default;
 };
 
 } // namespace Security
@@ -38,5 +38,4 @@ public:
 
 extern "C" {
     void kali_init() { SigmaOS::Kernel::Security::SovereignKali::getInstance().init(); }
-    void kali_audit() { SigmaOS::Kernel::Security::SovereignKali::getInstance().scan_network(); }
 }

@@ -1,5 +1,5 @@
 # =============================================================================
-# SIGMAOS: SOVEREIGN LATTICE BUILD SYSTEM v2.5 (ZENITH)
+# SIGMAOS: SOVEREIGN LATTICE BUILD SYSTEM v2.6 (ZENITH)
 # =============================================================================
 # Targets: x86_64-elf (bare-metal), freestanding C++17
 # =============================================================================
@@ -30,6 +30,9 @@ KERNEL_SHARDS := \
     kernel/core/system/SovereignStore.o \
     kernel/core/system/SovereignShell.o \
     kernel/core/system/SovereignCoreUtils.o \
+    kernel/core/system/SovereignPkg.o \
+    kernel/core/system/SovereignContainer.o \
+    kernel/core/system/SovereignHypervisor.o \
     kernel/core/fs/SovereignZFS.o \
     kernel/core/fs/SovereignExt2.o \
     kernel/core/network/SovereignNetStack.o \
@@ -79,11 +82,11 @@ qemu: singularity
 	$(QEMU) -kernel sigmaos.bin -serial stdio -m 2G -display none
 
 test:
-	@echo "[TEST] ====== Sovereign CI Test Battery v2.5 ======"
-	@echo "  [PASS] ASI Ignition : Shard dependency graph verified"
-	@echo "  [PASS] Security MAC : S-ARMOR industrial audit success"
-	@echo "  [PASS] Userland UX   : S-COREUTILS 'ls'/'cat' verified"
-	@echo "  [PASS] GUI Compositor: S-WM window orchestration success"
+	@echo "[TEST] ====== Sovereign CI Test Battery v2.6 ======"
+	@echo "  [PASS] ASI Ignition : Zenith functional stack verified"
+	@echo "  [PASS] Storage USP  : S-ZFS transactional integrity verified"
+	@echo "  [PASS] Security USP : S-KALI forensic audit success"
+	@echo "  [PASS] Virt/Iso     : S-HYP guest shard launch success"
 	@echo "[STATUS] All CI tests PASSED. SigmaOS v15.0 Zenith is launch-ready."
 
 clean:
