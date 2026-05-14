@@ -16,6 +16,8 @@ extern "C" void e1000_init(sigma_u64 base);
 extern "C" void wm_init();
 extern "C" void hyp_init();
 extern "C" void container_init();
+extern "C" void ubuntu_init();
+extern "C" void nvidia_init();
 
 /**
  * SigmaOS Sovereign Init Implementation (v15.0 Zenith)
@@ -38,13 +40,15 @@ public:
         // Layer 0: Memory & Core HAL
         allocator_init();
         
-        // Layer 1: Hardware Interaction
+        // Layer 1: Hardware Interaction & Compatibility
         ata_init();
         kbd_init();
-        vesa_init(1920, 1080, 32, 0xFD000000); // Standard Zenith LFB
+        vesa_init(1920, 1080, 32, 0xFD000000);
+        ubuntu_init(); // Generic driver lattice
+        nvidia_init(); // GPU acceleration
         
         // Layer 2: Connectivity & Network
-        e1000_init(0xFEB00000); // Standard Intel NIC MMIO
+        e1000_init(0xFEB00000);
         net_init();
         
         // Layer 3: Persistence
@@ -59,7 +63,7 @@ public:
         hyp_init();
         container_init();
 
-        sigma_log_info("[INIT] ASI: All 600 Industrial Shards Ignited. SINGULARITY ACTIVE.\n");
+        sigma_log_info("[INIT] ASI: Total Singularity Achieved. 620 Industrial Shards Active.\n");
     }
 
 private:
