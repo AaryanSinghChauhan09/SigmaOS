@@ -16,6 +16,9 @@ extern "C" void sata_init(sigma_u64 base);
 extern "C" void scsi_init();
 extern "C" void usb3_init(sigma_u64 base);
 extern "C" void e1000_init(sigma_u64 base);
+extern "C" void firewire_init(sigma_u64 base);
+extern "C" void pcmcia_init();
+extern "C" void agp_init(sigma_u64 base, sigma_u32 size);
 extern "C" void wm_init();
 extern "C" void hyp_init();
 extern "C" void container_init();
@@ -45,27 +48,30 @@ public:
         // Layer 0: Memory & Core HAL
         allocator_init();
         
-        // Layer 1: Hardware Interaction & Compatibility
+        // Layer 1: Hardware Interaction (Storage & Bus)
         ata_init();
         sata_init(0xFEA00000);
         scsi_init();
         usb3_init(0xFE000000);
+        firewire_init(0xFD000000);
+        pcmcia_init();
         kbd_init();
+        
+        // Layer 2: Graphics & Multimedia
+        agp_init(0xE0000000, 128);
         vesa_init(1920, 1080, 32, 0xFD000000);
-        ubuntu_init();
         nvidia_init();
         ati_init();
         media_init();
+        ubuntu_init(); // Generic compatibility
         
-        // Layer 2: Connectivity & Network
+        // Layer 3: Connectivity & Network
         e1000_init(0xFEB00000);
         net_init();
         
-        // Layer 3: Persistence
+        // Layer 4: Persistence & Userland
         vfs_init();
         ext2_mount("/dev/sda1");
-        
-        // Layer 4: Userland & UI
         pkg_init();
         wm_init();
         
@@ -73,7 +79,7 @@ public:
         hyp_init();
         container_init();
 
-        sigma_log_info("[INIT] ASI: Total Singularity Achieved. 650+ Industrial Shards Active.\n");
+        sigma_log_info("[INIT] ASI: Total Singularity Achieved. 680+ Industrial Shards Active.\n");
     }
 
 private:

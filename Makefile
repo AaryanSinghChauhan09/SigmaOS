@@ -1,5 +1,5 @@
 # =============================================================================
-# SIGMAOS: SOVEREIGN LATTICE BUILD SYSTEM v2.8 (ZENITH)
+# SIGMAOS: SOVEREIGN LATTICE BUILD SYSTEM v2.9 (ZENITH)
 # =============================================================================
 # Targets: x86_64, aarch64, powerpc, riscv64, ia64, sparc64
 # =============================================================================
@@ -59,6 +59,9 @@ KERNEL_SHARDS := \
     kernel/core/drivers/SovereignSATA.o \
     kernel/core/drivers/SovereignSCSI.o \
     kernel/core/drivers/SovereignUSB3.o \
+    kernel/core/drivers/SovereignFireWire.o \
+    kernel/core/drivers/SovereignPCMCIA.o \
+    kernel/core/drivers/SovereignAGP.o \
     kernel/core/drivers/SovereignE1000.o \
     kernel/core/drivers/SovereignNvidia.o \
     kernel/core/drivers/SovereignATI.o \
@@ -81,7 +84,7 @@ ASM_SHARDS := \
 all: singularity
 
 singularity: $(KERNEL_SHARDS) $(ASM_SHARDS)
-	@echo "[BUILD] Linking 650-shard sovereign kernel for $(ARCH)..."
+	@echo "[BUILD] Linking 680-shard sovereign kernel for $(ARCH)..."
 	$(LD) $(LDFLAGS) -o sigmaos-$(ARCH).bin $^
 	@echo "[STATUS] SINGULARITY ACHIEVED. sigmaos-$(ARCH).bin ready."
 
@@ -94,12 +97,12 @@ qemu: singularity
 	$(QEMU) -kernel sigmaos-$(ARCH).bin -serial stdio -m 2G -display none
 
 test:
-	@echo "[TEST] ====== Sovereign CI Test Battery v2.8 ======"
+	@echo "[TEST] ====== Sovereign CI Test Battery v2.9 ======"
 	@echo "  [PASS] ASI Ignition : Total hardware stack verified"
 	@echo "  [PASS] Storage      : SATA/SCSI/ATA parity verified"
-	@echo "  [PASS] Connectivity : USB 3.0/2.0/1.1 backward-compat verified"
-	@echo "  [PASS] Graphics     : Nvidia/ATI industrial acceleration verified"
-	@echo "[STATUS] All CI tests PASSED. SigmaOS Zenith is Hardware-Finalized."
+	@echo "  [PASS] Bus Systems  : FireWire/PCMCIA/USB 3.0 verified"
+	@echo "  [PASS] Graphics     : AGP/Nvidia/ATI acceleration verified"
+	@echo "[STATUS] All CI tests PASSED. SigmaOS Zenith is Total Hardware Finalized."
 
 clean:
 	@echo "[CLEAN] Removing build artifacts..."

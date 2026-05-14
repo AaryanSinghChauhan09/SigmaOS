@@ -71,6 +71,9 @@ kernel/core/drivers/SovereignATA.cpp
 kernel/core/drivers/SovereignSATA.cpp
 kernel/core/drivers/SovereignSCSI.cpp
 kernel/core/drivers/SovereignUSB3.cpp
+kernel/core/drivers/SovereignFireWire.cpp
+kernel/core/drivers/SovereignPCMCIA.cpp
+kernel/core/drivers/SovereignAGP.cpp
 kernel/core/drivers/SovereignE1000.cpp
 kernel/core/drivers/SovereignNvidia.cpp
 kernel/core/drivers/SovereignATI.cpp
