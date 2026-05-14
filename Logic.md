@@ -91,6 +91,9 @@ Below is a non-exhaustive list of critical shards and their relationships to the
 | File Path | Role | Logic |
 | :--- | :--- | :--- |
 | `kernel/core/automation/SovereignAutomation.cpp` | Automation Nexus | Orchestrates industrial-specific healing and rollback logic. |
+| `kernel/core/ui/SovereignTerminal.cpp` | Terminal Engine | GPU-accelerated CLI emulator for Zenith. |
+| `kernel/core/hal/SovereignNUMA.cpp` | NUMA Logic | Multi-node memory and CPU orchestration. |
+| `kernel/core/drivers/SovereignNVMe.cpp` | NVMe Driver | Ultra-low latency industrial storage. |
 | `kernel/core/security/SovereignUserAccounts.cpp` | Identity Matrix | Multi-tenant UID/GID management. |
 | `kernel/core/hal/SovereignVMM.cpp` | Virtual Memory | Demand-paging and Page-Table orchestration. |
 | `kernel/core/drivers/SovereignUSB.cpp` | USB Stack | XHCI/EHCI controller and device discovery. |
