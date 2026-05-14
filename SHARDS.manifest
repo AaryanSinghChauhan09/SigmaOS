@@ -45,10 +45,13 @@ kernel/core/security/SovereignKali.cpp
 kernel/core/security/SovereignGPG.cpp
 kernel/core/security/SovereignPQC.cpp
 kernel/core/security/SovereignLUKS.cpp
+kernel/core/security/SovereignAppArmor.cpp
 kernel/core/config/SovereignDecl.cpp
 kernel/core/system/SovereignNexus.cpp
 kernel/core/system/SovereignStore.cpp
 kernel/core/system/SovereignForum.cpp
+kernel/core/system/SovereignShell.cpp
+kernel/core/system/SovereignCoreUtils.cpp
 kernel/core/observability/SovereignBPF.cpp
 kernel/core/observability/SovereignWiki.cpp
 kernel/core/profiles/SovereignProfile.cpp

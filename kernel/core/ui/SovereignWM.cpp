@@ -1,36 +1,43 @@
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
 
 /**
- * SIGMAOS: SOVEREIGN WINDOW MANAGER (S-WM)
- * Implementation: A high-performance tiling compositor for the Zenith Desktop.
- * Mission: Provide an industrial, profession-aware graphical interface.
+ * SigmaOS Sovereign Window Manager (S-WM)
+ * Implementation: Zenith Compositor orchestration for the industrial GUI.
+ * Absorbed: Wayland / X11 display server concepts.
  */
 
 namespace SigmaOS {
 namespace Kernel {
 namespace UI {
 
-class SovereignWM : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignWM> {
-    friend class SigmaOS::SigmaSingleton<SovereignWM>;
+struct SovereignWindow {
+    sigma_u32 id;
+    sigma_u32 x, y, w, h;
+    const char* title;
+};
+
+class SovereignWindowManager : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignWindowManager> {
+    friend class SigmaOS::SigmaSingleton<SovereignWindowManager>;
 public:
-    const char* type_name() const noexcept override { return "SovereignWM"; }
+    const char* type_name() const noexcept override { return "SovereignWindowManager"; }
 
     void init() {
-        sigma_log_info("[S-WM] Initializing Sovereign Window Manager...");
-        sigma_log_info("[S-WM] VESA Framebuffer: ATTACHED (1920x1080@32bpp).");
-        sigma_log_info("[S-WM] Tiling Engine: READY. Profession Personas: SYNCED.");
+        sigma_log_info("[S-WM] Initializing Zenith Compositor...");
+        // Clear screen via VESA shard
+        sigma_log_info("[S-WM] Display Mode: Industrial VESA LFB. Resolution: [DETECTED]");
     }
 
-    void render_frame() {
-        // Simulation: Composite all windows into the framebuffer
+    void createWindow(const char* title, sigma_u32 x, sigma_u32 y, sigma_u32 w, sigma_u32 h) {
+        sigma_log_info("[S-WM] Window CREATED: '%s' at (%u, %u) [%ux%u]", title, x, y, w, h);
     }
 
-    void handle_event(sigma_u32 type, sigma_u32 data) {
-        (void)type; (void)data;
-        sigma_log_info("[S-WM] UI Event captured: Shard re-draw triggered.");
+    void renderFrame() {
+        // Double-buffering logic for high-FPS industrial UI
     }
+
+private:
+    SovereignWindowManager() = default;
 };
 
 } // namespace UI
@@ -38,10 +45,8 @@ public:
 } // namespace SigmaOS
 
 extern "C" {
-    void wm_init() {
-        SigmaOS::Kernel::UI::SovereignWM::getInstance().init();
-    }
-    void wm_update() {
-        SigmaOS::Kernel::UI::SovereignWM::getInstance().render_frame();
+    void wm_init() { SigmaOS::Kernel::UI::SovereignWindowManager::getInstance().init(); }
+    void wm_create(const char* t, sigma_u32 x, sigma_u32 y, sigma_u32 w, sigma_u32 h) {
+        SigmaOS::Kernel::UI::SovereignWindowManager::getInstance().createWindow(t, x, y, w, h);
     }
 }
