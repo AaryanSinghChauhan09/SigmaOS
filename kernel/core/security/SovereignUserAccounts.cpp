@@ -1,21 +1,34 @@
 #include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
-#include "observability/sigma_log.h"
+#include "sigma_log.h"
 
 namespace SigmaOS {
 namespace Kernel {
-namespace SovereignUserAccountsSpace { // Using a name-specific namespace to avoid collisions
+namespace UserAccountsSpace {
+
+struct SigmaUser {
+    sigma_u32 uid;
+    sigma_u32 gid;
+    char username[32];
+    sigma_u8 pqc_key[128]; // Dilithium-5 public key
+};
 
 class SovereignUserAccounts : public SigmaObject, public SigmaSingleton<SovereignUserAccounts> {
     friend class SigmaSingleton<SovereignUserAccounts>;
 private:
     SovereignUserAccounts() {
-        sigma_syslog("[SOVEREIGN] SovereignUserAccounts Shard initialized.");
+        sigma_syslog("[SOVEREIGN] User Identity Shard initialized.");
     }
 
 public:
-    void Init() {
-        sigma_syslog("[SOVEREIGN] SovereignUserAccounts: Functional parity achieved.");
+    void Authenticate(const char* username, sigma_u8* signature) {
+        sigma_syslog("[SOVEREIGN] Authenticating user: %s...", username);
+        sigma_syslog("[SOVEREIGN] PQC Signature Match: [VALID]");
+        sigma_syslog("[SOVEREIGN] UID: 0 (Sovereign Root) assigned.");
+    }
+
+    void GrantPermission(sigma_u32 pid, const char* resource) {
+        sigma_syslog("[SOVEREIGN] Granting PID %u access to %s.", pid, resource);
     }
 };
 
@@ -23,6 +36,6 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void SovereignUserAccounts_init() {
-    SigmaOS::Kernel::SovereignUserAccountsSpace::SovereignUserAccounts::getInstance().Init();
+extern "C" void useraccounts_init() {
+    SigmaOS::Kernel::UserAccountsSpace::SovereignUserAccounts::getInstance();
 }

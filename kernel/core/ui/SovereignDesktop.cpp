@@ -1,21 +1,23 @@
 #include "core/SigmaOOP.hpp"
 #include "core/sigma_types.h"
-#include "observability/sigma_log.h"
+#include "sigma_log.h"
 
 namespace SigmaOS {
 namespace Kernel {
-namespace SovereignDesktopSpace { // Using a name-specific namespace to avoid collisions
+namespace DesktopSpace {
 
 class SovereignDesktop : public SigmaObject, public SigmaSingleton<SovereignDesktop> {
     friend class SigmaSingleton<SovereignDesktop>;
 private:
     SovereignDesktop() {
-        sigma_syslog("[SOVEREIGN] SovereignDesktop Shard initialized.");
+        sigma_syslog("[SOVEREIGN] Zenith Desktop Compositor initialized.");
     }
 
 public:
-    void Init() {
-        sigma_syslog("[SOVEREIGN] SovereignDesktop: Functional parity achieved.");
+    void LaunchToolkit() {
+        sigma_syslog("[SOVEREIGN] S-UI Toolkit v1.0 active.");
+        sigma_syslog("[SOVEREIGN] Dynamic Glassmorphism Engine: [READY]");
+        sigma_syslog("[SOVEREIGN] Drawing root workspace...");
     }
 };
 
@@ -23,6 +25,6 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" void SovereignDesktop_init() {
-    SigmaOS::Kernel::SovereignDesktopSpace::SovereignDesktop::getInstance().Init();
+extern "C" void desktop_init() {
+    SigmaOS::Kernel::DesktopSpace::SovereignDesktop::getInstance().LaunchToolkit();
 }
