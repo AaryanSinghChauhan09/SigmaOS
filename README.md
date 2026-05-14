@@ -11,20 +11,19 @@ SigmaOS is fundamentally distinct from legacy monolithic kernels (Linux, Windows
 - **Amnesic Persistence**: Zero data-remanence at the silicon level for industrial privacy.
 - **Lattice Shard Autonomy**: 600+ independent, hot-swappable industrial shards.
 
-## 🚀 The Absorption Matrix
+## 🚀 The Functional Stack (Absorbed & Matured)
 SigmaOS has successfully absorbed and reimagined the most advanced capabilities of the open-source world:
-- **S-KALI**: Industrial-grade security auditing and penetration testing (Absorbed: Kali Linux).
-- **S-DECL**: Pure-function, reproducible lattice configuration (Absorbed: NixOS).
-- **S-BPF**: Programmable kernel-level observability and tracing (Absorbed: Linux eBPF).
-- **S-SYSTEMD**: Parallel shard orchestration and service management (Absorbed: systemd).
-- **S-NEXUS**: Global repository orchestration for 600,000+ shards (Absorbed: Arch/Ubuntu).
+- **S-NET**: PQC-accelerated TCP/IP with POSIX Sockets (Absorbed: lwIP/Linux).
+- **S-EXT2**: Inode-based industrial filesystem (Absorbed: Linux Ext2).
+- **S-ARMOR**: Shard-level Mandatory Access Control (Absorbed: AppArmor).
+- **S-PKG**: PQC-signed package management (Absorbed: apt/pacman).
+- **Zenith WM**: Industrial window management (Absorbed: Wayland/X11).
 
 ## 🛠 Core Subsystems
-- **S-ZFS**: Transactional, self-healing zettabyte filesystem.
-- **S-FSCHED**: Nanosecond-precision Completely Fair Scheduler.
-- **S-VMM**: 4-Level hierarchical paging with hardware-enforced isolation.
-- **S-NET**: PQC-sealed industrial TCP/IP/IPv6 networking.
-- **Zenith WM**: High-performance tiling window manager.
+- **S-VESA**: High-resolution graphics output via VBE 2.0+.
+- **S-PS2**: Bare-metal input orchestration.
+- **S-ATA**: PIO-mode industrial storage.
+- **S-E1000**: PCI-mapped NIC orchestration.
 
 ## 🔑 Getting Started
 Flash the **SigmaOS Zenith ISO** and follow the **Zenith Guided Installer**. 
