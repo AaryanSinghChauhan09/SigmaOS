@@ -104,6 +104,8 @@ extern "C" void SovereignAISched_ignite();
 extern "C" void SovereignCorespace_ignite();
 extern "C" void SovereignVault_ignite();
 extern "C" void SovereignEther_ignite();
+extern "C" void SovereignSDK_enable();
+extern "C" void SovereignPartition_enable();
 extern "C" void swap_init();
 extern "C" void swap_init();
 extern "C" void watchdog_init();
@@ -245,6 +247,8 @@ public:
         SovereignCorespace_ignite();
         SovereignVault_ignite();
         SovereignEther_ignite();
+        SovereignSDK_enable();
+        SovereignPartition_enable();
         swap_init();
         watchdog_init();
         auditlog_init();
