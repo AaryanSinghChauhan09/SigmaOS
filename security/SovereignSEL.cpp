@@ -28,7 +28,7 @@ public:
 
     static void init() {
         sigma_log("[SEL] Initializing Security Enforcement Lattice...");
-        getInstance().getInstance().getInstance().getInstance().m_active_sandboxes = 0;
+        getInstance().getInstance().getInstance().getInstance().getInstance().m_active_sandboxes = 0;
         sigma_log("[SEL] Micro-VM Isolation Shards (Intel VT-x) READY.");
     }
 
@@ -86,6 +86,7 @@ void sel_spawn_sandbox(const char* name) {
 
 
 } // extern "C"
+
 
 
 

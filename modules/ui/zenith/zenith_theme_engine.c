@@ -4,9 +4,9 @@
  * Context-aware Zenith UI personalisation for industrial shards
  * ============================================================
  */
-#include "libc/SovereignLibC.h"
-#include "sigma_log.h"
-#include "core/sigma_types.h"
+#include "../../../include/libc/SovereignLibC.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/core/sigma_types.h"
 
 typedef struct {
     sigma_u8 r, g, b, a;
@@ -45,7 +45,6 @@ static const zenith_color_t TEXT_DARK    = { 20,  20,  20, 255};
 void zenith_theme_load_shard(const char* shard_name) {
     sigma_log_info("[THEME] Loading Zenith persona for shard: %s\n", shard_name);
 
-    /* FIX: use sigma_hardened_strcmp (sigma_strcmp is the alias, hardened is canonical) */
     if      (sigma_hardened_strcmp(shard_name, "Medical")   == 0) {
         g_current_spec = (zenith_theme_spec_t){COLOR_CLINICAL_TEAL,  BG_LIGHT,      TEXT_DARK,  12, 200, "Outfit"       };
     } else if (sigma_hardened_strcmp(shard_name, "Finance") == 0) {
@@ -61,7 +60,6 @@ void zenith_theme_load_shard(const char* shard_name) {
     } else if (sigma_hardened_strcmp(shard_name, "Agri")    == 0) {
         g_current_spec = (zenith_theme_spec_t){COLOR_AGRI_GREEN,     BG_SOVEREIGN,  TEXT_WHITE, 12, 200, "Outfit"       };
     } else {
-        /* Default Sovereign Dark */
         g_current_spec = (zenith_theme_spec_t){COLOR_SOVEREIGN_BLUE, BG_SOVEREIGN,  TEXT_WHITE, 12, 240, "Outfit"       };
     }
 
@@ -70,7 +68,6 @@ void zenith_theme_load_shard(const char* shard_name) {
         g_current_spec.glass_alpha, g_current_spec.font_family);
 }
 
-/* Legacy alias for backward compat */
 void zenith_theme_load_industrial(const char* shard_name) {
     zenith_theme_load_shard(shard_name);
 }
