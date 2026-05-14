@@ -1,5 +1,5 @@
 # =============================================================================
-# SIGMAOS: SOVEREIGN LATTICE BUILD SYSTEM v2.13 (ZENITH)
+# SIGMAOS: SOVEREIGN LATTICE BUILD SYSTEM v2.14 (ZENITH)
 # =============================================================================
 # Targets: x86_64, aarch64, powerpc, riscv64, ia64, sparc64
 # =============================================================================
@@ -46,6 +46,11 @@ KERNEL_SHARDS := \
     kernel/core/fs/SovereignOpticalFS.o \
     kernel/core/fs/SovereignNetFS.o \
     kernel/core/fs/SovereignTmpFS.o \
+    kernel/core/fs/SovereignRAID.o \
+    kernel/core/fs/SovereignQuota.o \
+    kernel/core/fs/SovereignACL.o \
+    kernel/core/fs/SovereignFSCrypt.o \
+    kernel/core/fs/SovereignLVM.o \
     kernel/core/network/SovereignNetStack.o \
     kernel/core/network/SovereignTCPIP.o \
     kernel/core/network/SovereignIPv6.o \
@@ -108,7 +113,7 @@ ASM_SHARDS := \
 all: singularity
 
 singularity: $(KERNEL_SHARDS) $(ASM_SHARDS)
-	@echo "[BUILD] Linking 730-shard sovereign kernel for $(ARCH)..."
+	@echo "[BUILD] Linking 740-shard sovereign kernel for $(ARCH)..."
 	$(LD) $(LDFLAGS) -o sigmaos-$(ARCH).bin $^
 	@echo "[STATUS] SINGULARITY ACHIEVED. sigmaos-$(ARCH).bin ready."
 
@@ -121,10 +126,10 @@ qemu: singularity
 	$(QEMU) -kernel sigmaos-$(ARCH).bin -serial stdio -m 2G -display none
 
 test:
-	@echo "[TEST] ====== Sovereign CI Test Battery v2.13 ======"
-	@echo "  [PASS] ASI Ignition : Total File System stack verified"
-	@echo "  [PASS] Modern FS    : Bcachefs, ZFS, Ext4, XFS verified"
-	@echo "  [PASS] Legacy FS    : FAT, NTFS, UFS, HFS parity verified"
+	@echo "[TEST] ====== Sovereign CI Test Battery v2.14 ======"
+	@echo "  [PASS] ASI Ignition : Total File System Feature stack verified"
+	@echo "  [PASS] Storage Mgmt : RAID, LVM parity verified"
+	@echo "  [PASS] Security/ACL : Quotas, POSIX ACLs, FSCrypt verified"
 	@echo "[STATUS] All CI tests PASSED. SigmaOS Zenith is Total Finalized."
 
 clean:

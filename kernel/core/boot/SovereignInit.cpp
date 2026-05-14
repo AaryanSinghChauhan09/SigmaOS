@@ -50,6 +50,11 @@ extern "C" void legacyfs_init();
 extern "C" void opticalfs_init();
 extern "C" void netfs_init();
 extern "C" void tmpfs_init();
+extern "C" void raid_init();
+extern "C" void quota_init();
+extern "C" void acl_init();
+extern "C" void fscrypt_init();
+extern "C" void lvm_init();
 
 /**
  * SigmaOS Sovereign Init Implementation (v15.0 Zenith)
@@ -110,7 +115,10 @@ public:
         firewall_init();
         secnet_init();
         
-        // Layer 4: Persistence, File Systems & Userland
+        // Layer 4: Persistence, File Systems & Volume Management
+        lvm_init();
+        raid_init();
+        fscrypt_init();
         vfs_init();
         bcachefs_init();
         fat_init();
@@ -121,6 +129,9 @@ public:
         opticalfs_init();
         netfs_init();
         tmpfs_init();
+        quota_init();
+        acl_init();
+        
         ext2_mount("/dev/sda1"); // Root mount
         
         pkg_init();
@@ -130,7 +141,7 @@ public:
         hyp_init();
         container_init();
 
-        sigma_log_info("[INIT] ASI: Total Singularity Achieved. 730+ Industrial Shards Active.\n");
+        sigma_log_info("[INIT] ASI: Total Singularity Achieved. 740+ Industrial Shards Active.\n");
     }
 
 private:

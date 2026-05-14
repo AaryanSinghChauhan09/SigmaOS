@@ -52,6 +52,11 @@ kernel/core/fs/SovereignLegacyFS.cpp
 kernel/core/fs/SovereignOpticalFS.cpp
 kernel/core/fs/SovereignNetFS.cpp
 kernel/core/fs/SovereignTmpFS.cpp
+kernel/core/fs/SovereignRAID.cpp
+kernel/core/fs/SovereignQuota.cpp
+kernel/core/fs/SovereignACL.cpp
+kernel/core/fs/SovereignFSCrypt.cpp
+kernel/core/fs/SovereignLVM.cpp
 kernel/core/network/SovereignNetStack.cpp
 kernel/core/network/SovereignTCPIP.cpp
 kernel/core/network/SovereignIPv6.cpp
