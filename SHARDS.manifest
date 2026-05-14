@@ -23,6 +23,11 @@ kernel/core/hal/SovereignWiFiTranspiler.cpp
 kernel/core/hal/SovereignMesaTranspiler.cpp
 kernel/core/hal/SovereignWatchdog.cpp
 kernel/core/hal/SovereignSerial.cpp
+kernel/core/hal/SovereignArchARM.cpp
+kernel/core/hal/SovereignArchPPC.cpp
+kernel/core/hal/SovereignArchRISCV.cpp
+kernel/core/hal/SovereignArchIA64.cpp
+kernel/core/hal/SovereignArchSPARC.cpp
 kernel/core/mem/SovereignAllocator.cpp
 
 # LAYER 1: KERNEL CORE (IPC, SCHEDULER, MEMORY, FS, NET)
@@ -52,6 +57,9 @@ kernel/core/system/SovereignStore.cpp
 kernel/core/system/SovereignForum.cpp
 kernel/core/system/SovereignShell.cpp
 kernel/core/system/SovereignCoreUtils.cpp
+kernel/core/system/SovereignPkg.cpp
+kernel/core/system/SovereignContainer.cpp
+kernel/core/system/SovereignHypervisor.cpp
 kernel/core/observability/SovereignBPF.cpp
 kernel/core/observability/SovereignWiki.cpp
 kernel/core/profiles/SovereignProfile.cpp
