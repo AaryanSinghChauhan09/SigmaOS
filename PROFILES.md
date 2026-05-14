@@ -2,7 +2,7 @@
 
 ## The Profile Paradigm
 
-SigmaOS Horizon v15.0 introduces **modular profession profiles**. Each profile is a cryptographically-attested "shard bundle" that pre-configures the kernel, userland, and toolchain for a specific industrial role. Every profile bundle is PQC-signed (Dilithium-5) before installation.
+SigmaOS Zenith v15.0 introduces **modular profession profiles**. Each profile is a cryptographically-attested "shard bundle" that pre-configures the kernel, userland, and toolchain for a specific industrial role. Every profile bundle is PQC-signed (Dilithium-5) before installation.
 
 ---
 

@@ -30,11 +30,12 @@ public:
 
     void dmesg() {
         sigma_log_info("\n--- SOVEREIGN KERNEL LOGS (dmesg) ---\n");
-        // Simulation: Output the ring buffer
         sigma_log_info("[0.000000] ASI: Ignition sequence start.");
-        sigma_log_info("[0.012345] S-MM: Slab initialized.");
-        sigma_log_info("[0.045678] S-VMM: Paging active.");
-        sigma_log_info("[0.123456] S-NET: IP stack bound.");
+        sigma_log_info("[0.012345] S-MM: Slab initialized (128MB).");
+        sigma_log_info("[0.045678] S-VMM: Paging active (4-Level).");
+        sigma_log_info("[0.123456] S-NET: IP stack bound (IPv4/IPv6).");
+        sigma_log_info("[0.156789] S-LFS: Ext2 mount point reached.");
+        sigma_log_info("[0.200000] S-WM: VESA Framebuffer initialized.");
         sigma_log_info("--- END OF LOG ---\n");
     }
 

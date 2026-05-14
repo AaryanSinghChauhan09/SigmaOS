@@ -28,18 +28,25 @@ kernel/core/diag/SovereignKdump.cpp
 include/ipc/SovereignEventBus.h
 include/sched/SovereignScheduler.h
 kernel/core/ipc/SovereignBridge.cpp
-kernel/core/SovereignScheduler.cpp
+kernel/core/system/SovereignScheduler.cpp
+kernel/core/system/SovereignFairSched.cpp
+kernel/core/system/SovereignCGroup.cpp
 kernel/core/fs/SovereignLatticeFS.cpp
+kernel/core/fs/SovereignExt2.cpp
+kernel/core/fs/SovereignZFS.cpp
 kernel/core/network/SovereignNetStack.cpp
 kernel/core/system/SovereignSyscalls.cpp
 kernel/core/security/SovereignIdentity.cpp
+kernel/core/security/SovereignKali.cpp
+kernel/core/config/SovereignDecl.cpp
+kernel/core/system/SovereignNexus.cpp
 kernel/core/profiles/SovereignProfile.cpp
 
 # LAYER 6: SYSTEM UTILITIES
 suites/S32_SystemTools/core/SovereignCoreUtils.cpp
 kernel/core/system/SigmaPkg.cpp
-kernel/core/toolchain/SovereignToolchain.cpp
-kernel/core/security/SovereignAudit.cpp
+kernel/core/observability/SovereignLogD.cpp
+kernel/core/ui/SovereignWM.cpp
 kernel/core/ds/SovereignDS.cpp
 
 # ... [Remaining layers maintained in lattice memory] ...
