@@ -1,6 +1,6 @@
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -32,5 +32,9 @@ public:
 extern "C" {
     void luks_init() {
         SigmaOS::Kernel::Security::SovereignLUKS::getInstance().init();
+    }
+    
+    int luks_unlock(const char* device, const char* passphrase) {
+        return SigmaOS::Kernel::Security::SovereignLUKS::getInstance().unlock(device, passphrase) ? 1 : 0;
     }
 }

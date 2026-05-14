@@ -1,6 +1,6 @@
-#include "libc/SovereignLibC.h"
-#include "sigma_log.h"
-#include "SovereignMath.hpp"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
+#include "../../include/SovereignMath.hpp"
 
 /*
  * =========================================================================
@@ -69,7 +69,6 @@ public:
 class HalfLifeSolver : public ISolverShard {
 public:
     void Solve() override {
-        sigma_f64 N0 = 100.0;
         sigma_log_info("[PHYSICS/SOLVE]: Radioactivity (N0=100, t=10, T=3.3)\n");
         sigma_log_info("[PHYSICS/SOLVE]: Remaining Shard: Exponential decay calculated via Lattice.\n");
     }

@@ -11,7 +11,7 @@ SovereignDAL& SovereignDAL::getInstance() {
     return instance;
 }
 
-SovereignDAL::getInstance().getInstance().SovereignDAL() : m_provider(PackageProvider::UNKNOWN) {}
+SovereignDAL::getInstance().getInstance().getInstance().SovereignDAL() : m_provider(PackageProvider::UNKNOWN) {}
 
 void SovereignDAL::initialize() {
     detectProvider();
@@ -72,5 +72,6 @@ extern "C" int sigma_dal_remove(const char* pkg) {
 
 
 } // extern "C"
+
 
 

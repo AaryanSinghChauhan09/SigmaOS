@@ -2,11 +2,11 @@
 // SigmaOS  kernel/core/security  SovereignWatchdog.cpp  v2.0
 // Hardware Watchdog + Atomic Rollback on kernel deadlock
 // =============================================================================
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/core/SigmaOOP.hpp"
 
-/* Forward declaration of rollback (defined in SovereignRollback.cpp) */
+/* Forward declaration of rollback (defined in SovereignRollbackShard.cpp) */
 extern "C" void rollback_execute(void);
 
 namespace SigmaOS {
@@ -25,15 +25,15 @@ public:
         m_timeout_ms = timeout_ms;
         m_counter    = 0;
         m_triggered  = SIGMA_FALSE;
-        sigma_log("[WATCHDOG] Sovereign Industrial Watchdog v2.0 initialized.");
+        sigma_log_info("[WATCHDOG] Sovereign Industrial Watchdog v2.0 initialized.");
         sigma_log_info("[WATCHDOG] Timeout: %u ms | Fallback: ATOMIC ROLLBACK\n", m_timeout_ms);
-        sigma_log("[WATCHDOG] Heartbeat monitoring ACTIVE.");
+        sigma_log_info("[WATCHDOG] Heartbeat monitoring ACTIVE.");
     }
 
     /* Called periodically by the scheduler - resets the counter */
     void feed() {
         m_counter = 0;
-        sigma_log("[WATCHDOG] Heartbeat OK.");
+        sigma_log_info("[WATCHDOG] Heartbeat OK.");
     }
 
     /* Called on each timer tick - increments counter, triggers on expiry */
@@ -55,9 +55,9 @@ private:
     void onTimeout() {
         m_triggered = SIGMA_TRUE;
         sigma_log_err("[WATCHDOG CRITICAL] HEARTBEAT LOST - kernel deadlock suspected!");
-        sigma_log("[WATCHDOG CRITICAL] Initiating Sovereign Atomic Rollback...");
+        sigma_log_info("[WATCHDOG CRITICAL] Initiating Sovereign Atomic Rollback...");
         rollback_execute();
-        sigma_log("[WATCHDOG CRITICAL] Rollback complete. Resuming sovereign execution.");
+        sigma_log_info("[WATCHDOG CRITICAL] Rollback complete. Resuming sovereign execution.");
         m_triggered = SIGMA_FALSE;
         m_counter   = 0;
     }

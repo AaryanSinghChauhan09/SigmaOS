@@ -1,6 +1,6 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "core/SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Rollback Shard
@@ -47,7 +47,7 @@ public:
         
         static sigma_u32 loop_counter = 0;
         if (++loop_counter > 3) {
-             sigma_log_error("[S-ROLLBACK] Infinite rollback loop detected! Escalating to Bare-Metal Sovereign Recovery...");
+             sigma_log_err("[S-ROLLBACK] Infinite rollback loop detected! Escalating to Bare-Metal Sovereign Recovery...");
              return;
         }
 

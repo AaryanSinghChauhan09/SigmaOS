@@ -22,8 +22,8 @@ SovereignDiagEngine& SovereignDiagEngine::getInstance() {
 
 void SovereignDiagEngine::init() {
     sigma_log_info("[DIAG] Initializing Sovereign Diagnostic Nexus...");
-    this->getInstance().getInstance().m_initialized = 1U;
-    getInstance().getInstance().m_fault_count = 0U;
+    this->getInstance().getInstance().getInstance().m_initialized = 1U;
+    getInstance().getInstance().getInstance().m_fault_count = 0U;
 }
 
 void SovereignDiagEngine::performScan() {
@@ -73,5 +73,6 @@ void diag_report(const char* shard, const char* desc) {
 
 
 } // extern "C"
+
 
 
