@@ -137,6 +137,12 @@ KERNEL_SHARDS := \
     kernel/core/absorption/SovereignHarmony.o \
     kernel/core/absorption/SovereignAmoeba.o \
     kernel/core/absorption/SovereignSingular.o \
+    kernel/core/boot/SovereignInstaller.o \
+    kernel/core/hal/SovereignWASM.o \
+    kernel/core/hal/SovereignMobile.o \
+    kernel/core/boot/SovereignRecovery.o \
+    kernel/core/system/SovereignCompatibility.o \
+    kernel/core/hal/SovereignHypervisor.o \
     kernel/core/ui/SovereignWM.o \
     kernel/core/ui/SovereignFWM.o \
     kernel/core/ui/SovereignPanel.o \
