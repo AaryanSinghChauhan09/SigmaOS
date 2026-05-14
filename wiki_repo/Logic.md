@@ -91,6 +91,8 @@ Below is a non-exhaustive list of critical shards and their relationships to the
 | File Path | Role | Logic |
 | :--- | :--- | :--- |
 | `kernel/core/automation/SovereignAutomation.cpp` | Automation Nexus | Orchestrates industrial-specific healing and rollback logic. |
+| `kernel/shards/finance/SovereignIndianProfessionalTools.cpp` | Professional Tools | GST and Income Tax calculators (FY 2024-25). |
+| `kernel/shards/legal/SovereignBNS.cpp` | BNS Legal Shard | Mappings and lookups for Bharatiya Nyaya Sanhita 2023. |
 | `kernel/core/hal/SovereignHAL.cpp` | Hardware Entry | Orchestrates bus probing and driver registration. |
 | `kernel/core/hal/SovereignPMM.cpp` | Physical Memory | Managed Silicon-Direct page allocation (Bitmap-based). |
 | `kernel/core/ipc/SovereignBridge.cpp` | IPC Gateway | The primary bus for inter-shard communication. |

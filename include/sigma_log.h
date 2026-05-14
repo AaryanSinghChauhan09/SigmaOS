@@ -16,8 +16,8 @@ extern "C" {
 #endif
 
 typedef struct {
-    uint32_t timestamp;
-    uint32_t severity;
+    sigma_u32 timestamp;
+    sigma_u32 severity;
     char message[128];
 } sigma_log_entry_t;
 

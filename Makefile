@@ -16,6 +16,7 @@ CXXFLAGS := -ffreestanding -O2 -Wall -Wextra -Werror \
             -fno-exceptions -fno-rtti -std=c++17 \
             -fno-stack-protector -mno-red-zone \
             -I./include \
+            -I./include/core \
             -I./kernel/core \
             -DCONFIG_ARCH_$(shell echo $(ARCH) | tr '[:lower:]' '[:upper:]')
 
