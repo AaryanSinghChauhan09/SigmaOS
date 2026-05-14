@@ -46,7 +46,9 @@ kernel/core/security/SovereignLUKS.cpp
 kernel/core/config/SovereignDecl.cpp
 kernel/core/system/SovereignNexus.cpp
 kernel/core/system/SovereignStore.cpp
+kernel/core/system/SovereignForum.cpp
 kernel/core/observability/SovereignBPF.cpp
+kernel/core/observability/SovereignWiki.cpp
 kernel/core/profiles/SovereignProfile.cpp
 
 # LAYER 2: HARDWARE DRIVERS (ABSORBED)
