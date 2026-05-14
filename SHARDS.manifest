@@ -10,6 +10,7 @@ kernel/core/boot/SovereignRecover.cpp
 kernel/core/boot/SovereignLiveBoot.cpp
 kernel/core/hal/SovereignHAL.cpp
 kernel/core/hal/SovereignDrivers.cpp
+kernel/core/hal/SovereignUbuntu.cpp
 kernel/core/hal/SovereignPMM.cpp
 kernel/core/hal/SovereignVMM.cpp
 kernel/core/hal/SovereignISR.cpp
@@ -44,6 +45,11 @@ kernel/core/config/SovereignDecl.cpp
 kernel/core/system/SovereignNexus.cpp
 kernel/core/observability/SovereignBPF.cpp
 kernel/core/profiles/SovereignProfile.cpp
+
+# LAYER 2: HARDWARE DRIVERS (ABSORBED)
+kernel/core/drivers/SovereignNvidia.cpp
+kernel/core/drivers/SovereignBroadcom.cpp
+kernel/core/drivers/SovereignRealtek.cpp
 
 # LAYER 6: SYSTEM UTILITIES
 suites/S32_SystemTools/core/SovereignCoreUtils.cpp
