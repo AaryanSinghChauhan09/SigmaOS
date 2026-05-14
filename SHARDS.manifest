@@ -54,6 +54,10 @@ kernel/core/observability/SovereignWiki.cpp
 kernel/core/profiles/SovereignProfile.cpp
 
 # LAYER 2: HARDWARE DRIVERS (ABSORBED)
+kernel/core/drivers/SovereignPS2.cpp
+kernel/core/drivers/SovereignVESA.cpp
+kernel/core/drivers/SovereignATA.cpp
+kernel/core/drivers/SovereignE1000.cpp
 kernel/core/drivers/SovereignNvidia.cpp
 kernel/core/drivers/SovereignBroadcom.cpp
 kernel/core/drivers/SovereignRealtek.cpp

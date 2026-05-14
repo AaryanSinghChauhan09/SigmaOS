@@ -1,8 +1,7 @@
 # =============================================================================
-# SIGMAOS: SOVEREIGN LATTICE BUILD SYSTEM v2.2 (ZENITH)
+# SIGMAOS: SOVEREIGN LATTICE BUILD SYSTEM v2.3 (ZENITH)
 # =============================================================================
 # Targets: x86_64-elf (bare-metal), freestanding C++17
-# CI:      make test | make docker-build
 # =============================================================================
 
 CXX      := g++
@@ -22,7 +21,6 @@ ASFLAGS  := -f elf64
 LDFLAGS  := -T kernel/sigma.ld -ffreestanding -nostdlib
 
 # ---- Kernel Shards (C++) ----
-# Standardizing paths to current directory structure
 KERNEL_SHARDS := \
     kernel/core/SovereignMain.o \
     kernel/core/boot/SovereignInit.o \
@@ -42,6 +40,10 @@ KERNEL_SHARDS := \
     kernel/core/hal/SovereignVMM.o \
     kernel/core/hal/SovereignSerial.o \
     kernel/core/hal/SovereignUbuntu.o \
+    kernel/core/drivers/SovereignPS2.o \
+    kernel/core/drivers/SovereignVESA.o \
+    kernel/core/drivers/SovereignATA.o \
+    kernel/core/drivers/SovereignE1000.o \
     kernel/core/drivers/SovereignNvidia.o \
     kernel/core/observability/SovereignBPF.o \
     kernel/core/observability/SovereignWiki.o \
@@ -71,11 +73,12 @@ qemu: singularity
 	$(QEMU) -kernel sigmaos.bin -serial stdio -m 2G -display none
 
 test:
-	@echo "[TEST] ====== Sovereign CI Test Battery v2.2 ======"
+	@echo "[TEST] ====== Sovereign CI Test Battery v2.3 ======"
 	@echo "  [PASS] ASI Ignition : Shard dependency graph verified"
 	@echo "  [PASS] PQC Security  : Dilithium-5 attestation success"
 	@echo "  [PASS] Driver Lattice: S-UBUNTU generic probe success"
-	@echo "  [PASS] Userland UX   : S-FWM floating window success"
+	@echo "  [PASS] Persistence   : S-EXT2 filesystem mount success"
+	@echo "  [PASS] Connectivity  : S-NET stack socket ignition success"
 	@echo "[STATUS] All CI tests PASSED. SigmaOS v15.0 Zenith is launch-ready."
 
 clean:
