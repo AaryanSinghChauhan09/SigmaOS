@@ -146,3 +146,6 @@ kernel/core/security/SovereignUserAccounts.cpp
 kernel/core/ui/SovereignDesktop.cpp
 kernel/core/drivers/network/SovereignBluetooth.cpp
 kernel/core/drivers/network/SovereignIrDA.cpp
+kernel/core/system/SovereignWatchdog.cpp
+kernel/core/system/SovereignSwap.cpp
+kernel/core/security/SovereignAuditLog.cpp

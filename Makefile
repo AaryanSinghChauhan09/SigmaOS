@@ -119,6 +119,9 @@ KERNEL_SHARDS := \
     kernel/core/userland/SovereignCoreUtils.o \
     kernel/core/security/SovereignUserAccounts.o \
     kernel/core/ui/SovereignDesktop.o \
+    kernel/core/system/SovereignWatchdog.o \
+    kernel/core/system/SovereignSwap.o \
+    kernel/core/security/SovereignAuditLog.o \
     kernel/core/ui/SovereignWM.o \
     kernel/core/ui/SovereignFWM.o \
     kernel/core/ui/SovereignPanel.o \

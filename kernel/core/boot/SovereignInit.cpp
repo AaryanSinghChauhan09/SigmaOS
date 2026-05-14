@@ -79,6 +79,9 @@ extern "C" void useraccounts_init();
 extern "C" void desktop_init();
 extern "C" void bluetooth_init();
 extern "C" void irda_init();
+extern "C" void swap_init();
+extern "C" void watchdog_init();
+extern "C" void auditlog_init();
 
 /**
  * SigmaOS Sovereign Init Implementation (v15.0 Zenith)
@@ -190,6 +193,9 @@ public:
         desktop_init();
         bluetooth_init();
         irda_init();
+        swap_init();
+        watchdog_init();
+        auditlog_init();
 
         sigma_log_info("[INIT] ASI: Total Singularity Achieved. 750+ Industrial Shards Active.\n");
     }
