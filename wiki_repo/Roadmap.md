@@ -23,9 +23,11 @@ The path to the **Zenith Singularity** is defined by the absorption of proven in
 - [x] **Sovereign Hypervisor**: Hardware-assisted virtualization for guest shards.
 - [x] **Web-Lattice**: Running the SigmaOS kernel natively in the browser (S-WEB).
 
-## 🌌 Beyond Singularity
-- [ ] **Quantum-Hardened Persistence**: Kyber-1024 encrypted shard snapshots.
-- [ ] **Neural Lattice**: AI-orchestrated shard hot-swapping and self-healing.
-- [ ] **Heterogeneous Deployment**: Launching the lattice on ARM64 and RISC-V silicon.
+## 🌌 Beyond Singularity (ACTIVE)
+- [x] **Quantum-Hardened Persistence**: Kyber-1024 encrypted shard snapshots (Implemented S-SNAP/S-PQC).
+- [x] **Neural Lattice**: AI-orchestrated shard hot-swapping and self-healing (Implemented S-NEURAL/S-HOTSWAP).
+- [x] **Heterogeneous Deployment**: Launching on ARM64 and RISC-V silicon (Implemented S-ARCH Abstraction).
+
+Detailed specifications: [Beyond-Singularity.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Beyond-Singularity.md)
 
 *"Sovereignty is a continuous process of evolution."*
