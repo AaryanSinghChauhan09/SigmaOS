@@ -1,101 +1,71 @@
-# SigmaOS-README
+# S SigmaOS: The Sovereign Computational Lattice
 
-1
-
-> **The "Sigma" of all Operating Systems.**
-> A supreme fusion of Linux’s ecosystem, Windows’ performance, and **Enterprise-Grade Productivity** (Layer 10: Sovereign Nexus)—reimagined for absolute Digital Sovereignty.
+> **"Sovereignty is the ultimate efficiency."**
+> The world's first industrial-grade microkernel designed for total digital autonomy, post-quantum resilience, and Indian industrial compliance.
 
 ---
 
-1
+## ?? The Zenith Singularity (v15.0)
 
-SigmaOS is not just a Linux distribution; it is a **Sovereign Lattice** of 600+ atomic shards designed for total hardware-to-userland autonomy. By neutralizing foreign dependencies (`libc`) and implementing silicon-direct orchestration, SigmaOS provides a high-performance environment for the AI-native era.
+SigmaOS is not an operating system; it is a **Shard Lattice**. We have abandoned the legacy monolithic architecture of the 20th century in favor of a decentralized, 600-shard microkernel.
 
-1
+### ?? Key USPs (The Sigma Advantage)
 
-1
-
-1
-
-1
-
-1
-
-1
-
-1
-
-1
-
-1
-
-1
-
-1
-
-1
+*   **PQC-Native (NIST FIPS 203/204)**: Integrated Kyber-1024 and Dilithium-5 at Ring-0.
+*   **Shard Isolation**: 600+ hot-swappable kernel shards with zero-latency IPC.
+*   **Amnesic Memory**: Secure zeroing of all sensitive buffers via `sigma_secure_memset`.
+*   **S-INDIA Compliant**: Native engines for GST (Act 2017) and Income Tax (FY 2024-25).
+*   **Zero-Trust NetStack**: Hardware-level packet auditing and DPI firewalling.
 
 ---
 
-1
+## ??? Industrial Command Interface (sigma_sh)
 
-SigmaOS provides a unified namespace for all lattice operations:
+SigmaOS provides a unified, zero-dependency shell for high-performance orchestration:
 
-1
-
-1
-
-s-cli sigma-init     # Manage services
-
-s-cli sigma-top      # Real-time monitor
-
-s-cli sigma-health   # Full system audit
-
-1
-
-s-cli sigma-pkg install <shard>  # Atomic install with auto-snapshot
-
-s-cli sigma-snap rollback <id>    # Restore previous state
-
-1
-
-s-cli sigma-sec attest           # TPM 2.0 handshake
-
-s-cli sigma-ai query "Optimize latency"
-
-1
+```bash
+sigma> help                 # List industrial commands
+sigma> ps                   # List running shards & PIDs
+sigma> top                  # Real-time lattice telemetry
+sigma> gst 50000 18         # Calculate GST (Intra/Inter state)
+sigma> tax 1500000          # Income Tax Engine (FY 24-25 New Regime)
+sigma> pqc status           # Audit Post-Quantum Crypto health
+```
 
 ---
 
-1
+## ??? Architecture: The 600-Shard Lattice
 
-1
-
-1
-
-1
-
-1
-
-1
-
-make build
-s-cli sigma-init
-
-1
+SigmaOS decomposes the traditional kernel into specialized, isolated shards:
+- **`S-MM`**: Sovereign Memory Manager (Buddy-Allocator)
+- **`S-SCHED`**: Predictive Multi-Priority Scheduler
+- **`S-NET`**: Zero-Trust Network Stack
+- **`S-FS`**: Sovereign Distributed Filesystem (VFS)
+- **`S-INDIA`**: Industrial Professional Finance Suite
 
 ---
 
-1
+## ?? Deployment & Installation
 
-1
+SigmaOS is distributed as a PQC-signed Zenith ISO.
 
-1
-
-1
-
-1
+```powershell
+make singularity     # Compile the 600-shard kernel
+make zenith-iso      # Generate deployment image
+make test            # Run industrial CI/CD battery
+```
 
 ---
-"Sovereignty is the ultimate efficiency."
 
+## ?? Strategic Superiority
+
+| Feature | SigmaOS | Linux | Windows |
+| :--- | :--- | :--- | :--- |
+| **Kernel** | Shard Lattice | Monolithic | Hybrid |
+| **Crypto** | PQC-Native | Add-on | Add-on |
+| **Trust** | Zero-Trust | Implicit | Implicit |
+| **Legal** | Native India | External | External |
+
+---
+
+### Stay Sovereign. Stay Zenith.
