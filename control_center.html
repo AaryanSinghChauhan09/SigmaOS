@@ -3,21 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Σ SigmaOS | Control Center</title>
+    <title>S SigmaOS | Control Center v15.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0a0a0c;
-            --surface: #141418;
-            --primary: #00f2ff;
-            --accent: #7000ff;
-            --text: #e0e0e6;
+            --bg: #050507;
+            --surface: #0d0d12;
+            --primary: #00f5ff;
+            --accent: #8b00ff;
+            --text: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.6);
             --success: #00ff88;
+            --border: rgba(255, 255, 255, 0.1);
         }
 
         body {
             background: var(--bg);
             color: var(--text);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Outfit', sans-serif;
             margin: 0;
             display: flex;
             height: 100vh;
@@ -25,86 +28,123 @@
         }
 
         .sidebar {
-            width: 280px;
+            width: 300px;
             background: var(--surface);
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 2rem;
+            border-right: 1px solid var(--border);
+            padding: 2.5rem;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.5rem;
         }
 
         .main {
             flex: 1;
-            padding: 3rem;
+            padding: 4rem;
             overflow-y: auto;
+            background: radial-gradient(circle at top right, rgba(139, 0, 255, 0.05), transparent);
+        }
+
+        .nav-item {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--primary);
         }
 
         .card {
             background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        h1 { font-size: 2.5rem; margin-bottom: 2rem; background: linear-gradient(to right, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        .btn {
-            background: linear-gradient(45deg, var(--primary), var(--accent));
-            border: none;
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            backdrop-filter: blur(10px);
             transition: 0.3s;
         }
 
-        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+        }
 
-        .status { color: var(--success); font-weight: bold; }
+        h1 { 
+            font-size: 3rem; 
+            margin-bottom: 2.5rem; 
+            background: linear-gradient(135deg, var(--primary), var(--accent)); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+
+        h3 { color: var(--primary); margin-top: 0; }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            color: #000;
+            padding: 0.9rem 1.8rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
+            transition: 0.3s;
+            margin-top: 1rem;
+        }
+
+        .btn:hover { box-shadow: 0 0 20px rgba(0, 245, 255, 0.4); transform: scale(1.05); }
+
+        .status { color: var(--success); font-weight: bold; font-family: 'JetBrains Mono', monospace; }
+        .code { font-family: 'JetBrains Mono', monospace; color: var(--text-dim); font-size: 0.9rem; }
     </style>
 </head>
 <body>
     <div class="sidebar">
-        <h2>Σ CONTROL</h2>
-        <div>Lattice Status</div>
-        <div>Network & VPN</div>
-        <div>Security & PQC</div>
-        <div>Software Registry</div>
-        <div>Hardware & Drivers</div>
+        <h2 style="letter-spacing: 2px; color: var(--primary);">S CONTROL</h2>
+        <div class="nav-item active">Lattice Shards</div>
+        <div class="nav-item">Zero-Trust Network</div>
+        <div class="nav-item">PQC Security Hub</div>
+        <div class="nav-item">Professional Suites</div>
+        <div class="nav-item">Lattice Telemetry</div>
     </div>
     <div class="main">
-        <h1>Industrial Settings Lattice</h1>
+        <h1>Sovereign Industrial Shards</h1>
         
         <div class="card">
-            <h3>Sovereign Security Engine</h3>
-            <p>PQC-Verification: <span class="status">ACTIVE</span></p>
-            <p>MAC (SovereignMAC): Enforcing Zero-Trust Policy.</p>
-            <button class="btn">Configure AppArmor Profile</button>
+            <h3>PQC Security Engine (Zenith)</h3>
+            <p>Signature Verification: <span class="status">ENABLED (Dilithium-5)</span></p>
+            <p class="code">Amnesic Wipe: ACTIVE | Entropy Pool: RDRAND-Seeded</p>
+            <button class="btn">Audit Security Shards</button>
         </div>
 
         <div class="card">
-            <h3>Networking Shard</h3>
-            <p>S-VPN: <span class="status">CONNECTED</span> (WireGuard)</p>
-            <p>S-SSH: Listening on Port 22.</p>
-            <button class="btn">Manage Connections</button>
+            <h3>Sovereign NetStack</h3>
+            <p>Connection: <span class="status">PQC-VPN ACTIVE (Kyber-1024)</span></p>
+            <p class="code">DPI Firewall: ARMED | Shard Isolation: ENFORCED</p>
+            <button class="btn">Manage Network Lattice</button>
         </div>
 
         <div class="card">
-            <h3>Hardware Absorption</h3>
-            <p>GPU: S-Mesa (Industrial Acceleration)</p>
-            <p>Wifi: S-RTL8821CE (Realtek)</p>
-            <button class="btn">Scan for Hardware</button>
+            <h3>Indian Professional Suites (S-INDIA)</h3>
+            <p>GST Act 2017: <span class="status">COMPLIANT (v2.1)</span></p>
+            <p>Income Tax Engine: <span class="status">ACTIVE (FY 2024-25 New Regime)</span></p>
+            <p class="code">TDS / EPF / EMI modules: SYNCED</p>
+            <button class="btn">Launch Financial Nexus</button>
         </div>
-            <div class="card">
-            <h3>Indian Professional Suites (Compliance & Calculation)</h3>
-            <p>GST Engine: <span class="status">SYNCED (v1.0)</span></p>
-            <p>Income Tax (FY 23-24): <span class="status">ACTIVE</span></p>
-            <button class="btn">Launch Calculators</button>
+
+        <div class="card">
+            <h3>Hardware Shard Graph</h3>
+            <p>Core Shards: <span class="status">600/600 ONLINE</span></p>
+            <p class="code">PCI Discovery: 255 Buses Scanned | ACPI: RSDP Validated</p>
+            <button class="btn">Enumerated Shard Map</button>
         </div>
     </div>
 </body>
 </html>
-
