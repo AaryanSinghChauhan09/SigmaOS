@@ -21,6 +21,8 @@ extern "C" void watchdog_init();
 extern "C" void auditlog_init();
 extern "C" void usb_init(sigma_u64 base);
 extern "C" void audio_init();
+extern "C" void nvme_init(sigma_u64 base);
+extern "C" void numa_init();
 
 /**
  * SigmaOS Sovereign Init Implementation (v15.0 Zenith)
@@ -50,12 +52,14 @@ public:
 
         // 1. Critical Core (No dependencies)
         startService("Memory", allocator_init, nullptr);
+        startService("NUMA", numa_init, "Memory");
         startService("NX-Security", nx_init, "Memory");
         startService("ASLR", aslr_init, "NX-Security");
         
         // 2. Storage & Hardware
         startService("ATA", ata_init, "Memory");
         startService("SATA", [](){ sata_init(0xFEA00000); }, "ATA");
+        startService("NVMe", [](){ nvme_init(0xFD000000); }, "Memory");
         startService("USB", [](){ usb_init(0xFE000000); }, "Memory");
         startService("Audio", audio_init, "Memory");
         startService("Input", kbd_init, "Memory");
