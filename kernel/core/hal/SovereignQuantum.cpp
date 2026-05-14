@@ -1,14 +1,13 @@
-#include "sigma_log.h"
-#include "sigma_libc.h"
-#include "core/sigma_types.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/libc/SovereignLibC.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Quantum APIs (v100.0 Zenith)
  * Implements a Quantum-Shard Interop (QSI) algorithm.
  * ZERO-DEPENDENCY: High-level abstraction for quantum co-processors.
  */
-
-#include "core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -26,7 +25,7 @@ public:
 
     void dispatch_circuit(const void* circuit_data) {
         if (!this->m_initialized) {
-            sigma_log_warn("[QUANTUM] QSI: Engine not initialized. Discarding circuit.");
+            sigma_log_info("[QUANTUM] QSI: Engine not initialized. Discarding circuit.");
             return;
         }
         sigma_log_info("[QUANTUM] QSI: Dispatching quantum circuit to silicon-native accelerator...");

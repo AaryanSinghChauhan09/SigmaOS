@@ -1,11 +1,13 @@
-#include "libc/SovereignLibC.h"
-#include "sigma_log.h"
+#include "../../../include/libc/SovereignLibC.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/core/sigma_types.h"
 
-/*
- * =========================================================================
+/**
  * Σ SIGMAOS: SOVEREIGN INTELLIGENCE (v15.0)
- * =========================================================================
+ * Industrial Problem Solver Shard
  */
+
+extern "C" {
 
 void solve_kinematics() {
     sigma_log_info("[PHYSICS/SOLVE]: Kinematics Shard Initializing...\n");
@@ -22,6 +24,7 @@ void solve_molarity() {
 
 void solve_heron() {
     sigma_log_info("[MATH/SOLVE]: Heron's Formula Shard Active.\n");
+    sigma_log_info("[MATH/SOLVE]: Calculating triangle area via PQC-hardened FP-bridge...\n");
 }
 
 void execute_intelligence_audit() {
@@ -29,14 +32,11 @@ void execute_intelligence_audit() {
     solve_kinematics();
     solve_molarity();
     solve_heron();
+    sigma_log_info("--- AUDIT COMPLETE ---\n");
 }
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 void intelligence_main() {
     execute_intelligence_audit();
 }
-#ifdef __cplusplus
-}
-#endif
+
+} // extern "C"

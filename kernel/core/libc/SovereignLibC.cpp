@@ -2,9 +2,9 @@
 // SigmaOS  kernel/core/libc  SovereignLibC.cpp  v2.0
 // Industrial LibC implementation for Ring-0 stability.
 // =============================================================================
-#include "libc/SovereignLibC.h"
-#include "sigma_log.h"
-#include "core/sigma_types.h"
+#include "../../../include/libc/SovereignLibC.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/core/sigma_types.h"
 
 extern "C" {
 

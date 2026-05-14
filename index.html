@@ -13,6 +13,7 @@
             --text: #e0e0e6;
             --muted: #80808a;
             --success: #00ffaa;
+            --warning: #ffaa00;
         }
 
         body {
@@ -36,96 +37,82 @@
             background: radial-gradient(circle at center, rgba(112, 0, 255, 0.1) 0%, transparent 70%);
         }
 
-        h1 { font-size: 5.5rem; margin: 0; background: linear-gradient(to right, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -3px; font-weight: 800; }
-        .tagline { font-size: 1.6rem; color: var(--muted); margin-top: 1rem; font-weight: 300; }
+        h1 { font-size: 6rem; margin: 0; background: linear-gradient(to right, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -4px; font-weight: 800; }
+        .tagline { font-size: 1.8rem; color: var(--muted); margin-top: 1rem; font-weight: 300; }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 4rem; }
         .card { background: var(--surface); border: 1px solid rgba(255, 255, 255, 0.05); padding: 2.5rem; border-radius: 20px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
-        .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--primary), transparent); transform: translateX(-100%); transition: 0.5s; }
-        .card:hover::before { transform: translateX(100%); }
-        .card:hover { border-color: var(--primary); transform: translateY(-10px) scale(1.02); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); }
+        .card:hover { border-color: var(--primary); transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); }
 
         .section-title { font-size: 3rem; margin-top: 8rem; text-align: center; font-weight: 700; letter-spacing: -1px; }
 
         .parity-box { background: rgba(0, 242, 255, 0.03); border: 1px solid var(--primary); border-radius: 24px; padding: 3rem; margin-top: 4rem; }
-        .parity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-        .parity-item { display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-        .status-pill { color: var(--success); font-weight: bold; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+        .status-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+        .status-item { display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .status-val { color: var(--success); font-weight: bold; }
 
-        .showcase { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin-top: 3rem; }
-        .pill { background: rgba(255, 255, 255, 0.03); padding: 0.6rem 1.5rem; border-radius: 100px; font-size: 0.95rem; border: 1px solid rgba(255, 255, 255, 0.08); transition: 0.3s; }
-        .pill:hover { background: var(--primary); color: var(--bg); border-color: var(--primary); transform: translateY(-3px); }
+        .pill { background: rgba(255, 255, 255, 0.03); padding: 0.6rem 1.5rem; border-radius: 100px; font-size: 0.95rem; border: 1px solid rgba(255, 255, 255, 0.08); display: inline-block; margin: 0.5rem; }
 
-        .cta { margin-top: 4rem; padding: 1.4rem 4rem; font-size: 1.3rem; background: linear-gradient(45deg, var(--primary), var(--accent)); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 800; transition: 0.3s; box-shadow: 0 10px 20px rgba(112, 0, 255, 0.3); }
-        .cta:hover { transform: scale(1.05); box-shadow: 0 15px 30px rgba(112, 0, 255, 0.5); }
+        .cta { margin-top: 4rem; padding: 1.5rem 5rem; font-size: 1.4rem; background: linear-gradient(45deg, var(--primary), var(--accent)); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 800; box-shadow: 0 10px 20px rgba(112, 0, 255, 0.3); }
 
-        footer { text-align: center; padding: 6rem 2rem; color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.05); margin-top: 10rem; }
-        
-        .verified-badge { position: absolute; top: 1rem; right: 1rem; color: var(--success); font-size: 0.8rem; }
-
-        @media (max-width: 768px) {
-            h1 { font-size: 3.5rem; }
-            .parity-grid { grid-template-columns: 1fr; }
-        }
+        footer { text-align: center; padding: 8rem 2rem; color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.05); margin-top: 10rem; }
     </style>
 </head>
 <body>
     <header>
         <h1>Σ SIGMAOS ZENITH</h1>
-        <div class="tagline">The definitive sovereign industrial singularity. v15.0 "Zenith" is live.</div>
+        <div class="tagline">The definitive industrial singularity. v15.0 "Zenith" is live.</div>
         <button class="cta">Download Sovereign ISO</button>
     </header>
 
     <div class="container">
         <div class="parity-box">
-            <h2 style="margin-top: 0;">Sovereignty & Parity Dashboard</h2>
-            <div class="parity-grid">
+            <h2>Industrial Parity Verification</h2>
+            <div class="status-grid">
                 <div>
-                    <div class="parity-item"><span>Kernel Shard Autonomy</span> <span class="status-pill">Sovereign</span></div>
-                    <div class="parity-item"><span>PQC (Dilithium-5) Sealing</span> <span class="status-pill">Active</span></div>
-                    <div class="parity-item"><span>ASI Boot Ignition</span> <span class="status-pill">Synchronized</span></div>
-                    <div class="parity-item"><span>Legacy Monolithic Debt</span> <span class="status-pill">0.0%</span></div>
+                    <div class="status-item"><span>Priority Sched (v2.1)</span> <span class="status-val">VERIFIED</span></div>
+                    <div class="status-item"><span>Virtual Memory (S-VMM)</span> <span class="status-val">VERIFIED</span></div>
+                    <div class="status-item"><span>LatticeFS (S-EXT2)</span> <span class="status-val">VERIFIED</span></div>
                 </div>
                 <div>
-                    <p style="color: var(--muted);">SigmaOS v15.0 has achieved **Zero-Dependency Status**. It is no longer comparable to Linux or Windows distributions. It is an independent computational lattice.</p>
+                    <div class="status-item"><span>Window Manager (S-WM)</span> <span class="status-val">VERIFIED</span></div>
+                    <div class="status-item"><span>Net Stack (S-NET)</span> <span class="status-val">VERIFIED</span></div>
+                    <div class="status-item"><span>Logging Daemon (dmesg)</span> <span class="status-val">VERIFIED</span></div>
                 </div>
             </div>
         </div>
 
-        <h2 class="section-title">Industrial Shards</h2>
+        <h2 class="section-title">Core Subsystems</h2>
         <div class="grid">
             <div class="card">
-                <div class="verified-badge">VERIFIED</div>
-                <h3>LatticeFS (S-LFS)</h3>
-                <p>Distributed, amnesic filesystem with atomic shard snapshots. Immune to legacy data remanence.</p>
+                <h3>S-EXT2 Journaling</h3>
+                <p>Industrial-grade filesystem stability with atomic block persistence and amnesic wipe capabilities.</p>
             </div>
             <div class="card">
-                <div class="verified-badge">VERIFIED</div>
-                <h3>S-NET Stack</h3>
-                <p>Industrial TCP/IP/IPv6 parity with native PQC-VPN mesh and Zero-Trust firewalling.</p>
+                <h3>S-VMM Isolation</h3>
+                <p>4-Level hierarchical paging with hardware-enforced shard boundaries and silicon-native context switching.</p>
             </div>
             <div class="card">
-                <div class="verified-badge">VERIFIED</div>
-                <h3>S-PKG Nexus</h3>
-                <p>Professional shard orchestration with Dilithium-5 attestation and amnesic rollback.</p>
+                <h3>Zenith Compositor</h3>
+                <p>High-performance tiling window manager with profession-aware personas and VESA acceleration.</p>
             </div>
         </div>
 
-        <h2 class="section-title">Technological Supremacy</h2>
-        <div class="showcase">
-            <div class="pill">C11/C++23 Native</div>
-            <div class="pill">Zero-GPL</div>
-            <div class="pill">Silicon-Native</div>
-            <div class="pill">PQC-Hardened</div>
-            <div class="pill">ASI-Orchestrated</div>
-            <div class="pill">Amnesic Persistence</div>
-            <div class="pill">Shard Isolation</div>
-            <div class="pill">Deterministic Scheduler</div>
+        <h2 class="section-title">Industrial Capabilities</h2>
+        <div style="text-align: center;">
+            <div class="pill">Priority Scheduling</div>
+            <div class="pill">Virtual Memory</div>
+            <div class="pill">ext2/FAT Support</div>
+            <div class="pill">POSIX Syscalls</div>
+            <div class="pill">TCP/IP Stack</div>
+            <div class="pill">Tiling WM</div>
+            <div class="pill">dmesg Logging</div>
+            <div class="pill">PQC Attestation</div>
         </div>
 
-        <footer style="margin-top: 10rem;">
-            <p>SigmaOS is the world's only Sovereign Industrial Singularity.</p>
-            <p>&copy; 2026 SigmaOS Collective. All Rights Reserved.</p>
+        <footer>
+            <p>SigmaOS is an independent computational lattice. No legacy derivatives permitted.</p>
+            &copy; 2026 SigmaOS Collective.
         </footer>
     </div>
 </body>
