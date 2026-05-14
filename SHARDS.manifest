@@ -31,6 +31,7 @@ kernel/core/ipc/SovereignBridge.cpp
 kernel/core/system/SovereignScheduler.cpp
 kernel/core/system/SovereignFairSched.cpp
 kernel/core/system/SovereignCGroup.cpp
+kernel/core/system/SovereignSystemD.cpp
 kernel/core/fs/SovereignLatticeFS.cpp
 kernel/core/fs/SovereignExt2.cpp
 kernel/core/fs/SovereignZFS.cpp
@@ -38,12 +39,15 @@ kernel/core/network/SovereignNetStack.cpp
 kernel/core/system/SovereignSyscalls.cpp
 kernel/core/security/SovereignIdentity.cpp
 kernel/core/security/SovereignKali.cpp
+kernel/core/security/SovereignGPG.cpp
 kernel/core/config/SovereignDecl.cpp
 kernel/core/system/SovereignNexus.cpp
+kernel/core/observability/SovereignBPF.cpp
 kernel/core/profiles/SovereignProfile.cpp
 
 # LAYER 6: SYSTEM UTILITIES
 suites/S32_SystemTools/core/SovereignCoreUtils.cpp
+suites/S32_SystemTools/core/sovereign_playground/SovereignPlayground.cpp
 kernel/core/system/SigmaPkg.cpp
 kernel/core/observability/SovereignLogD.cpp
 kernel/core/ui/SovereignWM.cpp

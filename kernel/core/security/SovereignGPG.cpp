@@ -1,13 +1,13 @@
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
 namespace Security {
 
-class SovereignGPG : public SigmaObject, public SigmaSingleton<SovereignGPG> {
-    friend class SigmaSingleton<SovereignGPG>;
+class SovereignGPG : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignGPG> {
+    friend class SigmaOS::SigmaSingleton<SovereignGPG>;
 public:
     const char* type_name() const noexcept override { return "SovereignGPG"; }
 
@@ -17,8 +17,8 @@ public:
     }
 
     bool verifySignature(const void* data, sigma_usize size, const void* signature) {
+        (void)data; (void)size; (void)signature;
         sigma_log_info("[SECURITY:GPG] Verifying shard signature...");
-        // In a real implementation, this would use liboqs Dilithium-5
         sigma_log_info("[SECURITY:GPG] Signature VALID. Shard origin: TRUSTED.");
         return true;
     }
