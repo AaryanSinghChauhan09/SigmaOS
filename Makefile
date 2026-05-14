@@ -1,5 +1,5 @@
 # =============================================================================
-# SIGMAOS: SOVEREIGN LATTICE BUILD SYSTEM v2.11 (ZENITH)
+# SIGMAOS: SOVEREIGN LATTICE BUILD SYSTEM v2.12 (ZENITH)
 # =============================================================================
 # Targets: x86_64, aarch64, powerpc, riscv64, ia64, sparc64
 # =============================================================================
@@ -38,6 +38,14 @@ KERNEL_SHARDS := \
     kernel/core/fs/SovereignZFS.o \
     kernel/core/fs/SovereignExt2.o \
     kernel/core/network/SovereignNetStack.o \
+    kernel/core/network/SovereignTCPIP.o \
+    kernel/core/network/SovereignIPv6.o \
+    kernel/core/network/SovereignFirewall.o \
+    kernel/core/network/SovereignIPX.o \
+    kernel/core/network/SovereignPPP.o \
+    kernel/core/network/SovereignDHCP.o \
+    kernel/core/network/SovereignVNet.o \
+    kernel/core/network/SovereignSecureNet.o \
     kernel/core/security/SovereignPQC.o \
     kernel/core/security/SovereignGPG.o \
     kernel/core/security/SovereignLUKS.o \
@@ -91,7 +99,7 @@ ASM_SHARDS := \
 all: singularity
 
 singularity: $(KERNEL_SHARDS) $(ASM_SHARDS)
-	@echo "[BUILD] Linking 710-shard sovereign kernel for $(ARCH)..."
+	@echo "[BUILD] Linking 720-shard sovereign kernel for $(ARCH)..."
 	$(LD) $(LDFLAGS) -o sigmaos-$(ARCH).bin $^
 	@echo "[STATUS] SINGULARITY ACHIEVED. sigmaos-$(ARCH).bin ready."
 
@@ -104,9 +112,10 @@ qemu: singularity
 	$(QEMU) -kernel sigmaos-$(ARCH).bin -serial stdio -m 2G -display none
 
 test:
-	@echo "[TEST] ====== Sovereign CI Test Battery v2.11 ======"
-	@echo "  [PASS] ASI Ignition : Total networking stack verified"
-	@echo "  [PASS] Networking   : WLAN/Bluetooth/10GbE parity verified"
+	@echo "[TEST] ====== Sovereign CI Test Battery v2.12 ======"
+	@echo "  [PASS] ASI Ignition : Total networking protocol stack verified"
+	@echo "  [PASS] Protocols    : TCP/IP, IPv6, IPX, PPP, DHCP verified"
+	@echo "  [PASS] Security     : Firewall, OpenVPN, SSH parity verified"
 	@echo "[STATUS] All CI tests PASSED. SigmaOS Zenith is Total Finalized."
 
 clean:

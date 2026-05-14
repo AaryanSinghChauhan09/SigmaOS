@@ -44,6 +44,14 @@ kernel/core/fs/SovereignLatticeFS.cpp
 kernel/core/fs/SovereignExt2.cpp
 kernel/core/fs/SovereignZFS.cpp
 kernel/core/network/SovereignNetStack.cpp
+kernel/core/network/SovereignTCPIP.cpp
+kernel/core/network/SovereignIPv6.cpp
+kernel/core/network/SovereignFirewall.cpp
+kernel/core/network/SovereignIPX.cpp
+kernel/core/network/SovereignPPP.cpp
+kernel/core/network/SovereignDHCP.cpp
+kernel/core/network/SovereignVNet.cpp
+kernel/core/network/SovereignSecureNet.cpp
 kernel/core/SovereignSyscall.cpp
 kernel/core/security/SovereignIdentity.cpp
 kernel/core/security/SovereignKali.cpp

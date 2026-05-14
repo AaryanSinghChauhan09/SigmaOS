@@ -33,6 +33,14 @@ extern "C" void rtl8139_init(sigma_u64 base);
 extern "C" void ixgbe_init(sigma_u64 base);
 extern "C" void wlan_init();
 extern "C" void wpan_init();
+extern "C" void tcpip_init();
+extern "C" void ipv6_init();
+extern "C" void firewall_init();
+extern "C" void ipx_init();
+extern "C" void ppp_init();
+extern "C" void dhcp_init();
+extern "C" void vnet_init();
+extern "C" void secnet_init();
 
 /**
  * SigmaOS Sovereign Init Implementation (v15.0 Zenith)
@@ -74,14 +82,24 @@ public:
         video_init();
         ubuntu_init();
         
-        // Layer 3: Connectivity & Network
+        // Layer 3: Connectivity & Network Hardware
         e1000_init(0xFEB00000);
         ne2000_init(0x0300);
         rtl8139_init(0xFEC00000);
         ixgbe_init(0xFEA00000);
         wlan_init();
         wpan_init();
+        
+        // Layer 3.5: Network Protocols & Security
         net_init();
+        tcpip_init();
+        ipv6_init();
+        ipx_init();
+        ppp_init();
+        dhcp_init();
+        vnet_init();
+        firewall_init();
+        secnet_init();
         
         // Layer 4: Persistence & Userland
         vfs_init();
@@ -93,7 +111,7 @@ public:
         hyp_init();
         container_init();
 
-        sigma_log_info("[INIT] ASI: Total Singularity Achieved. 710+ Industrial Shards Active.\n");
+        sigma_log_info("[INIT] ASI: Total Singularity Achieved. 720+ Industrial Shards Active.\n");
     }
 
 private:
