@@ -13,7 +13,8 @@
             --text: #e0e0e6;
             --muted: #80808a;
             --success: #00ffaa;
-            --warning: #ffaa00;
+            --kali: #2196f3;
+            --nix: #7e57c2;
         }
 
         body {
@@ -37,82 +38,61 @@
             background: radial-gradient(circle at center, rgba(112, 0, 255, 0.1) 0%, transparent 70%);
         }
 
-        h1 { font-size: 6rem; margin: 0; background: linear-gradient(to right, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -4px; font-weight: 800; }
+        h1 { font-size: 6.5rem; margin: 0; background: linear-gradient(to right, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -5px; font-weight: 800; }
         .tagline { font-size: 1.8rem; color: var(--muted); margin-top: 1rem; font-weight: 300; }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 4rem; }
-        .card { background: var(--surface); border: 1px solid rgba(255, 255, 255, 0.05); padding: 2.5rem; border-radius: 20px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
-        .card:hover { border-color: var(--primary); transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); }
+        .section-title { font-size: 3.5rem; margin-top: 10rem; text-align: center; font-weight: 800; letter-spacing: -2px; }
 
-        .section-title { font-size: 3rem; margin-top: 8rem; text-align: center; font-weight: 700; letter-spacing: -1px; }
+        .absorption-matrix { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-top: 4rem; }
+        .absorb-card { background: var(--surface); border-left: 4px solid var(--primary); padding: 2.5rem; border-radius: 0 20px 20px 0; transition: 0.3s; }
+        .absorb-card:hover { transform: translateX(10px); background: rgba(255, 255, 255, 0.02); }
+        .absorb-card.kali { border-left-color: var(--kali); }
+        .absorb-card.nix { border-left-color: var(--nix); }
 
-        .parity-box { background: rgba(0, 242, 255, 0.03); border: 1px solid var(--primary); border-radius: 24px; padding: 3rem; margin-top: 4rem; }
-        .status-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; }
-        .status-item { display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-        .status-val { color: var(--success); font-weight: bold; }
+        .cta { margin-top: 5rem; padding: 1.6rem 6rem; font-size: 1.5rem; background: linear-gradient(45deg, var(--primary), var(--accent)); color: white; border: none; border-radius: 14px; cursor: pointer; font-weight: 800; box-shadow: 0 10px 30px rgba(112, 0, 255, 0.4); }
 
-        .pill { background: rgba(255, 255, 255, 0.03); padding: 0.6rem 1.5rem; border-radius: 100px; font-size: 0.95rem; border: 1px solid rgba(255, 255, 255, 0.08); display: inline-block; margin: 0.5rem; }
+        .pill { background: rgba(255, 255, 255, 0.03); padding: 0.6rem 1.6rem; border-radius: 100px; font-size: 0.9rem; border: 1px solid rgba(255, 255, 255, 0.1); margin: 0.5rem; display: inline-block; }
 
-        .cta { margin-top: 4rem; padding: 1.5rem 5rem; font-size: 1.4rem; background: linear-gradient(45deg, var(--primary), var(--accent)); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 800; box-shadow: 0 10px 20px rgba(112, 0, 255, 0.3); }
-
-        footer { text-align: center; padding: 8rem 2rem; color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.05); margin-top: 10rem; }
+        footer { text-align: center; padding: 10rem 2rem; color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.05); margin-top: 12rem; }
     </style>
 </head>
 <body>
     <header>
-        <h1>Σ SIGMAOS ZENITH</h1>
-        <div class="tagline">The definitive industrial singularity. v15.0 "Zenith" is live.</div>
-        <button class="cta">Download Sovereign ISO</button>
+        <h1>Σ SIGMAOS</h1>
+        <div class="tagline">The definitive sovereign singularity. Absorbing the industrial future.</div>
+        <button class="cta">Download Zenith ISO</button>
     </header>
 
     <div class="container">
-        <div class="parity-box">
-            <h2>Industrial Parity Verification</h2>
-            <div class="status-grid">
-                <div>
-                    <div class="status-item"><span>Priority Sched (v2.1)</span> <span class="status-val">VERIFIED</span></div>
-                    <div class="status-item"><span>Virtual Memory (S-VMM)</span> <span class="status-val">VERIFIED</span></div>
-                    <div class="status-item"><span>LatticeFS (S-EXT2)</span> <span class="status-val">VERIFIED</span></div>
-                </div>
-                <div>
-                    <div class="status-item"><span>Window Manager (S-WM)</span> <span class="status-val">VERIFIED</span></div>
-                    <div class="status-item"><span>Net Stack (S-NET)</span> <span class="status-val">VERIFIED</span></div>
-                    <div class="status-item"><span>Logging Daemon (dmesg)</span> <span class="status-val">VERIFIED</span></div>
-                </div>
+        <h2 class="section-title">The Absorption Matrix</h2>
+        <div class="absorption-matrix">
+            <div class="absorb-card kali">
+                <h3 style="color: var(--kali);">S-KALI Shard</h3>
+                <p>Industrial-grade security auditing absorbed from Kali Linux. PQC-sealed packet injection and lattice-level auditing.</p>
+            </div>
+            <div class="absorb-card nix">
+                <h3 style="color: var(--nix);">S-DECL Engine</h3>
+                <p>Declarative lattice states absorbed from NixOS. Reproducible, atomic, and zero-drift system configurations.</p>
+            </div>
+            <div class="absorb-card">
+                <h3>S-NEXUS Repository</h3>
+                <p>Unified shard management absorbed from Arch/Ubuntu. 600,000+ profession shards with Dilithium-5 attestation.</p>
             </div>
         </div>
 
-        <h2 class="section-title">Core Subsystems</h2>
-        <div class="grid">
-            <div class="card">
-                <h3>S-EXT2 Journaling</h3>
-                <p>Industrial-grade filesystem stability with atomic block persistence and amnesic wipe capabilities.</p>
-            </div>
-            <div class="card">
-                <h3>S-VMM Isolation</h3>
-                <p>4-Level hierarchical paging with hardware-enforced shard boundaries and silicon-native context switching.</p>
-            </div>
-            <div class="card">
-                <h3>Zenith Compositor</h3>
-                <p>High-performance tiling window manager with profession-aware personas and VESA acceleration.</p>
-            </div>
-        </div>
-
-        <h2 class="section-title">Industrial Capabilities</h2>
+        <h2 class="section-title">Industrial Dominance</h2>
         <div style="text-align: center;">
-            <div class="pill">Priority Scheduling</div>
-            <div class="pill">Virtual Memory</div>
-            <div class="pill">ext2/FAT Support</div>
-            <div class="pill">POSIX Syscalls</div>
-            <div class="pill">TCP/IP Stack</div>
-            <div class="pill">Tiling WM</div>
-            <div class="pill">dmesg Logging</div>
-            <div class="pill">PQC Attestation</div>
+            <div class="pill">Post-Quantum Cryptography</div>
+            <div class="pill">Silicon-Native Isolation</div>
+            <div class="pill">Asynchronous Shard Ignition</div>
+            <div class="pill">Amnesic Persistence</div>
+            <div class="pill">Zero-Monolithic Debt</div>
+            <div class="pill">Deterministic Scheduling</div>
         </div>
 
         <footer>
-            <p>SigmaOS is an independent computational lattice. No legacy derivatives permitted.</p>
-            &copy; 2026 SigmaOS Collective.
+            <p>SigmaOS is the world's only Non-Derivative Sovereign Operating Singularity.</p>
+            &copy; 2026 SigmaOS Collective. Stay Sovereign.
         </footer>
     </div>
 </body>

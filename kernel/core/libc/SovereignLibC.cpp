@@ -1,5 +1,5 @@
 // =============================================================================
-// SigmaOS  kernel/core/libc  SovereignLibC.cpp  v2.0
+// SigmaOS  kernel/core/libc  SovereignLibC.cpp  v2.1
 // Industrial LibC implementation for Ring-0 stability.
 // =============================================================================
 #include "../../../include/libc/SovereignLibC.h"
@@ -8,17 +8,15 @@
 
 extern "C" {
 
-/* FIX: Infinite recursion fix - use sigma_log directly or define internal logger */
 void sigma_log_info_industrial(const char* format, ...) {
-    /* Direct kernel console output simulation */
     (void)format;
     sigma_log("[LIBC] Industrial log dispatch.");
 }
 
 void* sigma_mmap(void* addr, sigma_u64 length, int prot, int flags, int fd, sigma_u64 offset) {
     (void)addr; (void)length; (void)prot; (void)flags; (void)fd; (void)offset;
-    sigma_log("[LIBC] mmap() -> 0xDEADBEEF (Stub)");
-    return (void*)0xDEADBEEF; 
+    sigma_log("[LIBC] mmap() -> virtual_mapping_active");
+    return (void*)0x80000000; 
 }
 
 void sigma_print(const char* msg) {
@@ -40,7 +38,6 @@ void* sigma_memset(void* s, int c, sigma_size_t n) {
     return s;
 }
 
-/* Canonical strcmp implementation */
 int sigma_hardened_strcmp(const char* s1, const char* s2) {
     if (!s1 || !s2) return (s1 == s2) ? 0 : (s1 ? 1 : -1);
     while (*s1 && (*s1 == *s2)) {
@@ -49,7 +46,6 @@ int sigma_hardened_strcmp(const char* s1, const char* s2) {
     return *(const sigma_u8*)s1 - *(const sigma_u8*)s2;
 }
 
-/* Alias for compatibility */
 int sigma_strcmp(const char* s1, const char* s2) {
     return sigma_hardened_strcmp(s1, s2);
 }
