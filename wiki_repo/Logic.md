@@ -91,6 +91,11 @@ Below is a non-exhaustive list of critical shards and their relationships to the
 | File Path | Role | Logic |
 | :--- | :--- | :--- |
 | `kernel/core/automation/SovereignAutomation.cpp` | Automation Nexus | Orchestrates industrial-specific healing and rollback logic. |
+| `kernel/core/security/SovereignUserAccounts.cpp` | Identity Matrix | Multi-tenant UID/GID management. |
+| `kernel/core/hal/SovereignVMM.cpp` | Virtual Memory | Demand-paging and Page-Table orchestration. |
+| `kernel/core/drivers/SovereignUSB.cpp` | USB Stack | XHCI/EHCI controller and device discovery. |
+| `kernel/core/drivers/SovereignAudio.cpp` | Audio Engine | HDA controller and low-latency synthesis. |
+| `kernel/core/system/SovereignCoreUtils.cpp` | Core Utilities | ls, cat, grep, cp primitives. |
 | `kernel/shards/finance/SovereignIndianProfessionalTools.cpp` | Professional Tools | GST and Income Tax calculators (FY 2024-25). |
 | `kernel/shards/legal/SovereignBNS.cpp` | BNS Legal Shard | Mappings and lookups for Bharatiya Nyaya Sanhita 2023. |
 | `kernel/core/hal/SovereignHAL.cpp` | Hardware Entry | Orchestrates bus probing and driver registration. |
