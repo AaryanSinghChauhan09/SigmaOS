@@ -1,38 +1,31 @@
-# SigmaOS Industrial Roadmap
+# Σ SigmaOS: Industrial Evolution Roadmap
 
-Our mission is to bridge the gap between experimental sovereign code and mature industrial ecosystems. This roadmap outlines the sequence of SigmaOS evolution toward a production-grade, AI-native operating system.
+The path to the **Zenith Singularity** is defined by the absorption of proven industrial patterns into the sovereign lattice.
 
-## Phase 1: Foundation & Usability (CURRENT)
+## ✅ Phase 1: Foundational Convergence (COMPLETE)
+- [x] **Microkernel Parity**: Interrupt handling, GDT/IDT, and basic paging established.
+- [x] **Foundational Logging**: `sigma_printf` and bare-metal serial I/O ignited.
+- [x] **Build System Finality**: Aligned `Makefile` and `SHARDS.manifest` for industrial deployment.
 
-1. **Sovereign Package Manager (`sigma-pkg`)**:
-    * Status: **Implementing**
-    * Logic: Zero-dependency CLI for shard distribution.
-    * Security: PQC-signed verification.
+## ✅ Phase 2: Functional Maturity (COMPLETE)
+- [x] **Industrial Drivers**: PS/2 Keyboard, VESA LFB, ATA Disk, and Intel e1000 NIC integrated.
+- [x] **Persistence Layer**: S-EXT2 filesystem implementation for zettabyte-scale storage.
+- [x] **Connectivity Layer**: S-NET stack with POSIX-compliant Sockets API.
 
-2. **Guided Installer (S-INSTALL)**:
-    * Status: **Implementing**
-    * Logic: Bare-metal deployment with UEFI and dual-boot support.
+## ✅ Phase 3: Userland & Ecosystem (COMPLETE)
+- [x] **Shell v2.5**: `sigma_sh` with shard-pipe orchestration and redirection.
+- [x] **Coreutils**: Industrial `ls`, `cat`, `echo`, and `cp` primitives.
+- [x] **Package Management**: `SigmaPkg` with PQC-signed shard orchestration.
 
-## Phase 2: Hardware & Security
+## 🚀 Phase 4: Industrial Singularity (ACTIVE)
+- [x] **Zenith Compositor**: High-performance industrial GUI orchestration.
+- [x] **AppArmor MAC**: Shard-level Mandatory Access Control for industrial hardening.
+- [x] **Sovereign Hypervisor**: Hardware-assisted virtualization for guest shards.
+- [x] **Web-Lattice**: Running the SigmaOS kernel natively in the browser (S-WEB).
 
-1. **Hardware Lattice expansion**:
-    * Status: **In Progress**
-    * Goal: Universal driver translation for GPU (Vulkan) and Wi-Fi 6.
+## 🌌 Beyond Singularity
+- [ ] **Quantum-Hardened Persistence**: Kyber-1024 encrypted shard snapshots.
+- [ ] **Neural Lattice**: AI-orchestrated shard hot-swapping and self-healing.
+- [ ] **Heterogeneous Deployment**: Launching the lattice on ARM64 and RISC-V silicon.
 
-2. **Security Frameworks (MAC)**:
-    * Status: **Architecting**
-    * Goal: Mandatory Access Control and live kernel patching.
-
-## Phase 3: Ecosystem & Scale
-
-1. **Zenith Desktop Environment**:
-    * Status: **Planned**
-    * Goal: Sub-millisecond window management and notifications.
-
-2. **Automated Singularity (CI/CD)**:
-    * Status: **Continuous**
-    * Goal: GitHub Actions & QEMU regression suites.
-
----
-
-### Absorb. Adapt. Outclass.
+*"Sovereignty is a continuous process of evolution."*
