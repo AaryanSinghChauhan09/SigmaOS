@@ -27,6 +27,12 @@ SigmaOS has successfully absorbed and reimagined the most advanced capabilities 
 - **Zenith WM**: High-performance tiling window manager.
 
 ## 🔑 Getting Started
-Flash the **SigmaOS Zenith ISO** and follow the **Zenith Guided Installer**. Initialize your **Profession Profile** (e.g., `AI_RESEARCH`, `CYBERSEC`, `FINANCE`) to orchestrate your specialized shard bundle.
+Flash the **SigmaOS Zenith ISO** and follow the **Zenith Guided Installer**. 
+
+### 🌐 Run in Browser (S-WEB Emulator)
+Experience the SigmaOS Zenith launch sequence and industrial shell directly in your browser:
+1. Open [index.html](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/index.html) in any modern browser.
+2. Observe the **Asynchronous Shard Ignition (ASI)** sequence.
+3. Interact with the `sigma_sh` shell in the Zenith Desktop.
 
 *"The Zenith is the final industrial fact."*
