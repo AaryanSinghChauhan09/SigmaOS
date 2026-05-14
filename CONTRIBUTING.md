@@ -1,38 +1,24 @@
 # Contributing to SigmaOS
 
-Thank you for considering a contribution to the **SigmaOS Sovereign Lattice**!
+Welcome to the SigmaOS industrial development lattice. To maintain silicon sovereignty and architectural purity, all contributors must adhere to the following industrial standards.
 
-## Getting Started
+## Shard-First Development
 
-1. Fork the repository.
-2. Implement your feature or bug fix.
-3. Add tests for your changes.
-4. **Build** the project using the deterministic build pipeline:
+- **No Derivatives**: Do not import standard libraries (`libc`, `libstdc++`, `stl`). Use only Sovereign primitives.
+- **PQC Attestation**: Every commit must be signed with a PQC-compatible key (Kyber/Dilithium).
+- **Isolation**: Ensure your shard has zero unintended side-effects on the global lattice.
 
-   ```bash
-   python3 tools/sigma-build.py
-   ```
+## Pull Request Process
 
-5. **Run static analysis** before submitting:
+1. **Shard Proposal**: Open an issue detailing the shard's mission, absorbed patterns, and industrial utility.
+2. **Implementation**: Build your shard in the appropriate directory (`kernel/core/`, `drivers/`, etc.).
+3. **Verification**: Your shard must pass the `verify_sovereignty.ps1` audit and the `S-FSCK` consistency check.
+4. **Documentation**: Update the Wiki with shard architecture and syscall additions.
 
-   ```bash
-   cppcheck --enable=warning,style,performance kernel/core/
-   ```
+## Coding Standards
 
-## Code Standards
+- Use `sigma_u32`, `sigma_u64` for fixed-width types.
+- Follow the `SigmaObject` and `SigmaSingleton` OOP patterns.
+- Keep comments professional and mission-focused.
 
-All contributions must adhere to the **Sovereign Shard Standard**:
-
-* ✅ Every new kernel component must be a **C++ OOP Singleton** with `extern "C"` wrappers
-* ✅ All functions must emit structured log output via `sigma_log()` / `sigma_printf()`
-* ✅ New shards must be registered in `SovereignUSR` at init.
-
-## Pull Request Checklist
-
-* [ ] Code compiles with `-Wall -Wextra -Werror`
-* [ ] New shard has a `_init()`, at least one primary function, and C wrapper
-* [ ] `MISSING_COMPONENTS.md` updated if a gap is closed
-
-## Security Issues
-
-Please **do not** open public issues for security vulnerabilities. Read [SECURITY.md](../SECURITY.md) for responsible disclosure guidelines.
+Join us in building the Zenith Singularity.

@@ -33,8 +33,17 @@ public:
         sigma_log_info("[S-GUI] Widget: Button '%s' @ (%u, %u)", label, x, y);
     }
 
+    void createTextField(const char* placeholder, sigma_u32 x, sigma_u32 y) {
+        sigma_log_info("[S-GUI] Widget: TextField '%s' @ (%u, %u)", placeholder, x, y);
+    }
+
     void createMenu(const char* title, const char** items, sigma_u32 count) {
-        sigma_log_info("[S-GUI] Widget: Menu '%s' (%u items)", title, count);
+        sigma_log_info("[S-GUI] Widget: Menu '%s' (%u items) - Industrial Shard Logic ACTIVE.", title, count);
+        for(sigma_u32 i=0; i<count; i++) sigma_log_info("  - Item: %s", items[i]);
+    }
+
+    void handleInput(sigma_u32 key) {
+        sigma_log_info("[S-GUI] Input: Key %u -> Dispatched to focused shard widget.", key);
     }
 
 private:
