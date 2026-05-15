@@ -1,20 +1,52 @@
-# SigmaOS: Zenith v15.0 Release Manifest
+# 🚀 SigmaOS: Zenith v15.0 Release Manifest
 
-SigmaOS is available in multiple sovereign formats to ensure total industrial parity and portability.
+> **The sovereign microkernel, distributed across every possible silicon format.**
 
-## ?? Deployment Formats Status
+SigmaOS is available in multiple professional formats to ensure total industrial parity, portability, and performance across heterogeneous hardware environments.
 
-| Format | Status | Branch | Primary Shards |
+---
+
+## 🏛️ Deployment Formats Status
+
+| Format | Status | Primary Branch | Key Shards |
 | :--- | :--- | :--- | :--- |
-| **Standalone (Bare Metal)** | [STABLE] | elease/standalone | SovereignInstaller, SovereignRecovery |
-| **Dual Boot (Interop)** | [STABLE] | elease/dual-boot | SovereignCompatibility, SovereignPartition |
-| **Browser-Based (Web)** | [BETA] | elease/browser | SovereignWASM, ZenithWebUI |
-| **App-Based (Mobile/VM)** | [BETA] | elease/app | SovereignMobile, SovereignSDK |
+| **Standalone (Bare Metal)** | 🟢 [STABLE] | `release/standalone` | `SovereignBoot`, `S-GPU`, `S-NVMe` |
+| **Dual Boot (Interop)** | 🟢 [STABLE] | `release/dual-boot` | `S-Compatibility`, `S-Partition`, `sigma-grub` |
+| **App-Based (Runtime)** | 🟡 [BETA] | `release/app` | `S-Wine`, `S-ARC`, `S-WASM` |
+| **Browser-Based (Web)** | 🟡 [BETA] | `release/browser` | `ZenithWebUI`, `S-Sandboxing` |
+| **Core (Headless/Server)** | 🟢 [STABLE] | `release/microkernel` | `S-SSH`, `S-Orchestrator`, `S-MM` |
+| **Distributed (Mesh)** | 🟠 [DEV] | `release/distributed` | `LatticeNet`, `S-Consensus` |
 
-## ?? Build Instructions
-To build a specific format, switch to the corresponding branch and run:
-`make zenith-<format>-iso`
+---
 
-Example:
-`git checkout release/standalone`
-`make zenith-standalone-iso`
+## 🛠️ Build and Deployment Instructions
+
+To build a specific edition of SigmaOS, switch to the corresponding branch and execute the industrial build command:
+
+```bash
+# 1. Switch to your desired format branch
+git checkout release/standalone
+
+# 2. Build the edition-specific ISO/Image
+make zenith-standalone-iso
+```
+
+### 📦 Unified Package Management
+Every format supports the `sigma-pkg` utility for cross-format shard synchronization:
+
+```bash
+# Update local lattice to match global repository
+sigma-pkg sync
+
+# Install format-specific industrial layers
+sigma-pkg layer standalone
+```
+
+---
+
+## 🛤️ Release Philosophy
+SigmaOS follows a **Strict Parity Protocol**. While the deployment format varies (Bare metal vs. WASM), the underlying **Sovereign Kernel** and **Lattice Algorithms** remain identical. This ensures that a security audit performed on the Standalone version is mathematically valid for the App version.
+
+---
+
+*SigmaOS — One Kernel. Every Hardware. Absolute Sovereignty.*
