@@ -1,18 +1,29 @@
-# RTOS Format
+# SigmaOS Format: RTOS (Real-Time OS)
+## Deterministic Latency & Safety-Critical Execution
 
-**Branch:** `release/rtos`
+The **RTOS** format is designed for mission-critical industrial deployments (Bio-Fab, Aerospace, Defense). It prioritizes deterministic scheduling over raw throughput.
 
-## Architecture
-The Real-Time OS deployment enforces strict deterministic execution. It utilizes a Completely Fair Scheduler (CFS) heavily tuned for priority-based preemptive scheduling to guarantee worst-case execution times (WCET) for safety-critical hardware shards.
+---
 
-## Performance Benchmarks
-- **Context Switch Jitter**: <2us standard deviation.
-- **Interrupt Latency**: Guaranteed <5us response time.
+## 🛠️ Bundled Industrial Tools
 
-## Vulnerabilities Fixed
-- Resolved priority inversion bugs through priority inheritance protocols.
-- Addressed memory allocation race conditions by enforcing pre-allocation.
+| Tool | Category | Linux/Windows Equivalent | Purpose |
+|------|----------|--------------------------|---------|
+| **SovereignSynth** | Creative | LMMS / Ardour | Real-time audio processing and synthesis shards. |
+| **SovereignOscilloscope** | Engineering | PulseView / Signal Analyzer | Logic analysis for embedded hardware shards. |
+| **SovereignWCET** | Verification | WCET Analyzers | Validate worst-case execution times for safety. |
+| **Node-RED Shard** | IoT | Node-RED | Visual flow-based IoT orchestration. |
 
-## Optimization Practices
-- **No Dynamic Allocation**: Use `SovereignMemoryPool` for static slab allocation during initialization. `malloc` is forbidden in critical loops.
-- **Formal Verification**: Safety-critical logic must pass model checking for state space violations before compilation.
+---
+
+## ⚙️ Core Shards
+- `kernel/core/system/SovereignScheduler.cpp` (Deterministic Mode)
+- `kernel/core/hal/SovereignWatchdog.cpp`
+- `kernel/core/hal/SovereignArchRISCV.cpp`
+
+---
+
+## 🚀 Optimization Checklist
+- [ ] Disable dynamic memory allocation (Zero-Alloc mode).
+- [ ] Pin critical shards to specific CPU cores.
+- [ ] Validate all task deadlines via **SovereignWCET**.
