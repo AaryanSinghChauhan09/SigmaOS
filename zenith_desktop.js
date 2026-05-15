@@ -85,10 +85,17 @@ class ZenithWM {
         this.windows.push(win);
         this.desktops[this.activeDesktop].push(win);
         win.addEventListener('mousedown', () => this.bringToFront(win));
+        
+        // Add "glass" effect dynamically if missing
+        if (!win.classList.contains('glass-premium')) {
+            win.classList.add('glass-premium');
+        }
     }
     bringToFront(win) {
         this.topZ = this.topZ >= 9999 ? 1000 : this.topZ + 1;
         win.style.zIndex = String(this.topZ);
+        this.windows.forEach(w => w.classList.remove('active-focus'));
+        win.classList.add('active-focus');
     }
     switchToDesktop(index) {
         if (index < 0 || index >= this.desktops.length) return;
@@ -96,22 +103,16 @@ class ZenithWM {
         this.windows.forEach(win => {
             if (this.desktops[index].includes(win)) {
                 win.style.display = win.dataset.prevDisplay || 'block';
+                win.style.opacity = '1';
+                win.style.transform = 'scale(1)';
             } else {
                 win.dataset.prevDisplay = win.style.display;
-                win.style.display = 'none';
+                win.style.opacity = '0';
+                win.style.transform = 'scale(0.95)';
+                setTimeout(() => { if (this.activeDesktop !== index) win.style.display = 'none'; }, 300);
             }
         });
-        if (window.addLog) addLog(`Σ [WM]: Desktop ${index + 1} active.`, 'success');
-    }
-    tileAll() {
-        const visible = this.windows.filter(w => w.style.display !== 'none');
-        if (!visible.length) return;
-        const w = window.innerWidth / visible.length;
-        visible.forEach((win, i) => {
-            win.style.width = `${w - 20}px`;
-            win.style.left = `${i * w + 10}px`;
-            win.style.top = '100px';
-        });
+        if (window.addLog) addLog(`Σ [WM]: Desktop ${index + 1} Orchestrated.`, 'success');
     }
 }
 const wm = new ZenithWM();
@@ -140,17 +141,42 @@ class HotkeyManager {
 const hotkeys = new HotkeyManager();
 
 // UI Global Functions
-window.toggleStart = () => document.getElementById('start-menu')?.classList.toggle('active');
+window.toggleStart = () => {
+    const menu = document.getElementById('start-menu');
+    if (!menu) return;
+    const isActive = menu.classList.toggle('active');
+    if (window.addLog) addLog(isActive ? 'Σ [ZENITH]: Start Matrix Exposed.' : 'Σ [ZENITH]: Start Matrix Concealed.');
+};
+
 window.openWindow = (id) => {
     const win = document.getElementById(id);
-    if (win) { win.style.display = 'block'; wm.bringToFront(win); }
+    if (win) { 
+        win.style.display = 'block'; 
+        win.style.opacity = '0';
+        win.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            win.style.opacity = '1';
+            win.style.transform = 'scale(1)';
+            wm.bringToFront(win);
+        }, 10);
+    }
 };
+
 window.closeWindow = (id) => {
     const win = document.getElementById(id);
-    if (win) { win.classList.add('shattering'); setTimeout(() => win.style.display = 'none', 400); }
+    if (win) { 
+        win.style.opacity = '0';
+        win.style.transform = 'scale(0.95)';
+        win.classList.add('shattering'); 
+        setTimeout(() => {
+            win.style.display = 'none';
+            win.classList.remove('shattering');
+        }, 400); 
+    }
 };
+
 window.launchApp = (app) => {
-    if (window.addLog) addLog(`Σ [ZENITH]: Launching ${app}...`, 'success');
+    if (window.addLog) addLog(`Σ [ZENITH]: Launching ${app} Shard...`, 'success');
     const map = {
         'Markup Forge': 'markup-forge-win',
         'Utility Nexus': 'utility-nexus-win',
@@ -164,10 +190,17 @@ window.launchApp = (app) => {
     if (map[app]) window.openWindow(map[app]);
     document.getElementById('start-menu')?.classList.remove('active');
 };
+
 window.setTheme = (name) => persona.setTheme(name);
 
 // Initialize Components
-hotkeys.register('alt+space', () => document.getElementById('cmd-palette')?.classList.toggle('active'));
+hotkeys.register('alt+space', () => {
+    const pal = document.getElementById('cmd-palette');
+    pal?.classList.toggle('active');
+    if (pal?.classList.contains('active')) {
+        document.getElementById('cmd-input')?.focus();
+    }
+});
 hotkeys.register('alt+1', () => wm.switchToDesktop(0));
 hotkeys.register('alt+2', () => wm.switchToDesktop(1));
 hotkeys.register('alt+3', () => wm.switchToDesktop(2));
@@ -175,19 +208,30 @@ hotkeys.register('alt+4', () => wm.switchToDesktop(3));
 
 function updateClock() {
     const now = new Date();
-    document.getElementById('clock-time').textContent = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
-    document.getElementById('clock-date').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    const timeEl = document.getElementById('clock-time');
+    const dateEl = document.getElementById('clock-date');
+    if (timeEl) timeEl.textContent = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+    if (dateEl) dateEl.textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 }
 setInterval(updateClock, 1000);
 updateClock();
 
-const logContainer = document.getElementById('kernel-logs');
 window.addLog = (text, type = '') => {
+    const logContainer = document.getElementById('kernel-logs');
+    if (!logContainer) return;
+    
+    const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
     const div = document.createElement('div');
     div.className = `log-item ${type}`;
-    div.textContent = text;
-    logContainer?.prepend(div);
-    if (logContainer?.children.length > 20) logContainer.lastChild.remove();
+    div.innerHTML = `<span class="log-time">[${time}]</span> ${text}`;
+    
+    logContainer.prepend(div);
+    
+    // Auto-remove old logs to maintain performance
+    if (logContainer.children.length > 25) {
+        logContainer.lastChild.classList.add('fade-out');
+        setTimeout(() => logContainer.lastChild?.remove(), 400);
+    }
 };
 
         // Marketplace Logic (Integrated with DAL)

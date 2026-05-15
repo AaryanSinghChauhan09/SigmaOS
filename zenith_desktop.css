@@ -1,14 +1,32 @@
 :root {
-    --accent: #00f2ff;
-    --accent-glow: rgba(0, 242, 255, 0.3);
-    --bg: #030305;
-    --glass: rgba(255, 255, 255, 0.03);
+    /* Industrial Color Lattice (HSL) */
+    --primary-h: 195;
+    --primary-s: 100%;
+    --primary-l: 50%;
+    --accent-h: 180;
+    --accent-s: 100%;
+    --accent-l: 45%;
+
+    --primary: hsl(var(--primary-h), var(--primary-s), var(--primary-l));
+    --accent: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
+    --accent-glow: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.3);
+    
+    --bg: #050506;
+    --bg-darker: #020203;
+    
+    /* Glassmorphism Constants */
+    --glass: rgba(10, 12, 16, 0.45);
     --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-blur: blur(20px);
-    --text: #e0e6ed;
-    --text-muted: #8a95a5;
+    --glass-blur: blur(25px) saturate(180%);
+    
+    --text: #f0f4f8;
+    --text-muted: #8e9aaf;
     --success: #00ff9d;
     --error: #ff4757;
+    --warning: #ffcc00;
+    
+    --shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.5);
+    --transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Theme Shards */
@@ -486,32 +504,32 @@ body {
     display: none;
     position: absolute;
     z-index: 1000;
-    border: 1px solid var(--accent);
-    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-    background: rgba(10, 10, 15, 0.4);
-    -webkit-backdrop-filter: blur(25px) saturate(180%);
-    backdrop-filter: blur(25px) saturate(180%);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    box-shadow: var(--shadow), 0 0 0 1px var(--glass-border);
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
 }
 
 .window-header {
-    background: rgba(255,255,255,0.05);
-    padding: 12px 18px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 14px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid var(--glass-border);
     cursor: move;
 }
 
 .window-title {
-    font-size: 0.85rem;
-    font-weight: 700;
+    font-size: 0.75rem;
+    font-weight: 800;
     color: var(--accent);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
 }
 
 .window-controls {
@@ -792,4 +810,86 @@ body {
 /* Onboarding wizard overlay — hidden by default via JS toggle */
 .wizard-overlay--hidden {
     display: none;
+}
+
+/* Toast System */
+.toast-container {
+    position: fixed;
+    bottom: 100px;
+    right: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 10000;
+}
+
+.toast {
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 16px 24px;
+    min-width: 300px;
+    color: var(--text);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    animation: toast-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes toast-in {
+    from { transform: translateX(50px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.toast-exit {
+    animation: toast-out 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes toast-out {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(50px); opacity: 0; }
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.toast-icon {
+    font-size: 1.2rem;
+    font-weight: 800;
+}
+
+.toast-success .toast-icon { color: var(--success); }
+.toast-error .toast-icon { color: var(--error); }
+.toast-warning .toast-icon { color: var(--warning); }
+.toast-info .toast-icon { color: var(--accent); }
+
+.toast-progress {
+    height: 3px;
+    background: var(--accent-glow);
+    border-radius: 2px;
+    width: 100%;
+    transform-origin: left;
+    animation: toast-progress 4s linear forwards;
+}
+
+@keyframes toast-progress {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
+}
+
+/* Lattice Mesh */
+.lattice-mesh-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
 }
