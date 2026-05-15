@@ -22,21 +22,27 @@ SigmaOS adheres to a rigorous technical roadmap to ensure total parity across al
 - **Shard-Based Microkernel**: Minimal core with dynamically loadable industrial shards (600+ available).
 - **Dynamic Configuration**: Real-time hardware discovery and module orchestration via `SovereignNexus`.
 
-### 4. Rigorous Testing (CI/CD)
+### 4. Algorithmic Performance & Benchmarking
+- **O(1) Memory Management**: Deterministic slab allocation via shard-level memory pools.
+- **Micro/Macro Benchmarks**: Automated performance profiling integrated into the CI/CD pipeline.
+- [Read the Algorithmic Complexity Specs](docs/ALGORITHMS.md)
+- [View Performance Roadmap](docs/PERFORMANCE.md)
+
+### 5. Rigorous Testing (CI/CD)
 - **Cross-Platform Validation**: Automated test suites running on QEMU, Virtio, and Bare-Metal.
 - **Stress Testing**: Extreme workload simulation for industrial stability.
 - [View Test Battery](tests/system_audit.test.js)
 
-### 5. Compatibility Layers
+### 6. Compatibility Layers
 - **Hypervisor Integration**: Native support for VMware, VirtualBox, KVM, and QEMU.
 - **Binary Translation**: WASM-native transpilation for legacy application support.
 
-### 6. Standards & Security (PQC)
+### 7. Standards & Security (PQC)
 - **Post-Quantum Hardening**: Dilithium-5 and Kyber-1024 encryption integrated into the core lattice.
 - **Security Hardening**: ASLR, NX, and SMAP enforced at the silicon level.
 - [Read the Security Standards](docs/security/PQC_HARDENING.md)
 
-### 7. Deployment & Maintenance
+### 8. Deployment & Maintenance
 - **Unified Build System**: Simplified `Makefile` with multi-target cross-compilation support.
 - **Rolling Updates**: OTA-ready package management via `SovereignPkg`.
 
