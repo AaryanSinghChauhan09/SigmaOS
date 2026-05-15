@@ -20,4 +20,9 @@ done
 echo "[BUILD] Generating Unified Manifest..."
 ls -lh sigmaos-*.bin
 
-echo "[STATUS] All Industrial Shards Processed."
+echo "[BUILD] Orchestrating Special Industrial Formats (x86_64)..."
+make build-embedded ARCH=x86_64
+make build-rtos ARCH=x86_64
+make build-cloud ARCH=x86_64
+
+echo "[STATUS] All Industrial Shards and Formats Processed."

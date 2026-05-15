@@ -174,6 +174,18 @@ singularity: $(KERNEL_SHARDS) $(ASM_SHARDS)
 	$(LD) $(LDFLAGS) -o sigmaos-$(ARCH).bin $^
 	@echo "[STATUS] SINGULARITY ACHIEVED. sigmaos-$(ARCH).bin ready."
 
+build-embedded: CXXFLAGS += -DCONFIG_EMBEDDED -DCONFIG_NO_UI
+build-embedded: singularity
+	@echo "[STATUS] EMBEDDED SHARD READY."
+
+build-rtos: CXXFLAGS += -DCONFIG_RTOS_HARD -DCONFIG_DETERMINISTIC
+build-rtos: singularity
+	@echo "[STATUS] REAL-TIME SHARD READY."
+
+build-cloud: CXXFLAGS += -DCONFIG_VIRTIO_ONLY -DCONFIG_CLOUD_NATIVE
+build-cloud: singularity
+	@echo "[STATUS] CLOUD-NATIVE SHARD READY."
+
 zenith-iso: singularity
 	@echo "[ISO] Generating Zenith deployment image..."
 	$(GRUB) -o zenith-$(ARCH).iso iso_root

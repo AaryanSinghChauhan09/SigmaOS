@@ -13,25 +13,30 @@ SigmaOS adheres to a rigorous technical roadmap to ensure total parity across al
 - **Portable APIs**: Strict POSIX-lite compliance for seamless userland portability.
 - [Read the HAL Specification](docs/architecture/HAL.md)
 
-### 2. Modularity & Extensibility
+### 2. Universal OS Format Adaptation
+- **Lattice Flexibility**: Support for Monolithic, Microkernel, Hybrid, Embedded, RTOS, Cloud, and Mobile formats.
+- **Profile-Based Build**: Native build targets for specific industrial environments (e.g., `make build-embedded`).
+- [Read the OS Format Matrix](docs/architecture/FORMATS.md)
+
+### 3. Modularity & Extensibility
 - **Shard-Based Microkernel**: Minimal core with dynamically loadable industrial shards (600+ available).
 - **Dynamic Configuration**: Real-time hardware discovery and module orchestration via `SovereignNexus`.
 
-### 3. Rigorous Testing (CI/CD)
+### 4. Rigorous Testing (CI/CD)
 - **Cross-Platform Validation**: Automated test suites running on QEMU, Virtio, and Bare-Metal.
 - **Stress Testing**: Extreme workload simulation for industrial stability.
 - [View Test Battery](tests/system_audit.test.js)
 
-### 4. Compatibility Layers
+### 5. Compatibility Layers
 - **Hypervisor Integration**: Native support for VMware, VirtualBox, KVM, and QEMU.
 - **Binary Translation**: WASM-native transpilation for legacy application support.
 
-### 5. Standards & Security (PQC)
+### 6. Standards & Security (PQC)
 - **Post-Quantum Hardening**: Dilithium-5 and Kyber-1024 encryption integrated into the core lattice.
 - **Security Hardening**: ASLR, NX, and SMAP enforced at the silicon level.
 - [Read the Security Standards](docs/security/PQC_HARDENING.md)
 
-### 6. Deployment & Maintenance
+### 7. Deployment & Maintenance
 - **Unified Build System**: Simplified `Makefile` with multi-target cross-compilation support.
 - **Rolling Updates**: OTA-ready package management via `SovereignPkg`.
 
