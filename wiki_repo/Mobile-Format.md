@@ -1,18 +1,29 @@
-# Mobile OS Format
+# SigmaOS Format: Mobile & App Center
+## Multimedia, Productivity, & End-User Sovereign Experience
 
-**Branch:** `release/mobile`
+The **Mobile** format provides the user-facing app ecosystem. It bundles creative, document, and media tools for high-productivity workflows.
 
-## Architecture
-The Mobile deployment adapts the `release/app` GUI stack for touch devices and strict energy constraints. `SovereignEnergySched` aggressively downclocks the CPU and suspends non-visible shards to maximize battery life.
+---
 
-## Performance Benchmarks
-- **Touch Responsiveness**: <16ms input-to-render latency (sustained 60/120Hz).
-- **Idle Power Draw**: CPU kept idle at 98% during wait states.
+## 🛠️ Bundled Productivity Tools
 
-## Vulnerabilities Fixed
-- Hardened IPC boundaries for third-party mobile applications to prevent privilege escalation.
-- Addressed memory leaks in the touch compositing engine.
+| Tool | Category | Linux/Windows Equivalent | Purpose |
+|------|----------|--------------------------|---------|
+| **ZenithCapture** | Multimedia | Bandicam / OBS Studio | High-performance screen and shard recording. |
+| **SovereignPDF** | Productivity | iLovePDF / LibreOffice | PQC-signed document management and PDF editing. |
+| **SovereignVis** | Creative | GIMP / Inkscape | Graphics editing and visualization engine. |
+| **SovereignVault** | Security | Privacy Badger | Hardened privacy add-ons for the browser shard. |
 
-## Optimization Practices
-- **Event-Driven UI**: UIs must strictly yield execution context (`sigma_yield`) and rely on asynchronous interrupts for touch events.
-- **Background Suspension**: Any background shard without an active audio/network lease must be suspended immediately.
+---
+
+## ⚙️ Core Shards
+- `kernel/core/vis/SovereignVis.cpp`
+- `userland/ZenithDesktop.cpp`
+- `kernel/core/ui/SovereignWM.cpp`
+
+---
+
+## 🚀 Optimization Checklist
+- [ ] Calibrate **ZenithCapture** for 60FPS recording.
+- [ ] Enforce **SovereignVault** rules for the browser sandbox.
+- [ ] Run **SovereignPDF** attestation on all financial shards.

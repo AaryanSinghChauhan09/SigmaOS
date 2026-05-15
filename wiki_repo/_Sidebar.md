@@ -33,26 +33,23 @@
 * [Contributing](CONTRIBUTING)
 * [Code of Conduct](CODE_OF_CONDUCT)
 
-## 🏁 Industrial Releases
-
-* [Release Notes v15.0](Release-Notes-v15.0)
-* [Edition: Browser](Browser-Integration)
-* [Edition: App](Application-Layer)
-* [Edition: Dual-Boot](Dual-Boot-Coexistence)
-* [Edition: Standalone](Independent-Deployment)
-* [Format: Microkernel](Microkernel-Format)
-* [Format: Distributed](Distributed-Format)
-* [Format: RTOS](RTOS-Format)
-* [Format: Cloud](Cloud-Format)
-* [Format: Mobile](Mobile-Format)
-* [Kernel Developer Handbook](Kernel-Developer-Handbook)
+## 🏛️ Industrial Maintenance
+* [Lattice Cleanup & Maintenance](Microkernel-Format)
+* [Incremental Shard Backup](Microkernel-Format)
 * [OS Problems & Solutions](Common-OS-Problems-Solutions)
-* [Performance Benchmarks](PERFORMANCE.md)
-* [Browser Security Profiling](Browser-Integration)
+
+## 🏁 OS Format Guides & Toolsets
+* [Format: Microkernel (Industrial baseline)](Microkernel-Format)
+* [Format: Distributed (Consensus & Network)](Distributed-Format)
+* [Format: RTOS (Safety-Critical & Creative)](RTOS-Format)
+* [Format: Cloud (Containers & Scaling)](Cloud-Format)
+* [Format: Mobile (Multimedia & Productivity)](Mobile-Format)
+
+## 🛠️ Industrial Readiness
+* [Kernel Developer Handbook](Kernel-Developer-Handbook)
 * [Dual-Boot Compatibility Matrix](Dual-Boot-Compatibility-Matrix)
 * [Embedded Hardware Compatibility](Embedded-Hardware-Compatibility)
-* [Static Analysis & Stress Testing](ROADMAP.md)
-* [Release Signing & Discipline](Release-Notes-v15.0)
+* [Performance Benchmarks](PERFORMANCE.md)
 * [Zenith v15.0 Changelog](CHANGELOG.md)
 
 ---

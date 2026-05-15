@@ -87,6 +87,8 @@ kernel/core/system/SovereignForum.cpp
 kernel/core/system/SovereignShell.cpp
 kernel/core/system/SovereignCoreUtils.cpp
 kernel/core/system/SovereignPkg.cpp
+kernel/core/system/SovereignCleanup.cpp
+kernel/core/multimedia/SovereignMedia.cpp
 kernel/core/system/SovereignContainer.cpp
 kernel/core/system/SovereignHypervisor.cpp
 kernel/core/system/SovereignKVM.cpp

@@ -1,18 +1,29 @@
-# Microkernel OS Format
+# SigmaOS Format: Microkernel Zenith
+## Industrial Modularity & Service Orchestration
 
-**Branch:** `release/microkernel`
+The **Microkernel** format is the architectural baseline of SigmaOS. It moves all non-essential services into user-space shards, ensuring that kernel panic in one shard does not compromise the entire lattice.
 
-## Architecture
-The Microkernel deployment strips the monolithic kernel down to its absolute minimum: IPC, basic scheduling, and virtual memory. All device drivers (Network, NVMe, Audio) and filesystems (XFS, Ext2) are extracted into isolated user-space shards. 
+---
 
-## Performance Benchmarks
-- **S-IPC Latency**: 40ns asynchronous lock-free messaging.
-- **Service Invocation**: <150ns overhead per system call.
+## 🛠️ Bundled Industrial Tools
 
-## Vulnerabilities Fixed
-- Null pointer dereferences in monolithic driver namespaces.
-- Hardened IPC buffer overflow protections using boundary validations.
+| Tool | Category | Linux/Windows Equivalent | Purpose |
+|------|----------|--------------------------|---------|
+| **SovereignKVM** | Virtualization | Oracle VirtualBox / QEMU | Run legacy OS shards within the lattice. |
+| **SovereignCleanup** | Maintenance | BleachBit / Disk Cleanup | Deep-clean lattice shards and redundant assets. |
+| **SovereignBackup** | Recovery | Timeshift / Veeam | PQC-signed incremental lattice snapshots. |
+| **SovereignDoctor** | Diagnostics | dmesg / Event Viewer | Real-time shard health monitoring. |
 
-## Optimization Practices
-- **Message Batching**: Shards must batch small IPC payloads to prevent excessive context switching.
-- **Shared Memory Windows**: High-throughput data (like video frames or disk blocks) must utilize zero-copy shared memory windows instead of message passing.
+---
+
+## ⚙️ Core Shards
+- `kernel/core/system/SovereignHypervisor.cpp`
+- `kernel/core/system/SovereignKVM.cpp`
+- `kernel/core/system/SovereignLXC.cpp`
+
+---
+
+## 🚀 Optimization Checklist
+- [ ] Enable **SovereignKVM** for hardware-accelerated virtualization.
+- [ ] Configure **SovereignBackup** for nightly shard snapshots.
+- [ ] Run **SovereignCleanup** after major version upgrades to reclaim lattice space.
