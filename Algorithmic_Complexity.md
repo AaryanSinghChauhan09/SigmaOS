@@ -13,7 +13,6 @@ This document outlines the complexity classes and optimization strategies for co
 | **Networking** | Packet Routing | O(log N) | O(N) | Radix-tree for IP prefix matching. |
 
 ## ⚙️ Shard-Level Optimization Practices
-
 1. **Minimize Context Switches**: Favor shard-local execution over frequent IPC where deterministic response is required.
 2. **Lock-Free Primitives**: Use atomic operations for high-frequency counters and state flags to prevent race conditions.
 3. **Memory Pool Isolation**: Each shard should initialize its own memory pool during ASI to prevent global heap fragmentation.
