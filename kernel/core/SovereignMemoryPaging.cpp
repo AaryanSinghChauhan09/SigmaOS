@@ -21,7 +21,7 @@ struct PageTable {
 class SovereignBuddyAllocator {
 private:
     static constexpr sigma_size_t MAX_ORDER = 10; // Up to 1024 pages
-    static constexpr sigma_size_t PAGE_SIZE = 4096;
+    static constexpr sigma_size_t SOVEREIGN_PAGE_SIZE = 4096;
     sigma_size_t free_lists[MAX_ORDER + 1];
     
 public:
@@ -40,25 +40,23 @@ public:
     void free_pages(void* ptr, sigma_size_t order) {
         if (!ptr) return;
         // Secure free
-        sigma_memset(ptr, 0, PAGE_SIZE * (1 << order));
+        sigma_memset(ptr, 0, SOVEREIGN_PAGE_SIZE * (1 << order));
         sigma_log_info("[BUDDY] Secure freed pages at %p order %llu\n", ptr, order);
     }
 };
 
-class SovereignPagingEngine {
+class SovereignPagingEngine : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignPagingEngine> {
+    friend class SigmaOS::SigmaSingleton<SovereignPagingEngine>;
 public:
-    static SovereignPagingEngine& getInstance() {
-        static SovereignPagingEngine instance;
-        return instance;
-    }
+    const char* type_name() const noexcept override { return "SovereignPagingEngine"; }
 
     void init() {
         sigma_log("[PAGING] Initializing Sovereign Predictive Paging Engine...");
-        this->active_pages = 0;
-        this->page_faults_averted = 0;
-        pml4 = (PageTable*)0x100000; // Simulated PML4 base
-        sigma_memset(pml4, 0, sizeof(PageTable));
-        buddy.init();
+        this->m_active_pages = 0;
+        this->m_page_faults_averted = 0;
+        m_pml4 = (PageTable*)0x100000; // Simulated PML4 base
+        sigma_memset(m_pml4, 0, sizeof(PageTable));
+        m_buddy.init();
         sigma_log("[PAGING] Predictive pre-fetching ACTIVE.");
     }
 
@@ -67,33 +65,27 @@ public:
         sigma_u64 paddr = (sigma_u64)physical_addr;
         
         sigma_u16 pml4_idx = (vaddr >> 39) & 0x1FF;
-        sigma_u16 pdp_idx = (vaddr >> 30) & 0x1FF;
-        sigma_u16 pd_idx = (vaddr >> 21) & 0x1FF;
-        sigma_u16 pt_idx = (vaddr >> 12) & 0x1FF;
         
-        // Setup minimal mappings
-        pml4->entries[pml4_idx].present = 1;
-        pml4->entries[pml4_idx].rw = (flags & 2) ? 1 : 0;
-        pml4->entries[pml4_idx].user = (flags & 4) ? 1 : 0;
-        pml4->entries[pml4_idx].frame = paddr >> 12;
-
-        this->active_pages++;
+        m_pml4->entries[pml4_idx].present = 1;
+        m_pml4->entries[pml4_idx].frame = paddr >> 12;
+        
+        this->m_active_pages++;
         sigma_log_info("[PAGING] Mapped %p -> %p (Flags: %X). Total active: %u\n", 
-                     virtual_addr, physical_addr, flags, this->active_pages);
+                     virtual_addr, physical_addr, flags, this->m_active_pages);
     }
 
     void predictAndPrefetch() {
         sigma_log("[PAGING] Analyzing access patterns... Prefetching 16 cold pages to L3 cache.");
-        this->page_faults_averted += 16;
+        this->m_page_faults_averted += 16;
     }
 
 private:
-    SovereignPagingEngine() : active_pages(0), page_faults_averted(0), pml4(nullptr) {}
+    SovereignPagingEngine() : m_active_pages(0), m_page_faults_averted(0), m_pml4(nullptr) {}
 
-    sigma_u32 active_pages;
-    sigma_u32 page_faults_averted;
-    PageTable* pml4;
-    SovereignBuddyAllocator buddy;
+    sigma_u32 m_active_pages;
+    sigma_u32 m_page_faults_averted;
+    PageTable* m_pml4;
+    SovereignBuddyAllocator m_buddy;
 };
 
 /* --- C Wrappers --- */

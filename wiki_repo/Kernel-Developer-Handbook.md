@@ -1,4 +1,5 @@
 # SigmaOS Kernel Developer Handbook
+
 ## Version 15.0.0 — Zenith Release
 
 ---
@@ -18,6 +19,7 @@ SigmaOS uses a **microkernel-inspired shard lattice** where each subsystem is an
 ## 2. Concurrency Model & Formal Verification
 
 ### 2.1 Lock Hierarchy (Enforced)
+
 All kernel shards MUST acquire locks in the following order to prevent deadlocks:
 
 ```
@@ -30,12 +32,14 @@ All kernel shards MUST acquire locks in the following order to prevent deadlocks
 **Violation** of this order will trigger a `SovereignWatchdog` panic.
 
 ### 2.2 Atomic Operations
+
 Prefer `__atomic_*` builtins over mutexes for counter updates:
 ```cpp
 __atomic_fetch_add(&shard_refcount, 1, __ATOMIC_SEQ_CST);
 ```
 
 ### 2.3 Formal Verification Checklist
+
 Before merging any concurrency-related change:
 - [ ] Verified with `ThreadSanitizer` (`-fsanitize=thread`)
 - [ ] No `TOCTOU` (time-of-check/time-of-use) patterns introduced

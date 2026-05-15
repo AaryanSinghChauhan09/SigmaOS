@@ -1,15 +1,18 @@
 #ifndef SOVEREIGN_VFS_HPP
 #define SOVEREIGN_VFS_HPP
 
-#include "include/sigma_types.h"
+#include "../../include/core/sigma_types.h"
+#include "../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
 namespace FS {
 
-class SovereignDistributedVFS {
+class SovereignDistributedVFS : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignDistributedVFS> {
+    friend class SigmaOS::SigmaSingleton<SovereignDistributedVFS>;
 public:
-    static SovereignDistributedVFS& getInstance();
+    const char* type_name() const noexcept override { return "SovereignDistributedVFS"; }
+    
     void init();
     void mountDistributedNode(const char* node_address);
     sigma_u32 open(const char* filepath, sigma_u32 flags);

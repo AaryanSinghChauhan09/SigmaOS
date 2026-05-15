@@ -1,6 +1,7 @@
 #include "../../include/core/sigma_types.h"
 #include "../../include/hal/sigma_hal.h"
 #include "../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
 
 /**
  * SigmaOS Kernel-Level I/O Orchestrator (Step 3: Debugging)

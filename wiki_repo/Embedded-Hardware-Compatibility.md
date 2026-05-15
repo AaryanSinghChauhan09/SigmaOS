@@ -1,4 +1,5 @@
 # SigmaOS Embedded Hardware Compatibility List
+
 ## Release: Standalone v15.0 — IoT/Edge Deployments
 
 ---
@@ -36,15 +37,19 @@
 ## Build Flags Per Architecture
 
 ```bash
+
 # ARM Cortex-A (32-bit)
+
 export SIGMA_ARCH=arm
 export SIGMA_FLAGS="-march=armv7-a -mfpu=neon -mfloat-abi=hard -DSIGMA_FASTBOOT=1"
 
 # ARM64 / AArch64
+
 export SIGMA_ARCH=aarch64
 export SIGMA_FLAGS="-march=armv8-a -DSIGMA_FASTBOOT=1"
 
 # RISC-V 64-bit
+
 export SIGMA_ARCH=riscv64
 export SIGMA_FLAGS="-march=rv64imafdc -mabi=lp64d -DSIGMA_FASTBOOT=1"
 ```

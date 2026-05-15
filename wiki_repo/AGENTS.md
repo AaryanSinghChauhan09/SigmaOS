@@ -9,7 +9,6 @@ SigmaOS replaces traditional background daemons and systemd services with **Auto
 ## 🏛️ Agent Hierarchy
 
 The agent ecosystem is modularized into specialized tiers:
-
 1. **Governance Agents**: Enforce security policies and resource quotas.
 2. **Maintenance Agents**: Perform self-healing, log rotation, and cache purging.
 3. **Observation Agents**: Monitor silicon health and network entropy.

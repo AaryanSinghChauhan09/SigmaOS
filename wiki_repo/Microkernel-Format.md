@@ -1,4 +1,5 @@
 # SigmaOS Format: Microkernel Zenith
+
 ## Industrial Modularity & Service Orchestration
 
 The **Microkernel** format is the architectural baseline of SigmaOS. It moves all non-essential services into user-space shards, ensuring that kernel panic in one shard does not compromise the entire lattice.
@@ -17,6 +18,7 @@ The **Microkernel** format is the architectural baseline of SigmaOS. It moves al
 ---
 
 ## ⚙️ Core Shards
+
 - `kernel/core/system/SovereignHypervisor.cpp`
 - `kernel/core/system/SovereignKVM.cpp`
 - `kernel/core/system/SovereignLXC.cpp`
@@ -24,6 +26,7 @@ The **Microkernel** format is the architectural baseline of SigmaOS. It moves al
 ---
 
 ## 🚀 Optimization Checklist
+
 - [ ] Enable **SovereignKVM** for hardware-accelerated virtualization.
 - [ ] Configure **SovereignBackup** for nightly shard snapshots.
 - [ ] Run **SovereignCleanup** after major version upgrades to reclaim lattice space.

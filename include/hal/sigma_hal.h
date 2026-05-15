@@ -51,7 +51,50 @@ extern "C" {
 #endif
 
 void hal_init(void);
+void hal_shutdown(void);
 void hal_probe(void);
+
+/* --- CPU Control --- */
+static inline void cpu_pause(void) {
+    __asm__ __volatile__("pause" ::: "memory");
+}
+
+static inline void cpu_halt(void) {
+    __asm__ __volatile__("hlt" ::: "memory");
+}
+
+/* --- Port I/O --- */
+static inline void port_outb(sigma_u16 port, sigma_u8 val) {
+    __asm__ __volatile__("outb %0, %1" : : "a"(val), "Nd"(port));
+}
+
+static inline sigma_u8 port_inb(sigma_u16 port) {
+    sigma_u8 ret;
+    __asm__ __volatile__("inb %1, %0" : "=a"(ret) : "Nd"(port));
+    return ret;
+}
+
+/* --- Serial I/O --- */
+#define COM1 0x3F8
+
+static inline void serial_init(void) {
+    port_outb(COM1 + 1, 0x00);
+    port_outb(COM1 + 3, 0x80);
+    port_outb(COM1 + 0, 0x03);
+    port_outb(COM1 + 1, 0x00);
+    port_outb(COM1 + 3, 0x03);
+    port_outb(COM1 + 2, 0xC7);
+    port_outb(COM1 + 4, 0x0B);
+}
+
+static inline int is_transmit_empty(void) {
+    return port_inb(COM1 + 5) & 0x20;
+}
+
+static inline void serial_putc(char c) {
+    while (is_transmit_empty() == 0);
+    port_outb(COM1, c);
+}
 
 #ifdef __cplusplus
 }

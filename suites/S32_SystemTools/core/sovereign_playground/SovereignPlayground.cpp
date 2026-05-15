@@ -1,6 +1,6 @@
-#include "include/sigma_types.h"
+#include "../../../../include/core/sigma_types.h"
 #include "../../../../include/sigma_log.h"
-#include "include/SigmaOOP.hpp"
+#include "../../../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Userland {

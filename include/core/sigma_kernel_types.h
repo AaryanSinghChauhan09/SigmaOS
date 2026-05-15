@@ -60,7 +60,6 @@ typedef int bool_t;
 #define SIGMA_NULL NULL
 #endif
 
-#define PAGE_SIZE    4096ULL
 #define PAGE_SHIFT   12u
 
 #define K_OK         0
@@ -85,8 +84,6 @@ typedef struct sigma_unit {
 extern "C" {
 #endif
 
-static inline void cpu_halt(void)  { __asm__ __volatile__("cli; hlt"); }
-static inline void cpu_pause(void) { __asm__ __volatile__("pause"); }
 void sigma_panic(const char* msg, u64 rip, u64 rsp);
 
 #ifdef __cplusplus

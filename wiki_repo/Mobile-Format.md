@@ -1,4 +1,5 @@
 # SigmaOS Format: Mobile & App Center
+
 ## Multimedia, Productivity, & End-User Sovereign Experience
 
 The **Mobile** format provides the user-facing app ecosystem. It bundles creative, document, and media tools for high-productivity workflows.
@@ -17,6 +18,7 @@ The **Mobile** format provides the user-facing app ecosystem. It bundles creativ
 ---
 
 ## ⚙️ Core Shards
+
 - `kernel/core/vis/SovereignVis.cpp`
 - `userland/ZenithDesktop.cpp`
 - `kernel/core/ui/SovereignWM.cpp`
@@ -24,6 +26,7 @@ The **Mobile** format provides the user-facing app ecosystem. It bundles creativ
 ---
 
 ## 🚀 Optimization Checklist
+
 - [ ] Calibrate **ZenithCapture** for 60FPS recording.
 - [ ] Enforce **SovereignVault** rules for the browser sandbox.
 - [ ] Run **SovereignPDF** attestation on all financial shards.

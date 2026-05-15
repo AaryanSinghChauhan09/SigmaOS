@@ -1,8 +1,11 @@
 # SigmaOS Sovereign Wiki
 
+* [Home (Hub)](Home)
+* [Standalone](Home-Zenith-Standalone) | [Dual-boot](Home-Zenith-Dualboot) | [Core](Home-Zenith-Core)
+* [Browser](Home-Zenith-Browser) | [App](Home-Zenith-App) | [Stable](Home-Stable) | [Horizon](Home-Horizon)
+
 ## 🏛️ Core Concepts
 
-* [Home](Home)
 * [Industrial Roadmap](ROADMAP.md)
 * [Architecture](Architecture)
 * [Lattice Subsystems](Subsystems)
@@ -34,11 +37,13 @@
 * [Code of Conduct](CODE_OF_CONDUCT)
 
 ## 🏛️ Industrial Maintenance
+
 * [Lattice Cleanup & Maintenance](Microkernel-Format)
 * [Incremental Shard Backup](Microkernel-Format)
 * [OS Problems & Solutions](Common-OS-Problems-Solutions)
 
 ## 🏁 OS Format Guides & Toolsets
+
 * [Format: Microkernel (Industrial baseline)](Microkernel-Format)
 * [Format: Distributed (Consensus & Network)](Distributed-Format)
 * [Format: RTOS (Safety-Critical & Creative)](RTOS-Format)
@@ -46,6 +51,7 @@
 * [Format: Mobile (Multimedia & Productivity)](Mobile-Format)
 
 ## 🛠️ Industrial Readiness
+
 * [Kernel Developer Handbook](Kernel-Developer-Handbook)
 * [Dual-Boot Compatibility Matrix](Dual-Boot-Compatibility-Matrix)
 * [Embedded Hardware Compatibility](Embedded-Hardware-Compatibility)

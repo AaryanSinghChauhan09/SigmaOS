@@ -15,6 +15,14 @@ This roadmap outlines the evolution of SigmaOS from its microkernel roots into a
 - **Userland Parity**: Full CoreUtils, scripting, and industrial GUI toolkit (S-GUI).
 - **Virtualization**: Type-1 Hypervisor (S-HYP) and Industrial Containers (S-CONT).
 
+### 🛤️ Unified Development Roadmap (v15.0.0+)
+- **Baseline Toolset Manifest**: Automate bundling of `sigma-bleach`, `sigma-timeshift`, and creative suites into every branch.
+- **Unified Package Management**: Implement dependency resolution and version pinning in `sigma-pkg`.
+- **Design & UI**: Adopt **Qt Sovereign** and a unified design language across App and Browser formats.
+- **Cross-Branch Testing**: Build CI/CD pipelines for automated stress tests and real-time benchmark publishing.
+- **Documentation**: Complete the Kernel Handbook and edition-specific troubleshooting guides.
+- **Release Discipline**: Transition to Semantic Versioning (v1.x.y) and PQC-signed ISO distribution.
+
 ## Phase 3: Omniscience (v16.0 - v20.0) [FUTURE]
 
 - **Neural Lattice**: AI-orchestrated shard hot-swapping and self-healing.
