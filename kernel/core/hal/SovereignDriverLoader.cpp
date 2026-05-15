@@ -1,10 +1,10 @@
-﻿/*
+/*
  * SigmaOS: Sovereign Driver Loader (HAL Shard)
  * Layer: L1 - Kernel Primitives / HAL
  */
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "../../../include/sigma_types.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/SigmaOOP.hpp"
 
 /* Forward-declare all driver entry points at file scope */
 extern "C" void gpu_init();

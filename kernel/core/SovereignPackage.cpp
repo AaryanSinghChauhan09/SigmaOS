@@ -1,9 +1,9 @@
 #include "SovereignPackage.hpp"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 
 SovereignPackageEngine& SovereignPackageEngine::getInstance() {
     static SovereignPackageEngine instance;

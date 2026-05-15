@@ -1,11 +1,11 @@
-#include "core/sigma_types.h"
+#include "../../../include/sigma_types.h"
 #include "hal/sigma_hal.h"
 #ifndef PERSONA_MANAGER_HPP
 #define PERSONA_MANAGER_HPP
 
 #include "libc/SovereignLibC.h"
 
-#include "core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

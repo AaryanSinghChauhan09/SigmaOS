@@ -1,13 +1,13 @@
 #include "sigma_hal.h"
-#include "sigma_log.h"
-#include "sigma_types.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_auto.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_telemetry.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Auto Implementation

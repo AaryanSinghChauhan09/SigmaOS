@@ -1,6 +1,6 @@
-#include "core/SigmaOOP.hpp"
-#include "core/sigma_types.h"
-#include "sigma_log.h"
+#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Containers (S-CONT)
@@ -26,10 +26,24 @@ public:
 
     void spawnContainer(const char* image_id) {
         sigma_log_info("[S-CONT] Spawning Sovereign Container from Shard Image '%s'...", image_id);
+        m_active_containers++;
+    }
+
+    void autoscale(sigma_u32 target_cpu_load) {
+        sigma_log_info("[S-CONT] Auto-scaling enabled. Target load: %u%%", target_cpu_load);
+        if (target_cpu_load > 85) {
+            spawnContainer("auto_scaled_replica");
+            sigma_log_info("[S-CONT] Instantiated replica to handle load spike. Active: %u", m_active_containers);
+        }
+    }
+
+    void monitor_metrics() {
+        sigma_log_info("[S-CONT] Telemetry: %u containers active. Analyzing IO/Memory usage...", m_active_containers);
     }
 
 private:
-    SovereignContainerEngine() = default;
+    SovereignContainerEngine() : m_active_containers(0) {}
+    sigma_u32 m_active_containers;
 };
 
 } // namespace Containers

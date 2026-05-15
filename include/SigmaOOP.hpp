@@ -109,6 +109,21 @@ extern "C" {
     int sigma_snprintf(char* str, sigma_size_t size, const char* format, ...);
 }
 
+// --- Sovereign Singleton Shard ---
+template<typename T>
+class SigmaSingleton {
+protected:
+    SigmaSingleton() = default;
+    ~SigmaSingleton() = default;
+public:
+    SigmaSingleton(const SigmaSingleton&) = delete;
+    SigmaSingleton& operator=(const SigmaSingleton&) = delete;
+    static T& getInstance() {
+        static T instance;
+        return instance;
+    }
+};
+
 } // namespace SigmaOS
 
 /* Global overrides for zero-dependency C++ support are handled in SigmaOOP.cpp */

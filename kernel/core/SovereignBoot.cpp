@@ -1,9 +1,9 @@
-#include "sigma_types.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_boot.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Boot Implementation

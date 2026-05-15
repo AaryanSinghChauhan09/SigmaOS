@@ -1,6 +1,6 @@
 #pragma once
-#include "core/sigma_types.h"
-#include "core/SigmaOOP.hpp"
+#include "../../../include/sigma_types.h"
+#include "../../../include/SigmaOOP.hpp"
 
 typedef struct {
     sigma_u32 memory_limit_mb;

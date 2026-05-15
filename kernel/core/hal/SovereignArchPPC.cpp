@@ -1,6 +1,6 @@
-#include "core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 #include "core/SovereignArch.hpp"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign PowerPC Architecture Shard (S-PPC)

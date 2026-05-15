@@ -1,15 +1,15 @@
 #include "sigma_hal.h"
-#include "sigma_log.h"
-#include "sigma_types.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_unidrop.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_ipc.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_continuity.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Universal Drag & Drop

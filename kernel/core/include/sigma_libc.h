@@ -1,7 +1,7 @@
 #ifndef SIGMA_LIBC_H
 #define SIGMA_LIBC_H
 
-#include "core/sigma_types.h"
+#include "../../../include/sigma_types.h"
 
 extern "C" {
     void* sigma_mmap(void* addr, sigma_u64 length, int prot, int flags, int fd, sigma_u64 offset);

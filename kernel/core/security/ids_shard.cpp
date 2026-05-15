@@ -1,9 +1,9 @@
 #include "Lattice.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "ids_shard.hpp"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Security {

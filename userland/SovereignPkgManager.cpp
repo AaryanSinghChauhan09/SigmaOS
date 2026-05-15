@@ -60,7 +60,7 @@ public:
 
 private:
     SovereignPackageManager() : installed_packages(0) {}
-    uint32_t installed_packages;
+    sigma_u32 installed_packages;
 };
 
 /* --- C Wrappers for Userland --- */

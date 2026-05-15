@@ -1,6 +1,6 @@
-#include "core/SigmaOOP.hpp"
-#include "core/sigma_types.h"
-#include "sigma_log.h"
+#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -10,14 +10,14 @@ class SovereignDesktop : public SigmaObject, public SigmaSingleton<SovereignDesk
     friend class SigmaSingleton<SovereignDesktop>;
 private:
     SovereignDesktop() {
-        sigma_syslog("[SOVEREIGN] Zenith Desktop Compositor initialized.");
+        sigma_log_info("[SOVEREIGN] Zenith Desktop Compositor initialized.");
     }
 
 public:
     void LaunchToolkit() {
-        sigma_syslog("[SOVEREIGN] S-UI Toolkit v1.0 active.");
-        sigma_syslog("[SOVEREIGN] Dynamic Glassmorphism Engine: [READY]");
-        sigma_syslog("[SOVEREIGN] Drawing root workspace...");
+        sigma_log_info("[SOVEREIGN] S-UI Toolkit v1.0 active.");
+        sigma_log_info("[SOVEREIGN] Dynamic Glassmorphism Engine: [READY]");
+        sigma_log_info("[SOVEREIGN] Drawing root workspace...");
     }
 };
 

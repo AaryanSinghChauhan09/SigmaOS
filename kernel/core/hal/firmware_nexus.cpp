@@ -1,6 +1,6 @@
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "hal/sigma_hal.h"
-#include "core/sigma_types.h"
+#include "../../../include/sigma_types.h"
 #include "firmware_nexus.hpp"
 #include "libc/SovereignLibC.h"
 

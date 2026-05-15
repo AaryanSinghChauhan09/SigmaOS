@@ -1,4 +1,4 @@
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "libc/SovereignLibC.h"
 
 extern "C" double sovereign_math_eval(const char* expr) {

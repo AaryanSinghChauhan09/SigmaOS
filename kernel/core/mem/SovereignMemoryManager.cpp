@@ -1,5 +1,5 @@
 #include "core/SovereignMemoryManager.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "libc/SovereignLibC.h"
 
 namespace SigmaOS {

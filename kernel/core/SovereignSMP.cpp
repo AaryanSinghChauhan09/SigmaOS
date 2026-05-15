@@ -1,9 +1,9 @@
-#include "sigma_types.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Symmetric Multi-Processing (SMP) Orchestrator (v28.0 Zenith)

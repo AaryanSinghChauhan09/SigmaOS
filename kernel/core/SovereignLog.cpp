@@ -1,6 +1,6 @@
-﻿#include "sigma_types.h"
+#include "../../../include/sigma_types.h"
 #include "SovereignLibC.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
 
 
@@ -9,7 +9,7 @@
  * Implements a Wait-Free Circular Shard Logging (WFCSL) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal machine-state tracing.
  *
- * Design: OOP-isolated singleton â€” SovereignLogEngine.
+ * Design: OOP-isolated singleton — SovereignLogEngine.
  */
 
 #define LOG_BUFFER_SIZE 256u

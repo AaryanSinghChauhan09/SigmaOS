@@ -4,10 +4,10 @@
  * for high-assurance real-time shards (e.g., HAL, PQC).
  */
 
-#include "core/sigma_types.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sched/SovereignScheduler.h"
-#include "core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

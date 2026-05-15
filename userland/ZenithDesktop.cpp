@@ -1,5 +1,5 @@
-#include "core/SigmaOOP.hpp"
-#include "core/sigma_types.h"
+#include "SigmaOOP.hpp"
+#include "sigma_types.h"
 #include "sigma_log.h"
 #include "ui/SovereignGUI.cpp"
 

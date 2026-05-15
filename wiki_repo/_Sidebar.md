@@ -33,6 +33,20 @@
 * [Contributing](CONTRIBUTING)
 * [Code of Conduct](CODE_OF_CONDUCT)
 
+## 🏁 Industrial Releases
+
+* [Release Notes v15.0](Release-Notes-v15.0)
+* [Edition: Browser](Browser-Integration)
+* [Edition: App](Application-Layer)
+* [Edition: Dual-Boot](Dual-Boot-Coexistence)
+* [Edition: Standalone](Independent-Deployment)
+* [Format: Microkernel](Microkernel-Format)
+* [Format: Distributed](Distributed-Format)
+* [Format: RTOS](RTOS-Format)
+* [Format: Cloud](Cloud-Format)
+* [Format: Mobile](Mobile-Format)
+* [OS Problems & Solutions](Common-OS-Problems-Solutions)
+
 ---
 
-### v14.0 [NEXUS-SUPREME]
+### v15.0 [ZENITH-SINGULARITY]

@@ -1,6 +1,6 @@
 #include "libc/SovereignLibC.h"
 #include "hal/sigma_hal.h"
-#include "core/sigma_types.h"
+#include "../../../include/sigma_types.h"
 #include "process_manager.hpp"
 
 namespace SigmaOS {

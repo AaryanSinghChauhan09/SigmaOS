@@ -1,15 +1,15 @@
 #include "sigma_hal.h"
-#include "sigma_log.h"
-#include "sigma_types.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_focus.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_hal.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_zeronet.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "sigma_ipc.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Focus Mode

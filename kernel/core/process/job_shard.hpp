@@ -1,11 +1,11 @@
-#include "core/sigma_types.h"
+#include "../../../include/sigma_types.h"
 #include "hal/sigma_hal.h"
 #ifndef JOB_SHARD_HPP
 #define JOB_SHARD_HPP
 
 #include "libc/SovereignLibC.h"
 
-#include "core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

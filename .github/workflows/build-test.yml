@@ -1,0 +1,50 @@
+name: "SigmaOS CI/CD Pipeline"
+
+on:
+  push:
+    branches: [ "main", "release/*" ]
+  pull_request:
+    branches: [ "main", "release/*" ]
+
+jobs:
+  build_and_test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        arch: [x86_64, aarch64]
+        mode: [release, debug]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential gcc-aarch64-linux-gnu make
+
+    - name: Build Core Microkernel
+      run: |
+        make ARCH=${{ matrix.arch }} MODE=${{ matrix.mode }}
+
+    - name: Run Unit Tests
+      run: |
+        make test ARCH=${{ matrix.arch }}
+
+    - name: Run Memory and I/O Regression Tests
+      run: |
+        bash ./scripts/regression_check.sh
+
+    - name: Run Format-Specific Stress Tests
+      run: |
+        bash ./scripts/format_stress_test.sh
+
+    - name: Run App Layer Regression Tests
+      run: |
+        bash ./scripts/app_regression_test.sh
+
+    - name: Block merge on failure
+      if: failure()
+      run: exit 1

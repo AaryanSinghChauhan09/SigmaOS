@@ -1,5 +1,5 @@
 #include "core/SovereignArch.hpp"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign ARM64 Architecture Implementation

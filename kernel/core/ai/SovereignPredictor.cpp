@@ -1,7 +1,7 @@
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "hal/sigma_hal.h"
 #include "libc/SovereignLibC.h"
-#include "core/sigma_types.h"
+#include "../../../include/sigma_types.h"
 
 /**
  * SigmaOS Sovereign Predictive Resource Engine

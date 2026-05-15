@@ -1,9 +1,9 @@
 #include "sigma_hal.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignNeuralNexus.hpp"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignLibC.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Neural Nexus (S-NPU)

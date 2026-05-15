@@ -1,6 +1,6 @@
-#include "core/sigma_types.h"
+#include "../../../include/sigma_types.h"
 #include "runtime/sigma_wasm.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "libc/SovereignLibC.h"
 
 namespace SigmaOS {

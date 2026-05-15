@@ -1,8 +1,8 @@
-#include "core/sigma_types.h"
+#include "../../../include/sigma_types.h"
 #include "hal/sigma_hal.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "observability/sigma_monitor.h"
-#include "core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 
 extern "C" void telemetry_execute_ebpf(const void* bytecode, sigma_usize size);
 

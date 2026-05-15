@@ -1,6 +1,6 @@
 #include "sigma_fs.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
+#include "../../../include/SigmaOOP.hpp"
 #include "sigma_allocator.h"
 
 /**

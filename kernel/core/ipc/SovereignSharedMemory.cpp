@@ -1,4 +1,4 @@
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "hal/sigma_hal.h"
 #include "system/sigma_ipc.h"
 #include "libc/SovereignLibC.h"

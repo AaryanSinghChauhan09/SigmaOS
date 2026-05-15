@@ -1,8 +1,8 @@
-#include "sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "hal/sigma_hal.h"
 #include "core/sigma_kernel_types.h"
 #include "libc/SovereignLibC.h"
-#include "core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Consensus Engine Shard

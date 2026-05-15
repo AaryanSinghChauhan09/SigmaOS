@@ -1,6 +1,7 @@
-#include "libc/SovereignLibC.h"
-#include "sigma_log.h"
-#include "core/sigma_types.h"
+#include "../../../../include/libc/SovereignLibC.h"
+#include "../../../../include/sigma_log.h"
+#include "../../../../include/sigma_types.h"
+#include "../../../../include/SigmaOOP.hpp"
 
 // ---- VT100 control codes ----
 #define VT_RESET    "\033[0m"

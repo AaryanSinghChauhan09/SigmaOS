@@ -1,6 +1,6 @@
-#include "core/SigmaOOP.hpp"
-#include "core/sigma_types.h"
-#include "sigma_log.h"
+#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/sigma_types.h"
+#include "../../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Quantum Persistence (S-QUANT-DISK)

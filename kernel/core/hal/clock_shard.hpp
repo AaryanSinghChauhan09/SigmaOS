@@ -1,11 +1,11 @@
-#include "core/sigma_types.h"
+#include "../../../include/sigma_types.h"
 #include "hal/sigma_hal.h"
 #ifndef CLOCK_SHARD_HPP
 #define CLOCK_SHARD_HPP
 
 #include "libc/SovereignLibC.h"
 
-#include "core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 #include "port_shard.hpp"
 
 namespace SigmaOS {

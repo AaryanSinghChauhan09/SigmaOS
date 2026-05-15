@@ -1,5 +1,5 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/sigma_types.h"
 #include "hal/sigma_hal.h"
 #include "fs/sigma_dna.h"
 #include "core/sigma_kernel_types.h"

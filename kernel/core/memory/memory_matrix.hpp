@@ -1,11 +1,11 @@
-#include "core/sigma_types.h"
+#include "../../../include/sigma_types.h"
 #include "hal/sigma_hal.h"
 #ifndef MEMORY_MATRIX_HPP
 #define MEMORY_MATRIX_HPP
 
 #include "libc/SovereignLibC.h"
 
-#include "core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

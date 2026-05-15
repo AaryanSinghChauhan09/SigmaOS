@@ -1,5 +1,5 @@
-#include "core/sigma_types.h"
-#include "sigma_log.h"
+#include "../../../include/sigma_types.h"
+#include "../../../include/sigma_log.h"
 #include "libc/SovereignLibC.h"
 #include "security/sigma_pqc.h"
 
