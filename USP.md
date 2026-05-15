@@ -18,11 +18,16 @@ Every data silo in SigmaOS is protected by lattice-based cryptographic primitive
 
 SigmaOS provides a bare-metal SDK (`SovereignLibC`) that allows professionals to build high-performance tools without the overhead or security risks of legacy POSIX layers.
 
-### 4. Self-Healing Resilience
+### 4. Sovereign Rollback Nexus (S-ROLLBACK)
+Zero-overhead kernel-level state snapshotting. Unlike filesystem snapshots (ZFS/Btrfs), S-ROLLBACK restores the entire kernel-shard lattice to a bit-perfect state in under 2ms.
 
-SigmaOS implements continuous health-checks for every professional tool. If a tool crashes, the OS performs an atomic rollback to the last known good state in milliseconds.
+### 5. Neural Self-Healing (S-NEURAL)
+AI-driven autonomous stabilization. Anomaly detection heuristics monitor shard signatures and heartbeats, orchestrating automated healing and rollback without human intervention.
 
-### 5. Sovereign Life-OS (PAI Infrastructure)
+### 6. Lattice Mesh Networking
+Decentralized, PQC-encrypted communication fabric. Shards can form an autonomous, peer-to-peer lattice mesh that is mathematically secure against quantum adversaries and immune to centralized gateway failures.
+
+### 7. Sovereign Life-OS (PAI Infrastructure)
 
 Inspired by modern personal AI frameworks, SigmaOS transcends traditional computing by acting as a **Life Operating System**.
 
