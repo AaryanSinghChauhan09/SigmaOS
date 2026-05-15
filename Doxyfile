@@ -1,13 +1,21 @@
-PROJECT_NAME           = "SigmaOS Sovereign Lattice"
-PROJECT_NUMBER         = "v100.2"
+# Doxyfile for SigmaOS Zenith v15.0
+PROJECT_NAME           = "SigmaOS Zenith"
+PROJECT_NUMBER         = "v15.0.0"
 OUTPUT_DIRECTORY       = docs/api
-INPUT                  = kernel/ include/ userland/
-RECURSIVE              = YES
 GENERATE_LATEX         = NO
 GENERATE_HTML          = YES
+INPUT                  = kernel/core include suites
+FILE_PATTERNS          = *.cpp *.h *.hpp *.c
+RECURSIVE              = YES
 EXTRACT_ALL            = YES
-CLASS_DIAGRAMS         = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = YES
 HAVE_DOT               = YES
 CALL_GRAPH             = YES
 CALLER_GRAPH           = YES
-OPTIMIZE_OUTPUT_FOR_C  = YES
+GRAPHICAL_HIERARCHY    = YES
+DIRECTORY_GRAPH        = YES
+DOT_IMAGE_FORMAT       = svg
+INTERACTIVE_SVG        = YES
