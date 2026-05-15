@@ -45,7 +45,10 @@
 * [Format: RTOS](RTOS-Format)
 * [Format: Cloud](Cloud-Format)
 * [Format: Mobile](Mobile-Format)
+* [Kernel Developer Handbook](Kernel-Developer-Handbook)
 * [OS Problems & Solutions](Common-OS-Problems-Solutions)
+* [Dual-Boot Compatibility Matrix](Dual-Boot-Compatibility-Matrix)
+* [Embedded Hardware Compatibility](Embedded-Hardware-Compatibility)
 
 ---
 

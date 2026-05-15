@@ -1,67 +1,38 @@
-# CHANGELOG
+# 📜 SigmaOS Change Log
 
-1
+All notable changes to the SigmaOS Sovereign Lattice will be documented in this file.
 
-All notable changes to the SigmaOS project will be documented in this file.
+## [v28.0 Zenith] - 2026-04-30
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+### Added
 
-1
+* **QEMU Emulation Support**: Added `make qemu` target for kernel verification.
+* **Serial Boot Tracing**: Direct silicon logging to COM1 for kernel-level debugging.
 
-1
+* **QBMP Allocator**: Functional bump allocator with 8-byte alignment and assertions.
+* **CI/CD Pipeline**: GitHub Actions workflow for automated build and security auditing.
 
-1
+* **Architecture Documentation**: New `docs/architecture.md` explaining the lattice sharding model.
+* **Verification Assertions**: Added `sigma_assert` for kernel-level sanity checks.
 
-1
+### Changed
 
-1
+* **Build System**: Standardized on `kernel/sigma.ld` and enabled `-Werror` for strict compilation.
+* **Documentation**: Updated README with boot instructions and architecture diagrams.
 
-1
+* **Include Strategy**: Consolidated include paths to use flat `include/` directory.
+* **Modularization**: Refactored core subsystems to the `SovereignEngine` singleton pattern for enhanced state isolation and ABI stability. Newly hardened engines: `SovereignSyscallEngine`, `SovereignEntropyEngine`, `SovereignAuditEngine`, `SovereignCryptoEngine`, `SovereignGUIEngine`, `SovereignEditEngine`, `SovereignDashEngine`, `SovereignTunerEngine`, `SovereignAllocatorEngine` — eliminating all static global state from these critical shards.
 
-1
+* **CI/CD Hardening**: Corrected GitHub Actions audit paths and synchronized the Makefile with the expanded 600-shard modular lattice to ensure production-grade build stability.
 
-1
+### Fixed
 
-1
+* Resolved `sigma_hardened_strcpy` undeclared error in `SovereignTuner.cpp`.
+* Fixed various markdown linting violations (MD012, MD022, MD058) in developer guides.
 
-1
+* Removed stale/unused header includes across 15+ kernel files.
 
-1
+---
 
-1
-
-1
-
-1
-
-1
-
-1
-
-1
-
-1
-
-1
-
-1
-
-1
-
-1
-
-1
-
-1
-
-1
-
-1
-
-1
-
-1
-
-1
+### Σ SIGMAOS: Sovereign Versioning. Absolute Continuity.
 
