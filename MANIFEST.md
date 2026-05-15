@@ -1,29 +1,67 @@
-# SigmaOS Zenith v15.0 Release Manifest
+# 📋 SigmaOS: Zenith Shard Manifest (v15.0.0)
 
-This manifest documents the production-ready status of the SigmaOS Zenith Singularity across all industrial release branches.
+> **The complete registry of all 600+ independent professional shards.**
 
-## 🏁 Release Status: FINAL (Zenith)
+SigmaOS is an industrial-grade microkernel composed of independent, PQC-attested shards. This manifest lists the core shards required for a stable Zenith Singularity deployment.
 
-| Edition | Branch | Readiness | Primary Interface | Target Environment |
-| :--- | :--- | :--- | :--- | :--- |
-| **Browser (S-WEB)** | `release/browser` | ✅ Ready | `index.html` | Any Modern Web Browser |
-| **Application (S-APP)** | `release/app` | ✅ Ready | `main.js` (Electron) | Windows / Linux / macOS |
-| **Dual-Boot (S-DUAL)** | `release/dual-boot` | ✅ Ready | `installer.html` | Hardware (Co-existence) |
-| **Standalone (S-STANDALONE)** | `release/standalone` | ✅ Ready | `sigmaos.bin` (ISO) | Bare Metal / QEMU |
+---
 
-## 🛠 Core Improvements Implemented
+## 🏛️ 1. Kernel Core Shards (Mandatory)
 
-- **Premium Design System**: Re-engineered `site.css` with HSL-based glassmorphism and smooth transitions.
-- **ASI Boot Sequence**: Implemented a high-fidelity Asynchronous Shard Ignition simulation in `index.html`.
-- **Zenith Desktop**: Enhanced the `sigma_sh` terminal with colored output, command history, and industrial neofetch.
-- **Industrial Core**: Integrated `industrial_core.js` for advanced toast notifications and animated lattice mesh visualization.
-- **Universal Documentation**: Synchronized and professionalized all READMEs for industrial clarity.
+| Shard ID | Namespace | Purpose |
+| :--- | :--- | :--- |
+| `S-BOOT` | `Kernel::System` | Secure Shard Bootstrapping (SSB) engine. |
+| `S-SCHED` | `Kernel::Orchestration` | S-CFS Deterministic scheduler. |
+| `S-MM` | `Kernel::Memory` | PQC-hardened demand paging and slab allocation. |
+| `S-VFS` | `Kernel::FS` | Distributed, amnesic virtual filesystem. |
+| `S-HAL` | `Kernel::HAL` | Universal hardware abstraction layer. |
+| `S-IPC` | `Kernel::IPC` | PQC-sealed inter-shard communication. |
 
-## 🔑 Accessing the Singularity
+---
 
-To deploy a specific edition:
-```bash
-git checkout release/<edition-name>
-```
+## 🛡️ 2. Security & Integrity Shards
 
-*"The Zenith is the final industrial fact."*
+| Shard ID | Purpose |
+| :--- | :--- |
+| `S-PQC` | Crystals-Kyber & Dilithium-5 cryptographic primitives. |
+| `S-AUDIT` | Real-time silicon-level behavioral auditing. |
+| `S-Pledge` | Shard-level permission and resource constraint engine. |
+| `S-IMA` | Integrity Measurement Architecture for shard verification. |
+| `S-SelfHeal` | Autonomous rollback and error correction daemon. |
+
+---
+
+## 🏗️ 3. Industrial Infrastructure Shards
+
+| Shard ID | Function |
+| :--- | :--- |
+| `S-PKG` | Unified package manager and repository sync. |
+| `S-SHELL` | Sovereign terminal and command orchestrator. |
+| `S-GUI` | GPU-accelerated Zenith industrial window manager. |
+| `S-SDK` | Native C++20/Rust compilation and debugging tools. |
+| `S-NET` | PQC-hardened TCP/IP stack and mesh networking. |
+
+---
+
+## 🏭 4. Professional Vertical Shards
+
+| Category | Shards |
+| :--- | :--- |
+| **Finance** | `S-Accountant`, `S-Ledger`, `S-TaxAudit` |
+| **Medical** | `S-PatientData`, `S-HIPAA`, `S-ClinicalUI` |
+| **Cyber** | `S-MAP`, `S-PLOIT`, `S-Forensic` |
+| **Creative** | `S-REC`, `GIMP-S`, `Ardour-S` |
+| **AI/ML** | `S-Nexus`, `S-Tensor`, `S-Predict` |
+
+---
+
+## 🔄 Shard Lifecycle
+All shards follow the **Dilithium-5** attestation protocol:
+1. **Creation**: Shard source is compiled and signed by a Sovereign Architect.
+2. **Distribution**: Shard is distributed via `sigma-pkg` over an encrypted lattice mesh.
+3. **Ignition**: The kernel verifies the signature before igniting the shard into memory.
+4. **Decommission**: Shards can be safely evacuated or rolled back at any time.
+
+---
+
+*SigmaOS — 600 Shards. One Vision. Absolute Parity.*
