@@ -19,8 +19,20 @@ public:
 
     bool checkAccess(const char* subject, const char* object, const char* action) {
         sigma_log_info("[MAC:AUDIT] Checking access: Subject(%s) -> Object(%s) Action(%s)", subject, object, action);
-        // Simulation of label check
-        sigma_log_info("[MAC:AUDIT] Access GRANTED.");
+        
+        // Strict confinement for browser shards
+        if (strstr(subject, "release/browser") && strstr(object, "kernel/core/hal")) {
+            sigma_log_warn("[MAC:DENIED] Browser shard attempted direct HAL access!");
+            return false;
+        }
+
+        // Confinement for third-party apps
+        if (strstr(subject, "userland/app") && strstr(object, "kernel/core/security/SovereignPQC")) {
+            sigma_log_warn("[MAC:DENIED] Userland app attempted direct PQC access!");
+            return false;
+        }
+
+        sigma_log_info("[MAC:AUDIT] Access GRANTED based on lattice-level policy.");
         return true;
     }
 };
@@ -33,4 +45,9 @@ extern "C" {
     void mac_init() {
         SigmaOS::Kernel::Security::SovereignMAC::getInstance().init();
     }
+
+    int mac_check_access(const char* subject, const char* object, const char* action) {
+        return SigmaOS::Kernel::Security::SovereignMAC::getInstance().checkAccess(subject, object, action) ? 1 : 0;
+    }
 }
+

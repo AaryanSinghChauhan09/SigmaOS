@@ -74,6 +74,7 @@ kernel/core/security/SovereignPQC.cpp
 kernel/core/security/SovereignLUKS.cpp
 kernel/core/security/SovereignAppArmor.cpp
 kernel/core/security/SovereignSELinux.cpp
+kernel/core/security/SovereignMAC.cpp
 kernel/core/security/SovereignNX.cpp
 kernel/core/security/SovereignASLR.cpp
 kernel/core/security/SovereignSeccomp.cpp

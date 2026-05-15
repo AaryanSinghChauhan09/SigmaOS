@@ -1,0 +1,8 @@
+{
+  "SIGMA_OS_TITLE": "SigmaOS Zenith v15.0",
+  "BOOT_STARTING": "Lattice Ignition in progress...",
+  "SHARD_LOADING": "Shard [%s] loading...",
+  "ACCESS_DENIED": "S-MAC Violation: Access Denied.",
+  "SYSTEM_STABLE": "Sovereign Lattice is stable.",
+  "RECOVERY_MODE": "SigmaOS Recovery Environment"
+}
