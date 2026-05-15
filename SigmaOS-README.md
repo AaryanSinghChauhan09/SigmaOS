@@ -25,11 +25,17 @@ SigmaOS provides a unified, zero-dependency shell for high-performance orchestra
 
 ```bash
 sigma> help                 # List industrial commands
+
 sigma> ps                   # List running shards & PIDs
+
 sigma> top                  # Real-time lattice telemetry
+
 sigma> gst 50000 18         # Calculate GST (Intra/Inter state)
+
 sigma> tax 1500000          # Income Tax Engine (FY 24-25 New Regime)
+
 sigma> pqc status           # Audit Post-Quantum Crypto health
+
 ```
 
 ---
@@ -51,8 +57,11 @@ SigmaOS is distributed as a PQC-signed Zenith ISO.
 
 ```powershell
 make singularity     # Compile the 600-shard kernel
+
 make zenith-iso      # Generate deployment image
+
 make test            # Run industrial CI/CD battery
+
 ```
 
 ---

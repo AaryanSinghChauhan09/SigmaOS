@@ -21,6 +21,7 @@ S-MM operates on a dual-tier allocation strategy:
 The engine is encapsulated in the `SigmaOS::Kernel::Memory::SovereignMemoryManager` class, utilizing a singleton pattern for global silicon access.
 
 ### Core Primitives
+
 - `mm_init()`: Initializes page tables and slab caches.
 - `mm_malloc(size)`: Performs high-speed slab allocation or falls back to page allocation for large shards.
 - `mm_free(ptr)`: Returns memory to the appropriate industrial cache.

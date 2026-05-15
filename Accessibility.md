@@ -1,4 +1,5 @@
 # Accessibility
+
 1 SigmaOS is dedicated to providing a **Sovereign Experience for All**. We prioritize inclusive design and low-latency assistive technologies.
 1 1
 1 1

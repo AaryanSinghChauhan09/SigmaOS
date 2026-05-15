@@ -1,4 +1,5 @@
 # Architecture Overview
+
 1 1
 1 graph TD
     L1[Layer 1: Bare-Metal Silicon & TPM]

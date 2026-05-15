@@ -24,6 +24,7 @@ All models loaded into the AI Nexus must be **PQC-Attested**.
 3. **Audit**: Continuous telemetry via S-LOG and TensorBoard parity.
 
 ## 🚀 Professional Workflow
+
 1. `sigma-pkg install s-ai-pytorch`
 2. `s-ai-nexus load model.onnx`
 3. `s-ai-nexus benchmark --target gpu`

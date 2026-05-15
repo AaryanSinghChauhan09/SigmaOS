@@ -1,4 +1,5 @@
 # Architecture Update
+
 1 1
 
 The Universal Namespace now features a natively accelerated array lookup for instantaneous virtual node traversal.

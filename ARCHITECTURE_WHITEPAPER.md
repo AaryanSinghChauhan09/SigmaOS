@@ -1,4 +1,5 @@
 # ARCHITECTURE WHITEPAPER
+
 1 1
 
 SigmaOS is built upon the "Sovereign Lattice" architecture, a highly modular, shard-based system designed to replace monolithic kernels with a decentralized web of discrete intelligence units.

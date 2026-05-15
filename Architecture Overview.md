@@ -1,4 +1,5 @@
 # Architecture Overview
+
 1 > A ground-truth description of the sovereign 7-layer lattice architecture.
 
 ---
