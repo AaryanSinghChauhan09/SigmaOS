@@ -1,26 +1,19 @@
-# Σ SIGMAOS: Zenith Singularity v15.0 Release Notes
+# SigmaOS Zenith v15.0 Release Notes
 
-The Zenith Singularity v15.0 is the definitive industrial release of SigmaOS, featuring total architectural parity, post-quantum security, and O(1) performance optimizations.
+## Overview
+SigmaOS Zenith v15.0 represents a major milestone in stabilizing the microkernel infrastructure, enhancing security, and resolving systemic compilation and dependency vulnerabilities.
 
-## 🏁 Edition Summary
+## Security Fixes & Vulnerability Remediation
+- **Code Scanning Resolution**: Addressed potential unsafe memory handling, unchecked input validation, and race conditions in kernel/shard orchestration by enforcing CodeQL scanning across all branches (`main`, `release/app`, `release/browser`, `release/dual-boot`, `release/standalone`).
+- **Dependency Updates (Dependabot)**: Fixed dependency CVEs including prototype pollution, SSRF, command injection, and weak cryptographic defaults.
+- **Bootloader Isolation**: Audited the bootloader code in the `release/dual-boot` branch to ensure strict partition isolation and validate persistence policies.
+- **Workflow Enhancements**: Configured automated GitHub Actions workflows for CodeQL and dependabot to maintain continuous security auditing.
 
-| Edition | Tag | Focus Area | Key Features |
-| :--- | :--- | :--- | :--- |
-| **Core** | `v15.0-zenith-core` | Kernel Foundation | O(1) S-MM, PQC-Sealed Shards, ASI Ignition. |
-| **App** | `v15.0-zenith-app` | User-Space | POSIX Compliance, Zenith Desktop UI, S-PKG. |
-| **Browser** | `v15.0-zenith-browser` | Web-Native | WASM Optimization, Predictive Caching, P2P Mesh. |
-| **Dual-Boot** | `v15.0-zenith-dualboot` | Coexistence | Sovereign Bootloader, SMAP/SMEP isolation. |
-| **Standalone** | `v15.0-zenith-standalone` | Bare-Metal | Fast Boot, Hard-RT Scheduling, Embedded HAL. |
+## Architecture & Performance Improvements
+- **Microkernel Orchestration**: Modularized the kernel and optimized shard orchestration routines.
+- **Relative Path Refactoring**: Executed a systemic refactoring of include hierarchies to use depth-aware relative paths (`../../../include/SigmaOOP.hpp`), fully resolving compilation debt.
+- **SigmaSingleton Stabilization**: Resolved template specialization issues preventing `getInstance()` resolution across driver subsystems.
+- **App & Browser Optimization**: Patched SSL/TLS libraries, benchmarked rendering engines, and optimized API calls to enhance UI responsiveness and WASM runtime security.
 
-## 🚀 Key Improvements
-- **Industrial Performance**: Integrated slab-based memory pools and priority-sharded scheduling.
-- **Quantum Sovereignty**: Dilithium-5 and Kyber-1024 integrated across all industrial shards.
-- **Multi-Format Adaptation**: Universal HAL and profile-based builds (Embedded, RTOS, Cloud).
-
-## 🛠 Deployment Instructions
-To deploy a specific edition:
-1. `git checkout release/<edition>`
-2. `git pull origin release/<edition>`
-3. Follow the branch-specific [Getting Started](Home) guide.
-
-*"The Zenith is the final industrial fact."*
+## Summary
+These changes ensure SigmaOS adapts securely and efficiently across monolithic, microkernel, distributed, real-time, and cloud-virtualized deployments.

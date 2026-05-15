@@ -40,6 +40,12 @@
 * [Edition: App](Application-Layer)
 * [Edition: Dual-Boot](Dual-Boot-Coexistence)
 * [Edition: Standalone](Independent-Deployment)
+* [Format: Microkernel](Microkernel-Format)
+* [Format: Distributed](Distributed-Format)
+* [Format: RTOS](RTOS-Format)
+* [Format: Cloud](Cloud-Format)
+* [Format: Mobile](Mobile-Format)
+* [OS Problems & Solutions](Common-OS-Problems-Solutions)
 
 ---
 
