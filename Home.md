@@ -20,12 +20,17 @@ SigmaOS is architected for universal compatibility across diverse OS formats and
 - **[Security Hardening](Security_Hardening)**: Post-Quantum Cryptography (Dilithium-5, Kyber-1024) and S-ARMOR isolation.
 - **[Amnesic Persistence](Security)**: Zero-data remanence algorithms for industrial privacy.
 
-## 📦 Release Branches
-SigmaOS is deployed through four specialized industrial editions:
-1. **[release/app](Application-Layer)**: Optimized for user-space programs and POSIX compliance.
-2. **[release/browser](Browser-Integration)**: Optimized for WASM runtime and web-based rendering.
-3. **[release/dual-boot](Dual-Boot-Coexistence)**: Optimized for multi-OS coexistence and hardware direct access.
-4. **[release/standalone](Independent-Deployment)**: Optimized for fast boot and resource-constrained environments.
+## 📦 Release Editions
+SigmaOS is deployed through seven specialized industrial editions:
+
+1. **[Standalone Edition](Release-Zenith-Standalone)**: Optimized for fast boot and resource-constrained environments.
+2. **[Dual-Boot Edition](Release-Zenith-Dualboot)**: Optimized for multi-OS coexistence and hardware direct access.
+3. **[Core Edition](Release-Zenith-Core)**: Pure microkernel lattice foundation.
+4. **[Browser Edition](Release-Zenith-Browser)**: Optimized for WASM runtime and web-native rendering.
+5. **[App Edition](Release-Zenith-App)**: Full user-space distribution with GUI support.
+6. **[Stable Baseline](Release-Stable)**: The verified industrial production standard.
+7. **[Horizon (Bleeding Edge)](Release-Horizon)**: Experimental features and future architectural shards.
+
 
 *"The Zenith is the final industrial fact."*
 
