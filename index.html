@@ -7,15 +7,17 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #050505;
-            --surface: #0a0a0c;
+            --bg: #050506;
+            --surface: #0c0c0e;
             --primary: #00f2ff;
             --accent: #7000ff;
-            --text: #e0e0e6;
-            --muted: #60606a;
+            --text: #f5f5f7;
+            --muted: #86868b;
             --success: #00ffaa;
             --error: #ff3366;
             --terminal: #0a0a0c;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
         }
 
         body {
@@ -38,79 +40,118 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: opacity 1s ease-out;
+            transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .boot-log {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--muted);
-            max-width: 600px;
-            height: 300px;
+            width: 80%;
+            max-width: 700px;
+            height: 350px;
             overflow-y: hidden;
-            border-left: 2px solid var(--accent);
-            padding-left: 20px;
+            border-left: 2px solid var(--primary);
+            padding-left: 30px;
+            mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
         }
 
-        .boot-log p { margin: 5px 0; }
-        .boot-log .ok { color: var(--success); font-weight: bold; }
+        .boot-log p { margin: 8px 0; opacity: 0; transform: translateX(-10px); animation: slideIn 0.3s forwards; }
+        @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
+        
+        .boot-log .ok { color: var(--success); font-weight: bold; text-shadow: 0 0 10px rgba(0, 255, 170, 0.3); }
 
-        .logo-box { margin-bottom: 40px; text-align: center; }
-        .logo-box h1 { font-size: 4rem; letter-spacing: -4px; margin: 0; color: white; }
+        .logo-box { margin-bottom: 60px; text-align: center; }
+        .logo-box h1 { 
+            font-size: 5rem; 
+            letter-spacing: -6px; 
+            margin: 0; 
+            color: white; 
+            font-weight: 800;
+            filter: drop-shadow(0 0 30px rgba(255,255,255,0.1));
+        }
         .logo-box span { color: var(--primary); }
+        .logo-box p { 
+            color: var(--muted); 
+            letter-spacing: 4px; 
+            font-size: 0.9rem;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
 
         /* --- Zenith Desktop --- */
         main {
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 20px;
+            padding: 30px;
             opacity: 0;
-            transition: opacity 1s;
+            transition: opacity 1.5s ease;
+            background: radial-gradient(circle at top right, rgba(112, 0, 255, 0.05), transparent 40%),
+                        radial-gradient(circle at bottom left, rgba(0, 242, 255, 0.05), transparent 40%);
         }
 
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--glass-border);
         }
 
-        .status-bar { display: flex; gap: 20px; font-size: 0.85rem; color: var(--muted); }
-        .status-item span { color: var(--primary); font-weight: bold; }
+        .desktop-title { font-weight: 800; font-size: 1.4rem; letter-spacing: -1px; }
+
+        .status-bar { display: flex; gap: 30px; font-size: 0.8rem; color: var(--muted); }
+        .status-item span { color: var(--primary); font-weight: 600; }
 
         .lattice-container {
             flex: 1;
             display: grid;
-            grid-template-columns: 1fr 350px;
-            gap: 20px;
-            margin-top: 20px;
+            grid-template-columns: 1fr 380px;
+            gap: 30px;
+            margin-top: 30px;
         }
 
         /* --- Terminal --- */
         .terminal-box {
-            background: var(--terminal);
-            border: 1px solid rgba(0, 242, 255, 0.1);
-            border-radius: 12px;
+            background: rgba(10, 10, 12, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            transition: var(--transition-smooth);
         }
 
-        .term-header { padding: 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; color: var(--muted); }
+        .term-header { 
+            padding: 12px 20px; 
+            border-bottom: 1px solid var(--glass-border); 
+            font-size: 0.75rem; 
+            color: var(--muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .term-controls { display: flex; gap: 8px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #333; }
+        .dot.red { background: #ff5f56; }
+        .dot.yellow { background: #ffbd2e; }
+        .dot.green { background: #27c93f; }
 
         #term-output {
             flex: 1;
-            padding: 20px;
+            padding: 25px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             overflow-y: auto;
             white-space: pre-wrap;
+            line-height: 1.5;
         }
 
-        .input-line { display: flex; padding: 0 20px 20px 20px; font-family: 'JetBrains Mono', monospace; }
-        .input-line span { color: var(--accent); margin-right: 10px; }
+        .input-line { display: flex; padding: 0 25px 25px 25px; font-family: 'JetBrains Mono', monospace; }
+        .input-line span { color: var(--primary); margin-right: 12px; font-weight: bold; }
         #shell-input {
             background: transparent;
             border: none;
@@ -123,24 +164,44 @@
 
         /* --- Shard Monitor --- */
         .shard-monitor {
-            background: var(--surface);
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid rgba(255,255,255,0.03);
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .shard-monitor h2 { 
+            font-size: 1.1rem; 
+            margin-top: 0; 
+            margin-bottom: 20px; 
+            color: var(--text); 
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .shard-item {
-            padding: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
+            padding: 15px;
+            border-bottom: 1px solid var(--glass-border);
             display: flex;
             justify-content: space-between;
-            font-size: 0.9rem;
+            align-items: center;
+            font-size: 0.85rem;
+            transition: background 0.2s;
         }
-        .shard-id { color: var(--primary); font-weight: bold; }
-        .shard-status { color: var(--success); font-size: 0.75rem; border: 1px solid; padding: 2px 6px; border-radius: 4px; }
-
-        .zenith-text { color: var(--muted); letter-spacing: 2px; }
-        .desktop-title { font-weight: 800; font-size: 1.2rem; }
+        .shard-item:hover { background: rgba(255,255,255,0.02); }
+        .shard-id { color: var(--primary); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        .shard-status { 
+            font-size: 0.7rem; 
+            border: 1px solid var(--success); 
+            color: var(--success);
+            padding: 3px 8px; 
+            border-radius: 4px; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: rgba(0, 255, 170, 0.05);
+        }
     </style>
 </head>
 <body>
@@ -148,28 +209,35 @@
     <div id="boot-overlay">
         <div class="logo-box">
             <h1>Σ SIGMA<span>OS</span></h1>
-            <p class="zenith-text">ZENITH SINGULARITY v15.0</p>
+            <p>Zenith Singularity v15.0</p>
         </div>
         <div class="boot-log" id="boot-log"></div>
     </div>
 
     <main id="desktop">
         <header>
-            <div class="desktop-title">Σ ZENITH DESKTOP</div>
+            <div class="desktop-title">Σ ZENITH_DESKTOP</div>
             <div class="status-bar">
                 <div class="status-item">LATTICE: <span>612 Shards</span></div>
-                <div class="status-item">CRYPT: <span>PQC-ACTIVE</span></div>
+                <div class="status-item">CRYPT: <span>Dilithium-5 Active</span></div>
                 <div class="status-item">UPTIME: <span id="uptime">0.00s</span></div>
             </div>
         </header>
 
         <div class="lattice-container">
             <div class="terminal-box">
-                <div class="term-header">sigma_sh v2.2.0 - Ring-3 Shard Interaction</div>
+                <div class="term-header">
+                    <span>sigma_sh v2.2.0 - Industrial Shard Interaction</span>
+                    <div class="term-controls">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                </div>
                 <div id="term-output"></div>
                 <div class="input-line">
                     <span>Σ ></span>
-                    <input type="text" id="shell-input" autofocus spellcheck="false" title="Shell Command Input" placeholder="Enter command...">
+                    <input type="text" id="shell-input" autofocus spellcheck="false" title="Shell Command Input" placeholder="Type shard command...">
                 </div>
             </div>
 
@@ -192,15 +260,19 @@
         const uptimeEl = document.getElementById('uptime');
 
         const logs = [
-            "ASI: Igniting Sovereign Boot Lattice...",
-            "HAL: Silicon-native isolation [OK]",
-            "S-MM: Slab memory initialized [OK]",
-            "S-VMM: 4-Level paging active [OK]",
-            "S-NET: PQC IP stack bound [OK]",
-            "S-LFS: Ext2 mount point reached [OK]",
-            "S-DDF: Industrial drivers ignited [OK]",
-            "S-PQC: Dilithium-5 attestation PASSED",
-            "S-WM: Zenith Compositor ready [OK]",
+            "ASI: Initializing Sovereign Shard Lattice...",
+            "HAL: Silicon-native isolation active [OK]",
+            "PQC: Dilithium-5 attestation sequence started...",
+            "PQC: Attestation PASSED (Entropy: 0x8F2E)",
+            "S-MM: Slab memory partition created [OK]",
+            "S-VMM: 4-Level paging tables orchestrated [OK]",
+            "S-NET: PQC-hardened IP stack bound [OK]",
+            "S-LFS: Industrial Ext2 mount point reached [OK]",
+            "S-DDF: Industrial driver orchestration started...",
+            "S-DDF: GPU Shard [STABLE]",
+            "S-DDF: NET Shard [ACTIVE]",
+            "S-DDF: STORAGE Shard [SYNCED]",
+            "S-WM: Zenith Compositor ignited [OK]",
             "SYSTEM: ASI sequence complete. Entering Zenith Singularity..."
         ];
 
@@ -208,31 +280,34 @@
         function runBoot() {
             if (logIdx < logs.length) {
                 const p = document.createElement('p');
-                p.innerHTML = logs[logIdx].replace("[OK]", '<span class="ok">[OK]</span>');
+                p.innerHTML = logs[logIdx].replace("[OK]", '<span class="ok">[OK]</span>')
+                                          .replace("[STABLE]", '<span class="ok">[STABLE]</span>')
+                                          .replace("[ACTIVE]", '<span class="ok">[ACTIVE]</span>')
+                                          .replace("[SYNCED]", '<span class="ok">[SYNCED]</span>');
                 bootLog.appendChild(p);
                 bootLog.scrollTop = bootLog.scrollHeight;
                 logIdx++;
-                setTimeout(runBoot, 200 + Math.random() * 300);
+                setTimeout(runBoot, 150 + Math.random() * 200);
             } else {
                 setTimeout(() => {
                     bootOverlay.style.opacity = '0';
                     desktop.style.opacity = '1';
                     setTimeout(() => bootOverlay.style.display = 'none', 1000);
                     initShell();
-                }, 1000);
+                }, 800);
             }
         }
 
         const shards = [
             { id: "S-KERN", name: "Sovereign Core", status: "STABLE" },
-            { id: "S-NET", name: "Net Stack", status: "ACTIVE" },
-            { id: "S-FS", name: "Lattice FS", status: "SYNCED" },
+            { id: "S-NET", name: "PQC Net Stack", status: "ACTIVE" },
+            { id: "S-FS", name: "Lattice Ext2", status: "SYNCED" },
             { id: "S-UI", name: "Zenith WM", status: "COMPOSITING" },
-            { id: "S-KALI", name: "Security Audit", status: "AUDITING" }
+            { id: "S-SEC", name: "Quantum Audit", status: "AUDITING" }
         ];
 
         function initShell() {
-            termOutput.innerHTML = "Σ SIGMA OS [Version 15.0.0.ZENITH]\n(c) 2026 Sovereign Collective. All rights reserved.\n\nType 'help' for available shard commands.\n";
+            termOutput.innerHTML = `<span style="color:var(--primary); font-weight:bold">Σ SIGMA OS [Version 15.0.ZENITH]</span>\n(c) 2026 Sovereign Industrial Collective. Absolute Privacy Guaranteed.\n\nType '<span style="color:var(--success)">help</span>' to view shard interaction protocols.\n`;
             shards.forEach(s => {
                 const div = document.createElement('div');
                 div.className = 'shard-item';
@@ -249,7 +324,7 @@
         shellInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 const cmd = shellInput.value.trim().toLowerCase();
-                termOutput.innerHTML += `\nΣ > ${cmd}\n`;
+                termOutput.innerHTML += `\n<span style="color:var(--primary)">Σ ></span> ${cmd}\n`;
                 handleCommand(cmd);
                 shellInput.value = '';
                 termOutput.scrollTop = termOutput.scrollHeight;
@@ -257,27 +332,43 @@
         });
 
         function handleCommand(cmd) {
-            switch(cmd) {
+            const args = cmd.split(' ');
+            const baseCmd = args[0];
+
+            switch(baseCmd) {
                 case 'help':
-                    termOutput.innerHTML += "Available commands: help, ls, dmesg, shards, whoami, clear, exit\n";
+                    termOutput.innerHTML += "Available shard protocols: <span style='color:var(--success)'>help, ls, dmesg, shards, whoami, neofetch, clear, exit</span>\n";
                     break;
                 case 'ls':
-                    termOutput.innerHTML += "  kernel/  system/  userland/  shards/  lattice_fs/\n";
+                    termOutput.innerHTML += "<span style='color:var(--accent)'>kernel/  system/  userland/  shards/  lattice_fs/</span>\n";
                     break;
                 case 'dmesg':
-                    termOutput.innerHTML += "[0.0000] ASI: Ignited.\n[0.1234] S-MM: Slab active.\n[0.4567] S-VMM: Paging active.\n";
+                    termOutput.innerHTML += "[0.0000] ASI: Ignited.\n[0.1234] S-MM: Slab active.\n[0.4567] S-VMM: Paging active.\n[0.8901] PQC: Sealed.\n";
                     break;
                 case 'shards':
-                    termOutput.innerHTML += "Currently active industrial shards: 612\nState: Sovereign Singularity\n";
+                    termOutput.innerHTML += "Currently active industrial shards: 612\nLattice State: <span style='color:var(--success)'>Sovereign Singularity</span>\nSync Status: 100%\n";
+                    break;
+                case 'neofetch':
+                    termOutput.innerHTML += `
+<span style="color:var(--primary)">       ΣΣΣΣΣΣΣΣ</span>    <span style="color:var(--primary)">OS</span>: SigmaOS 15.0 Zenith
+<span style="color:var(--primary)">     ΣΣΣ      ΣΣΣ</span>  <span style="color:var(--primary)">Kernel</span>: Sovereign-Lattice v15.0
+<span style="color:var(--primary)">    ΣΣΣ        ΣΣΣ</span> <span style="color:var(--primary)">Uptime</span>: ${uptimeEl.innerText}
+<span style="color:var(--primary)">    ΣΣΣ</span>            <span style="color:var(--primary)">Packages</span>: 612 (s-pkg)
+<span style="color:var(--primary)">    ΣΣΣ            </span><span style="color:var(--primary)">Shell</span>: sigma_sh 2.2.0
+<span style="color:var(--primary)">    ΣΣΣ    ΣΣΣΣΣΣΣΣ</span><span style="color:var(--primary)">Resolution</span>: 1920x1080
+<span style="color:var(--primary)">    ΣΣΣ        ΣΣΣ</span> <span style="color:var(--primary)">WM</span>: Zenith Compositor
+<span style="color:var(--primary)">     ΣΣΣ      ΣΣΣ</span>  <span style="color:var(--primary)">Terminal</span>: Zenith Console
+<span style="color:var(--primary)">       ΣΣΣΣΣΣΣΣ</span>    <span style="color:var(--primary)">Memory</span>: 128MB / 16384MB
+`;
                     break;
                 case 'whoami':
-                    termOutput.innerHTML += "Sovereign Shard Controller [UID: 0]\n";
+                    termOutput.innerHTML += "Sovereign Shard Controller [UID: 0]\nIdentity: <span style='color:var(--primary)'>Aaryan</span>\n";
                     break;
                 case 'clear':
                     termOutput.innerHTML = "";
                     break;
                 default:
-                    termOutput.innerHTML += `<span style="color:var(--error)">[sigma_sh] Shard command not found: ${cmd}</span>\n`;
+                    termOutput.innerHTML += `<span style="color:var(--error)">[sigma_sh] Shard protocol violation: '${cmd}' not recognized.</span>\n`;
             }
         }
 
