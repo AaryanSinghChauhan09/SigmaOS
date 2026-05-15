@@ -2,61 +2,54 @@
 
 **SigmaOS is an industrial-grade, sovereign microkernel operating system built on the principle of Lattice Shard Autonomy.**
 
-The Zenith Singularity (v15.0) marks the definitive transition from experimental kernel to a production-ready, profession-aware computational singularity. It is designed for mission-critical industrial applications, post-quantum security, and absolute computational sovereignty.
+The Zenith Singularity (v15.0) marks the definitive transition from a conceptual microkernel to a production-ready computational lattice, optimized for extreme environments, hardware-native performance, and post-quantum security.
 
-## 🌌 Core Philosophy: Absolute Non-Equivalence
-SigmaOS is fundamentally distinct from legacy monolithic kernels (Linux, Windows, NT).
-- **Asynchronous Shard Ignition (ASI)**: Parallel, dependency-aware system startup (No SysV/Systemd legacy).
-- **PQC-Sealed Shards**: Every module is post-quantum encrypted and attested via Dilithium-5.
-- **Amnesic Persistence**: Zero data-remanence at the silicon level for industrial privacy.
-- **Lattice Shard Autonomy**: 600+ independent, hot-swappable industrial shards.
+## 🚀 The Zenith Singularity Roadmap
 
-## 🚀 The Industrial Stack
-SigmaOS has successfully absorbed and reimagined the most advanced capabilities of the computational world:
-- **S-NET**: PQC-accelerated TCP/IP with POSIX Sockets.
-- **S-EXT2**: Inode-based industrial filesystem with amnesic properties.
-- **S-ARMOR**: Shard-level Mandatory Access Control (SMAC).
-- **S-PKG**: PQC-signed package management with Dilithium-5 verification.
-- **Zenith WM**: Industrial-grade, glassmorphic window management system.
+SigmaOS adheres to a rigorous technical roadmap to ensure total parity across all architectures and environments:
 
-## 🛠 Editions & Deployment
-SigmaOS is available in four distinct industrial editions:
+### 1. Architecture Abstraction (HAL)
+- **Multi-Silicon Support**: Unified HAL for x86_64, AArch64, RISC-V, and PowerPC.
+- **Portable APIs**: Strict POSIX-lite compliance for seamless userland portability.
+- [Read the HAL Specification](docs/architecture/HAL.md)
 
-### 1. 🌐 Browser Edition (S-WEB)
-Experience the Zenith Singularity directly in any modern browser. Ideal for demonstration and light shard interaction.
-- **How to Use**: Open [index.html](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/index.html) in your browser.
-- **Branch**: `release/browser`
+### 2. Modularity & Extensibility
+- **Shard-Based Microkernel**: Minimal core with dynamically loadable industrial shards (600+ available).
+- **Dynamic Configuration**: Real-time hardware discovery and module orchestration via `SovereignNexus`.
 
-### 2. 💻 Desktop Application (S-APP)
-A standalone, high-performance desktop wrapper for the SigmaOS environment.
-- **How to Use**: Run `npm install && npm run dev` in the root directory.
-- **Branch**: `release/app`
+### 3. Rigorous Testing (CI/CD)
+- **Cross-Platform Validation**: Automated test suites running on QEMU, Virtio, and Bare-Metal.
+- **Stress Testing**: Extreme workload simulation for industrial stability.
+- [View Test Battery](tests/system_audit.test.js)
 
-### 3. 💾 Dual-Boot Edition (S-DUAL)
-The guided industrial installer for bare-metal deployment alongside legacy OSes.
-- **How to Use**: Boot from the Zenith ISO and select "Guided Dual-Boot".
-- **Branch**: `release/dual-boot`
+### 4. Compatibility Layers
+- **Hypervisor Integration**: Native support for VMware, VirtualBox, KVM, and QEMU.
+- **Binary Translation**: WASM-native transpilation for legacy application support.
 
-### 4. 🖥️ Standalone Edition (S-STANDALONE)
-The pure, bare-metal ISO for dedicated hardware or VM environments.
-- **How to Use**: Flash to USB or mount in QEMU/Bochs.
-- **Branch**: `release/standalone`
+### 5. Standards & Security (PQC)
+- **Post-Quantum Hardening**: Dilithium-5 and Kyber-1024 encryption integrated into the core lattice.
+- **Security Hardening**: ASLR, NX, and SMAP enforced at the silicon level.
+- [Read the Security Standards](docs/security/PQC_HARDENING.md)
 
-## 🔑 Getting Started (Dual-Boot Edition)
-The Dual-Boot Edition (S-DUAL) allows you to install SigmaOS alongside your existing operating system using the Zenith Guided Installer.
+### 6. Deployment & Maintenance
+- **Unified Build System**: Simplified `Makefile` with multi-target cross-compilation support.
+- **Rolling Updates**: OTA-ready package management via `SovereignPkg`.
 
-1. **Prepare the Media**:
-   - Download the Zenith ISO (built from this branch).
-   - Flash it to a USB drive using Rufus or `dd`.
-2. **Boot from USB**:
-   - Restart your computer and boot from the USB drive.
-3. **Run the Installer**:
-   - Select "Guided Zenith Installer" from the boot menu.
-   - Follow the step-by-step instructions in the [Sovereign Installer](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/installer.html).
+## 📦 Edition Manifest
 
-### 🚀 Key Features of S-DUAL
-- **Non-Destructive**: Co-exists with Windows/Linux using the Sovereign Bootloader.
-- **Shared Data Shards**: Access your legacy files securely through the S-EXT2 driver.
-- **Hardware Direct**: Full bare-metal performance for all industrial shards.
+| Edition | Purpose | Branch | Primary Interface |
+| :--- | :--- | :--- | :--- |
+| **S-BROWSER** | Instant Browser Simulation | `release/browser` | `index.html` |
+| **S-APP** | Standalone Desktop Wrapper | `release/app` | `Electron / main.js` |
+| **S-DUAL** | Hardware Installer | `release/dual-boot` | `installer.html` |
+| **S-STANDALONE** | Bare-Metal ISO | `release/standalone` | `sigmaos.bin` |
 
-*"The Zenith is the final industrial fact."*
+## 🔑 Getting Started (Quick Start)
+
+1. **Clone the Shard**: `git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git`
+2. **Launch Zenith**: 
+   - Browser: Open `zenith.html`
+   - Desktop: `npm install && npm start`
+3. **Audit the System**: `make test`
+
+*"The Zenith is not just an operating system; it is the final industrial fact."*
