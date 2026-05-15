@@ -93,6 +93,9 @@ kernel/core/system/SovereignLXC.cpp
 kernel/core/observability/SovereignBPF.cpp
 kernel/core/observability/SovereignWiki.cpp
 kernel/core/profiles/SovereignProfile.cpp
+kernel/core/system/SovereignWASM.cpp
+kernel/core/orchestration/SovereignConsensus.cpp
+kernel/core/concurrency/SovereignMutex.hpp
 
 # LAYER 2: HARDWARE DRIVERS (ABSORBED)
 kernel/core/drivers/SovereignPS2.cpp
