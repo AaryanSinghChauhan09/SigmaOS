@@ -25,13 +25,17 @@ SigmaOS is designed to automatically recover from shard-level corruption. If a c
 
 ## 🤝 Community & Industrial Support
 
-### GitHub Issues
+### 1. S-FORUM (Lattice-Net)
+SigmaOS v15.0 introduces the **S-FORUM**, a decentralized support mesh. Unlike legacy forums, all SigmaOS support threads are:
+- **PQC-Attested**: Every guide is signed by the author's Dilithium-5 key.
+- **Lattice-Integrated**: Tutorials can be executed directly as shard snippets in the **S-PLAY** playground.
+- **Self-Healing**: The S-WIKI automatically incorporates community-verified solutions.
 
+### 2. GitHub Issues
 For bug reports and architectural suggestions, please use the [Issue Tracker](https://github.com/AaryanSinghChauhan09/SigmaOS/issues). Ensure you attach the relevant `S-LOG` artifacts.
 
-### Professional Tiers
-
-For mission-critical industrial deployments (Bio-Fab, Aerospace, Defense), please refer to the `Sovereign-Industrial-Contract.md` in the `docs/` directory for SLA-backed support.
+### 3. Professional Tiers
+For mission-critical industrial deployments (Bio-Fab, Aerospace, Defense), professional support is available via SAC-certified partners. Refer to the `Sovereign-Industrial-Contract.md` for SLA-backed support.
 
 ## 🔍 Frequently Asked Questions (FAQ)
 

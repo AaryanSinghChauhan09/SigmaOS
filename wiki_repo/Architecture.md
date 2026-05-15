@@ -10,7 +10,8 @@ SigmaOS is fundamentally distinct from monolithic kernels (Linux, Windows, NT) a
 
 - **Lattice Shards**: Instead of a single kernel image, SigmaOS consists of 600+ independent, PQC-attested shards.
 - **Asynchronous Shard Ignition (ASI)**: Boot sequence is a parallel dependency resolution, not a linear execution.
-- **Zero-Dependency Core**: Not a single line of code is derived from GPL, BSD, or Proprietary sources. 100% Native C11/Assembly.
+- **Silicon-Direct Execution**: Minimized dependency on high-level languages (C++/Rust). Critical primitives (Memcpy, Memset, IO) are implemented as raw assembly shards for zero-latency execution.
+- **Zero-Dependency Core**: Not a single line of code is derived from GPL, BSD, or Proprietary sources. 100% Native Assembly/C11.
 - **PQC-Sealed IPC**: All communication between shards is sealed with Post-Quantum Cryptography (Dilithium-5) at the hardware level.
 
 ## 2. Core Subsystems
