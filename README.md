@@ -42,9 +42,21 @@ The pure, bare-metal ISO for dedicated hardware or VM environments.
 - **How to Use**: Flash to USB or mount in QEMU/Bochs.
 - **Branch**: `release/standalone`
 
-## 🔑 Getting Started
-1. **Clone the Repository**: `git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git`
-2. **Switch Edition**: `git checkout release/<edition>`
-3. **Follow the instructions** in the edition-specific README.
+## 🔑 Getting Started (Dual-Boot Edition)
+The Dual-Boot Edition (S-DUAL) allows you to install SigmaOS alongside your existing operating system using the Zenith Guided Installer.
+
+1. **Prepare the Media**:
+   - Download the Zenith ISO (built from this branch).
+   - Flash it to a USB drive using Rufus or `dd`.
+2. **Boot from USB**:
+   - Restart your computer and boot from the USB drive.
+3. **Run the Installer**:
+   - Select "Guided Zenith Installer" from the boot menu.
+   - Follow the step-by-step instructions in the [Sovereign Installer](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/installer.html).
+
+### 🚀 Key Features of S-DUAL
+- **Non-Destructive**: Co-exists with Windows/Linux using the Sovereign Bootloader.
+- **Shared Data Shards**: Access your legacy files securely through the S-EXT2 driver.
+- **Hardware Direct**: Full bare-metal performance for all industrial shards.
 
 *"The Zenith is the final industrial fact."*
