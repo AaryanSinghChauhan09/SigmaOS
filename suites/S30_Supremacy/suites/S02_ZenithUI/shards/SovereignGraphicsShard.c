@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN GRAPHICS ENGINE (v1.0)

@@ -6,7 +6,7 @@
 #ifndef SIGMA_SEC_INTEGRITY_HPP
 #define SIGMA_SEC_INTEGRITY_HPP
 
-#include "../S41_SiliconBoot/sigma_auto_rollback.hpp"
+#include "../../include/sigma_auto_rollback.hpp"
 
 namespace sigma {
 namespace security {

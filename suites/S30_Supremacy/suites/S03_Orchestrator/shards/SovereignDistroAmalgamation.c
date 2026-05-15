@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN DISTRO AMALGAMATION (v1.0)

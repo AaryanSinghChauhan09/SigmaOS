@@ -1,10 +1,10 @@
-#include "hal/sigma_hal.h"
+#include "../../../include/hal/sigma_hal.h"
 #ifndef POWER_SHARD_HPP
 #define POWER_SHARD_HPP
 
-#include "libc/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
-#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/core/SigmaOOP.hpp"
 #include "port_shard.hpp"
 
 namespace SigmaOS {

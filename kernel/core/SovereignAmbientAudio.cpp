@@ -1,13 +1,13 @@
-#include "sigma_hal.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "sigma_ambientaudio.h"
-#include "../../../include/sigma_log.h"
-#include "sigma_hal.h"
-#include "../../../include/sigma_log.h"
-#include "sigma_audio.h"
-#include "../../../include/sigma_log.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/sigma_ambientaudio.h"
+#include "../../include/sigma_log.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "../../include/sigma_audio.h"
+#include "../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Ambient Audio

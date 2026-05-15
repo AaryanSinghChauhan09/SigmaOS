@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN ELIMINATION SHARD (v54.2-TRIANGULUM)

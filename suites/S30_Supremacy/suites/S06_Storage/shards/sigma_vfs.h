@@ -2,7 +2,7 @@
  * =========================================================================
  * S SIGMAOS kernel/suites/S06_Storage/shards/sigma_vfs.h
  * =========================================================================
- * Sovereign Virtual Filesystem — gap-closes:
+ * Sovereign Virtual Filesystem  gap-closes:
  *   Linux  : VFS layer (dentry, inode, file, superblock)
  *   macOS  : HFS+/APFS VFS switch layer
  *   Windows: IRP/IoStack, NTFS/ReFS filter drivers
@@ -100,7 +100,7 @@ struct sigma_inode_s {
     void     (*destroy)(sigma_inode_t*);
 };
 
-/* -- Dentry (directory entry cache — Linux dcache / BSD namecache) -------- */
+/* -- Dentry (directory entry cache  Linux dcache / BSD namecache) -------- */
 struct sigma_dentry_s {
     char             name[VFS_MAX_NAME];
     sigma_inode_t   *inode;

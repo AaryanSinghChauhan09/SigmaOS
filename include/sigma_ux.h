@@ -9,7 +9,7 @@
 #ifndef SIGMA_UX_H
 #define SIGMA_UX_H
 
-#include "sigma_types.h"
+#include "../include/core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

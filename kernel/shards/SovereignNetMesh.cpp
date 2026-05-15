@@ -1,4 +1,4 @@
-#include "Lattice.h"
+#include "../../include/Lattice.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN NET-MESH (v25.0 - SOLID FINALITY)
@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "SigmaOOP.hpp"
+#include "../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Net {

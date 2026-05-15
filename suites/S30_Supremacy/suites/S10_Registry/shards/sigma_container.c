@@ -1,11 +1,12 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S10_Registry/shards/sigma_container.c
  * =========================================================================
  */
 
-#include "sigma_container.h"
-#include "sigma_libc.h"
+#include "../../../../../include/runtime/sigma_container.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 static sigma_container_t s_containers[CT_MAX];
 static ct_u32            s_ct_count = 0;

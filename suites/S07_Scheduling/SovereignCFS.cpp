@@ -1,5 +1,5 @@
 #include "SovereignCFS.hpp"
-#include "../S01_Genesis/sigma_libc.h"
+#include "../../include/libc/sigma_libc.h"
 
 namespace SigmaOS {
 namespace Kernel {

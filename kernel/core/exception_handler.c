@@ -5,7 +5,7 @@
  * Principles: Autonomous Error Handling & System Resilience.
  * =============================================================================
  */
-#include "sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 extern void kprintf(const char* fmt, ...);
 

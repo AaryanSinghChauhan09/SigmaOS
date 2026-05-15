@@ -1,7 +1,7 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "libc/SovereignLibC.h"
-#include "Lattice.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/libc/SovereignLibC.h"
+#include "../../../include/Lattice.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN BOOT-WIZARD (v37.0 - ZENITH FINALITY)
@@ -12,7 +12,7 @@
  * =========================================================================
  */
 
-#include "core/SigmaOOP.hpp"
+#include "../../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Wizard {

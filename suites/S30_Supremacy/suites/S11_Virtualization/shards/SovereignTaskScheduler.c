@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S11_VIRTUALIZATION — SovereignTaskScheduler.c
+ * S SIGMAOS: S11_VIRTUALIZATION  SovereignTaskScheduler.c
  * =========================================================================
  * Mission: High-Performance Multi-Level Feedback Queue (MLFQ) Scheduler.
  * Design: Priority-based preemption, nanosecond slicing, and NUMA awareness.

@@ -1,14 +1,14 @@
-#include "sigma_log.h"
-#include "SovereignLibC.h"
+#include "../../include/sigma_log.h"
+#include "../../include/libc/SovereignLibC.h"
 /**
  * SigmaOS Sovereign Package Manager (S-PKG)
- * v29.0 Zenith Foundation â€" Minimal Software Distribution
+ * v29.0 Zenith Foundation " Minimal Software Distribution
  * ZERO-DEPENDENCY: Strictly bare-metal package extraction.
  */
 
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "sigma_vfs.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/core/sigma_types.h"
+#include "../../include/fs/sigma_vfs.h"
 
 class SovereignPackageManager {
 public:

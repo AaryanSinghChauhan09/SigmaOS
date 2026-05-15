@@ -10,7 +10,7 @@
 //         on the Sovereign Lattice.
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 typedef enum {

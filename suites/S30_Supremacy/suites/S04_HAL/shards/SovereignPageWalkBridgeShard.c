@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN PAGE-WALK BRIDGE (v54.2-TRIANGULUM)

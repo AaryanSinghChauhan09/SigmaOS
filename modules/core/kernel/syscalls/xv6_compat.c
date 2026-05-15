@@ -1,4 +1,4 @@
-#include "sigma_libc.h"
+#include "../../../../include/libc/sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS Xv6-Compatible System Call Layer (Phase 6)

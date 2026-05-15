@@ -3,7 +3,7 @@
 // Industrial-grade Syscall Gate Shard
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 void syscall_gate_handler(uint32_t syscall_num, void* args) {

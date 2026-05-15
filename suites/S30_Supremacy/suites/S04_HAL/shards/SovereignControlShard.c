@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN CONTROL ENGINE (v1.0)

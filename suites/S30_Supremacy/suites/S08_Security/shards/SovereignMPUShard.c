@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS EON: SOVEREIGN MPU SHARD (v57.1-SUPREME-EON)

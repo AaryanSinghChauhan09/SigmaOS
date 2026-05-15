@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S13_SENTIENCE — SovereignSelfHealing.c
+ * S SIGMAOS: S13_SENTIENCE  SovereignSelfHealing.c
  * =========================================================================
  * Mission: Zero-Downtime Eternal Continuity.
  * Capability: Shard hot-swapping, state migration, proactive error avoidance.

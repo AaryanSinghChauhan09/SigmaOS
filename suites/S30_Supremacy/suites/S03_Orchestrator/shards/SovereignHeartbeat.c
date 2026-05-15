@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S03_ORCHESTRATOR — SovereignHeartbeat.c
+ * S SIGMAOS: S03_ORCHESTRATOR  SovereignHeartbeat.c
  * =========================================================================
  * Mission: Main Execution Loop & System Pulse.
  * Design: High-frequency task auditing and interconnect polling.

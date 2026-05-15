@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S19_SELFEVOLUTION — SovereignLatencyOptimizer.c
+ * S SIGMAOS: S19_SELFEVOLUTION  SovereignLatencyOptimizer.c
  * =========================================================================
  * Mission: Real-time suite performance monitoring and logic optimization.
  * Design: Metaheuristic feedback loop based on OmniFabric telemetry.

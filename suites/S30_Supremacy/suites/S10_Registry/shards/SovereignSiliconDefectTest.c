@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN SILICON DEFECT TEST (v1.0)

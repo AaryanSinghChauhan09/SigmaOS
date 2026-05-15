@@ -9,7 +9,7 @@
 #ifndef SIGMA_CRYPTO_H
 #define SIGMA_CRYPTO_H
 
-#include "core/sigma_types.h"
+#include "include/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

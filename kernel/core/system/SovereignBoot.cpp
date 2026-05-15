@@ -1,8 +1,8 @@
 #include "../../../include/sigma_log.h"
-#include "libc/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
-#include "sigma_boot.h"
-#include "hal/sigma_hal.h"
+#include "../../../include/libc/SovereignLibC.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_boot.h"
 
 /**
  * SigmaOS Sovereign Boot Implementation
@@ -20,7 +20,7 @@ public:
     }
 
     void init() {
-        sigma_log("[BOOT] Initializing Sovereign System Boot Nexus (SSB Algorithm)...");
+        sigma_log_info("[BOOT] Initializing Sovereign System Boot Nexus (SSB Algorithm)...");
         this->current_stage = SIGMA_BOOT_STAGE_INIT;
         this->initialized = 1u;
     }
@@ -38,7 +38,7 @@ public:
          * Verifies and ignites the 600-shard modular lattice in topological order. */
         
         this->current_stage = SIGMA_BOOT_STAGE_KERNEL;
-        sigma_log("[BOOT] SSB: Commencing Secure Shard Ignition sequence...");
+        sigma_log_info("[BOOT] SSB: Commencing Secure Shard Ignition sequence...");
         
         sigma_u32 step = m_fast_boot ? 50u : 1u;
         for (sigma_u32 i = 1u; i <= 600u; i += step) {
@@ -50,13 +50,13 @@ public:
             }
             if (i % 100u == 0u || m_fast_boot) {
                 if (!m_fast_boot) {
-                    sigma_log("[BOOT] SSB: Verified and Ignited Shard Cluster S%03u-S%03u\n", i-99u, i);
+                    sigma_log_info("[BOOT] SSB: Verified and Ignited Shard Cluster S%03u-S%03u\n", i-99u, i);
                 }
             }
             this->ignited_shards += step;
         }
         
-        sigma_log("[BOOT] SSB: Global Lattice Ignition COMPLETE (Optimization: %s).", m_fast_boot ? "FAST_BOOT" : "STANDARD");
+        sigma_log_info("[BOOT] SSB: Global Lattice Ignition COMPLETE (Optimization: %s).", m_fast_boot ? "FAST_BOOT" : "STANDARD");
         this->current_stage = SIGMA_BOOT_STAGE_USERLAND;
     }
 
@@ -80,11 +80,11 @@ void boot_init() {
 }
 
 void boot_ignite_lattice() {
-    SovereignBootEngine::igniteLattice();
+    SovereignBootEngine::getInstance().igniteLattice();
 }
 
 extern "C" sigma_boot_stage_t boot_get_current_stage() {
-    return SovereignBootEngine::getCurrentStage();
+    return SovereignBootEngine::getInstance().getCurrentStage();
 }
 
 extern "C" void boot_enable_fast_boot(sigma_bool enable) {
@@ -92,11 +92,5 @@ extern "C" void boot_enable_fast_boot(sigma_bool enable) {
 }
 
 extern "C" sigma_u32 boot_get_ignited_count() {
-    return SovereignBootEngine::getIgnitedCount();
+    return SovereignBootEngine::getInstance().getIgnitedCount();
 }
-
-
-
-
-
-} // extern "C"

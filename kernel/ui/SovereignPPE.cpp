@@ -3,13 +3,13 @@
  * Î£ SIGMAOS: SOVEREIGN PPE (Predictive Personalization Engine)
  * =========================================================================
  * Mission: Isolated shard for UI adaptation algorithms.
- * Layer  : L6 â€" Zenith UI / Personalization
+ * Layer  : L6 " Zenith UI / Personalization
  * =========================================================================
  */
 
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

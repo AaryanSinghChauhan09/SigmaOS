@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN SPEC-GUARD SHARD (v55.0-CENTAURI-PRIME)

@@ -1,4 +1,5 @@
-#include "SovereignDesktopZenith.h"
+#include "../../../include/SovereignLibC.h"
+#include "../../../include/SovereignDesktopZenith.h"
 #include "sigma_kernel.h"
 
 namespace SigmaOS {

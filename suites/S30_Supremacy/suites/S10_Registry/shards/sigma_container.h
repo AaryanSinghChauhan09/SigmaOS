@@ -2,7 +2,7 @@
  * =========================================================================
  * S SIGMAOS kernel/suites/S10_Registry/shards/sigma_container.h
  * =========================================================================
- * Sovereign Container Runtime — gap-closes:
+ * Sovereign Container Runtime  gap-closes:
  *   Linux  : LXC/Docker namespaces, cgroups v2, seccomp-BPF, overlayfs
  *   macOS  : Virtualization.framework, App Sandbox (per-app containers)
  *   Windows: WSL2/HCS, Windows Containers (WCOW), Hyper-V isolation
@@ -26,7 +26,7 @@ typedef unsigned char      ct_bool;
 
 /* -- Isolation level ------------------------------------------------------- */
 typedef enum {
-    ISOLATE_NONE      = 0,  /* no isolation — bare process               */
+    ISOLATE_NONE      = 0,  /* no isolation  bare process               */
     ISOLATE_PROCESS   = 1,  /* PID + IPC namespace only (Android model)  */
     ISOLATE_CONTAINER = 2,  /* full: PID+NET+MNT+UTS+IPC (Docker model)  */
     ISOLATE_VM_LITE   = 3,  /* user-mode kernel (gVisor/microVM)         */

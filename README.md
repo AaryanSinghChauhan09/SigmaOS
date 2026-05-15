@@ -9,39 +9,47 @@ The Zenith Singularity (v15.0) marks the definitive transition from a conceptual
 SigmaOS adheres to a rigorous technical roadmap to ensure total parity and efficiency across all architectures:
 
 ### 1. Core System Performance
+
 - **O(1) Kernel Primitives**: Deterministic scheduling and memory allocation.
 - **Shard-Level Memory Pools**: Isolated pools for each shard to prevent fragmentation.
 - **Lightweight Synchronization**: Lock-free primitives for high-concurrency orchestration.
 
 ### 2. Algorithmic Profiling & Benchmarking
+
 - **Automated Benchmarks**: `make benchmark` integrates micro and macro metrics into CI/CD.
 - **Industrial Stress Testing**: Simulation framework for large-scale workload validation.
 - [Read the Algorithmic Complexity Specs](docs/ALGORITHMS.md)
 - [View Performance Roadmap](docs/PERFORMANCE.md)
 
 ### 3. Security & Reliability
+
 - **PQC-Sealed Shards**: Dilithium-5 and Kyber-1024 verified with automated fuzzing.
 - **S-ARMOR Access Control**: Strict shard isolation with minimal overhead.
 - **Amnesic Persistence**: Zero-data remanence verified under hardware stress.
 - [Read the Security Standards](docs/security/PQC_HARDENING.md)
 
 ### 4. Universal OS Format Adaptation
+
 - **Lattice Flexibility**: Native profiles for Monolithic, Microkernel, Hybrid, Embedded, RTOS, Cloud, and Mobile.
 - [Read the OS Format Matrix](docs/architecture/FORMATS.md)
 
 ### 5. Modularity & Extensibility
+
 - **Shard Autonomy**: Hot-swappable modules verified for algorithmic consistency.
 - **POSIX-lite Compliance**: Seamless portability for industrial applications.
 
 ### 6. Tooling & Branch Strategy
+
 - **Static & Dynamic Analysis**: Integration with Clang-Tidy, perf, and custom shard profilers.
 - **Performance Branch**: Dedicated `performance/optimization` branch for experimental improvements.
 
 ### 7. Documentation & Wiki Alignment
+
 - **Industrial Wiki**: Consolidated technical specifications in `docs/wiki/`.
 - **Optimization Guidelines**: Best practices for shard-level performance tuning.
 
 ### 8. Future-Proofing
+
 - **WASM Runtime**: Optimized for lightweight, sandboxed shard execution.
 - **Cross-Platform Builds**: Reproducible builds for ARM, x86, and RISC-V.
 
@@ -57,6 +65,7 @@ SigmaOS adheres to a rigorous technical roadmap to ensure total parity and effic
 ## 🔑 Getting Started (Industrial Quick Start)
 
 1. **Clone the Shard**: `git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git`
+
 2. **Build for Architecture**: `make singularity ARCH=x86_64`
 3. **Verify Performance**: `make benchmark && make test`
 4. **Simulate Stress**: `python simulation/industrial_stress_test.py`

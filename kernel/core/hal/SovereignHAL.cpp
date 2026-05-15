@@ -1,6 +1,6 @@
 #include "../../../include/sigma_log.h"
-#include "hal/sigma_hal.h"
-#include "libc/SovereignLibC.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 void hal_load_drivers();
 

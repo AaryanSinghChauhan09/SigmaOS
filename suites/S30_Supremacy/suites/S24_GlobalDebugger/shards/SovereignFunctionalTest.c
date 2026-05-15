@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN FUNCTIONAL TEST RUNNER (v1.0)

@@ -1,11 +1,12 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS ZENITH: SOVEREIGN NEURAL SHARD (v2.0 — DEEP INFERENCE)
+ * S SIGMAOS ZENITH: SOVEREIGN NEURAL SHARD (v2.0  DEEP INFERENCE)
  * =========================================================================
- * Mission: Native Silicon Inference — AI/ML at the kernel level.
+ * Mission: Native Silicon Inference  AI/ML at the kernel level.
  * Principles: Forward-pass, Activation functions, Loss computation.
  *
- * v2.0: Real softmax, ReLU, forward-pass inference, and MSE loss —
+ * v2.0: Real softmax, ReLU, forward-pass inference, and MSE loss 
  *       not printf stubs. Uses kernel-local float arrays.
  * =========================================================================
  */
@@ -27,7 +28,7 @@ static SigmaNeuralModel_t s_neural_models[MAX_LOADED_MODELS];
 static sigma_u32 s_model_count = 0;
 
 /* =======================================================================
- * REAL ML MATH — ACTIVATION FUNCTIONS
+ * REAL ML MATH  ACTIVATION FUNCTIONS
  * ======================================================================= */
 
 /**
@@ -69,7 +70,7 @@ static void sigma_softmax(float* input, float* output, sigma_u32 len) {
 }
 
 /* =======================================================================
- * REAL ML MATH — LOSS FUNCTIONS
+ * REAL ML MATH  LOSS FUNCTIONS
  * ======================================================================= */
 
 /**
@@ -87,7 +88,7 @@ static float sigma_mse_loss(const float* predictions, const float* targets,
 }
 
 /* =======================================================================
- * REAL FORWARD PASS — DENSE LAYER
+ * REAL FORWARD PASS  DENSE LAYER
  * ======================================================================= */
 
 #define MAX_DIM 16

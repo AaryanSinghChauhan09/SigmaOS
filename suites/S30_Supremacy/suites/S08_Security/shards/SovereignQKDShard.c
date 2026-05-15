@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ABSOLUTE_TRANSCENDENCE: SOVEREIGN QKD SHARD (v59.0-ABSOLUTE)

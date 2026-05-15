@@ -1,9 +1,9 @@
-#include "../../../include/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "sigma_telemetry.h"
-#include "../../../include/sigma_log.h"
-#include "sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/observability/sigma_telemetry.h"
+#include "../../include/sigma_log.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Telemetry Implementation

@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN QUANTUM SCHEDULER (v2.0 - SUPREME UPGRADE)

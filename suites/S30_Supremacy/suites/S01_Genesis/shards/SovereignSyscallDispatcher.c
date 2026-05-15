@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S01_GENESIS — SovereignSyscallDispatcher.c
+ * S SIGMAOS: S01_GENESIS  SovereignSyscallDispatcher.c
  * =========================================================================
  * Implementation of Idea 121 (Apex Infinity): 512-entry Syscall Table.
  * Provides the industrial-grade gateway between User and Kernel space.
@@ -8,7 +9,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 #define MAX_SYSCALLS 512
 

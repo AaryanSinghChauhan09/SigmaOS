@@ -7,6 +7,6 @@
 #ifndef SIGMA_LIBC_H
 #define SIGMA_LIBC_H
 
-#include "libc/SovereignLibC.h"
+#include "include/SovereignLibC.h"
 
 #endif /* SIGMA_LIBC_H */

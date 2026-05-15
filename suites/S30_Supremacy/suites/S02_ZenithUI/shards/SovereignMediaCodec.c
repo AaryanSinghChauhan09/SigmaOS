@@ -1,11 +1,12 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN MEDIA CODEC + OBS COMPOSITOR — IMPLEMENTATION (v1.0)
+ * S SIGMAOS: SOVEREIGN MEDIA CODEC + OBS COMPOSITOR  IMPLEMENTATION (v1.0)
  * =========================================================================
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
-#include "SovereignMediaCodec.h"
+#include "../../../../../include/SovereignMediaCodec.h"
 
 /* -------------------------------------------------------------------------
  * Playback state
@@ -58,7 +59,7 @@ static const char *accel_name(SigmaHWAccel_t a) {
 }
 
 /* =========================================================================
- * §1  MEDIA PLAYBACK  (VLC libvlc parity)
+ * 1  MEDIA PLAYBACK  (VLC libvlc parity)
  * ====================================================================== */
 
 sigma_err_t sigma_media_open(const char *url, SigmaMediaInfo_t *out) {
@@ -176,7 +177,7 @@ SigmaMediaState_t sigma_media_state(void) {
 }
 
 /* =========================================================================
- * §2  OBS SCENE COMPOSITOR
+ * 2  OBS SCENE COMPOSITOR
  * ====================================================================== */
 
 static SigmaScene_t *scene_find(const char *name) {

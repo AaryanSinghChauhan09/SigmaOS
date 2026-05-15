@@ -1,6 +1,6 @@
-#include "sigma_log.h"
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Control Shard (v100.0 Zenith)

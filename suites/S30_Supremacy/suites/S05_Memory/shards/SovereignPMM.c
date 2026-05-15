@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S05_MEMORY — SovereignPMM.c
+ * S SIGMAOS: S05_MEMORY  SovereignPMM.c
  * =========================================================================
  * Implementation of Idea 41 (Apex Infinity): Bitmap Physical Memory Manager.
  * Zero external libraries. Direct page-frame management.
@@ -8,8 +9,8 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "sigma_types.h"
-#include "sigma_libc.h"
+#include "../../../../../include/core/sigma_types.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 #define PAGE_SIZE 4096
 #define MAX_PAGES 1048576 // 4GB management coverage

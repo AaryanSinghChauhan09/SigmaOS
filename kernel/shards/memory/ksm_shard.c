@@ -1,4 +1,5 @@
-#include "core/sigma_types.h"
+#include "../../../include/SovereignLibC.h"
+#include "../../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-KSM-SHARD (v1.0 - MEMORY DEDUPLICATION)
@@ -12,7 +13,7 @@
  * =============================================================================
  */
 
-#include "core/sigma_kernel_types.h"
+#include "../../../include/core/sigma_kernel_types.h"
 
 #define KSM_SCAN_PAGES 128
 

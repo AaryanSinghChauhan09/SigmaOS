@@ -5,7 +5,7 @@
 #ifndef SIGMA_NET_DRIVER_WIFI_HPP
 #define SIGMA_NET_DRIVER_WIFI_HPP
 
-#include "sigma_net_driver_ethernet.hpp"
+#include "../../include/sigma_net_driver_ethernet.hpp"
 
 namespace sigma {
 namespace net {

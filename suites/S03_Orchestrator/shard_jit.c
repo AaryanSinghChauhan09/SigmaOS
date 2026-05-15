@@ -4,7 +4,7 @@
  * USP: Compile and execute C-like "Silicon Scripts" directly into Ring 0 for instant hot-fixing.
  */
 
-#include "sigma_libc.h"
+#include "../../include/libc/sigma_libc.h"
 
 typedef void (*sigma_kernel_func)();
 

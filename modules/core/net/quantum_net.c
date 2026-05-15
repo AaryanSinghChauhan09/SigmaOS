@@ -1,5 +1,5 @@
-#include "sigma_libc.h"
-#include "../kernel/security/kyber_shard.c"
+#include "../../../include/libc/sigma_libc.h"
+#include "../../../include/kernel/security/kyber_shard.c"
 
 // ---------------------------------------------------------
 // SigmaOS Quantum Mesh: Distributed Authentication (Phase 8)

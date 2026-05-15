@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN FLAT-COMBINING SHARD (v53.0-SINGULARITY-OMEGA)

@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S01_GENESIS — SovereignVTable.c
+ * S SIGMAOS: S01_GENESIS  SovereignVTable.c
  * =========================================================================
  * Mission: Outperforming C++ VTables.
  * Capability: Ultra-fast dynamic dispatch for modular drivers.

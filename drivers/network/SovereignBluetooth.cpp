@@ -1,16 +1,16 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "hal/sigma_hal.h"
-#include "libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
+#include "include/sigma_types.h"
+#include "include/hal/sigma_hal.h"
+#include "include/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Bluetooth Stack
  * Kernel-level bare-metal BT controller driver.
  *
  * USP: Replaces BlueZ's 600k-line userland daemon with a Ring-0 HCI driver.
- * Device pairing is verified against SovereignPQC attestation â€" zero spoofing.
+ * Device pairing is verified against SovereignPQC attestation " zero spoofing.
  *
- * Design: OOP-isolated singleton â€" SovereignBluetoothEngine.
+ * Design: OOP-isolated singleton " SovereignBluetoothEngine.
  */
 
 class SovereignBluetoothEngine {
@@ -38,7 +38,7 @@ public:
         if (this->paired_devices >= 16 || !this->controller_active) return false;
         sigma_hardened_strcpy(this->paired_addrs[this->paired_devices], bt_addr, 18);
         this->paired_devices++;
-        sigma_log("[BT] Paired: '%s' (%s) â€" PQC attestation verified.\n", device_name, bt_addr);
+        sigma_log("[BT] Paired: '%s' (%s) " PQC attestation verified.\n", device_name, bt_addr);
         return true;
     }
 

@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S06_STORAGE — SovereignSQLShard.c
+ * S SIGMAOS: S06_STORAGE  SovereignSQLShard.c
  * =========================================================================
  * Mission: High-Performance Kernel-Level ACID Database Shard.
  * Design: B+Tree Indexing, WAL (Write-Ahead-Logging), and SQL Purity.

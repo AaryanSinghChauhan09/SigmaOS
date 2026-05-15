@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS MULTIVERSE_CORE: SOVEREIGN HBM SHARD (v58.1-SUPREME-MULTIVERSE_CORE)

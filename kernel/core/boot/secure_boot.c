@@ -1,4 +1,4 @@
-#include "core/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SECURE BOOT CHAIN-OF-TRUST (v1.0)
@@ -6,7 +6,7 @@
  * Principles: Shard Signature Verification & Silicon-Native Integrity.
  * =============================================================================
  */
-#include "core/sigma_kernel_types.h"
+#include "../../../include/core/sigma_kernel_types.h"
 
 typedef struct ShardSignature {
     sigma_u64     shard_id;

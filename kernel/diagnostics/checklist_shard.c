@@ -6,8 +6,8 @@
  * =========================================================================
  */
 
-#include "sigma_types.h"
-#include "SovereignLibC.h"
+#include "../../include/core/sigma_types.h"
+#include "../../include/libc/SovereignLibC.h"
 
 #define MAX_CHECKLIST_ITEMS 32
 #define MAX_TEMPLATES      16

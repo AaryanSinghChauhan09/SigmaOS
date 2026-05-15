@@ -1,10 +1,10 @@
 #include "../../../include/sigma_log.h"
-#include "libc/SovereignLibC.h"
-#include "hal/sigma_hal.h"
-#include "../../../include/sigma_types.h"
-#include "sigma_livekernel.h"
-#include "hal/sigma_hal.h"
-#include "sigma_dynmodule.h"
+#include "../../../include/libc/SovereignLibC.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_livekernel.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_dynmodule.h"
 #include "security/sigma_crypto.h"
 
 /**

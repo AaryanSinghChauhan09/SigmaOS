@@ -11,6 +11,8 @@
 #ifndef SOVEREIGN_HOLY_JIT_H
 #define SOVEREIGN_HOLY_JIT_H
 
+#include "../../../../../include/SovereignLibC.h"
+
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 // -------------------------------------------------------------------------

@@ -6,12 +6,17 @@ SigmaOS is available in multiple sovereign formats to ensure total industrial pa
 
 | Format | Status | Branch | Primary Shards |
 | :--- | :--- | :--- | :--- |
-| **Standalone (Bare Metal)** | [STABLE] | elease/standalone | SovereignInstaller, SovereignRecovery |
-| **Dual Boot (Interop)** | [STABLE] | elease/dual-boot | SovereignCompatibility, SovereignPartition |
-| **Browser-Based (Web)** | [BETA] | elease/browser | SovereignWASM, ZenithWebUI |
-| **App-Based (Mobile/VM)** | [BETA] | elease/app | SovereignMobile, SovereignSDK |
+| **Standalone (Bare Metal)** | [STABLE] |
+elease/standalone | SovereignInstaller, SovereignRecovery |
+| **Dual Boot (Interop)** | [STABLE] |
+elease/dual-boot | SovereignCompatibility, SovereignPartition |
+| **Browser-Based (Web)** | [BETA] |
+elease/browser | SovereignWASM, ZenithWebUI |
+| **App-Based (Mobile/VM)** | [BETA] |
+elease/app | SovereignMobile, SovereignSDK |
 
 ## ?? Build Instructions
+
 To build a specific format, switch to the corresponding branch and run:
 `make zenith-<format>-iso`
 

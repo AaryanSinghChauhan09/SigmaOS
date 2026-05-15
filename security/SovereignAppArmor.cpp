@@ -3,13 +3,13 @@
  * Î£ SIGMAOS: SOVEREIGN APPARMOR (Mandatory Access Control Shard)
  * =========================================================================
  * Mission: Implements SEC-002 (MAC) to provide Linux-parity sandboxing.
- * Layer  : L3 â€" Security
+ * Layer  : L3 " Security
  * =========================================================================
  */
 
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "include/sigma_types.h"
+#include "../include/sigma_log.h"
+#include "include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

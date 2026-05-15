@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 // =============================================================================
 // SigmaOS — S11_Virtualization — SovereignHypervisor.c
 // Type-1.5 Bare-Metal Hypervisor Shard
@@ -14,7 +15,7 @@
 //   • Sub-10ms microVM cold-boot target (Firecracker model)
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 #define MAX_VMS             16

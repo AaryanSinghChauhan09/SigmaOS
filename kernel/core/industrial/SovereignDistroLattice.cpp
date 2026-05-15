@@ -6,7 +6,7 @@ namespace Kernel {
 namespace Industrial {
 
 /**
- * SovereignDistroLattice â€" Specialized Shard Logic for Global Distros.
+ * SovereignDistroLattice " Specialized Shard Logic for Global Distros.
  */
 void SovereignGlobalEcosystem::initSovereignDistros() {
     sigma_log_info("[ECOSYSTEM] Absorbing OS USPs (600-Shard Mode):");

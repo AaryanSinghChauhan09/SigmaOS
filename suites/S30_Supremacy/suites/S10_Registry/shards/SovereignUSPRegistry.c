@@ -1,8 +1,9 @@
+#include "../../../../../include/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "SovereignUSP.h"
-#include "sigma_libc.h"
-#include "sigma_string.h"
+#include "../../../../../include/SovereignUSP.h"
+#include "../../../../../include/libc/sigma_libc.h"
+#include "../../../../../include/sigma_string.h"
 
 static sovereign_usp_registry_t g_usp_registry;
 

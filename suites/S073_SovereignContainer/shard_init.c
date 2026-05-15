@@ -1,4 +1,5 @@
-#include "sigma_libc.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/libc/sigma_libc.h"
 
 // SigmaOS Sovereign Container (S-CONTAINER)
 // Philosophy: Zero-Overhead Containerization - Industrial-Grade Process Isolation.

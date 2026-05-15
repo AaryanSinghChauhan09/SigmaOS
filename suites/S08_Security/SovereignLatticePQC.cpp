@@ -1,7 +1,7 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "core/SigmaOOP.hpp"
-#include "libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
+#include "include/sigma_types.h"
+#include "include/SigmaOOP.hpp"
+#include "include/SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)

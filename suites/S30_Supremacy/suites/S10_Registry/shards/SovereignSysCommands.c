@@ -1,5 +1,6 @@
-#include "SovereignCommand.h"
-#include "sigma_libc.h"
+#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/SovereignCommand.h"
+#include "../../../../../include/libc/sigma_libc.h"
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 extern void _sigma_sys_close_window(const char* target);

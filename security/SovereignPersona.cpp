@@ -1,11 +1,11 @@
-#include "sigma_log.h"
-#include "libc/SovereignLibC.h"
-#include "core/sigma_types.h"
+#include "../include/sigma_log.h"
+#include "include/SovereignLibC.h"
+#include "include/sigma_types.h"
 
-#include "sigma_persona.h"
-#include "hal/sigma_hal.h"
+#include "../include/sigma_persona.h"
+#include "include/hal/sigma_hal.h"
 
-#include "sigma_universal_ui.h"
+#include "../include/sigma_universal_ui.h"
 
 /**
  * SigmaOS Sovereign Persona Engine

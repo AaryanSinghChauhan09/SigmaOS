@@ -12,7 +12,7 @@
 //         of the fastest memory in the lattice.
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 typedef struct {
     uint8_t  peer_node_uuid[16];

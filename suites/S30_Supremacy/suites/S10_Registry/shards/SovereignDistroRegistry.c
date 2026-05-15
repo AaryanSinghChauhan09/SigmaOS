@@ -1,8 +1,9 @@
+#include "../../../../../include/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "SovereignDistro.h"
-#include "sigma_libc.h"
-#include "sigma_string.h"
+#include "../../../../../include/SovereignDistro.h"
+#include "../../../../../include/libc/sigma_libc.h"
+#include "../../../../../include/sigma_string.h"
 
 static sovereign_distro_registry_t g_distro_registry;
 

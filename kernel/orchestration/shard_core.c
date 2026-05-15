@@ -12,7 +12,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 #define MAX_SYSTEM_SHARDS 256
 #define SHARD_MAGIC       0x53485244 // "SHRD"

@@ -1,8 +1,8 @@
 #ifndef SIGMA_API_H
 #define SIGMA_API_H
 
-#include "sigma_libc.h"
-#include "sigma_libc.h"
+#include "../../../include/libc/sigma_libc.h"
+#include "../../../include/libc/sigma_libc.h"
 
 // ============================================================================
 // SigmaOS Sovereign System API Blueprint (1000+ Functions Specification)

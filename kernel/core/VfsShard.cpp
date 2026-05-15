@@ -1,5 +1,5 @@
-#include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/core/sigma_types.h"
 #include "VfsShard.hpp"
 
 // Implementation for SovereignVFS could go here if needed, 

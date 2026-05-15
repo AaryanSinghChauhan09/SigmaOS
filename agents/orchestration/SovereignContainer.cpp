@@ -1,7 +1,7 @@
-#include "sigma_log.h"
-#include "libc/SovereignLibC.h"
-#include "core/sigma_types.h"
-#include "hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "include/SovereignLibC.h"
+#include "include/sigma_types.h"
+#include "include/hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Containerization (S-Container)
@@ -10,7 +10,7 @@
  * USP: Instantly spins up hardware-isolated micro-containers for applications
  * without needing Docker or LXC. Native integration means zero overhead.
  *
- * Design: OOP-isolated singleton â€" SovereignContainerEngine.
+ * Design: OOP-isolated singleton " SovereignContainerEngine.
  */
 
 namespace SigmaOS {

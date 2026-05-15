@@ -4,13 +4,13 @@
  * =========================================================================
  * Mission: Hardened lattice networking with sovereign anonymity.
  * Target : Neutralizes Whonix requirement for isolation-based privacy.
- * Layer  : L3 â€" Security Fabric
+ * Layer  : L3 " Security Fabric
  * =========================================================================
  */
 
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "include/sigma_types.h"
+#include "../include/sigma_log.h"
+#include "include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

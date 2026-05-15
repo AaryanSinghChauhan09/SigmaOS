@@ -1,7 +1,7 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "hal/sigma_hal.h"
-#include "libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
+#include "include/sigma_types.h"
+#include "include/hal/sigma_hal.h"
+#include "include/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Tiling Window Manager
@@ -9,9 +9,9 @@
  *
  * USP: Unlike i3/Sway running in userland, the Sovereign Tiler operates
  * via direct framebuffer geometry commands through the Zenith MLC compositor.
- * Layout decisions are O(1) â€" no redraw overhead, no compositor round-trips.
+ * Layout decisions are O(1) " no redraw overhead, no compositor round-trips.
  *
- * Design: OOP-isolated singleton â€" SovereignTilingEngine.
+ * Design: OOP-isolated singleton " SovereignTilingEngine.
  */
 
 typedef struct {

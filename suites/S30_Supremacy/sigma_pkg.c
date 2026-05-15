@@ -1,3 +1,4 @@
+#include "../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN PACKAGE SHARD (v1.0 - Industrial Absorbtion: APT/Pacman)
@@ -9,7 +10,7 @@
  * =========================================================================
  */
 
-#include "../libc/sigma_libc.h"
+#include "../../include/libc/sigma_libc.h"
 
 typedef struct sigma_package {
     const char* name;

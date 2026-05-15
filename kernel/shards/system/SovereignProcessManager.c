@@ -1,4 +1,4 @@
-#include "core/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN PROCESS MANAGER (v25.0 - PURE C11)
@@ -11,7 +11,7 @@
  * =========================================================================
  */
 
-#include "libc/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 /* PCB state constants */
 #define PROC_STATE_READY   0u

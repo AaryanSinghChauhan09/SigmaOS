@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN TDX SHARD (v56.7-SUPREME-MULTIVERSE_CORE)

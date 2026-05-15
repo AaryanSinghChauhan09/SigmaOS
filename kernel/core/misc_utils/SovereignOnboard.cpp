@@ -1,12 +1,12 @@
 #include "../../../include/sigma_log.h"
-#include "libc/SovereignLibC.h"
-#include "hal/sigma_hal.h"
-#include "../../../include/sigma_types.h"
-#include "sigma_onboard.h"
-#include "hal/sigma_hal.h"
-#include "sigma_persona.h"
-#include "sigma_biometrics.h"
-#include "sigma_access.h"
+#include "../../../include/libc/SovereignLibC.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_onboard.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_persona.h"
+#include "../../../include/sigma_biometrics.h"
+#include "../../../include/sigma_access.h"
 
 /**
  * SigmaOS Sovereign Onboarding Wizard

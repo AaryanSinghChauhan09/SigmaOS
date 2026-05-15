@@ -1,3 +1,4 @@
+#include "../../include/SovereignLibC.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SERIAL DRIVER + EARLY CONSOLE (v1.0 - PURE C11)
@@ -8,8 +9,8 @@
  * =============================================================================
  */
 
-#include "core/sigma_kernel_types.h"
-#include "core/sigma_types.h"   /* compiler built-in â€ no libc */
+#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/core/sigma_types.h"   /* compiler built-in â€ no libc */
 
 /* =========================================================================
  * COM1 Port Map

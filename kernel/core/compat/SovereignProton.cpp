@@ -1,7 +1,7 @@
-#include "../../../include/sigma_types.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/core/SigmaOOP.hpp"
 #include "../../../include/sigma_log.h"
-#include "sigma_libc.h"
+#include "../../../include/libc/sigma_libc.h"
 
 /**
  * SigmaOS Sovereign Proton Bridge (S-PROTON)

@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN CROSS-BROWSER SYNC (v1.0)

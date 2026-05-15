@@ -1,10 +1,10 @@
 #ifndef SOVEREIGN_NEURAL_ENGINE_HPP
 #define SOVEREIGN_NEURAL_ENGINE_HPP
 
-#include "libc/SovereignLibC.h"
+#include "include/SovereignLibC.h"
 
-#include "core/sigma_types.h"
-#include "core/SigmaOOP.hpp"
+#include "include/sigma_types.h"
+#include "include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace AI {

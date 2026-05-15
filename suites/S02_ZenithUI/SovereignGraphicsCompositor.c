@@ -1,5 +1,5 @@
-#include "sigma_ui_wayland.h"
-#include "sigma_libc.h"
+#include "../../include/sigma_ui_wayland.h"
+#include "../../include/libc/sigma_libc.h"
 
 /**
  * Σ SIGMA OS: SOVEREIGN ZENITH COMPOSITOR

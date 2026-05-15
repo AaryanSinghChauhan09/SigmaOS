@@ -1,4 +1,5 @@
-#include "core/sigma_types.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: QUANTUM RCU (v1.0 - LOCK-FREE SYNC)
@@ -12,7 +13,7 @@
  * =============================================================================
  */
 
-#include "core/sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 extern sigma_vaddr_t vmalloc(sigma_u64 npages);
 

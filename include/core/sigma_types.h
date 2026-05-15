@@ -6,7 +6,7 @@
  * Dependencies: sigma_kernel_types.h (Industrial Source of Truth)
  */
 
-#include "sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {

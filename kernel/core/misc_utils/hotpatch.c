@@ -1,4 +1,4 @@
-#include "core/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: DYNAMIC HOT-PATCHING SHARD (v1.0)
@@ -6,7 +6,7 @@
  * Principles: Zero-Downtime Updates & Shard Redirection.
  * =============================================================================
  */
-#include "core/sigma_kernel_types.h"
+#include "../../../include/core/sigma_kernel_types.h"
 
 typedef struct Patch {
     void** target_func_ptr;

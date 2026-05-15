@@ -1,9 +1,9 @@
-#include "sigma_hal.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "sigma_hypervisor.h"
-#include "../../../include/sigma_log.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/runtime/sigma_hypervisor.h"
+#include "../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Hypervisor Implementation (Zenith Edition - v28.0)

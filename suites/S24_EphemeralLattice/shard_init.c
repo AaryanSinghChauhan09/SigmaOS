@@ -1,4 +1,5 @@
-#include "sigma_libc.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/libc/sigma_libc.h"
 
 // SigmaOS Ephemeral Lattice (S-EPHEMERAL)
 // Philosophy: Tails OS - Zero-Trace Anonymity and Ephemeral Sessions.

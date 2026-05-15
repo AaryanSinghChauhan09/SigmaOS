@@ -1,4 +1,4 @@
-#include "Lattice.h"
+#include "../../../include/Lattice.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: AETHER ORCHESTRATOR ZENITH (v14.0 - THE AUTOMATOR)

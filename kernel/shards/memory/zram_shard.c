@@ -1,4 +1,5 @@
-#include "core/sigma_types.h"
+#include "../../../include/SovereignLibC.h"
+#include "../../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-ZRAM-SHARD (v1.0 - MEMORY COMPRESSION)
@@ -12,7 +13,7 @@
  * =============================================================================
  */
 
-#include "core/sigma_kernel_types.h"
+#include "../../../include/core/sigma_kernel_types.h"
 
 typedef struct ZRAMPulse {
     sigma_u64 raw_pfn;

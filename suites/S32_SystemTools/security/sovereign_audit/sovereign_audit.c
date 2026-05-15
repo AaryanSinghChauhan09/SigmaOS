@@ -1,3 +1,4 @@
+#include "../../../../include/SovereignLibC.h"
 #define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS — tools/sovereign_audit — sovereign_audit.c
@@ -11,8 +12,8 @@
 // Zero external deps — compiles with: gcc -std=c11 -O2 sovereign_audit.c -o sigma-audit
 // =============================================================================
 
-#include "sigma_libc.h"
-#include "sigma_types.h"
+#include "../../../../include/libc/sigma_libc.h"
+#include "../../../../include/core/sigma_types.h"
 
 #include <dirent.h>
 #include <sys/stat.h>

@@ -1,7 +1,7 @@
 #ifndef SIGMA_BFT_CONSENSUS_H
 #define SIGMA_BFT_CONSENSUS_H
 
-#include "sigma_libc.h"
+#include "../../include/libc/sigma_libc.h"
 
 /* SigmaOS Lattice Consensus Engine - Phase 7 Sovereign Intelligence
  * Implements Practical Byzantine Fault Tolerance (pBFT) primitives

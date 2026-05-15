@@ -1,4 +1,5 @@
-#include "sigma_libc.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/libc/sigma_libc.h"
 
 // SigmaOS NCERT Calculators (S-ACADEMY-CALC)
 // Philosophy: Precision Lattice - Native, High-Performance Mathematical Primitives.

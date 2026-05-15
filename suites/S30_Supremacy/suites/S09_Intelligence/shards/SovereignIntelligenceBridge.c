@@ -12,7 +12,7 @@
 //   • Multi-Model Support: Swap between lightweight 1B models and Pro-Models.
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 #define MAX_PROMPT_LEN      4096

@@ -1,4 +1,4 @@
-#include "sigma_cpu.h"
+#include "../../../../include/sigma_cpu.h"
 
 /* =========================================================================
  * SIGMA OS: GLOBAL DESCRIPTOR TABLE (GDT) KERNEL SHARD

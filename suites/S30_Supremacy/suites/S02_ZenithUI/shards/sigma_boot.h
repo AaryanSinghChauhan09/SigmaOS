@@ -2,7 +2,7 @@
  * =========================================================================
  * S SIGMAOS kernel/suites/S02_ZenithUI/shards/sigma_boot.h
  * =========================================================================
- * Sovereign Boot Subsystem — gap-closes:
+ * Sovereign Boot Subsystem  gap-closes:
  *   Linux  : GRUB2, systemd-boot, EFISTUB, kexec, initramfs
  *   Windows: Windows Boot Manager, BCD store, Secure Boot shims
  *   macOS  : Apple Silicon boot (iBoot), OpenFirmware, efibootmgr

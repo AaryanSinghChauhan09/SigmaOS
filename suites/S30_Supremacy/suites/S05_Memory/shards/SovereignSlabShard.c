@@ -1,6 +1,6 @@
-#include "SovereignMemory.h"
+#include "../../../../../include/SovereignMemory.h"
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
-#include "sigma_libc.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 #define SLAB_SIGNATURE 0x516D4105
 

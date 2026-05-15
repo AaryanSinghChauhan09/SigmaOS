@@ -1,9 +1,9 @@
 #ifndef NCERT_PHYSICS_HPP
 #define NCERT_PHYSICS_HPP
 
-#include "SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
-#include "ncert_base.hpp"
+#include "../../../include/ncert_base.hpp"
 
 class GravitationSim : public INCERTSim {
 public:

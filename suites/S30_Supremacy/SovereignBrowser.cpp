@@ -1,9 +1,9 @@
-#include "sigma_log.h"
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "sigma_net.h"
-#include "sigma_zenithui.h"
+#include "../../include/sigma_log.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_net.h"
+#include "../../include/ui/sigma_zenithui.h"
 
 /**
  * SigmaOS Sovereign Browser Shard (v100.0 Zenith)

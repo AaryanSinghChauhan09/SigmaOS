@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN DIFF-PRIVACY SHARD (v53.2-SUPREME-EMPYREAN)

@@ -12,7 +12,7 @@
 //   • Near-Zero latency local cache with lazy-mesh synchronization.
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 #define BLOCK_SIZE          4096

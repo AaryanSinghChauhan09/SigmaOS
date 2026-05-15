@@ -1,3 +1,4 @@
+#include "../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN CAMERA SHARD (v94.0 - ZENITH)
@@ -8,7 +9,7 @@
  * =========================================================================
  */
 
-#include "sigma_camera.h"
+#include "../../include/sigma_camera.h"
 
 void sigma_camera_init(sigma_camera_state_t* cam) {
     sigma_memset(cam, 0, sizeof(*cam));

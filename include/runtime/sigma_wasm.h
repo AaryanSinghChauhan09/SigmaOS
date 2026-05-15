@@ -9,7 +9,7 @@
 #ifndef SIGMA_WASM_H
 #define SIGMA_WASM_H
 
-#include "core/sigma_types.h"
+#include "include/sigma_types.h"
 
 #ifdef __cplusplus
 namespace SigmaOS {

@@ -10,9 +10,9 @@
 #ifndef SIGMA_SDK_H
 #define SIGMA_SDK_H
 
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "include/sigma_types.h"
+#include "../include/sigma_log.h"
+#include "include/SigmaOOP.hpp"
 
 /**
  * @brief Base class for all Sovereign Shards.

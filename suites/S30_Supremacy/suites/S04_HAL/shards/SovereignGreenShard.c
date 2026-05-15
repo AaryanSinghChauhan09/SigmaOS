@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS ZENITH: SOVEREIGN GREEN SUSTAINABILITY (v2.0 — DVFS)
+ * S SIGMAOS ZENITH: SOVEREIGN GREEN SUSTAINABILITY (v2.0  DVFS)
  * =========================================================================
  * Mission: Energy-Efficient Kernel-Level Power Management.
  * Principles: Dynamic Voltage/Frequency Scaling, Thermal Throttling,

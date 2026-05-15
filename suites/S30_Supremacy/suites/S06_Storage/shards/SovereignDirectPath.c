@@ -10,7 +10,7 @@
 // Result: 0-Latency game/asset loading with 0% CPU impact.
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 typedef struct {

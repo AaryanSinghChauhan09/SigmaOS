@@ -1,3 +1,4 @@
+#include "../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN CGROUPS (v1.0 - Industrial Absorbtion: Linux)
@@ -9,7 +10,7 @@
  * =========================================================================
  */
 
-#include "../libc/sigma_libc.h"
+#include "../../include/libc/sigma_libc.h"
 
 typedef struct sigma_cgroup {
     const char* name;

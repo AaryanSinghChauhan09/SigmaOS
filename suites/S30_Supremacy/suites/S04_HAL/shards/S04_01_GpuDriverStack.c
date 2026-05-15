@@ -3,7 +3,7 @@
 // Industrial-Grade Unified GPU Orchestration Shard
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 typedef struct {

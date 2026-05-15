@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN MASKED-AES SHARD (v52.2-SUPREME-MULTIVERSE)

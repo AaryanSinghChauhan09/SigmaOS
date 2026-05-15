@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS OLYMPUS: SOVEREIGN CSO SHARD (v57.9-SUPREME-OLYMPUS)

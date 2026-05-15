@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S02_ZENITHUI — SovereignHolographicCore.c
+ * S SIGMAOS: S02_ZENITHUI  SovereignHolographicCore.c
  * =========================================================================
  * Mission: 3D-First Terminal UI (?? Windows/macOS).
  * Capability: Volumetric windowing, Depth-buffered shaders, Sentient Chroma.

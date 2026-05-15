@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 /*
@@ -10,12 +11,12 @@
  * =========================================================================
  */
 
-#include "SovereignToolHeader.h"
-#include "SovereignPersonalizer.h"
+#include "../../../../../include/SovereignToolHeader.h"
+#include "../../../../../include/SovereignPersonalizer.h"
 
 static void wizard_print_header() {
     sigma_sigma_printf("\n");
-    sigma_sigma_printf("  S SIGMAOS ZENITH SUPREME — SOVEREIGN SETUP WIZARD\n");
+    sigma_sigma_printf("  S SIGMAOS ZENITH SUPREME  SOVEREIGN SETUP WIZARD\n");
     sigma_sigma_printf("  ?????????????????????????????????????????????????\n");
     sigma_sigma_printf("  Welcome, Citizen. Let us personalize your silicon.\n");
     sigma_sigma_printf("\n");

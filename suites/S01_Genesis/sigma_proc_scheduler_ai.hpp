@@ -5,7 +5,7 @@
 #ifndef SIGMA_PROC_SCHEDULER_AI_HPP
 #define SIGMA_PROC_SCHEDULER_AI_HPP
 
-#include "sigma_proc_scheduler.hpp"
+#include "../../include/sigma_proc_scheduler.hpp"
 
 namespace sigma {
 namespace proc {

@@ -1,4 +1,5 @@
-#include "sigma_libc.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/libc/sigma_libc.h"
 
 // SigmaOS Sovereign Ghost (S-GHOST)
 // Philosophy: Tails / Incognito - Pure Anti-Forensics and Amnesic Execution.

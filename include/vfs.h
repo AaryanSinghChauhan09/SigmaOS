@@ -8,7 +8,7 @@
 #ifndef SIGMA_VFS_H
 #define SIGMA_VFS_H
 
-#include "sigma_kernel_types.h"
+#include "../include/core/sigma_kernel_types.h"
 
 typedef struct vfs_node {
     char name[128];

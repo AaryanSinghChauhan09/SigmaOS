@@ -1,7 +1,7 @@
 #ifndef SVG_RENDERER_HPP
 #define SVG_RENDERER_HPP
 
-#include "core/SigmaOOP.hpp"
+#include "include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Graphics {

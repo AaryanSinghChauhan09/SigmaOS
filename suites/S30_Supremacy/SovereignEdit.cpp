@@ -1,15 +1,15 @@
-#include "sigma_log.h"
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
-#include "sigma_types.h"
-#include "sigma_fs.h"
-#include "sigma_zenithui.h"
+#include "../../include/sigma_log.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/core/sigma_types.h"
+#include "../../include/fs/sigma_fs.h"
+#include "../../include/ui/sigma_zenithui.h"
 
 /**
  * SigmaOS Sovereign Editor (v100.0 Zenith)
  * A zero-dependency, bare-metal text orchestration shard.
  *
- * Design: OOP-isolated singleton â€" SovereignEditEngine.
+ * Design: OOP-isolated singleton " SovereignEditEngine.
  */
 
 class SovereignEditEngine {

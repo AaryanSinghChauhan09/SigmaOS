@@ -10,7 +10,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 typedef struct VoiceConfig {
     sigma_u32 sample_rate;

@@ -4,7 +4,7 @@
  * =========================================================================
  */
 
-#include "sigma_libc.h"
+#include "../../../../../../../include/libc/sigma_libc.h"
 
 void* sigma_sigma_memset(void* s, int c, sigma_sz_t n) {
     unsigned char* p = (unsigned char*)s;

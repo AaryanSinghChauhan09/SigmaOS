@@ -1,6 +1,7 @@
-#include "../../../include/SigmaOOP.hpp"
-#include "../../../include/sigma_types.h"
+#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/core/sigma_types.h"
 #include "../../../include/sigma_log.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign IPv6 Shard (S-IPv6)
@@ -24,7 +25,8 @@ public:
 
     void init() {
         sigma_log_info("[S-IPv6] Initializing Sovereign IPv6 Stack...");
-        m_link_local = {{{0xFE, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01}}};
+        sigma_u8 link_local[16] = {0xFE, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
+        sigma_memcpy(m_link_local.addr, link_local, 16);
         sigma_log_info("[S-IPv6] Link-Local Address: fe80::1 (Lattice-Internal)");
     }
 

@@ -1,3 +1,4 @@
+#include "../../../include/SovereignLibC.h"
 /*
  * =============================================================================
  * Σ SIGMAOS: EXCEPTION ROUTING
@@ -10,7 +11,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"
+#include "../../../include/core/sigma_kernel_types.h"
 
 // External scheduler hook to safely terminate a faulting process
 extern void sched_kill_current_task(u32 fault_code);

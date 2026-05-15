@@ -1,7 +1,7 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "hal/sigma_hal.h"
-#include "libc/SovereignLibC.h"
+#include "../include/sigma_log.h"
+#include "include/sigma_types.h"
+#include "include/hal/sigma_hal.h"
+#include "include/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Telemetry UI Engine
@@ -10,7 +10,7 @@
  * USP: Hardware-accelerated, real-time visualization of SovereignNetStack throughput,
  * NUMA node latency, and SovereignVFS replication status at 120fps.
  *
- * Design: OOP-isolated singleton â€" SovereignTelemetryUIEngine.
+ * Design: OOP-isolated singleton " SovereignTelemetryUIEngine.
  */
 
 class SovereignTelemetryUIEngine {

@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS THE_SINGULARITY: SOVEREIGN AGI SHARD (v63.0-SINGULARITY)

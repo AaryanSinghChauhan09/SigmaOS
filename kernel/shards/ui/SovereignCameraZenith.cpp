@@ -1,4 +1,4 @@
-#include "Lattice.h"
+#include "../../../include/Lattice.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN CAMERA ZENITH (v92.1)

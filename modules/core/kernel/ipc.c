@@ -1,4 +1,5 @@
-#include "sigma_libc.h"
+#include "../../../include/SovereignLibC.h"
+#include "../../../include/libc/sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS Sovereign IPC (Inter-Process Communication) v2.0

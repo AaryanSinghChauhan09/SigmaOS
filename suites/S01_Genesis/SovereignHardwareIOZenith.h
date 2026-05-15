@@ -1,8 +1,8 @@
-#include "core/sigma_types.h"
+#include "include/sigma_types.h"
 #ifndef SOVEREIGN_HARDWARE_IO_ZENITH_H
 #define SOVEREIGN_HARDWARE_IO_ZENITH_H
 
-#include "core/SigmaOOP.hpp"
+#include "include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Hardware {

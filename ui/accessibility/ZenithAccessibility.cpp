@@ -4,13 +4,13 @@
  * =========================================================================
  * Mission: Polished accessibility layers for the futuristic Zenith UI.
  * Target : Neutralizes elementary OS requirement for user-friendly elegance.
- * Layer  : L6 â€" Zenith UI / Display Server
+ * Layer  : L6 " Zenith UI / Display Server
  * =========================================================================
  */
 
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "include/sigma_types.h"
+#include "../../include/sigma_log.h"
+#include "include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

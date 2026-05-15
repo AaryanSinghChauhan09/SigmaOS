@@ -1,3 +1,4 @@
+#include "../../include/SovereignLibC.h"
 /*
  * =============================================================================
  * Σ SIGMAOS: AI-OPTIMIZED SCHEDULER (v1.0)
@@ -21,7 +22,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 #include "sigma/sigma_features.h"
 
 /* =========================================================================

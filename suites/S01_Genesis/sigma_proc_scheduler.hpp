@@ -5,7 +5,7 @@
 #ifndef SIGMA_PROC_SCHEDULER_HPP
 #define SIGMA_PROC_SCHEDULER_HPP
 
-#include "sigma_proc_pcb.h"
+#include "../../include/sigma_proc_pcb.h"
 
 namespace sigma {
 namespace proc {

@@ -1,7 +1,7 @@
 #ifndef VIDEO_SHARD_HPP
 #define VIDEO_SHARD_HPP
 
-#include "SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 
 #include "port_shard.hpp"
 

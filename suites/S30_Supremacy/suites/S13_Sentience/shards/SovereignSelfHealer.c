@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S13_SENTIENCE — SovereignSelfHealer.c
+ * S SIGMAOS: S13_SENTIENCE  SovereignSelfHealer.c
  * =========================================================================
  * Implementation of Idea 61.10 (Apex Infinity): Self-Healing Kernel.
  * Real-time integrity verification and restoration of critical kernel pages.
@@ -8,7 +9,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 typedef struct {
     uintptr_t address;

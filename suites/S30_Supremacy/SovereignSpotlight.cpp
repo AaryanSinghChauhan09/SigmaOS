@@ -1,6 +1,6 @@
-#include "sigma_log.h"
-#include "SovereignLibC.h"
-#include "sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/hal/sigma_hal.h"
 #include <thread>
 
 
@@ -8,7 +8,7 @@
  * S-SPOT: Sovereign Spotlight (v100.0 Zenith)
  * Fast, indexed search across the entire lattice.
  *
- * Design: OOP-isolated singleton â€" SovereignSpotlightEngine.
+ * Design: OOP-isolated singleton " SovereignSpotlightEngine.
  */
 
 class SovereignSpotlightEngine {

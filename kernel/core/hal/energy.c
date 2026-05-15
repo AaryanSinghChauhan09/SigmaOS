@@ -5,7 +5,7 @@
  * Principles: Power-Efficient Tasking & Silicon Longevity.
  * =============================================================================
  */
-#include "core/sigma_kernel_types.h"
+#include "../../../include/core/sigma_kernel_types.h"
 
 typedef enum PowerState {
     POWER_PERFORMANCE,

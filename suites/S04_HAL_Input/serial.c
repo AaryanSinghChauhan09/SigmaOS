@@ -5,7 +5,7 @@
  * Principles: Bare-Metal Debugging & Agentic Heartbeats.
  * =============================================================================
  */
-#include "core/sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 #define COM1 0x3F8
 

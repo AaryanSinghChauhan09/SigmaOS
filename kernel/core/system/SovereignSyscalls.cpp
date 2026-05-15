@@ -1,7 +1,7 @@
-#include "../../../include/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 #include "../../../include/sigma_log.h"
-#include "core/SovereignLatticeFS.h"
-#include "core/SovereignNetStack.h"
+#include "../../../include/core/SovereignLatticeFS.h"
+#include "../../../include/core/SovereignNetStack.h"
 
 /**
  * Σ SIGMAOS: SOVEREIGN SYSTEM CALL BRIDGE (S-SYSCALL)

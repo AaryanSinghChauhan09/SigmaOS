@@ -1,8 +1,8 @@
 #ifndef NEUROMORPHIC_SHARD_HPP
 #define NEUROMORPHIC_SHARD_HPP
 
-#include "core/sigma_types.h"
-#include "core/SigmaOOP.hpp"
+#include "include/sigma_types.h"
+#include "include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Drivers {

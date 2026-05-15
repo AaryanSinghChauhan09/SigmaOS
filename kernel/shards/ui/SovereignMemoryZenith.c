@@ -1,4 +1,4 @@
-#include "core/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN MEMORY ZENITH (v100.0 - PURE C11)
@@ -14,7 +14,7 @@
  * =========================================================================
  */
 
-#include "libc/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 /* =========================================================================
  * Memory Segment Descriptor (replaces C++ struct with bool)

@@ -2,9 +2,9 @@
  * SigmaOS: Sovereign Proton (Gaming Compatibility Layer)
  * Layer: L5 - Industrial Ecosystem / Multimedia
  */
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "include/sigma_types.h"
+#include "../../include/sigma_log.h"
+#include "include/SigmaOOP.hpp"
 
 extern "C" void proton_dxvk_init();
 

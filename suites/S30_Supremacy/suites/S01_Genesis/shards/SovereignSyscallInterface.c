@@ -2,7 +2,7 @@
 // Absorbs Linux syscall table + Windows NT Executive + Mach Traps
 // Zero-dependency, hardware-trap-based, C11 pure.
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 #define SIGMA_SYSCALL_MAX   512
 

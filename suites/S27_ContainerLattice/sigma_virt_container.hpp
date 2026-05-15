@@ -6,8 +6,8 @@
 #ifndef SIGMA_VIRT_CONTAINER_HPP
 #define SIGMA_VIRT_CONTAINER_HPP
 
-#include "sigma_cgroup.h"
-#include "../S43_SovereignCaps/sigma_caps.h"
+#include "../../include/sigma_cgroup.h"
+#include "../../include/S43_SovereignCaps/sigma_caps.h"
 
 namespace sigma {
 namespace virt {

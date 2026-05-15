@@ -1,7 +1,7 @@
-#include "SigmaOOP.hpp"
-#include "sigma_log.h"
-#include "sigma_libc.h"
-#include "sigma_log.h"
+#include "../../include/core/SigmaOOP.hpp"
+#include "../../include/sigma_log.h"
+#include "../../include/libc/sigma_libc.h"
+#include "../../include/sigma_log.h"
 
 namespace SigmaOS {
 

@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /**
  * @file SovereignNix_Immutable.c
  * @brief Phase 66: NixOS Absorption Shard (Immutable State).

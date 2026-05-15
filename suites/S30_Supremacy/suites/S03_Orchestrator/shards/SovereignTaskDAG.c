@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: S03_ORCHESTRATOR — SovereignTaskDAG.c
@@ -8,7 +9,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 #define MAX_TASKS 64
 #define MAX_DEPS  8

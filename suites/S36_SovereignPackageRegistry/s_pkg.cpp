@@ -1,9 +1,9 @@
-﻿#include "../S01_Genesis/sigma_libc.h"
-#include "sigma_log.h"
-#include "DependencyGraph.hpp"
-#include "CryptoSignatures.hpp"
-#include "DeltaPatcher.hpp"
-#include "../S47_DistroAssimilator/SpkgTranslator.hpp"
+﻿#include "../../include/libc/sigma_libc.h"
+#include "../../include/sigma_log.h"
+#include "../../include/DependencyGraph.hpp"
+#include "../../include/CryptoSignatures.hpp"
+#include "../../include/DeltaPatcher.hpp"
+#include "../../include/S47_DistroAssimilator/SpkgTranslator.hpp"
 #include <stdint.h>
 
 namespace SigmaOS {

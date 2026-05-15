@@ -6,8 +6,8 @@
 #ifndef SIGMA_NET_DRIVER_ETHERNET_HPP
 #define SIGMA_NET_DRIVER_ETHERNET_HPP
 
-#include "sigma_libc.h"
-#include "../../sigmaos/core/src/atomic_sigma_oop_base.hpp"
+#include "../../include/libc/sigma_libc.h"
+#include "../../include/atomic_sigma_oop_base.hpp"
 
 namespace sigma {
 namespace net {

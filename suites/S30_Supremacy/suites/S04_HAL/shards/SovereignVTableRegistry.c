@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN VTABLE REGISTRY (v1.0)
@@ -6,7 +7,7 @@
  * Principle: Encapsulation, Inheritance (Composition), Dynamic Dispatch.
  *
  * Design:
- *   Every hardware driver and subsystem module registers a "vtable" —
+ *   Every hardware driver and subsystem module registers a "vtable" 
  *   a struct of function pointers that implements a common interface.
  *   The kernel dispatches calls through vtable->method(), achieving
  *   runtime polymorphism without C++ overhead.
@@ -50,7 +51,7 @@ static sigma_u32 s_object_count = 0;
 /**
  * sigma_vtable_register: Seats a new polymorphic object in the global pool.
  *
- * OOP Principle: This is the "constructor" —
+ * OOP Principle: This is the "constructor" 
  * it binds a concrete vtable to an opaque instance.
  */
 sigma_err_t sigma_vtable_register(const char* name,
@@ -72,7 +73,7 @@ sigma_err_t sigma_vtable_register(const char* name,
 /**
  * sigma_vtable_dispatch_read: Unified read through dynamic dispatch.
  *
- * OOP Principle: The caller doesn't know the concrete type —
+ * OOP Principle: The caller doesn't know the concrete type 
  * it calls through the vtable, achieving runtime polymorphism.
  */
 sigma_err_t sigma_vtable_dispatch_read(const char* name,

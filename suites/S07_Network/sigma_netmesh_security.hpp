@@ -5,7 +5,7 @@
 #ifndef SIGMA_NETMESH_SECURITY_HPP
 #define SIGMA_NETMESH_SECURITY_HPP
 
-#include "../S08_Security/sigma_caps.h"
+#include "../../include/S08_Security/sigma_caps.h"
 
 namespace sigma {
 namespace netmesh {

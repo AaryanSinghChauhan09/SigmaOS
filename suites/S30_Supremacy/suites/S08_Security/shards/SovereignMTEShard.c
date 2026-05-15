@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ABSOLUTE_FINALITY: SOVEREIGN MTE SHARD (v59.2-ABSOLUTE)

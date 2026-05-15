@@ -9,9 +9,9 @@
  * =========================================================================
  */
 
-#include "SovereignLibC.h"
-#include "SovereignLibC.h"   /* C11 scheduler/cloud/ui/net structs */
-#include "SovereignPersona.h"     /* C11 Persona/Dashboard structs */
+#include "../include/libc/SovereignLibC.h"
+#include "../include/libc/SovereignLibC.h"   /* C11 scheduler/cloud/ui/net structs */
+#include "../include/SovereignPersona.h"     /* C11 Persona/Dashboard structs */
 
 /* =========================================================================
  * Command dispatch table entry (replaces C++ if-else chain with data table)

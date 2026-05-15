@@ -1,7 +1,7 @@
-#include "../../../include/sigma_types.h"
-#include "hal/sigma_hal.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/hal/sigma_hal.h"
 #include "../../../include/sigma_log.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Diagnostics (SovereignDiag)
@@ -34,7 +34,7 @@ void SovereignDiagEngine::performScan() {
 
 void SovereignDiagEngine::reportAnomaly(ShardID shard_id, AnomalyDesc description) {
     (void)shard_id; (void)description;
-    sigma_log_err("[DIAG] [CRITICAL] Shard anomaly detected â€" triggering self-heal.");
+    sigma_log_err("[DIAG] [CRITICAL] Shard anomaly detected " triggering self-heal.");
     m_fault_count++;
 }
 

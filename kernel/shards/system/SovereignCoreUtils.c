@@ -1,4 +1,4 @@
-#include "core/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN CORE UTILS (v100.0 - PURE C11)
@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "libc/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 /* =========================================================================
  * Sovereign Hex Dump (replaces C++ class utility)

@@ -13,7 +13,7 @@
 //   • Native DSP Engine: kernel-level 32-band EQ and Dynamics
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 #define AUDIO_MAX_CHANNELS  64

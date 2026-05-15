@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN SEMANTIC SEARCH (v51.1-SINGULARITY-NEXUS)

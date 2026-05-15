@@ -1,4 +1,4 @@
-#include "core/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN DIAGNOSTICS ZENITH (v100.0 - PURE C11)
@@ -12,9 +12,9 @@
  */
 
 <<<<<<<< HEAD:suites/S30_Supremacy/sigma_diag.c
-#include "sigma_libc.h"
+#include "../../../include/libc/sigma_libc.h"
 ========
-#include "libc/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 >>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/ui/SovereignDiagnosticsZenith.c
 
 /* =========================================================================

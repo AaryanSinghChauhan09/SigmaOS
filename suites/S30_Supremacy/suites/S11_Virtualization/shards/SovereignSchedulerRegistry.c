@@ -1,8 +1,9 @@
+#include "../../../../../include/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "SovereignScheduler.h"
-#include "sigma_libc.h"
-#include "sigma_string.h"
+#include "../../../../../include/sched/SovereignScheduler.h"
+#include "../../../../../include/libc/sigma_libc.h"
+#include "../../../../../include/sigma_string.h"
 
 #define MAX_SCHED_SHARDS 4
 static sovereign_scheduler_shard_t g_sched_shards[MAX_SCHED_SHARDS];

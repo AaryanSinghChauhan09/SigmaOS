@@ -1,3 +1,4 @@
+#include "../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN SHARD REGISTRY (v94.0 ZENITH SUPREME)
@@ -7,7 +8,7 @@
  * =========================================================================
  */
 
-#include "../libc/sigma_libc.h"
+#include "../../include/libc/sigma_libc.h"
 
 #define MAX_SHARDS 1024
 

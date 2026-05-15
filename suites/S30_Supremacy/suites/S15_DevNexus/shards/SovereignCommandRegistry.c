@@ -1,8 +1,9 @@
+#include "../../../../../include/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "SovereignCommand.h"
-#include "sigma_libc.h"
-#include "sigma_string.h"
+#include "../../../../../include/SovereignCommand.h"
+#include "../../../../../include/libc/sigma_libc.h"
+#include "../../../../../include/sigma_string.h"
 
 #define MAX_COMMAND_SHARDS 64
 static sovereign_command_shard_t g_cmd_shards[MAX_COMMAND_SHARDS];

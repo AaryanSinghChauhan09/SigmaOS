@@ -1,6 +1,6 @@
-﻿#include "sigma_log.h"
-#include "Lattice.h"
-#include "libc/SovereignLibC.h"
+﻿#include "../../../include/sigma_log.h"
+#include "../../../include/Lattice.h"
+#include "../../../include/libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -10,8 +10,8 @@
  * =========================================================================
  */
 
-#include "SigmaOOP.hpp"
-#include "../libc/SovereignLibC.h"
+#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/libc/SovereignLibC.h"
 
 /**
  * Î£ SIGMA OS: SOVEREIGN SHARD KERNEL (v128.0 - KERNEL ZENITH)

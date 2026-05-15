@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN MICRO-HYPERVISOR (v51.6-SUPREME-SINGULARITY)

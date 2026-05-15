@@ -1,7 +1,7 @@
 #ifndef SIGMA_VIRTIO_H
 #define SIGMA_VIRTIO_H
 
-#include "core/sigma_types.h"
+#include "include/sigma_types.h"
 
 #ifdef __cplusplus
 namespace SigmaOS {

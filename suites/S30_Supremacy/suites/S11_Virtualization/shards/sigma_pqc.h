@@ -2,18 +2,18 @@
  * =========================================================================
  * S SIGMAOS kernel/suites/S11_Virtualization/shards/sigma_pqc.h
  * =========================================================================
- * Post-Quantum Cryptography Suite — gap-closes:
+ * Post-Quantum Cryptography Suite  gap-closes:
  *   OpenSSL : RSA/ECC/AES (now quantum-vulnerable)
  *   BoringSSL: CECPQ2 hybrid key exchange
  *   NSS     : NIST PQC Round 3 draft support
  *   wolfSSL : ML-KEM/ML-DSA early integration
  * =========================================================================
  * Implements NIST-selected PQC standards (FIPS 203/204/205):
- *   • ML-KEM   (Module Lattice Key Encapsulation — Kyber)
- *   • ML-DSA   (Module Lattice Digital Signature  — Dilithium)
- *   • SLH-DSA  (Stateless Hash-Based Signature    — SPHINCS+)
- *   • AES-256-GCM (symmetric layer, quantum-safe for 256-bit keys)
- *   • BLAKE3   (hash, used as PRF/KDF backbone)
+ *    ML-KEM   (Module Lattice Key Encapsulation  Kyber)
+ *    ML-DSA   (Module Lattice Digital Signature   Dilithium)
+ *    SLH-DSA  (Stateless Hash-Based Signature     SPHINCS+)
+ *    AES-256-GCM (symmetric layer, quantum-safe for 256-bit keys)
+ *    BLAKE3   (hash, used as PRF/KDF backbone)
  * All implementations are pure C11, constant-time where noted.
  * =========================================================================
  */

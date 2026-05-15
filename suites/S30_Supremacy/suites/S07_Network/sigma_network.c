@@ -1,4 +1,5 @@
-#include "sigma_proto.h"
+#include "../../../../include/SovereignLibC.h"
+#include "../../../../include/sigma_proto.h"
 #include "suites/S01_Genesis/shards/sigma_libc.h"
 #include "suites/S01_Genesis/shards/sigma_libc.h"
 

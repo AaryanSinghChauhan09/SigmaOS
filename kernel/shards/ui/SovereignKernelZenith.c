@@ -1,4 +1,4 @@
-#include "core/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN KERNEL ZENITH (v1.0 - PERFORMANCE ENGINE)
@@ -8,7 +8,7 @@
  * =========================================================================
  */
 
-#include "libc/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 /* --- External Rust Kernel Pulse --- */
 extern void sovereign_kernel_initial_pulse(void);

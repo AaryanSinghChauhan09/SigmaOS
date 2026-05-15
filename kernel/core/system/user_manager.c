@@ -1,4 +1,5 @@
-#include "core/sigma_types.h"
+#include "../../../include/SovereignLibC.h"
+#include "../../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-USER-MANAGER (v1.0 - IDENTITY SHARDING)
@@ -12,7 +13,7 @@
  * =============================================================================
  */
 
-#include "core/sigma_kernel_types.h"
+#include "../../../include/core/sigma_kernel_types.h"
 
 #define MAX_SOVEREIGN_USERS 8
 

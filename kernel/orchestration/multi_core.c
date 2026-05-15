@@ -5,7 +5,7 @@
  * Principles: CPU-Local State (GS-Base) & Scalable Sharding.
  * =============================================================================
  */
-#include "sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 typedef struct CPU {
     sigma_u32     id;

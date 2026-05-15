@@ -1,9 +1,9 @@
-#include "sigma_hal.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/sigma_types.h"
-#include "../../../include/sigma_log.h"
-#include "sigma_time.h"
-#include "../../../include/sigma_log.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/sigma_time.h"
+#include "../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Time Engine (v28.0 Zenith)

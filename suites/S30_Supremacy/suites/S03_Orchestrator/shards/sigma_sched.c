@@ -1,11 +1,12 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S03_Orchestrator/shards/sigma_sched.c
  * =========================================================================
  */
 
-#include "sigma_sched.h"
-#include "sigma_libc.h"
+#include "../../../../../include/sigma_sched.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 static sigma_runqueue_t s_rqs[SIGMA_MAX_CPUS];
 static sc_u32           s_num_cpus = 0;

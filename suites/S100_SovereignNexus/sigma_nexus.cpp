@@ -1,6 +1,6 @@
-#include "sigma_libc.h"
-#include "sigma_kernel_types.h"
-#include "sigma_cap_manager.h"
+#include "../../include/libc/sigma_libc.h"
+#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_cap_manager.h"
 
 // Î£ SIGMAOS: SOVEREIGN NEXUS ENTERPRISE SUITE (S100)
 // Responsibility: Integrated Productivity, ERP, and Cloud Infrastructure.
@@ -17,32 +17,32 @@ class SovereignNexus {
 public:
     void handle_office_intent(const char* doc_type) {
         sigma_print("[Nexus] Initializing Sovereign Office (%s)...\n", doc_type);
-        sigma_print("[âœ"] Collaborative Shard-Locking ACTIVE (Microsoft/Google style).\n");
-        sigma_print("[âœ"] ODF/OOXML Compatibility Layer Online.\n");
+        sigma_print("["] Collaborative Shard-Locking ACTIVE (Microsoft/Google style).\n");
+        sigma_print("["] ODF/OOXML Compatibility Layer Online.\n");
     }
 
     void handle_erp_intent(const char* module) {
         sigma_print("[Nexus] Launching Sovereign ERP Module: %s\n", module);
-        sigma_print("[âœ"] Odoo-style Modular Shard Integration ACTIVE.\n");
-        sigma_print("[âœ"] Oracle-grade ACID-compliant Lattice DB: Verified.\n");
+        sigma_print("["] Odoo-style Modular Shard Integration ACTIVE.\n");
+        sigma_print("["] Oracle-grade ACID-compliant Lattice DB: Verified.\n");
     }
 
     void handle_bi_intent(const char* tool) {
         sigma_print("[Nexus] Initializing Sovereign BI (%s)...\n", tool);
-        sigma_print("[âœ"] PowerBI/Tableau-grade Data Visualization Online.\n");
-        sigma_print("[âœ"] Predictive Analytics Engine (S09): Synchronized.\n");
+        sigma_print("["] PowerBI/Tableau-grade Data Visualization Online.\n");
+        sigma_print("["] Predictive Analytics Engine (S09): Synchronized.\n");
     }
 
     void handle_creative_intent(const char* suite) {
         sigma_print("[Nexus] Deploying Sovereign Creative Suite: %s\n", suite);
-        sigma_print("[âœ"] Apple Pro/Adobe-grade Media Processing: ACTIVE.\n");
-        sigma_print("[âœ"] GPU-Accelerated Morphic Rendering: 120Hz.\n");
+        sigma_print("["] Apple Pro/Adobe-grade Media Processing: ACTIVE.\n");
+        sigma_print("["] GPU-Accelerated Morphic Rendering: 120Hz.\n");
     }
 
     void handle_crm_intent(const char* service) {
         sigma_print("[Nexus] Initializing Sovereign CRM+: %s\n", service);
-        sigma_print("[âœ"] Salesforce/Zoho-grade Lead Scoring: ONLINE.\n");
-        sigma_print("[âœ"] Bitrix24-style Unified Communication: ACTIVE.\n");
+        sigma_print("["] Salesforce/Zoho-grade Lead Scoring: ONLINE.\n");
+        sigma_print("["] Bitrix24-style Unified Communication: ACTIVE.\n");
     }
 };
 

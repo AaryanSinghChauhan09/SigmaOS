@@ -1,8 +1,8 @@
-#include "sigma_log.h"
-#include "libc/SovereignLibC.h"
-#include "hal/sigma_hal.h"
-#include "core/sigma_types.h"
-#include "ui/sigma_zenithui.h"
+#include "../include/sigma_log.h"
+#include "include/SovereignLibC.h"
+#include "include/hal/sigma_hal.h"
+#include "include/sigma_types.h"
+#include "../include/ui/sigma_zenithui.h"
 
 /**
  * SigmaOS Sovereign Zenith UI Compositor Implementation
@@ -10,7 +10,7 @@
  * ZERO-DEPENDENCY: Direct framebuffer manipulation; no external GPU libraries.
  * Competitor parity: Windows DWM, macOS WindowServer, Wayland.
  *
- * Design: OOP-isolated singleton â€" SovereignZenithEngine.
+ * Design: OOP-isolated singleton " SovereignZenithEngine.
  *         Morphic glassmorphism and depth shadows at the kernel level.
  */
 

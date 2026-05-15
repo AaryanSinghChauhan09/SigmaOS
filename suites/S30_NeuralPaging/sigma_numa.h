@@ -7,8 +7,8 @@
 #ifndef SIGMA_NUMA_H
 #define SIGMA_NUMA_H
 
-#include "sigma_slab_alloc.h"
-#include "sigma_spinlock.h"
+#include "../../include/sigma_slab_alloc.h"
+#include "../../include/sigma_spinlock.h"
 
 #define SIGMA_NUMA_MAX_NODES  8
 #define SIGMA_NUMA_SLAB_BLOCKS 2048

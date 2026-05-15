@@ -1,10 +1,10 @@
-#include "hal/sigma_hal.h"
+#include "../../../include/hal/sigma_hal.h"
 #ifndef UNIT_TESTS_SHARD_HPP
 #define UNIT_TESTS_SHARD_HPP
 
-#include "libc/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
-#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

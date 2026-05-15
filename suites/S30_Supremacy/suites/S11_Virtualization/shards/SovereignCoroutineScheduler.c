@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S11_VIRTUALIZATION — SovereignCoroutineScheduler.c
+ * S SIGMAOS: S11_VIRTUALIZATION  SovereignCoroutineScheduler.c
  * =========================================================================
  * Implementation of Idea 95 (Apex Infinity): Ultra-lightweight co-routines.
  * Uses setjmp/longjmp for stack-less task switching within a shard.

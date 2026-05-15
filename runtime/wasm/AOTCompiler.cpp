@@ -1,9 +1,9 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "sigma_log.h"
+#include "../../include/core/sigma_types.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
 
 /**
- * SovereignAOT Compiler â€" Ahead-of-Time WASM-to-Native Translator
+ * SovereignAOT Compiler " Ahead-of-Time WASM-to-Native Translator
  * Compiles WASM shard bytecode to native x86_64 at load-time.
  * Zero runtime overhead: all JIT is eliminated at the entry gate.
  */

@@ -1,9 +1,10 @@
+#include "../../../../../include/SovereignLibC.h"
 /**
  * @file SovereignPersonalization.c
  * @brief Phase 60: Deep Personalization & Configuration Shard.
  */
 
-#include "sigma_libc.h"
+#include "../../../../../include/libc/sigma_libc.h"
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 void Sovereign_Apply_Personalization(const char* config_path) {

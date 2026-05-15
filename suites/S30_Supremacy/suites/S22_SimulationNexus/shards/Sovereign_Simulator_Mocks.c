@@ -1,10 +1,11 @@
+#include "../../../../../include/SovereignLibC.h"
 /**
  * @file Sovereign_Simulator_Mocks.c
  * @brief Zero-Dependency Simulation Mocks.
  */
 
-#include "sigma_libc.h"
-#include "sigma_string.h"
+#include "../../../../../include/libc/sigma_libc.h"
+#include "../../../../../include/sigma_string.h"
 
 /* Redirecting simulate.c mocks to Sovereign Atoms */
 void sigma_printf_sim(const char* format, ...) {

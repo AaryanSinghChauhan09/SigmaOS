@@ -1,6 +1,6 @@
-#include "core/SovereignDriverFramework.h"
+#include "../../../include/core/SovereignDriverFramework.h"
 #include "../../../include/sigma_log.h"
-#include "libc/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {

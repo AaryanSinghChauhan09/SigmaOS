@@ -2,7 +2,7 @@
  * =========================================================================
  * S SIGMAOS kernel/suites/S15_DevNexus/shards/sigma_raft.h
  * =========================================================================
- * Sovereign Distributed Consensus — gap-closes:
+ * Sovereign Distributed Consensus  gap-closes:
  *   etcd    : Raft consensus, leader election, log replication
  *   ZooKeeper: ZAB protocol, ephemeral nodes, watches
  *   Consul  : gossip (SWIM), service discovery, health checks

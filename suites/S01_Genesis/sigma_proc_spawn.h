@@ -5,8 +5,8 @@
 #ifndef SIGMA_PROC_SPAWN_H
 #define SIGMA_PROC_SPAWN_H
 
-#include "sigma_proc_pcb.h"
-#include "sigma_vmm.h"
+#include "../../include/sigma_proc_pcb.h"
+#include "../../include/hal/sigma_vmm.h"
 
 typedef struct SigmaSpawnResult {
     unsigned long pid;

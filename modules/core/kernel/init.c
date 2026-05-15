@@ -1,4 +1,4 @@
-#include "sigma_libc.h"
+#include "../../../include/libc/sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS Core Modular Initialization Implementation

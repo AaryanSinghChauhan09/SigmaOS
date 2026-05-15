@@ -1,4 +1,4 @@
-#include "core/sigma_types.h"
+#include "../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN AUTOMATION SHARD (v7.0 - INDUSTRIAL FINALITY)
@@ -13,10 +13,10 @@
  */
 
 <<<<<<<< HEAD:suites/S03_Orchestrator/automation_shard.c
-#include "sigma_kernel_types.h"
-#include "sigma_libc.h"
+#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/libc/sigma_libc.h"
 ========
-#include "libc/SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 >>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/ai/automation_shard.c
 
 #define AUTOMATION_TICK_THRESHOLD 60000 // Every 60s @ 1kHz

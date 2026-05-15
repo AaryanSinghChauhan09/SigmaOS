@@ -12,11 +12,11 @@
  */
 
 <<<<<<< HEAD:suites/S30_Supremacy/suites/S04_HAL/shards/paging.c
-#include "sigma_libc.h"
+#include "../../../../../include/libc/sigma_libc.h"
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 =======
-#include "SovereignLibC.h"
-#include "sigma_types.h"
+#include "../../../../../include/libc/SovereignLibC.h"
+#include "../../../../../include/core/sigma_types.h"
 >>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:arch/x86_64/paging.c
 
 #define PAGE_SIZE 4096

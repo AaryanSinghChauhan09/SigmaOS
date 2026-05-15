@@ -1,7 +1,7 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "Lattice.h"
-#include "libc/SovereignLibC.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/Lattice.h"
+#include "../../../include/libc/SovereignLibC.h"
 /* =========================================================================
  * S SIGMAOS: COLONIZATION SHARD (v1.0 - SOVEREIGN EXPANSION)
  * =========================================================================
@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "core/SigmaOOP.hpp"
+#include "../../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Expansion {

@@ -1,4 +1,5 @@
-#include "sigma_libc.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/libc/sigma_libc.h"
 
 // SigmaOS Sovereign Harden (S-HARDEN)
 // Philosophy: OpenBSD Style - Proactive Security Auditing and Automated Patching.

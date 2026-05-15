@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SENTINEL GUARDIAN (v1.0)

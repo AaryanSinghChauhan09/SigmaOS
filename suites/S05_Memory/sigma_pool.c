@@ -1,3 +1,4 @@
+#include "../../include/SovereignLibC.h"
 /*
  * =============================================================================
  * Σ SIGMAOS: PER-MODULE MEMORY POOL DELEGATION (v1.0)
@@ -16,7 +17,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 #include "sigma/sigma_features.h"
 
 #if SIGMA_FEATURE_SLAB_POOLS

@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 
 /* =========================================================================
  * Personality Mode (replaces C++ enum class)

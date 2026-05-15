@@ -1,4 +1,5 @@
-#include "../sigma_libc.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/libc/sigma_libc.h"
 
 // SigmaOS Sovereign Bio-Link (S-BIOLINK)
 // Philosophy: Total Synergy - Integration of Biological Telemetry with the Lattice Scheduler.

@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_DESKTOP_ZENITH_H
 #define SOVEREIGN_DESKTOP_ZENITH_H
 
-#include "SigmaC11.h"
+#include "../../include/SigmaC11.h"
 
 namespace SigmaOS {
 namespace Desktop {

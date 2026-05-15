@@ -1,7 +1,8 @@
+#include "../../../../../include/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 #include "suites/S20_Interconnect/shards/SovereignInterconnect.h"
 
-#include "SovereignPMM.h"
+#include "../../../../../include/SovereignPMM.h"
 
 static sigma_u64 s_frame_bitmap[FRAME_BITMAP_WORDS]; /* 1=free, 0=used */
 static sigma_u32 s_free_frames = (sigma_u32)TOTAL_FRAMES;
@@ -56,8 +57,8 @@ sigma_u32 pmm_get_free_count(void) {
     return s_free_frames;
 }
 
-#include "SovereignVMA.h"
-#include "SovereignAddrSpace.h"
+#include "../../../../../include/SovereignVMA.h"
+#include "../../../../../include/SovereignAddrSpace.h"
 
 SigmaVMA_t *vma_find(SigmaAddressSpace_t *as, sigma_u64 addr) {
     if (!as) return SIGMA_NULL;
@@ -78,7 +79,7 @@ SigmaVMA_t *vma_insert(SigmaAddressSpace_t *as,
     return v;
 }
 
-#include "SovereignAddrSpace.h"
+#include "../../../../../include/SovereignAddrSpace.h"
 
 #define SHADOW_POOL_SIZE  (MAX_PROCESSES * 256)  /* 256 entries per process */
 static SigmaPageEntry_t s_shadow_pool[SHADOW_POOL_SIZE];

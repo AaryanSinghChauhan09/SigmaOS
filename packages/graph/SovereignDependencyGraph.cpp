@@ -3,13 +3,13 @@
  * Î£ SIGMAOS: UNIVERSAL PACKAGE DEPENDENCY GRAPH (PKG-005)
  * =========================================================================
  * Mission: Enforces a unified dependency graph across Pacman, Flatpak, and Nix.
- * Layer  : L5 â€" Industrial Ecosystem
+ * Layer  : L5 " Industrial Ecosystem
  * =========================================================================
  */
 
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "include/sigma_types.h"
+#include "../../include/sigma_log.h"
+#include "include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

@@ -1,4 +1,5 @@
-#include "../sigma_libc.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/libc/sigma_libc.h"
 
 // SigmaOS Sovereign Amnesia (S-AMNESIA)
 // Philosophy: Anti-Forensics - Zero-Trace Execution and Immediate State Erasure.

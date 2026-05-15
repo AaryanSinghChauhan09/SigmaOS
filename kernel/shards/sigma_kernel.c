@@ -19,7 +19,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 /* =========================================================================
  * Multiboot2 Info (minimal â€ only what we need to read memory map)

@@ -1,4 +1,4 @@
-#include "core/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: LOCK-FREE INPUT QUEUE (v1.0)
@@ -6,7 +6,7 @@
  * Principles: Zero-Latency Interrupt Handling & Atomic Synchronization.
  * =============================================================================
  */
-#include "core/sigma_kernel_types.h"
+#include "../../../include/core/sigma_kernel_types.h"
 
 #define KBD_QUEUE_SIZE 256
 

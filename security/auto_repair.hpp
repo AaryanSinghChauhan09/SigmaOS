@@ -1,10 +1,10 @@
-#include "hal/sigma_hal.h"
+#include "include/hal/sigma_hal.h"
 #ifndef AUTO_REPAIR_HPP
 #define AUTO_REPAIR_HPP
 
-#include "libc/SovereignLibC.h"
+#include "include/SovereignLibC.h"
 
-#include "core/SigmaOOP.hpp"
+#include "include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Security {

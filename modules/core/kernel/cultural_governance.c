@@ -1,4 +1,4 @@
-#include "sigma_libc.h"
+#include "../../../include/libc/sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS Cosmic Cultural Governance (Phase 19) — Track B

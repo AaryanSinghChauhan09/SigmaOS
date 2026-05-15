@@ -1,4 +1,4 @@
-#include "sigma_neural_opt.h"
+#include "../../include/sigma_neural_opt.h"
 
 // Simple LCG for pseudo-random exploration (zero-dependency)
 static uint32_t sigma_rand_seed = 123456789;

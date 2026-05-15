@@ -1,9 +1,9 @@
-#include "../../../include/sigma_types.h"
+#include "../../include/core/sigma_types.h"
 
-#include "sigma_omnisense.h"
-#include "sigma_hal.h"
-#include "sigma_universal_ui.h"
-#include "sigma_energysched.h"
+#include "../../include/sigma_omnisense.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_universal_ui.h"
+#include "../../include/sigma_energysched.h"
 
 /**
  * SigmaOS Sovereign Omni-Sense Hub

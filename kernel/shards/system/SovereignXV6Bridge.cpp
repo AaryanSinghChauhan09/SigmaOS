@@ -1,6 +1,6 @@
-#include "sigma_log.h"
-#include "Lattice.h"
-#include "libc/SovereignLibC.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/Lattice.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace XV6Parity {

@@ -1,4 +1,5 @@
-#include "sigma_libc.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/libc/sigma_libc.h"
 
 // SigmaOS Lattice Block (S-BLOCK)
 // Philosophy: Stands AdBlocker / Pie - Global Kernel-Level Ad and Tracker Eradication.

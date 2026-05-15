@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS NEBULA: SOVEREIGN SMM SHARD (v57.3-SUPREME-NEBULA)

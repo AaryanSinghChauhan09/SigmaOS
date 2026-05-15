@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 /*
@@ -9,8 +10,8 @@
  * =========================================================================
  */
 
-#include "SovereignToolHeader.h"
-#include "sigma_libc.h"
+#include "../../../../../include/SovereignToolHeader.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 void SovereignBench_SyscallLatency(void) {
     sigma_sigma_printf("S [BENCH]: Measuring SIGMA_NULL-Syscall Latency (getpid dummy)...\n");

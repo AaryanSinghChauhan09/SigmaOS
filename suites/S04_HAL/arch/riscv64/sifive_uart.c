@@ -9,7 +9,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"
+#include "../../../../include/core/sigma_kernel_types.h"
 #include "sigma/hal_contract.h"
 
 #ifdef SIGMA_ARCH_RISCV64

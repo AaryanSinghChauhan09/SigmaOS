@@ -1,6 +1,6 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "Lattice.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/Lattice.h"
 /*
  * =========================================================================
  * S SIGMAOS: MORPHIC UI DESIGNER (v1.0 - INDUSTRIAL SHARD)
@@ -10,8 +10,8 @@
  * =========================================================================
  */
 
-#include "core/SigmaOOP.hpp"
-#include "libc/SovereignLibC.h"
+#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Design {

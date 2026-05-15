@@ -1,11 +1,12 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN BIOSPHERE (Suite S23)
  * =========================================================================
  */
 
-#include "sigma_biosphere.h"
-#include "sigma_libc.h"
+#include "../../../../../include/sigma_biosphere.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 static sigma_u32 s_jailed_count = 0;
 

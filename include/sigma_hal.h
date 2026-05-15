@@ -6,10 +6,8 @@
  * =========================================================================
  */
 
-#ifndef SIGMA_HAL_H
-#define SIGMA_HAL_H
-
-#include "sigma_types.h"
+#include "../include/core/sigma_types.h"
+#include "../include/libc/SovereignLibC.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,8 +18,12 @@ void hal_init(void);
 void hal_shutdown(void);
 
 /* --- Industrial Logging --- */
-void sigma_log(const char* msg);
-void sigma_printf(const char* format, ...);
+void sigma_hal_log(const char* msg);
+/* sigma_printf is declared in SovereignLibC.h — included above */
+/* sigma_log backward-compat alias */
+#ifndef sigma_log
+#define sigma_log(msg) sigma_hal_log(msg)
+#endif
 
 /* --- CPU Control --- */
 static inline void cpu_pause(void) {

@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 
 /* =========================================================================
  * Sovereign AI Kernel State (struct replaces C++ class)

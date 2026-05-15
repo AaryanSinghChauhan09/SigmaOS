@@ -3,13 +3,13 @@
  * Î£ SIGMAOS: SOVEREIGN DIRECT GPU (Bare-Metal Shard)
  * =========================================================================
  * Mission: Implements GAM-003 (Direct hardware access for Gaming/AI).
- * Layer  : L1 â€" Kernel Primitives / Drivers
+ * Layer  : L1 " Kernel Primitives / Drivers
  * =========================================================================
  */
 
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "include/sigma_types.h"
+#include "../include/sigma_log.h"
+#include "include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

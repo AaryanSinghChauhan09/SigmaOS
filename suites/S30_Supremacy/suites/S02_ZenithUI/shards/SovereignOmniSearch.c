@@ -11,7 +11,7 @@
 //         cognitive prediction from your own Digital Twin.
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 #define MAX_SEARCH_RESULTS 256

@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S15_DEVNEXUS — SovereignCompiler_Frontend.c
+ * S SIGMAOS: S15_DEVNEXUS  SovereignCompiler_Frontend.c
  * =========================================================================
  * Implementation of Idea 48.1 (Apex Infinity): SigmaCC Compiler Frontend.
  * Hand-coded lexer and tokenizer for native SigmaOS self-hosting.
@@ -8,8 +9,8 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "sigma_types.h"
-#include "sigma_libc.h"
+#include "../../../../../include/core/sigma_types.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 typedef enum {
     TOK_KEYWORD, TOK_IDENTIFIER, TOK_NUMBER, TOK_OPERATOR, TOK_EOF

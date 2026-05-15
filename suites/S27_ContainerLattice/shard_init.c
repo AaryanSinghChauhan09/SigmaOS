@@ -1,4 +1,5 @@
-#include "sigma_libc.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/libc/sigma_libc.h"
 
 // SigmaOS Container Lattice (S-CONTAINER)
 // Philosophy: CoreOS / RancherOS - Container-Native Shard Isolation.

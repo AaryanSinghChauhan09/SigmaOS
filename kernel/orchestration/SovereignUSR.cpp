@@ -1,7 +1,7 @@
-#include "sigma_hal.h"
-#include "sigma_log.h"
-#include "sigma_usr.h"
-#include "sigma_log.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "../../include/sigma_usr.h"
+#include "../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Unified Shard Registry (USR)

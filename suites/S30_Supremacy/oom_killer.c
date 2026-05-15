@@ -1,4 +1,5 @@
-#include "core/sigma_types.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-OOM-KILLER (v1.0 - INDUSTRIAL DISCIPLINE)
@@ -12,7 +13,7 @@
  * =============================================================================
  */
 
-#include "core/sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 typedef struct OOMMaster {
     sigma_u32 total_pills;

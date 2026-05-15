@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/sigma_main.c
@@ -8,7 +9,7 @@
  * =========================================================================
  */
 
-#include "sigma_libc.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 /* Suite headers */
 #include "kernel/suites/S01_Genesis/shards/sigma_syscall_table.h"

@@ -1,4 +1,4 @@
-#include "Web3Persistence.hpp"
+#include "../../include/Web3Persistence.hpp"
 
 namespace SigmaOS {
 namespace CLI {

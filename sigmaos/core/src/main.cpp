@@ -1,5 +1,5 @@
-#include "sigma_core.h"
-#include "sigma_libc.h"
+#include "../../../include/sigma_core.h"
+#include "../../../include/libc/sigma_libc.h"
 
 extern "C" int main(int argc, char** argv) {
     sigma_kprint("========================================\n");

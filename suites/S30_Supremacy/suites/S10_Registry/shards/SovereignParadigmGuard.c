@@ -1,12 +1,13 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS ZENITH: SOVEREIGN PARADIGM GUARD (v2.0 — DEEP AUDIT)
+ * S SIGMAOS ZENITH: SOVEREIGN PARADIGM GUARD (v2.0  DEEP AUDIT)
  * =========================================================================
  * Mission: Universal Enforcement of ALL Master Engineering Domains.
  * Method:  Each audit function verifies that its domain's shards
- *          provide the correct _Register() symbol — proving the
+ *          provide the correct _Register() symbol  proving the
  *          shard exists, compiles, and is linked.
- * Status:  STRUCTURAL VERIFICATION — NOT JUST MARKERS.
+ * Status:  STRUCTURAL VERIFICATION  NOT JUST MARKERS.
  * =========================================================================
  */
 
@@ -26,16 +27,16 @@ extern void SovereignRegistry_Register(void);   /* replaced by Finalize */
 extern void SovereignNeuralShard_Init(void);
 extern void SovereignUDF_Register(void);
 
-/* Data Science — DataFrame (S10) */
+/* Data Science  DataFrame (S10) */
 /* SovereignDataframeMatrix.c is compiled; no separate Register needed */
 
-/* OOP — VTable Polymorphism (S04) — NEW */
+/* OOP  VTable Polymorphism (S04)  NEW */
 extern void SovereignVTableRegistry_Register(void);
 
 /* Automations (S09) */
 extern void SovereignAutomation_Register(void);
 
-/* Customisations (S01) — NEW */
+/* Customisations (S01)  NEW */
 extern void SovereignCustomisation_Register(void);
 
 /* Personalisations (S01) */
@@ -52,7 +53,7 @@ extern void SovereignPersonalization_Register(void);
 
 void Domain_OS_Audit(void) {
     sigma_sigma_printf("[ZENITH-GUARD]: [OS]  Scheduler + Registry -> ");
-    /* If we reach here, the symbols linked — proof of existence. */
+    /* If we reach here, the symbols linked  proof of existence. */
     sigma_sigma_printf("VERIFIED\n");
 }
 
@@ -107,7 +108,7 @@ void Domain_Consensus_Audit(void) {
 void SovereignParadigmGuard_Enforce(void) {
     sigma_sigma_printf("\n");
     sigma_sigma_printf("===============================================================\n");
-    sigma_sigma_printf("  SOVEREIGN PARADIGM GUARD v2.0 — DEEP STRUCTURAL AUDIT\n");
+    sigma_sigma_printf("  SOVEREIGN PARADIGM GUARD v2.0  DEEP STRUCTURAL AUDIT\n");
     sigma_sigma_printf("===============================================================\n\n");
 
     Domain_OS_Audit();
@@ -122,7 +123,7 @@ void SovereignParadigmGuard_Enforce(void) {
     Domain_Consensus_Audit();
 
     sigma_sigma_printf("\n[RESULT]: 10/10 PRINCIPLE DOMAINS STRUCTURALLY VERIFIED.\n");
-    sigma_sigma_printf("[STATUS]: ZENITH SUPREME — ABSOLUTE SINGULARITY CONFIRMED.\n");
+    sigma_sigma_printf("[STATUS]: ZENITH SUPREME  ABSOLUTE SINGULARITY CONFIRMED.\n");
     sigma_sigma_printf("===============================================================\n\n");
 }
 

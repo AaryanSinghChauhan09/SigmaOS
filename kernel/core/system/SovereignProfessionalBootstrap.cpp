@@ -1,4 +1,4 @@
-#include "../../../include/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 #include "../../../include/sigma_log.h"
 
 /* Forward declarations of professional healers */

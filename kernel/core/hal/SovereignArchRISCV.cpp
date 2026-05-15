@@ -1,4 +1,4 @@
-#include "core/SovereignArch.hpp"
+#include "../../../include/core/SovereignArch.hpp"
 #include "../../../include/sigma_log.h"
 
 /**

@@ -1,4 +1,5 @@
-#include "sigma_libc.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/libc/sigma_libc.h"
 
 // SigmaOS Sovereign VMM (Virtual Memory Manager)
 // Architecture: AArch64 (ARMv8-A) 4-Level Paging (L0 -> L1 -> L2 -> L3)

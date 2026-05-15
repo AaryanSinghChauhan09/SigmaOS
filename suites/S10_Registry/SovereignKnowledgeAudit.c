@@ -1,6 +1,6 @@
-#include "SovereignHardwareIOZenith.h"
-#include "SovereignCoordinationZenith.h"
-#include "SovereignLibC.h"
+#include "../../include/SovereignHardwareIOZenith.h"
+#include "../../include/SovereignCoordinationZenith.h"
+#include "../../include/libc/SovereignLibC.h"
 
 namespace SigmaOS {
 

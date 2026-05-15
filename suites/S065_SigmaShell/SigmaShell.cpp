@@ -1,4 +1,4 @@
-#include "SigmaShell.hpp"
+#include "../../include/SigmaShell.hpp"
 
 namespace SigmaOS {
 namespace Userland {

@@ -1,11 +1,11 @@
-#include "../../../include/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 #include "../../../include/sigma_log.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/core/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Audit Engine (S-AUDIT)
  * Inspired by: OpenSCAP / OSSEC
- * Purpose: Real-time compliance auditing â€" FIPS 140-3, PQC, GDPR, HIPAA.
+ * Purpose: Real-time compliance auditing " FIPS 140-3, PQC, GDPR, HIPAA.
  * Features: Automated evidence collection, tamper-proof audit log with ZFS.
  */
 

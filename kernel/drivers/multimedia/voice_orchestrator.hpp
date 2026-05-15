@@ -1,9 +1,9 @@
 #ifndef VOICE_ORCHESTRATOR_HPP
 #define VOICE_ORCHESTRATOR_HPP
 
-#include "SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "../../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Multimedia {

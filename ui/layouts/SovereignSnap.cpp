@@ -1,11 +1,11 @@
-#include "core/sigma_types.h"
-#include "hal/sigma_hal.h"
-#include "sigma_log.h"
-#include "sigma_snap_types.h"
-#include "core/SigmaOOP.hpp"
+#include "include/sigma_types.h"
+#include "include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "../../include/sigma_snap_types.h"
+#include "include/SigmaOOP.hpp"
 
 /**
- * SovereignSnap â€" Sovereign Window Snapping Engine
+ * SovereignSnap " Sovereign Window Snapping Engine
  * Implements a Predictive Layout Engine (PLE) algorithm for adaptive tiling.
  */
 

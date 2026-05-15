@@ -11,7 +11,7 @@
 //   • 100% Sovereign: No external libraries (No nVidia/Microsoft binary bloat).
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 typedef struct {

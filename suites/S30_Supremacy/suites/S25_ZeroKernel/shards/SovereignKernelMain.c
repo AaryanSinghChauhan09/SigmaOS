@@ -1,5 +1,6 @@
+#include "../../../../../include/SovereignLibC.h"
 // =============================================================================
-// SigmaOS — S25_ZeroKernel — SovereignKernelMain.c
+// SigmaOS  S25_ZeroKernel  SovereignKernelMain.c
 // =============================================================================
 #include "suites/S01_Genesis/shards/sigma_base.h"
 #include "suites/S01_Genesis/shards/sigma_kernel.h"

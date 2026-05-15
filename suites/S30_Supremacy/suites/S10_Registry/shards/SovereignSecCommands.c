@@ -1,5 +1,6 @@
-#include "SovereignCommand.h"
-#include "sigma_libc.h"
+#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/SovereignCommand.h"
+#include "../../../../../include/libc/sigma_libc.h"
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 static int sigma_strcmp_local(const char* s1, const char* s2) {

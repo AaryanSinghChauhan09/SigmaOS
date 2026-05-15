@@ -1,3 +1,4 @@
+#include "../../../../../../../include/SovereignLibC.h"
 // =============================================================================
 // SigmaOS — libc — sigma_libc_extended.c
 // Extended Sovereign LibC — glibc-free string, math, and I/O primitives
@@ -14,8 +15,8 @@
 //   • This file extends: string ops, memory ops, printf, atoi, qsort
 // =============================================================================
 
-#include "sigma_types.h"
-#include "sigma_types.h"
+#include "../../../../../../../include/core/sigma_types.h"
+#include "../../../../../../../include/core/sigma_types.h"
 
 
 // ── Memory Primitives (no glibc) ──────────────────────────────────────────────

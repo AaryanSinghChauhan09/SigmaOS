@@ -1,9 +1,9 @@
-#include "sigma_hal.h"
-#include "../../../include/sigma_types.h"
-#include "sigma_eyetrack.h"
-#include "sigma_hal.h"
-#include "sigma_neural.h"
-#include "sigma_universal_ui.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_eyetrack.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/ai/sigma_neural.h"
+#include "../../include/sigma_universal_ui.h"
 
 /**
  * SigmaOS Sovereign Eye Tracking

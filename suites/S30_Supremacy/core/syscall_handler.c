@@ -1,5 +1,6 @@
+#include "../../../include/SovereignLibC.h"
 #include "sovereign_syscall.h"
-#include "sigma_libc.h"
+#include "../../../include/libc/sigma_libc.h"
 
 /**
  * SigmaOS Sovereign Syscall Handler

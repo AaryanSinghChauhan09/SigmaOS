@@ -1,7 +1,7 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "hal/sigma_hal.h"
-#include "libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
+#include "include/sigma_types.h"
+#include "include/hal/sigma_hal.h"
+#include "include/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Storage Driver (VirtIO-Blk / ATA PIO)
@@ -11,7 +11,7 @@
  * Block I/O is performed via DMA scatter-gather, integrated directly 
  * with SovereignVFS for atomic file writes.
  *
- * Design: OOP-isolated singleton â€" SovereignStorageDriverEngine.
+ * Design: OOP-isolated singleton " SovereignStorageDriverEngine.
  */
 
 typedef enum {

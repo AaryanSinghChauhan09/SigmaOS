@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 #include "../../../include/sigma_log.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/core/SigmaOOP.hpp"
 
 // Post-Quantum Cryptography Engine for SigmaOS
 // Implements CRYSTALS-Dilithium and CRYSTALS-Kyber stubs

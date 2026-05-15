@@ -1,4 +1,5 @@
-#include "sigma_libc.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/libc/sigma_libc.h"
 
 // SigmaOS Neural Paging (S-NEURAL-PAGE)
 // Philosophy: AI/ML Frameworks - Pattern-Based Memory Prediction.

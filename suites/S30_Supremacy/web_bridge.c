@@ -1,4 +1,5 @@
-#include "core/sigma_types.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: WEB-BRIDGE SHARD (v1.0 - BROWSER-SILICON SYNC)
@@ -12,7 +13,7 @@
  * =============================================================================
  */
 
-#include "core/sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 #define WEB_SERIAL_PORT 0x3F8  /* COM1 */
 #define WEB_SIGNAL_VGA  0x100  /* Custom MMIO signal for VGA sync */

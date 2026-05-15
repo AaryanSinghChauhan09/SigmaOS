@@ -6,7 +6,7 @@
 #ifndef SIGMA_SEC_AUDIT_RUNTIME_HPP
 #define SIGMA_SEC_AUDIT_RUNTIME_HPP
 
-#include "sigma_pqc_sign.h"
+#include "../../include/sigma_pqc_sign.h"
 
 namespace sigma {
 namespace security {

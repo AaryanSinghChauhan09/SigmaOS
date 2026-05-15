@@ -1,6 +1,6 @@
 #pragma once
-#include "../../../include/sigma_types.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "../../../../include/core/sigma_types.h"
+#include "../../../../include/core/SigmaOOP.hpp"
 #include "observability/sigma_monitor.h"
 
 namespace SigmaOS {

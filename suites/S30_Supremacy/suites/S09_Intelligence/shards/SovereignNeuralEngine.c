@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S09_INTELLIGENCE — SovereignNeuralEngine.c
+ * S SIGMAOS: S09_INTELLIGENCE  SovereignNeuralEngine.c
  * =========================================================================
  * Implementation of Idea 471 (Apex Infinity): Native Neural Inference.
  * Supports dense layer forward pass and ReLU activation in pure C.
@@ -8,7 +9,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 #include <math.h>
 
 #define MAX_NEURONS 256

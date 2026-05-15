@@ -1,4 +1,5 @@
-#include "core/sigma_types.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN SHARD CORE (v1.0 - ABSOLUTE ISOLATION)
@@ -13,7 +14,7 @@
  * =============================================================================
  */
 
-#include "core/sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 #define MAX_SYSTEM_SHARDS 256
 #define SHARD_MAGIC       0x53485244 // "SHRD"

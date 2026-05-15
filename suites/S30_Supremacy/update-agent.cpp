@@ -1,9 +1,9 @@
-#include "sigma_types.h"
-#include "sigma_hal.h"
-#include "sigma_log.h"
+#include "../../include/core/sigma_types.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
 
 /**
- * SovereignUpdateAgent â€" Atomic System Updates and Rollbacks.
+ * SovereignUpdateAgent " Atomic System Updates and Rollbacks.
  * Ensures the integrity of the lattice during shard migrations.
  */
 

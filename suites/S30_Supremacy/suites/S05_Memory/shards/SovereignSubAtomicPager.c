@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S05_MEMORY — SovereignSubAtomicPager.c
+ * S SIGMAOS: S05_MEMORY  SovereignSubAtomicPager.c
  * =========================================================================
  * Mission: Zero-Latency Paging (Overcoming standard kernel allocators).
  * Capability: Pre-faulting, Hardware-backed isolation, Transparent Huge Pages.

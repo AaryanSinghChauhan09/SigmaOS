@@ -1,11 +1,12 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN INTELLIGENCE (Suite S09)
  * =========================================================================
  */
 
-#include "sigma_sentience.h"
-#include "sigma_libc.h"
+#include "../../../../../include/sigma_sentience.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 static system_sentience_t s_sentience;
 

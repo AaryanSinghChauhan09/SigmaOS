@@ -1,15 +1,15 @@
 #include "../../../include/sigma_log.h"
-#include "libc/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
-#include "hal/sigma_mmu.h"
-#include "hal/sigma_hal.h"
+#include "../../../include/libc/SovereignLibC.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/hal/sigma_mmu.h"
+#include "../../../include/hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign MMU Implementation
  * Implements an Asynchronous Page Fault Resolution (APFR) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal silicon isolation.
  *
- * Design: OOP-isolated singleton â€" SovereignMMUEngine.
+ * Design: OOP-isolated singleton " SovereignMMUEngine.
  */
 
 /* --- Sovereign MMU Engine (OOP Isolation) --- */

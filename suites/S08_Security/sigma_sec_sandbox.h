@@ -6,7 +6,7 @@
 #define SIGMA_SEC_SANDBOX_H
 
 #include "sigma_caps.h"
-#include "../../sigmaos/core/src/atomic_sigma_process.hpp"
+#include "../../include/sigmaos/core/src/atomic_sigma_process.hpp"
 
 #define SIGMA_SANDBOX_STRICT 1
 #define SIGMA_SANDBOX_PERMISSIVE 0

@@ -12,7 +12,7 @@
 //   • Anti-Tamper: Physical memory erasure on unauthorized hardware access.
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 #define ENCLAVE_KEY_LEN     64

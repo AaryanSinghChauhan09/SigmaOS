@@ -1,5 +1,5 @@
-#include "sigma_libc.h"
-#include "sigma_kernel_types.h"
+#include "../../include/libc/sigma_libc.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 // Σ SIGMAOS: SOVEREIGN INIT MANAGER
 // Responsibility: Orchestrate service lifecycle and system state.

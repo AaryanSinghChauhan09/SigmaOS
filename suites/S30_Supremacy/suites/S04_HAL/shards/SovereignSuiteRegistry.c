@@ -1,5 +1,6 @@
-#include "sigma_types.h"
-#include "sigma_libc.h"
+#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/core/sigma_types.h"
+#include "../../../../../include/libc/sigma_libc.h"
 extern void console_init(void);
 extern void paging_init(void);
 void S04_HAL_Register(void) {

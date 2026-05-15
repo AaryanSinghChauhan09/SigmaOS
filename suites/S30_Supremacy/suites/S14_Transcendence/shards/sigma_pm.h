@@ -2,7 +2,7 @@
  * =========================================================================
  * S SIGMAOS kernel/suites/S14_Transcendence/shards/sigma_pm.h
  * =========================================================================
- * Sovereign Power Management — gap-closes:
+ * Sovereign Power Management  gap-closes:
  *   Linux  : ACPI, cpufreq (governors: performance/powersave/schedutil)
  *            suspend-to-RAM (S3), hibernate (S4), runtime PM, wakelock
  *   Windows: Power Plans (Balanced/High/Power-Saver), Modern Standby (S0ix)
@@ -38,7 +38,7 @@ typedef enum {
     CPU_C0 = 0,  /* executing                                          */
     CPU_C1 = 1,  /* halt / HLT                                         */
     CPU_C2 = 2,  /* stop-clock                                         */
-    CPU_C3 = 3,  /* sleep — cache flush required                       */
+    CPU_C3 = 3,  /* sleep  cache flush required                       */
     CPU_C6 = 4,  /* deep power-down (Intel)                            */
     CPU_C8 = 5   /* deeper state (Intel Skylake+)                      */
 } sigma_cpu_cstate_t;

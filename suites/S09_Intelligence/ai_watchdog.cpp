@@ -1,5 +1,5 @@
-#include "sigma_libc.h"
-#include "sigma_auto_rollback.h"
+#include "../../include/libc/sigma_libc.h"
+#include "../../include/sigma_auto_rollback.h"
 
 // Σ SIGMAOS: SOVEREIGN AI WATCHDOG
 // Responsibility: Predictive resilience via shard monitoring.

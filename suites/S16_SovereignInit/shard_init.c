@@ -1,4 +1,5 @@
-#include "sigma_libc.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/libc/sigma_libc.h"
 
 // SigmaOS Sovereign Init (S-INIT)
 // Purpose: Profile-aware boot orchestration and service lifecycle management.

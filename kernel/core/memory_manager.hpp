@@ -1,8 +1,8 @@
 #ifndef MEMORY_MANAGER_HPP
 #define MEMORY_MANAGER_HPP
 
-#include "../../../include/sigma_types.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "../../include/core/sigma_types.h"
+#include "../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

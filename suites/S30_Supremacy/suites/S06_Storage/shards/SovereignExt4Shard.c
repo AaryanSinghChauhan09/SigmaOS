@@ -1,7 +1,8 @@
+#include "../../../../../include/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "SovereignVFS.h"
-#include "sigma_libc.h"
+#include "../../../../../include/SovereignVFS.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 sigma_err_t sigma_ext4_mount(const char* source, const char* target, void** sb_out) {
     sigma_sigma_printf("  S [EXT4]: Parsing Ext4 Superblock from sector 2 of %s...\n", source);

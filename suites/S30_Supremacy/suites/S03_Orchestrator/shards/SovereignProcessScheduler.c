@@ -14,7 +14,7 @@
 //   • Interactive boost: tracks sleep/run ratio, boosts waking tasks
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 #define SIGMA_MAX_TASKS     4096

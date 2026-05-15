@@ -1,6 +1,7 @@
-#include "SovereignSyncZenith.h"
-#include "SovereignDiskZenith.h"
-#include "SovereignOSBasicsZenith.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/SovereignSyncZenith.h"
+#include "../../include/SovereignDiskZenith.h"
+#include "../../include/SovereignOSBasicsZenith.h"
 
 namespace SigmaOS {
 

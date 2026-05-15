@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ASGARD: SOVEREIGN MPAM SHARD (v57.8-SUPREME-ASGARD)

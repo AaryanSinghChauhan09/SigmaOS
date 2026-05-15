@@ -1,4 +1,5 @@
-#include "core/sigma_types.h"
+#include "../../../include/SovereignLibC.h"
+#include "../../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-REGISTRY (v1.0 - PERSISTENT CONFIG SHARD)
@@ -13,7 +14,7 @@
  * =============================================================================
  */
 
-#include "core/sigma_kernel_types.h"
+#include "../../../include/core/sigma_kernel_types.h"
 
 #define MAX_REGISTRY_KEYS 1024u
 #define MAX_KEY_LEN 64

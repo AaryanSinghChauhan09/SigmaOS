@@ -4,7 +4,7 @@
  * USP: Transparent synchronization of lattice configs and user data via Nextcloud WebDAV.
  */
 
-#include "sigma_libc.h"
+#include "../../include/libc/sigma_libc.h"
 
 void sigma_nextcloud_init(const char* server_url, const char* auth_token) {
     // 1. Initialize WebDAV client bridge

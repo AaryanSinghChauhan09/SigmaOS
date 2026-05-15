@@ -1,5 +1,5 @@
-#include "sigma_libc.h"
-#include "sigma_libc.h"
+#include "../../../../include/libc/sigma_libc.h"
+#include "../../../../include/libc/sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS Capability-Aware Process Scheduler Prototype

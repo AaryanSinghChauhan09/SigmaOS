@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS EON: SOVEREIGN RDTSC SHARD (v57.1-SUPREME-EON)

@@ -1,4 +1,5 @@
-#include "sigma_libc.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/libc/sigma_libc.h"
 
 // Minimal Sovereign Lua-like VM Shard
 // Implements a subset of stack-based scripting for OS personalization.

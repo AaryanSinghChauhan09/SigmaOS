@@ -1,7 +1,7 @@
 #ifndef SIGMA_SOVEREIGN_DAL_H
 #define SIGMA_SOVEREIGN_DAL_H
 
-#include "core/sigma_types.h"
+#include "include/sigma_types.h"
 #include <string>
 #include <map>
 #include <vector>

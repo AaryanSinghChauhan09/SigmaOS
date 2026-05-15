@@ -8,8 +8,8 @@
  * =========================================================================
  */
 
-#include "sigma_log.h"
-#include "SigmaOOP.hpp"
+#include "../../include/sigma_log.h"
+#include "../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Wizard {

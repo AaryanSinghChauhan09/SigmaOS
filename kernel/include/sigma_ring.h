@@ -1,7 +1,7 @@
 #ifndef SIGMA_RING_H
 #define SIGMA_RING_H
 
-#include "core/sigma_types.h"
+#include "../../include/core/sigma_types.h"
 
 /**
  * @file sigma_ring.h

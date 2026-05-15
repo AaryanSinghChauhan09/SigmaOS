@@ -14,7 +14,7 @@
 //   • Predictive Window Placement using S13 Sentiment.
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 #define MAX_VIRTUAL_SCREENS 8

@@ -11,7 +11,7 @@
 #ifndef SIGMA_COGNITIVE_H
 #define SIGMA_COGNITIVE_H
 
-#include "core/sigma_types.h"
+#include "include/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

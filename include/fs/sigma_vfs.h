@@ -1,7 +1,7 @@
 #ifndef SIGMA_VFS_H
 #define SIGMA_VFS_H
 
-#include "core/sigma_types.h"
+#include "include/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

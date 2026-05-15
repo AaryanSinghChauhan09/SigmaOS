@@ -1,3 +1,4 @@
+#include "../../include/SovereignLibC.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-CS-RESEARCH-SHARD (v1.0 - ACADEMIC MASTER)
@@ -11,7 +12,7 @@
  * =============================================================================
  */
 
-#include "core/sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 typedef struct ResearchPaperShard {
     char        title[64];

@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "SovereignToolHeader.h"
+#include "../../../../../include/SovereignToolHeader.h"
 
 /*
  * S SIGMAOS: SOVEREIGN REMOTE BOT (v1.0)

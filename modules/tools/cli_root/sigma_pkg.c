@@ -4,8 +4,8 @@
  * USP: Decentralized, shard-based package management with architectural parity checks.
  */
 
-#include "sigma_libc.h"
-#include "sigma_libc.h"
+#include "../../../include/libc/sigma_libc.h"
+#include "../../../include/libc/sigma_libc.h"
 
 typedef struct {
     char* name;

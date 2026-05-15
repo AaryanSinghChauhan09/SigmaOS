@@ -1,4 +1,4 @@
-#include "core/sigma_types.h"
+#include "../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: OPTIMIZED VGA TEXT DRIVER (v1.2)
@@ -6,7 +6,7 @@
  * Principles: Zero-Abstract Visualization & High-Performance Scrolling.
  * =============================================================================
  */
-#include "core/sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 #define VGA_ADDR 0xB8000
 #define COLS     80

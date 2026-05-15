@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN ECOSYSTEM SUITE (v3.0 - SUPREME ETHER)

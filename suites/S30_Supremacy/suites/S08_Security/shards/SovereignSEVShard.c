@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS DIVINE_INTERVENTION: SOVEREIGN SEV SHARD (v61.0-DIVINE)

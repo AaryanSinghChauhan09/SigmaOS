@@ -1,4 +1,4 @@
-#include "Lattice.h"
+#include "../../include/Lattice.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -21,7 +21,7 @@
  * =========================================================================
  */
 
-#include "core/SigmaOOP.hpp"
+#include "../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Science {

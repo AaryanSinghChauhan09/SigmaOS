@@ -81,7 +81,7 @@ private:
 };
 
 int main() {
-    std::cout << "�"══════════════════════════════════════════════════════════╗\n";
+    std::cout << ""══════════════════════════════════════════════════════════╗\n";
     std::cout << "║  Σ SigmaOS Native Test Runner v1.0                      ║\n";
     std::cout << "║  Bare-Metal Lattice Integrity Verification              ║\n";
     std::cout << "╚══════════════════════════════════════════════════════════╝\n\n";

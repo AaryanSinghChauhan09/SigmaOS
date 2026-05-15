@@ -1,4 +1,4 @@
-#include "Lattice.h"
+#include "../../include/Lattice.h"
 #include "aether_orchestrator.hpp"
 
 namespace SigmaOS {

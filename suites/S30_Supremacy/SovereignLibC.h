@@ -11,6 +11,8 @@
 #ifndef SOVEREIGN_LIBC_H
 #define SOVEREIGN_LIBC_H
 
+#include "../../include/SovereignLibC.h"
+
 typedef unsigned long long sigma_size_t;
 typedef long long          sigma_ssize_t;
 typedef unsigned char      sigma_u8;

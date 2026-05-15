@@ -1,7 +1,7 @@
-#include "Lattice.h"
-#include "sigma_log.h"
-#include "SovereignLibC.h"
-#include "sigma_log.h"
+#include "../include/Lattice.h"
+#include "../include/sigma_log.h"
+#include "../include/libc/SovereignLibC.h"
+#include "../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -11,8 +11,8 @@
  * =========================================================================
  */
 
-#include "SigmaOOP.hpp"
-#include "sigma_log.h"
+#include "../include/core/SigmaOOP.hpp"
+#include "../include/sigma_log.h"
 
 /**
  * Î£ SIGMA OS: SOVEREIGN HARDWARE AUDIT (v128.0 - ZERO-STD NATIVE)

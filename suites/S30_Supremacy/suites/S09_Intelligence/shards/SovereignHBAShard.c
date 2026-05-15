@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ETERNITY: SOVEREIGN HBA SHARD (v57.6-SUPREME-ETERNITY)

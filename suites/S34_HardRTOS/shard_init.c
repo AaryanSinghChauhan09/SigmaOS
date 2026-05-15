@@ -1,4 +1,5 @@
-#include "sigma_libc.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/libc/sigma_libc.h"
 
 // SigmaOS Hard RTOS (S-RTOS)
 // Philosophy: FreeRTOS / QNX - Deterministic Hard Real-Time Scheduling.

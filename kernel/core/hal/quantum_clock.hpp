@@ -1,10 +1,10 @@
-#include "hal/sigma_hal.h"
+#include "../../../include/hal/sigma_hal.h"
 #ifndef QUANTUM_CLOCK_HPP
 #define QUANTUM_CLOCK_HPP
 
-#include "libc/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
-#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

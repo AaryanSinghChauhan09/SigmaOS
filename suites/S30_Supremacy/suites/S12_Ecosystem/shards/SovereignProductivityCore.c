@@ -1,5 +1,6 @@
-#include "sigma_libc.h"
-#include "sigma_types.h"
+#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/libc/sigma_libc.h"
+#include "../../../../../include/core/sigma_types.h"
 
 /**
  * SigmaOS Sovereign Productivity Core

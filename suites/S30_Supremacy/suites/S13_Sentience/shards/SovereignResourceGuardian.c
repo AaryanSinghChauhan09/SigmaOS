@@ -11,7 +11,7 @@
 //     memory zone BEFORE the system slows down.
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 #define TREND_WINDOW    32

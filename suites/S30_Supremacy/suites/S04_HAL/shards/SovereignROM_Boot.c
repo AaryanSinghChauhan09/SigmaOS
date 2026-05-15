@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S04_HAL — SovereignROM_Boot.c
+ * S SIGMAOS: S04_HAL  SovereignROM_Boot.c
  * =========================================================================
  * Implementation of Idea 68.1 (Apex Infinity): ROM-able Kernel.
  * Enables execution directly from Flash/ROM without RAM relocation.
@@ -8,7 +9,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 extern void kernel_main(void);
 

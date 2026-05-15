@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
-#include "sigma_thermaliq.h"
-#include "sigma_hal.h"
+#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_thermaliq.h"
+#include "../../include/hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Thermal Intelligence (ThermalIQ)

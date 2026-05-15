@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S15_DevNexus/shards/sigma_raft.c
@@ -6,8 +7,8 @@
  * =========================================================================
  */
 
-#include "sigma_raft.h"
-#include "sigma_libc.h"
+#include "../../../../../include/sigma_raft.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 static raft_node_t        s_raft;
 static sigma_service_entry_t s_services[SIGMA_SVC_MAX];
@@ -116,7 +117,7 @@ void sigma_raft_handle_vote_resp(rf_u32 from, raft_vote_resp_t *resp) {
     }
     if (resp->granted && s_raft.state == RAFT_CANDIDATE) {
         s_raft.votes_received++;
-        sigma_sigma_printf("S [RAFT] Vote from %u — total %u\n",
+        sigma_sigma_printf("S [RAFT] Vote from %u  total %u\n",
                      from, s_raft.votes_received);
     }
 }
@@ -168,7 +169,7 @@ void sigma_raft_send_heartbeats(void) {
 /* -- Client propose -------------------------------------------------------- */
 rf_i32 sigma_raft_propose(const char *command) {
     if (s_raft.state != RAFT_LEADER) {
-        sigma_sigma_printf("S [RAFT] Propose rejected — not leader\n");
+        sigma_sigma_printf("S [RAFT] Propose rejected  not leader\n");
         return RF_ERR;
     }
     if (s_raft.log_len >= RAFT_LOG_MAX) return RF_ERR;
@@ -221,7 +222,7 @@ sigma_service_entry_t *sigma_svc_lookup(const char *name) {
 
 void sigma_svc_health_check(void) {
     for (rf_u32 i = 0; i < s_svc_count; i++) {
-        /* Simulated health check — toggle based on last_check_ns */
+        /* Simulated health check  toggle based on last_check_ns */
         s_services[i].last_check_ns++;
         s_services[i].healthy = (s_services[i].last_check_ns % 10 != 0);
     }

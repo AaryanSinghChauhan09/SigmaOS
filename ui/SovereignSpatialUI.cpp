@@ -1,17 +1,17 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "hal/sigma_hal.h"
-#include "libc/SovereignLibC.h"
+#include "../include/sigma_log.h"
+#include "include/sigma_types.h"
+#include "include/hal/sigma_hal.h"
+#include "include/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Hot Corners & Split Snapping Engine
  * Hardware-accelerated spatial UI interaction engine.
  *
  * USP: Hot corners and split snapping are processed by the kernel-level
- * gesture subsystem â€" no userland compositor polling. Corner triggers 
+ * gesture subsystem " no userland compositor polling. Corner triggers 
  * are acted on within one display refresh cycle (~8ms at 120Hz).
  *
- * Design: OOP-isolated singleton â€" SovereignSpatialUIEngine.
+ * Design: OOP-isolated singleton " SovereignSpatialUIEngine.
  */
 
 typedef enum {

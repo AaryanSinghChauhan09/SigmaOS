@@ -1,5 +1,5 @@
-﻿#include "Lattice.h"
-#include "SovereignLibC.h"
+﻿#include "../../include/Lattice.h"
+#include "../../include/libc/SovereignLibC.h"
 /*
  * =========================================================================
  * ÃŽÂ£ SIGMAOS: SOVEREIGN BUILD SYSTEM (v128.0 - ZERO-STD NATIVE)

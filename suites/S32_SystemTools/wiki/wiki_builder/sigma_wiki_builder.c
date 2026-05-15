@@ -1,3 +1,4 @@
+#include "../../../../include/SovereignLibC.h"
 // =============================================================================
 // SigmaOS — tools/wiki_builder — sigma_wiki_builder.c
 // Native C Sovereign Wiki Generator
@@ -8,9 +9,9 @@
 //   Generates a professional GitHub Wiki (Markdown) structure.
 // =============================================================================
 
-#include "sigma_libc.h"
-#include "sigma_libc.h"
-#include "sigma_libc.h"
+#include "../../../../include/libc/sigma_libc.h"
+#include "../../../../include/libc/sigma_libc.h"
+#include "../../../../include/libc/sigma_libc.h"
 
 typedef struct {
     char suite_name[64];

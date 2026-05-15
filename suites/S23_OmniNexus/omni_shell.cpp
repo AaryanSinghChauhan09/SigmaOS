@@ -9,23 +9,23 @@
  */
 
 <<<<<<< HEAD:suites/S23_OmniNexus/omni_shell.cpp
-#include "SigmaOOP.hpp"
-#include "sigma_libc.h"
+#include "../../include/core/SigmaOOP.hpp"
+#include "../../include/libc/sigma_libc.h"
 =======
-#include "sigma_log.h"
-#include "SigmaOOP.hpp"
-#include "SovereignLibC.h"
+#include "../../include/sigma_log.h"
+#include "../../include/core/SigmaOOP.hpp"
+#include "../../include/libc/SovereignLibC.h"
 >>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:userland/omni_shell.cpp
-#include "SovereignDistroForge.h"
-#include "SovereignCoreUtils.h"
-#include "SovereignLibC.h"
-#include "SovereignSyncZenith.h"
-#include "SovereignDiskZenith.h"
-#include "SovereignOSBasicsZenith.h"
-#include "SovereignXV6Bridge.h"
-#include "SovereignHardwareIOZenith.h"
-#include "SovereignCoordinationZenith.h"
-#include "SovereignDesktopZenith.h"
+#include "../../include/SovereignDistroForge.h"
+#include "../../include/SovereignCoreUtils.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/SovereignSyncZenith.h"
+#include "../../include/SovereignDiskZenith.h"
+#include "../../include/SovereignOSBasicsZenith.h"
+#include "../../include/SovereignXV6Bridge.h"
+#include "../../include/SovereignHardwareIOZenith.h"
+#include "../../include/SovereignCoordinationZenith.h"
+#include "../../include/SovereignDesktopZenith.h"
 #include "SovereignAetherAbsorption.cpp"
 
 namespace SigmaOS {

@@ -1,11 +1,12 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN USERLAND (Suite S21)
  * =========================================================================
  */
 
-#include "sigma_shell.h"
-#include "sigma_libc.h"
+#include "../../../../../include/sigma_shell.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 static char s_history[SHELL_HISTORY_MAX][SHELL_MAX_LINE];
 static sigma_u32 s_hist_tail = 0;

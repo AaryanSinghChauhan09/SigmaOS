@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S14_Transcendence/shards/sigma_pm.c
@@ -5,7 +6,7 @@
  */
 
 #include "sigma_pm.h"
-#include "sigma_libc.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 static sigma_cpu_power_t s_cpus[SIGMA_PM_MAX_CPUS];
 static pm_u32            s_num_cpus = 0;
@@ -40,7 +41,7 @@ void sigma_pm_init(pm_u32 num_cpus) {
         s_cpus[i].governor     = GOV_SCHEDUTIL;
         s_cpus[i].cstate       = CPU_C0;
         s_cpus[i].online       = PM_TRUE;
-        s_cpus[i].temperature_mc= 45000; /* 45°C */
+        s_cpus[i].temperature_mc= 45000; /* 45C */
         s_cpus[i].power_mw     = 3500;
     }
     s_profile.sys_state       = PM_S0_WORKING;
@@ -179,7 +180,7 @@ pm_bool sigma_pm_may_sleep(void) {
 /* -- Doze / App Nap -------------------------------------------------------- */
 void sigma_pm_doze_enter(void) {
     s_profile.doze_active = PM_TRUE;
-    sigma_sigma_printf("S [PM] Doze mode activated — deferring network/alarm wakeups\n");
+    sigma_sigma_printf("S [PM] Doze mode activated  deferring network/alarm wakeups\n");
     for (pm_u32 i = 1; i < s_num_cpus; i++)
         sigma_pm_cpu_hotplug_off(i);
 }
@@ -196,14 +197,14 @@ void sigma_pm_thermal_update(pm_u32 cpu_id, pm_u32 temp_mc) {
     sigma_cpu_power_t *c = get_cpu(cpu_id);
     if (!c) return;
     c->temperature_mc = temp_mc;
-    if (temp_mc > 95000) {          /* > 95°C — emergency throttle */
+    if (temp_mc > 95000) {          /* > 95C  emergency throttle */
         sigma_pm_set_freq(cpu_id, c->min_freq_mhz);
         sigma_pm_enter_cstate(cpu_id, CPU_C3);
-        sigma_sigma_printf("S [PM] THERMAL CRITICAL: CPU%u %u°C — throttled\n",
+        sigma_sigma_printf("S [PM] THERMAL CRITICAL: CPU%u %uC  throttled\n",
                      cpu_id, temp_mc/1000);
-    } else if (temp_mc > 80000) {   /* > 80°C — moderate throttle */
+    } else if (temp_mc > 80000) {   /* > 80C  moderate throttle */
         sigma_pm_set_freq(cpu_id, (c->min_freq_mhz + c->max_freq_mhz) / 2);
-        sigma_sigma_printf("S [PM] THERMAL WARN: CPU%u %u°C\n", cpu_id, temp_mc/1000);
+        sigma_sigma_printf("S [PM] THERMAL WARN: CPU%u %uC\n", cpu_id, temp_mc/1000);
     }
 }
 
@@ -219,7 +220,7 @@ void sigma_pm_report(void) {
     sigma_sigma_printf("  Wakelocks:     %u held\n", s_profile.wakelock_count);
     sigma_sigma_printf("  Doze:          %s\n", s_profile.doze_active ? "active":"off");
     sigma_sigma_printf("  Uptime:        %llu ns\n", (unsigned long long)s_profile.uptime_ns);
-    sigma_sigma_printf("\n  CPU  FREQ(MHz)  CSTATE  TEMP(°C)  POWER(mW)  GOV\n");
+    sigma_sigma_printf("\n  CPU  FREQ(MHz)  CSTATE  TEMP(C)  POWER(mW)  GOV\n");
     for (pm_u32 i = 0; i < s_num_cpus; i++) {
         sigma_cpu_power_t *c = &s_cpus[i];
         sigma_sigma_printf("  %-3u  %-9u  %-6s  %-9u  %-9u  %s%s\n",

@@ -1,6 +1,6 @@
-#include "libc/SovereignLibC.h"
-#include "sigma_log.h"
-#include "SovereignMath.hpp"
+#include "include/SovereignLibC.h"
+#include "../../include/sigma_log.h"
+#include "../../include/SovereignMath.hpp"
 
 /*
  * =========================================================================

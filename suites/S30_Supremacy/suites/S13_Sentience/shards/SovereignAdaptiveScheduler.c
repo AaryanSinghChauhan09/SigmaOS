@@ -13,7 +13,7 @@
 //   • Jitter-free real-time adjustment for pro-audio and holographic rendering
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 #define TRAINING_WINDOW     1024

@@ -1,9 +1,9 @@
 #ifndef CACHE_SHARD_HPP
 #define CACHE_SHARD_HPP
 
-#include "SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 
-#include "../../../include/SigmaOOP.hpp"
+#include "../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

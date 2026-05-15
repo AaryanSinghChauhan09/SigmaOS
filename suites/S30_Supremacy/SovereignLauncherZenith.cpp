@@ -1,5 +1,5 @@
-#include "SovereignLibC.h"
-#include "sigma_log.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
 /*
  * =========================================================================
 <<<<<<< HEAD:suites/S30_Supremacy/SovereignLauncherZenith.cpp
@@ -27,8 +27,8 @@
  * =========================================================================
  */
 
-#include "SigmaOOP.hpp"
-#include "sigma_log.h"
+#include "../../include/core/SigmaOOP.hpp"
+#include "../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Boot {

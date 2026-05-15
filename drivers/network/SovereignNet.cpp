@@ -1,14 +1,14 @@
-#include "sigma_log.h"
-#include "libc/SovereignLibC.h"
-#include "core/sigma_types.h"
-#include "sigma_net.h"
-#include "hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "include/SovereignLibC.h"
+#include "include/sigma_types.h"
+#include "../../include/sigma_net.h"
+#include "include/hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Networking Implementation
  * Implements a Predictive Packet Routing (PPR) algorithm for zero-buffer flow.
  *
- * Design: OOP-isolated singleton â€" SovereignNetEngine.
+ * Design: OOP-isolated singleton " SovereignNetEngine.
  */
 
 typedef struct {

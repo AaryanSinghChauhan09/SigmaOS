@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS GENESIS: SOVEREIGN TPM SHARD (v57.2-SUPREME-GENESIS)

@@ -1,7 +1,7 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "hal/sigma_hal.h"
-#include "libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
+#include "include/sigma_types.h"
+#include "include/hal/sigma_hal.h"
+#include "include/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Container Networking (CNI)
@@ -10,7 +10,7 @@
  * USP: Automatically provisions virtual network interfaces (veth) and routes 
  * container traffic through the SovereignNetStack's deep packet inspection.
  *
- * Design: OOP-isolated singleton â€" SovereignContainerNetEngine.
+ * Design: OOP-isolated singleton " SovereignContainerNetEngine.
  */
 
 class SovereignContainerNetEngine {

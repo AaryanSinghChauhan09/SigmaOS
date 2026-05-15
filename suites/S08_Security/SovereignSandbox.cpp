@@ -1,4 +1,4 @@
-#include "../S01_Genesis/sigma_libc.h"
+#include "../../include/libc/sigma_libc.h"
 #include <stdint.h>
 
 namespace SigmaOS {

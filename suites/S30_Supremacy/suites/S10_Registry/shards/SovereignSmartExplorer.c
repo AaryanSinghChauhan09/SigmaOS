@@ -1,4 +1,5 @@
-#include "SovereignToolHeader.h"
+#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/SovereignToolHeader.h"
 
 /*
  * =========================================================================

@@ -1,9 +1,9 @@
 #ifndef POLICIES_HPP
 #define POLICIES_HPP
 
-#include "SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
-#include "SigmaOOP.hpp"
+#include "../../../include/core/SigmaOOP.hpp"
 
 class IGovernanceModule : public SigmaOS::SigmaObject {
 public:

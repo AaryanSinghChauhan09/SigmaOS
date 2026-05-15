@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 
 /* =========================================================================
  * MSR probe helpers (inline asm â€ replaces function-pointer opcode casting)

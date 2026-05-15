@@ -1,4 +1,4 @@
-#include "Lattice.h"
+#include "../../../include/Lattice.h"
 #include "camera_zenith.hpp"
 
 namespace SigmaOS {

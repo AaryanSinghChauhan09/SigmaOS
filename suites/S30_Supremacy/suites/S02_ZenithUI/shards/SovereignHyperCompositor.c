@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S02_ZENITHUI — SovereignHyperCompositor.c
+ * S SIGMAOS: S02_ZENITHUI  SovereignHyperCompositor.c
  * =========================================================================
  * Mission: Terminal UI Superiority (?? Linux/Mac/Windows).
  * Capability: Multi-buffer blending, Volumetric windowing, Shader-driven chrome.

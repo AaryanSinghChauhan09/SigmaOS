@@ -8,7 +8,7 @@
  * =========================================================================
  */
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 void* sigma_sigma_memcpy(void* dest, const void* src, uint64_t n) {
     uint8_t* d = (uint8_t*)dest;

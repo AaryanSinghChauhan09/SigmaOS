@@ -1,11 +1,12 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN INTERCONNECT (Suite S20)
  * =========================================================================
  */
 
-#include "sigma_interconnect.h"
-#include "sigma_libc.h"
+#include "../../../../../include/sigma_interconnect.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 static interconnect_bus_t s_buses[MAX_BUSES];
 static sigma_u32          s_bus_count = 0;

@@ -1,7 +1,7 @@
 #include "../../../include/sigma_log.h"
-#include "../../../include/sigma_types.h"
-#include "SovereignSnap.h"
-#include "libc/SovereignLibC.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/SovereignSnap.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {

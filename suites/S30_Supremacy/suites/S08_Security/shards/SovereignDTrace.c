@@ -1,14 +1,15 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN DTRACE + PF PACKET FILTER — IMPLEMENTATION (v1.0)
+ * S SIGMAOS: SOVEREIGN DTRACE + PF PACKET FILTER  IMPLEMENTATION (v1.0)
  * =========================================================================
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
-#include "SovereignDTrace.h"
+#include "../../../../../include/SovereignDTrace.h"
 
 /* =========================================================================
- * §1  DTRACE SUBSYSTEM
+ * 1  DTRACE SUBSYSTEM
  * ====================================================================== */
 
 static SigmaDTProbe_t    s_probes [DTRACE_PROBE_MAX];
@@ -21,7 +22,7 @@ static SigmaDTAggr_t     s_aggrs    [64];
 static sigma_u32         s_aggr_cnt  = 0;
 
 /* -------------------------------------------------------------------------
- * sigma_dt_probe_register — Add a new probe point
+ * sigma_dt_probe_register  Add a new probe point
  * ---------------------------------------------------------------------- */
 dtrace_id_t sigma_dt_probe_register(const char *provider, const char *module,
                                      const char *function, const char *name) {
@@ -39,7 +40,7 @@ dtrace_id_t sigma_dt_probe_register(const char *provider, const char *module,
 }
 
 /* -------------------------------------------------------------------------
- * sigma_dt_probe_fire — Execute all enabled consumer actions for probe id
+ * sigma_dt_probe_fire  Execute all enabled consumer actions for probe id
  * ---------------------------------------------------------------------- */
 void sigma_dt_probe_fire(dtrace_id_t id,
                           sigma_u64 a0, sigma_u64 a1,
@@ -78,7 +79,7 @@ sigma_err_t sigma_dt_disable(dtrace_id_t id) {
 }
 
 /* -------------------------------------------------------------------------
- * sigma_dt_consumer_enable — Attach action to probe(s) matching clause
+ * sigma_dt_consumer_enable  Attach action to probe(s) matching clause
  *   clause format: "provider:module:function:name"
  * ---------------------------------------------------------------------- */
 sigma_err_t sigma_dt_consumer_enable(const char *clause, SigmaDTAction_t action) {
@@ -108,7 +109,7 @@ sigma_err_t sigma_dt_consumer_enable(const char *clause, SigmaDTAction_t action)
 }
 
 /* -------------------------------------------------------------------------
- * sigma_dt_list_probes — dtrace -l
+ * sigma_dt_list_probes  dtrace -l
  * ---------------------------------------------------------------------- */
 void sigma_dt_list_probes(const char *filter) {
     sigma_sigma_printf("S [DTRACE]: Probe list (%u total):\n", s_probe_cnt);
@@ -125,7 +126,7 @@ void sigma_dt_list_probes(const char *filter) {
 }
 
 /* -------------------------------------------------------------------------
- * sigma_dt_aggr_print — print aggregation results
+ * sigma_dt_aggr_print  print aggregation results
  * ---------------------------------------------------------------------- */
 void sigma_dt_aggr_print(const SigmaDTAggr_t *a) {
     sigma_sigma_printf("S [DTRACE-AGG]: @%s: count=%llu sum=%lld min=%lld max=%lld\n",
@@ -139,7 +140,7 @@ void sigma_dt_aggr_print(const SigmaDTAggr_t *a) {
 }
 
 /* =========================================================================
- * §2  PACKET FILTER (pf)
+ * 2  PACKET FILTER (pf)
  * ====================================================================== */
 
 SigmaPFCtx_t g_sigma_pf;
@@ -198,7 +199,7 @@ sigma_err_t sigma_pf_match(const char *src, const char *dst,
                 sigma_sigma_printf("S [PF]: %s %s:%u -> %s:%u  rule#%u [label:%s]\n",
                              r->action == PF_PASS ? "PASS" : "BLOCK",
                              src, sport, dst, dport, i,
-                             r->label[0] ? r->label : "—");
+                             r->label[0] ? r->label : "");
 
             if (r->action == PF_BLOCK) {
                 g_sigma_pf.total_blocked++;

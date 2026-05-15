@@ -1,7 +1,7 @@
 #ifndef SIGMA_MONITOR_H
 #define SIGMA_MONITOR_H
 
-#include "core/sigma_types.h"
+#include "include/sigma_types.h"
 
 typedef struct {
     sigma_u32 cpu_utilization;

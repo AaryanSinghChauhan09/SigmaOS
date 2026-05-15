@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN RW-SPINLOCK SHARD (v51.4-ABSOLUTE-VOID)

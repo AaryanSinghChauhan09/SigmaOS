@@ -1,11 +1,11 @@
 #include "../../../include/sigma_log.h"
-#include "libc/SovereignLibC.h"
-#include "hal/sigma_hal.h"
-#include "../../../include/sigma_types.h"
-#include "sigma_unidrop.h"
-#include "hal/sigma_hal.h"
-#include "system/sigma_ipc.h"
-#include "sigma_continuity.h"
+#include "../../../include/libc/SovereignLibC.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_unidrop.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/system/sigma_ipc.h"
+#include "../../../include/sigma_continuity.h"
 
 /**
  * SigmaOS Sovereign Universal Drag & Drop

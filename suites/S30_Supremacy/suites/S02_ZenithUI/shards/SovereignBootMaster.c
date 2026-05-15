@@ -13,7 +13,9 @@
 #ifndef SOVEREIGN_BOOT_MASTER_H
 #define SOVEREIGN_BOOT_MASTER_H
 
-#include "sigma_libc.h"
+#include "../../../../../include/SovereignLibC.h"
+
+#include "../../../../../include/libc/sigma_libc.h"
 #include "suites/S03_Orchestrator/shards/SigmaOOP.h"
 
 // -------------------------------------------------------------------------

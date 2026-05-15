@@ -11,7 +11,7 @@
 //         you ask for it.
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 #define MAX_UI_ELEMENTS     256

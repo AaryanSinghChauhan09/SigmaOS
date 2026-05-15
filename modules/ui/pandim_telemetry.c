@@ -1,4 +1,4 @@
-#include "sigma_libc.h"
+#include "../../include/libc/sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS Pan-Dimensional + Cosmic Telemetry Fusion (Phase 20)

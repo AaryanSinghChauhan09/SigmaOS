@@ -1,5 +1,5 @@
-#include "../../../include/SigmaOOP.hpp"
-#include "../../../include/sigma_types.h"
+#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/core/sigma_types.h"
 #include "observability/sigma_log.h"
 
 namespace SigmaOS {

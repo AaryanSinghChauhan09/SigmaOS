@@ -1,7 +1,8 @@
+#include "../../../../../include/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
-#include "sigma_libc.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 /*
  * Sovereign Package Registry (v1.0).
@@ -37,7 +38,7 @@ sigma_err_t SovereignPkg_Register(const char* name, const char* version) {
 void SovereignPkg_Audit(void) {
     sigma_sigma_printf("S [PKG-AUDIT]: Verifying %d seated application shards...\n", g_pkg_count);
     for (sigma_u32 i = 0; i < g_pkg_count; i++) {
-        sigma_sigma_printf("  ? [OK]: %s (v%s) — integrity verified.\n", g_pkg_registry[i].name, g_pkg_registry[i].version);
+        sigma_sigma_printf("  ? [OK]: %s (v%s)  integrity verified.\n", g_pkg_registry[i].name, g_pkg_registry[i].version);
     }
 }
 

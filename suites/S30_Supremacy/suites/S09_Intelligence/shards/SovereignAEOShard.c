@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS MULTIVERSE_CHRONOS: SOVEREIGN AEO SHARD (v58.2-SUPREME-MULTIVERSE_CHRONOS)

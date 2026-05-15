@@ -1,7 +1,7 @@
-#include "Lattice.h"
-#include "sigma_log.h"
-#include "SovereignLibC.h"
-#include "sigma_log.h"
+#include "../../include/Lattice.h"
+#include "../../include/sigma_log.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
 /* =========================================================================
  * Σ SIGMAOS: PERSONA SHARD (v1.0 - DECLARATIVE PERSONALIZATION)
  * =========================================================================
@@ -10,8 +10,8 @@
  * =========================================================================
  */
 
-#include "SigmaOOP.hpp"
-#include "sigma_log.h"
+#include "../../include/core/SigmaOOP.hpp"
+#include "../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Personalization {

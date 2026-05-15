@@ -1,11 +1,12 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S02_ZenithUI/shards/sigma_boot.c
  * =========================================================================
  */
 
-#include "sigma_boot.h"
-#include "sigma_libc.h"
+#include "../../../../../include/sigma_boot.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 static sigma_boot_config_t s_cfg;
 static sigma_boot_phase_t  s_phase = BOOT_PHASE_FIRMWARE;
@@ -141,7 +142,7 @@ boot_i32 sigma_kexec_load(boot_u64 new_kernel_phys, boot_u64 new_initrd_phys) {
 }
 
 void sigma_kexec_execute(void) {
-    sigma_sigma_printf("S [KEXEC] Jumping to new kernel — no reboot needed.\n");
+    sigma_sigma_printf("S [KEXEC] Jumping to new kernel  no reboot needed.\n");
     /* In real implementation: disable IRQs, flush TLB, jump to entry */
     sigma_boot_phase_advance(BOOT_PHASE_KERNEL);
 }

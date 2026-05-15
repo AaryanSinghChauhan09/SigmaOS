@@ -1,7 +1,7 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "hal/sigma_hal.h"
-#include "libc/SovereignLibC.h"
+#include "../include/sigma_log.h"
+#include "include/sigma_types.h"
+#include "include/hal/sigma_hal.h"
+#include "include/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Quick Shortcuts
@@ -10,7 +10,7 @@
  * USP: Predictively surfaces OS-level shortcuts inside Zenith based on 
  * the user's active workflow (e.g. surfacing IDE tools when compiling).
  *
- * Design: OOP-isolated singleton â€" SovereignShortcutsEngine.
+ * Design: OOP-isolated singleton " SovereignShortcutsEngine.
  */
 
 class SovereignShortcutsEngine {

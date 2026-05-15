@@ -1,6 +1,7 @@
+#include "../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: TOOLS — sovereign_ls.c
+ * S SIGMAOS: TOOLS  sovereign_ls.c
  * =========================================================================
  * Implementation of Idea 361 (Apex Infinity): Native Sovereign LS.
  * Zero dependency on coreutils/stat/libc wrappers.
@@ -8,11 +9,11 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "sigma_types.h"
-#include "sigma_libc.h"
+#include "../../../../include/core/sigma_types.h"
+#include "../../../../include/libc/sigma_libc.h"
 
 #ifdef __SIGMAOS__
-#include "SovereignVFS.h"
+#include "../../../../include/SovereignVFS.h"
 #else
 #include <dirent.h>
 #endif

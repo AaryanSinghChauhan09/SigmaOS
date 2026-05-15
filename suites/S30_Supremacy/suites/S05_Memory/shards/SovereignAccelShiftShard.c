@@ -1,7 +1,8 @@
+#include "../../../../../include/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "SovereignMemory.h"
-#include "sigma_libc.h"
+#include "../../../../../include/SovereignMemory.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 /*
  * Sovereign Hardware-Accelerated Memory Shifting.

@@ -1,7 +1,8 @@
+#include "../../../../../include/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
-#include "sigma_libc.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 /*
  * Sovereign Integrity Shard (v1.0).

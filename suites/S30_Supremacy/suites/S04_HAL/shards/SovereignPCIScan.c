@@ -1,7 +1,8 @@
+#include "../../../../../include/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "SovereignDriver.h"
-#include "sigma_libc.h"
+#include "../../../../../include/SovereignDriver.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 #define MAX_PCI_DEVICES 64
 
@@ -29,9 +30,9 @@ void sigma_pcie_scan(void) {
         SigmaPCIDevice_t* p = &s_pci_scan[s_pci_count++];
         p->vendor_id = simulated[i].vid;
         p->device_id = simulated[i].did;
-        sigma_sigma_printf("S [PCI]: 00:%02x.0 [%04x:%04x] — %s\n", i, p->vendor_id, p->device_id, simulated[i].name);
+        sigma_sigma_printf("S [PCI]: 00:%02x.0 [%04x:%04x]  %s\n", i, p->vendor_id, p->device_id, simulated[i].name);
     }
-    sigma_sigma_printf("S [PCI]: PCIe scan complete — %u devices found.\n", s_pci_count);
+    sigma_sigma_printf("S [PCI]: PCIe scan complete  %u devices found.\n", s_pci_count);
 }
 
 

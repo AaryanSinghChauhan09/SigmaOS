@@ -1,7 +1,8 @@
+#include "../../../../../include/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "SovereignScheduler.h"
-#include "sigma_libc.h"
+#include "../../../../../include/sched/SovereignScheduler.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 /*
  * Sovereign Garuda-Zen Performance Shard.

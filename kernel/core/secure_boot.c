@@ -5,7 +5,7 @@
  * Principles: Shard Signature Verification & Silicon-Native Integrity.
  * =============================================================================
  */
-#include "sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 typedef struct ShardSignature {
     sigma_u64     shard_id;

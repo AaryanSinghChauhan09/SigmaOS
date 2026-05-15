@@ -7,7 +7,9 @@
 #ifndef SOVEREIGN_LIBC_H
 #define SOVEREIGN_LIBC_H
 
-#include "sigma_types.h"
+#include "SovereignLibC.h"
+
+#include "../include/core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,11 +53,12 @@ void  sigma_strcpy(char* dest, const char* src);
 void  sigma_strncpy(char* dest, const char* src, sigma_size_t n);
 int   sigma_strcmp(const char* s1, const char* s2);
 int   sigma_atoi(const char* s);
+char* sigma_strstr(const char* haystack, const char* needle);
 
 void  sigma_print(const char* str);
 void  sigma_print_num(sigma_u64 val);
 void  sigma_print_hex(sigma_u64 val);
-void  sigma_printf(const char* format, ...);
+int  sigma_printf(const char* format, ...);
 void  sigma_log(const char* msg);
 
 /* =========================================================================

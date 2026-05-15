@@ -1,8 +1,8 @@
 #include "../../../include/sigma_log.h"
-#include "../../../include/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 #include "SovereignMultiUser.hpp"
-#include "hal/sigma_hal.h"
-#include "libc/SovereignLibC.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 SovereignMultiUserEngine& SovereignMultiUserEngine::getInstance() {
     static SovereignMultiUserEngine instance;

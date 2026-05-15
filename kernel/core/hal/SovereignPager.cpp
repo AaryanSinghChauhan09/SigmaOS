@@ -3,8 +3,8 @@
  * Implements high-performance demand paging and swapping for the micro-sharded kernel.
  */
 
-#include "../../../include/sigma_types.h"
-#include "hal/sigma_hal.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/hal/sigma_hal.h"
 #include "../../../include/sigma_log.h"
 
 namespace SigmaOS {

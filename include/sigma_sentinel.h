@@ -9,7 +9,7 @@
 #ifndef SIGMA_SENTINEL_H
 #define SIGMA_SENTINEL_H
 
-#include "sigma_types.h"
+#include "../include/core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

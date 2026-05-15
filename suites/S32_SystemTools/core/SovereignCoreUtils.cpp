@@ -1,6 +1,6 @@
-#include "libc/SovereignLibC.h"
-#include "sigma_log.h"
-#include "core/SovereignLatticeFS.h"
+#include "include/SovereignLibC.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/core/SovereignLatticeFS.h"
 
 namespace SigmaOS {
 namespace Userland {

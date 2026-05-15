@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN BIO-CRYPTOGRAPHY SUITE (v2.0 - SUPREME)

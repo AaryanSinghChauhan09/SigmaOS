@@ -1,7 +1,7 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "hal/sigma_hal.h"
-#include "libc/SovereignLibC.h"
+#include "../include/sigma_log.h"
+#include "include/sigma_types.h"
+#include "include/hal/sigma_hal.h"
+#include "include/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Gesture Navigation
@@ -11,7 +11,7 @@
  * for absolutely zero-latency UI manipulation. Feeds directly into the 
  * Zenith Morphic Compositor.
  *
- * Design: OOP-isolated singleton â€" SovereignGestureEngine.
+ * Design: OOP-isolated singleton " SovereignGestureEngine.
  */
 
 class SovereignGestureEngine {

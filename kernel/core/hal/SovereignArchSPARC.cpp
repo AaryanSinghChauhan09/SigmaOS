@@ -1,5 +1,5 @@
-#include "../../../include/SigmaOOP.hpp"
-#include "core/SovereignArch.hpp"
+#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/core/SovereignArch.hpp"
 #include "../../../include/sigma_log.h"
 
 /**

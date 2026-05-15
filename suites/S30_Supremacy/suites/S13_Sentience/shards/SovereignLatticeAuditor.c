@@ -1,16 +1,17 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S13_SENTIENCE — SovereignLatticeAuditor.c
+ * S SIGMAOS: S13_SENTIENCE  SovereignLatticeAuditor.c
  * =========================================================================
  * Implementation of the industrial-grade system integrity monitor.
  * =========================================================================
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
-#include "sigma_types.h"
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 static uint32_t g_audited_count = 0;
 static bool g_sealed = false;

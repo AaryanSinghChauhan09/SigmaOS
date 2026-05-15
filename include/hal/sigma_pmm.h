@@ -1,8 +1,8 @@
 #ifndef SIGMA_PMM_H
 #define SIGMA_PMM_H
 
-#include "core/sigma_types.h"
-#include "core/SigmaOOP.hpp"
+#include "include/sigma_types.h"
+#include "include/SigmaOOP.hpp"
 
 #ifdef __cplusplus
 namespace SigmaOS {

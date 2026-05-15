@@ -4,7 +4,7 @@
  * USP: Everything is a Shard. Mount shards, devices, and remote lattice streams as local files.
  */
 
-#include "sigma_libc.h"
+#include "../../include/libc/sigma_libc.h"
 
 typedef struct {
     char* mount_point;

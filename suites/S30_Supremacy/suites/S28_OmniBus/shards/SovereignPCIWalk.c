@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S28_OMNIBUS — SovereignPCIWalk.c
+ * S SIGMAOS: S28_OMNIBUS  SovereignPCIWalk.c
  * =========================================================================
  * Implementation of Idea 196 (Apex Infinity): PCI Configuration Walkthrough.
  * Provides the industrial-grade discovery mechanism for all PCIe devices.
@@ -8,7 +9,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 /* PCI Access primitives (using HAL S04 logic implicitly) */
 extern void outb(uint16_t port, uint8_t val);

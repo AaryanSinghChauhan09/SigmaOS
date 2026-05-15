@@ -1,7 +1,9 @@
 /* sigma_libc.h — Sovereign canonical shim */
 #ifndef SIGMA_LIBC_H
 #define SIGMA_LIBC_H
-#include "sigma_kernel_types.h"
+
+#include "../../include/SovereignLibC.h"
+#include "../../include/core/sigma_kernel_types.h"
 void          sigma_exit(int code);
 sigma_ssize_t sigma_write(int fd, const void* buf, sigma_size_t count);
 sigma_ssize_t sigma_read(int fd, void* buf, sigma_size_t count);

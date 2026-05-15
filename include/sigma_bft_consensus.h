@@ -1,7 +1,7 @@
 #ifndef SIGMA_BFT_CONSENSUS_H
 #define SIGMA_BFT_CONSENSUS_H
-#include "../suites/S32_SystemTools/include/sigma_types.h"
-#include "sigma_log.h"
+#include "../include/core/sigma_types.h"
+#include "../include/sigma_log.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

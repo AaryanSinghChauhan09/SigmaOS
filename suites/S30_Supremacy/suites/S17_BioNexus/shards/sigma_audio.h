@@ -2,7 +2,7 @@
  * =========================================================================
  * S SIGMAOS kernel/suites/S17_BioNexus/shards/sigma_audio.h
  * =========================================================================
- * Sovereign Audio Subsystem — gap-closes:
+ * Sovereign Audio Subsystem  gap-closes:
  *   Linux  : ALSA (Advanced Linux Sound Architecture), PipeWire, PulseAudio
  *   Windows: WASAPI, WDM audio, DirectSound, ASIO
  *   macOS  : CoreAudio, AudioHAL, AudioUnit, AVAudioEngine
@@ -76,7 +76,7 @@ typedef struct {
 /* -- Mixer control (ALSA amixer / CoreAudio volume) ----------------------- */
 typedef struct {
     char    name[32];
-    au_u32  volume_pct;   /* 0–100                                     */
+    au_u32  volume_pct;   /* 0100                                     */
     au_bool muted;
 } sigma_au_control_t;
 

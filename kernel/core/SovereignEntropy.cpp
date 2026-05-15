@@ -1,5 +1,5 @@
-#include "sigma_entropy.h"
-#include "sigma_hal.h"
+#include "../../include/sigma_entropy.h"
+#include "../../include/hal/sigma_hal.h"
 
 extern "C" uint32_t time_get_uptime_ms(void);
 

@@ -2,7 +2,7 @@
  * =========================================================================
  * S SIGMAOS kernel/suites/S16_SoulMolding/shards/sigma_gpu.h
  * =========================================================================
- * Sovereign GPU Subsystem — gap-closes:
+ * Sovereign GPU Subsystem  gap-closes:
  *   Linux  : DRM/KMS, GEM/TTM buffer objects, PRIME (dma-buf), Mesa/Gallium
  *   Windows: WDDM (Display Model), DXGI, DirectX 12, D3D resource heaps
  *   macOS  : Metal, IOSurface, CoreAnimation, CAMetalLayer

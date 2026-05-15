@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /**
  * @file SovereignUniversalDistroSuite.c
  * @brief Phase 58: Universal Distro Absorption Shard.
@@ -10,10 +11,10 @@
  * - Gentoo: Hardware-Aware Tailored Optimization.
  */
 
-#include "SovereignInit.h"
-#include "sigma_libc.h"
+#include "../../../../../include/SovereignInit.h"
+#include "../../../../../include/libc/sigma_libc.h"
 #include "suites/S01_Genesis/shards/SigmaC11.h"
-#include "SovereignUniversalDistroSuite.h"
+#include "../../../../../include/SovereignUniversalDistroSuite.h"
 
 /* NixOS USP: Functional Purity & Atomic Rollbacks */
 void sigma_nixos_pure_init(void) {

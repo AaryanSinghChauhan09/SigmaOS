@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN DESIGN PRINCIPLES SUITE (v2.0 - INDUSTRIAL)

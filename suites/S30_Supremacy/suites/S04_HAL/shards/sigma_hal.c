@@ -1,11 +1,12 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S04_HAL/shards/sigma_hal.c
  * =========================================================================
  */
 
-#include "sigma_hal.h"
-#include "sigma_libc.h"
+#include "../../../../../include/hal/sigma_hal.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 static sigma_device_t s_devices[SIGMA_HAL_MAX_DEVICES];
 static hal_u32        s_dev_count = 0;

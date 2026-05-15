@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S07_NETWORK — SovereignNetwork_FSM.c
+ * S SIGMAOS: S07_NETWORK  SovereignNetwork_FSM.c
  * =========================================================================
  * Implementation of Idea 251 (Apex Infinity): TCP Finite State Machine.
  * Zero external libraries. Direct state transitions.

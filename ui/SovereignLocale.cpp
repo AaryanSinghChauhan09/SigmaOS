@@ -1,8 +1,8 @@
-#include "sigma_log.h"
-#include "libc/SovereignLibC.h"
-#include "sigma_locale.h"
-#include "hal/sigma_hal.h"
-#include "core/sigma_types.h"
+#include "../include/sigma_log.h"
+#include "include/SovereignLibC.h"
+#include "../include/sigma_locale.h"
+#include "include/hal/sigma_hal.h"
+#include "include/sigma_types.h"
 
 /**
  * SigmaOS Sovereign Locale & Timezone Service Implementation
@@ -10,7 +10,7 @@
  * ZERO-DEPENDENCY: Inline CLDR-derived data; no glibc/ICU/tzdata daemon.
  * Competitor parity: Linux glibc locale, Windows NLS, macOS CFLocale.
  *
- * Design: OOP-isolated singleton â€" SovereignLocaleManager.
+ * Design: OOP-isolated singleton " SovereignLocaleManager.
  */
 
 /* Internal helper: sovereign bare-metal strlen (avoids libc dependency) */

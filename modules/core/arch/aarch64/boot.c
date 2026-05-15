@@ -1,4 +1,4 @@
-#include "sigma_libc.h"
+#include "../../../../include/libc/sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS aarch64 (ARM64) Bootstrapping - Refined MMU Setup

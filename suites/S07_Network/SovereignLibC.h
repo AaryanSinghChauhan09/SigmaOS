@@ -1,6 +1,6 @@
 /* SovereignLibC.h — Sovereign canonical shim */
 #ifndef SOVEREIGN_LIBC_H
 #define SOVEREIGN_LIBC_H
-#include "sigma_kernel_types.h"
-#include "sigma_libc.h"
+#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/libc/sigma_libc.h"
 #endif

@@ -1,11 +1,12 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN PARALLELISM (Suite S19)
  * =========================================================================
  */
 
-#include "sigma_gcd.h"
-#include "sigma_libc.h"
+#include "../../../../../include/sigma_gcd.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 static gcd_queue_t s_queues[GCD_MAX_QUEUES];
 static sigma_u32   s_queue_count = 0;

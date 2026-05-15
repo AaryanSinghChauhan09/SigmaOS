@@ -1,4 +1,4 @@
-#include "core/sigma_types.h"
+#include "../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: INTEL E1000 DRIVER (v1.0)
@@ -6,7 +6,7 @@
  * Principles: Zero-Copy Networking, Silicon-Direct Communication.
  * =============================================================================
  */
-#include "core/sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 #define E1000_REG_TDT   0x3818 /* Transmit Descriptor Tail */
 #define E1000_REG_STATUS 0x0008

@@ -1,4 +1,5 @@
-#include "sigma_libc.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/libc/sigma_libc.h"
 
 // SigmaOS Silicon Boot (S-BOOT)
 // Philosophy: Assembly-Native - Zero-Dependency Hardware Initialization.

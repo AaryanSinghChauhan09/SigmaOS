@@ -1,16 +1,17 @@
+#include "../../../../../include/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 /*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN TOOLCHAIN — ORCHESTRATOR (v1.0)
+ * S SIGMAOS: SOVEREIGN TOOLCHAIN  ORCHESTRATOR (v1.0)
  * =========================================================================
  * Mission: Zero-dependency cross-compilation for embedded devices.
  * Design: C11 / Zero-Dependency / Standalone.
  * =========================================================================
  */
 
-#include "SovereignToolHeader.h"
-#include "sigma_libc.h"
+#include "../../../../../include/SovereignToolHeader.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 void SovereignToolchain_SysrootSetup(const char* arch) {
     sigma_sigma_printf("S [TOOLCHAIN]: Configuring sysroot for %s-sigma-freestanding...\n", arch);

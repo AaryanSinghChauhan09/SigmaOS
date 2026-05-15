@@ -10,7 +10,7 @@
 #ifndef SIGMA_HAL_CORE_H
 #define SIGMA_HAL_CORE_H
 
-#include "../../S01_Genesis/shards/SovereignCommon.h"
+#include "../../../../../include/S01_Genesis/shards/SovereignCommon.h"
 
 typedef enum {
     HAL_DEVICE_GPU   = 1,

@@ -1,7 +1,7 @@
-#include "Lattice.h"
-#include "sigma_log.h"
-#include "SovereignLibC.h"
-#include "sigma_log.h"
+#include "../../include/Lattice.h"
+#include "../../include/sigma_log.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN NCERT ZENITH (v128.0 - SCHOLAR ZENITH)
@@ -10,18 +10,18 @@
  * =========================================================================
  */
 
-#include "SigmaOOP.hpp"
-#include "sigma_log.h"
+#include "../../include/core/SigmaOOP.hpp"
+#include "../../include/sigma_log.h"
 #include "userland/apps/scholar_zenith/ncert_base.hpp"
-#include "sigma_log.h"
+#include "../../include/sigma_log.h"
 #include "userland/apps/scholar_zenith/ncert_physics.hpp"
-#include "sigma_log.h"
+#include "../../include/sigma_log.h"
 #include "userland/apps/scholar_zenith/ncert_chemistry.hpp"
-#include "sigma_log.h"
+#include "../../include/sigma_log.h"
 #include "userland/apps/scholar_zenith/ncert_biology.hpp"
-#include "sigma_log.h"
+#include "../../include/sigma_log.h"
 #include "userland/apps/scholar_zenith/ncert_math.hpp"
-#include "sigma_log.h"
+#include "../../include/sigma_log.h"
 
 int main() {
     sigma_log_info("--- Î£ SIGMA OS SOVEREIGN NCERT ZENITH SHARD ENGINE (v128.0) ---\n");

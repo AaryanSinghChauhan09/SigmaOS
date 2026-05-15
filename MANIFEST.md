@@ -12,6 +12,7 @@ This manifest documents the production-ready status of the SigmaOS Zenith Singul
 | **Standalone (S-STANDALONE)** | `release/standalone` | ✅ Ready | `sigmaos.bin` (ISO) | Bare Metal / QEMU |
 
 ## 🛠 Core Improvements Implemented
+
 - **Premium Design System**: Re-engineered `site.css` with HSL-based glassmorphism and smooth transitions.
 - **ASI Boot Sequence**: Implemented a high-fidelity Asynchronous Shard Ignition simulation in `index.html`.
 - **Zenith Desktop**: Enhanced the `sigma_sh` terminal with colored output, command history, and industrial neofetch.
@@ -19,6 +20,7 @@ This manifest documents the production-ready status of the SigmaOS Zenith Singul
 - **Universal Documentation**: Synchronized and professionalized all READMEs for industrial clarity.
 
 ## 🔑 Accessing the Singularity
+
 To deploy a specific edition:
 ```bash
 git checkout release/<edition-name>

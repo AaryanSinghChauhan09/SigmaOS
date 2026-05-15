@@ -1,9 +1,11 @@
-#include "sigma_hal.h"
-#include "../../../include/sigma_log.h"
-#include "SovereignVFS.hpp"
-#include "../../../include/sigma_log.h"
-#include "SovereignLibC.h"
-#include "../../../include/sigma_log.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "../../include/fs/SovereignVFS.hpp"
+#include "../../include/libc/SovereignLibC.h"
+
+namespace SigmaOS {
+namespace Kernel {
+namespace FS {
 
 /**
  * SigmaOS Sovereign Virtual File System (VFS)
@@ -16,10 +18,7 @@
  * Design: OOP-isolated singleton — SovereignDistributedVFS.
  */
 
-SovereignDistributedVFS& SovereignDistributedVFS::getInstance() {
-    static SovereignDistributedVFS instance;
-    return instance;
-}
+// getInstance is provided by SigmaSingleton
 
 void SovereignDistributedVFS::init() {
     sigma_log("[VFS] Initializing Sovereign Distributed Virtual File System...");
@@ -76,33 +75,37 @@ void SovereignDistributedVFS::atomicSync() {
 
 SovereignDistributedVFS::SovereignDistributedVFS() : active_shards(0), files_tracked(0), system_vector_clock(0), drift_correction_ms(2) {}
 
+} // namespace FS
+} // namespace Kernel
+} // namespace SigmaOS
+
 /* --- C Wrappers --- */
 extern "C" void vfs_init() {
-    SovereignDistributedVFS::getInstance().init();
+    SigmaOS::Kernel::FS::SovereignDistributedVFS::getInstance().init();
 }
 
 extern "C" void vfs_mount_node(const char* node_address) {
-    SovereignDistributedVFS::getInstance().mountDistributedNode(node_address);
+    SigmaOS::Kernel::FS::SovereignDistributedVFS::getInstance().mountDistributedNode(node_address);
 }
 
 extern "C" void vfs_write_file(const char* filepath, const char* data) {
-    SovereignDistributedVFS::getInstance().writeReplicatedFile(filepath, data);
+    SigmaOS::Kernel::FS::SovereignDistributedVFS::getInstance().writeReplicatedFile(filepath, data);
 }
 
 extern "C" sigma_u32 vfs_open(const char* path, sigma_u32 flags) {
-    return SovereignDistributedVFS::getInstance().open(path, flags);
+    return SigmaOS::Kernel::FS::SovereignDistributedVFS::getInstance().open(path, flags);
 }
 
 extern "C" sigma_u32 vfs_read(sigma_u32 fd, void* buf, sigma_u32 sz) {
-    return SovereignDistributedVFS::getInstance().read(fd, buf, sz);
+    return SigmaOS::Kernel::FS::SovereignDistributedVFS::getInstance().read(fd, buf, sz);
 }
 
 extern "C" sigma_u32 vfs_write(sigma_u32 fd, const void* buf, sigma_u32 sz) {
-    return SovereignDistributedVFS::getInstance().write(fd, buf, sz);
+    return SigmaOS::Kernel::FS::SovereignDistributedVFS::getInstance().write(fd, buf, sz);
 }
 
 extern "C" void vfs_close(sigma_u32 fd) {
-    SovereignDistributedVFS::getInstance().close(fd);
+    SigmaOS::Kernel::FS::SovereignDistributedVFS::getInstance().close(fd);
 }
 
 

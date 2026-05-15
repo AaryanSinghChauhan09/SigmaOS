@@ -1,4 +1,5 @@
-#include "core/sigma_types.h"
+#include "../../../include/SovereignLibC.h"
+#include "../../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-CAMERA-SHARD (v3.0 - VISUAL ZENITH)
@@ -14,7 +15,7 @@
  * =============================================================================
  */
 
-#include "core/sigma_kernel_types.h"
+#include "../../../include/core/sigma_kernel_types.h"
 
 /* =========================================================================
  * Fixed-point arithmetic (16.16 format â€ zero libm dependency)

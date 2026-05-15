@@ -6,7 +6,7 @@
 #ifndef SIGMA_BOOT_SECURECHECK_HPP
 #define SIGMA_BOOT_SECURECHECK_HPP
 
-#include "../S08_Security/sigma_pqc_verify.h"
+#include "../../include/sigma_pqc_verify.h"
 
 namespace sigma {
 namespace boot {

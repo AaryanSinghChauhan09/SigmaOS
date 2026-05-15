@@ -17,9 +17,9 @@
 //   • Clean shutdown: sends SIGTERM to all shards in reverse dep order
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
-#include "sigma_libc.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 #define SIGMA_MAX_UNITS      256
 #define SIGMA_UNIT_NAME_LEN   64

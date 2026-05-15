@@ -1,10 +1,10 @@
-#include "hal/sigma_hal.h"
+#include "../../../include/hal/sigma_hal.h"
 #ifndef ABSORPTION_ENGINE_HPP
 #define ABSORPTION_ENGINE_HPP
 
-#include "libc/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
-#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 

@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /**
  * @file SovereignTurboBootstrap.c
  * @brief Phase 59: Turbo-Performance & Instant-Deploy.
@@ -8,8 +9,8 @@
  * - Alpine: Minimal footprint allocation.
  */
 
-#include "SovereignInit.h"
-#include "sigma_libc.h"
+#include "../../../../../include/SovereignInit.h"
+#include "../../../../../include/libc/sigma_libc.h"
 #include "suites/S01_Genesis/shards/SigmaC11.h"
 
 /* High-Speed Parallel Registry */

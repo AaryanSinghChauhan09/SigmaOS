@@ -1,13 +1,14 @@
+#include "../../../../../include/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 /*
- * S SIGMAOS: SOVEREIGN TOOL ABSORBER v3.0 — MODULAR
+ * S SIGMAOS: SOVEREIGN TOOL ABSORBER v3.0  MODULAR
  * Mission: Unified entry point for all software tool absorption shards.
  * Design: C11 / Zero-Dependency / Registry-Based.
  */
-#include "SovereignToolHeader.h"
-#include "SovereignTool.h"
-#include "sigma_string.h"
+#include "../../../../../include/SovereignToolHeader.h"
+#include "../../../../../include/SovereignTool.h"
+#include "../../../../../include/sigma_string.h"
 
 /* Extern Registration Functions */
 extern void SovereignGit_Register(void);

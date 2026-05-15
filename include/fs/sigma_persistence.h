@@ -1,7 +1,7 @@
 #ifndef SIGMA_PERSISTENCE_H
 #define SIGMA_PERSISTENCE_H
 
-#include "core/sigma_types.h"
+#include "include/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

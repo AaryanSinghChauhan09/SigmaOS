@@ -1,4 +1,4 @@
-#include "core/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN DISTRIBUTED TASK SHARD (v9.0 - INDUSTRIAL ZENITH)
@@ -12,7 +12,7 @@
  * =============================================================================
  */
 
-#include "libc/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 #ifndef __cplusplus
 typedef _Bool bool;

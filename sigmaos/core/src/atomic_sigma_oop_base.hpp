@@ -1,7 +1,7 @@
 #ifndef SIGMA_OOP_BASE_HPP
 #define SIGMA_OOP_BASE_HPP
 
-#include "sigma_libc.h"
+#include "../../../include/libc/sigma_libc.h"
 
 namespace sigma {
 namespace core {

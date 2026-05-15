@@ -2,14 +2,14 @@
 
 /*
  * =========================================================================
- * S SIGMAOS: OMNIBUS CLI CONTROLLER (v2.0 — PURE C11)
+ * S SIGMAOS: OMNIBUS CLI CONTROLLER (v2.0 ï¿½ PURE C11)
  * =========================================================================
  * An industrial-grade Command Line Interface to interact with every 
  * Sovereign Subsystem in the kernel natively via IPC/sysfs.
  * =========================================================================
  */
 
-#include "SovereignLibC.h"
+#include "../../../../../include/libc/SovereignLibC.h"
 
 void print_help(void) {
     sigma_sigma_printf("\n======================================================\n");

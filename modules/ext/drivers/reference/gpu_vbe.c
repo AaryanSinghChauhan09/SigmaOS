@@ -3,7 +3,7 @@
  * USP: Direct silicon pixel sharding for Zenith UI.
  */
 
-#include "sigma_libc.h"
+#include "../../../../include/libc/sigma_libc.h"
 
 typedef struct {
     uint16_t attributes;

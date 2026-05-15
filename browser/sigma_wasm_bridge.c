@@ -9,7 +9,7 @@
  *   - LocalStorage for sovereign state persistence.
  * =============================================================================
  */
-#include "sigma_kernel_types.h"
+#include "../include/core/sigma_kernel_types.h"
 
 /* Emscripten-style exports */
 #ifdef __EMSCRIPTEN__

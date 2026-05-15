@@ -1,11 +1,11 @@
-#include "hal/sigma_hal.h"
+#include "../../../include/hal/sigma_hal.h"
 #ifndef PREDICTIVE_SCHEDULER_HPP
 #define PREDICTIVE_SCHEDULER_HPP
 
-#include "libc/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
-#include "../../../include/sigma_types.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

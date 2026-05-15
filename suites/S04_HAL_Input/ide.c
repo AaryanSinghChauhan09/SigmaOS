@@ -1,4 +1,4 @@
-#include "core/sigma_types.h"
+#include "../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: IDE-PIO DRIVER (v1.0)
@@ -6,7 +6,7 @@
  * Principles: Zero-Abstract Hardware Interaction.
  * =============================================================================
  */
-#include "core/sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 #define IDE_DATA        0x1F0
 #define IDE_ERROR       0x1F1

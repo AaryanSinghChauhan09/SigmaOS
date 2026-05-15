@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN ACPI SUBSYSTEM (v1.0 — PURE C11)
+ * S SIGMAOS: SOVEREIGN ACPI SUBSYSTEM (v1.0  PURE C11)
  * =========================================================================
  * Competitor Gap Closed: Linux drivers/acpi/ (ACPI CA), Windows acpi.sys.
  * Modern x86 and ARM servers completely rely on ACPI (Advanced Configuration
@@ -8,18 +9,18 @@
  * SigmaOS had no native abstraction for parsing standard ACPI tables.
  *
  * This shard implements:
- *   § 1  RSDP & RSDT/XSDT Root Pointer Discovery
- *   § 2  Table Descriptors (FADT, MADT, DSDT)
- *   § 3  Interrupt Routing Configuration (MADT IO-APIC parsing)
- *   § 4  Power Management hooks via FADT (RESET_REG, SLEEP)
- *   § 5  ACPI Thermal & Battery status placeholders
+ *    1  RSDP & RSDT/XSDT Root Pointer Discovery
+ *    2  Table Descriptors (FADT, MADT, DSDT)
+ *    3  Interrupt Routing Configuration (MADT IO-APIC parsing)
+ *    4  Power Management hooks via FADT (RESET_REG, SLEEP)
+ *    5  ACPI Thermal & Battery status placeholders
  * =========================================================================
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /* -----------------------------------------------------------------------
- * ¦¦ ACPI STRUCTURES (Packed per specification)
+ *  ACPI STRUCTURES (Packed per specification)
  * ----------------------------------------------------------------------- */
 typedef struct {
     char     signature[8];
@@ -76,14 +77,14 @@ typedef struct {
 } SIGMA_PACKED SigmaACPIFADT_t;
 
 /* -----------------------------------------------------------------------
- * ¦¦ GLOBALS
+ *  GLOBALS
  * ----------------------------------------------------------------------- */
 static SigmaACPIRSDP_t *s_rsdp = SIGMA_NULL;
 static SigmaACPISdtHeader_t *s_fadt = SIGMA_NULL;
 static SigmaACPISdtHeader_t *s_madt = SIGMA_NULL;
 
 /* -----------------------------------------------------------------------
- * ¦¦ ACPI DISCOVERY (RSDP SCAN)
+ *  ACPI DISCOVERY (RSDP SCAN)
  * ----------------------------------------------------------------------- */
 static sigma_bool acpi_checksum(const void *ptr, sigma_u32 len) {
     const sigma_u8 *data = (const sigma_u8 *)ptr;
@@ -100,7 +101,7 @@ static SigmaACPIRSDP_t* acpi_find_rsdp(void) {
 }
 
 /* -----------------------------------------------------------------------
- * ¦¦ TABLE PARSING
+ *  TABLE PARSING
  * ----------------------------------------------------------------------- */
 static void acpi_parse_madt(SigmaACPIMADT_t *madt) {
     sigma_sigma_printf("S [ACPI]: Parsing MADT (Multiple APIC Description Table)\n");
@@ -130,7 +131,7 @@ static void acpi_parse_madt(SigmaACPIMADT_t *madt) {
 }
 
 /* -----------------------------------------------------------------------
- * ¦¦ POWER & THERMAL ABSTRACTIONS
+ *  POWER & THERMAL ABSTRACTIONS
  * ----------------------------------------------------------------------- */
 void sigma_acpi_reboot(void) {
     sigma_sigma_printf("S [ACPI]: Executing ACPI reboot via RESET_REG...\n");
@@ -143,7 +144,7 @@ sigma_i32 sigma_acpi_get_temperature(void) {
 }
 
 /* -----------------------------------------------------------------------
- * ¦¦ INITIALISATION
+ *  INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignACPI_Init(void) {
     sigma_sigma_printf("S [ACPI]: Initialising Sovereign ACPI Core...\n");

@@ -1,8 +1,8 @@
 #include "../../../include/sigma_log.h"
-#include "libc/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
-#include "system/sigma_ipc.h"
-#include "hal/sigma_hal.h"
+#include "../../../include/libc/SovereignLibC.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/system/sigma_ipc.h"
+#include "../../../include/hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign IPC Implementation (Optimized)

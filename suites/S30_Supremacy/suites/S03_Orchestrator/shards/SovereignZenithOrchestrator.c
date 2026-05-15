@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN ZENITH ORCHESTRATOR (v2.0 — FINAL FORMAL)
+ * S SIGMAOS: SOVEREIGN ZENITH ORCHESTRATOR (v2.0  FINAL FORMAL)
  * =========================================================================
  * Mission: Master kernel entry point and unified registry orchestration.
  * Design: C11 / Zero-Dependency / Sector-Based.
@@ -9,16 +10,16 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
-#include "sigma_libc.h"
-#include "SovereignArch.h"
-#include "SovereignMemory.h"
-#include "SovereignSyscall.h"
-#include "SovereignIPC.h"
-#include "SovereignFS.h"
-#include "SovereignNetwork.h"
-#include "SovereignScheduler.h"
-#include "SovereignSecurity.h"
-#include "SovereignInit.h"
+#include "../../../../../include/libc/sigma_libc.h"
+#include "../../../../../include/SovereignArch.h"
+#include "../../../../../include/SovereignMemory.h"
+#include "../../../../../include/SovereignSyscall.h"
+#include "../../../../../include/SovereignIPC.h"
+#include "../../../../../include/SovereignFS.h"
+#include "../../../../../include/SovereignNetwork.h"
+#include "../../../../../include/sched/SovereignScheduler.h"
+#include "../../../../../include/SovereignSecurity.h"
+#include "../../../../../include/SovereignInit.h"
 
 void sigma_kernel_main(void) {
     sigma_sigma_printf("--- S SIGMAOS ZENITH SUPREME: SOVEREIGN REIGN INITIATED --- \n");
@@ -52,7 +53,7 @@ void sigma_kernel_main(void) {
     SovereignInit_StartAll();
 
     sigma_sigma_printf("\n--- S SIGMAOS ZENITH SUPREME: SYSTEM SOVEREIGNTY VERIFIED --- \n");
-    sigma_sigma_printf("S [SYNC]: vROADMAP_1005 — ARCHITECTURAL ZENITH REACHED.\n");
+    sigma_sigma_printf("S [SYNC]: vROADMAP_1005  ARCHITECTURAL ZENITH REACHED.\n");
 }
 
 

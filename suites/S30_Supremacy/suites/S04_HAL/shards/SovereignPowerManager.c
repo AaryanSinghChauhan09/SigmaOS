@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S04_HAL — SovereignPowerManager.c
+ * S SIGMAOS: S04_HAL  SovereignPowerManager.c
  * =========================================================================
  * Mission: ACPI / Power Management Parity.
  * Capability: S-States (Sleep), P-States (Performance), Throttling.

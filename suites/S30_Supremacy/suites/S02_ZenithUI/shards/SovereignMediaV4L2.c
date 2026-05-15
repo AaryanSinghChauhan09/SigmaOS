@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN MEDIA CORE (V4L2 PARITY) (v1.0 — PURE C11)
+ * S SIGMAOS: SOVEREIGN MEDIA CORE (V4L2 PARITY) (v1.0  PURE C11)
  * =========================================================================
  * Competitor Gap Closed: Linux drivers/media/v4l2-core/, macOS AVFoundation,
  * Windows DirectShow / Media Foundation. 
@@ -8,18 +9,18 @@
  * (webcams, TV tuners, hardware encoders/decoders).
  *
  * This shard implements:
- *   § 1  V4L2 generic video device registration (/dev/videoX)
- *   § 2  Videobuf2-style buffer queues for streaming (mmap/userptr)
- *   § 3  Format negotiation (VIDIOC_S_FMT, VIDIOC_G_FMT)
- *   § 4  Stream state machine (VIDIOC_STREAMON, VIDIOC_STREAMOFF)
- *   § 5  Camera controls (Brightness, Exposure, White Balance)
+ *    1  V4L2 generic video device registration (/dev/videoX)
+ *    2  Videobuf2-style buffer queues for streaming (mmap/userptr)
+ *    3  Format negotiation (VIDIOC_S_FMT, VIDIOC_G_FMT)
+ *    4  Stream state machine (VIDIOC_STREAMON, VIDIOC_STREAMOFF)
+ *    5  Camera controls (Brightness, Exposure, White Balance)
  * =========================================================================
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /* -----------------------------------------------------------------------
- * ¦¦ CONSTANTS & MACROS
+ *  CONSTANTS & MACROS
  * ----------------------------------------------------------------------- */
 #define V4L2_MAX_DEVICES    8
 #define V4L2_MAX_BUFFERS    32
@@ -43,7 +44,7 @@
 #define V4L2_MEMORY_USERPTR    2
 
 /* -----------------------------------------------------------------------
- * ¦¦ V4L2 STRUCTURES (Matching Linux UAPI)
+ *  V4L2 STRUCTURES (Matching Linux UAPI)
  * ----------------------------------------------------------------------- */
 typedef struct {
     sigma_u32 width;
@@ -83,7 +84,7 @@ typedef struct {
 } SigmaV4L2Control_t;
 
 /* -----------------------------------------------------------------------
- * ¦¦ VIDEOBUF QUEUE & DEVICE ABSTRACTION
+ *  VIDEOBUF QUEUE & DEVICE ABSTRACTION
  * ----------------------------------------------------------------------- */
 typedef struct SigmaV4L2Device {
     char name[64];
@@ -114,7 +115,7 @@ static SigmaV4L2Device_t s_vdevs[V4L2_MAX_DEVICES];
 static sigma_u32 s_vdev_count = 0;
 
 /* -----------------------------------------------------------------------
- * ¦¦ CORE REGISTRATION
+ *  CORE REGISTRATION
  * ----------------------------------------------------------------------- */
 sigma_err_t sigma_v4l2_register_device(SigmaV4L2Device_t *dev) {
     if (!dev) return SIGMA_EINVAL;
@@ -134,7 +135,7 @@ SigmaV4L2Device_t* sigma_v4l2_get_device(sigma_u32 minor) {
 }
 
 /* -----------------------------------------------------------------------
- * ¦¦ IOCTL EMULATION
+ *  IOCTL EMULATION
  * ----------------------------------------------------------------------- */
 sigma_err_t sigma_v4l2_vidioc_s_fmt(SigmaV4L2Device_t *dev, SigmaV4L2Format_t *f) {
     if (dev->streaming) return SIGMA_EBUSY; /* Can't change format while active */
@@ -195,7 +196,7 @@ sigma_err_t sigma_v4l2_streamon(SigmaV4L2Device_t *dev) {
 }
 
 /* -----------------------------------------------------------------------
- * ¦¦ UVC DRIVER MOCK (USB Video Class)
+ *  UVC DRIVER MOCK (USB Video Class)
  * ----------------------------------------------------------------------- */
 static sigma_err_t mock_uvc_start(SigmaV4L2Device_t *dev) {
     SIGMA_UNUSED(dev);
@@ -205,7 +206,7 @@ static sigma_err_t mock_uvc_start(SigmaV4L2Device_t *dev) {
 }
 
 /* -----------------------------------------------------------------------
- * ¦¦ INITIALISATION
+ *  INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignMediaV4L2_Init(void) {
     sigma_sigma_printf("S [V4L2]: Initialising Sovereign Video4Linux2 Media Core...\n");

@@ -1,4 +1,4 @@
-#include "sigma_bft_consensus.h"
+#include "../../include/sigma_bft_consensus.h"
 
 // Simple internal memory copy to avoid libc dependencies
 static void sigma_internal_sigma_memcpy(void* dest, const void* src, uint32_t len) {

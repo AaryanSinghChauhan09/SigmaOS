@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 
 /* --- External Rust Kernel Pulse --- */
 extern void sovereign_kernel_initial_pulse(void);

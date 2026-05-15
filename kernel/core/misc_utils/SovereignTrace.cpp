@@ -1,9 +1,9 @@
 #include "../../../include/sigma_log.h"
-#include "libc/SovereignLibC.h"
-#include "../../../include/sigma_types.h"
+#include "../../../include/libc/SovereignLibC.h"
+#include "../../../include/core/sigma_types.h"
 #include "observability/sigma_trace.h"
-#include "hal/sigma_hal.h"
-#include "sigma_time.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_time.h"
 
 /**
  * SigmaOS Sovereign Trace Implementation

@@ -1,4 +1,4 @@
-#include "core/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN AI KERNEL ZENITH (v100.0 - PURE C11)
@@ -11,7 +11,7 @@
  * =========================================================================
  */
 
-#include "libc/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 /* =========================================================================
  * Sovereign AI Kernel State (struct replaces C++ class)

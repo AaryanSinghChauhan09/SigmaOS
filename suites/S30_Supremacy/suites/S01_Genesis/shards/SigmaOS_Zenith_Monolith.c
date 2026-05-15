@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN ZENITH ORCHESTRATOR (v2.0 - MODULAR REGISTRY)
@@ -8,7 +9,7 @@
  * =========================================================================
  */
 
-#include "SovereignOSBasicsZenith.h"
+#include "../../../../../include/SovereignOSBasicsZenith.h"
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 

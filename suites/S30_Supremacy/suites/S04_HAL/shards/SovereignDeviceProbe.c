@@ -12,8 +12,10 @@
 #ifndef SOVEREIGN_DEVICE_PROBE_C
 #define SOVEREIGN_DEVICE_PROBE_C
 
-#include "SovereignArch.h"
-#include "sigma_libc.h"
+#include "../../../../../include/SovereignLibC.h"
+
+#include "../../../../../include/SovereignArch.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 void SovereignDevice_ProbeMatrix(void) {
     sigma_sigma_printf("S [PROBE]: Initiating Universal Hardware Discovery...\n");

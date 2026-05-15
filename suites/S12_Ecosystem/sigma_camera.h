@@ -11,7 +11,7 @@
 #ifndef SIGMA_CAMERA_H
 #define SIGMA_CAMERA_H
 
-#include "../libc/sigma_libc.h"
+#include "../../include/libc/sigma_libc.h"
 
 typedef enum {
     FILTER_NONE = 0,

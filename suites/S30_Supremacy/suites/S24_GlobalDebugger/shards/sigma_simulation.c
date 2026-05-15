@@ -1,11 +1,12 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN SIMULATION (Suite S24)
  * =========================================================================
  */
 
-#include "sigma_simulation.h"
-#include "sigma_libc.h"
+#include "../../../../../include/sigma_simulation.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 static sim_context_t s_active_sim[4];
 static sigma_u32     s_sim_count = 0;

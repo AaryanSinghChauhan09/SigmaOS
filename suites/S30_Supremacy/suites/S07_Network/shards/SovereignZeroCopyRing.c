@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S07_NETWORK — SovereignZeroCopyRing.c
+ * S SIGMAOS: S07_NETWORK  SovereignZeroCopyRing.c
  * =========================================================================
  * Mission: Bypassing Kernel Bottlenecks (DPDK/XDP Parity).
  * Capability: Direct-to-Device memory mapping for 100Gbps+ throughput.

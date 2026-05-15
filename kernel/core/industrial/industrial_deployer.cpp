@@ -1,8 +1,8 @@
 #include "../../../include/sigma_log.h"
-#include "hal/sigma_hal.h"
-#include "../../../include/sigma_types.h"
-#include "industrial_deployer.hpp"
-#include "libc/SovereignLibC.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/industrial_deployer.hpp"
+#include "../../../include/libc/SovereignLibC.h"
 
 void gatekeeper_init();
 void assistant_init();

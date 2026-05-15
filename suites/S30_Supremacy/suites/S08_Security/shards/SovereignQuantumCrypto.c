@@ -11,7 +11,7 @@
 //   • Optimized AVX-512 implementation for zero-latency encryption.
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 #define PQC_PUBKEY_LEN      1184 // Kyber-768

@@ -1,8 +1,8 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "hal/sigma_hal.h"
-#include "libc/SovereignLibC.h"
-#include "sigma_time.h"
+#include "../../include/sigma_log.h"
+#include "include/sigma_types.h"
+#include "include/hal/sigma_hal.h"
+#include "include/SovereignLibC.h"
+#include "../../include/sigma_time.h"
 
 /**
  * SigmaOS Sovereign Adaptive Theme Engine
@@ -11,7 +11,7 @@
  * USP: Hardware-accelerated glassmorphism with Adaptive auto-dark switching 
  * natively embedded in the OS kernel.
  *
- * Design: OOP-isolated singleton â€" SovereignThemeEngine.
+ * Design: OOP-isolated singleton " SovereignThemeEngine.
  */
 
 class SovereignThemeEngine {

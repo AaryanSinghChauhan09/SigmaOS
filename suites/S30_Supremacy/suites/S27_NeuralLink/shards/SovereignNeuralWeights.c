@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S27_NEURALLINK — SovereignNeuralWeights.c
+ * S SIGMAOS: S27_NEURALLINK  SovereignNeuralWeights.c
  * =========================================================================
  * Mission: Hardware-Accelerated Weight Scaling for Sentient Intelligence.
  * Capability: Matrix dot-products, SIMD-accelerated inference.

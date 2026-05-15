@@ -1,5 +1,5 @@
-#include "core/sigma_types.h"
-#include "Lattice.h"
+#include "include/sigma_types.h"
+#include "../../../include/Lattice.h"
 #include "camera_zenith.hpp"
 
 namespace SigmaOS {

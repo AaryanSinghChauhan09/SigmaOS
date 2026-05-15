@@ -1,11 +1,12 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S16_SoulMolding/shards/sigma_gpu.c
  * =========================================================================
  */
 
-#include "sigma_gpu.h"
-#include "sigma_libc.h"
+#include "../../../../../include/drivers/sigma_gpu.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 static sigma_bo_t         s_bos[GPU_MAX_BOS];
 static gpu_u32            s_bo_count    = 0;

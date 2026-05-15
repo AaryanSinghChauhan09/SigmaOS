@@ -11,7 +11,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 #define HUGE_PAGE_SIZE (2u * 1024u * 1024u) /* 2MB Shard */
 

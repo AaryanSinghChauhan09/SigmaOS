@@ -1,4 +1,4 @@
-#include "sigma_package_registry.h"
+#include "../../include/sigma_package_registry.h"
 
 // Internal string copy
 static void sigma_internal_strncpy(char* dest, const char* src, uint32_t n) {

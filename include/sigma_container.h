@@ -12,7 +12,7 @@
 #ifndef SIGMA_CONTAINER_H
 #define SIGMA_CONTAINER_H
 
-#include "sigma_types.h"
+#include "../include/core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

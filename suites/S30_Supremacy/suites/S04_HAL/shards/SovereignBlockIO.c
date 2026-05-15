@@ -1,24 +1,25 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN BLOCK IO LAYER (v1.0 — PURE C11)
+ * S SIGMAOS: SOVEREIGN BLOCK IO LAYER (v1.0  PURE C11)
  * =========================================================================
  * Competitor Gap Closed: Linux block/ (blk-mq), Windows disk/Classpnp,
  * macOS IOBlockStorageDriver. SigmaOS had no block layer abstraction,
  * only a bare NVMe driver skeleton in SovereignDriverFramework.
  *
  * This shard implements:
- *   § 1  Generic block device representation (gendisk/block_device)
- *   § 2  bio (Block I/O) request structure
- *   § 3  Multi-queue block I/O scheduling (blk-mq)
- *   § 4  Elevator algorithm (MQ-Deadline / FCFS)
- *   § 5  Partition parsing abstraction (MBR / GPT)
+ *    1  Generic block device representation (gendisk/block_device)
+ *    2  bio (Block I/O) request structure
+ *    3  Multi-queue block I/O scheduling (blk-mq)
+ *    4  Elevator algorithm (MQ-Deadline / FCFS)
+ *    5  Partition parsing abstraction (MBR / GPT)
  * =========================================================================
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /* -----------------------------------------------------------------------
- * ¦¦ CONSTANTS
+ *  CONSTANTS
  * ----------------------------------------------------------------------- */
 #define MAX_BLOCK_DEVICES    32
 #define MAX_PARTITIONS       16
@@ -31,7 +32,7 @@
 #define BLK_OP_DISCARD       3
 
 /* -----------------------------------------------------------------------
- * ¦¦ BIO (Block I/O) Request
+ *  BIO (Block I/O) Request
  * ----------------------------------------------------------------------- */
 typedef void (*SigmaBioEndIo_t)(void *bio);
 
@@ -49,7 +50,7 @@ typedef struct SigmaBio {
 } SigmaBio_t;
 
 /* -----------------------------------------------------------------------
- * ¦¦ REQUEST QUEUE (blk-mq equivalent)
+ *  REQUEST QUEUE (blk-mq equivalent)
  * ----------------------------------------------------------------------- */
 typedef struct {
     SigmaBio_t *head;
@@ -59,7 +60,7 @@ typedef struct {
 } SigmaRequestQueue_t;
 
 /* -----------------------------------------------------------------------
- * ¦¦ BLOCK DEVICE STRUCTURE
+ *  BLOCK DEVICE STRUCTURE
  * ----------------------------------------------------------------------- */
 typedef struct SigmaBlockDevice {
     char name[32];          /* "sda", "nvme0n1" */
@@ -81,7 +82,7 @@ static SigmaBlockDevice_t s_bdevs[MAX_BLOCK_DEVICES];
 static sigma_u32 s_bdev_count = 0;
 
 /* -----------------------------------------------------------------------
- * ¦¦ REGISTRATION 
+ *  REGISTRATION 
  * ----------------------------------------------------------------------- */
 SigmaBlockDevice_t* sigma_blk_allocate_disk(void) {
     if (s_bdev_count >= MAX_BLOCK_DEVICES) return SIGMA_NULL;
@@ -101,7 +102,7 @@ sigma_err_t sigma_blk_register_disk(SigmaBlockDevice_t *bdev) {
 }
 
 /* -----------------------------------------------------------------------
- * ¦¦ I/O SCHEDULING & DISPATCH (Elevator)
+ *  I/O SCHEDULING & DISPATCH (Elevator)
  * ----------------------------------------------------------------------- */
 /* Generic make_request function called by filesystem layer */
 sigma_err_t sigma_submit_bio(SigmaBlockDevice_t *bdev, SigmaBio_t *bio) {
@@ -148,7 +149,7 @@ void sigma_bio_complete(SigmaBio_t *bio, sigma_err_t status) {
 }
 
 /* -----------------------------------------------------------------------
- * ¦¦ SIMULATED NVMe DRIVER BINDING
+ *  SIMULATED NVMe DRIVER BINDING
  * ----------------------------------------------------------------------- */
 static sigma_err_t dummy_nvme_submit_bio(SigmaBlockDevice_t *bdev, SigmaBio_t *bio) {
     SIGMA_UNUSED(bdev);
@@ -172,7 +173,7 @@ static void my_bio_end_io(void *arg) {
 }
 
 /* -----------------------------------------------------------------------
- * ¦¦ /proc/diskstats Parity
+ *  /proc/diskstats Parity
  * ----------------------------------------------------------------------- */
 void sigma_blk_print_stats(void) {
     sigma_sigma_printf("S [BLK]: Block Layer Statistics:\n");
@@ -187,7 +188,7 @@ void sigma_blk_print_stats(void) {
 }
 
 /* -----------------------------------------------------------------------
- * ¦¦ INITIALISATION
+ *  INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignBlockIO_Init(void) {
     sigma_sigma_printf("S [BLK]: Initialising Sovereign Block IO Layer (blk-mq)...\n");

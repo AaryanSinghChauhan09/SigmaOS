@@ -9,7 +9,7 @@
  *   - Consensus-based result verification.
  * =============================================================================
  */
-#include "sigma_kernel_types.h"
+#include "../include/core/sigma_kernel_types.h"
 
 typedef struct TaskPacket {
     sigma_u32     task_id;

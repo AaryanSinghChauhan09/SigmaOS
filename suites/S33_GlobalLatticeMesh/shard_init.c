@@ -2,9 +2,9 @@
  * SigmaOS Global Lattice Mesh — Shard Init
  * Registers S33 with the Sovereign Lattice at boot time.
  * ============================================================================= */
-#include "sigma_lattice_mesh.h"
-#include "sigma_kernel_types.h"
-#include "sigma_libc.h"
+#include "../../include/sigma_lattice_mesh.h"
+#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/libc/sigma_libc.h"
 
 /* Global mesh node instance */
 static sigma_lattice_node_t g_mesh_node;

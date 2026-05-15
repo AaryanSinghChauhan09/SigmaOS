@@ -3,13 +3,13 @@
  * Î£ SIGMAOS: CLAW RESOURCE QUOTAS (Agent Sandboxing Shard)
  * =========================================================================
  * Mission: Enforces resource limits (CPU/MEM/IO) on Claw agents.
- * Layer  : L4 â€" AI & Automation
+ * Layer  : L4 " AI & Automation
  * =========================================================================
  */
 
-#include "../../../include/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 #include "../../../include/sigma_log.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

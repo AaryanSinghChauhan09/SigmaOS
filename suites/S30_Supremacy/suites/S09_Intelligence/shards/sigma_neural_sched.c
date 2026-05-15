@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S09_Intelligence/shards/sigma_neural_sched.c
@@ -7,8 +8,8 @@
  * =========================================================================
  */
 
-#include "sigma_neural_sched.h"
-#include "sigma_libc.h"
+#include "../../../../../include/sigma_neural_sched.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 /* ── Fixed-point helpers (Q8: multiplied by 256) ─────────────────────────── */
 #define Q8_ONE   256

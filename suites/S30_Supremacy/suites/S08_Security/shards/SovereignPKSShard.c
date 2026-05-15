@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS VALKYRIE: SOVEREIGN PKS SHARD (v57.7-SUPREME-VALKYRIE)

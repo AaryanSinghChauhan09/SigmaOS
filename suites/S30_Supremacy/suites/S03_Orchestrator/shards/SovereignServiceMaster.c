@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S03_ORCHESTRATOR — SovereignServiceMaster.c
+ * S SIGMAOS: S03_ORCHESTRATOR  SovereignServiceMaster.c
  * =========================================================================
  * Mission: Systemd Parity (Unit Management).
  * Capability: Dependency mapping, parallel startup, watchdog monitoring.

@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S31_GLOBALGOVERNANCE — SovereignAudioEngine.c
+ * S SIGMAOS: S31_GLOBALGOVERNANCE  SovereignAudioEngine.c
  * =========================================================================
  * Mission: High-Fidelity Spatial Audio and Signal Processing Grid.
  * Design: Low-latency Ring-Buffer, Mixed-Channel Mesh.

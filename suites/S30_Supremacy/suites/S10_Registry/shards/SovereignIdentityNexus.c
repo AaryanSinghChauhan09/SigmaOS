@@ -13,7 +13,7 @@
 //   • Zero-Knowledge Proofs: Login without ever transmitting the password.
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 #define MAX_IDENTITY_TOKENS 16

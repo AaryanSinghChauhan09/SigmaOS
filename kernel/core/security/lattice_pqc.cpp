@@ -1,8 +1,8 @@
-#include "Lattice.h"
+#include "../../../include/Lattice.h"
 #include "../../../include/sigma_log.h"
 #include "lattice_pqc.hpp"
 #include "../../../include/sigma_log.h"
-#include "SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 #include "../../../include/sigma_log.h"
 
 namespace SigmaOS {

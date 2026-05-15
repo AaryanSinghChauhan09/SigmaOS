@@ -8,7 +8,7 @@
  * =========================================================================
  */
 
-#include "SigmaOOP.hpp"
+#include "../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Wizard {

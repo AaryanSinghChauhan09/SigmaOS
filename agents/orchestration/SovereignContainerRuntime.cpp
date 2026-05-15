@@ -4,14 +4,14 @@
  * =========================================================================
  * Mission: Bridges interoperability gaps with Docker, Kubernetes, and 
  *          enterprise OCI (Open Container Initiative) ecosystems.
- * Layer  : L5 â€" Industrial Ecosystem
+ * Layer  : L5 " Industrial Ecosystem
  * =========================================================================
  */
 
-#include "core/sigma_types.h"
-#include "libc/SovereignLibC.h"
-#include "core/SigmaOOP.hpp"
-#include "sigma_log.h"
+#include "include/sigma_types.h"
+#include "include/SovereignLibC.h"
+#include "include/SigmaOOP.hpp"
+#include "../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Kernel {

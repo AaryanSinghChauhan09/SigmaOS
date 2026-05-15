@@ -1,10 +1,11 @@
+#include "../../../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN I/O SHARD (v1.0 - PURE C11)
  * =========================================================================
  */
 
-#include "sigma_libc.h"
+#include "../../../../../../../include/libc/sigma_libc.h"
 
 void sigma_print(const char* str) {
     if (!str) return;

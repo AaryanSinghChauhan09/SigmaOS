@@ -1,3 +1,4 @@
+#include "../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS ZENITH SUPREME: SCHEDULER SHARD (O(1) COORDINATION)
@@ -7,8 +8,8 @@
  * =========================================================================
  */
 
-#include "../libc/sigma_libc.h"
-#include "../libc/sigma_types.h"
+#include "../../include/libc/sigma_libc.h"
+#include "../../include/core/sigma_types.h"
 
 #define MAX_TASKS 64
 #define STACK_SIZE 16384

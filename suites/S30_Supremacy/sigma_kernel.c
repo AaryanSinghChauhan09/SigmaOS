@@ -1,3 +1,4 @@
+#include "../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN KERNEL ZENITH (v94.0 ZENITH SUPREME)
@@ -7,8 +8,8 @@
  * =========================================================================
  */
 
-#include "../libc/sigma_libc.h"
-#include "sigma_basics.h"
+#include "../../include/libc/sigma_libc.h"
+#include "../../include/sigma_basics.h"
 
 /* --- External Components --- */
 extern void sovereign_register_shard_system(void);

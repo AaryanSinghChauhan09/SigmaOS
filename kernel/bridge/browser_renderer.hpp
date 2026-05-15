@@ -1,10 +1,10 @@
 #ifndef BROWSER_RENDERER_HPP
 #define BROWSER_RENDERER_HPP
 
-#include "SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "../../include/core/sigma_types.h"
+#include "../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Bridge {

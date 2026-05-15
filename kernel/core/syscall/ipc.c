@@ -1,4 +1,4 @@
-#include "core/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN IPC FRAMEWORK (v1.0)
@@ -6,7 +6,7 @@
  * Principles: Asynchronous Message Passing & Shard-Isolation Integrity.
  * =============================================================================
  */
-#include "core/sigma_kernel_types.h"
+#include "../../../include/core/sigma_kernel_types.h"
 
 extern sigma_u32 cpu_get_id(void);
 

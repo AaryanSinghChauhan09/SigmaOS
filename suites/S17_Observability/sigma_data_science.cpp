@@ -1,5 +1,5 @@
-#include "sigma_libc.h"
-#include "sigma_kernel_types.h"
+#include "../../include/libc/sigma_libc.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 // Î£ SIGMAOS: SOVEREIGN DATA SCIENCE & OBSERVABILITY
 // Responsibility: Metric collection, structured logging, and predictive analytics.
@@ -41,8 +41,8 @@ public:
 
     void predictive_analytics() {
         sigma_print("[DATA-SCIENCE] Running resource usage forecasting (ARIMA/RNN mock)...\n");
-        sigma_print("[âœ"] Prediction: CPU spike expected on S02_ZenithUI in T-minus 400ms.\n");
-        sigma_print("[âœ"] Recommendation: Pre-warm GPU cache and scale S28_Performance.\n");
+        sigma_print("["] Prediction: CPU spike expected on S02_ZenithUI in T-minus 400ms.\n");
+        sigma_print("["] Recommendation: Pre-warm GPU cache and scale S28_Performance.\n");
     }
 };
 

@@ -1,7 +1,7 @@
 #ifndef AETHER_ORCHESTRATOR_HPP
 #define AETHER_ORCHESTRATOR_HPP
 
-#include "SigmaOOP.hpp"
+#include "../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Automation {

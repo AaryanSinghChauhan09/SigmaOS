@@ -3,13 +3,13 @@
  * Î£ SIGMAOS: SOVEREIGN WHONIX TOR (Privacy Networking Shim)
  * =========================================================================
  * Mission: Implements SEC-004 (Privacy-first defaults from Whonix/Tails).
- * Layer  : L3 â€" Security / Network
+ * Layer  : L3 " Security / Network
  * =========================================================================
  */
 
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "include/sigma_types.h"
+#include "../include/sigma_log.h"
+#include "include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

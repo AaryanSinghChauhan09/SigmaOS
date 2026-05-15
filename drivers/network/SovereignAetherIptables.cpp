@@ -4,13 +4,13 @@
  * =========================================================================
  * Mission: Bridges the maturity gap with Linux networking by mapping
  *          standard iptables/nftables rules into the Aether Firewall.
- * Layer  : L2 â€" System Services / Network
+ * Layer  : L2 " System Services / Network
  * =========================================================================
  */
 
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "include/sigma_types.h"
+#include "../../include/sigma_log.h"
+#include "include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS OMNIPOTENCE: SOVEREIGN MBO SHARD (v57.5-SUPREME-OMNIPOTENCE)

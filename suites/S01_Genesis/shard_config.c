@@ -4,7 +4,7 @@
  * USP: Atomically apply lattice-wide configurations from a single source of truth.
  */
 
-#include "sigma_libc.h"
+#include "../../include/libc/sigma_libc.h"
 
 typedef struct {
     char* suite_name;

@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S04_HAL — SovereignHAL_x86_64.c
+ * S SIGMAOS: S04_HAL  SovereignHAL_x86_64.c
  * =========================================================================
  * Implementation of Idea 131 (Apex Infinity): Hardware Abstraction Layer.
  * Direct silicon interaction for x86_64 architecture.
@@ -8,7 +9,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 /* Port I/O primitives */
 static inline void outb(uint16_t port, uint8_t val) {

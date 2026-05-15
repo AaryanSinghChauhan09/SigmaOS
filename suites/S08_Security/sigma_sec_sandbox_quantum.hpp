@@ -6,8 +6,8 @@
 #ifndef SIGMA_SEC_SANDBOX_QUANTUM_HPP
 #define SIGMA_SEC_SANDBOX_QUANTUM_HPP
 
-#include "../../sigmaos/core/src/atomic_sigma_process.hpp"
-#include "sigma_pqc_verify.h"
+#include "../../include/sigmaos/core/src/atomic_sigma_process.hpp"
+#include "../../include/sigma_pqc_verify.h"
 
 namespace sigma {
 namespace security {

@@ -1,10 +1,10 @@
-#include "../../../include/sigma_types.h"
-#include "hal/sigma_hal.h"
-#include "libc/SovereignLibC.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/libc/SovereignLibC.h"
 #ifndef INTERRUPT_SHARD_HPP
 #define INTERRUPT_SHARD_HPP
 
-#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

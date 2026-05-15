@@ -7,7 +7,7 @@
 #ifndef SIGMA_SYS_BUSYBOX_H
 #define SIGMA_SYS_BUSYBOX_H
 
-#include "sigma_libc.h"
+#include "../../include/libc/sigma_libc.h"
 
 // ── sigma_echo: print a string ──────────────────────────────────────────────
 static inline void sigma_echo(const char* msg) {

@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S31_GOVERNANCE — SovereignLifecycle.c
+ * S SIGMAOS: S31_GOVERNANCE  SovereignLifecycle.c
  * =========================================================================
  * Mission: Android Parity (Lifecycle States).
  * Capability: OnStart, OnResume, OnPause, OnDestroy for system services.

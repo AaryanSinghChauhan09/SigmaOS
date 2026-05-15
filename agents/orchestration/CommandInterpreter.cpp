@@ -1,9 +1,9 @@
-#include "core/sigma_types.h"
-#include "libc/SovereignLibC.h"
-#include "hal/sigma_hal.h"
-#include "sigma_log.h"
-#include "core/context/manager.hpp"
-#include "../AgentBase.h"
+#include "include/sigma_types.h"
+#include "include/SovereignLibC.h"
+#include "include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "../../include/core/context/manager.hpp"
+#include "../../include/AgentBase.h"
 
 /**
  * AI Orchestration: Command Interpreter

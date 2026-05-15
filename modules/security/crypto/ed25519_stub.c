@@ -1,5 +1,5 @@
-#include "sigma_libc.h"
-#include "sigma_libc.h"
+#include "../../../include/libc/sigma_libc.h"
+#include "../../../include/libc/sigma_libc.h"
 
 // ---------------------------------------------------------
 // libsovereign_crypto : Ed25519 Stub Implementation

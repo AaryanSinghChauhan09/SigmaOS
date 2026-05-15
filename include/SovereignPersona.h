@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_PERSONA_H
 #define SOVEREIGN_PERSONA_H
 
-#include "SovereignLibC.h"
+#include "../include/libc/SovereignLibC.h"
 
 typedef struct SovereignPersona {
     char name[32];

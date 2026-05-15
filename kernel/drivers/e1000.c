@@ -5,7 +5,7 @@
  * Principles: Zero-Copy Networking, Silicon-Direct Communication.
  * =============================================================================
  */
-#include "sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 #define E1000_REG_TDT   0x3818 /* Transmit Descriptor Tail */
 #define E1000_REG_STATUS 0x0008

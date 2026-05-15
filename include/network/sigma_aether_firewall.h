@@ -9,7 +9,7 @@
 #ifndef SIGMA_AETHER_FIREWALL_H
 #define SIGMA_AETHER_FIREWALL_H
 
-#include "core/sigma_types.h"
+#include "include/sigma_types.h"
 
 #ifdef __cplusplus
 namespace SigmaOS {

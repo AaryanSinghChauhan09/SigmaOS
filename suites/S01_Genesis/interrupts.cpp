@@ -1,5 +1,5 @@
-#include "sigma_types.h"
-#include "sigma_libc.h"
+#include "../../include/core/sigma_types.h"
+#include "../../include/libc/sigma_libc.h"
 
 // IDT Entry Structure (x86_64)
 struct idt_entry {
@@ -70,7 +70,7 @@ void sigma_idt_init() {
     
     // Load IDT
     asm volatile("lidt %0" : : "m"(idtr_ptr));
-    sigma_print("[âœ"] IDT Loaded at 0x%p\n", idtr_ptr.base);
+    sigma_print("["] IDT Loaded at 0x%p\n", idtr_ptr.base);
 }
 
 } // extern "C"

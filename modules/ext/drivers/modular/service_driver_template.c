@@ -4,7 +4,7 @@
  * USP: Driver isolation via IPC-based messaging rather than direct kernel linking.
  */
 
-#include "sigma_libc.h"
+#include "../../../../include/libc/sigma_libc.h"
 
 typedef struct {
     uint32_t type;

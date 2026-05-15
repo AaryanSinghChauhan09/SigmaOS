@@ -11,6 +11,7 @@ Welcome to the SigmaOS industrial development lattice. To maintain silicon sover
 ## Pull Request Process
 
 1. **Shard Proposal**: Open an issue detailing the shard's mission, absorbed patterns, and industrial utility.
+
 2. **Implementation**: Build your shard in the appropriate directory (`kernel/core/`, `drivers/`, etc.).
 3. **Verification**: Your shard must pass the `verify_sovereignty.ps1` audit and the `S-FSCK` consistency check.
 4. **Documentation**: Update the Wiki with shard architecture and syscall additions.

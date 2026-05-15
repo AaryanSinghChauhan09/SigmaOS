@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS MULTIVERSE_EXODUS: SOVEREIGN FAM SHARD (v58.0-SUPREME-MULTIVERSE_EXODUS)

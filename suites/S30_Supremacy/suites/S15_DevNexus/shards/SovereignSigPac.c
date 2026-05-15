@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SIGPAC (SOVEREIGN PACKAGE MANAGER CLI)

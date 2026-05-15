@@ -1,4 +1,5 @@
-#include "sigma_libc.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/libc/sigma_libc.h"
 
 // SigmaOS Universal Abstraction Layer (UAL)
 // Purpose: Seamless adaptation across Bare-metal, Virtualized (QEMU), and Browser (WASM) environments.

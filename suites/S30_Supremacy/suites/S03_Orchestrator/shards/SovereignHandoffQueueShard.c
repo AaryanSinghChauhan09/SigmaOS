@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN HANDOFF-QUEUE SHARD (v55.5-ORION-ZENITH)

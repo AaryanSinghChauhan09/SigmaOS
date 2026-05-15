@@ -1,9 +1,9 @@
-#include "hal/sigma_hal.h"
-#include "libc/SovereignLibC.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/libc/SovereignLibC.h"
 #ifndef SOVEREIGN_ONBOARDING_HPP
 #define SOVEREIGN_ONBOARDING_HPP
 
-#include "../../../include/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 
 class SovereignOnboardingEngine {
 public:

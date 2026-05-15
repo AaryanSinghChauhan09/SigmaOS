@@ -1,10 +1,10 @@
 #ifndef SECURITY_FABRIC_HPP
 #define SECURITY_FABRIC_HPP
 
-#include "SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
-#include "../../../include/sigma_types.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Security {

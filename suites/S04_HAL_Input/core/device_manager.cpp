@@ -1,7 +1,7 @@
-#include "sigma_log.h"
-#include "Lattice.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/Lattice.h"
 #include "device_manager.hpp"
-#include "libc/SovereignLibC.h"
+#include "include/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Drivers {

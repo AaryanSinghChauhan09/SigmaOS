@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S22_SIMULATIONNEXUS — SovereignPhysicsEngine.c
+ * S SIGMAOS: S22_SIMULATIONNEXUS  SovereignPhysicsEngine.c
  * =========================================================================
  * Mission: High-Fidelity Reality Simulation.
  * Capability: Rigid body dynamics, Collision detection, Entropy math.

@@ -11,7 +11,7 @@
 #ifndef SIGMA_LOCALE_H
 #define SIGMA_LOCALE_H
 
-#include "sigma_types.h"
+#include "../include/core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

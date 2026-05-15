@@ -1,4 +1,5 @@
-#include "core/sigma_types.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: USB XHCI HOST CONTROLLER DRIVER (v1.0 â€ PURE C11)
@@ -14,7 +15,7 @@
  * =============================================================================
  */
 
-#include "core/sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 <<<<<<< HEAD:suites/S04_HAL_Input/shard_usb.c
 extern void  ksigma_printf(const char *fmt, ...);

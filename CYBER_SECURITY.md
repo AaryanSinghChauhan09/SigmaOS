@@ -4,7 +4,7 @@
 
 SigmaOS is built from the ground up to resist quantum-computational attacks.
 
-### Components:
+### Components
 
 - **S-PLOIT**: A native C implementation of penetration testing frameworks (Metasploit parity).
 - **S-MAP**: High-performance network scanning and packet analysis (Nmap/Wireshark absorption).
@@ -15,7 +15,7 @@ SigmaOS is built from the ground up to resist quantum-computational attacks.
 
 SigmaOS provides a turnkey environment for security professionals to audit silicon and networking infrastructures.
 
-### Bundled Tools:
+### Bundled Tools
 
 - **Lattice-Native Fuzzers**: Directed at the Sovereign memory allocator and system calls.
 - **Protocol Shards**: Pre-configured shards for auditing 802.11 (Wi-Fi), Bluetooth (BlueZ), and IPsec tunnels.
@@ -29,4 +29,4 @@ SigmaOS provides a turnkey environment for security professionals to audit silic
 
 ---
 
-### Stay Sovereign.
+### Stay Sovereign

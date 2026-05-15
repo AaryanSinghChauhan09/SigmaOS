@@ -1,10 +1,10 @@
-#include "core/sigma_types.h"
-#include "sigma_universal_ui.h" // Assume UI API
-#include "sigma_log.h"
+#include "include/sigma_types.h"
+#include "../../include/sigma_universal_ui.h" // Assume UI API
+#include "../../include/sigma_log.h"
 #include "ai/sigma_claw.h"
 
 /**
- * SovereignClawCompanion â€" Userland app for the Claw Gateway
+ * SovereignClawCompanion " Userland app for the Claw Gateway
  * Provides the interactive "Live Canvas" and multi-channel conversational UI.
  */
 

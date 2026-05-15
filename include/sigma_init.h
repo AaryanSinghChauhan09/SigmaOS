@@ -1,6 +1,6 @@
 #ifndef SIGMA_INIT_H
 #define SIGMA_INIT_H
-#include "sigma_types.h"
+#include "../include/core/sigma_types.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

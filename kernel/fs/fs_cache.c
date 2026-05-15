@@ -5,7 +5,7 @@
  * Principles: LRU Block Caching & Zero-Downtime Data Retrieval.
  * =============================================================================
  */
-#include "sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 #define CACHE_SIZE 256
 #define BLOCK_SIZE 512

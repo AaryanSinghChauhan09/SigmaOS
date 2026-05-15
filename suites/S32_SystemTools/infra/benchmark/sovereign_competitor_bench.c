@@ -1,3 +1,4 @@
+#include "../../../../include/SovereignLibC.h"
 #define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS — tools/benchmark — sovereign_competitor_bench.c
@@ -12,8 +13,8 @@
 //   • Empirically prove SigmaOS is 5x–50x more efficient than legacy OSs.
 // =============================================================================
 
-#include "sigma_libc.h"
-#include "sigma_types.h"
+#include "../../../../include/libc/sigma_libc.h"
+#include "../../../../include/core/sigma_types.h"
 #include <time.h>
 
 static uint64_t rdtsc(void) {

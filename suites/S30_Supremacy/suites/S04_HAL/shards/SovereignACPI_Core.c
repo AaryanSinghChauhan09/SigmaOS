@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S04_HAL — SovereignACPI_Core.c
+ * S SIGMAOS: S04_HAL  SovereignACPI_Core.c
  * =========================================================================
  * Implementation of Idea 49.1 (Apex Infinity): ACPI Table Parser.
  * Hand-coded RSDP/XSDT traversal for hardware power and thermal management.
@@ -8,8 +9,8 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "sigma_types.h"
-#include "sigma_libc.h"
+#include "../../../../../include/core/sigma_types.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 typedef struct {
     char     signature[8];

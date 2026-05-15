@@ -1,4 +1,4 @@
-#include "core/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Σ SIGMAOS KERNEL: SOVEREIGN PANIC HANDLER (v100.0)
@@ -6,9 +6,9 @@
  * Principles: Industrial Logging & Post-Mortem Diagnostics.
  * =============================================================================
  */
-#include "core/sigma_kernel_types.h"
-#include "libc/SovereignLibC.h"
-#include "sigma_log.h"
+#include "../../../include/core/sigma_kernel_types.h"
+#include "../../../include/libc/SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 
 extern void vga_clear(sigma_u8 color);
 

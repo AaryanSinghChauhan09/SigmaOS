@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN GSA SHARD (v54.0-SUPREME-PULSAR-CENTAURI)

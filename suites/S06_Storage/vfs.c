@@ -1,3 +1,4 @@
+#include "../../include/SovereignLibC.h"
 /*
  * =============================================================================
  * Σ SIGMAOS KERNEL: VIRTUAL FILE SYSTEM (v1.0 - PURE C11)
@@ -14,7 +15,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 /* =========================================================================
  * VFS Constants

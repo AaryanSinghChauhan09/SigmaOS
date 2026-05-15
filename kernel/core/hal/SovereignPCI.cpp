@@ -1,6 +1,6 @@
-#include "../../../include/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 #include "../../../include/sigma_log.h"
-#include "SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 // PCI Configuration Space Addresses
 #define PCI_CONFIG_ADDRESS 0xCF8

@@ -1,8 +1,8 @@
 #include "../../../include/sigma_log.h"
-#include "../../../include/sigma_types.h"
-#include "hal/sigma_hal.h"
-#include "sigma_thermaliq.h"
-#include "libc/SovereignLibC.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_thermaliq.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 void energysched_set_shard_state(sigma_u32 shard_id, sigma_u32 state);
 

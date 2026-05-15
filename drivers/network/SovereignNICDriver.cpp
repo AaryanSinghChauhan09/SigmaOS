@@ -1,7 +1,7 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "hal/sigma_hal.h"
-#include "libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
+#include "include/sigma_types.h"
+#include "include/hal/sigma_hal.h"
+#include "include/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign NIC Driver (VirtIO-Net)
@@ -11,7 +11,7 @@
  * VirtIO-net (for QEMU) or RTL8139 (for bare-metal) at boot via PCIe probing
  * and programs the DMA descriptor rings directly with zero abstraction overhead.
  *
- * Design: OOP-isolated singleton â€" SovereignNICDriverEngine.
+ * Design: OOP-isolated singleton " SovereignNICDriverEngine.
  */
 
 typedef enum {

@@ -6,7 +6,7 @@
 #ifndef SIGMA_HAL_DRIVER_GPU_HPP
 #define SIGMA_HAL_DRIVER_GPU_HPP
 
-#include "../../sigmaos/core/src/atomic_sigma_oop_base.hpp"
+#include "../../include/atomic_sigma_oop_base.hpp"
 
 namespace sigma {
 namespace hal {

@@ -1,7 +1,7 @@
 #ifndef SIGMA_SYSTEM_SHARDS_H
 #define SIGMA_SYSTEM_SHARDS_H
 
-#include "sigma_types.h"
+#include "../include/core/sigma_types.h"
 
 /* Sovereign Net Mesh Shard */
 typedef struct SovereignNetZenith {
@@ -21,7 +21,7 @@ typedef struct SovereignScheduler {
     sigma_u8  cpu_affinity;
 } SovereignScheduler;
 
-#include "sigma_ui_types.h"
+#include "../include/ui/sigma_ui_types.h"
 
 #endif /* SIGMA_SYSTEM_SHARDS_H */
 

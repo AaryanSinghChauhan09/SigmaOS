@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S20_GLOBALVFS — SovereignVFS_Node.c
+ * S SIGMAOS: S20_GLOBALVFS  SovereignVFS_Node.c
  * =========================================================================
  * Implementation of Idea 218 (Apex Infinity): Unified VFS Node.
  * Provides the industrial-grade interface for all Sovereign file systems.
@@ -8,8 +9,8 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "sigma_types.h"
-#include "sigma_libc.h"
+#include "../../../../../include/core/sigma_types.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 #define MAX_VFS_NODES 1024
 

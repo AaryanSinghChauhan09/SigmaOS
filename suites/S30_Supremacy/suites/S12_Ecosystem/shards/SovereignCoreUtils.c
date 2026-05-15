@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S12_ECOSYSTEM — SovereignCoreUtils.c
+ * S SIGMAOS: S12_ECOSYSTEM  SovereignCoreUtils.c
  * =========================================================================
  * Mission: GNU Coreutils Parity.
  * Capability: ls, cat, rm, mkdir, touch (VFS-backed).
@@ -8,7 +9,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
-#include "sigma_libc.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 void sigma_util_ls(const char* path) {
     sigma_sigma_printf("S [UTIL]: Listing directory '%s'...\n", path);

@@ -6,7 +6,7 @@
 #ifndef SIGMA_BOOT_DRIVERLOAD_HPP
 #define SIGMA_BOOT_DRIVERLOAD_HPP
 
-#include "../../sigmaos/core/src/atomic_sigma_oop_base.hpp"
+#include "../../include/atomic_sigma_oop_base.hpp"
 
 namespace sigma {
 namespace boot {

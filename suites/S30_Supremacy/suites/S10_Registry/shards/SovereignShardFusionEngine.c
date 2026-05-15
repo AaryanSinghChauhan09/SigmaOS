@@ -11,7 +11,7 @@
 // Result: Deterministic performance leadership at the instruction level.
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 typedef struct {

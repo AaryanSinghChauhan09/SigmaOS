@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: SOVEREIGN I2C CORE (v1.0 — PURE C11)
+ * S SIGMAOS: SOVEREIGN I2C CORE (v1.0  PURE C11)
  * =========================================================================
  * Competitor Gap Closed: Linux drivers/i2c/ (I2C/SMBus core layer),
  * macOS I2C Family, Windows SpbCx.
@@ -8,18 +9,18 @@
  * serial buses (I2C/SMBus) heavily used by touchpads, sensors, and EEPROMs.
  *
  * This shard implements:
- *   § 1  I2C Adapter (Bus Controller) abstraction
- *   § 2  I2C Client (Device) Representation
- *   § 3  Plaform-agnostic messaging format (i2c_msg equivalent)
- *   § 4  SMBus (System Management Bus) compatibility commands
- *   § 5  Device topology probing (simulated EEPROM read)
+ *    1  I2C Adapter (Bus Controller) abstraction
+ *    2  I2C Client (Device) Representation
+ *    3  Plaform-agnostic messaging format (i2c_msg equivalent)
+ *    4  SMBus (System Management Bus) compatibility commands
+ *    5  Device topology probing (simulated EEPROM read)
  * =========================================================================
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 /* -----------------------------------------------------------------------
- * ¦¦ MAGICS & CONSTANTS
+ *  MAGICS & CONSTANTS
  * ----------------------------------------------------------------------- */
 #define I2C_M_RD           0x0001  /* Read message */
 #define I2C_M_TEN          0x0010  /* 10-bit address */
@@ -30,7 +31,7 @@
 #define I2C_MAX_CLIENTS    32
 
 /* -----------------------------------------------------------------------
- * ¦¦ I2C MESSAGE STRUCT (Parity with linux/i2c.h)
+ *  I2C MESSAGE STRUCT (Parity with linux/i2c.h)
  * ----------------------------------------------------------------------- */
 typedef struct {
     sigma_u16 addr;    /* Slave address (7- or 10-bit) */
@@ -40,7 +41,7 @@ typedef struct {
 } SigmaI2CMsg_t;
 
 /* -----------------------------------------------------------------------
- * ¦¦ I2C ALGORITHM & ADAPTER (Host Controller)
+ *  I2C ALGORITHM & ADAPTER (Host Controller)
  * ----------------------------------------------------------------------- */
 struct SigmaI2CAdapter;
 
@@ -68,7 +69,7 @@ static SigmaI2CAdapter_t s_adapters[I2C_MAX_ADAPTERS];
 static sigma_u32 s_adapter_count = 0;
 
 /* -----------------------------------------------------------------------
- * ¦¦ I2C CLIENT (Connected Device)
+ *  I2C CLIENT (Connected Device)
  * ----------------------------------------------------------------------- */
 typedef struct {
     char name[32];
@@ -78,7 +79,7 @@ typedef struct {
 } SigmaI2CClient_t;
 
 /* -----------------------------------------------------------------------
- * ¦¦ CORE API (Host Driver)
+ *  CORE API (Host Driver)
  * ----------------------------------------------------------------------- */
 sigma_err_t sigma_i2c_add_adapter(SigmaI2CAdapter_t *adap) {
     if (!adap || !adap->algo) return SIGMA_EINVAL;
@@ -105,7 +106,7 @@ sigma_i32 sigma_i2c_transfer(SigmaI2CAdapter_t *adap, SigmaI2CMsg_t *msgs, sigma
 }
 
 /* -----------------------------------------------------------------------
- * ¦¦ I2C CLIENT API
+ *  I2C CLIENT API
  * ----------------------------------------------------------------------- */
 sigma_i32 sigma_i2c_smbus_read_byte_data(const SigmaI2CClient_t *client, sigma_u8 command) {
     if (!client || !client->adapter) return -1;
@@ -141,7 +142,7 @@ sigma_i32 sigma_i2c_smbus_write_byte_data(const SigmaI2CClient_t *client, sigma_
 }
 
 /* -----------------------------------------------------------------------
- * ¦¦ MOCK HARDWARE ALGORITHM
+ *  MOCK HARDWARE ALGORITHM
  * ----------------------------------------------------------------------- */
 static sigma_i32 mock_i2c_xfer(SigmaI2CAdapter_t *adap, SigmaI2CMsg_t *msgs, sigma_i32 num) {
     SIGMA_UNUSED(adap);
@@ -164,7 +165,7 @@ static const SigmaI2CAlgorithm_t mock_algo = {
 };
 
 /* -----------------------------------------------------------------------
- * ¦¦ INITIALISATION
+ *  INITIALISATION
  * ----------------------------------------------------------------------- */
 void SovereignI2CCore_Init(void) {
     sigma_sigma_printf("S [I2C]: Initialising Sovereign I2C/SMBus Core...\n");

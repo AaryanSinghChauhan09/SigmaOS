@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ULTIMATE_APOTHEOSIS: SOVEREIGN K-LOCKER SHARD (v60.1-ULTIMATE)

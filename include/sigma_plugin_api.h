@@ -1,7 +1,7 @@
 #ifndef SIGMA_PLUGIN_API_H
 #define SIGMA_PLUGIN_API_H
 
-#include "core/sigma_types.h"
+#include "include/sigma_types.h"
 
 typedef struct {
     const char* name;

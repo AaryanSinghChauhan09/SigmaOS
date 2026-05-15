@@ -2,7 +2,7 @@
  * =========================================================================
  * S SIGMAOS kernel/suites/S18_QuantumLink/shards/sigma_usb.h
  * =========================================================================
- * Sovereign USB Subsystem — gap-closes:
+ * Sovereign USB Subsystem  gap-closes:
  *   Linux  : USB core, xHCI/EHCI host controller, usb-storage, usbhid
  *            gadget framework, libusb, USB Audio class (UAC)
  *   Windows: WinUSB, KMDF, USB 4.0 / Thunderbolt 4
@@ -41,7 +41,7 @@ typedef enum {
     USB_CLASS_MSC     = 0x08,  /* Mass storage (flash drives)         */
     USB_CLASS_HUB     = 0x09,
     USB_CLASS_AUDIO   = 0x01,  /* USB Audio Class (UAC)               */
-    USB_CLASS_VIDEO   = 0x0E,  /* USB Video Class (UVC — webcams)     */
+    USB_CLASS_VIDEO   = 0x0E,  /* USB Video Class (UVC  webcams)     */
     USB_CLASS_PRINTER = 0x07,
     USB_CLASS_VENDOR  = 0xFF   /* vendor-specific (ADB, etc.)         */
 } sigma_usb_class_t;
@@ -82,7 +82,7 @@ typedef struct {
     usb_u32           parent_hub;  /* 0 = root hub                    */
 } sigma_usb_dev_t;
 
-/* -- URB — USB Request Block (Linux urb parity) ---------------------------- */
+/* -- URB  USB Request Block (Linux urb parity) ---------------------------- */
 typedef struct {
     usb_u32           dev_id;
     usb_u8            ep_addr;

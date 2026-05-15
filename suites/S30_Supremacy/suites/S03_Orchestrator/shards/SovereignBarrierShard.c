@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN BARRIER SHARD (v52.3-SUPREME-OMNIPOTENCE)

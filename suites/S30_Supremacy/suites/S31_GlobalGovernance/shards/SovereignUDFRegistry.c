@@ -1,10 +1,11 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
- * S SIGMAOS: S31_GOVERNANCE — SovereignUDFRegistry.c
+ * S SIGMAOS: S31_GOVERNANCE  SovereignUDFRegistry.c
  * Status: Materialized User-Logic Plane
  */
 
 #include "suites/S10_Registry/shards/sigma_udf.h"
-#include "sigma_libc.h"
+#include "../../../../../include/libc/sigma_libc.h"
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 
 static sigma_udf_t g_udf_registry[MAX_UDFS];

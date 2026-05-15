@@ -4,7 +4,7 @@
  * USP: Fault-tolerant shard management with automatic restart strategies.
  */
 
-#include "sigma_libc.h"
+#include "../../include/libc/sigma_libc.h"
 
 typedef enum {
     STRATEGY_ONE_FOR_ONE,

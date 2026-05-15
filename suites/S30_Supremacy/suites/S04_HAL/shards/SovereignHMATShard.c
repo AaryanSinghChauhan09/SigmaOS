@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ABSOLUTE_FINALITY: SOVEREIGN HMAT SHARD (v59.2-ABSOLUTE)

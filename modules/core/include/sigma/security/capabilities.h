@@ -7,7 +7,7 @@
 #ifndef SIGMA_CAPABILITIES_H
 #define SIGMA_CAPABILITIES_H
 
-#include "sigma_libc.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 typedef uint64_t sigma_cap_t;
 

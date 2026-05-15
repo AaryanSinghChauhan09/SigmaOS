@@ -1,6 +1,7 @@
+#include "../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: TOOLS — SovereignTemporalJournal.c
+ * S SIGMAOS: TOOLS  SovereignTemporalJournal.c
  * =========================================================================
  * Implementation of Idea 61.3 (Apex Infinity): Temporal Shell Journaling.
  * Hash-chained command logging for irreversible time-travel and re-execution.
@@ -8,7 +9,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "sigma_types.h"
+#include "../../../../include/core/sigma_types.h"
 #include <time.h>
 
 typedef struct {

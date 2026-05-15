@@ -1,3 +1,4 @@
+#include "../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN AI KERNEL ZENITH (v94.0 ZENITH SUPREME)
@@ -8,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../libc/sigma_libc.h"
+#include "../../include/libc/sigma_libc.h"
 
 typedef struct SovereignAIKernel {
     sigma_u64 predictions;

@@ -7,7 +7,7 @@
 #ifndef SIGMA_AIO_H
 #define SIGMA_AIO_H
 
-#include "sigma_ring_buffer.h"
+#include "../../include/sigma_ring_buffer.h"
 
 #define SIGMA_AIO_RING_SIZE  128
 #define SIGMA_AIO_OP_READ    0x01

@@ -6,7 +6,7 @@
  * =========================================================================
  */
 
-#include "sigma_libc.h"
+#include "../../../../../../../include/libc/sigma_libc.h"
 
 void sigma_exit(int code) {
     __asm__ volatile (

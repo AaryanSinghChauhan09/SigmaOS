@@ -1,7 +1,7 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "hal/sigma_hal.h"
-#include "libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
+#include "include/sigma_types.h"
+#include "include/hal/sigma_hal.h"
+#include "include/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Custom Protocol (SCP)
@@ -11,7 +11,7 @@
  * ultra-low latency mesh networking between Sovereign nodes. It bypasses traditional 
  * OSI constraints for raw silicon-to-silicon data transfers.
  *
- * Design: OOP-isolated singleton â€" SovereignProtocolEngine.
+ * Design: OOP-isolated singleton " SovereignProtocolEngine.
  */
 
 class SovereignProtocolEngine {

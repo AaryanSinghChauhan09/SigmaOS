@@ -10,8 +10,8 @@
 #ifndef SOVEREIGN_OMNI_SHARD_H
 #define SOVEREIGN_OMNI_SHARD_H
 
-#include "SovereignLibC.h"
-#include "sigma_system_shards.h"
+#include "../include/libc/SovereignLibC.h"
+#include "../include/sigma_system_shards.h"
 
 /* =========================================================================
  * DOMAIN: OS KERNEL & ADVANCED SCHEDULING

@@ -2,7 +2,7 @@
  * =========================================================================
  * S SIGMAOS kernel/suites/S13_Sentience/shards/sigma_perf.h
  * =========================================================================
- * Sovereign Observability Engine — gap-closes:
+ * Sovereign Observability Engine  gap-closes:
  *   Linux  : perf_events, ftrace, eBPF, kprobes, tracepoints, /proc/pid
  *   macOS  : DTrace, Instruments, kdebug, os_log
  *   Windows: ETW (Event Tracing for Windows), PerfMon, WPR/WPA

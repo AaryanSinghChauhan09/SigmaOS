@@ -1,7 +1,7 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "hal/sigma_hal.h"
-#include "libc/SovereignLibC.h"
+#include "../include/sigma_log.h"
+#include "include/sigma_types.h"
+#include "include/hal/sigma_hal.h"
+#include "include/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Personalization Engine
@@ -10,7 +10,7 @@
  * USP: Predicts and adapts the OS workflow, themes, and layouts specifically
  * to the user's daily habits, completely processed on-device (zero cloud).
  *
- * Design: OOP-isolated singleton â€" SovereignPersonalizationEngine.
+ * Design: OOP-isolated singleton " SovereignPersonalizationEngine.
  */
 
 class SovereignPersonalizationEngine {

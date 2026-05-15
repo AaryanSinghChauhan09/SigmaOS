@@ -3,13 +3,13 @@
  * Î£ SIGMAOS: SOVEREIGN AETHER NEURAL (Heuristic Shard)
  * =========================================================================
  * Mission: Isolated shard for AI-driven packet inspection.
- * Layer  : L2 â€" System Services / Network
+ * Layer  : L2 " System Services / Network
  * =========================================================================
  */
 
-#include "sigma_types.h"
-#include "sigma_log.h"
-#include "core/SigmaOOP.hpp"
+#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_log.h"
+#include "include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

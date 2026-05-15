@@ -1,11 +1,13 @@
-#include "../../../include/sigma_types.h"
+#include "../../../include/SovereignLibC.h"
+#include "../../../include/core/sigma_types.h"
 #include <stdarg.h>
 
 extern "C" {
 
 void serial_putc(char c);
 
-void sigma_printf(const char* format, ...) {
+int sigma_printf(const char* format, ...) {
+    int count = 0;
     va_list args;
     va_start(args, format);
 
@@ -15,7 +17,7 @@ void sigma_printf(const char* format, ...) {
             switch (*p) {
                 case 's': {
                     const char* s = va_arg(args, const char*);
-                    while (s && *s) serial_putc(*s++);
+                    while (s && *s) { serial_putc(*s++); count++; }
                     break;
                 }
                 case 'd':
@@ -24,19 +26,22 @@ void sigma_printf(const char* format, ...) {
                     // Simplified hex/dec output for Zenith stability
                     va_arg(args, sigma_u32);
                     const char* stub = "[NUM]";
-                    while (*stub) serial_putc(*stub++);
+                    while (*stub) { serial_putc(*stub++); count++; }
                     break;
                 }
                 default:
                     serial_putc('%');
                     serial_putc(*p);
+                    count += 2;
             }
         } else {
             serial_putc(*p);
+            count++;
         }
     }
 
     va_end(args);
+    return count;
 }
 
 // Map sigma_log to sigma_printf

@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN POWER QUERY MASTER (v1.0 - PURE C11)
@@ -9,7 +10,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
-#include "SovereignPowerBIZenith.h"
+#include "../../../../../include/SovereignPowerBIZenith.h"
 
 // -------------------------------------------------------------------------
 // Implementation

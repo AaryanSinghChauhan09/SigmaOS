@@ -1,4 +1,4 @@
-#include "core/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS: SOVEREIGN KERNEL MAIN (v1.0 - THE APEX)
@@ -20,7 +20,7 @@
  * =============================================================================
  */
 
-#include "core/sigma_kernel_types.h"
+#include "../../../include/core/sigma_kernel_types.h"
 
 /* =========================================================================
  * Multiboot2 Info (minimal â€ only what we need to read memory map)

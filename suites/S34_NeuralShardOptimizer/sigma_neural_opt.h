@@ -1,7 +1,7 @@
 #ifndef SIGMA_NEURAL_OPT_H
 #define SIGMA_NEURAL_OPT_H
 
-#include "sigma_libc.h"
+#include "../../include/libc/sigma_libc.h"
 
 /* SigmaOS Neural Shard Optimizer - Phase 7 Sovereign Intelligence
  * Implements an embedded Q-Learning agent to optimize shard scheduling

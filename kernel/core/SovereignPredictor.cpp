@@ -1,5 +1,5 @@
-#include "../../../include/sigma_types.h"
-#include "sigma_hal.h"
+#include "../../include/core/sigma_types.h"
+#include "../../include/hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Predictive Resource Allocator (v28.0 Zenith)

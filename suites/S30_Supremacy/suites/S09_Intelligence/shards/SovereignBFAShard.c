@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS OMEGA_POINT: SOVEREIGN BFA SHARD (v62.0-OMEGA)

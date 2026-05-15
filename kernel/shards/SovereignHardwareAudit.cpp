@@ -1,7 +1,7 @@
-#include "Lattice.h"
-#include "sigma_log.h"
-#include "SovereignLibC.h"
-#include "sigma_log.h"
+#include "../../include/Lattice.h"
+#include "../../include/sigma_log.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN HARDWARE AUDIT (v128.0 - ZERO-STD NATIVE)
@@ -11,7 +11,7 @@
  */
 
 #include "kernel/diagnostics/hardware_audit.hpp"
-#include "sigma_log.h"
+#include "../../include/sigma_log.h"
 
 extern "C" void _start(void) {
     sigma_log_info("--- Î£ SIGMA OS SOVEREIGN HARDWARE AUDIT (ZENITH) ---\n");

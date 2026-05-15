@@ -1,3 +1,4 @@
+#include "../../../../include/SovereignLibC.h"
 #define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS — tools/sovereign_pkg — sovereign_pkg_manager.c
@@ -12,10 +13,10 @@
 // Zero external deps — single-file C11, no Python runtime
 // =============================================================================
 
-#include "sigma_libc.h"
-#include "sigma_libc.h"
-#include "sigma_libc.h"
-#include "sigma_types.h"
+#include "../../../../include/libc/sigma_libc.h"
+#include "../../../../include/libc/sigma_libc.h"
+#include "../../../../include/libc/sigma_libc.h"
+#include "../../../../include/core/sigma_types.h"
 
 #include <sys/stat.h>
 

@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S28_OMNIBUS — SovereignPRU_Drone.c
+ * S SIGMAOS: S28_OMNIBUS  SovereignPRU_Drone.c
  * =========================================================================
  * Implementation of Idea 68.3 (Apex Infinity): Drone PRU Controller.
  * Real-time coprocessor orchestration for safety-critical flight logic.
@@ -8,7 +9,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 typedef struct {
     uint32_t throttle;

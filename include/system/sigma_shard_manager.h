@@ -1,9 +1,9 @@
-#include "core/sigma_types.h"
+#include "include/sigma_types.h"
 #ifndef SIGMA_SHARD_MANAGER_H
 #define SIGMA_SHARD_MANAGER_H
 
-#include "core/sigma_kernel_types.h"
-#include "core/SigmaOOP.hpp"
+#include "../../include/core/sigma_kernel_types.h"
+#include "include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

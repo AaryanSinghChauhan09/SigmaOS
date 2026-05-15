@@ -1,6 +1,6 @@
-#include "sigma_types.h"
-#include "sigma_log.h"
-#include "../../kernel/core/SovereignLibC.h"
+#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/libc/SovereignLibC.h"
 
 // Professional Indian Standards Calculator
 class SovereignIndianCalc {

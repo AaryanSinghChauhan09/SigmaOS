@@ -9,7 +9,9 @@ All shards live in `kernel/core/`. Create `SovereignMyFeature.cpp`:
 ```cpp
 
 #include "sigma_types.h"
+
 #include "sigma_hal.h"
+
 #include "SovereignLibC.h"
 
 /**
@@ -75,4 +77,3 @@ Ensure your PR description references:
 * The `cppcheck` output (zero warnings)
 
 * A wiki page update in `SigmaOS.wiki/`
-

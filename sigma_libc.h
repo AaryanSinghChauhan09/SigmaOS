@@ -1,6 +1,8 @@
 #ifndef SIGMA_LIBC_H
 #define SIGMA_LIBC_H
 
+#include "include/SovereignLibC.h"
+
 /*
  * =========================================================
  * SIGMAOS: SOVEREIGN LIBC (INDUSTRIAL GRADE)
@@ -9,7 +11,7 @@
  * =========================================================
  */
 
-#include "core/sigma_kernel_types.h"
+#include "include/core/sigma_kernel_types.h"
 
 #define SIGMA_LIBC_VERSION 0x09
 

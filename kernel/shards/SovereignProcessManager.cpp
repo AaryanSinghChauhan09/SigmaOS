@@ -1,4 +1,4 @@
-#include "Lattice.h"
+#include "../../include/Lattice.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN PROCESS MANAGER (v25.0 - SOLID FINALITY)
@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "SigmaOOP.hpp"
+#include "../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

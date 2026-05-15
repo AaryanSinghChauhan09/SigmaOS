@@ -7,7 +7,7 @@
 #ifndef SIGMA_WORKSTEAL_H
 #define SIGMA_WORKSTEAL_H
 
-#include "sigma_spinlock.h"
+#include "../../include/sigma_spinlock.h"
 
 #define SIGMA_WS_MAX_WORKERS 16
 #define SIGMA_WS_DEQUE_SIZE  256

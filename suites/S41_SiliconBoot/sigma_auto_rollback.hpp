@@ -5,7 +5,7 @@
 #ifndef SIGMA_AUTO_ROLLBACK_HPP
 #define SIGMA_AUTO_ROLLBACK_HPP
 
-#include "../S43_SovereignCaps/sigma_caps.h"
+#include "../../include/S43_SovereignCaps/sigma_caps.h"
 
 namespace sigma {
 namespace auto_layer {

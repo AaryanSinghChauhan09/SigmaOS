@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_SYSCALL_H
 #define SOVEREIGN_SYSCALL_H
 
-#include "sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 
 /**
  * SigmaOS Sovereign Syscall Interface (v1.0)

@@ -1,4 +1,5 @@
-#include "../sigma_libc.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/libc/sigma_libc.h"
 
 // SigmaOS Sovereign WASM (S-WASM)
 // Philosophy: Universal Sandboxing - High-Performance Cross-Platform Execution.

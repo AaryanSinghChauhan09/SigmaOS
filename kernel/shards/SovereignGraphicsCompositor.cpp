@@ -1,7 +1,7 @@
-#include "Lattice.h"
-#include "sigma_log.h"
-#include "SovereignLibC.h"
-#include "sigma_log.h"
+#include "../../include/Lattice.h"
+#include "../../include/sigma_log.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN GRAPHICS COMPOSITOR (v21.0)
@@ -11,9 +11,9 @@
  */
 
 #include "kernel/drivers/graphics/compositor.hpp"
-#include "sigma_log.h"
+#include "../../include/sigma_log.h"
 #include "kernel/drivers/graphics/widget_orchestrator.hpp"
-#include "sigma_log.h"
+#include "../../include/sigma_log.h"
 
 extern "C" void _start(void) {
     SigmaOS::Graphics::SovereignGraphicsCompositor compositor;

@@ -7,8 +7,8 @@
 #ifndef SIGMA_NET_TCP_H
 #define SIGMA_NET_TCP_H
 
-#include "sigma_ring_buffer.h"
-#include "sigma_spinlock.h"
+#include "../../include/sigma_ring_buffer.h"
+#include "../../include/sigma_spinlock.h"
 
 #define SIGMA_TCP_MAX_CONNS  32
 #define SIGMA_TCP_RX_BUF     1024

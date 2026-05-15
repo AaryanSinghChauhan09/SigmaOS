@@ -1,6 +1,7 @@
-#include "../../../include/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 #include "../../../include/sigma_log.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/libc/SovereignLibC.h"
+#include "../../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -21,13 +22,16 @@ public:
         sigma_log_info("[MAC:AUDIT] Checking access: Subject(%s) -> Object(%s) Action(%s)", subject, object, action);
         
         // Strict confinement for browser shards
-        if (strstr(subject, "release/browser") && strstr(object, "kernel/core/hal")) {
-            sigma_log_warn("[MAC:DENIED] Browser shard attempted direct HAL access!");
+        if (sigma_strstr(object, "/dev/") || sigma_strstr(object, "/proc/")) {
+            return false;
+        }
+
+        if (sigma_strstr(object, "/browser/") && sigma_strstr(object, "/etc/shadow")) {
             return false;
         }
 
         // Confinement for third-party apps
-        if (strstr(subject, "userland/app") && strstr(object, "kernel/core/security/SovereignPQC")) {
+        if (sigma_strstr(subject, "userland/app") && sigma_strstr(object, "kernel/core/security/SovereignPQC")) {
             sigma_log_warn("[MAC:DENIED] Userland app attempted direct PQC access!");
             return false;
         }

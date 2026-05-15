@@ -1,7 +1,7 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "hal/sigma_hal.h"
-#include "libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
+#include "include/sigma_types.h"
+#include "include/hal/sigma_hal.h"
+#include "include/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Networking Stack (NetStack)
@@ -10,7 +10,7 @@
  * USP: Completely bypasses legacy POSIX networking overhead. Implements a
  * hardened IPv4/IPv6 stack with inherent packet filtering at the data-link layer.
  *
- * Design: OOP-isolated singleton â€" SovereignNetStackEngine.
+ * Design: OOP-isolated singleton " SovereignNetStackEngine.
  */
 
 class SovereignNetStackEngine {

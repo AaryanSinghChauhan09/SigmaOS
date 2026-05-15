@@ -1,3 +1,4 @@
+#include "../../include/SovereignLibC.h"
 /*
  * =============================================================================
  * Σ SIGMAOS KERNEL: SOVEREIGN-BNSS-SHARD (v2.0 - BNS/BNSS/BSA PARITY)
@@ -11,7 +12,7 @@
  * =============================================================================
  */
 
-#include "sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 typedef struct BNSSStep {
     u32         bnss_section;

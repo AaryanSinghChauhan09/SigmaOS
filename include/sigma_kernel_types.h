@@ -3,7 +3,7 @@
  * Î£ SIGMAOS: SOVEREIGN KERNEL TYPES (v1.0 - C11 ZERO-DEPENDENCY)
  * =============================================================================
  * All kernel-internal types, constants, and primitive definitions.
- * Standard: C11 (ISO/IEC 9899:2011) â€� no external headers.
+ * Standard: C11 (ISO/IEC 9899:2011) â€ no external headers.
  * =============================================================================
  */
 

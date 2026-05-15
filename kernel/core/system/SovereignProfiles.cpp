@@ -1,6 +1,6 @@
 #include "../../../include/sigma_log.h"
-#include "../../../include/sigma_types.h"
-#include "core/PersonalizationBridge.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/core/PersonalizationBridge.h"
 
 /**
  * SigmaOS Adaptive Profiles

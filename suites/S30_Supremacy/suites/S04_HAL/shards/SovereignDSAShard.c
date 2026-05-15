@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS OLYMPUS: SOVEREIGN DSA SHARD (v57.9-SUPREME-OLYMPUS)

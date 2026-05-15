@@ -5,7 +5,7 @@
  * Principles: Zero-Downtime Updates & Shard Redirection.
  * =============================================================================
  */
-#include "sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 typedef struct Patch {
     void** target_func_ptr;

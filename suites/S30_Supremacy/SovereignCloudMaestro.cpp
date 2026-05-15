@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "SigmaOOP.hpp"
-#include "sigma_log.h"
+#include "../../include/core/SigmaOOP.hpp"
+#include "../../include/sigma_log.h"
 
 /**
  * Σ SIGMA OS: SOVEREIGN CLOUD MAESTRO (v128.0 - ZERO-STD NATIVE)

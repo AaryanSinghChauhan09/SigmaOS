@@ -6,7 +6,7 @@
 #ifndef SIGMA_POWER_SCHEDULER_HPP
 #define SIGMA_POWER_SCHEDULER_HPP
 
-#include "../S01_Genesis/sigma_proc_pcb.h"
+#include "../../include/sigma_proc_pcb.h"
 
 namespace sigma {
 namespace power {

@@ -1,7 +1,7 @@
-#include "sigma_log.h"
-#include "core/sigma_types.h"
-#include "hal/sigma_hal.h"
-#include "libc/SovereignLibC.h"
+#include "../include/sigma_log.h"
+#include "include/sigma_types.h"
+#include "include/hal/sigma_hal.h"
+#include "include/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Widget Engine
@@ -10,7 +10,7 @@
  * USP: Widgets run natively on the GPU pipeline directly orchestrated by the kernel,
  * allowing 120fps smooth animations and interactive drag-and-drop mechanics.
  *
- * Design: OOP-isolated singleton â€" SovereignWidgetEngine.
+ * Design: OOP-isolated singleton " SovereignWidgetEngine.
  */
 
 class SovereignWidgetEngine {

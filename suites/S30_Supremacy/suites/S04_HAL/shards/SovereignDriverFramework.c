@@ -1,11 +1,12 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
- * S SIGMAOS: SOVEREIGN DEVICE DRIVER FRAMEWORK (v2.0 — MODULAR)
+ * S SIGMAOS: SOVEREIGN DEVICE DRIVER FRAMEWORK (v2.0  MODULAR)
  * Mission: Orchestrate hardware autonomy across sharded drivers.
  * Design: C11 / Zero-Dependency / Registry-Based.
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
-#include "SovereignDriver.h"
+#include "../../../../../include/SovereignDriver.h"
 
 /* Extern Shard Registration Functions */
 extern void SovereignNVMe_Register(void);

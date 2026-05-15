@@ -1,6 +1,7 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
- * S SIGMAOS: S12_ECOSYSTEM — SovereignEcosystem_Consensus.c
+ * S SIGMAOS: S12_ECOSYSTEM  SovereignEcosystem_Consensus.c
  * =========================================================================
  * Implementation of Idea 586 (Apex Infinity): Raft Consensus.
  * Orchestrates leader election and distributed log replication stubs.

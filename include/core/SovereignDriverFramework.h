@@ -1,8 +1,8 @@
 #ifndef SOVEREIGN_DRIVER_FRAMEWORK_H
 #define SOVEREIGN_DRIVER_FRAMEWORK_H
 
-#include "sigma_types.h"
-#include "SigmaOOP.hpp"
+#include "../../include/core/sigma_types.h"
+#include "../../include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

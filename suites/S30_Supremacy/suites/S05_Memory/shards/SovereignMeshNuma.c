@@ -13,7 +13,7 @@
 //     minimize mesh traffic while maintaining thread safety.
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 #define HIVE_PAGE_SIZE      4096

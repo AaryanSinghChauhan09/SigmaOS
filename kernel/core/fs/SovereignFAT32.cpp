@@ -1,7 +1,7 @@
-#include "../sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 #include "../../../include/sigma_log.h"
-#include "../sigma_hal.h"
-#include "../SovereignLibC.h"
+#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 // FAT32 Boot Sector
 #pragma pack(push, 1)

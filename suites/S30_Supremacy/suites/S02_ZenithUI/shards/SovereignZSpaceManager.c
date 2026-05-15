@@ -9,7 +9,7 @@
 //     and occlusion as it moves further away in the spatial desktop.
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 
 typedef struct {

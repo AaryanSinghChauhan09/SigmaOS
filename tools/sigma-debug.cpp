@@ -1,6 +1,6 @@
-#include "core/sigma_types.h"
-#include "sigma_log.h"
-#include "sigma_sdk.h"
+#include "include/sigma_types.h"
+#include "../include/sigma_log.h"
+#include "../include/sigma_sdk.h"
 
 /**
  * SIGMA-DEBUG: Kernel Shard Debugger

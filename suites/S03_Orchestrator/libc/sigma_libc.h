@@ -1,7 +1,9 @@
 /* sigma_libc.h — libc shim for S03_Orchestrator's ../libc/sigma_libc.h */
 #ifndef SIGMA_LIBC_H
 #define SIGMA_LIBC_H
-#include "../sigma_kernel_types.h"
+
+#include "../../../include/SovereignLibC.h"
+#include "../../../include/core/sigma_kernel_types.h"
 void          sigma_exit(int code);
 long          sigma_write(int fd, const void* buf, unsigned long count);
 void*         sigma_mmap(void* addr, unsigned long length, int prot, int flags, int fd, unsigned long long offset);

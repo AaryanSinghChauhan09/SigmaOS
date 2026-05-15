@@ -1,6 +1,6 @@
-#include "sigma_log.h"
-#include "Lattice.h"
-#include "libc/SovereignLibC.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/Lattice.h"
+#include "../../../include/libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -16,7 +16,7 @@
  * Mission: sub-second boot, hardware-skip, shard-init.
  */
 
-#include "core/SigmaOOP.hpp"
+#include "../../../include/core/SigmaOOP.hpp"
 
 class SovereignBootMaster : public SigmaObject {
 public:

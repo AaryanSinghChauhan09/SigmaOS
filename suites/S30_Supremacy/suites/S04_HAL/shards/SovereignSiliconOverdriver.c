@@ -12,7 +12,7 @@
 //         thermal and power envelopes through ultra-granular efficiency.
 // =============================================================================
 
-#include "sigma_types.h"
+#include "../../../../../include/core/sigma_types.h"
 
 typedef struct {
     uint32_t active_target_mhz;

@@ -1,9 +1,9 @@
-#include "SovereignLibC.h"
-#include "sigma_log.h"
-#include "sigma_hal.h"
-#include "sigma_log.h"
-#include "sigma_transpiler.h"
-#include "sigma_log.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "../../include/sigma_transpiler.h"
+#include "../../include/sigma_log.h"
 
 
 /**

@@ -1,8 +1,9 @@
+#include "../../../../../include/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "SovereignSecurity.h"
-#include "sigma_libc.h"
-#include "sigma_string.h"
+#include "../../../../../include/SovereignSecurity.h"
+#include "../../../../../include/libc/sigma_libc.h"
+#include "../../../../../include/sigma_string.h"
 
 #define MAX_SECURITY_SHARDS 16
 static sovereign_security_shard_t g_sec_shards[MAX_SECURITY_SHARDS];

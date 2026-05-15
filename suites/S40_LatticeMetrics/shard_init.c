@@ -1,4 +1,5 @@
-#include "sigma_libc.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/libc/sigma_libc.h"
 
 // SigmaOS Lattice Metrics (S-METRICS)
 // Philosophy: Prometheus / Grafana - Real-Time Lattice Metrics and Observability.

@@ -4,8 +4,8 @@
 // Uses pure C++ OOP — inherits from ISigmaDriver base
 
 #pragma once
-#include "../../sigmaos/core/src/atomic_sigma_oop_base.hpp"
-#include "../../suites/S32_SystemTools/include/sigma_libc.h"
+#include "../../include/atomic_sigma_oop_base.hpp"
+#include "../../include/libc/sigma_libc.h"
 
 namespace sigma {
 namespace hal {

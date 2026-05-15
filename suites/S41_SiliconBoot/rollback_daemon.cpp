@@ -1,5 +1,5 @@
-#include "sigma_auto_rollback.h"
-#include "sigma_libc.h"
+#include "../../include/sigma_auto_rollback.h"
+#include "../../include/libc/sigma_libc.h"
 
 // Î£ SIGMAOS: SOVEREIGN ROLLBACK DAEMON
 // Responsibility: Monitor system stability and trigger silicon-level recovery.
@@ -29,7 +29,7 @@ public:
             sigma_print("[CRITICAL] Stability threshold exceeded. Initiating Sovereign Rollback...\n");
             int restored_idx = snap_auto_rollback(manager);
             if (restored_idx >= 0) {
-                sigma_print("[âœ"] Restored to Snapshot: %s. Rebooting...\n", 
+                sigma_print("["] Restored to Snapshot: %s. Rebooting...\n", 
                             manager->snaps[restored_idx].name);
                 // Trigger hardware reset
             } else {

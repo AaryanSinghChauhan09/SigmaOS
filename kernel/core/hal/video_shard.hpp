@@ -1,9 +1,9 @@
-#include "../../../include/sigma_types.h"
-#include "hal/sigma_hal.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/hal/sigma_hal.h"
 #ifndef VIDEO_SHARD_HPP
 #define VIDEO_SHARD_HPP
 
-#include "libc/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 #include "port_shard.hpp"
 

@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: UNIVERSAL SOVEREIGN IMAGE BUILDER (v2.0)
@@ -9,8 +10,8 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
-#include "sigma_libc.h"
-#include "sigma_string.h"
+#include "../../../../../include/libc/sigma_libc.h"
+#include "../../../../../include/sigma_string.h"
 
 typedef struct {
     char target_arch[16];

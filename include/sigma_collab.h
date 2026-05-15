@@ -10,7 +10,7 @@
 #ifndef SIGMA_COLLAB_H
 #define SIGMA_COLLAB_H
 
-#include "sigma_types.h"
+#include "../include/core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

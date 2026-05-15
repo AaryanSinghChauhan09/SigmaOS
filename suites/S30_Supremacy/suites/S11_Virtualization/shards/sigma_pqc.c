@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S11_Virtualization/shards/sigma_pqc.c
@@ -8,8 +9,8 @@
  * =========================================================================
  */
 
-#include "sigma_pqc.h"
-#include "sigma_libc.h"
+#include "../../../../../include/security/sigma_pqc.h"
+#include "../../../../../include/libc/sigma_libc.h"
 
 void sigma_pqc_init(void) {
     sigma_sigma_printf("S [PQC] Suite initialized\n");
@@ -19,7 +20,7 @@ void sigma_pqc_init(void) {
 
 /* -- BLAKE3 (simplified Merkle-tree sponge, real impl is ~1000 LOC) ------- */
 static void blake3_compress(const pq_u8 *in, pq_u64 len, pq_u8 out[32]) {
-    /* Simplified chained XOR + rotate — replace with actual BLAKE3 in prod */
+    /* Simplified chained XOR + rotate  replace with actual BLAKE3 in prod */
     pq_u64 h[4] = {0x6A09E667ULL,0xBB67AE85ULL,0x3C6EF372ULL,0xA54FF53AULL};
     for (pq_u64 i = 0; i < len; i++) {
         h[i & 3] ^= in[i];
@@ -117,7 +118,7 @@ pq_i32 sigma_aes256gcm_encrypt(const pq_u8 key[AES_KEY_LEN],
                                 const pq_u8 iv[AES_IV_LEN],
                                 const pq_u8 *pt, pq_u32 pt_len,
                                 pq_u8 *ct, pq_u8 tag[AES_TAG_LEN]) {
-    /* XOR stream cipher stub — replace with AES-NI or bitsliced AES */
+    /* XOR stream cipher stub  replace with AES-NI or bitsliced AES */
     pq_u8 ks[32];
     sigma_blake3_kdf(key, AES_KEY_LEN, iv, AES_IV_LEN, ks, 32);
     for (pq_u32 i = 0; i < pt_len; i++) ct[i] = pt[i] ^ ks[i % 32];

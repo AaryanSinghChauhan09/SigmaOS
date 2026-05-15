@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS MULTIVERSE_ETERNITY_GATE: SOVEREIGN AHA SHARD (v58.3-SUPREME)

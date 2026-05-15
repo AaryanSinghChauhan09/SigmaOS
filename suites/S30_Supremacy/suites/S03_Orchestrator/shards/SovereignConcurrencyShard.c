@@ -1,3 +1,4 @@
+#include "../../../../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN LOCK-FREE CONCURRENCY (v50.8-ETERNITY-CORE)

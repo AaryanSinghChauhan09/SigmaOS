@@ -1,6 +1,6 @@
-#include "sigma_log.h"
-#include "Lattice.h"
-#include "libc/SovereignLibC.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/Lattice.h"
+#include "../../../include/libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "core/SigmaOOP.hpp"
+#include "../../../include/core/SigmaOOP.hpp"
 
 /**
  * Σ SIGMA OS: SOVEREIGN CONTAINER RUNTIME (v128.0 - ZERO-STD NATIVE)
