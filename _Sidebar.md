@@ -47,8 +47,11 @@
 * [Format: Mobile](Mobile-Format)
 * [Kernel Developer Handbook](Kernel-Developer-Handbook)
 * [OS Problems & Solutions](Common-OS-Problems-Solutions)
+* [Performance Benchmarks](PERFORMANCE.md)
+* [Browser Security Profiling](Browser-Integration)
 * [Dual-Boot Compatibility Matrix](Dual-Boot-Compatibility-Matrix)
 * [Embedded Hardware Compatibility](Embedded-Hardware-Compatibility)
+* [Zenith v15.0 Changelog](CHANGELOG.md)
 
 ---
 
