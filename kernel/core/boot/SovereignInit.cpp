@@ -23,6 +23,21 @@ extern "C" void usb_init(sigma_u64 base);
 extern "C" void audio_init();
 extern "C" void nvme_init(sigma_u64 base);
 extern "C" void numa_init();
+extern "C" void SovereignZOS_ignite();
+extern "C" void SovereignQNX_ignite();
+extern "C" void SovereignBeOS_ignite();
+extern "C" void SovereignNeXT_ignite();
+extern "C" void SovereignPlan9_ignite();
+extern "C" void SovereignCisco_ignite();
+extern "C" void SovereignSolaris_ignite();
+extern "C" void SovereignAmnesic_ignite();
+extern "C" void SovereignGenera_ignite();
+extern "C" void SovereignKeyKOS_ignite();
+extern "C" void SovereignFlex_ignite();
+extern "C" void SovereignVME_ignite();
+extern "C" void SovereignHarmony_ignite();
+extern "C" void SovereignAmoeba_ignite();
+extern "C" void SovereignSingular_ignite();
 
 /**
  * SigmaOS Sovereign Init Implementation (v15.0 Zenith)
@@ -77,6 +92,23 @@ public:
         // 5. Watchdogs & Auditing
         registerAndStart("Watchdog", watchdog_init, "Memory");
         registerAndStart("AuditLog", auditlog_init, "RootFS");
+        
+        // 6. Lattice Absorption (The Zenith Singularity)
+        registerAndStart("ZOS-Rel", SovereignZOS_ignite, "Memory");
+        registerAndStart("QNX-RTOS", SovereignQNX_ignite, "Memory");
+        registerAndStart("BeOS-Media", SovereignBeOS_ignite, "Memory");
+        registerAndStart("NeXT-Object", SovereignNeXT_ignite, "Memory");
+        registerAndStart("Plan9-Dist", SovereignPlan9_ignite, "NetStack");
+        registerAndStart("Cisco-Net", SovereignCisco_ignite, "NetStack");
+        registerAndStart("Solaris-Ent", SovereignSolaris_ignite, "RootFS");
+        registerAndStart("Amnesic-Priv", SovereignAmnesic_ignite, "Memory");
+        registerAndStart("Genera-Sym", SovereignGenera_ignite, "Memory");
+        registerAndStart("KeyKOS-Cap", SovereignKeyKOS_ignite, "Memory");
+        registerAndStart("Flex-Industrial", SovereignFlex_ignite, "Memory");
+        registerAndStart("VME-Integrity", SovereignVME_ignite, "Memory");
+        registerAndStart("Harmony-IoT", SovereignHarmony_ignite, "NetStack");
+        registerAndStart("Amoeba-Lattice", SovereignAmoeba_ignite, "NetStack");
+        registerAndStart("Singular-Managed", SovereignSingular_ignite, "Memory");
 
         supervise();
 

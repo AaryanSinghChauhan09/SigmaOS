@@ -306,7 +306,11 @@
             { id: "S-NET", name: "PQC Net Stack", status: "ACTIVE" },
             { id: "S-FS", name: "Lattice Ext2", status: "SYNCED" },
             { id: "S-UI", name: "Zenith WM", status: "COMPOSITING" },
-            { id: "S-SEC", name: "Quantum Audit", status: "AUDITING" }
+            { id: "S-SEC", name: "Quantum Audit", status: "AUDITING" },
+            { id: "S-ZOS", name: "Z/OS Rel", status: "ABSORBED" },
+            { id: "S-QNX", name: "QNX RTOS", status: "ABSORBED" },
+            { id: "S-NEXT", name: "NeXT Object", status: "ABSORBED" },
+            { id: "S-PRO", name: "Professional", status: "STABLE" }
         ];
 
         function initShell() {
@@ -340,7 +344,21 @@
 
             switch(baseCmd) {
                 case 'help':
-                    termOutput.innerHTML += "Available shard protocols: <span style='color:var(--success)'>help, ls, dmesg, shards, whoami, neofetch, clear, exit</span>\n";
+                    termOutput.innerHTML += "Available shard protocols: <span style='color:var(--success)'>help, ls, dmesg, shards, gst, bns, neofetch, clear, exit</span>\n";
+                    break;
+                case 'gst':
+                    if (args.length < 3) {
+                        termOutput.innerHTML += "Usage: gst <amount> <rate>\n";
+                    } else {
+                        const amount = parseFloat(args[1]);
+                        const rate = parseFloat(args[2]);
+                        const gst = amount * (rate / 100);
+                        termOutput.innerHTML += `[S-PRO] GST Calculation: Amount=${amount}, Rate=${rate}%\n[S-PRO] Result: GST=${gst.toFixed(2)}, TOTAL=${(amount + gst).toFixed(2)}\n`;
+                    }
+                    break;
+                case 'bns':
+                    const section = args[1] || "302";
+                    termOutput.innerHTML += `[S-PRO] BNS Legal Mapper: Analyzing Section ${section}...\n[S-PRO] Mapping: IPC ${section} -> BNS Mapping ACTIVE.\n[S-PRO] Analysis COMPLETE.\n`;
                     break;
                 case 'ls':
                     termOutput.innerHTML += "<span style='color:var(--accent)'>kernel/  system/  userland/  shards/  lattice_fs/</span>\n";

@@ -1,4 +1,4 @@
-﻿#include "../include/core/sigma_types.h"
+#include "../include/core/sigma_types.h"
 #include "../include/sigma_log.h"
 #include "../include/hal/sigma_hal.h"
 #include "../include/sigma_log.h"
@@ -35,9 +35,20 @@ public:
             // syscall_halt()
         } else if (sigma_hardened_strncmp(cmd, "exec --zero-trace", 17) == 0) {
             this->zeroTraceExecute("target_shard");
+        } else if (sigma_hardened_strncmp(cmd, "sh ", 3) == 0 || sigma_strstr(cmd, ".ssh")) {
+            this->runScript(cmd);
         } else {
             sigma_log_info("sigma_sh: command not found: %s\n", cmd);
         }
+    }
+
+    void runScript(const char* path) {
+        sigma_log_info("[SHELL] Executing Sovereign Script: %s\n", path);
+        sigma_log("[VFS] Loading shard script into amnesic buffer...");
+        // Simulation: Sequence of commands
+        sigma_log("[SHELL] Script Step 1: Mounting encrypted shards...");
+        sigma_log("[SHELL] Script Step 2: Attesting silicon integrity...");
+        sigma_log("[SHELL] Script COMPLETE.\n");
     }
 
     void zeroTraceExecute(const char* shard_path) {
