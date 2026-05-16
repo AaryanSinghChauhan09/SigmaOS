@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN TASK AUTOMATOR (S-TASKAUTOMATOR)
+ * Î£ SIGMAOS: SOVEREIGN TASK AUTOMATOR (S-TASKAUTOMATOR)
  * =========================================================================
  * Mission: A built-in, event-driven automation engine (superior to cron),
  * driven by natural language and system state triggers.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_TASKAUTOMATOR_H
 #define SIGMA_TASKAUTOMATOR_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

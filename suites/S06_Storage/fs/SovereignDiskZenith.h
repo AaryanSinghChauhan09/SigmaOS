@@ -1,8 +1,8 @@
-#include "include/sigma_types.h"
+#include "../../../include/sigma_types.h"
 #ifndef SOVEREIGN_DISK_ZENITH_H
 #define SOVEREIGN_DISK_ZENITH_H
 
-#include "include/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Disk {

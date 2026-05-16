@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN LAZY-LOAD ACTIVATION (S-LAZYLOAD)
+ * Î£ SIGMAOS: SOVEREIGN LAZY-LOAD ACTIVATION (S-LAZYLOAD)
  * =========================================================================
  * Mission: On-demand service execution based on socket/event triggers,
  * drastically reducing boot times and memory overhead (systemd USP).
@@ -10,7 +10,7 @@
 #ifndef SIGMA_LAZYLOAD_H
 #define SIGMA_LAZYLOAD_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

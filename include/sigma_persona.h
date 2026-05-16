@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN PERSONA ENGINE (S-PERSONA)
+ * Î£ SIGMAOS: SOVEREIGN PERSONA ENGINE (S-PERSONA)
  * =========================================================================
  * Mission: Deeply integrated system personalization, automation, and 
  * user experience adaptation based on real-time telemetry and user habits.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_PERSONA_H
 #define SIGMA_PERSONA_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

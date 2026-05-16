@@ -1,6 +1,6 @@
-#ifndef SIGMA_MICRO_H
+﻿#ifndef SIGMA_MICRO_H
 #define SIGMA_MICRO_H
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

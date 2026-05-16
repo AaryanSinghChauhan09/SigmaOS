@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN LOCALE & TIMEZONE SERVICE (S-LOCALE)
+ * Î£ SIGMAOS: SOVEREIGN LOCALE & TIMEZONE SERVICE (S-LOCALE)
  * =========================================================================
  * Mission: Kernel-native locale, timezone, and i18n without glibc/ICU.
  * Competitor parity: Linux glibc locale / Windows NLS / macOS CFLocale.
@@ -11,7 +11,7 @@
 #ifndef SIGMA_LOCALE_H
 #define SIGMA_LOCALE_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

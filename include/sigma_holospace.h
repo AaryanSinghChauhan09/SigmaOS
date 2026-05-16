@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN HOLOGRAPHIC WORKSPACE (S-HOLOSPACE)
+ * Î£ SIGMAOS: SOVEREIGN HOLOGRAPHIC WORKSPACE (S-HOLOSPACE)
  * =========================================================================
  * Mission: 3D spatial computing support built directly into the kernel,
  * preparing the OS for native AR/VR head-mounted displays.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_HOLOSPACE_H
 #define SIGMA_HOLOSPACE_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

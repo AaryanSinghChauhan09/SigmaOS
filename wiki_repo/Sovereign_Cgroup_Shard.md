@@ -1,8 +1,8 @@
-# Sovereign Cgroup Shard
+ï»¿# Sovereign Cgroup Shard
 
 1
 
-**Parity:** Linux cgroups v2 · Windows Job Objects · Kubernetes ResourceQuota
+**Parity:** Linux cgroups v2 Â· Windows Job Objects Â· Kubernetes ResourceQuota
 **Location:** `kernel/modules/system/SovereignCgroupShard.c`
 **Standard:** Zenith Industrial Sovereignty v1.0
 
@@ -19,9 +19,9 @@ The Sovereign Cgroup Shard provides native, zero-dependency silicon resource acc
 1
 
 Cgroup Matrix (up to 12 resource groups)
-  +-- zenith_kernel   — 80% CPU | 4 GB  MEM | IO:900 (High)
-  +-- citizen_apps    — 60% CPU | 2 GB  MEM | IO:500 (Mid)
-  +-- guest_sandbox   — 20% CPU | 512MB MEM | IO:100 (Low)
+  +-- zenith_kernel   â€” 80% CPU | 4 GB  MEM | IO:900 (High)
+  +-- citizen_apps    â€” 60% CPU | 2 GB  MEM | IO:500 (Mid)
+  +-- guest_sandbox   â€” 20% CPU | 512MB MEM | IO:100 (Low)
 
 Auto-Governor Engine (called by Zen Scheduler every tick)
   +-- For each cgroup:
@@ -63,5 +63,5 @@ Auto-Governor Engine (called by Zen Scheduler every tick)
 
 1
 
-`GLOBAL MESH ACTIVE` — Synchronized with `AaryanSinghChauhan09/SigmaOS`.
+`GLOBAL MESH ACTIVE` â€” Synchronized with `AaryanSinghChauhan09/SigmaOS`.
 

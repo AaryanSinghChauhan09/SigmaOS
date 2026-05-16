@@ -1,31 +1,37 @@
-# 🛠 FOLEY_ARTIST Profile
+﻿# ðŸ›  FOLEY_ARTIST Profile
 
 ## Required Tools & Functions
 
 - Sound-lattice
+
 - spectral-layering-engine
+
 - Foley-prop-index
+
 - real-time-resynthesizer
 
-## 📜 Compliance Rules
+## ðŸ“œ Compliance Rules
 
 - Audio post-production standards
 
-## 🧮 Professional Calculators
+## ðŸ§® Professional Calculators
 
 - Sample-rate delta
+
 - reverb-tail-calc
+
 - sync-offset
 
-## 🧬 Core Algorithms
+## ðŸ§¬ Core Algorithms
 
 - Automated footstep matching
+
 - textural sound synthesis
 
-## 🛡 Self-Healing Strategy
+## ðŸ›¡ Self-Healing Strategy
 
 - Audio-buffer consistency, Prop-Lattice sync
 
-## 🔄 Rollback Strategy
+## ðŸ”„ Rollback Strategy
 
 - Mix-state snapshots, sound-design-history restoration

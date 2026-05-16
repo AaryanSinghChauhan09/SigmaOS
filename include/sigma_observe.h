@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN OBSERVABILITY MATRIX (S-OBSERVE)
+ * Î£ SIGMAOS: SOVEREIGN OBSERVABILITY MATRIX (S-OBSERVE)
  * =========================================================================
  * Mission: Safe, in-kernel programmable observability and tracing, 
  * matching the power of eBPF and DTrace without external dependencies.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_OBSERVE_H
 #define SIGMA_OBSERVE_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

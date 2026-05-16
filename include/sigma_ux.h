@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN UX & PERSONALIZATION ENGINE
+ * Î£ SIGMAOS: SOVEREIGN UX & PERSONALIZATION ENGINE
  * =========================================================================
  * Mission: High-fidelity aesthetics and automated personalization.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_UX_H
 #define SIGMA_UX_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN GPG SHARD (Header)
+ * Î£ SIGMAOS: SOVEREIGN GPG SHARD (Header)
  * =========================================================================
  * Mission: PQC-hardened package signing and verification.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SOVEREIGN_GPG_H
 #define SOVEREIGN_GPG_H
 
-#include "../../include/core/sigma_types.h"
+#include "../core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

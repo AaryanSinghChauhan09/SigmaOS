@@ -1,5 +1,6 @@
-# SigmaOS Kernel Developer Handbook
-## Version 15.0.0 — Zenith Release
+﻿# SigmaOS Kernel Developer Handbook
+
+## Version 15.0.0 â€” Zenith Release
 
 ---
 
@@ -10,7 +11,9 @@ SigmaOS uses a **microkernel-inspired shard lattice** where each subsystem is an
 | Layer | Path | Purpose |
 |-------|------|---------|
 | **LAYER 0** | `kernel/core/hal/` | Hardware Abstraction & Boot |
+
 | **LAYER 1** | `kernel/core/` | IPC, Scheduler, Memory, FS, Net |
+
 | **LAYER 2** | `kernel/core/drivers/` | Hardware Drivers |
 
 ---
@@ -18,47 +21,65 @@ SigmaOS uses a **microkernel-inspired shard lattice** where each subsystem is an
 ## 2. Concurrency Model & Formal Verification
 
 ### 2.1 Lock Hierarchy (Enforced)
+
 All kernel shards MUST acquire locks in the following order to prevent deadlocks:
 
 ```
+
 1. SovereignMemoryPool::mutex
+
 2. SovereignScheduler::runqueue_lock
+
 3. SovereignNetStack::socket_lock
+
 4. SovereignFS::inode_lock
 ```
 
 **Violation** of this order will trigger a `SovereignWatchdog` panic.
 
 ### 2.2 Atomic Operations
+
 Prefer `__atomic_*` builtins over mutexes for counter updates:
 ```cpp
 __atomic_fetch_add(&shard_refcount, 1, __ATOMIC_SEQ_CST);
 ```
 
 ### 2.3 Formal Verification Checklist
+
 Before merging any concurrency-related change:
+
 - [ ] Verified with `ThreadSanitizer` (`-fsanitize=thread`)
+
 - [ ] No `TOCTOU` (time-of-check/time-of-use) patterns introduced
+
 - [ ] Lock ordering documented in shard header comment
+
 - [ ] Stress-tested via `scripts/format_stress_test.sh`
 
 ---
 
 ## 3. Memory Management Rules
 
-- **No `malloc`/`free`** in kernel shards — use `SovereignMemoryPool::alloc()`
+- **No `malloc`/`free`** in kernel shards â€” use `SovereignMemoryPool::alloc()`
+
 - **RTOS shards** are forbidden from ALL dynamic allocation
+
 - Run `SovereignMemoryPool::profile_leaks()` after each integration test
-- Buddy allocation handles blocks ≥ 4KB; slab handles < 4KB objects
+
+- Buddy allocation handles blocks â‰¥ 4KB; slab handles < 4KB objects
 
 ---
 
 ## 4. Shard Interface Contract
 
 Every shard MUST:
+
 1. Inherit from `SigmaOS::SigmaObject`
+
 2. Implement `type_name()` returning a unique string
+
 3. Use `SigmaSingleton<T>` if stateful
+
 4. Include only relative headers (`../../../include/`)
 
 ---
@@ -66,9 +87,13 @@ Every shard MUST:
 ## 5. Regression Test Requirements
 
 All PRs to `main` must pass:
-- `scripts/regression_check.sh` — functional correctness
-- `scripts/format_stress_test.sh` — concurrency stress
-- `scripts/fuzz_pqc.sh` — security/fuzzing
+
+- `scripts/regression_check.sh` â€” functional correctness
+
+- `scripts/format_stress_test.sh` â€” concurrency stress
+
+- `scripts/fuzz_pqc.sh` â€” security/fuzzing
+
 - GitHub Actions: CodeQL scan must return 0 critical alerts
 
 ---

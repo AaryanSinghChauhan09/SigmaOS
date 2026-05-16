@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN GESTURAL UX (S-GESTURE)
+ * Î£ SIGMAOS: SOVEREIGN GESTURAL UX (S-GESTURE)
  * =========================================================================
  * Mission: Zero-latency, camera-based hand tracking and gesture 
  * recognition for completely touchless system navigation.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_GESTURE_H
 #define SIGMA_GESTURE_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

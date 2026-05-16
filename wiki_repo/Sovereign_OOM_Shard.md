@@ -1,8 +1,8 @@
-# Sovereign OOM Shard
+ï»¿# Sovereign OOM Shard
 
 1
 
-**Parity:** Linux OOM Killer · macOS Jetsam · Android LMKD
+**Parity:** Linux OOM Killer Â· macOS Jetsam Â· Android LMKD
 **Location:** `kernel/modules/system/SovereignOOMShard.c`
 **Standard:** Zenith Industrial Sovereignty v1.0
 
@@ -25,8 +25,8 @@ OOM Score Table (24 entries max)
   guest_sandbox       PID:99 score:+900  ? culled first
 
 Thresholds:
-  WARN     < 512 MB free — sweep with logging
-  CRITICAL < 128 MB free — aggressive cull, highest-score victim selected
+  WARN     < 512 MB free â€” sweep with logging
+  CRITICAL < 128 MB free â€” aggressive cull, highest-score victim selected
 
 1
 
@@ -52,5 +52,5 @@ Thresholds:
 
 1
 
-`GLOBAL MESH ACTIVE` — Synchronized with `AaryanSinghChauhan09/SigmaOS`.
+`GLOBAL MESH ACTIVE` â€” Synchronized with `AaryanSinghChauhan09/SigmaOS`.
 

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ADAPTIVE TYPOGRAPHY (S-ADAPTIVETYPE)
+ * Î£ SIGMAOS: SOVEREIGN ADAPTIVE TYPOGRAPHY (S-ADAPTIVETYPE)
  * =========================================================================
  * Mission: Real-time, continuous adjustment of UI font weight, scale, and 
  * spacing based on user's eye-distance and screen resolution.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_ADAPTIVETYPE_H
 #define SIGMA_ADAPTIVETYPE_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

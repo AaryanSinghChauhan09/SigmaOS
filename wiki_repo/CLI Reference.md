@@ -1,4 +1,4 @@
-# CLI Reference
+﻿# CLI Reference
 
 1
 
@@ -11,9 +11,13 @@
 | Command | Action | Description |
 |---------|--------|-------------|
 | **`sigma-office`** | **Produce** | **Sovereign Productivity Suite (Docs, Sheets, Slides).** |
+
 | **`sigma-nexus`** | **Manage** | **Sovereign Enterprise ERP/CRM/Cloud management.** |
+
 | **`sigma-linux`** | **Compatibility** | **Run legacy Linux/POSIX binaries via S99 translation.** |
+
 | **`sigma-reg`** | **Configure** | **Query/Edit the Sovereign Registry (Git-backed).** |
+
 | `sigma-driver`| Manage | Load, list, and auto-detect modular kernel drivers. |
 
 1
@@ -21,7 +25,9 @@
 | Command | Action | Description |
 |---------|--------|-------------|
 | **`sigma-claw`** | **Automate** | **Sovereign Claw AI Automation (Multi-step intents).** |
+
 | **`sigma-shell`** | **Interact** | **Enter the Sovereign Intent Shell (NL-to-CLI).** |
+
 | `sigma-ai status` | Monitor | Check the health of the local AI assistant. |
 | `sigma-ai query` | Interact | Send a natural language command to the OS. |
 
@@ -31,6 +37,7 @@
 |---------|--------|-------------|
 | `sigma-init` | Initialize | Manage and list system services (AI-enhanced). |
 | **`sigma-reg`** | **Configure** | **Query/Edit the Sovereign Registry (Git-backed).** |
+
 | `sigma-boot-fast`| Boot | Execute Apex Fast Startup (Hybrid Hibernation). |
 | `sigma-irq` | Inspect | View the hardware IDT and active interrupt handlers. |
 | `sigma-sched` | Tune | Configure SHS v2 Hybrid Scheduling policies. |

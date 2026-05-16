@@ -1,8 +1,8 @@
-#include "../../../include/sigma_log.h"
+﻿#include "../../../include/sigma_log.h"
 #include "../../../include/libc/SovereignLibC.h"
 #include "../../../include/hal/sigma_hal.h"
 #include "../../../include/core/sigma_types.h"
-#include "ai/sigma_assistant.h"
+#include "../../../include/ai/sigma_assistant.h"
 
 /**
  * SigmaOS Sovereign Assistant Implementation (v100.0 Zenith)

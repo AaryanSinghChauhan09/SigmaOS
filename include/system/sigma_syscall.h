@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SYSTEM CALL GATE (SSG)
+ * Î£ SIGMAOS: SOVEREIGN SYSTEM CALL GATE (SSG)
  * =========================================================================
  * Mission: Zero-latency, interrupt-driven shard transitions.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_SYSCALL_H
 #define SIGMA_SYSCALL_H
 
-#include "include/sigma_types.h"
+#include "../sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

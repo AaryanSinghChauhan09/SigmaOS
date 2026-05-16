@@ -1,219 +1,92 @@
-# ⚡ SigmaOS v15.0 Zenith — Wiki Home
+﻿# Î£ SIGMAOS: THE SOVEREIGN INDUSTRIAL SINGULARITY (v15.0 Zenith)
 
-> **The Sovereign Lattice Operating System. 600 shards. PQC-hardened. Industrial-grade.**
+### SigmaOS is an industrial-grade, sovereign microkernel operating system built on the principle of Lattice Shard Autonomy.
 
-[![GitHub](https://img.shields.io/badge/GitHub-SigmaOS-black?logo=github)](https://github.com/AaryanSinghChauhan09/SigmaOS)
-[![Latest Release](https://img.shields.io/badge/latest-v15.0.0--Stable-brightgreen)](https://github.com/AaryanSinghChauhan09/SigmaOS/releases)
-[![License](https://img.shields.io/badge/license-Sovereign--MIT-purple)](https://github.com/AaryanSinghChauhan09/SigmaOS)
-[![Architecture](https://img.shields.io/badge/arch-x86__64%20%7C%20ARM64%20%7C%20RISC--V-green)](https://github.com/AaryanSinghChauhan09/SigmaOS)
+The Zenith Singularity (v15.0) marks the definitive transition from a conceptual microkernel to a production-ready computational lattice, optimized for extreme environments, hardware-native performance, and post-quantum security.
 
----
+## ðŸš€ The Zenith Singularity Roadmap (Performance-Integrated)
 
-## 🏗️ Unified Strategy (v15.0+)
-SigmaOS v15.0 follows a **Unified Development Strategy** to ensure functional, algorithmic, and design parity across all 7 formats.
-*   [**Unified Development Strategy**](Architecture#5-unified-development-strategy-v150) — Core architecture overview.
-*   [**Core Toolset Manifest**](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/architecture/CORE_TOOLSET.md) — Baseline tools in every edition.
-*   [**Unified Task Manifest**](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/UNIFIED_TASK_MANIFEST.md) — Future and incomplete work tracker.
+SigmaOS adheres to a rigorous technical roadmap to ensure total parity and efficiency across all architectures:
 
----
+### 1. Core System Performance
 
-SigmaOS v15.0 ships in **7 distinct editions**, each purpose-built for a specific deployment scenario. Select the edition that matches your hardware and use case:
+- **O(1) Kernel Primitives**: Deterministic scheduling and memory allocation.
 
----
+- **Shard-Level Memory Pools**: Isolated pools for each shard to prevent fragmentation.
 
-### 🖥️ [Zenith Standalone](Home-Zenith-Standalone)
+- **Lightweight Synchronization**: Lock-free primitives for high-concurrency orchestration.
 
-**The flagship bare-metal edition.** Full sovereign ownership of your hardware. No hypervisor, no Windows, no Linux substrate.
+### 2. Algorithmic Profiling & Benchmarking
 
-- ✅ Complete Zenith Desktop (Z-DESKTOP)
-- ✅ All 600 shards
-- ✅ PQC-hardened (Dilithium-5 + Kyber-1024)
-- ✅ <2ms boot with SSB fast-boot mode
-- **Best for**: Power users, professionals, dedicated workstations
+- **Automated Benchmarks**: `make benchmark` integrates micro and macro metrics into CI/CD.
 
-**Release**: [v15.0-zenith-standalone](https://github.com/AaryanSinghChauhan09/SigmaOS/releases/tag/v15.0-zenith-standalone)
+- **Industrial Stress Testing**: Simulation framework for large-scale workload validation.
 
----
+- [Read the Algorithmic Complexity Specs](docs/ALGORITHMS.md)
 
-### ⚡ [Zenith Dual-Boot](Home-Zenith-Dualboot)
+- [View Performance Roadmap](docs/PERFORMANCE.md)
 
-**Coexistence with Windows or Linux.** Install alongside your existing OS — safely, reversibly, and without touching foreign partitions.
+### 3. Security & Reliability
 
-- ✅ GRUB2 sovereign boot manager
-- ✅ GPT-safe installer
-- ✅ Windows 10/11 & Linux compatible
-- ✅ Cross-OS file sharing
-- **Best for**: Users transitioning to SigmaOS, professionals who need both worlds
+- **PQC-Sealed Shards**: Dilithium-5 and Kyber-1024 verified with automated fuzzing.
 
-**Release**: [v15.0-zenith-dualboot](https://github.com/AaryanSinghChauhan09/SigmaOS/releases/tag/v15.0-zenith-dualboot)
+- **S-ARMOR Access Control**: Strict shard isolation with minimal overhead.
 
----
+- **Amnesic Persistence**: Zero-data remanence verified under hardware stress.
 
-### 🔬 [Zenith Core](Home-Zenith-Core)
+- [Read the Security Standards](docs/security/PQC_HARDENING.md)
 
-**Headless microkernel — no GUI.** Pure kernel power for servers, CI/CD nodes, embedded systems, and kernel developers.
+### 4. Universal OS Format Adaptation
 
-- ✅ 2 MB kernel image
-- ✅ <100ms headless boot
-- ✅ Full kernel ABI + 48 custom syscalls
-- ✅ PXE, container, and VM deployment
-- **Best for**: Servers, embedded systems, kernel researchers, CI/CD infrastructure
+- **Lattice Flexibility**: Native profiles for Monolithic, Microkernel, Hybrid, Embedded, RTOS, Cloud, and Mobile.
 
-**Release**: [v15.0-zenith-core](https://github.com/AaryanSinghChauhan09/SigmaOS/releases/tag/v15.0-zenith-core)
+- [Read the OS Format Matrix](docs/architecture/FORMATS.md)
 
----
+### 5. Modularity & Extensibility
 
-### 🌐 [Zenith Browser](Home-Zenith-Browser)
+- **Shard Autonomy**: Hot-swappable modules verified for algorithmic consistency.
 
-**Privacy-first, web-optimized OS.** Purpose-built for sovereign browsing with zero tracking, built-in PQC VPN, and 3-second boot to browser.
+- **POSIX-lite Compliance**: Seamless portability for industrial applications.
 
-- ✅ SovereignBrowser (PQC-hardened TLS)
-- ✅ Built-in S-VPN + SovereignBlock ad blocker
-- ✅ Zero telemetry — ever
-- ✅ <3 second boot to browser
-- **Best for**: Privacy advocates, kiosk stations, Chromebook replacements, secure browsing
+### 6. Tooling & Branch Strategy
 
-**Release**: [v15.0-zenith-browser](https://github.com/AaryanSinghChauhan09/SigmaOS/releases/tag/v15.0-zenith-browser)
+- **Static & Dynamic Analysis**: Integration with Clang-Tidy, perf, and custom shard profilers.
 
----
+- **Performance Branch**: Dedicated `performance/optimization` branch for experimental improvements.
 
-### 📱 [Zenith App](Home-Zenith-App)
+### 7. Documentation & Wiki Alignment
 
-**Universal application platform.** Run Linux, Windows (S-Wine), Android (S-ARC), and WebAssembly apps alongside native sovereign shards.
+- **Industrial Wiki**: Consolidated technical specifications in `docs/wiki/`.
 
-- ✅ Linux ELF + Windows S-Wine + Android S-ARC
-- ✅ Sovereign App Nexus (50,000+ apps)
-- ✅ Per-app S-ARMOR sandboxing
-- ✅ Built-in developer tools + SovereignIDE
-- **Best for**: Developers, creative professionals, enterprise workstations
+- **Optimization Guidelines**: Best practices for shard-level performance tuning.
 
-**Release**: [v15.0-zenith-app](https://github.com/AaryanSinghChauhan09/SigmaOS/releases/tag/v15.0-zenith-app)
+### 8. Future-Proofing
 
----
+- **WASM Runtime**: Optimized for lightweight, sandboxed shard execution.
 
-### 🏔️ [Stable (LTS)](Home-Stable)
+- **Cross-Platform Builds**: Reproducible builds for ARM, x86, and RISC-V.
 
-**Production-hardened Long-Term Support.** 3 years of security backports, formal verification, enterprise directory integration, and fleet management.
+## ðŸ“¦ Edition Manifest
 
-- ✅ 3-year LTS security backports
-- ✅ LDAP/Active Directory integration
-- ✅ FIPS 140-3 aligned cryptography
-- ✅ Atomic updates with rollback
-- **Best for**: Enterprises, governments, critical infrastructure, production deployments
+| Edition | Purpose | Branch | Primary Interface |
+| :--- | :--- | :--- | :--- |
 
-**Release**: [v15.0.0-Stable](https://github.com/AaryanSinghChauhan09/SigmaOS/releases/tag/v15.0.0-Stable)
+| **S-BROWSER** | Instant Browser Simulation | `release/browser` | `index.html` |
 
----
+| **S-APP** | Standalone Desktop Wrapper | `release/app` | `Electron / main.js` |
 
-### 🌅 [Horizon (Research Preview)](Home-Horizon)
+| **S-DUAL** | Hardware Installer | `release/dual-boot` | `installer.html` |
 
-**Bleeding-edge research edition.** Neural scheduler, quantum HAL, holographic UI, AI-native IPC, and Rust kernel drivers — the future of SigmaOS.
+| **S-STANDALONE** | Bare-Metal ISO | `release/standalone` | `sigmaos.bin` |
 
-- 🔬 Neural AI Scheduler (ML-driven)
-- 🔮 Quantum HAL (QPU integration)
-- 🌌 Holographic UI (XR support)
-- 🦀 Rust Kernel Driver Framework
-- **Best for**: Kernel researchers, AI engineers, quantum computing pioneers, early adopters
+## ðŸ”‘ Getting Started (Industrial Quick Start)
 
-> ⚠️ Not for production — research preview
+1. **Clone the Shard**: `git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git`
 
-**Release**: [v15.0.0-Horizon](https://github.com/AaryanSinghChauhan09/SigmaOS/releases/tag/v15.0.0-Horizon)
+2. **Build for Architecture**: `make singularity ARCH=x86_64`
 
----
+3. **Verify Performance**: `make benchmark && make test`
 
-## 📊 Edition Comparison
+4. **Simulate Stress**: `python simulation/industrial_stress_test.py`
 
-| Feature | Standalone | Dual-Boot | Core | Browser | App | Stable | Horizon |
-|---|---|---|---|---|---|---|---|
-| Desktop | ✅ Full | ✅ Full | ❌ CLI | ✅ Minimal | ✅ Full | ✅ Full | ✅ Holo |
-| PQC Security | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Boot Time | <2s | <5s | <100ms | <3s | <5s | <8s | <10s |
-| RAM (idle) | ~512MB | ~512MB | ~128MB | ~256MB | ~800MB | ~512MB | ~2GB |
-| Windows Apps | ❌ | ❌ | ❌ | ❌ | ✅ S-Wine | ❌ | ✅ |
-| Android Apps | ❌ | ❌ | ❌ | ❌ | ✅ S-ARC | ❌ | ✅ |
-| Neural Sched | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Quantum HAL | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| LTS Support | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ 3yr | ❌ |
-| Production | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ Beta |
-
----
-
-## 🏛️ Core Documentation
-
-| Document | Description |
-|---|---|
-| [Architecture](Architecture) | Sovereign Lattice Microkernel architecture overview |
-| [Kernel-Developer-Handbook](Kernel-Developer-Handbook) | Deep-dive kernel development reference |
-| [SYSCALLS](SYSCALLS) | Full sovereign syscall table reference |
-| [Installation](Installation) | General installation guide |
-| [Security-Safety](Security-Safety) | PQC security architecture |
-| [Performance-Benchmarks](Performance-Benchmarks) | Benchmarks vs Linux/Windows |
-| [Driver-Framework](Driver-Framework) | Sovereign Driver Framework (SDF) |
-| [Sovereign-Lattice-Filesystem](Sovereign-Lattice-Filesystem) | SLF distributed filesystem |
-| [Sovereign-Industrial-Scheduler](Sovereign-Industrial-Scheduler) | S-CFS scheduler internals |
-| [Sovereign-Memory-Management](Sovereign-Memory-Management) | Memory management deep-dive |
-| [API-Reference](API-Reference) | Sovereign API reference |
-| [CONTRIBUTING](CONTRIBUTING) | Contribution guide |
-| [SECURITY](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/SECURITY.md) | Security policy & CVE reporting |
-
----
-
-## 🚀 Quick Start
-
-**Not sure which edition to choose?**
-
-```
-Are you replacing Windows/Linux entirely?     → Standalone
-Running alongside Windows or Linux?           → Dual-Boot
-Building a server or embedded system?         → Core
-Need a privacy-first browser experience?      → Browser
-Need to run apps from multiple ecosystems?    → App
-Deploying in enterprise / production?         → Stable
-Researching AI/quantum/kernel internals?      → Horizon
-```
-
----
-
-## 🧬 What is SigmaOS?
-
-SigmaOS is a **ground-up sovereign operating system** built on the Sovereign Lattice Microkernel. It is:
-
-- **Not a Linux fork** — sovereign kernel written in C++20/C11, not derived from Linux
-- **Not a Windows clone** — entirely independent architecture and ABI
-- **Post-quantum secured** — Dilithium-5 signatures and Kyber-1024 key exchange throughout
-- **Modular** — 600 professional shards loadable/unloadable at runtime
-- **Industrial-grade** — Designed for bare-metal performance, not VM emulation
-
-### Architecture Snapshot
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                     USERLAND LAYER                       │
-│  Z-DESKTOP  │  OmniShell  │  sigma-pkg  │  App Store    │
-├─────────────────────────────────────────────────────────┤
-│                  SHARD LATTICE (600 shards)              │
-│  S-NET  │  S-VFS  │  S-SCHED  │  S-SEC  │  S-GPU  ...  │
-├─────────────────────────────────────────────────────────┤
-│              SOVEREIGN LATTICE MICROKERNEL               │
-│    Syscall Table │ S-ARMOR │ IMA │ PQC Daemon           │
-├─────────────────────────────────────────────────────────┤
-│                      HAL LAYER                           │
-│    CPU │ Memory │ Serial │ PCI │ USB │ NVMe │ GPU        │
-├─────────────────────────────────────────────────────────┤
-│                   BARE METAL / SILICON                   │
-└─────────────────────────────────────────────────────────┘
-```
-
----
-
-## 🔗 Links
-
-- **GitHub Repository**: [AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS)
-- **All Releases**: [Releases Page](https://github.com/AaryanSinghChauhan09/SigmaOS/releases)
-- **Issue Tracker**: [GitHub Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions)
-- **Security Advisories**: [Security](https://github.com/AaryanSinghChauhan09/SigmaOS/security/advisories)
-
----
-
-*SigmaOS v15.0 Zenith — Sovereign computing, redefined from silicon up.*
+*"The Zenith is not just an operating system; it is the final industrial fact."*

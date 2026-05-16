@@ -1,7 +1,7 @@
-#ifndef SIGMA_SNAP_TYPES_H
+﻿#ifndef SIGMA_SNAP_TYPES_H
 #define SIGMA_SNAP_TYPES_H
 
-#include "include/sigma_types.h"
+#include "./sigma_types.h"
 
 typedef sigma_u32 sigma_snap_zone_id_t;
 

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * =========================================================================
  * SIGMAOS: SOVEREIGN SYSTEM CALL GATE (SSG) v2.0
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_SYSCALL_H
 #define SIGMA_SYSCALL_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

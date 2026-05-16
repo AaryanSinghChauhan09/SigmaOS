@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_DISTRO_FORGE_H
 #define SOVEREIGN_DISTRO_FORGE_H
 
-#include "../include/core/SigmaOOP.hpp"
+#include "./include/core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace DistroForge {

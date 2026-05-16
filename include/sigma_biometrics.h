@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN BIOMETRICS ENGINE (S-BIOMETRICS)
+ * Î£ SIGMAOS: SOVEREIGN BIOMETRICS ENGINE (S-BIOMETRICS)
  * =========================================================================
  * Mission: Silicon-level biometric authentication (fingerprint, face, iris)
  * providing instantaneous, zero-trust user login and personalization.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_BIOMETRICS_H
 #define SIGMA_BIOMETRICS_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

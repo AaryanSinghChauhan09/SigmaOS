@@ -1,26 +1,27 @@
-# CODE OF CONDUCT
+﻿# Code of Conduct
 
-1
-
-1
+## Our Pledge
 
 In the interest of fostering an open and welcoming environment, we as contributors and maintainers pledge to make participation in our project and our community a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, religion, or sexual identity and orientation.
 
-1
+## Our Standards
 
 Examples of behavior that contributes to creating a positive environment include:
 
-1
+- Using welcoming and inclusive language.
 
-1
+- Being respectful of differing viewpoints and experiences.
+
+- Gracefully accepting constructive criticism.
 
 Examples of unacceptable behavior by participants include:
 
-1
+- The use of sexualized language or imagery.
 
-1
+- Trolling, insulting/derogatory comments, and personal or political attacks.
 
-1
+- Public or private harassment.
+
+## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team. All complaints will be reviewed and investigated and will result in a response that is deemed necessary and appropriate to the circumstances.
-

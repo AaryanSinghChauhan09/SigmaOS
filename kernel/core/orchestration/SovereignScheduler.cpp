@@ -23,6 +23,7 @@ void SovereignScheduler::schedule(void (*task)(), sigma_u32 priority) {
     // 1. Task Registration with Fair Initial vruntime
     SovereignTask& t = m_tasks[m_task_count++];
     t.id = m_task_count;
+    t.func = task;
     t.priority = priority;
     t.active = true;
     

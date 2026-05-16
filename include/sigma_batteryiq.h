@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN BATTERY INTELLIGENCE (S-BATTERYIQ)
+ * Î£ SIGMAOS: SOVEREIGN BATTERY INTELLIGENCE (S-BATTERYIQ)
  * =========================================================================
  * Mission: Ultra-detailed battery health, charge cycle tracking, and
  * intelligent power routing to maximize hardware longevity.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_BATTERYIQ_H
 #define SIGMA_BATTERYIQ_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

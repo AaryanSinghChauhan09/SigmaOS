@@ -1,10 +1,10 @@
-#include "include/sigma_types.h"
+﻿#include "./sigma_types.h"
 #ifndef SOVEREIGN_MESH_LATTICE_H
 #define SOVEREIGN_MESH_LATTICE_H
 
-#include "../include/core/sigma_kernel_types.h"
-#include "../include/sigma_mesh_types.h"
-#include "include/SigmaOOP.hpp"
+#include "./core/sigma_kernel_types.h"
+#include "./sigma_mesh_types.h"
+#include "./SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

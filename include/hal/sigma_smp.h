@@ -1,7 +1,7 @@
-#ifndef SIGMA_SMP_H
+﻿#ifndef SIGMA_SMP_H
 #define SIGMA_SMP_H
 
-#include "include/sigma_types.h"
+#include "../sigma_types.h"
 
 #ifdef __cplusplus
 namespace SigmaOS {

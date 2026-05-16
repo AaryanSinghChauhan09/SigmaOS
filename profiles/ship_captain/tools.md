@@ -1,34 +1,43 @@
-# 🛠 SHIP_CAPTAIN Profile
+﻿# ðŸ›  SHIP_CAPTAIN Profile
 
 ## Required Tools & Functions
 
 - ECDIS navigation
+
 - AIS-Lattice
+
 - weather routing
+
 - ballast manager
 
-## 📜 Compliance Rules
+## ðŸ“œ Compliance Rules
 
 - SOLAS
+
 - MARPOL
+
 - STCW
 
-## 🧮 Professional Calculators
+## ðŸ§® Professional Calculators
 
 - Fuel consumption
+
 - eta
+
 - cargo stability (GM)
 
-## 🧬 Core Algorithms
+## ðŸ§¬ Core Algorithms
 
 - Route optimization
+
 - collision avoidance
+
 - tidal prediction
 
-## 🛡 Self-Healing Strategy
+## ðŸ›¡ Self-Healing Strategy
 
 - Navigational data sync, engine diagnostic monitoring
 
-## 🔄 Rollback Strategy
+## ðŸ”„ Rollback Strategy
 
 - Voyage log snapshots, autopilot calibration restoration

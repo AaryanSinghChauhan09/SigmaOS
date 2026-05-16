@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN HYBRID KERNEL (S-HYBRID)
+ * Î£ SIGMAOS: SOVEREIGN HYBRID KERNEL (S-HYBRID)
  * =========================================================================
  * Mission: Combines microkernel stability with monolithic performance, offering
  * modularity without sacrificing speed.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_HYBRID_H
 #define SIGMA_HYBRID_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

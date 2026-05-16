@@ -1,31 +1,37 @@
-# 🛠 GEO_ENGINEERING_ANALYST Profile
+﻿# ðŸ›  GEO_ENGINEERING_ANALYST Profile
 
 ## Required Tools & Functions
 
 - Albedo-monitor
+
 - stratospheric-aerosol-Lattice
+
 - carbon-cycle-modeler
 
-## 📜 Compliance Rules
+## ðŸ“œ Compliance Rules
 
 - UN Environmental protocols
+
 - SRM-governance guidelines
 
-## 🧮 Professional Calculators
+## ðŸ§® Professional Calculators
 
 - Radiative-forcing-delta
+
 - aerosol-depth-ratio
+
 - precipitation-impact
 
-## 🧬 Core Algorithms
+## ðŸ§¬ Core Algorithms
 
 - Climate-impact simulation
+
 - unintended-consequence modeling
 
-## 🛡 Self-Healing Strategy
+## ðŸ›¡ Self-Healing Strategy
 
 - Aerosol-delivery-sync, atmospheric-probe verification
 
-## 🔄 Rollback Strategy
+## ðŸ”„ Rollback Strategy
 
 - Geo-state snapshots, atmospheric-baseline restoration

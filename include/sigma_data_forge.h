@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN DATA FORGE (S-DATAFORGE)
+ * Î£ SIGMAOS: SOVEREIGN DATA FORGE (S-DATAFORGE)
  * =========================================================================
  * Mission: Lattice-scale distributed data processing and analytics.
  * Replaces: Apache Spark, Pandas, Dask, Airflow.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_DATA_FORGE_H
 #define SIGMA_DATA_FORGE_H
 
-#include "include/sigma_types.h"
+#include "./sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

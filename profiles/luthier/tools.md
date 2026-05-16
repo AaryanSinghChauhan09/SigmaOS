@@ -1,32 +1,39 @@
-# 🛠 LUTHIER Profile
+﻿# ðŸ›  LUTHIER Profile
 
 ## Required Tools & Functions
 
 - Acoustic-frequency analyzer
+
 - wood-density scanner
+
 - micro-planer
+
 - resonance-Lattice
 
-## 📜 Compliance Rules
+## ðŸ“œ Compliance Rules
 
 - CITES wood-usage regs
+
 - traditional craft standards
 
-## 🧮 Professional Calculators
+## ðŸ§® Professional Calculators
 
 - String-tension
+
 - bridge-pressure
+
 - vibrational-mode delta
 
-## 🧬 Core Algorithms
+## ðŸ§¬ Core Algorithms
 
 - Resonance-box simulation
+
 - structural-vibration analysis
 
-## 🛡 Self-Healing Strategy
+## ðŸ›¡ Self-Healing Strategy
 
 - Workshop-climate sync, resonance-profile verification
 
-## 🔄 Rollback Strategy
+## ðŸ”„ Rollback Strategy
 
 - Instrument-design snapshots, vibrational-history restoration

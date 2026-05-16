@@ -1,7 +1,7 @@
-#ifndef SIGMA_UI_TYPES_H
+﻿#ifndef SIGMA_UI_TYPES_H
 #define SIGMA_UI_TYPES_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 /* 
  * =========================================================================

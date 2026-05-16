@@ -1,8 +1,8 @@
-#ifndef SOVEREIGN_LATTICE_FS_H
+﻿#ifndef SOVEREIGN_LATTICE_FS_H
 #define SOVEREIGN_LATTICE_FS_H
 
-#include "../../include/core/sigma_types.h"
-#include "../../include/core/SigmaOOP.hpp"
+#include "../sigma_types.h"
+#include "../SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

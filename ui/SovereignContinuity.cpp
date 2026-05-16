@@ -1,8 +1,8 @@
-#include "../include/sigma_log.h"
-#include "include/SovereignLibC.h"
-#include "include/hal/sigma_hal.h"
-#include "include/sigma_types.h"
-#include "../include/sigma_continuity.h"
+#include "./include/sigma_log.h"
+#include "./include/SovereignLibC.h"
+#include "./include/hal/sigma_hal.h"
+#include "./include/sigma_types.h"
+#include "./include/sigma_continuity.h"
 
 /**
  * SigmaOS Sovereign Continuity Engine (v100.0 Zenith)

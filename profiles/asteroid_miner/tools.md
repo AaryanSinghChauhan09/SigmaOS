@@ -1,32 +1,39 @@
-# 🛠 ASTEROID_MINER Profile
+﻿# ðŸ›  ASTEROID_MINER Profile
 
 ## Required Tools & Functions
 
 - Spectroscopic analyzer
+
 - drill-bit thermal monitor
+
 - low-gravity navigation
+
 - ore-density mapper
 
-## 📜 Compliance Rules
+## ðŸ“œ Compliance Rules
 
 - Outer Space Treaty compliance
+
 - resource extraction protocols
 
-## 🧮 Professional Calculators
+## ðŸ§® Professional Calculators
 
 - Delta-V
+
 - ore-yield probability
+
 - trajectory-delta
 
-## 🧬 Core Algorithms
+## ðŸ§¬ Core Algorithms
 
 - Autonomous excavation pathing
+
 - structural stability prediction in vacuum
 
-## 🛡 Self-Healing Strategy
+## ðŸ›¡ Self-Healing Strategy
 
 - Thruster-link verification, drill-head cooling sync
 
-## 🔄 Rollback Strategy
+## ðŸ”„ Rollback Strategy
 
 - Excavation state snapshots, orbital-return baseline restoration

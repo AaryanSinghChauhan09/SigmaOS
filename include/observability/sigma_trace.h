@@ -1,6 +1,6 @@
-#ifndef SIGMA_TRACE_H
+﻿#ifndef SIGMA_TRACE_H
 #define SIGMA_TRACE_H
-#include "include/sigma_types.h"
+#include "../sigma_types.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

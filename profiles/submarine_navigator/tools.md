@@ -1,32 +1,39 @@
-# 🛠 SUBMARINE_NAVIGATOR Profile
+﻿# ðŸ›  SUBMARINE_NAVIGATOR Profile
 
 ## Required Tools & Functions
 
 - SONAR-Lattice
+
 - pressure-hull monitor
+
 - bathymetric-map-engine
+
 - silent-running-nexus
 
-## 📜 Compliance Rules
+## ðŸ“œ Compliance Rules
 
 - Maritime law
+
 - deep-sea exploration protocols
 
-## 🧮 Professional Calculators
+## ðŸ§® Professional Calculators
 
 - Buoyancy-delta
+
 - acoustic-range
+
 - pressure-limit-calc
 
-## 🧬 Core Algorithms
+## ðŸ§¬ Core Algorithms
 
 - Sub-surface obstacle avoidance
+
 - passive sonar triangulation
 
-## 🛡 Self-Healing Strategy
+## ðŸ›¡ Self-Healing Strategy
 
 - Acoustic-link verification, hull-sensor-integrity scan
 
-## 🔄 Rollback Strategy
+## ðŸ”„ Rollback Strategy
 
 - Dive-log snapshots, ballast-configuration restoration

@@ -1,7 +1,7 @@
-#ifndef SIGMA_CLAW_H
+﻿#ifndef SIGMA_CLAW_H
 #define SIGMA_CLAW_H
 
-#include "include/sigma_types.h"
+#include "../sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,7 +21,7 @@ typedef struct {
 } sigma_claw_config_t;
 
 /* --- Sovereign Claw Gateway Primitives --- */
-/* The Lobster Way 🦞 */
+/* The Lobster Way ðŸ¦ž */
 void claw_gateway_init(void);
 void claw_route_message(const char* channel, const char* message);
 void claw_render_canvas(void);

@@ -1,5 +1,5 @@
-#include "../include/libc/SovereignLibC.h"
-#include "../include/sigma_log.h"
+#include "./include/libc/SovereignLibC.h"
+#include "./include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -19,8 +19,8 @@
  * =========================================================================
  */
 
-#include "../include/core/SigmaOOP.hpp"
-#include "../include/sigma_log.h"
+#include "./include/core/SigmaOOP.hpp"
+#include "./include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Dev {
@@ -42,7 +42,7 @@ public:
         
         SigmaString input(sigma_script);
         SigmaString output("#include \"SigmaOOP.hpp\"\n\n");
-#include "../include/sigma_log.h"
+#include "./include/sigma_log.h"
         
         if (input.contains("print")) {
             sigma_log_info("[TRANSPILER-ZENITH]: Mapping 'print' -> 'sigma_log_info'\n");

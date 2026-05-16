@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN AUTOMATED ROLLBACK (S-ROLLBACK)
+ * Î£ SIGMAOS: SOVEREIGN AUTOMATED ROLLBACK (S-ROLLBACK)
  * =========================================================================
  * Mission: Zero-downtime automated state recovery and rollback.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_ROLLBACK_H
 #define SIGMA_ROLLBACK_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

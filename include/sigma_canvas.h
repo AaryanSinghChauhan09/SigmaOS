@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN INFINITE CANVAS (S-CANVAS)
+ * Î£ SIGMAOS: SOVEREIGN INFINITE CANVAS (S-CANVAS)
  * =========================================================================
  * Mission: Break free from standard desktop boundaries by providing a 
  * hardware-accelerated, infinite 2D zoomable workspace plane.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_CANVAS_H
 #define SIGMA_CANVAS_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

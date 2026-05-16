@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN BLUETOOTH STACK (S-BT)
+ * Î£ SIGMAOS: SOVEREIGN BLUETOOTH STACK (S-BT)
  * =========================================================================
  * Mission: Silicon-native BT 5.x + BLE stack without external daemon bloat.
  * Competitor parity: Linux BlueZ / macOS CoreBluetooth / Windows BT Stack.
@@ -11,7 +11,7 @@
 #ifndef SIGMA_BLUETOOTH_H
 #define SIGMA_BLUETOOTH_H
 
-#include "include/sigma_types.h"
+#include "../sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,7 +1,7 @@
-#ifndef SIGMA_ASSISTANT_H
+﻿#ifndef SIGMA_ASSISTANT_H
 #define SIGMA_ASSISTANT_H
 
-#include "include/sigma_types.h"
+#include "../sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,7 +1,7 @@
-#ifndef SOVEREIGN_ATOMIC_HPP
+﻿#ifndef SOVEREIGN_ATOMIC_HPP
 #define SOVEREIGN_ATOMIC_HPP
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 namespace SigmaOS {
 namespace Core {

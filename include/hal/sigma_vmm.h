@@ -1,8 +1,8 @@
-#ifndef SIGMA_VMM_H
+﻿#ifndef SIGMA_VMM_H
 #define SIGMA_VMM_H
 
-#include "include/sigma_types.h"
-#include "include/SigmaOOP.hpp"
+#include "../sigma_types.h"
+#include "../SigmaOOP.hpp"
 
 #ifdef __cplusplus
 namespace SigmaOS {

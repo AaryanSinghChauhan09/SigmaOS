@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN UNIVERSAL UI (S-UNIVERSALUI)
+ * Î£ SIGMAOS: SOVEREIGN UNIVERSAL UI (S-UNIVERSALUI)
  * =========================================================================
  * Mission: Silicon-accelerated rendering and universal human-machine interface
  * logic, enabling next-generation user experiences directly from the kernel.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_UNIVERSALUI_H
 #define SIGMA_UNIVERSALUI_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

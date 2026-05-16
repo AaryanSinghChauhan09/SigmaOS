@@ -1,8 +1,8 @@
-#include "../include/libc/SovereignLibC.h"
+﻿#include "../include/libc/SovereignLibC.h"
 #include "../include/sigma_log.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -11,7 +11,7 @@
 
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN LAUNCHER ZENITH (v14.0 - THE FINAL ENTRY)
+ * ÃŽÂ£ SIGMAOS: SOVEREIGN LAUNCHER ZENITH (v14.0 - THE FINAL ENTRY)
  * =========================================================================
  * Mission: Bootstrapping and Sharding the Sovereign OS Finality.
  * Capability: Ring-0 entry, Hardware-Handshake, Shard-Pairing.

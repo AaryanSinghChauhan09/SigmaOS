@@ -1,6 +1,6 @@
-/**
+﻿/**
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SCHEDULER (v1.0 - AI-NATIVE CFS EVOLUTION)
+ * Î£ SIGMAOS: SOVEREIGN SCHEDULER (v1.0 - AI-NATIVE CFS EVOLUTION)
  * =========================================================================
  * Inspired by: Linux CFS (Completely Fair Scheduler) + seL4 MCS scheduler
  * Purpose: Priority-aware, cgroup-like task scheduling for kernel shards.
@@ -11,8 +11,8 @@
 
 #pragma once
 
-#include "include/sigma_types.h"
-#include "../../include/sigma_log.h"
+#include "../sigma_types.h"
+#include "../sigma_log.h"
 
 #define SIGMA_SCHED_MAX_TASKS  256u
 #define SIGMA_SCHED_TICK_MS    4u      /* 4ms scheduling quantum */
@@ -21,16 +21,16 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Scheduler {
 
-/* ─── Task Priority Levels (inspired by Linux nice values) ─────────────── */
+/* â”€â”€â”€ Task Priority Levels (inspired by Linux nice values) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 enum class TaskPriority : sigma_u32 {
-    REALTIME   = 0u,   /* RT tasks — AI inference, audio, security */
-    HIGH       = 1u,   /* Interactive tasks — UI, input events */
+    REALTIME   = 0u,   /* RT tasks â€” AI inference, audio, security */
+    HIGH       = 1u,   /* Interactive tasks â€” UI, input events */
     NORMAL     = 2u,   /* Standard workloads */
     BATCH      = 3u,   /* Background indexing, compression */
     IDLE       = 4u,   /* Run only when CPU is idle */
 };
 
-/* ─── Task States ───────────────────────────────────────────────────────── */
+/* â”€â”€â”€ Task States â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 enum class TaskState : sigma_u32 {
     RUNNABLE  = 0u,
     RUNNING   = 1u,
@@ -39,7 +39,7 @@ enum class TaskState : sigma_u32 {
     ZOMBIE    = 4u,
 };
 
-/* ─── Task Control Block ────────────────────────────────────────────────── */
+/* â”€â”€â”€ Task Control Block â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 struct SovereignTask {
     sigma_u32     pid;
     TaskPriority  priority;
@@ -53,7 +53,7 @@ struct SovereignTask {
 };
 
 /**
- * @brief SovereignScheduler — CFS-inspired fair scheduler with AI-hint
+ * @brief SovereignScheduler â€” CFS-inspired fair scheduler with AI-hint
  *        integration. Absorbs ideas from Linux CFS, seL4 MCS, and
  *        the Zircon (Fuchsia) scheduler's deadline-based RT path.
  */
@@ -72,7 +72,7 @@ public:
      */
     bool enqueue(const SovereignTask& task) {
         if (m_task_count >= SIGMA_SCHED_MAX_TASKS) {
-            sigma_log_warn("[SCHED] Run queue full — task rejected.");
+            sigma_log_warn("[SCHED] Run queue full â€” task rejected.");
             return false;
         }
         m_tasks[m_task_count] = task;
@@ -88,7 +88,7 @@ public:
     SovereignTask* pickNext() {
         SovereignTask* best = nullptr;
 
-        /* 1. Check for RT task (EDF — earliest deadline first) */
+        /* 1. Check for RT task (EDF â€” earliest deadline first) */
         for (sigma_u32 i = 0u; i < m_task_count; i++) {
             auto& t = m_tasks[i];
             if (!t.valid || t.state != TaskState::RUNNABLE) continue;
@@ -123,7 +123,7 @@ public:
         m_current->vruntime_ns += elapsed_ms * 1000000ULL * weight;
 
         if (m_current->slice_remaining_ms == 0u) {
-            sigma_log_info("[SCHED] Timeslice expired — preempting task.");
+            sigma_log_info("[SCHED] Timeslice expired â€” preempting task.");
             m_current->state = TaskState::RUNNABLE;
             m_current = pickNext();
             if (m_current) {
@@ -184,7 +184,7 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-/* ─── C Bridge ─────────────────────────────────────────────────────────── */
+/* â”€â”€â”€ C Bridge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 extern "C" {
 
 inline void sigma_sched_tick(unsigned long long elapsed_ms) {

@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_XV6_BRIDGE_H
 #define SOVEREIGN_XV6_BRIDGE_H
 
-#include "include/SigmaOOP.hpp"
+#include "../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace XV6Parity {

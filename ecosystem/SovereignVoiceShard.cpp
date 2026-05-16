@@ -1,5 +1,5 @@
-#include "../include/libc/SovereignLibC.h"
-#include "../include/sigma_log.h"
+#include "./include/libc/SovereignLibC.h"
+#include "./include/sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -49,7 +49,7 @@ public:
 // Concrete implementation for Windows-based HID Bridge
 #ifdef _WIN32
 #include <windows.h>
-#include "../include/sigma_log.h"
+#include "./include/sigma_log.h"
 class WindowsHIDBridge : public IHIDBridge {
 public:
     void InjectText(const const char*& text) override {

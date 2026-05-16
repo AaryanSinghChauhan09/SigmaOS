@@ -7,10 +7,10 @@
  * =========================================================================
  */
 
-#include "include/sigma_types.h"
+#include "../../include/sigma_types.h"
 #include "../../include/sigma_log.h"
-#include "include/SigmaOOP.hpp"
-#include "include/SovereignLibC.h"
+#include "../../include/SigmaOOP.hpp"
+#include "../../include/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Userland {

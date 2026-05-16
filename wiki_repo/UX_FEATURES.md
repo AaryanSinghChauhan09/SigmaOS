@@ -1,4 +1,4 @@
-# UX FEATURES
+﻿# UX FEATURES
 
 1
 
@@ -105,6 +105,7 @@ Automatic ambient light-driven theme switching:
 
 theme_init();
 theme_update_ambient(20);   // < 50 lux ? Dark Mode + Glow Effects
+
 theme_update_ambient(800);  // > 50 lux ? Light Mode + Anti-Glare
 
 1

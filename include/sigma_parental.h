@@ -1,16 +1,16 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN PARENTAL CONTROLS (S-PARENTAL)
+ * Î£ SIGMAOS: SOVEREIGN PARENTAL CONTROLS (S-PARENTAL)
  * =========================================================================
  * Mission: Hardware-backed, cryptographically enforced usage restrictions
- * for child accounts — app filtering, time limits, and content gating.
+ * for child accounts â€” app filtering, time limits, and content gating.
  * =========================================================================
  */
 
 #ifndef SIGMA_PARENTAL_H
 #define SIGMA_PARENTAL_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

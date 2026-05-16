@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN VISUAL SCRIPTING (S-VISSCRIPT)
+ * Î£ SIGMAOS: SOVEREIGN VISUAL SCRIPTING (S-VISSCRIPT)
  * =========================================================================
  * Mission: A node-based visual scripting interface built directly into 
  * the OS to democratize automation and shell scripting for non-programmers.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_VISSCRIPT_H
 #define SIGMA_VISSCRIPT_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

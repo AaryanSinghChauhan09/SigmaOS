@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN NEURAL SEARCH (S-NEURALSEARCH)
+ * Î£ SIGMAOS: SOVEREIGN NEURAL SEARCH (S-NEURALSEARCH)
  * =========================================================================
  * Mission: Deeply integrated, instantaneous search of files, logic,
  * and processes using embedded tensor mathematics, eliminating indexing lag.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_NEURALSEARCH_H
 #define SIGMA_NEURALSEARCH_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

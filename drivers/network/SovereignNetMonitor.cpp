@@ -1,9 +1,9 @@
 #include "../../include/sigma_log.h"
-#include "include/SovereignLibC.h"
-#include "include/hal/sigma_hal.h"
-#include "include/sigma_types.h"
+#include "../../include/SovereignLibC.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_types.h"
 #include "../../include/sigma_netmonitor.h"
-#include "include/hal/sigma_hal.h"
+#include "../../include/hal/sigma_hal.h"
 #include "../../include/sigma_zeronet.h"
 #include "../../include/sigma_sentinel.h"
 

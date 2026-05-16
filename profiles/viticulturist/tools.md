@@ -1,32 +1,39 @@
-# 🛠 VITICULTURIST Profile
+﻿# ðŸ›  VITICULTURIST Profile
 
 ## Required Tools & Functions
 
 - Soil-moisture mesh
+
 - brix-analyzer
+
 - phenolic-maturity monitor
+
 - weather-Lattice
 
-## 📜 Compliance Rules
+## ðŸ“œ Compliance Rules
 
-- Appellation d'origine contrôlée (AOC) standards
+- Appellation d'origine contrÃ´lÃ©e (AOC) standards
+
 - organic certification rules
 
-## 🧮 Professional Calculators
+## ðŸ§® Professional Calculators
 
 - Pruning density
+
 - irrigation delta
+
 - fermentation heat-rate
 
-## 🧬 Core Algorithms
+## ðŸ§¬ Core Algorithms
 
 - Harvest-window prediction
+
 - yield-estimation simulation
 
-## 🛡 Self-Healing Strategy
+## ðŸ›¡ Self-Healing Strategy
 
 - Micro-climate sensor sync, pest-pressure verification
 
-## 🔄 Rollback Strategy
+## ðŸ”„ Rollback Strategy
 
 - Seasonal growth logs, irrigation state history

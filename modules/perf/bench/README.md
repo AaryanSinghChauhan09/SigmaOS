@@ -1,4 +1,4 @@
-# perf/bench
+﻿# perf/bench
 
 Benchmarking Module.
 

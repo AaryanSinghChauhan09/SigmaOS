@@ -1,16 +1,16 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN LIVE KERNEL PATCH (S-LIVEKERNEL)
+ * Î£ SIGMAOS: SOVEREIGN LIVE KERNEL PATCH (S-LIVEKERNEL)
  * =========================================================================
  * Mission: Apply critical security patches and shard updates to a running
- * kernel without requiring a system reboot — inspired by Livepatch.
+ * kernel without requiring a system reboot â€” inspired by Livepatch.
  * =========================================================================
  */
 
 #ifndef SIGMA_LIVEKERNEL_H
 #define SIGMA_LIVEKERNEL_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

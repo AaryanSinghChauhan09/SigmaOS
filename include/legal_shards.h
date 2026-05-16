@@ -1,12 +1,12 @@
-/*
+﻿/*
  * =============================================================================
- * Î£ SIGMAOS KERNEL: LEGAL-SHARDS-MANIFEST (v3.0)
+ * ÃŽÂ£ SIGMAOS KERNEL: LEGAL-SHARDS-MANIFEST (v3.0)
  * =============================================================================
  */
 #ifndef SIGMA_LEGAL_SHARDS_H
 #define SIGMA_LEGAL_SHARDS_H
 
-#include "../include/core/sigma_kernel_types.h"
+#include "./core/sigma_kernel_types.h"
 
 /* Modular Domain Init Functions */
 void init_bnss_template(void* t);

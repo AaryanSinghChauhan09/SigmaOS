@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN GRAPHICS INTERFACE (SGI)
+ * Î£ SIGMAOS: SOVEREIGN GRAPHICS INTERFACE (SGI)
  * =========================================================================
  * Mission: Silicon-native, zero-latency frame-buffer orchestration.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_GUI_H
 #define SIGMA_GUI_H
 
-#include "include/sigma_types.h"
+#include "../sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SMART CLIPBOARD (S-CLIPBOARD)
+ * Î£ SIGMAOS: SOVEREIGN SMART CLIPBOARD (S-CLIPBOARD)
  * =========================================================================
  * Mission: A context-aware, globally synchronized clipboard providing
  * seamless data transfer across the entire Sovereign Lattice.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_CLIPBOARD_H
 #define SIGMA_CLIPBOARD_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

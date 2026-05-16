@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SHARD SDK (v1.0)
+ * Î£ SIGMAOS: SOVEREIGN SHARD SDK (v1.0)
  * =========================================================================
  * Mission: Standardized toolkit for building high-assurance OS shards.
  * Principle: Zero-dependency, type-safe, and PQC-attested.
@@ -10,9 +10,9 @@
 #ifndef SIGMA_SDK_H
 #define SIGMA_SDK_H
 
-#include "include/sigma_types.h"
-#include "../include/sigma_log.h"
-#include "include/SigmaOOP.hpp"
+#include "./core/sigma_types.h"
+#include "./sigma_log.h"
+#include "./core/SigmaOOP.hpp"
 
 /**
  * @brief Base class for all Sovereign Shards.

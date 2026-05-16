@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SOVEREIGN VAULT (S-VAULT)
+ * Î£ SIGMAOS: SOVEREIGN SOVEREIGN VAULT (S-VAULT)
  * =========================================================================
  * Mission: A hardware-encrypted, zero-knowledge secret manager for
  * passwords, SSH keys, and credentials with biometric unlock.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_VAULT_H
 #define SIGMA_VAULT_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

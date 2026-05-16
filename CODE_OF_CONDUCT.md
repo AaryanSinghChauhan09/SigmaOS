@@ -1,4 +1,4 @@
-# Code of Conduct
+﻿# Code of Conduct
 
 ## Our Pledge
 
@@ -8,17 +8,19 @@ In the interest of fostering an open and welcoming environment, we as contributo
 
 Examples of behavior that contributes to creating a positive environment include:
 
-* Using welcoming and inclusive language.
-* Being respectful of differing viewpoints and experiences.
+- Using welcoming and inclusive language.
 
-* Gracefully accepting constructive criticism.
+- Being respectful of differing viewpoints and experiences.
+
+- Gracefully accepting constructive criticism.
 
 Examples of unacceptable behavior by participants include:
 
-* The use of sexualized language or imagery.
-* Trolling, insulting/derogatory comments, and personal or political attacks.
+- The use of sexualized language or imagery.
 
-* Public or private harassment.
+- Trolling, insulting/derogatory comments, and personal or political attacks.
+
+- Public or private harassment.
 
 ## Enforcement
 

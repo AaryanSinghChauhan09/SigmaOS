@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN NOTIFICATION INTELLIGENCE (S-NOTIFYIQ)
+ * Î£ SIGMAOS: SOVEREIGN NOTIFICATION INTELLIGENCE (S-NOTIFYIQ)
  * =========================================================================
  * Mission: Replace dumb notification flooding with an AI-curated priority
  * system that batches, summarizes, and silences based on context.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_NOTIFYIQ_H
 #define SIGMA_NOTIFYIQ_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -46,6 +46,7 @@ public:
     }
 
     void handleVPNTraffic(const void* data, sigma_size_t size) {
+        (void)data;
         sigma_log_info("[S-NET:VPN] Encapsulating %zu bytes for secure lattice transit.", size);
     }
 
@@ -68,7 +69,7 @@ public:
     }
 
     sigma_i32 socket(sigma_i32 domain, sigma_i32 type, sigma_i32 protocol) {
-        sigma_log_info("[S-NET] Socket CREATED: [Domain:%d Type:%d]", domain, type);
+        sigma_log_info("[S-NET] Socket CREATED: [Domain:%d Type:%d Proto:%d]", domain, type, protocol);
         return 0; 
     }
 

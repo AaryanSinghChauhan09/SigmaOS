@@ -1,6 +1,6 @@
-#ifndef SIGMA_PQC_H
+﻿#ifndef SIGMA_PQC_H
 #define SIGMA_PQC_H
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

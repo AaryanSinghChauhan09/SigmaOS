@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN DISPLAY SERVER (S-DISPLAY)
+ * Î£ SIGMAOS: SOVEREIGN DISPLAY SERVER (S-DISPLAY)
  * =========================================================================
  * Mission: Zero-compositor silicon-native display protocol.
  * Competitor parity: Wayland / X11 / macOS Core Display.
@@ -11,7 +11,7 @@
 #ifndef SIGMA_DISPLAYSERVER_H
 #define SIGMA_DISPLAYSERVER_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

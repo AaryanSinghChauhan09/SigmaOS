@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ACCESSIBILITY CORE (S-ACCESS)
+ * Î£ SIGMAOS: SOVEREIGN ACCESSIBILITY CORE (S-ACCESS)
  * =========================================================================
  * Mission: Universal usability features built into the kernel, providing
  * zero-overhead screen reading, high-contrast, and motor-assist layers.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_ACCESS_H
 #define SIGMA_ACCESS_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

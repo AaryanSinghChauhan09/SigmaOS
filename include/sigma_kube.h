@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN KERNEL-NATIVE ORCHESTRATOR (S-KUBE)
+ * Î£ SIGMAOS: SOVEREIGN KERNEL-NATIVE ORCHESTRATOR (S-KUBE)
  * =========================================================================
  * Mission: High-level shard orchestration and service mesh for KNSI containers.
  * Competitor parity: Kubernetes (K8s), Docker Swarm, Nomad.
@@ -11,7 +11,7 @@
 #ifndef SIGMA_KUBE_H
 #define SIGMA_KUBE_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

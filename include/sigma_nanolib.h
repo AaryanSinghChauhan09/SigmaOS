@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN NANO-LIBRARY CORE (S-NANOLIB)
+ * Î£ SIGMAOS: SOVEREIGN NANO-LIBRARY CORE (S-NANOLIB)
  * =========================================================================
  * Mission: Provide an extreme minimal footprint standard library,
  * prioritizing speed and size over legacy POSIX bloat.
@@ -11,7 +11,7 @@
 #ifndef SIGMA_NANOLIB_H
 #define SIGMA_NANOLIB_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN INPUT INTERFACE (SII)
+ * Î£ SIGMAOS: SOVEREIGN INPUT INTERFACE (SII)
  * =========================================================================
  * Mission: Zero-latency, interrupt-driven input orchestration.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_INPUT_H
 #define SIGMA_INPUT_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

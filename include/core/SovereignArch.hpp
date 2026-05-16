@@ -1,8 +1,8 @@
-#ifndef SOVEREIGN_ARCH_HPP
+﻿#ifndef SOVEREIGN_ARCH_HPP
 #define SOVEREIGN_ARCH_HPP
 
-#include "../../include/core/sigma_types.h"
-#include "../../include/core/SigmaOOP.hpp"
+#include "../sigma_types.h"
+#include "../SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Architecture Abstraction (S-ARCH)

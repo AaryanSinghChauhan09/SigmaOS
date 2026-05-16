@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ZENITH UI COMPOSITOR (ZCSR-ZENITH)
+ * Î£ SIGMAOS: SOVEREIGN ZENITH UI COMPOSITOR (ZCSR-ZENITH)
  * =========================================================================
  * Mission: Ultra-low-latency morphic UI compositor with glassmorphism support.
  * Competitor parity: Windows DWM, macOS WindowServer, Wayland Compositors.
@@ -11,7 +11,7 @@
 #ifndef SIGMA_ZENITHUI_H
 #define SIGMA_ZENITHUI_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 /**
  * SigmaOS Morphic Zenith UI Header

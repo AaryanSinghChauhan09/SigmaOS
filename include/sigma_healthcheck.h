@@ -1,16 +1,16 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SYSTEM HEALTH CHECK (S-HEALTHCHECK)
+ * Î£ SIGMAOS: SOVEREIGN SYSTEM HEALTH CHECK (S-HEALTHCHECK)
  * =========================================================================
  * Mission: A comprehensive periodic audit of all shard states, hardware
- * sensors, and security posture — producing a live system health score.
+ * sensors, and security posture â€” producing a live system health score.
  * =========================================================================
  */
 
 #ifndef SIGMA_HEALTHCHECK_H
 #define SIGMA_HEALTHCHECK_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

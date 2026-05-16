@@ -1,32 +1,39 @@
-# 🛠 GENERATIVE_ART_CURATOR Profile
+﻿# ðŸ›  GENERATIVE_ART_CURATOR Profile
 
 ## Required Tools & Functions
 
 - Latent-space-navigator
+
 - GAN-monitor
+
 - NFT-lattice-bridge
+
 - style-transfer-engine
 
-## 📜 Compliance Rules
+## ðŸ“œ Compliance Rules
 
 - AI-ethics in art
+
 - digital-provenance standards
 
-## 🧮 Professional Calculators
+## ðŸ§® Professional Calculators
 
 - Visual-entropy
+
 - stylistic-divergence
+
 - aesthetic-score
 
-## 🧬 Core Algorithms
+## ðŸ§¬ Core Algorithms
 
 - Prompt-optimization
+
 - latent-walk orchestration
 
-## 🛡 Self-Healing Strategy
+## ðŸ›¡ Self-Healing Strategy
 
 - Art-lattice integrity check, provenance-seal verification
 
-## 🔄 Rollback Strategy
+## ðŸ”„ Rollback Strategy
 
 - Curation-state snapshots, aesthetic-baseline restoration

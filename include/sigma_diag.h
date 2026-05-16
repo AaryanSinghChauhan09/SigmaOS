@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SYSTEM DIAGNOSTICS (S-DIAG)
+ * Î£ SIGMAOS: SOVEREIGN SYSTEM DIAGNOSTICS (S-DIAG)
  * =========================================================================
  * Mission: Silicon-direct fault localization and machine-state debugging.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_DIAG_H
 #define SIGMA_DIAG_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

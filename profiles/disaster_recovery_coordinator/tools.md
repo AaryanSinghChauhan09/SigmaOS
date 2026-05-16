@@ -1,31 +1,37 @@
-# 🛠 DISASTER_RECOVERY_COORDINATOR Profile
+﻿# ðŸ›  DISASTER_RECOVERY_COORDINATOR Profile
 
 ## Required Tools & Functions
 
 - Real-time hazard mapping
+
 - resource allocation mesh
+
 - secure satellite comms
 
-## 📜 Compliance Rules
+## ðŸ“œ Compliance Rules
 
 - NDMA guidelines
+
 - FEMA protocols
 
-## 🧮 Professional Calculators
+## ðŸ§® Professional Calculators
 
 - Casualty estimation
+
 - resource burn rate
+
 - logistics pathing
 
-## 🧬 Core Algorithms
+## ðŸ§¬ Core Algorithms
 
 - Multi-agent evacuation routing
+
 - supply chain optimization
 
-## 🛡 Self-Healing Strategy
+## ðŸ›¡ Self-Healing Strategy
 
 - Communication mesh integrity, sensor network validation
 
-## 🔄 Rollback Strategy
+## ðŸ”„ Rollback Strategy
 
 - Incident command state restoration, resource map versioning

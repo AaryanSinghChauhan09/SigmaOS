@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN UNIFIED SHARD REGISTRY HEADER (sigma_usr.h)
+ * Î£ SIGMAOS: SOVEREIGN UNIFIED SHARD REGISTRY HEADER (sigma_usr.h)
  * =========================================================================
  * Mission: Quantum-Safe Shard discovery, registration, and orchestration.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_USR_H
 #define SIGMA_USR_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

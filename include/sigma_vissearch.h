@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN VISUAL SEARCH (S-VISSEARCH)
+ * Î£ SIGMAOS: SOVEREIGN VISUAL SEARCH (S-VISSEARCH)
  * =========================================================================
  * Mission: Native, OS-level visual parsing and indexing of all images,
  * screenshots, and video frames via the Neural Engine for instant OCR.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_VISSEARCH_H
 #define SIGMA_VISSEARCH_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

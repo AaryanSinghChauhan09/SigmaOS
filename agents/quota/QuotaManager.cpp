@@ -1,5 +1,5 @@
-#include "include/sigma_types.h"
-#include "include/SigmaOOP.hpp"
+#include "../../include/sigma_types.h"
+#include "../../include/SigmaOOP.hpp"
 #include "../../include/libc/sigma_libc.h"
 #include "../../include/sigma_log.h"
 

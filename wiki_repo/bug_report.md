@@ -1,47 +1,48 @@
-# bug report
-
-1
+﻿# bug report
 
 ---
-
-name: ?? Bug Report
-about: Report a bug or unexpected behavior in the SigmaOS Lattice
-title: "[BUG] "
-labels: ["bug", "needs-triage"]
-assignees: AaryanSinghChauhan09
+name: Bug Report
+about: Report a kernel shard malfunction or build failure
+title: "[BUG] <shard_name>: <short description>"
+labels: bug, triage
+assignees: ''
 ---
 
-1
+## Affected Shard
 
-<!-- A clear and concise description of the bug -->
+<!-- Which kernel shard is affected? e.g. SovereignNetStack, SovereignGPU -->
 
-1
+## Description
 
-1. 1.
+<!-- A clear description of the bug -->
 
-2. ## ? Expected Behavior
+## Reproduction Steps
 
-<!-- What should have happened -->
+1. Step one
 
-1
+2. Step two
 
-<!-- What actually happened -->
+3. Step three
 
-1
+## Expected Behavior
 
-1
+<!-- What should happen -->
 
-1
+## Actual Behavior
 
-1
+<!-- What actually happens -->
 
-1
+## Build Environment
 
-Paste logs here
+- Architecture: `[ ] x86_64  [ ] ARM64  [ ] RISC-V
 
-1
+ sigma-build output: paste here
 
-1
+## Logs
 
-<!-- Any other relevant info, screenshots, etc. -->
+```text
+
+<!-- Paste sigma_log / serial output here -->
+
+```
 

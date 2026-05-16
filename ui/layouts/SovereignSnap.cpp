@@ -1,8 +1,8 @@
-#include "include/sigma_types.h"
-#include "include/hal/sigma_hal.h"
+#include "../../include/sigma_types.h"
+#include "../../include/hal/sigma_hal.h"
 #include "../../include/sigma_log.h"
 #include "../../include/sigma_snap_types.h"
-#include "include/SigmaOOP.hpp"
+#include "../../include/SigmaOOP.hpp"
 
 /**
  * SovereignSnap " Sovereign Window Snapping Engine

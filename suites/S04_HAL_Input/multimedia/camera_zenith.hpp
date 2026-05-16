@@ -1,7 +1,7 @@
 #ifndef CAMERA_ZENITH_HPP
 #define CAMERA_ZENITH_HPP
 
-#include "include/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Multimedia {

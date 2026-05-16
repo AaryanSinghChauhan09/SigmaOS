@@ -1,7 +1,7 @@
-#ifndef SOVEREIGNUSP_H
+﻿#ifndef SOVEREIGNUSP_H
 #define SOVEREIGNUSP_H
-#include "../include/core/sigma_types.h"
-#include "../include/sigma_log.h"
+#include "./core/sigma_types.h"
+#include "./sigma_log.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

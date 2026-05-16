@@ -1,33 +1,41 @@
-# 🛠 CRM_ADMINISTRATOR Profile
+﻿# ðŸ›  CRM_ADMINISTRATOR Profile
 
 ## Required Tools & Functions
 
 - Salesforce-Lattice
+
 - HubSpot-Bridge
+
 - lead-scoring-engine
+
 - customer-journey-mapper
 
-## 📜 Compliance Rules
+## ðŸ“œ Compliance Rules
 
 - GDPR
+
 - CCPA
+
 - CRM data-privacy standards
 
-## 🧮 Professional Calculators
+## ðŸ§® Professional Calculators
 
 - CLV (Customer Lifetime Value)
+
 - churn-rate
+
 - conversion-delta
 
-## 🧬 Core Algorithms
+## ðŸ§¬ Core Algorithms
 
 - Lead prioritization modeling
+
 - automated-marketing-pathing
 
-## 🛡 Self-Healing Strategy
+## ðŸ›¡ Self-Healing Strategy
 
 - Lead-data consistency check, automation-workflow validation
 
-## 🔄 Rollback Strategy
+## ðŸ”„ Rollback Strategy
 
 - Customer-record snapshots, marketing-campaign rollback

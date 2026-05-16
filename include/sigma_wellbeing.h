@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN DIGITAL WELLBEING (S-WELLBEING)
+ * Î£ SIGMAOS: SOVEREIGN DIGITAL WELLBEING (S-WELLBEING)
  * =========================================================================
  * Mission: Comprehensive screen-time tracking, app usage analytics,
  * and customizable daily limits with a beautiful visual report.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_WELLBEING_H
 #define SIGMA_WELLBEING_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

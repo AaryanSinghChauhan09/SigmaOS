@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN PREDICTIVE UX (S-PREDICTUX)
+ * Î£ SIGMAOS: SOVEREIGN PREDICTIVE UX (S-PREDICTUX)
  * =========================================================================
  * Mission: Pre-loads UI assets and shards into memory based on predictive
  * user behavior models, achieving negative-latency user experiences.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_PREDICTUX_H
 #define SIGMA_PREDICTUX_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

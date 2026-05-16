@@ -1,9 +1,10 @@
-# SigmaOS Security Policy
+﻿# SigmaOS Security Policy
 
 ## Supported Versions
 
 | Version | Status               |
 | ------- | -------------------- |
+
 | v15.x   | Actively supported   |
 | v14.x   | Security fixes only  |
 | < v14   | End of Life          |
@@ -13,7 +14,9 @@
 If you discover a security vulnerability in the SigmaOS Sovereign Lattice, **do not open a public issue**. Instead:
 
 1. Email the **SigmaOS Security Council** via the contact listed on the repository profile.
+
 2. Include: affected shard name, reproduction steps, and potential impact.
+
 3. You will receive a response within **72 hours**.
 
 We operate a responsible disclosure policy with a **90-day coordinated fix window**.
@@ -26,27 +29,35 @@ SigmaOS employs multiple layers of sovereign defence:
 
 ### Ring-0 Access Control
 
-- **`SovereignSEL`** � Mandatory Access Control (MAC) enforced at Ring-0 via capability tables. No process can escalate privileges without a PQC-signed policy token.
-- **`SovereignEnclave`** � Hardware-level isolation (Intel TDX / AMD SEV) for all cryptographic state. Key material never exists in accessible RAM.
+- **`SovereignSEL`** Â— Mandatory Access Control (MAC) enforced at Ring-0 via capability tables. No process can escalate privileges without a PQC-signed policy token.
+
+- **`SovereignEnclave`** Â— Hardware-level isolation (Intel TDX / AMD SEV) for all cryptographic state. Key material never exists in accessible RAM.
 
 ### Post-Quantum Cryptography
 
-- **`SovereignPQC`** � CRYSTALS-Kyber-1024 (KEM) + CRYSTALS-Dilithium-5 (DSA) per NIST FIPS 203/204.
+- **`SovereignPQC`** Â— CRYSTALS-Kyber-1024 (KEM) + CRYSTALS-Dilithium-5 (DSA) per NIST FIPS 203/204.
+
 - All shard packages are Dilithium-5 signed before distribution via S-PKG.
+
 - Session keys are ephemeral and wiped via `sigma_secure_memset` after use.
 
 ### Process & Memory Isolation
 
-- **`SovereignSandbox`** � Zero-trust container isolation for all Ring-3 processes. Each process gets its own CR3 page directory.
-- **`SovereignMemoryManager`** � Double-free detection + amnesic wipe on every `deallocate()` call.
-- **NX / SMEP / SMAP** � Hardware-enforced no-execute + supervisor-mode protection.
+- **`SovereignSandbox`** Â— Zero-trust container isolation for all Ring-3 processes. Each process gets its own CR3 page directory.
+
+- **`SovereignMemoryManager`** Â— Double-free detection + amnesic wipe on every `deallocate()` call.
+
+- **NX / SMEP / SMAP** Â— Hardware-enforced no-execute + supervisor-mode protection.
 
 ### Continuous Security Monitoring
 
-- **`SovereignWatchdog`** � Kernel heartbeat monitor; triggers atomic rollback on deadlock.
-- **`SovereignAudit`** � Immutable audit log for all Ring-0 operations.
-- **CodeQL** � Automated vulnerability scanning on every pull request.
-- **Dependabot** � Weekly automated supply-chain patch management.
+- **`SovereignWatchdog`** Â— Kernel heartbeat monitor; triggers atomic rollback on deadlock.
+
+- **`SovereignAudit`** Â— Immutable audit log for all Ring-0 operations.
+
+- **CodeQL** Â— Automated vulnerability scanning on every pull request.
+
+- **Dependabot** Â— Weekly automated supply-chain patch management.
 
 ---
 

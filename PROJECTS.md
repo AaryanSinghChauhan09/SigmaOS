@@ -1,34 +1,44 @@
-# Σ SIGMAOS STRATEGIC PROJECT BOARD
+﻿# Î£ SIGMAOS STRATEGIC PROJECT BOARD
 
-## 🎯 Milestones
+## ðŸŽ¯ Milestones
 
-### 🔴 ALPHA: Industrial Foundation (v15.0 - DONE)
+### ðŸ”´ ALPHA: Industrial Foundation (v15.0 - DONE)
 
 - [x] Kernel Hardening (Lattice PMM/S-SCHED)
+
 - [x] S-KDUMP & S-WATCHDOG Integration
+
 - [x] MESA/CUPS/BLUEZ Shard Absorption
+
 - [x] PQC-GPG Dilithium-5 Attestation
 
-### 🟡 BETA: Usability & AI (v15.1 - DONE)
+### ðŸŸ¡ BETA: Usability & AI (v15.1 - DONE)
 
 - [x] XFCE/LXQt Zenith Desktop Port
+
 - [x] Sovereign VPN (WireGuard) Shard
+
 - [x] Sovereign AI (CUDA/ONNX) Compute Nexus
+
 - [x] Guided Dual-Boot Installer Partitioning
 
-### 🟢 STABLE: Global Ecosystem (v16.0 - CURRENT)
+### ðŸŸ¢ STABLE: Global Ecosystem (v16.0 - CURRENT)
 
 - [x] full FIPS-140-3 Compliance
+
 - [x] Sovereign Cloud Lattice Mesh
+
 - [x] 100% Rust-Hardened Driver Tree
+
 - [x] LTS Release Channel Initialization
 
 ---
 
-## 📋 Task Board
+## ðŸ“‹ Task Board
 
 | Task | Category | Priority | Status |
 | :--- | :--- | :--- | :--- |
+
 | Refactor PMM to SigmaSingleton | Kernel | High | DONE |
 | Implement S-GPG Verification | Security | High | DONE |
 | Redesign Installer UI | UX | Medium | DONE |

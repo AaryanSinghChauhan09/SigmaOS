@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN CONTAINER RUNTIME (S-CONTAINER)
+ * Î£ SIGMAOS: SOVEREIGN CONTAINER RUNTIME (S-CONTAINER)
  * =========================================================================
  * Mission: Native kernel-level container isolation without a daemon layer.
  * Competitor parity: Linux OCI/Docker/Podman, macOS Virtualization.framework,
@@ -12,7 +12,7 @@
 #ifndef SIGMA_CONTAINER_H
 #define SIGMA_CONTAINER_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

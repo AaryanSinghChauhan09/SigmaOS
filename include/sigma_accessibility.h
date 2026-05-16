@@ -1,9 +1,9 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ACCESSIBILITY SERVICE (S-ACCESS)
+ * Î£ SIGMAOS: SOVEREIGN ACCESSIBILITY SERVICE (S-ACCESS)
  * =========================================================================
- * Mission: Universal access — screen reader, magnifier, colour-correct,
- *          input-assist — at the silicon kernel layer.
+ * Mission: Universal access â€” screen reader, magnifier, colour-correct,
+ *          input-assist â€” at the silicon kernel layer.
  * Competitor parity: GNOME Orca / Windows Narrator / macOS VoiceOver.
  * ZERO-DEPENDENCY: No HLL runtime. Bare-metal silicon accessibility.
  * =========================================================================
@@ -12,7 +12,7 @@
 #ifndef SIGMA_ACCESSIBILITY_H
 #define SIGMA_ACCESSIBILITY_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,7 +32,7 @@ typedef struct {
     sigma_u32 features_active;   /* Bitmask of SIGMA_ACCESS_* flags  */
     sigma_u32 magnifier_percent; /* 100 = 1x, 200 = 2x               */
     sigma_u32 speech_rate_wpm;   /* Words-per-minute for screen reader*/
-    sigma_u32 colour_mode;       /* 0 = Normal, 1 = Deuteranopia, …   */
+    sigma_u32 colour_mode;       /* 0 = Normal, 1 = Deuteranopia, â€¦   */
 } sigma_accessibility_config_t;
 
 /* --- Accessibility Primitives --- */

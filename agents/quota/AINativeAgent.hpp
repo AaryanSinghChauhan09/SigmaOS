@@ -1,6 +1,6 @@
 #pragma once
 #include "../../include/core/sigma_kernel_types.h"
-#include "include/SigmaOOP.hpp"
+#include "../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Agents {

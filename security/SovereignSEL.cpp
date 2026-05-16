@@ -1,10 +1,10 @@
-﻿#include "../include/sigma_log.h"
-#include "include/sigma_types.h"
-#include "include/hal/sigma_hal.h"
-#include "../include/core/sigma_kernel_types.h"
-#include "include/SovereignLibC.h"
-#include "include/SigmaOOP.hpp"
-#include "security/SovereignQKD.hpp"
+#include "./include/sigma_log.h"
+#include "./include/sigma_types.h"
+#include "./include/hal/sigma_hal.h"
+#include "./include/core/sigma_kernel_types.h"
+#include "./include/SovereignLibC.h"
+#include "./include/SigmaOOP.hpp"
+#include "./include/security/SovereignQKD.hpp"
 
 
 namespace SigmaOS {
@@ -53,7 +53,7 @@ public:
     }
 
     void audit() {
-        sigma_log("\n--- Î£ SOVEREIGN SEL AUDIT ---\n");
+        sigma_log("\n--- Σ SOVEREIGN SEL AUDIT ---\n");
         sigma_log("| Sandboxes Active : %u\n", m_active_sandboxes);
         sigma_log("| Trust Fabric     : QKD-ENFORCED\n");
         sigma_log("-------------------------------\n");

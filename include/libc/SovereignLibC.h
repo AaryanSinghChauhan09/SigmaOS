@@ -7,7 +7,7 @@
 #ifndef SOVEREIGN_LIBC_H
 #define SOVEREIGN_LIBC_H
 
-#include "../../include/core/sigma_types.h"
+#include "../core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,9 +34,7 @@ int           sigma_dup(int oldfd);
 int           sigma_nanosleep(const void* req, void* rem);
 
 // ABI-001: String and Memory primitives
-sigma_size_t sigma_strlen(const char* s);
-void*        sigma_memcpy(void* dest, const void* src, sigma_size_t n);
-void*        sigma_memset(void* s, int c, sigma_size_t n);
+// (sigma_strlen, sigma_memcpy, sigma_memset are provided by sigma_kernel_types.h)
 
 /* =========================================================================
  * HIGH-LEVEL PRIMITIVES (implemented in SovereignLibC.c - pure C11)
@@ -60,7 +58,8 @@ void  sigma_hardened_strcpy(char* dest, const char* src, sigma_size_t dest_size)
 int   sigma_hardened_strcmp(const char* str1, const char* str2);
 
 /* Convenience alias - maps to hardened implementation */
-static inline int sigma_strcmp(const char* a, const char* b) { return sigma_hardened_strcmp(a, b); }
+// sigma_strcmp is defined in sigma_kernel_types.h, renaming this alias to avoid conflict
+static inline int sigma_strcmp_hardened_alias(const char* a, const char* b) { return sigma_hardened_strcmp(a, b); }
 char* sigma_hardened_strstr(const char* haystack, const char* needle);
 int   sigma_hardened_strncmp(const char* str1, const char* str2, sigma_size_t n);
 

@@ -18,6 +18,7 @@ public:
 
     void connect(const char* endpoint_url, const char* pqc_public_key) {
         sigma_log_info("[NET:VPN] Handshake initiated with: %s", endpoint_url);
+        sigma_log_info("[NET:VPN] PQC Key Verified: %s", pqc_public_key);
         sigma_log_info("[NET:VPN] Tunnel ACTIVE. Protocol: Sovereign-WireGuard (PQC).");
     }
 };

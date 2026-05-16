@@ -1,7 +1,7 @@
-#ifndef SIGMA_NVME_H
+﻿#ifndef SIGMA_NVME_H
 #define SIGMA_NVME_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

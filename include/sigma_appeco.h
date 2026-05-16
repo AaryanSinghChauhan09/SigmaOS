@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN APP ECOSYSTEM (S-APPECO)
+ * Î£ SIGMAOS: SOVEREIGN APP ECOSYSTEM (S-APPECO)
  * =========================================================================
  * Mission: A sandboxed application runtime that supports WASM, native
  * binaries, and Linux compatibility layers, forming a unified app store.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_APPECO_H
 #define SIGMA_APPECO_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

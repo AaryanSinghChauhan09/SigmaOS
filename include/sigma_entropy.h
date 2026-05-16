@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SYSTEM ENTROPY (S-ENTROPY)
+ * Î£ SIGMAOS: SOVEREIGN SYSTEM ENTROPY (S-ENTROPY)
  * =========================================================================
  * Mission: Quantum-resistant entropy pooling and secure silicon randomness.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_ENTROPY_H
 #define SIGMA_ENTROPY_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

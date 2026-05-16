@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN COGNITIVE SHARD ORCHESTRATOR (S-COGNITIVE)
+ * Î£ SIGMAOS: SOVEREIGN COGNITIVE SHARD ORCHESTRATOR (S-COGNITIVE)
  * =========================================================================
  * Mission: Neural-driven automated shard management and self-healing.
  * Competitor parity: AI-driven OS optimization (Windows 12/macOS-AI concept).
@@ -11,7 +11,7 @@
 #ifndef SIGMA_COGNITIVE_H
 #define SIGMA_COGNITIVE_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

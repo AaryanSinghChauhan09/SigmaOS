@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN VIRTUAL FILE SYSTEM (VFS)
+ * Î£ SIGMAOS: SOVEREIGN VIRTUAL FILE SYSTEM (VFS)
  * =========================================================================
  * Mission: Zero-latency shard-mapped path resolution.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_VFS_H
 #define SIGMA_VFS_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,4 +1,4 @@
-#include "../../../include/sigma_log.h"
+﻿#include "../../../include/sigma_log.h"
 #include "../../../include/libc/SovereignLibC.h"
 #include "../../../include/hal/sigma_hal.h"
 #include "../../../include/core/sigma_types.h"
@@ -7,7 +7,7 @@
 #include "../../../include/sigma_batteryiq.h"
 #include "../../../include/sigma_thermaliq.h"
 #include "../../../include/sigma_sentinel.h"
-#include "observability/sigma_telemetry.h"
+#include "../../../include/observability/sigma_telemetry.h"
 
 /**
  * SigmaOS Sovereign System Health Check
@@ -33,7 +33,7 @@ extern "C" sigma_health_report_t healthcheck_run_full_audit() {
         .security_posture_ok = true
     };
     
-    sigma_log("[HEALTHCHECK] HSI: Health Score: %d/100. Shards: %d. Thermal: %d�C. Battery: %d%%.\n",
+    sigma_log("[HEALTHCHECK] HSI: Health Score: %d/100. Shards: %d. Thermal: %dï¿½C. Battery: %d%%.\n",
                  report.health_score, report.active_shards, report.thermal_celsius, report.battery_percent);
     
     return report;

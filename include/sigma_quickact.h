@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN QUICK ACTIONS BAR (S-QUICKACT)
+ * Î£ SIGMAOS: SOVEREIGN QUICK ACTIONS BAR (S-QUICKACT)
  * =========================================================================
  * Mission: A single-keystroke universal command palette (like Spotlight/
  * Krunner) deeply integrated with NeuralSearch, DeepLink, and TaskAutomator.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_QUICKACT_H
 #define SIGMA_QUICKACT_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

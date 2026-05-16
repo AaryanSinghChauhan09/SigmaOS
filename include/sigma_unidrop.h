@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN UNIVERSAL DRAG & DROP (S-UNIDROP)
+ * Î£ SIGMAOS: SOVEREIGN UNIVERSAL DRAG & DROP (S-UNIDROP)
  * =========================================================================
  * Mission: A seamless drag-and-drop layer that allows moving data across
  * process boundaries, microVMs, and even remote paired devices instantly.
@@ -10,8 +10,8 @@
 #ifndef SIGMA_UNIDROP_H
 #define SIGMA_UNIDROP_H
 
-#include "../include/core/sigma_types.h"
-#include "../include/sigma_clipboard.h"
+#include "./core/sigma_types.h"
+#include "./sigma_clipboard.h"
 
 #ifdef __cplusplus
 extern "C" {

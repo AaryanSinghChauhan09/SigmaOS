@@ -1,6 +1,6 @@
-#ifndef SIGMA_RECOVER_H
+﻿#ifndef SIGMA_RECOVER_H
 #define SIGMA_RECOVER_H
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

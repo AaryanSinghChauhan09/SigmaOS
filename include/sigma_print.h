@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN PRINT SUBSYSTEM (S-PRINT)
+ * Î£ SIGMAOS: SOVEREIGN PRINT SUBSYSTEM (S-PRINT)
  * =========================================================================
  * Mission: Kernel-native print spooler with zero-driver-bloat rendering.
  * Competitor parity: Linux CUPS, Windows Print Spooler, macOS CUPS/AirPrint.
@@ -11,7 +11,7 @@
 #ifndef SIGMA_PRINT_H
 #define SIGMA_PRINT_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

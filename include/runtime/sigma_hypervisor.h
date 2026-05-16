@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SILICON-NATIVE HYPERVISOR (S-HYPER)
+ * Î£ SIGMAOS: SOVEREIGN SILICON-NATIVE HYPERVISOR (S-HYPER)
  * =========================================================================
  * Mission: Zero-latency hardware virtualization (Type-1).
  * Competitor parity: KVM, Xen, ESXi, Hyper-V.
@@ -11,7 +11,7 @@
 #ifndef SIGMA_HYPERVISOR_H
 #define SIGMA_HYPERVISOR_H
 
-#include "include/sigma_types.h"
+#include "../sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

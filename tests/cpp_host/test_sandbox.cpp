@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "security/sigma_sandbox.h"
+#include "./include/security/sigma_sandbox.h"
 
 class SovereignSandboxTest : public ::testing::Test {
 protected:

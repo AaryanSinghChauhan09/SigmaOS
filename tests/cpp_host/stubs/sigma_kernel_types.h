@@ -1,4 +1,4 @@
-#include "include/sigma_types.h"
+#include "../../../include/sigma_types.h"
 /*
  * tests/cpp_host/stubs/sigma_kernel_types.h
  * Host-mode stub — replaces bare-metal ASM intrinsics for unit testing.

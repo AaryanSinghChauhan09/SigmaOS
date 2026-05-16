@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SYSTEM TELEMETRY (SST)
+ * Î£ SIGMAOS: SOVEREIGN SYSTEM TELEMETRY (SST)
  * =========================================================================
  * Mission: Silicon-direct performance monitoring and shard-state observability.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_TELEMETRY_H
 #define SIGMA_TELEMETRY_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

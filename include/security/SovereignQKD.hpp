@@ -1,8 +1,8 @@
-#ifndef SOVEREIGN_QKD_HPP
+﻿#ifndef SOVEREIGN_QKD_HPP
 #define SOVEREIGN_QKD_HPP
 
-#include "include/SigmaOOP.hpp"
-#include "../../include/sigma_log.h"
+#include "../SigmaOOP.hpp"
+#include "../sigma_log.h"
 
 namespace SigmaOS {
 namespace Kernel {

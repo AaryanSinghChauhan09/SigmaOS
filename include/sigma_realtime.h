@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN REAL-TIME CORE (S-REALTIME)
+ * Î£ SIGMAOS: SOVEREIGN REAL-TIME CORE (S-REALTIME)
  * =========================================================================
  * Mission: Offer a specialized mode for robotics, industrial automation,
  * and mission-critical systems with guaranteed microsecond latency.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_REALTIME_H
 #define SIGMA_REALTIME_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

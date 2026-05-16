@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SYSTEM CONFIGURATION (S-CONFIG)
+ * Î£ SIGMAOS: SOVEREIGN SYSTEM CONFIGURATION (S-CONFIG)
  * =========================================================================
  * Mission: Atomic, shard-isolated configuration orchestration.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_CONFIG_H
 #define SIGMA_CONFIG_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

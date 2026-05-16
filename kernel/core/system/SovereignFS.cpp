@@ -13,6 +13,11 @@ namespace SigmaOS {
 namespace Kernel {
 namespace System {
 
+enum sigma_file_type_t {
+    S_IFREG = 1,
+    S_IFDIR = 2
+};
+
 struct FSNode {
     char name[64];
     sigma_file_type_t type;

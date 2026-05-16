@@ -1,8 +1,8 @@
-#include "../../../include/sigma_log.h"
+﻿#include "../../../include/sigma_log.h"
 #include "../../../include/libc/SovereignLibC.h"
 #include "../../../include/hal/sigma_hal.h"
 #include "../../../include/core/sigma_types.h"
-#include "runtime/sigma_hypervisor.h"
+#include "../../../include/runtime/sigma_hypervisor.h"
 
 /**
  * SigmaOS Sovereign Hypervisor Implementation (Zenith Edition - v100.0)
@@ -10,7 +10,7 @@
  * ZERO-DEPENDENCY: Direct VT-x/AMD-V hooks for silicon-native guests.
  * Competitor parity: KVM, Xen, ESXi, Hyper-V.
  *
- * Design: OOP-isolated singleton � SovereignHyperEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignHyperEngine.
  */
 
 namespace SigmaOS {

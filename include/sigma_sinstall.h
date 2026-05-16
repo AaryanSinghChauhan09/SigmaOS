@@ -1,7 +1,7 @@
-#ifndef SIGMA_SINSTALL_H
+﻿#ifndef SIGMA_SINSTALL_H
 #define SIGMA_SINSTALL_H
-#include "../include/core/sigma_types.h"
-#include "../include/sigma_log.h"
+#include "./core/sigma_types.h"
+#include "./sigma_log.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

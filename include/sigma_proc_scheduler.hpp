@@ -1,7 +1,7 @@
-#ifndef SIGMA_PROC_SCHEDULER_HPP
+﻿#ifndef SIGMA_PROC_SCHEDULER_HPP
 #define SIGMA_PROC_SCHEDULER_HPP
-#include "../include/core/sigma_types.h"
-#include "../include/sigma_log.h"
+#include "./core/sigma_types.h"
+#include "./sigma_log.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

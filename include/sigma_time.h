@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN REAL-TIME CLOCK (SRTC)
+ * Î£ SIGMAOS: SOVEREIGN REAL-TIME CLOCK (SRTC)
  * =========================================================================
  * Mission: Silicon-native, drift-corrected time orchestration.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_TIME_H
 #define SIGMA_TIME_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

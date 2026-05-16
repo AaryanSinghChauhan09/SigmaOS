@@ -1,4 +1,4 @@
-#include "../include/core/sigma_types.h"
+﻿#include "../include/core/sigma_types.h"
 #include "../include/sigma_log.h"
 #include "../include/hal/sigma_hal.h"
 #include "../include/sigma_log.h"
@@ -12,7 +12,7 @@
  * USP: Executable directly on bare metal without standard libraries, 
  * communicating directly with the Sovereign Kernel via IPC and syscalls.
  *
- * Design: OOP-isolated singleton — SovereignShell.
+ * Design: OOP-isolated singleton â€” SovereignShell.
  */
 
 class SovereignShell {

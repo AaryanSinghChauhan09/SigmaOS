@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN WASM RUNTIME (S-WASM)
+ * Î£ SIGMAOS: SOVEREIGN WASM RUNTIME (S-WASM)
  * =========================================================================
  * Mission: High-performance, sandboxed AOT execution for system shards.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_WASM_H
 #define SIGMA_WASM_H
 
-#include "include/sigma_types.h"
+#include "../sigma_types.h"
 
 #ifdef __cplusplus
 namespace SigmaOS {

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN COLLABORATIVE WORKSPACE (S-COLLAB)
+ * Î£ SIGMAOS: SOVEREIGN COLLABORATIVE WORKSPACE (S-COLLAB)
  * =========================================================================
  * Mission: Real-time, multiplayer document and canvas collaboration
  * built natively into the OS, with zero-trust encrypted shared state.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_COLLAB_H
 #define SIGMA_COLLAB_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

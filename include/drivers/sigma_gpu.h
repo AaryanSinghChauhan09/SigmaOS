@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN GPU COMPUTE DRIVER (S-GPU)
+ * Î£ SIGMAOS: SOVEREIGN GPU COMPUTE DRIVER (S-GPU)
  * =========================================================================
  * Mission: Silicon-native GPU command-queue dispatch and compute sharding.
  * Competitor parity: Linux DRM/KMS, macOS Metal, Windows DirectX 12.
@@ -11,7 +11,7 @@
 #ifndef SIGMA_GPU_H
 #define SIGMA_GPU_H
 
-#include "include/sigma_types.h"
+#include "../sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

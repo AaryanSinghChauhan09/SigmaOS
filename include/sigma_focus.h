@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN FOCUS MODE (S-FOCUS)
+ * Î£ SIGMAOS: SOVEREIGN FOCUS MODE (S-FOCUS)
  * =========================================================================
  * Mission: Hardware-level distraction blocking. Temporarily suspends
  * network traffic and IPC for all shards except the active user task.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_FOCUS_H
 #define SIGMA_FOCUS_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SELF-HEALING FILE SYSTEM (S-FS)
+ * Î£ SIGMAOS: SOVEREIGN SELF-HEALING FILE SYSTEM (S-FS)
  * =========================================================================
  * Mission: Atomic, journaled file operations and automated corruption repair.
  * Inspired by ZFS / Btrfs / Immutable Systems.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_FS_H
 #define SIGMA_FS_H
 
-#include "include/sigma_types.h"
+#include "../sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

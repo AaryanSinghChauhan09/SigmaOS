@@ -1,4 +1,4 @@
-# CORE IMPROVEMENTS
+﻿# CORE IMPROVEMENTS
 
 1
 
@@ -48,7 +48,7 @@ The Zenith cyberpunk-inspired UI is unique, but polish is key:
 
 1
 
-SigmaOS�s neural assistant and workflow automation are differentiators.
+SigmaOS’s neural assistant and workflow automation are differentiators.
 
 1
 

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SMART SCREENSHOT (S-SMARTSHOT)
+ * Î£ SIGMAOS: SOVEREIGN SMART SCREENSHOT (S-SMARTSHOT)
  * =========================================================================
  * Mission: An intelligent screenshot tool that auto-recognizes content,
  * performs instant OCR, and offers contextual actions (translate, share,
@@ -11,7 +11,7 @@
 #ifndef SIGMA_SMARTSHOT_H
 #define SIGMA_SMARTSHOT_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

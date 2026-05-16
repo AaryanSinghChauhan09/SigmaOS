@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN FUNCTION MULTI-VERSIONING (S-FMV)
+ * Î£ SIGMAOS: SOVEREIGN FUNCTION MULTI-VERSIONING (S-FMV)
  * =========================================================================
  * Mission: Extreme performance optimizations via automated function 
  * multi-versioning, selecting the fastest code path for the specific CPU.
@@ -11,7 +11,7 @@
 #ifndef SIGMA_FMV_H
 #define SIGMA_FMV_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

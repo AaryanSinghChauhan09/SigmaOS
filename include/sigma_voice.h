@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN VOICE ORCHESTRATOR (S-VOICE)
+ * Î£ SIGMAOS: SOVEREIGN VOICE ORCHESTRATOR (S-VOICE)
  * =========================================================================
  * Mission: A completely offline, zero-latency voice recognition and 
  * command engine for true hands-free automation.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_VOICE_H
 #define SIGMA_VOICE_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

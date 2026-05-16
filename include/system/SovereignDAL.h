@@ -1,7 +1,7 @@
-#ifndef SIGMA_SOVEREIGN_DAL_H
+﻿#ifndef SIGMA_SOVEREIGN_DAL_H
 #define SIGMA_SOVEREIGN_DAL_H
 
-#include "include/sigma_types.h"
+#include "../sigma_types.h"
 #include <string>
 #include <map>
 #include <vector>
@@ -20,7 +20,7 @@ struct PackageInfo {
 };
 
 /**
- * @brief SovereignDAL — Sovereign Distro Abstraction Layer
+ * @brief SovereignDAL â€” Sovereign Distro Abstraction Layer
  * Provides a unified interface for package management across heterogeneous distros.
  */
 class SovereignDAL {

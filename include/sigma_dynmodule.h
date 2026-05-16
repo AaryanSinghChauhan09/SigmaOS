@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN DYNAMIC MODULE LOADER (S-DYNMODULE)
+ * Î£ SIGMAOS: SOVEREIGN DYNAMIC MODULE LOADER (S-DYNMODULE)
  * =========================================================================
  * Mission: Allow hot-swapping of kernel components for flexibility and 
  * faster updates, matching the loadable kernel module (LKM) architecture.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_DYNMODULE_H
 #define SIGMA_DYNMODULE_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

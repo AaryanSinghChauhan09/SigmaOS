@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ADAPTIVE ERGONOMICS (S-ERGO)
+ * Î£ SIGMAOS: SOVEREIGN ADAPTIVE ERGONOMICS (S-ERGO)
  * =========================================================================
  * Mission: A built-in OS layer that monitors user strain, automatically
  * adjusting color temperatures, brightness, and enforcing micro-breaks.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_ERGO_H
 #define SIGMA_ERGO_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

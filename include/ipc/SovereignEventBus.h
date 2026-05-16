@@ -1,6 +1,6 @@
-/**
+﻿/**
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN EVENT BUS (v1.0 - LATTICE NERVOUS SYSTEM)
+ * Î£ SIGMAOS: SOVEREIGN EVENT BUS (v1.0 - LATTICE NERVOUS SYSTEM)
  * =========================================================================
  * Inspired by: Linux kernel notifier chains + D-Bus event model
  * Purpose: Type-safe, zero-heap publish/subscribe event routing for all
@@ -11,8 +11,8 @@
 
 #pragma once
 
-#include "include/sigma_types.h"
-#include "../../include/sigma_log.h"
+#include "../sigma_types.h"
+#include "../sigma_log.h"
 
 #define SIGMA_BUS_MAX_SUBSCRIBERS 128u
 #define SIGMA_BUS_MAX_EVENT_LEN   64u
@@ -21,7 +21,7 @@ namespace SigmaOS {
 namespace Kernel {
 namespace IPC {
 
-/* ─── Event Types ──────────────────────────────────────────────────────── */
+/* â”€â”€â”€ Event Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 enum class EventType : sigma_u32 {
     BATTERY_LOW       = 0x01,
     CPU_HIGH          = 0x02,
@@ -48,7 +48,7 @@ struct SovereignEvent {
 
 typedef void (*SovereignEventHandler)(const SovereignEvent&);
 
-/* ─── Subscriber Entry ──────────────────────────────────────────────────── */
+/* â”€â”€â”€ Subscriber Entry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 struct EventSubscriber {
     EventType              event_type;
     SovereignEventHandler  handler;
@@ -57,7 +57,7 @@ struct EventSubscriber {
 };
 
 /**
- * @brief SovereignEventBus — the lattice-wide publish/subscribe bus.
+ * @brief SovereignEventBus â€” the lattice-wide publish/subscribe bus.
  *
  * All shards communicate through typed events rather than direct calls,
  * enabling strict decoupling and MAC-policy auditing at the bus layer.
@@ -148,7 +148,7 @@ private:
 } // namespace Kernel
 } // namespace SigmaOS
 
-/* ─── C Bridge ─────────────────────────────────────────────────────────── */
+/* â”€â”€â”€ C Bridge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 extern "C" {
 
 inline void sigma_bus_publish_simple(unsigned int event_type_raw, unsigned int source_id) {

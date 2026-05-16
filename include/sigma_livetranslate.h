@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN LIVE TRANSLATE (S-LIVETRANSLATE)
+ * Î£ SIGMAOS: SOVEREIGN LIVE TRANSLATE (S-LIVETRANSLATE)
  * =========================================================================
  * Mission: Real-time, fully offline translation of text, UI labels, and
  * voice input across 50+ languages using on-device neural inference.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_LIVETRANSLATE_H
 #define SIGMA_LIVETRANSLATE_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

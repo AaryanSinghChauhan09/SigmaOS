@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN LATTICE NETWORKING (S-NET)
+ * Î£ SIGMAOS: SOVEREIGN LATTICE NETWORKING (S-NET)
  * =========================================================================
  * Mission: Zero-latency, industrial-grade network stack.
  * Principle: PQC-signed packets, DoS-resilient routing.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_NET_H
 #define SIGMA_NET_H
 
-#include "include/sigma_types.h"
+#include "./sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

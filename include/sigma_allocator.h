@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN CUSTOM ALLOCATOR (S-ALLOCATOR)
+ * Î£ SIGMAOS: SOVEREIGN CUSTOM ALLOCATOR (S-ALLOCATOR)
  * =========================================================================
  * Mission: A highly optimized, lightweight memory allocator tuned for 
  * modern silicon workloads, outperforming standard Linux malloc.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_ALLOCATOR_H
 #define SIGMA_ALLOCATOR_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

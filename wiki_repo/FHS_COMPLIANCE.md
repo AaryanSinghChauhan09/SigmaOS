@@ -1,4 +1,4 @@
-# FHS COMPLIANCE
+﻿# FHS COMPLIANCE
 
 1
 
@@ -11,6 +11,7 @@ While SigmaOS is amnesic and shard-based, it provides a Virtual File System (VFS
 By adhering to these paths, SigmaOS ensures that:
 
 1. **Tooling Parity**: Standard tools (`ls`, `cd`, `grep`, `vim`) work as expected.
+
 2. **User Onboarding**: Users from Ubuntu, Fedora, or Arch find a recognizable environment.
 
 3. **Application Portability**: Linux applications can locate resources using standard FHS assumptions.

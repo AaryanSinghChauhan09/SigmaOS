@@ -1,33 +1,41 @@
-# 🛠 DEFI_ARCHITECT Profile
+﻿# ðŸ›  DEFI_ARCHITECT Profile
 
 ## Required Tools & Functions
 
 - Liquidity-Lattice
+
 - AMM-simulator
+
 - yield-curve-nexus
+
 - flash-loan-auditor
 
-## 📜 Compliance Rules
+## ðŸ“œ Compliance Rules
 
 - Smart-contract security standards
+
 - DeFi-governance protocols
 
-## 🧮 Professional Calculators
+## ðŸ§® Professional Calculators
 
 - Impermanent loss
+
 - slippage-delta
+
 - TVL-ratio
+
 - gas-optimization
 
-## 🧬 Core Algorithms
+## ðŸ§¬ Core Algorithms
 
 - Automated market making
+
 - risk-tranche simulation
 
-## 🛡 Self-Healing Strategy
+## ðŸ›¡ Self-Healing Strategy
 
 - Contract-state verification, liquidity-mesh sync
 
-## 🔄 Rollback Strategy
+## ðŸ”„ Rollback Strategy
 
 - Vault-state snapshots, protocol-baseline restoration

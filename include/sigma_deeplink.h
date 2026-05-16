@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN DEEP LINKING (S-DEEPLINK)
+ * Î£ SIGMAOS: SOVEREIGN DEEP LINKING (S-DEEPLINK)
  * =========================================================================
  * Mission: OS-level deep linking allowing any application state, setting,
  * or file context to be hyperlinked, shared, and triggered globally.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_DEEPLINK_H
 #define SIGMA_DEEPLINK_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,8 +1,8 @@
-#include "../../../include/sigma_log.h"
+﻿#include "../../../include/sigma_log.h"
 #include "../../../include/libc/SovereignLibC.h"
 #include "../../../include/core/sigma_types.h"
 #include "../../../include/hal/sigma_hal.h"
-#include "ai/sigma_neural.h"
+#include "../../../include/ai/sigma_neural.h"
 
 /**
  * SigmaOS Sovereign Neural Hardware Acceleration

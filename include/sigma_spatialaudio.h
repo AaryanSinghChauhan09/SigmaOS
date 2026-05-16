@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SPATIAL AUDIO (S-SPATIALAUDIO)
+ * Î£ SIGMAOS: SOVEREIGN SPATIAL AUDIO (S-SPATIALAUDIO)
  * =========================================================================
  * Mission: Hardware-accelerated 3D positional audio natively in the
  * kernel, mapping audio sources to spatial coordinates for immersive UX.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_SPATIALAUDIO_H
 #define SIGMA_SPATIALAUDIO_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

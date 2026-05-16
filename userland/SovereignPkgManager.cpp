@@ -1,6 +1,6 @@
-/**
+﻿/**
  * SigmaOS Sovereign Package Manager (S-PKG)
- * v29.0 Zenith Foundation — Industrial Software Distribution
+ * v29.0 Zenith Foundation â€” Industrial Software Distribution
  * ZERO-DEPENDENCY: Strictly bare-metal package extraction.
  */
 

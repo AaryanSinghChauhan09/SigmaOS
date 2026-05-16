@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN UNIFIED PACKAGE SYSTEM (S-UNIFIEDPKG)
+ * Î£ SIGMAOS: SOVEREIGN UNIFIED PACKAGE SYSTEM (S-UNIFIEDPKG)
  * =========================================================================
  * Mission: A single, cryptographically verified package manager handling
  * both system and application software, avoiding fragmentation.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_UNIFIEDPKG_H
 #define SIGMA_UNIFIEDPKG_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

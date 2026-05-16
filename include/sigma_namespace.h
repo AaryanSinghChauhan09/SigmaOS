@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN UNIVERSAL NAMESPACE (S-NAMESPACE)
+ * Î£ SIGMAOS: SOVEREIGN UNIVERSAL NAMESPACE (S-NAMESPACE)
  * =========================================================================
  * Mission: Expose all system resources (hardware, processes, network)
  * as a single, uniform, distributed file namespace.
@@ -11,7 +11,7 @@
 #ifndef SIGMA_NAMESPACE_H
 #define SIGMA_NAMESPACE_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

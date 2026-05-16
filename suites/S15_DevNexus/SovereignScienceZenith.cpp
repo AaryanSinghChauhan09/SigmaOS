@@ -1,6 +1,6 @@
 #include "../../include/sigma_log.h"
 #include "../../include/Lattice.h"
-#include "include/SovereignLibC.h"
+#include "../../include/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)

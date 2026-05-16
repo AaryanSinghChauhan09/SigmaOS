@@ -6,7 +6,7 @@
 #ifndef SIGMA_PKG_H
 #define SIGMA_PKG_H
 
-#include "include/sigma_types.h"
+#include "../../include/sigma_types.h"
 #include "../../include/S43_SovereignCaps/sigma_caps.h"
 
 #define SIGMA_PKG_MAX        128

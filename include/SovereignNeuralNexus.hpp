@@ -1,7 +1,7 @@
-#ifndef SOVEREIGN_NEURAL_NEXUS_HPP
+﻿#ifndef SOVEREIGN_NEURAL_NEXUS_HPP
 #define SOVEREIGN_NEURAL_NEXUS_HPP
 
-#include "include/sigma_types.h"
+#include "./sigma_types.h"
 
 namespace SigmaOS {
 namespace Kernel {

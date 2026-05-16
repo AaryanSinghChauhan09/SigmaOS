@@ -1,7 +1,7 @@
-#ifndef SIGMA_APPARMOR_H
+﻿#ifndef SIGMA_APPARMOR_H
 #define SIGMA_APPARMOR_H
 
-#include "include/sigma_types.h"
+#include "../sigma_types.h"
 
 #ifdef __cplusplus
 namespace SigmaOS {

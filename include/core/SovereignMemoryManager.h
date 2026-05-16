@@ -1,8 +1,8 @@
-#ifndef SOVEREIGN_MEMORY_MANAGER_H
+﻿#ifndef SOVEREIGN_MEMORY_MANAGER_H
 #define SOVEREIGN_MEMORY_MANAGER_H
 
-#include "../../include/core/sigma_types.h"
-#include "../../include/core/SigmaOOP.hpp"
+#include "../sigma_types.h"
+#include "../SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

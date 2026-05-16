@@ -1,4 +1,4 @@
-# Σ SigmaOS — Formal Verification
+﻿# Î£ SigmaOS â€” Formal Verification
 
 This directory contains mathematically rigorous proofs verifying the sovereignty and
 correctness claims of the SigmaOS Sovereign Lattice.
@@ -15,12 +15,12 @@ correctness claims of the SigmaOS Sovereign Lattice.
 
 | File | Tool | Property Verified |
 |------|------|------------------|
-| `../suites/S08_Security/formal_proofs/ipc_dma_kani.rs` | Kani | DMA ∩ IPC = ∅ (non-interference) |
+| `../suites/S08_Security/formal_proofs/ipc_dma_kani.rs` | Kani | DMA âˆ© IPC = âˆ… (non-interference) |
 | `../suites/S08_Security/formal_proofs/ipc_dma_kani.rs` | Kani | Dispatch requires ownership capability |
 | `../suites/S08_Security/formal_proofs/ipc_dma_kani.rs` | Kani | Sequence numbers are strictly monotonic |
 | `../suites/S08_Security/formal_proofs/ipc_dma_kani.rs` | Kani | Rollback atomically purges exactly one entry |
 | `../suites/S08_Security/formal_proofs/tensor_kani.rs` | Kani | NPU matmul never panics or overflows |
-| `coq/ipc_isolation.v` | Coq | IPC channel isolation — Coq proof sketch |
+| `coq/ipc_isolation.v` | Coq | IPC channel isolation â€” Coq proof sketch |
 | `isabelle/crdt_merge.thy` | Isabelle | CRDT LWW merge is idempotent and associative |
 
 ## Running Kani Proofs

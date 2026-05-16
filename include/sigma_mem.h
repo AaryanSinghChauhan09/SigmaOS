@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN MEMORY ALLOCATOR (HEAP)
+ * Î£ SIGMAOS: SOVEREIGN MEMORY ALLOCATOR (HEAP)
  * =========================================================================
  * Mission: Zero-dependency, buddy-system silicon allocation.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_MEM_ALLOC_H
 #define SIGMA_MEM_ALLOC_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

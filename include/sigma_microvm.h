@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN MICRO-VIRTUALIZATION (S-MICROVM)
+ * Î£ SIGMAOS: SOVEREIGN MICRO-VIRTUALIZATION (S-MICROVM)
  * =========================================================================
  * Mission: Security through extreme compartmentalization via lightweight 
  * hypervisor-level virtualization for individual tasks.
@@ -11,7 +11,7 @@
 #ifndef SIGMA_MICROVM_H
 #define SIGMA_MICROVM_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

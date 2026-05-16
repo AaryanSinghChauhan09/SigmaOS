@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SENTINEL (S-SENTINEL)
+ * Î£ SIGMAOS: SOVEREIGN SENTINEL (S-SENTINEL)
  * =========================================================================
  * Mission: Zero-trust, fine-grained access control and capability mediation.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_SENTINEL_H
 #define SIGMA_SENTINEL_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

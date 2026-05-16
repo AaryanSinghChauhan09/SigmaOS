@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ORB MANAGER (Package Management Shard)
+ * Î£ SIGMAOS: SOVEREIGN ORB MANAGER (Package Management Shard)
  * =========================================================================
  * Mission: Cryptographically signed, zero-latency Orb deployment.
  * Layer  : L5 " Industrial Ecosystem
@@ -13,7 +13,7 @@
 #include "../../../include/libc/SovereignLibC.h"
 #include "../../../include/core/SigmaOOP.hpp"
 #include "../../../include/sigma_log.h"
-#include "security/SovereignQKD.hpp"
+#include "../../../include/security/SovereignQKD.hpp"
 
 /**
  * SovereignOrbManager " Sovereign Orb Package Ecosystem
@@ -107,7 +107,7 @@ public:
     }
 
     static void listOrbs() {
-        sigma_log("[ORB-MAN] --- Σ SOVEREIGN ORB REGISTRY ---\n");
+        sigma_log("[ORB-MAN] --- Î£ SOVEREIGN ORB REGISTRY ---\n");
         auto& self = getInstance();
         for (sigma_u32 i = 0; i < 10; ++i) {
             if (self.m_registry[i][0] != '\0') {

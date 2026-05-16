@@ -1,31 +1,37 @@
-# 🛠 AGI_SAFETY_RESEARCHER Profile
+﻿# ðŸ›  AGI_SAFETY_RESEARCHER Profile
 
 ## Required Tools & Functions
 
 - Alignment monitor
+
 - semantic drift analyzer
+
 - reward hacking detector
+
 - sandbox-lattice
 
-## 📜 Compliance Rules
+## ðŸ“œ Compliance Rules
 
 - Asilomar AI principles
+
 - safety-first development
 
-## 🧮 Professional Calculators
+## ðŸ§® Professional Calculators
 
 - Complexity-to-safety ratio
+
 - interpretability score
 
-## 🧬 Core Algorithms
+## ðŸ§¬ Core Algorithms
 
 - Formal verification
+
 - recursive self-improvement monitoring
 
-## 🛡 Self-Healing Strategy
+## ðŸ›¡ Self-Healing Strategy
 
 - Automated kill-switch activation, sandbox containment verification
 
-## 🔄 Rollback Strategy
+## ðŸ”„ Rollback Strategy
 
 - Safe-state model restoration, audit log immutability

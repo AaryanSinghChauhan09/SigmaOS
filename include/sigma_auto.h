@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SYSTEM AUTOMATION (S-AUTO)
+ * Î£ SIGMAOS: SOVEREIGN SYSTEM AUTOMATION (S-AUTO)
  * =========================================================================
  * Mission: Event-driven shard automation and autonomous task hub.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_AUTO_H
 #define SIGMA_AUTO_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

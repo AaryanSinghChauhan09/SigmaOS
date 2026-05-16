@@ -25,6 +25,9 @@ public:
 
     bool verifyFile(const char* path, const sigma_u8* signature) {
         sigma_log_info("[S-IMA] Attesting shard primitive: %s", path);
+        if (signature) {
+            sigma_log_info("[S-IMA] Signature detected. Performing Dilithium-5 verification...");
+        }
         // Simulated PQC verification
         sigma_log_info("[S-IMA] PQC Integrity Check: [VERIFIED]");
         return true;

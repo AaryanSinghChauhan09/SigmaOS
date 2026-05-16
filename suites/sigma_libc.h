@@ -2,8 +2,8 @@
 #ifndef SIGMA_LIBC_H
 #define SIGMA_LIBC_H
 
-#include "../include/SovereignLibC.h"
-#include "../include/core/sigma_kernel_types.h"
+#include "./include/SovereignLibC.h"
+#include "./include/core/sigma_kernel_types.h"
 
 // Standard integer equivalents for Sovereign Silicon
 typedef unsigned char      uint8_t;

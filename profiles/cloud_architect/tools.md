@@ -1,34 +1,43 @@
-# 🛠 CLOUD_ARCHITECT Profile
+﻿# ðŸ›  CLOUD_ARCHITECT Profile
 
 ## Required Tools & Functions
 
 - Docker
+
 - Podman
+
 - Kubernetes
+
 - Terraform
+
 - Ansible
+
 - Jenkins
+
 - OCI-Nexus
 
-## 📜 Compliance Rules
+## ðŸ“œ Compliance Rules
 
 - Industry standards
+
 - professional ethics
 
-## 🧮 Professional Calculators
+## ðŸ§® Professional Calculators
 
 - Efficiency metrics
+
 - cost analysis
 
-## 🧬 Core Algorithms
+## ðŸ§¬ Core Algorithms
 
 - Workflow optimization
+
 - adaptive assistance
 
-## 🛡 Self-Healing Strategy
+## ðŸ›¡ Self-Healing Strategy
 
 - Continuous health check for Cloud Architect tools
 
-## 🔄 Rollback Strategy
+## ðŸ”„ Rollback Strategy
 
 - Automatic state snapshots

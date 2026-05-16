@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN POWER MANAGEMENT (SPM)
+ * Î£ SIGMAOS: SOVEREIGN POWER MANAGEMENT (SPM)
  * =========================================================================
  * Mission: Zero-latency power orchestration and intelligent thermal balancing.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_POWER_H
 #define SIGMA_POWER_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

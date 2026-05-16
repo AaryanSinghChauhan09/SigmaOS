@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN MODULE LOADER (S-MODULE)
+ * Î£ SIGMAOS: SOVEREIGN MODULE LOADER (S-MODULE)
  * =========================================================================
  * Mission: Dynamic, hot-swappable shard loading and runtime extensibility.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_MODULES_H
 #define SIGMA_MODULES_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

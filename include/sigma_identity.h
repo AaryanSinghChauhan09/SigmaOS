@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN QUANTUM-SAFE IDENTITY NEXUS (S-IDENTITY)
+ * Î£ SIGMAOS: SOVEREIGN QUANTUM-SAFE IDENTITY NEXUS (S-IDENTITY)
  * =========================================================================
  * Mission: Zero-trust, PQC-hardened identity and attestation.
  * Competitor parity: Windows Hello, macOS TouchID/FaceID, Linux PAM/RBAC.
@@ -11,7 +11,7 @@
 #ifndef SIGMA_IDENTITY_H
 #define SIGMA_IDENTITY_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * =========================================================================
  * SIGMAOS: SOVEREIGN OOP FRAMEWORK (v19.0 - ZERO-DEPENDENCY)
  * =========================================================================
@@ -11,8 +11,8 @@
 #ifndef SIGMA_OOP_HPP
 #define SIGMA_OOP_HPP
 
-#include "../include/core/sigma_types.h"
-#include "../include/libc/SovereignLibC.h"
+#include "./core/sigma_types.h"
+#include "./libc/SovereignLibC.h"
 
 namespace SigmaOS {
 

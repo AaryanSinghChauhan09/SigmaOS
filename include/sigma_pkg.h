@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN PACKAGE MANAGEMENT (S-PKG)
+ * Î£ SIGMAOS: SOVEREIGN PACKAGE MANAGEMENT (S-PKG)
  * =========================================================================
  * Mission: Zero-dependency shard distribution and dependency resolution.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_PKG_H
 #define SIGMA_PKG_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

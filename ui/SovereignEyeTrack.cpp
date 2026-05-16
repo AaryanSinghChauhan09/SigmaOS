@@ -1,11 +1,11 @@
-#include "../include/sigma_log.h"
-#include "include/SovereignLibC.h"
-#include "include/hal/sigma_hal.h"
-#include "include/sigma_types.h"
-#include "../include/sigma_eyetrack.h"
-#include "include/hal/sigma_hal.h"
-#include "ai/sigma_neural.h"
-#include "../include/sigma_universal_ui.h"
+#include "./include/sigma_log.h"
+#include "./include/SovereignLibC.h"
+#include "./include/hal/sigma_hal.h"
+#include "./include/sigma_types.h"
+#include "./include/sigma_eyetrack.h"
+#include "./include/hal/sigma_hal.h"
+#include "./include/ai/sigma_neural.h"
+#include "./include/sigma_universal_ui.h"
 
 /**
  * SigmaOS Sovereign Eye Tracking

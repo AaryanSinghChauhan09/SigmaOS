@@ -1,6 +1,6 @@
 #include "../../include/sigma_log.h"
-#include "include/sigma_types.h"
-#include "include/SovereignLibC.h"
+#include "../../include/sigma_types.h"
+#include "../../include/SovereignLibC.h"
 #include "../../include/Lattice.h"
 /*
  * =========================================================================
@@ -12,7 +12,7 @@
  * =========================================================================
  */
 
-#include "include/SigmaOOP.hpp"
+#include "../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Forge {

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN TELEPATHIC TYPING (S-TELEPATHTYPE)
+ * Î£ SIGMAOS: SOVEREIGN TELEPATHIC TYPING (S-TELEPATHTYPE)
  * =========================================================================
  * Mission: Leverage the S-Neural Engine to predict entire sentences and 
  * contextually complete logic blocks with a single keystroke.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_TELEPATHTYPE_H
 #define SIGMA_TELEPATHTYPE_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

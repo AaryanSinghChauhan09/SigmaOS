@@ -1,33 +1,66 @@
-# Σ SIGMAOS v15.0 "HORIZON" - STABLE RELEASE
+﻿# ðŸš€ SigmaOS: Zenith v15.0 Release Manifest
 
-The **SigmaOS Industrial Collective** is proud to announce the first production-grade release of the **Sovereign Lattice™** architecture.
+> **The sovereign microkernel, distributed across every possible silicon format.**
 
-## 🚀 Key Highlights
-
-- **Industrial Stability**: 100% pass rate on S-REGRESS industrial testing.
-- **PQC-Hardened Security**: Dilithium-5 attested shard distribution via S-PKG.
-- **Zero-Latency AI**: Native CUDA/ROCm absorption with ONNX inference lattice.
-- **Professional Shard Bundles**: Modular turnkey deployments for 600+ industrial roles.
-
-## 📦 New Components
-
-- **S-MAC**: Mandatory Access Control (AppArmor/SELinux parity).
-- **S-PKG**: Cryptographically verified lattice package manager.
-- **S-VPN**: WireGuard-native secure tunneling engine.
-- **Zenith Control Center**: Unified industrial settings lattice.
-
-## 🛠 Stability Improvements
-
-- **Kdump Parity**: Industrial crash dump integration for kernel debugging.
-- **Watchdog L3**: Heartbeat-driven atomic fallback and self-healing.
-- **Driver Absorption**: Native support for Mesa (GPU), Realtek (Wifi), and PipeWire (Audio).
-
-## 🏛 Ecosystem Sync
-
-- **Wiki**: Comprehensive documentation for all 10 lattice layers.
-- **GitHub Pages**: New landing page with installation guide and benchmarks.
-- **CI/CD**: Automated QEMU regression suite and Fuzz testing.
+SigmaOS is available in multiple professional formats to ensure total industrial parity, portability, and performance across heterogeneous hardware environments.
 
 ---
 
-### Stay Sovereign
+## ðŸ›ï¸ Deployment Formats Status
+
+| Format | Status | Primary Branch | Key Shards |
+| :--- | :--- | :--- | :--- |
+
+| **Standalone (Bare Metal)** | ðŸŸ¢ [STABLE] | `release/standalone` | `SovereignBoot`, `S-GPU`, `S-NVMe` |
+
+| **Dual Boot (Interop)** | ðŸŸ¢ [STABLE] | `release/dual-boot` | `S-Compatibility`, `S-Partition`, `sigma-grub` |
+
+| **App-Based (Runtime)** | ðŸŸ¡ [BETA] | `release/app` | `S-Wine`, `S-ARC`, `S-WASM` |
+
+| **Browser-Based (Web)** | ðŸŸ¡ [BETA] | `release/browser` | `ZenithWebUI`, `S-Sandboxing` |
+
+| **Core (Headless/Server)** | ðŸŸ¢ [STABLE] | `release/microkernel` | `S-SSH`, `S-Orchestrator`, `S-MM` |
+
+| **Distributed (Mesh)** | ðŸŸ  [DEV] | `release/distributed` | `LatticeNet`, `S-Consensus` |
+
+---
+
+## ðŸ› ï¸ Build and Deployment Instructions
+
+To build a specific edition of SigmaOS, switch to the corresponding branch and execute the industrial build command:
+
+```bash
+
+# 1. Switch to your desired format branch
+
+git checkout release/standalone
+
+# 2. Build the edition-specific ISO/Image
+
+make zenith-standalone-iso
+```
+
+### ðŸ“¦ Unified Package Management
+
+Every format supports the `sigma-pkg` utility for cross-format shard synchronization:
+
+```bash
+
+# Update local lattice to match global repository
+
+sigma-pkg sync
+
+# Install format-specific industrial layers
+
+sigma-pkg layer standalone
+```
+
+---
+
+## ðŸ›¤ï¸ Release Philosophy
+
+SigmaOS follows a **Strict Parity Protocol**. While the deployment format varies (Bare metal vs. WASM), the underlying **Sovereign Kernel** and **Lattice Algorithms** remain identical. This ensures that a security audit performed on the Standalone version is mathematically valid for the App version.
+
+---
+
+*SigmaOS â€” One Kernel. Every Hardware. Absolute Sovereignty.*

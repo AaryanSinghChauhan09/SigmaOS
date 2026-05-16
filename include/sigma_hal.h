@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN HARDWARE ABSTRACTION LAYER (HAL)
+ * Î£ SIGMAOS: SOVEREIGN HARDWARE ABSTRACTION LAYER (HAL)
  * =========================================================================
  * Mission: Zero-dependency silicon orchestration.
  * =========================================================================
@@ -9,7 +9,9 @@
 #ifndef SIGMA_HAL_H
 #define SIGMA_HAL_H
 
-#include "sigma_types.h"
+#include "SovereignLibC.h"
+
+#include "./sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

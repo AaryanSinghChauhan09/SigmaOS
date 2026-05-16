@@ -1,22 +1,25 @@
-# 🤝 Contributing to SigmaOS
+﻿# ðŸ¤ Contributing to SigmaOS
 
 Thank you for your interest in contributing to **SigmaOS Sovereign Lattice**. We are building a high-performance, AI-native ecosystem and we welcome contributions that align with our vision of absolute digital sovereignty.
 
 ---
 
-## 🏛️ Contribution Philosophy
+## ðŸ›ï¸ Contribution Philosophy
 
 SigmaOS is built on a **600-Shard Modular Architecture**. Every contribution should be:
 
 1. **Atomic**: Focus on a single shard or functional cluster.
+
 2. **Zero-Dependency**: Do not introduce external libraries unless absolutely necessary.
+
 3. **PQC-Ready**: Consider security and attestation in every line of code.
 
 ---
 
-## 🛠️ How to Contribute
+## ðŸ› ï¸ How to Contribute
 
 1. **Fork the Repository**: Create your own fork and clone it locally.
+
 2. **Create a Shard Branch**:
    ```bash
    git checkout -b shard/your-feature-name
@@ -35,15 +38,17 @@ SigmaOS is built on a **600-Shard Modular Architecture**. Every contribution sho
 
 ---
 
-## 🎨 Code Style
+## ðŸŽ¨ Code Style
 
 - Use **OOP-Isolated Singletons** for core engines.
+
 - Follow the `sigma_` naming convention for kernel-level primitives.
+
 - Maintain strict **C++11/14** standards for hardware compatibility.
 
 ---
 
-## 🛡️ Security First
+## ðŸ›¡ï¸ Security First
 
 If you find a security vulnerability, please follow our **[Security Policy](SECURITY.md)**. Do NOT open a public issue for security bugs.
 

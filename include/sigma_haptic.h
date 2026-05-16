@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN HAPTIC ENGINE (S-HAPTIC)
+ * Î£ SIGMAOS: SOVEREIGN HAPTIC ENGINE (S-HAPTIC)
  * =========================================================================
  * Mission: A dedicated kernel-level API for precise, immersive haptic 
  * feedback on supported hardware (trackpads, controllers, wearables).
@@ -10,7 +10,7 @@
 #ifndef SIGMA_HAPTIC_H
 #define SIGMA_HAPTIC_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,7 +1,7 @@
-#ifndef SIGMA_MESH_TYPES_H
+﻿#ifndef SIGMA_MESH_TYPES_H
 #define SIGMA_MESH_TYPES_H
 
-#include "include/sigma_types.h"
+#include "./sigma_types.h"
 
 typedef struct {
     char node_id[32];

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN LATTICE ROLLING UPDATE (S-LRU)
+ * Î£ SIGMAOS: SOVEREIGN LATTICE ROLLING UPDATE (S-LRU)
  * =========================================================================
  * Mission: Zero-downtime, rolling shard updates and machine-state migration.
  * Inspired by Arch Linux / Rolling Release.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_LRU_H
 #define SIGMA_LRU_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

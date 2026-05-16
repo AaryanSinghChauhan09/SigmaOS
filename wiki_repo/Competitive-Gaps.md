@@ -1,8 +1,8 @@
-# Competitive-Gaps
+Ôªø# Competitive-Gaps
 
 1
 
-This document frames why SigmaOS can feel ìbehindî established systems (Linux, BSD, commercial OSes) and how we plan to close the gap without overstating current capabilities.
+This document frames why SigmaOS can feel ‚Äúbehind‚Äù established systems (Linux, BSD, commercial OSes) and how we plan to close the gap without overstating current capabilities.
 
 1
 

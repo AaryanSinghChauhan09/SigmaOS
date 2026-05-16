@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =============================================================================
- * Î£ SIGMAOS KERNEL: VIRTUAL FILE SYSTEM (VFS) (v1.0)
+ * ÃŽÂ£ SIGMAOS KERNEL: VIRTUAL FILE SYSTEM (VFS) (v1.0)
  * =============================================================================
  * Principles: Everything is a Shard. Zero-Abstract Hardware Abstraction.
  * =============================================================================
@@ -8,7 +8,7 @@
 #ifndef SIGMA_VFS_H
 #define SIGMA_VFS_H
 
-#include "../include/core/sigma_kernel_types.h"
+#include "./core/sigma_kernel_types.h"
 
 typedef struct vfs_node {
     char name[128];

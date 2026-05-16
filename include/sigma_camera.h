@@ -1,7 +1,7 @@
-#ifndef SIGMA_CAMERA_H
+﻿#ifndef SIGMA_CAMERA_H
 #define SIGMA_CAMERA_H
-#include "../include/core/sigma_types.h"
-#include "../include/sigma_log.h"
+#include "./core/sigma_types.h"
+#include "./sigma_log.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

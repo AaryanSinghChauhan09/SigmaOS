@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SECURITY HARDENER (S-SECHARDENER)  — SHARD #500
+ * Î£ SIGMAOS: SOVEREIGN SECURITY HARDENER (S-SECHARDENER)  â€” SHARD #500
  * =========================================================================
  * Mission: A comprehensive, modular security hardening framework that
  * enforces bounds checking, ASLR, stack canaries, and seccomp-style
@@ -16,7 +16,7 @@
 #ifndef SIGMA_SECHARDENER_H
 #define SIGMA_SECHARDENER_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

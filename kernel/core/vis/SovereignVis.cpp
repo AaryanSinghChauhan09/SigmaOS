@@ -19,7 +19,7 @@ public:
     }
 
     void renderTopology(const void* adjacency_list) {
-        sigma_log_info("[VIS:GRAPH] Rendering Lattice Topology via SovereignVis...");
+        sigma_log_info("[VIS:GRAPH] Rendering Lattice Topology (source: %p) via SovereignVis...", adjacency_list);
         // Simulation of high-performance SVG/Canvas rendering
         sigma_log_info("[VIS:GRAPH] Render complete (0.1ms).");
     }

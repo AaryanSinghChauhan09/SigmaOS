@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SHARD INTEGRITY CHECKSUM (S-SIC)
+ * Î£ SIGMAOS: SOVEREIGN SHARD INTEGRITY CHECKSUM (S-SIC)
  * =========================================================================
  * Mission: Atomic, reproducible shard verification and build-parity audit.
  * Inspired by NixOS / Reproducible Builds.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_SIC_H
 #define SIGMA_SIC_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

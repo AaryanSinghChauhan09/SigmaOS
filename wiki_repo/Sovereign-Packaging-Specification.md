@@ -1,23 +1,26 @@
-# Sovereign-Packaging-Specification
+﻿# Sovereign-Packaging-Specification
 
-# 📦 Sovereign Packaging Specification (.spkg)
+# ðŸ“¦ Sovereign Packaging Specification (.spkg)
 
 The **Sovereign Packaging Specification** defines the industrial standard for creating, signing, and distributing shards within the SigmaOS lattice.
 
 ---
 
-## 🏗️ Structure of a Shard
+## ðŸ—ï¸ Structure of a Shard
 
 A SigmaOS package (`.spkg`) is a PQC-sealed archive containing:
 
 1. **manifest.json**: Shard metadata, dependencies, and capability requirements.
+
 2. **binary.wasm**: The functional payload compiled for the SigmaOS runtime.
+
 3. **resources/**: Assets, icons, and localized strings for the Zenith UI.
+
 4. **signature.sig**: Dilithium-based PQC signature for lattice-wide attestation.
 
 ---
 
-## 📄 Manifest Specification
+## ðŸ“„ Manifest Specification
 
 1
 
@@ -34,20 +37,24 @@ A SigmaOS package (`.spkg`) is a PQC-sealed archive containing:
 
 ---
 
-## 🛡️ Security & Isolation
+## ðŸ›¡ï¸ Security & Isolation
 
 Packages must specify their isolation level to ensure lattice integrity:
 
 - **Core-Lattice**: Reserved for system shards. Run in Ring 0 with full hardware access.
+
 - **Ring3-Sandboxed**: Standard user apps. Capability-gated access to resources.
+
 - **Ephemeral**: Temporary shards that are purged from memory after execution.
 
 ---
 
-## 🔄 Deployment Flow
+## ðŸ”„ Deployment Flow
 
 1. **Marketplace Fetch**: The `SovereignMarketplace` fetches the `.spkg` from a verified sovereign node.
+
 2. **PQC Attestation**: `SovereignAttestation` verifies the PQC signature against the developer's public key.
+
 3. **Sandbox Injection**: `SovereignShardManager` stages the binary and executes it within a `SovereignSandbox` matching the requested capabilities.
 
 ---

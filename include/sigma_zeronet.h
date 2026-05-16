@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ZERO-TRUST NETWORK (S-ZERONET)
+ * Î£ SIGMAOS: SOVEREIGN ZERO-TRUST NETWORK (S-ZERONET)
  * =========================================================================
  * Mission: Enforce cryptographic verification for all network traffic, even internal.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_ZERONET_H
 #define SIGMA_ZERONET_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

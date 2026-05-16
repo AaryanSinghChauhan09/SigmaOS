@@ -1,67 +1,81 @@
-# Hacking-Guide
+﻿# HACKING.md â€” Writing a New Sovereign Shard
 
-1
+This guide walks through writing, registering, and testing a new kernel shard for SigmaOS.
 
-This guide defines the industrial workflow for developing, registering, and validating new **Sovereign Shards** within the SigmaOS lattice.
+## Step 1: Create the Shard File
 
-1
+All shards live in `kernel/core/`. Create `SovereignMyFeature.cpp`:
 
-All core shards must adhere to the **Singleton Pattern** to ensure a single source of truth for system state.
+```cpp
 
-1
+#include "sigma_types.h"
 
-#include "core/sigma_types.h"
+#include "sigma_hal.h"
 
-#include "hal/sigma_hal.h"
+#include "SovereignLibC.h"
 
-namespace SigmaOS {
-namespace Kernel {
-namespace MyModule {
+/**
 
-class SovereignMyShard : public SigmaObject {
+- SovereignMyFeature â€” What this shard does.
+
+- Algorithm: ALGORITHM_NAME
+
+- USP: What makes this sovereign vs. legacy Linux equivalent.
+ */
+
+class SovereignMyFeatureEngine {
 public:
-    static SovereignMyShard& getInstance() {
-        static SovereignMyShard instance;
+    static SovereignMyFeatureEngine& getInstance() {
+        static SovereignMyFeatureEngine instance;
         return instance;
     }
+
     void init() {
-        sigma_log_info("[MYSHARD] Initializing Sovereign Logic...");
+        sigma_log("[MYFEATURE] Initializing...");
     }
+
 private:
-    SovereignMyShard() = default;
+    SovereignMyFeatureEngine() {}
 };
 
-} // namespace MyModule
-} // namespace Kernel
-} // namespace SigmaOS
-
-1
-
-1
-
-Expose your shard to the C-based kernel initialization sequence via a bridge.
-
-1
-
-extern "C" void myshard_init() {
-    SigmaOS::Kernel::MyModule::SovereignMyShard::getInstance().init();
-    usr_register_shard("SovereignMyShard", SHARD_ID_GENERIC);
+extern "C" void myfeature_init() {
+    SovereignMyFeatureEngine::getInstance().init();
 }
 
-1
+```
 
-1
+## Step 2: Register in SovereignUSR
 
-Before submission, every shard must undergo the **Sovereign Audit**:
+After your shard is initialized, register it:
 
-1
+```c
 
-1
+usr_register_shard("SovereignMyFeature", 0x00FF);
 
-1. Create a `feature/` branch.
-2. Submit a Pull Request targeting the `main` branch.
-3. Ensure the shard is registered in the [Industrial Nexus](Industrial-Nexus) if it provides global USPs.
+```
 
----
-[**? Back to Home**](Home)
+## Step 3: Run Static Analysis
 
+```bash
+
+cppcheck --enable=warning,style kernel/core/SovereignMyFeature.cpp
+
+```
+
+## Step 4: Build
+
+```bash
+
+python3 tools/sigma-build.py
+
+```
+
+## Step 5: Submit a PR
+
+Ensure your PR description references:
+
+- The `IDEAS_BACKLOG.md` item or `ROADMAP.md` milestone it closes
+
+- The `cppcheck` output (zero warnings)
+
+- A wiki page update in `SigmaOS.wiki/`

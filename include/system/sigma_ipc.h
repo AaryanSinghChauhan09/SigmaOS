@@ -1,9 +1,9 @@
-#include "include/sigma_types.h"
+﻿#include "../sigma_types.h"
 #ifndef SIGMA_IPC_H
 #define SIGMA_IPC_H
 
-#include "../../include/core/sigma_kernel_types.h"
-#include "include/SigmaOOP.hpp"
+#include "../core/sigma_kernel_types.h"
+#include "../SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

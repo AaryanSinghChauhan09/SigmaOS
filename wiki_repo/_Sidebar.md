@@ -1,62 +1,90 @@
-# SigmaOS Sovereign Wiki
+﻿# SigmaOS Sovereign Wiki
 
-* [Home (Hub)](Home)
-* [Standalone](Home-Zenith-Standalone) | [Dual-boot](Home-Zenith-Dualboot) | [Core](Home-Zenith-Core)
-* [Browser](Home-Zenith-Browser) | [App](Home-Zenith-App) | [Stable](Home-Stable) | [Horizon](Home-Horizon)
+- [Home (Hub)](Home)
 
-## 🏛️ Core Concepts
+- [Standalone](Home-Zenith-Standalone) | [Dual-boot](Home-Zenith-Dualboot) | [Core](Home-Zenith-Core)
 
-* [Industrial Roadmap](ROADMAP.md)
-* [Architecture](Architecture)
-* [Lattice Subsystems](Subsystems)
-* [AI/ML Intelligence Nexus](AI-ML-Nexus)
-* [Sovereign Principles](SOVEREIGN_PRINCIPLES)
+- [Browser](Home-Zenith-Browser) | [App](Home-Zenith-App) | [Stable](Home-Stable) | [Horizon](Home-Horizon)
 
-## 🚀 Strategic Vision
+## ðŸ›ï¸ Core Concepts
 
-* [Linux Competitive Edge](Linux-Competitive-Edge)
-* [Leapfrog Strategy](Leapfrog-Strategy)
-* [Profession Center](PROFESSION-MAP)
-* [100-Step Roadmap](ULTIMATE-ADVANCEMENT-STRATEGY)
-* [SigmaOS vs The World](SigmaOS_vs_The_World)
+- [Industrial Roadmap](ROADMAP.md)
 
-## ⚙️ Technical Shards
+- [Architecture](Architecture)
 
-* [Kernel Modularization](MODULARIZATION_MAP)
-* [Post-Quantum Security](Verified-Boot)
-* [Zenith UI](ZENITH_UI)
-* [Self-Healing Engine](Sovereign_Self_Healing)
-* [Doctor Tool](Doctor_Tool)
-* [Trust Graph UI](Trust_Graph)
-* [AI Orchestration](AGENTS)
+- [Lattice Subsystems](Subsystems)
 
-## 👥 Community & Contribution
+- [AI/ML Intelligence Nexus](AI-ML-Nexus)
 
-* [Getting Started](Getting-Started)
-* [Contributing](CONTRIBUTING)
-* [Code of Conduct](CODE_OF_CONDUCT)
+- [Sovereign Principles](SOVEREIGN_PRINCIPLES)
 
-## 🏛️ Industrial Maintenance
+## ðŸš€ Strategic Vision
 
-* [Lattice Cleanup & Maintenance](Microkernel-Format)
-* [Incremental Shard Backup](Microkernel-Format)
-* [OS Problems & Solutions](Common-OS-Problems-Solutions)
+- [Linux Competitive Edge](Linux-Competitive-Edge)
 
-## 🏁 OS Format Guides & Toolsets
+- [Leapfrog Strategy](Leapfrog-Strategy)
 
-* [Format: Microkernel (Industrial baseline)](Microkernel-Format)
-* [Format: Distributed (Consensus & Network)](Distributed-Format)
-* [Format: RTOS (Safety-Critical & Creative)](RTOS-Format)
-* [Format: Cloud (Containers & Scaling)](Cloud-Format)
-* [Format: Mobile (Multimedia & Productivity)](Mobile-Format)
+- [Profession Center](PROFESSION-MAP)
 
-## 🛠️ Industrial Readiness
+- [100-Step Roadmap](ULTIMATE-ADVANCEMENT-STRATEGY)
 
-* [Kernel Developer Handbook](Kernel-Developer-Handbook)
-* [Dual-Boot Compatibility Matrix](Dual-Boot-Compatibility-Matrix)
-* [Embedded Hardware Compatibility](Embedded-Hardware-Compatibility)
-* [Performance Benchmarks](PERFORMANCE.md)
-* [Zenith v15.0 Changelog](CHANGELOG.md)
+- [SigmaOS vs The World](SigmaOS_vs_The_World)
+
+## âš™ï¸ Technical Shards
+
+- [Kernel Modularization](MODULARIZATION_MAP)
+
+- [Post-Quantum Security](Verified-Boot)
+
+- [Zenith UI](ZENITH_UI)
+
+- [Self-Healing Engine](Sovereign_Self_Healing)
+
+- [Doctor Tool](Doctor_Tool)
+
+- [Trust Graph UI](Trust_Graph)
+
+- [AI Orchestration](AGENTS)
+
+## ðŸ‘¥ Community & Contribution
+
+- [Getting Started](Getting-Started)
+
+- [Contributing](CONTRIBUTING)
+
+- [Code of Conduct](CODE_OF_CONDUCT)
+
+## ðŸ›ï¸ Industrial Maintenance
+
+- [Lattice Cleanup & Maintenance](Microkernel-Format)
+
+- [Incremental Shard Backup](Microkernel-Format)
+
+- [OS Problems & Solutions](Common-OS-Problems-Solutions)
+
+## ðŸ OS Format Guides & Toolsets
+
+- [Format: Microkernel (Industrial baseline)](Microkernel-Format)
+
+- [Format: Distributed (Consensus & Network)](Distributed-Format)
+
+- [Format: RTOS (Safety-Critical & Creative)](RTOS-Format)
+
+- [Format: Cloud (Containers & Scaling)](Cloud-Format)
+
+- [Format: Mobile (Multimedia & Productivity)](Mobile-Format)
+
+## ðŸ› ï¸ Industrial Readiness
+
+- [Kernel Developer Handbook](Kernel-Developer-Handbook)
+
+- [Dual-Boot Compatibility Matrix](Dual-Boot-Compatibility-Matrix)
+
+- [Embedded Hardware Compatibility](Embedded-Hardware-Compatibility)
+
+- [Performance Benchmarks](PERFORMANCE.md)
+
+- [Zenith v15.0 Changelog](CHANGELOG.md)
 
 ---
 

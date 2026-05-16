@@ -1,7 +1,7 @@
 #ifndef SIGMA_SCHEDULER_H
 #define SIGMA_SCHEDULER_H
 
-#include "../../include/core/SigmaOOP.hpp"
+#include "../core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -9,6 +9,7 @@ namespace Orchestration {
 
 struct SovereignTask {
     sigma_u32 id;
+    void (*func)();     // Task entry point
     sigma_u64 vruntime; // Virtual Runtime for CFS fairness
     sigma_u32 priority;
     bool active;
@@ -32,7 +33,6 @@ private:
 } // namespace Orchestration
 } // namespace Kernel
 } // namespace SigmaOS
-#endif
 
 #ifdef __cplusplus
 extern "C" {

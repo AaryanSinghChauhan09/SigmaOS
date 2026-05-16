@@ -1,4 +1,4 @@
-#include "../include/hal/sigma_hal.h"
+﻿#include "../include/hal/sigma_hal.h"
 #include "../include/sigma_log.h"
 
 /**

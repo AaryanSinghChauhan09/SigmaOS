@@ -1,10 +1,10 @@
-#include "../../../include/sigma_log.h"
+﻿#include "../../../include/sigma_log.h"
 #include "../../../include/core/sigma_types.h"
 #include "../../../include/hal/sigma_hal.h"
 #include "../../../include/core/sigma_kernel_types.h"
 #include "../../../include/libc/SovereignLibC.h"
 #include "../../../include/core/SigmaOOP.hpp"
-#include "security/SovereignQKD.hpp"
+#include "../../../include/security/SovereignQKD.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

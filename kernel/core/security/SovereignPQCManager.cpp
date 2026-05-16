@@ -32,7 +32,7 @@ public:
     }
 
     void encryptShard(const char* shard_name, void* data, sigma_size_t size) {
-        sigma_log_info("[S-PQC] Encrypting shard '%s' [%zu bytes] with Kyber-1024...", shard_name, size);
+        sigma_log_info("[S-PQC] Encrypting shard '%s' [%zu bytes] at %p with Kyber-1024...", shard_name, size, data);
         // Simulate encryption
         sigma_log_info("[S-PQC] Shard encryption COMPLETE. State: QUANTUM-SECURE.");
     }

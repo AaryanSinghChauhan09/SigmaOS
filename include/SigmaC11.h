@@ -1,8 +1,8 @@
-/*
+﻿/*
  * =========================================================================
- * Î£ SIGMAOS: SIGMA C11 FOUNDATION (v20.0 - PURE C11 REPLACEMENT)
+ * ÃŽÂ£ SIGMAOS: SIGMA C11 FOUNDATION (v20.0 - PURE C11 REPLACEMENT)
  * =========================================================================
- * Replaces SigmaOOP.hpp â€ all C++ OOP constructs eliminated.
+ * Replaces SigmaOOP.hpp Ã¢â‚¬ all C++ OOP constructs eliminated.
  * Provides: core types, sigma_status, sigma_log, fundamental macros.
  * Standard: C11 (ISO/IEC 9899:2011). No namespaces. No classes. No vtables.
  *
@@ -17,7 +17,7 @@
 #ifndef SIGMA_C11_H
 #define SIGMA_C11_H
 
-#include "../include/libc/SovereignLibC.h"
+#include "./libc/SovereignLibC.h"
 
 /* =========================================================================
  * Common typedefs used across shards

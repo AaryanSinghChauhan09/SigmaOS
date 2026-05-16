@@ -1,4 +1,4 @@
-#include "../include/hal/sigma_hal.h"
+﻿#include "../include/hal/sigma_hal.h"
 #include "../include/sigma_log.h"
 #include "../include/core/sigma_types.h"
 #include "../include/sigma_log.h"
@@ -11,7 +11,7 @@
  * SigmaOS Sovereign Editor (v28.0 Zenith)
  * A zero-dependency, bare-metal text orchestration shard.
  *
- * Design: OOP-isolated singleton — SovereignEditEngine.
+ * Design: OOP-isolated singleton â€” SovereignEditEngine.
  */
 
 class SovereignEditEngine {

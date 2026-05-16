@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SANDBOX CONTAINER (S-SANDBOX)
+ * Î£ SIGMAOS: SOVEREIGN SANDBOX CONTAINER (S-SANDBOX)
  * =========================================================================
  * Mission: Isolated, zero-trust execution environments for all applications.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_SANDBOX_H
 #define SIGMA_SANDBOX_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

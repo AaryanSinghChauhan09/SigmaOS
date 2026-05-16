@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN EMOTION UX (S-EMOTION)
+ * Î£ SIGMAOS: SOVEREIGN EMOTION UX (S-EMOTION)
  * =========================================================================
  * Mission: A hyper-personalized layer that analyzes subtle user cues
  * (voice stress, facial tension) to dynamically adjust OS responsiveness,
@@ -11,7 +11,7 @@
 #ifndef SIGMA_EMOTION_H
 #define SIGMA_EMOTION_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

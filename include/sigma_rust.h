@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN RUST INTEROP (S-RUSTINTEROP)
+ * Î£ SIGMAOS: SOVEREIGN RUST INTEROP (S-RUSTINTEROP)
  * =========================================================================
  * Mission: Provide zero-overhead memory-safe Rust bindings for drivers,
  * positioning SigmaOS as a memory-safe, high-speed singularity.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_RUST_H
 #define SIGMA_RUST_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

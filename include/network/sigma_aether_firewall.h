@@ -1,15 +1,15 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN AETHER FIREWALL (Neural Nexus)
+ * Î£ SIGMAOS: SOVEREIGN AETHER FIREWALL (Neural Nexus)
  * =========================================================================
  * Mission: AI-driven packet filtering and protocol ghosting.
- * Layer  : L2 — System Services / Network
+ * Layer  : L2 â€” System Services / Network
  * =========================================================================
  */
 #ifndef SIGMA_AETHER_FIREWALL_H
 #define SIGMA_AETHER_FIREWALL_H
 
-#include "include/sigma_types.h"
+#include "../sigma_types.h"
 
 #ifdef __cplusplus
 namespace SigmaOS {

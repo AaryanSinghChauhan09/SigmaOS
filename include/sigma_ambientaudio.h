@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN AMBIENT AUDIO (S-AMBIENTAUDIO)
+ * Î£ SIGMAOS: SOVEREIGN AMBIENT AUDIO (S-AMBIENTAUDIO)
  * =========================================================================
  * Mission: Generative background audioscapes native to the kernel to 
  * improve focus, flow states, and drown out distracting background noise.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_AMBIENTAUDIO_H
 #define SIGMA_AMBIENTAUDIO_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

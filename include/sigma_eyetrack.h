@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN EYE TRACKING (S-EYETRACK)
+ * Î£ SIGMAOS: SOVEREIGN EYE TRACKING (S-EYETRACK)
  * =========================================================================
  * Mission: Utmost accessibility and hands-free control via highly 
  * accurate, silicon-accelerated pupillary tracking.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_EYETRACK_H
 #define SIGMA_EYETRACK_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

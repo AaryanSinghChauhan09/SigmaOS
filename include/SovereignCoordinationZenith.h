@@ -1,9 +1,9 @@
-#ifndef SOVEREIGN_COORDINATION_ZENITH_H
+﻿#ifndef SOVEREIGN_COORDINATION_ZENITH_H
 #define SOVEREIGN_COORDINATION_ZENITH_H
 
-#include "../include/libc/SovereignLibC.h"
+#include "./libc/SovereignLibC.h"
 
-#include "../include/core/SigmaOOP.hpp"
+#include "./core/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Coordination {

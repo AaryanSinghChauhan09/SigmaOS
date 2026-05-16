@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ENERGY-AWARE SCHEDULER (S-ENERGYSCHED)
+ * Î£ SIGMAOS: SOVEREIGN ENERGY-AWARE SCHEDULER (S-ENERGYSCHED)
  * =========================================================================
  * Mission: Prioritize low-power operations for IoT and mobile devices,
  * making SigmaOS greener than traditional Linux.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_ENERGYSCHED_H
 #define SIGMA_ENERGYSCHED_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

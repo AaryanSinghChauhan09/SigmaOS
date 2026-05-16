@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN NETWORK MONITOR (S-NETMONITOR)
+ * Î£ SIGMAOS: SOVEREIGN NETWORK MONITOR (S-NETMONITOR)
  * =========================================================================
  * Mission: Real-time, per-process network traffic visualization with 
  * anomaly detection and bandwidth throttling per shard.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_NETMONITOR_H
 #define SIGMA_NETMONITOR_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

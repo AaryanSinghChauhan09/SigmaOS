@@ -1,7 +1,7 @@
-#include "../include/core/SigmaOOP.hpp"
+﻿#include "../include/core/SigmaOOP.hpp"
 #include "../include/core/sigma_types.h"
 #include "../include/sigma_log.h"
-#include "ui/SovereignGUI.cpp"
+#include "../include/ui/SovereignGUI.h"
 
 /**
  * SigmaOS Zenith Desktop Orchestrator (Z-DESKTOP)

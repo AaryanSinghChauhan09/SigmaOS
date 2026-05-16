@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN VIRTUAL MEMORY (MMU)
+ * Î£ SIGMAOS: SOVEREIGN VIRTUAL MEMORY (MMU)
  * =========================================================================
  * Mission: Zero-latency address translation and shard-isolated paging.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_MMU_H
 #define SIGMA_MMU_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

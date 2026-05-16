@@ -5,21 +5,21 @@
  */
 
 .section .text
-.global sigma_memcpy
-.global sigma_memset
-.global sigma_strlen
+.global sigma_memcpy_asm
+.global sigma_memset_asm
+.global sigma_strlen_asm
 
-# void* sigma_memcpy(void* dest, const void* src, sigma_size_t n)
+# void* sigma_memcpy_asm(void* dest, const void* src, sigma_size_t n)
 # RDI = dest, RSI = src, RDX = n
-sigma_memcpy:
+sigma_memcpy_asm:
     mov %rdi, %rax          # Return value is dest
     mov %rdx, %rcx          # RCX = count
     rep movsb               # Copy RCX bytes from RSI to RDI
     ret
 
-# void* sigma_memset(void* s, int c, sigma_size_t n)
+# void* sigma_memset_asm(void* s, int c, sigma_size_t n)
 # RDI = s, RSI = c, RDX = n
-sigma_memset:
+sigma_memset_asm:
     mov %rdi, %rax          # Return value is s
     mov %rsi, %rcx          # RCX = value (c)
     mov %rdx, %r8           # Save n
@@ -29,9 +29,9 @@ sigma_memset:
     mov %rdi, %rax          # Return s
     ret
 
-# sigma_size_t sigma_strlen(const char* s)
+# sigma_size_t sigma_strlen_asm(const char* s)
 # RDI = s
-sigma_strlen:
+sigma_strlen_asm:
     xor %rax, %rax          # RAX = 0 (counter)
 .L_strlen_loop:
     cmpb $0, (%rdi, %rax)   # Is s[RAX] == 0?

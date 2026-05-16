@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN INTER-PROCESS COMMUNICATION (IPC)
+ * Î£ SIGMAOS: SOVEREIGN INTER-PROCESS COMMUNICATION (IPC)
  * =========================================================================
  * Mission: Zero-copy shard-mapped message passing.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_IPC_H
 #define SIGMA_IPC_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

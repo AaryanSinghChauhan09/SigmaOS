@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN USB SUBSYSTEM (S-USB)
+ * Î£ SIGMAOS: SOVEREIGN USB SUBSYSTEM (S-USB)
  * =========================================================================
  * Mission: USB 3.x/3.1/4.0 host controller orchestration at bare metal.
  * Competitor parity: Linux xhci-hcd / Windows USBHUB / macOS IOUSBFamily.
@@ -11,7 +11,7 @@
 #ifndef SIGMA_USB_H
 #define SIGMA_USB_H
 
-#include "include/sigma_types.h"
+#include "../sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,32 +1,39 @@
-# 🛠 INTELLIGENCE_OFFICER Profile
+﻿# ðŸ›  INTELLIGENCE_OFFICER Profile
 
 ## Required Tools & Functions
 
 - Signals intelligence (SIGINT) analyzer
+
 - OSINT-Lattice
+
 - secure satellite uplink
+
 - steganography detector
 
-## 📜 Compliance Rules
+## ðŸ“œ Compliance Rules
 
 - Classified protocols
+
 - zero-trust communication
 
-## 🧮 Professional Calculators
+## ðŸ§® Professional Calculators
 
 - Encryption strength
+
 - signal-to-noise ratio
+
 - geolocation triangulator
 
-## 🧬 Core Algorithms
+## ðŸ§¬ Core Algorithms
 
 - Heuristic pattern matching
+
 - semantic link analysis
 
-## 🛡 Self-Healing Strategy
+## ðŸ›¡ Self-Healing Strategy
 
 - Secure channel re-establishment, payload sanitization
 
-## 🔄 Rollback Strategy
+## ðŸ”„ Rollback Strategy
 
 - Redaction-safe state restoration, operational security (OPSEC) baseline

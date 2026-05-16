@@ -1,7 +1,7 @@
-#ifndef SOVEREIGNPERSONALIZER_H
+﻿#ifndef SOVEREIGNPERSONALIZER_H
 #define SOVEREIGNPERSONALIZER_H
-#include "../include/core/sigma_types.h"
-#include "../include/sigma_log.h"
+#include "./core/sigma_types.h"
+#include "./sigma_log.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

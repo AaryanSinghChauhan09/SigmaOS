@@ -1,4 +1,4 @@
-/*
+﻿/*
  * =========================================================================
  * SIGMAOS: SOVEREIGN SANDBOX CONTAINER (S-SANDBOX)
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_SANDBOX_H
 #define SIGMA_SANDBOX_H
 
-#include "include/sigma_types.h"
+#include "../sigma_types.h"
 
 typedef struct {
     sigma_u32 container_id;

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN NATIVE IDE (S-IDE)
+ * Î£ SIGMAOS: SOVEREIGN NATIVE IDE (S-IDE)
  * =========================================================================
  * Mission: OS-native, lightweight development environment for kernel shards.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_IDE_H
 #define SIGMA_IDE_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

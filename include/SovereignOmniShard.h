@@ -1,4 +1,4 @@
-/*
+﻿/*
  * =========================================================================
  * SIGMAOS: SOVEREIGN OMNI-SHARD (v20.0 - PURE C11 FINALITY)
  * =========================================================================
@@ -10,8 +10,8 @@
 #ifndef SOVEREIGN_OMNI_SHARD_H
 #define SOVEREIGN_OMNI_SHARD_H
 
-#include "../include/libc/SovereignLibC.h"
-#include "../include/sigma_system_shards.h"
+#include "./libc/SovereignLibC.h"
+#include "./sigma_system_shards.h"
 
 /* =========================================================================
  * DOMAIN: OS KERNEL & ADVANCED SCHEDULING

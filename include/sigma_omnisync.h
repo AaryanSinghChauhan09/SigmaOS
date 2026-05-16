@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN OMNI-SYNC ENGINE (S-OMNISYNC)
+ * Î£ SIGMAOS: SOVEREIGN OMNI-SYNC ENGINE (S-OMNISYNC)
  * =========================================================================
  * Mission: Unified, zero-configuration background data synchronization 
  * across the Sovereign Lattice using the Zero-Trust Network.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_OMNISYNC_H
 #define SIGMA_OMNISYNC_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

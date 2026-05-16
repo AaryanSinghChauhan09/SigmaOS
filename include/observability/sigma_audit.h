@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SYSTEM AUDIT (S-AUDIT)
+ * Î£ SIGMAOS: SOVEREIGN SYSTEM AUDIT (S-AUDIT)
  * =========================================================================
  * Mission: Continuous lattice auditing and industrial-grade integrity validation.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_AUDIT_H
 #define SIGMA_AUDIT_H
 
-#include "include/sigma_types.h"
+#include "../sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

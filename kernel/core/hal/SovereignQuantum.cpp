@@ -19,7 +19,7 @@ public:
     const char* type_name() const noexcept override { return "SovereignQuantum"; }
 
     void init() {
-        sigma_log_info("[QUANTUM] Initializing Sovereign Quantum-Shard Interop (QSI)...");
+        sigma_log_info("[QUANTUM] Initializing Sovereign Quantum-Shard Interop (QSI) with %u qubits...", this->m_qubits);
         this->m_initialized = true;
     }
 
@@ -28,6 +28,7 @@ public:
             sigma_log_info("[QUANTUM] QSI: Engine not initialized. Discarding circuit.");
             return;
         }
+        (void)circuit_data;
         sigma_log_info("[QUANTUM] QSI: Dispatching quantum circuit to silicon-native accelerator...");
         sigma_log_info("[QUANTUM] QSI: Result coherent. Lattice state synchronized.");
     }

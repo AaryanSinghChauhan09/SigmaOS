@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN PANIC RECOVERY (S-PANICRECOV)
+ * Î£ SIGMAOS: SOVEREIGN PANIC RECOVERY (S-PANICRECOV)
  * =========================================================================
  * Mission: Industrial-grade kernel panic handler that captures full 
  * register state, generates a diagnostic report, and attempts automatic
@@ -11,7 +11,7 @@
 #ifndef SIGMA_PANICRECOV_H
 #define SIGMA_PANICRECOV_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

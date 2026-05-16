@@ -1,9 +1,9 @@
-#include "../include/sigma_log.h"
-#include "include/SovereignLibC.h"
-#include "include/sigma_types.h"
+#include "./include/sigma_log.h"
+#include "./include/SovereignLibC.h"
+#include "./include/sigma_types.h"
 
-#include "../include/sigma_gesture.h"
-#include "include/hal/sigma_hal.h"
+#include "./include/sigma_gesture.h"
+#include "./include/hal/sigma_hal.h"
 
 
 /**

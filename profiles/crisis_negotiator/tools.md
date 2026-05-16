@@ -1,31 +1,37 @@
-# 🛠 CRISIS_NEGOTIATOR Profile
+﻿# ðŸ›  CRISIS_NEGOTIATOR Profile
 
 ## Required Tools & Functions
 
 - Voice-stress analyzer
+
 - semantic sentiment engine
+
 - hostage-link bridge
+
 - secure-comms
 
-## 📜 Compliance Rules
+## ðŸ“œ Compliance Rules
 
 - Negotiation protocols
+
 - de-escalation guidelines
 
-## 🧮 Professional Calculators
+## ðŸ§® Professional Calculators
 
 - Time-elapsed risk
+
 - psychological profile score
 
-## 🧬 Core Algorithms
+## ðŸ§¬ Core Algorithms
 
 - Behavioral change staircase model
+
 - automated sentiment tracking
 
-## 🛡 Self-Healing Strategy
+## ðŸ›¡ Self-Healing Strategy
 
 - Communication-link stability check, secure-line verification
 
-## 🔄 Rollback Strategy
+## ðŸ”„ Rollback Strategy
 
 - Negotiation log history, previous incident case-restoration

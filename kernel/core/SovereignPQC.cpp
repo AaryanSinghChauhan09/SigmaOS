@@ -1,7 +1,7 @@
-#include "../../include/core/sigma_types.h"
+﻿#include "../../include/core/sigma_types.h"
 #include "../../include/sigma_log.h"
 #include "../../include/libc/SovereignLibC.h"
-#include "security/sigma_pqc.h"
+#include "../../include/security/sigma_pqc.h"
 
 /* =========================================================================
  * SIGMAOS: POST-QUANTUM CRYPTOGRAPHY ENGINE v2.0

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN AUDIO ENGINE (SAE)
+ * Î£ SIGMAOS: SOVEREIGN AUDIO ENGINE (SAE)
  * =========================================================================
  * Mission: Silicon-native, zero-latency waveform orchestration.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_AUDIO_H
 #define SIGMA_AUDIO_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

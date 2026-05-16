@@ -1,16 +1,16 @@
-#include "../../../include/sigma_log.h"
+﻿#include "../../../include/sigma_log.h"
 #include "../../../include/libc/SovereignLibC.h"
 #include "../../../include/hal/sigma_hal.h"
 #include "../../../include/core/sigma_types.h"
-#include "ai/sigma_cognitive.h"
-#include "ai/sigma_neural.h"
+#include "../../../include/ai/sigma_cognitive.h"
+#include "../../../include/ai/sigma_neural.h"
 
 /**
  * SigmaOS Sovereign Cognitive Shard Orchestrator Implementation
  * Implements a Neural Lattice Optimization (NLO) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal neural orchestration.
  *
- * Design: OOP-isolated singleton � SovereignCognitiveEngine.
+ * Design: OOP-isolated singleton ï¿½ SovereignCognitiveEngine.
  */
 
 /* --- Sovereign Cognitive Engine (OOP Isolation) --- */

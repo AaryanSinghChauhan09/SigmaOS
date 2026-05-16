@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN SHARD MANIFEST (S-MANIFEST)
+ * Î£ SIGMAOS: SOVEREIGN SHARD MANIFEST (S-MANIFEST)
  * =========================================================================
  * Mission: Declarative, atomic lattice configuration and state persistence.
  * Inspired by NixOS / Declarative Infrastructure.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_MANIFEST_H
 #define SIGMA_MANIFEST_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

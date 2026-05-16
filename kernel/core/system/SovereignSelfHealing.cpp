@@ -1,4 +1,4 @@
-/**
+﻿/**
  * =========================================================================
  * S SIGMAOS: SOVEREIGN SELF-HEALING (v1.1 - LATTICE RESILIENCE)
  * =========================================================================
@@ -11,7 +11,7 @@
 
 #include "../../../include/core/sigma_types.h"
 #include "../../../include/sigma_log.h"
-#include "ipc/SovereignEventBus.h"
+#include "../../../include/ipc/SovereignEventBus.h"
 
 namespace SigmaOS {
 namespace Kernel {

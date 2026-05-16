@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN MEMORY PALACE (S-MEMORYPALACE)
+ * Î£ SIGMAOS: SOVEREIGN MEMORY PALACE (S-MEMORYPALACE)
  * =========================================================================
  * Mission: A revolutionary timeline-based file explorer that organizes
  * data by when and where it was used, completely replacing hierarchical folders.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_MEMORYPALACE_H
 #define SIGMA_MEMORYPALACE_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

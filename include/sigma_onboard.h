@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN ONBOARDING WIZARD (S-ONBOARD)
+ * Î£ SIGMAOS: SOVEREIGN ONBOARDING WIZARD (S-ONBOARD)
  * =========================================================================
  * Mission: A first-boot guided setup that configures Persona, Biometrics,
  * Accessibility, Theme, and Network in a beautiful, step-by-step flow.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_ONBOARD_H
 #define SIGMA_ONBOARD_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

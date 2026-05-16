@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN GLOBAL LATTICE SYNC (S-SYNC)
+ * Î£ SIGMAOS: SOVEREIGN GLOBAL LATTICE SYNC (S-SYNC)
  * =========================================================================
  * Mission: Zero-latency global state synchronisation across lattice shards.
  * Competitor parity: Chrony/NTP, Git-sync, AWS Global Accelerator (concept).
@@ -11,7 +11,7 @@
 #ifndef SIGMA_GLOBAL_SYNC_H
 #define SIGMA_GLOBAL_SYNC_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

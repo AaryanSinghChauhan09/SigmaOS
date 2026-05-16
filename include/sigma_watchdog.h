@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN WATCHDOG (S-WATCH)
+ * Î£ SIGMAOS: SOVEREIGN WATCHDOG (S-WATCH)
  * =========================================================================
  * Mission: Hardware + software heartbeat for kernel liveness guarantee.
  * Competitor parity: Linux watchdog subsystem / Windows WHEA / macOS Panic.
@@ -11,7 +11,7 @@
 #ifndef SIGMA_WATCHDOG_H
 #define SIGMA_WATCHDOG_H
 
-#include "../include/core/sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {
