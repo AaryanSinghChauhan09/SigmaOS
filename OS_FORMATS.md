@@ -4,8 +4,8 @@ SigmaOS Zenith v15.0 can be deployed in multiple specialized profiles depending 
 
 ## 1. Monolithic (Desktop/Workstation)
 *   **Target**: High-performance workstations and daily-driver desktops.
-*   **Features**: Full GPU/Vulkan support, Zenith Compositor, Sovereign Office Suite, Wi-Fi 6E.
-*   **Optimized for**: Maximum user responsiveness and peripheral compatibility.
+*   **Features**: Full GPU/Vulkan support, Zenith Compositor, Sovereign Office Suite, Wi-Fi 6E, **Sigma-Game-Mode**.
+*   **Optimized for**: Maximum user responsiveness, gaming performance, and peripheral compatibility.
 
 ## 2. Hybrid (Edge/Server)
 *   **Target**: Edge servers and high-availability infrastructure.
@@ -24,13 +24,13 @@ SigmaOS Zenith v15.0 can be deployed in multiple specialized profiles depending 
 
 ## 5. Forensic (Audit/Recovery)
 *   **Target**: Incident response, digital forensics, and silicon recovery.
-*   **Features**: Hardware Write-Blockers, Silicon-Direct Memory Dumper, PQC Integrity Auditor.
-*   **Optimized for**: Air-gapped, read-only auditing and evidence preservation.
+*   **Features**: Hardware Write-Blockers, Silicon-Direct Memory Dumper, PQC Integrity Auditor, **S-Recovery Snapshot Rollback**.
+*   **Optimized for**: Air-gapped, read-only auditing, evidence preservation, and disaster recovery.
 
 ## 6. Mobile (Arm64/RISC-V)
 *   **Target**: Tablets, smartphones, and low-power handhelds.
-*   **Features**: Aggressive AI-Telemetry power management, touch-optimized glassmorphism, cellular S-NET shards.
-*   **Optimized for**: Battery longevity and heterogeneous ARM/RISC-V architecture.
+*   **Features**: Aggressive AI-Telemetry power management, touch-optimized glassmorphism, cellular S-NET shards, **GPIO/IoT Sensor Toolkit**.
+*   **Optimized for**: Battery longevity, heterogeneous ARM/RISC-V architecture, and embedded IoT sensing.
 
 ---
 **Profile Switching**: Profiles can be toggled via the `Sovereign Choice Installer` or at runtime using `sigma-cli profile <name>`.
