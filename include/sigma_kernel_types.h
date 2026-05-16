@@ -53,7 +53,10 @@ typedef int                sigma_bool;
 #define K_ERR_NOTFOUND   -4
 #define K_ERR_PERM       -5
 
+#ifndef SIGMA_STATUS_DEFINED
+#define SIGMA_STATUS_DEFINED
 typedef sigma_i32 sigma_status;
+#endif
 
 /* ---- intrinsics ---- */
 static inline void cpu_halt(void)  { __asm__ __volatile__("cli; hlt"); }

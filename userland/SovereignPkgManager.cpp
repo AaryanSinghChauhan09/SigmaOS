@@ -1,13 +1,11 @@
-﻿/**
+/**
  * SigmaOS Sovereign Package Manager (S-PKG)
  * v29.0 Zenith Foundation â€” Industrial Software Distribution
  * ZERO-DEPENDENCY: Strictly bare-metal package extraction.
  */
 
-#include "../include/hal/sigma_hal.h"
 #include "../include/sigma_log.h"
 #include "../include/core/sigma_types.h"
-#include "../include/fs/sigma_vfs.h"
 
 class SovereignPackageManager {
 public:

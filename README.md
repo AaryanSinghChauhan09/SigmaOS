@@ -85,8 +85,7 @@ SigmaOS adheres to a rigorous technical roadmap to ensure total parity and effic
 We welcome contributions from the community. Please read our [Contributor Guidelines](CONTRIBUTING.md) and the [Wiki Contributor Guidelines](wiki_repo/Contributor-Guidelines.md) for details on our code of conduct, development rules, and the process for submitting pull requests.
 
 ## 🔑 Getting Started (Industrial Quick Start)
-
-1. **Install Toolchain**: `./scripts/setup.sh`
+: `./scripts/setup.sh`
 
 2. **Clone the Shard**: `git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git`
 
