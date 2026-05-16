@@ -10357,6 +10357,7 @@ SigmaOS/
 │   ├── sigma_dev_dashboard.cpp
 │   ├── sigma_edge_ml.cpp
 │   ├── sigma_edge_vision.cpp
+│   ├── sigma_education.cpp
 │   ├── sigma_energy.cpp
 │   ├── sigma_enterprise_recovery.cpp
 │   ├── sigma_fsck.cpp

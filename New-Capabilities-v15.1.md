@@ -384,6 +384,15 @@ Built-in profiles:
 
 **C API:** `workspace_init()`, `workspace_load()`, `workspace_list()`
 
+### Sigma Education Profile (`tools/sigma_education.cpp`)
+
+Classroom management shards.
+
+- Deterministic workspace lock-in for testing and focus
+- Disables clipboard and restricts network access in exam mode
+
+**C API:** `edu_init()`, `edu_exam_mode()`, `edu_broadcast()`
+
 ### Sigma Accessibility Hub (`tools/sigma_accessibility.cpp`)
 
 One-click accessibility presets.
