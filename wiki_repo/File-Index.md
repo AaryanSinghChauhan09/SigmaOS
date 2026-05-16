@@ -10341,6 +10341,7 @@ SigmaOS/
 │   ├── reconcile_shards.py
 │   ├── release_auto.py
 │   ├── sigma_accessibility.cpp
+│   ├── sigma_adaptive_input.cpp
 │   ├── sigma_api_gateway.cpp
 │   ├── sigma_archive_suite.cpp
 │   ├── sigma_audio_mixer.cpp
@@ -10352,6 +10353,8 @@ SigmaOS/
 │   ├── sigma_cloud_sync.cpp
 │   ├── sigma_cluster.cpp
 │   ├── sigma_compliance_cli.cpp
+│   ├── sigma_debug_cli.cpp
+│   ├── sigma_dev_dashboard.cpp
 │   ├── sigma_edge_ml.cpp
 │   ├── sigma_edge_vision.cpp
 │   ├── sigma_energy.cpp
@@ -10361,7 +10364,9 @@ SigmaOS/
 │   ├── sigma_inspector.cpp
 │   ├── sigma_latency.cpp
 │   ├── sigma_log_visualizer.cpp
+│   ├── sigma_mirror_manager.cpp
 │   ├── sigma_notifications.cpp
+│   ├── sigma_personalisation.cpp
 │   ├── sigma_policy_engine.cpp
 │   ├── sigma_quantum_simulator.cpp
 │   ├── sigma_robotics_planner.cpp
