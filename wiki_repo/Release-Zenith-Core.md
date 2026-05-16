@@ -9,6 +9,7 @@ Welcome to the **Sovereign Singularity Heart**. The Core Edition is the pure, ba
 2. **Ignite**: Boot into the **Silicon-Direct CLI**.
 
 3. **Configure**: Manually define shard allocation limits via `sigma-config`.
+
    ```bash
 
    core-init --shards 1024 --mem-lock secure

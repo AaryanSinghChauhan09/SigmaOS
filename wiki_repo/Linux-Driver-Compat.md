@@ -54,5 +54,4 @@ By offering a seamless path for existing Linux tools and drivers, SigmaOS elimin
 
 ---
 
-### Bridging the gap between legacy flexibility and sovereign efficiency.
-
+### Bridging the gap between legacy flexibility and sovereign efficiency

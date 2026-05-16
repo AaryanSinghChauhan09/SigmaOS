@@ -6,7 +6,7 @@ SigmaOS is not an "operating system" in the traditional sense; it is a **Soverei
 
 ### 1. The Shard Lattice (Ring-0)
 
-Unlike a standard microkernel, SigmaOS treats every system component (Memory, Network, Drivers) as an isolated, hot-swappable **Shard**. 
+Unlike a standard microkernel, SigmaOS treats every system component (Memory, Network, Drivers) as an isolated, hot-swappable **Shard**.
 
 - 600+ Shards operating in parallel.
 

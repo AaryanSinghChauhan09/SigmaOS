@@ -27,4 +27,3 @@ SigmaOS enforces a strict [Code of Conduct](CODE_OF_CONDUCT.md). We prioritize i
 1
 
 By adhering to this charter, SigmaOS aims to transition from a single-architect project to a globally trusted, decentralized operating system ecosystem.
-

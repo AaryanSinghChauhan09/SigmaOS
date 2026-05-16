@@ -55,4 +55,3 @@ We don't aim to replace Linux everywhere at once. We dominate **Sovereign Silico
 
 ---
 *These features represent the definitive path for SigmaOS to redefine the modern operating system landscape.*
-

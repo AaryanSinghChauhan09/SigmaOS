@@ -15,4 +15,3 @@ By adhering to these paths, SigmaOS ensures that:
 2. **User Onboarding**: Users from Ubuntu, Fedora, or Arch find a recognizable environment.
 
 3. **Application Portability**: Linux applications can locate resources using standard FHS assumptions.
-

@@ -47,4 +47,3 @@ We strongly encourage developers to submit patches for unsupported hardware!
 2. Find an open Driver Request issue.
 
 3. Submit a Pull Request targeting the `drivers/linux_distros/` compatibility modules.
-

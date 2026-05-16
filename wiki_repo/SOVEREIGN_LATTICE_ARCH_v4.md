@@ -20,9 +20,9 @@ All internal dependencies now utilize project-relative paths to prevent namespac
 
 1
 
-#include "suites/S01_Genesis/shards/sigma_types.h"
+# include "suites/S01_Genesis/shards/sigma_types.h"
 
-#include "suites/S10_Registry/shards/SovereignRegistry.h"
+# include "suites/S10_Registry/shards/SovereignRegistry.h"
 
 1
 
@@ -34,4 +34,3 @@ Each suite operates as a "Sovereign Domain," verified by the Global Integration 
 **Status**: Architecture Finalized and Verified.
 **Lattice Count**: 33 Master Suites.
 **Shard Limit**: 281.4 Trillion (48-bit addressing).
-

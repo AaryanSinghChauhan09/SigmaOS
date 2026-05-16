@@ -56,7 +56,7 @@ Extends: [`ClientOptions`](/docs/docs/api/Client.md#parameter-clientoptions)
 
 - Load balancer uses source-IP-hash or sticky sessions
 
-### How it works:
+### How it works
 
 1. `RoundRobinPool` creates N TCP connections to the load balancer endpoint
 
@@ -158,4 +158,3 @@ await pool.close()
 - [BalancedPool](/docs/docs/api/BalancedPool.md) - Load balancing across multiple origins
 
 - [Issue #3648](https://github.com/nodejs/undici/issues/3648) - Original issue describing uneven distribution
-

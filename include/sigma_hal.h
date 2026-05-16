@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN HARDWARE ABSTRACTION LAYER (HAL)
  * =========================================================================
@@ -22,7 +22,6 @@ void hal_init(void);
 void hal_shutdown(void);
 
 /* --- Industrial Logging --- */
-void sigma_log(const char* msg);
 void sigma_printf(const char* format, ...);
 
 /* --- CPU Control --- */

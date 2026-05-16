@@ -32,4 +32,3 @@ This document defines the formal technical requirements for any code unit ("Shar
 
 ---
 *By adhering to this specification, SigmaOS remains the world's only freestanding, sharded, and sovereign ecosystem.*
-

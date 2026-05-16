@@ -36,4 +36,4 @@
 
 ---
 
-### Stay Sovereign.
+### Stay Sovereign

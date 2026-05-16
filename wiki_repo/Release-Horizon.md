@@ -7,6 +7,7 @@ Welcome to the **Sovereign Future Shard**. The Horizon edition is the bleeding-e
 1. **Clone**: Use the `main` branch of the SigmaOS repository.
 
 2. **Build**: Run the industrial build orchestrator.
+
    ```powershell
 
    ./scripts/industrial_build.ps1

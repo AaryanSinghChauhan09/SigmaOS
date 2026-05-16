@@ -55,21 +55,22 @@ Returns: `Client`
 - **pingInterval**: `number` - Default: `60e3`. The time interval in milliseconds between PING frames sent to the server. Set to `0` to disable PING frames. This is only applicable for HTTP/2 connections. This will emit a `ping` event on the client with the duration of the ping in milliseconds.
 
 > **Notes about HTTP/2**
+>
 > - It only works under TLS connections. h2c is not supported.
 
 > - The server must support HTTP/2 and choose it as the protocol during the ALPN negotiation.
 
->   - The server must not have a bigger priority for HTTP/1.1 than HTTP/2.
+> - The server must not have a bigger priority for HTTP/1.1 than HTTP/2.
 
 > - Pseudo headers are automatically attached to the request. If you try to set them, they will be overwritten.
 
->   - The `:path` header is automatically set to the request path.
+> - The `:path` header is automatically set to the request path.
 
->   - The `:method` header is automatically set to the request method.
+> - The `:method` header is automatically set to the request method.
 
->   - The `:scheme` header is automatically set to the request scheme.
+> - The `:scheme` header is automatically set to the request scheme.
 
->   - The `:authority` header is automatically set to the request `host[:port]`.
+> - The `:authority` header is automatically set to the request `host[:port]`.
 
 > - `PUSH` frames are yet not supported.
 

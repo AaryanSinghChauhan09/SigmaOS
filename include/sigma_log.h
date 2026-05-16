@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * SIGMAOS: SOVEREIGN SYSTEM LOGGING (S-LOG) v2.0
  * =========================================================================
@@ -9,8 +9,8 @@
 #ifndef SIGMA_LOG_H
 #define SIGMA_LOG_H
 
-#include "./libc/SovereignLibC.h"
-#include "./core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,7 +28,7 @@ void      log_emit(sigma_u32 severity, const char* message);
 void      log_dump_lattice(void);
 sigma_u64 log_get_total_emitted(void);
 
-extern int sigma_printf(const char* format, ...);
+extern void sigma_printf(const char* format, ...);
 
 /* --- Severity-gated log macros --- */
 #define sigma_log(...)          sigma_printf(__VA_ARGS__)

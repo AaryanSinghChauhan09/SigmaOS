@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * SIGMAOS: SOVEREIGN LIBC (v20.0 - PURE C11 ZERO-DEPENDENCY)
  * =========================================================================
@@ -52,7 +52,6 @@ void  sigma_print(const char* str);
 void  sigma_print_num(sigma_u64 val);
 void  sigma_print_hex(sigma_u64 val);
 void  sigma_printf(const char* format, ...);
-void  sigma_log(const char* msg);
 
 /* =========================================================================
  * SECURITY-HARDENED PRIMITIVES (Inspired by Alpine/musl)

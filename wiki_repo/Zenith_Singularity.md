@@ -38,6 +38,6 @@ We have absorbed the core USPs of the world's most innovative systems:
 
 - **Industrial Mesh**: Deterministic PQC-accelerated networking.
 
-## ?? The Future is Sovereign.
+## ?? The Future is Sovereign
 
 SigmaOS Zenith v15.0 is the definitive alternative to monolithic, non-sovereign operating systems. The lattice is active. The singularity is achieved.

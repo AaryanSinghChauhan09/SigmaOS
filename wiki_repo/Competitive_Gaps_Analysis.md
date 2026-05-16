@@ -39,4 +39,3 @@ An operating system's value is heavily tied to its software ecosystem.
 1
 
 To reach parity with industrial competitors, Phase 3 (Hardware & Ecosystem) and full POSIX compliance must be heavily prioritized. The immediate focus should be on expanding the driver matrix (NVMe, USB, Wi-Fi) and stabilizing the ACPI subsystem.
-

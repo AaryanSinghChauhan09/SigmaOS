@@ -23,4 +23,3 @@ SigmaOS systematically "absorbs" the strengths of established distributions to m
 ---
 
 1
-

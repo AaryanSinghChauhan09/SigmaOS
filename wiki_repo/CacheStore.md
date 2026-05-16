@@ -114,6 +114,7 @@ values are automatically filtered out during revalidation so they are not sent
 as request headers.
 
 For example, for a response like
+
 ```
 Vary: content-encoding, accepts
 content-encoding: utf8
@@ -121,6 +122,7 @@ accepts: application/json
 ```
 
 This would be
+
 ```js
 {
   'content-encoding': 'utf8',
@@ -129,6 +131,7 @@ This would be
 ```
 
 If the original request did not include the `accepts` header:
+
 ```js
 {
   'content-encoding': 'utf8',

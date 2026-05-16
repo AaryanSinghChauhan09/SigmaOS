@@ -40,6 +40,6 @@ A system-wide graph database that connects all shards, documentation, and user n
 
 ---
 
-### The ecosystem is the manifestation of sovereignty.
+### The ecosystem is the manifestation of sovereignty
 
 v14.4 [ECOSYSTEM-ZENITH]

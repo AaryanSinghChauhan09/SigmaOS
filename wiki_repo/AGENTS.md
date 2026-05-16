@@ -55,5 +55,4 @@ All agents must adhere to the **Capability-Gated Security** model and report sta
 
 ---
 
-### Autonomous agents: The brain of the Sovereign Lattice.
-
+### Autonomous agents: The brain of the Sovereign Lattice

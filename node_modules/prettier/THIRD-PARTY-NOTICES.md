@@ -13,7 +13,7 @@ Author: angular
 
 > The MIT License
 >
-> Copyright (c) 2010-2025 Google LLC. https://angular.dev/license
+> Copyright (c) 2010-2025 Google LLC. <https://angular.dev/license>
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ Author: angular
 License: MIT  
 Homepage: <https://babel.dev/docs/en/next/babel-code-frame>  
 Repository: <https://github.com/babel/babel.git>  
-Author: The Babel Team (https://babel.dev/team)  
+Author: The Babel Team (<https://babel.dev/team>)  
 
 > MIT License
 >
@@ -75,7 +75,7 @@ Author: The Babel Team (https://babel.dev/team)
 
 License: MIT  
 Repository: <https://github.com/babel/babel.git>  
-Author: The Babel Team (https://babel.dev/team)  
+Author: The Babel Team (<https://babel.dev/team>)  
 
 > MIT License
 >
@@ -109,7 +109,7 @@ Author: The Babel Team (https://babel.dev/team)
 License: MIT  
 Homepage: <https://babel.dev/docs/en/next/babel-parser>  
 Repository: <https://github.com/babel/babel.git>  
-Author: The Babel Team (https://babel.dev/team)  
+Author: The Babel Team (<https://babel.dev/team>)  
 
 > Copyright (C) 2012-2014 by various contributors (see AUTHORS)
 >
@@ -233,7 +233,7 @@ Repository: <git+https://github.com/handlebars-lang/handlebars-parser.git>
 License: MIT  
 Homepage: <https://github.com/jaredwray/keyv>  
 Repository: <git+https://github.com/jaredwray/keyv.git>  
-Author: Jared Wray <me@jaredwray.com> (https://jaredwray.com)  
+Author: Jared Wray <me@jaredwray.com> (<https://jaredwray.com>)  
 
 > MIT License
 >
@@ -359,7 +359,7 @@ Author: fisker Cheung <lionkay@gmail.com>
 
 > MIT License
 >
-> Copyright (c) fisker Cheung <lionkay@gmail.com> (https://www.fiskercheung.com/)
+> Copyright (c) fisker Cheung <lionkay@gmail.com> (<https://www.fiskercheung.com/>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
@@ -546,11 +546,11 @@ Repository: <https://github.com/acornjs/acorn-jsx>
 
 License: MIT  
 Homepage: <https://github.com/prettier/angular-estree-parser#readme>  
-Author: Ika <ikatyang@gmail.com> (https://github.com/ikatyang)  
+Author: Ika <ikatyang@gmail.com> (<https://github.com/ikatyang>)  
 
 > MIT License
 >
-> Copyright (c) Ika <ikatyang@gmail.com> (https://github.com/ikatyang)
+> Copyright (c) Ika <ikatyang@gmail.com> (<https://github.com/ikatyang>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
@@ -578,22 +578,22 @@ Author: Ika <ikatyang@gmail.com> (https://github.com/ikatyang)
 
 License: MIT  
 Homepage: <https://github.com/prettier/angular-html-parser/blob/master/packages/angular-html-parser#readme>  
-Author: Ika <ikatyang@gmail.com> (https://github.com/ikatyang)  
+Author: Ika <ikatyang@gmail.com> (<https://github.com/ikatyang>)  
 
 > MIT License
-> 
-> Copyright (c) Ika <ikatyang@gmail.com> (https://github.com/ikatyang)
-> 
+>
+> Copyright (c) Ika <ikatyang@gmail.com> (<https://github.com/ikatyang>)
+>
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
 > in the Software without restriction, including without limitation the rights
 > to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 > copies of the Software, and to permit persons to whom the Software is
 > furnished to do so, subject to the following conditions:
-> 
+>
 > The above copyright notice and this permission notice shall be included in all
 > copies or substantial portions of the Software.
-> 
+>
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 > IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 > FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -609,11 +609,11 @@ Author: Ika <ikatyang@gmail.com> (https://github.com/ikatyang)
 > Regular expression for matching ANSI escape codes
 
 License: MIT  
-Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)  
+Author: Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)  
 
 > MIT License
 >
-> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
@@ -628,9 +628,10 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 > Throw a given error
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -663,13 +664,14 @@ Contributors:
 
 License: MIT  
 Homepage: <https://github.com/micromatch/braces>  
-Author: Jon Schlinkert (https://github.com/jonschlinkert)  
+Author: Jon Schlinkert (<https://github.com/jonschlinkert>)  
 Contributors:
- - Brian Woodward (https://twitter.com/doowb)
- - Elan Shanker (https://github.com/es128)
- - Eugene Sharygin (https://github.com/eush77)
- - hemanth.hm (http://h3manth.com)
- - Jon Schlinkert (http://twitter.com/jonschlinkert)
+
+- Brian Woodward (<https://twitter.com/doowb>)
+- Elan Shanker (<https://github.com/es128>)
+- Eugene Sharygin (<https://github.com/eush77>)
+- hemanth.hm (<http://h3manth.com>)
+- Jon Schlinkert (<http://twitter.com/jonschlinkert>)
 
 > The MIT License (MIT)
 >
@@ -703,7 +705,7 @@ License: MIT
 Repository: <git+https://github.com/jaredwray/cacheable.git>  
 Author: Jared Wray <me@jaredwray.com>  
 
-> MIT License & Â© Jared Wray 
+> MIT License & Â© Jared Wray
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to
@@ -730,11 +732,11 @@ Author: Jared Wray <me@jaredwray.com>
 > Convert a dash/dot/underscore/space separated string to camelCase or PascalCase: `foo-bar` â†’ `fooBar`
 
 License: MIT  
-Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)  
+Author: Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)  
 
 > MIT License
 >
-> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
@@ -749,9 +751,10 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 > Count characters
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -786,7 +789,7 @@ License: MIT
 
 > MIT License
 >
-> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
@@ -801,9 +804,10 @@ License: MIT
 > HTML character entity information
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -835,9 +839,10 @@ Contributors:
 > HTML legacy character entity information
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -869,9 +874,10 @@ Contributors:
 > HTML invalid numeric character reference information
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -904,9 +910,10 @@ Contributors:
 
 License: MIT  
 Homepage: <https://github.com/watson/ci-info>  
-Author: Thomas Watson Steen <w@tson.dk> (https://twitter.com/wa7son)  
+Author: Thomas Watson Steen <w@tson.dk> (<https://twitter.com/wa7son>)  
 Contributors:
- - Sibiraj (https://github.com/sibiraj-s)
+
+- Sibiraj (<https://github.com/sibiraj-s>)
 
 > The MIT License (MIT)
 >
@@ -937,9 +944,10 @@ Contributors:
 > Replace multiple white-space characters with a single space
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -973,7 +981,7 @@ Contributors:
 License: ISC  
 Homepage: <https://github.com/novemberborn/common-path-prefix#readme>  
 Repository: <git+https://github.com/novemberborn/common-path-prefix.git>  
-Author: Mark Wubben (https://novemberborn.net/)  
+Author: Mark Wubben (<https://novemberborn.net/>)  
 
 > ISC License (ISC)
 > Copyright (c) 2016, Mark Wubben
@@ -998,11 +1006,12 @@ Author: Mark Wubben (https://novemberborn.net/)
 
 License: MIT  
 Homepage: <https://github.com/jonschlinkert/dashify>  
-Author: Jon Schlinkert (https://github.com/jonschlinkert)  
+Author: Jon Schlinkert (<https://github.com/jonschlinkert>)  
 Contributors:
- - Jeffrey Priebe (https://github.com/jeffreypriebe)
- - Jon Schlinkert (http://twitter.com/jonschlinkert)
- - Ondrej Brinkel (https://www.anzui.de)
+
+- Jeffrey Priebe (<https://github.com/jeffreypriebe>)
+- Jon Schlinkert (<http://twitter.com/jonschlinkert>)
+- Ondrej Brinkel (<https://www.anzui.de>)
 
 > The MIT License (MIT)
 >
@@ -1075,9 +1084,10 @@ License: MIT
 Repository: <git://github.com/editorconfig/editorconfig-core-js.git>  
 Author: EditorConfig Team  
 Contributors:
- - Hong Xu (topbug.net)
- - Jed Mao (https://github.com/jedmao/)
- - Trey Hunner (http://treyhunner.com)
+
+- Hong Xu (topbug.net)
+- Jed Mao (<https://github.com/jedmao/>)
+- Trey Hunner (<http://treyhunner.com>)
 
 > Copyright Â© 2012 EditorConfig Team
 >
@@ -1108,7 +1118,7 @@ Contributors:
 License: MIT  
 Homepage: <https://mths.be/emoji-regex>  
 Repository: <https://github.com/mathiasbynens/emoji-regex.git>  
-Author: Mathias Bynens (https://mathiasbynens.be/)  
+Author: Mathias Bynens (<https://mathiasbynens.be/>)  
 
 > Copyright Mathias Bynens <https://mathiasbynens.be/>
 >
@@ -1138,11 +1148,11 @@ Author: Mathias Bynens (https://mathiasbynens.be/)
 > Escape RegExp special characters
 
 License: MIT  
-Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)  
+Author: Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)  
 
 > MIT License
 >
-> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
@@ -1194,9 +1204,10 @@ Author: Nicholas C. Zakas <nicholas+npm@nczconsulting.com>
 
 License: MIT  
 Repository: <https://github.com/justmoon/node-extend.git>  
-Author: Stefan Thomas <justmoon@members.fsf.org> (http://www.justmoon.net)  
+Author: Stefan Thomas <justmoon@members.fsf.org> (<http://www.justmoon.net>)  
 Contributors:
- - Jordan Harband (https://github.com/ljharb)
+
+- Jordan Harband (<https://github.com/ljharb>)
 
 > The MIT License (MIT)
 >
@@ -1228,7 +1239,7 @@ Contributors:
 > It's a very fast and efficient glob library for Node.js
 
 License: MIT  
-Author: Denis Malinochkin (https://mrmlnc.com)  
+Author: Denis Malinochkin (<https://mrmlnc.com>)  
 
 > The MIT License (MIT)
 >
@@ -1261,7 +1272,7 @@ Author: Denis Malinochkin (https://mrmlnc.com)
 License: MIT  
 Homepage: <https://github.com/epoberezkin/fast-json-stable-stringify>  
 Repository: <git://github.com/epoberezkin/fast-json-stable-stringify.git>  
-Author: James Halliday <mail@substack.net> (http://substack.net)  
+Author: James Halliday <mail@substack.net> (<http://substack.net>)  
 
 > This software is released under the MIT license:
 >
@@ -1320,7 +1331,7 @@ License: MIT
 Repository: <git+https://github.com/jaredwray/cacheable.git>  
 Author: Jared Wray <me@jaredwray.com>  
 
-> MIT License & Â© Jared Wray 
+> MIT License & Â© Jared Wray
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to
@@ -1348,13 +1359,14 @@ Author: Jared Wray <me@jaredwray.com>
 
 License: MIT  
 Homepage: <https://github.com/jonschlinkert/fill-range>  
-Author: Jon Schlinkert (https://github.com/jonschlinkert)  
+Author: Jon Schlinkert (<https://github.com/jonschlinkert>)  
 Contributors:
- - Edo Rivai (edo.rivai.nl)
- - Jon Schlinkert (http://twitter.com/jonschlinkert)
- - Paul Miller (paulmillr.com)
- - Rouven WeÃŸling (www.rouvenwessling.de)
- - null (https://github.com/wtgtybhertgeghgtwtg)
+
+- Edo Rivai (edo.rivai.nl)
+- Jon Schlinkert (<http://twitter.com/jonschlinkert>)
+- Paul Miller (paulmillr.com)
+- Rouven WeÃŸling (<www.rouvenwessling.de>)
+- null (<https://github.com/wtgtybhertgeghgtwtg>)
 
 > The MIT License (MIT)
 >
@@ -1385,12 +1397,12 @@ Contributors:
 > Finds the common standard cache directory
 
 License: MIT  
-Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)  
+Author: Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)  
 
 > MIT License
 >
-> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
-> Copyright (c) James Talmage <james@talmage.io> (https://github.com/jamestalmage)
+> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)
+> Copyright (c) James Talmage <james@talmage.io> (<https://github.com/jamestalmage>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
@@ -1405,11 +1417,11 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 > Find a file or directory by walking up parent directories
 
 License: MIT  
-Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)  
+Author: Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)  
 
 > MIT License
 >
-> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
@@ -1427,7 +1439,7 @@ License: MIT
 Repository: <git+https://github.com/jaredwray/cacheable.git>  
 Author: Jared Wray <me@jaredwray.com>  
 
-> MIT License & Â© Jared Wray 
+> MIT License & Â© Jared Wray
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to
@@ -1483,9 +1495,10 @@ Author: Andrea Giammarchi
 License: MIT  
 Homepage: <https://github.com/mk-pmb/flatten-js/#readme>  
 Repository: <git+https://github.com/mk-pmb/flatten-js.git>  
-Author: Joshua Holbrook <josh.holbrook@gmail.com> (http://jesusabdullah.net)  
+Author: Joshua Holbrook <josh.holbrook@gmail.com> (<http://jesusabdullah.net>)  
 Contributors:
- - M.K. (https://github.com/mk-pmb)
+
+- M.K. (<https://github.com/mk-pmb>)
 
 > The MIT License (MIT)
 >
@@ -1527,11 +1540,11 @@ Author: Flow Team <flow@fb.com>
 > Determine the East Asian Width of a Unicode character
 
 License: MIT  
-Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)  
+Author: Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)  
 
 > MIT License
 >
-> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
@@ -1546,11 +1559,11 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 > Get stdin as a string or buffer
 
 License: MIT  
-Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)  
+Author: Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)  
 
 > MIT License
 >
-> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
@@ -1565,10 +1578,11 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 > Extract the non-magic parent path from a glob string.
 
 License: ISC  
-Author: Gulp Team <team@gulpjs.com> (https://gulpjs.com/)  
+Author: Gulp Team <team@gulpjs.com> (<https://gulpjs.com/>)  
 Contributors:
- - Elan Shanker (https://github.com/es128)
- - Blaine Bublitz <blaine.bublitz@gmail.com>
+
+- Elan Shanker (<https://github.com/es128>)
+- Blaine Bublitz <blaine.bublitz@gmail.com>
 
 > The ISC License
 >
@@ -1656,11 +1670,11 @@ Author: Jared Wray <me@jaredwray.com>
 > Ignore is a manager and filter for .gitignore rules, the one used by eslint, gitbook and many others.
 
 License: MIT  
-Repository: <git@github.com:kaelzhang/node-ignore.git>  
+Repository: <<git@github.com>:kaelzhang/node-ignore.git>  
 Author: kael  
 
 > Copyright (c) 2013 Kael Zhang <i@kael.me>, contributors
-> http://kael.me/
+> <http://kael.me/>
 >
 > Permission is hereby granted, free of charge, to any person obtaining
 > a copy of this software and associated documentation files (the
@@ -1688,9 +1702,10 @@ Author: kael
 > Resolve things like Node.js â€” ponyfill for `import.meta.resolve`
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -1744,7 +1759,7 @@ Contributors:
 > """
 >
 > This license applies to parts of Node.js originating from the
-> https://github.com/joyent/node repository:
+> <https://github.com/joyent/node> repository:
 >
 > """
 > Copyright Joyent, Inc. and other Node contributors. All rights reserved.
@@ -1774,11 +1789,11 @@ Contributors:
 > Convert a string index to its line and column position
 
 License: MIT  
-Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)  
+Author: Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)  
 
 > MIT License
 >
-> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
@@ -1799,25 +1814,25 @@ Author: Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)
 
 > Copyright (c) 2013 Dominic Tarr
 >
-> Permission is hereby granted, free of charge, 
-> to any person obtaining a copy of this software and 
-> associated documentation files (the "Software"), to 
-> deal in the Software without restriction, including 
-> without limitation the rights to use, copy, modify, 
-> merge, publish, distribute, sublicense, and/or sell 
-> copies of the Software, and to permit persons to whom 
-> the Software is furnished to do so, 
+> Permission is hereby granted, free of charge,
+> to any person obtaining a copy of this software and
+> associated documentation files (the "Software"), to
+> deal in the Software without restriction, including
+> without limitation the rights to use, copy, modify,
+> merge, publish, distribute, sublicense, and/or sell
+> copies of the Software, and to permit persons to whom
+> the Software is furnished to do so,
 > subject to the following conditions:
 >
-> The above copyright notice and this permission notice 
+> The above copyright notice and this permission notice
 > shall be included in all copies or substantial portions of the Software.
 >
-> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
-> EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
-> OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-> IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR 
-> ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
-> TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+> EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+> OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+> IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+> ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+> TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ----------------------------------------
@@ -1851,9 +1866,10 @@ License: ISC
 > Check if a character is alphabetical
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -1885,9 +1901,10 @@ Contributors:
 > Check if a character is alphanumerical
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -1920,7 +1937,7 @@ Contributors:
 
 License: MIT  
 Repository: <git://github.com/feross/is-buffer.git>  
-Author: Feross Aboukhadijeh <feross@feross.org> (https://feross.org)  
+Author: Feross Aboukhadijeh <feross@feross.org> (<https://feross.org>)  
 
 > The MIT License (MIT)
 >
@@ -1951,9 +1968,10 @@ Author: Feross Aboukhadijeh <feross@feross.org> (https://feross.org)
 > Check if a character is decimal
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -1986,7 +2004,7 @@ Contributors:
 
 License: MIT  
 Homepage: <https://github.com/jonschlinkert/is-extglob>  
-Author: Jon Schlinkert (https://github.com/jonschlinkert)  
+Author: Jon Schlinkert (<https://github.com/jonschlinkert>)  
 
 > The MIT License (MIT)
 >
@@ -2018,11 +2036,12 @@ Author: Jon Schlinkert (https://github.com/jonschlinkert)
 
 License: MIT  
 Homepage: <https://github.com/micromatch/is-glob>  
-Author: Jon Schlinkert (https://github.com/jonschlinkert)  
+Author: Jon Schlinkert (<https://github.com/jonschlinkert>)  
 Contributors:
- - Brian Woodward (https://twitter.com/doowb)
- - Daniel Perez (https://tuvistavie.com)
- - Jon Schlinkert (http://twitter.com/jonschlinkert)
+
+- Brian Woodward (<https://twitter.com/doowb>)
+- Daniel Perez (<https://tuvistavie.com>)
+- Jon Schlinkert (<http://twitter.com/jonschlinkert>)
 
 > The MIT License (MIT)
 >
@@ -2053,9 +2072,10 @@ Contributors:
 > Check if a character is hexadecimal
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -2088,11 +2108,12 @@ Contributors:
 
 License: MIT  
 Homepage: <https://github.com/jonschlinkert/is-number>  
-Author: Jon Schlinkert (https://github.com/jonschlinkert)  
+Author: Jon Schlinkert (<https://github.com/jonschlinkert>)  
 Contributors:
- - Jon Schlinkert (http://twitter.com/jonschlinkert)
- - Olsten Larck (https://i.am.charlike.online)
- - Rouven WeÃŸling (www.rouvenwessling.de)
+
+- Jon Schlinkert (<http://twitter.com/jonschlinkert>)
+- Olsten Larck (<https://i.am.charlike.online>)
+- Rouven WeÃŸling (<www.rouvenwessling.de>)
 
 > The MIT License (MIT)
 >
@@ -2142,9 +2163,10 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
 > Check if a character is a whitespace character
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -2176,9 +2198,10 @@ Contributors:
 > Check if a character is a word character
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -2211,11 +2234,11 @@ Contributors:
 
 License: MIT  
 Homepage: <https://github.com/fisker/iterate-directory-up#readme>  
-Author: fisker Cheung <lionkay@gmail.com> (https://www.fiskercheung.com/)  
+Author: fisker Cheung <lionkay@gmail.com> (<https://www.fiskercheung.com/>)  
 
 > MIT License
 >
-> Copyright (c) fisker Cheung <lionkay@gmail.com> (https://www.fiskercheung.com/)
+> Copyright (c) fisker Cheung <lionkay@gmail.com> (<https://www.fiskercheung.com/>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
@@ -2305,9 +2328,10 @@ Author: Simon Lydell
 License: MIT  
 Author: Vladimir Zapparov <dervus.grim@gmail.com>  
 Contributors:
- - Aleksey V Zapparov <ixti@member.fsf.org> (http://www.ixti.net/)
- - Vitaly Puzrin <vitaly@rcdesign.ru> (https://github.com/puzrin)
- - Martin Grenfell <martin.grenfell@gmail.com> (http://got-ravings.blogspot.com)
+
+- Aleksey V Zapparov <ixti@member.fsf.org> (<http://www.ixti.net/>)
+- Vitaly Puzrin <vitaly@rcdesign.ru> (<https://github.com/puzrin>)
+- Martin Grenfell <martin.grenfell@gmail.com> (<http://got-ravings.blogspot.com>)
 
 > (The MIT License)
 >
@@ -2342,9 +2366,10 @@ Homepage: <http://json5.org/>
 Repository: <git+https://github.com/json5/json5.git>  
 Author: Aseem Kishore <aseem.kishore@gmail.com>  
 Contributors:
- - Max Nanasy <max.nanasy@gmail.com>
- - Andrew Eisenberg <andrew@eisenberg.as>
- - Jordan Tucker <jordanbtucker@gmail.com>
+
+- Max Nanasy <max.nanasy@gmail.com>
+- Andrew Eisenberg <andrew@eisenberg.as>
+- Jordan Tucker <jordanbtucker@gmail.com>
 
 > MIT License
 >
@@ -2379,7 +2404,7 @@ Contributors:
 License: MIT  
 Homepage: <https://github.com/jaredwray/keyv>  
 Repository: <git+https://github.com/jaredwray/keyv.git>  
-Author: Jared Wray <me@jaredwray.com> (http://jaredwray.com)  
+Author: Jared Wray <me@jaredwray.com> (<http://jaredwray.com>)  
 
 > MIT License
 >
@@ -2411,11 +2436,11 @@ Author: Jared Wray <me@jaredwray.com> (http://jaredwray.com)
 > Measure the difference between two strings using the Levenshtein distance algorithm
 
 License: MIT  
-Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)  
+Author: Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)  
 
 > MIT License
 >
-> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
@@ -2463,11 +2488,11 @@ Author: Brian Donovan <brian@donovans.cc>
 > Get the first path that exists on disk of multiple paths
 
 License: MIT  
-Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)  
+Author: Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)  
 
 > MIT License
 >
-> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
@@ -2507,9 +2532,10 @@ Author: Isaac Z. Schlueter <i@izs.me>
 > List of escapable characters in markdown
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -2542,7 +2568,7 @@ Contributors:
 
 License: MIT  
 Homepage: <https://github.com/teambition/merge2>  
-Repository: <git@github.com:teambition/merge2.git>  
+Repository: <<git@github.com>:teambition/merge2.git>  
 
 > The MIT License (MIT)
 >
@@ -2575,9 +2601,10 @@ Repository: <git@github.com:teambition/merge2.git>
 License: ISC  
 Homepage: <https://github.com/meriyah/meriyah>  
 Repository: <git+https://github.com/meriyah/meriyah.git>  
-Author: Kenny F. (https://github.com/KFlash)  
+Author: Kenny F. (<https://github.com/KFlash>)  
 Contributors:
- - Chunpeng Huo (https://github.com/3cp)
+
+- Chunpeng Huo (<https://github.com/3cp>)
 
 > ISC License
 >
@@ -2595,23 +2622,24 @@ Contributors:
 
 License: MIT  
 Homepage: <https://github.com/micromatch/micromatch>  
-Author: Jon Schlinkert (https://github.com/jonschlinkert)  
+Author: Jon Schlinkert (<https://github.com/jonschlinkert>)  
 Contributors:
- - null (https://github.com/DianeLooney)
- - Amila Welihinda (amilajack.com)
- - Bogdan Chadkin (https://github.com/TrySound)
- - Brian Woodward (https://twitter.com/doowb)
- - Devon Govett (http://badassjs.com)
- - Elan Shanker (https://github.com/es128)
- - FabrÃ­cio MattÃ© (https://ultcombo.js.org)
- - Jon Schlinkert (http://twitter.com/jonschlinkert)
- - Martin KolÃ¡rik (https://kolarik.sk)
- - Olsten Larck (https://i.am.charlike.online)
- - Paul Miller (paulmillr.com)
- - Tom Byrer (https://github.com/tomByrer)
- - Tyler Akins (http://rumkin.com)
- - Peter Bright <drpizza@quiscalusmexicanus.org> (https://github.com/drpizza)
- - Kuba Juszczyk (https://github.com/ku8ar)
+
+- null (<https://github.com/DianeLooney>)
+- Amila Welihinda (amilajack.com)
+- Bogdan Chadkin (<https://github.com/TrySound>)
+- Brian Woodward (<https://twitter.com/doowb>)
+- Devon Govett (<http://badassjs.com>)
+- Elan Shanker (<https://github.com/es128>)
+- FabrÃ­cio MattÃ© (<https://ultcombo.js.org>)
+- Jon Schlinkert (<http://twitter.com/jonschlinkert>)
+- Martin KolÃ¡rik (<https://kolarik.sk>)
+- Olsten Larck (<https://i.am.charlike.online>)
+- Paul Miller (paulmillr.com)
+- Tom Byrer (<https://github.com/tomByrer>)
+- Tyler Akins (<http://rumkin.com>)
+- Peter Bright <drpizza@quiscalusmexicanus.org> (<https://github.com/drpizza>)
+- Kuba Juszczyk (<https://github.com/ku8ar>)
 
 > The MIT License (MIT)
 >
@@ -2644,7 +2672,7 @@ Contributors:
 License: MIT  
 Homepage: <https://github.com/minimistjs/minimist>  
 Repository: <git://github.com/minimistjs/minimist.git>  
-Author: James Halliday <mail@substack.net> (http://substack.net)  
+Author: James Halliday <mail@substack.net> (<http://substack.net>)  
 
 > This software is released under the MIT license:
 >
@@ -2733,11 +2761,11 @@ Author: Andrey Sitnik <andrey@sitnik.ru>
 > Run multiple promise-returning & async functions with limited concurrency
 
 License: MIT  
-Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)  
+Author: Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)  
 
 > MIT License
 >
-> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
@@ -2752,11 +2780,11 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 > Get the first fulfilled promise that satisfies the provided testing function
 
 License: MIT  
-Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)  
+Author: Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)  
 
 > MIT License
 >
-> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
@@ -2771,9 +2799,10 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 > Parse HTML character references: fast, spec-compliant, positional information
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -2805,11 +2834,11 @@ Contributors:
 > Parse JSON with more helpful errors
 
 License: MIT  
-Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)  
+Author: Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)  
 
 > MIT License
 >
-> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
@@ -2824,11 +2853,11 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 > Check if a path exists
 
 License: MIT  
-Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)  
+Author: Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)  
 
 > MIT License
 >
-> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
@@ -2869,7 +2898,7 @@ Author: Alexey Raspopov
 
 License: MIT  
 Homepage: <https://github.com/micromatch/picomatch>  
-Author: Jon Schlinkert (https://github.com/jonschlinkert)  
+Author: Jon Schlinkert (<https://github.com/jonschlinkert>)  
 
 > The MIT License (MIT)
 >
@@ -2900,11 +2929,11 @@ Author: Jon Schlinkert (https://github.com/jonschlinkert)
 > Find the root directory of a Node.js project or npm package
 
 License: MIT  
-Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)  
+Author: Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)  
 
 > MIT License
 >
-> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
@@ -2925,7 +2954,7 @@ Author: typicode
 
 > MIT License
 >
-> Copyright (c) 2017 
+> Copyright (c) 2017
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
@@ -3058,9 +3087,9 @@ Author: Andrey Sitnik <andrey@sitnik.ru>
 
 License: MIT  
 Homepage: <https://github.com/postcss/postcss-selector-parser>  
-Author: Ben Briggs <beneb.info@gmail.com> (http://beneb.info)  
+Author: Ben Briggs <beneb.info@gmail.com> (<http://beneb.info>)  
 
-> Copyright (c) Ben Briggs <beneb.info@gmail.com> (http://beneb.info)
+> Copyright (c) Ben Briggs <beneb.info@gmail.com> (<http://beneb.info>)
 >
 > Permission is hereby granted, free of charge, to any person
 > obtaining a copy of this software and associated documentation
@@ -3090,7 +3119,7 @@ Author: Ben Briggs <beneb.info@gmail.com> (http://beneb.info)
 > A CSS property value parser for use with PostCSS
 
 License: MIT  
-Author: Andrew Powell (shellscape) <andrew@shellscape.org> (http://shellscape.org)  
+Author: Andrew Powell (shellscape) <andrew@shellscape.org> (<http://shellscape.org>)  
 
 > Copyright (c) Andrew Powell <andrew@shellscape.org>
 >
@@ -3124,7 +3153,7 @@ Author: Andrew Powell (shellscape) <andrew@shellscape.org> (http://shellscape.or
 License: ISC  
 Homepage: <https://github.com/isaacs/pseudomap#readme>  
 Repository: <git+https://github.com/isaacs/pseudomap.git>  
-Author: Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)  
+Author: Isaac Z. Schlueter <i@izs.me> (<http://blog.izs.me/>)  
 
 > The ISC License
 >
@@ -3151,7 +3180,7 @@ Author: Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)
 License: MIT  
 Homepage: <https://github.com/feross/queue-microtask>  
 Repository: <git://github.com/feross/queue-microtask.git>  
-Author: Feross Aboukhadijeh <feross@feross.org> (https://feross.org)  
+Author: Feross Aboukhadijeh <feross@feross.org> (<https://feross.org>)  
 
 > The MIT License (MIT)
 >
@@ -3181,9 +3210,10 @@ Author: Feross Aboukhadijeh <feross@feross.org> (https://feross.org)
 > remark plugin to add support for pandoc footnotes
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -3215,10 +3245,11 @@ Contributors:
 > remark plugin to parse and stringify math
 
 License: MIT  
-Author: Junyoung Choi <fluke8259@gmail.com> (https://rokt33r.github.io)  
+Author: Junyoung Choi <fluke8259@gmail.com> (<https://rokt33r.github.io>)  
 Contributors:
- - Junyoung Choi <fluke8259@gmail.com> (https://rokt33r.github.io)
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Junyoung Choi <fluke8259@gmail.com> (<https://rokt33r.github.io>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 ----------------------------------------
 
@@ -3228,13 +3259,14 @@ Contributors:
 
 License: MIT  
 Homepage: <https://remark.js.org>  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
- - Eugene Sharygin <eush77@gmail.com>
- - Junyoung Choi <fluke8259@gmail.com>
- - Elijah Hamovitz <elijahhamovitz@gmail.com>
- - Ika <ikatyang@gmail.com>
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Eugene Sharygin <eush77@gmail.com>
+- Junyoung Choi <fluke8259@gmail.com>
+- Elijah Hamovitz <elijahhamovitz@gmail.com>
+- Ika <ikatyang@gmail.com>
 
 ----------------------------------------
 
@@ -3244,13 +3276,14 @@ Contributors:
 
 License: MIT  
 Homepage: <https://github.com/jonschlinkert/repeat-string>  
-Author: Jon Schlinkert (http://github.com/jonschlinkert)  
+Author: Jon Schlinkert (<http://github.com/jonschlinkert>)  
 Contributors:
- - Brian Woodward <brian.woodward@gmail.com> (https://github.com/doowb)
- - Jon Schlinkert <jon.schlinkert@sellside.com> (http://twitter.com/jonschlinkert)
- - Linus UnnebÃ¤ck <linus@folkdatorn.se> (http://linus.unnebÃ¤ck.se)
- - Thijs Busser <tbusser@gmail.com> (http://tbusser.net)
- - Titus <tituswormer@gmail.com> (wooorm.com)
+
+- Brian Woodward <brian.woodward@gmail.com> (<https://github.com/doowb>)
+- Jon Schlinkert <jon.schlinkert@sellside.com> (<http://twitter.com/jonschlinkert>)
+- Linus UnnebÃ¤ck <linus@folkdatorn.se> (<http://linus.unnebÃ¤ck.se>)
+- Thijs Busser <tbusser@gmail.com> (<http://tbusser.net>)
+- Titus <tituswormer@gmail.com> (wooorm.com)
 
 > The MIT License (MIT)
 >
@@ -3316,7 +3349,7 @@ Author: Matteo Collina <hello@matteocollina.com>
 License: MIT  
 Homepage: <https://github.com/feross/run-parallel>  
 Repository: <git://github.com/feross/run-parallel.git>  
-Author: Feross Aboukhadijeh <feross@feross.org> (https://feross.org)  
+Author: Feross Aboukhadijeh <feross@feross.org> (<https://feross.org>)  
 
 > The MIT License (MIT)
 >
@@ -3346,11 +3379,11 @@ Author: Feross Aboukhadijeh <feross@feross.org> (https://feross.org)
 > SDBM non-cryptographic hash function
 
 License: MIT  
-Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)  
+Author: Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)  
 
 > MIT License
 >
-> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
@@ -3393,7 +3426,7 @@ Author: GitHub Inc.
 License: MIT  
 Homepage: <https://github.com/substack/semver-compare>  
 Repository: <git://github.com/substack/semver-compare.git>  
-Author: James Halliday <mail@substack.net> (http://substack.net)  
+Author: James Halliday <mail@substack.net> (<http://substack.net>)  
 
 > This software is released under the MIT license:
 >
@@ -3422,7 +3455,7 @@ Author: James Halliday <mail@substack.net> (http://substack.net)
 
 License: ISC  
 Repository: <git://github.com/isaacs/sigmund>  
-Author: Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)  
+Author: Isaac Z. Schlueter <i@izs.me> (<http://blog.izs.me/>)  
 
 > The ISC License
 >
@@ -3510,9 +3543,10 @@ Author: Cynthia <cyyynthia@borkenware.com>
 > Enter/exit a state
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -3544,11 +3578,11 @@ Contributors:
 > Strip ANSI escape codes from a string
 
 License: MIT  
-Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)  
+Author: Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)  
 
 > MIT License
 >
-> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
@@ -3568,9 +3602,9 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https:/sindresorhus.com)
 > MIT License
 >
 > Copyright (c) Petka Antonov
->               Benjamin Gruenbaum
->               John-David Dalton
->               Sindre Sorhus
+> Benjamin Gruenbaum
+> John-David Dalton
+> Sindre Sorhus
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
@@ -3586,10 +3620,11 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https:/sindresorhus.com)
 
 License: MIT  
 Homepage: <https://github.com/micromatch/to-regex-range>  
-Author: Jon Schlinkert (https://github.com/jonschlinkert)  
+Author: Jon Schlinkert (<https://github.com/jonschlinkert>)  
 Contributors:
- - Jon Schlinkert (http://twitter.com/jonschlinkert)
- - Rouven WeÃŸling (www.rouvenwessling.de)
+
+- Jon Schlinkert (<http://twitter.com/jonschlinkert>)
+- Rouven WeÃŸling (<www.rouvenwessling.de>)
 
 > The MIT License (MIT)
 >
@@ -3630,9 +3665,10 @@ Author: TJ Holowaychuk <tj@vision-media.ca>
 > Remove final line feeds from a string
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -3664,9 +3700,10 @@ Contributors:
 > Middleware: a channel used to convey a liquid
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -3734,59 +3771,59 @@ Repository: <https://github.com/microsoft/TypeScript.git>
 Author: Microsoft Corp.  
 
 > Apache License
-> 
+>
 > Version 2.0, January 2004
-> 
-> http://www.apache.org/licenses/ 
-> 
+>
+> <http://www.apache.org/licenses/>
+>
 > TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
-> 
+>
 > 1. Definitions.
-> 
+>
 > "License" shall mean the terms and conditions for use, reproduction, and distribution as defined by Sections 1 through 9 of this document.
-> 
+>
 > "Licensor" shall mean the copyright owner or entity authorized by the copyright owner that is granting the License.
-> 
+>
 > "Legal Entity" shall mean the union of the acting entity and all other entities that control, are controlled by, or are under common control with that entity. For the purposes of this definition, "control" means (i) the power, direct or indirect, to cause the direction or management of such entity, whether by contract or otherwise, or (ii) ownership of fifty percent (50%) or more of the outstanding shares, or (iii) beneficial ownership of such entity.
-> 
+>
 > "You" (or "Your") shall mean an individual or Legal Entity exercising permissions granted by this License.
-> 
+>
 > "Source" form shall mean the preferred form for making modifications, including but not limited to software source code, documentation source, and configuration files.
-> 
+>
 > "Object" form shall mean any form resulting from mechanical transformation or translation of a Source form, including but not limited to compiled object code, generated documentation, and conversions to other media types.
-> 
+>
 > "Work" shall mean the work of authorship, whether in Source or Object form, made available under the License, as indicated by a copyright notice that is included in or attached to the work (an example is provided in the Appendix below).
-> 
+>
 > "Derivative Works" shall mean any work, whether in Source or Object form, that is based on (or derived from) the Work and for which the editorial revisions, annotations, elaborations, or other modifications represent, as a whole, an original work of authorship. For the purposes of this License, Derivative Works shall not include works that remain separable from, or merely link (or bind by name) to the interfaces of, the Work and Derivative Works thereof.
-> 
+>
 > "Contribution" shall mean any work of authorship, including the original version of the Work and any modifications or additions to that Work or Derivative Works thereof, that is intentionally submitted to Licensor for inclusion in the Work by the copyright owner or by an individual or Legal Entity authorized to submit on behalf of the copyright owner. For the purposes of this definition, "submitted" means any form of electronic, verbal, or written communication sent to the Licensor or its representatives, including but not limited to communication on electronic mailing lists, source code control systems, and issue tracking systems that are managed by, or on behalf of, the Licensor for the purpose of discussing and improving the Work, but excluding communication that is conspicuously marked or otherwise designated in writing by the copyright owner as "Not a Contribution."
-> 
+>
 > "Contributor" shall mean Licensor and any individual or Legal Entity on behalf of whom a Contribution has been received by Licensor and subsequently incorporated within the Work.
-> 
-> 2. Grant of Copyright License. Subject to the terms and conditions of this License, each Contributor hereby grants to You a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare Derivative Works of, publicly display, publicly perform, sublicense, and distribute the Work and such Derivative Works in Source or Object form.
-> 
-> 3. Grant of Patent License. Subject to the terms and conditions of this License, each Contributor hereby grants to You a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable (except as stated in this section) patent license to make, have made, use, offer to sell, sell, import, and otherwise transfer the Work, where such license applies only to those patent claims licensable by such Contributor that are necessarily infringed by their Contribution(s) alone or by combination of their Contribution(s) with the Work to which such Contribution(s) was submitted. If You institute patent litigation against any entity (including a cross-claim or counterclaim in a lawsuit) alleging that the Work or a Contribution incorporated within the Work constitutes direct or contributory patent infringement, then any patent licenses granted to You under this License for that Work shall terminate as of the date such litigation is filed.
-> 
-> 4. Redistribution. You may reproduce and distribute copies of the Work or Derivative Works thereof in any medium, with or without modifications, and in Source or Object form, provided that You meet the following conditions:
-> 
+>
+> 1. Grant of Copyright License. Subject to the terms and conditions of this License, each Contributor hereby grants to You a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare Derivative Works of, publicly display, publicly perform, sublicense, and distribute the Work and such Derivative Works in Source or Object form.
+>
+> 2. Grant of Patent License. Subject to the terms and conditions of this License, each Contributor hereby grants to You a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable (except as stated in this section) patent license to make, have made, use, offer to sell, sell, import, and otherwise transfer the Work, where such license applies only to those patent claims licensable by such Contributor that are necessarily infringed by their Contribution(s) alone or by combination of their Contribution(s) with the Work to which such Contribution(s) was submitted. If You institute patent litigation against any entity (including a cross-claim or counterclaim in a lawsuit) alleging that the Work or a Contribution incorporated within the Work constitutes direct or contributory patent infringement, then any patent licenses granted to You under this License for that Work shall terminate as of the date such litigation is filed.
+>
+> 3. Redistribution. You may reproduce and distribute copies of the Work or Derivative Works thereof in any medium, with or without modifications, and in Source or Object form, provided that You meet the following conditions:
+>
 > You must give any other recipients of the Work or Derivative Works a copy of this License; and
-> 
+>
 > You must cause any modified files to carry prominent notices stating that You changed the files; and
-> 
+>
 > You must retain, in the Source form of any Derivative Works that You distribute, all copyright, patent, trademark, and attribution notices from the Source form of the Work, excluding those notices that do not pertain to any part of the Derivative Works; and
-> 
+>
 > If the Work includes a "NOTICE" text file as part of its distribution, then any Derivative Works that You distribute must include a readable copy of the attribution notices contained within such NOTICE file, excluding those notices that do not pertain to any part of the Derivative Works, in at least one of the following places: within a NOTICE text file distributed as part of the Derivative Works; within the Source form or documentation, if provided along with the Derivative Works; or, within a display generated by the Derivative Works, if and wherever such third-party notices normally appear. The contents of the NOTICE file are for informational purposes only and do not modify the License. You may add Your own attribution notices within Derivative Works that You distribute, alongside or as an addendum to the NOTICE text from the Work, provided that such additional attribution notices cannot be construed as modifying the License. You may add Your own copyright statement to Your modifications and may provide additional or different license terms and conditions for use, reproduction, or distribution of Your modifications, or for any such Derivative Works as a whole, provided Your use, reproduction, and distribution of the Work otherwise complies with the conditions stated in this License.
-> 
-> 5. Submission of Contributions. Unless You explicitly state otherwise, any Contribution intentionally submitted for inclusion in the Work by You to the Licensor shall be under the terms and conditions of this License, without any additional terms or conditions. Notwithstanding the above, nothing herein shall supersede or modify the terms of any separate license agreement you may have executed with Licensor regarding such Contributions.
-> 
-> 6. Trademarks. This License does not grant permission to use the trade names, trademarks, service marks, or product names of the Licensor, except as required for reasonable and customary use in describing the origin of the Work and reproducing the content of the NOTICE file.
-> 
-> 7. Disclaimer of Warranty. Unless required by applicable law or agreed to in writing, Licensor provides the Work (and each Contributor provides its Contributions) on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied, including, without limitation, any warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for determining the appropriateness of using or redistributing the Work and assume any risks associated with Your exercise of permissions under this License.
-> 
-> 8. Limitation of Liability. In no event and under no legal theory, whether in tort (including negligence), contract, or otherwise, unless required by applicable law (such as deliberate and grossly negligent acts) or agreed to in writing, shall any Contributor be liable to You for damages, including any direct, indirect, special, incidental, or consequential damages of any character arising as a result of this License or out of the use or inability to use the Work (including but not limited to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any and all other commercial damages or losses), even if such Contributor has been advised of the possibility of such damages.
-> 
-> 9. Accepting Warranty or Additional Liability. While redistributing the Work or Derivative Works thereof, You may choose to offer, and charge a fee for, acceptance of support, warranty, indemnity, or other liability obligations and/or rights consistent with this License. However, in accepting such obligations, You may act only on Your own behalf and on Your sole responsibility, not on behalf of any other Contributor, and only if You agree to indemnify, defend, and hold each Contributor harmless for any liability incurred by, or claims asserted against, such Contributor by reason of your accepting any such warranty or additional liability.
-> 
+>
+> 1. Submission of Contributions. Unless You explicitly state otherwise, any Contribution intentionally submitted for inclusion in the Work by You to the Licensor shall be under the terms and conditions of this License, without any additional terms or conditions. Notwithstanding the above, nothing herein shall supersede or modify the terms of any separate license agreement you may have executed with Licensor regarding such Contributions.
+>
+> 2. Trademarks. This License does not grant permission to use the trade names, trademarks, service marks, or product names of the Licensor, except as required for reasonable and customary use in describing the origin of the Work and reproducing the content of the NOTICE file.
+>
+> 3. Disclaimer of Warranty. Unless required by applicable law or agreed to in writing, Licensor provides the Work (and each Contributor provides its Contributions) on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied, including, without limitation, any warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for determining the appropriateness of using or redistributing the Work and assume any risks associated with Your exercise of permissions under this License.
+>
+> 4. Limitation of Liability. In no event and under no legal theory, whether in tort (including negligence), contract, or otherwise, unless required by applicable law (such as deliberate and grossly negligent acts) or agreed to in writing, shall any Contributor be liable to You for damages, including any direct, indirect, special, incidental, or consequential damages of any character arising as a result of this License or out of the use or inability to use the Work (including but not limited to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any and all other commercial damages or losses), even if such Contributor has been advised of the possibility of such damages.
+>
+> 5. Accepting Warranty or Additional Liability. While redistributing the Work or Derivative Works thereof, You may choose to offer, and charge a fee for, acceptance of support, warranty, indemnity, or other liability obligations and/or rights consistent with this License. However, in accepting such obligations, You may act only on Your own behalf and on Your sole responsibility, not on behalf of any other Contributor, and only if You agree to indemnify, defend, and hold each Contributor harmless for any liability incurred by, or claims asserted against, such Contributor by reason of your accepting any such warranty or additional liability.
+>
 > END OF TERMS AND CONDITIONS
 
 ----------------------------------------
@@ -3796,9 +3833,10 @@ Author: Microsoft Corp.
 > Clone a constructor without affecting the super-class
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -3830,14 +3868,15 @@ Contributors:
 
 License: MIT  
 Homepage: <https://unifiedjs.com>  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
- - Junyoung Choi <fluke8259@gmail.com>
- - Hernan Rajchert <hrajchert@gmail.com>
- - Christian Murphy <christian.murphy.42@gmail.com>
- - Vse Mozhet Byt <vsemozhetbyt@gmail.com>
- - Richard Littauer <richard.littauer@gmail.com>
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Junyoung Choi <fluke8259@gmail.com>
+- Hernan Rajchert <hrajchert@gmail.com>
+- Christian Murphy <christian.murphy.42@gmail.com>
+- Vse Mozhet Byt <vsemozhetbyt@gmail.com>
+- Richard Littauer <richard.littauer@gmail.com>
 
 > (The MIT License)
 >
@@ -3900,11 +3939,12 @@ Author: Mikola Lysenko
 > unist utility to check if a node passes a test
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
- - Christian Murphy <christian.murphy.42@gmail.com>
- - Lucas Brandstaetter <lucas@brandstaetter.tech> (https://github.com/Roang-zero1)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Christian Murphy <christian.murphy.42@gmail.com>
+- Lucas Brandstaetter <lucas@brandstaetter.tech> (<https://github.com/Roang-zero1>)
 
 > (The MIT license)
 >
@@ -3936,9 +3976,10 @@ Contributors:
 > unist utility to remove positions from a tree
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -3970,9 +4011,10 @@ Contributors:
 > unist utility to serialize a node, position, or point as a human readable location
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -4004,11 +4046,12 @@ Contributors:
 > unist utility to visit nodes
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
- - Eugene Sharygin <eush77@gmail.com>
- - Richard Gibson <richard.gibson@gmail.com>
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Eugene Sharygin <eush77@gmail.com>
+- Richard Gibson <richard.gibson@gmail.com>
 
 > (The MIT License)
 >
@@ -4040,9 +4083,10 @@ Contributors:
 > unist utility to recursively walk over nodes, with ancestral information
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -4075,11 +4119,11 @@ Contributors:
 
 License: MIT  
 Homepage: <https://github.com/fisker/url-or-path#readme>  
-Author: fisker Cheung <lionkay@gmail.com> (https://www.fiskercheung.com/)  
+Author: fisker Cheung <lionkay@gmail.com> (<https://www.fiskercheung.com/>)  
 
 > MIT License
 >
-> Copyright (c) fisker Cheung <lionkay@gmail.com> (https://www.fiskercheung.com/)
+> Copyright (c) fisker Cheung <lionkay@gmail.com> (<https://www.fiskercheung.com/>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
@@ -4106,14 +4150,15 @@ Author: fisker Cheung <lionkay@gmail.com> (https://www.fiskercheung.com/)
 > Virtual file format for text processing
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
- - Brendan Abbott <brendan.abbott@temando.com>
- - Denys Dovhan <email@denysdovhan.com>
- - Kyle Mathews <mathews.kyle@gmail.com>
- - Shinnosuke Watanabe <snnskwtnb@gmail.com>
- - Sindre Sorhus <sindresorhus@gmail.com>
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Brendan Abbott <brendan.abbott@temando.com>
+- Denys Dovhan <email@denysdovhan.com>
+- Kyle Mathews <mathews.kyle@gmail.com>
+- Shinnosuke Watanabe <snnskwtnb@gmail.com>
+- Sindre Sorhus <sindresorhus@gmail.com>
 
 > (The MIT License)
 >
@@ -4144,10 +4189,11 @@ Contributors:
 > vfile utility to convert between positional (line and column-based) and offset (range-based) locations
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
- - Christian Murphy <christian.murphy.42@gmail.com>
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Christian Murphy <christian.murphy.42@gmail.com>
 
 > (The MIT License)
 >
@@ -4179,9 +4225,10 @@ Contributors:
 > vfile utility to create a virtual message
 
 License: MIT  
-Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)  
+Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)  
 Contributors:
- - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -4214,11 +4261,11 @@ Contributors:
 
 License: MIT  
 Homepage: <https://github.com/ikatyang/vnopts#readme>  
-Author: Ika <ikatyang@gmail.com> (https://github.com/ikatyang)  
+Author: Ika <ikatyang@gmail.com> (<https://github.com/ikatyang>)  
 
 > MIT License
 >
-> Copyright (c) Ika <ikatyang@gmail.com> (https://github.com/ikatyang)
+> Copyright (c) Ika <ikatyang@gmail.com> (<https://github.com/ikatyang>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
@@ -4247,9 +4294,10 @@ Author: Ika <ikatyang@gmail.com> (https://github.com/ikatyang)
 License: MIT  
 Homepage: <http://code.woong.org/wcwidth.js>  
 Repository: <https://github.com/mycoboco/wcwidth.js.git>  
-Author: Woong Jun <woong.jun@gmail.com> (http://code.woong.org/)  
+Author: Woong Jun <woong.jun@gmail.com> (<http://code.woong.org/>)  
 Contributors:
- - Tim Oxley <secoif@gmail.com> (http://campjs.com/)
+
+- Tim Oxley <secoif@gmail.com> (<http://campjs.com/>)
 
 > wcwidth.js: a javascript portng of C's wcwidth()
 > ================================================
@@ -4291,8 +4339,9 @@ License: MIT
 Homepage: <https://github.com/Raynos/xtend>  
 Author: Raynos <raynos2@gmail.com>  
 Contributors:
- - Jake Verbaten
- - Matt Esch
+
+- Jake Verbaten
+- Matt Esch
 
 > The MIT License (MIT)
 > Copyright (c) 2012-2014 Raynos.
@@ -4323,7 +4372,7 @@ Contributors:
 
 License: ISC  
 Repository: <git+https://github.com/isaacs/yallist.git>  
-Author: Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)  
+Author: Isaac Z. Schlueter <i@izs.me> (<http://blog.izs.me/>)  
 
 > The ISC License
 >
@@ -4373,11 +4422,11 @@ Author: Eemeli Aro <eemeli@gmail.com>
 
 License: MIT  
 Homepage: <https://github.com/prettier/yaml-unist-parser#readme>  
-Author: Ika <ikatyang@gmail.com> (https://github.com/ikatyang)  
+Author: Ika <ikatyang@gmail.com> (<https://github.com/ikatyang>)  
 
 > MIT License
 >
-> Copyright (c) Ika <ikatyang@gmail.com> (https://github.com/ikatyang)
+> Copyright (c) Ika <ikatyang@gmail.com> (<https://github.com/ikatyang>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
@@ -4404,11 +4453,11 @@ Author: Ika <ikatyang@gmail.com> (https://github.com/ikatyang)
 > Tiny queue data structure
 
 License: MIT  
-Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)  
+Author: Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)  
 
 > MIT License
 >
-> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+> Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (<https://sindresorhus.com>)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >

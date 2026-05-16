@@ -35,4 +35,3 @@ This document serves as the immutable single source of truth for the industrial-
 ---
 
 1
-

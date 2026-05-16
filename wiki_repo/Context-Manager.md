@@ -38,7 +38,7 @@ Dynamically resolves and returns a pointer to the registered module instance.
 
 1
 
-QuotaManager* qm = (QuotaManager*)
+QuotaManager*qm = (QuotaManager*)
     SigmaOS::Kernel::Context::ContextManager::getInstance()
     .resolve("agent.quota");
 
@@ -53,4 +53,3 @@ QuotaManager* qm = (QuotaManager*)
 1
 
 1
-

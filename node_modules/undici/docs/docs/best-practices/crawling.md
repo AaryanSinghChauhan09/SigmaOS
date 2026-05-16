@@ -15,7 +15,7 @@ AcmeCo Crawler - acme.co - contact@acme.co
 
 ```
 
-When adding contact details, avoid using personal identifiers such as your own name or a private email addressâ€”especially in a professional or employment context. Instead, use a role-based or organizational contact (e.g., crawler-team@company.com) to protect individual privacy while still enabling communication.
+When adding contact details, avoid using personal identifiers such as your own name or a private email addressâ€”especially in a professional or employment context. Instead, use a role-based or organizational contact (e.g., <crawler-team@company.com>) to protect individual privacy while still enabling communication.
 
 If a crawler behaves unexpectedlyâ€”for example, due to misconfiguration or implementation errorsâ€”server administrators can use the information in the user agent to contact the operator and coordinate an appropriate resolution.
 

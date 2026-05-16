@@ -50,6 +50,6 @@ To reach the same level of industrial trust as Ubuntu, SigmaOS is implementing:
 
 ---
 
-### The SigmaOS Zenith is the end of the legacy OS era.
+### The SigmaOS Zenith is the end of the legacy OS era
 
 v14.3 [LEAPFROG-STRATEGY]

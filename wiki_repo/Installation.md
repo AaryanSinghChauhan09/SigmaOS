@@ -28,6 +28,7 @@ Welcome to the SigmaOS Installation Guide. This document provides a step-by-step
 
 1. **Flash to SD Card / NVMe**
    Use `dd` or a tool like BalenaEtcher to flash the image.
+
    ```bash
    sudo dd if=sigmaos_aarch64.img of=/dev/sdX bs=4M status=progress
    ```
@@ -45,6 +46,7 @@ If you want to test SigmaOS without physical hardware, use the QEMU target.
    Follow the instructions in [Build.md](Build.md) to compile `sigma_os.elf`.
 
 1. **Run QEMU**
+
    ```bash
    qemu-system-aarch64 \
        -machine raspi4b \
@@ -62,12 +64,14 @@ The `SovereignPartitionManager` supports scanning existing GPT partitions and br
 
 1. **Copy the Kernel**
    Copy `sigma_os_x64.elf` to your EFI partition.
+
    ```bash
    sudo cp sigma_os_x64.elf /boot/efi/EFI/sigmaos/
    ```
 
 1. **Add Boot Entry**
    Create `/boot/efi/loader/entries/sigmaos.conf`:
+
    ```ini
    title   SigmaOS Sovereign Lattice
    linux   /EFI/sigmaos/sigma_os_x64.elf
@@ -88,5 +92,4 @@ Upon first boot, the **Onboarding Wizard** will launch to:
 
 ---
 
-### Welcome to the future of sovereign computing.
-
+### Welcome to the future of sovereign computing

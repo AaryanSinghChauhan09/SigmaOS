@@ -9,7 +9,7 @@ The GitHub Wiki uses a specific slug format. All relative links must point to th
 **Incorrect**: `[API Reference](wiki/API_Reference.md)`
 **Correct**: `[API Reference](API-Reference)`
 
-### Action Plan:
+### Action Plan
 
 1. Navigate to the `Home` page of the Wiki.
 
@@ -43,4 +43,3 @@ To automate Wiki synchronization, use the following GitHub Action pattern in you
     token: ${{ secrets.GITHUB_TOKEN }}
 
 ```
-

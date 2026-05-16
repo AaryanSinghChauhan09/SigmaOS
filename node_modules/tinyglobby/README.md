@@ -22,4 +22,4 @@ globSync('src/**/*.ts', { ignore: '**/*.d.ts' });
 
 ## Documentation
 
-Visit https://superchupu.dev/tinyglobby to read the full documentation.
+Visit <https://superchupu.dev/tinyglobby> to read the full documentation.

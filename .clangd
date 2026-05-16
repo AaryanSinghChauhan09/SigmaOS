@@ -1,12 +1,11 @@
-﻿CompileFlags:
+CompileFlags:
   Add:
-    - -I./include
-    - -ffreestanding
-    - -std=c++17
-    - -fno-exceptions
-    - -fno-rtti
+    - "-I./include"
+    - "-I./include/core"
+    - "-I./include/libc"
+    - "-I./include/hal"
+    - "-std=c++17"
+    - "-x"
+    - "c++"
   Remove:
-    - -mno-red-zone
-
-Diagnostics:
-  UnusedIncludes: None
+    - "-W*"

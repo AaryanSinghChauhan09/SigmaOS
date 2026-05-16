@@ -21,4 +21,3 @@ SigmaOS has achieved **Sovereign Singularity**. The system is fully enclosed, mo
 ---
 
 1
-

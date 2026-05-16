@@ -60,4 +60,4 @@ The **Sovereign Latticeâ„¢** is organized into 10 industrial layers. Every s
 
 ---
 
-### Stay Sovereign.
+### Stay Sovereign

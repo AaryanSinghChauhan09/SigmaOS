@@ -98,9 +98,8 @@ Inspired by the Windows Registry but reimagined for sovereignty, the **Sovereign
 1 1
 1 1. **Usability First**: Zenith Compositor + `sigma-pkg`.
 
-2. **Security Next**: TPM Attestation + PQC Encryption.
+1. **Security Next**: TPM Attestation + PQC Encryption.
 
-3. **Resilience**: Self-Healing Snapshots + AI Watchdog.
+2. **Resilience**: Self-Healing Snapshots + AI Watchdog.
 
-4. **Differentiation**: Adaptive UI + Sovereign AI Assistant.
-
+3. **Differentiation**: Adaptive UI + Sovereign AI Assistant.

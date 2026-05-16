@@ -33,6 +33,7 @@ SigmaOS is on a 3-year trajectory to become the world's most innovative and prof
 - **Global Repo**: A curated repository of 600+ professional shards.
 
 ---
+
 | Phase | Focus | Key Shard |
 | :--- | :--- | :--- |
 

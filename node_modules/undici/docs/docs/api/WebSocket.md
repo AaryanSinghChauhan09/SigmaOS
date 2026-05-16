@@ -22,7 +22,7 @@ When passing an object as the second argument, the following options are availab
 
 - **headers** `HeadersInit` (optional) - Custom headers to include in the WebSocket handshake request.
 
-### Example:
+### Example
 
 This example will not work in browsers or other platforms that don't allow passing an object.
 
@@ -45,7 +45,7 @@ import { WebSocket } from 'undici'
 const ws = new WebSocket('wss://echo.websocket.events', ['echo', 'chat'])
 ```
 
-### Example with HTTP/2:
+### Example with HTTP/2
 
 > âš ï¸ Warning: WebSocket over HTTP/2 is experimental, it is likely to change in the future.
 
@@ -121,7 +121,7 @@ Arguments:
 
 Sends a ping frame to the WebSocket server. The server must respond with a pong frame containing the same payload data. This can be used for keepalive purposes or to verify that the connection is still active.
 
-### Example:
+### Example
 
 ```js
 import { WebSocket, ping } from 'undici'
