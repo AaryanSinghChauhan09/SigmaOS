@@ -1,0 +1,37 @@
+# SigmaOS Lattice Declarative Configuration
+# Defines reproducible shard deployments across architectures.
+
+lattice:
+  version: "15.0"
+  edition: "Zenith"
+  security_level: "Strict"
+  pqc_provider: "Kyber-1024"
+
+shards:
+  - id: "S-CORE"
+    type: "Microkernel"
+    priority: "Critical"
+    isolation: "Lattice-Ring-0"
+
+  - id: "S-NET"
+    type: "Distributed"
+    protocol: "Sovereign-P2P"
+    encryption: "Kyber-1024"
+
+  - id: "S-ARMOR"
+    type: "Security"
+    policy: "Zero-Trust"
+    attestation: "Dilithium-5"
+
+profiles:
+  monolithic:
+    includes: ["S-GPU", "S-AUDIO", "S-UI"]
+    scheduler: "Adaptive-NPWO"
+  
+  rtos:
+    includes: ["S-GPIO", "S-SENSOR"]
+    scheduler: "Deterministic-O1"
+
+  forensic:
+    includes: ["S-RECOVERY", "S-AUDITOR"]
+    mount_mode: "Read-Only"
