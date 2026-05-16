@@ -12,9 +12,17 @@
 
 - [Architecture](Architecture)
 
-- [Lattice Subsystems](Subsystems)
+## ⚙️ Core Subsystems
 
-- [AI/ML Intelligence Nexus](AI-ML-Nexus)
+- [Networking Shard (TCP/IP)](Networking-Shard)
+
+- [Storage Shard (LFS/VFS)](Storage-Shard)
+
+- [Real-Time Scheduler (CFS)](Real-Time-Scheduler-Shard)
+
+- [Hardware Driver Shards](Driver-Shards)
+
+- [Security & PQC Shard](Security-Shard)
 
 - [Sovereign Principles](SOVEREIGN_PRINCIPLES)
 
