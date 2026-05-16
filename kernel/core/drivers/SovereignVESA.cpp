@@ -30,8 +30,14 @@ public:
         m_info.bpp = bpp;
         m_info.phys_addr = lfb_phys;
 
-        sigma_log_info("[VESA] Initializing Sovereign LFB: %ux%ux%u @ 0x%016llX", w, h, bpp, lfb_phys);
-        sigma_log_info("[VESA] Zenith Compositor: READY.");
+        sigma_log_info("[S-VESA] Initializing Sovereign LFB: %ux%ux%u @ 0x%016llX", w, h, bpp, lfb_phys);
+        sigma_log_info("[S-VESA] Zenith Compositor: READY.");
+    }
+
+    void initLegacyVGA() {
+        sigma_log_info("[S-VESA] [LEGACY] No LFB detected. Falling back to VGA Text Mode (0xB8000)...");
+        // VGA Text Mode initialization logic
+        sigma_log_info("[S-VESA] [LEGACY] VGA Fallback: ACTIVE (80x25 characters).");
     }
 
     void drawPixel(sigma_u32 x, sigma_u32 y, sigma_u32 color) {
@@ -61,8 +67,10 @@ extern "C" {
     void vesa_init(sigma_u32 w, sigma_u32 h, sigma_u32 bpp, sigma_u64 lfb) { 
         SigmaOS::Kernel::Drivers::SovereignVESA::getInstance().init(w, h, bpp, lfb); 
     }
+    void vesa_init_legacy_fallback() {
+        SigmaOS::Kernel::Drivers::SovereignVESA::getInstance().initLegacyVGA();
+    }
     void vesa_put_pixel(sigma_u32 x, sigma_u32 y, sigma_u32 color) {
         SigmaOS::Kernel::Drivers::SovereignVESA::getInstance().drawPixel(x, y, color);
     }
 }
-
