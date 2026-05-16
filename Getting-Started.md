@@ -1,77 +1,50 @@
-﻿# Getting-Started
+# SigmaOS Getting Started Guide
 
-1
+Welcome to the SigmaOS development environment! This guide will walk you through setting up your environment, building the kernel, and running it in an emulator or on hardware.
 
-Welcome to the SigmaOS Sovereign Lattice. This guide will help you set up your development environment and run your first SigmaOS instance.
+## 1. Environment Setup
 
-1
+SigmaOS relies on a cross-compiled x86_64-elf toolchain. We provide a setup script to automate this process.
 
-Before you begin, ensure you have the following installed:
+**Linux (Debian/Ubuntu/Arch)** & **macOS (Homebrew)**:
+```bash
+chmod +x scripts/setup.sh
+./scripts/setup.sh
+```
 
-1
+This will install:
+- `gcc-x86-64-linux-gnu` / `x86_64-elf-gcc`
+- `nasm` (Assembler)
+- `qemu-system-x86` (Emulator)
+- `xorriso` and `grub-pc-bin` (ISO generation)
 
-1
+## 2. Building the OS
 
-1
+SigmaOS uses a standard Makefile. From the root directory, run:
 
-1
-
-git clone <https://github.com/AaryanSinghChauhan09/SigmaOS.git>
-cd SigmaOS
-
-1
-
-1
-
-The SigmaOS build system is modular and shard-based.
-
-1
-
-1
-
+```bash
 make all
+```
 
-1
+This compiles the kernel, links it, and generates a bootable ISO image (`build/sigmaos.iso`) using GRUB.
 
-1
+## 3. Running in QEMU
 
-We provide a specialized boot script that handles ISO creation and QEMU orchestration.
+To boot the newly compiled OS in QEMU, run:
 
-1
+```bash
+make qemu
+```
 
-1
+This will launch QEMU with 2GB of RAM and attach the serial output to your terminal. You should see the `[BOOT] SSB: Initializing Boot Nexus` messages in your terminal.
 
-./qemu-boot.sh
+## 4. Hardware Deployment
 
-1
+To boot SigmaOS on real hardware, you can flash the ISO to a USB drive using `dd` (Linux/macOS) or Rufus (Windows).
 
-To view the kernel logs in real-time:
+```bash
+# Example on Linux (Replace /dev/sdX with your USB drive)
+sudo dd if=build/sigmaos.iso of=/dev/sdX bs=4M status=progress
+```
 
-1
-
-tail -f serial.log
-
-1
-
-1
-
-If you want to interact with the experimental web-based UI:
-
-1
-
-npm install
-node server.js
-
-1
-
-1
-
-1
-
-1
-
-1
-
----
-
-1
+**Note:** Ensure your hardware is supported and secure boot is disabled, as SigmaOS is currently self-signed.
