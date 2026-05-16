@@ -1319,7 +1319,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
 
 
     <!-- S-MIND Window -->
-    <div class="window" id="s-mind-win" style="display:none; flex-direction:column; width:800px; height:600px; left:100px; top:100px;">
+    <div class="window s-mind-window" id="s-mind-win">
         <div class="window-header">
             <div class="window-title">Σ S-MIND: Sovereign Lattice Mapper</div>
             <div class="window-controls">
@@ -1327,11 +1327,11 @@ https://chatgpt.com/?q={{prompt}}</textarea>
                 <div class="win-btn close" onclick="closeWindow('s-mind-win')"></div>
             </div>
         </div>
-        <div class="window-content" style="padding:0; flex-grow:1; background: #000; overflow: hidden; position: relative;">
-            <div id="mind-canvas-container" style="width:100%; height:100%; position: relative;">
-                <canvas id="mind-canvas" style="cursor: crosshair;"></canvas>
+        <div class="window-content mind-window-content">
+            <div id="mind-canvas-container" class="mind-canvas-container">
+                <canvas id="mind-canvas" class="mind-canvas"></canvas>
             </div>
-            <div class="mind-controls" style="position: absolute; bottom: 20px; left: 20px; display: flex; gap: 10px;">
+            <div class="mind-controls">
                 <button class="util-btn" onclick="addMindNode()">ADD SHARD NODE</button>
                 <button class="util-btn" onclick="exportMindLattice()">EXPORT MANIFEST</button>
             </div>
@@ -2196,7 +2196,7 @@ https://chatgpt.com/?q={{prompt}}</textarea>
 
     </script>
     <!-- Sovereign Accessibility Layer -->
-    <div id="s-accessibility" aria-live="polite" style="display:none;"></div>
+    <div id="s-accessibility" class="s-accessibility" aria-live="polite"></div>
     <script>
         function speak(text) {
             console.log("[S-ACCESSIBILITY]: " + text);
