@@ -149,6 +149,16 @@ Compression and encryption utilities.
 
 **C API:** `archive_init()`, `archive_compress()`, `archive_extract()`
 
+### Sigma Notification Center (`tools/sigma_notifications.cpp`)
+
+Unified alerts across shards.
+
+- Cross-shard event bus for UI-independent notifications
+- Priority queues (NORMAL, HIGH, CRITICAL)
+- Decoupled from the GUI stack
+
+**C API:** `notify_init()`, `notify_push()`, `notify_clear()`
+
 ### Sigma Clipboard Hub (`tools/sigma_clipboard.cpp`)
 
 Multi-clipboard manager.
@@ -194,6 +204,26 @@ Enforce enterprise rules across the lattice.
 
 **C API:** `policy_init()`, `policy_load()`, `policy_check()`
 
+### Sigma Enterprise Recovery (`tools/sigma_enterprise_recovery.cpp`)
+
+Fleet rollback utilities.
+
+- Atomic rollbacks for entire networked clusters
+- RDMA broadcast commands for snapshot syncing
+- Immutable rollback hashes
+
+**C API:** `recovery_init()`, `recovery_register()`, `recovery_rollback()`
+
+### Sigma Sovereign Cloud OS (`tools/sigma_sovereign_cloud.cpp`)
+
+Hybrid bare-metal + cloud orchestration.
+
+- Treat remote instances exactly like local shards
+- Deploy bare-metal hypervisors remotely
+- Live migration of active shards across the network
+
+**C API:** `cloudos_init()`, `cloudos_deploy()`, `cloudos_migrate()`
+
 ---
 
 ## 🌐 IoT & Embedded
@@ -237,6 +267,25 @@ CAN bus + OBD integration.
 
 **C API:** `autodiag_init()`, `autodiag_connect()`, `autodiag_read_obd()`
 
+### Sigma Smart Grid Manager (`tools/sigma_smart_grid.cpp`)
+
+IoT utilities for energy networks.
+
+- Real-time decentralised energy load balancing
+- Peak shaving logic
+- Distributed node power tracking
+
+**C API:** `smartgrid_init()`, `smartgrid_register()`, `smartgrid_balance()`
+
+### Sigma Edge Vision (`tools/sigma_edge_vision.cpp`)
+
+Computer vision toolkit for IoT.
+
+- Hardware-accelerated pixel inference at the edge
+- Direct hardware camera integration
+
+**C API:** `edgevis_init()`, `edgevis_attach()`, `edgevis_process()`
+
 ---
 
 ## 🔬 Experimental & Developer Tools
@@ -270,6 +319,24 @@ Distributed shard compilation.
 - Distributed dependency graph resolution
 
 **C API:** `buildfarm_init()`, `buildfarm_connect()`, `buildfarm_dispatch()`
+
+### Sigma API Gateway (`tools/sigma_api_gateway.cpp`)
+
+Sovereign API orchestration.
+
+- PQC-attested routing for all microkernel IPC services
+- Distributed endpoint management
+
+**C API:** `apigate_init()`, `apigate_add()`, `apigate_handle()`
+
+### Sigma Blockchain Hub (`tools/sigma_blockchain.cpp`)
+
+Distributed ledger integration.
+
+- PQC-hardened smart contract validation at the OS level
+- OS-native ledger synchronization
+
+**C API:** `blockchain_init()`, `blockchain_sync()`, `blockchain_validate()`
 
 ---
 
