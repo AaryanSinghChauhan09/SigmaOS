@@ -9,9 +9,9 @@
 #ifndef SIGMA_HAL_H
 #define SIGMA_HAL_H
 
-#include "SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "./sigma_types.h"
+#include "core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,226 +1,63 @@
-# =============================================================================
-# SIGMAOS: SOVEREIGN LATTICE BUILD SYSTEM v2.15 (ZENITH)
-# =============================================================================
-# Targets: x86_64, aarch64, powerpc, riscv64, ia64, sparc64
-# =============================================================================
+# =========================================================================
+# SIGMAOS: INDUSTRIAL KERNEL MAKEFILE (v15.0 - ZENITH)
+# =========================================================================
 
-ARCH     ?= x86_64
-CXX      := g++
-AS       := nasm
-LD       := g++
-QEMU     := qemu-system-$(ARCH)
-GRUB     := grub-mkrescue
+CC = x86_64-linux-gnu-gcc
+CXX = x86_64-linux-gnu-g++
+LD = x86_64-linux-gnu-ld
+ASM = nasm
 
-# All include roots
-CXXFLAGS := -ffreestanding -O2 -Wall -Wextra -Werror \
-            -fno-exceptions -fno-rtti -std=c++17 \
-            -fno-stack-protector -mno-red-zone \
-            -I./include \
-            -I./include/core \
-            -I./kernel/core \
-            -DCONFIG_ARCH_$(shell echo $(ARCH) | tr '[:lower:]' '[:upper:]')
+CFLAGS = -Iinclude -ffreestanding -mno-red-zone -Wall -Wextra -O2 -fno-pie
+CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -std=c++17
+ASMFLAGS = -f elf64
 
-ASFLAGS  := -f elf64
-LDFLAGS  := -T kernel/sigma.ld -ffreestanding -nostdlib
+BUILD_DIR = build
+ISO_DIR = $(BUILD_DIR)/iso
+KERNEL_BIN = $(BUILD_DIR)/sigmaos.bin
+ISO_IMAGE = $(BUILD_DIR)/sigmaos.iso
 
-# ---- Kernel Shards (C++) ----
-KERNEL_SHARDS := \
-    kernel/core/SovereignMain.o \
-    kernel/core/boot/SovereignInit.o \
-    kernel/core/system/SovereignScheduler.o \
-    kernel/core/system/SovereignSystemD.o \
-    kernel/core/system/SovereignNexus.o \
-    kernel/core/system/SovereignStore.o \
-    kernel/core/system/SovereignShell.o \
-    kernel/core/system/SovereignCoreUtils.o \
-    kernel/core/system/SovereignPkg.o \
-    kernel/core/system/SovereignContainer.o \
-    kernel/core/system/SovereignHypervisor.o \
-    kernel/core/system/SovereignKVM.o \
-    kernel/core/system/SovereignLXC.o \
-    kernel/core/fs/SovereignZFS.o \
-    kernel/core/fs/SovereignExt2.o \
-    kernel/core/fs/SovereignBcacheFS.o \
-    kernel/core/fs/SovereignFAT.o \
-    kernel/core/fs/SovereignNTFS.o \
-    kernel/core/fs/SovereignExt4.o \
-    kernel/core/fs/SovereignXFS.o \
-    kernel/core/fs/SovereignLegacyFS.o \
-    kernel/core/fs/SovereignOpticalFS.o \
-    kernel/core/fs/SovereignNetFS.o \
-    kernel/core/fs/SovereignTmpFS.o \
-    kernel/core/fs/SovereignRAID.o \
-    kernel/core/fs/SovereignQuota.o \
-    kernel/core/fs/SovereignACL.o \
-    kernel/core/fs/SovereignFSCrypt.o \
-    kernel/core/fs/SovereignLVM.o \
-    kernel/core/network/SovereignNetStack.o \
-    kernel/core/network/SovereignTCPIP.o \
-    kernel/core/network/SovereignIPv6.o \
-    kernel/core/network/SovereignFirewall.o \
-    kernel/core/network/SovereignIPX.o \
-    kernel/core/network/SovereignPPP.o \
-    kernel/core/network/SovereignDHCP.o \
-    kernel/core/network/SovereignVNet.o \
-    kernel/core/network/SovereignSecureNet.o \
-    kernel/core/security/SovereignPQC.o \
-    kernel/core/security/SovereignGPG.o \
-    kernel/core/security/SovereignLUKS.o \
-    kernel/core/security/SovereignKali.o \
-    kernel/core/security/SovereignAppArmor.o \
-    kernel/core/security/SovereignSELinux.o \
-    kernel/core/security/SovereignNX.o \
-    kernel/core/security/SovereignASLR.o \
-    kernel/core/security/SovereignSeccomp.o \
-    kernel/core/security/SovereignAudit.o \
-    kernel/core/security/SovereignIMA.o \
-    kernel/core/libc/SovereignLibC.o \
-    kernel/core/hal/SovereignHAL.o \
-    kernel/core/hal/SovereignVMM.o \
-    kernel/core/hal/SovereignSerial.o \
-    kernel/core/hal/SovereignUbuntu.o \
-    kernel/core/hal/SovereignArchARM.o \
-    kernel/core/hal/SovereignArchPPC.o \
-    kernel/core/hal/SovereignArchRISCV.o \
-    kernel/core/hal/SovereignArchIA64.o \
-    kernel/core/hal/SovereignArchSPARC.o \
-    kernel/core/drivers/SovereignPS2.o \
-    kernel/core/drivers/SovereignVESA.o \
-    kernel/core/drivers/SovereignATA.o \
-    kernel/core/drivers/SovereignSATA.o \
-    kernel/core/drivers/SovereignSCSI.o \
-    kernel/core/drivers/SovereignUSB3.o \
-    kernel/core/drivers/SovereignFireWire.o \
-    kernel/core/drivers/SovereignPCMCIA.o \
-    kernel/core/drivers/SovereignAGP.o \
-    kernel/core/drivers/SovereignE1000.o \
-    kernel/core/drivers/SovereignNvidia.o \
-    kernel/core/drivers/SovereignATI.o \
-    kernel/core/drivers/SovereignMedia.o \
-    kernel/core/drivers/SovereignTVTuner.o \
-    kernel/core/drivers/SovereignVideo.o \
-    kernel/core/drivers/SovereignNE2000.o \
-    kernel/core/drivers/SovereignRTL8139.o \
-    kernel/core/drivers/SovereignIXGBE.o \
-    kernel/core/drivers/SovereignWLAN.o \
-    kernel/core/drivers/SovereignWPAN.o \
-    kernel/core/drivers/gpu/SovereignAMDGPU.o \
-    kernel/core/drivers/gpu/SovereignIntelGMA.o \
-    kernel/core/drivers/gpu/SovereignNouveau.o \
-    kernel/core/drivers/wlan/SovereignAtheros.o \
-    kernel/core/drivers/wlan/SovereignRealtek.o \
-    kernel/core/drivers/wlan/SovereignIntelWIFI.o \
-    kernel/core/drivers/audio/SovereignHDAudio.o \
-    kernel/core/drivers/input/SovereignEvdev.o \
-    kernel/core/drivers/network/SovereignBluetooth.o \
-    kernel/core/drivers/network/SovereignIrDA.o \
-    kernel/core/network/SovereignIPv6.o \
-    kernel/core/network/SovereignNftables.o \
-    kernel/core/userland/SovereignBusyBox.o \
-    kernel/core/userland/SovereignCoreUtils.o \
-    kernel/core/security/SovereignUserAccounts.o \
-    kernel/core/ui/SovereignDesktop.o \
-    kernel/core/system/SovereignWatchdog.o \
-    kernel/core/system/SovereignSwap.o \
-    kernel/core/security/SovereignAuditLog.o \
-    kernel/core/absorption/SovereignZOS.o \
-    kernel/core/absorption/SovereignQNX.o \
-    kernel/core/absorption/SovereignBeOS.o \
-    kernel/core/absorption/SovereignNeXT.o \
-    kernel/core/absorption/SovereignPlan9.o \
-    kernel/core/absorption/SovereignCisco.o \
-    kernel/core/absorption/SovereignSolaris.o \
-    kernel/core/absorption/SovereignAmnesic.o \
-    kernel/core/absorption/SovereignGenera.o \
-    kernel/core/absorption/SovereignKeyKOS.o \
-    kernel/core/absorption/SovereignFlex.o \
-    kernel/core/absorption/SovereignVME.o \
-    kernel/core/absorption/SovereignHarmony.o \
-    kernel/core/absorption/SovereignAmoeba.o \
-    kernel/core/absorption/SovereignSingular.o \
-    kernel/core/boot/SovereignInstaller.o \
-    kernel/core/hal/SovereignWASM.o \
-    kernel/core/hal/SovereignMobile.o \
-    kernel/core/boot/SovereignRecovery.o \
-    kernel/core/system/SovereignCompatibility.o \
-    kernel/core/hal/SovereignHypervisor.o \
-    kernel/core/cloud/SovereignCloud.o \
-    kernel/core/intelligence/SovereignAISched.o \
-    kernel/core/system/SovereignCorespace.o \
-    kernel/core/fs/SovereignVault.o \
-    kernel/core/network/SovereignEther.o \
-    kernel/core/hal/SovereignSDK.o \
-    kernel/core/fs/SovereignPartition.o \
-    kernel/core/ui/ZenithWebUI.o \
-    kernel/core/ui/SovereignWM.o \
-    kernel/core/ui/SovereignFWM.o \
-    kernel/core/ui/SovereignPanel.o \
-    kernel/core/observability/SovereignBPF.o \
-    kernel/core/observability/SovereignWiki.o \
-    kernel/core/observability/SovereignLogD.o \
-    kernel/core/system/SovereignMemoryPool.o
+# Directories to search for source files
+SRC_DIRS := kernel/core/system userland
+C_SRCS := $(shell find $(SRC_DIRS) -name '*.c')
+CXX_SRCS := $(shell find $(SRC_DIRS) -name '*.cpp')
+ASM_SRCS := $(shell find $(SRC_DIRS) -name '*.asm')
 
-# ---- ASM Shards ----
-ASM_SHARDS := \
-    kernel/core/boot.o \
-    kernel/core/hal.o \
-    kernel/core/idt.o
+# Object files
+OBJS := $(patsubst %.c, $(BUILD_DIR)/%.o, $(C_SRCS)) \
+        $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(CXX_SRCS)) \
+        $(patsubst %.asm, $(BUILD_DIR)/%.o, $(ASM_SRCS))
 
-.PHONY: all singularity zenith-iso qemu clean test
+.PHONY: all clean iso qemu
 
-all: singularity
+all: iso
 
-singularity: $(KERNEL_SHARDS) $(ASM_SHARDS)
-	@echo "[BUILD] Linking 750-shard sovereign kernel for $(ARCH)..."
-	$(LD) $(LDFLAGS) -o sigmaos-$(ARCH).bin $^
-	@echo "[STATUS] SINGULARITY ACHIEVED. sigmaos-$(ARCH).bin ready."
+$(BUILD_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-build-embedded: CXXFLAGS += -DCONFIG_EMBEDDED -DCONFIG_NO_UI
-build-embedded: singularity
-	@echo "[STATUS] EMBEDDED SHARD READY."
-
-build-rtos: CXXFLAGS += -DCONFIG_RTOS_HARD -DCONFIG_DETERMINISTIC
-build-rtos: singularity
-	@echo "[STATUS] REAL-TIME SHARD READY."
-
-build-cloud: CXXFLAGS += -DCONFIG_VIRTIO_ONLY -DCONFIG_CLOUD_NATIVE
-build-cloud: singularity
-	@echo "[STATUS] CLOUD-NATIVE SHARD READY."
-
-zenith-iso: singularity
-	@echo "[ISO] Generating Zenith deployment image..."
-	$(GRUB) -o zenith-$(ARCH).iso iso_root
-	@echo "[STATUS] zenith-$(ARCH).iso ready."
-
-qemu: singularity
-	$(QEMU) -kernel sigmaos-$(ARCH).bin -serial stdio -m 2G -display none
-
-test:
-	@echo "[TEST] ====== Sovereign CI Test Battery v2.15 ======"
-	@echo "  [PASS] ASI Ignition : Total Security & Virtualization stack verified"
-	@echo "  [PASS] MAC/Audit    : SELinux, IMA, Seccomp, Audit parity verified"
-	@echo "  [PASS] Virt/Containers: KVM, LXC virtualization verified"
-	@echo "[STATUS] All CI tests PASSED. SigmaOS Zenith is Total Finalized."
-
-clean:
-	@echo "[CLEAN] Removing build artifacts..."
-	rm -f $(KERNEL_SHARDS) $(ASM_SHARDS) sigmaos-*.bin zenith-*.iso
-
-%.o: %.cpp
-	@echo "[CXX] $<"
+$(BUILD_DIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-%.o: %.asm
-	@echo "[AS]  $<"
-	$(AS) $(ASFLAGS) $< -o $@
+$(BUILD_DIR)/%.o: %.asm
+	@mkdir -p $(dir $@)
+	$(ASM) $(ASMFLAGS) $< -o $@
 
-lint:
-	@echo "[LINT] Running Clang-Tidy static analysis..."
-	clang-tidy kernel/core/*.cpp -- -I./include -I./kernel/core
+$(KERNEL_BIN): $(OBJS)
+	# Using a basic linker script logic or raw binary dump for now
+	$(LD) -n -Ttext 0x100000 -o $@ $^
 
-benchmark: singularity
-	@echo "[BENCH] Running Industrial Shard Benchmarks..."
-	@echo "  [INFO] S-MM Latency: 42ns (O(1))"
-	@echo "  [INFO] ASI Ignition: 380ms"
-	@echo "  [INFO] PQC Overhead: 4.2%"
-	@echo "[STATUS] Benchmarks complete. See docs/PERFORMANCE.md for trends."
+iso: $(KERNEL_BIN)
+	@mkdir -p $(ISO_DIR)/boot/grub
+	@cp $(KERNEL_BIN) $(ISO_DIR)/boot/
+	@echo "menuentry 'SigmaOS Zenith' {" > $(ISO_DIR)/boot/grub/grub.cfg
+	@echo "    multiboot /boot/sigmaos.bin" >> $(ISO_DIR)/boot/grub/grub.cfg
+	@echo "    boot" >> $(ISO_DIR)/boot/grub/grub.cfg
+	@echo "}" >> $(ISO_DIR)/boot/grub/grub.cfg
+	grub-mkrescue -o $(ISO_IMAGE) $(ISO_DIR)
+
+qemu: iso
+	qemu-system-x86_64 -cdrom $(ISO_IMAGE) -serial stdio -m 2G
+
+clean:
+	rm -rf $(BUILD_DIR)
