@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * SIGMAOS: SOVEREIGN OOP FRAMEWORK (v19.0 - ZERO-DEPENDENCY)
  * =========================================================================
@@ -11,8 +11,7 @@
 #ifndef SIGMA_OOP_HPP
 #define SIGMA_OOP_HPP
 
-#include "./core/sigma_types.h"
-#include "./libc/SovereignLibC.h"
+#include "sigma_kernel_types.h"
 
 namespace SigmaOS {
 
@@ -55,6 +54,7 @@ public:
         m_len += slen;
     }
     const char* c_str() const { return m_data; }
+    sigma_size_t length() const { return m_len; }
 };
 
 // --- Sovereign Map Shard ---

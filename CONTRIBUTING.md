@@ -1,33 +1,33 @@
 # Contributing to SigmaOS
 
-Welcome, Citizen-Developer. By contributing to SigmaOS, you are helping build a sovereign, post-quantum future for humanity.
+SigmaOS is a sovereign project. We value industrial-grade code, zero-dependency engineering, and transparency.
 
-## ⚖️ The Code of Sovereignty
-1. **User First**: Always prioritize user control over system telemetry and package sources.
-2. **Silicon Direct**: Avoid high-level abstractions where silicon-direct primitives are possible.
-3. **PQC-Hardened**: All new shards must implement PQC-GPG attestation for inter-shard comms.
-4. **Zero-Trust**: Every shard is isolated. Minimal permissions by default.
+## ⚖️ General Guidelines
 
-## 🛠 Development Workflow
-1. **Fork the Lattice**: Fork the `main` branch.
-2. **Shard Isolation**: Develop your feature in a dedicated shard directory.
-3. **Build & Fuzz**: Run `sigma-build.py` and ensure the PQC-fuzzer passes.
-4. **Sync**: Ensure your `.md` documentation is updated and synced via `wiki_sync.py`.
+*   **Zero-Dependency**: Do not include external monolithic libraries (glibc, boost, etc.).
+*   **Silicon-Up**: Write code that interacts directly with the lattice/hal when possible.
+*   **PQC-First**: All networked shards must use Dilithium-5/Kyber-1024 signing.
 
-## 📝 Issue Templates
-When reporting a problem, use the `@current_problems` tag so our automated tracker can prioritize it.
+## 🛠 Branching Strategy
 
-**Bug Report Template:**
-- **Problem**: Description of the lattice anomaly.
-- **Shard**: Which shard is affected (e.g., S-NET, S-VFS).
-- **Environment**: Architecture (x86_64, ARM64, RISC-V).
-- **Entropy Hash**: Provide your local lattice entropy hash for reproduction.
+*   `main`: The Industrial Gold build. Stable and certified.
+*   `rolling`: Continuous updates and experimental shards.
+*   `release/*`: Format-specific production builds.
 
-**Feature Request Template:**
-- **Vision**: Description of the new sovereignty-enhancing feature.
-- **Impact**: How it improves user autonomy or system resilience.
+## 📝 Commit Standards
 
-## 🤝 Community
-Join the Sovereign Developer Forum or sync with the Global Lattice Mesh for real-time peer review.
+*   Use imperative mood ("feat: add shard" not "added shard").
+*   Reference the shard ID (e.g., `[S-NET]`).
 
-**Your Silicon. Your Rules. Your Contribution.**
+## 🖇 Pull Request Process
+
+1.  Synchronize your local lattice with the current `rolling` branch.
+2.  Run the Matrix Testing Algorithm (`tests/matrix_test.py`).
+3.  Ensure 100% documentation parity in the Wiki.
+
+## 🛡 Security Reports
+
+Report vulnerabilities directly to the Sovereign Security Shard (`security@sigmaos.org`) using PQC-GPG encryption.
+
+---
+**Your contributions define the future of sovereignty.**

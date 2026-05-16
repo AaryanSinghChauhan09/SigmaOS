@@ -1,9 +1,9 @@
-#include "../include/core/sigma_types.h"
+#include "../include/sigma_kernel_types.h"
 #include "../include/sigma_log.h"
-#include "../include/core/SigmaOOP.hpp"
+#include "../include/SigmaOOP.hpp"
 #include "../include/sigma_sdk.h"
-#include "../kernel/net/SovereignNetStack.hpp"
-#include "../kernel/fs/SovereignVFS.hpp"
+#include "../kernel/include/sigma_net.h"
+#include "../kernel/include/sigma_vfs.h"
 
 /**
  * SigmaOS Package Manager CLI (sigma-pkg) - Sovereign Edition

@@ -19,6 +19,10 @@ typedef signed char        sigma_i8;
 typedef signed short       sigma_i16;
 typedef signed int         sigma_i32;
 typedef signed long long   sigma_i64;
+typedef sigma_i8           sigma_s8;
+typedef sigma_i16          sigma_s16;
+typedef sigma_i32          sigma_s32;
+typedef sigma_i64          sigma_s64;
 typedef unsigned long long sigma_usize;
 typedef long long          sigma_isize;
 typedef sigma_u64                sigma_paddr_t;   /* physical address */
@@ -149,6 +153,10 @@ void sigma_panic(const char* msg, sigma_u64 rip, sigma_u64 rsp);
 #define SIGMA_ASSERT(cond, msg) \
     do { if (!(cond)) sigma_panic(msg, 0, 0); } while (0)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ---- Common Kernel Function Declarations ---- */
 void kprintf(const char* fmt, ...);
 sigma_u32  cpu_get_id(void);
@@ -157,5 +165,9 @@ void serial_putc(char c);
 void serial_puts(const char* s);
 void vga_clear(sigma_u8 color);
 void vga_putc_at(sigma_u8 x, sigma_u8 y, char c, sigma_u8 color);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SIGMA_KERNEL_TYPES_H */

@@ -26,6 +26,7 @@
         .customizer-card {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 24px;
             padding: 40px;
@@ -118,12 +119,12 @@
         
         <div class="control-group">
             <label>Glass Transparency (Lattice Blur)</label>
-            <input type="range" min="0" max="100" value="70">
+            <input type="range" min="0" max="100" value="70" title="Glass Transparency">
         </div>
 
         <div class="control-group">
             <label>Accent Luminescence</label>
-            <input type="range" min="0" max="100" value="80">
+            <input type="range" min="0" max="100" value="80" title="Accent Luminescence">
         </div>
 
         <label>System Theme Profile</label>

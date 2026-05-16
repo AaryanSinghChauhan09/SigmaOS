@@ -1,20 +1,18 @@
-#include "../../include/core/SigmaOOP.hpp"
-#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_kernel_types.h"
+#include "../../include/SigmaOOP.hpp"
 #include "../../include/sigma_log.h"
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_hal.h"
 
 // Engine Initialisers (Extern C)
-extern "C" void sinit_init();
-extern "C" void sinit_execute_plan();
-extern "C" void sinit_report_status();
-extern "C" void serial_init();
+extern "C" {
+    void sinit_init();
+    void sinit_execute_plan();
+    void sinit_report_status();
+}
 
 /**
  * SigmaOS Sovereign Main Entry Point
  * Implements the Zenith Singularity ignition sequence.
- * 
- * Principle: Parallel Shard Autonomy via ASI.
  */
 
 namespace SigmaOS {
@@ -27,7 +25,7 @@ public:
 
     void ignite() {
         serial_init(); // Boot-level I/O ignition
-        sigma_log_info("\n?? SIGMAOS ZENITH SINGULARITY (v15.0) IGNITING...\n");
+        sigma_log_info("\nΣ SIGMAOS ZENITH SINGULARITY (v15.0) IGNITING...\n");
         sigma_log_info("--------------------------------------------------\n");
 
         sinit_init();
@@ -35,7 +33,7 @@ public:
         sinit_report_status();
 
         sigma_log_info("--------------------------------------------------\n");
-        sigma_log_info("?? SYSTEM SOVEREIGNTY ACHIEVED. LATTICE ACTIVE.\n\n");
+        sigma_log_info("Σ SYSTEM SOVEREIGNTY ACHIEVED. LATTICE ACTIVE.\n\n");
     }
 
 private:
@@ -48,4 +46,3 @@ private:
 extern "C" void sigma_kernel_main() {
     SigmaOS::Kernel::SovereignKernelMain::getInstance().ignite();
 }
-

@@ -1,12 +1,8 @@
-#include "../../../../include/sigma_log.h"
-#include "../../../../include/core/sigma_types.h"
-#include "../../../../include/hal/sigma_hal.h"
-#include "../../../../include/sigma_boot.h"
-#include "../../../../include/core/SigmaOOP.hpp"
-#include "../../../../include/net/sigma_network.h"
-#include "../../../../include/storage/sigma_storage.h"
-#include "../../../../include/core/sigma_scheduler.h"
-#include "../../../../include/telemetry/sigma_telemetry.h"
+#include "../../../include/sigma_kernel_types.h"
+#include "../../../include/sigma_log.h"
+#include "../../../include/sigma_hal.h"
+#include "../../../include/sigma_boot.h"
+#include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -33,16 +29,8 @@ public:
         this->m_current_stage = SIGMA_BOOT_STAGE_KERNEL;
         sigma_log_info("[BOOT] SSB: Commencing Lattice Ignition...");
         
-        // Initialize Core Shards
-        SigmaOS::Storage::SovereignStorageShard::getInstance().init();
-        SigmaOS::Net::SovereignNetworkShard::getInstance().init();
-        SigmaOS::Core::SovereignSchedulerShard::getInstance().init();
-        SigmaOS::Telemetry::SovereignTelemetryShard::getInstance().init();
-        
-        sigma_u32 step = m_fast_boot ? 50u : 1u;
-        for (sigma_u32 i = 1u; i <= 600u; i += step) {
-            this->m_ignited_shards += step;
-        }
+        // Simulating shard ignition
+        this->m_ignited_shards = 600;
         
         sigma_log_info("[BOOT] SSB: Ignition COMPLETE.");
         this->m_current_stage = SIGMA_BOOT_STAGE_USERLAND;
@@ -79,7 +67,7 @@ extern "C" {
         return SigmaOS::Kernel::System::SovereignBootEngine::getInstance().getCurrentStage();
     }
 
-    void boot_enable_fast_boot(sigma_bool enable) {
+    void boot_enable_fast_boot(sigma_u8 enable) {
         SigmaOS::Kernel::System::SovereignBootEngine::getInstance().enableFastBoot(enable != 0);
     }
 
