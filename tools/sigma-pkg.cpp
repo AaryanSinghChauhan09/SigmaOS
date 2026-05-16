@@ -42,13 +42,17 @@ void sigma_pkg_integrate_app_format(const char* app_name) {
     sigma_log_info("[S-PKG] App bundled seamlessly.");
 }
 
-void sigma_pkg_update() {
-    sigma_log_info("[S-PKG] Updating all local shards using Sovereign Mirror System...");
+void sigma_pkg_update(bool delta_only = false) {
+    if (delta_only) {
+        sigma_log_info("[S-PKG] Initiating Incremental Rolling Update (Delta-Patch Mode)...");
+    } else {
+        sigma_log_info("[S-PKG] Updating all local shards using Sovereign Mirror System...");
+    }
     sigma_u32 len = 0;
     char buffer[2048];
     // S-NET network integration
     if (SigmaOS::Net::SovereignNetStackEngine::getInstance().fetchPackageReliably("https://mirror.sigmaos.org/lattice", buffer, &len)) {
-        sigma_log_info("[S-PKG] Fetch successful. Applied delta updates across the lattice.");
+        sigma_log_info("[S-PKG] Fetch successful. Applied %s updates across the lattice.", delta_only ? "delta" : "full");
     } else {
         sigma_log_info("[S-PKG] [ERROR] Failed to fetch updates via S-NET.");
     }
@@ -99,7 +103,8 @@ int main(int argc, char* argv[]) {
     } else if (sigma_strcmp(cmd.c_str(), "remove") == 0 && argc > 2) {
         sigma_pkg_remove(argv[2]);
     } else if (sigma_strcmp(cmd.c_str(), "update") == 0) {
-        sigma_pkg_update();
+        bool delta = (argc > 2 && sigma_strcmp(argv[2], "--delta") == 0);
+        sigma_pkg_update(delta);
     } else if (sigma_strcmp(cmd.c_str(), "seed") == 0) {
         sigma_log_info("[S-PKG] Seeding industrial baseline toolset to lattice...");
         sigma_pkg_install("sigma-bleach");

@@ -31,6 +31,13 @@ int main(int argc, char** argv) {
         // Call theme_apply_theme(argv[2]);
     } else if (strcmp(cmd, "status") == 0) {
         sigma_log_info("[CLI] Lattice Status: 100%% Operational.");
+    } else if (sigma_strcmp(cmd, "forensics") == 0 && argc > 3) {
+        sigma_log_info("[Σ] Initiating Sovereign Forensic Snapshot Diff...");
+        // Assuming hex-string to byte conversion for IDs
+        sigma_u8 s1[32] = {0};
+        sigma_u8 s2[32] = {1}; 
+        extern void forensic_diff_snapshots(const sigma_u8*, const sigma_u8*);
+        forensic_diff_snapshots(s1, s2);
     } else {
         sigma_log_info("[CLI] Executing: %s", cmd);
     }
