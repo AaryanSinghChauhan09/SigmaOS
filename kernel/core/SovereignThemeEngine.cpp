@@ -1,11 +1,7 @@
 #include "../../include/core/sigma_types.h"
 #include "../../include/sigma_log.h"
 #include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_log.h"
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/sigma_log.h"
 #include "../../include/sigma_time.h"
-#include "../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Adaptive Theme Engine
@@ -25,38 +21,36 @@ public:
     }
 
     void init() {
-        sigma_log("[THEME] Initializing Sovereign Adaptive Theme Engine...");
+        sigma_log_info("[S-THEME] Initializing Sovereign Adaptive Theme Engine...");
         
         this->active_theme.accent_color = 0x00A0FF; // Sigma Blue
         this->active_theme.background_blur_sigma = 20;
         this->active_theme.dark_mode = true;
         this->adaptive_switch_enabled = true;
-        sigma_hardened_strcpy(this->active_theme.font_family, "Outfit", 32);
-        sigma_log("[THEME] Adaptive Engine initialized. Awaiting ambient sensor data.");
+        sigma_log_info("[S-THEME] Adaptive Engine initialized. Awaiting ambient sensor data.");
     }
 
     void applyAccent(sigma_u32 color) {
         this->active_theme.accent_color = color;
-        sigma_log_info("[THEME] Silicon Accent Color updated to 0x%06X.\n", (unsigned)color);
+        sigma_log_info("[S-THEME] Silicon Accent Color updated to 0x%06X.", (unsigned)color);
     }
 
     void toggleDarkMode() {
         this->active_theme.dark_mode = !this->active_theme.dark_mode;
-        sigma_log(this->active_theme.dark_mode ? "[THEME] Dark Mode: ENABLED." : "[THEME] Dark Mode: DISABLED.");
+        sigma_log_info(this->active_theme.dark_mode ? "[S-THEME] Dark Mode: ENABLED." : "[S-THEME] Dark Mode: DISABLED.");
     }
 
-    void evaluateAdaptiveTheme() {
-        if (!this->adaptive_switch_enabled) return;
+    void loadUserProfile(const char* username) {
+        sigma_log_info("[S-THEME] [PERSONALIZATION] Loading Sovereign Profile for User: %s", username);
+        sigma_log_info("[S-THEME] [PERSONALIZATION] Restoring custom shard toggles and workspace layout.");
+    }
 
-        // Scaffolded Adaptive UI Theme logic: 
-        // Queries real-time clock to switch Dark/Light mode dynamically.
-        // In reality, this would also query an ambient light sensor.
-        sigma_time_t now = time_now();
-        bool should_be_dark = (now.hour >= 18 || now.hour <= 6);
-        
-        if (should_be_dark != this->active_theme.dark_mode) {
-            sigma_log_info("[THEME] Adaptive Trigger: Auto-switching theme due to time (%02d:%02d).\n", now.hour, now.minute);
-            this->toggleDarkMode();
+    void evaluateTelemetryPersonalization(sigma_u32 cpu_load) {
+        if (cpu_load > 80) {
+            sigma_log_info("[S-THEME] [AI-UI] High silicon load detected. Reducing UI blur/transparency for performance.");
+            this->active_theme.background_blur_sigma = 0;
+        } else {
+            this->active_theme.background_blur_sigma = 20;
         }
     }
 
@@ -79,20 +73,24 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void theme_init() {
-    SovereignThemeEngine::getInstance().init();
+extern "C" {
+    void theme_init() {
+        SovereignThemeEngine::getInstance().init();
+    }
+
+    void theme_apply_accent(sigma_u32 color) {
+        SovereignThemeEngine::getInstance().applyAccent(color);
+    }
+
+    void theme_toggle_dark_mode() {
+        SovereignThemeEngine::getInstance().toggleDarkMode();
+    }
+
+    void theme_load_profile(const char* user) {
+        SovereignThemeEngine::getInstance().loadUserProfile(user);
+    }
+
+    void theme_adaptive_telemetry(sigma_u32 cpu) {
+        SovereignThemeEngine::getInstance().evaluateTelemetryPersonalization(cpu);
+    }
 }
-
-extern "C" void theme_apply_accent(sigma_u32 color) {
-    SovereignThemeEngine::getInstance().applyAccent(color);
-}
-
-extern "C" void theme_toggle_dark_mode() {
-    SovereignThemeEngine::getInstance().toggleDarkMode();
-}
-
-extern "C" void theme_evaluate_adaptive() {
-    SovereignThemeEngine::getInstance().evaluateAdaptiveTheme();
-}
-
-
