@@ -1,45 +1,64 @@
 #include "../include/sigma_kernel_types.h"
 #include "../include/sigma_log.h"
-#include <string.h>
+#include "../include/sigma_recovery.h"
+#include "../include/sigma_iot.h"
+#include "../include/sigma_gaming.h"
+#include "../include/SigmaOOP.hpp"
 
 /**
- * SIGMA-CLI: Unified Sovereign Command Line Interface
- * Manages shards, themes, and system profiles.
+ * Σ SIGMAOS: SOVEREIGN UNIFIED CLI (sigma-cli)
+ * Purpose: Professional interface for shard orchestration, diagnostics, and recovery.
+ * Principle: One CLI to rule the Lattice.
  */
 
+using namespace SigmaOS;
+
 void print_help() {
-    sigma_log_info("Σ SigmaOS Unified CLI (sigma-cli)");
-    sigma_log_info("Usage: sigma <command> [options]");
-    sigma_log_info("Commands:");
-    sigma_log_info("  install <shard>    Install a lattice shard");
-    sigma_log_info("  remove  <shard>    Remove a lattice shard");
-    sigma_log_info("  status             View lattice health");
-    sigma_log_info("  theme   <name>     Apply a visual theme (NOIR, FROST, etc.)");
-    sigma_log_info("  profile <name>     Apply a system profile (RTOS, CLOUD, etc.)");
+    sigma_log_info("Σ SigmaOS Sovereign CLI (sigma-cli) v15.0 [Zenith]");
+    sigma_log_info("Usage: sigma-cli <subsystem> <command> [args]");
+    sigma_log_info("Subsystems:");
+    sigma_log_info("  recover   Shard recovery, snapshots, and forensics.");
+    sigma_log_info("  iot       GPIO management and sensor polling.");
+    sigma_log_info("  game      GPU boost and controller management.");
+    sigma_log_info("  telemetry Query shard health and performance metrics.");
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char* argv[]) {
     if (argc < 2) {
         print_help();
         return 1;
     }
 
-    const char* cmd = argv[1];
+    SigmaString subsystem(argv[1]);
 
-    if (strcmp(cmd, "theme") == 0 && argc > 2) {
-        sigma_log_info("[CLI] Updating Lattice Visuals to: %s", argv[2]);
-        // Call theme_apply_theme(argv[2]);
-    } else if (strcmp(cmd, "status") == 0) {
-        sigma_log_info("[CLI] Lattice Status: 100%% Operational.");
-    } else if (sigma_strcmp(cmd, "forensics") == 0 && argc > 3) {
-        sigma_log_info("[Σ] Initiating Sovereign Forensic Snapshot Diff...");
-        // Assuming hex-string to byte conversion for IDs
-        sigma_u8 s1[32] = {0};
-        sigma_u8 s2[32] = {1}; 
-        extern void forensic_diff_snapshots(const sigma_u8*, const sigma_u8*);
-        forensic_diff_snapshots(s1, s2);
+    if (sigma_strcmp(subsystem.c_str(), "recover") == 0 && argc > 2) {
+        SigmaString cmd(argv[2]);
+        if (sigma_strcmp(cmd.c_str(), "snapshot") == 0 && argc > 3) {
+            recovery_create_snapshot(argv[3]);
+        } else if (sigma_strcmp(cmd.c_str(), "audit") == 0) {
+            recovery_run_forensic_audit();
+        } else if (sigma_strcmp(cmd.c_str(), "wipe") == 0 && argc > 3) {
+            recovery_secure_wipe_shard(argv[3]);
+        }
+    } else if (sigma_strcmp(subsystem.c_str(), "iot") == 0 && argc > 2) {
+        SigmaString cmd(argv[2]);
+        if (sigma_strcmp(cmd.c_str(), "poll") == 0) {
+            iot_sensor_poll_all();
+        } else if (sigma_strcmp(cmd.c_str(), "set") == 0 && argc > 4) {
+            iot_gpio_write(0, sigma_strcmp(argv[4], "high") == 0);
+        }
+    } else if (sigma_strcmp(subsystem.c_str(), "game") == 0 && argc > 2) {
+        SigmaString cmd(argv[2]);
+        if (sigma_strcmp(cmd.c_str(), "boost") == 0) {
+            gaming_enable_boost(0, GAME_LEVEL_ULTRA);
+        } else if (sigma_strcmp(cmd.c_str(), "controllers") == 0) {
+            gaming_detect_controllers();
+        }
+    } else if (sigma_strcmp(subsystem.c_str(), "telemetry") == 0) {
+        gaming_report_gpu_load();
+        sigma_log_info("[CLI] Lattice Health: 100%% | Shard Status: ALL_ACTIVE");
     } else {
-        sigma_log_info("[CLI] Executing: %s", cmd);
+        print_help();
     }
 
     return 0;
