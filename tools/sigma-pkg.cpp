@@ -26,8 +26,19 @@ void sigma_pkg_version_pin(const char* shard_id, const char* version) {
 
 void sigma_pkg_integrate_app_format(const char* app_name) {
     sigma_log_info("[S-PKG] Integrating universal app bundle (Portable App Format) for %s...", app_name);
-    // S-VFS Sandbox integration
-    SigmaOS::FS::SovereignVFS::getInstance().isolate_package_sandbox(app_name, "/mnt/sandbox/app");
+    
+    SigmaString name_str(app_name);
+    if (sigma_strcmp(name_str.c_str() + name_str.length() - 8, ".flatpak") == 0) {
+        sigma_log_info("[S-PKG] [FORMAT] Detected Flatpak bundle. Initializing Sovereign OSTree extraction...");
+        SigmaOS::FS::SovereignVFS::getInstance().isolate_package_sandbox(app_name, "/var/sigma-pkg/flatpak-sandbox");
+    } else if (sigma_strcmp(name_str.c_str() + name_str.length() - 9, ".appimage") == 0) {
+        sigma_log_info("[S-PKG] [FORMAT] Detected AppImage bundle. Mounting squashfs layer...");
+        SigmaOS::FS::SovereignVFS::getInstance().isolate_package_sandbox(app_name, "/var/sigma-pkg/appimage-sandbox");
+    } else {
+        // Default S-VFS Sandbox integration
+        SigmaOS::FS::SovereignVFS::getInstance().isolate_package_sandbox(app_name, "/mnt/sandbox/app");
+    }
+    
     sigma_log_info("[S-PKG] App bundled seamlessly.");
 }
 
@@ -54,6 +65,7 @@ void print_help() {
     sigma_log_info("Usage: sigma-pkg <command> [options]");
     sigma_log_info("Commands:");
     sigma_log_info("  install <id>   Install a professional shard from the lattice nexus.");
+    sigma_log_info("                 (Also supports .flatpak and .appimage directly)");
     sigma_log_info("  remove  <id>   Decommission a shard from the local silicon node.");
     sigma_log_info("  update         Update all installed shards to their latest version.");
     sigma_log_info("  list           List all active professional shards.");
