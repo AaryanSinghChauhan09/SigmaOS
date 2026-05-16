@@ -28,25 +28,25 @@ This roadmap formalizes the remaining gaps between SigmaOS Zenith and legacy com
 
 - [x] Automated Wiki synchronization initialization.
 
-### Phase 2: Utilities Parity (CURRENT)
+### Phase 2: Utilities Parity (COMPLETE)
 
-- [ ] Forensic Snapshot Diff Engine implementation.
+- [x] Forensic Snapshot Diff Engine implementation.
 
-- [ ] Education Profile (Classroom management shards).
+- [x] Education Profile (Classroom management shards).
 
-- [ ] Gaming Optimization Shards (GPU/Input).
+- [x] Gaming Optimization Shards (GPU/Input).
 
-- [ ] IoT/Sensor Toolkit for embedded silicon.
+- [x] IoT/Sensor Toolkit for embedded silicon.
 
-### Phase 3: Advanced Automation (PLANNED)
+### Phase 3: Advanced Automation (COMPLETE)
 
-- [ ] Sovereign App Store GUI development.
+- [x] Sovereign App Store GUI development.
 
-- [ ] sigma-cli + Telemetry CLI expansion.
+- [x] sigma-cli + Telemetry CLI expansion.
 
-- [ ] Adaptive ML scheduling algorithms.
+- [x] Adaptive ML scheduling algorithms.
 
-- [ ] Theme engine & Accessibility toolkit completion.
+- [x] Theme engine & Accessibility toolkit completion.
 
 ## ⚙️ Contribution Principles
 
