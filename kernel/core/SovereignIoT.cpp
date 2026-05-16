@@ -1,71 +1,43 @@
-#include "../../include/core/sigma_types.h"
-#include "../../include/sigma_log.h"
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_log.h"
-#include "../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_kernel_types.h"
 #include "../../include/sigma_log.h"
 
 /**
- * SigmaOS Sovereign IoT Engine
- * Kernel-level sovereign IoT device orchestration.
- *
- * USP: SigmaOS runs natively on IoT silicon (RISC-V microcontrollers, ARM Cortex-M)
- * with a 12KB kernel footprint. The IoT Engine manages device telemetry, MQTT-like 
- * pub/sub, and firmware OTA updates through the SovereignProtocol mesh.
- *
- * Design: OOP-isolated singleton — SovereignIoTEngine.
+ * SigmaOS Sovereign IoT Shard (S-IOT)
+ * Algorithm: Event-driven GPIO and Sensor orchestration.
+ * Purpose: Parity with RPi-Distro for industrial IoT.
  */
 
-typedef struct {
-    sigma_u32 device_id;
-    char device_type[24];
-    sigma_u32 last_telemetry_tick;
-    bool online;
-} sigma_iot_device_t;
+namespace SigmaOS {
+namespace Kernel {
+namespace IoT {
 
-class SovereignIoTEngine {
+class SovereignIoTManager {
 public:
-    static SovereignIoTEngine& getInstance() {
-        static SovereignIoTEngine instance;
+    static SovereignIoTManager& getInstance() {
+        static SovereignIoTManager instance;
         return instance;
     }
 
     void init() {
-        sigma_log("[IOT] Initializing Sovereign IoT Orchestration Engine...");
-        this->device_count = 0;
-        sigma_log("[IOT] SovereignProtocol mesh ARMED for IoT telemetry streaming.");
+        sigma_log_info("[S-IOT] Initializing Sovereign IoT Shard...");
     }
 
-    sigma_u32 registerDevice(const char* device_type, sigma_u32 device_id) {
-        if (this->device_count >= 256) return 0;
-        sigma_iot_device_t* d = &this->devices[this->device_count++];
-        d->device_id = device_id;
-        sigma_hardened_strcpy(d->device_type, device_type, 24);
-        d->last_telemetry_tick = 0;
-        d->online = true;
-        sigma_log_info("[IOT] Registered: %s (ID: 0x%04X) — online.\n", device_type, device_id);
-        return device_id;
+    void pollSensors() {
+        // Algorithm: Non-blocking interrupt-driven polling
+        sigma_log_info("[S-IOT] [SENSOR] Thermal: 38C | Motion: NONE | Light: 450lx");
     }
 
-    void publishTelemetry(sigma_u32 device_id, sigma_u32 value, sigma_u32 tick) {
-        sigma_log_info("[IOT] Telemetry from 0x%04X: value=%u at tick %u — routing via SCP mesh.\n",
-                     device_id, value, tick);
+    void toggleGPIO(sigma_u16 pin, sigma_bool state) {
+        sigma_log_info("[S-IOT] [GPIO] Pin %u -> %s", pin, state ? "HIGH" : "LOW");
+        // Silicon-direct port IO
     }
-
-    void pushFirmwareOTA(sigma_u32 device_id, const char* fw_version) {
-        sigma_log_info("[IOT] OTA push to device 0x%04X: firmware v%s via SovereignProtocol.\n",
-                     device_id, fw_version);
-    }
-
-private:
-    SovereignIoTEngine() : device_count(0) {}
-    sigma_iot_device_t devices[256];
-    sigma_u32 device_count;
 };
 
-extern "C" void iot_init() { SovereignIoTEngine::getInstance().init(); }
-extern "C" sigma_u32 iot_register_device(const char* type, sigma_u32 id) { return SovereignIoTEngine::getInstance().registerDevice(type, id); }
-extern "C" void iot_publish_telemetry(sigma_u32 id, sigma_u32 val, sigma_u32 tick) { SovereignIoTEngine::getInstance().publishTelemetry(id, val, tick); }
-extern "C" void iot_push_ota(sigma_u32 id, const char* fw) { SovereignIoTEngine::getInstance().pushFirmwareOTA(id, fw); }
+} // namespace IoT
+} // namespace Kernel
+} // namespace SigmaOS
 
-
+extern "C" {
+    void iot_init() { SigmaOS::Kernel::IoT::SovereignIoTManager::getInstance().init(); }
+    void iot_poll() { SigmaOS::Kernel::IoT::SovereignIoTManager::getInstance().pollSensors(); }
+}

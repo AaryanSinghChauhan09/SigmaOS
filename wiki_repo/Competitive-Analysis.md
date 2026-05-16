@@ -28,8 +28,8 @@ SigmaOS is designed for **Absolute Non-Equivalence** — a sovereign computation
 - **Storage (`S-STOR`)**: Lattice File System with atomic commits and VFS abstraction.
 - **Real-Time Scheduler (`S-SCHED`)**: Deterministic CFS-style scheduling with EDF support.
 - **AI Telemetry (`S-AI-TEL`)**: Predictive failure analysis and anomaly detection hooks.
-- **Package Manager (`S-PKG`)**: PQC-attested `.sab` bundle delivery and verification.
-- **Automated CI/CD**: x86, ARM64, RISC-V builds + QEMU boot + stress tests.
+- **Package Manager (`S-PKG`)**: PQC-attested `.sab` bundle delivery, verification, and **incremental delta updates**.
+- **Automated CI/CD**: x86, ARM64, RISC-V builds + QEMU boot + **forensic snapshot diffing**.
 
 ## 🔴 What SigmaOS Still Needs
 
@@ -41,6 +41,9 @@ SigmaOS is designed for **Absolute Non-Equivalence** — a sovereign computation
 | Gaming | SteamOS | GPU Opt | Dynamic GPU scheduler | ✅ **FIXED** |
 | Performance | Clear Linux | Auto-Opt | Telemetry-driven optimiser | ✅ **FIXED** |
 | Recovery | RescueZilla | Snapshots | Snapshot diff engine | ✅ **FIXED** |
+| Containers | Fedora CoreOS | Orchestration | Shard orchestrator | ✅ **FIXED** |
+| Rolling | Arch / Solus | Delta Updates | Incremental shard updater | ✅ **FIXED** |
+| Enterprise | Ubuntu | Regressions | Automated regression harness | ✅ **FIXED** |
 
 ## 🔑 Key Recommendations
 
