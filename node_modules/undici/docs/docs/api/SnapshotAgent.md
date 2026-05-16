@@ -46,7 +46,7 @@ Makes real HTTP requests and saves the responses to snapshots.
 ```javascript
 import { SnapshotAgent, setGlobalDispatcher } from 'undici'
 
-const agent = new SnapshotAgent({ 
+const agent = new SnapshotAgent({
   mode: 'record',
   snapshotPath: './test/snapshots/api-calls.json'
 })
@@ -122,13 +122,13 @@ Control which headers are used for request matching and what gets stored in snap
 const agent = new SnapshotAgent({
   mode: 'record',
   snapshotPath: './snapshots.json',
-  
+
   // Only match these specific headers
   matchHeaders: ['content-type', 'accept'],
-  
+
   // Ignore these headers during matching (but still store them)
   ignoreHeaders: ['user-agent', 'date'],
-  
+
   // Exclude sensitive headers from snapshots entirely
   excludeHeaders: ['authorization', 'x-api-key', 'cookie']
 })
@@ -142,13 +142,13 @@ Use callback functions to determine what gets recorded or played back:
 const agent = new SnapshotAgent({
   mode: 'record',
   snapshotPath: './snapshots.json',
-  
+
   // Only record GET requests to specific endpoints
   shouldRecord: (requestOpts) => {
     const url = new URL(requestOpts.path, requestOpts.origin)
     return requestOpts.method === 'GET' && url.pathname.startsWith('/api/v1/')
   },
-  
+
   // Skip authentication endpoints during playback
   shouldPlayback: (requestOpts) => {
     const url = new URL(requestOpts.path, requestOpts.origin)
@@ -165,7 +165,7 @@ Exclude specific URLs from recording/playback using patterns:
 const agent = new SnapshotAgent({
   mode: 'record',
   snapshotPath: './snapshots.json',
-  
+
   excludeUrls: [
     'https://analytics.example.com',  // String match
     /\/api\/v\d+\/health/,           // Regex pattern
@@ -182,10 +182,10 @@ Configure automatic memory and disk management:
 const agent = new SnapshotAgent({
   mode: 'record',
   snapshotPath: './snapshots.json',
-  
+
   // Keep only 1000 snapshots in memory
   maxSnapshots: 1000,
-  
+
   // Automatically save to disk every 30 seconds
   autoFlush: true,
   flushInterval: 30000
@@ -203,7 +203,7 @@ const agent = new SnapshotAgent({ mode: 'record', snapshotPath: './sequential.js
 // First call returns response A
 await fetch('https://api.example.com/random')
 
-// Second call returns response B  
+// Second call returns response B
 await fetch('https://api.example.com/random')
 
 await agent.saveSnapshots()
@@ -234,7 +234,7 @@ const recorder = agent.getRecorder()
 const snapshots = recorder.getSnapshots()
 
 // Modify or filter snapshots
-const filteredSnapshots = snapshots.filter(s => 
+const filteredSnapshots = snapshots.filter(s =>
   !s.request.url.includes('deprecated')
 )
 
@@ -350,19 +350,19 @@ import { SnapshotAgent, setGlobalDispatcher, getGlobalDispatcher } from 'undici'
 
 test('API integration test', async (t) => {
   const originalDispatcher = getGlobalDispatcher()
-  
+
   const agent = new SnapshotAgent({
     mode: 'playback',
     snapshotPath: './test/snapshots/api-test.json'
   })
   setGlobalDispatcher(agent)
-  
+
   t.after(() => setGlobalDispatcher(originalDispatcher))
-  
+
   // This will use recorded data
   const response = await fetch('https://api.example.com/users')
   const users = await response.json()
-  
+
   assert(Array.isArray(users))
   assert(users.length > 0)
 })
@@ -395,7 +395,7 @@ function createSnapshotAgent(testName, mode = 'playback') {
 test('user API test', async (t) => {
   const agent = createSnapshotAgent('user-api')
   setGlobalDispatcher(agent)
-  
+
   // Test implementation...
 })
 ```
@@ -441,26 +441,26 @@ By default, SnapshotAgent records all headers and request/response data. For pro
 const agent = new SnapshotAgent({
   mode: 'record',
   snapshotPath: './snapshots.json',
-  
+
   // Exclude sensitive headers from snapshots
   excludeHeaders: [
     'authorization',
-    'x-api-key', 
+    'x-api-key',
     'cookie',
     'set-cookie',
     'x-auth-token',
     'x-csrf-token'
   ],
-  
+
   // Filter out requests with sensitive data
   shouldRecord: (requestOpts) => {
     const url = new URL(requestOpts.path, requestOpts.origin)
-    
+
     // Don't record authentication endpoints
     if (url.pathname.includes('/auth/') || url.pathname.includes('/login')) {
       return false
     }
-    
+
     // Don't record if request contains sensitive body data
     if (requestOpts.body && typeof requestOpts.body === 'string') {
       const body = requestOpts.body.toLowerCase()
@@ -468,7 +468,7 @@ const agent = new SnapshotAgent({
         return false
       }
     }
-    
+
     return true
   }
 })
@@ -561,7 +561,7 @@ test('API test', async (t) => {
     mode: 'playback',
     snapshotPath: './test/snapshots/temp-test.json'
   })
-  
+
   // Clean up after test
   t.after(() => {
     agent.clearSnapshots()
@@ -577,10 +577,10 @@ test('validate snapshot contents', async (t) => {
     mode: 'playback',
     snapshotPath: './test/snapshots/validation.json'
   })
-  
+
   const recorder = agent.getRecorder()
   const snapshots = recorder.getSnapshots()
-  
+
   // Validate snapshot structure
   assert(snapshots.length > 0, 'Should have recorded snapshots')
   assert(snapshots[0].request.url.startsWith('https://'), 'Should use HTTPS')

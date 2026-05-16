@@ -1,6 +1,7 @@
 # Subsystem Diagrams
 
 ## 1. Sovereign Network Stack (S-NET)
+
 ```mermaid
 graph TD
     A[Silicon NIC] --> B[SovereignNetStack Shard]
@@ -12,6 +13,7 @@ graph TD
 ```
 
 ## 2. Sovereign File System (S-VFS)
+
 ```mermaid
 graph TD
     A[S-VFS Interface] --> B[Journaling Engine]
@@ -23,6 +25,7 @@ graph TD
 ```
 
 ## 3. AI Telemetry & Adaptive Scheduling
+
 ```mermaid
 graph LR
     A[Telemetry ALO] --> B[Predictive Analysis]
@@ -33,6 +36,7 @@ graph LR
 ```
 
 ## 4. Package Management (sigma-pkg)
+
 ```mermaid
 graph TD
     A[User CLI] --> B[Dependency Resolver]

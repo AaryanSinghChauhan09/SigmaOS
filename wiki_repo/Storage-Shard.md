@@ -12,14 +12,16 @@ graph TD
     B --> E{NVMe Raw}
     C --> F[Sovereign HAL]
     D --> F
-    E --> 
+    E -->
 
 
 
 
 
  **Lattice FS (LFS)**: A custom, atomic file system designed to prevent corruption during unexpected shutdowns.
+
 - **Legacy Support**: `mount()` operations for FAT32 and EXT2 partitions.
+
 - **NVMe Awareness**: Direct Memory Access (DMA) hooks for extreme throughput.
 
 ## VFS API Example

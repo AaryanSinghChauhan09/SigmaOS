@@ -19,19 +19,23 @@ graph TD
 
 
  **VESA Framebuffer**: Basic legacy compatibility.
+
 - **Intel Graphics (Work-in-Progress)**: Experimental hardware acceleration.
 
 
 
  **Intel PRO/1000**: Gigabit Ethernet support.
+
 - **802.11ax (Experimental)**: High-speed wireless orchestration.
 
 
 
  **AHCI (SATA)**: Legacy HDD/SSD support.
+
 - **NVMe**: Direct PCIe memory access for near-zero latency storage.
 
 ## Writing a Driver
+
 Drivers are just standard Shard modules implementing `register_device()`.
 
 ```c

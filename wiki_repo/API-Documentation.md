@@ -39,8 +39,7 @@ c
 sigma_status load_shard_module(sigma_module_t* module)
 
 Dynamically links and loads a `sigma_module_t` into the kernel lattice.
-
-**Parameters:**
+### Parameters:
 - `module`: A pointer to a valid `sigma_module_t` struct containing the `init_hook` and `exit_hook`.
 
 ### `register_device
@@ -48,7 +47,7 @@ Dynamically links and loads a `sigma_module_t` into the kernel lattice.
 c
 sigma_status register_device(const char* device_name, void* operations)
 
-Registers a new hardware device with the Sovereign HAL. 
+Registers a new hardware device with the Sovereign HAL.
 
 ## Post-Quantum APIs
 

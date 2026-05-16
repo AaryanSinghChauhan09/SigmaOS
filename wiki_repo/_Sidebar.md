@@ -95,7 +95,9 @@
 - [Format: Cloud (Containers & Scaling)](Cloud-Format)
 
 - [Format: Mobile (Multimedia & Productivity)](Mobile-Format)
+
 - [Format: Forensic (Audit & Recovery)](Forensic-Profile)
+
 - [Format: Education (NCERT & Labs)](Education-Profile)
 
 ## ðŸ› ï¸ Industrial Readiness
@@ -108,7 +110,21 @@
 
 - [Performance Benchmarks](PERFORMANCE.md)
 
-- [Zenith v15.0 Changelog](CHANGELOG.md)
+## 📊 Niche Parity (vs Competitors)
+
+- [Gaming & GPU Utilities](Gaming-Utilities)
+
+- [Performance Optimizer](Performance-Optimizer)
+
+- [IoT & Embedded Toolkit](IoT-and-Embedded)
+
+- [Reproducibility & Rollback](Reproducibility-Guide)
+
+- [Container Orchestration](Container-Orchestration)
+
+- [Rolling Release Strategy](Rolling-Release-Strategy)
+
+- [Enterprise & Regression](Enterprise-Regression)
 
 ---
 
