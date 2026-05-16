@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_API_HPP
 #define SOVEREIGN_API_HPP
 
-#include "./core/sigma_types.h"
+#include "./sigma_kernel_types.h"
 #include "./SigmaOOP.hpp"
 
 namespace SigmaOS {

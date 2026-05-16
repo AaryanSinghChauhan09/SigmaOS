@@ -1,4 +1,4 @@
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-LABOUR-SHARD (New Labour Codes 2020)

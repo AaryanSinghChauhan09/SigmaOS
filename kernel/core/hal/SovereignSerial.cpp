@@ -1,4 +1,4 @@
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/sigma_log.h"
 
 #define COM1 0x3F8

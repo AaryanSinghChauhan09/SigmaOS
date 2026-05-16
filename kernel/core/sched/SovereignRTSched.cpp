@@ -4,7 +4,7 @@
  * for high-assurance real-time shards (e.g., HAL, PQC).
  */
 
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/sigma_log.h"
 #include "../../../include/sched/SovereignScheduler.h"
 #include "../../../include/SigmaOOP.hpp"

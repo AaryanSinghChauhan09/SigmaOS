@@ -1,5 +1,5 @@
 #include "../../include/hal/sigma_hal.h"
-#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_kernel_types.h"
 #include "../../include/sigma_eyetrack.h"
 #include "../../include/hal/sigma_hal.h"
 #include "../../include/ai/sigma_neural.h"

@@ -3,7 +3,7 @@
  * Implements high-performance demand paging and swapping for the micro-sharded kernel.
  */
 
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/sigma_hal.h"
 #include "../../../include/sigma_log.h"
 

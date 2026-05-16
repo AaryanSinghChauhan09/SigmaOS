@@ -1,4 +1,4 @@
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: ROLE-BASED ACCESS CONTROL (v1.0)

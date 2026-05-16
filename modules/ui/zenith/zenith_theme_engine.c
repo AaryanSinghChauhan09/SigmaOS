@@ -6,7 +6,7 @@
  */
 #include "../../../include/libc/SovereignLibC.h"
 #include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 
 typedef struct {
     sigma_u8 r, g, b, a;

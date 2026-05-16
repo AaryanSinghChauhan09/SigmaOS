@@ -8,7 +8,7 @@
  */
 
 #include "../../include/libc/SovereignLibC.h"
-#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 #define PAGE_SIZE 4096
 

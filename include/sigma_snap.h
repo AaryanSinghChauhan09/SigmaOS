@@ -1,7 +1,7 @@
 ﻿#ifndef SIGMA_SNAP_H
 #define SIGMA_SNAP_H
 
-#include "./core/sigma_types.h"
+#include "./sigma_kernel_types.h"
 
 typedef struct {
     sigma_u32 id;

@@ -1,4 +1,4 @@
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN PROCESS MANAGER (v25.0 - PURE C11)

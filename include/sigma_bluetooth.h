@@ -11,7 +11,7 @@
 #ifndef SIGMA_BLUETOOTH_H
 #define SIGMA_BLUETOOTH_H
 
-#include "./core/sigma_types.h"
+#include "./sigma_kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {

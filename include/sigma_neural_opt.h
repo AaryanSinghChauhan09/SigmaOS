@@ -1,6 +1,6 @@
 ﻿#ifndef SIGMA_NEURAL_OPT_H
 #define SIGMA_NEURAL_OPT_H
-#include "./core/sigma_types.h"
+#include "./sigma_kernel_types.h"
 #include "./sigma_log.h"
 #ifdef __cplusplus
 extern "C" {

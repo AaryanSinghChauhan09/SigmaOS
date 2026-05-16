@@ -11,7 +11,7 @@
 #ifndef SIGMA_ZENITHUI_H
 #define SIGMA_ZENITHUI_H
 
-#include "./core/sigma_types.h"
+#include "./sigma_kernel_types.h"
 
 /**
  * SigmaOS Morphic Zenith UI Header

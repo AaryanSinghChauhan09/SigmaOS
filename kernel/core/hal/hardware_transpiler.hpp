@@ -3,7 +3,7 @@
 #ifndef HARDWARE_TRANSPILER_HPP
 #define HARDWARE_TRANSPILER_HPP
 
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {

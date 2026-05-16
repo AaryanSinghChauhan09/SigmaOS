@@ -13,7 +13,7 @@
 #define SIGMA_HAL_H
 
 /* sigma_kernel_types.h is the single source of truth for all primitives */
-#include "./core/sigma_types.h"
+#include "./sigma_kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {

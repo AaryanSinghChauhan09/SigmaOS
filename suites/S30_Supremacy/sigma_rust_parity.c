@@ -8,7 +8,7 @@
  */
 
 #include "../../include/libc/SovereignLibC.h"
-#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 // --- Safe Wrapper Sharding (Option/Result style) ---
 typedef struct {

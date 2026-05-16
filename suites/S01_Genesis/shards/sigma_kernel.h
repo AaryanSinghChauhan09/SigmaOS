@@ -1,6 +1,6 @@
 #ifndef SIGMA_KERNEL_H
 #define SIGMA_KERNEL_H
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/sigma_log.h"
 #ifdef __cplusplus
 extern "C" {

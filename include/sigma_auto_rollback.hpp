@@ -1,6 +1,6 @@
 ﻿#ifndef SIGMA_AUTO_ROLLBACK_HPP
 #define SIGMA_AUTO_ROLLBACK_HPP
-#include "./core/sigma_types.h"
+#include "./sigma_kernel_types.h"
 #include "./sigma_log.h"
 #ifdef __cplusplus
 extern "C" {

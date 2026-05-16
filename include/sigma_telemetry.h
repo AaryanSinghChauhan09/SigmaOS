@@ -9,7 +9,7 @@
 #ifndef SIGMA_TELEMETRY_H
 #define SIGMA_TELEMETRY_H
 
-#include "./core/sigma_types.h"
+#include "./sigma_kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {

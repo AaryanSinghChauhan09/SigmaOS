@@ -7,7 +7,7 @@
  */
 
 #include "../../include/hal/sigma_hal.h"
-#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_kernel_types.h"
 #include "../../include/fs/sigma_vfs.h"
 
 class SovereignPackageManager {

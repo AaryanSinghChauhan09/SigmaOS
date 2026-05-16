@@ -1,7 +1,7 @@
 ﻿#ifndef SOVEREIGN_MATH_HPP
 #define SOVEREIGN_MATH_HPP
 
-#include "./core/sigma_types.h"
+#include "./sigma_kernel_types.h"
 
 namespace SigmaOS {
 namespace Core {

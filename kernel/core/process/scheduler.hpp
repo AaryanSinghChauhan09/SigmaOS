@@ -3,7 +3,7 @@
 #ifndef SCHEDULER_HPP
 #define SCHEDULER_HPP
 
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/SigmaOOP.hpp"
 #include "../../../include/SovereignString.hpp"
 

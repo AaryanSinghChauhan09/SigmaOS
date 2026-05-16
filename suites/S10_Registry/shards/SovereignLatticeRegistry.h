@@ -1,6 +1,6 @@
 #ifndef SOVEREIGN_LATTICE_REGISTRY_H
 #define SOVEREIGN_LATTICE_REGISTRY_H
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/sigma_log.h"
 #include "../../../include/SigmaOOP.hpp"
 #ifdef __cplusplus

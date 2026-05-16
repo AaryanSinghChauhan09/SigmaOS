@@ -1,4 +1,4 @@
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/sigma_hal.h"
 #ifndef JOB_SHARD_HPP
 #define JOB_SHARD_HPP

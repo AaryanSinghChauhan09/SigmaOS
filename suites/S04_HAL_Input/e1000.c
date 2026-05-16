@@ -1,4 +1,4 @@
-#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_kernel_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: INTEL E1000 DRIVER (v1.0)

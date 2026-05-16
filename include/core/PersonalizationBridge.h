@@ -1,7 +1,7 @@
 ﻿#ifndef PERSONALIZATION_BRIDGE_H
 #define PERSONALIZATION_BRIDGE_H
 
-#include "./sigma_types.h"
+#include "./sigma_kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {

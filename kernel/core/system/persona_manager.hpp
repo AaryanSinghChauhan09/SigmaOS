@@ -1,4 +1,4 @@
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/sigma_hal.h"
 #ifndef PERSONA_MANAGER_HPP
 #define PERSONA_MANAGER_HPP

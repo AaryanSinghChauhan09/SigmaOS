@@ -9,7 +9,7 @@
 #ifndef SIGMA_MMU_H
 #define SIGMA_MMU_H
 
-#include "./core/sigma_types.h"
+#include "./sigma_kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {

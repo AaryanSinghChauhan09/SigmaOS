@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_MUTEX_HPP
 #define SOVEREIGN_MUTEX_HPP
 
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/sigma_log.h"
 #include "../../../include/SigmaOOP.hpp"
 

@@ -10,7 +10,7 @@
 #ifndef SIGMA_REALTIME_H
 #define SIGMA_REALTIME_H
 
-#include "./core/sigma_types.h"
+#include "./sigma_kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -3,7 +3,7 @@
 #ifndef SOVEREIGN_PACKAGE_HPP
 #define SOVEREIGN_PACKAGE_HPP
 
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 
 class SovereignPackageEngine {
 public:

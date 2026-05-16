@@ -1,4 +1,4 @@
-﻿#include "./sigma_types.h"
+﻿#include "./sigma_kernel_types.h"
 #ifndef SOVEREIGN_SNAP_H
 #define SOVEREIGN_SNAP_H
 

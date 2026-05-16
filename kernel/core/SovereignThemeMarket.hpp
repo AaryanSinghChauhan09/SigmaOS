@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_THEME_MARKET_HPP
 #define SOVEREIGN_THEME_MARKET_HPP
 
-#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 class SovereignThemeMarketEngine {
 public:

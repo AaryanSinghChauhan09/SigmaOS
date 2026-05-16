@@ -9,7 +9,7 @@
  */
 
 #include "../../include/libc/sigma_libc.h"
-#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 #define MAX_TASKS 64
 #define STACK_SIZE 16384

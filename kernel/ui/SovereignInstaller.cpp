@@ -2,7 +2,7 @@
  * SigmaOS: Sovereign Installer (UI-001)
  * Layer: L6 - Zenith UI / System Deployment
  */
-#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_kernel_types.h"
 #include "../../include/sigma_log.h"
 #include "../../include/SigmaOOP.hpp"
 

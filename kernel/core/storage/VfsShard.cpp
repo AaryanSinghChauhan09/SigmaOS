@@ -1,6 +1,6 @@
 #include "../../../include/libc/SovereignLibC.h"
 #include "../../../include/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "VfsShard.hpp"
 
 // Implementation for SovereignVFS could go here if needed, 

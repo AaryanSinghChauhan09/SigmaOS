@@ -1,4 +1,4 @@
-#include "../include/core/sigma_types.h"
+#include "../include/sigma_kernel_types.h"
 #include "../include/hal/sigma_hal.h"
 #ifndef HASH_SHARD_HPP
 #define HASH_SHARD_HPP

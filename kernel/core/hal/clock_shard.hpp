@@ -1,4 +1,4 @@
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/sigma_hal.h"
 #ifndef CLOCK_SHARD_HPP
 #define CLOCK_SHARD_HPP

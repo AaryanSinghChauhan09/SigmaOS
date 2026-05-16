@@ -1,6 +1,6 @@
 ﻿#ifndef SOVEREIGNMEDIACODEC_H
 #define SOVEREIGNMEDIACODEC_H
-#include "./core/sigma_types.h"
+#include "./sigma_kernel_types.h"
 #include "./sigma_log.h"
 #ifdef __cplusplus
 extern "C" {

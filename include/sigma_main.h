@@ -1,7 +1,7 @@
 ﻿#ifndef SIGMA_MAIN_H
 #define SIGMA_MAIN_H
 
-#include "./core/sigma_types.h"
+#include "./sigma_kernel_types.h"
 
 #ifdef __cplusplus
 namespace SigmaOS {

@@ -1,4 +1,4 @@
-#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_kernel_types.h"
 #ifndef SOVEREIGN_HARDWARE_IO_ZENITH_H
 #define SOVEREIGN_HARDWARE_IO_ZENITH_H
 

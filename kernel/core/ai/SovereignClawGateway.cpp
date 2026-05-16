@@ -1,5 +1,5 @@
 #include "../../../include/SigmaOOP.hpp"
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/libc/SovereignLibC.h"
 #include "../../../include/Lattice.h"
 #include "../../../include/sigma_log.h"

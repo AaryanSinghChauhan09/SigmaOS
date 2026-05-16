@@ -10,7 +10,7 @@
 #ifndef SIGMA_BATTERYIQ_H
 #define SIGMA_BATTERYIQ_H
 
-#include "./core/sigma_types.h"
+#include "./sigma_kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {

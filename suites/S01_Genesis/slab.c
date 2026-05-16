@@ -8,7 +8,7 @@
  */
 
 #include "../../include/libc/sigma_libc.h"
-#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 #define SLAB_SIGNATURE 0x516D4105 // "SIGMAOS"
 

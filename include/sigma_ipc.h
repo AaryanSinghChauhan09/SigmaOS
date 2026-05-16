@@ -9,7 +9,7 @@
 #ifndef SIGMA_IPC_H
 #define SIGMA_IPC_H
 
-#include "./core/sigma_types.h"
+#include "./sigma_kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {

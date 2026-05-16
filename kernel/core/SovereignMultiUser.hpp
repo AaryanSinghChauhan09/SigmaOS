@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_MULTI_USER_HPP
 #define SOVEREIGN_MULTI_USER_HPP
 
-#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct {
     sigma_u32 uid;

@@ -1,6 +1,6 @@
 ﻿#ifndef SIGMA_SLAB_ALLOC_H
 #define SIGMA_SLAB_ALLOC_H
-#include "./core/sigma_types.h"
+#include "./sigma_kernel_types.h"
 #include "./sigma_log.h"
 #ifdef __cplusplus
 extern "C" {

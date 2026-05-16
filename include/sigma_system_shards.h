@@ -1,7 +1,7 @@
 ﻿#ifndef SIGMA_SYSTEM_SHARDS_H
 #define SIGMA_SYSTEM_SHARDS_H
 
-#include "./core/sigma_types.h"
+#include "./sigma_kernel_types.h"
 
 /* Sovereign Net Mesh Shard */
 typedef struct SovereignNetZenith {

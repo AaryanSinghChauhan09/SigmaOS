@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_NEURAL_NEXUS_HPP
 #define SOVEREIGN_NEURAL_NEXUS_HPP
 
-#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 class SovereignNeuralEngine {
 public:

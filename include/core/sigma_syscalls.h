@@ -10,7 +10,7 @@
 #ifndef SIGMA_SYSCALLS_H
 #define SIGMA_SYSCALLS_H
 
-#include "./sigma_types.h"
+#include "./sigma_kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {

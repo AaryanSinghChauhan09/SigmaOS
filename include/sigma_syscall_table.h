@@ -1,6 +1,6 @@
 ﻿#ifndef SIGMA_SYSCALL_TABLE_H
 #define SIGMA_SYSCALL_TABLE_H
-#include "./core/sigma_types.h"
+#include "./sigma_kernel_types.h"
 #include "./sigma_log.h"
 #ifdef __cplusplus
 extern "C" {

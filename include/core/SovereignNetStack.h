@@ -1,7 +1,7 @@
 ﻿#ifndef SOVEREIGN_NET_STACK_H
 #define SOVEREIGN_NET_STACK_H
 
-#include "./sigma_types.h"
+#include "./sigma_kernel_types.h"
 #include "../SigmaOOP.hpp"
 
 namespace SigmaOS {

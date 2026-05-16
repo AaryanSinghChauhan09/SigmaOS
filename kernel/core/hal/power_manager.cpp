@@ -1,6 +1,6 @@
 #include "../../../include/sigma_log.h"
 #include "../../../include/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "power_manager.hpp"
 #include "../../../include/libc/SovereignLibC.h"
 

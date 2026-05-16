@@ -1,6 +1,6 @@
 #ifndef SIGMA_BASE_H
 #define SIGMA_BASE_H
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/sigma_log.h"
 #include "../../../include/libc/SovereignLibC.h"
 #ifdef __cplusplus

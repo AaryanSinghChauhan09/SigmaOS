@@ -1,6 +1,6 @@
 #define SIGMA_LIBC_INTERNAL
+#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/sigma_types.h"
 #include <stdarg.h>
 
 extern "C" {

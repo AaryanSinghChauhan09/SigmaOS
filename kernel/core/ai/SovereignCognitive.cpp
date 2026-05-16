@@ -1,7 +1,7 @@
 ﻿#include "../../include/sigma_log.h"
 #include "../../../include/libc/SovereignLibC.h"
 #include "../../../include/sigma_hal.h"
-#include "../../../include/core/sigma_types.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/ai/sigma_cognitive.h"
 #include "../../../include/ai/sigma_neural.h"
 
