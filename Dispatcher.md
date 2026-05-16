@@ -1274,7 +1274,7 @@ const client = new Client("http://service.example").compose(
 
 - `gzip` / `x-gzip` - GZIP compression
 
-- `deflate` / `x-compress` - DEFLATE compression  
+- `deflate` / `x-compress` - DEFLATE compression
 
 - `br` - Brotli compression
 

@@ -12,7 +12,7 @@ graph TD
     A --> C[S-SCHED Scheduler Shard]
     A --> D[S-NET Network Shard]
     A --> E[S-VFS Storage Shard]
-    
+
     subgraph Shard Isolation
         D -.-> F{Failure Detected}
         F --> G[Self-Healing Restarts S-NET]
@@ -31,13 +31,13 @@ graph LR
     subgraph Core Lattice
         Core[Kernel Space]
     end
-    
+
     subgraph Modular Extensions
         Core <--> H[GUI Shard]
         Core <--> I[AI Telemetry]
         Core <--> J[PQC Security]
     end
-    
+
     subgraph Deployment Formats
         H --> K(Desktop/Standalone)
         H --> L(Browser Environment)
@@ -55,7 +55,7 @@ sequenceDiagram
     participant Git as Repository
     participant CI as CI Pipeline
     participant QA as Testing Matrix
-    
+
     Dev->>Git: Push Commit (Branch)
     Git->>CI: Trigger Build
     CI->>CI: Linting & Static Analysis

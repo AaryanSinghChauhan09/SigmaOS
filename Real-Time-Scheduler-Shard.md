@@ -13,14 +13,16 @@ flowchart LR
     C -->|Idle| F[Idle Loop]
     D --> G[CPU Execution]
     E --> G
-    F --> 
+    F -->
 
 
 
 
 
  **Deterministic Latency**: Guarantees O(1) task switching time.
+
 - **AI Telemetry Hooks**: Automatically detects infinite loops or stalled tasks.
+
 - **Priority Bands**: IDLE, NORMAL, HIGH, and REALTIME_CRITICAL.
 
 ## Task Spawning Example

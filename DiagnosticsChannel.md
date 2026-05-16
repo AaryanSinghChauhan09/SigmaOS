@@ -170,7 +170,7 @@ This message is published after the client has successfully connected to a serve
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
 
-diagnosticsChannel.channel('undici:websocket:open').subscribe(({ 
+diagnosticsChannel.channel('undici:websocket:open').subscribe(({
   address,           // { address: string, family: string, port: number }
   protocol,          // string - negotiated subprotocol
   extensions,        // string - negotiated extensions
@@ -182,7 +182,7 @@ diagnosticsChannel.channel('undici:websocket:open').subscribe(({
   console.log(protocol) // negotiated subprotocols
   console.log(extensions) // negotiated extensions
   console.log(websocket) // the WebSocket instance
-  
+
   // Handshake response details
   console.log(handshakeResponse.status) // 101 for HTTP/1.1, 200 for HTTP/2 extended CONNECT
   console.log(handshakeResponse.statusText) // 'Switching Protocols' for HTTP/1.1, commonly 'OK' for HTTP/2 in Node.js

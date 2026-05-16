@@ -18,7 +18,9 @@ graph TD
 
 
  **TCP/IP Stack**: Full IPv4 (and future IPv6) implementation.
+
 - **Secure Sockets**: Built-in integration with the Post-Quantum Cryptography (PQC) engine for default-encrypted packet transmission.
+
 - **Hot-swappable**: The network driver and stack can be restarted or updated without rebooting the kernel.
 
 ## API Examples

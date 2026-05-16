@@ -58,9 +58,9 @@ Using the kernel's built-in PQC API to encrypt a small buffer.
 void secure_transmit() {
     char secret_data[] = "Classified Information";
     char encrypted_buffer[256];
-    
+
     sigma_status status = pq_encrypt(secret_data, sizeof(secret_data), encrypted_buffer);
-    
+
     if (status == SIGMA_OK) {
         sys_write(1, "Encryption successful.\n", 23);
     }
