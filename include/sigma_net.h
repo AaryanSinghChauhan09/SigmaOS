@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN LATTICE NETWORKING (S-NET)
  * =========================================================================
@@ -10,7 +10,7 @@
 #ifndef SIGMA_NET_H
 #define SIGMA_NET_H
 
-#include "./sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

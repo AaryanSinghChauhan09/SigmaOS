@@ -32,4 +32,5 @@ Every shard boundary is secured with Dilithium-5 and Kyber-1024, providing futur
 Unlike monolithic kernels that panic on driver failure, the SigmaOS lattice hot-swaps shards in sub-ms timeframes without compromising the core system.
 
 ---
+
 ### SigmaOS Zenith v15.0 is formally certified for global industrial deployment.

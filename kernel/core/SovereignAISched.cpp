@@ -7,8 +7,6 @@
  * SigmaOS Sovereign AI-Optimized Scheduler
  * Implements a Neural Predictive Workload Orchestration (NPWO) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal ML-driven scheduling.
- *
- * Design: OOP-isolated singleton — SovereignAISchedEngine.
  */
 
 void SovereignAISchedEngine::init() {

@@ -57,4 +57,5 @@ This roadmap formalizes the remaining gaps between SigmaOS Zenith and legacy com
 3. **Resilience**: Shards must be atomic and PQC-sealed.
 
 ---
+
 ### Build the future of sovereignty. Join the lattice.
