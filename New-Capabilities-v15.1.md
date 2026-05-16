@@ -224,6 +224,15 @@ Hybrid bare-metal + cloud orchestration.
 
 **C API:** `cloudos_init()`, `cloudos_deploy()`, `cloudos_migrate()`
 
+### Sigma Mirror Manager (`tools/sigma_mirror_manager.cpp`)
+
+Sovereign distribution mirrors.
+
+- Decentralised, cryptographic package seeding
+- Finds the fastest PQC-attested mirror on the network
+
+**C API:** `mirror_init()`, `mirror_add()`, `mirror_sync()`
+
 ---
 
 ## 🌐 IoT & Embedded
@@ -338,6 +347,24 @@ Distributed ledger integration.
 
 **C API:** `blockchain_init()`, `blockchain_sync()`, `blockchain_validate()`
 
+### Sigma Debug CLI (`tools/sigma_debug_cli.cpp`)
+
+Advanced debugging commands.
+
+- Sovereign introspection into running shards
+- Dump core registers and analyze IPC payloads
+
+**C API:** `debugcli_init()`, `debugcli_attach()`, `debugcli_dump()`
+
+### Sigma Dev Dashboard (`tools/sigma_dev_dashboard.cpp`)
+
+GUI for developer telemetry.
+
+- Unified real-time view of IPC bounds, heap limits, and traces
+- Visually toggled developer overlay
+
+**C API:** `devdash_init()`, `devdash_toggle()`, `devdash_feed()`
+
 ---
 
 ## 🎨 Customisation & Personalisation
@@ -366,6 +393,24 @@ One-click accessibility presets.
 - Magnifier zoom logic built into the display server
 
 **C API:** `access_init()`, `access_reader()`, `access_contrast()`, `access_magnify()`
+
+### Sigma Adaptive Input (`tools/sigma_adaptive_input.cpp`)
+
+Voice, gesture, and haptic controls.
+
+- Multi-modal sovereign input parsing
+- Hardware-direct haptic intensity orchestration
+
+**C API:** `adaptin_init()`, `adaptin_voice()`, `adaptin_gesture()`, `adaptin_haptic()`
+
+### Sigma Personalisation CLI (`tools/sigma_personalisation.cpp`)
+
+Manage user preferences via terminal.
+
+- Deterministic setting application with live compositor updates
+- Unified configuration dump commands
+
+**C API:** `person_init()`, `person_set()`, `person_dump()`
 
 ---
 
