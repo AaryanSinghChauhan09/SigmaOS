@@ -68,20 +68,29 @@
 
 ## 📊 Niche Parity (vs Linux)
 
-* [Gaming & GPU Utilities](Gaming-Utilities)
-* [Performance Optimizer](Performance-Optimizer)
-* [IoT & Embedded Toolkit](IoT-and-Embedded)
-* [Reproducibility & Rollback](Reproducibility-Guide)
-* [Container Orchestration](Container-Orchestration)
-* [Rolling Release Strategy](Rolling-Release-Strategy)
-* [Enterprise & Regression](Enterprise-Regression)
-* [Gap Analysis vs Competitors](Gap-Analysis-vs-Competitors)
-* [Niche Parity Certification](Niche-Parity-Certification)
+- [Gaming & GPU Utilities](Gaming-Utilities)
+
+- [Performance Optimizer](Performance-Optimizer)
+
+- [IoT & Embedded Toolkit](IoT-and-Embedded)
+
+- [Reproducibility & Rollback](Reproducibility-Guide)
+
+- [Container Orchestration](Container-Orchestration)
+
+- [Rolling Release Strategy](Rolling-Release-Strategy)
+
+- [Enterprise & Regression](Enterprise-Regression)
+
+- [Gap Analysis vs Competitors](Gap-Analysis-vs-Competitors)
+
+- [Niche Parity Certification](Niche-Parity-Certification)
 
 ## 📅 Roadmap & Future
 
-* [Contributor Roadmap](CONTRIBUTOR_ROADMAP)
-* [Industrial Release Notes](CHANGELOG)
+- [Contributor Roadmap](CONTRIBUTOR_ROADMAP)
+
+- [Industrial Release Notes](CHANGELOG)
 
 ## 🛠️ Developer Reference
 

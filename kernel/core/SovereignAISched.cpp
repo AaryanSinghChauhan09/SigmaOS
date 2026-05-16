@@ -11,29 +11,10 @@
  * Design: OOP-isolated singleton — SovereignAISchedEngine.
  */
 
-class SovereignAISchedEngine {
-public:
-    static SovereignAISchedEngine& getInstance() {
-        static SovereignAISchedEngine instance;
-        return instance;
-    }
-
-    void init() {
-        sigma_log_info("[S-AISCHED] Initializing Sovereign AI-Optimized Scheduler (NPWO Algorithm)...");
-        this->initialized = 1u;
-    }
-
-    void predictWorkload(sigma_u32 process_id);
-    void runAdaptiveRebalancing();
-    void setMode(sigma_aisched_mode_t mode);
-    sigma_u64 getPredictionCount() { return prediction_count; }
-
-private:
-    SovereignAISchedEngine() : initialized(0), prediction_count(0), current_mode(AISCHED_MODE_BALANCED) {}
-    sigma_u8 initialized;
-    sigma_u64 prediction_count;
-    sigma_aisched_mode_t current_mode;
-};
+void SovereignAISchedEngine::init() {
+    sigma_log_info("[S-AISCHED] Initializing Sovereign AI-Optimized Scheduler (NPWO Algorithm)...");
+    this->initialized = 1u;
+}
 
 void SovereignAISchedEngine::predictWorkload(sigma_u32 process_id) {
     /* NPWO (Neural Predictive Workload Orchestration) Algorithm

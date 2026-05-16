@@ -23,4 +23,5 @@ The lattice is secure by default. All inter-shard communication and network traf
 Documentation is a technical requirement, not an afterthought. Every line of code must be mapped to a Wiki entry, a diagram, and a regression test.
 
 ---
+
 ### Your Silicon. Your Rules. Your Sovereignty.

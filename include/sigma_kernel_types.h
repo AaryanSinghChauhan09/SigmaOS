@@ -19,6 +19,8 @@ typedef signed char        sigma_i8;
 typedef signed short       sigma_i16;
 typedef signed int         sigma_i32;
 typedef signed long long   sigma_i64;
+typedef sigma_usize        sigma_size_t;
+typedef sigma_isize        sigma_ssize_t;
 typedef sigma_i8           sigma_s8;
 typedef sigma_i16          sigma_s16;
 typedef sigma_i32          sigma_s32;
@@ -109,28 +111,32 @@ static inline void port_outw(sigma_u16 port, sigma_u16 val) {
  * SOVEREIGN-ASM: Silicon-Direct Memory Orchestration (No Pre-Defined Functions)
  * ========================================================================= */
 
-static inline void sigma_memcpy(void* dst, const void* src, sigma_usize n) {
+#ifndef SIGMA_LIBC_INTERNAL
+static inline void* sigma_memcpy(void* dst, const void* src, sigma_size_t n) {
     __asm__ __volatile__ (
         "rep movsb"
         : "+D"(dst), "+S"(src), "+c"(n)
         : : "memory"
     );
+    return dst;
 }
 
-static inline void sigma_memset(void* s, int c, sigma_usize n) {
+static inline void* sigma_memset(void* s, int c, sigma_size_t n) {
     __asm__ __volatile__ (
         "rep stosb"
         : "+D"(s), "+c"(n)
         : "a"((sigma_u8)c)
         : "memory"
     );
+    return s;
 }
 
-static inline sigma_usize sigma_strlen(const char* s) {
-    sigma_usize len = 0;
+static inline sigma_size_t sigma_strlen(const char* s) {
+    sigma_size_t len = 0;
     while (s[len]) len++;
     return len;
 }
+#endif
 
 static inline int sigma_strcmp(const char* s1, const char* s2) {
     while (*s1 && (*s1 == *s2)) {

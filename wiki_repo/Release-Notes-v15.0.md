@@ -29,5 +29,7 @@ The **Zenith** release marks the transition of SigmaOS from an experimental latt
 - **Education Suite**: NCERT-aligned Science and Math simulation shards.
 
 ---
+
 ### Certified for Global Deployment.
+
 ### Your Silicon. Your Rules. Your Sovereignty.

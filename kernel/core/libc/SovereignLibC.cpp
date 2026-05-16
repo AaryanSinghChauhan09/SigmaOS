@@ -1,3 +1,4 @@
+#define SIGMA_LIBC_INTERNAL
 #include "../../../include/libc/SovereignLibC.h"
 #include "../../../include/core/sigma_types.h"
 #include <stdarg.h>

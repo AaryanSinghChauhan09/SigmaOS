@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN AI-OPTIMIZED SCHEDULER (S-AISCHED)
  * =========================================================================
@@ -39,6 +39,7 @@ public:
 
     void init();
     void predictWorkload(sigma_u32 process_id);
+    void runAdaptiveRebalancing();
     void setMode(sigma_aisched_mode_t mode);
     sigma_u64 getPredictionCount() const { return this->prediction_count; }
 

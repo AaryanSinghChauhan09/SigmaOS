@@ -37,4 +37,5 @@ SigmaOS is a sovereign project. We value industrial-grade code, zero-dependency 
 Report vulnerabilities directly to the Sovereign Security Shard (`security@sigmaos.org`) using PQC-GPG encryption.
 
 ---
+
 ### Your contributions define the future of sovereignty.

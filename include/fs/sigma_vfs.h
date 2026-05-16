@@ -1,7 +1,7 @@
-﻿#ifndef SIGMA_VFS_H
+#ifndef SIGMA_VFS_H
 #define SIGMA_VFS_H
 
-#include "../sigma_types.h"
+#include "../sigma_kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,7 +19,6 @@ typedef struct {
 } // Close extern "C"
 
 namespace SigmaOS {
-namespace Kernel {
 namespace FS {
 
 class SovereignVFS {
@@ -32,6 +31,8 @@ public:
     void init();
     void mount(const char* source, const char* target);
     void listFiles(const char* path);
+    void isolate_package_sandbox(const char* pkg, const char* path);
+    void write_journal(const char* op, const char* data);
 
 private:
     SovereignVFS() : m_mount_count(0) {}
@@ -39,7 +40,6 @@ private:
 };
 
 } // namespace FS
-} // namespace Kernel
 } // namespace SigmaOS
 
 extern "C" {

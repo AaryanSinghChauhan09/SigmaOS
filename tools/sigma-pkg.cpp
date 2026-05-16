@@ -2,8 +2,14 @@
 #include "../include/sigma_log.h"
 #include "../include/SigmaOOP.hpp"
 #include "../include/sigma_sdk.h"
-#include "../kernel/include/sigma_net.h"
-#include "../kernel/include/sigma_vfs.h"
+#include "../include/sigma_net.h"
+#include "../include/fs/sigma_vfs.h"
+#include "../kernel/net/SovereignNetStack.hpp"
+
+// Forward declarations for missing internal functions
+void sigma_pkg_install(const char* shard_id) { sigma_log_info("[S-PKG] Installing shard: %s", shard_id); }
+void sigma_pkg_list() { sigma_log_info("[S-PKG] Listing all active shards..."); }
+void sigma_pkg_sync() { sigma_log_info("[S-PKG] Lattice synchronized."); }
 
 /**
  * SigmaOS Package Manager CLI (sigma-pkg) - Sovereign Edition

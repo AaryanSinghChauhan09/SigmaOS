@@ -19,4 +19,5 @@ User data is stored in journaled, PQC-encrypted shards that are only decrypted a
 The lattice uses asynchronous telemetry (ALO) to monitor silicon health. Predictive failure analysis shards can hot-swap failing drivers before a crash occurs, ensuring 99.999% industrial uptime.
 
 ---
+
 ### Your Silicon. Your Rules. Your Sovereignty.

@@ -19,27 +19,42 @@ This roadmap formalizes the remaining gaps between SigmaOS Zenith and legacy com
 ## 🚀 Development Phases
 
 ### Phase 1: Core Stabilisation (COMPLETE)
-*   [x] QEMU cross-arch boot validation.
-*   [x] Implementation of core regression pipelines.
-*   [x] Resolution of all `@current_problems`.
-*   [x] Automated Wiki synchronization initialization.
+
+-   [x] QEMU cross-arch boot validation.
+
+-   [x] Implementation of core regression pipelines.
+
+-   [x] Resolution of all `@current_problems`.
+
+-   [x] Automated Wiki synchronization initialization.
 
 ### Phase 2: Utilities Parity (CURRENT)
-*   [ ] Forensic Snapshot Diff Engine implementation.
-*   [ ] Education Profile (Classroom management shards).
-*   [ ] Gaming Optimization Shards (GPU/Input).
-*   [ ] IoT/Sensor Toolkit for embedded silicon.
+
+-   [ ] Forensic Snapshot Diff Engine implementation.
+
+-   [ ] Education Profile (Classroom management shards).
+
+-   [ ] Gaming Optimization Shards (GPU/Input).
+
+-   [ ] IoT/Sensor Toolkit for embedded silicon.
 
 ### Phase 3: Advanced Automation (PLANNED)
-*   [ ] Sovereign App Store GUI development.
-*   [ ] sigma-cli + Telemetry CLI expansion.
-*   [ ] Adaptive ML scheduling algorithms.
-*   [ ] Theme engine & Accessibility toolkit completion.
+
+-   [ ] Sovereign App Store GUI development.
+
+-   [ ] sigma-cli + Telemetry CLI expansion.
+
+-   [ ] Adaptive ML scheduling algorithms.
+
+-   [ ] Theme engine & Accessibility toolkit completion.
 
 ## ⚙️ Contribution Principles
+
 1. **Sovereignty**: No external monolithic dependencies.
+
 2. **Transparency**: All changes must be reflected in the Wiki parity tables.
+
 3. **Resilience**: Shards must be atomic and PQC-sealed.
 
 ---
-**Build the future of sovereignty. Join the lattice.**
+### Build the future of sovereignty. Join the lattice.

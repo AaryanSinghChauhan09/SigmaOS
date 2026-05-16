@@ -20,13 +20,16 @@ SigmaOS Zenith v15.0 is formally certified as having achieved functional parity 
 ## 🚀 Industrial Capability Status
 
 ### 1. Zero-Data Remanence (Amnesic Persistence)
+
 SigmaOS is the only OS that enforces bit-level wiping of all freed silicon resources, achieving a higher privacy tier than standard Linux distributions.
 
 ### 2. Post-Quantum Lattice
+
 Every shard boundary is secured with Dilithium-5 and Kyber-1024, providing future-proof protection against quantum computational threats.
 
 ### 3. Asynchronous Shard Ignition
+
 Unlike monolithic kernels that panic on driver failure, the SigmaOS lattice hot-swaps shards in sub-ms timeframes without compromising the core system.
 
 ---
-**SigmaOS Zenith v15.0 is formally certified for global industrial deployment.**
+### SigmaOS Zenith v15.0 is formally certified for global industrial deployment.
