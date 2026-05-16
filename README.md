@@ -19,8 +19,17 @@ SigmaOS Zenith v15.0 is an industrial-grade, microkernel-based operating system 
 
 ## ⚖️ Our Principles
 1.  **Sovereignty**: The user owns the silicon. No opaque telemetry or forced updates.
-2.  **Transparency**: Open-source roadmap, Wiki-first documentation, and real-time health metrics.
-3.  **Resilience**: Built for survivability across heterogeneous silicon clusters.
+2.  **Amnesic Persistence**: Zero data remanence across the lattice.
+3.  **Shard Autonomy**: Isolated, PQC-sealed singletons ensure fault tolerance.
+4.  **Transparency**: Open-source roadmap, Wiki-first documentation, and real-time health metrics.
+
+## 🛠 OS Profiles
+SigmaOS supports 8 specialized industrial profiles, including:
+*   **Monolithic**: High-performance workstation.
+*   **RTOS**: Safety-critical industrial control.
+*   **Forensic**: PQC-hardened audit & recovery.
+*   **Enterprise**: Governance & compliance certification.
+*   **Hypervisor**: Type-1 hardware-accelerated virtualization.
 
 ## 🛠 Getting Started
 Visit the [Sovereign Choice Guide](wiki_repo/Sovereign-Choice-Guide) or run `sigma-cli list-shards` to inspect your local lattice.

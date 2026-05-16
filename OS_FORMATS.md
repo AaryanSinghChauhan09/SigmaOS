@@ -38,6 +38,18 @@ SigmaOS Zenith v15.0 can be deployed in multiple specialized profiles depending 
 *   **Features**: Aggressive AI-Telemetry power management, touch-optimized glassmorphism, cellular S-NET shards, **GPIO/IoT Sensor Toolkit**.
 *   **Optimized for**: Battery longevity, heterogeneous ARM/RISC-V architecture, and embedded IoT sensing.
 
+## 7. Enterprise (Governance/Compliance)
+
+*   **Target**: Financial institutions, healthcare, and government defense.
+*   **Features**: Automated Compliance Checker, Multi-Tenant PQC-Isolation, **Hardware Regression Certifier**, Sovereign Audit Logging.
+*   **Optimized for**: 100% regulatory compliance, mission-critical stability, and secure multi-org collaboration.
+
+## 8. Hypervisor (Type-1 Virt/Infrastructure)
+
+*   **Target**: Data centers, bare-metal cloud providers, and development labs.
+*   **Features**: VT-x/SVM Hardware Acceleration, Nested Shard Paging, Isolated Guest Lattices, **Sovereign VMM Shard**.
+*   **Optimized for**: Maximum silicon utilization, hardware-level isolation, and distributed lattice virtualization.
+
 ---
 
 **Profile Switching**: Profiles can be toggled via the `Sovereign Choice Installer` or at runtime using `sigma-cli profile <name>`.
