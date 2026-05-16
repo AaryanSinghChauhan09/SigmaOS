@@ -1,4 +1,4 @@
-﻿# Î£ SIGMAOS: THE SOVEREIGN INDUSTRIAL SINGULARITY (v15.0 Zenith)
+# Î£ SIGMAOS: THE SOVEREIGN INDUSTRIAL SINGULARITY (v15.0 Zenith)
 
 ### SigmaOS is an industrial-grade, sovereign microkernel operating system built on the principle of Lattice Shard Autonomy
 
@@ -79,14 +79,21 @@ SigmaOS adheres to a rigorous technical roadmap to ensure total parity and effic
 
 | **S-STANDALONE** | Bare-Metal ISO | `release/standalone` | `sigmaos.bin` |
 
-## ðŸ”‘ Getting Started (Industrial Quick Start)
 
-1. **Clone the Shard**: `git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git`
+## 🤝 Contributing
 
-2. **Build for Architecture**: `make singularity ARCH=x86_64`
+We welcome contributions from the community. Please read our [Contributor Guidelines](CONTRIBUTING.md) and the [Wiki Contributor Guidelines](wiki_repo/Contributor-Guidelines.md) for details on our code of conduct, development rules, and the process for submitting pull requests.
 
-3. **Verify Performance**: `make benchmark && make test`
+## 🔑 Getting Started (Industrial Quick Start)
 
-4. **Simulate Stress**: `python simulation/industrial_stress_test.py`
+1. **Install Toolchain**: `./scripts/setup.sh`
+
+2. **Clone the Shard**: `git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git`
+
+3. **Build the OS**: `make all`
+
+4. **Boot in Emulator**: `make qemu`
+
+5. **Simulate Stress**: `python simulation/industrial_stress_test.py`
 
 *"The Zenith is not just an operating system; it is the final industrial fact."*

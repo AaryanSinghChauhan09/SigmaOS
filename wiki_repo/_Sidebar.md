@@ -1,4 +1,4 @@
-﻿# SigmaOS Sovereign Wiki
+# SigmaOS Sovereign Wiki
 
 - [Home (Hub)](Home)
 
@@ -46,13 +46,25 @@
 
 - [AI Orchestration](AGENTS)
 
-## ðŸ‘¥ Community & Contribution
+## 👥 Community & Contribution
 
 - [Getting Started](Getting-Started)
 
-- [Contributing](CONTRIBUTING)
+- [Contributor Guidelines](Contributor-Guidelines)
+
+- [Developer Roadmap](Developer-Roadmap)
 
 - [Code of Conduct](CODE_OF_CONDUCT)
+
+## 🛠️ Developer Reference
+
+- [API Documentation](API-Documentation)
+
+- [Examples and Demos](Examples-and-Demos)
+
+- [Glossary](Glossary)
+
+- [Release Notes](Release-Notes)
 
 ## ðŸ›ï¸ Industrial Maintenance
 
