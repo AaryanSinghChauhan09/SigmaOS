@@ -66,6 +66,14 @@ SigmaOS Zenith v15.0 can be deployed in multiple specialized profiles depending 
 
 - **Optimized for**: Maximum silicon utilization, hardware-level isolation, and distributed lattice virtualization.
 
+## 9. AI/ML (Compute/Neural)
+
+- **Target**: Neural processing nodes, GPU farms, and autonomous intelligence units.
+
+- **Features**: PQC-Secured Model Inference (S-ML), GPU-Accelerated Tensors, Distributed Training Lattices, AI-Telemetry Reinforcement.
+
+- **Optimized for**: Mathematical throughput, silicon-direct model execution, and private on-device intelligence.
+
 ---
 
 **Profile Switching**: Profiles can be toggled via the `Sovereign Choice Installer` or at runtime using `sigma-cli profile <name>`.

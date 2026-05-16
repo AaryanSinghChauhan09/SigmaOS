@@ -2,6 +2,9 @@
 #include "../include/sigma_log.h"
 #include "../include/sigma_optimizer.h"
 #include "../include/sigma_gaming.h"
+#include "../include/sigma_ml.h"
+#include "../include/sigma_orchestrator.h"
+#include "../include/sigma_cloud.h"
 #include "../include/SigmaOOP.hpp"
 
 /**
@@ -18,6 +21,9 @@ int main() {
     // Querying subsystems
     opt_report_efficiency();
     gaming_report_gpu_load();
+    ml_report_acceleration_status();
+    orch_report_cluster_health();
+    cloud_report_cluster_stats();
     
     sigma_log_info("Lattice Integrity: 100% [PQC-Verified]");
     sigma_log_info("Active Shards: 14 / 14");

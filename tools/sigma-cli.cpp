@@ -5,6 +5,12 @@
 #include "../include/sigma_gaming.h"
 #include "../include/sigma_optimizer.h"
 #include "../include/sigma_ui_toolkit.h"
+#include "../include/sigma_ml.h"
+#include "../include/sigma_orchestrator.h"
+#include "../include/sigma_armor.h"
+#include "../include/sigma_cloud.h"
+#include "../include/sigma_compliance.h"
+#include "../include/sigma_forensic.h"
 #include "../include/SigmaOOP.hpp"
 
 /**
@@ -24,6 +30,12 @@ void print_help() {
     sigma_log_info("  game      GPU boost and controller management.");
     sigma_log_info("  opt       System-wide performance optimization.");
     sigma_log_info("  ui        Theme and accessibility management.");
+    sigma_log_info("  ml        Machine Learning model inference.");
+    sigma_log_info("  orch      Shard orchestration and replicas.");
+    sigma_log_info("  armor     Security policy and MAC enforcement.");
+    sigma_log_info("  cloud     Distributed storage and cluster stats.");
+    sigma_log_info("  comply    Regulatory auditing and compliance.");
+    sigma_log_info("  forensic  Silicon auditing and evidence preservation.");
     sigma_log_info("  telemetry Query shard health and performance metrics.");
 }
 
@@ -75,6 +87,48 @@ int main(int argc, char* argv[]) {
             ui_set_scaling(1.5f); // Simplified
         } else if (sigma_strcmp(cmd.c_str(), "accessibility") == 0) {
             ui_enable_magnifier(true);
+        }
+    } else if (sigma_strcmp(subsystem.c_str(), "ml") == 0 && argc > 2) {
+        SigmaString cmd(argv[2]);
+        if (sigma_strcmp(cmd.c_str(), "load") == 0 && argc > 3) {
+            ml_load_model(argv[3], ML_BACKEND_GPU);
+        } else if (sigma_strcmp(cmd.c_str(), "status") == 0) {
+            ml_report_acceleration_status();
+        }
+    } else if (sigma_strcmp(subsystem.c_str(), "orch") == 0 && argc > 2) {
+        SigmaString cmd(argv[2]);
+        if (sigma_strcmp(cmd.c_str(), "deploy") == 0 && argc > 4) {
+            orch_deploy_shard(argv[3], sigma_atoi(argv[4]));
+        } else if (sigma_strcmp(cmd.c_str(), "health") == 0) {
+            orch_report_cluster_health();
+        }
+    } else if (sigma_strcmp(subsystem.c_str(), "armor") == 0 && argc > 2) {
+        SigmaString cmd(argv[2]);
+        if (sigma_strcmp(cmd.c_str(), "set") == 0 && argc > 3) {
+            armor_set_level(ARMOR_LEVEL_ENFORCING);
+        } else if (sigma_strcmp(cmd.c_str(), "check") == 0 && argc > 3) {
+            armor_check_permission(argv[3], "NET_ACCESS");
+        }
+    } else if (sigma_strcmp(subsystem.c_str(), "cloud") == 0 && argc > 2) {
+        SigmaString cmd(argv[2]);
+        if (sigma_strcmp(cmd.c_str(), "join") == 0 && argc > 3) {
+            cloud_join_lattice(argv[3]);
+        } else if (sigma_strcmp(cmd.c_str(), "stats") == 0) {
+            cloud_report_cluster_stats();
+        }
+    } else if (sigma_strcmp(subsystem.c_str(), "comply") == 0 && argc > 2) {
+        SigmaString cmd(argv[2]);
+        if (sigma_strcmp(cmd.c_str(), "audit") == 0) {
+            comply_run_audit(COMPLIANCE_LEVEL_STANDARD);
+        } else if (sigma_strcmp(cmd.c_str(), "report") == 0) {
+            comply_generate_pqc_report();
+        }
+    } else if (sigma_strcmp(subsystem.c_str(), "forensic") == 0 && argc > 2) {
+        SigmaString cmd(argv[2]);
+        if (sigma_strcmp(cmd.c_str(), "block") == 0 && argc > 3) {
+            forensic_enable_write_block(argv[3]);
+        } else if (sigma_strcmp(cmd.c_str(), "audit") == 0) {
+            forensic_analyze_lattice_integrity();
         }
     } else if (sigma_strcmp(subsystem.c_str(), "telemetry") == 0) {
         gaming_report_gpu_load();
