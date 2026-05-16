@@ -1,8 +1,8 @@
-﻿# Î£ SIGMAOS: HORIZON EDITION (v15.0.0)
+# Σ SIGMAOS: HORIZON EDITION (v15.0.0)
 
 Welcome to the **Sovereign Future Shard**. The Horizon edition is the bleeding-edge testing ground for the next generation of SigmaOS architectural advancements.
 
-## ðŸ“¥ Installation Guide (Bleeding-Edge)
+## 📥 Installation Guide (Bleeding-Edge)
 
 1. **Clone**: Use the `main` branch of the SigmaOS repository.
 
@@ -17,7 +17,7 @@ Welcome to the **Sovereign Future Shard**. The Horizon edition is the bleeding-e
 
 4. **Experiment**: Toggle experimental shards via the `SovereignHorizon` control panel.
 
-## ðŸ› ï¸ Core Functions
+## 🛠️ Core Functions
 
 - **SovereignAI Orchestration**: Experimental AI-intent shard scheduling.
 
@@ -27,7 +27,7 @@ Welcome to the **Sovereign Future Shard**. The Horizon edition is the bleeding-e
 
 - **Dynamic Shard Synthesis**: Real-time compilation and hot-loading of experimental system logic.
 
-## ðŸŒŸ Premium Features
+## 🌟 Premium Features
 
 - **Horizon-UI**: Next-generation neural-adaptive interface components.
 
@@ -37,7 +37,7 @@ Welcome to the **Sovereign Future Shard**. The Horizon edition is the bleeding-e
 
 - **Bio-Lattice Integration**: Early research into biological computing shard interfaces.
 
-## ðŸ“Š Technical Specs
+## 📊 Technical Specs
 
 - **Status**: EXPERIMENTAL / BLEEDING-EDGE.
 

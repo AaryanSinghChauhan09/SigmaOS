@@ -1,10 +1,10 @@
-﻿# Î£ SigmaOS v15.0 Zenith: Dual-Boot Edition
+# Σ SigmaOS v15.0 Zenith: Dual-Boot Edition
 
-## ðŸ¤ Coexistence & Power
+## 🤝 Coexistence & Power
 
 The **Dual-Boot Edition** is engineered for users who require the power of the Sovereign Lattice alongside legacy environments (Windows/Linux). It includes advanced partitioning logic and the `S-GRUB` recovery shard.
 
-### ðŸ› ï¸ Key Features
+### 🛠️ Key Features
 
 - **Sovereign Partitioning (SPT)**: Safely resize legacy partitions to create shard space.
 
@@ -14,7 +14,7 @@ The **Dual-Boot Edition** is engineered for users who require the power of the S
 
 - **Hybrid Security**: Shield legacy partitions from shard-level anomalies.
 
-### ðŸ“¥ Installation Guide (Coexistence)
+### 📥 Installation Guide (Coexistence)
 
 1. **Prepare Media**: Use `SigmaOS-v15.0-Zenith-Dualboot.iso`.
 
@@ -26,7 +26,7 @@ The **Dual-Boot Edition** is engineered for users who require the power of the S
 
 5. **Validation**: Run `sigma-pkg verify-boot` after the first login to ensure total integrity.
 
-### ðŸ’Ž Exclusive Functions
+### 💎 Exclusive Functions
 
 - `legacy-mount`: Mount Windows/Linux drives with automatic PQC integrity scanning.
 

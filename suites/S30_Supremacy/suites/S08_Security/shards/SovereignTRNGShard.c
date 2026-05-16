@@ -1,4 +1,4 @@
-#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ETERNITY: SOVEREIGN TRNG SHARD (v57.6-SUPREME-ETERNITY)

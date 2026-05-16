@@ -5,7 +5,7 @@
  * Principles: Shard-Level Packet Filtering & Zero-Trust Mesh.
  * =============================================================================
  */
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct Rule {
     sigma_u32 src_ip;

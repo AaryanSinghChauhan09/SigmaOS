@@ -1,4 +1,4 @@
-#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN AUDIO SYNTHESIS (v51.2-OMNIPOTENCE-VOX)

@@ -1,4 +1,4 @@
-﻿# Profession-Designer-Tools
+# Profession-Designer-Tools
 
 1
 

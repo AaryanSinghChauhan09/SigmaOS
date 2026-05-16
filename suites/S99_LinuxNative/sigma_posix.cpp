@@ -1,5 +1,5 @@
 #include "../../include/libc/sigma_libc.h"
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 #include "../../include/sigma_cap_manager.h"
 
 // Σ SIGMAOS: LINUX-NATIVE TRANSLATION LAYER (S99)

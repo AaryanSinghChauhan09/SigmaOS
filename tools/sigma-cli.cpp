@@ -12,6 +12,7 @@
 #include "../include/sigma_compliance.h"
 #include "../include/sigma_forensic.h"
 #include "../include/sigma_regression.h"
+#include "../include/libc/SovereignLibC.h"
 #include "../include/SigmaOOP.hpp"
 
 /**

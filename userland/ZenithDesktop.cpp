@@ -1,4 +1,4 @@
-﻿#include "../include/core/SigmaOOP.hpp"
+#include "../include/SigmaOOP.hpp"
 #include "../include/core/sigma_types.h"
 #include "../include/sigma_log.h"
 #include "../include/ui/SovereignGUI.h"

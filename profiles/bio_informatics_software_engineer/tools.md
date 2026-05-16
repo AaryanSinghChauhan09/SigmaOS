@@ -1,4 +1,4 @@
-﻿# ðŸ›  BIO_INFORMATICS_SOFTWARE_ENGINEER Profile
+# 🛠 BIO_INFORMATICS_SOFTWARE_ENGINEER Profile
 
 ## Required Tools & Functions
 
@@ -20,28 +20,28 @@
 
 - Git-Lattice
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Industry standards
 
 - professional ethics
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Efficiency metrics
 
 - cost analysis
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Workflow optimization
 
 - adaptive assistance
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Continuous health check for Bio-Informatics Software Engineer tools
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Automatic state snapshots

@@ -1,4 +1,4 @@
-#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN SENTIENCE CORE (v1.0 - INFINITE VOID)

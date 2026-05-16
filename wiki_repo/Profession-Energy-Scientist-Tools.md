@@ -1,4 +1,4 @@
-﻿# Profession-Energy-Scientist-Tools
+# Profession-Energy-Scientist-Tools
 
 1
 

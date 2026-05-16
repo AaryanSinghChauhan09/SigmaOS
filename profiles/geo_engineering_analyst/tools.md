@@ -1,4 +1,4 @@
-﻿# ðŸ›  GEO_ENGINEERING_ANALYST Profile
+# 🛠 GEO_ENGINEERING_ANALYST Profile
 
 ## Required Tools & Functions
 
@@ -8,13 +8,13 @@
 
 - carbon-cycle-modeler
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - UN Environmental protocols
 
 - SRM-governance guidelines
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Radiative-forcing-delta
 
@@ -22,16 +22,16 @@
 
 - precipitation-impact
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Climate-impact simulation
 
 - unintended-consequence modeling
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Aerosol-delivery-sync, atmospheric-probe verification
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Geo-state snapshots, atmospheric-baseline restoration

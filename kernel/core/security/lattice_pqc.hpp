@@ -1,7 +1,7 @@
 #ifndef LATTICE_PQC_HPP
 #define LATTICE_PQC_HPP
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 // SovereignLibC.h removed
 
 namespace SigmaOS {

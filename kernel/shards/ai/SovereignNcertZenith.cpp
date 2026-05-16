@@ -9,8 +9,8 @@
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
-#include "userland/apps/scholar_zenith/ncert_base.hpp"
+#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/ncert_base.hpp"
 #include "userland/apps/scholar_zenith/ncert_physics.hpp"
 #include "userland/apps/scholar_zenith/ncert_chemistry.hpp"
 #include "userland/apps/scholar_zenith/ncert_biology.hpp"

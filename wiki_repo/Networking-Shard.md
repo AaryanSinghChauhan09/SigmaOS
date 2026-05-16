@@ -40,5 +40,3 @@ if (status == SIGMA_OK) {
 
 c
 SovereignNetworkShard::getInstance().socket_bind(fd, 0x7F000001, 8080)
-
-

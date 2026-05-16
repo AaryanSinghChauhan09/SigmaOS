@@ -1,4 +1,4 @@
-﻿# AI-Governance
+# AI-Governance
 
 1 SigmaOS introduces the **AI-Native Governance Layer**, a completely unique orchestrator that decisively crushes the static resource management models of **Clear Linux**, **Gentoo**, and **NixOS**.
 1 Unlike traditional distros that rely on static package configs and upstream hypervisors, SigmaOS dynamically allocates compute resources (CPU, GPU, TensorCores) based on real-time AI workloads via Autonomous Agent Quotas.

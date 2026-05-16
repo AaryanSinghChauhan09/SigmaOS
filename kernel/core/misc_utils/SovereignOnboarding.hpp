@@ -1,4 +1,4 @@
-#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_hal.h"
 #include "../../../include/libc/SovereignLibC.h"
 #ifndef SOVEREIGN_ONBOARDING_HPP
 #define SOVEREIGN_ONBOARDING_HPP

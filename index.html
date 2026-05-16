@@ -310,7 +310,10 @@
             { id: "S-ZOS", name: "Z/OS Rel", status: "ABSORBED" },
             { id: "S-QNX", name: "QNX RTOS", status: "ABSORBED" },
             { id: "S-NEXT", name: "NeXT Object", status: "ABSORBED" },
-            { id: "S-PRO", name: "Professional", status: "STABLE" }
+            { id: "S-PRO", name: "Professional", status: "STABLE" },
+            { id: "S-IOT", name: "Industrial IoT", status: "POLLING" },
+            { id: "S-OPT", name: "Sovereign Opt", status: "TUNING" },
+            { id: "S-KUBE", name: "Lattice Kube", status: "RECONCILING" }
         ];
 
         function initShell() {
@@ -344,7 +347,20 @@
 
             switch(baseCmd) {
                 case 'help':
-                    termOutput.innerHTML += "Available shard protocols: <span style='color:var(--success)'>help, ls, dmesg, shards, gst, bns, neofetch, clear, exit</span>\n";
+                    termOutput.innerHTML += "Available shard protocols: <span style='color:var(--success)'>help, ls, dmesg, shards, sigma-cli, neofetch, clear, exit</span>\n";
+                    break;
+                case 'sigma-cli':
+                    if (args.length < 3) {
+                        termOutput.innerHTML += "Usage: sigma-cli <subsystem> <command>\nSubsystems: iot, game, opt, orch, forensic, regress\n";
+                    } else {
+                        const sub = args[1];
+                        const scmd = args[2];
+                        termOutput.innerHTML += `<span style="color:var(--warning)">[CLI]</span> Executing ${scmd} on subsystem ${sub}...\n`;
+                        setTimeout(() => {
+                            termOutput.innerHTML += `<span style="color:var(--success)">[CLI]</span> Operation successful. Lattice status: 100% stable.\n`;
+                            termOutput.scrollTop = termOutput.scrollHeight;
+                        }, 500);
+                    }
                     break;
                 case 'gst':
                     if (args.length < 3) {

@@ -8,7 +8,7 @@
 #ifndef SIGMA_OOP_H
 #define SIGMA_OOP_H
 
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct SovereignObject {
     sigma_u32     id;

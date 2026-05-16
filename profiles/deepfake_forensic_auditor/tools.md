@@ -1,4 +1,4 @@
-﻿# ðŸ›  DEEPFAKE_FORENSIC_AUDITOR Profile
+# 🛠 DEEPFAKE_FORENSIC_AUDITOR Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - eye-blink-monitor
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Media ethics
 
 - digital-authenticity standards
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Artifact-density
 
@@ -24,16 +24,16 @@
 
 - emotional-inconsistency-delta
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Deepfake detection ensemble
 
 - synthetic-voice attribution
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Auditor-lattice integrity, model-weight-sync
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Analysis-state snapshots, authenticity-baseline

@@ -1,7 +1,7 @@
 #ifndef PORT_SHARD_HPP
 #define PORT_SHARD_HPP
 
-#include "../../include/core/SigmaOOP.hpp"
+#include "../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

@@ -6,7 +6,7 @@
  * Principles: Shard-Level Permissions & Zero-Trust Resource Access.
  * =============================================================================
  */
-#include "../../../include/core/sigma_kernel_types.h"
+#include "../../../include/sigma_kernel_types.h"
 
 typedef enum Role {
     ROLE_KERNEL,

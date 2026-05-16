@@ -1,4 +1,4 @@
-#include "../../include/SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 /*
  * =============================================================================
  * Σ SIGMAOS KERNEL: OMNI-SHELL-ZENITH (v3.0 - ADVANCED SOVEREIGN CLI)
@@ -14,7 +14,7 @@
  * =============================================================================
  */
 
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 /* =========================================================================
  * External kernel functions

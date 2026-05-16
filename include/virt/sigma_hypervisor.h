@@ -12,7 +12,7 @@
 #define SIGMA_HYPERVISOR_H
 
 #include "../core/sigma_types.h"
-#include "../core/SigmaOOP.hpp"
+#include "../SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Virt {

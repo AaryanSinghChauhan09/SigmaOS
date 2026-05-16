@@ -10,9 +10,9 @@
  * =========================================================================
  */
 
-#include "../../include/core/SigmaOOP.hpp"
+#include "../../include/SigmaOOP.hpp"
 #include "../../include/sigma_log.h"
-#include "userland/apps/scholar_zenith/ncert_base.hpp"
+#include "../../include/ncert_base.hpp"
 #include "../../include/sigma_log.h"
 #include "userland/apps/scholar_zenith/ncert_physics.hpp"
 #include "../../include/sigma_log.h"

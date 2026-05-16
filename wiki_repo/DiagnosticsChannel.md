@@ -1,4 +1,4 @@
-﻿# Diagnostics Channel Support
+# Diagnostics Channel Support
 
 Stability: Experimental.
 

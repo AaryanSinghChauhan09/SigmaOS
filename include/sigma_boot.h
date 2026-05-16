@@ -1,7 +1,7 @@
 #ifndef SIGMA_BOOT_H
 #define SIGMA_BOOT_H
 
-#include "sigma_kernel_types.h"
+#include "./sigma_kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {

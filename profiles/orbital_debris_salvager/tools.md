@@ -1,4 +1,4 @@
-﻿# ðŸ›  ORBITAL_DEBRIS_SALVAGER Profile
+# 🛠 ORBITAL_DEBRIS_SALVAGER Profile
 
 ## Required Tools & Functions
 
@@ -8,28 +8,28 @@
 
 - compliance manager
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Industry standards
 
 - professional ethics
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Efficiency metrics
 
 - cost analysis
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Workflow optimization
 
 - adaptive assistance
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Continuous health check for Orbital Debris Salvager tools
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Automatic state snapshots

@@ -1,7 +1,7 @@
 #ifndef AGENT_BASE_H
 #define AGENT_BASE_H
 
-#include "./include/sigma_types.h"
+#include "../include/core/sigma_types.h"
 
 /**
  * Base class for all Autonomous Agents

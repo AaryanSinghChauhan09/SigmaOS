@@ -1,4 +1,4 @@
-﻿# Architecture Update
+# Architecture Update
 
 1 1
 

@@ -1,4 +1,4 @@
-﻿# ðŸ›  ECOMMERCE_DEVELOPER Profile
+# 🛠 ECOMMERCE_DEVELOPER Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - payment-gateway-bridge
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - PCI-DSS
 
 - e-commerce consumer laws
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - AOV (Average Order Value)
 
@@ -24,16 +24,16 @@
 
 - shipping-cost-delta
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Inventory-replenishment prediction
 
 - personalized-recommendation engine
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Inventory-sync verification, payment-link validation
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Store-state snapshots, order-history restoration

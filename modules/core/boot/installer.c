@@ -1,5 +1,5 @@
-#include "../../../include/SovereignLibC.h"
-#include "./sigma_libc.h"
+#include "../../../include/libc/SovereignLibC.h"
+#include "../../../include/sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS Interactive Installer & Bootloader config (Phase 4)

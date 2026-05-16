@@ -2,7 +2,7 @@
 #include "../../../include/libc/SovereignLibC.h"
 #include "../../../include/core/sigma_types.h"
 #include "../../../include/system/sigma_ipc.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign IPC Implementation (Optimized)

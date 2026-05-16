@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 #include "userland/apps/collective_conscious/agents.hpp"
 
 using namespace SigmaOS;

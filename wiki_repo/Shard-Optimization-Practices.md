@@ -1,4 +1,4 @@
-﻿# SigmaOS Shard Optimization Practices
+# SigmaOS Shard Optimization Practices
 
 This document outlines the strict guidelines required to maintain the ultra-low latency profile of SigmaOS Shards across all deployment formats.
 

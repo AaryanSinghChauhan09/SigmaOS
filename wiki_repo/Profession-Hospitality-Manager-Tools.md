@@ -1,4 +1,4 @@
-﻿# Profession-Hospitality-Manager-Tools
+# Profession-Hospitality-Manager-Tools
 
 1
 

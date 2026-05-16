@@ -1,4 +1,4 @@
-#include "../../include/SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 /*
  * sigma_utils.c — SigmaOS Shared Utility Library Implementation
  * Provides: logging, config parsing, networking stubs

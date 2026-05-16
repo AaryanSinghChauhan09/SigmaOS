@@ -1,4 +1,4 @@
-﻿# ðŸ›  INTELLIGENCE_OFFICER Profile
+# 🛠 INTELLIGENCE_OFFICER Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - steganography detector
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Classified protocols
 
 - zero-trust communication
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Encryption strength
 
@@ -24,16 +24,16 @@
 
 - geolocation triangulator
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Heuristic pattern matching
 
 - semantic link analysis
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Secure channel re-establishment, payload sanitization
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Redaction-safe state restoration, operational security (OPSEC) baseline

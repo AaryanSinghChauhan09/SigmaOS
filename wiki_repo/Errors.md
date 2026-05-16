@@ -1,4 +1,4 @@
-﻿# Errors
+# Errors
 
 Undici exposes a variety of error objects that you can use to enhance your error handling.
 You can find all the error objects inside the `errors` key.

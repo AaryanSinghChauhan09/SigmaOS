@@ -1,12 +1,12 @@
-﻿# ZENITH UI
+# ZENITH UI
 
-# ðŸŽ¨ Zenith UI: The Sovereign Interface
+# 🎨 Zenith UI: The Sovereign Interface
 
-SigmaOS ships with the **Zenith UI Dashboard**â€”a production-grade, hardware-accelerated orchestration interface for the Sovereign Lattice. Zenith is designed to provide "Apple-like simplicity" for power users.
+SigmaOS ships with the **Zenith UI Dashboard**—a production-grade, hardware-accelerated orchestration interface for the Sovereign Lattice. Zenith is designed to provide "Apple-like simplicity" for power users.
 
 ---
 
-## ðŸ’Ž Morphic Layer Composition (MLC)
+## 💎 Morphic Layer Composition (MLC)
 
 Zenith utilizes the **MLC Algorithm**, natively implemented in the `SovereignZenithUI` shard. By operating directly at Ring 0 with framebuffer manipulation, Zenith delivers:
 
@@ -18,7 +18,7 @@ Zenith utilizes the **MLC Algorithm**, natively implemented in the `SovereignZen
 
 ---
 
-## ðŸ› ï¸ Utility-Class Architecture
+## 🛠️ Utility-Class Architecture
 
 As of the current stabilization phase, Zenith has migrated to a **Strict Utility-Class Architecture**. Themes and layouts are defined using a modular CSS engine that allows users to swap aesthetics without breaking functional components.
 
@@ -32,7 +32,7 @@ As of the current stabilization phase, Zenith has migrated to a **Strict Utility
 
 ---
 
-## ðŸ“Š Sovereign Telemetry UI
+## 📊 Sovereign Telemetry UI
 
 The `SovereignTelemetryUI` exposes deep kernel insights with sub-millisecond latency, correlating data from across the lattice:
 
@@ -44,13 +44,13 @@ The `SovereignTelemetryUI` exposes deep kernel insights with sub-millisecond lat
 
 ---
 
-## ðŸ“ Sovereign Snap Engine
+## 📐 Sovereign Snap Engine
 
 The `SovereignSnapEngine` provides industrial-grade multi-window spatial organization. Using a **2D Spatial Lattice**, it allows shards to "snap" into optimized **Golden Ratio** layouts, maximizing information density for professionals.
 
 ---
 
-## ðŸ¤– AI-Driven Interaction
+## 🤖 AI-Driven Interaction
 
 Integrated via `SovereignPersonalization` and the `SovereignClawGateway`, Zenith features:
 

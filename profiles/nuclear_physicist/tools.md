@@ -1,4 +1,4 @@
-﻿# ðŸ›  NUCLEAR_PHYSICIST Profile
+# 🛠 NUCLEAR_PHYSICIST Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - SCADA-Lattice
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - IAEA safety standards
 
 - NRC protocols
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Half-life
 
@@ -24,16 +24,16 @@
 
 - radiation dose
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Monte Carlo N-Particle (MCNP)
 
 - fission rate simulation
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Fail-safe core monitoring, containment integrity scan
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Reactor state snapshot, safety protocol baseline restoration

@@ -1,8 +1,8 @@
-﻿# Î£ SIGMAOS: Hardware Abstraction Layer (HAL) Specification
+# Σ SIGMAOS: Hardware Abstraction Layer (HAL) Specification
 
 SigmaOS utilizes a strictly decoupled HAL to ensure portability across multiple silicon architectures. This document outlines the interface and implementation strategy for the Zenith Singularity.
 
-## ðŸ— Supported Architectures
+## 🏗 Supported Architectures
 
 | Architecture | Status | Shard Path |
 | :--- | :--- | :--- |
@@ -15,7 +15,7 @@ SigmaOS utilizes a strictly decoupled HAL to ensure portability across multiple 
 
 | **ia64** | Legacy Support | `kernel/core/hal/SovereignArchIA64.cpp` |
 
-## ðŸ›  HAL Interface Philosophy
+## 🛠 HAL Interface Philosophy
 
 1. **Zero-Direct Access**: Userland and Kernel Shards MUST NOT access MSRs, CRn registers, or I/O ports directly.
 
@@ -26,7 +26,7 @@ SigmaOS utilizes a strictly decoupled HAL to ensure portability across multiple 
 
 3. **Interrupt Sharding**: Interrupts are abstracted into a unified `InterruptNexus` which maps arch-specific vectors to SigmaOS Shard IDs.
 
-## ðŸ”„ Porting Guide
+## 🔄 Porting Guide
 
 To port SigmaOS to a new architecture:
 

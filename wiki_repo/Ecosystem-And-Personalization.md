@@ -1,10 +1,10 @@
-﻿# ðŸŒ SigmaOS Ecosystem & Personalization (Phase 4)
+# 🌐 SigmaOS Ecosystem & Personalization (Phase 4)
 
 SigmaOS is evolving into a comprehensive professional ecosystem that balances **Sovereignty** with **Maturity**. Phase 4 focuses on bridging the gap with legacy systems while maintaining a zero-trust architecture.
 
 ---
 
-## ðŸ›ï¸ Ecosystem Infrastructure
+## 🏛️ Ecosystem Infrastructure
 
 ### 1. Sovereign App Store (#63)
 
@@ -24,7 +24,7 @@ A privacy-first, local-only AI search engine. It semantically indexes the entire
 
 ---
 
-## ðŸŽ¨ Personalized Professionalism
+## 🎨 Personalized Professionalism
 
 ### 1. Predictive UI (#67)
 

@@ -1,4 +1,4 @@
-#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN MVO SHARD (v55.0-SUPREME-CENTAURI-PRIME)

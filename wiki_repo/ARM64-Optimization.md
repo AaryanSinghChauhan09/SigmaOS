@@ -1,4 +1,4 @@
-﻿# ARM64-Optimization
+# ARM64-Optimization
 
 1 SigmaOS systematically crushes the hardware sovereignty of **RPi-Distro** and **Alpine Linux** by executing custom silicon-sovereign optimizations on the ARM64 architecture, specifically targeting the BCM2712 (Raspberry Pi 5) processor.
 

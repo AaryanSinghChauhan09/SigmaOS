@@ -1,4 +1,4 @@
-﻿# Profession-Data-Analyst-Tools
+# Profession-Data-Analyst-Tools
 
 1
 

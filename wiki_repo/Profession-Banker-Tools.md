@@ -1,4 +1,4 @@
-﻿# Profession-Banker-Tools
+# Profession-Banker-Tools
 
 1
 

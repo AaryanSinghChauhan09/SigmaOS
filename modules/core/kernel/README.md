@@ -1,4 +1,4 @@
-﻿# core/kernel
+# core/kernel
 
 Minimal kernel handling scheduling, memory management, and IPC.
 

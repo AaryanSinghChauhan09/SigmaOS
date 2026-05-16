@@ -3,7 +3,7 @@
 #include "../../../include/core/sigma_types.h"
 
 #include "../../../include/sigma_smartshot.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_hal.h"
 #include "../../../include/sigma_vissearch.h"
 #include "../../../include/sigma_memorypalace.h"
 #include "../../../include/sigma_clipboard.h"

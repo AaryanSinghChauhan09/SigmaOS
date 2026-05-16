@@ -11,7 +11,7 @@
 #ifndef SIGMA_HYPERVISOR_H
 #define SIGMA_HYPERVISOR_H
 
-#include "../sigma_types.h"
+#include "../core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

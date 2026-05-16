@@ -1,4 +1,4 @@
-#include "../../../include/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -8,7 +8,7 @@
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 
 /**
  * Σ SIGMA OS: SOVEREIGN HARDWARE AUDIT (v128.0 - ZERO-STD NATIVE)

@@ -1,7 +1,7 @@
 ﻿#include "../../../include/core/sigma_types.h"
 #include "../../../include/sigma_log.h"
-#include "core/sigma_libc.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_libc.h"
+#include "../../../include/sigma_hal.h"
 #include "../../../include/ai/sigma_neural.h"
 
 /**

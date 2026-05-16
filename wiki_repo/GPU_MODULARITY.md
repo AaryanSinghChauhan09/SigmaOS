@@ -1,8 +1,8 @@
-﻿# GPU MODULARITY
+# GPU MODULARITY
 
 1
 
-SigmaOS achieves heterogeneous compute sovereignty via the `SovereignGPUEngine` — a vendor-agnostic, NUMA-aware hardware acceleration framework operating natively in Ring-0.
+SigmaOS achieves heterogeneous compute sovereignty via the `SovereignGPUEngine` � a vendor-agnostic, NUMA-aware hardware acceleration framework operating natively in Ring-0.
 
 1
 

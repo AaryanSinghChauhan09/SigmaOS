@@ -3,7 +3,7 @@
  * Σ SIGMAOS: CANONICAL SigmaOOP HEADER (v19.0 - CANONICAL SHIM)
  * =========================================================================
  * Global shim for the Sovereign OOP framework. All sources that use
- * #include "../../include/core/SigmaOOP.hpp" will resolve here via -Isuites/include.
+ * #include "../../include/SigmaOOP.hpp" will resolve here via -Isuites/include.
  * =========================================================================
  */
 #ifndef SIGMA_OOP_HPP

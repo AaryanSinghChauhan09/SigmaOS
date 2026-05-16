@@ -1,4 +1,4 @@
-﻿# Architectural Stabilization Roadmap
+# Architectural Stabilization Roadmap
 
 ## Objective
 

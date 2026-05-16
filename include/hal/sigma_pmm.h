@@ -1,7 +1,7 @@
 ﻿#ifndef SIGMA_PMM_H
 #define SIGMA_PMM_H
 
-#include "../sigma_types.h"
+#include "../core/sigma_types.h"
 #include "../SigmaOOP.hpp"
 
 #ifdef __cplusplus

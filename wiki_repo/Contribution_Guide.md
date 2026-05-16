@@ -1,4 +1,4 @@
-﻿# Contribution Guide
+# Contribution Guide
 
 1
 
@@ -11,7 +11,7 @@
 1
 
 Have an idea?
-    Â¦
+    ¦
     +- New kernel primitive?  ? suites/S01_Genesis/sigma_<name>.h
     +- New hardware driver?   ? suites/S04_HAL/sigma_<name>.hpp
     +- New security module?   ? suites/S08_Security/sigma_<name>.h
@@ -28,7 +28,7 @@ Have an idea?
 
 1
 
-Find the right `suites/S<NN>_*` directory: | Suite Range | Domain | |-------------|--------| | S01Â–S10 | Kernel core (allocator, HAL, IPC, security) | | S11Â–S20 | System services (VFS, networking, process mgmt) | | S21Â–S30 | Performance (NUMA, cache, BPF, containers) | | S31Â–S40 | Storage, immutability, ZKP, sovereign wire | | S41Â–S50 | Boot, self-healing, caps, mesh | | S51Â–S65 | Applications, AI, developer tools | ---
+Find the right `suites/S<NN>_*` directory: | Suite Range | Domain | |-------------|--------| | S01S10 | Kernel core (allocator, HAL, IPC, security) | | S11S20 | System services (VFS, networking, process mgmt) | | S21S30 | Performance (NUMA, cache, BPF, containers) | | S31S40 | Storage, immutability, ZKP, sovereign wire | | S41S50 | Boot, self-healing, caps, mesh | | S51S65 | Applications, AI, developer tools | ---
 
 1
 

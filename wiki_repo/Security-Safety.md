@@ -1,26 +1,26 @@
-﻿# Security & Privacy: The Sovereign Shield
+# Security & Privacy: The Sovereign Shield
 
 SigmaOS provides industrial-grade protection for professional data and network communications.
 
-## ðŸ”’ Mandatory Access Control (S-MAC)
+## 🔒 Mandatory Access Control (S-MAC)
 
 - **Zero-Trust**: Shards are isolated at the silicon level.
 
 - **Capability Tokens**: Every resource access is validated against a PQC-signed lattice.
 
-## ðŸ›¡ï¸ Network Security (S-FIRE)
+## 🛡️ Network Security (S-FIRE)
 
 - **Industrial Firewall**: Nftables-parity packet filtering with shard-level granular rules.
 
 - **Anti-DDoS**: Automated lattice-rebalancing to mitigate network-level attacks.
 
-## ðŸ” Data-at-Rest (S-LUKS)
+## 🔐 Data-at-Rest (S-LUKS)
 
 - **Kyber-Encryption**: Volumes are encrypted using Post-Quantum (PQC) primitives.
 
 - **Isolated Mounts**: Professional shards only see their own encrypted data silos.
 
-## ðŸ“‹ Security Auditing (S-AUDIT)
+## 📋 Security Auditing (S-AUDIT)
 
 - **Live Forensic Trace**: Every security event is logged to a write-only, PQC-signed audit lattice.
 

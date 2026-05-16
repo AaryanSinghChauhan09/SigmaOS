@@ -1,4 +1,4 @@
-#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/libc/SovereignLibC.h"
 /* --------------------------------------------------------------------------
  * SIGMA OS SOVEREIGN HTTP ENGINE (SYSTEM-LEVEL ARCHITECTURE)
  * --------------------------------------------------------------------------
@@ -6,8 +6,8 @@
  * modular C sub-systems, representing pure OS-level design methodology.
  * -------------------------------------------------------------------------- */
 
-#include "suites/S01_Genesis/shards/sigma_libc.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "../../../../../include/sigma_libc.h"
+#include "../../../../../include/sigma_libc.h"
 #include "../../../../../include/sigma_network.h"
 #include "../../../../../include/sigma_http.h"
 

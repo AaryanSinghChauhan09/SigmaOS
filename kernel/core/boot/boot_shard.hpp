@@ -1,10 +1,10 @@
-#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_hal.h"
 #ifndef BOOT_SHARD_HPP
 #define BOOT_SHARD_HPP
 
 #include "../../../include/libc/SovereignLibC.h"
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

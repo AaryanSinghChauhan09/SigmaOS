@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "../../include/core/SigmaOOP.hpp"
+#include "../../include/SigmaOOP.hpp"
 
 /**
  * Σ SIGMA OS: SOVEREIGN CONCEPT GENERATOR (v128.0 - ZERO-STD NATIVE)

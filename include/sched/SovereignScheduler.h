@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "../sigma_types.h"
+#include "../core/sigma_types.h"
 #include "../sigma_log.h"
 
 #define SIGMA_SCHED_MAX_TASKS  256u

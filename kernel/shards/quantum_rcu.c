@@ -11,7 +11,7 @@
  * =============================================================================
  */
 
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 extern sigma_vaddr_t vmalloc(sigma_u64 npages);
 

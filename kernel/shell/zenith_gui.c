@@ -5,7 +5,7 @@
  * Principles: Sharded Window Management & VGA Glassmorphism.
  * =============================================================================
  */
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 #define COLS 80
 #define ROWS 25

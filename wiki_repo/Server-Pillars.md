@@ -1,8 +1,8 @@
-﻿# Sovereign Server Pillars
+# Sovereign Server Pillars
 
 SigmaOS is designed to outperform legacy Linux servers (Ubuntu Server, Debian) by implementing a **Lattice-Aware Server Stack**.
 
-## ðŸš€ S-SSH: Secure Administration
+## 🚀 S-SSH: Secure Administration
 
 Unlike standard OpenSSH, S-SSH utilizes **Post-Quantum Key Exchange** (CRYSTALS-Kyber) for every session.
 
@@ -10,7 +10,7 @@ Unlike standard OpenSSH, S-SSH utilizes **Post-Quantum Key Exchange** (CRYSTALS-
 
 - **Audit Mesh**: All commands are logged to the PQC-signed Sovereign Journal.
 
-## ðŸ“¦ S-CONTAINER: Industrial Sharding
+## 📦 S-CONTAINER: Industrial Sharding
 
 S-CONTAINER provides an OCI-compliant runtime that bridges standard Docker/Podman images to the Sovereign Lattice.
 
@@ -18,7 +18,7 @@ S-CONTAINER provides an OCI-compliant runtime that bridges standard Docker/Podma
 
 - **State Reconciliation**: If a containerized service fails, S-AUTO performs an atomic rollback within 10ms.
 
-## ðŸŒ S-WWW: High-Performance Web Lattice
+## 🌐 S-WWW: High-Performance Web Lattice
 
 Our web server shard provides Nginx-parity performance with native lattice integration.
 

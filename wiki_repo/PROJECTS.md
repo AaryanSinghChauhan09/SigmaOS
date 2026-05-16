@@ -1,8 +1,8 @@
-﻿# Î£ SIGMAOS STRATEGIC PROJECT BOARD
+# Σ SIGMAOS STRATEGIC PROJECT BOARD
 
-## ðŸŽ¯ Milestones
+## 🎯 Milestones
 
-### ðŸ”´ ALPHA: Industrial Foundation (v15.0 - DONE)
+### 🔴 ALPHA: Industrial Foundation (v15.0 - DONE)
 
 - [x] Kernel Hardening (Lattice PMM/S-SCHED)
 
@@ -12,7 +12,7 @@
 
 - [x] PQC-GPG Dilithium-5 Attestation
 
-### ðŸŸ¡ BETA: Usability & AI (v15.1 - DONE)
+### 🟡 BETA: Usability & AI (v15.1 - DONE)
 
 - [x] XFCE/LXQt Zenith Desktop Port
 
@@ -22,7 +22,7 @@
 
 - [x] Guided Dual-Boot Installer Partitioning
 
-### ðŸŸ¢ STABLE: Global Ecosystem (v16.0 - CURRENT)
+### 🟢 STABLE: Global Ecosystem (v16.0 - CURRENT)
 
 - [x] full FIPS-140-3 Compliance
 
@@ -34,7 +34,7 @@
 
 ---
 
-## ðŸ“‹ Task Board
+## 📋 Task Board
 
 | Task | Category | Priority | Status |
 | :--- | :--- | :--- | :--- |

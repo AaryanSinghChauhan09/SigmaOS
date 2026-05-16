@@ -1,6 +1,6 @@
 #include "../../../include/sigma_log.h"
 #include "../../../include/Lattice.h"
-#include "../../../include/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 #include "compositor.hpp"
 
 namespace SigmaOS {

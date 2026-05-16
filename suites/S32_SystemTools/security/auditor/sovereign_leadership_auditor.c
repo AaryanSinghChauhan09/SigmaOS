@@ -1,4 +1,4 @@
-#include "../../../../include/SovereignLibC.h"
+#include "../../../../include/libc/SovereignLibC.h"
 #define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS — tools/auditor — sovereign_leadership_auditor.c

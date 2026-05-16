@@ -1,4 +1,4 @@
-﻿# SIGMAOS: PROFESSION PROFILE LATTICE
+# SIGMAOS: PROFESSION PROFILE LATTICE
 
 ## The Profile Paradigm
 
@@ -50,7 +50,7 @@ SigmaOS Zenith v15.0 introduces **modular profession profiles**. Each profile is
 
 ---
 
-## ðŸ›  Shard Orchestration
+## 🛠 Shard Orchestration
 
 Profession profiles are Dilithium-5 attested. Switching profiles re-configures the **Sovereign Window Manager** and **Lattice Memory** in real-time.
 

@@ -1,4 +1,4 @@
-#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS DIVINE_OMNIPRESENCE: SOVEREIGN LSH SHARD (v61.1-DIVINE)

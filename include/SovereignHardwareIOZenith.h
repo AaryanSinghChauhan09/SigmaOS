@@ -1,7 +1,7 @@
-﻿#ifndef SOVEREIGN_HARDWARE_IO_ZENITH_H
+#ifndef SOVEREIGN_HARDWARE_IO_ZENITH_H
 #define SOVEREIGN_HARDWARE_IO_ZENITH_H
 
-#include "./core/SigmaOOP.hpp"
+#include "./SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Hardware {

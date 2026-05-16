@@ -1,4 +1,4 @@
-﻿# SigmaOS Sovereign Syscall Interface (Zenith v15.0)
+# SigmaOS Sovereign Syscall Interface (Zenith v15.0)
 
 This document specifies the industrial-grade syscall interface for the sovereign lattice. Every syscall is PQC-attested and executed within an isolated shard context.
 

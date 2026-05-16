@@ -1,4 +1,4 @@
-﻿# ðŸ›  SHIP_CAPTAIN Profile
+# 🛠 SHIP_CAPTAIN Profile
 
 ## Required Tools & Functions
 
@@ -10,7 +10,7 @@
 
 - ballast manager
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - SOLAS
 
@@ -18,7 +18,7 @@
 
 - STCW
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Fuel consumption
 
@@ -26,7 +26,7 @@
 
 - cargo stability (GM)
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Route optimization
 
@@ -34,10 +34,10 @@
 
 - tidal prediction
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Navigational data sync, engine diagnostic monitoring
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Voyage log snapshots, autopilot calibration restoration

@@ -1,4 +1,4 @@
-﻿# ðŸ›  BIO_ETHICIST Profile
+# 🛠 BIO_ETHICIST Profile
 
 ## Required Tools & Functions
 
@@ -10,7 +10,7 @@
 
 - CRISPR-log-Lattice
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Declaration of Helsinki
 
@@ -18,22 +18,22 @@
 
 - bio-ethics guidelines
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Risk-benefit ratio
 
 - genetic-diversity index
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Ethical-dilemma simulation
 
 - long-term impact analysis
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Compliance-log integrity check, ethical-seal verification
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Decision-state snapshots, protocol baseline restoration

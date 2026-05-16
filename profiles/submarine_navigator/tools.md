@@ -1,4 +1,4 @@
-﻿# ðŸ›  SUBMARINE_NAVIGATOR Profile
+# 🛠 SUBMARINE_NAVIGATOR Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - silent-running-nexus
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Maritime law
 
 - deep-sea exploration protocols
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Buoyancy-delta
 
@@ -24,16 +24,16 @@
 
 - pressure-limit-calc
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Sub-surface obstacle avoidance
 
 - passive sonar triangulation
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Acoustic-link verification, hull-sensor-integrity scan
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Dive-log snapshots, ballast-configuration restoration

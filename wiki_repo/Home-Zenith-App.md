@@ -1,10 +1,10 @@
-﻿# Î£ SigmaOS v15.0 Zenith: App Edition
+# Σ SigmaOS v15.0 Zenith: App Edition
 
-## ðŸ“± The Productivity Lattice
+## 📱 The Productivity Lattice
 
 The **App Edition** is optimized for heavy application workflows. It includes pre-loaded industrial shards for Media, Finance, and CAD, as well as the `S-ARC` (Sovereign Application Runtime Container) for running cross-platform bundles.
 
-### ðŸ› ï¸ Key Features
+### 🛠️ Key Features
 
 - **S-ARC Integration**: Run `.sab` (Sovereign App Bundles) with native performance.
 
@@ -14,7 +14,7 @@ The **App Edition** is optimized for heavy application workflows. It includes pr
 
 - **Unified App Store**: Secure, PQC-vetted access to the Sigma Shard Registry.
 
-### ðŸ“¥ Installation Guide (Professional)
+### 📥 Installation Guide (Professional)
 
 1. **Prepare Media**: Flash `SigmaOS-v15.0-Zenith-App.iso`.
 
@@ -26,7 +26,7 @@ The **App Edition** is optimized for heavy application workflows. It includes pr
 
 5. **Security**: Set up your Dilithium-5 keys for app attestation.
 
-### ðŸ’Ž Exclusive Functions
+### 💎 Exclusive Functions
 
 - `shard-bundle-create`: Package your own tools into .sab bundles for the lattice.
 

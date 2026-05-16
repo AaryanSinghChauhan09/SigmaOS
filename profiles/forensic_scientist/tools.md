@@ -1,4 +1,4 @@
-﻿# ðŸ›  FORENSIC_SCIENTIST Profile
+# 🛠 FORENSIC_SCIENTIST Profile
 
 ## Required Tools & Functions
 
@@ -10,28 +10,28 @@
 
 - bit-stream imaging
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Evidence Act
 
 - BNSS forensic protocols
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Probability of match
 
 - decomposition rate
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Pattern recognition
 
 - digital fingerprinting
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Hash-based integrity check for evidence files
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Chain-of-custody immutable state restoration

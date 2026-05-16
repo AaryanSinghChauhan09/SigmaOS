@@ -1,4 +1,4 @@
-﻿# SigmaOS: Roadmap Status - TOTAL SINGULARITY
+# SigmaOS: Roadmap Status - TOTAL SINGULARITY
 
 All 4 phases of the SigmaOS industrial roadmap have been implemented and integrated into the **Zenith v15.0 Lattice**.
 

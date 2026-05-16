@@ -1,4 +1,4 @@
-﻿# Profession-Pharmacist-Tools
+# Profession-Pharmacist-Tools
 
 1
 

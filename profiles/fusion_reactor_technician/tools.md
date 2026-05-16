@@ -1,4 +1,4 @@
-﻿# ðŸ›  FUSION_REACTOR_TECHNICIAN Profile
+# 🛠 FUSION_REACTOR_TECHNICIAN Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - tritium-breeder-auditor
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - IAEA fusion safety standards
 
 - high-energy-physics protocols
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Plasma-beta-ratio
 
@@ -24,16 +24,16 @@
 
 - neutron-flux-calc
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Automated plasma stability control
 
 - ELM-suppression orchestration
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Magnetic-field-calibration sync, containment-integrity verify
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Reactor-state snapshots, baseline-plasma-parameters

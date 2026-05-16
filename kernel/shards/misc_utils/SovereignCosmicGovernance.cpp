@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 #include "userland/apps/cosmic_governance/policies.hpp"
 
 using namespace SigmaOS;

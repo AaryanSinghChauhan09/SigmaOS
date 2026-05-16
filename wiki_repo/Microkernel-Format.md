@@ -1,4 +1,4 @@
-﻿# SigmaOS Format: Microkernel Zenith
+# SigmaOS Format: Microkernel Zenith
 
 ## Industrial Modularity & Service Orchestration
 
@@ -6,7 +6,7 @@ The **Microkernel** format is the architectural baseline of SigmaOS. It moves al
 
 ---
 
-## ðŸ› ï¸ Bundled Industrial Tools
+## 🛠️ Bundled Industrial Tools
 
 | Tool | Category | Linux/Windows Equivalent | Purpose |
 |------|----------|--------------------------|---------|
@@ -20,7 +20,7 @@ The **Microkernel** format is the architectural baseline of SigmaOS. It moves al
 
 ---
 
-## âš™ï¸ Core Shards
+## ⚙️ Core Shards
 
 - `kernel/core/system/SovereignHypervisor.cpp`
 
@@ -30,7 +30,7 @@ The **Microkernel** format is the architectural baseline of SigmaOS. It moves al
 
 ---
 
-## ðŸš€ Optimization Checklist
+## 🚀 Optimization Checklist
 
 - [ ] Enable **SovereignKVM** for hardware-accelerated virtualization.
 

@@ -1,4 +1,4 @@
-﻿# Cache Store
+# Cache Store
 
 A Cache Store is responsible for storing and retrieving cached responses.
 It is also responsible for deciding which specific response to use based off of

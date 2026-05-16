@@ -1,4 +1,4 @@
-﻿# Undici Module vs. Node.js Built-in Fetch
+# Undici Module vs. Node.js Built-in Fetch
 
 Node.js has shipped a built-in `fetch()` implementation powered by undici since
 Node.js v18. This guide explains the relationship between the `undici` npm

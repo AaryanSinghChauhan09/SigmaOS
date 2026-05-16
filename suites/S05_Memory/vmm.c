@@ -1,4 +1,4 @@
-#include "../../include/SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 /*
  * =============================================================================
  * Σ SIGMAOS KERNEL: VIRTUAL MEMORY MANAGER (v1.0 - PURE C11)
@@ -14,7 +14,7 @@
  * =============================================================================
  */
 
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 /* =========================================================================
  * External: physical allocator

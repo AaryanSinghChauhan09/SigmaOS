@@ -1,4 +1,4 @@
-﻿# Dispatcher
+# Dispatcher
 
 Extends: `events.EventEmitter`
 
@@ -916,16 +916,16 @@ Compose a new dispatcher from the current dispatcher and the given interceptors.
 > compose([interceptor1, interceptor2, interceptor3])
 >
 > Request Flow:
-> â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-> â”‚   Request   â”‚â”€â”€â”€â–¶â”‚interceptor3 â”‚â”€â”€â”€â–¶â”‚interceptor2 â”‚â”€â”€â”€â–¶â”‚interceptor1 â”‚â”€â”€â”€â–¶â”‚  dispatcher â”‚
-> â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â”‚   .dispatch â”‚
->                           â–²                   â–²                   â–²         â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
->                           â”‚                   â”‚                   â”‚                â–²
->                    (called first)      (called second)     (called last)           â”‚
->                                                                                    â”‚
-> â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”          â”‚
-> â”‚  Response   â”‚â—€â”€â”€â”€â”‚interceptor3 â”‚â—€â”€â”€â”€â”‚interceptor2 â”‚â—€â”€â”€â”€â”‚interceptor1 â”‚â—€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-> â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+> ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+> │   Request   │───▶│interceptor3 │───▶│interceptor2 │───▶│interceptor1 │───▶│  dispatcher │
+> └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘    │   .dispatch │
+>                           ▲                   ▲                   ▲         └─────────────┘
+>                           │                   │                   │                ▲
+>                    (called first)      (called second)     (called last)           │
+>                                                                                    │
+> ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐          │
+> │  Response   │◀───│interceptor3 │◀───│interceptor2 │◀───│interceptor1 │◀─────────┘
+> └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
 >
 > The interceptors are composed in reverse order due to function composition.
 > ```
@@ -1229,7 +1229,7 @@ await client.request({
 
 ##### `decompress`
 
-âš ï¸ The decompress interceptor is experimental and subject to change.
+⚠️ The decompress interceptor is experimental and subject to change.
 
 The `decompress` interceptor automatically decompresses response bodies that are compressed with gzip, deflate, brotli, or zstd compression. It removes the `content-encoding` and `content-length` headers from decompressed responses and supports RFC-9110 compliant multiple encodings.
 

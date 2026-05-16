@@ -1,4 +1,4 @@
-﻿# ðŸ›  ORBITAL_DEBRIS_MANAGER Profile
+# 🛠 ORBITAL_DEBRIS_MANAGER Profile
 
 ## Required Tools & Functions
 
@@ -10,11 +10,11 @@
 
 - TLE-Lattice
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - IADC space debris mitigation guidelines
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Probability of collision (Pc)
 
@@ -22,16 +22,16 @@
 
 - delta-V for de-orbit
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Cascading collision prediction
 
 - debris-cloud propagation
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Radar-link consistency, laser-aiming-calibration verification
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Orbital-map state snapshots, de-orbit sequence logs

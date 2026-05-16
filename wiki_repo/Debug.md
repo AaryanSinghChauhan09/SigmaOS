@@ -1,4 +1,4 @@
-﻿# Debug
+# Debug
 
 Undici (and subsenquently `fetch` and `websocket`) exposes a debug statement that can be enabled by setting `NODE_DEBUG` within the environment.
 

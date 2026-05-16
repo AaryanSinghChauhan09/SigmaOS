@@ -1,4 +1,4 @@
-﻿# SigmaOS Industrial Roadmap: The Zenith Singularity
+# SigmaOS Industrial Roadmap: The Zenith Singularity
 
 This roadmap outlines the evolution of SigmaOS from its microkernel roots into a global sovereign computational lattice.
 
@@ -20,7 +20,7 @@ This roadmap outlines the evolution of SigmaOS from its microkernel roots into a
 
 - **Virtualization**: Type-1 Hypervisor (S-HYP) and Industrial Containers (S-CONT).
 
-### ðŸ›¤ï¸ Unified Development Roadmap (v15.0.0+)
+### 🛤️ Unified Development Roadmap (v15.0.0+)
 
 - **Baseline Toolset Manifest**: Automate bundling of `sigma-bleach`, `sigma-timeshift`, and creative suites into every branch.
 

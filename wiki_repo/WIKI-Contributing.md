@@ -1,4 +1,4 @@
-﻿# WIKI-Contributing
+# WIKI-Contributing
 
 1
 

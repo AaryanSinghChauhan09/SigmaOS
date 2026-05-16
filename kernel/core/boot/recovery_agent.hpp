@@ -1,11 +1,11 @@
-#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_hal.h"
 #ifndef RECOVERY_AGENT_HPP
 #define RECOVERY_AGENT_HPP
 
 #include "../../../include/libc/SovereignLibC.h"
 
 #include "../../../include/core/sigma_types.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Core {

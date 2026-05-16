@@ -1,8 +1,8 @@
-﻿# Sovereign Support Nexus
+# Sovereign Support Nexus
 
 Welcome to the SigmaOS Support Nexus. As an industrial-grade operating system, SigmaOS provides several tiers of support for the Sovereign Lattice.
 
-## ðŸ›  Self-Service Support
+## 🛠 Self-Service Support
 
 ### 1. The Sovereign Wiki
 
@@ -23,7 +23,7 @@ sigma-cli log --follow
 
 SigmaOS is designed to automatically recover from shard-level corruption. If a component fails, the `SovereignRollbackShard` will attempt to restore the last stable PQC-attested snapshot.
 
-## ðŸ¤ Community & Industrial Support
+## 🤝 Community & Industrial Support
 
 ### 1. S-FORUM (Lattice-Net)
 
@@ -43,7 +43,7 @@ For bug reports and architectural suggestions, please use the [Issue Tracker](ht
 
 For mission-critical industrial deployments (Bio-Fab, Aerospace, Defense), professional support is available via SAC-certified partners. Refer to the `Sovereign-Industrial-Contract.md` for SLA-backed support.
 
-## ðŸ” Frequently Asked Questions (FAQ)
+## 🔍 Frequently Asked Questions (FAQ)
 
 ### Q: How do I resolve include path errors?
 

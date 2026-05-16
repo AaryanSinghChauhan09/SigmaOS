@@ -1,4 +1,4 @@
-#include "../../../include/sigma_types.h"
+#include "../../../include/core/sigma_types.h"
 #ifndef COMPOSITOR_HPP
 #define COMPOSITOR_HPP
 

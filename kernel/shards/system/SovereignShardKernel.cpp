@@ -1,20 +1,20 @@
-﻿#include "../../../include/sigma_log.h"
+#include "../../../include/sigma_log.h"
 #include "../../../include/Lattice.h"
 #include "../../../include/libc/SovereignLibC.h"
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
+ * Σ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 #include "../../../include/libc/SovereignLibC.h"
 
 /**
- * Î£ SIGMA OS: SOVEREIGN SHARD KERNEL (v128.0 - KERNEL ZENITH)
+ * Σ SIGMA OS: SOVEREIGN SHARD KERNEL (v128.0 - KERNEL ZENITH)
  * ==========================================================
  * USP: Real-time Shard Scheduling, Memory Isolation, and NCERT execution.
  * Principle: OOPS, SOLID, Process Management, Memory Sovereignty.
@@ -100,7 +100,7 @@ public:
 
     void ExecuteAll() {
 <<<<<<<< HEAD:suites/S01_Genesis/SovereignShardKernel.c
-        sigma_log_info("\n--- Î£ SIGMA OS KERNEL SCHEDULER INITIATED ---\n");
+        sigma_log_info("\n--- Σ SIGMA OS KERNEL SCHEDULER INITIATED ---\n");
         for (unsigned int i = 0; i < m_count; i++) {
             unsigned int idx = (m_head + i) % 32;
             IShardProcess* shard = m_queue[idx];
@@ -108,7 +108,7 @@ public:
             sigma_log_info("\n[SCHEDULER]: Dispatching Shard-Process: %s\n", shard->GetName());
             
 ========
-        sigma_log("--- Î£ SIGMA OS KERNEL SCHEDULER INITIATED ---\n");
+        sigma_log("--- Σ SIGMA OS KERNEL SCHEDULER INITIATED ---\n");
         for (auto& shard : m_queue) {
             std::cout << "\n[SCHEDULER]: Dispatching Shard-Process: " << shard->GetName() << std::endl;
 >>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/system/SovereignShardKernel.cpp

@@ -1,4 +1,4 @@
-﻿# Profession-Social-Scientist-Tools
+# Profession-Social-Scientist-Tools
 
 1
 

@@ -1,4 +1,4 @@
-﻿# ðŸ›  ACCOUNTANT Profile
+# 🛠 ACCOUNTANT Profile
 
 ## Required Tools & Functions
 
@@ -12,7 +12,7 @@
 
 - Tally-lattice integration
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Ind-AS
 
@@ -22,7 +22,7 @@
 
 - Companies Act
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - GST
 
@@ -34,7 +34,7 @@
 
 - annuity
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Automated ledger balancing
 
@@ -42,10 +42,10 @@
 
 - tax filing optimization
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Continuous audit log integrity check, transaction consistency validation
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Snapshot-per-transaction, daily fiscal state preservation

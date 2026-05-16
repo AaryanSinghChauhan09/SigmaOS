@@ -1,7 +1,7 @@
-﻿#ifndef SOVEREIGN_CORE_UTILS_H
+#ifndef SOVEREIGN_CORE_UTILS_H
 #define SOVEREIGN_CORE_UTILS_H
 
-#include "./core/SigmaOOP.hpp"
+#include "./SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace CoreUtils {

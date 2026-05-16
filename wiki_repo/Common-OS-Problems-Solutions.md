@@ -1,4 +1,4 @@
-﻿# Common OS Problems & Solutions in SigmaOS
+# Common OS Problems & Solutions in SigmaOS
 
 SigmaOS takes a proactive, structural approach to solving universal operating system challenges across its Microkernel, Monolithic, Distributed, RTOS, Cloud, and Mobile formats.
 

@@ -1,4 +1,4 @@
-﻿# Profession-Accountant-Tools
+# Profession-Accountant-Tools
 
 1
 

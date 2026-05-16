@@ -1,4 +1,4 @@
-﻿# ðŸ›  TERRAFORMING_ENGINEER Profile
+# 🛠 TERRAFORMING_ENGINEER Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - planetary thermal monitor
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Planetary protection protocols
 
 - ethical terraforming guidelines
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Atmospheric pressure delta
 
@@ -24,16 +24,16 @@
 
 - oxygen-cycle rate
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Climate engineering simulation
 
 - ecosystem stability prediction
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Atmospheric probe calibration, bio-dome integrity monitoring
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Planetary state snapshots, bio-injection phase rollback

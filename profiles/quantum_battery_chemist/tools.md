@@ -1,4 +1,4 @@
-﻿# ðŸ›  QUANTUM_BATTERY_CHEMIST Profile
+# 🛠 QUANTUM_BATTERY_CHEMIST Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - SEI-layer-auditor
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Material safety data
 
 - quantum-chemistry standards
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Energy-density-delta
 
@@ -24,16 +24,16 @@
 
 - thermal-runaway-risk
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Generative electrolyte design
 
 - molecular-structure optimization
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Charge-balance verification, thermal-sensor-sync
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Chemical-state snapshots, battery-configuration history

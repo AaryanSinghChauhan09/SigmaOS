@@ -6,7 +6,7 @@
 #ifndef SIGMA_LEGAL_SHARDS_H
 #define SIGMA_LEGAL_SHARDS_H
 
-#include "./core/sigma_kernel_types.h"
+#include "./sigma_kernel_types.h"
 
 /* Modular Domain Init Functions */
 void init_bnss_template(void* t);

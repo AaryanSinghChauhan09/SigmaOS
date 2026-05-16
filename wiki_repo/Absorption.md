@@ -1,4 +1,4 @@
-﻿# SigmaOS: Total Absorption & Industrial Parity
+# SigmaOS: Total Absorption & Industrial Parity
 
 SigmaOS Zenith v15.0 is the result of a global architectural absorption. We have analyzed and distilled the core innovations from over 50 years of operating system history into the **Sovereign Shard Lattice**.
 

@@ -5,7 +5,7 @@
  * ============================================================================= */
 
 #include "../../include/sigma_lattice_mesh.h"
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 #include "../../include/libc/sigma_libc.h"
 
 /* ── FNV-1a 64-bit Hash ─────────────────────────────────────────────────── */

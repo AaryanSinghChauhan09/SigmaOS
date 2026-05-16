@@ -1,4 +1,4 @@
-﻿# ext/plugins
+# ext/plugins
 
 Plugin System.
 

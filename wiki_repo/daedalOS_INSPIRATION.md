@@ -1,4 +1,4 @@
-﻿# daedalOS INSPIRATION
+# daedalOS INSPIRATION
 
 1
 

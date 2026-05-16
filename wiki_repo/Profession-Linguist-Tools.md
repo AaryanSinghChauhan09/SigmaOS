@@ -1,4 +1,4 @@
-﻿# Profession-Linguist-Tools
+# Profession-Linguist-Tools
 
 1
 

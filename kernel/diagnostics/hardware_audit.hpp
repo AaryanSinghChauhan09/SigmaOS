@@ -1,7 +1,7 @@
 #ifndef HARDWARE_AUDIT_HPP
 #define HARDWARE_AUDIT_HPP
 
-#include "../../include/core/SigmaOOP.hpp"
+#include "../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Diagnostics {

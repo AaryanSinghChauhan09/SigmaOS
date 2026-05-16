@@ -11,7 +11,7 @@
 
 /* Use the single source-of-truth types header directly.
  * sigma_kernel_types.h is zero-dependency and always available. */
-#include "sigma_kernel_types.h"
+#include "./sigma_kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {

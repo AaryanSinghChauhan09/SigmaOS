@@ -1,6 +1,6 @@
-﻿# Detects instances of new Buffer(argument) where argument is any non-literal value (`security/detect-new-buffer`)
+# Detects instances of new Buffer(argument) where argument is any non-literal value (`security/detect-new-buffer`)
 
-âš ï¸ This rule _warns_ in the âœ… `recommended` config.
+⚠️ This rule _warns_ in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 

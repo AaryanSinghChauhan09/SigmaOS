@@ -1,4 +1,4 @@
-﻿# Sovereign-Lattice
+# Sovereign-Lattice
 
 1
 

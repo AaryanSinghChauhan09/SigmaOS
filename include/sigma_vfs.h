@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN VIRTUAL FILE SYSTEM (VFS)
+ * Σ SIGMAOS: SOVEREIGN VIRTUAL FILE SYSTEM (VFS)
  * =========================================================================
  * Mission: Zero-latency shard-mapped path resolution.
  * =========================================================================

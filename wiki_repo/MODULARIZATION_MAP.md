@@ -1,10 +1,10 @@
-﻿# ðŸ—ºï¸ SigmaOS Modularization Map: The 600-Shard Lattice
+# 🗺️ SigmaOS Modularization Map: The 600-Shard Lattice
 
 SigmaOS is designed for **Absolute Modularity**. Unlike the monolithic Linux kernel, every component in SigmaOS is an atomic **Shard**.
 
 ---
 
-## ðŸ›ï¸ Shard Hierarchy
+## 🏛️ Shard Hierarchy
 
 | Layer | Purpose | Key Shards |
 | :--- | :--- | :--- |
@@ -23,7 +23,7 @@ SigmaOS is designed for **Absolute Modularity**. Unlike the monolithic Linux ker
 
 ---
 
-## ðŸ§© Shard Design Principles
+## 🧩 Shard Design Principles
 
 ### 1. Atomic Isolation
 
@@ -39,7 +39,7 @@ Shards can be updated or replaced at runtime. The **SovereignAutomation** shard 
 
 ---
 
-## ðŸš€ Industrial Automatability
+## 🚀 Industrial Automatability
 
 SigmaOS provides **One-Click Industrialization** (#68), allowing enterprise users to deploy a fully hardened, FIPS-140-3 compliant lattice with a single command.
 

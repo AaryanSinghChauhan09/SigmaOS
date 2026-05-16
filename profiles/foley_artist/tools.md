@@ -1,4 +1,4 @@
-﻿# ðŸ›  FOLEY_ARTIST Profile
+# 🛠 FOLEY_ARTIST Profile
 
 ## Required Tools & Functions
 
@@ -10,11 +10,11 @@
 
 - real-time-resynthesizer
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Audio post-production standards
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Sample-rate delta
 
@@ -22,16 +22,16 @@
 
 - sync-offset
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Automated footstep matching
 
 - textural sound synthesis
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Audio-buffer consistency, Prop-Lattice sync
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Mix-state snapshots, sound-design-history restoration

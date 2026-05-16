@@ -1,4 +1,4 @@
-#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/libc/SovereignLibC.h"
 /**
  * @file SovereignArch_Zen.c
  * @brief Phase 66: Arch Linux Absorption Shard (Zen Optimization).

@@ -1,4 +1,4 @@
-﻿# SigmaOS Sovereign Architecture
+# SigmaOS Sovereign Architecture
 
 SigmaOS is an industrial-grade, sovereign microkernel operating system built on the principle of **Lattice Shard Autonomy**.
 
@@ -46,7 +46,7 @@ SigmaOS targets pure silicon abstraction, making it immune to legacy BIOS/UEFI c
 
 To ensure total functional parity across all formats, SigmaOS adopts a "Core-Plus-Layer" distribution model:
 
-### ðŸ› ï¸ Consistent Core
+### 🛠️ Consistent Core
 
 - **Single Kernel Base**: One microkernel codebase for Standalone, Dual-boot, App, and Browser formats.
 
@@ -54,7 +54,7 @@ To ensure total functional parity across all formats, SigmaOS adopts a "Core-Plu
 
 - **Standard Library (`SovereignLibC`)**: Zero-dependency C library shared by all kernel and userland shards.
 
-### ðŸ“¦ Default Toolset Baseline
+### 📦 Default Toolset Baseline
 
 Every SigmaOS edition includes a mandatory baseline of industrial tools:
 
@@ -66,7 +66,7 @@ Every SigmaOS edition includes a mandatory baseline of industrial tools:
 
 - **Infrastructure**: `sigma-top` (Monitoring), `QEMU-S`, `VirtualBox-S`.
 
-### ðŸ—ï¸ Edition Layering
+### 🏗️ Edition Layering
 
 Format-specific functionality is added as professional layers on top of the consistent core:
 
@@ -78,7 +78,7 @@ Format-specific functionality is added as professional layers on top of the cons
 
 - **Browser Edition**: PQC-hardened sandboxing and SovereignBrowser.
 
-### ðŸ§ª Quality Assurance
+### 🧪 Quality Assurance
 
 - **Cross-Branch Testing**: Automated regression tests enforced via CI/CD for every commit.
 

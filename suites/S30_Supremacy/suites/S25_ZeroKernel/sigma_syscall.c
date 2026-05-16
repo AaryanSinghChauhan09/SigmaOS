@@ -1,4 +1,4 @@
-#include "../../../../include/SovereignLibC.h"
+#include "../../../../include/libc/SovereignLibC.h"
 #include "../../../../include/system/sigma_syscall.h"
 #include "../../../../include/hal/sigma_pmm.h"
 #include "../../../../include/sigma_process.h"
@@ -6,8 +6,8 @@
 #include "../../../../include/sigma_security.h"
 #include "../../../../include/sigma_ai_mem.h"
 #include "../../../../include/drivers/sigma_virtio.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "../../../../include/sigma_libc.h"
+#include "../../../../include/sigma_libc.h"
 
 /* =========================================================================
  * SIGMA OS: SOVEREIGN SYSCALL DISPATCHER (S25 - ZeroKernel)

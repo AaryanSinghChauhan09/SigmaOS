@@ -1,4 +1,4 @@
-#include "../../../include/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 #include "../../../include/core/sigma_types.h"
 /*
  * =============================================================================
@@ -13,7 +13,7 @@
  * =============================================================================
  */
 
-#include "../../../include/core/sigma_kernel_types.h"
+#include "../../../include/sigma_kernel_types.h"
 
 #define MAX_EDITOR_LINES 4096u
 #define MAX_LINE_LEN 256u

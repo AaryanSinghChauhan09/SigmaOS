@@ -1,4 +1,4 @@
-﻿# ðŸ›  CHARTERED_ACCOUNTANT Profile
+# 🛠 CHARTERED_ACCOUNTANT Profile
 
 ## Required Tools & Functions
 
@@ -12,7 +12,7 @@
 
 - audit-trail-engine
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - ICAI standards
 
@@ -22,7 +22,7 @@
 
 - Companies Act
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Tax-liability
 
@@ -32,7 +32,7 @@
 
 - depreciation-lattice
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Anomaly detection in ledgers
 
@@ -40,10 +40,10 @@
 
 - automated-audit-sampling
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Tally-data-integrity scan, GST-reconciliation verification
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Fiscal-year snapshots, historical ledger restoration

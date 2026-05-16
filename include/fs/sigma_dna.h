@@ -1,7 +1,7 @@
 ﻿#ifndef SIGMA_DNA_H
 #define SIGMA_DNA_H
 
-#include "../sigma_types.h"
+#include "../core/sigma_types.h"
 
 #ifdef __cplusplus
 namespace SigmaOS {

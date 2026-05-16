@@ -1,4 +1,4 @@
-﻿# ðŸ›  VITICULTURIST Profile
+# 🛠 VITICULTURIST Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - weather-Lattice
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
-- Appellation d'origine contrÃ´lÃ©e (AOC) standards
+- Appellation d'origine contrôlée (AOC) standards
 
 - organic certification rules
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Pruning density
 
@@ -24,16 +24,16 @@
 
 - fermentation heat-rate
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Harvest-window prediction
 
 - yield-estimation simulation
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Micro-climate sensor sync, pest-pressure verification
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Seasonal growth logs, irrigation state history

@@ -1,4 +1,4 @@
-﻿# docs-SHARD MANIFEST
+# docs-SHARD MANIFEST
 
 1
 

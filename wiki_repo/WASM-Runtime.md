@@ -1,4 +1,4 @@
-﻿# WASM-Runtime
+# WASM-Runtime
 
 1
 

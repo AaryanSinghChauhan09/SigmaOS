@@ -1,4 +1,4 @@
-﻿# L-Stream
+# L-Stream
 
 1
 

@@ -8,7 +8,7 @@
  * =========================================================================
  */
 
-#include "../../include/core/SigmaOOP.hpp"
+#include "../../include/SigmaOOP.hpp"
 
 /**
  * Î£ SIGMA OS: SOVEREIGN DATA PREPROCESSOR (v128.0 - ZERO-STD NATIVE)

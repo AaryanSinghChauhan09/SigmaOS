@@ -1,6 +1,6 @@
-﻿# Detects "RegExp(variable)", which might allow an attacker to DOS your server with a long-running regular expression (`security/detect-non-literal-regexp`)
+# Detects "RegExp(variable)", which might allow an attacker to DOS your server with a long-running regular expression (`security/detect-non-literal-regexp`)
 
-âš ï¸ This rule _warns_ in the âœ… `recommended` config.
+⚠️ This rule _warns_ in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 

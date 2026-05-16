@@ -1,4 +1,4 @@
-﻿# ðŸ›  GENERATIVE_ART_CURATOR Profile
+# 🛠 GENERATIVE_ART_CURATOR Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - style-transfer-engine
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - AI-ethics in art
 
 - digital-provenance standards
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Visual-entropy
 
@@ -24,16 +24,16 @@
 
 - aesthetic-score
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Prompt-optimization
 
 - latent-walk orchestration
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Art-lattice integrity check, provenance-seal verification
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Curation-state snapshots, aesthetic-baseline restoration

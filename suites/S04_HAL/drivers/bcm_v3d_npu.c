@@ -1,4 +1,4 @@
-#include "../../../include/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 /*
  * =============================================================================
  * Σ SIGMAOS: BROADCOM VIDEOCORE V3D ACCELERATOR (v1.0)
@@ -16,9 +16,9 @@
  * =============================================================================
  */
 
-#include "../../../include/core/sigma_kernel_types.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "sigma/hal_contract.h"
-#include "sigma/sigma_features.h"
+#include "../../../include/sigma_features.h"
 
 #ifdef SIGMA_ARCH_AARCH64
 

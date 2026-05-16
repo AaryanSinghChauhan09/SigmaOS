@@ -1,4 +1,4 @@
-﻿# MIME Type Parsing
+# MIME Type Parsing
 
 ## `MIMEType` interface
 

@@ -33,4 +33,4 @@ Unlike monolithic kernels that panic on driver failure, the SigmaOS lattice hot-
 
 ---
 
-### SigmaOS Zenith v15.0 is formally certified for global industrial deployment.
+### SigmaOS Zenith v15.0 is formally certified for global industrial deployment

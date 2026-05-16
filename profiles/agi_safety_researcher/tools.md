@@ -1,4 +1,4 @@
-﻿# ðŸ›  AGI_SAFETY_RESEARCHER Profile
+# 🛠 AGI_SAFETY_RESEARCHER Profile
 
 ## Required Tools & Functions
 
@@ -10,28 +10,28 @@
 
 - sandbox-lattice
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Asilomar AI principles
 
 - safety-first development
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Complexity-to-safety ratio
 
 - interpretability score
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Formal verification
 
 - recursive self-improvement monitoring
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Automated kill-switch activation, sandbox containment verification
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Safe-state model restoration, audit log immutability

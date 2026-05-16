@@ -1,4 +1,4 @@
-﻿# ðŸ›  LAWYER Profile
+# 🛠 LAWYER Profile
 
 ## Required Tools & Functions
 
@@ -12,7 +12,7 @@
 
 - BNS-IPC cross-mapper
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Bharatiya Nyaya Sanhita (BNS) 2023
 
@@ -22,7 +22,7 @@
 
 - Constitution of India
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Court fee
 
@@ -32,7 +32,7 @@
 
 - Alimony Estimator
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Case law search
 
@@ -40,10 +40,10 @@
 
 - automated legal drafting
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Legal reference sync, document authenticity verification
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Case history snapshots, immutable filing records

@@ -10,7 +10,7 @@
  *   - PQC-compliant entropy pool for Dilithium keys.
  * =============================================================================
  */
-#include "../../../include/core/sigma_kernel_types.h"
+#include "../../../include/sigma_kernel_types.h"
 
 static sigma_u64 g_entropy_pool = 0x5164AA55;
 

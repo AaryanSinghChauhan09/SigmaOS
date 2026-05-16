@@ -12,7 +12,7 @@
  * =============================================================================
  */
 
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 #define MAX_VIEW_SHARDS 1024
 

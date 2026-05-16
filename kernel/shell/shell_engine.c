@@ -3,7 +3,7 @@
  * Î£ SIGMAOS KERNEL: SHELL-ENGINE (Atomic Shard)
  * =============================================================================
  */
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct OmniShell {
     char        history[100][256];

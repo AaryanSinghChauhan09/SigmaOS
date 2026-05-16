@@ -3,7 +3,7 @@
 
 #include "../../include/libc/SovereignLibC.h"
 
-#include "../../include/core/SigmaOOP.hpp"
+#include "../../include/SigmaOOP.hpp"
 #include "port_shard.hpp"
 
 namespace SigmaOS {

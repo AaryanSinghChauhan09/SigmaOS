@@ -1,8 +1,8 @@
-﻿# Î£ SIGMAOS: Browser Integration & Rendering (release/browser)
+# Σ SIGMAOS: Browser Integration & Rendering (release/browser)
 
 The `release/browser` branch optimizes SigmaOS for instant access through modern web browsers using WASM and advanced rendering strategies.
 
-## âš™ï¸ Performance Focus
+## ⚙️ Performance Focus
 
 - **WASM Optimization**: Profiling the WASM runtime for lightweight, high-speed shard execution.
 
@@ -10,13 +10,13 @@ The `release/browser` branch optimizes SigmaOS for instant access through modern
 
 - **Network Stack Latency**: Using predictive caching to reduce packet round-trip times in S-NET.
 
-## ðŸ§© Browser Sovereignty
+## 🧩 Browser Sovereignty
 
 - **Sandboxed Execution**: Every browser-based shard runs in a dedicated WASM-isolated context.
 
 - **Multimedia Optimization**: Hardware-accelerated decoding for industrial-grade multimedia content.
 
-## ðŸ§ª Testing & Validation
+## 🧪 Testing & Validation
 
 - **Heavy Load Simulation**: Stress-testing the lattice with concurrent multi-tab shard orchestration.
 

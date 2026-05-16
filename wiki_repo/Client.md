@@ -1,4 +1,4 @@
-﻿# Class: Client
+# Class: Client
 
 Extends: `undici.Dispatcher`
 

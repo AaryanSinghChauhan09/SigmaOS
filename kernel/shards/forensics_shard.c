@@ -11,7 +11,7 @@
  * =============================================================================
  */
 
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef struct ForensicReport {
     sigma_u32  artifacts_found;

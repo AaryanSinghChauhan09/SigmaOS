@@ -1,10 +1,10 @@
 #include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_hal.h"
 #include "../../../include/libc/SovereignLibC.h"
 #ifndef PROCESS_MANAGER_HPP
 #define PROCESS_MANAGER_HPP
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

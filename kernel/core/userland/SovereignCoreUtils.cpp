@@ -1,6 +1,6 @@
-#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 #include "../../../include/core/sigma_types.h"
-#include "observability/sigma_log.h"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Kernel {

@@ -37,5 +37,3 @@ void my_rtos_task() {
 
 sigma_u32 task_id;
 SovereignSchedulerShard::getInstance().spawn_task(my_rtos_task, TaskPriority::REALTIME_CRITICAL, &task_id)
-
-

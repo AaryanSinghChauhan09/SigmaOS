@@ -10,9 +10,9 @@
 #include "../../include/libc/SovereignLibC.h"
 
 /* Modular implementations */
-#include "libc/sigma_io.c"
-#include "libc/sigma_string.c"
-#include "libc/sigma_mem.c"
+#include "../../include/libc/sigma_io.c"
+#include "../../include/libc/sigma_string.c"
+#include "../../include/libc/sigma_mem.c"
 
 /* Legacy / Core Syscall Shims */
 unsigned int sigma_sleep(unsigned int seconds) {

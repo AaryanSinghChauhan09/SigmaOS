@@ -2,7 +2,7 @@
 #ifndef SOVEREIGN_MESH_LATTICE_H
 #define SOVEREIGN_MESH_LATTICE_H
 
-#include "./core/sigma_kernel_types.h"
+#include "./sigma_kernel_types.h"
 #include "./sigma_mesh_types.h"
 #include "./SigmaOOP.hpp"
 

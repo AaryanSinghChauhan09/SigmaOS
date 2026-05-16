@@ -1,10 +1,10 @@
-﻿# Î£ SigmaOS v15.0: Stable Edition
+# Σ SigmaOS v15.0: Stable Edition
 
-## ðŸ›¡ï¸ The Immutable Pillar
+## 🛡️ The Immutable Pillar
 
 The **Stable Edition** is the battle-tested, long-term support (LTS) release of SigmaOS. It prioritizes reliability and security over experimental features, making it the perfect choice for production environments and enterprise infrastructure.
 
-### ðŸ› ï¸ Key Features
+### 🛠️ Key Features
 
 - **LTS Kernel**: Verified for 5+ years of uptime and industrial stability.
 
@@ -14,7 +14,7 @@ The **Stable Edition** is the battle-tested, long-term support (LTS) release of 
 
 - **Wide Hardware Compatibility**: Supports a vast array of x86_64 industrial hardware.
 
-### ðŸ“¥ Installation Guide (Enterprise)
+### 📥 Installation Guide (Enterprise)
 
 1. **Prepare Media**: Use `SigmaOS-v15.0-Stable.iso`.
 
@@ -26,7 +26,7 @@ The **Stable Edition** is the battle-tested, long-term support (LTS) release of 
 
 5. **Certification**: Run the `sigma-audit` suite to certify the node for production.
 
-### ðŸ’Ž Exclusive Functions
+### 💎 Exclusive Functions
 
 - `integrity-check-full`: Exhaustive cryptographic audit of every shard on disk.
 

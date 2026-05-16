@@ -1,4 +1,4 @@
-﻿# ðŸ›  PERFUMER Profile
+# 🛠 PERFUMER Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - olfactory sim
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - IFRA standards
 
 - allergen compliance
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Concentration ratio
 
@@ -24,16 +24,16 @@
 
 - sillage estimator
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Scent-chord generator
 
 - molecular stability prediction
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Formula consistency check, component availability sync
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Iterative scent-state restoration, allergen safety baseline

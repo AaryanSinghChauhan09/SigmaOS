@@ -1,4 +1,4 @@
-﻿# Sovereign Lattice Mapper (S-MIND)
+# Sovereign Lattice Mapper (S-MIND)
 
 The **Sovereign Lattice Mapper (S-MIND)** is a high-assurance, interactive visualization tool for the SigmaOS Zenith environment. It serves as the industrial alternative to Nicemind, providing real-time auditing of shard connections and lattice topology.
 
@@ -16,7 +16,7 @@ The **Sovereign Lattice Mapper (S-MIND)** is a high-assurance, interactive visua
 
 1. Open the **Zenith Desktop**.
 
-2. Click the **S-MIND** icon (ðŸ§ ).
+2. Click the **S-MIND** icon (🧠).
 
 3. Use the **Add Shard Node** button to register new industrial modules.
 

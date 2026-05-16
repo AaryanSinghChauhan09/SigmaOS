@@ -11,7 +11,7 @@
 #define SIGMA_TELEMETRY_H
 
 #include "../core/sigma_types.h"
-#include "../core/SigmaOOP.hpp"
+#include "../SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Telemetry {

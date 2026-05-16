@@ -2,7 +2,7 @@
 #ifndef SOVEREIGN_SNAP_H
 #define SOVEREIGN_SNAP_H
 
-#include "./core/sigma_kernel_types.h"
+#include "./sigma_kernel_types.h"
 #include "./sigma_snap_types.h"
 #include "./SigmaOOP.hpp"
 

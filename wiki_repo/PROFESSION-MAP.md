@@ -1,4 +1,4 @@
-﻿# Professionalization Lattice Map
+# Professionalization Lattice Map
 
 | Profession | Tools | Resilience |
 | :--- | :--- | :--- |

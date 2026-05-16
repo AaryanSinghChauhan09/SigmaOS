@@ -1,5 +1,5 @@
-﻿/**
- * SovereignRTSched ï¿½ Real-Time Scheduling Policy for SigmaOS
+/**
+ * SovereignRTSched � Real-Time Scheduling Policy for SigmaOS
  * Implements Earliest Deadline First (EDF) and Fixed Priority (FIFO) policies
  * for high-assurance real-time shards (e.g., HAL, PQC).
  */
@@ -7,7 +7,7 @@
 #include "../../../include/core/sigma_types.h"
 #include "../../../include/sigma_log.h"
 #include "../../../include/sched/SovereignScheduler.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

@@ -1,12 +1,12 @@
-﻿# Installation
+# Installation
 
-# ðŸš€ SigmaOS Installation Guide
+# 🚀 SigmaOS Installation Guide
 
 Welcome to the SigmaOS Installation Guide. This document provides a step-by-step procedure to deploy the SigmaOS Sovereign Lattice onto physical hardware or a virtualized environment.
 
 ---
 
-## ðŸ’» Supported Hardware
+## 💻 Supported Hardware
 
 | Platform | Support Tier | Notes |
 | :--- | :--- | :--- |
@@ -21,7 +21,7 @@ Welcome to the SigmaOS Installation Guide. This document provides a step-by-step
 
 ---
 
-## âš¡ Quick Deployment (Physical Hardware)
+## ⚡ Quick Deployment (Physical Hardware)
 
 1. **Download the Official Image**
    Download the latest `sigmaos_aarch64.img` from the GitHub Release page.
@@ -38,7 +38,7 @@ Welcome to the SigmaOS Installation Guide. This document provides a step-by-step
 
 ---
 
-## ðŸ”¬ Virtualization (QEMU)
+## 🔬 Virtualization (QEMU)
 
 If you want to test SigmaOS without physical hardware, use the QEMU target.
 
@@ -58,7 +58,7 @@ If you want to test SigmaOS without physical hardware, use the QEMU target.
 
 ---
 
-## ðŸŒ“ Dual-Boot Configuration
+## 🌓 Dual-Boot Configuration
 
 The `SovereignPartitionManager` supports scanning existing GPT partitions and bridging with systemd-boot.
 
@@ -80,7 +80,7 @@ The `SovereignPartitionManager` supports scanning existing GPT partitions and br
 
 ---
 
-## ðŸŽ¯ Post-Installation
+## 🎯 Post-Installation
 
 Upon first boot, the **Onboarding Wizard** will launch to:
 

@@ -1,4 +1,4 @@
-﻿# ðŸ›  CRISIS_NEGOTIATOR Profile
+# 🛠 CRISIS_NEGOTIATOR Profile
 
 ## Required Tools & Functions
 
@@ -10,28 +10,28 @@
 
 - secure-comms
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Negotiation protocols
 
 - de-escalation guidelines
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Time-elapsed risk
 
 - psychological profile score
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Behavioral change staircase model
 
 - automated sentiment tracking
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Communication-link stability check, secure-line verification
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Negotiation log history, previous incident case-restoration

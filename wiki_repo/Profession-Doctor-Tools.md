@@ -1,12 +1,12 @@
-﻿# Profession-Doctor-Tools
+# Profession-Doctor-Tools
 
-# âš•ï¸ Doctor Profile
+# ⚕️ Doctor Profile
 
 The Doctor Profile is designed for HIPAA-compliant data handling, high-fidelity imaging, and real-time diagnostic assistance.
 
 ---
 
-## ðŸ› ï¸ Integrated Shards
+## 🛠️ Integrated Shards
 
 - **PatientLattice**: Decentralized, encrypted patient record management.
 
@@ -18,7 +18,7 @@ The Doctor Profile is designed for HIPAA-compliant data handling, high-fidelity 
 
 ---
 
-## ðŸŽ¨ Zenith Configuration
+## 🎨 Zenith Configuration
 
 - **Theme**: Clinical White (High Contrast)
 
@@ -28,7 +28,7 @@ The Doctor Profile is designed for HIPAA-compliant data handling, high-fidelity 
 
 ---
 
-## ðŸ”’ Compliance & Integrity
+## 🔒 Compliance & Integrity
 
 SigmaOS ensures 100% data residency and zero-leakage through the **Medical Sandbox**. All clinical decisions are logged in an immutable, PQC-signed audit trail.
 

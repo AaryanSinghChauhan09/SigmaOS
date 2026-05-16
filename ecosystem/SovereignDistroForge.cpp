@@ -1,7 +1,7 @@
-#include "./include/libc/SovereignLibC.h"
-#include "./include/sigma_log.h"
-#include "./include/SovereignDistroForge.h"
-#include "./include/sigma_log.h"
+#include "../include/libc/SovereignLibC.h"
+#include "../include/sigma_log.h"
+#include "../include/SovereignDistroForge.h"
+#include "../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace DistroForge {

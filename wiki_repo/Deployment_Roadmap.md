@@ -1,4 +1,4 @@
-﻿# SigmaOS: Zenith v15.0 Deployment & Roadmap
+# SigmaOS: Zenith v15.0 Deployment & Roadmap
 
 SigmaOS Zenith v15.0 is the first version of the Sovereign Lattice to support multi-format deployment. Our roadmap ensures total industrial dominance through a 4-phase evolution.
 

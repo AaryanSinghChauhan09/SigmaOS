@@ -1,7 +1,7 @@
-#include "../../include/sigma_types.h"
-#include "../../include/sigma_universal_ui.h" // Assume UI API
+#include "../../include/core/sigma_types.h"
+#include "../../include/sigma_universal_ui.h"
 #include "../../include/sigma_log.h"
-#include "./include/ai/sigma_claw.h"
+#include "../../include/ai/sigma_claw.h"
 
 /**
  * SovereignClawCompanion " Userland app for the Claw Gateway

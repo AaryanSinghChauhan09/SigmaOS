@@ -1,6 +1,6 @@
-﻿# Î£ SIGMAOS: AI, ML, DS, AND CS EDUCATION ECOSYSTEM
+# Σ SIGMAOS: AI, ML, DS, AND CS EDUCATION ECOSYSTEM
 
-## ðŸ¤– AI & Machine Learning (S-AI)
+## 🤖 AI & Machine Learning (S-AI)
 
 SigmaOS Horizon v15.0 integrates a post-quantum hardened AI stack designed for industrial inference and autonomous diagnostics.
 
@@ -14,7 +14,7 @@ SigmaOS Horizon v15.0 integrates a post-quantum hardened AI stack designed for i
 
 - **PQC-Attested Models**: All weights must be signed with Dilithium-5 keys to prevent neural-injection attacks.
 
-## ðŸ“Š Data Science (S-DS)
+## 📊 Data Science (S-DS)
 
 The Data Science pillar provides a high-performance environment for silicon-level telemetry and professional analytics.
 
@@ -26,7 +26,7 @@ The Data Science pillar provides a high-performance environment for silicon-leve
 
 - **S-JULIA/R**: First-class support for scientific computing via the Sovereign LLVM bridge.
 
-## ðŸŽ“ CS Education & Competitive Programming (S-PLAY)
+## 🎓 CS Education & Competitive Programming (S-PLAY)
 
 Designed for the next generation of Sovereign Architects, this pillar provides a built-in, offline-first learning environment.
 
@@ -38,7 +38,7 @@ Designed for the next generation of Sovereign Architects, this pillar provides a
 
 - **Competitive Toolchain**: Pre-configured `sigma-cc` (Clang-based) with O3-optimization profiles for sub-millisecond execution.
 
-## ðŸ›  Strategic Integration Plan (Roadmap)
+## 🛠 Strategic Integration Plan (Roadmap)
 
 1. **Phase 1 (v15.0)**: Core S-AI and S-PLAY shards online.
 

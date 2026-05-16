@@ -1,7 +1,7 @@
 #include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_hal.h"
 #include "../../../include/sigma_log.h"
-#include "hal/SovereignSMP.hpp"
+#include "../../../include/hal/SovereignSMP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

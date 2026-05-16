@@ -1,4 +1,4 @@
-﻿# ðŸ›  ERP_CONSULTANT Profile
+# 🛠 ERP_CONSULTANT Profile
 
 ## Required Tools & Functions
 
@@ -12,7 +12,7 @@
 
 - module-optimizer
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Business logic standards
 
@@ -20,7 +20,7 @@
 
 - compliance-frameworks
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - TCO (Total Cost of Ownership)
 
@@ -28,7 +28,7 @@
 
 - process-latency-calc
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Automated workflow mapping
 
@@ -36,10 +36,10 @@
 
 - inventory-prediction
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - ERP-database consistency check, module-dependency validation
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - ERP-state snapshots, transactional-history restoration

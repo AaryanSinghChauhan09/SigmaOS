@@ -1,4 +1,4 @@
-﻿# Feature-Roadmap
+# Feature-Roadmap
 
 1
 

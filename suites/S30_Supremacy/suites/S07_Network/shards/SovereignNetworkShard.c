@@ -10,7 +10,7 @@
 #ifndef SOVEREIGN_NETWORK_SHARD_H
 #define SOVEREIGN_NETWORK_SHARD_H
 
-#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/libc/SovereignLibC.h"
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 

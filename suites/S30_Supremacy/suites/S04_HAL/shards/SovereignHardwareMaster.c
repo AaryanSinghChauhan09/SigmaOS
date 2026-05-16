@@ -11,7 +11,7 @@
 #ifndef SOVEREIGN_HARDWARE_MASTER_H
 #define SOVEREIGN_HARDWARE_MASTER_H
 
-#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/libc/SovereignLibC.h"
 
 #include "../../../../../include/SovereignOSBasicsZenith.h"
 #include "suites/S01_Genesis/shards/sigma_kernel.h"

@@ -1,4 +1,4 @@
-﻿# tools/diag
+# tools/diag
 
 Diagnostics Module.
 

@@ -2,7 +2,7 @@
 #define SIGMA_TYPES_H
 
 /**
- * SIGMAOS: Sovereign Type Shards (v13.5 - Obsidian)
+ * SIGMAOS: Sovereign Type Shards (v15.0 - Zenith)
  * Dependencies: sigma_kernel_types.h (Industrial Source of Truth)
  */
 
@@ -25,11 +25,15 @@ typedef sigma_i16 int16_t;
 typedef sigma_i32 int32_t;
 typedef sigma_i64 int64_t;
 
-typedef sigma_usize sigma_size_t;
-typedef sigma_isize sigma_ssize_t;
-
+#ifndef _SIZE_T_DEFINED
+#define _SIZE_T_DEFINED
 typedef sigma_usize size_t;
+#endif
+
+#ifndef _SSIZE_T_DEFINED
+#define _SSIZE_T_DEFINED
 typedef sigma_isize ssize_t;
+#endif
 #endif
 
 typedef float  sigma_f32;

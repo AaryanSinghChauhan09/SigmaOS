@@ -1,10 +1,10 @@
-﻿# Î£ SigmaOS: The Sovereign Lattice Wiki
+# Σ SigmaOS: The Sovereign Lattice Wiki
 
 Welcome to the official technical manifest of **SigmaOS**, the world's most advanced, bare-metal, and self-optimizing computing singularity.
 
-## ðŸ›ï¸ Architectural Singularity: The 500-Shard Lattice
+## 🏛️ Architectural Singularity: The 500-Shard Lattice
 
-SigmaOS is not a monolithic kernel; it is a **Sovereign Lattice**. Every system componentâ€”from the scheduler to the graphics pipelineâ€”is an atomic **Silicon Shard**.
+SigmaOS is not a monolithic kernel; it is a **Sovereign Lattice**. Every system component—from the scheduler to the graphics pipeline—is an atomic **Silicon Shard**.
 
 ### 1. Quantum-Safe Orchestrator (USR)
 
@@ -44,7 +44,7 @@ The **Sovereign Recovery Agent** automates lattice restoration. If a shard is co
 
 ---
 
-## âš¡ Deployment Paradigms
+## ⚡ Deployment Paradigms
 
 SigmaOS is designed for universal portability and industrial dominance:
 
@@ -60,13 +60,13 @@ SigmaOS is designed for universal portability and industrial dominance:
 
 - Cloud Hosting: Global consensus-driven lattice clustering.
 
-## ðŸ”’ Security Posture: S80 Amnesia
+## 🔒 Security Posture: S80 Amnesia
 
 The OS implements the **S80 Amnesia** protocol, ensuring that sensitive silicon shards are wiped with military-grade precision upon task completion, leaving zero relativistic fingerprints.
 
 ---
 
-## ðŸš€ Industrial Deployment Guide
+## 🚀 Industrial Deployment Guide
 
 ### 1. Bare-Metal Colonization (S-Install)
 
@@ -100,7 +100,7 @@ For large-scale data center deployment:
 
 ---
 
-## ðŸ› ï¸ Industrial API Reference
+## 🛠️ Industrial API Reference
 
 The **Sovereign Industrial API** provides a clean, C++ OOP interface for developing and integrating custom silicon shards into the lattice.
 
@@ -122,7 +122,7 @@ The **Sovereign Industrial API** provides a clean, C++ OOP interface for develop
 
 ---
 
-## ðŸ“¦ Shard Contribution Guide
+## 📦 Shard Contribution Guide
 
 SigmaOS is an open-governance silicon singularity. Developers can contribute to the lattice by creating custom **Silicon Shards**.
 
@@ -146,7 +146,7 @@ SigmaOS is an open-governance silicon singularity. Developers can contribute to 
 
 ---
 
-## ðŸŒ Global Shard Index
+## 🌐 Global Shard Index
 
 The following core shards form the foundation of the Sovereign Lattice:
 
@@ -160,7 +160,7 @@ The following core shards form the foundation of the Sovereign Lattice:
 
 - **`SovereignLatticePQC`**: Quantum-resistant cryptographic nexus.
 
-## ðŸ† Competitive Dominance Analysis
+## 🏆 Competitive Dominance Analysis
 
 | Feature            | SigmaOS                     | Legacy OS (Linux/NT)  | Competitor Shards |
 | :----------------- | :-------------------------- | :-------------------- | :---------------- |
@@ -177,7 +177,7 @@ The following core shards form the foundation of the Sovereign Lattice:
 
 ---
 
-## ðŸ›ï¸ Virtualization Dominance: Legacy Encapsulation
+## 🏛️ Virtualization Dominance: Legacy Encapsulation
 
 SigmaOS does not just compete with legacy operating systems; it **masters** them. Through the **Sovereign Industrial Hypervisor**, legacy kernels are encapsulated within isolated lattice shards.
 
@@ -195,7 +195,7 @@ Guest OSes benefit from the **PQC-based Blockchain Identity** of the host, provi
 
 ---
 
-## ðŸ’¾ Storage Dominance: Sovereign VFS
+## 💾 Storage Dominance: Sovereign VFS
 
 SigmaOS replaces legacy, vulnerable block-based file systems (NTFS, Ext4, APFS) with the **Sovereign VFS**, a content-addressed and PQC-encrypted storage singularity.
 
@@ -213,7 +213,7 @@ All data at rest is protected by the **Lattice-PQC** engine, ensuring that even 
 
 ---
 
-## ðŸ§  AI Dominance: Sovereign Neural Engine
+## 🧠 AI Dominance: Sovereign Neural Engine
 
 SigmaOS is the world's first **AI-native** operating system. We bypass legacy userspace frameworks (TensorFlow, PyTorch) in favor of the **Sovereign Neural Engine**, a kernel-native Spiking Neural Network (SNN) shard.
 
@@ -231,7 +231,7 @@ The **Morphic Zenith** UI is driven by synaptic spikes from the Neural Engine, e
 
 ---
 
-## ðŸŒ Networking Dominance: Sovereign RDMA Stack
+## 🌐 Networking Dominance: Sovereign RDMA Stack
 
 SigmaOS achieves relativistic data throughput by bypassing legacy, overhead-heavy protocols (TCP/IP, UDP) in favor of the **Sovereign Networking Stack**, a zero-buffer, RDMA-native communication singularity.
 
@@ -249,7 +249,7 @@ The networking stack maintains 100% relativistic state parity across global node
 
 ---
 
-## ðŸ› ï¸ Diagnostic Dominance: Sovereign Debugger
+## 🛠️ Diagnostic Dominance: Sovereign Debugger
 
 SigmaOS provides a world-class developer experience through the **Sovereign Debugger**, a silicon-native diagnostic and tracing singularity that replaces legacy tools (GDB, LLDB).
 
@@ -267,7 +267,7 @@ Inspect and modify shard state during active execution. The **Sovereign Industri
 
 ---
 
-## âš¡ Energy Dominance: Sovereign Energy Manager
+## ⚡ Energy Dominance: Sovereign Energy Manager
 
 SigmaOS achieves unprecedented battery life and thermal efficiency through the **Sovereign Energy Manager**, a silicon-native power optimization singularity that bypasses legacy models (ACPI, APM).
 
@@ -285,7 +285,7 @@ By operating directly at the silicon level without OS-level overhead, SigmaOS ac
 
 ---
 
-## ðŸ†” Identity Dominance: Sovereign Identity
+## 🆔 Identity Dominance: Sovereign Identity
 
 SigmaOS achieves absolute user and system sovereignty through the **Sovereign Identity** layer, a PQC-based, hardware-rooted blockchain identity singularity that replaces legacy systems (UID, GID, LDAP).
 
@@ -303,7 +303,7 @@ Identity governance is managed via a decentralized, silicon-native blockchain, e
 
 ---
 
-## ðŸ‘ï¸ Vision Dominance: Sovereign Vision Engine
+## 👁️ Vision Dominance: Sovereign Vision Engine
 
 SigmaOS achieves absolute environmental awareness through the **Sovereign Vision Engine**, a silicon-native computer vision singularity that bypasses legacy userspace frameworks (OpenCV).
 
@@ -321,4 +321,4 @@ Integrated with the **Sovereign Neural Engine**, the vision system provides real
 
 ---
 
-### Î£ SIGMAOS: Absolute Mastery. Silicon-Direct. Zero-Dependency. Aware
+### Σ SIGMAOS: Absolute Mastery. Silicon-Direct. Zero-Dependency. Aware

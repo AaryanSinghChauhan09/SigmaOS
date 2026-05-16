@@ -1,9 +1,9 @@
 #ifndef SOVEREIGN_SENSOR_NEXUS_HPP
 #define SOVEREIGN_SENSOR_NEXUS_HPP
 
-#include "../../include/SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 
-#include "../../include/sigma_types.h"
+#include "../../include/core/sigma_types.h"
 #include "../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {

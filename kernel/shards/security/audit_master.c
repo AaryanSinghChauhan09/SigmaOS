@@ -1,4 +1,4 @@
-#include "../../../include/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: UNIVERSAL-AUDIT-MASTER (v1.0 - SILICON INTEGRITY)
@@ -12,7 +12,7 @@
  * =============================================================================
  */
 
-#include "../../../include/core/sigma_kernel_types.h"
+#include "../../../include/sigma_kernel_types.h"
 
 typedef struct AuditTarget {
     char        name[32];

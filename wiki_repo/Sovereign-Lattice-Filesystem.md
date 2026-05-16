@@ -1,8 +1,8 @@
-﻿# S-FS: Sovereign Lattice Filesystem (SLFS)
+# S-FS: Sovereign Lattice Filesystem (SLFS)
 
 The **Sovereign Lattice Filesystem (SLFS)** is the primary persistent storage layer for SigmaOS v15.0 "Horizon". Unlike traditional generic filesystems like ext4 or XFS, SLFS is designed for **industrial-grade atomicity**, **PQC-attestation**, and **shard-level resilience**.
 
-## ðŸ› Architectural Principles
+## 🏛 Architectural Principles
 
 1. **Atomic State Snapshots**: Every write operation is tracked via the `SovereignRollbackShard`, allowing the kernel to restore the entire filesystem to a bit-perfect state within 2ms of a catastrophic crash.
 
@@ -10,7 +10,7 @@ The **Sovereign Lattice Filesystem (SLFS)** is the primary persistent storage la
 
 3. **Cross-Silicon Distribution**: Through integration with `SovereignVFS`, SLFS can transparently replicate critical professional data across multiple networked SigmaOS nodes.
 
-## ðŸ›  File Operations (S-SDK)
+## 🛠 File Operations (S-SDK)
 
 SLFS exposes a high-level C++ API for professional applications:
 
@@ -26,7 +26,7 @@ void save_critical_data() {
 }
 ```
 
-## ðŸ“¦ Components
+## 📦 Components
 
 - **Superblock**: Contains Dilithium-5 signatures and lattice-wide Lamport clocks.
 
@@ -34,7 +34,7 @@ void save_critical_data() {
 
 - **Atomic Journal**: A ring-buffer for all pending I/O operations, ensuring zero data loss during thermal or power events.
 
-## ðŸš€ Industrial Parity
+## 🚀 Industrial Parity
 
 | Feature | ext4 (Linux) | SLFS (SigmaOS) |
 | :--- | :--- | :--- |

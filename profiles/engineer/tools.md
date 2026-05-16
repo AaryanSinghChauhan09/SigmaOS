@@ -1,4 +1,4 @@
-﻿# ðŸ›  ENGINEER Profile
+# 🛠 ENGINEER Profile
 
 ## Required Tools & Functions
 
@@ -12,7 +12,7 @@
 
 - Finite Element Analysis (FEA)
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Bureau of Indian Standards (BIS)
 
@@ -20,7 +20,7 @@
 
 - Eurocodes
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Structural load
 
@@ -30,7 +30,7 @@
 
 - thermal stress
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - CAD simulation
 
@@ -38,10 +38,10 @@
 
 - project scheduling
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Simulation state verification, build-cache integrity check
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Project-wide git-lattice rollback, CAD design versioning

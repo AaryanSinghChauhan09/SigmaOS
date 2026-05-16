@@ -1,4 +1,4 @@
-﻿# Profession-Economist-Tools
+# Profession-Economist-Tools
 
 1
 

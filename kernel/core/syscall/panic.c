@@ -6,7 +6,7 @@
  * Principles: Industrial Logging & Post-Mortem Diagnostics.
  * =============================================================================
  */
-#include "../../../include/core/sigma_kernel_types.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/libc/SovereignLibC.h"
 #include "../../../include/sigma_log.h"
 

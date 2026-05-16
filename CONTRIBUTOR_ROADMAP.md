@@ -58,4 +58,4 @@ This roadmap formalizes the remaining gaps between SigmaOS Zenith and legacy com
 
 ---
 
-### Build the future of sovereignty. Join the lattice.
+### Build the future of sovereignty. Join the lattice

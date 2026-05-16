@@ -1,4 +1,4 @@
-﻿# BUG BOUNTY
+# BUG BOUNTY
 
 1
 

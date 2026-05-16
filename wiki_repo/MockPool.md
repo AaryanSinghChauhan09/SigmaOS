@@ -1,4 +1,4 @@
-﻿# Class: MockPool
+# Class: MockPool
 
 Extends: `undici.Pool`
 

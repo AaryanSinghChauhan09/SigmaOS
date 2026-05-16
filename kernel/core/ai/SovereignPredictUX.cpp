@@ -3,7 +3,7 @@
 #include "../../../include/core/sigma_types.h"
 
 #include "../../../include/sigma_predictux.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_hal.h"
 
 
 /**

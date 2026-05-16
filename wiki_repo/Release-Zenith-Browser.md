@@ -1,8 +1,8 @@
-﻿# Î£ SIGMAOS: ZENITH BROWSER EDITION (v15.0)
+# Σ SIGMAOS: ZENITH BROWSER EDITION (v15.0)
 
 Welcome to the **Sovereign Web Shard**. The Browser edition is a specialized, web-centric operating system optimized for WASM, high-speed networking, and decentralized persistence.
 
-## ðŸ“¥ Installation Guide (Cloud-Native)
+## 📥 Installation Guide (Cloud-Native)
 
 1. **Download**: Obtain `sigma-v15.0-browser.iso`.
 
@@ -12,7 +12,7 @@ Welcome to the **Sovereign Web Shard**. The Browser edition is a specialized, we
 
 4. **Browse**: Launch the **Zenith-Web** shard to begin hardware-accelerated browsing.
 
-## ðŸ› ï¸ Core Functions
+## 🛠️ Core Functions
 
 - **SovereignWASM Runtime**: Direct-to-silicon WebAssembly execution with near-native performance.
 
@@ -22,7 +22,7 @@ Welcome to the **Sovereign Web Shard**. The Browser edition is a specialized, we
 
 - **Decentralized Storage**: Automatically maps browser local storage to the **SovereignMesh** lattice.
 
-## ðŸŒŸ Premium Features
+## 🌟 Premium Features
 
 - **Zero-Fingerprint Browsing**: Hardware-level MAC/ID randomization for every browser session.
 
@@ -32,7 +32,7 @@ Welcome to the **Sovereign Web Shard**. The Browser edition is a specialized, we
 
 - **Quantum-Safe Handshake**: Every TLS connection is upgraded to Kyber-1024 encryption.
 
-## ðŸ“Š Technical Specs
+## 📊 Technical Specs
 
 - **Network Stack**: HTTP/3, QUIC, IPFS (Native Shard).
 

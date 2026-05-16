@@ -1,10 +1,10 @@
-﻿# Î£ SigmaOS v15.0: Horizon Edition
+# Σ SigmaOS v15.0: Horizon Edition
 
-## ðŸŒ… The Future Lattice
+## 🌅 The Future Lattice
 
 The **Horizon Edition** is the cutting-edge, experimental release of SigmaOS. It includes the latest shard primitives, AI-native orchestrators, and the next-generation `Silicon-Direct` evolution. For developers and visionaries only.
 
-### ðŸ› ï¸ Key Features
+### 🛠️ Key Features
 
 - **Rolling Shard Release**: Access the latest features as soon as they clear the build lattice.
 
@@ -14,7 +14,7 @@ The **Horizon Edition** is the cutting-edge, experimental release of SigmaOS. It
 
 - **Lattice Mesh Networking**: Decentralized, peer-to-peer node discovery and sync.
 
-### ðŸ“¥ Installation Guide (Bleeding Edge)
+### 📥 Installation Guide (Bleeding Edge)
 
 1. **Prepare Media**: Use `SigmaOS-v15.0-Horizon.iso`.
 
@@ -26,7 +26,7 @@ The **Horizon Edition** is the cutting-edge, experimental release of SigmaOS. It
 
 5. **Warning**: Expect instability; this edition is for testing future computational paradigms.
 
-### ðŸ’Ž Exclusive Functions
+### 💎 Exclusive Functions
 
 - `ai-optimize-lattice`: Allow the PAI shard to dynamically restructure kernel priorities.
 

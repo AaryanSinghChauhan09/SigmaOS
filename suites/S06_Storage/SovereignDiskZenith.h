@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_DISK_ZENITH_H
 #define SOVEREIGN_DISK_ZENITH_H
 
-#include "suites/S01_Genesis/shards/SigmaC11.h"
+#include "../../include/SigmaC11.h"
 
 namespace SigmaOS {
 namespace Disk {

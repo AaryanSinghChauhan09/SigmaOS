@@ -1,8 +1,8 @@
-﻿# Î£ SIGMAOS: Post-Quantum Security Hardening (PQC)
+# Σ SIGMAOS: Post-Quantum Security Hardening (PQC)
 
 SigmaOS Zenith implements a sovereign security lattice designed to remain resilient against future quantum-computational threats.
 
-## ðŸ”’ Post-Quantum Cryptography (PQC) Implementation
+## 🔒 Post-Quantum Cryptography (PQC) Implementation
 
 SigmaOS uses a multi-layered approach to cryptographic sovereignty:
 
@@ -12,7 +12,7 @@ SigmaOS uses a multi-layered approach to cryptographic sovereignty:
 
 3. **Quantum-Entropy Feed**: The `SovereignEntropy` driver leverages hardware-native RDRAND and environmental jitter to seed the sovereign PRNG lattice.
 
-## ðŸ›¡ System Hardening Standard
+## 🛡 System Hardening Standard
 
 | Feature | Mechanism | Standard Compliance |
 | :--- | :--- | :--- |
@@ -23,7 +23,7 @@ SigmaOS uses a multi-layered approach to cryptographic sovereignty:
 
 | **Integrity** | IMA (Integrity Measurement Architecture) | IEEE 802.1AR |
 
-## ðŸ›  Security Audit Workflow
+## 🛠 Security Audit Workflow
 
 To verify system integrity:
 

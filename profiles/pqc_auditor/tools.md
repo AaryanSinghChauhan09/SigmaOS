@@ -1,4 +1,4 @@
-﻿# ðŸ›  PQC_AUDITOR Profile
+# 🛠 PQC_AUDITOR Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - entropy-mesh
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - NIST PQC standards
 
 - FIPS 140-3
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Quantum-resistance-score
 
@@ -24,16 +24,16 @@
 
 - key-strength delta
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Post-quantum signature verification
 
 - cryptographic-mesh auditing
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Key-lattice integrity check, PQC-seal validation
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Security-state snapshots, PQC-baseline restoration

@@ -1,4 +1,4 @@
-﻿# ðŸ›  BIOMETRIC_IDENTITY_GUARDIAN Profile
+# 🛠 BIOMETRIC_IDENTITY_GUARDIAN Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - liveness-probe
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Privacy laws (GDPR/BIPA)
 
 - biometric-security standards
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - False-match-rate (FMR)
 
@@ -24,16 +24,16 @@
 
 - template-aging-delta
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Privacy-preserving biometric matching
 
 - cancelable biometric generation
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Template-integrity verify, sensor-liveness-sync
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Vault-state snapshots, identity-baseline restoration

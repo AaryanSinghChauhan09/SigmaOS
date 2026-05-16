@@ -12,7 +12,7 @@
 #ifndef SOVEREIGN_DEVICE_PROBE_C
 #define SOVEREIGN_DEVICE_PROBE_C
 
-#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/libc/SovereignLibC.h"
 
 #include "../../../../../include/SovereignArch.h"
 #include "../../../../../include/libc/sigma_libc.h"

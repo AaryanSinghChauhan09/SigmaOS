@@ -19,10 +19,17 @@ typedef signed char        sigma_i8;
 typedef signed short       sigma_i16;
 typedef signed int         sigma_i32;
 typedef signed long long   sigma_i64;
+
+/* Canonical industrial sizes */
 typedef unsigned long long sigma_usize;
 typedef long long          sigma_isize;
+
+#ifndef SIGMA_SIZE_T_DEFINED
+#define SIGMA_SIZE_T_DEFINED
 typedef sigma_usize        sigma_size_t;
 typedef sigma_isize        sigma_ssize_t;
+#endif
+
 typedef sigma_i8           sigma_s8;
 typedef sigma_i16          sigma_s16;
 typedef sigma_i32          sigma_s32;

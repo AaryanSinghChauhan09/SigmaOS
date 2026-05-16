@@ -1,4 +1,4 @@
-﻿# Class: BalancedPool
+# Class: BalancedPool
 
 Extends: `undici.Dispatcher`
 

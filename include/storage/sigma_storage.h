@@ -11,7 +11,7 @@
 #define SIGMA_STORAGE_H
 
 #include "../core/sigma_types.h"
-#include "../core/SigmaOOP.hpp"
+#include "../SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Storage {

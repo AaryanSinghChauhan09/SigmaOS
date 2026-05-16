@@ -1,4 +1,4 @@
-﻿# SigmaOS Zenith v15.0: Gap Analysis vs Legacy Competitors
+# SigmaOS Zenith v15.0: Gap Analysis vs Legacy Competitors
 
 This table outlines the final state of SigmaOS Zenith compared to legacy monolithic and hybrid kernels (Linux, Windows). It demonstrates how SigmaOS has absorbed missing components and transformed them into unique selling propositions (USPs) within the Sovereign Shard Architecture.
 

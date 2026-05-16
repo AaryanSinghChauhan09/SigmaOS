@@ -1,4 +1,4 @@
-#include "../../../../include/SovereignLibC.h"
+#include "../../../../include/libc/SovereignLibC.h"
 // =============================================================================
 // SigmaOS — tools/wiki_sync — sigma_wiki_syncer.c
 // Native C Sovereign Wiki / Documentation Orchestrator

@@ -1,8 +1,8 @@
-﻿# Î£ SIGMAOS: Industrial Release Checklist (v15.0 Zenith)
+# Σ SIGMAOS: Industrial Release Checklist (v15.0 Zenith)
 
 This document serves as the final orchestrator for the production launch of the SigmaOS Zenith Singularity.
 
-## ðŸ·ï¸ Tagged Releases
+## 🏷️ Tagged Releases
 
 The following tags have been pushed to GitHub. Use these to create the official Releases.
 
@@ -16,7 +16,7 @@ The following tags have been pushed to GitHub. Use these to create the official 
 
 5. **v15.0-zenith-standalone** (Branch: `release/standalone`)
 
-## ðŸ›  Action Items for Manual Finalization
+## 🛠 Action Items for Manual Finalization
 
 Since the `gh` CLI is not available in the local environment, please complete these steps on the [GitHub Release Page](https://github.com/AaryanSinghChauhan09/SigmaOS/releases):
 
@@ -42,7 +42,7 @@ For each edition (`app`, `browser`, `dualboot`, `standalone`):
 
 - **Assets**: Upload the relevant edition artifacts (ISO for standalone, Electron bin for app).
 
-## ðŸ“š Wiki Synchronization
+## 📚 Wiki Synchronization
 
 The Wiki is already updated with:
 

@@ -1,4 +1,4 @@
-#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/libc/SovereignLibC.h"
 /**
  * @file SovereignUniversalDistroSuite.c
  * @brief Phase 58: Universal Distro Absorption Shard.
@@ -13,7 +13,7 @@
 
 #include "../../../../../include/SovereignInit.h"
 #include "../../../../../include/libc/sigma_libc.h"
-#include "suites/S01_Genesis/shards/SigmaC11.h"
+#include "../../../../../include/SigmaC11.h"
 #include "../../../../../include/SovereignUniversalDistroSuite.h"
 
 /* NixOS USP: Functional Purity & Atomic Rollbacks */

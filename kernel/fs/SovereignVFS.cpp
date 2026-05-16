@@ -1,4 +1,4 @@
-#include "SovereignVFS.hpp"
+#include "../../include/fs/SovereignVFS.hpp"
 #include "../../include/sigma_log.h"
 
 namespace SigmaOS {

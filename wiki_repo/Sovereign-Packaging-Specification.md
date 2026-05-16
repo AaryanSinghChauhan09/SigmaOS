@@ -1,12 +1,12 @@
-﻿# Sovereign-Packaging-Specification
+# Sovereign-Packaging-Specification
 
-# ðŸ“¦ Sovereign Packaging Specification (.spkg)
+# 📦 Sovereign Packaging Specification (.spkg)
 
 The **Sovereign Packaging Specification** defines the industrial standard for creating, signing, and distributing shards within the SigmaOS lattice.
 
 ---
 
-## ðŸ—ï¸ Structure of a Shard
+## 🏗️ Structure of a Shard
 
 A SigmaOS package (`.spkg`) is a PQC-sealed archive containing:
 
@@ -20,7 +20,7 @@ A SigmaOS package (`.spkg`) is a PQC-sealed archive containing:
 
 ---
 
-## ðŸ“„ Manifest Specification
+## 📄 Manifest Specification
 
 1
 
@@ -37,7 +37,7 @@ A SigmaOS package (`.spkg`) is a PQC-sealed archive containing:
 
 ---
 
-## ðŸ›¡ï¸ Security & Isolation
+## 🛡️ Security & Isolation
 
 Packages must specify their isolation level to ensure lattice integrity:
 
@@ -49,7 +49,7 @@ Packages must specify their isolation level to ensure lattice integrity:
 
 ---
 
-## ðŸ”„ Deployment Flow
+## 🔄 Deployment Flow
 
 1. **Marketplace Fetch**: The `SovereignMarketplace` fetches the `.spkg` from a verified sovereign node.
 

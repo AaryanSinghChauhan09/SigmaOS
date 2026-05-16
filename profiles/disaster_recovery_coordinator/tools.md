@@ -1,4 +1,4 @@
-﻿# ðŸ›  DISASTER_RECOVERY_COORDINATOR Profile
+# 🛠 DISASTER_RECOVERY_COORDINATOR Profile
 
 ## Required Tools & Functions
 
@@ -8,13 +8,13 @@
 
 - secure satellite comms
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - NDMA guidelines
 
 - FEMA protocols
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Casualty estimation
 
@@ -22,16 +22,16 @@
 
 - logistics pathing
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Multi-agent evacuation routing
 
 - supply chain optimization
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Communication mesh integrity, sensor network validation
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Incident command state restoration, resource map versioning

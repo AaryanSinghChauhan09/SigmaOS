@@ -10,7 +10,7 @@
  *   - Cloud/Browser (WASM/JS-Bridge)
  * =============================================================================
  */
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 typedef enum TargetPlatform {
     TARGET_BARE_METAL = 0,

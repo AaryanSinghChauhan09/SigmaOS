@@ -1,4 +1,4 @@
-#include "../../../../include/SovereignLibC.h"
+#include "../../../../include/libc/SovereignLibC.h"
 /* S SIGMAOS: S06_Storage Registry */
 #include "suites/S01_Genesis/shards/sigma_base.h"
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"

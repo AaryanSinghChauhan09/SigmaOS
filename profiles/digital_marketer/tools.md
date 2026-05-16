@@ -1,4 +1,4 @@
-﻿# ðŸ›  DIGITAL_MARKETER Profile
+# 🛠 DIGITAL_MARKETER Profile
 
 ## Required Tools & Functions
 
@@ -12,13 +12,13 @@
 
 - conversion-pixel-nexus
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Search engine guidelines
 
 - advertising ethics
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - CPC/CPM
 
@@ -28,16 +28,16 @@
 
 - domain-authority-score
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Keyword-ranking prediction
 
 - automated-bidding optimization
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Pixel-tracking verification, backlink-integrity scan
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - SEO-state snapshots, campaign-history restoration

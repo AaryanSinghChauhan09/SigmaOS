@@ -1,4 +1,4 @@
-﻿# Formal-Verification
+# Formal-Verification
 
 1
 

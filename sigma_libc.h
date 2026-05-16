@@ -1,7 +1,7 @@
 #ifndef SIGMA_LIBC_H
 #define SIGMA_LIBC_H
 
-#include "./include/SovereignLibC.h"
+#include "./include/libc/SovereignLibC.h"
 
 /*
  * =========================================================
@@ -11,7 +11,7 @@
  * =========================================================
  */
 
-#include "./include/core/sigma_kernel_types.h"
+#include "./include/sigma_kernel_types.h"
 
 #define SIGMA_LIBC_VERSION 0x09
 

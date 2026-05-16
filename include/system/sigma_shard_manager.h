@@ -2,7 +2,7 @@
 #ifndef SIGMA_SHARD_MANAGER_H
 #define SIGMA_SHARD_MANAGER_H
 
-#include "../core/sigma_kernel_types.h"
+#include "../sigma_kernel_types.h"
 #include "../SigmaOOP.hpp"
 
 namespace SigmaOS {

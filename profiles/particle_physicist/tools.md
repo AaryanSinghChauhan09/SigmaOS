@@ -1,4 +1,4 @@
-﻿# ðŸ›  PARTICLE_PHYSICIST Profile
+# 🛠 PARTICLE_PHYSICIST Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - muon-chamber monitor
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Open-science protocols
 
 - high-energy safety standards
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Energy-to-mass delta
 
@@ -24,16 +24,16 @@
 
 - decay-width
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Automated track reconstruction
 
 - dark-matter candidate search
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Sensor-lattice calibration, data-stream consistency check
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Experiment-state snapshots, baseline-simulation restoration

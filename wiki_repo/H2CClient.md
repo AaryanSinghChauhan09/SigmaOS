@@ -1,4 +1,4 @@
-﻿# Class: H2CClient
+# Class: H2CClient
 
 Extends: `undici.Dispatcher`
 

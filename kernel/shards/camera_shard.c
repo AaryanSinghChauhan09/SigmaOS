@@ -13,7 +13,7 @@
  * =============================================================================
  */
 
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 /* =========================================================================
  * Fixed-point arithmetic (16.16 format â€ zero libm dependency)

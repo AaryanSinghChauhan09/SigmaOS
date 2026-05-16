@@ -1,4 +1,4 @@
-﻿# Profession-Retail-Worker-Tools
+# Profession-Retail-Worker-Tools
 
 1
 

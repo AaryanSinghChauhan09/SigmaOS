@@ -1,4 +1,4 @@
-﻿# S-MAC: Mandatory Access Control
+# S-MAC: Mandatory Access Control
 
 SigmaOS enforces a zero-trust security model via the **Sovereign MAC** shard.
 

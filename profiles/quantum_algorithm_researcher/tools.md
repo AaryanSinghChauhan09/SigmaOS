@@ -1,4 +1,4 @@
-﻿# ðŸ›  QUANTUM_ALGORITHM_RESEARCHER Profile
+# 🛠 QUANTUM_ALGORITHM_RESEARCHER Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - entanglement analyzer
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Quantum supremacy protocols
 
 - error correction standards
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Qubit fidelity
 
@@ -24,7 +24,7 @@
 
 - gate-error probability
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Shor's optimization
 
@@ -32,10 +32,10 @@
 
 - Quantum Fourier Transform
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Continuous decoherence correction, qubit state validation
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Quantum state checkpointing, entanglement-graph restoration

@@ -1,4 +1,4 @@
-﻿# Class: Pool
+# Class: Pool
 
 Extends: `undici.Dispatcher`
 

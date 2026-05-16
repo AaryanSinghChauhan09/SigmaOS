@@ -1,7 +1,7 @@
 /* SigmaOOP.hpp — Sovereign canonical shim */
 #ifndef SIGMA_OOP_HPP
 #define SIGMA_OOP_HPP
-#include "../../../include/core/sigma_kernel_types.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/libc/sigma_libc.h"
 namespace SigmaOS {
 typedef sigma_u32 sigma_status;

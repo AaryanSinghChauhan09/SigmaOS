@@ -1,10 +1,10 @@
-﻿# ðŸŒ SigmaOS vs. The World: Comparative Sovereignty
+# 🌍 SigmaOS vs. The World: Comparative Sovereignty
 
 This document breaks down how SigmaOS compares to the dominant operating systems of 2026.
 
 ---
 
-## ðŸ›ï¸ SigmaOS vs. Ubuntu (The Ecosystem Giant)
+## 🏛️ SigmaOS vs. Ubuntu (The Ecosystem Giant)
 
 | Feature | Ubuntu | SigmaOS |
 | :--- | :--- | :--- |
@@ -21,7 +21,7 @@ This document breaks down how SigmaOS compares to the dominant operating systems
 
 ---
 
-## ðŸ—ï¸ Closing the Maturity Gap (Phase 4)
+## 🏗️ Closing the Maturity Gap (Phase 4)
 
 To reach the same level of industrial trust as Ubuntu, SigmaOS is implementing:
 
@@ -35,7 +35,7 @@ To reach the same level of industrial trust as Ubuntu, SigmaOS is implementing:
 
 ---
 
-## ðŸ” Summary Table: 2026 Competitive Matrix
+## 🔝 Summary Table: 2026 Competitive Matrix
 
 | Metric | Pop!_OS | CachyOS | SigmaOS |
 | :--- | :--- | :--- | :--- |

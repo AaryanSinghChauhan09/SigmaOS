@@ -1,4 +1,4 @@
-﻿# ðŸ›  NEURO_SYMBOLIC_AI_TRAINER Profile
+# 🛠 NEURO_SYMBOLIC_AI_TRAINER Profile
 
 ## Required Tools & Functions
 
@@ -14,28 +14,28 @@
 
 - Neural Nexus
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Industry standards
 
 - professional ethics
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Efficiency metrics
 
 - cost analysis
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Workflow optimization
 
 - adaptive assistance
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Continuous health check for Neuro-Symbolic AI Trainer tools
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Automatic state snapshots

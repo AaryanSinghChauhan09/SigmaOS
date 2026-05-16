@@ -1,4 +1,4 @@
-﻿# ðŸ›  LUTHIER Profile
+# 🛠 LUTHIER Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - resonance-Lattice
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - CITES wood-usage regs
 
 - traditional craft standards
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - String-tension
 
@@ -24,16 +24,16 @@
 
 - vibrational-mode delta
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Resonance-box simulation
 
 - structural-vibration analysis
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Workshop-climate sync, resonance-profile verification
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Instrument-design snapshots, vibrational-history restoration

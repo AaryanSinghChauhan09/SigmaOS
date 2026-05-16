@@ -3,7 +3,7 @@
  * Registers S33 with the Sovereign Lattice at boot time.
  * ============================================================================= */
 #include "../../include/sigma_lattice_mesh.h"
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 #include "../../include/libc/sigma_libc.h"
 
 /* Global mesh node instance */

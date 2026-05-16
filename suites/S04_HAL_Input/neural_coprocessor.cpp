@@ -1,8 +1,8 @@
 #include "../../include/sigma_log.h"
-#include "../../include/sigma_types.h"
+#include "../../include/core/sigma_types.h"
 #include "../../include/Lattice.h"
 #include "neural_coprocessor.hpp"
-#include "../../include/SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Drivers {

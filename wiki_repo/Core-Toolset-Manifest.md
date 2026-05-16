@@ -1,4 +1,4 @@
-﻿# ðŸ› ï¸ SigmaOS: Core Toolset Manifest
+# 🛠️ SigmaOS: Core Toolset Manifest
 
 > **The industrial baseline for every sovereign lattice format.**
 
@@ -6,7 +6,7 @@ This manifest defines the **Default Toolset** that is guaranteed to be present i
 
 ---
 
-## ðŸ—ï¸ 1. Core System Shards (Mandatory)
+## 🏗️ 1. Core System Shards (Mandatory)
 
 | Tool | SigmaOS Equivalent | Purpose |
 |---|---|---|
@@ -20,21 +20,21 @@ This manifest defines the **Default Toolset** that is guaranteed to be present i
 
 ---
 
-## ðŸ“¦ 2. Professional Toolset (Unified Baseline)
+## 📦 2. Professional Toolset (Unified Baseline)
 
-### ðŸ–¥ï¸ Virtualization & Emulation
+### 🖥️ Virtualization & Emulation
 
 - **Sovereign-VM (s-vm)**: Native micro-hypervisor for running foreign OS shards.
 
 - **QEMU-Sovereign**: PQC-hardened emulation for cross-architecture research.
 
-### ðŸ“„ Document & Office Suite
+### 📄 Document & Office Suite
 
 - **Sovereign-PDF (s-pdf)**: High-performance PDF sharding and manipulation.
 
 - **LibreOffice Sovereign**: Full office suite integrated with the Zenith UI framework.
 
-### ðŸŽ¥ Multimedia & Content Creation
+### 🎥 Multimedia & Content Creation
 
 - **Sovereign-Rec (s-rec)**: GPU-accelerated screen and audio recording (OBS equivalent).
 
@@ -44,7 +44,7 @@ This manifest defines the **Default Toolset** that is guaranteed to be present i
 
 - **Ardour-S**: Professional audio workstation for musical shard composition.
 
-### ðŸŒ Web & Networking
+### 🌐 Web & Networking
 
 - **SovereignBrowser-Core**: The baseline Blink-based engine used across all formats.
 
@@ -52,7 +52,7 @@ This manifest defines the **Default Toolset** that is guaranteed to be present i
 
 ---
 
-## âš™ï¸ 3. Developer Baseline (SDK)
+## ⚙️ 3. Developer Baseline (SDK)
 
 Every SigmaOS installation includes the **Sovereign SDK** to allow for local shard compilation and system repair:
 
@@ -66,7 +66,7 @@ Every SigmaOS installation includes the **Sovereign SDK** to allow for local sha
 
 ---
 
-## ðŸ›¤ï¸ 4. Branch-Specific Layering
+## 🛤️ 4. Branch-Specific Layering
 
 While the core baseline is identical, each branch adds its own **Industrial Layer**:
 
@@ -82,7 +82,7 @@ While the core baseline is identical, each branch adds its own **Industrial Laye
 
 ---
 
-## ðŸ”„ 5. Maintenance & Versioning
+## 🔄 5. Maintenance & Versioning
 
 - **Semantic Versioning**: All core tools follow the SigmaOS master version (current: v15.0.0).
 
@@ -92,4 +92,4 @@ While the core baseline is identical, each branch adds its own **Industrial Laye
 
 ---
 
-*SigmaOS â€” One Core. One Language. Absolute Sovereignty.*
+*SigmaOS — One Core. One Language. Absolute Sovereignty.*

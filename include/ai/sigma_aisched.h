@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN AI-OPTIMIZED SCHEDULER (S-AISCHED)
+ * Σ SIGMAOS: SOVEREIGN AI-OPTIMIZED SCHEDULER (S-AISCHED)
  * =========================================================================
  * Mission: Dynamic workload prediction and CPU/GPU scheduling using built-in ML.
  * =========================================================================
@@ -9,7 +9,7 @@
 #ifndef SIGMA_AISCHED_H
 #define SIGMA_AISCHED_H
 
-#include "../sigma_types.h"
+#include "../core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,6 +1,6 @@
-﻿# SigmaOS Embedded Hardware Compatibility List
+# SigmaOS Embedded Hardware Compatibility List
 
-## Release: Standalone v15.0 â€” IoT/Edge Deployments
+## Release: Standalone v15.0 — IoT/Edge Deployments
 
 ---
 
@@ -8,31 +8,31 @@
 
 | Hardware | Architecture | RAM | Flash/Storage | Status |
 |----------|-------------|-----|---------------|--------|
-| Raspberry Pi 4 Model B | ARM Cortex-A72 | 4GB+ | MicroSD/NVMe | âœ… Fully Supported |
+| Raspberry Pi 4 Model B | ARM Cortex-A72 | 4GB+ | MicroSD/NVMe | ✅ Fully Supported |
 
-| Raspberry Pi Zero 2 W | ARM Cortex-A53 | 512MB | MicroSD | âœ… Fully Supported |
-| BeagleBone Black | ARM Cortex-A8 | 512MB | eMMC 4GB | âœ… Fully Supported |
-| STM32MP157 Discovery | ARM Cortex-A7 | 512MB | eMMC | âœ… Fully Supported |
-| NXP i.MX8M | ARM Cortex-A53 | 2GB | eMMC | âœ… Fully Supported |
+| Raspberry Pi Zero 2 W | ARM Cortex-A53 | 512MB | MicroSD | ✅ Fully Supported |
+| BeagleBone Black | ARM Cortex-A8 | 512MB | eMMC 4GB | ✅ Fully Supported |
+| STM32MP157 Discovery | ARM Cortex-A7 | 512MB | eMMC | ✅ Fully Supported |
+| NXP i.MX8M | ARM Cortex-A53 | 2GB | eMMC | ✅ Fully Supported |
 
 ## Tier 2: Validated with Constraints
 
 | Hardware | Architecture | RAM | Notes | Status |
 |----------|-------------|-----|-------|--------|
-| Raspberry Pi 3B+ | ARM Cortex-A53 | 1GB | GUI disabled, FastBoot required | âš ï¸ Constrained |
+| Raspberry Pi 3B+ | ARM Cortex-A53 | 1GB | GUI disabled, FastBoot required | ⚠️ Constrained |
 
-| Jetson Nano | ARM Cortex-A57 | 4GB | CUDA shards excluded | âš ï¸ Constrained |
-| ODROID-C4 | ARM Cortex-A55 | 4GB | USB3 driver in beta | âš ï¸ Constrained |
-| SiFive HiFive Unmatched | RISC-V U74 | 16GB | Network driver beta | âš ï¸ Constrained |
-| VisionFive 2 | RISC-V JH7110 | 8GB | No GPU acceleration | âš ï¸ Constrained |
+| Jetson Nano | ARM Cortex-A57 | 4GB | CUDA shards excluded | ⚠️ Constrained |
+| ODROID-C4 | ARM Cortex-A55 | 4GB | USB3 driver in beta | ⚠️ Constrained |
+| SiFive HiFive Unmatched | RISC-V U74 | 16GB | Network driver beta | ⚠️ Constrained |
+| VisionFive 2 | RISC-V JH7110 | 8GB | No GPU acceleration | ⚠️ Constrained |
 
 ## Tier 3: Experimental
 
 | Hardware | Architecture | Status | Notes |
 |----------|-------------|--------|-------|
-| ESP32-S3 | Xtensa LX7 | ðŸ§ª Experimental | No MMU â€” heap only |
-| Allwinner H616 | ARM Cortex-A53 | ðŸ§ª Experimental | Mali GPU unvalidated |
-| Milk-V Mars | RISC-V StarFive | ðŸ§ª Experimental | PCIe not yet tested |
+| ESP32-S3 | Xtensa LX7 | 🧪 Experimental | No MMU — heap only |
+| Allwinner H616 | ARM Cortex-A53 | 🧪 Experimental | Mali GPU unvalidated |
+| Milk-V Mars | RISC-V StarFive | 🧪 Experimental | PCIe not yet tested |
 
 ---
 

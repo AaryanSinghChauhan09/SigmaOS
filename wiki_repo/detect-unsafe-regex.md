@@ -1,6 +1,6 @@
-﻿# Detects potentially unsafe regular expressions, which may take a very long time to run, blocking the event loop (`security/detect-unsafe-regex`)
+# Detects potentially unsafe regular expressions, which may take a very long time to run, blocking the event loop (`security/detect-unsafe-regex`)
 
-âš ï¸ This rule _warns_ in the âœ… `recommended` config.
+⚠️ This rule _warns_ in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 

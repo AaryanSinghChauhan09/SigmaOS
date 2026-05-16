@@ -13,7 +13,7 @@
  */
 
 <<<<<<<< HEAD:suites/S03_Orchestrator/automation_shard.c
-#include "../../../include/core/sigma_kernel_types.h"
+#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/libc/sigma_libc.h"
 ========
 #include "../../../include/libc/SovereignLibC.h"

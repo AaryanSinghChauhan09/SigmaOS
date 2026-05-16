@@ -1,4 +1,4 @@
-﻿# Profession-Artist-Tools
+# Profession-Artist-Tools
 
 1
 

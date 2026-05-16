@@ -14,7 +14,7 @@
  * =============================================================================
  */
 
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 #define TENSOR_FIXED_SHIFT 16
 #define FLOAT_TO_FIXED(x) ((int)((x) * (1 << TENSOR_FIXED_SHIFT)))

@@ -1,4 +1,4 @@
-#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/libc/SovereignLibC.h"
 // =============================================================================
 // SigmaOS  S25_ZeroKernel  SovereignKernelMain.c
 // =============================================================================

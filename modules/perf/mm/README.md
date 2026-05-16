@@ -1,4 +1,4 @@
-﻿# perf/mm
+# perf/mm
 
 Memory Management Module.
 

@@ -1,8 +1,8 @@
-﻿# Sovereign Trace Shard
+# Sovereign Trace Shard
 
 1
 
-**Parity:** strace · ptrace · DTrace · Frida · Windows ETW
+**Parity:** strace � ptrace � DTrace � Frida � Windows ETW
 **Location:** `kernel/modules/core/SovereignTraceShard.c`
 **Standard:** Zenith Industrial Sovereignty v1.0
 
@@ -63,4 +63,4 @@ Workflow:
 
 1
 
-`GLOBAL MESH ACTIVE` — Synchronized with `AaryanSinghChauhan09/SigmaOS`.
+`GLOBAL MESH ACTIVE` � Synchronized with `AaryanSinghChauhan09/SigmaOS`.

@@ -34,4 +34,4 @@ SigmaOS Zenith v15.0 is an industrial-grade, microkernel-based operating system 
 
 Visit the [Sovereign Choice Guide](wiki_repo/Sovereign-Choice-Guide) or run `sigma-cli list-shards` to inspect your local lattice.
 
-### Your Silicon. Your Rules. Your Sovereignty.
+### Your Silicon. Your Rules. Your Sovereignty

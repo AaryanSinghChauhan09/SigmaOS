@@ -1,4 +1,4 @@
-#include "../../include/core/SigmaOOP.hpp"
+#include "../../include/SigmaOOP.hpp"
 #include "../../include/sigma_log.h"
 #include "../../include/libc/sigma_libc.h"
 #include "../../include/sigma_log.h"

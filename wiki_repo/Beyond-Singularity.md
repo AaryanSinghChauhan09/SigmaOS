@@ -1,8 +1,8 @@
-﻿# Beyond Singularity: The Future of SigmaOS
+# Beyond Singularity: The Future of SigmaOS
 
 SigmaOS Zenith v15.0 has transitioned into the **Beyond Singularity** phase, implementing next-generation industrial primitives.
 
-## ðŸ“Š Summary Table (Beyond Singularity Phase)
+## 📊 Summary Table (Beyond Singularity Phase)
 
 | Roadmap Item | Implemented Shards | Implementation Details |
 | :--- | :--- | :--- |
@@ -15,7 +15,7 @@ SigmaOS Zenith v15.0 has transitioned into the **Beyond Singularity** phase, imp
 
 ---
 
-## ðŸ” 1. Quantum-Hardened Persistence
+## 🔐 1. Quantum-Hardened Persistence
 
 ### Shards
 
@@ -31,7 +31,7 @@ SigmaOS Zenith v15.0 has transitioned into the **Beyond Singularity** phase, imp
 
 ---
 
-## ðŸ§  2. Neural Lattice (AI Orchestration)
+## 🧠 2. Neural Lattice (AI Orchestration)
 
 ### Shards
 
@@ -47,7 +47,7 @@ SigmaOS Zenith v15.0 has transitioned into the **Beyond Singularity** phase, imp
 
 ---
 
-## âš™ï¸ 3. Heterogeneous Deployment
+## ⚙️ 3. Heterogeneous Deployment
 
 ### Shards
 

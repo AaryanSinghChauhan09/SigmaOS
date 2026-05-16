@@ -9,7 +9,7 @@
 #ifndef SIGMA_SANDBOX_H
 #define SIGMA_SANDBOX_H
 
-#include "../sigma_types.h"
+#include "../core/sigma_types.h"
 
 typedef struct {
     sigma_u32 container_id;

@@ -1,4 +1,4 @@
-﻿# ðŸ›  VIRTUAL_WORLD_HISTORIAN Profile
+# 🛠 VIRTUAL_WORLD_HISTORIAN Profile
 
 ## Required Tools & Functions
 
@@ -8,13 +8,13 @@
 
 - world-state-tracer
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Digital-preservation ethics
 
 - virtual-heritage standards
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - World-age
 
@@ -22,16 +22,16 @@
 
 - event-epoch-delta
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Cross-world event correlation
 
 - virtual-evolution mapping
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Archival-sync verification, world-state integrity check
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Historical-state snapshots, timeline-baseline restoration

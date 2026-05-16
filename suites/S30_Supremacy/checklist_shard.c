@@ -1,4 +1,4 @@
-#include "../../include/SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 /*
  * =============================================================================
  * Σ SIGMAOS KERNEL: SOVEREIGN-CHECKLIST-SHARD (v3.0 - OMNI-LEGAL ZENITH)
@@ -15,7 +15,7 @@
  * =============================================================================
  */
 
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 /* =========================================================================
  * Constants

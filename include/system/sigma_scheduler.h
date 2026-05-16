@@ -1,7 +1,7 @@
 #ifndef SIGMA_SCHEDULER_H
 #define SIGMA_SCHEDULER_H
 
-#include "../core/SigmaOOP.hpp"
+#include "../SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

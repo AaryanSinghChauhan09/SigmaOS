@@ -1,7 +1,7 @@
 #include "../../include/sigma_log.h"
 #include "../../include/core/sigma_types.h"
 #include "../../include/libc/SovereignLibC.h"
-#include "security/crypto/crypto_shard.hpp"
+#include "../../include/security/crypto/crypto_shard.hpp"
 
 /**
  * SigmaOS Quantum-Safe Kernel Hooks

@@ -1,7 +1,7 @@
 #ifndef VOICE_ORCHESTRATOR_HPP
 #define VOICE_ORCHESTRATOR_HPP
 
-#include "../../../include/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 
 #include "../../../include/SigmaOOP.hpp"
 

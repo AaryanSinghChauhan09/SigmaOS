@@ -1,4 +1,4 @@
-#include "../../../include/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN OMNI-SHELL ZENITH (v27.0 - THE ULTIMATE COMMAND-ZENITH)
@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 #include "sigma_kernel.h"
 #include "../../../include/SovereignDistroForge.h"
 #include "../../../include/SovereignCoreUtils.h"

@@ -1,4 +1,4 @@
-#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/libc/SovereignLibC.h"
 /*
  * S SIGMAOS: SOVEREIGN DEVICE DRIVER FRAMEWORK (v2.0  MODULAR)
  * Mission: Orchestrate hardware autonomy across sharded drivers.

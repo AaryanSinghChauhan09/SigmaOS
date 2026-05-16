@@ -1,4 +1,4 @@
-﻿# Maintenance-Policy
+# Maintenance-Policy
 
 1
 

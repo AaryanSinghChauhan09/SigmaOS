@@ -1,6 +1,6 @@
 #include "../../include/sigma_kernel_types.h"
 #include "../../include/sigma_log.h"
-#include "../fs/SovereignVFS.hpp"
+#include "../../include/fs/SovereignVFS.hpp"
 
 namespace SigmaOS {
 namespace FS {

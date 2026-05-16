@@ -8,9 +8,9 @@
  */
 
 #include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_hal.h"
 #include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 #include "../../../include/sigma_log.h"
 
 namespace SigmaOS {

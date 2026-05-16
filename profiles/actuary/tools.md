@@ -1,4 +1,4 @@
-﻿# ðŸ›  ACTUARY Profile
+# 🛠 ACTUARY Profile
 
 ## Required Tools & Functions
 
@@ -10,7 +10,7 @@
 
 - monte-carlo-sim
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - IFRS 17
 
@@ -18,7 +18,7 @@
 
 - actuarial standards
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Net present value (NPV)
 
@@ -26,16 +26,16 @@
 
 - loss-ratio
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Stochastic modeling
 
 - predictive claim analytics
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Data consistency verification, model-drift detection
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Policy-state snapshots, historical loss development

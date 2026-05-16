@@ -1,4 +1,4 @@
-#include "../../../include/SovereignLibC.h"
+#include "../../../include/libc/SovereignLibC.h"
 #include "../../../include/core/sigma_types.h"
 /*
  * =============================================================================
@@ -12,7 +12,7 @@
  * =============================================================================
  */
 
-#include "../../../include/core/sigma_kernel_types.h"
+#include "../../../include/sigma_kernel_types.h"
 
 /* Linux x86_64 Syscall IDs */
 #define SYS_READ      0

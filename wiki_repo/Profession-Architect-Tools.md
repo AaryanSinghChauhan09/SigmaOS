@@ -1,4 +1,4 @@
-﻿# Profession-Architect-Tools
+# Profession-Architect-Tools
 
 1
 

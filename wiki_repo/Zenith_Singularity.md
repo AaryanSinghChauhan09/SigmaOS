@@ -1,4 +1,4 @@
-﻿# SigmaOS Zenith v15.0: The Industrial Singularity
+# SigmaOS Zenith v15.0: The Industrial Singularity
 
 SigmaOS has reached its Zenith. We have evolved from a microkernel project into a **Sovereign Industrial Lattice** capable of global leadership.
 

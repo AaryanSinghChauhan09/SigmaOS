@@ -12,7 +12,7 @@
 #ifndef SIGMA_GLOBAL_LATTICE_MESH_H
 #define SIGMA_GLOBAL_LATTICE_MESH_H
 
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 /* ── Node Identity ────────────────────────────────────────────────────────── */
 #define SIGMA_NODE_ID_LEN   32u      /* SHA-256 length in bytes              */

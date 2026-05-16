@@ -8,7 +8,7 @@
  * =============================================================================
  */
 
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 /* =============================================================================
  * 1. FINANCE & ACCOUNTING (Accountant, Banker, Trader, Entrepreneur)

@@ -1,4 +1,4 @@
-﻿# core/net
+# core/net
 
 Standalone networking subsystem.
 

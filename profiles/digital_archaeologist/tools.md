@@ -1,4 +1,4 @@
-﻿# ðŸ›  DIGITAL_ARCHAEOLOGIST Profile
+# 🛠 DIGITAL_ARCHAEOLOGIST Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - archival-lattice
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Digital preservation standards
 
 - copyright-fair-use protocols
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Data-integrity-hash
 
@@ -24,16 +24,16 @@
 
 - compression-ratio
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Fragmented data reconstruction
 
 - legacy-format detection
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Bit-rot correction, archival-sync verification
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Data-state snapshots, archival-integrity restoration

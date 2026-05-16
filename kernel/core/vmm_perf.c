@@ -5,7 +5,7 @@
  * Principles: Zero-Wait Memory Duplication.
  * =============================================================================
  */
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 extern void vmm_fast_copy(void* dest, void* src);
 

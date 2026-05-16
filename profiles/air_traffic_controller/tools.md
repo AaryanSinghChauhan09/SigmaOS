@@ -1,4 +1,4 @@
-﻿# ðŸ›  AIR_TRAFFIC_CONTROLLER Profile
+# 🛠 AIR_TRAFFIC_CONTROLLER Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - comm-link bridge
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - ICAO standards
 
 - FAA protocols
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Separation minima
 
@@ -24,16 +24,16 @@
 
 - descent rate
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Conflict detection and resolution (CD&R)
 
 - 4D trajectory prediction
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Redundant radar link verification, comms-failover automation
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Flight state historical restoration, sequence logs

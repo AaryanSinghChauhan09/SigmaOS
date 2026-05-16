@@ -1,4 +1,4 @@
-﻿# ðŸ›  DEFI_ARCHITECT Profile
+# 🛠 DEFI_ARCHITECT Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - flash-loan-auditor
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Smart-contract security standards
 
 - DeFi-governance protocols
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Impermanent loss
 
@@ -26,16 +26,16 @@
 
 - gas-optimization
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Automated market making
 
 - risk-tranche simulation
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Contract-state verification, liquidity-mesh sync
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Vault-state snapshots, protocol-baseline restoration

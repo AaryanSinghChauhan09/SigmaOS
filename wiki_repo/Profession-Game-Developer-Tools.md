@@ -1,4 +1,4 @@
-﻿# Profession-Game-Developer-Tools
+# Profession-Game-Developer-Tools
 
 1
 

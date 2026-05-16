@@ -2,7 +2,7 @@
 #define SCHEDULER_HPP
 
 #include "../../include/core/sigma_types.h"
-#include "../../include/core/SigmaOOP.hpp"
+#include "../../include/SigmaOOP.hpp"
 #include "../../include/SovereignString.hpp"
 
 namespace SigmaOS {

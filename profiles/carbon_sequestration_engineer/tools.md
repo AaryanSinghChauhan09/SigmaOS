@@ -1,4 +1,4 @@
-﻿# ðŸ›  CARBON_SEQUESTRATION_ENGINEER Profile
+# 🛠 CARBON_SEQUESTRATION_ENGINEER Profile
 
 ## Required Tools & Functions
 
@@ -8,13 +8,13 @@
 
 - plume-migration-monitor
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - EPA CCS regulations
 
 - carbon-capture standards
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Injection-pressure-delta
 
@@ -22,16 +22,16 @@
 
 - leakage-probability
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Plume-migration prediction
 
 - sequestration-efficiency optimization
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Well-integrity verification, plume-sensor-sync
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Injection-state snapshots, geological-baseline restoration

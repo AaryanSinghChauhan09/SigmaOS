@@ -3,7 +3,7 @@
 
 #include "../../../include/libc/SovereignLibC.h"
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 
 // Simple math primitives for Zero-Dependency environment
 static inline double sigma_sqrt(double x) {

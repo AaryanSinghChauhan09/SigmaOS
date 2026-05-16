@@ -1,10 +1,10 @@
-﻿# Î£ SigmaOS v15.0 Zenith: Standalone Edition
+# Σ SigmaOS v15.0 Zenith: Standalone Edition
 
-## ðŸš€ The Sovereign Foundation
+## 🚀 The Sovereign Foundation
 
 The **Standalone Edition** is the purest form of SigmaOS. It is designed to run directly on bare metal, assuming total control of the hardware lattice. It is the recommended choice for dedicated workstations and mission-critical industrial nodes.
 
-### ðŸ› ï¸ Key Features
+### 🛠️ Key Features
 
 - **Silicon-Direct Kernel**: Zero-overhead execution with no hypervisor layer.
 
@@ -14,7 +14,7 @@ The **Standalone Edition** is the purest form of SigmaOS. It is designed to run 
 
 - **Full Entropy Security**: Hardware-attested PQC key generation.
 
-### ðŸ“¥ Installation Guide (Bare Metal)
+### 📥 Installation Guide (Bare Metal)
 
 1. **Prepare Media**: Flash the `SigmaOS-v15.0-Zenith-Standalone.iso` to a USB 3.0+ drive using `sigma-pkg boot-create`.
 
@@ -26,7 +26,7 @@ The **Standalone Edition** is the purest form of SigmaOS. It is designed to run 
 
 5. **Finalize**: Once the lattice is seeded, reboot and remove media.
 
-### ðŸ’Ž Exclusive Functions
+### 💎 Exclusive Functions
 
 - `lattice-hard-lock`: Physically isolate the node from the network via the S-WIFI shard.
 

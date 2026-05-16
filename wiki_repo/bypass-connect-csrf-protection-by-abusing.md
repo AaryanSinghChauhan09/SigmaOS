@@ -1,4 +1,4 @@
-﻿# Bypass Connect CSRF protection by abusing methodOverride Middleware
+# Bypass Connect CSRF protection by abusing methodOverride Middleware
 
 Since our platform isn't setup for advisories that are not specific to a particular module version, but rather a use / configuration of a certain module, we will announce this issue here and get it into the database at a later date.
 

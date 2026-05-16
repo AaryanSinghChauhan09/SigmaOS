@@ -2,7 +2,7 @@
 #define SIGMA_HAL_H
 
 #include "../core/sigma_types.h"
-#include "../core/SigmaOOP.hpp"
+#include "../SigmaOOP.hpp"
 
 #ifdef __cplusplus
 namespace SigmaOS {

@@ -4,7 +4,7 @@
 #include "../../include/libc/SovereignLibC.h"
 
 #include "../../include/core/sigma_types.h"
-#include "../../include/core/SigmaOOP.hpp"
+#include "../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

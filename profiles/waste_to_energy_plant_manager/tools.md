@@ -1,4 +1,4 @@
-﻿# ðŸ›  WASTE_TO_ENERGY_PLANT_MANAGER Profile
+# 🛠 WASTE_TO_ENERGY_PLANT_MANAGER Profile
 
 ## Required Tools & Functions
 
@@ -8,28 +8,28 @@
 
 - compliance manager
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Industry standards
 
 - professional ethics
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Efficiency metrics
 
 - cost analysis
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Workflow optimization
 
 - adaptive assistance
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Continuous health check for Waste-to-Energy Plant Manager tools
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Automatic state snapshots

@@ -1,4 +1,4 @@
-﻿# Profession-Scientist-Tools
+# Profession-Scientist-Tools
 
 1
 

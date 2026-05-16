@@ -2,7 +2,7 @@
 #define SOVEREIGN_LATTICE_REGISTRY_H
 #include "../../../include/core/sigma_types.h"
 #include "../../../include/sigma_log.h"
-#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 #ifdef __cplusplus
 namespace SigmaOS { namespace Registry {
 class SovereignLatticeRegistry {

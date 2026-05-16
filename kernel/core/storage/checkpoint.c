@@ -6,7 +6,7 @@
  * Principles: Shard State Persistence & Fault-Tolerant Execution.
  * =============================================================================
  */
-#include "../../../include/core/sigma_kernel_types.h"
+#include "../../../include/sigma_kernel_types.h"
 
 typedef struct Checkpoint {
     sigma_u64     task_id;

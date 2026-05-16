@@ -1,12 +1,12 @@
-﻿# Leapfrog-Strategy
+# Leapfrog-Strategy
 
-# ðŸ¸ SigmaOS Leapfrog Strategy
+# 🐸 SigmaOS Leapfrog Strategy
 
 To surpass industrial competitors and realize the full potential of the Sovereign Lattice, SigmaOS is prioritizing a strategic feature set that combines sovereignty, futuristic UX, and deep community engagement.
 
 ---
 
-## ðŸ›ï¸ Strategic Pillars
+## 🏛️ Strategic Pillars
 
 Based on architectural analysis, the following pillars are prioritized for immediate architectural focus:
 
@@ -18,7 +18,7 @@ Based on architectural analysis, the following pillars are prioritized for immed
 
 ---
 
-## ðŸš€ Competitive Acceleration
+## 🚀 Competitive Acceleration
 
 ### 1. The Automation Advantage
 
@@ -38,7 +38,7 @@ We don't aim to replace Linux everywhere at once. We dominate **Sovereign Silico
 
 ---
 
-## ðŸ› ï¸ Implementation Roadmap
+## 🛠️ Implementation Roadmap
 
 | Feature | Phase | Priority |
 | :--- | :--- | :--- |

@@ -1,4 +1,4 @@
-#include "../../../../../../../include/SovereignLibC.h"
+#include "../../../../../../../include/libc/SovereignLibC.h"
 // =============================================================================
 // SigmaOS — libc — sigma_libc_extended.c
 // Extended Sovereign LibC — glibc-free string, math, and I/O primitives

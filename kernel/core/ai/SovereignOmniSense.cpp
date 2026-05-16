@@ -3,7 +3,7 @@
 #include "../../../include/core/sigma_types.h"
 
 #include "../../../include/sigma_omnisense.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "../../../include/sigma_hal.h"
 #include "../../../include/sigma_universal_ui.h"
 #include "../../../include/sigma_energysched.h"
 

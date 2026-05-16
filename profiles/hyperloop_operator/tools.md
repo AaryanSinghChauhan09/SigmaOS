@@ -1,4 +1,4 @@
-﻿# ðŸ›  HYPERLOOP_OPERATOR Profile
+# 🛠 HYPERLOOP_OPERATOR Profile
 
 ## Required Tools & Functions
 
@@ -10,11 +10,11 @@
 
 - capsule-life-support
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - High-speed transit safety protocols
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - G-force delta
 
@@ -22,16 +22,16 @@
 
 - pod-spacing-minima
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Pod-dispatch optimization
 
 - vacuum-pressure regulation
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Track-alignment verification, pod-telemetry-sync
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Transit-state snapshots, pod-dispatch-baseline restoration

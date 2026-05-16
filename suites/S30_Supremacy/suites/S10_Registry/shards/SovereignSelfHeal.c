@@ -12,7 +12,7 @@
 #ifndef SOVEREIGN_SELF_HEAL_C
 #define SOVEREIGN_SELF_HEAL_C
 
-#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/libc/SovereignLibC.h"
 
 #include "../../../../../include/SovereignToolHeader.h"
 #include "../../../../../include/libc/sigma_libc.h"

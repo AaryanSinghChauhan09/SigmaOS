@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/SigmaOOP.hpp"
 #include "userland/apps/scholar_zenith/solvers.hpp"
 
 using namespace SigmaOS;

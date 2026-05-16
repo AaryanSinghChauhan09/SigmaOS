@@ -1,4 +1,4 @@
-﻿# Sandbox-Hardening
+# Sandbox-Hardening
 
 1
 

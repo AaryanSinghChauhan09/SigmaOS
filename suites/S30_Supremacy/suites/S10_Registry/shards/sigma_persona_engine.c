@@ -1,6 +1,6 @@
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "suites/S01_Genesis/shards/SigmaC11.h"
+#include "../../../../../include/SigmaC11.h"
 
 // =========================================================================
 // SIGMA PERSONA ENGINE (Absolute UX/OS Personalization)

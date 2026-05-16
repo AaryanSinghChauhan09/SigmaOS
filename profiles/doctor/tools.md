@@ -1,4 +1,4 @@
-﻿# ðŸ›  DOCTOR Profile
+# 🛠 DOCTOR Profile
 
 ## Required Tools & Functions
 
@@ -12,7 +12,7 @@
 
 - DICOM viewer
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Medical Council of India guidelines
 
@@ -22,7 +22,7 @@
 
 - GDPR
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Dosage
 
@@ -32,7 +32,7 @@
 
 - glomerular filtration rate
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Patient record indexing
 
@@ -40,10 +40,10 @@
 
 - lab result interpretation
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Medical data integrity scan, prescription conflict detection
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Patient record versioning, emergency state restoration

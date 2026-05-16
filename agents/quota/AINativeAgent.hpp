@@ -1,5 +1,5 @@
 #pragma once
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 #include "../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {

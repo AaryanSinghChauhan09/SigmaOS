@@ -1,4 +1,4 @@
-﻿# IP-Compliance
+# IP-Compliance
 
 1
 

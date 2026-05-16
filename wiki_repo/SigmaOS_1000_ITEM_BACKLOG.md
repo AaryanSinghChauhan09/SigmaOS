@@ -1,4 +1,4 @@
-﻿# SigmaOS 1000 ITEM BACKLOG
+# SigmaOS 1000 ITEM BACKLOG
 
 1
 

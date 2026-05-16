@@ -1,4 +1,4 @@
-#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S01_Genesis/shards/sigma_syscall_table.c
@@ -9,7 +9,7 @@
  */
 
 #include "../../../../../include/sigma_syscall_table.h"
-#include "suites/S01_Genesis/shards/sigma_libc.h"
+#include "../../../../../include/sigma_libc.h"
 
 static sigma_syscall_desc_t s_table[SIGMA_SYSCALL_MAX];
 static sigma_u32               s_registered = 0;

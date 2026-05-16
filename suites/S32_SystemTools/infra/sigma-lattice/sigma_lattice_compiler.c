@@ -1,4 +1,4 @@
-#include "../../../../include/SovereignLibC.h"
+#include "../../../../include/libc/SovereignLibC.h"
 // =============================================================================
 // SigmaOS — tools/sigma-lattice — sigma_lattice_compiler.c
 // Quantum-Tier Modularization Synthesis Tool

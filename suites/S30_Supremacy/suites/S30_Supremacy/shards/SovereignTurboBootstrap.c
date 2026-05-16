@@ -1,4 +1,4 @@
-#include "../../../../../include/SovereignLibC.h"
+#include "../../../../../include/libc/SovereignLibC.h"
 /**
  * @file SovereignTurboBootstrap.c
  * @brief Phase 59: Turbo-Performance & Instant-Deploy.
@@ -11,7 +11,7 @@
 
 #include "../../../../../include/SovereignInit.h"
 #include "../../../../../include/libc/sigma_libc.h"
-#include "suites/S01_Genesis/shards/SigmaC11.h"
+#include "../../../../../include/SigmaC11.h"
 
 /* High-Speed Parallel Registry */
 typedef struct {

@@ -1,9 +1,9 @@
 #ifndef NEURAL_COPROCESSOR_HPP
 #define NEURAL_COPROCESSOR_HPP
 
-#include "../../include/SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 
-#include "../../include/sigma_types.h"
+#include "../../include/core/sigma_types.h"
 #include "../../include/SigmaOOP.hpp"
 
 namespace SigmaOS {

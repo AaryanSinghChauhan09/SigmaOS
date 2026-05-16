@@ -1,4 +1,4 @@
-﻿# Hardware-Support
+# Hardware-Support
 
 1
 

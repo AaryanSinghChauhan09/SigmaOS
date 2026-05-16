@@ -1,4 +1,4 @@
-﻿# ðŸ›  GRID_RESILIENCE_ENGINEER Profile
+# 🛠 GRID_RESILIENCE_ENGINEER Profile
 
 ## Required Tools & Functions
 
@@ -10,7 +10,7 @@
 
 - SCADA-shield
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - IEEE standards
 
@@ -18,7 +18,7 @@
 
 - NERC CIP compliance
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Frequency stability
 
@@ -26,7 +26,7 @@
 
 - peak-load predictor
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Dynamic line rating
 
@@ -34,10 +34,10 @@
 
 - black-start optimization
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Automatic breaker re-closing, load-shedding lattice priority
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Pre-fault grid state restoration, historical load profiles

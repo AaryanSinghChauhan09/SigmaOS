@@ -5,7 +5,7 @@
  * Modules: NCERT Physics/Math & Indian Law Timelines/Fines.
  * =============================================================================
  */
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 /* --- NCERT Module: Classical Physics --- */
 sigma_u64 ncert_calc_force(sigma_u64 mass, sigma_u64 acceleration) {

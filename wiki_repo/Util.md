@@ -1,4 +1,4 @@
-﻿# Util
+# Util
 
 Utility API for third-party implementations of the dispatcher API.
 

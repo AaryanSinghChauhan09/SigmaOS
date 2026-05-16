@@ -2,4 +2,4 @@
  * This file re-exports the authoritative sigma_kernel_types.h
  * from the S30_Supremacy suite, making it accessible via -Isuites/include.
  */
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"

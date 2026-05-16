@@ -1,4 +1,4 @@
-﻿# ðŸ›  ASTEROID_MINER Profile
+# 🛠 ASTEROID_MINER Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - ore-density mapper
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Outer Space Treaty compliance
 
 - resource extraction protocols
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Delta-V
 
@@ -24,16 +24,16 @@
 
 - trajectory-delta
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Autonomous excavation pathing
 
 - structural stability prediction in vacuum
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Thruster-link verification, drill-head cooling sync
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Excavation state snapshots, orbital-return baseline restoration

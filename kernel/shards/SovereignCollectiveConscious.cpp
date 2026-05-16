@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "../../include/core/SigmaOOP.hpp"
+#include "../../include/SigmaOOP.hpp"
 #include "../../include/sigma_log.h"
 #include "userland/apps/collective_conscious/agents.hpp"
 #include "../../include/sigma_log.h"

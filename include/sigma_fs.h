@@ -1,6 +1,6 @@
-﻿/*
+/*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN LATTICE FILESYSTEM (S-FS)
+ * Σ SIGMAOS: SOVEREIGN LATTICE FILESYSTEM (S-FS)
  * =========================================================================
  * Mission: High-assurance, transactional filesystem for industrial shards.
  * Principle: Zero-latency metadata, atomic journaled commits.
@@ -10,7 +10,7 @@
 #ifndef SIGMA_FS_H
 #define SIGMA_FS_H
 
-#include "./sigma_types.h"
+#include "./core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

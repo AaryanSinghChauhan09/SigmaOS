@@ -1,10 +1,10 @@
-﻿# ðŸ“Š Sovereign Trust Graph & Provenance
+# 📊 Sovereign Trust Graph & Provenance
 
-## ðŸ›ï¸ Mission
+## 🏛️ Mission
 
 The Trust Graph provides absolute transparency into the provenance, integrity, and compliance of every active shard in the SigmaOS Sovereign Lattice.
 
-## ðŸ›¡ï¸ Strategic Transparency
+## 🛡️ Strategic Transparency
 
 Unlike mainstream distributions that rely on black-box updates, SigmaOS visualizes the entire security chain:
 
@@ -14,7 +14,7 @@ Unlike mainstream distributions that rely on black-box updates, SigmaOS visualiz
 
 - **Universal Package Graph**: Mathematical proof of software origin via the immutable provenance lattice.
 
-## ðŸŽ¨ Visualization (Zenith UI)
+## 🎨 Visualization (Zenith UI)
 
 The **Trust Graph UI** ([trust_graph.c](file:///C:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/modules/ui/zenith/trust_graph.c)) renders a real-time mesh of shard interactions and their respective trust-levels.
 

@@ -1,4 +1,4 @@
-﻿# Profession-Chef-Tools
+# Profession-Chef-Tools
 
 1
 

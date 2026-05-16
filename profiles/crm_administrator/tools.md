@@ -1,4 +1,4 @@
-﻿# ðŸ›  CRM_ADMINISTRATOR Profile
+# 🛠 CRM_ADMINISTRATOR Profile
 
 ## Required Tools & Functions
 
@@ -10,7 +10,7 @@
 
 - customer-journey-mapper
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - GDPR
 
@@ -18,7 +18,7 @@
 
 - CRM data-privacy standards
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - CLV (Customer Lifetime Value)
 
@@ -26,16 +26,16 @@
 
 - conversion-delta
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Lead prioritization modeling
 
 - automated-marketing-pathing
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Lead-data consistency check, automation-workflow validation
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Customer-record snapshots, marketing-campaign rollback

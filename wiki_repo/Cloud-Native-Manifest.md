@@ -1,4 +1,4 @@
-﻿# Cloud-Native-Manifest
+# Cloud-Native-Manifest
 
 1
 

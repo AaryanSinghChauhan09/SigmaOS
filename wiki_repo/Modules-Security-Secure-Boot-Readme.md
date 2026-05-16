@@ -1,4 +1,4 @@
-﻿# security/secure_boot
+# security/secure_boot
 
 Independent verification system for boot integrity.
 

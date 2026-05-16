@@ -1,4 +1,4 @@
-﻿# ðŸ›  ARCHITECT Profile
+# 🛠 ARCHITECT Profile
 
 ## Required Tools & Functions
 
@@ -12,7 +12,7 @@
 
 - GIS mapping
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - Building bye-laws
 
@@ -20,7 +20,7 @@
 
 - sustainability standards
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - FSI/FAR
 
@@ -30,16 +30,16 @@
 
 - carbon footprint
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Generative design
 
 - urban density simulation
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - BIM model consistency check, asset link validation
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Iterative design snapshots, client approval state rollback

@@ -1,4 +1,4 @@
-﻿# Sovereign Persona Shard (persona.shard)
+# Sovereign Persona Shard (persona.shard)
 
 ## Overview
 

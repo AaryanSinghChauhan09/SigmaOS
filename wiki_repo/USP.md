@@ -1,10 +1,10 @@
-﻿# USP
+# USP
 
 ## SigmaOS: The Sovereign USP (Unique Selling Points)
 
 SigmaOS is not a generic operating system. It is a **Profession-Aware Industrial Lattice** designed for high-assurance specialized workflows.
 
-## ðŸš€ Core Differentiators
+## 🚀 Core Differentiators
 
 ### 1. Profession-Aware Dynamic Sharding
 
@@ -40,7 +40,7 @@ Inspired by modern personal AI frameworks, SigmaOS transcends traditional comput
 
 - **S-PULSE**: A real-time dashboard tracking your "Current State" vs. "Desired State".
 
-## ðŸ›  Professional Integration Examples
+## 🛠 Professional Integration Examples
 
 | Profession | Open Source Alignment | SigmaOS Customization |
 | :--- | :--- | :--- |

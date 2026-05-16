@@ -14,7 +14,7 @@
  * Mission: sub-second boot, hardware-skip, shard-init.
  */
 
-#include "../../include/core/SigmaOOP.hpp"
+#include "../../include/SigmaOOP.hpp"
 
 class SovereignBootMaster : public SigmaObject {
 public:

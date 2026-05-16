@@ -1,4 +1,4 @@
-﻿# CacheStorage
+# CacheStorage
 
 Undici exposes a W3C spec-compliant implementation of [CacheStorage](https://developer.mozilla.org/en-US/docs/Web/API/CacheStorage) and [Cache](https://developer.mozilla.org/en-US/docs/Web/API/Cache).
 

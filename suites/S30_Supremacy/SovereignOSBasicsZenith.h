@@ -1,4 +1,4 @@
-#include "../../include/sigma_types.h"
+#include "../../include/core/sigma_types.h"
 #ifndef SOVEREIGN_OS_BASICS_ZENITH_H
 #define SOVEREIGN_OS_BASICS_ZENITH_H
 

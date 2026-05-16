@@ -1,4 +1,4 @@
-﻿# Profession-Entrepreneur-Tools
+# Profession-Entrepreneur-Tools
 
 1
 

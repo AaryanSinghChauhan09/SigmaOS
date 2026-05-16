@@ -1,8 +1,8 @@
-﻿# Sovereign Driver Framework (SDF)
+# Sovereign Driver Framework (SDF)
 
 The **Sovereign Driver Framework (SDF)** is the unified hardware orchestration layer for **SigmaOS v15.0 "Horizon"**. It provides a professional, object-oriented interface for sharding physical hardware into the microkernel lattice.
 
-## ðŸ› Architecture
+## 🏛 Architecture
 
 SDF abstracts hardware interactions into **Professional Shards**, allowing the kernel to manage GPU, Network, and USB controllers with zero-dependency isolation.
 
@@ -14,7 +14,7 @@ SDF abstracts hardware interactions into **Professional Shards**, allowing the k
 
 - **Hardware Sharding**: Direct mapping of physical registers and interrupts into Ring-0 memory space.
 
-## ðŸ”Œ Industrial Driver Shards
+## 🔌 Industrial Driver Shards
 
 SDF currently supports the following professional shards:
 
@@ -36,7 +36,7 @@ SDF currently supports the following professional shards:
 
 - **Compliance**: XHCI v3.2 compatible shard orchestration.
 
-## ðŸ›  Implementation Details
+## 🛠 Implementation Details
 
 Drivers are implemented in `kernel/core/drivers/SovereignDriverFramework.cpp`.
 

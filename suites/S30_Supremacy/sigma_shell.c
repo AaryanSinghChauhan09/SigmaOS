@@ -10,7 +10,7 @@
  */
 
 #include "../../include/libc/sigma_libc.h"
-#include "../../include/SovereignOmniShard.h"   /* C11 scheduler/cloud/ui/net structs */
+#include "../../include/SovereignOmniShard.h"
 
 /* =========================================================================
  * Command dispatch table entry (replaces C++ if-else chain with data table)

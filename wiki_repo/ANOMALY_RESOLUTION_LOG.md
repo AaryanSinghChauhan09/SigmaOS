@@ -1,4 +1,4 @@
-﻿# ANOMALY RESOLUTION LOG
+# ANOMALY RESOLUTION LOG
 
 This document tracks the resolution of critical system anomalies identified during the Zenith Supreme phase.
 

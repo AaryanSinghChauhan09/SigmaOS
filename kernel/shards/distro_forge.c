@@ -10,7 +10,7 @@
  * =============================================================================
  */
 
-#include "../../include/core/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
 #define MAX_DISTRO_SHARDS 256
 

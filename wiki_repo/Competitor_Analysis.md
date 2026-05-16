@@ -1,4 +1,4 @@
-﻿# Competitor Analysis
+# Competitor Analysis
 
 1
 

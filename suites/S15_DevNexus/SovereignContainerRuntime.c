@@ -8,7 +8,7 @@
  * =========================================================================
  */
 
-#include "../../include/core/SigmaOOP.hpp"
+#include "../../include/SigmaOOP.hpp"
 
 /**
  * Î£ SIGMA OS: SOVEREIGN CONTAINER RUNTIME (v128.0 - ZERO-STD NATIVE)

@@ -1,4 +1,4 @@
-﻿# ðŸ›  MUSEOLOGIST Profile
+# 🛠 MUSEOLOGIST Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - provenance tracer
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - UNESCO conventions
 
 - ICOM ethics
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Carbon dating calibration
 
@@ -24,16 +24,16 @@
 
 - lux hours
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Provenance verification
 
 - archival restoration prediction
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Archive integrity scan, provenance link validation
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Collection state snapshots, provenance history restoration

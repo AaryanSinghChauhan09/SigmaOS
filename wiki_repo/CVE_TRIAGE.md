@@ -1,4 +1,4 @@
-﻿# CVE TRIAGE
+# CVE TRIAGE
 
 1
 

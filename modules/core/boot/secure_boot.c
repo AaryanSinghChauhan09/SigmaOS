@@ -1,5 +1,5 @@
 #include "../../../include/libc/sigma_libc.h"
-#include "../../../include/security/kyber_shard.c" // Mock include for Kyber primitives
+#include "../../../include/security/kyber_shard.c"
 
 // ---------------------------------------------------------
 // SigmaOS Quantum-Resilient Secure Boot Sequence (Phase 7)

@@ -1,4 +1,4 @@
-﻿# ðŸ›  DIGITAL_EVIDENCE_ANALYST Profile
+# 🛠 DIGITAL_EVIDENCE_ANALYST Profile
 
 ## Required Tools & Functions
 
@@ -10,13 +10,13 @@
 
 - metadata-carver
 
-## ðŸ“œ Compliance Rules
+## 📜 Compliance Rules
 
 - BSA 2023 evidence standards
 
 - digital-forensics protocols
 
-## ðŸ§® Professional Calculators
+## 🧮 Professional Calculators
 
 - Entropy-density
 
@@ -24,16 +24,16 @@
 
 - timeline-delta
 
-## ðŸ§¬ Core Algorithms
+## 🧬 Core Algorithms
 
 - Automated artifact correlation
 
 - encrypted-volume detection
 
-## ðŸ›¡ Self-Healing Strategy
+## 🛡 Self-Healing Strategy
 
 - Evidence-seal verification, hash-lattice integrity check
 
-## ðŸ”„ Rollback Strategy
+## 🔄 Rollback Strategy
 
 - Analysis-state snapshots, evidence-baseline restoration

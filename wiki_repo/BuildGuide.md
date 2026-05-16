@@ -1,4 +1,4 @@
-﻿# BuildGuide
+# BuildGuide
 
 1
 
