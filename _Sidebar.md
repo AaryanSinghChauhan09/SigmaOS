@@ -76,6 +76,7 @@
 * [Rolling Release Strategy](Rolling-Release-Strategy)
 * [Enterprise & Regression](Enterprise-Regression)
 * [Gap Analysis vs Competitors](Gap-Analysis-vs-Competitors)
+* [Niche Parity Certification](Niche-Parity-Certification)
 
 ## 📅 Roadmap & Future
 
