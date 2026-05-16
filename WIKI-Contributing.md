@@ -46,4 +46,3 @@ Every Pull Request triggers the following automated suite:
 
 ---
 "Sovereignty is a collective intent."
-

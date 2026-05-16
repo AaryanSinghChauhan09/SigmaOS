@@ -7,6 +7,7 @@ Welcome to the **Sovereign Standalone Shard**. This edition is the ultimate expr
 1. **Download**: Obtain the `sigma-v15.0-zenith-standalone.iso`.
 
 2. **Flash**: Use `dd` or `SovereignFlasher` to write the image to a physical block device.
+
    ```bash
 
    dd if=sigma-standalone.iso of=/dev/sdX bs=4M status=progress

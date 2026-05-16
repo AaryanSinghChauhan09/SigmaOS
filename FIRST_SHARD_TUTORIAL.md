@@ -15,7 +15,7 @@ Use the standard SigmaOS macros to define your shard:
 
 1
 
-#include "sigma_core.h"
+# include "sigma_core.h"
 
 SIGMA_SHARD_INIT(HelloWorld) {
     sigma_print("Hello from the Sovereign Lattice!\n");
@@ -35,4 +35,3 @@ make all
 1
 
 Your shard will be compiled into a `.o` object and dynamically linked into the Lattice on the next boot!
-

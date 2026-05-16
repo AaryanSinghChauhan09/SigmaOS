@@ -591,7 +591,7 @@ test('validate snapshot contents', async (t) => {
 
 ### vs Manual MockAgent Setup
 
-### Manual MockAgent:
+### Manual MockAgent
 
 ```javascript
 const mockAgent = new MockAgent()
@@ -606,7 +606,7 @@ mockPool.intercept({
 ])
 ```
 
-### SnapshotAgent:
+### SnapshotAgent
 
 ```javascript
 // Record once

@@ -22,7 +22,7 @@ Zenith utilizes the **MLC Algorithm**, natively implemented in the `SovereignZen
 
 As of the current stabilization phase, Zenith has migrated to a **Strict Utility-Class Architecture**. Themes and layouts are defined using a modular CSS engine that allows users to swap aesthetics without breaking functional components.
 
-### Key CSS Variables:
+### Key CSS Variables
 
 - `--bg-primary`: The core lattice background.
 
@@ -62,5 +62,4 @@ Integrated via `SovereignPersonalization` and the `SovereignClawGateway`, Zenith
 
 ---
 
-### Zenith UI: Where aesthetics meet absolute efficiency.
-
+### Zenith UI: Where aesthetics meet absolute efficiency

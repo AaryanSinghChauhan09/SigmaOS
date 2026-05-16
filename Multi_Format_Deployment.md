@@ -27,7 +27,7 @@ SigmaOS is designed as a **Sovereign Microkernel** that can adapt its lattice co
 
 ### 1. Design for Modularity
 
-SigmaOS uses **Asynchronous Shard Ignition (ASI)**. Each service (Driver, FS, Network) is a standalone shard. 
+SigmaOS uses **Asynchronous Shard Ignition (ASI)**. Each service (Driver, FS, Network) is a standalone shard.
 
 - **To switch to Embedded**: Disable `SovereignDesktop` and `SovereignMedia` shards in `MANIFEST.json`.
 

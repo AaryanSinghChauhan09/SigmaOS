@@ -90,4 +90,3 @@ SigmaOS has surpassed all industrial competitors by modularizing every kernel fe
 ---
 
 1
-

@@ -11,15 +11,15 @@ SigmaOS is not an operating system; it is a **Shard Lattice**. We have abandoned
 
 ### ?? Key USPs (The Sigma Advantage)
 
--   **PQC-Native (NIST FIPS 203/204)**: Integrated Kyber-1024 and Dilithium-5 at Ring-0.
+- **PQC-Native (NIST FIPS 203/204)**: Integrated Kyber-1024 and Dilithium-5 at Ring-0.
 
--   **Shard Isolation**: 600+ hot-swappable kernel shards with zero-latency IPC.
+- **Shard Isolation**: 600+ hot-swappable kernel shards with zero-latency IPC.
 
--   **Amnesic Memory**: Secure zeroing of all sensitive buffers via `sigma_secure_memset`.
+- **Amnesic Memory**: Secure zeroing of all sensitive buffers via `sigma_secure_memset`.
 
--   **S-INDIA Compliant**: Native engines for GST (Act 2017) and Income Tax (FY 2024-25).
+- **S-INDIA Compliant**: Native engines for GST (Act 2017) and Income Tax (FY 2024-25).
 
--   **Zero-Trust NetStack**: Hardware-level packet auditing and DPI firewalling.
+- **Zero-Trust NetStack**: Hardware-level packet auditing and DPI firewalling.
 
 ---
 
@@ -90,4 +90,4 @@ make test            # Run industrial CI/CD battery
 
 ---
 
-### Stay Sovereign. Stay Zenith.
+### Stay Sovereign. Stay Zenith

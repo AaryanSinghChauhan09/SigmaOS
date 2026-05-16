@@ -31,4 +31,3 @@ This document frames why SigmaOS can feel “behind” established systems (Linu
 ---
 
 1
-

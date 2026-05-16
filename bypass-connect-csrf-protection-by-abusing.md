@@ -10,7 +10,7 @@ Connect, methodOverride middleware
 
 ### Description
 
-### Connect's "methodOverride" middleware allows an HTTP request to override the method of the request with the value of the "\_method" post key or with the header "x-http-method-override".
+### Connect's "methodOverride" middleware allows an HTTP request to override the method of the request with the value of the "\_method" post key or with the header "x-http-method-override"
 
 As the declaration order of middlewares determines the execution stack in Connect, it is possible to abuse this functionality in order to bypass the standard Connect's anti-CSRF protection.
 

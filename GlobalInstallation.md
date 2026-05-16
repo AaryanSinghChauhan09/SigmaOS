@@ -6,7 +6,7 @@ Undici provides an `install()` function to add all WHATWG fetch classes to `glob
 
 Install all WHATWG fetch classes globally on `globalThis`.
 
-### Example:
+### Example
 
 ```js
 import { install } from 'undici'

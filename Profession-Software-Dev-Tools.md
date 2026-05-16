@@ -34,5 +34,4 @@ The kernel prioritizes `sched_fifo` for development tasks and allocates dedicate
 
 ---
 
-### Code with absolute sovereignty.
-
+### Code with absolute sovereignty

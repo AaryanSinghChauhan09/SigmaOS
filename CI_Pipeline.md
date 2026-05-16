@@ -45,4 +45,3 @@ To trigger a manual convergence of the Sovereign Lattice:
 make industrial_sync
 
 1
-

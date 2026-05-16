@@ -11,9 +11,9 @@ This document tracks the incomplete work and future tasks required to achieve 10
 - [x] **Unify Kernel Branch**: Single kernel codebase for all formats.
 
 - [ ] **ðŸ”œ Task**: Formalize and document algorithms for:
-    - [ ] S-CFS Scheduling (Fairness & Determinism)
-    - [ ] Sovereign Memory Management (Paging & Slab)
-    - [ ] SDF I/O Orchestration (Zero-copy paths)
+  - [ ] S-CFS Scheduling (Fairness & Determinism)
+  - [ ] Sovereign Memory Management (Paging & Slab)
+  - [ ] SDF I/O Orchestration (Zero-copy paths)
 
 - [ ] **ðŸ”œ Task**: Implement automated regression tests to verify algorithm consistency across different hardware targets (x86_64, ARM64, RISC-V).
 
@@ -38,10 +38,10 @@ This document tracks the incomplete work and future tasks required to achieve 10
 - [x] **Definition**: [CORE_TOOLSET.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/docs/architecture/CORE_TOOLSET.md) created.
 
 - [ ] **ðŸ”œ Task**: Finalize the "Default Toolset Manifest" bundles for:
-    - [ ] **System Utilities**: BleachBit (Cleanup), Timeshift (Backup), htop/sysbench (Monitoring).
-    - [ ] **Virtualization**: VirtualBox-S, QEMU-S.
-    - [ ] **Multimedia**: OBS-S (Recording), PDFsam/LibreOffice (Documents), GIMP/Inkscape (Creative).
-    - [ ] **Creative Tools**: LMMS/Ardour (Music).
+  - [ ] **System Utilities**: BleachBit (Cleanup), Timeshift (Backup), htop/sysbench (Monitoring).
+  - [ ] **Virtualization**: VirtualBox-S, QEMU-S.
+  - [ ] **Multimedia**: OBS-S (Recording), PDFsam/LibreOffice (Documents), GIMP/Inkscape (Creative).
+  - [ ] **Creative Tools**: LMMS/Ardour (Music).
 
 - [ ] **ðŸ”œ Task**: Automate the bundling of this manifest into every format's release ISO/Image.
 
@@ -64,11 +64,11 @@ This document tracks the incomplete work and future tasks required to achieve 10
 - [ ] **ðŸ”œ Task**: Build GitHub Actions pipelines that run the **Unified Test Suite** across all branches.
 
 - [ ] **ðŸ”œ Task**: Add high-pressure **Stress Tests** for:
-    - [ ] Concurrency (Deadlock detection)
-    - [ ] Memory Leakage (Silicon-native leak detection)
-    - [ ] I/O Throughput benchmarks
-    - [ ] Boot Times (<2ms enforcement)
-    - [ ] GUI Responsiveness (Latency monitoring)
+  - [ ] Concurrency (Deadlock detection)
+  - [ ] Memory Leakage (Silicon-native leak detection)
+  - [ ] I/O Throughput benchmarks
+  - [ ] Boot Times (<2ms enforcement)
+  - [ ] GUI Responsiveness (Latency monitoring)
 
 - [ ] **ðŸ”œ Task**: Publish real-time benchmark results to the [Performance Benchmarks](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Performance-Benchmarks.md) page.
 

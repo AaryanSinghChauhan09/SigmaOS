@@ -29,4 +29,3 @@ Rewards are tiered based on severity as determined by the Sovereign Council:
 1
 
 Researchers who successfully discover and help patch vulnerabilities will be permanently credited in the `MAINTAINERS.md` and our hall of fame.
-

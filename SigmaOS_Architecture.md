@@ -6,15 +6,15 @@ The Zenith release marks the stabilization of the SigmaOS core. It is designed f
 
 ### System Shards
 
-1.  **S-MM (Memory)**: Industrial buddy-allocator with amnesic wiping.
+1. **S-MM (Memory)**: Industrial buddy-allocator with amnesic wiping.
 
-2.  **S-SCHED (Scheduler)**: Multi-priority predictive scheduler with CR3-per-process isolation.
+2. **S-SCHED (Scheduler)**: Multi-priority predictive scheduler with CR3-per-process isolation.
 
-3.  **S-NET (NetStack)**: Zero-trust DPI firewalling for IPv4/IPv6.
+3. **S-NET (NetStack)**: Zero-trust DPI firewalling for IPv4/IPv6.
 
-4.  **S-VIS (Visualization)**: Real-time topology rendering of the computational lattice.
+4. **S-VIS (Visualization)**: Real-time topology rendering of the computational lattice.
 
-5.  **S-PQC (Security)**: CRYSTALS-Kyber/Dilithium implementation.
+5. **S-PQC (Security)**: CRYSTALS-Kyber/Dilithium implementation.
 
 ### Userland: sigma_sh
 

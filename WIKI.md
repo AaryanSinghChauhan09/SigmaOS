@@ -321,5 +321,4 @@ Integrated with the **Sovereign Neural Engine**, the vision system provides real
 
 ---
 
-### Î£ SIGMAOS: Absolute Mastery. Silicon-Direct. Zero-Dependency. Aware.
-
+### Î£ SIGMAOS: Absolute Mastery. Silicon-Direct. Zero-Dependency. Aware

@@ -145,4 +145,3 @@ Below is a non-exhaustive list of critical shards and their relationships to the
 ---
 
 ### Document Version: 15.0.4 - Stabilized
-

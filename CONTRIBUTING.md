@@ -16,7 +16,7 @@ Thank you for your interest in contributing to the Sovereign Lattice!
 
 - `qemu-system-x86` (for local emulation)
 
-### Alternatively, use the provided `Dockerfile` for a zero-setup, cross-platform build environment.
+### Alternatively, use the provided `Dockerfile` for a zero-setup, cross-platform build environment
 
 ### 2. Building
 

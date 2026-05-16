@@ -17,4 +17,3 @@ SigmaOS is built upon the "Sovereign Lattice" architecture, a highly modular, sh
 The communication between the lowest-level hardware abstraction (S01) and the highest-level UI (S33) happens via the Sovereign Event Bus and Memory Paging.
 Instead of system calls, the Lattice uses a message-passing interface where shards broadcast state changes. The UI layer (S33) subscribes to these state changes asynchronously.
 1 SigmaOS strives for a dependency-free core. The kernel is written in C11 and Assembly, requiring no external libraries, ensuring ultimate security and immutability.
-

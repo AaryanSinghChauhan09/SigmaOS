@@ -27,6 +27,7 @@ SigmaOS provides industrial-grade protection for professional data and network c
 - **Self-Healing**: S-AUTO triggers atomic rollbacks if the audit lattice detects a security breach.
 
 ---
+
 | Component | Function | Linux Equivalent |
 | :--- | :--- | :--- |
 

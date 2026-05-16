@@ -221,4 +221,3 @@ This document outlines the 100 functional aspirations for the SigmaOS Sovereign 
 ---
 
 1
-

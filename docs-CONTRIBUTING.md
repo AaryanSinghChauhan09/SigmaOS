@@ -21,20 +21,21 @@ SigmaOS is built on a **600-Shard Modular Architecture**. Every contribution sho
 1. **Fork the Repository**: Create your own fork and clone it locally.
 
 2. **Create a Shard Branch**:
+
    ```bash
    git checkout -b shard/your-feature-name
    ```
 
-1. **Implement & Document**:
+3. **Implement & Document**:
    - Add your logic to the appropriate directory (`/kernel`, `/drivers`, `/ui`).
    - Update the corresponding `.md` file in the wiki if the architecture changes.
 
-2. **Validation**:
+4. **Validation**:
    - Run the build system: `make all`.
    - Test in QEMU: `./qemu-boot.sh`.
    - Ensure `sigma-heal` reports no technical debt.
 
-3. **Submit a PR**: Provide a clear description of the shard's purpose and any capability requirements.
+5. **Submit a PR**: Provide a clear description of the shard's purpose and any capability requirements.
 
 ---
 
@@ -54,4 +55,4 @@ If you find a security vulnerability, please follow our **[Security Policy](SECU
 
 ---
 
-### Build the lattice. Command the future.
+### Build the lattice. Command the future

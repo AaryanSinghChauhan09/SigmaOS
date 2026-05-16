@@ -21,4 +21,3 @@ The `/agents/orchestration/CommandInterpreter.cpp` parses sovereign commands and
 4. **Recovery**: Fallback to `/recovery/` hooks if execution fails.
 
 This architecture permanently differentiates SigmaOS as the sole AI-native Sovereign OS.
-

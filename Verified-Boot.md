@@ -22,7 +22,7 @@ To ensure the **Sovereignty** of the lattice, SigmaOS implements a multi-stage c
 
 SigmaOS utilizes **Lattice-Based Shard Verification (LBSV)** to protect against future quantum computing threats. This ensures that even with a quantum advantage, an attacker cannot forge system shards or bypass security gates.
 
-### Key Algorithms:
+### Key Algorithms
 
 - **Kyber**: Used for secure key encapsulation during lattice sync.
 
@@ -50,5 +50,4 @@ The `SovereignInit` shard enforces a strict boot policy:
 
 ---
 
-### Verified boot is the foundation of digital sovereignty.
-
+### Verified boot is the foundation of digital sovereignty

@@ -1,6 +1,6 @@
 ﻿# Î£ SIGMAOS: THE SOVEREIGN INDUSTRIAL SINGULARITY (v15.0 Zenith)
 
-### SigmaOS is an industrial-grade, sovereign microkernel operating system built on the principle of Lattice Shard Autonomy.
+### SigmaOS is an industrial-grade, sovereign microkernel operating system built on the principle of Lattice Shard Autonomy
 
 The Zenith Singularity (v15.0) marks the definitive transition from a conceptual microkernel to a production-ready computational lattice, optimized for extreme environments, hardware-native performance, and post-quantum security.
 

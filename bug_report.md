@@ -1,6 +1,7 @@
 ﻿# bug report
 
 ---
+
 name: Bug Report
 about: Report a kernel shard malfunction or build failure
 title: "[BUG] <shard_name>: <short description>"
@@ -45,4 +46,3 @@ assignees: ''
 <!-- Paste sigma_log / serial output here -->
 
 ```
-

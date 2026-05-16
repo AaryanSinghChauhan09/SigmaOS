@@ -57,4 +57,3 @@ This manifest documents the definitive mapping of competitor USPs into the Sigma
 
 ---
 "Every feature of the old world is a shard in the new world."
-

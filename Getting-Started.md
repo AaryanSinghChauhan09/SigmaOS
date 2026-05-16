@@ -16,7 +16,7 @@ Before you begin, ensure you have the following installed:
 
 1
 
-git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
+git clone <https://github.com/AaryanSinghChauhan09/SigmaOS.git>
 cd SigmaOS
 
 1
@@ -75,4 +75,3 @@ node server.js
 ---
 
 1
-

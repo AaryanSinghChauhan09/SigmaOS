@@ -902,6 +902,7 @@ try {
 Compose a new dispatcher from the current dispatcher and the given interceptors.
 
 > _Notes_:
+>
 > - The order of the interceptors matters. The last interceptor will be the first to be called.
 
 > - It is important to note that the `interceptor` function should return a function that follows the `Dispatcher.dispatch` signature.
@@ -910,6 +911,7 @@ Compose a new dispatcher from the current dispatcher and the given interceptors.
 
 >
 > **Interceptor Stack Visualization:**
+>
 > ```
 > compose([interceptor1, interceptor2, interceptor3])
 >
@@ -1479,7 +1481,9 @@ new Headers({
   accept: '*/*'
 })
 ```
+
 or
+
 ```js
 new Map([
   ['content-length', '123'],
@@ -1489,7 +1493,9 @@ new Map([
   ['accept', '*/*']
 ])
 ```
+
 or
+
 ```js
 {
   *[Symbol.iterator] () {

@@ -23,4 +23,3 @@ The Sovereign Sandbox is directly integrated into the Zenith GUI and CLI, allowi
 ---
 
 1
-
