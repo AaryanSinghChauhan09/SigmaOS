@@ -139,6 +139,16 @@ Sovereign sync with GitHub/Dropbox/OneDrive/SigmaS3.
 
 **C API:** `cloudsync_init()`, `cloudsync_add()`, `cloudsync_execute()`
 
+### Sigma Clipboard Hub (`tools/sigma_clipboard.cpp`)
+
+Multi-clipboard manager.
+
+- Cross-shard copy/paste ring buffer
+- PQC-encrypted memory allocation
+- Access history of previous clipboard states
+
+**C API:** `clipboard_init()`, `clipboard_copy()`, `clipboard_list()`
+
 ---
 
 ## 🌍 Enterprise & Cloud
@@ -179,6 +189,16 @@ Combine multiple IoT sensor streams.
 
 **C API:** `fusion_init()`, `fusion_register()`, `fusion_update()`, `fusion_process()`, `fusion_dump()`
 
+### Sigma Edge ML (`tools/sigma_edge_ml.cpp`)
+
+Deploy lightweight ML models on IoT devices.
+
+- Hardware-accelerated ML inference
+- No external Python dependencies
+- Fast deterministic execution paths
+
+**C API:** `edgeml_init()`, `edgeml_load()`, `edgeml_infer()`
+
 ---
 
 ## 🔬 Experimental & Developer Tools
@@ -202,6 +222,16 @@ PQC and quantum workload simulation.
 - Tracks active circuits and simulated state vectors
 
 **C API:** `quantum_init()`, `quantum_load()`, `quantum_execute()`
+
+### Sigma Build Farm (`tools/sigma_build_farm.cpp`)
+
+Distributed shard compilation.
+
+- Parallel compilation across RDMA-connected nodes
+- Automatic horizontal scaling of compile tasks
+- Distributed dependency graph resolution
+
+**C API:** `buildfarm_init()`, `buildfarm_connect()`, `buildfarm_dispatch()`
 
 ---
 
