@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Σ SigmaOS Sovereign App Store</title>
+    <style>
+        :root {
+            --bg: #050505;
+            --accent: #00a0ff;
+            --text: #ffffff;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 40px;
+        }
+        .app-card {
+            background: var(--glass);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .app-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+        }
+        .btn {
+            background: var(--accent);
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+        .badge {
+            background: rgba(0, 160, 255, 0.2);
+            color: var(--accent);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Σ Sovereign App Store</h1>
+        <div>Lattice Node: Zenith-v15.0</div>
+    </header>
+
+    <div class="grid">
+        <div class="app-card">
+            <h3>Sovereign Browser</h3>
+            <p>Air-gapped, PQC-encrypted web navigation shard.</p>
+            <span class="badge">Lattice-Native</span>
+            <button class="btn">Install</button>
+        </div>
+        <div class="app-card">
+            <h3>Sigma Office</h3>
+            <p>Industrial suite for DICOM, BIM, and Legal drafting.</p>
+            <span class="badge">AppImage</span>
+            <button class="btn">Install</button>
+        </div>
+        <div class="app-card">
+            <h3>Lattice Node Manager</h3>
+            <p>GUI orchestrator for distributed shard replication.</p>
+            <span class="badge">Shard</span>
+            <button class="btn">Install</button>
+        </div>
+        <div class="app-card">
+            <h3>Zenith Music</h3>
+            <p>Spatial audio engine with MIDI lattice interop.</p>
+            <span class="badge">Flatpak</span>
+            <button class="btn">Install</button>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.onclick = () => {
+                const appName = btn.parentElement.querySelector('h3').innerText;
+                alert(`Σ Initiating sigma-pkg install for: ${appName}\nVerifying PQC Signatures...`);
+            }
+        });
+    </script>
+</body>
+</html>
