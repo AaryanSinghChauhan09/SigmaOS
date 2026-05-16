@@ -11,26 +11,32 @@ graph TD
     C -->|Encrypted| D[TCP/IP Stack]
     C -->|Unencrypted| D
     D --> E[Sovereign HAL]
-    E --> F[Hardware NIC]
-```
+    E --> F[Hardware NIC
 
-## Features
-- **TCP/IP Stack**: Full IPv4 (and future IPv6) implementation.
+
+
+
+
+ **TCP/IP Stack**: Full IPv4 (and future IPv6) implementation.
 - **Secure Sockets**: Built-in integration with the Post-Quantum Cryptography (PQC) engine for default-encrypted packet transmission.
 - **Hot-swappable**: The network driver and stack can be restarted or updated without rebooting the kernel.
 
 ## API Examples
 
-### Creating a Socket
-```c
+### Creating a Socke
+
+c
 int fd;
 sigma_status status = SovereignNetworkShard::getInstance().socket_create(AF_INET, SOCK_STREAM, 0, &fd);
 if (status == SIGMA_OK) {
     sigma_log("Socket successfully created.");
-}
-```
 
-### Binding to Port
-```c
-SovereignNetworkShard::getInstance().socket_bind(fd, 0x7F000001, 8080);
-```
+
+
+
+### Binding to Por
+
+c
+SovereignNetworkShard::getInstance().socket_bind(fd, 0x7F000001, 8080)
+
+

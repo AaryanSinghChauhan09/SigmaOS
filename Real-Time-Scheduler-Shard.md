@@ -13,11 +13,13 @@ flowchart LR
     C -->|Idle| F[Idle Loop]
     D --> G[CPU Execution]
     E --> G
-    F --> G
-```
+    F --> 
 
-## Features
-- **Deterministic Latency**: Guarantees O(1) task switching time.
+
+
+
+
+ **Deterministic Latency**: Guarantees O(1) task switching time.
 - **AI Telemetry Hooks**: Automatically detects infinite loops or stalled tasks.
 - **Priority Bands**: IDLE, NORMAL, HIGH, and REALTIME_CRITICAL.
 
@@ -32,5 +34,6 @@ void my_rtos_task() {
 }
 
 sigma_u32 task_id;
-SovereignSchedulerShard::getInstance().spawn_task(my_rtos_task, TaskPriority::REALTIME_CRITICAL, &task_id);
-```
+SovereignSchedulerShard::getInstance().spawn_task(my_rtos_task, TaskPriority::REALTIME_CRITICAL, &task_id)
+
+

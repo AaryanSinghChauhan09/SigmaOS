@@ -12,11 +12,13 @@ graph TD
     B --> E{NVMe Raw}
     C --> F[Sovereign HAL]
     D --> F
-    E --> F
-```
+    E --> 
 
-## Features
-- **Lattice FS (LFS)**: A custom, atomic file system designed to prevent corruption during unexpected shutdowns.
+
+
+
+
+ **Lattice FS (LFS)**: A custom, atomic file system designed to prevent corruption during unexpected shutdowns.
 - **Legacy Support**: `mount()` operations for FAT32 and EXT2 partitions.
 - **NVMe Awareness**: Direct Memory Access (DMA) hooks for extreme throughput.
 
@@ -30,5 +32,6 @@ if (status == SIGMA_OK) {
     char buffer[512];
     SovereignStorageShard::getInstance().file_read(fd, buffer, 512);
     SovereignStorageShard::getInstance().file_close(fd);
-}
-```
+
+
+
