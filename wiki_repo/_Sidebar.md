@@ -26,7 +26,9 @@
 
 - [Sovereign Principles](SOVEREIGN_PRINCIPLES)
 
-## ðŸš€ Strategic Vision
+## 🚀 Strategic Vision
+
+- [Competitive Analysis (vs Linux)](Competitive-Analysis)
 
 - [Linux Competitive Edge](Linux-Competitive-Edge)
 
