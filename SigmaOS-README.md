@@ -1,4 +1,4 @@
-# S SigmaOS: The Sovereign Computational Lattice
+﻿# S SigmaOS: The Sovereign Computational Lattice
 
 > **"Sovereignty is the ultimate efficiency."**
 > The world's first industrial-grade microkernel designed for total digital autonomy, post-quantum resilience, and Indian industrial compliance.
@@ -11,11 +11,15 @@ SigmaOS is not an operating system; it is a **Shard Lattice**. We have abandoned
 
 ### ?? Key USPs (The Sigma Advantage)
 
-*   **PQC-Native (NIST FIPS 203/204)**: Integrated Kyber-1024 and Dilithium-5 at Ring-0.
-*   **Shard Isolation**: 600+ hot-swappable kernel shards with zero-latency IPC.
-*   **Amnesic Memory**: Secure zeroing of all sensitive buffers via `sigma_secure_memset`.
-*   **S-INDIA Compliant**: Native engines for GST (Act 2017) and Income Tax (FY 2024-25).
-*   **Zero-Trust NetStack**: Hardware-level packet auditing and DPI firewalling.
+-   **PQC-Native (NIST FIPS 203/204)**: Integrated Kyber-1024 and Dilithium-5 at Ring-0.
+
+-   **Shard Isolation**: 600+ hot-swappable kernel shards with zero-latency IPC.
+
+-   **Amnesic Memory**: Secure zeroing of all sensitive buffers via `sigma_secure_memset`.
+
+-   **S-INDIA Compliant**: Native engines for GST (Act 2017) and Income Tax (FY 2024-25).
+
+-   **Zero-Trust NetStack**: Hardware-level packet auditing and DPI firewalling.
 
 ---
 
@@ -43,10 +47,15 @@ sigma> pqc status           # Audit Post-Quantum Crypto health
 ## ??? Architecture: The 600-Shard Lattice
 
 SigmaOS decomposes the traditional kernel into specialized, isolated shards:
+
 - **`S-MM`**: Sovereign Memory Manager (Buddy-Allocator)
+
 - **`S-SCHED`**: Predictive Multi-Priority Scheduler
+
 - **`S-NET`**: Zero-Trust Network Stack
+
 - **`S-FS`**: Sovereign Distributed Filesystem (VFS)
+
 - **`S-INDIA`**: Industrial Professional Finance Suite
 
 ---
@@ -70,9 +79,13 @@ make test            # Run industrial CI/CD battery
 
 | Feature | SigmaOS | Linux | Windows |
 | :--- | :--- | :--- | :--- |
+
 | **Kernel** | Shard Lattice | Monolithic | Hybrid |
+
 | **Crypto** | PQC-Native | Add-on | Add-on |
+
 | **Trust** | Zero-Trust | Implicit | Implicit |
+
 | **Legal** | Native India | External | External |
 
 ---

@@ -1,70 +1,57 @@
-# PROFILES
+﻿# SIGMAOS: PROFESSION PROFILE LATTICE
 
-1
+## The Profile Paradigm
 
-SigmaOS adopts a highly specialized, intent-driven OS model through its **Profession Profiles**. Instead of a generic desktop environment, the OS dynamically adapts its UI, underlying kernel policies, toolchain, and shortcuts based on the active profession profile.
+SigmaOS Zenith v15.0 introduces **modular profession profiles**. Each profile is a cryptographically-attested "shard bundle" that pre-configures the kernel, userland, and toolchain for a specific industrial role.
 
-1
+---
 
-The repository's `/profiles/` directory structure dictates the available configurations:
+## Available Profiles (v15.0 Stable)
 
-1
+### [General Purpose] (New)
 
-1
+- **Industrial Suite**: `ZENITH_DESKTOP v1.0` (One-Click)
 
-1
+- **Kernel Shards**: `S-FWM`, `S-PANEL`, `S-EXPLORER`, `S-MEDIA`
 
-Each directory contains:
+- **UX Model**: **Floating-Window / Mouse-Driven** (Intuitive Absorption)
 
-1
+- **USP**: "Install and Play" accessibility for non-industrial users.
 
-1
+### [AI Researcher]
 
-1
+- **Industrial Suite**: `AI_LAB v2.0` (One-Click)
 
-1
+- **Kernel Shards**: `S-CUDA`, `S-ROCm`, `S-NNFS`, `S-TENSOR`
 
-1
+- **UX Model**: Tiling / Keyboard-Heavy (Industrial Efficiency)
 
-1
+- **USP**: Zero-copy lattice inference; Sub-millisecond tensor orchestration.
 
-1
+### [Cybersecurity Analyst]
 
-1
+- **Industrial Suite**: `CYBER_HUNT v3.1` (One-Click)
 
-1
+- **Kernel Shards**: `S-KALI`, `S-MAP`, `S-AUDIT`, `S-FORENSIC`
 
-1
+- **UX Model**: Hybrid Tiling (Security Orchestration)
 
-1
+- **USP**: Silicon-level forensic auditing; PQC-sealed packet injection.
 
-1
+### [Data Scientist]
 
-1
+- **Industrial Suite**: `DATA_NEXUS v1.5` (One-Click)
 
-1
+- **Kernel Shards**: `S-PANDAS`, `S-JULIA`, `S-R`, `S-DS`
 
-1
+- **UX Model**: Tiling / Scientific Dashboard
 
-1
+- **USP**: High-performance telemetry sharding; Lattice data streaming.
 
-1
+---
 
-1
+## ðŸ›  Shard Orchestration
 
-1
+Profession profiles are Dilithium-5 attested. Switching profiles re-configures the **Sovereign Window Manager** and **Lattice Memory** in real-time.
 
-1
-
-1
-
-1
-
-1. **Create a new folder** under `/profiles/` (e.g., `/profiles/architect/`).
-2. **Add `config.json`**: Define the profession name and active status.
-
-3. **Link Tools**: Add symlinks to binaries in `/profiles/architect/shortcuts/`.
-4. **Define Tools**: Write `/profiles/architect/tools.md` explaining the workflow.
-
-5. **Restart Context Manager**: Run `agent.task run` and the OS will automatically adapt layout and quotas.
-
+*"SigmaOS is the single source of truth for every user persona."*

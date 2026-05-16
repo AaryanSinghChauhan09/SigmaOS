@@ -1,23 +1,27 @@
-# Installation
+﻿# Installation
 
-# 🚀 SigmaOS Installation Guide
+# ðŸš€ SigmaOS Installation Guide
 
 Welcome to the SigmaOS Installation Guide. This document provides a step-by-step procedure to deploy the SigmaOS Sovereign Lattice onto physical hardware or a virtualized environment.
 
 ---
 
-## 💻 Supported Hardware
+## ðŸ’» Supported Hardware
 
 | Platform | Support Tier | Notes |
 | :--- | :--- | :--- |
+
 | **Raspberry Pi 5 (BCM2712)** | Tier 1 (Optimized) | Full silicon-level hardware acceleration. |
+
 | **Raspberry Pi 4 (BCM2711)** | Tier 1 (Supported) | Primary development target. |
+
 | **x86_64 Systems (Intel/AMD)** | Tier 2 (Stable) | Generic drivers for UEFI systems. |
+
 | **RISC-V Generic** | Experimental | Basic kernel boot only. |
 
 ---
 
-## ⚡ Quick Deployment (Physical Hardware)
+## âš¡ Quick Deployment (Physical Hardware)
 
 1. **Download the Official Image**
    Download the latest `sigmaos_aarch64.img` from the GitHub Release page.
@@ -33,7 +37,7 @@ Welcome to the SigmaOS Installation Guide. This document provides a step-by-step
 
 ---
 
-## 🔬 Virtualization (QEMU)
+## ðŸ”¬ Virtualization (QEMU)
 
 If you want to test SigmaOS without physical hardware, use the QEMU target.
 
@@ -52,7 +56,7 @@ If you want to test SigmaOS without physical hardware, use the QEMU target.
 
 ---
 
-## 🌓 Dual-Boot Configuration
+## ðŸŒ“ Dual-Boot Configuration
 
 The `SovereignPartitionManager` supports scanning existing GPT partitions and bridging with systemd-boot.
 
@@ -72,12 +76,14 @@ The `SovereignPartitionManager` supports scanning existing GPT partitions and br
 
 ---
 
-## 🎯 Post-Installation
+## ðŸŽ¯ Post-Installation
 
 Upon first boot, the **Onboarding Wizard** will launch to:
 
 - Detect your hardware and apply **Smart Defaults**.
+
 - Prompt for your **Profession Profile** (Lawyer, Doctor, Engineer, etc.).
+
 - Configure **Verified Boot** and PQC security levels.
 
 ---

@@ -1,4 +1,4 @@
-# Competitive Gaps Analysis
+﻿# Competitive Gaps Analysis
 
 1
 

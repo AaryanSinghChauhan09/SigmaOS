@@ -1,4 +1,4 @@
-# security/isolation
+﻿# security/isolation
 
 Process Isolation Module.
 

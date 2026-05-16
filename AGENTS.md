@@ -1,23 +1,28 @@
-# AGENTS
+﻿# AGENTS
 
-# 🤖 Autonomous Agents: The Intelligence Layer
+# ðŸ¤– Autonomous Agents: The Intelligence Layer
 
 SigmaOS replaces traditional background daemons and systemd services with **Autonomous Agents**. These agents are self-healing, goal-oriented shards that orchestrate the system based on the **Context Manager**.
 
 ---
 
-## 🏛️ Agent Hierarchy
+## ðŸ›ï¸ Agent Hierarchy
 
 The agent ecosystem is modularized into specialized tiers:
+
 1. **Governance Agents**: Enforce security policies and resource quotas.
+
 2. **Maintenance Agents**: Perform self-healing, log rotation, and cache purging.
+
 3. **Observation Agents**: Monitor silicon health and network entropy.
+
 4. **Interface Agents**: Suggest workflows and optimize the Zenith UI.
+
 5. **Bridge Agents**: Manage legacy compatibility (e.g., Linux translation).
 
 ---
 
-## 🏗️ Design Patterns
+## ðŸ—ï¸ Design Patterns
 
 ### 1. Goal-Based Execution
 
@@ -25,7 +30,7 @@ Agents are not just scripts; they are given "Intents" (e.g., "Minimize latency f
 
 ### 2. Event-Driven Communication
 
-All agents communicate via the **Sovereign Event Bus**. This ensures loose coupling—an agent can be swapped or updated without affecting the rest of the lattice.
+All agents communicate via the **Sovereign Event Bus**. This ensures loose couplingâ€”an agent can be swapped or updated without affecting the rest of the lattice.
 
 ### 3. Self-Healing Watchdogs
 
@@ -33,7 +38,7 @@ Each agent is monitored by a **Watchdog Shard**. If an agent crashes or consumes
 
 ---
 
-## 🛠️ Developer SDK
+## ðŸ› ï¸ Developer SDK
 
 Developers can add new agents by subclassing `AgentBase`.
 

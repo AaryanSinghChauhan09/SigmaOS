@@ -1,4 +1,4 @@
-# perf/scheduler
+﻿# perf/scheduler
 
 Pluggable scheduling algorithms.
 

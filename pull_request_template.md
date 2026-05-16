@@ -1,46 +1,59 @@
-# pull request template
+﻿# PULL REQUEST TEMPLATE
 
-1
+---
+name: Pull Request
+about: Submit a new Sovereign Shard or bug fix
+---
 
-<!-- What does this PR do? One paragraph max. -->
+# Pull Request
 
-1
+## Summary
 
-1
+<!-- One-line description of what this PR does -->
 
-1
+## Type
 
-1
+- [ ] New Shard
 
-1
+- [ ] Bug Fix
 
-1
+- [ ] Documentation Update
 
-1
+- [ ] GitHub Actions / CI improvement
 
-1
+## Closes
 
-1
+<!-- Reference the ROADMAP.md milestone, IDEAS_BACKLOG.md item, or issue number -->
 
-1
+Closes #
 
-1
+## Shard Checklist (New Shards Only)
 
-1
+- [ ] C++ OOP Singleton with `getInstance()`
 
-1
+- [ ] `extern "C"` wrappers for all public functions
 
-1
+- [ ] Registered in `SovereignUSR` via `usr_register_shard()`
 
-1
+- [ ] `cppcheck` passes with zero warnings
 
-1
+- [ ] Wiki page created or updated in `SigmaOS.wiki/`
 
-Closes # <!-- issue number -->
+- [ ] `IDEAS_BACKLOG.md` or `MISSING_COMPONENTS.md` updated
 
-1
+## Bug Fix Checklist
 
-1
+- [ ] Root cause identified and documented
 
-1
+- [ ] Regression test described
+
+- [ ] No new `cppcheck` warnings introduced
+
+## Testing
+
+<!-- Describe how you tested this change -->
+
+## Screenshots / Serial Output
+
+<!-- Paste sigma_log output or screenshots if applicable -->
 

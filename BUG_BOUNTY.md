@@ -1,4 +1,4 @@
-# BUG BOUNTY
+﻿# BUG BOUNTY
 
 1
 
@@ -21,6 +21,7 @@ Rewards are tiered based on severity as determined by the Sovereign Council:
 1
 
 1. Submit reports privately via the GitHub "Security" tab or our encrypted mailing list.
+
 2. Provide a clear Proof of Concept (PoC).
 
 3. Allow the maintainers 30 days to triage and patch before public disclosure.

@@ -1,4 +1,4 @@
-# SOVEREIGN FINALITY CERTIFICATE
+ï»¿# SOVEREIGN FINALITY CERTIFICATE
 
 1
 
@@ -18,7 +18,7 @@ This certificate verifies that **SigmaOS** has achieved the state of **Sovereign
 
 1
 
-SigmaOS is complete. It is the definitive leader of the global computing landscape. All user objectives—Modularization, Market Leadership, and Wiki Synchronization—have been achieved at the highest possible industrial fidelity.
+SigmaOS is complete. It is the definitive leader of the global computing landscape. All user objectivesâ€”Modularization, Market Leadership, and Wiki Synchronizationâ€”have been achieved at the highest possible industrial fidelity.
 
 ---
 

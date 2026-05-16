@@ -1,60 +1,47 @@
-# Security Policy
+﻿<!-- BEGIN MICROSOFT SECURITY.MD V0.0.7 BLOCK -->
 
-## Supported Versions
+## Security
 
-| Version | Supported |
-|---------|-----------|
-| v1.2.5-BEYOND (main) | ✅ Active |
-| v1.1.0-APEX-SINGULARITY | ⚠️ Critical fixes only |
-| < v1.0 | ❌ No longer supported |
+Microsoft takes the security of our software products and services seriously, which includes all source code repositories managed through our GitHub organizations, which include [Microsoft](https://github.com/Microsoft), [Azure](https://github.com/Azure), [DotNet](https://github.com/dotnet), [AspNet](https://github.com/aspnet), [Xamarin](https://github.com/xamarin), and [our GitHub organizations](https://opensource.microsoft.com/).
 
-## Reporting a Vulnerability
+If you believe you have found a security vulnerability in any Microsoft-owned repository that meets [Microsoft's definition of a security vulnerability](https://aka.ms/opensource/security/definition), please report it to us as described below.
 
-### Please do NOT report security vulnerabilities via public GitHub Issues.
+## Reporting Security Issues
 
-To report a security vulnerability in SigmaOS:
+### Please do not report security vulnerabilities through public GitHub issues.
 
-1. **Email**: [Sovereign-OS0305@gmail.com](mailto:Sovereign-OS0305@gmail.com)
-2. **Or**: Open a private [Security Advisory](https://github.com/Sovereign-OS/SigmaOS/security/advisories/new) on GitHub
+Instead, please report them to the Microsoft Security Response Center (MSRC) at [https://msrc.microsoft.com/create-report](https://aka.ms/opensource/security/create-report).
 
-3. **Include**:
+If you prefer to submit without logging in, send email to [secure@microsoft.com](mailto:secure@microsoft.com).  If possible, encrypt your message with our PGP key; please download it from the [Microsoft Security Response Center PGP Key page](https://aka.ms/opensource/security/pgpkey).
 
-   * A description of the vulnerability
-   * Steps to reproduce (PoC if possible)
+You should receive a response within 24 hours. If for some reason you do not, please follow up via email to ensure we received your original message. Additional information can be found at [microsoft.com/msrc](https://aka.ms/opensource/security/msrc). 
 
-   * The affected shard(s) or component
-   * Potential impact assessment
+Please include the requested information listed below (as much as you can provide) to help us better understand the nature and scope of the possible issue:
 
-4. **Response time**: We aim to acknowledge reports within **72 hours** and provide a fix timeline within **7 days**
+- Type of issue (e.g. buffer overflow, SQL injection, cross-site scripting, etc.)
 
-## Security Architecture
+- Full paths of source file(s) related to the manifestation of the issue
 
-SigmaOS enforces sovereign security through:
+- The location of the affected source code (tag/branch/commit or direct URL)
 
-* **Capability-Based IPC (S-Zircon)**: All inter-shard communication uses unforgeable capability handles
-* **Hardware-Backed Isolation**: Each suite runs in isolated shard domains with hardware compartmentalization
+- Any special configuration required to reproduce the issue
 
-* **Neural Firewall (S08_Security)**: AI-driven anomaly detection at the kernel level
-* **Zero-Trust Network (S07_Network)**: All mesh communications use HMAC-authenticated gossip
+- Step-by-step instructions to reproduce the issue
 
-* **Privacy Shard (S31_Privacy)**: Native Tor routing and amnesic memory for sensitive operations
-* **Quantum-Resistant Design**: Post-quantum cryptography planned for Phase 7 (CRYSTALS-Kyber)
+- Proof-of-concept or exploit code (if possible)
 
-## Scope
+- Impact of the issue, including how an attacker might exploit the issue
 
-The following are **in scope** for security reports:
+This information will help us triage your report more quickly.
 
-* Kernel privilege escalation via shard boundaries
-* Memory corruption in `suites/S01_Genesis/` (core kernel)
+If you are reporting for a bug bounty, more complete reports can contribute to a higher bounty award. Please visit our [Microsoft Bug Bounty Program](https://aka.ms/opensource/security/bounty) page for more details about our active programs.
 
-* Bypass of capability-based access controls
-* Cryptographic weaknesses in Lattice Mesh (S33) HMAC implementation
+## Preferred Languages
 
-* Buffer overflows in any `sigma_*` LibC function
+We prefer all communications to be in English.
 
-The following are **out of scope**:
+## Policy
 
-* Issues in userland shards that don't affect kernel integrity
-* Performance degradation without security impact
+Microsoft follows the principle of [Coordinated Vulnerability Disclosure](https://aka.ms/opensource/security/cvd).
 
-* Issues requiring physical hardware access
+<!-- END MICROSOFT SECURITY.MD BLOCK -->

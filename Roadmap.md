@@ -1,38 +1,49 @@
-# Σ SigmaOS: Industrial Evolution Roadmap
+﻿# SigmaOS Industrial Roadmap: The Zenith Singularity
 
-The path to the **Zenith Singularity** is defined by the absorption of proven industrial patterns into the sovereign lattice.
+This roadmap outlines the evolution of SigmaOS from its microkernel roots into a global sovereign computational lattice.
 
-## ✅ Phase 1: Foundational Convergence (COMPLETE)
+## Phase 1: Horizon (v10.0 - v14.0) [COMPLETED]
 
-- [x] **Microkernel Parity**: Interrupt handling, GDT/IDT, and basic paging established.
-- [x] **Foundational Logging**: `sigma_printf` and bare-metal serial I/O ignited.
-- [x] **Build System Finality**: Aligned `Makefile` and `SHARDS.manifest` for industrial deployment.
+- Implementation of the Sovereign Shard Lattice.
 
-## ✅ Phase 2: Functional Maturity (COMPLETE)
+- Integration of PQC Security (Kyber/Dilithium).
 
-- [x] **Industrial Drivers**: PS/2 Keyboard, VESA LFB, ATA Disk, and Intel e1000 NIC integrated.
-- [x] **Persistence Layer**: S-EXT2 filesystem implementation for zettabyte-scale storage.
-- [x] **Connectivity Layer**: S-NET stack with POSIX-compliant Sockets API.
+- Establishment of the Asynchronous Shard Ignition (ASI) boot sequence.
 
-## ✅ Phase 3: Userland & Ecosystem (COMPLETE)
+## Phase 2: Zenith Singularity (v15.0) [CURRENT]
 
-- [x] **Shell v2.5**: `sigma_sh` with shard-pipe orchestration and redirection.
-- [x] **Coreutils**: Industrial `ls`, `cat`, `echo`, and `cp` primitives.
-- [x] **Package Management**: `SigmaPkg` with PQC-signed shard orchestration.
+- **Industrial Hardening**: Demand paging, CFS scheduling, and NUMA awareness.
 
-## 🚀 Phase 4: Industrial Singularity (ACTIVE)
+- **Hardware Maturity**: USB 3.0 (XHCI), NVMe, 802.11ax Wi-Fi, and HDA Audio.
 
-- [x] **Zenith Compositor**: High-performance industrial GUI orchestration.
-- [x] **AppArmor MAC**: Shard-level Mandatory Access Control for industrial hardening.
-- [x] **Sovereign Hypervisor**: Hardware-assisted virtualization for guest shards.
-- [x] **Web-Lattice**: Running the SigmaOS kernel natively in the browser (S-WEB).
+- **Userland Parity**: Full CoreUtils, scripting, and industrial GUI toolkit (S-GUI).
 
-## 🌌 Beyond Singularity (ACTIVE)
+- **Virtualization**: Type-1 Hypervisor (S-HYP) and Industrial Containers (S-CONT).
 
-- [x] **Quantum-Hardened Persistence**: Kyber-1024 encrypted shard snapshots (Implemented S-SNAP/S-PQC).
-- [x] **Neural Lattice**: AI-orchestrated shard hot-swapping and self-healing (Implemented S-NEURAL/S-HOTSWAP).
-- [x] **Heterogeneous Deployment**: Launching on ARM64 and RISC-V silicon (Implemented S-ARCH Abstraction).
+### ðŸ›¤ï¸ Unified Development Roadmap (v15.0.0+)
 
-Detailed specifications: [Beyond-Singularity.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Beyond-Singularity.md)
+- **Baseline Toolset Manifest**: Automate bundling of `sigma-bleach`, `sigma-timeshift`, and creative suites into every branch.
 
-*"Sovereignty is a continuous process of evolution."*
+- **Unified Package Management**: Implement dependency resolution and version pinning in `sigma-pkg`.
+
+- **Design & UI**: Adopt **Qt Sovereign** and a unified design language across App and Browser formats.
+
+- **Cross-Branch Testing**: Build CI/CD pipelines for automated stress tests and real-time benchmark publishing.
+
+- **Documentation**: Complete the Kernel Handbook and edition-specific troubleshooting guides.
+
+- **Release Discipline**: Transition to Semantic Versioning (v1.x.y) and PQC-signed ISO distribution.
+
+## Phase 3: Omniscience (v16.0 - v20.0) [FUTURE]
+
+- **Neural Lattice**: AI-orchestrated shard hot-swapping and self-healing.
+
+- **Global Mesh**: Decentralized PQC-sealed networking between sovereign nodes.
+
+- **Quantum-Hardened Persistence**: Kyber-1024 encrypted shard snapshots as the primary storage model.
+
+## Phase 4: Singularity (v21.0+)
+
+- Total silicon sovereignty achieved.
+
+- 600-shard maximum capacity reached across the global lattice.
