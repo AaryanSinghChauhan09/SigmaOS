@@ -1,12 +1,12 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/core/sigma_types.h"
-#include "../../../include/hal/sigma_hal.h"
-#include "../../../include/sigma_boot.h"
-#include "../../../include/core/SigmaOOP.hpp"
-#include "../../../include/net/sigma_network.h"
-#include "../../../include/storage/sigma_storage.h"
-#include "../../../include/core/sigma_scheduler.h"
-#include "../../../include/telemetry/sigma_telemetry.h"
+#include "../../../../include/sigma_log.h"
+#include "../../../../include/core/sigma_types.h"
+#include "../../../../include/hal/sigma_hal.h"
+#include "../../../../include/sigma_boot.h"
+#include "../../../../include/core/SigmaOOP.hpp"
+#include "../../../../include/net/sigma_network.h"
+#include "../../../../include/storage/sigma_storage.h"
+#include "../../../../include/core/sigma_scheduler.h"
+#include "../../../../include/telemetry/sigma_telemetry.h"
 
 namespace SigmaOS {
 namespace Kernel {
