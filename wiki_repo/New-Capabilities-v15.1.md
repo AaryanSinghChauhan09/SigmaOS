@@ -17,6 +17,16 @@ Live visualization of inter-shard dependency health.
 
 **C API:** `inspector_init()`, `inspector_register()`, `inspector_update()`, `inspector_dump()`
 
+### Sigma Log Visualizer (`tools/sigma_log_visualizer.cpp`)
+
+Interactive TUI charts for system logs.
+
+- Aggregates kernel ring buffer and shard telemetry
+- Supports CPU usage lines, memory footprints, and error density heatmaps
+- Zero-dependency graph generation
+
+**C API:** `logvis_init()`, `logvis_render()`
+
 ### Sigma Kernel Tuner (`tools/sigma_tuner.cpp`)
 
 Live kernel parameter adjustment without reboots.
@@ -73,6 +83,26 @@ Curated open-source gaming hub with direct hardware access.
 - Tracks local vs cloud installations
 
 **C API:** `gamelib_init()`, `gamelib_launch()`, `gamelib_list()`
+
+### Sigma VR Studio (`tools/sigma_vr_studio.cpp`)
+
+VR workspace for productivity.
+
+- Sovereign spatial compositor for HMDs
+- Stereo 4K at 120Hz deterministic tracking
+- Spawn and recenter floating application windows
+
+**C API:** `vrstudio_init()`, `vrstudio_connect()`, `vrstudio_spawn()`, `vrstudio_recenter()`
+
+### Sigma GPU Profiler (`tools/sigma_gpu_profiler.cpp`)
+
+Real-time graphics performance analysis.
+
+- Silicon-direct VRAM and shader pipeline telemetry
+- Thermal throttling threshold warnings
+- Lightweight lock-free monitoring
+
+**C API:** `gpuprof_init()`, `gpuprof_update()`, `gpuprof_dump()`
 
 ### Sigma Audio Mixer (`tools/sigma_audio_mixer.cpp`)
 
@@ -148,6 +178,30 @@ Combine multiple IoT sensor streams.
 - Supports up to 64 concurrent sensor inputs
 
 **C API:** `fusion_init()`, `fusion_register()`, `fusion_update()`, `fusion_process()`, `fusion_dump()`
+
+---
+
+## 🔬 Experimental & Developer Tools
+
+### Sigma Test Lab (`tools/sigma_test_lab.cpp`)
+
+Automated regression and fuzzing suite.
+
+- High-throughput IPC fuzzer
+- Sovereign memory leak detector
+- Continuous integration of kernel/shard boundaries
+
+**C API:** `testlab_init()`, `testlab_run_suite()`, `testlab_report()`
+
+### Sigma Quantum Simulator (`tools/sigma_quantum_simulator.cpp`)
+
+PQC and quantum workload simulation.
+
+- Hardware-accelerated tensor network simulation for qubits
+- Validates post-quantum cryptography algorithms
+- Tracks active circuits and simulated state vectors
+
+**C API:** `quantum_init()`, `quantum_load()`, `quantum_execute()`
 
 ---
 
