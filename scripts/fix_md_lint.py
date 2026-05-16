@@ -25,6 +25,9 @@ def fix_markdown(content):
     # MD004: Unordered list style (Force -)
     content = re.sub(r'^[ \t]*\* ', r'- ', content, flags=re.MULTILINE)
     
+    # MD030: Spaces after list markers
+    content = re.sub(r'^([ \t]*[-*+]|[0-9]+\.)[ \t]{2,}', r'\1 ', content, flags=re.MULTILINE)
+    
     return content
 
 for root, dirs, files in os.walk("."):

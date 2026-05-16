@@ -15,9 +15,6 @@ void SovereignAISchedEngine::init() {
 }
 
 void SovereignAISchedEngine::predictWorkload(sigma_u32 process_id) {
-    /* NPWO (Neural Predictive Workload Orchestration) Algorithm
-     * Uses lightweight on-device ML to predict process resource needs. */
-    
     sigma_log_info("[S-AISCHED] NPWO: Analyzing workload patterns for PID %u...", process_id);
     this->prediction_count++;
     
@@ -36,7 +33,6 @@ void SovereignAISchedEngine::predictWorkload(sigma_u32 process_id) {
 
 void SovereignAISchedEngine::runAdaptiveRebalancing() {
     sigma_log_info("[S-AISCHED] [AI] Initiating Dynamic Adaptive Workload Rebalancing...");
-    // AI Logic: Dynamically rebalance workloads across cores and shards
     sigma_log_info("[S-AISCHED] [AI] Rebalancing Core 0 -> Core 3 (Shard S04 affinity optimized).");
     sigma_log_info("[S-AISCHED] [AI] Workload distribution finalized. Efficiency: +15%.");
 }

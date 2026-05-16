@@ -3,6 +3,8 @@
 #include "../include/sigma_recovery.h"
 #include "../include/sigma_iot.h"
 #include "../include/sigma_gaming.h"
+#include "../include/sigma_optimizer.h"
+#include "../include/sigma_ui_toolkit.h"
 #include "../include/SigmaOOP.hpp"
 
 /**
@@ -20,6 +22,8 @@ void print_help() {
     sigma_log_info("  recover   Shard recovery, snapshots, and forensics.");
     sigma_log_info("  iot       GPIO management and sensor polling.");
     sigma_log_info("  game      GPU boost and controller management.");
+    sigma_log_info("  opt       System-wide performance optimization.");
+    sigma_log_info("  ui        Theme and accessibility management.");
     sigma_log_info("  telemetry Query shard health and performance metrics.");
 }
 
@@ -53,6 +57,24 @@ int main(int argc, char* argv[]) {
             gaming_enable_boost(0, GAME_LEVEL_ULTRA);
         } else if (sigma_strcmp(cmd.c_str(), "controllers") == 0) {
             gaming_detect_controllers();
+        }
+    } else if (sigma_strcmp(subsystem.c_str(), "opt") == 0 && argc > 2) {
+        SigmaString cmd(argv[2]);
+        if (sigma_strcmp(cmd.c_str(), "profile") == 0 && argc > 3) {
+            opt_set_profile(OPTIMIZER_PROFILE_PERFORMANCE); // Simplified
+        } else if (sigma_strcmp(cmd.c_str(), "tune") == 0 && argc > 3) {
+            opt_tune_workload(argv[3]);
+        } else if (sigma_strcmp(cmd.c_str(), "metrics") == 0) {
+            opt_report_efficiency();
+        }
+    } else if (sigma_strcmp(subsystem.c_str(), "ui") == 0 && argc > 2) {
+        SigmaString cmd(argv[2]);
+        if (sigma_strcmp(cmd.c_str(), "theme") == 0 && argc > 3) {
+            ui_set_theme(THEME_DARK_MODERN); // Simplified
+        } else if (sigma_strcmp(cmd.c_str(), "scaling") == 0 && argc > 3) {
+            ui_set_scaling(1.5f); // Simplified
+        } else if (sigma_strcmp(cmd.c_str(), "accessibility") == 0) {
+            ui_enable_magnifier(true);
         }
     } else if (sigma_strcmp(subsystem.c_str(), "telemetry") == 0) {
         gaming_report_gpu_load();

@@ -20,33 +20,33 @@ This roadmap formalizes the remaining gaps between SigmaOS Zenith and legacy com
 
 ### Phase 1: Core Stabilisation (COMPLETE)
 
--   [x] QEMU cross-arch boot validation.
+- [x] QEMU cross-arch boot validation.
 
--   [x] Implementation of core regression pipelines.
+- [x] Implementation of core regression pipelines.
 
--   [x] Resolution of all `@current_problems`.
+- [x] Resolution of all `@current_problems`.
 
--   [x] Automated Wiki synchronization initialization.
+- [x] Automated Wiki synchronization initialization.
 
 ### Phase 2: Utilities Parity (CURRENT)
 
--   [ ] Forensic Snapshot Diff Engine implementation.
+- [ ] Forensic Snapshot Diff Engine implementation.
 
--   [ ] Education Profile (Classroom management shards).
+- [ ] Education Profile (Classroom management shards).
 
--   [ ] Gaming Optimization Shards (GPU/Input).
+- [ ] Gaming Optimization Shards (GPU/Input).
 
--   [ ] IoT/Sensor Toolkit for embedded silicon.
+- [ ] IoT/Sensor Toolkit for embedded silicon.
 
 ### Phase 3: Advanced Automation (PLANNED)
 
--   [ ] Sovereign App Store GUI development.
+- [ ] Sovereign App Store GUI development.
 
--   [ ] sigma-cli + Telemetry CLI expansion.
+- [ ] sigma-cli + Telemetry CLI expansion.
 
--   [ ] Adaptive ML scheduling algorithms.
+- [ ] Adaptive ML scheduling algorithms.
 
--   [ ] Theme engine & Accessibility toolkit completion.
+- [ ] Theme engine & Accessibility toolkit completion.
 
 ## ⚙️ Contribution Principles
 

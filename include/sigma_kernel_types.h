@@ -19,16 +19,16 @@ typedef signed char        sigma_i8;
 typedef signed short       sigma_i16;
 typedef signed int         sigma_i32;
 typedef signed long long   sigma_i64;
+typedef unsigned long long sigma_usize;
+typedef long long          sigma_isize;
 typedef sigma_usize        sigma_size_t;
 typedef sigma_isize        sigma_ssize_t;
 typedef sigma_i8           sigma_s8;
 typedef sigma_i16          sigma_s16;
 typedef sigma_i32          sigma_s32;
 typedef sigma_i64          sigma_s64;
-typedef unsigned long long sigma_usize;
-typedef long long          sigma_isize;
-typedef sigma_u64                sigma_paddr_t;   /* physical address */
-typedef sigma_u64                sigma_vaddr_t;   /* virtual  address */
+typedef sigma_u64          sigma_paddr_t;   /* physical address */
+typedef sigma_u64          sigma_vaddr_t;   /* virtual  address */
 typedef int                sigma_bool;
 
 #define SIGMA_TRUE   1
