@@ -3,6 +3,10 @@
 #include "../../../include/hal/sigma_hal.h"
 #include "../../../include/sigma_boot.h"
 #include "../../../include/core/SigmaOOP.hpp"
+#include "../../../include/net/sigma_network.h"
+#include "../../../include/storage/sigma_storage.h"
+#include "../../../include/core/sigma_scheduler.h"
+#include "../../../include/telemetry/sigma_telemetry.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -28,6 +32,12 @@ public:
     void igniteLattice() {
         this->m_current_stage = SIGMA_BOOT_STAGE_KERNEL;
         sigma_log_info("[BOOT] SSB: Commencing Lattice Ignition...");
+        
+        // Initialize Core Shards
+        SigmaOS::Storage::SovereignStorageShard::getInstance().init();
+        SigmaOS::Net::SovereignNetworkShard::getInstance().init();
+        SigmaOS::Core::SovereignSchedulerShard::getInstance().init();
+        SigmaOS::Telemetry::SovereignTelemetryShard::getInstance().init();
         
         sigma_u32 step = m_fast_boot ? 50u : 1u;
         for (sigma_u32 i = 1u; i <= 600u; i += step) {
