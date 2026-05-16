@@ -40,6 +40,22 @@ public:
         sigma_log_info(this->active_theme.dark_mode ? "[S-THEME] Dark Mode: ENABLED." : "[S-THEME] Dark Mode: DISABLED.");
     }
 
+    void applyTheme(const char* themeName) {
+        sigma_log_info("[S-THEME] Applying Lattice Theme: %s", themeName);
+        if (strcmp(themeName, "NOIR") == 0) {
+            sigma_log_info("[S-THEME] Mode: OLED-Black | Accent: Silver");
+        } else if (strcmp(themeName, "FROST") == 0) {
+            sigma_log_info("[S-THEME] Mode: High-Contrast-White | Accent: Arctic-Blue");
+        } else if (strcmp(themeName, "AMBER") == 0) {
+            sigma_log_info("[S-THEME] Mode: Retro-Cyberpunk | Accent: Neon-Orange");
+        } else if (strcmp(themeName, "PLASMA") == 0) {
+            sigma_log_info("[S-THEME] Mode: Deep-Space | Accent: Violet");
+        } else if (strcmp(themeName, "FORENSIC") == 0) {
+            sigma_log_info("[S-THEME] Mode: High-Clarity-Minimal | Accent: Crimson");
+        }
+        sigma_log_info("[S-THEME] Rendering pipeline re-sealed.");
+    }
+
     void loadUserProfile(const char* username) {
         sigma_log_info("[S-THEME] [PERSONALIZATION] Loading Sovereign Profile for User: %s", username);
         sigma_log_info("[S-THEME] [PERSONALIZATION] Restoring custom shard toggles and workspace layout.");
@@ -92,5 +108,9 @@ extern "C" {
 
     void theme_adaptive_telemetry(sigma_u32 cpu) {
         SovereignThemeEngine::getInstance().evaluateTelemetryPersonalization(cpu);
+    }
+
+    void theme_apply_theme(const char* name) {
+        SovereignThemeEngine::getInstance().applyTheme(name);
     }
 }

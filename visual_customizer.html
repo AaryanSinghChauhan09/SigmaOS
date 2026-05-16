@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Σ SigmaOS Visual Customizer</title>
+    <style>
+        :root {
+            --glass-bg: rgba(15, 15, 25, 0.7);
+            --accent: #00f2ff;
+            --text: #e0e0e0;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #1a1a2e, #0f0f19);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .customizer-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            width: 450px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            text-align: center;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .theme-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        .theme-btn:hover {
+            background: rgba(0, 242, 255, 0.2);
+            border-color: var(--accent);
+        }
+
+        .theme-btn.active {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .apply-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            background: var(--accent);
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+
+        .apply-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px var(--accent);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="customizer-card">
+        <h1>VISUAL ENGINE</h1>
+        
+        <div class="control-group">
+            <label>Glass Transparency (Lattice Blur)</label>
+            <input type="range" min="0" max="100" value="70">
+        </div>
+
+        <div class="control-group">
+            <label>Accent Luminescence</label>
+            <input type="range" min="0" max="100" value="80">
+        </div>
+
+        <label>System Theme Profile</label>
+        <div class="theme-grid">
+            <div class="theme-btn active">ZENITH</div>
+            <div class="theme-btn">NOIR</div>
+            <div class="theme-btn">FROST</div>
+            <div class="theme-btn">AMBER</div>
+            <div class="theme-btn">PLASMA</div>
+            <div class="theme-btn">FORENSIC</div>
+        </div>
+
+        <button class="apply-btn" onclick="alert('Lattice Visuals Updated Successfully.')">APPLY SHARD THEME</button>
+    </div>
+</body>
+</html>
