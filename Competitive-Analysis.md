@@ -47,6 +47,8 @@ SigmaOS is designed for **Absolute Non-Equivalence** — a sovereign computation
 | ARM/IoT | RPi-Distro | GPIO/Sensors | Event-driven GPIO | ✅ **FIXED** |
 | Gaming | SteamOS | GPU Opt | Dynamic GPU scheduler | ✅ **FIXED** |
 | Performance | Clear Linux | Auto-Opt | Telemetry-driven optimiser | ✅ **FIXED** |
+| AI/ML | TensorFlow/PyTorch | ML Inference | PQC-Secured ML Engine | ✅ **FIXED** |
+| Cloud | OpenStack/Ceph | Dist. Storage | Shard-based Cloud Nexus | ✅ **FIXED** |
 | Recovery | RescueZilla | Snapshots | Snapshot diff engine | ✅ **FIXED** |
 | Containers | Fedora CoreOS | Orchestration | Shard orchestrator | ✅ **FIXED** |
 | Rolling | Arch / Solus | Delta Updates | Incremental shard updater | ✅ **FIXED** |
