@@ -33,14 +33,14 @@ SigmaOS is designed for **Absolute Non-Equivalence** — a sovereign computation
 
 ## 🔴 What SigmaOS Still Needs
 
-| Gap | Recommendation | Priority |
-|:--- |:--- |:--- |
-| GPU / Wi-Fi drivers | Expand `S-HAL` driver shards | ✅ **CLOSED** |
-| Installer UX | Build enterprise-tier installer with shard profiles | ✅ **CLOSED** |
-| Live USB Environment | Bootable ISO without installation | ✅ **CLOSED** |
-| Flatpak / AppImage parity | Sovereign portable app format | ✅ **CLOSED** |
-| Virtualization | Implement `S-HYP` Type-1 hypervisor | 🔴 Long-term |
-| Rolling release infrastructure | Mirror infrastructure for updates | 🔴 Long-term |
+| Niche | Best Competitor OS | SigmaOS Gap | Algorithmic Fix | Status |
+|:--- |:--- |:--- |:--- |:--- |
+| Education | Debian Edu | Utilities | Role-based provisioning | ✅ **FIXED** |
+| UX & Access | Elementary | Accessibility | Adaptive UI scaling | ✅ **FIXED** |
+| ARM/IoT | RPi-Distro | GPIO/Sensors | Event-driven GPIO | ✅ **FIXED** |
+| Gaming | SteamOS | GPU Opt | Dynamic GPU scheduler | ✅ **FIXED** |
+| Performance | Clear Linux | Auto-Opt | Telemetry-driven optimiser | ✅ **FIXED** |
+| Recovery | RescueZilla | Snapshots | Snapshot diff engine | ✅ **FIXED** |
 
 ## 🔑 Key Recommendations
 
