@@ -134,19 +134,55 @@
             margin-bottom: 20px;
             display: flex;
             overflow: hidden;
+            transition: all 0.3s ease;
         }
 
         .partition { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
         .part-efi { background: #555; width: 5%; border-right: 1px solid #000; }
         .part-swap { background: #333; width: 10%; border-right: 1px solid #000; }
         .part-root { background: var(--accent); color: #000; width: 85%; }
+        
+        /* Dual Boot Option */
+        .part-windows { background: #0078D7; color: #fff; width: 45%; border-right: 1px solid #000;}
+        .part-sigma-dual { background: var(--accent); color: #000; width: 40%; }
+
+        .partition-option {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.2s ease;
+        }
+        
+        .partition-option:hover {
+            border-color: var(--accent);
+            background: rgba(0, 242, 255, 0.05);
+        }
+        
+        .partition-option.selected {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .partition-option h4 { font-size: 16px; margin-bottom: 5px; color: #fff; }
+        .partition-option p { font-size: 13px; margin-bottom: 0; }
 
         /* Controls */
         .controls {
             display: flex;
-            justify-content: flex-end;
-            gap: 15px;
+            justify-content: space-between;
+            align-items: center;
             margin-top: auto;
+        }
+        
+        .controls-right {
+            display: flex;
+            gap: 15px;
         }
 
         button {
@@ -160,6 +196,7 @@
 
         .btn-secondary { background: var(--card-bg); color: #fff; border: 1px solid var(--border); }
         .btn-primary { background: var(--accent); color: #000; box-shadow: 0 10px 30px var(--accent-glow); }
+        .btn-ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
 
         button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 
@@ -169,9 +206,9 @@
         .step-feature-box { background: var(--card-bg); padding: 25px; border-radius: 16px; border: 1px solid var(--border); }
         .step-feature-title { color: var(--accent); margin-bottom: 10px; }
         .step-feature-list { color: var(--text-dim); font-size: 14px; list-style: none; }
-        .partition-box { margin-bottom: 30px; }
-        .partition-label { display: block; margin-bottom: 10px; font-weight: 700; }
-        .tip-box { background: rgba(0,242,255,0.05); border: 1px solid var(--accent-glow); padding: 20px; border-radius: 12px; }
+        .partition-box { margin-top: 20px; }
+        .partition-label { display: block; margin-bottom: 10px; font-weight: 700; color: var(--accent); }
+        .tip-box { background: rgba(0,242,255,0.05); border: 1px solid var(--accent-glow); padding: 20px; border-radius: 12px; margin-top: 20px;}
         .tip-title { color: var(--accent); font-weight: 700; }
         .tip-content { color: var(--text-dim); font-size: 14px; }
         .log-footer { margin-top: 50px; font-family: 'JetBrains Mono'; font-size: 12px; color: #444; }
@@ -204,25 +241,45 @@
                     <li>• Zero-Trust AppArmor Profiles</li>
                 </ul>
             </div>
+            <div class="tip-box" style="margin-top: 30px;">
+                <span class="tip-title">LIVE USB MODE:</span>
+                <span class="tip-content"> Want to test SigmaOS without installing? Click "Try Live USB" below to boot directly into the workspace.</span>
+            </div>
         </div>
 
         <!-- Step 4: Partitions -->
         <div class="view" id="v4">
-            <h1>Partitioning</h1>
-            <p>Select how you would like to allocate space on your silicon disk. SigmaOS recommends the industrial layout for automatic snapshot integrity.</p>
+            <h1>Enterprise Partitioning</h1>
+            <p>Select how you would like to allocate space on your silicon disk. SigmaOS ensures sovereign integrity via guided provisioning.</p>
+            
+            <div class="partition-option selected" id="opt-erase" onclick="selectPartition('erase')">
+                <div>
+                    <h4>Erase Entire Disk</h4>
+                    <p>Deletes all programs, documents, and operating systems. Installs pure SigmaOS.</p>
+                </div>
+            </div>
+            
+            <div class="partition-option" id="opt-dual" onclick="selectPartition('dual')">
+                <div>
+                    <h4>Install Alongside Windows (Dual-Boot)</h4>
+                    <p>Preserves Windows Boot Manager and dynamically shrinks partitions safely.</p>
+                </div>
+            </div>
+            
+            <div class="partition-option" id="opt-manual" onclick="selectPartition('manual')">
+                <div>
+                    <h4>Manual Partitioning</h4>
+                    <p>For advanced engineers. Create, resize, or mount sovereign shards manually.</p>
+                </div>
+            </div>
             
             <div class="partition-box">
-                <label class="partition-label">Proposed Layout: /dev/nvme0n1</label>
-                <div class="disk-map">
+                <label class="partition-label" id="layout-label">Proposed Layout: /dev/nvme0n1 (Erase Disk)</label>
+                <div class="disk-map" id="disk-map-view">
                     <div class="partition part-efi">EFI</div>
                     <div class="partition part-swap">SWAP</div>
                     <div class="partition part-root">SIGMA_LATTICE (Ext4/Journaled)</div>
                 </div>
-            </div>
-
-            <div class="tip-box">
-                <span class="tip-title">PRO TIP:</span>
-                <span class="tip-content"> SovereignRollback shards require at least 20GB of unallocated space for atomic state snapshots.</span>
             </div>
         </div>
 
@@ -240,8 +297,13 @@
         </div>
 
         <div class="controls" id="ctrl">
-            <button class="btn-secondary" onclick="nextStep(-1)">Back</button>
-            <button class="btn-primary" onclick="nextStep(1)">Next</button>
+            <div id="live-btn-container">
+                <button class="btn-ghost" onclick="location.href='zenith.html'">Try Live USB</button>
+            </div>
+            <div class="controls-right">
+                <button class="btn-secondary" onclick="nextStep(-1)">Back</button>
+                <button class="btn-primary" onclick="nextStep(1)">Next</button>
+            </div>
         </div>
     </div>
 </div>
@@ -249,6 +311,39 @@
 <script>
     let current = 1;
     const total = 6;
+
+    function selectPartition(type) {
+        document.getElementById('opt-erase').classList.remove('selected');
+        document.getElementById('opt-dual').classList.remove('selected');
+        document.getElementById('opt-manual').classList.remove('selected');
+        
+        document.getElementById(`opt-${type}`).classList.add('selected');
+        
+        const map = document.getElementById('disk-map-view');
+        const label = document.getElementById('layout-label');
+        
+        if (type === 'erase') {
+            label.innerText = 'Proposed Layout: /dev/nvme0n1 (Erase Disk)';
+            map.innerHTML = `
+                <div class="partition part-efi">EFI</div>
+                <div class="partition part-swap">SWAP</div>
+                <div class="partition part-root">SIGMA_LATTICE (Ext4/Journaled)</div>
+            `;
+        } else if (type === 'dual') {
+            label.innerText = 'Proposed Layout: /dev/nvme0n1 (Dual-Boot)';
+            map.innerHTML = `
+                <div class="partition part-efi">EFI</div>
+                <div class="partition part-windows">WINDOWS (NTFS)</div>
+                <div class="partition part-sigma-dual">SIGMA_LATTICE</div>
+                <div class="partition part-swap">SWAP</div>
+            `;
+        } else if (type === 'manual') {
+            label.innerText = 'Proposed Layout: Manual Provisioning';
+            map.innerHTML = `
+                <div class="partition" style="width:100%; background: #222; color: #888;">Select partitions...</div>
+            `;
+        }
+    }
 
     function nextStep(dir) {
         if (current === 6 && dir === 1) return;
@@ -259,6 +354,13 @@
         current += dir;
         if (current < 1) current = 1;
         if (current > total) current = total;
+
+        // Hide Live USB button after step 1
+        document.getElementById('live-btn-container').style.display = current === 1 ? 'block' : 'none';
+
+        // Fake skipping steps 2, 3, 5 for demo purposes
+        if ((current === 2 || current === 3 || current === 5) && dir === 1) current++;
+        if ((current === 2 || current === 3 || current === 5) && dir === -1) current--;
 
         document.getElementById(`v${current}`).classList.add('active');
         document.getElementById(`s${current}`).classList.add('active');
