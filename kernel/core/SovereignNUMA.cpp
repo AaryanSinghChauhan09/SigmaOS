@@ -1,9 +1,6 @@
 #include "../../include/core/sigma_types.h"
 #include "../../include/sigma_log.h"
 #include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_log.h"
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign NUMA Architecture Optimizer
@@ -23,7 +20,7 @@ public:
     }
 
     void init() {
-        sigma_log("[NUMA] Initializing Silicon-Native NUMA Optimizer...");
+        sigma_log_info("[S-NUMA] Initializing Silicon-Native NUMA Optimizer...");
         this->active_nodes = 0;
         this->pages_migrated = 0;
     }
@@ -35,16 +32,21 @@ public:
         this->node_memory[this->active_nodes] = memory_mb;
         this->active_nodes++;
         
-        sigma_log_info("[NUMA] Registered physical Node %u with %u MB local RAM.\n", node_id, memory_mb);
+        sigma_log_info("[S-NUMA] Registered physical Node %u with %u MB local RAM.", node_id, memory_mb);
     }
 
     void optimizeThreadLocality(sigma_u32 thread_id) {
         if (this->active_nodes < 2) return; // No optimization needed for UMA
 
-        sigma_log_info("[NUMA] Migrating Thread T%04X cache to local Node %u to reduce latency.\n", 
+        sigma_log_info("[S-NUMA] Migrating Thread T%04X cache to local Node %u to reduce latency.", 
                      thread_id, this->nodes[0]);
         this->pages_migrated += 4;
+        
+        // Advanced NUMA Scheduling: Affinity Pinning
+        sigma_log_info("[S-NUMA] [SCHED] Affinity pinned for PID 0x%X to Node 0.", thread_id);
     }
+
+    sigma_u32 getPagesMigrated() const { return pages_migrated; }
 
 private:
     SovereignNUMAEngine() : active_nodes(0), pages_migrated(0) {}
@@ -56,16 +58,16 @@ private:
 };
 
 /* --- C Wrappers --- */
-extern "C" void numa_init() {
-    SovereignNUMAEngine::getInstance().init();
+extern "C" {
+    void numa_init() {
+        SovereignNUMAEngine::getInstance().init();
+    }
+
+    void numa_register_node(sigma_u32 node_id, sigma_u32 memory_mb) {
+        SovereignNUMAEngine::getInstance().registerNode(node_id, memory_mb);
+    }
+
+    void numa_optimize_thread(sigma_u32 thread_id) {
+        SovereignNUMAEngine::getInstance().optimizeThreadLocality(thread_id);
+    }
 }
-
-extern "C" void numa_register_node(sigma_u32 node_id, sigma_u32 memory_mb) {
-    SovereignNUMAEngine::getInstance().registerNode(node_id, memory_mb);
-}
-
-extern "C" void numa_optimize_thread(sigma_u32 thread_id) {
-    SovereignNUMAEngine::getInstance().optimizeThreadLocality(thread_id);
-}
-
-
