@@ -139,6 +139,16 @@ Sovereign sync with GitHub/Dropbox/OneDrive/SigmaS3.
 
 **C API:** `cloudsync_init()`, `cloudsync_add()`, `cloudsync_execute()`
 
+### Sigma Archive Suite (`tools/sigma_archive_suite.cpp`)
+
+Compression and encryption utilities.
+
+- PQC-encrypted archives
+- zstd-equivalent compression speeds
+- Zero-dependency extraction
+
+**C API:** `archive_init()`, `archive_compress()`, `archive_extract()`
+
 ### Sigma Clipboard Hub (`tools/sigma_clipboard.cpp`)
 
 Multi-clipboard manager.
@@ -175,6 +185,15 @@ RDMA-native shard orchestration across distributed nodes.
 
 **C API:** `cluster_init()`, `cluster_add_node()`, `cluster_deploy()`, `cluster_report()`
 
+### Sigma Policy Engine (`tools/sigma_policy_engine.cpp`)
+
+Enforce enterprise rules across the lattice.
+
+- Zero-trust RBAC and immutable policy evaluation
+- Checks permissions dynamically across kernel and shards
+
+**C API:** `policy_init()`, `policy_load()`, `policy_check()`
+
 ---
 
 ## 🌐 IoT & Embedded
@@ -198,6 +217,25 @@ Deploy lightweight ML models on IoT devices.
 - Fast deterministic execution paths
 
 **C API:** `edgeml_init()`, `edgeml_load()`, `edgeml_infer()`
+
+### Sigma Robotics Planner (`tools/sigma_robotics_planner.cpp`)
+
+Pathfinding and control utilities.
+
+- Deterministic real-time kinematics
+- A* pathfinding algorithms for motor vectors
+- Obstacle avoidance engine
+
+**C API:** `robotics_init()`, `robotics_set_target()`, `robotics_step()`
+
+### Sigma Automotive Diagnostics (`tools/sigma_auto_diag.cpp`)
+
+CAN bus + OBD integration.
+
+- Deterministic real-time vehicle telemetry parsing
+- Requests standard OBD-II PIDs directly from hardware
+
+**C API:** `autodiag_init()`, `autodiag_connect()`, `autodiag_read_obd()`
 
 ---
 
@@ -251,6 +289,16 @@ Built-in profiles:
 | zen | sigma-zen | zen-mode |
 
 **C API:** `workspace_init()`, `workspace_load()`, `workspace_list()`
+
+### Sigma Accessibility Hub (`tools/sigma_accessibility.cpp`)
+
+One-click accessibility presets.
+
+- Deep hardware/UI integration for screen readers
+- Triggers compositor high contrast and color inversion
+- Magnifier zoom logic built into the display server
+
+**C API:** `access_init()`, `access_reader()`, `access_contrast()`, `access_magnify()`
 
 ---
 

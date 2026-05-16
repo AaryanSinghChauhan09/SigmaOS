@@ -10340,7 +10340,10 @@ SigmaOS/
 │   ├── problem_tracker.py
 │   ├── reconcile_shards.py
 │   ├── release_auto.py
+│   ├── sigma_accessibility.cpp
+│   ├── sigma_archive_suite.cpp
 │   ├── sigma_audio_mixer.cpp
+│   ├── sigma_auto_diag.cpp
 │   ├── sigma_backup.cpp
 │   ├── sigma_build_farm.cpp
 │   ├── sigma_clipboard.cpp
@@ -10354,7 +10357,9 @@ SigmaOS/
 │   ├── sigma_inspector.cpp
 │   ├── sigma_latency.cpp
 │   ├── sigma_log_visualizer.cpp
+│   ├── sigma_policy_engine.cpp
 │   ├── sigma_quantum_simulator.cpp
+│   ├── sigma_robotics_planner.cpp
 │   ├── sigma_secure_boot.cpp
 │   ├── sigma_sensor_fusion.cpp
 │   ├── sigma_test_lab.cpp
