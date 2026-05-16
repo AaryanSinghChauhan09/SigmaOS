@@ -17,13 +17,13 @@ SigmaOS Zenith v15.0 has transitioned into the **Beyond Singularity** phase, imp
 
 ## ðŸ” 1. Quantum-Hardened Persistence
 
-### Shards:
+### Shards
 
 - `kernel/core/security/SovereignPQCManager.cpp` (`S-PQC`)
 
 - `kernel/core/fs/SovereignSnap.cpp` (`S-SNAP`)
 
-### Implementation:
+### Implementation
 
 - **Lattice-Based Cryptography**: Integration of **Kyber-1024** for key encapsulation and **Dilithium-5** for signature verification.
 
@@ -33,13 +33,13 @@ SigmaOS Zenith v15.0 has transitioned into the **Beyond Singularity** phase, imp
 
 ## ðŸ§  2. Neural Lattice (AI Orchestration)
 
-### Shards:
+### Shards
 
 - `kernel/core/automation/SovereignNeuralOrchestrator.cpp` (`S-NEURAL`)
 
 - `kernel/core/automation/SovereignHotSwap.cpp` (`S-HOTSWAP`)
 
-### Implementation:
+### Implementation
 
 - **Predictive Healing**: `S-NEURAL` monitors shard telemetry (CPU, Mem, Errors) and uses a lightweight ML model to predict failures before they occur.
 
@@ -49,13 +49,13 @@ SigmaOS Zenith v15.0 has transitioned into the **Beyond Singularity** phase, imp
 
 ## âš™ï¸ 3. Heterogeneous Deployment
 
-### Shards:
+### Shards
 
 - `kernel/core/hal/SovereignArchARM64.cpp`
 
 - `kernel/core/hal/SovereignArchRISCV.cpp`
 
-### Implementation:
+### Implementation
 
 - **Silicon Sovereignty**: The kernel now supports ARM64 (PSCI/VMSAv8) and RISC-V (SBI/Sv39) through a unified `SovereignArch` abstraction.
 

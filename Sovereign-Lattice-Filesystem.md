@@ -4,11 +4,11 @@ The **Sovereign Lattice Filesystem (SLFS)** is the primary persistent storage la
 
 ## ðŸ› Architectural Principles
 
-1.  **Atomic State Snapshots**: Every write operation is tracked via the `SovereignRollbackShard`, allowing the kernel to restore the entire filesystem to a bit-perfect state within 2ms of a catastrophic crash.
+1. **Atomic State Snapshots**: Every write operation is tracked via the `SovereignRollbackShard`, allowing the kernel to restore the entire filesystem to a bit-perfect state within 2ms of a catastrophic crash.
 
-2.  **PQC-Hardened Integrity**: All blocks are checksummed and signed using Lattice-Based Cryptography (Dilithium-5), preventing data corruption or unauthorized manipulation at the silicon level.
+2. **PQC-Hardened Integrity**: All blocks are checksummed and signed using Lattice-Based Cryptography (Dilithium-5), preventing data corruption or unauthorized manipulation at the silicon level.
 
-3.  **Cross-Silicon Distribution**: Through integration with `SovereignVFS`, SLFS can transparently replicate critical professional data across multiple networked SigmaOS nodes.
+3. **Cross-Silicon Distribution**: Through integration with `SovereignVFS`, SLFS can transparently replicate critical professional data across multiple networked SigmaOS nodes.
 
 ## ðŸ›  File Operations (S-SDK)
 

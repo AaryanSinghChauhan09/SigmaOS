@@ -4,9 +4,9 @@ SigmaOS is an industrial-grade, sovereign microkernel operating system built on 
 
 ## 1. Absolute Non-Equivalence
 
-SigmaOS is fundamentally distinct from monolithic kernels (Linux, Windows, NT) and traditional microkernels (L4, Minix). 
+SigmaOS is fundamentally distinct from monolithic kernels (Linux, Windows, NT) and traditional microkernels (L4, Minix).
 
-### Key Differentiators:
+### Key Differentiators
 
 - **Lattice Shards**: Instead of a single kernel image, SigmaOS consists of 600+ independent, PQC-attested shards.
 

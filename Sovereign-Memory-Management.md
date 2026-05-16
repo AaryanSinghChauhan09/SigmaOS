@@ -6,21 +6,21 @@ The **Sovereign Memory Manager (S-MM)** is the high-performance paging and slab 
 
 S-MM operates on a dual-tier allocation strategy:
 
-1.  **Paging Tier (HugePages)**:
+1. **Paging Tier (HugePages)**:
 
--   Industrial identity mapping for core kernel shards.
+- Industrial identity mapping for core kernel shards.
 
--   2MB HugePage support for zero-latency memory access.
+- 2MB HugePage support for zero-latency memory access.
 
--   Post-quantum attested page table protection.
+- Post-quantum attested page table protection.
 
-2.  **Slab Tier (Industrial Caches)**:
+1. **Slab Tier (Industrial Caches)**:
 
--   Power-of-two slab caches (16B to 2KB).
+- Power-of-two slab caches (16B to 2KB).
 
--   Atomic free-list management for stable multitasking.
+- Atomic free-list management for stable multitasking.
 
--   Zero-fragmentation compaction via shard auditing.
+- Zero-fragmentation compaction via shard auditing.
 
 ## Implementation Details
 

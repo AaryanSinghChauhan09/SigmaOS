@@ -4,7 +4,7 @@ This document outlines the strict guidelines required to maintain the ultra-low 
 
 ## 1. IPC and Orchestration
 
-- **Minimize Context Switches**: Shards must batch IPC messages when communicating with the Sovereign Orchestrator. 
+- **Minimize Context Switches**: Shards must batch IPC messages when communicating with the Sovereign Orchestrator.
 
 - **Wait-Free Ring Buffers**: Utilize the `SigmaOS::SovereignRingBuffer` for all data streaming between shards instead of blocking synchronization primitives like mutexes.
 

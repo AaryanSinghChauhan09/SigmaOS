@@ -6,7 +6,7 @@ This page explains the core architectural logic, file relationships, and the "So
 
 SigmaOS is an **Industrial-Grade, AI-Native Sovereign Operating System**. It follows a **Modular Sharding** strategy to ensure stability, security, and hardware sovereignty.
 
-### Universal Principles:
+### Universal Principles
 
 - **Zero-Dependency**: No reliance on standard libraries (`libc`, `libstdc++`). All primitives are silicon-direct.
 
