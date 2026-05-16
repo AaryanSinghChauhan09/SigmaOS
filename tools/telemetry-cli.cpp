@@ -5,6 +5,7 @@
 #include "../include/sigma_ml.h"
 #include "../include/sigma_orchestrator.h"
 #include "../include/sigma_cloud.h"
+#include "../include/sigma_regression.h"
 #include "../include/SigmaOOP.hpp"
 
 /**
@@ -24,6 +25,7 @@ int main() {
     ml_report_acceleration_status();
     orch_report_cluster_health();
     cloud_report_cluster_stats();
+    regress_report_certification();
     
     sigma_log_info("Lattice Integrity: 100% [PQC-Verified]");
     sigma_log_info("Active Shards: 14 / 14");

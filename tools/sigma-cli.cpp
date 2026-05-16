@@ -11,6 +11,7 @@
 #include "../include/sigma_cloud.h"
 #include "../include/sigma_compliance.h"
 #include "../include/sigma_forensic.h"
+#include "../include/sigma_regression.h"
 #include "../include/SigmaOOP.hpp"
 
 /**
@@ -36,6 +37,7 @@ void print_help() {
     sigma_log_info("  cloud     Distributed storage and cluster stats.");
     sigma_log_info("  comply    Regulatory auditing and compliance.");
     sigma_log_info("  forensic  Silicon auditing and evidence preservation.");
+    sigma_log_info("  regress   Hardware regression and certification.");
     sigma_log_info("  telemetry Query shard health and performance metrics.");
 }
 
@@ -129,6 +131,13 @@ int main(int argc, char* argv[]) {
             forensic_enable_write_block(argv[3]);
         } else if (sigma_strcmp(cmd.c_str(), "audit") == 0) {
             forensic_analyze_lattice_integrity();
+        }
+    } else if (sigma_strcmp(subsystem.c_str(), "regress") == 0 && argc > 2) {
+        SigmaString cmd(argv[2]);
+        if (sigma_strcmp(cmd.c_str(), "run") == 0) {
+            regress_run_matrix();
+        } else if (sigma_strcmp(cmd.c_str(), "report") == 0) {
+            regress_report_certification();
         }
     } else if (sigma_strcmp(subsystem.c_str(), "telemetry") == 0) {
         gaming_report_gpu_load();
