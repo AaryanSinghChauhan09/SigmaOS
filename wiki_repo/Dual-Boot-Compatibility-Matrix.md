@@ -42,7 +42,7 @@ This matrix documents verified co-existence behavior between SigmaOS and other o
 
 ### Recommended GPT Partition Layout (UEFI Systems)
 
-```
+```text
 â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
 â”‚  Partition 1: EFI System (512MB)    â”‚ â† Shared with co-OS
 â”‚  Type: vfat  /dev/sdX1              â”‚
@@ -56,8 +56,7 @@ This matrix documents verified co-existence behavior between SigmaOS and other o
 â”‚  Partition 4: Co-OS Partition       â”‚ â† Windows/Linux
 â”‚  (Remainder of disk)                â”‚
 â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-```
-
+```text
 ---
 
 ## Known Conflicts & Mitigations

@@ -36,11 +36,11 @@ The scheduler is implemented in `kernel/core/system/SovereignScheduler.cpp`.
 
 S-SCHED is ignited during **Stage 5** of the **Asynchronous Shard Ignition (ASI)** plan. Core system threads spawned at boot include:
 
-1.  **Sovereign Shell (0x1001)**: The professional CLI interface.
+1. **Sovereign Shell (0x1001)**: The professional CLI interface.
 
-2.  **Sovereign Watchdog (0x2001)**: The lattice integrity guardian.
+2. **Sovereign Watchdog (0x2001)**: The lattice integrity guardian.
 
-3.  **Sovereign AI Shard (0x3001)**: Background neural compute.
+3. **Sovereign AI Shard (0x3001)**: Background neural compute.
 
 ---
 *Stay Sovereign.*

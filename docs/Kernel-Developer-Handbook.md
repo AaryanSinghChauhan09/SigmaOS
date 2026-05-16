@@ -24,8 +24,7 @@ SigmaOS uses a **microkernel-inspired shard lattice** where each subsystem is an
 
 All kernel shards MUST acquire locks in the following order to prevent deadlocks:
 
-```
-
+```text
 1. SovereignMemoryPool::mutex
 
 2. SovereignScheduler::runqueue_lock
@@ -33,17 +32,19 @@ All kernel shards MUST acquire locks in the following order to prevent deadlocks
 3. SovereignNetStack::socket_lock
 
 4. SovereignFS::inode_lock
-```
 
+```text
 **Violation** of this order will trigger a `SovereignWatchdog` panic.
 
 ### 2.2 Atomic Operations
 
 Prefer `__atomic_*` builtins over mutexes for counter updates:
-```cpp
-__atomic_fetch_add(&shard_refcount, 1, __ATOMIC_SEQ_CST);
-```
 
+```cpp
+
+__atomic_fetch_add(&shard_refcount, 1, __ATOMIC_SEQ_CST);
+
+```text
 ### 2.3 Formal Verification Checklist
 
 Before merging any concurrency-related change:

@@ -10,6 +10,7 @@ Welcome to the **Sovereign Professional Shard**. The App edition is the definiti
 
 3. **Provision**: Run the `SovereignPackage` manager to install your professional suite.
    ```bash
+
    s-pkg install dev-suite-zenith
    ```
 

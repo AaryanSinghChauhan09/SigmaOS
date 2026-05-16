@@ -8,6 +8,7 @@ Welcome to the **Sovereign Future Shard**. The Horizon edition is the bleeding-e
 
 2. **Build**: Run the industrial build orchestrator.
    ```powershell
+
    ./scripts/industrial_build.ps1
    ```
 

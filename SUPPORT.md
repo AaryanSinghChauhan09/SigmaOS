@@ -49,7 +49,7 @@ For mission-critical industrial deployments (Bio-Fab, Aerospace, Defense), profe
 
 A: SigmaOS enforces root-relative addressing. Ensure your compiler search path includes the project root.
 
-### Q: My PQC keys are not synchronizing.
+### Q: My PQC keys are not synchronizing
 
 A: Verify that the `SovereignPQCEngine` is initialized and the hardware RNG (RDRAND) is accessible.
 

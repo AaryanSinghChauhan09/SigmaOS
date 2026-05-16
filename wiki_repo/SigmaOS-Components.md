@@ -78,4 +78,4 @@ This page lists the industry-standard products and technologies absorbed into th
 
 ---
 
-### Stay Sovereign.
+### Stay Sovereign
