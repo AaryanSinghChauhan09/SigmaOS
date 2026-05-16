@@ -82,8 +82,8 @@ public:
             sigma_log("[NET] [WARN] Interface table full.");
             return;
         }
-        sigma_hardened_strcpy(this->iface_mac[this->interfaces_active], mac_addr, 18);
-        sigma_hardened_strcpy(this->iface_ip[this->interfaces_active],  ip_addr,  16);
+        sigma_strncpy(this->iface_mac[this->interfaces_active], mac_addr, 18);
+        sigma_strncpy(this->iface_ip[this->interfaces_active],  ip_addr,  16);
         this->interfaces_active++;
         sigma_log_info("[NET] Interface registered: MAC=%s IP=%s\n", mac_addr, ip_addr);
     }
