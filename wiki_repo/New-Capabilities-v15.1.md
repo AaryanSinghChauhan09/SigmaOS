@@ -74,6 +74,16 @@ Curated open-source gaming hub with direct hardware access.
 
 **C API:** `gamelib_init()`, `gamelib_launch()`, `gamelib_list()`
 
+### Sigma Audio Mixer (`tools/sigma_audio_mixer.cpp`)
+
+Sovereign sound routing and mixing.
+
+- Lock-free zero-copy audio pipeline
+- Deterministic mixing guarantees (no PulseAudio/PipeWire stutter)
+- Hardware-direct volume orchestration
+
+**C API:** `audio_init()`, `audio_register()`, `audio_set_vol()`, `audio_master_vol()`, `audio_list()`
+
 ---
 
 ## 🛠️ Everyday Utilities
@@ -88,6 +98,16 @@ Incremental PQC-encrypted snapshot backup system.
 - Full integrity verification before restore
 
 **C API:** `backup_init()`, `backup_create()`, `backup_restore()`, `backup_list()`
+
+### Sigma Cloud Sync (`tools/sigma_cloud_sync.cpp`)
+
+Sovereign sync with GitHub/Dropbox/OneDrive/SigmaS3.
+
+- End-to-End PQC Encryption before transport
+- Batch syncing across multiple heterogeneous providers
+- Zero-knowledge data orchestration
+
+**C API:** `cloudsync_init()`, `cloudsync_add()`, `cloudsync_execute()`
 
 ---
 
@@ -114,6 +134,20 @@ RDMA-native shard orchestration across distributed nodes.
 - Inspired by Fedora CoreOS + RancherOS orchestration principles
 
 **C API:** `cluster_init()`, `cluster_add_node()`, `cluster_deploy()`, `cluster_report()`
+
+---
+
+## 🌐 IoT & Embedded
+
+### Sigma Sensor Fusion (`tools/sigma_sensor_fusion.cpp`)
+
+Combine multiple IoT sensor streams.
+
+- Deterministic multiplexing of hardware inputs
+- Scaled Kalman/AHRS simulation framework
+- Supports up to 64 concurrent sensor inputs
+
+**C API:** `fusion_init()`, `fusion_register()`, `fusion_update()`, `fusion_process()`, `fusion_dump()`
 
 ---
 
