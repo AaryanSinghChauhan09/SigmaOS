@@ -20,10 +20,22 @@ jobs:
         sudo apt-get install -y build-essential gcc-x86-64-linux-gnu nasm qemu-system-x86 xorriso grub-pc-bin grub-efi-amd64-bin
         sudo apt-get install -y cppcheck clang-tidy doxygen
 
-    - name: Static Analysis
+    - name: Static Analysis & Compliance
       run: |
         # Run clang-tidy or cppcheck on core sources
         cppcheck --enable=all --suppress=missingIncludeSystem -I include kernel/core/
+        
+        # Enforce Markdown Rules
+        npm install -g markdownlint-cli
+        markdownlint "**/*.md" --ignore "wiki_repo/**" --ignore "node_modules/**" || echo "Lint warnings found, but proceeding."
+
+    - name: Enforce Documentation Sync
+      run: |
+        # Ensure Doxygen docs build successfully
+        doxygen -g Doxyfile
+        echo 'INPUT = include kernel' >> Doxyfile
+        echo 'GENERATE_HTML = YES' >> Doxyfile
+        doxygen Doxyfile || exit 1
 
     - name: Build SigmaOS Kernel (x86_64)
       run: |

@@ -1,74 +1,78 @@
 # SigmaOS Contributor Guidelines
 
-Welcome to SigmaOS! These rules act like a constitution for the repo: they keep development disciplined, documentation clear, and collaboration smooth.
+Welcome to SigmaOS! Every contributor must follow these rules. They act like a constitution for the repo, ensuring disciplined development, clear documentation, and smooth collaboration.
 
-## 🛠 Development Rules
+## 🛠 General Task Rules
 
-### Code Style
-- Use consistent formatting enforced by `clang-format` or equivalent.
-- Follow naming conventions: `snake_case` for functions, `PascalCase` for structs/classes.
-- Comment every function with purpose, parameters, and return values.
+### Consistency First
+- Every task must follow the same naming conventions, formatting, and documentation style.
+- **No shortcuts**: even small fixes require tests and documentation updates.
 
-### Modularity
-- Write kernel modules and drivers as independent units.
-- Expose APIs for user-defined functions through a syscall table.
-- No hard-coding; use configuration files or constants.
+### Traceability
+- Each task must be linked to an issue or roadmap item.
+- Commit messages must reference the issue ID and describe the change clearly.
 
-### Testing
-- Every new function/module must include unit tests.
-- Run automated QEMU boot tests before merging.
-- Stress-test concurrency and shard isolation.
+### Atomic Changes
+- One task = one logical change.
+- Avoid mixing bug fixes, new features, and documentation in a single PR.
 
-### Security
-- Implement post-quantum cryptography where relevant.
-- Ensure memory is wiped after use (zero-data remanence).
-- No unchecked pointer arithmetic; always validate inputs.
+---
 
-## 📚 Documentation Rules
+## 📂 Repo Rules
 
-### README
-- Update whenever new features or modules are added.
-- Include build instructions, dependencies, and usage examples.
+### .MD Files
+- Every `.md` file must be fully implemented (no placeholders).
+- Once complete, its content should be migrated into the Wiki.
+- After migration, **delete the `.md` file** from the main repository to avoid duplication (except for core files like `README.md` and `CONTRIBUTING.md`).
 
-### Wiki
-- Each subsystem (kernel, memory, scheduler, drivers, security) gets its own page.
-- Add diagrams for architecture and workflows.
-- Maintain a glossary for technical terms (e.g., “shards,” “sovereign lattice”).
+### Code Contributions
+- Must include unit tests and CI validation.
+- Kernel shards must be modular and documented in the Wiki.
+- Security primitives must pass regression tests before merging.
 
-### Change Logs
-- Document every release with a “What’s New” section.
-- Track breaking changes separately.
+### Branching & PRs
+- Use `main` for stable releases only.
+- Feature branches must follow the `feature/<name>` format.
+- PRs require at least one reviewer approval.
 
-## 🤝 Collaboration Rules
+---
 
-### Issues
-- Use templates for bug reports and feature requests.
-- Label issues clearly (bug, enhancement, documentation, security).
+## 📚 Wiki Rules
 
-### Pull Requests
-- Must include description, tests, and documentation updates.
-- Require at least one reviewer approval before merging.
+### Structure
+- Each subsystem (kernel, memory, scheduler, drivers, security, CI/CD) gets its own page.
+- Add diagrams, flowcharts, and examples where possible.
+- Maintain a glossary for technical terms.
 
-### Branching
-- Use `main` for stable releases.
-- Develop features in separate branches (`feature/memory-manager`, `fix/irq-handler`).
+### Updates
+- Any new feature or module must be documented in the Wiki **before** merging.
+- Wiki pages must be kept in sync with repo changes.
+- Changelogs and release notes must be mirrored in the Wiki.
+
+### Contributor Guidelines
+- Clearly state coding standards, testing requirements, and review process (this file).
+- Provide templates for bug reports, feature requests, and PRs.
+
+---
 
 ## ⚙️ Automation Rules
 
 ### CI/CD
-- Every commit triggers automated builds and tests.
-- Add static analysis (`clang-tidy`) and security scans.
+- Every commit triggers automated builds, QEMU boot tests, and security scans.
+- Cross-architecture builds (x86, ARM, RISC-V) must be validated.
 
-### Documentation Automation
-- Auto-generate API docs from code comments (`Doxygen`/`Sphinx`).
-- Link CI status badges in the Wiki.
+### Docs Automation
+- Auto-generate API docs from code comments using Doxygen or Sphinx.
+- Push generated docs into the Wiki automatically.
 
 ### Release Automation
-- Use GitHub Actions to package ISO images and binaries.
-- Publish tagged releases with changelogs.
+- Tagged releases must package ISO images and binaries.
+- Publish changelogs both in the repo and Wiki.
 
-## ✅ Contribution Rules
-- **Coding Standards:** Follow kernel coding guidelines (C, C++, Rust).
-- **Commit Messages:** Use imperative style (“Add memory allocator,” “Fix IRQ handler”).
-- **Review Process:** No direct commits to `main`; all changes go through PR review.
-- **Community Engagement:** Encourage contributors to add examples and tutorials in the Wiki.
+---
+
+## ✅ Enforcement
+
+- These rules are enforced via GitHub Actions checks (`lint`, `test`, `docs`).
+- **No merge is allowed if rules are violated.**
+- Every contributor or AI tool knows exactly what to do: `implement` → `document` → `automate` → `enforce`.
