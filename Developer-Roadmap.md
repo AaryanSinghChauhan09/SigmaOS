@@ -1,33 +1,29 @@
 # SigmaOS Developer Roadmap: The 100 Strategic Advancements
 
-The Zenith Singularity (v15.0) introduces a structured path toward 100 strategic advancements. Below is the actionable roadmap broken down by milestones.
+The Zenith Singularity (v15.0) introduces a structured path toward 100 strategic advancements. Below is the actionable roadmap broken down by transparent milestones.
 
-## Milestone 1: Core Architectural Stability (Months 1-3)
+## 🟢 Short-Term Priorities (Immediate)
+**Goal:** Establish hardware parity and core usability.
 1. **Lattice Initialization**: Stabilize `SovereignBootEngine` and multi-stage boot sequence.
 2. **Sovereign Memory Manager**: Implement `sigma_mmap` and O(1) slab allocator.
-3. **Interrupt Handling**: Fully map IDT and implement IRQ routing.
-4. **Basic Shard Isolation**: Ensure Ring 3 / Ring 0 transitions are secure.
-5. **PQC Cryptography Baseline**: Integrate Kyber-1024 for shard attestation.
+3. **Networking & Storage**: Implement the `S-NET` TCP/IP stack and `S-STOR` Native FS.
+4. **PQC Cryptography Baseline**: Integrate Kyber-1024 for shard attestation.
+5. **Basic Shard Isolation**: Ensure Ring 3 / Ring 0 transitions are secure.
 
-## Milestone 2: Hardware Orchestration (Months 4-6)
-6. **Sovereign HAL**: Abstract PCI, ACPI, and USB subsystems.
-7. **Storage Shards**: Implement NVMe and AHCI drivers.
-8. **Sovereign Filesystem**: Build the Lattice File System (LFS) with atomic commits.
-9. **Display Subsystem**: VESA graphics and hardware-accelerated compositor.
-10. **Network Stack**: Basic TCP/IP and socket primitives via `SigmaNetworkShard`.
+## 🟡 Mid-Term Priorities (6 - 12 Months)
+**Goal:** Expand CI/CD depth, real-hardware support, and professional ecosystems.
+6. **Cross-Architecture CI/CD**: Ensure x86_64, ARM64, and RISC-V builds are tested continuously.
+7. **Storage Shards Expansion**: Implement NVMe and AHCI drivers.
+8. **Security Regression Tests**: Automated cryptographic validation pipelines.
+9. **Display Subsystem**: VESA graphics and hardware-accelerated compositor (`Z-DESKTOP`).
+10. **Stress Testing Framework**: Automated concurrency and shard isolation testing.
 
-## Milestone 3: Ecosystem Expansion (Months 7-9)
-11. **Userland ABI**: Finalize `Z-SYSCALL` interface.
-12. **Sovereign App Store**: PQC-attested package delivery mechanism.
-13. **Zenith Desktop**: UI compositing with hardware acceleration.
-14. **Omni Shell**: Command-line interface with advanced piping.
-15. **Developer Tooling**: On-device compiler and debugger support.
+## 🔴 Long-Term Priorities (1 - 2 Years)
+**Goal:** Layer in AI telemetry, predictive behavior, and extreme scaling.
+11. **Smart Kernel Profiling**: AI models to detect anomalies in shard performance (e.g., memory leaks).
+12. **Predictive Failure Analysis**: Forecast shard crashes or bottlenecks before they occur.
+13. **Adaptive Scheduling**: AI-driven schedulers that learn workload patterns.
+14. **WASM Runtime**: Sandboxed WebAssembly execution directly in the microkernel.
+15. **Distributed Lattice**: Multi-node OS clustering across the network.
 
-## Milestone 4: Advanced Capabilities (Months 10-12)
-16. **WASM Runtime**: Sandboxed WebAssembly execution.
-17. **AI Telemetry**: ML-driven system resource optimization.
-18. **Distributed Lattice**: Multi-node OS clustering.
-19. **Real-Time Capabilities**: Hard-RTOS thread scheduling.
-20. **Zero-Trust Networking**: Built-in encrypted mesh networking.
-
-*(Remaining 80 advancements track parallel improvements across 600 specific industrial shards).*
+*(Remaining 85 advancements track parallel improvements across 600 specific industrial shards).*

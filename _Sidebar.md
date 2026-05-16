@@ -22,6 +22,8 @@
 
 - [Hardware Driver Shards](Driver-Shards)
 
+- [Security & PQC Shard](Security-Shard)
+
 - [Sovereign Principles](SOVEREIGN_PRINCIPLES)
 
 ## ðŸš€ Strategic Vision
