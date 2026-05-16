@@ -10342,9 +10342,12 @@ SigmaOS/
 │   ├── release_auto.py
 │   ├── sigma_audio_mixer.cpp
 │   ├── sigma_backup.cpp
+│   ├── sigma_build_farm.cpp
+│   ├── sigma_clipboard.cpp
 │   ├── sigma_cloud_sync.cpp
 │   ├── sigma_cluster.cpp
 │   ├── sigma_compliance_cli.cpp
+│   ├── sigma_edge_ml.cpp
 │   ├── sigma_energy.cpp
 │   ├── sigma_fsck.cpp
 │   ├── sigma_gpu_profiler.cpp
