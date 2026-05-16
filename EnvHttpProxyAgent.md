@@ -1,4 +1,4 @@
-﻿# Class: EnvHttpProxyAgent
+# Class: EnvHttpProxyAgent
 
 Extends: `undici.Dispatcher`
 

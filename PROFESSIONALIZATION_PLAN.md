@@ -1,4 +1,4 @@
-﻿# PROFESSIONALIZATION PLAN
+# PROFESSIONALIZATION PLAN
 
 # SigmaOS Professionalization Plan (v14.0 Zenith)
 

@@ -1,6 +1,6 @@
-﻿# Î£ SIGMAOS: CYBER SECURITY & OFFENSIVE DEFENSE
+# Σ SIGMAOS: CYBER SECURITY & OFFENSIVE DEFENSE
 
-## ðŸ›¡ Post-Quantum Security Lattice (S-PQC)
+## 🛡 Post-Quantum Security Lattice (S-PQC)
 
 SigmaOS is built from the ground up to resist quantum-computational attacks.
 
@@ -14,7 +14,7 @@ SigmaOS is built from the ground up to resist quantum-computational attacks.
 
 - **S-CRYPT**:CRYSTALS-Kyber and Dilithium-5 are hard-coded into the Lattice for all inter-shard communication.
 
-## ðŸ¹ Offensive Capabilities (Ethical Hacking)
+## 🏹 Offensive Capabilities (Ethical Hacking)
 
 SigmaOS provides a turnkey environment for security professionals to audit silicon and networking infrastructures.
 
@@ -26,7 +26,7 @@ SigmaOS provides a turnkey environment for security professionals to audit silic
 
 - **Static Analysis**: Integrated `sigma-audit` tool for analyzing shard binary integrity.
 
-## ðŸ›¡ Defensive Hardening
+## 🛡 Defensive Hardening
 
 - **Zero-Trust AppArmor**: Every userland process is constrained by a post-quantum attested MAC profile.
 

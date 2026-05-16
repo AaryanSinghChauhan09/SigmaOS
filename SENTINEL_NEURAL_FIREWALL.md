@@ -1,8 +1,8 @@
-﻿# SENTINEL NEURAL FIREWALL
+# SENTINEL NEURAL FIREWALL
 
 1
 
-The **Sentinel Neural Firewall** defines SigmaOS’s approach to absolute Cyber Security by integrating fundamental algorithms, data science logic, and machine learning methodologies directly into the Sovereign OS kernel layer without heavy external library dependencies.
+The **Sentinel Neural Firewall** defines SigmaOS�s approach to absolute Cyber Security by integrating fundamental algorithms, data science logic, and machine learning methodologies directly into the Sovereign OS kernel layer without heavy external library dependencies.
 
 1
 

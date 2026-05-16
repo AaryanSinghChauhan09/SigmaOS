@@ -1,8 +1,8 @@
-﻿# Î£ SIGMAOS: ZENITH APP EDITION (v15.0)
+# Σ SIGMAOS: ZENITH APP EDITION (v15.0)
 
 Welcome to the **Sovereign Professional Shard**. The App edition is the definitive desktop experience, optimized for heavy-duty application development and creative workflows.
 
-## ðŸ“¥ Installation Guide (Professional Desktop)
+## 📥 Installation Guide (Professional Desktop)
 
 1. **Flash**: Write `sigma-v15.0-app.iso` to a high-speed USB 3.0+ drive.
 
@@ -17,7 +17,7 @@ Welcome to the **Sovereign Professional Shard**. The App edition is the definiti
 
 4. **Personalize**: Use the `SigmaPersona` engine to customize your glassmorphic dashboard.
 
-## ðŸ› ï¸ Core Functions
+## 🛠️ Core Functions
 
 - **Zenith Desktop Manager**: High-performance, GPU-accelerated window compositor with blur and transparency.
 
@@ -27,7 +27,7 @@ Welcome to the **Sovereign Professional Shard**. The App edition is the definiti
 
 - **Industrial Multi-Tasking**: Advanced scheduler optimized for heavy CAD/Dev/Media workloads.
 
-## ðŸŒŸ Premium Features
+## 🌟 Premium Features
 
 - **SovereignIDE Integration**: Direct kernel-level debugging for app developers.
 
@@ -37,7 +37,7 @@ Welcome to the **Sovereign Professional Shard**. The App edition is the definiti
 
 - **Universal Shard Repository**: Access 10,000+ community-verified application shards.
 
-## ðŸ“Š Technical Specs
+## 📊 Technical Specs
 
 - **Graphics**: OpenGL 4.6 / Vulkan 1.3 / DirectX 12 (via Bridge).
 

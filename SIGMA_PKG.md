@@ -1,10 +1,10 @@
-﻿# Î£ SIGMA-PKG: INDUSTRIAL SHARD DISTRIBUTION
+# Σ SIGMA-PKG: INDUSTRIAL SHARD DISTRIBUTION
 
-## ðŸ“¦ The Package Nexus
+## 📦 The Package Nexus
 
-`sigma-pkg` is the primary industrial distribution engine for SigmaOS shards. It ensures that every component added to the **Sovereign Latticeâ„¢** is cryptographically verified and dependencies are resolved with zero-dependency engineering principles.
+`sigma-pkg` is the primary industrial distribution engine for SigmaOS shards. It ensures that every component added to the **Sovereign Lattice™** is cryptographically verified and dependencies are resolved with zero-dependency engineering principles.
 
-## ðŸ› Core USPs
+## 🏛 Core USPs
 
 - **Dilithium-5 Verification**: Every shard package must be signed with a PQC-attested key.
 
@@ -14,7 +14,7 @@
 
 - **Lattice-Native**: Directly manipulates the shard registry (`SHARDS.manifest`).
 
-## ðŸ›  Command Reference
+## 🛠 Command Reference
 
 - `sigma-pkg install <shard>`: Installs and registers a new industrial shard.
 
@@ -24,7 +24,7 @@
 
 - `sigma-pkg rollback`: Emergency recovery to the last stable Lattice snapshot.
 
-## ðŸš€ Industrial Workflow
+## 🚀 Industrial Workflow
 
 1. **Verification**: PQC-GPG check of the shard binary.
 

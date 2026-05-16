@@ -1,4 +1,4 @@
-﻿# Î£ SIGMAOS: INDUSTRIAL EVOLUTION ROADMAP (Phase 2)
+# Σ SIGMAOS: INDUSTRIAL EVOLUTION ROADMAP (Phase 2)
 
 This document outlines the strategic development path for evolving the SigmaOS Sovereign Lattice from a conceptual bootable kernel into a production-grade functional environment.
 
@@ -34,20 +34,20 @@ This document outlines the strategic development path for evolving the SigmaOS S
 
 ---
 
-## ðŸš€ Development Progress
+## 🚀 Development Progress
 
 | Phase | Focus | Key Shard to Build | Status |
 | :--- | :--- | :--- | :--- |
 
-| **Foundation** | Stability | **Multitasking Shard**: Round-robin scheduler. | â³ Planned |
+| **Foundation** | Stability | **Multitasking Shard**: Round-robin scheduler. | ⏳ Planned |
 
-| **Interaction** | Usability | **Zenith UI Shard**: Premium glassmorphic compositor. | âœ… **Implemented** |
+| **Interaction** | Usability | **Zenith UI Shard**: Premium glassmorphic compositor. | ✅ **Implemented** |
 
-| **Expansion** | Automation | **Sovereign Personalization**: Profession Profiles. | âœ… **Implemented** |
+| **Expansion** | Automation | **Sovereign Personalization**: Profession Profiles. | ✅ **Implemented** |
 
-| **Evolution** | Network | **SovereignNetStack**: VirtIO-based PQC networking. | âœ… **Implemented** |
+| **Evolution** | Network | **SovereignNetStack**: VirtIO-based PQC networking. | ✅ **Implemented** |
 
-| **Singularity** | Security | **Identity Vault**: PQC-sealed attestation keys. | â³ Planned |
+| **Singularity** | Security | **Identity Vault**: PQC-sealed attestation keys. | ⏳ Planned |
 
 ---
 

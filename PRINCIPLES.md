@@ -1,4 +1,4 @@
-﻿# PRINCIPLES
+# PRINCIPLES
 
 1
 

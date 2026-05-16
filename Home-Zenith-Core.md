@@ -1,10 +1,10 @@
-﻿# Î£ SigmaOS v15.0 Zenith: Core Edition
+# Σ SigmaOS v15.0 Zenith: Core Edition
 
-## ðŸ§© The Minimalist Lattice
+## 🧩 The Minimalist Lattice
 
 The **Core Edition** is the stripped-down, high-performance base of the Zenith architecture. It contains only the Sovereign Kernel, essential HAL drivers, and the `S-SHELL` terminal shard. Perfect for servers, IoT, and custom shard development.
 
-### ðŸ› ï¸ Key Features
+### 🛠️ Key Features
 
 - **Headless Architecture**: Optimized for SSH and serial console interaction.
 
@@ -14,7 +14,7 @@ The **Core Edition** is the stripped-down, high-performance base of the Zenith a
 
 - **PQC-Hardened SSH**: Exclusive Dilithium-5 authenticated remote access.
 
-### ðŸ“¥ Installation Guide (Developer/Server)
+### 📥 Installation Guide (Developer/Server)
 
 1. **Prepare Media**: Flash `SigmaOS-v15.0-Zenith-Core.iso`.
 
@@ -26,7 +26,7 @@ The **Core Edition** is the stripped-down, high-performance base of the Zenith a
 
 5. **Expansion**: Use `sigma-pkg install <shard>` to add only the functionality you need.
 
-### ðŸ’Ž Exclusive Functions
+### 💎 Exclusive Functions
 
 - `shard-debug`: Low-level kernel tracing and shard memory inspection.
 

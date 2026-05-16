@@ -1,8 +1,8 @@
-﻿# Î£ SIGMAOS: STABLE EDITION (v15.0.0)
+# Σ SIGMAOS: STABLE EDITION (v15.0.0)
 
 The **Stable Edition** is the immutable industrial benchmark of SigmaOS. It is designed for users who require absolute reliability, bit-perfect stability, and long-term support.
 
-## ðŸ“¥ Installation Guide (Enterprise Standard)
+## 📥 Installation Guide (Enterprise Standard)
 
 1. **Verify**: Check the PQC signature of `sigma-v15.0.0-stable.iso`.
 
@@ -12,7 +12,7 @@ The **Stable Edition** is the immutable industrial benchmark of SigmaOS. It is d
 
 4. **Lockdown**: Enable **SovereignGuard** to prevent any unauthorized shard modifications.
 
-## ðŸ› ï¸ Core Functions
+## 🛠️ Core Functions
 
 - **Bit-Perfect Verification**: Continuous background auditing of every system shard.
 
@@ -22,7 +22,7 @@ The **Stable Edition** is the immutable industrial benchmark of SigmaOS. It is d
 
 - **Hardened System Calls**: Every kernel interaction is audited and logged to a secure, immutable shard.
 
-## ðŸŒŸ Premium Features
+## 🌟 Premium Features
 
 - **Deterministic Execution**: Guaranteed response times for mission-critical industrial logic.
 
@@ -32,7 +32,7 @@ The **Stable Edition** is the immutable industrial benchmark of SigmaOS. It is d
 
 - **Automated Shard Snapshots**: Periodic, zero-impact backups of the entire system state.
 
-## ðŸ“Š Technical Specs
+## 📊 Technical Specs
 
 - **Stability Rating**: Industrial-Grade (Zenith Verified).
 

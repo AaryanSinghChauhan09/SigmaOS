@@ -1,4 +1,4 @@
-﻿# SigmaOS Industrial Components
+# SigmaOS Industrial Components
 
 SigmaOS v15.0 (Zenith) has reached industrial maturity through the implementation of these sovereign subsystems:
 

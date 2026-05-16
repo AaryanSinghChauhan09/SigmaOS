@@ -1,10 +1,10 @@
-﻿# Î£ SigmaOS v15.0 Zenith: Browser Edition
+# Σ SigmaOS v15.0 Zenith: Browser Edition
 
-## ðŸŒ The Connected Shard
+## 🌐 The Connected Shard
 
 The **Browser Edition** is a specialized environment designed for web-first workflows. It boots directly into the `S-BROWSER` shard, providing a sandboxed, PQC-secured gateway to the global internet.
 
-### ðŸ› ï¸ Key Features
+### 🛠️ Key Features
 
 - **Direct-to-Browser Boot**: The lattice ignites the UI compositor and Browser shard immediately.
 
@@ -14,7 +14,7 @@ The **Browser Edition** is a specialized environment designed for web-first work
 
 - **WebAssembly Accelerator**: Native silicon-direct execution for heavy WASM apps.
 
-### ðŸ“¥ Installation Guide (Web-Centric)
+### 📥 Installation Guide (Web-Centric)
 
 1. **Prepare Media**: Flash `SigmaOS-v15.0-Zenith-Browser.iso`.
 
@@ -26,7 +26,7 @@ The **Browser Edition** is a specialized environment designed for web-first work
 
 5. **Updates**: The browser shard updates independently of the kernel lattice.
 
-### ðŸ’Ž Exclusive Functions
+### 💎 Exclusive Functions
 
 - `private-lattice-mode`: Force all browser traffic through the S-VPN and clear shard state on exit.
 

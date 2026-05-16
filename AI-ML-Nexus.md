@@ -1,10 +1,10 @@
-﻿# Î£ SOVEREIGN AI/ML NEXUS
+# Σ SOVEREIGN AI/ML NEXUS
 
 The **Intelligence Nexus** (S-AI) is the industrial absorption layer for high-performance compute workloads. It provides native, zero-latency parity for CUDA, ROCm, and ONNX Runtimes.
 
-## ðŸ› Architecture
+## 🏛 Architecture
 
-The AI Nexus operates as a high-privilege shard within the **Sovereign Latticeâ„¢**, directly orchestrating silicon-level compute primitives.
+The AI Nexus operates as a high-privilege shard within the **Sovereign Lattice™**, directly orchestrating silicon-level compute primitives.
 
 - **S-CUDA**: Low-level bridge for NVIDIA industrial acceleration.
 
@@ -12,7 +12,7 @@ The AI Nexus operates as a high-privilege shard within the **Sovereign Latticeâ
 
 - **S-ONNX**: The universal inference engine for cross-framework model sharding.
 
-## ðŸ¤– Framework Parity
+## 🤖 Framework Parity
 
 SigmaOS natively absorbs the USPs of:
 
@@ -22,7 +22,7 @@ SigmaOS natively absorbs the USPs of:
 
 - **Hugging Face**: Pre-cached transformer archetypes for offline industrial use.
 
-## ðŸ›¡ Security & Attestation
+## 🛡 Security & Attestation
 
 All models loaded into the AI Nexus must be **PQC-Attested**.
 
@@ -32,7 +32,7 @@ All models loaded into the AI Nexus must be **PQC-Attested**.
 
 3. **Audit**: Continuous telemetry via S-LOG and TensorBoard parity.
 
-## ðŸš€ Professional Workflow
+## 🚀 Professional Workflow
 
 1. `sigma-pkg install s-ai-pytorch`
 

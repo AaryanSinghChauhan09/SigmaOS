@@ -1,4 +1,4 @@
-﻿# Î£ SIGMAOS: DECENTRALIZED GOVERNANCE MANIFESTO
+# Σ SIGMAOS: DECENTRALIZED GOVERNANCE MANIFESTO
 
 > **The Sovereign Lattice is governed by code, consensus, and contribution.**
 
@@ -6,7 +6,7 @@ SigmaOS v15.0 rejects the "Benevolent Dictator for Life" (BDFL) model used by le
 
 ---
 
-## ðŸ›ï¸ 1. The Sovereign Architect Consensus (SAC)
+## 🏛️ 1. The Sovereign Architect Consensus (SAC)
 
 The SAC is a decentralized body of contributors who have proven their commitment to the project via PQC-attested code submissions.
 
@@ -20,7 +20,7 @@ The SAC is a decentralized body of contributors who have proven their commitment
 
 ---
 
-## âš–ï¸ 2. The Absolute Parity Protocol
+## ⚖️ 2. The Absolute Parity Protocol
 
 All governance decisions are bound by the **Absolute Parity Protocol**:
 
@@ -32,7 +32,7 @@ All governance decisions are bound by the **Absolute Parity Protocol**:
 
 ---
 
-## ðŸ—³ï¸ 3. Voting & Proposals (S-VOTE)
+## 🗳️ 3. Voting & Proposals (S-VOTE)
 
 Governance proposals are submitted as **Sovereign Shard Proposals (SSPs)**:
 
@@ -46,7 +46,7 @@ Governance proposals are submitted as **Sovereign Shard Proposals (SSPs)**:
 
 ---
 
-## ðŸ’° 4. Professional Incentives
+## 💰 4. Professional Incentives
 
 SigmaOS is an industrial-grade OS. Contribution is incentivized through:
 

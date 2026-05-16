@@ -1,4 +1,4 @@
-﻿# Logic: The Sovereign Architecture of SigmaOS
+# Logic: The Sovereign Architecture of SigmaOS
 
 This page explains the core architectural logic, file relationships, and the "Source of Truth" build system within the 600-shard SigmaOS Sovereign Lattice.
 

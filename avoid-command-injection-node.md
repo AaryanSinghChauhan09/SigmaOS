@@ -1,4 +1,4 @@
-﻿# Avoiding Command Injection in Node.js
+# Avoiding Command Injection in Node.js
 
 In this post we are going to learn about the proper way to call a system command using node.js to avoid a common security flaw, command injection.
 

@@ -1,4 +1,4 @@
-﻿# Data-Forge
+# Data-Forge
 
 1
 

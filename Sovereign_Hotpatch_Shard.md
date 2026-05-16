@@ -1,8 +1,8 @@
-﻿# Sovereign Hotpatch Shard
+# Sovereign Hotpatch Shard
 
 1
 
-**Parity:** kpatch · ksplice · Linux `livepatch` · Oracle Ksplice
+**Parity:** kpatch � ksplice � Linux `livepatch` � Oracle Ksplice
 **Location:** `kernel/modules/system/SovereignHotpatchShard.c`
 **Standard:** Zenith Industrial Sovereignty v1.0
 
@@ -10,7 +10,7 @@
 
 1
 
-The Sovereign Hotpatch Shard provides native, zero-dependency live kernel patching for SigmaOS. It absorbs the defining USPs of `kpatch`, `ksplice`, and Linux `livepatch` by enabling atomic 5-byte JMP trampoline installation at any target silicon function address — achieving zero downtime and zero reboot for any kernel update.
+The Sovereign Hotpatch Shard provides native, zero-dependency live kernel patching for SigmaOS. It absorbs the defining USPs of `kpatch`, `ksplice`, and Linux `livepatch` by enabling atomic 5-byte JMP trampoline installation at any target silicon function address � achieving zero downtime and zero reboot for any kernel update.
 
 ---
 
@@ -19,15 +19,15 @@ The Sovereign Hotpatch Shard provides native, zero-dependency live kernel patchi
 1
 
 Patch Matrix (up to 16 concurrent patches)
-  +-- PENDING   — Loaded, awaiting quiesce
-  +-- APPLIED   — Trampoline active; calls redirected to patch_func
-  +-- REVERTED  — Original instruction bytes restored
-  +-- FAILED    — Quiesce or install failure
+  +-- PENDING   � Loaded, awaiting quiesce
+  +-- APPLIED   � Trampoline active; calls redirected to patch_func
+  +-- REVERTED  � Original instruction bytes restored
+  +-- FAILED    � Quiesce or install failure
 
 Trampoline Engine
   Step 1: Quiesce silicon missions using target function
   Step 2: Install 5-byte JMP at target_func ? patch_func
-  Step 3: Resume missions — zero downtime achieved
+  Step 3: Resume missions � zero downtime achieved
 
 1
 
@@ -53,4 +53,4 @@ Trampoline Engine
 
 1
 
-`GLOBAL MESH ACTIVE` — Synchronized with `AaryanSinghChauhan09/SigmaOS`.
+`GLOBAL MESH ACTIVE` � Synchronized with `AaryanSinghChauhan09/SigmaOS`.

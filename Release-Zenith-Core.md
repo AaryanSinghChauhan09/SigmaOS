@@ -1,8 +1,8 @@
-﻿# Î£ SIGMAOS: ZENITH CORE EDITION (v15.0)
+# Σ SIGMAOS: ZENITH CORE EDITION (v15.0)
 
 Welcome to the **Sovereign Singularity Heart**. The Core Edition is the pure, bare-metal microkernel lattice, serving as the immutable foundation for all other SigmaOS shards.
 
-## ðŸ“¥ Installation Guide (Industrial Deployment)
+## 📥 Installation Guide (Industrial Deployment)
 
 1. **Bootstrap**: Flash the `sigma-v15.0-core.img` to a bootable medium.
 
@@ -17,7 +17,7 @@ Welcome to the **Sovereign Singularity Heart**. The Core Edition is the pure, ba
 
 4. **Deploy**: Use `lattice-deploy` to add custom industrial or userland shards as needed.
 
-## ðŸ› ï¸ Core Functions
+## 🛠️ Core Functions
 
 - **Sovereign Scheduler**: Deterministic, O(1) multi-priority shard orchestration.
 
@@ -27,7 +27,7 @@ Welcome to the **Sovereign Singularity Heart**. The Core Edition is the pure, ba
 
 - **Lattice Registry**: The immutable source of truth for all active system shards.
 
-## ðŸŒŸ Premium Features
+## 🌟 Premium Features
 
 - **Zero-Trust Kernel Mode**: Every kernel-level operation requires a valid PQC-signed capability.
 
@@ -37,7 +37,7 @@ Welcome to the **Sovereign Singularity Heart**. The Core Edition is the pure, ba
 
 - **Deadlock-Free Orchestration**: Formally verified resource allocation algorithms.
 
-## ðŸ“Š Technical Specs
+## 📊 Technical Specs
 
 - **Binary Size**: < 2 MB
 

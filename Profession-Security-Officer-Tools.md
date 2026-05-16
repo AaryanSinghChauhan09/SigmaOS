@@ -1,4 +1,4 @@
-﻿# Profession-Security-Officer-Tools
+# Profession-Security-Officer-Tools
 
 1
 

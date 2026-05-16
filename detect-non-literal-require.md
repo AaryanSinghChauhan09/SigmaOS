@@ -1,6 +1,6 @@
-﻿# Detects "require(variable)", which might allow an attacker to load and run arbitrary code, or access arbitrary files on disk (`security/detect-non-literal-require`)
+# Detects "require(variable)", which might allow an attacker to load and run arbitrary code, or access arbitrary files on disk (`security/detect-non-literal-require`)
 
-âš ï¸ This rule _warns_ in the âœ… `recommended` config.
+⚠️ This rule _warns_ in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 

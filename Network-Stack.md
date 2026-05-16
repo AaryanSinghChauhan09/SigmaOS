@@ -1,4 +1,4 @@
-﻿# S-NET: Sovereign Networking
+# S-NET: Sovereign Networking
 
 SigmaOS implements a high-performance network stack designed for industrial reliability and security.
 

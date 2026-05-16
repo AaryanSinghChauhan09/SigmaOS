@@ -30,6 +30,6 @@ The **Zenith** release marks the transition of SigmaOS from an experimental latt
 
 ---
 
-### Certified for Global Deployment.
+### Certified for Global Deployment
 
-### Your Silicon. Your Rules. Your Sovereignty.
+### Your Silicon. Your Rules. Your Sovereignty

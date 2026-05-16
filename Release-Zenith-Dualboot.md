@@ -1,8 +1,8 @@
-﻿# Î£ SIGMAOS: ZENITH DUAL-BOOT EDITION (v15.0)
+# Σ SIGMAOS: ZENITH DUAL-BOOT EDITION (v15.0)
 
 Welcome to the **Sovereign Coexistence Shard**. The Dual-Boot edition is designed to dominate hardware while allowing legacy OSes to exist in partitioned isolation.
 
-## ðŸ“¥ Installation Guide (Lattice-Merge)
+## 📥 Installation Guide (Lattice-Merge)
 
 1. **Prepare**: Ensure you have a free partition (min 20GB) alongside your existing OS.
 
@@ -14,7 +14,7 @@ Welcome to the **Sovereign Coexistence Shard**. The Dual-Boot edition is designe
 
 5. **Sync**: On first boot, run `vfs-sync` to map legacy partitions into the SigmaOS Mesh Lattice.
 
-## ðŸ› ï¸ Core Functions
+## 🛠️ Core Functions
 
 - **Legacy Partition Absorption**: Maps NTFS/Ext4/APFS directly into the Sovereign VFS with zero-latency translation.
 
@@ -24,7 +24,7 @@ Welcome to the **Sovereign Coexistence Shard**. The Dual-Boot edition is designe
 
 - **Cross-OS IPC**: Secure messaging between SigmaOS and legacy guest processes (via SovereignBridge).
 
-## ðŸŒŸ Premium Features
+## 🌟 Premium Features
 
 - **SovereignVFS Bridge**: Access your Windows/Linux files with bit-perfect integrity and no metadata leaks.
 
@@ -34,7 +34,7 @@ Welcome to the **Sovereign Coexistence Shard**. The Dual-Boot edition is designe
 
 - **Zenith Dual-Compositor**: Switch between SigmaOS and guest displays with a single keystroke.
 
-## ðŸ“Š Technical Specs
+## 📊 Technical Specs
 
 - **Compatibility**: Linux (Ubuntu, Fedora, Arch), Windows 10/11, macOS (Intel/M1).
 

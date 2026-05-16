@@ -1,4 +1,4 @@
-﻿# Profession-Farmer-Tools
+# Profession-Farmer-Tools
 
 1
 

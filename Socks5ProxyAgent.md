@@ -1,4 +1,4 @@
-﻿# Class: Socks5ProxyAgent
+# Class: Socks5ProxyAgent
 
 Extends: `undici.Dispatcher`
 

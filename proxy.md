@@ -1,4 +1,4 @@
-﻿# Connecting through a proxy
+# Connecting through a proxy
 
 Connecting through a proxy is possible by:
 

@@ -1,4 +1,4 @@
-﻿# Profession-Agricultural-Scientist-Tools
+# Profession-Agricultural-Scientist-Tools
 
 1
 

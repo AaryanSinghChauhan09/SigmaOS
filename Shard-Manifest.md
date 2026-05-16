@@ -1,4 +1,4 @@
-﻿# ðŸ“‹ SigmaOS: Zenith Shard Manifest (v15.0.0)
+# 📋 SigmaOS: Zenith Shard Manifest (v15.0.0)
 
 > **The complete registry of all 600+ independent professional shards.**
 
@@ -6,7 +6,7 @@ SigmaOS is an industrial-grade microkernel composed of independent, PQC-attested
 
 ---
 
-## ðŸ›ï¸ 1. Kernel Core Shards (Mandatory)
+## 🏛️ 1. Kernel Core Shards (Mandatory)
 
 | Shard ID | Namespace | Purpose |
 | :--- | :--- | :--- |
@@ -20,7 +20,7 @@ SigmaOS is an industrial-grade microkernel composed of independent, PQC-attested
 
 ---
 
-## ðŸ›¡ï¸ 2. Security & Integrity Shards
+## 🛡️ 2. Security & Integrity Shards
 
 | Shard ID | Purpose |
 | :--- | :--- |
@@ -33,7 +33,7 @@ SigmaOS is an industrial-grade microkernel composed of independent, PQC-attested
 
 ---
 
-## ðŸ—ï¸ 3. Industrial Infrastructure Shards
+## 🏗️ 3. Industrial Infrastructure Shards
 
 | Shard ID | Function |
 | :--- | :--- |
@@ -46,7 +46,7 @@ SigmaOS is an industrial-grade microkernel composed of independent, PQC-attested
 
 ---
 
-## ðŸ­ 4. Professional Vertical Shards
+## 🏭 4. Professional Vertical Shards
 
 | Category | Shards |
 | :--- | :--- |
@@ -63,7 +63,7 @@ SigmaOS is an industrial-grade microkernel composed of independent, PQC-attested
 
 ---
 
-## ðŸ”„ Shard Lifecycle
+## 🔄 Shard Lifecycle
 
 All shards follow the **Dilithium-5** attestation protocol:
 
@@ -77,4 +77,4 @@ All shards follow the **Dilithium-5** attestation protocol:
 
 ---
 
-*SigmaOS â€” 600 Shards. One Vision. Absolute Parity.*
+*SigmaOS — 600 Shards. One Vision. Absolute Parity.*

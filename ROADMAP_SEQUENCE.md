@@ -1,4 +1,4 @@
-﻿# ROADMAP SEQUENCE
+# ROADMAP SEQUENCE
 
 1
 
@@ -20,4 +20,4 @@
 
 5. **Gaming stack integration** ? neutralize SteamOS advantage.
 
-6. **UI polish + accessibility** ? surpass elementaryÂ’s design reputation.
+6. **UI polish + accessibility** ? surpass elementarys design reputation.

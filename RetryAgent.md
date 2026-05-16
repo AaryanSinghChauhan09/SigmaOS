@@ -1,4 +1,4 @@
-﻿# Class: RetryAgent
+# Class: RetryAgent
 
 Extends: `undici.Dispatcher`
 

@@ -1,4 +1,4 @@
-﻿# Regular Expression DoS and Node.js
+# Regular Expression DoS and Node.js
 
 Imagine you are trying to buy a ticket to your favorite JavaScript conference, and instead of getting the ticket page, you instead get `500 Internal Server Error`. For some reason the site is down. You can't do the thing that you want to do most and the conference is losing out on your purchase, all because the application is unavailable.
 

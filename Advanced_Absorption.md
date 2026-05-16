@@ -1,4 +1,4 @@
-﻿# SigmaOS: Advanced Lattice Absorption (Zenith Singularity)
+# SigmaOS: Advanced Lattice Absorption (Zenith Singularity)
 
 SigmaOS Zenith v15.0 has evolved through the deep-lattice absorption of the most advanced operating system paradigms in history.
 

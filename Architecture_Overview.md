@@ -1,4 +1,4 @@
-﻿# Architecture Overview
+# Architecture Overview
 
 1 1
 1 graph TD

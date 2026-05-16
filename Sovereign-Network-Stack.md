@@ -1,4 +1,4 @@
-﻿# Sovereign Network Stack (S-NET)
+# Sovereign Network Stack (S-NET)
 
 The Sovereign Network Stack is the industrial networking backbone of SigmaOS v15.0 (Zenith). It provides high-performance, PQC-sealed connectivity for the industrial shard lattice.
 

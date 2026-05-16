@@ -1,4 +1,4 @@
-﻿# Shard Development
+# Shard Development
 
 1
 

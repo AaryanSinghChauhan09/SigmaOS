@@ -1,20 +1,20 @@
-﻿# Sovereign SDK API Reference
+# Sovereign SDK API Reference
 
 The Sovereign SDK provides the bridge between your code and the SigmaOS kernel.
 
-## ðŸ“ Core Primitives (`sigma_types.h`)
+## 📁 Core Primitives (`sigma_types.h`)
 
 - `sigma_u32`, `sigma_u64`: Unsigned integers.
 
 - `sigma_status_t`: Status codes (`SIGMA_OK`, `SIGMA_ERROR`).
 
-## ðŸ›  Logging (`sigma_log.h`)
+## 🛠 Logging (`sigma_log.h`)
 
 - `sigma_log_info(fmt, ...)`: Emit informational log.
 
 - `sigma_log_crit(fmt, ...)`: Emit critical fault log.
 
-## ðŸ§¬ Industrial Shards (`sigma_sdk.h`)
+## 🧬 Industrial Shards (`sigma_sdk.h`)
 
 - `vakil_search(query)`: Search legal database (Indian Law).
 
@@ -24,7 +24,7 @@ The Sovereign SDK provides the bridge between your code and the SigmaOS kernel.
 
 - `auto_heal(sid, prof)`: Trigger manual healing for a shard.
 
-## ðŸ”Œ UI & Graphics (`zenith_compositor.h`)
+## 🔌 UI & Graphics (`zenith_compositor.h`)
 
 - `zenith_init(fb_addr)`: Initialize the UI compositor.
 

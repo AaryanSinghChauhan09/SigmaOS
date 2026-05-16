@@ -1,4 +1,4 @@
-﻿# Connector
+# Connector
 
 Undici creates the underlying socket via the connector builder.
 Normally, this happens automatically and you don't need to care about this,

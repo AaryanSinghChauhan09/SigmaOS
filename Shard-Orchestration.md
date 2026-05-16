@@ -1,4 +1,4 @@
-﻿# Shard-Orchestration
+# Shard-Orchestration
 
 1
 

@@ -1,4 +1,4 @@
-﻿# Cloud/Virtual OS Format
+# Cloud/Virtual OS Format
 
 **Branch:** `release/cloud`
 

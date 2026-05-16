@@ -1,4 +1,4 @@
-﻿# AI AUTOMATION GATEWAY
+# AI AUTOMATION GATEWAY
 
 1 The SigmaOS AI Automation Stack is a specialized implementation inspired by **OpenClaw** ("The lobster way ??"), designed for secure, autonomous system orchestration.
 

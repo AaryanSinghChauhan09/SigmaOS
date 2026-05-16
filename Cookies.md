@@ -1,4 +1,4 @@
-﻿# Cookie Handling
+# Cookie Handling
 
 ## `Cookie` interface
 

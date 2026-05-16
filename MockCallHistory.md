@@ -1,4 +1,4 @@
-﻿# Class: MockCallHistory
+# Class: MockCallHistory
 
 Access to an instance with :
 

@@ -1,8 +1,8 @@
-﻿# ðŸ—ï¸ Building and Running SigmaOS
+# 🏗️ Building and Running SigmaOS
 
 This guide provides instructions for building the SigmaOS Sovereign Lattice and running it in an emulator.
 
-## ðŸ“‹ Prerequisites
+## 📋 Prerequisites
 
 To build and run SigmaOS, you need the following tools:
 
@@ -18,7 +18,7 @@ To build and run SigmaOS, you need the following tools:
 
 - **xorriso**: Dependency for `grub-mkrescue`.
 
-## ðŸ› ï¸ Build Instructions
+## 🛠️ Build Instructions
 
 ### 1. Clean previous builds
 
@@ -42,7 +42,7 @@ make zenith-iso
 
 This requires an `iso_root` directory with the appropriate GRUB configuration.
 
-## ðŸš€ Running in Emulation
+## 🚀 Running in Emulation
 
 To boot the kernel in QEMU and trace execution via serial output:
 
@@ -54,7 +54,7 @@ make qemu
 
 Kernel logs are piped to `stdio` (serial port 0). You can monitor the boot sequence and shard initialization directly in your terminal.
 
-## ðŸ” Static Analysis
+## 🔍 Static Analysis
 
 We recommend running `cppcheck` before submitting any PRs:
 
@@ -68,4 +68,4 @@ If you encounter errors during the PQC attestation phase, ensure your hardware R
 
 ---
 
-### Î£ SIGMAOS: Sovereign Build System. Absolute Integrity
+### Σ SIGMAOS: Sovereign Build System. Absolute Integrity

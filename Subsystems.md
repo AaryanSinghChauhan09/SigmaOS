@@ -1,6 +1,6 @@
-﻿# Î£ SIGMAOS SUBSYSTEM LATTICE
+# Σ SIGMAOS SUBSYSTEM LATTICE
 
-The **Sovereign Latticeâ„¢** is organized into 10 industrial layers. Every subsystem is a self-contained shard with strict PQC-attestation.
+The **Sovereign Lattice™** is organized into 10 industrial layers. Every subsystem is a self-contained shard with strict PQC-attestation.
 
 ## LAYER 1: PQC KERNEL FOUNDATION
 

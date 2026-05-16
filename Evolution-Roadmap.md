@@ -1,8 +1,8 @@
-﻿# ðŸ—º SigmaOS Industrial Evolution Roadmap
+# 🗺 SigmaOS Industrial Evolution Roadmap
 
 SigmaOS is on a 3-year trajectory to become the world's most innovative and professional alternative to mainstream Linux distributions.
 
-## ðŸš€ Horizon 1 (Year 1): Foundation & Usability
+## 🚀 Horizon 1 (Year 1): Foundation & Usability
 
 - **S-INSTALL**: Polished graphical installer with dual-boot support.
 
@@ -12,7 +12,7 @@ SigmaOS is on a 3-year trajectory to become the world's most innovative and prof
 
 - **Z-DESK**: Launch of the Zenith Desktop Environment (Tiling/Pro-Telemetry).
 
-## ðŸš€ Horizon 2 (Year 2): Security & Reliability
+## 🚀 Horizon 2 (Year 2): Security & Reliability
 
 - **S-MAC**: Deployment of the Mandatory Access Control security framework.
 
@@ -22,7 +22,7 @@ SigmaOS is on a 3-year trajectory to become the world's most innovative and prof
 
 - **S-WASM**: Sandboxed execution environment for third-party application shards.
 
-## ðŸš€ Horizon 3 (Year 3): Ecosystem & Professionalism
+## 🚀 Horizon 3 (Year 3): Ecosystem & Professionalism
 
 - **S-PROTON**: Full binary compatibility for mainstream Linux/Windows apps and games.
 

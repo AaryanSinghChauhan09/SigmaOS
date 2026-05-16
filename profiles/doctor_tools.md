@@ -1,4 +1,4 @@
-﻿# doctor tools
+# doctor tools
 
 1
 

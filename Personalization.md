@@ -1,4 +1,4 @@
-﻿# Personalization
+# Personalization
 
 1
 

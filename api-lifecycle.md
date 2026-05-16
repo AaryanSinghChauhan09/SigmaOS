@@ -1,4 +1,4 @@
-﻿# Client Lifecycle
+# Client Lifecycle
 
 An Undici [Client](/docs/docs/api/Client.md) can be best described as a state machine. The following list is a summary of the various state transitions the `Client` will go through in its lifecycle. This document also contains detailed breakdowns of each state.
 

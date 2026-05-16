@@ -1,4 +1,4 @@
-﻿# Class: RetryHandler
+# Class: RetryHandler
 
 Extends: `undici.DispatcherHandlers`
 

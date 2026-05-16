@@ -1,4 +1,4 @@
-﻿# Mocking Request
+# Mocking Request
 
 Undici has its own mocking [utility](/docs/docs/api/MockAgent.md). It allow us to intercept undici HTTP requests and return mocked values instead. It can be useful for testing purposes.
 

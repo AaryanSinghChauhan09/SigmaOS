@@ -1,12 +1,12 @@
-﻿# Profession-Lawyer-Tools
+# Profession-Lawyer-Tools
 
-# âš–ï¸ Lawyer Profile
+# ⚖️ Lawyer Profile
 
 The Lawyer Profile prioritizes document integrity, absolute privacy, and ironclad security for sensitive legal data.
 
 ---
 
-## ðŸ› ï¸ Integrated Shards
+## 🛠️ Integrated Shards
 
 - **CaseLaw AI**: Local, zero-latency search engine for legal precedents.
 
@@ -18,7 +18,7 @@ The Lawyer Profile prioritizes document integrity, absolute privacy, and ironcla
 
 ---
 
-## ðŸŽ¨ Zenith Configuration
+## 🎨 Zenith Configuration
 
 - **Theme**: Ivory Parchment (Clean/Minimal)
 
@@ -28,7 +28,7 @@ The Lawyer Profile prioritizes document integrity, absolute privacy, and ironcla
 
 ---
 
-## ðŸ›¡ï¸ Privacy Enforcement
+## 🛡️ Privacy Enforcement
 
 All legal data is stored in the **Sovereign Vault**, protected by Dilithium-based signatures. Network traffic is routed through the **PQC-VPN** by default to prevent interception.
 

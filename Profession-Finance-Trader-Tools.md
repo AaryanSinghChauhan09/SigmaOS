@@ -1,4 +1,4 @@
-﻿# Profession-Finance-Trader-Tools
+# Profession-Finance-Trader-Tools
 
 1
 

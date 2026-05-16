@@ -1,4 +1,4 @@
-﻿# The Dangers of Square Bracket Notation
+# The Dangers of Square Bracket Notation
 
 We are going to be looking at some peculiar and potentially dangerous implications of JavaScript's square bracket notation in this post: where you shouldn't use this style of object access and why, as well how to use it safely when needed.
 

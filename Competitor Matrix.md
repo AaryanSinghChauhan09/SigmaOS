@@ -1,4 +1,4 @@
-﻿# Competitor Matrix
+# Competitor Matrix
 
 1
 

@@ -1,4 +1,4 @@
-﻿# Class: MockClient
+# Class: MockClient
 
 Extends: `undici.Client`
 

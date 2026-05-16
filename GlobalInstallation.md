@@ -1,4 +1,4 @@
-﻿# Global Installation
+# Global Installation
 
 Undici provides an `install()` function to add all WHATWG fetch classes to `globalThis`, making them available globally without requiring imports.
 

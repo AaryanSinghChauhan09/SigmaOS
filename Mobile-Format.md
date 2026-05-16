@@ -1,4 +1,4 @@
-﻿# SigmaOS Format: Mobile & App Center
+# SigmaOS Format: Mobile & App Center
 
 ## Multimedia, Productivity, & End-User Sovereign Experience
 
@@ -6,7 +6,7 @@ The **Mobile** format provides the user-facing app ecosystem. It bundles creativ
 
 ---
 
-## ðŸ› ï¸ Bundled Productivity Tools
+## 🛠️ Bundled Productivity Tools
 
 | Tool | Category | Linux/Windows Equivalent | Purpose |
 |------|----------|--------------------------|---------|
@@ -20,7 +20,7 @@ The **Mobile** format provides the user-facing app ecosystem. It bundles creativ
 
 ---
 
-## âš™ï¸ Core Shards
+## ⚙️ Core Shards
 
 - `kernel/core/vis/SovereignVis.cpp`
 
@@ -30,7 +30,7 @@ The **Mobile** format provides the user-facing app ecosystem. It bundles creativ
 
 ---
 
-## ðŸš€ Optimization Checklist
+## 🚀 Optimization Checklist
 
 - [ ] Calibrate **ZenithCapture** for 60FPS recording.
 

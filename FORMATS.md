@@ -1,8 +1,8 @@
-﻿# Î£ SIGMAOS: Industrial Format Adaptation
+# Σ SIGMAOS: Industrial Format Adaptation
 
 SigmaOS is designed as a **Sovereign Microkernel** that can adapt its lattice configuration to meet the requirements of any OS format, from embedded sensors to distributed cloud clusters.
 
-## ðŸ OS Format Matrix
+## 🏁 OS Format Matrix
 
 | Format | SigmaOS Shard Configuration | Key Traits Implemented |
 | :--- | :--- | :--- |
@@ -23,7 +23,7 @@ SigmaOS is designed as a **Sovereign Microkernel** that can adapt its lattice co
 
 | **Mobile** | `SovereignMobile + Touch` | Optimized for touch interfaces and battery-sharding. |
 
-## ðŸ›  Achieving Universal Compatibility
+## 🛠 Achieving Universal Compatibility
 
 ### 1. Design for Modularity
 

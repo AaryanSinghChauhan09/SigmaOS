@@ -1,8 +1,8 @@
-﻿# Î£ SIGMAOS: Algorithmic Complexity & Optimization Guidelines
+# Σ SIGMAOS: Algorithmic Complexity & Optimization Guidelines
 
 This document outlines the complexity classes and optimization strategies for core SigmaOS subsystems, ensuring industrial-grade efficiency.
 
-## ðŸ“Š Core Algorithm Complexity Matrix
+## 📊 Core Algorithm Complexity Matrix
 
 | Subsystem | Algorithm | Complexity (Time) | Complexity (Space) | Optimization Strategy |
 | :--- | :--- | :--- | :--- | :--- |
@@ -17,7 +17,7 @@ This document outlines the complexity classes and optimization strategies for co
 
 | **Networking** | Packet Routing | O(log N) | O(N) | Radix-tree for IP prefix matching. |
 
-## âš™ï¸ Shard-Level Optimization Practices
+## ⚙️ Shard-Level Optimization Practices
 
 1. **Minimize Context Switches**: Favor shard-local execution over frequent IPC where deterministic response is required.
 
@@ -27,11 +27,11 @@ This document outlines the complexity classes and optimization strategies for co
 
 4. **Static Allocation**: In Embedded and RTOS profiles, favor static allocation over dynamic heap usage.
 
-## ðŸ§ª Benchmarking Standards
+## 🧪 Benchmarking Standards
 
 All industrial shards must pass the following benchmarks before merging:
 
-- **Ignition Latency**: < 500Î¼s (on reference x86_64 hardware).
+- **Ignition Latency**: < 500μs (on reference x86_64 hardware).
 
 - **Throughput (S-NET)**: > 90% of wire speed for large packets.
 

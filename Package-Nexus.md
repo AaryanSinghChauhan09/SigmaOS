@@ -1,4 +1,4 @@
-﻿# S-PKG: Lattice Package Nexus
+# S-PKG: Lattice Package Nexus
 
 The **Lattice Package Nexus** is the centralized distribution system for SigmaOS professional shards.
 

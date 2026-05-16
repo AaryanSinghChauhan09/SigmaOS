@@ -1,6 +1,6 @@
-﻿# SigmaOS Kernel Developer Handbook
+# SigmaOS Kernel Developer Handbook
 
-## Version 15.0.0 â€” Zenith Release
+## Version 15.0.0 — Zenith Release
 
 ---
 
@@ -63,13 +63,13 @@ Before merging any concurrency-related change:
 
 ## 3. Memory Management Rules
 
-- **No `malloc`/`free`** in kernel shards â€” use `SovereignMemoryPool::alloc()`
+- **No `malloc`/`free`** in kernel shards — use `SovereignMemoryPool::alloc()`
 
 - **RTOS shards** are forbidden from ALL dynamic allocation
 
 - Run `SovereignMemoryPool::profile_leaks()` after each integration test
 
-- Buddy allocation handles blocks â‰¥ 4KB; slab handles < 4KB objects
+- Buddy allocation handles blocks ≥ 4KB; slab handles < 4KB objects
 
 ---
 
@@ -91,11 +91,11 @@ Every shard MUST:
 
 All PRs to `main` must pass:
 
-- `scripts/regression_check.sh` â€” functional correctness
+- `scripts/regression_check.sh` — functional correctness
 
-- `scripts/format_stress_test.sh` â€” concurrency stress
+- `scripts/format_stress_test.sh` — concurrency stress
 
-- `scripts/fuzz_pqc.sh` â€” security/fuzzing
+- `scripts/fuzz_pqc.sh` — security/fuzzing
 
 - GitHub Actions: CodeQL scan must return 0 critical alerts
 

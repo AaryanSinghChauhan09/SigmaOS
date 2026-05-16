@@ -1,4 +1,4 @@
-﻿# Kernel Module Reference
+# Kernel Module Reference
 
 1
 

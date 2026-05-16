@@ -1,4 +1,4 @@
-﻿# Writing tests
+# Writing tests
 
 Undici is tuned for a production use case and its default will keep
 a socket open for a few seconds after an HTTP request is completed to

@@ -1,4 +1,4 @@
-﻿# Distributed OS Format
+# Distributed OS Format
 
 **Branch:** `release/distributed`
 

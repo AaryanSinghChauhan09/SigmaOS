@@ -1,4 +1,4 @@
-﻿# CI Pipeline
+# CI Pipeline
 
 1
 

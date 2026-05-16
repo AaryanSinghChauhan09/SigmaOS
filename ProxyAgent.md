@@ -1,4 +1,4 @@
-﻿# Class: ProxyAgent
+# Class: ProxyAgent
 
 Extends: `undici.Dispatcher`
 

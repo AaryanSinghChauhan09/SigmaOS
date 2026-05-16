@@ -1,4 +1,4 @@
-﻿# ext/hal
+# ext/hal
 
 Hardware Abstraction Layer (HAL).
 

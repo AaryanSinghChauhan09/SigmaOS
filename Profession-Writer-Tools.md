@@ -1,4 +1,4 @@
-﻿# Profession-Writer-Tools
+# Profession-Writer-Tools
 
 1
 

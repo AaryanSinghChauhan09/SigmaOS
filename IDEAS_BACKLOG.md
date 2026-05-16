@@ -1,4 +1,4 @@
-﻿# ðŸ’¡ SigmaOS: Industrial Ideas Backlog
+# 💡 SigmaOS: Industrial Ideas Backlog
 
 > **The visionary roadmap for the post-Zenith era.**
 
@@ -6,7 +6,7 @@ This backlog tracks architectural concepts, shard improvements, and future indus
 
 ---
 
-## ðŸ—ï¸ 1. Core Kernel & Lattice Evolution
+## 🏗️ 1. Core Kernel & Lattice Evolution
 
 - [ ] **Relativistic IPC**: Implement a specialized IPC shard for sub-microsecond communication between shards residing on different CPU dies.
 
@@ -14,7 +14,7 @@ This backlog tracks architectural concepts, shard improvements, and future indus
 
 - [ ] **Amnesic Persistence**: A storage model where file data is cryptographically scrambled and "forgotten" unless explicitly accessed via a PQC-attested bio-metric shard.
 
-## ðŸ¤– 2. AI & Neural Integration
+## 🤖 2. AI & Neural Integration
 
 - [ ] **NNFS (Neural Network Integrated File System)**: Use local LLMs to predict file access patterns and pre-fetch shards into L3 cache before the user requests them.
 
@@ -22,7 +22,7 @@ This backlog tracks architectural concepts, shard improvements, and future indus
 
 - [ ] **Lattice-Wide Model Distillation**: Share learning weights between distributed SigmaOS nodes via PQC-secured network shards.
 
-## ðŸŒ 3. Networking & Global Mesh
+## 🌐 3. Networking & Global Mesh
 
 - [ ] **SigmaMesh**: A decentralized, peer-to-peer networking protocol that eliminates the need for centralized ISPs or routing tables.
 
@@ -30,7 +30,7 @@ This backlog tracks architectural concepts, shard improvements, and future indus
 
 - [ ] **Relay Sharding**: Use idle SigmaOS nodes as encrypted relay points for global lattice traffic.
 
-## ðŸŽ¨ 4. User Experience (Zenith UI)
+## 🎨 4. User Experience (Zenith UI)
 
 - [ ] **Holographic Projection Bridge**: Support for hardware shards capable of 3D holographic workspace projection.
 
@@ -38,7 +38,7 @@ This backlog tracks architectural concepts, shard improvements, and future indus
 
 - [ ] **Relativistic Clock Correction**: Automatic UI synchronization for nodes operating at high relative velocities (Aviation/Spacecraft deployments).
 
-## ðŸ¢ 5. Industrial Vertical Shards
+## 🏢 5. Industrial Vertical Shards
 
 - [ ] **Nuclear/Defense Shard**: Specialized RTOS profile for mission-critical reactor management and orbital defense.
 
@@ -48,4 +48,4 @@ This backlog tracks architectural concepts, shard improvements, and future indus
 
 ---
 
-*SigmaOS â€” The Singularity is just the beginning.*
+*SigmaOS — The Singularity is just the beginning.*

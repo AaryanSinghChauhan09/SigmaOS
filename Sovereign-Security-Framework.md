@@ -1,10 +1,10 @@
-﻿# ðŸ›¡ï¸ Sovereign Security Framework (v14.2)
+# 🛡️ Sovereign Security Framework (v14.2)
 
 SigmaOS implements a multi-layered security lattice designed to withstand both classical and post-quantum cryptographic threats. This framework adheres to the **FIPS-140-3** industrial standard for cryptographic modules.
 
 ---
 
-## ðŸ›ï¸ FIPS-140-3 Compliance (#41-42)
+## 🏛️ FIPS-140-3 Compliance (#41-42)
 
 The **SovereignCompliance** shard ensures that all cryptographic operations use NIST-validated primitives.
 
@@ -16,7 +16,7 @@ The **SovereignCompliance** shard ensures that all cryptographic operations use 
 
 ---
 
-## ðŸŒ€ Post-Quantum Cryptography (#43)
+## 🌀 Post-Quantum Cryptography (#43)
 
 SigmaOS utilizes **CRYSTALS-Kyber** and **CRYSTALS-Dilithium** as its primary cryptographic primitives for the Sovereign Lattice.
 
@@ -26,7 +26,7 @@ SigmaOS utilizes **CRYSTALS-Kyber** and **CRYSTALS-Dilithium** as its primary cr
 
 ---
 
-## ðŸ”— Universal Package Graph Attestation (#44)
+## 🔗 Universal Package Graph Attestation (#44)
 
 The attestation framework verifies every shard before it is ignited in the lattice.
 
@@ -38,7 +38,7 @@ The attestation framework verifies every shard before it is ignited in the latti
 
 ---
 
-## ðŸ“Š Security Profiles (#47)
+## 📊 Security Profiles (#47)
 
 Users can customize their security posture via the **SovereignCompliance** shard:
 
@@ -53,7 +53,7 @@ Users can customize their security posture via the **SovereignCompliance** shard
 
 ---
 
-## ðŸ“œ Certification & Audit Results (#49-50)
+## 📜 Certification & Audit Results (#49-50)
 
 SigmaOS has completed its initial internal audit and is currently in the "FIPS-140-3 Ready" phase.
 

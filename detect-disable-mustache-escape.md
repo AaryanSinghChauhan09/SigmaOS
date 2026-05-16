@@ -1,6 +1,6 @@
-﻿# Detects "object.escapeMarkup = false", which can be used with some template engines to disable escaping of HTML entities (`security/detect-disable-mustache-escape`)
+# Detects "object.escapeMarkup = false", which can be used with some template engines to disable escaping of HTML entities (`security/detect-disable-mustache-escape`)
 
-âš ï¸ This rule _warns_ in the âœ… `recommended` config.
+⚠️ This rule _warns_ in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 

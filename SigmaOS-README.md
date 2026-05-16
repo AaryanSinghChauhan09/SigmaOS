@@ -1,4 +1,4 @@
-﻿# S SigmaOS: The Sovereign Computational Lattice
+# S SigmaOS: The Sovereign Computational Lattice
 
 > **"Sovereignty is the ultimate efficiency."**
 > The world's first industrial-grade microkernel designed for total digital autonomy, post-quantum resilience, and Indian industrial compliance.

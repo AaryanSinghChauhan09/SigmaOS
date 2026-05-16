@@ -1,4 +1,4 @@
-﻿# Profession-Data-Scientist-Tools
+# Profession-Data-Scientist-Tools
 
 1
 

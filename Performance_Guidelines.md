@@ -1,8 +1,8 @@
-﻿# Î£ SIGMAOS: Performance & Benchmarking Roadmap
+# Σ SIGMAOS: Performance & Benchmarking Roadmap
 
 SigmaOS Zenith (v15.0) prioritizes deterministic performance and high throughput. This document outlines the profiling and benchmarking infrastructure.
 
-## ðŸ“Š Benchmarking Tiers
+## 📊 Benchmarking Tiers
 
 ### 1. Micro-Benchmarks (Unit Level)
 
@@ -26,7 +26,7 @@ SigmaOS Zenith (v15.0) prioritizes deterministic performance and high throughput
 
 - Performance degradation > 2% triggers an automatic audit.
 
-## ðŸ›  Tooling Integration
+## 🛠 Tooling Integration
 
 - **Static Analysis**: `make lint` uses Clang-Tidy to detect algorithmic inefficiencies.
 
@@ -34,7 +34,7 @@ SigmaOS Zenith (v15.0) prioritizes deterministic performance and high throughput
 
 - **Automated CI**: Benchmarks are executed across x86, ARM, and RISC-V targets.
 
-## ðŸš€ Performance-Optimized Branch
+## 🚀 Performance-Optimized Branch
 
 The `performance/optimization` branch is dedicated to experimental algorithmic improvements, including:
 

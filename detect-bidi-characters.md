@@ -1,6 +1,6 @@
-﻿# Detects trojan source attacks that employ unicode bidi attacks to inject malicious code (`security/detect-bidi-characters`)
+# Detects trojan source attacks that employ unicode bidi attacks to inject malicious code (`security/detect-bidi-characters`)
 
-âš ï¸ This rule _warns_ in the âœ… `recommended` config.
+⚠️ This rule _warns_ in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 

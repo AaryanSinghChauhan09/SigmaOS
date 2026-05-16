@@ -1,4 +1,4 @@
-﻿# Profession-Photographer-Tools
+# Profession-Photographer-Tools
 
 1
 

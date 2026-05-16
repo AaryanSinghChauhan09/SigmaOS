@@ -1,4 +1,4 @@
-﻿# UX FEATURES
+# UX FEATURES
 
 1
 

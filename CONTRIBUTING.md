@@ -1,4 +1,4 @@
-﻿# Contributing to SigmaOS
+# Contributing to SigmaOS
 
 Thank you for your interest in contributing to the Sovereign Lattice!
 

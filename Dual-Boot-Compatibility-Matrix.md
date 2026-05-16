@@ -1,4 +1,4 @@
-﻿# SigmaOS Dual-Boot OS Compatibility Matrix
+# SigmaOS Dual-Boot OS Compatibility Matrix
 
 ## Release: Dual-Boot v15.0
 
@@ -14,27 +14,27 @@ This matrix documents verified co-existence behavior between SigmaOS and other o
 
 | Co-Resident OS | Boot Method | Partition Scheme | Filesystem | SigmaOS Coexists | Notes |
 |----------------|-------------|-----------------|------------|------------------|-------|
-| **Ubuntu 24.04 LTS** | GRUB2 | GPT | ext4 | âœ… Verified | GRUB detects SigmaOS automatically |
+| **Ubuntu 24.04 LTS** | GRUB2 | GPT | ext4 | ✅ Verified | GRUB detects SigmaOS automatically |
 
-| **Fedora 40** | GRUB2 | GPT | ext4/btrfs | âœ… Verified | EFI chainloading confirmed |
+| **Fedora 40** | GRUB2 | GPT | ext4/btrfs | ✅ Verified | EFI chainloading confirmed |
 
-| **Debian 12** | GRUB2 | MBR/GPT | ext4 | âœ… Verified | Legacy BIOS + UEFI both tested |
+| **Debian 12** | GRUB2 | MBR/GPT | ext4 | ✅ Verified | Legacy BIOS + UEFI both tested |
 
-| **Arch Linux** | systemd-boot | GPT | ext4/xfs | âœ… Verified | Manual bootloader entry required |
+| **Arch Linux** | systemd-boot | GPT | ext4/xfs | ✅ Verified | Manual bootloader entry required |
 
-| **Windows 11** | Windows Boot Manager | GPT | NTFS | âœ… Verified | Fast Startup must be disabled |
+| **Windows 11** | Windows Boot Manager | GPT | NTFS | ✅ Verified | Fast Startup must be disabled |
 
-| **Windows 10** | Windows Boot Manager | MBR/GPT | NTFS | âœ… Verified | Legacy MBR: GRUB must be primary |
+| **Windows 10** | Windows Boot Manager | MBR/GPT | NTFS | ✅ Verified | Legacy MBR: GRUB must be primary |
 
-| **macOS Ventura** | Apple Boot Picker | APFS | APFS | âš ï¸ Constrained | Apple Silicon unsupported; Intel only |
+| **macOS Ventura** | Apple Boot Picker | APFS | APFS | ⚠️ Constrained | Apple Silicon unsupported; Intel only |
 
-| **FreeBSD 14** | BSD Bootloader | GPT | UFS/ZFS | âš ï¸ Constrained | Manual partition table tuning needed |
+| **FreeBSD 14** | BSD Bootloader | GPT | UFS/ZFS | ⚠️ Constrained | Manual partition table tuning needed |
 
-| **OpenBSD 7.5** | OpenBSD Bootloader | GPT | FFS | âš ï¸ Constrained | Shared EFI partition required |
+| **OpenBSD 7.5** | OpenBSD Bootloader | GPT | FFS | ⚠️ Constrained | Shared EFI partition required |
 
-| **ChromeOS Flex** | coreboot | GPT | ext4 | ðŸ§ª Experimental | Developer mode required |
+| **ChromeOS Flex** | coreboot | GPT | ext4 | 🧪 Experimental | Developer mode required |
 
-| **Android-x86** | GRUB | GPT | ext4 | ðŸ§ª Experimental | Partition alignment critical |
+| **Android-x86** | GRUB | GPT | ext4 | 🧪 Experimental | Partition alignment critical |
 
 ---
 
@@ -43,19 +43,19 @@ This matrix documents verified co-existence behavior between SigmaOS and other o
 ### Recommended GPT Partition Layout (UEFI Systems)
 
 ```text
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚  Partition 1: EFI System (512MB)    â”‚ â† Shared with co-OS
-â”‚  Type: vfat  /dev/sdX1              â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚  Partition 2: SigmaOS Root (25GB+)  â”‚ â† SovereignLatticeFS
-â”‚  Type: ext4  /dev/sdX2              â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚  Partition 3: SigmaOS Recovery (2GB)â”‚ â† SovereignRecover
-â”‚  Type: ext4  /dev/sdX3              â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚  Partition 4: Co-OS Partition       â”‚ â† Windows/Linux
-â”‚  (Remainder of disk)                â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌─────────────────────────────────────┐
+│  Partition 1: EFI System (512MB)    │ ← Shared with co-OS
+│  Type: vfat  /dev/sdX1              │
+├─────────────────────────────────────┤
+│  Partition 2: SigmaOS Root (25GB+)  │ ← SovereignLatticeFS
+│  Type: ext4  /dev/sdX2              │
+├─────────────────────────────────────┤
+│  Partition 3: SigmaOS Recovery (2GB)│ ← SovereignRecover
+│  Type: ext4  /dev/sdX3              │
+├─────────────────────────────────────┤
+│  Partition 4: Co-OS Partition       │ ← Windows/Linux
+│  (Remainder of disk)                │
+└─────────────────────────────────────┘
 ```text
 ---
 

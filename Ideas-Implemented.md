@@ -1,4 +1,4 @@
-﻿# Ideas-Implemented
+# Ideas-Implemented
 
 1
 

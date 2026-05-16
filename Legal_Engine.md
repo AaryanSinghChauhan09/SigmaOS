@@ -1,4 +1,4 @@
-﻿# Legal Engine
+# Legal Engine
 
 1
 

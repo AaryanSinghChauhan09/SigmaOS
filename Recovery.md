@@ -1,4 +1,4 @@
-﻿# Recovery
+# Recovery
 
 1
 

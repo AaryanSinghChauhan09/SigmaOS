@@ -1,8 +1,8 @@
-﻿# Î£ SIGMAOS: Independent Deployment (release/standalone)
+# Σ SIGMAOS: Independent Deployment (release/standalone)
 
 The `release/standalone` branch is the pure, bare-metal expression of SigmaOS, optimized for independent hardware and resource-constrained environments.
 
-## âš™ï¸ Performance Focus
+## ⚙️ Performance Focus
 
 - **Rapid Ignition**: Stripping unnecessary modules to achieve the fastest possible boot times.
 
@@ -10,13 +10,13 @@ The `release/standalone` branch is the pure, bare-metal expression of SigmaOS, o
 
 - **Deterministic Scheduling**: Using the `SovereignAISched` in Hard-RT mode for absolute latency guarantees.
 
-## ðŸ§© Shard Autonomy
+## 🧩 Shard Autonomy
 
 - **Resource Constraints**: Validating shard performance on low-memory (MB range) hardware.
 
 - **Hot-Swappable Shards**: Ensuring modules can be replaced under high load without system instability.
 
-## ðŸ§ª Testing & Validation
+## 🧪 Testing & Validation
 
 - **Bare-Metal Audits**: Automated testing on physical x86, ARM, and RISC-V hardware.
 

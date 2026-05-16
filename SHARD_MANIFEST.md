@@ -1,12 +1,12 @@
-﻿# SHARD MANIFEST
+# SHARD MANIFEST
 
-# ðŸ§± SigmaOS Shard Manifest
+# 🧱 SigmaOS Shard Manifest
 
 This manifest outlines the core functional shards that define the SigmaOS ecosystem. SigmaOS is composed of 600+ atomic shards, ensuring that no single component can destabilize the system.
 
 ---
 
-## ðŸ›ï¸ Core System Shards (/kernel/core)
+## 🏛️ Core System Shards (/kernel/core)
 
 1. **Lattice-Aware Scheduler**: AI-Native predictive allocation for RDTSC-precision tasking.
 
@@ -20,7 +20,7 @@ This manifest outlines the core functional shards that define the SigmaOS ecosys
 
 ---
 
-## ðŸ›¡ï¸ Security & Observability Shards (/kernel/security)
+## 🛡️ Security & Observability Shards (/kernel/security)
 
 1. **Sovereign Sandbox**: Capability-gated isolation for Ring 3 applications.
 
@@ -32,7 +32,7 @@ This manifest outlines the core functional shards that define the SigmaOS ecosys
 
 ---
 
-## ðŸŽ¨ Zenith UI Shards (/ui)
+## 🎨 Zenith UI Shards (/ui)
 
 1. **Morphic Compositor**: GPU-accelerated window management with glassmorphism.
 
@@ -44,7 +44,7 @@ This manifest outlines the core functional shards that define the SigmaOS ecosys
 
 ---
 
-## ðŸŒ Networking & Ecosystem (/net)
+## 🌐 Networking & Ecosystem (/net)
 
 1. **PQC-VPN**: Built-in quantum-resistant networking layer.
 

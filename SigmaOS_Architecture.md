@@ -1,4 +1,4 @@
-﻿# SigmaOS: Industrial Architecture Manifest
+# SigmaOS: Industrial Architecture Manifest
 
 ## Zenith v15.0 "Horizon" Release
 

@@ -1,4 +1,4 @@
-﻿# SigmaOS Format: RTOS (Real-Time OS)
+# SigmaOS Format: RTOS (Real-Time OS)
 
 ## Deterministic Latency & Safety-Critical Execution
 
@@ -6,7 +6,7 @@ The **RTOS** format is designed for mission-critical industrial deployments (Bio
 
 ---
 
-## ðŸ› ï¸ Bundled Industrial Tools
+## 🛠️ Bundled Industrial Tools
 
 | Tool | Category | Linux/Windows Equivalent | Purpose |
 |------|----------|--------------------------|---------|
@@ -20,7 +20,7 @@ The **RTOS** format is designed for mission-critical industrial deployments (Bio
 
 ---
 
-## âš™ï¸ Core Shards
+## ⚙️ Core Shards
 
 - `kernel/core/system/SovereignScheduler.cpp` (Deterministic Mode)
 
@@ -30,7 +30,7 @@ The **RTOS** format is designed for mission-critical industrial deployments (Bio
 
 ---
 
-## ðŸš€ Optimization Checklist
+## 🚀 Optimization Checklist
 
 - [ ] Disable dynamic memory allocation (Zero-Alloc mode).
 

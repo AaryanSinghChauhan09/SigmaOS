@@ -1,4 +1,4 @@
-﻿# Profession-Statistician-Tools
+# Profession-Statistician-Tools
 
 1
 

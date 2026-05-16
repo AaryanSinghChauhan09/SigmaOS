@@ -1,4 +1,4 @@
-﻿# Sovereign Industrial Scheduler (S-SCHED)
+# Sovereign Industrial Scheduler (S-SCHED)
 
 The **Sovereign Industrial Scheduler (S-SCHED)** is the multi-tasking orchestrator for **SigmaOS v15.0 "Horizon"**. It provides deterministic, priority-based execution for the 600-shard microkernel lattice.
 

@@ -1,4 +1,4 @@
-﻿# Master Feature Manifest
+# Master Feature Manifest
 
 1
 

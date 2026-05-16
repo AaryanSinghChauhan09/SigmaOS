@@ -1,4 +1,4 @@
-﻿# SigmaOS 100 ITEM BACKLOG
+# SigmaOS 100 ITEM BACKLOG
 
 1
 

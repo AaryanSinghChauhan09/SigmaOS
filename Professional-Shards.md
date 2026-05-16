@@ -1,8 +1,8 @@
-﻿# S-SHARDS: Professional Shard Registry
+# S-SHARDS: Professional Shard Registry
 
 SigmaOS is built on a modular "shard" architecture. Each profession is served by a dedicated, isolated shard that provides role-specific tools and resilience strategies.
 
-## ðŸ©º S-MED: Medical Diagnostic Shard
+## 🩺 S-MED: Medical Diagnostic Shard
 
 - **Primary Tool**: DICOM Volumetric Renderer.
 
@@ -10,7 +10,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: Real-time life-sync for surgical continuity.
 
-## ðŸ›¡ï¸ S-CYBER: Cyber-Security Shard
+## 🛡️ S-CYBER: Cyber-Security Shard
 
 - **Primary Tool**: Packet-Audit Lattice.
 
@@ -18,7 +18,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: Ephemeral sandbox containment for exploit research.
 
-## ðŸ“ˆ S-FIN: Financial Modeling Shard
+## 📈 S-FIN: Financial Modeling Shard
 
 - **Primary Tool**: Monte-Carlo Nexus.
 
@@ -26,7 +26,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: Transaction consistency validation via the Sovereign Ledger.
 
-## ðŸš€ S-SPACE: Aerospace Engineering Shard
+## 🚀 S-SPACE: Aerospace Engineering Shard
 
 - **Primary Tool**: CFD Dynamics Lattice.
 
@@ -34,7 +34,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: Real-time telemetry verification via the Sovereign Mesh.
 
-## âš–ï¸ S-VAKIL: Legal Professional Shard
+## ⚖️ S-VAKIL: Legal Professional Shard
 
 - **Primary Tool**: Case-Lattice Search.
 
@@ -42,7 +42,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: Immutable case-history rollback.
 
-## ðŸ—ï¸ S-CAD: Architecture & Engineering Shard
+## 🏗️ S-CAD: Architecture & Engineering Shard
 
 - **Primary Tool**: Parametric Sharder.
 
@@ -50,7 +50,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: State-reconciliation for BIM models.
 
-## ðŸŒ¾ S-AGRIC: Agricultural Scientist Shard
+## 🌾 S-AGRIC: Agricultural Scientist Shard
 
 - **Primary Tool**: IoT Soil-Lattice Monitor.
 
@@ -58,7 +58,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: Real-time harvest failover.
 
-## ðŸŽ¨ S-ART: Creative Studio Shard
+## 🎨 S-ART: Creative Studio Shard
 
 - **Primary Tool**: High-Bit-Depth Color Lattice.
 
@@ -66,7 +66,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: Low-latency GPU context restoration.
 
-## ðŸŽ“ S-EDU: Academic & Researcher Shard
+## 🎓 S-EDU: Academic & Researcher Shard
 
 - **Primary Tool**: Peer-Review Mesh.
 
@@ -74,7 +74,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: Decentralized research sharding.
 
-## ðŸ›ï¸ S-GOV: Government & Policy Shard
+## 🏛️ S-GOV: Government & Policy Shard
 
 - **Primary Tool**: PQC-Encrypted Voting Lattice.
 
@@ -82,7 +82,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: Policy-state reconciliation.
 
-## âš™ï¸ S-ENGINEER: Industrial Engineering Shard
+## ⚙️ S-ENGINEER: Industrial Engineering Shard
 
 - **Primary Tool**: Real-time Stress-Analysis Nexus.
 
@@ -90,7 +90,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: PLM-lattice failover.
 
-## ðŸ§¬ S-BIO: Biotechnology & Genetics Shard
+## 🧬 S-BIO: Biotechnology & Genetics Shard
 
 - **Primary Tool**: Genomic Sequencing Lattice.
 
@@ -98,7 +98,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: Real-time protein-folding simulation.
 
-## ðŸ§® S-MATH: Mathematical Research Shard
+## 🧮 S-MATH: Mathematical Research Shard
 
 - **Primary Tool**: Symbolic Computation Nexus.
 
@@ -106,7 +106,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: Arbitrary-precision state recovery.
 
-## ðŸ§ª S-CHEM: Chemical Engineering Shard
+## 🧪 S-CHEM: Chemical Engineering Shard
 
 - **Primary Tool**: Molecular Dynamics Lattice.
 
@@ -114,7 +114,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: Quantum-mechanical state stability.
 
-## ðŸº S-ARCH: Archaeology & Heritage Shard
+## 🏺 S-ARCH: Archaeology & Heritage Shard
 
 - **Primary Tool**: LiDAR Point-Cloud Lattice.
 
@@ -122,7 +122,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: 3D site-reconstruction failover.
 
-## ðŸšš S-LOGIST: Logistics & Supply Chain Shard
+## 🚚 S-LOGIST: Logistics & Supply Chain Shard
 
 - **Primary Tool**: Route-Optimization Lattice.
 
@@ -130,7 +130,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: PQC-signed manifest verification.
 
-## âš¡ S-ENERGY: Energy Grid & Renewables Shard
+## ⚡ S-ENERGY: Energy Grid & Renewables Shard
 
 - **Primary Tool**: Grid-Stability Lattice.
 
@@ -138,7 +138,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: PQC-encrypted utility telemetry.
 
-## ðŸŒŠ S-OCEAN: Oceanography & Marine Research Shard
+## 🌊 S-OCEAN: Oceanography & Marine Research Shard
 
 - **Primary Tool**: Tidal-Pressure Lattice.
 
@@ -146,7 +146,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: Underwater telemetry failover.
 
-## ðŸŒ¤ï¸ S-METEO: Meteorology & Climate Research Shard
+## 🌤️ S-METEO: Meteorology & Climate Research Shard
 
 - **Primary Tool**: Atmospheric-Dynamic Lattice.
 
@@ -154,7 +154,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: PQC-signed climate record integrity.
 
-## â˜¢ï¸ S-NUKE: Nuclear Engineering Shard
+## ☢️ S-NUKE: Nuclear Engineering Shard
 
 - **Standards**: AERB Safety Code, ANS-5.1 Decay Heat.
 
@@ -162,7 +162,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: Hardware interlocked failsafe.
 
-## ðŸ—ï¸ S-CIVIL: Civil & Structural Engineering Shard
+## 🏗️ S-CIVIL: Civil & Structural Engineering Shard
 
 - **Standards**: IS 456:2000, IS 875:1987, IS 1893:2016, NBC 2016.
 
@@ -170,7 +170,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: PLM-lattice failover with PQC-signed reports.
 
-## ðŸ’Š S-PHARMA: Pharmacology Shard
+## 💊 S-PHARMA: Pharmacology Shard
 
 - **Standards**: Drugs & Cosmetics Act 1940, Schedule H/X.
 
@@ -178,7 +178,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: PQC-sealed prescription records.
 
-## ðŸ©º S-MBBS: Indian Doctor Clinical Decision Support
+## 🩺 S-MBBS: Indian Doctor Clinical Decision Support
 
 - **Standards**: NMC, ICMR, WHO-Asia BMI cutoffs, JSSK/NHM.
 
@@ -186,15 +186,15 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: Real-time life-sync.
 
-## âš–ï¸ S-ADVOCATE: Indian Advocate & Legal Research
+## ⚖️ S-ADVOCATE: Indian Advocate & Legal Research
 
 - **Standards**: BNS 2023, BNSS 2023, CPC 1908, Limitation Act 1963, CP Act 2019.
 
-- **Calculators**: IPCâ†’BNS mapper, Limitation lookup, RTI deadline, Bail check, Consumer forum.
+- **Calculators**: IPC→BNS mapper, Limitation lookup, RTI deadline, Bail check, Consumer forum.
 
 - **Resilience**: PQC-sealed case history.
 
-## ðŸ  S-REALTY: Real Estate & Property Shard
+## 🏠 S-REALTY: Real Estate & Property Shard
 
 - **Standards**: RERA 2016, Stamp Duty (10 states), Registration Act 1908.
 
@@ -202,7 +202,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: PQC-signed title documents.
 
-## ðŸ§¾ S-CA: Chartered Accountant Shard
+## 🧾 S-CA: Chartered Accountant Shard
 
 - **Standards**: Income Tax Act 1961, GST 2017, Companies Act 2013.
 
@@ -210,7 +210,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: PQC-audited financial ledger.
 
-## ðŸ’° S-TAX: Indian Income Tax Shard
+## 💰 S-TAX: Indian Income Tax Shard
 
 - **Standards**: IT Act 1961, AY 2025-26 New & Old Regime.
 
@@ -218,7 +218,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: Immutable audit trail.
 
-## ðŸ‘” S-HR: Indian HR & Labour Compliance Shard
+## 👔 S-HR: Indian HR & Labour Compliance Shard
 
 - **Standards**: PF Act 1952, ESI Act 1948, Gratuity Act 1972, Bonus Act 1965.
 
@@ -226,7 +226,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: PQC-signed payslip registry.
 
-## ðŸ¢ S-IS: Indian IS-Code Engineering Shard
+## 🏢 S-IS: Indian IS-Code Engineering Shard
 
 - **Standards**: IS 456:2000, IS 875-3:1987, IS 1893:2016.
 
@@ -234,7 +234,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: NBC 2016 compliance attestation.
 
-## ðŸ“Š S-SEBI: Capital Markets & Stockbroker Shard
+## 📊 S-SEBI: Capital Markets & Stockbroker Shard
 
 - **Standards**: SEBI Act 1992, LODR 2015, PIT 2015, PMLA 2002.
 
@@ -242,7 +242,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: T+1 settlement audit trail.
 
-## ðŸ›¡ï¸ S-ACTUARY: Insurance & Risk Shard
+## 🛡️ S-ACTUARY: Insurance & Risk Shard
 
 - **Standards**: IRDAI Act 1999, Insurance Act 1938, LIC IAM 94-96 mortality tables.
 
@@ -250,7 +250,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: IAI-compliant valuation attestation.
 
-## ðŸš” S-POLICE: Indian Law Enforcement Shard
+## 🚔 S-POLICE: Indian Law Enforcement Shard
 
 - **Standards**: BNS 2023, BNSS 2023, IEA 2023, NDPS Act 1985, PC Act 1988.
 
@@ -258,7 +258,7 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 
 - **Resilience**: PQC-signed case dossier.
 
-## ðŸ“š S-TEACH: Indian Teacher & Educator Shard
+## 📚 S-TEACH: Indian Teacher & Educator Shard
 
 - **Standards**: NEP 2020, CBSE grading, UGC 7th Pay Commission, RTE Act 2009, NAAC.
 

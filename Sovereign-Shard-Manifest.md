@@ -1,4 +1,4 @@
-﻿# Sovereign-Shard-Manifest
+# Sovereign-Shard-Manifest
 
 1
 

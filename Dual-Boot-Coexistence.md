@@ -1,8 +1,8 @@
-﻿# Î£ SIGMAOS: Multi-OS Coexistence (release/dual-boot)
+# Σ SIGMAOS: Multi-OS Coexistence (release/dual-boot)
 
 The `release/dual-boot` branch focuses on the seamless integration of SigmaOS with existing hardware environments alongside legacy operating systems.
 
-## âš™ï¸ Performance Focus
+## ⚙️ Performance Focus
 
 - **Bootloader Optimization**: Validating the Sovereign Bootloader for sub-second OS selection.
 
@@ -10,13 +10,13 @@ The `release/dual-boot` branch focuses on the seamless integration of SigmaOS wi
 
 - **Hardware Direct Access**: Ensuring zero-latency hardware passthrough for industrial shards.
 
-## ðŸ”’ Security & Isolation
+## 🔒 Security & Isolation
 
 - **Cross-OS Leakage Prevention**: Hardened memory protection (SMAP/SMEP) to ensure total isolation from legacy OSes.
 
 - **Persistence Validation**: Verifying amnesic persistence routines to prevent data remanence across reboots.
 
-## ðŸ§ª Testing & Validation
+## 🧪 Testing & Validation
 
 - **Compatibility Matrix**: Automated testing against diverse UEFI/BIOS and partition configurations.
 

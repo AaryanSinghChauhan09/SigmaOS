@@ -1,4 +1,4 @@
-﻿# SigmaOS Performance Benchmarks (v15.0)
+# SigmaOS Performance Benchmarks (v15.0)
 
 This page tracks the official performance metrics of the SigmaOS Zenith v15.0 microkernel under different workloads and formats.
 

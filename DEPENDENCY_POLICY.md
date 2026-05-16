@@ -1,9 +1,9 @@
-﻿# DEPENDENCY POLICY
+# DEPENDENCY POLICY
 
 1
 
 // =============================================================================
-// SigmaOS Â— DEPENDENCY PURITY POLICY
+// SigmaOS  DEPENDENCY PURITY POLICY
 // =============================================================================
 // This document defines which external dependencies are ALLOWED in SigmaOS.
 // Any violation must be replaced before merging to main.
@@ -19,11 +19,11 @@ ALLOWED LANGUAGES (kernel):
 
 1
 
-ALLOWED LANGUAGES (userland tools Â— in tools/):
+ALLOWED LANGUAGES (userland tools  in tools/):
 
 1
 
-FORBIDDEN IN KERNEL SUITES (S01Â–S10):
+FORBIDDEN IN KERNEL SUITES (S01S10):
 
 1
 

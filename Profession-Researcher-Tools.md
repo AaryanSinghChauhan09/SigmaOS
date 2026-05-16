@@ -1,4 +1,4 @@
-﻿# Profession-Researcher-Tools
+# Profession-Researcher-Tools
 
 1
 

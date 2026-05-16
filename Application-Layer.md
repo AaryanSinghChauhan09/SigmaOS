@@ -1,8 +1,8 @@
-﻿# Î£ SIGMAOS: Application Layer & User-Space (release/app)
+# Σ SIGMAOS: Application Layer & User-Space (release/app)
 
 The `release/app` branch focuses on providing a robust, high-performance environment for industrial applications and user-space programs.
 
-## âš™ï¸ Performance Focus
+## ⚙️ Performance Focus
 
 - **API Optimization**: Minimizing system call overhead through zero-copy buffers.
 
@@ -10,13 +10,13 @@ The `release/app` branch focuses on providing a robust, high-performance environ
 
 - **GUI Responsiveness**: Asynchronous event handling for the Zenith UI.
 
-## ðŸ§© Compatibility & Portability
+## 🧩 Compatibility & Portability
 
 - **POSIX Compliance**: Strict adherence to IEEE 1003.1 for seamless application porting.
 
 - **S-PKG Management**: Post-quantum signed package installation and verification.
 
-## ðŸ§ª Testing & Validation
+## 🧪 Testing & Validation
 
 - **Regression Tests**: Automated benchmarking of package install times and UI frame rates.
 

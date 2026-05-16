@@ -1,4 +1,4 @@
-﻿# HACKING.md â€” Writing a New Sovereign Shard
+# HACKING.md — Writing a New Sovereign Shard
 
 This guide walks through writing, registering, and testing a new kernel shard for SigmaOS.
 
@@ -16,7 +16,7 @@ All shards live in `kernel/core/`. Create `SovereignMyFeature.cpp`:
 
 /**
 
-- SovereignMyFeature â€” What this shard does.
+- SovereignMyFeature — What this shard does.
 
 - Algorithm: ALGORITHM_NAME
 
