@@ -95,6 +95,8 @@
 - [Format: Cloud (Containers & Scaling)](Cloud-Format)
 
 - [Format: Mobile (Multimedia & Productivity)](Mobile-Format)
+- [Format: Forensic (Audit & Recovery)](Forensic-Profile)
+- [Format: Education (NCERT & Labs)](Education-Profile)
 
 ## ðŸ› ï¸ Industrial Readiness
 
