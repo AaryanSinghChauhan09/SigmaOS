@@ -8,9 +8,10 @@ Welcome to SigmaOS! Every contributor must follow these rules. They act like a c
 - Every task must follow the same naming conventions, formatting, and documentation style.
 - **No shortcuts**: even small fixes require tests and documentation updates.
 
-### Traceability
+### Traceability & Commit Messages
 - Each task must be linked to an issue or roadmap item.
-- Commit messages must reference the issue ID and describe the change clearly.
+- Commit messages must use the **imperative style** (e.g., "Add memory allocator," "Fix IRQ handler").
+- Reference issue IDs for traceability to ensure every change maps back to the roadmap.
 
 ### Atomic Changes
 - One task = one logical change.
