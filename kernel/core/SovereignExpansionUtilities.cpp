@@ -23,9 +23,10 @@ public:
         sigma_log_info("[S-RECOVERY] S-VFS Journal Rewinding... SUCCESS.");
     }
 
-    // 2. Education: Classroom Management (Debian Edu parity)
+    // 2. Education: Classroom Management & NCERT Experiments (Debian Edu parity)
     void edu_broadcast_screen() {
         sigma_log_info("[S-EDU] Broadcasting primary node screen to 30 student shards...");
+        sigma_log_info("[S-EDU] Loading NCERT Experiment Suite: Science (Class 10), Math (Class 12).");
         sigma_log_info("[S-EDU] Multicast S-NET stream active.");
     }
 

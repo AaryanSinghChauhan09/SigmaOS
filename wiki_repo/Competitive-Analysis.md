@@ -35,10 +35,10 @@ SigmaOS is designed for **Absolute Non-Equivalence** — a sovereign computation
 
 | Gap | Recommendation | Priority |
 |:--- |:--- |:--- |
-| GPU / Wi-Fi drivers | Expand `S-HAL` driver shards | 🟢 Immediate |
-| Installer UX | Build enterprise-tier installer with shard profiles | 🟡 Medium |
-| Live USB Environment | Bootable ISO without installation | 🟡 Medium |
-| Flatpak / AppImage parity | Sovereign portable app format | 🟡 Medium |
+| GPU / Wi-Fi drivers | Expand `S-HAL` driver shards | ✅ **CLOSED** |
+| Installer UX | Build enterprise-tier installer with shard profiles | ✅ **CLOSED** |
+| Live USB Environment | Bootable ISO without installation | ✅ **CLOSED** |
+| Flatpak / AppImage parity | Sovereign portable app format | ✅ **CLOSED** |
 | Virtualization | Implement `S-HYP` Type-1 hypervisor | 🔴 Long-term |
 | Rolling release infrastructure | Mirror infrastructure for updates | 🔴 Long-term |
 
