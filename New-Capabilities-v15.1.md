@@ -17,6 +17,36 @@ Live visualization of inter-shard dependency health.
 
 **C API:** `inspector_init()`, `inspector_register()`, `inspector_update()`, `inspector_dump()`
 
+### Sigma Kernel Tuner (`tools/sigma_tuner.cpp`)
+
+Live kernel parameter adjustment without reboots.
+
+- Modifies kernel tunables in real-time
+- Validates inputs against safe boundaries
+- Read-only support for protected variables
+
+**C API:** `tuner_init()`, `tuner_set()`, `tuner_list()`
+
+### Sigma Energy Saver (`tools/sigma_energy.cpp`)
+
+Intelligent power scaling for laptops/servers.
+
+- 4 modes: PERFORMANCE, BALANCED, POWERSAVE, ULTRA_ECO
+- Automatically switches profile based on battery % and AC status
+- Modifies CPU frequency bounds and device sleep toggles
+
+**C API:** `energy_init()`, `energy_set_state()`, `energy_force_powersave()`, `energy_report()`
+
+### Sigma Secure Boot Manager (`tools/sigma_secure_boot.cpp`)
+
+Sovereign boot validation with PQC.
+
+- Attests boot images using PQC-Kyber/Dilithium signatures
+- Strict enforcement and auditing modes
+- Pre-loads platform keys into memory
+
+**C API:** `secboot_init()`, `secboot_verify()`, `secboot_set_mode()`, `secboot_report()`
+
 ---
 
 ## 🎮 Gaming & Multimedia
@@ -33,6 +63,16 @@ Reduces input lag for eSports and real-time workloads.
 | ULTRA | 0.1ms | Yes |
 
 **C API:** `latency_init()`, `latency_set_gaming()`, `latency_set_esports()`, `latency_set_ultra()`, `latency_pin_cpu()`
+
+### Sigma Game Library (`userland/apps/SigmaGameLibrary.cpp`)
+
+Curated open-source gaming hub with direct hardware access.
+
+- Launch titles directly with zero-overhead graphics
+- Automatically toggles eSports Latency Optimizer for competitive games
+- Tracks local vs cloud installations
+
+**C API:** `gamelib_init()`, `gamelib_launch()`, `gamelib_list()`
 
 ---
 
