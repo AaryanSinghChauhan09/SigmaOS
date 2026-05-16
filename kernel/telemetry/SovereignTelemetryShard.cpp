@@ -6,7 +6,6 @@
 
 #include "../../include/telemetry/sigma_telemetry.h"
 #include "../../include/sigma_log.h"
-#include "../../include/libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Telemetry {

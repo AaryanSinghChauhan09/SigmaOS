@@ -6,7 +6,6 @@
 
 #include "../../include/virt/sigma_hypervisor.h"
 #include "../../include/sigma_log.h"
-#include "../../include/libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Virt {

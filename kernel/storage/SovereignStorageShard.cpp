@@ -6,7 +6,6 @@
 
 #include "../../include/storage/sigma_storage.h"
 #include "../../include/sigma_log.h"
-#include "../../include/libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Storage {

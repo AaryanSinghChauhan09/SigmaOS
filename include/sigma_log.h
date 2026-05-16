@@ -9,8 +9,9 @@
 #ifndef SIGMA_LOG_H
 #define SIGMA_LOG_H
 
-#include "libc/SovereignLibC.h"
-#include "core/sigma_types.h"
+/* Use the single source-of-truth types header directly.
+ * sigma_kernel_types.h is zero-dependency and always available. */
+#include "sigma_kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {
