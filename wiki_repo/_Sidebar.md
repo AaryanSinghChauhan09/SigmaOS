@@ -66,6 +66,22 @@
 
 - [Code of Conduct](CODE_OF_CONDUCT)
 
+## 📊 Niche Parity (vs Linux)
+
+* [Gaming & GPU Utilities](Gaming-Utilities)
+* [Performance Optimizer](Performance-Optimizer)
+* [IoT & Embedded Toolkit](IoT-and-Embedded)
+* [Reproducibility & Rollback](Reproducibility-Guide)
+* [Container Orchestration](Container-Orchestration)
+* [Rolling Release Strategy](Rolling-Release-Strategy)
+* [Enterprise & Regression](Enterprise-Regression)
+* [Gap Analysis vs Competitors](Gap-Analysis-vs-Competitors)
+
+## 📅 Roadmap & Future
+
+* [Contributor Roadmap](CONTRIBUTOR_ROADMAP)
+* [Industrial Release Notes](CHANGELOG)
+
 ## 🛠️ Developer Reference
 
 - [API Documentation](API-Documentation)
