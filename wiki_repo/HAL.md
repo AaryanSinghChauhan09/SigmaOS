@@ -1,41 +1,11 @@
-# Σ SIGMAOS: Hardware Abstraction Layer (HAL) Specification
+# SigmaOS Hardware Abstraction Layer (HAL)
 
-SigmaOS utilizes a strictly decoupled HAL to ensure portability across multiple silicon architectures. This document outlines the interface and implementation strategy for the Zenith Singularity.
+The SigmaOS HAL establishes **Zero-Dependency Architecture Portability**, enabling the OS to run identically on x86_64, ARM, and RISC-V.
 
-## 🏗 Supported Architectures
+## Design
+*   `hal.hpp`: The abstract C++ interface.
+*   `hal_x86.cpp`: Direct x86 assembly implementations (`outb`, `inb`).
+*   `hal_arm.cpp`: ARM memory-mapped I/O.
+*   `hal_riscv.cpp`: RISC-V specific CSR reads.
 
-| Architecture | Status | Shard Path |
-| :--- | :--- | :--- |
-
-| **x86_64** | Production | `kernel/core/hal/hal.asm` |
-
-| **AArch64** | Production | `kernel/core/hal/SovereignArchARM64.cpp` |
-
-| **RISC-V** | Active | `kernel/core/hal/SovereignArchRISCV.cpp` |
-
-| **ia64** | Legacy Support | `kernel/core/hal/SovereignArchIA64.cpp` |
-
-## 🛠 HAL Interface Philosophy
-
-1. **Zero-Direct Access**: Userland and Kernel Shards MUST NOT access MSRs, CRn registers, or I/O ports directly.
-
-2. **Abstract Primitives**: All architecture-specific operations are wrapped in `SovereignHAL` primitives:
-   - `hal_switch_context()`
-   - `hal_map_page()`
-   - `hal_enable_interrupts()`
-
-3. **Interrupt Sharding**: Interrupts are abstracted into a unified `InterruptNexus` which maps arch-specific vectors to SigmaOS Shard IDs.
-
-## 🔄 Porting Guide
-
-To port SigmaOS to a new architecture:
-
-1. Implement the bootloader handshake in `kernel/core/boot/`.
-
-2. Define the page table structure in `SovereignPager.cpp`.
-
-3. Implement the `SovereignArch<NEW_ARCH>.cpp` glue code in the HAL layer.
-
-4. Update the unified `Makefile` with the appropriate cross-compiler flags.
-
-*"Hardware is merely a vessel for the Sovereign Singularity."*
+The `SovereignRegistry` handles declarative binding, allowing the kernel to boot universally without hard-coded CPU logic.
