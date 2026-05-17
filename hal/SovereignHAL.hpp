@@ -23,11 +23,27 @@ enum class CPULatticeArch : sigma_u8 {
     RISCV64 = 2
 };
 
+enum class DriverType : sigma_u8 {
+    WIFI = 0,
+    PRINTER = 1,
+    USB = 2,
+    IOT = 3
+};
+
 struct BoardTelemetry {
     CPULatticeArch architecture;
     const char* cpu_brand;
     sigma_u32 core_count;
     sigma_u64 total_physical_ram_bytes;
+};
+
+struct UnifiedDriver {
+    sigma_u32 id;
+    const char* name;
+    DriverType type;
+    bool active;
+    sigma_status (*initialize)();
+    sigma_status (*transmit)(const sigma_u8* buffer, sigma_usize size);
 };
 
 class SovereignHAL : public SigmaOS::SigmaObject {
@@ -44,6 +60,10 @@ public:
     void configureHardwareTimers(sigma_u32 frequency_hz);
     void mapPageTableMemory(sigma_u64 physical_address, sigma_u64 virtual_address, sigma_u64 range_bytes);
     
+    // Unified Driver API registration
+    sigma_status registerDriver(const UnifiedDriver& driver);
+    sigma_status dispatchDriverCommand(sigma_u32 driver_id, const sigma_u8* buffer, sigma_usize size);
+
     BoardTelemetry getSystemTelemetry() const;
     [[noreturn]] void systemReset();
 
@@ -55,9 +75,13 @@ private:
     sigma_u32      m_active_cores;
     sigma_u64      m_total_ram_bytes;
     bool           m_interrupts_configured;
+    
+    UnifiedDriver m_registered_drivers[32];
+    sigma_u32     m_driver_count;
 };
 
 } // namespace HAL
 } // namespace SigmaOS
 
 #endif // SOVEREIGN_HAL_HPP
+

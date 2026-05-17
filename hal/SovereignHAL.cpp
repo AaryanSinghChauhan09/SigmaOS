@@ -16,8 +16,10 @@ SovereignHAL::SovereignHAL()
     : m_arch(CPULatticeArch::X86_64),
       m_active_cores(1),
       m_total_ram_bytes(1024 * 1024 * 2048ULL), // 2 GB Default
-      m_interrupts_configured(false) {
+      m_interrupts_configured(false),
+      m_driver_count(0) {
     m_arch = detectArchitecture();
+    sigma_memset(m_registered_drivers, 0, sizeof(m_registered_drivers));
 }
 
 CPULatticeArch SovereignHAL::detectArchitecture() {
@@ -28,7 +30,6 @@ CPULatticeArch SovereignHAL::detectArchitecture() {
 #elif defined(__riscv)
     return CPULatticeArch::RISCV64;
 #else
-    // Fallback default
     return CPULatticeArch::X86_64;
 #endif
 }
@@ -69,6 +70,38 @@ void SovereignHAL::mapPageTableMemory(sigma_u64 physical_address, sigma_u64 virt
     sigma_log_info("[HAL] S-HAL: Mapping Paging tables -> Zero-Copy secure passthrough.");
 }
 
+sigma_status SovereignHAL::registerDriver(const UnifiedDriver& driver) {
+    if (m_driver_count >= 32) {
+        sigma_log_error("[HAL/ERR] Cannot register driver: unified register table full.\n");
+        return K_ERR_INVAL;
+    }
+    
+    m_registered_drivers[m_driver_count] = driver;
+    m_registered_drivers[m_driver_count].id = m_driver_count;
+    m_driver_count++;
+    
+    sigma_log_info("[HAL] Unified Driver Registered: %s (Type ID: %u, Assigned ID: %u)\n", 
+        driver.name, (sigma_u32)driver.type, m_driver_count - 1);
+        
+    return K_OK;
+}
+
+sigma_status SovereignHAL::dispatchDriverCommand(sigma_u32 driver_id, const sigma_u8* buffer, sigma_usize size) {
+    if (driver_id >= m_driver_count) {
+        sigma_log_error("[HAL/ERR] Cannot dispatch command: invalid driver ID %u\n", driver_id);
+        return K_ERR_INVAL;
+    }
+    
+    UnifiedDriver& driver = m_registered_drivers[driver_id];
+    if (!driver.active || !driver.transmit) {
+        sigma_log_error("[HAL/ERR] Driver %s is currently inactive or lacks transmission vector.\n", driver.name);
+        return K_ERR_INVAL;
+    }
+    
+    sigma_log_info("[HAL] Dispatching packet (%zu bytes) to Unified Driver: %s\n", size, driver.name);
+    return driver.transmit(buffer, size);
+}
+
 BoardTelemetry SovereignHAL::getSystemTelemetry() const {
     BoardTelemetry telemetry{};
     telemetry.architecture = m_arch;
@@ -87,7 +120,6 @@ BoardTelemetry SovereignHAL::getSystemTelemetry() const {
 void SovereignHAL::systemReset() {
     sigma_log_info("[HAL] S-HAL: Dispatching ACPI/GPIO System Reset Vector...");
     while (true) {
-        // Enforce hard CPU halt
 #if defined(__x86_64__)
         __asm__ __volatile__("cli; hlt");
 #endif
@@ -102,3 +134,4 @@ extern "C" {
         SigmaOS::HAL::SovereignHAL::getInstance().initializeHAL();
     }
 }
+
