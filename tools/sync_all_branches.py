@@ -47,14 +47,21 @@ def sync_branches():
                 print(f"[ERROR] Failed to switch to or create branch '{branch}'. Skipping.")
                 continue
 
-        # Hard reset to main to guarantee bit-perfect uniformity
-        if not run_git(["reset", "--hard", "main"]):
-            print(f"[ERROR] Failed to reset '{branch}' to main. Skipping.")
-            continue
+        # Merge main into the branch to keep branch-specific customizations while integrating core updates
+        print(f"[*] Merging core improvements from main into {branch}...")
+        if not run_git(["merge", "main", "-m", "Sync: Merge latest core improvements from main"]):
+            print(f"[!] Conflict detected during merge. Resolving by preferring core improvements from main...")
+            run_git(["merge", "--abort"])
+            # Use -X theirs to auto-resolve conflicts in favor of main's core upgrades while retaining branch-only files
+            if not run_git(["merge", "-X", "theirs", "main", "-m", "Sync: Merge latest core improvements from main (conflict resolved)"]):
+                print(f"[ERROR] Failed to merge main into branch '{branch}'. Skipping push.")
+                continue
 
-        # Force push the update to remote
-        if not run_git(["push", "origin", branch, "--force"]):
-            print(f"[ERROR] Failed to push branch '{branch}' to remote.")
+        # Push the synchronized branch to remote
+        if not run_git(["push", "origin", branch]):
+            print(f"[!] Standard push failed. Attempting force push for parity...")
+            if not run_git(["push", "origin", branch, "--force"]):
+                print(f"[ERROR] Failed to push branch '{branch}' to remote.")
 
     # Always return to main
     print("\n[*] Returning to main branch...")

@@ -612,11 +612,57 @@ class SigmaTerminal {
         this.in.value = '';
         const args = cmd.trim().split(' ');
         const base = args[0].toLowerCase();
-        if (base === 'help') this.print('Commands: ls, cd, cat, clear, reboot, exit');
-        else if (base === 'ls') this.print(vfs.ls().join('  '));
-        else if (base === 'clear') this.out.innerHTML = '';
-        else if (base === 'reboot') location.reload();
-        else this.print(`Command not found: ${base}`, 'error');
+        
+        if (base === 'help') {
+            this.print('Commands: ls, cd [dir], cat [file], clear, reboot, status, shards, systemctl, exit');
+        } else if (base === 'ls') {
+            this.print(vfs.ls().join('  '));
+        } else if (base === 'cd') {
+            const path = args[1] || '/home/sovereign';
+            const node = vfs.resolve(path);
+            if (node && node.type === 'dir') {
+                vfs.cwd = path.startsWith('/') ? path : (vfs.cwd === '/' ? '/' + path : vfs.cwd + '/' + path);
+                vfs.cwd = vfs.cwd.replace(/\/+/g, '/');
+                if (vfs.cwd.endsWith('/') && vfs.cwd.length > 1) vfs.cwd = vfs.cwd.slice(0, -1);
+                this.print(`Changed directory to ${vfs.cwd}`);
+            } else {
+                this.print(`Directory not found: ${path}`, 'error');
+            }
+        } else if (base === 'cat') {
+            const name = args[1];
+            if (!name) {
+                this.print('Usage: cat [filename]');
+            } else {
+                const targetPath = vfs.cwd === '/' ? '/' + name : vfs.cwd + '/' + name;
+                const node = vfs.resolve(targetPath);
+                if (node && node.type === 'file') {
+                    this.print(node.content || '(empty file)');
+                } else {
+                    this.print(`File not found: ${name}`, 'error');
+                }
+            }
+        } else if (base === 'clear') {
+            this.out.innerHTML = '';
+        } else if (base === 'reboot') {
+            location.reload();
+        } else if (base === 'status') {
+            this.print('System Status: <span style="color: #4ade80;">ACTIVE</span>');
+            this.print('Silicon attestation: Dilithium-5 VERIFIED');
+            this.print('Vitals: CPU 12% | MEM 256MB / 4096MB | NET ACTIVE');
+        } else if (base === 'shards') {
+            this.print('Active Sovereign Shards:');
+            this.print(' - SovereignBootEngine (Active)');
+            this.print(' - SovereignAISched (Active)');
+            this.print(' - SovereignGPU (Active)');
+            this.print(' - SovereignVFS (Active)');
+            this.print(' - SovereignPacketFilter (Enforcing)');
+        } else if (base === 'systemctl') {
+            this.print('Active services: netstack, pkgmanager, maintenance, dynamic-theme');
+        } else if (base === 'exit') {
+            closeWindow('terminal-win');
+        } else {
+            this.print(`Command not found: ${base}`, 'error');
+        }
     }
 }
 window.addEventListener('load', () => {

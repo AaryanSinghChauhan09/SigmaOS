@@ -643,7 +643,8 @@ async function loadSystem() {
 function loadScript(src) {
     return new Promise((resolve, reject) => {
         const script = document.createElement('script');
-        script.src = src;
+        const prefix = (location.pathname.includes('/web_ui/') || location.pathname.endsWith('web_ui/')) ? '' : 'web_ui/';
+        script.src = prefix + src;
         script.onload = resolve;
         script.onerror = reject;
         document.head.appendChild(script);
