@@ -1,6 +1,5 @@
 #include "../../include/sigma_recovery.h"
 #include "../../include/sigma_log.h"
-#include "../../include/SigmaOOP.hpp"
 
 /**
  * Σ SIGMAOS: SOVEREIGN RECOVERY & FORENSICS (S-RECOVER)

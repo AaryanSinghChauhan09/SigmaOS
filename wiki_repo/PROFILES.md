@@ -14,7 +14,7 @@ SigmaOS Zenith v15.0 introduces **modular profession profiles**. Each profile is
 
 * **Kernel Shards**: `S-FWM`, `S-PANEL`, `S-EXPLORER`, `S-MEDIA`
 
-* **UX Model**: **Floating-Window / Mouse-Driven** (Intuitive Absorption)
+***UX Model**:**Floating-Window / Mouse-Driven** (Intuitive Absorption)
 
 * **USP**: "Install and Play" accessibility for non-industrial users.
 

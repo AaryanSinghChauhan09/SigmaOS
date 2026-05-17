@@ -1,6 +1,5 @@
 #include "../../include/sigma_cloud.h"
 #include "../../include/sigma_log.h"
-#include "../../include/SigmaOOP.hpp"
 
 /**
  * Σ SIGMAOS: SOVEREIGN CLOUD & DISTRIBUTED STORAGE (S-CLOUD)

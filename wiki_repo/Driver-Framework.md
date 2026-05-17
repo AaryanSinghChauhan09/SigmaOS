@@ -48,7 +48,7 @@ Drivers are implemented in `kernel/core/drivers/SovereignDriverFramework.cpp`.
 
 * `driver_register_net()`: Links the PQC network shard.
 
-* `driver_start_all()`: Atomically ignites all registered hardware shards during **Stage 6** of the ASI plan.
+*`driver_start_all()`: Atomically ignites all registered hardware shards during**Stage 6** of the ASI plan.
 
 ---
 *Stay Sovereign.*

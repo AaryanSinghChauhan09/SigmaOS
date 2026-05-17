@@ -32,7 +32,7 @@ SigmaOS v15.0 introduces the **S-FORUM**, a decentralized support mesh. Unlike l
 
 * **PQC-Attested**: Every guide is signed by the author's Dilithium-5 key.
 
-* **Lattice-Integrated**: Tutorials can be executed directly as shard snippets in the **S-PLAY** playground.
+***Lattice-Integrated**: Tutorials can be executed directly as shard snippets in the**S-PLAY** playground.
 
 * **Self-Healing**: The S-WIKI automatically incorporates community-verified solutions.
 

@@ -1,6 +1,5 @@
 #include "../../include/sigma_forensic.h"
 #include "../../include/sigma_log.h"
-#include "../../include/SigmaOOP.hpp"
 
 /**
  * Σ SIGMAOS: SOVEREIGN FORENSIC TOOLKIT (S-FORENSIC)

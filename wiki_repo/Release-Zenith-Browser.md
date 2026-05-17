@@ -20,7 +20,7 @@ Welcome to the **Sovereign Web Shard**. The Browser edition is a specialized, we
 
 * **PQC-VPN Integration**: Built-in, zero-config post-quantum encrypted tunnel for all web traffic.
 
-* **Decentralized Storage**: Automatically maps browser local storage to the **SovereignMesh** lattice.
+***Decentralized Storage**: Automatically maps browser local storage to the**SovereignMesh** lattice.
 
 ## 🌟 Premium Features
 

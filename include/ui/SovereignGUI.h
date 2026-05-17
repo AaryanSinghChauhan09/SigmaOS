@@ -1,7 +1,6 @@
 ﻿#ifndef SOVEREIGN_GUI_H
 #define SOVEREIGN_GUI_H
 
-#include "../core/sigma_types.h"
 
 #ifdef __cplusplus
 extern "C" {

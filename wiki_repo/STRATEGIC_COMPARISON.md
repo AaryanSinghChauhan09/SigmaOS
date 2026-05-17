@@ -8,23 +8,23 @@ SigmaOS is designed to transcend the limitations of legacy monolithic kernels (U
 
 * **The Gap**: Generic distros have Calamares/Ubiquity installers.
 
-* **The Sigma Solution**: **S-INSTALL** (Sovereign Installer). A bare-metal setup experience that automatically detects your professional role and optimizes the hardware lattice for your specific workflow (e.g., Medical, Engineering, AI).
+***The Sigma Solution**:**S-INSTALL** (Sovereign Installer). A bare-metal setup experience that automatically detects your professional role and optimizes the hardware lattice for your specific workflow (e.g., Medical, Engineering, AI).
 
 ### 2. Package Ecosystem (The Nexus)
 
 * **The Gap**: Linux has `apt`, `dnf`, and `pacman`.
 
-* **The Sigma Solution**: **Lattice Package Nexus (S-PKG)**. A zero-trust, PQC-signed distribution system. Unlike Flatpaks/Snaps, S-PKG shards are binary-optimized for the Sovereign Lattice and feature mandatory 10ms rollback integrity.
+***The Sigma Solution**:**Lattice Package Nexus (S-PKG)**. A zero-trust, PQC-signed distribution system. Unlike Flatpaks/Snaps, S-PKG shards are binary-optimized for the Sovereign Lattice and feature mandatory 10ms rollback integrity.
 
 ### 3. Hardware Support & Drivers
 
 * **The Gap**: Linux supports everything from toasters to supercomputers.
 
-* **The Sigma Solution**: **Lattice-HAL**. We utilize a **Driver Transpiler** that allows SigmaOS to consume open-source driver specifications and generate memory-safe, isolated shard drivers. We provide software-rendering fallbacks for GPUs to ensure 100% "Zenith" UI compatibility.
+***The Sigma Solution**:**Lattice-HAL**. We utilize a **Driver Transpiler** that allows SigmaOS to consume open-source driver specifications and generate memory-safe, isolated shard drivers. We provide software-rendering fallbacks for GPUs to ensure 100% "Zenith" UI compatibility.
 
 ### 4. Performance Benchmarking
 
-* **Lattice Allocator**: Benchmarked at **7x faster** than standard `malloc` for industrial workloads.
+***Lattice Allocator**: Benchmarked at**7x faster** than standard `malloc` for industrial workloads.
 
 * **PQC Security**: Native hardware acceleration for CRYSTALS-Kyber, outperforming legacy OpenSSL-based implementations in high-assurance environments.
 

@@ -15,16 +15,16 @@ namespace PackageForge {
 class SovereignPackageNexus : public SigmaObject {
 public:
     SovereignPackageNexus() {
-        sigma_print("[PACKAGE-NEXUS]: Bootstrapping Zero-Dependency Bare-Metal Shard Repository.\n");
+        sigma_log_info("[PACKAGE-NEXUS]: Bootstrapping Zero-Dependency Bare-Metal Shard Repository.\n");
     }
     
     const char* type_name() const noexcept override { return "SovereignPackageNexus"; }
 
     // USP: Cryptographic App-Vetting bypassing Linux OpenSSL/GPG bloated binaries
     void VetHardwareSignature(const char* shard_id) {
-        sigma_print("[PACKAGE-NEXUS]: Executing Hardware Hash Verification on Shard: ");
-        sigma_print(shard_id);
-        sigma_print("\n");
+        sigma_log_info("[PACKAGE-NEXUS]: Executing Hardware Hash Verification on Shard: ");
+        sigma_log_info(shard_id);
+        sigma_log_info("\n");
         
         // Execute raw x86_64 hexadecimal instructions to invoke AES-NI hardware decryption
         // Completely bypasses millions of lines of OpenSSL C code.
@@ -33,14 +33,14 @@ public:
             0xC3                          // ret
         };
         ((void(*)())aes_ni_opcode)();
-        sigma_print("[PACKAGE-NEXUS]: Silicon Signature: SIGMA_VERIFIED. Malware probability mathematically 0%.\n");
+        sigma_log_info("[PACKAGE-NEXUS]: Silicon Signature: SIGMA_VERIFIED. Malware probability mathematically 0%.\n");
     }
 
     // USP: Micro-Architectural Sandbox Execution (bypassing Flatpak/Docker overhead)
     void InstallSandboxedShard(const char* shard_id) {
-        sigma_print("[PACKAGE-NEXUS]: Injecting Shard into Silicon-Enclave: ");
-        sigma_print(shard_id);
-        sigma_print("\n");
+        sigma_log_info("[PACKAGE-NEXUS]: Injecting Shard into Silicon-Enclave: ");
+        sigma_log_info(shard_id);
+        sigma_log_info("\n");
         
         // Raw machine code manipulating CPU Control Registers to enforce hardware sandboxing
         // Manipulating CR4 to enforce SMEP (Supervisor Mode Execution Protection) instantly.
@@ -51,7 +51,7 @@ public:
             0xC3              // ret
         };
         ((void(*)())cr4_sandbox_opcode)();
-        sigma_print("[PACKAGE-NEXUS]: Success. High-level Flatpaks/Dockers rendered totally irrelevant.\n");
+        sigma_log_info("[PACKAGE-NEXUS]: Success. High-level Flatpaks/Dockers rendered totally irrelevant.\n");
     }
 };
 
@@ -65,7 +65,7 @@ extern "C" void start_package_zenith() {
 }
 
 int main() {
-    sigma_print("\n[SUCCESS]: Competitive Shard App-Store Online. Ultimate Package Sovereignty.\n");
+    sigma_log_info("\n[SUCCESS]: Competitive Shard App-Store Online. Ultimate Package Sovereignty.\n");
     start_package_zenith();
     return 0;
 }

@@ -1,6 +1,5 @@
 #include "../include/sigma_kernel_types.h"
 #include "../include/sigma_log.h"
-#include <string>
 
 /**
  * SigmaOS Filesystem Consistency Checker (sigma_fsck)

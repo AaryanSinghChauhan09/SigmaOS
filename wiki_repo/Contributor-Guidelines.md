@@ -14,7 +14,7 @@ Welcome to SigmaOS! Every contributor must follow these rules. They act like a c
 
 * Each task must be linked to an issue or roadmap item.
 
-* Commit messages must use the **imperative style** (e.g., "Add memory allocator," "Fix IRQ handler").
+*Commit messages must use the**imperative style** (e.g., "Add memory allocator," "Fix IRQ handler").
 
 * Reference issue IDs for traceability to ensure every change maps back to the roadmap.
 
@@ -34,7 +34,7 @@ Welcome to SigmaOS! Every contributor must follow these rules. They act like a c
 
 * Once complete, its content should be migrated into the Wiki.
 
-* After migration, **delete the `.md` file** from the main repository to avoid duplication (except for core files like `README.md` and `CONTRIBUTING.md`).
+*After migration,**delete the `.md` file** from the main repository to avoid duplication (except for core files like `README.md` and `CONTRIBUTING.md`).
 
 ### Code Contributions
 
@@ -66,7 +66,7 @@ Welcome to SigmaOS! Every contributor must follow these rules. They act like a c
 
 ### Updates
 
-* Any new feature or module must be documented in the Wiki **before** merging.
+*Any new feature or module must be documented in the Wiki**before** merging.
 
 * Wiki pages must be kept in sync with repo changes.
 

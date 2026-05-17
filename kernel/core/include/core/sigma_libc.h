@@ -7,7 +7,6 @@
 #ifndef SIGMA_LIBC_H
 #define SIGMA_LIBC_H
 
-#include "../../../../include/libc/SovereignLibC.h"
 
 #include "../../../../include/core/sigma_types.h"
 

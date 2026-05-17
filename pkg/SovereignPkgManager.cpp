@@ -7,8 +7,8 @@
  * - Zero-Dependency Shard Resolution
  * - Reproducible Installation
  */
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
+#include "../include/sigma_kernel_types.h"
+#include "../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Pkg {

@@ -1,6 +1,5 @@
 #include "../../include/sigma_ml.h"
 #include "../../include/sigma_log.h"
-#include "../../include/SigmaOOP.hpp"
 
 /**
  * Σ SIGMAOS: SOVEREIGN MACHINE LEARNING (S-ML)

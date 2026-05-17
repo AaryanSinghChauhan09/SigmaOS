@@ -26,7 +26,7 @@ This roadmap outlines the evolution of SigmaOS from its microkernel roots into a
 
 * **Unified Package Management**: Implement dependency resolution and version pinning in `sigma-pkg`.
 
-* **Design & UI**: Adopt **Qt Sovereign** and a unified design language across App and Browser formats.
+***Design & UI**: Adopt**Qt Sovereign** and a unified design language across App and Browser formats.
 
 * **Cross-Branch Testing**: Build CI/CD pipelines for automated stress tests and real-time benchmark publishing.
 

@@ -5,7 +5,6 @@ Please see the [Storage Branch Wiki](https://github.com/AaryanSinghChauhan09/Sig
 
 ## To-Do
 
-
 * [ ] Build Sovereign Filesystem (S-FS) journaling.
 * [ ] Add block device abstraction.
 * [ ] Implement PQC-sealed at-rest encryption.

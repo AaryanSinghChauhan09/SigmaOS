@@ -48,12 +48,12 @@ public:
         }
 
         // Create if not exists (Simplified)
-        FSNode* newNode = (FSNode*)allocator_malloc(sizeof(FSNode));
+        FSNode* newNode = (FSNode*)sigma_malloc(sizeof(FSNode));
         sigma_memcpy(newNode->name, path, 64);
         newNode->type = S_IFREG;
         newNode->size = 0;
         newNode->capacity = 1024;
-        newNode->data = (sigma_u8*)allocator_malloc(newNode->capacity);
+        newNode->data = (sigma_u8*)sigma_malloc(newNode->capacity);
         newNode->next = m_root;
         m_root = newNode;
 

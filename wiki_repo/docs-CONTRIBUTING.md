@@ -41,11 +41,11 @@ SigmaOS is built on a **600-Shard Modular Architecture**. Every contribution sho
 
 ## 🎨 Code Style
 
-* Use **OOP-Isolated Singletons** for core engines.
+*Use**OOP-Isolated Singletons** for core engines.
 
 * Follow the `sigma_` naming convention for kernel-level primitives.
 
-* Maintain strict **C++11/14** standards for hardware compatibility.
+*Maintain strict**C++11/14** standards for hardware compatibility.
 
 ---
 

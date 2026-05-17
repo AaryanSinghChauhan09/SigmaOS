@@ -16,9 +16,9 @@ SigmaOS has achieved functional parity and superiority across all major Linux in
 ## 🚀 Key Release Features
 
 * **Sovereign Choice**: Select your profile (Legacy, Modern, Cloud, RTOS, Forensic, Enterprise) at install time.
-* **sigma-pkg**: Professional package manager with incremental **Delta Updates**.
-* **sigma-cli**: Industrial CLI for shard management and **Forensic Snapshot Diffing**.
-* **Zenith Desktop**: Polished, glassmorphic UI with native **Adaptive UI Scaling**.
+***sigma-pkg**: Professional package manager with incremental**Delta Updates**.
+***sigma-cli**: Industrial CLI for shard management and**Forensic Snapshot Diffing**.
+***Zenith Desktop**: Polished, glassmorphic UI with native**Adaptive UI Scaling**.
 
 ## ⚖️ Our Principles
 

@@ -6,7 +6,6 @@
 #include "../include/sigma_orchestrator.h"
 #include "../include/sigma_cloud.h"
 #include "../include/sigma_regression.h"
-#include "../include/SigmaOOP.hpp"
 
 /**
  * Σ SIGMAOS: SOVEREIGN TELEMETRY CLI (telemetry-cli)

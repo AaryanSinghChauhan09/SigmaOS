@@ -2,7 +2,6 @@
 #ifndef SIGMA_LIBC_H
 #define SIGMA_LIBC_H
 
-#include "../include/libc/SovereignLibC.h"
 #include "../include/sigma_kernel_types.h"
 
 // Standard integer equivalents for Sovereign Silicon

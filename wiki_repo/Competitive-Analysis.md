@@ -34,9 +34,9 @@ SigmaOS is designed for **Absolute Non-Equivalence** — a sovereign computation
 
 * **AI Telemetry (`S-AI-TEL`)**: Predictive failure analysis and anomaly detection hooks.
 
-* **Package Manager (`S-PKG`)**: PQC-attested `.sab` bundle delivery, verification, and **incremental delta updates**.
+***Package Manager (`S-PKG`)**: PQC-attested `.sab` bundle delivery, verification, and**incremental delta updates**.
 
-* **Automated CI/CD**: x86, ARM64, RISC-V builds + QEMU boot + **forensic snapshot diffing**.
+***Automated CI/CD**: x86, ARM64, RISC-V builds + QEMU boot +**forensic snapshot diffing**.
 
 ## 🔴 What SigmaOS Still Needs
 

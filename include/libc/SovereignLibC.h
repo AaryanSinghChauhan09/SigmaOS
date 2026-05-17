@@ -7,6 +7,9 @@
 #ifndef SOVEREIGN_LIBC_H
 #define SOVEREIGN_LIBC_H
 
+#include "../sigma_kernel_types.h"
+
+
 
 #ifdef __cplusplus
 extern "C" {

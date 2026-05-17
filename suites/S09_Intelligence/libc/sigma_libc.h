@@ -2,7 +2,6 @@
 #ifndef SIGMA_LIBC_H
 #define SIGMA_LIBC_H
 
-#include "../../../include/libc/SovereignLibC.h"
 #include "../../../include/sigma_kernel_types.h"
 void          sigma_exit(int code);
 long          sigma_write(int fd, const void* buf, unsigned long count);
