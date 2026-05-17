@@ -1,4 +1,10 @@
-<!DOCTYPE html>
+import os
+
+WORKSPACE_DIR = r"c:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS"
+INDEX_HTML_PATH = os.path.join(WORKSPACE_DIR, "index.html")
+ZENITH_HTML_PATH = os.path.join(WORKSPACE_DIR, "zenith.html")
+
+new_html = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -100,3 +106,12 @@
     </div>
 </body>
 </html>
+"""
+
+with open(INDEX_HTML_PATH, "w", encoding="utf-8") as f:
+    f.write(new_html)
+
+with open(ZENITH_HTML_PATH, "w", encoding="utf-8") as f:
+    f.write(new_html)
+
+print("Instantiated Zenith Desktop Windows!")
