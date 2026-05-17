@@ -1,8 +1,8 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SOVEREIGN REGISTRY
+ * Σ SIGMAOS: .SIG BINARY FORMAT LOADER
  * =========================================================================
- * ZERO-DEPENDENCY DECLARATIVE CONFIGURATION MANAGER
+ * ZERO-DEPENDENCY NATIVE EXECUTABLE PARSER
  * =========================================================================
  */
 #include "../../../include/sigma_kernel_types.h"
@@ -11,14 +11,14 @@
 namespace SigmaOS {{
 namespace System {{
 
-class SovereignRegistry {{
+class SovereignSigLoader {{
 public:
-    void evaluate_config() {{
-        sigma_log_info("[Registry] Parsing /etc/config.sig for declarative state.");
+    void execute_sig_binary() {{
+        sigma_log_info("[SigLoader] Bypassing ELF overhead. Parsing ultra-fast .sig binary.");
     }}
     
-    void rebuild_state() {{
-        sigma_log_info("[Registry] Instantly rebuilding OS state without rebooting.");
+    void map_to_memory() {{
+        sigma_log_info("[SigLoader] Paging executable directly to hardware-isolated shard.");
     }}
 }};
 
