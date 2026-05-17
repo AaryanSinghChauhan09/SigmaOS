@@ -1509,18 +1509,6 @@ function deployCapsule(name) {
     if (win) win.style.display = 'none';
 }
 
-    } else if (name === 'Hacker Lab') {
-        setWorkflowMode('Red Team');
-        launchApp('OmniShell');
-        launchApp('Security Mission Control');
-    } else if (name === 'Cyberpunk Dev') {
-        setWorkflowMode('Coding');
-        launchApp('Markup Forge');
-    }
-    const win = document.getElementById('sigma-capsule-win');
-    if (win) win.style.display = 'none';
-}
-
 // =========================================================================
 // Σ SIGMAOS: MULTI-TAB SETTINGS, 12 BRANCH SIMULATION & ACCESSIBILITY
 // =========================================================================
