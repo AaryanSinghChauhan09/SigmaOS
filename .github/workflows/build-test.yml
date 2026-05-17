@@ -55,7 +55,7 @@ jobs:
       uses: github/codeql-action/analyze@v2
 
     - name: Dependabot Security Updates
-      uses: dependabot/fetch-metadata@v1
+      uses: dependabot/fetch-metadata@v3
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
 
