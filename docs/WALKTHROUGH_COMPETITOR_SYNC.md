@@ -1,6 +1,6 @@
 # WALKTHROUGH: Competitor Linux Parity & Branch Synchronization
 
-This document records the design implementation of **Sovereign Cgroups**, **Sovereign ZFS Storage Pools**, and the total conversion of the release/synchronization pipeline from Python to Node.js.
+This document records the design implementation of **Sovereign Cgroups**, **Sovereign ZFS Storage Pools**, **Sovereign OverlayFS Union Mounts**, and the total conversion of the release/synchronization pipeline from Python to Node.js.
 
 ---
 
@@ -15,7 +15,7 @@ We implemented the resource management engine in a completely freestanding, zero
 
 ---
 
-## 2. 🗄️ Sovereign ZFS Storage Pool (`S-ZFS`)
+## 🗄️ 2. Sovereign ZFS Storage Pool (`S-ZFS`)
 We implemented OpenZFS-style physical block device pooling and transactional Copy-on-Write validation.
 
 * **Core Subsystem**: [SovereignZFSPool.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/SovereignZFSPool.cpp)
@@ -27,7 +27,18 @@ We implemented OpenZFS-style physical block device pooling and transactional Cop
 
 ---
 
-## 3. 🐍 Purging Python Runtime Dependency
+## 📂 3. Sovereign OverlayFS Union Mount (`S-OverlayFS`)
+We implemented Linux OverlayFS-style union directory mounts and Copy-Up-On-Write logic.
+
+* **Core Subsystem**: [SovereignOverlayFS.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/SovereignOverlayFS.cpp)
+  * Dynamically mounts a read-only lower directory (`/sys/base`) and a read-write upper directory (`/var/tmp`) to form a unified merged view (`/merged`).
+  * Features atomic Copy-Up-On-Write logic: writing to a lower read-only file automatically copies it up to the upper layer and applies modifications dynamically.
+* **CLI Wrapper**: [sigma_overlayfs.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/tools/sigma_overlayfs.cpp)
+  * Integrates unionFS options into `sigma-overlay` to mount pools, write files, and inspect merged filesystems.
+
+---
+
+## 🐍 4. Purging Python Runtime Dependency
 To make the build and deployment pipeline completely standalone and immune to missing Python runtimes on user environments:
 * **Purged Scripts**: Removed `sync.py`, `final_sync.py`, `tools/sync_all_branches.py`, and `tools/wiki_sync.py`.
 * **Zero-Dependency Node.js Alternatives**:
@@ -38,7 +49,7 @@ To make the build and deployment pipeline completely standalone and immune to mi
 
 ---
 
-## 🔄 4. Branch Synchronization (Parity: 100%)
+## 🔄 5. Branch Synchronization (Parity: 100%)
 We executed `node tools/sync_all_branches.js` to propagate the entire v15.1 Zenith improvements across:
 1. `release/standalone`
 2. `release/rtos`
@@ -57,8 +68,10 @@ All conflict resolutions were auto-handled via the `-X theirs` merge driver, and
 
 ---
 
-## 📖 5. GitHub Wiki Upgrades
+## 📖 6. GitHub Wiki Upgrades
 We redesigned the wiki repository:
+* **Overlay FS Specifications**: [Sovereign_OverlayFS.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Sovereign_OverlayFS.md)
+  * Wrote complete specifications, copy-up-on-write diagrams, and subcommands list.
 * **Storage Pooling Guide**: [Sovereign_ZFS_Pool.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Sovereign_ZFS_Pool.md)
   * Wrote complete architectural specifications, parity grids, and mermaid striping diagrams.
 * **Cgroup Specifications**: [Sovereign_Cgroup_Shard.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Sovereign_Cgroup_Shard.md)
