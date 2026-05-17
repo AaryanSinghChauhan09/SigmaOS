@@ -40,7 +40,7 @@ if (!runGit(["checkout", "main"])) {
 }
 
 for (const branch of branches) {
-    console.log(`\n[*] Syncing branch: {branch} -> Uniformity with main...`);
+    console.log(`\n[*] Syncing branch: ${branch} -> Uniformity with main...`);
     
     // Checkout target branch
     if (!runGit(["checkout", branch])) {
