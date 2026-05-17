@@ -3,6 +3,7 @@
 SigmaOS is designed to not just replace existing operating systems, but to absorb their best features natively at the microkernel level, ensuring zero-dependency, silicon-direct execution.
 
 ## Absorbed Features
+
 1. **Sigma TimeMachine (macOS USP)**
    * **Concept:** Zero-copy Copy-on-Write (CoW) filesystem snapshots.
    * **Implementation:** `tools/sigma_timemachine.c` allows instantaneous root-level rollback without external backup software.
@@ -18,3 +19,7 @@ SigmaOS is designed to not just replace existing operating systems, but to absor
 4. **Sigma RT Analyzer (QNX/VxWorks RTOS USP)**
    * **Concept:** Hard real-time determinism and latency bounding.
    * **Implementation:** `tools/sigma_rt_analyzer.c` continuously profiles interrupt latency and context switch times to guarantee RTOS compliance.
+
+5. **Sigma Cgroups (Linux cgroups v2 / Kubernetes ResourceQuota USP)**
+   * **Concept:** Native silicon resource accounting and auto-throttle governance.
+   * **Implementation:** `kernel/core/SovereignCgroup.cpp` and `tools/sigma_cgroup.cpp` enable CPU quota, memory limits, and I/O weights with an auto-governor sweep.
