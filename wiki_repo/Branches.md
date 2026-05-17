@@ -28,5 +28,24 @@ SigmaOS implements a strict, 12-branch unified system architecture. The **Branch
 To prevent repository fragmentation and keep all 12 branches perfectly uniform:
 
 1. All changes, bugfixes, and C++ modules are developed and committed onto `main`.
-2. The Branch Uniformity & Synchronization Engine (`tools/sync_all_branches.py`) programmatically checks out each target branch, resets its workspace head to `main`, and force-pushes back to remote.
-3. This guarantees bit-perfect uniformity and instant updates across all branches with zero merge conflicts!
+2. The Branch Uniformity & Synchronization Engine (`tools/sync_all_branches.js`) programmatically checks out each target branch, merges from `main`, and pushes back to remote origin.
+3. This guarantees bit-perfect uniformity and instant updates across all branches with zero merge conflicts.
+
+---
+
+## 🗺️ Per-Branch Improvement Plans
+
+| Branch | Gap | Improvement Plan |
+|:---|:---|:---|
+| `main` | Scattered experimental modules | Stabilise kernel, unify HAL, sync /docs/ with Wiki, add CI/CD |
+| `release/standalone` | Minimal OS incomplete | Harden bootloader, RegistryManager, bare-metal init sequence |
+| `release/rtos` | No deterministic scheduling | SCHED_SOVEREIGN RT class, priority inheritance, lock-free IPC |
+| `release/mobile` | No energy-aware features | Power governor, touch Zenith UI, ARM64 HAL tuning |
+| `release/microkernel` | IPC not optimised | Lock-free SPSC message-passing, modular drivers, zero-copy IPC |
+| `release/dual-boot` | Bootloader integration missing | GRUB/LIM chain-loading, rollback snapshot integration |
+| `release/distributed` | No cluster FS | SovereignCloudFS, distributed scheduler, container orchestration |
+| `release/cloud` | No container-native support | CoreOS/RancherOS ideas, SovereignCluster, immutable OS tree |
+| `release/browser` | Browser-centric OS absent | Lightweight Chromium fork, sandboxed WASM apps, GPU acceleration |
+| `release/app` | No professional tools | GST, court fees, BIS, forensic CLI tools fully integrated |
+| `performance-optimized` | No tuned builds | Clear Linux–style flags, SIMD, adaptive O(1) slab allocator |
+| `gh-pages` | Docs scattered | Contributor portal, interactive desktop demos, subsystem guides |

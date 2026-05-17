@@ -1,49 +1,37 @@
-# Σ SigmaOS: The Sovereign Computational Lattice
+# SigmaOS Zenith — Home
 
-SigmaOS Zenith v15.0 is an industrial-grade, microkernel-based operating system designed for the post-quantum era. It provides absolute user sovereignty through a sharded, silicon-direct architecture.
+Welcome to the **SigmaOS Zenith v15.2** knowledge base. SigmaOS is an industrial-grade, sovereign microkernel operating system built on a 600-shard C++ singleton lattice — targeting x86_64, ARM64, and RISC-V without any monolithic Linux or Windows dependency.
 
-## 📊 SigmaOS vs Linux Distros
+---
 
-| Area | SigmaOS (Zenith) | Linux Distros (Ubuntu/Fedora/Arch) | Sigma Advantage |
-| :--- | :--- | :--- | :--- |
-| **Kernel** | Microkernel Lattice | Monolithic Kernel | Fault-Tolerant Shards |
-| **Security** | PQC-GPG (Dilithium-5) | Standard RSA/AES | Post-Quantum Resilience |
-| **Telemetry** | AI-Predictive Health | Passive Monitoring | Proactive Failure Prevention |
-| **Scheduling** | Adaptive NUMA-Aware | Traditional CFS | Sub-ns Latency Guarantees |
-| **Formats** | Universal (RTOS to Cloud) | Profile-Specific (Server/IoT) | One Lattice, Any Silicon |
+## 🚀 Quick Navigation
 
-## 🚀 Key Release Features (v15.0)
+| Section | Description |
+|:---|:---|
+| [Architecture Overview](Architecture-Overview) | Kernel shard map, HAL, and Ring-0/3 dispatch pipeline |
+| [Kernel](Kernel.md) | CFS scheduling, NUMA, slab allocator, real-time class |
+| [HAL](HAL.md) | x86_64 / ARM64 / RISC-V hardware abstraction |
+| [Syscall Dispatcher](SyscallDispatcher.md) | Modular O(1) C dispatch table |
+| [Storage](Storage.md) | VFS, ZFS-inspired CoW, SovereignCloudFS |
+| [Desktop](Desktop.md) | Zenith UI, Vulkan compositor, SovereignThemeEngine |
+| [Tools](Tools.md) | Professional calculators, forensics, developer tools |
+| [Branches](Branches.md) | 12-branch taxonomy and improvement roadmap |
+| [Onboarding Guide](Onboarding_Guide.md) | Build instructions and coding standards |
+| [Problems](Problems.md) | Bug ledger and resolution log |
+| [RFC Template](RFC_Template.md) | Proposal format for new subsystem features |
 
-- **Sovereign Choice**: Select your profile (Legacy, Modern, Cloud, RTOS, Forensic) at install time.
+---
 
-- **sigma-pkg**: Professional package manager with Flatpak/AppImage support.
+## ⚡ Core Capabilities
 
-- **sigma-cli**: Industrial CLI for shard management and telemetry analysis.
+- **Shard-Aware CFS Scheduler** — NUMA-balanced with inline assembly context switches
+- **O(1) Slab Allocator** — Lockless, fragmentation-free, power-of-2 bucket design
+- **Lock-Free SPSC IPC** — Zero-copy ring buffer for inter-shard messaging
+- **SovereignVulkanLayer** — Direct SPIR-V GPU shader routing without Vulkan SDK
+- **Modular C Syscall Dispatcher** — 256-slot registry with runtime handler registration
+- **Post-Quantum Cryptography** — Dilithium-5 attested boot and IPC signatures
+- **Glassmorphic Desktop** — Zenith UI with hardware-composited glassmorphism
 
-- **Sovereign App Store**: A stunning GUI for the professional ecosystem.
+---
 
-## ⚖️ Our Principles
-
-1. **Sovereignty**: The user owns the silicon. No opaque telemetry or forced updates.
-
-2. **Transparency**: Open-source roadmap, Wiki-first documentation, and real-time health metrics.
-
-3. **Resilience**: Built for survivability across heterogeneous silicon clusters.
-
-## 📚 Subsystem Knowledge Bases (Branch Wikis)
-
-To maintain an organized ecosystem, each major kernel subsystem has a dedicated Wiki branch index:
-
-- [Main Branch Wiki](Wiki-Main-Branch): Core Architecture, Governance, Security Policies
-- [Networking Branch Wiki](Wiki-Networking-Branch): TCP/IP Stack, Firewalls
-- [Storage Branch Wiki](Wiki-Storage-Branch): Sovereign Filesystem, Encryption
-- [Memory Branch Wiki](Wiki-Memory-Branch): Paging, Shard Allocators
-- [Scheduling Branch Wiki](Wiki-Scheduling-Branch): Algorithms, Preemption
-- [Drivers Branch Wiki](Wiki-Drivers-Branch): SDF, Hardware Abstraction
-
-## 🛠 Getting Started
-
-Visit the [Sovereign Choice Guide](Sovereign-Choice-Guide) or run `sigma-cli list-shards` to inspect your local lattice.
-
-### Your Silicon. Your Rules. Your Sovereignty
- 
+> **Σ SigmaOS**: Absolute Sovereignty. Singularity Achieved.
