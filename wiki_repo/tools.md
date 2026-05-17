@@ -12,11 +12,11 @@ This document defines exactly 99 highly technical architectural and implementati
 8. **Establish**: Establish SovereignMaternityBenefitTracker auditing paid leaves and compliance under the Maternity Benefit Act 2017.
 9. **Write**: Write SovereignRERAPenaltyCalc computing delayed possession interest and refund payouts under the RERA Act 2016.
 10. **Add**: Add SovereignPatentsFeeCalc calculating patent application, exam, and renewal fees under the Patents Act 1970.
-11. **Implement**: Implement SovereignIncomeTaxCalc computing tax slabs, deductions, and exemptions as per the Indian Income Tax Act 1961.
-12. **Introduce**: Introduce SovereignROCComplianceChecker validating corporate filing timelines under the Indian Companies Act 2013.
-13. **Deploy**: Deploy SovereignStampDutyCalc computing state-specific ad-valorem stamp duty rates across Indian territories.
-14. **Establish**: Establish SovereignTelemedicineAudit validating patient data handling against CDSCO telemedicine regulations.
-15. **Implement**: Implement SovereignStructuralSteelCalc computing steel beam capacity based on BIS IS-800 specifications.
+11. **Implement**: Implement SovereignGratuityTaxCalc calculating taxable and tax-exempt gratuity parts as per Income Tax Act Section 10(10).
+12. **Introduce**: Introduce SovereignBonusComplianceCalc auditing statutory bonus eligibility under the Payment of Bonus Act 1965.
+13. **Deploy**: Deploy SovereignEqualRemunerationAuditor tracking equal pay and gender parity under the Equal Remuneration Act 1976.
+14. **Establish**: Establish SovereignPFRDAMemberRegistry computing NPS Tier-I tax benefits under the PFRDA Act 2013.
+15. **Implement**: Implement SovereignConsumerCourtFeeCalc calculating commission filing fees under the Consumer Protection Act 2019.
 16. **Introduce**: Introduce SovereignThermodynamicsCalc simulating heat transfer cycles with zero external mathematical libraries.
 17. **Deploy**: Deploy SovereignQuizGenerator creating verified educational tests with post-quantum random seed generation.
 18. **Establish**: Establish SovereignFlashcardEngine utilizing optimized spaced-repetition algorithms to track student study metrics.
