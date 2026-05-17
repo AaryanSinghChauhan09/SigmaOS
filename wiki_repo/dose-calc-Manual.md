@@ -1,0 +1,1 @@
+# dose-calc Manual\n\nZero-dependency native tool executed in Ring-3 isolation.
