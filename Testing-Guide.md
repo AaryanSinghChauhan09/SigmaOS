@@ -9,16 +9,18 @@ To test the boot sequence and kernel initialization locally:
    ```bash
    qemu-system-x86_64 -kernel build/sigmaos_kernel.bin -serial stdio
    ```
+
 3. Watch the serial output for `[BOOT] SSB: Userland ready. Boot sequence COMPLETE.`, indicating a successful boot.
 
 ## 2. Regression Suites (kselftest equivalent)
 We use the `SovereignRegression` shard to perform self-tests:
-* **Memory Tests**: Verifies slab allocator boundaries and hugepage identity mapping.
-* **Security Tests**: Runs PQC attestation mocks to ensure `S-ARMOR` isolation is intact.
+***Memory Tests**: Verifies slab allocator boundaries and hugepage identity mapping.* **Security Tests**: Runs PQC attestation mocks to ensure `S-ARMOR` isolation is intact.
 
 To invoke the regression suite from the shell:
+
 ```bash
 sigma-cli diag run-tests
+
 ```
 
 ## 3. CI/CD Pipeline (GitHub Actions)
