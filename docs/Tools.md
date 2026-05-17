@@ -7,11 +7,11 @@ This document defines exactly 99 highly technical architectural and implementati
 3. **Establish**: Establish SovereignLoadCalc computing dead, live, and wind structural loads conforming to BIS IS-875 standards.
 4. **Develop**: Develop SovereignMSMERegistry automating MSME categorization dynamically as per the latest MSMED Act 2020 revision.
 5. **Introduce**: Introduce SovereignADRTracker automating court fee calculations and fast-track timeline audits under Arbitration Act rules.
-6. **Deploy**: Deploy a comprehensive ethical cybersecurity scanner (sigma-audit) standardizing vulnerability reports on the lattice.
-7. **Implement**: Implement a declarative configuration builder parsing YAML/JSON parameters to compile reproducible tool settings.
-8. **Establish**: Establish high-performance diagnostic tools (sigma-hal-info) returning real-time hardware status metrics.
-9. **Write**: Write detailed, comprehensive operational and compliance manuals directly to the professional Tools documents.
-10. **Add**: Add secure, PQC-signed cryptographic key management utilities ensuring secure local storage of code keys.
+6. **Deploy**: Deploy SovereignEPFCalculator computing employee and employer provident fund shares as per the Employees' Provident Funds Act 1952.
+7. **Implement**: Implement SovereignGratuityCalculator calculating gratuity benefits and caps under the Payment of Gratuity Act 1972.
+8. **Establish**: Establish SovereignMaternityBenefitTracker auditing paid leaves and compliance under the Maternity Benefit Act 2017.
+9. **Write**: Write SovereignRERAPenaltyCalc computing delayed possession interest and refund payouts under the RERA Act 2016.
+10. **Add**: Add SovereignPatentsFeeCalc calculating patent application, exam, and renewal fees under the Patents Act 1970.
 11. **Implement**: Implement SovereignIncomeTaxCalc computing tax slabs, deductions, and exemptions as per the Indian Income Tax Act 1961.
 12. **Introduce**: Introduce SovereignROCComplianceChecker validating corporate filing timelines under the Indian Companies Act 2013.
 13. **Deploy**: Deploy SovereignStampDutyCalc computing state-specific ad-valorem stamp duty rates across Indian territories.
