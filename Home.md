@@ -30,8 +30,19 @@ SigmaOS Zenith v15.0 is an industrial-grade, microkernel-based operating system 
 
 3. **Resilience**: Built for survivability across heterogeneous silicon clusters.
 
+## 📚 Subsystem Knowledge Bases (Branch Wikis)
+
+To maintain an organized ecosystem, each major kernel subsystem has a dedicated Wiki branch index:
+
+- [Main Branch Wiki](Wiki-Main-Branch): Core Architecture, Governance, Security Policies
+- [Networking Branch Wiki](Wiki-Networking-Branch): TCP/IP Stack, Firewalls
+- [Storage Branch Wiki](Wiki-Storage-Branch): Sovereign Filesystem, Encryption
+- [Memory Branch Wiki](Wiki-Memory-Branch): Paging, Shard Allocators
+- [Scheduling Branch Wiki](Wiki-Scheduling-Branch): Algorithms, Preemption
+- [Drivers Branch Wiki](Wiki-Drivers-Branch): SDF, Hardware Abstraction
+
 ## 🛠 Getting Started
 
-Visit the [Sovereign Choice Guide](wiki_repo/Sovereign-Choice-Guide) or run `sigma-cli list-shards` to inspect your local lattice.
+Visit the [Sovereign Choice Guide](Sovereign-Choice-Guide) or run `sigma-cli list-shards` to inspect your local lattice.
 
 ### Your Silicon. Your Rules. Your Sovereignty
