@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="external_styles.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SigmaOS | Sovereign Lattice Dashboard</title>
@@ -17,7 +18,7 @@
             <span class="status-badge">Kernel v12.5 Online (Sovereign)</span>
         </div>
         <div class="metrics">
-            <span style="font-size: 0.8rem; color: var(--text-secondary);">Modular Lattice | Web Component Architecture</span>
+            <span class="auto-style-162">Modular Lattice | Web Component Architecture</span>
         </div>
     </header>
 
@@ -48,7 +49,7 @@
 
         <!-- Main Dashboard -->
         <main class="dashboard">
-            <div class="dashboard-header zenith-prism" style="padding: 30px; margin-bottom: 30px; border-radius: 20px;">
+            <div class="dashboard-header zenith-prism" class="auto-style-163">
                 <h2>Sovereign Lattice — Modular Architecture</h2>
                 <p>Contract-based HAL • Declarative Features • Per-Module Memory Pools • Zero-Trust Capabilities • Decoupled Web Components</p>
             </div>
@@ -57,12 +58,12 @@
             <sigma-monitor></sigma-monitor>
 
             <!-- §2: Memory Pool Inspector via <sigma-pool-inspector> Web Component -->
-            <div style="margin-top: 24px;">
+            <div class="auto-style-164">
                 <sigma-pool-inspector></sigma-pool-inspector>
             </div>
 
             <!-- §3: Kernel Log Viewer via <sigma-logs> Web Component -->
-            <div style="margin-top: 24px; display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+            <div class="auto-style-165">
                 <sigma-logs max-entries="150"></sigma-logs>
                 <sigma-ai-dispatch></sigma-ai-dispatch>
             </div>
@@ -75,7 +76,7 @@
             </sigma-auth-guard>
 
             <!-- §7: Shard Grid rendered dynamically via JS -->
-            <div class="shard-grid" id="shardContainer" style="margin-top: 24px;">
+            <div class="shard-grid" id="shardContainer" class="auto-style-166">
                 <!-- Populated by kernel_loader.js -->
             </div>
         </main>
@@ -111,7 +112,7 @@
                         card.innerHTML = `
                             <div class="shard-header">
                                 <span class="shard-id">${shard.shardId.split('_')[0]}</span>
-                                <span style="font-size: 0.8rem; color: #10b981;">● Active</span>
+                                <span class="auto-style-167">● Active</span>
                             </div>
                             <h3 class="shard-title">${title.replace(/([A-Z])/g, ' $1').trim()}</h3>
                             <p class="shard-desc">Sovereign Lattice Shard — contract-isolated module.</p>

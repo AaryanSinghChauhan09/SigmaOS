@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="external_styles.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Σ SigmaOS Zenith | Sovereign Lattice Desktop</title>
@@ -23,7 +24,7 @@
             <div class="vital-item">CPU: <span id="telemetry-cpu">0%</span></div>
             <div class="vital-item">MEM: <span id="telemetry-mem">0.0 GB</span></div>
             <div class="vital-item">FPS: <span id="telemetry-fps">60.0ms</span></div>
-            <div class="vital-item">Silicon Attestation: <span style="color: #10b981;">Kyber-1024</span></div>
+            <div class="vital-item">Silicon Attestation: <span class="auto-style-81">Kyber-1024</span></div>
         </div>
         <div class="top-bar-right">
             <span id="clock-date">Sunday, May 17</span>
@@ -32,10 +33,10 @@
     </header>
 
     <!-- Draggable Premium Windows -->
-    <div class="desktop-area" style="position: absolute; top: 50px; bottom: 90px; left: 0; right: 0; z-index: 5;">
+    <div class="desktop-area" class="auto-style-82">
         
         <!-- App: OmniShell Terminal -->
-        <div class="window" id="terminal-win" style="top: 8%; left: 10%; display: none;">
+        <div class="window" id="terminal-win" class="auto-style-83">
             <div class="window-header">
                 <div class="window-title">💻 <span>OmniShell v5.1</span></div>
                 <div class="window-controls">
@@ -44,7 +45,7 @@
                     <div class="control-dot close" onclick="closeWindow('terminal-win')"></div>
                 </div>
             </div>
-            <div class="window-body" style="padding: 0;">
+            <div class="window-body" class="auto-style-84">
                 <div class="terminal-container">
                     <div class="terminal-output" id="terminal-output"></div>
                     <div class="terminal-input-line">
@@ -56,7 +57,7 @@
         </div>
 
         <!-- App: File Manager -->
-        <div class="window" id="file-manager-win" style="top: 15%; left: 35%; display: none;">
+        <div class="window" id="file-manager-win" class="auto-style-85">
             <div class="window-header">
                 <div class="window-title">📂 <span>Sovereign VFS Browser</span></div>
                 <div class="window-controls">
@@ -77,7 +78,7 @@
         </div>
 
         <!-- App: Observability & Core Vitals -->
-        <div class="window" id="browser-win" style="top: 20%; left: 15%; display: none; width: 750px; height: 500px;">
+        <div class="window" id="browser-win" class="auto-style-86">
             <div class="window-header">
                 <div class="window-title">📊 <span>Observability Matrix</span></div>
                 <div class="window-controls">
@@ -86,20 +87,20 @@
                     <div class="control-dot close" onclick="closeWindow('browser-win')"></div>
                 </div>
             </div>
-            <div class="window-body" style="background: rgba(10,10,12,0.95); overflow-y: auto;">
-                <h3 style="color: var(--accent-gold); margin-bottom: 15px;">Σ Sovereign Observer</h3>
+            <div class="window-body" class="auto-style-87">
+                <h3 class="auto-style-88">Σ Sovereign Observer</h3>
                 <sigma-monitor></sigma-monitor>
-                <div style="margin-top: 20px;">
+                <div class="auto-style-89">
                     <sigma-pool-inspector></sigma-pool-inspector>
                 </div>
-                <div style="margin-top: 20px;">
+                <div class="auto-style-90">
                     <sigma-logs max-entries="50"></sigma-logs>
                 </div>
             </div>
         </div>
 
         <!-- App: AI Research Assistant -->
-        <div class="window" id="ai-assistant-win" style="top: 12%; left: 45%; display: none; width: 550px; height: 480px;">
+        <div class="window" id="ai-assistant-win" class="auto-style-91">
             <div class="window-header">
                 <div class="window-title">🧠 <span>Lattice Neural Core</span></div>
                 <div class="window-controls">
@@ -108,20 +109,20 @@
                     <div class="control-dot close" onclick="closeWindow('ai-assistant-win')"></div>
                 </div>
             </div>
-            <div class="window-body" style="display: flex; flex-direction: column; gap: 15px;">
-                <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); padding: 15px; border-radius: 12px;">
-                    <h4 style="color: var(--accent-gold); margin-bottom: 5px;">Edge ML Failure Model</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-muted);">Predictive attestation running continuously inside Ring-0.</p>
+            <div class="window-body" class="auto-style-92">
+                <div class="auto-style-93">
+                    <h4 class="auto-style-94">Edge ML Failure Model</h4>
+                    <p class="auto-style-95">Predictive attestation running continuously inside Ring-0.</p>
                 </div>
                 <sigma-ai-dispatch></sigma-ai-dispatch>
-                <div style="flex-grow: 1; border: 1px solid var(--border-glass); border-radius: 12px; padding: 15px; overflow-y: auto; background: rgba(0,0,0,0.2);">
+                <div class="auto-style-96">
                     <sigma-neural-demo></sigma-neural-demo>
                 </div>
             </div>
         </div>
 
         <!-- App: Lattice Settings -->
-        <div class="window" id="lattice-settings-win" style="top: 25%; left: 30%; display: none; width: 620px; height: 440px;">
+        <div class="window" id="lattice-settings-win" class="auto-style-97">
             <div class="window-header">
                 <div class="window-title">⚙️ <span>Lattice System Settings</span></div>
                 <div class="window-controls">
@@ -170,7 +171,7 @@
         </div>
 
         <!-- App: Utility Nexus (Statutory Calculators) -->
-        <div class="window" id="utility-nexus-win" style="top: 5%; left: 40%; display: none; width: 500px; height: 500px;">
+        <div class="window" id="utility-nexus-win" class="auto-style-98">
             <div class="window-header">
                 <div class="window-title">🔧 <span>Sovereign Pro Calculators</span></div>
                 <div class="window-controls">
@@ -179,29 +180,29 @@
                     <div class="control-dot close" onclick="closeWindow('utility-nexus-win')"></div>
                 </div>
             </div>
-            <div class="window-body" style="overflow-y: auto;">
+            <div class="window-body" class="auto-style-99">
                 <div class="settings-content">
                     <div class="settings-group">
-                        <h4 style="color: var(--accent-gold);">Zero-Loss paise GST Calculator</h4>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <input type="number" id="gst-amount" class="cmd-input" placeholder="Amount (in paise)" style="height: 38px;">
-                            <input type="number" id="gst-rate" class="cmd-input" placeholder="GST Rate %" style="height: 38px;">
+                        <h4 class="auto-style-100">Zero-Loss paise GST Calculator</h4>
+                        <div class="auto-style-101">
+                            <input type="number" id="gst-amount" class="cmd-input" placeholder="Amount (in paise)" class="auto-style-102">
+                            <input type="number" id="gst-rate" class="cmd-input" placeholder="GST Rate %" class="auto-style-103">
                         </div>
-                        <button class="wizard-btn" style="padding: 8px;" onclick="calculateGST()">COMPUTE GST</button>
-                        <div style="font-family: monospace; font-size: 0.8rem; color: #10b981;" id="gst-result">> Result: Ready</div>
+                        <button class="wizard-btn" class="auto-style-104" onclick="calculateGST()">COMPUTE GST</button>
+                        <div class="auto-style-105" id="gst-result">> Result: Ready</div>
                     </div>
                     <div class="settings-group">
-                        <h4 style="color: var(--accent-gold);">BNS Legal Complier</h4>
-                        <input type="text" id="legal-query" class="cmd-input" placeholder="Search BNS section..." style="height: 38px;">
-                        <button class="wizard-btn" style="padding: 8px;" onclick="checkLegalCompliance()">MAP COMPLIANCE</button>
-                        <div style="font-family: monospace; font-size: 0.8rem; color: #10b981;" id="legal-result">> Mapping Status: Active</div>
+                        <h4 class="auto-style-106">BNS Legal Complier</h4>
+                        <input type="text" id="legal-query" class="cmd-input" placeholder="Search BNS section..." class="auto-style-107">
+                        <button class="wizard-btn" class="auto-style-108" onclick="checkLegalCompliance()">MAP COMPLIANCE</button>
+                        <div class="auto-style-109" id="legal-result">> Mapping Status: Active</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- App: Sovereign App Store (Marketplace) -->
-        <div class="window" id="sigma-market-win" style="top: 10%; left: 25%; display: none; width: 650px; height: 480px;">
+        <div class="window" id="sigma-market-win" class="auto-style-110">
             <div class="window-header">
                 <div class="window-title">🛒 <span>Lattice Shard Marketplace</span></div>
                 <div class="window-controls">
@@ -210,88 +211,88 @@
                     <div class="control-dot close" onclick="closeWindow('sigma-market-win')"></div>
                 </div>
             </div>
-            <div class="window-body" style="overflow-y: auto;">
-                <div style="display: flex; gap: 15px; border-bottom: 1px solid var(--border-glass); padding-bottom: 10px; margin-bottom: 15px;">
+            <div class="window-body" class="auto-style-111">
+                <div class="auto-style-112">
                     <button class="fm-btn" onclick="switchMarketTab('core-shards')">Core Shards</button>
                     <button class="fm-btn" onclick="switchMarketTab('foss-apps')">FOSS Lattice</button>
                 </div>
                 
                 <div id="market-core-shards">
-                    <h3 style="color: var(--accent-gold); margin-bottom: 10px;">Attested Core Shards</h3>
-                    <div class="shard-grid" id="shardContainer" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <h3 class="auto-style-113">Attested Core Shards</h3>
+                    <div class="shard-grid" id="shardContainer" class="auto-style-114">
                         <!-- Dynamically populated from kernel_loader.js -->
                     </div>
                 </div>
 
-                <div id="market-foss-apps" style="display: none;">
-                    <h3 style="color: var(--accent-gold); margin-bottom: 10px;">FOSS Lattice Packages</h3>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">Inject verified open-source environments directly into your running shard.</p>
+                <div id="market-foss-apps" class="auto-style-115">
+                    <h3 class="auto-style-116">FOSS Lattice Packages</h3>
+                    <p class="auto-style-117">Inject verified open-source environments directly into your running shard.</p>
                     
-                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div class="auto-style-118">
                         <!-- AI & Machine Learning Category -->
                         <div class="settings-group">
-                            <h4 style="color: var(--accent-gold);">🧠 AI & Large Language Models</h4>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); padding: 10px; border-radius: 8px; font-size: 0.75rem;">
+                            <h4 class="auto-style-119">🧠 AI & Large Language Models</h4>
+                            <div class="auto-style-120">
+                                <div class="auto-style-121">
                                     <strong>DeepSeek / Gemma / Qwen</strong><br>
-                                    <span style="font-size: 0.65rem; color: var(--text-muted);">LLM Inference Engines</span><br>
-                                    <button class="fm-btn" style="margin-top: 5px; font-size: 0.65rem; padding: 3px 8px;" onclick="injectFOSS('DeepSeek-LLM')">INJECT ENGINE</button>
+                                    <span class="auto-style-122">LLM Inference Engines</span><br>
+                                    <button class="fm-btn" class="auto-style-123" onclick="injectFOSS('DeepSeek-LLM')">INJECT ENGINE</button>
                                 </div>
-                                <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); padding: 10px; border-radius: 8px; font-size: 0.75rem;">
+                                <div class="auto-style-124">
                                     <strong>eSpeak & eSpeak NG</strong><br>
-                                    <span style="font-size: 0.65rem; color: var(--text-muted);">Speech Synthesis & Speech Recognition</span><br>
-                                    <button class="fm-btn" style="margin-top: 5px; font-size: 0.65rem; padding: 3px 8px;" onclick="injectFOSS('eSpeak-Speech')">INJECT SHARD</button>
+                                    <span class="auto-style-125">Speech Synthesis & Speech Recognition</span><br>
+                                    <button class="fm-btn" class="auto-style-126" onclick="injectFOSS('eSpeak-Speech')">INJECT SHARD</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- CAD & EDA Simulation Category -->
                         <div class="settings-group">
-                            <h4 style="color: var(--accent-gold);">🔌 CAD, CAE & EDA Simulation</h4>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); padding: 10px; border-radius: 8px; font-size: 0.75rem;">
+                            <h4 class="auto-style-127">🔌 CAD, CAE & EDA Simulation</h4>
+                            <div class="auto-style-128">
+                                <div class="auto-style-129">
                                     <strong>KiCad & Fritzing</strong><br>
-                                    <span style="font-size: 0.65rem; color: var(--text-muted);">EDA Electronic Design Simulation</span><br>
-                                    <button class="fm-btn" style="margin-top: 5px; font-size: 0.65rem; padding: 3px 8px;" onclick="injectFOSS('KiCad-EDA')">INJECT WORKSPACE</button>
+                                    <span class="auto-style-130">EDA Electronic Design Simulation</span><br>
+                                    <button class="fm-btn" class="auto-style-131" onclick="injectFOSS('KiCad-EDA')">INJECT WORKSPACE</button>
                                 </div>
-                                <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); padding: 10px; border-radius: 8px; font-size: 0.75rem;">
+                                <div class="auto-style-132">
                                     <strong>FreeCAD & OpenSCAD</strong><br>
-                                    <span style="font-size: 0.65rem; color: var(--text-muted);">3D Mechanical Design Models</span><br>
-                                    <button class="fm-btn" style="margin-top: 5px; font-size: 0.65rem; padding: 3px 8px;" onclick="injectFOSS('FreeCAD-3D')">INJECT WORKSPACE</button>
+                                    <span class="auto-style-133">3D Mechanical Design Models</span><br>
+                                    <button class="fm-btn" class="auto-style-134" onclick="injectFOSS('FreeCAD-3D')">INJECT WORKSPACE</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Forensics & Security Audit Category -->
                         <div class="settings-group">
-                            <h4 style="color: var(--accent-gold);">🔐 Security & Hardened Forensics</h4>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); padding: 10px; border-radius: 8px; font-size: 0.75rem;">
+                            <h4 class="auto-style-135">🔐 Security & Hardened Forensics</h4>
+                            <div class="auto-style-136">
+                                <div class="auto-style-137">
                                     <strong>Kali Arsenal (Nmap / Ghidra / Volatility)</strong><br>
-                                    <span style="font-size: 0.65rem; color: var(--text-muted);">Security Audit Core Vitals</span><br>
-                                    <button class="fm-btn" style="margin-top: 5px; font-size: 0.65rem; padding: 3px 8px;" onclick="injectFOSS('Kali-Arsenal')">INJECT SECURITY</button>
+                                    <span class="auto-style-138">Security Audit Core Vitals</span><br>
+                                    <button class="fm-btn" class="auto-style-139" onclick="injectFOSS('Kali-Arsenal')">INJECT SECURITY</button>
                                 </div>
-                                <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); padding: 10px; border-radius: 8px; font-size: 0.75rem;">
+                                <div class="auto-style-140">
                                     <strong>RescueZilla Recovery Hub</strong><br>
-                                    <span style="font-size: 0.65rem; color: var(--text-muted);">Declarative Snapshot Rollbacks</span><br>
-                                    <button class="fm-btn" style="margin-top: 5px; font-size: 0.65rem; padding: 3px 8px;" onclick="injectFOSS('RescueZilla-Core')">INJECT SHARD</button>
+                                    <span class="auto-style-141">Declarative Snapshot Rollbacks</span><br>
+                                    <button class="fm-btn" class="auto-style-142" onclick="injectFOSS('RescueZilla-Core')">INJECT SHARD</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Data & Mathematics Category -->
                         <div class="settings-group">
-                            <h4 style="color: var(--accent-gold);">🧮 Mathematics, GIS & Science</h4>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); padding: 10px; border-radius: 8px; font-size: 0.75rem;">
+                            <h4 class="auto-style-143">🧮 Mathematics, GIS & Science</h4>
+                            <div class="auto-style-144">
+                                <div class="auto-style-145">
                                     <strong>SageMath / Octave / GeoGebra</strong><br>
-                                    <span style="font-size: 0.65rem; color: var(--text-muted);">Numerical Science & Calculus Libraries</span><br>
-                                    <button class="fm-btn" style="margin-top: 5px; font-size: 0.65rem; padding: 3px 8px;" onclick="injectFOSS('SageMath-Calculus')">INJECT TOOLKIT</button>
+                                    <span class="auto-style-146">Numerical Science & Calculus Libraries</span><br>
+                                    <button class="fm-btn" class="auto-style-147" onclick="injectFOSS('SageMath-Calculus')">INJECT TOOLKIT</button>
                                 </div>
-                                <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); padding: 10px; border-radius: 8px; font-size: 0.75rem;">
+                                <div class="auto-style-148">
                                     <strong>QGIS & OpenStreetMap</strong><br>
-                                    <span style="font-size: 0.65rem; color: var(--text-muted);">Geographical Information Systems</span><br>
-                                    <button class="fm-btn" style="margin-top: 5px; font-size: 0.65rem; padding: 3px 8px;" onclick="injectFOSS('QGIS-GIS')">INJECT SHARD</button>
+                                    <span class="auto-style-149">Geographical Information Systems</span><br>
+                                    <button class="fm-btn" class="auto-style-150" onclick="injectFOSS('QGIS-GIS')">INJECT SHARD</button>
                                 </div>
                             </div>
                         </div>
@@ -302,7 +303,7 @@
         </div>
 
         <!-- App: Markup Forge -->
-        <div class="window" id="markup-forge-win" style="top: 15%; left: 20%; display: none; width: 680px; height: 460px;">
+        <div class="window" id="markup-forge-win" class="auto-style-151">
             <div class="window-header">
                 <div class="window-title">📥 <span>Zenith System Installer</span></div>
                 <div class="window-controls">
@@ -311,15 +312,15 @@
                     <div class="control-dot close" onclick="closeWindow('markup-forge-win')"></div>
                 </div>
             </div>
-            <div class="window-body" style="padding: 0;">
-                <iframe src="installer.html" style="width: 100%; height: 100%; border: none;"></iframe>
+            <div class="window-body" class="auto-style-152">
+                <iframe src="installer.html" class="auto-style-153"></iframe>
             </div>
         </div>
 
     </div>
 
     <!-- Floating System Log Feed -->
-    <div id="kernel-logs" style="position: absolute; bottom: 100px; right: 30px; width: 350px; max-height: 180px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 5px; z-index: 10; pointer-events: none;"></div>
+    <div id="kernel-logs" class="auto-style-154"></div>
 
     <!-- Bottom Dock -->
     <div class="dock-container">
@@ -331,7 +332,7 @@
         <div class="dock-icon" data-tooltip="Pro Tools" onclick="launchApp('Utility Nexus')">🔧</div>
         <div class="dock-icon" data-tooltip="Marketplace" onclick="launchApp('Marketplace')">🛒</div>
         <div class="dock-icon" data-tooltip="Zenith Installer" onclick="launchApp('Markup Forge')">📥</div>
-        <div style="width: 1px; height: 30px; background: var(--border-glass);"></div>
+        <div class="auto-style-155"></div>
         <div class="dock-icon" data-tooltip="Help Matrix" onclick="toggleHelp()">❓</div>
     </div>
 
@@ -340,7 +341,7 @@
         <div class="context-item" onclick="contextAction('refresh')">🔄 Force Refresh</div>
         <div class="context-item" onclick="contextAction('cleanup')">🧹 Purge Caches</div>
         <div class="context-item" onclick="contextAction('audit')">🛡️ Attest System</div>
-        <div style="height: 1px; background: var(--border-glass); margin: 4px 0;"></div>
+        <div class="auto-style-156"></div>
         <div class="context-item" onclick="toggleHelp()">❓ Help Matrix</div>
     </div>
 
@@ -381,7 +382,7 @@
             const rate = parseFloat(rateInput.value);
             
             if (isNaN(amount) || isNaN(rate)) {
-                resultEl.innerHTML = '<span style="color: #ef4444;">> Error: Invalid input</span>';
+                resultEl.innerHTML = '<span class="auto-style-157">> Error: Invalid input</span>';
                 return;
             }
             
@@ -399,7 +400,7 @@
             
             const q = queryInput.value.trim().toLowerCase();
             if (!q) {
-                resultEl.innerHTML = '<span style="color: #ef4444;">> Error: Please input search term</span>';
+                resultEl.innerHTML = '<span class="auto-style-158">> Error: Please input search term</span>';
                 return;
             }
             
@@ -445,9 +446,9 @@
                         card.style.border = '1px solid var(--border-glass)';
                         card.style.borderRadius = '10px';
                         card.innerHTML = `
-                            <span style="font-size: 0.7rem; color: #10b981;">● Attested</span>
-                            <h4 style="font-size: 0.8rem; margin: 5px 0;">${title.replace(/([A-Z])/g, ' $1').trim()}</h4>
-                            <code style="font-size: 0.65rem; color: var(--accent-gold);">${shard.shardId.split('_')[0]}</code>
+                            <span class="auto-style-159">● Attested</span>
+                            <h4 class="auto-style-160">${title.replace(/([A-Z])/g, ' $1').trim()}</h4>
+                            <code class="auto-style-161">${shard.shardId.split('_')[0]}</code>
                         `;
                         container.appendChild(card);
                     }
