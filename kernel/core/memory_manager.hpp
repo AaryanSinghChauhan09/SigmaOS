@@ -26,7 +26,7 @@ struct MemorySegment {
 /* =========================================================================
  * SOVEREIGN SLAB ALLOCATOR v2.0
  * - 8-byte aligned buddy splitting
- * - Amnesic wipe on free (sigma_secure_memset)
+ * - Amnesic wipe on sigma_free(sigma_secure_memset)
  * - Double-free detection with address tracking
  * - Automatic coalescing of adjacent free blocks
  * ========================================================================= */

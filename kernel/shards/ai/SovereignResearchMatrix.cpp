@@ -12,11 +12,8 @@
 #include "../../../include/libc/SovereignLibC.h"
 
 #include <map>
-#include <string>
 #include <thread>
 #include <mutex>
-#include <vector>
-
 namespace SigmaOS {
 namespace AI {
 
@@ -26,7 +23,7 @@ namespace AI {
 class IResearchEngine {
 public:
     virtual ~IResearchEngine() = default;
-    virtual void MineData(const std::string& source) = 0;
+    virtual void MineData(const const char*& source) = 0;
     virtual void SynthesizeInsights() = 0;
     virtual void GenerateHypothesis() = 0;
 };
@@ -36,8 +33,8 @@ public:
  */
 class SovereignResearchMatrix : public IResearchEngine {
 private:
-    std::vector<std::string>            m_knowledge_base;
-    std::map<std::string, float>        m_correlations;
+    SigmaVector<const char*>            m_knowledge_base;
+    std::map<const char*, float>        m_correlations;
     mutable std::mutex                  m_kb_mutex;
     mutable std::mutex                  m_cor_mutex;
 
@@ -49,12 +46,12 @@ public:
      * @brief Asynchronously mine data from a given source.
      * @param source The URI or label of the data source.
      */
-    void MineData(const std::string& source) override {
+    void MineData(const const char*& source) override {
         sigma_log("[RESEARCH/MINER]: Enqueueing scrape for: %s\n", source.c_str());
 
         std::thread([this, source]() {
             // Real I/O or incremental indexing would happen here.
-            const std::string entry = "Data Ingested from " + source;
+            const const char* entry = "Data Ingested from " + source;
             {
                 std::lock_guard<std::mutex> lock(m_kb_mutex);
                 m_knowledge_base.push_back(entry);

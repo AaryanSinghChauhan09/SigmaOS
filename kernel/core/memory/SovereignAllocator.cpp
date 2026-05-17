@@ -21,7 +21,7 @@ void SovereignAllocatorEngine::init() {
     this->heap_offset = 0u;
 }
 
-void* SovereignAllocatorEngine::malloc(sigma_u32 size) {
+void* SovereignAllocatorEngine::sigma_malloc(sigma_u32 size) {
     /* QBMP (Quantum-Bucket Memory Pool) Algorithm
      * Bump allocator with 8-byte alignment + guard bytes for silicon-native safety. */
     sigma_u32 total_size = size + 2 * sizeof(sigma_u32); // Prefix + Suffix guards
@@ -50,7 +50,7 @@ void* SovereignAllocatorEngine::malloc(sigma_u32 size) {
     return ptr;
 }
 
-void SovereignAllocatorEngine::free(void* ptr) {
+void SovereignAllocatorEngine::sigma_free(void* ptr) {
     if (!ptr) return;
     sigma_u32* prefix = (sigma_u32*)((sigma_u8*)ptr - sizeof(sigma_u32));
     if (*prefix != SIGMA_GUARD_MAGIC) {
@@ -83,11 +83,11 @@ void allocator_init() {
 }
 
 void* allocator_malloc(sigma_u32 size) {
-    return SigmaOS::Kernel::Memory::SovereignAllocatorEngine::getInstance().malloc(size);
+    return SigmaOS::Kernel::Memory::SovereignAllocatorEngine::getInstance().sigma_malloc(size);
 }
 
 void allocator_free(void* ptr) {
-    SigmaOS::Kernel::Memory::SovereignAllocatorEngine::getInstance().free(ptr);
+    SigmaOS::Kernel::Memory::SovereignAllocatorEngine::getInstance().sigma_free(ptr);
 }
 
 void allocator_defrag() {

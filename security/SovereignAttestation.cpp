@@ -2,8 +2,6 @@
 #include "../include/hal/sigma_hal.h"
 #include "../include/sigma_log.h"
 #include "../include/security/sigma_pqc.h"
-#include <string>
-
 /**
  * Sigma Sovereign Hardware Attestation Shard
  *

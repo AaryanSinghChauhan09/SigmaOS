@@ -2,8 +2,6 @@
 #include "../../include/sigma_log.h"
 #include "../../include/sigma_hal.h"
 #include "../../include/sigma_time.h"
-#include <string.h>
-
 /**
  * SigmaOS Sovereign Adaptive Theme Engine
  * High-performance, silicon-native personalization for the Zenith interface.

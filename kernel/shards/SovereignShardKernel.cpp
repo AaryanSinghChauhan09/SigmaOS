@@ -76,7 +76,7 @@ private:
     void*> m_queue;
 public:
     void LoadShard(void* shard) {
-        m_queue.push_back(std::move(shard));
+        m_queue.push_back(sigma_move(shard));
     }
 
     void ExecuteAll() {

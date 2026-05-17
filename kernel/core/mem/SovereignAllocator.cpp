@@ -31,11 +31,11 @@ public:
         mm_init();
     }
 
-    void* malloc(sigma_u32 size) {
+    void* sigma_malloc(sigma_u32 size) {
         return mm_malloc((sigma_size_t)size);
     }
 
-    void free(void* ptr) {
+    void sigma_free(void* ptr) {
         mm_free(ptr);
     }
 
@@ -57,11 +57,11 @@ extern "C" {
     }
 
     void* allocator_malloc(sigma_u32 size) {
-        return SigmaOS::Kernel::Memory::SovereignAllocatorEngine::getInstance().malloc(size);
+        return SigmaOS::Kernel::Memory::SovereignAllocatorEngine::getInstance().sigma_malloc(size);
     }
 
     void allocator_free(void* ptr) {
-        SigmaOS::Kernel::Memory::SovereignAllocatorEngine::getInstance().free(ptr);
+        SigmaOS::Kernel::Memory::SovereignAllocatorEngine::getInstance().sigma_free(ptr);
     }
 
     void allocator_defrag() {

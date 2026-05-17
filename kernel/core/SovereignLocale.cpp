@@ -14,7 +14,7 @@
  * Design: OOP-isolated singleton — SovereignLocaleManager.
  */
 
-/* Internal helper: sovereign bare-metal strlen (avoids libc dependency) */
+/* Internal helper: sovereign bare-metal sigma_strlen(avoids libc dependency) */
 static sigma_u32 _locale_strlen(const char* s) {
     sigma_u32 n = 0u;
     while (s && s[n]) n++;

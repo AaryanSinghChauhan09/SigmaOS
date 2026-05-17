@@ -21,7 +21,7 @@ void SovereignAllocatorEngine::init() {
 
 #define SIGMA_GUARD_MAGIC 0xDEADBEEF
 
-void* SovereignAllocatorEngine::malloc(sigma_u32 size) {
+void* SovereignAllocatorEngine::sigma_malloc(sigma_u32 size) {
     /* QBMP (Quantum-Bucket Memory Pool) Algorithm
      * Bump allocator with 8-byte alignment + guard bytes for silicon-native safety. */
     sigma_u32 total_size = size + 2 * sizeof(sigma_u32); // Prefix + Suffix guards
@@ -50,7 +50,7 @@ void* SovereignAllocatorEngine::malloc(sigma_u32 size) {
     return ptr;
 }
 
-void SovereignAllocatorEngine::free(void* ptr) {
+void SovereignAllocatorEngine::sigma_free(void* ptr) {
     if (!ptr) return;
     
     // Verify prefix guard
@@ -71,11 +71,11 @@ extern "C" void allocator_init() {
 }
 
 extern "C" void* allocator_malloc(sigma_u32 size) {
-    return SovereignAllocatorEngine::getInstance().malloc(size);
+    return SovereignAllocatorEngine::getInstance().sigma_malloc(size);
 }
 
 extern "C" void allocator_free(void* ptr) {
-    SovereignAllocatorEngine::getInstance().free(ptr);
+    SovereignAllocatorEngine::getInstance().sigma_free(ptr);
 }
 
 

@@ -1,7 +1,5 @@
 #include "../../../include/sigma_log.h"
 #include <map>
-#include <memory>
-#include <string>
 #include <iostream>
 
 #include "../../../include/Lattice.h"
@@ -87,7 +85,7 @@ public:
 
 class SovereignScholasticRepo {
 private:
-    std::map<std::string, std::unique_ptr<IScholasticShard>> m_repo;
+    std::map<const char*, std::unique_ptr<IScholasticShard>> m_repo;
 public:
     void Synthesize() {
         m_repo["RELATIVITY"] = std::make_unique<RelativityShard>();
