@@ -28,3 +28,8 @@ SigmaOS is designed to not just replace existing operating systems, but to absor
    * **Concept:** Transactional physical block device pooling, CoW snapshot guarantees, and striping/mirroring.
    * **Implementation:** `kernel/core/SovereignZFSPool.cpp` and `tools/sigma_zfs.cpp` implement a bare-metal RAID-Z transactional space allocator.
 
+7. **Sigma OverlayFS Union Mount (Linux OverlayFS / UnionFS USP)**
+   * **Concept:** Directory union mounting with transactional Copy-Up-On-Write redirection for live system boot.
+   * **Implementation:** `kernel/core/SovereignOverlayFS.cpp` and `tools/sigma_overlayfs.cpp` implement a dynamic overlay union filesystem.
+
+
