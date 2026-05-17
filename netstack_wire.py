@@ -1,4 +1,12 @@
-/*
+import os
+
+WORKSPACE_DIR = r"c:\Users\Aaryan\.gemini\antigravity\scratch\SigmaOS"
+NETSTACK_PATH = os.path.join(WORKSPACE_DIR, "kernel", "core", "network", "SovereignNetStack.cpp")
+if not os.path.exists(NETSTACK_PATH):
+    # fallback
+    NETSTACK_PATH = os.path.join(WORKSPACE_DIR, "kernel", "core", "SovereignNetStack.cpp")
+
+content = """/*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN NET STACK (v15.1)
  * =========================================================================
@@ -78,3 +86,24 @@ public:
 
 } // namespace Network
 } // namespace SigmaOS
+"""
+
+# Write NetStack
+os.makedirs(os.path.dirname(NETSTACK_PATH), exist_ok=True)
+with open(NETSTACK_PATH, "w", encoding="utf-8") as f:
+    f.write(content)
+
+# Generate new MD documentation
+WIKI_DIR = os.path.join(WORKSPACE_DIR, "wiki_repo")
+
+docs = {
+    "SovereignNetStack-Architecture.md": "# SovereignNetStack Architecture\\n\\n## TCP/IP Stack\\nImplements POSIX-compatible shard sockets with strict zero-trust firewall isolation.",
+    "Package-Manager-Spec.md": "# SovereignPkgManager Spec\\n\\n## CRYSTALS-Dilithium-5\\nAll packages are attested via PQC level 5. Dependency resolution ensures isolated execution trees.",
+    "Desktop-UX-Guidelines.md": "# Zenith Desktop UX\\n\\n## Premium Glassmorphism\\nSigmaOS uses a heavily blurred backdrop filter with Inter typography for maximum industrial polish."
+}
+
+for name, md_content in docs.items():
+    with open(os.path.join(WIKI_DIR, name), "w", encoding="utf-8") as f:
+        f.write(md_content)
+
+print("SovereignNetStack wired and Documentation generated!")
