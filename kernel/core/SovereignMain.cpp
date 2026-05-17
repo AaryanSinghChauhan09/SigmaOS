@@ -1,7 +1,6 @@
 #include "../../include/sigma_kernel_types.h"
 #include "../../include/SigmaOOP.hpp"
 #include "../../include/sigma_log.h"
-#include "../../include/sigma_hal.h"
 
 // Engine Initialisers (Extern C)
 extern "C" {

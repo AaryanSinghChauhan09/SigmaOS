@@ -2,36 +2,36 @@
 
 ## Required Tools & Functions
 
-- Alignment monitor
+* Alignment monitor
 
-- semantic drift analyzer
+* semantic drift analyzer
 
-- reward hacking detector
+* reward hacking detector
 
-- sandbox-lattice
+* sandbox-lattice
 
 ## 📜 Compliance Rules
 
-- Asilomar AI principles
+* Asilomar AI principles
 
-- safety-first development
+* safety-first development
 
 ## 🧮 Professional Calculators
 
-- Complexity-to-safety ratio
+* Complexity-to-safety ratio
 
-- interpretability score
+* interpretability score
 
 ## 🧬 Core Algorithms
 
-- Formal verification
+* Formal verification
 
-- recursive self-improvement monitoring
+* recursive self-improvement monitoring
 
 ## 🛡 Self-Healing Strategy
 
-- Automated kill-switch activation, sandbox containment verification
+* Automated kill-switch activation, sandbox containment verification
 
 ## 🔄 Rollback Strategy
 
-- Safe-state model restoration, audit log immutability
+* Safe-state model restoration, audit log immutability

@@ -2,40 +2,40 @@
 
 ## Required Tools & Functions
 
-- Qiskit-Lattice
+* Qiskit-Lattice
 
-- QuIP interpreter
+* QuIP interpreter
 
-- cryogenic state monitor
+* cryogenic state monitor
 
-- entanglement analyzer
+* entanglement analyzer
 
 ## 📜 Compliance Rules
 
-- Quantum supremacy protocols
+* Quantum supremacy protocols
 
-- error correction standards
+* error correction standards
 
 ## 🧮 Professional Calculators
 
-- Qubit fidelity
+* Qubit fidelity
 
-- decoherence rate
+* decoherence rate
 
-- gate-error probability
+* gate-error probability
 
 ## 🧬 Core Algorithms
 
-- Shor's optimization
+* Shor's optimization
 
-- Grover's search
+* Grover's search
 
-- Quantum Fourier Transform
+* Quantum Fourier Transform
 
 ## 🛡 Self-Healing Strategy
 
-- Continuous decoherence correction, qubit state validation
+* Continuous decoherence correction, qubit state validation
 
 ## 🔄 Rollback Strategy
 
-- Quantum state checkpointing, entanglement-graph restoration
+* Quantum state checkpointing, entanglement-graph restoration

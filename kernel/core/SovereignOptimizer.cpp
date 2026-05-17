@@ -1,6 +1,5 @@
 #include "../../include/sigma_optimizer.h"
 #include "../../include/sigma_log.h"
-#include "../../include/SigmaOOP.hpp"
 
 /**
  * Σ SIGMAOS: SOVEREIGN PERFORMANCE OPTIMIZER (S-OPT)

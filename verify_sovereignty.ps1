@@ -9,10 +9,10 @@ Write-Host "--- SIGMAOS SOVEREIGNTY AUDIT ---" -ForegroundColor Cyan
 $IssuesFound = 0
 
 foreach ($Token in $LegacyTokens) {
-    $Matches = Get-ChildItem -Path $SearchDir -Recurse -File -Exclude "*.ps1", "*.md", "*.html", ".git" | Select-String -Pattern $Token
-    if ($Matches) {
-        Write-Host "[WARN] Non-Sovereign Token Found: '$Token' in $($Matches.Count) locations." -ForegroundColor Yellow
-        $IssuesFound += $Matches.Count
+    $FoundMatches = Get-ChildItem -Path $SearchDir -Recurse -File -Exclude "*.ps1", "*.md", "*.html", ".git" | Select-String -Pattern $Token
+    if ($FoundMatches) {
+        Write-Host "[WARN] Non-Sovereign Token Found: '$Token' in $($FoundMatches.Count) locations." -ForegroundColor Yellow
+        $IssuesFound += $FoundMatches.Count
     }
 }
 

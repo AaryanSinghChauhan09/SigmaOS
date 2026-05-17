@@ -11,7 +11,6 @@ The channels available are the following.
 
 This message is published when a new outgoing request is created.
 
-
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
 
@@ -33,7 +32,6 @@ Note: a request is only loosely completed to a given socket.
 
 This message is published when a chunk of the request body is being sent.
 
-
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
 
@@ -47,7 +45,6 @@ diagnosticsChannel.channel('undici:request:bodyChunkSent').subscribe(({ request,
 
 This message is published after the request body has been fully sent.
 
-
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
 
@@ -60,7 +57,6 @@ diagnosticsChannel.channel('undici:request:bodySent').subscribe(({ request }) =>
 ## `undici:request:headers`
 
 This message is published after the response headers have been received.
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -79,7 +75,6 @@ diagnosticsChannel.channel('undici:request:headers').subscribe(({ request, respo
 
 This message is published after a chunk of the response body has been received.
 
-
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
 
@@ -92,7 +87,6 @@ diagnosticsChannel.channel('undici:request:bodyChunkReceived').subscribe(({ requ
 ## `undici:request:trailers`
 
 This message is published after the response body and trailers have been received, i.e. the response has been completed.
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -110,7 +104,6 @@ diagnosticsChannel.channel('undici:request:trailers').subscribe(({ request, trai
 
 This message is published if the request is going to error, but it has not errored yet.
 
-
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
 
@@ -125,7 +118,6 @@ diagnosticsChannel.channel('undici:request:error').subscribe(({ request, error }
 This message is published right before the first byte of the request is written to the socket.
 
 *Note*: It will publish the exact headers that will be sent to the server in raw format.
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -143,7 +135,6 @@ This message is published before creating a new connection for **any** request.
 
 You can not assume that this event is related to any specific request.
 
-
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
 
@@ -157,7 +148,6 @@ diagnosticsChannel.channel('undici:client:beforeConnect').subscribe(({ connectPa
 ## `undici:client:connected`
 
 This message is published after a connection is established.
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -173,7 +163,6 @@ diagnosticsChannel.channel('undici:client:connected').subscribe(({ socket, conne
 
 This message is published if it did not succeed to create new connection
 
-
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
 
@@ -188,7 +177,6 @@ diagnosticsChannel.channel('undici:client:connectError').subscribe(({ error, soc
 ## `undici:websocket:open`
 
 This message is published after the client has successfully connected to a server.
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -218,14 +206,14 @@ diagnosticsChannel.channel('undici:websocket:open').subscribe(({
 
 The `handshakeResponse` object contains the HTTP response that established the WebSocket connection:
 
-- `status` (number): The HTTP status code (`101` for HTTP/1.1 upgrade, `200` for HTTP/2 extended CONNECT)
+* `status` (number): The HTTP status code (`101` for HTTP/1.1 upgrade, `200` for HTTP/2 extended CONNECT)
 
-- `statusText` (string): The HTTP status message (`'Switching Protocols'` for HTTP/1.1, commonly `'OK'` for HTTP/2 in Node.js)
+* `statusText` (string): The HTTP status message (`'Switching Protocols'` for HTTP/1.1, commonly `'OK'` for HTTP/2 in Node.js)
 
-- `headers` (object): The HTTP response headers from the server, including:
-  - `sec-websocket-accept` and other WebSocket-related headers
-  - `upgrade: 'websocket'`
-  - `connection: 'upgrade'`
+* `headers` (object): The HTTP response headers from the server, including:
+  * `sec-websocket-accept` and other WebSocket-related headers
+  * `upgrade: 'websocket'`
+  * `connection: 'upgrade'`
 
   The `upgrade` and `connection` headers are only present for HTTP/1.1 handshakes.
 
@@ -234,7 +222,6 @@ This information is particularly useful for debugging and monitoring WebSocket c
 ## `undici:websocket:close`
 
 This message is published after the connection has closed.
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -251,7 +238,6 @@ diagnosticsChannel.channel('undici:websocket:close').subscribe(({ websocket, cod
 
 This message is published if the socket experiences an error.
 
-
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
 
@@ -264,7 +250,6 @@ diagnosticsChannel.channel('undici:websocket:socket_error').subscribe((error) =>
 ## `undici:websocket:ping`
 
 This message is published after the client receives a ping frame, if the connection is not closing.
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -281,7 +266,6 @@ diagnosticsChannel.channel('undici:websocket:ping').subscribe(({ payload, websoc
 
 This message is published after the client receives a pong frame.
 
-
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
 
@@ -296,7 +280,6 @@ diagnosticsChannel.channel('undici:websocket:pong').subscribe(({ payload, websoc
 ## `undici:proxy:connected`
 
 This message is published after the `ProxyAgent` establishes a connection to the proxy server.
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -315,7 +298,6 @@ This message is published when the deduplicate interceptor's pending request map
 
 The deduplicate interceptor automatically deduplicates concurrent requests for the same resource. When multiple identical requests are made while one is already in-flight, only one request is sent to the origin server, and all waiting handlers receive the same response.
 
-
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
 
@@ -329,14 +311,13 @@ diagnosticsChannel.channel('undici:request:pending-requests').subscribe(({ type,
 
 ### Event Properties
 
-- `type` (`string`): Either `'added'` when a new pending request is registered, or `'removed'` when a pending request completes (successfully or with an error).
+* `type` (`string`): Either `'added'` when a new pending request is registered, or `'removed'` when a pending request completes (successfully or with an error).
 
-- `size` (`number`): The current number of pending requests after the change.
+* `size` (`number`): The current number of pending requests after the change.
 
-- `key` (`string`): The deduplication key for the request, composed of the origin, method, path, and request headers.
+* `key` (`string`): The deduplication key for the request, composed of the origin, method, path, and request headers.
 
 ### Example: Monitoring Request Deduplication
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -355,8 +336,8 @@ channel.subscribe(({ type, size, key }) => {
 
 This can be useful for:
 
-- Verifying that request deduplication is working as expected
+* Verifying that request deduplication is working as expected
 
-- Monitoring the number of concurrent in-flight requests
+* Monitoring the number of concurrent in-flight requests
 
-- Debugging deduplication behavior in production environments
+* Debugging deduplication behavior in production environments

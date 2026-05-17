@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-- Market dashboards
+* Market dashboards
 
-- risk analysis tools
+* risk analysis tools
 
-- AI forecasting
+* AI forecasting
 
-- bloomberg-lattice integration
+* bloomberg-lattice integration
 
 ## 📜 Compliance Rules
 
-- SEBI guidelines
+* SEBI guidelines
 
-- Basel III
+* Basel III
 
 ## 🧮 Professional Calculators
 
-- VaR
+* VaR
 
-- Sharpe ratio
+* Sharpe ratio
 
-- Monte Carlo sims
+* Monte Carlo sims
 
 ## 🧬 Core Algorithms
 
-- Algorithmic trading models
+* Algorithmic trading models
 
-- sentiment analysis
+* sentiment analysis
 
 ## 🛡 Self-Healing Strategy
 
-- Portfolio exposure verification, feed latency correction
+* Portfolio exposure verification, feed latency correction
 
 ## 🔄 Rollback Strategy
 
-- Pre-trade state restoration, historical data reconciliation
+* Pre-trade state restoration, historical data reconciliation

@@ -19,31 +19,32 @@ Welcome to the **Sovereign Singularity Heart**. The Core Edition is the pure, ba
 
 ## 🛠️ Core Functions
 
-- **Sovereign Scheduler**: Deterministic, O(1) multi-priority shard orchestration.
+* **Sovereign Scheduler**: Deterministic, O(1) multi-priority shard orchestration.
 
-- **Micro-Memory Nexus**: Zero-fragmentation, slab-based allocation with PQC attestation.
+* **Micro-Memory Nexus**: Zero-fragmentation, slab-based allocation with PQC attestation.
 
-- **Asynchronous IPC**: Lock-free communication between kernel nodes for maximum throughput.
+* **Asynchronous IPC**: Lock-free communication between kernel nodes for maximum throughput.
 
-- **Lattice Registry**: The immutable source of truth for all active system shards.
+* **Lattice Registry**: The immutable source of truth for all active system shards.
 
 ## 🌟 Premium Features
 
-- **Zero-Trust Kernel Mode**: Every kernel-level operation requires a valid PQC-signed capability.
+* **Zero-Trust Kernel Mode**: Every kernel-level operation requires a valid PQC-signed capability.
 
-- **Industrial Telemetry**: Real-time silicon-native performance tracing via the DTrace shard.
+* **Industrial Telemetry**: Real-time silicon-native performance tracing via the DTrace shard.
 
-- **Hot-Patch Nexus**: Update kernel logic shards without system downtime.
+* **Hot-Patch Nexus**: Update kernel logic shards without system downtime.
 
-- **Deadlock-Free Orchestration**: Formally verified resource allocation algorithms.
+* **Deadlock-Free Orchestration**: Formally verified resource allocation algorithms.
 
 ## 📊 Technical Specs
 
-- **Binary Size**: < 2 MB
+* **Binary Size**: < 2 MB
 
-- **Context Switch**: < 50ns
+* **Context Switch**: < 50ns
 
-- **Interrupt Latency**: Deterministic (Real-time capable)
+* **Interrupt Latency**: Deterministic (Real-time capable)
 
-- **Security**: Ring-0 Isolation (Zenith Standard)
+* **Security**: Ring-0 Isolation (Zenith Standard)
+
  village

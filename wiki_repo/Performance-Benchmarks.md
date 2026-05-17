@@ -4,33 +4,33 @@ This page tracks the official performance metrics of the SigmaOS Zenith v15.0 mi
 
 ## 1. Inter-Shard IPC Latency
 
-- **Baseline**: 85ns
+* **Baseline**: 85ns
 
-- **v15.0 Optimized**: 42ns
+* **v15.0 Optimized**: 42ns
 
-- **Measurement**: Ring-0 asynchronous IPC using the sovereign lock-free ring buffer (S-IPC).
+* **Measurement**: Ring-0 asynchronous IPC using the sovereign lock-free ring buffer (S-IPC).
 
 ## 2. Kernel Memory Allocation (S-MM)
 
-- **Slab Allocation (Small Objects)**: 12ns per allocation
+* **Slab Allocation (Small Objects)**: 12ns per allocation
 
-- **Page Allocation (4KB)**: 55ns per allocation
+* **Page Allocation (4KB)**: 55ns per allocation
 
-- **Regression Limit**: 5% degradation threshold strictly enforced by CI.
+* **Regression Limit**: 5% degradation threshold strictly enforced by CI.
 
 ## 3. Asynchronous Shard Ignition (Boot Time)
 
-- **Standalone Edition (Embedded)**: 380ms
+* **Standalone Edition (Embedded)**: 380ms
 
-- **Dual-Boot Edition**: 520ms (includes EFI partition selection)
+* **Dual-Boot Edition**: 520ms (includes EFI partition selection)
 
-- **Cloud/Virtual Hypervisor**: 450ms
+* **Cloud/Virtual Hypervisor**: 450ms
 
 ## 4. UI Responsiveness (App/Browser Layer)
 
-- **Compositor Framerate**: Sustained 144Hz (locked, zero drops under 90% CPU load).
+* **Compositor Framerate**: Sustained 144Hz (locked, zero drops under 90% CPU load).
 
-- **WASM Runtime Latency**: <15ms execution overhead for compiled shards.
+* **WASM Runtime Latency**: <15ms execution overhead for compiled shards.
 
 ## Continuous Monitoring
 

@@ -24,9 +24,11 @@ Welcome to the SigmaOS Installation Guide. This document provides a step-by-step
 ## ⚡ Quick Deployment (Physical Hardware)
 
 1. **Download the Official Image**
+
    Download the latest `sigmaos_aarch64.img` from the GitHub Release page.
 
 1. **Flash to SD Card / NVMe**
+
    Use `dd` or a tool like BalenaEtcher to flash the image.
 
    ```bash
@@ -34,6 +36,7 @@ Welcome to the SigmaOS Installation Guide. This document provides a step-by-step
    ```
 
 1. **Booting**
+
    Insert the drive and power on. The Sovereign Boot Manager will initialize the lattice shards and launch the Zenith UI automatically.
 
 ---
@@ -43,6 +46,7 @@ Welcome to the SigmaOS Installation Guide. This document provides a step-by-step
 If you want to test SigmaOS without physical hardware, use the QEMU target.
 
 1. **Build the Kernel**
+
    Follow the instructions in [Build.md](Build.md) to compile `sigma_os.elf`.
 
 1. **Run QEMU**
@@ -63,6 +67,7 @@ If you want to test SigmaOS without physical hardware, use the QEMU target.
 The `SovereignPartitionManager` supports scanning existing GPT partitions and bridging with systemd-boot.
 
 1. **Copy the Kernel**
+
    Copy `sigma_os_x64.elf` to your EFI partition.
 
    ```bash
@@ -70,6 +75,7 @@ The `SovereignPartitionManager` supports scanning existing GPT partitions and br
    ```
 
 1. **Add Boot Entry**
+
    Create `/boot/efi/loader/entries/sigmaos.conf`:
 
    ```ini
@@ -84,11 +90,11 @@ The `SovereignPartitionManager` supports scanning existing GPT partitions and br
 
 Upon first boot, the **Onboarding Wizard** will launch to:
 
-- Detect your hardware and apply **Smart Defaults**.
+* Detect your hardware and apply **Smart Defaults**.
 
-- Prompt for your **Profession Profile** (Lawyer, Doctor, Engineer, etc.).
+* Prompt for your **Profession Profile** (Lawyer, Doctor, Engineer, etc.).
 
-- Configure **Verified Boot** and PQC security levels.
+* Configure **Verified Boot** and PQC security levels.
 
 ---
 

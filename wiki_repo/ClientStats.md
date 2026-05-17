@@ -6,7 +6,7 @@ Stats for a [Client](/docs/docs/api/Client.md).
 
 Arguments:
 
-- **client** `Client` - Client from which to return stats.
+* **client** `Client` - Client from which to return stats.
 
 ## Instance Properties
 

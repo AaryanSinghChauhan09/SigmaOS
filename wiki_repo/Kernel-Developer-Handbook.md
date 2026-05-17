@@ -24,7 +24,6 @@ SigmaOS uses a **microkernel-inspired shard lattice** where each subsystem is an
 
 All kernel shards MUST acquire locks in the following order to prevent deadlocks:
 
-
 ```text
 
 1. SovereignMemoryPool::mutex
@@ -37,12 +36,12 @@ All kernel shards MUST acquire locks in the following order to prevent deadlocks
 
 
 ```text
+
 **Violation** of this order will trigger a `SovereignWatchdog` panic.
 
 ### 2.2 Atomic Operations
 
 Prefer `__atomic_*` builtins over mutexes for counter updates:
-
 
 ```cpp
 
@@ -55,25 +54,25 @@ __atomic_fetch_add(&shard_refcount, 1, __ATOMIC_SEQ_CST);
 
 Before merging any concurrency-related change:
 
-- [ ] Verified with `ThreadSanitizer` (`-fsanitize=thread`)
+* [ ] Verified with `ThreadSanitizer` (`-fsanitize=thread`)
 
-- [ ] No `TOCTOU` (time-of-check/time-of-use) patterns introduced
+* [ ] No `TOCTOU` (time-of-check/time-of-use) patterns introduced
 
-- [ ] Lock ordering documented in shard header comment
+* [ ] Lock ordering documented in shard header comment
 
-- [ ] Stress-tested via `scripts/format_stress_test.sh`
+* [ ] Stress-tested via `scripts/format_stress_test.sh`
 
 ---
 
 ## 3. Memory Management Rules
 
-- **No `malloc`/`free`** in kernel shards — use `SovereignMemoryPool::alloc()`
+* **No `malloc`/`free`** in kernel shards — use `SovereignMemoryPool::alloc()`
 
-- **RTOS shards** are forbidden from ALL dynamic allocation
+* **RTOS shards** are forbidden from ALL dynamic allocation
 
-- Run `SovereignMemoryPool::profile_leaks()` after each integration test
+* Run `SovereignMemoryPool::profile_leaks()` after each integration test
 
-- Buddy allocation handles blocks ≥ 4KB; slab handles < 4KB objects
+* Buddy allocation handles blocks ≥ 4KB; slab handles < 4KB objects
 
 ---
 
@@ -95,13 +94,13 @@ Every shard MUST:
 
 All PRs to `main` must pass:
 
-- `scripts/regression_check.sh` — functional correctness
+* `scripts/regression_check.sh` — functional correctness
 
-- `scripts/format_stress_test.sh` — concurrency stress
+* `scripts/format_stress_test.sh` — concurrency stress
 
-- `scripts/fuzz_pqc.sh` — security/fuzzing
+* `scripts/fuzz_pqc.sh` — security/fuzzing
 
-- GitHub Actions: CodeQL scan must return 0 critical alerts
+* GitHub Actions: CodeQL scan must return 0 critical alerts
 
 ---
 

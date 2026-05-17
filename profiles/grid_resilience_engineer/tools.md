@@ -2,42 +2,42 @@
 
 ## Required Tools & Functions
 
-- Smart-grid monitor
+* Smart-grid monitor
 
-- load balancer-Lattice
+* load balancer-Lattice
 
-- phase-angle sync
+* phase-angle sync
 
-- SCADA-shield
+* SCADA-shield
 
 ## 📜 Compliance Rules
 
-- IEEE standards
+* IEEE standards
 
-- FERC regulations
+* FERC regulations
 
-- NERC CIP compliance
+* NERC CIP compliance
 
 ## 🧮 Professional Calculators
 
-- Frequency stability
+* Frequency stability
 
-- reactive power
+* reactive power
 
-- peak-load predictor
+* peak-load predictor
 
 ## 🧬 Core Algorithms
 
-- Dynamic line rating
+* Dynamic line rating
 
-- islanding detection
+* islanding detection
 
-- black-start optimization
+* black-start optimization
 
 ## 🛡 Self-Healing Strategy
 
-- Automatic breaker re-closing, load-shedding lattice priority
+* Automatic breaker re-closing, load-shedding lattice priority
 
 ## 🔄 Rollback Strategy
 
-- Pre-fault grid state restoration, historical load profiles
+* Pre-fault grid state restoration, historical load profiles

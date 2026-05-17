@@ -25,7 +25,6 @@ correctness claims of the SigmaOS Sovereign Lattice.
 
 ## Running Kani Proofs
 
-
 ```bash
 
 # Install Kani

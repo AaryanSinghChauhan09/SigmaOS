@@ -31,35 +31,35 @@ This document tracks the final readiness of SigmaOS Zenith v15.0 based on the in
 
 ## 🛠 1. Kernel Stability (COMPLETE)
 
-- **Demand Paging**: `kernel/core/hal/SovereignVMM.cpp` provides memory isolation.
+* **Demand Paging**: `kernel/core/hal/SovereignVMM.cpp` provides memory isolation.
 
-- **Fair Scheduling**: `kernel/core/orchestration/SovereignScheduler.cpp` implements multi-priority industrial execution.
+* **Fair Scheduling**: `kernel/core/orchestration/SovereignScheduler.cpp` implements multi-priority industrial execution.
 
-- **Resilience**: `kernel/core/security/SovereignWatchdog.cpp` provides silicon-direct heartbeats.
+* **Resilience**: `kernel/core/security/SovereignWatchdog.cpp` provides silicon-direct heartbeats.
 
 ## 📂 2. Filesystem Reliability (COMPLETE)
 
-- **Journaling**: `kernel/core/fs/SovereignExt2.cpp` now supports crash-consistent shard metadata.
+* **Journaling**: `kernel/core/fs/SovereignExt2.cpp` now supports crash-consistent shard metadata.
 
-- **Snapshots**: `kernel/core/fs/SovereignSnap.cpp` implements Kyber-1024 encrypted CoW persistence.
+* **Snapshots**: `kernel/core/fs/SovereignSnap.cpp` implements Kyber-1024 encrypted CoW persistence.
 
 ## 🌐 3. Networking Maturity (COMPLETE)
 
-- **IPv6**: Modern network shard with NDP/SLAAC support.
+* **IPv6**: Modern network shard with NDP/SLAAC support.
 
-- **Firewall**: `S-ARMOR` packet filtering integrated into the netstack.
+* **Firewall**: `S-ARMOR` packet filtering integrated into the netstack.
 
 ## 🖥 4. Driver Coverage (COMPLETE)
 
-- **Industrial Bus**: Support for **USB 3.0 (XHCI)**, **High-Definition Audio (HDA)**, and **802.11 Wireless**.
+* **Industrial Bus**: Support for **USB 3.0 (XHCI)**, **High-Definition Audio (HDA)**, and **802.11 Wireless**.
 
-- **GPU**: Basic framebuffer acceleration shards established.
+* **GPU**: Basic framebuffer acceleration shards established.
 
 ## 💻 5. Userland Usability (COMPLETE)
 
-- **Professional Primitives**: Native implementation of `ls`, `cat`, `grep`, `cp`, and `mv` via `S-COREUTILS`.
+* **Professional Primitives**: Native implementation of `ls`, `cat`, `grep`, `cp`, and `mv` via `S-COREUTILS`.
 
-- **Sovereign Shell**: Enhanced `sigma_sh` with redirection and pipe stubs.
+* **Sovereign Shell**: Enhanced `sigma_sh` with redirection and pipe stubs.
 
 ---
 

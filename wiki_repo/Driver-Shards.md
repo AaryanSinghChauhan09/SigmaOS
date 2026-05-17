@@ -4,7 +4,6 @@ SigmaOS implements hardware orchestration via independent Driver Shards. This pr
 
 ## Architecture Diagram
 
-
 ```mermaid
 graph TD
     A[Hardware Component] --> B(Sovereign HAL)
@@ -41,6 +40,7 @@ Drivers are just standard Shard modules implementing `register_device()`.
 
 
 ```c
+
 void my_custom_gpu_driver_init() {
     register_device("custom_gpu_0", &gpu_operations_struct);
     sigma_log("Custom GPU Driver Loaded.");

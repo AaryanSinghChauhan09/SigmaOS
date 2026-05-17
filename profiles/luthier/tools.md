@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-- Acoustic-frequency analyzer
+* Acoustic-frequency analyzer
 
-- wood-density scanner
+* wood-density scanner
 
-- micro-planer
+* micro-planer
 
-- resonance-Lattice
+* resonance-Lattice
 
 ## 📜 Compliance Rules
 
-- CITES wood-usage regs
+* CITES wood-usage regs
 
-- traditional craft standards
+* traditional craft standards
 
 ## 🧮 Professional Calculators
 
-- String-tension
+* String-tension
 
-- bridge-pressure
+* bridge-pressure
 
-- vibrational-mode delta
+* vibrational-mode delta
 
 ## 🧬 Core Algorithms
 
-- Resonance-box simulation
+* Resonance-box simulation
 
-- structural-vibration analysis
+* structural-vibration analysis
 
 ## 🛡 Self-Healing Strategy
 
-- Workshop-climate sync, resonance-profile verification
+* Workshop-climate sync, resonance-profile verification
 
 ## 🔄 Rollback Strategy
 
-- Instrument-design snapshots, vibrational-history restoration
+* Instrument-design snapshots, vibrational-history restoration

@@ -11,7 +11,6 @@
 #ifndef SIGMA_HYPERVISOR_H
 #define SIGMA_HYPERVISOR_H
 
-#include "../core/sigma_types.h"
 #include "../SigmaOOP.hpp"
 
 namespace SigmaOS {

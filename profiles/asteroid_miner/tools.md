@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-- Spectroscopic analyzer
+* Spectroscopic analyzer
 
-- drill-bit thermal monitor
+* drill-bit thermal monitor
 
-- low-gravity navigation
+* low-gravity navigation
 
-- ore-density mapper
+* ore-density mapper
 
 ## 📜 Compliance Rules
 
-- Outer Space Treaty compliance
+* Outer Space Treaty compliance
 
-- resource extraction protocols
+* resource extraction protocols
 
 ## 🧮 Professional Calculators
 
-- Delta-V
+* Delta-V
 
-- ore-yield probability
+* ore-yield probability
 
-- trajectory-delta
+* trajectory-delta
 
 ## 🧬 Core Algorithms
 
-- Autonomous excavation pathing
+* Autonomous excavation pathing
 
-- structural stability prediction in vacuum
+* structural stability prediction in vacuum
 
 ## 🛡 Self-Healing Strategy
 
-- Thruster-link verification, drill-head cooling sync
+* Thruster-link verification, drill-head cooling sync
 
 ## 🔄 Rollback Strategy
 
-- Excavation state snapshots, orbital-return baseline restoration
+* Excavation state snapshots, orbital-return baseline restoration

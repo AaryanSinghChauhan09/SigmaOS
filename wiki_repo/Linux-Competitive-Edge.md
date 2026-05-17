@@ -35,11 +35,11 @@ Mainstream Linux distributions are often fragmented and rely on massive communit
 
 To surpass the competition, SigmaOS does not compete on "popularity" but on **Indisputable Trust**.
 
-- **Focus**: Own the security, sovereignty, and personalization niches.
+* **Focus**: Own the security, sovereignty, and personalization niches.
 
-- **Automation**: Deliver what Linux leaves to manual configuration (e.g., auto-tuning, self-healing).
+* **Automation**: Deliver what Linux leaves to manual configuration (e.g., auto-tuning, self-healing).
 
-- **Personalization**: Transition from "Generic OS" to "Profession-Aware Lattice".
+* **Personalization**: Transition from "Generic OS" to "Profession-Aware Lattice".
 
 ---
 

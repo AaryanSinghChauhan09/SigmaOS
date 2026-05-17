@@ -2,40 +2,40 @@
 
 ## Required Tools & Functions
 
-- Liquidity-Lattice
+* Liquidity-Lattice
 
-- AMM-simulator
+* AMM-simulator
 
-- yield-curve-nexus
+* yield-curve-nexus
 
-- flash-loan-auditor
+* flash-loan-auditor
 
 ## 📜 Compliance Rules
 
-- Smart-contract security standards
+* Smart-contract security standards
 
-- DeFi-governance protocols
+* DeFi-governance protocols
 
 ## 🧮 Professional Calculators
 
-- Impermanent loss
+* Impermanent loss
 
-- slippage-delta
+* slippage-delta
 
-- TVL-ratio
+* TVL-ratio
 
-- gas-optimization
+* gas-optimization
 
 ## 🧬 Core Algorithms
 
-- Automated market making
+* Automated market making
 
-- risk-tranche simulation
+* risk-tranche simulation
 
 ## 🛡 Self-Healing Strategy
 
-- Contract-state verification, liquidity-mesh sync
+* Contract-state verification, liquidity-mesh sync
 
 ## 🔄 Rollback Strategy
 
-- Vault-state snapshots, protocol-baseline restoration
+* Vault-state snapshots, protocol-baseline restoration

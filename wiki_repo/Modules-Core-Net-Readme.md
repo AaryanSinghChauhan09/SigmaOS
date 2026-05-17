@@ -4,7 +4,6 @@ Standalone networking subsystem.
 
 ## API Interface
 
-
 ```c
 
 // Abstract interface for core/net

@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-- Latent-space-navigator
+* Latent-space-navigator
 
-- GAN-monitor
+* GAN-monitor
 
-- NFT-lattice-bridge
+* NFT-lattice-bridge
 
-- style-transfer-engine
+* style-transfer-engine
 
 ## 📜 Compliance Rules
 
-- AI-ethics in art
+* AI-ethics in art
 
-- digital-provenance standards
+* digital-provenance standards
 
 ## 🧮 Professional Calculators
 
-- Visual-entropy
+* Visual-entropy
 
-- stylistic-divergence
+* stylistic-divergence
 
-- aesthetic-score
+* aesthetic-score
 
 ## 🧬 Core Algorithms
 
-- Prompt-optimization
+* Prompt-optimization
 
-- latent-walk orchestration
+* latent-walk orchestration
 
 ## 🛡 Self-Healing Strategy
 
-- Art-lattice integrity check, provenance-seal verification
+* Art-lattice integrity check, provenance-seal verification
 
 ## 🔄 Rollback Strategy
 
-- Curation-state snapshots, aesthetic-baseline restoration
+* Curation-state snapshots, aesthetic-baseline restoration

@@ -3,7 +3,6 @@
 Undici exposes a variety of error objects that you can use to enhance your error handling.
 You can find all the error objects inside the `errors` key.
 
-
 ```js
 import { errors } from 'undici'
 
@@ -36,7 +35,6 @@ Be aware of the possible difference between the global dispatcher version and th
 ### `SocketError`
 
 The `SocketError` has a `.socket` property which holds socket metadata:
-
 
 ```ts
 interface SocketInfo {

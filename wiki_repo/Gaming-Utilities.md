@@ -8,17 +8,17 @@ SigmaOS provides a native `sigma-game-mode` shard that dynamically reconfigures 
 
 ### Key Algorithms
 
-- **Dynamic GPU Scheduler (`SovereignGPUSched`)**: Prioritizes the rendering shard's access to silicon compute units.
+* **Dynamic GPU Scheduler (`SovereignGPUSched`)**: Prioritizes the rendering shard's access to silicon compute units.
 
-- **Haptic Feedback Sync**: Sub-ms synchronization between game audio and controller haptics.
+* **Haptic Feedback Sync**: Sub-ms synchronization between game audio and controller haptics.
 
-- **Vulkan-Direct Sharding**: Bypasses traditional driver overhead for zero-copy vertex throughput.
+* **Vulkan-Direct Sharding**: Bypasses traditional driver overhead for zero-copy vertex throughput.
 
 ## 🕹️ Peripheral Support
 
-- **Controller Manager**: Native support for Xbox, PlayStation, and Nintendo controllers via the `SovereignInput` shard.
+* **Controller Manager**: Native support for Xbox, PlayStation, and Nintendo controllers via the `SovereignInput` shard.
 
-- **VR/AR Shard**: Specialized profile for low-persistence rendering and spatial tracking.
+* **VR/AR Shard**: Specialized profile for low-persistence rendering and spatial tracking.
 
 ## 🚀 How to Enable
 

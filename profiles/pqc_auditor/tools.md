@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-- Lattice-based-crypto analyzer
+* Lattice-based-crypto analyzer
 
-- quantum-threat-modeler
+* quantum-threat-modeler
 
-- PQC-seal-validator
+* PQC-seal-validator
 
-- entropy-mesh
+* entropy-mesh
 
 ## 📜 Compliance Rules
 
-- NIST PQC standards
+* NIST PQC standards
 
-- FIPS 140-3
+* FIPS 140-3
 
 ## 🧮 Professional Calculators
 
-- Quantum-resistance-score
+* Quantum-resistance-score
 
-- entropy-density
+* entropy-density
 
-- key-strength delta
+* key-strength delta
 
 ## 🧬 Core Algorithms
 
-- Post-quantum signature verification
+* Post-quantum signature verification
 
-- cryptographic-mesh auditing
+* cryptographic-mesh auditing
 
 ## 🛡 Self-Healing Strategy
 
-- Key-lattice integrity check, PQC-seal validation
+* Key-lattice integrity check, PQC-seal validation
 
 ## 🔄 Rollback Strategy
 
-- Security-state snapshots, PQC-baseline restoration
+* Security-state snapshots, PQC-baseline restoration

@@ -2,7 +2,6 @@
 
 Access to an instance with :
 
-
 ```js
 const mockAgent = new MockAgent({ enableCallHistory: true })
 mockAgent.getCallHistory()
@@ -16,7 +15,6 @@ mockAgent.getCallHistory()
 ```
 
 a MockCallHistory instance implements a **Symbol.iterator** letting you iterate on registered logs :
-
 
 ```ts
 for (const log of mockAgent.getCallHistory()) {
@@ -34,7 +32,6 @@ const set: Set<MockCallHistoryLog> = new Set(mockAgent.getCallHistory())
 
 Clear all MockCallHistoryLog registered. This is automatically done when calling `mockAgent.close()`
 
-
 ```js
 mockAgent.clearCallHistory()
 // same as
@@ -46,7 +43,6 @@ mockAgent.getCallHistory()?.clear()
 
 Get all MockCallHistoryLog registered as an array
 
-
 ```js
 mockAgent.getCallHistory()?.calls()
 
@@ -55,7 +51,6 @@ mockAgent.getCallHistory()?.calls()
 ### firstCall
 
 Get the first MockCallHistoryLog registered or undefined
-
 
 ```js
 mockAgent.getCallHistory()?.firstCall()
@@ -66,7 +61,6 @@ mockAgent.getCallHistory()?.firstCall()
 
 Get the last MockCallHistoryLog registered or undefined
 
-
 ```js
 mockAgent.getCallHistory()?.lastCall()
 
@@ -75,7 +69,6 @@ mockAgent.getCallHistory()?.lastCall()
 ### nthCall
 
 Get the nth MockCallHistoryLog registered or undefined
-
 
 ```js
 mockAgent.getCallHistory()?.nthCall(3) // the third MockCallHistoryLog registered
@@ -87,7 +80,6 @@ mockAgent.getCallHistory()?.nthCall(3) // the third MockCallHistoryLog registere
 Filter MockCallHistoryLog by protocol.
 
 > more details for the first parameter can be found [here](/docs/docs/api/MockCallHistory.md#filter-parameter)
-
 
 ```js
 mockAgent.getCallHistory()?.filterCallsByProtocol(/https/)
@@ -101,7 +93,6 @@ Filter MockCallHistoryLog by host.
 
 > more details for the first parameter can be found [here](/docs/docs/api/MockCallHistory.md#filter-parameter)
 
-
 ```js
 mockAgent.getCallHistory()?.filterCallsByHost(/localhost/)
 mockAgent.getCallHistory()?.filterCallsByHost('localhost:3000')
@@ -113,7 +104,6 @@ mockAgent.getCallHistory()?.filterCallsByHost('localhost:3000')
 Filter MockCallHistoryLog by port.
 
 > more details for the first parameter can be found [here](/docs/docs/api/MockCallHistory.md#filter-parameter)
-
 
 ```js
 mockAgent.getCallHistory()?.filterCallsByPort(/3000/)
@@ -128,7 +118,6 @@ Filter MockCallHistoryLog by origin.
 
 > more details for the first parameter can be found [here](/docs/docs/api/MockCallHistory.md#filter-parameter)
 
-
 ```js
 mockAgent.getCallHistory()?.filterCallsByOrigin(/http:\/\/localhost:3000/)
 mockAgent.getCallHistory()?.filterCallsByOrigin('http://localhost:3000')
@@ -140,7 +129,6 @@ mockAgent.getCallHistory()?.filterCallsByOrigin('http://localhost:3000')
 Filter MockCallHistoryLog by path.
 
 > more details for the first parameter can be found [here](/docs/docs/api/MockCallHistory.md#filter-parameter)
-
 
 ```js
 mockAgent.getCallHistory()?.filterCallsByPath(/api\/v1\/graphql/)
@@ -154,7 +142,6 @@ Filter MockCallHistoryLog by hash.
 
 > more details for the first parameter can be found [here](/docs/docs/api/MockCallHistory.md#filter-parameter)
 
-
 ```js
 mockAgent.getCallHistory()?.filterCallsByPath(/hash/)
 mockAgent.getCallHistory()?.filterCallsByPath('#hash')
@@ -166,7 +153,6 @@ mockAgent.getCallHistory()?.filterCallsByPath('#hash')
 Filter MockCallHistoryLog by fullUrl. fullUrl contains protocol, host, port, path, hash, and query params
 
 > more details for the first parameter can be found [here](/docs/docs/api/MockCallHistory.md#filter-parameter)
-
 
 ```js
 mockAgent.getCallHistory()?.filterCallsByFullUrl(/https:\/\/localhost:3000\/\?query=value#hash/)
@@ -180,7 +166,6 @@ Filter MockCallHistoryLog by method.
 
 > more details for the first parameter can be found [here](/docs/docs/api/MockCallHistory.md#filter-parameter)
 
-
 ```js
 mockAgent.getCallHistory()?.filterCallsByMethod(/POST/)
 mockAgent.getCallHistory()?.filterCallsByMethod('POST')
@@ -193,14 +178,13 @@ This class method is a meta function / alias to apply complex filtering in a sin
 
 Parameters :
 
-- criteria : the first parameter. a function, regexp or object.
-  - function : filter MockCallHistoryLog when the function returns false
-  - regexp : filter MockCallHistoryLog when the regexp does not match on MockCallHistoryLog.toString() ([see](./MockCallHistoryLog.md#to-string))
-  - object : an object with MockCallHistoryLog properties as keys to apply multiple filters. each values are a [filter parameter](/docs/docs/api/MockCallHistory.md#filter-parameter)
+* criteria : the first parameter. a function, regexp or object.
+  * function : filter MockCallHistoryLog when the function returns false
+  * regexp : filter MockCallHistoryLog when the regexp does not match on MockCallHistoryLog.toString() ([see](./MockCallHistoryLog.md#to-string))
+  * object : an object with MockCallHistoryLog properties as keys to apply multiple filters. each values are a [filter parameter](/docs/docs/api/MockCallHistory.md#filter-parameter)
 
-- options : the second parameter. an object.
-  - options.operator : `'AND'` or `'OR'` (default `'OR'`). Used only if criteria is an object. see below
-
+* options : the second parameter. an object.
+  * options.operator : `'AND'` or `'OR'` (default `'OR'`). Used only if criteria is an object. see below
 
 ```js
 mockAgent.getCallHistory()?.filterCalls((log) => log.hash === value && log.headers?.['authorization'] !== undefined)
@@ -230,10 +214,10 @@ mockAgent.getCallHistory()?.filterCalls({ hash: /my-hash/, path: '/endpoint' }, 
 
 Can be :
 
-- string. MockCallHistoryLog filtered if `value !== parameterValue`
+* string. MockCallHistoryLog filtered if `value !== parameterValue`
 
-- null. MockCallHistoryLog filtered if `value !== parameterValue`
+* null. MockCallHistoryLog filtered if `value !== parameterValue`
 
-- undefined. MockCallHistoryLog filtered if `value !== parameterValue`
+* undefined. MockCallHistoryLog filtered if `value !== parameterValue`
 
-- regexp. MockCallHistoryLog filtered if `!parameterValue.test(value)`
+* regexp. MockCallHistoryLog filtered if `!parameterValue.test(value)`

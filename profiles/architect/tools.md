@@ -2,44 +2,44 @@
 
 ## Required Tools & Functions
 
-- BIM software
+* BIM software
 
-- 3D modeling
+* 3D modeling
 
-- site analysis tools
+* site analysis tools
 
-- rendering engines
+* rendering engines
 
-- GIS mapping
+* GIS mapping
 
 ## 📜 Compliance Rules
 
-- Building bye-laws
+* Building bye-laws
 
-- National Building Code (NBC)
+* National Building Code (NBC)
 
-- sustainability standards
+* sustainability standards
 
 ## 🧮 Professional Calculators
 
-- FSI/FAR
+* FSI/FAR
 
-- structural stability
+* structural stability
 
-- lighting/ventilation
+* lighting/ventilation
 
-- carbon footprint
+* carbon footprint
 
 ## 🧬 Core Algorithms
 
-- Generative design
+* Generative design
 
-- urban density simulation
+* urban density simulation
 
 ## 🛡 Self-Healing Strategy
 
-- BIM model consistency check, asset link validation
+* BIM model consistency check, asset link validation
 
 ## 🔄 Rollback Strategy
 
-- Iterative design snapshots, client approval state rollback
+* Iterative design snapshots, client approval state rollback

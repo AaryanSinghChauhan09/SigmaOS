@@ -38,7 +38,6 @@
 
 ## Build Flags Per Architecture
 
-
 ```bash
 
 # ARM Cortex-A (32-bit)

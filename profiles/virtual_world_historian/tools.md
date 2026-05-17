@@ -2,36 +2,36 @@
 
 ## Required Tools & Functions
 
-- Metaverse-archiver
+* Metaverse-archiver
 
-- avatar-ancestry-Lattice
+* avatar-ancestry-Lattice
 
-- world-state-tracer
+* world-state-tracer
 
 ## 📜 Compliance Rules
 
-- Digital-preservation ethics
+* Digital-preservation ethics
 
-- virtual-heritage standards
+* virtual-heritage standards
 
 ## 🧮 Professional Calculators
 
-- World-age
+* World-age
 
-- social-graph-density
+* social-graph-density
 
-- event-epoch-delta
+* event-epoch-delta
 
 ## 🧬 Core Algorithms
 
-- Cross-world event correlation
+* Cross-world event correlation
 
-- virtual-evolution mapping
+* virtual-evolution mapping
 
 ## 🛡 Self-Healing Strategy
 
-- Archival-sync verification, world-state integrity check
+* Archival-sync verification, world-state integrity check
 
 ## 🔄 Rollback Strategy
 
-- Historical-state snapshots, timeline-baseline restoration
+* Historical-state snapshots, timeline-baseline restoration

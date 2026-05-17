@@ -14,30 +14,31 @@ Welcome to the **Sovereign Web Shard**. The Browser edition is a specialized, we
 
 ## 🛠️ Core Functions
 
-- **SovereignWASM Runtime**: Direct-to-silicon WebAssembly execution with near-native performance.
+* **SovereignWASM Runtime**: Direct-to-silicon WebAssembly execution with near-native performance.
 
-- **Hardware-Accelerated Rendering**: Low-level Vulkan/WebGPU orchestration for the browser compositor.
+* **Hardware-Accelerated Rendering**: Low-level Vulkan/WebGPU orchestration for the browser compositor.
 
-- **PQC-VPN Integration**: Built-in, zero-config post-quantum encrypted tunnel for all web traffic.
+* **PQC-VPN Integration**: Built-in, zero-config post-quantum encrypted tunnel for all web traffic.
 
-- **Decentralized Storage**: Automatically maps browser local storage to the **SovereignMesh** lattice.
+* **Decentralized Storage**: Automatically maps browser local storage to the **SovereignMesh** lattice.
 
 ## 🌟 Premium Features
 
-- **Zero-Fingerprint Browsing**: Hardware-level MAC/ID randomization for every browser session.
+* **Zero-Fingerprint Browsing**: Hardware-level MAC/ID randomization for every browser session.
 
-- **WASM-Direct Drivers**: Run hardware drivers compiled as WASM shards for maximum safety.
+* **WASM-Direct Drivers**: Run hardware drivers compiled as WASM shards for maximum safety.
 
-- **Zenith-Adblock Shard**: Kernel-level blocking of malicious network shards (ads/trackers).
+* **Zenith-Adblock Shard**: Kernel-level blocking of malicious network shards (ads/trackers).
 
-- **Quantum-Safe Handshake**: Every TLS connection is upgraded to Kyber-1024 encryption.
+* **Quantum-Safe Handshake**: Every TLS connection is upgraded to Kyber-1024 encryption.
 
 ## 📊 Technical Specs
 
-- **Network Stack**: HTTP/3, QUIC, IPFS (Native Shard).
+* **Network Stack**: HTTP/3, QUIC, IPFS (Native Shard).
 
-- **GPU**: Vulkan 1.3 / WebGPU Zenith.
+* **GPU**: Vulkan 1.3 / WebGPU Zenith.
 
-- **Isolation**: Per-tab shard sandboxing (S-ARMOR).
+* **Isolation**: Per-tab shard sandboxing (S-ARMOR).
+
  village
  village

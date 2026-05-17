@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-- Retinal-lattice-vault
+* Retinal-lattice-vault
 
-- iris-mesh-attestor
+* iris-mesh-attestor
 
-- gait-analysis-nexus
+* gait-analysis-nexus
 
-- liveness-probe
+* liveness-probe
 
 ## 📜 Compliance Rules
 
-- Privacy laws (GDPR/BIPA)
+* Privacy laws (GDPR/BIPA)
 
-- biometric-security standards
+* biometric-security standards
 
 ## 🧮 Professional Calculators
 
-- False-match-rate (FMR)
+* False-match-rate (FMR)
 
-- biometric-entropy
+* biometric-entropy
 
-- template-aging-delta
+* template-aging-delta
 
 ## 🧬 Core Algorithms
 
-- Privacy-preserving biometric matching
+* Privacy-preserving biometric matching
 
-- cancelable biometric generation
+* cancelable biometric generation
 
 ## 🛡 Self-Healing Strategy
 
-- Template-integrity verify, sensor-liveness-sync
+* Template-integrity verify, sensor-liveness-sync
 
 ## 🔄 Rollback Strategy
 
-- Vault-state snapshots, identity-baseline restoration
+* Vault-state snapshots, identity-baseline restoration

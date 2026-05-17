@@ -10,7 +10,6 @@
 #ifndef SIGMA_NETWORK_H
 #define SIGMA_NETWORK_H
 
-#include "../core/sigma_types.h"
 #include "../SigmaOOP.hpp"
 
 namespace SigmaOS {

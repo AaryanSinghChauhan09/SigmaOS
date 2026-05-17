@@ -34,11 +34,11 @@ Decentralized, PQC-encrypted communication fabric. Shards can form an autonomous
 
 Inspired by modern personal AI frameworks, SigmaOS transcends traditional computing by acting as a **Life Operating System**.
 
-- **S-PAI Shard**: A local, agentic AI orchestrator that manages context, memory, and skills.
+* **S-PAI Shard**: A local, agentic AI orchestrator that manages context, memory, and skills.
 
-- **S-TELOS**: A goal-alignment engine that ensures every system action aligns with your professional and personal mission.
+* **S-TELOS**: A goal-alignment engine that ensures every system action aligns with your professional and personal mission.
 
-- **S-PULSE**: A real-time dashboard tracking your "Current State" vs. "Desired State".
+* **S-PULSE**: A real-time dashboard tracking your "Current State" vs. "Desired State".
 
 ## 🛠 Professional Integration Examples
 

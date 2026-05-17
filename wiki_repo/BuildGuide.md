@@ -20,6 +20,7 @@ sudo apt install build-essential g++ make qemu-system-x86 nasm mtools
 SigmaOS uses the `s-cli` orchestrator for all build operations.
 
 1. **Compile the Orchestrator:**
+
    If you haven't already, compile the CLI:
 
    ```bash
@@ -28,6 +29,7 @@ SigmaOS uses the `s-cli` orchestrator for all build operations.
    ```
 
 1. **Select a Build Profile:**
+
    Configure the system for your target environment:
 
    ```bash
@@ -36,6 +38,7 @@ SigmaOS uses the `s-cli` orchestrator for all build operations.
    ```
 
 1. **Compile the Lattice:**
+
    Build the kernel and all enabled shards for the x86_64 architecture:
 
    ```bash

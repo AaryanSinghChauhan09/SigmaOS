@@ -4,7 +4,6 @@ Diagnostics Module.
 
 ## API Interface
 
-
 ```c
 
 // Abstract interface for tools/diag

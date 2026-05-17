@@ -6,13 +6,13 @@ The **Dual-Boot Edition** is engineered for users who require the power of the S
 
 ### 🛠️ Key Features
 
-- **Sovereign Partitioning (SPT)**: Safely resize legacy partitions to create shard space.
+* **Sovereign Partitioning (SPT)**: Safely resize legacy partitions to create shard space.
 
-- **Cross-Lattice Bridge**: Read-only access to NTFS and Ext4 volumes via the S-FS shard.
+* **Cross-Lattice Bridge**: Read-only access to NTFS and Ext4 volumes via the S-FS shard.
 
-- **Unified Bootloader**: PQC-signed entry points for all installed OSes.
+* **Unified Bootloader**: PQC-signed entry points for all installed OSes.
 
-- **Hybrid Security**: Shield legacy partitions from shard-level anomalies.
+* **Hybrid Security**: Shield legacy partitions from shard-level anomalies.
 
 ### 📥 Installation Guide (Coexistence)
 
@@ -28,9 +28,9 @@ The **Dual-Boot Edition** is engineered for users who require the power of the S
 
 ### 💎 Exclusive Functions
 
-- `legacy-mount`: Mount Windows/Linux drives with automatic PQC integrity scanning.
+* `legacy-mount`: Mount Windows/Linux drives with automatic PQC integrity scanning.
 
-- `boot-manager-gui`: Visually manage boot priorities and themes.
+* `boot-manager-gui`: Visually manage boot priorities and themes.
 
 ---
 [Return to Global Home](Home)

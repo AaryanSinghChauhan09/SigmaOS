@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-- Scent-molecule database
+* Scent-molecule database
 
-- GC-MS analyzer link
+* GC-MS analyzer link
 
-- formula optimizer
+* formula optimizer
 
-- olfactory sim
+* olfactory sim
 
 ## 📜 Compliance Rules
 
-- IFRA standards
+* IFRA standards
 
-- allergen compliance
+* allergen compliance
 
 ## 🧮 Professional Calculators
 
-- Concentration ratio
+* Concentration ratio
 
-- evaporation rate
+* evaporation rate
 
-- sillage estimator
+* sillage estimator
 
 ## 🧬 Core Algorithms
 
-- Scent-chord generator
+* Scent-chord generator
 
-- molecular stability prediction
+* molecular stability prediction
 
 ## 🛡 Self-Healing Strategy
 
-- Formula consistency check, component availability sync
+* Formula consistency check, component availability sync
 
 ## 🔄 Rollback Strategy
 
-- Iterative scent-state restoration, allergen safety baseline
+* Iterative scent-state restoration, allergen safety baseline

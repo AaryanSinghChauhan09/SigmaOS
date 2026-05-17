@@ -10,7 +10,6 @@
 #ifndef SIGMA_STORAGE_H
 #define SIGMA_STORAGE_H
 
-#include "../core/sigma_types.h"
 #include "../SigmaOOP.hpp"
 
 namespace SigmaOS {

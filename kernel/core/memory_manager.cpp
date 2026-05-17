@@ -1,6 +1,5 @@
 #include "../../include/sigma_kernel_types.h"
 #include "../../include/sigma_log.h"
-#include "../../include/hal/sigma_hal.h"
 #include "memory_manager.hpp"
 #include "../../include/libc/SovereignLibC.h"
 

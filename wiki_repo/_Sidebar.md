@@ -1,156 +1,156 @@
 # SigmaOS Sovereign Wiki
 
-- [Home (Hub)](Home)
+* [Home (Hub)](Home)
 
-- [Standalone](Home-Zenith-Standalone) | [Dual-boot](Home-Zenith-Dualboot) | [Core](Home-Zenith-Core)
+* [Standalone](Home-Zenith-Standalone) | [Dual-boot](Home-Zenith-Dualboot) | [Core](Home-Zenith-Core)
 
-- [Browser](Home-Zenith-Browser) | [App](Home-Zenith-App) | [Stable](Home-Stable) | [Horizon](Home-Horizon)
+* [Browser](Home-Zenith-Browser) | [App](Home-Zenith-App) | [Stable](Home-Stable) | [Horizon](Home-Horizon)
 
 ## ðŸ›ï¸ Core Concepts
 
-- [Industrial Roadmap](ROADMAP.md)
+* [Industrial Roadmap](ROADMAP.md)
 
-- [Architecture](Architecture)
+* [Architecture](Architecture)
 
 ## ⚙️ Core Subsystems
 
-- [Networking Shard (TCP/IP)](Networking-Shard)
+* [Networking Shard (TCP/IP)](Networking-Shard)
 
-- [Storage Shard (LFS/VFS)](Storage-Shard)
+* [Storage Shard (LFS/VFS)](Storage-Shard)
 
-- [Real-Time Scheduler (CFS)](Real-Time-Scheduler-Shard)
+* [Real-Time Scheduler (CFS)](Real-Time-Scheduler-Shard)
 
-- [Hardware Driver Shards](Driver-Shards)
+* [Hardware Driver Shards](Driver-Shards)
 
-- [Security & PQC Shard](Security-Shard)
+* [Security & PQC Shard](Security-Shard)
 
-- [Sovereign Principles](SOVEREIGN_PRINCIPLES)
+* [Sovereign Principles](SOVEREIGN_PRINCIPLES)
 
 ## 🚀 Strategic Vision
 
-- [Competitive Analysis (vs Linux)](Competitive-Analysis)
+* [Competitive Analysis (vs Linux)](Competitive-Analysis)
 
-- [Linux Competitive Edge](Linux-Competitive-Edge)
+* [Linux Competitive Edge](Linux-Competitive-Edge)
 
-- [Leapfrog Strategy](Leapfrog-Strategy)
+* [Leapfrog Strategy](Leapfrog-Strategy)
 
-- [Profession Center](PROFESSION-MAP)
+* [Profession Center](PROFESSION-MAP)
 
-- [100-Step Roadmap](ULTIMATE-ADVANCEMENT-STRATEGY)
+* [100-Step Roadmap](ULTIMATE-ADVANCEMENT-STRATEGY)
 
-- [SigmaOS vs The World](SigmaOS_vs_The_World)
+* [SigmaOS vs The World](SigmaOS_vs_The_World)
 
 ## âš™ï¸ Technical Shards
 
-- [Kernel Modularization](MODULARIZATION_MAP)
+* [Kernel Modularization](MODULARIZATION_MAP)
 
-- [Post-Quantum Security](Verified-Boot)
+* [Post-Quantum Security](Verified-Boot)
 
-- [Zenith UI](ZENITH_UI)
+* [Zenith UI](ZENITH_UI)
 
-- [Self-Healing Engine](Sovereign_Self_Healing)
+* [Self-Healing Engine](Sovereign_Self_Healing)
 
-- [Doctor Tool](Doctor_Tool)
+* [Doctor Tool](Doctor_Tool)
 
-- [Trust Graph UI](Trust_Graph)
+* [Trust Graph UI](Trust_Graph)
 
-- [AI Orchestration](AGENTS)
+* [AI Orchestration](AGENTS)
 
 ## 👥 Community & Contribution
 
-- [Getting Started](Getting-Started)
+* [Getting Started](Getting-Started)
 
-- [Contributor Guidelines](Contributor-Guidelines)
+* [Contributor Guidelines](Contributor-Guidelines)
 
-- [Developer Roadmap](Developer-Roadmap)
+* [Developer Roadmap](Developer-Roadmap)
 
-- [Code of Conduct](CODE_OF_CONDUCT)
+* [Code of Conduct](CODE_OF_CONDUCT)
 
 ## 📊 Niche Parity (vs Linux)
 
-- [Gaming & GPU Utilities](Gaming-Utilities)
+* [Gaming & GPU Utilities](Gaming-Utilities)
 
-- [Performance Optimizer](Performance-Optimizer)
+* [Performance Optimizer](Performance-Optimizer)
 
-- [IoT & Embedded Toolkit](IoT-and-Embedded)
+* [IoT & Embedded Toolkit](IoT-and-Embedded)
 
-- [Reproducibility & Rollback](Reproducibility-Guide)
+* [Reproducibility & Rollback](Reproducibility-Guide)
 
-- [Container Orchestration](Container-Orchestration)
+* [Container Orchestration](Container-Orchestration)
 
-- [Rolling Release Strategy](Rolling-Release-Strategy)
+* [Rolling Release Strategy](Rolling-Release-Strategy)
 
-- [Enterprise & Regression](Enterprise-Regression)
+* [Enterprise & Regression](Enterprise-Regression)
 
-- [Gap Analysis vs Competitors](Gap-Analysis-vs-Competitors)
+* [Gap Analysis vs Competitors](Gap-Analysis-vs-Competitors)
 
-- [Niche Parity Certification](Niche-Parity-Certification)
+* [Niche Parity Certification](Niche-Parity-Certification)
 
 ## 📅 Roadmap & Future
 
-- [Contributor Roadmap](CONTRIBUTOR_ROADMAP)
+* [Contributor Roadmap](CONTRIBUTOR_ROADMAP)
 
-- [Industrial Release Notes](CHANGELOG)
+* [Industrial Release Notes](CHANGELOG)
 
 ## 🛠️ Developer Reference
 
-- [API Documentation](API-Documentation)
+* [API Documentation](API-Documentation)
 
-- [Examples and Demos](Examples-and-Demos)
+* [Examples and Demos](Examples-and-Demos)
 
-- [Glossary](Glossary)
+* [Glossary](Glossary)
 
-- [Release Notes](Release-Notes)
+* [Release Notes](Release-Notes)
 
 ## ðŸ›ï¸ Industrial Maintenance
 
-- [Lattice Cleanup & Maintenance](Microkernel-Format)
+* [Lattice Cleanup & Maintenance](Microkernel-Format)
 
-- [Incremental Shard Backup](Microkernel-Format)
+* [Incremental Shard Backup](Microkernel-Format)
 
-- [OS Problems & Solutions](Common-OS-Problems-Solutions)
+* [OS Problems & Solutions](Common-OS-Problems-Solutions)
 
 ## ðŸ OS Format Guides & Toolsets
 
-- [Format: Microkernel (Industrial baseline)](Microkernel-Format)
+* [Format: Microkernel (Industrial baseline)](Microkernel-Format)
 
-- [Format: Distributed (Consensus & Network)](Distributed-Format)
+* [Format: Distributed (Consensus & Network)](Distributed-Format)
 
-- [Format: RTOS (Safety-Critical & Creative)](RTOS-Format)
+* [Format: RTOS (Safety-Critical & Creative)](RTOS-Format)
 
-- [Format: Cloud (Containers & Scaling)](Cloud-Format)
+* [Format: Cloud (Containers & Scaling)](Cloud-Format)
 
-- [Format: Mobile (Multimedia & Productivity)](Mobile-Format)
+* [Format: Mobile (Multimedia & Productivity)](Mobile-Format)
 
-- [Format: Forensic (Audit & Recovery)](Forensic-Profile)
+* [Format: Forensic (Audit & Recovery)](Forensic-Profile)
 
-- [Format: Education (NCERT & Labs)](Education-Profile)
+* [Format: Education (NCERT & Labs)](Education-Profile)
 
 ## ðŸ› ï¸ Industrial Readiness
 
-- [Kernel Developer Handbook](Kernel-Developer-Handbook)
+* [Kernel Developer Handbook](Kernel-Developer-Handbook)
 
-- [Dual-Boot Compatibility Matrix](Dual-Boot-Compatibility-Matrix)
+* [Dual-Boot Compatibility Matrix](Dual-Boot-Compatibility-Matrix)
 
-- [Embedded Hardware Compatibility](Embedded-Hardware-Compatibility)
+* [Embedded Hardware Compatibility](Embedded-Hardware-Compatibility)
 
-- [Performance Benchmarks](PERFORMANCE.md)
+* [Performance Benchmarks](PERFORMANCE.md)
 
 ## 📊 Niche Parity (vs Competitors)
 
-- [Gaming & GPU Utilities](Gaming-Utilities)
+* [Gaming & GPU Utilities](Gaming-Utilities)
 
-- [Performance Optimizer](Performance-Optimizer)
+* [Performance Optimizer](Performance-Optimizer)
 
-- [IoT & Embedded Toolkit](IoT-and-Embedded)
+* [IoT & Embedded Toolkit](IoT-and-Embedded)
 
-- [Reproducibility & Rollback](Reproducibility-Guide)
+* [Reproducibility & Rollback](Reproducibility-Guide)
 
-- [Container Orchestration](Container-Orchestration)
+* [Container Orchestration](Container-Orchestration)
 
-- [Rolling Release Strategy](Rolling-Release-Strategy)
+* [Rolling Release Strategy](Rolling-Release-Strategy)
 
-- [Enterprise & Regression](Enterprise-Regression)
+* [Enterprise & Regression](Enterprise-Regression)
 
 ---
 

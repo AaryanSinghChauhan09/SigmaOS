@@ -12,7 +12,7 @@ Uppercase environment variables are also supported: `HTTP_PROXY`, `HTTPS_PROXY`,
 
 Arguments:
 
-- **options** `EnvHttpProxyAgentOptions` (optional) - extends the `Agent` options.
+* **options** `EnvHttpProxyAgentOptions` (optional) - extends the `Agent` options.
 
 Returns: `EnvHttpProxyAgent`
 
@@ -20,14 +20,13 @@ Returns: `EnvHttpProxyAgent`
 
 Extends: [`AgentOptions`](/docs/docs/api/Agent.md#parameter-agentoptions)
 
-- **httpProxy** `string` (optional) - When set, it will override the `HTTP_PROXY` environment variable.
+* **httpProxy** `string` (optional) - When set, it will override the `HTTP_PROXY` environment variable.
 
-- **httpsProxy** `string` (optional) - When set, it will override the `HTTPS_PROXY` environment variable.
+* **httpsProxy** `string` (optional) - When set, it will override the `HTTPS_PROXY` environment variable.
 
-- **noProxy** `string` (optional) - When set, it will override the `NO_PROXY` environment variable.
+* **noProxy** `string` (optional) - When set, it will override the `NO_PROXY` environment variable.
 
 Examples:
-
 
 ```js
 import { EnvHttpProxyAgent } from 'undici'
@@ -42,7 +41,6 @@ const envHttpProxyAgent = new EnvHttpProxyAgent({ httpProxy: 'my.proxy.server:80
 
 This will instantiate the EnvHttpProxyAgent. It will not do anything until registered as the agent to use with requests.
 
-
 ```js
 import { EnvHttpProxyAgent } from 'undici'
 
@@ -51,7 +49,6 @@ const envHttpProxyAgent = new EnvHttpProxyAgent()
 ```
 
 #### Example - Basic Proxy Fetch with global agent dispatcher
-
 
 ```js
 import { setGlobalDispatcher, fetch, EnvHttpProxyAgent } from 'undici'
@@ -68,7 +65,6 @@ const data = await json() // data { foo: "bar" }
 ```
 
 #### Example - Basic Proxy Request with global agent dispatcher
-
 
 ```js
 import { setGlobalDispatcher, request, EnvHttpProxyAgent } from 'undici'
@@ -87,7 +83,6 @@ for await (const data of body) {
 ```
 
 #### Example - Basic Proxy Request with local agent dispatcher
-
 
 ```js
 import { EnvHttpProxyAgent, request } from 'undici'
@@ -108,7 +103,6 @@ for await (const data of body) {
 ```
 
 #### Example - Basic Proxy Fetch with local agent dispatcher
-
 
 ```js
 import { EnvHttpProxyAgent, fetch } from 'undici'
@@ -144,7 +138,7 @@ Implements [`Dispatcher.dispatch(options, handler)`](/docs/docs/api/Dispatcher.m
 
 Extends: [`DispatchOptions`](/docs/docs/api/Dispatcher.md#parameter-dispatchoptions)
 
-- **origin** `string | URL`
+* **origin** `string | URL`
 
 Implements [`Dispatcher.destroy([error, callback])`](/docs/docs/api/Dispatcher.md#dispatcherdestroyerror-callback-promise).
 

@@ -20,9 +20,9 @@ SigmaOS utilizes a strictly decoupled HAL to ensure portability across multiple 
 1. **Zero-Direct Access**: Userland and Kernel Shards MUST NOT access MSRs, CRn registers, or I/O ports directly.
 
 2. **Abstract Primitives**: All architecture-specific operations are wrapped in `SovereignHAL` primitives:
-   - `hal_switch_context()`
-   - `hal_map_page()`
-   - `hal_enable_interrupts()`
+   * `hal_switch_context()`
+   * `hal_map_page()`
+   * `hal_enable_interrupts()`
 
 3. **Interrupt Sharding**: Interrupts are abstracted into a unified `InterruptNexus` which maps arch-specific vectors to SigmaOS Shard IDs.
 

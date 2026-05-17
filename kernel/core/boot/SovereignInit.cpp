@@ -1,8 +1,6 @@
 #include "../../../include/SigmaOOP.hpp"
 #include "../../../include/sigma_log.h"
 #include "../../../include/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/sigma_hal.h"
 
 /* Forward declarations for Zenith functional layers */
 extern "C" void allocator_init();

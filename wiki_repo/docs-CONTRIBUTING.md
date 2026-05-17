@@ -27,13 +27,13 @@ SigmaOS is built on a **600-Shard Modular Architecture**. Every contribution sho
    ```
 
 3. **Implement & Document**:
-   - Add your logic to the appropriate directory (`/kernel`, `/drivers`, `/ui`).
-   - Update the corresponding `.md` file in the wiki if the architecture changes.
+   * Add your logic to the appropriate directory (`/kernel`, `/drivers`, `/ui`).
+   * Update the corresponding `.md` file in the wiki if the architecture changes.
 
 4. **Validation**:
-   - Run the build system: `make all`.
-   - Test in QEMU: `./qemu-boot.sh`.
-   - Ensure `sigma-heal` reports no technical debt.
+   * Run the build system: `make all`.
+   * Test in QEMU: `./qemu-boot.sh`.
+   * Ensure `sigma-heal` reports no technical debt.
 
 5. **Submit a PR**: Provide a clear description of the shard's purpose and any capability requirements.
 
@@ -41,11 +41,11 @@ SigmaOS is built on a **600-Shard Modular Architecture**. Every contribution sho
 
 ## 🎨 Code Style
 
-- Use **OOP-Isolated Singletons** for core engines.
+* Use **OOP-Isolated Singletons** for core engines.
 
-- Follow the `sigma_` naming convention for kernel-level primitives.
+* Follow the `sigma_` naming convention for kernel-level primitives.
 
-- Maintain strict **C++11/14** standards for hardware compatibility.
+* Maintain strict **C++11/14** standards for hardware compatibility.
 
 ---
 

@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-- Genetic-modification auditor
+* Genetic-modification auditor
 
-- bio-risk modeler
+* bio-risk modeler
 
-- ethical-compliance dashboard
+* ethical-compliance dashboard
 
-- CRISPR-log-Lattice
+* CRISPR-log-Lattice
 
 ## 📜 Compliance Rules
 
-- Declaration of Helsinki
+* Declaration of Helsinki
 
-- Belmont Report
+* Belmont Report
 
-- bio-ethics guidelines
+* bio-ethics guidelines
 
 ## 🧮 Professional Calculators
 
-- Risk-benefit ratio
+* Risk-benefit ratio
 
-- genetic-diversity index
+* genetic-diversity index
 
 ## 🧬 Core Algorithms
 
-- Ethical-dilemma simulation
+* Ethical-dilemma simulation
 
-- long-term impact analysis
+* long-term impact analysis
 
 ## 🛡 Self-Healing Strategy
 
-- Compliance-log integrity check, ethical-seal verification
+* Compliance-log integrity check, ethical-seal verification
 
 ## 🔄 Rollback Strategy
 
-- Decision-state snapshots, protocol baseline restoration
+* Decision-state snapshots, protocol baseline restoration

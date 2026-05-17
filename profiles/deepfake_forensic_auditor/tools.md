@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-- Spatial-temporal-consistency-mesh
+* Spatial-temporal-consistency-mesh
 
-- frequency-domain-nexus
+* frequency-domain-nexus
 
-- lip-sync-auditor
+* lip-sync-auditor
 
-- eye-blink-monitor
+* eye-blink-monitor
 
 ## 📜 Compliance Rules
 
-- Media ethics
+* Media ethics
 
-- digital-authenticity standards
+* digital-authenticity standards
 
 ## 🧮 Professional Calculators
 
-- Artifact-density
+* Artifact-density
 
-- GAN-fingerprint-score
+* GAN-fingerprint-score
 
-- emotional-inconsistency-delta
+* emotional-inconsistency-delta
 
 ## 🧬 Core Algorithms
 
-- Deepfake detection ensemble
+* Deepfake detection ensemble
 
-- synthetic-voice attribution
+* synthetic-voice attribution
 
 ## 🛡 Self-Healing Strategy
 
-- Auditor-lattice integrity, model-weight-sync
+* Auditor-lattice integrity, model-weight-sync
 
 ## 🔄 Rollback Strategy
 
-- Analysis-state snapshots, authenticity-baseline
+* Analysis-state snapshots, authenticity-baseline

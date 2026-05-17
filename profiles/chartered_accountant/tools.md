@@ -2,48 +2,48 @@
 
 ## Required Tools & Functions
 
-- Tally-Lattice
+* Tally-Lattice
 
-- GST-Nexus
+* GST-Nexus
 
-- Income Tax Auditor
+* Income Tax Auditor
 
-- balance-sheet-lattice
+* balance-sheet-lattice
 
-- audit-trail-engine
+* audit-trail-engine
 
 ## 📜 Compliance Rules
 
-- ICAI standards
+* ICAI standards
 
-- Income Tax Act
+* Income Tax Act
 
-- GST laws
+* GST laws
 
-- Companies Act
+* Companies Act
 
 ## 🧮 Professional Calculators
 
-- Tax-liability
+* Tax-liability
 
-- TDS-estimator
+* TDS-estimator
 
-- capital-gains-calc
+* capital-gains-calc
 
-- depreciation-lattice
+* depreciation-lattice
 
 ## 🧬 Core Algorithms
 
-- Anomaly detection in ledgers
+* Anomaly detection in ledgers
 
-- tax-optimization modeling
+* tax-optimization modeling
 
-- automated-audit-sampling
+* automated-audit-sampling
 
 ## 🛡 Self-Healing Strategy
 
-- Tally-data-integrity scan, GST-reconciliation verification
+* Tally-data-integrity scan, GST-reconciliation verification
 
 ## 🔄 Rollback Strategy
 
-- Fiscal-year snapshots, historical ledger restoration
+* Fiscal-year snapshots, historical ledger restoration

@@ -2,40 +2,40 @@
 
 ## Required Tools & Functions
 
-- Salesforce-Lattice
+* Salesforce-Lattice
 
-- HubSpot-Bridge
+* HubSpot-Bridge
 
-- lead-scoring-engine
+* lead-scoring-engine
 
-- customer-journey-mapper
+* customer-journey-mapper
 
 ## 📜 Compliance Rules
 
-- GDPR
+* GDPR
 
-- CCPA
+* CCPA
 
-- CRM data-privacy standards
+* CRM data-privacy standards
 
 ## 🧮 Professional Calculators
 
-- CLV (Customer Lifetime Value)
+* CLV (Customer Lifetime Value)
 
-- churn-rate
+* churn-rate
 
-- conversion-delta
+* conversion-delta
 
 ## 🧬 Core Algorithms
 
-- Lead prioritization modeling
+* Lead prioritization modeling
 
-- automated-marketing-pathing
+* automated-marketing-pathing
 
 ## 🛡 Self-Healing Strategy
 
-- Lead-data consistency check, automation-workflow validation
+* Lead-data consistency check, automation-workflow validation
 
 ## 🔄 Rollback Strategy
 
-- Customer-record snapshots, marketing-campaign rollback
+* Customer-record snapshots, marketing-campaign rollback

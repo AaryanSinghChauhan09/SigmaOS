@@ -6,13 +6,13 @@ SigmaOS Horizon v15.0 integrates a post-quantum hardened AI stack designed for i
 
 ### Components
 
-- **Sovereign AI Nexus**: The central compute shard for model orchestration.
+* **Sovereign AI Nexus**: The central compute shard for model orchestration.
 
-- **CUDA/ROCm Absorption**: Low-level drivers are directly absorbed into the Lattice for zero-latency GPU access.
+* **CUDA/ROCm Absorption**: Low-level drivers are directly absorbed into the Lattice for zero-latency GPU access.
 
-- **ONNX Runtime**: Cross-framework support for PyTorch, TensorFlow, and scikit-learn models.
+* **ONNX Runtime**: Cross-framework support for PyTorch, TensorFlow, and scikit-learn models.
 
-- **PQC-Attested Models**: All weights must be signed with Dilithium-5 keys to prevent neural-injection attacks.
+* **PQC-Attested Models**: All weights must be signed with Dilithium-5 keys to prevent neural-injection attacks.
 
 ## 📊 Data Science (S-DS)
 
@@ -20,11 +20,11 @@ The Data Science pillar provides a high-performance environment for silicon-leve
 
 ### Bundled Shards
 
-- **S-PANDAS**: Native C implementation of dataframe primitives.
+* **S-PANDAS**: Native C implementation of dataframe primitives.
 
-- **S-JUPYTER**: An offline, lattice-native interactive compute environment.
+* **S-JUPYTER**: An offline, lattice-native interactive compute environment.
 
-- **S-JULIA/R**: First-class support for scientific computing via the Sovereign LLVM bridge.
+* **S-JULIA/R**: First-class support for scientific computing via the Sovereign LLVM bridge.
 
 ## 🎓 CS Education & Competitive Programming (S-PLAY)
 
@@ -32,11 +32,11 @@ Designed for the next generation of Sovereign Architects, this pillar provides a
 
 ### Features
 
-- **Offline Coding Playground**: A sandboxed REPL for C, Python, Java, and Rust.
+* **Offline Coding Playground**: A sandboxed REPL for C, Python, Java, and Rust.
 
-- **DSA Shard Library**: Highly optimized implementations of algorithms (Graph, Tree, Dynamic Programming) available as kernel services.
+* **DSA Shard Library**: Highly optimized implementations of algorithms (Graph, Tree, Dynamic Programming) available as kernel services.
 
-- **Competitive Toolchain**: Pre-configured `sigma-cc` (Clang-based) with O3-optimization profiles for sub-millisecond execution.
+* **Competitive Toolchain**: Pre-configured `sigma-cc` (Clang-based) with O3-optimization profiles for sub-millisecond execution.
 
 ## 🛠 Strategic Integration Plan (Roadmap)
 

@@ -1,6 +1,4 @@
-#include "../../include/sigma_kernel_types.h"
 #include "../../include/sigma_log.h"
-#include "../../include/sigma_time.h"
 
 /**
  * SigmaOS Sovereign Health Monitor (S-HEALTH)

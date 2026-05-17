@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-- SONAR-Lattice
+* SONAR-Lattice
 
-- pressure-hull monitor
+* pressure-hull monitor
 
-- bathymetric-map-engine
+* bathymetric-map-engine
 
-- silent-running-nexus
+* silent-running-nexus
 
 ## 📜 Compliance Rules
 
-- Maritime law
+* Maritime law
 
-- deep-sea exploration protocols
+* deep-sea exploration protocols
 
 ## 🧮 Professional Calculators
 
-- Buoyancy-delta
+* Buoyancy-delta
 
-- acoustic-range
+* acoustic-range
 
-- pressure-limit-calc
+* pressure-limit-calc
 
 ## 🧬 Core Algorithms
 
-- Sub-surface obstacle avoidance
+* Sub-surface obstacle avoidance
 
-- passive sonar triangulation
+* passive sonar triangulation
 
 ## 🛡 Self-Healing Strategy
 
-- Acoustic-link verification, hull-sensor-integrity scan
+* Acoustic-link verification, hull-sensor-integrity scan
 
 ## 🔄 Rollback Strategy
 
-- Dive-log snapshots, ballast-configuration restoration
+* Dive-log snapshots, ballast-configuration restoration

@@ -10,7 +10,6 @@
 #ifndef SIGMA_OPTIMIZER_H
 #define SIGMA_OPTIMIZER_H
 
-#include "./sigma_kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -2,34 +2,34 @@
 
 ## Required Tools & Functions
 
-- Zero-Gravity Manufacturing Specialist workspace
+* Zero-Gravity Manufacturing Specialist workspace
 
-- specialized analytics
+* specialized analytics
 
-- compliance manager
+* compliance manager
 
 ## 📜 Compliance Rules
 
-- Industry standards
+* Industry standards
 
-- professional ethics
+* professional ethics
 
 ## 🧮 Professional Calculators
 
-- Efficiency metrics
+* Efficiency metrics
 
-- cost analysis
+* cost analysis
 
 ## 🧬 Core Algorithms
 
-- Workflow optimization
+* Workflow optimization
 
-- adaptive assistance
+* adaptive assistance
 
 ## 🛡 Self-Healing Strategy
 
-- Continuous health check for Zero-Gravity Manufacturing Specialist tools
+* Continuous health check for Zero-Gravity Manufacturing Specialist tools
 
 ## 🔄 Rollback Strategy
 
-- Automatic state snapshots
+* Automatic state snapshots

@@ -1,4 +1,4 @@
-function Fix-Includes {
+function Repair-Includes {
     param([string]$Path, [int]$UpLevels)
     $Content = Get-Content $Path -Raw
     $Prefix = if ($UpLevels -gt 0) { "../" * $UpLevels } else { "./" }
@@ -11,10 +11,10 @@ function Fix-Includes {
 }
 
 if (Test-Path "userland") {
-    Get-ChildItem -Path userland -Filter *.cpp | ForEach-Object { Fix-Includes $_.FullName 1 }
+    Get-ChildItem -Path userland -Filter *.cpp | ForEach-Object { Repair-Includes $_.FullName 1 }
 }
 if (Test-Path "tools") {
-    Get-ChildItem -Path tools -Filter *.cpp | ForEach-Object { Fix-Includes $_.FullName 1 }
+    Get-ChildItem -Path tools -Filter *.cpp | ForEach-Object { Repair-Includes $_.FullName 1 }
 }
 
 if (Test-Path "kernel") {
@@ -22,7 +22,7 @@ if (Test-Path "kernel") {
         $Rel = $_.FullName.Substring((Get-Location).Path.Length + 1)
         $RelTrim = $Rel -replace "^kernel[\\/]", ""
         $Levels = ($RelTrim -split "[\\/]").Count
-        Fix-Includes $_.FullName $Levels
+        Repair-Includes $_.FullName $Levels
     }
 }
 

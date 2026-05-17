@@ -4,7 +4,6 @@ Process Isolation Module.
 
 ## API Interface
 
-
 ```c
 
 // Abstract interface for security/isolation

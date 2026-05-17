@@ -6,13 +6,13 @@ The **Core Edition** is the stripped-down, high-performance base of the Zenith a
 
 ### 🛠️ Key Features
 
-- **Headless Architecture**: Optimized for SSH and serial console interaction.
+* **Headless Architecture**: Optimized for SSH and serial console interaction.
 
-- **Development-Native**: Pre-loaded with the `S-SDK` and `sigma-pkg` toolchain.
+* **Development-Native**: Pre-loaded with the `S-SDK` and `sigma-pkg` toolchain.
 
-- **Resource Efficiency**: Idles at less than 128MB of RAM.
+* **Resource Efficiency**: Idles at less than 128MB of RAM.
 
-- **PQC-Hardened SSH**: Exclusive Dilithium-5 authenticated remote access.
+* **PQC-Hardened SSH**: Exclusive Dilithium-5 authenticated remote access.
 
 ### 📥 Installation Guide (Developer/Server)
 
@@ -28,9 +28,9 @@ The **Core Edition** is the stripped-down, high-performance base of the Zenith a
 
 ### 💎 Exclusive Functions
 
-- `shard-debug`: Low-level kernel tracing and shard memory inspection.
+* `shard-debug`: Low-level kernel tracing and shard memory inspection.
 
-- `lattice-stat`: High-resolution telemetry for CPU, memory, and packet flow.
+* `lattice-stat`: High-resolution telemetry for CPU, memory, and packet flow.
 
 ---
 [Return to Global Home](Home)

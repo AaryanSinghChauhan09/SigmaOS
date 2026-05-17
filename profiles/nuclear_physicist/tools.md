@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-- Reactor core monitor
+* Reactor core monitor
 
-- neutron flux analyzer
+* neutron flux analyzer
 
-- isotope tracking
+* isotope tracking
 
-- SCADA-Lattice
+* SCADA-Lattice
 
 ## 📜 Compliance Rules
 
-- IAEA safety standards
+* IAEA safety standards
 
-- NRC protocols
+* NRC protocols
 
 ## 🧮 Professional Calculators
 
-- Half-life
+* Half-life
 
-- criticality index
+* criticality index
 
-- radiation dose
+* radiation dose
 
 ## 🧬 Core Algorithms
 
-- Monte Carlo N-Particle (MCNP)
+* Monte Carlo N-Particle (MCNP)
 
-- fission rate simulation
+* fission rate simulation
 
 ## 🛡 Self-Healing Strategy
 
-- Fail-safe core monitoring, containment integrity scan
+* Fail-safe core monitoring, containment integrity scan
 
 ## 🔄 Rollback Strategy
 
-- Reactor state snapshot, safety protocol baseline restoration
+* Reactor state snapshot, safety protocol baseline restoration

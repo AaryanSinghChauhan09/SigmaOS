@@ -22,21 +22,21 @@ SigmaOS is designed for **Absolute Non-Equivalence** — a sovereign computation
 
 ## 🟢 What SigmaOS Already Has (v15.0 Zenith)
 
-- **Sovereign Shard Lattice**: Asynchronous Shard Ignition (ASI), hot-swappable modules.
+* **Sovereign Shard Lattice**: Asynchronous Shard Ignition (ASI), hot-swappable modules.
 
-- **Post-Quantum Security**: Dilithium-5 and Kyber-1024 at shard boundaries.
+* **Post-Quantum Security**: Dilithium-5 and Kyber-1024 at shard boundaries.
 
-- **Modular Networking (`S-NET`)**: Zero-trust TCP/IP with PQC-encrypted sockets.
+* **Modular Networking (`S-NET`)**: Zero-trust TCP/IP with PQC-encrypted sockets.
 
-- **Storage (`S-STOR`)**: Lattice File System with atomic commits and VFS abstraction.
+* **Storage (`S-STOR`)**: Lattice File System with atomic commits and VFS abstraction.
 
-- **Real-Time Scheduler (`S-SCHED`)**: Deterministic CFS-style scheduling with EDF support.
+* **Real-Time Scheduler (`S-SCHED`)**: Deterministic CFS-style scheduling with EDF support.
 
-- **AI Telemetry (`S-AI-TEL`)**: Predictive failure analysis and anomaly detection hooks.
+* **AI Telemetry (`S-AI-TEL`)**: Predictive failure analysis and anomaly detection hooks.
 
-- **Package Manager (`S-PKG`)**: PQC-attested `.sab` bundle delivery, verification, and **incremental delta updates**.
+* **Package Manager (`S-PKG`)**: PQC-attested `.sab` bundle delivery, verification, and **incremental delta updates**.
 
-- **Automated CI/CD**: x86, ARM64, RISC-V builds + QEMU boot + **forensic snapshot diffing**.
+* **Automated CI/CD**: x86, ARM64, RISC-V builds + QEMU boot + **forensic snapshot diffing**.
 
 ## 🔴 What SigmaOS Still Needs
 
@@ -56,13 +56,13 @@ SigmaOS is designed for **Absolute Non-Equivalence** — a sovereign computation
 
 ## 🔑 Key Recommendations
 
-- **Immediate**: Networking + storage shards, driver expansion, package manager.
+* **Immediate**: Networking + storage shards, driver expansion, package manager.
 
-- **Medium Term**: CI/CD with cross-arch boot tests, stress/security regressions.
+* **Medium Term**: CI/CD with cross-arch boot tests, stress/security regressions.
 
-- **Long Term**: AI telemetry for predictive monitoring and adaptive scheduling.
+* **Long Term**: AI telemetry for predictive monitoring and adaptive scheduling.
 
-- **Community**: Expand Wiki into a contributor hub with tutorials, diagrams, and roadmap transparency.
+* **Community**: Expand Wiki into a contributor hub with tutorials, diagrams, and roadmap transparency.
 
 ## 🛡 The "Sovereignty" Difference
 

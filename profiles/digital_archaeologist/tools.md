@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-- Data-carving suite
+* Data-carving suite
 
-- legacy-system emulator
+* legacy-system emulator
 
-- bit-rot detector
+* bit-rot detector
 
-- archival-lattice
+* archival-lattice
 
 ## 📜 Compliance Rules
 
-- Digital preservation standards
+* Digital preservation standards
 
-- copyright-fair-use protocols
+* copyright-fair-use protocols
 
 ## 🧮 Professional Calculators
 
-- Data-integrity-hash
+* Data-integrity-hash
 
-- bit-error rate
+* bit-error rate
 
-- compression-ratio
+* compression-ratio
 
 ## 🧬 Core Algorithms
 
-- Fragmented data reconstruction
+* Fragmented data reconstruction
 
-- legacy-format detection
+* legacy-format detection
 
 ## 🛡 Self-Healing Strategy
 
-- Bit-rot correction, archival-sync verification
+* Bit-rot correction, archival-sync verification
 
 ## 🔄 Rollback Strategy
 
-- Data-state snapshots, archival-integrity restoration
+* Data-state snapshots, archival-integrity restoration

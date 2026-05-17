@@ -10,17 +10,17 @@ SigmaOS is not a monolithic kernel; it is a **Sovereign Lattice**. Every system 
 
 The **Universal Sovereign Runtime**ensures that every interaction within the lattice is cryptographically verified using**Lattice-PQC** (Post-Quantum Cryptography).
 
-- Security: Ring-LWE based encryption.
+* Security: Ring-LWE based encryption.
 
-- Resilience: Zero-trust shard communication.
+* Resilience: Zero-trust shard communication.
 
 ### 2. Neural Hardware Sharding (Zenith)
 
 SigmaOS is AI-native. The **Morphic Zenith**UI is not just rendered; it is**morphed**based on usage patterns using**Neuromorphic Shards**.
 
-- Adaptive UX: Predictive UI layouts.
+* Adaptive UX: Predictive UI layouts.
 
-- Hardware: Direct spiking neural network (SNN) driver support.
+* Hardware: Direct spiking neural network (SNN) driver support.
 
 ### 3. Distributed Sovereign Consensus
 
@@ -34,9 +34,9 @@ Unlike legacy operating systems, SigmaOS utilizes **Runtime Formal Verification*
 
 The **Sovereign Neural Coprocessor** leverages TPU/NPU silicon shards for real-time lattice optimization.
 
-- Predictive Scaling: Anticipates silicon pressure.
+* Predictive Scaling: Anticipates silicon pressure.
 
-- Inference Shards: Native AI support for kernel-level decisions.
+* Inference Shards: Native AI support for kernel-level decisions.
 
 ### 6. Self-Healing Security Fabric
 
@@ -48,17 +48,17 @@ The **Sovereign Recovery Agent**automates lattice restoration. If a shard is com
 
 SigmaOS is designed for universal portability and industrial dominance:
 
-- Independent Installation: Autonomous S-Install for bare-metal colonization.
+* Independent Installation: Autonomous S-Install for bare-metal colonization.
 
-- Live Boot Nexus: Zero-trace execution from portable silicon media.
+* Live Boot Nexus: Zero-trace execution from portable silicon media.
 
-- Network Ignition (PXE): Sovereign PXE Nexus for RDMA-native cloud bootstrapping.
+* Network Ignition (PXE): Sovereign PXE Nexus for RDMA-native cloud bootstrapping.
 
-- Browser-Native Delivery: Web Nexus packaging for high-performance WASM-based lattice execution.
+* Browser-Native Delivery: Web Nexus packaging for high-performance WASM-based lattice execution.
 
-- Sovereign Virtualization: Hypervisor-less, bare-metal shard containerization.
+* Sovereign Virtualization: Hypervisor-less, bare-metal shard containerization.
 
-- Cloud Hosting: Global consensus-driven lattice clustering.
+* Cloud Hosting: Global consensus-driven lattice clustering.
 
 ## 🔒 Security Posture: S80 Amnesia
 
@@ -106,19 +106,19 @@ The **Sovereign Industrial API** provides a clean, C++ OOP interface for develop
 
 ### Core Primitives
 
-- `SovereignAPI::Log(const char*)`: Industrial-grade diagnostic logging.
+* `SovereignAPI::Log(const char*)`: Industrial-grade diagnostic logging.
 
-- `SovereignAPI::AllocateShard(sigma_size_t)`: Allocates memory in protected RAM-phantom space.
+* `SovereignAPI::AllocateShard(sigma_size_t)`: Allocates memory in protected RAM-phantom space.
 
-- `SovereignAPI::ReleaseShard(void*)`: Wipes and releases shard memory using the **S80 Amnesia** protocol.
+* `SovereignAPI::ReleaseShard(void*)`: Wipes and releases shard memory using the **S80 Amnesia** protocol.
 
 ### Distributed & Consensus
 
-- `SovereignAPI::ProposeState(const char* id, const void* data, sigma_size_t)`: Initiates a lattice-wide agreement for state transitions.
+* `SovereignAPI::ProposeState(const char* id, const void* data, sigma_size_t)`: Initiates a lattice-wide agreement for state transitions.
 
 ### Security
 
-- `SovereignAPI::EncryptPQC(const void*, void*, sigma_size_t)`: High-performance post-quantum lattice encryption for shard-to-shard communication.
+* `SovereignAPI::EncryptPQC(const void*, void*, sigma_size_t)`: High-performance post-quantum lattice encryption for shard-to-shard communication.
 
 ---
 
@@ -128,21 +128,21 @@ SigmaOS is an open-governance silicon singularity. Developers can contribute to 
 
 ### 1. Development Environment
 
-- Use the **Sovereign Industrial API** (`include/SovereignAPI.hpp`).
+* Use the **Sovereign Industrial API** (`include/SovereignAPI.hpp`).
 
-- Ensure all code is **Zero-Dependency**and adheres to**Silicon-Native** performance standards.
+* Ensure all code is **Zero-Dependency**and adheres to**Silicon-Native** performance standards.
 
 ### 2. Verification & PQC Signing
 
-- Every shard must be signed with a **Post-Quantum Key**.
+* Every shard must be signed with a **Post-Quantum Key**.
 
-- Use the `VerifyShardPQC` protocol to ensure shard integrity before submission to the global nexus.
+* Use the `VerifyShardPQC` protocol to ensure shard integrity before submission to the global nexus.
 
 ### 3. Hot-Loading & Integration
 
-- Shards are integrated via the **Sovereign Shard Manager**.
+* Shards are integrated via the **Sovereign Shard Manager**.
 
-- Use the `HotLoadShard` method for real-time integration without system reset.
+* Use the `HotLoadShard` method for real-time integration without system reset.
 
 ---
 
@@ -150,15 +150,15 @@ SigmaOS is an open-governance silicon singularity. Developers can contribute to 
 
 The following core shards form the foundation of the Sovereign Lattice:
 
-- **`SovereignCore`**: The root orchestrator shard.
+* **`SovereignCore`**: The root orchestrator shard.
 
-- **`SovereignNetMesh`**: PQC-hardened distributed networking.
+* **`SovereignNetMesh`**: PQC-hardened distributed networking.
 
-- **`SovereignZenith`**: Morphic UI and hardware-accelerated graphics.
+* **`SovereignZenith`**: Morphic UI and hardware-accelerated graphics.
 
-- **`SovereignIDS`**: Real-time silicon anomaly detection.
+* **`SovereignIDS`**: Real-time silicon anomaly detection.
 
-- **`SovereignLatticePQC`**: Quantum-resistant cryptographic nexus.
+* **`SovereignLatticePQC`**: Quantum-resistant cryptographic nexus.
 
 ## 🏆 Competitive Dominance Analysis
 

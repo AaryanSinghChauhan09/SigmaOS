@@ -4,7 +4,6 @@ Testing Sandbox.
 
 ## API Interface
 
-
 ```c
 
 // Abstract interface for tools/sandbox

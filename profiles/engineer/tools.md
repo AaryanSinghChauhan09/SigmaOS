@@ -2,46 +2,46 @@
 
 ## Required Tools & Functions
 
-- Compilers
+* Compilers
 
-- CAD tools
+* CAD tools
 
-- simulation engines
+* simulation engines
 
-- project management dashboards
+* project management dashboards
 
-- Finite Element Analysis (FEA)
+* Finite Element Analysis (FEA)
 
 ## 📜 Compliance Rules
 
-- Bureau of Indian Standards (BIS)
+* Bureau of Indian Standards (BIS)
 
-- IS codes
+* IS codes
 
-- Eurocodes
+* Eurocodes
 
 ## 🧮 Professional Calculators
 
-- Structural load
+* Structural load
 
-- electrical circuit
+* electrical circuit
 
-- fluid mechanics
+* fluid mechanics
 
-- thermal stress
+* thermal stress
 
 ## 🧬 Core Algorithms
 
-- CAD simulation
+* CAD simulation
 
-- stress analysis
+* stress analysis
 
-- project scheduling
+* project scheduling
 
 ## 🛡 Self-Healing Strategy
 
-- Simulation state verification, build-cache integrity check
+* Simulation state verification, build-cache integrity check
 
 ## 🔄 Rollback Strategy
 
-- Project-wide git-lattice rollback, CAD design versioning
+* Project-wide git-lattice rollback, CAD design versioning

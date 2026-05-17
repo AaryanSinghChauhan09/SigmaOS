@@ -8,23 +8,23 @@ The Developer Profile is engineered for maximum throughput, low-latency executio
 
 ## 🛠️ Integrated Shards
 
-- **ShardTracer**: Real-time syscall tracing and performance profiling.
+* **ShardTracer**: Real-time syscall tracing and performance profiling.
 
-- **GitLattice**: High-speed, P2P git synchronization with built-in audit logs.
+* **GitLattice**: High-speed, P2P git synchronization with built-in audit logs.
 
-- **PQC-SDK**: Libraries and tools for building quantum-resistant applications.
+* **PQC-SDK**: Libraries and tools for building quantum-resistant applications.
 
-- **Lattice-Containers**: Sub-millisecond startup times for isolated developer environments.
+* **Lattice-Containers**: Sub-millisecond startup times for isolated developer environments.
 
 ---
 
 ## 🎨 Zenith Configuration
 
-- **Theme**: Cyber Midnight (High Contrast)
+* **Theme**: Cyber Midnight (High Contrast)
 
-- **Layout**: Tri-pane (Terminal, Editor, Shard Monitor)
+* **Layout**: Tri-pane (Terminal, Editor, Shard Monitor)
 
-- **Personalization**: Adaptive font scaling and focus-mode triggers.
+* **Personalization**: Adaptive font scaling and focus-mode triggers.
 
 ---
 

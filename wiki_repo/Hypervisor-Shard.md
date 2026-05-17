@@ -4,7 +4,6 @@ The `S-HYP` shard implements a **Type-1 bare-metal hypervisor** running directly
 
 ## Architecture Diagram
 
-
 ```mermaid
 graph TD
     A[SigmaOS Microkernel] --> B(S-HYP Hypervisor Shard)
@@ -38,6 +37,7 @@ graph TD
 
 
 ```c
+
 // Create an isolated industrial VM
 VirtualMachineConfig config = {
     .name = "s-finance-vm",

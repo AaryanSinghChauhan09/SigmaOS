@@ -4,7 +4,6 @@ SigmaOS implements a full Post-Quantum Security Lattice, providing both defensiv
 
 ## Architecture
 
-
 ```mermaid
 graph TD
     A[Sovereign Lattice] --> B{S-PQC Engine}
@@ -34,7 +33,6 @@ SigmaOS is built from the ground up to resist quantum-computational attacks.
 
 ### Cryptography API
 
-
 ```c
 // Encrypt an inter-shard payload
 sigma_status status = pq_encrypt(data, sizeof(data), encrypted_out);
@@ -53,17 +51,17 @@ SigmaOS provides a turnkey environment for security professionals to audit silic
 
 ### Bundled Security Tools
 
-- **`S-PLOIT`**: Native penetration testing framework targeting shard memory and system call surfaces.
+* **`S-PLOIT`**: Native penetration testing framework targeting shard memory and system call surfaces.
 
-- **`S-MAP`**: High-performance network scanning and packet analysis (Nmap/Wireshark-class).
+* **`S-MAP`**: High-performance network scanning and packet analysis (Nmap/Wireshark-class).
 
-- **`S-FORENSIC`**: Post-quantum forensic engine for atomic state analysis and shard-level investigation.
+* **`S-FORENSIC`**: Post-quantum forensic engine for atomic state analysis and shard-level investigation.
 
-- **`sigma-audit`**: Static analysis tool for verifying shard binary integrity against known-good PQC hashes.
+* **`sigma-audit`**: Static analysis tool for verifying shard binary integrity against known-good PQC hashes.
 
-- **Lattice Fuzzers**: Directed fuzzing at the sovereign memory allocator and Z-SYSCALL interface.
+* **Lattice Fuzzers**: Directed fuzzing at the sovereign memory allocator and Z-SYSCALL interface.
 
-- **Protocol Shards**: Pre-configured modules for auditing 802.11 Wi-Fi, Bluetooth, and IPsec tunnels.
+* **Protocol Shards**: Pre-configured modules for auditing 802.11 Wi-Fi, Bluetooth, and IPsec tunnels.
 
 ---
 

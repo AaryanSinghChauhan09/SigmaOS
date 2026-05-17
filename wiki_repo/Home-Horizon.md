@@ -6,13 +6,13 @@ The **Horizon Edition** is the cutting-edge, experimental release of SigmaOS. It
 
 ### 🛠️ Key Features
 
-- **Rolling Shard Release**: Access the latest features as soon as they clear the build lattice.
+* **Rolling Shard Release**: Access the latest features as soon as they clear the build lattice.
 
-- **AI-Native Orchestration (PAI)**: Autonomous resource management and self-optimization.
+* **AI-Native Orchestration (PAI)**: Autonomous resource management and self-optimization.
 
-- **Quantum Shard Interop (QSI)**: Experimental support for quantum co-processors.
+* **Quantum Shard Interop (QSI)**: Experimental support for quantum co-processors.
 
-- **Lattice Mesh Networking**: Decentralized, peer-to-peer node discovery and sync.
+* **Lattice Mesh Networking**: Decentralized, peer-to-peer node discovery and sync.
 
 ### 📥 Installation Guide (Bleeding Edge)
 
@@ -28,9 +28,9 @@ The **Horizon Edition** is the cutting-edge, experimental release of SigmaOS. It
 
 ### 💎 Exclusive Functions
 
-- `ai-optimize-lattice`: Allow the PAI shard to dynamically restructure kernel priorities.
+* `ai-optimize-lattice`: Allow the PAI shard to dynamically restructure kernel priorities.
 
-- `mesh-sync-global`: Real-time state synchronization with all Horizon nodes.
+* `mesh-sync-global`: Real-time state synchronization with all Horizon nodes.
 
 ---
 [Return to Global Home](Home)

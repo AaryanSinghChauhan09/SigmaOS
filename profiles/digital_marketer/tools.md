@@ -2,42 +2,42 @@
 
 ## Required Tools & Functions
 
-- SERP-Lattice
+* SERP-Lattice
 
-- SEM-Analyzer
+* SEM-Analyzer
 
-- crawl-budget-optimizer
+* crawl-budget-optimizer
 
-- backlink-auditor
+* backlink-auditor
 
-- conversion-pixel-nexus
+* conversion-pixel-nexus
 
 ## 📜 Compliance Rules
 
-- Search engine guidelines
+* Search engine guidelines
 
-- advertising ethics
+* advertising ethics
 
 ## 🧮 Professional Calculators
 
-- CPC/CPM
+* CPC/CPM
 
-- ROAS
+* ROAS
 
-- keyword-density
+* keyword-density
 
-- domain-authority-score
+* domain-authority-score
 
 ## 🧬 Core Algorithms
 
-- Keyword-ranking prediction
+* Keyword-ranking prediction
 
-- automated-bidding optimization
+* automated-bidding optimization
 
 ## 🛡 Self-Healing Strategy
 
-- Pixel-tracking verification, backlink-integrity scan
+* Pixel-tracking verification, backlink-integrity scan
 
 ## 🔄 Rollback Strategy
 
-- SEO-state snapshots, campaign-history restoration
+* SEO-state snapshots, campaign-history restoration

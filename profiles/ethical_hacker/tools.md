@@ -2,40 +2,40 @@
 
 ## Required Tools & Functions
 
-- Wireshark
+* Wireshark
 
-- Nmap
+* Nmap
 
-- Metasploit
+* Metasploit
 
-- OpenVAS
+* OpenVAS
 
-- Sovereign Audit
+* Sovereign Audit
 
-- PQC-Vault
+* PQC-Vault
 
 ## 📜 Compliance Rules
 
-- Industry standards
+* Industry standards
 
-- professional ethics
+* professional ethics
 
 ## 🧮 Professional Calculators
 
-- Efficiency metrics
+* Efficiency metrics
 
-- cost analysis
+* cost analysis
 
 ## 🧬 Core Algorithms
 
-- Workflow optimization
+* Workflow optimization
 
-- adaptive assistance
+* adaptive assistance
 
 ## 🛡 Self-Healing Strategy
 
-- Continuous health check for Ethical Hacker tools
+* Continuous health check for Ethical Hacker tools
 
 ## 🔄 Rollback Strategy
 
-- Automatic state snapshots
+* Automatic state snapshots

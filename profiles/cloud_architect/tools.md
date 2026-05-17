@@ -2,42 +2,42 @@
 
 ## Required Tools & Functions
 
-- Docker
+* Docker
 
-- Podman
+* Podman
 
-- Kubernetes
+* Kubernetes
 
-- Terraform
+* Terraform
 
-- Ansible
+* Ansible
 
-- Jenkins
+* Jenkins
 
-- OCI-Nexus
+* OCI-Nexus
 
 ## 📜 Compliance Rules
 
-- Industry standards
+* Industry standards
 
-- professional ethics
+* professional ethics
 
 ## 🧮 Professional Calculators
 
-- Efficiency metrics
+* Efficiency metrics
 
-- cost analysis
+* cost analysis
 
 ## 🧬 Core Algorithms
 
-- Workflow optimization
+* Workflow optimization
 
-- adaptive assistance
+* adaptive assistance
 
 ## 🛡 Self-Healing Strategy
 
-- Continuous health check for Cloud Architect tools
+* Continuous health check for Cloud Architect tools
 
 ## 🔄 Rollback Strategy
 
-- Automatic state snapshots
+* Automatic state snapshots

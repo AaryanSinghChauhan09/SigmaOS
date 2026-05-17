@@ -19,30 +19,31 @@ Welcome to the **Sovereign Professional Shard**. The App edition is the definiti
 
 ## 🛠️ Core Functions
 
-- **Zenith Desktop Manager**: High-performance, GPU-accelerated window compositor with blur and transparency.
+* **Zenith Desktop Manager**: High-performance, GPU-accelerated window compositor with blur and transparency.
 
-- **SovereignLibC (Full)**: Comprehensive POSIX and C11 compatibility for legacy app porting.
+* **SovereignLibC (Full)**: Comprehensive POSIX and C11 compatibility for legacy app porting.
 
-- **PQC-Signed Applications**: Every application must be attested by a trusted SigmaOS developer shard.
+* **PQC-Signed Applications**: Every application must be attested by a trusted SigmaOS developer shard.
 
-- **Industrial Multi-Tasking**: Advanced scheduler optimized for heavy CAD/Dev/Media workloads.
+* **Industrial Multi-Tasking**: Advanced scheduler optimized for heavy CAD/Dev/Media workloads.
 
 ## 🌟 Premium Features
 
-- **SovereignIDE Integration**: Direct kernel-level debugging for app developers.
+* **SovereignIDE Integration**: Direct kernel-level debugging for app developers.
 
-- **Multimedia Lattice**: High-fidelity audio and video shards with zero-latency synchronization.
+* **Multimedia Lattice**: High-fidelity audio and video shards with zero-latency synchronization.
 
-- **Dynamic Persona Switching**: Instantly swap between "Dev", "Creative", and "Security" desktop profiles.
+* **Dynamic Persona Switching**: Instantly swap between "Dev", "Creative", and "Security" desktop profiles.
 
-- **Universal Shard Repository**: Access 10,000+ community-verified application shards.
+* **Universal Shard Repository**: Access 10,000+ community-verified application shards.
 
 ## 📊 Technical Specs
 
-- **Graphics**: OpenGL 4.6 / Vulkan 1.3 / DirectX 12 (via Bridge).
+* **Graphics**: OpenGL 4.6 / Vulkan 1.3 / DirectX 12 (via Bridge).
 
-- **Audio**: 7.1 Surround (Lattice Audio).
+* **Audio**: 7.1 Surround (Lattice Audio).
 
-- **Workspace**: Infinite Virtual Desktops.
+* **Workspace**: Infinite Virtual Desktops.
+
  village
  village

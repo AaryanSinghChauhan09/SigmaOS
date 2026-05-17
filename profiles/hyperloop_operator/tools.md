@@ -2,36 +2,36 @@
 
 ## Required Tools & Functions
 
-- Vacuum-tube monitor
+* Vacuum-tube monitor
 
-- maglev-alignment-nexus
+* maglev-alignment-nexus
 
-- pod-telemetry-mesh
+* pod-telemetry-mesh
 
-- capsule-life-support
+* capsule-life-support
 
 ## 📜 Compliance Rules
 
-- High-speed transit safety protocols
+* High-speed transit safety protocols
 
 ## 🧮 Professional Calculators
 
-- G-force delta
+* G-force delta
 
-- braking-distance
+* braking-distance
 
-- pod-spacing-minima
+* pod-spacing-minima
 
 ## 🧬 Core Algorithms
 
-- Pod-dispatch optimization
+* Pod-dispatch optimization
 
-- vacuum-pressure regulation
+* vacuum-pressure regulation
 
 ## 🛡 Self-Healing Strategy
 
-- Track-alignment verification, pod-telemetry-sync
+* Track-alignment verification, pod-telemetry-sync
 
 ## 🔄 Rollback Strategy
 
-- Transit-state snapshots, pod-dispatch-baseline restoration
+* Transit-state snapshots, pod-dispatch-baseline restoration

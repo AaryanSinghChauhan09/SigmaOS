@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-- Artifact cataloging
+* Artifact cataloging
 
-- environmental monitoring
+* environmental monitoring
 
-- digital archiving
+* digital archiving
 
-- provenance tracer
+* provenance tracer
 
 ## 📜 Compliance Rules
 
-- UNESCO conventions
+* UNESCO conventions
 
-- ICOM ethics
+* ICOM ethics
 
 ## 🧮 Professional Calculators
 
-- Carbon dating calibration
+* Carbon dating calibration
 
-- humidity/temp delta
+* humidity/temp delta
 
-- lux hours
+* lux hours
 
 ## 🧬 Core Algorithms
 
-- Provenance verification
+* Provenance verification
 
-- archival restoration prediction
+* archival restoration prediction
 
 ## 🛡 Self-Healing Strategy
 
-- Archive integrity scan, provenance link validation
+* Archive integrity scan, provenance link validation
 
 ## 🔄 Rollback Strategy
 
-- Collection state snapshots, provenance history restoration
+* Collection state snapshots, provenance history restoration

@@ -4,7 +4,6 @@ Independent verification system for boot integrity.
 
 ## API Interface
 
-
 ```c
 
 // Abstract interface for security/secure_boot

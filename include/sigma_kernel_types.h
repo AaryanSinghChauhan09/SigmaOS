@@ -184,3 +184,13 @@ void vga_putc_at(sigma_u8 x, sigma_u8 y, char c, sigma_u8 color);
 #endif
 
 #endif /* SIGMA_KERNEL_TYPES_H */
+
+#define SIGMA_OK 0
+#define SIGMA_ERROR -1
+
+typedef enum {
+    SIGMA_BOOT_STAGE_INIT = 0,
+    SIGMA_BOOT_STAGE_KERNEL = 1,
+    SIGMA_BOOT_STAGE_USERLAND = 2,
+    SIGMA_BOOT_STAGE_RECOVERY = 3
+} sigma_boot_stage_t;

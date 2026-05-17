@@ -12,19 +12,19 @@ Requests are not guaranteed to be dispatched in order of invocation.
 
 Arguments:
 
-- **url**`URL | string` - It should only include the**protocol, hostname, and port**.
+* **url**`URL | string` - It should only include the**protocol, hostname, and port**.
 
-- **options** `RoundRobinPoolOptions` (optional)
+* **options** `RoundRobinPoolOptions` (optional)
 
 ### Parameter: `RoundRobinPoolOptions`
 
 Extends: [`ClientOptions`](/docs/docs/api/Client.md#parameter-clientoptions)
 
-- **factory** `(origin: URL, opts: Object) => Dispatcher` - Default: `(origin, opts) => new Client(origin, opts)`
+* **factory** `(origin: URL, opts: Object) => Dispatcher` - Default: `(origin, opts) => new Client(origin, opts)`
 
-- **connections** `number | null` (optional) - Default: `null` - The number of `Client` instances to create. When set to `null`, the `RoundRobinPool` instance will create an unlimited amount of `Client` instances.
+* **connections** `number | null` (optional) - Default: `null` - The number of `Client` instances to create. When set to `null`, the `RoundRobinPool` instance will create an unlimited amount of `Client` instances.
 
-- **clientTtl** `number | null` (optional) - Default: `null` - The amount of time before a `Client` instance is removed from the `RoundRobinPool` and closed. When set to `null`, `Client` instances will not be removed or closed based on age.
+* **clientTtl** `number | null` (optional) - Default: `null` - The amount of time before a `Client` instance is removed from the `RoundRobinPool` and closed. When set to `null`, `Client` instances will not be removed or closed based on age.
 
 ## Use Case
 
@@ -44,17 +44,17 @@ Extends: [`ClientOptions`](/docs/docs/api/Client.md#parameter-clientoptions)
 
 **✓ Works when the load balancer**:
 
-- Assigns different backends to different TCP connections from the same client
+* Assigns different backends to different TCP connections from the same client
 
-- Uses algorithms like: round-robin, random, least-connections (without client affinity)
+* Uses algorithms like: round-robin, random, least-connections (without client affinity)
 
-- Example: Default Kubernetes Services without `sessionAffinity`
+* Example: Default Kubernetes Services without `sessionAffinity`
 
 **✗ Does NOT work when**:
 
-- Load balancer has client/source IP affinity (all connections from one IP → same backend)
+* Load balancer has client/source IP affinity (all connections from one IP → same backend)
 
-- Load balancer uses source-IP-hash or sticky sessions
+* Load balancer uses source-IP-hash or sticky sessions
 
 ### How it works
 
@@ -132,7 +132,6 @@ See [Dispatcher Event: `'drain'`](/docs/docs/api/Dispatcher.md#event-drain).
 
 ## Example
 
-
 ```javascript
 import { RoundRobinPool } from 'undici'
 
@@ -155,8 +154,8 @@ await pool.close()
 
 ## See Also
 
-- [Pool](/docs/docs/api/Pool.md) - Connection pool without round-robin
+* [Pool](/docs/docs/api/Pool.md) - Connection pool without round-robin
 
-- [BalancedPool](/docs/docs/api/BalancedPool.md) - Load balancing across multiple origins
+* [BalancedPool](/docs/docs/api/BalancedPool.md) - Load balancing across multiple origins
 
-- [Issue #3648](https://github.com/nodejs/undici/issues/3648) - Original issue describing uneven distribution
+* [Issue #3648](https://github.com/nodejs/undici/issues/3648) - Original issue describing uneven distribution

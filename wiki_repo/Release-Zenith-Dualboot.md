@@ -16,28 +16,28 @@ Welcome to the **Sovereign Coexistence Shard**. The Dual-Boot edition is designe
 
 ## 🛠️ Core Functions
 
-- **Legacy Partition Absorption**: Maps NTFS/Ext4/APFS directly into the Sovereign VFS with zero-latency translation.
+* **Legacy Partition Absorption**: Maps NTFS/Ext4/APFS directly into the Sovereign VFS with zero-latency translation.
 
-- **Bootloader Interception**: Protects the boot sequence from legacy OS tampering via PQC signatures.
+* **Bootloader Interception**: Protects the boot sequence from legacy OS tampering via PQC signatures.
 
-- **Hardware Direct Access**: Bypasses the need for virtualization, giving SigmaOS raw access to the GPU/NIC even when dual-booting.
+* **Hardware Direct Access**: Bypasses the need for virtualization, giving SigmaOS raw access to the GPU/NIC even when dual-booting.
 
-- **Cross-OS IPC**: Secure messaging between SigmaOS and legacy guest processes (via SovereignBridge).
+* **Cross-OS IPC**: Secure messaging between SigmaOS and legacy guest processes (via SovereignBridge).
 
 ## 🌟 Premium Features
 
-- **SovereignVFS Bridge**: Access your Windows/Linux files with bit-perfect integrity and no metadata leaks.
+* **SovereignVFS Bridge**: Access your Windows/Linux files with bit-perfect integrity and no metadata leaks.
 
-- **Dynamic Partition Resizing**: Safe, on-the-fly shard allocation for the SigmaOS partition.
+* **Dynamic Partition Resizing**: Safe, on-the-fly shard allocation for the SigmaOS partition.
 
-- **Host-Guest Isolation**: Ensures legacy OS vulnerabilities cannot traverse the partition boundary.
+* **Host-Guest Isolation**: Ensures legacy OS vulnerabilities cannot traverse the partition boundary.
 
-- **Zenith Dual-Compositor**: Switch between SigmaOS and guest displays with a single keystroke.
+* **Zenith Dual-Compositor**: Switch between SigmaOS and guest displays with a single keystroke.
 
 ## 📊 Technical Specs
 
-- **Compatibility**: Linux (Ubuntu, Fedora, Arch), Windows 10/11, macOS (Intel/M1).
+* **Compatibility**: Linux (Ubuntu, Fedora, Arch), Windows 10/11, macOS (Intel/M1).
 
-- **VFS Drivers**: NTFS, Ext4, Btrfs, APFS, ZFS.
+* **VFS Drivers**: NTFS, Ext4, Btrfs, APFS, ZFS.
 
-- **Overhead**: < 1% CPU utilization for the Bridge shard.
+* **Overhead**: < 1% CPU utilization for the Bridge shard.

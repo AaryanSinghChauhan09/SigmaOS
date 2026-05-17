@@ -2,36 +2,36 @@
 
 ## Required Tools & Functions
 
-- Nano-lattice modeler
+* Nano-lattice modeler
 
-- shape-memory-alloy simulator
+* shape-memory-alloy simulator
 
-- self-healing-polymer monitor
+* self-healing-polymer monitor
 
 ## 📜 Compliance Rules
 
-- Material safety standards
+* Material safety standards
 
-- nano-tech regulations
+* nano-tech regulations
 
 ## 🧮 Professional Calculators
 
-- Young's modulus delta
+* Young's modulus delta
 
-- phase-transition temp
+* phase-transition temp
 
-- molecular-strain
+* molecular-strain
 
 ## 🧬 Core Algorithms
 
-- Generative material design
+* Generative material design
 
-- micro-structure simulation
+* micro-structure simulation
 
 ## 🛡 Self-Healing Strategy
 
-- Material-property-sync, molecular-model validation
+* Material-property-sync, molecular-model validation
 
 ## 🔄 Rollback Strategy
 
-- Material-iteration snapshots, chemical-baseline restoration
+* Material-iteration snapshots, chemical-baseline restoration

@@ -10,7 +10,11 @@ namespace SigmaOS {
 namespace Memory {
 namespace Paging {
 
+#ifndef PAGE_SIZE
+#ifndef PAGE_SIZE
 #define PAGE_SIZE 4096
+#endif
+#endif
 #define MAX_SHARDS 1024
 
 struct PageDirectoryEntry {

@@ -2,48 +2,48 @@
 
 ## Required Tools & Functions
 
-- Patient records
+* Patient records
 
-- prescription management
+* prescription management
 
-- lab results integration
+* lab results integration
 
-- telemedicine tools
+* telemedicine tools
 
-- DICOM viewer
+* DICOM viewer
 
 ## 📜 Compliance Rules
 
-- Medical Council of India guidelines
+* Medical Council of India guidelines
 
-- Ayushman Bharat protocols
+* Ayushman Bharat protocols
 
-- HIPAA
+* HIPAA
 
-- GDPR
+* GDPR
 
 ## 🧮 Professional Calculators
 
-- Dosage
+* Dosage
 
-- BMI
+* BMI
 
-- medical billing
+* medical billing
 
-- glomerular filtration rate
+* glomerular filtration rate
 
 ## 🧬 Core Algorithms
 
-- Patient record indexing
+* Patient record indexing
 
-- diagnostic prediction
+* diagnostic prediction
 
-- lab result interpretation
+* lab result interpretation
 
 ## 🛡 Self-Healing Strategy
 
-- Medical data integrity scan, prescription conflict detection
+* Medical data integrity scan, prescription conflict detection
 
 ## 🔄 Rollback Strategy
 
-- Patient record versioning, emergency state restoration
+* Patient record versioning, emergency state restoration

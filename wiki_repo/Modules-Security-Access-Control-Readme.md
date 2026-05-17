@@ -4,7 +4,6 @@ Centralized security policies.
 
 ## API Interface
 
-
 ```c
 
 // Abstract interface for security/access_control
