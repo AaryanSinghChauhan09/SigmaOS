@@ -8,23 +8,23 @@ SigmaOS is an **Industrial-Grade, AI-Native Sovereign Operating System**. It fol
 
 ### Universal Principles
 
-- **Zero-Dependency**: No reliance on standard libraries (`libc`, `libstdc++`). All primitives are silicon-direct.
+* **Zero-Dependency**: No reliance on standard libraries (`libc`, `libstdc++`). All primitives are silicon-direct.
 
-- **Sovereign Lattice**: A modular mesh of "shards" where each component is an isolated, PQC-attested singleton.
+* **Sovereign Lattice**: A modular mesh of "shards" where each component is an isolated, PQC-attested singleton.
 
-- **Formal Verification Ready**: Code is structured to allow mathematical proof of correctness in critical shards.
+* **Formal Verification Ready**: Code is structured to allow mathematical proof of correctness in critical shards.
 
-- **Universal Sharding**: Everything from drivers to AI personas is a "shard" with a standardized lifecycle.
+* **Universal Sharding**: Everything from drivers to AI personas is a "shard" with a standardized lifecycle.
 
 ---
 
 ## 2. The Build Logic (SHARDS.manifest)
 
-- **Logic**: The `Makefile` reads `SHARDS.manifest` (audited and normalized) to discover every source file.
+* **Logic**: The `Makefile` reads `SHARDS.manifest` (audited and normalized) to discover every source file.
 
-- **Relationship**: If a file is not in the manifest, it is not part of the "Singularity". All includes are normalized to root-relative paths for industrial stability.
+* **Relationship**: If a file is not in the manifest, it is not part of the "Singularity". All includes are normalized to root-relative paths for industrial stability.
 
-- **Layers**: The manifest is organized into logical layers (HAL, Core, AI, Industrial, UI) to manage dependency flow.
+* **Layers**: The manifest is organized into logical layers (HAL, Core, AI, Industrial, UI) to manage dependency flow.
 
 ---
 
@@ -51,41 +51,41 @@ Each directory in the SigmaOS repository serves a distinct logical purpose:
 
 ### `kernel/` (The Sovereign Brain)
 
-- **`core/`**: Essential services: HAL, PMM/VMM, IPC, AI (Claw Stack), and Security.
+* **`core/`**: Essential services: HAL, PMM/VMM, IPC, AI (Claw Stack), and Security.
 
-- **`shards/`**: Industrial and professional modules (e.g., `medical/`, `finance/`, `engineering/`).
+* **`shards/`**: Industrial and professional modules (e.g., `medical/`, `finance/`, `engineering/`).
 
-- **`hal/`**: Hardware Abstraction Layer for x86_64, ARM64 (RPi5), and RISC-V.
+* **`hal/`**: Hardware Abstraction Layer for x86_64, ARM64 (RPi5), and RISC-V.
 
 ### `drivers/` (Hardware Sovereignty)
 
-- **`linux_distros/`**: Ported and hardened drivers from the Linux ecosystem to ensure hardware parity.
+* **`linux_distros/`**: Ported and hardened drivers from the Linux ecosystem to ensure hardware parity.
 
-- **`gpu/`**: Custom Vulkan-native drivers for high-performance Zenith UI.
+* **`gpu/`**: Custom Vulkan-native drivers for high-performance Zenith UI.
 
 ### `modules/ui/zenith/` (The UX Layer)
 
-- **Logic**: A C-native, GPU-accelerated compositor.
+* **Logic**: A C-native, GPU-accelerated compositor.
 
-- **Relationship**: Connects the `SovereignSnap` application logic to the physical display via Vulkan.
+* **Relationship**: Connects the `SovereignSnap` application logic to the physical display via Vulkan.
 
 ### `userland/` (The Sovereign Ecosystem)
 
-- **Logic**: System-level agents and utilities (e.g., `update-agent`, `logd`).
+* **Logic**: System-level agents and utilities (e.g., `update-agent`, `logd`).
 
-- **Relationship**: Operates in the `SovereignSandbox` to ensure kernel-space protection.
+* **Relationship**: Operates in the `SovereignSandbox` to ensure kernel-space protection.
 
 ### `tools/` (The Industrial Toolchain)
 
-- **Logic**: Custom tools for packaging (`sigma-pkg`), fixing (`sigma-fix`), and debugging.
+* **Logic**: Custom tools for packaging (`sigma-pkg`), fixing (`sigma-fix`), and debugging.
 
-- **Relationship**: Used by developers to maintain the repository and deploy the OS.
+* **Relationship**: Used by developers to maintain the repository and deploy the OS.
 
 ### `WIKI/` & `docs/` (The Knowledge Graph)
 
-- **Logic**: Comprehensive documentation ensuring the system remains professional and accessible.
+* **Logic**: Comprehensive documentation ensuring the system remains professional and accessible.
 
-- **Relationship**: Syncs with GitHub Wiki and Pages to provide a global source of truth.
+* **Relationship**: Syncs with GitHub Wiki and Pages to provide a global source of truth.
 
 ---
 

@@ -8,7 +8,6 @@ The flags available are:
 
 This flag enables debug statements for the core undici library.
 
-
 ```sh
 NODE_DEBUG=undici node script.js
 
@@ -34,7 +33,6 @@ This flag enables debug statements for the `fetch` API.
 
 > **Note**: statements are pretty similar to the ones in the `undici` flag, but scoped to `fetch`
 
-
 ```sh
 NODE_DEBUG=fetch node script.js
 
@@ -59,7 +57,6 @@ FETCH 16241: trailers received from GET https://nodejs.org/en
 This flag enables debug statements for the `Websocket` API.
 
 > **Note**: statements can overlap with `UNDICI` ones if `undici` or `fetch` flag has been enabled as well.
-
 
 ```sh
 NODE_DEBUG=websocket node script.js

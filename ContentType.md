@@ -2,20 +2,19 @@
 
 ## `MIMEType` interface
 
-- **type** `string`
+* **type** `string`
 
-- **subtype** `string`
+* **subtype** `string`
 
-- **parameters** `Map<string, string>`
+* **parameters** `Map<string, string>`
 
-- **essence** `string`
+* **essence** `string`
 
 ## `parseMIMEType(input)`
 
 Implements [parse a MIME type](https://mimesniff.spec.whatwg.org/#parse-a-mime-type).
 
 Parses a MIME type, returning its type, subtype, and any associated parameters. If the parser can't parse an input it returns the string literal `'failure'`.
-
 
 ```js
 import { parseMIMEType } from 'undici'
@@ -32,7 +31,7 @@ parseMIMEType('text/html; charset=gbk')
 
 Arguments:
 
-- **input** `string`
+* **input** `string`
 
 Returns: `MIMEType|'failure'`
 
@@ -41,7 +40,6 @@ Returns: `MIMEType|'failure'`
 Implements [serialize a MIME type](https://mimesniff.spec.whatwg.org/#serialize-a-mime-type).
 
 Serializes a MIMEType object.
-
 
 ```js
 import { serializeAMimeType } from 'undici'
@@ -59,6 +57,6 @@ serializeAMimeType({
 
 Arguments:
 
-- **mimeType** `MIMEType`
+* **mimeType** `MIMEType`
 
 Returns: `string`

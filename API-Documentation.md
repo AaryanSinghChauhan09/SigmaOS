@@ -42,7 +42,7 @@ Dynamically links and loads a `sigma_module_t` into the kernel lattice.
 
 ### Parameters
 
-- `module`: A pointer to a valid `sigma_module_t` struct containing the `init_hook` and `exit_hook`.
+* `module`: A pointer to a valid `sigma_module_t` struct containing the `init_hook` and `exit_hook`.
 
 ### `register_device
 

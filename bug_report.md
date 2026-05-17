@@ -34,12 +34,11 @@ assignees: ''
 
 ## Build Environment
 
-- Architecture: `[ ] x86_64  [ ] ARM64  [ ] RISC-V
+* Architecture: `[ ] x86_64  [ ] ARM64  [ ] RISC-V
 
  sigma-build output: paste here
 
 ## Logs
-
 
 ```text
 

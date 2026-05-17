@@ -4,7 +4,6 @@ The Networking Shard is a modular, hot-swappable TCP/IP stack implemented indepe
 
 ## Architecture Diagram
 
-
 ```mermaid
 graph TD
     A[Userland App] -->|Z-SYSCALL| B(S-NET Socket API)

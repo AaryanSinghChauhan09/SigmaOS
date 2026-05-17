@@ -12,7 +12,6 @@ If user provided input finds its way into a regular expression, or a regular exp
 
 Let's look at an vulnerable example. Below we are attempting the common task of validating an email address on the server.
 
-
 ```js
 validateEmailFormat: function( string ) {
   var emailExpression = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
@@ -23,7 +22,6 @@ validateEmailFormat: function( string ) {
 ```
 
 With the example above, we can use this test script to show how bad input can impact server responsiveness:
-
 
 ```js
 start = process.hrtime();
@@ -46,7 +44,6 @@ console.log(process.hrtime(start));
 
 Here are the results of running that script:
 
-
 ```sh
 true
 [ 0, 9694442 ]  <- Match on good data takes little time
@@ -66,7 +63,6 @@ false
 One way you can check regular expressions for badness in an automated way is by using a module from [substack](https://twitter.com/substack) called [safe-regex](https://www.npmjs.org/package/safe-regex). It's prone to false positives, however, it can be useful to point to potentially vulnerable regular expressions you would have otherwise missed in your code.
 
 Here is a rule for eslint that you can use to test your JavaScript regular expressions:
-
 
 ```js
 var safe = require('safe-regex');

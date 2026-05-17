@@ -8,14 +8,12 @@ You should use this package instead of an array if you do a lot of `Array#push()
 
 ## Install
 
-
 ```
 npm install yocto-queue
 
 ```
 
 ## Usage
-
 
 ```js
 const Queue = require('yocto-queue');
@@ -65,4 +63,4 @@ The size of the queue.
 
 ## Related
 
-- [quick-lru](https://github.com/sindresorhus/quick-lru) - Simple “Least Recently Used” (LRU) cache
+* [quick-lru](https://github.com/sindresorhus/quick-lru) - Simple “Least Recently Used” (LRU) cache

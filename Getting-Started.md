@@ -16,18 +16,17 @@ chmod +x scripts/setup.sh
 
 This will install:
 
-- `gcc-x86-64-linux-gnu` / `x86_64-elf-gcc`
+* `gcc-x86-64-linux-gnu` / `x86_64-elf-gcc`
 
-- `nasm` (Assembler)
+* `nasm` (Assembler)
 
-- `qemu-system-x86` (Emulator)
+* `qemu-system-x86` (Emulator)
 
-- `xorriso` and `grub-pc-bin` (ISO generation)
+* `xorriso` and `grub-pc-bin` (ISO generation)
 
 ## 2. Building the OS
 
 SigmaOS uses a standard Makefile. From the root directory, run:
-
 
 ```bash
 make all
@@ -40,7 +39,6 @@ This compiles the kernel, links it, and generates a bootable ISO image (`build/s
 
 To boot the newly compiled OS in QEMU, run:
 
-
 ```bash
 make qemu
 
@@ -51,7 +49,6 @@ This will launch QEMU with 2GB of RAM and attach the serial output to your termi
 ## 4. Hardware Deployment
 
 To boot SigmaOS on real hardware, you can flash the ISO to a USB drive using `dd` (Linux/macOS) or Rufus (Windows).
-
 
 ```bash
 

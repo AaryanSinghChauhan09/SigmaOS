@@ -8,11 +8,11 @@ SigmaOS implements a multi-layered security lattice designed to withstand both c
 
 The **SovereignCompliance** shard ensures that all cryptographic operations use NIST-validated primitives.
 
-- **KAT (Known Answer Tests)**: Automated boot-time verification of AES-GCM, SHA-3, and HMAC implementations.
+* **KAT (Known Answer Tests)**: Automated boot-time verification of AES-GCM, SHA-3, and HMAC implementations.
 
-- **Physical Isolation**: Cryptographic keys are bound to the hardware root of trust (TPM 2.0 / Secure Enclave).
+* **Physical Isolation**: Cryptographic keys are bound to the hardware root of trust (TPM 2.0 / Secure Enclave).
 
-- **Immutable Audit Logs**: All security-critical events are logged in an append-only, PQC-signed lattice.
+* **Immutable Audit Logs**: All security-critical events are logged in an append-only, PQC-signed lattice.
 
 ---
 
@@ -20,9 +20,9 @@ The **SovereignCompliance** shard ensures that all cryptographic operations use 
 
 SigmaOS utilizes **CRYSTALS-Kyber**and**CRYSTALS-Dilithium** as its primary cryptographic primitives for the Sovereign Lattice.
 
-- **Kyber (KEM)**: Secures inter-shard key exchange and network handshakes.
+* **Kyber (KEM)**: Secures inter-shard key exchange and network handshakes.
 
-- **Dilithium (Digital Signatures)**: Verifies the provenance and integrity of the **Universal Package Graph**.
+* **Dilithium (Digital Signatures)**: Verifies the provenance and integrity of the **Universal Package Graph**.
 
 ---
 
@@ -57,13 +57,13 @@ Users can customize their security posture via the **SovereignCompliance** shard
 
 SigmaOS has completed its initial internal audit and is currently in the "FIPS-140-3 Ready" phase.
 
-- **Audit Date**: 2026-05-11
+* **Audit Date**: 2026-05-11
 
-- **Validator**: Sovereign Compliance Engine (NIST-SP-800-208 Validated)
+* **Validator**: Sovereign Compliance Engine (NIST-SP-800-208 Validated)
 
-- **Result**: **PASS** - 600 shards successfully attested via Dilithium proofs.
+* **Result**: **PASS** - 600 shards successfully attested via Dilithium proofs.
 
-- **Certification**: PQC-Certified for Industrial Sovereign Environments.
+* **Certification**: PQC-Certified for Industrial Sovereign Environments.
 
 ---
 

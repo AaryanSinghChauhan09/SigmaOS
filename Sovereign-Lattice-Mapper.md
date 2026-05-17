@@ -4,13 +4,13 @@ The **Sovereign Lattice Mapper (S-MIND)** is a high-assurance, interactive visua
 
 ## Features
 
-- **Interactive Shard Mapping**: Add and visualize new shards within the lattice mesh.
+* **Interactive Shard Mapping**: Add and visualize new shards within the lattice mesh.
 
-- **Real-Time Heartbeat Visualization**: Animated connections pulse to indicate lattice synchronization and shard health.
+* **Real-Time Heartbeat Visualization**: Animated connections pulse to indicate lattice synchronization and shard health.
 
-- **PQC-Attested Export**: Export the current lattice topology as a `SHARDS.manifest.pqc` file, encrypted with Dilithium-5.
+* **PQC-Attested Export**: Export the current lattice topology as a `SHARDS.manifest.pqc` file, encrypted with Dilithium-5.
 
-- **Zero-Dependency Core**: Built directly on the Zenith rendering engine with no external high-level library requirements.
+* **Zero-Dependency Core**: Built directly on the Zenith rendering engine with no external high-level library requirements.
 
 ## Usage
 
@@ -24,8 +24,8 @@ The **Sovereign Lattice Mapper (S-MIND)** is a high-assurance, interactive visua
 
 ## Technical Specifications
 
-- **Engine**: Zenith Canvas (HTML5/WASM Bridge)
+* **Engine**: Zenith Canvas (HTML5/WASM Bridge)
 
-- **Encryption**: CRYSTALS-Dilithium-5 (PQC)
+* **Encryption**: CRYSTALS-Dilithium-5 (PQC)
 
-- **Performance**: Sub-1ms frame latency on Zenith hardware.
+* **Performance**: Sub-1ms frame latency on Zenith hardware.

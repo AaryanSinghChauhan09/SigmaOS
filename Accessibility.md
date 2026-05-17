@@ -13,6 +13,7 @@
 3. **Semantic Sharding**: Use standard UI primitives to ensure screen reader compatibility.
 
 4. **ARIA Labels**: Every `<input>` or interactive component must have a descriptive `aria-label`.
+
 1 1
 1 ---
 

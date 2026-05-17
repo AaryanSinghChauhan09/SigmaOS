@@ -4,7 +4,6 @@ Module Loader.
 
 ## API Interface
 
-
 ```c
 
 // Abstract interface for tools/loader

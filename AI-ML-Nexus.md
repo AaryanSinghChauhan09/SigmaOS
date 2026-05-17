@@ -6,21 +6,21 @@ The **Intelligence Nexus** (S-AI) is the industrial absorption layer for high-pe
 
 The AI Nexus operates as a high-privilege shard within the **Sovereign Lattice™**, directly orchestrating silicon-level compute primitives.
 
-- **S-CUDA**: Low-level bridge for NVIDIA industrial acceleration.
+* **S-CUDA**: Low-level bridge for NVIDIA industrial acceleration.
 
-- **S-ROCm**: Native support for AMD industrial compute.
+* **S-ROCm**: Native support for AMD industrial compute.
 
-- **S-ONNX**: The universal inference engine for cross-framework model sharding.
+* **S-ONNX**: The universal inference engine for cross-framework model sharding.
 
 ## 🤖 Framework Parity
 
 SigmaOS natively absorbs the USPs of:
 
-- **PyTorch**: Industrial-grade tensor sharding and autograd lattice.
+* **PyTorch**: Industrial-grade tensor sharding and autograd lattice.
 
-- **TensorFlow**: Graph-based distributed compute.
+* **TensorFlow**: Graph-based distributed compute.
 
-- **Hugging Face**: Pre-cached transformer archetypes for offline industrial use.
+* **Hugging Face**: Pre-cached transformer archetypes for offline industrial use.
 
 ## 🛡 Security & Attestation
 

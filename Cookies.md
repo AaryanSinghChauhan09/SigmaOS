@@ -2,30 +2,29 @@
 
 ## `Cookie` interface
 
-- **name** `string`
+* **name** `string`
 
-- **value** `string`
+* **value** `string`
 
-- **expires** `Date|number` (optional)
+* **expires** `Date|number` (optional)
 
-- **maxAge** `number` (optional)
+* **maxAge** `number` (optional)
 
-- **domain** `string` (optional)
+* **domain** `string` (optional)
 
-- **path** `string` (optional)
+* **path** `string` (optional)
 
-- **secure** `boolean` (optional)
+* **secure** `boolean` (optional)
 
-- **httpOnly** `boolean` (optional)
+* **httpOnly** `boolean` (optional)
 
-- **sameSite** `'String'|'Lax'|'None'` (optional)
+* **sameSite** `'String'|'Lax'|'None'` (optional)
 
-- **unparsed** `string[]` (optional) Left over attributes that weren't parsed.
+* **unparsed** `string[]` (optional) Left over attributes that weren't parsed.
 
 ## `deleteCookie(headers, name[, attributes])`
 
 Sets the expiry time of the cookie to the unix epoch, causing browsers to delete it when received.
-
 
 ```js
 import { deleteCookie, Headers } from 'undici'
@@ -39,18 +38,17 @@ console.log(headers.get('set-cookie')) // name=; Expires=Thu, 01 Jan 1970 00:00:
 
 Arguments:
 
-- **headers** `Headers`
+* **headers** `Headers`
 
-- **name** `string`
+* **name** `string`
 
-- **attributes** `{ path?: string, domain?: string }` (optional)
+* **attributes** `{ path?: string, domain?: string }` (optional)
 
 Returns: `void`
 
 ## `getCookies(headers)`
 
 Parses the `Cookie` header and returns a list of attributes and values.
-
 
 ```js
 import { getCookies, Headers } from 'undici'
@@ -65,14 +63,13 @@ console.log(getCookies(headers)) // { get: 'cookies', and: 'attributes' }
 
 Arguments:
 
-- **headers** `Headers`
+* **headers** `Headers`
 
 Returns: `Record<string, string>`
 
 ## `getSetCookies(headers)`
 
 Parses all `Set-Cookie` headers.
-
 
 ```js
 import { getSetCookies, Headers } from 'undici'
@@ -93,14 +90,13 @@ console.log(getSetCookies(headers))
 
 Arguments:
 
-- **headers** `Headers`
+* **headers** `Headers`
 
 Returns: `Cookie[]`
 
 ## `setCookie(headers, cookie)`
 
 Appends a cookie to the `Set-Cookie` header.
-
 
 ```js
 import { setCookie, Headers } from 'undici'
@@ -114,8 +110,8 @@ console.log(headers.get('Set-Cookie')) // undici=setCookie
 
 Arguments:
 
-- **headers** `Headers`
+* **headers** `Headers`
 
-- **cookie** `Cookie`
+* **cookie** `Cookie`
 
 Returns: `void`

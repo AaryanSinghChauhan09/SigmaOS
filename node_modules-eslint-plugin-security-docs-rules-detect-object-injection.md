@@ -6,7 +6,6 @@
 
 JavaScript allows you to use expressions to access object properties in addition to using dot notation. So instead of writing this:
 
-
 ```js
 object.name = 'foo';
 
@@ -14,14 +13,12 @@ object.name = 'foo';
 
 You can write this:
 
-
 ```js
 object['name'] = 'foo';
 
 ```
 
 Square bracket notation allows any expression to be used in place of an identifier, so you can also do this:
-
 
 ```js
 const key = 'name';
@@ -32,7 +29,6 @@ object[key] = 'foo';
 By doing so, you've now obfuscated the property name from the reader, which makes it easy for a malicious actor to replace the value of `key` and change the behavior of the code.
 
 This rule flags any expression in the form of `object[expression]` no matter where it occurs. Examples of patterns this will be flagged are:
-
 
 ```js
 object[key] = value;

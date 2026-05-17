@@ -4,33 +4,33 @@
 
 ### 🔴 ALPHA: Industrial Foundation (v15.0 - DONE)
 
-- [x] Kernel Hardening (Lattice PMM/S-SCHED)
+* [x] Kernel Hardening (Lattice PMM/S-SCHED)
 
-- [x] S-KDUMP & S-WATCHDOG Integration
+* [x] S-KDUMP & S-WATCHDOG Integration
 
-- [x] MESA/CUPS/BLUEZ Shard Absorption
+* [x] MESA/CUPS/BLUEZ Shard Absorption
 
-- [x] PQC-GPG Dilithium-5 Attestation
+* [x] PQC-GPG Dilithium-5 Attestation
 
 ### 🟡 BETA: Usability & AI (v15.1 - DONE)
 
-- [x] XFCE/LXQt Zenith Desktop Port
+* [x] XFCE/LXQt Zenith Desktop Port
 
-- [x] Sovereign VPN (WireGuard) Shard
+* [x] Sovereign VPN (WireGuard) Shard
 
-- [x] Sovereign AI (CUDA/ONNX) Compute Nexus
+* [x] Sovereign AI (CUDA/ONNX) Compute Nexus
 
-- [x] Guided Dual-Boot Installer Partitioning
+* [x] Guided Dual-Boot Installer Partitioning
 
 ### 🟢 STABLE: Global Ecosystem (v16.0 - CURRENT)
 
-- [x] full FIPS-140-3 Compliance
+* [x] full FIPS-140-3 Compliance
 
-- [x] Sovereign Cloud Lattice Mesh
+* [x] Sovereign Cloud Lattice Mesh
 
-- [x] 100% Rust-Hardened Driver Tree
+* [x] 100% Rust-Hardened Driver Tree
 
-- [x] LTS Release Channel Initialization
+* [x] LTS Release Channel Initialization
 
 ---
 

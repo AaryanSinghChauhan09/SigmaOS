@@ -41,11 +41,11 @@ A SigmaOS package (`.spkg`) is a PQC-sealed archive containing:
 
 Packages must specify their isolation level to ensure lattice integrity:
 
-- **Core-Lattice**: Reserved for system shards. Run in Ring 0 with full hardware access.
+* **Core-Lattice**: Reserved for system shards. Run in Ring 0 with full hardware access.
 
-- **Ring3-Sandboxed**: Standard user apps. Capability-gated access to resources.
+* **Ring3-Sandboxed**: Standard user apps. Capability-gated access to resources.
 
-- **Ephemeral**: Temporary shards that are purged from memory after execution.
+* **Ephemeral**: Temporary shards that are purged from memory after execution.
 
 ---
 

@@ -6,7 +6,6 @@ A basic H2C client.
 
 ### Example
 
-
 ```js
 const { createServer } = require('node:http2')
 const { once } = require('node:events')
@@ -34,58 +33,57 @@ once(server, 'listening').then(() => {
 
 Arguments:
 
-- **url**`URL | string` - Should only include the**protocol, hostname, and port**. It only supports `http` protocol.
+* **url**`URL | string` - Should only include the**protocol, hostname, and port**. It only supports `http` protocol.
 
-- **options** `H2CClientOptions` (optional)
+* **options** `H2CClientOptions` (optional)
 
 Returns: `H2CClient`
 
 ### Parameter: `H2CClientOptions`
 
-- **bodyTimeout** `number | null` (optional) - Default: `300e3` - The timeout after which a request will time out, in milliseconds. Monitors time between receiving body data. Use `0` to disable it entirely. Defaults to 300 seconds. Please note the `timeout` will be reset if you keep writing data to the socket everytime.
+* **bodyTimeout** `number | null` (optional) - Default: `300e3` - The timeout after which a request will time out, in milliseconds. Monitors time between receiving body data. Use `0` to disable it entirely. Defaults to 300 seconds. Please note the `timeout` will be reset if you keep writing data to the socket everytime.
 
-- **headersTimeout** `number | null` (optional) - Default: `300e3` - The amount of time, in milliseconds, the parser will wait to receive the complete HTTP headers while not sending the request. Defaults to 300 seconds.
+* **headersTimeout** `number | null` (optional) - Default: `300e3` - The amount of time, in milliseconds, the parser will wait to receive the complete HTTP headers while not sending the request. Defaults to 300 seconds.
 
-- **keepAliveMaxTimeout** `number | null` (optional) - Default: `600e3` - The maximum allowed `keepAliveTimeout`, in milliseconds, when overridden by _keep-alive_ hints from the server. Defaults to 10 minutes.
+* **keepAliveMaxTimeout** `number | null` (optional) - Default: `600e3` - The maximum allowed `keepAliveTimeout`, in milliseconds, when overridden by _keep-alive_ hints from the server. Defaults to 10 minutes.
 
-- **keepAliveTimeout** `number | null` (optional) - Default: `4e3` - The timeout, in milliseconds, after which a socket without active requests will time out. Monitors time between activity on a connected socket. This value may be overridden by _keep-alive_ hints from the server. See [MDN: HTTP - Headers - Keep-Alive directives](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Keep-Alive#directives) for more details. Defaults to 4 seconds.
+* **keepAliveTimeout** `number | null` (optional) - Default: `4e3` - The timeout, in milliseconds, after which a socket without active requests will time out. Monitors time between activity on a connected socket. This value may be overridden by _keep-alive_ hints from the server. See [MDN: HTTP - Headers - Keep-Alive directives](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Keep-Alive#directives) for more details. Defaults to 4 seconds.
 
-- **keepAliveTimeoutThreshold** `number | null` (optional) - Default: `2e3` - A number of milliseconds subtracted from server _keep-alive_ hints when overriding `keepAliveTimeout` to account for timing inaccuracies caused by e.g. transport latency. Defaults to 2 seconds.
+* **keepAliveTimeoutThreshold** `number | null` (optional) - Default: `2e3` - A number of milliseconds subtracted from server _keep-alive_ hints when overriding `keepAliveTimeout` to account for timing inaccuracies caused by e.g. transport latency. Defaults to 2 seconds.
 
-- **maxHeaderSize** `number | null` (optional) - Default: `--max-http-header-size` or `16384` - The maximum length of request headers in bytes. Defaults to Node.js' --max-http-header-size or 16KiB.
+* **maxHeaderSize** `number | null` (optional) - Default: `--max-http-header-size` or `16384` - The maximum length of request headers in bytes. Defaults to Node.js' --max-http-header-size or 16KiB.
 
-- **maxResponseSize** `number | null` (optional) - Default: `-1` - The maximum length of response body in bytes. Set to `-1` to disable.
+* **maxResponseSize** `number | null` (optional) - Default: `-1` - The maximum length of response body in bytes. Set to `-1` to disable.
 
-- **maxConcurrentStreams**: `number` - Default: `100`. Dictates the maximum number of concurrent streams for a single H2 session. It can be overridden by a SETTINGS remote frame.
+* **maxConcurrentStreams**: `number` - Default: `100`. Dictates the maximum number of concurrent streams for a single H2 session. It can be overridden by a SETTINGS remote frame.
 
-- **pipelining** `number | null` (optional) - Default to `maxConcurrentStreams` - The amount of concurrent requests sent over a single HTTP/2 session in accordance with [RFC-7540](https://httpwg.org/specs/rfc7540.html#StreamsLayer) Stream specification. Streams can be closed up by remote server at any time.
+* **pipelining** `number | null` (optional) - Default to `maxConcurrentStreams` - The amount of concurrent requests sent over a single HTTP/2 session in accordance with [RFC-7540](https://httpwg.org/specs/rfc7540.html#StreamsLayer) Stream specification. Streams can be closed up by remote server at any time.
 
-- **pingInterval**: `number` - Default: `60e3`. The time interval in milliseconds between PING frames sent to the server. Set to `0` to disable PING frames. This is only applicable for HTTP/2 connections.
+* **pingInterval**: `number` - Default: `60e3`. The time interval in milliseconds between PING frames sent to the server. Set to `0` to disable PING frames. This is only applicable for HTTP/2 connections.
 
-- **connect** `ConnectOptions | null` (optional) - Default: `null`.
+* **connect** `ConnectOptions | null` (optional) - Default: `null`.
 
-- **strictContentLength**`Boolean` (optional) - Default: `true` - Whether to treat request content length mismatches as errors. If true, an error is thrown when the request content-length header doesn't match the length of the request body.**Security Warning:** Disabling this option can expose your application to HTTP Request Smuggling attacks, where mismatched content-length headers cause servers and proxies to interpret request boundaries differently. This can lead to cache poisoning, credential hijacking, and bypassing security controls. Only disable this in controlled environments where you fully trust the request source.
+* **strictContentLength**`Boolean` (optional) - Default: `true` - Whether to treat request content length mismatches as errors. If true, an error is thrown when the request content-length header doesn't match the length of the request body.**Security Warning:** Disabling this option can expose your application to HTTP Request Smuggling attacks, where mismatched content-length headers cause servers and proxies to interpret request boundaries differently. This can lead to cache poisoning, credential hijacking, and bypassing security controls. Only disable this in controlled environments where you fully trust the request source.
 
-- **autoSelectFamily**: `boolean` (optional) - Default: depends on local Node version, on Node 18.13.0 and above is `false`. Enables a family autodetection algorithm that loosely implements section 5 of [RFC 8305](https://tools.ietf.org/html/rfc8305#section-5). See [here](https://nodejs.org/api/net.html#socketconnectoptions-connectlistener) for more details. This option is ignored if not supported by the current Node version.
+* **autoSelectFamily**: `boolean` (optional) - Default: depends on local Node version, on Node 18.13.0 and above is `false`. Enables a family autodetection algorithm that loosely implements section 5 of [RFC 8305](https://tools.ietf.org/html/rfc8305#section-5). See [here](https://nodejs.org/api/net.html#socketconnectoptions-connectlistener) for more details. This option is ignored if not supported by the current Node version.
 
-- **autoSelectFamilyAttemptTimeout**: `number` - Default: depends on local Node version, on Node 18.13.0 and above is `250`. The amount of time in milliseconds to wait for a connection attempt to finish before trying the next address when using the `autoSelectFamily` option. See [here](https://nodejs.org/api/net.html#socketconnectoptions-connectlistener) for more details.
+* **autoSelectFamilyAttemptTimeout**: `number` - Default: depends on local Node version, on Node 18.13.0 and above is `250`. The amount of time in milliseconds to wait for a connection attempt to finish before trying the next address when using the `autoSelectFamily` option. See [here](https://nodejs.org/api/net.html#socketconnectoptions-connectlistener) for more details.
 
 #### Parameter: `H2CConnectOptions`
 
-- **socketPath** `string | null` (optional) - Default: `null` - An IPC endpoint, either Unix domain socket or Windows named pipe.
+* **socketPath** `string | null` (optional) - Default: `null` - An IPC endpoint, either Unix domain socket or Windows named pipe.
 
-- **timeout** `number | null` (optional) - In milliseconds, Default `10e3`.
+* **timeout** `number | null` (optional) - In milliseconds, Default `10e3`.
 
-- **servername** `string | null` (optional)
+* **servername** `string | null` (optional)
 
-- **keepAlive** `boolean | null` (optional) - Default: `true` - TCP keep-alive enabled
+* **keepAlive** `boolean | null` (optional) - Default: `true` - TCP keep-alive enabled
 
-- **keepAliveInitialDelay** `number | null` (optional) - Default: `60000` - TCP keep-alive interval for the socket in milliseconds
+* **keepAliveInitialDelay** `number | null` (optional) - Default: `60000` - TCP keep-alive interval for the socket in milliseconds
 
 ### Example - Basic Client instantiation
 
 This will instantiate the undici H2CClient, but it will not connect to the origin until something is queued. Consider using `client.connect` to prematurely connect to the origin, or just call `client.request`.
-
 
 ```js
 "use strict";
@@ -135,19 +133,19 @@ See [`Dispatcher.upgrade(options[, callback])`](/docs/docs/api/Dispatcher.md#dis
 
 ### `H2CClient.closed`
 
-- `boolean`
+* `boolean`
 
 `true` after `H2CClient.close()` has been called.
 
 ### `H2CClient.destroyed`
 
-- `boolean`
+* `boolean`
 
 `true` after `client.destroyed()` has been called or `client.close()` has been called and the client shutdown has completed.
 
 ### `H2CClient.pipelining`
 
-- `number`
+* `number`
 
 Property to get and set the pipelining factor.
 
@@ -159,14 +157,13 @@ See [Dispatcher Event: `'connect'`](/docs/docs/api/Dispatcher.md#event-connect).
 
 Parameters:
 
-- **origin** `URL`
+* **origin** `URL`
 
-- **targets** `Array<Dispatcher>`
+* **targets** `Array<Dispatcher>`
 
 Emitted when a socket has been created and connected. The client will connect once `client.size > 0`.
 
 #### Example - Client connect event
-
 
 ```js
 import { createServer } from "node:http2";
@@ -208,16 +205,15 @@ See [Dispatcher Event: `'disconnect'`](/docs/docs/api/Dispatcher.md#event-discon
 
 Parameters:
 
-- **origin** `URL`
+* **origin** `URL`
 
-- **targets** `Array<Dispatcher>`
+* **targets** `Array<Dispatcher>`
 
-- **error** `Error`
+* **error** `Error`
 
 Emitted when socket has disconnected. The error argument of the event is the error which caused the socket to disconnect. The client will reconnect if or once `client.size > 0`.
 
 #### Example - Client disconnect event
-
 
 ```js
 import { createServer } from "node:http2";
@@ -256,7 +252,6 @@ Emitted when pipeline is no longer busy.
 See [Dispatcher Event: `'drain'`](/docs/docs/api/Dispatcher.md#event-drain).
 
 #### Example - Client drain event
-
 
 ```js
 import { createServer } from "node:http2";

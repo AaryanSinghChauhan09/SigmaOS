@@ -8,7 +8,7 @@ A mocked Agent class that implements the Agent API. It allows one to intercept H
 
 Arguments:
 
-- **options** `MockAgentOptions` (optional) - It extends the `Agent` options.
+* **options** `MockAgentOptions` (optional) - It extends the `Agent` options.
 
 Returns: `MockAgent`
 
@@ -16,16 +16,15 @@ Returns: `MockAgent`
 
 Extends: [`AgentOptions`](/docs/docs/api/Agent.md#parameter-agentoptions)
 
-- **agent** `Agent` (optional) - Default: `new Agent([options])` - a custom agent encapsulated by the MockAgent.
+* **agent** `Agent` (optional) - Default: `new Agent([options])` - a custom agent encapsulated by the MockAgent.
 
-- **ignoreTrailingSlash** `boolean` (optional) - Default: `false` - set the default value for `ignoreTrailingSlash` for interceptors.
+* **ignoreTrailingSlash** `boolean` (optional) - Default: `false` - set the default value for `ignoreTrailingSlash` for interceptors.
 
-- **acceptNonStandardSearchParameters** `boolean` (optional) - Default: `false` - set to `true` if the matcher should also accept non standard search parameters such as multi-value items specified with `[]` (e.g. `param[]=1&param[]=2&param[]=3`) and multi-value items which values are comma separated (e.g. `param=1,2,3`).
+* **acceptNonStandardSearchParameters** `boolean` (optional) - Default: `false` - set to `true` if the matcher should also accept non standard search parameters such as multi-value items specified with `[]` (e.g. `param[]=1&param[]=2&param[]=3`) and multi-value items which values are comma separated (e.g. `param=1,2,3`).
 
 ### Example - Basic MockAgent instantiation
 
 This will instantiate the MockAgent. It will not do anything until registered as the agent to use with requests and mock interceptions are added.
-
 
 ```js
 import { MockAgent } from 'undici'
@@ -35,7 +34,6 @@ const mockAgent = new MockAgent()
 ```
 
 ### Example - Basic MockAgent instantiation with custom agent
-
 
 ```js
 import { Agent, MockAgent } from 'undici'
@@ -56,7 +54,7 @@ For subsequent `MockAgent.get` calls on the same origin, the same mock instance 
 
 Arguments:
 
-- **origin** `string | RegExp | (value) => boolean` - a matcher for the pool origin to be retrieved from the MockAgent.
+* **origin** `string | RegExp | (value) => boolean` - a matcher for the pool origin to be retrieved from the MockAgent.
 
 | Matcher type | Condition to pass          |
 |:------------:| -------------------------- |
@@ -74,7 +72,6 @@ Returns: `MockClient | MockPool`.
 | `connections` > `1`  | `MockPool`             |
 
 #### Example - Basic Mocked Request
-
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -96,7 +93,6 @@ for await (const data of body) {
 ```
 
 #### Example - Basic Mocked Request with local mock agent dispatcher
-
 
 ```js
 import { MockAgent, request } from 'undici'
@@ -121,7 +117,6 @@ for await (const data of body) {
 
 #### Example - Basic Mocked Request with local mock pool dispatcher
 
-
 ```js
 import { MockAgent, request } from 'undici'
 
@@ -145,7 +140,6 @@ for await (const data of body) {
 
 #### Example - Basic Mocked Request with local mock client dispatcher
 
-
 ```js
 import { MockAgent, request } from 'undici'
 
@@ -168,7 +162,6 @@ for await (const data of body) {
 ```
 
 #### Example - Basic Mocked requests with multiple intercepts
-
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -200,7 +193,6 @@ for await (const data of result2.body) {
 
 #### Example - Mock different requests within the same file
 
-
 ```js
 const { MockAgent, setGlobalDispatcher } = require('undici');
 const agent = new MockAgent();
@@ -220,7 +212,6 @@ describe('Test', () => {
 ```
 
 #### Example - Mocked request with query body, headers and trailers
-
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -262,7 +253,6 @@ console.log('trailers', trailers) // { 'content-md5': 'test' }
 
 #### Example - Mocked request with origin regex
 
-
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
 
@@ -286,7 +276,6 @@ for await (const data of body) {
 ```
 
 #### Example - Mocked request with origin function
-
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -318,7 +307,6 @@ Returns: `Promise<void>`
 
 #### Example - clean up after tests are complete
 
-
 ```js
 import { MockAgent, setGlobalDispatcher } from 'undici'
 
@@ -338,7 +326,6 @@ Implements [`Agent.dispatch(options, handlers)`](/docs/docs/api/Agent.md#paramet
 See [`Dispatcher.request(options [, callback])`](/docs/docs/api/Dispatcher.md#dispatcherrequestoptions-callback).
 
 #### Example - MockAgent request
-
 
 ```js
 import { MockAgent } from 'undici'
@@ -373,7 +360,6 @@ Returns: `void`
 
 #### Example - Deactivate Mocking
 
-
 ```js
 import { MockAgent, setGlobalDispatcher } from 'undici'
 
@@ -391,7 +377,6 @@ This method enables mocking in a MockAgent instance. When instantiated, a MockAg
 Returns: `void`
 
 #### Example - Activate Mocking
-
 
 ```js
 import { MockAgent, setGlobalDispatcher } from 'undici'
@@ -415,12 +400,11 @@ When using a string, it should only include the **hostname and optionally, the p
 
 Arguments:
 
-- **host** `string | RegExp | (value) => boolean` - (optional)
+* **host** `string | RegExp | (value) => boolean` - (optional)
 
 Returns: `void`
 
 #### Example - Allow all non-matching urls to be dispatched in a real HTTP request
-
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -436,7 +420,6 @@ await request('http://example.com')
 ```
 
 #### Example - Allow requests matching a host string to make real requests
-
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -460,7 +443,6 @@ await request('http://example-3.com')
 
 #### Example - Allow requests matching a host regex to make real requests
 
-
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
 
@@ -475,7 +457,6 @@ await request('http://example.com')
 ```
 
 #### Example - Allow requests matching a host function to make real requests
-
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -498,7 +479,6 @@ Returns: `void`
 
 #### Example - Disable all non-matching requests by throwing an error for each
 
-
 ```js
 import { MockAgent, request } from 'undici'
 
@@ -515,16 +495,15 @@ await request('http://example.com')
 
 This method returns any pending interceptors registered on a mock agent. A pending interceptor meets one of the following criteria:
 
-- Is registered with neither `.times(<number>)` nor `.persist()`, and has not been invoked;
+* Is registered with neither `.times(<number>)` nor `.persist()`, and has not been invoked;
 
-- Is persistent (i.e., registered with `.persist()`) and has not been invoked;
+* Is persistent (i.e., registered with `.persist()`) and has not been invoked;
 
-- Is registered with `.times(<number>)` and has not been invoked `<number>` of times.
+* Is registered with `.times(<number>)` and has not been invoked `<number>` of times.
 
 Returns: `PendingInterceptor[]` (where `PendingInterceptor` is a `MockDispatch` with an additional `origin: string`)
 
 #### Example - List all pending interceptors
-
 
 ```js
 const agent = new MockAgent()
@@ -564,14 +543,13 @@ const pendingInterceptors = agent.pendingInterceptors()
 
 This method throws if the mock agent has any pending interceptors. A pending interceptor meets one of the following criteria:
 
-- Is registered with neither `.times(<number>)` nor `.persist()`, and has not been invoked;
+* Is registered with neither `.times(<number>)` nor `.persist()`, and has not been invoked;
 
-- Is persistent (i.e., registered with `.persist()`) and has not been invoked;
+* Is persistent (i.e., registered with `.persist()`) and has not been invoked;
 
-- Is registered with `.times(<number>)` and has not been invoked `<number>` of times.
+* Is registered with `.times(<number>)` and has not been invoked `<number>` of times.
 
 #### Example - Check that there are no pending interceptors
-
 
 ```js
 const agent = new MockAgent()
@@ -601,7 +579,6 @@ You can register every call made within a MockAgent to be able to retrieve the b
 
 This is not enabled by default.
 
-
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
 
@@ -629,7 +606,6 @@ mockAgent.getCallHistory()?.firstCall()
 
 #### Example - clear call history
 
-
 ```js
 const mockAgent = new MockAgent()
 
@@ -638,7 +614,6 @@ mockAgent.clearAllCallHistory()
 ```
 
 #### Example - call history instance class method
-
 
 ```js
 const mockAgent = new MockAgent()

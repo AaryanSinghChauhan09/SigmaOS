@@ -2,7 +2,6 @@
 
 Access to an instance with :
 
-
 ```js
 const mockAgent = new MockAgent({ enableCallHistory: true })
 mockAgent.getCallHistory()?.firstCall()
@@ -11,36 +10,35 @@ mockAgent.getCallHistory()?.firstCall()
 
 ## class properties
 
-- body `mockAgent.getCallHistory()?.firstCall()?.body`
+* body `mockAgent.getCallHistory()?.firstCall()?.body`
 
-- headers `mockAgent.getCallHistory()?.firstCall()?.headers` an object
+* headers `mockAgent.getCallHistory()?.firstCall()?.headers` an object
 
-- method `mockAgent.getCallHistory()?.firstCall()?.method` a string
+* method `mockAgent.getCallHistory()?.firstCall()?.method` a string
 
-- fullUrl `mockAgent.getCallHistory()?.firstCall()?.fullUrl` a string containing the protocol, origin, path, query and hash
+* fullUrl `mockAgent.getCallHistory()?.firstCall()?.fullUrl` a string containing the protocol, origin, path, query and hash
 
-- origin `mockAgent.getCallHistory()?.firstCall()?.origin` a string containing the protocol and the host
+* origin `mockAgent.getCallHistory()?.firstCall()?.origin` a string containing the protocol and the host
 
-- headers `mockAgent.getCallHistory()?.firstCall()?.headers` an object
+* headers `mockAgent.getCallHistory()?.firstCall()?.headers` an object
 
-- path `mockAgent.getCallHistory()?.firstCall()?.path` a string always starting with `/`
+* path `mockAgent.getCallHistory()?.firstCall()?.path` a string always starting with `/`
 
-- searchParams `mockAgent.getCallHistory()?.firstCall()?.searchParams` an object
+* searchParams `mockAgent.getCallHistory()?.firstCall()?.searchParams` an object
 
-- protocol `mockAgent.getCallHistory()?.firstCall()?.protocol` a string (`https:`)
+* protocol `mockAgent.getCallHistory()?.firstCall()?.protocol` a string (`https:`)
 
-- host `mockAgent.getCallHistory()?.firstCall()?.host` a string
+* host `mockAgent.getCallHistory()?.firstCall()?.host` a string
 
-- port `mockAgent.getCallHistory()?.firstCall()?.port` an empty string or a string containing numbers
+* port `mockAgent.getCallHistory()?.firstCall()?.port` an empty string or a string containing numbers
 
-- hash `mockAgent.getCallHistory()?.firstCall()?.hash` an empty string or a string starting with `#`
+* hash `mockAgent.getCallHistory()?.firstCall()?.hash` an empty string or a string starting with `#`
 
 ## class methods
 
 ### toMap
 
 Returns a Map instance
-
 
 ```js
 mockAgent.getCallHistory()?.firstCall()?.toMap()?.get('hash')
@@ -51,7 +49,6 @@ mockAgent.getCallHistory()?.firstCall()?.toMap()?.get('hash')
 ### toString
 
 Returns a string computed with any class property name and value pair
-
 
 ```js
 mockAgent.getCallHistory()?.firstCall()?.toString()

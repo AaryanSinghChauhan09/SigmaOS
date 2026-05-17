@@ -4,7 +4,6 @@ Undici has its own mocking [utility](/docs/docs/api/MockAgent.md). It allow us t
 
 Example:
 
-
 ```js
 // bank.mjs
 import { request } from 'undici'
@@ -28,7 +27,6 @@ export async function bankTransfer(recipient, amount) {
 ```
 
 And this is what the test file looks like:
-
 
 ```js
 // index.test.mjs
@@ -85,7 +83,6 @@ Using a MockAgent also allows you to make assertions on the configuration used t
 
 Here is an example :
 
-
 ```js
 // index.test.mjs
 import { strict as assert } from 'node:assert'
@@ -139,7 +136,6 @@ Explore other MockCallHistoryLog functionality [here](/docs/docs/api/MockCallHis
 
 When the interceptor and the request options are not the same, undici will automatically make a real HTTP request. To prevent real requests from being made, use `mockAgent.disableNetConnect()`:
 
-
 ```js
 const mockAgent = new MockAgent();
 
@@ -167,7 +163,6 @@ const badRequest = await bankTransfer('1234567890', '100')
 
 If the mocked response needs to be dynamically derived from the request parameters, you can provide a function instead of an object to `reply`:
 
-
 ```js
 mockPool.intercept({
   path: '/bank-transfer',
@@ -188,7 +183,6 @@ mockPool.intercept({
 ```
 
 in this case opts will be
-
 
 ```
 {

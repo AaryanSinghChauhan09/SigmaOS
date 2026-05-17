@@ -8,9 +8,9 @@ A mock client class that implements the same api as [MockPool](/docs/docs/api/Mo
 
 Arguments:
 
-- **origin**`string` - It should only include the**protocol, hostname, and port**.
+* **origin**`string` - It should only include the**protocol, hostname, and port**.
 
-- **options** `MockClientOptions` - It extends the `Client` options.
+* **options** `MockClientOptions` - It extends the `Client` options.
 
 Returns: `MockClient`
 
@@ -18,12 +18,11 @@ Returns: `MockClient`
 
 Extends: `ClientOptions`
 
-- **agent** `Agent` - the agent to associate this MockClient with.
+* **agent** `Agent` - the agent to associate this MockClient with.
 
 ### Example - Basic MockClient instantiation
 
 We can use MockAgent to instantiate a MockClient ready to be used to intercept specified requests. It will not do anything until registered as the agent to use and any mock request are registered.
-
 
 ```js
 import { MockAgent } from 'undici'
@@ -58,7 +57,6 @@ Implements [`Dispatcher.dispatch(options, handlers)`](/docs/docs/api/Dispatcher.
 See [`Dispatcher.request(options [, callback])`](/docs/docs/api/Dispatcher.md#dispatcherrequestoptions-callback).
 
 #### Example - MockClient request
-
 
 ```js
 import { MockAgent } from 'undici'

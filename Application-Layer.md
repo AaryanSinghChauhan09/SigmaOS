@@ -4,22 +4,22 @@ The `release/app` branch focuses on providing a robust, high-performance environ
 
 ## ⚙️ Performance Focus
 
-- **API Optimization**: Minimizing system call overhead through zero-copy buffers.
+* **API Optimization**: Minimizing system call overhead through zero-copy buffers.
 
-- **Redundant Call Reduction**: Caching frequently accessed shard metadata in user-space.
+* **Redundant Call Reduction**: Caching frequently accessed shard metadata in user-space.
 
-- **GUI Responsiveness**: Asynchronous event handling for the Zenith UI.
+* **GUI Responsiveness**: Asynchronous event handling for the Zenith UI.
 
 ## 🧩 Compatibility & Portability
 
-- **POSIX Compliance**: Strict adherence to IEEE 1003.1 for seamless application porting.
+* **POSIX Compliance**: Strict adherence to IEEE 1003.1 for seamless application porting.
 
-- **S-PKG Management**: Post-quantum signed package installation and verification.
+* **S-PKG Management**: Post-quantum signed package installation and verification.
 
 ## 🧪 Testing & Validation
 
-- **Regression Tests**: Automated benchmarking of package install times and UI frame rates.
+* **Regression Tests**: Automated benchmarking of package install times and UI frame rates.
 
-- **Stress Testing**: Concurrent multi-application execution within the sovereign lattice.
+* **Stress Testing**: Concurrent multi-application execution within the sovereign lattice.
 
 *"Applications are the interface to the Singularity."*

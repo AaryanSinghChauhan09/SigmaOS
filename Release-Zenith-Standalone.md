@@ -19,30 +19,30 @@ Welcome to the **Sovereign Standalone Shard**. This edition is the ultimate expr
 
 ## 🛠️ Core Functions
 
-- **Lattice Shard Orchestration**: Dynamically manages 600+ shards with O(1) complexity.
+* **Lattice Shard Orchestration**: Dynamically manages 600+ shards with O(1) complexity.
 
-- **S-ARMOR Isolation**: Hardware-enforced memory protection between industrial nodes.
+* **S-ARMOR Isolation**: Hardware-enforced memory protection between industrial nodes.
 
-- **Bit-Perfect Logging**: Wait-free serial logging for zero-impact diagnostics.
+* **Bit-Perfect Logging**: Wait-free serial logging for zero-impact diagnostics.
 
-- **Autonomous Recovery**: Automated shard rollback via `SovereignRollbackNexus` if a state inconsistency is detected.
+* **Autonomous Recovery**: Automated shard rollback via `SovereignRollbackNexus` if a state inconsistency is detected.
 
 ## 🌟 Premium Features
 
-- **Zero-Dependency Runtime**: No legacy binaries; everything is compiled from sovereign source shards.
+* **Zero-Dependency Runtime**: No legacy binaries; everything is compiled from sovereign source shards.
 
-- **PQC Sentinel**: Integrated Dilithium-5 signatures for every system call.
+* **PQC Sentinel**: Integrated Dilithium-5 signatures for every system call.
 
-- **Omni-Shell Zenith**: A high-performance, wait-free CLI shard for direct kernel interaction.
+* **Omni-Shell Zenith**: A high-performance, wait-free CLI shard for direct kernel interaction.
 
-- **Adaptive Paging**: Predictive memory allocation based on shard execution patterns.
+* **Adaptive Paging**: Predictive memory allocation based on shard execution patterns.
 
 ## 📊 Technical Specs
 
-- **Boot Time**: 0.8s (typical)
+* **Boot Time**: 0.8s (typical)
 
-- **Idle Memory**: 12.4 MB
+* **Idle Memory**: 12.4 MB
 
-- **Architecture**: x86_64 (Zenith Optimized)
+* **Architecture**: x86_64 (Zenith Optimized)
 
-- **Security Level**: Industrial-Sovereign (PQC-Hardened)
+* **Security Level**: Industrial-Sovereign (PQC-Hardened)

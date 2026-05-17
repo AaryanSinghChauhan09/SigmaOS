@@ -24,9 +24,9 @@ SigmaOS utilizes **Lattice-Based Shard Verification (LBSV)** to protect against 
 
 ### Key Algorithms
 
-- **Kyber**: Used for secure key encapsulation during lattice sync.
+* **Kyber**: Used for secure key encapsulation during lattice sync.
 
-- **Dilithium**: Used for digital signatures across all 600 shards.
+* **Dilithium**: Used for digital signatures across all 600 shards.
 
 ---
 
@@ -42,11 +42,11 @@ The resulting `.shard` file contains the PQC signature required for the kernel t
 
 The `SovereignInit` shard enforces a strict boot policy:
 
-- **Enforcing Mode**: System will not boot if any shard fails verification.
+* **Enforcing Mode**: System will not boot if any shard fails verification.
 
-- **Audit Mode**: System boots but logs all verification failures for forensic analysis.
+* **Audit Mode**: System boots but logs all verification failures for forensic analysis.
 
-- **Recovery Mode**: Boots into a minimal, verified lattice for self-healing.
+* **Recovery Mode**: Boots into a minimal, verified lattice for self-healing.
 
 ---
 

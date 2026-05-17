@@ -42,7 +42,6 @@ This matrix documents verified co-existence behavior between SigmaOS and other o
 
 ### Recommended GPT Partition Layout (UEFI Systems)
 
-
 ```text
 ┌─────────────────────────────────────┐
 │  Partition 1: EFI System (512MB)    │ ← Shared with co-OS
@@ -59,6 +58,7 @@ This matrix documents verified co-existence behavior between SigmaOS and other o
 └─────────────────────────────────────┘
 
 ```text
+
 ---
 
 ## Known Conflicts & Mitigations

@@ -6,25 +6,25 @@ SigmaOS Zenith v15.0 is the first version of the Sovereign Lattice to support mu
 
 ### ??? Standalone (Bare Metal)
 
-- **Installer**: SovereignInstaller provides guided partitioning and PQC-sealing.
+* **Installer**: SovereignInstaller provides guided partitioning and PQC-sealing.
 
-- **Recovery**: SovereignRecovery ensures filesystem integrity and shard-level repair.
+* **Recovery**: SovereignRecovery ensures filesystem integrity and shard-level repair.
 
 ### ?? Dual Boot (Coexistence)
 
-- **Compatibility**: SovereignCompatibility layer allows mounting and secure interaction with ext4/NTFS.
+* **Compatibility**: SovereignCompatibility layer allows mounting and secure interaction with ext4/NTFS.
 
-- **Bootloader**: Custom shard-aware bootloader supports cohabitation with GRUB.
+* **Bootloader**: Custom shard-aware bootloader supports cohabitation with GRUB.
 
 ### ?? Browser-Based (Demo)
 
-- **WASM Bridge**: SovereignWASM allows core kernel shards to run in a sandboxed web environment for demonstration and developer testing.
+* **WASM Bridge**: SovereignWASM allows core kernel shards to run in a sandboxed web environment for demonstration and developer testing.
 
 ### ?? App-Based (Portability)
 
-- **Mobile Runtime**: SovereignMobile enables the lattice to run as a secure app inside Android/iOS environments.
+* **Mobile Runtime**: SovereignMobile enables the lattice to run as a secure app inside Android/iOS environments.
 
-- **Hypervisor**: SovereignHypervisor tuned for lightweight virtualization on host systems.
+* **Hypervisor**: SovereignHypervisor tuned for lightweight virtualization on host systems.
 
 ## ??? Evolution Roadmap
 

@@ -4,7 +4,6 @@ The Scheduler Shard provides deterministic, Hard-RTOS thread scheduling based on
 
 ## Architecture Flowchart
 
-
 ```mermaid
 flowchart LR
     A[Hardware Timer IRQ] --> B(tick)
@@ -30,6 +29,7 @@ flowchart LR
 
 
 ```c
+
 void my_rtos_task() {
     while(true) {
         // Critical industrial control loop

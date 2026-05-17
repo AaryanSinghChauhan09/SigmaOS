@@ -12,34 +12,33 @@ If you want to create a custom connector, you must import the `buildConnector` u
 Every Tls option, see [here](https://nodejs.org/api/tls.html#tls_tls_connect_options_callback).
 Furthermore, the following options can be passed:
 
-- **socketPath** `string | null` (optional) - Default: `null` - An IPC endpoint, either Unix domain socket or Windows named pipe.
+* **socketPath** `string | null` (optional) - Default: `null` - An IPC endpoint, either Unix domain socket or Windows named pipe.
 
-- **maxCachedSessions** `number | null` (optional) - Default: `100` - Maximum number of TLS cached sessions. Use 0 to disable TLS session caching. Default: `100`.
+* **maxCachedSessions** `number | null` (optional) - Default: `100` - Maximum number of TLS cached sessions. Use 0 to disable TLS session caching. Default: `100`.
 
-- **timeout** `number | null` (optional) -  In milliseconds. Default `10e3`.
+* **timeout** `number | null` (optional) -  In milliseconds. Default `10e3`.
 
-- **servername** `string | null` (optional)
+* **servername** `string | null` (optional)
 
 Once you call `buildConnector`, it will return a connector function, which takes the following parameters.
 
 #### Parameter: `connector.Options`
 
-- **hostname** `string` (required)
+* **hostname** `string` (required)
 
-- **host** `string` (optional)
+* **host** `string` (optional)
 
-- **protocol** `string` (required)
+* **protocol** `string` (required)
 
-- **port** `string` (required)
+* **port** `string` (required)
 
-- **servername** `string` (optional)
+* **servername** `string` (optional)
 
-- **localAddress** `string | null` (optional) Local address the socket should connect from.
+* **localAddress** `string | null` (optional) Local address the socket should connect from.
 
-- **httpSocket** `Socket` (optional) Establish secure connection on a given socket rather than creating a new socket. It can only be sent on TLS update.
+* **httpSocket** `Socket` (optional) Establish secure connection on a given socket rather than creating a new socket. It can only be sent on TLS update.
 
 ### Basic example
-
 
 ```js
 'use strict'
@@ -65,7 +64,6 @@ const client = new Client('https://localhost:3000', {
 ```
 
 ### Example: validate the CA fingerprint
-
 
 ```js
 'use strict'

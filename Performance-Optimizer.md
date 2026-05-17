@@ -8,11 +8,11 @@ Unlike static kernels, SigmaOS uses a reinforcement learning agent (`SovereignAI
 
 ### Key Features
 
-- **Telemetry-Driven Tuning**: Monitors CPU frequency, cache hit rates, and bus latency to adjust power states dynamically.
+* **Telemetry-Driven Tuning**: Monitors CPU frequency, cache hit rates, and bus latency to adjust power states dynamically.
 
-- **Auto-Tuning Daemon**: Automatically applies optimizations for identified workloads (e.g., Compilation, Rendering, Web Browsing).
+* **Auto-Tuning Daemon**: Automatically applies optimizations for identified workloads (e.g., Compilation, Rendering, Web Browsing).
 
-- **Sub-ns Profiling**: Native hardware profiling shards for deep inspection of shard performance.
+* **Sub-ns Profiling**: Native hardware profiling shards for deep inspection of shard performance.
 
 ## 📊 Benchmarking
 

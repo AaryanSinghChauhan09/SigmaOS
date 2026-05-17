@@ -4,7 +4,6 @@ The Storage Shard implements the file system abstractions for SigmaOS, providing
 
 ## Architecture Diagram
 
-
 ```mermaid
 graph TD
     A[Userland App] -->|Z-SYSCALL| B(VFS Abstraction)
@@ -29,6 +28,7 @@ graph TD
 
 
 ```c
+
 int fd;
 sigma_status status = SovereignStorageShard::getInstance().file_open("/mnt/data/config.sab", O_RDONLY, &fd);
 

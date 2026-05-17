@@ -4,7 +4,6 @@ Pluggable scheduling algorithms.
 
 ## API Interface
 
-
 ```c
 
 // Abstract interface for perf/scheduler

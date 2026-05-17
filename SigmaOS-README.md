@@ -11,22 +11,21 @@ SigmaOS is not an operating system; it is a **Shard Lattice**. We have abandoned
 
 ### ?? Key USPs (The Sigma Advantage)
 
-- **PQC-Native (NIST FIPS 203/204)**: Integrated Kyber-1024 and Dilithium-5 at Ring-0.
+* **PQC-Native (NIST FIPS 203/204)**: Integrated Kyber-1024 and Dilithium-5 at Ring-0.
 
-- **Shard Isolation**: 600+ hot-swappable kernel shards with zero-latency IPC.
+* **Shard Isolation**: 600+ hot-swappable kernel shards with zero-latency IPC.
 
-- **Amnesic Memory**: Secure zeroing of all sensitive buffers via `sigma_secure_memset`.
+* **Amnesic Memory**: Secure zeroing of all sensitive buffers via `sigma_secure_memset`.
 
-- **S-INDIA Compliant**: Native engines for GST (Act 2017) and Income Tax (FY 2024-25).
+* **S-INDIA Compliant**: Native engines for GST (Act 2017) and Income Tax (FY 2024-25).
 
-- **Zero-Trust NetStack**: Hardware-level packet auditing and DPI firewalling.
+* **Zero-Trust NetStack**: Hardware-level packet auditing and DPI firewalling.
 
 ---
 
 ## ??? Industrial Command Interface (sigma_sh)
 
 SigmaOS provides a unified, zero-dependency shell for high-performance orchestration:
-
 
 ```bash
 sigma> help                 # List industrial commands
@@ -50,22 +49,21 @@ sigma> pqc status           # Audit Post-Quantum Crypto health
 
 SigmaOS decomposes the traditional kernel into specialized, isolated shards:
 
-- **`S-MM`**: Sovereign Memory Manager (Buddy-Allocator)
+* **`S-MM`**: Sovereign Memory Manager (Buddy-Allocator)
 
-- **`S-SCHED`**: Predictive Multi-Priority Scheduler
+* **`S-SCHED`**: Predictive Multi-Priority Scheduler
 
-- **`S-NET`**: Zero-Trust Network Stack
+* **`S-NET`**: Zero-Trust Network Stack
 
-- **`S-FS`**: Sovereign Distributed Filesystem (VFS)
+* **`S-FS`**: Sovereign Distributed Filesystem (VFS)
 
-- **`S-INDIA`**: Industrial Professional Finance Suite
+* **`S-INDIA`**: Industrial Professional Finance Suite
 
 ---
 
 ## ?? Deployment & Installation
 
 SigmaOS is distributed as a PQC-signed Zenith ISO.
-
 
 ```powershell
 make singularity     # Compile the 600-shard kernel

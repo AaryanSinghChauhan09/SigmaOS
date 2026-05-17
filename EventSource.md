@@ -10,7 +10,6 @@ for [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server
 Undici exports a EventSource class. You can instantiate the EventSource as
 follows:
 
-
 ```mjs
 import { EventSource } from 'undici'
 
@@ -26,7 +25,6 @@ eventSource.onmessage = (event) => {
 undici allows you to set your own Dispatcher in the EventSource constructor.
 
 An example which allows you to modify the request headers is:
-
 
 ```mjs
 import { EventSource, Agent } from 'undici'

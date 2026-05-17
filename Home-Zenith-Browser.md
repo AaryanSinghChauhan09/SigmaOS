@@ -6,13 +6,13 @@ The **Browser Edition** is a specialized environment designed for web-first work
 
 ### 🛠️ Key Features
 
-- **Direct-to-Browser Boot**: The lattice ignites the UI compositor and Browser shard immediately.
+* **Direct-to-Browser Boot**: The lattice ignites the UI compositor and Browser shard immediately.
 
-- **PQC-Hardened Sandbox**: Every tab is an isolated shard with no access to the kernel lattice.
+* **PQC-Hardened Sandbox**: Every tab is an isolated shard with no access to the kernel lattice.
 
-- **Zero-Trust Networking**: Built-in `S-VPN` and `S-BLOCK` ad/tracker mitigation.
+* **Zero-Trust Networking**: Built-in `S-VPN` and `S-BLOCK` ad/tracker mitigation.
 
-- **WebAssembly Accelerator**: Native silicon-direct execution for heavy WASM apps.
+* **WebAssembly Accelerator**: Native silicon-direct execution for heavy WASM apps.
 
 ### 📥 Installation Guide (Web-Centric)
 
@@ -28,9 +28,9 @@ The **Browser Edition** is a specialized environment designed for web-first work
 
 ### 💎 Exclusive Functions
 
-- `private-lattice-mode`: Force all browser traffic through the S-VPN and clear shard state on exit.
+* `private-lattice-mode`: Force all browser traffic through the S-VPN and clear shard state on exit.
 
-- `web-shard-extract`: Convert any website into a standalone, pinned desktop shard.
+* `web-shard-extract`: Convert any website into a standalone, pinned desktop shard.
 
 ---
 [Return to Global Home](Home)
