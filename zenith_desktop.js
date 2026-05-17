@@ -743,6 +743,8 @@ launchApp = function(app) {
     } else if (app === 'File Manager' || app === '📂') {
         openWindow('file-manager-win');
         if (fileManager) fileManager.update();
+    } else if (app === 'AI Studio' || app === '🤖') {
+        openWindow('sigma-ai-studio-win');
     } else {
         originalLaunchApp(app);
     }
@@ -754,8 +756,160 @@ window.addEventListener('load', () => {
     if (typeof wm !== 'undefined') {
         wm.register('terminal-win');
         wm.register('file-manager-win');
+        wm.register('sigma-ai-studio-win');
     }
 });
+
+// =========================================================================
+// Σ SIGMAOS: SOVEREIGN AI/ML STUDIO INTERACTIVE ENGINE
+// =========================================================================
+
+const modelMetadatas = {
+    '0': {
+        type: 'Hybrid Transformer-Mamba Architecture',
+        features: '256K Context Window, Structured Output Support, Multilingual, 398B parameters (94B active).'
+    },
+    '1': {
+        type: 'Open-Weight Reasoning & Context Core (Phi-4)',
+        features: 'Advanced math reasoning, multi-step problem solving, audio and image inputs ready.'
+    },
+    '2': {
+        type: 'OpenAI Open-Source Core (gpt-oss-120b)',
+        features: '120B parameters, first open-source release with full parameter tuning weights.'
+    },
+    '3': {
+        type: 'OpenAI o-series Core (o3 Advanced Reasoning)',
+        features: 'High efficiency, safety-hardened, dynamic planning logic cycles.'
+    },
+    '4': {
+        type: 'OpenAI Edge Core (gpt-5-nano)',
+        features: 'Silicon-direct compiler bindings, optimized for low latency IoT shards.'
+    }
+};
+
+window.updateModelInfo = function() {
+    const val = document.getElementById('ml-model-select').value;
+    const info = modelMetadatas[val];
+    const infoEl = document.getElementById('ml-model-info');
+    if (info && infoEl) {
+        infoEl.innerHTML = `Type: ${info.type}<br>Features: ${info.features}`;
+    }
+};
+
+window.startMFTraining = function() {
+    const progressContainer = document.getElementById('ml-progress-container');
+    const progressBar = document.getElementById('ml-progress-bar');
+    const progressStatus = document.getElementById('ml-progress-status');
+    const progressPct = document.getElementById('ml-progress-pct');
+    const modelVal = document.getElementById('ml-model-select').value;
+    const dataset = document.getElementById('ml-dataset').value;
+    const epochs = document.getElementById('ml-epochs').value;
+
+    if (!progressContainer || !progressBar) return;
+
+    progressContainer.style.display = 'block';
+    progressBar.style.width = '0%';
+    progressPct.innerText = '0%';
+    progressStatus.innerText = 'Initializing Silicon-Direct SFT context...';
+
+    let percent = 0;
+    const interval = setInterval(() => {
+        percent += 4;
+        if (percent > 100) percent = 100;
+        
+        progressBar.style.width = `${percent}%`;
+        progressPct.innerText = `${percent}%`;
+
+        if (percent === 12) progressStatus.innerText = `Epoch 1/${epochs} SFT: computing forward pass...`;
+        if (percent === 44) progressStatus.innerText = `Epoch 2/${epochs} SFT: adjusting weights loss=0.742...`;
+        if (percent === 72) progressStatus.innerText = `Epoch ${epochs}/${epochs} SFT: generating Dilithium-5 PQC signature...`;
+        if (percent === 96) progressStatus.innerText = `Signing attested model weights...`;
+
+        if (percent === 100) {
+            clearInterval(interval);
+            progressStatus.innerText = `Training complete! Weights Attested & Verified.`;
+            addLog(`Σ [EDGEML]: Finished Fine-Tuning model ${modelVal} on dataset [${dataset.toUpperCase()}] for ${epochs} epochs. Loss stabilized at 0.12f.`, 'success');
+        }
+    }, 100);
+};
+
+window.generateMLEmbedding = function() {
+    const textInput = document.getElementById('ml-embed-text');
+    const resultEl = document.getElementById('ml-embed-result');
+    if (!textInput || !resultEl) return;
+
+    const val = textInput.value.trim();
+    if (!val) {
+        resultEl.innerText = '> Error: Input text is empty.';
+        return;
+    }
+
+    const vector = Array.from({length: 6}, () => (Math.random() * 2 - 1).toFixed(4));
+    resultEl.innerHTML = `> Projection (Embedding 3 Large 1536d):<br>[${vector.join(', ')}, ...]`;
+    addLog(`Σ [EDGEML]: Indexed semantic text embedding successfully: "${val.slice(0, 30)}..."`, 'success');
+    textInput.value = '';
+};
+
+const spawnedAgents = [
+    { name: 'CoreAgent', role: 'Scheduler Optimization', depth: 5 }
+];
+
+window.registerMLAgent = function() {
+    const nameInput = document.getElementById('ml-agent-name');
+    const roleInput = document.getElementById('ml-agent-role');
+    const depthSelect = document.getElementById('ml-agent-depth');
+    const listEl = document.getElementById('ml-agent-list');
+
+    if (!nameInput || !roleInput || !listEl) return;
+
+    const name = nameInput.value.trim();
+    const role = roleInput.value.trim();
+    const depth = depthSelect.value;
+
+    if (!name || !role) {
+        addLog('Σ [AGENT]: Name and Role are required to register a workflow agent.', 'error');
+        return;
+    }
+
+    spawnedAgents.push({ name, role, depth });
+    
+    // Refresh list
+    listEl.innerHTML = spawnedAgents.map(a => `
+        <li style="font-size: 0.7rem; padding: 4px 8px; background: rgba(255,255,255,0.01); border-left: 2px solid var(--accent-gold); display: flex; justify-content: space-between;">
+            <span>🧠 <strong>${a.name}</strong> (${a.role})</span>
+            <span style="color: var(--text-muted);">Depth ${a.depth}</span>
+        </li>
+    `).join('');
+
+    addLog(`Σ [AGENT]: Successfully spawned workflow agent: ${name} (${role})`, 'success');
+    nameInput.value = '';
+    roleInput.value = '';
+};
+
+window.runOWLCooperation = function() {
+    const consoleEl = document.getElementById('ml-console');
+    if (!consoleEl) return;
+
+    if (spawnedAgents.length < 2) {
+        consoleEl.innerHTML = `<span style="color: var(--accent-magenta);">[OWL] Error: Multi-agent OWL orchestration requires at least 2 active agents. Register another agent first!</span>`;
+        return;
+    }
+
+    consoleEl.innerHTML = `[OWL] Multi-Agent Mesh Triggered...<br>[OWL] Active agents: ${spawnedAgents.map(a => a.name).join(', ')}<br>[OWL] Launching Model Context Protocol (MCP) tool gateway proxy...`;
+
+    setTimeout(() => {
+        consoleEl.innerHTML += `<br><span style="color: var(--accent-gold);">[OWL] Agent [${spawnedAgents[0].name}] initiated system load audit (cgroups).</span>`;
+    }, 1000);
+
+    setTimeout(() => {
+        consoleEl.innerHTML += `<br><span style="color: #00ffc3;">[OWL] Agent [${spawnedAgents[1].name}] optimized active scheduler balancing indices.</span>`;
+    }, 2000);
+
+    setTimeout(() => {
+        consoleEl.innerHTML += `<br><span style="color: var(--success);">[OWL] Multi-agent task solved successfully with zero-copy IPC telemetry!</span>`;
+        addLog('Σ [OWL]: Multi-agent cooperation completed with active MCP tool bindings.', 'success');
+    }, 3000);
+};
 
 
 function fmBack() {

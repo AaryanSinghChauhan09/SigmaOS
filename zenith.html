@@ -419,6 +419,116 @@
             </div>
         </div>
 
+        <!-- App: AI/ML Studio & Multi-Agent Orchestrator -->
+        <div class="window" id="sigma-ai-studio-win" style="width: 780px; height: 580px; display: none;">
+            <div class="window-header">
+                <div class="window-title">🤖 <span>Sovereign AI/ML Studio</span></div>
+                <div class="window-controls">
+                    <div class="control-dot min" onclick="closeWindow('sigma-ai-studio-win')"></div>
+                    <div class="control-dot max"></div>
+                    <div class="control-dot close" onclick="closeWindow('sigma-ai-studio-win')"></div>
+                </div>
+            </div>
+            <div class="window-body" style="padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; background: var(--bg-dark);">
+                <div class="settings-content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    
+                    <!-- Left Side: Model Selector & SFT Training -->
+                    <div class="settings-pane" style="display: flex; flex-direction: column; gap: 12px;">
+                        <div class="settings-group">
+                            <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🧠 Select Model Architecture</h4>
+                            <select id="ml-model-select" class="cmd-input" style="width: 100%; height: 35px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);" onchange="updateModelInfo()">
+                                <option value="0">AI21 Jamba 1.5 Large (398B params, 256K context)</option>
+                                <option value="1">Microsoft Phi-4 Reasoning (Open-Weight)</option>
+                                <option value="2">OpenAI gpt-oss-120b (Open-Source Release)</option>
+                                <option value="3">OpenAI o3 Advanced Reasoning (High-Efficiency)</option>
+                                <option value="4">OpenAI gpt-5-nano (Low-Latency Silicon Edge)</option>
+                            </select>
+                            <div id="ml-model-info" style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; padding: 8px; background: rgba(255,255,255,0.02); border-radius: 4px;">
+                                Type: Hybrid Transformer-Mamba<br>
+                                Features: 256K Context Window, Structured Output Support
+                            </div>
+                        </div>
+
+                        <div class="settings-group">
+                            <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🏋️ Supervised Fine-Tuning (SFT)</h4>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <select id="ml-dataset" class="cmd-input" style="width: 100%; height: 35px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                                    <option value="syslogs">Sovereign Lattice System Logs</option>
+                                    <option value="bns">BNS Court Case Matrix</option>
+                                    <option value="gst">Indian GST Ledger Accounts</option>
+                                    <option value="metadata">S-OverlayFS Node Metadata</option>
+                                </select>
+                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem;">
+                                    <span>Training Epochs: <strong id="epoch-val">3</strong></span>
+                                    <input type="range" id="ml-epochs" min="1" max="10" value="3" style="width: 120px;" oninput="document.getElementById('epoch-val').innerText = this.value">
+                                </div>
+                                <button class="wizard-btn" onclick="startMFTraining()">START ATTESTED FINE-TUNING</button>
+                                
+                                <div id="ml-progress-container" style="display: none; margin-top: 10px;">
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.7rem; margin-bottom: 4px;">
+                                        <span id="ml-progress-status">Training model...</span>
+                                        <span id="ml-progress-pct">0%</span>
+                                    </div>
+                                    <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden;">
+                                        <div id="ml-progress-bar" style="width: 0%; height: 100%; background: var(--accent-gold); transition: width 0.1s linear;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-group">
+                            <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🧮 Semantic Text Embedding (Embedding 3)</h4>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="ml-embed-text" class="cmd-input" placeholder="Type text to project..." style="font-size: 0.8rem; height: 35px;">
+                                <button class="wizard-btn" onclick="generateMLEmbedding()" style="white-space: nowrap; height: 35px; padding: 0 12px; font-size: 0.75rem;">EMBED</button>
+                            </div>
+                            <div id="ml-embed-result" style="margin-top: 8px; font-size: 0.7rem; color: var(--accent-gold); font-family: monospace;">
+                                > Vector Space Ready.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Side: Multi-Agent Orchestration -->
+                    <div class="settings-pane" style="display: flex; flex-direction: column; gap: 12px;">
+                        <div class="settings-group">
+                            <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🤖 AutoGPT Agent Registrar</h4>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                                <input type="text" id="ml-agent-name" class="cmd-input" placeholder="Agent Name..." style="font-size: 0.8rem; height: 35px;">
+                                <input type="text" id="ml-agent-role" class="cmd-input" placeholder="Agent Role..." style="font-size: 0.8rem; height: 35px;">
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <select id="ml-agent-depth" class="cmd-input" style="width: 140px; height: 35px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                                    <option value="1">Depth 1 (Fast)</option>
+                                    <option value="3">Depth 3 (Balanced)</option>
+                                    <option value="5">Depth 5 (Rigorous)</option>
+                                </select>
+                                <button class="wizard-btn" onclick="registerMLAgent()" style="height: 35px; padding: 0 15px; font-size: 0.8rem;">SPAWN AGENT</button>
+                            </div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px;">Spawned Agents:</div>
+                            <ul id="ml-agent-list" style="list-style: none; padding-left: 0; display: flex; flex-direction: column; gap: 4px; max-height: 90px; overflow-y: auto;">
+                                <li style="font-size: 0.7rem; padding: 4px 8px; background: rgba(255,255,255,0.01); border-left: 2px solid var(--accent-gold); display: flex; justify-content: space-between;">
+                                    <span>🧠 <strong>CoreAgent</strong> (Scheduler Optimization)</span>
+                                    <span style="color: var(--text-muted);">Depth 5</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="settings-group" style="flex: 1; display: flex; flex-direction: column; min-height: 180px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <h4 style="color: var(--accent-gold);">🦉 OWL Multi-Agent Cooperation</h4>
+                                <button class="cyber-btn small-btn" onclick="runOWLCooperation()" style="font-size: 0.75rem; padding: 4px 12px;">EXECUTE COOPERATION</button>
+                            </div>
+                            <div id="ml-console" style="flex: 1; background: #000; border: 1px solid var(--border-glass); border-radius: 4px; padding: 8px; font-family: monospace; font-size: 0.7rem; overflow-y: auto; color: #4af626; line-height: 1.4;">
+                                [OWL] Proxy server listening on MCP port 8080...<br>
+                                [OWL] Waiting for cooperation trigger.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Floating System Log Feed -->
@@ -430,6 +540,7 @@
         <div class="dock-icon" data-tooltip="OmniShell Terminal" onclick="launchApp('OmniShell')">💻</div>
         <div class="dock-icon" data-tooltip="Observability Matrix" onclick="launchApp('Sigma Browser')">📊</div>
         <div class="dock-icon" data-tooltip="Neural Core" onclick="launchApp('AI Assistant')">🧠</div>
+        <div class="dock-icon" data-tooltip="AI/ML Studio" onclick="launchApp('AI Studio')">🤖</div>
         <div class="dock-icon" data-tooltip="Lattice Settings" onclick="launchApp('Lattice Settings')">⚙️</div>
         <div class="dock-icon" data-tooltip="Pro Tools" onclick="launchApp('Utility Nexus')">🔧</div>
         <div class="dock-icon" data-tooltip="Marketplace" onclick="launchApp('Marketplace')">🛒</div>
