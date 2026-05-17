@@ -12,7 +12,6 @@ SigmaOS utilizes a zero-trust, post-quantum architecture.
 
 ## 3. Sandboxing & Isolation
 
-
 * User processes are isolated using sovereign namespaces and resource limitation cgroups.
 
 ## 4. Cryptography

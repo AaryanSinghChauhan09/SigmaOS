@@ -90,11 +90,11 @@ The `SovereignPartitionManager` supports scanning existing GPT partitions and br
 
 Upon first boot, the **Onboarding Wizard** will launch to:
 
-* Detect your hardware and apply **Smart Defaults**.
+*Detect your hardware and apply**Smart Defaults**.
 
-* Prompt for your **Profession Profile** (Lawyer, Doctor, Engineer, etc.).
+*Prompt for your**Profession Profile** (Lawyer, Doctor, Engineer, etc.).
 
-* Configure **Verified Boot** and PQC security levels.
+*Configure**Verified Boot** and PQC security levels.
 
 ---
 

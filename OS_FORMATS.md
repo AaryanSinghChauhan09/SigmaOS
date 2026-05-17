@@ -6,7 +6,7 @@ SigmaOS Zenith v15.0 can be deployed in multiple specialized profiles depending 
 
 * **Target**: High-performance workstations and daily-driver desktops.
 
-* **Features**: Full GPU/Vulkan support, Zenith Compositor, Sovereign Office Suite, Wi-Fi 6E, **Sigma-Game-Mode**.
+***Features**: Full GPU/Vulkan support, Zenith Compositor, Sovereign Office Suite, Wi-Fi 6E,**Sigma-Game-Mode**.
 
 * **Optimized for**: Maximum user responsiveness, gaming performance, and peripheral compatibility.
 
@@ -38,7 +38,7 @@ SigmaOS Zenith v15.0 can be deployed in multiple specialized profiles depending 
 
 * **Target**: Incident response, digital forensics, and silicon recovery.
 
-* **Features**: Hardware Write-Blockers, Silicon-Direct Memory Dumper, PQC Integrity Auditor, **S-Recovery Snapshot Rollback**.
+***Features**: Hardware Write-Blockers, Silicon-Direct Memory Dumper, PQC Integrity Auditor,**S-Recovery Snapshot Rollback**.
 
 * **Optimized for**: Air-gapped, read-only auditing, evidence preservation, and disaster recovery.
 
@@ -46,7 +46,7 @@ SigmaOS Zenith v15.0 can be deployed in multiple specialized profiles depending 
 
 * **Target**: Tablets, smartphones, and low-power handhelds.
 
-* **Features**: Aggressive AI-Telemetry power management, touch-optimized glassmorphism, cellular S-NET shards, **GPIO/IoT Sensor Toolkit**.
+***Features**: Aggressive AI-Telemetry power management, touch-optimized glassmorphism, cellular S-NET shards,**GPIO/IoT Sensor Toolkit**.
 
 * **Optimized for**: Battery longevity, heterogeneous ARM/RISC-V architecture, and embedded IoT sensing.
 
@@ -54,7 +54,7 @@ SigmaOS Zenith v15.0 can be deployed in multiple specialized profiles depending 
 
 * **Target**: Financial institutions, healthcare, and government defense.
 
-* **Features**: Automated Compliance Checker, Multi-Tenant PQC-Isolation, **Hardware Regression Certifier**, Sovereign Audit Logging.
+***Features**: Automated Compliance Checker, Multi-Tenant PQC-Isolation,**Hardware Regression Certifier**, Sovereign Audit Logging.
 
 * **Optimized for**: 100% regulatory compliance, mission-critical stability, and secure multi-org collaboration.
 
@@ -62,7 +62,7 @@ SigmaOS Zenith v15.0 can be deployed in multiple specialized profiles depending 
 
 * **Target**: Data centers, bare-metal cloud providers, and development labs.
 
-* **Features**: VT-x/SVM Hardware Acceleration, Nested Shard Paging, Isolated Guest Lattices, **Sovereign VMM Shard**.
+***Features**: VT-x/SVM Hardware Acceleration, Nested Shard Paging, Isolated Guest Lattices,**Sovereign VMM Shard**.
 
 * **Optimized for**: Maximum silicon utilization, hardware-level isolation, and distributed lattice virtualization.
 

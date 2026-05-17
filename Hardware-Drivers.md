@@ -8,7 +8,7 @@ SigmaOS achieves universal hardware compatibility via the **Sovereign Driver Lat
 
 * **Vulkan-First**: The Zenith compositor is optimized for Vulkan 1.3.
 
-* **Software Fallback**: Systems without hardware acceleration use the **Sovereign Software Rasterizer** to ensure 100% UI compatibility.
+***Software Fallback**: Systems without hardware acceleration use the**Sovereign Software Rasterizer** to ensure 100% UI compatibility.
 
 ## 🔊 S-AUDIO: Multimedia Parity
 

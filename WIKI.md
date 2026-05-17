@@ -110,7 +110,7 @@ The **Sovereign Industrial API** provides a clean, C++ OOP interface for develop
 
 * `SovereignAPI::AllocateShard(sigma_size_t)`: Allocates memory in protected RAM-phantom space.
 
-* `SovereignAPI::ReleaseShard(void*)`: Wipes and releases shard memory using the **S80 Amnesia** protocol.
+*`SovereignAPI::ReleaseShard(void*)`: Wipes and releases shard memory using the**S80 Amnesia** protocol.
 
 ### Distributed & Consensus
 
@@ -128,19 +128,19 @@ SigmaOS is an open-governance silicon singularity. Developers can contribute to 
 
 ### 1. Development Environment
 
-* Use the **Sovereign Industrial API** (`include/SovereignAPI.hpp`).
+*Use the**Sovereign Industrial API** (`include/SovereignAPI.hpp`).
 
-* Ensure all code is **Zero-Dependency**and adheres to**Silicon-Native** performance standards.
+*Ensure all code is**Zero-Dependency**and adheres to**Silicon-Native** performance standards.
 
 ### 2. Verification & PQC Signing
 
-* Every shard must be signed with a **Post-Quantum Key**.
+*Every shard must be signed with a**Post-Quantum Key**.
 
 * Use the `VerifyShardPQC` protocol to ensure shard integrity before submission to the global nexus.
 
 ### 3. Hot-Loading & Integration
 
-* Shards are integrated via the **Sovereign Shard Manager**.
+*Shards are integrated via the**Sovereign Shard Manager**.
 
 * Use the `HotLoadShard` method for real-time integration without system reset.
 

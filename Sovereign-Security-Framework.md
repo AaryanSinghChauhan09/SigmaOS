@@ -22,7 +22,7 @@ SigmaOS utilizes **CRYSTALS-Kyber**and**CRYSTALS-Dilithium** as its primary cryp
 
 * **Kyber (KEM)**: Secures inter-shard key exchange and network handshakes.
 
-* **Dilithium (Digital Signatures)**: Verifies the provenance and integrity of the **Universal Package Graph**.
+***Dilithium (Digital Signatures)**: Verifies the provenance and integrity of the**Universal Package Graph**.
 
 ---
 
@@ -61,7 +61,7 @@ SigmaOS has completed its initial internal audit and is currently in the "FIPS-1
 
 * **Validator**: Sovereign Compliance Engine (NIST-SP-800-208 Validated)
 
-* **Result**: **PASS** - 600 shards successfully attested via Dilithium proofs.
+***Result**:**PASS** - 600 shards successfully attested via Dilithium proofs.
 
 * **Certification**: PQC-Certified for Industrial Sovereign Environments.
 

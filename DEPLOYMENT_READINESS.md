@@ -51,7 +51,7 @@ This document tracks the final readiness of SigmaOS Zenith v15.0 based on the in
 
 ## 🖥 4. Driver Coverage (COMPLETE)
 
-* **Industrial Bus**: Support for **USB 3.0 (XHCI)**, **High-Definition Audio (HDA)**, and **802.11 Wireless**.
+***Industrial Bus**: Support for**USB 3.0 (XHCI)**, **High-Definition Audio (HDA)**, and **802.11 Wireless**.
 
 * **GPU**: Basic framebuffer acceleration shards established.
 

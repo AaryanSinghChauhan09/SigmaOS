@@ -32,8 +32,8 @@ The **Mobile** format provides the user-facing app ecosystem. It bundles creativ
 
 ## 🚀 Optimization Checklist
 
-* [ ] Calibrate **ZenithCapture** for 60FPS recording.
+*[ ] Calibrate**ZenithCapture** for 60FPS recording.
 
-* [ ] Enforce **SovereignVault** rules for the browser sandbox.
+*[ ] Enforce**SovereignVault** rules for the browser sandbox.
 
-* [ ] Run **SovereignPDF** attestation on all financial shards.
+*[ ] Run**SovereignPDF** attestation on all financial shards.

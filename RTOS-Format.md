@@ -36,4 +36,4 @@ The **RTOS** format is designed for mission-critical industrial deployments (Bio
 
 * [ ] Pin critical shards to specific CPU cores.
 
-* [ ] Validate all task deadlines via **SovereignWCET**.
+*[ ] Validate all task deadlines via**SovereignWCET**.

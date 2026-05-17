@@ -4,7 +4,6 @@ This knowledge base governs the development of the SigmaOS storage subsystems wi
 
 ## Focus Areas
 
-
 * **Sovereign Filesystem (S-FS)**: A custom, journaling-based filesystem designed for absolute data persistence and corruption resistance.
 * **Encryption**: PQC-sealed at-rest data encryption and zero-knowledge storage keys.
 * **Persistence Strategies**: Managing volatile and non-volatile block abstractions.

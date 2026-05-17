@@ -86,7 +86,7 @@ While the core baseline is identical, each branch adds its own **Industrial Laye
 
 * **Lattice Sync**: `sigma-pkg sync` updates the core baseline across all formats simultaneously.
 
-* **CI/CD Enforcement**: No format is released unless it passes the **Core Toolset Validation Suite (CTVS)**.
+***CI/CD Enforcement**: No format is released unless it passes the**Core Toolset Validation Suite (CTVS)**.
 
 ---
 

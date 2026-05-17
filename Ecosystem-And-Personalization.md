@@ -32,7 +32,7 @@ The **Zenith UI** uses local behavior telemetry to anticipate the next tool or l
 
 * **Morphic Layering**: UI components physically adapt their shape and transparency based on task urgency.
 
-* **Smart Shortcuts**: Gesture and hotkey mapping tailored specifically to the user's **Profession Profile**.
+***Smart Shortcuts**: Gesture and hotkey mapping tailored specifically to the user's**Profession Profile**.
 
 ### 2. Knowledge Lattice (#71)
 
