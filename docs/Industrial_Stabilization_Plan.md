@@ -33,9 +33,9 @@ To achieve **Industrial Stable** grade production readiness:
 
 SigmaOS implements the **Sovereign Industrial Scheduler (S-SCHED)** utilizing a shard-aware CFS scheduling algorithm to allocate task slices across the 600-shard mesh:
 
-* **Symmetric Multiprocessing (SMP) Pinning**: Subsystems can bind real-time threads to specific physical CPU cores using the `sigma_sched_setaffinity` syscall to bypass scheduler overhead.
-* **Lock-Free Runqueues**: Uses atomic circular buffers to enqueue tasks, bypassing core scheduler locks and eliminating multi-core thread lock contention.
-* **Relativistic Drift Correction**: Incorporates CPU high-precision timers (TSC/HPET) to auto-adjust scheduling ticks for NUMA and clock drift.
+- **Symmetric Multiprocessing (SMP) Pinning**: Subsystems can bind real-time threads to specific physical CPU cores using the `sigma_sched_setaffinity` syscall to bypass scheduler overhead.
+- **Lock-Free Runqueues**: Uses atomic circular buffers to enqueue tasks, bypassing core scheduler locks and eliminating multi-core thread lock contention.
+- **Relativistic Drift Correction**: Incorporates CPU high-precision timers (TSC/HPET) to auto-adjust scheduling ticks for NUMA and clock drift.
 
 ---
 
@@ -51,9 +51,9 @@ The **Sovereign Memory Manager (S-MM)** operates on a dual-tier bare-metal isola
 ## 5. Post-Quantum Attested Boot (Asynchronous Shard Ignition)
 
 The boot pipeline guarantees complete integrity using the **Asynchronous Shard Ignition (ASI)** sequence:
-* **CRYSTALS-Dilithium Signatures**: Every kernel shard loaded during boot is verified using CRYSTALS-Dilithium post-quantum cryptography to prevent rootkit tampering.
-* **Self-Healing Recovery**: If a shard fails verification, S-BOOT triggers a hardware fallback recovery routine to load backup snapshots compiled from secure local storage.
-* **Lattice Ignition**: Automatically ignites the 600-shard mesh concurrently in deterministic priority order.
+- **CRYSTALS-Dilithium Signatures**: Every kernel shard loaded during boot is verified using CRYSTALS-Dilithium post-quantum cryptography to prevent rootkit tampering.
+- **Self-Healing Recovery**: If a shard fails verification, S-BOOT triggers a hardware fallback recovery routine to load backup snapshots compiled from secure local storage.
+- **Lattice Ignition**: Automatically ignites the 600-shard mesh concurrently in deterministic priority order.
 
 ---
 
