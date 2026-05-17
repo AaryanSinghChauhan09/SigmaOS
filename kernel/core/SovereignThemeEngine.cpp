@@ -41,15 +41,15 @@ public:
 
     void applyTheme(const char* themeName) {
         sigma_log_info("[S-THEME] Applying Lattice Theme: %s", themeName);
-        if (strcmp(themeName, "NOIR") == 0) {
+        if (sigma_strcmp(themeName, "NOIR") == 0) {
             sigma_log_info("[S-THEME] Mode: OLED-Black | Accent: Silver");
-        } else if (strcmp(themeName, "FROST") == 0) {
+        } else if (sigma_strcmp(themeName, "FROST") == 0) {
             sigma_log_info("[S-THEME] Mode: High-Contrast-White | Accent: Arctic-Blue");
-        } else if (strcmp(themeName, "AMBER") == 0) {
+        } else if (sigma_strcmp(themeName, "AMBER") == 0) {
             sigma_log_info("[S-THEME] Mode: Retro-Cyberpunk | Accent: Neon-Orange");
-        } else if (strcmp(themeName, "PLASMA") == 0) {
+        } else if (sigma_strcmp(themeName, "PLASMA") == 0) {
             sigma_log_info("[S-THEME] Mode: Deep-Space | Accent: Violet");
-        } else if (strcmp(themeName, "FORENSIC") == 0) {
+        } else if (sigma_strcmp(themeName, "FORENSIC") == 0) {
             sigma_log_info("[S-THEME] Mode: High-Clarity-Minimal | Accent: Crimson");
         }
         sigma_log_info("[S-THEME] Rendering pipeline re-sealed.");
