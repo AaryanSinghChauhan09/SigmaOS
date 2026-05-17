@@ -1,7 +1,6 @@
 #ifndef SIGMA_HAL_H
 #define SIGMA_HAL_H
 
-#include "../core/sigma_types.h"
 #include "../SigmaOOP.hpp"
 
 #ifdef __cplusplus

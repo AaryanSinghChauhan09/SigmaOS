@@ -26,13 +26,16 @@ Extends: [`AgentOptions`](/docs/docs/api/Agent.md#parameter-agentoptions)
 
 This will instantiate the MockAgent. It will not do anything until registered as the agent to use with requests and mock interceptions are added.
 
+
 ```js
 import { MockAgent } from 'undici'
 
 const mockAgent = new MockAgent()
+
 ```
 
 ### Example - Basic MockAgent instantiation with custom agent
+
 
 ```js
 import { Agent, MockAgent } from 'undici'
@@ -40,6 +43,7 @@ import { Agent, MockAgent } from 'undici'
 const agent = new Agent()
 
 const mockAgent = new MockAgent({ agent })
+
 ```
 
 ## Instance Methods
@@ -71,6 +75,7 @@ Returns: `MockClient | MockPool`.
 
 #### Example - Basic Mocked Request
 
+
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
 
@@ -87,9 +92,11 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 ```
 
 #### Example - Basic Mocked Request with local mock agent dispatcher
+
 
 ```js
 import { MockAgent, request } from 'undici'
@@ -109,9 +116,11 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 ```
 
 #### Example - Basic Mocked Request with local mock pool dispatcher
+
 
 ```js
 import { MockAgent, request } from 'undici'
@@ -131,9 +140,11 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 ```
 
 #### Example - Basic Mocked Request with local mock client dispatcher
+
 
 ```js
 import { MockAgent, request } from 'undici'
@@ -153,9 +164,11 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 ```
 
 #### Example - Basic Mocked requests with multiple intercepts
+
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -182,9 +195,11 @@ console.log('response received', result2.statusCode) // response received 200
 for await (const data of result2.body) {
   console.log('data', data.toString('utf8')) // data hello
 }
+
 ```
 
 #### Example - Mock different requests within the same file
+
 
 ```js
 const { MockAgent, setGlobalDispatcher } = require('undici');
@@ -201,9 +216,11 @@ describe('Test', () => {
     // your test
   });
 });
+
 ```
 
 #### Example - Mocked request with query body, headers and trailers
+
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -240,9 +257,11 @@ for await (const data of body) {
 }
 
 console.log('trailers', trailers) // { 'content-md5': 'test' }
+
 ```
 
 #### Example - Mocked request with origin regex
+
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -263,9 +282,11 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 ```
 
 #### Example - Mocked request with origin function
+
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -286,6 +307,7 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 ```
 
 ### `MockAgent.close()`
@@ -296,6 +318,7 @@ Returns: `Promise<void>`
 
 #### Example - clean up after tests are complete
 
+
 ```js
 import { MockAgent, setGlobalDispatcher } from 'undici'
 
@@ -303,6 +326,7 @@ const mockAgent = new MockAgent()
 setGlobalDispatcher(mockAgent)
 
 await mockAgent.close()
+
 ```
 
 ### `MockAgent.dispatch(options, handlers)`
@@ -314,6 +338,7 @@ Implements [`Agent.dispatch(options, handlers)`](/docs/docs/api/Agent.md#paramet
 See [`Dispatcher.request(options [, callback])`](/docs/docs/api/Dispatcher.md#dispatcherrequestoptions-callback).
 
 #### Example - MockAgent request
+
 
 ```js
 import { MockAgent } from 'undici'
@@ -337,6 +362,7 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 ```
 
 ### `MockAgent.deactivate()`
@@ -347,6 +373,7 @@ Returns: `void`
 
 #### Example - Deactivate Mocking
 
+
 ```js
 import { MockAgent, setGlobalDispatcher } from 'undici'
 
@@ -354,6 +381,7 @@ const mockAgent = new MockAgent()
 setGlobalDispatcher(mockAgent)
 
 mockAgent.deactivate()
+
 ```
 
 ### `MockAgent.activate()`
@@ -363,6 +391,7 @@ This method enables mocking in a MockAgent instance. When instantiated, a MockAg
 Returns: `void`
 
 #### Example - Activate Mocking
+
 
 ```js
 import { MockAgent, setGlobalDispatcher } from 'undici'
@@ -375,6 +404,7 @@ mockAgent.deactivate()
 
 // Later
 mockAgent.activate()
+
 ```
 
 ### `MockAgent.enableNetConnect([host])`
@@ -391,6 +421,7 @@ Returns: `void`
 
 #### Example - Allow all non-matching urls to be dispatched in a real HTTP request
 
+
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
 
@@ -401,9 +432,11 @@ mockAgent.enableNetConnect()
 
 await request('http://example.com')
 // A real request is made
+
 ```
 
 #### Example - Allow requests matching a host string to make real requests
+
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -422,9 +455,11 @@ await request('http://example-2.com:8080')
 
 await request('http://example-3.com')
 // Will throw
+
 ```
 
 #### Example - Allow requests matching a host regex to make real requests
+
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -436,9 +471,11 @@ mockAgent.enableNetConnect(new RegExp('example.com'))
 
 await request('http://example.com')
 // A real request is made
+
 ```
 
 #### Example - Allow requests matching a host function to make real requests
+
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -450,6 +487,7 @@ mockAgent.enableNetConnect((value) => value === 'example.com')
 
 await request('http://example.com')
 // A real request is made
+
 ```
 
 ### `MockAgent.disableNetConnect()`
@@ -460,6 +498,7 @@ Returns: `void`
 
 #### Example - Disable all non-matching requests by throwing an error for each
 
+
 ```js
 import { MockAgent, request } from 'undici'
 
@@ -469,6 +508,7 @@ mockAgent.disableNetConnect()
 
 await request('http://example.com')
 // Will throw
+
 ```
 
 ### `MockAgent.pendingInterceptors()`
@@ -484,6 +524,7 @@ This method returns any pending interceptors registered on a mock agent. A pendi
 Returns: `PendingInterceptor[]` (where `PendingInterceptor` is a `MockDispatch` with an additional `origin: string`)
 
 #### Example - List all pending interceptors
+
 
 ```js
 const agent = new MockAgent()
@@ -516,6 +557,7 @@ const pendingInterceptors = agent.pendingInterceptors()
 //     origin: 'https://example.com'
 //   }
 // ]
+
 ```
 
 ### `MockAgent.assertNoPendingInterceptors([options])`
@@ -529,6 +571,7 @@ This method throws if the mock agent has any pending interceptors. A pending int
 - Is registered with `.times(<number>)` and has not been invoked `<number>` of times.
 
 #### Example - Check that there are no pending interceptors
+
 
 ```js
 const agent = new MockAgent()
@@ -549,6 +592,7 @@ agent.assertNoPendingInterceptors()
 // ├─────────┼────────┼───────────────────────┼──────┼─────────────┼────────────┼─────────────┼───────────┤
 // │    0    │ 'GET'  │ 'https://example.com' │ '/'  │     200     │    '❌'    │      0      │     1     │
 // └─────────┴────────┴───────────────────────┴──────┴─────────────┴────────────┴─────────────┴───────────┘
+
 ```
 
 #### Example - access call history on MockAgent
@@ -556,6 +600,7 @@ agent.assertNoPendingInterceptors()
 You can register every call made within a MockAgent to be able to retrieve the body, headers and so on.
 
 This is not enabled by default.
+
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -579,17 +624,21 @@ mockAgent.getCallHistory()?.firstCall()
 //   host: 'example.com',
 //   port: ''
 // }
+
 ```
 
 #### Example - clear call history
+
 
 ```js
 const mockAgent = new MockAgent()
 
 mockAgent.clearAllCallHistory()
+
 ```
 
 #### Example - call history instance class method
+
 
 ```js
 const mockAgent = new MockAgent()
@@ -606,4 +655,5 @@ mockAgentHistory?.filterCalls(/"data": "{}"/) // returns an Array of MockCallHis
 mockAgentHistory?.filterCalls('application/json') // returns an Array of MockCallHistoryLogs where any value === 'application/json'
 mockAgentHistory?.filterCalls((log) => log.path === '/endpoint') // returns an Array of MockCallHistoryLogs when given function returns true
 mockAgentHistory?.clear() // clear the history
+
 ```

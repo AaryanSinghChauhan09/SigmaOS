@@ -1,4 +1,4 @@
-﻿# PULL REQUEST TEMPLATE
+# PULL REQUEST TEMPLATE
 
 ---
 name: Pull Request

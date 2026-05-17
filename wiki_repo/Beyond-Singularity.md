@@ -25,7 +25,7 @@ SigmaOS Zenith v15.0 has transitioned into the **Beyond Singularity** phase, imp
 
 ### Implementation
 
-- **Lattice-Based Cryptography**: Integration of **Kyber-1024** for key encapsulation and **Dilithium-5** for signature verification.
+- **Lattice-Based Cryptography**: Integration of **Kyber-1024**for key encapsulation and**Dilithium-5** for signature verification.
 
 - **Encrypted Snapshots**: Every shard snapshot is now sealed with a unique quantum-resistant key, ensuring data sovereignty even against future compute-adversaries.
 

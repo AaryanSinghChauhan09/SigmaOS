@@ -18,7 +18,7 @@ The **SovereignCompliance** shard ensures that all cryptographic operations use 
 
 ## 🌀 Post-Quantum Cryptography (#43)
 
-SigmaOS utilizes **CRYSTALS-Kyber** and **CRYSTALS-Dilithium** as its primary cryptographic primitives for the Sovereign Lattice.
+SigmaOS utilizes **CRYSTALS-Kyber**and**CRYSTALS-Dilithium** as its primary cryptographic primitives for the Sovereign Lattice.
 
 - **Kyber (KEM)**: Secures inter-shard key exchange and network handshakes.
 

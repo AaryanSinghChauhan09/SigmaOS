@@ -1,6 +1,6 @@
 # Sovereign Driver Framework (SDF)
 
-The **Sovereign Driver Framework (SDF)** is the unified hardware orchestration layer for **SigmaOS v15.0 "Horizon"**. It provides a professional, object-oriented interface for sharding physical hardware into the microkernel lattice.
+The **Sovereign Driver Framework (SDF)**is the unified hardware orchestration layer for**SigmaOS v15.0 "Horizon"**. It provides a professional, object-oriented interface for sharding physical hardware into the microkernel lattice.
 
 ## 🏛 Architecture
 

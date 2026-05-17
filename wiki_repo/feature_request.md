@@ -1,4 +1,4 @@
-﻿# feature request
+# feature request
 
 ---
 name: Feature Request / New Shard

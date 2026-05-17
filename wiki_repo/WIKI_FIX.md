@@ -34,6 +34,7 @@ The GitHub Wiki uses a specific slug format. All relative links must point to th
 
 To automate Wiki synchronization, use the following GitHub Action pattern in your `.github/workflows/wiki-sync.yml`:
 
+
 ```yaml
 
 - name: Push to Wiki
@@ -41,5 +42,6 @@ To automate Wiki synchronization, use the following GitHub Action pattern in you
   with:
     path: docs/
     token: ${{ secrets.GITHUB_TOKEN }}
+
 
 ```

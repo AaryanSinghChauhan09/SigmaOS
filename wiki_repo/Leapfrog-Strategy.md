@@ -22,7 +22,7 @@ Based on architectural analysis, the following pillars are prioritized for immed
 
 ### 1. The Automation Advantage
 
-By implementing **Self-Healing Kernel Watchdogs** and **Workflow Rule Engines**, SigmaOS reduces the maintenance burden that plagues traditional Linux distributions. The OS should manage itself, allowing the user to focus on their profession.
+By implementing **Self-Healing Kernel Watchdogs**and**Workflow Rule Engines**, SigmaOS reduces the maintenance burden that plagues traditional Linux distributions. The OS should manage itself, allowing the user to focus on their profession.
 
 ### 2. Personalization through Professions
 
@@ -34,7 +34,7 @@ The **Linux Compatibility Layer** is the bridge that allows users to transition 
 
 ### 4. Strategic Niche Targeting
 
-We don't aim to replace Linux everywhere at once. We dominate **Sovereign Silicon** and **High-Security Professional Environments** where trust and performance are non-negotiable. Once established, the polished UX will pull in general power users.
+We don't aim to replace Linux everywhere at once. We dominate **Sovereign Silicon**and**High-Security Professional Environments** where trust and performance are non-negotiable. Once established, the polished UX will pull in general power users.
 
 ---
 

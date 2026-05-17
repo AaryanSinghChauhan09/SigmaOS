@@ -9,7 +9,7 @@ The **RTOS** format is designed for mission-critical industrial deployments (Bio
 ## 🛠️ Bundled Industrial Tools
 
 | Tool | Category | Linux/Windows Equivalent | Purpose |
-|------|----------|--------------------------|---------|
+|---|---|---|---|
 | **SovereignSynth** | Creative | LMMS / Ardour | Real-time audio processing and synthesis shards. |
 
 | **SovereignOscilloscope** | Engineering | PulseView / Signal Analyzer | Logic analysis for embedded hardware shards. |

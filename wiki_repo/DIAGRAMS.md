@@ -6,6 +6,7 @@ This document contains visual representations of SigmaOS's core architectural pa
 
 Shard autonomy allows individual components (shards) of SigmaOS to run in isolation, fail gracefully, and restart without affecting the rest of the system.
 
+
 ```mermaid
 graph TD
     A[Sovereign Dispatcher] --> B[S-MM Memory Shard]
@@ -20,11 +21,13 @@ graph TD
         C -.->|No impact| D
         E -.->|No impact| D
     end
+
 ```
 
 ## 2. Lattice Flexibility
 
 Lattice Flexibility represents how the microkernel structure allows shards to dynamically interconnect and form a cohesive system depending on the target format (Core, Browser, App, Dualboot, Standalone).
+
 
 ```mermaid
 graph LR
@@ -43,11 +46,13 @@ graph LR
         H --> L(Browser Environment)
         J --> M(Secure Server)
     end
+
 ```
 
 ## 3. CI/CD Flow
 
 The automated pipeline ensures that every commit to the SigmaOS repository is rigorously tested for performance, security, and stability before merging.
+
 
 ```mermaid
 sequenceDiagram
@@ -68,4 +73,5 @@ sequenceDiagram
     else Tests Fail
         CI-->>Dev: Send Failure Report
     end
+
 ```

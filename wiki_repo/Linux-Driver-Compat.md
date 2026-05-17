@@ -50,7 +50,7 @@ The `SovereignLinuxCompat` engine will:
 
 ## 🚦 Strategic Advantage
 
-By offering a seamless path for existing Linux tools and drivers, SigmaOS eliminates the primary friction point for switching. Users get the **Stability of SigmaOS** with the **Compatibility of Linux**.
+By offering a seamless path for existing Linux tools and drivers, SigmaOS eliminates the primary friction point for switching. Users get the **Stability of SigmaOS**with the**Compatibility of Linux**.
 
 ---
 

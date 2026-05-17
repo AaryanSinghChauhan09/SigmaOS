@@ -29,6 +29,7 @@ SigmaOS is available in multiple professional formats to ensure total industrial
 
 To build a specific edition of SigmaOS, switch to the corresponding branch and execute the industrial build command:
 
+
 ```bash
 
 # 1. Switch to your desired format branch
@@ -38,11 +39,13 @@ git checkout release/standalone
 # 2. Build the edition-specific ISO/Image
 
 make zenith-standalone-iso
+
 ```
 
 ### 📦 Unified Package Management
 
 Every format supports the `sigma-pkg` utility for cross-format shard synchronization:
+
 
 ```bash
 
@@ -53,13 +56,14 @@ sigma-pkg sync
 # Install format-specific industrial layers
 
 sigma-pkg layer standalone
+
 ```
 
 ---
 
 ## 🛤️ Release Philosophy
 
-SigmaOS follows a **Strict Parity Protocol**. While the deployment format varies (Bare metal vs. WASM), the underlying **Sovereign Kernel** and **Lattice Algorithms** remain identical. This ensures that a security audit performed on the Standalone version is mathematically valid for the App version.
+SigmaOS follows a **Strict Parity Protocol**. While the deployment format varies (Bare metal vs. WASM), the underlying **Sovereign Kernel**and**Lattice Algorithms** remain identical. This ensures that a security audit performed on the Standalone version is mathematically valid for the App version.
 
 ---
 

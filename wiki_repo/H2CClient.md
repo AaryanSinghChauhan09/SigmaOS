@@ -6,6 +6,7 @@ A basic H2C client.
 
 ### Example
 
+
 ```js
 const { createServer } = require('node:http2')
 const { once } = require('node:events')
@@ -26,13 +27,14 @@ once(server, 'listening').then(() => {
     console.log(text) // Hello, world!
   })
 })
+
 ```
 
 ## `new H2CClient(url[, options])`
 
 Arguments:
 
-- **url** `URL | string` - Should only include the **protocol, hostname, and port**. It only supports `http` protocol.
+- **url**`URL | string` - Should only include the**protocol, hostname, and port**. It only supports `http` protocol.
 
 - **options** `H2CClientOptions` (optional)
 
@@ -62,7 +64,7 @@ Returns: `H2CClient`
 
 - **connect** `ConnectOptions | null` (optional) - Default: `null`.
 
-- **strictContentLength** `Boolean` (optional) - Default: `true` - Whether to treat request content length mismatches as errors. If true, an error is thrown when the request content-length header doesn't match the length of the request body. **Security Warning:** Disabling this option can expose your application to HTTP Request Smuggling attacks, where mismatched content-length headers cause servers and proxies to interpret request boundaries differently. This can lead to cache poisoning, credential hijacking, and bypassing security controls. Only disable this in controlled environments where you fully trust the request source.
+- **strictContentLength**`Boolean` (optional) - Default: `true` - Whether to treat request content length mismatches as errors. If true, an error is thrown when the request content-length header doesn't match the length of the request body.**Security Warning:** Disabling this option can expose your application to HTTP Request Smuggling attacks, where mismatched content-length headers cause servers and proxies to interpret request boundaries differently. This can lead to cache poisoning, credential hijacking, and bypassing security controls. Only disable this in controlled environments where you fully trust the request source.
 
 - **autoSelectFamily**: `boolean` (optional) - Default: depends on local Node version, on Node 18.13.0 and above is `false`. Enables a family autodetection algorithm that loosely implements section 5 of [RFC 8305](https://tools.ietf.org/html/rfc8305#section-5). See [here](https://nodejs.org/api/net.html#socketconnectoptions-connectlistener) for more details. This option is ignored if not supported by the current Node version.
 
@@ -84,11 +86,13 @@ Returns: `H2CClient`
 
 This will instantiate the undici H2CClient, but it will not connect to the origin until something is queued. Consider using `client.connect` to prematurely connect to the origin, or just call `client.request`.
 
+
 ```js
 "use strict";
 import { H2CClient } from "undici";
 
 const client = new H2CClient("http://localhost:3000");
+
 ```
 
 ## Instance Methods
@@ -163,6 +167,7 @@ Emitted when a socket has been created and connected. The client will connect on
 
 #### Example - Client connect event
 
+
 ```js
 import { createServer } from "node:http2";
 import { H2CClient } from "undici";
@@ -194,6 +199,7 @@ try {
   client.close();
   server.close();
 }
+
 ```
 
 ### Event: `'disconnect'`
@@ -211,6 +217,7 @@ Parameters:
 Emitted when socket has disconnected. The error argument of the event is the error which caused the socket to disconnect. The client will reconnect if or once `client.size > 0`.
 
 #### Example - Client disconnect event
+
 
 ```js
 import { createServer } from "node:http2";
@@ -239,6 +246,7 @@ try {
   client.close();
   server.close();
 }
+
 ```
 
 ### Event: `'drain'`
@@ -248,6 +256,7 @@ Emitted when pipeline is no longer busy.
 See [Dispatcher Event: `'drain'`](/docs/docs/api/Dispatcher.md#event-drain).
 
 #### Example - Client drain event
+
 
 ```js
 import { createServer } from "node:http2";
@@ -277,6 +286,7 @@ const requests = [
 await Promise.all(requests);
 
 console.log("requests completed");
+
 ```
 
 ### Event: `'error'`

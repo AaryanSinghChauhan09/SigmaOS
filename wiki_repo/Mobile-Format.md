@@ -9,7 +9,7 @@ The **Mobile** format provides the user-facing app ecosystem. It bundles creativ
 ## 🛠️ Bundled Productivity Tools
 
 | Tool | Category | Linux/Windows Equivalent | Purpose |
-|------|----------|--------------------------|---------|
+|---|---|---|---|
 | **ZenithCapture** | Multimedia | Bandicam / OBS Studio | High-performance screen and shard recording. |
 
 | **SovereignPDF** | Productivity | iLovePDF / LibreOffice | PQC-signed document management and PDF editing. |

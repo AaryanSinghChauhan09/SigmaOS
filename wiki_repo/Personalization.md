@@ -2,7 +2,7 @@
 
 1
 
-SigmaOS provides an unparalleled level of system-level customization through its **Zenith Persona** and **Morphic Dashboard** shards.
+SigmaOS provides an unparalleled level of system-level customization through its **Zenith Persona**and**Morphic Dashboard** shards.
 
 ---
 

@@ -26,6 +26,7 @@ When passing an object as the second argument, the following options are availab
 
 This example will not work in browsers or other platforms that don't allow passing an object.
 
+
 ```js
 import { WebSocket, ProxyAgent } from 'undici'
 
@@ -35,14 +36,17 @@ const ws = new WebSocket('wss://echo.websocket.events', {
   dispatcher: proxyAgent,
   protocols: ['echo', 'chat']
 })
+
 ```
 
 If you do not need a custom Dispatcher, it's recommended to use the following pattern:
+
 
 ```js
 import { WebSocket } from 'undici'
 
 const ws = new WebSocket('wss://echo.websocket.events', ['echo', 'chat'])
+
 ```
 
 ### Example with HTTP/2
@@ -55,6 +59,7 @@ const ws = new WebSocket('wss://echo.websocket.events', ['echo', 'chat'])
 
 This example will not work in browsers or other platforms that don't allow passing an object.
 
+
 ```js
 import { Agent } from 'undici'
 
@@ -64,6 +69,7 @@ const ws = new WebSocket('wss://echo.websocket.events', {
   dispatcher: agent,
   protocols: ['echo', 'chat']
 })
+
 ```
 
 # Class: WebSocketStream
@@ -82,12 +88,13 @@ Arguments:
 
 ### WebSocketStream Example
 
+
 ```js
 const stream = new WebSocketStream('https://echo.websocket.org/')
 const { readable, writable } = await stream.opened
 
 async function read () {
-  /** @type {ReadableStreamReader} */
+  /**@type {ReadableStreamReader}*/
   const reader = readable.getReader()
 
   while (true) {
@@ -99,7 +106,7 @@ async function read () {
 }
 
 async function write () {
-  /** @type {WritableStreamDefaultWriter} */
+  /**@type {WritableStreamDefaultWriter}*/
   const writer = writable.getWriter()
   writer.write('Hello, world!')
   writer.releaseLock()
@@ -108,6 +115,7 @@ async function write () {
 read()
 
 setInterval(() => write(), 5000)
+
 
 ```
 
@@ -123,6 +131,7 @@ Sends a ping frame to the WebSocket server. The server must respond with a pong 
 
 ### Example
 
+
 ```js
 import { WebSocket, ping } from 'undici'
 
@@ -136,6 +145,7 @@ ws.addEventListener('open', () => {
   const payload = Buffer.from('hello')
   ping(ws, payload)
 })
+
 ```
 
 **Note**: A ping frame cannot have a payload larger than 125 bytes. The ping will only be sent if the WebSocket connection is in the OPEN state.

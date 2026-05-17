@@ -23,7 +23,9 @@ SigmaOS provides a native `sigma-game-mode` shard that dynamically reconfigures 
 ## 🚀 How to Enable
 
 Run the following in the Sovereign CLI:
+
 ```bash
 sigma-cli install sigma-game-mode
 sigma-cli profile set gaming
+
 ```

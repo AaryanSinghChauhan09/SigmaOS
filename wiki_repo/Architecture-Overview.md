@@ -50,12 +50,12 @@
 ---
 1 1
 
-SHS merges the **stability of Fedora's CFS** with the **priority-based preemptive scheduling of Windows**.
+SHS merges the **stability of Fedora's CFS**with the**priority-based preemptive scheduling of Windows**.
 
 1 1
 1 1
 
-Combines **openSUSE Snapper-style CoW snapshots** with **Windows-style System Restore checkpoints**, allowing for absolute state recovery at any lattice layer.
+Combines **openSUSE Snapper-style CoW snapshots**with**Windows-style System Restore checkpoints**, allowing for absolute state recovery at any lattice layer.
 
 1 All Inter-Shard communication in v11.0 is **Zero-Trust**. Every packet is:
 1 1
@@ -63,7 +63,7 @@ Combines **openSUSE Snapper-style CoW snapshots** with **Windows-style System Re
 ---
 1 1
 
-SigmaOS implements a **Fast Startup** mechanism inspired by Windows. At shutdown, the kernel state and critical driver shards are serialized to a silicon-direct snapshot. During boot, the system bypasses traditional hardware re-init, restoring the lattice in **under 0.8s**.
+SigmaOS implements a **Fast Startup**mechanism inspired by Windows. At shutdown, the kernel state and critical driver shards are serialized to a silicon-direct snapshot. During boot, the system bypasses traditional hardware re-init, restoring the lattice in**under 0.8s**.
 
 1 The memory manager uses a **Neural Network (S09)** to predict which shards will be needed next based on user intent. Predicted shards are pre-loaded from NVMe to DRAM, reducing effective latency to near-zero.
 
@@ -82,7 +82,7 @@ SigmaOS implements a **Fast Startup** mechanism inspired by Windows. At shutdown
 ---
 1 SigmaOS integrates reinforcement learning models directly into the kernel scheduler and memory manager. The **AI Watchdog** (S09) predicts resource contention and preemptively triggers rollbacks or re-sharding.
 
-1 All sovereign events are logged in structured **JSON/CSV** formats by the **Sovereign Data Science Shard** (S17). This data powers the `sigma-top` dashboard and predictive analytics.
+1 All sovereign events are logged in structured **JSON/CSV**formats by the**Sovereign Data Science Shard** (S17). This data powers the `sigma-top` dashboard and predictive analytics.
 
 1 The **HAL** (S04) implements plug-and-play detection. Drivers are loaded as atomic shards. Fallback drivers ensure basic I/O availability.
 

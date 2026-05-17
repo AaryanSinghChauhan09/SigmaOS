@@ -2,9 +2,7 @@
 
 1
 
-**Parity:** kpatch � ksplice � Linux `livepatch` � Oracle Ksplice
-**Location:** `kernel/modules/system/SovereignHotpatchShard.c`
-**Standard:** Zenith Industrial Sovereignty v1.0
+**Parity:**kpatch � ksplice � Linux `livepatch` � Oracle Ksplice**Location:**`kernel/modules/system/SovereignHotpatchShard.c`**Standard:** Zenith Industrial Sovereignty v1.0
 
 ---
 

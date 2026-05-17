@@ -57,6 +57,24 @@ Sovereign boot validation with PQC.
 
 **C API:** `secboot_init()`, `secboot_verify()`, `secboot_set_mode()`, `secboot_report()`
 
+### Sigma SystemCtl (`tools/sigma_systemctl.cpp`)
+
+Service management and init orchestrator.
+
+- Deterministic, parallelized dependency resolution for background daemons
+- Replaces legacy systemd with atomic, C++ native logic
+
+**C API:** `sysctl_init()`, `sysctl_start()`, `sysctl_stop()`, `sysctl_status()`
+
+### Sigma Container Engine (`tools/sigma_container_engine.cpp`)
+
+Daemonless, rootless container engine.
+
+- Directly orchestrates memory bounds and kernel namespaces
+- Sandboxes workloads using Sovereign boundaries rather than cgroups
+
+**C API:** `container_init()`, `container_run()`, `container_stop()`
+
 ---
 
 ## 🎮 Gaming & Multimedia

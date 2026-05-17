@@ -2,6 +2,7 @@
 
 ## 1. Sovereign Network Stack (S-NET)
 
+
 ```mermaid
 graph TD
     A[Silicon NIC] --> B[SovereignNetStack Shard]
@@ -10,9 +11,11 @@ graph TD
     C --> E[sigma-pkg Fetcher]
     D --> E
     E --> F[Repository Sync]
+
 ```
 
 ## 2. Sovereign File System (S-VFS)
+
 
 ```mermaid
 graph TD
@@ -22,9 +25,11 @@ graph TD
     C --> E[Physical Storage]
     D --> E
     E --> F[Atomic Rollback Shard]
+
 ```
 
 ## 3. AI Telemetry & Adaptive Scheduling
+
 
 ```mermaid
 graph LR
@@ -33,9 +38,11 @@ graph LR
     C --> D[Adaptive Scheduler]
     D --> E[Shard Rebalancing]
     E --> F[Performance Optimization]
+
 ```
 
 ## 4. Package Management (sigma-pkg)
+
 
 ```mermaid
 graph TD
@@ -44,4 +51,5 @@ graph TD
     C --> D[Sandbox Provisioner]
     D --> E[S-VFS Isolation]
     E --> F[Lattice Integration]
+
 ```

@@ -78,4 +78,4 @@ SigmaOS enforces Dilithium-5 and Kyber-1024 at the shard boundary. Even if a gue
 
 Zero-data remanence is enforced via the storage shard. Every freed memory page or closed file descriptor is immediately overwritten, meeting the highest industrial privacy standards.
 
-> *"The Zenith is the final industrial fact."* — **The SigmaOS Constitution**
+> *"The Zenith is the final industrial fact."*—**The SigmaOS Constitution**

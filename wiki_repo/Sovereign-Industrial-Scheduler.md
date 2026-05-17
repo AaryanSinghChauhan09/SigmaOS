@@ -1,6 +1,6 @@
 # Sovereign Industrial Scheduler (S-SCHED)
 
-The **Sovereign Industrial Scheduler (S-SCHED)** is the multi-tasking orchestrator for **SigmaOS v15.0 "Horizon"**. It provides deterministic, priority-based execution for the 600-shard microkernel lattice.
+The **Sovereign Industrial Scheduler (S-SCHED)**is the multi-tasking orchestrator for**SigmaOS v15.0 "Horizon"**. It provides deterministic, priority-based execution for the 600-shard microkernel lattice.
 
 ## Architecture
 
@@ -34,7 +34,7 @@ The scheduler is implemented in `kernel/core/system/SovereignScheduler.cpp`.
 
 ## Integration
 
-S-SCHED is ignited during **Stage 5** of the **Asynchronous Shard Ignition (ASI)** plan. Core system threads spawned at boot include:
+S-SCHED is ignited during **Stage 5**of the**Asynchronous Shard Ignition (ASI)** plan. Core system threads spawned at boot include:
 
 1. **Sovereign Shell (0x1001)**: The professional CLI interface.
 

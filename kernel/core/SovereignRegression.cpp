@@ -1,6 +1,5 @@
 #include "../../include/sigma_regression.h"
 #include "../../include/sigma_log.h"
-#include "../../include/SigmaOOP.hpp"
 
 /**
  * Σ SIGMAOS: SOVEREIGN HARDWARE REGRESSION MATRIX (S-REGRESS)

@@ -40,13 +40,13 @@ To reach the same level of industrial trust as Ubuntu, SigmaOS is implementing:
 | Metric | Pop!_OS | CachyOS | SigmaOS |
 | :--- | :--- | :--- | :--- |
 
-| **Automation** | High (Desktop AI) | Moderate (Arch-based) | **Supreme** (Self-Healing) |
+| **Automation**| High (Desktop AI) | Moderate (Arch-based) |**Supreme** (Self-Healing) |
 
-| **Customization** | Moderate | High | **Modular** (Atomic Shards) |
+| **Customization**| Moderate | High |**Modular** (Atomic Shards) |
 
-| **UX Polish** | Extreme | Moderate | **Premium** (Zenith UI) |
+| **UX Polish**| Extreme | Moderate |**Premium** (Zenith UI) |
 
-| **Quantum-Ready** | No | No | **Yes** (Kyber/Dilithium) |
+| **Quantum-Ready**| No | No |**Yes** (Kyber/Dilithium) |
 
 ---
 

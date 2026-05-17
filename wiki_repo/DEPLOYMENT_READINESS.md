@@ -7,25 +7,25 @@ This document tracks the final readiness of SigmaOS Zenith v15.0 based on the in
 | Component | Missing Features (Audited) | Industrial Fix (Implemented) | Status |
 | :--- | :--- | :--- | :--- |
 
-| **Kernel** | Paging, scheduler, recovery | **Demand Paging (S-VMM)**, **Fair Scheduler**, **Watchdogs** | ✅ READY |
+| **Kernel**| Paging, scheduler, recovery |**Demand Paging (S-VMM)**, **Fair Scheduler**, **Watchdogs** | ✅ READY |
 
-| **Filesystem** | Journaling, snapshots, recovery| **S-EXT2 Journaling**, **S-SNAP (CoW)**, **S-PQC Sealing** | ✅ READY |
+| **Filesystem**| Journaling, snapshots, recovery|**S-EXT2 Journaling**, **S-SNAP (CoW)**, **S-PQC Sealing** | ✅ READY |
 
-| **Networking** | IPv6, firewall, VPN | **IPv6 Support**, **S-ARMOR Firewall**, VPN stubs | ✅ READY |
+| **Networking**| IPv6, firewall, VPN |**IPv6 Support**, **S-ARMOR Firewall**, VPN stubs | ✅ READY |
 
-| **Drivers** | USB, GPU, audio, Wi-Fi | **USB (XHCI)**, **HDA Audio**, **802.11 Wi-Fi** shards | ✅ READY |
+| **Drivers**| USB, GPU, audio, Wi-Fi |**USB (XHCI)**, **HDA Audio**, **802.11 Wi-Fi** shards | ✅ READY |
 
-| **Shell** | Pipes, scripting, coreutils | **S-COREUTILS** (ls, cat, grep), Pipe/Redirection stubs | ✅ READY |
+| **Shell**| Pipes, scripting, coreutils |**S-COREUTILS** (ls, cat, grep), Pipe/Redirection stubs | ✅ READY |
 
-| **Package Mgr** | Dependency resolution, repos | **SigmaPkg** with PQC-signed shard orchestration | ✅ READY |
+| **Package Mgr**| Dependency resolution, repos |**SigmaPkg** with PQC-signed shard orchestration | ✅ READY |
 
-| **Security** | Users, permissions, logging | **UID/GID Identity Matrix**, Audit Logging active | ✅ READY |
+| **Security**| Users, permissions, logging |**UID/GID Identity Matrix**, Audit Logging active | ✅ READY |
 
-| **GUI/Desktop** | Full Zenith Desktop | **Zenith Desktop** development (CSS/Compositor-native) | 🚀 ACTIVE |
+| **GUI/Desktop**| Full Zenith Desktop |**Zenith Desktop** development (CSS/Compositor-native) | 🚀 ACTIVE |
 
 | **Virtualisation**| Hypervisor, containers | **S-HYP** Hypervisor & Namespace-isolation shards | ✅ READY |
 
-| **Docs/Wiki** | Detailed API docs, roadmap | **SigmaWiki** expanded with 600+ shard documentation | ✅ READY |
+| **Docs/Wiki**| Detailed API docs, roadmap |**SigmaWiki** expanded with 600+ shard documentation | ✅ READY |
 
 ---
 

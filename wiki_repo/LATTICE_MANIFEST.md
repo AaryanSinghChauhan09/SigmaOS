@@ -6,9 +6,7 @@ This manifest outlines the 500 individual features and functional shards that de
 
 1
 
-*Organized into: /ai, /automation, /boot, /cloud, /community, /container, /diag, /ecosystem, /fs, /hal, /hardware, /industrial, /ipc, /memory, /misc_utils, /network, /observability, /orchestration, /process, /runtime, /security, /state, /storage, /syscall, /system, /ui, /virtualization*
-
-1. **Lattice-Aware Scheduler**: AI-Native predictive allocation. [ACTIVE]
+*Organized into: /ai, /automation, /boot, /cloud, /community, /container, /diag, /ecosystem, /fs, /hal, /hardware, /industrial, /ipc, /memory, /misc_utils, /network, /observability, /orchestration, /process, /runtime, /security, /state, /storage, /syscall, /system, /ui, /virtualization*1.**Lattice-Aware Scheduler**: AI-Native predictive allocation. [ACTIVE]
 
 2. **Sovereign GDT / IDT**: Standardized segments and exception landing zones (/arch).
 

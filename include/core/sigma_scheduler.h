@@ -9,7 +9,6 @@
 #ifndef SIGMA_SCHEDULER_H
 #define SIGMA_SCHEDULER_H
 
-#include "./sigma_kernel_types.h"
 #include "../SigmaOOP.hpp"
 
 namespace SigmaOS {

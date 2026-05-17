@@ -1,8 +1,6 @@
 # Σ SIGMAOS: DECENTRALIZED GOVERNANCE MANIFESTO
 
-> **The Sovereign Lattice is governed by code, consensus, and contribution.**
-
-SigmaOS v15.0 rejects the "Benevolent Dictator for Life" (BDFL) model used by legacy projects like Linux. Instead, the project is governed by the **Sovereign Architect Consensus (SAC)**.
+> **The Sovereign Lattice is governed by code, consensus, and contribution.**SigmaOS v15.0 rejects the "Benevolent Dictator for Life" (BDFL) model used by legacy projects like Linux. Instead, the project is governed by the**Sovereign Architect Consensus (SAC)**.
 
 ---
 

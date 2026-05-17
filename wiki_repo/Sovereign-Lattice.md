@@ -4,7 +4,7 @@
 
 1
 
-The **Sovereign Lattice** is the core structural paradigm of SigmaOS. Unlike monolithic or microkernel systems, the Lattice is composed of **600+ independent atomic shards**, each responsible for a single, isolated system responsibility.
+The **Sovereign Lattice**is the core structural paradigm of SigmaOS. Unlike monolithic or microkernel systems, the Lattice is composed of**600+ independent atomic shards**, each responsible for a single, isolated system responsibility.
 
 1
 

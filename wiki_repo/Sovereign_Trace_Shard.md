@@ -2,9 +2,7 @@
 
 1
 
-**Parity:** strace � ptrace � DTrace � Frida � Windows ETW
-**Location:** `kernel/modules/core/SovereignTraceShard.c`
-**Standard:** Zenith Industrial Sovereignty v1.0
+**Parity:**strace � ptrace � DTrace � Frida � Windows ETW**Location:**`kernel/modules/core/SovereignTraceShard.c`**Standard:** Zenith Industrial Sovereignty v1.0
 
 ---
 

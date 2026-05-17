@@ -42,8 +42,8 @@
             align-items: center;
             padding: 20px 40px;
             background: rgba(11, 12, 16, 0.8);
-            backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--glass-border);
             position: sticky;
             top: 0;
@@ -297,6 +297,17 @@
             opacity: 0;
         }
 
+        .profile-icon {
+            width: 40px; height: 40px; border-radius: 50%; background: var(--glass-bg); border: 1px solid var(--glass-border); display: flex; justify-content:center; align-items:center; cursor: pointer;
+        }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+        .delay-6 { animation-delay: 0.6s; }
+        .delay-7 { animation-delay: 0.7s; }
+        .install-banner-btn { padding: 12px 30px; width: auto; }
     </style>
 </head>
 <body>
@@ -304,7 +315,7 @@
     <nav>
         <div class="brand">Σ <span>SOVEREIGN STORE</span></div>
         <input type="text" class="search-bar" placeholder="Search PQC-attested shards...">
-        <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--glass-bg); border: 1px solid var(--glass-border); display: flex; justify-content:center; align-items:center; cursor: pointer;">
+        <div class="profile-icon">
             👤
         </div>
     </nav>
@@ -325,19 +336,19 @@
         </aside>
 
         <main>
-            <div class="featured-banner animate" style="animation-delay: 0.1s;">
+            <div class="featured-banner animate delay-1">
                 <div class="banner-content">
                     <div class="banner-tag">Essential</div>
                     <h2>Sigma Shard Inspector</h2>
                     <p>Live visualization of inter-shard dependency health. Detect degraded shards, monitor memory footprints, and trace IPC payloads in real-time.</p>
-                    <button class="install-btn" style="padding: 12px 30px; width: auto;">Install Shard</button>
+                    <button class="install-btn install-banner-btn">Install Shard</button>
                 </div>
                 <div class="banner-img">🔍</div>
             </div>
 
             <div class="app-grid">
                 <!-- App 1 -->
-                <div class="app-card animate" style="animation-delay: 0.2s;">
+                <div class="app-card animate delay-2">
                     <div class="app-icon">🎛️</div>
                     <div class="app-title">Sigma Kernel Tuner</div>
                     <div class="app-desc">Live kernel parameter adjustment without reboots. Safely modify tunables with real-time validation.</div>
@@ -349,7 +360,7 @@
                 </div>
 
                 <!-- App 2 -->
-                <div class="app-card animate" style="animation-delay: 0.3s;">
+                <div class="app-card animate delay-3">
                     <div class="app-icon">⚡</div>
                     <div class="app-title">Sigma Energy Saver</div>
                     <div class="app-desc">Intelligent power scaling. Auto-switches between PERFORMANCE and ULTRA_ECO profiles based on telemetry.</div>
@@ -361,7 +372,7 @@
                 </div>
 
                 <!-- App 3 -->
-                <div class="app-card animate" style="animation-delay: 0.4s;">
+                <div class="app-card animate delay-4">
                     <div class="app-icon">🎮</div>
                     <div class="app-title">Sigma Game Library</div>
                     <div class="app-desc">Zero-overhead launching hub with direct GPU HAL access. Auto-toggles eSports Latency Optimizer.</div>
@@ -373,7 +384,7 @@
                 </div>
 
                 <!-- App 4 -->
-                <div class="app-card animate" style="animation-delay: 0.5s;">
+                <div class="app-card animate delay-5">
                     <div class="app-icon">🥽</div>
                     <div class="app-title">Sigma VR Studio</div>
                     <div class="app-desc">Sovereign spatial compositor for HMDs. Stereo 4K at 120Hz deterministic tracking for productivity.</div>
@@ -385,7 +396,7 @@
                 </div>
 
                 <!-- App 5 -->
-                <div class="app-card animate" style="animation-delay: 0.6s;">
+                <div class="app-card animate delay-6">
                     <div class="app-icon">📊</div>
                     <div class="app-title">Sigma GPU Profiler</div>
                     <div class="app-desc">Real-time graphics performance analysis. Silicon-direct VRAM and shader pipeline telemetry.</div>
@@ -397,7 +408,7 @@
                 </div>
 
                 <!-- App 6 -->
-                <div class="app-card animate" style="animation-delay: 0.7s;">
+                <div class="app-card animate delay-7">
                     <div class="app-icon">🧠</div>
                     <div class="app-title">Sigma Edge ML</div>
                     <div class="app-desc">Deploy lightweight ML models on IoT devices with hardware-accelerated inference.</div>

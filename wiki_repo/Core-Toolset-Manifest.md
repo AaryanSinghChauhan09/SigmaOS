@@ -1,8 +1,6 @@
 # 🛠️ SigmaOS: Core Toolset Manifest
 
-> **The industrial baseline for every sovereign lattice format.**
-
-This manifest defines the **Default Toolset** that is guaranteed to be present in every SigmaOS v15.0 edition (Standalone, Dual-boot, Core, Browser, App, Stable, Horizon). This ensures a consistent user experience and developer API across the entire ecosystem.
+> **The industrial baseline for every sovereign lattice format.**This manifest defines the**Default Toolset** that is guaranteed to be present in every SigmaOS v15.0 edition (Standalone, Dual-boot, Core, Browser, App, Stable, Horizon). This ensures a consistent user experience and developer API across the entire ecosystem.
 
 ---
 

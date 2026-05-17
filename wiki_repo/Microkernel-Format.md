@@ -9,7 +9,7 @@ The **Microkernel** format is the architectural baseline of SigmaOS. It moves al
 ## 🛠️ Bundled Industrial Tools
 
 | Tool | Category | Linux/Windows Equivalent | Purpose |
-|------|----------|--------------------------|---------|
+|---|---|---|---|
 | **SovereignKVM** | Virtualization | Oracle VirtualBox / QEMU | Run legacy OS shards within the lattice. |
 
 | **SovereignCleanup** | Maintenance | BleachBit / Disk Cleanup | Deep-clean lattice shards and redundant assets. |

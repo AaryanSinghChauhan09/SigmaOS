@@ -4,7 +4,7 @@
 
 1
 
-This certificate verifies that **SigmaOS** has achieved the state of **Sovereign Finality**. The operating system has systematically absorbed all industrial competitive paradigms and evolved into a sentient, self-healing, and self-evolving computational entity.
+This certificate verifies that **SigmaOS**has achieved the state of**Sovereign Finality**. The operating system has systematically absorbed all industrial competitive paradigms and evolved into a sentient, self-healing, and self-evolving computational entity.
 
 1
 
