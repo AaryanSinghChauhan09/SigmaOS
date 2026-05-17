@@ -1,6 +1,7 @@
 #include "../../../include/fs/sigma_fs.h"
 #include "../../../include/sigma_log.h"
 #include "../../../include/SigmaOOP.hpp"
+#include "../../../include/sigma_mem.h"
 
 /**
  * Σ SIGMAOS: SOVEREIGN LATTICEFS (S-FS)

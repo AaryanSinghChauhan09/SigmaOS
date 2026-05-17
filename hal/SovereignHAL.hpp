@@ -45,7 +45,7 @@ public:
     void mapPageTableMemory(sigma_u64 physical_address, sigma_u64 virtual_address, sigma_u64 range_bytes);
     
     BoardTelemetry getSystemTelemetry() const;
-    void systemReset() [[noreturn]];
+    [[noreturn]] void systemReset();
 
 private:
     SovereignHAL();

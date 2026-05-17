@@ -35,7 +35,7 @@ public:
 
     void spawn_window(const char* app_name, float x, float y, float z) {
         if (!m_hmd_connected) {
-            sigma_log_error("[VRSTUDIO] Cannot spawn window: HMD not connected.");
+            sigma_log_info("[VRSTUDIO] [ERROR] Cannot spawn window: HMD not connected.");
             return;
         }
         m_active_windows++;

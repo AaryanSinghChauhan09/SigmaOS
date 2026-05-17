@@ -1,6 +1,7 @@
 #include "../../include/sigma_kernel_types.h"
 #include "../../include/sigma_log.h"
 #include "../../include/SigmaOOP.hpp"
+#include "../../include/core/sigma_types.h"
 
 /**
  * Σ SIGMAOS: SOVEREIGN PROFESSIONAL TOOLS (S-PRO)

@@ -18,13 +18,15 @@ SigmaOS implements a strict, 12-branch unified system architecture. The **Branch
 | **`release/cloud`** | Headless Virtualization Servers | Optimizes memory pages for hypervisor hosting and multi-tenant memory sharing. |
 | **`release/browser`** | In-Browser WebAssembly Runtime | Compiles core components to WebAssembly to execute in standard web browsers. |
 | **`release/app`** | App-Store Sandbox Containers | Configures static container sandboxes with locked filesystem access profiles. |
-| **`performance-optimized`**| Aggressively Vectorized Machines | Enables SIMD auto-vectorization (AVX-512/ARM Neon) at compile-time for max PQC throughput. |
+| **`performance-optimized`** | Aggressively Vectorized Machines | Enables SIMD auto-vectorization (AVX-512/ARM Neon) at compile-time for max PQC throughput. |
 | **`gh-pages`** | High-Performance Static Web | Serves the interactive desktop UI simulator, documentation, and live app installer guides. |
 
 ---
 
 ## 🔄 The S-BUSE Parity Pipeline
+
 To prevent repository fragmentation and keep all 12 branches perfectly uniform:
+
 1. All changes, bugfixes, and C++ modules are developed and committed onto `main`.
 2. The Branch Uniformity & Synchronization Engine (`tools/sync_all_branches.py`) programmatically checks out each target branch, resets its workspace head to `main`, and force-pushes back to remote.
 3. This guarantees bit-perfect uniformity and instant updates across all branches with zero merge conflicts!

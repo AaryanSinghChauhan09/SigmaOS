@@ -79,7 +79,7 @@ bool SovereignNetStackEngine::fetchPackageReliably(const char* url, void* buffer
 } // namespace SigmaOS
 
 extern "C" {
-    void net_init(const SigmaOS::Net::sigma_net_config_t* config) {
+    void net_stack_init(const SigmaOS::Net::sigma_net_config_t* config) {
         SigmaOS::Net::SovereignNetStackEngine::getInstance().init(config);
     }
 

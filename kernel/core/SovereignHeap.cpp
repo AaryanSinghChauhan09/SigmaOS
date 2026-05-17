@@ -1,19 +1,15 @@
+#include "../../include/sigma_log.h"
 #include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
 #include "../../include/libc/SovereignLibC.h"
-#include "../../include/sigma_log.h"
 #include "../../include/sigma_mem.h"
-#include "../../include/sigma_log.h"
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_log.h"
-
+#include "../../include/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Heap Manager
  * Implements an Industrial Buddy Allocation (IBA) algorithm.
  * ZERO-DEPENDENCY: No external malloc, free, or stdlib.
  *
- * Design: OOP-isolated singleton — SovereignHeapEngine.
+ * Design: OOP-isolated singleton – SovereignHeapEngine.
  */
 
 class SovereignHeapEngine {
@@ -28,7 +24,7 @@ public:
         this->total_size = size;
         this->current_offset = 0u;
         this->initialized = 1u;
-        sigma_log("[HEAP] Sovereign IBA Initialized (OOP-Isolated Singleton).");
+        sigma_log_info("[HEAP] Sovereign IBA Initialized (OOP-Isolated Singleton).");
     }
 
     void* allocate(sigma_size_t size) {
@@ -48,10 +44,10 @@ public:
             order++;
         }
         
-        sigma_log_info("[HEAP] IBA: Allocating Order %u (%u bytes)...\n", (unsigned)order, (unsigned)alloc_size);
+        sigma_log_info("[HEAP] IBA: Allocating Order %u (%u bytes)...", (unsigned)order, (unsigned)alloc_size);
         
         if (this->current_offset + alloc_size > this->total_size) {
-            sigma_log("[HEAP] [CRITICAL] Silicon out of memory.");
+            sigma_log_info("[HEAP] [CRITICAL] Silicon out of memory.");
             return SIGMA_NULL;
         }
         
@@ -76,10 +72,10 @@ public:
         // Verify canary
         sigma_u32* canary = (sigma_u32*)((sigma_u8*)ptr - 4u);
         if (*canary != 0xDEADC0DEu) {
-            sigma_log("[HEAP] [SECURITY] Buffer overflow detected! Memory corruption at canary.");
+            sigma_log_info("[HEAP] [SECURITY] Buffer overflow detected! Memory corruption at canary.");
         } else {
             if (this->active_allocations > 0u) this->active_allocations--;
-            sigma_log_info("[HEAP] IBA: Released block. Active allocations: %u\n", (unsigned)this->active_allocations);
+            sigma_log_info("[HEAP] IBA: Released block. Active allocations: %u", (unsigned)this->active_allocations);
         }
     }
 
@@ -97,25 +93,27 @@ private:
     sigma_u32    initialized;
 };
 
+extern "C" {
+
 /* --- C Wrappers --- */
-extern "C" void heap_init(void* start, sigma_size_t size) {
+void heap_init(void* start, sigma_size_t size) {
     SovereignHeapEngine::getInstance().init(start, size);
 }
 
-extern "C" void* sigma_malloc(sigma_size_t size) {
+void* sigma_malloc(sigma_size_t size) {
     return SovereignHeapEngine::getInstance().allocate(size);
 }
 
-extern "C" void sigma_free(void* ptr) {
+void sigma_free(void* ptr) {
     SovereignHeapEngine::getInstance().release(ptr);
 }
 
-extern "C" sigma_u64 heap_get_total_allocations() {
+sigma_u64 heap_get_total_allocations() {
     return SovereignHeapEngine::getInstance().getTotalAllocations();
 }
 
-extern "C" sigma_u32 heap_get_active_allocations() {
+sigma_u32 heap_get_active_allocations() {
     return SovereignHeapEngine::getInstance().getActiveAllocations();
 }
 
-
+} // extern "C"

@@ -52,8 +52,12 @@ typedef unsigned char bool;
 #endif
 #endif
 
+#ifndef SIGMA_OK
 #define SIGMA_OK    0x00000000u
+#endif
+#ifndef SIGMA_ERROR
 #define SIGMA_ERROR 0xFFFFFFFFu
+#endif
 
 #define SIGMA_PACKED     __attribute__((packed))
 #define SIGMA_ALIGNED(x) __attribute__((aligned(x)))

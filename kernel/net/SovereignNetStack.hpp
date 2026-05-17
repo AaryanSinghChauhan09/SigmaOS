@@ -53,7 +53,7 @@ private:
 } // namespace SigmaOS
 
 extern "C" {
-    void net_init(const SigmaOS::Net::sigma_net_config_t* config);
+    void net_stack_init(const SigmaOS::Net::sigma_net_config_t* config);
     void net_send_packet(const void* data, sigma_u32 len);
     void net_receive_packet(void* buffer, sigma_u32* len);
     void net_report_stats();

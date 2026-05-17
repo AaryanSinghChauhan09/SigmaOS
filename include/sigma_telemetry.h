@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN SYSTEM TELEMETRY (SST)
  * =========================================================================
@@ -25,7 +25,7 @@ typedef struct {
 /* --- Telemetry Primitives --- */
 void telemetry_init(void);
 sigma_telemetry_data_t telemetry_get_snapshot(void);
-void telemetry_log_shard_event(uint32_t shard_id, const char* event);
+void telemetry_log_shard_event(sigma_u32 shard_id, const char* event);
 
 #ifdef __cplusplus
 }
