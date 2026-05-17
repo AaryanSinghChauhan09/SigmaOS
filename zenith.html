@@ -420,7 +420,7 @@
         </div>
 
         <!-- App: AI/ML Studio & Multi-Agent Orchestrator -->
-        <div class="window" id="sigma-ai-studio-win" style="width: 780px; height: 580px; display: none;">
+        <div class="window" id="sigma-ai-studio-win" style="width: 820px; height: 600px; display: none;">
             <div class="window-header">
                 <div class="window-title">🤖 <span>Sovereign AI/ML Studio</span></div>
                 <div class="window-controls">
@@ -429,36 +429,82 @@
                     <div class="control-dot close" onclick="closeWindow('sigma-ai-studio-win')"></div>
                 </div>
             </div>
-            <div class="window-body" style="padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; background: var(--bg-dark);">
-                <div class="settings-content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    
-                    <!-- Left Side: Model Selector & SFT Training -->
-                    <div class="settings-pane" style="display: flex; flex-direction: column; gap: 12px;">
-                        <div class="settings-group">
-                            <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🧠 Select Model Architecture</h4>
-                            <select id="ml-model-select" class="cmd-input" style="width: 100%; height: 35px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);" onchange="updateModelInfo()">
-                                <option value="0">AI21 Jamba 1.5 Large (398B params, 256K context)</option>
-                                <option value="1">Microsoft Phi-4 Reasoning (Open-Weight)</option>
-                                <option value="2">OpenAI gpt-oss-120b (Open-Source Release)</option>
-                                <option value="3">OpenAI o3 Advanced Reasoning (High-Efficiency)</option>
-                                <option value="4">OpenAI gpt-5-nano (Low-Latency Silicon Edge)</option>
-                            </select>
-                            <div id="ml-model-info" style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; padding: 8px; background: rgba(255,255,255,0.02); border-radius: 4px;">
-                                Type: Hybrid Transformer-Mamba<br>
-                                Features: 256K Context Window, Structured Output Support
+            
+            <!-- Tab Navigation Bar -->
+            <div style="display: flex; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border-glass); padding: 5px 15px; gap: 10px; z-index: 10;">
+                <button class="fm-btn" id="ai-tab-tuner-btn" onclick="switchAIPane('tuner')" style="padding: 6px 12px; font-size: 0.75rem; border-radius: 4px; background: rgba(255,255,255,0.05); color: var(--accent-gold);">🏋️ LlamaFactory Tuner</button>
+                <button class="fm-btn" id="ai-tab-mcp-btn" onclick="switchAIPane('mcp')" style="padding: 6px 12px; font-size: 0.75rem; border-radius: 4px;">🔌 Awesome-MCP Gateway</button>
+                <button class="fm-btn" id="ai-tab-nodes-btn" onclick="switchAIPane('nodes')" style="padding: 6px 12px; font-size: 0.75rem; border-radius: 4px;">🧬 n8n Workflow Nodes</button>
+            </div>
+
+            <div class="window-body" style="padding: 15px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; background: var(--bg-dark); height: calc(100% - 85px);">
+                
+                <!-- Pane 1: LlamaFactory Fine-Tuner -->
+                <div class="ai-studio-pane" id="ai-pane-tuner" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px;">
+                        
+                        <!-- Tuner Parameter Matrix -->
+                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="settings-group">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🧠 Select LLM Base Architecture</h4>
+                                <select id="ml-model-select" class="cmd-input" style="width: 100%; height: 35px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);" onchange="updateModelInfo()">
+                                    <option value="0">AI21 Jamba 1.5 Large (398B params, 256K Context)</option>
+                                    <option value="1">Microsoft Phi-4 Reasoning (Open-Weight)</option>
+                                    <option value="2">OpenAI gpt-oss-120b (Open-Source Release)</option>
+                                    <option value="3">OpenAI o3 Advanced Reasoning (High-Efficiency)</option>
+                                    <option value="4">OpenAI gpt-5-nano (Low-Latency Silicon Edge)</option>
+                                </select>
+                                <div id="ml-model-info" style="margin-top: 8px; font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; padding: 8px; background: rgba(255,255,255,0.02); border-radius: 4px;">
+                                    Type: Hybrid Transformer-Mamba<br>
+                                    Features: 256K Context Window, Structured Output Support
+                                </div>
+                            </div>
+
+                            <div class="settings-group">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🔧 LlamaFactory QLoRA Hyperparameters</h4>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                                    <div>
+                                        <span style="font-size: 0.7rem; color: var(--text-muted);">LoRA Rank (r)</span>
+                                        <select id="ml-qlora-rank" class="cmd-input" style="width: 100%; height: 32px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                                            <option value="8">Rank 8</option>
+                                            <option value="16" selected>Rank 16</option>
+                                            <option value="32">Rank 32</option>
+                                            <option value="64">Rank 64</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <span style="font-size: 0.7rem; color: var(--text-muted);">LoRA Alpha (α)</span>
+                                        <select id="ml-qlora-alpha" class="cmd-input" style="width: 100%; height: 32px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                                            <option value="16">Alpha 16</option>
+                                            <option value="32" selected>Alpha 32</option>
+                                            <option value="64">Alpha 64</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 8px; margin-bottom: 8px;">
+                                    <div>
+                                        <span style="font-size: 0.7rem; color: var(--text-muted);">Dropout</span>
+                                        <input type="number" id="ml-qlora-dropout" class="cmd-input" value="0.05" step="0.01" style="height: 32px; font-size: 0.8rem;">
+                                    </div>
+                                    <div>
+                                        <span style="font-size: 0.7rem; color: var(--text-muted);">Target Modules</span>
+                                        <input type="text" id="ml-qlora-targets" class="cmd-input" value="q_proj,v_proj" style="height: 32px; font-size: 0.8rem;">
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="settings-group">
-                            <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🏋️ Supervised Fine-Tuning (SFT)</h4>
-                            <div style="display: flex; flex-direction: column; gap: 8px;">
-                                <select id="ml-dataset" class="cmd-input" style="width: 100%; height: 35px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                        <!-- Dataset, SFT Trigger and Embeddings -->
+                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="settings-group">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🏋️ Fine-Tuning Execution</h4>
+                                <select id="ml-dataset" class="cmd-input" style="width: 100%; height: 35px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass); margin-bottom: 8px;">
                                     <option value="syslogs">Sovereign Lattice System Logs</option>
                                     <option value="bns">BNS Court Case Matrix</option>
                                     <option value="gst">Indian GST Ledger Accounts</option>
                                     <option value="metadata">S-OverlayFS Node Metadata</option>
                                 </select>
-                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; margin-bottom: 8px;">
                                     <span>Training Epochs: <strong id="epoch-val">3</strong></span>
                                     <input type="range" id="ml-epochs" min="1" max="10" value="3" style="width: 120px;" oninput="document.getElementById('epoch-val').innerText = this.value">
                                 </div>
@@ -474,60 +520,196 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="settings-group">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🧮 RAG Flow Cosine Similarity Indexer</h4>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                                    <div>
+                                        <span style="font-size: 0.7rem; color: var(--text-muted);">Chunk Size</span>
+                                        <input type="number" id="ml-rag-chunk" class="cmd-input" value="512" style="height: 32px; font-size: 0.8rem;">
+                                    </div>
+                                    <div>
+                                        <span style="font-size: 0.7rem; color: var(--text-muted);">Overlap</span>
+                                        <input type="number" id="ml-rag-overlap" class="cmd-input" value="64" style="height: 32px; font-size: 0.8rem;">
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="text" id="ml-embed-text" class="cmd-input" placeholder="Type text to RAG chunk..." style="font-size: 0.8rem; height: 35px;">
+                                    <button class="wizard-btn" onclick="generateMLEmbedding()" style="white-space: nowrap; height: 35px; padding: 0 12px; font-size: 0.75rem;">PARSE BLOCK</button>
+                                </div>
+                                <div id="ml-embed-result" style="margin-top: 8px; font-size: 0.7rem; color: var(--accent-gold); font-family: monospace;">
+                                    > Vector Space Ready.
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="settings-group">
-                            <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🧮 Semantic Text Embedding (Embedding 3)</h4>
-                            <div style="display: flex; gap: 8px;">
-                                <input type="text" id="ml-embed-text" class="cmd-input" placeholder="Type text to project..." style="font-size: 0.8rem; height: 35px;">
-                                <button class="wizard-btn" onclick="generateMLEmbedding()" style="white-space: nowrap; height: 35px; padding: 0 12px; font-size: 0.75rem;">EMBED</button>
-                            </div>
-                            <div id="ml-embed-result" style="margin-top: 8px; font-size: 0.7rem; color: var(--accent-gold); font-family: monospace;">
-                                > Vector Space Ready.
-                            </div>
-                        </div>
                     </div>
-
-                    <!-- Right Side: Multi-Agent Orchestration -->
-                    <div class="settings-pane" style="display: flex; flex-direction: column; gap: 12px;">
-                        <div class="settings-group">
-                            <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🤖 AutoGPT Agent Registrar</h4>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
-                                <input type="text" id="ml-agent-name" class="cmd-input" placeholder="Agent Name..." style="font-size: 0.8rem; height: 35px;">
-                                <input type="text" id="ml-agent-role" class="cmd-input" placeholder="Agent Role..." style="font-size: 0.8rem; height: 35px;">
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                <select id="ml-agent-depth" class="cmd-input" style="width: 140px; height: 35px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
-                                    <option value="1">Depth 1 (Fast)</option>
-                                    <option value="3">Depth 3 (Balanced)</option>
-                                    <option value="5">Depth 5 (Rigorous)</option>
-                                </select>
-                                <button class="wizard-btn" onclick="registerMLAgent()" style="height: 35px; padding: 0 15px; font-size: 0.8rem;">SPAWN AGENT</button>
-                            </div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px;">Spawned Agents:</div>
-                            <ul id="ml-agent-list" style="list-style: none; padding-left: 0; display: flex; flex-direction: column; gap: 4px; max-height: 90px; overflow-y: auto;">
-                                <li style="font-size: 0.7rem; padding: 4px 8px; background: rgba(255,255,255,0.01); border-left: 2px solid var(--accent-gold); display: flex; justify-content: space-between;">
-                                    <span>🧠 <strong>CoreAgent</strong> (Scheduler Optimization)</span>
-                                    <span style="color: var(--text-muted);">Depth 5</span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div class="settings-group" style="flex: 1; display: flex; flex-direction: column; min-height: 180px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                <h4 style="color: var(--accent-gold);">🦉 OWL Multi-Agent Cooperation</h4>
-                                <button class="cyber-btn small-btn" onclick="runOWLCooperation()" style="font-size: 0.75rem; padding: 4px 12px;">EXECUTE COOPERATION</button>
-                            </div>
-                            <div id="ml-console" style="flex: 1; background: #000; border: 1px solid var(--border-glass); border-radius: 4px; padding: 8px; font-family: monospace; font-size: 0.7rem; overflow-y: auto; color: #4af626; line-height: 1.4;">
-                                [OWL] Proxy server listening on MCP port 8080...<br>
-                                [OWL] Waiting for cooperation trigger.
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
+
+                <!-- Pane 2: Awesome-MCP Server Gateway -->
+                <div class="ai-studio-pane" id="ai-pane-mcp" style="display: none; flex-direction: column; gap: 12px;">
+                    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px;">
+                        
+                        <!-- MCP Servers Catalog -->
+                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="settings-group">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🔌 Registered MCP Servers (Model Context Protocol)</h4>
+                                <ul id="mcp-servers-list" style="list-style: none; padding-left: 0; display: flex; flex-direction: column; gap: 6px;">
+                                    <li style="font-size: 0.75rem; padding: 6px 10px; background: rgba(255,255,255,0.02); border-left: 2px solid var(--accent-gold); border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <strong>📂 SovereignVFS Explorer</strong><br>
+                                            <span style="font-size: 0.65rem; color: var(--text-muted);">Host: 127.0.0.1:8081 | Protocol: SSE</span>
+                                        </div>
+                                        <span class="status-success" style="font-size: 0.65rem;">CONNECTED</span>
+                                    </li>
+                                    <li style="font-size: 0.75rem; padding: 6px 10px; background: rgba(255,255,255,0.02); border-left: 2px solid var(--accent-gold); border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <strong>📊 Netdata Telemetry Monitor</strong><br>
+                                            <span style="font-size: 0.65rem; color: var(--text-muted);">Host: 127.0.0.1:19999 | Protocol: stdio</span>
+                                        </div>
+                                        <span class="status-success" style="font-size: 0.65rem;">CONNECTED</span>
+                                    </li>
+                                    <li style="font-size: 0.75rem; padding: 6px 10px; background: rgba(255,255,255,0.02); border-left: 2px solid var(--border-glass); border-radius: 4px; display: flex; justify-content: space-between; align-items: center; opacity: 0.7;">
+                                        <div>
+                                            <strong>⚖️ BNS Legal Compliance Complier</strong><br>
+                                            <span style="font-size: 0.65rem; color: var(--text-muted);">Host: 127.0.0.1:8082 | Protocol: stdio</span>
+                                        </div>
+                                        <button class="cyber-btn small-btn" onclick="addLog('Σ [MCP]: Connecting to BNS Complier MCP...', 'warning')" style="font-size: 0.65rem; padding: 2px 6px;">CONNECT</button>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🤖 AutoGPT Agent Registrar</h4>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                                    <input type="text" id="ml-agent-name" class="cmd-input" placeholder="Agent Name..." style="font-size: 0.8rem; height: 35px;">
+                                    <input type="text" id="ml-agent-role" class="cmd-input" placeholder="Agent Role..." style="font-size: 0.8rem; height: 35px;">
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <select id="ml-agent-depth" class="cmd-input" style="width: 140px; height: 35px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                                        <option value="1">Depth 1 (Fast)</option>
+                                        <option value="3">Depth 3 (Balanced)</option>
+                                        <option value="5">Depth 5 (Rigorous)</option>
+                                    </select>
+                                    <button class="wizard-btn" onclick="registerMLAgent()" style="height: 35px; padding: 0 15px; font-size: 0.8rem;">SPAWN AGENT</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- OWL Multi-Agent Console -->
+                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="settings-group">
+                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px;">Spawned Agents:</div>
+                                <ul id="ml-agent-list" style="list-style: none; padding-left: 0; display: flex; flex-direction: column; gap: 4px; max-height: 90px; overflow-y: auto;">
+                                    <li style="font-size: 0.7rem; padding: 4px 8px; background: rgba(255,255,255,0.01); border-left: 2px solid var(--accent-gold); display: flex; justify-content: space-between;">
+                                        <span>🧠 <strong>CoreAgent</strong> (Scheduler Optimization)</span>
+                                        <span style="color: var(--text-muted);">Depth 5</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="settings-group" style="flex: 1; display: flex; flex-direction: column; min-height: 200px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <h4 style="color: var(--accent-gold);">🦉 OWL Multi-Agent Cooperation</h4>
+                                    <button class="cyber-btn small-btn" onclick="runOWLCooperation()" style="font-size: 0.75rem; padding: 4px 12px;">EXECUTE COOPERATION</button>
+                                </div>
+                                <div id="ml-console" style="flex: 1; background: #000; border: 1px solid var(--border-glass); border-radius: 4px; padding: 8px; font-family: monospace; font-size: 0.7rem; overflow-y: auto; color: #4af626; line-height: 1.4;">
+                                    [OWL] Proxy server listening on MCP port 8080...<br>
+                                    [OWL] Waiting for cooperation trigger.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Pane 3: n8n Node-Based Workflow Simulator -->
+                <div class="ai-studio-pane" id="ai-pane-nodes" style="display: none; flex-direction: column; gap: 12px; height: 100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">Construct autonomous automation pipelines with linked nodes (n8n/Dify/ComfyUI style).</span>
+                        <button class="wizard-btn" onclick="executeWorkflowNodes()" style="padding: 5px 15px; font-size: 0.75rem;">RUN WORKFLOW ENGINE</button>
+                    </div>
+
+                    <!-- Workflow Visual Arena -->
+                    <div style="flex: 1; min-height: 300px; background: rgba(0,0,0,0.6); border: 1px dashed var(--border-glass); border-radius: 6px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 20px;">
+                        
+                        <!-- Grid Lines overlay -->
+                        <div style="position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 20px 20px;"></div>
+
+                        <!-- Node 1: Trigger -->
+                        <div class="routine-item routine-border-cyan" style="z-index: 2; width: 140px; background: rgba(10,15,20,0.9); border-radius: 6px; padding: 8px; font-size: 0.7rem; position: relative;">
+                            <div style="font-weight: bold; margin-bottom: 5px; color: #00ffc3;">🔔 Webhook Trigger</div>
+                            <div style="color: var(--text-muted); font-size: 0.65rem;">Rule: CPU > 85%</div>
+                            <!-- Connector dot -->
+                            <div style="width: 8px; height: 8px; border-radius: 4px; background: #00ffc3; position: absolute; right: -4px; top: 50%; transform: translateY(-50%);"></div>
+                        </div>
+
+                        <!-- Arrow/Line 1 -->
+                        <div id="flow-line-1" style="z-index: 1; width: 40px; height: 2px; background: rgba(255,255,255,0.15); position: relative; transition: background 0.3s;">
+                            <div id="flow-dot-1" style="width: 6px; height: 6px; border-radius: 3px; background: #ff00ff; position: absolute; left: 0; top: -2px; display: none;"></div>
+                        </div>
+
+                        <!-- Node 2: Netdata fetch -->
+                        <div class="routine-item routine-border-magenta" style="z-index: 2; width: 150px; background: rgba(20,10,20,0.9); border-radius: 6px; padding: 8px; font-size: 0.7rem; position: relative;">
+                            <div style="font-weight: bold; margin-bottom: 5px; color: #ff00ff;">🔌 RAGFlow Context</div>
+                            <div style="color: var(--text-muted); font-size: 0.65rem;">Index: Syslogs database</div>
+                            <!-- Connectors -->
+                            <div style="width: 8px; height: 8px; border-radius: 4px; background: #ff00ff; position: absolute; left: -4px; top: 50%; transform: translateY(-50%);"></div>
+                            <div style="width: 8px; height: 8px; border-radius: 4px; background: #ffcc00; position: absolute; right: -4px; top: 50%; transform: translateY(-50%);"></div>
+                        </div>
+
+                        <!-- Arrow/Line 2 -->
+                        <div id="flow-line-2" style="z-index: 1; width: 40px; height: 2px; background: rgba(255,255,255,0.15); position: relative; transition: background 0.3s;">
+                            <div id="flow-dot-2" style="width: 6px; height: 6px; border-radius: 3px; background: #ffcc00; position: absolute; left: 0; top: -2px; display: none;"></div>
+                        </div>
+
+                        <!-- Node 3: o3 Reasoning -->
+                        <div class="routine-item routine-border-yellow" style="z-index: 2; width: 140px; background: rgba(20,20,10,0.9); border-radius: 6px; padding: 8px; font-size: 0.7rem; position: relative;">
+                            <div style="font-weight: bold; margin-bottom: 5px; color: #ffcc00;">🧠 Phi-4 / o3 Agent</div>
+                            <div style="color: var(--text-muted); font-size: 0.65rem;">Task: Load balance audit</div>
+                            <!-- Connectors -->
+                            <div style="width: 8px; height: 8px; border-radius: 4px; background: #ffcc00; position: absolute; left: -4px; top: 50%; transform: translateY(-50%);"></div>
+                            <div style="width: 8px; height: 8px; border-radius: 4px; background: #00ff55; position: absolute; right: -4px; top: 50%; transform: translateY(-50%);"></div>
+                        </div>
+
+                        <!-- Arrow/Line 3 -->
+                        <div id="flow-line-3" style="z-index: 1; width: 40px; height: 2px; background: rgba(255,255,255,0.15); position: relative; transition: background 0.3s;">
+                            <div id="flow-dot-3" style="width: 6px; height: 6px; border-radius: 3px; background: #00ff55; position: absolute; left: 0; top: -2px; display: none;"></div>
+                        </div>
+
+                        <!-- Node 4: Action MCP -->
+                        <div class="routine-item routine-border-green" style="z-index: 2; width: 140px; background: rgba(10,20,15,0.9); border-radius: 6px; padding: 8px; font-size: 0.7rem; position: relative;">
+                            <div style="font-weight: bold; margin-bottom: 5px; color: #00ff55;">⚙️ MCP Executor</div>
+                            <div style="color: var(--text-muted); font-size: 0.65rem;">Action: Limit cgroup cycles</div>
+                            <!-- Connector -->
+                            <div style="width: 8px; height: 8px; border-radius: 4px; background: #00ff55; position: absolute; left: -4px; top: 50%; transform: translateY(-50%);"></div>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
         </div>
+
+    </div>
+
+    <!-- Floating System Log Feed -->
+    <div id="kernel-logs" class="auto-style-154"></div>
+
+    <!-- Bottom Dock -->
+    <div class="dock-container">
+        <div class="dock-icon" data-tooltip="File Manager" onclick="launchApp('File Manager')">📂</div>
+        <div class="dock-icon" data-tooltip="OmniShell Terminal" onclick="launchApp('OmniShell')">💻</div>
+        <div class="dock-icon" data-tooltip="Observability Matrix" onclick="launchApp('Sigma Browser')">📊</div>
+        <div class="dock-icon" data-tooltip="Neural Core" onclick="launchApp('AI Assistant')">🧠</div>
+        <div class="dock-icon" data-tooltip="AI/ML Studio" onclick="launchApp('AI Studio')">🤖</div>
+        <div class="dock-icon" data-tooltip="Lattice Settings" onclick="launchApp('Lattice Settings')">⚙️</div>
+        <div class="dock-icon" data-tooltip="Pro Tools" onclick="launchApp('Utility Nexus')">🔧</div>
+        <div class="dock-icon" data-tooltip="Marketplace" onclick="launchApp('Marketplace')">🛒</div>
+        <div class="dock-icon" data-tooltip="Zenith Installer" onclick="launchApp('Markup Forge')">📥</div>
+        <div class="auto-style-155"></div>
+        <div class="dock-icon" data-tooltip="Help Matrix" onclick="toggleHelp()">❓</div>
+    </div>
 
     </div>
 

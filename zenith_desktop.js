@@ -764,13 +764,29 @@ window.addEventListener('load', () => {
 // Σ SIGMAOS: SOVEREIGN AI/ML STUDIO INTERACTIVE ENGINE
 // =========================================================================
 
+window.switchAIPane = function(paneName) {
+    // Hide all panes
+    const panes = ['tuner', 'mcp', 'nodes'];
+    panes.forEach(pane => {
+        const el = document.getElementById(`ai-pane-${pane}`);
+        if (el) el.style.display = (pane === paneName) ? 'flex' : 'none';
+        
+        const btn = document.getElementById(`ai-tab-${pane}-btn`);
+        if (btn) {
+            btn.style.background = (pane === paneName) ? 'rgba(255,255,255,0.05)' : 'none';
+            btn.style.color = (pane === paneName) ? 'var(--accent-gold)' : 'var(--text-white)';
+        }
+    });
+    addLog(`Σ [EDGEML]: AI/ML Studio pane shifted to [${paneName.toUpperCase()}].`, 'success');
+};
+
 const modelMetadatas = {
     '0': {
-        type: 'Hybrid Transformer-Mamba Architecture',
+        type: 'Hybrid Transformer-Mamba Architecture (AI21 Jamba 1.5)',
         features: '256K Context Window, Structured Output Support, Multilingual, 398B parameters (94B active).'
     },
     '1': {
-        type: 'Open-Weight Reasoning & Context Core (Phi-4)',
+        type: 'Open-Weight Reasoning & Context Core (Microsoft Phi-4)',
         features: 'Advanced math reasoning, multi-step problem solving, audio and image inputs ready.'
     },
     '2': {
@@ -805,12 +821,19 @@ window.startMFTraining = function() {
     const dataset = document.getElementById('ml-dataset').value;
     const epochs = document.getElementById('ml-epochs').value;
 
+    const rank = document.getElementById('ml-qlora-rank').value;
+    const alpha = document.getElementById('ml-qlora-alpha').value;
+    const dropout = document.getElementById('ml-qlora-dropout').value;
+    const targets = document.getElementById('ml-qlora-targets').value;
+
     if (!progressContainer || !progressBar) return;
 
     progressContainer.style.display = 'block';
     progressBar.style.width = '0%';
     progressPct.innerText = '0%';
-    progressStatus.innerText = 'Initializing Silicon-Direct SFT context...';
+    progressStatus.innerText = 'Configuring LlamaFactory QLoRA parameter matrices...';
+
+    addLog(`Σ [QLORA]: Configuring hyperparameters: Rank=${rank}, Alpha=${alpha}, Dropout=${dropout}, Targets=${targets}`, 'warning');
 
     let percent = 0;
     const interval = setInterval(() => {
@@ -820,15 +843,15 @@ window.startMFTraining = function() {
         progressBar.style.width = `${percent}%`;
         progressPct.innerText = `${percent}%`;
 
-        if (percent === 12) progressStatus.innerText = `Epoch 1/${epochs} SFT: computing forward pass...`;
-        if (percent === 44) progressStatus.innerText = `Epoch 2/${epochs} SFT: adjusting weights loss=0.742...`;
-        if (percent === 72) progressStatus.innerText = `Epoch ${epochs}/${epochs} SFT: generating Dilithium-5 PQC signature...`;
-        if (percent === 96) progressStatus.innerText = `Signing attested model weights...`;
+        if (percent === 12) progressStatus.innerText = `Epoch 1/${epochs} QLoRA: loss=1.841 gradient_norm=0.14...`;
+        if (percent === 44) progressStatus.innerText = `Epoch 2/${epochs} QLoRA: tuning attention layers [${targets}]...`;
+        if (percent === 72) progressStatus.innerText = `Epoch ${epochs}/${epochs} QLoRA: weights loss=0.075 converged...`;
+        if (percent === 96) progressStatus.innerText = `Signing attested model weights with Dilithium-5 signature...`;
 
         if (percent === 100) {
             clearInterval(interval);
             progressStatus.innerText = `Training complete! Weights Attested & Verified.`;
-            addLog(`Σ [EDGEML]: Finished Fine-Tuning model ${modelVal} on dataset [${dataset.toUpperCase()}] for ${epochs} epochs. Loss stabilized at 0.12f.`, 'success');
+            addLog(`Σ [EDGEML]: Finished Fine-Tuning model ${modelVal} on dataset [${dataset.toUpperCase()}] with QLoRA parameters (Rank=${rank}, Alpha=${alpha}).`, 'success');
         }
     }, 100);
 };
@@ -836,6 +859,9 @@ window.startMFTraining = function() {
 window.generateMLEmbedding = function() {
     const textInput = document.getElementById('ml-embed-text');
     const resultEl = document.getElementById('ml-embed-result');
+    const chunkSize = document.getElementById('ml-rag-chunk').value;
+    const overlap = document.getElementById('ml-rag-overlap').value;
+
     if (!textInput || !resultEl) return;
 
     const val = textInput.value.trim();
@@ -844,9 +870,10 @@ window.generateMLEmbedding = function() {
         return;
     }
 
+    addLog(`Σ [RAGFLOW]: Parsing semantic block. ChunkSize=${chunkSize}, Overlap=${overlap}.`, 'warning');
     const vector = Array.from({length: 6}, () => (Math.random() * 2 - 1).toFixed(4));
-    resultEl.innerHTML = `> Projection (Embedding 3 Large 1536d):<br>[${vector.join(', ')}, ...]`;
-    addLog(`Σ [EDGEML]: Indexed semantic text embedding successfully: "${val.slice(0, 30)}..."`, 'success');
+    resultEl.innerHTML = `> Projection (Embedding 3 Large 1536d - RAGflow Graph parsed):<br>[${vector.join(', ')}, ...]`;
+    addLog(`Σ [RAGFLOW]: Cognitive Graph indexed successfully: "${val.slice(0, 30)}..."`, 'success');
     textInput.value = '';
 };
 
@@ -858,9 +885,11 @@ window.registerMLAgent = function() {
     const nameInput = document.getElementById('ml-agent-name');
     const roleInput = document.getElementById('ml-agent-role');
     const depthSelect = document.getElementById('ml-agent-depth');
-    const listEl = document.getElementById('ml-agent-list');
+    
+    // There might be two lists in different tabs, let's update all lists
+    const lists = document.querySelectorAll('#ml-agent-list');
 
-    if (!nameInput || !roleInput || !listEl) return;
+    if (!nameInput || !roleInput || lists.length === 0) return;
 
     const name = nameInput.value.trim();
     const role = roleInput.value.trim();
@@ -873,13 +902,15 @@ window.registerMLAgent = function() {
 
     spawnedAgents.push({ name, role, depth });
     
-    // Refresh list
-    listEl.innerHTML = spawnedAgents.map(a => `
-        <li style="font-size: 0.7rem; padding: 4px 8px; background: rgba(255,255,255,0.01); border-left: 2px solid var(--accent-gold); display: flex; justify-content: space-between;">
-            <span>🧠 <strong>${a.name}</strong> (${a.role})</span>
-            <span style="color: var(--text-muted);">Depth ${a.depth}</span>
-        </li>
-    `).join('');
+    // Refresh all lists
+    lists.forEach(listEl => {
+        listEl.innerHTML = spawnedAgents.map(a => `
+            <li style="font-size: 0.7rem; padding: 4px 8px; background: rgba(255,255,255,0.01); border-left: 2px solid var(--accent-gold); display: flex; justify-content: space-between;">
+                <span>🧠 <strong>${a.name}</strong> (${a.role})</span>
+                <span style="color: var(--text-muted);">Depth ${a.depth}</span>
+            </li>
+        `).join('');
+    });
 
     addLog(`Σ [AGENT]: Successfully spawned workflow agent: ${name} (${role})`, 'success');
     nameInput.value = '';
@@ -909,6 +940,79 @@ window.runOWLCooperation = function() {
         consoleEl.innerHTML += `<br><span style="color: var(--success);">[OWL] Multi-agent task solved successfully with zero-copy IPC telemetry!</span>`;
         addLog('Σ [OWL]: Multi-agent cooperation completed with active MCP tool bindings.', 'success');
     }, 3000);
+};
+
+// n8n Workflow visual simulation engine
+window.executeWorkflowNodes = function() {
+    const line1 = document.getElementById('flow-line-1');
+    const line2 = document.getElementById('flow-line-2');
+    const line3 = document.getElementById('flow-line-3');
+
+    const dot1 = document.getElementById('flow-dot-1');
+    const dot2 = document.getElementById('flow-dot-2');
+    const dot3 = document.getElementById('flow-dot-3');
+
+    if (!line1 || !line2 || !line3) return;
+
+    addLog('Σ [N8N-WORKFLOW]: Visual workflow simulator executing...', 'warning');
+
+    // Reset lines
+    line1.style.background = 'rgba(255,255,255,0.15)';
+    line2.style.background = 'rgba(255,255,255,0.15)';
+    line3.style.background = 'rgba(255,255,255,0.15)';
+
+    // Step 1: Webhook -> RAGFlow
+    setTimeout(() => {
+        dot1.style.display = 'block';
+        dot1.style.left = '0%';
+        line1.style.background = '#ff00ff';
+        // Animate dot across the line
+        let pos = 0;
+        const anim = setInterval(() => {
+            pos += 10;
+            dot1.style.left = `${pos}%`;
+            if (pos >= 100) {
+                clearInterval(anim);
+                dot1.style.display = 'none';
+                addLog('Σ [N8N-WORKFLOW]: Webhook trigger routed to RAGFlow successfully.', 'success');
+            }
+        }, 80);
+    }, 100);
+
+    // Step 2: RAGFlow -> Reasoning Agent
+    setTimeout(() => {
+        dot2.style.display = 'block';
+        dot2.style.left = '0%';
+        line2.style.background = '#ffcc00';
+        let pos = 0;
+        const anim = setInterval(() => {
+            pos += 10;
+            dot2.style.left = `${pos}%`;
+            if (pos >= 100) {
+                clearInterval(anim);
+                dot2.style.display = 'none';
+                addLog('Σ [N8N-WORKFLOW]: Context retrieval done. Prompting Phi-4 reasoning agent.', 'success');
+            }
+        }, 80);
+    }, 1200);
+
+    // Step 3: Agent -> MCP Executor
+    setTimeout(() => {
+        dot3.style.display = 'block';
+        dot3.style.left = '0%';
+        line3.style.background = '#00ff55';
+        let pos = 0;
+        const anim = setInterval(() => {
+            pos += 10;
+            dot3.style.left = `${pos}%`;
+            if (pos >= 100) {
+                clearInterval(anim);
+                dot3.style.display = 'none';
+                addLog('Σ [N8N-WORKFLOW]: Autonomous task plan generated. Triggering MCP tool execute.', 'success');
+                addLog('Σ [N8N-WORKFLOW]: Success! cgroup CPU cycles capped at 25% for security hygiene.', 'success');
+            }
+        }, 80);
+    }, 2400);
 };
 
 
