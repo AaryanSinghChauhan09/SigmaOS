@@ -55,35 +55,35 @@ sequenceDiagram
 ## 📄 3. Detailed File-by-File Logical Mapping & Purpose
 
 ### 🩻 A. Core Header & Type Definitions (`/include/`)
-* **[sigma_kernel_types.h](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/include/sigma_kernel_types.h)**:
+- **[sigma_kernel_types.h](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/include/sigma_kernel_types.h)**:
   - **Purpose**: Defines clean fixed-width integers (`sigma_u32`, `sigma_u64`, etc.) and status codes.
   - **Relationship**: Included by every single C++ source file in the repository to guarantee absolute freedom from high-level, compiler-dependent `std` headers.
-* **[SigmaOOP.hpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/include/SigmaOOP.hpp)**:
+- **[SigmaOOP.hpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/include/SigmaOOP.hpp)**:
   - **Purpose**: Implements the fundamental `SigmaObject` base class.
   - **Relationship**: Serves as the base class for all C++ singletons across the kernel, drivers, and calculators, establishing a uniform object-oriented model.
-* **[sigma_log.h](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/include/sigma_log.h)**:
+- **[sigma_log.h](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/include/sigma_log.h)**:
   - **Purpose**: Implements raw, fast-path, silicon-direct telemetry logging primitives.
   - **Relationship**: Connected to all driver and core system layers to write real-time, attestation-sealed audits.
 
 ### 🧠 B. The Microkernel Core (`/kernel/core/`)
-* **[SovereignBoot.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/system/SovereignBoot.cpp)**:
+- **[SovereignBoot.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/system/SovereignBoot.cpp)**:
   - **Purpose**: Manages the **Asynchronous Shard Ignition (ASI)** boot sequence.
   - **Relationship**: Acts as the system orchestrator, igniting all 600 shards and loading active developer or forensic profile configs.
-* **[SyscallDispatcher.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/system/SyscallDispatcher.cpp)**:
+- **[SyscallDispatcher.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/system/SyscallDispatcher.cpp)**:
   - **Purpose**: Performs high-performance, modular system call validation and routing.
   - **Relationship**: Intercepts all Ring-3 userland instructions and dispatches them securely to Ring-0 drivers.
-* **[SovereignHypervisor.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/system/SovereignHypervisor.cpp)**:
+- **[SovereignHypervisor.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/system/SovereignHypervisor.cpp)**:
   - **Purpose**: Implements Type-1 microkernel virtualization partitions.
   - **Relationship**: Orchestrates guest VMs and containers, enforcing total isolation between core shards.
-* **[SovereignTimeMachine.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/system/SovereignTimeMachine.cpp)**:
+- **[SovereignTimeMachine.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/system/SovereignTimeMachine.cpp)**:
   - **Purpose**: Manages atomic checkpoints and rollback vectors.
   - **Relationship**: Captures instantaneous, zero-overhead memory and sector state snapshots for disaster recovery.
-* **[SovereignVulkanLayer.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/drivers/SovereignVulkanLayer.cpp)**:
+- **[SovereignVulkanLayer.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/drivers/SovereignVulkanLayer.cpp)**:
   - **Purpose**: Bypasses legacy windowing layers to execute direct GPU pipelines.
   - **Relationship**: Feeds rendering queues to `SovereignVideo.cpp` to output triple-buffered desktop compositor frames.
 
 ### 🧮 C. Statutory & Professional Utilities (`/tools/pro/`)
-* Contains **20 custom calculators** written in clean, zero-dependency C++:
+- Contains **20 custom calculators** written in clean, zero-dependency C++:
   - Implements complex statutory models (such as `SovereignGSTCalculator.cpp` under the GST Act 2017 and `SovereignConsumerCourtFeeCalc.cpp` under the Consumer Protection Act 2019).
   - Performs high-performance, fixed-point calculations in paise to eliminate standard floating-point precision loss.
 
@@ -114,8 +114,8 @@ sequenceDiagram
 
 ## 🔄 5. Multi-Branch Parity & Uniformity
 To guarantee absolute architectural uniformity across all computing paradigms, the **Branch Uniformity & Synchronization Engine** (`sync_all_branches.py`) automatically propagates the entire system directory lattice across all 12 operational branches:
-* `main`: Stable Production Launch Vector.
-* `release/rtos`: Real-Time Operating System branch with deterministic schedulers.
-* `release/mobile`: Energy-aware, high-performance battery scheduler models.
-* `release/microkernel`: Skeletal, minimal build configs.
-* `gh-pages`: Optimized high-performance GitHub Pages web site.
+- `main`: Stable Production Launch Vector.
+- `release/rtos`: Real-Time Operating System branch with deterministic schedulers.
+- `release/mobile`: Energy-aware, high-performance battery scheduler models.
+- `release/microkernel`: Skeletal, minimal build configs.
+- `gh-pages`: Optimized high-performance GitHub Pages web site.

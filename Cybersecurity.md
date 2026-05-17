@@ -49,12 +49,12 @@ SigmaOS provides a turnkey environment for security professionals to audit silic
 
 ### Bundled Security Tools
 
-* **`S-PLOIT`**: Native penetration testing framework targeting shard memory and system call surfaces.
-* **`S-MAP`**: High-performance network scanning and packet analysis (Nmap/Wireshark-class).
-* **`S-FORENSIC`**: Post-quantum forensic engine for atomic state analysis and shard-level investigation.
-* **`sigma-audit`**: Static analysis tool for verifying shard binary integrity against known-good PQC hashes.
-* **Lattice Fuzzers**: Directed fuzzing at the sovereign memory allocator and Z-SYSCALL interface.
-* **Protocol Shards**: Pre-configured modules for auditing 802.11 Wi-Fi, Bluetooth, and IPsec tunnels.
+- **`S-PLOIT`**: Native penetration testing framework targeting shard memory and system call surfaces.
+- **`S-MAP`**: High-performance network scanning and packet analysis (Nmap/Wireshark-class).
+- **`S-FORENSIC`**: Post-quantum forensic engine for atomic state analysis and shard-level investigation.
+- **`sigma-audit`**: Static analysis tool for verifying shard binary integrity against known-good PQC hashes.
+- **Lattice Fuzzers**: Directed fuzzing at the sovereign memory allocator and Z-SYSCALL interface.
+- **Protocol Shards**: Pre-configured modules for auditing 802.11 Wi-Fi, Bluetooth, and IPsec tunnels.
 
 ---
 

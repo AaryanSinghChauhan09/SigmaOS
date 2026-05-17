@@ -20,16 +20,16 @@ This document provides a highly technical, multi-dimensional comparison of **Sig
 ## 🛠️ Deep Technical Improvement Plan & Architectural Enhancements
 
 ### 1. Algorithms & System Performance
-* **NUMA-Aware CFS Scheduling**: Allocates execution threads to the nearest physical CPU memory nodes, reducing cross-socket bus contention.
-* **Lock-Free Concurrency Primitives**: Leverages compare-and-swap (CAS) loops inside task scheduling queues, completely eliminating spinlock pauses.
-* **Microsecond Ring Transitions**: Custom-optimized Assembly entry points for `SYSCALL` and `SYSRET` instructions reduce context-switch overhead to less than 12 clock cycles.
+- **NUMA-Aware CFS Scheduling**: Allocates execution threads to the nearest physical CPU memory nodes, reducing cross-socket bus contention.
+- **Lock-Free Concurrency Primitives**: Leverages compare-and-swap (CAS) loops inside task scheduling queues, completely eliminating spinlock pauses.
+- **Microsecond Ring Transitions**: Custom-optimized Assembly entry points for `SYSCALL` and `SYSRET` instructions reduce context-switch overhead to less than 12 clock cycles.
 
 ### 2. Code, Programs, & System Customization
-* **Zero-Dependency Core**: Compiles without generic GNU `libc` headers, using custom inline string operations and custom memory allocators.
-* **Declarative Configuration Manager**: The system boots by parsing a secure configuration registry, configuring network adapters, memory segments, and GPU shards in real-time.
-* **Profile-Based Personalization**: Real-time hot-swapping between `Developer`, `Forensic`, `Gaming`, and `Container Host` configurations via Dilithium-5 attested profile bundles.
+- **Zero-Dependency Core**: Compiles without generic GNU `libc` headers, using custom inline string operations and custom memory allocators.
+- **Declarative Configuration Manager**: The system boots by parsing a secure configuration registry, configuring network adapters, memory segments, and GPU shards in real-time.
+- **Profile-Based Personalization**: Real-time hot-swapping between `Developer`, `Forensic`, `Gaming`, and `Container Host` configurations via Dilithium-5 attested profile bundles.
 
 ### 3. User Experience & Desktop GUI
-* **SovereignThemeEngine**: Provides smooth animations, gradients, and dynamic layout scaling based on screen resolutions.
-* **High-Contrast Screen Reader**: Low-level screen-scraping routines speak desktop elements directly to hardware audio channels in real-time for maximum accessibility.
-* **Declarative UI Engine**: Dynamic UI configurations are defined using lightweight JSON schemas, enabling users to customize the system dashboard without touching the underlying C++ source code.
+- **SovereignThemeEngine**: Provides smooth animations, gradients, and dynamic layout scaling based on screen resolutions.
+- **High-Contrast Screen Reader**: Low-level screen-scraping routines speak desktop elements directly to hardware audio channels in real-time for maximum accessibility.
+- **Declarative UI Engine**: Dynamic UI configurations are defined using lightweight JSON schemas, enabling users to customize the system dashboard without touching the underlying C++ source code.
