@@ -115,3 +115,4 @@ Arguments:
 - **cookie** `Cookie`
 
 Returns: `void`
+ 

@@ -23,3 +23,4 @@ The Distributed deployment clusters multiple SigmaOS nodes into a single, unifie
 - **Network Locality**: Keep tightly coupled shards on the same physical node.
 
 - **Eventual Consistency**: Use eventual consistency for non-critical telemetry to save bandwidth.
+ 

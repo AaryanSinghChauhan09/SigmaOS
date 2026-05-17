@@ -51,3 +51,4 @@ Security is customizable:
 - **Permissive:** For offline, sandboxed development.
 
 Take control. Welcome to the Lattice.
+ 

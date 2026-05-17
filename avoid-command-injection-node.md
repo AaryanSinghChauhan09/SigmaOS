@@ -95,3 +95,4 @@ So, here's the collective guidance for running system commands from node.js:
 - Try to avoid letting users pass in options to commands if possible. Typically values are okay when using spawn or execfile, but selecting options via a user controlled string is a bad idea.
 
 - If you must allow for user controlled options, look at the options for the command extensively, determine which options are safe, and whitelist only those options.
+ 

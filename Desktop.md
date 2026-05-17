@@ -1,2 +1,2 @@
 # Zenith Desktop
-SovereignThemeEngine, Accessibility, Installer.
+SovereignThemeEngine, Accessibility, Installer. 

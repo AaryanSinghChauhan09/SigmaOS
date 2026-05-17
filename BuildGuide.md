@@ -80,3 +80,4 @@ To run SigmaOS on actual hardware:
 1
 
 Upon boot, you will be greeted by the Zenith UI dashboard. You can switch to the `SigmaShell` fallback terminal by pressing `Ctrl + Alt + F1`.
+ 

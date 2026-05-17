@@ -46,3 +46,4 @@ To maintain an organized ecosystem, each major kernel subsystem has a dedicated 
 Visit the [Sovereign Choice Guide](Sovereign-Choice-Guide) or run `sigma-cli list-shards` to inspect your local lattice.
 
 ### Your Silicon. Your Rules. Your Sovereignty
+ 

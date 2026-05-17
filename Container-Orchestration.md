@@ -19,3 +19,4 @@ SigmaOS treats "shards" as ultra-lightweight containers. The `SovereignOrchestra
 - **Headless CLI**: Optimized for remote management via PQC-SSH.
 
 - **Distributed S-VFS**: Shared storage across the entire cluster.
+ 

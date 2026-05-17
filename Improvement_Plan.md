@@ -66,3 +66,4 @@ To secure absolute system integrity, SigmaOS implements:
 1. **Lattice Fuzzing Pools**: Executes continuous input fuzzing across all 256 syscall vectors to detect edge-case boundaries.
 2. **Deterministic Regression Sweeps**: Conducts strict structural validations after every branch merge, preventing regression drift.
 3. **PQC Cryptographic Verification**: Verifies Dilithium signatures across all active userland binaries.
+ 

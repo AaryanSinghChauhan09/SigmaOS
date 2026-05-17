@@ -36,3 +36,4 @@ if (status == SIGMA_OK) {
     char buffer[512];
     SovereignStorageShard::getInstance().file_read(fd, buffer, 512);
     SovereignStorageShard::getInstance().file_close(fd);
+ 

@@ -19,3 +19,4 @@ To crush **SteamOS**, SigmaOS is integrating:
 1
 
 SigmaOS provides a specialized pipeline for porting legacy Linux drivers into the sovereign OOP format, ensuring rapid hardware expansion without sacrificing stability.
+ 

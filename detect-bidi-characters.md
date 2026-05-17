@@ -52,3 +52,4 @@ For more information on the topic, you're welcome to read on the official websit
 - <https://github.com/lirantal/anti-trojan-source/>
 
 - <https://github.com/lirantal/eslint-plugin-anti-trojan-source>
+ 

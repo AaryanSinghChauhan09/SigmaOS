@@ -35,3 +35,4 @@ SigmaOS has transitioned from a "personal desktop" narrative to a **"Distributed
 ---
 
 1
+ 

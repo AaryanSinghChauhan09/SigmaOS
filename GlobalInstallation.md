@@ -150,3 +150,4 @@ test('fetch API test', async () => {
 - This provides access to undici's latest features and performance improvements
 
 - The global installation persists for the lifetime of the process
+ 

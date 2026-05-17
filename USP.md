@@ -58,3 +58,4 @@ Inspired by modern personal AI frameworks, SigmaOS transcends traditional comput
 ---
 
 ### SigmaOS: Sovereignty over your professional workspace
+ 

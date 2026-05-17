@@ -22,3 +22,4 @@ Run the sovereign benchmarker to certify your lattice performance:
 sigma-cli telemetry --bench
 
 ```
+ 

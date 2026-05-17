@@ -113,3 +113,4 @@ SigmaOS uses **Semantic Versioning**: `vMAJOR.MINOR.PATCH-FORMAT`
 | `v15.0.0-main` | Core kernel stable release |
 | `v15.1.0-app` | App layer feature release |
 | `v15.0.1-hotfix` | Security patch |
+ 

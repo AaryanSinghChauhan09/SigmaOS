@@ -51,3 +51,4 @@ SovereignHypervisor::getInstance().create_vm(config, &vm_id);
 
 // Tear it down with amnesic wipe
 SovereignHypervisor::getInstance().destroy_vm(vm_id)
+ 

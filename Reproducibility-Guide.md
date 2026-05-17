@@ -22,3 +22,4 @@ Edit your `lattice.yaml` and apply:
 sigma-pkg apply ./lattice.yaml
 
 ```
+ 

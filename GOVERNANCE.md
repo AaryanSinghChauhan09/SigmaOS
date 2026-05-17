@@ -16,3 +16,4 @@ Please refer to the `CONTRIBUTING.md` file in the main repository for:
 ***Meeting Notes**: TSC meeting notes and changelogs are published in this Wiki.* **Mailing List**: Subscribe to the `sigma-dev` mailing list for core kernel discussions.
 
 - **Release Notes**: Regular developer updates and milestone tracking.
+ 

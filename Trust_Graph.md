@@ -21,3 +21,4 @@ The **Trust Graph UI** ([trust_graph.c](file:///C:/Users/Aaryan/.gemini/antigrav
 ---
 
 ### Part of the SigmaOS Sovereign Industrial Lattice
+ 

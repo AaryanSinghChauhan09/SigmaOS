@@ -19,3 +19,4 @@ The Forge operates on a **Map-Shuffle-Reduce** model optimized for high-affinity
 2. **Ignition**: SDP pipelines are ignited in parallel.
 
 3. **Consensus**: Results are aggregated via the Sovereign Neural Nexus.
+ 

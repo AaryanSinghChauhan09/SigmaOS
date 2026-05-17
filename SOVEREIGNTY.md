@@ -43,3 +43,4 @@ SigmaOS v15.0 introduces the **S-FORUM** shard, enabling decentralized, communit
 ### Final Declaration
 
 *"We did not build another OS. We built the end of the OS as you know it."*
+ 

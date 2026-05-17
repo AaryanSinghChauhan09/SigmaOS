@@ -52,3 +52,4 @@ SigmaOS uses **Asynchronous Shard Ignition (ASI)**. Each service (Driver, FS, Ne
 - `SovereignLXC` allows for sub-millisecond containerization within the lattice.
 
 *"The Shard is the unit of sovereignty; the Format is its expression."*
+ 

@@ -47,3 +47,4 @@ void save_critical_data() {
 | **Snapshot Speed** | Seconds/Minutes | < 2ms (Silicon-Direct) |
 
 | **Shard Distribution**| External (DRBD/Gluster) | Native (SovereignVFS) |
+ 

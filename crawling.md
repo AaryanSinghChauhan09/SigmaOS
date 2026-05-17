@@ -67,3 +67,4 @@ When developing a crawler, the following practices are recommended in addition t
 - [W3C Wiki: Write Web Crawler](https://www.w3.org/wiki/Write_Web_Crawler)
 
 - [Ethical Web Crawling (WWW 2010 Conference Paper)](https://archives.iw3c2.org/www2010/proceedings/www/p1101.pdf)
+ 

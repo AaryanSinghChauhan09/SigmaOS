@@ -60,3 +60,4 @@ Arguments:
 - **mimeType** `MIMEType`
 
 Returns: `string`
+ 

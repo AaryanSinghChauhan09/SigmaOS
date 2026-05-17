@@ -70,3 +70,4 @@ export SIGMA_FLAGS="-march=rv64imafdc -mabi=lp64d -DSIGMA_FASTBOOT=1"
 | With SovereignContainer | **1GB** | 4GB |
 
 > **Note**: RTOS mode forbids dynamic memory allocation. All shards must use `SovereignMemoryPool::alloc()`.
+ 

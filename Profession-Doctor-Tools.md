@@ -35,3 +35,4 @@ SigmaOS ensures 100% data residency and zero-leakage through the **Medical Sandb
 ---
 
 ### Precision care, sovereign data
+ 

@@ -39,3 +39,4 @@ Report vulnerabilities directly to the Sovereign Security Shard (`security@sigma
 ---
 
 ### Your contributions define the future of sovereignty
+ 

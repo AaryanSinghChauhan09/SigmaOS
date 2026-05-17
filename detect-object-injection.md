@@ -40,3 +40,4 @@ doSomething(object[key]);
 ```
 
 More information: [The Dangers of Square Bracket Notation](../the-dangers-of-square-bracket-notation.md)
+ 

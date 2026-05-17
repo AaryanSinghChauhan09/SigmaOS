@@ -7,3 +7,4 @@
 `new Buffer()` now emits a deprecation warning in Node.js.
 
 More information: [new Buffer(number) is unsafe](https://github.com/nodejs/node/issues/4660)
+ 

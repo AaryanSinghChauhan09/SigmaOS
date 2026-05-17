@@ -305,3 +305,4 @@ The wrapper handles various SOCKS5 error conditions:
 - **Node.js**: Compatible with all supported Node.js versions
 
 - **HTTP Versions**: Works with HTTP/1.1 and HTTP/2 over the tunnel
+ 

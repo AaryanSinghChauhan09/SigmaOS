@@ -91,3 +91,4 @@ While the core baseline is identical, each branch adds its own **Industrial Laye
 ---
 
 *SigmaOS — One Core. One Language. Absolute Sovereignty.*
+ 

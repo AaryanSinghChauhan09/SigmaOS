@@ -13,3 +13,4 @@ SigmaOS has formally integrated the architectures of the world's leading FOSS pr
 
 ### Zero-Dependency Paradigm
 Every integrated subsystem leverages `sigma_kernel_types.h` and bypasses all standard libc functions, fully eradicating legacy dependencies.
+ 

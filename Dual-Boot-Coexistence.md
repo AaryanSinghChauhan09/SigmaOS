@@ -23,3 +23,4 @@ The `release/dual-boot` branch focuses on the seamless integration of SigmaOS wi
 - **Integrity Audits**: Continuous verification of the sovereign boot partition during ASI ignition.
 
 *"Coexistence is the first step toward sovereignty."*
+ 
