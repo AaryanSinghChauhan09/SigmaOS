@@ -1,6 +1,6 @@
 # SigmaOS Implementation Roadmap
 
-This roadmap tracks the development of core features required for the "Zenith" and "Horizon" microkernel releases. 
+This roadmap tracks the development of core features required for the "Zenith" and "Horizon" microkernel releases.
 
 ## 1. Bootloader (Bare-Metal Start)
 

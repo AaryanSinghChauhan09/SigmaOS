@@ -1,5 +1,6 @@
 #include "../../../include/sigma_kernel_types.h"
 #include "../../../include/sigma_log.h"
+#include "../../../include/SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Video Shard (S-VIDEO)
@@ -12,10 +13,14 @@ namespace SigmaOS {
 namespace Kernel {
 namespace Drivers {
 
-class SovereignVideo : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignVideo> {
-    friend class SigmaOS::SigmaSingleton<SovereignVideo>;
+class SovereignVideo : public SigmaOS::SigmaObject {
 public:
     const char* type_name() const noexcept override { return "SovereignVideo"; }
+
+    static SovereignVideo& getInstance() {
+        static SovereignVideo instance;
+        return instance;
+    }
 
     void init() {
         sigma_log_info("[S-VIDEO] Initializing Sovereign Video Processing Shard...");
@@ -39,4 +44,3 @@ private:
 extern "C" {
     void video_init() { SigmaOS::Kernel::Drivers::SovereignVideo::getInstance().init(); }
 }
-

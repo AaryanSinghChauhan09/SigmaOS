@@ -19,12 +19,14 @@ namespace System {
 /* =========================================================================
  * SovereignBootEngine — Singleton Boot Sequencer
  * ========================================================================= */
-class SovereignBootEngine : public SigmaOS::SigmaObject,
-                            public SigmaOS::SigmaSingleton<SovereignBootEngine> {
-    friend class SigmaOS::SigmaSingleton<SovereignBootEngine>;
-
+class SovereignBootEngine : public SigmaOS::SigmaObject {
 public:
     const char* type_name() const noexcept override { return "SovereignBootEngine"; }
+
+    static SovereignBootEngine& getInstance() {
+        static SovereignBootEngine instance;
+        return instance;
+    }
 
     void init() {
         sigma_log_info("[BOOT] SSB: Initializing Sovereign System Boot Nexus...");

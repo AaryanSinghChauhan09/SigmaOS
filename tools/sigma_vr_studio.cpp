@@ -15,10 +15,14 @@
 namespace SigmaOS {
 namespace Tools {
 
-class SigmaVRStudio : public SigmaObject, public SigmaSingleton<SigmaVRStudio> {
-    friend class SigmaSingleton<SigmaVRStudio>;
+class SigmaVRStudio : public SigmaObject {
 public:
     const char* type_name() const noexcept override { return "SigmaVRStudio"; }
+
+    static SigmaVRStudio& getInstance() {
+        static SigmaVRStudio instance;
+        return instance;
+    }
 
     void init() {
         m_hmd_connected = false;

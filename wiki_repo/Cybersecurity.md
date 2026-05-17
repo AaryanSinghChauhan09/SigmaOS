@@ -15,7 +15,6 @@ graph TD
     A --> H[S-WATCHDOG]
     H --> I[Anomaly Detected]
     I --> J[Atomic Shard Rollback]
-
 ```
 
 ## 🛡 Post-Quantum Security Lattice (S-PQC)
@@ -25,7 +24,7 @@ SigmaOS is built from the ground up to resist quantum-computational attacks.
 ### Core Components
 
 | Component | Role | Algorithm |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | **S-CRYPT** | All inter-shard communication encryption | CRYSTALS-Kyber-1024 |
 | **S-SIGN** | Package and shard binary attestation | CRYSTALS-Dilithium-5 |
 | **S-ARMOR** | Mandatory Access Control at shard boundaries | PQC-attested MAC profiles |
@@ -40,7 +39,6 @@ if (status != SIGMA_OK) {
     sigma_log_error("[S-PQC] FATAL: Cryptographic violation. Halting.");
     // Hardware halt triggered
 }
-
 ```
 
 ---
@@ -51,24 +49,19 @@ SigmaOS provides a turnkey environment for security professionals to audit silic
 
 ### Bundled Security Tools
 
-- **`S-PLOIT`**: Native penetration testing framework targeting shard memory and system call surfaces.
-
-- **`S-MAP`**: High-performance network scanning and packet analysis (Nmap/Wireshark-class).
-
-- **`S-FORENSIC`**: Post-quantum forensic engine for atomic state analysis and shard-level investigation.
-
-- **`sigma-audit`**: Static analysis tool for verifying shard binary integrity against known-good PQC hashes.
-
-- **Lattice Fuzzers**: Directed fuzzing at the sovereign memory allocator and Z-SYSCALL interface.
-
-- **Protocol Shards**: Pre-configured modules for auditing 802.11 Wi-Fi, Bluetooth, and IPsec tunnels.
+* **`S-PLOIT`**: Native penetration testing framework targeting shard memory and system call surfaces.
+* **`S-MAP`**: High-performance network scanning and packet analysis (Nmap/Wireshark-class).
+* **`S-FORENSIC`**: Post-quantum forensic engine for atomic state analysis and shard-level investigation.
+* **`sigma-audit`**: Static analysis tool for verifying shard binary integrity against known-good PQC hashes.
+* **Lattice Fuzzers**: Directed fuzzing at the sovereign memory allocator and Z-SYSCALL interface.
+* **Protocol Shards**: Pre-configured modules for auditing 802.11 Wi-Fi, Bluetooth, and IPsec tunnels.
 
 ---
 
 ## 🛡 Defensive Hardening
 
 | Defense Layer | Implementation | Replaces |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | **Zero-Trust MAC** | PQC-attested mandatory profiles for every userland process | SELinux / AppArmor |
 | **Amnesic Memory** | Zero-data remanence: every freed page is immediately wiped | None (unique USP) |
 | **S-WATCHDOG** | Detects anomalous silicon behavior → triggers atomic shard rollback | auditd / inotify |
