@@ -53,7 +53,7 @@ public:
         sigma_log_info(enable ? "[BOOT] SSB: Fast-boot ENABLED." : "[BOOT] SSB: Fast-boot DISABLED.");
     }
 
-    sigma_boot_stage_t getCurrentStage() const { return m_current_stage; }
+    int getCurrentStage() const { return m_current_stage; }
     sigma_u32          getIgnitedCount()  const { return m_ignited_shards; }
     sigma_u32          isInitialized()    const { return m_initialized; }
 
@@ -64,7 +64,7 @@ private:
           m_initialized(0u),
           m_fast_boot(false) {}
 
-    sigma_boot_stage_t m_current_stage;
+    int m_current_stage;
     sigma_u32          m_ignited_shards;
     sigma_u32          m_initialized;
     bool               m_fast_boot;
@@ -91,7 +91,7 @@ void boot_fallback_recovery() {
     SigmaOS::Kernel::System::SovereignBootEngine::getInstance().fallback_recovery();
 }
 
-sigma_boot_stage_t boot_get_current_stage() {
+int boot_get_current_stage() {
     return SigmaOS::Kernel::System::SovereignBootEngine::getInstance().getCurrentStage();
 }
 
