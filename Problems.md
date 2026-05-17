@@ -41,4 +41,3 @@ Attestation checks expect standard stage outputs:
 - `[BOOT] SSB: Initializing Sovereign System Boot Nexus...`
 - `[BOOT] SSB: Commencing Lattice Ignition...`
 - `[BOOT] SSB: Ignition COMPLETE. 600 shards active.`
- 

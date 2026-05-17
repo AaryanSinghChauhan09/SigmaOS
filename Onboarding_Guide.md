@@ -75,4 +75,3 @@ Verify compilation and boot stage behavior locally using the QEMU target suite:
    ```
 
 Observe the direct serial telemetry stream to confirm the **Asynchronous Shard Ignition (ASI)** successfully bootstrapped all shards.
- 
