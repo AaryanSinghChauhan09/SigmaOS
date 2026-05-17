@@ -1,6 +1,6 @@
 # WALKTHROUGH: Competitor Linux Parity & Branch Synchronization
 
-This document records the design implementation of **Sovereign Cgroups**, **Sovereign ZFS Storage Pools**, **Sovereign OverlayFS Union Mounts**, **Sovereign LBU State Persistence**, and the total conversion of the release/synchronization/package/build pipeline from Python to Node.js.
+This document records the design implementation of **Sovereign Cgroups**, **Sovereign ZFS Storage Pools**, **Sovereign OverlayFS Union Mounts**, **Sovereign LBU State Persistence**, and the total conversion of the release/synchronization/package/build/audit pipeline from Python to Node.js.
 
 ---
 
@@ -51,8 +51,8 @@ We implemented Alpine Linux-style diskless persistent memory state packing.
 ---
 
 ## 🐍 5. Purging Python Runtime Dependency
-To make the build and deployment pipeline completely standalone and immune to missing Python runtimes on user environments:
-* **Purged Scripts**: Removed `sync.py`, `final_sync.py`, `tools/sync_all_branches.py`, `tools/wiki_sync.py`, `tools/sigma-pkg.py`, `tools/sigma-build.py`, and `tools/sovereign-deploy.py`.
+To make the build, deployment, and auditing pipelines completely standalone and immune to missing Python runtimes on user environments:
+* **Purged Scripts**: Removed `sync.py`, `final_sync.py`, `tools/sync_all_branches.py`, `tools/wiki_sync.py`, `tools/sigma-pkg.py`, `tools/sigma-build.py`, `tools/sovereign-deploy.py`, `tools/reconcile_shards.py`, `tools/problem_tracker.py`, and `tools/release_auto.py`.
 * **Zero-Dependency Node.js Alternatives**:
   * [sync.js](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/sync.js): Executes staged local packaging commits.
   * [final_sync.js](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/final_sync.js): Handles absolute remote pushes.
@@ -61,6 +61,9 @@ To make the build and deployment pipeline completely standalone and immune to mi
   * [sigma-pkg.js](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/tools/sigma-pkg.js): Resolves package graphs using zero-dependency local JSON stores.
   * [sigma-build.js](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/tools/sigma-build.js): cross-compiles target shards deterministically.
   * [sovereign-deploy.js](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/tools/sovereign-deploy.js): orchestrates multi-architecture silicon VFS deployments.
+  * [reconcile_shards.js](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/tools/reconcile_shards.js): detects overlapping files and legacy legacy shards.
+  * [problem_tracker.js](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/tools/problem_tracker.js): scans code bases for unresolved blockages.
+  * [release_auto.js](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/tools/release_auto.js): generates clean markdown release manifests and tags builds.
 
 ---
 
