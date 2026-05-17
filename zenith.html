@@ -420,7 +420,7 @@
         </div>
 
         <!-- App: AI/ML Studio & Multi-Agent Orchestrator -->
-        <div class="window" id="sigma-ai-studio-win" style="width: 820px; height: 600px; display: none;">
+        <div class="window" id="sigma-ai-studio-win" style="width: 840px; height: 620px; display: none;">
             <div class="window-header">
                 <div class="window-title">🤖 <span>Sovereign AI/ML Studio</span></div>
                 <div class="window-controls">
@@ -431,10 +431,12 @@
             </div>
             
             <!-- Tab Navigation Bar -->
-            <div style="display: flex; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border-glass); padding: 5px 15px; gap: 10px; z-index: 10;">
-                <button class="fm-btn" id="ai-tab-tuner-btn" onclick="switchAIPane('tuner')" style="padding: 6px 12px; font-size: 0.75rem; border-radius: 4px; background: rgba(255,255,255,0.05); color: var(--accent-gold);">🏋️ LlamaFactory Tuner</button>
-                <button class="fm-btn" id="ai-tab-mcp-btn" onclick="switchAIPane('mcp')" style="padding: 6px 12px; font-size: 0.75rem; border-radius: 4px;">🔌 Awesome-MCP Gateway</button>
-                <button class="fm-btn" id="ai-tab-nodes-btn" onclick="switchAIPane('nodes')" style="padding: 6px 12px; font-size: 0.75rem; border-radius: 4px;">🧬 n8n Workflow Nodes</button>
+            <div style="display: flex; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border-glass); padding: 5px 15px; gap: 8px; z-index: 10; overflow-x: auto; white-space: nowrap;">
+                <button class="fm-btn" id="ai-tab-tuner-btn" onclick="switchAIPane('tuner')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px; background: rgba(255,255,255,0.05); color: var(--accent-gold);">🏋️ LlamaFactory Tuner</button>
+                <button class="fm-btn" id="ai-tab-mcp-btn" onclick="switchAIPane('mcp')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px;">🔌 Awesome-MCP Gateway</button>
+                <button class="fm-btn" id="ai-tab-nodes-btn" onclick="switchAIPane('nodes')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px;">🧬 n8n Workflow Nodes</button>
+                <button class="fm-btn" id="ai-tab-memory-btn" onclick="switchAIPane('memory')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px;">💾 Letta Memory & Voice</button>
+                <button class="fm-btn" id="ai-tab-claudecam-btn" onclick="switchAIPane('claudecam')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px;">💻 ClaudeCode & Cam</button>
             </div>
 
             <div class="window-body" style="padding: 15px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; background: var(--bg-dark); height: calc(100% - 85px);">
@@ -688,28 +690,114 @@
                     </div>
                 </div>
 
+                <!-- Pane 4: Letta Agent-File Memory & VoiceStar Real-Time Voice -->
+                <div class="ai-studio-pane" id="ai-pane-memory" style="display: none; flex-direction: column; gap: 12px;">
+                    <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 15px;">
+                        
+                        <!-- Letta Episodic Memory -->
+                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="settings-group">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">💾 Letta-AI agent-file Persistent Memory</h4>
+                                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
+                                    <span style="font-size: 0.7rem; color: var(--text-muted);">Core Memory Slot</span>
+                                    <textarea id="letta-core-mem" class="cmd-input" style="width: 100%; height: 65px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass); padding: 6px; font-size: 0.72rem; resize: none;">User identity details: Admin Singh, Kernel target: x86_64 Sovereign.</textarea>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
+                                    <span style="font-size: 0.7rem; color: var(--text-muted);">Episodic Memory Logs</span>
+                                    <textarea id="letta-episodic-mem" class="cmd-input" style="width: 100%; height: 65px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass); padding: 6px; font-size: 0.72rem; resize: none;">Syslogs loaded, checked memory fragmentation bounds, CPU cycle rate normal.</textarea>
+                                </div>
+                                <button class="wizard-btn" onclick="consolidateLettaMemory()">CONSOLIDATE MEMORY FILE</button>
+                            </div>
+                        </div>
+
+                        <!-- VoiceStar Audio Streaming -->
+                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="settings-group" style="flex: 1;">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🗣️ VoiceStar Real-Time Voice Synthesis Stream</h4>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                                    <div>
+                                        <span style="font-size: 0.7rem; color: var(--text-muted);">Sample Rate</span>
+                                        <select id="voicestar-rate" class="cmd-input" style="width: 100%; height: 32px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                                            <option value="16000">16 kHz</option>
+                                            <option value="24000" selected>24 kHz</option>
+                                            <option value="48000">48 kHz</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <span style="font-size: 0.7rem; color: var(--text-muted);">Latency Target</span>
+                                        <select id="voicestar-latency" class="cmd-input" style="width: 100%; height: 32px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                                            <option value="5">5 ms (Ultra)</option>
+                                            <option value="8.5" selected>8.5 ms</option>
+                                            <option value="15">15 ms</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button class="cyber-btn small-btn" id="voicestar-stream-btn" onclick="toggleVoiceStreaming()" style="width: 100%; margin-bottom: 12px; font-size: 0.75rem;">START VOICE STREAM</button>
+                                
+                                <span style="font-size: 0.7rem; color: var(--text-muted);">Wave Visualizer Preview:</span>
+                                <div style="width: 100%; height: 60px; background: #000; border: 1px solid var(--border-glass); border-radius: 4px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                                    <div id="voice-wave-line" style="width: 90%; height: 2px; background: #ff00ff; box-shadow: 0 0 10px #ff00ff; transition: height 0.08s ease;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Pane 5: ClaudeCode CLI Sandbox & DeepLiveCam Swaps -->
+                <div class="ai-studio-pane" id="ai-pane-claudecam" style="display: none; flex-direction: column; gap: 12px;">
+                    <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 15px;">
+                        
+                        <!-- ClaudeCode CLI Simulation -->
+                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="settings-group" style="flex: 1; display: flex; flex-direction: column;">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">💻 Claude-Code CLI Terminal Sandbox</h4>
+                                <div style="display:flex; gap:6px; margin-bottom:8px;">
+                                    <input type="text" id="claudecode-file" class="cmd-input" value="SovereignBoot.cpp" style="flex:1; height:32px; font-size: 0.72rem;">
+                                    <input type="text" id="claudecode-prompt" class="cmd-input" placeholder="Analyze compile locks..." style="flex:2; height:32px; font-size: 0.72rem;">
+                                    <button class="cyber-btn small-btn" onclick="executeClaudeCodeCLI()" style="white-space:nowrap; font-size:0.7rem; height:32px;">HEAL CODE</button>
+                                </div>
+                                <div id="claudecode-terminal" style="flex:1; min-height: 140px; background: #000; border: 1px solid var(--border-glass); border-radius: 4px; padding: 8px; font-family: monospace; font-size: 0.7rem; overflow-y: auto; color: #4af626; line-height: 1.4;">
+                                    admin@sigma-zenith:~/SigmaOS$ claudecode --version<br>
+                                    claude-code v1.0.4 (attested standalone sandbox)<br>
+                                    Type prompt to run automated debugger.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DeepLiveCam Face Swap -->
+                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="settings-group">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🎭 Deep-Live-Cam face swaps</h4>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                                    <div>
+                                        <span style="font-size: 0.7rem; color: var(--text-muted);">Face Model</span>
+                                        <select id="deeplivecam-model" class="cmd-input" style="width: 100%; height: 32px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                                            <option value="InsightFace">InsightFace resnet100</option>
+                                            <option value="GFPGAN">GFPGAN v1.4</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <span style="font-size: 0.7rem; color: var(--text-muted);">Target FPS</span>
+                                        <select id="deeplivecam-fps" class="cmd-input" style="width: 100%; height: 32px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                                            <option value="30">30 FPS</option>
+                                            <option value="60">60 FPS</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button class="wizard-btn" onclick="startDeepLiveCamSimulation()">MAP CAMERA SOURCE</button>
+                                <div id="deeplivecam-console" style="margin-top: 10px; font-size: 0.7rem; font-family: monospace; color: var(--accent-gold); line-height: 1.4; padding: 6px; background: rgba(255,255,255,0.02); border-radius: 4px;">
+                                    > Camera source: IDLE.<br>
+                                    > Inference mapping time: 0ms.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
         </div>
-
-    </div>
-
-    <!-- Floating System Log Feed -->
-    <div id="kernel-logs" class="auto-style-154"></div>
-
-    <!-- Bottom Dock -->
-    <div class="dock-container">
-        <div class="dock-icon" data-tooltip="File Manager" onclick="launchApp('File Manager')">📂</div>
-        <div class="dock-icon" data-tooltip="OmniShell Terminal" onclick="launchApp('OmniShell')">💻</div>
-        <div class="dock-icon" data-tooltip="Observability Matrix" onclick="launchApp('Sigma Browser')">📊</div>
-        <div class="dock-icon" data-tooltip="Neural Core" onclick="launchApp('AI Assistant')">🧠</div>
-        <div class="dock-icon" data-tooltip="AI/ML Studio" onclick="launchApp('AI Studio')">🤖</div>
-        <div class="dock-icon" data-tooltip="Lattice Settings" onclick="launchApp('Lattice Settings')">⚙️</div>
-        <div class="dock-icon" data-tooltip="Pro Tools" onclick="launchApp('Utility Nexus')">🔧</div>
-        <div class="dock-icon" data-tooltip="Marketplace" onclick="launchApp('Marketplace')">🛒</div>
-        <div class="dock-icon" data-tooltip="Zenith Installer" onclick="launchApp('Markup Forge')">📥</div>
-        <div class="auto-style-155"></div>
-        <div class="dock-icon" data-tooltip="Help Matrix" onclick="toggleHelp()">❓</div>
-    </div>
 
     </div>
 

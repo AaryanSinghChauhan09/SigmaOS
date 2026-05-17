@@ -766,7 +766,7 @@ window.addEventListener('load', () => {
 
 window.switchAIPane = function(paneName) {
     // Hide all panes
-    const panes = ['tuner', 'mcp', 'nodes'];
+    const panes = ['tuner', 'mcp', 'nodes', 'memory', 'claudecam'];
     panes.forEach(pane => {
         const el = document.getElementById(`ai-pane-${pane}`);
         if (el) el.style.display = (pane === paneName) ? 'flex' : 'none';
@@ -1014,6 +1014,139 @@ window.executeWorkflowNodes = function() {
         }, 80);
     }, 2400);
 };
+
+
+// Letta Episodic Memory Consolidation
+window.consolidateLettaMemory = function() {
+    const coreMem = document.getElementById('letta-core-mem').value.trim();
+    const episodicMem = document.getElementById('letta-episodic-mem').value.trim();
+
+    if (!coreMem || !episodicMem) {
+        addLog('Σ [LETTA]: Core and Episodic memory fields cannot be empty.', 'error');
+        return;
+    }
+
+    addLog('Σ [LETTA]: Initiating Letta Agent-File consolidation loop...', 'warning');
+    addLog(`Σ [LETTA]: Native config parameters: CoreBytes=${coreMem.length}, EpisodicBytes=${episodicMem.length}`, 'warning');
+
+    setTimeout(() => {
+        addLog('Σ [LETTA]: Consolidated agent episodic memory buffers into cold VFS storage.', 'success');
+        addLog('Σ [LETTA]: Invoking native edgeml_configure_agentfile hook...', 'success');
+        addLog('Σ [EDGEML]: Native agent-file sandbox memory attested successfully.', 'success');
+        alert('Σ Letta Alert:\nAgent memory consolidated successfully into sovereign .agentfile storage!');
+    }, 1200);
+};
+
+// VoiceStar Streaming Synthesizer
+let voiceStreamInterval = null;
+window.toggleVoiceStreaming = function() {
+    const btn = document.getElementById('voicestar-stream-btn');
+    const wave = document.getElementById('voice-wave-line');
+    const rate = document.getElementById('voicestar-rate').value;
+    const latency = document.getElementById('voicestar-latency').value;
+
+    if (!btn || !wave) return;
+
+    if (voiceStreamInterval) {
+        // Stop streaming
+        clearInterval(voiceStreamInterval);
+        voiceStreamInterval = null;
+        btn.innerText = 'START VOICE STREAM';
+        btn.style.boxShadow = '';
+        btn.style.color = '';
+        wave.style.height = '2px';
+        wave.style.opacity = '0.5';
+        addLog('Σ [VOICESTAR]: Disconnected real-time voice streaming channel.', 'warning');
+    } else {
+        // Start streaming
+        addLog(`Σ [VOICESTAR]: Tuning VoiceStar streaming channel at ${rate}Hz. Target latency: ${latency}ms.`, 'warning');
+        btn.innerText = 'STOP VOICE STREAM';
+        btn.style.color = '#ff00ff';
+        btn.style.boxShadow = '0 0 15px rgba(255, 0, 255, 0.4)';
+        
+        let angle = 0;
+        voiceStreamInterval = setInterval(() => {
+            angle += 0.5;
+            const newHeight = Math.round(15 + Math.sin(angle) * 12 + Math.cos(angle * 2) * 5);
+            wave.style.height = `${newHeight}px`;
+            wave.style.opacity = (0.4 + Math.random() * 0.6).toFixed(2);
+        }, 80);
+
+        addLog('Σ [VOICESTAR]: Real-time synthesis channel successfully established. Audio wave streaming live.', 'success');
+    }
+};
+
+// ClaudeCode CLI Sandboxed Healer
+window.executeClaudeCodeCLI = function() {
+    const file = document.getElementById('claudecode-file').value.trim();
+    const prompt = document.getElementById('claudecode-prompt').value.trim();
+    const term = document.getElementById('claudecode-terminal');
+
+    if (!file || !prompt || !term) return;
+
+    term.innerHTML = `admin@sigma-zenith:~/SigmaOS$ claudecode --heal "${file}" --prompt "${prompt}"<br>`;
+    term.innerHTML += `<span style="color: var(--accent-gold);">[claude-code] Analyzing semantic architecture of ${file}...</span><br>`;
+
+    setTimeout(() => {
+        term.innerHTML += `[claude-code] Finding compiler lock blocks in file lines 120-185...<br>`;
+        term.scrollTop = term.scrollHeight;
+    }, 600);
+
+    setTimeout(() => {
+        term.innerHTML += `<span style="color: #ff00ff;">[claude-code] Match found: Potential priority inversion lock in cgroup scheduler callback!</span><br>`;
+        term.scrollTop = term.scrollHeight;
+    }, 1200);
+
+    setTimeout(() => {
+        term.innerHTML += `[claude-code] Performing lock-free atomic replace operation on memory offsets...<br>`;
+        term.scrollTop = term.scrollHeight;
+    }, 1800);
+
+    setTimeout(() => {
+        term.innerHTML += `<span style="color: #00ffc3;">[claude-code] Code replacement completed. Compiling and running regression tests...</span><br>`;
+        term.scrollTop = term.scrollHeight;
+    }, 2400);
+
+    setTimeout(() => {
+        term.innerHTML += `<span style="color: #00ff55;">[claude-code] Success! All 10/10 Vitest core tests passed. File stabilized.</span><br>`;
+        term.innerHTML += `admin@sigma-zenith:~/SigmaOS$ `;
+        term.scrollTop = term.scrollHeight;
+        addLog(`Σ [CLAUDECODE]: Sandboxed healing engine successfully refactored ${file} lock bounds!`, 'success');
+    }, 3200);
+};
+
+// DeepLiveCam Face Swap Simulator
+let liveCamInterval = null;
+window.startDeepLiveCamSimulation = function() {
+    const model = document.getElementById('deeplivecam-model').value;
+    const fps = document.getElementById('deeplivecam-fps').value;
+    const consoleEl = document.getElementById('deeplivecam-console');
+
+    if (!consoleEl) return;
+
+    if (liveCamInterval) {
+        clearInterval(liveCamInterval);
+        liveCamInterval = null;
+        consoleEl.innerHTML = `> Camera source: IDLE.<br>> Inference mapping time: 0ms.`;
+        addLog('Σ [DEEPLIVECAM]: Disconnected face swap mapping camera feed.', 'warning');
+    } else {
+        addLog(`Σ [DEEPLIVECAM]: Map face swap triggered. Model: ${model}, Target: ${fps} FPS.`, 'warning');
+        
+        liveCamInterval = setInterval(() => {
+            const inferenceTime = (1.5 + Math.random() * 1.8).toFixed(2);
+            consoleEl.innerHTML = `> Camera source: ACTIVE [Streaming live]<br>` +
+                                 `> Model: ${model} ResNet core<br>` +
+                                 `> Inference latency: ${inferenceTime} ms<br>` +
+                                 `> Active frame rate: ${fps} FPS [Stable]<br>` +
+                                 `> Attestation: Dilithium-5 authenticated`;
+        }, 200);
+
+        addLog(`Σ [DEEPLIVECAM]: Face mapping stream active using InsightFace weights.`, 'success');
+    }
+};
+
+
+
 
 
 function fmBack() {
