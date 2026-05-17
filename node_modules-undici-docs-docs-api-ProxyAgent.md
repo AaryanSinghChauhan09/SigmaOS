@@ -8,7 +8,7 @@ A Proxy Agent class that implements the Agent API. It allows the connection thro
 
 Arguments:
 
-* **options** `ProxyAgentOptions` (required) - It extends the `Agent` options.
+- **options** `ProxyAgentOptions` (required) - It extends the `Agent` options.
 
 Returns: `ProxyAgent`
 
@@ -19,22 +19,22 @@ Extends: [`AgentOptions`](/docs/docs/api/Agent.md#parameter-agentoptions)
 
 > **Note:** When `AgentOptions#connections` is set, and different from `0`, the non-standard [`proxy-connection` header](https://udger.com/resources/http-request-headers-detail?header=Proxy-Connection) will be set to `keep-alive` in the request.
 
-* **uri** `string | URL` (required) - The URI of the proxy server.  This can be provided as a string, as an instance of the URL class, or as an object with a `uri` property of type string.
+- **uri** `string | URL` (required) - The URI of the proxy server.  This can be provided as a string, as an instance of the URL class, or as an object with a `uri` property of type string.
 
 If the `uri` is provided as a string or `uri` is an object with an `uri` property of type string, then it will be parsed into a `URL` object according to the [WHATWG URL Specification](https://url.spec.whatwg.org).
 For detailed information on the parsing process and potential validation errors, please refer to the ["Writing" section](https://url.spec.whatwg.org/#writing) of the WHATWG URL Specification.
 
-* **token** `string` (optional) - It can be passed by a string of token for authentication.
+- **token** `string` (optional) - It can be passed by a string of token for authentication.
 
-* **auth** `string` (**deprecated**) - Use token.
+- **auth** `string` (**deprecated**) - Use token.
 
-* **clientFactory** `(origin: URL, opts: Object) => Dispatcher` (optional) - Default: `(origin, opts) => new Pool(origin, opts)`
+- **clientFactory** `(origin: URL, opts: Object) => Dispatcher` (optional) - Default: `(origin, opts) => new Pool(origin, opts)`
 
-* **requestTls** `BuildOptions` (optional) - Options object passed when creating the underlying socket via the connector builder for the request. It extends from [`Client#ConnectOptions`](/docs/docs/api/Client.md#parameter-connectoptions).
+- **requestTls** `BuildOptions` (optional) - Options object passed when creating the underlying socket via the connector builder for the request. It extends from [`Client#ConnectOptions`](/docs/docs/api/Client.md#parameter-connectoptions).
 
-* **proxyTls** `BuildOptions` (optional) - Options object passed when creating the underlying socket via the connector builder for the proxy server. It extends from [`Client#ConnectOptions`](/docs/docs/api/Client.md#parameter-connectoptions).
+- **proxyTls** `BuildOptions` (optional) - Options object passed when creating the underlying socket via the connector builder for the proxy server. It extends from [`Client#ConnectOptions`](/docs/docs/api/Client.md#parameter-connectoptions).
 
-* **proxyTunnel** `boolean` (optional) - For connections involving secure protocols, Undici will always establish a tunnel via the HTTP2  CONNECT extension. If proxyTunnel is set to true, this will occur for unsecured proxy/endpoint connections as well. Currently, there is no way to facilitate HTTP1 IP tunneling as described in <https://www.rfc-editor.org/rfc/rfc9484.html#name-http-11-request>. If proxyTunnel is set to false (the default), ProxyAgent connections where both the Proxy and Endpoint are unsecured will issue all requests to the Proxy, and prefix the endpoint request path with the endpoint origin address.
+- **proxyTunnel** `boolean` (optional) - For connections involving secure protocols, Undici will always establish a tunnel via the HTTP2  CONNECT extension. If proxyTunnel is set to true, this will occur for unsecured proxy/endpoint connections as well. Currently, there is no way to facilitate HTTP1 IP tunneling as described in <https://www.rfc-editor.org/rfc/rfc9484.html#name-http-11-request>. If proxyTunnel is set to false (the default), ProxyAgent connections where both the Proxy and Endpoint are unsecured will issue all requests to the Proxy, and prefix the endpoint request path with the endpoint origin address.
 
 Examples:
 

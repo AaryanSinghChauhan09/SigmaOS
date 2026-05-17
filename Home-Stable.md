@@ -6,13 +6,13 @@ The **Stable Edition** is the battle-tested, long-term support (LTS) release of 
 
 ### 🛠️ Key Features
 
-* **LTS Kernel**: Verified for 5+ years of uptime and industrial stability.
+- **LTS Kernel**: Verified for 5+ years of uptime and industrial stability.
 
-* **Security-First Updates**: Only PQC-signed, audited patches are applied.
+- **Security-First Updates**: Only PQC-signed, audited patches are applied.
 
-* **Rollback Assurance**: Every update is a separate shard; revert instantly with `s-rollback`.
+- **Rollback Assurance**: Every update is a separate shard; revert instantly with `s-rollback`.
 
-* **Wide Hardware Compatibility**: Supports a vast array of x86_64 industrial hardware.
+- **Wide Hardware Compatibility**: Supports a vast array of x86_64 industrial hardware.
 
 ### 📥 Installation Guide (Enterprise)
 
@@ -28,9 +28,9 @@ The **Stable Edition** is the battle-tested, long-term support (LTS) release of 
 
 ### 💎 Exclusive Functions
 
-* `integrity-check-full`: Exhaustive cryptographic audit of every shard on disk.
+- `integrity-check-full`: Exhaustive cryptographic audit of every shard on disk.
 
-* `uptime-guarantee-init`: Activate high-availability shards for redundant lattice nodes.
+- `uptime-guarantee-init`: Activate high-availability shards for redundant lattice nodes.
 
 ---
 [Return to Global Home](Home)

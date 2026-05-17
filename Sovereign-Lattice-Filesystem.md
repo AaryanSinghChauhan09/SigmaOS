@@ -29,11 +29,11 @@ void save_critical_data() {
 
 ## 📦 Components
 
-* **Superblock**: Contains Dilithium-5 signatures and lattice-wide Lamport clocks.
+- **Superblock**: Contains Dilithium-5 signatures and lattice-wide Lamport clocks.
 
-* **Inode Lattice**: 1024 concurrent inodes with bit-perfect block mapping.
+- **Inode Lattice**: 1024 concurrent inodes with bit-perfect block mapping.
 
-* **Atomic Journal**: A ring-buffer for all pending I/O operations, ensuring zero data loss during thermal or power events.
+- **Atomic Journal**: A ring-buffer for all pending I/O operations, ensuring zero data loss during thermal or power events.
 
 ## 🚀 Industrial Parity
 

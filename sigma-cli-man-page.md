@@ -18,7 +18,7 @@
 
 *`sigma-cli pkg update` : Synchronizes the local delta indices with the package nexus.* `sigma-cli pkg install [SHARD_NAME]` : Installs a cryptographically attested shard.
 
-* `sigma-cli pkg rollback` : Reverts the system to the last verified clean state.
+- `sigma-cli pkg rollback` : Reverts the system to the last verified clean state.
 
 ### `shard` (Kernel Module Management)
 

@@ -14,31 +14,31 @@ The **Stable Edition** is the immutable industrial benchmark of SigmaOS. It is d
 
 ## 🛠️ Core Functions
 
-* **Bit-Perfect Verification**: Continuous background auditing of every system shard.
+- **Bit-Perfect Verification**: Continuous background auditing of every system shard.
 
-* **LTS Scheduler**: Optimized for long-running processes and 99.999% uptime.
+- **LTS Scheduler**: Optimized for long-running processes and 99.999% uptime.
 
-* **Rollback Nexus**: Automatic, zero-data-loss rollback to the previous stable state if a fault is detected.
+- **Rollback Nexus**: Automatic, zero-data-loss rollback to the previous stable state if a fault is detected.
 
-* **Hardened System Calls**: Every kernel interaction is audited and logged to a secure, immutable shard.
+- **Hardened System Calls**: Every kernel interaction is audited and logged to a secure, immutable shard.
 
 ## 🌟 Premium Features
 
-* **Deterministic Execution**: Guaranteed response times for mission-critical industrial logic.
+- **Deterministic Execution**: Guaranteed response times for mission-critical industrial logic.
 
-* **Enterprise PQC**: Full Dilithium-5 / Kyber-1024 encryption suite enabled by default.
+- **Enterprise PQC**: Full Dilithium-5 / Kyber-1024 encryption suite enabled by default.
 
-* **Remote Attestation**: Verify the integrity of the stable lattice from a remote console.
+- **Remote Attestation**: Verify the integrity of the stable lattice from a remote console.
 
-* **Automated Shard Snapshots**: Periodic, zero-impact backups of the entire system state.
+- **Automated Shard Snapshots**: Periodic, zero-impact backups of the entire system state.
 
 ## 📊 Technical Specs
 
-* **Stability Rating**: Industrial-Grade (Zenith Verified).
+- **Stability Rating**: Industrial-Grade (Zenith Verified).
 
-* **Update Frequency**: Monthly Security Shards Only.
+- **Update Frequency**: Monthly Security Shards Only.
 
-* **Support**: 10-Year Shard Continuity Guarantee.
+- **Support**: 10-Year Shard Continuity Guarantee.
 
  village
  village

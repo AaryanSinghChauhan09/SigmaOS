@@ -22,11 +22,11 @@ The **Mobile** format provides the user-facing app ecosystem. It bundles creativ
 
 ## ⚙️ Core Shards
 
-* `kernel/core/vis/SovereignVis.cpp`
+- `kernel/core/vis/SovereignVis.cpp`
 
-* `userland/ZenithDesktop.cpp`
+- `userland/ZenithDesktop.cpp`
 
-* `kernel/core/ui/SovereignWM.cpp`
+- `kernel/core/ui/SovereignWM.cpp`
 
 ---
 

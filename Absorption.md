@@ -6,33 +6,33 @@ SigmaOS Zenith v15.0 is the result of a global architectural absorption. We have
 
 ### 1. Mainframe Reliability (SovereignZOS)
 
-* **Source**: IBM z/OS, MVS.
+- **Source**: IBM z/OS, MVS.
 
-* **Absorption**: Transactional amnesia and 100% fault-tolerant shard isolation.
+- **Absorption**: Transactional amnesia and 100% fault-tolerant shard isolation.
 
 ### 2. Real-Time Hardening (SovereignQNX)
 
-* **Source**: QNX, VxWorks.
+- **Source**: QNX, VxWorks.
 
-* **Absorption**: Deterministic O(1) interrupt latency and hard real-time shard prioritization.
+- **Absorption**: Deterministic O(1) interrupt latency and hard real-time shard prioritization.
 
 ### 3. Distributed Sharding (SovereignPlan9)
 
-* **Source**: Plan 9 from Bell Labs, HarmonyOS.
+- **Source**: Plan 9 from Bell Labs, HarmonyOS.
 
-* **Absorption**: Shard-as-a-Resource (SaaR) protocol allowing seamless compute distribution across nodes.
+- **Absorption**: Shard-as-a-Resource (SaaR) protocol allowing seamless compute distribution across nodes.
 
 ### 4. Objective Primitives (SovereignNeXT)
 
-* **Source**: NeXTSTEP, macOS.
+- **Source**: NeXTSTEP, macOS.
 
-* **Absorption**: Unified object-oriented system API for high-performance application orchestration.
+- **Absorption**: Unified object-oriented system API for high-performance application orchestration.
 
 ### 5. Amnesic Persistence (SovereignAmnic)
 
-* **Source**: Tails, Qubes OS.
+- **Source**: Tails, Qubes OS.
 
-* **Absorption**: Automatic zeroing of silicon remnants and silicon-level domain isolation.
+- **Absorption**: Automatic zeroing of silicon remnants and silicon-level domain isolation.
 
 ## ?? Launch Readiness
 

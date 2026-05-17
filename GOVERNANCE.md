@@ -9,10 +9,10 @@
 Please refer to the `CONTRIBUTING.md` file in the main repository for:
 *Coding style (C/C++).* Patch submission processes.
 
-* The formal RFC (Request for Comments) process required for major lattice changes.
+- The formal RFC (Request for Comments) process required for major lattice changes.
 
 ## 3. Transparency & Engagement
 
 ***Meeting Notes**: TSC meeting notes and changelogs are published in this Wiki.* **Mailing List**: Subscribe to the `sigma-dev` mailing list for core kernel discussions.
 
-* **Release Notes**: Regular developer updates and milestone tracking.
+- **Release Notes**: Regular developer updates and milestone tracking.

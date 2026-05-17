@@ -2,9 +2,9 @@
 
 Connecting through a proxy is possible by:
 
-* Using [ProxyAgent](/docs/docs/api/ProxyAgent.md).
+- Using [ProxyAgent](/docs/docs/api/ProxyAgent.md).
 
-* Configuring `Client` or `Pool` constructor.
+- Configuring `Client` or `Pool` constructor.
 
 The proxy url should be passed to the `Client` or `Pool` constructor, while the upstream server url
 should be added to every request call in the `path`.

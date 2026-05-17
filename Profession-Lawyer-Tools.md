@@ -8,23 +8,23 @@ The Lawyer Profile prioritizes document integrity, absolute privacy, and ironcla
 
 ## 🛠️ Integrated Shards
 
-* **CaseLaw AI**: Local, zero-latency search engine for legal precedents.
+- **CaseLaw AI**: Local, zero-latency search engine for legal precedents.
 
-* **EvidenceFS**: WORM (Write Once, Read Many) storage for evidentiary data.
+- **EvidenceFS**: WORM (Write Once, Read Many) storage for evidentiary data.
 
-* **LegalTimer**: High-precision billing and task management shard.
+- **LegalTimer**: High-precision billing and task management shard.
 
-* **PQC-Seal**: Quantum-resistant document signing and encryption.
+- **PQC-Seal**: Quantum-resistant document signing and encryption.
 
 ---
 
 ## 🎨 Zenith Configuration
 
-* **Theme**: Ivory Parchment (Clean/Minimal)
+- **Theme**: Ivory Parchment (Clean/Minimal)
 
-* **Layout**: Side-by-side Document Review.
+- **Layout**: Side-by-side Document Review.
 
-* **Personalization**: Mandatory biometric verification for encrypted shards.
+- **Personalization**: Mandatory biometric verification for encrypted shards.
 
 ---
 

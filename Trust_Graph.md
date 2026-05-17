@@ -8,11 +8,11 @@ The Trust Graph provides absolute transparency into the provenance, integrity, a
 
 Unlike mainstream distributions that rely on black-box updates, SigmaOS visualizes the entire security chain:
 
-* **PQC Attestation**: Verification that the shard has been signed using Post-Quantum Cryptography (Dilithium/Kyber).
+- **PQC Attestation**: Verification that the shard has been signed using Post-Quantum Cryptography (Dilithium/Kyber).
 
-* **FIPS-140-3 Compliance**: Real-time auditing of cryptographic module standards.
+- **FIPS-140-3 Compliance**: Real-time auditing of cryptographic module standards.
 
-* **Universal Package Graph**: Mathematical proof of software origin via the immutable provenance lattice.
+- **Universal Package Graph**: Mathematical proof of software origin via the immutable provenance lattice.
 
 ## 🎨 Visualization (Zenith UI)
 

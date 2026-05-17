@@ -10,11 +10,11 @@ SigmaOS implements a robust **Sovereign Linux Compatibility Layer** (`SovereignL
 
 Instead of rewriting every driver from scratch, SigmaOS intercepts calls from Linux Kernel Modules (LKM) and maps them to the native SigmaOS Hardware Abstraction Layer (HAL). This provides:
 
-* **Instant Hardware Support**: Access to thousands of existing Linux drivers for Wi-Fi, Bluetooth, and GPU.
+- **Instant Hardware Support**: Access to thousands of existing Linux drivers for Wi-Fi, Bluetooth, and GPU.
 
-* **Zero-Trust Isolation**: Linux drivers are executed within a constrained shard, preventing them from destabilizing the core lattice.
+- **Zero-Trust Isolation**: Linux drivers are executed within a constrained shard, preventing them from destabilizing the core lattice.
 
-* **Performance Parity**: Near-native execution speed through direct call-mapping without heavy emulation.
+- **Performance Parity**: Near-native execution speed through direct call-mapping without heavy emulation.
 
 ---
 

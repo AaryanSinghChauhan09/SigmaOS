@@ -6,13 +6,13 @@ The **Standalone Edition** is the purest form of SigmaOS. It is designed to run 
 
 ### 🛠️ Key Features
 
-* **Silicon-Direct Kernel**: Zero-overhead execution with no hypervisor layer.
+- **Silicon-Direct Kernel**: Zero-overhead execution with no hypervisor layer.
 
-* **Unified HAL**: Native drivers for NVMe, GPU (Vulcan-S), and PQC-hardened Wi-Fi.
+- **Unified HAL**: Native drivers for NVMe, GPU (Vulcan-S), and PQC-hardened Wi-Fi.
 
-* **Asynchronous Shard Ignition (ASI)**: Boot times under 1.2 seconds on NVMe.
+- **Asynchronous Shard Ignition (ASI)**: Boot times under 1.2 seconds on NVMe.
 
-* **Full Entropy Security**: Hardware-attested PQC key generation.
+- **Full Entropy Security**: Hardware-attested PQC key generation.
 
 ### 📥 Installation Guide (Bare Metal)
 
@@ -28,9 +28,9 @@ The **Standalone Edition** is the purest form of SigmaOS. It is designed to run 
 
 ### 💎 Exclusive Functions
 
-* `lattice-hard-lock`: Physically isolate the node from the network via the S-WIFI shard.
+- `lattice-hard-lock`: Physically isolate the node from the network via the S-WIFI shard.
 
-* `silicon-direct-render`: Bypass the compositor for ultra-low latency compute.
+- `silicon-direct-render`: Bypass the compositor for ultra-low latency compute.
 
 ---
 [Return to Global Home](Home)

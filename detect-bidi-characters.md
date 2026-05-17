@@ -47,8 +47,8 @@ For more information on the topic, you're welcome to read on the official websit
 
 ### References
 
-* <https://certitude.consulting/blog/en/invisible-backdoor/>
+- <https://certitude.consulting/blog/en/invisible-backdoor/>
 
-* <https://github.com/lirantal/anti-trojan-source/>
+- <https://github.com/lirantal/anti-trojan-source/>
 
-* <https://github.com/lirantal/eslint-plugin-anti-trojan-source>
+- <https://github.com/lirantal/eslint-plugin-anti-trojan-source>

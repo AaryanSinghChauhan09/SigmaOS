@@ -10,11 +10,11 @@ The SAC is a decentralized body of contributors who have proven their commitment
 
 ### Roles
 
-* **Sovereign Architect**: Contributors with >10 major shards merged. They have voting rights on architectural changes.
+- **Sovereign Architect**: Contributors with >10 major shards merged. They have voting rights on architectural changes.
 
-* **Lattice Guardian**: Maintainers responsible for shard security auditing and signature verification.
+- **Lattice Guardian**: Maintainers responsible for shard security auditing and signature verification.
 
-* **Shard Contributor**: Any professional who has at least one PQC-signed commit merged into the lattice.
+- **Shard Contributor**: Any professional who has at least one PQC-signed commit merged into the lattice.
 
 ---
 
@@ -48,9 +48,9 @@ Governance proposals are submitted as **Sovereign Shard Proposals (SSPs)**:
 
 SigmaOS is an industrial-grade OS. Contribution is incentivized through:
 
-* **PQC Recognition**: Permanent, cryptographically-verifiable authorship of lattice shards.
+- **PQC Recognition**: Permanent, cryptographically-verifiable authorship of lattice shards.
 
-* **Industrial Certification**: SAC-signed certificates for professionals who have achieved "Sovereign Architect" status.
+- **Industrial Certification**: SAC-signed certificates for professionals who have achieved "Sovereign Architect" status.
 
 ---
 

@@ -118,19 +118,19 @@ Using matching pairs keeps multipart handling predictable.
 If all of the following are true, you can rely on the built-in globals and skip
 adding undici to your dependencies:
 
-* You only need the standard Fetch API (`fetch`, `Request`, `Response`,
+- You only need the standard Fetch API (`fetch`, `Request`, `Response`,
 
   `Headers`, `FormData`).
 
-* You are running Node.js v18 or later.
+- You are running Node.js v18 or later.
 
-* You do not depend on features or bug fixes introduced in a version of undici
+- You do not depend on features or bug fixes introduced in a version of undici
 
   newer than the one bundled with your Node.js release.
 
-* You want zero additional runtime dependencies.
+- You want zero additional runtime dependencies.
 
-* You want cross-platform interoperability with browsers and other runtimes
+- You want cross-platform interoperability with browsers and other runtimes
 
   (Deno, Bun, Cloudflare Workers, etc.) using the same Fetch API surface.
 
@@ -236,14 +236,14 @@ import { fetch } from 'undici' // uses your installed version, not the built-in
 
 ## Further reading
 
-* [API Reference: Fetch](/docs/api/Fetch.md)
+- [API Reference: Fetch](/docs/api/Fetch.md)
 
-* [API Reference: Client](/docs/api/Client.md)
+- [API Reference: Client](/docs/api/Client.md)
 
-* [API Reference: Pool](/docs/api/Pool.md)
+- [API Reference: Pool](/docs/api/Pool.md)
 
-* [API Reference: ProxyAgent](/docs/api/ProxyAgent.md)
+- [API Reference: ProxyAgent](/docs/api/ProxyAgent.md)
 
-* [API Reference: MockAgent](/docs/api/MockAgent.md)
+- [API Reference: MockAgent](/docs/api/MockAgent.md)
 
-* [API Reference: Global Installation](/docs/api/GlobalInstallation.md)
+- [API Reference: Global Installation](/docs/api/GlobalInstallation.md)

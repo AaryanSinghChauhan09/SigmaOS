@@ -10,11 +10,11 @@ SigmaOS ships with the **Zenith UI Dashboard**—a production-grade, hardware-ac
 
 Zenith utilizes the **MLC Algorithm**, natively implemented in the `SovereignZenithUI` shard. By operating directly at Ring 0 with framebuffer manipulation, Zenith delivers:
 
-* **High-Fidelity Glassmorphism**: Real-time blur and saturation effects.
+- **High-Fidelity Glassmorphism**: Real-time blur and saturation effects.
 
-* **Depth Shadowing**: Dynamic Z-index based drop shadows.
+- **Depth Shadowing**: Dynamic Z-index based drop shadows.
 
-* **Ultra-Smooth Transitions**: Sub-pixel motion rendering at 144Hz+.
+- **Ultra-Smooth Transitions**: Sub-pixel motion rendering at 144Hz+.
 
 ---
 
@@ -24,11 +24,11 @@ As of the current stabilization phase, Zenith has migrated to a **Strict Utility
 
 ### Key CSS Variables
 
-* `--bg-primary`: The core lattice background.
+- `--bg-primary`: The core lattice background.
 
-* `--accent-glow`: The primary interaction highlight.
+- `--accent-glow`: The primary interaction highlight.
 
-* `--glass-blur`: Adaptive intensity for morphic panels.
+- `--glass-blur`: Adaptive intensity for morphic panels.
 
 ---
 
@@ -36,11 +36,11 @@ As of the current stabilization phase, Zenith has migrated to a **Strict Utility
 
 The `SovereignTelemetryUI` exposes deep kernel insights with sub-millisecond latency, correlating data from across the lattice:
 
-* **Network Entropy**: Real-time throughput and packet-level security.
+- **Network Entropy**: Real-time throughput and packet-level security.
 
-* **Workload Balancing**: Multi-die silicon usage and shard migration.
+- **Workload Balancing**: Multi-die silicon usage and shard migration.
 
-* **Silicon Forensics**: Fault localization and machine-state diagnostics.
+- **Silicon Forensics**: Fault localization and machine-state diagnostics.
 
 ---
 
@@ -54,11 +54,11 @@ The `SovereignSnapEngine` provides industrial-grade multi-window spatial organiz
 
 Integrated via `SovereignPersonalization` and the `SovereignClawGateway`, Zenith features:
 
-* **Adaptive Layouts**: The UI learns user habits and suggests window arrangements.
+- **Adaptive Layouts**: The UI learns user habits and suggests window arrangements.
 
-* **Profession Profiles**: Instant workspace setup for Doctors, Lawyers, and Engineers.
+- **Profession Profiles**: Instant workspace setup for Doctors, Lawyers, and Engineers.
 
-* **Context-Aware Widgets**: Dynamic dashboards that surface tools based on the current task.
+- **Context-Aware Widgets**: Dynamic dashboards that surface tools based on the current task.
 
 ---
 

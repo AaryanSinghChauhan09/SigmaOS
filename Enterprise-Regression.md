@@ -8,14 +8,14 @@ For enterprise users, SigmaOS provides a "Certified Shard" channel where every u
 
 ### Key Features
 
-* **Automated Regression Harness**: `SovereignRegression` runs 10,000+ tests across different silicon profiles to ensure zero breakage.
+- **Automated Regression Harness**: `SovereignRegression` runs 10,000+ tests across different silicon profiles to ensure zero breakage.
 
-* **Compliance Checker**: Automatically audits the lattice against industrial standards (GDPR, HIPAA, NIST-PQC).
+- **Compliance Checker**: Automatically audits the lattice against industrial standards (GDPR, HIPAA, NIST-PQC).
 
-* **LTS Channel**: A long-term support branch with 10-year stability guarantees for critical infrastructure.
+- **LTS Channel**: A long-term support branch with 10-year stability guarantees for critical infrastructure.
 
 ## 🏢 Enterprise UX
 
-* **Centralized Management**: Orchestrate thousands of SigmaOS nodes from a single dashboard.
+- **Centralized Management**: Orchestrate thousands of SigmaOS nodes from a single dashboard.
 
-* **Audit Logging**: PQC-signed audit logs for all system-level operations.
+- **Audit Logging**: PQC-signed audit logs for all system-level operations.

@@ -22,11 +22,11 @@ The **Microkernel** format is the architectural baseline of SigmaOS. It moves al
 
 ## ⚙️ Core Shards
 
-* `kernel/core/system/SovereignHypervisor.cpp`
+- `kernel/core/system/SovereignHypervisor.cpp`
 
-* `kernel/core/system/SovereignKVM.cpp`
+- `kernel/core/system/SovereignKVM.cpp`
 
-* `kernel/core/system/SovereignLXC.cpp`
+- `kernel/core/system/SovereignLXC.cpp`
 
 ---
 

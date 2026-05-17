@@ -6,7 +6,7 @@ Aggregate stats for a [Pool](/docs/docs/api/Pool.md) or [BalancedPool](/docs/doc
 
 Arguments:
 
-* **pool** `Pool` - Pool or BalancedPool from which to return stats.
+- **pool** `Pool` - Pool or BalancedPool from which to return stats.
 
 ## Instance Properties
 

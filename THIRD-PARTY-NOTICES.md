@@ -631,7 +631,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -667,15 +667,15 @@ Homepage: <https://github.com/micromatch/braces>
 Author: Jon Schlinkert (<https://github.com/jonschlinkert>)
 Contributors:
 
-* Brian Woodward (<https://twitter.com/doowb>)
+- Brian Woodward (<https://twitter.com/doowb>)
 
-* Elan Shanker (<https://github.com/es128>)
+- Elan Shanker (<https://github.com/es128>)
 
-* Eugene Sharygin (<https://github.com/eush77>)
+- Eugene Sharygin (<https://github.com/eush77>)
 
-* hemanth.hm (<http://h3manth.com>)
+- hemanth.hm (<http://h3manth.com>)
 
-* Jon Schlinkert (<http://twitter.com/jonschlinkert>)
+- Jon Schlinkert (<http://twitter.com/jonschlinkert>)
 
 > The MIT License (MIT)
 >
@@ -758,7 +758,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -811,7 +811,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -846,7 +846,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -881,7 +881,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -917,7 +917,7 @@ Homepage: <https://github.com/watson/ci-info>
 Author: Thomas Watson Steen <w@tson.dk> (<https://twitter.com/wa7son>)
 Contributors:
 
-* Sibiraj (<https://github.com/sibiraj-s>)
+- Sibiraj (<https://github.com/sibiraj-s>)
 
 > The MIT License (MIT)
 >
@@ -951,7 +951,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -1013,11 +1013,11 @@ Homepage: <https://github.com/jonschlinkert/dashify>
 Author: Jon Schlinkert (<https://github.com/jonschlinkert>)
 Contributors:
 
-* Jeffrey Priebe (<https://github.com/jeffreypriebe>)
+- Jeffrey Priebe (<https://github.com/jeffreypriebe>)
 
-* Jon Schlinkert (<http://twitter.com/jonschlinkert>)
+- Jon Schlinkert (<http://twitter.com/jonschlinkert>)
 
-* Ondrej Brinkel (<https://www.anzui.de>)
+- Ondrej Brinkel (<https://www.anzui.de>)
 
 > The MIT License (MIT)
 >
@@ -1091,11 +1091,11 @@ Repository: <git://github.com/editorconfig/editorconfig-core-js.git>
 Author: EditorConfig Team
 Contributors:
 
-* Hong Xu (topbug.net)
+- Hong Xu (topbug.net)
 
-* Jed Mao (<https://github.com/jedmao/>)
+- Jed Mao (<https://github.com/jedmao/>)
 
-* Trey Hunner (<http://treyhunner.com>)
+- Trey Hunner (<http://treyhunner.com>)
 
 > Copyright © 2012 EditorConfig Team
 >
@@ -1215,7 +1215,7 @@ Repository: <https://github.com/justmoon/node-extend.git>
 Author: Stefan Thomas <justmoon@members.fsf.org> (<http://www.justmoon.net>)
 Contributors:
 
-* Jordan Harband (<https://github.com/ljharb>)
+- Jordan Harband (<https://github.com/ljharb>)
 
 > The MIT License (MIT)
 >
@@ -1370,15 +1370,15 @@ Homepage: <https://github.com/jonschlinkert/fill-range>
 Author: Jon Schlinkert (<https://github.com/jonschlinkert>)
 Contributors:
 
-* Edo Rivai (edo.rivai.nl)
+- Edo Rivai (edo.rivai.nl)
 
-* Jon Schlinkert (<http://twitter.com/jonschlinkert>)
+- Jon Schlinkert (<http://twitter.com/jonschlinkert>)
 
-* Paul Miller (paulmillr.com)
+- Paul Miller (paulmillr.com)
 
-* Rouven Weßling (<www.rouvenwessling.de>)
+- Rouven Weßling (<www.rouvenwessling.de>)
 
-* null (<https://github.com/wtgtybhertgeghgtwtg>)
+- null (<https://github.com/wtgtybhertgeghgtwtg>)
 
 > The MIT License (MIT)
 >
@@ -1510,7 +1510,7 @@ Repository: <git+https://github.com/mk-pmb/flatten-js.git>
 Author: Joshua Holbrook <josh.holbrook@gmail.com> (<http://jesusabdullah.net>)
 Contributors:
 
-* M.K. (<https://github.com/mk-pmb>)
+- M.K. (<https://github.com/mk-pmb>)
 
 > The MIT License (MIT)
 >
@@ -1593,9 +1593,9 @@ License: ISC
 Author: Gulp Team <team@gulpjs.com> (<https://gulpjs.com/>)
 Contributors:
 
-* Elan Shanker (<https://github.com/es128>)
+- Elan Shanker (<https://github.com/es128>)
 
-* Blaine Bublitz <blaine.bublitz@gmail.com>
+- Blaine Bublitz <blaine.bublitz@gmail.com>
 
 > The ISC License
 >
@@ -1718,7 +1718,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -1882,7 +1882,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -1917,7 +1917,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -1984,7 +1984,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -2052,11 +2052,11 @@ Homepage: <https://github.com/micromatch/is-glob>
 Author: Jon Schlinkert (<https://github.com/jonschlinkert>)
 Contributors:
 
-* Brian Woodward (<https://twitter.com/doowb>)
+- Brian Woodward (<https://twitter.com/doowb>)
 
-* Daniel Perez (<https://tuvistavie.com>)
+- Daniel Perez (<https://tuvistavie.com>)
 
-* Jon Schlinkert (<http://twitter.com/jonschlinkert>)
+- Jon Schlinkert (<http://twitter.com/jonschlinkert>)
 
 > The MIT License (MIT)
 >
@@ -2090,7 +2090,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -2126,11 +2126,11 @@ Homepage: <https://github.com/jonschlinkert/is-number>
 Author: Jon Schlinkert (<https://github.com/jonschlinkert>)
 Contributors:
 
-* Jon Schlinkert (<http://twitter.com/jonschlinkert>)
+- Jon Schlinkert (<http://twitter.com/jonschlinkert>)
 
-* Olsten Larck (<https://i.am.charlike.online>)
+- Olsten Larck (<https://i.am.charlike.online>)
 
-* Rouven Weßling (<www.rouvenwessling.de>)
+- Rouven Weßling (<www.rouvenwessling.de>)
 
 > The MIT License (MIT)
 >
@@ -2183,7 +2183,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -2218,7 +2218,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -2346,11 +2346,11 @@ License: MIT
 Author: Vladimir Zapparov <dervus.grim@gmail.com>
 Contributors:
 
-* Aleksey V Zapparov <ixti@member.fsf.org> (<http://www.ixti.net/>)
+- Aleksey V Zapparov <ixti@member.fsf.org> (<http://www.ixti.net/>)
 
-* Vitaly Puzrin <vitaly@rcdesign.ru> (<https://github.com/puzrin>)
+- Vitaly Puzrin <vitaly@rcdesign.ru> (<https://github.com/puzrin>)
 
-* Martin Grenfell <martin.grenfell@gmail.com> (<http://got-ravings.blogspot.com>)
+- Martin Grenfell <martin.grenfell@gmail.com> (<http://got-ravings.blogspot.com>)
 
 > (The MIT License)
 >
@@ -2386,11 +2386,11 @@ Repository: <git+https://github.com/json5/json5.git>
 Author: Aseem Kishore <aseem.kishore@gmail.com>
 Contributors:
 
-* Max Nanasy <max.nanasy@gmail.com>
+- Max Nanasy <max.nanasy@gmail.com>
 
-* Andrew Eisenberg <andrew@eisenberg.as>
+- Andrew Eisenberg <andrew@eisenberg.as>
 
-* Jordan Tucker <jordanbtucker@gmail.com>
+- Jordan Tucker <jordanbtucker@gmail.com>
 
 > MIT License
 >
@@ -2556,7 +2556,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -2625,7 +2625,7 @@ Repository: <git+https://github.com/meriyah/meriyah.git>
 Author: Kenny F. (<https://github.com/KFlash>)
 Contributors:
 
-* Chunpeng Huo (<https://github.com/3cp>)
+- Chunpeng Huo (<https://github.com/3cp>)
 
 > ISC License
 >
@@ -2646,35 +2646,35 @@ Homepage: <https://github.com/micromatch/micromatch>
 Author: Jon Schlinkert (<https://github.com/jonschlinkert>)
 Contributors:
 
-* null (<https://github.com/DianeLooney>)
+- null (<https://github.com/DianeLooney>)
 
-* Amila Welihinda (amilajack.com)
+- Amila Welihinda (amilajack.com)
 
-* Bogdan Chadkin (<https://github.com/TrySound>)
+- Bogdan Chadkin (<https://github.com/TrySound>)
 
-* Brian Woodward (<https://twitter.com/doowb>)
+- Brian Woodward (<https://twitter.com/doowb>)
 
-* Devon Govett (<http://badassjs.com>)
+- Devon Govett (<http://badassjs.com>)
 
-* Elan Shanker (<https://github.com/es128>)
+- Elan Shanker (<https://github.com/es128>)
 
-* Fabrício Matté (<https://ultcombo.js.org>)
+- Fabrício Matté (<https://ultcombo.js.org>)
 
-* Jon Schlinkert (<http://twitter.com/jonschlinkert>)
+- Jon Schlinkert (<http://twitter.com/jonschlinkert>)
 
-* Martin Kolárik (<https://kolarik.sk>)
+- Martin Kolárik (<https://kolarik.sk>)
 
-* Olsten Larck (<https://i.am.charlike.online>)
+- Olsten Larck (<https://i.am.charlike.online>)
 
-* Paul Miller (paulmillr.com)
+- Paul Miller (paulmillr.com)
 
-* Tom Byrer (<https://github.com/tomByrer>)
+- Tom Byrer (<https://github.com/tomByrer>)
 
-* Tyler Akins (<http://rumkin.com>)
+- Tyler Akins (<http://rumkin.com>)
 
-* Peter Bright <drpizza@quiscalusmexicanus.org> (<https://github.com/drpizza>)
+- Peter Bright <drpizza@quiscalusmexicanus.org> (<https://github.com/drpizza>)
 
-* Kuba Juszczyk (<https://github.com/ku8ar>)
+- Kuba Juszczyk (<https://github.com/ku8ar>)
 
 > The MIT License (MIT)
 >
@@ -2837,7 +2837,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -3248,7 +3248,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -3283,9 +3283,9 @@ License: MIT
 Author: Junyoung Choi <fluke8259@gmail.com> (<https://rokt33r.github.io>)
 Contributors:
 
-* Junyoung Choi <fluke8259@gmail.com> (<https://rokt33r.github.io>)
+- Junyoung Choi <fluke8259@gmail.com> (<https://rokt33r.github.io>)
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 ----------------------------------------
 
@@ -3298,15 +3298,15 @@ Homepage: <https://remark.js.org>
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
-* Eugene Sharygin <eush77@gmail.com>
+- Eugene Sharygin <eush77@gmail.com>
 
-* Junyoung Choi <fluke8259@gmail.com>
+- Junyoung Choi <fluke8259@gmail.com>
 
-* Elijah Hamovitz <elijahhamovitz@gmail.com>
+- Elijah Hamovitz <elijahhamovitz@gmail.com>
 
-* Ika <ikatyang@gmail.com>
+- Ika <ikatyang@gmail.com>
 
 ----------------------------------------
 
@@ -3319,15 +3319,15 @@ Homepage: <https://github.com/jonschlinkert/repeat-string>
 Author: Jon Schlinkert (<http://github.com/jonschlinkert>)
 Contributors:
 
-* Brian Woodward <brian.woodward@gmail.com> (<https://github.com/doowb>)
+- Brian Woodward <brian.woodward@gmail.com> (<https://github.com/doowb>)
 
-* Jon Schlinkert <jon.schlinkert@sellside.com> (<http://twitter.com/jonschlinkert>)
+- Jon Schlinkert <jon.schlinkert@sellside.com> (<http://twitter.com/jonschlinkert>)
 
-* Linus Unnebäck <linus@folkdatorn.se> (<http://linus.unnebäck.se>)
+- Linus Unnebäck <linus@folkdatorn.se> (<http://linus.unnebäck.se>)
 
-* Thijs Busser <tbusser@gmail.com> (<http://tbusser.net>)
+- Thijs Busser <tbusser@gmail.com> (<http://tbusser.net>)
 
-* Titus <tituswormer@gmail.com> (wooorm.com)
+- Titus <tituswormer@gmail.com> (wooorm.com)
 
 > The MIT License (MIT)
 >
@@ -3590,7 +3590,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -3667,9 +3667,9 @@ Homepage: <https://github.com/micromatch/to-regex-range>
 Author: Jon Schlinkert (<https://github.com/jonschlinkert>)
 Contributors:
 
-* Jon Schlinkert (<http://twitter.com/jonschlinkert>)
+- Jon Schlinkert (<http://twitter.com/jonschlinkert>)
 
-* Rouven Weßling (<www.rouvenwessling.de>)
+- Rouven Weßling (<www.rouvenwessling.de>)
 
 > The MIT License (MIT)
 >
@@ -3713,7 +3713,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -3748,7 +3748,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -3881,7 +3881,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -3916,17 +3916,17 @@ Homepage: <https://unifiedjs.com>
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
-* Junyoung Choi <fluke8259@gmail.com>
+- Junyoung Choi <fluke8259@gmail.com>
 
-* Hernan Rajchert <hrajchert@gmail.com>
+- Hernan Rajchert <hrajchert@gmail.com>
 
-* Christian Murphy <christian.murphy.42@gmail.com>
+- Christian Murphy <christian.murphy.42@gmail.com>
 
-* Vse Mozhet Byt <vsemozhetbyt@gmail.com>
+- Vse Mozhet Byt <vsemozhetbyt@gmail.com>
 
-* Richard Littauer <richard.littauer@gmail.com>
+- Richard Littauer <richard.littauer@gmail.com>
 
 > (The MIT License)
 >
@@ -3992,11 +3992,11 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
-* Christian Murphy <christian.murphy.42@gmail.com>
+- Christian Murphy <christian.murphy.42@gmail.com>
 
-* Lucas Brandstaetter <lucas@brandstaetter.tech> (<https://github.com/Roang-zero1>)
+- Lucas Brandstaetter <lucas@brandstaetter.tech> (<https://github.com/Roang-zero1>)
 
 > (The MIT license)
 >
@@ -4031,7 +4031,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -4066,7 +4066,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -4101,11 +4101,11 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
-* Eugene Sharygin <eush77@gmail.com>
+- Eugene Sharygin <eush77@gmail.com>
 
-* Richard Gibson <richard.gibson@gmail.com>
+- Richard Gibson <richard.gibson@gmail.com>
 
 > (The MIT License)
 >
@@ -4140,7 +4140,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -4207,17 +4207,17 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
-* Brendan Abbott <brendan.abbott@temando.com>
+- Brendan Abbott <brendan.abbott@temando.com>
 
-* Denys Dovhan <email@denysdovhan.com>
+- Denys Dovhan <email@denysdovhan.com>
 
-* Kyle Mathews <mathews.kyle@gmail.com>
+- Kyle Mathews <mathews.kyle@gmail.com>
 
-* Shinnosuke Watanabe <snnskwtnb@gmail.com>
+- Shinnosuke Watanabe <snnskwtnb@gmail.com>
 
-* Sindre Sorhus <sindresorhus@gmail.com>
+- Sindre Sorhus <sindresorhus@gmail.com>
 
 > (The MIT License)
 >
@@ -4251,9 +4251,9 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
-* Christian Murphy <christian.murphy.42@gmail.com>
+- Christian Murphy <christian.murphy.42@gmail.com>
 
 > (The MIT License)
 >
@@ -4288,7 +4288,7 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 Contributors:
 
-* Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
+- Titus Wormer <tituswormer@gmail.com> (<https://wooorm.com>)
 
 > (The MIT License)
 >
@@ -4357,7 +4357,7 @@ Repository: <https://github.com/mycoboco/wcwidth.js.git>
 Author: Woong Jun <woong.jun@gmail.com> (<http://code.woong.org/>)
 Contributors:
 
-* Tim Oxley <secoif@gmail.com> (<http://campjs.com/>)
+- Tim Oxley <secoif@gmail.com> (<http://campjs.com/>)
 
 > wcwidth.js: a javascript portng of C's wcwidth()
 > ================================================
@@ -4400,9 +4400,9 @@ Homepage: <https://github.com/Raynos/xtend>
 Author: Raynos <raynos2@gmail.com>
 Contributors:
 
-* Jake Verbaten
+- Jake Verbaten
 
-* Matt Esch
+- Matt Esch
 
 > The MIT License (MIT)
 > Copyright (c) 2012-2014 Raynos.

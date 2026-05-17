@@ -8,19 +8,19 @@ The WebSocket object provides a way to manage a WebSocket connection to a server
 
 Arguments:
 
-* **url** `URL | string`
+- **url** `URL | string`
 
-* **protocol** `string | string[] | WebSocketInit` (optional) - Subprotocol(s) to request the server use, or a [`Dispatcher`](/docs/docs/api/Dispatcher.md).
+- **protocol** `string | string[] | WebSocketInit` (optional) - Subprotocol(s) to request the server use, or a [`Dispatcher`](/docs/docs/api/Dispatcher.md).
 
 ### WebSocketInit
 
 When passing an object as the second argument, the following options are available:
 
-* **protocols** `string | string[]` (optional) - Subprotocol(s) to request the server use.
+- **protocols** `string | string[]` (optional) - Subprotocol(s) to request the server use.
 
-* **dispatcher** `Dispatcher` (optional) - A custom [`Dispatcher`](/docs/docs/api/Dispatcher.md) to use for the connection.
+- **dispatcher** `Dispatcher` (optional) - A custom [`Dispatcher`](/docs/docs/api/Dispatcher.md) to use for the connection.
 
-* **headers** `HeadersInit` (optional) - Custom headers to include in the WebSocket handshake request.
+- **headers** `HeadersInit` (optional) - Custom headers to include in the WebSocket handshake request.
 
 ### Example
 
@@ -79,9 +79,9 @@ See [MDN](https://developer.mozilla.org/en-US/docs/Web/API/WebSocketStream) for 
 
 Arguments:
 
-* **url** `URL | string`
+- **url** `URL | string`
 
-* **options** `WebSocketStreamOptions` (optional)
+- **options** `WebSocketStreamOptions` (optional)
 
 ### WebSocketStream Example
 
@@ -119,9 +119,9 @@ setInterval(() => write(), 5000)
 
 Arguments:
 
-* **websocket** `WebSocket` - The WebSocket instance to send the ping frame on
+- **websocket** `WebSocket` - The WebSocket instance to send the ping frame on
 
-* **payload** `Buffer|undefined` (optional) - Optional payload data to include with the ping frame. Must not exceed 125 bytes.
+- **payload** `Buffer|undefined` (optional) - Optional payload data to include with the ping frame. Must not exceed 125 bytes.
 
 Sends a ping frame to the WebSocket server. The server must respond with a pong frame containing the same payload data. This can be used for keepalive purposes or to verify that the connection is still active.
 
@@ -147,8 +147,8 @@ ws.addEventListener('open', () => {
 
 ## Read More
 
-* [MDN - WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
+- [MDN - WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
 
-* [The WebSocket Specification](https://www.rfc-editor.org/rfc/rfc6455)
+- [The WebSocket Specification](https://www.rfc-editor.org/rfc/rfc6455)
 
-* [The WHATWG WebSocket Specification](https://websockets.spec.whatwg.org/)
+- [The WHATWG WebSocket Specification](https://websockets.spec.whatwg.org/)

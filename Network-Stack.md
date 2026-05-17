@@ -4,8 +4,8 @@ SigmaOS implements a high-performance network stack designed for industrial reli
 
 ## Features
 
-* **PQC Encryption**: All traffic is encrypted via CRYSTALS-Kyber by default.
+- **PQC Encryption**: All traffic is encrypted via CRYSTALS-Kyber by default.
 
-* **Lattice Routing**: Shard-aware packet routing to minimize latency in distributed workflows.
+- **Lattice Routing**: Shard-aware packet routing to minimize latency in distributed workflows.
 
-* **Hardware Agnostic**: Supports generic WiFi and Ethernet chipsets via the Sovereign Driver Framework.
+- **Hardware Agnostic**: Supports generic WiFi and Ethernet chipsets via the Sovereign Driver Framework.
