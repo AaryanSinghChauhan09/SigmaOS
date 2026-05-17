@@ -178,13 +178,13 @@ This class method is a meta function / alias to apply complex filtering in a sin
 
 Parameters :
 
-* criteria : the first parameter. a function, regexp or object.
-  * function : filter MockCallHistoryLog when the function returns false
-  * regexp : filter MockCallHistoryLog when the regexp does not match on MockCallHistoryLog.toString() ([see](./MockCallHistoryLog.md#to-string))
-  * object : an object with MockCallHistoryLog properties as keys to apply multiple filters. each values are a [filter parameter](/docs/docs/api/MockCallHistory.md#filter-parameter)
+- criteria : the first parameter. a function, regexp or object.
+  - function : filter MockCallHistoryLog when the function returns false
+  - regexp : filter MockCallHistoryLog when the regexp does not match on MockCallHistoryLog.toString() ([see](./MockCallHistoryLog.md#to-string))
+  - object : an object with MockCallHistoryLog properties as keys to apply multiple filters. each values are a [filter parameter](/docs/docs/api/MockCallHistory.md#filter-parameter)
 
-* options : the second parameter. an object.
-  * options.operator : `'AND'` or `'OR'` (default `'OR'`). Used only if criteria is an object. see below
+- options : the second parameter. an object.
+  - options.operator : `'AND'` or `'OR'` (default `'OR'`). Used only if criteria is an object. see below
 
 ```js
 mockAgent.getCallHistory()?.filterCalls((log) => log.hash === value && log.headers?.['authorization'] !== undefined)
@@ -214,10 +214,10 @@ mockAgent.getCallHistory()?.filterCalls({ hash: /my-hash/, path: '/endpoint' }, 
 
 Can be :
 
-* string. MockCallHistoryLog filtered if `value !== parameterValue`
+- string. MockCallHistoryLog filtered if `value !== parameterValue`
 
-* null. MockCallHistoryLog filtered if `value !== parameterValue`
+- null. MockCallHistoryLog filtered if `value !== parameterValue`
 
-* undefined. MockCallHistoryLog filtered if `value !== parameterValue`
+- undefined. MockCallHistoryLog filtered if `value !== parameterValue`
 
-* regexp. MockCallHistoryLog filtered if `!parameterValue.test(value)`
+- regexp. MockCallHistoryLog filtered if `!parameterValue.test(value)`

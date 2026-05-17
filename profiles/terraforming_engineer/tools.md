@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-* Atmospheric modeler
+- Atmospheric modeler
 
-* lithosphere stabilizer
+- lithosphere stabilizer
 
-* bio-sphere injector
+- bio-sphere injector
 
-* planetary thermal monitor
+- planetary thermal monitor
 
 ## 📜 Compliance Rules
 
-* Planetary protection protocols
+- Planetary protection protocols
 
-* ethical terraforming guidelines
+- ethical terraforming guidelines
 
 ## 🧮 Professional Calculators
 
-* Atmospheric pressure delta
+- Atmospheric pressure delta
 
-* solar radiation shielding
+- solar radiation shielding
 
-* oxygen-cycle rate
+- oxygen-cycle rate
 
 ## 🧬 Core Algorithms
 
-* Climate engineering simulation
+- Climate engineering simulation
 
-* ecosystem stability prediction
+- ecosystem stability prediction
 
 ## 🛡 Self-Healing Strategy
 
-* Atmospheric probe calibration, bio-dome integrity monitoring
+- Atmospheric probe calibration, bio-dome integrity monitoring
 
 ## 🔄 Rollback Strategy
 
-* Planetary state snapshots, bio-injection phase rollback
+- Planetary state snapshots, bio-injection phase rollback

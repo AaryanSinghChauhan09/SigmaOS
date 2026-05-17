@@ -1,1 +1,1 @@
-# Contributing to SigmaOS\n\n## Coding Style\n- Zero-dependency C++ (C11).\n- No external libraries.\n- Direct hardware paging required.\n\n## Patch Submission\nSubmit RFC templates for review prior to PR.
+# Contributing to SigmaOS\n\n## Coding Style\n- Zero-dependency C++ (C11).\n- No external libraries.\n- Direct hardware paging required.\n\n## Patch Submission\nSubmit RFC templates for review prior to PR

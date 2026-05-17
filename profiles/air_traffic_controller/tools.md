@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-* Radar-Lattice
+- Radar-Lattice
 
-* flight path predictor
+- flight path predictor
 
-* collision alert nexus
+- collision alert nexus
 
-* comm-link bridge
+- comm-link bridge
 
 ## 📜 Compliance Rules
 
-* ICAO standards
+- ICAO standards
 
-* FAA protocols
+- FAA protocols
 
 ## 🧮 Professional Calculators
 
-* Separation minima
+- Separation minima
 
-* fuel-to-weight ratio
+- fuel-to-weight ratio
 
-* descent rate
+- descent rate
 
 ## 🧬 Core Algorithms
 
-* Conflict detection and resolution (CD&R)
+- Conflict detection and resolution (CD&R)
 
-* 4D trajectory prediction
+- 4D trajectory prediction
 
 ## 🛡 Self-Healing Strategy
 
-* Redundant radar link verification, comms-failover automation
+- Redundant radar link verification, comms-failover automation
 
 ## 🔄 Rollback Strategy
 
-* Flight state historical restoration, sequence logs
+- Flight state historical restoration, sequence logs

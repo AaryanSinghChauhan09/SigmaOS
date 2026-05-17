@@ -4,17 +4,17 @@ This directory contains algorithmically generated ideas absorbed from competitor
 
 ## 📊 Idea Categories
 
-* **[UX & Accessibility](UX_Accessibility.md)** (Elementary / Zorin Parity)
+- **[UX & Accessibility](UX_Accessibility.md)** (Elementary / Zorin Parity)
 
-* **[ARM & IoT](ARM_IoT.md)** (RPi-Distro Parity)
+- **[ARM & IoT](ARM_IoT.md)** (RPi-Distro Parity)
 
-* **[Gaming](Gaming.md)** (SteamOS Parity)
+- **[Gaming](Gaming.md)** (SteamOS Parity)
 
-* **[Performance](Performance.md)** (Clear Linux Parity)
+- **[Performance](Performance.md)** (Clear Linux Parity)
 
-* **[Reproducibility](Reproducibility.md)** (NixOS Parity)
+- **[Reproducibility](Reproducibility.md)** (NixOS Parity)
 
-* **[Recovery & Forensics](Recovery_Forensics.md)** (RescueZilla / CAINE Parity)
+- **[Recovery & Forensics](Recovery_Forensics.md)** (RescueZilla / CAINE Parity)
 
 ## ⚙️ Expansion Algorithm
 

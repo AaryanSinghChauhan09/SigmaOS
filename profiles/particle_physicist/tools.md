@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-* CERN-Lattice-link
+- CERN-Lattice-link
 
-* collider-event analyzer
+- collider-event analyzer
 
-* Higgs-boson-search-nexus
+- Higgs-boson-search-nexus
 
-* muon-chamber monitor
+- muon-chamber monitor
 
 ## 📜 Compliance Rules
 
-* Open-science protocols
+- Open-science protocols
 
-* high-energy safety standards
+- high-energy safety standards
 
 ## 🧮 Professional Calculators
 
-* Energy-to-mass delta
+- Energy-to-mass delta
 
-* collision-luminosity
+- collision-luminosity
 
-* decay-width
+- decay-width
 
 ## 🧬 Core Algorithms
 
-* Automated track reconstruction
+- Automated track reconstruction
 
-* dark-matter candidate search
+- dark-matter candidate search
 
 ## 🛡 Self-Healing Strategy
 
-* Sensor-lattice calibration, data-stream consistency check
+- Sensor-lattice calibration, data-stream consistency check
 
 ## 🔄 Rollback Strategy
 
-* Experiment-state snapshots, baseline-simulation restoration
+- Experiment-state snapshots, baseline-simulation restoration

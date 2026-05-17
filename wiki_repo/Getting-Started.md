@@ -16,13 +16,13 @@ chmod +x scripts/setup.sh
 
 This will install:
 
-* `gcc-x86-64-linux-gnu` / `x86_64-elf-gcc`
+- `gcc-x86-64-linux-gnu` / `x86_64-elf-gcc`
 
-* `nasm` (Assembler)
+- `nasm` (Assembler)
 
-* `qemu-system-x86` (Emulator)
+- `qemu-system-x86` (Emulator)
 
-* `xorriso` and `grub-pc-bin` (ISO generation)
+- `xorriso` and `grub-pc-bin` (ISO generation)
 
 ## 2. Building the OS
 

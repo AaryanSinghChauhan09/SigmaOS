@@ -30,11 +30,11 @@ SigmaOS is designed to automatically recover from shard-level corruption. If a c
 
 SigmaOS v15.0 introduces the **S-FORUM**, a decentralized support mesh. Unlike legacy forums, all SigmaOS support threads are:
 
-* **PQC-Attested**: Every guide is signed by the author's Dilithium-5 key.
+- **PQC-Attested**: Every guide is signed by the author's Dilithium-5 key.
 
 ***Lattice-Integrated**: Tutorials can be executed directly as shard snippets in the**S-PLAY** playground.
 
-* **Self-Healing**: The S-WIKI automatically incorporates community-verified solutions.
+- **Self-Healing**: The S-WIKI automatically incorporates community-verified solutions.
 
 ### 2. GitHub Issues
 

@@ -1,1 +1,1 @@
-# Drivers Subsystem\n\nSovereign isolation layer for drivers operations.
+# Drivers Subsystem\n\nSovereign isolation layer for drivers operations

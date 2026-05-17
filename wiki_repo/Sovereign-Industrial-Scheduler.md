@@ -8,11 +8,11 @@ S-SCHED utilizes an **Industrial Priority-based Round Robin (IP-RR)** algorithm,
 
 ### Key Features
 
-* **Deterministic Latency**: Sub-microsecond context switches via optimized TCB (Thread Control Block) management.
+- **Deterministic Latency**: Sub-microsecond context switches via optimized TCB (Thread Control Block) management.
 
-* **Priority Classes**: Dynamic priority adjustment for foreground "Zenith" UI shards.
+- **Priority Classes**: Dynamic priority adjustment for foreground "Zenith" UI shards.
 
-* **Lattice Affinity**: Shards are pinned to silicon nodes to maximize cache locality and minimize IPI (Inter-Processor Interrupt) overhead.
+- **Lattice Affinity**: Shards are pinned to silicon nodes to maximize cache locality and minimize IPI (Inter-Processor Interrupt) overhead.
 
 ## Implementation
 
@@ -20,17 +20,17 @@ The scheduler is implemented in `kernel/core/system/SovereignScheduler.cpp`.
 
 ### Core Structures
 
-* `ThreadControlBlock (TCB)`: Stores the machine state (stack pointer, registers, priority, time-slice).
+- `ThreadControlBlock (TCB)`: Stores the machine state (stack pointer, registers, priority, time-slice).
 
-* `ReadyQueue`: A multi-level feedback queue (planned) currently operating as a prioritized linked-list for Ring-0 stability.
+- `ReadyQueue`: A multi-level feedback queue (planned) currently operating as a prioritized linked-list for Ring-0 stability.
 
 ### API Bridge
 
-* `sched_init()`: Cold-boot ignition of the scheduling engine.
+- `sched_init()`: Cold-boot ignition of the scheduling engine.
 
-* `sched_spawn(id, priority)`: Spawns a new industrial thread into the lattice.
+- `sched_spawn(id, priority)`: Spawns a new industrial thread into the lattice.
 
-* `sched_yield()`: Voluntarily relinquishes the CPU to the next optimal shard.
+- `sched_yield()`: Voluntarily relinquishes the CPU to the next optimal shard.
 
 ## Integration
 

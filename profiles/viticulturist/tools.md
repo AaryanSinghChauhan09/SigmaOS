@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-* Soil-moisture mesh
+- Soil-moisture mesh
 
-* brix-analyzer
+- brix-analyzer
 
-* phenolic-maturity monitor
+- phenolic-maturity monitor
 
-* weather-Lattice
+- weather-Lattice
 
 ## 📜 Compliance Rules
 
-* Appellation d'origine contrôlée (AOC) standards
+- Appellation d'origine contrôlée (AOC) standards
 
-* organic certification rules
+- organic certification rules
 
 ## 🧮 Professional Calculators
 
-* Pruning density
+- Pruning density
 
-* irrigation delta
+- irrigation delta
 
-* fermentation heat-rate
+- fermentation heat-rate
 
 ## 🧬 Core Algorithms
 
-* Harvest-window prediction
+- Harvest-window prediction
 
-* yield-estimation simulation
+- yield-estimation simulation
 
 ## 🛡 Self-Healing Strategy
 
-* Micro-climate sensor sync, pest-pressure verification
+- Micro-climate sensor sync, pest-pressure verification
 
 ## 🔄 Rollback Strategy
 
-* Seasonal growth logs, irrigation state history
+- Seasonal growth logs, irrigation state history

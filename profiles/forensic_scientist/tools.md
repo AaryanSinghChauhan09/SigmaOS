@@ -2,36 +2,36 @@
 
 ## Required Tools & Functions
 
-* Evidence indexing
+- Evidence indexing
 
-* chain of custody manager
+- chain of custody manager
 
-* DNA analysis
+- DNA analysis
 
-* bit-stream imaging
+- bit-stream imaging
 
 ## 📜 Compliance Rules
 
-* Evidence Act
+- Evidence Act
 
-* BNSS forensic protocols
+- BNSS forensic protocols
 
 ## 🧮 Professional Calculators
 
-* Probability of match
+- Probability of match
 
-* decomposition rate
+- decomposition rate
 
 ## 🧬 Core Algorithms
 
-* Pattern recognition
+- Pattern recognition
 
-* digital fingerprinting
+- digital fingerprinting
 
 ## 🛡 Self-Healing Strategy
 
-* Hash-based integrity check for evidence files
+- Hash-based integrity check for evidence files
 
 ## 🔄 Rollback Strategy
 
-* Chain-of-custody immutable state restoration
+- Chain-of-custody immutable state restoration

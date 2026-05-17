@@ -8,9 +8,9 @@ A mock client class that implements the same api as [MockPool](/docs/docs/api/Mo
 
 Arguments:
 
-* **origin**`string` - It should only include the**protocol, hostname, and port**.
+- **origin**`string` - It should only include the**protocol, hostname, and port**.
 
-* **options** `MockClientOptions` - It extends the `Client` options.
+- **options** `MockClientOptions` - It extends the `Client` options.
 
 Returns: `MockClient`
 
@@ -18,7 +18,7 @@ Returns: `MockClient`
 
 Extends: `ClientOptions`
 
-* **agent** `Agent` - the agent to associate this MockClient with.
+- **agent** `Agent` - the agent to associate this MockClient with.
 
 ### Example - Basic MockClient instantiation
 

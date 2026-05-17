@@ -28,7 +28,7 @@ public:
 
     void init() {
         sigma_log_info("[BOOT] SSB: Initializing Sovereign System Boot Nexus...");
-        m_current_stage  = SIGMA_BOOT_STAGE_INIT;
+        m_current_stage  = 0;
         m_initialized    = 1u;
         m_ignited_shards = 0u;
         sigma_log_info("[BOOT] SSB: Stage -> INIT complete.");
@@ -36,15 +36,15 @@ public:
 
     void fallback_recovery() {
         sigma_log_error("[BOOT] SSB: Fallback recovery initiated.");
-        m_current_stage = SIGMA_BOOT_STAGE_RECOVERY;
+        m_current_stage = 1;
     }
 
     void igniteLattice() {
-        m_current_stage = SIGMA_BOOT_STAGE_KERNEL;
+        m_current_stage = 2;
         sigma_log_info("[BOOT] SSB: Commencing Lattice Ignition...");
         m_ignited_shards = 600u;  /* 600 sovereign shards ignited */
         sigma_log_info("[BOOT] SSB: Ignition COMPLETE. 600 shards active.");
-        m_current_stage = SIGMA_BOOT_STAGE_USERLAND;
+        m_current_stage = 3;
         sigma_log_info("[BOOT] SSB: Userland ready. Boot sequence COMPLETE.");
     }
 
@@ -59,7 +59,7 @@ public:
 
 private:
     SovereignBootEngine()
-        : m_current_stage(SIGMA_BOOT_STAGE_INIT),
+        : m_current_stage(0),
           m_ignited_shards(0u),
           m_initialized(0u),
           m_fast_boot(false) {}

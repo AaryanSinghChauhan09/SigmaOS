@@ -20,11 +20,11 @@ The Zenith release marks the stabilization of the SigmaOS core. It is designed f
 
 The `sigma_sh` provides an industrial interface to the lattice, including:
 
-* **GST/Tax Tools**: For Indian professional auditing.
+- **GST/Tax Tools**: For Indian professional auditing.
 
-* **Shard Control**: Real-time hot-swapping and telemetry.
+- **Shard Control**: Real-time hot-swapping and telemetry.
 
-* **PQC-Attested Pkgs**: Secure software distribution via S-PKG.
+- **PQC-Attested Pkgs**: Secure software distribution via S-PKG.
 
 ---
 *Sovereignty achieved through mathematical finality.*

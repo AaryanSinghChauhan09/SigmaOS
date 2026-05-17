@@ -2,34 +2,34 @@
 
 ## Required Tools & Functions
 
-* Post-Quantum Cryptographer workspace
+- Post-Quantum Cryptographer workspace
 
-* specialized analytics
+- specialized analytics
 
-* compliance manager
+- compliance manager
 
 ## 📜 Compliance Rules
 
-* Industry standards
+- Industry standards
 
-* professional ethics
+- professional ethics
 
 ## 🧮 Professional Calculators
 
-* Efficiency metrics
+- Efficiency metrics
 
-* cost analysis
+- cost analysis
 
 ## 🧬 Core Algorithms
 
-* Workflow optimization
+- Workflow optimization
 
-* adaptive assistance
+- adaptive assistance
 
 ## 🛡 Self-Healing Strategy
 
-* Continuous health check for Post-Quantum Cryptographer tools
+- Continuous health check for Post-Quantum Cryptographer tools
 
 ## 🔄 Rollback Strategy
 
-* Automatic state snapshots
+- Automatic state snapshots

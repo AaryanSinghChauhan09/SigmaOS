@@ -12,12 +12,12 @@ Understanding SigmaOS terminology is essential for contributing. Below are the d
 
  **PQC (Post-Quantum Cryptography)**: Cryptographic algorithms (like Kyber and Dilithium) implemented in the kernel designed to be secure against attacks by quantum computers.
 
-* **Profession Matrix**: A set of pre-configured OS profiles (e.g., S-FINANCE, S-MEDICAL) that dynamically load only the shards required for specific industries.
+- **Profession Matrix**: A set of pre-configured OS profiles (e.g., S-FINANCE, S-MEDICAL) that dynamically load only the shards required for specific industries.
 
  **Sovereign**: Indicates complete independence from legacy monolithic kernels (like Linux or NT). SigmaOS is built from the ground up, sharing no code with standard systems.
 
-* **Syscall (Z-SYSCALL)**: The Application Binary Interface used by userland programs to request services from the kernel safely.
+- **Syscall (Z-SYSCALL)**: The Application Binary Interface used by userland programs to request services from the kernel safely.
 
  **Zenith Singularity**: The code name for the v15.0 stable release of SigmaOS, representing the point where the architecture becomes fully production-ready.
 
-* **Zero-Data Remanence**: A security principle ensuring that once memory or storage is freed, it is immediately wiped to prevent data scavenging.
+- **Zero-Data Remanence**: A security principle ensuring that once memory or storage is freed, it is immediately wiped to prevent data scavenging.

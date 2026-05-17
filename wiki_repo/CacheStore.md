@@ -13,11 +13,11 @@ The `MemoryCacheStore` stores the responses in-memory.
 
 ### Options
 
-* `maxSize` - The maximum total size in bytes of all stored responses. Default `104857600` (100MB).
+- `maxSize` - The maximum total size in bytes of all stored responses. Default `104857600` (100MB).
 
-* `maxCount` - The maximum amount of responses to store. Default `1024`.
+- `maxCount` - The maximum amount of responses to store. Default `1024`.
 
-* `maxEntrySize` - The maximum size in bytes that a response's body can be. If a response's body is greater than or equal to this, the response will not be cached. Default `5242880` (5MB).
+- `maxEntrySize` - The maximum size in bytes that a response's body can be. If a response's body is greater than or equal to this, the response will not be cached. Default `5242880` (5MB).
 
 ### Getters
 
@@ -45,11 +45,11 @@ The `SqliteCacheStore` is only exposed if the `node:sqlite` api is present.
 
 ### Options
 
-* `location` - The location of the SQLite database to use. Default `:memory:`.
+- `location` - The location of the SQLite database to use. Default `:memory:`.
 
-* `maxCount` - The maximum number of entries to store in the database. Default `Infinity`.
+- `maxCount` - The maximum number of entries to store in the database. Default `Infinity`.
 
-* `maxEntrySize` - The maximum size in bytes that a response's body can be. If a response's body is greater than or equal to this, the response will not be cached. Default `Infinity`.
+- `maxEntrySize` - The maximum size in bytes that a response's body can be. If a response's body is greater than or equal to this, the response will not be cached. Default `Infinity`.
 
 ## Defining a Custom Cache Store
 
@@ -64,7 +64,7 @@ the cache interceptor will not attempt to cache the response.
 
 Parameters:
 
-* **req** `Dispatcher.RequestOptions` - Incoming request
+- **req** `Dispatcher.RequestOptions` - Incoming request
 
 Returns: `GetResult | Promise<GetResult | undefined> | undefined` - If the request is cached, the cached response is returned. If the request's method is anything other than HEAD, the response is also returned.
 
@@ -74,17 +74,17 @@ The `get` method may return a `Promise` for async cache stores (e.g. Redis-backe
 
 Response properties:
 
-* **response** `CacheValue` - The cached response data.
+- **response** `CacheValue` - The cached response data.
 
-* **body** `Readable | Iterable<Buffer> | undefined` - The response's body. This can be an array of `Buffer` chunks (with a `.values()` method) or a `Readable` stream. Both formats are supported in all code paths, including 304 revalidation.
+- **body** `Readable | Iterable<Buffer> | undefined` - The response's body. This can be an array of `Buffer` chunks (with a `.values()` method) or a `Readable` stream. Both formats are supported in all code paths, including 304 revalidation.
 
 ### Function: `createWriteStream`
 
 Parameters:
 
-* **req** `Dispatcher.RequestOptions` - Incoming request
+- **req** `Dispatcher.RequestOptions` - Incoming request
 
-* **value** `CacheValue` - Response to store
+- **value** `CacheValue` - Response to store
 
 Returns: `Writable | undefined` - If the store is full, return `undefined`. Otherwise, return a writable so that the cache interceptor can stream the body and trailers to the store.
 

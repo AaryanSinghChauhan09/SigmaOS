@@ -2,36 +2,36 @@
 
 ## Required Tools & Functions
 
-* Albedo-monitor
+- Albedo-monitor
 
-* stratospheric-aerosol-Lattice
+- stratospheric-aerosol-Lattice
 
-* carbon-cycle-modeler
+- carbon-cycle-modeler
 
 ## 📜 Compliance Rules
 
-* UN Environmental protocols
+- UN Environmental protocols
 
-* SRM-governance guidelines
+- SRM-governance guidelines
 
 ## 🧮 Professional Calculators
 
-* Radiative-forcing-delta
+- Radiative-forcing-delta
 
-* aerosol-depth-ratio
+- aerosol-depth-ratio
 
-* precipitation-impact
+- precipitation-impact
 
 ## 🧬 Core Algorithms
 
-* Climate-impact simulation
+- Climate-impact simulation
 
-* unintended-consequence modeling
+- unintended-consequence modeling
 
 ## 🛡 Self-Healing Strategy
 
-* Aerosol-delivery-sync, atmospheric-probe verification
+- Aerosol-delivery-sync, atmospheric-probe verification
 
 ## 🔄 Rollback Strategy
 
-* Geo-state snapshots, atmospheric-baseline restoration
+- Geo-state snapshots, atmospheric-baseline restoration

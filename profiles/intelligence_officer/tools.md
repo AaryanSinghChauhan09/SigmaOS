@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-* Signals intelligence (SIGINT) analyzer
+- Signals intelligence (SIGINT) analyzer
 
-* OSINT-Lattice
+- OSINT-Lattice
 
-* secure satellite uplink
+- secure satellite uplink
 
-* steganography detector
+- steganography detector
 
 ## 📜 Compliance Rules
 
-* Classified protocols
+- Classified protocols
 
-* zero-trust communication
+- zero-trust communication
 
 ## 🧮 Professional Calculators
 
-* Encryption strength
+- Encryption strength
 
-* signal-to-noise ratio
+- signal-to-noise ratio
 
-* geolocation triangulator
+- geolocation triangulator
 
 ## 🧬 Core Algorithms
 
-* Heuristic pattern matching
+- Heuristic pattern matching
 
-* semantic link analysis
+- semantic link analysis
 
 ## 🛡 Self-Healing Strategy
 
-* Secure channel re-establishment, payload sanitization
+- Secure channel re-establishment, payload sanitization
 
 ## 🔄 Rollback Strategy
 
-* Redaction-safe state restoration, operational security (OPSEC) baseline
+- Redaction-safe state restoration, operational security (OPSEC) baseline

@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-* Chain-of-custody-Lattice
+- Chain-of-custody-Lattice
 
-* hash-nexus
+- hash-nexus
 
-* cold-storage-bridge
+- cold-storage-bridge
 
-* metadata-carver
+- metadata-carver
 
 ## 📜 Compliance Rules
 
-* BSA 2023 evidence standards
+- BSA 2023 evidence standards
 
-* digital-forensics protocols
+- digital-forensics protocols
 
 ## 🧮 Professional Calculators
 
-* Entropy-density
+- Entropy-density
 
-* file-integrity-score
+- file-integrity-score
 
-* timeline-delta
+- timeline-delta
 
 ## 🧬 Core Algorithms
 
-* Automated artifact correlation
+- Automated artifact correlation
 
-* encrypted-volume detection
+- encrypted-volume detection
 
 ## 🛡 Self-Healing Strategy
 
-* Evidence-seal verification, hash-lattice integrity check
+- Evidence-seal verification, hash-lattice integrity check
 
 ## 🔄 Rollback Strategy
 
-* Analysis-state snapshots, evidence-baseline restoration
+- Analysis-state snapshots, evidence-baseline restoration

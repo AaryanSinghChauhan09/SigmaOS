@@ -22,40 +22,40 @@ Since the `gh` CLI is not available in the local environment, please complete th
 
 ### Step 1: Draft Core Release
 
-* **Tag**: `v15.0-zenith-core`
+- **Tag**: `v15.0-zenith-core`
 
-* **Title**: `SigmaOS Zenith v15.0: The Sovereign Core`
+- **Title**: `SigmaOS Zenith v15.0: The Sovereign Core`
 
-* **Description**: Copy content from [Release-Notes-v15.0](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Release-Notes-v15.0).
+- **Description**: Copy content from [Release-Notes-v15.0](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Release-Notes-v15.0).
 
-* **Assets**: Upload `sigmaos-x86_64.bin`, `sigmaos-aarch64.bin`.
+- **Assets**: Upload `sigmaos-x86_64.bin`, `sigmaos-aarch64.bin`.
 
 ### Step 2: Draft Edition-Specific Releases
 
 For each edition (`app`, `browser`, `dualboot`, `standalone`):
 
-* **Tag**: Use the corresponding `v15.0-zenith-*` tag.
+- **Tag**: Use the corresponding `v15.0-zenith-*` tag.
 
-* **Title**: `SigmaOS Zenith v15.0: <Edition Name>`
+- **Title**: `SigmaOS Zenith v15.0: <Edition Name>`
 
-* **Description**: Link to the edition-specific Wiki page.
+- **Description**: Link to the edition-specific Wiki page.
 
-* **Assets**: Upload the relevant edition artifacts (ISO for standalone, Electron bin for app).
+- **Assets**: Upload the relevant edition artifacts (ISO for standalone, Electron bin for app).
 
 ## 📚 Wiki Synchronization
 
 The Wiki is already updated with:
 
-* [Home](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Home) (v15.0 Overview)
+- [Home](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Home) (v15.0 Overview)
 
-* [Release Notes](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Release-Notes-v15.0) (Unified)
+- [Release Notes](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Release-Notes-v15.0) (Unified)
 
-* [Application Layer](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Application-Layer)
+- [Application Layer](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Application-Layer)
 
-* [Browser Integration](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Browser-Integration)
+- [Browser Integration](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Browser-Integration)
 
-* [Dual-Boot Coexistence](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Dual-Boot-Coexistence)
+- [Dual-Boot Coexistence](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Dual-Boot-Coexistence)
 
-* [Independent Deployment](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Independent-Deployment)
+- [Independent Deployment](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Independent-Deployment)
 
 *"The Zenith is the final industrial fact."*

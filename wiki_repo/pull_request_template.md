@@ -13,13 +13,13 @@ about: Submit a new Sovereign Shard or bug fix
 
 ## Type
 
-* [ ] New Shard
+- [ ] New Shard
 
-* [ ] Bug Fix
+- [ ] Bug Fix
 
-* [ ] Documentation Update
+- [ ] Documentation Update
 
-* [ ] GitHub Actions / CI improvement
+- [ ] GitHub Actions / CI improvement
 
 ## Closes
 
@@ -29,25 +29,25 @@ Closes #
 
 ## Shard Checklist (New Shards Only)
 
-* [ ] C++ OOP Singleton with `getInstance()`
+- [ ] C++ OOP Singleton with `getInstance()`
 
-* [ ] `extern "C"` wrappers for all public functions
+- [ ] `extern "C"` wrappers for all public functions
 
-* [ ] Registered in `SovereignUSR` via `usr_register_shard()`
+- [ ] Registered in `SovereignUSR` via `usr_register_shard()`
 
-* [ ] `cppcheck` passes with zero warnings
+- [ ] `cppcheck` passes with zero warnings
 
-* [ ] Wiki page created or updated in `SigmaOS.wiki/`
+- [ ] Wiki page created or updated in `SigmaOS.wiki/`
 
-* [ ] `IDEAS_BACKLOG.md` or `MISSING_COMPONENTS.md` updated
+- [ ] `IDEAS_BACKLOG.md` or `MISSING_COMPONENTS.md` updated
 
 ## Bug Fix Checklist
 
-* [ ] Root cause identified and documented
+- [ ] Root cause identified and documented
 
-* [ ] Regression test described
+- [ ] Regression test described
 
-* [ ] No new `cppcheck` warnings introduced
+- [ ] No new `cppcheck` warnings introduced
 
 ## Testing
 

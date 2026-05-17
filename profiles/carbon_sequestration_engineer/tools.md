@@ -2,36 +2,36 @@
 
 ## Required Tools & Functions
 
-* CCS-nexus
+- CCS-nexus
 
-* geological-storage-Lattice
+- geological-storage-Lattice
 
-* plume-migration-monitor
+- plume-migration-monitor
 
 ## 📜 Compliance Rules
 
-* EPA CCS regulations
+- EPA CCS regulations
 
-* carbon-capture standards
+- carbon-capture standards
 
 ## 🧮 Professional Calculators
 
-* Injection-pressure-delta
+- Injection-pressure-delta
 
-* storage-capacity-ratio
+- storage-capacity-ratio
 
-* leakage-probability
+- leakage-probability
 
 ## 🧬 Core Algorithms
 
-* Plume-migration prediction
+- Plume-migration prediction
 
-* sequestration-efficiency optimization
+- sequestration-efficiency optimization
 
 ## 🛡 Self-Healing Strategy
 
-* Well-integrity verification, plume-sensor-sync
+- Well-integrity verification, plume-sensor-sync
 
 ## 🔄 Rollback Strategy
 
-* Injection-state snapshots, geological-baseline restoration
+- Injection-state snapshots, geological-baseline restoration

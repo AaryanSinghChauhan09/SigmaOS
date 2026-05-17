@@ -2,42 +2,42 @@
 
 ## Required Tools & Functions
 
-* ECDIS navigation
+- ECDIS navigation
 
-* AIS-Lattice
+- AIS-Lattice
 
-* weather routing
+- weather routing
 
-* ballast manager
+- ballast manager
 
 ## 📜 Compliance Rules
 
-* SOLAS
+- SOLAS
 
-* MARPOL
+- MARPOL
 
-* STCW
+- STCW
 
 ## 🧮 Professional Calculators
 
-* Fuel consumption
+- Fuel consumption
 
-* eta
+- eta
 
-* cargo stability (GM)
+- cargo stability (GM)
 
 ## 🧬 Core Algorithms
 
-* Route optimization
+- Route optimization
 
-* collision avoidance
+- collision avoidance
 
-* tidal prediction
+- tidal prediction
 
 ## 🛡 Self-Healing Strategy
 
-* Navigational data sync, engine diagnostic monitoring
+- Navigational data sync, engine diagnostic monitoring
 
 ## 🔄 Rollback Strategy
 
-* Voyage log snapshots, autopilot calibration restoration
+- Voyage log snapshots, autopilot calibration restoration

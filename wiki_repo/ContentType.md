@@ -2,13 +2,13 @@
 
 ## `MIMEType` interface
 
-* **type** `string`
+- **type** `string`
 
-* **subtype** `string`
+- **subtype** `string`
 
-* **parameters** `Map<string, string>`
+- **parameters** `Map<string, string>`
 
-* **essence** `string`
+- **essence** `string`
 
 ## `parseMIMEType(input)`
 
@@ -31,7 +31,7 @@ parseMIMEType('text/html; charset=gbk')
 
 Arguments:
 
-* **input** `string`
+- **input** `string`
 
 Returns: `MIMEType|'failure'`
 
@@ -57,6 +57,6 @@ serializeAMimeType({
 
 Arguments:
 
-* **mimeType** `MIMEType`
+- **mimeType** `MIMEType`
 
 Returns: `string`

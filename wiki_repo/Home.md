@@ -14,13 +14,13 @@ SigmaOS Zenith v15.0 is an industrial-grade, microkernel-based operating system 
 
 ## 🚀 Key Release Features (v15.0)
 
-* **Sovereign Choice**: Select your profile (Legacy, Modern, Cloud, RTOS, Forensic) at install time.
+- **Sovereign Choice**: Select your profile (Legacy, Modern, Cloud, RTOS, Forensic) at install time.
 
-* **sigma-pkg**: Professional package manager with Flatpak/AppImage support.
+- **sigma-pkg**: Professional package manager with Flatpak/AppImage support.
 
-* **sigma-cli**: Industrial CLI for shard management and telemetry analysis.
+- **sigma-cli**: Industrial CLI for shard management and telemetry analysis.
 
-* **Sovereign App Store**: A stunning GUI for the professional ecosystem.
+- **Sovereign App Store**: A stunning GUI for the professional ecosystem.
 
 ## ⚖️ Our Principles
 
@@ -34,12 +34,12 @@ SigmaOS Zenith v15.0 is an industrial-grade, microkernel-based operating system 
 
 To maintain an organized ecosystem, each major kernel subsystem has a dedicated Wiki branch index:
 
-* [Main Branch Wiki](Wiki-Main-Branch): Core Architecture, Governance, Security Policies
-* [Networking Branch Wiki](Wiki-Networking-Branch): TCP/IP Stack, Firewalls
-* [Storage Branch Wiki](Wiki-Storage-Branch): Sovereign Filesystem, Encryption
-* [Memory Branch Wiki](Wiki-Memory-Branch): Paging, Shard Allocators
-* [Scheduling Branch Wiki](Wiki-Scheduling-Branch): Algorithms, Preemption
-* [Drivers Branch Wiki](Wiki-Drivers-Branch): SDF, Hardware Abstraction
+- [Main Branch Wiki](Wiki-Main-Branch): Core Architecture, Governance, Security Policies
+- [Networking Branch Wiki](Wiki-Networking-Branch): TCP/IP Stack, Firewalls
+- [Storage Branch Wiki](Wiki-Storage-Branch): Sovereign Filesystem, Encryption
+- [Memory Branch Wiki](Wiki-Memory-Branch): Paging, Shard Allocators
+- [Scheduling Branch Wiki](Wiki-Scheduling-Branch): Algorithms, Preemption
+- [Drivers Branch Wiki](Wiki-Drivers-Branch): SDF, Hardware Abstraction
 
 ## 🛠 Getting Started
 

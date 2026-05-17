@@ -10,7 +10,7 @@ Requests are not guaranteed to be dispatched in order of invocation.
 
 Arguments:
 
-* **options** `AgentOptions` (optional)
+- **options** `AgentOptions` (optional)
 
 Returns: `Agent`
 
@@ -18,9 +18,9 @@ Returns: `Agent`
 
 Extends: [`PoolOptions`](/docs/docs/api/Pool.md#parameter-pooloptions)
 
-* **factory** `(origin: URL, opts: Object) => Dispatcher` - Default: `(origin, opts) => new Pool(origin, opts)`
+- **factory** `(origin: URL, opts: Object) => Dispatcher` - Default: `(origin, opts) => new Pool(origin, opts)`
 
-* **maxOrigins** `number` (optional) - Default: `Infinity` - Limits the total number of origins that can receive requests at a time, throwing an `MaxOriginsReachedError` error when attempting to dispatch when the max is reached. If `Infinity`, no limit is enforced.
+- **maxOrigins** `number` (optional) - Default: `Infinity` - Limits the total number of origins that can receive requests at a time, throwing an `MaxOriginsReachedError` error when attempting to dispatch when the max is reached. If `Infinity`, no limit is enforced.
 
 ## Instance Properties
 
@@ -50,7 +50,7 @@ Implements [`Dispatcher.dispatch(options, handler)`](/docs/docs/api/Dispatcher.m
 
 Extends: [`DispatchOptions`](/docs/docs/api/Dispatcher.md#parameter-dispatchoptions)
 
-* **origin** `string | URL`
+- **origin** `string | URL`
 
 Implements [`Dispatcher.destroy([error, callback])`](/docs/docs/api/Dispatcher.md#dispatcherdestroyerror-callback-promise).
 

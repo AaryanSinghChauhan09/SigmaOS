@@ -2,34 +2,34 @@
 
 ## Required Tools & Functions
 
-* Crispr Gene Editing Technician workspace
+- Crispr Gene Editing Technician workspace
 
-* specialized analytics
+- specialized analytics
 
-* compliance manager
+- compliance manager
 
 ## 📜 Compliance Rules
 
-* Industry standards
+- Industry standards
 
-* professional ethics
+- professional ethics
 
 ## 🧮 Professional Calculators
 
-* Efficiency metrics
+- Efficiency metrics
 
-* cost analysis
+- cost analysis
 
 ## 🧬 Core Algorithms
 
-* Workflow optimization
+- Workflow optimization
 
-* adaptive assistance
+- adaptive assistance
 
 ## 🛡 Self-Healing Strategy
 
-* Continuous health check for Crispr Gene Editing Technician tools
+- Continuous health check for Crispr Gene Editing Technician tools
 
 ## 🔄 Rollback Strategy
 
-* Automatic state snapshots
+- Automatic state snapshots

@@ -6,13 +6,13 @@ The **App Edition** is optimized for heavy application workflows. It includes pr
 
 ### 🛠️ Key Features
 
-* **S-ARC Integration**: Run `.sab` (Sovereign App Bundles) with native performance.
+- **S-ARC Integration**: Run `.sab` (Sovereign App Bundles) with native performance.
 
-* **Pre-Loaded Professional Suite**: Includes `s-pdf`, `libreoffice-s`, and `gimp-s`.
+- **Pre-Loaded Professional Suite**: Includes `s-pdf`, `libreoffice-s`, and `gimp-s`.
 
-* **GPU-Direct Acceleration**: Hardware-native rendering for professional creative tools.
+- **GPU-Direct Acceleration**: Hardware-native rendering for professional creative tools.
 
-* **Unified App Store**: Secure, PQC-vetted access to the Sigma Shard Registry.
+- **Unified App Store**: Secure, PQC-vetted access to the Sigma Shard Registry.
 
 ### 📥 Installation Guide (Professional)
 
@@ -28,9 +28,9 @@ The **App Edition** is optimized for heavy application workflows. It includes pr
 
 ### 💎 Exclusive Functions
 
-* `shard-bundle-create`: Package your own tools into .sab bundles for the lattice.
+- `shard-bundle-create`: Package your own tools into .sab bundles for the lattice.
 
-* `pro-mode-ignite`: Optimize kernel scheduling for foreground creative applications.
+- `pro-mode-ignite`: Optimize kernel scheduling for foreground creative applications.
 
 ---
 [Return to Global Home](Home)

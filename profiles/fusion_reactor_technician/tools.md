@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-* Tokamak-monitor
+- Tokamak-monitor
 
-* magnetic-containment-nexus
+- magnetic-containment-nexus
 
-* plasma-density-Lattice
+- plasma-density-Lattice
 
-* tritium-breeder-auditor
+- tritium-breeder-auditor
 
 ## 📜 Compliance Rules
 
-* IAEA fusion safety standards
+- IAEA fusion safety standards
 
-* high-energy-physics protocols
+- high-energy-physics protocols
 
 ## 🧮 Professional Calculators
 
-* Plasma-beta-ratio
+- Plasma-beta-ratio
 
-* Lawson-criterion-delta
+- Lawson-criterion-delta
 
-* neutron-flux-calc
+- neutron-flux-calc
 
 ## 🧬 Core Algorithms
 
-* Automated plasma stability control
+- Automated plasma stability control
 
-* ELM-suppression orchestration
+- ELM-suppression orchestration
 
 ## 🛡 Self-Healing Strategy
 
-* Magnetic-field-calibration sync, containment-integrity verify
+- Magnetic-field-calibration sync, containment-integrity verify
 
 ## 🔄 Rollback Strategy
 
-* Reactor-state snapshots, baseline-plasma-parameters
+- Reactor-state snapshots, baseline-plasma-parameters

@@ -2,34 +2,34 @@
 
 ## Required Tools & Functions
 
-* Cyber-Security Threat Hunter workspace
+- Cyber-Security Threat Hunter workspace
 
-* specialized analytics
+- specialized analytics
 
-* compliance manager
+- compliance manager
 
 ## 📜 Compliance Rules
 
-* Industry standards
+- Industry standards
 
-* professional ethics
+- professional ethics
 
 ## 🧮 Professional Calculators
 
-* Efficiency metrics
+- Efficiency metrics
 
-* cost analysis
+- cost analysis
 
 ## 🧬 Core Algorithms
 
-* Workflow optimization
+- Workflow optimization
 
-* adaptive assistance
+- adaptive assistance
 
 ## 🛡 Self-Healing Strategy
 
-* Continuous health check for Cyber-Security Threat Hunter tools
+- Continuous health check for Cyber-Security Threat Hunter tools
 
 ## 🔄 Rollback Strategy
 
-* Automatic state snapshots
+- Automatic state snapshots

@@ -2,36 +2,36 @@
 
 ## Required Tools & Functions
 
-* Real-time hazard mapping
+- Real-time hazard mapping
 
-* resource allocation mesh
+- resource allocation mesh
 
-* secure satellite comms
+- secure satellite comms
 
 ## 📜 Compliance Rules
 
-* NDMA guidelines
+- NDMA guidelines
 
-* FEMA protocols
+- FEMA protocols
 
 ## 🧮 Professional Calculators
 
-* Casualty estimation
+- Casualty estimation
 
-* resource burn rate
+- resource burn rate
 
-* logistics pathing
+- logistics pathing
 
 ## 🧬 Core Algorithms
 
-* Multi-agent evacuation routing
+- Multi-agent evacuation routing
 
-* supply chain optimization
+- supply chain optimization
 
 ## 🛡 Self-Healing Strategy
 
-* Communication mesh integrity, sensor network validation
+- Communication mesh integrity, sensor network validation
 
 ## 🔄 Rollback Strategy
 
-* Incident command state restoration, resource map versioning
+- Incident command state restoration, resource map versioning

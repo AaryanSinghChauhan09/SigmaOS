@@ -1,1 +1,1 @@
-# Desktop Subsystem\n\nSovereign isolation layer for desktop operations.
+# Desktop Subsystem\n\nSovereign isolation layer for desktop operations

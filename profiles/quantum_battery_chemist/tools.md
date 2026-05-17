@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-* Ion-transport-simulator
+- Ion-transport-simulator
 
-* anode-cathode-Lattice
+- anode-cathode-Lattice
 
-* charge-density-mapper
+- charge-density-mapper
 
-* SEI-layer-auditor
+- SEI-layer-auditor
 
 ## 📜 Compliance Rules
 
-* Material safety data
+- Material safety data
 
-* quantum-chemistry standards
+- quantum-chemistry standards
 
 ## 🧮 Professional Calculators
 
-* Energy-density-delta
+- Energy-density-delta
 
-* cycle-life-predictor
+- cycle-life-predictor
 
-* thermal-runaway-risk
+- thermal-runaway-risk
 
 ## 🧬 Core Algorithms
 
-* Generative electrolyte design
+- Generative electrolyte design
 
-* molecular-structure optimization
+- molecular-structure optimization
 
 ## 🛡 Self-Healing Strategy
 
-* Charge-balance verification, thermal-sensor-sync
+- Charge-balance verification, thermal-sensor-sync
 
 ## 🔄 Rollback Strategy
 
-* Chemical-state snapshots, battery-configuration history
+- Chemical-state snapshots, battery-configuration history

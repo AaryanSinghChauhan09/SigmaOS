@@ -10,15 +10,15 @@ Requests are not guaranteed to be dispatched in order of invocation.
 
 Arguments:
 
-* **upstreams**`URL | string | string[]` - It should only include the**protocol, hostname, and port**.
+- **upstreams**`URL | string | string[]` - It should only include the**protocol, hostname, and port**.
 
-* **options** `BalancedPoolOptions` (optional)
+- **options** `BalancedPoolOptions` (optional)
 
 ### Parameter: `BalancedPoolOptions`
 
 Extends: [`PoolOptions`](/docs/docs/api/Pool.md#parameter-pooloptions)
 
-* **factory** `(origin: URL, opts: Object) => Dispatcher` - Default: `(origin, opts) => new Pool(origin, opts)`
+- **factory** `(origin: URL, opts: Object) => Dispatcher` - Default: `(origin, opts) => new Pool(origin, opts)`
 
 The `PoolOptions` are passed to each of the `Pool` instances being created.
 
@@ -48,7 +48,7 @@ Add an upstream.
 
 Arguments:
 
-* **upstream**`string` - It should only include the**protocol, hostname, and port**.
+- **upstream**`string` - It should only include the**protocol, hostname, and port**.
 
 ### `BalancedPool.removeUpstream(upstream)`
 

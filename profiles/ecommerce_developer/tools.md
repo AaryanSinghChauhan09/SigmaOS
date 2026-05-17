@@ -2,38 +2,38 @@
 
 ## Required Tools & Functions
 
-* Shopify-Lattice
+- Shopify-Lattice
 
-* Magento-Sovereign-Core
+- Magento-Sovereign-Core
 
-* inventory-sync-nexus
+- inventory-sync-nexus
 
-* payment-gateway-bridge
+- payment-gateway-bridge
 
 ## 📜 Compliance Rules
 
-* PCI-DSS
+- PCI-DSS
 
-* e-commerce consumer laws
+- e-commerce consumer laws
 
 ## 🧮 Professional Calculators
 
-* AOV (Average Order Value)
+- AOV (Average Order Value)
 
-* cart-abandonment rate
+- cart-abandonment rate
 
-* shipping-cost-delta
+- shipping-cost-delta
 
 ## 🧬 Core Algorithms
 
-* Inventory-replenishment prediction
+- Inventory-replenishment prediction
 
-* personalized-recommendation engine
+- personalized-recommendation engine
 
 ## 🛡 Self-Healing Strategy
 
-* Inventory-sync verification, payment-link validation
+- Inventory-sync verification, payment-link validation
 
 ## 🔄 Rollback Strategy
 
-* Store-state snapshots, order-history restoration
+- Store-state snapshots, order-history restoration

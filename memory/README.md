@@ -1,1 +1,1 @@
-# Memory Subsystem\n\nSovereign isolation layer for memory operations.
+# Memory Subsystem\n\nSovereign isolation layer for memory operations

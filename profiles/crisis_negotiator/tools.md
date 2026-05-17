@@ -2,36 +2,36 @@
 
 ## Required Tools & Functions
 
-* Voice-stress analyzer
+- Voice-stress analyzer
 
-* semantic sentiment engine
+- semantic sentiment engine
 
-* hostage-link bridge
+- hostage-link bridge
 
-* secure-comms
+- secure-comms
 
 ## 📜 Compliance Rules
 
-* Negotiation protocols
+- Negotiation protocols
 
-* de-escalation guidelines
+- de-escalation guidelines
 
 ## 🧮 Professional Calculators
 
-* Time-elapsed risk
+- Time-elapsed risk
 
-* psychological profile score
+- psychological profile score
 
 ## 🧬 Core Algorithms
 
-* Behavioral change staircase model
+- Behavioral change staircase model
 
-* automated sentiment tracking
+- automated sentiment tracking
 
 ## 🛡 Self-Healing Strategy
 
-* Communication-link stability check, secure-line verification
+- Communication-link stability check, secure-line verification
 
 ## 🔄 Rollback Strategy
 
-* Negotiation log history, previous incident case-restoration
+- Negotiation log history, previous incident case-restoration

@@ -26,7 +26,7 @@ Its existence is a total departure from the monolithic, dependency-heavy paradig
 
 SigmaOS v15.0 introduces the **S-FORUM** shard, enabling decentralized, community-driven support. Unlike legacy forums, all SigmaOS support threads are:
 
-* **PQC-Attested**: Every guide is signed by the author's Dilithium-5 key.
+- **PQC-Attested**: Every guide is signed by the author's Dilithium-5 key.
 
 ***Lattice-Integrated**: Tutorials can be executed directly as shard snippets in the**S-PLAY** playground.
 
@@ -34,11 +34,11 @@ SigmaOS v15.0 introduces the **S-FORUM** shard, enabling decentralized, communit
 
 ## 4. ZERO-DERIVATION GUARANTEE
 
-* **0% GPL Code**: No Linux kernel bits or GNU tools.
+- **0% GPL Code**: No Linux kernel bits or GNU tools.
 
-* **0% Proprietary Code**: No Windows NT drivers or closed-source blobs.
+- **0% Proprietary Code**: No Windows NT drivers or closed-source blobs.
 
-* **100% Native**: Every line of the kernel and industrial toolchain is written natively.
+- **100% Native**: Every line of the kernel and industrial toolchain is written natively.
 
 ### Final Declaration
 

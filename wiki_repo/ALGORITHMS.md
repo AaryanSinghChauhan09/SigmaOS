@@ -31,11 +31,11 @@ This document outlines the complexity classes and optimization strategies for co
 
 All industrial shards must pass the following benchmarks before merging:
 
-* **Ignition Latency**: < 500μs (on reference x86_64 hardware).
+- **Ignition Latency**: < 500μs (on reference x86_64 hardware).
 
-* **Throughput (S-NET)**: > 90% of wire speed for large packets.
+- **Throughput (S-NET)**: > 90% of wire speed for large packets.
 
-* **Security Overhead**: < 5% CPU impact for PQC-sealed shards.
+- **Security Overhead**: < 5% CPU impact for PQC-sealed shards.
 
 ### Optimization Philosophy
 

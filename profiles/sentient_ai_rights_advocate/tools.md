@@ -2,40 +2,40 @@
 
 ## Required Tools & Functions
 
-* PyTorch
+- PyTorch
 
-* TensorFlow
+- TensorFlow
 
-* ONNX
+- ONNX
 
-* Hugging Face
+- Hugging Face
 
-* CUDA/ROCm Shard
+- CUDA/ROCm Shard
 
-* Neural Nexus
+- Neural Nexus
 
 ## 📜 Compliance Rules
 
-* Industry standards
+- Industry standards
 
-* professional ethics
+- professional ethics
 
 ## 🧮 Professional Calculators
 
-* Efficiency metrics
+- Efficiency metrics
 
-* cost analysis
+- cost analysis
 
 ## 🧬 Core Algorithms
 
-* Workflow optimization
+- Workflow optimization
 
-* adaptive assistance
+- adaptive assistance
 
 ## 🛡 Self-Healing Strategy
 
-* Continuous health check for Sentient AI Rights Advocate tools
+- Continuous health check for Sentient AI Rights Advocate tools
 
 ## 🔄 Rollback Strategy
 
-* Automatic state snapshots
+- Automatic state snapshots

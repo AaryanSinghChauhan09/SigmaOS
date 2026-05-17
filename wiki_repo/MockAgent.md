@@ -8,7 +8,7 @@ A mocked Agent class that implements the Agent API. It allows one to intercept H
 
 Arguments:
 
-* **options** `MockAgentOptions` (optional) - It extends the `Agent` options.
+- **options** `MockAgentOptions` (optional) - It extends the `Agent` options.
 
 Returns: `MockAgent`
 
@@ -16,11 +16,11 @@ Returns: `MockAgent`
 
 Extends: [`AgentOptions`](/docs/docs/api/Agent.md#parameter-agentoptions)
 
-* **agent** `Agent` (optional) - Default: `new Agent([options])` - a custom agent encapsulated by the MockAgent.
+- **agent** `Agent` (optional) - Default: `new Agent([options])` - a custom agent encapsulated by the MockAgent.
 
-* **ignoreTrailingSlash** `boolean` (optional) - Default: `false` - set the default value for `ignoreTrailingSlash` for interceptors.
+- **ignoreTrailingSlash** `boolean` (optional) - Default: `false` - set the default value for `ignoreTrailingSlash` for interceptors.
 
-* **acceptNonStandardSearchParameters** `boolean` (optional) - Default: `false` - set to `true` if the matcher should also accept non standard search parameters such as multi-value items specified with `[]` (e.g. `param[]=1&param[]=2&param[]=3`) and multi-value items which values are comma separated (e.g. `param=1,2,3`).
+- **acceptNonStandardSearchParameters** `boolean` (optional) - Default: `false` - set to `true` if the matcher should also accept non standard search parameters such as multi-value items specified with `[]` (e.g. `param[]=1&param[]=2&param[]=3`) and multi-value items which values are comma separated (e.g. `param=1,2,3`).
 
 ### Example - Basic MockAgent instantiation
 
@@ -54,7 +54,7 @@ For subsequent `MockAgent.get` calls on the same origin, the same mock instance 
 
 Arguments:
 
-* **origin** `string | RegExp | (value) => boolean` - a matcher for the pool origin to be retrieved from the MockAgent.
+- **origin** `string | RegExp | (value) => boolean` - a matcher for the pool origin to be retrieved from the MockAgent.
 
 | Matcher type | Condition to pass          |
 |:------------:| -------------------------- |
@@ -400,7 +400,7 @@ When using a string, it should only include the **hostname and optionally, the p
 
 Arguments:
 
-* **host** `string | RegExp | (value) => boolean` - (optional)
+- **host** `string | RegExp | (value) => boolean` - (optional)
 
 Returns: `void`
 
@@ -495,11 +495,11 @@ await request('http://example.com')
 
 This method returns any pending interceptors registered on a mock agent. A pending interceptor meets one of the following criteria:
 
-* Is registered with neither `.times(<number>)` nor `.persist()`, and has not been invoked;
+- Is registered with neither `.times(<number>)` nor `.persist()`, and has not been invoked;
 
-* Is persistent (i.e., registered with `.persist()`) and has not been invoked;
+- Is persistent (i.e., registered with `.persist()`) and has not been invoked;
 
-* Is registered with `.times(<number>)` and has not been invoked `<number>` of times.
+- Is registered with `.times(<number>)` and has not been invoked `<number>` of times.
 
 Returns: `PendingInterceptor[]` (where `PendingInterceptor` is a `MockDispatch` with an additional `origin: string`)
 
@@ -543,11 +543,11 @@ const pendingInterceptors = agent.pendingInterceptors()
 
 This method throws if the mock agent has any pending interceptors. A pending interceptor meets one of the following criteria:
 
-* Is registered with neither `.times(<number>)` nor `.persist()`, and has not been invoked;
+- Is registered with neither `.times(<number>)` nor `.persist()`, and has not been invoked;
 
-* Is persistent (i.e., registered with `.persist()`) and has not been invoked;
+- Is persistent (i.e., registered with `.persist()`) and has not been invoked;
 
-* Is registered with `.times(<number>)` and has not been invoked `<number>` of times.
+- Is registered with `.times(<number>)` and has not been invoked `<number>` of times.
 
 #### Example - Check that there are no pending interceptors
 

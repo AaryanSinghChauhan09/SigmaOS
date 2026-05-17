@@ -6,17 +6,17 @@ This guide provides instructions for building the SigmaOS Sovereign Lattice and 
 
 To build and run SigmaOS, you need the following tools:
 
-* **GCC / G++**: Cross-compiler for `x86_64-elf` (or local `g++` if building for simulation).
+- **GCC / G++**: Cross-compiler for `x86_64-elf` (or local `g++` if building for simulation).
 
-* **NASM**: Assembly compiler for low-level silicon.
+- **NASM**: Assembly compiler for low-level silicon.
 
-* **Make**: Build orchestration tool.
+- **Make**: Build orchestration tool.
 
-* **QEMU**: Hardware emulator for kernel verification.
+- **QEMU**: Hardware emulator for kernel verification.
 
-* **grub-mkrescue**: Required for generating bootable ISO images.
+- **grub-mkrescue**: Required for generating bootable ISO images.
 
-* **xorriso**: Dependency for `grub-mkrescue`.
+- **xorriso**: Dependency for `grub-mkrescue`.
 
 ## 🛠️ Build Instructions
 

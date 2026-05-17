@@ -2,50 +2,50 @@
 
 ## Required Tools & Functions
 
-* Ledger system
+- Ledger system
 
-* tax compliance modules
+- tax compliance modules
 
-* balance sheet generator
+- balance sheet generator
 
-* audit tools
+- audit tools
 
-* Tally-lattice integration
+- Tally-lattice integration
 
 ## 📜 Compliance Rules
 
-* Ind-AS
+- Ind-AS
 
-* GST
+- GST
 
-* Income Tax Act
+- Income Tax Act
 
-* Companies Act
+- Companies Act
 
 ## 🧮 Professional Calculators
 
-* GST
+- GST
 
-* TDS
+- TDS
 
-* depreciation
+- depreciation
 
-* advance tax
+- advance tax
 
-* annuity
+- annuity
 
 ## 🧬 Core Algorithms
 
-* Automated ledger balancing
+- Automated ledger balancing
 
-* audit trail generation
+- audit trail generation
 
-* tax filing optimization
+- tax filing optimization
 
 ## 🛡 Self-Healing Strategy
 
-* Continuous audit log integrity check, transaction consistency validation
+- Continuous audit log integrity check, transaction consistency validation
 
 ## 🔄 Rollback Strategy
 
-* Snapshot-per-transaction, daily fiscal state preservation
+- Snapshot-per-transaction, daily fiscal state preservation

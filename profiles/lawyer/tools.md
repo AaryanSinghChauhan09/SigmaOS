@@ -2,48 +2,48 @@
 
 ## Required Tools & Functions
 
-* Case indexing
+- Case indexing
 
-* legal references
+- legal references
 
-* compliance document management
+- compliance document management
 
-* secure communication
+- secure communication
 
-* BNS-IPC cross-mapper
+- BNS-IPC cross-mapper
 
 ## 📜 Compliance Rules
 
-* Bharatiya Nyaya Sanhita (BNS) 2023
+- Bharatiya Nyaya Sanhita (BNS) 2023
 
-* Bharatiya Nagarik Suraksha Sanhita (BNSS) 2023
+- Bharatiya Nagarik Suraksha Sanhita (BNSS) 2023
 
-* Bharatiya Sakshya Adhiniyam (BSA) 2023
+- Bharatiya Sakshya Adhiniyam (BSA) 2023
 
-* Constitution of India
+- Constitution of India
 
 ## 🧮 Professional Calculators
 
-* Court fee
+- Court fee
 
-* stamp duty
+- stamp duty
 
-* Limitation Period Calc
+- Limitation Period Calc
 
-* Alimony Estimator
+- Alimony Estimator
 
 ## 🧬 Core Algorithms
 
-* Case law search
+- Case law search
 
-* compliance checker
+- compliance checker
 
-* automated legal drafting
+- automated legal drafting
 
 ## 🛡 Self-Healing Strategy
 
-* Legal reference sync, document authenticity verification
+- Legal reference sync, document authenticity verification
 
 ## 🔄 Rollback Strategy
 
-* Case history snapshots, immutable filing records
+- Case history snapshots, immutable filing records

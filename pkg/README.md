@@ -1,1 +1,1 @@
-# Pkg Subsystem\n\nSovereign isolation layer for pkg operations.
+# Pkg Subsystem\n\nSovereign isolation layer for pkg operations

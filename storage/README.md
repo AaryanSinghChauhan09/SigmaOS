@@ -1,1 +1,1 @@
-# Storage Subsystem\n\nSovereign isolation layer for storage operations.
+# Storage Subsystem\n\nSovereign isolation layer for storage operations

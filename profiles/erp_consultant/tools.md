@@ -2,44 +2,44 @@
 
 ## Required Tools & Functions
 
-* Odoo-Lattice
+- Odoo-Lattice
 
-* SAP-Sovereign-Bridge
+- SAP-Sovereign-Bridge
 
-* business process modeler
+- business process modeler
 
-* ERP-migration-nexus
+- ERP-migration-nexus
 
-* module-optimizer
+- module-optimizer
 
 ## 📜 Compliance Rules
 
-* Business logic standards
+- Business logic standards
 
-* ERP-best-practices
+- ERP-best-practices
 
-* compliance-frameworks
+- compliance-frameworks
 
 ## 🧮 Professional Calculators
 
-* TCO (Total Cost of Ownership)
+- TCO (Total Cost of Ownership)
 
-* ROI-estimator
+- ROI-estimator
 
-* process-latency-calc
+- process-latency-calc
 
 ## 🧬 Core Algorithms
 
-* Automated workflow mapping
+- Automated workflow mapping
 
-* database schema normalization
+- database schema normalization
 
-* inventory-prediction
+- inventory-prediction
 
 ## 🛡 Self-Healing Strategy
 
-* ERP-database consistency check, module-dependency validation
+- ERP-database consistency check, module-dependency validation
 
 ## 🔄 Rollback Strategy
 
-* ERP-state snapshots, transactional-history restoration
+- ERP-state snapshots, transactional-history restoration
