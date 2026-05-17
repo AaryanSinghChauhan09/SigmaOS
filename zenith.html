@@ -68,9 +68,12 @@
             </div>
             <div class="window-body">
                 <div class="fm-layout">
-                    <div class="fm-toolbar">
-                        <button class="fm-btn" onclick="fmBack()">Back</button>
-                        <span class="fm-breadcrumbs" id="fm-breadcrumbs">/home/sovereign</span>
+                    <div class="fm-toolbar" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                        <div>
+                            <button class="fm-btn" onclick="fmBack()">Back</button>
+                            <span class="fm-breadcrumbs" id="fm-breadcrumbs">/home/sovereign</span>
+                        </div>
+                        <button class="cyber-btn small-btn" onclick="runRepomixPackager()" style="font-size: 0.68rem; padding: 4px 8px; border-radius: 4px; box-shadow: 0 0 10px rgba(0,255,195,0.15);">📦 Repomix Prompt Packager</button>
                     </div>
                     <div class="fm-grid" id="fm-grid"></div>
                 </div>
@@ -272,34 +275,176 @@
             </div>
         </div>
 
-        <!-- App: Utility Nexus (Statutory Calculators) -->
-        <div class="window" id="utility-nexus-win" class="auto-style-98">
+        <!-- App: Sovereign Developer Workspace (Utility Nexus & DevKit) -->
+        <div class="window" id="utility-nexus-win" style="width: 820px; height: 580px; display: none;">
             <div class="window-header">
-                <div class="window-title">🔧 <span>Sovereign Pro Calculators</span></div>
+                <div class="window-title">🔧 <span>Sovereign Developer Workspace</span></div>
                 <div class="window-controls">
                     <div class="control-dot min" onclick="closeWindow('utility-nexus-win')"></div>
                     <div class="control-dot max"></div>
                     <div class="control-dot close" onclick="closeWindow('utility-nexus-win')"></div>
                 </div>
             </div>
-            <div class="window-body auto-style-99">
-                <div class="settings-content">
-                    <div class="settings-group">
-                        <h4 class="auto-style-100">Zero-Loss paise GST Calculator</h4>
-                        <div class="auto-style-101">
-                            <input type="number" id="gst-amount" class="cmd-input" placeholder="Amount (in paise)" class="auto-style-102">
-                            <input type="number" id="gst-rate" class="cmd-input" placeholder="GST Rate %" class="auto-style-103">
+            
+            <!-- DevTab Navigation Bar -->
+            <div style="display: flex; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border-glass); padding: 5px 15px; gap: 8px; z-index: 10; overflow-x: auto; white-space: nowrap;">
+                <button class="fm-btn" id="dev-tab-compliance-btn" onclick="switchDevPane('compliance')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px; background: rgba(255,255,255,0.05); color: var(--accent-gold);">⚖️ Compliance & GST</button>
+                <button class="fm-btn" id="dev-tab-hoppscotch-btn" onclick="switchDevPane('hoppscotch')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px;">🔌 Hoppscotch REST & httpie</button>
+                <button class="fm-btn" id="dev-tab-toys-btn" onclick="switchDevPane('toys')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px;">🛠️ DevToys swiss-army-knife</button>
+                <button class="fm-btn" id="dev-tab-docs-btn" onclick="switchDevPane('docs')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px;">📚 API offline Zeal docs</button>
+            </div>
+
+            <div class="window-body" style="padding: 15px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; background: var(--bg-dark); height: calc(100% - 85px);">
+                
+                <!-- Pane 1: Compliance & Calculators -->
+                <div class="dev-workspace-pane" id="dev-pane-compliance" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 15px;">
+                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="settings-group">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">Zero-Loss paise GST Calculator</h4>
+                                <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 8px; margin-bottom: 8px;">
+                                    <input type="number" id="gst-amount" class="cmd-input" placeholder="Amount (in paise)" style="height: 35px; font-size: 0.8rem;">
+                                    <input type="number" id="gst-rate" class="cmd-input" placeholder="GST Rate %" style="height: 35px; font-size: 0.8rem;">
+                                </div>
+                                <button class="wizard-btn" onclick="calculateGST()">COMPUTE GST</button>
+                                <div id="gst-result" style="margin-top: 8px; font-size: 0.75rem; color: var(--accent-gold); font-family: monospace;">> Result: Ready</div>
+                            </div>
                         </div>
-                        <button class="wizard-btn auto-style-104" onclick="calculateGST()">COMPUTE GST</button>
-                        <div class="auto-style-105" id="gst-result">> Result: Ready</div>
-                    </div>
-                    <div class="settings-group">
-                        <h4 class="auto-style-106">BNS Legal Complier</h4>
-                        <input type="text" id="legal-query" class="cmd-input" placeholder="Search BNS section..." class="auto-style-107">
-                        <button class="wizard-btn auto-style-108" onclick="checkLegalCompliance()">MAP COMPLIANCE</button>
-                        <div class="auto-style-109" id="legal-result">> Mapping Status: Active</div>
+                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="settings-group" style="flex: 1;">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">BNS Legal Complier</h4>
+                                <input type="text" id="legal-query" class="cmd-input" placeholder="Search BNS section..." style="margin-bottom: 8px; height: 35px; font-size: 0.8rem;">
+                                <button class="wizard-btn" onclick="checkLegalCompliance()">MAP COMPLIANCE</button>
+                                <div id="legal-result" style="margin-top: 8px; font-size: 0.75rem; color: var(--accent-gold); font-family: monospace;">> Mapping Status: Active</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Pane 2: Hoppscotch API Client & httpie -->
+                <div class="dev-workspace-pane" id="dev-pane-hoppscotch" style="display: none; flex-direction: column; gap: 12px;">
+                    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px;">
+                        
+                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="settings-group">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🔌 Hoppscotch REST API tool</h4>
+                                <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+                                    <select id="hop-method" class="cmd-input" style="width: 80px; height: 35px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                                        <option value="GET">GET</option>
+                                        <option value="POST" selected>POST</option>
+                                        <option value="PUT">PUT</option>
+                                        <option value="DELETE">DELETE</option>
+                                    </select>
+                                    <input type="text" id="hop-url" class="cmd-input" value="api.sigmaos.internal/v1/attest" style="flex: 1; height: 35px; font-size: 0.8rem;">
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px;">
+                                    <span style="font-size: 0.7rem; color: var(--text-muted);">Request Headers</span>
+                                    <input type="text" id="hop-headers" class="cmd-input" value="Content-Type: application/json, X-PQC-Attestation: Dilithium-5" style="height: 32px; font-size: 0.75rem;">
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px;">
+                                    <span style="font-size: 0.7rem; color: var(--text-muted);">Request Body (JSON)</span>
+                                    <textarea id="hop-body" class="cmd-input" style="width: 100%; height: 50px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass); padding: 6px; font-family: monospace; font-size: 0.72rem; resize: none;">{"payload": "attest-sovereign-kernel-swaps"}</textarea>
+                                </div>
+                                <button class="wizard-btn" onclick="sendHoppRequest()">SEND HTTP REQUEST</button>
+                            </div>
+                        </div>
+
+                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="settings-group" style="flex: 1; display: flex; flex-direction: column;">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">httpie Snippet & Response</h4>
+                                <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px;">equivalent httpie CLI Command:</div>
+                                <div id="hop-httpie-snippet" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-glass); padding: 6px; font-family: monospace; font-size: 0.7rem; color: var(--accent-gold); border-radius: 4px; margin-bottom: 8px; white-space: nowrap; overflow-x: auto;">
+                                    http POST api.sigmaos.internal/v1/attest payload=attest-sovereign-kernel-swaps
+                                </div>
+                                <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px;">Response Body:</div>
+                                <div id="hop-response-body" style="flex: 1; background: #000; border: 1px solid var(--border-glass); border-radius: 4px; padding: 8px; font-family: monospace; font-size: 0.7rem; overflow-y: auto; color: #4af626; line-height: 1.4; min-height: 100px;">
+                                    Status: 200 OK<br>
+                                    Time: 1.25ms<br>
+                                    Payload attestation passed!
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Pane 3: DevToys swiss-army-knife -->
+                <div class="dev-workspace-pane" id="dev-pane-toys" style="display: none; flex-direction: column; gap: 12px;">
+                    <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 15px;">
+                        
+                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="settings-group">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🛠️ Swiss Army Knife DevTools</h4>
+                                <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 8px;">
+                                    <div>
+                                        <span style="font-size: 0.7rem; color: var(--text-muted);">Conversion Target</span>
+                                        <select id="toy-action-select" class="cmd-input" style="width: 100%; height: 35px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);" onchange="updateToyFields()">
+                                            <option value="json-yaml">JSON ➡️ YAML Converter</option>
+                                            <option value="base64">Base64 Encoder / Decoder</option>
+                                            <option value="cron">Cron Schedule Expression Generator</option>
+                                            <option value="d2">D2 Diagram Scripting Renderer</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px;">
+                                    <span id="toy-input-label" style="font-size: 0.7rem; color: var(--text-muted);">JSON Input String</span>
+                                    <textarea id="toy-input-data" class="cmd-input" style="width: 100%; height: 75px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass); padding: 6px; font-family: monospace; font-size: 0.72rem; resize: none;">{"title": "SigmaOS", "version": 15.2}</textarea>
+                                </div>
+                                <button class="wizard-btn" onclick="executeToyUtility()">CONVERT / GENERATE</button>
+                            </div>
+                        </div>
+
+                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="settings-group" style="flex: 1; display: flex; flex-direction: column;">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">Processed Output Preview</h4>
+                                <div id="toy-output-preview" style="flex: 1; background: #000; border: 1px solid var(--border-glass); border-radius: 4px; padding: 8px; font-family: monospace; font-size: 0.7rem; overflow-y: auto; color: #ff00ff; line-height: 1.4; min-height: 140px;">
+                                    title: SigmaOS<br>
+                                    version: 15.2
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Pane 4: Zeal / DevDocs offline documentation browser -->
+                <div class="dev-workspace-pane" id="dev-pane-docs" style="display: none; flex-direction: column; gap: 12px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 15px;">
+                        
+                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="settings-group">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">📚 offline API browser (Zeal style)</h4>
+                                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
+                                    <span style="font-size: 0.7rem; color: var(--text-muted);">Framework / Language Docset</span>
+                                    <select id="docset-select" class="cmd-input" style="width: 100%; height: 35px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                                        <option value="cpp">C++ STL Sovereign standard</option>
+                                        <option value="vulkan">SovereignVulkanLayer APIs</option>
+                                        <option value="js">Javascript ES17 web runtime</option>
+                                    </select>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
+                                    <span style="font-size: 0.7rem; color: var(--text-muted);">Documentation Search Query</span>
+                                    <input type="text" id="docset-query" class="cmd-input" value="std::atomic" style="height: 35px; font-size: 0.8rem;">
+                                </div>
+                                <button class="wizard-btn" onclick="searchZealOfflineDocs()">SEARCH OFFLINE DOCS</button>
+                            </div>
+                        </div>
+
+                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="settings-group" style="flex: 1; display: flex; flex-direction: column;">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">API Documentation Entry</h4>
+                                <div id="docset-preview" style="flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); border-radius: 4px; padding: 10px; font-size: 0.72rem; overflow-y: auto; line-height: 1.4;">
+                                    <strong style="font-size: 0.85rem; color: #00ffc3;">std::atomic (C++11 STL)</strong><br>
+                                    <code style="background: rgba(0,0,0,0.5); padding: 2px 4px; border-radius: 2px; color: #ff00ff; display: block; margin: 6px 0;">template&lt;class T&gt; struct atomic;</code>
+                                    Each instantiation and specialization of std::atomic defines an atomic type. 
+                                    Guarantees lock-free thread safety direct to CPU silicon pipelines without OS priority inversions.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -437,6 +582,7 @@
                 <button class="fm-btn" id="ai-tab-nodes-btn" onclick="switchAIPane('nodes')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px;">🧬 n8n Workflow Nodes</button>
                 <button class="fm-btn" id="ai-tab-memory-btn" onclick="switchAIPane('memory')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px;">💾 Letta Memory & Voice</button>
                 <button class="fm-btn" id="ai-tab-claudecam-btn" onclick="switchAIPane('claudecam')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px;">💻 ClaudeCode & Cam</button>
+                <button class="fm-btn" id="ai-tab-swe-btn" onclick="switchAIPane('swe')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px;">🤖 SWE-Agent & Marimo</button>
             </div>
 
             <div class="window-body" style="padding: 15px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; background: var(--bg-dark); height: calc(100% - 85px);">
@@ -789,6 +935,55 @@
                                 <div id="deeplivecam-console" style="margin-top: 10px; font-size: 0.7rem; font-family: monospace; color: var(--accent-gold); line-height: 1.4; padding: 6px; background: rgba(255,255,255,0.02); border-radius: 4px;">
                                     > Camera source: IDLE.<br>
                                     > Inference mapping time: 0ms.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Pane 6: SWE-Agent & Marimo / Streamlit Reactive Sandbox -->
+                <div class="ai-studio-pane" id="ai-pane-swe" style="display: none; flex-direction: column; gap: 12px;">
+                    <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 15px;">
+                        
+                        <!-- SWE-Agent / OpenHands / GPT-Pilot Console -->
+                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="settings-group" style="flex: 1; display: flex; flex-direction: column;">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🤖 SWE-Agent & OpenHands Developer Autopilot</h4>
+                                <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px;">
+                                    <span style="font-size: 0.7rem; color: var(--text-muted);">Repository Scope Workspace</span>
+                                    <input type="text" id="swe-repo-path" class="cmd-input" value="/vfs/workspace/SigmaOS" style="height:32px; font-size: 0.72rem;">
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px;">
+                                    <span style="font-size: 0.7rem; color: var(--text-muted);">Autopilot Issue Query</span>
+                                    <textarea id="swe-issue-desc" class="cmd-input" style="width: 100%; height: 50px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass); padding: 6px; font-size: 0.72rem; resize: none;">Optimize context switches lock contention in SovereignBoot.cpp line 110.</textarea>
+                                </div>
+                                <button class="wizard-btn" onclick="startSWEAgentAutopilot()">SPAWN AUTOPILOT AGENT</button>
+                                <div id="swe-agent-terminal" style="flex: 1; min-height: 120px; background: #000; border: 1px solid var(--border-glass); border-radius: 4px; padding: 8px; font-family: monospace; font-size: 0.7rem; overflow-y: auto; color: #00ffc3; line-height: 1.4; margin-top: 8px;">
+                                    SWE-agent v1.2.0 starting...<br>
+                                    Ready to parse target issues.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Marimo / Streamlit / Dash Reactive Sandbox -->
+                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="settings-group" style="flex: 1; display: flex; flex-direction: column;">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">📊 Streamlit & Marimo Reactive App Sandbox</h4>
+                                <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px;">
+                                    <span style="font-size: 0.7rem; color: var(--text-muted);">Python Reactive Script Input</span>
+                                    <textarea id="marimo-code-input" class="cmd-input" style="width: 100%; height: 80px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass); padding: 6px; font-family: monospace; font-size: 0.72rem; resize: none;">import streamlit as st
+import numpy as np
+
+# Slider inputs triggers reactive cell runs
+freq = st.slider(&quot;Signal frequency&quot;, 1, 10, 5)
+st.line_chart(np.sin(np.linspace(0, 10, 100) * freq))</textarea>
+                                </div>
+                                <button class="cyber-btn small-btn" onclick="runReactiveSandbox()" style="width: 100%; margin-bottom: 8px; font-size: 0.75rem;">RUN REACTIVE CELL</button>
+                                
+                                <span style="font-size: 0.7rem; color: var(--text-muted);">Reactive Chart Preview:</span>
+                                <div id="marimo-chart-preview" style="flex: 1; background: rgba(0,0,0,0.6); border: 1px solid var(--border-glass); border-radius: 4px; padding: 8px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; min-height: 100px;">
+                                    <div style="font-size: 0.7rem; color: var(--accent-gold); text-align: center; margin-top: 20px;">[REACTIVE PREVIEW INACTIVE]</div>
                                 </div>
                             </div>
                         </div>

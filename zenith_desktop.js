@@ -766,7 +766,7 @@ window.addEventListener('load', () => {
 
 window.switchAIPane = function(paneName) {
     // Hide all panes
-    const panes = ['tuner', 'mcp', 'nodes', 'memory', 'claudecam'];
+    const panes = ['tuner', 'mcp', 'nodes', 'memory', 'claudecam', 'swe'];
     panes.forEach(pane => {
         const el = document.getElementById(`ai-pane-${pane}`);
         if (el) el.style.display = (pane === paneName) ? 'flex' : 'none';
@@ -1146,7 +1146,336 @@ window.startDeepLiveCamSimulation = function() {
 };
 
 
+// =========================================================================
+// Σ SIGMAOS: SOVEREIGN DEVELOPER WORKSPACE (UTILITY NEXUS EVOLUTION)
+// =========================================================================
 
+// Dev Workspace Tab Switching
+window.switchDevPane = function(paneName) {
+    const panes = ['compliance', 'hoppscotch', 'toys', 'docs'];
+    panes.forEach(pane => {
+        const el = document.getElementById(`dev-pane-${pane}`);
+        if (el) el.style.display = (pane === paneName) ? 'flex' : 'none';
+        
+        const btn = document.getElementById(`dev-tab-${pane}-btn`);
+        if (btn) {
+            btn.style.background = (pane === paneName) ? 'rgba(255,255,255,0.05)' : 'none';
+            btn.style.color = (pane === paneName) ? 'var(--accent-gold)' : 'var(--text-white)';
+        }
+    });
+    addLog(`Σ [DEVELOPER]: Workspace shifted to [${paneName.toUpperCase()}].`, 'success');
+};
+
+// Hoppscotch REST API Client & httpie Compiler
+window.sendHoppRequest = function() {
+    const method = document.getElementById('hop-method').value;
+    const url = document.getElementById('hop-url').value.trim();
+    const headers = document.getElementById('hop-headers').value.trim();
+    const body = document.getElementById('hop-body').value.trim();
+    const responseEl = document.getElementById('hop-response-body');
+    const snippetEl = document.getElementById('hop-httpie-snippet');
+
+    if (!url || !responseEl || !snippetEl) return;
+
+    // Compile httpie command
+    let httpieCmd = `http ${method} ${url}`;
+    if (headers) {
+        const headArr = headers.split(',');
+        headArr.forEach(h => {
+            const parts = h.split(':');
+            if (parts.length === 2) {
+                httpieCmd += ` "${parts[0].trim()}:${parts[1].trim()}"`;
+            }
+        });
+    }
+    if (body && (method === 'POST' || method === 'PUT')) {
+        try {
+            const parsed = JSON.parse(body);
+            Object.keys(parsed).forEach(k => {
+                httpieCmd += ` ${k}="${parsed[k]}"`;
+            });
+        } catch (e) {
+            httpieCmd += ` --raw-data='${body}'`;
+        }
+    }
+    snippetEl.innerText = httpieCmd;
+
+    // Simulate Network Query
+    responseEl.innerHTML = `<span style="color: var(--accent-gold);">[Hoppscotch] Dispatching REST request to ${url}...</span>`;
+    addLog(`Σ [HTTP]: Dispatching ${method} transaction to ${url}`, 'warning');
+
+    setTimeout(() => {
+        const latency = (0.5 + Math.random() * 1.5).toFixed(2);
+        const transactionId = Math.random().toString(16).substring(2, 10).toUpperCase();
+        addLog(`Σ [HTTP]: Response received from ${url} in ${latency}ms. Status: 200 OK.`, 'success');
+        
+        responseEl.innerHTML = `<span style="color: #00ff55;">HTTP/1.1 200 OK</span><br>` +
+                                `<span style="color: var(--text-muted);">Content-Type: application/json<br>` +
+                                `Server: SovereignKernel/v15.2<br>` +
+                                `X-Transaction-ID: TX-${transactionId}<br>` +
+                                `Latency: ${latency} ms</span><br><br>` +
+                                `<span style="color: #00ffc3;">{<br>` +
+                                `  "attestation": "SUCCESS",<br>` +
+                                `  "status": "active",<br>` +
+                                `  "quantum_safe": true,<br>` +
+                                `  "dilithium_signature": "0x5A8B...4F9E"<br>` +
+                                `}</span>`;
+    }, 800);
+};
+
+// DevToys Swiss Army Knife fields updater
+const toyTemplates = {
+    'json-yaml': {
+        label: 'JSON Input String',
+        data: '{\n  "title": "SigmaOS",\n  "version": 15.2,\n  "kernel": "Sovereign"\n}'
+    },
+    'base64': {
+        label: 'Plaintext String to Encode (or Base64 to Decode)',
+        data: 'Sovereign computational system'
+    },
+    'cron': {
+        label: 'Cron Expression (5-field standard)',
+        data: '*/5 * * * *'
+    },
+    'd2': {
+        label: 'D2 Diagram Scripting code',
+        data: 'x -> y: "zero-copy IPC"\ny -> z: "NUMA balancing"\nz -> x: "priority attestation"'
+    }
+};
+
+window.updateToyFields = function() {
+    const val = document.getElementById('toy-action-select').value;
+    const label = document.getElementById('toy-input-label');
+    const textarea = document.getElementById('toy-input-data');
+    const template = toyTemplates[val];
+
+    if (label && textarea && template) {
+        label.innerText = template.label;
+        textarea.value = template.data;
+    }
+};
+
+// DevToys Utility Compiler
+window.executeToyUtility = function() {
+    const action = document.getElementById('toy-action-select').value;
+    const input = document.getElementById('toy-input-data').value.trim();
+    const preview = document.getElementById('toy-output-preview');
+
+    if (!input || !preview) return;
+
+    addLog(`Σ [DEVTOYS]: Running tool utility [${action.toUpperCase()}]`, 'warning');
+
+    if (action === 'json-yaml') {
+        try {
+            const parsed = JSON.parse(input);
+            let yaml = '';
+            Object.keys(parsed).forEach(k => {
+                yaml += `${k}: ${parsed[k]}\n`;
+            });
+            preview.innerText = yaml;
+            preview.style.color = '#00ffc3';
+        } catch (e) {
+            preview.innerText = `> Error parsing JSON: ${e.message}`;
+            preview.style.color = 'var(--accent-magenta)';
+        }
+    } else if (action === 'base64') {
+        try {
+            // Encode if plain, decode if looks like base64
+            if (/^[a-zA-Z0-9+/]*={0,2}$/.test(input) && input.length % 4 === 0) {
+                preview.innerText = `Decoded Output:\n${atob(input)}`;
+            } else {
+                preview.innerText = `Encoded Base64:\n${btoa(input)}`;
+            }
+            preview.style.color = '#ff00ff';
+        } catch (e) {
+            preview.innerText = `Encoded Base64:\n${btoa(input)}`;
+            preview.style.color = '#ff00ff';
+        }
+    } else if (action === 'cron') {
+        if (input.startsWith('*/5')) {
+            preview.innerText = `Cron parsed successfully:\n- At every 5th minute.\n- Every hour, day, and month.\n- Active schedule: Next run in 3m 12s.`;
+        } else {
+            preview.innerText = `Cron parsed successfully:\n- Custom scheduler active.\n- Run target: Midnight standard.`;
+        }
+        preview.style.color = 'var(--accent-gold)';
+    } else if (action === 'd2') {
+        // Render beautiful simulated D2 flowchart block
+        preview.innerHTML = `<span style="color:#00ff55;">// D2 diagram compiled successfully</span><br><br>` +
+                            `<div style="display:flex; flex-direction:column; gap:4px; padding:6px; background:rgba(255,255,255,0.05); border-radius:4px;">` +
+                            `  <div style="text-align:center; border:1px solid #ff00ff; padding:2px;">[Node X]</div>` +
+                            `  <div style="text-align:center; color:#ff00ff;">⬇️ zero-copy IPC</div>` +
+                            `  <div style="text-align:center; border:1px solid #00ffc3; padding:2px;">[Node Y]</div>` +
+                            `  <div style="text-align:center; color:#00ffc3;">⬇️ NUMA balancing</div>` +
+                            `  <div style="text-align:center; border:1px solid var(--accent-gold); padding:2px;">[Node Z]</div>` +
+                            `</div>`;
+    }
+};
+
+// Zeal Offline Docs Search
+const docsetEntries = {
+    'cpp': {
+        'std::atomic': '<strong>std::atomic (C++11 STL)</strong><br><code style="color:#ff00ff; display:block; margin:4px 0;">template&lt;class T&gt; struct atomic;</code>Guarantees thread-safe atomic execution directly in CPU registers without mutex contention.',
+        'std::vector': '<strong>std::vector (C++ STL)</strong><br><code style="color:#ff00ff; display:block; margin:4px 0;">template&lt;class T, class Alloc&gt; class vector;</code>Contiguous dynamic array supporting zero-allocation reserve buffers.',
+        'default': '<strong>C++ Standard Docset</strong><br>Query compiled successfully. Standard template library headers resolved.'
+    },
+    'vulkan': {
+        'vkCreateDevice': '<strong>vkCreateDevice (Vulkan API)</strong><br><code style="color:#00ffc3; display:block; margin:4px 0;">VkResult vkCreateDevice(...);</code>Creates a logical device interface to direct Vulkan silicon pipelines.',
+        'default': '<strong>SovereignVulkanLayer APIs</strong><br>Direct shader routing and compute queue families loaded.'
+    },
+    'js': {
+        'fetch': '<strong>fetch (Web APIs)</strong><br>Simulates high-performance async HTTP pipeline standard.',
+        'default': '<strong>Javascript ES17 docset</strong><br>Web assembly interface bindings resolved.'
+    }
+};
+
+window.searchZealOfflineDocs = function() {
+    const docset = document.getElementById('docset-select').value;
+    const query = document.getElementById('docset-query').value.trim();
+    const preview = document.getElementById('docset-preview');
+
+    if (!query || !preview) return;
+
+    addLog(`Σ [ZEAL]: Offline docset lookup for "${query}"`, 'warning');
+
+    const db = docsetEntries[docset];
+    if (db) {
+        const match = db[query] || db['default'];
+        preview.innerHTML = match;
+    } else {
+        preview.innerHTML = `No offline entries found for "${query}"`;
+    }
+};
+
+// SWE-Agent / OpenHands Autopilot Console
+window.startSWEAgentAutopilot = function() {
+    const repo = document.getElementById('swe-repo-path').value.trim();
+    const issue = document.getElementById('swe-issue-desc').value.trim();
+    const term = document.getElementById('swe-agent-terminal');
+
+    if (!repo || !issue || !term) return;
+
+    term.innerHTML = `swe-agent@sigma-zenith:~$ swe-agent --repo "${repo}" --issue "${issue}"<br>`;
+    term.innerHTML += `<span style="color:var(--accent-gold);">[SWE] Cloning repository structures into cgroup workspace...</span><br>`;
+    addLog('Σ [SWE-AGENT]: Spawning code-healing autopilot agent...', 'warning');
+
+    setTimeout(() => {
+        term.innerHTML += `[SWE] Invoking prompt packaging compiler (Repomix paradigm)...<br>`;
+        term.scrollTop = term.scrollHeight;
+    }, 600);
+
+    setTimeout(() => {
+        term.innerHTML += `[SWE] Packaging files: SovereignBoot.cpp, sigma_kernel_types.h...<br>`;
+        term.scrollTop = term.scrollHeight;
+    }, 1200);
+
+    setTimeout(() => {
+        term.innerHTML += `<span style="color:#ff00ff;">[SWE] Issue match: Spinlock deadlock detected at SovereignBoot.cpp:L142!</span><br>`;
+        term.scrollTop = term.scrollHeight;
+    }, 1800);
+
+    setTimeout(() => {
+        term.innerHTML += `[SWE] Performing code correction loop (GPT-Pilot auto-healing)...<br>`;
+        term.scrollTop = term.scrollHeight;
+    }, 2400);
+
+    setTimeout(() => {
+        term.innerHTML += `<span style="color:#00ffc3;">[SWE] Compilation check: 0 warning, 0 error. Running local regression tests...</span><br>`;
+        term.scrollTop = term.scrollHeight;
+    }, 3000);
+
+    setTimeout(() => {
+        term.innerHTML += `<span style="color:#00ff55;">[SWE] Success! Auto-healed bug successfully. Dilithium-5 attestation signed.</span><br>`;
+        term.innerHTML += `swe-agent@sigma-zenith:~$ `;
+        term.scrollTop = term.scrollHeight;
+        addLog('Σ [SWE-AGENT]: Codebase bug solved and committed by agent autopilot.', 'success');
+    }, 3800);
+};
+
+// Marimo / Streamlit Reactive Sandbox
+window.runReactiveSandbox = function() {
+    const code = document.getElementById('marimo-code-input').value;
+    const preview = document.getElementById('marimo-chart-preview');
+
+    if (!code || !preview) return;
+
+    addLog('Σ [MARIMO]: Re-running reactive notebook cells...', 'warning');
+    preview.innerHTML = `<span style="color:var(--accent-gold);">[Marimo] Compiling reactive Python cell...</span>`;
+
+    setTimeout(() => {
+        preview.innerHTML = `
+            <div style="border-bottom: 1px solid var(--border-glass); padding-bottom: 4px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.72rem; color: #00ffc3; font-weight: bold;">⚡ Streamlit/Marimo userland</span>
+                <span style="font-size: 0.65rem; color: var(--text-muted);">Reactive update: 0.12ms</span>
+            </div>
+            <div style="margin-bottom: 8px;">
+                <label style="font-size: 0.7rem; color: var(--text-white);">Signal Frequency Slider:</label>
+                <input type="range" min="1" max="10" value="5" id="reactive-freq-slider" oninput="updateReactiveChart()" style="width: 100%; accent-color: #ff00ff; background: rgba(0,0,0,0.5); height: 6px; border-radius: 3px;">
+                <div style="display:flex; justify-content:space-between; font-size:0.65rem; color:var(--text-muted); margin-top:2px;">
+                    <span>1 Hz</span>
+                    <span id="reactive-slider-val" style="color:var(--accent-gold);">5 Hz</span>
+                    <span>10 Hz</span>
+                </div>
+            </div>
+            <span style="font-size: 0.7rem; color: var(--text-muted);">Dynamic Line Chart Visualization:</span>
+            <div style="width: 100%; height: 60px; background: rgba(0,0,0,0.8); border: 1px solid var(--border-glass); position: relative; overflow: hidden; display: flex; align-items: flex-end; padding-bottom: 4px;">
+                <div id="reactive-wave-container" style="width: 100%; height: 100%; display: flex; align-items: flex-end; justify-content: space-around;">
+                    <!-- Wave bars will be populated dynamically -->
+                </div>
+            </div>
+        `;
+        window.updateReactiveChart();
+        addLog('Σ [MARIMO]: Reactive cells converged. Interface rendered.', 'success');
+    }, 600);
+};
+
+// Update Marimo Reactive Chart waves
+window.updateReactiveChart = function() {
+    const slider = document.getElementById('reactive-freq-slider');
+    const valEl = document.getElementById('reactive-slider-val');
+    const container = document.getElementById('reactive-wave-container');
+
+    if (!slider || !container) return;
+
+    const freq = parseInt(slider.value);
+    if (valEl) valEl.innerText = `${freq} Hz`;
+
+    container.innerHTML = '';
+    const barCount = 30;
+    for (let i = 0; i < barCount; i++) {
+        const height = Math.round(20 + Math.sin((i / barCount) * Math.PI * freq) * 18 + Math.cos((i / barCount) * Math.PI * 2) * 5);
+        const bar = document.createElement('div');
+        bar.style.width = '6px';
+        bar.style.height = `${Math.max(4, height)}px`;
+        bar.style.background = `linear-gradient(to top, #ff00ff, #00ffc3)`;
+        bar.style.borderRadius = '2px';
+        container.appendChild(bar);
+    }
+};
+
+// Repomix Repository prompt packager
+window.runRepomixPackager = function() {
+    addLog('Σ [REPOMIX]: Packaging active directory files for LLM prompt...', 'warning');
+    
+    setTimeout(() => {
+        const packSnippet = `This file is a prompt-friendly repository packager.
+Files included:
+- tools/sigma_edge_ml.cpp
+- zenith.html
+- zenith_desktop.js
+==================================================
+File: tools/sigma_edge_ml.cpp
+==================================================
+[sigma_edge_ml.cpp contents compiled successfully]`;
+        
+        navigator.clipboard.writeText(packSnippet).then(() => {
+            alert('Σ Repomix Success:\\nPrompt package compiled and copied to clipboard successfully!');
+            addLog('Σ [REPOMIX]: Prompt context package copied to clipboard. Prompt length: ~12K characters.', 'success');
+        }).catch(() => {
+            alert('Σ Repomix Success:\\nPrompt package compiled successfully!');
+            addLog('Σ [REPOMIX]: Prompt context package compiled successfully.', 'success');
+        });
+    }, 600);
+};
 
 
 function fmBack() {
