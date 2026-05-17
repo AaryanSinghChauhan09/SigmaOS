@@ -1,6 +1,6 @@
 # WALKTHROUGH: Competitor Linux Parity & Branch Synchronization
 
-This document records the design implementation of **Sovereign Cgroups**, **Sovereign ZFS Storage Pools**, **Sovereign OverlayFS Union Mounts**, and the total conversion of the release/synchronization pipeline from Python to Node.js.
+This document records the design implementation of **Sovereign Cgroups**, **Sovereign ZFS Storage Pools**, **Sovereign OverlayFS Union Mounts**, **Sovereign LBU State Persistence**, and the total conversion of the release/synchronization/package/build pipeline from Python to Node.js.
 
 ---
 
@@ -38,18 +38,33 @@ We implemented Linux OverlayFS-style union directory mounts and Copy-Up-On-Write
 
 ---
 
-## 🐍 4. Purging Python Runtime Dependency
+## 💾 4. Sovereign LBU Local State persistence (`S-LBU`)
+We implemented Alpine Linux-style diskless persistent memory state packing.
+
+* **Core Subsystem**: [SovereignLBU.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/SovereignLBU.cpp)
+  * Monitors persistent configuration paths (such as `/etc/network/interfaces` and `/sys/config/declarative.nix`).
+  * On command `sigma-lbu commit`, aggregates dynamic RAM-based configuration files, signs them using Post-Quantum Cryptographic signatures, and commits them to physical boot flash as a single `zenith_state.apk` archive.
+  * Extends rapid system state recovery on cold boot without requiring local hard drive storage partition constraints.
+* **CLI Wrapper**: [sigma_lbu.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/tools/sigma_lbu.cpp)
+  * Exposes LBU controls to track files, commit states, and restore configurations.
+
+---
+
+## 🐍 5. Purging Python Runtime Dependency
 To make the build and deployment pipeline completely standalone and immune to missing Python runtimes on user environments:
-* **Purged Scripts**: Removed `sync.py`, `final_sync.py`, `tools/sync_all_branches.py`, and `tools/wiki_sync.py`.
+* **Purged Scripts**: Removed `sync.py`, `final_sync.py`, `tools/sync_all_branches.py`, `tools/wiki_sync.py`, `tools/sigma-pkg.py`, `tools/sigma-build.py`, and `tools/sovereign-deploy.py`.
 * **Zero-Dependency Node.js Alternatives**:
   * [sync.js](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/sync.js): Executes staged local packaging commits.
   * [final_sync.js](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/final_sync.js): Handles absolute remote pushes.
   * [sync_all_branches.js](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/tools/sync_all_branches.js): Synchronizes all 12 target branches.
   * [wiki_sync.js](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/tools/wiki_sync.js): Handles docs migration.
+  * [sigma-pkg.js](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/tools/sigma-pkg.js): Resolves package graphs using zero-dependency local JSON stores.
+  * [sigma-build.js](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/tools/sigma-build.js): cross-compiles target shards deterministically.
+  * [sovereign-deploy.js](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/tools/sovereign-deploy.js): orchestrates multi-architecture silicon VFS deployments.
 
 ---
 
-## 🔄 5. Branch Synchronization (Parity: 100%)
+## 🔄 6. Branch Synchronization (Parity: 100%)
 We executed `node tools/sync_all_branches.js` to propagate the entire v15.1 Zenith improvements across:
 1. `release/standalone`
 2. `release/rtos`
@@ -68,8 +83,10 @@ All conflict resolutions were auto-handled via the `-X theirs` merge driver, and
 
 ---
 
-## 📖 6. GitHub Wiki Upgrades
+## 📖 7. GitHub Wiki Upgrades
 We redesigned the wiki repository:
+* **State Persistence Specs**: [Sovereign_LBU.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Sovereign_LBU.md)
+  * Detailed the design specifications, cold-boot restore triggers, and CLI dashboard commands.
 * **Overlay FS Specifications**: [Sovereign_OverlayFS.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Sovereign_OverlayFS.md)
   * Wrote complete specifications, copy-up-on-write diagrams, and subcommands list.
 * **Storage Pooling Guide**: [Sovereign_ZFS_Pool.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Sovereign_ZFS_Pool.md)
