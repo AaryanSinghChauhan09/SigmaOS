@@ -1,5 +1,5 @@
 // sigma_rt_analyzer.c - Real-time determinism and latency analyzer
-#include "sigma_log.h"
+#include "../include/sigma_log.h"
 
 // Analyzes the max interrupt latency and context switch overhead
 int sigma_rt_analyze(void) {

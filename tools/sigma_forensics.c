@@ -1,6 +1,5 @@
 // sigma_forensics.c - Minimal forensic utility stub
-#include "sigma_log.h"
-#include <stddef.h>
+#include "../include/sigma_log.h"
 
 // Entry point for forensic collection
 int sigma_forensics_collect(void) {

@@ -17,7 +17,7 @@ KERNEL_BIN = $(BUILD_DIR)/sigmaos.bin
 ISO_IMAGE = $(BUILD_DIR)/sigmaos.iso
 
 # Directories to search for source files
-SRC_DIRS := kernel/core/system kernel/net kernel/storage kernel/telemetry userland
+SRC_DIRS := kernel/core kernel/core/system kernel/core/syscall kernel/core/hal kernel/core/vulkan kernel/net kernel/storage kernel/telemetry tools userland
 C_SRCS := $(shell find $(SRC_DIRS) -name '*.c')
 CXX_SRCS := $(shell find $(SRC_DIRS) -name '*.cpp')
 ASM_SRCS := $(shell find $(SRC_DIRS) -name '*.asm')

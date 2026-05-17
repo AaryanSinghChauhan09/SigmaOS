@@ -1,6 +1,5 @@
 // sigma_timemachine.c - System state snapshot and rollback utility
-#include "sigma_log.h"
-#include <stdio.h>
+#include "../include/sigma_log.h"
 
 // Initiates a zero-copy CoW snapshot of the filesystem and kernel state
 int sigma_snapshot_create(const char* label) {
