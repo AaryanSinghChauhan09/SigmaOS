@@ -1,55 +1,41 @@
 # Contributing to SigmaOS
 
-Thank you for your interest in contributing to the Sovereign Lattice!
+SigmaOS is a sovereign project. We value industrial-grade code, zero-dependency engineering, and transparency.
 
-## Getting Started
+## ⚖️ General Guidelines
 
-### 1. Prerequisites
+- **Zero-Dependency**: Do not include external monolithic libraries (glibc, boost, etc.).
 
-- `gcc-x86-64-linux-gnu`
+- **Silicon-Up**: Write code that interacts directly with the lattice/hal when possible.
 
-- `nasm`
+- **PQC-First**: All networked shards must use Dilithium-5/Kyber-1024 signing.
 
-- `make`
+## 🛠 Branching Strategy
 
-- `python3` (for scripts)
+- `main`: The Industrial Gold build. Stable and certified.
 
-- `qemu-system-x86` (for local emulation)
+- `rolling`: Continuous updates and experimental shards.
 
-### Alternatively, use the provided `Dockerfile` for a zero-setup, cross-platform build environment
+- `release/*`: Format-specific production builds.
 
-### 2. Building
+## 📝 Commit Standards
 
-Run the following to compile the entire OS:
+- Use imperative mood ("feat: add shard" not "added shard").
 
+- Reference the shard ID (e.g., `[S-NET]`).
 
-```bash
+## 🖇 Pull Request Process
 
-make all
+1. Synchronize your local lattice with the current `rolling` branch.
 
+2. Run the Matrix Testing Algorithm (`tests/matrix_test.py`).
 
-```
+3. Ensure 100% documentation parity in the Wiki.
 
-### 3. Architecture Rules
+## 🛡 Security Reports
 
-- **No External Dependencies:** We rely on `sigma_libc.h` and the Sovereign SDK. Do not include standard libraries like `<stdio.h>` in the kernel suites.
+Report vulnerabilities directly to the Sovereign Security Shard (`security@sigmaos.org`) using PQC-GPG encryption.
 
-- **Zero-Trust:** Assume other shards are hostile. Verify inputs when exposing handlers to the Sovereign Event Bus.
+---
 
-## Coding Standards
-
-- Use C11.
-
-- Variables should be `snake_case`. Macros must be `UPPER_SNAKE_CASE`.
-
-- Indentation is 4 spaces.
-
-## PR Workflow
-
-1. Fork the repo and create your branch from `main`.
-
-2. Add your shard to the appropriate `SXX_` suite directory.
-
-3. Ensure the CI passes (we check for dependencies and run static analysis).
-
-4. Issue a PR with a clear description of the shard's purpose.
+### Your contributions define the future of sovereignty

@@ -1,6 +1,6 @@
 # Sovereign Memory Management (S-MM)
 
-The **Sovereign Memory Manager (S-MM)**is the high-performance paging and slab allocation engine designed for the**SigmaOS v15.0 "Horizon"** release. It replaces the legacy bump-allocator with an industrial-grade memory singularity.
+The **Sovereign Memory Manager (S-MM)** is the high-performance paging and slab allocation engine designed for the **SigmaOS v15.0 "Horizon"** release. It replaces the legacy bump-allocator with an industrial-grade memory singularity.
 
 ## Architecture
 
@@ -14,7 +14,7 @@ S-MM operates on a dual-tier allocation strategy:
 
 - Post-quantum attested page table protection.
 
-1. **Slab Tier (Industrial Caches)**:
+2. **Slab Tier (Industrial Caches)**:
 
 - Power-of-two slab caches (16B to 2KB).
 
