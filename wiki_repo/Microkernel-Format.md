@@ -27,6 +27,6 @@ The **Microkernel** format is the architectural baseline of SigmaOS. It moves al
 
 ## 🚀 Optimization Checklist
 
-* [ ] Enable **SovereignKVM** for hardware-accelerated virtualization.
-* [ ] Configure **SovereignBackup** for nightly shard snapshots.
-* [ ] Run **SovereignCleanup** after major version upgrades to reclaim lattice space.
+- [ ] Enable **SovereignKVM** for hardware-accelerated virtualization.
+- [ ] Configure **SovereignBackup** for nightly shard snapshots.
+- [ ] Run **SovereignCleanup** after major version upgrades to reclaim lattice space.
