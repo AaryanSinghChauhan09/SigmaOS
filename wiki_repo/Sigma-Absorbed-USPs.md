@@ -23,3 +23,8 @@ SigmaOS is designed to not just replace existing operating systems, but to absor
 5. **Sigma Cgroups (Linux cgroups v2 / Kubernetes ResourceQuota USP)**
    * **Concept:** Native silicon resource accounting and auto-throttle governance.
    * **Implementation:** `kernel/core/SovereignCgroup.cpp` and `tools/sigma_cgroup.cpp` enable CPU quota, memory limits, and I/O weights with an auto-governor sweep.
+
+6. **Sigma ZFS Storage Pools (OpenZFS / APFS / NTFS USP)**
+   * **Concept:** Transactional physical block device pooling, CoW snapshot guarantees, and striping/mirroring.
+   * **Implementation:** `kernel/core/SovereignZFSPool.cpp` and `tools/sigma_zfs.cpp` implement a bare-metal RAID-Z transactional space allocator.
+
