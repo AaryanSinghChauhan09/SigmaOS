@@ -32,4 +32,9 @@ SigmaOS is designed to not just replace existing operating systems, but to absor
    * **Concept:** Directory union mounting with transactional Copy-Up-On-Write redirection for live system boot.
    * **Implementation:** `kernel/core/SovereignOverlayFS.cpp` and `tools/sigma_overlayfs.cpp` implement a dynamic overlay union filesystem.
 
+8. **Sigma LBU Local State persistence (Alpine LBU / Diskless persistent state USP)**
+   * **Concept:** Diskless configuration state packing and persistent RAM archiving via boot flash backup.
+   * **Implementation:** `kernel/core/SovereignLBU.cpp` and `tools/sigma_lbu.cpp` implement a bare-metal state serializer.
+
+
 
