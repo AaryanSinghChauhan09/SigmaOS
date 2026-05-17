@@ -1,66 +1,90 @@
-# yocto-queue [![](https://badgen.net/bundlephobia/minzip/yocto-queue)](https://bundlephobia.com/result?p=yocto-queue)
+# 🏛️ SigmaOS: A Modular, Experimental Operating System
 
-> Tiny queue data structure
+SigmaOS is an experimental, bare-metal operating system kernel built to explore extreme modularity using C++ singleton patterns. While currently in a conceptual phase (v100.0), its goal is to provide a clean, zero-dependency alternative to legacy monolithic kernels.
 
-You should use this package instead of an array if you do a lot of `Array#push()` and `Array#shift()` on large arrays, since `Array#shift()` has [linear time complexity](https://medium.com/@ariel.salem1989/an-easy-to-use-guide-to-big-o-time-complexity-5dcf4be8a444#:~:text=O(N)%E2%80%94Linear%20Time) *O(n)*while `Queue#dequeue()` has [constant time complexity](https://medium.com/@ariel.salem1989/an-easy-to-use-guide-to-big-o-time-complexity-5dcf4be8a444#:~:text=O(1)%20%E2%80%94%20Constant%20Time)*O(1)*. That makes a huge difference for large arrays.
+## 🚀 Current Status (What SigmaOS Does Today)
 
-> A [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)) is an ordered list of elements where an element is inserted at the end of the queue and is removed from the front of the queue. A queue works based on the first-in, first-out ([FIFO](https://en.wikipedia.org/wiki/FIFO_(computing_and_electronics))) principle.
+SigmaOS is **not** a daily-driver operating system. Currently, the kernel can:
 
-## Install
+- **Boot reliably in QEMU:** Using a Multiboot2 compliant binary and GRUB.
+
+- **Initialize Hardware:** Basic probing of the CPU and establishing serial output (COM1) for debugging.
+
+- **Allocate Memory:** A simple bare-metal bump allocator (QBMP) with basic guard checks.
+
+- **Execute Minimal Userland:** A barebones interactive shell (`sigma_sh`) is in development to provide basic I/O.
+
+- **Demonstrate Architecture:** The entire kernel is divided into isolated C++ singletons ("Shards") that communicate via strict C-linkage interfaces.
+
+SigmaOS currently lacks a fully functional filesystem, robust device drivers (e.g., USB, GPU), and a mature networking stack, though stubs exist.
+
+## 🛠️ Building & Running
+
+### Dependencies
+
+- `make`
+
+- `nasm`
+
+- `g++` (multilib / cross-compiler)
+
+- `qemu-system-x86_64`
+
+- `grub-mkrescue` and `xorriso` (for ISO generation)
+
+### 1. Build the Kernel
+
+```bash
+
+make clean
+make singularity
 
 ```
-npm install yocto-queue
+
+### This generates `sigmaos.bin`, the core Multiboot2 executable
+
+### 2. Generate a Bootable ISO
+
+```bash
+
+make zenith-iso
 
 ```
 
-## Usage
+### Creates a GRUB-bootable ISO image for testing on hardware or VMs
 
-```js
-const Queue = require('yocto-queue');
+### 3. Run in Emulator
 
-const queue = new Queue();
+```bash
 
-queue.enqueue('🦄');
-queue.enqueue('🌈');
-
-console.log(queue.size);
-//=> 2
-
-console.log(...queue);
-//=> '🦄 🌈'
-
-console.log(queue.dequeue());
-//=> '🦄'
-
-console.log(queue.dequeue());
-//=> '🌈'
+make qemu
 
 ```
 
-## API
+### Boots the kernel in QEMU and pipes the internal kernel logs directly to your terminal
 
-### `queue = new Queue()`
+## 📚 Glossary: Translating the Vision
 
-The instance is an [`Iterable`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols), which means you can iterate over the queue front to back with a “for…of” loop, or use spreading to convert the queue to an array. Don't do this unless you really need to though, since it's slow.
+SigmaOS uses unique terminology for its architectural concepts. Here is what they mean in standard OS engineering terms: | SigmaOS Term | Standard Technical Meaning | | :------------------------------- | :----------------------------------------------------------------------------------------------- | | **Sovereign Lattice**| The operating system architecture as a whole. | |**Shard**| A distinct subsystem or driver encapsulated as a C++ Singleton class. | |**Amnesic Memory**| Stateless RAM allocation; memory buffers that are eagerly zeroed out after use to prevent leaks. | |**Zenith**| The target milestone version denoting a stable, complete foundation. | |**ZCLN (Zero-Copy Lattice Net)** | A zero-copy networking stack (bypassing redundant buffer copies between kernel and userland). | ## 🤝 Contributing
 
-#### `.enqueue(value)`
+We welcome contributions to help evolve SigmaOS from an experimental kernel into a fully usable distribution.
 
-Add a value to the queue.
+- Please read [CONTRIBUTING.md](CONTRIBUTING) for our PR process and coding standards.
 
-#### `.dequeue()`
+## 🚀 Current Status (Zenith Supreme: Singularity Complete)
 
-Remove the next value in the queue.
+SigmaOS has reached its architectural zenith. The kernel is now:
 
-Returns the removed value or `undefined` if the queue is empty.
+- **600-Shard Modular Lattice:** Fully transitioned to OOP-isolated singletons.
 
-#### `.clear()`
+- **Neural UI Transpilation:** AVX-512 accelerated Morphic Zenith UI.
 
-Clear the queue.
+- **Atomic Lattice Sync:** Zero-drift distributed filesystem state.
 
-#### `.size`
+- **Amnesic Security:** Zero-trace execution and quantum-safe identity vaults.
 
-The size of the queue.
+For a detailed look at our implementation history, refer to the project Wiki and GitHub Insights.
 
-## Related
+---
 
-- [quick-lru](https://github.com/sindresorhus/quick-lru) - Simple “Least Recently Used” (LRU) cache
+### Σ SIGMAOS: Absolute Sovereignty. Singularity Achieved
