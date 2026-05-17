@@ -1,6 +1,6 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/sigma_kernel_types.h" // NOLINT
+#include "../../../include/sigma_log.h"          // NOLINT
+#include "../../../include/SigmaOOP.hpp"         // NOLINT
 
 /**
  * SigmaOS Sovereign Video Shard (S-VIDEO)
