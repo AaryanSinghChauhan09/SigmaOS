@@ -1,0 +1,1 @@
+# RFC Template\n\n**Feature:** [Name]\n**Motivation:** [Why]\n**Architecture:** [How]
