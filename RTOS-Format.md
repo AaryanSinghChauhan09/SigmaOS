@@ -27,6 +27,6 @@ The **RTOS** format is designed for mission-critical industrial deployments (Bio
 
 ## 🚀 Optimization Checklist
 
-* [ ] Disable dynamic memory allocation (Zero-Alloc mode).
-* [ ] Pin critical shards to specific CPU cores.
-* [ ] Validate all task deadlines via **SovereignWCET**.
+- [ ] Disable dynamic memory allocation (Zero-Alloc mode).
+- [ ] Pin critical shards to specific CPU cores.
+- [ ] Validate all task deadlines via **SovereignWCET**.

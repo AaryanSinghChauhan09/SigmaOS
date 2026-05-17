@@ -14,7 +14,7 @@ S-MM operates on a dual-tier allocation strategy:
 
 - Post-quantum attested page table protection.
 
-2. **Slab Tier (Industrial Caches)**:
+1. **Slab Tier (Industrial Caches)**:
 
 - Power-of-two slab caches (16B to 2KB).
 
