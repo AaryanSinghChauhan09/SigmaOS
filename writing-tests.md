@@ -8,6 +8,7 @@ tests, as it will result in longer execution times.
 
 The following are good defaults that will keep the socket open for only 10ms:
 
+
 ```js
 import { request, setGlobalDispatcher, Agent } from 'undici'
 
@@ -17,6 +18,7 @@ const agent = new Agent({
 })
 
 setGlobalDispatcher(agent)
+
 ```
 
 ## Guarding against unexpected disconnects
@@ -26,6 +28,7 @@ a test can silently disconnect, reconnect, and still pass. Unfortunately,
 this could mask bugs like unexpected parser errors or protocol violations.
 To catch these silent reconnections, add a disconnect guard after creating
 a `Client`:
+
 
 ```js
 const { Client } = require('undici')
@@ -46,6 +49,7 @@ test('example with disconnect guard', async (t) => {
 
   // ... test logic ...
 })
+
 ```
 
 `client.close()` and `client.destroy()` both emit `'disconnect'` events, but

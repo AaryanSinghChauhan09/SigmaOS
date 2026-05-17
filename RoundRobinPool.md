@@ -12,7 +12,7 @@ Requests are not guaranteed to be dispatched in order of invocation.
 
 Arguments:
 
-- **url** `URL | string` - It should only include the **protocol, hostname, and port**.
+- **url**`URL | string` - It should only include the**protocol, hostname, and port**.
 
 - **options** `RoundRobinPoolOptions` (optional)
 
@@ -40,7 +40,7 @@ Extends: [`ClientOptions`](/docs/docs/api/Client.md#parameter-clientoptions)
 
 ### Important: Backend Distribution Considerations
 
-`RoundRobinPool` distributes **HTTP requests** evenly across **TCP connections**. Whether this translates to even backend server distribution depends on the load balancer's behavior:
+`RoundRobinPool` distributes **HTTP requests**evenly across**TCP connections**. Whether this translates to even backend server distribution depends on the load balancer's behavior:
 
 **✓ Works when the load balancer**:
 
@@ -132,6 +132,7 @@ See [Dispatcher Event: `'drain'`](/docs/docs/api/Dispatcher.md#event-drain).
 
 ## Example
 
+
 ```javascript
 import { RoundRobinPool } from 'undici'
 
@@ -149,6 +150,7 @@ for (let i = 0; i < 100; i++) {
 }
 
 await pool.close()
+
 ```
 
 ## See Also

@@ -1,6 +1,6 @@
 # S-FS: Sovereign Lattice Filesystem (SLFS)
 
-The **Sovereign Lattice Filesystem (SLFS)** is the primary persistent storage layer for SigmaOS v15.0 "Horizon". Unlike traditional generic filesystems like ext4 or XFS, SLFS is designed for **industrial-grade atomicity**, **PQC-attestation**, and **shard-level resilience**.
+The **Sovereign Lattice Filesystem (SLFS)**is the primary persistent storage layer for SigmaOS v15.0 "Horizon". Unlike traditional generic filesystems like ext4 or XFS, SLFS is designed for**industrial-grade atomicity**, **PQC-attestation**, and **shard-level resilience**.
 
 ## 🏛 Architectural Principles
 
@@ -14,6 +14,7 @@ The **Sovereign Lattice Filesystem (SLFS)** is the primary persistent storage la
 
 SLFS exposes a high-level C++ API for professional applications:
 
+
 ```cpp
 #include <core/SovereignLatticeFS.h>
 
@@ -24,6 +25,7 @@ void save_critical_data() {
     fs.commit_atomic_snapshot();
     fs.close(fd);
 }
+
 ```
 
 ## 📦 Components

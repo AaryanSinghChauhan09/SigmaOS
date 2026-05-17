@@ -2,9 +2,7 @@
 
 1
 
-**Parity:** systemd-journal � syslog � Windows Event Log � macOS ASL
-**Location:** `kernel/modules/core/SovereignJournalShard.c`
-**Standard:** Zenith Industrial Sovereignty v1.0
+**Parity:**systemd-journal � syslog � Windows Event Log � macOS ASL**Location:**`kernel/modules/core/SovereignJournalShard.c`**Standard:** Zenith Industrial Sovereignty v1.0
 
 ---
 

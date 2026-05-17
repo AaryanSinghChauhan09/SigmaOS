@@ -10,7 +10,7 @@ Requests are not guaranteed to be dispatched in order of invocation.
 
 Arguments:
 
-- **url** `URL | string` - Should only include the **protocol, hostname, and port**.
+- **url**`URL | string` - Should only include the**protocol, hostname, and port**.
 
 - **options** `ClientOptions` (optional)
 
@@ -22,11 +22,11 @@ Returns: `Client`
 
 - **headersTimeout** `number | null` (optional) - Default: `300e3` - The amount of time, in milliseconds, the parser will wait to receive the complete HTTP headers while not sending the request. Defaults to 300 seconds.
 
-- **keepAliveMaxTimeout** `number | null` (optional) - Default: `600e3` - The maximum allowed `keepAliveTimeout`, in milliseconds, when overridden by *keep-alive* hints from the server. Defaults to 10 minutes.
+- **keepAliveMaxTimeout**`number | null` (optional) - Default: `600e3` - The maximum allowed `keepAliveTimeout`, in milliseconds, when overridden by*keep-alive* hints from the server. Defaults to 10 minutes.
 
-- **keepAliveTimeout** `number | null` (optional) - Default: `4e3` - The timeout, in milliseconds, after which a socket without active requests will time out. Monitors time between activity on a connected socket. This value may be overridden by *keep-alive* hints from the server. See [MDN: HTTP - Headers - Keep-Alive directives](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Keep-Alive#directives) for more details. Defaults to 4 seconds.
+- **keepAliveTimeout**`number | null` (optional) - Default: `4e3` - The timeout, in milliseconds, after which a socket without active requests will time out. Monitors time between activity on a connected socket. This value may be overridden by*keep-alive* hints from the server. See [MDN: HTTP - Headers - Keep-Alive directives](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Keep-Alive#directives) for more details. Defaults to 4 seconds.
 
-- **keepAliveTimeoutThreshold** `number | null` (optional) - Default: `2e3` - A number of milliseconds subtracted from server *keep-alive* hints when overriding `keepAliveTimeout` to account for timing inaccuracies caused by e.g. transport latency. Defaults to 2 seconds.
+- **keepAliveTimeoutThreshold**`number | null` (optional) - Default: `2e3` - A number of milliseconds subtracted from server*keep-alive* hints when overriding `keepAliveTimeout` to account for timing inaccuracies caused by e.g. transport latency. Defaults to 2 seconds.
 
 - **maxHeaderSize** `number | null` (optional) - Default: `--max-http-header-size` or `16384` - The maximum length of request headers in bytes. Defaults to Node.js' --max-http-header-size or 16KiB.
 
@@ -36,7 +36,7 @@ Returns: `Client`
 
 - **connect** `ConnectOptions | Function | null` (optional) - Default: `null`.
 
-- **strictContentLength** `Boolean` (optional) - Default: `true` - Whether to treat request content length mismatches as errors. If true, an error is thrown when the request content-length header doesn't match the length of the request body. **Security Warning:** Disabling this option can expose your application to HTTP Request Smuggling attacks, where mismatched content-length headers cause servers and proxies to interpret request boundaries differently. This can lead to cache poisoning, credential hijacking, and bypassing security controls. Only disable this in controlled environments where you fully trust the request source.
+- **strictContentLength**`Boolean` (optional) - Default: `true` - Whether to treat request content length mismatches as errors. If true, an error is thrown when the request content-length header doesn't match the length of the request body.**Security Warning:** Disabling this option can expose your application to HTTP Request Smuggling attacks, where mismatched content-length headers cause servers and proxies to interpret request boundaries differently. This can lead to cache poisoning, credential hijacking, and bypassing security controls. Only disable this in controlled environments where you fully trust the request source.
 
 - **autoSelectFamily**: `boolean` (optional) - Default: depends on local Node version, on Node 18.13.0 and above is `false`. Enables a family autodetection algorithm that loosely implements section 5 of [RFC 8305](https://tools.ietf.org/html/rfc8305#section-5). See [here](https://nodejs.org/api/net.html#socketconnectoptions-connectlistener) for more details. This option is ignored if not supported by the current Node version.
 
@@ -95,16 +95,19 @@ Furthermore, the following options can be passed:
 
 This will instantiate the undici Client, but it will not connect to the origin until something is queued. Consider using `client.connect` to prematurely connect to the origin, or just call `client.request`.
 
+
 ```js
 'use strict'
 import { Client } from 'undici'
 
 const client = new Client('http://localhost:3000')
+
 ```
 
 ### Example - Custom connector
 
 This will allow you to perform some additional check on the socket that will be used for the next request.
+
 
 ```js
 'use strict'
@@ -116,7 +119,7 @@ const client = new Client('https://localhost:3000', {
     connector(opts, (err, socket) => {
       if (err) {
         cb(err)
-      } else if (/* assertion */) {
+      } else if (/*assertion*/) {
         socket.destroy()
         cb(new Error('kaboom'))
       } else {
@@ -125,6 +128,7 @@ const client = new Client('https://localhost:3000', {
     })
   }
 })
+
 ```
 
 ## Instance Methods
@@ -199,6 +203,7 @@ Emitted when a socket has been created and connected. The client will connect on
 
 #### Example - Client connect event
 
+
 ```js
 import { createServer } from 'http'
 import { Client } from 'undici'
@@ -230,6 +235,7 @@ try {
   client.close()
   server.close()
 }
+
 ```
 
 ### Event: `'disconnect'`
@@ -247,6 +253,7 @@ Parameters:
 Emitted when socket has disconnected. The error argument of the event is the error which caused the socket to disconnect. The client will reconnect if or once `client.size > 0`.
 
 #### Example - Client disconnect event
+
 
 ```js
 import { createServer } from 'http'
@@ -275,6 +282,7 @@ try {
   client.close()
   server.close()
 }
+
 ```
 
 ### Event: `'drain'`
@@ -284,6 +292,7 @@ Emitted when pipeline is no longer busy.
 See [Dispatcher Event: `'drain'`](/docs/docs/api/Dispatcher.md#event-drain).
 
 #### Example - Client drain event
+
 
 ```js
 import { createServer } from 'http'
@@ -313,6 +322,7 @@ const requests = [
 await Promise.all(requests)
 
 console.log('requests completed')
+
 ```
 
 ### Event: `'error'`

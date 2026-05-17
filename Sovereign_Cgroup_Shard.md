@@ -2,9 +2,7 @@
 
 1
 
-**Parity:** Linux cgroups v2 � Windows Job Objects � Kubernetes ResourceQuota
-**Location:** `kernel/modules/system/SovereignCgroupShard.c`
-**Standard:** Zenith Industrial Sovereignty v1.0
+**Parity:**Linux cgroups v2 � Windows Job Objects � Kubernetes ResourceQuota**Location:**`kernel/modules/system/SovereignCgroupShard.c`**Standard:** Zenith Industrial Sovereignty v1.0
 
 ---
 

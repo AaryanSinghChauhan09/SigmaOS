@@ -47,6 +47,7 @@ Returns: `ProxyAgent`
 
 Example:
 
+
 ```js
 import { Agent, RetryAgent } from 'undici'
 
@@ -59,4 +60,5 @@ const res = await agent.request({
 })
 console.log(res.statusCode)
 console.log(await res.body.text())
+
 ```

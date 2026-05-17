@@ -2,9 +2,7 @@
 
 1
 
-**Parity:** Linux OOM Killer � macOS Jetsam � Android LMKD
-**Location:** `kernel/modules/system/SovereignOOMShard.c`
-**Standard:** Zenith Industrial Sovereignty v1.0
+**Parity:**Linux OOM Killer � macOS Jetsam � Android LMKD**Location:**`kernel/modules/system/SovereignOOMShard.c`**Standard:** Zenith Industrial Sovereignty v1.0
 
 ---
 

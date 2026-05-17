@@ -12,15 +12,18 @@ If user provided input finds its way into a regular expression, or a regular exp
 
 Let's look at an vulnerable example. Below we are attempting the common task of validating an email address on the server.
 
+
 ```js
 validateEmailFormat: function( string ) {
   var emailExpression = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 
   return emailExpression.test( string );
 }
+
 ```
 
 With the example above, we can use this test script to show how bad input can impact server responsiveness:
+
 
 ```js
 start = process.hrtime();
@@ -38,9 +41,11 @@ console.log(process.hrtime(start));
 start = process.hrtime();
 console.log(validateEmailFormat('jjjjjjjjjjjjjjjjjjjjjjjjjjjj@ccccccccccccccccccccccccccccc.555555555555555555555555555555555555555555555555555555{'));
 console.log(process.hrtime(start));
+
 ```
 
 Here are the results of running that script:
+
 
 ```sh
 true
@@ -55,11 +60,13 @@ false
 false
 [ 8, 487126563 ] <- Added 12 characters and you see it bumps up significantly
 
+
 ```
 
 One way you can check regular expressions for badness in an automated way is by using a module from [substack](https://twitter.com/substack) called [safe-regex](https://www.npmjs.org/package/safe-regex). It's prone to false positives, however, it can be useful to point to potentially vulnerable regular expressions you would have otherwise missed in your code.
 
 Here is a rule for eslint that you can use to test your JavaScript regular expressions:
+
 
 ```js
 var safe = require('safe-regex');
@@ -80,6 +87,7 @@ module.exports = function (context) {
     },
   };
 };
+
 ```
 
 Additionally, OWASP has a [list of regular expressions](https://www.owasp.org/index.php/OWASP_Validation_Regex_Repository) for common validations that might be useful to you.

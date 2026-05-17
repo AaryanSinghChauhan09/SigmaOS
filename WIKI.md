@@ -8,7 +8,7 @@ SigmaOS is not a monolithic kernel; it is a **Sovereign Lattice**. Every system 
 
 ### 1. Quantum-Safe Orchestrator (USR)
 
-The **Universal Sovereign Runtime** ensures that every interaction within the lattice is cryptographically verified using **Lattice-PQC** (Post-Quantum Cryptography).
+The **Universal Sovereign Runtime**ensures that every interaction within the lattice is cryptographically verified using**Lattice-PQC** (Post-Quantum Cryptography).
 
 - Security: Ring-LWE based encryption.
 
@@ -16,7 +16,7 @@ The **Universal Sovereign Runtime** ensures that every interaction within the la
 
 ### 2. Neural Hardware Sharding (Zenith)
 
-SigmaOS is AI-native. The **Morphic Zenith** UI is not just rendered; it is **morphed** based on usage patterns using **Neuromorphic Shards**.
+SigmaOS is AI-native. The **Morphic Zenith**UI is not just rendered; it is**morphed**based on usage patterns using**Neuromorphic Shards**.
 
 - Adaptive UX: Predictive UI layouts.
 
@@ -40,7 +40,7 @@ The **Sovereign Neural Coprocessor** leverages TPU/NPU silicon shards for real-t
 
 ### 6. Self-Healing Security Fabric
 
-The **Sovereign Recovery Agent** automates lattice restoration. If a shard is compromised or experiences relativistic drift, the system automatically rolls back to a known-good state from the **Shadow Lattice Mirror**.
+The **Sovereign Recovery Agent**automates lattice restoration. If a shard is compromised or experiences relativistic drift, the system automatically rolls back to a known-good state from the**Shadow Lattice Mirror**.
 
 ---
 
@@ -130,7 +130,7 @@ SigmaOS is an open-governance silicon singularity. Developers can contribute to 
 
 - Use the **Sovereign Industrial API** (`include/SovereignAPI.hpp`).
 
-- Ensure all code is **Zero-Dependency** and adheres to **Silicon-Native** performance standards.
+- Ensure all code is **Zero-Dependency**and adheres to**Silicon-Native** performance standards.
 
 ### 2. Verification & PQC Signing
 
@@ -179,7 +179,7 @@ The following core shards form the foundation of the Sovereign Lattice:
 
 ## 🏛️ Virtualization Dominance: Legacy Encapsulation
 
-SigmaOS does not just compete with legacy operating systems; it **masters** them. Through the **Sovereign Industrial Hypervisor**, legacy kernels are encapsulated within isolated lattice shards.
+SigmaOS does not just compete with legacy operating systems; it **masters**them. Through the**Sovereign Industrial Hypervisor**, legacy kernels are encapsulated within isolated lattice shards.
 
 ### 1. Zero-Latency Passthrough
 
@@ -215,7 +215,7 @@ All data at rest is protected by the **Lattice-PQC** engine, ensuring that even 
 
 ## 🧠 AI Dominance: Sovereign Neural Engine
 
-SigmaOS is the world's first **AI-native** operating system. We bypass legacy userspace frameworks (TensorFlow, PyTorch) in favor of the **Sovereign Neural Engine**, a kernel-native Spiking Neural Network (SNN) shard.
+SigmaOS is the world's first **AI-native**operating system. We bypass legacy userspace frameworks (TensorFlow, PyTorch) in favor of the**Sovereign Neural Engine**, a kernel-native Spiking Neural Network (SNN) shard.
 
 ### 1. Silicon-Direct Inference
 

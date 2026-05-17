@@ -42,6 +42,7 @@ Each agent is monitored by a **Watchdog Shard**. If an agent crashes or consumes
 
 Developers can add new agents by subclassing `AgentBase`.
 
+
 ```cpp
 class MyCustomAgent : public AgentBase {
 public:
@@ -49,6 +50,7 @@ public:
         // Logic to achieve the goal
     }
 };
+
 ```
 
 All agents must adhere to the **Capability-Gated Security** model and report status to the `SovereignMonitor`.

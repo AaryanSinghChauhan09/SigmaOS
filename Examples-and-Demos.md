@@ -6,6 +6,7 @@ This page contains examples of how to build user-defined functions and extend th
 
 In SigmaOS, userland programs communicate with the kernel using `Z-SYSCALL`.
 
+
 ```c
 #include "sigma_syscalls.h"
 
@@ -14,11 +15,13 @@ int main() {
     sys_write(1, message, 35);
     return 0;
 }
+
 ```
 
 ## 2. Writing a Kernel Shard Module
 
 SigmaOS allows developers to write hot-swappable modules (Shards). Here is an example of a simple module that registers itself.
+
 
 ```c
 #include "sigma_syscalls.h"
@@ -46,11 +49,13 @@ int _start() {
     load_shard_module(&my_module);
     return 0;
 }
+
 ```
 
 ## 3. Post-Quantum Encryption
 
 Using the kernel's built-in PQC API to encrypt a small buffer.
+
 
 ```c
 #include "sigma_syscalls.h"
@@ -65,4 +70,5 @@ void secure_transmit() {
         sys_write(1, "Encryption successful.\n", 23);
     }
 }
+
 ```

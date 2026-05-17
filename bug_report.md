@@ -1,4 +1,4 @@
-﻿# bug report
+# bug report
 
 ---
 name: Bug Report
@@ -40,8 +40,10 @@ assignees: ''
 
 ## Logs
 
+
 ```text
 
 <!-- Paste sigma_log / serial output here -->
+
 
 ```

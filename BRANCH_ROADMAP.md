@@ -4,13 +4,13 @@ This branch-wise roadmap ensures SigmaOS closes gaps with Linux distros while le
 
 ## 🌐 Main Branch (main)
 
-### Issues:
+### Issues
 
 - Missing networking and storage subsystems.
 
 - Limited driver support (GPU, Wi-Fi, peripherals).
 
-### Fixes:
+### Fixes
 
 - [ ] Implement a modular TCP/IP stack.
 
@@ -20,13 +20,13 @@ This branch-wise roadmap ensures SigmaOS closes gaps with Linux distros while le
 
 ## ⚙️ Performance Branch
 
-### Issues:
+### Issues
 
 - O(1) primitives not fully benchmarked under mixed workloads.
 
 - Concurrency stress tests incomplete.
 
-### Fixes:
+### Fixes
 
 - [ ] Integrate automated latency/throughput benchmarks into CI.
 
@@ -36,13 +36,13 @@ This branch-wise roadmap ensures SigmaOS closes gaps with Linux distros while le
 
 ## 🔒 Security Branch
 
-### Issues:
+### Issues
 
 - PQC modules (Dilithium-5, Kyber-1024) need side-channel resistance validation.
 
 - Amnesic persistence not verified across SSD/NVMe.
 
-### Fixes:
+### Fixes
 
 - [ ] Add fuzzing for crypto modules.
 
@@ -52,13 +52,13 @@ This branch-wise roadmap ensures SigmaOS closes gaps with Linux distros while le
 
 ## 📚 Documentation Branch
 
-### Issues:
+### Issues
 
 - Wiki not fully aligned with repo milestones.
 
 - Missing subsystem diagrams and glossary.
 
-### Fixes:
+### Fixes
 
 - [ ] Migrate completed .md files into Wiki, then delete them.
 
@@ -68,13 +68,13 @@ This branch-wise roadmap ensures SigmaOS closes gaps with Linux distros while le
 
 ## 🧪 CI/CD Branch
 
-### Issues:
+### Issues
 
 - No automated QEMU boot tests yet.
 
 - Cross-architecture builds not validated.
 
-### Fixes:
+### Fixes
 
 - [ ] Add boot log validation in CI.
 
@@ -84,13 +84,13 @@ This branch-wise roadmap ensures SigmaOS closes gaps with Linux distros while le
 
 ## 🚀 Editions Branch (S-Browser, S-App, S-Dual, S-Standalone)
 
-### Issues:
+### Issues
 
 - Installer UX is basic (partitioning, language selection missing).
 
 - No live USB boot option.
 
-### Fixes:
+### Fixes
 
 - [ ] Improve installer with enterprise-tier UX.
 
@@ -100,11 +100,11 @@ This branch-wise roadmap ensures SigmaOS closes gaps with Linux distros while le
 
 ## 🧩 Universal OS Format Branch
 
-### Issues:
+### Issues
 
 - Profiles (monolithic, hybrid, RTOS, cloud) not fully validated.
 
-### Fixes:
+### Fixes
 
 - [ ] Add automated compatibility tests for each profile.
 
@@ -112,11 +112,11 @@ This branch-wise roadmap ensures SigmaOS closes gaps with Linux distros while le
 
 ## 🤖 AI Telemetry Branch
 
-### Issues:
+### Issues
 
 - AI profiling hooks not yet integrated.
 
-### Fixes:
+### Fixes
 
 - [ ] Add anomaly detection for shard performance.
 

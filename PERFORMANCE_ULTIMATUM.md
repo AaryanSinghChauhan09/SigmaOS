@@ -13,11 +13,11 @@ SigmaOS has transcendently finalized its architecture for **Peak Performance See
 
 | **Background Processes**| 150 - 300+ Active Threads | **0 Active** (On-Demand only) | No context-switch jitter. |
 
-| **Memory Resident** | 2GB - 8GB+ (Static) | **Core-Only (KB/MB)** | Full RAM available to task. |
+| **Memory Resident**| 2GB - 8GB+ (Static) |**Core-Only (KB/MB)** | Full RAM available to task. |
 
-| **Response Time** | Interrupt dependent | **Hardware-Direct** (S04) | Micro-second task activation. |
+| **Response Time**| Interrupt dependent |**Hardware-Direct** (S04) | Micro-second task activation. |
 
-| **Power Efficiency** | Constant Background Drain | **Dynamic Pulsing** | Infinite shelf-life. |
+| **Power Efficiency**| Constant Background Drain |**Dynamic Pulsing** | Infinite shelf-life. |
 
 ---
 

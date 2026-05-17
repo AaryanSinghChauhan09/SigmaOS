@@ -2,9 +2,7 @@
 
 1
 
-**Parity:** eBPF � DTrace � Linux `perf` � macOS Instruments
-**Location:** `kernel/modules/core/SovereignTelemetryShard.c`
-**Standard:** Zenith Industrial Sovereignty v1.0
+**Parity:**eBPF � DTrace � Linux `perf` � macOS Instruments**Location:**`kernel/modules/core/SovereignTelemetryShard.c`**Standard:** Zenith Industrial Sovereignty v1.0
 
 ---
 

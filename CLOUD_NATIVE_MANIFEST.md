@@ -14,7 +14,7 @@ SigmaOS is designed to run as a sovereign lattice across multiple nodes. It util
 
 1
 
-Rather than running the *entire* kernel in a browser (which introduces the "Browser Barrier"), SigmaOS provides a **Web-Srv Dashboard**. This allows for remote terminal access (via xterm.js) and resource visualization while the core kernel remains silicon-native and high-performance.
+Rather than running the *entire*kernel in a browser (which introduces the "Browser Barrier"), SigmaOS provides a**Web-Srv Dashboard**. This allows for remote terminal access (via xterm.js) and resource visualization while the core kernel remains silicon-native and high-performance.
 
 1
 

@@ -10,6 +10,7 @@ The server option `rejectUnauthorized: false` allows us to handle any invalid ce
 
 ### Client Certificate Authentication
 
+
 ```js
 const { readFileSync } = require('node:fs')
 const { join } = require('node:path')
@@ -61,4 +62,5 @@ server.listen(0, function () {
     })
   })
 })
+
 ```
