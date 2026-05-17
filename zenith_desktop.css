@@ -759,4 +759,46 @@ input:checked + .slider:before {
     background: #fff;
     transform: translateY(-2px);
 }
+
+/* Accessibility: High Contrast Mode Overrides */
+body.high-contrast-active {
+    --bg-dark: #000000;
+    --bg-charcoal: #000000;
+    --bg-glass: #000000;
+    --bg-glass-heavy: #000000;
+    --accent-gold: #ffffff;
+    --accent-gold-bright: #ffffff;
+    --accent-blue: #ffffff;
+    --text-white: #ffffff;
+    --text-muted: #ffffff;
+    --border-glass: #ffffff;
+    --border-bright: #ffffff;
+    --shadow-premium: none;
+    --glass-blur: 0px;
+}
+
+body.high-contrast-active .window {
+    background: #000000 !important;
+    border: 3px solid #ffffff !important;
+    box-shadow: none !important;
+}
+
+body.high-contrast-active .top-bar {
+    background: #000000 !important;
+    border-bottom: 3px solid #ffffff !important;
+}
+
+body.high-contrast-active .dock-container {
+    background: #000000 !important;
+    border: 3px solid #ffffff !important;
+}
+
+body.high-contrast-active button, 
+body.high-contrast-active .fm-btn,
+body.high-contrast-active .wizard-btn {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #ffffff !important;
+    font-weight: 900 !important;
+}
  

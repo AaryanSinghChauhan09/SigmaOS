@@ -1509,6 +1509,233 @@ function deployCapsule(name) {
     if (win) win.style.display = 'none';
 }
 
+    } else if (name === 'Hacker Lab') {
+        setWorkflowMode('Red Team');
+        launchApp('OmniShell');
+        launchApp('Security Mission Control');
+    } else if (name === 'Cyberpunk Dev') {
+        setWorkflowMode('Coding');
+        launchApp('Markup Forge');
+    }
+    const win = document.getElementById('sigma-capsule-win');
+    if (win) win.style.display = 'none';
+}
+
+// =========================================================================
+// Σ SIGMAOS: MULTI-TAB SETTINGS, 12 BRANCH SIMULATION & ACCESSIBILITY
+// =========================================================================
+
+window.switchSettingsTab = function(tabName) {
+    // Switch active state of tabs
+    const tabs = document.querySelectorAll('#settings-tabs-list .settings-tab');
+    tabs.forEach(tab => {
+        const matches = tab.innerText.toLowerCase().includes(tabName.toLowerCase());
+        tab.classList.toggle('active', matches);
+    });
+
+    // Toggle panes
+    const panes = ['appearance', 'branches', 'profiles', 'accessibility'];
+    panes.forEach(pane => {
+        const el = document.getElementById(`pane-${pane}`);
+        if (el) {
+            el.style.display = (pane === tabName) ? 'block' : 'none';
+        }
+    });
+
+    addLog(`Σ [SETTINGS]: Navigation to [${tabName.toUpperCase()}] Pane.`, 'success');
+};
+
+// Simulated Branch Parity Configurations
+const branchParityConfigs = {
+    'main': {
+        capsule: 'Zenith Core',
+        scheduler: 'CFS Shard-Aware Socket Balancer',
+        ipc: 'Lock-Free circular queues SPSC',
+        features: 'Zero-Dependency, Attested Ring-3 Core'
+    },
+    'release/standalone': {
+        capsule: 'Bare-Metal Standalone',
+        scheduler: 'Deterministic Hardware Init Scheduler',
+        ipc: 'Single-thread lockless Direct Mapping',
+        features: 'Harden Bootloader, RegistryManager, No Host Parity'
+    },
+    'release/rtos': {
+        capsule: 'Deterministic RTOS',
+        scheduler: 'Deterministic SCHED_SOVEREIGN Priorities',
+        ipc: 'Zero-Copy lock-free RT circular queue',
+        features: 'Priority Inheritance, Hard Real-Time Assured'
+    },
+    'release/mobile': {
+        capsule: 'Mobile Horizon',
+        scheduler: 'Energy Aware Scheduler (EAS) Governor',
+        ipc: 'Power-optimized lockless ring buffers',
+        features: 'Touch-friendly interface adjustments, ARM HAL enabled'
+    },
+    'release/microkernel': {
+        capsule: 'Microkernel Shard',
+        scheduler: 'Message-passing task scheduler',
+        ipc: 'Modular decoupled driver IPC ports',
+        features: 'Decoupled system servers, zero-copy pointer pass'
+    },
+    'release/dual-boot': {
+        capsule: 'Dual-Boot Shard',
+        scheduler: 'GRUB/LIM bootstrap vectors dispatcher',
+        ipc: 'Boot stage synchronization rings',
+        features: 'Atomic rollbacks, multi-boot layout matrix'
+    },
+    'release/distributed': {
+        capsule: 'Sovereign Distributed',
+        scheduler: 'Global Lattice scheduler',
+        ipc: 'Distributed SovereignCloudFS sockets',
+        features: 'Node discovery, multi-machine container orchestrator'
+    },
+    'release/cloud': {
+        capsule: 'Sovereign Cloud',
+        scheduler: 'Container-native scheduler (CoreOS style)',
+        ipc: 'SovereignCluster multi-tenant buses',
+        features: 'Host virtualization orchestration layers active'
+    },
+    'release/browser': {
+        capsule: 'Browser OS Shard',
+        scheduler: 'Chromium sandboxed execution router',
+        ipc: 'GPU-accelerated Direct Compositor layers',
+        features: 'Web-centric sandboxed applications scheduler'
+    },
+    'release/app': {
+        capsule: 'Pro App Shard',
+        scheduler: 'Statutory calculations thread scheduler',
+        ipc: 'Interactive calculations context queues',
+        features: 'Indian GST, BNS Complier, court ad-valorem, BIS verifiers'
+    },
+    'performance-optimized': {
+        capsule: 'Clear-Tuned Perf',
+        scheduler: 'AVX-512 vector-aware scheduler',
+        ipc: 'SIMD optimized lock-free queues',
+        features: 'Clear Linux tuning, SIMD loop optimizations, adaptive memory allocator'
+    },
+    'gh-pages': {
+        capsule: 'Documentation Wiki',
+        scheduler: 'AOT Docs page generator',
+        ipc: 'Static site manifest synchronizer',
+        features: 'Contributor guides, demos index, subsystem Wiki sheets'
+    }
+};
+
+window.simulateBranch = function(branchName) {
+    const config = branchParityConfigs[branchName];
+    if (!config) return;
+
+    // Update capsule badge
+    const badge = document.getElementById('active-capsule');
+    if (badge) {
+        badge.innerText = config.capsule.toUpperCase();
+    }
+
+    // Update Branch Status Text
+    const statusText = document.getElementById('branch-status-text');
+    if (statusText) {
+        statusText.innerHTML = `
+            Branch: ${branchName} (Active)<br>
+            Scheduler: ${config.scheduler}<br>
+            IPC State: ${config.ipc}<br>
+            Core features: ${config.features}
+        `;
+    }
+
+    // Customize Telemetry and Logs
+    addLog(`Σ [BRANCH]: Active kernel branch hot-swapped to [${branchName}].`, 'warning');
+    addLog(`Σ [KERN]: Scheduler shifted to [${config.scheduler}].`, 'success');
+    addLog(`Σ [IPC]: IPC protocols adjusted to [${config.ipc}].`, 'success');
+
+    // Speech attestation if screen reader is active
+    if (isScreenReaderActive) {
+        speakText(`Active kernel branch shifted to ${config.capsule}.`);
+    }
+};
+
+// Profile selector logic
+window.selectWorkspaceProfile = function(profileName) {
+    addLog(`Σ [PROFILE]: Transitioning workspace to [${profileName.toUpperCase()}] profile.`, 'warning');
+    
+    // Automatically trigger branch and workflow shifts matching the profile
+    if (profileName === 'Developer') {
+        simulateBranch('main');
+        setWorkflowMode('Coding');
+        launchApp('File Manager');
+    } else if (profileName === 'Forensic') {
+        simulateBranch('release/app');
+        setWorkflowMode('Red Team');
+        launchApp('OmniShell');
+        // Simulate CAINE/Forensics logs in terminal
+        setTimeout(() => {
+            const out = document.getElementById('terminal-output');
+            if (out) {
+                const div = document.createElement('div');
+                div.className = 'term-line error';
+                div.innerHTML = `Σ [FORENSIC]: Forensic partition raw scan active (CAINE inspiration)...<br>
+                                 Σ [FORENSIC]: Mounted loop /dev/loop0 Read-Only (Safe-Write).<br>
+                                 Σ [FORENSIC]: Cryptographic attestation: SHA256 verified successfully.`;
+                out.appendChild(div);
+                out.scrollTop = out.scrollHeight;
+            }
+        }, 800);
+    } else if (profileName === 'Gaming') {
+        simulateBranch('performance-optimized');
+        setWorkflowMode('Gamer');
+        toggleTurboMode();
+    } else if (profileName === 'Container Host') {
+        simulateBranch('release/cloud');
+        setWorkflowMode('AI Native');
+        launchApp('AI Assistant');
+    }
+};
+
+// Cron-watchdog toggle
+window.toggleCronWatchdog = function(checked) {
+    addLog(checked ? 'Σ [CRON]: Watchdog Daemon ACTIVE. Running Registry tasks...' : 'Σ [CRON]: Watchdog Daemon SUSPENDED.', checked ? 'success' : 'warning');
+};
+
+// Accessibility: High Contrast Mode
+window.toggleHighContrast = function(checked) {
+    document.body.classList.toggle('high-contrast-active', checked);
+    addLog(checked ? 'Σ [ACCESSIBILITY]: High Contrast Mode ENABLED.' : 'Σ [ACCESSIBILITY]: High Contrast Mode DISABLED.', 'success');
+};
+
+// Accessibility: Screen Reader
+let isScreenReaderActive = false;
+window.toggleScreenReader = function(checked) {
+    isScreenReaderActive = checked;
+    addLog(checked ? 'Σ [ACCESSIBILITY]: Text Screen Reader Vocalizations ENABLED.' : 'Σ [ACCESSIBILITY]: Text Screen Reader Vocalizations DISABLED.', 'success');
+    if (checked) {
+        speakText("Screen reader activated. SigmaOS attestation verified.");
+    }
+};
+
+function speakText(text) {
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.1;
+        window.speechSynthesis.speak(utterance);
+    }
+}
+
+// Add hover vocalizations for Accessibility Screen Reader
+window.addEventListener('load', () => {
+    document.addEventListener('mouseover', (e) => {
+        if (!isScreenReaderActive) return;
+        const target = e.target.closest('[data-tooltip], button, .dock-icon, .fm-item');
+        if (target) {
+            const textToSpeak = target.getAttribute('data-tooltip') || target.innerText || target.getAttribute('placeholder');
+            if (textToSpeak) {
+                // Throttle speech
+                window.speechSynthesis.cancel();
+                speakText(textToSpeak);
+            }
+        }
+    });
+});
+
 // --- Global Orchestration Hooks ---
 
 // Final initialization

@@ -122,49 +122,151 @@
         </div>
 
         <!-- App: Lattice Settings -->
-        <div class="window" id="lattice-settings-win" class="auto-style-97">
+        <div class="window" id="lattice-settings-win" class="auto-style-97" style="width: 750px; height: 500px;">
             <div class="window-header">
-                <div class="window-title">⚙️ <span>Lattice System Settings</span></div>
+                <div class="window-title">⚙️ <span>Lattice System settings</span></div>
                 <div class="window-controls">
                     <div class="control-dot min" onclick="closeWindow('lattice-settings-win')"></div>
                     <div class="control-dot max"></div>
                     <div class="control-dot close" onclick="closeWindow('lattice-settings-win')"></div>
                 </div>
             </div>
-            <div class="window-body">
-                <div class="settings-layout">
-                    <div class="settings-tabs">
-                        <div class="settings-tab active">Appearance</div>
-                        <div class="settings-tab">Core Profiles</div>
-                        <div class="settings-tab">Obs Sync</div>
+            <div class="window-body" style="padding: 15px;">
+                <div class="settings-layout" style="grid-template-columns: 180px 1fr;">
+                    <div class="settings-tabs" id="settings-tabs-list">
+                        <div class="settings-tab active" onclick="switchSettingsTab('appearance')">🎨 Appearance</div>
+                        <div class="settings-tab" onclick="switchSettingsTab('branches')">⚙️ Sovereign Branches</div>
+                        <div class="settings-tab" onclick="switchSettingsTab('profiles')">👤 Work Profiles</div>
+                        <div class="settings-tab" onclick="switchSettingsTab('accessibility')">♿ Accessibility & Rollback</div>
                     </div>
-                    <div class="settings-content">
-                        <div class="settings-group">
-                            <h4>Dynamic Theme Engine</h4>
-                            <div class="theme-selector-grid">
-                                <button class="theme-button theme-cyan" onclick="setTheme('cyan')">Cyan</button>
-                                <button class="theme-button theme-gold" onclick="setTheme('gold')">Gold</button>
-                                <button class="theme-button theme-solar" onclick="setTheme('solar')">Solar</button>
-                                <button class="theme-button theme-crimson" onclick="setTheme('crimson')">Crimson</button>
+                    <div class="settings-content" id="settings-panes-container" style="overflow-y: auto; max-height: 400px; padding-right: 5px;">
+                        
+                        <!-- Panel 1: Appearance -->
+                        <div class="settings-pane" id="pane-appearance" style="display: block;">
+                            <div class="settings-group">
+                                <h4>Dynamic Theme Engine</h4>
+                                <div class="theme-selector-grid">
+                                    <button class="theme-button theme-cyan" onclick="setTheme('cyan')">Cyan</button>
+                                    <button class="theme-button theme-gold" onclick="setTheme('gold')">Gold</button>
+                                    <button class="theme-button theme-solar" onclick="setTheme('solar')">Solar</button>
+                                    <button class="theme-button theme-crimson" onclick="setTheme('crimson')">Crimson</button>
+                                </div>
+                            </div>
+                            <div class="settings-group">
+                                <h4>System UI parameters</h4>
+                                <div class="form-switch" style="margin-bottom: 10px;">
+                                    <span>Glass Blur Intensity (px)</span>
+                                    <input type="range" min="4" max="40" value="24" oninput="updateGlassBlur(this.value)" style="width: 120px; accent-color: var(--accent-gold);">
+                                </div>
+                                <div class="form-switch">
+                                    <span>Accent Color Hue</span>
+                                    <input type="range" min="0" max="360" value="42" oninput="updateAccentHue(this.value)" style="width: 120px; accent-color: var(--accent-gold);">
+                                </div>
                             </div>
                         </div>
-                        <div class="settings-group">
-                            <h4>Workflow Profiles</h4>
-                            <div class="form-switch">
-                                <span>Enable Neural Layout Engine</span>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" checked onchange="neural.setMindfulness(this.checked)" title="Enable Neural Layout" aria-label="Enable Neural Layout">
-                                    <span class="slider"></span>
-                                </label>
+
+                        <!-- Panel 2: Sovereign Branches (The 12 Branches Switcher!) -->
+                        <div class="settings-pane" id="pane-branches" style="display: none;">
+                            <div class="settings-group">
+                                <h4>Sovereign Branch Simulator</h4>
+                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">
+                                    Dynamically swap active kernel modes and architectures across the 12 git-synchronized branches.
+                                </p>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                                    <button class="fm-btn" onclick="simulateBranch('main')">🌐 main (Stable Core)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('release/standalone')">💾 standalone (Bare-Metal)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('release/rtos')">⏱️ rtos (SCHED_SOVEREIGN)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('release/mobile')">📱 mobile (ARM/EAS)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('release/microkernel')">🧪 microkernel (SPSC IPC)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('release/dual-boot')">💿 dual-boot (GRUB/LIM)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('release/distributed')">🕸️ distributed (CloudFS)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('release/cloud')">☁️ cloud (SovereignCluster)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('release/browser')">🌐 browser (Sandbox OS)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('release/app')">📊 app (Statutory Tools)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('performance-optimized')">⚡ perf-opt (Clear Linux Tuned)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('gh-pages')">📖 gh-pages (Wiki Docs)</button>
+                                </div>
                             </div>
-                            <div class="form-switch">
-                                <span>Ambient VSync Overdrive</span>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" title="Toggle Ambient VSync" aria-label="Toggle Ambient VSync">
-                                    <span class="slider"></span>
-                                </label>
+                            <div class="settings-group" id="branch-status-box" style="border-left: 3px solid var(--accent-gold); padding-left: 10px;">
+                                <h5 style="color: var(--accent-gold); font-size: 0.8rem; text-transform: uppercase;">Active Shard Status</h5>
+                                <div id="branch-status-text" style="font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; color: white;">
+                                    Branch: main (Active)<br>
+                                    Scheduler: CFS-Affinity socket Balancer<br>
+                                    IPC state: Default zero-copy messaging
+                                </div>
                             </div>
                         </div>
+
+                        <!-- Panel 3: Work Profiles -->
+                        <div class="settings-pane" id="pane-profiles" style="display: none;">
+                            <div class="settings-group">
+                                <h4>Identity Profile Selector</h4>
+                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">
+                                    Switch custom software suite sets and system profiles for special environments.
+                                </p>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                                    <button class="fm-btn" onclick="selectWorkspaceProfile('Developer')">💻 Developer Mode</button>
+                                    <button class="fm-btn" onclick="selectWorkspaceProfile('Forensic')">🔍 Forensic CLI Audit</button>
+                                    <button class="fm-btn" onclick="selectWorkspaceProfile('Gaming')">🎮 Gaming / Turbo</button>
+                                    <button class="fm-btn" onclick="selectWorkspaceProfile('Container Host')">🐳 Container Cluster Host</button>
+                                </div>
+                            </div>
+                            <div class="settings-group">
+                                <h4>Cron-Like automation scheduler</h4>
+                                <div class="form-switch" style="margin-bottom: 10px;">
+                                    <span>Enable Neural Layout Engine</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" checked onchange="neural.setMindfulness(this.checked)" title="Enable Neural Layout" aria-label="Enable Neural Layout">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="form-switch">
+                                    <span>Registry Cron Watchdog</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="cron-toggle" checked onchange="toggleCronWatchdog(this.checked)" title="Toggle Cron" aria-label="Toggle Cron">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 4: Accessibility & Rollback -->
+                        <div class="settings-pane" id="pane-accessibility" style="display: none;">
+                            <div class="settings-group">
+                                <h4>Sovereign accessibility Engine</h4>
+                                <div class="form-switch" style="margin-bottom: 10px;">
+                                    <span>High Contrast Mode</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="high-contrast-toggle" onchange="toggleHighContrast(this.checked)" title="Toggle High Contrast" aria-label="Toggle High Contrast">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="form-switch" style="margin-bottom: 10px;">
+                                    <span>Text Screen Reader Voice</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="screen-reader-toggle" onchange="toggleScreenReader(this.checked)" title="Toggle Screen Reader" aria-label="Toggle Screen Reader">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="settings-group">
+                                <h4>RescueZilla Snapshot Recovery</h4>
+                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">
+                                    Capture or roll back running system configurations instantly using the atomic VFS snapshot registers.
+                                </p>
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="text" id="snap-name" class="cmd-input" placeholder="Snapshot label..." style="height: 35px; font-size: 0.8rem;">
+                                    <button class="wizard-btn" onclick="createSnapshot()" style="padding: 5px 15px; font-size: 0.8rem; height: 35px; white-space: nowrap;">CAPTURE SNAP</button>
+                                </div>
+                                <ul id="snapshot-list" style="margin-top: 10px; font-size: 0.75rem; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 5px;">
+                                    <li class="routine-item routine-border-cyan" style="display: flex; justify-content: space-between; align-items: center; padding: 5px 8px; background: rgba(255,255,255,0.02); border-radius: 4px; border-left: 2px solid var(--accent-gold);">
+                                        <strong>Default_Restore_Point</strong> (System)
+                                        <button class="cyber-btn small-btn" onclick="atomicSwap('Default_Restore_Point')" style="padding: 2px 8px; font-size: 0.7rem;">ROLLBACK</button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
