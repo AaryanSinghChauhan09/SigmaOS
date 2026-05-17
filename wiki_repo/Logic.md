@@ -1,101 +1,121 @@
-# Sovereign Logic & File Mappings (99 Points)
+# SigmaOS Sovereign Logic, Dependency & Directory Lattice
 
-This document defines exactly 99 highly technical blueprints mapping the architectural flow and file interactions within the 600-shard SigmaOS lattice.
+This document establishes the official architectural index and logical relationships connecting every module, shard, driver, and tool within the **SigmaOS Zenith** microkernel.
 
-1. **Define**: Define strict structural relationships between all core kernel files in a clear technical document.
-2. **Establish**: Establish the logical interaction pipelines connecting Ring-3 user tasks to Ring-0 kernel drivers.
-3. **Introduce**: Introduce high-resolution dependency graph mapping directories to prevent recursive compile loops.
-4. **Map**: Map the exact execution stages of the Asynchronous Shard Ignition (ASI) system bootstrap.
-5. **Deploy**: Deploy detailed file status maps tracking the development state of all 600-shards in the lattice.
-6. **Incorporate**: Incorporate precise physical memory boundary mappings isolating the core kernel from guest VMs.
-7. **Establish**: Establish clean logical transitions standardizing security validation checks across all shard boundaries.
-8. **Configure**: Configure portable build configuration mappings standardizing compilation options across architectures.
-9. **Introduce**: Introduce comprehensive operational flow diagrams tracing raw hardware interrupts to user compositor panels.
-10. **Write**: Write detailed, comprehensive architectural interaction manuals directly to the Logic documents.
-11. **Deploy**: Deploy automated verification rules ensuring that no circular import paths ever exist in files.
-12. **Establish**: Establish standard naming conventions mapping source code directories to system layer levels.
-13. **Implement**: Implement automated logical status tracking dynamically updating code state details inside docs.
-14. **Add**: Add support for post-quantum cryptographic signature validation checks across the global logic file index.
-15. **Configure**: Configure custom file access rules dynamically updated based on the currently active developer profile.
-16. **Deploy**: Deploy portable logic schemas standardizing interaction mappings across diverse branches.
-17. **Add**: Add support for secure virtualized logic mapping namespaces isolating experimental driver configurations.
-18. **Implement**: Implement highly optimized logic lookup metrics resolving dependencies in static constant O(1) times.
-19. **Configure**: Configure strict directory size limits protecting the logic map from excessive binary files.
-20. **Deploy**: Deploy portable logic diagnostic dashboards returning detailed system architecture graphs.
-21. **Add**: Add support for secure, isolated logic spaces separating core system maps from user utilities.
-22. **Implement**: Implement automated logic index updates writing metadata directly to the global file manifest.
-23. **Configure**: Configure custom layout maps dynamically updated based on the currently active compile flags.
-24. **Deploy**: Deploy portable logic diagnostic consoles returning detailed mapping warning reports.
-25. **Add**: Add support for secure virtualized logic redirection layers enabling clean compile checks.
-26. **Implement**: Implement automated logical integrity validation proving mathematically that deadlocks are blocked.
-27. **Configure**: Configure custom repository access matrices restricting direct logic maps commit rights to verified keys.
-28. **Deploy**: Deploy portable logic execution trace capture routines for rapid system architecture audits.
-29. **Introduce**: Introduce generic logic helper templates reducing redundant code inside module registries.
-30. **Implement**: Implement highly optimized logic lookup indexes resolving modules in static constant cycle loops.
-31. **Configure**: Configure strict formatting checking rules preventing unaligned architectural layout representations.
-32. **Deploy**: Deploy portable logic status reporting engines writing directly to the secure system diagnostic file.
-33. **Add**: Add support for secure, isolated wiki namespaces separating core blueprints from user guides.
-34. **Implement**: Implement automated logic writing audits checking commit authors against verified security keys.
-35. **Configure**: Configure custom logic scheduling rules to prioritize safety-critical kernel system updates.
-36. **Deploy**: Deploy portable logic performance tracking indexes recording exactly the cycle cost of module loading.
-37. **Introduce**: Introduce generic logic status reporting helpers to cleanly transition context details.
-38. **Implement**: Implement highly optimized logic dispatching pipelines resolving calls in minimum clock cycles.
-39. **Configure**: Configure strict logic system controls protecting the core against invalid register mapping rules.
-40. **Deploy**: Deploy portable logic status diagnostic output ports writing directly to serial console consoles.
-41. **Add**: Add support for secure virtualized logic routing standardizing container-to-host operational vectors.
-42. **Implement**: Implement automated logic execution audits checking caller instruction pointers against memory maps.
-43. **Configure**: Configure custom logic boundary limits to prevent memory pool overlaps between separate VM maps.
-44. **Deploy**: Deploy portable logic execution trace capture routines for rapid layout analysis.
-45. **Introduce**: Introduce generic logic validation templates ensuring complete consistency across all system maps.
-46. **Implement**: Implement highly optimized logic lookup maps resolving pathways in static constant cycle loops.
-47. **Configure**: Configure strict formatting checking rules preventing unaligned column layouts.
-48. **Deploy**: Deploy portable logic status reporting engines writing directly to the secure system log.
-49. **Add**: Add support for secure, isolated wiki namespaces separating core code guides from user guides.
-50. **Implement**: Implement automated document writing audits checking commit authors against active security keys.
-51. **Configure**: Configure custom document scheduling rules to prioritize safety-critical security guidelines.
-52. **Deploy**: Deploy portable documentation performance tracking indexes recording exactly the cycle cost of page rendering.
-53. **Introduce**: Introduce generic documentation status reporting helpers to cleanly transition context details.
-54. **Implement**: Implement highly optimized markdown rendering pipelines resolving layout in minimum cycles.
-55. **Configure**: Configure strict documentation system controls protecting the wiki against broken links.
-56. **Deploy**: Deploy portable documentation status diagnostic output ports writing directly to serial console consoles.
-57. **Add**: Add support for secure virtualized document routing standardizing container-to-host manual frames.
-58. **Implement**: Implement automated documentation execution audits checking writer keys against active security rules.
-59. **Configure**: Configure custom document boundary limits to prevent memory pool overlaps between separate VM wikis.
-60. **Deploy**: Deploy portable documentation execution trace capture routines for rapid layout analysis.
-61. **Introduce**: Introduce generic documentation validation templates ensuring complete consistency across all wiki pages.
-62. **Implement**: Implement highly optimized document lookup maps resolving pathways in static constant cycle loops.
-63. **Configure**: Configure strict formatting checking rules preventing unaligned column layouts.
-64. **Deploy**: Deploy portable documentation status reporting engines writing directly to the secure system log.
-65. **Add**: Add support for secure, isolated wiki namespaces separating core code guides from user guides.
-66. **Implement**: Implement automated document writing audits checking commit authors against active security keys.
-67. **Configure**: Configure custom document scheduling rules to prioritize safety-critical security guidelines.
-68. **Deploy**: Deploy portable documentation performance tracking indexes recording exactly the cycle cost of page rendering.
-69. **Introduce**: Introduce generic documentation status reporting helpers to cleanly transition context details.
-70. **Implement**: Implement highly optimized markdown rendering pipelines resolving layout in minimum cycles.
-71. **Configure**: Configure strict documentation system controls protecting the wiki against broken links.
-72. **Deploy**: Deploy portable documentation status diagnostic output ports writing directly to serial console consoles.
-73. **Add**: Add support for secure virtualized document routing standardizing container-to-host manual frames.
-74. **Implement**: Implement automated documentation execution audits checking writer keys against active security rules.
-75. **Configure**: Configure custom document boundary limits to prevent memory pool overlaps between separate VM wikis.
-76. **Deploy**: Deploy portable documentation execution trace capture routines for rapid layout analysis.
-77. **Introduce**: Introduce generic documentation validation templates ensuring complete consistency across all wiki pages.
-78. **Implement**: Implement highly optimized document lookup maps resolving pathways in static constant cycle loops.
-79. **Configure**: Configure strict formatting checking rules preventing unaligned column layouts.
-80. **Deploy**: Deploy portable documentation status reporting engines writing directly to the secure system log.
-81. **Add**: Add support for secure, isolated wiki namespaces separating core code guides from user guides.
-82. **Implement**: Implement automated document writing audits checking commit authors against active security keys.
-83. **Configure**: Configure custom document scheduling rules to prioritize safety-critical security guidelines.
-84. **Deploy**: Deploy portable documentation performance tracking indexes recording exactly the cycle cost of page rendering.
-85. **Introduce**: Introduce generic documentation status reporting helpers to cleanly transition context details.
-86. **Implement**: Implement highly optimized markdown rendering pipelines resolving layout in minimum cycles.
-87. **Configure**: Configure strict documentation system controls protecting the wiki against broken links.
-88. **Deploy**: Deploy portable documentation status diagnostic output ports writing directly to serial console consoles.
-89. **Add**: Add support for secure virtualized document routing standardizing container-to-host manual frames.
-90. **Implement**: Implement automated documentation execution audits checking writer keys against active security rules.
-91. **Configure**: Configure custom document boundary limits to prevent memory pool overlaps between separate VM wikis.
-92. **Deploy**: Deploy portable documentation execution trace capture routines for rapid layout analysis.
-93. **Introduce**: Introduce generic documentation validation templates ensuring complete consistency across all wiki pages.
-94. **Implement**: Implement highly optimized document lookup maps resolving pathways in static constant cycle loops.
-95. **Configure**: Configure strict formatting checking rules preventing unaligned column layouts.
-96. **Deploy**: Deploy portable documentation status reporting engines writing directly to the secure system log.
-97. **Add**: Add support for secure, isolated wiki namespaces separating core code guides from user guides.
+---
+
+## 📂 1. System Directory Hierarchy & Directory Topology
+
+The SigmaOS codebase is structured as a non-derivative, zero-dependency microkernel lattice organized to isolate execution spaces:
+
+```
+SigmaOS/
+├── include/                     # Zero-Dependency Core Type Declarations & OOP Model
+│   ├── sigma_kernel_types.h     # Fundamental standard-free kernel types
+│   ├── sigma_log.h              # Zero-dependency, silicon-direct kernel log
+│   └── SigmaOOP.hpp             # Base SigmaObject abstraction for C++ Singletons
+├── kernel/                      # The Microkernel Core
+│   └── core/                    # Core Subsystems and Drivers
+│       ├── drivers/             # Silicon-direct GPU and Video controllers
+│       │   ├── SovereignVideo.cpp
+│       │   └── SovereignVulkanLayer.cpp
+│       └── system/              # Process routing, hypervisors, and security layers
+│           ├── SovereignBoot.cpp
+│           ├── SovereignCluster.cpp
+│           ├── SovereignHypervisor.cpp
+│           ├── SovereignTimeMachine.cpp
+│           └── SyscallDispatcher.cpp
+├── tools/                       # System Utilities & Statutory Auditors
+│   ├── pro/                     # 20 C++ Indian Statutory Calculators (Zero-Dependency)
+│   ├── sync_all_branches.py     # Branch Uniformity & Synchronization Engine (S-BUSE)
+│   └── wiki_sync.py             # Technical Documentation Synchronizer
+├── docs/                        # Subsystem Architectural Blueprints & Specs
+└── wiki_repo/                   # Local Mirror of the Remote GitHub Wiki
+```
+
+---
+
+## 🔄 2. Core Subsystems Interaction Flow
+
+The following interaction sequence illustrates how userland requests traverse the isolated microkernel boundary, execute via attested singletons, and leverage direct hardware layers:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    Userland App->>SyscallDispatcher: Trigger System Call (Ring 3 -> Ring 0)
+    SyscallDispatcher->>SovereignBoot: Dispatch Stage Attestation Check
+    SovereignBoot->>SovereignHypervisor: VM Context Sandbox Allocation
+    SovereignHypervisor->>SovereignVulkanLayer: Request Direct GPU Context
+    SovereignVulkanLayer->>SovereignVideo: HEVC Transcoding Vector Dispatch
+    SovereignVideo-->>Userland App: Return Direct composited UI Buffer
+```
+
+---
+
+## 📄 3. Detailed File-by-File Logical Mapping & Purpose
+
+### 🩻 A. Core Header & Type Definitions (`/include/`)
+* **[sigma_kernel_types.h](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/include/sigma_kernel_types.h)**:
+  - **Purpose**: Defines clean fixed-width integers (`sigma_u32`, `sigma_u64`, etc.) and status codes.
+  - **Relationship**: Included by every single C++ source file in the repository to guarantee absolute freedom from high-level, compiler-dependent `std` headers.
+* **[SigmaOOP.hpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/include/SigmaOOP.hpp)**:
+  - **Purpose**: Implements the fundamental `SigmaObject` base class.
+  - **Relationship**: Serves as the base class for all C++ singletons across the kernel, drivers, and calculators, establishing a uniform object-oriented model.
+* **[sigma_log.h](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/include/sigma_log.h)**:
+  - **Purpose**: Implements raw, fast-path, silicon-direct telemetry logging primitives.
+  - **Relationship**: Connected to all driver and core system layers to write real-time, attestation-sealed audits.
+
+### 🧠 B. The Microkernel Core (`/kernel/core/`)
+* **[SovereignBoot.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/system/SovereignBoot.cpp)**:
+  - **Purpose**: Manages the **Asynchronous Shard Ignition (ASI)** boot sequence.
+  - **Relationship**: Acts as the system orchestrator, igniting all 600 shards and loading active developer or forensic profile configs.
+* **[SyscallDispatcher.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/system/SyscallDispatcher.cpp)**:
+  - **Purpose**: Performs high-performance, modular system call validation and routing.
+  - **Relationship**: Intercepts all Ring-3 userland instructions and dispatches them securely to Ring-0 drivers.
+* **[SovereignHypervisor.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/system/SovereignHypervisor.cpp)**:
+  - **Purpose**: Implements Type-1 microkernel virtualization partitions.
+  - **Relationship**: Orchestrates guest VMs and containers, enforcing total isolation between core shards.
+* **[SovereignTimeMachine.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/system/SovereignTimeMachine.cpp)**:
+  - **Purpose**: Manages atomic checkpoints and rollback vectors.
+  - **Relationship**: Captures instantaneous, zero-overhead memory and sector state snapshots for disaster recovery.
+* **[SovereignVulkanLayer.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/drivers/SovereignVulkanLayer.cpp)**:
+  - **Purpose**: Bypasses legacy windowing layers to execute direct GPU pipelines.
+  - **Relationship**: Feeds rendering queues to `SovereignVideo.cpp` to output triple-buffered desktop compositor frames.
+
+### 🧮 C. Statutory & Professional Utilities (`/tools/pro/`)
+* Contains **20 custom calculators** written in clean, zero-dependency C++:
+  - Implements complex statutory models (such as `SovereignGSTCalculator.cpp` under the GST Act 2017 and `SovereignConsumerCourtFeeCalc.cpp` under the Consumer Protection Act 2019).
+  - Performs high-performance, fixed-point calculations in paise to eliminate standard floating-point precision loss.
+
+---
+
+## 📈 4. Data Flow: From Boot Ignition to Composited Desktop
+
+```
+[System Power On] 
+       │
+       ▼
+[Asynchronous Shard Ignition] ──> attests Dilithium-5 Boot Signature
+       │
+       ▼
+[SovereignRegistry Loader] ────> parses declarative JSON config
+       │
+       ▼
+[SyscallDispatcher Register] ──> configures Ring-3 to Ring-0 interface vectors
+       │
+       ▼
+[Vulkan GPU Compsitor Frame] ──> loads SovereignThemeEngine dynamic styles
+       │
+       ▼
+[Active Desktop Shards] ───────> launches isolated Developer/Forensic profiles
+```
+
+---
+
+## 🔄 5. Multi-Branch Parity & Uniformity
+To guarantee absolute architectural uniformity across all computing paradigms, the **Branch Uniformity & Synchronization Engine** (`sync_all_branches.py`) automatically propagates the entire system directory lattice across all 12 operational branches:
+* `main`: Stable Production Launch Vector.
+* `release/rtos`: Real-Time Operating System branch with deterministic schedulers.
+* `release/mobile`: Energy-aware, high-performance battery scheduler models.
+* `release/microkernel`: Skeletal, minimal build configs.
+* `gh-pages`: Optimized high-performance GitHub Pages web site.
