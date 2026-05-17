@@ -109,3 +109,4 @@ Welcome to SigmaOS! Every contributor must follow these rules. They act like a c
 - **No merge is allowed if rules are violated.**
 
 - Every contributor or AI tool knows exactly what to do: `implement` → `document` → `automate` → `enforce`.
+ 

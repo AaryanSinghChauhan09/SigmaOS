@@ -38,3 +38,4 @@ extern "C" {
         SigmaOS::Kernel::Observability::SigmaBenchmark::getInstance().runBenchmarks();
     }
 }
+ 

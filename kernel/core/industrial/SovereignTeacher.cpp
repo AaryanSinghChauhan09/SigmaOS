@@ -170,3 +170,4 @@ void teach_rte_ptr(sigma_u32 s, sigma_u32 t, bool primary) {
 }
 
 } // extern "C"
+ 

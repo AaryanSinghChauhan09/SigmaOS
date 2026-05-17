@@ -35,3 +35,4 @@ extern "C" {
     void rtl8139_init(sigma_u64 base) { SigmaOS::Kernel::Drivers::SovereignRTL8139::getInstance().init(base); }
 }
 
+ 

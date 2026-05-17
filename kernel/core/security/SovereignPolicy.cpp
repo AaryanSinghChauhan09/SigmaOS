@@ -69,3 +69,4 @@ void policy_enforce(sigma_u32 sid, sigma_u32 cpu, sigma_u64 mem) {
 }
 
 } // extern "C"
+ 

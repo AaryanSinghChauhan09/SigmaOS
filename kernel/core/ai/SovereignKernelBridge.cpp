@@ -83,3 +83,4 @@ void bridge_emit_hint(const char* type, const char* data) {
 }
 
 } // extern "C"
+ 

@@ -77,3 +77,4 @@ void power_set_state(sigma_u32 s) {
 
 
 } // extern "C"
+ 

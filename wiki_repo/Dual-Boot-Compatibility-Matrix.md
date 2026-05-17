@@ -83,3 +83,4 @@ If SigmaOS fails to boot:
 3. Re-install GRUB: `sovereign-bootctl install --target=/dev/sdX`
 
 4. Verify: `sovereign-bootctl verify`
+ 

@@ -31,3 +31,4 @@ public:
 extern "C" void SovereignAmnesic_ignite() {
     SigmaOS::Kernel::Absorption::SovereignAmnesic::getInstance().ignite();
 }
+ 

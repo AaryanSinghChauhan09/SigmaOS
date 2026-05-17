@@ -84,3 +84,4 @@ void atomic_rollback() {
 
 
 } // extern "C"
+ 

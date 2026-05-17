@@ -117,3 +117,4 @@ sigma_u32 heap_get_active_allocations() {
 }
 
 } // extern "C"
+ 

@@ -69,3 +69,4 @@ void ai_persona_adapt(const char* ctx) {
 
 
 } // extern "C"
+ 

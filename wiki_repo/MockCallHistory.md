@@ -221,3 +221,4 @@ Can be :
 - undefined. MockCallHistoryLog filtered if `value !== parameterValue`
 
 - regexp. MockCallHistoryLog filtered if `!parameterValue.test(value)`
+ 

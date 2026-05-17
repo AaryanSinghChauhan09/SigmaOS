@@ -36,3 +36,4 @@ extern "C" {
     void wpan_init() { SigmaOS::Kernel::Drivers::SovereignWPAN::getInstance().init(); }
 }
 
+ 

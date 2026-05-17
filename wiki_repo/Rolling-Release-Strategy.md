@@ -22,3 +22,4 @@ Synchronize your lattice with the rolling edge:
 sigma-pkg update --rolling
 
 ```
+ 

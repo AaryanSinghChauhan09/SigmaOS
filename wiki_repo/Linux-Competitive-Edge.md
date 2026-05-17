@@ -46,3 +46,4 @@ To surpass the competition, SigmaOS does not compete on "popularity" but on **In
 ### Sovereignty is the ultimate differentiator
 
 v14.3 [LEAPFROG-STRATEGY]
+ 

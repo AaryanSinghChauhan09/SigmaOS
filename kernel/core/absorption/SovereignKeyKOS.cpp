@@ -31,3 +31,4 @@ public:
 extern "C" void SovereignKeyKOS_ignite() {
     SigmaOS::Kernel::Absorption::SovereignKeyKOS::getInstance().ignite();
 }
+ 

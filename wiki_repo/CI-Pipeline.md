@@ -23,3 +23,4 @@ The pipeline is automatically triggered on every push to the `main` branch. Manu
 make industrial_sync
 
 1
+ 

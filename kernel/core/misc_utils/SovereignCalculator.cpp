@@ -7,3 +7,4 @@ extern "C" double sovereign_math_eval(const char* expr) {
 }
 
 } // extern "C"
+ 

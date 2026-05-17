@@ -35,3 +35,4 @@ extern "C" {
     void raid_init() { SigmaOS::Kernel::FS::SovereignRAID::getInstance().init(); }
 }
 
+ 

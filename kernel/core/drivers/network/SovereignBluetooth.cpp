@@ -26,3 +26,4 @@ public:
 extern "C" void SovereignBluetooth_init() {
     SigmaOS::Kernel::SovereignBluetoothSpace::SovereignBluetooth::getInstance().Init();
 }
+ 

@@ -54,3 +54,4 @@ extern "C" {
     unsigned long long pqc_get_signature_count() { return SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().getSignatureCount(); }
     void pqc_refresh_lattice() { SigmaOS::Kernel::Security::SovereignPQCEngine::getInstance().refreshLattice(); }
 }
+ 

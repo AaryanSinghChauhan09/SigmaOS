@@ -122,3 +122,4 @@ extern "C" {
         return SigmaOS::Kernel::Professional::SovereignIndianTools::getInstance().lookupBNSSection(ipc);
     }
 }
+ 

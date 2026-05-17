@@ -145,3 +145,4 @@ extern "C" {
     sigma_u32 sched_schedule() { return SigmaOS::Kernel::System::SovereignScheduler::getInstance().schedule(); }
     void sched_block(sigma_u32 pid) { SigmaOS::Kernel::System::SovereignScheduler::getInstance().block(pid); }
 }
+ 

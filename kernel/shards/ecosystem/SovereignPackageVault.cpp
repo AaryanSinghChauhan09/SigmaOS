@@ -49,3 +49,4 @@ void vault_init() {
 }
 
 } // extern "C"
+ 

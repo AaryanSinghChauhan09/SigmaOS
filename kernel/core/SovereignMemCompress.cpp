@@ -56,3 +56,4 @@ extern "C" sigma_u32 memcompress_compress(sigma_u32 pages) { return SovereignMem
 extern "C" void memcompress_stats() { SovereignMemCompressEngine::getInstance().printStats(); }
 
 
+ 

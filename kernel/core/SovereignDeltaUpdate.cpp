@@ -38,3 +38,4 @@ extern "C" {
         return SigmaOS::Kernel::Updates::SovereignDeltaUpdater::getInstance().applyDeltaPatch(sid, p, s);
     }
 }
+ 

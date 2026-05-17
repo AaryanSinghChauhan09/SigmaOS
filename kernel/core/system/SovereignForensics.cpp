@@ -69,3 +69,4 @@ void forensics_scan(const char* vol) {
 
 
 } // extern "C"
+ 

@@ -247,3 +247,4 @@ import { fetch } from 'undici' // uses your installed version, not the built-in
 - [API Reference: MockAgent](/docs/api/MockAgent.md)
 
 - [API Reference: Global Installation](/docs/api/GlobalInstallation.md)
+ 

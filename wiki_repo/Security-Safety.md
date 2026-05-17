@@ -38,3 +38,4 @@ SigmaOS provides industrial-grade protection for professional data and network c
 | **S-LUKS** | Disk Encryption | LUKS / dm-crypt |
 
 | **S-AUDIT** | Auditing | Auditd |
+ 

@@ -65,3 +65,4 @@ extern "C" void personalize_suggest_theme(sigma_u32 ambient_light_lux) {
 }
 
 
+ 

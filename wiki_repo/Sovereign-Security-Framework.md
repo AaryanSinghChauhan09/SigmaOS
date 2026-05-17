@@ -70,3 +70,4 @@ SigmaOS has completed its initial internal audit and is currently in the "FIPS-1
 ### Sovereignty is built on the bedrock of verifiable security
 
 v14.2 [SECURE-NEXUS]
+ 

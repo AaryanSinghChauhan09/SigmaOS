@@ -43,3 +43,4 @@ extern "C" void* nanolib_memset(void* s, int c, uint32_t n) {
     while (n--) *p++ = (unsigned char)c;
     return s;
 }
+ 

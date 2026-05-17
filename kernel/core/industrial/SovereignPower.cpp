@@ -61,3 +61,4 @@ void power_optimize() {
 }
 
 } // extern "C"
+ 

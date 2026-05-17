@@ -60,3 +60,4 @@ void warehouse_scan(const char* col) {
 }
 
 } // extern "C"
+ 

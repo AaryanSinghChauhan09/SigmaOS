@@ -60,3 +60,4 @@ void sigma_smp_send_ipi(unsigned int core_id, unsigned int vector) {
 }
 
 } // extern "C"
+ 

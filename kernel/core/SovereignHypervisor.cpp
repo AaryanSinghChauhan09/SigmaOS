@@ -41,3 +41,4 @@ extern "C" {
     void hyp_init() { SigmaOS::Kernel::Virt::SovereignHypervisor::getInstance().init(); }
     void hyp_spawn(const char* image) { SigmaOS::Kernel::Virt::SovereignHypervisor::getInstance().createIsolatedShardContainer(image); }
 }
+ 

@@ -57,3 +57,4 @@ private:
 extern "C" {
     void gui_init() { SigmaOS::Kernel::UI::SovereignGUIToolkit::getInstance().init(); }
 }
+ 

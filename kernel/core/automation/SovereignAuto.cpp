@@ -50,3 +50,4 @@ void auto_trigger_event(sigma_u32 event_id) {
 
 
 } // extern "C"
+ 

@@ -21,3 +21,4 @@ SigmaOS utilizes a zero-trust, post-quantum architecture.
 ## 5. Testing & CI
 
 *Automated fuzzing (via `SovereignFuzzer`) is required for all new device drivers.* Regression tests continuously validate MAC policies.
+ 

@@ -38,3 +38,4 @@ All industrial shards must pass the following benchmarks before merging:
 - **Security Overhead**: < 5% CPU impact for PQC-sealed shards.
 
 *"Complexity is the enemy of sovereignty; O(1) is the goal."*
+ 

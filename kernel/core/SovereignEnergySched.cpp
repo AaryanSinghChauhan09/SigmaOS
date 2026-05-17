@@ -44,3 +44,4 @@ extern "C" void energysched_set_shard_state(uint32_t shard_id, sigma_energy_stat
 }
 
 
+ 

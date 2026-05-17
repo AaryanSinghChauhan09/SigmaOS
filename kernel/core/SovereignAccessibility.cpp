@@ -41,3 +41,4 @@ extern "C" {
     void access_init() { SigmaOS::Kernel::UX::SovereignAccessibilityManager::getInstance().init(); }
     void access_scale(sigma_u32 score) { SigmaOS::Kernel::UX::SovereignAccessibilityManager::getInstance().applyAdaptiveScaling(score); }
 }
+ 

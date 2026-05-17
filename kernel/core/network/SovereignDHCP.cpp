@@ -35,3 +35,4 @@ extern "C" {
     void dhcp_init() { SigmaOS::Kernel::Network::SovereignDHCP::getInstance().init(); }
 }
 
+ 

@@ -51,3 +51,4 @@ interface SocketInfo {
 ```
 
 Be aware that in some cases the `.socket` property can be `null`.
+ 

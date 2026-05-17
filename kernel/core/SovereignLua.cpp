@@ -37,3 +37,4 @@ extern "C" sigma_u32 lua_get_script_count() {
 }
 
 
+ 

@@ -60,3 +60,4 @@ extern "C" const sigma_cognitive_state_t* cognitive_get_state() {
 
 
 } // extern "C"
+ 

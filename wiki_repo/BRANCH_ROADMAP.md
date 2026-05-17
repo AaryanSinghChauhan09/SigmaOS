@@ -137,3 +137,4 @@ This branch-wise roadmap ensures SigmaOS closes gaps with Linux distros while le
 - [ ] CI/CD automation (boot tests, cross-arch builds, fuzzing).
 
 - [ ] Wiki alignment (migrate .md files, diagrams, glossary).
+ 

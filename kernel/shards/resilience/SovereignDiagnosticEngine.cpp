@@ -49,3 +49,4 @@ void diag_init() {
 }
 
 } // extern "C"
+ 

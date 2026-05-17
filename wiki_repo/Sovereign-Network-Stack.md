@@ -25,3 +25,4 @@ SigmaOS::Kernel::Network::SovereignNetStack::getInstance().add_firewall_rule(0xF
 ```
 
 *"Connectivity is only sovereign when it is absolute."*
+ 

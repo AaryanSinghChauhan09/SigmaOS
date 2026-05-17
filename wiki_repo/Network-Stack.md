@@ -9,3 +9,4 @@ SigmaOS implements a high-performance network stack designed for industrial reli
 - **Lattice Routing**: Shard-aware packet routing to minimize latency in distributed workflows.
 
 - **Hardware Agnostic**: Supports generic WiFi and Ethernet chipsets via the Sovereign Driver Framework.
+ 

@@ -43,3 +43,4 @@ extern "C" {
     void ft_audit_registry() { SigmaOS::Kernel::Forensics::SovereignForensicToolbox::getInstance().auditRegistrySignatures(); }
     void ft_write_block(const char* drive) { SigmaOS::Kernel::Forensics::SovereignForensicToolbox::getInstance().engageWriteBlocker(drive); }
 }
+ 

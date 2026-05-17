@@ -43,3 +43,4 @@ void proton_dxvk_init() {
 }
 
 } // extern "C"
+ 

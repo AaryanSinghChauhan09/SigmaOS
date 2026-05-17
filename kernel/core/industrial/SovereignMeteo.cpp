@@ -53,3 +53,4 @@ void meteo_sim(const char* r) {
 }
 
 } // extern "C"
+ 

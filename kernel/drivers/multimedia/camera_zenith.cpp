@@ -45,3 +45,4 @@ void PhotographicOrchestrator::Ignite() {
 
 } // namespace Multimedia
 } // namespace SigmaOS
+ 

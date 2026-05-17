@@ -43,3 +43,4 @@ private:
 extern "C" {
     void wlan_init() { SigmaOS::Kernel::Drivers::SovereignWLAN::getInstance().init(); }
 }
+ 

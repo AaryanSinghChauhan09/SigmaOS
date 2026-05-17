@@ -89,3 +89,4 @@ module.exports = function (context) {
 Additionally, OWASP has a [list of regular expressions](https://www.owasp.org/index.php/OWASP_Validation_Regex_Repository) for common validations that might be useful to you.
 
 As part of our ongoing effort to increase the overall security of the Node.js ecosystem, we have conducted automated analysis of every module on npm. We did identify 56 unique vulnerable regular expressions and over 120 modules containing vulnerable regular expressions. Considering that there are now over 100k modules, the results were not alarming. We're working closely with the maintainers of each module to get the issues resolved, once that's done, advisories will be published to the [npm Security advisories](https://www.npmjs.com/advisories) site.
+ 

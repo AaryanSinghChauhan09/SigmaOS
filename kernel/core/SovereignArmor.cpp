@@ -54,3 +54,4 @@ extern "C" {
         SigmaOS::Kernel::Security::SovereignArmorEngine::getInstance().applyPolicy(policy);
     }
 }
+ 

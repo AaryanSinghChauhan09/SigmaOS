@@ -31,3 +31,4 @@ public:
 extern "C" void SovereignVME_ignite() {
     SigmaOS::Kernel::Absorption::SovereignVME::getInstance().ignite();
 }
+ 

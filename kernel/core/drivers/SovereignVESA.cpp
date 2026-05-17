@@ -74,3 +74,4 @@ extern "C" {
         SigmaOS::Kernel::Drivers::SovereignVESA::getInstance().drawPixel(x, y, color);
     }
 }
+ 

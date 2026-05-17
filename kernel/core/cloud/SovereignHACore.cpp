@@ -66,3 +66,4 @@ void ha_core_failover(const char* node) {
 
 
 } // extern "C"
+ 

@@ -7,3 +7,4 @@ This knowledge base governs the development of the Sovereign Scheduler within th
 - **Process Scheduling Algorithms**: Round-Robin, Completely Fair Scheduler (CFS) equivalents, and strict Priority-Based executions.
 - **Shard-Aware Policies**: Ensuring high-priority system shards never yield to low-priority userland shards.
 - **Hardware Interrupts**: Managing preemption via the APIC timer and handling complex hardware IRQs.
+ 

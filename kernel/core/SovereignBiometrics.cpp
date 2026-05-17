@@ -45,3 +45,4 @@ extern "C" void biometrics_enroll(sigma_bio_type_t type, const void* sensor_data
 }
 
 
+ 

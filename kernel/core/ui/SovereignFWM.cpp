@@ -40,3 +40,4 @@ public:
 extern "C" {
     void fwm_init() { SigmaOS::Kernel::UI::SovereignFWM::getInstance().init(); }
 }
+ 

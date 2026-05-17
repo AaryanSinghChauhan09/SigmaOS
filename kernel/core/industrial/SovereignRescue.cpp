@@ -55,3 +55,4 @@ void rescue_image(const char* path) {
 
 
 } // extern "C"
+ 

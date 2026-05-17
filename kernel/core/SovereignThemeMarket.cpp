@@ -52,3 +52,4 @@ extern "C" bool theme_market_apply(const char* name) { return SovereignThemeMark
 extern "C" void theme_market_list() { SovereignThemeMarketEngine::getInstance().listThemes(); }
 
 
+ 

@@ -46,3 +46,4 @@ void smartshot_capture_fullscreen() {
 
 
 } // extern "C"
+ 

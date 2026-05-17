@@ -2,7 +2,6 @@
 #include "../include/sigma_log.h"
 #include "../include/SigmaOOP.hpp"
 #include "../include/sigma_sdk.h"
-#include "../include/sigma_net.h"
 #include "../include/fs/sigma_vfs.h"
 #include "../kernel/net/SovereignNetStack.hpp"
 

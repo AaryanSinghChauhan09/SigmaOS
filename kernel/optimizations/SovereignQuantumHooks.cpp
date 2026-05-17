@@ -31,3 +31,4 @@ extern "C" bool sigma_quantum_verify(const void* d, size_t s) {
 }
 
 } // extern "C"
+ 

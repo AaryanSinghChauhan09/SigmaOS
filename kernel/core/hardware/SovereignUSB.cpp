@@ -100,3 +100,4 @@ void usb_hotplug_notify(sigma_u8 addr, sigma_u32 attached) {
 
 
 } // extern "C"
+ 

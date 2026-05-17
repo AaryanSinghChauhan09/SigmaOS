@@ -66,3 +66,4 @@ extern "C" {
     void bns_lookup_ipc(sigma_u32 sec) { SigmaOS::Kernel::Legal::SovereignBNS::getInstance().lookupByIPC(sec); }
     void bns_lookup_bns(sigma_u32 sec) { SigmaOS::Kernel::Legal::SovereignBNS::getInstance().lookupByBNS(sec); }
 }
+ 

@@ -53,3 +53,4 @@ extern "C" bool shard_manager_reload(sigma_u32 id, const void* data, sigma_usize
 }
 
 } // extern "C"
+ 

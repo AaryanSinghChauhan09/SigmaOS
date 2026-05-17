@@ -63,3 +63,4 @@ extern "C" {
         SigmaOS::Drivers::SovereignVulkanLayer::getInstance().initialize_gpu_ring();
     }
 }
+ 

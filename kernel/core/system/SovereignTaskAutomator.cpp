@@ -100,3 +100,4 @@ void taskautomator_stop_macro() {
 
 
 } // extern "C"
+ 

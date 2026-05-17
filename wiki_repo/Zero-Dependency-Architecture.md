@@ -21,3 +21,4 @@ All critical kernel paths in SigmaOS run without reliance on:
 ## Enforcement
 All kernel `.cpp`/`.h` files are automatically scanned
 by `omega_fix.py` to purge stdlib symbols on every sync.
+ 

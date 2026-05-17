@@ -42,3 +42,4 @@ extern "C" {
     void e1000_init(sigma_u64 base) { SigmaOS::Kernel::Drivers::SovereignE1000::getInstance().init(base); }
 }
 
+ 

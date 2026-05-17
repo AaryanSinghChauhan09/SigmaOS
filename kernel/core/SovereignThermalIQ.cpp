@@ -57,3 +57,4 @@ extern "C" void thermaliq_emergency_throttle(sigma_u32 threshold_celsius) {
 }
 
 
+ 

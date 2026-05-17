@@ -31,3 +31,4 @@ public:
 extern "C" void SovereignRecovery_deploy() {
     SigmaOS::Kernel::Strategy::SovereignRecovery::getInstance().deploy();
 }
+ 

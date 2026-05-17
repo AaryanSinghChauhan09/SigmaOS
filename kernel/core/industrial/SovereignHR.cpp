@@ -173,3 +173,4 @@ void hr_net_pay(sigma_u64 gross, sigma_u64 basic, sigma_u64 pt) {
 }
 
 } // extern "C"
+ 

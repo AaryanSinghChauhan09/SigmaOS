@@ -48,3 +48,4 @@ extern "C" void gesture_init() {
 extern "C" void gesture_process_touch(sigma_u32 fingers, sigma_u32 dx, sigma_u32 dy) {
     SovereignGestureEngine::getInstance().processMultiTouch(fingers, dx, dy);
 }
+ 

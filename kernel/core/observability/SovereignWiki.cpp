@@ -38,3 +38,4 @@ public:
 extern "C" {
     void wiki_init() { SigmaOS::Kernel::Documentation::SovereignWiki::getInstance().init(); }
 }
+ 

@@ -64,3 +64,4 @@ extern "C" {
     void exp_gaming_on() { SigmaOS::Kernel::Utilities::SovereignExpansionEngine::getInstance().gaming_optimize(); }
     void exp_iot_gpio(sigma_u32 p, bool s) { SigmaOS::Kernel::Utilities::SovereignExpansionEngine::getInstance().iot_gpio_toggle(p, s); }
 }
+ 

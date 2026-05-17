@@ -73,3 +73,4 @@ extern "C" bool wifi_connect(const char* ssid, const char* pass, sigma_u32 sec) 
 extern "C" void wifi_disconnect() { SovereignWiFiEngine::getInstance().disconnect(); }
 
 
+ 

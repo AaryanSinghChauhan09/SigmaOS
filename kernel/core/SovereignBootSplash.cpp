@@ -55,3 +55,4 @@ extern "C" void bootsplash_set_theme(const char* theme) { SovereignBootSplashEng
 extern "C" void bootsplash_dismiss() { SovereignBootSplashEngine::getInstance().dismiss(); }
 
 
+ 

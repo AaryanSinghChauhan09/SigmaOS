@@ -58,3 +58,4 @@ void commerce_transact(sigma_u64 val, const char* id) {
 }
 
 } // extern "C"
+ 

@@ -31,3 +31,4 @@ public:
 extern "C" void SovereignSolaris_ignite() {
     SigmaOS::Kernel::Absorption::SovereignSolaris::getInstance().ignite();
 }
+ 

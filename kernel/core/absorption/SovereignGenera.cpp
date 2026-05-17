@@ -31,3 +31,4 @@ public:
 extern "C" void SovereignGenera_ignite() {
     SigmaOS::Kernel::Absorption::SovereignGenera::getInstance().ignite();
 }
+ 

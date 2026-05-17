@@ -55,3 +55,4 @@ extern "C" unsigned long long entropy_get_random() {
 }
 
 } // extern "C"
+ 

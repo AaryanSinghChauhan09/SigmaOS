@@ -152,3 +152,4 @@ void is_rc_beam(sigma_u32 b, sigma_u32 d, sigma_u32 fy) {
 }
 
 } // extern "C"
+ 

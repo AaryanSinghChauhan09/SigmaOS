@@ -35,3 +35,4 @@ extern "C" {
     void ne2000_init(sigma_u32 base) { SigmaOS::Kernel::Drivers::SovereignNE2000::getInstance().init(base); }
 }
 
+ 

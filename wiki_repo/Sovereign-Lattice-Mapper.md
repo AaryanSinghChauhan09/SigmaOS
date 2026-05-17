@@ -29,3 +29,4 @@ The **Sovereign Lattice Mapper (S-MIND)** is a high-assurance, interactive visua
 - **Encryption**: CRYSTALS-Dilithium-5 (PQC)
 
 - **Performance**: Sub-1ms frame latency on Zenith hardware.
+ 

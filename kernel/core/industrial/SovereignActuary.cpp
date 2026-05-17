@@ -105,3 +105,4 @@ void actuary_solvency(sigma_u64 asm_paise, sigma_u64 npi_paise) {
 }
 
 } // extern "C"
+ 

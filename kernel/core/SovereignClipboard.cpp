@@ -58,3 +58,4 @@ extern "C" void* clipboard_paste(sigma_clip_type_t* out_type, uint32_t* out_size
 }
 
 
+ 

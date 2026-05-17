@@ -53,3 +53,4 @@ extern "C" void cognitive_auto_heal() {
 extern "C" const sigma_cognitive_state_t* cognitive_get_state() {
     return &SovereignCognitiveEngine.state;
 }
+ 

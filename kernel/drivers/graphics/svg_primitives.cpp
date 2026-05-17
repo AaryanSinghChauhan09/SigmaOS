@@ -24,3 +24,4 @@ extern "C" void sigma_graphics_rasterize_bezier_lowlevel(const char* path) {
 
 
 
+ 

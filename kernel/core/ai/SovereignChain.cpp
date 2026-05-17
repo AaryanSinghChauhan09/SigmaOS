@@ -50,3 +50,4 @@ void sigma_chain_execute(const char* flow) {
 }
 
 } // extern "C"
+ 

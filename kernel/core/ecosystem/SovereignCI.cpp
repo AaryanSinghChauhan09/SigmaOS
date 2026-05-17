@@ -69,3 +69,4 @@ void ci_trigger(const char* hash) {
 
 
 } // extern "C"
+ 

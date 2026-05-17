@@ -34,3 +34,4 @@ extern "C" void ergo_evaluate_fatigue(uint32_t active_minutes) {
 }
 
 
+ 

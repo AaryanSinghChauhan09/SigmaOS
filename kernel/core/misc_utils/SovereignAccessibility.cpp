@@ -68,3 +68,4 @@ void access_set_font_scale(float scale) {
 
 
 } // extern "C"
+ 

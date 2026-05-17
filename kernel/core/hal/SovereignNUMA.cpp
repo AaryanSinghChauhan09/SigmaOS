@@ -58,3 +58,4 @@ private:
 extern "C" {
     void numa_init() { SigmaOS::Kernel::Memory::SovereignNUMA::getInstance().init(); }
 }
+ 

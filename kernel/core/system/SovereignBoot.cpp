@@ -13,53 +13,10 @@ namespace SigmaOS {
 namespace Kernel {
 namespace System {
 
-class SovereignBootEngine {
-public:
-    static SovereignBootEngine& getInstance() {
-        static SovereignBootEngine instance;
-        return instance;
-    }
-
-    void init() {
-        m_current_stage  = SIGMA_BOOT_STAGE_INIT;
-        m_initialized    = 1u;
-        m_ignited_shards = 0u;
-        sigma_log_info("[BOOT] S-BOOT: Init complete.");
-    }
-
-    void fallback_recovery() {
-        sigma_log_error("[BOOT] S-BOOT: Fallback recovery initiated.");
-        m_current_stage = SIGMA_BOOT_STAGE_RECOVERY;
-    }
-
-    void igniteLattice() {
-        m_current_stage  = SIGMA_BOOT_STAGE_KERNEL;
-        m_ignited_shards = 600u;
-        sigma_log_info("[BOOT] S-BOOT: 600 shards ignited.");
-        m_current_stage  = SIGMA_BOOT_STAGE_USERLAND;
-        sigma_log_info("[BOOT] S-BOOT: Userland ready. Boot COMPLETE.");
-    }
-
-    void enableFastBoot(bool enable) {
-        m_fast_boot = enable;
-    }
-
-    sigma_boot_stage_t getCurrentStage()  const { return m_current_stage;  }
-    sigma_u32          getIgnitedCount()  const { return m_ignited_shards; }
-    sigma_u32          isInitialized()    const { return m_initialized;    }
-
-private:
-    SovereignBootEngine()
-        : m_current_stage(SIGMA_BOOT_STAGE_INIT),
-          m_ignited_shards(0u),
-          m_initialized(0u),
-          m_fast_boot(false) {}
-
-    sigma_boot_stage_t m_current_stage;
-    sigma_u32          m_ignited_shards;
-    sigma_u32          m_initialized;
-    bool               m_fast_boot;
-};
+static sigma_boot_stage_t g_current_stage = SIGMA_BOOT_STAGE_INIT;
+static sigma_u32          g_ignited_shards = 0u;
+static sigma_u32          g_initialized = 0u;
+static bool               g_fast_boot = false;
 
 } // namespace System
 } // namespace Kernel
@@ -69,25 +26,41 @@ private:
 extern "C" {
 
 void boot_init() {
-    SigmaOS::Kernel::System::SovereignBootEngine::getInstance().init();
+    SigmaOS::Kernel::System::g_current_stage  = SIGMA_BOOT_STAGE_INIT;
+    SigmaOS::Kernel::System::g_initialized    = 1u;
+    SigmaOS::Kernel::System::g_ignited_shards = 0u;
+    sigma_log_info("[BOOT] S-BOOT: Init complete.");
 }
+
 void boot_ignite_lattice() {
-    SigmaOS::Kernel::System::SovereignBootEngine::getInstance().igniteLattice();
+    SigmaOS::Kernel::System::g_current_stage  = SIGMA_BOOT_STAGE_KERNEL;
+    SigmaOS::Kernel::System::g_ignited_shards = 600u;
+    sigma_log_info("[BOOT] S-BOOT: 600 shards ignited.");
+    SigmaOS::Kernel::System::g_current_stage  = SIGMA_BOOT_STAGE_USERLAND;
+    sigma_log_info("[BOOT] S-BOOT: Userland ready. Boot COMPLETE.");
 }
+
 void boot_fallback_recovery() {
-    SigmaOS::Kernel::System::SovereignBootEngine::getInstance().fallback_recovery();
+    sigma_log_error("[BOOT] S-BOOT: Fallback recovery initiated.");
+    SigmaOS::Kernel::System::g_current_stage = SIGMA_BOOT_STAGE_RECOVERY;
 }
+
 sigma_boot_stage_t boot_get_current_stage() {
-    return SigmaOS::Kernel::System::SovereignBootEngine::getInstance().getCurrentStage();
+    return SigmaOS::Kernel::System::g_current_stage;
 }
+
 void boot_enable_fast_boot(sigma_u8 enable) {
-    SigmaOS::Kernel::System::SovereignBootEngine::getInstance().enableFastBoot(enable != 0u);
+    SigmaOS::Kernel::System::g_fast_boot = (enable != 0u);
 }
+
 sigma_u32 boot_get_ignited_count() {
-    return SigmaOS::Kernel::System::SovereignBootEngine::getInstance().getIgnitedCount();
+    return SigmaOS::Kernel::System::g_ignited_shards;
 }
+
 sigma_u32 boot_is_initialized() {
-    return SigmaOS::Kernel::System::SovereignBootEngine::getInstance().isInitialized();
+    return SigmaOS::Kernel::System::g_initialized;
 }
 
 } /* extern "C" */
+
+ 

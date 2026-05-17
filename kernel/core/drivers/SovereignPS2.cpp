@@ -58,3 +58,4 @@ extern "C" {
     void kbd_init_legacy_fallback() { SigmaOS::Kernel::Drivers::SovereignPS2::getInstance().initLegacySupport(); }
     char kbd_read() { return SigmaOS::Kernel::Drivers::SovereignPS2::getInstance().readScancode(); }
 }
+ 

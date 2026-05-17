@@ -47,3 +47,4 @@ int main() {
     sigma_log("\n[SUCCESS]: Competitive Scholastic Problem Solver Online. NCERT Sovereignty 100%.\n");
     return 0;
 }
+ 

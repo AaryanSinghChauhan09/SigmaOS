@@ -41,3 +41,4 @@ extern "C" {
     void iot_init() { SigmaOS::Kernel::IoT::SovereignIoTManager::getInstance().init(); }
     void iot_poll() { SigmaOS::Kernel::IoT::SovereignIoTManager::getInstance().pollSensors(); }
 }
+ 

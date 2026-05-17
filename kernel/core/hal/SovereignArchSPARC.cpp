@@ -53,3 +53,4 @@ extern "C" {
     void arch_init_sparc() { SigmaOS::Kernel::Arch::SovereignArchSPARC::getInstance().setupPaging(0); }
 }
 
+ 

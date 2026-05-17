@@ -151,3 +151,4 @@ void sigma_log_industrial(const char* msg) {
 }
 
 } // extern "C"
+ 

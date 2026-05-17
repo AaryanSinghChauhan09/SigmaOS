@@ -35,3 +35,4 @@ public:
 extern "C" {
     void panel_init() { SigmaOS::Kernel::UI::SovereignPanel::getInstance().init(); }
 }
+ 

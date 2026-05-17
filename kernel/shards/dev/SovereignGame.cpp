@@ -49,3 +49,4 @@ void game_init() {
 }
 
 } // extern "C"
+ 

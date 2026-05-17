@@ -39,3 +39,4 @@ private:
 extern "C" {
     void nvme_init(sigma_u64 base) { SigmaOS::Kernel::Drivers::SovereignNVMe::getInstance().init(base); }
 }
+ 

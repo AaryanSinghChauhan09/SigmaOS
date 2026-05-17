@@ -55,3 +55,4 @@ This manifest outlines the core functional shards that define the SigmaOS ecosys
 ---
 
 ### The complete 600-shard manifest is available via `s-cli sigma-driver list`
+ 

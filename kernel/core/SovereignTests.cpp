@@ -46,3 +46,4 @@ extern "C" void run_sovereign_tests() {
     sigma_log("✅ ALL CORE TESTS PASSED. SYSTEM STABLE.");
     sigma_log("==================================================");
 }
+ 

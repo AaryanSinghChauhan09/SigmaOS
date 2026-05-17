@@ -50,3 +50,4 @@ void sigma_model_infer() {
 }
 
 } // extern "C"
+ 

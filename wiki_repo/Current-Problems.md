@@ -12,3 +12,4 @@ All IDE-reported errors and warnings have been fixed as of v15.1:
 - ✅ `index.html` / `zenith.html` inline styles → extracted to `external_styles.css`
 - ✅ HTML accessibility → `title` and `aria-label` added to form elements and iframes
 - ✅ stdlib dependencies → purged across all kernel `.cpp`/`.h` files
+ 

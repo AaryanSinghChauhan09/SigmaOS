@@ -7,3 +7,4 @@
 This can lead to Cross-Site Scripting (XSS) vulnerabilities.
 
 More information: [OWASP XSS](<https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)>)
+ 

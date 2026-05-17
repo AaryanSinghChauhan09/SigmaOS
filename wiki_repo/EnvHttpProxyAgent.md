@@ -165,3 +165,4 @@ See [`Dispatcher.stream(options, factory[, callback])`](/docs/docs/api/Dispatche
 ### `EnvHttpProxyAgent.upgrade(options[, callback])`
 
 See [`Dispatcher.upgrade(options[, callback])`](/docs/docs/api/Dispatcher.md#dispatcherupgradeoptions-callback).
+ 

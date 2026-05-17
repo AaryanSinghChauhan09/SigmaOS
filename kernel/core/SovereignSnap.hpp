@@ -26,3 +26,4 @@ private:
 typedef sigma_u32 sigma_snap_zone_id_t;
 
 #endif
+ 

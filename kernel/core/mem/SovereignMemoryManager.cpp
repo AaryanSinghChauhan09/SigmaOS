@@ -106,3 +106,4 @@ extern "C" void* mm_malloc(sigma_size_t size) {
 extern "C" void mm_free(void* ptr) {
     SigmaOS::Kernel::Memory::SovereignMemoryManager::getInstance().slab_free(ptr);
 }
+ 

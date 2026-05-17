@@ -69,3 +69,4 @@ Skip the guard for tests where a disconnect is expected behavior, such as:
 - Retry/reconnect tests where the disconnect triggers the retry
 
 - HTTP parser errors from malformed responses (`HTTPParserError`)
+ 

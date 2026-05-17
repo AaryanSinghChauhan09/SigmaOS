@@ -73,3 +73,4 @@ extern "C" {
         SigmaOS::Kernel::Memory::SovereignMemoryPool::getInstance().reset();
     }
 }
+ 

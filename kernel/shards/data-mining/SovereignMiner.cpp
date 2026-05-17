@@ -61,3 +61,4 @@ void miner_run_job(const char* id) {
 }
 
 } // extern "C"
+ 

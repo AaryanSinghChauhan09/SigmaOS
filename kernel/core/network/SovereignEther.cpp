@@ -31,3 +31,4 @@ public:
 extern "C" void SovereignEther_ignite() {
     SigmaOS::Kernel::Leadership::SovereignEther::getInstance().ignite();
 }
+ 

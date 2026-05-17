@@ -50,3 +50,4 @@ public:
 extern "C" {
     void filter_init() { SigmaOS::Kernel::Net::SovereignPacketFilter::getInstance().init(); }
 }
+ 

@@ -42,3 +42,4 @@ extern "C" {
     void nvidia_init() { SigmaOS::Kernel::Drivers::SovereignNvidia::getInstance().init(); }
 }
 
+ 

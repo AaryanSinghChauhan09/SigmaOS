@@ -64,3 +64,4 @@ sudo mkarchiso -v -w /tmp/archiso-tmp -o ~/iso-output ~/sigmaos-iso
 ---
 
 1
+ 

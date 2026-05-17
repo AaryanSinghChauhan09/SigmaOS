@@ -39,3 +39,4 @@ extern "C" {
     void store_init() { SigmaOS::Kernel::Packaging::SovereignStore::getInstance().init(); }
     void store_install(const char* id) { SigmaOS::Kernel::Packaging::SovereignStore::getInstance().install_suite(id); }
 }
+ 

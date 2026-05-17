@@ -80,3 +80,4 @@ void vmm_set_swap(bool enable) {
 
 
 } // extern "C"
+ 

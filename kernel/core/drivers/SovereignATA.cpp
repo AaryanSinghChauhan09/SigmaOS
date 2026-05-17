@@ -56,3 +56,4 @@ extern "C" {
     void ata_init_legacy_fallback() { SigmaOS::Kernel::Drivers::SovereignATA::getInstance().initLegacySupport(); }
     void ata_read(sigma_u32 lba, void* buf) { SigmaOS::Kernel::Drivers::SovereignATA::getInstance().readSector(lba, buf); }
 }
+ 

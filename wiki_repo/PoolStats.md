@@ -33,3 +33,4 @@ Number of currently active requests across all clients in this pool.
 ### `PoolStats.size`
 
 Number of active, pending, or queued requests across all clients in this pool.
+ 

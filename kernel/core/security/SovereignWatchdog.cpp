@@ -52,3 +52,4 @@ extern "C" {
         SigmaOS::Kernel::Security::SovereignWatchdog::getInstance().logPanic(m, s); 
     }
 }
+ 

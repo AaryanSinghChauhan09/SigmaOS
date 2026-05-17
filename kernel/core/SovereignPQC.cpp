@@ -100,3 +100,4 @@ extern "C" void pqc_secure_wipe(void* ptr, sigma_size_t size) {
     sigma_secure_memset(ptr, 0, size);
     sigma_log_info("[PQC] Secure wipe: %llu bytes at %p\n", (sigma_u64)size, ptr);
 }
+ 

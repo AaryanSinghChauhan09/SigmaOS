@@ -104,3 +104,4 @@ This sub-state is only entered when a `Client` instance has queued requests and 
 ### destroyed
 
 The **destroyed** state is a final state for the `Client` instance. Once in this state, a `Client` is nonfunctional. Calling any other `Client` methods will result in an `ClientDestroyedError`.
+ 

@@ -46,3 +46,4 @@ private:
 extern "C" {
     void qdisk_init() { SigmaOS::Kernel::Storage::SovereignQuantumDisk::getInstance().init(); }
 }
+ 

@@ -41,3 +41,4 @@ extern "C" {
     void scsi_init() { SigmaOS::Kernel::Drivers::SovereignSCSI::getInstance().init(); }
 }
 
+ 

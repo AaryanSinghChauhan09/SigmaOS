@@ -60,3 +60,4 @@ extern "C" {
     void util_mem() { SigmaOS::Kernel::Utilities::SovereignUtilityEngine::getInstance().sigma_mem(); }
     void util_inspect(sigma_u32 sid) { SigmaOS::Kernel::Utilities::SovereignUtilityEngine::getInstance().sigma_shard_inspect(sid); }
 }
+ 

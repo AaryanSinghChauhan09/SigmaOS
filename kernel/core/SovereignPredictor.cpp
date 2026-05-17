@@ -44,3 +44,4 @@ extern "C" void predictor_init() {
 extern "C" void predictor_anticipate_load() {
     SovereignPredictorEngine::getInstance().anticipateLoad();
 }
+ 

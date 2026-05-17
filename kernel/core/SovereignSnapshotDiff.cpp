@@ -48,3 +48,4 @@ extern "C" {
         SigmaOS::Kernel::Forensics::SovereignSnapshotDiffEngine::getInstance().compareSnapshots(s1, s2);
     }
 }
+ 

@@ -146,3 +146,4 @@ void enviro_eia(sigma_u32 mw, sigma_u32 ha, bool sensitive) {
 }
 
 } // extern "C"
+ 

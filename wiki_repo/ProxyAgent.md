@@ -243,3 +243,4 @@ setGlobalDispatcher(proxyAgent);
 const response = await fetch('http://example.com');
 console.log('Response status:', response.status);
 console.log('Response data:', await response.text());
+ 

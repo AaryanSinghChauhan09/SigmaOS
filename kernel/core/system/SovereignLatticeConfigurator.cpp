@@ -69,3 +69,4 @@ void configurator_apply(const char* policy) {
 
 
 } // extern "C"
+ 

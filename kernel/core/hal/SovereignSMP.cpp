@@ -65,3 +65,4 @@ extern "C" unsigned int smp_get_core_count() {
 }
 
 } // extern "C"
+ 

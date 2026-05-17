@@ -28,3 +28,4 @@ extern "C" void quantum_dispatch_circuit(const void* circuit_data) {
     /* QSI Algorithm: Offloads quantum kernels to available QPU shards */
     sigma_log("[QUANTUM] QSI: Result coherent. Lattice state synchronized.");
 }
+ 

@@ -21,3 +21,4 @@
 5. **Gaming stack integration** ? neutralize SteamOS advantage.
 
 6. **UI polish + accessibility** ? surpass elementarys design reputation.
+ 

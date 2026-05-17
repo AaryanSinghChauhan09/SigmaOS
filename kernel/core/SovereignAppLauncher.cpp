@@ -74,3 +74,4 @@ extern "C" void launcher_launch(const char* query) { SovereignAppLauncherEngine:
 extern "C" void launcher_list_top(sigma_u32 n) { SovereignAppLauncherEngine::getInstance().listTop(n); }
 
 
+ 

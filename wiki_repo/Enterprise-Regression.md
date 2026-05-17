@@ -19,3 +19,4 @@ For enterprise users, SigmaOS provides a "Certified Shard" channel where every u
 - **Centralized Management**: Orchestrate thousands of SigmaOS nodes from a single dashboard.
 
 - **Audit Logging**: PQC-signed audit logs for all system-level operations.
+ 

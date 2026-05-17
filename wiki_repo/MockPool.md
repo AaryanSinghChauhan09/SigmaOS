@@ -585,3 +585,4 @@ for await (const data of body) {
 This method cleans up all the prepared mocks.
 
 Returns: `void`
+ 

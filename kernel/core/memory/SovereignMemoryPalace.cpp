@@ -32,3 +32,4 @@ void memorypalace_query_timeline(sigma_u64 start_time, sigma_u64 end_time) {
 
 
 } // extern "C"
+ 

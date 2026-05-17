@@ -64,3 +64,4 @@ void academic_seal_draft(const char* title) {
 }
 
 } // extern "C"
+ 

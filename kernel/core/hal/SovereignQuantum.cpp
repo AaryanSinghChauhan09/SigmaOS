@@ -51,3 +51,4 @@ extern "C" {
         SigmaOS::Kernel::HAL::SovereignQuantum::getInstance().dispatch_circuit(circuit_data);
     }
 }
+ 

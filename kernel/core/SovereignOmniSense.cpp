@@ -43,3 +43,4 @@ extern "C" void omnisense_adapt_system(const sigma_omnisense_data_t* data) {
         }
     }
 }
+ 

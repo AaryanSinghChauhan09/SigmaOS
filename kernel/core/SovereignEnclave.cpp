@@ -63,3 +63,4 @@ extern "C" void enclave_store_key(sigma_u32 id, const char* key) {
 }
 
 
+ 

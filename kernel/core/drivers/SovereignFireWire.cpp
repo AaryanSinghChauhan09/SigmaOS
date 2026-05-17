@@ -40,3 +40,4 @@ extern "C" {
     void firewire_init(sigma_u64 base) { SigmaOS::Kernel::Drivers::SovereignFireWire::getInstance().init(base); }
 }
 
+ 

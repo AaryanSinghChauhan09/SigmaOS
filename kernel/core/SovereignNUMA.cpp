@@ -1,6 +1,5 @@
 #include "../../include/sigma_kernel_types.h"
 #include "../../include/sigma_log.h"
-#include "../../include/hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign NUMA Architecture Optimizer
@@ -71,3 +70,4 @@ extern "C" {
         SovereignNUMAEngine::getInstance().optimizeThreadLocality(thread_id);
     }
 }
+ 

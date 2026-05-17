@@ -54,3 +54,4 @@ extern "C" {
     void edu_sim_phys(sigma_u32 m, sigma_u32 a) { SigmaOS::Kernel::Education::SovereignEduExperiments::getInstance().simulatePhysics(m, a); }
     void edu_solve_pyth(sigma_u32 a, sigma_u32 b) { SigmaOS::Kernel::Education::SovereignEduExperiments::getInstance().solvePythagoras(a, b); }
 }
+ 

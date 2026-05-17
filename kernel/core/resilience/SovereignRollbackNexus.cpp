@@ -64,3 +64,4 @@ extern "C" {
     sigma_u64 rollback_create() { return SigmaOS::Kernel::Resilience::SovereignRollbackNexus::getInstance().createHorizon(); }
     void rollback_execute(sigma_u64 id) { SigmaOS::Kernel::Resilience::SovereignRollbackNexus::getInstance().rollbackToHorizon(id); }
 }
+ 

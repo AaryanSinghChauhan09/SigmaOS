@@ -35,3 +35,4 @@ void neuralsearch_index_shard(sigma_u32 shard_id) {
 
 
 } // extern "C"
+ 

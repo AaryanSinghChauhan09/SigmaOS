@@ -49,3 +49,4 @@ void brand_init() {
 }
 
 } // extern "C"
+ 

@@ -47,3 +47,4 @@ extern "C" void did_attest_identity(const char* identity_shard) {
 }
 
 
+ 

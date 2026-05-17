@@ -66,3 +66,4 @@ void sigma_load_profile_name(const char* name) {
 }
 
 } // extern "C"
+ 

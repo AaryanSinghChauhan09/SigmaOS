@@ -1,2 +1,2 @@
 # Tools
-sigma-recover, sigma-forensics, SovereignCluster.
+sigma-recover, sigma-forensics, SovereignCluster. 

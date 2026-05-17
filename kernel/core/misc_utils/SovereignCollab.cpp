@@ -39,3 +39,4 @@ void collab_apply_remote_change(const void* delta, sigma_u32 delta_size) {
 
 
 } // extern "C"
+ 

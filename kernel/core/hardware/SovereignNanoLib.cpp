@@ -52,3 +52,4 @@ void* nanolib_memset(void* s, int c, sigma_u32 n) {
 } // extern "C"
 
 } // extern "C"
+ 

@@ -28,3 +28,4 @@ public:
 extern "C" void desktop_init() {
     SigmaOS::Kernel::DesktopSpace::SovereignDesktop::getInstance().LaunchToolkit();
 }
+ 

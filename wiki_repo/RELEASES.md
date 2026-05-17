@@ -66,3 +66,4 @@ SigmaOS follows a **Strict Parity Protocol**. While the deployment format varies
 ---
 
 *SigmaOS — One Kernel. Every Hardware. Absolute Sovereignty.*
+ 

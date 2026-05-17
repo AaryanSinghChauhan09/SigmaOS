@@ -49,3 +49,4 @@ void risk_init() {
 }
 
 } // extern "C"
+ 

@@ -54,3 +54,4 @@ extern "C" {
     void logd_init() { SigmaOS::Kernel::Observability::SovereignLogDaemon::getInstance().init(); }
     void logd_dmesg() { SigmaOS::Kernel::Observability::SovereignLogDaemon::getInstance().dmesg(); }
 }
+ 

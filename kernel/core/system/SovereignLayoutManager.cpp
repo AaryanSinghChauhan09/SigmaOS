@@ -46,3 +46,4 @@ void layout_switch(desktop_layout_t layout) {
 
 
 } // extern "C"
+ 

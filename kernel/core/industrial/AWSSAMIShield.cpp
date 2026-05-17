@@ -44,3 +44,4 @@ void aws_shield_init() {
 }
 
 } // extern "C"
+ 

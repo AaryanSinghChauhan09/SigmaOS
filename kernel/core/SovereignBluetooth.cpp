@@ -56,3 +56,4 @@ extern "C" bool bt_probe(sigma_u32 vid, sigma_u32 pid) { return SovereignBluetoo
 extern "C" bool bt_pair(const char* addr, const char* name) { return SovereignBluetoothEngine::getInstance().pairDevice(addr, name); }
 
 
+ 

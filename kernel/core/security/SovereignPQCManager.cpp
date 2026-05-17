@@ -48,3 +48,4 @@ private:
 extern "C" {
     void pqc_init() { SigmaOS::Kernel::Security::SovereignPQCManager::getInstance().init(); }
 }
+ 

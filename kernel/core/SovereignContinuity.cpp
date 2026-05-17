@@ -22,3 +22,4 @@ extern "C" void continuity_sync_state() {
     SovereignContinuityEngine.handoff_count++;
     sigma_log("[S-CONTINUITY] State synchronization COMPLETE.");
 }
+ 

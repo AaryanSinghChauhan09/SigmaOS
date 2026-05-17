@@ -74,3 +74,4 @@ extern "C" uint32_t entropy_get_random_u32() {
 extern "C" sigma_entropy_stats_t entropy_get_stats() {
     return SovereignEntropyEngine::getInstance().getStats();
 }
+ 

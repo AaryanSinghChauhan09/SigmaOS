@@ -99,3 +99,4 @@ extern "C" void taskautomator_stop_macro() {
 }
 
 
+ 

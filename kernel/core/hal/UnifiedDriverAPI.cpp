@@ -7,3 +7,4 @@ namespace SigmaOS {
         void register_device() { /* Generic peripheral registration */ }
     };
 }
+ 

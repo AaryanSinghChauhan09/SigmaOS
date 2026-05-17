@@ -54,3 +54,4 @@ extern "C" {
         SigmaOS::Kernel::Scheduling::SovereignGPUScheduler::getInstance().reportLoad(); 
     }
 }
+ 

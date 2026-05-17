@@ -41,3 +41,4 @@ extern "C" {
     void agp_init(sigma_u64 base, sigma_u32 size) { SigmaOS::Kernel::Drivers::SovereignAGP::getInstance().init(base, size); }
 }
 
+ 

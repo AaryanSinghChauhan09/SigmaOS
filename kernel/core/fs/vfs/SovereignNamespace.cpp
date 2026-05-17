@@ -65,3 +65,4 @@ void* namespace_resolve_path(const char* path) {
 } // extern "C"
 
 } // extern "C"
+ 

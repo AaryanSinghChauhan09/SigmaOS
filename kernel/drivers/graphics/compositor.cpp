@@ -29,3 +29,4 @@ void SovereignGraphicsCompositor::ExecuteAlphaBlend(const char* overlay_shard) {
 } // namespace SigmaOS
 
 
+ 

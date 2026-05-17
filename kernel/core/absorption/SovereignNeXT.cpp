@@ -31,3 +31,4 @@ public:
 extern "C" void SovereignNeXT_ignite() {
     SigmaOS::Kernel::Absorption::SovereignNeXT::getInstance().ignite();
 }
+ 

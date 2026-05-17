@@ -31,3 +31,4 @@ public:
 extern "C" void SovereignSingular_ignite() {
     SigmaOS::Kernel::Absorption::SovereignSingular::getInstance().ignite();
 }
+ 

@@ -72,3 +72,4 @@ extern "C" void settings_search_register(const char* key, const char* label, con
 extern "C" void settings_search_query(const char* query) { SovereignSettingsSearchEngine::getInstance().search(query); }
 
 
+ 

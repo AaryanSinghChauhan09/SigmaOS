@@ -55,3 +55,4 @@ void sigma_bench_run_mem() {
 }
 
 } // extern "C"
+ 

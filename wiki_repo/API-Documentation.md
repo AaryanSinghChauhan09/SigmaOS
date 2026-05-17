@@ -67,3 +67,4 @@ sigma_status pq_encrypt(const void* data, sigma_size_t size, void* out_buffer);
 ```
 
 Encrypts data using the hardware-accelerated Post-Quantum cryptographic engine.
+ 

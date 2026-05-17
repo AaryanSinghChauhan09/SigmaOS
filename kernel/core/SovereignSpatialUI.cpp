@@ -63,3 +63,4 @@ extern "C" void spatial_ui_trigger_corner(sigma_u32 corner) { SovereignSpatialUI
 extern "C" void spatial_ui_snap_window(sigma_u32 wid, const char* zone) { SovereignSpatialUIEngine::getInstance().snapWindow(wid, zone); }
 
 
+ 

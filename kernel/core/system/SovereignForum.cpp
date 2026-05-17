@@ -36,3 +36,4 @@ public:
 extern "C" {
     void forum_init() { SigmaOS::Kernel::Communication::SovereignForum::getInstance().init(); }
 }
+ 

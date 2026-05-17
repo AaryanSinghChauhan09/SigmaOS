@@ -31,3 +31,4 @@ public:
 extern "C" void SovereignBeOS_ignite() {
     SigmaOS::Kernel::Absorption::SovereignBeOS::getInstance().ignite();
 }
+ 

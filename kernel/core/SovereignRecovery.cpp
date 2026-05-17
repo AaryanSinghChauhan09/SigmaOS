@@ -66,3 +66,4 @@ extern "C" {
         SigmaOS::Kernel::Recovery::SovereignRecoveryNexus::getInstance().secureWipe(shard_id);
     }
 }
+ 

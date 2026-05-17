@@ -37,3 +37,4 @@ extern "C" {
     void decl_init() { SigmaOS::Kernel::Config::SovereignDecl::getInstance().init(); }
     void decl_apply(const char* path) { SigmaOS::Kernel::Config::SovereignDecl::getInstance().apply_manifest(path); }
 }
+ 

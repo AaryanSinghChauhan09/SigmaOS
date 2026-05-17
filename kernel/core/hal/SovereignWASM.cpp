@@ -31,3 +31,4 @@ public:
 extern "C" void SovereignWASM_activate() {
     SigmaOS::Kernel::Deployment::SovereignWASM::getInstance().activate();
 }
+ 

@@ -42,3 +42,4 @@ extern "C" {
     void usb3_init(sigma_u64 base) { SigmaOS::Kernel::Drivers::SovereignUSB3::getInstance().init(base); }
 }
 
+ 

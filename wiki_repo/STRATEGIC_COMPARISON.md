@@ -47,3 +47,4 @@ Mainstream distros focus on **General Purpose**. SigmaOS focuses on **Sovereign 
 
 ---
 *Next: [Professionalization Roadmap](PROFESSIONALIZATION_PLAN.md)*
+ 

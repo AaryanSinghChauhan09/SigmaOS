@@ -31,3 +31,4 @@ public:
 extern "C" void SovereignHypervisor_deploy() {
     SigmaOS::Kernel::Strategy::SovereignHypervisor::getInstance().deploy();
 }
+ 

@@ -58,3 +58,4 @@ extern "C" {
         SigmaOS::Kernel::HAL::SovereignWiFiTranspiler::getInstance().TranspileBroadcom();
     }
 }
+ 

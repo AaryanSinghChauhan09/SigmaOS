@@ -46,3 +46,4 @@ void telemetry_execute_ebpf(const void* bytecode, sigma_usize size) {
 
 
 } // extern "C"
+ 

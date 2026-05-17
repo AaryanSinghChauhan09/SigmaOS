@@ -77,3 +77,4 @@ SigmaOS Zenith v15.0 can be deployed in multiple specialized profiles depending 
 ---
 
 **Profile Switching**: Profiles can be toggled via the `Sovereign Choice Installer` or at runtime using `sigma-cli profile <name>`.
+ 

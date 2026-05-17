@@ -35,3 +35,4 @@ extern "C" {
     void nx_init() { SigmaOS::Kernel::Security::SovereignNX::getInstance().init(); }
 }
 
+ 

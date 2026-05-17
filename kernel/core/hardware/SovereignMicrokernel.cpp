@@ -80,3 +80,4 @@ extern "C" sigma_u32 microkernel_allocate_ipc(sigma_u32 service_a, sigma_u32 ser
 
 
 } // extern "C"
+ 

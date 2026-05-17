@@ -92,3 +92,4 @@ extern "C" sigma_bool fat32_mount(void* base) {
 extern "C" sigma_u32 fat32_read(const char* path, void* buf, sigma_u32 max_sz) {
     return SovereignFAT32Driver::getInstance().readFile(path, buf, max_sz);
 }
+ 

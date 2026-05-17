@@ -31,3 +31,4 @@ public:
 extern "C" void SovereignAmoeba_ignite() {
     SigmaOS::Kernel::Absorption::SovereignAmoeba::getInstance().ignite();
 }
+ 

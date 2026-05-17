@@ -37,3 +37,4 @@ Every Pull Request triggers the CI/CD pipeline which automatically:
 4. If any test fails, the pipeline aborts and blocks the merge.
 
 For details on the pipeline configuration, see `.github/workflows/sigma-build.yml`.
+ 

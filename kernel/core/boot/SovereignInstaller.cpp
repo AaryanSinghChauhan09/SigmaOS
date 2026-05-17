@@ -48,3 +48,4 @@ private:
 extern "C" {
     void installer_run() { SigmaOS::Kernel::Boot::SovereignInstaller::getInstance().ignite(); }
 }
+ 

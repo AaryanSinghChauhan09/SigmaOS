@@ -31,3 +31,4 @@ public:
 extern "C" void SovereignCisco_ignite() {
     SigmaOS::Kernel::Absorption::SovereignCisco::getInstance().ignite();
 }
+ 

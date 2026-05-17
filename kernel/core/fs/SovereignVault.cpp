@@ -31,3 +31,4 @@ public:
 extern "C" void SovereignVault_ignite() {
     SigmaOS::Kernel::Leadership::SovereignVault::getInstance().ignite();
 }
+ 

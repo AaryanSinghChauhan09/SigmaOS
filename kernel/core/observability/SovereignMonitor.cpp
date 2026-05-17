@@ -68,3 +68,4 @@ extern "C" void monitor_execute_ebpf(const void* bytecode, sigma_usize size) {
 extern "C" void monitor_rebalance_lattice() {
     SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().rebalanceLattice();
 }
+ 

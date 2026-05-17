@@ -33,3 +33,4 @@ void sigma_guest_start(const char* id, int cpus, sigma_u64 mem) {
 }
 
 } // extern "C"
+ 

@@ -45,3 +45,4 @@ extern "C" {
     void media_init() { SigmaOS::Kernel::Drivers::SovereignMedia::getInstance().init(); }
 }
 
+ 

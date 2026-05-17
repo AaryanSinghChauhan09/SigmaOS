@@ -71,3 +71,4 @@ void numa_optimize_thread(sigma_u32 thread_id) {
 
 
 } // extern "C"
+ 

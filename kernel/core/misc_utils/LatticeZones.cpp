@@ -15,3 +15,4 @@ void applyFancyZone(sigma_u32 zone_id) {
 } // namespace UI
 } // namespace Kernel
 } // namespace SigmaOS
+ 

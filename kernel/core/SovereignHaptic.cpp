@@ -33,3 +33,4 @@ extern "C" void haptic_play_pattern(sigma_haptic_pattern_t pattern, float intens
 }
 
 
+ 

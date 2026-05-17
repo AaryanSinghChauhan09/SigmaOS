@@ -68,3 +68,4 @@ void neural_log_training_telemetry(float loss, float accuracy) {
 }
 
 } // extern "C"
+ 

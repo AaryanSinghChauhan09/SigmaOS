@@ -38,3 +38,4 @@ private:
 extern "C" void installer_start() {
     SigmaOS::Kernel::Deployment::SovereignInstaller::startInstallation();
 }
+ 

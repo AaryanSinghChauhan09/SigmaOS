@@ -103,3 +103,4 @@ void wasm_run(const char* func) {
 }
 
 } // extern "C"
+ 

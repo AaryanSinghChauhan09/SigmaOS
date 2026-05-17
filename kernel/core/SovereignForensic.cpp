@@ -51,3 +51,4 @@ extern "C" {
         SigmaOS::Kernel::Forensics::SovereignForensicEngine::getInstance().auditLattice();
     }
 }
+ 

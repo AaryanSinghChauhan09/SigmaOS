@@ -39,3 +39,4 @@ void wellbeing_set_daily_limit(sigma_u32 app_id, sigma_u32 max_minutes) {
 
 
 } // extern "C"
+ 

@@ -39,3 +39,4 @@ private:
 extern "C" {
     void audio_init() { SigmaOS::Kernel::Drivers::SovereignAudio::getInstance().init(); }
 }
+ 

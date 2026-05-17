@@ -61,3 +61,4 @@ void adapt_run_trial(sigma_u32 sid) {
 }
 
 } // extern "C"
+ 

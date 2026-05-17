@@ -44,3 +44,4 @@ Drivers are just standard Shard modules implementing `register_device()`.
 void my_custom_gpu_driver_init() {
     register_device("custom_gpu_0", &gpu_operations_struct);
     sigma_log("Custom GPU Driver Loaded.");
+ 

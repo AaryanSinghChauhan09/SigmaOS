@@ -55,3 +55,4 @@ void orb_indexer_query(const char* q) {
 }
 
 } // extern "C"
+ 

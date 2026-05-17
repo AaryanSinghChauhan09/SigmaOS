@@ -63,3 +63,4 @@ extern "C" const sigma_bt_config_t* bt_get_config() {
 }
 
 
+ 

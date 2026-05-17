@@ -37,3 +37,4 @@ extern "C" {
     void nexus_init() { SigmaOS::Kernel::Packaging::SovereignNexus::getInstance().init(); }
     void nexus_install(const char* name) { SigmaOS::Kernel::Packaging::SovereignNexus::getInstance().install_shard(name); }
 }
+ 

@@ -50,3 +50,4 @@ private:
 extern "C" {
     void snap_create(const char* shard) { SigmaOS::Kernel::FS::SovereignSnap::getInstance().createSnapshot(shard); }
 }
+ 

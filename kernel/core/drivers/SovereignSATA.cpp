@@ -41,3 +41,4 @@ extern "C" {
     void sata_init(sigma_u64 base) { SigmaOS::Kernel::Drivers::SovereignSATA::getInstance().init(base); }
 }
 
+ 

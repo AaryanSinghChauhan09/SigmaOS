@@ -59,3 +59,4 @@ sudo dd if=build/sigmaos.iso of=/dev/sdX bs=4M status=progress
 ```
 
 **Note:** Ensure your hardware is supported and secure boot is disabled, as SigmaOS is currently self-signed.
+ 

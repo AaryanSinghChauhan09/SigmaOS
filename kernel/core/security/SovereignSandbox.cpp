@@ -45,3 +45,4 @@ extern "C" {
         SigmaOS::Kernel::Security::SovereignSandbox::getInstance().SandboxProcess(pid);
     }
 }
+ 

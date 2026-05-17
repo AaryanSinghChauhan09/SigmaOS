@@ -49,3 +49,4 @@ void wasm_init() {
 }
 
 } // extern "C"
+ 

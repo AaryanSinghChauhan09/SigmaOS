@@ -61,3 +61,4 @@ void recover_trigger_healing(sigma_u32 shard_id) {
 }
 
 } // extern "C"
+ 

@@ -61,3 +61,4 @@ void nix_rollback(sigma_u32 gen) {
 }
 
 } // extern "C"
+ 

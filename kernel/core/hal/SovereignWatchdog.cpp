@@ -54,3 +54,4 @@ extern "C" {
         SigmaOS::Kernel::HAL::SovereignWatchdog::getInstance().init();
     }
 }
+ 

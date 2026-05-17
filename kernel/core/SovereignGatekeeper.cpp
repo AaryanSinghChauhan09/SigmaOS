@@ -36,3 +36,4 @@ extern "C" bool gatekeeper_verify_shard_access(uint32_t shard_id) {
     // Zero-trust verification for cross-shard communication
     return true; 
 }
+ 

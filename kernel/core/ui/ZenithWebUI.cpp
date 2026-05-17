@@ -31,3 +31,4 @@ public:
 extern "C" void ZenithWebUI_ignite() {
     SigmaOS::Kernel::UI::ZenithWebUI::getInstance().ignite();
 }
+ 

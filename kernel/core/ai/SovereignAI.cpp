@@ -45,3 +45,4 @@ extern "C" {
     void ai_init() { SigmaOS::Kernel::AI::SovereignAI::getInstance().init(); }
     void ai_load(const char* path) { SigmaOS::Kernel::AI::SovereignAI::getInstance().loadModel(path); }
 }
+ 

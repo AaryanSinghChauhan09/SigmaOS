@@ -1,4 +1,3 @@
-#include "../../include/sigma_kernel_types.h"
 #include "../../include/sigma_log.h"
 #include "../../include/sigma_telemetry.h"
 
@@ -56,3 +55,4 @@ extern "C" {
         SigmaOS::Kernel::Telemetry::SovereignTelemetryEngine::getInstance().runPredictiveFailureAnalysis();
     }
 }
+ 

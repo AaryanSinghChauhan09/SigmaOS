@@ -63,3 +63,4 @@ void vakil_certify(const char* hash) {
 }
 
 } // extern "C"
+ 

@@ -19,3 +19,4 @@ Designed for low-power ARM and RISC-V silicon, the IoT profile minimizes footpri
 - **Aggressive AI-Telemetry**: Suspends non-essential shards based on sensor activity.
 
 - **Mesh Networking**: Low-power S-NET profile for distributed sensor clusters.
+ 

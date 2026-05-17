@@ -69,3 +69,4 @@ extern "C" sigma_u64 forge_get_processed_bytes() {
 
 
 } // extern "C"
+ 

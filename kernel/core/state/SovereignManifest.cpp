@@ -54,3 +54,4 @@ extern "C" sigma_shard_config_t* manifest_get_config(sigma_u32 shard_id) {
 
 
 } // extern "C"
+ 

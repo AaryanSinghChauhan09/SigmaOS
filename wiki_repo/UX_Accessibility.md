@@ -13,3 +13,4 @@ Absorbed from: **Elementary**, **Zorin**
 | **Workspace Layouts** | Immersive | `SovereignUXImmersiveLayout` |
 
 ... (Scaling to Billions via Lattice Automation)
+ 

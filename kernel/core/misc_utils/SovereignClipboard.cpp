@@ -61,3 +61,4 @@ void* clipboard_paste(sigma_clip_type_t* out_type, sigma_u32* out_size) {
 } // extern "C"
 
 } // extern "C"
+ 

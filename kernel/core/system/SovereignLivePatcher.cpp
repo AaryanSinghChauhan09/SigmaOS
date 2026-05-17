@@ -70,3 +70,4 @@ void live_patch_apply(const char* func, const void* payload) {
 
 
 } // extern "C"
+ 

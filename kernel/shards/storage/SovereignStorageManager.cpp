@@ -50,3 +50,4 @@ void storage_init() {
 }
 
 } // extern "C"
+ 

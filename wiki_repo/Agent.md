@@ -83,3 +83,4 @@ See [`Dispatcher.upgrade(options[, callback])`](/docs/docs/api/Dispatcher.md#dis
 Returns an object of stats by origin in the format of `Record<string, TClientStats | TPoolStats>`
 
 See [`PoolStats`](/docs/docs/api/PoolStats.md) and [`ClientStats`](/docs/docs/api/ClientStats.md).
+ 

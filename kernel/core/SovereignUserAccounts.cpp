@@ -53,3 +53,4 @@ extern "C" {
         return SigmaOS::Kernel::Security::SovereignUserAccounts::getInstance().authenticateUser(uid, sig);
     }
 }
+ 

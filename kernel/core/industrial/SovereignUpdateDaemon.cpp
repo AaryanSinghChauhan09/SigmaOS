@@ -61,3 +61,4 @@ extern "C" int update_verify(const char* path, const sigma_u8* sig) {
 
 
 } // extern "C"
+ 

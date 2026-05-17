@@ -42,3 +42,4 @@ extern "C" {
         SigmaOS::Kernel::Diagnostics::SovereignKdump::getInstance().init();
     }
 }
+ 

@@ -1,6 +1,5 @@
 #include "../../include/sigma_ui_toolkit.h"
 #include "../../include/sigma_log.h"
-#include "../../include/SigmaOOP.hpp"
 
 /**
  * Σ SIGMAOS: SOVEREIGN UI TOOLKIT (S-UI-TOOLKIT)
@@ -63,3 +62,4 @@ extern "C" {
         SigmaOS::Kernel::UI::SovereignUIToolkit::getInstance().setScaling(factor);
     }
 }
+ 

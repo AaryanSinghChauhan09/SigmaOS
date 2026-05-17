@@ -24,3 +24,4 @@ void sigma_pkg_sync() {
 }
 
 } // extern "C"
+ 

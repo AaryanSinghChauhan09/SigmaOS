@@ -52,3 +52,4 @@ extern "C" {
         SigmaOS::Kernel::IoT::SovereignIoTManager::getInstance().pollSensors(); 
     }
 }
+ 

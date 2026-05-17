@@ -44,3 +44,4 @@ private:
 extern "C" void hal_load_drivers() {
     SigmaOS::Kernel::HAL::SovereignDriverLoader::loadAll();
 }
+ 

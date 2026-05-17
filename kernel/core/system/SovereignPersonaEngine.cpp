@@ -62,3 +62,4 @@ extern "C" {
         SigmaOS::Kernel::Professional::SovereignPersonaEngine::getInstance().switchMode(static_cast<SigmaOS::Kernel::Professional::ProfessionalMode>(mode)); 
     }
 }
+ 

@@ -26,3 +26,4 @@ public:
 extern "C" void SovereignAuditLog_init() {
     SigmaOS::Kernel::SovereignAuditLogSpace::SovereignAuditLog::getInstance().Init();
 }
+ 

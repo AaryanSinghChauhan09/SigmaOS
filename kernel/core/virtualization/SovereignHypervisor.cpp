@@ -76,3 +76,4 @@ extern "C" {
         return SigmaOS::Virtualization::SovereignHypervisor::getInstance().boot_guest_vm(os_name);
     }
 }
+ 

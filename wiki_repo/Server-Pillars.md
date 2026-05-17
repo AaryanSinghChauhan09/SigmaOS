@@ -25,3 +25,4 @@ Our web server shard provides Nginx-parity performance with native lattice integ
 - **PQC SSL/TLS**: Native support for post-quantum certificates.
 
 - **Dynamic Scaling**: The kernel automatically migrates web shards to the least-congested silicon cores.
+ 

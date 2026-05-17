@@ -51,3 +51,4 @@ public:
 extern "C" void acpi_init() {
     SovereignACPIDriver::getInstance().init();
 }
+ 

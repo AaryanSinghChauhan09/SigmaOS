@@ -49,3 +49,4 @@ void armor_init() {
 }
 
 } // extern "C"
+ 

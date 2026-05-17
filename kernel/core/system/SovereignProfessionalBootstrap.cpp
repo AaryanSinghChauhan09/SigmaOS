@@ -44,3 +44,4 @@ void sigma_professional_bootstrap() {
 } // extern "C"
 
 } // extern "C"
+ 

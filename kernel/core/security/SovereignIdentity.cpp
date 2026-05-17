@@ -61,3 +61,4 @@ extern "C" {
         return SigmaOS::Kernel::Security::SovereignIdentityManager::getInstance().get_current_uid();
     }
 }
+ 

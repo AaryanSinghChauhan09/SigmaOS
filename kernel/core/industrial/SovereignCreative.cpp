@@ -65,3 +65,4 @@ void creative_sync_tablet() {
 }
 
 } // extern "C"
+ 

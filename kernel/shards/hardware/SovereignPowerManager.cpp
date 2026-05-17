@@ -49,3 +49,4 @@ void power_init() {
 }
 
 } // extern "C"
+ 

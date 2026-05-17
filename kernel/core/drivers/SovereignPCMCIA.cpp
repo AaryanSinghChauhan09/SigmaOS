@@ -39,3 +39,4 @@ extern "C" {
     void pcmcia_init() { SigmaOS::Kernel::Drivers::SovereignPCMCIA::getInstance().init(); }
 }
 
+ 

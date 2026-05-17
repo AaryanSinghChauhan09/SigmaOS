@@ -68,3 +68,4 @@ extern "C" {
         SigmaOS::Kernel::Memory::SovereignAllocatorEngine::getInstance().compact();
     }
 }
+ 

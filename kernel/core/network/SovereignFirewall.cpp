@@ -1,5 +1,4 @@
 #include "../../../include/SigmaOOP.hpp"
-#include "../../../include/sigma_kernel_types.h"
 #include "../../../include/sigma_log.h"
 
 /**
@@ -35,3 +34,4 @@ extern "C" {
     void firewall_init() { SigmaOS::Kernel::Network::SovereignFirewall::getInstance().init(); }
 }
 
+ 

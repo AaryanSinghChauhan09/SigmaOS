@@ -49,3 +49,4 @@ void wiki_init() {
 }
 
 } // extern "C"
+ 

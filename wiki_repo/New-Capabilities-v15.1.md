@@ -458,3 +458,4 @@ Similarly, `include/core/sigma_kernel_types.h` now acts as a redirect to `includ
 - `SovereignLibC.cpp` — `sigma_kernel_types.h` added as first include; `sigma_usize` always defined
 - `include/core/SigmaOOP.hpp` — created as redirect shim
 - `SigmaOOP.hpp` operator new/delete — marked `inline` removed to fix ODR warnings
+ 

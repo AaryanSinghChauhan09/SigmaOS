@@ -52,3 +52,4 @@ void sigma_forge_build(const char* name) {
 }
 
 } // extern "C"
+ 

@@ -50,3 +50,4 @@ extern "C" {
         SigmaOS::Kernel::HAL::SovereignUSB::getInstance().HandleHotplug(port);
     }
 }
+ 

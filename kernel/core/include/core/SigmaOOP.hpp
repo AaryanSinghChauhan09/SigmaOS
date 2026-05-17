@@ -29,3 +29,4 @@ inline void sigma_log(const char* msg) {
 }
 } // namespace SigmaOS
 #endif /* SIGMA_OOP_HPP */
+ 

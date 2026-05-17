@@ -101,3 +101,4 @@ void viz_render_legal(const char* doc_hash) {
 }
 
 } // extern "C"
+ 

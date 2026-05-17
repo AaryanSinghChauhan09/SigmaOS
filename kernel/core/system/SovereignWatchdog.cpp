@@ -26,3 +26,4 @@ public:
 extern "C" void SovereignWatchdog_init() {
     SigmaOS::Kernel::SovereignWatchdogSpace::SovereignWatchdog::getInstance().Init();
 }
+ 

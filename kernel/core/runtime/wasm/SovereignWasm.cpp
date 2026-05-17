@@ -41,3 +41,4 @@ extern "C" bool wasm_invoke(const char* funcName) {
 }
 
 } // extern "C"
+ 

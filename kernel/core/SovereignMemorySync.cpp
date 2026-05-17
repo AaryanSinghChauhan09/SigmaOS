@@ -68,3 +68,4 @@ extern "C" bool memsync_cas(sigma_u32* addr, sigma_u32 expected, sigma_u32 new_v
 }
 
 
+ 

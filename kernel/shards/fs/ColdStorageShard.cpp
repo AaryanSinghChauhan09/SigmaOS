@@ -77,3 +77,4 @@ void start_cold_storage() {
 }
 
 } // extern "C"
+ 

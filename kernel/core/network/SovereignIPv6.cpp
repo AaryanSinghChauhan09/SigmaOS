@@ -46,3 +46,4 @@ private:
 extern "C" {
     void ipv6_init() { SigmaOS::Kernel::Network::SovereignIPv6::getInstance().init(); }
 }
+ 

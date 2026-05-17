@@ -45,3 +45,4 @@ private:
 extern "C" {
     void term_init() { SigmaOS::Kernel::Userland::SovereignTerminal::getInstance().init(); }
 }
+ 

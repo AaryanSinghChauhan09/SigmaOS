@@ -103,3 +103,4 @@ extern "C" int tpm_attest_bootloader(const unsigned char* expected_hash) {
 }
 
 } // extern "C"
+ 

@@ -49,3 +49,4 @@ void smap_init() {
 }
 
 } // extern "C"
+ 

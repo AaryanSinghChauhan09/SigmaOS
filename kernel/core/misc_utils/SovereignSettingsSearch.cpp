@@ -74,3 +74,4 @@ void settings_search_query(const char* query) { SovereignSettingsSearchEngine::s
 
 
 } // extern "C"
+ 

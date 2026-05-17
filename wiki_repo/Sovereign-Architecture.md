@@ -21,3 +21,4 @@ The lattice uses asynchronous telemetry (ALO) to monitor silicon health. Predict
 ---
 
 ### Your Silicon. Your Rules. Your Sovereignty
+ 

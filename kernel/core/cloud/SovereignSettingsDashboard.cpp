@@ -63,3 +63,4 @@ void settings_apply(const char* category, const char* value) {
 
 
 } // extern "C"
+ 

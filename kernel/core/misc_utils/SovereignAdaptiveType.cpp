@@ -38,3 +38,4 @@ void adaptivetype_render_glyph(char c, sigma_u32 x, sigma_u32 y) {
 
 
 } // extern "C"
+ 

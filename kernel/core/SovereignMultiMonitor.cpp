@@ -74,3 +74,4 @@ extern "C" void multimon_arrange(sigma_u32 primary, const char* layout) { Sovere
 extern "C" void multimon_mirror(sigma_u32 src, sigma_u32 dst) { SovereignMultiMonitorEngine::getInstance().mirrorDisplays(src, dst); }
 
 
+ 

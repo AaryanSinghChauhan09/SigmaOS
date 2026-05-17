@@ -31,3 +31,4 @@ extern "C" void adaptivetype_render_glyph(char c, uint32_t x, uint32_t y) {
     // Pass scaled glyph data to the DFO rendering pipeline
     // universalui_render_widget(...)
 }
+ 

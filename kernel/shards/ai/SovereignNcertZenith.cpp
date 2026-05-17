@@ -42,3 +42,4 @@ int main() {
     sigma_log("\n[SUCCESS]: Competitive NCERT Shard Cluster Verified. Eradication Level: [APEX].\n");
     return 0;
 }
+ 

@@ -58,3 +58,4 @@ extern "C" bool multiboot_is_secure() {
 
 
 } // extern "C"
+ 

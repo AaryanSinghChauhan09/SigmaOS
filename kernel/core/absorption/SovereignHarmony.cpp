@@ -31,3 +31,4 @@ public:
 extern "C" void SovereignHarmony_ignite() {
     SigmaOS::Kernel::Absorption::SovereignHarmony::getInstance().ignite();
 }
+ 

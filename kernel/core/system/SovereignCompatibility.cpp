@@ -31,3 +31,4 @@ public:
 extern "C" void SovereignCompatibility_deploy() {
     SigmaOS::Kernel::Strategy::SovereignCompatibility::getInstance().deploy();
 }
+ 

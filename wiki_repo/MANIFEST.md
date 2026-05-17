@@ -78,3 +78,4 @@ All shards follow the **Dilithium-5** attestation protocol:
 ---
 
 *SigmaOS — 600 Shards. One Vision. Absolute Parity.*
+ 

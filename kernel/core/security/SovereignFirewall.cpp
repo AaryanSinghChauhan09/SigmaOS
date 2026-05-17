@@ -53,3 +53,4 @@ void sfire_block(sigma_u16 port) {
 }
 
 } // extern "C"
+ 

@@ -38,3 +38,4 @@ extern "C" {
         return SigmaOS::Kernel::Security::SovereignLUKS::getInstance().unlock(device, passphrase) ? 1 : 0;
     }
 }
+ 

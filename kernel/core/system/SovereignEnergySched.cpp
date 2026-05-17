@@ -46,3 +46,4 @@ void energysched_set_shard_state(sigma_u32 shard_id, sigma_energy_state_t state)
 
 
 } // extern "C"
+ 

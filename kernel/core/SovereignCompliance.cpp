@@ -53,3 +53,4 @@ extern "C" {
         return SigmaOS::Kernel::Compliance::SovereignComplianceAuditor::getInstance().checkIntegrity();
     }
 }
+ 

@@ -57,3 +57,4 @@ extern "C" {
         return SigmaOS::Kernel::Security::SovereignAppArmor::getInstance().validateShardExecution(id, ptr) ? 1 : 0;
     }
 }
+ 

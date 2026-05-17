@@ -53,3 +53,4 @@ void sentinel_enforce_policy(const char* policy_blob) {
 }
 
 } // extern "C"
+ 

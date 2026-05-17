@@ -48,3 +48,4 @@ private:
 extern "C" {
     void health_check() { SigmaOS::Kernel::Telemetry::SovereignHealthMonitor::getInstance().runHealthCheck(); }
 }
+ 

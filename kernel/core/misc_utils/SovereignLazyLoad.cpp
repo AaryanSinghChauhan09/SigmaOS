@@ -58,3 +58,4 @@ void lazyload_trigger_event(sigma_trigger_type_t trigger, sigma_u32 context_id) 
 
 
 } // extern "C"
+ 

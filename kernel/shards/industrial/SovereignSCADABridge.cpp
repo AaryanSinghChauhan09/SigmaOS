@@ -53,3 +53,4 @@ void scada_init() {
 }
 
 } // extern "C"
+ 

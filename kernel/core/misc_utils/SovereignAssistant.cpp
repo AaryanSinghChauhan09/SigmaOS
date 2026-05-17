@@ -39,3 +39,4 @@ extern "C" sigma_u32 assistant_get_query_count() {
 
 
 } // extern "C"
+ 

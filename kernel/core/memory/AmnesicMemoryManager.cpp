@@ -53,3 +53,4 @@ void sigma_free_amnesic(void* ptr, sigma_size_t size) {
 } // extern "C"
 
 } // extern "C"
+ 

@@ -26,3 +26,4 @@ public:
 extern "C" void SovereignIrDA_init() {
     SigmaOS::Kernel::SovereignIrDASpace::SovereignIrDA::getInstance().Init();
 }
+ 

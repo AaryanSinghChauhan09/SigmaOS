@@ -42,3 +42,4 @@ extern "C" bool rust_execute_safe_driver(sigma_u32 driver_id) {
 } // extern "C"
 
 } // extern "C"
+ 

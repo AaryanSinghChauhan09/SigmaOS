@@ -38,3 +38,4 @@ void batteryiq_render_report() {
 
 
 } // extern "C"
+ 

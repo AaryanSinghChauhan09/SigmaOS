@@ -85,3 +85,4 @@ extern "C" void notif_dismiss(sigma_u32 id) { SovereignNotificationEngine::getIn
 extern "C" void notif_set_sound(bool enabled) { SovereignNotificationEngine::getInstance().setSoundEnabled(enabled); }
 
 
+ 

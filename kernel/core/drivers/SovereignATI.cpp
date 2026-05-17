@@ -41,3 +41,4 @@ extern "C" {
     void ati_init() { SigmaOS::Kernel::Drivers::SovereignATI::getInstance().init(); }
 }
 
+ 

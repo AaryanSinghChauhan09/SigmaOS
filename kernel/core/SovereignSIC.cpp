@@ -53,3 +53,4 @@ extern "C" bool sic_verify_token(uint32_t shard_id, sigma_sic_token_t token) {
 }
 
 
+ 

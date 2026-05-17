@@ -318,3 +318,4 @@ void sigma_free(void* ptr) {
     (void)ptr; // No-op: bump-pointer slab; per-process cleanup on exit.
 >>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/system/SovereignLibC.cpp
 }
+ 

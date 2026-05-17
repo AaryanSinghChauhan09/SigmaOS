@@ -57,3 +57,4 @@ extern "C" {
     void neural_healer_init() { SigmaOS::Kernel::AI::SovereignNeuralHealer::getInstance().init(); }
     void neural_healer_tick() { SigmaOS::Kernel::AI::SovereignNeuralHealer::getInstance().monitorLattice(); }
 }
+ 

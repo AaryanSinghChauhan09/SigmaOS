@@ -72,3 +72,4 @@ extern "C" const sigma_thermal_state_t* thermaliq_get_state() {
 
 
 } // extern "C"
+ 

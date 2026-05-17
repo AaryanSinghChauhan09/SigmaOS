@@ -57,3 +57,4 @@ void bootsplash_dismiss() { SovereignBootSplashEngine::dismiss(); }
 
 
 } // extern "C"
+ 

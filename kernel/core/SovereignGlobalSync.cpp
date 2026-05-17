@@ -94,3 +94,4 @@ extern "C" const sigma_sync_state_t* sync_get_state() {
 }
 
 
+ 

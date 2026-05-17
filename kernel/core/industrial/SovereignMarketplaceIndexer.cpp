@@ -45,3 +45,4 @@ void marketplace_indexer_sync() {
 }
 
 } // extern "C"
+ 

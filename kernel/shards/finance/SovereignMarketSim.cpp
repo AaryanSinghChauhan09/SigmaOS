@@ -49,3 +49,4 @@ void market_init() {
 }
 
 } // extern "C"
+ 

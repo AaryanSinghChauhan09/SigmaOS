@@ -49,3 +49,4 @@ extern "C" {
     void aip_init() { SigmaOS::Kernel::AI::SovereignAICoprocessor::getInstance().init(); }
     void aip_optimize() { SigmaOS::Kernel::AI::SovereignAICoprocessor::getInstance().optimizeLattice(); }
 }
+ 

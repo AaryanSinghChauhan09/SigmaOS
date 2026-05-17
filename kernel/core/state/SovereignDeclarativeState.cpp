@@ -69,3 +69,4 @@ void declarative_build(const char* hash) {
 
 
 } // extern "C"
+ 

@@ -95,3 +95,4 @@ sigma_u32 civil_soil_bearing(sigma_u32 c_kpa, sigma_u32 depth, sigma_u32 uw, sig
 }
 
 } // extern "C"
+ 

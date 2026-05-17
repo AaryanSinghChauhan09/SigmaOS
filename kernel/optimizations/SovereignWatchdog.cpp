@@ -44,3 +44,4 @@ void sigma_watchdog_tick() {
 }
 
 } // extern "C"
+ 

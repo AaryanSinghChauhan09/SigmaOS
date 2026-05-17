@@ -129,3 +129,4 @@ void architect_fire(sigma_u32 dist, bool sprinkler, sigma_u32 occ) {
 }
 
 } // extern "C"
+ 

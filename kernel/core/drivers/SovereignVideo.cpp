@@ -1,6 +1,5 @@
 #include "../../../include/sigma_kernel_types.h" // NOLINT
 #include "../../../include/sigma_log.h"          // NOLINT
-#include "../../../include/SigmaOOP.hpp"         // NOLINT
 
 /**
  * SigmaOS Sovereign Video Shard (S-VIDEO)
@@ -44,3 +43,4 @@ private:
 extern "C" {
     void video_init() { SigmaOS::Kernel::Drivers::SovereignVideo::getInstance().init(); }
 }
+ 

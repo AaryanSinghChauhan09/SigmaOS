@@ -68,3 +68,4 @@ extern "C" sigma_size_t dna_compress(const void* in, sigma_size_t sz, void* out)
 
 
 } // extern "C"
+ 

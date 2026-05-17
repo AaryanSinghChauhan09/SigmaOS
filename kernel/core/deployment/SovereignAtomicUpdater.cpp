@@ -80,3 +80,4 @@ void updater_rollback() {
 
 
 } // extern "C"
+ 

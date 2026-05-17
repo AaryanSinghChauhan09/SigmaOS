@@ -72,3 +72,4 @@ void zfs_scrub() {
 }
 
 } // extern "C"
+ 

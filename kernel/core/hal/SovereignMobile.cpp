@@ -31,3 +31,4 @@ public:
 extern "C" void SovereignMobile_activate() {
     SigmaOS::Kernel::Deployment::SovereignMobile::getInstance().activate();
 }
+ 

@@ -68,3 +68,4 @@ extern "C" sigma_time_t time_now() {
 
 
 } // extern "C"
+ 

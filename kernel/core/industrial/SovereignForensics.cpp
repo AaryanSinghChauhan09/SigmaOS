@@ -63,3 +63,4 @@ void forensics_scan(sigma_u32 sid) {
 }
 
 } // extern "C"
+ 

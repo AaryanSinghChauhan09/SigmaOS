@@ -50,3 +50,4 @@ extern "C" {
         return SigmaOS::Kernel::Drivers::SovereignWifi::getInstance().validateWPA3Handshake();
     }
 }
+ 

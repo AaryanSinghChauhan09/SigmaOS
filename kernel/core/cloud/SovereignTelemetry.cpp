@@ -38,3 +38,4 @@ void telemetry_log_shard_event(sigma_u32 shard_id, const char* event) {
 
 
 } // extern "C"
+ 

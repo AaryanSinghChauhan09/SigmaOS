@@ -82,3 +82,4 @@ void auto_rollback(sigma_u32 sid, const char* prof) {
 }
 
 } // extern "C"
+ 

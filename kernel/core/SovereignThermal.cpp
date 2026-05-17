@@ -64,3 +64,4 @@ extern "C" void thermaliq_update() {
 extern "C" const sigma_thermal_state_t* thermaliq_get_state() {
     return SovereignThermalEngine::getInstance().getState();
 }
+ 

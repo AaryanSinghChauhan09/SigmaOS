@@ -66,3 +66,4 @@ void init_service_spawn(const char* name) {
 } // extern "C"
 
 } // extern "C"
+ 

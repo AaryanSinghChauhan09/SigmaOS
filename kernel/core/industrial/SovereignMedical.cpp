@@ -65,3 +65,4 @@ void medical_seal_record(const char* id) {
 }
 
 } // extern "C"
+ 

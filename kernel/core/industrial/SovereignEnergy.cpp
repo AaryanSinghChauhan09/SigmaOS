@@ -53,3 +53,4 @@ void energy_calc(sigma_u32 v, sigma_u32 l) {
 }
 
 } // extern "C"
+ 

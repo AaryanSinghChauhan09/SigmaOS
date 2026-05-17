@@ -30,3 +30,4 @@ To prevent repository fragmentation and keep all 12 branches perfectly uniform:
 1. All changes, bugfixes, and C++ modules are developed and committed onto `main`.
 2. The Branch Uniformity & Synchronization Engine (`tools/sync_all_branches.py`) programmatically checks out each target branch, resets its workspace head to `main`, and force-pushes back to remote.
 3. This guarantees bit-perfect uniformity and instant updates across all branches with zero merge conflicts!
+ 

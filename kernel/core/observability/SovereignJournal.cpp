@@ -52,3 +52,4 @@ void journal_emit(sigma_u32 sev, const char* sid, const char* msg) {
 }
 
 } // extern "C"
+ 

@@ -38,3 +38,4 @@ private:
 extern "C" {
     void hyp_init() { SigmaOS::Kernel::Virtualization::SovereignHypervisor::getInstance().init(); }
 }
+ 

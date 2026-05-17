@@ -54,3 +54,4 @@ void cloud_image_generate(const char* provider) {
 }
 
 } // extern "C"
+ 

@@ -62,3 +62,4 @@ void access_read_element(const char* text) {
 }
 
 } // extern "C"
+ 

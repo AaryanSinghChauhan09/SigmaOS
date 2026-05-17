@@ -31,3 +31,4 @@ public:
 extern "C void SovereignPartition_enable() {
     SigmaOS::Kernel::Deployment::SovereignPartition::getInstance().enable();
 }
+ 

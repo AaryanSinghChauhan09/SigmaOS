@@ -87,3 +87,4 @@ extern "C" {
         return SigmaOS::Kernel::Security::SovereignSecurityMatrix::getInstance().checkPermission(uid, shard, mask); 
     }
 }
+ 

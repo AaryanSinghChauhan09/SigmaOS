@@ -45,3 +45,4 @@ private:
 extern "C" void sigma_kernel_main() {
     SigmaOS::Kernel::SovereignKernelMain::getInstance().ignite();
 }
+ 

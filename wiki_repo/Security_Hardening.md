@@ -34,3 +34,4 @@ To verify system integrity:
 3. Verify shard signatures via `pqc_verify <shard_id>`
 
 *"Security is not a feature; it is the fundamental state of the Shard."*
+ 
