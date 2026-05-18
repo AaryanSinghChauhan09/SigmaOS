@@ -34,4 +34,3 @@ The **Browser Edition** is a specialized environment designed for web-first work
 
 ---
 [Return to Global Home](Home)
- 

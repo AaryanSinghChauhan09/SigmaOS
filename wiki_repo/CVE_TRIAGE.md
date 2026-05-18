@@ -29,4 +29,3 @@ Vulnerabilities should be reported via the [**Bug Bounty Program**](BUG_BOUNTY).
 1
 
 All security patches are released as **Atomic Orb Shards**. Users can apply patches without a full system reboot by swapping the affected kernel shard in the Lattice.
- 

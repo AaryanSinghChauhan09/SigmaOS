@@ -1,6 +1,6 @@
 # SigmaOS Sovereign Cgroup Shard (S-Cgroup)
 
-The **Sovereign Cgroup Shard** is a core silicon governance and resource scheduling subsystem of SigmaOS Zenith v15.1. It provides zero-dependency, silicon-native resource accounting, automatic throttle limits, and hardware partition isolation. 
+The **Sovereign Cgroup Shard** is a core silicon governance and resource scheduling subsystem of SigmaOS Zenith v15.1. It provides zero-dependency, silicon-native resource accounting, automatic throttle limits, and hardware partition isolation.
 
 By executing directly within the scheduling path, it absorbs the defining advantages of **Linux cgroups v2**, **Windows Job Objects**, and **Kubernetes ResourceQuota** without the performance overhead of external user-space agents.
 
@@ -8,13 +8,13 @@ By executing directly within the scheduling path, it absorbs the defining advant
 
 ## 🚀 Architectural Design & Parity
 
-| Feature Domain | SigmaOS S-Cgroup | Linux cgroups v2 | Windows Job Objects | Kubernetes |
-| :--- | :--- | :--- | :--- | :--- |
-| **Purity** | Freestanding C++17 | Monolithic C / SysFS | Win32 / NT Kernel APIs | YAML Orchestrated |
-| **CPU Accounting** | Direct scheduler sweep | CFS bandwidth controller | Job Cpu Rate limits | CPU Shares / Limits |
-| **Memory Isolation** | Transactional Slab accounting | Memory controller / OOM | Memory limit / Job limits | Memory request / Limit |
-| **I/O Regulation** | Silicon weights matrix | blkio I/O throttle | I/O rate limits | Storage IOPS Quota |
-| **Execution Path** | Native microkernel scheduler | Kernel cgroup subsystem | Object Manager hooks | Kubelet / containerd |
+| Feature Domain | SigmaOS S-Cgroup | Linux cgroups v2 | Windows Job Objects | Kubernetes | 
+| :--- | :--- | :--- | :--- | :--- | 
+| **Purity** | Freestanding C++17 | Monolithic C / SysFS | Win32 / NT Kernel APIs | YAML Orchestrated | 
+| **CPU Accounting** | Direct scheduler sweep | CFS bandwidth controller | Job Cpu Rate limits | CPU Shares / Limits | 
+| **Memory Isolation** | Transactional Slab accounting | Memory controller / OOM | Memory limit / Job limits | Memory request / Limit | 
+| **I/O Regulation** | Silicon weights matrix | blkio I/O throttle | I/O rate limits | Storage IOPS Quota | 
+| **Execution Path** | Native microkernel scheduler | Kernel cgroup subsystem | Object Manager hooks | Kubelet / containerd | 
 
 ---
 
@@ -26,16 +26,17 @@ The cgroup system maintains up to 12 active resource partitions in a zero-depend
 graph TD
     A[Zenith Microkernel Scheduler] --> B[Sovereign Cgroup Governor]
     B --> C{Resource Limits Exceeded?}
-    C -->|YES| D[Apply Silicon Thread Throttling]
-    C -->|NO| E[Proceed with O(1) Thread Dispatch]
+    C --> | YES | D[Apply Silicon Thread Throttling]
+    C --> | NO | E[Proceed with O(1) Thread Dispatch]
     D --> F[Active Groups Matrix]
     E --> F
+
 ```
 
 ### Resource Partition Matrix
 
-* **`zenith_kernel`**: Reserved partition for system-critical core shards (80% CPU quota, 4GB Memory limit, High 900 IO Weight).
-* **`citizen_apps`**: Default partition for authenticated user-space workloads (60% CPU quota, 2GB Memory limit, Medium 500 IO Weight).
+***`zenith_kernel`**: Reserved partition for system-critical core shards (80% CPU quota, 4GB Memory limit, High 900 IO Weight).* **`citizen_apps`**: Default partition for authenticated user-space workloads (60% CPU quota, 2GB Memory limit, Medium 500 IO Weight).
+
 * **`guest_sandbox`**: Hard-isolated sandbox partition for untrusted / alien binaries (20% CPU quota, 512MB Memory limit, Low 100 IO Weight).
 
 ---
@@ -53,6 +54,7 @@ sigma-cgroup enforce
 
 # Print audit report of all resource groups with live CPU/MEM/IO accounting
 sigma-cgroup audit
+
 ```
 
 ### Active Governor Sweeps
@@ -64,8 +66,9 @@ When the auto-governor sweeps, it analyzes live thread performance indexes. If a
 ## 📂 Source Code Implementation
 
 The S-Cgroup subsystem is built across the following zero-dependency files:
-* **Core Logic**: `kernel/core/SovereignCgroup.cpp`
-* **Management CLI**: `tools/sigma_cgroup.cpp`
+
+***Core Logic**: `kernel/core/SovereignCgroup.cpp`* **Management CLI**: `tools/sigma_cgroup.cpp`
+
 * **Syscall Bridge**: `include/syscall_dispatcher.h`
 
 ---

@@ -33,4 +33,3 @@ This document provides strictly technical facts regarding the SigmaOS Sovereign 
 ---
 
 1
- 

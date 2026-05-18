@@ -9,7 +9,6 @@
 
 #include "../../include/sigma_kernel_types.h"
 #include "../../include/sigma_log.h"
-#include "../../include/libc/SovereignLibC.h"
 
 #ifdef __cplusplus
 extern "C" {

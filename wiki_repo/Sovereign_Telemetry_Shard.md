@@ -31,12 +31,12 @@ Latency Histogram Engine
 
 1
 
-| Sub-command | Action |
-|---|---|
-| `sigma-tele arm <name> <addr>` | Arm a kprobe at a target silicon kernel address |
-| `sigma-tele sample` | Fire all armed probes and record a latency sample |
-| `sigma-tele flush` | Print the nanosecond latency histogram |
-| `sigma-tele audit` | Display full probe matrix with fire counts and state |
+| Sub-command | Action | 
+| --- | --- | 
+| `sigma-tele arm <name> <addr>` | Arm a kprobe at a target silicon kernel address | 
+| `sigma-tele sample` | Fire all armed probes and record a latency sample | 
+| `sigma-tele flush` | Print the nanosecond latency histogram | 
+| `sigma-tele audit` | Display full probe matrix with fire counts and state | 
 
 ---
 
@@ -51,4 +51,3 @@ Latency Histogram Engine
 1
 
 `GLOBAL MESH ACTIVE` � Synchronized with `AaryanSinghChauhan09/SigmaOS`.
- 

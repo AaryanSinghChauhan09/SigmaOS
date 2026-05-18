@@ -6,10 +6,10 @@ The Networking Shard is a modular, hot-swappable TCP/IP stack implemented indepe
 
 ```mermaid
 graph TD
-    A[Userland App] -->|Z-SYSCALL| B(S-NET Socket API)
+    A[Userland App] --> | Z-SYSCALL | B(S-NET Socket API)
     B --> C{PQC Engine}
-    C -->|Encrypted| D[TCP/IP Stack]
-    C -->|Unencrypted| D
+    C --> | Encrypted | D[TCP/IP Stack]
+    C --> | Unencrypted | D
     D --> E[Sovereign HAL]
     E --> F[Hardware NIC
 
@@ -40,4 +40,3 @@ if (status == SIGMA_OK) {
 
 c
 SovereignNetworkShard::getInstance().socket_bind(fd, 0x7F000001, 8080)
- 

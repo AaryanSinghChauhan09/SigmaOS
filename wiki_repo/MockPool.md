@@ -31,6 +31,7 @@ const mockAgent = new MockAgent()
 
 const mockPool = mockAgent.get('http://localhost:3000')
 
+
 ```
 
 ## Instance Methods
@@ -41,12 +42,12 @@ This method defines the interception rules for matching against requests for a M
 
 When defining interception rules, all the rules must pass for a request to be intercepted. If a request is not intercepted, a real request will be attempted.
 
-| Matcher type | Condition to pass          |
-|:------------:| -------------------------- |
+| Matcher type | Condition to pass          | 
+| :------------: | -------------------------- | 
 
-| `string`     | Exact match against string |
-| `RegExp`     | Regex must pass            |
-| `Function`   | Function must return true  |
+| `string`     | Exact match against string | 
+| `RegExp`     | Regex must pass            | 
+| `Function`   | Function must return true  | 
 
 Arguments:
 
@@ -127,6 +128,7 @@ for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
 
+
 ```
 
 #### Example - Mocked request using reply data callbacks
@@ -161,6 +163,7 @@ for await (const data of body) {
   console.log('data', data.toString('utf8')) // { "message":"hello world!" }
 }
 
+
 ```
 
 #### Example - Mocked request using reply options callback
@@ -194,6 +197,7 @@ console.log('headers', headers) // { 'content-type': 'application/json' }
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // { "message":"hello world!" }
 }
+
 
 ```
 
@@ -232,6 +236,7 @@ console.log('response received', result2.statusCode) // response received 200
 for await (const data of result2.body) {
   console.log('data', data.toString('utf8')) // data hello
 }
+
 
 ```
 
@@ -282,6 +287,7 @@ for await (const data of body) {
 
 console.log('trailers', trailers) // { 'content-md5': 'test' }
 
+
 ```
 
 #### Example - Mocked request using different matchers
@@ -323,6 +329,7 @@ for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
 
+
 ```
 
 #### Example - Mocked request with reply with a defined error
@@ -349,6 +356,7 @@ try {
   console.error(error.cause) // Error: kaboom
 }
 
+
 ```
 
 #### Example - Mocked request with defaultReplyHeaders
@@ -370,6 +378,7 @@ mockPool.intercept({
 const { headers } = await request('http://localhost:3000/foo')
 
 console.log('headers', headers) // headers { foo: 'bar' }
+
 
 ```
 
@@ -393,6 +402,7 @@ const { trailers } = await request('http://localhost:3000/foo')
 
 console.log('trailers', trailers) // trailers { foo: 'bar' }
 
+
 ```
 
 #### Example - Mocked request with automatic content-length calculation
@@ -414,6 +424,7 @@ const { headers } = await request('http://localhost:3000/foo')
 
 console.log('headers', headers) // headers { 'content-length': '3' }
 
+
 ```
 
 #### Example - Mocked request with automatic content-length calculation on an object
@@ -434,6 +445,7 @@ mockPool.intercept({
 const { headers } = await request('http://localhost:3000/foo')
 
 console.log('headers', headers) // headers { 'content-length': '13' }
+
 
 ```
 
@@ -459,6 +471,7 @@ const result2 = await request('http://localhost:3000/foo')
 // Will match and return mocked data
 
 // Etc
+
 
 ```
 
@@ -486,6 +499,7 @@ const result2 = await request('http://localhost:3000/foo')
 const result3 = await request('http://localhost:3000/foo')
 // Will not match and make attempt a real request
 
+
 ```
 
 #### Example - Mocked request with path callback
@@ -507,7 +521,7 @@ const matchPath = requestPath => {
     return false
   }
 
-  if (!Object.keys(requestQuery).includes('foo') || requestQuery.foo !== 'bar') {
+  if (!Object.keys(requestQuery).includes('foo') | | requestQuery.foo !== 'bar') {
     return false
   }
 
@@ -521,6 +535,7 @@ mockPool.intercept({
 
 const result = await request('http://localhost:3000/foo?foo=bar')
 // Will match and return mocked data
+
 
 ```
 
@@ -539,6 +554,7 @@ const mockAgent = new MockAgent()
 const mockPool = mockAgent.get('http://localhost:3000')
 
 await mockPool.close()
+
 
 ```
 
@@ -578,6 +594,7 @@ for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
 
+
 ```
 
 ### `MockPool.cleanMocks()`
@@ -585,4 +602,3 @@ for await (const data of body) {
 This method cleans up all the prepared mocks.
 
 Returns: `void`
- 

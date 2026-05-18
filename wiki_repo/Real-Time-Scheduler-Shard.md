@@ -8,9 +8,9 @@ The Scheduler Shard provides deterministic, Hard-RTOS thread scheduling based on
 flowchart LR
     A[Hardware Timer IRQ] --> B(tick)
     B --> C{Priority Queue}
-    C -->|Critical| D[RTOS Context]
-    C -->|High/Normal| E[Standard Context]
-    C -->|Idle| F[Idle Loop]
+    C --> | Critical | D[RTOS Context]
+    C --> | High/Normal | E[Standard Context]
+    C --> | Idle | F[Idle Loop]
     D --> G[CPU Execution]
     E --> G
     F -->
@@ -28,6 +28,7 @@ flowchart LR
 ## Task Spawning Example
 
 
+
 ```c
 
 void my_rtos_task() {
@@ -39,4 +40,3 @@ void my_rtos_task() {
 
 sigma_u32 task_id;
 SovereignSchedulerShard::getInstance().spawn_task(my_rtos_task, TaskPriority::REALTIME_CRITICAL, &task_id)
- 

@@ -29,4 +29,3 @@
 - Created `SovereignPkgManager` for sandboxed application handling.
 
  Legacy `sigma_os_init()` was replaced by the `SigmaSingleton` pattern across all HAL subsystems.
- 

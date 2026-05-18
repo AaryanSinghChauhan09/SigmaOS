@@ -25,6 +25,7 @@ To invoke the regression suite from the shell:
 ```bash
 sigma-cli diag run-tests
 
+
 ```
 
 ## 3. CI/CD Pipeline (GitHub Actions)
@@ -37,4 +38,3 @@ Every Pull Request triggers the CI/CD pipeline which automatically:
 4. If any test fails, the pipeline aborts and blocks the merge.
 
 For details on the pipeline configuration, see `.github/workflows/sigma-build.yml`.
- 

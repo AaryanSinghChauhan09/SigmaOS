@@ -55,4 +55,3 @@ The **Lattice Shard Matrix** provides an industrial-grade visualization of the 5
 Profiles are defined in `profiles/*.json` (Modular JSON).
 
 Example: `sovereign_identity.json` enables the Persona Shard and triggers the Lattice Shard Matrix dashboard.
- 

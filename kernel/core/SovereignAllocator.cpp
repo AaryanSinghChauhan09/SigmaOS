@@ -1,7 +1,6 @@
 #include "../../include/sigma_kernel_types.h"
 #include "../../include/sigma_log.h"
 #include "../../include/sigma_allocator.h"
-#include "../../include/hal/sigma_hal.h"
 
 /**
  * =========================================================================
@@ -142,6 +141,6 @@ extern "C" void* allocator_malloc(sigma_u32 size) {
     return SovereignAllocatorEngine::getInstance().sigma_malloc(size);
 }
 
-extern "C" void allocator_free(void* ptr, sigma_u32 size) {
-    SovereignAllocatorEngine::getInstance().sigma_free(ptr, size);
+extern "C" void allocator_free(void* ptr) {
+    SovereignAllocatorEngine::getInstance().sigma_free(ptr, 0);
 }

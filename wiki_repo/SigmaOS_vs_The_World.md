@@ -6,18 +6,18 @@ This document breaks down how SigmaOS compares to the dominant operating systems
 
 ## 🏛️ SigmaOS vs. Ubuntu (The Ecosystem Giant)
 
-| Feature | Ubuntu | SigmaOS |
-| :--- | :--- | :--- |
+| Feature | Ubuntu | SigmaOS | 
+| :--- | :--- | :--- | 
 
-| **Ecosystem Size** | Massive (Evolved over decades) | Focused (Growing 600-shard lattice) |
+| **Ecosystem Size** | Massive (Evolved over decades) | Focused (Growing 600-shard lattice) | 
 
-| **Hardware Support** | Broad (OEM partnerships) | Targeted (Silicon-Direct ARM64/x86) |
+| **Hardware Support** | Broad (OEM partnerships) | Targeted (Silicon-Direct ARM64/x86) | 
 
-| **Security** | Conventional (AppArmor/SELinux) | Sovereign (PQC/FIPS-140-3) |
+| **Security** | Conventional (AppArmor/SELinux) | Sovereign (PQC/FIPS-140-3) | 
 
-| **Personalization** | Manual (Gnome/KDE tweaks) | Autonomous (AI Profession Profiles) |
+| **Personalization** | Manual (Gnome/KDE tweaks) | Autonomous (AI Profession Profiles) | 
 
-| **Trust Model** | Centralized (Canonical/Repos) | Decentralized (Lattice Attestation) |
+| **Trust Model** | Centralized (Canonical/Repos) | Decentralized (Lattice Attestation) | 
 
 ---
 
@@ -37,20 +37,19 @@ To reach the same level of industrial trust as Ubuntu, SigmaOS is implementing:
 
 ## 🔝 Summary Table: 2026 Competitive Matrix
 
-| Metric | Pop!_OS | CachyOS | SigmaOS |
-| :--- | :--- | :--- | :--- |
+| Metric | Pop!_OS | CachyOS | SigmaOS | 
+| :--- | :--- | :--- | :--- | 
 
-| **Automation**| High (Desktop AI) | Moderate (Arch-based) |**Supreme** (Self-Healing) |
+| **Automation** | High (Desktop AI) | Moderate (Arch-based) | **Supreme** (Self-Healing) | 
 
-| **Customization**| Moderate | High |**Modular** (Atomic Shards) |
+| **Customization** | Moderate | High | **Modular** (Atomic Shards) | 
 
-| **UX Polish**| Extreme | Moderate |**Premium** (Zenith UI) |
+| **UX Polish** | Extreme | Moderate | **Premium** (Zenith UI) | 
 
-| **Quantum-Ready**| No | No |**Yes** (Kyber/Dilithium) |
+| **Quantum-Ready** | No | No | **Yes** (Kyber/Dilithium) | 
 
 ---
 
 ### The SigmaOS Zenith is the end of the legacy OS era
 
 v14.3 [LEAPFROG-STRATEGY]
- 

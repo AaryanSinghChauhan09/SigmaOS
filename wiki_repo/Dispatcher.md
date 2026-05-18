@@ -22,6 +22,7 @@ Returns: `void | Promise<null>` - Only returns a `Promise` if no `callback` argu
 dispatcher.close() // -> Promise
 dispatcher.close(() => {}) // -> void
 
+
 ```
 
 #### Example - Request resolves before Client closes
@@ -52,6 +53,7 @@ await client.close()
 
 console.log('Client closed')
 server.close()
+
 
 ```
 
@@ -131,6 +133,7 @@ try {
   socket.end()
 } catch (error) { }
 
+
 ```
 
 ### `Dispatcher.destroy([error, callback]): Promise`
@@ -152,6 +155,7 @@ dispatcher.destroy() // -> Promise
 dispatcher.destroy(new Error()) // -> Promise
 dispatcher.destroy(() => {}) // -> void
 dispatcher.destroy(new Error(), () => {}) // -> void
+
 
 ```
 
@@ -184,6 +188,7 @@ try {
 } catch (error) {
   console.error(error)
 }
+
 
 ```
 
@@ -289,6 +294,7 @@ client.dispatch({
   }
 })
 
+
 ```
 
 #### Example 2 - Dispatch Upgrade Request
@@ -339,6 +345,7 @@ client.dispatch({
     socket.end()
   }
 })
+
 
 ```
 
@@ -393,6 +400,7 @@ client.dispatch({
     server.close()
   }
 })
+
 
 ```
 
@@ -480,6 +488,7 @@ pipeline(
     server.close()
   }
 )
+
 
 ```
 
@@ -594,6 +603,7 @@ try {
   console.error(error)
 }
 
+
 ```
 
 #### Example 2 - Aborting a request
@@ -628,6 +638,7 @@ try {
 
 abortController.abort()
 
+
 ```
 
 Alternatively, any `EventEmitter` that emits an `'abort'` event may be used as an abort controller:
@@ -660,6 +671,7 @@ try {
 
 ee.emit('abort')
 
+
 ```
 
 Destroying the request or response body will have the same effect.
@@ -689,6 +701,7 @@ try {
   server.close()
 }
 
+
 ```
 
 #### Example 3 - Conditionally reading the body
@@ -708,6 +721,7 @@ if (statusCode === 200) {
 await body.dump()
 
 return null
+
 
 ```
 
@@ -787,6 +801,7 @@ try {
   console.error(error)
 }
 
+
 ```
 
 #### Example 2 - Stream to Fastify Response
@@ -844,6 +859,7 @@ try {
   fastifyServer.close()
   nodeServer.close()
 } catch (error) { }
+
 
 ```
 
@@ -912,6 +928,7 @@ try {
   client.close()
   server.close()
 }
+
 
 ```
 
@@ -987,6 +1004,7 @@ const client = new Client('http://localhost:3000')
 
 await client.request({ path: '/', method: 'GET' })
 
+
 ```
 
 #### Example 2 - Chained Compose
@@ -1031,6 +1049,7 @@ const client = new Client('http://localhost:3000')
 
 await client.request({ path: '/', method: 'GET' })
 
+
 ```
 
 #### Pre-built interceptors
@@ -1051,6 +1070,7 @@ const client = new Client("http://service.example").compose(
   redirect({ maxRedirections: 3, throwOnMaxRedirect: true })
 );
 client.request({ path: "/" })
+
 
 ```
 
@@ -1075,6 +1095,7 @@ const client = new Client("http://service.example").compose(
     retryAfter: true,
   })
 );
+
 
 ```
 
@@ -1109,6 +1130,7 @@ client.dispatch(
   },
   handler
 );
+
 
 ```
 
@@ -1189,6 +1211,7 @@ const response = await client.request({
   ...requestOpts
 })
 
+
 ```
 
 ### Example - DNS Interceptor and LRU cache as a storage
@@ -1229,6 +1252,7 @@ const response = await client.request({
   ...requestOpts
 })
 
+
 ```
 
 ##### `responseError`
@@ -1250,6 +1274,7 @@ await client.request({
   method: "GET",
   path: "/"
 });
+
 
 ```
 
@@ -1281,6 +1306,7 @@ const response = await client.request({
   path: "/"
 });
 
+
 ```
 
 ### Example - Custom Options
@@ -1295,6 +1321,7 @@ const client = new Client("http://service.example").compose(
     skipStatusCodes: [204, 304, 201] // Skip these status codes
   })
 );
+
 
 ```
 
@@ -1360,6 +1387,7 @@ const first = await fetch('https://example.com/data')
 // Second request can be served from cache according to RFC9111 rules.
 const second = await fetch('https://example.com/data')
 
+
 ```
 
 ##### `Deduplicate Interceptor`
@@ -1392,6 +1420,7 @@ const clientWithCache = new Client("http://service.example").compose(
   deduplicate(),
   cache()
 );
+
 
 ```
 
@@ -1487,6 +1516,7 @@ Response headers will derive a `host` from the `url` of the [Client](/docs/docs/
   accept: '*/*'
 }
 
+
 ```
 
 ### Example 2 - Array
@@ -1499,6 +1529,7 @@ Response headers will derive a `host` from the `url` of the [Client](/docs/docs/
   'host', 'mysite.com',
   'accept', '*/*'
 ]
+
 
 ```
 
@@ -1513,6 +1544,7 @@ new Headers({
   accept: '*/*'
 })
 
+
 ```
 
 or
@@ -1525,6 +1557,7 @@ new Map([
   ['host', 'mysite.com'],
   ['accept', '*/*']
 ])
+
 
 ```
 
@@ -1541,5 +1574,5 @@ or
   }
 }
 
+
 ```
- 

@@ -12,29 +12,29 @@ This matrix documents verified co-existence behavior between SigmaOS and other o
 
 ## Compatibility Matrix
 
-| Co-Resident OS | Boot Method | Partition Scheme | Filesystem | SigmaOS Coexists | Notes |
-|----------------|-------------|-----------------|------------|------------------|-------|
-| **Ubuntu 24.04 LTS** | GRUB2 | GPT | ext4 | ✅ Verified | GRUB detects SigmaOS automatically |
+| Co-Resident OS | Boot Method | Partition Scheme | Filesystem | SigmaOS Coexists | Notes | 
+| ---------------- | ------------- | ----------------- | ------------ | ------------------ | ------- | 
+| **Ubuntu 24.04 LTS** | GRUB2 | GPT | ext4 | ✅ Verified | GRUB detects SigmaOS automatically | 
 
-| **Fedora 40** | GRUB2 | GPT | ext4/btrfs | ✅ Verified | EFI chainloading confirmed |
+| **Fedora 40** | GRUB2 | GPT | ext4/btrfs | ✅ Verified | EFI chainloading confirmed | 
 
-| **Debian 12** | GRUB2 | MBR/GPT | ext4 | ✅ Verified | Legacy BIOS + UEFI both tested |
+| **Debian 12** | GRUB2 | MBR/GPT | ext4 | ✅ Verified | Legacy BIOS + UEFI both tested | 
 
-| **Arch Linux** | systemd-boot | GPT | ext4/xfs | ✅ Verified | Manual bootloader entry required |
+| **Arch Linux** | systemd-boot | GPT | ext4/xfs | ✅ Verified | Manual bootloader entry required | 
 
-| **Windows 11** | Windows Boot Manager | GPT | NTFS | ✅ Verified | Fast Startup must be disabled |
+| **Windows 11** | Windows Boot Manager | GPT | NTFS | ✅ Verified | Fast Startup must be disabled | 
 
-| **Windows 10** | Windows Boot Manager | MBR/GPT | NTFS | ✅ Verified | Legacy MBR: GRUB must be primary |
+| **Windows 10** | Windows Boot Manager | MBR/GPT | NTFS | ✅ Verified | Legacy MBR: GRUB must be primary | 
 
-| **macOS Ventura** | Apple Boot Picker | APFS | APFS | ⚠️ Constrained | Apple Silicon unsupported; Intel only |
+| **macOS Ventura** | Apple Boot Picker | APFS | APFS | ⚠️ Constrained | Apple Silicon unsupported; Intel only | 
 
-| **FreeBSD 14** | BSD Bootloader | GPT | UFS/ZFS | ⚠️ Constrained | Manual partition table tuning needed |
+| **FreeBSD 14** | BSD Bootloader | GPT | UFS/ZFS | ⚠️ Constrained | Manual partition table tuning needed | 
 
-| **OpenBSD 7.5** | OpenBSD Bootloader | GPT | FFS | ⚠️ Constrained | Shared EFI partition required |
+| **OpenBSD 7.5** | OpenBSD Bootloader | GPT | FFS | ⚠️ Constrained | Shared EFI partition required | 
 
-| **ChromeOS Flex** | coreboot | GPT | ext4 | 🧪 Experimental | Developer mode required |
+| **ChromeOS Flex** | coreboot | GPT | ext4 | 🧪 Experimental | Developer mode required | 
 
-| **Android-x86** | GRUB | GPT | ext4 | 🧪 Experimental | Partition alignment critical |
+| **Android-x86** | GRUB | GPT | ext4 | 🧪 Experimental | Partition alignment critical | 
 
 ---
 
@@ -57,18 +57,19 @@ This matrix documents verified co-existence behavior between SigmaOS and other o
 │  (Remainder of disk)                │
 └─────────────────────────────────────┘
 
+
 ```text
 
 ---
 
 ## Known Conflicts & Mitigations
 
-| Conflict | Affected OS | Mitigation |
-|----------|-------------|------------|
-| Windows Fast Startup locks NTFS | Windows 10/11 | Disable Fast Startup in Windows Power Settings |
-| GRUB overwritten by Windows Update | Windows | Re-run `sovereign-bootctl install` post-update |
-| Secure Boot key conflict | All UEFI | Enroll SigmaOS MOK key via `mokutil --import` |
-| Clock skew (UTC vs Local) | Windows | Set Windows to use UTC via registry key |
+| Conflict | Affected OS | Mitigation | 
+| ---------- | ------------- | ------------ | 
+| Windows Fast Startup locks NTFS | Windows 10/11 | Disable Fast Startup in Windows Power Settings | 
+| GRUB overwritten by Windows Update | Windows | Re-run `sovereign-bootctl install` post-update | 
+| Secure Boot key conflict | All UEFI | Enroll SigmaOS MOK key via `mokutil --import` | 
+| Clock skew (UTC vs Local) | Windows | Set Windows to use UTC via registry key | 
 
 ---
 
@@ -83,4 +84,3 @@ If SigmaOS fails to boot:
 3. Re-install GRUB: `sovereign-bootctl install --target=/dev/sdX`
 
 4. Verify: `sovereign-bootctl verify`
- 

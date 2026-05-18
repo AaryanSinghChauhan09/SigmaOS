@@ -25,12 +25,14 @@ To build and run SigmaOS, you need the following tools:
 ```bash
 make clean
 
+
 ```
 
 ### 2. Build the kernel singularity
 
 ```bash
 make singularity
+
 
 ```
 
@@ -40,6 +42,7 @@ This will generate `sigmaos.bin` in the root directory.
 
 ```bash
 make zenith-iso
+
 
 ```
 
@@ -51,6 +54,7 @@ To boot the kernel in QEMU and trace execution via serial output:
 
 ```bash
 make qemu
+
 
 ```
 
@@ -65,6 +69,7 @@ We recommend running `cppcheck` before submitting any PRs:
 ```bash
 cppcheck --enable=warning,style,performance -Iinclude kernel/
 
+
 ```
 
 ## Troubleshooting
@@ -74,4 +79,3 @@ If you encounter errors during the PQC attestation phase, ensure your hardware R
 ---
 
 ### Σ SIGMAOS: Sovereign Build System. Absolute Integrity
- 

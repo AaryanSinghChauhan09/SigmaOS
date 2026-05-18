@@ -12,6 +12,7 @@ mockAgent.enableMockHistory()
 mockAgent.getCallHistory()
 
 
+
 ```
 
 a MockCallHistory instance implements a **Symbol.iterator** letting you iterate on registered logs :
@@ -23,6 +24,7 @@ for (const log of mockAgent.getCallHistory()) {
 
 const array: Array<MockCallHistoryLog> = [...mockAgent.getCallHistory()]
 const set: Set<MockCallHistoryLog> = new Set(mockAgent.getCallHistory())
+
 
 ```
 
@@ -37,6 +39,7 @@ mockAgent.clearCallHistory()
 // same as
 mockAgent.getCallHistory()?.clear()
 
+
 ```
 
 ### calls
@@ -45,6 +48,7 @@ Get all MockCallHistoryLog registered as an array
 
 ```js
 mockAgent.getCallHistory()?.calls()
+
 
 ```
 
@@ -55,6 +59,7 @@ Get the first MockCallHistoryLog registered or undefined
 ```js
 mockAgent.getCallHistory()?.firstCall()
 
+
 ```
 
 ### lastCall
@@ -64,6 +69,7 @@ Get the last MockCallHistoryLog registered or undefined
 ```js
 mockAgent.getCallHistory()?.lastCall()
 
+
 ```
 
 ### nthCall
@@ -72,6 +78,7 @@ Get the nth MockCallHistoryLog registered or undefined
 
 ```js
 mockAgent.getCallHistory()?.nthCall(3) // the third MockCallHistoryLog registered
+
 
 ```
 
@@ -85,6 +92,7 @@ Filter MockCallHistoryLog by protocol.
 mockAgent.getCallHistory()?.filterCallsByProtocol(/https/)
 mockAgent.getCallHistory()?.filterCallsByProtocol('https:')
 
+
 ```
 
 ### filterCallsByHost
@@ -96,6 +104,7 @@ Filter MockCallHistoryLog by host.
 ```js
 mockAgent.getCallHistory()?.filterCallsByHost(/localhost/)
 mockAgent.getCallHistory()?.filterCallsByHost('localhost:3000')
+
 
 ```
 
@@ -110,6 +119,7 @@ mockAgent.getCallHistory()?.filterCallsByPort(/3000/)
 mockAgent.getCallHistory()?.filterCallsByPort('3000')
 mockAgent.getCallHistory()?.filterCallsByPort('')
 
+
 ```
 
 ### filterCallsByOrigin
@@ -121,6 +131,7 @@ Filter MockCallHistoryLog by origin.
 ```js
 mockAgent.getCallHistory()?.filterCallsByOrigin(/http:\/\/localhost:3000/)
 mockAgent.getCallHistory()?.filterCallsByOrigin('http://localhost:3000')
+
 
 ```
 
@@ -134,6 +145,7 @@ Filter MockCallHistoryLog by path.
 mockAgent.getCallHistory()?.filterCallsByPath(/api\/v1\/graphql/)
 mockAgent.getCallHistory()?.filterCallsByPath('/api/v1/graphql')
 
+
 ```
 
 ### filterCallsByHash
@@ -145,6 +157,7 @@ Filter MockCallHistoryLog by hash.
 ```js
 mockAgent.getCallHistory()?.filterCallsByPath(/hash/)
 mockAgent.getCallHistory()?.filterCallsByPath('#hash')
+
 
 ```
 
@@ -158,6 +171,7 @@ Filter MockCallHistoryLog by fullUrl. fullUrl contains protocol, host, port, pat
 mockAgent.getCallHistory()?.filterCallsByFullUrl(/https:\/\/localhost:3000\/\?query=value#hash/)
 mockAgent.getCallHistory()?.filterCallsByFullUrl('https://localhost:3000/?query=value#hash')
 
+
 ```
 
 ### filterCallsByMethod
@@ -169,6 +183,7 @@ Filter MockCallHistoryLog by method.
 ```js
 mockAgent.getCallHistory()?.filterCallsByMethod(/POST/)
 mockAgent.getCallHistory()?.filterCallsByMethod('POST')
+
 
 ```
 
@@ -208,6 +223,7 @@ mockAgent.getCallHistory()?.filterCalls({ hash: /my-hash/, path: '/endpoint' })
 
 mockAgent.getCallHistory()?.filterCalls({ hash: /my-hash/, path: '/endpoint' }, { operator: 'AND' })
 
+
 ```
 
 ## filter parameter
@@ -221,4 +237,3 @@ Can be :
 - undefined. MockCallHistoryLog filtered if `value !== parameterValue`
 
 - regexp. MockCallHistoryLog filtered if `!parameterValue.test(value)`
- 

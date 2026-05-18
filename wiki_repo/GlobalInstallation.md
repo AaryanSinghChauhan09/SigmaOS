@@ -25,24 +25,25 @@ const formData = new FormData()
 const ws = new WebSocket('wss://example.com')
 const eventSource = new EventSource('https://example.com/events')
 
+
 ```
 
 ## Installed Classes
 
 The `install()` function adds the following classes to `globalThis`:
 
-| Class | Description |
-|-------|-------------|
-| `fetch` | The fetch function for making HTTP requests |
-| `Headers` | HTTP headers management |
-| `Response` | HTTP response representation |
-| `Request` | HTTP request representation |
-| `FormData` | Form data handling |
-| `WebSocket` | WebSocket client |
-| `CloseEvent` | WebSocket close event |
-| `ErrorEvent` | WebSocket error event |
-| `MessageEvent` | WebSocket message event |
-| `EventSource` | Server-sent events client |
+| Class | Description | 
+| ------- | ------------- | 
+| `fetch` | The fetch function for making HTTP requests | 
+| `Headers` | HTTP headers management | 
+| `Response` | HTTP response representation | 
+| `Request` | HTTP request representation | 
+| `FormData` | Form data handling | 
+| `WebSocket` | WebSocket client | 
+| `CloseEvent` | WebSocket close event | 
+| `ErrorEvent` | WebSocket error event | 
+| `MessageEvent` | WebSocket message event | 
+| `EventSource` | Server-sent events client | 
 
 ## Using `FormData` with `fetch`
 
@@ -59,6 +60,7 @@ await fetch('https://example.com', {
   body
 })
 
+
 ```
 
 ```js
@@ -72,6 +74,7 @@ await fetch('https://example.com', {
   method: 'POST',
   body
 })
+
 
 ```
 
@@ -88,6 +91,7 @@ await fetch('https://example.com', {
   method: 'POST',
   body
 })
+
 
 ```
 
@@ -123,6 +127,7 @@ if (typeof globalThis.fetch === 'undefined') {
 // Now fetch is guaranteed to be available
 const response = await fetch('https://api.example.com')
 
+
 ```
 
 ## Example: Testing Environment
@@ -139,6 +144,7 @@ test('fetch API test', async () => {
   expect(response).toBeInstanceOf(Response)
 })
 
+
 ```
 
 ## Notes
@@ -150,4 +156,3 @@ test('fetch API test', async () => {
 - This provides access to undici's latest features and performance improvements
 
 - The global installation persists for the lifetime of the process
- 

@@ -42,20 +42,19 @@ Inspired by modern personal AI frameworks, SigmaOS transcends traditional comput
 
 ## 🛠 Professional Integration Examples
 
-| Profession | Open Source Alignment | SigmaOS Customization |
-| :--- | :--- | :--- |
+| Profession | Open Source Alignment | SigmaOS Customization | 
+| :--- | :--- | :--- | 
 
-| **Medical Doctor** | DICOM Viewer / OpenEMR | HIPAA-Locked Shards |
+| **Medical Doctor** | DICOM Viewer / OpenEMR | HIPAA-Locked Shards | 
 
-| **Architect** | Blender / FreeCAD | Real-time Stress-Mesh Viz |
+| **Architect** | Blender / FreeCAD | Real-time Stress-Mesh Viz | 
 
-| **Indian Lawyer**| Indian Code (BNS 2023) |**S-BNS** Legal Lookup Shard |
+| **Indian Lawyer** | Indian Code (BNS 2023) | **S-BNS** Legal Lookup Shard | 
 
-| **Indian Accountant**| GST/Income Tax (FY 24-25) |**S-IN-TOOLS** Tax Compliance |
+| **Indian Accountant** | GST/Income Tax (FY 24-25) | **S-IN-TOOLS** Tax Compliance | 
 
-| **Data Engineer** | Apache Spark / DuckDB | Bare-metal DataMatrix Query |
+| **Data Engineer** | Apache Spark / DuckDB | Bare-metal DataMatrix Query | 
 
 ---
 
 ### SigmaOS: Sovereignty over your professional workspace
- 

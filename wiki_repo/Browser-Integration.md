@@ -23,4 +23,3 @@ The `release/browser` branch optimizes SigmaOS for instant access through modern
 - **WASM Benchmarking**: Real-time profiling of shard ignition latency within the browser.
 
 *"The browser is the gateway to the infinite lattice."*
- 

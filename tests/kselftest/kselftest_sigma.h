@@ -11,7 +11,7 @@
 #define KSELFTEST_SIGMA_H
 
 #include <stdio.h>
-#include <string.h>
+#include <stdarg.h>
 
 #define KSFT_PASS 0
 #define KSFT_FAIL 1

@@ -49,4 +49,3 @@ Designed for the next generation of Sovereign Architects, this pillar provides a
 ---
 
 ### Stay Sovereign
- 

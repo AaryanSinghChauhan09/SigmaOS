@@ -6,19 +6,19 @@ Welcome to the **SigmaOS Zenith v15.2** knowledge base. SigmaOS is an industrial
 
 ## 🚀 Quick Navigation
 
-| Section | Description |
-|:---|:---|
-| [Architecture Overview](Architecture-Overview) | Kernel shard map, HAL, and Ring-0/3 dispatch pipeline |
-| [Kernel](Kernel.md) | CFS scheduling, NUMA, slab allocator, real-time class |
-| [HAL](HAL.md) | x86_64 / ARM64 / RISC-V hardware abstraction |
-| [Syscall Dispatcher](SyscallDispatcher.md) | Modular O(1) C dispatch table |
-| [Storage](Storage.md) | VFS, ZFS-inspired CoW, SovereignCloudFS |
-| [Desktop](Desktop.md) | Zenith UI, Vulkan compositor, SovereignThemeEngine |
-| [Tools](Tools.md) | Professional calculators, forensics, developer tools |
-| [Branches](Branches.md) | 12-branch taxonomy and improvement roadmap |
-| [Onboarding Guide](Onboarding_Guide.md) | Build instructions and coding standards |
-| [Problems](Problems.md) | Bug ledger and resolution log |
-| [RFC Template](RFC_Template.md) | Proposal format for new subsystem features |
+| Section | Description | 
+| :--- | :--- | 
+| [Architecture Overview](Architecture-Overview) | Kernel shard map, HAL, and Ring-0/3 dispatch pipeline | 
+| [Kernel](Kernel.md) | CFS scheduling, NUMA, slab allocator, real-time class | 
+| [HAL](HAL.md) | x86_64 / ARM64 / RISC-V hardware abstraction | 
+| [Syscall Dispatcher](SyscallDispatcher.md) | Modular O(1) C dispatch table | 
+| [Storage](Storage.md) | VFS, ZFS-inspired CoW, SovereignCloudFS | 
+| [Desktop](Desktop.md) | Zenith UI, Vulkan compositor, SovereignThemeEngine | 
+| [Tools](Tools.md) | Professional calculators, forensics, developer tools | 
+| [Branches](Branches.md) | 12-branch taxonomy and improvement roadmap | 
+| [Onboarding Guide](Onboarding_Guide.md) | Build instructions and coding standards | 
+| [Problems](Problems.md) | Bug ledger and resolution log | 
+| [RFC Template](RFC_Template.md) | Proposal format for new subsystem features | 
 
 ---
 

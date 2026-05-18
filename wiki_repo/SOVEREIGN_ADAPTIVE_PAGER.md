@@ -24,4 +24,3 @@ Users can trace Page Hits, LRU Misses, and successfully pre-fetched predictive w
 ---
 
 1
- 

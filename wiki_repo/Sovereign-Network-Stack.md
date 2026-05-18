@@ -22,7 +22,7 @@ S-NET operates on a zero-copy data path between the hardware HAL and the userlan
 // Example: Attesting a network shard
 SigmaOS::Kernel::Network::SovereignNetStack::getInstance().add_firewall_rule(0xFFFFFFFF, Protocol::TCP, true);
 
+
 ```
 
 *"Connectivity is only sovereign when it is absolute."*
- 

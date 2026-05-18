@@ -1,6 +1,5 @@
 #include "../../include/sigma_kernel_types.h"
 #include "../../include/sigma_log.h"
-#include "../../include/hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Overlay File System Shard (S-OverlayFS)
@@ -65,7 +64,7 @@ public:
 
         // Seed read-only files inside lower directory
         seedFile(m, "kernel_core.sys", "SYSTEM_IMAGE_V15_1_ZENITH", SIGMA_FALSE);
-        seedFile(m, "config.json", "{\\"theme\\": \\"dark\\"}", SIGMA_FALSE);
+        seedFile(m, "config.json", "{ \"theme\": \"dark\" }", SIGMA_FALSE);
 
         sigma_log_info("[OVERLAYFS] Mounted Union FS | Lower: %s (RO) | Upper: %s (RW) | Merged: %s\n", 
             m.lower_dir, m.upper_dir, m.merged_dir);

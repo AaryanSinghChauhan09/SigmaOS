@@ -34,4 +34,3 @@ The **Stable Edition** is the battle-tested, long-term support (LTS) release of 
 
 ---
 [Return to Global Home](Home)
- 

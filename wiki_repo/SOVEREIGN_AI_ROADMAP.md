@@ -23,4 +23,3 @@ The Neural Bridge (S09/S27) shunts natural language prompts directly into the So
 ---
 
 1
- 

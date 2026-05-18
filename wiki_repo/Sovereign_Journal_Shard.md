@@ -34,11 +34,11 @@ Boot Entries (pre-seeded):
 
 1
 
-| Sub-command | Action |
-|---|---|
-| `sigma-journal write <level_num> <unit> <msg>` | Write a structured event entry (0=EMERG�7=DEBUG) |
-| `sigma-journal follow <min_level_num>` | Stream all entries at or above the minimum priority |
-| `sigma-journal audit` | Print ring buffer stats and full event stream |
+| Sub-command | Action | 
+| --- | --- | 
+| `sigma-journal write <level_num> <unit> <msg>` | Write a structured event entry (0=EMERG�7=DEBUG) | 
+| `sigma-journal follow <min_level_num>` | Stream all entries at or above the minimum priority | 
+| `sigma-journal audit` | Print ring buffer stats and full event stream | 
 
 ---
 
@@ -53,4 +53,3 @@ Boot Entries (pre-seeded):
 1
 
 `GLOBAL MESH ACTIVE` � Synchronized with `AaryanSinghChauhan09/SigmaOS`.
- 

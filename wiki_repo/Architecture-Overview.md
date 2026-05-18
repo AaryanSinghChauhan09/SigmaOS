@@ -27,27 +27,29 @@ This page describes the high-level structure of the SigmaOS Zenith microkernel.
 └─────────────────────┬───────────────────────────────┘
                       │
               Physical Hardware
+
 ```
 
 ---
 
 ## Key Subsystems
 
-| Subsystem | File | Purpose |
-|:---|:---|:---|
-| **S-HAL** | `hal/SovereignHAL.cpp` | Platform-agnostic register access |
-| **Scheduler** | `kernel/scheduler/SovereignScheduler.cpp` | CFS + NUMA + SCHED_SOVEREIGN |
-| **Allocator** | `kernel/core/SovereignAllocator.cpp` | O(1) lockless slab |
-| **SPSC IPC** | `kernel/core/ipc/SovereignSPSCQueue.hpp` | Zero-copy ring buffers |
-| **Syscalls** | `kernel/core/SovereignSyscall.cpp` | Modular C dispatch table |
-| **VFS** | `kernel/core/SovereignVFS.cpp` | ZFS-inspired virtual FS |
-| **Vulkan** | `kernel/core/vulkan/sovereign_vulkan.c` | Direct SPIR-V GPU routing |
-| **UI** | `kernel/core/SovereignZenithUI.cpp` | Glassmorphic compositor |
-| **PQC** | `kernel/core/SovereignPQC.cpp` | Dilithium-5 attestation |
+| Subsystem | File | Purpose | 
+| :--- | :--- | :--- | 
+| **S-HAL** | `hal/SovereignHAL.cpp` | Platform-agnostic register access | 
+| **Scheduler** | `kernel/scheduler/SovereignScheduler.cpp` | CFS + NUMA + SCHED_SOVEREIGN | 
+| **Allocator** | `kernel/core/SovereignAllocator.cpp` | O(1) lockless slab | 
+| **SPSC IPC** | `kernel/core/ipc/SovereignSPSCQueue.hpp` | Zero-copy ring buffers | 
+| **Syscalls** | `kernel/core/SovereignSyscall.cpp` | Modular C dispatch table | 
+| **VFS** | `kernel/core/SovereignVFS.cpp` | ZFS-inspired virtual FS | 
+| **Vulkan** | `kernel/core/vulkan/sovereign_vulkan.c` | Direct SPIR-V GPU routing | 
+| **UI** | `kernel/core/SovereignZenithUI.cpp` | Glassmorphic compositor | 
+| **PQC** | `kernel/core/SovereignPQC.cpp` | Dilithium-5 attestation | 
 
 ---
 
 ## Boot Sequence
+
 1. `SovereignHAL::initializeHAL()` — CPU arch detection, MMIO mapping
 2. `SovereignAllocator::init()` — Slab bucket setup
 3. `syscall_init()` — Dispatch table population

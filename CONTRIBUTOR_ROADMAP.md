@@ -4,17 +4,17 @@ This roadmap formalizes the remaining gaps between SigmaOS Zenith and legacy com
 
 ## 📊 Comparative Gaps & Parity Targets
 
-| Category | Best Competitor | SigmaOS Parity Target | Shard/Utility |
-| :--- | :--- | :--- | :--- |
-| **UX & Access** | Zorin / Elementary | Adaptive UI Scaling & Accessibility Toolkit | `SovereignAccessibility` |
-| **IoT / ARM** | RPi-Distro | Event-Driven GPIO & Sensor Toolkit | `SovereignIoT` |
-| **Gaming** | SteamOS | Dynamic GPU Scheduler & Controller Manager | `SovereignGPUSched` |
-| **Performance** | Clear Linux | Telemetry-Driven Auto-Tuner | `SovereignAISched` |
-| **Reproducibility** | NixOS | Declarative Shard Configs & Rollbacks | `sigma-pkg sync` |
-| **Recovery** | RescueZilla | Snapshot Diff Engine & Forensic Toolkit | `SovereignSnapshotDiff` |
-| **Containers** | Fedora CoreOS | Shard Container Orchestrator (K8s) | `SovereignOrchestrator` |
-| **Rolling** | Arch / Solus | Incremental Shard Delta Updates | `sigma-pkg update --delta` |
-| **Enterprise** | Ubuntu | Hardware Regression Harness | `SovereignRegression` |
+| Category | Best Competitor | SigmaOS Parity Target | Shard/Utility | 
+| :--- | :--- | :--- | :--- | 
+| **UX & Access** | Zorin / Elementary | Adaptive UI Scaling & Accessibility Toolkit | `SovereignAccessibility` | 
+| **IoT / ARM** | RPi-Distro | Event-Driven GPIO & Sensor Toolkit | `SovereignIoT` | 
+| **Gaming** | SteamOS | Dynamic GPU Scheduler & Controller Manager | `SovereignGPUSched` | 
+| **Performance** | Clear Linux | Telemetry-Driven Auto-Tuner | `SovereignAISched` | 
+| **Reproducibility** | NixOS | Declarative Shard Configs & Rollbacks | `sigma-pkg sync` | 
+| **Recovery** | RescueZilla | Snapshot Diff Engine & Forensic Toolkit | `SovereignSnapshotDiff` | 
+| **Containers** | Fedora CoreOS | Shard Container Orchestrator (K8s) | `SovereignOrchestrator` | 
+| **Rolling** | Arch / Solus | Incremental Shard Delta Updates | `sigma-pkg update --delta` | 
+| **Enterprise** | Ubuntu | Hardware Regression Harness | `SovereignRegression` | 
 
 ## 🚀 Development Phases
 

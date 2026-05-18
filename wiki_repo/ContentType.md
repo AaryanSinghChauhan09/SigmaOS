@@ -27,13 +27,14 @@ parseMIMEType('text/html; charset=gbk')
 //   essence: 'text/html'
 // }
 
+
 ```
 
 Arguments:
 
 - **input** `string`
 
-Returns: `MIMEType|'failure'`
+Returns: `MIMEType | 'failure'`
 
 ## `serializeAMimeType(input)`
 
@@ -53,6 +54,7 @@ serializeAMimeType({
 // text/html;charset=gbk
 
 
+
 ```
 
 Arguments:
@@ -60,4 +62,3 @@ Arguments:
 - **mimeType** `MIMEType`
 
 Returns: `string`
- 

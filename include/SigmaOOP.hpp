@@ -134,11 +134,11 @@ public:
 /* Global overrides for zero-dependency C++ support */
 #ifndef SIGMA_NEW_DEFINED
 #define SIGMA_NEW_DEFINED
-inline void* operator new(sigma_size_t size);
-inline void* operator new[](sigma_size_t size);
-inline void operator delete(void* ptr) noexcept;
-inline void operator delete(void* ptr, sigma_size_t size) noexcept;
-inline void operator delete[](void* ptr) noexcept;
+void* operator new(sigma_size_t size);
+void* operator new[](sigma_size_t size);
+void operator delete(void* ptr) noexcept;
+void operator delete(void* ptr, sigma_size_t size) noexcept;
+void operator delete[](void* ptr) noexcept;
 #endif
 
 #endif

@@ -8,4 +8,3 @@ The Main branch is the stabilization lattice for SigmaOS. This branch contains o
 - **Governance**: The [Governance Model](GOVERNANCE.md) and Technical Steering Committee (TSC) procedures.
 - **Security Policies**: The [Security Hardening Policies](SECURITY.md) covering S-ARMOR MAC and PQC attestation.
 - **Roadmap**: Master roadmap and milestone tracking.
- 

@@ -31,6 +31,7 @@ import { MockAgent } from 'undici'
 
 const mockAgent = new MockAgent()
 
+
 ```
 
 ### Example - Basic MockAgent instantiation with custom agent
@@ -41,6 +42,7 @@ import { Agent, MockAgent } from 'undici'
 const agent = new Agent()
 
 const mockAgent = new MockAgent({ agent })
+
 
 ```
 
@@ -56,20 +58,20 @@ Arguments:
 
 - **origin** `string | RegExp | (value) => boolean` - a matcher for the pool origin to be retrieved from the MockAgent.
 
-| Matcher type | Condition to pass          |
-|:------------:| -------------------------- |
+| Matcher type | Condition to pass          | 
+| :------------: | -------------------------- | 
 
-| `string`     | Exact match against string |
-| `RegExp`     | Regex must pass            |
-| `Function`   | Function must return true  |
+| `string`     | Exact match against string | 
+| `RegExp`     | Regex must pass            | 
+| `Function`   | Function must return true  | 
 
 Returns: `MockClient | MockPool`.
 
-| `MockAgentOptions`   | Mock instance returned |
-| -------------------- | ---------------------- |
+| `MockAgentOptions`   | Mock instance returned | 
+| -------------------- | ---------------------- | 
 
-| `connections === 1`  | `MockClient`           |
-| `connections` > `1`  | `MockPool`             |
+| `connections === 1`  | `MockClient`           | 
+| `connections` > `1`  | `MockPool`             | 
 
 #### Example - Basic Mocked Request
 
@@ -89,6 +91,7 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 
 ```
 
@@ -113,6 +116,7 @@ for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
 
+
 ```
 
 #### Example - Basic Mocked Request with local mock pool dispatcher
@@ -136,6 +140,7 @@ for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
 
+
 ```
 
 #### Example - Basic Mocked Request with local mock client dispatcher
@@ -158,6 +163,7 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 
 ```
 
@@ -189,6 +195,7 @@ for await (const data of result2.body) {
   console.log('data', data.toString('utf8')) // data hello
 }
 
+
 ```
 
 #### Example - Mock different requests within the same file
@@ -208,6 +215,7 @@ describe('Test', () => {
     // your test
   });
 });
+
 
 ```
 
@@ -249,6 +257,7 @@ for await (const data of body) {
 
 console.log('trailers', trailers) // { 'content-md5': 'test' }
 
+
 ```
 
 #### Example - Mocked request with origin regex
@@ -272,6 +281,7 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 
 ```
 
@@ -297,6 +307,7 @@ for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
 
+
 ```
 
 ### `MockAgent.close()`
@@ -314,6 +325,7 @@ const mockAgent = new MockAgent()
 setGlobalDispatcher(mockAgent)
 
 await mockAgent.close()
+
 
 ```
 
@@ -350,6 +362,7 @@ for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
 
+
 ```
 
 ### `MockAgent.deactivate()`
@@ -367,6 +380,7 @@ const mockAgent = new MockAgent()
 setGlobalDispatcher(mockAgent)
 
 mockAgent.deactivate()
+
 
 ```
 
@@ -389,6 +403,7 @@ mockAgent.deactivate()
 
 // Later
 mockAgent.activate()
+
 
 ```
 
@@ -417,6 +432,7 @@ mockAgent.enableNetConnect()
 await request('http://example.com')
 // A real request is made
 
+
 ```
 
 #### Example - Allow requests matching a host string to make real requests
@@ -439,6 +455,7 @@ await request('http://example-2.com:8080')
 await request('http://example-3.com')
 // Will throw
 
+
 ```
 
 #### Example - Allow requests matching a host regex to make real requests
@@ -454,6 +471,7 @@ mockAgent.enableNetConnect(new RegExp('example.com'))
 await request('http://example.com')
 // A real request is made
 
+
 ```
 
 #### Example - Allow requests matching a host function to make real requests
@@ -468,6 +486,7 @@ mockAgent.enableNetConnect((value) => value === 'example.com')
 
 await request('http://example.com')
 // A real request is made
+
 
 ```
 
@@ -488,6 +507,7 @@ mockAgent.disableNetConnect()
 
 await request('http://example.com')
 // Will throw
+
 
 ```
 
@@ -537,6 +557,7 @@ const pendingInterceptors = agent.pendingInterceptors()
 //   }
 // ]
 
+
 ```
 
 ### `MockAgent.assertNoPendingInterceptors([options])`
@@ -571,6 +592,7 @@ agent.assertNoPendingInterceptors()
 // │    0    │ 'GET'  │ 'https://example.com' │ '/'  │     200     │    '❌'    │      0      │     1     │
 // └─────────┴────────┴───────────────────────┴──────┴─────────────┴────────────┴─────────────┴───────────┘
 
+
 ```
 
 #### Example - access call history on MockAgent
@@ -602,6 +624,7 @@ mockAgent.getCallHistory()?.firstCall()
 //   port: ''
 // }
 
+
 ```
 
 #### Example - clear call history
@@ -610,6 +633,7 @@ mockAgent.getCallHistory()?.firstCall()
 const mockAgent = new MockAgent()
 
 mockAgent.clearAllCallHistory()
+
 
 ```
 
@@ -631,5 +655,5 @@ mockAgentHistory?.filterCalls('application/json') // returns an Array of MockCal
 mockAgentHistory?.filterCalls((log) => log.path === '/endpoint') // returns an Array of MockCallHistoryLogs when given function returns true
 mockAgentHistory?.clear() // clear the history
 
+
 ```
- 

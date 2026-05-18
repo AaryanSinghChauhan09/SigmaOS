@@ -43,4 +43,3 @@ All models loaded into the AI Nexus must be **PQC-Attested**.
 ---
 
 ### Stay Sovereign
- 

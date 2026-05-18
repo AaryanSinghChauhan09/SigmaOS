@@ -50,7 +50,7 @@
                     <div class="terminal-output" id="terminal-output"></div>
                     <div class="terminal-input-line">
                         <span class="term-prompt">sovereign@sigma:~$</span>
-                        <input type="text" class="terminal-input" id="terminal-input" placeholder="Type help..." autofocus autocomplete="off">
+                        <input type="text" class="terminal-input" id="terminal-input" placeholder="Type help..." autofocus autocomplete="off" title="input">
                     </div>
                 </div>
             </div>
@@ -68,12 +68,12 @@
             </div>
             <div class="window-body">
                 <div class="fm-layout">
-                    <div class="fm-toolbar" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                    <div class="fm-toolbar auto-style-1">
                         <div>
                             <button class="fm-btn" onclick="fmBack()">Back</button>
                             <span class="fm-breadcrumbs" id="fm-breadcrumbs">/home/sovereign</span>
                         </div>
-                        <button class="cyber-btn small-btn" onclick="runRepomixPackager()" style="font-size: 0.68rem; padding: 4px 8px; border-radius: 4px; box-shadow: 0 0 10px rgba(0,255,195,0.15);">📦 Repomix Prompt Packager</button>
+                        <button class="cyber-btn small-btn" onclick="runRepomixPackager()" class="auto-style-2">📦 Repomix Prompt Packager</button>
                     </div>
                     <div class="fm-grid" id="fm-grid"></div>
                 </div>
@@ -125,7 +125,7 @@
         </div>
 
         <!-- App: Lattice Settings -->
-        <div class="window" id="lattice-settings-win" class="auto-style-97" style="width: 750px; height: 500px;">
+        <div class="window" id="lattice-settings-win" class="auto-style-97 auto-style-3">
             <div class="window-header">
                 <div class="window-title">⚙️ <span>Lattice System settings</span></div>
                 <div class="window-controls">
@@ -134,18 +134,18 @@
                     <div class="control-dot close" onclick="closeWindow('lattice-settings-win')"></div>
                 </div>
             </div>
-            <div class="window-body" style="padding: 15px;">
-                <div class="settings-layout" style="grid-template-columns: 180px 1fr;">
+            <div class="window-body auto-style-4">
+                <div class="settings-layout auto-style-5">
                     <div class="settings-tabs" id="settings-tabs-list">
                         <div class="settings-tab active" onclick="switchSettingsTab('appearance')">🎨 Appearance</div>
                         <div class="settings-tab" onclick="switchSettingsTab('branches')">⚙️ Sovereign Branches</div>
                         <div class="settings-tab" onclick="switchSettingsTab('profiles')">👤 Work Profiles</div>
                         <div class="settings-tab" onclick="switchSettingsTab('accessibility')">♿ Accessibility & Rollback</div>
                     </div>
-                    <div class="settings-content" id="settings-panes-container" style="overflow-y: auto; max-height: 400px; padding-right: 5px;">
+                    <div class="settings-content" id="settings-panes-container" class="auto-style-6">
                         
                         <!-- Panel 1: Appearance -->
-                        <div class="settings-pane" id="pane-appearance" style="display: block;">
+                        <div class="settings-pane" id="pane-appearance" class="auto-style-7">
                             <div class="settings-group">
                                 <h4>Dynamic Theme Engine</h4>
                                 <div class="theme-selector-grid">
@@ -157,25 +157,25 @@
                             </div>
                             <div class="settings-group">
                                 <h4>System UI parameters</h4>
-                                <div class="form-switch" style="margin-bottom: 10px;">
+                                <div class="form-switch auto-style-8">
                                     <span>Glass Blur Intensity (px)</span>
-                                    <input type="range" min="4" max="40" value="24" oninput="updateGlassBlur(this.value)" style="width: 120px; accent-color: var(--accent-gold);">
+                                    <input type="range" min="4" max="40" value="24" oninput="updateGlassBlur(this.value)" class="auto-style-9" title="Range input" placeholder="input">
                                 </div>
                                 <div class="form-switch">
                                     <span>Accent Color Hue</span>
-                                    <input type="range" min="0" max="360" value="42" oninput="updateAccentHue(this.value)" style="width: 120px; accent-color: var(--accent-gold);">
+                                    <input type="range" min="0" max="360" value="42" oninput="updateAccentHue(this.value)" class="auto-style-10" title="Range input" placeholder="input">
                                 </div>
                             </div>
                         </div>
 
                         <!-- Panel 2: Sovereign Branches (The 12 Branches Switcher!) -->
-                        <div class="settings-pane" id="pane-branches" style="display: none;">
+                        <div class="settings-pane" id="pane-branches" class="auto-style-11">
                             <div class="settings-group">
                                 <h4>Sovereign Branch Simulator</h4>
-                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">
+                                <p class="auto-style-12">
                                     Dynamically swap active kernel modes and architectures across the 12 git-synchronized branches.
                                 </p>
-                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                                <div class="auto-style-13">
                                     <button class="fm-btn" onclick="simulateBranch('main')">🌐 main (Stable Core)</button>
                                     <button class="fm-btn" onclick="simulateBranch('release/standalone')">💾 standalone (Bare-Metal)</button>
                                     <button class="fm-btn" onclick="simulateBranch('release/rtos')">⏱️ rtos (SCHED_SOVEREIGN)</button>
@@ -190,9 +190,9 @@
                                     <button class="fm-btn" onclick="simulateBranch('gh-pages')">📖 gh-pages (Wiki Docs)</button>
                                 </div>
                             </div>
-                            <div class="settings-group" id="branch-status-box" style="border-left: 3px solid var(--accent-gold); padding-left: 10px;">
-                                <h5 style="color: var(--accent-gold); font-size: 0.8rem; text-transform: uppercase;">Active Shard Status</h5>
-                                <div id="branch-status-text" style="font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; color: white;">
+                            <div class="settings-group" id="branch-status-box" class="auto-style-14">
+                                <h5 class="auto-style-15">Active Shard Status</h5>
+                                <div id="branch-status-text" class="auto-style-16">
                                     Branch: main (Active)<br>
                                     Scheduler: CFS-Affinity socket Balancer<br>
                                     IPC state: Default zero-copy messaging
@@ -201,13 +201,13 @@
                         </div>
 
                         <!-- Panel 3: Work Profiles -->
-                        <div class="settings-pane" id="pane-profiles" style="display: none;">
+                        <div class="settings-pane" id="pane-profiles" class="auto-style-17">
                             <div class="settings-group">
                                 <h4>Identity Profile Selector</h4>
-                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">
+                                <p class="auto-style-18">
                                     Switch custom software suite sets and system profiles for special environments.
                                 </p>
-                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                                <div class="auto-style-19">
                                     <button class="fm-btn" onclick="selectWorkspaceProfile('Developer')">💻 Developer Mode</button>
                                     <button class="fm-btn" onclick="selectWorkspaceProfile('Forensic')">🔍 Forensic CLI Audit</button>
                                     <button class="fm-btn" onclick="selectWorkspaceProfile('Gaming')">🎮 Gaming / Turbo</button>
@@ -216,17 +216,17 @@
                             </div>
                             <div class="settings-group">
                                 <h4>Cron-Like automation scheduler</h4>
-                                <div class="form-switch" style="margin-bottom: 10px;">
+                                <div class="form-switch auto-style-20">
                                     <span>Enable Neural Layout Engine</span>
                                     <label class="toggle-switch">
-                                        <input type="checkbox" checked onchange="neural.setMindfulness(this.checked)" title="Enable Neural Layout" aria-label="Enable Neural Layout">
+                                        <input type="checkbox" checked onchange="neural.setMindfulness(this.checked)" title="Enable Neural Layout" aria-label="Enable Neural Layout" placeholder="input">
                                         <span class="slider"></span>
                                     </label>
                                 </div>
                                 <div class="form-switch">
                                     <span>Registry Cron Watchdog</span>
                                     <label class="toggle-switch">
-                                        <input type="checkbox" id="cron-toggle" checked onchange="toggleCronWatchdog(this.checked)" title="Toggle Cron" aria-label="Toggle Cron">
+                                        <input type="checkbox" id="cron-toggle" checked onchange="toggleCronWatchdog(this.checked)" title="Toggle Cron" aria-label="Toggle Cron" placeholder="input">
                                         <span class="slider"></span>
                                     </label>
                                 </div>
@@ -234,37 +234,37 @@
                         </div>
 
                         <!-- Panel 4: Accessibility & Rollback -->
-                        <div class="settings-pane" id="pane-accessibility" style="display: none;">
+                        <div class="settings-pane" id="pane-accessibility" class="auto-style-21">
                             <div class="settings-group">
                                 <h4>Sovereign accessibility Engine</h4>
-                                <div class="form-switch" style="margin-bottom: 10px;">
+                                <div class="form-switch auto-style-22">
                                     <span>High Contrast Mode</span>
                                     <label class="toggle-switch">
-                                        <input type="checkbox" id="high-contrast-toggle" onchange="toggleHighContrast(this.checked)" title="Toggle High Contrast" aria-label="Toggle High Contrast">
+                                        <input type="checkbox" id="high-contrast-toggle" onchange="toggleHighContrast(this.checked)" title="Toggle High Contrast" aria-label="Toggle High Contrast" placeholder="input">
                                         <span class="slider"></span>
                                     </label>
                                 </div>
-                                <div class="form-switch" style="margin-bottom: 10px;">
+                                <div class="form-switch auto-style-23">
                                     <span>Text Screen Reader Voice</span>
                                     <label class="toggle-switch">
-                                        <input type="checkbox" id="screen-reader-toggle" onchange="toggleScreenReader(this.checked)" title="Toggle Screen Reader" aria-label="Toggle Screen Reader">
+                                        <input type="checkbox" id="screen-reader-toggle" onchange="toggleScreenReader(this.checked)" title="Toggle Screen Reader" aria-label="Toggle Screen Reader" placeholder="input">
                                         <span class="slider"></span>
                                     </label>
                                 </div>
                             </div>
                             <div class="settings-group">
                                 <h4>RescueZilla Snapshot Recovery</h4>
-                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">
+                                <p class="auto-style-24">
                                     Capture or roll back running system configurations instantly using the atomic VFS snapshot registers.
                                 </p>
-                                <div style="display: flex; gap: 8px;">
-                                    <input type="text" id="snap-name" class="cmd-input" placeholder="Snapshot label..." style="height: 35px; font-size: 0.8rem;">
-                                    <button class="wizard-btn" onclick="createSnapshot()" style="padding: 5px 15px; font-size: 0.8rem; height: 35px; white-space: nowrap;">CAPTURE SNAP</button>
+                                <div class="auto-style-25">
+                                    <input type="text" id="snap-name" class="cmd-input" placeholder="Snapshot label..." class="auto-style-26" title="input">
+                                    <button class="wizard-btn" onclick="createSnapshot()" class="auto-style-27">CAPTURE SNAP</button>
                                 </div>
-                                <ul id="snapshot-list" style="margin-top: 10px; font-size: 0.75rem; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 5px;">
-                                    <li class="routine-item routine-border-cyan" style="display: flex; justify-content: space-between; align-items: center; padding: 5px 8px; background: rgba(255,255,255,0.02); border-radius: 4px; border-left: 2px solid var(--accent-gold);">
+                                <ul id="snapshot-list" class="auto-style-28">
+                                    <li class="routine-item routine-border-cyan auto-style-29">
                                         <strong>Default_Restore_Point</strong> (System)
-                                        <button class="cyber-btn small-btn" onclick="atomicSwap('Default_Restore_Point')" style="padding: 2px 8px; font-size: 0.7rem;">ROLLBACK</button>
+                                        <button class="cyber-btn small-btn" onclick="atomicSwap('Default_Restore_Point')" class="auto-style-30">ROLLBACK</button>
                                     </li>
                                 </ul>
                             </div>
@@ -276,7 +276,7 @@
         </div>
 
         <!-- App: Sovereign Developer Workspace (Utility Nexus & DevKit) -->
-        <div class="window" id="utility-nexus-win" style="width: 820px; height: 580px; display: none;">
+        <div class="window" id="utility-nexus-win" class="auto-style-31">
             <div class="window-header">
                 <div class="window-title">🔧 <span>Sovereign Developer Workspace</span></div>
                 <div class="window-controls">
@@ -287,77 +287,77 @@
             </div>
             
             <!-- DevTab Navigation Bar -->
-            <div style="display: flex; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border-glass); padding: 5px 15px; gap: 8px; z-index: 10; overflow-x: auto; white-space: nowrap;">
-                <button class="fm-btn" id="dev-tab-compliance-btn" onclick="switchDevPane('compliance')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px; background: rgba(255,255,255,0.05); color: var(--accent-gold);">⚖️ Compliance & GST</button>
-                <button class="fm-btn" id="dev-tab-hoppscotch-btn" onclick="switchDevPane('hoppscotch')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px;">🔌 Hoppscotch REST & httpie</button>
-                <button class="fm-btn" id="dev-tab-toys-btn" onclick="switchDevPane('toys')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px;">🛠️ DevToys swiss-army-knife</button>
-                <button class="fm-btn" id="dev-tab-docs-btn" onclick="switchDevPane('docs')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px;">📚 API offline Zeal docs</button>
+            <div class="auto-style-32">
+                <button class="fm-btn" id="dev-tab-compliance-btn" onclick="switchDevPane('compliance')" class="auto-style-33">⚖️ Compliance & GST</button>
+                <button class="fm-btn" id="dev-tab-hoppscotch-btn" onclick="switchDevPane('hoppscotch')" class="auto-style-34">🔌 Hoppscotch REST & httpie</button>
+                <button class="fm-btn" id="dev-tab-toys-btn" onclick="switchDevPane('toys')" class="auto-style-35">🛠️ DevToys swiss-army-knife</button>
+                <button class="fm-btn" id="dev-tab-docs-btn" onclick="switchDevPane('docs')" class="auto-style-36">📚 API offline Zeal docs</button>
             </div>
 
-            <div class="window-body" style="padding: 15px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; background: var(--bg-dark); height: calc(100% - 85px);">
+            <div class="window-body auto-style-37">
                 
                 <!-- Pane 1: Compliance & Calculators -->
-                <div class="dev-workspace-pane" id="dev-pane-compliance" style="display: flex; flex-direction: column; gap: 12px;">
-                    <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 15px;">
-                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                <div class="dev-workspace-pane" id="dev-pane-compliance" class="auto-style-38">
+                    <div class="auto-style-39">
+                        <div class="settings-pane auto-style-40">
                             <div class="settings-group">
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">Zero-Loss paise GST Calculator</h4>
-                                <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 8px; margin-bottom: 8px;">
-                                    <input type="number" id="gst-amount" class="cmd-input" placeholder="Amount (in paise)" style="height: 35px; font-size: 0.8rem;">
-                                    <input type="number" id="gst-rate" class="cmd-input" placeholder="GST Rate %" style="height: 35px; font-size: 0.8rem;">
+                                <h4 class="auto-style-41">Zero-Loss paise GST Calculator</h4>
+                                <div class="auto-style-42">
+                                    <input type="number" id="gst-amount" class="cmd-input" placeholder="Amount (in paise)" class="auto-style-43" title="input">
+                                    <input type="number" id="gst-rate" class="cmd-input" placeholder="GST Rate %" class="auto-style-44" title="input">
                                 </div>
                                 <button class="wizard-btn" onclick="calculateGST()">COMPUTE GST</button>
-                                <div id="gst-result" style="margin-top: 8px; font-size: 0.75rem; color: var(--accent-gold); font-family: monospace;">> Result: Ready</div>
+                                <div id="gst-result" class="auto-style-45">> Result: Ready</div>
                             </div>
                         </div>
-                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
-                            <div class="settings-group" style="flex: 1;">
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">BNS Legal Complier</h4>
-                                <input type="text" id="legal-query" class="cmd-input" placeholder="Search BNS section..." style="margin-bottom: 8px; height: 35px; font-size: 0.8rem;">
+                        <div class="settings-pane auto-style-46">
+                            <div class="settings-group auto-style-47">
+                                <h4 class="auto-style-48">BNS Legal Complier</h4>
+                                <input type="text" id="legal-query" class="cmd-input" placeholder="Search BNS section..." class="auto-style-49" title="input">
                                 <button class="wizard-btn" onclick="checkLegalCompliance()">MAP COMPLIANCE</button>
-                                <div id="legal-result" style="margin-top: 8px; font-size: 0.75rem; color: var(--accent-gold); font-family: monospace;">> Mapping Status: Active</div>
+                                <div id="legal-result" class="auto-style-50">> Mapping Status: Active</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Pane 2: Hoppscotch API Client & httpie -->
-                <div class="dev-workspace-pane" id="dev-pane-hoppscotch" style="display: none; flex-direction: column; gap: 12px;">
-                    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px;">
+                <div class="dev-workspace-pane" id="dev-pane-hoppscotch" class="auto-style-51">
+                    <div class="auto-style-52">
                         
-                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="settings-pane auto-style-53">
                             <div class="settings-group">
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🔌 Hoppscotch REST API tool</h4>
-                                <div style="display: flex; gap: 6px; margin-bottom: 8px;">
-                                    <select id="hop-method" class="cmd-input" style="width: 80px; height: 35px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                                <h4 class="auto-style-54">🔌 Hoppscotch REST API tool</h4>
+                                <div class="auto-style-55">
+                                    <select id="hop-method" class="cmd-input auto-style-56" title="input">
                                         <option value="GET">GET</option>
                                         <option value="POST" selected>POST</option>
                                         <option value="PUT">PUT</option>
                                         <option value="DELETE">DELETE</option>
                                     </select>
-                                    <input type="text" id="hop-url" class="cmd-input" value="api.sigmaos.internal/v1/attest" style="flex: 1; height: 35px; font-size: 0.8rem;">
+                                    <input type="text" id="hop-url" class="cmd-input" value="api.sigmaos.internal/v1/attest" class="auto-style-57" title="input" placeholder="input">
                                 </div>
-                                <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px;">
-                                    <span style="font-size: 0.7rem; color: var(--text-muted);">Request Headers</span>
-                                    <input type="text" id="hop-headers" class="cmd-input" value="Content-Type: application/json, X-PQC-Attestation: Dilithium-5" style="height: 32px; font-size: 0.75rem;">
+                                <div class="auto-style-58">
+                                    <span class="auto-style-59">Request Headers</span>
+                                    <input type="text" id="hop-headers" class="cmd-input" value="Content-Type: application/json, X-PQC-Attestation: Dilithium-5" class="auto-style-60" title="input" placeholder="input">
                                 </div>
-                                <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px;">
-                                    <span style="font-size: 0.7rem; color: var(--text-muted);">Request Body (JSON)</span>
-                                    <textarea id="hop-body" class="cmd-input" style="width: 100%; height: 50px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass); padding: 6px; font-family: monospace; font-size: 0.72rem; resize: none;">{"payload": "attest-sovereign-kernel-swaps"}</textarea>
+                                <div class="auto-style-61">
+                                    <span class="auto-style-62">Request Body (JSON)</span>
+                                    <textarea id="hop-body" class="cmd-input auto-style-63" title="input" placeholder="input">{"payload": "attest-sovereign-kernel-swaps"}</textarea>
                                 </div>
                                 <button class="wizard-btn" onclick="sendHoppRequest()">SEND HTTP REQUEST</button>
                             </div>
                         </div>
 
-                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
-                            <div class="settings-group" style="flex: 1; display: flex; flex-direction: column;">
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">httpie Snippet & Response</h4>
-                                <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px;">equivalent httpie CLI Command:</div>
-                                <div id="hop-httpie-snippet" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-glass); padding: 6px; font-family: monospace; font-size: 0.7rem; color: var(--accent-gold); border-radius: 4px; margin-bottom: 8px; white-space: nowrap; overflow-x: auto;">
+                        <div class="settings-pane auto-style-64">
+                            <div class="settings-group auto-style-65">
+                                <h4 class="auto-style-66">httpie Snippet & Response</h4>
+                                <div class="auto-style-67">equivalent httpie CLI Command:</div>
+                                <div id="hop-httpie-snippet" class="auto-style-68">
                                     http POST api.sigmaos.internal/v1/attest payload=attest-sovereign-kernel-swaps
                                 </div>
-                                <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px;">Response Body:</div>
-                                <div id="hop-response-body" style="flex: 1; background: #000; border: 1px solid var(--border-glass); border-radius: 4px; padding: 8px; font-family: monospace; font-size: 0.7rem; overflow-y: auto; color: #4af626; line-height: 1.4; min-height: 100px;">
+                                <div class="auto-style-69">Response Body:</div>
+                                <div id="hop-response-body" class="auto-style-70">
                                     Status: 200 OK<br>
                                     Time: 1.25ms<br>
                                     Payload attestation passed!
@@ -369,16 +369,16 @@
                 </div>
 
                 <!-- Pane 3: DevToys swiss-army-knife -->
-                <div class="dev-workspace-pane" id="dev-pane-toys" style="display: none; flex-direction: column; gap: 12px;">
-                    <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 15px;">
+                <div class="dev-workspace-pane" id="dev-pane-toys" class="auto-style-71">
+                    <div class="auto-style-72">
                         
-                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="settings-pane auto-style-73">
                             <div class="settings-group">
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🛠️ Swiss Army Knife DevTools</h4>
-                                <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 8px;">
+                                <h4 class="auto-style-74">🛠️ Swiss Army Knife DevTools</h4>
+                                <div class="auto-style-75">
                                     <div>
-                                        <span style="font-size: 0.7rem; color: var(--text-muted);">Conversion Target</span>
-                                        <select id="toy-action-select" class="cmd-input" style="width: 100%; height: 35px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);" onchange="updateToyFields()">
+                                        <span class="auto-style-76">Conversion Target</span>
+                                        <select id="toy-action-select" class="cmd-input auto-style-77" onchange="updateToyFields()" title="input">
                                             <option value="json-yaml">JSON ➡️ YAML Converter</option>
                                             <option value="base64">Base64 Encoder / Decoder</option>
                                             <option value="cron">Cron Schedule Expression Generator</option>
@@ -386,18 +386,18 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px;">
-                                    <span id="toy-input-label" style="font-size: 0.7rem; color: var(--text-muted);">JSON Input String</span>
-                                    <textarea id="toy-input-data" class="cmd-input" style="width: 100%; height: 75px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass); padding: 6px; font-family: monospace; font-size: 0.72rem; resize: none;">{"title": "SigmaOS", "version": 15.2}</textarea>
+                                <div class="auto-style-78">
+                                    <span id="toy-input-label" class="auto-style-79">JSON Input String</span>
+                                    <textarea id="toy-input-data" class="cmd-input auto-style-80" title="input" placeholder="input">{"title": "SigmaOS", "version": 15.2}</textarea>
                                 </div>
                                 <button class="wizard-btn" onclick="executeToyUtility()">CONVERT / GENERATE</button>
                             </div>
                         </div>
 
-                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
-                            <div class="settings-group" style="flex: 1; display: flex; flex-direction: column;">
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">Processed Output Preview</h4>
-                                <div id="toy-output-preview" style="flex: 1; background: #000; border: 1px solid var(--border-glass); border-radius: 4px; padding: 8px; font-family: monospace; font-size: 0.7rem; overflow-y: auto; color: #ff00ff; line-height: 1.4; min-height: 140px;">
+                        <div class="settings-pane auto-style-81">
+                            <div class="settings-group auto-style-82">
+                                <h4 class="auto-style-83">Processed Output Preview</h4>
+                                <div id="toy-output-preview" class="auto-style-84">
                                     title: SigmaOS<br>
                                     version: 15.2
                                 </div>
@@ -408,34 +408,34 @@
                 </div>
 
                 <!-- Pane 4: Zeal / DevDocs offline documentation browser -->
-                <div class="dev-workspace-pane" id="dev-pane-docs" style="display: none; flex-direction: column; gap: 12px;">
-                    <div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 15px;">
+                <div class="dev-workspace-pane" id="dev-pane-docs" class="auto-style-85">
+                    <div class="auto-style-86">
                         
-                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="settings-pane auto-style-87">
                             <div class="settings-group">
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">📚 offline API browser (Zeal style)</h4>
-                                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
-                                    <span style="font-size: 0.7rem; color: var(--text-muted);">Framework / Language Docset</span>
-                                    <select id="docset-select" class="cmd-input" style="width: 100%; height: 35px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                                <h4 class="auto-style-88">📚 offline API browser (Zeal style)</h4>
+                                <div class="auto-style-89">
+                                    <span class="auto-style-90">Framework / Language Docset</span>
+                                    <select id="docset-select" class="cmd-input auto-style-91" title="input">
                                         <option value="cpp">C++ STL Sovereign standard</option>
                                         <option value="vulkan">SovereignVulkanLayer APIs</option>
                                         <option value="js">Javascript ES17 web runtime</option>
                                     </select>
                                 </div>
-                                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
-                                    <span style="font-size: 0.7rem; color: var(--text-muted);">Documentation Search Query</span>
-                                    <input type="text" id="docset-query" class="cmd-input" value="std::atomic" style="height: 35px; font-size: 0.8rem;">
+                                <div class="auto-style-92">
+                                    <span class="auto-style-93">Documentation Search Query</span>
+                                    <input type="text" id="docset-query" class="cmd-input" value="std::atomic" class="auto-style-94" title="input" placeholder="input">
                                 </div>
                                 <button class="wizard-btn" onclick="searchZealOfflineDocs()">SEARCH OFFLINE DOCS</button>
                             </div>
                         </div>
 
-                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
-                            <div class="settings-group" style="flex: 1; display: flex; flex-direction: column;">
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">API Documentation Entry</h4>
-                                <div id="docset-preview" style="flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); border-radius: 4px; padding: 10px; font-size: 0.72rem; overflow-y: auto; line-height: 1.4;">
-                                    <strong style="font-size: 0.85rem; color: #00ffc3;">std::atomic (C++11 STL)</strong><br>
-                                    <code style="background: rgba(0,0,0,0.5); padding: 2px 4px; border-radius: 2px; color: #ff00ff; display: block; margin: 6px 0;">template&lt;class T&gt; struct atomic;</code>
+                        <div class="settings-pane auto-style-95">
+                            <div class="settings-group auto-style-96">
+                                <h4 class="auto-style-97">API Documentation Entry</h4>
+                                <div id="docset-preview" class="auto-style-98">
+                                    <strong class="auto-style-99">std::atomic (C++11 STL)</strong><br>
+                                    <code class="auto-style-100">template&lt;class T&gt; struct atomic;</code>
                                     Each instantiation and specialization of std::atomic defines an atomic type. 
                                     Guarantees lock-free thread safety direct to CPU silicon pipelines without OS priority inversions.
                                 </div>
@@ -565,7 +565,7 @@
         </div>
 
         <!-- App: AI/ML Studio & Multi-Agent Orchestrator -->
-        <div class="window" id="sigma-ai-studio-win" style="width: 840px; height: 620px; display: none;">
+        <div class="window" id="sigma-ai-studio-win" class="auto-style-101">
             <div class="window-header">
                 <div class="window-title">🤖 <span>Sovereign AI/ML Studio</span></div>
                 <div class="window-controls">
@@ -576,44 +576,44 @@
             </div>
             
             <!-- Tab Navigation Bar -->
-            <div style="display: flex; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border-glass); padding: 5px 15px; gap: 8px; z-index: 10; overflow-x: auto; white-space: nowrap;">
-                <button class="fm-btn" id="ai-tab-tuner-btn" onclick="switchAIPane('tuner')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px; background: rgba(255,255,255,0.05); color: var(--accent-gold);">🏋️ LlamaFactory Tuner</button>
-                <button class="fm-btn" id="ai-tab-mcp-btn" onclick="switchAIPane('mcp')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px;">🔌 Awesome-MCP Gateway</button>
-                <button class="fm-btn" id="ai-tab-nodes-btn" onclick="switchAIPane('nodes')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px;">🧬 n8n Workflow Nodes</button>
-                <button class="fm-btn" id="ai-tab-memory-btn" onclick="switchAIPane('memory')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px;">💾 Letta Memory & Voice</button>
-                <button class="fm-btn" id="ai-tab-claudecam-btn" onclick="switchAIPane('claudecam')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px;">💻 ClaudeCode & Cam</button>
-                <button class="fm-btn" id="ai-tab-swe-btn" onclick="switchAIPane('swe')" style="padding: 6px 10px; font-size: 0.72rem; border-radius: 4px;">🤖 SWE-Agent & Marimo</button>
+            <div class="auto-style-102">
+                <button class="fm-btn" id="ai-tab-tuner-btn" onclick="switchAIPane('tuner')" class="auto-style-103">🏋️ LlamaFactory Tuner</button>
+                <button class="fm-btn" id="ai-tab-mcp-btn" onclick="switchAIPane('mcp')" class="auto-style-104">🔌 Awesome-MCP Gateway</button>
+                <button class="fm-btn" id="ai-tab-nodes-btn" onclick="switchAIPane('nodes')" class="auto-style-105">🧬 n8n Workflow Nodes</button>
+                <button class="fm-btn" id="ai-tab-memory-btn" onclick="switchAIPane('memory')" class="auto-style-106">💾 Letta Memory & Voice</button>
+                <button class="fm-btn" id="ai-tab-claudecam-btn" onclick="switchAIPane('claudecam')" class="auto-style-107">💻 ClaudeCode & Cam</button>
+                <button class="fm-btn" id="ai-tab-swe-btn" onclick="switchAIPane('swe')" class="auto-style-108">🤖 SWE-Agent & Marimo</button>
             </div>
 
-            <div class="window-body" style="padding: 15px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; background: var(--bg-dark); height: calc(100% - 85px);">
+            <div class="window-body auto-style-109">
                 
                 <!-- Pane 1: LlamaFactory Fine-Tuner -->
-                <div class="ai-studio-pane" id="ai-pane-tuner" style="display: flex; flex-direction: column; gap: 12px;">
-                    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px;">
+                <div class="ai-studio-pane" id="ai-pane-tuner" class="auto-style-110">
+                    <div class="auto-style-111">
                         
                         <!-- Tuner Parameter Matrix -->
-                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="settings-pane auto-style-112">
                             <div class="settings-group">
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🧠 Select LLM Base Architecture</h4>
-                                <select id="ml-model-select" class="cmd-input" style="width: 100%; height: 35px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);" onchange="updateModelInfo()">
+                                <h4 class="auto-style-113">🧠 Select LLM Base Architecture</h4>
+                                <select id="ml-model-select" class="cmd-input auto-style-114" onchange="updateModelInfo()" title="input">
                                     <option value="0">AI21 Jamba 1.5 Large (398B params, 256K Context)</option>
                                     <option value="1">Microsoft Phi-4 Reasoning (Open-Weight)</option>
                                     <option value="2">OpenAI gpt-oss-120b (Open-Source Release)</option>
                                     <option value="3">OpenAI o3 Advanced Reasoning (High-Efficiency)</option>
                                     <option value="4">OpenAI gpt-5-nano (Low-Latency Silicon Edge)</option>
                                 </select>
-                                <div id="ml-model-info" style="margin-top: 8px; font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; padding: 8px; background: rgba(255,255,255,0.02); border-radius: 4px;">
+                                <div id="ml-model-info" class="auto-style-115">
                                     Type: Hybrid Transformer-Mamba<br>
                                     Features: 256K Context Window, Structured Output Support
                                 </div>
                             </div>
 
                             <div class="settings-group">
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🔧 LlamaFactory QLoRA Hyperparameters</h4>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                                <h4 class="auto-style-116">🔧 LlamaFactory QLoRA Hyperparameters</h4>
+                                <div class="auto-style-117">
                                     <div>
-                                        <span style="font-size: 0.7rem; color: var(--text-muted);">LoRA Rank (r)</span>
-                                        <select id="ml-qlora-rank" class="cmd-input" style="width: 100%; height: 32px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                                        <span class="auto-style-118">LoRA Rank (r)</span>
+                                        <select id="ml-qlora-rank" class="cmd-input auto-style-119" title="input">
                                             <option value="8">Rank 8</option>
                                             <option value="16" selected>Rank 16</option>
                                             <option value="32">Rank 32</option>
@@ -621,71 +621,71 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <span style="font-size: 0.7rem; color: var(--text-muted);">LoRA Alpha (α)</span>
-                                        <select id="ml-qlora-alpha" class="cmd-input" style="width: 100%; height: 32px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                                        <span class="auto-style-120">LoRA Alpha (α)</span>
+                                        <select id="ml-qlora-alpha" class="cmd-input auto-style-121" title="input">
                                             <option value="16">Alpha 16</option>
                                             <option value="32" selected>Alpha 32</option>
                                             <option value="64">Alpha 64</option>
                                         </select>
                                     </div>
                                 </div>
-                                <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 8px; margin-bottom: 8px;">
+                                <div class="auto-style-122">
                                     <div>
-                                        <span style="font-size: 0.7rem; color: var(--text-muted);">Dropout</span>
-                                        <input type="number" id="ml-qlora-dropout" class="cmd-input" value="0.05" step="0.01" style="height: 32px; font-size: 0.8rem;">
+                                        <span class="auto-style-123">Dropout</span>
+                                        <input type="number" id="ml-qlora-dropout" class="cmd-input" value="0.05" step="0.01" class="auto-style-124" title="input" placeholder="input">
                                     </div>
                                     <div>
-                                        <span style="font-size: 0.7rem; color: var(--text-muted);">Target Modules</span>
-                                        <input type="text" id="ml-qlora-targets" class="cmd-input" value="q_proj,v_proj" style="height: 32px; font-size: 0.8rem;">
+                                        <span class="auto-style-125">Target Modules</span>
+                                        <input type="text" id="ml-qlora-targets" class="cmd-input" value="q_proj,v_proj" class="auto-style-126" title="input" placeholder="input">
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Dataset, SFT Trigger and Embeddings -->
-                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="settings-pane auto-style-127">
                             <div class="settings-group">
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🏋️ Fine-Tuning Execution</h4>
-                                <select id="ml-dataset" class="cmd-input" style="width: 100%; height: 35px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass); margin-bottom: 8px;">
+                                <h4 class="auto-style-128">🏋️ Fine-Tuning Execution</h4>
+                                <select id="ml-dataset" class="cmd-input auto-style-129" title="input">
                                     <option value="syslogs">Sovereign Lattice System Logs</option>
                                     <option value="bns">BNS Court Case Matrix</option>
                                     <option value="gst">Indian GST Ledger Accounts</option>
                                     <option value="metadata">S-OverlayFS Node Metadata</option>
                                 </select>
-                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; margin-bottom: 8px;">
+                                <div class="auto-style-130">
                                     <span>Training Epochs: <strong id="epoch-val">3</strong></span>
-                                    <input type="range" id="ml-epochs" min="1" max="10" value="3" style="width: 120px;" oninput="document.getElementById('epoch-val').innerText = this.value">
+                                    <input type="range" id="ml-epochs" min="1" max="10" value="3" class="auto-style-131" oninput="document.getElementById('epoch-val').innerText = this.value" title="Range input" placeholder="input">
                                 </div>
                                 <button class="wizard-btn" onclick="startMFTraining()">START ATTESTED FINE-TUNING</button>
                                 
-                                <div id="ml-progress-container" style="display: none; margin-top: 10px;">
-                                    <div style="display: flex; justify-content: space-between; font-size: 0.7rem; margin-bottom: 4px;">
+                                <div id="ml-progress-container" class="auto-style-132">
+                                    <div class="auto-style-133">
                                         <span id="ml-progress-status">Training model...</span>
                                         <span id="ml-progress-pct">0%</span>
                                     </div>
-                                    <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden;">
-                                        <div id="ml-progress-bar" style="width: 0%; height: 100%; background: var(--accent-gold); transition: width 0.1s linear;"></div>
+                                    <div class="auto-style-134">
+                                        <div id="ml-progress-bar" class="auto-style-135"></div>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="settings-group">
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🧮 RAG Flow Cosine Similarity Indexer</h4>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                                <h4 class="auto-style-136">🧮 RAG Flow Cosine Similarity Indexer</h4>
+                                <div class="auto-style-137">
                                     <div>
-                                        <span style="font-size: 0.7rem; color: var(--text-muted);">Chunk Size</span>
-                                        <input type="number" id="ml-rag-chunk" class="cmd-input" value="512" style="height: 32px; font-size: 0.8rem;">
+                                        <span class="auto-style-138">Chunk Size</span>
+                                        <input type="number" id="ml-rag-chunk" class="cmd-input" value="512" class="auto-style-139" title="input" placeholder="input">
                                     </div>
                                     <div>
-                                        <span style="font-size: 0.7rem; color: var(--text-muted);">Overlap</span>
-                                        <input type="number" id="ml-rag-overlap" class="cmd-input" value="64" style="height: 32px; font-size: 0.8rem;">
+                                        <span class="auto-style-140">Overlap</span>
+                                        <input type="number" id="ml-rag-overlap" class="cmd-input" value="64" class="auto-style-141" title="input" placeholder="input">
                                     </div>
                                 </div>
-                                <div style="display: flex; gap: 8px;">
-                                    <input type="text" id="ml-embed-text" class="cmd-input" placeholder="Type text to RAG chunk..." style="font-size: 0.8rem; height: 35px;">
-                                    <button class="wizard-btn" onclick="generateMLEmbedding()" style="white-space: nowrap; height: 35px; padding: 0 12px; font-size: 0.75rem;">PARSE BLOCK</button>
+                                <div class="auto-style-142">
+                                    <input type="text" id="ml-embed-text" class="cmd-input" placeholder="Type text to RAG chunk..." class="auto-style-143" title="input">
+                                    <button class="wizard-btn" onclick="generateMLEmbedding()" class="auto-style-144">PARSE BLOCK</button>
                                 </div>
-                                <div id="ml-embed-result" style="margin-top: 8px; font-size: 0.7rem; color: var(--accent-gold); font-family: monospace;">
+                                <div id="ml-embed-result" class="auto-style-145">
                                     > Vector Space Ready.
                                 </div>
                             </div>
@@ -695,73 +695,73 @@
                 </div>
 
                 <!-- Pane 2: Awesome-MCP Server Gateway -->
-                <div class="ai-studio-pane" id="ai-pane-mcp" style="display: none; flex-direction: column; gap: 12px;">
-                    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px;">
+                <div class="ai-studio-pane" id="ai-pane-mcp" class="auto-style-146">
+                    <div class="auto-style-147">
                         
                         <!-- MCP Servers Catalog -->
-                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="settings-pane auto-style-148">
                             <div class="settings-group">
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🔌 Registered MCP Servers (Model Context Protocol)</h4>
-                                <ul id="mcp-servers-list" style="list-style: none; padding-left: 0; display: flex; flex-direction: column; gap: 6px;">
-                                    <li style="font-size: 0.75rem; padding: 6px 10px; background: rgba(255,255,255,0.02); border-left: 2px solid var(--accent-gold); border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+                                <h4 class="auto-style-149">🔌 Registered MCP Servers (Model Context Protocol)</h4>
+                                <ul id="mcp-servers-list" class="auto-style-150">
+                                    <li class="auto-style-151">
                                         <div>
                                             <strong>📂 SovereignVFS Explorer</strong><br>
-                                            <span style="font-size: 0.65rem; color: var(--text-muted);">Host: 127.0.0.1:8081 | Protocol: SSE</span>
+                                            <span class="auto-style-152">Host: 127.0.0.1:8081 | Protocol: SSE</span>
                                         </div>
-                                        <span class="status-success" style="font-size: 0.65rem;">CONNECTED</span>
+                                        <span class="status-success auto-style-153">CONNECTED</span>
                                     </li>
-                                    <li style="font-size: 0.75rem; padding: 6px 10px; background: rgba(255,255,255,0.02); border-left: 2px solid var(--accent-gold); border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+                                    <li class="auto-style-154">
                                         <div>
                                             <strong>📊 Netdata Telemetry Monitor</strong><br>
-                                            <span style="font-size: 0.65rem; color: var(--text-muted);">Host: 127.0.0.1:19999 | Protocol: stdio</span>
+                                            <span class="auto-style-155">Host: 127.0.0.1:19999 | Protocol: stdio</span>
                                         </div>
-                                        <span class="status-success" style="font-size: 0.65rem;">CONNECTED</span>
+                                        <span class="status-success auto-style-156">CONNECTED</span>
                                     </li>
-                                    <li style="font-size: 0.75rem; padding: 6px 10px; background: rgba(255,255,255,0.02); border-left: 2px solid var(--border-glass); border-radius: 4px; display: flex; justify-content: space-between; align-items: center; opacity: 0.7;">
+                                    <li class="auto-style-157">
                                         <div>
                                             <strong>⚖️ BNS Legal Compliance Complier</strong><br>
-                                            <span style="font-size: 0.65rem; color: var(--text-muted);">Host: 127.0.0.1:8082 | Protocol: stdio</span>
+                                            <span class="auto-style-158">Host: 127.0.0.1:8082 | Protocol: stdio</span>
                                         </div>
-                                        <button class="cyber-btn small-btn" onclick="addLog('Σ [MCP]: Connecting to BNS Complier MCP...', 'warning')" style="font-size: 0.65rem; padding: 2px 6px;">CONNECT</button>
+                                        <button class="cyber-btn small-btn" onclick="addLog('Σ [MCP]: Connecting to BNS Complier MCP...', 'warning')" class="auto-style-159">CONNECT</button>
                                     </li>
                                 </ul>
                             </div>
                             
                             <div class="settings-group">
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🤖 AutoGPT Agent Registrar</h4>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
-                                    <input type="text" id="ml-agent-name" class="cmd-input" placeholder="Agent Name..." style="font-size: 0.8rem; height: 35px;">
-                                    <input type="text" id="ml-agent-role" class="cmd-input" placeholder="Agent Role..." style="font-size: 0.8rem; height: 35px;">
+                                <h4 class="auto-style-160">🤖 AutoGPT Agent Registrar</h4>
+                                <div class="auto-style-161">
+                                    <input type="text" id="ml-agent-name" class="cmd-input" placeholder="Agent Name..." class="auto-style-162" title="input">
+                                    <input type="text" id="ml-agent-role" class="cmd-input" placeholder="Agent Role..." class="auto-style-163" title="input">
                                 </div>
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <select id="ml-agent-depth" class="cmd-input" style="width: 140px; height: 35px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                                <div class="auto-style-164">
+                                    <select id="ml-agent-depth" class="cmd-input auto-style-165" title="input">
                                         <option value="1">Depth 1 (Fast)</option>
                                         <option value="3">Depth 3 (Balanced)</option>
                                         <option value="5">Depth 5 (Rigorous)</option>
                                     </select>
-                                    <button class="wizard-btn" onclick="registerMLAgent()" style="height: 35px; padding: 0 15px; font-size: 0.8rem;">SPAWN AGENT</button>
+                                    <button class="wizard-btn" onclick="registerMLAgent()" class="auto-style-166">SPAWN AGENT</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- OWL Multi-Agent Console -->
-                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="settings-pane auto-style-167">
                             <div class="settings-group">
-                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px;">Spawned Agents:</div>
-                                <ul id="ml-agent-list" style="list-style: none; padding-left: 0; display: flex; flex-direction: column; gap: 4px; max-height: 90px; overflow-y: auto;">
-                                    <li style="font-size: 0.7rem; padding: 4px 8px; background: rgba(255,255,255,0.01); border-left: 2px solid var(--accent-gold); display: flex; justify-content: space-between;">
+                                <div class="auto-style-168">Spawned Agents:</div>
+                                <ul id="ml-agent-list" class="auto-style-169">
+                                    <li class="auto-style-170">
                                         <span>🧠 <strong>CoreAgent</strong> (Scheduler Optimization)</span>
-                                        <span style="color: var(--text-muted);">Depth 5</span>
+                                        <span class="auto-style-171">Depth 5</span>
                                     </li>
                                 </ul>
                             </div>
 
-                            <div class="settings-group" style="flex: 1; display: flex; flex-direction: column; min-height: 200px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                    <h4 style="color: var(--accent-gold);">🦉 OWL Multi-Agent Cooperation</h4>
-                                    <button class="cyber-btn small-btn" onclick="runOWLCooperation()" style="font-size: 0.75rem; padding: 4px 12px;">EXECUTE COOPERATION</button>
+                            <div class="settings-group auto-style-172">
+                                <div class="auto-style-173">
+                                    <h4 class="auto-style-174">🦉 OWL Multi-Agent Cooperation</h4>
+                                    <button class="cyber-btn small-btn" onclick="runOWLCooperation()" class="auto-style-175">EXECUTE COOPERATION</button>
                                 </div>
-                                <div id="ml-console" style="flex: 1; background: #000; border: 1px solid var(--border-glass); border-radius: 4px; padding: 8px; font-family: monospace; font-size: 0.7rem; overflow-y: auto; color: #4af626; line-height: 1.4;">
+                                <div id="ml-console" class="auto-style-176">
                                     [OWL] Proxy server listening on MCP port 8080...<br>
                                     [OWL] Waiting for cooperation trigger.
                                 </div>
@@ -772,117 +772,117 @@
                 </div>
 
                 <!-- Pane 3: n8n Node-Based Workflow Simulator -->
-                <div class="ai-studio-pane" id="ai-pane-nodes" style="display: none; flex-direction: column; gap: 12px; height: 100%;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 0.75rem; color: var(--text-muted);">Construct autonomous automation pipelines with linked nodes (n8n/Dify/ComfyUI style).</span>
-                        <button class="wizard-btn" onclick="executeWorkflowNodes()" style="padding: 5px 15px; font-size: 0.75rem;">RUN WORKFLOW ENGINE</button>
+                <div class="ai-studio-pane" id="ai-pane-nodes" class="auto-style-177">
+                    <div class="auto-style-178">
+                        <span class="auto-style-179">Construct autonomous automation pipelines with linked nodes (n8n/Dify/ComfyUI style).</span>
+                        <button class="wizard-btn" onclick="executeWorkflowNodes()" class="auto-style-180">RUN WORKFLOW ENGINE</button>
                     </div>
 
                     <!-- Workflow Visual Arena -->
-                    <div style="flex: 1; min-height: 300px; background: rgba(0,0,0,0.6); border: 1px dashed var(--border-glass); border-radius: 6px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 20px;">
+                    <div class="auto-style-181">
                         
                         <!-- Grid Lines overlay -->
-                        <div style="position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 20px 20px;"></div>
+                        <div class="auto-style-182"></div>
 
                         <!-- Node 1: Trigger -->
-                        <div class="routine-item routine-border-cyan" style="z-index: 2; width: 140px; background: rgba(10,15,20,0.9); border-radius: 6px; padding: 8px; font-size: 0.7rem; position: relative;">
-                            <div style="font-weight: bold; margin-bottom: 5px; color: #00ffc3;">🔔 Webhook Trigger</div>
-                            <div style="color: var(--text-muted); font-size: 0.65rem;">Rule: CPU > 85%</div>
+                        <div class="routine-item routine-border-cyan auto-style-183">
+                            <div class="auto-style-184">🔔 Webhook Trigger</div>
+                            <div class="auto-style-185">Rule: CPU > 85%</div>
                             <!-- Connector dot -->
-                            <div style="width: 8px; height: 8px; border-radius: 4px; background: #00ffc3; position: absolute; right: -4px; top: 50%; transform: translateY(-50%);"></div>
+                            <div class="auto-style-186"></div>
                         </div>
 
                         <!-- Arrow/Line 1 -->
-                        <div id="flow-line-1" style="z-index: 1; width: 40px; height: 2px; background: rgba(255,255,255,0.15); position: relative; transition: background 0.3s;">
-                            <div id="flow-dot-1" style="width: 6px; height: 6px; border-radius: 3px; background: #ff00ff; position: absolute; left: 0; top: -2px; display: none;"></div>
+                        <div id="flow-line-1" class="auto-style-187">
+                            <div id="flow-dot-1" class="auto-style-188"></div>
                         </div>
 
                         <!-- Node 2: Netdata fetch -->
-                        <div class="routine-item routine-border-magenta" style="z-index: 2; width: 150px; background: rgba(20,10,20,0.9); border-radius: 6px; padding: 8px; font-size: 0.7rem; position: relative;">
-                            <div style="font-weight: bold; margin-bottom: 5px; color: #ff00ff;">🔌 RAGFlow Context</div>
-                            <div style="color: var(--text-muted); font-size: 0.65rem;">Index: Syslogs database</div>
+                        <div class="routine-item routine-border-magenta auto-style-189">
+                            <div class="auto-style-190">🔌 RAGFlow Context</div>
+                            <div class="auto-style-191">Index: Syslogs database</div>
                             <!-- Connectors -->
-                            <div style="width: 8px; height: 8px; border-radius: 4px; background: #ff00ff; position: absolute; left: -4px; top: 50%; transform: translateY(-50%);"></div>
-                            <div style="width: 8px; height: 8px; border-radius: 4px; background: #ffcc00; position: absolute; right: -4px; top: 50%; transform: translateY(-50%);"></div>
+                            <div class="auto-style-192"></div>
+                            <div class="auto-style-193"></div>
                         </div>
 
                         <!-- Arrow/Line 2 -->
-                        <div id="flow-line-2" style="z-index: 1; width: 40px; height: 2px; background: rgba(255,255,255,0.15); position: relative; transition: background 0.3s;">
-                            <div id="flow-dot-2" style="width: 6px; height: 6px; border-radius: 3px; background: #ffcc00; position: absolute; left: 0; top: -2px; display: none;"></div>
+                        <div id="flow-line-2" class="auto-style-194">
+                            <div id="flow-dot-2" class="auto-style-195"></div>
                         </div>
 
                         <!-- Node 3: o3 Reasoning -->
-                        <div class="routine-item routine-border-yellow" style="z-index: 2; width: 140px; background: rgba(20,20,10,0.9); border-radius: 6px; padding: 8px; font-size: 0.7rem; position: relative;">
-                            <div style="font-weight: bold; margin-bottom: 5px; color: #ffcc00;">🧠 Phi-4 / o3 Agent</div>
-                            <div style="color: var(--text-muted); font-size: 0.65rem;">Task: Load balance audit</div>
+                        <div class="routine-item routine-border-yellow auto-style-196">
+                            <div class="auto-style-197">🧠 Phi-4 / o3 Agent</div>
+                            <div class="auto-style-198">Task: Load balance audit</div>
                             <!-- Connectors -->
-                            <div style="width: 8px; height: 8px; border-radius: 4px; background: #ffcc00; position: absolute; left: -4px; top: 50%; transform: translateY(-50%);"></div>
-                            <div style="width: 8px; height: 8px; border-radius: 4px; background: #00ff55; position: absolute; right: -4px; top: 50%; transform: translateY(-50%);"></div>
+                            <div class="auto-style-199"></div>
+                            <div class="auto-style-200"></div>
                         </div>
 
                         <!-- Arrow/Line 3 -->
-                        <div id="flow-line-3" style="z-index: 1; width: 40px; height: 2px; background: rgba(255,255,255,0.15); position: relative; transition: background 0.3s;">
-                            <div id="flow-dot-3" style="width: 6px; height: 6px; border-radius: 3px; background: #00ff55; position: absolute; left: 0; top: -2px; display: none;"></div>
+                        <div id="flow-line-3" class="auto-style-201">
+                            <div id="flow-dot-3" class="auto-style-202"></div>
                         </div>
 
                         <!-- Node 4: Action MCP -->
-                        <div class="routine-item routine-border-green" style="z-index: 2; width: 140px; background: rgba(10,20,15,0.9); border-radius: 6px; padding: 8px; font-size: 0.7rem; position: relative;">
-                            <div style="font-weight: bold; margin-bottom: 5px; color: #00ff55;">⚙️ MCP Executor</div>
-                            <div style="color: var(--text-muted); font-size: 0.65rem;">Action: Limit cgroup cycles</div>
+                        <div class="routine-item routine-border-green auto-style-203">
+                            <div class="auto-style-204">⚙️ MCP Executor</div>
+                            <div class="auto-style-205">Action: Limit cgroup cycles</div>
                             <!-- Connector -->
-                            <div style="width: 8px; height: 8px; border-radius: 4px; background: #00ff55; position: absolute; left: -4px; top: 50%; transform: translateY(-50%);"></div>
+                            <div class="auto-style-206"></div>
                         </div>
 
                     </div>
                 </div>
 
                 <!-- Pane 4: Letta Agent-File Memory & VoiceStar Real-Time Voice -->
-                <div class="ai-studio-pane" id="ai-pane-memory" style="display: none; flex-direction: column; gap: 12px;">
-                    <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 15px;">
+                <div class="ai-studio-pane" id="ai-pane-memory" class="auto-style-207">
+                    <div class="auto-style-208">
                         
                         <!-- Letta Episodic Memory -->
-                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="settings-pane auto-style-209">
                             <div class="settings-group">
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">💾 Letta-AI agent-file Persistent Memory</h4>
-                                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
-                                    <span style="font-size: 0.7rem; color: var(--text-muted);">Core Memory Slot</span>
-                                    <textarea id="letta-core-mem" class="cmd-input" style="width: 100%; height: 65px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass); padding: 6px; font-size: 0.72rem; resize: none;">User identity details: Admin Singh, Kernel target: x86_64 Sovereign.</textarea>
+                                <h4 class="auto-style-210">💾 Letta-AI agent-file Persistent Memory</h4>
+                                <div class="auto-style-211">
+                                    <span class="auto-style-212">Core Memory Slot</span>
+                                    <textarea id="letta-core-mem" class="cmd-input auto-style-213" title="input" placeholder="input">User identity details: Admin Singh, Kernel target: x86_64 Sovereign.</textarea>
                                 </div>
-                                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
-                                    <span style="font-size: 0.7rem; color: var(--text-muted);">Episodic Memory Logs</span>
-                                    <textarea id="letta-episodic-mem" class="cmd-input" style="width: 100%; height: 65px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass); padding: 6px; font-size: 0.72rem; resize: none;">Syslogs loaded, checked memory fragmentation bounds, CPU cycle rate normal.</textarea>
+                                <div class="auto-style-214">
+                                    <span class="auto-style-215">Episodic Memory Logs</span>
+                                    <textarea id="letta-episodic-mem" class="cmd-input auto-style-216" title="input" placeholder="input">Syslogs loaded, checked memory fragmentation bounds, CPU cycle rate normal.</textarea>
                                 </div>
                                 <button class="wizard-btn" onclick="consolidateLettaMemory()">CONSOLIDATE MEMORY FILE</button>
                             </div>
                         </div>
 
                         <!-- VoiceStar Audio Streaming -->
-                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
-                            <div class="settings-group" style="flex: 1;">
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🗣️ VoiceStar Real-Time Voice Synthesis Stream</h4>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                        <div class="settings-pane auto-style-217">
+                            <div class="settings-group auto-style-218">
+                                <h4 class="auto-style-219">🗣️ VoiceStar Real-Time Voice Synthesis Stream</h4>
+                                <div class="auto-style-220">
                                     <div>
-                                        <span style="font-size: 0.7rem; color: var(--text-muted);">Sample Rate</span>
-                                        <select id="voicestar-rate" class="cmd-input" style="width: 100%; height: 32px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                                        <span class="auto-style-221">Sample Rate</span>
+                                        <select id="voicestar-rate" class="cmd-input auto-style-222" title="input">
                                             <option value="16000">16 kHz</option>
                                             <option value="24000" selected>24 kHz</option>
                                             <option value="48000">48 kHz</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <span style="font-size: 0.7rem; color: var(--text-muted);">Latency Target</span>
-                                        <select id="voicestar-latency" class="cmd-input" style="width: 100%; height: 32px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                                        <span class="auto-style-223">Latency Target</span>
+                                        <select id="voicestar-latency" class="cmd-input auto-style-224" title="input">
                                             <option value="5">5 ms (Ultra)</option>
                                             <option value="8.5" selected>8.5 ms</option>
                                             <option value="15">15 ms</option>
                                         </select>
                                     </div>
                                 </div>
-                                <button class="cyber-btn small-btn" id="voicestar-stream-btn" onclick="toggleVoiceStreaming()" style="width: 100%; margin-bottom: 12px; font-size: 0.75rem;">START VOICE STREAM</button>
+                                <button class="cyber-btn small-btn" id="voicestar-stream-btn" onclick="toggleVoiceStreaming()" class="auto-style-225">START VOICE STREAM</button>
                                 
-                                <span style="font-size: 0.7rem; color: var(--text-muted);">Wave Visualizer Preview:</span>
-                                <div style="width: 100%; height: 60px; background: #000; border: 1px solid var(--border-glass); border-radius: 4px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                                    <div id="voice-wave-line" style="width: 90%; height: 2px; background: #ff00ff; box-shadow: 0 0 10px #ff00ff; transition: height 0.08s ease;"></div>
+                                <span class="auto-style-226">Wave Visualizer Preview:</span>
+                                <div class="auto-style-227">
+                                    <div id="voice-wave-line" class="auto-style-228"></div>
                                 </div>
                             </div>
                         </div>
@@ -891,19 +891,19 @@
                 </div>
 
                 <!-- Pane 5: ClaudeCode CLI Sandbox & DeepLiveCam Swaps -->
-                <div class="ai-studio-pane" id="ai-pane-claudecam" style="display: none; flex-direction: column; gap: 12px;">
-                    <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 15px;">
+                <div class="ai-studio-pane" id="ai-pane-claudecam" class="auto-style-229">
+                    <div class="auto-style-230">
                         
                         <!-- ClaudeCode CLI Simulation -->
-                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
-                            <div class="settings-group" style="flex: 1; display: flex; flex-direction: column;">
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">💻 Claude-Code CLI Terminal Sandbox</h4>
-                                <div style="display:flex; gap:6px; margin-bottom:8px;">
-                                    <input type="text" id="claudecode-file" class="cmd-input" value="SovereignBoot.cpp" style="flex:1; height:32px; font-size: 0.72rem;">
-                                    <input type="text" id="claudecode-prompt" class="cmd-input" placeholder="Analyze compile locks..." style="flex:2; height:32px; font-size: 0.72rem;">
-                                    <button class="cyber-btn small-btn" onclick="executeClaudeCodeCLI()" style="white-space:nowrap; font-size:0.7rem; height:32px;">HEAL CODE</button>
+                        <div class="settings-pane auto-style-231">
+                            <div class="settings-group auto-style-232">
+                                <h4 class="auto-style-233">💻 Claude-Code CLI Terminal Sandbox</h4>
+                                <div class="auto-style-234">
+                                    <input type="text" id="claudecode-file" class="cmd-input" value="SovereignBoot.cpp" class="auto-style-235" title="input" placeholder="input">
+                                    <input type="text" id="claudecode-prompt" class="cmd-input" placeholder="Analyze compile locks..." class="auto-style-236" title="input">
+                                    <button class="cyber-btn small-btn" onclick="executeClaudeCodeCLI()" class="auto-style-237">HEAL CODE</button>
                                 </div>
-                                <div id="claudecode-terminal" style="flex:1; min-height: 140px; background: #000; border: 1px solid var(--border-glass); border-radius: 4px; padding: 8px; font-family: monospace; font-size: 0.7rem; overflow-y: auto; color: #4af626; line-height: 1.4;">
+                                <div id="claudecode-terminal" class="auto-style-238">
                                     admin@sigma-zenith:~/SigmaOS$ claudecode --version<br>
                                     claude-code v1.0.4 (attested standalone sandbox)<br>
                                     Type prompt to run automated debugger.
@@ -912,27 +912,27 @@
                         </div>
 
                         <!-- DeepLiveCam Face Swap -->
-                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="settings-pane auto-style-239">
                             <div class="settings-group">
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🎭 Deep-Live-Cam face swaps</h4>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                                <h4 class="auto-style-240">🎭 Deep-Live-Cam face swaps</h4>
+                                <div class="auto-style-241">
                                     <div>
-                                        <span style="font-size: 0.7rem; color: var(--text-muted);">Face Model</span>
-                                        <select id="deeplivecam-model" class="cmd-input" style="width: 100%; height: 32px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                                        <span class="auto-style-242">Face Model</span>
+                                        <select id="deeplivecam-model" class="cmd-input auto-style-243" title="input">
                                             <option value="InsightFace">InsightFace resnet100</option>
                                             <option value="GFPGAN">GFPGAN v1.4</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <span style="font-size: 0.7rem; color: var(--text-muted);">Target FPS</span>
-                                        <select id="deeplivecam-fps" class="cmd-input" style="width: 100%; height: 32px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass);">
+                                        <span class="auto-style-244">Target FPS</span>
+                                        <select id="deeplivecam-fps" class="cmd-input auto-style-245" title="input">
                                             <option value="30">30 FPS</option>
                                             <option value="60">60 FPS</option>
                                         </select>
                                     </div>
                                 </div>
                                 <button class="wizard-btn" onclick="startDeepLiveCamSimulation()">MAP CAMERA SOURCE</button>
-                                <div id="deeplivecam-console" style="margin-top: 10px; font-size: 0.7rem; font-family: monospace; color: var(--accent-gold); line-height: 1.4; padding: 6px; background: rgba(255,255,255,0.02); border-radius: 4px;">
+                                <div id="deeplivecam-console" class="auto-style-246">
                                     > Camera source: IDLE.<br>
                                     > Inference mapping time: 0ms.
                                 </div>
@@ -943,23 +943,23 @@
                 </div>
 
                 <!-- Pane 6: SWE-Agent & Marimo / Streamlit Reactive Sandbox -->
-                <div class="ai-studio-pane" id="ai-pane-swe" style="display: none; flex-direction: column; gap: 12px;">
-                    <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 15px;">
+                <div class="ai-studio-pane" id="ai-pane-swe" class="auto-style-247">
+                    <div class="auto-style-248">
                         
                         <!-- SWE-Agent / OpenHands / GPT-Pilot Console -->
-                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
-                            <div class="settings-group" style="flex: 1; display: flex; flex-direction: column;">
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">🤖 SWE-Agent & OpenHands Developer Autopilot</h4>
-                                <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px;">
-                                    <span style="font-size: 0.7rem; color: var(--text-muted);">Repository Scope Workspace</span>
-                                    <input type="text" id="swe-repo-path" class="cmd-input" value="/vfs/workspace/SigmaOS" style="height:32px; font-size: 0.72rem;">
+                        <div class="settings-pane auto-style-249">
+                            <div class="settings-group auto-style-250">
+                                <h4 class="auto-style-251">🤖 SWE-Agent & OpenHands Developer Autopilot</h4>
+                                <div class="auto-style-252">
+                                    <span class="auto-style-253">Repository Scope Workspace</span>
+                                    <input type="text" id="swe-repo-path" class="cmd-input" value="/vfs/workspace/SigmaOS" class="auto-style-254" title="input" placeholder="input">
                                 </div>
-                                <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px;">
-                                    <span style="font-size: 0.7rem; color: var(--text-muted);">Autopilot Issue Query</span>
-                                    <textarea id="swe-issue-desc" class="cmd-input" style="width: 100%; height: 50px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass); padding: 6px; font-size: 0.72rem; resize: none;">Optimize context switches lock contention in SovereignBoot.cpp line 110.</textarea>
+                                <div class="auto-style-255">
+                                    <span class="auto-style-256">Autopilot Issue Query</span>
+                                    <textarea id="swe-issue-desc" class="cmd-input auto-style-257" title="input" placeholder="input">Optimize context switches lock contention in SovereignBoot.cpp line 110.</textarea>
                                 </div>
                                 <button class="wizard-btn" onclick="startSWEAgentAutopilot()">SPAWN AUTOPILOT AGENT</button>
-                                <div id="swe-agent-terminal" style="flex: 1; min-height: 120px; background: #000; border: 1px solid var(--border-glass); border-radius: 4px; padding: 8px; font-family: monospace; font-size: 0.7rem; overflow-y: auto; color: #00ffc3; line-height: 1.4; margin-top: 8px;">
+                                <div id="swe-agent-terminal" class="auto-style-258">
                                     SWE-agent v1.2.0 starting...<br>
                                     Ready to parse target issues.
                                 </div>
@@ -967,23 +967,23 @@
                         </div>
 
                         <!-- Marimo / Streamlit / Dash Reactive Sandbox -->
-                        <div class="settings-pane" style="display: flex; flex-direction: column; gap: 10px;">
-                            <div class="settings-group" style="flex: 1; display: flex; flex-direction: column;">
-                                <h4 style="color: var(--accent-gold); margin-bottom: 8px;">📊 Streamlit & Marimo Reactive App Sandbox</h4>
-                                <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px;">
-                                    <span style="font-size: 0.7rem; color: var(--text-muted);">Python Reactive Script Input</span>
-                                    <textarea id="marimo-code-input" class="cmd-input" style="width: 100%; height: 80px; background: rgba(0,0,0,0.5); color: var(--text-white); border: 1px solid var(--border-glass); padding: 6px; font-family: monospace; font-size: 0.72rem; resize: none;">import streamlit as st
+                        <div class="settings-pane auto-style-259">
+                            <div class="settings-group auto-style-260">
+                                <h4 class="auto-style-261">📊 Streamlit & Marimo Reactive App Sandbox</h4>
+                                <div class="auto-style-262">
+                                    <span class="auto-style-263">Python Reactive Script Input</span>
+                                    <textarea id="marimo-code-input" class="cmd-input auto-style-264" title="input" placeholder="input">import streamlit as st
 import numpy as np
 
 # Slider inputs triggers reactive cell runs
 freq = st.slider(&quot;Signal frequency&quot;, 1, 10, 5)
 st.line_chart(np.sin(np.linspace(0, 10, 100) * freq))</textarea>
                                 </div>
-                                <button class="cyber-btn small-btn" onclick="runReactiveSandbox()" style="width: 100%; margin-bottom: 8px; font-size: 0.75rem;">RUN REACTIVE CELL</button>
+                                <button class="cyber-btn small-btn" onclick="runReactiveSandbox()" class="auto-style-265">RUN REACTIVE CELL</button>
                                 
-                                <span style="font-size: 0.7rem; color: var(--text-muted);">Reactive Chart Preview:</span>
-                                <div id="marimo-chart-preview" style="flex: 1; background: rgba(0,0,0,0.6); border: 1px solid var(--border-glass); border-radius: 4px; padding: 8px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; min-height: 100px;">
-                                    <div style="font-size: 0.7rem; color: var(--accent-gold); text-align: center; margin-top: 20px;">[REACTIVE PREVIEW INACTIVE]</div>
+                                <span class="auto-style-266">Reactive Chart Preview:</span>
+                                <div id="marimo-chart-preview" class="auto-style-267">
+                                    <div class="auto-style-268">[REACTIVE PREVIEW INACTIVE]</div>
                                 </div>
                             </div>
                         </div>
@@ -1025,7 +1025,7 @@ st.line_chart(np.sin(np.linspace(0, 10, 100) * freq))</textarea>
 
     <!-- Alt + Space Command Center -->
     <div id="cmd-palette">
-        <input type="text" class="cmd-input" id="cmd-input" placeholder="Search system commands...">
+        <input type="text" class="cmd-input" id="cmd-input" placeholder="Search system commands..." title="input">
         <div class="cmd-results" id="cmd-results"></div>
     </div>
 

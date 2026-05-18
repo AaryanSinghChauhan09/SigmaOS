@@ -11,6 +11,7 @@ child_process.exec('ls', function (err, data) {
   console.log(data);
 });
 
+
 ```
 
 What happens though when you need to start getting user input for arguments into your command? The obvious solution is to take the user input and build your command out using string concatenation. But here's something I've learned over the years: When you use string concatenation to send data from one system to another you're probably going to have a bad day.
@@ -21,6 +22,7 @@ child_process.exec('ls -l ' + path, function (err, data) {
   console.log(data);
 });
 
+
 ```
 
 ## Why is string concatenation a problem?
@@ -29,6 +31,7 @@ Well, because under the hood, `child_process.exec` makes a call to execute <kbd>
 
 ```sh
 [pid 25170] execve("/bin/sh", ["/bin/sh", "-c", "ls -l user input"], [/*16 vars*/]
+
 
 
 ```
@@ -51,12 +54,14 @@ child_process.execFile('/bin/ls', ['-l', path], function (err, result) {
   console.log(result);
 });
 
+
 ```
 
 System call that is run
 
 ```sh
 [pid 25565] execve("/bin/ls", ["/bin/ls", "-l", "."], [/*16 vars*/]
+
 
 
 ```
@@ -74,12 +79,14 @@ ls.stdout.on('data', function (data) {
   console.log(data.toString());
 });
 
+
 ```
 
 System call that is run
 
 ```sh
 [pid 26883] execve("/bin/ls", ["/bin/ls", "-l", "."], [/*16 vars*/
+
 
 
 ```
@@ -95,4 +102,3 @@ So, here's the collective guidance for running system commands from node.js:
 - Try to avoid letting users pass in options to commands if possible. Typically values are okay when using spawn or execfile, but selecting options via a user controlled string is a bad idea.
 
 - If you must allow for user controlled options, look at the options for the command extensively, determine which options are safe, and whitelist only those options.
- 

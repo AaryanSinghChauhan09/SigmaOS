@@ -6,6 +6,7 @@ Access to an instance with :
 const mockAgent = new MockAgent({ enableCallHistory: true })
 mockAgent.getCallHistory()?.firstCall()
 
+
 ```
 
 ## class properties
@@ -44,6 +45,7 @@ Returns a Map instance
 mockAgent.getCallHistory()?.firstCall()?.toMap()?.get('hash')
 // #hash
 
+
 ```
 
 ### toString
@@ -52,7 +54,7 @@ Returns a string computed with any class property name and value pair
 
 ```js
 mockAgent.getCallHistory()?.firstCall()?.toString()
-// protocol->https:|host->localhost:4000|port->4000|origin->https://localhost:4000|path->/endpoint|hash->#here|searchParams->{"query":"value"}|fullUrl->https://localhost:4000/endpoint?query=value#here|method->PUT|body->"{ "data": "hello" }"|headers->{"content-type":"application/json"}
+// protocol->https: | host->localhost:4000 | port->4000 | origin->https://localhost:4000 | path->/endpoint | hash->#here | searchParams->{"query":"value"} | fullUrl->https://localhost:4000/endpoint?query=value#here | method->PUT | body->"{ "data": "hello" }" | headers->{"content-type":"application/json"}
+
 
 ```
- 

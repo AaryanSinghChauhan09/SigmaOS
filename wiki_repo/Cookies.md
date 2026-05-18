@@ -6,7 +6,7 @@
 
 - **value** `string`
 
-- **expires** `Date|number` (optional)
+- **expires** `Date | number` (optional)
 
 - **maxAge** `number` (optional)
 
@@ -18,7 +18,7 @@
 
 - **httpOnly** `boolean` (optional)
 
-- **sameSite** `'String'|'Lax'|'None'` (optional)
+- **sameSite** `'String' | 'Lax' | 'None'` (optional)
 
 - **unparsed** `string[]` (optional) Left over attributes that weren't parsed.
 
@@ -33,6 +33,7 @@ const headers = new Headers()
 deleteCookie(headers, 'name')
 
 console.log(headers.get('set-cookie')) // name=; Expires=Thu, 01 Jan 1970 00:00:00 GMT
+
 
 ```
 
@@ -58,6 +59,7 @@ const headers = new Headers({
 })
 
 console.log(getCookies(headers)) // { get: 'cookies', and: 'attributes' }
+
 
 ```
 
@@ -86,6 +88,7 @@ console.log(getSetCookies(headers))
 // ]
 
 
+
 ```
 
 Arguments:
@@ -106,6 +109,7 @@ setCookie(headers, { name: 'undici', value: 'setCookie' })
 
 console.log(headers.get('Set-Cookie')) // undici=setCookie
 
+
 ```
 
 Arguments:
@@ -115,4 +119,3 @@ Arguments:
 - **cookie** `Cookie`
 
 Returns: `void`
- 

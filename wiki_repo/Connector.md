@@ -61,6 +61,7 @@ const client = new Client('https://localhost:3000', {
   }
 })
 
+
 ```
 
 ### Example: validate the CA fingerprint
@@ -123,5 +124,5 @@ function getIssuerCertificate (socket) {
   return certificate
 }
 
+
 ```
- 

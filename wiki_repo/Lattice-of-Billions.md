@@ -19,4 +19,3 @@ This directory contains algorithmically generated ideas absorbed from competitor
 ## ⚙️ Expansion Algorithm
 
 `Total Ideas = (Competitor Features) *(Variants)*(Shard Profiles)*(Hardware Matrix)`*Example: 50 features *10 variants*5 profiles* 4 hardware archs = 10,000 Actionable Shard Specifications.*
- 

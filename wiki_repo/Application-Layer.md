@@ -23,4 +23,3 @@ The `release/app` branch focuses on providing a robust, high-performance environ
 - **Stress Testing**: Concurrent multi-application execution within the sovereign lattice.
 
 *"Applications are the interface to the Singularity."*
- 

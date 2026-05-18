@@ -43,4 +43,3 @@ SigmaOS v100.0 Zenith incorporates a unified index of 1000+ industrial-grade uti
 ---
 
 1
- 

@@ -54,6 +54,7 @@ const proxyAgent = new ProxyAgent({
   }
 })
 
+
 ```
 
 #### Example - Basic ProxyAgent instantiation
@@ -64,6 +65,7 @@ This will instantiate the ProxyAgent. It will not do anything until registered a
 import { ProxyAgent } from 'undici'
 
 const proxyAgent = new ProxyAgent('my.proxy.server')
+
 
 ```
 
@@ -82,6 +84,7 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 
 ```
 
@@ -102,6 +105,7 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 
 ```
 
@@ -125,6 +129,7 @@ for await (const data of body) {
   console.log('data', data.toString('utf8')); // data foo
 }
 
+
 ```
 
 ### `ProxyAgent.close()`
@@ -142,6 +147,7 @@ const proxyAgent = new ProxyAgent('my.proxy.server')
 setGlobalDispatcher(proxyAgent)
 
 await proxyAgent.close()
+
 
 ```
 
@@ -171,6 +177,7 @@ const response = await fetch('http://localhost:3000/foo', {
 
 console.log('Response status:', response.status);
 console.log('Response data:', await response.text());
+
 
 ```
 
@@ -203,6 +210,7 @@ const response = await fetch('http://example.com', {
 console.log('Response status:', response.status);
 console.log('Response data:', await response.text());
 
+
 ```
 
 ---
@@ -226,6 +234,7 @@ const response = await fetch('https://secure.endpoint.com/api/data', {
 console.log('Response status:', response.status);
 console.log('Response data:', await response.json());
 
+
 ```
 
 #### Example - ProxyAgent as a Global Dispatcher
@@ -243,4 +252,3 @@ setGlobalDispatcher(proxyAgent);
 const response = await fetch('http://example.com');
 console.log('Response status:', response.status);
 console.log('Response data:', await response.text());
- 

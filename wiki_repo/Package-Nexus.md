@@ -13,4 +13,3 @@ The **Lattice Package Nexus** is the centralized distribution system for SigmaOS
 ## Security
 
 All packages are **Bit-Perfect**and**PQC-Signed**. The system uses a decentralized verification lattice to ensure shard integrity before hot-loading into the kernel.
- 

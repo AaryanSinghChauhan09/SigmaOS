@@ -6,7 +6,6 @@
 #ifndef SIGMA_DISPATCHER_H
 #define SIGMA_DISPATCHER_H
 
-#include "syscalls.h"
 
 #ifdef __cplusplus
 extern "C" {

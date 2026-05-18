@@ -43,6 +43,7 @@ extern "C" void myfeature_init() {
 }
 
 
+
 ```
 
 ## Step 2: Register in SovereignUSR
@@ -54,6 +55,7 @@ After your shard is initialized, register it:
 usr_register_shard("SovereignMyFeature", 0x00FF);
 
 
+
 ```
 
 ## Step 3: Run Static Analysis
@@ -63,6 +65,7 @@ usr_register_shard("SovereignMyFeature", 0x00FF);
 cppcheck --enable=warning,style kernel/core/SovereignMyFeature.cpp
 
 
+
 ```
 
 ## Step 4: Build
@@ -70,6 +73,7 @@ cppcheck --enable=warning,style kernel/core/SovereignMyFeature.cpp
 ```bash
 
 python3 tools/sigma-build.py
+
 
 
 ```
@@ -83,4 +87,3 @@ Ensure your PR description references:
 - The `cppcheck` output (zero warnings)
 
 - A wiki page update in `SigmaOS.wiki/`
- 

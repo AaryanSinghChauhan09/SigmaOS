@@ -27,6 +27,7 @@ once(server, 'listening').then(() => {
   })
 })
 
+
 ```
 
 ## `new H2CClient(url[, options])`
@@ -90,6 +91,7 @@ This will instantiate the undici H2CClient, but it will not connect to the origi
 import { H2CClient } from "undici";
 
 const client = new H2CClient("http://localhost:3000");
+
 
 ```
 
@@ -197,6 +199,7 @@ try {
   server.close();
 }
 
+
 ```
 
 ### Event: `'disconnect'`
@@ -243,6 +246,7 @@ try {
   server.close();
 }
 
+
 ```
 
 ### Event: `'drain'`
@@ -282,9 +286,9 @@ await Promise.all(requests);
 
 console.log("requests completed");
 
+
 ```
 
 ### Event: `'error'`
 
 Invoked for users errors such as throwing in the `onError` handler.
- 

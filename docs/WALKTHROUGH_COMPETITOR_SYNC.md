@@ -5,6 +5,7 @@ This document records the design implementation of **Sovereign Cgroups**, **Sove
 ---
 
 ## 1. ⚙️ Sovereign Cgroup Shard (`S-Cgroup`)
+
 We implemented the resource management engine in a completely freestanding, zero-dependency C++ structure.
 
 * **Core Subsystem**: [SovereignCgroup.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/SovereignCgroup.cpp)
@@ -16,6 +17,7 @@ We implemented the resource management engine in a completely freestanding, zero
 ---
 
 ## 🗄️ 2. Sovereign ZFS Storage Pool (`S-ZFS`)
+
 We implemented OpenZFS-style physical block device pooling and transactional Copy-on-Write validation.
 
 * **Core Subsystem**: [SovereignZFSPool.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/SovereignZFSPool.cpp)
@@ -28,6 +30,7 @@ We implemented OpenZFS-style physical block device pooling and transactional Cop
 ---
 
 ## 📂 3. Sovereign OverlayFS Union Mount (`S-OverlayFS`)
+
 We implemented Linux OverlayFS-style union directory mounts and Copy-Up-On-Write logic.
 
 * **Core Subsystem**: [SovereignOverlayFS.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/SovereignOverlayFS.cpp)
@@ -39,6 +42,7 @@ We implemented Linux OverlayFS-style union directory mounts and Copy-Up-On-Write
 ---
 
 ## 💾 4. Sovereign LBU Local State persistence (`S-LBU`)
+
 We implemented Alpine Linux-style diskless persistent memory state packing.
 
 * **Core Subsystem**: [SovereignLBU.cpp](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/kernel/core/SovereignLBU.cpp)
@@ -51,7 +55,9 @@ We implemented Alpine Linux-style diskless persistent memory state packing.
 ---
 
 ## 🐍 5. Purging Python Runtime Dependency
+
 To make the build, deployment, and auditing pipelines completely standalone and immune to missing Python runtimes on user environments:
+
 * **Purged Scripts**: Removed `sync.py`, `final_sync.py`, `tools/sync_all_branches.py`, `tools/wiki_sync.py`, `tools/sigma-pkg.py`, `tools/sigma-build.py`, `tools/sovereign-deploy.py`, `tools/reconcile_shards.py`, `tools/problem_tracker.py`, and `tools/release_auto.py`.
 * **Zero-Dependency Node.js Alternatives**:
   * [sync.js](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/sync.js): Executes staged local packaging commits.
@@ -68,7 +74,9 @@ To make the build, deployment, and auditing pipelines completely standalone and 
 ---
 
 ## 🔄 6. Branch Synchronization (Parity: 100%)
+
 We executed `node tools/sync_all_branches.js` to propagate the entire v15.1 Zenith improvements across:
+
 1. `release/standalone`
 2. `release/rtos`
 3. `release/mobile`
@@ -87,7 +95,9 @@ All conflict resolutions were auto-handled via the `-X theirs` merge driver, and
 ---
 
 ## 📖 7. GitHub Wiki Upgrades
+
 We redesigned the wiki repository:
+
 * **State Persistence Specs**: [Sovereign_LBU.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Sovereign_LBU.md)
   * Detailed the design specifications, cold-boot restore triggers, and CLI dashboard commands.
 * **Overlay FS Specifications**: [Sovereign_OverlayFS.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Sovereign_OverlayFS.md)

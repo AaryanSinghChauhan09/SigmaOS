@@ -21,4 +21,3 @@ Understanding SigmaOS terminology is essential for contributing. Below are the d
  **Zenith Singularity**: The code name for the v15.0 stable release of SigmaOS, representing the point where the architecture becomes fully production-ready.
 
 - **Zero-Data Remanence**: A security principle ensuring that once memory or storage is freed, it is immediately wiped to prevent data scavenging.
- 

@@ -15,6 +15,7 @@ graph TD
     A --> H[S-WATCHDOG]
     H --> I[Anomaly Detected]
     I --> J[Atomic Shard Rollback]
+
 ```
 
 ## 🛡 Post-Quantum Security Lattice (S-PQC)
@@ -23,12 +24,12 @@ SigmaOS is built from the ground up to resist quantum-computational attacks.
 
 ### Core Components
 
-| Component | Role | Algorithm |
-| :--- | :--- | :--- |
-| **S-CRYPT** | All inter-shard communication encryption | CRYSTALS-Kyber-1024 |
-| **S-SIGN** | Package and shard binary attestation | CRYSTALS-Dilithium-5 |
-| **S-ARMOR** | Mandatory Access Control at shard boundaries | PQC-attested MAC profiles |
-| **S-WATCHDOG** | Anomalous behavior detection + rollback | Behavioral heuristics |
+| Component | Role | Algorithm | 
+| :--- | :--- | :--- | 
+| **S-CRYPT** | All inter-shard communication encryption | CRYSTALS-Kyber-1024 | 
+| **S-SIGN** | Package and shard binary attestation | CRYSTALS-Dilithium-5 | 
+| **S-ARMOR** | Mandatory Access Control at shard boundaries | PQC-attested MAC profiles | 
+| **S-WATCHDOG** | Anomalous behavior detection + rollback | Behavioral heuristics | 
 
 ### Cryptography API
 
@@ -39,6 +40,7 @@ if (status != SIGMA_OK) {
     sigma_log_error("[S-PQC] FATAL: Cryptographic violation. Halting.");
     // Hardware halt triggered
 }
+
 ```
 
 ---
@@ -60,12 +62,12 @@ SigmaOS provides a turnkey environment for security professionals to audit silic
 
 ## 🛡 Defensive Hardening
 
-| Defense Layer | Implementation | Replaces |
-| :--- | :--- | :--- |
-| **Zero-Trust MAC** | PQC-attested mandatory profiles for every userland process | SELinux / AppArmor |
-| **Amnesic Memory** | Zero-data remanence: every freed page is immediately wiped | None (unique USP) |
-| **S-WATCHDOG** | Detects anomalous silicon behavior → triggers atomic shard rollback | auditd / inotify |
-| **Encrypted Silicon** | Full hardware-level data sovereignty (LUKS2 equivalent) | dm-crypt / LUKS |
+| Defense Layer | Implementation | Replaces | 
+| :--- | :--- | :--- | 
+| **Zero-Trust MAC** | PQC-attested mandatory profiles for every userland process | SELinux / AppArmor | 
+| **Amnesic Memory** | Zero-data remanence: every freed page is immediately wiped | None (unique USP) | 
+| **S-WATCHDOG** | Detects anomalous silicon behavior → triggers atomic shard rollback | auditd / inotify | 
+| **Encrypted Silicon** | Full hardware-level data sovereignty (LUKS2 equivalent) | dm-crypt / LUKS | 
 
 ---
 
@@ -74,4 +76,3 @@ SigmaOS provides a turnkey environment for security professionals to audit silic
 All PQC primitives are tested automatically in CI/CD against official NIST test vectors.
 
 See: [CI/CD Pipeline](API-Documentation#cicd) | [Security Shard](Security-Shard)
- 

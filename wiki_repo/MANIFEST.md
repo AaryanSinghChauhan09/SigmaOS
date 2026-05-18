@@ -8,58 +8,58 @@ SigmaOS is an industrial-grade microkernel composed of independent, PQC-attested
 
 ## 🏛️ 1. Kernel Core Shards (Mandatory)
 
-| Shard ID | Namespace | Purpose |
-| :--- | :--- | :--- |
+| Shard ID | Namespace | Purpose | 
+| :--- | :--- | :--- | 
 
-| `S-BOOT` | `Kernel::System` | Secure Shard Bootstrapping (SSB) engine. |
-| `S-SCHED` | `Kernel::Orchestration` | S-CFS Deterministic scheduler. |
-| `S-MM` | `Kernel::Memory` | PQC-hardened demand paging and slab allocation. |
-| `S-VFS` | `Kernel::FS` | Distributed, amnesic virtual filesystem. |
-| `S-HAL` | `Kernel::HAL` | Universal hardware abstraction layer. |
-| `S-IPC` | `Kernel::IPC` | PQC-sealed inter-shard communication. |
+| `S-BOOT` | `Kernel::System` | Secure Shard Bootstrapping (SSB) engine. | 
+| `S-SCHED` | `Kernel::Orchestration` | S-CFS Deterministic scheduler. | 
+| `S-MM` | `Kernel::Memory` | PQC-hardened demand paging and slab allocation. | 
+| `S-VFS` | `Kernel::FS` | Distributed, amnesic virtual filesystem. | 
+| `S-HAL` | `Kernel::HAL` | Universal hardware abstraction layer. | 
+| `S-IPC` | `Kernel::IPC` | PQC-sealed inter-shard communication. | 
 
 ---
 
 ## 🛡️ 2. Security & Integrity Shards
 
-| Shard ID | Purpose |
-| :--- | :--- |
+| Shard ID | Purpose | 
+| :--- | :--- | 
 
-| `S-PQC` | Crystals-Kyber & Dilithium-5 cryptographic primitives. |
-| `S-AUDIT` | Real-time silicon-level behavioral auditing. |
-| `S-Pledge` | Shard-level permission and resource constraint engine. |
-| `S-IMA` | Integrity Measurement Architecture for shard verification. |
-| `S-SelfHeal` | Autonomous rollback and error correction daemon. |
+| `S-PQC` | Crystals-Kyber & Dilithium-5 cryptographic primitives. | 
+| `S-AUDIT` | Real-time silicon-level behavioral auditing. | 
+| `S-Pledge` | Shard-level permission and resource constraint engine. | 
+| `S-IMA` | Integrity Measurement Architecture for shard verification. | 
+| `S-SelfHeal` | Autonomous rollback and error correction daemon. | 
 
 ---
 
 ## 🏗️ 3. Industrial Infrastructure Shards
 
-| Shard ID | Function |
-| :--- | :--- |
+| Shard ID | Function | 
+| :--- | :--- | 
 
-| `S-PKG` | Unified package manager and repository sync. |
-| `S-SHELL` | Sovereign terminal and command orchestrator. |
-| `S-GUI` | GPU-accelerated Zenith industrial window manager. |
-| `S-SDK` | Native C++20/Rust compilation and debugging tools. |
-| `S-NET` | PQC-hardened TCP/IP stack and mesh networking. |
+| `S-PKG` | Unified package manager and repository sync. | 
+| `S-SHELL` | Sovereign terminal and command orchestrator. | 
+| `S-GUI` | GPU-accelerated Zenith industrial window manager. | 
+| `S-SDK` | Native C++20/Rust compilation and debugging tools. | 
+| `S-NET` | PQC-hardened TCP/IP stack and mesh networking. | 
 
 ---
 
 ## 🏭 4. Professional Vertical Shards
 
-| Category | Shards |
-| :--- | :--- |
+| Category | Shards | 
+| :--- | :--- | 
 
-| **Finance** | `S-Accountant`, `S-Ledger`, `S-TaxAudit` |
+| **Finance** | `S-Accountant`, `S-Ledger`, `S-TaxAudit` | 
 
-| **Medical** | `S-PatientData`, `S-HIPAA`, `S-ClinicalUI` |
+| **Medical** | `S-PatientData`, `S-HIPAA`, `S-ClinicalUI` | 
 
-| **Cyber** | `S-MAP`, `S-PLOIT`, `S-Forensic` |
+| **Cyber** | `S-MAP`, `S-PLOIT`, `S-Forensic` | 
 
-| **Creative** | `S-REC`, `GIMP-S`, `Ardour-S` |
+| **Creative** | `S-REC`, `GIMP-S`, `Ardour-S` | 
 
-| **AI/ML** | `S-Nexus`, `S-Tensor`, `S-Predict` |
+| **AI/ML** | `S-Nexus`, `S-Tensor`, `S-Predict` | 
 
 ---
 
@@ -78,4 +78,3 @@ All shards follow the **Dilithium-5** attestation protocol:
 ---
 
 *SigmaOS — 600 Shards. One Vision. Absolute Parity.*
- 

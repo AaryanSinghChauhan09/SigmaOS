@@ -34,4 +34,3 @@ The **Standalone Edition** is the purest form of SigmaOS. It is designed to run 
 
 ---
 [Return to Global Home](Home)
- 

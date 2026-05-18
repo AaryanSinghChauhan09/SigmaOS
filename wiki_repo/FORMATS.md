@@ -4,24 +4,24 @@ SigmaOS is designed as a **Sovereign Microkernel** that can adapt its lattice co
 
 ## 🏁 OS Format Matrix
 
-| Format | SigmaOS Shard Configuration | Key Traits Implemented |
-| :--- | :--- | :--- |
+| Format | SigmaOS Shard Configuration | Key Traits Implemented | 
+| :--- | :--- | :--- | 
 
-| **Monolithic** | `Lattice: Full` | Unified drivers, filesystem, and net-stack for max performance. |
+| **Monolithic** | `Lattice: Full` | Unified drivers, filesystem, and net-stack for max performance. | 
 
-| **Microkernel** | `Lattice: Minimal` | Only IPC and Memory Shards in kernel space; all others in userland. |
+| **Microkernel** | `Lattice: Minimal` | Only IPC and Memory Shards in kernel space; all others in userland. | 
 
-| **Hybrid** | `Lattice: Adaptive` | Critical drivers (Video/Net) in kernel; others isolated. |
+| **Hybrid** | `Lattice: Adaptive` | Critical drivers (Video/Net) in kernel; others isolated. | 
 
-| **Distributed** | `SovereignNexus + P2P` | Multi-machine transparency via `Lattice Mesh` protocol. |
+| **Distributed** | `SovereignNexus + P2P` | Multi-machine transparency via `Lattice Mesh` protocol. | 
 
-| **Embedded** | `Lattice: Nano` | Lightweight builds for IoT; no UI shards. |
+| **Embedded** | `Lattice: Nano` | Lightweight builds for IoT; no UI shards. | 
 
-| **Real-Time (RTOS)** | `SovereignAISched (Hard-RT)` | Deterministic response times via priority-sharding. |
+| **Real-Time (RTOS)** | `SovereignAISched (Hard-RT)` | Deterministic response times via priority-sharding. | 
 
-| **Cloud/Virtual** | `SovereignVirtio + WASM` | Optimized for hypervisors and containerized workloads. |
+| **Cloud/Virtual** | `SovereignVirtio + WASM` | Optimized for hypervisors and containerized workloads. | 
 
-| **Mobile** | `SovereignMobile + Touch` | Optimized for touch interfaces and battery-sharding. |
+| **Mobile** | `SovereignMobile + Touch` | Optimized for touch interfaces and battery-sharding. | 
 
 ## 🛠 Achieving Universal Compatibility
 
@@ -52,4 +52,3 @@ SigmaOS uses **Asynchronous Shard Ignition (ASI)**. Each service (Driver, FS, Ne
 - `SovereignLXC` allows for sub-millisecond containerization within the lattice.
 
 *"The Shard is the unit of sovereignty; the Format is its expression."*
- 

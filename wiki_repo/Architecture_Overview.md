@@ -22,4 +22,3 @@ Communication between layers is enforced by the **Sovereign IPC Bus**. No driver
 1 1
 
 The `SovereignHAL` provides a strict interface for hardware interaction. Direct I/O port mapping is prohibited unless verified by the Hardware Attestation TPM driver during boot.
- 

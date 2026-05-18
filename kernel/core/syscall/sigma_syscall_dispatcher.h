@@ -15,6 +15,11 @@
 extern "C" {
 #endif
 
+#define K_OK 0
+#define K_ERR_FAULT -14
+#define K_ERR_INVAL -22
+
+
 typedef struct {
     sigma_u64 r15;
     sigma_u64 r14;

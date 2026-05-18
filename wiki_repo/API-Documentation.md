@@ -10,6 +10,7 @@ The following standard POSIX-like system calls are available:
 
 ```c
 sigma_isize sys_read(sigma_u32 fd, void* buffer, sigma_size_t count);
+
 ```
 
 Reads `count` bytes from file descriptor `fd` into `buffer`. Returns bytes read or error.
@@ -18,6 +19,7 @@ Reads `count` bytes from file descriptor `fd` into `buffer`. Returns bytes read 
 
 ```c
 sigma_isize sys_write(sigma_u32 fd, const void* buffer, sigma_size_t count);
+
 ```
 
 Writes `count` bytes from `buffer` to file descriptor `fd`. Returns bytes written or error.
@@ -26,6 +28,7 @@ Writes `count` bytes from `buffer` to file descriptor `fd`. Returns bytes writte
 
 ```c
 void* sys_mmap(void* addr, sigma_size_t length, int prot, int flags, int fd, sigma_u64 offset);
+
 ```
 
 Maps memory directly to the calling shard. Crucial for custom memory allocators.
@@ -40,6 +43,7 @@ SigmaOS is designed around modular "Shards". You can load custom functionality i
 
 ```c
 sigma_status load_shard_module(sigma_module_t* module);
+
 ```
 
 Dynamically links and loads a `sigma_module_t` into the kernel lattice.
@@ -52,6 +56,7 @@ Dynamically links and loads a `sigma_module_t` into the kernel lattice.
 
 ```c
 sigma_status register_device(const char* device_name, void* operations);
+
 ```
 
 Registers a new hardware device with the Sovereign HAL.
@@ -64,7 +69,7 @@ Registers a new hardware device with the Sovereign HAL.
 
 ```c
 sigma_status pq_encrypt(const void* data, sigma_size_t size, void* out_buffer);
+
 ```
 
 Encrypts data using the hardware-accelerated Post-Quantum cryptographic engine.
- 

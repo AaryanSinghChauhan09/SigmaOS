@@ -32,6 +32,7 @@ const mockAgent = new MockAgent({ connections: 1 })
 
 const mockClient = mockAgent.get('http://localhost:3000')
 
+
 ```
 
 ## Instance Methods
@@ -81,5 +82,5 @@ for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
 
+
 ```
- 

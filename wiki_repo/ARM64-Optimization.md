@@ -11,4 +11,3 @@
 3. **Custom BCM2712 Mailbox Bypass**: Drops legacy Alpine/Linux compatibility layers in favor of a sovereign, highly-optimized hardware initialization routine.
 
 By executing these maneuvers natively, SigmaOS operates at a hardware-efficiency tier that generic ARM64 distributions cannot mathematically reach without adopting the Sovereign Lattice architecture.
- 

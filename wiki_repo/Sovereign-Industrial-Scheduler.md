@@ -44,4 +44,3 @@ S-SCHED is ignited during **Stage 5**of the**Asynchronous Shard Ignition (ASI)**
 
 ---
 *Stay Sovereign.*
- 

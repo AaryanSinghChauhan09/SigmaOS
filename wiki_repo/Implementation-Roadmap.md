@@ -49,4 +49,3 @@ This roadmap tracks the development of core features required for the "Zenith" a
 ***Status**: Not present.* **Implementation Plan**: Build a sovereign shell environment, core CLI utilities, and a non-derivative package manager.
 
 - **Documentation**: `User-Tools.md` (Wiki)
- 

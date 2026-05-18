@@ -18,6 +18,7 @@ const agent = new Agent({
 
 setGlobalDispatcher(agent)
 
+
 ```
 
 ## Guarding against unexpected disconnects
@@ -48,6 +49,7 @@ test('example with disconnect guard', async (t) => {
   // ... test logic ...
 })
 
+
 ```
 
 `client.close()` and `client.destroy()` both emit `'disconnect'` events, but
@@ -69,4 +71,3 @@ Skip the guard for tests where a disconnect is expected behavior, such as:
 - Retry/reconnect tests where the disconnect triggers the retry
 
 - HTTP parser errors from malformed responses (`HTTPParserError`)
- 

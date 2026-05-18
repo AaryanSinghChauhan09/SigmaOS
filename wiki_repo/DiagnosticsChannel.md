@@ -24,6 +24,7 @@ diagnosticsChannel.channel('undici:request:create').subscribe(({ request }) => {
   console.log('headers', request.headers) // e.g. ['foo', 'bar', 'hello', 'world']
 })
 
+
 ```
 
 Note: a request is only loosely completed to a given socket.
@@ -39,6 +40,7 @@ diagnosticsChannel.channel('undici:request:bodyChunkSent').subscribe(({ request,
   // request is the same object undici:request:create
 })
 
+
 ```
 
 ## `undici:request:bodySent`
@@ -51,6 +53,7 @@ import diagnosticsChannel from 'diagnostics_channel'
 diagnosticsChannel.channel('undici:request:bodySent').subscribe(({ request }) => {
   // request is the same object undici:request:create
 })
+
 
 ```
 
@@ -69,6 +72,7 @@ diagnosticsChannel.channel('undici:request:headers').subscribe(({ request, respo
   console.log(response.headers.map((x) => x.toString()))
 })
 
+
 ```
 
 ## `undici:request:bodyChunkReceived`
@@ -81,6 +85,7 @@ import diagnosticsChannel from 'diagnostics_channel'
 diagnosticsChannel.channel('undici:request:bodyChunkReceived').subscribe(({ request, chunk }) => {
   // request is the same object undici:request:create
 })
+
 
 ```
 
@@ -98,6 +103,7 @@ diagnosticsChannel.channel('undici:request:trailers').subscribe(({ request, trai
   console.log(trailers.map((x) => x.toString()))
 })
 
+
 ```
 
 ## `undici:request:error`
@@ -110,6 +116,7 @@ import diagnosticsChannel from 'diagnostics_channel'
 diagnosticsChannel.channel('undici:request:error').subscribe(({ request, error }) => {
   // request is the same object undici:request:create
 })
+
 
 ```
 
@@ -127,6 +134,7 @@ diagnosticsChannel.channel('undici:client:sendHeaders').subscribe(({ request, he
   console.log(`Full headers list ${headers.split('\r\n')}`);
 })
 
+
 ```
 
 ## `undici:client:beforeConnect`
@@ -143,6 +151,7 @@ diagnosticsChannel.channel('undici:client:beforeConnect').subscribe(({ connectPa
   // connector is a function that creates the socket
 })
 
+
 ```
 
 ## `undici:client:connected`
@@ -156,6 +165,7 @@ diagnosticsChannel.channel('undici:client:connected').subscribe(({ socket, conne
   // const { host, hostname, protocol, port, servername, version } = connectParams
  // connector is a function that creates the socket
 })
+
 
 ```
 
@@ -171,6 +181,7 @@ diagnosticsChannel.channel('undici:client:connectError').subscribe(({ error, soc
   // connector is a function that creates the socket
   console.log(`Connect failed with ${error.message}`)
 })
+
 
 ```
 
@@ -199,6 +210,7 @@ diagnosticsChannel.channel('undici:websocket:open').subscribe(({
   console.log(handshakeResponse.statusText) // 'Switching Protocols' for HTTP/1.1, commonly 'OK' for HTTP/2 in Node.js
   console.log(handshakeResponse.headers) // Object containing response headers
 })
+
 
 ```
 
@@ -232,6 +244,7 @@ diagnosticsChannel.channel('undici:websocket:close').subscribe(({ websocket, cod
   console.log(reason) // the closing reason
 })
 
+
 ```
 
 ## `undici:websocket:socket_error`
@@ -244,6 +257,7 @@ import diagnosticsChannel from 'diagnostics_channel'
 diagnosticsChannel.channel('undici:websocket:socket_error').subscribe((error) => {
   console.log(error)
 })
+
 
 ```
 
@@ -260,6 +274,7 @@ diagnosticsChannel.channel('undici:websocket:ping').subscribe(({ payload, websoc
   console.log(websocket) // the WebSocket instance
 })
 
+
 ```
 
 ## `undici:websocket:pong`
@@ -275,6 +290,7 @@ diagnosticsChannel.channel('undici:websocket:pong').subscribe(({ payload, websoc
   console.log(websocket) // the WebSocket instance
 })
 
+
 ```
 
 ## `undici:proxy:connected`
@@ -289,6 +305,7 @@ diagnosticsChannel.channel('undici:proxy:connected').subscribe(({ socket, connec
   console.log(connectParams)
   // const { origin, port, path, signal, headers, servername } = connectParams
 })
+
 
 ```
 
@@ -306,6 +323,7 @@ diagnosticsChannel.channel('undici:request:pending-requests').subscribe(({ type,
   console.log(size)  // current number of pending requests
   console.log(key)   // the deduplication key for this request
 })
+
 
 ```
 
@@ -332,6 +350,7 @@ channel.subscribe(({ type, size, key }) => {
   }
 })
 
+
 ```
 
 This can be useful for:
@@ -341,4 +360,3 @@ This can be useful for:
 - Monitoring the number of concurrent in-flight requests
 
 - Debugging deduplication behavior in production environments
- 

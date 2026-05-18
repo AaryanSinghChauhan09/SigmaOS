@@ -6,12 +6,13 @@ SigmaOS implements security as a zero-trust, post-quantum fortified subsystem de
 
 ```mermaid
 graph TD
-    A[Sovereign Boot Engine] -->|Attestation| B(Security Engine)
+    A[Sovereign Boot Engine] --> | Attestation | B(Security Engine)
     B --> C{PQC Validator}
-    C -->|Kyber-1024| D[Shard Execution]
-    C -->|Dilithium-5| E[Package Signatures]
+    C --> | Kyber-1024 | D[Shard Execution]
+    C --> | Dilithium-5 | E[Package Signatures]
     D --> F[Memory Isolation Enforcer]
     F --> G[Zero-Data Remanence Wiper]
+
 
 ```
 
@@ -34,5 +35,5 @@ if (status != SIGMA_OK) {
     // Hardware halt triggered
 }
 
+
 ```
- 

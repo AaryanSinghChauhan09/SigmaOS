@@ -6,20 +6,20 @@ SigmaOS is designed for **Absolute Modularity**. Unlike the monolithic Linux ker
 
 ## 🏛️ Shard Hierarchy
 
-| Layer | Purpose | Key Shards |
-| :--- | :--- | :--- |
+| Layer | Purpose | Key Shards | 
+| :--- | :--- | :--- | 
 
-| **L1: Physical** | Silicon Tuning | `SovereignARM64`, `SovereignX64` |
+| **L1: Physical** | Silicon Tuning | `SovereignARM64`, `SovereignX64` | 
 
-| **L2: HAL** | Hardware Abstraction | `SovereignGPU`, `SovereignNVMe`, `SovereignNet` |
+| **L2: HAL** | Hardware Abstraction | `SovereignGPU`, `SovereignNVMe`, `SovereignNet` | 
 
-| **L3: Lattice** | Core Kernel | `SovereignInit`, `SovereignIPC`, `SovereignVFS` |
+| **L3: Lattice** | Core Kernel | `SovereignInit`, `SovereignIPC`, `SovereignVFS` | 
 
-| **L4: Governance**| Security & PQC | `SovereignPQC`, `SovereignCompliance` |
-| **L5: Industrial**| Performance & Power | `SovereignPower`, `SovereignMonitor`, `SovereignAutomation` |
-| **L6: Interface** | UI & Personalization| `SovereignZenith`, `SovereignCustomizer` |
+| **L4: Governance** | Security & PQC | `SovereignPQC`, `SovereignCompliance` | 
+| **L5: Industrial** | Performance & Power | `SovereignPower`, `SovereignMonitor`, `SovereignAutomation` | 
+| **L6: Interface** | UI & Personalization | `SovereignZenith`, `SovereignCustomizer` | 
 
-| **L7: Sovereignty**| Decentralized State | `SovereignIdentity`, `SovereignP2P` |
+| **L7: Sovereignty** | Decentralized State | `SovereignIdentity`, `SovereignP2P` | 
 
 ---
 
@@ -48,4 +48,3 @@ SigmaOS provides **One-Click Industrialization** (#68), allowing enterprise user
 ### The lattice is the unit of sovereignty
 
 v14.3 [MODULAR-SUPREMACY]
- 

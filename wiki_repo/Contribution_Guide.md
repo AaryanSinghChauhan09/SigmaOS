@@ -28,7 +28,7 @@ Have an idea?
 
 1
 
-Find the right `suites/S<NN>_*` directory: | Suite Range | Domain | |-------------|--------| | S01S10 | Kernel core (allocator, HAL, IPC, security) | | S11S20 | System services (VFS, networking, process mgmt) | | S21S30 | Performance (NUMA, cache, BPF, containers) | | S31S40 | Storage, immutability, ZKP, sovereign wire | | S41S50 | Boot, self-healing, caps, mesh | | S51S65 | Applications, AI, developer tools | ---
+Find the right `suites/S<NN>_*` directory: | Suite Range | Domain | | ------------- | -------- | | S01S10 | Kernel core (allocator, HAL, IPC, security) | | S11S20 | System services (VFS, networking, process mgmt) | | S21S30 | Performance (NUMA, cache, BPF, containers) | | S31S40 | Storage, immutability, ZKP, sovereign wire | | S41S50 | Boot, self-healing, caps, mesh | | S51S65 | Applications, AI, developer tools | ---
 
 1
 
@@ -105,4 +105,3 @@ CI will automatically run all 4 workflows and report results.
 ---
 
 1
- 

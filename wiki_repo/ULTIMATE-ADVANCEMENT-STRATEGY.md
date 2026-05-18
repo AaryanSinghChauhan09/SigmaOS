@@ -237,4 +237,3 @@ This document outlines the 100 strategic advancements required to make SigmaOS t
 ### The SigmaOS Roadmap is an immutable strategic document
 
 v14.1 [ZENITH-EXPANSION]
- 

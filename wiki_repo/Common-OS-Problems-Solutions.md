@@ -75,4 +75,3 @@ SigmaOS takes a proactive, structural approach to solving universal operating sy
 
 - **POSIX Compliance**: The `SovereignLibC` implementation ensures legacy compatibility with POSIX software.
 - **Extensive HAL**: Support ranging from x86_64 to ARM and emerging quantum computing interconnects through isolated Hardware Abstraction Layers (`kernel/core/hal/`).
- 
