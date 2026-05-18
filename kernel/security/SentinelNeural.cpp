@@ -42,9 +42,9 @@ void SentinelNeural::init() {
 
     // Initialize ML weights with dummy baseline values
     m_anomaly_threshold = 0.75f;
-    for (int i = 0; i < 10 * 32; i++) m_weights_1[i] = 0.01ff * (float)(i % 5 - 2);
+    for (int i = 0; i < 10 * 32; i++) m_weights_1[i] = 0.01f * (float)(i % 5 - 2);
     for (int i = 0; i < 32; i++) m_bias_1[i] = 0.0f;
-    for (int i = 0; i < 32 * 16; i++) m_weights_2[i] = 0.01ff * (float)(i % 5 - 2);
+    for (int i = 0; i < 32 * 16; i++) m_weights_2[i] = 0.01f * (float)(i % 5 - 2);
     for (int i = 0; i < 16; i++) m_bias_2[i] = 0.0f;
     for (int i = 0; i < 16; i++) m_weights_3[i] = 0.05f;
     m_bias_3 = -0.1f;
