@@ -1,12 +1,18 @@
+
 # Statistics → SigmaStats Toolkit
+
 
 > Maps the Statistics syllabus to `SigmaStats` — SigmaOS's built-in statistical analysis library, integrated with SigmaViz and SigmaAI.
 
 ---
 
+
 ## Unit I: Introduction & Data Collection
 
+
+
 ### What is Statistics?
+
 Statistics is the science of collecting, organizing, analyzing, interpreting, and presenting data.
 
 **SigmaOS Integration:** `SigmaStats` provides kernel-level statistical primitives used by:
@@ -15,17 +21,23 @@ Statistics is the science of collecting, organizing, analyzing, interpreting, an
 - `SigmaSheets` — spreadsheet formulas
 - `SigmaDB` — aggregate query functions
 
+
 ### Primary vs Secondary Data
+
 
 | Type | Source | SigmaOS Analogy |
 | --- | --- | --- |
 | **Primary** | Collected firsthand (surveys, sensors) | Live telemetry from SigmaOS sensors |
 | **Secondary** | Pre-collected (databases, reports) | Historical data from SigmaDB |
 
+
 ### Diagrammatic Representation — SigmaViz Charts
 
+
 ```python
+
 # SigmaViz Python API (SigmaPy integration)
+
 import sigmaviz as sv
 
 data = [23, 45, 12, 67, 34, 89, 55]
@@ -41,9 +53,13 @@ sv.frequency_curve(data, title="Ogive / Frequency Curve")
 
 ---
 
+
 ## Unit II: Measures of Central Tendency & Dispersion
 
+
+
 ### Central Tendency
+
 
 ```cpp
 // kernel/math/SigmaStats.h
@@ -69,7 +85,9 @@ namespace Sigma::Stats {
 
 ```text
 
+
 ### Measures of Dispersion
+
 
 ```cpp
 namespace Sigma::Stats {
@@ -97,7 +115,9 @@ namespace Sigma::Stats {
 
 ```text
 
+
 ### Skewness, Moments & Kurtosis
+
 
 ```cpp
 namespace Sigma::Stats {
@@ -121,9 +141,13 @@ namespace Sigma::Stats {
 
 ---
 
+
 ## Unit III: Correlation, Regression & Index Numbers
 
+
+
 ### Correlation Analysis
+
 
 ```cpp
 namespace Sigma::Stats {
@@ -145,7 +169,9 @@ namespace Sigma::Stats {
 
 ```text
 
+
 ### Interpretation
+
 
 | r value | Correlation |
 | --- | --- |
@@ -156,7 +182,9 @@ namespace Sigma::Stats {
 | -0.4 to -0.6 | Moderate negative |
 | -1.0 | Perfect negative |
 
+
 ### Regression Analysis
+
 
 ```cpp
 namespace Sigma::Stats {
@@ -178,7 +206,9 @@ namespace Sigma::Stats {
 
 ```text
 
+
 ### Index Numbers
+
 
 | Type | Formula | SigmaOS Use |
 | --- | --- | --- |
@@ -189,9 +219,13 @@ namespace Sigma::Stats {
 
 ---
 
+
 ## Unit IV: Interpolation, Time Series & Probability
 
+
+
 ### Interpolation & Extrapolation
+
 
 ```cpp
 namespace Sigma::Stats {
@@ -210,7 +244,9 @@ namespace Sigma::Stats {
 
 ```text
 
+
 ### Time Series Analysis
+
 
 ```text
 Time Series = Trend (T) + Seasonal (S) + Cyclical (C) + Irregular (I)
@@ -235,7 +271,9 @@ namespace Sigma::Stats {
 
 ```text
 
+
 ### Probability
+
 
 ```cpp
 namespace Sigma::Math {
@@ -263,7 +301,9 @@ namespace Sigma::Math {
 
 ---
 
+
 ## SigmaStats Integration Map
+
 
 ```text
 SigmaStats Library

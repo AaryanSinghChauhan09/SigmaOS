@@ -1,12 +1,18 @@
+
 # RDBMS & Oracle SQL → SigmaDB Engine
+
 
 > Maps the RDBMS/Oracle SQL syllabus to `SigmaDB` — SigmaOS's native relational database engine.
 
 ---
 
+
 ## Unit I: DBMS Overview
 
+
+
 ### Codd's 12 Rules — SigmaDB Compliance
+
 
 | Rule | SigmaDB Status |
 | --- | --- |
@@ -19,12 +25,16 @@
 | Physical Data Independence | ✅ S-ZFS backend |
 | Distribution Independence | ✅ SovereignCloudFS |
 
+
 ### Normalization
+
 1NF → 2NF → 3NF → BCNF — enforced by SigmaDB schema validator (`normalizer.cpp`).
 
 ---
 
+
 ## Unit II: DDL, DML, Joins, Transactions
+
 
 ```sql
 -- Create with constraints
@@ -57,7 +67,9 @@ REVOKE INSERT ON employees FROM sigma_admin;
 
 ---
 
+
 ## Unit III: Functions & Oracle Objects
+
 
 ```sql
 -- Numeric: ABS, CEIL, FLOOR, ROUND, TRUNC, SQRT, MOD, POWER, GREATEST, LEAST
@@ -79,7 +91,9 @@ CREATE INDEX idx_salary ON employees(salary);
 
 ---
 
+
 ## Unit IV: PL/SQL
+
 
 ```plsql
 -- Block structure
@@ -110,7 +124,9 @@ FOR EACH ROW BEGIN INSERT INTO audit_log VALUES(SYSDATE, :NEW.emp_id); END;
 
 ---
 
+
 ## SigmaDB Architecture
+
 
 ```text
 SigmaDB Engine
