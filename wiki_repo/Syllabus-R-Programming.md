@@ -76,7 +76,8 @@ nrow(df); ncol(df)
 df_csv   <- read.csv("/sigma/data/metrics.csv")
 df_scan  <- scan("/sigma/data/values.txt")
 lines    <- readLines("/sigma/log/kernel.log")
-```
+
+```text
 
 ---
 
@@ -140,7 +141,8 @@ ifelse(v > 3, "high", "low")
 for (proc in df$process) cat(proc, "\n")
 while (retries < 3) { if (connect()) break; retries <- retries + 1 }
 repeat { val <- scan(n=1); if (val == 0) break }
-```
+
+```text
 
 ---
 
@@ -196,7 +198,8 @@ ggplot(df, aes(x=cpu_pct, y=mem_mb, color=process)) +
 
 # Pie chart
 pie(table(df$process), main="Process Distribution", col=rainbow(5))
-```
+
+```text
 
 ---
 
@@ -245,14 +248,15 @@ knn_pred <- knn(train_features, test_features, train_labels, k=5)
 # Model evaluation
 conf_matrix <- table(Predicted=predictions, Actual=test_labels)
 accuracy <- sum(diag(conf_matrix)) / sum(conf_matrix)
-```
+
+```text
 
 ---
 
 ## SigmaR Integration
 
 | R Feature | SigmaOS Integration |
-|---|---|
+| --- | --- |
 | `ggplot2` | Renders via `SigmaViz` engine |
 | `RMySQL` | Connects to `SigmaDB` |
 | `readLines` | Reads from `SovereignFS` |

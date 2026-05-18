@@ -26,6 +26,7 @@
 
 Sets the expiry time of the cookie to the unix epoch, causing browsers to delete it when received.
 
+
 ```js
 import { deleteCookie, Headers } from 'undici'
 
@@ -33,6 +34,7 @@ const headers = new Headers()
 deleteCookie(headers, 'name')
 
 console.log(headers.get('set-cookie')) // name=; Expires=Thu, 01 Jan 1970 00:00:00 GMT
+
 
 
 ```
@@ -51,6 +53,7 @@ Returns: `void`
 
 Parses the `Cookie` header and returns a list of attributes and values.
 
+
 ```js
 import { getCookies, Headers } from 'undici'
 
@@ -59,6 +62,7 @@ const headers = new Headers({
 })
 
 console.log(getCookies(headers)) // { get: 'cookies', and: 'attributes' }
+
 
 
 ```
@@ -72,6 +76,7 @@ Returns: `Record<string, string>`
 ## `getSetCookies(headers)`
 
 Parses all `Set-Cookie` headers.
+
 
 ```js
 import { getSetCookies, Headers } from 'undici'
@@ -89,6 +94,7 @@ console.log(getSetCookies(headers))
 
 
 
+
 ```
 
 Arguments:
@@ -101,6 +107,7 @@ Returns: `Cookie[]`
 
 Appends a cookie to the `Set-Cookie` header.
 
+
 ```js
 import { setCookie, Headers } from 'undici'
 
@@ -108,6 +115,7 @@ const headers = new Headers()
 setCookie(headers, { name: 'undici', value: 'setCookie' })
 
 console.log(headers.get('Set-Cookie')) // undici=setCookie
+
 
 
 ```

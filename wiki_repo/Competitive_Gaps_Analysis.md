@@ -19,19 +19,19 @@ This document identifies the critical areas where the SigmaOS Sovereign Lattice 
 
 ### 1. Hardware Driver Parity
 
-***Gap:** Mature OS kernels ship massive binary driver modules supporting thousands of target devices.* **Resolution:** Establish a decoupled Hardware Abstraction Layer (HAL) for x86_64, ARM, and RISC-V, allowing hardware manufacturers to compile bare-metal drivers that interface directly with the Unified Driver API without modifying the core microkernel source.
+***Gap:**Mature OS kernels ship massive binary driver modules supporting thousands of target devices.***Resolution:** Establish a decoupled Hardware Abstraction Layer (HAL) for x86_64, ARM, and RISC-V, allowing hardware manufacturers to compile bare-metal drivers that interface directly with the Unified Driver API without modifying the core microkernel source.
 
 ### 2. ACPI & Silicon Power Integration
 
-***Gap:** Modern notebooks and servers require complex thermal governors, CPU active frequency scaling, and dynamic suspend states to conserve energy.* **Resolution:** Stabilize the `SovereignPowerManager` by linking thread scheduler priorities directly to thermal indexes, ensuring intensive execution workloads are automatically distributed across energy-efficient cores.
+***Gap:**Modern notebooks and servers require complex thermal governors, CPU active frequency scaling, and dynamic suspend states to conserve energy.***Resolution:** Stabilize the `SovereignPowerManager` by linking thread scheduler priorities directly to thermal indexes, ensuring intensive execution workloads are automatically distributed across energy-efficient cores.
 
 ### 3. File System & Storage Parity
 
-***Gap:** Enterprise users require bulletproof storage resilience, metadata journaling, and hot-swappable disk pools.* **Resolution:**The implementation of**S-ZFS** closes this gap by allowing physical multi-disk configurations to act as a single pool (`tank`) with built-in zero-copy backup snapshots and PQC signature verification.
+***Gap:**Enterprise users require bulletproof storage resilience, metadata journaling, and hot-swappable disk pools.***Resolution:**The implementation of**S-ZFS** closes this gap by allowing physical multi-disk configurations to act as a single pool (`tank`) with built-in zero-copy backup snapshots and PQC signature verification.
 
 ### 4. Ecosystem & Application Isolation
 
-***Gap:** Users require sandboxed environments to run third-party software without compromising system security.* **Resolution:** Leverage post-quantum secure flatpak isolation boundaries to run untrusted applications inside strict silicon-governed cgroups.
+***Gap:**Users require sandboxed environments to run third-party software without compromising system security.***Resolution:** Leverage post-quantum secure flatpak isolation boundaries to run untrusted applications inside strict silicon-governed cgroups.
 
 ---
 

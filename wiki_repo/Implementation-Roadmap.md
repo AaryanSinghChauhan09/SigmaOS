@@ -1,6 +1,6 @@
 # SigmaOS Implementation Roadmap
 
-> This roadmap tracks the development of core features for the **Zenith v15.1** and **Horizon** microkernel releases, fully aligned with the academic syllabus implementation map.
+> This roadmap tracks the development of core features for the **Zenith v15.1**and**Horizon** microkernel releases, fully aligned with the academic syllabus implementation map.
 
 📚 **See the full Syllabus→SigmaOS mapping:** [Syllabus-Implementation-Map](Syllabus-Implementation-Map)
 
@@ -11,7 +11,7 @@
 All 14 academic subjects have been mapped to SigmaOS architecture layers. See individual pages:
 
 | Subject | SigmaOS Layer | Wiki |
-|---|---|---|
+| --- | --- | --- |
 | Fundamentals of CS & IT | Kernel + HAL + CLI + Office Suite | [FCIT](Syllabus-FCIT) |
 | Discrete Mathematics | Math/Logic Engine | [DiscreteMath](Syllabus-DiscreteMath) |
 | C Programming | Developer C API Layer | [C-Prog](Syllabus-C-Programming) |
@@ -33,57 +33,49 @@ All 14 academic subjects have been mapped to SigmaOS architecture layers. See in
 
 ## 1. Bootloader (Bare-Metal Start)
 
-**Status:** Partial — assembly boot stub exists.
-**Plan:** Write NASM/C bootloader → GDT/IDT setup → load microkernel into memory.
+**Status:**Partial — assembly boot stub exists.**Plan:** Write NASM/C bootloader → GDT/IDT setup → load microkernel into memory.
 
 - **Docs:** `Bootloader-Design.md`
 
 ## 2. Kernel Modules Architecture
 
-**Status:** Modular shard architecture defined.
-**Plan:** Hot-swappable kernel modules — scheduler, MMU, PQC attestation.
+**Status:**Modular shard architecture defined.**Plan:** Hot-swappable kernel modules — scheduler, MMU, PQC attestation.
 
 - **Docs:** `Kernel-Architecture.md`
 
 ## 3. Memory Management (S-MM)
 
-**Status:** Paging partially implemented; slab allocator skeleton exists.
-**Plan:** Full 4-level paging (PML4), CoW fork, slab allocator, buddy system.
+**Status:**Paging partially implemented; slab allocator skeleton exists.**Plan:** Full 4-level paging (PML4), CoW fork, slab allocator, buddy system.
 
 - **Docs:** `Sovereign-Memory-Management.md`
 
 ## 4. Process Scheduling (S-SCHED)
 
-**Status:** Round-robin stub present.
-**Plan:** CFS-like scheduler, multi-core dispatch, thread isolation per shard.
+**Status:**Round-robin stub present.**Plan:** CFS-like scheduler, multi-core dispatch, thread isolation per shard.
 
 - **Docs:** `Scheduling-Algorithms.md`
 
 ## 5. Device Drivers (HAL)
 
-**Status:** Stubs for NVMe, USB, VGA exist.
-**Plan:** Full HAL registry — keyboard, mouse, NVMe, SATA, USB, VGA/VESA, audio.
+**Status:**Stubs for NVMe, USB, VGA exist.**Plan:** Full HAL registry — keyboard, mouse, NVMe, SATA, USB, VGA/VESA, audio.
 
 - **Docs:** `Driver-Development.md`
 
 ## 6. Security Model (S-ARMOR)
 
-**Status:** PQC key types defined; enforcement incomplete.
-**Plan:** Ring 0/3 separation, MAC namespaces, Kyber/Dilithium syscall signing.
+**Status:**PQC key types defined; enforcement incomplete.**Plan:** Ring 0/3 separation, MAC namespaces, Kyber/Dilithium syscall signing.
 
 - **Docs:** `Security-Model.md`
 
 ## 7. Networking Stack (S-NET)
 
-**Status:** TCP/IP stubs only.
-**Plan:** Full TCP/IP stack, WebSocket support, encrypted IPC via SovereignIPC.
+**Status:**TCP/IP stubs only.**Plan:** Full TCP/IP stack, WebSocket support, encrypted IPC via SovereignIPC.
 
 - **Docs:** `Networking.md`
 
 ## 8. User-Space Tooling
 
-**Status:** sigma-cli partially implemented.
-**Plan:** Full shell + package manager + SigmaStore + sigma-doctor CLI.
+**Status:**sigma-cli partially implemented.**Plan:** Full shell + package manager + SigmaStore + sigma-doctor CLI.
 
 - **Docs:** `User-Tools.md`
 
@@ -92,7 +84,7 @@ All 14 academic subjects have been mapped to SigmaOS architecture layers. See in
 ## 📊 Feature Status Summary
 
 | Feature | Status | Priority |
-|---|---|---|
+| --- | --- | --- |
 | SovereignCodec (number systems) | 🟡 Planned | High |
 | sigma-cli shell | 🟢 Partial | High |
 | HAL I/O Drivers | 🟢 Partial | High |

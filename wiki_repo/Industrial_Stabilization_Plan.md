@@ -8,6 +8,7 @@ This document establishes the strategic, structural, and architectural blueprint
 
 As a sovereign, AI-native operating system designed to outpace monolithic systems, SigmaOS must guarantee absolute system stability, zero-drift real-time task execution, and post-quantum attested security. This plan transitions SigmaOS from high-performance development stages into a certified, industrial-grade operational platform.
 
+
 ```mermaid
 graph TD
     A[Silicon-Direct Hardware Layer] --> B[Sovereign HAL Drivers]
@@ -16,6 +17,7 @@ graph TD
     D --> E[Shard-Aware CFS Scheduler]
     E --> F[Professional Indian Compliance Tools]
     F --> G[Industrial Production Sovereign Stable]
+
 
 ```
 

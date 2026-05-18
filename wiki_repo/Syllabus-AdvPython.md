@@ -8,12 +8,13 @@
 
 ### Data Science Lifecycle in SigmaOS
 
-```
+```text
 Problem Definition → Data Collection (SigmaDB/SovereignFS)
 → Data Cleaning (SigmaETL) → EDA (SigmaViz)
 → Feature Engineering → Model Training (SigmaAI)
 → Evaluation → Deployment (SigmaOS service)
-```
+
+```text
 
 ### Tools Setup (SigmaOS)
 
@@ -22,7 +23,8 @@ Problem Definition → Data Collection (SigmaDB/SovereignFS)
 sigma pkg install sigma-datascience  # installs numpy, pandas, matplotlib, sklearn
 sigma-jupyter start                   # Launch Jupyter-compatible notebook server
 sigma-py --repl                       # Interactive Python REPL
-```
+
+```text
 
 ### NumPy
 
@@ -90,7 +92,8 @@ np.save('/sigma/data/array.npy', arr)
 loaded = np.load('/sigma/data/array.npy')
 np.savetxt('/sigma/data/matrix.csv', arr2d, delimiter=',')
 loaded_txt = np.loadtxt('/sigma/data/matrix.csv', delimiter=',')
-```
+
+```text
 
 ---
 
@@ -154,7 +157,8 @@ df = pd.read_csv('/sigma/data/metrics.csv')
 df = pd.read_json('/sigma/data/config.json')
 df.to_csv('/sigma/data/output.csv', index=False)
 df.to_parquet('/sigma/data/metrics.parquet')
-```
+
+```text
 
 ---
 
@@ -213,7 +217,8 @@ sns.lineplot(data=ts_df, x='time', y='cpu')
 sns.boxplot(data=df, x='process', y='cpu_pct')
 sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', center=0)
 sns.pairplot(df[['cpu_pct','mem_mb','io_mbps']])
-```
+
+```text
 
 ---
 
@@ -265,14 +270,15 @@ print(f"CV Mean: {cv_scores.mean():.4f} ± {cv_scores.std():.4f}")
 # Save / load model
 joblib.dump(pipe, '/sigma/ai/models/anomaly_detector.pkl')
 loaded = joblib.load('/sigma/ai/models/anomaly_detector.pkl')
-```
+
+```text
 
 ---
 
 ## SigmaOS Integration Map
 
 | Component | Role |
-|---|---|
+| --- | --- |
 | NumPy | Tensor/matrix ops in `SigmaAI::NPURuntime` |
 | Pandas | ETL data frames in `SigmaWarehouse` |
 | Matplotlib/Seaborn | Charts rendered by `SigmaViz` |

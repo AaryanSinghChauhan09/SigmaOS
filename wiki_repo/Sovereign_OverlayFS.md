@@ -22,6 +22,7 @@ By executing directly within the microkernel storage mount path, it absorbs the 
 
 The S-OverlayFS system manages dynamic union mounting. A read-only base system partition (e.g. `/sys/base` on live silicon) is merged with a temporary writable RAM disk partition (`/var/tmp`) to form a single, fully editable virtual partition (`/merged`).
 
+
 ```mermaid
 graph TD
     A[S-OverlayFS Engine] --> B[Upper Layer /var/tmp RW]
@@ -29,6 +30,7 @@ graph TD
     B --> D[Merged Union View /merged]
     C --> D
     E[User Write Command] --> | Triggers Copy-Up-On-Write | B
+
 
 ```
 
@@ -47,6 +49,7 @@ When a write command targets a read-only lower file (e.g., `config.json` inside 
 
 The `sigma-overlay` utility allows live, non-disruptive union manipulation:
 
+
 ```bash
 # Mount a new OverlayFS partition combining base and temp layers
 sigma-overlay mount <lowerdir> <upperdir> <mergeddir>
@@ -57,6 +60,7 @@ sigma-overlay write <filename> <content>
 # List the active files inside the merged directory view
 sigma-overlay list
 
+
 ```
 
 ---
@@ -65,9 +69,7 @@ sigma-overlay list
 
 The S-OverlayFS subsystem is built across the following zero-dependency files:
 
-***Core Engine**: `kernel/core/SovereignOverlayFS.cpp`* **CLI Controller**: `tools/sigma_overlayfs.cpp`
-
-* **Header Mappings**: `include/sigma_kernel_types.h`
+***Core Engine**: `kernel/core/SovereignOverlayFS.cpp`***CLI Controller**: `tools/sigma_overlayfs.cpp`* **Header Mappings**: `include/sigma_kernel_types.h`
 
 ---
 

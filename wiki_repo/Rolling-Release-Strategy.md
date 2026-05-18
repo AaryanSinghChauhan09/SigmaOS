@@ -18,8 +18,10 @@ SigmaOS does not have "point releases" in the traditional sense. Individual shar
 
 Synchronize your lattice with the rolling edge:
 
+
 ```bash
 sigma-pkg update --rolling
+
 
 
 ```

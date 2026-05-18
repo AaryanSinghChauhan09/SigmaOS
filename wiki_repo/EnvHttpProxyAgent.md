@@ -28,6 +28,7 @@ Extends: [`AgentOptions`](/docs/docs/api/Agent.md#parameter-agentoptions)
 
 Examples:
 
+
 ```js
 import { EnvHttpProxyAgent } from 'undici'
 
@@ -36,11 +37,13 @@ const envHttpProxyAgent = new EnvHttpProxyAgent()
 const envHttpProxyAgent = new EnvHttpProxyAgent({ httpProxy: 'my.proxy.server:8080', httpsProxy: 'my.proxy.server:8443', noProxy: 'localhost' })
 
 
+
 ```
 
 #### Example - EnvHttpProxyAgent instantiation
 
 This will instantiate the EnvHttpProxyAgent. It will not do anything until registered as the agent to use with requests.
+
 
 ```js
 import { EnvHttpProxyAgent } from 'undici'
@@ -48,9 +51,11 @@ import { EnvHttpProxyAgent } from 'undici'
 const envHttpProxyAgent = new EnvHttpProxyAgent()
 
 
+
 ```
 
 #### Example - Basic Proxy Fetch with global agent dispatcher
+
 
 ```js
 import { setGlobalDispatcher, fetch, EnvHttpProxyAgent } from 'undici'
@@ -65,9 +70,11 @@ console.log('response received', status) // response received 200
 const data = await json() // data { foo: "bar" }
 
 
+
 ```
 
 #### Example - Basic Proxy Request with global agent dispatcher
+
 
 ```js
 import { setGlobalDispatcher, request, EnvHttpProxyAgent } from 'undici'
@@ -84,9 +91,11 @@ for await (const data of body) {
 }
 
 
+
 ```
 
 #### Example - Basic Proxy Request with local agent dispatcher
+
 
 ```js
 import { EnvHttpProxyAgent, request } from 'undici'
@@ -105,9 +114,11 @@ for await (const data of body) {
 }
 
 
+
 ```
 
 #### Example - Basic Proxy Fetch with local agent dispatcher
+
 
 ```js
 import { EnvHttpProxyAgent, fetch } from 'undici'
@@ -122,6 +133,7 @@ const {
 console.log('response received', status) // response received 200
 
 const data = await json() // data { foo: "bar" }
+
 
 
 ```

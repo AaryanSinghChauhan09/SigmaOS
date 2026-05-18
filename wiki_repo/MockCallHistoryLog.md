@@ -2,9 +2,11 @@
 
 Access to an instance with :
 
+
 ```js
 const mockAgent = new MockAgent({ enableCallHistory: true })
 mockAgent.getCallHistory()?.firstCall()
+
 
 
 ```
@@ -41,9 +43,11 @@ mockAgent.getCallHistory()?.firstCall()
 
 Returns a Map instance
 
+
 ```js
 mockAgent.getCallHistory()?.firstCall()?.toMap()?.get('hash')
 // #hash
+
 
 
 ```
@@ -52,9 +56,11 @@ mockAgent.getCallHistory()?.firstCall()?.toMap()?.get('hash')
 
 Returns a string computed with any class property name and value pair
 
+
 ```js
 mockAgent.getCallHistory()?.firstCall()?.toString()
 // protocol->https: | host->localhost:4000 | port->4000 | origin->https://localhost:4000 | path->/endpoint | hash->#here | searchParams->{"query":"value"} | fullUrl->https://localhost:4000/endpoint?query=value#here | method->PUT | body->"{ "data": "hello" }" | headers->{"content-type":"application/json"}
+
 
 
 ```

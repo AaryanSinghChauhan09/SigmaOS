@@ -18,7 +18,7 @@ Statistics is the science of collecting, organizing, analyzing, interpreting, an
 ### Primary vs Secondary Data
 
 | Type | Source | SigmaOS Analogy |
-|---|---|---|
+| --- | --- | --- |
 | **Primary** | Collected firsthand (surveys, sensors) | Live telemetry from SigmaOS sensors |
 | **Secondary** | Pre-collected (databases, reports) | Historical data from SigmaDB |
 
@@ -36,7 +36,8 @@ sv.pie_chart(data, labels, title="Resource Distribution")
 sv.histogram(data, bins=5, title="Latency Distribution")
 sv.frequency_polygon(data, title="Frequency Polygon")
 sv.frequency_curve(data, title="Ogive / Frequency Curve")
-```
+
+```text
 
 ---
 
@@ -57,7 +58,7 @@ namespace Sigma::Stats {
     double median(double* data, size_t n);  // Sort then pick middle
     double mode(const double* data, size_t n);  // Most frequent value
 
-    // GM = (x1 * x2 * ... * xn)^(1/n)
+    // GM = (x1 *x2* ... * xn)^(1/n)
     double geometric_mean(const double* data, size_t n);
 
     // HM = n / (1/x1 + 1/x2 + ... + 1/xn)
@@ -65,7 +66,8 @@ namespace Sigma::Stats {
 
     // Relation: AM >= GM >= HM (for positive values)
 }
-```
+
+```text
 
 ### Measures of Dispersion
 
@@ -75,7 +77,7 @@ namespace Sigma::Stats {
     double range(const double* data, size_t n);  // max - min
 
     double mean_deviation(const double* data, size_t n);
-    // MD = Σ|xi - mean| / n
+    // MD = Σ | xi - mean | / n
 
     double variance(const double* data, size_t n);
     // σ² = Σ(xi - mean)² / n
@@ -92,7 +94,8 @@ namespace Sigma::Stats {
     // Coefficient of variation: CV = (σ / mean) × 100
     double coeff_variation(const double* data, size_t n);
 }
-```
+
+```text
 
 ### Skewness, Moments & Kurtosis
 
@@ -113,7 +116,8 @@ namespace Sigma::Stats {
     // Leptokurtic: β2 > 3 (heavy tails)
     // Platykurtic: β2 < 3 (light tails)
 }
-```
+
+```text
 
 ---
 
@@ -138,12 +142,13 @@ namespace Sigma::Stats {
     // r²: coefficient of determination
     double coeff_determination(double r);  // = r * r
 }
-```
 
-**Interpretation:**
+```text
+
+### Interpretation
 
 | r value | Correlation |
-|---|---|
+| --- | --- |
 | +1.0 | Perfect positive |
 | +0.7 to +0.9 | Strong positive |
 | +0.4 to +0.6 | Moderate positive |
@@ -170,12 +175,13 @@ namespace Sigma::Stats {
     // Both lines pass through (x̄, ȳ)
     // byx * bxy = r²
 }
-```
+
+```text
 
 ### Index Numbers
 
 | Type | Formula | SigmaOS Use |
-|---|---|---|
+| --- | --- | --- |
 | Simple Price Index | (Pn / P0) × 100 | Performance index vs baseline |
 | Laspeyre's | ΣP1Q0 / ΣP0Q0 × 100 | Weighted by base year quantities |
 | Paasche's | ΣP1Q1 / ΣP0Q1 × 100 | Weighted by current year quantities |
@@ -201,13 +207,15 @@ namespace Sigma::Stats {
     // Extrapolation: predict beyond known range (use with caution)
     double extrapolate(RegressionLine reg, double x_future);
 }
-```
+
+```text
 
 ### Time Series Analysis
 
-```
+```text
 Time Series = Trend (T) + Seasonal (S) + Cyclical (C) + Irregular (I)
-```
+
+```text
 
 ```cpp
 namespace Sigma::Stats {
@@ -224,7 +232,8 @@ namespace Sigma::Stats {
     // SigmaOS use: CPU/memory usage forecasting
     ForecastResult forecast_next(const double* history, size_t n, int steps);
 }
-```
+
+```text
 
 ### Probability
 
@@ -237,7 +246,7 @@ namespace Sigma::Math {
     // Addition theorem: P(A∪B) = P(A) + P(B) - P(A∩B)
     double prob_union(double pA, double pB, double pAB);
 
-    // Multiplication theorem: P(A∩B) = P(A) × P(B|A)
+    // Multiplication theorem: P(A∩B) = P(A) × P(B | A)
     double prob_intersection(double pA, double pB_given_A);
 
     // Independent events: P(A∩B) = P(A) × P(B)
@@ -245,17 +254,18 @@ namespace Sigma::Math {
 
     // Bayes' Theorem
     double bayes(double pA, double pB_given_A, double pB);
-    // P(A|B) = P(B|A)×P(A) / P(B)
+    // P(A | B) = P(B | A)×P(A) / P(B)
 
     // Used in SigmaAI: Naive Bayes classifier, anomaly detection
 }
-```
+
+```text
 
 ---
 
 ## SigmaStats Integration Map
 
-```
+```text
 SigmaStats Library
 ├── Central Tendency:  mean, median, mode, GM, HM
 ├── Dispersion:        range, MD, σ, σ², QD
@@ -272,8 +282,7 @@ Consumers:
 ├── SigmaViz (chart rendering)
 ├── SigmaAI (ML feature engineering)
 └── SigmaDB (aggregate SQL functions)
-```
 
-**Files:** `userland/apps/SigmaStats/sigma_stats.cpp`, `sigma_stats.h`
+```text
 
-*Last updated: 2026-05-18 | SigmaOS Zenith v15.1*
+**Files:**`userland/apps/SigmaStats/sigma_stats.cpp`, `sigma_stats.h`*Last updated: 2026-05-18 | SigmaOS Zenith v15.1*

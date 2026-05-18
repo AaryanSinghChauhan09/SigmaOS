@@ -34,10 +34,12 @@ SigmaOS currently lacks a fully functional filesystem, robust device drivers (e.
 
 ### 1. Build the Kernel
 
+
 ```bash
 
 make clean
 make singularity
+
 
 
 ```
@@ -46,9 +48,11 @@ make singularity
 
 ### 2. Generate a Bootable ISO
 
+
 ```bash
 
 make zenith-iso
+
 
 
 ```
@@ -57,9 +61,11 @@ make zenith-iso
 
 ### 3. Run in Emulator
 
+
 ```bash
 
 make qemu
+
 
 
 ```
@@ -68,7 +74,7 @@ make qemu
 
 ## 📚 Glossary: Translating the Vision
 
-SigmaOS uses unique terminology for its architectural concepts. Here is what they mean in standard OS engineering terms: | SigmaOS Term | Standard Technical Meaning | | :------------------------------- | :----------------------------------------------------------------------------------------------- | | **Sovereign Lattice** | The operating system architecture as a whole. | | **Shard** | A distinct subsystem or driver encapsulated as a C++ Singleton class. | | **Amnesic Memory** | Stateless RAM allocation; memory buffers that are eagerly zeroed out after use to prevent leaks. | | **Zenith** | The target milestone version denoting a stable, complete foundation. | | **ZCLN (Zero-Copy Lattice Net)** | A zero-copy networking stack (bypassing redundant buffer copies between kernel and userland). | ## 🤝 Contributing
+SigmaOS uses unique terminology for its architectural concepts. Here is what they mean in standard OS engineering terms: | SigmaOS Term | Standard Technical Meaning | | :------------------------------- | :----------------------------------------------------------------------------------------------- | | **Sovereign Lattice**| The operating system architecture as a whole. | |**Shard**| A distinct subsystem or driver encapsulated as a C++ Singleton class. | |**Amnesic Memory**| Stateless RAM allocation; memory buffers that are eagerly zeroed out after use to prevent leaks. | |**Zenith**| The target milestone version denoting a stable, complete foundation. | |**ZCLN (Zero-Copy Lattice Net)** | A zero-copy networking stack (bypassing redundant buffer copies between kernel and userland). | ## 🤝 Contributing
 
 We welcome contributions to help evolve SigmaOS from an experimental kernel into a fully usable distribution.
 

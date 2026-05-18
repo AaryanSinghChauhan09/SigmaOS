@@ -31,16 +31,18 @@ df_sampled = dp.sample(df, n=10000, strategy='stratified')
 df_norm = dp.normalize(df, method='min-max')  # Scale to [0, 1]
 df_std  = dp.standardize(df, method='zscore') # Mean=0, Std=1
 df_enc  = dp.encode_categorical(df, columns=['os_type'], method='onehot')
-```
+
+```text
 
 ### Data Warehouse Concepts
 
-```
+```text
 OLTP (Transactional DB)       →  ETL  →  Data Warehouse  →  Data Marts
 Real-time, normalized, CRUD          Denormalized, historical, read-heavy
 
 SigmaDB (OLTP)  →  SigmaETL  →  SigmaWarehouse  →  SigmaViz Dashboards
-```
+
+```text
 
 ### Data Cube & OLAP Operations
 
@@ -60,7 +62,8 @@ cube.drill_down('timestamp', 'hour')     # Granular view
 cube.slice(app_name='sigma-ui')          # Fix one dimension
 cube.dice(hostname='node1', month='May') # Filter 2+ dimensions
 cube.pivot(rows='app_name', cols='month', values='cpu_pct')
-```
+
+```text
 
 ### ETL Pipeline
 
@@ -77,7 +80,8 @@ pipeline = ETLPipeline(
     load=SigmaWarehouse.table('metrics_warehouse')
 )
 pipeline.run(schedule='daily')  # Runs via SigmaOS task scheduler
-```
+
+```text
 
 ---
 
@@ -101,7 +105,8 @@ rules = Apriori(
 for rule in rules:
     print(f"{rule.antecedent} → {rule.consequent}")
     print(f"  Support: {rule.support:.2f}, Confidence: {rule.confidence:.2f}")
-```
+
+```text
 
 ### Classification
 
@@ -120,7 +125,8 @@ sigma.viz.plot_tree(dt, feature_names=X.columns)
 # Naive Bayes for text classification
 nb = NaiveBayes(type='multinomial')
 nb.fit(tfidf_matrix, y_labels)
-```
+
+```text
 
 ### Clustering
 
@@ -140,13 +146,14 @@ anomalies = process_metrics[labels == -1]
 hc = Hierarchical(n_clusters=3, linkage='ward')
 dendogram = hc.fit_predict(X)
 sigma.viz.dendrogram(hc)
-```
+
+```text
 
 ---
 
 ## SigmaWarehouse Architecture
 
-```
+```text
 SigmaWarehouse Stack
 ├── Source Systems: SigmaDB, Log Files, HAL Sensors
 ├── ETL Layer: SigmaETL (Extract-Transform-Load pipelines)
@@ -155,9 +162,10 @@ SigmaWarehouse Stack
 ├── Data Marts: CPU, Memory, Network, Security, App-specific
 ├── Mining Engine: Apriori, Decision Trees, Clustering
 └── Visualization: SigmaViz dashboards
-```
 
-**Files:**
+```text
+
+### Files
 - `userland/apps/SigmaWarehouse/sigma_warehouse.cpp`
 - `userland/apps/SigmaAnalytics/data_mining.cpp`
 - `userland/apps/SigmaViz/olap_dashboard.cpp`

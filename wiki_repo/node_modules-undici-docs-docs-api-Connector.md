@@ -40,6 +40,7 @@ Once you call `buildConnector`, it will return a connector function, which takes
 
 ### Basic example
 
+
 ```js
 'use strict'
 
@@ -62,9 +63,11 @@ const client = new Client('https://localhost:3000', {
 })
 
 
+
 ```
 
 ### Example: validate the CA fingerprint
+
 
 ```js
 'use strict'
@@ -123,6 +126,7 @@ function getIssuerCertificate (socket) {
   }
   return certificate
 }
+
 
 
 ```

@@ -14,25 +14,27 @@ Data modeling defines the structure, relationships, and constraints of data — 
 
 ### Levels of Data Abstraction
 
-```
+```text
 Physical Level     — How data is stored (S-ZFS blocks, B-tree indexes)
 Logical Level      — Tables, columns, relationships (SigmaDB schema)
 View Level         — What users see (SigmaDB Views, SigmaDocs reports)
 Conceptual Level   — ER Diagrams (SigmaModeler)
-```
+
+```text
 
 ### Data Modeling Process
 
-```
+```text
 Requirements → Conceptual Model (ER) → Logical Model (Relational/OO)
 → Physical Model (DDL/Storage) → Implementation (SigmaDB)
 → Versioning (Git-backed) → Migration (SigmaModeler Migration Tool)
-```
+
+```text
 
 ### Normalization in SigmaModeler
 
 | Normal Form | Rule | SigmaModeler Check |
-|---|---|---|
+| --- | --- | --- |
 | 1NF | Atomic values, no repeating groups | ✅ Auto-detected |
 | 2NF | No partial dependencies (full PK deps) | ✅ |
 | 3NF | No transitive dependencies | ✅ |
@@ -47,7 +49,7 @@ Requirements → Conceptual Model (ER) → Logical Model (Relational/OO)
 ### Data Model Types
 
 | Type | Structure | SigmaOS Use |
-|---|---|---|
+| --- | --- | --- |
 | **Hierarchical** | Tree (parent-child) | File system tree, org charts |
 | **Network** | Graph (many-to-many) | Process dependency graph |
 | **Relational** | Tables + Foreign Keys | SigmaDB primary model |
@@ -57,7 +59,7 @@ Requirements → Conceptual Model (ER) → Logical Model (Relational/OO)
 
 ### Entity-Relationship Diagram (ERD)
 
-```
+```text
 SigmaDB ERD — System Metrics Schema
 
 ┌─────────────────┐         ┌─────────────────┐
@@ -80,11 +82,12 @@ SigmaDB ERD — System Metrics Schema
 │ state (ENUM)    │
 │ stack_addr(BIGINT)│
 └─────────────────┘
-```
+
+```text
 
 ### Dimensional Modeling (Star Schema)
 
-```
+```text
              FACT_METRICS
              ┌──────────────┐
   DIM_TIME──►│ time_id (FK) │◄──DIM_HOST
@@ -94,7 +97,8 @@ SigmaDB ERD — System Metrics Schema
              │ mem_mb       │
              │ io_mbps      │
              └──────────────┘
-```
+
+```text
 
 ### NoSQL in SigmaDB
 
@@ -115,7 +119,8 @@ store.insert("processes", doc)
 
 # Query
 results = store.find("processes", {"name": {"$regex": "sigma-*"}})
-```
+
+```text
 
 ---
 
@@ -160,7 +165,8 @@ dashboard.add_widget(sv.LineChart(cpu_ts))
 dashboard.add_widget(sv.Gauge("System Load", value=cpu_avg, max=100))
 dashboard.add_widget(sv.Table(df.head(10)))
 dashboard.render('/sigma/dashboard/health.html')
-```
+
+```text
 
 ### EDA Techniques
 
@@ -188,7 +194,8 @@ Q1, Q3 = df['cpu_pct'].quantile([0.25, 0.75])
 IQR = Q3 - Q1
 outliers = df[(df['cpu_pct'] < Q1 - 1.5*IQR) | (df['cpu_pct'] > Q3 + 1.5*IQR)]
 sv.boxplot(df, x='process', y='cpu_pct', title="Outlier Detection")
-```
+
+```text
 
 ---
 
@@ -220,8 +227,7 @@ dash.add_filter('Process', type='multiselect', options=df['process'].unique())
 dash.narrative("""
 ## System Health Summary — May 2026
 
-The system processed **42 active applications** today. CPU usage peaked at
-**87%** at 14:30 IST, driven by the `sigma-ai` training job.
+The system processed **42 active applications**today. CPU usage peaked at**87%** at 14:30 IST, driven by the `sigma-ai` training job.
 Memory remains stable at **62%** utilization. No anomalies detected.
 """)
 
@@ -233,7 +239,8 @@ dash.render('/sigma/dashboard/executive.html', auto_refresh=30)  # refresh every
 # - Always show confidence intervals for predictions
 # - Clearly mark estimated vs actual data
 # - Respect data privacy — anonymize PII in charts
-```
+
+```text
 
 ### Integrating Data Models with Visualization
 
@@ -254,13 +261,14 @@ ml_dash.roc_curve()
 ml_dash.feature_importance()
 ml_dash.learning_curve()
 ml_dash.render('/sigma/ai/reports/model_report.html')
-```
+
+```text
 
 ---
 
 ## SigmaModeler + SigmaViz Architecture
 
-```
+```text
 SigmaModeler
 ├── ER Diagram Editor (visual, drag-drop)
 ├── Schema Validator (NF checker)
@@ -275,9 +283,10 @@ SigmaViz
 ├── Narrative / Storytelling Layer
 ├── ML Model Visualization
 └── Export: PNG, SVG, PDF, HTML
-```
 
-**Files:**
+```text
+
+### Files
 - `userland/apps/SigmaModeler/erd_engine.cpp`
 - `userland/apps/SigmaModeler/schema_validator.cpp`
 - `userland/apps/SigmaViz/chart_engine.cpp`

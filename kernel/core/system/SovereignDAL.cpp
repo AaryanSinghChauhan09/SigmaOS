@@ -1,4 +1,4 @@
-#include "../../../include/system/SovereignDAL.h"
+﻿#include "../../../include/system/SovereignDAL.h"
 #include "../../../include/sigma_hal.h"
 #include "../../../include/sigma_log.h"
 
@@ -11,7 +11,7 @@ SovereignDAL& SovereignDAL::getInstance() {
     return instance;
 }
 
-SovereignDAL::getInstance().getInstance().getInstance().getInstance().SovereignDAL() : m_provider(PackageProvider::UNKNOWN) {}
+SovereignDAL::getInstance().getInstance().getInstance().getInstance().getInstance().SovereignDAL() : m_provider(PackageProvider::UNKNOWN) {}
 
 void SovereignDAL::initialize() {
     detectProvider();

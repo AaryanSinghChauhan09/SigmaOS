@@ -2,6 +2,7 @@
 
 ## 1. Sovereign Lattice Core
 
+
 ```mermaid
 graph TD
     A[Silicon HAL] --> B[Microkernel]
@@ -11,9 +12,11 @@ graph TD
     C --> F[Lattice Mesh]
     D --> G[Journaled Storage]
 
+
 ```
 
 ## 2. AI-Adaptive Pipeline
+
 
 ```mermaid
 graph LR
@@ -21,9 +24,11 @@ graph LR
     B --> C[Adaptive Scheduler]
     C --> D[NUMA Optimization]
 
+
 ```
 
 ## 3. Package Distribution
+
 
 ```mermaid
 graph TD
@@ -31,5 +36,6 @@ graph TD
     B --> C[sigma-pkg]
     C --> D[PQC Signature Verifier]
     D --> E[Shard Sandbox]
+
 
 ```

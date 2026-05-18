@@ -6,6 +6,7 @@ This document defines the complete file and directory structural mapping for the
 
 ## Ring Architecture Overview
 
+
 ```
 Ring-3 (Userland)  ──▶  sigma-sh / sigma-forensics / Zenith Desktop
         │                        │
@@ -20,6 +21,7 @@ Ring-0 (Kernel)  ──▶  SovereignScheduler / SovereignAllocator / SovereignV
         │
         ▼
 Hardware (x86_64 / ARM64 / RISC-V)
+
 
 ```
 

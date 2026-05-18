@@ -22,6 +22,7 @@ By executing directly within the scheduling path, it absorbs the defining advant
 
 The cgroup system maintains up to 12 active resource partitions in a zero-dependency static matrix. The scheduler references this matrix on every context switch to calculate thread budgets.
 
+
 ```mermaid
 graph TD
     A[Zenith Microkernel Scheduler] --> B[Sovereign Cgroup Governor]
@@ -31,19 +32,19 @@ graph TD
     D --> F[Active Groups Matrix]
     E --> F
 
+
 ```
 
 ### Resource Partition Matrix
 
-***`zenith_kernel`**: Reserved partition for system-critical core shards (80% CPU quota, 4GB Memory limit, High 900 IO Weight).* **`citizen_apps`**: Default partition for authenticated user-space workloads (60% CPU quota, 2GB Memory limit, Medium 500 IO Weight).
-
-* **`guest_sandbox`**: Hard-isolated sandbox partition for untrusted / alien binaries (20% CPU quota, 512MB Memory limit, Low 100 IO Weight).
+***`zenith_kernel`**: Reserved partition for system-critical core shards (80% CPU quota, 4GB Memory limit, High 900 IO Weight).***`citizen_apps`**: Default partition for authenticated user-space workloads (60% CPU quota, 2GB Memory limit, Medium 500 IO Weight).* **`guest_sandbox`**: Hard-isolated sandbox partition for untrusted / alien binaries (20% CPU quota, 512MB Memory limit, Low 100 IO Weight).
 
 ---
 
 ## 🛠️ Command-Line Interface (CLI)
 
 The `sigma-cgroup` utility allows real-time, zero-reboot manipulation of partition constraints:
+
 
 ```bash
 # Create a new resource group
@@ -54,6 +55,7 @@ sigma-cgroup enforce
 
 # Print audit report of all resource groups with live CPU/MEM/IO accounting
 sigma-cgroup audit
+
 
 ```
 
@@ -67,9 +69,7 @@ When the auto-governor sweeps, it analyzes live thread performance indexes. If a
 
 The S-Cgroup subsystem is built across the following zero-dependency files:
 
-***Core Logic**: `kernel/core/SovereignCgroup.cpp`* **Management CLI**: `tools/sigma_cgroup.cpp`
-
-* **Syscall Bridge**: `include/syscall_dispatcher.h`
+***Core Logic**: `kernel/core/SovereignCgroup.cpp`***Management CLI**: `tools/sigma_cgroup.cpp`* **Syscall Bridge**: `include/syscall_dispatcher.h`
 
 ---
 

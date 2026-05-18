@@ -8,9 +8,7 @@
 
 ### 🔢 Number Systems & Base Conversion
 
-**Syllabus:** Binary, Octal, Decimal, Hexadecimal; conversions in C, C++, HTML, JS, PHP, Python.
-
-**SigmaOS Implementation:** `SovereignCodec` — a zero-dependency encoding/conversion module in the kernel.
+**Syllabus:**Binary, Octal, Decimal, Hexadecimal; conversions in C, C++, HTML, JS, PHP, Python.**SigmaOS Implementation:** `SovereignCodec` — a zero-dependency encoding/conversion module in the kernel.
 
 ```cpp
 // kernel/core/sigma_codec.h
@@ -28,7 +26,8 @@ namespace Sigma::Codec {
     void print_html_style(uint64_t val);    // &#xHH; entity format
     void print_php_style(uint64_t val);     // hexdec() / decoct()
 }
-```
+
+```text
 
 **Integration Layer:** Kernel Core → `sigma-cli` shell (run `sigma convert 255 --to hex`)
 
@@ -36,9 +35,7 @@ namespace Sigma::Codec {
 
 ### 💻 Basic Binary Arithmetic
 
-**Syllabus:** Addition, subtraction, multiplication, 1s/2s complement, overflow detection.
-
-**SigmaOS Implementation:** Native ALU primitives exposed via HAL.
+**Syllabus:**Addition, subtraction, multiplication, 1s/2s complement, overflow detection.**SigmaOS Implementation:** Native ALU primitives exposed via HAL.
 
 ```cpp
 // kernel/hal/sigma_alu.h
@@ -49,15 +46,14 @@ namespace Sigma::ALU {
     uint64_t ones_complement(uint64_t val, int bits);
     uint64_t twos_complement(uint64_t val, int bits);
 }
-```
+
+```text
 
 ---
 
 ### 📝 Computer Codes (ASCII, BCD, EBCDIC, UNICODE)
 
-**Syllabus:** ASCII table, BCD encoding, EBCDIC legacy, Unicode UTF-8/16/32.
-
-**SigmaOS Implementation:** `SovereignCharset` multi-encoding layer.
+**Syllabus:**ASCII table, BCD encoding, EBCDIC legacy, Unicode UTF-8/16/32.**SigmaOS Implementation:** `SovereignCharset` multi-encoding layer.
 
 ```cpp
 // kernel/core/SovereignCharset.cpp
@@ -78,18 +74,17 @@ namespace Sigma::Charset {
     void codepoint_to_utf8(uint32_t cp, char* out);
     void codepoint_to_utf16(uint32_t cp, uint16_t* out);
 }
-```
+
+```text
 
 ---
 
 ### 🖥️ History & Generations of Computers
 
-**Syllabus:** 5 generations (vacuum tubes → AI chips), characteristics of each.
-
-**SigmaOS Context:** SigmaOS is designed for the **5th Generation** — AI-native, silicon-direct, post-quantum secure.
+**Syllabus:**5 generations (vacuum tubes → AI chips), characteristics of each.**SigmaOS Context:**SigmaOS is designed for the**5th Generation** — AI-native, silicon-direct, post-quantum secure.
 
 | Generation | Technology | SigmaOS Parallel |
-|---|---|---|
+| --- | --- | --- |
 | 1st | Vacuum Tubes (1940s) | — |
 | 2nd | Transistors (1950s) | — |
 | 3rd | ICs (1960s) | — |
@@ -102,10 +97,10 @@ namespace Sigma::Charset {
 
 **Syllabus:** CPU, ALU, CU, Memory, I/O — von Neumann architecture.
 
-**SigmaOS Mapping:**
+### SigmaOS Mapping
 
 | Component | SigmaOS Module |
-|---|---|
+| --- | --- |
 | CPU (ALU + CU) | `SovereignScheduler` + HAL ALU |
 | Primary Memory | `SovereignAllocator` (RAM manager) |
 | Secondary Storage | `SovereignZFSPool` (S-ZFS) |
@@ -117,9 +112,7 @@ namespace Sigma::Charset {
 
 ### 🖱️ Command Prompt
 
-**Syllabus:** Basic CMD commands, file navigation, scripting.
-
-**SigmaOS Implementation:** `sigma-cli` — the Sovereign Shell.
+**Syllabus:**Basic CMD commands, file navigation, scripting.**SigmaOS Implementation:** `sigma-cli` — the Sovereign Shell.
 
 ```bash
 # sigma-cli commands (SigmaOS equivalent of CMD/bash)
@@ -131,7 +124,8 @@ sigma pkg install sigma-python # package manager
 sigma sysinfo                  # system information
 sigma netstat                  # network status
 sigma kill <pid>               # process management
-```
+
+```text
 
 **File:** `tools/sigma_cli.cpp`
 
@@ -141,10 +135,9 @@ sigma kill <pid>               # process management
 
 ### 🖨️ Types of Input & Output Devices
 
-**Input Devices:** Keyboard, Mouse, Scanner, Microphone, Webcam, Touchscreen, Joystick.
-**Output Devices:** Monitor, Printer, Speaker, Projector, Headphones.
+**Input Devices:**Keyboard, Mouse, Scanner, Microphone, Webcam, Touchscreen, Joystick.**Output Devices:** Monitor, Printer, Speaker, Projector, Headphones.
 
-**SigmaOS HAL Driver Registry:**
+### SigmaOS HAL Driver Registry
 
 ```cpp
 // kernel/core/drivers/SovereignDriverRegistry.cpp
@@ -165,14 +158,15 @@ HALDevice input_devices[] = {
     { OUTPUT,"VGA/VESA Monitor",0x0010, vga_probe,  nullptr,  vga_write },
     { OUTPUT,"ALSA Audio",     0x0011, audio_probe, nullptr,  audio_write },
 };
-```
+
+```text
 
 ---
 
 ### 💾 Types of Memory
 
 | Type | Description | SigmaOS Mapping |
-|---|---|---|
+| --- | --- | --- |
 | **RAM** | Volatile, fast, primary | `SovereignAllocator` — heap/stack manager |
 | **ROM** | Non-volatile, firmware | Boot ROM mapped at `0x0000_0000` |
 | **PROM** | Programmable ROM | Secure boot key storage in TPM |
@@ -193,28 +187,31 @@ namespace Sigma::Memory {
         uintptr_t eeprom_region;  // UEFI NVram
     };
 }
-```
+
+```text
 
 ---
 
 ### 💿 Storage Devices
 
 | Device | Capacity | Speed | SigmaOS Driver |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Hard Disk (HDD) | TB range | ~150 MB/s | `SovereignATA.cpp` |
 | SSD (NVMe) | TB range | ~7 GB/s | `SovereignNVMe.cpp` |
 | Flash Drive (USB) | GB range | ~400 MB/s | `SovereignUSBMass.cpp` |
 | Optical Disk (CD/DVD/BD) | 700MB–50GB | ~72 MB/s | `SovereignOptical.cpp` |
 | Cloud Storage | Unlimited | Network-speed | `SovereignCloudFS.cpp` |
 
-**S-ZFS Unified Storage API:**
+### S-ZFS Unified Storage API
+
 ```cpp
 // All storage types unified under S-ZFS
 SovereignZFSPool pool;
 pool.mount("/sigma/data", DEVICE_NVME, ZFS_RAIDZ);
 pool.mount("/sigma/backup", DEVICE_HDD, ZFS_MIRROR);
 pool.mount("/sigma/cloud", PROVIDER_S3, ZFS_CLOUD);
-```
+
+```text
 
 ---
 
@@ -234,14 +231,15 @@ public:
     // Files appear locally under /sigma/cloud/
     // Encrypted with PQC Kyber-1024 in transit
 };
-```
+
+```text
 
 ---
 
 ### ⚙️ Processor Types
 
 | Type | Use Case | SigmaOS Scheduler |
-|---|---|---|
+| --- | --- | --- |
 | CISC (x86-64) | Desktop/Server | Full support, native compilation |
 | RISC (ARM64) | Mobile/Embedded | ARM64 HAL, energy-efficient scheduling |
 | RISC-V | Open Hardware | Community HAL port |
@@ -261,7 +259,8 @@ enum ProcessorTarget {
 };
 
 void schedule_task(Task* t, ProcessorTarget target);
-```
+
+```text
 
 ---
 
@@ -269,12 +268,13 @@ void schedule_task(Task* t, ProcessorTarget target);
 
 ### 📊 Data → Information → Knowledge Pipeline
 
-```
+```text
 Raw Data (bytes) → Processed Information (context) → Knowledge (insight) → Action
      ↓                        ↓                             ↓
   SovereignFS            SigmaDB                      SigmaAI
   (stores data)      (queries/transforms)          (ML insights)
-```
+
+```text
 
 **SigmaOS Knowledge Graph:** An in-kernel graph database connecting data entities.
 
@@ -291,7 +291,8 @@ public:
     std::vector<KnowledgeNode> query(const char* sparql_like_query);
     void infer_rules();  // Forward chaining inference
 };
-```
+
+```text
 
 ---
 
@@ -300,7 +301,7 @@ public:
 **SigmaOS Implementation:** `SentinelNeural` — real-time integrity checker.
 
 | Protection Layer | Mechanism |
-|---|---|
+| --- | --- |
 | Boot Integrity | PQC-signed bootloader (CRYSTALS-Dilithium) |
 | Kernel Integrity | Merkle-tree hash of all kernel modules |
 | Process Isolation | Mandatory Access Control (MAC) sandboxing |
@@ -318,7 +319,8 @@ public:
     void quarantine(pid_t pid);
     void rollback_to_snapshot(SnapshotID snap);
 };
-```
+
+```text
 
 ---
 
@@ -327,7 +329,7 @@ public:
 ### 📄 SigmaDocs (MS Word Equivalent)
 
 | Word Feature | SigmaDocs Equivalent |
-|---|---|
+| --- | --- |
 | Text Formatting | Rich text engine (RTF/DOCX/ODF) |
 | Tables | Native table renderer |
 | Mail Merge | Template engine with SigmaDB data source |
@@ -341,7 +343,7 @@ public:
 ### 📊 SigmaSheets (MS Excel Equivalent)
 
 | Excel Feature | SigmaSheets Equivalent |
-|---|---|
+| --- | --- |
 | Data Sorting | Multi-column sort engine |
 | Filtering | AutoFilter with regex support |
 | Pivot Tables | `SigmaSheets::PivotEngine` |
@@ -356,7 +358,7 @@ public:
 ### 🎞️ SigmaSlides (MS PowerPoint Equivalent)
 
 | PowerPoint Feature | SigmaSlides Equivalent |
-|---|---|
+| --- | --- |
 | Slides | Vector-based slide canvas |
 | Animations | CSS/WebGL transition engine |
 | Multimedia | Native video/audio embedding |
@@ -370,7 +372,7 @@ public:
 ### 🗄️ SigmaDB GUI (MS Access Equivalent)
 
 | Access Feature | SigmaDB Equivalent |
-|---|---|
+| --- | --- |
 | Table Designer | Visual schema editor |
 | Query Builder | SQL visual query builder |
 | Forms | Data entry form generator |

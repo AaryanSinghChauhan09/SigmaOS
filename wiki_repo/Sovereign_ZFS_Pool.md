@@ -22,6 +22,7 @@ By executing directly on bare-metal block allocations, it absorbs the defining s
 
 The S-ZFS system manages multiple hardware devices inside a unified dynamic storage container named `tank`. The microkernel file system distributes write transactions in stripes across online physical drives with instant mirror replication.
 
+
 ```mermaid
 graph TD
     A[S-ZFS Transaction Allocator] --> B[device_stripe_0 /dev/sdb]
@@ -30,19 +31,19 @@ graph TD
     C --> D
     D --> E[Sentinel Post-Quantum Attestation]
 
+
 ```
 
 ### Physical Pool Specifications
 
-***Active Devices**: Dynamic allocation up to 8 hardware block devices.* **RAID-Z Parity**: Distributed block striping and mirrored transaction logs.
-
-* **Instant CoW Snapshots**: Lock-free block pointer mapping for zero-overhead, sub-millisecond backups.
+***Active Devices**: Dynamic allocation up to 8 hardware block devices.***RAID-Z Parity**: Distributed block striping and mirrored transaction logs.* **Instant CoW Snapshots**: Lock-free block pointer mapping for zero-overhead, sub-millisecond backups.
 
 ---
 
 ## 🛠️ Command-Line Interface (CLI)
 
 The `sigma-zfs` utility allows live, non-disruptive storage orchestration:
+
 
 ```bash
 # Add a physical block device to the pool
@@ -57,6 +58,7 @@ sigma-zfs snapshot <dataset_name> <snapshot_name>
 # Run real-time diagnostics and device health audit
 sigma-zfs audit
 
+
 ```
 
 ---
@@ -65,9 +67,7 @@ sigma-zfs audit
 
 The S-ZFS subsystem is built across the following zero-dependency files:
 
-***Core Engine**: `kernel/core/SovereignZFSPool.cpp`* **CLI Controller**: `tools/sigma_zfs.cpp`
-
-* **Header Mappings**: `include/sigma_kernel_types.h`
+***Core Engine**: `kernel/core/SovereignZFSPool.cpp`***CLI Controller**: `tools/sigma_zfs.cpp`* **Header Mappings**: `include/sigma_kernel_types.h`
 
 ---
 

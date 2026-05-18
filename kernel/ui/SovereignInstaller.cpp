@@ -1,10 +1,10 @@
-/*
+﻿/*
  * SigmaOS: Sovereign Installer (UI-001)
  * Layer: L6 - Zenith UI / System Deployment
  */
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
-#include "../../include/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "sigma_log.h"
+#include "core/SigmaOOP.hpp"
 
 extern "C" void partition_manager_scan();
 
@@ -38,4 +38,3 @@ private:
 extern "C" void installer_start() {
     SigmaOS::Kernel::Deployment::SovereignInstaller::startInstallation();
 }
- 

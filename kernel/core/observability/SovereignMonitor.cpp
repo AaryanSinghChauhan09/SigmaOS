@@ -1,8 +1,8 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_hal.h"
+#include "../../../include/core/sigma_types.h"
+#include "../../../include/hal/sigma_hal.h"
 #include "../../../include/sigma_log.h"
 #include "../../../include/observability/sigma_monitor.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "../../../include/core/SigmaOOP.hpp"
 
 extern "C" void telemetry_execute_ebpf(const void* bytecode, sigma_usize size);
 
@@ -68,4 +68,3 @@ extern "C" void monitor_execute_ebpf(const void* bytecode, sigma_usize size) {
 extern "C" void monitor_rebalance_lattice() {
     SigmaOS::Kernel::Observability::SovereignObservabilityMonitor::getInstance().rebalanceLattice();
 }
- 

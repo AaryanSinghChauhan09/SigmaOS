@@ -14,6 +14,7 @@ The following publication on the topic of unicode characters attacks, dubbed [Tr
 
 As an example, take the following code where `RLO`, `LRI`, `PDI`, `IRI` are placeholders to visualise the respective dangerous unicode characters:
 
+
 ```js
 #!/usr/bin/env node
 
@@ -24,9 +25,11 @@ if (accessLevel != 'userRLO LRI// Check if adminPDI IRI') {
 }
 
 
+
 ```
 
 The code above, will be rendered by a text editor as follows:
+
 
 ```js
 #!/usr/bin/env node
@@ -37,6 +40,7 @@ if (accessLevel != 'user') {
   // Check if admin
   console.log('You are an admin.');
 }
+
 
 
 ```

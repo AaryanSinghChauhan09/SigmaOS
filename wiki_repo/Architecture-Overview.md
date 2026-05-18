@@ -6,6 +6,7 @@ This page describes the high-level structure of the SigmaOS Zenith microkernel.
 
 ## Ring Architecture
 
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │  Ring-3 (Userland)                                  │
@@ -27,6 +28,7 @@ This page describes the high-level structure of the SigmaOS Zenith microkernel.
 └─────────────────────┬───────────────────────────────┘
                       │
               Physical Hardware
+
 
 ```
 

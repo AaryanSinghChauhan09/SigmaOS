@@ -16,6 +16,7 @@ Implements [parse a MIME type](https://mimesniff.spec.whatwg.org/#parse-a-mime-t
 
 Parses a MIME type, returning its type, subtype, and any associated parameters. If the parser can't parse an input it returns the string literal `'failure'`.
 
+
 ```js
 import { parseMIMEType } from 'undici'
 
@@ -26,6 +27,7 @@ parseMIMEType('text/html; charset=gbk')
 //   parameters: Map(1) { 'charset' => 'gbk' },
 //   essence: 'text/html'
 // }
+
 
 
 ```
@@ -42,6 +44,7 @@ Implements [serialize a MIME type](https://mimesniff.spec.whatwg.org/#serialize-
 
 Serializes a MIMEType object.
 
+
 ```js
 import { serializeAMimeType } from 'undici'
 
@@ -52,6 +55,7 @@ serializeAMimeType({
   essence: 'text/html'
 })
 // text/html;charset=gbk
+
 
 
 

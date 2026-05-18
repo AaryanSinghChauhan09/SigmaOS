@@ -4,6 +4,7 @@ The `S-HYP` shard implements a **Type-1 bare-metal hypervisor** running directly
 
 ## Architecture Diagram
 
+
 ```mermaid
 graph TD
     A[SigmaOS Microkernel] --> B(S-HYP Hypervisor Shard)
@@ -34,6 +35,7 @@ graph TD
 - At least 4 GB RAM for the host lattice + 512 MB per guest VM.
 
 ## API Example
+
 
 
 

@@ -9789,16 +9789,14 @@ SigmaOS/
 │   │   ├── gui_pkg
 │   │   │   └── explorer_page
 │   │   │       └── explorerpage
-│   │   │           └── __init__
-│   │   │               └── _ExplorerPage_core.py
+│   │   │           └── __init__│   │   │               └──_ExplorerPage_core.py
 │   │   ├── linux_parity_engine
 │   │   │   └── sigmapackagemanager
 │   │   │       └── sigma_translate
 │   │   │           └── __init__.py
 │   │   ├── peripherals
 │   │   │   └── biometricengine
-│   │   │       └── __init__
-│   │   │           └── _BiometricEngine_core.py
+│   │   │       └── __init__│   │   │           └──_BiometricEngine_core.py
 │   │   ├── module.json
 │   │   ├── SigmaRPC.hpp
 │   │   └── SovereignSDK.hpp
@@ -10688,16 +10686,14 @@ SigmaOS/
 │   │   ├── gui_pkg
 │   │   │   └── explorer_page
 │   │   │       └── explorerpage
-│   │   │           └── __init__
-│   │   │               └── _ExplorerPage_core.py
+│   │   │           └── __init__│   │   │               └──_ExplorerPage_core.py
 │   │   ├── linux_parity_engine
 │   │   │   └── sigmapackagemanager
 │   │   │       └── sigma_translate
 │   │   │           └── __init__.py
 │   │   └── peripherals
 │   │       └── biometricengine
-│   │           └── __init__
-│   │               └── _BiometricEngine_core.py
+│   │           └── __init__│   │               └──_BiometricEngine_core.py
 │   ├── logd.cpp
 │   ├── omni_shell.c
 │   ├── omni_shell.cpp
@@ -11501,4 +11497,4 @@ SigmaOS/
 ├── zenith_desktop.js
 └── zenith.html
 
-```
+```text

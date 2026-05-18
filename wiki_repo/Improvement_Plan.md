@@ -8,11 +8,13 @@ This document establishes the official engineering roadmap for performance scali
 
 To maintain undisputed superiority over monolithic operating systems, SigmaOS must continuously optimize its low-level algorithms. This plan outlines targeted performance optimizations, zero-copy abstractions, and post-quantum cryptographic speedups to scale the 600-shard mesh to maximum throughput.
 
+
 ```mermaid
 graph LR
     A[S-MM Slab Allocator] --> | Lock-Free Bitmaps | B[O1 Slab Compaction]
     C[Storage Block Layer] --> | Direct IO Passthrough | D[Zero-Copy Buffer Cache]
     E[GPU Shader Core] --> | Multi-Queue Pools | F[Vulkan Ring Buffering]
+
 
 ```
 

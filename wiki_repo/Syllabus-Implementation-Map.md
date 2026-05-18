@@ -7,7 +7,7 @@
 ## 📚 Subjects Covered
 
 | # | Subject | SigmaOS Layer | Wiki Page |
-|---|---------|---------------|-----------|
+| --- | --------- | --------------- | ----------- |
 | 1 | Fundamentals of Computer & IT | Kernel + HAL + CLI | [FCIT-Map](Syllabus-FCIT) |
 | 2 | Discrete Mathematics | Logic & Math Engine | [DiscreteMath-Map](Syllabus-DiscreteMath) |
 | 3 | C Programming | Developer Runtime (C API) | [C-Programming-Map](Syllabus-C-Programming) |
@@ -27,7 +27,7 @@
 
 ## 🏗️ SigmaOS Integration Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                     SigmaOS Zenith v15.1                        │
 ├──────────────┬──────────────┬───────────────┬───────────────────┤
@@ -41,7 +41,8 @@
 │ Process Mgr  │ Cloud API    │ SigmaAI       │ SigmaViz          │
 │ FS + VFS     │ PQC Crypto   │ SigmaModeler  │ SigmaCLI          │
 └──────────────┴──────────────┴───────────────┴───────────────────┘
-```
+
+```text
 
 ---
 
@@ -49,7 +50,7 @@
 
 ### Fundamentals of Computers & IT
 | Syllabus Topic | SigmaOS Feature | File/Module |
-|---|---|---|
+| --- | --- | --- |
 | Number Systems & Base Conversion | `sigma_codec` encoding module | `kernel/core/sigma_codec.h` |
 | Binary Arithmetic | Native ALU primitives in HAL | `kernel/hal/sigma_alu.h` |
 | ASCII / Unicode / BCD / EBCDIC | `SovereignCharset` multi-encoding layer | `kernel/core/SovereignCharset.cpp` |
@@ -65,7 +66,7 @@
 
 ### Discrete Mathematics
 | Syllabus Topic | SigmaOS Feature | Module |
-|---|---|---|
+| --- | --- | --- |
 | Set Theory | `SovereignSetEngine` — data structure lib | `kernel/math/SovereignSetEngine.cpp` |
 | Matrices & Determinants | `SovereignMatrix` — linear algebra lib | `kernel/math/SovereignMatrix.cpp` |
 | Propositional Logic | Rule engine for compliance dashboard | `kernel/logic/SovereignRuleEngine.cpp` |
@@ -74,7 +75,7 @@
 
 ### C / C++ Programming
 | Syllabus Topic | SigmaOS Feature | Module |
-|---|---|---|
+| --- | --- | --- |
 | Pointers / Memory | Kernel pointer safety wrappers | `kernel/core/SovereignAllocator.cpp` |
 | File Handling | VFS file operations API | `kernel/fs/` |
 | OOP / Inheritance | All C++17 kernel shards | `kernel/core/*.cpp` |
@@ -84,7 +85,7 @@
 
 ### RDBMS / SQL / PL/SQL
 | Syllabus Topic | SigmaOS Feature | Module |
-|---|---|---|
+| --- | --- | --- |
 | SQL DDL/DML | SigmaDB SQL engine | `userland/apps/SigmaDB/sql_engine.cpp` |
 | Joins / Subqueries | Query optimizer | `userland/apps/SigmaDB/query_optimizer.cpp` |
 | PL/SQL Cursors | DB cursor runtime | `userland/apps/SigmaDB/plsql_runtime.cpp` |
@@ -93,7 +94,7 @@
 
 ### Statistics & Data Science
 | Syllabus Topic | SigmaOS Feature | Module |
-|---|---|---|
+| --- | --- | --- |
 | Central Tendency | `SigmaStats::mean/median/mode()` | `userland/apps/SigmaStats/` |
 | Dispersion | `SigmaStats::stddev/variance()` | `userland/apps/SigmaStats/` |
 | Regression | `SigmaAI::LinearRegression` | `userland/apps/SigmaAI/` |
@@ -102,7 +103,7 @@
 
 ### AI & ML
 | Syllabus Topic | SigmaOS Feature | Module |
-|---|---|---|
+| --- | --- | --- |
 | Classification / Clustering | `SigmaAI::SKLearnRuntime` | `userland/apps/SigmaAI/` |
 | Neural Networks | TensorFlow/PyTorch integration | `userland/apps/SigmaAI/nn_runtime.cpp` |
 | NLP / Text Analytics | `SigmaNLP` legal document engine | `userland/apps/SigmaNLP/` |
@@ -113,7 +114,7 @@
 ## 📌 Implementation Status
 
 | Feature | Status | Priority |
-|---|---|---|
+| --- | --- | --- |
 | `sigma_codec` (encoding/number systems) | 🟡 Planned | High |
 | `sigma-cli` sovereign shell | 🟢 Partial | High |
 | HAL I/O Drivers | 🟢 Partial | High |

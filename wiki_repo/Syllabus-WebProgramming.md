@@ -6,7 +6,7 @@
 
 ## Architecture Overview
 
-```
+```text
 SigmaWeb Runtime
 ├── HTML5 Parser + DOM Engine
 ├── CSS Layout Engine (Flexbox, Grid)
@@ -15,7 +15,8 @@ SigmaWeb Runtime
 ├── WebSocket + WebWorker support
 ├── Geolocation API (from HAL GPS driver)
 └── localStorage / sessionStorage (on SovereignFS)
-```
+
+```text
 
 ---
 
@@ -79,7 +80,8 @@ SigmaWeb Runtime
     <script src="sigma.js"></script>
 </body>
 </html>
-```
+
+```text
 
 ---
 
@@ -103,7 +105,8 @@ SigmaWeb Runtime
 <mark>     <!-- Highlighted text -->
 <progress value="75" max="100">75%</progress>
 <meter value="0.7">70%</meter>
-```
+
+```text
 
 ### HTML5 Web Storage
 
@@ -117,7 +120,8 @@ localStorage.removeItem('theme');
 sessionStorage.setItem('session_token', 'abc123');
 
 // SigmaOS maps these to /sigma/web/storage/<origin>/
-```
+
+```text
 
 ### HTML5 APIs
 
@@ -146,7 +150,8 @@ target.addEventListener('drop', e => {
     e.preventDefault();
     const data = e.dataTransfer.getData('text');
 });
-```
+
+```text
 
 ---
 
@@ -155,7 +160,7 @@ target.addEventListener('drop', e => {
 ### CSS
 
 ```css
-/* Box model, selectors, specificity */
+/*Box model, selectors, specificity*/
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 .sigma-panel {
@@ -169,10 +174,10 @@ target.addEventListener('drop', e => {
     gap: 1rem;
 }
 
-/* Grid layout */
+/*Grid layout*/
 .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
 
-/* Animations */
+/*Animations*/
 @keyframes sigma-pulse {
     0%   { transform: scale(1); }
     50%  { transform: scale(1.05); }
@@ -180,9 +185,10 @@ target.addEventListener('drop', e => {
 }
 .btn:hover { animation: sigma-pulse 0.3s ease; }
 
-/* Media queries */
+/*Media queries*/
 @media (max-width: 768px) { .dashboard { grid-template-columns: 1fr; } }
-```
+
+```text
 
 ### JavaScript Core
 
@@ -205,7 +211,7 @@ else { deny(); }
 const label = isActive ? 'Running' : 'Stopped';  // ternary
 
 // Loops
-for (let i = 0; i < procs.length; i++) { /* ... */ }
+for (let i = 0; i < procs.length; i++) { /*...*/ }
 for (const proc of procs) { console.log(proc.name); }
 while (retries < 3 && !connected) { retries++; }
 
@@ -243,7 +249,8 @@ async function fetchSystemInfo() {
     const data = await res.json();
     return data;
 }
-```
+
+```text
 
 ---
 
@@ -319,14 +326,15 @@ function get_memory_info(string $unit = 'MB'): string {
 
 echo get_memory_info('MB');
 ?>
-```
+
+```text
 
 ---
 
 ## SigmaWeb Runtime Integration
 
 | Web Standard | SigmaOS Component | File |
-|---|---|---|
+| --- | --- | --- |
 | HTML5 Parser | `SigmaDOM` | `userland/sigmaweb/dom/` |
 | CSS Engine | `SigmaLayout` | `userland/sigmaweb/css/` |
 | JS Engine | QuickJS embed | `userland/sigmaweb/js/` |

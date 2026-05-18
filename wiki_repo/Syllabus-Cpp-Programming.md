@@ -9,7 +9,7 @@
 ### OOP vs Procedural in SigmaOS
 
 | Paradigm | Procedural (C) | OOP (C++) |
-|---|---|---|
+| --- | --- | --- |
 | Code style | Functions on data | Objects encapsulating data + behavior |
 | Kernel use | Drivers, boot code | Core subsystems, HAL, shard modules |
 | Reuse | Copy-paste, macros | Inheritance, templates |
@@ -18,7 +18,7 @@
 ### C vs C++ in SigmaOS
 
 | Feature | C | C++ |
-|---|---|---|
+| --- | --- | --- |
 | `struct` | Data only | Data + methods |
 | Memory | `malloc`/`free` | `new`/`delete` + RAII |
 | Type safety | Casts are unsafe | `static_cast`, `dynamic_cast` |
@@ -42,7 +42,8 @@ namespace Sigma {
     using u64 = uint64_t;
     using i32 = int32_t;
 }
-```
+
+```text
 
 ---
 
@@ -112,7 +113,8 @@ SovereignProcess proc_table[4096];
 class AddressSpace {
     uint64_t m_pml4[512];  // Page Map Level 4 — 512 entries
 };
-```
+
+```text
 
 ---
 
@@ -185,7 +187,8 @@ public:
         return m_addr == other.m_addr;
     }
 };
-```
+
+```text
 
 ---
 
@@ -262,14 +265,15 @@ void risky_operation(int fd) {
         sigma_panic("unhandled exception");
     }
 }
-```
+
+```text
 
 ---
 
 ## SigmaOS C++ Standards & Conventions
 
 | Rule | Detail |
-|---|---|
+| --- | --- |
 | Standard | C++17 (`-std=c++17`) |
 | RTTI | Disabled (`-fno-rtti`) — no `dynamic_cast` cost |
 | Exceptions | Enabled only in userland; kernel uses error codes |

@@ -1,4 +1,4 @@
-#include "../../../include/SigmaOOP.hpp"
+﻿#include "../../../include/SigmaOOP.hpp"
 #include "../../../include/sigma_kernel_types.h"
 #include "../../../include/sigma_log.h"
 #include "../../../include/libc/SovereignLibC.h"
@@ -37,12 +37,12 @@ public:
         } else if (sigma_strcmp(cmd_line, "cat") == 0) {
             utils_cat("RELEASES.md");
         } else if (sigma_strcmp(cmd_line, "help") == 0) {
-            sigma_printf("SigmaOS Sovereign Shell (sigma_sh) v2.5.0-Zenith\n");
-            sigma_printf("Commands: ls, cat, help, shards, whoami, exit\n");
+            sigma_log_info("SigmaOS Sovereign Shell (sigma_sh) v2.5.0-Zenith\n");
+            sigma_log_info("Commands: ls, cat, help, shards, whoami, exit\n");
         } else if (sigma_strcmp(cmd_line, "whoami") == 0) {
-            sigma_printf("current_user: professional (UID: 1000)\n");
+            sigma_log_info("current_user: professional (UID: 1000)\n");
         } else if (sigma_strcmp(cmd_line, "shards") == 0) {
-            sigma_printf("Active Shards: 618 | State: Sovereign Singularity\n");
+            sigma_log_info("Active Shards: 618 | State: Sovereign Singularity\n");
         } else {
             sigma_log_warn("[SHELL] Command not found: %s", cmd_line);
         }
