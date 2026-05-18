@@ -9,7 +9,7 @@
 ### Codd's 12 Rules — SigmaDB Compliance
 
 | Rule | SigmaDB Status |
-|---|---|
+| --- | --- |
 | Information Rule — all data in tables | ✅ |
 | Guaranteed Access — PK + table name | ✅ |
 | NULL Support | ✅ Three-valued logic |
@@ -52,7 +52,8 @@ BEGIN; UPDATE accounts SET bal=bal-1000 WHERE id=1;
 -- DCL
 GRANT SELECT, INSERT ON employees TO sigma_admin;
 REVOKE INSERT ON employees FROM sigma_admin;
-```
+
+```text
 
 ---
 
@@ -73,7 +74,8 @@ INSERT INTO employees (emp_id, emp_name) VALUES (emp_seq.NEXTVAL, 'Alice');
 
 -- Index
 CREATE INDEX idx_salary ON employees(salary);
-```
+
+```text
 
 ---
 
@@ -103,21 +105,21 @@ BEGIN UPDATE employees SET salary=salary*(1+p_pct/100) WHERE dept_id=p_dept; COM
 -- Trigger
 CREATE OR REPLACE TRIGGER emp_audit AFTER INSERT OR UPDATE ON employees
 FOR EACH ROW BEGIN INSERT INTO audit_log VALUES(SYSDATE, :NEW.emp_id); END;
-```
+
+```text
 
 ---
 
 ## SigmaDB Architecture
 
-```
+```text
 SigmaDB Engine
 ├── SQL Parser + Query Optimizer
 ├── PL/SQL Runtime + Cursor Engine
 ├── Transaction Manager (MVCC, ACID)
 ├── Trigger Dispatcher + Package Registry
 └── Storage: SovereignZFSPool (CoW + Snapshots)
-```
 
-**Files:** `userland/apps/SigmaDB/sql_engine.cpp`, `plsql_runtime.cpp`, `trigger_dispatcher.cpp`
+```text
 
-*Last updated: 2026-05-18 | SigmaOS Zenith v15.1*
+**Files:**`userland/apps/SigmaDB/sql_engine.cpp`, `plsql_runtime.cpp`, `trigger_dispatcher.cpp`*Last updated: 2026-05-18 | SigmaOS Zenith v15.1*

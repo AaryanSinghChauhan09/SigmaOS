@@ -6,6 +6,7 @@ Undici exposes a W3C spec-compliant implementation of [CacheStorage](https://dev
 
 Undici exports a top-level CacheStorage instance. You can open a new Cache, or duplicate a Cache with an existing name, by using `CacheStorage.prototype.open`. If you open a Cache with the same name as an already-existing Cache, its list of cached Responses will be shared between both instances.
 
+
 ```mjs
 import { caches } from 'undici'
 
@@ -18,17 +19,20 @@ assert(cache_1 !== cache_2)
 assert.deepStrictEqual(await cache_1.match('/req'), await cache_2.match('/req'))
 
 
+
 ```
 
 ## Deleting a Cache
 
 If a Cache is deleted, the cached Responses/Requests can still be used.
 
+
 ```mjs
 const response = await cache_1.match('/req')
 await caches.delete('v1')
 
 await response.text() // the Response's body
+
 
 
 ```

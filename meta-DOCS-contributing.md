@@ -22,9 +22,11 @@ Thank you for your interest in contributing to the Sovereign Lattice!
 
 Run the following to compile the entire OS:
 
+
 ```bash
 
 make all
+
 
 
 

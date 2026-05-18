@@ -24,6 +24,7 @@ Extends: `ClientOptions`
 
 We can use MockAgent to instantiate a MockClient ready to be used to intercept specified requests. It will not do anything until registered as the agent to use and any mock request are registered.
 
+
 ```js
 import { MockAgent } from 'undici'
 
@@ -31,6 +32,7 @@ import { MockAgent } from 'undici'
 const mockAgent = new MockAgent({ connections: 1 })
 
 const mockClient = mockAgent.get('http://localhost:3000')
+
 
 
 ```
@@ -59,6 +61,7 @@ See [`Dispatcher.request(options [, callback])`](/docs/docs/api/Dispatcher.md#di
 
 #### Example - MockClient request
 
+
 ```js
 import { MockAgent } from 'undici'
 
@@ -81,6 +84,7 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 
 
 ```

@@ -30,6 +30,7 @@
 
 ## EXAMPLES
 
+
 ```bash
 # Update the package lattice and install the VR compositor
 sigma-cli pkg update
@@ -37,6 +38,7 @@ sigma-cli pkg install vr-studio
 
 # View active system shards
 sigma-cli shard list
+
 
 
 ```

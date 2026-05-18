@@ -33,10 +33,11 @@ docstring / comment
 if True:
     print("Indented block")
 
-# Running Python in SigmaOS:
+# Running Python in SigmaOS
 # sigma run script.py
 # sigma-py interactive shell: sigma-py --repl
-```
+
+```text
 
 ---
 
@@ -71,7 +72,8 @@ float_val = float(42)        # int → float
 str_val = str(3.14)          # float → str
 bool_val = bool(0)           # int → bool (0 = False)
 list_val = list((1, 2, 3))   # tuple → list
-```
+
+```text
 
 ---
 
@@ -133,7 +135,8 @@ for n in range(10):
 # pass: placeholder (no operation)
 def placeholder_fn():
     pass
-```
+
+```text
 
 ---
 
@@ -188,7 +191,8 @@ import sigma            # Core OS API
 sigma.proc.list()       # List running processes
 sigma.fs.read('/sigma/log/latest.log')
 sigma.net.ping('8.8.8.8')
-```
+
+```text
 
 ---
 
@@ -245,14 +249,15 @@ even_sq   = [x**2 for x in range(10) if x % 2 == 0]     # With filter
 sq_dict   = {x: x**2 for x in range(5)}                  # Dict
 unique_sq = {x**2 for x in range(-5, 6)}                  # Set
 gen       = (x**2 for x in range(1000000))               # Generator (memory-efficient)
-```
+
+```text
 
 ---
 
 ## SigmaPy Integration Points
 
 | Python Feature | SigmaOS Usage |
-|---|---|
+| --- | --- |
 | `subprocess` | Spawn sigma shard processes |
 | `socket` | SovereignNetStack Python API |
 | `os.path` | SovereignFS path helpers |

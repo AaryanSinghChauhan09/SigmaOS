@@ -4,6 +4,7 @@ Undici has its own mocking [utility](/docs/docs/api/MockAgent.md). It allow us t
 
 Example:
 
+
 ```js
 // bank.mjs
 import { request } from 'undici'
@@ -25,9 +26,11 @@ export async function bankTransfer(recipient, amount) {
 }
 
 
+
 ```
 
 And this is what the test file looks like:
+
 
 ```js
 // index.test.mjs
@@ -75,6 +78,7 @@ const badRequest = await bankTransfer('1234567890', '100')
 assert.deepEqual(badRequest, { message: 'bank account not found' })
 
 
+
 ```
 
 Explore other MockAgent functionality [here](/docs/docs/api/MockAgent.md)
@@ -84,6 +88,7 @@ Explore other MockAgent functionality [here](/docs/docs/api/MockAgent.md)
 Using a MockAgent also allows you to make assertions on the configuration used to make your request in your application.
 
 Here is an example :
+
 
 ```js
 // index.test.mjs
@@ -125,6 +130,7 @@ mockAgent.clearCallHistory()
 assert.ok(mockAgent.getCallHistory()?.calls().length === 0)
 
 
+
 ```
 
 Calling `mockAgent.close()` will automatically clear and delete every call history for you.
@@ -138,6 +144,7 @@ Explore other MockCallHistoryLog functionality [here](/docs/docs/api/MockCallHis
 ## Debug Mock Value
 
 When the interceptor and the request options are not the same, undici will automatically make a real HTTP request. To prevent real requests from being made, use `mockAgent.disableNetConnect()`:
+
 
 ```js
 const mockAgent = new MockAgent();
@@ -161,11 +168,13 @@ const badRequest = await bankTransfer('1234567890', '100')
 // subsequent request to origin http://localhost:3000 was not allowed (net.connect disabled)
 
 
+
 ```
 
 ## Reply with data based on request
 
 If the mocked response needs to be dynamically derived from the request parameters, you can provide a function instead of an object to `reply`:
+
 
 ```js
 mockPool.intercept({
@@ -185,9 +194,11 @@ mockPool.intercept({
 })
 
 
+
 ```
 
 in this case opts will be
+
 
 ```
 {
@@ -197,6 +208,7 @@ in this case opts will be
   origin: 'http://localhost:3000',
   path: '/bank-transfer'
 }
+
 
 
 ```

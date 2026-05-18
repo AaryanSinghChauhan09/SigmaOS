@@ -38,6 +38,7 @@ For detailed information on the parsing process and potential validation errors,
 
 Examples:
 
+
 ```js
 import { ProxyAgent } from 'undici'
 
@@ -55,11 +56,13 @@ const proxyAgent = new ProxyAgent({
 })
 
 
+
 ```
 
 #### Example - Basic ProxyAgent instantiation
 
 This will instantiate the ProxyAgent. It will not do anything until registered as the agent to use with requests.
+
 
 ```js
 import { ProxyAgent } from 'undici'
@@ -67,9 +70,11 @@ import { ProxyAgent } from 'undici'
 const proxyAgent = new ProxyAgent('my.proxy.server')
 
 
+
 ```
 
 #### Example - Basic Proxy Request with global agent dispatcher
+
 
 ```js
 import { setGlobalDispatcher, request, ProxyAgent } from 'undici'
@@ -86,9 +91,11 @@ for await (const data of body) {
 }
 
 
+
 ```
 
 #### Example - Basic Proxy Request with local agent dispatcher
+
 
 ```js
 import { ProxyAgent, request } from 'undici'
@@ -107,9 +114,11 @@ for await (const data of body) {
 }
 
 
+
 ```
 
 #### Example - Basic Proxy Request with authentication
+
 
 ```js
 import { setGlobalDispatcher, request, ProxyAgent } from 'undici';
@@ -130,6 +139,7 @@ for await (const data of body) {
 }
 
 
+
 ```
 
 ### `ProxyAgent.close()`
@@ -140,6 +150,7 @@ Returns: `Promise<void>`
 
 #### Example - clean up after tests are complete
 
+
 ```js
 import { ProxyAgent, setGlobalDispatcher } from 'undici'
 
@@ -147,6 +158,7 @@ const proxyAgent = new ProxyAgent('my.proxy.server')
 setGlobalDispatcher(proxyAgent)
 
 await proxyAgent.close()
+
 
 
 ```
@@ -162,6 +174,7 @@ See [`Dispatcher.request(options [, callback])`](/docs/docs/api/Dispatcher.md#di
 #### Example - ProxyAgent with Fetch
 
 This example demonstrates how to use `fetch` with a proxy via `ProxyAgent`. It is particularly useful for scenarios requiring proxy tunneling.
+
 
 ```javascript
 import { ProxyAgent, fetch } from 'undici';
@@ -179,6 +192,7 @@ console.log('Response status:', response.status);
 console.log('Response data:', await response.text());
 
 
+
 ```
 
 ---
@@ -186,6 +200,7 @@ console.log('Response data:', await response.text());
 #### Example - ProxyAgent with a Custom Proxy Server
 
 This example shows how to create a custom proxy server and use it with `ProxyAgent`.
+
 
 ```javascript
 import * as http from 'node:http';
@@ -211,6 +226,7 @@ console.log('Response status:', response.status);
 console.log('Response data:', await response.text());
 
 
+
 ```
 
 ---
@@ -218,6 +234,7 @@ console.log('Response data:', await response.text());
 #### Example - ProxyAgent with HTTPS Tunneling
 
 This example demonstrates how to perform HTTPS tunneling using a proxy.
+
 
 ```javascript
 import { ProxyAgent, fetch } from 'undici';
@@ -235,11 +252,13 @@ console.log('Response status:', response.status);
 console.log('Response data:', await response.json());
 
 
+
 ```
 
 #### Example - ProxyAgent as a Global Dispatcher
 
 `ProxyAgent` can be configured as a global dispatcher, making it available for all requests without explicitly passing it. This simplifies code and is useful when a single proxy configuration applies to all requests.
+
 
 ```javascript
 import { ProxyAgent, setGlobalDispatcher, fetch } from 'undici';

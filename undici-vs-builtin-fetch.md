@@ -12,8 +12,10 @@ Node.js v18+ are provided by a version of undici that is bundled into Node.js
 
 itself. You can check which version is bundled with:
 
+
 ```js
 console.log(process.versions.undici); // e.g., "7.5.0"
+
 
 
 ```
@@ -31,6 +33,7 @@ Use one of these patterns:
 
 ### Built-in globals
 
+
 ```js
 const body = new FormData()
 body.set('name', 'some')
@@ -42,9 +45,11 @@ await fetch('https://example.com', {
 })
 
 
+
 ```
 
 ### `undici` module imports
+
 
 ```js
 import { fetch, FormData } from 'undici'
@@ -59,12 +64,14 @@ await fetch('https://example.com', {
 })
 
 
+
 ```
 
 ### `undici.install()` globals
 
 If you want the installed `undici` package to provide the globals, call
 [`install()`](/docs/api/GlobalInstallation.md):
+
 
 ```js
 import { install } from 'undici'
@@ -81,6 +88,7 @@ await fetch('https://example.com', {
 })
 
 
+
 ```
 
 `install()` replaces the global `fetch`, `Headers`, `Response`, `Request`, and
@@ -89,6 +97,7 @@ await fetch('https://example.com', {
 globals.
 
 Avoid mixing implementations in the same request, for example:
+
 
 ```js
 import { fetch } from 'undici'
@@ -101,7 +110,9 @@ await fetch('https://example.com', {
 })
 
 
+
 ```
+
 
 ```js
 import { FormData } from 'undici'
@@ -112,6 +123,7 @@ await fetch('https://example.com', {
   method: 'POST',
   body
 })
+
 
 
 ```
@@ -152,11 +164,13 @@ Install undici from npm when you need capabilities beyond the standard Fetch API
 undici exposes `request`, `stream`, `pipeline`, and `connect` methods that
 provide lower-level control and significantly better performance than `fetch`:
 
+
 ```js
 import { request } from 'undici';
 
 const { statusCode, headers, body } = await request('https://example.com');
 const data = await body.json();
+
 
 
 ```
@@ -167,11 +181,13 @@ const data = await body.json();
 let you manage connection lifecycle, keep-alive behavior, pipelining depth,
 and concurrency limits:
 
+
 ```js
 import { Pool } from 'undici';
 
 const pool = new Pool('https://example.com', { connections: 10 });
 const { body } = await pool.request({ path: '/', method: 'GET' });
+
 
 
 ```
@@ -185,11 +201,13 @@ configuration for the built-in `fetch` via the `--use-env-proxy` flag (or
 `NODE_USE_ENV_PROXY=1`). However, undici's `ProxyAgent` still provides
 programmatic control through the dispatcher API:
 
+
 ```js
 import { ProxyAgent, fetch } from 'undici';
 
 const proxyAgent = new ProxyAgent('https://my-proxy.example.com:8080');
 const response = await fetch('https://example.com', { dispatcher: proxyAgent });
+
 
 
 ```
@@ -199,6 +217,7 @@ const response = await fetch('https://example.com', { dispatcher: proxyAgent });
 `MockAgent`, `MockClient`, and `MockPool` let you intercept and mock HTTP
 requests without patching globals or depending on external libraries:
 
+
 ```js
 import { MockAgent, setGlobalDispatcher, fetch } from 'undici';
 
@@ -207,6 +226,7 @@ setGlobalDispatcher(mockAgent);
 
 const pool = mockAgent.get('https://example.com');
 pool.intercept({ path: '/api' }).reply(200, { message: 'mocked' });
+
 
 
 ```
@@ -239,8 +259,10 @@ your installed version to replace the global `fetch` and related classes, use
 [`install()`](/docs/api/GlobalInstallation.md). Otherwise, import `fetch`
 directly from `'undici'`:
 
+
 ```js
 import { fetch } from 'undici' // uses your installed version, not the built-in
+
 
 
 ```

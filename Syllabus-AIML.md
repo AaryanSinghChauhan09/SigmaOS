@@ -9,7 +9,7 @@
 ### AI in SigmaOS
 
 | AI Type | SigmaOS Feature |
-|---|---|
+| --- | --- |
 | Data-driven AI | `SigmaAI::DataPipeline` — learns from system telemetry |
 | Autonomous Systems | `SentinelNeural` — self-healing, autonomous threat response |
 | Recommendation | `SigmaAssistant` — intelligent app/config recommendations |
@@ -29,7 +29,8 @@ kg.add_fact("NVMe", "faster_than", "HDD")
 
 # Query: what storage devices does SigmaOS support?
 results = kg.query("SELECT ?device WHERE SigmaOS supports ?device")
-```
+
+```text
 
 ---
 
@@ -37,10 +38,11 @@ results = kg.query("SELECT ?device WHERE SigmaOS supports ?device")
 
 ### ML Pipeline in SigmaOS
 
-```
+```text
 SourceData → Feature Extraction → Feature Correlation → Feature Transform
 → Train Model → Ensemble → Evaluate → Deploy
-```
+
+```text
 
 ```python
 from sigma.ai import SigmaML
@@ -54,7 +56,8 @@ X_scaled = SigmaML.StandardScaler().fit_transform(X)
 
 # Train/test split
 X_train, X_test, y_train, y_test = SigmaML.train_test_split(X_scaled, y, test_size=0.2)
-```
+
+```text
 
 ### ML Algorithms
 
@@ -79,7 +82,8 @@ predictions = reg.predict(X_test)
 # Clustering
 kmeans = KMeans(n_clusters=3)
 labels = kmeans.fit_predict(X_scaled)
-```
+
+```text
 
 ### Evaluation Metrics
 
@@ -104,7 +108,8 @@ cm = confusion_matrix(y_test, y_pred)
 # Overfitting: high train acc, low test acc
 # Underfitting: low both
 # Bias: model too simple; Variance: model too complex
-```
+
+```text
 
 ---
 
@@ -137,7 +142,8 @@ model.compile(
 # Sigmoid: f(x) = 1/(1+e^-x) — binary output [0,1]
 # Softmax: multi-class probability distribution
 # Tanh: f(x) = (e^x - e^-x)/(e^x + e^-x) — range [-1,1]
-```
+
+```text
 
 ### Training
 
@@ -156,7 +162,8 @@ history = model.fit(
 
 # TensorBoard for visualization
 tensorboard_cb = tf.keras.callbacks.TensorBoard(log_dir='/sigma/ai/logs')
-```
+
+```text
 
 ### PyTorch Integration
 
@@ -189,7 +196,8 @@ for epoch in range(100):
     loss = loss_fn(output, y_tensor)
     loss.backward()   # Backpropagation
     optimizer.step()  # Update weights
-```
+
+```text
 
 ---
 
@@ -235,13 +243,14 @@ legal_ai = SigmaLegalAI()
 legal_ai.load_model('/sigma/ai/models/court_predictor.pkl')
 prediction = legal_ai.predict_outcome(case_facts)
 # {'guilty': 0.82, 'acquitted': 0.18, 'confidence': 0.87}
-```
+
+```text
 
 ---
 
 ## SigmaAI Architecture
 
-```
+```text
 SigmaAI Intelligence Layer
 ├── ML Engine (sklearn-compatible API)
 │   ├── Classification: RandomForest, SVM, KNN, LogReg
@@ -265,9 +274,10 @@ SigmaAI Intelligence Layer
     ├── SigmaViz — model visualization
     ├── SentinelNeural — anomaly detection
     └── SigmaPy / SigmaR — scripting API
-```
 
-**Files:**
+```text
+
+### Files
 - `userland/apps/SigmaAI/sigma_ai_engine.cpp`
 - `userland/apps/SigmaAI/nn_runtime.cpp`
 - `userland/apps/SigmaNLP/sigma_nlp.cpp`

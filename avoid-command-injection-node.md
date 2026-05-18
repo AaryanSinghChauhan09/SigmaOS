@@ -6,15 +6,18 @@ A call that we often see used, due to it's simplicity is `child_process.exec`. I
 
 Here is a very typical way you would call a system command with `child_process.exec.`
 
+
 ```js
 child_process.exec('ls', function (err, data) {
   console.log(data);
 });
 
 
+
 ```
 
 What happens though when you need to start getting user input for arguments into your command? The obvious solution is to take the user input and build your command out using string concatenation. But here's something I've learned over the years: When you use string concatenation to send data from one system to another you're probably going to have a bad day.
+
 
 ```js
 var path = 'user input';
@@ -23,14 +26,17 @@ child_process.exec('ls -l ' + path, function (err, data) {
 });
 
 
+
 ```
 
 ## Why is string concatenation a problem?
 
 Well, because under the hood, `child_process.exec` makes a call to execute <kbd>/bin/sh</kbd> rather than the target program. The command that was sent just gets passed along as a shell command in the newly spawned <kbd>/bin/sh</kbd> process. `child_process.exec` has a misleading name - it's a bash interpreter, not a program launcher. And that means that all shell metacharacters can have devastating effects if the command is including user input.
 
+
 ```sh
 [pid 25170] execve("/bin/sh", ["/bin/sh", "-c", "ls -l user input"], [/*16 vars*/]
+
 
 
 
@@ -46,6 +52,7 @@ Let's modify our example to use `execFile` and `spawn` and see how the system ca
 
 ### `child_process.execFile`
 
+
 ```js
 var child_process = require('child_process');
 
@@ -55,12 +62,15 @@ child_process.execFile('/bin/ls', ['-l', path], function (err, result) {
 });
 
 
+
 ```
 
 System call that is run
 
+
 ```sh
 [pid 25565] execve("/bin/ls", ["/bin/ls", "-l", "."], [/*16 vars*/]
+
 
 
 
@@ -69,6 +79,7 @@ System call that is run
 ### `child_process.spawn`
 
 Similar example using `spawn` instead.
+
 
 ```js
 var child_process = require('child_process');
@@ -80,12 +91,15 @@ ls.stdout.on('data', function (data) {
 });
 
 
+
 ```
 
 System call that is run
 
+
 ```sh
 [pid 26883] execve("/bin/ls", ["/bin/ls", "-l", "."], [/*16 vars*/
+
 
 
 

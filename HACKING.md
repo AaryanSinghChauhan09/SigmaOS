@@ -6,6 +6,7 @@ This guide walks through writing, registering, and testing a new kernel shard fo
 
 All shards live in `kernel/core/`. Create `SovereignMyFeature.cpp`:
 
+
 ```cpp
 
 #include "sigma_types.h"
@@ -44,11 +45,13 @@ extern "C" void myfeature_init() {
 
 
 
+
 ```
 
 ## Step 2: Register in SovereignUSR
 
 After your shard is initialized, register it:
+
 
 ```c
 
@@ -56,9 +59,11 @@ usr_register_shard("SovereignMyFeature", 0x00FF);
 
 
 
+
 ```
 
 ## Step 3: Run Static Analysis
+
 
 ```bash
 
@@ -66,13 +71,16 @@ cppcheck --enable=warning,style kernel/core/SovereignMyFeature.cpp
 
 
 
+
 ```
 
 ## Step 4: Build
 
+
 ```bash
 
 python3 tools/sigma-build.py
+
 
 
 

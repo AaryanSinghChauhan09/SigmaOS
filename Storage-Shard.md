@@ -4,6 +4,7 @@ The Storage Shard implements the file system abstractions for SigmaOS, providing
 
 ## Architecture Diagram
 
+
 ```mermaid
 graph TD
     A[Userland App] --> | Z-SYSCALL | B(VFS Abstraction)
@@ -25,6 +26,7 @@ graph TD
 - **NVMe Awareness**: Direct Memory Access (DMA) hooks for extreme throughput.
 
 ## VFS API Example
+
 
 
 

@@ -4,6 +4,7 @@ The Scheduler Shard provides deterministic, Hard-RTOS thread scheduling based on
 
 ## Architecture Flowchart
 
+
 ```mermaid
 flowchart LR
     A[Hardware Timer IRQ] --> B(tick)
@@ -26,6 +27,7 @@ flowchart LR
 - **Priority Bands**: IDLE, NORMAL, HIGH, and REALTIME_CRITICAL.
 
 ## Task Spawning Example
+
 
 
 

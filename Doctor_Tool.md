@@ -18,9 +18,11 @@ Inspired by the concept of "self-healing silicon," the Doctor Tool performs deep
 
 ## 🚀 Usage (via sigma-cli)
 
+
 ```bash
 sigma-cli doctor --full-scan
 sigma-cli doctor --treat <shard-id>
+
 
 
 ```

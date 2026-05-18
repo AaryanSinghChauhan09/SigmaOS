@@ -26,6 +26,7 @@ When passing an object as the second argument, the following options are availab
 
 This example will not work in browsers or other platforms that don't allow passing an object.
 
+
 ```js
 import { WebSocket, ProxyAgent } from 'undici'
 
@@ -37,14 +38,17 @@ const ws = new WebSocket('wss://echo.websocket.events', {
 })
 
 
+
 ```
 
 If you do not need a custom Dispatcher, it's recommended to use the following pattern:
+
 
 ```js
 import { WebSocket } from 'undici'
 
 const ws = new WebSocket('wss://echo.websocket.events', ['echo', 'chat'])
+
 
 
 ```
@@ -59,6 +63,7 @@ const ws = new WebSocket('wss://echo.websocket.events', ['echo', 'chat'])
 
 This example will not work in browsers or other platforms that don't allow passing an object.
 
+
 ```js
 import { Agent } from 'undici'
 
@@ -68,6 +73,7 @@ const ws = new WebSocket('wss://echo.websocket.events', {
   dispatcher: agent,
   protocols: ['echo', 'chat']
 })
+
 
 
 ```
@@ -87,6 +93,7 @@ Arguments:
 - **options** `WebSocketStreamOptions` (optional)
 
 ### WebSocketStream Example
+
 
 ```js
 const stream = new WebSocketStream('https://echo.websocket.org/')
@@ -117,6 +124,7 @@ setInterval(() => write(), 5000)
 
 
 
+
 ```
 
 ## ping(websocket, payload)
@@ -131,6 +139,7 @@ Sends a ping frame to the WebSocket server. The server must respond with a pong 
 
 ### Example
 
+
 ```js
 import { WebSocket, ping } from 'undici'
 
@@ -144,6 +153,7 @@ ws.addEventListener('open', () => {
   const payload = Buffer.from('hello')
   ping(ws, payload)
 })
+
 
 
 ```

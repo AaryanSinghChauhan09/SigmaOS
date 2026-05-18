@@ -15,7 +15,7 @@ An Operating System is system software that manages hardware resources and provi
 ### OS Functions → SigmaOS Modules
 
 | OS Function | SigmaOS Module | File |
-|---|---|---|
+| --- | --- | --- |
 | Process Management | `SovereignScheduler` | `kernel/core/SovereignScheduler.cpp` |
 | Memory Management | `SovereignAllocator` | `kernel/core/SovereignAllocator.cpp` |
 | File System | `SovereignFS` + S-ZFS | `kernel/fs/` |
@@ -27,7 +27,7 @@ An Operating System is system software that manages hardware resources and provi
 ### Types of OS
 
 | Type | Example | SigmaOS Parallel |
-|---|---|---|
+| --- | --- | --- |
 | Batch | IBM OS/360 | — |
 | Time-sharing | Unix | SigmaOS multi-user |
 | Real-time | VxWorks | RTOS format of SigmaOS |
@@ -41,11 +41,12 @@ An Operating System is system software that manages hardware resources and provi
 
 ### Process States
 
-```
+```text
 NEW → READY → RUNNING → TERMINATED
                 ↓ ↑
              WAITING/BLOCKED
-```
+
+```text
 
 ```cpp
 // kernel/core/SovereignScheduler.cpp
@@ -68,7 +69,8 @@ struct SovereignProcess {
     uint64_t     cpu_time_ns;    // Time on CPU
     char         name[64];
 };
-```
+
+```text
 
 ### Scheduling Algorithms
 
@@ -93,7 +95,8 @@ class SovereignScheduler {
     // Multi-core dispatch
     void dispatch_to_core(SovereignProcess* p, uint32_t core_id);
 };
-```
+
+```text
 
 ### Threads
 
@@ -130,7 +133,8 @@ public:
     void wait();   // P operation (down)
     void signal(); // V operation (up)
 };
-```
+
+```text
 
 ### Inter-Process Communication (IPC)
 
@@ -151,7 +155,8 @@ sigma_shm_attach(shm);
 // Signals
 sigma_signal(PROC_42, SIGTERM);  // Request termination
 sigma_signal(PROC_42, SIGKILL);  // Force termination
-```
+
+```text
 
 ---
 
@@ -159,10 +164,11 @@ sigma_signal(PROC_42, SIGKILL);  // Force termination
 
 ### Memory Hierarchy
 
-```
+```text
 Registers (< 1ns) → L1 Cache (1ns) → L2 Cache (3ns) → L3 Cache (10ns)
 → RAM (50ns) → NVMe SSD (100μs) → HDD (10ms) → Cloud (RTT)
-```
+
+```text
 
 ### Paging
 
@@ -185,7 +191,8 @@ struct PageTableEntry {
     uint64_t reserved2    : 11;
     uint64_t nx           : 1;   // No-execute bit
 };
-```
+
+```text
 
 ### Virtual Memory & Page Replacement
 
@@ -208,7 +215,8 @@ void sigma_page_fault_handler(uintptr_t faulting_addr, uint32_t error_code) {
 // LRU: evict least recently used
 // Optimal: evict page used furthest in future (theoretical)
 // Clock Algorithm: circular buffer with reference bits (SigmaOS uses this)
-```
+
+```text
 
 ### Memory Allocation
 
@@ -219,7 +227,8 @@ void* buddy_alloc(size_t size);  // 4KB, 8KB, 16KB...
 // Slab Allocator: fixed-size object caches (used for kernel objects)
 SigmaSlabCache* proc_cache = sigma_slab_create(sizeof(SovereignProcess));
 SovereignProcess* p = (SovereignProcess*)sigma_slab_alloc(proc_cache);
-```
+
+```text
 
 ---
 
@@ -242,11 +251,12 @@ class SovereignIOScheduler {
     void enqueue(IORequest* req);
     IORequest* next_request();  // Returns by SCAN order
 };
-```
+
+```text
 
 ### File System — S-ZFS
 
-```
+```text
 SigmaOS Virtual File System (VFS)
 ├── /sigma/          — OS root
 │   ├── kernel/      — Kernel modules
@@ -257,7 +267,8 @@ SigmaOS Virtual File System (VFS)
 │   └── data/        — User data
 │
 Backed by: SovereignZFSPool (CoW, Snapshots, RAID-Z, PQC encrypted)
-```
+
+```text
 
 ```cpp
 // File Operations
@@ -275,7 +286,8 @@ while ((entry = sigma_readdir(dir)) != nullptr) {
     sigma_klog(LOG_INFO, "  %s\n", entry->name);
 }
 sigma_closedir(dir);
-```
+
+```text
 
 ---
 

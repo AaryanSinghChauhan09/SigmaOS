@@ -30,6 +30,7 @@ Extends: [`PoolOptions`](/docs/docs/api/Pool.md#parameter-pooloptions)
 
 Examples:
 
+
 ```js
 import { Socks5ProxyAgent } from 'undici'
 
@@ -44,11 +45,13 @@ const socks5ProxyWithOptions = new Socks5ProxyAgent('socks5://localhost:1080', {
 })
 
 
+
 ```
 
 #### Example - Basic SOCKS5 Proxy instantiation
 
 This will instantiate the Socks5ProxyAgent. It will not do anything until registered as the dispatcher to use with requests.
+
 
 ```js
 import { Socks5ProxyAgent } from 'undici'
@@ -56,9 +59,11 @@ import { Socks5ProxyAgent } from 'undici'
 const socks5Proxy = new Socks5ProxyAgent('socks5://localhost:1080')
 
 
+
 ```
 
 #### Example - Basic SOCKS5 Proxy Request with global dispatcher
+
 
 ```js
 import { setGlobalDispatcher, request, Socks5ProxyAgent } from 'undici'
@@ -75,9 +80,11 @@ for await (const data of body) {
 }
 
 
+
 ```
 
 #### Example - Basic SOCKS5 Proxy Request with local dispatcher
+
 
 ```js
 import { Socks5ProxyAgent, request } from 'undici'
@@ -96,9 +103,11 @@ for await (const data of body) {
 }
 
 
+
 ```
 
 #### Example - SOCKS5 Proxy Request with authentication
+
 
 ```js
 import { setGlobalDispatcher, request, Socks5ProxyAgent } from 'undici'
@@ -123,11 +132,13 @@ for await (const data of body) {
 }
 
 
+
 ```
 
 #### Example - SOCKS5 Proxy with HTTPS requests
 
 SOCKS5 proxy supports both HTTP and HTTPS requests through tunneling:
+
 
 ```js
 import { Socks5ProxyAgent, request } from 'undici'
@@ -143,9 +154,11 @@ console.log('Response status:', response.statusCode)
 console.log('Response data:', await response.body.json())
 
 
+
 ```
 
 #### Example - SOCKS5 Proxy with Fetch
+
 
 ```js
 import { Socks5ProxyAgent, fetch } from 'undici'
@@ -161,11 +174,13 @@ console.log('Response status:', response.status)
 console.log('Response data:', await response.text())
 
 
+
 ```
 
 #### Example - Connection Pooling
 
 SOCKS5ProxyWrapper automatically manages connection pooling for better performance:
+
 
 ```js
 import { Socks5ProxyAgent, request } from 'undici'
@@ -185,6 +200,7 @@ const responses = await Promise.all([
 console.log('All requests completed through the same SOCKS5 proxy')
 
 
+
 ```
 
 ### `Socks5ProxyAgent.close()`
@@ -195,6 +211,7 @@ Returns: `Promise<void>`
 
 #### Example - clean up after tests are complete
 
+
 ```js
 import { Socks5ProxyAgent, setGlobalDispatcher } from 'undici'
 
@@ -204,6 +221,7 @@ setGlobalDispatcher(socks5Proxy)
 // ... make requests
 
 await socks5Proxy.close()
+
 
 
 ```
@@ -220,6 +238,7 @@ Returns: `Promise<void>`
 
 #### Example - force close all connections
 
+
 ```js
 import { Socks5ProxyAgent } from 'undici'
 
@@ -227,6 +246,7 @@ const socks5Proxy = new Socks5ProxyAgent('socks5://localhost:1080')
 
 // Force close all connections
 await socks5Proxy.destroy()
+
 
 
 ```
@@ -243,8 +263,10 @@ See [`Dispatcher.request(options [, callback])`](/docs/docs/api/Dispatcher.md#di
 
 SOCKS5 proxy connections can be debugged using Node.js diagnostics:
 
+
 ```sh
 NODE_DEBUG=undici:socks5 node script.js
+
 
 
 ```

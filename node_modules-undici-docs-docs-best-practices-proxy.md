@@ -15,6 +15,7 @@ If you proxy requires basic authentication, you can send it via the `proxy-autho
 
 ### Connect without authentication
 
+
 ```js
 import { Client } from 'undici'
 import { createServer } from 'http'
@@ -67,9 +68,11 @@ function buildProxy () {
 }
 
 
+
 ```
 
 ### Connect with authentication
+
 
 ```js
 import { Client } from 'undici'
@@ -127,6 +130,7 @@ function buildProxy () {
     server.listen(0, () => resolve(server))
   })
 }
+
 
 
 ```
