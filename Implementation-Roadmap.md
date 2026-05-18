@@ -1,51 +1,114 @@
 # SigmaOS Implementation Roadmap
 
-This roadmap tracks the development of core features required for the "Zenith" and "Horizon" microkernel releases.
+> This roadmap tracks the development of core features for the **Zenith v15.1** and **Horizon** microkernel releases, fully aligned with the academic syllabus implementation map.
+
+📚 **See the full Syllabus→SigmaOS mapping:** [Syllabus-Implementation-Map](Syllabus-Implementation-Map)
+
+---
+
+## 🎓 Syllabus-Driven Roadmap (Zenith v15.1)
+
+All 14 academic subjects have been mapped to SigmaOS architecture layers. See individual pages:
+
+| Subject | SigmaOS Layer | Wiki |
+|---|---|---|
+| Fundamentals of CS & IT | Kernel + HAL + CLI + Office Suite | [FCIT](Syllabus-FCIT) |
+| Discrete Mathematics | Math/Logic Engine | [DiscreteMath](Syllabus-DiscreteMath) |
+| C Programming | Developer C API Layer | [C-Prog](Syllabus-C-Programming) |
+| C++ Programming | Kernel Core (C++17) | [Cpp-Prog](Syllabus-Cpp-Programming) |
+| RDBMS & Oracle SQL | SigmaDB Engine | [RDBMS](Syllabus-RDBMS) |
+| Statistics | SigmaStats Toolkit | [Statistics](Syllabus-Statistics) |
+| Web Programming | SigmaWeb Runtime | [WebProg](Syllabus-WebProgramming) |
+| OS Concepts | Kernel Implementation | [OS-Concepts](Syllabus-OS-Concepts) |
+| Python Programming | SigmaPy Runtime | [Python](Syllabus-Python) |
+| Data Warehousing & Mining | SigmaWarehouse + Analytics | [DWDM](Syllabus-DWDM) |
+| R Programming | SigmaR Runtime | [R-Prog](Syllabus-R-Programming) |
+| Advanced Python / Data Science | SigmaAI + NumPy Pipeline | [AdvPython](Syllabus-AdvPython) |
+| AI & Machine Learning | SigmaAI Intelligence Layer | [AIML](Syllabus-AIML) |
+| Data Modeling & Visualization | SigmaModeler + SigmaViz | [DataModeling](Syllabus-DataModeling) |
+
+---
+
+## 🔑 Core Kernel Features
 
 ## 1. Bootloader (Bare-Metal Start)
 
-***Status**: Mentioned, not fully implemented.* **Implementation Plan**: Write assembly/C code to initialize CPU, set up stack, establish the initial GDT/IDT, and load the microkernel into memory.
+**Status:** Partial — assembly boot stub exists.
+**Plan:** Write NASM/C bootloader → GDT/IDT setup → load microkernel into memory.
 
-- **Documentation**: `Bootloader-Design.md` (Wiki)
+- **Docs:** `Bootloader-Design.md`
 
 ## 2. Kernel Modules Architecture
 
-***Status**: Mentioned in repo goals.* **Implementation Plan**: Create a modular kernel lattice allowing hot-swapping of loadable modules (e.g., scheduler, MMU, cryptographic attestation) without rebooting.
+**Status:** Modular shard architecture defined.
+**Plan:** Hot-swappable kernel modules — scheduler, MMU, PQC attestation.
 
-- **Documentation**: `Kernel-Architecture.md` (Wiki)
+- **Docs:** `Kernel-Architecture.md`
 
 ## 3. Memory Management (S-MM)
 
-***Status**: Initial definitions exist, paging incomplete.* **Implementation Plan**: Implement industrial-grade paging, secure identity mapping, segmentation, and an O(1) memory slab allocator.
+**Status:** Paging partially implemented; slab allocator skeleton exists.
+**Plan:** Full 4-level paging (PML4), CoW fork, slab allocator, buddy system.
 
-- **Documentation**: `Sovereign-Memory-Management.md` (Wiki)
+- **Docs:** `Sovereign-Memory-Management.md`
 
 ## 4. Process Scheduling (S-SCHED)
 
-***Status**: Mentioned, missing logic.* **Implementation Plan**: Add multi-priority preemptive scheduling with round-robin fallback. Implement thread isolation for shard workers.
+**Status:** Round-robin stub present.
+**Plan:** CFS-like scheduler, multi-core dispatch, thread isolation per shard.
 
-- **Documentation**: `Scheduling-Algorithms.md` (Wiki)
+- **Docs:** `Scheduling-Algorithms.md`
 
-## 5. Device Drivers
+## 5. Device Drivers (HAL)
 
-***Status**: Referenced, stubs exist.* **Implementation Plan**: Write hardware-direct drivers for basic I/O including keyboard/HID, VESA display, and NVMe/SATA storage.
+**Status:** Stubs for NVMe, USB, VGA exist.
+**Plan:** Full HAL registry — keyboard, mouse, NVMe, SATA, USB, VGA/VESA, audio.
 
-- **Documentation**: `Driver-Development.md` (Wiki)
+- **Docs:** `Driver-Development.md`
 
 ## 6. Security Model (S-ARMOR)
 
-***Status**: Mentioned, not implemented.* **Implementation Plan**: Define hardware privilege levels (Ring 0 vs Ring 3), namespace isolation, and secure post-quantum cryptographic syscalls.
+**Status:** PQC key types defined; enforcement incomplete.
+**Plan:** Ring 0/3 separation, MAC namespaces, Kyber/Dilithium syscall signing.
 
-- **Documentation**: `Security-Model.md` (Wiki)
+- **Docs:** `Security-Model.md`
 
 ## 7. Networking Stack (S-NET)
 
-***Status**: Missing.* **Implementation Plan**: Implement a minimal, secure TCP/IP interconnect layer and local message-passing interface (IPC).
+**Status:** TCP/IP stubs only.
+**Plan:** Full TCP/IP stack, WebSocket support, encrypted IPC via SovereignIPC.
 
-- **Documentation**: `Networking.md` (Wiki)
+- **Docs:** `Networking.md`
 
 ## 8. User-Space Tooling
 
-***Status**: Not present.* **Implementation Plan**: Build a sovereign shell environment, core CLI utilities, and a non-derivative package manager.
+**Status:** sigma-cli partially implemented.
+**Plan:** Full shell + package manager + SigmaStore + sigma-doctor CLI.
 
-- **Documentation**: `User-Tools.md` (Wiki)
+- **Docs:** `User-Tools.md`
+
+---
+
+## 📊 Feature Status Summary
+
+| Feature | Status | Priority |
+|---|---|---|
+| SovereignCodec (number systems) | 🟡 Planned | High |
+| sigma-cli shell | 🟢 Partial | High |
+| HAL I/O Drivers | 🟢 Partial | High |
+| S-ZFS Storage | 🟢 Implemented | High |
+| SigmaDB SQL Engine | 🟡 Planned | High |
+| SigmaStats Toolkit | 🟡 Planned | Medium |
+| SigmaWeb Runtime | 🟡 Planned | Medium |
+| SigmaAI Layer | 🟡 Planned | Medium |
+| SigmaModeler (ERD) | 🟡 Planned | Low |
+| SigmaViz Dashboards | 🟡 Planned | Low |
+| SigmaDocs/Sheets/Slides | 🟡 Planned | Low |
+| SigmaPy / SigmaR Runtimes | 🟡 Planned | Medium |
+| SentinelNeural (antivirus) | 🟡 Planned | High |
+| SovereignCloudFS | 🟢 Partial | Medium |
+| SovereignNetStack | 🟡 Planned | High |
+
+---
+
+*Last updated: 2026-05-18 | SigmaOS Zenith v15.1*
