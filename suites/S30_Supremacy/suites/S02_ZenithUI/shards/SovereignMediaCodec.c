@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN MEDIA CODEC + OBS COMPOSITOR  IMPLEMENTATION (v1.0)
@@ -6,7 +6,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
-#include "../../../../../include/SovereignMediaCodec.h"
+#include "SovereignMediaCodec.h"
 
 /* -------------------------------------------------------------------------
  * Playback state

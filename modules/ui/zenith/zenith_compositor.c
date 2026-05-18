@@ -1,6 +1,6 @@
-#include "../../../include/libc/sigma_libc.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/sigma_kernel_types.h"
+#include "libc/sigma_libc.h"
+#include "sigma_log.h"
+#include "sigma_kernel_types.h"
 
 // ---------------------------------------------------------
 // SigmaOS Zenith UI Compositor

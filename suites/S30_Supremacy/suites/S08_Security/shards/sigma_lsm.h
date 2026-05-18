@@ -14,7 +14,7 @@
 #ifndef SIGMA_LSM_H
 #define SIGMA_LSM_H
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 #define LSM_TRUE  ((sigma_bool)1)
 #define LSM_FALSE ((sigma_bool)0)

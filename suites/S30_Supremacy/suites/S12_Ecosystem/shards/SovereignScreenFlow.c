@@ -11,7 +11,7 @@
 //         Sovereign device over QSSS (S07).
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 typedef struct {

@@ -1,4 +1,4 @@
-#include "../../../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS NUMA Balancing Engine (Phase 10)

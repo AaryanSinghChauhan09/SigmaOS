@@ -9,8 +9,8 @@
  * =========================================================================
  */
 
-#include "../../include/libc/sigma_libc.h"
-#include "../../include/SovereignOmniShard.h"
+#include "libc/sigma_libc.h"
+#include "SovereignOmniShard.h"
 
 /* =========================================================================
  * Command dispatch table entry (replaces C++ if-else chain with data table)

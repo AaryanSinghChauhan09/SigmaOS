@@ -1,7 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SigmaOOP.hpp"
-#include "../../../include/sigma_log.h"
-#include "../../../include/libc/sigma_libc.h"
+#include "sigma_kernel_types.h"
+#include "SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "libc/sigma_libc.h"
 
 /**
  * SigmaOS Sovereign SSH Shard (S-SSH)

@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS MULTIVERSE_EXODUS: SOVEREIGN PBO SHARD (v58.0-SUPREME-MULTIVERSE_EXODUS)

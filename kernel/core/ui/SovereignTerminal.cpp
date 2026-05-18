@@ -1,7 +1,7 @@
-#include "../../../include/SigmaOOP.hpp"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "SigmaOOP.hpp"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Terminal Shard (S-TERM)

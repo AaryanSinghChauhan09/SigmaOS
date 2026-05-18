@@ -1,7 +1,7 @@
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "SovereignOnboarding.hpp"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 SovereignOnboardingEngine& SovereignOnboardingEngine::getInstance() {
     static SovereignOnboardingEngine instance;

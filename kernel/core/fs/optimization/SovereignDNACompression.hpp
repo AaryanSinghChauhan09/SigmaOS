@@ -1,10 +1,10 @@
-#include "../../../../include/hal/sigma_hal.h"
-#include "../../../../include/libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 #ifndef SOVEREIGN_DNA_COMPRESSION_HPP
 #define SOVEREIGN_DNA_COMPRESSION_HPP
 
-#include "../../../../include/core/sigma_types.h"
-#include "../../../../include/SigmaOOP.hpp"
+#include "core/sigma_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

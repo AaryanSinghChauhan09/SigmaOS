@@ -1,6 +1,6 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "Lattice.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN BUILD SYSTEM (v128.0 - ZERO-STD NATIVE)

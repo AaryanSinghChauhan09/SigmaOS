@@ -6,7 +6,7 @@
 #ifndef SIGMA_SOVEREIGN_CFS_H
 #define SIGMA_SOVEREIGN_CFS_H
 
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 namespace SigmaOS {
 namespace Scheduling {

@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ZENITH: SOVEREIGN BUDDY ALLOCATOR (v1.0)

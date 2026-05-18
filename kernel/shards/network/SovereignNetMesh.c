@@ -1,4 +1,4 @@
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN NET-MESH (v25.0 - PURE C11 FINALITY)
@@ -12,9 +12,9 @@
  */
 
 <<<<<<<< HEAD:suites/S07_Network/sigma_net.c
-#include "../../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 ========
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 >>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/network/SovereignNetMesh.c
 
 /* =========================================================================

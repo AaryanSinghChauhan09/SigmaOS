@@ -1,9 +1,9 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "../../../../../include/SovereignTool.h"
-#include "../../../../../include/libc/sigma_libc.h"
-#include "../../../../../include/sigma_string.h"
+#include "SovereignTool.h"
+#include "libc/sigma_libc.h"
+#include "sigma_string.h"
 
 static sovereign_tool_registry_t g_tool_registry;
 

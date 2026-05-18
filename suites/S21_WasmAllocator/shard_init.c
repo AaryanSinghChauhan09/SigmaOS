@@ -1,5 +1,5 @@
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/libc/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "libc/sigma_libc.h"
 
 // SigmaOS WASM-Safe Allocator (S-WASM-ALLOC)
 // Purpose: Browser-safe memory management targeting the WASM linear memory model.

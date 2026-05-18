@@ -13,7 +13,7 @@
 //   • Automatic Sandboxing: If the driver crashes, SigmaOS isolates it.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 typedef struct {

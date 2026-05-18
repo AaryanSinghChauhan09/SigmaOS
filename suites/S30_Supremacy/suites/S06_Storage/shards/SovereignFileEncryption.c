@@ -16,9 +16,9 @@
 //   • Per-file granular encryption via VFS open() hook
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
-#include "../../../../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 #define FDE_SECTOR_SIZE       512
 #define FDE_KEY_LEN_BYTES      32   // AES-256

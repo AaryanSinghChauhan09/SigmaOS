@@ -6,7 +6,7 @@
 #ifndef SIGMA_IPC_CHANNEL_HPP
 #define SIGMA_IPC_CHANNEL_HPP
 
-#include "../../include/S43_SovereignCaps/sigma_caps.h"
+#include "S43_SovereignCaps/sigma_caps.h"
 
 namespace sigma {
 namespace ipc {

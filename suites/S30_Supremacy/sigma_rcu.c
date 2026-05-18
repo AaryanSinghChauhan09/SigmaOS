@@ -1,4 +1,4 @@
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN RCU (v1.0 - Industrial Absorbtion: Linux Kernel)
@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 #include <stdatomic.h> /* C11 Atomic headers, compiler built-in */
 
 typedef struct sigma_rcu_head {

@@ -5,9 +5,9 @@
  * Maps to: Syllabus-Python, Syllabus-R-Programming, Syllabus-AdvPython
  */
 #pragma once
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
-#include "../../include/sigma_string.h"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
+#include "sigma_string.h"
 #include <stdio.h>
 
 // ─── CPython 3.12 Embed Stub Declarations ─────────────────────────────────────

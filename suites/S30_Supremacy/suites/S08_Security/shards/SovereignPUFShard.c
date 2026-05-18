@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS OLYMPUS: SOVEREIGN PUF SHARD (v57.9-SUPREME-OLYMPUS)

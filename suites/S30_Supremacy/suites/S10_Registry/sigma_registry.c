@@ -1,7 +1,7 @@
-#include "../../../../include/libc/SovereignLibC.h"
-#include "../../../../include/sigma_registry.h"
-#include "../../../../include/sigma_libc.h"
-#include "../../../../include/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_registry.h"
+#include "sigma_libc.h"
+#include "sigma_libc.h"
 
 /* =========================================================================
  * SIGMA OS: SOVEREIGN REGISTRY (S10)

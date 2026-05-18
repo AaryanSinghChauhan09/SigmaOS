@@ -1,9 +1,9 @@
 #ifndef PAGE_SHARD_HPP
 #define PAGE_SHARD_HPP
 
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

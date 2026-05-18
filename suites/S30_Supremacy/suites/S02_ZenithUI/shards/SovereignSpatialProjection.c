@@ -10,7 +10,7 @@
 // Result: Total immersion leader for all form-factors.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 typedef struct {

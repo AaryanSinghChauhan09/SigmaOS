@@ -1,4 +1,4 @@
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =============================================================================
  * Σ SIGMAOS: DMA COHERENT BUFFER ALLOCATOR (v1.0)
@@ -16,8 +16,8 @@
  * =============================================================================
  */
 
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_features.h"
+#include "sigma_kernel_types.h"
+#include "sigma_features.h"
 
 /* =========================================================================
  * DMA Memory Pool State

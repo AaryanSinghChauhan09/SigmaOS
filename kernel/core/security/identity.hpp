@@ -1,8 +1,8 @@
 #ifndef SOVEREIGN_IDENTITY_HPP
 #define SOVEREIGN_IDENTITY_HPP
 
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_kernel_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Security {

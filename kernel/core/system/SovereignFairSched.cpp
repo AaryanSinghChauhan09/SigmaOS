@@ -1,7 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SIGMAOS: SOVEREIGN FAIR SCHEDULER (S-FSCHED)

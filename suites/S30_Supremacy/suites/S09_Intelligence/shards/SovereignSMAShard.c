@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ABSOLUTE_INFINITY: SOVEREIGN SMA SHARD (v59.1-ABSOLUTE)

@@ -7,7 +7,7 @@
 //   Quantum-Silicon or standard AMD64/ARM64 fabrics.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 typedef struct {
     uint32_t target_arch_id;

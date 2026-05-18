@@ -1,7 +1,7 @@
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
-#include "../../include/sigma_adaptivetype.h"
-#include "../../include/hal/sigma_hal.h"
+#include "sigma_adaptivetype.h"
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Adaptive Typography

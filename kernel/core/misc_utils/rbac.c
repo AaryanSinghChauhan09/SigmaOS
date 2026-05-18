@@ -1,4 +1,4 @@
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: ROLE-BASED ACCESS CONTROL (v1.0)
@@ -6,7 +6,7 @@
  * Principles: Shard-Level Permissions & Zero-Trust Resource Access.
  * =============================================================================
  */
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 typedef enum Role {
     ROLE_KERNEL,

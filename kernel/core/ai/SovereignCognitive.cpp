@@ -1,7 +1,7 @@
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/ai/sigma_cognitive.h"
-#include "../../include/ai/sigma_neural.h"
+#include "hal/sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "ai/sigma_cognitive.h"
+#include "ai/sigma_neural.h"
 
 /**
  * SigmaOS Sovereign Cognitive Shard Orchestrator Implementation

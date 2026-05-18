@@ -2,7 +2,7 @@
 #ifndef SIGMA_LIBC_H
 #define SIGMA_LIBC_H
 
-#include "../../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 void          sigma_exit(int code);
 sigma_ssize_t sigma_write(int fd, const void* buf, sigma_size_t count);
 sigma_ssize_t sigma_read(int fd, void* buf, sigma_size_t count);

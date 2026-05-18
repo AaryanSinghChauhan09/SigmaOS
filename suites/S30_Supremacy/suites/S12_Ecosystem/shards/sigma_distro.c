@@ -1,12 +1,12 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S12_Ecosystem/shards/sigma_distro.c
  * =========================================================================
  */
 
-#include "../../../../../include/sigma_distro.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "sigma_distro.h"
+#include "libc/sigma_libc.h"
 
 static sigma_package_t s_pkgs[DA_MAX_PKGS];
 static da_u32          s_pkg_count  = 0;

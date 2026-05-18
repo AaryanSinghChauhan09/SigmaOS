@@ -1,4 +1,4 @@
-#include "../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: tools/sigmatop  sigmatop.c
@@ -8,9 +8,9 @@
  * =========================================================================
  */
 
-#include "../../../../include/libc/sigma_libc.h"
-#include "../../../../include/libc/sigma_libc.h"
-#include "../../../../include/core/sigma_types.h"
+#include "libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
+#include "core/sigma_types.h"
 
 #define VT_CLEAR "\033[2J\033[H"
 #define VT_HIDE  "\033[?25l"

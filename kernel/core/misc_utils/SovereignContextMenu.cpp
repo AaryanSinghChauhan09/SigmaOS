@@ -1,11 +1,11 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_contextmenu.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/ai/sigma_neural.h"
-#include "../../../include/sigma_universal_ui.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "sigma_contextmenu.h"
+#include "sigma_hal.h"
+#include "ai/sigma_neural.h"
+#include "sigma_universal_ui.h"
 
 /**
  * SigmaOS Sovereign Contextual Menus

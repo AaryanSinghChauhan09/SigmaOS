@@ -1,8 +1,8 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "../../../../../include/SovereignFS.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "SovereignFS.h"
+#include "libc/sigma_libc.h"
 
 /*
  * Plan 9 9P Protocol Shard.

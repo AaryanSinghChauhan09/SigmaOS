@@ -7,7 +7,7 @@
 #ifndef SIGMA_VMM_H
 #define SIGMA_VMM_H
 
-#include "../../include/sigma_slab_alloc.h"
+#include "sigma_slab_alloc.h"
 
 // Page size and table constants
 #define PAGE_SIZE       4096

@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: S01_GENESIS  SovereignSyscallDispatcher.c
@@ -9,7 +9,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 #define MAX_SYSCALLS 512
 

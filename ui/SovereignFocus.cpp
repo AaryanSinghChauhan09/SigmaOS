@@ -1,11 +1,11 @@
-#include "../include/sigma_log.h"
-#include "../include/libc/SovereignLibC.h"
-#include "../include/hal/sigma_hal.h"
-#include "../include/sigma_kernel_types.h"
-#include "../include/sigma_focus.h"
-#include "../include/hal/sigma_hal.h"
-#include "../include/sigma_zeronet.h"
-#include "../include/system/sigma_ipc.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "sigma_focus.h"
+#include "hal/sigma_hal.h"
+#include "sigma_zeronet.h"
+#include "system/sigma_ipc.h"
 
 /**
  * SigmaOS Sovereign Focus Mode

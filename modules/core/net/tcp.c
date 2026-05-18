@@ -1,4 +1,4 @@
-#include "../../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS TCP/IP Stack Prototype

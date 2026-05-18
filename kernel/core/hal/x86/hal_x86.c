@@ -7,7 +7,7 @@
  * =========================================================================
  */
 #include "../hal.h"
-#include "../../../../include/sigma_log.h"
+#include "sigma_log.h"
 
 /* ── Global hal_ops pointer (defined here for x86 TU) ──────────────── */
 const hal_ops_t* hal_ops = (const hal_ops_t*)0; /* set by hal_init */

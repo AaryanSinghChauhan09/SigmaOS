@@ -7,7 +7,7 @@
 #ifndef SIGMA_MEM_TCACHE_H
 #define SIGMA_MEM_TCACHE_H
 
-#include "../../include/sigma_spinlock.h"
+#include "sigma_spinlock.h"
 
 #define SIGMA_TC_NUM_CLASSES  8
 #define SIGMA_TC_CLASS_DEPTH  64  // max items per free list

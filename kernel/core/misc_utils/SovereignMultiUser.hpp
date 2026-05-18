@@ -1,9 +1,9 @@
-#include "../../../include/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_hal.h"
+#include "libc/SovereignLibC.h"
 #ifndef SOVEREIGN_MULTI_USER_HPP
 #define SOVEREIGN_MULTI_USER_HPP
 
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 typedef struct {
     sigma_u32 uid;

@@ -10,7 +10,7 @@
 // Result: The OS is 'Everywhere' and 'Nowhere', effectively immortal.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 typedef struct {

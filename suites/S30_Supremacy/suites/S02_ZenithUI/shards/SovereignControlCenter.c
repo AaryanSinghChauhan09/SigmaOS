@@ -13,7 +13,7 @@
 //   • Unified Hardware Toggle Hub
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define MAX_WIDGETS     32

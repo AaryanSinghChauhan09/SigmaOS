@@ -6,10 +6,10 @@
  * ========================================
  */
 
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

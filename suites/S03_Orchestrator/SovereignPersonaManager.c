@@ -1,4 +1,4 @@
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /**
  * @file SovereignPersonaManager.c
  * @brief SigmaOS Dynamic System Personalities
@@ -7,7 +7,7 @@
  * Personas define scheduling priority, network visibility, and UI aesthetics.
  */
 
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 typedef struct {
     char name[32];

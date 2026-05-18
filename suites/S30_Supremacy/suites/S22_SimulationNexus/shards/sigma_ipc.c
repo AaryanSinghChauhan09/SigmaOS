@@ -1,12 +1,12 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN IPC (Suite S22)
  * =========================================================================
  */
 
-#include "../../../../../include/system/sigma_ipc.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "system/sigma_ipc.h"
+#include "libc/sigma_libc.h"
 
 static sigma_u32 s_next_port = 0x1000;
 static sigma_u32 s_port_count = 0;

@@ -11,7 +11,7 @@
 //         fundamental logic to the current computational load and user intent.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define FABRIC_WEIGHT_COUNT 1048576 // 1M weight-set for the local fabric

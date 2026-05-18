@@ -12,7 +12,7 @@
 //     for a compilation burst or "Undervolt" for a reading session.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 typedef struct {

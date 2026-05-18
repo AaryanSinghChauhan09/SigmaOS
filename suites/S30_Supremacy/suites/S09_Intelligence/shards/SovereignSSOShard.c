@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS COSMOS: SOVEREIGN SSO SHARD (v57.4-SUPREME-COSMOS)

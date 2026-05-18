@@ -1,4 +1,4 @@
-#include "../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS — tools/sovereign_purge — sovereign_purge.c
@@ -16,10 +16,10 @@
 //   • Outputs a purge manifest before executing any deletions
 // =============================================================================
 
-#include "../../../../include/libc/sigma_libc.h"
-#include "../../../../include/libc/sigma_libc.h"
-#include "../../../../include/libc/sigma_libc.h"
-#include "../../../../include/core/sigma_types.h"
+#include "libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
+#include "core/sigma_types.h"
 
 #include <dirent.h>
 #include <sys/stat.h>

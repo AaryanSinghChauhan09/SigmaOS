@@ -1,8 +1,8 @@
-#include "../../include/sigma_log.h"
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/Lattice.h"
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/SovereignCoreUtils.h"
+#include "sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "Lattice.h"
+#include "libc/SovereignLibC.h"
+#include "SovereignCoreUtils.h"
 
 namespace SigmaOS {
 namespace CoreUtils {

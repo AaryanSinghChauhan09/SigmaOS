@@ -5,8 +5,8 @@
 #ifndef SIGMA_OS_ADAPTIVE_PROFILE_HPP
 #define SIGMA_OS_ADAPTIVE_PROFILE_HPP
 
-#include "../../include/sigma_ui_profile_switcher.h"
-#include "../../include/S43_SovereignCaps/sigma_caps.h"
+#include "sigma_ui_profile_switcher.h"
+#include "S43_SovereignCaps/sigma_caps.h"
 
 namespace sigma {
 namespace core {

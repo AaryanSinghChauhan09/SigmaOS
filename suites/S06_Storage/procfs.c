@@ -1,5 +1,5 @@
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_kernel_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-PROCFS (v1.0 - LINUX OBSERVABILITY)
@@ -12,7 +12,7 @@
  * =============================================================================
  */
 
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 /* =========================================================================
  * PROCFS Engine (The Linux Status Monitor)

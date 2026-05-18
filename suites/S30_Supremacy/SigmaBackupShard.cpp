@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_log.h"
 
 void sigma_backup_media(const char* source_url) {
     sigma_log_info("[BACKUP] Initializing Media Scraper (source: %s)... OK\n", source_url);

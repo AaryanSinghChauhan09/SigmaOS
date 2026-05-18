@@ -23,7 +23,7 @@
 #ifndef SIGMA_HAL_CONTRACT_H
 #define SIGMA_HAL_CONTRACT_H
 
-#include "../../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {

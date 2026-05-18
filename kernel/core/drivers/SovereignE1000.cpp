@@ -1,6 +1,6 @@
-#include "../../../include/SigmaOOP.hpp"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_log.h"
+#include "SigmaOOP.hpp"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Sovereign Intel e1000 Driver (S-E1000)

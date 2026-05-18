@@ -12,7 +12,7 @@
  * =========================================================================
  */
 
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 /* =========================================================================
  * Zenith VFS Node (replaces C++ struct with bool)

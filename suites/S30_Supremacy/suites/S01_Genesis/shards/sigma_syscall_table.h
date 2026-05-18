@@ -12,7 +12,7 @@
 #ifndef SIGMA_SYSCALL_TABLE_H
 #define SIGMA_SYSCALL_TABLE_H
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 /* ── Syscall numbers ─────────────────────────────────────────────────────── */
 #define SC_READ          0

@@ -13,7 +13,7 @@
 //   • Multi-Arch Fat Binaries: Support for x86_64, ARM64, and RISC-V in one bundle
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define SAB_MAX_PERMISSIONS 32

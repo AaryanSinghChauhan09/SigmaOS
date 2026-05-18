@@ -1,4 +1,4 @@
-#include "../include/sigma_log.h"
+#include "sigma_log.h"
 
 /* Simple monitor that prints uptime and a stub for CPU usage */
 void sigma_monitor(void) {

@@ -1,4 +1,4 @@
-#include "../../include/sigma_log.h"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Sovereign Health Monitor (S-HEALTH)

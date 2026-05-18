@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN CRYPTOGRAPHY SUITE (v2.0 - INTEGRATED)

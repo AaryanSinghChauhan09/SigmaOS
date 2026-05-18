@@ -9,9 +9,9 @@
  * =========================================================================
  */
 
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/SovereignPersona.h"
+#include "libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
+#include "SovereignPersona.h"
 
 /* =========================================================================
  * Command dispatch table entry (replaces C++ if-else chain with data table)

@@ -1,5 +1,5 @@
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/SovereignOmniShard.h"
+#include "libc/SovereignLibC.h"
+#include "SovereignOmniShard.h"
 
 namespace SigmaOS {
 namespace Omni {

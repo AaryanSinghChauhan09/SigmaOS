@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S11_Virtualization/shards/sigma_pqc.c
@@ -9,8 +9,8 @@
  * =========================================================================
  */
 
-#include "../../../../../include/security/sigma_pqc.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "security/sigma_pqc.h"
+#include "libc/sigma_libc.h"
 
 void sigma_pqc_init(void) {
     sigma_sigma_printf("S [PQC] Suite initialized\n");

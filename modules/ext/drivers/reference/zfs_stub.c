@@ -4,7 +4,7 @@
  * USP: Industrial-grade data integrity and snapshotting for the lattice.
  */
 
-#include "../../../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 typedef struct {
     char* pool_name;

@@ -5,8 +5,8 @@
 #ifndef SIGMA_PQC_VERIFY_H
 #define SIGMA_PQC_VERIFY_H
 
-#include "../../include/sigma_pqc_keygen.h"
-#include "../../include/sigma_pqc_sign.h"
+#include "sigma_pqc_keygen.h"
+#include "sigma_pqc_sign.h"
 
 static inline int pqc_verify(const unsigned char* public_key, 
                              const unsigned char* message, unsigned int message_len,

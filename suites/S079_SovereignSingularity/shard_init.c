@@ -1,5 +1,5 @@
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/libc/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "libc/sigma_libc.h"
 
 // SigmaOS Sovereign Singularity (S-SINGULARITY)
 // Philosophy: Final Convergence - Absolute Architectural Unity and Native Silicon Mastery.

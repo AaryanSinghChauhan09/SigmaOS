@@ -1,4 +1,4 @@
-#include "../../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS Self-Replicating Shards: Propagation Engine (Phase 13)

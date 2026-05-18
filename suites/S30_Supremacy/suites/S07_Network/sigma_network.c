@@ -1,7 +1,7 @@
-#include "../../../../include/libc/SovereignLibC.h"
-#include "../../../../include/sigma_proto.h"
-#include "../../../../include/sigma_libc.h"
-#include "../../../../include/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_proto.h"
+#include "sigma_libc.h"
+#include "sigma_libc.h"
 
 /* =========================================================================
  * SIGMA OS: SOVEREIGN NETWORK PROTOCOL STACK (S07)

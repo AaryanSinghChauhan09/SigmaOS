@@ -10,10 +10,10 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_sinstall.h"
-#include "../../include/sigma_log.h"
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/sigma_log.h"
+#include "sigma_sinstall.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_log.h"
 
 /* =========================================================================
  * SovereignDeploymentEngine Method Implementations

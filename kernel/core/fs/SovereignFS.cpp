@@ -1,9 +1,9 @@
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
-#include "../../include/fs/sigma_fs.h"
-#include "../../include/sigma_log.h"
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
+#include "fs/sigma_fs.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Sovereign File System Implementation
@@ -11,8 +11,8 @@
  * ZERO-DEPENDENCY: Strictly bare-metal data persistence.
  */
 
-#include "../../include/fs/sigma_fs.h"
-#include "../../include/sigma_log.h"
+#include "fs/sigma_fs.h"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Sovereign File System Implementation

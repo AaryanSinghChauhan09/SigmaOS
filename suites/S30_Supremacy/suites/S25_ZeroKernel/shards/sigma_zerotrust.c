@@ -1,12 +1,12 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN ZERO-TRUST (Suite S25)
  * =========================================================================
  */
 
-#include "../../../../../include/sigma_zerotrust.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "sigma_zerotrust.h"
+#include "libc/sigma_libc.h"
 
 static sigma_u32 s_verified_count = 0;
 

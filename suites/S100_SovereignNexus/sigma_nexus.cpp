@@ -1,6 +1,6 @@
-#include "../../include/libc/sigma_libc.h"
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_cap_manager.h"
+#include "libc/sigma_libc.h"
+#include "sigma_kernel_types.h"
+#include "sigma_cap_manager.h"
 
 // Σ SIGMAOS: SOVEREIGN NEXUS ENTERPRISE SUITE (S100)
 // Responsibility: Integrated Productivity, ERP, and Cloud Infrastructure.

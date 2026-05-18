@@ -1,9 +1,9 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_kernel_types.h"
 
-#include "../../../include/sigma_adaptivetype.h"
-#include "../../../include/sigma_hal.h"
+#include "sigma_adaptivetype.h"
+#include "sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Adaptive Typography

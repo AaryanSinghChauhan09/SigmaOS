@@ -1,6 +1,6 @@
-#include "../include/sigma_log.h"
-#include "../include/sigma_kernel_types.h"
-#include "../include/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Zenith Desktop Shard

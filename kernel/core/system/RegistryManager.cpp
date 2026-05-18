@@ -3,7 +3,7 @@
  * Boot-time parsing in C++ with custom string parser (no stdlib dependency).
  * Profiles: Developer, Forensic, Gaming, Container Host.
  */
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 namespace SigmaOS {
     class RegistryManager {
     public:

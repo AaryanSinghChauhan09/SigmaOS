@@ -11,7 +11,7 @@
 //     to any timestamp in under 5 seconds (Atomic boot flip).
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define MAX_SNAPSHOTS       128

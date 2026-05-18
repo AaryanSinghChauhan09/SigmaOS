@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS THE_SINGULARITY: SOVEREIGN QPU SHARD (v63.0-SINGULARITY)

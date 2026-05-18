@@ -1,4 +1,4 @@
-#include "../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS 3D Spatial Audio: Immersive Sound Shard (Phase 10)

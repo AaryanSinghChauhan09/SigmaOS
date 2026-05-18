@@ -1,12 +1,12 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_kernel_types.h"
 
-#include "../../../include/sigma_smartshot.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/sigma_vissearch.h"
-#include "../../../include/sigma_memorypalace.h"
-#include "../../../include/sigma_clipboard.h"
+#include "sigma_smartshot.h"
+#include "sigma_hal.h"
+#include "sigma_vissearch.h"
+#include "sigma_memorypalace.h"
+#include "sigma_clipboard.h"
 
 /**
  * SigmaOS Sovereign Smart Screenshot

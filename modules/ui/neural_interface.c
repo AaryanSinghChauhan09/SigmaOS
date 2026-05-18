@@ -1,4 +1,4 @@
-#include "../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS Bio-Adaptive Shards: Neural Interface (Phase 12)

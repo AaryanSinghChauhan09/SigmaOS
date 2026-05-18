@@ -10,7 +10,7 @@
 // Result: The OS evolves and optimizes its own source code in real-time.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 typedef struct {

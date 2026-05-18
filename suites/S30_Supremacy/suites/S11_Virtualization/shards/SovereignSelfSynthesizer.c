@@ -10,7 +10,7 @@
 //     (Mobile, Desktop, Server, RTOS) at boot to match the hardware.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 typedef enum {

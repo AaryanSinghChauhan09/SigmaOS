@@ -1,7 +1,7 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/sigma_hal.h"
+#include "sigma_log.h"
+#include "sigma_hal.h"
 #include "SovereignAppShard.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {

@@ -1,5 +1,5 @@
-#include "../../include/sigma_ui_toolkit.h"
-#include "../../include/sigma_log.h"
+#include "sigma_ui_toolkit.h"
+#include "sigma_log.h"
 
 /**
  * Σ SIGMAOS: SOVEREIGN UI TOOLKIT (S-UI-TOOLKIT)

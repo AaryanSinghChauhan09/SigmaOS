@@ -7,13 +7,13 @@
  */
 
 #include "sigma_syscall_dispatcher.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 
 // Simulated user space boundary check (e.g. 0x7FFFFFFFFFFF)
 #define USER_SPACE_LIMIT 0x00007FFFFFFFFFFFULL
 
 static int validate_user_pointer(sigma_u64 ptr, sigma_u64 size) {
-    if (ptr == 0) return 0; // Reject null
+    if (ptr == 0) return 0; // Reject SIGMA_NULL
     if (ptr + size > USER_SPACE_LIMIT) {
         return 0; // Potential kernel memory intrusion protection
     }

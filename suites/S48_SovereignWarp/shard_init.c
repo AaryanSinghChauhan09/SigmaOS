@@ -1,5 +1,5 @@
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/libc/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "libc/sigma_libc.h"
 
 // SigmaOS Sovereign Warp (S-WARP)
 // Philosophy: ZFS / Btrfs - Time-Traveling Shard Snapshots and Rollbacks.

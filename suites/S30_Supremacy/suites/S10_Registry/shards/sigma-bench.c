@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 /**
@@ -8,13 +8,13 @@
  */
 
 #ifdef UNIT_TEST_ENV
-  #include "../../../../../include/SovereignToolHeader.h"
-  #include "../../../../../include/SovereignToolHeader.h"
+  #include "SovereignToolHeader.h"
+  #include "SovereignToolHeader.h"
   #define sigma_printf printf
   #define sigma_u64 sigma_u64
   static inline sigma_u64 cpu_rdtsc(void) { return 0; }
 #else
-  #include "../../../../../include/SovereignToolHeader.h"
+  #include "SovereignToolHeader.h"
   extern sigma_u64 cpu_rdtsc(void);
 #endif
 

@@ -1,5 +1,5 @@
 // sigma_recover.c – recovery utility stub for SigmaOS
-#include "../include/sigma_log.h"
+#include "sigma_log.h"
 
 // Simple recovery entry point
 int sigma_recover_main(void) {

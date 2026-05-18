@@ -1,8 +1,8 @@
 #ifndef DISPLAY_DRIVER_HPP
 #define DISPLAY_DRIVER_HPP
 
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_kernel_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Drivers {

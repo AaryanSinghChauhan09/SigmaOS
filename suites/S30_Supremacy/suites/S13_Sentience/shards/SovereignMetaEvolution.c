@@ -13,7 +13,7 @@
 //     on actual process fragmentation trends.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define HOTPATH_THRESHOLD 1000000 // Cycles

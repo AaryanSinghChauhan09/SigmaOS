@@ -1,5 +1,5 @@
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_kernel_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-AUTOMATION (v1.0 - KERNEL-NATIVE WORKFLOWS)
@@ -13,7 +13,7 @@
  * =============================================================================
  */
 
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 #define MAX_AUTO_WORKFLOWS 128
 

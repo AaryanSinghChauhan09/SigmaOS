@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS MULTIVERSE_CHRONOS: SOVEREIGN VBS SHARD (v58.2-SUPREME-MULTIVERSE_CHRONOS)

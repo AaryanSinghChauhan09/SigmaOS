@@ -5,7 +5,7 @@
 #ifndef SIGMA_OS_BEHAVIOR_ADAPTIVE_HPP
 #define SIGMA_OS_BEHAVIOR_ADAPTIVE_HPP
 
-#include "../../include/atomic_sigma_oop_base.hpp"
+#include "atomic_sigma_oop_base.hpp"
 
 namespace sigma {
 namespace perf {

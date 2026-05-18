@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS OMEGA_POINT: SOVEREIGN QST SHARD (v62.0-OMEGA)

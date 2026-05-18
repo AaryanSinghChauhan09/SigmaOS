@@ -1,5 +1,5 @@
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/core/context/manager.hpp"
+#include "libc/SovereignLibC.h"
+#include "core/context/manager.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

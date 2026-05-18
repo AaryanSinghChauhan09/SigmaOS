@@ -1,8 +1,8 @@
 #ifndef SOVEREIGN_CONTAINER_HPP
 #define SOVEREIGN_CONTAINER_HPP
 
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_kernel_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

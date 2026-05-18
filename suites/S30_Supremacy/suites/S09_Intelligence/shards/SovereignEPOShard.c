@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS ASGARD: SOVEREIGN EPO SHARD (v57.8-SUPREME-ASGARD)

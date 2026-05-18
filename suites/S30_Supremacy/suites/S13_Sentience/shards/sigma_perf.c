@@ -1,12 +1,12 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S13_Sentience/shards/sigma_perf.c
  * =========================================================================
  */
 
-#include "../../../../../include/sigma_perf.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "sigma_perf.h"
+#include "libc/sigma_libc.h"
 
 static sigma_perf_counter_t s_counters[SIGMA_PERF_MAX_COUNTERS];
 static pf_u32               s_counter_count = 0;

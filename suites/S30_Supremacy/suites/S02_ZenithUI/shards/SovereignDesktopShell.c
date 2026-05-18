@@ -13,7 +13,7 @@
 //   • Integrated Spotlight (S02) and Control Center (S02) hooks
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define MAX_WINDOWS         128

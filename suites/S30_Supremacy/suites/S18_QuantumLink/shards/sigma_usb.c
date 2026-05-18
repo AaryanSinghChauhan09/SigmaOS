@@ -1,12 +1,12 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S18_QuantumLink/shards/sigma_usb.c
  * =========================================================================
  */
 
-#include "../../../../../include/drivers/sigma_usb.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "drivers/sigma_usb.h"
+#include "libc/sigma_libc.h"
 
 static sigma_usb_dev_t s_devices[USB_MAX_DEVICES];
 static usb_u32         s_dev_count  = 0;

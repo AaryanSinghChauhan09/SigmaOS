@@ -5,8 +5,8 @@
  * No stdlib, no libc, no predefined allocators.
  * =========================================================================
  */
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
 /* sigma_boot_stage_t is already defined in sigma_kernel_types.h — no
  * second include needed; including sigma_boot.h here would cause
  * a typedef-redefinition error because that header also defines

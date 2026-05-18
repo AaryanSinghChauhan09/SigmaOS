@@ -1,7 +1,7 @@
-#include "../../../../../include/libc/SovereignLibC.h"
-#include "../../../../../include/sigma_network.h"
-#include "../../../../../include/sigma_libc.h"
-#include "../../../../../include/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_network.h"
+#include "sigma_libc.h"
+#include "sigma_libc.h"
 
 #ifdef _WIN32
     #include <winsock2.h>

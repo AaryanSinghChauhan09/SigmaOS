@@ -13,7 +13,7 @@
 //   • Parallax holographic icons that react to gyroscope/mouse tilt
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define MAX_ZENITH_LAYERS   16

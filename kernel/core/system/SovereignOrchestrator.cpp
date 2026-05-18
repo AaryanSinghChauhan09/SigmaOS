@@ -1,5 +1,5 @@
-#include "../../include/sigma_orchestrator.h"
-#include "../../include/sigma_log.h"
+#include "sigma_orchestrator.h"
+#include "sigma_log.h"
 
 /**
  * Σ SIGMAOS: SOVEREIGN SHARD ORCHESTRATOR (S-ORCH)

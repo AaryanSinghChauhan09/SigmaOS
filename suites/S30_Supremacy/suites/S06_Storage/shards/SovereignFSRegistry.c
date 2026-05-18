@@ -1,9 +1,9 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "../../../../../include/SovereignVFS.h"
-#include "../../../../../include/libc/sigma_libc.h"
-#include "../../../../../include/sigma_string.h"
+#include "SovereignVFS.h"
+#include "libc/sigma_libc.h"
+#include "sigma_string.h"
 
 #define MAX_FS_TYPES 16
 static sovereign_fs_type_t g_fs_types[MAX_FS_TYPES];

@@ -8,7 +8,7 @@
 // Result: A system that feels 'Off' when not in use, yet 'Instant' on call.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 typedef struct {
     uint32_t shard_id;

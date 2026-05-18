@@ -4,9 +4,9 @@
  * Phase 6: Omnipresence — P2P State Synchronization
  * ============================================================================= */
 
-#include "../../include/sigma_lattice_mesh.h"
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/libc/sigma_libc.h"
+#include "sigma_lattice_mesh.h"
+#include "sigma_kernel_types.h"
+#include "libc/sigma_libc.h"
 
 /* ── FNV-1a 64-bit Hash ─────────────────────────────────────────────────── */
 u64 sigma_mesh_fnv1a(const u8* data, u32 len) {

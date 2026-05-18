@@ -5,7 +5,7 @@
 #ifndef SIGMA_HAL_DRIVER_NETWORK_HPP
 #define SIGMA_HAL_DRIVER_NETWORK_HPP
 
-#include "../../include/atomic_sigma_oop_base.hpp"
+#include "atomic_sigma_oop_base.hpp"
 
 namespace sigma {
 namespace hal {

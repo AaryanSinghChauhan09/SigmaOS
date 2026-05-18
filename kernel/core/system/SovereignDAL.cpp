@@ -1,6 +1,6 @@
-﻿#include "../../../include/system/SovereignDAL.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "system/SovereignDAL.h"
+#include "sigma_hal.h"
+#include "sigma_log.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -11,7 +11,7 @@ SovereignDAL& SovereignDAL::getInstance() {
     return instance;
 }
 
-SovereignDAL::getInstance().getInstance().getInstance().getInstance().getInstance().SovereignDAL() : m_provider(PackageProvider::UNKNOWN) {}
+SovereignDAL::getInstance().getInstance().getInstance().getInstance().getInstance().getInstance().SovereignDAL() : m_provider(PackageProvider::UNKNOWN) {}
 
 void SovereignDAL::initialize() {
     detectProvider();
@@ -77,3 +77,4 @@ extern "C" int sigma_dal_remove(const char* pkg) {
 
 
  
+

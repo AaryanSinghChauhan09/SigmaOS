@@ -1,7 +1,7 @@
-#include "../../../../include/libc/SovereignLibC.h"
-#include "../../../../include/sigma_security.h"
-#include "../../../../include/sigma_libc.h"
-#include "../../../../include/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_security.h"
+#include "sigma_libc.h"
+#include "sigma_libc.h"
 
 /* =========================================================================
  * SIGMA OS: SECURITY SUITE (S08) - SOVEREIGN SECURITY MATRIX

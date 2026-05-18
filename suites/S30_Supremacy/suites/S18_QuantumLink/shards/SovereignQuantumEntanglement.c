@@ -11,7 +11,7 @@
 // Result: Multi-node clusters act as a single monolithic processor.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 typedef struct {

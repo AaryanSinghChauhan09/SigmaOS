@@ -11,7 +11,7 @@
 //   • Statistically proves the absence of common buffer-overflows and race conditions
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 typedef struct {

@@ -1,11 +1,11 @@
-#include "../../../include/sigma_hal.h"
+#include "sigma_hal.h"
 #ifndef LATTICE_MIRROR_HPP
 #define LATTICE_MIRROR_HPP
 
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "sigma_kernel_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

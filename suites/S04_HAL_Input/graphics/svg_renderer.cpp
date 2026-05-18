@@ -1,7 +1,7 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/Lattice.h"
+#include "sigma_log.h"
+#include "Lattice.h"
 #include "svg_renderer.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 // Forward declaration of low-level primitive
 void sigma_graphics_rasterize_bezier_lowlevel(const char* path);

@@ -1,5 +1,5 @@
-#include "../../include/libc/sigma_libc.h"
-#include "../../include/sigma_kernel_types.h"
+#include "libc/sigma_libc.h"
+#include "sigma_kernel_types.h"
 
 // Σ SIGMAOS: SOVEREIGN DATA SCIENCE & OBSERVABILITY
 // Responsibility: Metric collection, structured logging, and predictive analytics.

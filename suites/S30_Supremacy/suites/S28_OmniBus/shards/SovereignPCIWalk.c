@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: S28_OMNIBUS  SovereignPCIWalk.c
@@ -9,7 +9,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 /* PCI Access primitives (using HAL S04 logic implicitly) */
 extern void outb(uint16_t port, uint8_t val);

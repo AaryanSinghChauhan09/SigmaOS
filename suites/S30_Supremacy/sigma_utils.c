@@ -1,24 +1,24 @@
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * sigma_utils.c — SigmaOS Shared Utility Library Implementation
  * Provides: logging, config parsing, networking stubs
  * Dependency: None (pure C11, no libc beyond minimal hosted wrappers)
  */
 #define SIGMA_EXCLUDE_STD_ALIASES
-#include "../../include/sigma_utils.h"
+#include "sigma_utils.h"
 
 /* ── Platform shim (bare-metal vs hosted) ─────────────────────────────────── */
 #ifdef SIGMA_HOSTED_BUILD
-    #include "../../include/libc/sigma_libc.h"
-    #include "../../include/libc/sigma_libc.h"
-    #include "../../include/libc/sigma_libc.h"
+    #include "libc/sigma_libc.h"
+    #include "libc/sigma_libc.h"
+    #include "libc/sigma_libc.h"
     #define sigma_puts(s) puts(s)
     #define sigma_snprintf snprintf
     #define sigma_strcmp strcmp
     #define sigma_strncpy strncpy
     #define sigma_strlen strlen
 #else
-    #include "../../include/libc/sigma_libc.h"  /* kernel-space replacements */
+    #include "libc/sigma_libc.h"  /* kernel-space replacements */
 #endif
 
 /* ── Version ────────────────────────────────────────────────────────────────── */

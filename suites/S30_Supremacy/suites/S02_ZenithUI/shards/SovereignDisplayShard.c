@@ -1,8 +1,8 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "../../../../../include/SovereignOSBasicsZenith.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "SovereignOSBasicsZenith.h"
+#include "libc/sigma_libc.h"
 
 /*
  * Sovereign Display Matrix (DRM/KMS Parity).

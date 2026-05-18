@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 void print_help(void) {
     sigma_sigma_printf("\n======================================================\n");

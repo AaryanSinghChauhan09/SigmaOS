@@ -1,4 +1,4 @@
-#include "../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS — tools/sovereign_wiki — sovereign_wiki_builder.c
@@ -12,8 +12,8 @@
 // Zero external deps — single-file, compiles with gcc -std=c11 -O2
 // =============================================================================
 
-#include "../../../../include/libc/sigma_libc.h"
-#include "../../../../include/core/sigma_types.h"
+#include "libc/sigma_libc.h"
+#include "core/sigma_types.h"
 
 #include <dirent.h>
 #include <sys/stat.h>

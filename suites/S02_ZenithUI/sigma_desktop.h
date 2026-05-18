@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_DESKTOP_ZENITH_H
 #define SOVEREIGN_DESKTOP_ZENITH_H
 
-#include "../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Desktop {

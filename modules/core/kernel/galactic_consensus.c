@@ -1,4 +1,4 @@
-#include "../../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS Galactic Consensus Dashboard (Phase 17)

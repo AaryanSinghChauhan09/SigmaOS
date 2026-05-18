@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: S04_HAL  SovereignROM_Boot.c
@@ -9,7 +9,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 extern void kernel_main(void);
 

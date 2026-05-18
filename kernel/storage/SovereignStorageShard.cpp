@@ -4,8 +4,8 @@
  * =========================================================================
  */
 
-#include "../../include/storage/sigma_storage.h"
-#include "../../include/sigma_log.h"
+#include "storage/sigma_storage.h"
+#include "sigma_log.h"
 
 namespace SigmaOS {
 namespace Storage {

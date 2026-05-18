@@ -1,10 +1,10 @@
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-POCSO-SHARD (POCSO Act 2012)
  * =============================================================================
  */
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 extern void add_item(void* t, const char* desc, const char* ref, const char* prereq, const char* proc, sigma_u32 days, sigma_u32 penalty_rs);
 

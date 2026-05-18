@@ -4,7 +4,7 @@
  * via the WASI interface, reducing cross-language runtime dependencies.
  */
 #include "suites/S11_Virtualization/WasmEngine.h"
-#include "../../../../../include/sigma_utils.h"
+#include "sigma_utils.h"
 
 /* C-side bridge entry: called by the WASM runtime to invoke a native shard */
 int sigma_wasm_call_native(const char *shard_name, const uint8_t *args, uint32_t args_len) {

@@ -1,7 +1,7 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "sigma_hal.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Dynamic Theming Engine

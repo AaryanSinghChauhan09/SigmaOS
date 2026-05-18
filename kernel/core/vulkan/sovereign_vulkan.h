@@ -9,7 +9,7 @@
 #ifndef SOVEREIGN_VULKAN_H
 #define SOVEREIGN_VULKAN_H
 
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {

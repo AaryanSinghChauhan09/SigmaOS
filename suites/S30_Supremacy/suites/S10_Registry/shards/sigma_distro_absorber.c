@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 /*
@@ -6,9 +6,9 @@
  * Mission: Unified entry point for all distro personality shards.
  * Design: C11 / Zero-Dependency / Registry-Based.
  */
-#include "../../../../../include/SovereignToolHeader.h"
-#include "../../../../../include/SovereignDistro.h"
-#include "../../../../../include/sigma_string.h"
+#include "SovereignToolHeader.h"
+#include "SovereignDistro.h"
+#include "sigma_string.h"
 
 /* Extern Registration Functions */
 extern void SovereignArch_Register(void);

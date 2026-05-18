@@ -1,5 +1,5 @@
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/libc/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "libc/sigma_libc.h"
 
 // SigmaOS Sovereign AI Agent (S-AI-AGENT)
 // Philosophy: Monica / MaxAI / AITOPIA - The Ultimate All-In-One AI Sidebar.

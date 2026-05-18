@@ -12,7 +12,7 @@
 //   • Pipeline: Automatic frame-graph optimization before VRAM transfer
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define MAX_COMMANDS_PER_BLOCK 4096

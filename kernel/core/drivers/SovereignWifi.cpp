@@ -1,5 +1,5 @@
-#include "../../../include/SigmaOOP.hpp"
-#include "../../../include/sigma_log.h"
+#include "SigmaOOP.hpp"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Sovereign Wi-Fi Shard (S-WIFI)

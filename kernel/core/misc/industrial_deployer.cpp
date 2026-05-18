@@ -1,11 +1,11 @@
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_log.h"
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
-#include "../../include/industrial_deployer.hpp"
-#include "../../include/sigma_log.h"
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
+#include "industrial_deployer.hpp"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_log.h"
 
 extern "C" void gatekeeper_init();
 extern "C" void assistant_init();

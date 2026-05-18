@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "../../include/fs/SovereignVFS.hpp"
-#include "../../include/sigma_log.h"
+#include "fs/SovereignVFS.hpp"
+#include "sigma_log.h"
 
 namespace SigmaOS {
 namespace Kernel {

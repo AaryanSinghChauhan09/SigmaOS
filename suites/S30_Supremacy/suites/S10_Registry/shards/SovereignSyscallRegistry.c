@@ -1,8 +1,8 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "../../../../../include/SovereignSyscall.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "SovereignSyscall.h"
+#include "libc/sigma_libc.h"
 
 #define TABLE_SIZE 428
 static SyscallFn_t s_syscall_table[TABLE_SIZE];

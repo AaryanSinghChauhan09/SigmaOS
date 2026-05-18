@@ -1,5 +1,5 @@
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_kernel_types.h"
+#include "hal/sigma_hal.h"
+#include "sigma_kernel_types.h"
 
 /**
  * SigmaOS Sovereign Quantum APIs (v28.0 Zenith)

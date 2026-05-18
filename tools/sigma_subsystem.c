@@ -1,5 +1,5 @@
 // sigma_subsystem.c - Binary compatibility layer manager
-#include "../include/sigma_log.h"
+#include "sigma_log.h"
 
 // Loads a translation layer for alien binaries (e.g., Linux ELF or Windows PE)
 int sigma_subsystem_load(const char* env_type) {

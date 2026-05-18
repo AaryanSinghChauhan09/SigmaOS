@@ -1,5 +1,5 @@
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/libc/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "libc/sigma_libc.h"
 
 // SigmaOS Lattice Mesh (S-MESH)
 // Philosophy: IPFS / Libp2p - Decentralized State and Shard Synchronization.

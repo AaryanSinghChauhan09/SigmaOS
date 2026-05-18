@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 /*
@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "../../../../../include/SovereignToolHeader.h"
+#include "SovereignToolHeader.h"
 
 // -------------------------------------------------------------------------
 // Forensic Amnesic OOP Structure

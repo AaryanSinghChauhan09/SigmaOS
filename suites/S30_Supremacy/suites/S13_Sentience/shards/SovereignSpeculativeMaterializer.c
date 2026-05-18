@@ -12,7 +12,7 @@
 //         standard NVMe/CXL inter-connects.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 typedef struct {
     uint32_t predicted_shard_ids[10];

@@ -1,9 +1,9 @@
-#include "../../include/sigma_log.h"
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/fs/sigma_fs.h"
-#include "../../include/ui/sigma_zenithui.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "fs/sigma_fs.h"
+#include "ui/sigma_zenithui.h"
 
 /**
  * SigmaOS Sovereign Editor (v100.0 Zenith)

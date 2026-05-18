@@ -1,4 +1,4 @@
-﻿/*
+/*
  * SigmaOS: Sovereign Proton (Gaming Compatibility Layer)
  * Layer: L5 - Industrial Ecosystem / Multimedia
  */

@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_ONBOARDING_HPP
 #define SOVEREIGN_ONBOARDING_HPP
 
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 class SovereignOnboardingEngine {
 public:

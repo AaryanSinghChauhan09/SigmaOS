@@ -1,9 +1,9 @@
 #ifndef NCERT_CHEMISTRY_HPP
 #define NCERT_CHEMISTRY_HPP
 
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "../../../include/ncert_base.hpp"
+#include "ncert_base.hpp"
 
 class IdealGasSim : public INCERTSim {
 public:

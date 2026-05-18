@@ -5,7 +5,7 @@
  * Principles: Syscall Pattern Analysis & Shard Integrity Auditing.
  * =============================================================================
  */
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 typedef struct SyscallLog {
     sigma_u64 syscall_id;

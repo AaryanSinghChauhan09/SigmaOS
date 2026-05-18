@@ -1,5 +1,5 @@
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/libc/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "libc/sigma_libc.h"
 
 // SigmaOS Sovereign Optimizer (S-OPTIMIZER)
 // Philosophy: Functional Pruning - Extreme Code Granularity.

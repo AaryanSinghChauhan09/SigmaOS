@@ -1,8 +1,8 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "../../../../../include/SovereignIPC.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "SovereignIPC.h"
+#include "libc/sigma_libc.h"
 
 sigma_err_t sigma_pipe_init(void) {
     sigma_sigma_printf("  S [PIPE]: Sovereign Anonymous Ring-Buffer Pipes online.\n");

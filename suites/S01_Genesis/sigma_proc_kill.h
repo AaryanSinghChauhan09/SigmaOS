@@ -5,7 +5,7 @@
 #ifndef SIGMA_PROC_KILL_H
 #define SIGMA_PROC_KILL_H
 
-#include "../../include/sigma_proc_pcb.h"
+#include "sigma_proc_pcb.h"
 
 typedef enum SigmaKillCode {
     KILL_OK        = 0,

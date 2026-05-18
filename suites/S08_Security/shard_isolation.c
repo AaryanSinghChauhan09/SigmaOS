@@ -4,7 +4,7 @@
  * USP: Compartmentalize the 33-suite lattice into isolated hardware-backed domains.
  */
 
-#include "../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 typedef enum {
     DOMAIN_ROOT = 0,

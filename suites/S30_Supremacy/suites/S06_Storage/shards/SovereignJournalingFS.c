@@ -14,7 +14,7 @@
 //   • Recovery: replay uncommitted journal entries on mount after crash
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define SIGMA_JOURNAL_MAGIC       0x5349474D4A524E4CULL // "SIGMAJRNL"

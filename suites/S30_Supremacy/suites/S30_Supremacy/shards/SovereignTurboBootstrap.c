@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /**
  * @file SovereignTurboBootstrap.c
  * @brief Phase 59: Turbo-Performance & Instant-Deploy.
@@ -9,9 +9,9 @@
  * - Alpine: Minimal footprint allocation.
  */
 
-#include "../../../../../include/SovereignInit.h"
-#include "../../../../../include/libc/sigma_libc.h"
-#include "../../../../../include/SigmaC11.h"
+#include "SovereignInit.h"
+#include "libc/sigma_libc.h"
+#include "SigmaC11.h"
 
 /* High-Speed Parallel Registry */
 typedef struct {

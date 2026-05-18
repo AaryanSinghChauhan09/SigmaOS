@@ -1,8 +1,8 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "../../../../../include/SovereignTool.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "SovereignTool.h"
+#include "libc/sigma_libc.h"
 
 void SovereignGit_AbsorbLogic(void) {
     sigma_sigma_printf("  S [GIT]: Branching matrix synchronized. Object database mapped.\n");

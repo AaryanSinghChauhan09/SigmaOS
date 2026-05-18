@@ -1,5 +1,5 @@
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/libc/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "libc/sigma_libc.h"
 
 // SigmaOS Buddy Allocator (S-BUDDY)
 // Purpose: Minimal fragmentation, power-of-two allocation for IoT/Embedded.

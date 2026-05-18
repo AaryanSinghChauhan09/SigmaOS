@@ -1,5 +1,5 @@
-#include "../../include/sigma_iot.h"
-#include "../../include/sigma_log.h"
+#include "sigma_iot.h"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Event-Driven GPIO Manager (EDGM)

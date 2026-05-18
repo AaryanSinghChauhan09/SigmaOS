@@ -1,5 +1,5 @@
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/libc/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "libc/sigma_libc.h"
 
 // SigmaOS Sovereign Wire (S-WIRE)
 // Philosophy: WireGuard - Minimal, High-Performance Kernel-Native VPN.

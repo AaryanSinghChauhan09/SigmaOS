@@ -5,8 +5,8 @@
 #ifndef SIGMA_MEM_AUDIT_H
 #define SIGMA_MEM_AUDIT_H
 
-#include "../../include/sigma_mem_pool.h"
-#include "../../include/libc/sigma_libc.h"
+#include "sigma_mem_pool.h"
+#include "libc/sigma_libc.h"
 
 static inline void mem_audit(SigmaMemPool* mp) {
     sigma_kprint("\n--- Sigma Memory Audit ---\n");

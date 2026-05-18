@@ -1,13 +1,13 @@
-#include "../../include/Lattice.h"
-#include "../../include/sigma_log.h"
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/sigma_log.h"
-#include "../../include/SovereignSyncZenith.h"
-#include "../../include/sigma_log.h"
-#include "../../include/SovereignDiskZenith.h"
-#include "../../include/sigma_log.h"
-#include "../../include/SovereignOSBasicsZenith.h"
-#include "../../include/sigma_log.h"
+#include "Lattice.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "SovereignSyncZenith.h"
+#include "sigma_log.h"
+#include "SovereignDiskZenith.h"
+#include "sigma_log.h"
+#include "SovereignOSBasicsZenith.h"
+#include "sigma_log.h"
 
 namespace SigmaOS {
 

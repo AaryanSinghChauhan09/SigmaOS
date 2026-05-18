@@ -1,7 +1,7 @@
 #pragma once
-#include "../../../../include/core/sigma_types.h"
-#include "../../../../include/SigmaOOP.hpp"
-#include "../../../../include/observability/sigma_monitor.h"
+#include "core/sigma_types.h"
+#include "SigmaOOP.hpp"
+#include "observability/sigma_monitor.h"
 
 namespace SigmaOS {
 namespace Kernel {

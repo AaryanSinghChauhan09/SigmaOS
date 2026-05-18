@@ -4,7 +4,7 @@
  * USP: Execute high-performance, memory-safe bytecode within the kernel lattice.
  */
 
-#include "../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 void* sigma_wasm_load(const uint8_t* bytecode, uint32_t size) {
     // 1. Validate WASM bytecode

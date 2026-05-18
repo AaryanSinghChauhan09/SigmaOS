@@ -15,9 +15,9 @@
  * =============================================================================
  */
 
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 #include "sigma/hal_contract.h"
-#include "../../../include/sigma_features.h"
+#include "sigma_features.h"
 
 #ifdef SIGMA_MOCK_HAL
 

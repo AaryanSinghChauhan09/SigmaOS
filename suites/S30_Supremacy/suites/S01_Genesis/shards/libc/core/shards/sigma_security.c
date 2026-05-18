@@ -1,4 +1,4 @@
-#include "../../../../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "sigma_kernel.h"
 sigma_u64 __stack_chk_guard = 0x5EE160A5C0DE7A7A;
 void __stack_chk_fail(void) {

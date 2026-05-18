@@ -1,4 +1,4 @@
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN VFS ZENITH (v100.0 - PURE C11)
@@ -13,7 +13,7 @@
  * =========================================================================
  */
 
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 /* =========================================================================
  * Zenith VFS Node (replaces C++ struct with bool)

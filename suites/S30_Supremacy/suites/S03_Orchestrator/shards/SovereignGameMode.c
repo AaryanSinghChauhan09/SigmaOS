@@ -12,7 +12,7 @@
 //   • 100% Zero-Throttling: Bypasses S04 PowerPulse to maintain max clock.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 typedef struct {

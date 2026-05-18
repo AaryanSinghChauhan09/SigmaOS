@@ -12,7 +12,7 @@
 //   • Dynamic Weighting: Adjusts font weight based on system "Sentiment" scale
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define MAX_GLYPH_CACHE     4096

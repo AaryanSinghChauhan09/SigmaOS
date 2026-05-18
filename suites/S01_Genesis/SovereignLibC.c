@@ -1,15 +1,15 @@
 <<<<<<<< HEAD:suites/S01_Genesis/SovereignLibC.c
-#include "../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 // Absolute zero-dependency varargs using compiler built-ins
 typedef __builtin_va_list va_list;
 #define va_start(v,l)   __builtin_va_start(v,l)
 #define va_end(v)       __builtin_va_end(v)
 #define va_arg(v,l)     __builtin_va_arg(v,l)
 ========
-#include "../../include/sigma_log.h"
-#include "../../include/Lattice.h"
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_log.h"
+#include "Lattice.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_kernel_types.h"
 
 /* va_list support in freestanding mode via compiler builtins */
 #ifndef va_list

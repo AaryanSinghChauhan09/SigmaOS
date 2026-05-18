@@ -11,7 +11,7 @@
  * =============================================================================
  */
 
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 #define KSM_SCAN_PAGES 128
 

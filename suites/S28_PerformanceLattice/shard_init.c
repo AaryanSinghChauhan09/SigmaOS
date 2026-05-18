@@ -1,5 +1,5 @@
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/libc/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "libc/sigma_libc.h"
 
 // SigmaOS Performance Lattice (S-PERF)
 // Philosophy: Clear Linux - Extreme Optimization and Hardware-Specific Tuning.

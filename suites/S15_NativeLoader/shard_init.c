@@ -1,5 +1,5 @@
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/libc/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "libc/sigma_libc.h"
 
 // SigmaOS Sovereign Native Loader (SLDR)
 // Purpose: Load and execute "Sigma-Native" binaries (SBN) from the VFS.

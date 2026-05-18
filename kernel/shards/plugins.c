@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_kernel_types.h"
 
 typedef struct {
     char name[32];

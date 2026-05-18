@@ -4,9 +4,9 @@
  * =========================================================================
  */
 
-#include "../../../include/core/sigma_scheduler.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/sigma_kernel_types.h"
+#include "core/sigma_scheduler.h"
+#include "sigma_log.h"
+#include "sigma_kernel_types.h"
 
 namespace SigmaOS {
 namespace Core {

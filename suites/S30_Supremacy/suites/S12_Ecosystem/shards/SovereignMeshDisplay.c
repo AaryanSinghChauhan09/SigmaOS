@@ -12,7 +12,7 @@
 //   • Touch-Back: Multi-touch on external device flows back to host (S04).
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define DISPLAY_MAX_RESOLUTION_W 7680

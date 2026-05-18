@@ -10,7 +10,7 @@
 //     (iGPU, dGPU, NPU, or Peer Hive Node) without app-level visibility.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 typedef enum {

@@ -1,5 +1,5 @@
 // sigma_dtrace.c - Dynamic tracing and performance analysis
-#include "../include/sigma_log.h"
+#include "sigma_log.h"
 
 // Attaches a trace probe to a given kernel symbol or address
 int sigma_trace_attach(const char* target, const char* probe_script) {

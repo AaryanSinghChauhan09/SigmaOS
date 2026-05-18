@@ -15,7 +15,7 @@
 //   • Distributed clipboard ring buffer (synchronized across peers)
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define MAX_PEER_DEVICES    16

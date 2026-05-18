@@ -1,7 +1,7 @@
-#include "../../include/Lattice.h"
-#include "../../include/sigma_log.h"
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/sigma_log.h"
+#include "Lattice.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_log.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -11,8 +11,8 @@
  * =========================================================================
  */
 
-#include "../../include/SigmaOOP.hpp"
-#include "../../include/sigma_log.h"
+#include "SigmaOOP.hpp"
+#include "sigma_log.h"
 
 /**
  * Î£ SIGMA OS: SOVEREIGN DATA PREPROCESSOR (v128.0 - ZERO-STD NATIVE)

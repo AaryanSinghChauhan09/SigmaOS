@@ -4,8 +4,8 @@
  * =========================================================================
  */
 
-#include "../../include/net/sigma_network.h"
-#include "../../include/sigma_log.h"
+#include "net/sigma_network.h"
+#include "sigma_log.h"
 
 namespace SigmaOS {
 namespace Net {

@@ -9,7 +9,7 @@
 //     in a "Frozen" state in the background, ready for instant wake.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define MAX_PREDICTIONS 8

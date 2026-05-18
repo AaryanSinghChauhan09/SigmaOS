@@ -1,4 +1,4 @@
-#include "../../../include/sigma_libc.h"
+#include "sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS Native Command-Line Shell (S-Shell)

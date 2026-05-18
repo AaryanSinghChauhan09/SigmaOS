@@ -1,8 +1,8 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "../../../../../include/SovereignDistro.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "SovereignDistro.h"
+#include "libc/sigma_libc.h"
 
 void SovereignGaruda_AbsorbLogic(void) {
     sigma_sigma_printf("  S [GARUDA]: Zen-Kernel optimizations applied. Scheduler tuned for low latency.\n");

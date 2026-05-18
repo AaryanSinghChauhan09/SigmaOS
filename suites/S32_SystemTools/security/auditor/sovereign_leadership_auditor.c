@@ -1,4 +1,4 @@
-#include "../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #define SIGMA_EXCLUDE_STD_ALIASES
 // =============================================================================
 // SigmaOS — tools/auditor — sovereign_leadership_auditor.c
@@ -11,8 +11,8 @@
 //   - Supremacy Score (Features unique to SigmaOS)
 // =============================================================================
 
-#include "../../../../include/libc/sigma_libc.h"
-#include "../../../../include/core/sigma_types.h"
+#include "libc/sigma_libc.h"
+#include "core/sigma_types.h"
 
 void audit_purity(void) {
     sigma_printf("[audit] Scanning for legacy runtimes... 0 found. PURITY 100%.\n");

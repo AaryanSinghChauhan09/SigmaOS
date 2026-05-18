@@ -1,8 +1,8 @@
-#include "../../include/sigma_log.h"
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/sigma_zeronet.h"
+#include "sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_zeronet.h"
 
 namespace SigmaOS {
 namespace Kernel {

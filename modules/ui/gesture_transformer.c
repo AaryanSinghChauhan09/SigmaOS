@@ -1,4 +1,4 @@
-#include "../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS Gesture Transformer: 3D Spatial Intelligence (Phase 9)

@@ -12,7 +12,7 @@
 //   • Continuity Sync: Shared translation caches across Hive peers (S12).
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define MAX_LANGUAGES       128

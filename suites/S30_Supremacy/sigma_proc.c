@@ -1,4 +1,4 @@
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN PROCESS MANAGER (v94.0 ZENITH SUPREME)
@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 #define PROC_STATE_READY   0u
 #define PROC_STATE_RUNNING 1u

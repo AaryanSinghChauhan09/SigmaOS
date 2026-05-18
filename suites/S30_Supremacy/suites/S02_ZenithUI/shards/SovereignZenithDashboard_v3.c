@@ -10,7 +10,7 @@
 // Result: 100% visibility into the OS Singularity.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 typedef struct {
     uint32_t active_shards_count;

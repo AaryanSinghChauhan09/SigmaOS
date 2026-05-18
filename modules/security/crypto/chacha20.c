@@ -1,5 +1,5 @@
-#include "../../../include/libc/sigma_libc.h"
-#include "../../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 // ---------------------------------------------------------
 // libsovereign_crypto : ChaCha20 Implementation

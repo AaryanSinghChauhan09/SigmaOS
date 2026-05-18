@@ -1,4 +1,4 @@
-#include "../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 // =============================================================================
 // SigmaOS — tools/wiki_sync — sigma_wiki_syncer.c
 // Native C Sovereign Wiki / Documentation Orchestrator
@@ -8,9 +8,9 @@
 //   internal WIKI.md and external GitHub Wiki structures.
 // =============================================================================
 
-#include "../../../../include/libc/sigma_libc.h"
-#include "../../../../include/libc/sigma_libc.h"
-#include "../../../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 void sync_suite_docs(void) {
     sigma_printf("[wiki] Scanning 30 Master Sovereign Suites...\n");

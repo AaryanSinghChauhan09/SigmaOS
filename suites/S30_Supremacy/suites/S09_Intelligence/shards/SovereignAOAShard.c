@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS VALKYRIE: SOVEREIGN AOA SHARD (v57.7-SUPREME-VALKYRIE)

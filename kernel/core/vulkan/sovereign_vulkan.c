@@ -8,7 +8,7 @@
  */
 #include "sovereign_vulkan.h"
 #include "../hal/hal.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 
 /* ── GPU MMIO map (adjust base for real hardware) ───────────────────── */
 #define GPU_BASE           ((sigma_paddr_t)0xFEE00000u)

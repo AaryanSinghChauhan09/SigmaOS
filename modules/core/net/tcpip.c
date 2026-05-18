@@ -1,5 +1,5 @@
-#include "../../../include/libc/sigma_libc.h"
-#include "../../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS Lightweight TCP/IP Stack Prototype

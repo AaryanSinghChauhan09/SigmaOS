@@ -1,13 +1,13 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_healthcheck.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/sigma_batteryiq.h"
-#include "../../../include/sigma_thermaliq.h"
-#include "../../../include/sigma_sentinel.h"
-#include "../../../include/observability/sigma_telemetry.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "sigma_healthcheck.h"
+#include "sigma_hal.h"
+#include "sigma_batteryiq.h"
+#include "sigma_thermaliq.h"
+#include "sigma_sentinel.h"
+#include "observability/sigma_telemetry.h"
 
 /**
  * SigmaOS Sovereign System Health Check

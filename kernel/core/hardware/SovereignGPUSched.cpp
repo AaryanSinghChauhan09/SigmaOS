@@ -1,5 +1,5 @@
-#include "../../include/sigma_gaming.h"
-#include "../../include/sigma_log.h"
+#include "sigma_gaming.h"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Dynamic GPU Scheduler (DGS)

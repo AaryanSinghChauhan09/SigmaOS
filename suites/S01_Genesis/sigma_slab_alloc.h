@@ -7,7 +7,7 @@
 #define SIGMA_SLAB_ALLOC_H
 
 #ifdef __cplusplus
-#include "../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 using size_type = sigma_size_t;
 #else
 typedef unsigned long size_type;

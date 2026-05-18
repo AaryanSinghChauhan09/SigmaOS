@@ -6,7 +6,7 @@
 #ifndef SIGMA_HAL_DRIVER_STORAGE_HPP
 #define SIGMA_HAL_DRIVER_STORAGE_HPP
 
-#include "../../include/atomic_sigma_oop_base.hpp"
+#include "atomic_sigma_oop_base.hpp"
 
 namespace sigma {
 namespace hal {

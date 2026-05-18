@@ -1,4 +1,4 @@
-#include "../include/sigma_log.h"
+#include "sigma_log.h"
 
 /**
  * Universal OS Format Tests

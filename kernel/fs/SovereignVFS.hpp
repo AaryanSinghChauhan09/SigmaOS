@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_VFS_HPP
 #define SOVEREIGN_VFS_HPP
 
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 namespace SigmaOS {
 namespace FS {

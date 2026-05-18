@@ -8,7 +8,7 @@
 //   • Sigma SSM — Formal Verification (S08) backed policy enforcement
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 typedef struct {

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * SigmaOS: Sovereign Installer (UI-001)
  * Layer: L6 - Zenith UI / System Deployment
  */

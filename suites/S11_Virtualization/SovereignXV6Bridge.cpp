@@ -1,7 +1,7 @@
-#include "../../include/SovereignXV6Bridge.h"
-#include "../../include/sigma_log.h"
-#include "../../include/libc/sigma_libc.h"
-#include "../../include/sigma_log.h"
+#include "SovereignXV6Bridge.h"
+#include "sigma_log.h"
+#include "libc/sigma_libc.h"
+#include "sigma_log.h"
 
 namespace SigmaOS {
 namespace XV6Parity {

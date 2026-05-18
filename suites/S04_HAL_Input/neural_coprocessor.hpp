@@ -1,10 +1,10 @@
 #ifndef NEURAL_COPROCESSOR_HPP
 #define NEURAL_COPROCESSOR_HPP
 
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/SigmaOOP.hpp"
+#include "sigma_kernel_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Drivers {

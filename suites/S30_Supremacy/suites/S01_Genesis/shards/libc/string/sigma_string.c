@@ -4,7 +4,7 @@
  * =========================================================================
  */
 
-#include "../../../../../../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 sigma_sz_t sigma_sigma_strlen(const char* s) {
     if (!s) return 0;

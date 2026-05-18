@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
 
 #ifdef __cplusplus
 extern "C" {

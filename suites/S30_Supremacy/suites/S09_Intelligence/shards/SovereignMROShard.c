@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS MULTIVERSE_CORE: SOVEREIGN MRO SHARD (v58.1-SUPREME-MULTIVERSE_CORE)

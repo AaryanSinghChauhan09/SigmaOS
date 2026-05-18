@@ -5,9 +5,9 @@
  * Maps to: Syllabus-FCIT Unit IV (Office Automation)
  */
 #pragma once
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
-#include "../../include/sigma_string.h"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
+#include "sigma_string.h"
 
 namespace Sigma::Suite {
 

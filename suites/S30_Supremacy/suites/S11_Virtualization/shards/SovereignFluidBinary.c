@@ -11,7 +11,7 @@
 //         or emulation overhead.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 typedef struct {

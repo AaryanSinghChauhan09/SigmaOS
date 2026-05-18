@@ -16,7 +16,7 @@
 //   • Sovereign signature verified via S08_Security before any write
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define UPDATER_MAX_GENERATIONS  32

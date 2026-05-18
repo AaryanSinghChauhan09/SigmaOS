@@ -1,13 +1,13 @@
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
-#include "../../include/sigma_emotion.h"
-#include "../../include/sigma_log.h"
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_log.h"
-#include "../../include/sigma_universal_ui.h"
-#include "../../include/sigma_log.h"
-#include "../../include/sigma_focus.h"
-#include "../../include/sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
+#include "sigma_emotion.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "sigma_universal_ui.h"
+#include "sigma_log.h"
+#include "sigma_focus.h"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Sovereign Emotion UX

@@ -1,8 +1,8 @@
-#include "../include/sigma_kernel_types.h"
-#include "../include/sigma_log.h"
-#include "../include/SigmaOOP.hpp"
-#include "../include/sigma_sdk.h"
-#include "../include/fs/sigma_vfs.h"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
+#include "SigmaOOP.hpp"
+#include "sigma_sdk.h"
+#include "fs/sigma_vfs.h"
 #include "../kernel/net/SovereignNetStack.hpp"
 
 // Forward declarations for missing internal functions

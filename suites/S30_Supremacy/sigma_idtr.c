@@ -1,4 +1,4 @@
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN INTERRUPT DESCRIPTOR TABLE (v1.0 - ZENITH)
@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 typedef struct idt_entry {
     sigma_u16 base_low;

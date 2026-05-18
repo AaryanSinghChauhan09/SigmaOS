@@ -10,7 +10,7 @@
 // Result: Impossible to 'break' the OS via configuration errors.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 typedef struct {

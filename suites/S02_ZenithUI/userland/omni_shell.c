@@ -1,4 +1,4 @@
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN OMNI-SHELL ZENITH (v27.0 - THE ULTIMATE COMMAND-ZENITH)
@@ -9,18 +9,18 @@
  * =========================================================================
  */
 
-#include "../../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 #include "sigma_kernel.h"
-#include "../../../include/SovereignDistroForge.h"
-#include "../../../include/SovereignCoreUtils.h"
-#include "../../../include/SovereignOmniShard.h"
-#include "../../../include/SovereignSyncZenith.h"
-#include "../../../include/SovereignDiskZenith.h"
-#include "../../../include/SovereignOSBasicsZenith.h"
-#include "../../../include/SovereignXV6Bridge.h"
-#include "../../../include/SovereignHardwareIOZenith.h"
-#include "../../../include/SovereignCoordinationZenith.h"
-#include "../../../include/SovereignDesktopZenith.h"
+#include "SovereignDistroForge.h"
+#include "SovereignCoreUtils.h"
+#include "SovereignOmniShard.h"
+#include "SovereignSyncZenith.h"
+#include "SovereignDiskZenith.h"
+#include "SovereignOSBasicsZenith.h"
+#include "SovereignXV6Bridge.h"
+#include "SovereignHardwareIOZenith.h"
+#include "SovereignCoordinationZenith.h"
+#include "SovereignDesktopZenith.h"
 #include "SovereignAetherAbsorption.cpp"
 
 namespace SigmaOS {

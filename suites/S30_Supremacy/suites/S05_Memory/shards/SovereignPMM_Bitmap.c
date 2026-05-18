@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: S05_MEMORY — SovereignPMM_Bitmap.c
@@ -10,7 +10,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 /* 1 byte = 8 pages of 4KB = 32KB managed per entry */
 #define BITMAP_SIZE 32768

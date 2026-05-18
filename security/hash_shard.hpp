@@ -1,11 +1,11 @@
-#include "../include/sigma_kernel_types.h"
-#include "../include/hal/sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "hal/sigma_hal.h"
 #ifndef HASH_SHARD_HPP
 #define HASH_SHARD_HPP
 
-#include "../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
-#include "../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Security {

@@ -2,7 +2,7 @@
 // Absorbs systemd-resolved (Linux) + Windows DNS Client + macOS mDNSResponder
 // Modular zero-dependency C11 network shard
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define SIGMA_DNS_CACHE_SIZE    512

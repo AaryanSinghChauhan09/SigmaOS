@@ -1,5 +1,5 @@
-#include "../../../include/libc/sigma_libc.h"
-#include "../../../include/sigma_log.h"
+#include "libc/sigma_libc.h"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Zenith Trust Graph UI

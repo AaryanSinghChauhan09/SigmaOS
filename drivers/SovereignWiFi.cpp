@@ -1,6 +1,6 @@
-#include "../include/sigma_log.h"
-#include "../include/libc/SovereignLibC.h"
-#include "../include/hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Wi-Fi Driver

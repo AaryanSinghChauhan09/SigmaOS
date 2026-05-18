@@ -1,5 +1,5 @@
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/SovereignDistroForge.h"
+#include "libc/SovereignLibC.h"
+#include "SovereignDistroForge.h"
 
 namespace SigmaOS {
 namespace DistroForge {

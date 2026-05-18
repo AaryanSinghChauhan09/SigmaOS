@@ -1,7 +1,7 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/system/sigma_shard_manager.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_kernel_types.h"
+#include "system/sigma_shard_manager.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {

@@ -1,6 +1,6 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/Lattice.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "Lattice.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN PROBLEM SOLVER (v128.0 - SCHOLASTIC SOLVER)
@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 #include "userland/apps/scholar_zenith/solvers.hpp"
 
 using namespace SigmaOS;

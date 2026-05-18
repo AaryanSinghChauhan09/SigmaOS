@@ -6,7 +6,7 @@
 #define SIGMA_PERF_ISOLATOR_H
 
 #include "./sigmaos/core/src/atomic_sigma_process.hpp"
-#include "../../include/sigma_perf_profiler.h"
+#include "sigma_perf_profiler.h"
 
 namespace sigma {
 namespace perf {

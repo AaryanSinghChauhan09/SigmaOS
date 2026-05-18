@@ -2,10 +2,10 @@
 // SigmaOS  kernel/core  boot_orchestrator.cpp  v2.0
 // UEFI/BIOS/Multiboot2 hardware boot validation + ASI ignition
 // =============================================================================
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
 #include "boot_orchestrator.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Kernel {

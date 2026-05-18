@@ -9,7 +9,7 @@
 #ifndef SIGMA_LOCKFREE_IPC_HPP
 #define SIGMA_LOCKFREE_IPC_HPP
 
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 #include <atomic>
 
 namespace SigmaOS {

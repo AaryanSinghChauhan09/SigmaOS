@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: S08_SECURITY — SovereignHardwareLinkedID.c
@@ -9,7 +9,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 typedef struct {
     uint8_t  hw_id[32];      // SHA-256(CPU_Serial + TPM_Seed)

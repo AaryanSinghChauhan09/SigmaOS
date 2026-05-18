@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 /*
@@ -10,8 +10,8 @@
  * =========================================================================
  */
 
-#include "../../../../../include/SovereignToolHeader.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "SovereignToolHeader.h"
+#include "libc/sigma_libc.h"
 
 void SovereignToolchain_SysrootSetup(const char* arch) {
     sigma_sigma_printf("S [TOOLCHAIN]: Configuring sysroot for %s-sigma-freestanding...\n", arch);

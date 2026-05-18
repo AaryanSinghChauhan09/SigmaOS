@@ -1,8 +1,8 @@
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 #define SIGMA_HOST
 #include <gtest/gtest.h>
-#include "../../include/security/sigma_pqc.h"
-#include "../../include/sigma_kernel_types.h"
+#include "security/sigma_pqc.h"
+#include "sigma_kernel_types.h"
 
 // Stubs for hardware/kernel functions not available on host
 extern "C" {

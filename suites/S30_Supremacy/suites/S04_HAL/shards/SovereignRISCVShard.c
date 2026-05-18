@@ -1,8 +1,8 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "../../../../../include/SovereignArch.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "SovereignArch.h"
+#include "libc/sigma_libc.h"
 
 void sigma_riscv_init(void) {
     sigma_sigma_printf("  S [RISC-V]: Initialising RV64GC Industrial Matrix...\n");

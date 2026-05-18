@@ -1,5 +1,5 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
 
 void hal_load_drivers();
 

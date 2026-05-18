@@ -3,7 +3,7 @@
 #ifndef SIGMA_PROCESS_HPP
 #define SIGMA_PROCESS_HPP
 
-#include "../../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 namespace sigma {
 namespace proc {

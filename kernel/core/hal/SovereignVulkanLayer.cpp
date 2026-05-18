@@ -3,7 +3,7 @@
  * Bare-metal GPU communication, shader binary routing, and DMA integration.
  * Built for zero-latency SteamOS-style gaming acceleration.
  */
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 namespace SigmaOS {
 namespace HAL {

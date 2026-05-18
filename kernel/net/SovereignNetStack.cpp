@@ -1,6 +1,6 @@
 #include "SovereignNetStack.hpp"
-#include "../../include/sigma_log.h"
-#include "../../include/hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
 
 namespace SigmaOS {
 namespace Net {

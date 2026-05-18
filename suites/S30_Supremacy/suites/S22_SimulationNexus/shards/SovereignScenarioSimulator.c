@@ -12,7 +12,7 @@
 //         in the real system.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define MAX_SIM_CORES       1024

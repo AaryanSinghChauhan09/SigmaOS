@@ -4,7 +4,7 @@
  * USP: Near-zero latency memory allocation via silicon-level bitmap sharding.
  */
 
-#include "../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 #define MAX_PAGES 1048576 // 4GB of RAM in 4KB pages
 uint8_t memory_bitmap[MAX_PAGES / 8];

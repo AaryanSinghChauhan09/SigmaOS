@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /* --------------------------------------------------------------------------
  * SIGMA OS SOVEREIGN HTTP ENGINE (SYSTEM-LEVEL ARCHITECTURE)
  * --------------------------------------------------------------------------
@@ -6,10 +6,10 @@
  * modular C sub-systems, representing pure OS-level design methodology.
  * -------------------------------------------------------------------------- */
 
-#include "../../../../../include/sigma_libc.h"
-#include "../../../../../include/sigma_libc.h"
-#include "../../../../../include/sigma_network.h"
-#include "../../../../../include/sigma_http.h"
+#include "sigma_libc.h"
+#include "sigma_libc.h"
+#include "sigma_network.h"
+#include "sigma_http.h"
 
 #ifdef _WIN32
     #include <winsock2.h>

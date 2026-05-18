@@ -1,5 +1,5 @@
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/libc/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "libc/sigma_libc.h"
 
 // SigmaOS Sovereign Synapse (S-SYNAPSE)
 // Philosophy: Neural Routing - Real-time IPC Path Optimization via Neural Prediction.

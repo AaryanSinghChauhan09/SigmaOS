@@ -1,8 +1,8 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "../../../../../include/SovereignCommand.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "SovereignCommand.h"
+#include "libc/sigma_libc.h"
 
 static sovereign_command_registry_t g_cmd_registry;
 

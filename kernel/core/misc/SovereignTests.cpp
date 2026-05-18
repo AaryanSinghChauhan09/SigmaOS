@@ -1,7 +1,7 @@
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_allocator.h"
-#include "../../include/libc/SovereignLibC.h"
+#include "sigma_kernel_types.h"
+#include "hal/sigma_hal.h"
+#include "sigma_allocator.h"
+#include "libc/SovereignLibC.h"
 
 /**
  * SigmaOS Sovereign Test Suite (v1.0)

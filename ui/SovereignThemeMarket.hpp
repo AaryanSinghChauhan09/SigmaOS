@@ -1,9 +1,9 @@
-#include "../include/hal/sigma_hal.h"
-#include "../include/libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "libc/SovereignLibC.h"
 #ifndef SOVEREIGN_THEME_MARKET_HPP
 #define SOVEREIGN_THEME_MARKET_HPP
 
-#include "../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 class SovereignThemeMarketEngine {
 public:

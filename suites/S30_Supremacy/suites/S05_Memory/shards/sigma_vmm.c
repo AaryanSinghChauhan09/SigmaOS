@@ -1,12 +1,12 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S05_Memory/shards/sigma_vmm.c
  * =========================================================================
  */
 
-#include "../../../../../include/hal/sigma_vmm.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "hal/sigma_vmm.h"
+#include "libc/sigma_libc.h"
 
 /* ── Global address space table ────────────────────────────────────────── */
 #define SIGMA_MAX_PROCS 512

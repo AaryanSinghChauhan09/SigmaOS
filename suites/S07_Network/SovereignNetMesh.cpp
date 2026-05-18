@@ -1,7 +1,7 @@
-#include "../../include/sigma_log.h"
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/Lattice.h"
+#include "sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "Lattice.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN NET-MESH (v25.0 - SOLID FINALITY)
@@ -12,7 +12,7 @@
  * =========================================================================
  */
 
-#include "../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Net {

@@ -6,7 +6,7 @@
 #ifndef SIGMA_RTOS_DEADLINE_HPP
 #define SIGMA_RTOS_DEADLINE_HPP
 
-#include "../../include/sigma_proc_pcb.h"
+#include "sigma_proc_pcb.h"
 
 namespace sigma {
 namespace rtos {

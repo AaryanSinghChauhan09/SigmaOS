@@ -1,4 +1,4 @@
-#include "../../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 // Extern declarations for tests
 extern int test_sigma_atoi_nano();

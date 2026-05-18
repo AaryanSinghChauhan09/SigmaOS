@@ -2,7 +2,7 @@
  * SigmaOS: Sigma Installer
  * Zenith UI-based installer with rollback options (Ubuntu/Zorin inspiration).
  */
-#include "../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 namespace SigmaOS {
     class Installer {
     public:

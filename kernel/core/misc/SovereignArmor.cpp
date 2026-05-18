@@ -1,5 +1,5 @@
-#include "../../include/sigma_armor.h"
-#include "../../include/sigma_log.h"
+#include "sigma_armor.h"
+#include "sigma_log.h"
 
 /**
  * Σ SIGMAOS: SOVEREIGN ARMOR POLICY ENGINE (S-ARMOR)

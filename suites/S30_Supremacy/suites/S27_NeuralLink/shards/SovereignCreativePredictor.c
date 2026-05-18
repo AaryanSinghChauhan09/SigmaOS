@@ -10,7 +10,7 @@
 // Result: High-speed creative output (10x - 100x human baseline).
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 typedef struct {

@@ -1,8 +1,8 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "../../../../../include/SovereignDriver.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "SovereignDriver.h"
+#include "libc/sigma_libc.h"
 
 #define MAX_PCI_DEVICES 64
 

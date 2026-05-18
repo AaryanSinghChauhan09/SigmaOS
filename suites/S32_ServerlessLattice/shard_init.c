@@ -1,5 +1,5 @@
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/libc/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "libc/sigma_libc.h"
 
 // SigmaOS Serverless Lattice (S-LAMBDA)
 // Philosophy: AWS Lambda / Kubernetes - On-Demand Shard Orchestration.

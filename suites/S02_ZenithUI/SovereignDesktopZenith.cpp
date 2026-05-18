@@ -1,11 +1,11 @@
 <<<<<<< HEAD:suites/S02_ZenithUI/SovereignDesktopZenith.cpp
-#include "../../include/SovereignDesktopZenith.h"
-#include "../../include/sigma_log.h"
-#include "../../include/libc/sigma_libc.h"
-#include "../../include/sigma_log.h"
+#include "SovereignDesktopZenith.h"
+#include "sigma_log.h"
+#include "libc/sigma_libc.h"
+#include "sigma_log.h"
 =======
-﻿#include "../../include/libc/SovereignLibC.h"
-#include "../../include/sigma_log.h"
+﻿#include "libc/SovereignLibC.h"
+#include "sigma_log.h"
 >>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:userland/SovereignDesktopZenith.cpp
 
 namespace SigmaOS {

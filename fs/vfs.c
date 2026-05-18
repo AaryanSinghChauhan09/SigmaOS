@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "../include/libc/SovereignLibC.h"
-#include "../include/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_kernel_types.h"
 
 #define MAX_FILES 128
 #define MAX_PATH_LEN 256

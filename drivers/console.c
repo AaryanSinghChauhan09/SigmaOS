@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "../include/libc/SovereignLibC.h"
-#include "../include/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_kernel_types.h"
 
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 25

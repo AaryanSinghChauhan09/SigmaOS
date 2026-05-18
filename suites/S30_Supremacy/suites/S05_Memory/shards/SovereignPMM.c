@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: S05_MEMORY  SovereignPMM.c
@@ -9,8 +9,8 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "../../../../../include/core/sigma_types.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "core/sigma_types.h"
+#include "libc/sigma_libc.h"
 
 #define PAGE_SIZE 4096
 #define MAX_PAGES 1048576 // 4GB management coverage

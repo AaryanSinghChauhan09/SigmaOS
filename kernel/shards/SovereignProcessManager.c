@@ -10,7 +10,7 @@
  * =========================================================================
  */
 
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 /* PCB state constants */
 #define PROC_STATE_READY   0u

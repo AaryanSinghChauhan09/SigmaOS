@@ -1,9 +1,9 @@
 #ifndef SCHEDULER_HPP
 #define SCHEDULER_HPP
 
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/SigmaOOP.hpp"
-#include "../../include/SovereignString.hpp"
+#include "sigma_kernel_types.h"
+#include "SigmaOOP.hpp"
+#include "SovereignString.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

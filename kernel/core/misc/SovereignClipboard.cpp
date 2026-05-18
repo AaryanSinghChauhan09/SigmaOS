@@ -1,12 +1,12 @@
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
 
-#include "../../include/sigma_clipboard.h"
-#include "../../include/sigma_log.h"
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_log.h"
-#include "../../include/sigma_continuity.h"
-#include "../../include/sigma_log.h"
+#include "sigma_clipboard.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "sigma_continuity.h"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Sovereign Smart Clipboard

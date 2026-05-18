@@ -1,4 +1,4 @@
-#include "../../include/SigmaAssistant.hpp"
+#include "SigmaAssistant.hpp"
 
 namespace SigmaOS {
 namespace CLI {

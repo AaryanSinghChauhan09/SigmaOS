@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S15_DevNexus/shards/sigma_raft.c
@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "../../../../../include/sigma_raft.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "sigma_raft.h"
+#include "libc/sigma_libc.h"
 
 static raft_node_t        s_raft;
 static sigma_service_entry_t s_services[SIGMA_SVC_MAX];

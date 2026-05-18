@@ -5,9 +5,9 @@
  * Maps to: Syllabus-WebProgramming (HTML5, CSS, JavaScript, PHP)
  */
 #pragma once
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
-#include "../../include/sigma_string.h"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
+#include "sigma_string.h"
 
 // Forward declare QuickJS types for JS Engine bridge
 typedef struct JSRuntime JSRuntime;

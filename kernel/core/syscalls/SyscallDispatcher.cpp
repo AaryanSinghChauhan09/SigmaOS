@@ -2,7 +2,7 @@
  * SigmaOS: Modular Syscall Dispatcher
  * Custom syscall table in C, inline assembly for fast context switches.
  */
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 namespace SigmaOS {
     extern "C" void syscall_dispatcher() {
         // Inline assembly for context switches

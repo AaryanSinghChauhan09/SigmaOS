@@ -1,6 +1,6 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
 
 /* =========================================================================
  * SIGMAOS: SOVEREIGN INDUSTRIAL SCHEDULER (S-Sched) v2.1

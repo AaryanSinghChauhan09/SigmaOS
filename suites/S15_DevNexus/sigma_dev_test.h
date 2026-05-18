@@ -7,7 +7,7 @@
 #ifndef SIGMA_DEV_TEST_H
 #define SIGMA_DEV_TEST_H
 
-#include "../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 #define SIGMA_TEST_MAX        128
 #define SIGMA_TEST_NAME_LEN    48

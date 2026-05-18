@@ -6,8 +6,8 @@
  * Principle: Bare-metal execution, zero standard library dependencies.
  * =========================================================================
  */
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
 
 namespace SigmaOS {
 namespace ProTools {

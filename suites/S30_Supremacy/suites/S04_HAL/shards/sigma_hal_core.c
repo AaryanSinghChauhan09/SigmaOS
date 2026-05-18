@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S04_HAL/shards/sigma_hal_core.c
@@ -7,9 +7,9 @@
  * =========================================================================
  */
 
-#include "../../../../../include/sigma_hal_core.h"
-#include "../../../../../include/S01_Genesis/shards/SovereignCommon.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "sigma_hal_core.h"
+#include "S01_Genesis/shards/SovereignCommon.h"
+#include "libc/sigma_libc.h"
 
 #define MAX_HAL_DEVICES 256
 static sigma_hal_device_t* s_hal_registry[MAX_HAL_DEVICES];

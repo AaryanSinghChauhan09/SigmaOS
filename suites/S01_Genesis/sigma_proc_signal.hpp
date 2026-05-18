@@ -5,7 +5,7 @@
 #ifndef SIGMA_PROC_SIGNAL_HPP
 #define SIGMA_PROC_SIGNAL_HPP
 
-#include "../../include/sigma_proc_pcb.h"
+#include "sigma_proc_pcb.h"
 
 namespace sigma {
 namespace proc {

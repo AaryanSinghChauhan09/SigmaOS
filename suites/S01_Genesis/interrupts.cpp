@@ -1,5 +1,5 @@
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/libc/sigma_libc.h"
+#include "sigma_kernel_types.h"
+#include "libc/sigma_libc.h"
 
 // IDT Entry Structure (x86_64)
 struct idt_entry {

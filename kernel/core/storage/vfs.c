@@ -1,10 +1,10 @@
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: VIRTUAL FILE SYSTEM (VFS) CORE
  * =============================================================================
  */
-#include "../../../include/vfs.h"
+#include "vfs.h"
 
 static vfs_node_t* vfs_root = SIGMA_NULL;
 

@@ -7,8 +7,8 @@
  * =========================================================================
  */
 
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_log.h"
 
 void sigma_academy_lesson_list() {
     sigma_log_info("\nÎ£ SOVEREIGN ACADEMY: COMMAND MASTERY\n");

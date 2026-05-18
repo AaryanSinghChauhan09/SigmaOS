@@ -1,7 +1,7 @@
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
-#include "../../include/sigma_batteryiq.h"
-#include "../../include/hal/sigma_hal.h"
+#include "sigma_batteryiq.h"
+#include "hal/sigma_hal.h"
 
 
 /**

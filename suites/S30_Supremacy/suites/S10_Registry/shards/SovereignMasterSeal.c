@@ -11,7 +11,7 @@
 // Result: 100% immune to runtime injection, logic-bombs, or bit-flip corruption.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 typedef struct {

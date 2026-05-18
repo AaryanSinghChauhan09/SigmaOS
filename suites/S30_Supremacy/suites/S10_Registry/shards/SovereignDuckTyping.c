@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN DUCK TYPING (v1.0 - PURE C11)
@@ -10,7 +10,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
-#include "../../../../../include/SovereignPythonZenith.h"
+#include "SovereignPythonZenith.h"
 
 // -------------------------------------------------------------------------
 // Implementation

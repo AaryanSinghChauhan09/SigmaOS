@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: SOVEREIGN DTRACE + PF PACKET FILTER  IMPLEMENTATION (v1.0)
@@ -6,7 +6,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
-#include "../../../../../include/SovereignDTrace.h"
+#include "SovereignDTrace.h"
 
 /* =========================================================================
  * 1  DTRACE SUBSYSTEM

@@ -2,7 +2,7 @@
  * SigmaOS: Profile Selector
  * UX Autonomy: Select between Developer, Forensic, Gaming, Container Host.
  */
-#include "../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 namespace SigmaOS {
     class ProfileSelector {
     public:

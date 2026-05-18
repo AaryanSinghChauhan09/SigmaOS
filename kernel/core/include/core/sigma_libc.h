@@ -8,7 +8,7 @@
 #define SIGMA_LIBC_H
 
 
-#include "../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 // --- Syscall Wrappers ---
 void          sigma_exit(int code);

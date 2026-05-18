@@ -5,7 +5,7 @@
 #ifndef SIGMA_AUTO_UPDATE_HPP
 #define SIGMA_AUTO_UPDATE_HPP
 
-#include "../../include/sigma_auto_rollback.hpp"
+#include "sigma_auto_rollback.hpp"
 
 namespace sigma {
 namespace auto_layer {

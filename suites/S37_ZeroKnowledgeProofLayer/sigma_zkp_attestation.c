@@ -1,4 +1,4 @@
-#include "../../include/sigma_zkp_attestation.h"
+#include "sigma_zkp_attestation.h"
 
 // Internal zeroing without libc dependency
 static void sigma_internal_memzero(void* dest, uint32_t len) {

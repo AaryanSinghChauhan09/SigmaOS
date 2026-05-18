@@ -3,8 +3,8 @@
  * Σ SIGMAOS: SOVEREIGN VFS-TO-JOURNAL INTEGRATION LAYER
  * =========================================================================
  */
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
 // #include "../fs/SovereignJournalFS.h" (Assuming header definition exists for integration)
 
 namespace SigmaOS {

@@ -1,9 +1,9 @@
-#include "../../include/sigma_log.h"
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "hal/sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign DNS Shard

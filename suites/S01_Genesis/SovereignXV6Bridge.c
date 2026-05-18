@@ -1,5 +1,5 @@
-#include "../../include/SovereignXV6Bridge.h"
-#include "../../include/libc/SovereignLibC.h"
+#include "SovereignXV6Bridge.h"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace XV6Parity {

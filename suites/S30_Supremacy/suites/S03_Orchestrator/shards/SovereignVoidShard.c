@@ -1,8 +1,8 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "../../../../../include/SovereignInit.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "SovereignInit.h"
+#include "libc/sigma_libc.h"
 
 /*
  * Sovereign Void Shard (Amalgamation).

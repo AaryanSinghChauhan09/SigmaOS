@@ -4,7 +4,7 @@
  * USP: Lightweight, shard-level virtualization for untrusted logic domains.
  */
 
-#include "../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 typedef struct {
     uint32_t jail_id;

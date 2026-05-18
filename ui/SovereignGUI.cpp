@@ -1,10 +1,10 @@
-#include "../include/sigma_log.h"
-#include "../include/libc/SovereignLibC.h"
-#include "../include/sigma_kernel_types.h"
-#include "../include/hal/sigma_hal.h"
-#include "../include/sigma_kernel_types.h"
-#include "../include/ui/sigma_gui.h"
-#include "../include/hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_kernel_types.h"
+#include "hal/sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "ui/sigma_gui.h"
+#include "hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign GUI Implementation

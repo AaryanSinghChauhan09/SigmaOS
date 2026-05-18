@@ -1,7 +1,7 @@
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/SigmaOOP.hpp"
-#include "../../include/libc/sigma_libc.h"
-#include "../../include/sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "SigmaOOP.hpp"
+#include "libc/sigma_libc.h"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Autonomous Agent Quota Manager (S-QUOTA)

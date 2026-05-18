@@ -2,7 +2,7 @@
  * SigmaOS: sigma-cron
  * Cron-like scheduler integrated with RegistryManager (automation).
  */
-#include "../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 namespace SigmaOS {
     class SigmaCron {
     public:

@@ -1,5 +1,5 @@
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/libc/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "libc/sigma_libc.h"
 
 // SigmaOS Immutable FS (S-IMMUTABLE)
 // Philosophy: Fedora Silverblue / NixOS - Atomic Updates and Read-Only Core.

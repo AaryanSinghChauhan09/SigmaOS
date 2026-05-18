@@ -1,11 +1,11 @@
-#include "../include/sigma_log.h"
-#include "../include/libc/SovereignLibC.h"
-#include "../include/hal/sigma_hal.h"
-#include "../include/sigma_kernel_types.h"
-#include "../include/sigma_privdash.h"
-#include "../include/hal/sigma_hal.h"
-#include "../include/observability/sigma_telemetry.h"
-#include "../include/sigma_sentinel.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "hal/sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "sigma_privdash.h"
+#include "hal/sigma_hal.h"
+#include "observability/sigma_telemetry.h"
+#include "sigma_sentinel.h"
 
 /**
  * SigmaOS Sovereign Privacy Dashboard

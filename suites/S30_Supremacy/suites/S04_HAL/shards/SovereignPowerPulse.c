@@ -12,7 +12,7 @@
 //   • Sentiment Efficiency: Correlates user patterns (S13) to battery drain
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 typedef enum {

@@ -1,11 +1,11 @@
-#include "../../include/Lattice.h"
-#include "../../include/sigma_log.h"
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/sigma_log.h"
+#include "Lattice.h"
+#include "sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_log.h"
 #include "neuromorphic_shard.hpp"
-#include "../../include/sigma_log.h"
+#include "sigma_log.h"
 
 namespace Drivers {
 

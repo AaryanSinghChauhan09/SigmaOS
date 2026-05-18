@@ -1,7 +1,7 @@
 #ifndef INTERRUPT_SHARD_HPP
 #define INTERRUPT_SHARD_HPP
 
-#include "../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

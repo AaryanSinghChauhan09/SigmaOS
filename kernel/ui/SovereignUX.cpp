@@ -1,9 +1,9 @@
 #include "../../include/sigma_ux.h"
-#include "../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "../../include/ui/sigma_gui.h"
-#include "../../include/sigma_log.h"
+#include "sigma_log.h"
 #include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_log.h"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Sovereign UX Implementation
@@ -111,3 +111,4 @@ extern "C" void ux_predict_adaptation() {
 
 
  
+

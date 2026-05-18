@@ -2,10 +2,10 @@
 // SigmaOS  kernel/core/deployment  SovereignPackageGraph.cpp  v2.0
 // Universal Package Graph (S-PKG) - PQC-Attested Shard Provisioning
 // =============================================================================
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

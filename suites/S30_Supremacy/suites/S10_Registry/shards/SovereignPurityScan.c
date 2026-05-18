@@ -9,9 +9,9 @@
  * =========================================================================
  */
 
-#include "../../../../../include/core/sigma_types.h"
-#include "../../../../../include/libc/SovereignLibC.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "libc/sigma_libc.h"
 
 void sigma_purity_audit(const char* file_path) {
     sigma_sigma_printf("S [PURITY]: Auditing shard '%s' for unauthorized high-level dependencies...\n", file_path);

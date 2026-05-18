@@ -1,4 +1,4 @@
-#include "../../../../include/hal/sigma_pmm.h"
+#include "hal/sigma_pmm.h"
 
 /* =========================================================================
  * SIGMA OS: VIRTUAL MEMORY & PMM (PHYSICAL MEMORY MANAGER) SHARD

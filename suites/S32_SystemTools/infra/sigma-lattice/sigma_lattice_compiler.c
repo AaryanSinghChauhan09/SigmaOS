@@ -1,4 +1,4 @@
-#include "../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 // =============================================================================
 // SigmaOS — tools/sigma-lattice — sigma_lattice_compiler.c
 // Quantum-Tier Modularization Synthesis Tool
@@ -12,9 +12,9 @@
 //         pluggable, hot-swappable module.
 // =============================================================================
 
-#include "../../../../include/libc/sigma_libc.h"
-#include "../../../../include/libc/sigma_libc.h"
-#include "../../../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 void analyze_and_split(const char* source_path) {
     sigma_printf("[lattice] Analyzing AST for: %s\n", source_path);

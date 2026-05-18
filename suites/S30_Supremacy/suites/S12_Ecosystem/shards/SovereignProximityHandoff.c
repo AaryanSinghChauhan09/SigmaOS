@@ -12,7 +12,7 @@
 //     closeness and orientation (pointing your phone at your PC).
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 typedef struct {

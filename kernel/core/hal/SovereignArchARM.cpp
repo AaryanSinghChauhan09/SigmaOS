@@ -1,6 +1,6 @@
-#include "../../../include/SigmaOOP.hpp"
-#include "../../../include/core/SovereignArch.hpp"
-#include "../../../include/sigma_log.h"
+#include "SigmaOOP.hpp"
+#include "core/SovereignArch.hpp"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Sovereign ARM Architecture Shard (S-ARM)

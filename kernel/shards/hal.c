@@ -11,7 +11,7 @@
  * =============================================================================
  */
 
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 typedef struct SigmaDevice {
     sigma_u16 vendor_id;

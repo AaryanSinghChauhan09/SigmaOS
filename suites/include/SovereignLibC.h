@@ -9,7 +9,7 @@
 #ifndef SOVEREIGN_LIBC_H
 #define SOVEREIGN_LIBC_H
 
-#include "../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 /* Forward declarations for all SovereignLibC primitives */
 void          sigma_print(const char* str);

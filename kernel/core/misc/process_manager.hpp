@@ -1,7 +1,7 @@
 #ifndef PROCESS_MANAGER_HPP
 #define PROCESS_MANAGER_HPP
 
-#include "../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

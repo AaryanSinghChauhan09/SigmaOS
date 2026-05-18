@@ -1,12 +1,12 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: OMNIFABRIC (Suite S26)
  * =========================================================================
  */
 
-#include "../../../../../include/sigma_omnifabric.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "sigma_omnifabric.h"
+#include "libc/sigma_libc.h"
 
 static omnifabric_node_t s_nodes[32];
 static sigma_u32         s_node_count = 0;

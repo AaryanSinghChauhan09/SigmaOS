@@ -1,4 +1,4 @@
-#include "../../../include/sigma_libc.h"
+#include "sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS Audio Driver (HDA / Intel High Definition Audio) Stub

@@ -1,5 +1,5 @@
-#include "../../include/sigma_compliance.h"
-#include "../../include/sigma_log.h"
+#include "sigma_compliance.h"
+#include "sigma_log.h"
 
 /**
  * Σ SIGMAOS: SOVEREIGN COMPLIANCE CHECKER (S-COMPLY)

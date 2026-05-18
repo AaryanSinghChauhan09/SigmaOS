@@ -1,6 +1,6 @@
 #pragma once
 #include <stdint.h>
-#include "../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 namespace SigmaOS {
 namespace Userland {

@@ -5,7 +5,7 @@
 #ifndef SIGMA_PQC_SIGN_H
 #define SIGMA_PQC_SIGN_H
 
-#include "../../include/sigma_pqc_keygen.h"
+#include "sigma_pqc_keygen.h"
 
 #define SIGMA_PQC_SIG_SIZE 2420
 

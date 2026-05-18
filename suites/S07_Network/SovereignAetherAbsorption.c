@@ -1,5 +1,5 @@
-#include "../../include/SigmaOOP.hpp"
-#include "../../include/libc/SovereignLibC.h"
+#include "SigmaOOP.hpp"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 

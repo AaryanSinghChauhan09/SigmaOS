@@ -1,4 +1,4 @@
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN SYSCALL DISPATCHER (v94.0 ZENITH SUPREME)
@@ -8,7 +8,7 @@
  * =========================================================================
  */
 
-#include "../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 typedef enum {
     SOV_SYS_SHARD_EXEC = 0x5101,

@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
 /*
@@ -11,9 +11,9 @@
  * =========================================================================
  */
 
-#include "../../../../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 #include "suites/S03_Orchestrator/shards/SigmaOOP.h"
-#include "../../../../../include/SovereignPythonZenith.h"
+#include "SovereignPythonZenith.h"
 
 // -------------------------------------------------------------------------
 // Implementation

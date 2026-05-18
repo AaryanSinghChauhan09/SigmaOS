@@ -1,6 +1,6 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/Lattice.h"
+#include "sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "Lattice.h"
 /*
  * =========================================================================
  * S SIGMAOS: MORPHIC AUTOMATION ENGINE (v1.0 - INDUSTRIAL SHARD)
@@ -10,8 +10,8 @@
  * =========================================================================
  */
 
-#include "../../../include/SigmaOOP.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "SigmaOOP.hpp"
+#include "libc/SovereignLibC.h"
 
 namespace SigmaOS {
 namespace Automation {

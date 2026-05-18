@@ -1,6 +1,6 @@
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "../../../../../include/SigmaC11.h"
+#include "SigmaC11.h"
 
 // =========================================================================
 // OMNI-SEARCH ENGINE (SOSE - Sovereign Omni-Search Engine)

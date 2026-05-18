@@ -2,8 +2,8 @@
  * SigmaOS: Profession-Based Calculators
  * Zero-dependency implementations for GST, Income Tax, Court Fees, and BIS Standards.
  */
-#include "../include/sigma_kernel_types.h"
-#include "../include/sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
 
 namespace SigmaOS {
     class ProfessionTools {

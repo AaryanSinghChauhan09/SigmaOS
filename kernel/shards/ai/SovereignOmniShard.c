@@ -1,4 +1,4 @@
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN OMNI-SHARD IMPLEMENTATION (v100.0 - PURE C11)
@@ -9,7 +9,7 @@
  * =========================================================================
  */
 
-#include "../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 
 /* =========================================================================
  * DOMAIN: OS KERNEL & ADVANCED SCHEDULING

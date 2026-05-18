@@ -6,7 +6,7 @@
  * =========================================================================
  */
 #pragma once
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 namespace SigmaOS {
 namespace HAL {

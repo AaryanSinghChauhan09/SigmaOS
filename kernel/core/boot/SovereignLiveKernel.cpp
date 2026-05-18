@@ -1,11 +1,11 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_livekernel.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/sigma_dynmodule.h"
-#include "../../../include/security/sigma_crypto.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "sigma_livekernel.h"
+#include "sigma_hal.h"
+#include "sigma_dynmodule.h"
+#include "security/sigma_crypto.h"
 
 /**
  * SigmaOS Sovereign Live Kernel Patch

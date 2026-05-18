@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 /**
  * Σ SIGMA OS: SOVEREIGN BUILD SYSTEM (v128.0 - ZERO-STD NATIVE)

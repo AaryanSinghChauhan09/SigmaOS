@@ -1,8 +1,8 @@
-#include "../../../include/SigmaOOP.hpp"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/Lattice.h"
-#include "../../../include/sigma_log.h"
+#include "SigmaOOP.hpp"
+#include "sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "Lattice.h"
+#include "sigma_log.h"
 
 /**
  * =========================================================================

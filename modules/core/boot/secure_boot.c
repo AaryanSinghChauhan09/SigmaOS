@@ -1,5 +1,5 @@
-#include "../../../include/libc/sigma_libc.h"
-#include "../../../include/security/kyber_shard.c"
+#include "libc/sigma_libc.h"
+#include "security/kyber_shard.c"
 
 // ---------------------------------------------------------
 // SigmaOS Quantum-Resilient Secure Boot Sequence (Phase 7)

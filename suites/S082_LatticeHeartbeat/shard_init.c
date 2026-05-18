@@ -1,5 +1,5 @@
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/libc/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "libc/sigma_libc.h"
 
 // SigmaOS Lattice Heartbeat (S-HEARTBEAT)
 // Philosophy: Real-Time Observability - High-Fidelity Lattice Telemetry.

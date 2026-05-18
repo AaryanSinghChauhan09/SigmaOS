@@ -1,5 +1,5 @@
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/libc/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "libc/sigma_libc.h"
 
 // SigmaOS Intent Bridge (S-INTENT)
 // Philosophy: Android / Binder - Decoupled Service Discovery and Intent Resolution.

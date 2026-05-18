@@ -4,7 +4,7 @@
  * USP: Dynamic discovery and messaging for distributed lattice shards.
  */
 
-#include "../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 typedef struct {
     char* service_name;

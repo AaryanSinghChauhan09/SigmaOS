@@ -1,5 +1,5 @@
-#include "../../include/sigma_log.h"
-#include "../../include/sigma_telemetry.h"
+#include "sigma_log.h"
+#include "sigma_telemetry.h"
 
 /**
  * SigmaOS Sovereign Telemetry Implementation

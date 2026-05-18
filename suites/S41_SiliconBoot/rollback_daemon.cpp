@@ -1,5 +1,5 @@
-#include "../../include/sigma_auto_rollback.h"
-#include "../../include/libc/sigma_libc.h"
+#include "sigma_auto_rollback.h"
+#include "libc/sigma_libc.h"
 
 // Σ SIGMAOS: SOVEREIGN ROLLBACK DAEMON
 // Responsibility: Monitor system stability and trigger silicon-level recovery.

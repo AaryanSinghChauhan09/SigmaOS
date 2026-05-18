@@ -4,12 +4,12 @@
  * ZERO-DEPENDENCY: Strictly bare-metal FAT32 parsing.
  */
 
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_log.h"
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
-#include "../../include/fs/sigma_vfs.h"
-#include "../../include/sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
+#include "fs/sigma_vfs.h"
+#include "sigma_log.h"
 
 class SovereignFAT32Engine {
 public:

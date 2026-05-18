@@ -2,7 +2,7 @@
 #ifndef SIGMA_LIBC_H
 #define SIGMA_LIBC_H
 
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 void          sigma_exit(int code);
 long          sigma_write(int fd, const void* buf, unsigned long count);
 void*         sigma_mmap(void* addr, unsigned long length, int prot, int flags, int fd, unsigned long long offset);

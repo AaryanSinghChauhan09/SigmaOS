@@ -1,6 +1,6 @@
-#include "../../../../../include/libc/SovereignLibC.h"
-#include "../../../../../include/core/sigma_types.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
+#include "libc/sigma_libc.h"
 
 extern void pmm_init(void);
 extern void vmm_as_init(void);

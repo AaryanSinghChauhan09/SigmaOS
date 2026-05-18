@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /**
  * @file Sovereign_Interrupt_Dispatch.c
  * @brief Atomic Shard: High-Level Interrupt Router.

@@ -1,5 +1,5 @@
-#include "../../../include/atomic_sigma_oop_base.hpp"
-#include "../../../include/libc/sigma_libc.h"
+#include "atomic_sigma_oop_base.hpp"
+#include "libc/sigma_libc.h"
 
 namespace sigma {
 namespace automation {

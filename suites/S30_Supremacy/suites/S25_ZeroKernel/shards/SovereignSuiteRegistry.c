@@ -1,7 +1,7 @@
 // =============================================================================
 // SigmaOS  S25_ZeroKernel  SovereignSuiteRegistry.c
 // =============================================================================
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 void S25_ZeroKernel_Register(void) {
     // Register functional shards for S25_ZeroKernel into the System Lattice Registry

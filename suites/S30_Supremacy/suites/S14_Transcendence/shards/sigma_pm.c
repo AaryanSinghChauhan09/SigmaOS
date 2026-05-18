@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S14_Transcendence/shards/sigma_pm.c
@@ -6,7 +6,7 @@
  */
 
 #include "sigma_pm.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 static sigma_cpu_power_t s_cpus[SIGMA_PM_MAX_CPUS];
 static pm_u32            s_num_cpus = 0;

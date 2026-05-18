@@ -10,7 +10,7 @@
 //     to avoid reboots entirely.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define UPDATE_CHUNK_SIZE   65536

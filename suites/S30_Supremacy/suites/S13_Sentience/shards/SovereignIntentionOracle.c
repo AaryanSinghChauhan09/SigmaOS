@@ -12,7 +12,7 @@
 //         chooses it.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 typedef struct {
     uint32_t anticipated_task_id;

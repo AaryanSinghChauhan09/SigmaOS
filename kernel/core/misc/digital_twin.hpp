@@ -1,8 +1,8 @@
 #ifndef DIGITAL_TWIN_HPP
 #define DIGITAL_TWIN_HPP
 
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/SigmaOOP.hpp"
+#include "sigma_kernel_types.h"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

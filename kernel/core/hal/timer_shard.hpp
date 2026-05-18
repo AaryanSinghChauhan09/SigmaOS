@@ -1,10 +1,10 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_kernel_types.h"
+#include "sigma_hal.h"
+#include "libc/SovereignLibC.h"
 #ifndef TIMER_SHARD_HPP
 #define TIMER_SHARD_HPP
 
-#include "../../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Kernel {

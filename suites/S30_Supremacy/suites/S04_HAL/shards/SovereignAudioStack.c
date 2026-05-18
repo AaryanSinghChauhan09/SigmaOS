@@ -2,7 +2,7 @@
 // Absorbs ALSA (Linux), CoreAudio (macOS), WASAPI (Windows) paradigms.
 // Zero-dependency, hardware-mapped C11 shard.
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define SIGMA_AUDIO_SAMPLE_RATE_48K   48000

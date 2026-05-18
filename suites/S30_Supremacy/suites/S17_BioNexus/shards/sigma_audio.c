@@ -1,12 +1,12 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S17_BioNexus/shards/sigma_audio.c
  * =========================================================================
  */
 
-#include "../../../../../include/sigma_audio.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "sigma_audio.h"
+#include "libc/sigma_libc.h"
 
 static sigma_au_stream_t  s_streams[AU_MAX_STREAMS];
 static au_u32             s_stream_count = 0;

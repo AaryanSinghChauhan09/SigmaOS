@@ -3,7 +3,7 @@
 // Zero-Bloat Crash Recovery & Internal Audit Shard
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 void kernel_panic(const char* reason, void* stack_frame) {

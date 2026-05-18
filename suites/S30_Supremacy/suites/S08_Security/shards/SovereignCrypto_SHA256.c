@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: S08_SECURITY  SovereignCrypto_SHA256.c
@@ -9,8 +9,8 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_base.h"
-#include "../../../../../include/core/sigma_types.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "core/sigma_types.h"
+#include "libc/sigma_libc.h"
 
 typedef struct {
     uint32_t state[8];

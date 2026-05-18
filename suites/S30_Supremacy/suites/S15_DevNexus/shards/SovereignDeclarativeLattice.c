@@ -1,6 +1,6 @@
-#include "../../../../../include/libc/SovereignLibC.h"
-#include "../../../../../include/libc/sigma_libc.h"
-#include "../../../../../include/core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "libc/sigma_libc.h"
+#include "core/sigma_types.h"
 
 /**
  * SigmaOS Sovereign Declarative Lattice (Nix-inspired)

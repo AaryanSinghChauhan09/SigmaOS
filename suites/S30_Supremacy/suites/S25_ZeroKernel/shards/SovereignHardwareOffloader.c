@@ -11,7 +11,7 @@
 //         The OS effectively has ZERO overhead.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 typedef enum {

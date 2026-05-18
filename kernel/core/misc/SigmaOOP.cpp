@@ -1,6 +1,6 @@
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/SigmaOOP.hpp"
+#include "hal/sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "SigmaOOP.hpp"
 
 void* operator new(sigma_size_t size) {
     return sigma_malloc(size);

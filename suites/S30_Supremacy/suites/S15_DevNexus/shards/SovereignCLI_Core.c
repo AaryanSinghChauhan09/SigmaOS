@@ -1,7 +1,7 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "../../../../../include/SovereignCLI_Core.h"
+#include "SovereignCLI_Core.h"
 
 SigmaCLICtx_t g_sigma_cli;
 

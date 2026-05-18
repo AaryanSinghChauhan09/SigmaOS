@@ -1,4 +1,4 @@
-﻿/*
+/*
  * SigmaOS: Sovereign Driver Loader (HAL Shard)
  * Layer: L1 - Kernel Primitives / HAL
  */

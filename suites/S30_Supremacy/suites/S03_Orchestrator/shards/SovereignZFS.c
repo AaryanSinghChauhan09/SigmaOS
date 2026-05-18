@@ -1,6 +1,6 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
-#include "../../../../../include/SovereignInterferenceGuard.h"
+#include "SovereignInterferenceGuard.h"
 
 // S SovereignZFS: Transactional Copy-on-Write (CoW) Storage Shard
 // Inspired by FreeBSD ZFS: Self-Healing, Snapshots, and Atomic Commit Groups

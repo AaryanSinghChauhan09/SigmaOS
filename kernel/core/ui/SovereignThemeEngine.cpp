@@ -1,5 +1,5 @@
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
 /**
  * SigmaOS Sovereign Adaptive Theme Engine
  * High-performance, silicon-native personalization for the Zenith interface.

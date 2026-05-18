@@ -1,7 +1,7 @@
-#include "../../include/drivers/sigma_bluetooth.h"
-#include "../../include/sigma_log.h"
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_log.h"
+#include "drivers/sigma_bluetooth.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Sovereign Bluetooth Stack (v28.0 Zenith)

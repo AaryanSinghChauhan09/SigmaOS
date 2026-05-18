@@ -3,7 +3,7 @@
  * Distributed metadata service, lock-free hash maps, and encryption.
  * Zero-dependency bare-metal storage architecture.
  */
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 namespace SigmaOS {
 namespace Storage {

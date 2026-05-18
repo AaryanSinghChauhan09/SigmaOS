@@ -1,10 +1,10 @@
-#include "../include/sigma_log.h"
-#include "../include/sigma_optimizer.h"
-#include "../include/sigma_gaming.h"
-#include "../include/sigma_ml.h"
-#include "../include/sigma_orchestrator.h"
-#include "../include/sigma_cloud.h"
-#include "../include/sigma_regression.h"
+#include "sigma_log.h"
+#include "sigma_optimizer.h"
+#include "sigma_gaming.h"
+#include "sigma_ml.h"
+#include "sigma_orchestrator.h"
+#include "sigma_cloud.h"
+#include "sigma_regression.h"
 
 /**
  * Σ SIGMAOS: SOVEREIGN TELEMETRY CLI (telemetry-cli)

@@ -1,12 +1,12 @@
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
 
-#include "../../include/sigma_vissearch.h"
-#include "../../include/sigma_log.h"
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_log.h"
-#include "../../include/ai/sigma_neural.h"
-#include "../../include/sigma_log.h"
+#include "sigma_vissearch.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "ai/sigma_neural.h"
+#include "sigma_log.h"
 
 /**
  * SigmaOS Sovereign Visual Search

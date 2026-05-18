@@ -12,7 +12,7 @@
 //   • Reduces asset loading latency by 90% via zero-copy pipeline
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define DS_MAX_STREAMS      8

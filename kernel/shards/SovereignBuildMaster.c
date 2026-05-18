@@ -1,4 +1,4 @@
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS: SOVEREIGN BUILD MASTER (v11.0 - WINDOWS SILICON FORGE)
@@ -8,8 +8,8 @@
  * =============================================================================
  */
 
-#include "../../include/libc/sigma_libc.h"
-#include "../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 #include <windows.h>
 
 #define C_BOLD   "\033[1m"

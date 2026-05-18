@@ -1,4 +1,4 @@
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SOVEREIGN-LATTICE-MEMORY (Beyond Linux Paging)
@@ -10,7 +10,7 @@
  *   - $O(1)$ memory isolation via hardware-enforced Shard-Keys.
  * =============================================================================
  */
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 typedef struct MemShard {
     sigma_u64     uuid;

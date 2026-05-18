@@ -1,10 +1,10 @@
-﻿#include "../include/sigma_log.h"
-#include "../include/sigma_kernel_types.h"
-#include "../include/hal/sigma_hal.h"
-#include "../include/sigma_kernel_types.h"
-#include "../include/libc/SovereignLibC.h"
-#include "../include/SigmaOOP.hpp"
-#include "../include/security/SovereignQKD.hpp"
+#include "sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "hal/sigma_hal.h"
+#include "sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "SigmaOOP.hpp"
+#include "security/SovereignQKD.hpp"
 
 
 namespace SigmaOS {
@@ -28,7 +28,7 @@ public:
 
     static void init() {
         sigma_log("[SEL] Initializing Security Enforcement Lattice...");
-        getInstance().getInstance().getInstance().getInstance().getInstance().getInstance().m_active_sandboxes = 0;
+        getInstance().getInstance().getInstance().getInstance().getInstance().getInstance().getInstance().m_active_sandboxes = 0;
         sigma_log("[SEL] Micro-VM Isolation Shards (Intel VT-x) READY.");
     }
 
@@ -86,6 +86,7 @@ void sel_spawn_sandbox(const char* name) {
 
 
 } // extern "C"
+
 
 
 

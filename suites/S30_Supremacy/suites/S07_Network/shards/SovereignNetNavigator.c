@@ -12,7 +12,7 @@
 //   • Direct VFS-to-Render path for web resources.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define MAX_TABS            32

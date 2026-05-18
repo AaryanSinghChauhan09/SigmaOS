@@ -1,9 +1,9 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "../../../../../include/SovereignMemory.h"
-#include "../../../../../include/libc/sigma_libc.h"
-#include "../../../../../include/sigma_string.h"
+#include "SovereignMemory.h"
+#include "libc/sigma_libc.h"
+#include "sigma_string.h"
 
 #define MAX_MEM_SHARDS 8
 static sovereign_memory_shard_t g_mem_shards[MAX_MEM_SHARDS];

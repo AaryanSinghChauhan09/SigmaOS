@@ -1,10 +1,10 @@
-#include "../include/sigma_log.h"
-#include "../include/libc/SovereignLibC.h"
-#include "../include/sigma_kernel_types.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_kernel_types.h"
 
-#include "../include/sigma_vissearch.h"
-#include "../include/hal/sigma_hal.h"
-#include "../include/ai/sigma_neural.h"
+#include "sigma_vissearch.h"
+#include "hal/sigma_hal.h"
+#include "ai/sigma_neural.h"
 
 /**
  * SigmaOS Sovereign Visual Search

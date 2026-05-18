@@ -1,7 +1,7 @@
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_log.h"
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
 /**
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN SECURITY HARDENER (S-SECHARDENER) — SHARD #500
@@ -15,12 +15,12 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_sechardener.h"
-#include "../../include/sigma_log.h"
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_log.h"
-#include "../../include/libc/sigma_libc.h"
-#include "../../include/sigma_log.h"
+#include "sigma_sechardener.h"
+#include "sigma_log.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "libc/sigma_libc.h"
+#include "sigma_log.h"
 
 /**
  * sigma_hardened_strcpy — CWE-119 fix for unsafe strcpy usage.

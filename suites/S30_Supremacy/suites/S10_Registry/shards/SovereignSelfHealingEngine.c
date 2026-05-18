@@ -13,7 +13,7 @@
 //     WITHOUT interrupting the running process.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define VAULT_PATH "/boot/sovereign/vault"

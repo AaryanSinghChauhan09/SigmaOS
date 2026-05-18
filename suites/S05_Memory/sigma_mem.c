@@ -1,4 +1,4 @@
-#include "../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN MEMORY ZENITH (v94.0 ZENITH SUPREME)
@@ -11,7 +11,7 @@
  * =========================================================================
  */
 
-#include "../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 #define MEM_SEG_MAX      1024u
 #define MEM_POOL_SIZE    (128ULL * 1024ULL * 1024ULL) /* 128 MB shard */

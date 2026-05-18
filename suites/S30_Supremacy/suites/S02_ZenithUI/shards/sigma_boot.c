@@ -1,12 +1,12 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S02_ZenithUI/shards/sigma_boot.c
  * =========================================================================
  */
 
-#include "../../../../../include/sigma_boot.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "sigma_boot.h"
+#include "libc/sigma_libc.h"
 
 static sigma_boot_config_t s_cfg;
 static sigma_boot_phase_t  s_phase = BOOT_PHASE_FIRMWARE;

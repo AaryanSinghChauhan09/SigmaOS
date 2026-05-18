@@ -9,7 +9,7 @@
 #ifndef SIGMA_SYSCALL_DISPATCHER_H
 #define SIGMA_SYSCALL_DISPATCHER_H
 
-#include "../../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {

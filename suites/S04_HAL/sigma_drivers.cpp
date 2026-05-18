@@ -1,5 +1,5 @@
-#include "../../include/libc/sigma_libc.h"
-#include "../../include/sigma_kernel_types.h"
+#include "libc/sigma_libc.h"
+#include "sigma_kernel_types.h"
 
 // Σ SIGMAOS: SOVEREIGN DRIVER LATTICE (S04)
 // Responsibility: Plug-and-Play detection and modular driver loading.

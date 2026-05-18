@@ -1,7 +1,7 @@
 #ifndef SOVEREIGN_UNIVERSAL_DISTRO_SUITE_H
 #define SOVEREIGN_UNIVERSAL_DISTRO_SUITE_H
 
-#include "../../../../../include/SigmaC11.h"
+#include "SigmaC11.h"
 
 /**
  * @file SovereignUniversalDistroSuite.h

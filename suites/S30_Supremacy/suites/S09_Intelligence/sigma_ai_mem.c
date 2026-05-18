@@ -1,8 +1,8 @@
-#include "../../../../include/libc/SovereignLibC.h"
-#include "../../../../include/sigma_ai_mem.h"
-#include "../../../../include/hal/sigma_pmm.h"
-#include "../../../../include/sigma_libc.h"
-#include "../../../../include/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_ai_mem.h"
+#include "hal/sigma_pmm.h"
+#include "sigma_libc.h"
+#include "sigma_libc.h"
 
 /* =========================================================================
  * SIGMA OS: INTELLIGENCE SUITE (S09) - AI MEMORY ALLOCATOR

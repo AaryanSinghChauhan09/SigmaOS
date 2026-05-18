@@ -1,8 +1,8 @@
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 #ifndef SOVEREIGN_OS_BASICS_ZENITH_H
 #define SOVEREIGN_OS_BASICS_ZENITH_H
 
-#include "../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace Basics {

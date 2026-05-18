@@ -11,7 +11,7 @@
 //         mitm attacks through lattice-based packet integrity.
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 typedef struct {

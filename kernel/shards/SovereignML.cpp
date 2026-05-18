@@ -1,8 +1,8 @@
-#include "../../include/Lattice.h"
+#include "Lattice.h"
 // Î£ SIGMAOS: SOVEREIGN MACHINE LEARNING & DATA SCIENCE (v91.0)
 // Zero-Dependency Neural & Statistical Matrix Solver (Silicon-Native NPU Sharding)
 
-#include "../../include/SigmaOOP.hpp"
+#include "SigmaOOP.hpp"
 
 namespace SigmaOS {
 namespace DataScience {

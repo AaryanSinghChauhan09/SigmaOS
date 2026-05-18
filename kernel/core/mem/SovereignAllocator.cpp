@@ -2,10 +2,10 @@
 // SigmaOS  kernel/core/mem  SovereignAllocator.cpp  v2.0
 // Sovereign Slab Allocator (S-ALLOC) - Industrial C-Bridge
 // =============================================================================
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/sigma_log.h"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SigmaOOP.hpp"
+#include "libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "SigmaOOP.hpp"
 
 /* Bridge to the underlying MMU/Memory Manager */
 extern "C" {

@@ -1,7 +1,7 @@
-#include "../include/sigma_kernel_types.h"
-#include "../include/hal/sigma_hal.h"
-#include "../include/sigma_log.h"
-#include "../include/security/sigma_pqc.h"
+#include "sigma_kernel_types.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
+#include "security/sigma_pqc.h"
 /**
  * Sigma Sovereign Hardware Attestation Shard
  *

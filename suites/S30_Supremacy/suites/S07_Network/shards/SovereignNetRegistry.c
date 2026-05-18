@@ -1,9 +1,9 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "../../../../../include/SovereignNet.h"
-#include "../../../../../include/libc/sigma_libc.h"
-#include "../../../../../include/sigma_string.h"
+#include "SovereignNet.h"
+#include "libc/sigma_libc.h"
+#include "sigma_string.h"
 
 #define MAX_NET_PROTOCOLS 16
 static sovereign_net_protocol_t g_net_protocols[MAX_NET_PROTOCOLS];

@@ -1,12 +1,12 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS kernel/suites/S08_Security/shards/sigma_lsm.c
  * =========================================================================
  */
 
-#include "../../../../../include/sigma_lsm.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "sigma_lsm.h"
+#include "libc/sigma_libc.h"
 
 static sigma_security_ctx_t s_ctxs[SIGMA_LSM_MAX_PROCS];
 static sigma_u32            s_ctx_count = 0;

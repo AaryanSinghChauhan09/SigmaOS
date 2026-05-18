@@ -1,4 +1,4 @@
-#include "../../../../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "sigma_kernel.h"
 void sigma_print(const char* str) {
     if (!str) return;

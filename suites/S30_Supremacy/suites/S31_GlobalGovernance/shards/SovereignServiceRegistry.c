@@ -1,9 +1,9 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "../../../../../include/SovereignInit.h"
-#include "../../../../../include/libc/sigma_libc.h"
-#include "../../../../../include/sigma_string.h"
+#include "SovereignInit.h"
+#include "libc/sigma_libc.h"
+#include "sigma_string.h"
 
 #define MAX_SYSTEM_SERVICES 32
 static sovereign_service_shard_t g_services[MAX_SYSTEM_SERVICES];

@@ -10,7 +10,7 @@
 #ifndef SIGMA_BASICS_H
 #define SIGMA_BASICS_H
 
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 /* --- PROCESS CONTROL BLOCK (PCB) & STATES --- */
 typedef enum {

@@ -1,5 +1,5 @@
-#include "../../../include/sigma_core.h"
-#include "../../../include/libc/sigma_libc.h"
+#include "sigma_core.h"
+#include "libc/sigma_libc.h"
 
 extern "C" {
 

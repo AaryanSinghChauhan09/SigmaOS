@@ -1,5 +1,5 @@
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/sigma_kernel_types.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_kernel_types.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: PS/2 KEYBOARD DRIVER (v1.1)
@@ -7,7 +7,7 @@
  * Principles: Zero-Abstract Human Input & ASCII Mapping.
  * =============================================================================
  */
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 static const char kbd_us[128] = {
     0,  27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',

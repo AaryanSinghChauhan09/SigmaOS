@@ -1,5 +1,5 @@
-#include "../../include/sigma_log.h"
-#include "../../include/SigmaOOP.hpp"
+#include "sigma_log.h"
+#include "SigmaOOP.hpp"
 
 /**
  * SigmaOS Sovereign Forensic Shard (S-FORENSICS)

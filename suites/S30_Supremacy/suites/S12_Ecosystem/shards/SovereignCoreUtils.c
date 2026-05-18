@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS: S12_ECOSYSTEM  SovereignCoreUtils.c
@@ -9,7 +9,7 @@
  */
 
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 void sigma_util_ls(const char* path) {
     sigma_sigma_printf("S [UTIL]: Listing directory '%s'...\n", path);

@@ -1,5 +1,5 @@
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/libc/sigma_libc.h"
+#include "libc/SovereignLibC.h"
+#include "libc/sigma_libc.h"
 
 // SigmaOS Browser Lattice (S-BROWSER)
 // Purpose: Extreme optimization for Chromium-based execution (V8/WASM).

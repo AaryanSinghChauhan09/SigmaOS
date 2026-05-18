@@ -1,7 +1,7 @@
-#include "../../include/Lattice.h"
-#include "../../include/sigma_log.h"
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/sigma_log.h"
+#include "Lattice.h"
+#include "sigma_log.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_log.h"
 /* =========================================================================
  * Σ SIGMAOS: SELF-HEALING SHARD (v1.0 - INDUSTRIAL FINALITY)
  * =========================================================================
@@ -10,8 +10,8 @@
  * =========================================================================
  */
 
-#include "../../include/SigmaOOP.hpp"
-#include "../../include/sigma_log.h"
+#include "SigmaOOP.hpp"
+#include "sigma_log.h"
 
 namespace SigmaOS {
 namespace Healing {

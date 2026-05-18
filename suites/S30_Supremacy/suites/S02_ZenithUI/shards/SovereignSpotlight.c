@@ -12,7 +12,7 @@
 //   • Real-time VFS watcher: Instant index updates on every S06 write
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 #define MAX_INDEX_ENTRIES   65536

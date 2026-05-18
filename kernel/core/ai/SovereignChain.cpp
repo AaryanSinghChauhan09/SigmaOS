@@ -1,6 +1,6 @@
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "sigma_hal.h"
+#include "sigma_log.h"
 
 /**
  * SovereignChain � AI Component Orchestration and Flow Engine.

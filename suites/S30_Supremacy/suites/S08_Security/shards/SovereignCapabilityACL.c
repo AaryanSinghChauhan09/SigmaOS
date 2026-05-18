@@ -15,7 +15,7 @@
 //   • Syscall dispatcher checks capability before dispatch (zero-cost fast path)
 // =============================================================================
 
-#include "../../../../../include/core/sigma_types.h"
+#include "core/sigma_types.h"
 
 
 // ── Capability Bit Definitions ───────────────────────────────────────────────

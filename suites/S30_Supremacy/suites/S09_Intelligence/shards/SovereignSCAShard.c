@@ -1,4 +1,4 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * S SIGMAOS TRANSCENDENCE: SOVEREIGN SCA SHARD (v57.0-TRANSCENDENCE)

@@ -1,6 +1,6 @@
 // sigma_diagnostics.c - Kernel diagnostics via syscall bridge
-#include "../include/syscall_dispatcher.h"
-#include "../include/sigma_log.h"
+#include "syscall_dispatcher.h"
+#include "sigma_log.h"
 
 // Simple diagnostics utility – prints basic kernel info via syscalls
 int sigma_diagnostics_run(void) {

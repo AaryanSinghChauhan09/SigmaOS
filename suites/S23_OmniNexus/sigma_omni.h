@@ -11,10 +11,10 @@
 #define SOVEREIGN_OMNI_SHARD_H
 
 <<<<<<<< HEAD:suites/S23_OmniNexus/sigma_omni.h
-#include "../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 ========
-#include "../../include/libc/SovereignLibC.h"
-#include "../../include/sigma_system_shards.h"
+#include "libc/SovereignLibC.h"
+#include "sigma_system_shards.h"
 >>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:include/SovereignOmniShard.h
 
 /* =========================================================================

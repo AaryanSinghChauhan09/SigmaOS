@@ -8,9 +8,9 @@
  * =========================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
-#include "../include/sigma_log.h"
-#include "../include/SigmaOOP.hpp"
+#include "sigma_kernel_types.h"
+#include "sigma_log.h"
+#include "SigmaOOP.hpp"
 #include <stdlib.h>
 
 #define sigma_atoi atoi

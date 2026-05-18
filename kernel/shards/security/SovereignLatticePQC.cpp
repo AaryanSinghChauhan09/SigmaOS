@@ -1,7 +1,7 @@
-﻿#include "../../../include/sigma_log.h"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/SigmaOOP.hpp"
-#include "../../../include/libc/SovereignLibC.h"
+#include "sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "SigmaOOP.hpp"
+#include "libc/SovereignLibC.h"
 /*
  * =========================================================================
  * ÃŽÂ£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
@@ -46,9 +46,9 @@ public:
         sigma_log("[SECURITY-ZENITH]: Sovereign Key Shard: %016llX (Quantum Shield Active)\n", m_key_id);
     }
 
-    SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaString encrypt(const char* plaintext) {
+    SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaString encrypt(const char* plaintext) {
         sigma_log("[SECURITY-ZENITH]: Sharding Plaintext via Lattice-Vector Transformation...\n");
-        SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaString out(plaintext);
+        SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaString out(plaintext);
         out.append("_PQC_SHARDED");
         return out;
     }
@@ -71,7 +71,7 @@ void start_security_zenith() {
     SigmaOS::Security::SovereignLatticePQC pqc;
 
     pqc.generate_sovereign_key();
-    SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaString secret = pqc.encrypt("SIGMA_CORE_V11");
+    SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaOS::SigmaString secret = pqc.encrypt("SIGMA_CORE_V11");
 
     sigma_log("\n[SECURITY-ZENITH]: SHARDED SECRET: %s\n", secret.c_str());
     pqc.audit();
@@ -91,3 +91,4 @@ int main() {
 
 
  
+

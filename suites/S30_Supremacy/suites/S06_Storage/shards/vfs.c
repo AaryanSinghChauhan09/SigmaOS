@@ -12,11 +12,11 @@
  */
 
 <<<<<<< HEAD:suites/S30_Supremacy/suites/S06_Storage/shards/vfs.c
-#include "../../../../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
 =======
-#include "../../../../../include/libc/SovereignLibC.h"
-#include "../../../../../include/core/sigma_types.h"
+#include "libc/SovereignLibC.h"
+#include "core/sigma_types.h"
 >>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:fs/vfs.c
 
 #define MAX_FILES 128

@@ -1,7 +1,7 @@
 #ifndef SIGMA_NET_H
 #define SIGMA_NET_H
 
-#include "../../include/sigma_kernel_types.h"
+#include "sigma_kernel_types.h"
 
 /**
  * @file sigma_net.h

@@ -1,4 +1,4 @@
-#include "../../../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 // ---------------------------------------------------------
 // SigmaOS Cache Eviction Policies (Phase 10)

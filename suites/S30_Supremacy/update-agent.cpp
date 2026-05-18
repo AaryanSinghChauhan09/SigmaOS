@@ -1,6 +1,6 @@
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/hal/sigma_hal.h"
-#include "../../include/sigma_log.h"
+#include "sigma_kernel_types.h"
+#include "hal/sigma_hal.h"
+#include "sigma_log.h"
 
 /**
  * SovereignUpdateAgent " Atomic System Updates and Rollbacks.

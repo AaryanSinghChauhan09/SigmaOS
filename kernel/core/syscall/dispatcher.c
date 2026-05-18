@@ -7,7 +7,7 @@
  * =========================================================================
  */
 #include "dispatcher.h"
-#include "../../../include/sigma_log.h"
+#include "sigma_log.h"
 
 /* ── Forward declarations of all handlers ──────────────────────────── */
 static sigma_u64 sys_getpid (sigma_u64, sigma_u64, sigma_u64, sigma_u64);

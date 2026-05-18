@@ -1,7 +1,7 @@
-#include "../../../../../include/fs/sigma_vfs.h"
-#include "../../../../../include/sigma_libc.h"
-#include "../../../../../include/sigma_libc.h"
-#include "../../../../../include/sigma_libc.h"
+#include "fs/sigma_vfs.h"
+#include "sigma_libc.h"
+#include "sigma_libc.h"
+#include "sigma_libc.h"
 
 /* =========================================================================
  * VFS (VIRTUAL FILE SYSTEM) KERNEL ROUTINES

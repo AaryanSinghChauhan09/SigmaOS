@@ -6,7 +6,7 @@
 #ifndef SIGMA_FS_SOVEREIGN_HPP
 #define SIGMA_FS_SOVEREIGN_HPP
 
-#include "../../include/S04_HAL/sigma_hal_driver_storage.hpp"
+#include "S04_HAL/sigma_hal_driver_storage.hpp"
 
 namespace sigma {
 namespace fs {

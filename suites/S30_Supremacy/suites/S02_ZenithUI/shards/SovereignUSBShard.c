@@ -1,9 +1,9 @@
-#include "../../../../../include/libc/SovereignLibC.h"
+#include "libc/SovereignLibC.h"
 #include "suites/S01_Genesis/shards/sigma_base.h"
 
-#include "../../../../../include/SovereignHardwareIOZenith.h"
+#include "SovereignHardwareIOZenith.h"
 #include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
-#include "../../../../../include/libc/sigma_libc.h"
+#include "libc/sigma_libc.h"
 
 /*
  * Sovereign USB/Thunderbolt Matrix.

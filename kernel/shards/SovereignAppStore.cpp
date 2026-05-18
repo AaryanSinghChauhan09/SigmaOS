@@ -1,4 +1,4 @@
-#include "../../include/Lattice.h"
+#include "Lattice.h"
 /*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN PACKAGE NEXUS (v15.0 - ABSOLUTE FINALITY)
