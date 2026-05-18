@@ -22,7 +22,7 @@ public:
 
     void init() {
         m_managed_nodes = 0;
-        sigma_log_info("[RECOVERY] Sigma Enterprise Recovery v1.0 initialized.");
+        sigma_printf("[RECOVERY] Sigma Enterprise Recovery v1.0 initialized.");
     }
 
     void register_fleet_node() {
@@ -30,11 +30,11 @@ public:
     }
 
     void trigger_fleet_rollback(const char* target_hash) {
-        sigma_log_info("[RECOVERY] WARNING: Initiating fleet-wide atomic rollback.");
-        sigma_log_info("[RECOVERY] Target Snapshot Hash: %s", target_hash);
-        sigma_log_info("[RECOVERY] Broadcasting rollback instruction to %u nodes...", m_managed_nodes);
+        sigma_printf("[RECOVERY] WARNING: Initiating fleet-wide atomic rollback.");
+        sigma_printf("[RECOVERY] Target Snapshot Hash: %s", target_hash);
+        sigma_printf("[RECOVERY] Broadcasting rollback instruction to %u nodes...", m_managed_nodes);
         /* Simulate fleet RDMA broadcast */
-        sigma_log_info("[RECOVERY] Fleet rollback successful. All nodes rebooting.");
+        sigma_printf("[RECOVERY] Fleet rollback successful. All nodes rebooting.");
     }
 
 private:

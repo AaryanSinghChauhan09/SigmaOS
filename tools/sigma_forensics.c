@@ -3,7 +3,7 @@
 
 // Entry point for forensic collection
 int sigma_forensics_collect(void) {
-    sigma_log_info("Sigma Forensics: starting collection...");
+    sigma_printf("Sigma Forensics: starting collection...");
     // TODO: implement memory dump, process snapshot, and log extraction
     return 0; // success
 }

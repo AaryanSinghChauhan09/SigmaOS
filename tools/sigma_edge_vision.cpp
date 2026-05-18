@@ -22,18 +22,18 @@ public:
 
     void init() {
         m_active_streams = 0;
-        sigma_log_info("[EDGE_VIS] Sigma Edge Vision v1.0 initialized.");
+        sigma_printf("[EDGE_VIS] Sigma Edge Vision v1.0 initialized.");
     }
 
     void attach_camera(const char* device_node) {
         if (m_active_streams >= 16) return;
         m_active_streams++;
-        sigma_log_info("[EDGE_VIS] Camera attached at %s.", device_node);
+        sigma_printf("[EDGE_VIS] Camera attached at %s.", device_node);
     }
 
     void process_frame() {
-        sigma_log_info("[EDGE_VIS] Processing frame via tensor accelerators...");
-        sigma_log_info("[EDGE_VIS] Object detected: Bounding box [100, 150, 300, 400]");
+        sigma_printf("[EDGE_VIS] Processing frame via tensor accelerators...");
+        sigma_printf("[EDGE_VIS] Object detected: Bounding box [100, 150, 300, 400]");
     }
 
 private:

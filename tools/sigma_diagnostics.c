@@ -5,7 +5,7 @@
 // Simple diagnostics utility – prints basic kernel info via syscalls
 int sigma_diagnostics_run(void) {
     sigma_u64 pid = syscall_dispatcher(0, 0, 0, 0, 0); // sys_getpid
-    sigma_log_info("SigmaOS Diagnostic Tool: PID=%llu", pid);
+    sigma_printf("SigmaOS Diagnostic Tool: PID=%llu", pid);
     // Additional diagnostics can be added here
     return 0;
 }

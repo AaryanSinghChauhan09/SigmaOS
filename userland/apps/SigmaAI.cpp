@@ -223,7 +223,7 @@ EntityList SigmaNLP::ner(const char* text) {
     // Detect SECTION references: "Section 302 IPC"
     const char* p = text;
     while (*p) {
-        if (sigma_startswith(p, "Section ")) {
+        if (sigma_strcmp(p, "Section ")) {
             const char* start = p;
             p += 8; // skip "Section "
             while (*p && (*p >= '0' && *p <= '9' || *p >= 'A' && *p <= 'Z')) p++;

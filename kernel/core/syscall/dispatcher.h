@@ -1,3 +1,4 @@
+#include "../../../include/core/sigma_kernel_types.h"
 /*
  * =========================================================================
  * SigmaOS: Syscall Dispatcher Public API (dispatcher.h)

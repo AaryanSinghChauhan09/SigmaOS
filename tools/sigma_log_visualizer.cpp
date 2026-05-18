@@ -22,8 +22,8 @@ public:
 
     void init() {
         m_active_chart = 0;
-        sigma_log_info("[LOGVIS] Sigma Log Visualizer v1.0 initialized.");
-        sigma_log_info("[LOGVIS] Aggregating kernel ring buffer and shard telemetry...");
+        sigma_printf("[LOGVIS] Sigma Log Visualizer v1.0 initialized.");
+        sigma_printf("[LOGVIS] Aggregating kernel ring buffer and shard telemetry...");
     }
 
     void render_tui_chart(sigma_u8 chart_type) {
@@ -34,23 +34,23 @@ public:
          * 2 = Error Density (Heatmap)
          */
         m_active_chart = chart_type;
-        sigma_log_info("[LOGVIS] Rendering TUI Chart Type: %u", chart_type);
+        sigma_printf("[LOGVIS] Rendering TUI Chart Type: %u", chart_type);
         
         switch(chart_type) {
             case 0:
-                sigma_log_info("[LOGVIS] CPU Usage (Last 60s):");
-                sigma_log_info("[LOGVIS] 100% |     *    *  ");
-                sigma_log_info("[LOGVIS]  50% |   *  *  * * ");
-                sigma_log_info("[LOGVIS]   0% | ** ** ** ***");
+                sigma_printf("[LOGVIS] CPU Usage (Last 60s):");
+                sigma_printf("[LOGVIS] 100% |     *    *  ");
+                sigma_printf("[LOGVIS]  50% |   *  *  * * ");
+                sigma_printf("[LOGVIS]   0% | ** ** ** ***");
                 break;
             case 1:
-                sigma_log_info("[LOGVIS] Memory Footprint (Shards):");
-                sigma_log_info("[LOGVIS] S-VFS   [████████  ] 80MB");
-                sigma_log_info("[LOGVIS] S-NET   [████      ] 40MB");
-                sigma_log_info("[LOGVIS] S-GUI   [██████████] 100MB");
+                sigma_printf("[LOGVIS] Memory Footprint (Shards):");
+                sigma_printf("[LOGVIS] S-VFS   [████████  ] 80MB");
+                sigma_printf("[LOGVIS] S-NET   [████      ] 40MB");
+                sigma_printf("[LOGVIS] S-GUI   [██████████] 100MB");
                 break;
             case 2:
-                sigma_log_info("[LOGVIS] Error Density (Kernel Panic Risk): LOW");
+                sigma_printf("[LOGVIS] Error Density (Kernel Panic Risk): LOW");
                 break;
         }
     }

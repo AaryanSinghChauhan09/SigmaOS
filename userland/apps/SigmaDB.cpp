@@ -28,7 +28,7 @@ int SigmaDB::create_table(const TableSchema& schema) {
     write_catalog_table(schema);
     // 4. Create physical storage extent in SovereignZFSPool
     storage_.create_extent(schema.name, schema.initial_pages);
-    sigma_klog(LOG_INFO, "[SigmaDB] CREATE TABLE %s (%d columns)\n",
+    sigma_klog(sigma_printf, "[SigmaDB] CREATE TABLE %s (%d columns)\n",
                schema.name, schema.column_count);
     return SIGMA_DB_OK;
 }
@@ -53,14 +53,14 @@ int SigmaDB::drop_table(const char* table_name, bool if_exists) {
     if (has_dependent_fkeys(table_name)) return SIGMA_DB_ERR_FK_CONSTRAINT;
     drop_catalog_table(table_name);
     storage_.drop_extent(table_name);
-    sigma_klog(LOG_INFO, "[SigmaDB] DROP TABLE %s\n", table_name);
+    sigma_klog(sigma_printf, "[SigmaDB] DROP TABLE %s\n", table_name);
     return SIGMA_DB_OK;
 }
 
 int SigmaDB::truncate_table(const char* table_name) {
     if (!catalog_has_table(table_name)) return SIGMA_DB_ERR_NO_TABLE;
     storage_.truncate_extent(table_name);  // Fast: reset extent, keep schema
-    sigma_klog(LOG_INFO, "[SigmaDB] TRUNCATE TABLE %s\n", table_name);
+    sigma_klog(sigma_printf, "[SigmaDB] TRUNCATE TABLE %s\n", table_name);
     return SIGMA_DB_OK;
 }
 
@@ -181,14 +181,14 @@ int SigmaDB::begin_transaction() {
     current_txn_.txn_id    = ++txn_counter_;
     current_txn_.rows_affected = 0;
     storage_.create_snapshot(current_txn_.txn_id); // CoW snapshot for rollback
-    sigma_klog(LOG_DEBUG, "[SigmaDB] BEGIN TRANSACTION txn_id=%u\n", current_txn_.txn_id);
+    sigma_klog(sigma_printf, "[SigmaDB] BEGIN TRANSACTION txn_id=%u\n", current_txn_.txn_id);
     return SIGMA_DB_OK;
 }
 
 int SigmaDB::commit() {
     if (!current_txn_.active) return SIGMA_DB_ERR_NO_TXN;
     storage_.commit_snapshot(current_txn_.txn_id);
-    sigma_klog(LOG_INFO, "[SigmaDB] COMMIT txn_id=%u, %u rows affected\n",
+    sigma_klog(sigma_printf, "[SigmaDB] COMMIT txn_id=%u, %u rows affected\n",
                current_txn_.txn_id, current_txn_.rows_affected);
     current_txn_.active = false;
     return SIGMA_DB_OK;
@@ -201,12 +201,12 @@ int SigmaDB::rollback(const char* savepoint_name) {
         Savepoint* sp = find_savepoint(savepoint_name);
         if (!sp) return SIGMA_DB_ERR_NO_SAVEPOINT;
         storage_.rollback_to_snapshot(sp->snapshot_id);
-        sigma_klog(LOG_INFO, "[SigmaDB] ROLLBACK TO SAVEPOINT %s\n", savepoint_name);
+        sigma_klog(sigma_printf, "[SigmaDB] ROLLBACK TO SAVEPOINT %s\n", savepoint_name);
     } else {
         // Full rollback
         storage_.rollback_snapshot(current_txn_.txn_id);
         current_txn_.active = false;
-        sigma_klog(LOG_INFO, "[SigmaDB] ROLLBACK txn_id=%u\n", current_txn_.txn_id);
+        sigma_klog(sigma_printf, "[SigmaDB] ROLLBACK txn_id=%u\n", current_txn_.txn_id);
     }
     return SIGMA_DB_OK;
 }
@@ -216,7 +216,7 @@ int SigmaDB::savepoint(const char* name) {
     sigma_strncpy(sp.name, name, sizeof(sp.name));
     sp.snapshot_id = storage_.create_snapshot(current_txn_.txn_id);
     savepoints_[savepoint_count_++] = sp;
-    sigma_klog(LOG_DEBUG, "[SigmaDB] SAVEPOINT %s\n", name);
+    sigma_klog(sigma_printf, "[SigmaDB] SAVEPOINT %s\n", name);
     return SIGMA_DB_OK;
 }
 
@@ -224,14 +224,14 @@ int SigmaDB::savepoint(const char* name) {
 
 int SigmaDB::grant(const char* user, const char* table_name, Permission perms) {
     acl_.add(user, table_name, perms);
-    sigma_klog(LOG_INFO, "[SigmaDB] GRANT 0x%X ON %s TO %s\n",
+    sigma_klog(sigma_printf, "[SigmaDB] GRANT 0x%X ON %s TO %s\n",
                (unsigned)perms, table_name, user);
     return SIGMA_DB_OK;
 }
 
 int SigmaDB::revoke(const char* user, const char* table_name, Permission perms) {
     acl_.remove(user, table_name, perms);
-    sigma_klog(LOG_INFO, "[SigmaDB] REVOKE 0x%X ON %s FROM %s\n",
+    sigma_klog(sigma_printf, "[SigmaDB] REVOKE 0x%X ON %s FROM %s\n",
                (unsigned)perms, table_name, user);
     return SIGMA_DB_OK;
 }
@@ -240,7 +240,7 @@ int SigmaDB::revoke(const char* user, const char* table_name, Permission perms) 
 
 int SigmaDB::create_trigger(const Trigger& trig) {
     triggers_[trigger_count_++] = trig;
-    sigma_klog(LOG_INFO, "[SigmaDB] CREATE TRIGGER %s ON %s\n",
+    sigma_klog(sigma_printf, "[SigmaDB] CREATE TRIGGER %s ON %s\n",
                trig.name, trig.table_name);
     return SIGMA_DB_OK;
 }

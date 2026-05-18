@@ -53,9 +53,9 @@ void SentinelNeural::init() {
     VirusSignature eicar;
     sigma_strncpy(eicar.name, "EICAR-Test-File", sizeof(eicar.name));
     const char* eicar_str = "X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*";
-    eicar.pattern_len = (sigma_u8)sigma_strlen(eicar_str);
-    for (sigma_u8 i = 0; i < eicar.pattern_len; i++) {
-        eicar.pattern[i] = (sigma_u8)eicar_str[i];
+    eicar.pattern_len = (sigma_u32)sigma_strlen(eicar_str);
+    for (sigma_u32 i = 0; i < eicar.pattern_len; i++) {
+        eicar.pattern[i] = (sigma_u32)eicar_str[i];
         eicar.wildcard_mask[i] = 0;
     }
     eicar.type = ThreatType::VIRUS;
@@ -63,21 +63,21 @@ void SentinelNeural::init() {
     m_signatures[m_sig_count++] = eicar;
     signatures_loaded = m_sig_count;
 
-    sigma_klog(LOG_INFO, "[SentinelNeural] Subsystem initialized. Signatures: %u\n", m_sig_count);
+    sigma_klog(sigma_printf, "[SentinelNeural] Subsystem initialized. Signatures: %u\n", m_sig_count);
 }
 
 void SentinelNeural::shutdown() {
     delete[] m_signatures;
-    sigma_klog(LOG_INFO, "[SentinelNeural] Subsystem shut down.\n");
+    sigma_klog(sigma_printf, "[SentinelNeural] Subsystem shut down.\n");
 }
 
 // ─── Signature Scanning ───────────────────────────────────────────────────────
-bool SentinelNeural::pattern_match(const sigma_u8* data, sigma_usize len, const VirusSignature& sig) {
+bool SentinelNeural::pattern_match(const sigma_u32* data, sigma_usize len, const VirusSignature& sig) {
     if (len < sig.pattern_len) return false;
     sigma_usize max_offset = len - sig.pattern_len;
     for (sigma_usize offset = 0; offset <= max_offset; offset++) {
         bool match = true;
-        for (sigma_u8 i = 0; i < sig.pattern_len; i++) {
+        for (sigma_u32 i = 0; i < sig.pattern_len; i++) {
             if (sig.wildcard_mask[i] == 0 && data[offset + i] != sig.pattern[i]) {
                 match = false; break;
             }
@@ -87,7 +87,7 @@ bool SentinelNeural::pattern_match(const sigma_u8* data, sigma_usize len, const 
     return false;
 }
 
-bool SentinelNeural::scan_memory(const sigma_u8* data, sigma_usize len, sigma_u32 pid, ThreatEvent* out_event) {
+bool SentinelNeural::scan_memory(const sigma_u32* data, sigma_usize len, sigma_u32 pid, ThreatEvent* out_event) {
     files_scanned_total++;
     for (sigma_u32 i = 0; i < m_sig_count; i++) {
         if (pattern_match(data, len, m_signatures[i])) {
@@ -113,18 +113,18 @@ bool SentinelNeural::scan_memory(const sigma_u8* data, sigma_usize len, sigma_u3
 
 bool SentinelNeural::scan_file(const char* path, ThreatEvent* out_event) {
     // Stub VFS file scan
-    sigma_u8 dummy_buf[128];
+    sigma_u32 dummy_buf[128];
     sigma_strncpy((char*)dummy_buf, "clean file contents", sizeof(dummy_buf));
     return scan_memory(dummy_buf, 19, 0, out_event);
 }
 
 sigma_u32 SentinelNeural::load_signatures(const char* sigdb_path) {
-    sigma_klog(LOG_INFO, "[SentinelNeural] Loading signatures from %s\n", sigdb_path);
+    sigma_klog(sigma_printf, "[SentinelNeural] Loading signatures from %s\n", sigdb_path);
     return m_sig_count;
 }
 
 int SentinelNeural::update_signatures_from_cloud() {
-    sigma_klog(LOG_INFO, "[SentinelNeural] Updating signatures from SovereignCloudFS...\n");
+    sigma_klog(sigma_printf, "[SentinelNeural] Updating signatures from SovereignCloudFS...\n");
     return 0;
 }
 
@@ -210,7 +210,7 @@ ThreatType SentinelNeural::classify_anomaly(float score, const ProcessFeatureVec
 }
 
 void SentinelNeural::update_model_baseline(const ProcessFeatureVector* samples, sigma_usize count) {
-    sigma_klog(LOG_INFO, "[SentinelNeural] Online learning: updating MLP baseline with %u samples\n", (unsigned)count);
+    sigma_klog(sigma_printf, "[SentinelNeural] Online learning: updating MLP baseline with %u samples\n", (unsigned)count);
 }
 
 // ─── Response Actions ─────────────────────────────────────────────────────────
@@ -229,14 +229,14 @@ void SentinelNeural::report_threat(const ThreatEvent& event) {
                (int)event.type, (int)event.severity, event.pid, event.description);
 }
 
-void SentinelNeural::compute_sha256(const sigma_u8* data, sigma_usize len, sigma_u8 out[32]) {
+void SentinelNeural::compute_sha256(const sigma_u32* data, sigma_usize len, sigma_u32 out[32]) {
     // Simple FNV-based hashing filling 32 bytes for heuristic stub
     sigma_u32 h = 2166136261u;
     for (sigma_usize i = 0; i < len; i++) { h ^= data[i]; h *= 16777619u; }
-    for (int i = 0; i < 32; i++) out[i] = (sigma_u8)((h >> ((i % 4) * 8)) & 0xFF);
+    for (int i = 0; i < 32; i++) out[i] = (sigma_u32)((h >> ((i % 4) * 8)) & 0xFF);
 }
 
-bool SentinelNeural::is_eicar_test_file(const sigma_u8* data, sigma_usize len) {
+bool SentinelNeural::is_eicar_test_file(const sigma_u32* data, sigma_usize len) {
     ThreatEvent event{};
     return scan_memory(data, len, 0, &event);
 }

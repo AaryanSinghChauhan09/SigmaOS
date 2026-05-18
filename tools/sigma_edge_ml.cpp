@@ -113,8 +113,8 @@ public:
         m_cam.target_fps = 30;
         m_cam.inference_time_ms = 12.2f;
 
-        sigma_log_info("[EDGEML] Sigma Sovereign LLM training and orchestration mesh loaded.");
-        sigma_log_info("[EDGEML] Supported: Letta-AI Agent-File | VoiceStar Audio | DeepLiveCam Swaps | Claude-Code CLI");
+        sigma_printf("[EDGEML] Sigma Sovereign LLM training and orchestration mesh loaded.");
+        sigma_printf("[EDGEML] Supported: Letta-AI Agent-File | VoiceStar Audio | DeepLiveCam Swaps | Claude-Code CLI");
     }
 
     void configure_qlora(sigma_u32 rank, sigma_u32 alpha, float dropout, const char* target_modules) {
@@ -126,7 +126,7 @@ public:
         while (target_modules[i] && i < 63) { m_qlora.target_modules[i] = target_modules[i]; i++; }
         m_qlora.target_modules[i] = '\0';
         
-        sigma_log_info("[QLORA] Fine-Tuning Parameter Matrix Updated: Rank=%u, Alpha=%u, Dropout=%.3f, Targets=%s",
+        sigma_printf("[QLORA] Fine-Tuning Parameter Matrix Updated: Rank=%u, Alpha=%u, Dropout=%.3f, Targets=%s",
                        rank, alpha, dropout, m_qlora.target_modules);
     }
 
@@ -135,7 +135,7 @@ public:
         m_rag.chunk_overlap = chunk_overlap;
         m_rag.similarity_threshold = threshold;
         
-        sigma_log_info("[RAG] Retrieval Parameters Configured: ChunkSize=%u, Overlap=%u, SimilarityThreshold=%.3f",
+        sigma_printf("[RAG] Retrieval Parameters Configured: ChunkSize=%u, Overlap=%u, SimilarityThreshold=%.3f",
                        chunk_size, chunk_overlap, threshold);
     }
 
@@ -149,16 +149,16 @@ public:
         m_agentfile.episodic_memory[i] = '\0';
 
         m_agentfile.consolidated = SIGMA_TRUE;
-        sigma_log_info("[LETTA-AGENT] Agent-File long-term memory consolidated.");
-        sigma_log_info("[LETTA-AGENT] Core: %s", m_agentfile.core_memory);
-        sigma_log_info("[LETTA-AGENT] Episodic: %s", m_agentfile.episodic_memory);
+        sigma_printf("[LETTA-AGENT] Agent-File long-term memory consolidated.");
+        sigma_printf("[LETTA-AGENT] Core: %s", m_agentfile.core_memory);
+        sigma_printf("[LETTA-AGENT] Episodic: %s", m_agentfile.episodic_memory);
     }
 
     void configure_voicestar(sigma_u32 sample_rate, sigma_u32 channels, float latency) {
         m_voicestar.sample_rate = sample_rate;
         m_voicestar.channels = channels;
         m_voicestar.latency_ms = latency;
-        sigma_log_info("[VOICESTAR] Audio Stream Streamed: Rate=%uHz, Channels=%u, Target Latency=%.2fms",
+        sigma_printf("[VOICESTAR] Audio Stream Streamed: Rate=%uHz, Channels=%u, Target Latency=%.2fms",
                        sample_rate, channels, latency);
     }
 
@@ -170,44 +170,44 @@ public:
         m_cam.target_fps = target_fps;
         m_cam.inference_time_ms = 1000.0f / (float)target_fps * 0.45f;
 
-        sigma_log_info("[DEEPLIVECAM] Face Swap configuration loaded: Model=%s, TargetFPS=%u, EstimatedInference=%.2fms",
+        sigma_printf("[DEEPLIVECAM] Face Swap configuration loaded: Model=%s, TargetFPS=%u, EstimatedInference=%.2fms",
                        m_cam.face_model, target_fps, m_cam.inference_time_ms);
     }
 
     void run_claudecode_healer(const char* file_path, const char* problem_desc) {
-        sigma_log_info("[CLAUDE-CODE] ====== CLAUDE-CODE CLI SELF-HEAL TRIGGERED ======");
-        sigma_log_info("[CLAUDE-CODE] Target file: %s", file_path);
-        sigma_log_info("[CLAUDE-CODE] Problem description: %s", problem_desc);
+        sigma_printf("[CLAUDE-CODE] ====== CLAUDE-CODE CLI SELF-HEAL TRIGGERED ======");
+        sigma_printf("[CLAUDE-CODE] Target file: %s", file_path);
+        sigma_printf("[CLAUDE-CODE] Problem description: %s", problem_desc);
         
         // Simulating Claude Code iterative debug-heal cycle
-        sigma_log_info("[CLAUDE-CODE] Step 1: Performing semantic search over codebase...");
-        sigma_log_info("[CLAUDE-CODE] Step 2: Locating error block and analyzing context...");
-        sigma_log_info("[CLAUDE-CODE] Step 3: Triggered tool [replace_file_content] to apply atomic correction.");
-        sigma_log_info("[CLAUDE-CODE] Step 4: Compiling target binary... VERIFIED PASS.");
-        sigma_log_info("[CLAUDE-CODE] Status: Issue resolved autonomously. Codebase fully certified.");
-        sigma_log_info("[CLAUDE-CODE] ===================================================");
+        sigma_printf("[CLAUDE-CODE] Step 1: Performing semantic search over codebase...");
+        sigma_printf("[CLAUDE-CODE] Step 2: Locating error block and analyzing context...");
+        sigma_printf("[CLAUDE-CODE] Step 3: Triggered tool [replace_file_content] to apply atomic correction.");
+        sigma_printf("[CLAUDE-CODE] Step 4: Compiling target binary... VERIFIED PASS.");
+        sigma_printf("[CLAUDE-CODE] Status: Issue resolved autonomously. Codebase fully certified.");
+        sigma_printf("[CLAUDE-CODE] ===================================================");
     }
 
     void initiate_training(ModelArchitecture model, const char* dataset_name, sigma_u32 epochs) {
         const char* model_label = get_model_label(model);
-        sigma_log_info("[EDGEML] ====== STARTING ATTESTED QLORA FINE-TUNING ======");
-        sigma_log_info("[EDGEML] Model Target: %s", model_label);
-        sigma_log_info("[EDGEML] Fine-Tuning Setups: Rank=%u | Alpha=%u | Dropout=%.3f | Modules=%s",
+        sigma_printf("[EDGEML] ====== STARTING ATTESTED QLORA FINE-TUNING ======");
+        sigma_printf("[EDGEML] Model Target: %s", model_label);
+        sigma_printf("[EDGEML] Fine-Tuning Setups: Rank=%u | Alpha=%u | Dropout=%.3f | Modules=%s",
                        m_qlora.rank, m_qlora.alpha, m_qlora.dropout, m_qlora.target_modules);
-        sigma_log_info("[EDGEML] Training Dataset: %s (Attested secure read)", dataset_name);
-        sigma_log_info("[EDGEML] Allocation: Direct Silicon AVX-512 Shards");
+        sigma_printf("[EDGEML] Training Dataset: %s (Attested secure read)", dataset_name);
+        sigma_printf("[EDGEML] Allocation: Direct Silicon AVX-512 Shards");
 
         float loss = 1.95f;
         for (sigma_u32 epoch = 1; epoch <= epochs; epoch++) {
             loss -= 0.28f * (float)epoch / (float)(epoch + 1);
             if (loss < 0.08f) loss = 0.075f;
-            sigma_log_info("[EDGEML]   - Epoch %u/%u | QLoRA Cross-Entropy Loss: %.4f | Grad Norm: 0.14",
+            sigma_printf("[EDGEML]   - Epoch %u/%u | QLoRA Cross-Entropy Loss: %.4f | Grad Norm: 0.14",
                            epoch, epochs, loss);
         }
         
         m_trained_epochs += epochs;
-        sigma_log_info("[EDGEML] Attestation: SFT weights cryptographically signed via Dilithium-5.");
-        sigma_log_info("[EDGEML] ===================================================");
+        sigma_printf("[EDGEML] Attestation: SFT weights cryptographically signed via Dilithium-5.");
+        sigma_printf("[EDGEML] ===================================================");
     }
 
     void register_agent(const char* name, const char* role, sigma_u32 depth) {
@@ -226,32 +226,32 @@ public:
         agent.persistent = SIGMA_TRUE;
         
         m_active_agents++;
-        sigma_log_info("[AGENT] Spawned AutoGPT workflow agent: %s (%s, Depth: %u)",
+        sigma_printf("[AGENT] Spawned AutoGPT workflow agent: %s (%s, Depth: %u)",
                        name, role, depth);
     }
 
     void run_multi_agent_cooperation() {
         if (m_active_agents < 2) {
-            sigma_log_err("[AGENT] Error: Multi-agent OWL orchestration requires at least 2 active agents.");
+            sigma_printf("[AGENT] Error: Multi-agent OWL orchestration requires at least 2 active agents.");
             return;
         }
         
-        sigma_log_info("[OWL] ====== OWL COOPERATIVE AGENT ORCHESTRATION ======");
-        sigma_log_info("[OWL] Proxy Server: Converting Model Context Protocol (MCP) to OpenAPI HTTP...");
+        sigma_printf("[OWL] ====== OWL COOPERATIVE AGENT ORCHESTRATION ======");
+        sigma_printf("[OWL] Proxy Server: Converting Model Context Protocol (MCP) to OpenAPI HTTP...");
         
-        sigma_log_info("[OWL] Agent [ %s ] proposes plan to resolve context switching latency.", m_agents[0].name);
-        sigma_log_info("[OWL] Agent [ %s ] audits virtual memory slab alignment...", m_agents[1].name);
-        sigma_log_info("[OWL] Status: Task accomplished cooperatively. Attestation verified.");
-        sigma_log_info("[OWL] =================================================");
+        sigma_printf("[OWL] Agent [ %s ] proposes plan to resolve context switching latency.", m_agents[0].name);
+        sigma_printf("[OWL] Agent [ %s ] audits virtual memory slab alignment...", m_agents[1].name);
+        sigma_printf("[OWL] Status: Task accomplished cooperatively. Attestation verified.");
+        sigma_printf("[OWL] =================================================");
     }
 
     void index_embeddings(const char* text_block) {
         if (m_embedding_count >= 1024) m_embedding_count = 0;
         
         // Simulating OpenAI Text Embedding 3 (large) 1536-dimensional projection
-        sigma_log_info("[RAGFLOW] Graph-Parsing semantic block with chunk size %u...", m_rag.chunk_size);
-        sigma_log_info("[RAGFLOW] Text Block: \"%s\"", text_block);
-        sigma_log_info("[RAGFLOW] Generated embedding signature; Index status: COMMITTED (Threshold: %.2f)", m_rag.similarity_threshold);
+        sigma_printf("[RAGFLOW] Graph-Parsing semantic block with chunk size %u...", m_rag.chunk_size);
+        sigma_printf("[RAGFLOW] Text Block: \"%s\"", text_block);
+        sigma_printf("[RAGFLOW] Generated embedding signature; Index status: COMMITTED (Threshold: %.2f)", m_rag.similarity_threshold);
         m_embedding_count++;
     }
 

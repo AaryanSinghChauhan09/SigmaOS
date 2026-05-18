@@ -22,20 +22,20 @@ public:
 
     void init() {
         m_exam_mode_active = false;
-        sigma_log_info("[EDU_PROF] Sigma Education Profile v1.0 initialized.");
+        sigma_printf("[EDU_PROF] Sigma Education Profile v1.0 initialized.");
     }
 
     void toggle_exam_mode(bool enable) {
         m_exam_mode_active = enable;
         if (enable) {
-            sigma_log_info("[EDU_PROF] EXAM MODE ENGAGED. Locking network to whitelist, disabling clipboard.");
+            sigma_printf("[EDU_PROF] EXAM MODE ENGAGED. Locking network to whitelist, disabling clipboard.");
         } else {
-            sigma_log_info("[EDU_PROF] Exam Mode Disabled. Normal operation resumed.");
+            sigma_printf("[EDU_PROF] Exam Mode Disabled. Normal operation resumed.");
         }
     }
 
     void broadcast_screen(const char* teacher_ip) {
-        sigma_log_info("[EDU_PROF] Casting screen buffer to teacher terminal at %s...", teacher_ip);
+        sigma_printf("[EDU_PROF] Casting screen buffer to teacher terminal at %s...", teacher_ip);
     }
 
 private:

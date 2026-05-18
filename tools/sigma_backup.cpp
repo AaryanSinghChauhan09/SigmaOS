@@ -32,13 +32,13 @@ public:
     void init() {
         m_snap_count = 0;
         m_total_bytes_backed = 0;
-        sigma_log_info("[BACKUP] Sigma Backup CLI v1.0 initialized.");
-        sigma_log_info("[BACKUP] Mode: Incremental | Encryption: PQC-AES256 | Journal: ACTIVE");
+        sigma_printf("[BACKUP] Sigma Backup CLI v1.0 initialized.");
+        sigma_printf("[BACKUP] Mode: Incremental | Encryption: PQC-AES256 | Journal: ACTIVE");
     }
 
     void create_snapshot(const char* label, sigma_u64 size_bytes) {
         if (m_snap_count >= MAX_SNAPS) {
-            sigma_log_error("[BACKUP] Snapshot limit reached (%u). Prune old snapshots.", MAX_SNAPS);
+            sigma_printfor("[BACKUP] Snapshot limit reached (%u). Prune old snapshots.", MAX_SNAPS);
             return;
         }
         BackupSnapshot& s = m_snaps[m_snap_count];
@@ -52,7 +52,7 @@ public:
         s.verified   = 1;
         m_snap_count++;
         m_total_bytes_backed += size_bytes;
-        sigma_log_info("[BACKUP] Snapshot '%s' created: %llu bytes, %u blocks, PQC-encrypted.",
+        sigma_printf("[BACKUP] Snapshot '%s' created: %llu bytes, %u blocks, PQC-encrypted.",
                        label, size_bytes, s.block_count);
     }
 
@@ -62,26 +62,26 @@ public:
             while (m_snaps[i].label[j] == label[j] && label[j]) j++;
             if (!label[j] && !m_snaps[i].label[j]) {
                 if (!m_snaps[i].verified) {
-                    sigma_log_error("[BACKUP] Snapshot '%s' failed integrity check. Aborting.", label);
+                    sigma_printfor("[BACKUP] Snapshot '%s' failed integrity check. Aborting.", label);
                     return;
                 }
-                sigma_log_info("[BACKUP] Restoring '%s' (%llu bytes)...", label, m_snaps[i].size_bytes);
-                sigma_log_info("[BACKUP] Decryption: OK | Journal replay: OK | Restore: COMPLETE.");
+                sigma_printf("[BACKUP] Restoring '%s' (%llu bytes)...", label, m_snaps[i].size_bytes);
+                sigma_printf("[BACKUP] Decryption: OK | Journal replay: OK | Restore: COMPLETE.");
                 return;
             }
         }
-        sigma_log_error("[BACKUP] Snapshot '%s' not found.", label);
+        sigma_printfor("[BACKUP] Snapshot '%s' not found.", label);
     }
 
     void list_snapshots() const {
-        sigma_log_info("[BACKUP] ===== Snapshot Registry =====");
-        sigma_log_info("[BACKUP] %-24s %-16s %-8s", "LABEL", "SIZE(bytes)", "STATUS");
+        sigma_printf("[BACKUP] ===== Snapshot Registry =====");
+        sigma_printf("[BACKUP] %-24s %-16s %-8s", "LABEL", "SIZE(bytes)", "STATUS");
         for (sigma_u32 i = 0; i < m_snap_count; i++) {
-            sigma_log_info("[BACKUP] %-24s %-16llu %s",
+            sigma_printf("[BACKUP] %-24s %-16llu %s",
                 m_snaps[i].label, m_snaps[i].size_bytes,
                 m_snaps[i].verified ? "VERIFIED" : "UNVERIFIED");
         }
-        sigma_log_info("[BACKUP] Total: %u snapshots | %llu bytes backed up.", m_snap_count, m_total_bytes_backed);
+        sigma_printf("[BACKUP] Total: %u snapshots | %llu bytes backed up.", m_snap_count, m_total_bytes_backed);
     }
 
 private:

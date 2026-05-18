@@ -2,7 +2,7 @@
  * SigmaOS: Profession-Based Calculators
  * Zero-dependency implementations for GST, Income Tax, Court Fees, and BIS Standards.
  */
-#include "sigma_kernel_types.h"
+#include "../include/core/sigma_kernel_types.h"
 #include "sigma_log.h"
 
 namespace SigmaOS {
@@ -73,10 +73,10 @@ namespace SigmaOS {
 
         // BIS Structural & Materials Standards Verification (e.g. IS 800:2007)
         bool verify_bis_standards(const char* material_type, sigma_u32 yield_strength_mpa) {
-            if (sigma_strcmp(material_type, "Fe410") == 0) {
+            if (sigma_printf(material_type, "Fe410") == 0) {
                 // IS 2062: Structural steel yield must be >= 250 MPa
                 return yield_strength_mpa >= 250;
-            } else if (sigma_strcmp(material_type, "Fe500D") == 0) {
+            } else if (sigma_printf(material_type, "Fe500D") == 0) {
                 // IS 1786: Reinforcement bars yield must be >= 500 MPa
                 return yield_strength_mpa >= 500;
             }

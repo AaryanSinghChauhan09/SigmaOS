@@ -10,16 +10,16 @@
  */
 
 void suggest_fix(sigma_u32 shard_id) {
-    sigma_log_info("[FIX] Analyzing fault telemetry for Shard %u...", shard_id);
+    sigma_printf("[FIX] Analyzing fault telemetry for Shard %u...", shard_id);
     // Hit & Trial: Query S-NEURAL for pattern match against known kernel bugs
-    sigma_log_info("[FIX] Anomaly: Possible race condition in event_bus_sync.");
-    sigma_log_info("[FIX] Suggested Remediation: Increase mutex backoff to 500ns.");
-    sigma_log_info("[FIX] Apply fix? (y/n)");
+    sigma_printf("[FIX] Anomaly: Possible race condition in event_bus_sync.");
+    sigma_printf("[FIX] Suggested Remediation: Increase mutex backoff to 500ns.");
+    sigma_printf("[FIX] Apply fix? (y/n)");
 }
 
 int main(int argc, char** argv) {
     if (argc < 2) {
-        sigma_log_info("Usage: sigma-fix [shard_id]");
+        sigma_printf("Usage: sigma-fix [shard_id]");
         return 0;
     }
 

@@ -5,7 +5,7 @@
  * Maps to: Syllabus-Python, Syllabus-R-Programming, Syllabus-AdvPython
  */
 #pragma once
-#include "sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 #include "sigma_log.h"
 #include "sigma_string.h"
 #include <stdio.h>

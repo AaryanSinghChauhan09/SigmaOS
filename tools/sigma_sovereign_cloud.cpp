@@ -22,18 +22,18 @@ public:
 
     void init() {
         m_active_hypervisors = 0;
-        sigma_log_info("[CLOUD_OS] Sigma Sovereign Cloud OS v1.0 initialized.");
+        sigma_printf("[CLOUD_OS] Sigma Sovereign Cloud OS v1.0 initialized.");
     }
 
     void deploy_hypervisor(const char* ip) {
         if (m_active_hypervisors >= 256) return;
         m_active_hypervisors++;
-        sigma_log_info("[CLOUD_OS] Deployed Sovereign Hypervisor to bare-metal node %s.", ip);
+        sigma_printf("[CLOUD_OS] Deployed Sovereign Hypervisor to bare-metal node %s.", ip);
     }
 
     void migrate_shard(const char* shard_name, const char* target_ip) {
-        sigma_log_info("[CLOUD_OS] Live migrating shard '%s' to cloud node %s...", shard_name, target_ip);
-        sigma_log_info("[CLOUD_OS] Memory delta synced. Execution transferred.");
+        sigma_printf("[CLOUD_OS] Live migrating shard '%s' to cloud node %s...", shard_name, target_ip);
+        sigma_printf("[CLOUD_OS] Memory delta synced. Execution transferred.");
     }
 
 private:

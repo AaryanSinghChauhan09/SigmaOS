@@ -23,21 +23,21 @@ public:
         m_active = false;
         m_current_x = 0.0f;
         m_current_y = 0.0f;
-        sigma_log_info("[ROBOTICS] Sigma Robotics Planner v1.0 initialized.");
+        sigma_printf("[ROBOTICS] Sigma Robotics Planner v1.0 initialized.");
     }
 
     void set_target(float x, float y) {
         m_target_x = x;
         m_target_y = y;
         m_active = true;
-        sigma_log_info("[ROBOTICS] Target coordinates set: X=%.2f, Y=%.2f", x, y);
+        sigma_printf("[ROBOTICS] Target coordinates set: X=%.2f, Y=%.2f", x, y);
     }
 
     void step_kinematics() {
         if (!m_active) return;
-        sigma_log_info("[ROBOTICS] Calculating A* pathfinding and motor vectors...");
+        sigma_printf("[ROBOTICS] Calculating A* pathfinding and motor vectors...");
         /* Simulated stepping */
-        sigma_log_info("[ROBOTICS] Motor output generated. Avoiding obstacles.");
+        sigma_printf("[ROBOTICS] Motor output generated. Avoiding obstacles.");
     }
 
 private:

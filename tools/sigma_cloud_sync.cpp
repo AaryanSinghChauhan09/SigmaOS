@@ -37,8 +37,8 @@ public:
 
     void init() {
         m_task_count = 0;
-        sigma_log_info("[CLOUDSYNC] Sigma Cloud Sync v1.0 initialized.");
-        sigma_log_info("[CLOUDSYNC] End-to-End PQC Encryption: ENABLED.");
+        sigma_printf("[CLOUDSYNC] Sigma Cloud Sync v1.0 initialized.");
+        sigma_printf("[CLOUDSYNC] End-to-End PQC Encryption: ENABLED.");
     }
 
     void add_task(const char* local, const char* remote, CloudProvider provider, sigma_u8 encrypt) {
@@ -51,11 +51,11 @@ public:
         t.provider = provider;
         t.pqc_encrypted = encrypt;
         t.last_sync_time = 0;
-        sigma_log_info("[CLOUDSYNC] Task added: '%s' -> '%s'", local, remote);
+        sigma_printf("[CLOUDSYNC] Task added: '%s' -> '%s'", local, remote);
     }
 
     void execute_sync() {
-        sigma_log_info("[CLOUDSYNC] Starting batch sync across %u tasks...", m_task_count);
+        sigma_printf("[CLOUDSYNC] Starting batch sync across %u tasks...", m_task_count);
         for (sigma_u32 i = 0; i < m_task_count; i++) {
             const char* p_str = "UNKNOWN";
             switch (m_tasks[i].provider) {
@@ -65,12 +65,12 @@ public:
                 case CloudProvider::SIGMA_S3: p_str = "SigmaS3"; break;
             }
             if (m_tasks[i].pqc_encrypted) {
-                sigma_log_info("[CLOUDSYNC] [%s] Encrypting '%s' with PQC-Kyber...", p_str, m_tasks[i].local_path);
+                sigma_printf("[CLOUDSYNC] [%s] Encrypting '%s' with PQC-Kyber...", p_str, m_tasks[i].local_path);
             }
-            sigma_log_info("[CLOUDSYNC] [%s] Pushing to '%s'...", p_str, m_tasks[i].remote_path);
+            sigma_printf("[CLOUDSYNC] [%s] Pushing to '%s'...", p_str, m_tasks[i].remote_path);
             m_tasks[i].last_sync_time = 1; /* Dummy updated time */
         }
-        sigma_log_info("[CLOUDSYNC] Batch sync COMPLETE.");
+        sigma_printf("[CLOUDSYNC] Batch sync COMPLETE.");
     }
 
 private:

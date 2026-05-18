@@ -73,21 +73,21 @@ DataSet DataPreprocessor::remove_outliers_zscore(const DataSet& ds, double thres
 // ─── ETL Pipeline ─────────────────────────────────────────────────────────────
 
 int ETLPipeline::run() {
-    sigma_klog(LOG_INFO, "[SigmaWarehouse] ETL pipeline '%s' starting\n", m_name);
+    sigma_klog(sigma_printf, "[SigmaWarehouse] ETL pipeline '%s' starting\n", m_name);
     // 1. EXTRACT: read from source
     DataSet raw = m_extractor->extract();
-    sigma_klog(LOG_INFO, "[SigmaWarehouse] Extracted %u rows\n", raw.n_samples);
+    sigma_klog(sigma_printf, "[SigmaWarehouse] Extracted %u rows\n", raw.n_samples);
 
     // 2. TRANSFORM: apply all transform steps
     DataSet current = raw;
     for (sigma_u32 i = 0; i < m_transform_count; i++) {
         current = m_transforms[i]->transform(current);
-        sigma_klog(LOG_DEBUG, "[SigmaWarehouse] Transform %u: %u rows\n", i, current.n_samples);
+        sigma_klog(sigma_printf, "[SigmaWarehouse] Transform %u: %u rows\n", i, current.n_samples);
     }
 
     // 3. LOAD: write to destination
     int rc = m_loader->load(current);
-    sigma_klog(LOG_INFO, "[SigmaWarehouse] ETL complete: %u rows loaded, rc=%d\n",
+    sigma_klog(sigma_printf, "[SigmaWarehouse] ETL complete: %u rows loaded, rc=%d\n",
                current.n_samples, rc);
     return rc;
 }
@@ -114,13 +114,13 @@ DataSet DataCube::roll_up(sigma_u32 dim_idx, AggFunc agg) {
     DataSet result;
     // Group by all other dimensions, aggregate on dim_idx
     // (simplified: aggregate over entire dimension)
-    sigma_klog(LOG_DEBUG, "[DataCube] ROLL UP dim=%u\n", dim_idx);
+    sigma_klog(sigma_printf, "[DataCube] ROLL UP dim=%u\n", dim_idx);
     return aggregate_by_dim(dim_idx, agg);
 }
 
 // Drill down: more detailed view
 DataSet DataCube::drill_down(sigma_u32 dim_idx) {
-    sigma_klog(LOG_DEBUG, "[DataCube] DRILL DOWN dim=%u\n", dim_idx);
+    sigma_klog(sigma_printf, "[DataCube] DRILL DOWN dim=%u\n", dim_idx);
     return m_ds; // Already at finest granularity
 }
 

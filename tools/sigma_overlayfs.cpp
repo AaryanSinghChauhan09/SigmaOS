@@ -38,7 +38,7 @@ public:
 
         if (sigma_strcmp(cmd.c_str(), "mount") == 0) {
             if (argc < 5) {
-                sigma_log_error("[OVERLAY-CLI] Error: 'mount' requires <lowerdir> <upperdir> <mergeddir>");
+                sigma_printfor("[OVERLAY-CLI] Error: 'mount' requires <lowerdir> <upperdir> <mergeddir>");
                 return;
             }
             const char* lower = argv[2];
@@ -47,7 +47,7 @@ public:
             overlay_mount(lower, upper, merged);
         } else if (sigma_strcmp(cmd.c_str(), "write") == 0) {
             if (argc < 4) {
-                sigma_log_error("[OVERLAY-CLI] Error: 'write' requires <filename> <content>");
+                sigma_printfor("[OVERLAY-CLI] Error: 'write' requires <filename> <content>");
                 return;
             }
             const char* filename = argv[2];
@@ -61,11 +61,11 @@ public:
     }
 
     void print_usage() {
-        sigma_log_info("Σ SigmaOS Overlay Union FS Governor (sigma-overlay) v1.0");
-        sigma_log_info("Usage:");
-        sigma_log_info("  sigma-overlay mount <lowerdir> <upperdir> <mergeddir> Mount a merged OverlayFS partition");
-        sigma_log_info("  sigma-overlay write <filename> <content>               Write data (triggers Copy-Up-On-Write)");
-        sigma_log_info("  sigma-overlay list                                     List the merged filesystem layout");
+        sigma_printf("Σ SigmaOS Overlay Union FS Governor (sigma-overlay) v1.0");
+        sigma_printf("Usage:");
+        sigma_printf("  sigma-overlay mount <lowerdir> <upperdir> <mergeddir> Mount a merged OverlayFS partition");
+        sigma_printf("  sigma-overlay write <filename> <content>               Write data (triggers Copy-Up-On-Write)");
+        sigma_printf("  sigma-overlay list                                     List the merged filesystem layout");
     }
 
 private:

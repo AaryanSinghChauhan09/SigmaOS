@@ -22,18 +22,18 @@ public:
 
     void init() {
         m_unread_count = 0;
-        sigma_log_info("[NOTIFY] Sigma Notification Center v1.0 initialized.");
+        sigma_printf("[NOTIFY] Sigma Notification Center v1.0 initialized.");
     }
 
     void push_alert(const char* title, const char* message, sigma_u8 priority) {
         if (m_unread_count >= 128) return;
         m_unread_count++;
         const char* prio_str = (priority > 1) ? "CRITICAL" : (priority == 1) ? "HIGH" : "NORMAL";
-        sigma_log_info("[NOTIFY] New Alert [%s]: %s - %s", prio_str, title, message);
+        sigma_printf("[NOTIFY] New Alert [%s]: %s - %s", prio_str, title, message);
     }
 
     void clear_all() {
-        sigma_log_info("[NOTIFY] Cleared %u unread notifications.", m_unread_count);
+        sigma_printf("[NOTIFY] Cleared %u unread notifications.", m_unread_count);
         m_unread_count = 0;
     }
 

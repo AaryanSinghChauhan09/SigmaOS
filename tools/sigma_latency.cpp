@@ -31,7 +31,7 @@ public:
         m_profile      = LatencyProfile::STANDARD;
         m_target_us    = 4000u;
         m_cpu_affinity = 0u;
-        sigma_log_info("[LATENCY] Sigma Latency Optimizer v1.0 ready.");
+        sigma_printf("[LATENCY] Sigma Latency Optimizer v1.0 ready.");
     }
 
     void set_profile(LatencyProfile p) {
@@ -43,23 +43,23 @@ public:
             case LatencyProfile::ULTRA:    m_target_us = 100u;  break;
             default: break;
         }
-        sigma_log_info("[LATENCY] Profile set: target=%uus. Quantum adjustment: ACTIVE.", m_target_us);
+        sigma_printf("[LATENCY] Profile set: target=%uus. Quantum adjustment: ACTIVE.", m_target_us);
         apply_kernel_tuning();
     }
 
     void pin_cpu(sigma_u32 cpu_id) {
         m_cpu_affinity = cpu_id;
-        sigma_log_info("[LATENCY] CPU affinity pinned to core %u. IRQ balancing: DISABLED.", cpu_id);
+        sigma_printf("[LATENCY] CPU affinity pinned to core %u. IRQ balancing: DISABLED.", cpu_id);
     }
 
     void report() const {
-        sigma_log_info("[LATENCY] === Latency Profile Report ===");
-        sigma_log_info("[LATENCY] Active profile : %s",
+        sigma_printf("[LATENCY] === Latency Profile Report ===");
+        sigma_printf("[LATENCY] Active profile : %s",
             m_profile == LatencyProfile::ULTRA   ? "ULTRA"    :
             m_profile == LatencyProfile::ESPORTS ? "ESPORTS"  :
             m_profile == LatencyProfile::GAMING  ? "GAMING"   : "STANDARD");
-        sigma_log_info("[LATENCY] Target latency : %u us", m_target_us);
-        sigma_log_info("[LATENCY] CPU affinity   : core %u", m_cpu_affinity);
+        sigma_printf("[LATENCY] Target latency : %u us", m_target_us);
+        sigma_printf("[LATENCY] CPU affinity   : core %u", m_cpu_affinity);
     }
 
 private:
@@ -67,7 +67,7 @@ private:
 
     void apply_kernel_tuning() {
         /* In production: write sched_rt_period_us, sched_rt_runtime_us, etc. */
-        sigma_log_info("[LATENCY] Kernel tuning applied: sched_quantum=%uus, LLC-pin: %s",
+        sigma_printf("[LATENCY] Kernel tuning applied: sched_quantum=%uus, LLC-pin: %s",
             m_target_us, (m_profile >= LatencyProfile::ESPORTS) ? "YES" : "NO");
     }
 

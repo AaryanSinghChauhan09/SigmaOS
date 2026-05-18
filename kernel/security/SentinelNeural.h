@@ -10,7 +10,7 @@
  * ML-based anomaly detection with zero external dependencies.
  */
 #pragma once
-#include "sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 
 namespace Sigma::Security {
 

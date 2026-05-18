@@ -22,19 +22,19 @@ public:
 
     void init() {
         m_attached_shards = 0;
-        sigma_log_info("[DEBUG_CLI] Sigma Debug CLI v1.0 initialized.");
+        sigma_printf("[DEBUG_CLI] Sigma Debug CLI v1.0 initialized.");
     }
 
     void attach(const char* target_shard) {
         if (m_attached_shards >= 32) return;
         m_attached_shards++;
-        sigma_log_info("[DEBUG_CLI] Attached to shard '%s'. Injecting tracepoints...", target_shard);
+        sigma_printf("[DEBUG_CLI] Attached to shard '%s'. Injecting tracepoints...", target_shard);
     }
 
     void dump_registers() {
-        sigma_log_info("[DEBUG_CLI] --- REGISTER DUMP ---");
-        sigma_log_info("[DEBUG_CLI] RAX: 0x0000000000000000  RBX: 0x00007FFFFFFFFFFF");
-        sigma_log_info("[DEBUG_CLI] RCX: 0x0000000000000042  RDX: 0x0000000000000000");
+        sigma_printf("[DEBUG_CLI] --- REGISTER DUMP ---");
+        sigma_printf("[DEBUG_CLI] RAX: 0x0000000000000000  RBX: 0x00007FFFFFFFFFFF");
+        sigma_printf("[DEBUG_CLI] RCX: 0x0000000000000042  RDX: 0x0000000000000000");
     }
 
 private:

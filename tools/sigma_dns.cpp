@@ -21,19 +21,19 @@ public:
     const char* type_name() const noexcept override { return "SigmaDNSManager"; }
 
     void init() {
-        sigma_log_info("[DNS] Sigma DNS Manager v1.0 initialized.");
-        sigma_log_info("[DNS] Mode: DNS-over-HTTPS with PQC signature validation.");
+        sigma_printf("[DNS] Sigma DNS Manager v1.0 initialized.");
+        sigma_printf("[DNS] Mode: DNS-over-HTTPS with PQC signature validation.");
     }
 
     void resolve(const char* hostname) {
-        sigma_log_info("[DNS] Resolving '%s' via encrypted DoH channel...", hostname);
-        sigma_log_info("[DNS] DNSSEC chain validated.");
-        sigma_log_info("[DNS] Response: 93.184.216.34 (TTL 300)");
+        sigma_printf("[DNS] Resolving '%s' via encrypted DoH channel...", hostname);
+        sigma_printf("[DNS] DNSSEC chain validated.");
+        sigma_printf("[DNS] Response: 93.184.216.34 (TTL 300)");
     }
 
     void add_blocklist(const char* blocklist_url) {
-        sigma_log_info("[DNS] Fetching and applying blocklist from %s...", blocklist_url);
-        sigma_log_info("[DNS] 1,234,567 domains blocked (ads/tracking/malware).");
+        sigma_printf("[DNS] Fetching and applying blocklist from %s...", blocklist_url);
+        sigma_printf("[DNS] 1,234,567 domains blocked (ads/tracking/malware).");
     }
 
 private:

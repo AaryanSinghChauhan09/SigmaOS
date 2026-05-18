@@ -24,24 +24,24 @@ public:
         m_screen_reader = false;
         m_high_contrast = false;
         m_magnifier_zoom = 1.0f;
-        sigma_log_info("[ACCESS] Sigma Accessibility Hub v1.0 initialized.");
+        sigma_printf("[ACCESS] Sigma Accessibility Hub v1.0 initialized.");
     }
 
     void toggle_screen_reader(bool enable) {
         m_screen_reader = enable;
-        sigma_log_info("[ACCESS] Screen Reader: %s", enable ? "ON" : "OFF");
+        sigma_printf("[ACCESS] Screen Reader: %s", enable ? "ON" : "OFF");
     }
 
     void toggle_high_contrast(bool enable) {
         m_high_contrast = enable;
-        sigma_log_info("[ACCESS] High Contrast Mode: %s", enable ? "ON" : "OFF");
+        sigma_printf("[ACCESS] High Contrast Mode: %s", enable ? "ON" : "OFF");
         /* Triggers compositor to invert/adjust colors */
     }
 
     void set_magnifier(float zoom_level) {
         if (zoom_level < 1.0f) zoom_level = 1.0f;
         m_magnifier_zoom = zoom_level;
-        sigma_log_info("[ACCESS] Magnifier Zoom Level: %.2fx", zoom_level);
+        sigma_printf("[ACCESS] Magnifier Zoom Level: %.2fx", zoom_level);
     }
 
 private:

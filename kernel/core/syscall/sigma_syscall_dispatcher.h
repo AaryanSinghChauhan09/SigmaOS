@@ -1,3 +1,4 @@
+#include "../../../include/core/sigma_kernel_types.h"
 /*
  * =========================================================================
  * Σ SIGMAOS: SOVEREIGN SYSCALL DISPATCHER
@@ -9,7 +10,7 @@
 #ifndef SIGMA_SYSCALL_DISPATCHER_H
 #define SIGMA_SYSCALL_DISPATCHER_H
 
-#include "sigma_kernel_types.h"
+
 
 #ifdef __cplusplus
 extern "C" {

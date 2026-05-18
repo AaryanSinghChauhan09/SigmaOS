@@ -22,23 +22,23 @@ public:
 
     void init() {
         m_active_nodes = 0;
-        sigma_log_info("[BUILDFARM] Sigma Build Farm v1.0 initialized.");
+        sigma_printf("[BUILDFARM] Sigma Build Farm v1.0 initialized.");
     }
 
     void connect_node(const char* ip_address) {
         if (m_active_nodes >= 64) {
-            sigma_log_error("[BUILDFARM] Max cluster nodes reached.");
+            sigma_printfor("[BUILDFARM] Max cluster nodes reached.");
             return;
         }
         m_active_nodes++;
-        sigma_log_info("[BUILDFARM] Connected build node: %s", ip_address);
+        sigma_printf("[BUILDFARM] Connected build node: %s", ip_address);
     }
 
     void dispatch_build(const char* shard_target) {
         if (m_active_nodes == 0) {
-            sigma_log_error("[BUILDFARM] No nodes available. Building locally...");
+            sigma_printfor("[BUILDFARM] No nodes available. Building locally...");
         } else {
-            sigma_log_info("[BUILDFARM] Dispatching compilation of '%s' to %u nodes...", shard_target, m_active_nodes);
+            sigma_printf("[BUILDFARM] Dispatching compilation of '%s' to %u nodes...", shard_target, m_active_nodes);
         }
     }
 

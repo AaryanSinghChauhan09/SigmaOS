@@ -22,19 +22,19 @@ public:
 
     void init() {
         m_active_mirrors = 0;
-        sigma_log_info("[MIRROR] Sigma Mirror Manager v1.0 initialized.");
+        sigma_printf("[MIRROR] Sigma Mirror Manager v1.0 initialized.");
     }
 
     void add_mirror(const char* url) {
         if (m_active_mirrors >= 16) return;
         m_active_mirrors++;
-        sigma_log_info("[MIRROR] Added sovereign mirror node: %s", url);
+        sigma_printf("[MIRROR] Added sovereign mirror node: %s", url);
     }
 
     void sync_packages() {
-        sigma_log_info("[MIRROR] Resolving fastest PQC-attested mirror...");
-        sigma_log_info("[MIRROR] Downloading registry delta...");
-        sigma_log_info("[MIRROR] Seed synchronization complete.");
+        sigma_printf("[MIRROR] Resolving fastest PQC-attested mirror...");
+        sigma_printf("[MIRROR] Downloading registry delta...");
+        sigma_printf("[MIRROR] Seed synchronization complete.");
     }
 
 private:

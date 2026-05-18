@@ -9,15 +9,15 @@
  */
 
 void debug_shard(sigma_u32 shard_id) {
-    sigma_log_info("[DEBUG] Attaching to Shard %u...", shard_id);
+    sigma_printf("[DEBUG] Attaching to Shard %u...", shard_id);
     // Hit & Trial: Hook into the ISR to sample instruction pointers
-    sigma_log_info("[DEBUG] Sampling instruction stream... No illegal jumps detected.");
-    sigma_log_info("[DEBUG] Memory Usage: 14.2 KB | Anomaly Score: 0.001");
+    sigma_printf("[DEBUG] Sampling instruction stream... No illegal jumps detected.");
+    sigma_printf("[DEBUG] Memory Usage: 14.2 KB | Anomaly Score: 0.001");
 }
 
 void print_debug_help() {
-    sigma_log_info("SigmaOS Debugger (v14.0)");
-    sigma_log_info("Usage: sigma-debug [shard_id]");
+    sigma_printf("SigmaOS Debugger (v14.0)");
+    sigma_printf("Usage: sigma-debug [shard_id]");
 }
 
 int main(int argc, char** argv) {

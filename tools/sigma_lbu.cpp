@@ -39,7 +39,7 @@ public:
 
         if (sigma_strcmp(cmd.c_str(), "track") == 0) {
             if (argc < 3) {
-                sigma_log_error("[LBU-CLI] Error: 'track' requires <file_path>");
+                sigma_printfor("[LBU-CLI] Error: 'track' requires <file_path>");
                 return;
             }
             const char* path = argv[2];
@@ -56,12 +56,12 @@ public:
     }
 
     void print_usage() {
-        sigma_log_info("Σ SigmaOS Local State Backup Governor (sigma-lbu) v1.0");
-        sigma_log_info("Usage:");
-        sigma_log_info("  sigma-lbu track <file_path>   Add path to persistent configuration manifest");
-        sigma_log_info("  sigma-lbu commit              Compress and commit dynamic RAM state to boot flash");
-        sigma_log_info("  sigma-lbu restore             Re-extract committed state back into memory ramdisk");
-        sigma_log_info("  sigma-lbu audit               Verify checksums and audit persistence manifest");
+        sigma_printf("Σ SigmaOS Local State Backup Governor (sigma-lbu) v1.0");
+        sigma_printf("Usage:");
+        sigma_printf("  sigma-lbu track <file_path>   Add path to persistent configuration manifest");
+        sigma_printf("  sigma-lbu commit              Compress and commit dynamic RAM state to boot flash");
+        sigma_printf("  sigma-lbu restore             Re-extract committed state back into memory ramdisk");
+        sigma_printf("  sigma-lbu audit               Verify checksums and audit persistence manifest");
     }
 
 private:

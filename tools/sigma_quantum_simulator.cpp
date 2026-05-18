@@ -23,28 +23,28 @@ public:
     void init() {
         m_qubit_capacity = 32; /* Can simulate 32 ideal qubits using 32GB RAM */
         m_active_circuit = false;
-        sigma_log_info("[QUANTUM] Sigma Quantum Simulator v1.0 initialized.");
-        sigma_log_info("[QUANTUM] Qubit simulation capacity: %u qubits.", m_qubit_capacity);
+        sigma_printf("[QUANTUM] Sigma Quantum Simulator v1.0 initialized.");
+        sigma_printf("[QUANTUM] Qubit simulation capacity: %u qubits.", m_qubit_capacity);
     }
 
     void load_circuit(sigma_u32 qubits) {
         if (qubits > m_qubit_capacity) {
-            sigma_log_error("[QUANTUM] Circuit exceeds simulator capacity (%u > %u).", qubits, m_qubit_capacity);
+            sigma_printfor("[QUANTUM] Circuit exceeds simulator capacity (%u > %u).", qubits, m_qubit_capacity);
             return;
         }
         m_active_circuit = true;
         m_current_qubits = qubits;
-        sigma_log_info("[QUANTUM] Loaded quantum circuit with %u qubits.", qubits);
+        sigma_printf("[QUANTUM] Loaded quantum circuit with %u qubits.", qubits);
     }
 
     void execute_circuit() {
         if (!m_active_circuit) {
-            sigma_log_error("[QUANTUM] No circuit loaded.");
+            sigma_printfor("[QUANTUM] No circuit loaded.");
             return;
         }
-        sigma_log_info("[QUANTUM] Executing tensor network contraction...");
+        sigma_printf("[QUANTUM] Executing tensor network contraction...");
         /* Simulate execution */
-        sigma_log_info("[QUANTUM] Execution complete. State vector collapsed.");
+        sigma_printf("[QUANTUM] Execution complete. State vector collapsed.");
         m_active_circuit = false;
     }
 

@@ -8,7 +8,7 @@
  * Zero-dependency kernel math primitives. No STL.
  */
 #pragma once
-#include "sigma_kernel_types.h"
+#include "../../../include/core/sigma_kernel_types.h"
 
 namespace Sigma::Math {
 

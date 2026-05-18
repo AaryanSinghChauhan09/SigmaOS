@@ -21,21 +21,21 @@ public:
 
     void init() {
         m_can_connected = false;
-        sigma_log_info("[AUTODIAG] Sigma Automotive Diagnostics v1.0 initialized.");
+        sigma_printf("[AUTODIAG] Sigma Automotive Diagnostics v1.0 initialized.");
     }
 
     void connect_can_bus() {
         m_can_connected = true;
-        sigma_log_info("[AUTODIAG] Connected to CAN bus network interface.");
+        sigma_printf("[AUTODIAG] Connected to CAN bus network interface.");
     }
 
     void read_obd2() {
         if (!m_can_connected) {
-            sigma_log_error("[AUTODIAG] Not connected to CAN bus.");
+            sigma_printfor("[AUTODIAG] Not connected to CAN bus.");
             return;
         }
-        sigma_log_info("[AUTODIAG] Requesting standard OBD-II PIDs...");
-        sigma_log_info("[AUTODIAG] RPM: 2400 | Speed: 65km/h | Engine Temp: 90C");
+        sigma_printf("[AUTODIAG] Requesting standard OBD-II PIDs...");
+        sigma_printf("[AUTODIAG] RPM: 2400 | Speed: 65km/h | Engine Temp: 90C");
     }
 
 private:

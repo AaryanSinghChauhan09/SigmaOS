@@ -22,20 +22,20 @@ public:
 
     void init() {
         m_rules_count = 0;
-        sigma_log_info("[FIREWALL] Sigma Firewall Daemon v1.0 initialized.");
-        sigma_log_info("[FIREWALL] Policy: DEFAULT DENY ALL INBOUND.");
+        sigma_printf("[FIREWALL] Sigma Firewall Daemon v1.0 initialized.");
+        sigma_printf("[FIREWALL] Policy: DEFAULT DENY ALL INBOUND.");
     }
 
     void allow_port(sigma_u16 port, const char* protocol) {
         if (m_rules_count >= 512) return;
         m_rules_count++;
-        sigma_log_info("[FIREWALL] Rule added: ALLOW INBOUND on %s:%u", protocol, port);
+        sigma_printf("[FIREWALL] Rule added: ALLOW INBOUND on %s:%u", protocol, port);
     }
 
     void deny_ip(const char* ip_address) {
         if (m_rules_count >= 512) return;
         m_rules_count++;
-        sigma_log_info("[FIREWALL] Rule added: DROP ALL from %s", ip_address);
+        sigma_printf("[FIREWALL] Rule added: DROP ALL from %s", ip_address);
     }
 
 private:

@@ -22,20 +22,20 @@ public:
 
     void init() {
         m_settings_changed = 0;
-        sigma_log_info("[PERSONALIZE] Sigma Personalisation CLI v1.0 initialized.");
+        sigma_printf("[PERSONALIZE] Sigma Personalisation CLI v1.0 initialized.");
     }
 
     void set_value(const char* key, const char* value) {
         m_settings_changed++;
-        sigma_log_info("[PERSONALIZE] Setting updated: %s = %s", key, value);
+        sigma_printf("[PERSONALIZE] Setting updated: %s = %s", key, value);
         /* Broadcast to the GUI compositor or appropriate shard */
     }
 
     void dump_preferences() {
-        sigma_log_info("[PERSONALIZE] --- User Preferences ---");
-        sigma_log_info("[PERSONALIZE] ui.theme.dark_mode = true");
-        sigma_log_info("[PERSONALIZE] wm.animations.speed = 0.5");
-        sigma_log_info("[PERSONALIZE] sys.language = en_US");
+        sigma_printf("[PERSONALIZE] --- User Preferences ---");
+        sigma_printf("[PERSONALIZE] ui.theme.dark_mode = true");
+        sigma_printf("[PERSONALIZE] wm.animations.speed = 0.5");
+        sigma_printf("[PERSONALIZE] sys.language = en_US");
     }
 
 private:

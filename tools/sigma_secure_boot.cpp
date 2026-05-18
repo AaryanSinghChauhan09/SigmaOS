@@ -23,49 +23,49 @@ public:
     void init() {
         m_enforce_mode = true;
         m_keys_loaded = 0;
-        sigma_log_info("[SECBOOT] Sigma Secure Boot Manager v1.0 initialized.");
+        sigma_printf("[SECBOOT] Sigma Secure Boot Manager v1.0 initialized.");
         load_platform_keys();
     }
 
     void load_platform_keys() {
-        sigma_log_info("[SECBOOT] Loading PQC-Dilithium Platform Key (PK)...");
+        sigma_printf("[SECBOOT] Loading PQC-Dilithium Platform Key (PK)...");
         m_keys_loaded++;
-        sigma_log_info("[SECBOOT] Loading PQC-Kyber Key Exchange Key (KEK)...");
+        sigma_printf("[SECBOOT] Loading PQC-Kyber Key Exchange Key (KEK)...");
         m_keys_loaded++;
-        sigma_log_info("[SECBOOT] Platform keys loaded successfully.");
+        sigma_printf("[SECBOOT] Platform keys loaded successfully.");
     }
 
     bool verify_image(const char* image_name, const sigma_u8* signature, sigma_u32 sig_len) {
         if (!m_enforce_mode) {
-            sigma_log_info("[SECBOOT] Verification bypassed for '%s' (Audit Mode).", image_name);
+            sigma_printf("[SECBOOT] Verification bypassed for '%s' (Audit Mode).", image_name);
             return true;
         }
 
         if (m_keys_loaded == 0) {
-            sigma_log_error("[SECBOOT] Verification failed for '%s': No keys loaded.", image_name);
+            sigma_printfor("[SECBOOT] Verification failed for '%s': No keys loaded.", image_name);
             return false;
         }
 
         if (!signature || sig_len == 0) {
-            sigma_log_error("[SECBOOT] Verification failed for '%s': Missing signature.", image_name);
+            sigma_printfor("[SECBOOT] Verification failed for '%s': Missing signature.", image_name);
             return false;
         }
 
         /* Simulate PQC verification */
-        sigma_log_info("[SECBOOT] Verifying '%s' with PQC signatures...", image_name);
-        sigma_log_info("[SECBOOT] Image '%s' is AUTHENTIC.", image_name);
+        sigma_printf("[SECBOOT] Verifying '%s' with PQC signatures...", image_name);
+        sigma_printf("[SECBOOT] Image '%s' is AUTHENTIC.", image_name);
         return true;
     }
 
     void set_enforce_mode(bool enforce) {
         m_enforce_mode = enforce;
-        sigma_log_info("[SECBOOT] Secure Boot is now %s.", enforce ? "ENFORCING" : "AUDITING");
+        sigma_printf("[SECBOOT] Secure Boot is now %s.", enforce ? "ENFORCING" : "AUDITING");
     }
 
     void report() const {
-        sigma_log_info("[SECBOOT] === Secure Boot Status ===");
-        sigma_log_info("[SECBOOT] State : %s", m_enforce_mode ? "ENFORCING" : "AUDITING");
-        sigma_log_info("[SECBOOT] Keys  : %u loaded (PQC active)", m_keys_loaded);
+        sigma_printf("[SECBOOT] === Secure Boot Status ===");
+        sigma_printf("[SECBOOT] State : %s", m_enforce_mode ? "ENFORCING" : "AUDITING");
+        sigma_printf("[SECBOOT] Keys  : %u loaded (PQC active)", m_keys_loaded);
     }
 
 private:

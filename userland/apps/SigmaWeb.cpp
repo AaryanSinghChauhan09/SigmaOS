@@ -101,7 +101,7 @@ void SigmaCSSEngine::apply_stylesheet(const char* css, DOMNode* root) {
 
 LayoutBox SigmaCSSEngine::compute_layout(DOMNode* node, const BoxConstraints& parent) {
     LayoutBox box;
-    ComputedStyle& style = node->computed_style;
+    ComputedStyle& style = node->style;
 
     // Display type determines layout mode
     if (style.display == Display::FLEX)        return layout_flex(node, parent);
@@ -172,7 +172,7 @@ int SigmaPHPBridge::execute(const char* script_path, const char* query_string,
     worker.set_env("QUERY_STRING", query_string);
     worker.set_env("REQUEST_METHOD", "GET");
     int rc = worker.execute(output_buf, output_len);
-    sigma_klog(LOG_DEBUG, "[SigmaWeb] PHP %s → %d bytes\n", script_path, (int)output_len);
+    sigma_klog(sigma_printf, "[SigmaWeb] PHP %s → %d bytes\n", script_path, (int)output_len);
     return rc;
 }
 
@@ -182,7 +182,7 @@ int SigmaWebCache::cache_resource(const char* url, const char* data,
     // Store in /sigma/web/cache/<origin>/<url_hash>
     char cache_path[512];
     sigma_u32 hash = fnv1a_hash(url, sigma_strlen(url));
-    sigma_snprintf(cache_path, sizeof(cache_path),
+    sigma_printf(cache_path, sizeof(cache_path),
                    "/sigma/web/cache/%08X", hash);
     SigmaFile* f = sigma_fopen(cache_path, "wb");
     if (!f) return -1;

@@ -22,20 +22,20 @@ public:
 
     void init() {
         m_session_active = false;
-        sigma_log_info("[DISPLAY_MGR] Sigma Display Manager v1.0 initialized.");
+        sigma_printf("[DISPLAY_MGR] Sigma Display Manager v1.0 initialized.");
     }
 
     void render_login_screen() {
-        sigma_log_info("[DISPLAY_MGR] Rendering Sovereign Lock Screen...");
-        sigma_log_info("[DISPLAY_MGR] Waiting for PQC YubiKey or Biometric attestation.");
+        sigma_printf("[DISPLAY_MGR] Rendering Sovereign Lock Screen...");
+        sigma_printf("[DISPLAY_MGR] Waiting for PQC YubiKey or Biometric attestation.");
     }
 
     void authenticate_user(const char* username, bool success) {
         if (success) {
             m_session_active = true;
-            sigma_log_info("[DISPLAY_MGR] User '%s' authenticated. Spawning Zenith Compositor...", username);
+            sigma_printf("[DISPLAY_MGR] User '%s' authenticated. Spawning Zenith Compositor...", username);
         } else {
-            sigma_log_error("[DISPLAY_MGR] Authentication failed for user '%s'.", username);
+            sigma_printfor("[DISPLAY_MGR] Authentication failed for user '%s'.", username);
         }
     }
 

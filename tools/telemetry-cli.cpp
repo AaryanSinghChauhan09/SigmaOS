@@ -14,8 +14,8 @@
 using namespace SigmaOS;
 
 int main() {
-    sigma_log_info("Σ SigmaOS Telemetry Dashboard [Zenith v15.0]");
-    sigma_log_info("---------------------------------------------");
+    sigma_printf("Σ SigmaOS Telemetry Dashboard [Zenith v15.0]");
+    sigma_printf("---------------------------------------------");
     
     // Querying subsystems
     opt_report_efficiency();
@@ -25,10 +25,10 @@ int main() {
     cloud_report_cluster_stats();
     regress_report_certification();
     
-    sigma_log_info("Lattice Integrity: 100% [PQC-Verified]");
-    sigma_log_info("Active Shards: 14 / 14");
-    sigma_log_info("Memory Pressure: 12% (1.5 GB / 12 GB)");
-    sigma_log_info("Entropy Level: HIGH [PQC-Secure]");
+    sigma_printf("Lattice Integrity: 100% [PQC-Verified]");
+    sigma_printf("Active Shards: 14 / 14");
+    sigma_printf("Memory Pressure: 12% (1.5 GB / 12 GB)");
+    sigma_printf("Entropy Level: HIGH [PQC-Secure]");
     
     return 0;
 }

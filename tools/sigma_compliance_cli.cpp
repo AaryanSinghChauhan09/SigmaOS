@@ -38,18 +38,18 @@ public:
     void init() {
         m_check_count   = 0;
         m_passed_count  = 0;
-        sigma_log_info("[COMPLIANCE] Sigma Compliance Dashboard v1.0 initialized.");
-        sigma_log_info("[COMPLIANCE] Frameworks: ISO27001 | GDPR | HIPAA | SOC2 | PCI-DSS");
+        sigma_printf("[COMPLIANCE] Sigma Compliance Dashboard v1.0 initialized.");
+        sigma_printf("[COMPLIANCE] Frameworks: ISO27001 | GDPR | HIPAA | SOC2 | PCI-DSS");
         run_default_checks();
     }
 
     void report() const {
-        sigma_log_info("[COMPLIANCE] ====== COMPLIANCE ATTESTATION REPORT ======");
-        sigma_log_info("[COMPLIANCE] Checks: %u total | %u passed | %u failed",
+        sigma_printf("[COMPLIANCE] ====== COMPLIANCE ATTESTATION REPORT ======");
+        sigma_printf("[COMPLIANCE] Checks: %u total | %u passed | %u failed",
                        m_check_count, m_passed_count, m_check_count - m_passed_count);
-        sigma_log_info("[COMPLIANCE] Compliance Score: %u%%",
+        sigma_printf("[COMPLIANCE] Compliance Score: %u%%",
                        m_check_count ? (m_passed_count * 100u / m_check_count) : 0u);
-        sigma_log_info("[COMPLIANCE] -------------------------------------------");
+        sigma_printf("[COMPLIANCE] -------------------------------------------");
         for (sigma_u32 i = 0; i < m_check_count; i++) {
             const char* fw = "UNKNOWN";
             switch (m_checks[i].framework) {
@@ -60,10 +60,10 @@ public:
                 case ComplianceFramework::PCI_DSS:  fw = "PCI-DSS";  break;
                 default: break;
             }
-            sigma_log_info("[COMPLIANCE] [%s] %-6s %s",
+            sigma_printf("[COMPLIANCE] [%s] %-6s %s",
                 m_checks[i].passed ? "PASS" : "FAIL", fw, m_checks[i].label);
         }
-        sigma_log_info("[COMPLIANCE] ============================================");
+        sigma_printf("[COMPLIANCE] ============================================");
     }
 
 private:

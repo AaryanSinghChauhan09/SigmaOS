@@ -5,7 +5,7 @@
  * Maps to: Syllabus-AIML + Syllabus-AdvPython (ML, DL, NLP)
  */
 #pragma once
-#include "sigma_kernel_types.h"
+#include "../../include/core/sigma_kernel_types.h"
 #include "sigma_log.h"
 #include "sigma_string.h"
 

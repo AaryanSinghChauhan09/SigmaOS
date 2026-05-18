@@ -42,7 +42,7 @@ public:
 
         if (sigma_strcmp(cmd.c_str(), "add") == 0) {
             if (argc < 4) {
-                sigma_log_error("[ZFS-CLI] Error: 'add' requires <dev_path> <size_gb>");
+                sigma_printfor("[ZFS-CLI] Error: 'add' requires <dev_path> <size_gb>");
                 return;
             }
             const char* path = argv[2];
@@ -50,7 +50,7 @@ public:
             zfs_pool_add(path, size);
         } else if (sigma_strcmp(cmd.c_str(), "allocate") == 0) {
             if (argc < 4) {
-                sigma_log_error("[ZFS-CLI] Error: 'allocate' requires <size_gb> <dataset_name>");
+                sigma_printfor("[ZFS-CLI] Error: 'allocate' requires <size_gb> <dataset_name>");
                 return;
             }
             sigma_u32 size = sigma_atoi(argv[2]);
@@ -58,7 +58,7 @@ public:
             zfs_allocate(size, dataset);
         } else if (sigma_strcmp(cmd.c_str(), "snapshot") == 0) {
             if (argc < 4) {
-                sigma_log_error("[ZFS-CLI] Error: 'snapshot' requires <dataset_name> <snapshot_name>");
+                sigma_printfor("[ZFS-CLI] Error: 'snapshot' requires <dataset_name> <snapshot_name>");
                 return;
             }
             const char* dataset = argv[2];
@@ -72,12 +72,12 @@ public:
     }
 
     void print_usage() {
-        sigma_log_info("Σ SigmaOS ZFS Storage Pool Governor (sigma-zfs) v1.0");
-        sigma_log_info("Usage:");
-        sigma_log_info("  sigma-zfs add <dev_path> <size_gb>        Add a block device to the storage pool");
-        sigma_log_info("  sigma-zfs allocate <size_gb> <dataset>    Allocate a new dataset transactionally");
-        sigma_log_info("  sigma-zfs snapshot <dataset> <snap_name>  Create an O(1) Copy-on-Write snapshot");
-        sigma_log_info("  sigma-zfs audit                           Perform storage pool diagnostics audit");
+        sigma_printf("Σ SigmaOS ZFS Storage Pool Governor (sigma-zfs) v1.0");
+        sigma_printf("Usage:");
+        sigma_printf("  sigma-zfs add <dev_path> <size_gb>        Add a block device to the storage pool");
+        sigma_printf("  sigma-zfs allocate <size_gb> <dataset>    Allocate a new dataset transactionally");
+        sigma_printf("  sigma-zfs snapshot <dataset> <snap_name>  Create an O(1) Copy-on-Write snapshot");
+        sigma_printf("  sigma-zfs audit                           Perform storage pool diagnostics audit");
     }
 
 private:

@@ -22,18 +22,18 @@ public:
 
     void init() {
         m_active_nodes = 0;
-        sigma_log_info("[SMARTGRID] Sigma Smart Grid Manager v1.0 initialized.");
+        sigma_printf("[SMARTGRID] Sigma Smart Grid Manager v1.0 initialized.");
     }
 
     void register_node(const char* node_id, sigma_u32 power_draw_w) {
         if (m_active_nodes >= 1024) return;
         m_active_nodes++;
-        sigma_log_info("[SMARTGRID] Registered node %s. Power Draw: %uW", node_id, power_draw_w);
+        sigma_printf("[SMARTGRID] Registered node %s. Power Draw: %uW", node_id, power_draw_w);
     }
 
     void balance_load() {
-        sigma_log_info("[SMARTGRID] Balancing load across %u nodes...", m_active_nodes);
-        sigma_log_info("[SMARTGRID] Peak shaving applied. Network stabilized.");
+        sigma_printf("[SMARTGRID] Balancing load across %u nodes...", m_active_nodes);
+        sigma_printf("[SMARTGRID] Peak shaving applied. Network stabilized.");
     }
 
 private:

@@ -25,22 +25,22 @@ void SigmaPy::init() {
     PyObject* sigma_module = create_sigma_module();
     PyDict_SetItemString(PyImport_GetModuleDict(), "sigma", sigma_module);
 
-    sigma_klog(LOG_INFO, "[SigmaPy] CPython %s initialized\n", Py_GetVersion());
+    sigma_klog(sigma_printf, "[SigmaPy] CPython %s initialized\n", Py_GetVersion());
 }
 
 void SigmaPy::shutdown() {
     Py_FinalizeEx();
-    sigma_klog(LOG_INFO, "[SigmaPy] CPython finalized\n");
+    sigma_klog(sigma_printf, "[SigmaPy] CPython finalized\n");
 }
 
 int SigmaPy::run_file(const char* path) {
     FILE* f = sigma_fopen_stdio(path, "r");
     if (!f) {
-        sigma_klog(LOG_ERROR, "[SigmaPy] Cannot open: %s\n", path);
+        sigma_klog(sigma_printf, "[SigmaPy] Cannot open: %s\n", path);
         return -1;
     }
     int rc = PyRun_SimpleFileEx(f, path, 1);
-    sigma_klog(LOG_DEBUG, "[SigmaPy] %s → rc=%d\n", path, rc);
+    sigma_klog(sigma_printf, "[SigmaPy] %s → rc=%d\n", path, rc);
     return rc;
 }
 
@@ -74,7 +74,7 @@ PyObject* SigmaPy::create_sigma_module() {
 // Python → SigmaOS log bridge
 static PyObject* py_sigma_log(PyObject*, PyObject* args) {
     const char* msg;
-    int level = LOG_INFO;
+    int level = sigma_printf;
     if (!PyArg_ParseTuple(args, "s|i", &msg, &level)) return nullptr;
     sigma_klog(level, "[SigmaPy] %s\n", msg);
     Py_RETURN_NONE;
@@ -82,7 +82,7 @@ static PyObject* py_sigma_log(PyObject*, PyObject* args) {
 
 // ─── REPL Mode ─────────────────────────────────────────────────────────────────
 void SigmaPy::repl() {
-    sigma_klog(LOG_INFO, "[SigmaPy] Starting Python REPL\n");
+    sigma_klog(sigma_printf, "[SigmaPy] Starting Python REPL\n");
     PyRun_InteractiveLoop(stdin, "<sigma-py>");
 }
 
@@ -115,17 +115,17 @@ void SigmaR::init() {
 
     // Set R library path to SigmaOS R runtime
     eval_r("'.libPaths(c(\"/sigma/runtime/R/library\", .libPaths()))'");
-    sigma_klog(LOG_INFO, "[SigmaR] R %s runtime initialized\n", R_version.major);
+    sigma_klog(sigma_printf, "[SigmaR] R %s runtime initialized\n", R_version.major);
 }
 
 void SigmaR::shutdown() {
     Rf_endEmbeddedR(0);
-    sigma_klog(LOG_INFO, "[SigmaR] R runtime finalized\n");
+    sigma_klog(sigma_printf, "[SigmaR] R runtime finalized\n");
 }
 
 int SigmaR::run_file(const char* path) {
     char cmd[512];
-    sigma_snprintf(cmd, sizeof(cmd), "source('%s')", path);
+    sigma_printf(cmd, sizeof(cmd), "source('%s')", path);
     return eval_r(cmd) ? 0 : -1;
 }
 
@@ -154,11 +154,11 @@ double SigmaR::eval_numeric(const char* expr) {
 int SigmaR::install_packages(const char* packages[], sigma_u32 count) {
     for (sigma_u32 i = 0; i < count; i++) {
         char cmd[256];
-        sigma_snprintf(cmd, sizeof(cmd),
+        sigma_printf(cmd, sizeof(cmd),
             "if (!require('%s', quietly=TRUE)) install.packages('%s', repos='https://cran.r-project.org')",
             packages[i], packages[i]);
         if (!eval_r(cmd)) {
-            sigma_klog(LOG_WARN, "[SigmaR] Failed to install: %s\n", packages[i]);
+            sigma_klog(sigma_printf, "[SigmaR] Failed to install: %s\n", packages[i]);
         }
     }
     return SIGMA_RUNTIME_OK;
@@ -173,10 +173,10 @@ void SigmaR::load_legal_ds_packages() {
     install_packages(pkgs, 9);
     for (sigma_u32 i = 0; i < 9; i++) {
         char cmd[128];
-        sigma_snprintf(cmd, sizeof(cmd), "library(%s)", pkgs[i]);
+        sigma_printf(cmd, sizeof(cmd), "library(%s)", pkgs[i]);
         eval_r(cmd);
     }
-    sigma_klog(LOG_INFO, "[SigmaR] Legal data science packages loaded\n");
+    sigma_klog(sigma_printf, "[SigmaR] Legal data science packages loaded\n");
 }
 
 // Python vs R comparison API (answers syllabus question)

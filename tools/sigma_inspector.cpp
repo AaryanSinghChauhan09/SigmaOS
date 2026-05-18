@@ -30,8 +30,8 @@ public:
 
     void init() {
         m_shard_count = 0;
-        sigma_log_info("[INSPECTOR] Sigma Shard Inspector v1.0 initialized.");
-        sigma_log_info("[INSPECTOR] Telemetry probe injection: ACTIVE.");
+        sigma_printf("[INSPECTOR] Sigma Shard Inspector v1.0 initialized.");
+        sigma_printf("[INSPECTOR] Telemetry probe injection: ACTIVE.");
     }
 
     void register_shard(const char* name, sigma_u32 mem_kb) {
@@ -60,9 +60,9 @@ public:
     }
 
     void dump_report() const {
-        sigma_log_info("[INSPECTOR] ============ SHARD HEALTH REPORT ============");
-        sigma_log_info("[INSPECTOR] %-24s %-8s %-12s %-8s %-8s", "SHARD", "STATUS", "CPU(ns)", "IPC", "MEM(KB)");
-        sigma_log_info("[INSPECTOR] -------------------------------------------------------");
+        sigma_printf("[INSPECTOR] ============ SHARD HEALTH REPORT ============");
+        sigma_printf("[INSPECTOR] %-24s %-8s %-12s %-8s %-8s", "SHARD", "STATUS", "CPU(ns)", "IPC", "MEM(KB)");
+        sigma_printf("[INSPECTOR] -------------------------------------------------------");
         for (sigma_u32 i = 0; i < m_shard_count; i++) {
             const char* status_str = "UNKNOWN";
             switch (m_shards[i].status) {
@@ -72,12 +72,12 @@ public:
                 case 3: status_str = "CRITICAL"; break;
                 default: break;
             }
-            sigma_log_info("[INSPECTOR] %-24s %-8s %-12llu %-8u %-8u",
+            sigma_printf("[INSPECTOR] %-24s %-8s %-12llu %-8u %-8u",
                 m_shards[i].name, status_str,
                 m_shards[i].cpu_ns, m_shards[i].ipc_calls, m_shards[i].mem_kb);
         }
-        sigma_log_info("[INSPECTOR] =============================================");
-        sigma_log_info("[INSPECTOR] Total shards: %u", m_shard_count);
+        sigma_printf("[INSPECTOR] =============================================");
+        sigma_printf("[INSPECTOR] Total shards: %u", m_shard_count);
     }
 
 private:

@@ -22,27 +22,27 @@ public:
 
     void init() {
         m_connected = false;
-        sigma_log_info("[NET_MGR] Sigma Network Manager v1.0 initialized.");
+        sigma_printf("[NET_MGR] Sigma Network Manager v1.0 initialized.");
     }
 
     void connect_wifi(const char* ssid, const char* passphrase) {
-        sigma_log_info("[NET_MGR] Scanning for '%s'...", ssid);
-        sigma_log_info("[NET_MGR] Negotiating WPA3-SAE with Sovereign PAKE...");
-        sigma_log_info("[NET_MGR] Generating ephemeral PQC session keys...");
+        sigma_printf("[NET_MGR] Scanning for '%s'...", ssid);
+        sigma_printf("[NET_MGR] Negotiating WPA3-SAE with Sovereign PAKE...");
+        sigma_printf("[NET_MGR] Generating ephemeral PQC session keys...");
         m_connected = true;
-        sigma_log_info("[NET_MGR] Connected to '%s'. IP: 192.168.1.42/24", ssid);
+        sigma_printf("[NET_MGR] Connected to '%s'. IP: 192.168.1.42/24", ssid);
     }
 
     void disconnect() {
         m_connected = false;
-        sigma_log_info("[NET_MGR] Disconnected. Session keys securely erased.");
+        sigma_printf("[NET_MGR] Disconnected. Session keys securely erased.");
     }
 
     void list_connections() const {
-        sigma_log_info("[NET_MGR] ===== Network Interfaces =====");
-        sigma_log_info("[NET_MGR] wlan0  Connected    192.168.1.42");
-        sigma_log_info("[NET_MGR] eth0   Disconnected");
-        sigma_log_info("[NET_MGR] lo     Loopback     127.0.0.1");
+        sigma_printf("[NET_MGR] ===== Network Interfaces =====");
+        sigma_printf("[NET_MGR] wlan0  Connected    192.168.1.42");
+        sigma_printf("[NET_MGR] eth0   Disconnected");
+        sigma_printf("[NET_MGR] lo     Loopback     127.0.0.1");
     }
 
 private:

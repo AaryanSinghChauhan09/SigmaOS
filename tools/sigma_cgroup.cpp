@@ -41,7 +41,7 @@ public:
 
         if (sigma_strcmp(cmd.c_str(), "create") == 0) {
             if (argc < 6) {
-                sigma_log_error("[CGROUP-CLI] Error: 'create' requires <name> <cpu_pct> <mem_mb> <io_weight>");
+                sigma_printfor("[CGROUP-CLI] Error: 'create' requires <name> <cpu_pct> <mem_mb> <io_weight>");
                 return;
             }
             const char* name = argv[2];
@@ -51,7 +51,7 @@ public:
 
             cgroup_create(name, cpu, mem, io);
         } else if (sigma_strcmp(cmd.c_str(), "enforce") == 0) {
-            sigma_log_info("[CGROUP-CLI] Triggering automatic governor sweep...");
+            sigma_printf("[CGROUP-CLI] Triggering automatic governor sweep...");
             cgroup_enforce();
         } else if (sigma_strcmp(cmd.c_str(), "audit") == 0) {
             cgroup_audit();
@@ -61,11 +61,11 @@ public:
     }
 
     void print_usage() {
-        sigma_log_info("Σ SigmaOS Cgroup Manager (sigma-cgroup) v1.0");
-        sigma_log_info("Usage:");
-        sigma_log_info("  sigma-cgroup create <name> <cpu_pct> <mem_mb> <io_weight>");
-        sigma_log_info("  sigma-cgroup enforce");
-        sigma_log_info("  sigma-cgroup audit");
+        sigma_printf("Σ SigmaOS Cgroup Manager (sigma-cgroup) v1.0");
+        sigma_printf("Usage:");
+        sigma_printf("  sigma-cgroup create <name> <cpu_pct> <mem_mb> <io_weight>");
+        sigma_printf("  sigma-cgroup enforce");
+        sigma_printf("  sigma-cgroup audit");
     }
 
 private:

@@ -21,20 +21,20 @@ public:
     const char* type_name() const noexcept override { return "SigmaArchiveSuite"; }
 
     void init() {
-        sigma_log_info("[ARCHIVE] Sigma Archive Suite v1.0 initialized.");
+        sigma_printf("[ARCHIVE] Sigma Archive Suite v1.0 initialized.");
     }
 
     void compress(const char* input_path, const char* output_path, bool encrypt) {
-        sigma_log_info("[ARCHIVE] Compressing '%s' -> '%s'...", input_path, output_path);
+        sigma_printf("[ARCHIVE] Compressing '%s' -> '%s'...", input_path, output_path);
         if (encrypt) {
-            sigma_log_info("[ARCHIVE] Applying PQC-Kyber encryption to archive stream.");
+            sigma_printf("[ARCHIVE] Applying PQC-Kyber encryption to archive stream.");
         }
-        sigma_log_info("[ARCHIVE] Compression complete. Ratio: 3.2x");
+        sigma_printf("[ARCHIVE] Compression complete. Ratio: 3.2x");
     }
 
     void extract(const char* archive_path, const char* out_dir) {
-        sigma_log_info("[ARCHIVE] Extracting '%s' to '%s'...", archive_path, out_dir);
-        sigma_log_info("[ARCHIVE] Extraction complete.");
+        sigma_printf("[ARCHIVE] Extracting '%s' to '%s'...", archive_path, out_dir);
+        sigma_printf("[ARCHIVE] Extraction complete.");
     }
 
 private:

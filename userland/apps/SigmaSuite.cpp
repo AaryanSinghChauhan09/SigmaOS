@@ -55,7 +55,7 @@ TableId SigmaDocs::insert_table(sigma_u32 rows, sigma_u32 cols,
     float col_width = (m_page.width - m_page.margin_left - m_page.margin_right) / (float)cols;
     for (sigma_u32 c = 0; c < cols; c++) tbl.col_widths[c] = col_width;
     m_tables.push(tbl);
-    sigma_klog(LOG_DEBUG, "[SigmaDocs] INSERT TABLE %dx%d at pos=%u\n", rows, cols, cursor_position);
+    sigma_klog(sigma_printf, "[SigmaDocs] INSERT TABLE %dx%d at pos=%u\n", rows, cols, cursor_position);
     return tbl.id;
 }
 
@@ -91,10 +91,10 @@ int SigmaDocs::mail_merge(const char* template_path,
         SigmaDocs output_doc = *this;  // Copy template
         output_doc.substitute_fields(record);
         char out_path[512];
-        sigma_snprintf(out_path, sizeof(out_path), "%s/merged_%04u.sdoc", output_dir, count++);
+        sigma_printf(out_path, sizeof(out_path), "%s/merged_%04u.sdoc", output_dir, count++);
         output_doc.save(out_path);
     }
-    sigma_klog(LOG_INFO, "[SigmaDocs] Mail merge: %u documents generated\n", count);
+    sigma_klog(sigma_printf, "[SigmaDocs] Mail merge: %u documents generated\n", count);
     return SIGMA_SUITE_OK;
 }
 
@@ -102,7 +102,7 @@ void SigmaDocs::substitute_fields(const MailMergeRecord& rec) {
     // Replace «FieldName» markers in document text with record values
     for (sigma_u32 i = 0; i < rec.field_count; i++) {
         char marker[128];
-        sigma_snprintf(marker, sizeof(marker), "<<%s>>", rec.fields[i].name);
+        sigma_printf(marker, sizeof(marker), "<<%s>>", rec.fields[i].name);
         replace_all_text(marker, rec.fields[i].value);
     }
 }
@@ -271,7 +271,7 @@ int SigmaAccess::open_database(const char* path) {
         // Create new .sdb file with SovereignFS
         if (!m_db.create(path)) return SIGMA_SUITE_ERR_FILE;
     }
-    sigma_klog(LOG_INFO, "[SigmaAccess] Opened database: %s\n", path);
+    sigma_klog(sigma_printf, "[SigmaAccess] Opened database: %s\n", path);
     return SIGMA_SUITE_OK;
 }
 
@@ -280,11 +280,11 @@ int SigmaAccess::run_query(const char* sql, ResultSet* out) {
     QueryParser parser(sql);
     ParsedQuery q = parser.parse();
     if (!q.valid) {
-        sigma_klog(LOG_WARN, "[SigmaAccess] Query parse error: %s\n", sql);
+        sigma_klog(sigma_printf, "[SigmaAccess] Query parse error: %s\n", sql);
         return SIGMA_SUITE_ERR_SQL;
     }
     *out = m_db.execute(q);
-    sigma_klog(LOG_DEBUG, "[SigmaAccess] Query returned %u rows\n", out->row_count);
+    sigma_klog(sigma_printf, "[SigmaAccess] Query returned %u rows\n", out->row_count);
     return SIGMA_SUITE_OK;
 }
 

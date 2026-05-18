@@ -23,21 +23,21 @@ public:
     void init() {
         m_tests_passed = 0;
         m_tests_failed = 0;
-        sigma_log_info("[TESTLAB] Sigma Test Lab v1.0 initialized.");
+        sigma_printf("[TESTLAB] Sigma Test Lab v1.0 initialized.");
     }
 
     void run_ipc_fuzzer() {
-        sigma_log_info("[TESTLAB] Running IPC Fuzzer (10,000 randomized payloads)...");
+        sigma_printf("[TESTLAB] Running IPC Fuzzer (10,000 randomized payloads)...");
         /* Simulated fuzzing */
         m_tests_passed += 9998;
         m_tests_failed += 2;
-        sigma_log_info("[TESTLAB] IPC Fuzzer completed. Detected 2 boundary faults.");
+        sigma_printf("[TESTLAB] IPC Fuzzer completed. Detected 2 boundary faults.");
     }
 
     void run_memory_leak_test() {
-        sigma_log_info("[TESTLAB] Running Sovereign Memory Allocator stress test...");
+        sigma_printf("[TESTLAB] Running Sovereign Memory Allocator stress test...");
         m_tests_passed += 500;
-        sigma_log_info("[TESTLAB] Memory stress test completed. 0 leaks detected.");
+        sigma_printf("[TESTLAB] Memory stress test completed. 0 leaks detected.");
     }
 
     void run_full_suite() {
@@ -47,10 +47,10 @@ public:
     }
 
     void report() const {
-        sigma_log_info("[TESTLAB] ====== Test Lab Report ======");
-        sigma_log_info("[TESTLAB] Passed: %u", m_tests_passed);
-        sigma_log_info("[TESTLAB] Failed: %u", m_tests_failed);
-        sigma_log_info("[TESTLAB] Overall Success Rate: %u%%", 
+        sigma_printf("[TESTLAB] ====== Test Lab Report ======");
+        sigma_printf("[TESTLAB] Passed: %u", m_tests_passed);
+        sigma_printf("[TESTLAB] Failed: %u", m_tests_failed);
+        sigma_printf("[TESTLAB] Overall Success Rate: %u%%", 
             (m_tests_passed * 100) / (m_tests_passed + m_tests_failed));
     }
 

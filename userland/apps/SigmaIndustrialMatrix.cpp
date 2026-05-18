@@ -7,7 +7,7 @@
  * =========================================================================
  */
 
-#include "libc/SovereignLibC.h"
+#include "../../include/libc/SovereignLibC.h"
 #include "sigma_log.h"
 
 // --- Macro Automation (XClicker / AutoKey style) ---

@@ -25,7 +25,7 @@ public:
         m_vram_used = 0;
         m_gpu_utilization = 0;
         m_temperature_c = 40;
-        sigma_log_info("[GPUPROF] Sigma GPU Profiler v1.0 initialized.");
+        sigma_printf("[GPUPROF] Sigma GPU Profiler v1.0 initialized.");
     }
 
     void update_metrics(sigma_u32 vram_used, sigma_u8 util, sigma_u8 temp) {
@@ -35,13 +35,13 @@ public:
     }
 
     void dump_report() const {
-        sigma_log_info("[GPUPROF] ====== GPU PERFORMANCE REPORT ======");
-        sigma_log_info("[GPUPROF] VRAM Usage  : %u MB / %u MB", m_vram_used, m_vram_total);
-        sigma_log_info("[GPUPROF] Core Util   : %u%%", m_gpu_utilization);
-        sigma_log_info("[GPUPROF] Temperature : %u°C", m_temperature_c);
+        sigma_printf("[GPUPROF] ====== GPU PERFORMANCE REPORT ======");
+        sigma_printf("[GPUPROF] VRAM Usage  : %u MB / %u MB", m_vram_used, m_vram_total);
+        sigma_printf("[GPUPROF] Core Util   : %u%%", m_gpu_utilization);
+        sigma_printf("[GPUPROF] Temperature : %u°C", m_temperature_c);
         
         if (m_temperature_c > 85) {
-            sigma_log_warn("[GPUPROF] WARNING: Thermal throttling threshold approaching.");
+            sigma_printf("[GPUPROF] WARNING: Thermal throttling threshold approaching.");
         }
     }
 

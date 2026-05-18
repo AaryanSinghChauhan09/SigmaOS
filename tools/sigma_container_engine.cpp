@@ -22,21 +22,21 @@ public:
 
     void init() {
         m_active_containers = 0;
-        sigma_log_info("[CONTAINER] Sigma Container Engine v1.0 initialized.");
+        sigma_printf("[CONTAINER] Sigma Container Engine v1.0 initialized.");
     }
 
     void run_container(const char* image_name) {
         if (m_active_containers >= 256) return;
         m_active_containers++;
-        sigma_log_info("[CONTAINER] Pulling image '%s' from Sovereign Registry...", image_name);
-        sigma_log_info("[CONTAINER] Verifying PQC signature of image...");
-        sigma_log_info("[CONTAINER] Allocating isolated shard boundaries...");
-        sigma_log_info("[CONTAINER] Container '%s' is now running.", image_name);
+        sigma_printf("[CONTAINER] Pulling image '%s' from Sovereign Registry...", image_name);
+        sigma_printf("[CONTAINER] Verifying PQC signature of image...");
+        sigma_printf("[CONTAINER] Allocating isolated shard boundaries...");
+        sigma_printf("[CONTAINER] Container '%s' is now running.", image_name);
     }
 
     void stop_container(const char* container_id) {
         if (m_active_containers > 0) m_active_containers--;
-        sigma_log_info("[CONTAINER] Destroying boundaries for '%s'. Stopped.", container_id);
+        sigma_printf("[CONTAINER] Destroying boundaries for '%s'. Stopped.", container_id);
     }
 
 private:

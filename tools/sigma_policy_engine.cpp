@@ -22,18 +22,18 @@ public:
 
     void init() {
         m_policies_enforced = 0;
-        sigma_log_info("[POLICY] Sigma Policy Engine v1.0 initialized.");
+        sigma_printf("[POLICY] Sigma Policy Engine v1.0 initialized.");
     }
 
     void load_policy(const char* policy_name) {
         m_policies_enforced++;
-        sigma_log_info("[POLICY] Loaded and enforced enterprise policy: '%s'", policy_name);
+        sigma_printf("[POLICY] Loaded and enforced enterprise policy: '%s'", policy_name);
     }
 
     bool check_access(const char* subject, const char* object, const char* action) {
-        sigma_log_info("[POLICY] Evaluating access: '%s' wants to '%s' on '%s'.", subject, action, object);
+        sigma_printf("[POLICY] Evaluating access: '%s' wants to '%s' on '%s'.", subject, action, object);
         /* In production, this evaluates against the policy tree */
-        sigma_log_info("[POLICY] Access GRANTED.");
+        sigma_printf("[POLICY] Access GRANTED.");
         return true;
     }
 

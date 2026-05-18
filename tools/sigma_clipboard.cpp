@@ -28,7 +28,7 @@ public:
     void init() {
         m_head = 0;
         m_count = 0;
-        sigma_log_info("[CLIPBOARD] Sigma Clipboard Hub v1.0 initialized.");
+        sigma_printf("[CLIPBOARD] Sigma Clipboard Hub v1.0 initialized.");
     }
 
     void copy(const char* text) {
@@ -43,14 +43,14 @@ public:
         } else {
             m_head = (m_head + 1) % MAX_ENTRIES;
         }
-        sigma_log_info("[CLIPBOARD] Copied %u bytes to history.", e.length);
+        sigma_printf("[CLIPBOARD] Copied %u bytes to history.", e.length);
     }
 
     void list_history() const {
-        sigma_log_info("[CLIPBOARD] ===== Clipboard History =====");
+        sigma_printf("[CLIPBOARD] ===== Clipboard History =====");
         for (sigma_u32 i = 0; i < m_count; i++) {
             sigma_u32 idx = (m_head + m_count - 1 - i) % MAX_ENTRIES;
-            sigma_log_info("[CLIPBOARD] [%u]: %s", i, m_history[idx].data);
+            sigma_printf("[CLIPBOARD] [%u]: %s", i, m_history[idx].data);
         }
     }
 

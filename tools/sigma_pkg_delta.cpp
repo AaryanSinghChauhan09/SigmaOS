@@ -22,21 +22,21 @@ public:
 
     void init() {
         m_pending_deltas = 0;
-        sigma_log_info("[PKG_DELTA] Sigma Package Delta v1.0 initialized.");
+        sigma_printf("[PKG_DELTA] Sigma Package Delta v1.0 initialized.");
     }
 
     void fetch_delta(const char* shard_name, const char* from_hash, const char* to_hash) {
         m_pending_deltas++;
-        sigma_log_info("[PKG_DELTA] Fetching delta for '%s': %s -> %s", shard_name, from_hash, to_hash);
-        sigma_log_info("[PKG_DELTA] Delta size: 142KB (vs full 18MB). Savings: 99.2%%");
+        sigma_printf("[PKG_DELTA] Fetching delta for '%s': %s -> %s", shard_name, from_hash, to_hash);
+        sigma_printf("[PKG_DELTA] Delta size: 142KB (vs full 18MB). Savings: 99.2%%");
     }
 
     void apply_deltas() {
-        sigma_log_info("[PKG_DELTA] Applying %u pending shard deltas...", m_pending_deltas);
+        sigma_printf("[PKG_DELTA] Applying %u pending shard deltas...", m_pending_deltas);
         /* Simulate atomic binary patch */
-        sigma_log_info("[PKG_DELTA] PQC signatures verified for all deltas.");
-        sigma_log_info("[PKG_DELTA] Rollback snapshot created.");
-        sigma_log_info("[PKG_DELTA] All deltas applied atomically. System updated.");
+        sigma_printf("[PKG_DELTA] PQC signatures verified for all deltas.");
+        sigma_printf("[PKG_DELTA] Rollback snapshot created.");
+        sigma_printf("[PKG_DELTA] All deltas applied atomically. System updated.");
         m_pending_deltas = 0;
     }
 

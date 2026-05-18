@@ -10,19 +10,19 @@
  */
 
 void analyze_logs() {
-    sigma_log_info("[LOG] Scanning system journals for anomalies...");
+    sigma_printf("[LOG] Scanning system journals for anomalies...");
     // Hit & Trial: Perform entropy analysis on log frequency and error codes
-    sigma_log_info("[LOG] Detected 3 potential anomalies in SovereignZFS shard.");
-    sigma_log_info("[LOG] Recommendation: Run sigma-fix on Shard ID 42.");
+    sigma_printf("[LOG] Detected 3 potential anomalies in SovereignZFS shard.");
+    sigma_printf("[LOG] Recommendation: Run sigma-fix on Shard ID 42.");
 }
 
 int main(int argc, char** argv) {
-    sigma_log_info("SigmaOS Unified Logger (v14.0)");
+    sigma_printf("SigmaOS Unified Logger (v14.0)");
     
     if (argc > 1 && sigma_strcmp(argv[1], "--analyze") == 0) {
         analyze_logs();
     } else {
-        sigma_log_info("Tailing industrial audit logs... [Press Ctrl+C to stop]");
+        sigma_printf("Tailing industrial audit logs... [Press Ctrl+C to stop]");
     }
 
     return 0;
