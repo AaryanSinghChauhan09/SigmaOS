@@ -150,6 +150,7 @@ for (let i = 0; i < 100; i++) {
 
 await pool.close()
 
+
 ```
 
 ## See Also
@@ -159,4 +160,3 @@ await pool.close()
 - [BalancedPool](/docs/docs/api/BalancedPool.md) - Load balancing across multiple origins
 
 - [Issue #3648](https://github.com/nodejs/undici/issues/3648) - Original issue describing uneven distribution
- 

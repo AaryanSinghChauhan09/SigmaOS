@@ -6,15 +6,15 @@
 
 ## 🏗️ 1. Core System Shards (Mandatory)
 
-| Tool | SigmaOS Equivalent | Purpose |
-|---|---|---|
-| **Cleanup** | `sigma-bleach` | Secure shard cleanup and cryptographic disk wiping. |
+| Tool | SigmaOS Equivalent | Purpose | 
+| --- | --- | --- | 
+| **Cleanup** | `sigma-bleach` | Secure shard cleanup and cryptographic disk wiping. | 
 
-| **Backup** | `sigma-timeshift` | Atomic lattice snapshots and state rollback. |
+| **Backup** | `sigma-timeshift` | Atomic lattice snapshots and state rollback. | 
 
-| **Monitoring** | `sigma-top` | Real-time shard resource orchestration and monitoring. |
+| **Monitoring** | `sigma-top` | Real-time shard resource orchestration and monitoring. | 
 
-| **Diagnostics** | `sigma-sysbench` | Hardware-direct performance validation and stress testing. |
+| **Diagnostics** | `sigma-sysbench` | Hardware-direct performance validation and stress testing. | 
 
 ---
 
@@ -91,4 +91,3 @@ While the core baseline is identical, each branch adds its own **Industrial Laye
 ---
 
 *SigmaOS — One Core. One Language. Absolute Sovereignty.*
- 

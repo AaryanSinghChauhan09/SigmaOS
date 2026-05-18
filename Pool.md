@@ -85,4 +85,3 @@ See [Dispatcher Event: `'disconnect'`](/docs/docs/api/Dispatcher.md#event-discon
 ### Event: `'drain'`
 
 See [Dispatcher Event: `'drain'`](/docs/docs/api/Dispatcher.md#event-drain).
- 

@@ -23,4 +23,3 @@ This document outlines the strict guidelines required to maintain the ultra-low 
 ## 4. Formal Verification for Safety Criticality
 
 For industrial/embedded use cases, any shard modifying hardware states or operating in Ring-0 must be audited using the `scripts/fuzz_pqc.sh` and formal verification toolchains to prevent race conditions or unsafe memory escalation.
- 

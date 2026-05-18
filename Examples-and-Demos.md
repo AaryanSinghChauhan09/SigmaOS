@@ -15,6 +15,7 @@ int main() {
     return 0;
 }
 
+
 ```
 
 ## 2. Writing a Kernel Shard Module
@@ -48,6 +49,7 @@ int _start() {
     return 0;
 }
 
+
 ```
 
 ## 3. Post-Quantum Encryption
@@ -68,5 +70,5 @@ void secure_transmit() {
     }
 }
 
+
 ```
- 

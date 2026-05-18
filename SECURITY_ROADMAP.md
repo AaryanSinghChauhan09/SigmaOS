@@ -31,4 +31,3 @@ Long-term, SigmaOS will target the following compliance standards to allow adopt
 1
 
 1
- 

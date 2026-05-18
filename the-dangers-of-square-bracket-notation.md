@@ -13,6 +13,7 @@ Let's take a look at why this could be a problem.
 ```js
 exampleClass[userInput[0]] = userInput[1];
 
+
 ```
 
 I won't spend much time here, as I believe this is fairly well known. If exampleClass contains a sensitive property, the above code will allow it to be edited.
@@ -22,6 +23,7 @@ I won't spend much time here, as I believe this is fairly well known. If example
 ```js
 userInput = ['constructor', '{}'];
 exampleClass[userInput[0]] = userInput[1];
+
 
 ```
 
@@ -42,6 +44,7 @@ function handler(userInput) {
   user[anyVal] = user[userInput[0]](userInput[1]);
 }
 
+
 ```
 
 In the previous section, I mentioned that constructor can be accessed from square brackets. In this case, since we are dealing with a function, the constructor we get back is the `Function` Constructor, which compiles a string of code into a function.
@@ -59,6 +62,7 @@ function exploit(cmd) {
   handler(userInputStageTwo);
 }
 
+
 ```
 
 Let's break it down.
@@ -71,6 +75,7 @@ userInput[1] = 'require("child_process").exec(arguments[0],console.log)';
 
 user['anyVal'] = user['constructor'](userInput[1]);
 
+
 ```
 
 Executing this code creates a function containing the payload, and assigns it to `user['anyVal']`:
@@ -80,12 +85,14 @@ user['anyVal'] = function () {
   require('child_process').exec(arguments[0], console.log);
 };
 
+
 ```
 
 And when handler is run a second time:
 
 ```js
 user.anyVal = user.anyVal('date');
+
 
 ```
 
@@ -112,4 +119,3 @@ Another option is to create a allowlist of allowed property names, and filter ea
 In cases where you don't have a strictly defined data model ( which isn't ideal, but there are cases where it has to be so ) then using the same method as above, but with a denylist of disallowed properties instead is a valid choice.
 
 If you are using the `--harmony` flag or [io.js](https://iojs.org/), you also have the option of using [ECMAScript 6 direct proxies](http://wiki.ecmascript.org/doku.php?id=harmony:direct_proxies), which can stand in front of your real object ( private API ) and expose a limited subset of the object ( public API ). This is probably the best approach if you are using this pattern, as it is most consistent with typical object oriented programming paradigms.
- 

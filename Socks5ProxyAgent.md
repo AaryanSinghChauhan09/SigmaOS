@@ -43,6 +43,7 @@ const socks5ProxyWithOptions = new Socks5ProxyAgent('socks5://localhost:1080', {
   connections: 10
 })
 
+
 ```
 
 #### Example - Basic SOCKS5 Proxy instantiation
@@ -53,6 +54,7 @@ This will instantiate the Socks5ProxyAgent. It will not do anything until regist
 import { Socks5ProxyAgent } from 'undici'
 
 const socks5Proxy = new Socks5ProxyAgent('socks5://localhost:1080')
+
 
 ```
 
@@ -71,6 +73,7 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 
 ```
 
@@ -91,6 +94,7 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
+
 
 ```
 
@@ -118,6 +122,7 @@ for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
 
+
 ```
 
 #### Example - SOCKS5 Proxy with HTTPS requests
@@ -137,6 +142,7 @@ const response = await request('https://api.example.com/data', {
 console.log('Response status:', response.statusCode)
 console.log('Response data:', await response.body.json())
 
+
 ```
 
 #### Example - SOCKS5 Proxy with Fetch
@@ -153,6 +159,7 @@ const response = await fetch('http://localhost:3000/api/users', {
 
 console.log('Response status:', response.status)
 console.log('Response data:', await response.text())
+
 
 ```
 
@@ -177,6 +184,7 @@ const responses = await Promise.all([
 
 console.log('All requests completed through the same SOCKS5 proxy')
 
+
 ```
 
 ### `Socks5ProxyAgent.close()`
@@ -196,6 +204,7 @@ setGlobalDispatcher(socks5Proxy)
 // ... make requests
 
 await socks5Proxy.close()
+
 
 ```
 
@@ -219,6 +228,7 @@ const socks5Proxy = new Socks5ProxyAgent('socks5://localhost:1080')
 // Force close all connections
 await socks5Proxy.destroy()
 
+
 ```
 
 ### `Socks5ProxyAgent.dispatch(options, handlers)`
@@ -235,6 +245,7 @@ SOCKS5 proxy connections can be debugged using Node.js diagnostics:
 
 ```sh
 NODE_DEBUG=undici:socks5 node script.js
+
 
 ```
 
@@ -305,4 +316,3 @@ The wrapper handles various SOCKS5 error conditions:
 - **Node.js**: Compatible with all supported Node.js versions
 
 - **HTTP Versions**: Works with HTTP/1.1 and HTTP/2 over the tunnel
- 

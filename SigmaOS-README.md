@@ -41,6 +41,7 @@ sigma> tax 1500000          # Income Tax Engine (FY 24-25 New Regime)
 sigma> pqc status           # Audit Post-Quantum Crypto health
 
 
+
 ```
 
 ---
@@ -73,24 +74,24 @@ make zenith-iso      # Generate deployment image
 make test            # Run industrial CI/CD battery
 
 
+
 ```
 
 ---
 
 ## ?? Strategic Superiority
 
-| Feature | SigmaOS | Linux | Windows |
-| :--- | :--- | :--- | :--- |
+| Feature | SigmaOS | Linux | Windows | 
+| :--- | :--- | :--- | :--- | 
 
-| **Kernel** | Shard Lattice | Monolithic | Hybrid |
+| **Kernel** | Shard Lattice | Monolithic | Hybrid | 
 
-| **Crypto** | PQC-Native | Add-on | Add-on |
+| **Crypto** | PQC-Native | Add-on | Add-on | 
 
-| **Trust** | Zero-Trust | Implicit | Implicit |
+| **Trust** | Zero-Trust | Implicit | Implicit | 
 
-| **Legal** | Native India | External | External |
+| **Legal** | Native India | External | External | 
 
 ---
 
 ### Stay Sovereign. Stay Zenith
- 

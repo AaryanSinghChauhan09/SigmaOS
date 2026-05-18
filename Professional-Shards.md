@@ -265,4 +265,3 @@ SigmaOS is built on a modular "shard" architecture. Each profession is served by
 - **Calculators**: CBSE 10-pt grade, CGPA (best-5), Attendance %, UGC pay level, RTE PTR check.
 
 - **Resilience**: NAAC criterion evidence archival.
- 

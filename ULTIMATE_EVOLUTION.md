@@ -43,4 +43,3 @@ This master document outlines the complete vision for SigmaOS, integrating indus
 ---
 
 1
- 

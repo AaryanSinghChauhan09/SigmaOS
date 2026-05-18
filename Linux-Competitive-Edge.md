@@ -6,16 +6,16 @@ In 2026, mainstream Linux distributions like **Pop!_OS**, **CachyOS**, and **Lin
 
 ## 🔝 The 2026 Linux Landscape
 
-| Distro | Strengths | Why Users Choose It | SigmaOS Leapfrog Opportunity |
-| :--- | :--- | :--- | :--- |
+| Distro | Strengths | Why Users Choose It | SigmaOS Leapfrog Opportunity | 
+| :--- | :--- | :--- | :--- | 
 
-| **Pop!_OS (COSMIC)**| Desktop UX, AI Workflows | Polished UI, NVIDIA support |**Security**: SigmaOS offers FIPS-140-3 |
+| **Pop!_OS (COSMIC)** | Desktop UX, AI Workflows | Polished UI, NVIDIA support | **Security**: SigmaOS offers FIPS-140-3 | 
 
-| **CachyOS**| Arch-based Performance | Gamers, optimized kernels |**Sovereignty**: SigmaOS offers PQC-Attestation |
+| **CachyOS** | Arch-based Performance | Gamers, optimized kernels | **Sovereignty**: SigmaOS offers PQC-Attestation | 
 
-| **Linux Mint**| Stability, Ease of Use | Windows switchers |**Automation**: SigmaOS offers Adaptive Profiles |
+| **Linux Mint** | Stability, Ease of Use | Windows switchers | **Automation**: SigmaOS offers Adaptive Profiles | 
 
-| **Ubuntu LTS**| Ecosystem maturity | Enterprise trust, OEM support|**Transparency**: SigmaOS offers Trust Graph UI |
+| **Ubuntu LTS** | Ecosystem maturity | Enterprise trust, OEM support | **Transparency**: SigmaOS offers Trust Graph UI | 
 
 ---
 
@@ -46,4 +46,3 @@ To surpass the competition, SigmaOS does not compete on "popularity" but on **In
 ### Sovereignty is the ultimate differentiator
 
 v14.3 [LEAPFROG-STRATEGY]
- 

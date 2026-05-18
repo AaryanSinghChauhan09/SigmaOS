@@ -8,13 +8,13 @@ By compiling directly into the microkernel memory manager, it absorbs the defini
 
 ## 🚀 Architectural Design & Parity
 
-| Feature Domain | SigmaOS S-LBU | Alpine Linux LBU | Linux initramfs | Windows PE |
-| :--- | :--- | :--- | :--- | :--- |
-| **Purity** | Bare-metal C++17 | Alpine POSIX sh | Linux kernel script | Closed-source NT |
-| **Storage Dependency** | Diskless RAM (No HD) | Diskless RAM | Memory RAM disk | Memory RAM disk |
-| **Commit Target** | Writable Boot Flash | USB/SD Flash media | Read-only image | RAM execution only |
-| **Security Layer** | PQC Merkle-root hashes | sha256 checksums | Unsigned cpio | Microsoft Cabinet auth |
-| **Restore Model** | Sub-millisecond direct extract | apk-tools extraction | kernel unpack | winpe initialization |
+| Feature Domain | SigmaOS S-LBU | Alpine Linux LBU | Linux initramfs | Windows PE | 
+| :--- | :--- | :--- | :--- | :--- | 
+| **Purity** | Bare-metal C++17 | Alpine POSIX sh | Linux kernel script | Closed-source NT | 
+| **Storage Dependency** | Diskless RAM (No HD) | Diskless RAM | Memory RAM disk | Memory RAM disk | 
+| **Commit Target** | Writable Boot Flash | USB/SD Flash media | Read-only image | RAM execution only | 
+| **Security Layer** | PQC Merkle-root hashes | sha256 checksums | Unsigned cpio | Microsoft Cabinet auth | 
+| **Restore Model** | Sub-millisecond direct extract | apk-tools extraction | kernel unpack | winpe initialization | 
 
 ---
 
@@ -28,10 +28,12 @@ graph TD
     B --> C[Post-Quantum Signature Block]
     C --> D[Encrypted zenith_state.apk Archive]
     D --> E[Write Target: Physical Boot Flash]
-    E -->|Cold Boot Restores State| A
+    E --> | Cold Boot Restores State | A
+
 ```
 
 ### Diskless Local State Commit Pipeline
+
 1. **Dynamic Track**: Add files to persistence via `sigma-lbu track <file_path>`.
 2. **Atomic Packaging**: On command `sigma-lbu commit`, the engine aggregates and compresses tracked directories.
 3. **PQC Attestation**: Generates and pins post-quantum cryptographic signatures inside the state header.
@@ -55,6 +57,7 @@ sigma-lbu restore
 
 # Audit tracked files and verify cryptographic signatures
 sigma-lbu audit
+
 ```
 
 ---
@@ -62,8 +65,9 @@ sigma-lbu audit
 ## 📂 Source Code Implementation
 
 The S-LBU subsystem is built across the following zero-dependency files:
-* **Core Engine**: `kernel/core/SovereignLBU.cpp`
-* **CLI Controller**: `tools/sigma_lbu.cpp`
+
+***Core Engine**: `kernel/core/SovereignLBU.cpp`* **CLI Controller**: `tools/sigma_lbu.cpp`
+
 * **Header Mappings**: `include/sigma_kernel_types.h`
 
 ---

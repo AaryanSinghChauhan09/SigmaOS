@@ -66,6 +66,7 @@ function buildProxy () {
   })
 }
 
+
 ```
 
 ### Connect with authentication
@@ -127,5 +128,5 @@ function buildProxy () {
   })
 }
 
+
 ```
- 

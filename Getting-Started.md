@@ -12,6 +12,7 @@ SigmaOS relies on a cross-compiled x86_64-elf toolchain. We provide a setup scri
 chmod +x scripts/setup.sh
 ./scripts/setup.sh
 
+
 ```
 
 This will install:
@@ -31,6 +32,7 @@ SigmaOS uses a standard Makefile. From the root directory, run:
 ```bash
 make all
 
+
 ```
 
 This compiles the kernel, links it, and generates a bootable ISO image (`build/sigmaos.iso`) using GRUB.
@@ -41,6 +43,7 @@ To boot the newly compiled OS in QEMU, run:
 
 ```bash
 make qemu
+
 
 ```
 
@@ -56,7 +59,7 @@ To boot SigmaOS on real hardware, you can flash the ISO to a USB drive using `dd
 
 sudo dd if=build/sigmaos.iso of=/dev/sdX bs=4M status=progress
 
+
 ```
 
 **Note:** Ensure your hardware is supported and secure boot is disabled, as SigmaOS is currently self-signed.
- 

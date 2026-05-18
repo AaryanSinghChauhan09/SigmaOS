@@ -1,6 +1,7 @@
 # PULL REQUEST TEMPLATE
 
 ---
+
 name: Pull Request
 about: Submit a new Sovereign Shard or bug fix
 ---
@@ -56,4 +57,3 @@ Closes #
 ## Screenshots / Serial Output
 
 <!-- Paste sigma_log output or screenshots if applicable -->
- 

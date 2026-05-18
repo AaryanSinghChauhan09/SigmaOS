@@ -103,4 +103,3 @@ Inspired by the Windows Registry but reimagined for sovereignty, the **Sovereign
 2. **Resilience**: Self-Healing Snapshots + AI Watchdog.
 
 3. **Differentiation**: Adaptive UI + Sovereign AI Assistant.
- 

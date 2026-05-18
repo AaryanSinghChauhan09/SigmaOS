@@ -10,9 +10,10 @@ To maintain undisputed superiority over monolithic operating systems, SigmaOS mu
 
 ```mermaid
 graph LR
-    A[S-MM Slab Allocator] -->|Lock-Free Bitmaps| B[O1 Slab Compaction]
-    C[Storage Block Layer] -->|Direct IO Passthrough| D[Zero-Copy Buffer Cache]
-    E[GPU Shader Core] -->|Multi-Queue Pools| F[Vulkan Ring Buffering]
+    A[S-MM Slab Allocator] --> | Lock-Free Bitmaps | B[O1 Slab Compaction]
+    C[Storage Block Layer] --> | Direct IO Passthrough | D[Zero-Copy Buffer Cache]
+    E[GPU Shader Core] --> | Multi-Queue Pools | F[Vulkan Ring Buffering]
+
 ```
 
 ---
@@ -51,18 +52,19 @@ graph LR
 
 ## 6. Unified API Expansion Roadmap
 
-| Phase | Target Subsystem | Improvement Feature | Expected Benefit |
-| :--- | :--- | :--- | :--- |
-| **Phase I** | `SovereignBoot` | Async concurrent shard ignition | Reduces boot times to under 400 milliseconds |
-| **Phase II** | `SovereignVideo` | SIMD-accelerated non-linear edits | 4x faster HEVC transcode operations |
-| **Phase III** | `SovereignCloudFS` | Encrypted multi-node block syncing | Zero-overhead distributed replication |
-| **Phase IV** | `S-ERA / S-CCF` | High-performance batch auditing | Real-time analysis for corporate registers |
+| Phase | Target Subsystem | Improvement Feature | Expected Benefit | 
+| :--- | :--- | :--- | :--- | 
+| **Phase I** | `SovereignBoot` | Async concurrent shard ignition | Reduces boot times to under 400 milliseconds | 
+| **Phase II** | `SovereignVideo` | SIMD-accelerated non-linear edits | 4x faster HEVC transcode operations | 
+| **Phase III** | `SovereignCloudFS` | Encrypted multi-node block syncing | Zero-overhead distributed replication | 
+| **Phase IV** | `S-ERA / S-CCF` | High-performance batch auditing | Real-time analysis for corporate registers | 
 
 ---
 
 ## 7. Quality Assurance & Fuzzing Strategies
 
 To secure absolute system integrity, SigmaOS implements:
+
 1. **Lattice Fuzzing Pools**: Executes continuous input fuzzing across all 256 syscall vectors to detect edge-case boundaries.
 2. **Deterministic Regression Sweeps**: Conducts strict structural validations after every branch merge, preventing regression drift.
 3. **PQC Cryptographic Verification**: Verifies Dilithium signatures across all active userland binaries.

@@ -120,6 +120,7 @@ Vary: content-encoding, accepts
 content-encoding: utf8
 accepts: application/json
 
+
 ```
 
 This would be
@@ -130,6 +131,7 @@ This would be
   accepts: 'application/json'
 }
 
+
 ```
 
 If the original request did not include the `accepts` header:
@@ -139,6 +141,7 @@ If the original request did not include the `accepts` header:
   'content-encoding': 'utf8',
   accepts: null
 }
+
 
 ```
 
@@ -176,4 +179,3 @@ and defines extra properties relevant to the cache interceptor.
 
 If the response has trailers, the cache interceptor will pass them to the cache
 interceptor through this method.
- 

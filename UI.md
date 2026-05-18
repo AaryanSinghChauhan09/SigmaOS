@@ -17,4 +17,3 @@ Located in the /ui/ module of the codebase, the Zenith engine achieves its compe
 1. **Dynamic Customization**: Implements modern typography (Inter), subtle micro-animations (cubic-bezier transitions), and accent glows to deliver a premium, fluid desktop experience.
 
 By isolating the UI rendering pipeline into a sovereign CSS engine, SigmaOS ensures that graphical accessibility and polish are hardcoded at the OS level, neutralizing elementary OS's primary selling point.
- 

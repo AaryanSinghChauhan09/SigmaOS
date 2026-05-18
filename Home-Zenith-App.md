@@ -34,4 +34,3 @@ The **App Edition** is optimized for heavy application workflows. It includes pr
 
 ---
 [Return to Global Home](Home)
- 

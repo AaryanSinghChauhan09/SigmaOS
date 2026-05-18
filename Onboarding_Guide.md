@@ -43,6 +43,7 @@ private:
 
 } // namespace MySubsystem
 } // namespace SigmaOS
+
 ```
 
 ### C. Zero-Loss Fixed-Point Calculations

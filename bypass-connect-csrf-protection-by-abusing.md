@@ -22,6 +22,7 @@ app.use(express.csrf())
 ...
 app.use(express.methodOverride())
 
+
 ```
 
 Connect's CSRF middleware does not check csrf tokens in case of idempotent verbs (GET/HEAD/OPTIONS, see lib/middleware/csrf.js). As a result, it is possible to bypass this security control by sending a GET request with a POST MethodOverride header or key.
@@ -33,6 +34,7 @@ GET / HTTP/1.1
 [..]
 _method=POST
 
+
 ```
 
 ### Mitigation Factors
@@ -42,4 +44,3 @@ Disable methodOverride or make sure that it takes precedence over other middlewa
 Thanks to the same origin policy enforced by modern browsers in XMLHttpRequest and other mechanisms, the exploitability of this issue abusing "x-http-method-override" header is significantly reduced.
 
 There is also an [ESLint plugin](https://github.com/evilpacket/eslint-rules) that you can use to help identify this.
- 

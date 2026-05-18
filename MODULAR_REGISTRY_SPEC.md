@@ -39,4 +39,3 @@ Each registration triggers a **Global Integration Verification (GIV)** sequence:
 ---
 
 1
- 

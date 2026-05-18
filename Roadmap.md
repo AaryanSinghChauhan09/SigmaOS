@@ -47,4 +47,3 @@ This roadmap outlines the evolution of SigmaOS from its microkernel roots into a
 - Total silicon sovereignty achieved.
 
 - 600-shard maximum capacity reached across the global lattice.
- 

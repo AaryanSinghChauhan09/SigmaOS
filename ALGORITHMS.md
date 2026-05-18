@@ -4,18 +4,18 @@ This document outlines the complexity classes and optimization strategies for co
 
 ## 📊 Core Algorithm Complexity Matrix
 
-| Subsystem | Algorithm | Complexity (Time) | Complexity (Space) | Optimization Strategy |
-| :--- | :--- | :--- | :--- | :--- |
+| Subsystem | Algorithm | Complexity (Time) | Complexity (Space) | Optimization Strategy | 
+| :--- | :--- | :--- | :--- | :--- | 
 
-| **Scheduler** | Priority-Sharded ASI | O(log N) | O(N) | Red-Black Tree for task prioritization. |
+| **Scheduler** | Priority-Sharded ASI | O(log N) | O(N) | Red-Black Tree for task prioritization. | 
 
-| **Memory (S-MM)** | Slab Allocator | O(1) | O(N) | Pre-allocated shard-level memory pools. |
+| **Memory (S-MM)** | Slab Allocator | O(1) | O(N) | Pre-allocated shard-level memory pools. | 
 
-| **Filesystem** | Inode Lookup | O(1) | O(1) | Hash-mapped cache for frequently accessed inodes. |
+| **Filesystem** | Inode Lookup | O(1) | O(1) | Hash-mapped cache for frequently accessed inodes. | 
 
-| **Security (PQC)** | Dilithium-5 Verify | O(K) | O(M) | Hardware-accelerated SIMD instructions. |
+| **Security (PQC)** | Dilithium-5 Verify | O(K) | O(M) | Hardware-accelerated SIMD instructions. | 
 
-| **Networking** | Packet Routing | O(log N) | O(N) | Radix-tree for IP prefix matching. |
+| **Networking** | Packet Routing | O(log N) | O(N) | Radix-tree for IP prefix matching. | 
 
 ## ⚙️ Shard-Level Optimization Practices
 
@@ -40,4 +40,3 @@ All industrial shards must pass the following benchmarks before merging:
 ### Optimization Philosophy
 
 *"Complexity is the enemy of sovereignty; O(1) is the goal."*
- 

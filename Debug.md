@@ -25,6 +25,7 @@ UNDICI 16241: received response to GET https://nodejs.org/en - HTTP 200
 
 UNDICI 16241: trailers received from GET https://nodejs.org/en
 
+
 ```
 
 ## `fetch`
@@ -50,6 +51,7 @@ FETCH 16241: received response to GET https://nodejs.org/en - HTTP 200
 
 FETCH 16241: trailers received from GET https://nodejs.org/en
 
+
 ```
 
 ## `websocket`
@@ -66,5 +68,5 @@ WEBSOCKET 18309: connected to echo.websocket.org using https:h1
 WEBSOCKET 18309: sending request to GET https://echo.websocket.org/
 WEBSOCKET 18309: connection opened <ip_address>
 
+
 ```
- 

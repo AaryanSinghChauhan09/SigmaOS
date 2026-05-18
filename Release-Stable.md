@@ -42,4 +42,3 @@ The **Stable Edition** is the immutable industrial benchmark of SigmaOS. It is d
 
  village
  village
- 

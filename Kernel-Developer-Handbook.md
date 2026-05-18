@@ -8,13 +8,13 @@
 
 SigmaOS uses a **microkernel-inspired shard lattice** where each subsystem is an isolated, independently-compiled shard. The kernel consists of 3 primary layers:
 
-| Layer | Path | Purpose |
-|-------|------|---------|
-| **LAYER 0** | `kernel/core/hal/` | Hardware Abstraction & Boot |
+| Layer | Path | Purpose | 
+| ------- | ------ | --------- | 
+| **LAYER 0** | `kernel/core/hal/` | Hardware Abstraction & Boot | 
 
-| **LAYER 1** | `kernel/core/` | IPC, Scheduler, Memory, FS, Net |
+| **LAYER 1** | `kernel/core/` | IPC, Scheduler, Memory, FS, Net | 
 
-| **LAYER 2** | `kernel/core/drivers/` | Hardware Drivers |
+| **LAYER 2** | `kernel/core/drivers/` | Hardware Drivers | 
 
 ---
 
@@ -35,6 +35,7 @@ All kernel shards MUST acquire locks in the following order to prevent deadlocks
 4. SovereignFS::inode_lock
 
 
+
 ```text
 
 **Violation** of this order will trigger a `SovereignWatchdog` panic.
@@ -43,9 +44,11 @@ All kernel shards MUST acquire locks in the following order to prevent deadlocks
 
 Prefer `__atomic_*` builtins over mutexes for counter updates:
 
+
 ```cpp
 
 __atomic_fetch_add(&shard_refcount, 1, __ATOMIC_SEQ_CST);
+
 
 
 ```text
@@ -108,9 +111,8 @@ All PRs to `main` must pass:
 
 SigmaOS uses **Semantic Versioning**: `vMAJOR.MINOR.PATCH-FORMAT`
 
-| Tag Example | Meaning |
-|-------------|---------|
-| `v15.0.0-main` | Core kernel stable release |
-| `v15.1.0-app` | App layer feature release |
-| `v15.0.1-hotfix` | Security patch |
- 
+| Tag Example | Meaning | 
+| ------------- | --------- | 
+| `v15.0.0-main` | Core kernel stable release | 
+| `v15.1.0-app` | App layer feature release | 
+| `v15.0.1-hotfix` | Security patch | 

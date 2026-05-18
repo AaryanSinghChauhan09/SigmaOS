@@ -44,4 +44,3 @@ The engine is encapsulated in the `SigmaOS::Kernel::Memory::SovereignMemoryManag
 
 ---
 *Stay Sovereign.*
- 

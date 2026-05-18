@@ -48,4 +48,3 @@ Welcome to the **Sovereign Future Shard**. The Horizon edition is the bleeding-e
  village
  village
  village
- 

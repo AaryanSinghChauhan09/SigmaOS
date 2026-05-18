@@ -28,4 +28,3 @@ The `sigma_sh` provides an industrial interface to the lattice, including:
 
 ---
 *Sovereignty achieved through mathematical finality.*
- 

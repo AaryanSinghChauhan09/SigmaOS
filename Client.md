@@ -101,6 +101,7 @@ import { Client } from 'undici'
 
 const client = new Client('http://localhost:3000')
 
+
 ```
 
 ### Example - Custom connector
@@ -126,6 +127,7 @@ const client = new Client('https://localhost:3000', {
     })
   }
 })
+
 
 ```
 
@@ -233,6 +235,7 @@ try {
   server.close()
 }
 
+
 ```
 
 ### Event: `'disconnect'`
@@ -279,6 +282,7 @@ try {
   server.close()
 }
 
+
 ```
 
 ### Event: `'drain'`
@@ -318,9 +322,9 @@ await Promise.all(requests)
 
 console.log('requests completed')
 
+
 ```
 
 ### Event: `'error'`
 
 Invoked for users errors such as throwing in the `onError` handler.
- 

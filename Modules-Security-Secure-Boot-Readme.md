@@ -10,5 +10,5 @@ Independent verification system for boot integrity.
 void init_security_secure_boot();
 
 
+
 ```
- 

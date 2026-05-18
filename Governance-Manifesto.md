@@ -55,4 +55,3 @@ SigmaOS is an industrial-grade OS. Contribution is incentivized through:
 ---
 
 *"Lattice is law. Consensus is sovereignty."*
- 

@@ -35,4 +35,3 @@ make all
 1
 
 Your shard will be compiled into a `.o` object and dynamically linked into the Lattice on the next boot!
- 

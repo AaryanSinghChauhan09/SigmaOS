@@ -51,4 +51,3 @@ The `SovereignInit` shard enforces a strict boot policy:
 ---
 
 ### Verified boot is the foundation of digital sovereignty
- 

@@ -18,6 +18,7 @@ If you encounter a shard failure, check the internal journal logs:
 
 sigma-cli log --follow
 
+
 ```
 
 ### 3. S-AUTO Self-Healing
@@ -57,4 +58,3 @@ A: Verify that the `SovereignPQCEngine` is initialized and the hardware RNG (RDR
 ### Q: Can I run Linux applications?
 
 A: Yes, via the `S-PROTON` bridge, which provides OCI-compliant sharding for mainstream binaries.
- 

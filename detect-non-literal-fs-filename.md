@@ -5,4 +5,3 @@
 <!-- end auto-generated rule header -->
 
 More information: [OWASP Path Traversal](https://www.owasp.org/index.php/Path_Traversal)
- 

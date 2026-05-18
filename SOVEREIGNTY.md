@@ -7,20 +7,20 @@ Its existence is a total departure from the monolithic, dependency-heavy paradig
 
 ## 2. NON-EQUIVALENCE PROOF
 
-| Feature | Legacy OS (Linux/Windows) | SigmaOS (Zenith) |
-| :--- | :--- | :--- |
+| Feature | Legacy OS (Linux/Windows) | SigmaOS (Zenith) | 
+| :--- | :--- | :--- | 
 
-| **Kernel Type**| Monolithic / Hybrid |**Sovereign Shard Lattice** |
+| **Kernel Type** | Monolithic / Hybrid | **Sovereign Shard Lattice** | 
 
-| **Security**| Perimeter-based / Patch-heavy |**PQC-Sealed Shard Isolation** |
+| **Security** | Perimeter-based / Patch-heavy | **PQC-Sealed Shard Isolation** | 
 
-| **Dependencies**| Shared Libraries (DLL/SO) |**Zero-Dependency Native Shards** |
+| **Dependencies** | Shared Libraries (DLL/SO) | **Zero-Dependency Native Shards** | 
 
-| **Boot Logic**| Sequential / BIOS-reliant |**Asynchronous Shard Ignition (ASI)** |
+| **Boot Logic** | Sequential / BIOS-reliant | **Asynchronous Shard Ignition (ASI)** | 
 
-| **Documentation**| Centralized / Outdated |**Built-in Sovereign Wiki (S-WIKI)** |
+| **Documentation** | Centralized / Outdated | **Built-in Sovereign Wiki (S-WIKI)** | 
 
-| **Community**| Fragmented Forums |**Decentralized Lattice (S-FORUM)** |
+| **Community** | Fragmented Forums | **Decentralized Lattice (S-FORUM)** | 
 
 ## 3. COMMUNITY GOVERNANCE
 
@@ -28,9 +28,7 @@ SigmaOS v15.0 introduces the **S-FORUM** shard, enabling decentralized, communit
 
 - **PQC-Attested**: Every guide is signed by the author's Dilithium-5 key.
 
-***Lattice-Integrated**: Tutorials can be executed directly as shard snippets in the**S-PLAY** playground.
-
-***Self-Healing**: The**S-WIKI** automatically incorporates community-verified solutions.
+***Lattice-Integrated**: Tutorials can be executed directly as shard snippets in the**S-PLAY**playground.***Self-Healing**: The**S-WIKI** automatically incorporates community-verified solutions.
 
 ## 4. ZERO-DERIVATION GUARANTEE
 
@@ -43,4 +41,3 @@ SigmaOS v15.0 introduces the **S-FORUM** shard, enabling decentralized, communit
 ### Final Declaration
 
 *"We did not build another OS. We built the end of the OS as you know it."*
- 

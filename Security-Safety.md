@@ -28,14 +28,13 @@ SigmaOS provides industrial-grade protection for professional data and network c
 
 ---
 
-| Component | Function | Linux Equivalent |
-| :--- | :--- | :--- |
+| Component | Function | Linux Equivalent | 
+| :--- | :--- | :--- | 
 
-| **S-MAC** | Access Control | SELinux / AppArmor |
+| **S-MAC** | Access Control | SELinux / AppArmor | 
 
-| **S-FIRE** | Firewall | Iptables / Nftables |
+| **S-FIRE** | Firewall | Iptables / Nftables | 
 
-| **S-LUKS** | Disk Encryption | LUKS / dm-crypt |
+| **S-LUKS** | Disk Encryption | LUKS / dm-crypt | 
 
-| **S-AUDIT** | Auditing | Auditd |
- 
+| **S-AUDIT** | Auditing | Auditd | 

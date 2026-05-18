@@ -112,6 +112,7 @@ const handler = new RetryHandler(
   }
 );
 
+
 ```
 
 #### Example - Basic RetryHandler with defaults
@@ -130,5 +131,5 @@ const handler = new RetryHandler(dispatchOptions, {
   },
 });
 
+
 ```
- 

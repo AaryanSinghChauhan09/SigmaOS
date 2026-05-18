@@ -22,9 +22,9 @@ Inspired by the concept of "self-healing silicon," the Doctor Tool performs deep
 sigma-cli doctor --full-scan
 sigma-cli doctor --treat <shard-id>
 
+
 ```
 
 ## 🧬 Architectural Integration
 
 The Doctor Tool is a **Level 2 System Service** with direct bridges to the `SovereignSelfHealing` and `SovereignRegistry` shards.
- 

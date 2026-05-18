@@ -42,14 +42,14 @@ The attestation framework verifies every shard before it is ignited in the latti
 
 Users can customize their security posture via the **SovereignCompliance** shard:
 
-| Profile | Description | Crypto Enforcement |
-| :--- | :--- | :--- |
+| Profile | Description | Crypto Enforcement | 
+| :--- | :--- | :--- | 
 
-| **HIGH_SECURITY** | Zero-trust; FIPS-140-3 strict. | PQC-Only (Kyber/Dilithium) |
+| **HIGH_SECURITY** | Zero-trust; FIPS-140-3 strict. | PQC-Only (Kyber/Dilithium) | 
 
-| **BALANCED** | Standard industrial protection. | Hybrid (Classical + PQC) |
+| **BALANCED** | Standard industrial protection. | Hybrid (Classical + PQC) | 
 
-| **PERFORMANCE** | Optimized for speed. | HW-Accelerated Classical |
+| **PERFORMANCE** | Optimized for speed. | HW-Accelerated Classical | 
 
 ---
 
@@ -70,4 +70,3 @@ SigmaOS has completed its initial internal audit and is currently in the "FIPS-1
 ### Sovereignty is built on the bedrock of verifiable security
 
 v14.2 [SECURE-NEXUS]
- 

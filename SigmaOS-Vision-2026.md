@@ -1,2 +1,1 @@
 # SigmaOS 2026 Vision\n\nSigmaOS is an AI-native experimental operating system with a secure modular architecture.\n\n## Identity\n- **AI-Native**: Built-in AI shell and process scheduler.\n- **Modular Architecture**: Microkernel lattice bypassing monolithic designs.\n- **Linux Absorbed**: Linux is now a sub-component executing in Ring-3
- 

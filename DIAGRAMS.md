@@ -16,10 +16,11 @@ graph TD
     subgraph Shard Isolation
         D -.-> F{Failure Detected}
         F --> G[Self-Healing Restarts S-NET]
-        B -.->|No impact| D
-        C -.->|No impact| D
-        E -.->|No impact| D
+        B -.-> | No impact | D
+        C -.-> | No impact | D
+        E -.-> | No impact | D
     end
+
 
 ```
 
@@ -44,6 +45,7 @@ graph LR
         H --> L(Browser Environment)
         J --> M(Secure Server)
     end
+
 
 ```
 
@@ -71,5 +73,5 @@ sequenceDiagram
         CI-->>Dev: Send Failure Report
     end
 
+
 ```
- 

@@ -41,4 +41,3 @@ Welcome to the **Sovereign Coexistence Shard**. The Dual-Boot edition is designe
 - **VFS Drivers**: NTFS, Ext4, Btrfs, APFS, ZFS.
 
 - **Overhead**: < 1% CPU utilization for the Bridge shard.
- 

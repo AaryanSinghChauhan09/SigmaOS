@@ -37,4 +37,3 @@ SigmaOS provides a turnkey environment for security professionals to audit silic
 ---
 
 ### Stay Sovereign
- 

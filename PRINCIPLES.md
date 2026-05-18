@@ -25,4 +25,3 @@ Documentation is a technical requirement, not an afterthought. Every line of cod
 ---
 
 ### Your Silicon. Your Rules. Your Sovereignty
- 

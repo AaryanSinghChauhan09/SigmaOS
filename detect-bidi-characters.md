@@ -23,6 +23,7 @@ if (accessLevel != 'userRLO LRI// Check if adminPDI IRI') {
   console.log('You are an admin.');
 }
 
+
 ```
 
 The code above, will be rendered by a text editor as follows:
@@ -36,6 +37,7 @@ if (accessLevel != 'user') {
   // Check if admin
   console.log('You are an admin.');
 }
+
 
 ```
 
@@ -52,4 +54,3 @@ For more information on the topic, you're welcome to read on the official websit
 - <https://github.com/lirantal/anti-trojan-source/>
 
 - <https://github.com/lirantal/eslint-plugin-anti-trojan-source>
- 

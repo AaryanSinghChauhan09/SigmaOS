@@ -25,4 +25,3 @@ Number of currently active requests across this client.
 ### `ClientStats.size`
 
 Number of active, pending, or queued requests of this clients.
- 

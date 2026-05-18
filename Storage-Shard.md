@@ -6,7 +6,7 @@ The Storage Shard implements the file system abstractions for SigmaOS, providing
 
 ```mermaid
 graph TD
-    A[Userland App] -->|Z-SYSCALL| B(VFS Abstraction)
+    A[Userland App] --> | Z-SYSCALL | B(VFS Abstraction)
     B --> C{Lattice File System}
     B --> D{FAT32 / EXT2}
     B --> E{NVMe Raw}
@@ -27,6 +27,7 @@ graph TD
 ## VFS API Example
 
 
+
 ```c
 
 int fd;
@@ -36,4 +37,3 @@ if (status == SIGMA_OK) {
     char buffer[512];
     SovereignStorageShard::getInstance().file_read(fd, buffer, 512);
     SovereignStorageShard::getInstance().file_close(fd);
- 

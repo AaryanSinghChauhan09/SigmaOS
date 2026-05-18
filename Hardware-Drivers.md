@@ -21,4 +21,3 @@ SigmaOS achieves universal hardware compatibility via the **Sovereign Driver Lat
 - **Driver Transpiler**: Allows SigmaOS to utilize open-source WiFi (Realtek/Broadcom) and Ethernet driver logic within safe, isolated shards.
 
 - **PQC Mesh**: All network interfaces are automatically integrated into the Sovereign Security Mesh.
- 

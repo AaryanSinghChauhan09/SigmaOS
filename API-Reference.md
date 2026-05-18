@@ -33,4 +33,3 @@ The Sovereign SDK provides the bridge between your code and the SigmaOS kernel.
 ---
 
 ### For full function prototypes, see the [include/](include/) directory
- 

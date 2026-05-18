@@ -39,6 +39,7 @@ SigmaOS currently lacks a fully functional filesystem, robust device drivers (e.
 make clean
 make singularity
 
+
 ```
 
 ### This generates `sigmaos.bin`, the core Multiboot2 executable
@@ -48,6 +49,7 @@ make singularity
 ```bash
 
 make zenith-iso
+
 
 ```
 
@@ -59,13 +61,14 @@ make zenith-iso
 
 make qemu
 
+
 ```
 
 ### Boots the kernel in QEMU and pipes the internal kernel logs directly to your terminal
 
 ## 📚 Glossary: Translating the Vision
 
-SigmaOS uses unique terminology for its architectural concepts. Here is what they mean in standard OS engineering terms: | SigmaOS Term | Standard Technical Meaning | | :------------------------------- | :----------------------------------------------------------------------------------------------- | | **Sovereign Lattice**| The operating system architecture as a whole. | |**Shard**| A distinct subsystem or driver encapsulated as a C++ Singleton class. | |**Amnesic Memory**| Stateless RAM allocation; memory buffers that are eagerly zeroed out after use to prevent leaks. | |**Zenith**| The target milestone version denoting a stable, complete foundation. | |**ZCLN (Zero-Copy Lattice Net)** | A zero-copy networking stack (bypassing redundant buffer copies between kernel and userland). | ## 🤝 Contributing
+SigmaOS uses unique terminology for its architectural concepts. Here is what they mean in standard OS engineering terms: | SigmaOS Term | Standard Technical Meaning | | :------------------------------- | :----------------------------------------------------------------------------------------------- | | **Sovereign Lattice** | The operating system architecture as a whole. | | **Shard** | A distinct subsystem or driver encapsulated as a C++ Singleton class. | | **Amnesic Memory** | Stateless RAM allocation; memory buffers that are eagerly zeroed out after use to prevent leaks. | | **Zenith** | The target milestone version denoting a stable, complete foundation. | | **ZCLN (Zero-Copy Lattice Net)** | A zero-copy networking stack (bypassing redundant buffer copies between kernel and userland). | ## 🤝 Contributing
 
 We welcome contributions to help evolve SigmaOS from an experimental kernel into a fully usable distribution.
 

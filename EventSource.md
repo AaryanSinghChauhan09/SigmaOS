@@ -18,6 +18,7 @@ eventSource.onmessage = (event) => {
   console.log(event.data)
 }
 
+
 ```
 
 ## Using a custom Dispatcher
@@ -41,8 +42,8 @@ const eventSource = new EventSource('http://localhost:3000', {
 })
 
 
+
 ```
 
 More information about the EventSource API can be found on
 [MDN](https://developer.mozilla.org/en-US/docs/Web/API/EventSource).
- 

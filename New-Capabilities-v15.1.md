@@ -83,12 +83,12 @@ Daemonless, rootless container engine.
 
 Reduces input lag for eSports and real-time workloads.
 
-| Profile | Quantum | LLC Pin |
-| :--- | :--- | :--- |
-| STANDARD | 4ms | No |
-| GAMING | 1ms | No |
-| ESPORTS | 0.5ms | Yes |
-| ULTRA | 0.1ms | Yes |
+| Profile | Quantum | LLC Pin | 
+| :--- | :--- | :--- | 
+| STANDARD | 4ms | No | 
+| GAMING | 1ms | No | 
+| ESPORTS | 0.5ms | Yes | 
+| ULTRA | 0.1ms | Yes | 
 
 **C API:** `latency_init()`, `latency_set_gaming()`, `latency_set_esports()`, `latency_set_ultra()`, `latency_pin_cpu()`
 
@@ -393,12 +393,12 @@ Declarative, snapshot-backed UI layout management.
 
 Built-in profiles:
 
-| Profile | Theme | Layout |
-| :--- | :--- | :--- |
-| default | sigma-dark | floating |
-| coding | sigma-focus | tiling |
-| gaming | sigma-neon | floating |
-| zen | sigma-zen | zen-mode |
+| Profile | Theme | Layout | 
+| :--- | :--- | :--- | 
+| default | sigma-dark | floating | 
+| coding | sigma-focus | tiling | 
+| gaming | sigma-neon | floating | 
+| zen | sigma-zen | zen-mode | 
 
 **C API:** `workspace_init()`, `workspace_load()`, `workspace_list()`
 
@@ -458,4 +458,3 @@ Similarly, `include/core/sigma_kernel_types.h` now acts as a redirect to `includ
 - `SovereignLibC.cpp` — `sigma_kernel_types.h` added as first include; `sigma_usize` always defined
 - `include/core/SigmaOOP.hpp` — created as redirect shim
 - `SigmaOOP.hpp` operator new/delete — marked `inline` removed to fix ODR warnings
- 
