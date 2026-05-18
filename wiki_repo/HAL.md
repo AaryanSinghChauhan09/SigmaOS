@@ -1,23 +1,7 @@
-# Sovereign Hardware Abstraction Layer (S-HAL)
+# SigmaOS Hardware Abstraction Layer (HAL)
 
-This document maps the extensive platform-specific hardware support in SigmaOS Zenith v15.2.
+The SigmaOS HAL provides a clean, zero-overhead interface isolating architecture-specific assembly stubs (`x86`, `ARM`, `RISC-V`) from the microkernel core.
 
-## Unified Driver Architecture
-
-1. **Unified Device Mapping**: Standardized API for Wi-Fi, USB, IoT, and printers via `UnifiedDriver` structs.
-2. **Platform-Agnostic Core**: Modular dispatching based on `CPULatticeArch` (x86_64, ARM64, RISCV64).
-3. **Silicon-direct Register Writes**: Memory-Mapped I/O (MMIO) wrappers (`HAL_MMIO_W32`, `HAL_MMIO_R32`) for absolute zero-overhead hardware control.
-4. **Hardware Timers**: High-precision ACPI and APIC timer bootstrapping for SCHED_SOVEREIGN logic.
-
-### Graphics & Processing
-
-1. **SovereignVulkanLayer**: Direct SPIR-V shader blob streaming to GPU without userland Vulkan wrappers.
-2. **Hardware Transpiler**: On-the-fly SIMD pipeline conversions (x86 SSE -> ARM Neon).
-3. **Neural Accelerators**: Native hooks for NPU dispatch (e.g., Apple Neural Engine, Intel Movidius).
-4. **Asynchronous DMA**: Zero-copy packet streaming straight to network interfaces.
-
-### Boot & Interrupt Control
-
-1. **APIC/GIC/PLIC Initialization**: Architecture-dependent interrupt controller setups.
-2. **Hardware Rollback Points**: Firmware-level snapshot integration for rapid bare-metal recovery.
-3. **ACPI Power Management**: Dynamic voltage/frequency scaling (DVFS) implemented in kernel space.
+## Mechanism
+* `hal.h` / `sigma_hal.h`: Exposes generic hardware operations (`cpu_halt`, `timer_init`, `interrupt_init`, `mmu_map`, `read_io`, `write_io`).
+* `hal_x86.S`, `hal_arm.S`, `hal_riscv.S`: Minimal assembly entry points executed early during bootstrap.

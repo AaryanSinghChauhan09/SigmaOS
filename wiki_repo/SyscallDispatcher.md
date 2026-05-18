@@ -1,23 +1,7 @@
-# Syscall Dispatcher & Functions Improvements
+# SigmaOS Syscall Dispatcher Architecture
 
-This document defines the architectural and security improvements implemented in the SigmaOS Syscall Dispatcher (S-SYSCALL).
+The SigmaOS Syscall Dispatcher is a modular, zero-dependency C/C++ implementation designed to replace high-level abstractions with silicon-direct dispatch tables.
 
-## Dispatch Mechanics
-
-1. **Modular Syscall Registry Database**: Dynamic registration of system call handlers mapping directly to functions.
-2. **O(1) Array Lookup Fast-Path**: Using IA32_LSTAR or ARM SVC direct indices without branch penalties.
-3. **Sub-nanosecond Tracing Hooks**: Low-overhead syscall tracing vectors capturing execution time, caller ID, and parameters.
-4. **Fallback Mitigation**: `sys_ni_syscall` intercepts all undefined parameters gracefully, returning `ENOSYS`.
-
-### Security Boundary Enforcement
-
-1. **Sandboxing Enforcement**: Strict namespace and permission bounds checks at user/kernel transitions.
-2. **Parameter Sanitization**: All Ring-3 pointer arguments are verified against the task's valid VMA ranges.
-3. **Capability-Based Routing**: Syscalls reject invalid operations inherently if the executing process lacks capabilities.
-4. **Register Scrubbing**: Information-leak prevention by scrubbing non-return registers on transition back to Ring-3.
-
-### Core Handlers
-
-1. **sys_write / sys_read**: POSIX-compliant file stream interactions.
-2. **sys_socket**: BSD-compatible network stack socket creation APIs.
-3. **sys_pkg_install**: Sovereign App Store integration at the syscall level.
+## Mechanism
+* `syscalls.h`: Defines sequential syscall identifiers (`SYSCALL_GETPID`, `SYSCALL_WRITE`, etc.) and function prototypes.
+* `dispatcher.c` / `dispatcher.cpp`: Implements direct table lookup O(1) dispatching, validating syscall numbers and forwarding register arguments directly to kernel handlers.
