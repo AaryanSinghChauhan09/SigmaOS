@@ -718,12 +718,10 @@ SigmaOS/
 │   └── devcontainer.json
 ├── .github
 │   ├── ISSUE_TEMPLATE
-│   │   ├── bug_report.md
 │   │   ├── bug_report.yml
 │   │   ├── config.yml
 │   │   ├── documentation_improvement.yml
 │   │   ├── driver_request.yml
-│   │   ├── feature_request.md
 │   │   ├── feature_request.yml
 │   │   └── industrial_bug.yml
 │   ├── workflows
@@ -739,7 +737,8 @@ SigmaOS/
 │   │   ├── sigma_qemu.yml
 │   │   ├── sigma_quality.yml
 │   │   ├── sigma_release.yml
-│   │   └── sigma_security_harden.yml
+│   │   ├── sigma_security_harden.yml
+│   │   └── sigma-build.yml
 │   ├── CODEOWNERS
 │   ├── codeql-config.yml
 │   ├── dependabot.yml
@@ -796,11 +795,29 @@ SigmaOS/
 │   ├── index.css
 │   ├── index.html
 │   └── index.js
+├── desktop
+│   └── README.md
 ├── docker
 │   └── micro
 │       └── Dockerfile
 ├── docs
-│   └── README.md
+│   ├── Branches.md
+│   ├── Competitive_Gaps.md
+│   ├── Desktop.md
+│   ├── HAL.md
+│   ├── Improvement_Plan.md
+│   ├── Industrial_Stabilization_Plan.md
+│   ├── Kernel.md
+│   ├── Logic.md
+│   ├── Onboarding_Guide.md
+│   ├── Problems.md
+│   ├── README.md
+│   ├── RFC_Template.md
+│   ├── Storage.md
+│   ├── SyscallDispatcher.md
+│   ├── Tools.md
+│   ├── WALKTHROUGH_COMPETITOR_SYNC.md
+│   └── Wiki.md
 ├── drivers
 │   ├── gpu
 │   │   ├── SovereignMesa.cpp
@@ -865,11 +882,15 @@ SigmaOS/
 │   │   ├── SovereignContainerStorage.cpp
 │   │   ├── SovereignPersistence.cpp
 │   │   └── SovereignStorageDriver.cpp
+│   ├── unified
+│   │   └── driver_api.h
 │   ├── console.c
 │   ├── mesh_sync.c
+│   ├── README.md
 │   ├── SovereignCameraZenith.cpp
 │   ├── SovereignDirectGPU.cpp
 │   ├── SovereignGPU.cpp
+│   ├── SovereignHAL.cpp
 │   ├── SovereignHardwareAudit.cpp
 │   ├── SovereignIPAuditor.cpp
 │   ├── SovereignLinuxCompat.cpp
@@ -937,6 +958,9 @@ SigmaOS/
 │   ├── SovereignDiskZenith.h
 │   ├── SovereignFileSystemZenith.cpp
 │   └── vfs.c
+├── hal
+│   ├── SovereignHAL.cpp
+│   └── SovereignHAL.hpp
 ├── include
 │   ├── ai
 │   │   ├── sigma_aisched.h
@@ -1293,6 +1317,7 @@ SigmaOS/
 │   ├── SovereignVFS.h
 │   ├── SovereignVMA.h
 │   ├── SovereignXV6Bridge.h
+│   ├── syscall_dispatcher.h
 │   ├── vfs.h
 │   └── Web3Persistence.hpp
 ├── iso_root
@@ -1418,6 +1443,8 @@ SigmaOS/
 │   │   │   └── sovereign_container.hpp
 │   │   ├── context
 │   │   │   └── manager.cpp
+│   │   ├── cpu
+│   │   │   └── sigma_context_switch.cpp
 │   │   ├── data
 │   │   │   ├── SovereignBI.cpp
 │   │   │   └── SovereignDataForge.cpp
@@ -1426,6 +1453,12 @@ SigmaOS/
 │   │   │   ├── SovereignCI.cpp
 │   │   │   ├── SovereignKube.cpp
 │   │   │   └── SovereignPackageGraph.cpp
+│   │   ├── desktop
+│   │   │   ├── SigmaAppStoreGUI.cpp
+│   │   │   ├── SigmaControlCenter.cpp
+│   │   │   ├── SovereignAccessibility.cpp
+│   │   │   ├── SovereignThemeEngine.cpp
+│   │   │   └── SovereignWindowManager.cpp
 │   │   ├── diag
 │   │   │   ├── SovereignAnalytics.cpp
 │   │   │   └── SovereignKdump.cpp
@@ -1458,6 +1491,7 @@ SigmaOS/
 │   │   │   ├── SovereignNE2000.cpp
 │   │   │   ├── SovereignNvidia.cpp
 │   │   │   ├── SovereignNVMe.cpp
+│   │   │   ├── SovereignObjectBus.cpp
 │   │   │   ├── SovereignPCMCIA.cpp
 │   │   │   ├── SovereignPS2.cpp
 │   │   │   ├── SovereignRTL8139.cpp
@@ -1468,6 +1502,7 @@ SigmaOS/
 │   │   │   ├── SovereignUSB3.cpp
 │   │   │   ├── SovereignVESA.cpp
 │   │   │   ├── SovereignVideo.cpp
+│   │   │   ├── SovereignVulkanLayer.cpp
 │   │   │   ├── SovereignWifi.cpp
 │   │   │   ├── SovereignWLAN.cpp
 │   │   │   └── SovereignWPAN.cpp
@@ -1475,7 +1510,12 @@ SigmaOS/
 │   │   │   └── SovereignDS.cpp
 │   │   ├── ecosystem
 │   │   │   ├── SovereignCI.cpp
+│   │   │   ├── SovereignFOSSIntegrator.cpp
 │   │   │   └── SovereignMarketplace.cpp
+│   │   ├── features
+│   │   │   ├── SigmaSDK.cpp
+│   │   │   ├── SovereignAIShell.cpp
+│   │   │   └── SovereignContainer.cpp
 │   │   ├── fs
 │   │   │   ├── management
 │   │   │   │   ├── SovereignFS.cpp
@@ -1510,14 +1550,28 @@ SigmaOS/
 │   │   │   ├── SovereignVault.cpp
 │   │   │   ├── SovereignXFS.cpp
 │   │   │   └── SovereignZFS.cpp
+│   │   ├── graphics
+│   │   │   ├── SovereignAMDGPU.cpp
+│   │   │   └── SovereignNvidia.cpp
 │   │   ├── hal
+│   │   │   ├── arm
+│   │   │   │   └── hal_arm.c
+│   │   │   ├── riscv
+│   │   │   │   └── hal_riscv.c
+│   │   │   ├── x86
+│   │   │   │   └── hal_x86.c
 │   │   │   ├── clock_shard.hpp
 │   │   │   ├── device_manager.cpp
 │   │   │   ├── device_manager.hpp
 │   │   │   ├── energy.c
 │   │   │   ├── firmware_nexus.cpp
 │   │   │   ├── firmware_nexus.hpp
+│   │   │   ├── hal_arm.cpp
+│   │   │   ├── hal_riscv.cpp
+│   │   │   ├── hal_x86.cpp
 │   │   │   ├── hal.asm
+│   │   │   ├── hal.h
+│   │   │   ├── hal.hpp
 │   │   │   ├── hardware_transpiler.cpp
 │   │   │   ├── hardware_transpiler.hpp
 │   │   │   ├── idt.asm
@@ -1563,11 +1617,13 @@ SigmaOS/
 │   │   │   ├── SovereignUSB.cpp
 │   │   │   ├── SovereignVirtio.cpp
 │   │   │   ├── SovereignVMM.cpp
+│   │   │   ├── SovereignVulkanLayer.cpp
 │   │   │   ├── SovereignWASM.cpp
 │   │   │   ├── SovereignWatchdog.cpp
 │   │   │   ├── SovereignWiFiTranspiler.cpp
 │   │   │   ├── timer_shard.hpp
 │   │   │   ├── transpiler_shard.hpp
+│   │   │   ├── UnifiedDriverAPI.cpp
 │   │   │   └── video_shard.hpp
 │   │   ├── hardware
 │   │   │   ├── SovereignBatteryIQ.cpp
@@ -1608,7 +1664,9 @@ SigmaOS/
 │   │   │   ├── security
 │   │   │   │   ├── SovereignPQC.hpp
 │   │   │   │   └── SovereignSandbox.hpp
-│   │   │   └── sigma_libc.h
+│   │   │   ├── sigma_codec.h
+│   │   │   ├── sigma_libc.h
+│   │   │   └── SovereignMathEngine.h
 │   │   ├── industrial
 │   │   │   ├── AWSSAMIShield.cpp
 │   │   │   ├── digital_twin.cpp
@@ -1709,13 +1767,17 @@ SigmaOS/
 │   │   ├── intelligence
 │   │   │   └── SovereignAISched.cpp
 │   │   ├── ipc
+│   │   │   ├── sigma_lockfree_ipc.hpp
 │   │   │   ├── SovereignBridge.cpp
 │   │   │   ├── SovereignIPC.cpp
 │   │   │   ├── SovereignMessageBus.cpp
-│   │   │   └── SovereignSharedMemory.cpp
+│   │   │   ├── SovereignSharedMemory.cpp
+│   │   │   └── SovereignSPSCQueue.hpp
 │   │   ├── libc
 │   │   │   ├── SovereignLibC_x64.S
 │   │   │   └── SovereignLibC.cpp
+│   │   ├── linux_compat
+│   │   │   └── SovereignLinuxSubsystem.cpp
 │   │   ├── mem
 │   │   │   ├── SovereignAllocator.cpp
 │   │   │   └── SovereignMemoryManager.cpp
@@ -1809,6 +1871,7 @@ SigmaOS/
 │   │   │   ├── SovereignMediaEngine.cpp
 │   │   │   └── SovereignSpatialStreamer.cpp
 │   │   ├── network
+│   │   │   ├── SovereignCluster.cpp
 │   │   │   ├── SovereignDHCP.cpp
 │   │   │   ├── SovereignEther.cpp
 │   │   │   ├── SovereignFirewall.cpp
@@ -1876,6 +1939,10 @@ SigmaOS/
 │   │   │   └── SovereignProfileManager.cpp
 │   │   ├── resilience
 │   │   │   └── SovereignRollbackNexus.cpp
+│   │   ├── rtos
+│   │   │   ├── SovereignFlex.cpp
+│   │   │   ├── SovereignQNX.cpp
+│   │   │   └── SovereignZOS.cpp
 │   │   ├── runtime
 │   │   │   ├── wasm
 │   │   │   │   └── SovereignWasm.cpp
@@ -1883,6 +1950,9 @@ SigmaOS/
 │   │   │   └── SovereignWasm.rs
 │   │   ├── sched
 │   │   │   └── SovereignRTSched.cpp
+│   │   ├── scheduling
+│   │   │   ├── RealTimeScheduler.cpp
+│   │   │   └── SovereignScheduler.cpp
 │   │   ├── security
 │   │   │   ├── amnesic_logger.hpp
 │   │   │   ├── auto_repair.hpp
@@ -1934,19 +2004,27 @@ SigmaOS/
 │   │   │   ├── industrial_vfs.hpp
 │   │   │   ├── registry.c
 │   │   │   ├── SovereignBackup.cpp
+│   │   │   ├── SovereignBcacheFS.cpp
+│   │   │   ├── SovereignCloudFS.cpp
 │   │   │   ├── SovereignDatabase.cpp
 │   │   │   ├── SovereignLUKS.cpp
+│   │   │   ├── SovereignNTFS.cpp
 │   │   │   ├── SovereignPackage.cpp
 │   │   │   ├── SovereignPackage.hpp
+│   │   │   ├── SovereignZFS.cpp
 │   │   │   ├── vfs_shard.hpp
 │   │   │   ├── vfs.c
 │   │   │   ├── VfsShard.cpp
 │   │   │   └── VfsShard.hpp
 │   │   ├── syscall
+│   │   │   ├── dispatcher.c
+│   │   │   ├── dispatcher.h
 │   │   │   ├── exception_handler.c
 │   │   │   ├── ipc.c
 │   │   │   ├── panic_shard.c
 │   │   │   ├── panic.c
+│   │   │   ├── sigma_syscall_dispatcher.c
+│   │   │   ├── sigma_syscall_dispatcher.h
 │   │   │   ├── signal_shard.hpp
 │   │   │   ├── signal.c
 │   │   │   ├── SovereignGlobalSync.cpp
@@ -1954,7 +2032,10 @@ SigmaOS/
 │   │   │   ├── SovereignSyscall.cpp
 │   │   │   ├── SovereignSyscallBridge.cpp
 │   │   │   ├── sync_shard.hpp
-│   │   │   └── syscall.c
+│   │   │   ├── syscall.c
+│   │   │   └── syscalls.h
+│   │   ├── syscalls
+│   │   │   └── SyscallDispatcher.cpp
 │   │   ├── system
 │   │   │   ├── absorption_engine.hpp
 │   │   │   ├── AdaptiveDebugMode.cpp
@@ -1962,6 +2043,7 @@ SigmaOS/
 │   │   │   ├── module_orchestrator.hpp
 │   │   │   ├── persona_manager.hpp
 │   │   │   ├── ProtonBridge.cpp
+│   │   │   ├── RegistryManager.cpp
 │   │   │   ├── shard_manager.cpp
 │   │   │   ├── shard_manager.hpp
 │   │   │   ├── shard_orchestrator.hpp
@@ -2024,6 +2106,7 @@ SigmaOS/
 │   │   │   ├── SovereignSelfHealing.cpp
 │   │   │   ├── SovereignShardManager.cpp
 │   │   │   ├── SovereignShell.cpp
+│   │   │   ├── SovereignSigLoader.cpp
 │   │   │   ├── SovereignStore.cpp
 │   │   │   ├── SovereignSwap.cpp
 │   │   │   ├── SovereignSyscalls.cpp
@@ -2033,8 +2116,10 @@ SigmaOS/
 │   │   │   ├── SovereignTelemetryShard.cpp
 │   │   │   ├── SovereignTelos.cpp
 │   │   │   ├── SovereignTime.cpp
+│   │   │   ├── SovereignTimeMachine.cpp
 │   │   │   ├── SovereignWASM.cpp
 │   │   │   ├── SovereignWatchdog.cpp
+│   │   │   ├── SyscallDispatcher.cpp
 │   │   │   └── user_manager.c
 │   │   ├── testing
 │   │   │   ├── SovereignFuzz.cpp
@@ -2068,6 +2153,9 @@ SigmaOS/
 │   │   │   └── SovereignVirtIO.cpp
 │   │   ├── vis
 │   │   │   └── SovereignVis.cpp
+│   │   ├── vulkan
+│   │   │   ├── sovereign_vulkan.c
+│   │   │   └── sovereign_vulkan.h
 │   │   ├── absorption_engine.hpp
 │   │   ├── app_manager.c
 │   │   ├── automation_shard.rs
@@ -2159,6 +2247,7 @@ SigmaOS/
 │   │   ├── shard_manager.hpp
 │   │   ├── shard_orchestrator.cpp
 │   │   ├── shard_orchestrator.hpp
+│   │   ├── sigma_codec.cpp
 │   │   ├── SigmaCore.asm
 │   │   ├── SigmaOOP.cpp
 │   │   ├── signal_shard.hpp
@@ -2187,6 +2276,7 @@ SigmaOS/
 │   │   ├── SovereignBootSplash.cpp
 │   │   ├── SovereignCanvas.cpp
 │   │   ├── SovereignCapability.cpp
+│   │   ├── SovereignCgroup.cpp
 │   │   ├── SovereignClipboard.cpp
 │   │   ├── SovereignCloud.cpp
 │   │   ├── SovereignCognitive.cpp
@@ -2256,6 +2346,7 @@ SigmaOS/
 │   │   ├── SovereignLayoutManager.cpp
 │   │   ├── SovereignLazy.cpp
 │   │   ├── SovereignLazyLoad.cpp
+│   │   ├── SovereignLBU.cpp
 │   │   ├── SovereignLiveKernel.cpp
 │   │   ├── SovereignLiveTranslate.cpp
 │   │   ├── SovereignLocale.cpp
@@ -2264,6 +2355,7 @@ SigmaOS/
 │   │   ├── SovereignLua.cpp
 │   │   ├── SovereignMain.cpp
 │   │   ├── SovereignManifest.cpp
+│   │   ├── SovereignMathEngine.cpp
 │   │   ├── SovereignMemCompress.cpp
 │   │   ├── SovereignMemoryPaging.cpp
 │   │   ├── SovereignMemoryPalace.cpp
@@ -2302,6 +2394,7 @@ SigmaOS/
 │   │   ├── SovereignOnboarding.hpp
 │   │   ├── SovereignOptimizer.cpp
 │   │   ├── SovereignOrchestrator.cpp
+│   │   ├── SovereignOverlayFS.cpp
 │   │   ├── SovereignPackage.cpp
 │   │   ├── SovereignPackage.hpp
 │   │   ├── SovereignPacketFilter.cpp
@@ -2385,6 +2478,7 @@ SigmaOS/
 │   │   ├── SovereignWiFi.cpp
 │   │   ├── SovereignZenithUI.cpp
 │   │   ├── SovereignZeroNet.cpp
+│   │   ├── SovereignZFSPool.cpp
 │   │   ├── sync_shard.hpp
 │   │   ├── syscall.c
 │   │   ├── task_switch.asm
@@ -2527,6 +2621,9 @@ SigmaOS/
 │   │   └── SovereignSafety.rs
 │   ├── scheduler
 │   │   └── SovereignScheduler.cpp
+│   ├── security
+│   │   ├── SentinelNeural.cpp
+│   │   └── SentinelNeural.h
 │   ├── shards
 │   │   ├── academic
 │   │   │   ├── SovereignAcademic.cpp
@@ -3050,6 +3147,10 @@ SigmaOS/
 │   └── libsigma_safe.rs
 ├── locales
 │   └── en-US.json
+├── memory
+│   ├── paging
+│   │   └── SovereignPaging.cpp
+│   └── README.md
 ├── meta
 │   ├── config
 │   │   ├── .clangd
@@ -3353,6 +3454,18 @@ SigmaOS/
 │       ├── spatial_audio.c
 │       ├── stellar_ui.c
 │       └── window_manager.c
+├── networking
+│   ├── firewall
+│   │   └── SovereignFirewallHook.cpp
+│   ├── link
+│   │   └── SovereignLoopback.cpp
+│   ├── sockets
+│   │   └── SovereignSocketAPI.cpp
+│   ├── transport
+│   │   ├── SovereignTCP.cpp
+│   │   └── SovereignUDP.cpp
+│   ├── README.md
+│   └── tcp_ip_stub.cpp
 ├── obj
 │   └── kernel
 │       └── core
@@ -3365,6 +3478,9 @@ SigmaOS/
 ├── packages
 │   └── graph
 │       └── SovereignDependencyGraph.cpp
+├── pkg
+│   ├── README.md
+│   └── SovereignPkgManager.cpp
 ├── profiles
 │   ├── 3d_printed_organ_transplant_coordinator
 │   │   ├── config.json
@@ -4596,44 +4712,32 @@ SigmaOS/
 ├── S01_Genesis
 │   └── include
 │       └── sigma_kernel_types.h
+├── scheduling
+│   ├── cfs
+│   │   ├── SovereignCFS.cpp
+│   │   └── SovereignCFS.h
+│   └── README.md
 ├── scratch
 │   └── fix_html_classes.py
 ├── scripts
-│   ├── launch_distro_shards
-│   │   ├── __init__.py
-│   │   ├── check_qemu.py
-│   │   ├── launch_distro.py
-│   │   └── print_header.py
 │   ├── app_regression_test.sh
 │   ├── apply_lattice.ps1
 │   ├── browser_security_profile.sh
 │   ├── build_all.sh
 │   ├── build_standalone.sh
-│   ├── check_modularity.py
 │   ├── concurrency_verify.sh
 │   ├── dualboot_installer.sh
 │   ├── dualboot_partition_validate.sh
-│   ├── fix_all_errors.py
 │   ├── fix_all_includes.ps1
-│   ├── fix_all_includes.py
-│   ├── fix_core_includes.py
-│   ├── fix_includes.py
 │   ├── fix_md_lint.ps1
-│   ├── fix_md_lint.py
 │   ├── fix_targeted_md.ps1
-│   ├── fix_wiki_lint.py
-│   ├── fix_wiki_linting.py
 │   ├── format_stress_test.sh
 │   ├── fuzz_pqc.sh
 │   ├── fuzz.sh
 │   ├── gen_changelog.sh
 │   ├── gen_iso.sh
 │   ├── harmonize_includes.ps1
-│   ├── harmonize_includes.py
-│   ├── idea_generator.py
 │   ├── industrial_build.ps1
-│   ├── lattice_coverage.py
-│   ├── launch_distro.py
 │   ├── orchestrator.cpp
 │   ├── package_app.sh
 │   ├── publish_release.ps1
@@ -4644,18 +4748,12 @@ SigmaOS/
 │   ├── run_stress_tests.sh
 │   ├── s_install.c
 │   ├── setup.sh
-│   ├── sigma_absolute_imports.py
-│   ├── sigma_apex_sharder.py
 │   ├── sigma_automator.sh
 │   ├── sigma_industrial_deploy.sh
 │   ├── sign_release.sh
-│   ├── sovereign_hardener.py
-│   ├── stabilize_includes.py
 │   ├── standalone_rt_validate.sh
-│   ├── sync_branches.py
 │   ├── sync_github.sh
 │   ├── sync_wiki.ps1
-│   ├── sync_wiki.py
 │   ├── test_runner.cpp
 │   └── uiux_accessibility_test.sh
 ├── security
@@ -5320,6 +5418,11 @@ SigmaOS/
 │   │   └── 450_hardened_forensic_auditing.js
 │   └── wasm
 │       └── hello_world.wasm
+├── sigma-build
+│   ├── deepseek.sb
+│   ├── fritzing.sb
+│   ├── ghidra.sb
+│   └── Readme.md
 ├── sigmaos
 │   ├── config
 │   │   └── schema.py
@@ -5364,6 +5467,12 @@ SigmaOS/
 ├── simulation
 │   ├── index.html
 │   └── industrial_stress_test.py
+├── storage
+│   ├── fs
+│   │   └── SovereignJournalFS.cpp
+│   ├── vfs
+│   │   └── SovereignVFS.cpp
+│   └── README.md
 ├── suites
 │   ├── include
 │   │   ├── sigma_kernel_types.h
@@ -9680,14 +9789,16 @@ SigmaOS/
 │   │   ├── gui_pkg
 │   │   │   └── explorer_page
 │   │   │       └── explorerpage
-│   │   │           └── __init__│   │   │               └──_ExplorerPage_core.py
+│   │   │           └── __init__
+│   │   │               └── _ExplorerPage_core.py
 │   │   ├── linux_parity_engine
 │   │   │   └── sigmapackagemanager
 │   │   │       └── sigma_translate
 │   │   │           └── __init__.py
 │   │   ├── peripherals
 │   │   │   └── biometricengine
-│   │   │       └── __init__│   │   │           └──_BiometricEngine_core.py
+│   │   │       └── __init__
+│   │   │           └── _BiometricEngine_core.py
 │   │   ├── module.json
 │   │   ├── SigmaRPC.hpp
 │   │   └── SovereignSDK.hpp
@@ -10324,20 +10435,58 @@ SigmaOS/
 │   │   ├── test_kernel.cpp
 │   │   ├── test_pqc.cpp
 │   │   └── test_sandbox.cpp
-│   ├── certify_release.py
-│   ├── matrix_test.py
+│   ├── kselftest
+│   │   ├── kselftest_run.cpp
+│   │   └── kselftest_sigma.h
 │   ├── system_audit.test.js
 │   ├── UNIFIED_TEST_SUITE.sh
 │   ├── UniversalOSFormatTest.cpp
 │   └── utils.test.js
 ├── tools
+│   ├── cli
+│   │   ├── dose-calc.cpp
+│   │   ├── gst-calc.cpp
+│   │   ├── sigma-cluster.cpp
+│   │   ├── sigma-forensics.cpp
+│   │   ├── sigma-hal-info.cpp
+│   │   ├── sigma-hal-test.cpp
+│   │   ├── sigma-hypervisor.cpp
+│   │   ├── sigma-monitor.cpp
+│   │   ├── sigma-recover.cpp
+│   │   ├── sigma-secure.cpp
+│   │   ├── sigma-snapshot.cpp
+│   │   └── struct-load.cpp
+│   ├── pro
+│   │   ├── SovereignADRTracker.cpp
+│   │   ├── SovereignBonusComplianceCalc.cpp
+│   │   ├── SovereignConsumerCourtFeeCalc.cpp
+│   │   ├── SovereignDosageCalc.cpp
+│   │   ├── SovereignEPFCalculator.cpp
+│   │   ├── SovereignEqualRemunerationAuditor.cpp
+│   │   ├── SovereignGratuityCalculator.cpp
+│   │   ├── SovereignGratuityTaxCalc.cpp
+│   │   ├── SovereignGSTCalculator.cpp
+│   │   ├── SovereignIndustrialDisputeArbitrator.cpp
+│   │   ├── SovereignLoadCalc.cpp
+│   │   ├── SovereignMaternityBenefitTracker.cpp
+│   │   ├── SovereignMSMERegistry.cpp
+│   │   ├── SovereignPatentsFeeCalc.cpp
+│   │   ├── SovereignPFRDAMemberRegistry.cpp
+│   │   ├── SovereignRationAllocationCalc.cpp
+│   │   ├── SovereignRERAPenaltyCalc.cpp
+│   │   ├── SovereignRTIComplianceCalc.cpp
+│   │   ├── SovereignTDSCalculator.cpp
+│   │   └── SovereignTradeUnionRegistrationValidator.cpp
 │   ├── qemu
 │   │   └── run-qemu.sh
-│   ├── diagram_gen.py
+│   ├── diagram_gen.js
+│   ├── fix_html.cjs
+│   ├── generate_docs.js
 │   ├── live_usb_creator.ps1
-│   ├── problem_tracker.py
-│   ├── reconcile_shards.py
-│   ├── release_auto.py
+│   ├── problem_tracker.js
+│   ├── profession_calculators.cpp
+│   ├── reconcile_shards.js
+│   ├── release_auto.js
 │   ├── sigma_accessibility.cpp
 │   ├── sigma_adaptive_input.cpp
 │   ├── sigma_api_gateway.cpp
@@ -10347,48 +10496,75 @@ SigmaOS/
 │   ├── sigma_backup.cpp
 │   ├── sigma_blockchain.cpp
 │   ├── sigma_build_farm.cpp
+│   ├── sigma_cgroup.cpp
 │   ├── sigma_clipboard.cpp
 │   ├── sigma_cloud_sync.cpp
 │   ├── sigma_cluster.cpp
 │   ├── sigma_compliance_cli.cpp
+│   ├── sigma_container_engine.cpp
+│   ├── sigma_cron.cpp
 │   ├── sigma_debug_cli.cpp
 │   ├── sigma_dev_dashboard.cpp
+│   ├── sigma_diagnostics.c
+│   ├── sigma_display_manager.cpp
+│   ├── sigma_dns.cpp
+│   ├── sigma_dtrace.c
 │   ├── sigma_edge_ml.cpp
 │   ├── sigma_edge_vision.cpp
 │   ├── sigma_education.cpp
 │   ├── sigma_energy.cpp
 │   ├── sigma_enterprise_recovery.cpp
+│   ├── sigma_firewall.cpp
+│   ├── sigma_flatpak.cpp
+│   ├── sigma_forensics.c
+│   ├── sigma_forensics.cpp
 │   ├── sigma_fsck.cpp
 │   ├── sigma_gpu_profiler.cpp
 │   ├── sigma_inspector.cpp
 │   ├── sigma_latency.cpp
+│   ├── sigma_lbu.cpp
 │   ├── sigma_log_visualizer.cpp
 │   ├── sigma_mirror_manager.cpp
+│   ├── sigma_monitor.c
+│   ├── sigma_network_manager.cpp
+│   ├── sigma_nix_config.cpp
 │   ├── sigma_notifications.cpp
+│   ├── sigma_overlayfs.cpp
 │   ├── sigma_personalisation.cpp
+│   ├── sigma_pkg_delta.cpp
+│   ├── sigma_pkg.cpp
 │   ├── sigma_policy_engine.cpp
 │   ├── sigma_quantum_simulator.cpp
+│   ├── sigma_recover.c
+│   ├── sigma_recover.cpp
 │   ├── sigma_robotics_planner.cpp
+│   ├── sigma_rt_analyzer.c
 │   ├── sigma_secure_boot.cpp
 │   ├── sigma_sensor_fusion.cpp
 │   ├── sigma_smart_grid.cpp
 │   ├── sigma_sovereign_cloud.cpp
+│   ├── sigma_subsystem.c
+│   ├── sigma_systemctl.cpp
 │   ├── sigma_test_lab.cpp
+│   ├── sigma_timemachine.c
+│   ├── sigma_top.cpp
 │   ├── sigma_tuner.cpp
 │   ├── sigma_vr_studio.cpp
 │   ├── sigma_workspace.cpp
-│   ├── sigma-build.py
+│   ├── sigma_zfs.cpp
+│   ├── sigma-build.js
 │   ├── sigma-cli.cpp
 │   ├── sigma-debug.cpp
 │   ├── sigma-fix.cpp
 │   ├── sigma-log.cpp
 │   ├── sigma-pkg.cpp
-│   ├── sigma-pkg.py
+│   ├── sigma-pkg.js
 │   ├── sigma-pkg.sh
 │   ├── sigma.ps1
-│   ├── sovereign-deploy.py
+│   ├── sovereign-deploy.js
+│   ├── sync_all_branches.js
 │   ├── telemetry-cli.cpp
-│   └── wiki_sync.py
+│   └── wiki_sync.js
 ├── ui
 │   ├── accessibility
 │   │   ├── SovereignAccessibility.cpp
@@ -10407,6 +10583,8 @@ SigmaOS/
 │   │   ├── style.css
 │   │   ├── zenith_desktop.css
 │   │   └── zenith_inline.css
+│   ├── ProfileSelector.cpp
+│   ├── SigmaInstaller.cpp
 │   ├── SovereignAmbientAudio.cpp
 │   ├── SovereignAudio.cpp
 │   ├── SovereignCanvas.cpp
@@ -10428,6 +10606,7 @@ SigmaOS/
 │   ├── SovereignSpatialAudio.cpp
 │   ├── SovereignSpatialUI.cpp
 │   ├── SovereignTelemetryUI.cpp
+│   ├── SovereignThemeEngine.cpp
 │   ├── SovereignThemeMarket.hpp
 │   ├── SovereignTilingEngine.cpp
 │   ├── SovereignUIWidgets.cpp
@@ -10477,9 +10656,13 @@ SigmaOS/
 │   │   │       └── _build_color_tab
 │   │   │           └── __init__.py
 │   │   ├── SigmaAcademy.cpp
+│   │   ├── SigmaAI.cpp
+│   │   ├── SigmaAI.h
 │   │   ├── SigmaAIIntegration.cpp
 │   │   ├── SigmaAuditTool.cpp
 │   │   ├── SigmaBackupShard.cpp
+│   │   ├── SigmaDB.cpp
+│   │   ├── SigmaDB.h
 │   │   ├── SigmaDistroStreamer.cpp
 │   │   ├── SigmaGameLibrary.cpp
 │   │   ├── SigmaIndustrialMatrix.cpp
@@ -10487,22 +10670,34 @@ SigmaOS/
 │   │   ├── SigmaNetworkShard.cpp
 │   │   ├── SigmaPersonalizer.cpp
 │   │   ├── SigmaRemoteManager.cpp
+│   │   ├── SigmaRuntimes.cpp
+│   │   ├── SigmaRuntimes.h
+│   │   ├── SigmaStats.cpp
+│   │   ├── SigmaStats.h
+│   │   ├── SigmaSuite.cpp
+│   │   ├── SigmaSuite.h
 │   │   ├── SigmaTerminalUtils.cpp
 │   │   ├── SigmaThemeStore.cpp
 │   │   ├── SigmaUserProvisioner.cpp
+│   │   ├── SigmaWarehouse.cpp
+│   │   ├── SigmaWarehouse.h
+│   │   ├── SigmaWeb.cpp
+│   │   ├── SigmaWeb.h
 │   │   └── SovereignProTools.cpp
 │   ├── system_api
 │   │   ├── gui_pkg
 │   │   │   └── explorer_page
 │   │   │       └── explorerpage
-│   │   │           └── __init__│   │   │               └──_ExplorerPage_core.py
+│   │   │           └── __init__
+│   │   │               └── _ExplorerPage_core.py
 │   │   ├── linux_parity_engine
 │   │   │   └── sigmapackagemanager
 │   │   │       └── sigma_translate
 │   │   │           └── __init__.py
 │   │   └── peripherals
 │   │       └── biometricengine
-│   │           └── __init__│   │               └──_BiometricEngine_core.py
+│   │           └── __init__
+│   │               └── _BiometricEngine_core.py
 │   ├── logd.cpp
 │   ├── omni_shell.c
 │   ├── omni_shell.cpp
@@ -11234,37 +11429,37 @@ SigmaOS/
 ├── .gitmodules
 ├── app_store.html
 ├── CHANGELOG.md
+├── CODE_OF_CONDUCT.md
 ├── compile_commands.json
 ├── compile_flags.txt
 ├── CONTRIBUTING.md
 ├── CONTRIBUTOR_ROADMAP.md
 ├── control_center.html
+├── CURRENT_PROBLEMS_MANIFEST.md
 ├── Dockerfile
 ├── Doxyfile
+├── external_styles.css
+├── final_sync.js
 ├── fix_all_errors.ps1
 ├── fix_all_includes.ps1
-├── fix_all_includes.py
-├── fix_all_v2.py
+├── fix_all.cjs
 ├── fix_cpp_errors.ps1
-├── fix_css_malform.py
 ├── fix_css.ps1
 ├── fix_depths.cjs
-├── fix_depths.py
 ├── fix_errors.ps1
+├── fix_gap.cjs
 ├── fix_headers_v3.cjs
 ├── fix_includes_precise.ps1
 ├── fix_includes_v2.cjs
 ├── fix_includes_v2.ps1
 ├── fix_includes.ps1
-├── fix_includes.py
-├── fix_logs.py
 ├── fix_markdown.cjs
-├── fix_markdown.py
-├── fix_style_despace_v2.py
-├── fix_style_despace.py
+├── fix_md.cjs
+├── fix_md.ps1
 ├── fix_unused.ps1
 ├── fix_zenith_inline.ps1
-├── generate_atomics.py
+├── fix.cjs
+├── fix.py
 ├── generate_file_index.cjs
 ├── headers_map.json
 ├── index.html
@@ -11274,16 +11469,15 @@ SigmaOS/
 ├── linker.ld
 ├── main.js
 ├── Makefile
-├── migrate_profiles.py
+├── migrate.ps1
+├── migration_log.txt
 ├── modularize_kernel.js
 ├── Niche-Parity-Certification.md
-├── normalize_css.py
 ├── normalize_md.ps1
-├── OS_FORMATS.md
 ├── package-lock.json
 ├── package.json
 ├── populate_profiles.cjs
-├── PRINCIPLES.md
+├── PROFILES.md
 ├── qemu-boot.sh
 ├── README.md
 ├── refactor_namespaces.ps1
@@ -11298,6 +11492,7 @@ SigmaOS/
 ├── site.css
 ├── site.js
 ├── style.css
+├── sync.js
 ├── verify_sovereignty.ps1
 ├── visual_customizer.html
 ├── vitest.config.js
@@ -11305,6 +11500,5 @@ SigmaOS/
 ├── zenith_desktop.css
 ├── zenith_desktop.js
 └── zenith.html
-
 
 ```
