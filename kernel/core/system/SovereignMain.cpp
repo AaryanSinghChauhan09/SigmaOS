@@ -1,45 +1,48 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/sigma_main.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_kernel_types.h"
+#include "../../include/SigmaOOP.hpp"
+#include "../../include/sigma_log.h"
 
 // Engine Initialisers (Extern C)
-void sigma_bootstrap_lattice();
+extern "C" {
+    void sinit_init();
+    void sinit_execute_plan();
+    void sinit_report_status();
+}
+
+/**
+ * SigmaOS Sovereign Main Entry Point
+ * Implements the Zenith Singularity ignition sequence.
+ */
 
 namespace SigmaOS {
 namespace Kernel {
-namespace System {
 
-SovereignKernelMain& SovereignKernelMain::getInstance() {
-    static SovereignKernelMain instance;
-    return instance;
-}
+class SovereignKernelMain : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignKernelMain> {
+    friend class SigmaOS::SigmaSingleton<SovereignKernelMain>;
+public:
+    const char* type_name() const noexcept override { return "SovereignKernelMain"; }
 
-void SovereignKernelMain::ignite() {
-    sigma_log("\nS SIGMAOS ZENITH SINGULARITY (v100.0) IGNITING...\n");
-    sigma_log("--------------------------------------------------\n");
+    void ignite() {
+        serial_init(); // Boot-level I/O ignition
+        sigma_log_info("\nΣ SIGMAOS ZENITH SINGULARITY (v15.0) IGNITING...\n");
+        sigma_log_info("--------------------------------------------------\n");
 
-    // Sovereign 4-Phase Shard Orchestration
-    sigma_bootstrap_lattice();
+        sinit_init();
+        sinit_execute_plan();
+        sinit_report_status();
 
-    sigma_log("--------------------------------------------------\n");
-    sigma_log("S SYSTEM SOVEREIGNTY ACHIEVED. LATTICE READY.\n\n");
-}
+        sigma_log_info("--------------------------------------------------\n");
+        sigma_log_info("Σ SYSTEM SOVEREIGNTY ACHIEVED. LATTICE ACTIVE.\n\n");
+    }
 
-} // namespace System
+private:
+    SovereignKernelMain() = default;
+};
+
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C" {
-
-void sigma_kernel_main() {
-    SigmaOS::Kernel::System::SovereignKernelMain::ignite();
+extern "C" void sigma_kernel_main() {
+    SigmaOS::Kernel::SovereignKernelMain::getInstance().ignite();
 }
-
-
-
-
-} // extern "C"
-
-} // extern "C"
  

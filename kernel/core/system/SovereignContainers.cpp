@@ -1,7 +1,9 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_kernel_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Containerization Engine
@@ -11,7 +13,7 @@
  * mathematically isolated micro-VMs without the overhead of Docker or KVM.
  * Allows bare-metal speed while executing untrusted userland code.
  *
- * Design: OOP-isolated singleton � SovereignContainerEngine.
+ * Design: OOP-isolated singleton — SovereignContainerEngine.
  */
 
 class SovereignContainerEngine {
@@ -21,7 +23,7 @@ public:
         return instance;
     }
 
-    static void init() {
+    void init() {
         sigma_log("[CONTAINER] Initializing Sovereign Micro-VM Containerization...");
         this->active_containers = 0;
         sigma_log("[CONTAINER] Bare-metal isolation namespaces ACTIVE.");
@@ -36,7 +38,7 @@ public:
         sigma_hardened_strcpy(this->containers[this->active_containers], container_name, 32);
         this->active_containers++;
         
-        sigma_log("[CONTAINER] Spawned Container '%s' executing '%s'. Total Active: %u\n", 
+        sigma_log_info("[CONTAINER] Spawned Container '%s' executing '%s'. Total Active: %u\n", 
                      container_name, entrypoint, this->active_containers);
     }
 
@@ -48,17 +50,13 @@ private:
 };
 
 /* --- C Wrappers --- */
-void container_init() {
-    SovereignContainerEngine::init();
+extern "C" void container_init() {
+    SovereignContainerEngine::getInstance().init();
 }
 
-void container_spawn(const char* name, const char* entrypoint) {
-    SovereignContainerEngine::spawnContainer(name, entrypoint);
+extern "C" void container_spawn(const char* name, const char* entrypoint) {
+    SovereignContainerEngine::getInstance().spawnContainer(name, entrypoint);
 }
 
 
-
-
-
-} // extern "C"
  

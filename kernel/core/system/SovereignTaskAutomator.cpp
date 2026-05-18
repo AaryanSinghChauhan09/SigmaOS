@@ -1,8 +1,11 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_taskautomator.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_kernel_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/sigma_taskautomator.h"
+#include "../../include/sigma_log.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Automation Engine
@@ -11,7 +14,7 @@
  * USP: Instantly automate any system UI or CLI action natively via 
  * semantic event parsing. No external tools like AutoHotkey needed.
  *
- * Design: OOP-isolated singleton � SovereignAutomationEngine.
+ * Design: OOP-isolated singleton — SovereignAutomationEngine.
  */
 
 typedef struct {
@@ -27,7 +30,7 @@ public:
         return instance;
     }
 
-    static void init() {
+    void init() {
         sigma_log("[AUTOMATION] Initializing Sovereign Automation Engine (SEP Algorithm)...");
         this->rule_count = 0;
         this->macro_recording = false;
@@ -41,7 +44,7 @@ public:
             this->rule_registry[this->rule_count].is_active = true;
             this->rule_count++;
             
-            sigma_log("[AUTOMATION] SEP: Rule created. Trigger: '%s' -> Action: '%s'.\n", 
+            sigma_log_info("[AUTOMATION] SEP: Rule created. Trigger: '%s' -> Action: '%s'.\n", 
                          nlp_trigger, action);
         }
     }
@@ -50,7 +53,7 @@ public:
         sigma_log("[AUTOMATION] SEP: Evaluating global state against registered automation rules...");
         for (sigma_u32 i = 0; i < this->rule_count; i++) {
             if (this->rule_registry[i].is_active) {
-                sigma_log("[AUTOMATION] SEP: Evaluating Rule %d: IF '%s' THEN '%s'\n", 
+                sigma_log_info("[AUTOMATION] SEP: Evaluating Rule %d: IF '%s' THEN '%s'\n", 
                              i, this->rule_registry[i].trigger, this->rule_registry[i].action);
             }
         }
@@ -75,29 +78,25 @@ private:
 };
 
 /* --- C Wrappers --- */
-void taskautomator_init() {
-    SovereignAutomationEngine::init();
+extern "C" void taskautomator_init() {
+    SovereignAutomationEngine::getInstance().init();
 }
 
-void taskautomator_create_rule(const char* nlp_trigger, const char* action) {
-    SovereignAutomationEngine::createRule(nlp_trigger, action);
+extern "C" void taskautomator_create_rule(const char* nlp_trigger, const char* action) {
+    SovereignAutomationEngine::getInstance().createRule(nlp_trigger, action);
 }
 
-void taskautomator_evaluate_rules() {
-    SovereignAutomationEngine::evaluateRules();
+extern "C" void taskautomator_evaluate_rules() {
+    SovereignAutomationEngine::getInstance().evaluateRules();
 }
 
-void taskautomator_start_macro() {
-    SovereignAutomationEngine::startMacroRecording();
+extern "C" void taskautomator_start_macro() {
+    SovereignAutomationEngine::getInstance().startMacroRecording();
 }
 
-void taskautomator_stop_macro() {
-    SovereignAutomationEngine::stopMacroRecording();
+extern "C" void taskautomator_stop_macro() {
+    SovereignAutomationEngine::getInstance().stopMacroRecording();
 }
 
 
-
-
-
-} // extern "C"
  

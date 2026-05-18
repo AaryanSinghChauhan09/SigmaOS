@@ -1,7 +1,9 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_kernel_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Modular GPU Driver Framework
@@ -11,7 +13,7 @@
  * Dynamically binds to the Sovereign NUMA node closest to the GPU die, 
  * delivering O(1) latency data pipelines to the SovereignTelemetryUI.
  *
- * Design: OOP-isolated singleton � SovereignGPUEngine.
+ * Design: OOP-isolated singleton — SovereignGPUEngine.
  */
 
 class SovereignGPUEngine {
@@ -21,7 +23,7 @@ public:
         return instance;
     }
 
-    static void init() {
+    void init() {
         sigma_log("[GPU] Initializing Modular GPU Driver Framework...");
         this->active_gpus = 0;
         this->ai_workloads_dispatched = 0;
@@ -32,7 +34,7 @@ public:
         if (this->active_gpus >= 4) return;
         sigma_hardened_strcpy(this->gpu_vendors[this->active_gpus], vendor_id, 16);
         this->active_gpus++;
-        sigma_log("[GPU] Registered %s GPU with %u MB VRAM.\n", vendor_id, vram_mb);
+        sigma_log_info("[GPU] Registered %s GPU with %u MB VRAM.\n", vendor_id, vram_mb);
     }
 
     bool dispatchComputeKernel(const char* workload_type) {
@@ -42,7 +44,7 @@ public:
         }
 
         this->ai_workloads_dispatched++;
-        sigma_log("[GPU] Dispatching '%s' workload to %s. (Total dispatched: %u)\n", 
+        sigma_log_info("[GPU] Dispatching '%s' workload to %s. (Total dispatched: %u)\n", 
                      workload_type, this->gpu_vendors[0], this->ai_workloads_dispatched);
         return true;
     }
@@ -56,21 +58,17 @@ private:
 };
 
 /* --- C Wrappers --- */
-void gpu_init() {
-    SovereignGPUEngine::init();
+extern "C" void gpu_init() {
+    SovereignGPUEngine::getInstance().init();
 }
 
-void gpu_register(const char* vendor_id, sigma_u32 vram_mb) {
-    SovereignGPUEngine::registerGPU(vendor_id, vram_mb);
+extern "C" void gpu_register(const char* vendor_id, sigma_u32 vram_mb) {
+    SovereignGPUEngine::getInstance().registerGPU(vendor_id, vram_mb);
 }
 
 extern "C" bool gpu_dispatch(const char* workload_type) {
-    return SovereignGPUEngine::dispatchComputeKernel(workload_type);
+    return SovereignGPUEngine::getInstance().dispatchComputeKernel(workload_type);
 }
 
 
-
-
-
-} // extern "C"
  

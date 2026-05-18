@@ -1,15 +1,16 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/hal/sigma_mmu.h"
-#include "../../../include/sigma_hal.h"
+#include "../../include/sigma_kernel_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/hal/sigma_mmu.h"
+#include "../../include/sigma_log.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign MMU Implementation
  * Implements an Asynchronous Page Fault Resolution (APFR) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal silicon isolation.
  *
- * Design: OOP-isolated singleton " SovereignMMUEngine.
+ * Design: OOP-isolated singleton â€” SovereignMMUEngine.
  */
 
 /* --- Sovereign MMU Engine (OOP Isolation) --- */
@@ -31,12 +32,12 @@ bool SovereignMMUEngine::mapShard(sigma_u32 shard_id, sigma_u64 vaddr, sigma_u64
     entry->flags = flags;
     entry->shard_owner = shard_id;
     
-    sigma_log("[MMU] Mapped: V%016llX -> P%016llX (Shard S%02u)\n", vaddr, paddr, shard_id);
+    sigma_log_info("[MMU] Mapped: V%016llX -> P%016llX (Shard S%02u)\n", vaddr, paddr, shard_id);
     return SIGMA_TRUE;
 }
 
 void SovereignMMUEngine::handleFault(sigma_u64 faulting_addr) {
-    sigma_log("[MMU] [FAULT] Access Violation at %016llX\n", faulting_addr);
+    sigma_log_info("[MMU] [FAULT] Access Violation at %016llX\n", faulting_addr);
     this->faults_resolved++;
     
     sigma_log("[MMU] APFR: Resolving fault via Shard Migration sequence...");
@@ -44,25 +45,22 @@ void SovereignMMUEngine::handleFault(sigma_u64 faulting_addr) {
 }
 
 /* --- C Wrappers --- */
-void mmu_init() {
-    SovereignMMUEngine::init();
+extern "C" void mmu_init() {
+    SovereignMMUEngine::getInstance().init();
 }
 
 extern "C" bool mmu_map_shard(sigma_u32 shard_id, sigma_u64 vaddr, sigma_u64 paddr, sigma_u32 flags) {
-    return SovereignMMUEngine::mapShard(shard_id, vaddr, paddr, flags);
+    return SovereignMMUEngine::getInstance().mapShard(shard_id, vaddr, paddr, flags);
 }
 
-void mmu_handle_fault(sigma_u64 faulting_addr) {
-    SovereignMMUEngine::handleFault(faulting_addr);
+extern "C" void mmu_handle_fault(sigma_u64 faulting_addr) {
+    SovereignMMUEngine::getInstance().handleFault(faulting_addr);
 }
 
 extern "C" sigma_u64 mmu_get_fault_count() {
-    return SovereignMMUEngine::getFaultCount();
+    return SovereignMMUEngine::getInstance().getFaultCount();
 }
 
 
 
-
-
-} // extern "C"
  

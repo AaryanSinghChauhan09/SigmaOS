@@ -1,15 +1,16 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_power.h"
-#include "../../../include/sigma_hal.h"
+#include "../../include/sigma_kernel_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/sigma_power.h"
+#include "../../include/sigma_log.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Power Management (SPM)
  * Implements an Intelligent Energy Orchestration (IEO) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal ACPI/APM orchestration.
  *
- * Design: OOP-isolated singleton � SovereignPowerEngine.
+ * Design: OOP-isolated singleton — SovereignPowerEngine.
  */
 
 class SovereignPowerEngine {
@@ -19,7 +20,7 @@ public:
         return instance;
     }
 
-    static void init() {
+    void init() {
         sigma_log("[POWER] Initializing Sovereign Power Management (IEO Algorithm)...");
         this->profile = SIGMA_POWER_BALANCED;
     }
@@ -33,7 +34,7 @@ public:
             case SIGMA_POWER_HIBERNATE: profile_name = "HIBERNATE"; break;
             default: break;
         }
-        sigma_log("[POWER] IEO: Switched to %s profile.\n", profile_name);
+        sigma_log_info("[POWER] IEO: Switched to %s profile.\n", profile_name);
     }
 
     sigma_u32 getBatteryPct() const {
@@ -52,25 +53,21 @@ private:
 };
 
 /* --- C Wrappers --- */
-void power_init() {
-    SovereignPowerEngine::init();
+extern "C" void power_init() {
+    SovereignPowerEngine::getInstance().init();
 }
 
-void power_set_profile(sigma_power_profile_t profile) {
-    SovereignPowerEngine::setProfile(profile);
+extern "C" void power_set_profile(sigma_power_profile_t profile) {
+    SovereignPowerEngine::getInstance().setProfile(profile);
 }
 
 extern "C" sigma_u32 power_get_battery_pct() {
-    return SovereignPowerEngine::getBatteryPct();
+    return SovereignPowerEngine::getInstance().getBatteryPct();
 }
 
-void power_reboot() {
-    SovereignPowerEngine::reboot();
+extern "C" void power_reboot() {
+    SovereignPowerEngine::getInstance().reboot();
 }
 
 
-
-
-
-} // extern "C"
  

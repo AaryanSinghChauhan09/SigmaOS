@@ -1,17 +1,19 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_kernel_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Memory Compression Engine
  * Zero-overhead RAM compression using silicon-native ZSTD-like algorithm.
  *
  * USP: Compresses cold memory pages in Ring-0 without any userland latency.
- * On embedded ARM targets this doubles effective RAM capacity � critical
+ * On embedded ARM targets this doubles effective RAM capacity — critical
  * for IoT sovereignty with constrained DRAM budgets.
  *
- * Design: OOP-isolated singleton � SovereignMemCompressEngine.
+ * Design: OOP-isolated singleton — SovereignMemCompressEngine.
  */
 
 class SovereignMemCompressEngine {
@@ -21,7 +23,7 @@ public:
         return instance;
     }
 
-    static void init() {
+    void init() {
         sigma_log("[MEMCOMPRESS] Initializing Sovereign Memory Compression Engine...");
         this->compressed_pages = 0;
         this->bytes_saved = 0;
@@ -33,13 +35,13 @@ public:
         sigma_u32 saved = (page_count - pages_after) * 4096;
         this->compressed_pages += pages_after;
         this->bytes_saved += saved;
-        sigma_log("[MEMCOMPRESS] Compressed %u cold pages -> %u pages. Saved %u KB.\n",
+        sigma_log_info("[MEMCOMPRESS] Compressed %u cold pages -> %u pages. Saved %u KB.\n",
                      page_count, pages_after, saved / 1024);
         return pages_after;
     }
 
     void printStats() {
-        sigma_log("[MEMCOMPRESS] Total compressed: %u pages. Bytes recovered: %u MB.\n",
+        sigma_log_info("[MEMCOMPRESS] Total compressed: %u pages. Bytes recovered: %u MB.\n",
                      this->compressed_pages, this->bytes_saved / (1024 * 1024));
     }
 
@@ -49,13 +51,9 @@ private:
     sigma_u32 bytes_saved;
 };
 
-void memcompress_init() { SovereignMemCompressEngine::init(); }
-extern "C" sigma_u32 memcompress_compress(sigma_u32 pages) { return SovereignMemCompressEngine::compressColdPages(pages); }
-void memcompress_stats() { SovereignMemCompressEngine::printStats(); }
+extern "C" void memcompress_init() { SovereignMemCompressEngine::getInstance().init(); }
+extern "C" sigma_u32 memcompress_compress(sigma_u32 pages) { return SovereignMemCompressEngine::getInstance().compressColdPages(pages); }
+extern "C" void memcompress_stats() { SovereignMemCompressEngine::getInstance().printStats(); }
 
 
-
-
-
-} // extern "C"
  

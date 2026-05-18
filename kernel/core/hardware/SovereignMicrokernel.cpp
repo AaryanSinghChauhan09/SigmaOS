@@ -1,7 +1,9 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_kernel_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Microkernel Orchestrator
@@ -11,7 +13,7 @@
  * execution models based on security requirements. In microkernel mode,
  * drivers and filesystems are pushed to user space, orchestrated by IPC.
  *
- * Design: OOP-isolated singleton � SovereignMicrokernelEngine.
+ * Design: OOP-isolated singleton — SovereignMicrokernelEngine.
  */
 
 class SovereignMicrokernelEngine {
@@ -21,7 +23,7 @@ public:
         return instance;
     }
 
-    static void init() {
+    void init() {
         sigma_log("[MICROKERNEL] Initializing Sovereign Microkernel Architecture...");
         this->microkernel_mode = false;
         this->ipc_channels_active = 0;
@@ -46,7 +48,7 @@ public:
         }
         
         sigma_u32 channel_id = ++this->ipc_channels_active;
-        sigma_log("[MICROKERNEL] IPC Channel %u allocated between Service 0x%04X and Service 0x%04X.\n", 
+        sigma_log_info("[MICROKERNEL] IPC Channel %u allocated between Service 0x%04X and Service 0x%04X.\n", 
                      channel_id, service_a, service_b);
         return channel_id;
     }
@@ -59,25 +61,21 @@ private:
 };
 
 /* --- C Wrappers --- */
-void microkernel_init() {
-    SovereignMicrokernelEngine::init();
+extern "C" void microkernel_init() {
+    SovereignMicrokernelEngine::getInstance().init();
 }
 
-void microkernel_enable() {
-    SovereignMicrokernelEngine::enableMicrokernelMode();
+extern "C" void microkernel_enable() {
+    SovereignMicrokernelEngine::getInstance().enableMicrokernelMode();
 }
 
-void microkernel_disable() {
-    SovereignMicrokernelEngine::disableMicrokernelMode();
+extern "C" void microkernel_disable() {
+    SovereignMicrokernelEngine::getInstance().disableMicrokernelMode();
 }
 
 extern "C" sigma_u32 microkernel_allocate_ipc(sigma_u32 service_a, sigma_u32 service_b) {
-    return SovereignMicrokernelEngine::allocateIPCChannel(service_a, service_b);
+    return SovereignMicrokernelEngine::getInstance().allocateIPCChannel(service_a, service_b);
 }
 
 
-
-
-
-} // extern "C"
  

@@ -1,11 +1,9 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 
-#include "../../../include/sigma_omnisense.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/sigma_universal_ui.h"
-#include "../../../include/sigma_energysched.h"
+#include "../../include/sigma_omnisense.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_universal_ui.h"
+#include "../../include/sigma_energysched.h"
 
 /**
  * SigmaOS Sovereign Omni-Sense Hub
@@ -13,11 +11,11 @@
  * ZERO-DEPENDENCY: Strictly bare-metal sensor orchestration.
  */
 
-void omnisense_init() {
+extern "C" void omnisense_init() {
     sigma_log("[OMNISENSE] Initializing Sovereign Omni-Sense Hub (REF Algorithm)...");
 }
 
-void omnisense_poll_sensors() {
+extern "C" void omnisense_poll_sensors() {
     sigma_log("[OMNISENSE] REF: Polling integrated silicon sensor matrix...");
     
     sigma_omnisense_data_t current_data = {
@@ -29,7 +27,7 @@ void omnisense_poll_sensors() {
     omnisense_adapt_system(&current_data);
 }
 
-void omnisense_adapt_system(const sigma_omnisense_data_t* data) {
+extern "C" void omnisense_adapt_system(const sigma_omnisense_data_t* data) {
     // REF (Reactive Environmental Fusion) Algorithm
     
     if (!data->user_presence_detected) {
@@ -45,9 +43,4 @@ void omnisense_adapt_system(const sigma_omnisense_data_t* data) {
         }
     }
 }
-
-
-
-
-} // extern "C"
  

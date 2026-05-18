@@ -1,8 +1,9 @@
-﻿#include "../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/ai/sigma_neural.h"
+#include "../../include/sigma_kernel_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "../../include/ai/sigma_neural.h"
+#include "../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Neural Hardware Acceleration
@@ -17,13 +18,13 @@ public:
         return instance;
     }
 
-    static void init() {
+    void init() {
         sigma_log("[NEURAL] Initializing Neural Hardware Acceleration Shard...");
         this->state.npu_engaged = true;
     }
 
     void morphUI(sigma_u32 widget_id, sigma_u32 cognitive_load) {
-        sigma_log("[NEURAL] Morphing Widget %u based on cognitive load %u...\n", (unsigned)widget_id, (unsigned)cognitive_load);
+        sigma_log_info("[NEURAL] Morphing Widget %u based on cognitive load %u...\n", (unsigned)widget_id, (unsigned)cognitive_load);
         // Perform tensor calculations for glassmorphic transitions
         sigma_log("[NEURAL] UI Transition optimized by silicon-native predictive model.");
     }
@@ -38,17 +39,13 @@ private:
 };
 
 /* --- C Wrappers --- */
-void neural_init() {
-    SovereignNeuralAccelEngine::init();
+extern "C" void neural_init() {
+    SovereignNeuralAccelEngine::getInstance().init();
 }
 
-void neural_morph_ui(sigma_u32 widget_id, sigma_u32 cognitive_load) {
-    SovereignNeuralAccelEngine::morphUI(widget_id, cognitive_load);
+extern "C" void neural_morph_ui(sigma_u32 widget_id, sigma_u32 cognitive_load) {
+    SovereignNeuralAccelEngine::getInstance().morphUI(widget_id, cognitive_load);
 }
 
 
-
-
-
-} // extern "C"
  

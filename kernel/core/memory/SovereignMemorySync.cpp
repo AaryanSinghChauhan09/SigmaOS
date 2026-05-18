@@ -1,7 +1,9 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_hal.h"
-#include "../../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_kernel_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_log.h"
 
 /**
  * SigmaOS Sovereign Memory Synchronization Engine
@@ -10,7 +12,7 @@
  * USP: Enables true heterogeneous computing by bridging the memory models of 
  * ARM (Weakly Ordered) and RISC-V (RVWMO) in real-time.
  *
- * Design: OOP-isolated singleton � SovereignMemorySyncEngine.
+ * Design: OOP-isolated singleton — SovereignMemorySyncEngine.
  */
 
 class SovereignMemorySyncEngine {
@@ -20,7 +22,7 @@ public:
         return instance;
     }
 
-    static void init() {
+    void init() {
         sigma_log("[MEM-SYNC] Initializing Cross-ISA Memory Synchronization Fabric...");
         this->active_fences = 0;
         this->coherence_faults = 0;
@@ -29,7 +31,7 @@ public:
 
     void emitMemoryFence(const char* isa_source, const char* isa_target) {
         this->active_fences++;
-        sigma_log("[MEM-SYNC] Emitted hardware barrier: %s -> %s (Fence %u).\n", 
+        sigma_log_info("[MEM-SYNC] Emitted hardware barrier: %s -> %s (Fence %u).\n", 
                      isa_source, isa_target, this->active_fences);
     }
 
@@ -53,21 +55,17 @@ private:
 };
 
 /* --- C Wrappers --- */
-void memsync_init() {
-    SovereignMemorySyncEngine::init();
+extern "C" void memsync_init() {
+    SovereignMemorySyncEngine::getInstance().init();
 }
 
-void memsync_fence(const char* src, const char* tgt) {
-    SovereignMemorySyncEngine::emitMemoryFence(src, tgt);
+extern "C" void memsync_fence(const char* src, const char* tgt) {
+    SovereignMemorySyncEngine::getInstance().emitMemoryFence(src, tgt);
 }
 
 extern "C" bool memsync_cas(sigma_u32* addr, sigma_u32 expected, sigma_u32 new_val) {
-    return SovereignMemorySyncEngine::compareAndSwapCrossISA(addr, expected, new_val);
+    return SovereignMemorySyncEngine::getInstance().compareAndSwapCrossISA(addr, expected, new_val);
 }
 
 
-
-
-
-} // extern "C"
  

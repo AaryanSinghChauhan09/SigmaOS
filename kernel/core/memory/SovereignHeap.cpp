@@ -1,9 +1,7 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/sigma_mem.h"
-#include "../../../include/sigma_hal.h"
-
+#include "../../include/sigma_log.h"
+#include "../../include/sigma_kernel_types.h"
+#include "../../include/libc/SovereignLibC.h"
+#include "../../include/sigma_mem.h"
 /**
  * SigmaOS Sovereign Heap Manager
  * Implements an Industrial Buddy Allocation (IBA) algorithm.

@@ -1,15 +1,13 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_thermaliq.h"
-#include "../../../include/sigma_hal.h"
+#include "../../include/sigma_kernel_types.h"
+#include "../../include/sigma_thermaliq.h"
+#include "../../include/hal/sigma_hal.h"
 
 /**
  * SigmaOS Sovereign Thermal Intelligence (ThermalIQ)
  * Implements an Adaptive Cooling Orchestration (ACO) algorithm.
  * ZERO-DEPENDENCY: Strictly bare-metal silicon thermal management.
  *
- * Design: OOP-isolated singleton � SovereignThermalEngine.
+ * Design: OOP-isolated singleton — SovereignThermalEngine.
  */
 
 class SovereignThermalEngine {
@@ -19,7 +17,7 @@ public:
         return instance;
     }
 
-    static void init() {
+    void init() {
         sigma_log("[THERMAL] Initializing Sovereign ThermalIQ (ACO Algorithm)...");
         this->state.cpu_temp_avg = 35; // Celsius
         this->state.gpu_temp_avg = 32;
@@ -55,21 +53,15 @@ private:
 };
 
 /* --- C Wrappers --- */
-void thermaliq_init() {
-    SovereignThermalEngine::init();
+extern "C" void thermaliq_init() {
+    SovereignThermalEngine::getInstance().init();
 }
 
-void thermaliq_update() {
-    SovereignThermalEngine::update();
+extern "C" void thermaliq_update() {
+    SovereignThermalEngine::getInstance().update();
 }
 
 extern "C" const sigma_thermal_state_t* thermaliq_get_state() {
-    return SovereignThermalEngine::getState();
+    return SovereignThermalEngine::getInstance().getState();
 }
-
-
-
-
-
-} // extern "C"
  

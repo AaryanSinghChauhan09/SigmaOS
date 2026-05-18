@@ -1,14 +1,14 @@
-#include "../../../include/sigma_log.h"
-#include "../../../include/libc/SovereignLibC.h"
-#include "../../../include/sigma_kernel_types.h"
-#include "../../../include/sigma_hal.h"
+#include "../../include/sigma_kernel_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/hal/sigma_hal.h"
+#include "../../include/sigma_log.h"
 
 /**
- * SigmaOS Sovereign Installer (S-Install) (v100.0 Zenith)
+ * SigmaOS Sovereign Installer (S-Install) (v28.0 Zenith)
  * Implements an Autonomous Bare-Metal Deployment (ABMD) algorithm.
  * ZERO-DEPENDENCY: No external shell or installation environment.
  *
- * Design: OOP-isolated singleton � SovereignInstallerEngine.
+ * Design: OOP-isolated singleton — SovereignInstallerEngine.
  */
 
 class SovereignInstallerEngine {
@@ -18,7 +18,7 @@ public:
         return instance;
     }
 
-    static void init() {
+    void init() {
         sigma_log("[INSTALL] Initializing Sovereign Autonomous Deployment Engine (ABMD)...");
         this->initialized = 1u;
     }
@@ -30,7 +30,7 @@ public:
         
         for (sigma_u32 i = 0u; i <= 100u; i += 25u) {
             this->progress = i;
-            sigma_log("[INSTALL] ABMD: Shard deployment progress: %u%%\n", i);
+            sigma_log_info("[INSTALL] ABMD: Shard deployment progress: %u%%\n", i);
             // Simulate shard deployment
         }
         
@@ -49,22 +49,17 @@ private:
 };
 
 /* --- C Wrappers --- */
-void install_init() {
-    SovereignInstallerEngine::init();
+extern "C" void install_init() {
+    SovereignInstallerEngine::getInstance().init();
 }
 
-void install_execute() {
-    SovereignInstallerEngine::execute();
+extern "C" void install_execute() {
+    SovereignInstallerEngine::getInstance().execute();
 }
 
 extern "C" sigma_u32 install_get_progress() {
-    return SovereignInstallerEngine::getProgress();
+    return SovereignInstallerEngine::getInstance().getProgress();
 }
 
 
-
-
-
-
-} // extern "C"
  
