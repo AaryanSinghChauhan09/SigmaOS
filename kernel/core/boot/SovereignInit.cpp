@@ -47,6 +47,18 @@ extern "C" void forensic_init();
 extern "C" void kube_init();
 extern "C" void regress_init();
 
+/* Omni-Distro Principles Absorption Components (Horizon v15.2) */
+extern "C" void initialize_general_principles();
+extern "C" void initialize_lightweight_principles();
+extern "C" void initialize_sec_principles();
+extern "C" void initialize_server_principles();
+extern "C" void initialize_privacy_principles();
+extern "C" void initialize_edu_principles();
+extern "C" void initialize_specialized_principles();
+extern "C" void initialize_forensics_principles();
+extern "C" void initialize_container_principles();
+extern "C" void initialize_rolling_principles();
+
 /**
  * SigmaOS Sovereign Init Implementation (v15.0 Zenith)
  * Implements an Asynchronous Shard Ignition (ASI) algorithm with service tracking.
@@ -127,6 +139,18 @@ public:
         registerAndStart("Forensic-Audit", forensic_init, "RootFS");
         registerAndStart("Kube-Orch", kube_init, "NetStack");
         registerAndStart("Regression", regress_init, "Memory");
+
+        // 8. Omni-Distro Absorption Components Integration
+        registerAndStart("Omni-General", initialize_general_principles, "Memory");
+        registerAndStart("Omni-Lightweight", initialize_lightweight_principles, "Memory");
+        registerAndStart("Omni-SecPentest", initialize_sec_principles, "Memory");
+        registerAndStart("Omni-Server", initialize_server_principles, "Memory");
+        registerAndStart("Omni-Privacy", initialize_privacy_principles, "Memory");
+        registerAndStart("Omni-EduDesktop", initialize_edu_principles, "Memory");
+        registerAndStart("Omni-Specialized", initialize_specialized_principles, "Memory");
+        registerAndStart("Omni-Forensic", initialize_forensics_principles, "Memory");
+        registerAndStart("Omni-Container", initialize_container_principles, "Memory");
+        registerAndStart("Omni-Rolling", initialize_rolling_principles, "Memory");
 
         supervise();
 
