@@ -135,9 +135,22 @@ static sigma_i64 sys_write_impl(SigmaInterruptFrame* f) {
 }
 
 static sigma_i64 sys_read_impl(SigmaInterruptFrame* f) {
-    (void)f;
-    /* TODO: VFS read dispatch */
-    return K_ERR_INVAL;
+    int fd            = (int)f->rdi;
+    char* buf         = (char*)(sigma_usize)f->rsi;
+    sigma_usize count = (sigma_usize)f->rdx;
+    if (fd == 0) {
+        /* stdin -> read from keyboard ring buffer */
+        extern char kbd_getc_blocking(void);
+        sigma_usize i;
+        for (i = 0; i < count; i++) {
+            buf[i] = kbd_getc_blocking();
+            if (buf[i] == '\n') { i++; break; }
+        }
+        return (sigma_i64)i;
+    }
+    /* VFS file read fallback */
+    extern sigma_i64 vfs_read_impl(int fd, char* buf, sigma_usize count);
+    return vfs_read_impl(fd, buf, count);
 }
 
 static sigma_i64 sys_getpid_impl(SigmaInterruptFrame* f) {
