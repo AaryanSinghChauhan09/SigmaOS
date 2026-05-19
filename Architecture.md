@@ -8,7 +8,7 @@ This document defines the strict execution boundaries between the Kernel Space a
 
 SigmaOS enforces a strict boundary using CPU privilege rings (Ring 0 and Ring 3):
 
-```
+```text
        +---------------------------------------------+
        |                 RING 3: USERLAND            |
        |  - sh shell       - coreutils (ls, cat)    |
