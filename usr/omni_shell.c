@@ -10,8 +10,8 @@
  */
 
 #include "libc/SovereignLibC.h"
-#include "libc/SovereignLibC.h"
 #include "SovereignPersona.h"
+#include "SovereignOmniShard.h"
 
 /* =========================================================================
  * Command dispatch table entry (replaces C++ if-else chain with data table)
@@ -146,8 +146,8 @@ static void cmd_dashboard_apply(void* ctx) {
 static void cmd_persona_swap(void* ctx) {
     OmniShellZenith* sh = (OmniShellZenith*)ctx;
     sigma_printf("[PERSONA]: Swapping to profile: ZENITH_ELITE\n");
-    sigma_strcpy(sh->current_persona.name, "Sovereign_Elite");
-    sigma_strcpy(sh->current_persona.theme, "neon-cyan");
+    sigma_strcpy(sh->current_persona.name, "Sovereign_Elite", sizeof(sh->current_persona.name));
+    sigma_strcpy(sh->current_persona.theme, "neon-cyan", sizeof(sh->current_persona.theme));
     sigma_printf("[PERSONA]: Theme updated -> %s\n", sh->current_persona.theme);
 }
 

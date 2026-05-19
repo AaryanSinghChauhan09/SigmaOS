@@ -1,4 +1,4 @@
-﻿#ifndef SOVEREIGN_PERSONA_H
+#ifndef SOVEREIGN_PERSONA_H
 #define SOVEREIGN_PERSONA_H
 
 #include "./libc/SovereignLibC.h"
@@ -12,9 +12,9 @@ typedef struct SovereignPersona {
 
 static void persona_init(SovereignPersona* p, const char* name, const char* theme) {
     sigma_memset(p, 0, sizeof(*p));
-    sigma_strcpy(p->name, name);
-    sigma_strcpy(p->theme, theme);
-    sigma_strcpy(p->dashboard_layout, "DEFAULT_ZENITH");
+    sigma_strcpy(p->name, name, sizeof(p->name));
+    sigma_strcpy(p->theme, theme, sizeof(p->theme));
+    sigma_strcpy(p->dashboard_layout, "DEFAULT_ZENITH", sizeof(p->dashboard_layout));
     p->ai_personalization = SIGMA_TRUE;
 }
 

@@ -50,6 +50,7 @@ char* sigma_strstr(const char* haystack, const char* needle);
 int   sigma_atoi(const char* s);
 
 void  sigma_print(const char* str);
+void  sigma_printf(const char* format, ...);
 void  sigma_print_num(sigma_u64 val);
 void  sigma_print_hex(sigma_u64 val);
 /* =========================================================================

@@ -83,8 +83,7 @@ static void sigma_itoa(sigma_u64 n, char* buf, int base) {
     buf[j] = '\0';
 }
 
-int sigma_log_info(const char* format, ...) {
-    int count = 0;
+void sigma_printf(const char* format, ...) {
     va_list args;
     va_start(args, format);
 
@@ -95,7 +94,7 @@ int sigma_log_info(const char* format, ...) {
                 case 's': {
                     const char* s = va_arg(args, const char*);
                     if (!s) s = "(null)";
-                    while (*s) { serial_putc(*s++); count++; }
+                    while (*s) { serial_putc(*s++); }
                     break;
                 }
                 case 'd':
@@ -104,7 +103,7 @@ int sigma_log_info(const char* format, ...) {
                     char buf[64];
                     sigma_itoa(val, buf, 10);
                     char* b = buf;
-                    while (*b) { serial_putc(*b++); count++; }
+                    while (*b) { serial_putc(*b++); }
                     break;
                 }
                 case 'x':
@@ -113,40 +112,37 @@ int sigma_log_info(const char* format, ...) {
                     char buf[64];
                     sigma_itoa(val, buf, 16);
                     char* b = buf;
-                    while (*b) { serial_putc(*b++); count++; }
+                    while (*b) { serial_putc(*b++); }
                     break;
                 }
                 case 'p': {
                     sigma_u64 val = (sigma_u64)va_arg(args, void*);
-                    serial_putc('0'); serial_putc('x'); count += 2;
+                    serial_putc('0'); serial_putc('x');
                     char buf[64];
                     sigma_itoa(val, buf, 16);
                     char* b = buf;
-                    while (*b) { serial_putc(*b++); count++; }
+                    while (*b) { serial_putc(*b++); }
                     break;
                 }
                 case 'c': {
                     char c = (char)va_arg(args, int);
-                    serial_putc(c); count++;
+                    serial_putc(c);
                     break;
                 }
                 case '%': {
-                    serial_putc('%'); count++;
+                    serial_putc('%');
                     break;
                 }
                 default:
                     serial_putc('%');
                     serial_putc(*p);
-                    count += 2;
             }
         } else {
             serial_putc(*p);
-            count++;
         }
     }
 
     va_end(args);
-    return count;
 }
 
 void sigma_log_industrial(const char* msg) {

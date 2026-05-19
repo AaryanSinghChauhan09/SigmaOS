@@ -3,6 +3,7 @@
  * Σ SIGMAOS KERNEL: SOVEREIGN-LIBC (Zero-Dependency)
  * =============================================================================
  */
+#define SIGMA_LIBC_INTERNAL
 #include "sigma_kernel_types.h"
 #include <stdarg.h>
 

@@ -40,7 +40,11 @@ typedef int                sigma_bool;
 
 #define SIGMA_TRUE   1
 #define SIGMA_FALSE  0
+#ifdef __cplusplus
+#define SIGMA_NULL   nullptr
+#else
 #define SIGMA_NULL   ((void*)0)
+#endif
 
 /* ---- page constants ---- */
 #define PAGE_SIZE       4096ULL
@@ -65,11 +69,15 @@ typedef int                sigma_bool;
 #define K_ERR_BUSY       -3
 #define K_ERR_NOTFOUND   -4
 #define K_ERR_PERM       -5
+#define SIGMA_EIO         5
 
 #ifndef SIGMA_STATUS_DEFINED
 #define SIGMA_STATUS_DEFINED
 typedef sigma_i32 sigma_status;
 #endif
+
+typedef sigma_status sigma_err_t;
+#define SIGMA_UNUSED(x)   ((void)(x))
 
 /* ---- intrinsics ---- */
 static inline void cpu_halt(void)  { __asm__ __volatile__("cli; hlt"); }
@@ -143,8 +151,6 @@ static inline sigma_size_t sigma_strlen(const char* s) {
     while (s[len]) len++;
     return len;
 }
-#endif
-
 static inline int sigma_strcmp(const char* s1, const char* s2) {
     while (*s1 && (*s1 == *s2)) {
         s1++; s2++;
@@ -157,6 +163,7 @@ static inline void sigma_strncpy(char* dest, const char* src, sigma_usize n) {
     for (i = 0; i < n - 1 && src[i] != '\0'; i++) dest[i] = src[i];
     dest[i] = '\0';
 }
+#endif
 
 /* =========================================================================
  * SOVEREIGN-FAULT: Industrial Recovery & Assertion

@@ -1,4 +1,4 @@
-﻿#ifndef SIGMA_SYSTEM_SHARDS_H
+#ifndef SIGMA_SYSTEM_SHARDS_H
 #define SIGMA_SYSTEM_SHARDS_H
 
 #include "./sigma_kernel_types.h"
@@ -19,7 +19,16 @@ typedef struct SovereignScheduler {
     sigma_u32 task_count;
     sigma_u32 context_switches;
     sigma_u8  cpu_affinity;
+    sigma_u64 ctx_switches;      /* compatibility */
+    sigma_u64 deadline_misses;   /* compatibility */
 } SovereignScheduler;
+
+/* Sovereign Cloud Orchestrator Shard */
+typedef struct SovereignCloudOrchestrator {
+    const char* type_name;
+    sigma_u32   active_nodes;
+    sigma_u32   isolated_vpcs;
+} SovereignCloudOrchestrator;
 
 #include "./ui/sigma_ui_types.h"
 
