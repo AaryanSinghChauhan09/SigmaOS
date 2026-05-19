@@ -37,6 +37,10 @@ function trackProblems() {
     const problems = [];
     
     walkDir(".", (filepath) => {
+        const basename = path.basename(filepath);
+        if (basename === 'problem_tracker.js' || basename === 'CURRENT_PROBLEMS_MANIFEST.md' || basename === 'CONTRIBUTOR_ROADMAP.md') {
+            return;
+        }
         const ext = path.extname(filepath);
         if ([".cpp", ".hpp", ".h", ".js", ".cjs", ".md"].includes(ext)) {
             let content;
