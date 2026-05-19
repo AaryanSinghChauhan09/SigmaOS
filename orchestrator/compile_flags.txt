@@ -1,5 +1,5 @@
 -std=c++11
--ISigmaOS-Repo/include
+-ISigmaOS/include
 -Iinclude
 -I.
 -m64
