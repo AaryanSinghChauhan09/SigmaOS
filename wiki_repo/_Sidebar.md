@@ -14,6 +14,10 @@
 
 - [Omni Computer Science & AI Architecture](Omni-Computer-Science-AI-Architecture)
 
+- [Omni-Distro Principles Absorption](SigmaOS-OmniDistro-Absorption-Principles)
+
+- [System Logic & File Topology](Logic)
+
 ## ⚙️ Core Subsystems
 
 - [Networking Shard (TCP/IP)](Networking-Shard)
