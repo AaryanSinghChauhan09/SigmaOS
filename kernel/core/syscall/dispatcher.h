@@ -1,5 +1,6 @@
 #include "../../../include/core/sigma_kernel_types.h"
 #include "../../../include/core/sigma_kernel_types.h"
+#include "../../../include/core/sigma_kernel_types.h"
 #ifndef DISPATCHER_H
 #define DISPATCHER_H
 

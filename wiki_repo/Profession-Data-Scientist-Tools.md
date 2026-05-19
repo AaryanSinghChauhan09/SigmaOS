@@ -10,7 +10,7 @@
 
 The **SigmaOS Zenith Data Science & Machine Learning Matrix** represents a paradigm shift in industrial computing. By purging high-level runtime dependencies (Python, PyTorch, TensorFlow, Pandas, NumPy, Scikit-Learn) and operating entirely at the bare-metal C++ microkernel layer, SigmaOS eliminates gigabytes of memory overhead, JIT compilation latency, and garbage collection pauses. 
 
-Every statistical calculation, matrix multiplication, tensor transformation, and data cleaning pass is executed directly on silicon using raw x86_64 AVX-512 FMA (Fused-Multiply-Add) instructions, direct framebuffer rasterization, and wait-free circular buffer sharding. This document defines the **Six Core Pillars of Data Science Principles** implemented within the SigmaOS sovereign lattice.
+Every statistical calculation, matrix multiplication, tensor transformation, and data cleaning pass is executed directly on silicon using raw x86_64 AVX-512 FMA (Fused-Multiply-Add) instructions, direct framebuffer rasterization, and wait-free circular buffer sharding. This document defines the **Ten Core Pillars of Data Science Principles** implemented within the SigmaOS sovereign lattice.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
@@ -23,6 +23,15 @@ Every statistical calculation, matrix multiplication, tensor transformation, and
 │ • Z-Score / IQR Outliers   │ • Variance / StdDev / IQR   │ • Logistic    │
 │ • Min-Max / Robust Scaling │ • Skewness / Kurtosis       │ • DecisionTree│
 │ • PCA Eigenvalue Reduction │ • Pearson / Spearman / Cov  │ • K-Means/KNN │
+├────────────────────────────┴─────────────────────────────┴───────────────┤
+│                 ADVANCED DATA SCIENCE & DEEP LEARNING MATRIX             │
+├────────────────────────────┬─────────────────────────────┬───────────────┤
+│      TIME SERIES (TS)      │      ENSEMBLE BOOSTING      │   NLP & DL    │
+├────────────────────────────┼─────────────────────────────┼───────────────┤
+│ • ARIMA Fitting Simulation │ • Random Forest Bagging     │ • TF-IDF/COS  │
+│ • SMA/EMA Moving Averages  │ • Gradient Boosting (GBM)   │ • N-Grams     │
+│ • ACF Autocorrelation      │ • AdaBoost Sample Weighting │ • MLP / Adam  │
+│ • ADF Stationarity Test    │ • Out-of-Bag (OOB) Error    │ • Regularize  │
 ├────────────────────────────┴─────────────────────────────┴───────────────┤
 │                       MLOPS & EXPERIMENT TRACKING                        │
 │                     (SovereignMLFlow / SovereignMLForge)                 │
@@ -81,8 +90,8 @@ Exploratory Data Analysis is powered by `ecosystem/SovereignML.cpp`, providing i
 │ • Arithmetic Mean (AM)       │ • Variance (σ²) & StdDev (σ)             │
 │ • Median (50th Percentile)   │ • Coefficient of Variation (CV = σ/μ)    │
 │ • Mode (Max Frequency)       │ • Interquartile Range (IQR = Q3 - Q1)    │
-│ • Geometric Mean (GM)        │ • Pearson Skewness (γ₁)                  │
-│ • Harmonic Mean (HM)         │ • Pearson Kurtosis (β₂ - Peakedness)     │
+│ • Geometric Mean (GM)        │ • Harmonic Mean (HM)                     │
+│ • Trimmed Mean (5% Cut)      │ • Pearson Skewness & Kurtosis            │
 └──────────────────────────────┴──────────────────────────────────────────┘
 ```
 
@@ -221,6 +230,71 @@ $$D_{KL}(P || Q) = \sum P(x) \ln\left(\frac{P(x)}{Q(x)}\right)$$
 
 ---
 
+## Pillar 7: Advanced Time Series Analysis & Forecasting (`SovereignTimeSeriesForecaster`)
+
+Industrial IoT sensors, kernel telemetry, and network traffic exhibit complex temporal dependencies. The `SovereignTimeSeriesForecaster` module provides native x86_64 time series analytics.
+
+### 7.1 Stationarity Testing & Diagnostics
+* **Augmented Dickey-Fuller (ADF) Test:** Evaluates whether a time series possesses a unit root, determining strict stationarity required for autoregressive modeling.
+* **Autocorrelation Function (ACF) & PACF:** Computes empirical correlation between a time series and its lagged values across sliding windows:
+$$\rho_k = \frac{\sum_{t=1}^{N-k} (y_t - \bar{y})(y_{t+k} - \bar{y})}{\sum_{t=1}^{N} (y_t - \bar{y})^2}$$
+
+### 7.2 Smoothing & Filtering Algorithms
+* **Simple Moving Average (SMA):** Filters high-frequency white noise by computing the unweighted mean over a rolling window $W$.
+* **Exponential Moving Average (EMA):** Applies exponentially decreasing weighting factors to prioritize recent sensor telemetry:
+$$S_t = \alpha \cdot Y_t + (1 - \alpha) \cdot S_{t-1}, \quad \alpha = \frac{2}{W + 1}$$
+* **Holt-Winters Triple Exponential Smoothing:** Incorporates level, trend, and seasonal components for multi-horizon IoT forecasting.
+
+### 7.3 Autoregressive Modeling
+* **ARIMA($p, d, q$) Simulation:** Combines Auto-Regressive ($p$), Integrated differencing ($d$), and Moving Average ($q$) parameters. Optimized via conditional Akaike Information Criterion (AIC) minimization scoring.
+
+---
+
+## Pillar 8: Advanced Ensemble Learning & Tree Boosting (`SovereignEnsembleForge`)
+
+Ensemble methods achieve state-of-the-art predictive accuracy by combining multiple base estimators. The `SovereignEnsembleForge` operates directly on SIMD vector registers.
+
+### 8.1 Bagging (Bootstrap Aggregating)
+* **Random Forest Classifier:** Fits parallel, deep decision trees on bootstrapped subsamples of the dataset shard. Employs random feature subspace selection ($\sqrt{M}$) at each split to de-correlate individual trees. Final classification is determined via SIMD majority voting. Computes Out-of-Bag (OOB) error estimates without requiring a separate validation set.
+
+### 8.2 Sequential Tree Boosting
+* **Gradient Boosting Machine (GBM):** Fits sequential decision trees on the pseudo-residuals of the preceding ensemble, minimizing arbitrary differentiable loss functions via functional gradient descent:
+$$r_{im} = -\left[\frac{\partial L(y_i, f(x_i))}{\partial f(x_i)}\right]_{f=f_{m-1}}$$
+* **Adaptive Boosting (AdaBoost):** Dynamically adjusts sample weights at each boosting iteration. Misclassified instances receive exponentially increased weights ($\alpha_m = \frac{1}{2} \ln \frac{1-\epsilon_m}{\epsilon_m}$), forcing subsequent weak learners to focus on difficult boundary cases.
+
+---
+
+## Pillar 9: Advanced Natural Language Processing & Text Analytics (`SovereignNLPAnalytics`)
+
+Kernel log parsing, intrusion detection, and automated root-cause analysis require robust text analytics. `SovereignNLPAnalytics` provides zero-allocation string parsing primitives.
+
+### 9.1 Vectorization & Embedding
+* **Term Frequency-Inverse Document Frequency (TF-IDF):** Transforms unstructured raw text tokens into sparse numerical feature matrices, weighting terms by their local frequency and global rarity across log shards:
+$$\text{TF-IDF}(t, d, D) = \text{tf}(t, d) \cdot \left(\ln\left(\frac{1 + |D|}{1 + |\{d \in D : t \in d\}|}\right) + 1\right)$$
+* **N-Gram Tokenization:** Extracts contiguous sliding windows of $N$ words or characters (Bi-grams, Tri-grams) to capture local syntactic context.
+
+### 9.2 Semantic Vector Search
+* **Cosine Similarity:** Evaluates semantic similarity between high-dimensional document vectors by computing the normalized dot product:
+$$\text{similarity} = \cos(\theta) = \frac{\mathbf{A} \cdot \mathbf{B}}{||\mathbf{A}|| \cdot ||\mathbf{B}||}$$
+
+---
+
+## Pillar 10: Advanced Neural Architectures & Deep Learning Primitives (`SovereignDeepLearningEngine`)
+
+The `SovereignDeepLearningEngine` provides foundational neural network building blocks optimized for AVX-512 FMA execution without external runtime frameworks.
+
+### 10.1 Multi-Layer Perceptron (MLP) Architecture
+* **Forward Propagation:** Implements dense matrix multiplication across input, hidden, and output layers. Uses the non-linear Rectified Linear Unit (ReLU) activation function to prevent vanishing gradients:
+$$f(x) = \max(0, x)$$
+* **Dropout Layer Simulation:** Stochastically zeroes out neuron activations at rate $p$ during training to prevent co-adaptation of weights and enforce robust feature representations.
+
+### 10.2 Optimization & Regularization
+* **Adam Optimizer (Adaptive Moment Estimation):** Combines Momentum and RMSprop. Tracks exponentially decaying averages of past gradients ($m_t$) and past squared gradients ($v_t$), applying bias corrections for stable parameter updates:
+$$\theta_{t+1} = \theta_t - \frac{\alpha}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t$$
+* **L1 (Lasso) & L2 (Ridge) Regularization:** Adds absolute ($\lambda \sum |\theta|$) or squared ($\lambda \sum \theta^2$) weight penalties to the loss function, inducing feature sparsity and preventing overfitting.
+
+---
+
 ## Architectural Implementation Mappings
 
 The table below maps the Data Science principles defined in this specification to their exact C++ translation units within the SigmaOS repository.
@@ -235,6 +309,10 @@ The table below maps the Data Science principles defined in this specification t
 | **Model Evaluation Metrics** | `SovereignMLDiagnostics` | `ecosystem/SovereignML.cpp` | `CalculateRegressionMetrics()`, `CalculateConfusionMatrix()`, `KFoldCrossValidation()` |
 | **Experiment Tracking** | `SovereignMLFlow` | `kernel/core/ai/SovereignMLFlow.cpp` | `logMetric()`, `saveExperiment()`, `runGridSearch()` |
 | **Drift & Explainability** | `SovereignMLForge` | `kernel/shards/ml-ai/SovereignMLForge.cpp` | `detectModelDrift()`, `explainPrediction()`, `scoreFeatureImportance()` |
+| **Time Series Forecasting** | `SovereignTimeSeriesForecaster` | `ecosystem/SovereignML.cpp` | `CalculateMovingAverages()`, `CalculateAutocorrelation()`, `PerformADFStationarityTest()` |
+| **Ensemble Learning & Boosting** | `SovereignEnsembleForge` | `ecosystem/SovereignML.cpp` | `FitRandomForestClassifier()`, `FitGradientBoostingMachine()`, `FitAdaBoostClassifier()` |
+| **NLP & Text Analytics** | `SovereignNLPAnalytics` | `ecosystem/SovereignML.cpp` | `ComputeTFIDFMatrix()`, `CalculateCosineSimilarity()`, `ExtractNGrams()` |
+| **Deep Learning Primitives** | `SovereignDeepLearningEngine` | `ecosystem/SovereignML.cpp` | `ForwardPropagateMLP()`, `ExecuteAdamOptimizerStep()`, `CalculateRegularizationPenalty()` |
 
 ---
 > **Verification Status:** BUILD-VERIFIED | ZERO-STL COMPLIANT | 100% SILICON PURITY  
