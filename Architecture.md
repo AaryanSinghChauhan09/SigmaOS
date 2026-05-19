@@ -1,85 +1,56 @@
-# SigmaOS Sovereign Architecture
+# SigmaOS Privilege & Isolation Boundaries
 
-SigmaOS is an industrial-grade, sovereign microkernel operating system built on the principle of **Lattice Shard Autonomy**.
+This document defines the strict execution boundaries between the Kernel Space and User Space in the SigmaOS Zenith microkernel.
 
-## 1. Absolute Non-Equivalence
+---
 
-SigmaOS is fundamentally distinct from monolithic kernels (Linux, Windows, NT) and traditional microkernels (L4, Minix).
+## 🔒 Privilege Ring Separation
 
-### Key Differentiators
+SigmaOS enforces a strict boundary using CPU privilege rings (Ring 0 and Ring 3):
 
-- **Lattice Shards**: Instead of a single kernel image, SigmaOS consists of 600+ independent, PQC-attested shards.
+```
+       +---------------------------------------------+
+       |                 RING 3: USERLAND            |
+       |  - sh shell       - coreutils (ls, cat)    |
+       |  - UI Renderer    - apps / web applications |
+       +----------------------+----------------------+
+                              |
+                     SYSCALL INTERFACE
+                              |
+       +----------------------v----------------------+
+       |                RING 0: KERNEL SPACE         |
+       |  - MLFQ Scheduler    - Page Allocators      |
+       |  - VFS Vitals        - TCP/IP Stack         |
+       |  - Device Drivers    - Shard Manager        |
+       +---------------------------------------------+
+```
 
-- **Asynchronous Shard Ignition (ASI)**: Boot sequence is a parallel dependency resolution, not a linear execution.
+### 1. Kernel Space (Ring 0 - Privilege)
+- **Subsystems**: Memory Manager, Scheduler, Device Drivers, VFS Core, Net Core.
+- **Privilege**: Direct access to hardware ports (`outb`/`inb`), page tables, CPU interrupt control registers, and physical disk sectors.
+- **Isolation**: Executed in a flat identity-mapped segment, isolated from user task interference.
 
-- **Silicon-Direct Execution**: Minimized dependency on high-level languages (C++/Rust). Critical primitives (Memcpy, Memset, IO) are implemented as raw assembly shards for zero-latency execution.
+### 2. User Space (Ring 3 - Non-Privilege)
+- **Subsystems**: Omni-Shell, user application shards, system packages, standard libraries.
+- **Privilege**: No direct access to memory outside allocated task boundaries. No direct hardware I/O commands.
+- **Isolation**: Each process runs in its own virtual address space managed by the Virtual Memory Manager.
 
-- **Zero-Dependency Core**: Not a single line of code is derived from GPL, BSD, or Proprietary sources. 100% Native Assembly/C11.
+---
 
-- **PQC-Sealed IPC**: All communication between shards is sealed with Post-Quantum Cryptography (Dilithium-5) at the hardware level.
+## 📞 System Call (Syscall) Dispatcher
 
-## 2. Core Subsystems
+Communication across the kernel-userland boundary is strictly routed via the Sovereign Syscall Dispatcher (`SovereignSyscall.cpp`), mapped through the `int 0x80` or `syscall` CPU instructions:
 
-- **Sovereign Memory Manager (S-MM)**: PQC-hardened slab allocation and silicon-native paging.
+| Syscall ID | Name | Source Parameter | Target Action |
+|---|---|---|---|
+| `0x01` | `sys_write` | String buffer, length | Writes data to the COM1 debug serial or VGA screen. |
+| `0x02` | `sys_read` | Input buffer, maximum length | Reads input data from the keyboard queue. |
+| `0x05` | `sys_socket` | Domain, type, protocol | Allocates a network socket handler. |
+| `0x06` | `sys_pkg_install` | Package name, source | Downloads and registers a software package. |
 
-- **Sovereign Industrial Scheduler (S-SCHED)**: Deterministic, priority-based execution for mission-critical shards.
+---
 
-- **Sovereign Driver Framework (SDF)**: Hardware-direct orchestration with zero-copy data paths.
-
-- **Sovereign VFS**: A distributed, amnesic filesystem with atomic snapshots.
-
-## 3. Industrial Profiles (Zenith personas)
-
-SigmaOS adapts its UI and logic gates based on the active industrial shard:
-
-- **Finance**: Secured for high-frequency auditing and tax compliance (GST/Income Tax).
-
-- **Medical**: HIPAA-hardened clinical teal interface with PQC-sealed patient data.
-
-- **Cyber**: Dark-mode, amnesic environment for PQC-hardened defense.
-
-## 4. Hardware Parity
-
-SigmaOS targets pure silicon abstraction, making it immune to legacy BIOS/UEFI constraints and compatible with advanced RISC-V and x86_64 industrial architectures.
-
-## 5. Unified Development Strategy (v15.0+)
-
-To ensure total functional parity across all formats, SigmaOS adopts a "Core-Plus-Layer" distribution model:
-
-### 🛠️ Consistent Core
-
-- **Single Kernel Base**: One microkernel codebase for Standalone, Dual-boot, App, and Browser formats.
-
-- **Unified Package Manager (`sigma-pkg`)**: A single tool for shard management, updates, and repository sync across all editions.
-
-- **Standard Library (`SovereignLibC`)**: Zero-dependency C library shared by all kernel and userland shards.
-
-### 📦 Default Toolset Baseline
-
-Every SigmaOS edition includes a mandatory baseline of industrial tools:
-
-- **Maintenance**: `sigma-bleach` (Cleanup), `sigma-timeshift` (Backup).
-
-- **Productivity**: `s-pdf`, `LibreOffice Sovereign`, `sigma-edit`.
-
-- **Creative**: `s-rec` (Recording), `GIMP Sovereign`, `Inkscape Sovereign`.
-
-- **Infrastructure**: `sigma-top` (Monitoring), `QEMU-S`, `VirtualBox-S`.
-
-### 🏗️ Edition Layering
-
-Format-specific functionality is added as professional layers on top of the consistent core:
-
-- **Standalone**: Bare-metal fast-boot (SSB) and hardware-direct drivers.
-
-- **Dual-boot**: Partition manager and bootloader recovery scripts.
-
-- **App Edition**: Universal runtimes (S-Wine, S-ARC, WASM).
-
-- **Browser Edition**: PQC-hardened sandboxing and SovereignBrowser.
-
-### 🧪 Quality Assurance
-
-- **Cross-Branch Testing**: Automated regression tests enforced via CI/CD for every commit.
-
-- **Semantic Versioning**: Unified versioning across the entire OS lattice.
+## 🛡️ Boundary Enforcement Policies
+1. **Memory Separation**: User space cannot read or write to memory belonging to the kernel. Violation triggers a Page Fault Exception, terminating the user thread.
+2. **I/O Isolation**: Any hardware I/O port manipulation from Ring 3 results in a General Protection Fault.
+3. **No Monolithic Bloat**: File systems (Ext4/FAT32) and protocol parsers are run inside isolated kernel services and exposed through clean, lightweight wrappers.
