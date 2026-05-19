@@ -3,6 +3,10 @@
 #include "sigma_log.h"
 #include "ai/sigma_claw.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * SovereignClawCompanion " Userland app for the Claw Gateway
  * Provides the interactive "Live Canvas" and multi-channel conversational UI.

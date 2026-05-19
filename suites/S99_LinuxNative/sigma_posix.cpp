@@ -2,9 +2,9 @@
 #include "sigma_kernel_types.h"
 #include "sigma_cap_manager.h"
 
-// Σ SIGMAOS: LINUX-NATIVE TRANSLATION LAYER (S99)
-// Responsibility: Binary compatibility for legacy Linux/POSIX applications.
-// Philosophy: "Absorb the ecosystem, maintain the sovereignty."
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 namespace sigma {
 
