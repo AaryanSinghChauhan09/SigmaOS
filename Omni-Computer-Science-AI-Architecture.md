@@ -1,4 +1,4 @@
-# Omni-Computer-Science-AI-Architecture: Sovereign 14-Domain Matrix Manifest
+# Omni-Computer-Science-AI-Architecture: Sovereign 15-Domain Matrix Manifest
 
 > **Specification Version:** 15.2-FINAL  
 > **Classification:** Industrial-Grade Sovereign Computer Science & AI Omni-Matrix Manifest  
@@ -8,9 +8,9 @@
 
 ## Executive Summary
 
-The **SigmaOS Zenith Omni-Matrix Architecture** represents the ultimate synthesis of computer science, artificial intelligence, data engineering, data visualisation, and mathematical theory. Operating entirely as a freestanding, zero-dependency C++ microkernel lattice, SigmaOS bypasses all conventional runtime interpreters, virtual machines, and external software libraries. 
+The **SigmaOS Zenith Omni-Matrix Architecture** represents the ultimate synthesis of computer science, artificial intelligence, data engineering, data visualisation, object oriented programming, and mathematical theory. Operating entirely as a freestanding, zero-dependency C++ microkernel lattice, SigmaOS bypasses all conventional runtime interpreters, virtual machines, and external software libraries. 
 
-Every algorithm across the fourteen core domains is compiled directly into cache-line-aligned, AVX-512 FMA vectorized x86_64 machine code. This manifest establishes the absolute theoretical foundation, architectural features, operational principles, tools, and Unique Selling Points (USPs) for the fourteen foundational pillars of modern computing within the SigmaOS sovereign ecosystem.
+Every algorithm across the fifteen core domains is compiled directly into cache-line-aligned, AVX-512 FMA vectorized x86_64 machine code. This manifest establishes the absolute theoretical foundation, architectural features, operational principles, tools, and Unique Selling Points (USPs) for the fifteen foundational pillars of modern computing within the SigmaOS sovereign ecosystem.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
@@ -48,14 +48,14 @@ Every algorithm across the fourteen core domains is compiled directly into cache
 │ • Banker's Deadlock Avoid  │ • MVCC Timestamp Isolation  │ • Weibull Fit │
 │ • WAL Journal Ring Buffer  │ • Relational Algebra Join   │ • KS CDF Test │
 ├────────────────────────────┴─────────────────────────────┴───────────────┤
-│    WEB PROGRAMMING         │      DATA VISUALISATION                     │
-│    (SovereignWeb)          │      (SovereignDataViz)                     │
-├────────────────────────────┼─────────────────────────────────────────────┤
-│ • HTTP/3 QUIC Demuxing     │ • t-SNE 2D Manifold Projection              │
-│ • Virtual DOM Diffing      │ • UMAP Simplicial Set Graphing              │
-│ • WASM Bytecode Execution  │ • Choropleth Spatial Density Heatmaps       │
-│ • GraphQL AST Dispatcher   │ • Sunburst Radial Hierarchy Charts          │
-└────────────────────────────┴─────────────────────────────────────────────┘
+│    WEB PROGRAMMING         │      DATA VISUALISATION     │      OOP      │
+│    (SovereignWeb)          │      (SovereignDataViz)     │(SovereignOOP) │
+├────────────────────────────┼─────────────────────────────┼───────────────┤
+│ • HTTP/3 QUIC Demuxing     │ • t-SNE 2D Projection       │ • VTable Jump │
+│ • Virtual DOM Diffing      │ • UMAP Simplicial Graph     │ • CRTP Static │
+│ • WASM Bytecode Execution  │ • Choropleth Heatmaps       │ • RAII Scope  │
+│ • GraphQL AST Dispatcher   │ • Sunburst Radial Hierarchy │ • Liskov Sub  │
+└────────────────────────────┴─────────────────────────────┴───────────────┘
 ```
 
 ---
@@ -299,9 +299,26 @@ Data Visualisation provides direct VRAM framebuffer rendering of high-dimensiona
 
 ---
 
+## Pillar 15: Object Oriented Programming (`SovereignOOP`)
+
+Object Oriented Programming within SigmaOS enforces zero-overhead zero-leak static polymorphism, vtable dispatch simulation, deterministic RAII lifecycle tracking, and behavioral subtyping validation.
+
+### 15.1 Algorithms & Concepts
+* **Virtual Method Table (vtable) Dynamic Dispatch:** Simulates indirect function pointer jumps ($O(1)$ lookup) across polymorphic class hierarchies to illustrate dynamic method overriding.
+* **Curiously Recurring Template Pattern (CRTP):** Implements static polymorphism at compile-time (`class Derived : public Base<Derived>`), enabling polymorphic method calls without runtime vtable pointer indirection.
+* **RAII Deterministic Scope Tracking:** Resource Acquisition Is Initialization. Guarantees that heap allocations, file handles, and mutex locks are acquired during object construction and deterministically released upon stack unwinding.
+* **Liskov Substitution Principle (LSP) Validation:** Evaluates behavioral subtyping compliance to ensure derived classes preserve all base class invariants, pre-conditions, and post-conditions without introducing unexpected exceptions.
+
+### 15.2 Unique Selling Points (USPs) & Tools
+* **USP - Zero-Overhead Polymorphism:** CRTP static polymorphism eliminates virtual table pointer bloat and indirect branch mispredictions, enabling polymorphic execution in hard real-time AI loops.
+* **USP - Deterministic RAII Unwinding:** Unlike garbage-collected environments, RAII guarantees immediate resource reclamation upon scope exit without non-deterministic GC pauses.
+* **Tools:** `SovereignOOP` C++ Class, `sigma_oop_runtime` kernel dispatcher.
+
+---
+
 ## Architectural Implementation Mappings
 
-The table below maps the 14 Computer Science, AI, and Data Visualisation domains defined in this specification to their exact C++ translation units within the SigmaOS repository.
+The table below maps the 15 Computer Science, AI, OOP, and Data Visualisation domains defined in this specification to their exact C++ translation units within the SigmaOS repository.
 
 | Domain Pillar | Module / Class Name | Primary Translation Unit | Key C++ Methods |
 | :--- | :--- | :--- | :--- |
@@ -319,6 +336,7 @@ The table below maps the 14 Computer Science, AI, and Data Visualisation domains
 | **Statistics** | `SovereignStatisticsAdvanced` | `ecosystem/SovereignOmniMatrix.cpp` | `KruskalWallisTest()`, `MonteCarloIntegration()`, `FitWeibullDistribution()` |
 | **Web Programming** | `SovereignWebProgramming` | `ecosystem/SovereignOmniMatrix.cpp` | `ParseHTTP3QUICFrame()`, `VirtualDOMDiffing()`, `ExecuteWASMBytecode()`, `DispatchGraphQLQuery()` |
 | **Data Visualisation** | `SovereignDataVisualisation` | `ecosystem/SovereignOmniMatrix.cpp` | `RendertSNEEmbedding()`, `GenerateUMAPManifold()`, `PlotChoroplethHeatmap()`, `RenderSunburstHierarchy()` |
+| **OOP** | `SovereignOOP` | `ecosystem/SovereignOmniMatrix.cpp` | `SimulateVirtualMethodTableDispatch()`, `ExecuteCRTPStaticPolymorphism()`, `EnforceRAIIMemoryManagement()`, `DemonstrateLiskovSubstitution()` |
 
 ---
-> **Verification Status:** BUILD-VERIFIED | ZERO-STL COMPLIANT | 100% SILICON PURITY | 14-DOMAIN COMPLETE  
+> **Verification Status:** BUILD-VERIFIED | ZERO-STL COMPLIANT | 100% SILICON PURITY | 15-DOMAIN COMPLETE  
