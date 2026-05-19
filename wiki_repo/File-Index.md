@@ -1217,6 +1217,7 @@ SigmaOS/
 │   ├── SovereignML.cpp
 │   ├── SovereignNcertUnity.cpp
 │   ├── SovereignNcertZenith.cpp
+│   ├── SovereignOmniMatrix.cpp
 │   ├── SovereignOmniShard.cpp
 │   ├── SovereignOmniShard.h
 │   ├── SovereignOmniTool.cpp
@@ -3308,6 +3309,7 @@ SigmaOS/
 │   │   ├── SovereignNcertZenith.cpp
 │   │   ├── SovereignNetMesh.c
 │   │   ├── SovereignNetMesh.cpp
+│   │   ├── SovereignOmniMatrix.cpp
 │   │   ├── SovereignOmniShard.c
 │   │   ├── SovereignOmniShard.cpp
 │   │   ├── SovereignOmniTool.cpp
@@ -6335,6 +6337,7 @@ SigmaOS/
 │   │   ├── SovereignExperimentCluster.c
 │   │   ├── SovereignML.c
 │   │   ├── SovereignML.cpp
+│   │   ├── SovereignOmniMatrix.cpp
 │   │   ├── SovereignPersonaManager.c
 │   │   ├── SovereignProblemSolver.c
 │   │   ├── SovereignVoiceShard.c
