@@ -18,17 +18,13 @@ Arguments:
 
 Returns: `void | Promise<null>` - Only returns a `Promise` if no `callback` argument was passed
 
-
 ```js
 dispatcher.close() // -> Promise
 dispatcher.close(() => {}) // -> void
 
-
-
 ```
 
 #### Example - Request resolves before Client closes
-
 
 ```js
 import { createServer } from 'http'
@@ -56,8 +52,6 @@ await client.close()
 
 console.log('Client closed')
 server.close()
-
-
 
 ```
 
@@ -94,7 +88,6 @@ Returns: `void | Promise<ConnectData>` - Only returns a `Promise` if no `callbac
 - **opaque** `unknown`
 
 #### Example - Connect request with echo
-
 
 ```js
 import { createServer } from 'http'
@@ -138,8 +131,6 @@ try {
   socket.end()
 } catch (error) { }
 
-
-
 ```
 
 ### `Dispatcher.destroy([error, callback]): Promise`
@@ -156,19 +147,15 @@ Arguments:
 
 Returns: `void | Promise<void>` - Only returns a `Promise` if no `callback` argument was passed
 
-
 ```js
 dispatcher.destroy() // -> Promise
 dispatcher.destroy(new Error()) // -> Promise
 dispatcher.destroy(() => {}) // -> void
 dispatcher.destroy(new Error(), () => {}) // -> void
 
-
-
 ```
 
 #### Example - Request is aborted when Client is destroyed
-
 
 ```js
 import { createServer } from 'http'
@@ -197,8 +184,6 @@ try {
 } catch (error) {
   console.error(error)
 }
-
-
 
 ```
 
@@ -260,7 +245,6 @@ Returns: `Boolean` - `false` if dispatcher is busy and further dispatch calls wo
 
 #### Example 1 - Dispatch GET request
 
-
 ```js
 import { createServer } from 'http'
 import { Client } from 'undici'
@@ -305,12 +289,9 @@ client.dispatch({
   }
 })
 
-
-
 ```
 
 #### Example 2 - Dispatch Upgrade Request
-
 
 ```js
 import { createServer } from 'http'
@@ -359,12 +340,9 @@ client.dispatch({
   }
 })
 
-
-
 ```
 
 #### Example 3 - Dispatch POST request
-
 
 ```js
 import { createServer } from 'http'
@@ -416,8 +394,6 @@ client.dispatch({
   }
 })
 
-
-
 ```
 
 ### `Dispatcher.pipeline(options, handler)`
@@ -453,7 +429,6 @@ Extends: [`RequestOptions`](/docs/docs/api/Dispatcher.md#parameter-requestoption
 - **onInfo** `({statusCode: number, headers: Record<string, string | string[]>}) => void | null` (optional) - Default: `null` - Callback collecting all the info headers (HTTP 100-199) received.
 
 #### Example 1 - Pipeline Echo
-
 
 ```js
 import { Readable, Writable, PassThrough, pipeline } from 'stream'
@@ -505,8 +480,6 @@ pipeline(
     server.close()
   }
 )
-
-
 
 ```
 
@@ -588,7 +561,6 @@ Note that body will still be a `Readable` even if it is empty, but attempting to
 
 #### Example 1 - Basic GET Request
 
-
 ```js
 import { createServer } from 'http'
 import { Client } from 'undici'
@@ -622,14 +594,11 @@ try {
   console.error(error)
 }
 
-
-
 ```
 
 #### Example 2 - Aborting a request
 
 > Node.js v15+ is required to run this example
-
 
 ```js
 import { createServer } from 'http'
@@ -659,12 +628,9 @@ try {
 
 abortController.abort()
 
-
-
 ```
 
 Alternatively, any `EventEmitter` that emits an `'abort'` event may be used as an abort controller:
-
 
 ```js
 import { createServer } from 'http'
@@ -694,12 +660,9 @@ try {
 
 ee.emit('abort')
 
-
-
 ```
 
 Destroying the request or response body will have the same effect.
-
 
 ```js
 import { createServer } from 'http'
@@ -726,14 +689,11 @@ try {
   server.close()
 }
 
-
-
 ```
 
 #### Example 3 - Conditionally reading the body
 
 Remember to fully consume the body even in the case when it is not read.
-
 
 ```js
 const { body, statusCode } = await client.request({
@@ -748,8 +708,6 @@ if (statusCode === 200) {
 await body.dump()
 
 return null
-
-
 
 ```
 
@@ -788,7 +746,6 @@ Returns: `void | Promise<StreamData>` - Only returns a `Promise` if no `callback
 - **context** `object`
 
 #### Example 1 - Basic GET stream request
-
 
 ```js
 import { createServer } from 'http'
@@ -830,14 +787,11 @@ try {
   console.error(error)
 }
 
-
-
 ```
 
 #### Example 2 - Stream to Fastify Response
 
 In this example, a (fake) request is made to the fastify server using `fastify.inject()`. This request then executes the fastify route handler which makes a subsequent request to the raw Node.js http server using `undici.dispatcher.stream()`. The fastify response is passed to the `opaque` option so that undici can tap into the underlying writable stream using `response.raw`. This methodology demonstrates how one could use undici and fastify together to create fast-as-possible requests from one backend server to another.
-
 
 ```js
 import { createServer } from 'http'
@@ -891,8 +845,6 @@ try {
   nodeServer.close()
 } catch (error) { }
 
-
-
 ```
 
 ### `Dispatcher.upgrade(options[, callback])`
@@ -929,7 +881,6 @@ Returns: `void | Promise<UpgradeData>` - Only returns a `Promise` if no `callbac
 
 #### Example 1 - Basic Upgrade Request
 
-
 ```js
 import { createServer } from 'http'
 import { Client } from 'undici'
@@ -961,8 +912,6 @@ try {
   client.close()
   server.close()
 }
-
-
 
 ```
 
@@ -1011,7 +960,6 @@ A function that takes a `dispatch` method and returns a `dispatch`-like function
 
 #### Example 1 - Basic Compose
 
-
 ```js
 const { Client, RedirectHandler } = require('undici')
 
@@ -1039,12 +987,9 @@ const client = new Client('http://localhost:3000')
 
 await client.request({ path: '/', method: 'GET' })
 
-
-
 ```
 
 #### Example 2 - Chained Compose
-
 
 ```js
 const { Client, RedirectHandler, RetryHandler } = require('undici')
@@ -1086,8 +1031,6 @@ const client = new Client('http://localhost:3000')
 
 await client.request({ path: '/', method: 'GET' })
 
-
-
 ```
 
 #### Pre-built interceptors
@@ -1100,7 +1043,6 @@ It accepts the same arguments as the [`RedirectHandler` constructor](/docs/docs/
 
 ### Example - Basic Redirect Interceptor
 
-
 ```js
 const { Client, interceptors } = require("undici");
 const { redirect } = interceptors;
@@ -1109,8 +1051,6 @@ const client = new Client("http://service.example").compose(
   redirect({ maxRedirections: 3, throwOnMaxRedirect: true })
 );
 client.request({ path: "/" })
-
-
 
 ```
 
@@ -1121,7 +1061,6 @@ The `retry` interceptor allows you to customize the way your dispatcher handles 
 It accepts the same arguments as the [`RetryHandler` constructor](/docs/docs/api/RetryHandler.md).
 
 ### Example - Basic Redirect Interceptor
-
 
 ```js
 const { Client, interceptors } = require("undici");
@@ -1137,8 +1076,6 @@ const client = new Client("http://service.example").compose(
   })
 );
 
-
-
 ```
 
 ##### `dump`
@@ -1152,7 +1089,6 @@ The `dump` interceptor enables you to dump the response body from a request upon
 > The `Dispatcher#options` also gets extended with the options `dumpMaxSize`, `abortOnDumped`, and `waitForTrailers` which can be used to configure the interceptor at a request-per-request basis.
 
 ### Example - Basic Dump Interceptor
-
 
 ```js
 const { Client, interceptors } = require("undici");
@@ -1173,8 +1109,6 @@ client.dispatch(
   },
   handler
 );
-
-
 
 ```
 
@@ -1242,7 +1176,6 @@ It represents a storage object for resolved DNS records.
 
 ### Example - Basic DNS Interceptor
 
-
 ```js
 const { Client, interceptors } = require("undici");
 const { dns } = interceptors;
@@ -1256,12 +1189,9 @@ const response = await client.request({
   ...requestOpts
 })
 
-
-
 ```
 
 ### Example - DNS Interceptor and LRU cache as a storage
-
 
 ```js
 const { Client, interceptors } = require("undici");
@@ -1299,8 +1229,6 @@ const response = await client.request({
   ...requestOpts
 })
 
-
-
 ```
 
 ##### `responseError`
@@ -1308,7 +1236,6 @@ const response = await client.request({
 The `responseError` interceptor throws an error for responses with status code errors (>= 400).
 
 ### Example
-
 
 ```js
 const { Client, interceptors } = require("undici");
@@ -1323,8 +1250,6 @@ await client.request({
   method: "GET",
   path: "/"
 });
-
-
 
 ```
 
@@ -1342,7 +1267,6 @@ The `decompress` interceptor automatically decompresses response bodies that are
 
 ### Example - Basic Decompress Interceptor
 
-
 ```js
 const { Client, interceptors } = require("undici");
 const { decompress } = interceptors;
@@ -1357,12 +1281,9 @@ const response = await client.request({
   path: "/"
 });
 
-
-
 ```
 
 ### Example - Custom Options
-
 
 ```js
 const { Client, interceptors } = require("undici");
@@ -1374,8 +1295,6 @@ const client = new Client("http://service.example").compose(
     skipStatusCodes: [204, 304, 201] // Skip these status codes
   })
 );
-
-
 
 ```
 
@@ -1422,7 +1341,6 @@ The `cache` interceptor implements client-side response caching as described in
 
 ### Usage with `fetch`
 
-
 ```js
 const { Agent, cacheStores, interceptors, setGlobalDispatcher } = require('undici')
 
@@ -1442,8 +1360,6 @@ const first = await fetch('https://example.com/data')
 // Second request can be served from cache according to RFC9111 rules.
 const second = await fetch('https://example.com/data')
 
-
-
 ```
 
 ##### `Deduplicate Interceptor`
@@ -1462,7 +1378,6 @@ The `deduplicate` interceptor deduplicates concurrent identical requests. When m
 
 ### Usage
 
-
 ```js
 const { Client, interceptors } = require("undici");
 const { deduplicate, cache } = interceptors;
@@ -1477,8 +1392,6 @@ const clientWithCache = new Client("http://service.example").compose(
   deduplicate(),
   cache()
 );
-
-
 
 ```
 
@@ -1565,7 +1478,6 @@ Response headers will derive a `host` from the `url` of the [Client](/docs/docs/
 
 ### Example 1 - Object
 
-
 ```js
 {
   'content-length': '123',
@@ -1575,12 +1487,9 @@ Response headers will derive a `host` from the `url` of the [Client](/docs/docs/
   accept: '*/*'
 }
 
-
-
 ```
 
 ### Example 2 - Array
-
 
 ```js
 [
@@ -1591,12 +1500,9 @@ Response headers will derive a `host` from the `url` of the [Client](/docs/docs/
   'accept', '*/*'
 ]
 
-
-
 ```
 
 ### Example 3 - Iterable
-
 
 ```js
 new Headers({
@@ -1607,12 +1513,9 @@ new Headers({
   accept: '*/*'
 })
 
-
-
 ```
 
 or
-
 
 ```js
 new Map([
@@ -1623,12 +1526,9 @@ new Map([
   ['accept', '*/*']
 ])
 
-
-
 ```
 
 or
-
 
 ```js
 {
@@ -1640,7 +1540,5 @@ or
     yield ['accept', '*/*']
   }
 }
-
-
 
 ```

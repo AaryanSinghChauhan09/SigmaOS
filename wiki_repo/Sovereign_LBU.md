@@ -22,7 +22,6 @@ By compiling directly into the microkernel memory manager, it absorbs the defini
 
 The S-LBU subsystem continuously monitors persistent directory paths (such as `/etc/network/interfaces` and `/sys/config/declarative.nix`). Rather than writing modifications directly to slow physical flash blocks, it commits all updates atomically to RAM.
 
-
 ```mermaid
 graph TD
     A[Dynamic RAM Configuration Files] --> B[S-LBU State Serializer]
@@ -30,7 +29,6 @@ graph TD
     C --> D[Encrypted zenith_state.apk Archive]
     D --> E[Write Target: Physical Boot Flash]
     E --> | Cold Boot Restores State | A
-
 
 ```
 
@@ -47,20 +45,23 @@ graph TD
 
 The `sigma-lbu` utility enables dynamic system state management:
 
-
 ```bash
+
 # Add a configuration file to the persistence tracking manifest
+
 sigma-lbu track <file_path>
 
 # Compress and commit current memory configuration states to boot flash
+
 sigma-lbu commit
 
 # Force-restore dynamic memory configurations from committed flash backups
+
 sigma-lbu restore
 
 # Audit tracked files and verify cryptographic signatures
-sigma-lbu audit
 
+sigma-lbu audit
 
 ```
 

@@ -29,7 +29,6 @@ SigmaOS is available in multiple professional formats to ensure total industrial
 
 To build a specific edition of SigmaOS, switch to the corresponding branch and execute the industrial build command:
 
-
 ```bash
 
 # 1. Switch to your desired format branch
@@ -40,14 +39,11 @@ git checkout release/standalone
 
 make zenith-standalone-iso
 
-
-
 ```
 
 ### 📦 Unified Package Management
 
 Every format supports the `sigma-pkg` utility for cross-format shard synchronization:
-
 
 ```bash
 
@@ -58,8 +54,6 @@ sigma-pkg sync
 # Install format-specific industrial layers
 
 sigma-pkg layer standalone
-
-
 
 ```
 

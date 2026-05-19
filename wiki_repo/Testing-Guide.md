@@ -22,11 +22,8 @@ We use the `SovereignRegression` shard to perform self-tests:
 
 To invoke the regression suite from the shell:
 
-
 ```bash
 sigma-cli diag run-tests
-
-
 
 ```
 

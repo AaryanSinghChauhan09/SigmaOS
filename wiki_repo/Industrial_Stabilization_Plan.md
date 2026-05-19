@@ -8,7 +8,6 @@ This document establishes the strategic, structural, and architectural blueprint
 
 As a sovereign, AI-native operating system designed to outpace monolithic systems, SigmaOS must guarantee absolute system stability, zero-drift real-time task execution, and post-quantum attested security. This plan transitions SigmaOS from high-performance development stages into a certified, industrial-grade operational platform.
 
-
 ```mermaid
 graph TD
     A[Silicon-Direct Hardware Layer] --> B[Sovereign HAL Drivers]
@@ -17,8 +16,6 @@ graph TD
     D --> E[Shard-Aware CFS Scheduler]
     E --> F[Professional Indian Compliance Tools]
     F --> G[Industrial Production Sovereign Stable]
-
-
 ```
 
 ---
@@ -85,4 +82,4 @@ To guarantee 100% codebase uniformity and prevent branch drift across the 12 git
 | **Right to Information Act, 2005** | `SovereignRTIComplianceCalc` | Timelines & penalty trackers | Capped ₹25,000 maximum penalty audit | 
 | **Industrial Disputes Act, 1947** | `SovereignIndustrialDisputeArbitrator` | Public Utility strike notice checkers | Statutory 6-week notices verification | 
 | **National Food Security Act, 2013** | `SovereignRationAllocationCalc` | Grain entitlement multipliers | Subsidized rate calculations auditing | 
-| **Trade Unions Act, 1926** | `SovereignTradeUnionRegistrationValidator` | Minimum worker membership checkers | Enforces 10% or 100 workers minimum limits | 
+| **Trade Unions Act, 1926** | `SovereignTradeUnionRegistrationValidator` | Minimum worker membership checkers | Enforces 10% or 100 workers minimum limits |

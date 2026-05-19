@@ -18,10 +18,7 @@ Unlike static kernels, SigmaOS uses a reinforcement learning agent (`SovereignAI
 
 Run the sovereign benchmarker to certify your lattice performance:
 
-
 ```bash
 sigma-cli telemetry --bench
-
-
 
 ```

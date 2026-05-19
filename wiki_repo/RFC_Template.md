@@ -25,13 +25,10 @@ Why is this expansion required? Explain what competency gap is addressed and how
 
 Describe how this module interacts with the core microkernel, tracing the dispatch pipeline:
 
-
 ```mermaid
 graph TD
     A[Ring-3 Userland Call] --> | SyscallDispatcher | B[Proposed Shard Vector]
     B --> | Attested Check | C[SovereignHAL Primitives]
-
-
 ```
 
 ---
@@ -39,7 +36,6 @@ graph TD
 ## 4. Zero-Dependency Code Primitives & Layout
 
 Provide concrete mock interfaces of the C++ classes conforming to static singletons:
-
 
 ```cpp
 namespace SigmaOS {
@@ -54,8 +50,6 @@ public:
 
 } // namespace Subsystem
 } // namespace SigmaOS
-
-
 ```
 
 ---

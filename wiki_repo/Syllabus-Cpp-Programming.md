@@ -1,29 +1,38 @@
 # C++ Programming → SigmaOS Kernel Core (C++17)
 
-> Maps the C++ OOP syllabus to the SigmaOS Zenith microkernel, which is written entirely in modern C++17.
+> Maps the C++ OOP syllabus to the SigmaOS Zenith microkernel, which is written entirely in modern, freestanding C++17.
 
 ---
 
-## Unit I: OOP Concepts & Basics
+## Unit I: OOP Principles, Concepts & Basics
+
+### Core OOP Principles
+
+* **Encapsulation:** Bundling data attributes and member functions into unified class abstractions, shielding internal state via explicit access specifiers (`private`, `protected`, `public`).
+* **Inheritance:** Establishing hierarchical relationships between base and derived classes, enabling structural code reuse and interface subtyping E.g., `NVMeDriver` inheriting from `HALDriver`.
+* **Polymorphism:** Permitting distinct derived objects to be treated uniformly via base pointers, utilizing dynamic vtable dispatch for late binding or templates for static compile-time resolution.
+* **Abstraction:** Exposing simplified, high-level operational interfaces while hiding complex internal implementation mechanics E.g., presenting a clean `read()` method while concealing low-level DMA register manipulation.
+
+**Unique Selling Point (USP):** Unmatched reusability, modularity, and clean architectural boundaries, enabling failure-isolated kernel shards and rapid ecosystem scaling.
 
 ### OOP vs Procedural in SigmaOS
 
 | Paradigm | Procedural (C) | OOP (C++) |
-| --- | --- | --- |
-| Code style | Functions on data | Objects encapsulating data + behavior |
-| Kernel use | Drivers, boot code | Core subsystems, HAL, shard modules |
-| Reuse | Copy-paste, macros | Inheritance, templates |
-| Safety | Manual conventions | Access specifiers, RAII |
+| :--- | :--- | :--- |
+| **Code style** | Functions operating on external data structures | Objects encapsulating data attributes + behavioral methods |
+| **Kernel use** | Low-level assembly traps, early boot loaders | Core microkernel subsystems, HAL, modular utility shards |
+| **Reuse** | Copy-paste mechanics, macro expansions | Inheritance hierarchies, template metaprogramming |
+| **Safety** | Manual pointer discipline and conventions | Access specifiers, RAII deterministic resource management |
 
 ### C vs C++ in SigmaOS
 
 | Feature | C | C++ |
-| --- | --- | --- |
-| `struct` | Data only | Data + methods |
-| Memory | `malloc`/`free` | `new`/`delete` + RAII |
-| Type safety | Casts are unsafe | `static_cast`, `dynamic_cast` |
-| Templates | Macros | Type-safe generics |
-| Namespaces | Global only | `Sigma::Core::Memory` |
+| :--- | :--- | :--- |
+| `struct` | Plain Old Data (POD) only | Data attributes + member methods |
+| **Memory** | `malloc`/`free` manual management | `new`/`delete` + RAII smart pointers |
+| **Type safety**| Implicit C-style casts are unsafe | Explicit `static_cast`, `reinterpret_cast` |
+| **Templates** | Preprocessor macros | Type-safe generic programming |
+| **Namespaces** | Global symbol space only | Hierarchical `Sigma::Core::Memory` |
 
 ```cpp
 // C++ basics used throughout SigmaOS kernel
@@ -42,8 +51,7 @@ namespace Sigma {
     using u64 = uint64_t;
     using i32 = int32_t;
 }
-
-```text
+```
 
 ---
 
@@ -113,8 +121,7 @@ SovereignProcess proc_table[4096];
 class AddressSpace {
     uint64_t m_pml4[512];  // Page Map Level 4 — 512 entries
 };
-
-```text
+```
 
 ---
 
@@ -187,8 +194,7 @@ public:
         return m_addr == other.m_addr;
     }
 };
-
-```text
+```
 
 ---
 
@@ -265,20 +271,34 @@ void risky_operation(int fd) {
         sigma_panic("unhandled exception");
     }
 }
+```
 
-```text
+---
+
+## Debugging & Problem-Solving in C++ OOP
+
+### Common Issues & Fix Strategies
+
+* **Issue - Memory Leaks & Dangling Pointers:** Manual `new`/`delete` mismanagement leaves orphaned heap allocations or dangling pointer references.
+  * *Fix Strategy:* Enforce strict RAII smart pointer wrapping (`SigmaUniquePtr`, `SigmaSharedPtr`) to guarantee deterministic heap deallocation upon scope exit.
+* **Issue - Concurrency Deadlocks in Object Methods:** Multiple threads invoking synchronized class methods acquire member mutexes in conflicting orders.
+  * *Fix Strategy:* Utilize `std::scoped_lock` (or sovereign equivalent) for deadlock-free multi-lock acquisition, and adhere to strict hierarchical locking protocols across object boundaries.
+* **Issue - Virtual Table (vtable) Slicing & Corruption:** Passing derived objects by value rather than reference/pointer slices off derived attributes and corrupts polymorphic vtable dispatch.
+  * *Fix Strategy:* Always pass polymorphic objects by reference (`const HALDriver&`) or smart pointer (`SigmaUniquePtr<HALDriver>`), and enforce mandatory `virtual` destructors on all base classes.
+* **Issue - Algorithmic Complexity in Container Traversal:** Linear array scanning ($O(n)$) or naive sorting ($O(n^2)$) degrades object container performance.
+  * *Fix Strategy:* Migrate from linear vectors to balanced B+ Trees or hash maps (`SovereignHashMap`), reducing search and indexing complexity to $O(\log n)$ or $O(1)$.
 
 ---
 
 ## SigmaOS C++ Standards & Conventions
 
 | Rule | Detail |
-| --- | --- |
-| Standard | C++17 (`-std=c++17`) |
-| RTTI | Disabled (`-fno-rtti`) — no `dynamic_cast` cost |
-| Exceptions | Enabled only in userland; kernel uses error codes |
-| STL | Forbidden in kernel; sovereign containers only |
-| Namespaces | All kernel code in `Sigma::` hierarchy |
-| Virtual dtors | Mandatory on all base classes with inheritance |
+| :--- | :--- |
+| **Standard** | C++17 (`-std=c++17`) |
+| **RTTI** | Disabled (`-fno-rtti`) — eliminates `dynamic_cast` runtime overhead |
+| **Exceptions** | Enabled only in userland; microkernel core utilizes explicit error codes |
+| **STL** | Forbidden in Ring-0 kernel memory; sovereign containers only |
+| **Namespaces**| All kernel code encapsulated within `Sigma::` hierarchy |
+| **Virtual dtors**| Mandatory on all base classes containing virtual methods |
 
-*Last updated: 2026-05-18 | SigmaOS Zenith v15.1*
+*Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

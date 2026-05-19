@@ -4,7 +4,6 @@ SigmaOS implements hardware orchestration via independent Driver Shards. This pr
 
 ## Architecture Diagram
 
-
 ```mermaid
 graph TD
     A[Hardware Component] --> B(Sovereign HAL)
@@ -13,23 +12,15 @@ graph TD
     C --> | Wi-Fi | E[Networking Shard]
     C --> | NVMe | F[Storage Shard
 
-
-
 ## Current Coverage
-
-
 
  **VESA Framebuffer**: Basic legacy compatibility.
 
 - **Intel Graphics (Work-in-Progress)**: Experimental hardware acceleration.
 
-
-
  **Intel PRO/1000**: Gigabit Ethernet support.
 
 - **802.11ax (Experimental)**: High-speed wireless orchestration.
-
-
 
  **AHCI (SATA)**: Legacy HDD/SSD support.
 
@@ -38,9 +29,6 @@ graph TD
 ## Writing a Driver
 
 Drivers are just standard Shard modules implementing `register_device()`.
-
-
-
 
 ```c
 

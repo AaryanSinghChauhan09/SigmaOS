@@ -17,7 +17,6 @@ SigmaOS is designed for silicon-direct, high-security operations. You must stric
 
 - All active driver and core system shards must derive from `SigmaOS::SigmaObject` and implement standard Meyer singletons to ensure safe static execution limits:
 
-
 ```cpp
 #include "../../include/SigmaOOP.hpp"
 #include "../../include/sigma_log.h"
@@ -44,8 +43,6 @@ private:
 
 } // namespace MySubsystem
 } // namespace SigmaOS
-
-
 ```
 
 ### C. Zero-Loss Fixed-Point Calculations

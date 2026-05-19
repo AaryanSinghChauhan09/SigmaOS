@@ -4,7 +4,6 @@ SigmaOS implements a full Post-Quantum Security Lattice, providing both defensiv
 
 ## Architecture
 
-
 ```mermaid
 graph TD
     A[Sovereign Lattice] --> B{S-PQC Engine}
@@ -16,7 +15,6 @@ graph TD
     A --> H[S-WATCHDOG]
     H --> I[Anomaly Detected]
     I --> J[Atomic Shard Rollback]
-
 
 ```
 
@@ -35,7 +33,6 @@ SigmaOS is built from the ground up to resist quantum-computational attacks.
 
 ### Cryptography API
 
-
 ```c
 // Encrypt an inter-shard payload
 sigma_status status = pq_encrypt(data, sizeof(data), encrypted_out);
@@ -43,7 +40,6 @@ if (status != SIGMA_OK) {
     sigma_log_error("[S-PQC] FATAL: Cryptographic violation. Halting.");
     // Hardware halt triggered
 }
-
 
 ```
 

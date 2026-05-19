@@ -1,22 +1,31 @@
 # Web Programming → SigmaWeb Runtime
 
-> Maps the Web Programming syllabus (HTML5, CSS, JS, PHP) to `SigmaWeb` — the browser-like runtime environment embedded inside SigmaOS.
+> Maps the Web Programming syllabus (HTML5, CSS, JS, PHP, React, Node.js, Django) to `SigmaWeb` — the highly isolated, sovereign runtime environment embedded inside SigmaOS.
 
 ---
 
-## Architecture Overview
+## Architecture Overview & Core Concepts
 
-```text
+### Core Web Concepts
+
+* **Client-Server Model:** Distributed application structure where client devices (browsers/SigmaWeb) request resources or services from centralized server nodes over network protocols (HTTP/TCP).
+* **REST APIs:** Representational State Transfer architectural style utilizing stateless HTTP methods (`GET`, `POST`, `PUT`, `DELETE`) to manipulate JSON/XML resource representations.
+* **MVC Architecture:** Design pattern decoupling web applications into three interconnected components: `Model` (data state and database logic), `View` (UI presentation and HTML rendering), and `Controller` (request handling and business routing).
+
+**Unique Selling Point (USP):** Enables interactive, globally accessible, and horizontally scalable web applications with unmatched accessibility and user engagement, securely sandboxed inside Ring-3 userland memory.
+
+```
 SigmaWeb Runtime
 ├── HTML5 Parser + DOM Engine
 ├── CSS Layout Engine (Flexbox, Grid)
-├── JavaScript Engine (V8-compatible or QuickJS)
+├── JavaScript Engine (V8-compatible / QuickJS)
 ├── PHP Runtime (PHP-FPM compatible)
+├── React Virtual DOM Bridge
+├── Node.js / Django Backend Emulation Layer
 ├── WebSocket + WebWorker support
 ├── Geolocation API (from HAL GPS driver)
 └── localStorage / sessionStorage (on SovereignFS)
-
-```text
+```
 
 ---
 
@@ -80,12 +89,11 @@ SigmaWeb Runtime
     <script src="sigma.js"></script>
 </body>
 </html>
-
-```text
+```
 
 ---
 
-## Unit II: Advanced HTML5
+## Unit II: Advanced HTML5 & Web Storage
 
 ### Semantic Tags
 
@@ -105,8 +113,7 @@ SigmaWeb Runtime
 <mark>     <!-- Highlighted text -->
 <progress value="75" max="100">75%</progress>
 <meter value="0.7">70%</meter>
-
-```text
+```
 
 ### HTML5 Web Storage
 
@@ -120,8 +127,7 @@ localStorage.removeItem('theme');
 sessionStorage.setItem('session_token', 'abc123');
 
 // SigmaOS maps these to /sigma/web/storage/<origin>/
-
-```text
+```
 
 ### HTML5 APIs
 
@@ -150,17 +156,17 @@ target.addEventListener('drop', e => {
     e.preventDefault();
     const data = e.dataTransfer.getData('text');
 });
-
-```text
+```
 
 ---
 
-## Unit III: JavaScript & CSS
+## Unit III: JavaScript, CSS & Frontend Frameworks
 
-### CSS
+### CSS & Responsive Design
 
 ```css
-/*Box model, selectors, specificity*/
+/* Box model, selectors, specificity */
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 .sigma-panel {
@@ -174,10 +180,10 @@ target.addEventListener('drop', e => {
     gap: 1rem;
 }
 
-/*Grid layout*/
+/* Grid layout */
 .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
 
-/*Animations*/
+/* Animations */
 @keyframes sigma-pulse {
     0%   { transform: scale(1); }
     50%  { transform: scale(1.05); }
@@ -185,81 +191,91 @@ target.addEventListener('drop', e => {
 }
 .btn:hover { animation: sigma-pulse 0.3s ease; }
 
-/*Media queries*/
+/* Media queries */
 @media (max-width: 768px) { .dashboard { grid-template-columns: 1fr; } }
+```
 
-```text
-
-### JavaScript Core
+### JavaScript Core & React Integration
 
 ```javascript
-// Variables
+// Variables & Core Syntax
 var legacy = 'avoid';
 let blockScoped = 42;
 const immutable = 'SigmaOS';
 
-// Operators
-let result = 10 + 3;    // 13
-let bits = 0xFF & 0x0F; // 0x0F — bitwise AND
-let str = `SigmaOS v${15}.1`; // template literal
+// React Virtual DOM Functional Component
+import React, { useState, useEffect } from 'react';
 
-// Conditionals
-if (role === 'admin') { grantAccess(); }
-else if (role === 'user') { limitAccess(); }
-else { deny(); }
+export function SigmaReactDashboard() {
+    const [metrics, setMetrics] = useState({ cpu: 0, mem: 0 });
 
-const label = isActive ? 'Running' : 'Stopped';  // ternary
+    useEffect(() => {
+        const timer = setInterval(async () => {
+            const res = await fetch('/sigma/api/sysinfo');
+            const data = await res.json();
+            setMetrics(data);
+        }, 1000);
+        return () => clearInterval(timer);
+    }, []);
 
-// Loops
-for (let i = 0; i < procs.length; i++) { /*...*/ }
-for (const proc of procs) { console.log(proc.name); }
-while (retries < 3 && !connected) { retries++; }
-
-// break / continue
-for (const item of items) {
-    if (item.type === 'skip') continue;
-    if (item.critical) { process(item); break; }
+    return (
+        <div className="sigma-panel">
+            <h2>React System Monitor</h2>
+            <p>CPU Usage: {metrics.cpu}%</p>
+            <p>Memory Usage: {metrics.mem} MB</p>
+        </div>
+    );
 }
-
-// Dialog boxes
-alert('SigmaOS boot complete');
-const ok = confirm('Restart?');
-const input = prompt('Enter username:', 'admin');
-
-// Arrays
-const cpus = ['x86-64', 'ARM64', 'RISC-V'];
-cpus.push('GPU');
-cpus.forEach(cpu => console.log(cpu));
-const filtered = cpus.filter(c => c.includes('64'));
-const mapped = cpus.map(c => c.toUpperCase());
-
-// User-defined functions
-function formatBytes(bytes) {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
-    return (bytes/1024/1024).toFixed(1) + ' MB';
-}
-
-// Arrow function
-const square = x => x * x;
-
-// Async/await
-async function fetchSystemInfo() {
-    const res = await fetch('/sigma/api/sysinfo');
-    const data = await res.json();
-    return data;
-}
-
-```text
+```
 
 ---
 
-## Unit IV: PHP
+## Unit IV: Backend Frameworks & PHP
+
+### Node.js Backend Integration
+
+```javascript
+// Node.js Express REST API Controller
+const express = require('express');
+const app = express();
+app.use(express.json());
+
+app.get('/sigma/api/sysinfo', (req, res) => {
+    res.json({
+        cpu: process.cpuUsage().user / 10000,
+        mem: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+        uptime: process.uptime()
+    });
+});
+
+app.listen(8080, () => console.log('SigmaNode Backend listening on port 8080'));
+```
+
+### Django Python MVC Integration
+
+```python
+
+# Django MVC View Controller (views.py)
+
+from django.http import JsonResponse
+from django.views import View
+import psutil
+
+class SigmaSysInfoView(View):
+    def get(self, request):
+        return JsonResponse({
+            'cpu': psutil.cpu_percent(),
+            'mem': psutil.virtual_memory().percent,
+            'disk': psutil.disk_usage('/sigma').percent
+        })
+```
+
+### PHP Core Runtime
 
 ```php
 <?php
 // Variables, echo, print
-$kernel_version = "15.1";
+$kernel_version = "15.2";
 $is_running = true;
 echo "SigmaOS v" . $kernel_version . "\n";
 print("Status: " . ($is_running ? "Running" : "Stopped"));
@@ -275,11 +291,11 @@ $null_val = null;
 // Strings
 echo strlen($str_val);            // 7
 echo strtoupper($str_val);        // SIGMAOS
-echo str_replace("OS", "OS v15.1", $str_val);
+echo str_replace("OS", "OS v15.2", $str_val);
 echo substr($str_val, 0, 5);      // Sigma
 
 // Constants
-define('SIGMA_VERSION', '15.1');
+define('SIGMA_VERSION', '15.2');
 const MAX_PROCS = 4096;
 
 // Operators
@@ -326,21 +342,36 @@ function get_memory_info(string $unit = 'MB'): string {
 
 echo get_memory_info('MB');
 ?>
+```
 
-```text
+---
+
+## Debugging & Problem-Solving in Web Programming
+
+### Common Issues & Fix Strategies
+
+* **Issue - Client-Side Memory Leaks:** Uncleaned event listeners, uncleared `setInterval` timers, or detached DOM nodes accumulate in browser memory, lagging UI execution.
+  * *Fix Strategy:* Execute explicit cleanup within React `useEffect` return callbacks (`clearInterval`), utilize `WeakMap`/`WeakSet` for caching DOM nodes, and profile heap allocations via Chrome DevTools Memory tab.
+* **Issue - Incorrect Indexing & Database Bottlenecks:** Unoptimized REST API backend ORM queries execute $N+1$ database selects or scan unindexed tables.
+  * *Fix #1:* Implement `select_related` or `prefetch_related` in Django ORM to compress $N+1$ queries into a single `JOIN`.
+  * *Fix #2:* Add composite B+ Tree indices to SigmaDB tables supporting frequent foreign key lookups.
+* **Issue - API Deadlocks & Starvation:** Synchronous, blocking I/O calls in Node.js or Django exhaust worker thread pools under high concurrent traffic.
+  * *Fix Strategy:* Migrate to fully asynchronous, non-blocking I/O event loops (`async`/`await`), offload heavy CPU calculations to Web Workers or Celery background queues, and utilize Redis caching layers.
+* **Issue - State Inconsistency & Prop Drilling:** Deeply nested React component trees suffer from sluggish re-renders and unsynchronized local state.
+  * *Fix Strategy:* Implement centralized state management (Redux Toolkit or React Context API) and utilize `useMemo`/`useCallback` hooks to prevent unneeded child component re-renders.
 
 ---
 
 ## SigmaWeb Runtime Integration
 
 | Web Standard | SigmaOS Component | File |
-| --- | --- | --- |
-| HTML5 Parser | `SigmaDOM` | `userland/sigmaweb/dom/` |
-| CSS Engine | `SigmaLayout` | `userland/sigmaweb/css/` |
-| JS Engine | QuickJS embed | `userland/sigmaweb/js/` |
-| PHP Runtime | PHP-FPM bridge | `userland/sigmaweb/php/` |
-| WebSockets | `SovereignNetStack` | `kernel/net/` |
-| localStorage | `SovereignFS` VFS | `kernel/fs/` |
-| Geolocation | HAL GPS driver | `kernel/hal/` |
+| :--- | :--- | :--- |
+| **HTML5 Parser** | `SigmaDOM` | `userland/sigmaweb/dom/` |
+| **CSS Engine** | `SigmaLayout` | `userland/sigmaweb/css/` |
+| **JS Engine** | QuickJS embed / V8 | `userland/sigmaweb/js/` |
+| **PHP Runtime** | PHP-FPM bridge | `userland/sigmaweb/php/` |
+| **WebSockets** | `SovereignNetStack` | `kernel/net/` |
+| **localStorage** | `SovereignFS` VFS | `kernel/fs/` |
+| **Geolocation** | HAL GPS driver | `kernel/hal/` |
 
-*Last updated: 2026-05-18 | SigmaOS Zenith v15.1*
+*Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

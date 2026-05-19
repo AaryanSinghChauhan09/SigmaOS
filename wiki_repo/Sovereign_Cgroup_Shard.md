@@ -22,7 +22,6 @@ By executing directly within the scheduling path, it absorbs the defining advant
 
 The cgroup system maintains up to 12 active resource partitions in a zero-dependency static matrix. The scheduler references this matrix on every context switch to calculate thread budgets.
 
-
 ```mermaid
 graph TD
     A[Zenith Microkernel Scheduler] --> B[Sovereign Cgroup Governor]
@@ -31,7 +30,6 @@ graph TD
     C --> | NO | E[Proceed with O(1) Thread Dispatch]
     D --> F[Active Groups Matrix]
     E --> F
-
 
 ```
 
@@ -45,17 +43,19 @@ graph TD
 
 The `sigma-cgroup` utility allows real-time, zero-reboot manipulation of partition constraints:
 
-
 ```bash
+
 # Create a new resource group
+
 sigma-cgroup create <name> <cpu_pct> <mem_mb> <io_weight>
 
 # Manually trigger automatic governor sweep and quota check
+
 sigma-cgroup enforce
 
 # Print audit report of all resource groups with live CPU/MEM/IO accounting
-sigma-cgroup audit
 
+sigma-cgroup audit
 
 ```
 

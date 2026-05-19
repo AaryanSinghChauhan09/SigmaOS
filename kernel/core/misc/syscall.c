@@ -86,13 +86,20 @@
 #define SIGMA_NSYSCALLS   64u
 
 /* =========================================================================
- * Interrupt Frame (forward decl)
+ * Interrupt Frame Definition
  * ========================================================================= */
-typedef struct SigmaInterruptFrame SigmaInterruptFrame;
+typedef struct SigmaInterruptFrame {
+    sigma_u64 es, ds;
+    sigma_u64 r15, r14, r13, r12, r11, r10, r9, r8;
+    sigma_u64 rbp, rdi, rsi, rdx, rcx, rbx, rax;
+    sigma_u64 vector;
+    sigma_u64 error_code;
+    sigma_u64 rip, cs, rflags, rsp, ss;  /* pushed by CPU on exception */
+} SigmaInterruptFrame;
 
 /* =========================================================================
  * Syscall handler function type
- * Args: (frame*) â†’ reads rdi, rsi, rdx, r10, r8, r9 as args
+ * Args: (frame*) -> reads rdi, rsi, rdx, r10, r8, r9 as args
  * Returns: sigma_i64 result written back to frame->rax
  * ========================================================================= */
 typedef sigma_i64 (*syscall_fn_t)(SigmaInterruptFrame* frame);

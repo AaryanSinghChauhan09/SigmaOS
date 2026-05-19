@@ -42,7 +42,6 @@ Each agent is monitored by a **Watchdog Shard**. If an agent crashes or consumes
 
 Developers can add new agents by subclassing `AgentBase`.
 
-
 ```cpp
 class MyCustomAgent : public AgentBase {
 public:
@@ -50,8 +49,6 @@ public:
         // Logic to achieve the goal
     }
 };
-
-
 
 ```
 

@@ -38,7 +38,6 @@
 
 ## Build Flags Per Architecture
 
-
 ```bash
 
 # ARM Cortex-A (32-bit)
@@ -55,8 +54,6 @@ export SIGMA_FLAGS="-march=armv8-a -DSIGMA_FASTBOOT=1"
 
 export SIGMA_ARCH=riscv64
 export SIGMA_FLAGS="-march=rv64imafdc -mabi=lp64d -DSIGMA_FASTBOOT=1"
-
-
 
 ```
 

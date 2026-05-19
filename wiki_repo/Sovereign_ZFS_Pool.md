@@ -22,7 +22,6 @@ By executing directly on bare-metal block allocations, it absorbs the defining s
 
 The S-ZFS system manages multiple hardware devices inside a unified dynamic storage container named `tank`. The microkernel file system distributes write transactions in stripes across online physical drives with instant mirror replication.
 
-
 ```mermaid
 graph TD
     A[S-ZFS Transaction Allocator] --> B[device_stripe_0 /dev/sdb]
@@ -30,7 +29,6 @@ graph TD
     B --> D[Parity Mirroring & CoW Validation]
     C --> D
     D --> E[Sentinel Post-Quantum Attestation]
-
 
 ```
 
@@ -44,20 +42,23 @@ graph TD
 
 The `sigma-zfs` utility allows live, non-disruptive storage orchestration:
 
-
 ```bash
+
 # Add a physical block device to the pool
+
 sigma-zfs add <dev_path> <size_gb>
 
 # Allocate dataset space transactionally
+
 sigma-zfs allocate <size_gb> <dataset_name>
 
 # Create an instantaneous zero-copy snapshot of a dataset
+
 sigma-zfs snapshot <dataset_name> <snapshot_name>
 
 # Run real-time diagnostics and device health audit
-sigma-zfs audit
 
+sigma-zfs audit
 
 ```
 

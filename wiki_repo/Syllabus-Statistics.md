@@ -1,38 +1,32 @@
-
 # Statistics → SigmaStats Toolkit
 
-
-> Maps the Statistics syllabus to `SigmaStats` — SigmaOS's built-in statistical analysis library, integrated with SigmaViz and SigmaAI.
+> Maps the Statistics syllabus to `SigmaStats` — SigmaOS's built-in statistical analysis library, integrated with SigmaViz, SigmaAI, and silicon-direct NPU sharding.
 
 ---
 
-
 ## Unit I: Introduction & Data Collection
-
-
 
 ### What is Statistics?
 
-Statistics is the science of collecting, organizing, analyzing, interpreting, and presenting data.
+Statistics is the mathematical science of collecting, organizing, analyzing, interpreting, and presenting empirical data. In sovereign computing, statistics provides the quantitative rigor required for deterministic decision-making, predictive caching, and hardware failure modeling.
 
-**SigmaOS Integration:** `SigmaStats` provides kernel-level statistical primitives used by:
-- `SigmaViz` — chart rendering
-- `SigmaAI` — ML feature engineering
-- `SigmaSheets` — spreadsheet formulas
-- `SigmaDB` — aggregate query functions
+**Unique Selling Point (USP):** Turning raw data into actionable insights with absolute quantitative rigor for decision-making.
 
+**SigmaOS Integration:** `SigmaStats` provides freestanding, kernel-level statistical primitives used by:
+
+- `SigmaViz` — direct framebuffer chart rendering
+- `SigmaAI` — ML feature engineering and normalization
+- `SigmaSheets` — spreadsheet calculation engine
+- `SigmaDB` — columnar aggregate query functions
 
 ### Primary vs Secondary Data
 
-
 | Type | Source | SigmaOS Analogy |
-| --- | --- | --- |
-| **Primary** | Collected firsthand (surveys, sensors) | Live telemetry from SigmaOS sensors |
-| **Secondary** | Pre-collected (databases, reports) | Historical data from SigmaDB |
-
+| :--- | :--- | :--- |
+| **Primary** | Collected firsthand (surveys, hardware sensors) | Live telemetry from SigmaOS HAL thermal/voltage sensors |
+| **Secondary** | Pre-collected (databases, historical logs) | Historical time-series metrics from SigmaDB |
 
 ### Diagrammatic Representation — SigmaViz Charts
-
 
 ```python
 
@@ -48,18 +42,17 @@ sv.pie_chart(data, labels, title="Resource Distribution")
 sv.histogram(data, bins=5, title="Latency Distribution")
 sv.frequency_polygon(data, title="Frequency Polygon")
 sv.frequency_curve(data, title="Ogive / Frequency Curve")
-
-```text
+```
 
 ---
 
-
 ## Unit II: Measures of Central Tendency & Dispersion
 
+### Central Tendency & Mathematical Formulas
 
+The foundational formulas for population mean ($\mu$) and sample arithmetic mean ($\bar{x}$) represent the center of mass for arbitrary data distributions:
 
-### Central Tendency
-
+$$\mu = \frac{\sum x_i}{n}, \quad \bar{x} = \frac{\sum_{i=1}^n x_i}{n}$$
 
 ```cpp
 // kernel/math/SigmaStats.h
@@ -74,7 +67,7 @@ namespace Sigma::Stats {
     double median(double* data, size_t n);  // Sort then pick middle
     double mode(const double* data, size_t n);  // Most frequent value
 
-    // GM = (x1 *x2* ... * xn)^(1/n)
+    // GM = (x1 * x2 * ... * xn)^(1/n)
     double geometric_mean(const double* data, size_t n);
 
     // HM = n / (1/x1 + 1/x2 + ... + 1/xn)
@@ -82,12 +75,13 @@ namespace Sigma::Stats {
 
     // Relation: AM >= GM >= HM (for positive values)
 }
+```
 
-```text
+### Measures of Dispersion & Variance Formula
 
+Dispersion quantifies the spread or variability of data around the central tendency. The foundational formula for population variance ($\sigma^2$) and standard deviation ($\sigma$) is defined as:
 
-### Measures of Dispersion
-
+$$\sigma^2 = \frac{\sum (x_i - \mu)^2}{n}, \quad \sigma = \sqrt{\frac{\sum (x_i - \mu)^2}{n}}$$
 
 ```cpp
 namespace Sigma::Stats {
@@ -112,12 +106,9 @@ namespace Sigma::Stats {
     // Coefficient of variation: CV = (σ / mean) × 100
     double coeff_variation(const double* data, size_t n);
 }
-
-```text
-
+```
 
 ### Skewness, Moments & Kurtosis
-
 
 ```cpp
 namespace Sigma::Stats {
@@ -136,18 +127,49 @@ namespace Sigma::Stats {
     // Leptokurtic: β2 > 3 (heavy tails)
     // Platykurtic: β2 < 3 (light tails)
 }
-
-```text
+```
 
 ---
 
+## Unit III: Hypothesis Testing, Regression & Bayesian Inference
 
-## Unit III: Correlation, Regression & Index Numbers
+### Hypothesis Testing & Probability Distributions
 
+Hypothesis testing provides a rigorous mathematical framework for validating assumptions regarding population parameters using sample data.
 
+* **Null Hypothesis ($H_0$):** Assumes no effect or no difference between groups.
+* **Alternative Hypothesis ($H_1$):** Assumes a statistically significant effect or difference exists.
+* **Probability Distributions:** Evaluates test statistics against established theoretical distributions including Normal ($Z$), Student's $t$, Chi-Square ($\chi^2$), and $F$-distributions.
 
-### Correlation Analysis
+```cpp
+namespace Sigma::Stats {
+    // Independent Two-Sample T-Test
+    double t_test_independent(const double* group1, size_t n1, const double* group2, size_t n2);
 
+    // Chi-Square Test of Independence
+    double chi_square_test(const double* observed, const double* expected, size_t k);
+
+    // One-Way ANOVA F-Test
+    double anova_one_way(const double* g1, const double* g2, const double* g3, size_t n);
+}
+```
+
+### Bayesian Inference
+
+Bayesian inference updates the probability of a hypothesis ($H$) as more evidence or information ($E$) becomes available, combining prior beliefs with current likelihoods:
+
+$$P(H|E) = \frac{P(E|H) \cdot P(H)}{P(E)}$$
+
+```cpp
+namespace Sigma::Stats {
+    // Bayesian Posterior Probability Calculator
+    double bayesian_posterior(double prior, double likelihood, double marginal_likelihood) {
+        return (marginal_likelihood > 0.0) ? ((likelihood * prior) / marginal_likelihood) : prior;
+    }
+}
+```
+
+### Correlation & Regression Analysis
 
 ```cpp
 namespace Sigma::Stats {
@@ -165,29 +187,6 @@ namespace Sigma::Stats {
 
     // r²: coefficient of determination
     double coeff_determination(double r);  // = r * r
-}
-
-```text
-
-
-### Interpretation
-
-
-| r value | Correlation |
-| --- | --- |
-| +1.0 | Perfect positive |
-| +0.7 to +0.9 | Strong positive |
-| +0.4 to +0.6 | Moderate positive |
-| 0 | No correlation |
-| -0.4 to -0.6 | Moderate negative |
-| -1.0 | Perfect negative |
-
-
-### Regression Analysis
-
-
-```cpp
-namespace Sigma::Stats {
 
     struct RegressionLine {
         double slope;      // b
@@ -198,60 +197,45 @@ namespace Sigma::Stats {
     RegressionLine regression_y_on_x(const double* x, const double* y, size_t n);
     // b = [nΣxy - ΣxΣy] / [nΣx² - (Σx)²]
     // a = ȳ - b*x̄
-
-    RegressionLine regression_x_on_y(const double* x, const double* y, size_t n);
-    // Both lines pass through (x̄, ȳ)
-    // byx * bxy = r²
 }
+```
 
-```text
+### Interpretation
 
-
-### Index Numbers
-
-
-| Type | Formula | SigmaOS Use |
-| --- | --- | --- |
-| Simple Price Index | (Pn / P0) × 100 | Performance index vs baseline |
-| Laspeyre's | ΣP1Q0 / ΣP0Q0 × 100 | Weighted by base year quantities |
-| Paasche's | ΣP1Q1 / ΣP0Q1 × 100 | Weighted by current year quantities |
-| Fisher's Ideal | √(Laspeyre × Paasche) | Best of both |
+| r value | Correlation |
+| :--- | :--- |
+| +1.0 | Perfect positive |
+| +0.7 to +0.9 | Strong positive |
+| +0.4 to +0.6 | Moderate positive |
+| 0 | No correlation |
+| -0.4 to -0.6 | Moderate negative |
+| -1.0 | Perfect negative |
 
 ---
 
-
-## Unit IV: Interpolation, Time Series & Probability
-
-
+## Unit IV: Interpolation, Time Series & Tools
 
 ### Interpolation & Extrapolation
-
 
 ```cpp
 namespace Sigma::Stats {
 
     // Newton's Forward Difference for equal intervals
-    double interpolate_newton_forward(
-        const double* x, const double* y, int n, double xi);
+    double interpolate_newton_forward(const double* x, const double* y, int n, double xi);
 
     // Lagrange interpolation for unequal intervals
-    double interpolate_lagrange(
-        const double* x, const double* y, int n, double xi);
+    double interpolate_lagrange(const double* x, const double* y, int n, double xi);
 
     // Extrapolation: predict beyond known range (use with caution)
     double extrapolate(RegressionLine reg, double x_future);
 }
-
-```text
-
+```
 
 ### Time Series Analysis
 
-
-```text
+```
 Time Series = Trend (T) + Seasonal (S) + Cyclical (C) + Irregular (I)
-
-```text
+```
 
 ```cpp
 namespace Sigma::Stats {
@@ -264,55 +248,44 @@ namespace Sigma::Stats {
 
     // Seasonal Index
     double seasonal_index(const double* data, size_t n, int season_period);
-
-    // SigmaOS use: CPU/memory usage forecasting
-    ForecastResult forecast_next(const double* history, size_t n, int steps);
 }
+```
 
-```text
+### Tools & Ecosystem Parity
 
+SigmaStats provides seamless bridging to industry-standard data science and statistical toolkits:
 
-### Probability
-
-
-```cpp
-namespace Sigma::Math {
-
-    // Classical: P(A) = favorable outcomes / total outcomes
-    double classical_prob(int favorable, int total);
-
-    // Addition theorem: P(A∪B) = P(A) + P(B) - P(A∩B)
-    double prob_union(double pA, double pB, double pAB);
-
-    // Multiplication theorem: P(A∩B) = P(A) × P(B | A)
-    double prob_intersection(double pA, double pB_given_A);
-
-    // Independent events: P(A∩B) = P(A) × P(B)
-    double prob_independent(double pA, double pB);
-
-    // Bayes' Theorem
-    double bayes(double pA, double pB_given_A, double pB);
-    // P(A | B) = P(B | A)×P(A) / P(B)
-
-    // Used in SigmaAI: Naive Bayes classifier, anomaly detection
-}
-
-```text
+* **R Environment:** Full compatibility with R dataframe structures and CRAN analytical packages.
+* **Python Ecosystem:** Direct interoperability with `NumPy` array buffers, `Pandas` series, and `Matplotlib` plotting backends.
+* **Jupyter Notebooks:** Interactive kernel execution for real-time exploratory data analysis (EDA).
 
 ---
 
+## Debugging & Problem-Solving in Statistics
+
+### Common Issues & Fix Strategies
+
+* **Issue - Overfitting in Statistical/ML Models:** Models capture noise rather than underlying distributions, leading to high training accuracy but poor generalization.
+  * *Fix Strategy:* Apply $L_1$ (Lasso) or $L_2$ (Ridge) regularization penalties, increase k-fold cross-validation partitions, or prune decision tree depths.
+* **Issue - Data Problems (Missing Values & Scaling):** Unclean datasets skew mean/variance calculations and cause gradient explosion.
+  * *Fix Strategy:* Implement robust imputation (k-NN or median replacement) for missing values, and normalize/standardize features using Z-score transformations ($z = \frac{x - \mu}{\sigma}$).
+* **Issue - Algorithmic Complexity Bottlenecks:** Naive sorting or pairwise distance calculations yield $O(n^2)$ complexity, stalling large dataset ingestion.
+  * *Fix Strategy:* Optimize algorithmic complexity by replacing naive bubble/insertion sorts with QuickSort or MergeSort ($O(n \log n)$), and utilize spatial B+ Trees or k-d trees for searching.
+* **Issue - Runtime Errors:** Unhandled exceptions during matrix inversion or floating-point division by zero.
+  * *Fix Strategy:* Use kernel-level logging (`sigma_log`), exhaustive unit testing suites, and hardware profiling tools (DTrace/perf) to trace execution bottlenecks.
+
+---
 
 ## SigmaStats Integration Map
 
-
-```text
+```
 SigmaStats Library
 ├── Central Tendency:  mean, median, mode, GM, HM
 ├── Dispersion:        range, MD, σ, σ², QD
 ├── Shape:             skewness, kurtosis, moments
 ├── Correlation:       Pearson r, Spearman r, PE
 ├── Regression:        y=a+bx, x=a+by, R²
-├── Index Numbers:     Laspeyre, Paasche, Fisher
+├── Hypothesis:        T-Test, Chi-Square, ANOVA, Bayes
 ├── Interpolation:     Newton, Lagrange
 ├── Time Series:       MA, LSM, Seasonal Index
 └── Probability:       Classical, Addition, Multiplication, Bayes
@@ -322,7 +295,7 @@ Consumers:
 ├── SigmaViz (chart rendering)
 ├── SigmaAI (ML feature engineering)
 └── SigmaDB (aggregate SQL functions)
+```
 
-```text
-
-**Files:**`userland/apps/SigmaStats/sigma_stats.cpp`, `sigma_stats.h`*Last updated: 2026-05-18 | SigmaOS Zenith v15.1*
+**Files:** `userland/apps/SigmaStats/sigma_stats.cpp`, `sigma_stats.h`  
+*Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

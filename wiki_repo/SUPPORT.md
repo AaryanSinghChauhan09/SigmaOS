@@ -12,14 +12,11 @@ The [GitHub Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki) is the p
 
 If you encounter a shard failure, check the internal journal logs:
 
-
 ```bash
 
 # View real-time kernel telemetry
 
 sigma-cli log --follow
-
-
 
 ```
 

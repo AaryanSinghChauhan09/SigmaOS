@@ -18,10 +18,12 @@ public:
     virtual ~SigmaObject() = default;
     virtual const char* type_name() const noexcept = 0;
 };
+#ifndef sigma_log
 inline void sigma_log(const char* msg) {
     ::sigma_print("[SIGMA_LOG]: ");
     ::sigma_print(msg);
     ::sigma_print("\n");
 }
+#endif
 } // namespace SigmaOS
 #endif /* SIGMA_OOP_HPP */

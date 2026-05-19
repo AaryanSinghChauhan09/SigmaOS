@@ -132,7 +132,6 @@ See [Dispatcher Event: `'drain'`](/docs/docs/api/Dispatcher.md#event-drain).
 
 ## Example
 
-
 ```javascript
 import { RoundRobinPool } from 'undici'
 
@@ -150,8 +149,6 @@ for (let i = 0; i < 100; i++) {
 }
 
 await pool.close()
-
-
 
 ```
 

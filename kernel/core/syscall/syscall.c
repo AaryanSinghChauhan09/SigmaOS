@@ -88,13 +88,20 @@
 #define SIGMA_NSYSCALLS   64u
 
 /* =========================================================================
- * Interrupt Frame (forward decl)
+ * Interrupt Frame Definition
  * ========================================================================= */
-typedef struct SigmaInterruptFrame SigmaInterruptFrame;
+typedef struct SigmaInterruptFrame {
+    sigma_u64 es, ds;
+    sigma_u64 r15, r14, r13, r12, r11, r10, r9, r8;
+    sigma_u64 rbp, rdi, rsi, rdx, rcx, rbx, rax;
+    sigma_u64 vector;
+    sigma_u64 error_code;
+    sigma_u64 rip, cs, rflags, rsp, ss;  /* pushed by CPU on exception */
+} SigmaInterruptFrame;
 
 /* =========================================================================
  * Syscall handler function type
- * Args: (frame*) â†’ reads rdi, rsi, rdx, r10, r8, r9 as args
+ * Args: (frame*) -> reads rdi, rsi, rdx, r10, r8, r9 as args
  * Returns: sigma_i64 result written back to frame->rax
  * ========================================================================= */
 typedef sigma_i64 (*syscall_fn_t)(SigmaInterruptFrame* frame);
@@ -122,7 +129,7 @@ static sigma_i64 sys_write_impl(SigmaInterruptFrame* f) {
     const char* buf   = (const char*)(sigma_usize)f->rsi;
     sigma_usize count       = (sigma_usize)f->rdx;
     if (fd == 1 || fd == 2) {
-        /* stdout/stderr â†’ serial + VGA */
+        /* stdout/stderr -> serial + VGA */
         sigma_usize i;
         for (i = 0; i < count; i++) {
             /* Write to COM1 (serial) */
@@ -164,7 +171,7 @@ static sigma_i64 sys_uname_impl(SigmaInterruptFrame* f) {
     char* buf = (char*)(sigma_usize)f->rdi;
     if (!buf) return K_ERR_INVAL;
     const char* info = "SigmaOS 1.0 SovereignKernel x86_64";
-    usize i = 0;
+    sigma_usize i = 0;
     while (i < 127 && info[i]) { buf[i] = info[i]; i++; }
     buf[i] = '\0';
     return 0;
@@ -195,7 +202,7 @@ static sigma_i64 sys_reboot_impl(SigmaInterruptFrame* f) {
     return 0;
 }
 
-static i64 sys_unimpl(SigmaInterruptFrame* f) {
+static sigma_i64 sys_unimpl(SigmaInterruptFrame* f) {
     ksigma_printf("[SYSCALL]: syscall #%llu not yet implemented.\n", f->vector);
     return K_ERR_INVAL;
 }
