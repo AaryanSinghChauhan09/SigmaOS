@@ -12,6 +12,8 @@
 
 - [Architecture](Architecture)
 
+- [Omni Computer Science & AI Architecture](Omni-Computer-Science-AI-Architecture)
+
 ## ⚙️ Core Subsystems
 
 - [Networking Shard (TCP/IP)](Networking-Shard)
