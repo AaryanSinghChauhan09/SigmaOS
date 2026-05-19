@@ -3283,6 +3283,7 @@ SigmaOS/
 │   │   ├── SovereignFlashMaster.cpp
 │   │   ├── SovereignForensicMatrix.c
 │   │   ├── SovereignForensicMatrix.cpp
+│   │   ├── SovereignFOSSSynthesis.cpp
 │   │   ├── SovereignGraphicsCompositor.cpp
 │   │   ├── SovereignHardwareAudit.cpp
 │   │   ├── SovereignHypervisorZenith.c
@@ -10692,6 +10693,7 @@ SigmaOS/
 │   ├── kselftest
 │   │   ├── kselftest_run.cpp
 │   │   └── kselftest_sigma.h
+│   ├── foss_synthesis.test.js
 │   ├── syscall_dispatcher_test.cpp
 │   ├── syscall_test.cpp
 │   ├── system_audit.test.js
@@ -10737,6 +10739,8 @@ SigmaOS/
 │   │   └── run-qemu.sh
 │   ├── diagram_gen.js
 │   ├── fix_html.cjs
+│   ├── fix_md_lint.cjs
+│   ├── fix_md_lint.js
 │   ├── generate_docs.js
 │   ├── live_usb_creator.ps1
 │   ├── problem_tracker.js
@@ -10937,6 +10941,7 @@ SigmaOS/
 │   ├── sigma_widget_sys_telemetry.cpp
 │   ├── sigma_workspace.cpp
 │   ├── sigma_write_blocker.cpp
+│   ├── sigma_zenith_synthesis_master.cpp
 │   ├── sigma_zfs.cpp
 │   ├── sigma-build.js
 │   ├── sigma-cli.cpp
@@ -10948,6 +10953,7 @@ SigmaOS/
 │   ├── sigma-pkg.sh
 │   ├── sigma.ps1
 │   ├── sovereign-deploy.js
+│   ├── SovereignComponentForge.cpp
 │   ├── sync_all_branches.js
 │   ├── telemetry-cli.cpp
 │   └── wiki_sync.js
@@ -11892,6 +11898,8 @@ SigmaOS/
 ├── reorganize_modular_tree.cjs
 ├── roadmap.html
 ├── roadmap.md
+├── scrub_all_conflicts.cjs
+├── scrub_all_conflicts.js
 ├── shards_list.txt
 ├── SHARDS.manifest
 ├── sigma_features.json

@@ -58,6 +58,7 @@ extern "C" void initialize_specialized_principles();
 extern "C" void initialize_forensics_principles();
 extern "C" void initialize_container_principles();
 extern "C" void initialize_rolling_principles();
+extern "C" void initialize_foss_synthesis_principles();
 
 /**
  * SigmaOS Sovereign Init Implementation (v15.0 Zenith)
@@ -151,6 +152,7 @@ public:
         registerAndStart("Omni-Forensic", initialize_forensics_principles, "Memory");
         registerAndStart("Omni-Container", initialize_container_principles, "Memory");
         registerAndStart("Omni-Rolling", initialize_rolling_principles, "Memory");
+        registerAndStart("Omni-FOSS-Synthesis", initialize_foss_synthesis_principles, "Memory");
 
         supervise();
 
