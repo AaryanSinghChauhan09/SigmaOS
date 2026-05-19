@@ -20,12 +20,12 @@ public:
     }
 
     void init() {
-        sigma_printf("[S-DISTRO/EDGE] Initializing Alpine/TinyCore RAM-only execution matrix...\n");
+        sigma_log_info("[S-DISTRO/EDGE] Initializing Alpine/TinyCore RAM-only execution matrix...\n");
         m_ram_only_execution = SIGMA_TRUE;
     }
 
     void purge_temp_ram() {
-        sigma_printf("[S-DISTRO/EDGE] Ephemeral RAM storage scrubbed successfully.\n");
+        sigma_log_info("[S-DISTRO/EDGE] Ephemeral RAM storage scrubbed successfully.\n");
     }
 };
 

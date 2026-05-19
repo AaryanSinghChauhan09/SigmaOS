@@ -20,7 +20,7 @@ public:
     }
 
     void init() {
-        sigma_printf("[S-DISTRO/ENTERPRISE] Enforcing RHEL-style 10-year enterprise stability guarantees...\n");
+        sigma_log_info("[S-DISTRO/ENTERPRISE] Enforcing RHEL-style 10-year enterprise stability guarantees...\n");
         m_lifecycle_years = 10;
     }
 };

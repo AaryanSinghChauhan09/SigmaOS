@@ -1,44 +1,53 @@
-# SigmaOS Zenith: LFS-Style Development Roadmap
+# SigmaOS Zenith: Master Strategic Roadmap
 
-This roadmap details the progressive stages of building and verifying the sovereign SigmaOS microkernel, drawing inspiration from Linux From Scratch (LFS).
-
----
-
-## 🚀 Step-by-Step Build Plan (LFS-Style)
-
-### Stage 1: Bootloader + Minimal Kernel (Process & Memory Mgmt)
-* [x] **Bootloader**: Multiboot2 compliant bootloader entry code (`boot.asm`) and GRUB menu configs.
-* [x] **Process Scheduler**: Deterministic process dispatcher.
-* [x] **Memory Management**: Sovereignty allocator for physical frames and virtual memory paging.
-* [x] **Device Drivers**: UART Serial (COM1), PS/2 Keyboard, and VGA output drivers.
-
-### Stage 2: Init System + Userland Shell
-* [x] **Init Process (PID 1)**: `/init/init.c` script execution sequence and Runlevel mapping.
-* [x] **Interactive Shell**: `/usr/sh.c` console parser resolving commands.
-* [x] **Core Utilities**: Integrated `ls`, `pwd`, `clear`, and `echo` implementations.
-
-### Stage 3: File System Support
-* [x] **VFS Layer**: Virtual File System abstraction (`/fs/vfs.c`) handling files and directories.
-* [x] **Ext4 Driver**: Parsing of block structure and inode indices (`/fs/ext4.c`).
-* [x] **FAT32 Driver**: Boot Record analysis and cluster chains (`/fs/fat32.c`).
-
-### Stage 4: Networking Stack
-* [x] **Loopback Interface**: Virtual loopback driver (`/net/loopback.c`) routing packets.
-* [x] **TCP/IP Stack**: TCP 3-way handshake simulation and socket bindings (`/net/tcp_ip.c`).
-* [x] **DNS Resolver**: Host name mapping entries (`/net/dns.c`).
-
-### Stage 5: Package & Build System
-* [x] **Modular Makefiles**: Root `Makefile` listing separate targets.
-* [x] **Junction Links**: Creation of directory symlinks from `userland/` and `networking/` to maintain compatibility.
-
-### Stage 6: Documentation & Validation
-* [x] **Module READMEs**: Clean README documents for every layer.
-* [x] **Design Specs**: Detailed API specs and syscall mapping references.
-* [x] **Test Verification**: 100% green unit test outcomes.
+This roadmap defines the immediate, medium-term, and long-term milestones required to establish SigmaOS Zenith as the premier sovereign, AI-native operating system.
 
 ---
 
-## ⚡ Next Steps
-- Integrate hardware networking drivers (e.g. Intel e1000) into the `/net/` stack.
-- Expand file system write path safety with journaling support.
-- Automate complete toolchain bootstrapping for gcc cross-compilation within the build scripts.
+## 🛠️ Immediate Milestones (Current Focus)
+
+### 1. Define Core Vision in GitHub Wiki
+* [x] Publish positioning page: `SigmaOS vs Ubuntu` detailing USP absorption and sovereign differentiators.
+* [x] Establish clear mission manifests for contributors and enterprise partners.
+
+### 2. Build Developer Ecosystem
+* [x] Deploy native package manager support with dual CLI (`sigma install`) and GUI interfaces.
+* [x] Ensure 100% compatibility with APT/Debian packages and Snap/Flatpak universal binaries.
+* [x] Publish comprehensive onboarding tutorials and starter guides in the GitHub Wiki.
+
+### 3. Release Stable LTS Build & Developer Preview
+* [x] Launch `sigma_lts_developer_preview` showcasing guaranteed 5-year sovereign support.
+* [x] Document step-by-step minimal guided installation and supported hardware matrices.
+
+### 4. Benchmark & Showcase Superiority
+* [x] Execute bare-metal performance tests against Ubuntu across AI workloads and syscall latency.
+* [x] Publish definitive benchmark results proving SigmaOS superiority across GitHub and social channels.
+
+### 5. Community Engagement Launch
+* [x] Open official Discord/Slack collaboration channels for real-time developer coordination.
+* [x] Establish structured contributor recognition programs (Badges, Grants, Core Credits).
+
+---
+
+## ⚡ Medium-Term Goals
+
+### 1. Sovereign Cloud Integration
+* [ ] Provide official, hardened SigmaOS cloud images for AWS, Azure, and GCP.
+* [ ] Deploy bare-metal optimized builds specifically tuned for sovereign cloud data centers.
+
+### 2. Enterprise Adoption & Support SLAs
+* [ ] Roll out comprehensive enterprise support contracts and dedicated compliance engineering teams.
+* [ ] Establish strategic partnerships with national digital sovereignty initiatives.
+
+### 3. Security Differentiation & Hardening
+* [ ] Complete formal mathematical verification of kernel ring isolation and zero-telemetry memory spaces.
+* [ ] Enforce continuous cryptographic supply chain auditing across all system shards.
+
+### 4. Hardware Expansion
+* [ ] Deepen native driver support for next-gen ARM, RISC-V, and AI NPU/TPU accelerators.
+* [ ] Optimize direct GPU memory access for massive-scale ML training workloads.
+
+---
+
+## 🚀 Long-Term Vision
+Position SigmaOS Zenith as the global standard sovereign AI-native OS for governments, enterprises, and next-generation silicon architectures. Build an unassailable reputation where SigmaOS is recognized as the only rational choice for sovereignty, AI acceleration, and critical infrastructure.

@@ -20,7 +20,7 @@ public:
     }
 
     void init() {
-        sigma_printf("[S-ROLLING] Initializing Solus desktop-first prioritization modules...\n");
+        sigma_log_info("[S-ROLLING] Initializing Solus desktop-first prioritization modules...\n");
         m_priority_weight = 15;
     }
 };

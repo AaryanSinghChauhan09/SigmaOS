@@ -20,7 +20,7 @@ public:
     }
 
     void init() {
-        sigma_printf("[S-DISTRO/PRIVACY] Initializing VM-level compartmentalized sandbox rules...\n");
+        sigma_log_info("[S-DISTRO/PRIVACY] Initializing VM-level compartmentalized sandbox rules...\n");
         m_compartment_isolation = SIGMA_TRUE;
     }
 };
