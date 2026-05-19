@@ -35,7 +35,7 @@ public:
     }
 
     void init() {
-        sigma_log_info("[S-CONTAINER] Initializing CoreOS-style container host daemon...\n");
+        sigma_printf("[S-CONTAINER] Initializing CoreOS-style container host daemon...\n");
         m_slots[0] = {'A', SIGMA_TRUE, SIGMA_TRUE, 152u};
         m_slots[1] = {'B', SIGMA_FALSE, SIGMA_TRUE, 151u};
         m_root_fs_immutable = SIGMA_TRUE;
@@ -44,7 +44,7 @@ public:
     sigma_bool EnforceRootImmutability(const char* path, sigma_bool is_write_operation) {
         if (m_root_fs_immutable && is_write_operation) {
             if (path[0] == '/' && (path[1] == 'u' || path[1] == 'b')) {
-                sigma_log_info("[S-CONTAINER/IMMUTABLE]: Write blocked to system root [%s]!\n", path);
+                sigma_printf("[S-CONTAINER/IMMUTABLE]: Write blocked to system root [%s]!\n", path);
                 return SIGMA_FALSE;
             }
         }

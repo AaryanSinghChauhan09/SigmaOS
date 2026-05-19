@@ -20,7 +20,7 @@ public:
     }
 
     void init() {
-        sigma_log_info("[S-DISTRO/FORENSICS] Activating absolute write-block on all storage interfaces...\n");
+        sigma_printf("[S-DISTRO/FORENSICS] Activating absolute write-block on all storage interfaces...\n");
         m_write_blocked = SIGMA_TRUE;
     }
 };

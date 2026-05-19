@@ -40,7 +40,7 @@ public:
 
     // --- 2. Hand Gesture Recognizer (Spatial Coordinate Analysis) ---
     const char* ParseHandGesture(const Vector3D* coordinates, sigma_size_t points_count) const {
-        sigma_log_info("[VR/GESTURE]: Parsing spatial hand coordinates for gesture detection...\n");
+        sigma_printf("[VR/GESTURE]: Parsing spatial hand coordinates for gesture detection...\n");
         if (points_count < 2) return "UNKNOWN";
 
         // Calculate thumb-to-index finger distance for pinch detection
@@ -68,7 +68,7 @@ public:
     // --- 3. 3D Spatial Audio: Head-Related Transfer Function (HRTF) Filter ---
     void ProcessHRTFAudio(const float* mono_input, float* left_out, float* right_out, 
                           sigma_size_t samples, float azimuth, float elevation) const {
-        sigma_log_info("[VR/AUDIO]: Computing HRTF convolution for azimuth: %.1f, elevation: %.1f...\n", azimuth, elevation);
+        sigma_printf("[VR/AUDIO]: Computing HRTF convolution for azimuth: %.1f, elevation: %.1f...\n", azimuth, elevation);
         
         // Simple head-shadow model to create stereo spatialization
         float pan_factor = (azimuth + 90.0f) / 180.0f; // Scale from [-90, 90] to [0, 1]
@@ -82,13 +82,13 @@ public:
             left_out[i] = input_val * (1.0f - pan_factor);
             right_out[i] = input_val * pan_factor;
         }
-        sigma_log_info("[VR/AUDIO]: HRTF Spatialization Complete.\n");
+        sigma_printf("[VR/AUDIO]: HRTF Spatialization Complete.\n");
     }
 
     // --- 4. Stereoscopic Projection Matrix Multiplier ---
     void GenerateStereoscopicProjection(const float* vertex_in, float* left_eye_out, float* right_eye_out, 
                                         sigma_size_t vertex_count, float ipd) const {
-        sigma_log_info("[VR/PROJECTION]: Calculating stereoscopic viewports with IPD separation %.3fm...\n", ipd);
+        sigma_printf("[VR/PROJECTION]: Calculating stereoscopic viewports with IPD separation %.3fm...\n", ipd);
         
         // IPD = Interpupillary distance. Shift viewport left/right by half IPD
         float half_ipd = ipd / 2.0f;
@@ -108,7 +108,7 @@ public:
             right_eye_out[i * 3 + 1] = y;
             right_eye_out[i * 3 + 2] = z;
         }
-        sigma_log_info("[VR/PROJECTION]: Stereoscopic matrix projections generated.\n");
+        sigma_printf("[VR/PROJECTION]: Stereoscopic matrix projections generated.\n");
     }
 };
 

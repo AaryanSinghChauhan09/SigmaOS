@@ -20,7 +20,7 @@ public:
     }
 
     void init() {
-        sigma_log_info("[S-DISTRO/SPECIALIZED] Loading declarative configuration and function multi-versioning...\n");
+        sigma_printf("[S-DISTRO/SPECIALIZED] Loading declarative configuration and function multi-versioning...\n");
         m_declarative_build = SIGMA_TRUE;
     }
 };

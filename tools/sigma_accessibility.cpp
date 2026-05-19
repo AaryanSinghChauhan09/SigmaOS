@@ -58,26 +58,26 @@ public:
 
     // --- 1. Screen Reader Text-To-Speech Phoneme Synthesizer ---
     void SynthesizeSpeechPhoneme(const char* text) const {
-        sigma_log_info("[ACCESS/TTS]: Synthesizing audio phonemes from string input...\n");
+        sigma_printf("[ACCESS/TTS]: Synthesizing audio phonemes from string input...\n");
         sigma_size_t i = 0;
         while (text[i] != '\0') {
             char c = text[i];
             // Simulated formant synthesizer matching character types
             if (c >= 'A' && c <= 'Z') {
-                sigma_log_info("[ACCESS/TTS]: Formant transition generated for phoneme consonant '%c'.\n", c);
+                sigma_printf("[ACCESS/TTS]: Formant transition generated for phoneme consonant '%c'.\n", c);
             } else if (c == ' ' || c == '.') {
-                sigma_log_info("[ACCESS/TTS]: Pause inserted for syntactic marker.\n");
+                sigma_printf("[ACCESS/TTS]: Pause inserted for syntactic marker.\n");
             } else {
-                sigma_log_info("[ACCESS/TTS]: Formant transition generated for phoneme vowel '%c'.\n", c);
+                sigma_printf("[ACCESS/TTS]: Formant transition generated for phoneme vowel '%c'.\n", c);
             }
             i++;
         }
-        sigma_log_info("[ACCESS/TTS]: Screen reader audio dispatch complete.\n");
+        sigma_printf("[ACCESS/TTS]: Screen reader audio dispatch complete.\n");
     }
 
     // --- 2. High Contrast Compositor Filter Matrix ---
     void ApplyHighContrastFilter(sigma_u32* pixel_buffer, sigma_size_t length) const {
-        sigma_log_info("[ACCESS/SHADER]: Applying high-contrast color transformation matrix...\n");
+        sigma_printf("[ACCESS/SHADER]: Applying high-contrast color transformation matrix...\n");
         for (sigma_size_t i = 0; i < length; i++) {
             sigma_u32 pixel = pixel_buffer[i];
             
@@ -93,13 +93,13 @@ public:
             
             pixel_buffer[i] = (0xFF000000) | (threshold << 16) | (threshold << 8) | threshold;
         }
-        sigma_log_info("[ACCESS/SHADER]: Compositor color transformation complete.\n");
+        sigma_printf("[ACCESS/SHADER]: Compositor color transformation complete.\n");
     }
 
     // --- 3. Lens Magnification Interpolator ---
     void MagnifyBoundingRegion(const sigma_u32* src_pixels, sigma_u32 width, sigma_u32 height, 
                                sigma_u32* dest_pixels, float zoom) const {
-        sigma_log_info("[ACCESS/ZOOM]: Interpolating magnifier lens region at scale %.2f...\n", zoom);
+        sigma_printf("[ACCESS/ZOOM]: Interpolating magnifier lens region at scale %.2f...\n", zoom);
         
         sigma_u32 dest_width = (sigma_u32)(width * zoom);
         sigma_u32 dest_height = (sigma_u32)(height * zoom);
@@ -120,7 +120,7 @@ public:
                 }
             }
         }
-        sigma_log_info("[ACCESS/ZOOM]: Magnified display surface updated.\n");
+        sigma_printf("[ACCESS/ZOOM]: Magnified display surface updated.\n");
     }
 
 private:

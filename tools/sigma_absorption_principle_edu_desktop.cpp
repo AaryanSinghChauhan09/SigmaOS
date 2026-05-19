@@ -20,7 +20,7 @@ public:
     }
 
     void init() {
-        sigma_log_info("[S-DISTRO/DESKTOP] Initializing Elementary-style Human Interface Guidelines compliance...\n");
+        sigma_printf("[S-DISTRO/DESKTOP] Initializing Elementary-style Human Interface Guidelines compliance...\n");
         m_hig_compliant = SIGMA_TRUE;
     }
 };

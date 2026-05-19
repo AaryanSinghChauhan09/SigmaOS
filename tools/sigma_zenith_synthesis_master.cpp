@@ -27,7 +27,7 @@ public:
     sigma_bool IsSafeState(const sigma_u32 available[3], 
                            const sigma_u32 max[4][3], 
                            const sigma_u32 allocation[4][3]) const {
-        sigma_log_info("[OS/BANKER]: Evaluating system allocation safety matrix...\n");
+        sigma_printf("[OS/BANKER]: Evaluating system allocation safety matrix...\n");
         
         sigma_u32 work[3];
         for (int i = 0; i < 3; i++) work[i] = available[i];
@@ -67,20 +67,20 @@ public:
 
         for (int i = 0; i < 4; i++) {
             if (!finish[i]) {
-                sigma_log_info("[OS/BANKER]: [DEADLOCK RISK] System is in UNSAFE state.\n");
+                sigma_printf("[OS/BANKER]: [DEADLOCK RISK] System is in UNSAFE state.\n");
                 return SIGMA_FALSE;
             }
         }
-        sigma_log_info("[OS/BANKER]: [SUCCESS] System state is verified SAFE.\n");
+        sigma_printf("[OS/BANKER]: [SUCCESS] System state is verified SAFE.\n");
         return SIGMA_TRUE;
     }
 
     // --- Watchdog Heartbeat Monitor ---
     void ServiceWatchdogHeartbeat(sigma_u32 heartbeat_tick) const {
         if (heartbeat_tick == 0) {
-            sigma_log_info("[OS/WATCHDOG]: [CRITICAL] Heartbeat missed! Initiating safe kernel reset...\n");
+            sigma_printf("[OS/WATCHDOG]: [CRITICAL] Heartbeat missed! Initiating safe kernel reset...\n");
         } else {
-            sigma_log_info("[OS/WATCHDOG]: Heartbeat received (tick %u). Watchdog timer reset.\n", heartbeat_tick);
+            sigma_printf("[OS/WATCHDOG]: Heartbeat received (tick %u). Watchdog timer reset.\n", heartbeat_tick);
         }
     }
 };
@@ -94,7 +94,7 @@ public:
 
     // --- B-Tree Logarithmic Search Index Complexity O(log N) ---
     sigma_i32 BTreeQueryIndex(const sigma_u32* sorted_keys, sigma_size_t size, sigma_u32 target) const {
-        sigma_log_info("[DB/BTREE]: Performing logarithmic B-Tree key lookup (Complexity: O(log N))...\n");
+        sigma_printf("[DB/BTREE]: Performing logarithmic B-Tree key lookup (Complexity: O(log N))...\n");
         if (size == 0) return -1;
 
         sigma_i32 low = 0;
@@ -103,7 +103,7 @@ public:
         while (low <= high) {
             sigma_i32 mid = low + (high - low) / 2;
             if (sorted_keys[mid] == target) {
-                sigma_log_info("[DB/BTREE]: [INDEX MATCH] Found target key %u at offset %d.\n", target, mid);
+                sigma_printf("[DB/BTREE]: [INDEX MATCH] Found target key %u at offset %d.\n", target, mid);
                 return mid;
             }
             if (sorted_keys[mid] < target) {
@@ -112,7 +112,7 @@ public:
                 high = mid - 1;
             }
         }
-        sigma_log_info("[DB/BTREE]: Key not found in secondary index partition.\n");
+        sigma_printf("[DB/BTREE]: Key not found in secondary index partition.\n");
         return -1;
     }
 };
@@ -127,7 +127,7 @@ public:
     // --- PCA Eigen Decomposition: X^T * X * v = lambda * v ---
     // Approximated via Power Iteration to capture dominant eigenvectors
     void PerformPCADecomposition(const float covariance[2][2], float eigenvector[2], float& eigenvalue) const {
-        sigma_log_info("[PIPELINE/PCA]: Evaluating principal components (Eigen Equation: X^T * X * v = lambda * v)...\n");
+        sigma_printf("[PIPELINE/PCA]: Evaluating principal components (Eigen Equation: X^T * X * v = lambda * v)...\n");
         
         // Seed initial guess vector v
         eigenvector[0] = 1.0f;
@@ -147,7 +147,7 @@ public:
             eigenvector[1] = next_y / sq;
             eigenvalue = sq;
         }
-        sigma_log_info("[PIPELINE/PCA]: PCA Convergence Complete. Dominant Eigenvalue: %.4f | Vector: [XS: %.4f, YS: %.4f]\n",
+        sigma_printf("[PIPELINE/PCA]: PCA Convergence Complete. Dominant Eigenvalue: %.4f | Vector: [XS: %.4f, YS: %.4f]\n",
                        eigenvalue, eigenvector[0], eigenvector[1]);
     }
 };
@@ -161,7 +161,7 @@ public:
 
     // --- Logistic Regression: P(y = 1 | x) = 1 / (1 + e^-(beta0 + beta1 * x)) ---
     float PredictLogisticProbability(float x, float beta0, float beta1) const {
-        sigma_log_info("[AI/ML]: Pushing logic model inference through sigmoid function...\n");
+        sigma_printf("[AI/ML]: Pushing logic model inference through sigmoid function...\n");
         
         float z = beta0 + beta1 * x;
         // Taylor series approximation for e^-z to maintain freestanding math independence
@@ -170,20 +170,20 @@ public:
         if (exp_term < 0.0001f) exp_term = 0.0001f; // Cap division error bounds
 
         float probability = 1.0f / (1.0f + exp_term);
-        sigma_log_info("[AI/ML]: Logistic Probability outcome P(y=1 | x=%.2f) = %.4f\n", x, probability);
+        sigma_printf("[AI/ML]: Logistic Probability outcome P(y=1 | x=%.2f) = %.4f\n", x, probability);
         return probability;
     }
 
     // --- Exploding Gradient Clipping ---
     void ClipGradients(float* gradients, sigma_size_t dim, float threshold) const {
-        sigma_log_info("[AI/ML]: Auditing NPU registers for exploding gradient metrics...\n");
+        sigma_printf("[AI/ML]: Auditing NPU registers for exploding gradient metrics...\n");
         for (sigma_size_t i = 0; i < dim; i++) {
             if (gradients[i] > threshold) {
-                sigma_log_info("[AI/ML]: [CLIPPED] Gradient index %u (value %.2f) capped to threshold %.2f.\n",
+                sigma_printf("[AI/ML]: [CLIPPED] Gradient index %u (value %.2f) capped to threshold %.2f.\n",
                                (unsigned int)i, gradients[i], threshold);
                 gradients[i] = threshold;
             } else if (gradients[i] < -threshold) {
-                sigma_log_info("[AI/ML]: [CLIPPED] Gradient index %u (value %.2f) capped to threshold -%.2f.\n",
+                sigma_printf("[AI/ML]: [CLIPPED] Gradient index %u (value %.2f) capped to threshold -%.2f.\n",
                                (unsigned int)i, gradients[i], -threshold);
                 gradients[i] = -threshold;
             }
@@ -200,7 +200,7 @@ public:
 
     // --- BFS State Tree Search Complexity O(V + E) ---
     void ExecuteBFSTraversal(const sigma_u8 adj_matrix[4][4], sigma_u32 num_vertices, sigma_u32 start) const {
-        sigma_log_info("[MATH/BFS]: Commencing optimized vertex search loop (O(V + E))...\n");
+        sigma_printf("[MATH/BFS]: Commencing optimized vertex search loop (O(V + E))...\n");
         
         sigma_bool visited[4] = {SIGMA_FALSE, SIGMA_FALSE, SIGMA_FALSE, SIGMA_FALSE};
         sigma_u32 queue[4];
@@ -212,7 +212,7 @@ public:
 
         while (head < tail) {
             sigma_u32 current = queue[head++];
-            sigma_log_info("[MATH/BFS]: Searched vertex space node: %u\n", current);
+            sigma_printf("[MATH/BFS]: Searched vertex space node: %u\n", current);
 
             for (sigma_u32 neighbor = 0; neighbor < num_vertices; neighbor++) {
                 if (adj_matrix[current][neighbor] == 1 && !visited[neighbor]) {
@@ -221,7 +221,7 @@ public:
                 }
             }
         }
-        sigma_log_info("[MATH/BFS]: Search completed across all reachable state spaces.\n");
+        sigma_printf("[MATH/BFS]: Search completed across all reachable state spaces.\n");
     }
 };
 
@@ -234,7 +234,7 @@ public:
 
     // --- XSS & HTML Input Injection Sanitization ---
     void SanitizeHTMLInput(const char* input_payload, char* sanitized_output, sigma_size_t max_len) const {
-        sigma_log_info("[WEB/SANITIZER]: Intercepting incoming REST API payload for XSS sanitization...\n");
+        sigma_printf("[WEB/SANITIZER]: Intercepting incoming REST API payload for XSS sanitization...\n");
         
         sigma_size_t read_idx = 0;
         sigma_size_t write_idx = 0;
@@ -263,7 +263,7 @@ public:
             read_idx++;
         }
         sanitized_output[write_idx] = '\0';
-        sigma_log_info("[WEB/SANITIZER]: Output payload clean and sanitized of HTML injection sequences.\n");
+        sigma_printf("[WEB/SANITIZER]: Output payload clean and sanitized of HTML injection sequences.\n");
     }
 };
 
@@ -274,7 +274,7 @@ public:
 extern "C" {
 
 void trigger_zenith_master_synthesis() {
-    sigma_log_info("[ZENITH/CORE]: Pushing execution logs through synthesis master module...\n");
+    sigma_printf("[ZENITH/CORE]: Pushing execution logs through synthesis master module...\n");
 
     // 1. Operating System Validation
     SigmaOS::Zenith::Master::SovereignOSKernel kernel;

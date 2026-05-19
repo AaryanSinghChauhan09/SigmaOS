@@ -22,7 +22,7 @@ public:
     }
 
     void init() {
-        sigma_log_info("[S-DISTRO/GENERAL] Enforcing Debian DFSG and Arch KISS principles...\n");
+        sigma_printf("[S-DISTRO/GENERAL] Enforcing Debian DFSG and Arch KISS principles...\n");
         m_kiss_enabled = SIGMA_TRUE;
         m_upstream_first = SIGMA_TRUE;
     }
