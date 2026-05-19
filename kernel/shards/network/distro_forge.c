@@ -31,13 +31,8 @@ void distro_forge_init(void) {
     // ksigma_printf("[DISTRO-FORGE]: Sovereign Industrial Distribution Forge Online.\n");
 }
 
-<<<<<<<< HEAD:suites/S15_DevNexus/distro_forge.c
 k_status forge_generate_distro(const char* name, bool_t include_pqc, bool_t include_ai) {
     // ksigma_printf("[DISTRO-FORGE]: Generating Sovereign Shard Distribution: %s\n", name);
-========
-sigma_status forge_generate_distro(const char* name, sigma_bool include_pqc, sigma_bool include_ai) {
-    // kprintf("[DISTRO-FORGE]: Generating Sovereign Shard Distribution: %s\n", name);
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/network/distro_forge.c
     
     if (include_pqc) {
         // ksigma_printf("[DISTRO-FORGE]: Embedding Lattice-PQC Security Shard...\n");

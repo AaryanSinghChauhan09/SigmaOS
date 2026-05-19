@@ -33,7 +33,6 @@ void keyboard_handler() {
         kbd_queue_push(c);
     }
 }
-<<<<<<< HEAD:suites/S04_HAL_Input/shard_keyboard.c
 
 /* =========================================================================
  * Public API
@@ -68,5 +67,3 @@ void kbd_init(void) {
     extern void ksigma_printf(const char* fmt, ...);
     ksigma_printf("[KBD]: PS/2 keyboard driver online. IRQ1 unmasked.\n");
 }
-=======
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/drivers/keyboard.c

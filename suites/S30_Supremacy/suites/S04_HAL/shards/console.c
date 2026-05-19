@@ -1,23 +1,14 @@
 /*
  * =========================================================================
-<<<<<<< HEAD:suites/S30_Supremacy/suites/S04_HAL/shards/console.c
  * S SIGMAOS ZENITH SUPREME: CONSOLE DRIVER (SILICON OUTPUT)
-=======
- * Î£ SIGMAOS ZENITH SUPREME: CONSOLE DRIVER (SILICON OUTPUT)
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:drivers/console.c
  * =========================================================================
  * Mission: Abstract kernel logging and user terminal output.
  * Capability: VGA Text Mode, Serial COM1, Scrolling, Colors.
  * =========================================================================
  */
 
-<<<<<<< HEAD:suites/S30_Supremacy/suites/S04_HAL/shards/console.c
 #include "libc/sigma_libc.h"
 #include "suites/S01_Genesis/shards/sigma_kernel.h"
-=======
-#include "libc/SovereignLibC.h"
-#include "core/sigma_types.h"
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:drivers/console.c
 
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 25

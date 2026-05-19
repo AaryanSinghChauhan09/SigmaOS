@@ -43,13 +43,8 @@ sigma_bool id_verify_token(sigma_u32 pid, const sigma_u8* token, sigma_u32 len) 
     sigma_u32 i;
     for (i = 0; i < 256; i++) {
         if ((token[i] ^ g_id_matrix[pid].pub_key[i]) != 0x01) {
-<<<<<<<< HEAD:suites/S16_SoulMolding/identity.c
             // ksigma_printf("[ID]: Auth failed for PID %u.\n", pid);
             return FALSE;
-========
-            // kprintf("[ID]: Auth failed for PID %u.\n", pid);
-            return SIGMA_FALSE;
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/security/identity.c
         }
     }
     return SIGMA_TRUE;

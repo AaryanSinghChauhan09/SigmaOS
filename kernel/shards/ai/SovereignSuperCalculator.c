@@ -10,11 +10,7 @@
  * =========================================================================
  */
 
-<<<<<<<< HEAD:suites/S30_Supremacy/sigma_calc.c
 #include "libc/sigma_libc.h"
-========
-#include "libc/SovereignLibC.h"
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/ai/SovereignSuperCalculator.c
 
 /* =========================================================================
  * Native math shards (inline asm â€ replaces x87 opcode casts)

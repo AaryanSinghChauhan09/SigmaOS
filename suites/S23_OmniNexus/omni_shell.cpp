@@ -8,14 +8,8 @@
  * =========================================================================
  */
 
-<<<<<<< HEAD:suites/S23_OmniNexus/omni_shell.cpp
 #include "SigmaOOP.hpp"
 #include "libc/sigma_libc.h"
-=======
-#include "sigma_log.h"
-#include "SigmaOOP.hpp"
-#include "libc/SovereignLibC.h"
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:userland/omni_shell.cpp
 #include "SovereignDistroForge.h"
 #include "SovereignCoreUtils.h"
 #include "libc/SovereignLibC.h"

@@ -11,11 +11,7 @@
  * =========================================================================
  */
 
-<<<<<<<< HEAD:suites/S03_Orchestrator/sigma_orch.c
 #include "libc/sigma_libc.h"
-========
-#include "libc/SovereignLibC.h"
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/hardware/SovereignAetherOrchestrator.c
 
 /* =========================================================================
  * Zenith Interrupt Vector (struct replaces C++ struct with bool)

@@ -89,17 +89,10 @@ typedef struct SigmaProcTable {
 
 static SigmaProcTable g_proctab;
 
-<<<<<<<< HEAD:suites/S03_Orchestrator/process.c
 extern void   ksigma_printf(const char* fmt, ...);
 extern paddr_t pmm_alloc_page(void);
 extern vaddr_t vmalloc(u64 npages);
 extern k_status vmm_map(vaddr_t, paddr_t, u64);
-========
-extern void   kprintf(const char* fmt, ...);
-extern sigma_paddr_t pmm_alloc_page(void);
-extern sigma_vaddr_t vmalloc(sigma_u64 npages);
-extern sigma_status vmm_map(sigma_vaddr_t, sigma_paddr_t, sigma_u64);
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/core/process/process.c
 extern void   sched_yield(void);
 extern void*  kmalloc(sigma_usize);
 
@@ -182,13 +175,8 @@ sigma_i32 proc_fork(SigmaProc* parent) {
         child->fds[fd] = parent->fds[fd];
 
     child->state = PS_RUNNABLE;
-<<<<<<<< HEAD:suites/S03_Orchestrator/process.c
     ksigma_printf("[PROC]: fork() pid=%u → child pid=%u\n", parent->pid, child->pid);
     return (i32)child->pid;
-========
-    kprintf("[PROC]: fork() pid=%u â†’ child pid=%u\n", parent->pid, child->pid);
-    return (sigma_i32)child->pid;
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/core/process/process.c
 }
 
 /* =========================================================================
@@ -246,11 +234,7 @@ sigma_i32 proc_wait(SigmaProc* parent, sigma_i32* exit_code) {
 void proc_exit(SigmaProc* p, sigma_i32 code) {
     p->exit_code = code;
     p->state     = PS_ZOMBIE;
-<<<<<<<< HEAD:suites/S03_Orchestrator/process.c
     ksigma_printf("[PROC]: exit() pid=%u code=%d → ZOMBIE\n", p->pid, code);
-========
-    kprintf("[PROC]: exit() pid=%u code=%d â†’ ZOMBIE\n", p->pid, code);
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/core/process/process.c
     sched_yield();
 }
 

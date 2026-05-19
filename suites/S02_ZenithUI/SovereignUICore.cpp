@@ -1,10 +1,6 @@
 /*
  * =========================================================================
-<<<<<<< HEAD:suites/S02_ZenithUI/SovereignUICore.cpp
  * S SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
-=======
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:userland/SovereignUICore.cpp
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -12,11 +8,7 @@
  */
 
 /**
-<<<<<<< HEAD:suites/S02_ZenithUI/SovereignUICore.cpp
  * S SIGMA OS: SOVEREIGN UI CORE (v4.0 - ZERO-JAVASCRIPT)
-=======
- * Î£ SIGMA OS: SOVEREIGN UI CORE (v4.0 - ZERO-JAVASCRIPT)
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:userland/SovereignUICore.cpp
  * ====================================================
  * USP Absorbed: WebAssembly (Wasm), Rust (Safety), C++20 (Performance).
  * Capability: Native UI logic sharding without high-level JavaScript overhead.

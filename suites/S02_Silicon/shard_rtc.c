@@ -104,15 +104,9 @@ const SigmaRTCTime *rtc_read_time(void) {
  * ========================================================================= */
 void rtc_init(void) {
     const SigmaRTCTime *t = rtc_read_time();
-<<<<<<< HEAD:suites/S02_Silicon/shard_rtc.c
     ksigma_printf("[RTC]: CMOS RTC online. Date: %04u-%02u-%02u  Time: %02u:%02u:%02u\n",
             (u32)t->year, (u32)t->month, (u32)t->day,
             (u32)t->hour, (u32)t->min,   (u32)t->sec);
-=======
-    kprintf("[RTC]: CMOS RTC online. Date: %04u-%02u-%02u  Time: %02u:%02u:%02u\n",
-            (sigma_u32)t->year, (sigma_u32)t->month, (sigma_u32)t->day,
-            (sigma_u32)t->hour, (sigma_u32)t->min,   (sigma_u32)t->sec);
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/drivers/rtc.c
 }
 
 /* =========================================================================
@@ -129,14 +123,8 @@ sigma_u64 rtc_uptime_seconds(void) {
  * ========================================================================= */
 void rtc_audit(void) {
     const SigmaRTCTime *t = rtc_read_time();
-<<<<<<< HEAD:suites/S02_Silicon/shard_rtc.c
     ksigma_printf("[RTC]: Current time: %04u-%02u-%02u %02u:%02u:%02u | Uptime: %llu s\n",
             (u32)t->year, (u32)t->month, (u32)t->day,
             (u32)t->hour, (u32)t->min,   (u32)t->sec,
-=======
-    kprintf("[RTC]: Current time: %04u-%02u-%02u %02u:%02u:%02u | Uptime: %llu s\n",
-            (sigma_u32)t->year, (sigma_u32)t->month, (sigma_u32)t->day,
-            (sigma_u32)t->hour, (sigma_u32)t->min,   (sigma_u32)t->sec,
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/drivers/rtc.c
             rtc_uptime_seconds());
 }

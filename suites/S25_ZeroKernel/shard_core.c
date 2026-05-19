@@ -109,9 +109,5 @@ void shard_amnesic_destroy(sigma_u64 shard_id) {
     
     // 3. Trigger silicon-level memory wipe of the shard segment
     // sigma_memset((void*)s->base_addr, 0, s->limit_addr - s->base_addr);
-<<<<<<<< HEAD:suites/S25_ZeroKernel/shard_core.c
     // ksigma_printf("[SHARD-CORE]: Shard %s destroyed with Amnesic Wipe [SUCCESS]\n", s->name);
-========
-    // kprintf("[SHARD-CORE]: Shard %s destroyed with Amnesic Wipe [SUCCESS]\n", s->name);
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/orchestration/shard_core.c
 }

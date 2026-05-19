@@ -1,25 +1,9 @@
-<<<<<<<< HEAD:suites/S01_Genesis/SovereignLibC.c
 #include "libc/sigma_libc.h"
 // Absolute zero-dependency varargs using compiler built-ins
 typedef __builtin_va_list va_list;
 #define va_start(v,l)   __builtin_va_start(v,l)
 #define va_end(v)       __builtin_va_end(v)
 #define va_arg(v,l)     __builtin_va_arg(v,l)
-========
-#include "sigma_log.h"
-#include "Lattice.h"
-#include "libc/SovereignLibC.h"
-#include "sigma_kernel_types.h"
-
-/* va_list support in freestanding mode via compiler builtins */
-#ifndef va_list
-typedef __builtin_va_list va_list;
-#define va_start(ap, last) __builtin_va_start(ap, last)
-#define va_arg(ap, type)   __builtin_va_arg(ap, type)
-#define va_end(ap)         __builtin_va_end(ap)
-#endif
-
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/system/SovereignLibC.cpp
 
 // --- sigma_print ---
 void sigma_print(const char* str) {
@@ -146,7 +130,6 @@ int sigma_pipe(int pipefd[2]) {
 }
 
 unsigned int sigma_sleep(unsigned int seconds) {
-<<<<<<<< HEAD:suites/S01_Genesis/SovereignLibC.c
     // x86_64 rax=35 (nanosleep)
     struct {
         long tv_sec;
@@ -159,11 +142,6 @@ unsigned int sigma_sleep(unsigned int seconds) {
         : "a"(35), "D"(&req), "S"(0) 
         : "rcx", "r11", "memory");
     return (unsigned int)res;
-========
-    // x86_64 rax=35 (nanosleep) - implementation simplifies for seconds
-    sigma_log("[ZENITH-LIBC]: Pulse sleep for %d seconds...\n", seconds);
-    return 0;
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/system/SovereignLibC.cpp
 }
 
 int sigma_wait(int* wstatus) {
@@ -286,12 +264,6 @@ static const sigma_size_t HEAP_SIZE = 1024 * 1024 * 128; // 128MB Shard
 
 void* sigma_slab_alloc_raw(sigma_size_t size) {
     if (g_heap_start == SIGMA_NULL) {
-<<<<<<<< HEAD:suites/S01_Genesis/SovereignLibC.c
-========
-        // mmap(SIGMA_NULL, size, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0)
-        // Linux: PROT_READ=1, PROT_WRITE=2 -> 3
-        // MAP_PRIVATE=0x02, MAP_ANONYMOUS=0x20 -> 0x22
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/system/SovereignLibC.cpp
         g_heap_start = sigma_mmap(SIGMA_NULL, HEAP_SIZE, 3, 0x22, -1, 0);
     }
     
@@ -310,12 +282,8 @@ void* sigma_malloc(sigma_size_t size) {
 }
 
 void sigma_free(void* ptr) {
-<<<<<<<< HEAD:suites/S01_Genesis/SovereignLibC.c
     // Shard-based memory reclamation: 
     // Individual blocks are not freed; the entire shard is cleared when the process exits.
     // This is a design decision for high-performance sovereign kernels.
-========
-    (void)ptr; // No-op: bump-pointer slab; per-process cleanup on exit.
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/system/SovereignLibC.cpp
 }
  

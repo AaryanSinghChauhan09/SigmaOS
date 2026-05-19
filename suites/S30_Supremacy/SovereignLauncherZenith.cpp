@@ -2,11 +2,7 @@
 #include "sigma_log.h"
 /*
  * =========================================================================
-<<<<<<< HEAD:suites/S30_Supremacy/SovereignLauncherZenith.cpp
  * S SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
-=======
- * Î£ SIGMAOS: SOVEREIGN ZENITH (v15.0 - ABSOLUTE FINALITY)
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:userland/SovereignLauncherZenith.cpp
  * =========================================================================
  * Author: Sovereign-Zenith-Developer
  * Principles: Zero-Library, Bit-Perfect, Silicon-Integrity, USP-Absorbed.
@@ -15,11 +11,7 @@
 
 /*
  * =========================================================================
-<<<<<<< HEAD:suites/S30_Supremacy/SovereignLauncherZenith.cpp
  * S SIGMAOS: SOVEREIGN LAUNCHER ZENITH (v14.0 - THE FINAL ENTRY)
-=======
- * Î£ SIGMAOS: SOVEREIGN LAUNCHER ZENITH (v14.0 - THE FINAL ENTRY)
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:userland/SovereignLauncherZenith.cpp
  * =========================================================================
  * Mission: Bootstrapping and Sharding the Sovereign OS Finality.
  * Capability: Ring-0 entry, Hardware-Handshake, Shard-Pairing.
@@ -74,10 +66,7 @@ int main() {
 }
 
 
-<<<<<<< HEAD:suites/S30_Supremacy/SovereignLauncherZenith.cpp
 
-=======
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:userland/SovereignLauncherZenith.cpp
 
 
 } // extern "C"

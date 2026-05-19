@@ -25,21 +25,12 @@ void sigma_panic(const char* msg, sigma_u64 rip, sigma_u64 rsp) {
      * In a sharded model: dump all active shard identifiers and faulting rip.
      */
     
-<<<<<<<< HEAD:suites/S30_Supremacy/panic_shard.c
     // ksigma_printf("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
     // ksigma_printf("Σ SIGMAOS KERNEL PANIC: SOVEREIGN FINALITY BREACHED\n");
     // ksigma_printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
     // ksigma_printf("MESSAGE: %s\n", msg);
     // ksigma_printf("FAULTING RIP: %p | RSP: %p\n", rip, rsp);
     // ksigma_printf("SHARD_AUDIT: System bit-integrity compromised at industrial scale.\n\n");
-========
-    // kprintf("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-    // kprintf("Î£ SIGMAOS KERNEL PANIC: SOVEREIGN FINALITY BREACHED\n");
-    // kprintf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-    // kprintf("MESSAGE: %s\n", msg);
-    // kprintf("FAULTING RIP: %p | RSP: %p\n", rip, rsp);
-    // kprintf("SHARD_AUDIT: System bit-integrity compromised at industrial scale.\n\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/core/syscall/panic_shard.c
     
     /* Enter Industrial Halt State (No-Mouse recovery pulse) */
     while (1) {

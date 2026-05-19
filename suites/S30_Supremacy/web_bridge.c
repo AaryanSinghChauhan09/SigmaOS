@@ -42,12 +42,7 @@ void web_sync_vga(void) {
     // outb(0x80, 0x93); // Post code specifically for browser-vga-sync
 }
 
-<<<<<<<< HEAD:suites/S30_Supremacy/web_bridge.c
 k_status web_process_request(u32 req_id) {
     // ksigma_printf("[WEB-BRIDGE]: Processing Browser Request ID: %u\n", req_id);
-========
-sigma_status web_process_request(sigma_u32 req_id) {
-    // kprintf("[WEB-BRIDGE]: Processing Browser Request ID: %u\n", req_id);
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/system/web_bridge.c
     return K_OK;
 }

@@ -94,15 +94,8 @@ void aether_pulse_trigger(sigma_u32 trigger_id) {
  * AUDIT & STATUS (Zenith Integration)
  * ========================================================================= */
 void aether_audit(void) {
-<<<<<<<< HEAD:suites/S03_Orchestrator/aether_orch.c
     // ksigma_printf("\n--- Σ AETHER ORCHESTRATOR KERNEL AUDIT ---\n");
     // ksigma_printf("| Vectors Mapped: %u\n", g_vector_count);
     // ksigma_printf("| Queue Head: %u | Tail: %u\n", g_main_event_queue.read_idx, g_main_event_queue.write_idx);
     // ksigma_printf("--------------------------------------------\n");
-========
-    // kprintf("\n--- Î£ AETHER ORCHESTRATOR KERNEL AUDIT ---\n");
-    // kprintf("| Vectors Mapped: %u\n", g_vector_count);
-    // kprintf("| Queue Head: %u | Tail: %u\n", g_main_event_queue.read_idx, g_main_event_queue.write_idx);
-    // kprintf("--------------------------------------------\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/hardware/aether_orch.c
 }

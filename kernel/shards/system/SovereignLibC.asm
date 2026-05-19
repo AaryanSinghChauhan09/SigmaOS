@@ -19,13 +19,6 @@ global sigma_execve
 global sigma_strlen
 global sigma_memset
 global sigma_memcpy
-<<<<<<<< HEAD:suites/S30_Supremacy/SovereignLibC.asm
-========
-global sigma_fork
-global sigma_pipe
-global sigma_wait
-global sigma_dup
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/system/SovereignLibC.asm
 global sigma_nanosleep
 
 section .text
@@ -93,20 +86,11 @@ sigma_strlen:
 
 ; --- sigma_memset (void* s, int c, size_t n) ---
 sigma_memset:
-<<<<<<<< HEAD:suites/S30_Supremacy/SovereignLibC.asm
     mov rax, rsi    ; rax = c (value to set)
     mov rcx, rdx    ; rcx = n (count)
     push rdi        ; save original s
     rep stosb       ; set n bytes
     pop rax         ; return original s
-========
-    mov rax, rdi    ; Store original pointer in rax to return it
-    push rax        ; Save it on stack just in case
-    mov al, sil     ; Lower byte of second param (c)
-    mov rcx, rdx    ; count (n)
-    rep stosb       ; set n bytes starting at rdi
-    pop rax         ; Restore original pointer to rax
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/system/SovereignLibC.asm
     ret
 
 
@@ -118,43 +102,9 @@ sigma_memcpy:
     pop rax         ; return original dest
     ret
 
-<<<<<<<< HEAD:suites/S30_Supremacy/SovereignLibC.asm
-========
-; --- sigma_fork () ---
-sigma_fork:
-    mov rax, 57     ; sys_fork
-    syscall
-    ret
-
-; --- sigma_pipe (int pipefd[2]) ---
-sigma_pipe:
-    mov rax, 22     ; sys_pipe
-    syscall
-    ret
-
-; --- sigma_wait (int* wstatus) ---
-sigma_wait:
-    mov rsi, rdi    ; wstatus is 1st arg in C, but 2nd arg in wait4 syscall
-    mov rdi, -1     ; pid = -1 (any child)
-    xor rdx, rdx    ; options = 0
-    xor r10, r10    ; rusage = NULL
-    mov rax, 61     ; sys_wait4
-    syscall
-    ret
-
-; --- sigma_dup (int oldfd) ---
-sigma_dup:
-    mov rax, 32     ; sys_dup
-    syscall
-    ret
-
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/system/SovereignLibC.asm
 ; --- sigma_nanosleep (const void* req, void* rem) ---
 sigma_nanosleep:
     mov rax, 35     ; sys_nanosleep
     syscall
     ret
-<<<<<<<< HEAD:suites/S30_Supremacy/SovereignLibC.asm
 
-========
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/system/SovereignLibC.asm

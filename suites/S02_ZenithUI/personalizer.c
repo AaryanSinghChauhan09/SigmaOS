@@ -31,13 +31,8 @@ static sigma_u32 g_identity_count = 0;
  * ========================================================================= */
 
 void personalizer_init(void) {
-<<<<<<<< HEAD:suites/S02_ZenithUI/personalizer.c
     for (int i = 0; i < MAX_PERSONALITIES; i++) g_identities[i].active = FALSE;
     // ksigma_printf("[PERSONALIZER]: Sovereign Customisation & Identity Shard Online.\n");
-========
-    for (int i = 0; i < MAX_PERSONALITIES; i++) g_identities[i].active = SIGMA_FALSE;
-    // kprintf("[PERSONALIZER]: Sovereign Customisation & Identity Shard Online.\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/security/personalizer.c
 }
 
 void register_identity(const char* tag, sigma_u32 color) {

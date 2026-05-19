@@ -9,16 +9,10 @@
 [BITS 64]
 
 global _start
-<<<<<<<< HEAD:suites/S30_Supremacy/SovereignKernelFinality.asm
 
 
 extern sigma_kernel_entry
 extern sigma_dispatch_shards
-========
-global sigma_kernel_entry
-global sigma_handler_common
-global sigma_singularity_handshake
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/core/boot/SovereignKernelFinality.asm
 
 section .text
 
@@ -30,14 +24,8 @@ _start:
     xor rax, rax
     mov rsp, stack_top              ; Initial stack for sharding
     
-<<<<<<<< HEAD:suites/S30_Supremacy/SovereignKernelFinality.asm
     call qword sigma_kernel_setup_paging
     call qword sigma_kernel_setup_idt
-========
-    call sigma_kernel_setup_paging
-    call sigma_kernel_setup_idt
-    call sigma_singularity_handshake ; Final Technical Parity Handshake
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/core/boot/SovereignKernelFinality.asm
     call sigma_kernel_entry         ; Handover to C++ Sovereign Core
 
     hlt                              ; Halt on absolute completion
@@ -89,7 +77,3 @@ stack_bottom:
     resb 32768          ; 32KB Sovereign Stack (SINGULARITY Grade)
 stack_top:
 
-<<<<<<<< HEAD:suites/S30_Supremacy/SovereignKernelFinality.asm
-========
-
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/core/boot/SovereignKernelFinality.asm

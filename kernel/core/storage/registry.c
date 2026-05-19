@@ -34,13 +34,8 @@ static sigma_u32 g_reg_count = 0;
  * ========================================================================= */
 
 void registry_init(void) {
-<<<<<<<< HEAD:suites/S10_Registry/registry.c
     for (int i = 0; i < MAX_REGISTRY_KEYS; i++) g_reg[i].active = FALSE;
     // ksigma_printf("[REGISTRY]: Sovereign Persistent Registry Shard Online.\n");
-========
-    for (int i = 0; i < MAX_REGISTRY_KEYS; i++) g_reg[i].active = SIGMA_FALSE;
-    // kprintf("[REGISTRY]: Sovereign Persistent Registry Shard Online.\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/core/storage/registry.c
 }
 
 sigma_status registry_set(const char* key, const char* val) {

@@ -39,13 +39,8 @@ static sigma_u32 g_ns_count = 0;
  * ========================================================================= */
 
 void namespace_init(void) {
-<<<<<<<< HEAD:suites/S30_Supremacy/namespace_shard.c
     for (int i = 0; i < MAX_NAMESPACES; i++) g_namespaces[i].active = FALSE;
     // ksigma_printf("[NAMESPACE]: Sovereign Shard-Isolation Interface Online.\n");
-========
-    for (int i = 0; i < MAX_NAMESPACES; i++) g_namespaces[i].active = SIGMA_FALSE;
-    // kprintf("[NAMESPACE]: Sovereign Shard-Isolation Interface Online.\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/fs/namespace_shard.c
 }
 
 sigma_status namespace_create(const char* name, NamespaceType type) {

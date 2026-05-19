@@ -41,13 +41,8 @@ static sigma_u32 g_rule_count = 0;
  * ========================================================================= */
 
 void firewall_init(void) {
-<<<<<<<< HEAD:suites/S07_Network/net_firewall.c
     for (int i = 0; i < MAX_FIREWALL_RULES; i++) g_rules[i].active = FALSE;
     // ksigma_printf("[FIREWALL]: Sovereign Netfilter-Parity Sentry Online.\n");
-========
-    for (int i = 0; i < MAX_FIREWALL_RULES; i++) g_rules[i].active = SIGMA_FALSE;
-    // kprintf("[FIREWALL]: Sovereign Netfilter-Parity Sentry Online.\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/net/net_firewall.c
     
     /* Default Sovereignty Rule: Deny all legacy-userland incoming */
     // firewall_add_rule(0, 0, 80, 6, RULE_ACCEPT); /* Allow Web-Bridge Shard Access */

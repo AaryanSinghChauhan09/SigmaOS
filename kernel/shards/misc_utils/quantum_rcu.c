@@ -81,11 +81,6 @@ void rcu_on_quiescent_state(sigma_u32 cpu_id) {
 void rcu_init_core(void) {
     g_rcu.grace_period_start = 0;
     g_rcu.quiescent_mask = 0;
-<<<<<<<< HEAD:suites/S14_Transcendence/quantum_rcu.c
     g_rcu.pending_reclaim = SIGMA_NULL;
     // ksigma_printf("[RCU]: Quantum RCU Lock-Free Sync Layer Online.\n");
-========
-    g_rcu.pending_reclaim = SIGMA_NULL;
-    // kprintf("[RCU]: Quantum RCU Lock-Free Sync Layer Online.\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/misc_utils/quantum_rcu.c
 }

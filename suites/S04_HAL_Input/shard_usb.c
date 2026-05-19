@@ -17,15 +17,9 @@
 
 #include "sigma_kernel_types.h"
 
-<<<<<<< HEAD:suites/S04_HAL_Input/shard_usb.c
 extern void  ksigma_printf(const char *fmt, ...);
 extern void *vmm_map_mmio(u64 phys, usize size);
 extern paddr_t pmm_alloc_page(void);
-=======
-extern void  kprintf(const char *fmt, ...);
-extern void *vmm_map_mmio(sigma_u64 phys, sigma_usize size);
-extern sigma_paddr_t pmm_alloc_page(void);
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/drivers/usb.c
 
 /* =========================================================================
  * xHCI Class codes (PCI)
@@ -157,11 +151,7 @@ static void xhci_enumerate_ports(void) {
                 "?", "Full(12Mb)", "Low(1.5Mb)", "High(480Mb)",
                 "Super(5Gb)", "Super+(10Gb)"
             };
-<<<<<<< HEAD:suites/S04_HAL_Input/shard_usb.c
             ksigma_printf("[USB]: Port %u: Connected — %s\n", (u32)i,
-=======
-            kprintf("[USB]: Port %u: Connected â€ %s\n", (sigma_u32)i,
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/drivers/usb.c
                     (speed <= USB_SPEED_SUPER_PLUS) ? spd_str[speed] : "?");
         }
     }
@@ -182,11 +172,7 @@ void usb_init(void) {
     /* Map MMIO region */
     void *mmio = vmm_map_mmio(XHCI_MMIO_BASE, XHCI_MMIO_SIZE);
     if (!mmio) {
-<<<<<<< HEAD:suites/S04_HAL_Input/shard_usb.c
         ksigma_printf("[USB]: MMIO mapping failed — no xHCI controller found.\n");
-=======
-        kprintf("[USB]: MMIO mapping failed â€ no xHCI controller found.\n");
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/drivers/usb.c
         return;
     }
 
@@ -199,21 +185,12 @@ void usb_init(void) {
     g_usb.max_slots = (sigma_u8)(hcs1 & 0xFFu);
     g_usb.max_ports = (sigma_u8)((hcs1 >> 24) & 0xFFu);
 
-<<<<<<< HEAD:suites/S04_HAL_Input/shard_usb.c
     ksigma_printf("[USB]: xHCI cap_len=%u max_slots=%u max_ports=%u\n",
             (u32)g_usb.cap_length, (u32)g_usb.max_slots, (u32)g_usb.max_ports);
 
     /* Reset controller */
     if (xhci_reset() != K_OK) {
         ksigma_printf("[USB]: WARN — xHCI reset timed out.\n");
-=======
-    kprintf("[USB]: xHCI cap_len=%u max_slots=%u max_ports=%u\n",
-            (sigma_u32)g_usb.cap_length, (sigma_u32)g_usb.max_slots, (sigma_u32)g_usb.max_ports);
-
-    /* Reset controller */
-    if (xhci_reset() != K_OK) {
-        kprintf("[USB]: WARN â€ xHCI reset timed out.\n");
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/drivers/usb.c
         return;
     }
 
@@ -244,11 +221,6 @@ void usb_audit(void) {
     for (sigma_u8 i = 0; i < g_usb.max_ports && i < USB_MAX_PORTS; i++) {
         if (g_usb.ports[i].connected) connected++;
     }
-<<<<<<< HEAD:suites/S04_HAL_Input/shard_usb.c
     ksigma_printf("[USB]: xHCI online | ports=%u connected=%u\n",
             (u32)g_usb.max_ports, connected);
-=======
-    kprintf("[USB]: xHCI online | ports=%u connected=%u\n",
-            (sigma_u32)g_usb.max_ports, connected);
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/drivers/usb.c
 }

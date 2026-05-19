@@ -31,13 +31,8 @@ static sigma_u32 g_mod_count = 0;
  * ========================================================================= */
 
 void mod_loader_init(void) {
-<<<<<<<< HEAD:suites/S30_Supremacy/mod_loader.c
     for (int i = 0; i < MAX_LOADED_MODULES; i++) g_modules[i].loaded = FALSE;
     // ksigma_printf("[MOD-LOADER]: Sovereign Module Expansion Shard Online.\n");
-========
-    for (int i = 0; i < MAX_LOADED_MODULES; i++) g_modules[i].loaded = SIGMA_FALSE;
-    // kprintf("[MOD-LOADER]: Sovereign Module Expansion Shard Online.\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/misc_utils/mod_loader.c
 }
 
 sigma_status ins_shard(const char* name, void* elf_data, sigma_usize size) {
@@ -65,13 +60,8 @@ sigma_status rm_shard(const char* name) {
         sigma_u32 j = 0; sigma_bool match = SIGMA_TRUE;
         while (name[j] && g_modules[i].name[j]) { if (name[j] != g_modules[i].name[j]) { match = SIGMA_FALSE; break; } j++; }
         if (match && g_modules[i].loaded) {
-<<<<<<<< HEAD:suites/S30_Supremacy/mod_loader.c
             g_modules[i].loaded = FALSE;
             // ksigma_printf("[MOD-LOADER]: Shard Module Evicted: %s\n", name);
-========
-            g_modules[i].loaded = SIGMA_FALSE;
-            // kprintf("[MOD-LOADER]: Shard Module Evicted: %s\n", name);
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/misc_utils/mod_loader.c
             return K_OK;
         }
     }

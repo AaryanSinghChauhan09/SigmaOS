@@ -32,13 +32,8 @@ static sigma_u32 g_hot_count = 0;
  * ========================================================================= */
 
 void hot_replace_init(void) {
-<<<<<<<< HEAD:suites/S30_Supremacy/hot_replace.c
     for (int i = 0; i < MAX_HOT_SHARDS; i++) g_hot_shards[i].is_active = FALSE;
     // ksigma_printf("[HOT-REPLACE]: Sovereign Zero-Downtime Patching Shard Online.\n");
-========
-    for (int i = 0; i < MAX_HOT_SHARDS; i++) g_hot_shards[i].is_active = SIGMA_FALSE;
-    // kprintf("[HOT-REPLACE]: Sovereign Zero-Downtime Patching Shard Online.\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/misc_utils/hot_replace.c
 }
 
 sigma_status hot_replace_register(const char* name, void* original, void* patched) {
@@ -63,11 +58,6 @@ void hot_replace_activate(sigma_u32 idx) {
      * Absorb Linux Ksplice USP: Atomic Redirection
      * In a sharded model: update the registry function pointer.
      */
-<<<<<<<< HEAD:suites/S30_Supremacy/hot_replace.c
     g_hot_shards[idx].is_active = TRUE;
     // ksigma_printf("[HOT-REPLACE]: Master Shard Activation complete: %s\n", g_hot_shards[idx].name);
-========
-    g_hot_shards[idx].is_active = SIGMA_TRUE;
-    // kprintf("[HOT-REPLACE]: Master Shard Activation complete: %s\n", g_hot_shards[idx].name);
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/misc_utils/hot_replace.c
 }

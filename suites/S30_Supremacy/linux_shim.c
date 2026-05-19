@@ -39,12 +39,7 @@ void linux_shim_init(void) {
 
 sigma_status linux_register_driver(LinuxDriverShim* drv) {
     if (!drv) return K_ERR_INVAL;
-<<<<<<<< HEAD:suites/S30_Supremacy/linux_shim.c
     drv->active = TRUE;
     // ksigma_printf("[LINUX-SHIM]: Sharding Linux Driver [%s] into Sovereign-ID pool.\n", drv->name);
-========
-    drv->active = SIGMA_TRUE;
-    // kprintf("[LINUX-SHIM]: Sharding Linux Driver [%s] into Sovereign-ID pool.\n", drv->name);
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/system/linux_shim.c
     return K_OK;
 }

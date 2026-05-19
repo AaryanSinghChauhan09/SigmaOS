@@ -32,13 +32,8 @@ static ZenEditor g_editor;
  * ========================================================================= */
 
 void zen_editor_init(void) {
-<<<<<<<< HEAD:suites/S30_Supremacy/zen_editor.c
     g_editor.active = FALSE;
     // ksigma_printf("[ZEN-EDITOR]: Sovereign Silicon-Native Zen Editor Online.\n");
-========
-    g_editor.active = SIGMA_FALSE;
-    // kprintf("[ZEN-EDITOR]: Sovereign Silicon-Native Zen Editor Online.\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/ui/zen_editor.c
 }
 
 /* =========================================================================
@@ -61,13 +56,8 @@ void zen_editor_highlight(sigma_u32 line_idx) {
 }
 
 void zen_editor_open_shard(const char* path) {
-<<<<<<<< HEAD:suites/S30_Supremacy/zen_editor.c
     // ksigma_printf("[ZEN-EDITOR]: Shard Load: %s\n", path);
     g_editor.active = TRUE;
-========
-    // kprintf("[ZEN-EDITOR]: Shard Load: %s\n", path);
-    g_editor.active = SIGMA_TRUE;
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/ui/zen_editor.c
 }
 
 void editor_personalize_theme(sigma_u32 bg_color, sigma_u32 fg_color) {

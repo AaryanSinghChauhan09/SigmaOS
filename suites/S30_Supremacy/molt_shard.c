@@ -38,13 +38,8 @@ static sigma_u32 g_agent_count = 0;
  * ========================================================================= */
 
 void molt_init(void) {
-<<<<<<<< HEAD:suites/S30_Supremacy/molt_shard.c
     for (int i = 0; i < MAX_AGENTS; i++) g_agents[i].active = FALSE;
     // ksigma_printf("[MOLT-SHARD]: Sovereign Multi-Agent Orchestrator Online.\n");
-========
-    for (int i = 0; i < MAX_AGENTS; i++) g_agents[i].active = SIGMA_FALSE;
-    // kprintf("[MOLT-SHARD]: Sovereign Multi-Agent Orchestrator Online.\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/misc_utils/molt_shard.c
 }
 
 sigma_status molt_spawn_agent(AgentTaskType type) {

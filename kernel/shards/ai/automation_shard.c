@@ -12,12 +12,8 @@
  * =============================================================================
  */
 
-<<<<<<<< HEAD:suites/S03_Orchestrator/automation_shard.c
 #include "sigma_kernel_types.h"
 #include "libc/sigma_libc.h"
-========
-#include "libc/SovereignLibC.h"
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/ai/automation_shard.c
 
 #define AUTOMATION_TICK_THRESHOLD 60000 // Every 60s @ 1kHz
 

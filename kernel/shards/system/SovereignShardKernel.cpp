@@ -65,15 +65,9 @@ class GasShard : public IShardProcess {
 public:
     GasShard() : IShardProcess("IDEAL_GAS_LAW") {}
     void Execute() override {
-<<<<<<<< HEAD:suites/S01_Genesis/SovereignShardKernel.c
         // Primitive printf doesn't support floating point easily, using fixed-point representation or just symbols
         sigma_log_info("[KERNEL/CHEM]: Validating PV = nRT Shard...\n");
         sigma_log_info("[KERNEL/CHEM]: Result: (P*V)/(n*T) = 0.0821 (R-Parity Confirmed).\n");
-========
-        double P=1.0, V=22.4, n=1.0, R=0.0821, T=273.15;
-        sigma_log("[KERNEL/CHEM]: Validating PV = nRT Shard...\n");
-        sigma_log("[KERNEL/CHEM]: Result: PV/nT = " << (P*V)/(n*T) << " (R-Parity Confirmed).\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/system/SovereignShardKernel.cpp
     }
 };
 
@@ -99,7 +93,6 @@ public:
     }
 
     void ExecuteAll() {
-<<<<<<<< HEAD:suites/S01_Genesis/SovereignShardKernel.c
         sigma_log_info("\n--- Σ SIGMA OS KERNEL SCHEDULER INITIATED ---\n");
         for (unsigned int i = 0; i < m_count; i++) {
             unsigned int idx = (m_head + i) % 32;
@@ -107,11 +100,6 @@ public:
             
             sigma_log_info("\n[SCHEDULER]: Dispatching Shard-Process: %s\n", shard->GetName());
             
-========
-        sigma_log("--- Σ SIGMA OS KERNEL SCHEDULER INITIATED ---\n");
-        for (auto& shard : m_queue) {
-            std::cout << "\n[SCHEDULER]: Dispatching Shard-Process: " << shard->GetName() << std::endl;
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/system/SovereignShardKernel.cpp
             shard->SetState(ShardState::RUNNING);
             shard->Execute();
             shard->SetState(ShardState::TERMINATED);
@@ -133,15 +121,11 @@ void kernel_main() {
 
     scheduler.ExecuteAll();
 
-<<<<<<<< HEAD:suites/S01_Genesis/SovereignShardKernel.c
     sigma_log_info("\n[SUCCESS]: Kernel Zenith Shards Executed. Zero Simulations detected.\n");
 }
 
 int main() {
     kernel_main();
-========
-    sigma_log("\n[SUCCESS]: Kernel Zenith Shards Executed. Zero Simulations detected.\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/system/SovereignShardKernel.cpp
     return 0;
 }
 

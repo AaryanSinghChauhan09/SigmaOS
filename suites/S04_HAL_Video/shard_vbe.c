@@ -32,13 +32,8 @@ typedef struct SigmaFB {
 
 static SigmaFB g_fb;
 
-<<<<<<< HEAD:suites/S04_HAL_Video/shard_vbe.c
 extern void* sigma_malloc(usize size);
 extern void  ksigma_printf(const char* fmt, ...);
-=======
-extern void* sigma_malloc(sigma_usize size);
-extern void  kprintf(const char* fmt, ...);
->>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/drivers/vbe.c
 
 /* =========================================================================
  * Blitting & Drawing

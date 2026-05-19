@@ -11,11 +11,7 @@
  * =========================================================================
  */
 
-<<<<<<<< HEAD:suites/S07_Network/sigma_net.c
 #include "libc/sigma_libc.h"
-========
-#include "libc/SovereignLibC.h"
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/network/SovereignNetMesh.c
 
 /* =========================================================================
  * Raw NIC opcode shards (x86_64 inline â€ bypasses POSIX send/recv)

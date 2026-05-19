@@ -101,15 +101,9 @@ static sigma_u64 elf_seg_to_pte_flags(sigma_u32 pflags) {
  * ELF64 Load â€ map PT_LOAD segments into given address space (cr3)
  * Returns entry point or 0 on error
  * ========================================================================= */
-<<<<<<<< HEAD:suites/S30_Supremacy/elf_loader.c
 extern k_status vmm_map(vaddr_t va, paddr_t pa, u64 flags);
 extern paddr_t  pmm_alloc_page(void);
 extern void     ksigma_printf(const char* fmt, ...);
-========
-extern sigma_status vmm_map(sigma_vaddr_t va, sigma_paddr_t pa, sigma_u64 flags);
-extern sigma_paddr_t  pmm_alloc_page(void);
-extern void     kprintf(const char* fmt, ...);
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/system/elf_loader.c
 
 typedef struct ElfLoadResult {
     sigma_vaddr_t entry;

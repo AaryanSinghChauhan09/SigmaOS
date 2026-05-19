@@ -33,13 +33,8 @@ static sigma_u32 g_cgroup_count = 0;
  * ========================================================================= */
 
 void cgroup_init(void) {
-<<<<<<<< HEAD:suites/S30_Supremacy/cgroup_shard.c
     for (int i = 0; i < MAX_CGROUPS; i++) g_cgroups[i].active = FALSE;
     // ksigma_printf("[CGROUP]: Sovereign Resource-Isolation Shard Online.\n");
-========
-    for (int i = 0; i < MAX_CGROUPS; i++) g_cgroups[i].active = SIGMA_FALSE;
-    // kprintf("[CGROUP]: Sovereign Resource-Isolation Shard Online.\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/system/cgroup_shard.c
 }
 
 sigma_status cgroup_create(const char* name, sigma_u32 weight, sigma_u64 mem_limit) {

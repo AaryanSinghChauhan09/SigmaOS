@@ -47,13 +47,8 @@ sigma_status screen_recorder_start(sigma_u32 w, sigma_u32 h, sigma_u32 bpp) {
 }
 
 void screen_recorder_stop(void) {
-<<<<<<<< HEAD:suites/S12_Ecosystem/screen_recorder.c
     g_recorder.recording = FALSE;
     // ksigma_printf("[SCREEN-RECORDER]: Recording Finalized. Captured %llu Shards.\n", 
-========
-    g_recorder.recording = SIGMA_FALSE;
-    // kprintf("[SCREEN-RECORDER]: Recording Finalized. Captured %llu Shards.\n", 
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/ui/screen_recorder.c
     //         g_recorder.frames_captured);
 }
 

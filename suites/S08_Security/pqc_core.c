@@ -32,13 +32,8 @@ static sigma_u32 g_secure_count = 0;
  * ========================================================================= */
 
 void pqc_init(void) {
-<<<<<<<< HEAD:suites/S08_Security/pqc_core.c
     for (int i = 0; i < MAX_SECURE_SHARDS; i++) g_pqc_contexts[i].active = FALSE;
     // ksigma_printf("[PQC]: Lattice Post-Quantum Security Shard Online.\n");
-========
-    for (int i = 0; i < MAX_SECURE_SHARDS; i++) g_pqc_contexts[i].active = SIGMA_FALSE;
-    // kprintf("[PQC]: Lattice Post-Quantum Security Shard Online.\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/security/pqc_core.c
 }
 
 void pqc_generate_shard_key(sigma_u32 shard_id) {
@@ -51,13 +46,8 @@ void pqc_generate_shard_key(sigma_u32 shard_id) {
         ctx->public_key[i] = (sigma_u8)(i ^ 0x93);
         ctx->secret_key[i] = (sigma_u8)(i ^ 0x66);
     }
-<<<<<<<< HEAD:suites/S08_Security/pqc_core.c
     ctx->active = TRUE;
     // ksigma_printf("[PQC]: Generated Quantum-Resistant Key for Shard [%u]\n", shard_id);
-========
-    ctx->active = SIGMA_TRUE;
-    // kprintf("[PQC]: Generated Quantum-Resistant Key for Shard [%u]\n", shard_id);
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/security/pqc_core.c
 }
 
 void pqc_encrypt_buffer(sigma_u32 shard_id, void* buffer, sigma_u32 len) {

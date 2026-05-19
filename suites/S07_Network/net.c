@@ -299,13 +299,8 @@ sigma_i32 net_connect(sigma_i32 sockfd, sigma_u32 dst_ip, sigma_u16 dst_port) {
     s->state = SOCK_SYN_SENT;
     s->seq++;
 
-<<<<<<<< HEAD:suites/S07_Network/net.c
     extern void ksigma_printf(const char* fmt, ...);
     ksigma_printf("[NET]: TCP SYN → %lu.%lu.%lu.%lu:%u (seq=%u)\n",
-========
-    extern void kprintf(const char* fmt, ...);
-    kprintf("[NET]: TCP SYN â†’ %lu.%lu.%lu.%lu:%u (seq=%u)\n",
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/net/net.c
             (dst_ip>>24)&0xFF, (dst_ip>>16)&0xFF,
             (dst_ip>>8)&0xFF,  dst_ip&0xFF,
             dst_port, s->seq - 1);
@@ -330,13 +325,8 @@ sigma_i64 net_send(sigma_i32 sockfd, const void* buf, sigma_usize len) {
     net_build_tcp(nb, s, TCP_PSH | TCP_ACK, buf, chunk);
     s->seq += chunk;
 
-<<<<<<<< HEAD:suites/S07_Network/net.c
     extern void ksigma_printf(const char* fmt, ...);
     ksigma_printf("[NET]: TCP PSH+ACK %u bytes → port %u\n", chunk, s->remote_port);
-========
-    extern void kprintf(const char* fmt, ...);
-    kprintf("[NET]: TCP PSH+ACK %u bytes â†’ port %u\n", chunk, s->remote_port);
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/net/net.c
     netbuf_free(nb);
     return (sigma_i64)chunk;
 }
@@ -378,13 +368,8 @@ void net_init(void) {
 }
 
 void net_audit(void) {
-<<<<<<<< HEAD:suites/S07_Network/net.c
     extern void ksigma_printf(const char* fmt, ...);
     u32 open = 0, i;
-========
-    extern void kprintf(const char* fmt, ...);
-    sigma_u32 open = 0, i;
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/net/net.c
     for (i = 0; i < SOCK_MAX; i++) if (g_socks[i].used) open++;
     ksigma_printf("[NET]: Open sockets=%u / %u. lwIP/BSD = ZERO dependency.\n",
             open, SOCK_MAX);

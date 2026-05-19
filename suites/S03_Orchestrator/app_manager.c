@@ -37,13 +37,8 @@ static sigma_u32 g_app_count = 0;
  * ========================================================================= */
 
 void app_manager_init(void) {
-<<<<<<<< HEAD:suites/S03_Orchestrator/app_manager.c
     for (int i = 0; i < MAX_ZENITH_APPS; i++) g_apps[i].active = FALSE;
     // ksigma_printf("[APP-MANAGER]: Sovereign Industrial Application Shard Online.\n");
-========
-    for (int i = 0; i < MAX_ZENITH_APPS; i++) g_apps[i].active = SIGMA_FALSE;
-    // kprintf("[APP-MANAGER]: Sovereign Industrial Application Shard Online.\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/core/process/app_manager.c
 }
 
 sigma_status register_app(const char* name) {

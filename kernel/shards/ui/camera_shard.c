@@ -138,13 +138,8 @@ static CameraDevice g_camera;
 /* =========================================================================
  * External dependencies (kernel functions)
  * ========================================================================= */
-<<<<<<<< HEAD:suites/S12_Ecosystem/camera_shard.c
 extern void   ksigma_printf(const char* fmt, ...);
 extern u64    os_get_timestamp_ns(void);
-========
-extern void   kprintf(const char* fmt, ...);
-extern sigma_u64    os_get_timestamp_ns(void);
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/ui/camera_shard.c
 
 /* =========================================================================
  * Utility: FNV-1a hash (evidence integrity â€ zero dependency)
@@ -257,25 +252,7 @@ static void filter_engine_init(FilterEngine* fe) {
         0, 0, FIXED(-1),
         FIXED(255));
 
-<<<<<<<< HEAD:suites/S12_Ecosystem/camera_shard.c
     ksigma_printf("[CAMERA-FILTER-ENGINE]: %u sovereign filters online.\n", fe->count);
-========
-    /* --- Filter 9: AR GHOST MODE (Snapchat style) --- */
-    filter_set_3x3(&fe->kernels[fe->count++], "AR_GHOST_MODE",
-        FIXED(1), FIXED(0), FIXED(1),
-        FIXED(0), FIXED(-2), FIXED(0),
-        FIXED(1), FIXED(0), FIXED(1),
-        FIXED(64));
-
-    /* --- Filter 10: NIGHT VISION (Green luminance) --- */
-    filter_set_3x3(&fe->kernels[fe->count++], "AR_NIGHT_VISION",
-        0, FIXED(1), 0,
-        0, FIXED(1), 0,
-        0, FIXED(1), 0,
-        FIXED(32));
-
-    kprintf("[CAMERA-FILTER-ENGINE]: %u sovereign filters online.\n", fe->count);
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/ui/camera_shard.c
 }
 
 /* =========================================================================
@@ -321,17 +298,10 @@ static void frame_set_pixel(Frame* f, sigma_u32 x, sigma_u32 y, Pixel p) {
 static sigma_status camera_apply_filter_internal(Frame* frame, const FilterKernel3x3* kernel) {
     if (!frame || !frame->valid || !kernel) return K_ERR_INVAL;
 
-<<<<<<<< HEAD:suites/S12_Ecosystem/camera_shard.c
     /* Special-case: Passthrough — no-op */
     u32 name_is_passthrough = 1;
     u32 k;
     for (k = 0; k < 4 && kernel->name[k]; k++) {
-========
-    /* Special-case: Passthrough â€ no-op */
-    sigma_u32 name_is_passthrough = 1;
-    sigma_u32 k;
-    for (k = 0; kernel->name[k] && k < 4; k++) {
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/ui/camera_shard.c
         if (kernel->name[k] != "PASS"[k]) { name_is_passthrough = 0; break; }
     }
     if (name_is_passthrough) return K_OK;
@@ -509,17 +479,12 @@ sigma_status camera_scratch_trigger(sigma_u32 event_id) {
             break;
         case 2: /* WHEN FORENSIC FLAG: BSA SIGN */
             eventbus_push(&g_camera.event_bus, SCRATCH_EVT_FORENSIC, event_id, 0);
-<<<<<<<< HEAD:suites/S12_Ecosystem/camera_shard.c
             ksigma_printf("[CAMERA-SCRATCH]: Forensic Export Block executed. Hash=0x%08x\n",
                     g_camera.current_frame.hash_fnv1a);
-========
-            kprintf("[CAMERA-SCRATCH]: Block: 'Sovereign BSA Sign' executed.\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/ui/camera_shard.c
             break;
         case 3: /* AR SNAPCHAT: GHOST MODE */
             camera_apply_filter(SIGMA_NULL, "AR_GHOST_MODE");
             break;
-<<<<<<<< HEAD:suites/S12_Ecosystem/camera_shard.c
         case 4: /* BSA SEC 63 CERTIFICATE BLOCK */
             ksigma_printf("[CAMERA-SCRATCH]: BSA Sec 63 Certificate — Frame #%u | Hash=0x%08x | TS=%llu\n",
                     g_camera.current_frame.seq_num,
@@ -529,14 +494,6 @@ sigma_status camera_scratch_trigger(sigma_u32 event_id) {
         default:
             eventbus_push(&g_camera.event_bus, SCRATCH_EVT_CUSTOM, event_id, 0);
             ksigma_printf("[CAMERA-SCRATCH]: Custom Block [ID:%u] executed.\n", event_id);
-========
-        case 4: /* MIT SCRATCH: BROADCAST 'CAPTURE_SYNC' */
-            eventbus_push(&g_camera.event_bus, SCRATCH_EVT_CUSTOM, 999, 0);
-            kprintf("[CAMERA-SCRATCH]: Block: 'Broadcast CaptureSync' triggered.\n");
-            break;
-        default:
-            eventbus_push(&g_camera.event_bus, SCRATCH_EVT_CUSTOM, event_id, 0);
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/ui/camera_shard.c
             break;
     }
     return K_OK;
@@ -560,13 +517,8 @@ sigma_status camera_forensic_session_start(const char* evidence_tag) {
 sigma_status camera_forensic_session_stop(void) {
     if (!g_camera.initialised || !g_camera.session.active) return K_ERR_INVAL;
     g_camera.session.end_ns   = os_get_timestamp_ns();
-<<<<<<<< HEAD:suites/S12_Ecosystem/camera_shard.c
     g_camera.session.active   = FALSE;
     ksigma_printf("[CAMERA-FORENSIC]: Session '%s' CLOSED. Frames=%u | Duration=%llu ms\n",
-========
-    g_camera.session.active   = SIGMA_FALSE;
-    kprintf("[CAMERA-FORENSIC]: Session '%s' CLOSED. Frames=%u | Duration=%llu ms\n",
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/ui/camera_shard.c
             g_camera.session.evidence_tag,
             g_camera.session.frames_captured,
             (g_camera.session.end_ns - g_camera.session.start_ns) / 1000000ULL);
@@ -577,13 +529,8 @@ sigma_status camera_forensic_session_stop(void) {
  * Public API â€ camera_list_filters
  * ========================================================================= */
 void camera_list_filters(void) {
-<<<<<<<< HEAD:suites/S12_Ecosystem/camera_shard.c
     ksigma_printf("[CAMERA-SHARD]: Available Filters:\n");
     u32 i;
-========
-    kprintf("[CAMERA-SHARD]: Available Filters:\n");
-    sigma_u32 i;
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/ui/camera_shard.c
     for (i = 0; i < g_camera.filter_engine.count; i++) {
         char marker = (g_camera.filter_engine.active_filter == i) ? '*' : ' ';
         ksigma_printf("  [%c%u] %s\n", marker, i, g_camera.filter_engine.kernels[i].name);
@@ -596,12 +543,7 @@ void camera_list_filters(void) {
 void camera_process_events(void) {
     ScratchEvent e;
     while (eventbus_pop(&g_camera.event_bus, &e)) {
-<<<<<<<< HEAD:suites/S12_Ecosystem/camera_shard.c
         ksigma_printf("[CAMERA-EVT]: type=%u id=%u ts=%llu\n",
                 (u32)e.type, e.id, e.timestamp_ns);
-========
-        kprintf("[CAMERA-EVT]: type=%u id=%u ts=%llu\n",
-                (sigma_u32)e.type, e.id, e.timestamp_ns);
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/ui/camera_shard.c
     }
 }

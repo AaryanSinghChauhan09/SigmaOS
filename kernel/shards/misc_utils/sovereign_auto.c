@@ -34,13 +34,8 @@ void sauto_register_workflow(sigma_u32 event, sigma_u32 action);
  * ========================================================================= */
 
 void sauto_init(void) {
-<<<<<<<< HEAD:suites/S03_Orchestrator/sovereign_auto.c
     for (int i = 0; i < MAX_AUTO_WORKFLOWS; i++) g_workflows[i].active = FALSE;
     // ksigma_printf("[S-AUTO]: Sovereign Industrial Automation Shard Online.\n");
-========
-    for (int i = 0; i < MAX_AUTO_WORKFLOWS; i++) g_workflows[i].active = SIGMA_FALSE;
-    // kprintf("[S-AUTO]: Sovereign Industrial Automation Shard Online.\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/misc_utils/sovereign_auto.c
 }
 
 /* =========================================================================

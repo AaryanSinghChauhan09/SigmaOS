@@ -77,13 +77,8 @@ sigma_u64 sovereign_bpf_exec(sigma_u32 prog_id, sigma_u64 ctx) {
 }
 
 void sovereign_bpf_init(void) {
-<<<<<<<< HEAD:suites/S30_Supremacy/sovereign_bpf.c
     for (int i = 0; i < MAX_S_BPF_PROGS; i++) g_progs[i].active = FALSE;
     // ksigma_printf("[S-BPF]: Sovereign BPF Virtual Machine Shard Online.\n");
-========
-    for (int i = 0; i < MAX_S_BPF_PROGS; i++) g_progs[i].active = SIGMA_FALSE;
-    // kprintf("[S-BPF]: Sovereign BPF Virtual Machine Shard Online.\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/misc_utils/sovereign_bpf.c
 }
 
 void sovereign_bpf_load(sigma_u64 id, SBPFInst* instructions, sigma_u32 count) {

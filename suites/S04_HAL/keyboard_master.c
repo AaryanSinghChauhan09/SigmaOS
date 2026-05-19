@@ -32,13 +32,8 @@ static sigma_u32 g_shortcut_count = 0;
  * ========================================================================= */
 
 void keyboard_master_init(void) {
-<<<<<<<< HEAD:suites/S04_HAL/keyboard_master.c
     for (int i = 0; i < MAX_SHORTCUTS; i++) g_shortcuts[i].active = FALSE;
     // ksigma_printf("[KEY-MASTER]: Sovereign Mouse-Free Keyboard Orchestrator Online.\n");
-========
-    for (int i = 0; i < MAX_SHORTCUTS; i++) g_shortcuts[i].active = SIGMA_FALSE;
-    // kprintf("[KEY-MASTER]: Sovereign Mouse-Free Keyboard Orchestrator Online.\n");
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/shards/misc_utils/keyboard_master.c
     
     /* Standard Industrial Shortcuts */
     // keyboard_register_shortcut(1, 'S', 0x93); /* Alt+S -> Shard Explorer */

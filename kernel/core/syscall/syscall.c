@@ -164,13 +164,8 @@ static sigma_i64 sys_uname_impl(SigmaInterruptFrame* f) {
     char* buf = (char*)(sigma_usize)f->rdi;
     if (!buf) return K_ERR_INVAL;
     const char* info = "SigmaOS 1.0 SovereignKernel x86_64";
-<<<<<<<< HEAD:suites/S30_Supremacy/syscall.c
     usize i = 0;
     while (i < 127 && info[i]) { buf[i] = info[i]; i++; }
-========
-    sigma_usize i = 0;
-    while (info[i] && i < 127) { buf[i] = info[i]; i++; }
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/core/syscall/syscall.c
     buf[i] = '\0';
     return 0;
 }
@@ -200,13 +195,8 @@ static sigma_i64 sys_reboot_impl(SigmaInterruptFrame* f) {
     return 0;
 }
 
-<<<<<<<< HEAD:suites/S30_Supremacy/syscall.c
 static i64 sys_unimpl(SigmaInterruptFrame* f) {
     ksigma_printf("[SYSCALL]: syscall #%llu not yet implemented.\n", f->vector);
-========
-static sigma_i64 sys_unimpl(SigmaInterruptFrame* f) {
-    kprintf("[SYSCALL]: syscall #%llu not yet implemented.\n", f->vector);
->>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645:kernel/core/syscall/syscall.c
     return K_ERR_INVAL;
 }
 
