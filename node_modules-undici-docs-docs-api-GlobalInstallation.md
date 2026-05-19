@@ -8,7 +8,6 @@ Install all WHATWG fetch classes globally on `globalThis`.
 
 ### Example
 
-
 ```js
 import { install } from 'undici'
 
@@ -25,8 +24,6 @@ const request = new Request('https://example.com')
 const formData = new FormData()
 const ws = new WebSocket('wss://example.com')
 const eventSource = new EventSource('https://example.com/events')
-
-
 
 ```
 
@@ -54,7 +51,6 @@ If you send a `FormData` body, use matching implementations for `fetch` and
 
 These two patterns are safe:
 
-
 ```js
 // Built-in globals from Node.js
 const body = new FormData()
@@ -63,10 +59,7 @@ await fetch('https://example.com', {
   body
 })
 
-
-
 ```
-
 
 ```js
 // Globals installed from the undici package
@@ -80,15 +73,12 @@ await fetch('https://example.com', {
   body
 })
 
-
-
 ```
 
 After `install()`, `fetch`, `Headers`, `Response`, `Request`, and `FormData`
 all come from the installed `undici` package, so they work as a matching set.
 
 If you do not want to install globals, import both from `undici` instead:
-
 
 ```js
 import { fetch, FormData } from 'undici'
@@ -98,8 +88,6 @@ await fetch('https://example.com', {
   method: 'POST',
   body
 })
-
-
 
 ```
 
@@ -123,7 +111,6 @@ Global installation is useful for:
 
 ## Example: Polyfilling an Environment
 
-
 ```js
 import { install } from 'undici'
 
@@ -136,12 +123,9 @@ if (typeof globalThis.fetch === 'undefined') {
 // Now fetch is guaranteed to be available
 const response = await fetch('https://api.example.com')
 
-
-
 ```
 
 ## Example: Testing Environment
-
 
 ```js
 import { install } from 'undici'
@@ -154,8 +138,6 @@ test('fetch API test', async () => {
   const response = await fetch('https://example.com')
   expect(response).toBeInstanceOf(Response)
 })
-
-
 
 ```
 

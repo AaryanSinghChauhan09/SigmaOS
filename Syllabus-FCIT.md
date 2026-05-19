@@ -115,7 +115,9 @@ namespace Sigma::Charset {
 **Syllabus:**Basic CMD commands, file navigation, scripting.**SigmaOS Implementation:** `sigma-cli` — the Sovereign Shell.
 
 ```bash
+
 # sigma-cli commands (SigmaOS equivalent of CMD/bash)
+
 sigma ls /sigma/home           # list directory
 sigma cd /sigma/apps           # change directory
 sigma run SigmaDocs            # launch app

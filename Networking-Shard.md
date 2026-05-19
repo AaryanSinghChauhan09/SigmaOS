@@ -4,7 +4,6 @@ The Networking Shard is a modular, hot-swappable TCP/IP stack implemented indepe
 
 ## Architecture Diagram
 
-
 ```mermaid
 graph TD
     A[Userland App] --> | Z-SYSCALL | B(S-NET Socket API)
@@ -13,10 +12,6 @@ graph TD
     C --> | Unencrypted | D
     D --> E[Sovereign HAL]
     E --> F[Hardware NIC
-
-
-
-
 
  **TCP/IP Stack**: Full IPv4 (and future IPv6) implementation.
 
@@ -33,9 +28,6 @@ int fd;
 sigma_status status = SovereignNetworkShard::getInstance().socket_create(AF_INET, SOCK_STREAM, 0, &fd);
 if (status == SIGMA_OK) {
     sigma_log("Socket successfully created.");
-
-
-
 
 ### Binding to Por
 

@@ -4,7 +4,6 @@ The Storage Shard implements the file system abstractions for SigmaOS, providing
 
 ## Architecture Diagram
 
-
 ```mermaid
 graph TD
     A[Userland App] --> | Z-SYSCALL | B(VFS Abstraction)
@@ -15,10 +14,6 @@ graph TD
     D --> F
     E -->
 
-
-
-
-
  **Lattice FS (LFS)**: A custom, atomic file system designed to prevent corruption during unexpected shutdowns.
 
 - **Legacy Support**: `mount()` operations for FAT32 and EXT2 partitions.
@@ -26,9 +21,6 @@ graph TD
 - **NVMe Awareness**: Direct Memory Access (DMA) hooks for extreme throughput.
 
 ## VFS API Example
-
-
-
 
 ```c
 

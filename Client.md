@@ -95,21 +95,17 @@ Furthermore, the following options can be passed:
 
 This will instantiate the undici Client, but it will not connect to the origin until something is queued. Consider using `client.connect` to prematurely connect to the origin, or just call `client.request`.
 
-
 ```js
 'use strict'
 import { Client } from 'undici'
 
 const client = new Client('http://localhost:3000')
 
-
-
 ```
 
 ### Example - Custom connector
 
 This will allow you to perform some additional check on the socket that will be used for the next request.
-
 
 ```js
 'use strict'
@@ -130,8 +126,6 @@ const client = new Client('https://localhost:3000', {
     })
   }
 })
-
-
 
 ```
 
@@ -207,7 +201,6 @@ Emitted when a socket has been created and connected. The client will connect on
 
 #### Example - Client connect event
 
-
 ```js
 import { createServer } from 'http'
 import { Client } from 'undici'
@@ -240,8 +233,6 @@ try {
   server.close()
 }
 
-
-
 ```
 
 ### Event: `'disconnect'`
@@ -259,7 +250,6 @@ Parameters:
 Emitted when socket has disconnected. The error argument of the event is the error which caused the socket to disconnect. The client will reconnect if or once `client.size > 0`.
 
 #### Example - Client disconnect event
-
 
 ```js
 import { createServer } from 'http'
@@ -289,8 +279,6 @@ try {
   server.close()
 }
 
-
-
 ```
 
 ### Event: `'drain'`
@@ -300,7 +288,6 @@ Emitted when pipeline is no longer busy.
 See [Dispatcher Event: `'drain'`](/docs/docs/api/Dispatcher.md#event-drain).
 
 #### Example - Client drain event
-
 
 ```js
 import { createServer } from 'http'
@@ -330,8 +317,6 @@ const requests = [
 await Promise.all(requests)
 
 console.log('requests completed')
-
-
 
 ```
 

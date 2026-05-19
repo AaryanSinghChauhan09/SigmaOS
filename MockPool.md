@@ -24,15 +24,12 @@ Extends: `PoolOptions`
 
 We can use MockAgent to instantiate a MockPool ready to be used to intercept specified requests. It will not do anything until registered as the agent to use and any mock request are registered.
 
-
 ```js
 import { MockAgent } from 'undici'
 
 const mockAgent = new MockAgent()
 
 const mockPool = mockAgent.get('http://localhost:3000')
-
-
 
 ```
 
@@ -109,7 +106,6 @@ A `MockScope` is associated with a single `MockInterceptor`. With this, we can c
 
 #### Example - Basic Mocked Request
 
-
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
 
@@ -131,12 +127,9 @@ for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
 
-
-
 ```
 
 #### Example - Mocked request using reply data callbacks
-
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -168,12 +161,9 @@ for await (const data of body) {
   console.log('data', data.toString('utf8')) // { "message":"hello world!" }
 }
 
-
-
 ```
 
 #### Example - Mocked request using reply options callback
-
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -205,12 +195,9 @@ for await (const data of body) {
   console.log('data', data.toString('utf8')) // { "message":"hello world!" }
 }
 
-
-
 ```
 
 #### Example - Basic Mocked requests with multiple intercepts
-
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -246,12 +233,9 @@ for await (const data of result2.body) {
   console.log('data', data.toString('utf8')) // data hello
 }
 
-
-
 ```
 
 #### Example - Mocked request with query body, request headers and response headers and trailers
-
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -298,12 +282,9 @@ for await (const data of body) {
 
 console.log('trailers', trailers) // { 'content-md5': 'test' }
 
-
-
 ```
 
 #### Example - Mocked request using different matchers
-
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -342,12 +323,9 @@ for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
 
-
-
 ```
 
 #### Example - Mocked request with reply with a defined error
-
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -371,12 +349,9 @@ try {
   console.error(error.cause) // Error: kaboom
 }
 
-
-
 ```
 
 #### Example - Mocked request with defaultReplyHeaders
-
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -396,12 +371,9 @@ const { headers } = await request('http://localhost:3000/foo')
 
 console.log('headers', headers) // headers { foo: 'bar' }
 
-
-
 ```
 
 #### Example - Mocked request with defaultReplyTrailers
-
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -421,12 +393,9 @@ const { trailers } = await request('http://localhost:3000/foo')
 
 console.log('trailers', trailers) // trailers { foo: 'bar' }
 
-
-
 ```
 
 #### Example - Mocked request with automatic content-length calculation
-
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -445,12 +414,9 @@ const { headers } = await request('http://localhost:3000/foo')
 
 console.log('headers', headers) // headers { 'content-length': '3' }
 
-
-
 ```
 
 #### Example - Mocked request with automatic content-length calculation on an object
-
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -469,12 +435,9 @@ const { headers } = await request('http://localhost:3000/foo')
 
 console.log('headers', headers) // headers { 'content-length': '13' }
 
-
-
 ```
 
 #### Example - Mocked request with persist enabled
-
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -497,12 +460,9 @@ const result2 = await request('http://localhost:3000/foo')
 
 // Etc
 
-
-
 ```
 
 #### Example - Mocked request with times enabled
-
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -526,12 +486,9 @@ const result2 = await request('http://localhost:3000/foo')
 const result3 = await request('http://localhost:3000/foo')
 // Will not match and make attempt a real request
 
-
-
 ```
 
 #### Example - Mocked request with path callback
-
 
 ```js
 import { MockAgent, setGlobalDispatcher, request } from 'undici'
@@ -565,8 +522,6 @@ mockPool.intercept({
 const result = await request('http://localhost:3000/foo?foo=bar')
 // Will match and return mocked data
 
-
-
 ```
 
 ### `MockPool.close()`
@@ -577,7 +532,6 @@ Returns: `Promise<void>`
 
 #### Example - clean up after tests are complete
 
-
 ```js
 import { MockAgent } from 'undici'
 
@@ -585,8 +539,6 @@ const mockAgent = new MockAgent()
 const mockPool = mockAgent.get('http://localhost:3000')
 
 await mockPool.close()
-
-
 
 ```
 
@@ -599,7 +551,6 @@ Implements [`Dispatcher.dispatch(options, handlers)`](/docs/docs/api/Dispatcher.
 See [`Dispatcher.request(options [, callback])`](/docs/docs/api/Dispatcher.md#dispatcherrequestoptions-callback).
 
 #### Example - MockPool request
-
 
 ```js
 import { MockAgent } from 'undici'
@@ -626,8 +577,6 @@ console.log('response received', statusCode) // response received 200
 for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
-
-
 
 ```
 

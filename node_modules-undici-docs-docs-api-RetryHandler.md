@@ -65,7 +65,6 @@ It represents the retry state for a given request.
 
 Examples:
 
-
 ```js
 const client = new Client(`http://localhost:${server.address().port}`);
 const chunks = [];
@@ -113,12 +112,9 @@ const handler = new RetryHandler(
   }
 );
 
-
-
 ```
 
 #### Example - Basic RetryHandler with defaults
-
 
 ```js
 const client = new Client(`http://localhost:${server.address().port}`);
@@ -133,7 +129,5 @@ const handler = new RetryHandler(dispatchOptions, {
     onError(err) {},
   },
 });
-
-
 
 ```

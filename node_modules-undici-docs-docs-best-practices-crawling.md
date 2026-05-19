@@ -10,12 +10,8 @@ It is recommended to specify a **custom `User-Agent` header** when implementing 
 
 A user agent string should include sufficient detail to identify the crawler and provide contact information. For example:
 
-
 ```
 AcmeCo Crawler - acme.co - contact@acme.co
-
-
-
 
 ```
 
@@ -27,7 +23,6 @@ The `User-Agent` header can be set on individual requests or applied globally by
 
 ### Example: setting a `User-Agent` per request
 
-
 ```js
 import { fetch } from 'undici'
 
@@ -37,8 +32,6 @@ const headers = {
 }
 
 const res = await fetch('https://example.com', { headers })
-
-
 
 ```
 

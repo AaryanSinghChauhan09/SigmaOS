@@ -1,39 +1,41 @@
 # Operating System Concepts → SigmaOS Kernel
 
-> Maps the OS Concepts syllabus directly to the SigmaOS Zenith microkernel implementation.
+> Maps the OS Concepts syllabus directly to the SigmaOS Zenith microkernel implementation, emphasizing silicon sovereignty, deterministic resource management, and failure isolation.
 
 ---
 
-## Unit I: Introduction to Operating System
+## Unit I: Introduction to Operating Systems & Sovereignty
 
 ### What is an OS?
 
-An Operating System is system software that manages hardware resources and provides services to application programs.
+An Operating System is foundational system software that manages hardware resources, schedules computational execution, and provides protected service abstractions to application programs.
 
-**SigmaOS Position:** A sovereign microkernel OS — zero-dependency, silicon-direct, C++17.
+**Unique Selling Point (USP):** Deterministic resource management, absolute kernel stability, and silicon-direct execution free from high-level runtime overhead.
+
+**SigmaOS Position:** A sovereign bare-metal microkernel OS — zero-dependency, freestanding C++17, and AVX-512 optimized for silicon sovereignty.
 
 ### OS Functions → SigmaOS Modules
 
 | OS Function | SigmaOS Module | File |
-| --- | --- | --- |
-| Process Management | `SovereignScheduler` | `kernel/core/SovereignScheduler.cpp` |
-| Memory Management | `SovereignAllocator` | `kernel/core/SovereignAllocator.cpp` |
-| File System | `SovereignFS` + S-ZFS | `kernel/fs/` |
-| Device Management | HAL Driver Registry | `kernel/core/drivers/` |
-| Security | `SentinelNeural` | `kernel/security/` |
-| UI | `ZenithDesktop` | `userland/desktop/` |
-| Networking | `SovereignNetStack` | `kernel/net/` |
+| :--- | :--- | :--- |
+| **Process Management** | `SovereignScheduler` | `kernel/core/SovereignScheduler.cpp` |
+| **Memory Management** | `SovereignAllocator` | `kernel/core/SovereignAllocator.cpp` |
+| **File System** | `SovereignFS` + S-ZFS | `kernel/fs/` |
+| **Device Management** | HAL Driver Registry | `kernel/core/drivers/` |
+| **Security** | `SentinelNeural` | `kernel/security/` |
+| **UI** | `ZenithDesktop` | `userland/desktop/` |
+| **Networking** | `SovereignNetStack` | `kernel/net/` |
 
 ### Types of OS
 
 | Type | Example | SigmaOS Parallel |
-| --- | --- | --- |
-| Batch | IBM OS/360 | — |
-| Time-sharing | Unix | SigmaOS multi-user |
-| Real-time | VxWorks | RTOS format of SigmaOS |
-| Distributed | Plan 9 | SigmaOS cluster mode |
-| Embedded | FreeRTOS | SigmaOS embedded build |
-| Microkernel | Mach, L4 | **SigmaOS Zenith** |
+| :--- | :--- | :--- |
+| **Batch** | IBM OS/360 | — |
+| **Time-sharing** | Unix | SigmaOS multi-user interactive |
+| **Real-time** | VxWorks | RTOS format of SigmaOS |
+| **Distributed** | Plan 9 | SigmaOS cluster mode |
+| **Embedded** | FreeRTOS | SigmaOS embedded build |
+| **Microkernel** | Mach, L4 | **SigmaOS Zenith** |
 
 ---
 
@@ -41,12 +43,11 @@ An Operating System is system software that manages hardware resources and provi
 
 ### Process States
 
-```text
+```
 NEW → READY → RUNNING → TERMINATED
                 ↓ ↑
              WAITING/BLOCKED
-
-```text
+```
 
 ```cpp
 // kernel/core/SovereignScheduler.cpp
@@ -61,7 +62,7 @@ enum class ProcessState {
 struct SovereignProcess {
     uint32_t     pid;
     uint32_t     ppid;           // Parent PID
-    ProcessState state;
+    Process_State state;
     uint8_t      priority;       // 0-255
     uint64_t     stack_base;
     uint64_t     pc;             // Program Counter
@@ -69,8 +70,7 @@ struct SovereignProcess {
     uint64_t     cpu_time_ns;    // Time on CPU
     char         name[64];
 };
-
-```text
+```
 
 ### Scheduling Algorithms
 
@@ -95,10 +95,9 @@ class SovereignScheduler {
     // Multi-core dispatch
     void dispatch_to_core(SovereignProcess* p, uint32_t core_id);
 };
+```
 
-```text
-
-### Threads
+### Threads & Synchronization
 
 ```cpp
 // Thread vs Process
@@ -133,8 +132,7 @@ public:
     void wait();   // P operation (down)
     void signal(); // V operation (up)
 };
-
-```text
+```
 
 ### Inter-Process Communication (IPC)
 
@@ -155,8 +153,7 @@ sigma_shm_attach(shm);
 // Signals
 sigma_signal(PROC_42, SIGTERM);  // Request termination
 sigma_signal(PROC_42, SIGKILL);  // Force termination
-
-```text
+```
 
 ---
 
@@ -164,11 +161,10 @@ sigma_signal(PROC_42, SIGKILL);  // Force termination
 
 ### Memory Hierarchy
 
-```text
+```
 Registers (< 1ns) → L1 Cache (1ns) → L2 Cache (3ns) → L3 Cache (10ns)
 → RAM (50ns) → NVMe SSD (100μs) → HDD (10ms) → Cloud (RTT)
-
-```text
+```
 
 ### Paging
 
@@ -191,8 +187,7 @@ struct PageTableEntry {
     uint64_t reserved2    : 11;
     uint64_t nx           : 1;   // No-execute bit
 };
-
-```text
+```
 
 ### Virtual Memory & Page Replacement
 
@@ -215,8 +210,7 @@ void sigma_page_fault_handler(uintptr_t faulting_addr, uint32_t error_code) {
 // LRU: evict least recently used
 // Optimal: evict page used furthest in future (theoretical)
 // Clock Algorithm: circular buffer with reference bits (SigmaOS uses this)
-
-```text
+```
 
 ### Memory Allocation
 
@@ -227,12 +221,11 @@ void* buddy_alloc(size_t size);  // 4KB, 8KB, 16KB...
 // Slab Allocator: fixed-size object caches (used for kernel objects)
 SigmaSlabCache* proc_cache = sigma_slab_create(sizeof(SovereignProcess));
 SovereignProcess* p = (SovereignProcess*)sigma_slab_alloc(proc_cache);
-
-```text
+```
 
 ---
 
-## Unit IV: I/O & File System
+## Unit IV: I/O & File Systems
 
 ### I/O Subsystem
 
@@ -251,12 +244,11 @@ class SovereignIOScheduler {
     void enqueue(IORequest* req);
     IORequest* next_request();  // Returns by SCAN order
 };
-
-```text
+```
 
 ### File System — S-ZFS
 
-```text
+```
 SigmaOS Virtual File System (VFS)
 ├── /sigma/          — OS root
 │   ├── kernel/      — Kernel modules
@@ -267,8 +259,7 @@ SigmaOS Virtual File System (VFS)
 │   └── data/        — User data
 │
 Backed by: SovereignZFSPool (CoW, Snapshots, RAID-Z, PQC encrypted)
-
-```text
+```
 
 ```cpp
 // File Operations
@@ -286,9 +277,23 @@ while ((entry = sigma_readdir(dir)) != nullptr) {
     sigma_klog(LOG_INFO, "  %s\n", entry->name);
 }
 sigma_closedir(dir);
-
-```text
+```
 
 ---
 
-*Last updated: 2026-05-18 | SigmaOS Zenith v15.1*
+## Debugging & Problem-Solving in Operating Systems
+
+### Common Issues & Fix Strategies
+
+* **Issue - Kernel Memory Leaks:** Unreleased slab allocations or orphaned page frames exhaust physical RAM over time.
+  * *Fix Strategy:* Implement strict RAII smart pointer wrappers (`SigmaUniquePtr`), execute automated kernel slab leak tracking, and run Valgrind/KASAN profiling tools during boot validation.
+* **Issue - Concurrency Deadlocks:** Threads acquire multiple mutex locks in conflicting orders, stalling kernel execution indefinitely.
+  * *Fix Strategy:* Enforce a strict lock acquisition hierarchy across all kernel subsystems, utilize `try_lock` with exponential backoff, and integrate priority inheritance protocols to prevent priority inversion.
+* **Issue - File System Corruption & Incorrect Indexing:** Sudden power loss leaves VFS B+ Tree directory indices fragmented or corrupted.
+  * *Fix Strategy:* Utilize S-ZFS Copy-on-Write (CoW) transactional semantics, ensuring directory structures are updated atomically via merkle tree root updates without requiring fsck disk scrubbing.
+* **Issue - Unhandled Interrupt Storms:** Faulty peripheral hardware floods the APIC with unhandled IRQs, starving userland CPU execution.
+  * *Fix Strategy:* Implement interrupt throttling and switch from pure interrupt-driven I/O to polling mode (NAPI equivalent) under high packet/event loads.
+
+---
+
+*Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

@@ -41,12 +41,8 @@ assignees: ''
 
 ## Logs
 
-
 ```text
 
 <!-- Paste sigma_log / serial output here -->
-
-
-
 
 ```

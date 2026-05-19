@@ -14,11 +14,8 @@ The `SnapshotAgent` provides a powerful way to record and replay HTTP requests f
 
 ## Constructor
 
-
 ```javascript
 new SnapshotAgent([options])
-
-
 
 ```
 
@@ -47,7 +44,6 @@ new SnapshotAgent([options])
 
 Makes real HTTP requests and saves the responses to snapshots.
 
-
 ```javascript
 import { SnapshotAgent, setGlobalDispatcher } from 'undici'
 
@@ -64,14 +60,11 @@ const users = await response.json()
 // Save recorded snapshots
 await agent.saveSnapshots()
 
-
-
 ```
 
 #### Playback Mode (`'playback'`)
 
 Replays recorded responses without making real HTTP requests.
-
 
 ```javascript
 import { SnapshotAgent, setGlobalDispatcher } from 'undici'
@@ -85,14 +78,11 @@ setGlobalDispatcher(agent)
 // Uses recorded response instead of real request
 const response = await fetch('https://api.example.com/users')
 
-
-
 ```
 
 #### Update Mode (`'update'`)
 
 Uses existing snapshots when available, but records new ones for missing requests.
-
 
 ```javascript
 import { SnapshotAgent, setGlobalDispatcher } from 'undici'
@@ -105,8 +95,6 @@ setGlobalDispatcher(agent)
 
 // Uses snapshot if exists, otherwise makes real request and records it
 const response = await fetch('https://api.example.com/new-endpoint')
-
-
 
 ```
 
@@ -124,11 +112,8 @@ Saves all recorded snapshots to a file.
 
 `Promise<void>`
 
-
 ```javascript
 await agent.saveSnapshots('./custom-snapshots.json')
-
-
 
 ```
 
@@ -137,7 +122,6 @@ await agent.saveSnapshots('./custom-snapshots.json')
 ### Header Filtering
 
 Control which headers are used for request matching and what gets stored in snapshots:
-
 
 ```javascript
 const agent = new SnapshotAgent({
@@ -154,14 +138,11 @@ const agent = new SnapshotAgent({
   excludeHeaders: ['authorization', 'x-api-key', 'cookie']
 })
 
-
-
 ```
 
 ### Custom Request/Response Filtering
 
 Use callback functions to determine what gets recorded or played back:
-
 
 ```javascript
 const agent = new SnapshotAgent({
@@ -181,14 +162,11 @@ const agent = new SnapshotAgent({
   }
 })
 
-
-
 ```
 
 ### URL Pattern Exclusion
 
 Exclude specific URLs from recording/playback using patterns:
-
 
 ```javascript
 const agent = new SnapshotAgent({
@@ -202,14 +180,11 @@ const agent = new SnapshotAgent({
   ]
 })
 
-
-
 ```
 
 ### Memory Management
 
 Configure automatic memory and disk management:
-
 
 ```javascript
 const agent = new SnapshotAgent({
@@ -224,14 +199,11 @@ const agent = new SnapshotAgent({
   flushInterval: 30000
 })
 
-
-
 ```
 
 ### Sequential Response Handling
 
 Handle multiple responses for the same request (similar to nock):
-
 
 ```javascript
 // In record mode, multiple identical requests get recorded as separate responses
@@ -257,14 +229,11 @@ const second = await fetch('https://api.example.com/random')
 // Third call repeats the last response (B)
 const third = await fetch('https://api.example.com/random')
 
-
-
 ```
 
 ## Managing Snapshots
 
 ### Replacing Existing Snapshots
-
 
 ```javascript
 // Load existing snapshots
@@ -288,8 +257,6 @@ agent.replaceSnapshots(filteredSnapshots.map((snapshot, index) => ({
 // Save updated snapshots
 await agent.saveSnapshots('./updated-snapshots.json')
 
-
-
 ```
 
 ### `agent.loadSnapshots([filePath])`
@@ -304,11 +271,8 @@ Loads snapshots from a file.
 
 `Promise<void>`
 
-
 ```javascript
 await agent.loadSnapshots('./existing-snapshots.json')
-
-
 
 ```
 
@@ -320,12 +284,9 @@ Gets the underlying `SnapshotRecorder` instance.
 
 `SnapshotRecorder`
 
-
 ```javascript
 const recorder = agent.getRecorder()
 console.log(`Recorded ${recorder.size()} interactions`)
-
-
 
 ```
 
@@ -341,18 +302,14 @@ Gets the current snapshot mode.
 
 Clears all recorded snapshots from memory.
 
-
 ```javascript
 agent.clearSnapshots()
-
-
 
 ```
 
 ## Working with Different Request Types
 
 ### GET Requests
-
 
 ```javascript
 // Record mode
@@ -364,12 +321,9 @@ const post = await response.json()
 
 await agent.saveSnapshots()
 
-
-
 ```
 
 ### POST Requests with Body
-
 
 ```javascript
 // Record mode
@@ -384,14 +338,11 @@ const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
 
 await agent.saveSnapshots()
 
-
-
 ```
 
 ### Using with `undici.request`
 
 SnapshotAgent works with all undici APIs, not just fetch:
-
 
 ```javascript
 import { SnapshotAgent, request, setGlobalDispatcher } from 'undici'
@@ -404,14 +355,11 @@ const data = await body.json()
 
 await agent.saveSnapshots()
 
-
-
 ```
 
 ## Test Integration
 
 ### Basic Test Setup
-
 
 ```javascript
 import { test } from 'node:test'
@@ -436,12 +384,9 @@ test('API integration test', async (t) => {
   assert(users.length > 0)
 })
 
-
-
 ```
 
 ### Environment-Based Mode Selection
-
 
 ```javascript
 const mode = process.env.SNAPSHOT_MODE | | 'playback'
@@ -454,12 +399,9 @@ const agent = new SnapshotAgent({
 // Run with: SNAPSHOT_MODE=record npm test (to record)
 // Run with: npm test (to playback)
 
-
-
 ```
 
 ### Test Helper Function
-
 
 ```javascript
 function createSnapshotAgent(testName, mode = 'playback') {
@@ -476,14 +418,11 @@ test('user API test', async (t) => {
   // Test implementation...
 })
 
-
-
 ```
 
 ## Snapshot File Format
 
 Snapshots are stored as JSON with the following structure:
-
 
 ```json
 [
@@ -511,8 +450,6 @@ Snapshots are stored as JSON with the following structure:
   }
 ]
 
-
-
 ```
 
 ## Security Considerations
@@ -520,7 +457,6 @@ Snapshots are stored as JSON with the following structure:
 ### Sensitive Data in Snapshots
 
 By default, SnapshotAgent records all headers and request/response data. For production use, always exclude sensitive information:
-
 
 ```javascript
 const agent = new SnapshotAgent({
@@ -558,8 +494,6 @@ const agent = new SnapshotAgent({
   }
 })
 
-
-
 ```
 
 ### Snapshot File Security
@@ -578,7 +512,6 @@ const agent = new SnapshotAgent({
 
 - ❌ Don't share snapshot files containing personal data
 
-
 ```gitignore
 
 # Exclude snapshots with real data
@@ -590,14 +523,11 @@ const agent = new SnapshotAgent({
 
 !/test/snapshots/mock-*.json
 
-
-
 ```
 
 ## Error Handling
 
 ### Missing Snapshots in Playback Mode
-
 
 ```javascript
 try {
@@ -609,12 +539,9 @@ try {
   }
 }
 
-
-
 ```
 
 ### Handling Network Errors in Record Mode
-
 
 ```javascript
 const agent = new SnapshotAgent({ mode: 'record', snapshotPath: './snapshots.json' })
@@ -626,14 +553,11 @@ try {
   console.log('Network error:', error.message)
 }
 
-
-
 ```
 
 ## Best Practices
 
 ### 1. Organize Snapshots by Test Suite
-
 
 ```javascript
 // Use descriptive snapshot file names
@@ -642,14 +566,11 @@ const agent = new SnapshotAgent({
   snapshotPath: `./test/snapshots/${testSuiteName}-${testName}.json`
 })
 
-
-
 ```
 
 ### 2. Version Control Snapshots
 
 Add snapshot files to version control to ensure consistent test behavior across environments:
-
 
 ```gitignore
 
@@ -657,12 +578,9 @@ Add snapshot files to version control to ensure consistent test behavior across 
 
 !/test/snapshots/*.json
 
-
-
 ```
 
 ### 3. Clean Up Test Data
-
 
 ```javascript
 test('API test', async (t) => {
@@ -677,12 +595,9 @@ test('API test', async (t) => {
   })
 })
 
-
-
 ```
 
 ### 4. Snapshot Validation
-
 
 ```javascript
 test('validate snapshot contents', async (t) => {
@@ -699,8 +614,6 @@ test('validate snapshot contents', async (t) => {
   assert(snapshots[0].request.url.startsWith('https://'), 'Should use HTTPS')
 })
 
-
-
 ```
 
 ## Comparison with Other Tools
@@ -708,7 +621,6 @@ test('validate snapshot contents', async (t) => {
 ### vs Manual MockAgent Setup
 
 ### Manual MockAgent
-
 
 ```javascript
 const mockAgent = new MockAgent()
@@ -722,12 +634,9 @@ mockPool.intercept({
   { id: 2, name: 'User 2' }
 ])
 
-
-
 ```
 
 ### SnapshotAgent
-
 
 ```javascript
 // Record once
@@ -737,8 +646,6 @@ const agent = new SnapshotAgent({ mode: 'record', snapshotPath: './snapshots.jso
 // Use in tests
 const agent = new SnapshotAgent({ mode: 'playback', snapshotPath: './snapshots.json' })
 // Automatically replays recorded response
-
-
 
 ```
 

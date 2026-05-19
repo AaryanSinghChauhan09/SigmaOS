@@ -6,7 +6,6 @@ A basic H2C client.
 
 ### Example
 
-
 ```js
 const { createServer } = require('node:http2')
 const { once } = require('node:events')
@@ -27,8 +26,6 @@ once(server, 'listening').then(() => {
     console.log(text) // Hello, world!
   })
 })
-
-
 
 ```
 
@@ -88,14 +85,11 @@ Returns: `H2CClient`
 
 This will instantiate the undici H2CClient, but it will not connect to the origin until something is queued. Consider using `client.connect` to prematurely connect to the origin, or just call `client.request`.
 
-
 ```js
 "use strict";
 import { H2CClient } from "undici";
 
 const client = new H2CClient("http://localhost:3000");
-
-
 
 ```
 
@@ -171,7 +165,6 @@ Emitted when a socket has been created and connected. The client will connect on
 
 #### Example - Client connect event
 
-
 ```js
 import { createServer } from "node:http2";
 import { H2CClient } from "undici";
@@ -204,8 +197,6 @@ try {
   server.close();
 }
 
-
-
 ```
 
 ### Event: `'disconnect'`
@@ -223,7 +214,6 @@ Parameters:
 Emitted when socket has disconnected. The error argument of the event is the error which caused the socket to disconnect. The client will reconnect if or once `client.size > 0`.
 
 #### Example - Client disconnect event
-
 
 ```js
 import { createServer } from "node:http2";
@@ -253,8 +243,6 @@ try {
   server.close();
 }
 
-
-
 ```
 
 ### Event: `'drain'`
@@ -264,7 +252,6 @@ Emitted when pipeline is no longer busy.
 See [Dispatcher Event: `'drain'`](/docs/docs/api/Dispatcher.md#event-drain).
 
 #### Example - Client drain event
-
 
 ```js
 import { createServer } from "node:http2";
@@ -294,8 +281,6 @@ const requests = [
 await Promise.all(requests);
 
 console.log("requests completed");
-
-
 
 ```
 

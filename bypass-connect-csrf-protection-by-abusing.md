@@ -16,14 +16,11 @@ As the declaration order of middlewares determines the execution stack in Connec
 
 Considering the following code:
 
-
 ```js
 ...
 app.use(express.csrf())
 ...
 app.use(express.methodOverride())
-
-
 
 ```
 
@@ -31,13 +28,10 @@ Connect's CSRF middleware does not check csrf tokens in case of idempotent verbs
 
 ### Example
 
-
 ```sh
 GET / HTTP/1.1
 [..]
 _method=POST
-
-
 
 ```
 

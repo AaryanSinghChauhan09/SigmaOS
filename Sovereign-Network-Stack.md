@@ -18,12 +18,9 @@ S-NET operates on a zero-copy data path between the hardware HAL and the userlan
 
 ### Configuration
 
-
 ```cpp
 // Example: Attesting a network shard
 SigmaOS::Kernel::Network::SovereignNetStack::getInstance().add_firewall_rule(0xFFFFFFFF, Protocol::TCP, true);
-
-
 
 ```
 

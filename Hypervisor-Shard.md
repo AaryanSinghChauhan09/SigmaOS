@@ -4,7 +4,6 @@ The `S-HYP` shard implements a **Type-1 bare-metal hypervisor** running directly
 
 ## Architecture Diagram
 
-
 ```mermaid
 graph TD
     A[SigmaOS Microkernel] --> B(S-HYP Hypervisor Shard)
@@ -16,10 +15,6 @@ graph TD
     E --> G
     F -->
 
-
-
-
-
  **Type-1 Hypervisor**: Runs directly on silicon — no host OS layer.
 
 - **PQC Isolation**: Every VM boundary is Kyber-1024 attested, preventing cross-VM data exfiltration.
@@ -28,16 +23,11 @@ graph TD
 
 - **64 Concurrent VMs**: Maximum capacity per host node.
 
-
-
  Intel VT-x or AMD-V CPU support (detected at boot via CPUID).
 
 - At least 4 GB RAM for the host lattice + 512 MB per guest VM.
 
 ## API Example
-
-
-
 
 ```c
 

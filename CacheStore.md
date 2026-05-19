@@ -115,18 +115,14 @@ as request headers.
 
 For example, for a response like
 
-
 ```
 Vary: content-encoding, accepts
 content-encoding: utf8
 accepts: application/json
 
-
-
 ```
 
 This would be
-
 
 ```js
 {
@@ -134,20 +130,15 @@ This would be
   accepts: 'application/json'
 }
 
-
-
 ```
 
 If the original request did not include the `accepts` header:
-
 
 ```js
 {
   'content-encoding': 'utf8',
   accepts: null
 }
-
-
 
 ```
 

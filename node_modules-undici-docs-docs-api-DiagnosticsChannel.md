@@ -11,7 +11,6 @@ The channels available are the following.
 
 This message is published when a new outgoing request is created.
 
-
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
 
@@ -25,8 +24,6 @@ diagnosticsChannel.channel('undici:request:create').subscribe(({ request }) => {
   console.log('headers', request.headers) // e.g. ['foo', 'bar', 'hello', 'world']
 })
 
-
-
 ```
 
 Note: a request is only loosely completed to a given socket.
@@ -35,7 +32,6 @@ Note: a request is only loosely completed to a given socket.
 
 This message is published when a chunk of the request body is being sent.
 
-
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
 
@@ -43,14 +39,11 @@ diagnosticsChannel.channel('undici:request:bodyChunkSent').subscribe(({ request,
   // request is the same object undici:request:create
 })
 
-
-
 ```
 
 ## `undici:request:bodySent`
 
 This message is published after the request body has been fully sent.
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -59,14 +52,11 @@ diagnosticsChannel.channel('undici:request:bodySent').subscribe(({ request }) =>
   // request is the same object undici:request:create
 })
 
-
-
 ```
 
 ## `undici:request:headers`
 
 This message is published after the response headers have been received.
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -79,14 +69,11 @@ diagnosticsChannel.channel('undici:request:headers').subscribe(({ request, respo
   console.log(response.headers.map((x) => x.toString()))
 })
 
-
-
 ```
 
 ## `undici:request:bodyChunkReceived`
 
 This message is published after a chunk of the response body has been received.
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -95,14 +82,11 @@ diagnosticsChannel.channel('undici:request:bodyChunkReceived').subscribe(({ requ
   // request is the same object undici:request:create
 })
 
-
-
 ```
 
 ## `undici:request:trailers`
 
 This message is published after the response body and trailers have been received, i.e. the response has been completed.
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -114,14 +98,11 @@ diagnosticsChannel.channel('undici:request:trailers').subscribe(({ request, trai
   console.log(trailers.map((x) => x.toString()))
 })
 
-
-
 ```
 
 ## `undici:request:error`
 
 This message is published if the request is going to error, but it has not errored yet.
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -129,8 +110,6 @@ import diagnosticsChannel from 'diagnostics_channel'
 diagnosticsChannel.channel('undici:request:error').subscribe(({ request, error }) => {
   // request is the same object undici:request:create
 })
-
-
 
 ```
 
@@ -140,7 +119,6 @@ This message is published right before the first byte of the request is written 
 
 *Note*: It will publish the exact headers that will be sent to the server in raw format.
 
-
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
 
@@ -148,8 +126,6 @@ diagnosticsChannel.channel('undici:client:sendHeaders').subscribe(({ request, he
   // request is the same object undici:request:create
   console.log(`Full headers list ${headers.split('\r\n')}`);
 })
-
-
 
 ```
 
@@ -159,7 +135,6 @@ This message is published before creating a new connection for **any** request.
 
 You can not assume that this event is related to any specific request.
 
-
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
 
@@ -168,14 +143,11 @@ diagnosticsChannel.channel('undici:client:beforeConnect').subscribe(({ connectPa
   // connector is a function that creates the socket
 })
 
-
-
 ```
 
 ## `undici:client:connected`
 
 This message is published after a connection is established.
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -185,14 +157,11 @@ diagnosticsChannel.channel('undici:client:connected').subscribe(({ socket, conne
  // connector is a function that creates the socket
 })
 
-
-
 ```
 
 ## `undici:client:connectError`
 
 This message is published if it did not succeed to create new connection
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -203,14 +172,11 @@ diagnosticsChannel.channel('undici:client:connectError').subscribe(({ error, soc
   console.log(`Connect failed with ${error.message}`)
 })
 
-
-
 ```
 
 ## `undici:websocket:open`
 
 This message is published after the client has successfully connected to a server.
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -233,8 +199,6 @@ diagnosticsChannel.channel('undici:websocket:open').subscribe(({
   console.log(handshakeResponse.statusText) // 'Switching Protocols' for HTTP/1.1, commonly 'OK' for HTTP/2 in Node.js
   console.log(handshakeResponse.headers) // Object containing response headers
 })
-
-
 
 ```
 
@@ -259,7 +223,6 @@ This information is particularly useful for debugging and monitoring WebSocket c
 
 This message is published after the connection has closed.
 
-
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
 
@@ -269,14 +232,11 @@ diagnosticsChannel.channel('undici:websocket:close').subscribe(({ websocket, cod
   console.log(reason) // the closing reason
 })
 
-
-
 ```
 
 ## `undici:websocket:socket_error`
 
 This message is published if the socket experiences an error.
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -285,14 +245,11 @@ diagnosticsChannel.channel('undici:websocket:socket_error').subscribe((error) =>
   console.log(error)
 })
 
-
-
 ```
 
 ## `undici:websocket:ping`
 
 This message is published after the client receives a ping frame, if the connection is not closing.
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -303,14 +260,11 @@ diagnosticsChannel.channel('undici:websocket:ping').subscribe(({ payload, websoc
   console.log(websocket) // the WebSocket instance
 })
 
-
-
 ```
 
 ## `undici:websocket:pong`
 
 This message is published after the client receives a pong frame.
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -321,14 +275,11 @@ diagnosticsChannel.channel('undici:websocket:pong').subscribe(({ payload, websoc
   console.log(websocket) // the WebSocket instance
 })
 
-
-
 ```
 
 ## `undici:proxy:connected`
 
 This message is published after the `ProxyAgent` establishes a connection to the proxy server.
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -339,8 +290,6 @@ diagnosticsChannel.channel('undici:proxy:connected').subscribe(({ socket, connec
   // const { origin, port, path, signal, headers, servername } = connectParams
 })
 
-
-
 ```
 
 ## `undici:request:pending-requests`
@@ -348,7 +297,6 @@ diagnosticsChannel.channel('undici:proxy:connected').subscribe(({ socket, connec
 This message is published when the deduplicate interceptor's pending request map changes. This is useful for monitoring and debugging request deduplication behavior.
 
 The deduplicate interceptor automatically deduplicates concurrent requests for the same resource. When multiple identical requests are made while one is already in-flight, only one request is sent to the origin server, and all waiting handlers receive the same response.
-
 
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
@@ -358,8 +306,6 @@ diagnosticsChannel.channel('undici:request:pending-requests').subscribe(({ type,
   console.log(size)  // current number of pending requests
   console.log(key)   // the deduplication key for this request
 })
-
-
 
 ```
 
@@ -373,7 +319,6 @@ diagnosticsChannel.channel('undici:request:pending-requests').subscribe(({ type,
 
 ### Example: Monitoring Request Deduplication
 
-
 ```js
 import diagnosticsChannel from 'diagnostics_channel'
 
@@ -386,8 +331,6 @@ channel.subscribe(({ type, size, key }) => {
     console.log(`Request completed: ${key} (${size} remaining)`)
   }
 })
-
-
 
 ```
 

@@ -46,4 +46,4 @@ This document specifies the industrial-grade syscall interface for the sovereign
 
 | `sigma_chown` | 0x40 | Changes the owner (UID/GID) of a shard node. | 
 | `sigma_chmod` | 0x41 | Modifies access permissions (S-ARMOR). | 
-| `sigma_audit` | 0x42 | Logs an industrial event to the secure audit shard. | 
+| `sigma_audit` | 0x42 | Logs an industrial event to the secure audit shard. |

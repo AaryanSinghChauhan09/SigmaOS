@@ -14,7 +14,6 @@ The **Sovereign Lattice Filesystem (SLFS)**is the primary persistent storage lay
 
 SLFS exposes a high-level C++ API for professional applications:
 
-
 ```cpp
 #include <core/SovereignLatticeFS.h>
 
@@ -25,8 +24,6 @@ void save_critical_data() {
     fs.commit_atomic_snapshot();
     fs.close(fd);
 }
-
-
 
 ```
 
@@ -49,4 +46,4 @@ void save_critical_data() {
 
 | **Snapshot Speed** | Seconds/Minutes | < 2ms (Silicon-Direct) | 
 
-| **Shard Distribution** | External (DRBD/Gluster) | Native (SovereignVFS) | 
+| **Shard Distribution** | External (DRBD/Gluster) | Native (SovereignVFS) |

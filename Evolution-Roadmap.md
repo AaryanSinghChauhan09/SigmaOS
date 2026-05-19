@@ -41,4 +41,4 @@ SigmaOS is on a 3-year trajectory to become the world's most innovative and prof
 
 | **Medium Term** | Security | S-MAC | 
 
-| **Long Term** | AI / Gaming | S-PROTON | 
+| **Long Term** | AI / Gaming | S-PROTON |

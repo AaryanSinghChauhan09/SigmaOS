@@ -4,7 +4,6 @@ SigmaOS implements security as a zero-trust, post-quantum fortified subsystem de
 
 ## Architecture Diagram
 
-
 ```mermaid
 graph TD
     A[Sovereign Boot Engine] --> | Attestation | B(Security Engine)
@@ -13,8 +12,6 @@ graph TD
     C --> | Dilithium-5 | E[Package Signatures]
     D --> F[Memory Isolation Enforcer]
     F --> G[Zero-Data Remanence Wiper]
-
-
 
 ```
 
@@ -30,14 +27,11 @@ graph TD
 
 All cryptographic primitives are strictly validated during the CI/CD pipeline using standard test vectors to prevent mathematical regressions.
 
-
 ```cpp
 sigma_status status = pq_encrypt(data, size, out_buffer);
 if (status != SIGMA_OK) {
     sigma_log_error("[S-SEC] FATAL: Cryptographic violation detected. Halting execution.");
     // Hardware halt triggered
 }
-
-
 
 ```

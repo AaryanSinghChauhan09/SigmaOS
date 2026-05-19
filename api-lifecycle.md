@@ -10,7 +10,6 @@ An Undici [Client](/docs/docs/api/Client.md) can be best described as a state ma
 
 A state diagram representing an Undici Client instance:
 
-
 ```mermaid
 stateDiagram-v2
   [*] --> idle
@@ -41,8 +40,6 @@ stateDiagram-v2
       running --> [*] : keepalive
       closing --> [*] : done
   }
-
-
 
 ```
 

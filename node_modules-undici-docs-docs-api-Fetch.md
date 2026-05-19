@@ -50,7 +50,6 @@ There is an ongoing discussion regarding `.formData()` and its usefulness and pe
 
 These libraries can be interfaced with fetch with the following example code:
 
-
 ```mjs
 import { Busboy } from '@fastify/busboy'
 import { Readable } from 'node:stream'
@@ -63,7 +62,5 @@ const busboy = new Busboy({
 })
 
 Readable.fromWeb(response.body).pipe(busboy)
-
-
 
 ```

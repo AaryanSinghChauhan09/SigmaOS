@@ -4,11 +4,17 @@
 
 ---
 
-## Unit I: Set Theory & Progression
+## Unit I: Set Theory, Combinatorics & Progression
 
-### Set Theory
+### Set Theory & Foundations
 
-**Syllabus:**Basic concepts, union, intersection, complement, De Morgan's laws, Cartesian products, power sets.**SigmaOS Implementation:** `SovereignSetEngine` — a kernel-resident set operations library used by process scheduling, access control, and SigmaDB.
+Discrete Mathematics provides the absolute theoretical backbone for all computing disciplines. In sovereign operating systems, set theory governs process capability boundaries, memory segmentation lattices, and relational database joins.
+
+**Unique Selling Point (USP):** Provides the theoretical backbone for all computing disciplines, establishing rigorous mathematical proofs for kernel stability and algorithmic correctness.
+
+**Syllabus:** Basic concepts, union, intersection, complement, De Morgan's laws, Cartesian products, power sets.
+
+**SigmaOS Implementation:** `SovereignSetEngine` — a kernel-resident set operations library used by process scheduling, access control, and SigmaDB.
 
 ```cpp
 // kernel/math/SovereignSetEngine.h
@@ -34,19 +40,17 @@ public:
     // Power set: 2^A
     SovereignSet<SovereignSet<T>> power_set() const;
 };
+```
 
-```text
+### Combinatorics & Counting Principles
 
-### OS Applications
-- Process capability sets (Linux-like capabilities as sets)
-- Permission sets in MAC (Mandatory Access Control)
-- SigmaDB JOIN operations modeled as set intersections
+Combinatorics analyzes the enumeration, combination, and permutation of discrete structures.
 
----
+* **Rule of Product & Sum:** Fundamental counting principles calculating total execution paths across branched system states.
+* **Permutations ($P(n,r)$) & Combinations ($C(n,r)$):** Evaluates cryptographic key space arrangements and thread scheduling permutations.
+* **Pigeonhole Principle:** If $n+1$ items are placed into $n$ containers, at least one container must contain $\ge 2$ items. Used to mathematically prove hash table collision rates and cache thrashing boundaries.
 
 ### Arithmetic & Geometric Progression
-
-**Syllabus:**AP/GP sequences, series, AM-GM-HM relations, sum formulas.**SigmaOS Implementation:** `SovereignSequence` — used in memory allocation patterns, scheduler time-slice progression, and SigmaStats.
 
 ```cpp
 // kernel/math/SovereignSequence.h
@@ -66,21 +70,36 @@ namespace Sigma::Math {
     double harmonic_mean(double a, double b);
     // AM ≥ GM ≥ HM (always holds for positive numbers)
 }
-
-```text
-
-### OS Applications
-- Memory allocator uses GP doubling (1 → 2 → 4 → 8 pages)
-- Exponential backoff in network retries
-- SigmaStats central tendency calculations
+```
 
 ---
 
-## Unit II: Matrices & Determinants
+## Unit II: Graph Theory, Matrices & Determinants
+
+### Graph Theory Foundations
+
+Graph theory models pairwise relations between discrete objects using vertices ($V$) and edges ($E$).
+
+* **Directed & Undirected Graphs:** Represents process dependency trees, network routing topologies, and deadlock wait-for graphs.
+* **Graph Algorithms:** Integrates core searching and traversal primitives directly into the VFS and network routing shards:
+  * **Breadth-First Search (BFS) & Depth-First Search (DFS):** Traverses hierarchical filesystem structures and AST dependency trees.
+  * **Dijkstra's Shortest Path Algorithm:** Calculates minimum-latency network routing paths across active TCP/IP socket nodes.
+
+```cpp
+// kernel/math/SovereignGraph.h
+template<typename Vertex, typename Weight>
+class SovereignGraph {
+public:
+    void add_vertex(Vertex v);
+    void add_edge(Vertex source, Vertex dest, Weight weight);
+
+    std::vector<Vertex> breadth_first_search(Vertex start);
+    std::vector<Vertex> depth_first_search(Vertex start);
+    std::map<Vertex, Weight> dijkstra_shortest_path(Vertex start);
+};
+```
 
 ### Matrix Operations
-
-**Syllabus:**Types (square, identity, diagonal, sparse, triangular), transpose, addition, multiplication, inverse.**SigmaOS Implementation:** `SovereignMatrix` — linear algebra engine for SigmaAI and SigmaStats.
 
 ```cpp
 // kernel/math/SovereignMatrix.h
@@ -102,20 +121,14 @@ public:
     SovereignMatrix<T, Rows, Cols> scalar_multiply(T scalar) const;
 
     template<size_t OtherCols>
-    SovereignMatrix<T, Rows, OtherCols> multiply(
-        const SovereignMatrix<T, Cols, OtherCols>& other) const;
+    SovereignMatrix<T, Rows, OtherCols> multiply(const SovereignMatrix<T, Cols, OtherCols>& other) const;
 
     // Inverse (for square matrices)
     SovereignMatrix<T, Rows, Cols> inverse() const;  // Gauss-Jordan elimination
 };
-
-```text
-
----
+```
 
 ### Determinants & Cramer's Method
-
-**Syllabus:** Properties of determinants, cofactor expansion, Cramer's rule for linear systems.
 
 ```cpp
 // kernel/math/SovereignDeterminant.h
@@ -127,21 +140,13 @@ namespace Sigma::Math {
     // Cramer's Rule: Ax = b → x_i = det(A_i) / det(A)
     std::vector<double> cramers_rule(double** A, double* b, int n);
 }
-
-```text
-
-### OS Applications
-- `SigmaAI` uses matrix multiplication for neural network forward passes
-- `SigmaStats` regression uses matrix inverse for least-squares solution
-- `SigmaModeler` ER diagram layout uses graph Laplacian matrices
+```
 
 ---
 
 ## Unit III: Propositional & Predicate Logic
 
 ### Propositional Logic
-
-**Syllabus:**Truth values, logical connectives (AND, OR, NOT, XOR, IMPLICATION, BICONDITIONAL), truth tables, tautologies, contradictions, logical equivalences.**SigmaOS Implementation:** `SovereignRuleEngine` — powers the compliance dashboard and access policy evaluator.
 
 ```cpp
 // kernel/logic/SovereignRuleEngine.h
@@ -172,19 +177,9 @@ public:
     bool are_equivalent(Proposition* p, Proposition* q);
     std::vector<std::map<std::string, bool>> truth_table(Proposition* p);
 };
-
-```text
-
-### OS Applications
-- Security policy: `IF user.role == "admin" AND file.sensitive == true THEN require_mfa`
-- SigmaDB WHERE clause parsing using propositional logic AST
-- Kernel capability checks: conjunction of permissions
-
----
+```
 
 ### Predicate Logic
-
-**Syllabus:** Predicates, quantifiers (∀, ∃), free and bound variables, logical inference.
 
 ```cpp
 // kernel/logic/SovereignPredicateEngine.h
@@ -201,21 +196,13 @@ public:
     // Free variables: appear unbound in formula
     // Bound variables: quantified by ∀ or ∃
 };
-
-```text
-
-### OS Applications
-- SigmaDB: `SELECT * FROM files WHERE ∀ permission IN required: user HAS permission`
-- Kernel verification: ∀ syscall: privilege_level ≥ required_ring
-- SigmaLegalAI: predicate-based case law matching
+```
 
 ---
 
 ## Unit IV: Relations & Functions
 
 ### Functions
-
-**Syllabus:** Definition, domain/range/codomain, injective, surjective, bijective, composition, inverse, pigeonhole principle.
 
 ```cpp
 // kernel/math/SovereignFunction.h
@@ -239,14 +226,9 @@ public:
 // Pigeonhole Principle: n+1 items into n holes → at least 1 hole has ≥ 2 items
 // Used in: hash collision analysis, scheduling conflict detection
 int pigeonhole_min_collisions(int items, int buckets);
-
-```text
-
----
+```
 
 ### Relations
-
-**Syllabus:** Properties (reflexive, symmetric, antisymmetric, transitive), equivalence relations, partial orders, composite relations.
 
 ```cpp
 // kernel/math/SovereignRelation.h
@@ -271,13 +253,20 @@ public:
     // Transitive closure (Warshall's algorithm)
     SovereignRelation<T> transitive_closure(const std::set<T>& domain) const;
 };
+```
 
-```text
+---
 
-### OS Applications
-- Process dependency graph: transitive closure determines deadlock detection
-- File system permissions: partial order on privilege levels
-- SigmaDB: equivalence relations for duplicate detection and normalization
+## Debugging & Problem-Solving in Discrete Mathematics
+
+### Common Issues & Fix Strategies
+
+* **Issue - Algorithmic Complexity in Graph Traversals:** Unoptimized adjacency matrix scans yield $O(n^2)$ complexity, stalling network routing and deadlock detection.
+  * *Fix Strategy:* Optimize complexity by replacing adjacency matrices with adjacency lists and Fibonacci heap priority queues, reducing Dijkstra's shortest path calculations from $O(V^2)$ to $O(E + V \log V)$.
+* **Issue - Deadlocks in Resource Allocation Graphs:** Circular wait dependencies between concurrent processes stall kernel execution.
+  * *Fix Strategy:* Model process allocations as directed graphs, executing cycle detection via Tarjan's strongly connected components algorithm or topological sorting to break circular wait loops.
+* **Issue - Logical Fallacies in Rule Engines:** Incorrect predicate quantifier ordering ($\forall \exists$ vs $\exists \forall$) or flawed De Morgan expansions cause security policy bypasses.
+  * *Fix Strategy:* Implement formal automated theorem proving and AST truth-table verification to guarantee tautological correctness across all policy branches.
 
 ---
 
@@ -290,4 +279,4 @@ public:
 
 ---
 
-*Last updated: 2026-05-18 | SigmaOS Zenith v15.1*
+*Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

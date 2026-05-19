@@ -8,14 +8,11 @@ This document establishes the official engineering roadmap for performance scali
 
 To maintain undisputed superiority over monolithic operating systems, SigmaOS must continuously optimize its low-level algorithms. This plan outlines targeted performance optimizations, zero-copy abstractions, and post-quantum cryptographic speedups to scale the 600-shard mesh to maximum throughput.
 
-
 ```mermaid
 graph LR
     A[S-MM Slab Allocator] --> | Lock-Free Bitmaps | B[O1 Slab Compaction]
     C[Storage Block Layer] --> | Direct IO Passthrough | D[Zero-Copy Buffer Cache]
     E[GPU Shader Core] --> | Multi-Queue Pools | F[Vulkan Ring Buffering]
-
-
 ```
 
 ---
@@ -54,12 +51,12 @@ graph LR
 
 ## 6. Unified API Expansion Roadmap
 
-| Phase | Target Subsystem | Improvement Feature | Expected Benefit | 
-| :--- | :--- | :--- | :--- | 
-| **Phase I** | `SovereignBoot` | Async concurrent shard ignition | Reduces boot times to under 400 milliseconds | 
-| **Phase II** | `SovereignVideo` | SIMD-accelerated non-linear edits | 4x faster HEVC transcode operations | 
-| **Phase III** | `SovereignCloudFS` | Encrypted multi-node block syncing | Zero-overhead distributed replication | 
-| **Phase IV** | `S-ERA / S-CCF` | High-performance batch auditing | Real-time analysis for corporate registers | 
+| Phase | Target Subsystem | Improvement Feature | Expected Benefit |
+| :--- | :--- | :--- | :--- |
+| **Phase I** | `SovereignBoot` | Async concurrent shard ignition | Reduces boot times to under 400 milliseconds |
+| **Phase II** | `SovereignVideo` | SIMD-accelerated non-linear edits | 4x faster HEVC transcode operations |
+| **Phase III** | `SovereignCloudFS` | Encrypted multi-node block syncing | Zero-overhead distributed replication |
+| **Phase IV** | `S-ERA / S-CCF` | High-performance batch auditing | Real-time analysis for corporate registers |
 
 ---
 

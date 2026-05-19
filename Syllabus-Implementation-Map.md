@@ -49,6 +49,7 @@
 ## 🔗 Quick Reference: Syllabus Unit → SigmaOS Feature
 
 ### Fundamentals of Computers & IT
+
 | Syllabus Topic | SigmaOS Feature | File/Module |
 | --- | --- | --- |
 | Number Systems & Base Conversion | `sigma_codec` encoding module | `kernel/core/sigma_codec.h` |
@@ -65,6 +66,7 @@
 | Office Automation | SigmaDocs / Sheets / Slides / DB | `userland/apps/` |
 
 ### Discrete Mathematics
+
 | Syllabus Topic | SigmaOS Feature | Module |
 | --- | --- | --- |
 | Set Theory | `SovereignSetEngine` — data structure lib | `kernel/math/SovereignSetEngine.cpp` |
@@ -74,6 +76,7 @@
 | Relations & Functions | Graph engine for data modeling | `kernel/math/SovereignGraph.cpp` |
 
 ### C / C++ Programming
+
 | Syllabus Topic | SigmaOS Feature | Module |
 | --- | --- | --- |
 | Pointers / Memory | Kernel pointer safety wrappers | `kernel/core/SovereignAllocator.cpp` |
@@ -84,6 +87,7 @@
 | STL / Templates | Sovereign template library | `kernel/core/sigma_kernel_types.h` |
 
 ### RDBMS / SQL / PL/SQL
+
 | Syllabus Topic | SigmaOS Feature | Module |
 | --- | --- | --- |
 | SQL DDL/DML | SigmaDB SQL engine | `userland/apps/SigmaDB/sql_engine.cpp` |
@@ -93,6 +97,7 @@
 | RDBMS Normalization | Schema validator | `userland/apps/SigmaDB/normalizer.cpp` |
 
 ### Statistics & Data Science
+
 | Syllabus Topic | SigmaOS Feature | Module |
 | --- | --- | --- |
 | Central Tendency | `SigmaStats::mean/median/mode()` | `userland/apps/SigmaStats/` |
@@ -102,6 +107,7 @@
 | Probability | `SigmaMath::ProbabilityEngine` | `kernel/math/` |
 
 ### AI & ML
+
 | Syllabus Topic | SigmaOS Feature | Module |
 | --- | --- | --- |
 | Classification / Clustering | `SigmaAI::SKLearnRuntime` | `userland/apps/SigmaAI/` |
