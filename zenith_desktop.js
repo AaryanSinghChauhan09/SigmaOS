@@ -17,6 +17,19 @@ const InputValidator = {
     sanitize: (str, max = 1000) => (typeof str === 'string' ? str.slice(0, max).trim() : '')
 };
 
+function escapeHtml(text) {
+    return typeof text === 'string' ? text.replace(/[&<>"']/g, function(m) {
+        switch (m) {
+            case '&': return '&amp;';
+            case '<': return '&lt;';
+            case '>': return '&gt;';
+            case '"': return '&quot;';
+            case "'": return '&#039;';
+            default: return m;
+        }
+    }) : '';
+}
+
 class NeuralLayoutEngine {
     constructor() {
         this.interactions = {};
@@ -235,6 +248,7 @@ window.addLog = (text, type = '') => {
 };
 
         // Marketplace Logic (Integrated with DAL)
+        const installedShards = new Set();
         function installShard(name) {
             try {
                 if (installedShards.has(name)) {
@@ -305,7 +319,7 @@ window.addLog = (text, type = '') => {
             const urlInput = document.getElementById('status-url');
             const output = document.getElementById('status-output');
             if (!urlInput || !output) return;
-            const url = InputValidator.sanitizeInput(urlInput.value);
+            const url = InputValidator.sanitize(urlInput.value);
             if (!url || !InputValidator.isValidURL(url)) {
                 output.textContent = '❌ Invalid URL format';
                 output.style.color = 'var(--error)';
@@ -736,8 +750,8 @@ function initFileManager() {
 }
 
 // Update existing launchApp to handle new windows
-const originalLaunchApp = launchApp;
-launchApp = function(app) {
+const originalLaunchApp = window.launchApp;
+window.launchApp = function(app) {
     if (app === 'OmniShell' || app === 'OmniShell v5.1') {
         openWindow('terminal-win');
     } else if (app === 'File Manager' || app === '📂') {
