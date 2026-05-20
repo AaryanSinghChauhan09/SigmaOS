@@ -148,6 +148,8 @@
 
 ## 📅 Roadmap & Future
 
+- [Sovereign Launch & Expansion Roadmap](SigmaOS-Development-Roadmap-and-Architecture)
+
 - [Contributor Roadmap](CONTRIBUTOR_ROADMAP)
 
 - [Industrial Release Notes](CHANGELOG)

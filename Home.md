@@ -19,6 +19,7 @@ Welcome to the **SigmaOS Zenith v15.2** knowledge base. SigmaOS is an industrial
 | [Onboarding Guide](Onboarding_Guide) | Build instructions and coding standards |
 | [Problems](Problems) | Bug ledger and resolution log |
 | [Improvements Inspired by Linux Distros](SigmaOS-Improvements-Inspired-by-Linux-Distros) | Layered OS maturity roadmap and multi-distro strategic synthesis |
+| [Sovereign Launch & Expansion Roadmap](SigmaOS-Development-Roadmap-and-Architecture) | Industrial development roadmap and architecture specification mapping key branches |
 | [RFC Template](RFC_Template) | Proposal format for new subsystem features |
 
 ---
