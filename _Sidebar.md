@@ -144,6 +144,8 @@
 
 - [Niche Parity Certification](Niche-Parity-Certification)
 
+- [Improvements Inspired by Linux Distros](SigmaOS-Improvements-Inspired-by-Linux-Distros)
+
 ## 📅 Roadmap & Future
 
 - [Contributor Roadmap](CONTRIBUTOR_ROADMAP)
