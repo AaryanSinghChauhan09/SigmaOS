@@ -1,8 +1,6 @@
 # Shard-Orchestration
 
-1
 
-1
 
 Every shard in the SigmaOS lattice follows a strict lifecycle managed by the **Sovereign Init Manager**:
 
@@ -16,13 +14,10 @@ Every shard in the SigmaOS lattice follows a strict lifecycle managed by the **S
 
 5. **Dormant/Hibernated**: Resources reclaimed for power efficiency.
 
-1
 
 The **Sovereign-Fair Scheduler (SFS)** uses machine learning to predict shard resource needs.
 
-1
 
-1
 
 If a shard enters a **FAILED** state:
 

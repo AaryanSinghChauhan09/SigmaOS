@@ -8,7 +8,7 @@
 
 ## 🏛️ Core Concepts
 
-- [Industrial Roadmap](ROADMAP.md)
+- [Industrial Roadmap](ROADMAP)
 
 - [Architecture](Architecture)
 
@@ -194,7 +194,7 @@
 
 - [Embedded Hardware Compatibility](Embedded-Hardware-Compatibility)
 
-- [Performance Benchmarks](PERFORMANCE.md)
+- [Performance Benchmarks](PERFORMANCE)
 
 ---
 

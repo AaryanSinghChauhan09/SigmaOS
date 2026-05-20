@@ -18,7 +18,6 @@
 
     style L10 fill:#f96,stroke:#333,stroke-width:4px
     style L9 fill:#fcf,stroke:#333,stroke-width:4px
-1 1
 
 1. **Hardware Abstraction (HAL)**: Direct silicon interfaces (NVMe, USB, VGA).
 
@@ -42,26 +41,17 @@
 
 ---
 1 The Nexus layer (S100) aggregates and enhances the USPs of the world's leading enterprise suites:
-1 1
-1 1
-1 1
-1 1
 
 ---
-1 1
 
 SHS merges the **stability of Fedora's CFS**with the**priority-based preemptive scheduling of Windows**.
 
-1 1
-1 1
 
 Combines **openSUSE Snapper-style CoW snapshots**with**Windows-style System Restore checkpoints**, allowing for absolute state recovery at any lattice layer.
 
 1 All Inter-Shard communication in v11.0 is **Zero-Trust**. Every packet is:
-1 1
 
 ---
-1 1
 
 SigmaOS implements a **Fast Startup**mechanism inspired by Windows. At shutdown, the kernel state and critical driver shards are serialized to a silicon-direct snapshot. During boot, the system bypasses traditional hardware re-init, restoring the lattice in**under 0.8s**.
 
@@ -86,16 +76,11 @@ SigmaOS implements a **Fast Startup**mechanism inspired by Windows. At shutdown,
 
 1 The **HAL** (S04) implements plug-and-play detection. Drivers are loaded as atomic shards. Fallback drivers ensure basic I/O availability.
 
-1 1
 
 Inspired by the Windows Registry but reimagined for sovereignty, the **Sovereign Registry** is a centralized, hierarchical configuration lattice.
 
-1 1
 
 ---
-1 1
-1 1
-1 1
 1 1. **Usability First**: Zenith Compositor + `sigma-pkg`.
 
 1. **Security Next**: TPM Attestation + PQC Encryption.

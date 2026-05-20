@@ -1,6 +1,5 @@
 # DEPENDENCY POLICY
 
-1
 
 // =============================================================================
 // SigmaOS  DEPENDENCY PURITY POLICY
@@ -15,25 +14,19 @@
 
 ALLOWED LANGUAGES (kernel):
 
-1
 
-1
 
 ALLOWED LANGUAGES (userland tools  in tools/):
 
-1
 
 FORBIDDEN IN KERNEL SUITES (S01S10):
 
-1
 
                  is isolated to S02_ZenithUI and must have a native path
 
-1
 
 ALLOWED EXTERNAL DEPS (vendored only, no network fetch):
 
-1
 
 MIGRATION STATUS:
   ? sovereign_audit.c        ? replaces global_integrated_audit.py [COMPLETED]

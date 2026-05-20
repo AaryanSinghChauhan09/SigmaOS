@@ -2,7 +2,7 @@
 
 Extends: `undici.Dispatcher`
 
-A pool of [Pool](/docs/docs/api/Pool.md) instances connected to multiple upstreams.
+A pool of [Pool](/docs/docs/api/Pool) instances connected to multiple upstreams.
 
 Requests are not guaranteed to be dispatched in order of invocation.
 
@@ -38,7 +38,7 @@ Implements [Client.destroyed](/docs/docs/api/Client.md#clientdestroyed)
 
 ### `Pool.stats`
 
-Returns [`PoolStats`](/docs/docs/api/PoolStats.md) instance for this pool.
+Returns [`PoolStats`](/docs/docs/api/PoolStats) instance for this pool.
 
 ## Instance Methods
 

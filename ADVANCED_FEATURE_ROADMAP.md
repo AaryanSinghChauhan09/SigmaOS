@@ -1,14 +1,6 @@
 # ADVANCED FEATURE ROADMAP
 
 1 This document outlines the extensive strategic roadmap for automation, customization, and industrial UX/UI integration for the SigmaOS Sovereign Lattice.
-1 1
-1 1
-1 1
-1 1
-1 1
-1 1
-1 1
-1 1
 
 1. **Phase 1: Foundation**: Theme engine overhaul, Settings Hub redesign, Unified Search.
 
@@ -18,4 +10,3 @@
 
 ---
 
-1

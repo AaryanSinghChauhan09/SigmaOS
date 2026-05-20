@@ -1,20 +1,16 @@
 # Sovereign Journal Shard
 
-1
 
 **Parity:**systemd-journal � syslog � Windows Event Log � macOS ASL**Location:**`kernel/modules/core/SovereignJournalShard.c`**Standard:** Zenith Industrial Sovereignty v1.0
 
 ---
 
-1
 
 The Sovereign Journal Shard provides native, zero-dependency structured kernel event logging for SigmaOS. It absorbs the systemd-journal, syslog, and Windows Event Log USPs by implementing a lock-free circular ring buffer with 8-level priority filtering, ANSI-coloured severity output, and `journalctl -f`-style streaming.
 
 ---
 
-1
 
-1
 
 Ring Buffer: 64 entries (circular, auto-overwrite oldest)
   Entry: seq | timestamp_us | level | unit | message
@@ -28,11 +24,9 @@ Boot Entries (pre-seeded):
   [INFO]    sigma_tele     "eBPF probes seated."
   [WARNING] sigma_oom      "Memory pressure elevated at boot."
 
-1
 
 ---
 
-1
 
 | Sub-command | Action | 
 | --- | --- | 
@@ -42,14 +36,10 @@ Boot Entries (pre-seeded):
 
 ---
 
-1
 
-1
 
-1
 
 ---
 
-1
 
 `GLOBAL MESH ACTIVE` � Synchronized with `AaryanSinghChauhan09/SigmaOS`.

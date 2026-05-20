@@ -4,4 +4,4 @@
 
 <!-- end auto-generated rule header -->
 
-More information: [Regular Expression DoS and Node.js](../regular-expression-dos-and-node.md)
+More information: [Regular Expression DoS and Node.js](../regular-expression-dos-and-node)

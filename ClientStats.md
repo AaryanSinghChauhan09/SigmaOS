@@ -1,6 +1,6 @@
 # Class: ClientStats
 
-Stats for a [Client](/docs/docs/api/Client.md).
+Stats for a [Client](/docs/docs/api/Client).
 
 ## `new ClientStats(client)`
 

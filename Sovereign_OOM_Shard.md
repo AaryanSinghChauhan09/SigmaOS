@@ -1,20 +1,16 @@
 # Sovereign OOM Shard
 
-1
 
 **Parity:**Linux OOM Killer � macOS Jetsam � Android LMKD**Location:**`kernel/modules/system/SovereignOOMShard.c`**Standard:** Zenith Industrial Sovereignty v1.0
 
 ---
 
-1
 
 The Sovereign OOM Shard provides native, zero-dependency memory-pressure governance for SigmaOS. It absorbs the Linux OOM Killer and macOS Jetsam USPs by providing score-based mission culling under configurable thresholds, with guaranteed protection for kernel-critical shards.
 
 ---
 
-1
 
-1
 
 OOM Score Table (24 entries max)
   sigma_kernel_core   PID:1  score:-500  [PROTECTED]   ? never culled
@@ -26,11 +22,9 @@ Thresholds:
   WARN     < 512 MB free � sweep with logging
   CRITICAL < 128 MB free � aggressive cull, highest-score victim selected
 
-1
 
 ---
 
-1
 
 | Sub-command | Action | 
 | --- | --- | 
@@ -40,14 +34,10 @@ Thresholds:
 
 ---
 
-1
 
-1
 
-1
 
 ---
 
-1
 
 `GLOBAL MESH ACTIVE` � Synchronized with `AaryanSinghChauhan09/SigmaOS`.

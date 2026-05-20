@@ -10,7 +10,7 @@ Arguments:
 
 - **url** `URL | string`
 
-- **protocol** `string | string[] | WebSocketInit` (optional) - Subprotocol(s) to request the server use, or a [`Dispatcher`](/docs/docs/api/Dispatcher.md).
+- **protocol** `string | string[] | WebSocketInit` (optional) - Subprotocol(s) to request the server use, or a [`Dispatcher`](/docs/docs/api/Dispatcher).
 
 ### WebSocketInit
 
@@ -18,7 +18,7 @@ When passing an object as the second argument, the following options are availab
 
 - **protocols** `string | string[]` (optional) - Subprotocol(s) to request the server use.
 
-- **dispatcher** `Dispatcher` (optional) - A custom [`Dispatcher`](/docs/docs/api/Dispatcher.md) to use for the connection.
+- **dispatcher** `Dispatcher` (optional) - A custom [`Dispatcher`](/docs/docs/api/Dispatcher) to use for the connection.
 
 - **headers** `HeadersInit` (optional) - Custom headers to include in the WebSocket handshake request.
 

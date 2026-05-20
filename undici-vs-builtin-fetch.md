@@ -61,7 +61,7 @@ await fetch('https://example.com', {
 ### `undici.install()` globals
 
 If you want the installed `undici` package to provide the globals, call
-[`install()`](/docs/api/GlobalInstallation.md):
+[`install()`](/docs/api/GlobalInstallation):
 
 ```js
 import { install } from 'undici'
@@ -226,7 +226,7 @@ You can always check the exact bundled version at runtime with
 
 Installing undici from npm does not replace the built-in globals. If you want
 your installed version to replace the global `fetch` and related classes, use
-[`install()`](/docs/api/GlobalInstallation.md). Otherwise, import `fetch`
+[`install()`](/docs/api/GlobalInstallation). Otherwise, import `fetch`
 directly from `'undici'`:
 
 ```js
@@ -236,14 +236,14 @@ import { fetch } from 'undici' // uses your installed version, not the built-in
 
 ## Further reading
 
-- [API Reference: Fetch](/docs/api/Fetch.md)
+- [API Reference: Fetch](/docs/api/Fetch)
 
-- [API Reference: Client](/docs/api/Client.md)
+- [API Reference: Client](/docs/api/Client)
 
-- [API Reference: Pool](/docs/api/Pool.md)
+- [API Reference: Pool](/docs/api/Pool)
 
-- [API Reference: ProxyAgent](/docs/api/ProxyAgent.md)
+- [API Reference: ProxyAgent](/docs/api/ProxyAgent)
 
-- [API Reference: MockAgent](/docs/api/MockAgent.md)
+- [API Reference: MockAgent](/docs/api/MockAgent)
 
-- [API Reference: Global Installation](/docs/api/GlobalInstallation.md)
+- [API Reference: Global Installation](/docs/api/GlobalInstallation)

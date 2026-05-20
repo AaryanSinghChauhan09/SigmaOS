@@ -98,12 +98,12 @@ All conflict resolutions were auto-handled via the `-X theirs` merge driver, and
 
 We redesigned the wiki repository:
 
-* **State Persistence Specs**: [Sovereign_LBU.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Sovereign_LBU.md)
+* **State Persistence Specs**: [Sovereign_LBU.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Sovereign_LBU)
   * Detailed the design specifications, cold-boot restore triggers, and CLI dashboard commands.
-* **Overlay FS Specifications**: [Sovereign_OverlayFS.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Sovereign_OverlayFS.md)
+* **Overlay FS Specifications**: [Sovereign_OverlayFS.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Sovereign_OverlayFS)
   * Wrote complete specifications, copy-up-on-write diagrams, and subcommands list.
-* **Storage Pooling Guide**: [Sovereign_ZFS_Pool.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Sovereign_ZFS_Pool.md)
+* **Storage Pooling Guide**: [Sovereign_ZFS_Pool.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Sovereign_ZFS_Pool)
   * Wrote complete architectural specifications, parity grids, and mermaid striping diagrams.
-* **Cgroup Specifications**: [Sovereign_Cgroup_Shard.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Sovereign_Cgroup_Shard.md)
+* **Cgroup Specifications**: [Sovereign_Cgroup_Shard.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Sovereign_Cgroup_Shard)
   * Redesigned to show O(1) scheduling governors and cgroup allocation matrices.
-* **Gap & USP Logs**: Rewrote [Competitive_Gaps_Analysis.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Competitive_Gaps_Analysis.md) and [Ideas-Implemented.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Ideas-Implemented.md) to purge duplicate manifests and template placeholders.
+* **Gap & USP Logs**: Rewrote [Competitive_Gaps_Analysis.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Competitive_Gaps_Analysis) and [Ideas-Implemented.md](file:///c:/Users/Aaryan/.gemini/antigravity/scratch/SigmaOS/wiki_repo/Ideas-Implemented) to purge duplicate manifests and template placeholders.

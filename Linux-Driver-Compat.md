@@ -34,7 +34,6 @@ SigmaOS's wrapper is tested against kernel drivers packaged for:
 
 To load a Linux driver manually into the lattice:
 
-1
 
 linux_compat_load("/lib/modules/linux_driver.ko");
 

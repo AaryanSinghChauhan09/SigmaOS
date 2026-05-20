@@ -2,7 +2,7 @@
 
 Extends: `undici.Dispatcher`
 
-A pool of [Client](/docs/docs/api/Client.md) instances connected to the same upstream target.
+A pool of [Client](/docs/docs/api/Client) instances connected to the same upstream target.
 
 Requests are not guaranteed to be dispatched in order of invocation.
 
@@ -36,7 +36,7 @@ Implements [Client.destroyed](/docs/docs/api/Client.md#clientdestroyed)
 
 ### `Pool.stats`
 
-Returns [`PoolStats`](PoolStats.md) instance for this pool.
+Returns [`PoolStats`](PoolStats) instance for this pool.
 
 ## Instance Methods
 

@@ -1,10 +1,8 @@
 # SigmaOS 1000 ITEM BACKLOG
 
-1
 
 This backlog expands the foundational "Distro Mastery" categories into thousands of actionable technical shards, documentation tasks, and community milestones.
 
-1
 
 1. **ABI-001**: Implement `kmalloc` / `kfree` shims for Linux compatibility. [Operational]
 
@@ -40,7 +38,6 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 
 17. **ABI-003**: Implement `musl` libc shims for Alpine-level minimalism. [Operational]
 
-1
 
 1. **PKG-001**: Implement `sigma-pkg` dependency graph resolver. [Operational]
 
@@ -56,7 +53,6 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 
 7. **PKG-004**: Implement `SovereignBusyBox` multi-call utility shard. [Operational]
 
-1
 
 1. **FHS-001**: Symlink `/usr/bin` to Sovereign binary lattice. [Operational]
 
@@ -70,7 +66,6 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 
 6. **WM-001**: Implement tiling layout engine (i3/sway style) in Zenith.
 
-1
 
 1. **SEC-001**: Audit `SovereignPQC` Kyber implementation vs NIST FIPS-203. [Operational]
 
@@ -96,7 +91,6 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 
 12. **CLAW-004**: Implement Sovereign Agent Quotas Extended (AI Scalability). [Operational]
 
-1
 
 1. **K8S-001**: Implement `SovereignKubelet` shim. [Operational]
 
@@ -128,4 +122,3 @@ This backlog expands the foundational "Distro Mastery" categories into thousands
 
 ---
 
-1

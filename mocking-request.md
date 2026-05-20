@@ -1,6 +1,6 @@
 # Mocking Request
 
-Undici has its own mocking [utility](/docs/docs/api/MockAgent.md). It allow us to intercept undici HTTP requests and return mocked values instead. It can be useful for testing purposes.
+Undici has its own mocking [utility](/docs/docs/api/MockAgent). It allow us to intercept undici HTTP requests and return mocked values instead. It can be useful for testing purposes.
 
 Example:
 
@@ -75,7 +75,7 @@ assert.deepEqual(badRequest, { message: 'bank account not found' })
 
 ```
 
-Explore other MockAgent functionality [here](/docs/docs/api/MockAgent.md)
+Explore other MockAgent functionality [here](/docs/docs/api/MockAgent)
 
 ## Access agent call history
 
@@ -126,11 +126,11 @@ assert.ok(mockAgent.getCallHistory()?.calls().length === 0)
 
 Calling `mockAgent.close()` will automatically clear and delete every call history for you.
 
-Explore other MockAgent functionality [here](/docs/docs/api/MockAgent.md)
+Explore other MockAgent functionality [here](/docs/docs/api/MockAgent)
 
-Explore other MockCallHistory functionality [here](/docs/docs/api/MockCallHistory.md)
+Explore other MockCallHistory functionality [here](/docs/docs/api/MockCallHistory)
 
-Explore other MockCallHistoryLog functionality [here](/docs/docs/api/MockCallHistoryLog.md)
+Explore other MockCallHistoryLog functionality [here](/docs/docs/api/MockCallHistoryLog)
 
 ## Debug Mock Value
 

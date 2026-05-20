@@ -1039,7 +1039,7 @@ await client.request({ path: '/', method: 'GET' })
 
 The `redirect` interceptor allows you to customize the way your dispatcher handles redirects.
 
-It accepts the same arguments as the [`RedirectHandler` constructor](/docs/docs/api/RedirectHandler.md).
+It accepts the same arguments as the [`RedirectHandler` constructor](/docs/docs/api/RedirectHandler).
 
 ### Example - Basic Redirect Interceptor
 
@@ -1058,7 +1058,7 @@ client.request({ path: "/" })
 
 The `retry` interceptor allows you to customize the way your dispatcher handles retries.
 
-It accepts the same arguments as the [`RetryHandler` constructor](/docs/docs/api/RetryHandler.md).
+It accepts the same arguments as the [`RetryHandler` constructor](/docs/docs/api/RetryHandler).
 
 ### Example - Basic Redirect Interceptor
 
@@ -1331,7 +1331,7 @@ The `cache` interceptor implements client-side response caching as described in
 
 ### Options
 
-- `store` - The [`CacheStore`](/docs/docs/api/CacheStore.md) to store and retrieve responses from. Default is [`MemoryCacheStore`](/docs/docs/api/CacheStore.md#memorycachestore).
+- `store` - The [`CacheStore`](/docs/docs/api/CacheStore) to store and retrieve responses from. Default is [`MemoryCacheStore`](/docs/docs/api/CacheStore.md#memorycachestore).
 
 - `methods` - The [**safe** HTTP methods](https://www.rfc-editor.org/rfc/rfc9110#section-9.2.1) to cache the response of.
 

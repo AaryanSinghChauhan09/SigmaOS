@@ -1,11 +1,6 @@
 # OPTIONAL SHARDS
 
-1
 
-1
 
-1
 
-1
 
-1
