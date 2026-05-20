@@ -23,3 +23,7 @@ userland
 networking
 node_modules/.vite
 
+
+# Wiki folders
+wiki_repo/
+wiki_temp/
