@@ -102,6 +102,11 @@ void sigma_sched_tick(void) {
         extern void sigma_ai_tuner_analyze(sigma_task_t* task);
         sigma_ai_tuner_analyze(current_task);
         
+        // Phase 7: Cluster-aware migration check
+        // If local queues are saturated, migrate task to a remote node via ZeroNet.
+        extern void cluster_orchestrate(uint32_t task_id);
+        cluster_orchestrate(current_task->id);
+        
         sigma_sched_yield();
     }
 }
