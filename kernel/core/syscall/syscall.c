@@ -273,12 +273,18 @@ static const syscall_fn_t g_syscall_table[SIGMA_NSYSCALLS] = {
  * ========================================================================= */
 static sigma_u64 g_syscall_count = 0;
 
-void syscall_handler(SigmaInterruptFrame* frame) {
-    sigma_u64 sysno = frame->rax;
+void sigma_syscall_handler(SigmaInterruptFrame* f) {
+    if (!f) return;
+    
+    // Anti-eBPF: Zero-Overhead Native Syscall Tracing (The Panopticon)
+    extern void forensic_matrix_syscall_hook(int sysno, unsigned long rdi);
+    forensic_matrix_syscall_hook((int)f->rax, f->rdi);
+
+    sigma_u64 sysno = f->rax;
     sigma_i64 result;
 
     if (sysno < SIGMA_NSYSCALLS && g_syscall_table[sysno]) {
-        result = g_syscall_table[sysno](frame);
+        result = g_syscall_table[sysno](f);
     } else {
         ksigma_printf("[SYSCALL]: Invalid syscall #%llu\n", sysno);
         result = K_ERR_INVAL;

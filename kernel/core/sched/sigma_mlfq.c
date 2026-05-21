@@ -93,10 +93,15 @@ void sigma_sched_tick(void) {
     current_task->time_slice--;
     
     if (current_task->time_slice == 0) {
-        // Demote priority
+        // Demote priority (Legacy CFS style)
         if (current_task->priority < NUM_QUEUES - 1) {
             current_task->priority++;
         }
+        
+        // Anti-CFS: Engage AI-Native Tuner
+        extern void sigma_ai_tuner_analyze(sigma_task_t* task);
+        sigma_ai_tuner_analyze(current_task);
+        
         sigma_sched_yield();
     }
 }

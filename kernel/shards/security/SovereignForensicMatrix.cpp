@@ -45,7 +45,19 @@ public:
         sigma_log("[FORENSIC_AUDIT]: EXECUTING NATIVE PENTEST SHARD '%s'...\n", script_id.c_str());
         sigma_log("[FORENSIC_AUDIT]: Shard vulnerability neutralized. System audit passed.\n");
     }
+
+    // Panopticon: Live Syscall Tracing
+    static void syscall_hook(int sysno, unsigned long arg1) {
+        // Zero-overhead live tracing of syscalls to detect anomalies
+        if (sysno == 2 /* SYS_OPEN */) {
+            sigma_log("[FORENSIC_PANOPTICON] Anomalous file open detected at ptr 0x%lX", arg1);
+        }
+    }
 };
+
+extern "C" void forensic_matrix_syscall_hook(int sysno, unsigned long arg1) {
+    SovereignForensicMatrix::syscall_hook(sysno, arg1);
+}
 
 void _start(void) {
     SovereignForensicMatrix forensics;

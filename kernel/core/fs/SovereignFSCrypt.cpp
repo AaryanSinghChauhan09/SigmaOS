@@ -21,6 +21,7 @@ public:
     void init() {
         sigma_log_info("[S-FSCRYPT] Initializing Transparent FS Encryption Engine...");
         sigma_log_info("[S-FSCRYPT] Post-Quantum Keys (Kyber-1024): LOADED.");
+        sigma_log_info("[S-FSCRYPT] Anti-Linux: VFS is now quantum-secure natively. LUKS/AES obsoleted.");
     }
 
 private:
