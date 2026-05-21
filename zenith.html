@@ -36,7 +36,7 @@
     <div class="desktop-area auto-style-82">
         
         <!-- App: OmniShell Terminal -->
-        <div class="window" id="terminal-win" class="auto-style-83">
+        <div class="window auto-style-83" id="terminal-win">
             <div class="window-header">
                 <div class="window-title">💻 <span>OmniShell v5.1</span></div>
                 <div class="window-controls">
@@ -57,7 +57,7 @@
         </div>
 
         <!-- App: File Manager -->
-        <div class="window" id="file-manager-win" class="auto-style-85">
+        <div class="window auto-style-85" id="file-manager-win">
             <div class="window-header">
                 <div class="window-title">📂 <span>Sovereign VFS Browser</span></div>
                 <div class="window-controls">
@@ -73,7 +73,7 @@
                             <button class="fm-btn" onclick="fmBack()">Back</button>
                             <span class="fm-breadcrumbs" id="fm-breadcrumbs">/home/sovereign</span>
                         </div>
-                        <button class="cyber-btn small-btn" onclick="runRepomixPackager()" class="auto-style-2">📦 Repomix Prompt Packager</button>
+                        <button class="cyber-btn small-btn auto-style-2" onclick="runRepomixPackager()">📦 Repomix Prompt Packager</button>
                     </div>
                     <div class="fm-grid" id="fm-grid"></div>
                 </div>
@@ -81,7 +81,7 @@
         </div>
 
         <!-- App: Observability & Core Vitals -->
-        <div class="window" id="browser-win" class="auto-style-86">
+        <div class="window auto-style-86" id="browser-win">
             <div class="window-header">
                 <div class="window-title">📊 <span>Observability Matrix</span></div>
                 <div class="window-controls">
@@ -103,7 +103,7 @@
         </div>
 
         <!-- App: AI Research Assistant -->
-        <div class="window" id="ai-assistant-win" class="auto-style-91">
+        <div class="window auto-style-91" id="ai-assistant-win">
             <div class="window-header">
                 <div class="window-title">🧠 <span>Lattice Neural Core</span></div>
                 <div class="window-controls">
@@ -125,7 +125,7 @@
         </div>
 
         <!-- App: Lattice Settings -->
-        <div class="window" id="lattice-settings-win" class="auto-style-97 auto-style-3">
+        <div class="window auto-style-97 auto-style-3" id="lattice-settings-win">
             <div class="window-header">
                 <div class="window-title">⚙️ <span>Lattice System settings</span></div>
                 <div class="window-controls">
@@ -142,10 +142,10 @@
                         <div class="settings-tab" onclick="switchSettingsTab('profiles')">👤 Work Profiles</div>
                         <div class="settings-tab" onclick="switchSettingsTab('accessibility')">♿ Accessibility & Rollback</div>
                     </div>
-                    <div class="settings-content" id="settings-panes-container" class="auto-style-6">
+                    <div class="settings-content auto-style-6" id="settings-panes-container">
                         
                         <!-- Panel 1: Appearance -->
-                        <div class="settings-pane" id="pane-appearance" class="auto-style-7">
+                        <div class="settings-pane auto-style-7" id="pane-appearance">
                             <div class="settings-group">
                                 <h4>Dynamic Theme Engine</h4>
                                 <div class="theme-selector-grid">
@@ -169,7 +169,7 @@
                         </div>
 
                         <!-- Panel 2: Sovereign Branches (The 12 Branches Switcher!) -->
-                        <div class="settings-pane" id="pane-branches" class="auto-style-11">
+                        <div class="settings-pane auto-style-11" id="pane-branches">
                             <div class="settings-group">
                                 <h4>Sovereign Branch Simulator</h4>
                                 <p class="auto-style-12">
@@ -190,7 +190,7 @@
                                     <button class="fm-btn" onclick="simulateBranch('gh-pages')">📖 gh-pages (Wiki Docs)</button>
                                 </div>
                             </div>
-                            <div class="settings-group" id="branch-status-box" class="auto-style-14">
+                            <div class="settings-group auto-style-14" id="branch-status-box">
                                 <h5 class="auto-style-15">Active Shard Status</h5>
                                 <div id="branch-status-text" class="auto-style-16">
                                     Branch: main (Active)<br>
@@ -201,7 +201,7 @@
                         </div>
 
                         <!-- Panel 3: Work Profiles -->
-                        <div class="settings-pane" id="pane-profiles" class="auto-style-17">
+                        <div class="settings-pane auto-style-17" id="pane-profiles">
                             <div class="settings-group">
                                 <h4>Identity Profile Selector</h4>
                                 <p class="auto-style-18">
@@ -234,7 +234,7 @@
                         </div>
 
                         <!-- Panel 4: Accessibility & Rollback -->
-                        <div class="settings-pane" id="pane-accessibility" class="auto-style-21">
+                        <div class="settings-pane auto-style-21" id="pane-accessibility">
                             <div class="settings-group">
                                 <h4>Sovereign accessibility Engine</h4>
                                 <div class="form-switch auto-style-22">
@@ -258,13 +258,13 @@
                                     Capture or roll back running system configurations instantly using the atomic VFS snapshot registers.
                                 </p>
                                 <div class="auto-style-25">
-                                    <input type="text" id="snap-name" class="cmd-input" placeholder="Snapshot label..." class="auto-style-26" title="input">
-                                    <button class="wizard-btn" onclick="createSnapshot()" class="auto-style-27">CAPTURE SNAP</button>
+                                    <input class="cmd-input auto-style-26" type="text" id="snap-name" placeholder="Snapshot label..." title="input">
+                                    <button class="wizard-btn auto-style-27" onclick="createSnapshot()">CAPTURE SNAP</button>
                                 </div>
                                 <ul id="snapshot-list" class="auto-style-28">
                                     <li class="routine-item routine-border-cyan auto-style-29">
                                         <strong>Default_Restore_Point</strong> (System)
-                                        <button class="cyber-btn small-btn" onclick="atomicSwap('Default_Restore_Point')" class="auto-style-30">ROLLBACK</button>
+                                        <button class="cyber-btn small-btn auto-style-30" onclick="atomicSwap('Default_Restore_Point')">ROLLBACK</button>
                                     </li>
                                 </ul>
                             </div>
@@ -276,7 +276,7 @@
         </div>
 
         <!-- App: Sovereign Developer Workspace (Utility Nexus & DevKit) -->
-        <div class="window" id="utility-nexus-win" class="auto-style-31">
+        <div class="window auto-style-31" id="utility-nexus-win">
             <div class="window-header">
                 <div class="window-title">🔧 <span>Sovereign Developer Workspace</span></div>
                 <div class="window-controls">
@@ -288,23 +288,23 @@
             
             <!-- DevTab Navigation Bar -->
             <div class="auto-style-32">
-                <button class="fm-btn" id="dev-tab-compliance-btn" onclick="switchDevPane('compliance')" class="auto-style-33">⚖️ Compliance & GST</button>
-                <button class="fm-btn" id="dev-tab-hoppscotch-btn" onclick="switchDevPane('hoppscotch')" class="auto-style-34">🔌 Hoppscotch REST & httpie</button>
-                <button class="fm-btn" id="dev-tab-toys-btn" onclick="switchDevPane('toys')" class="auto-style-35">🛠️ DevToys swiss-army-knife</button>
-                <button class="fm-btn" id="dev-tab-docs-btn" onclick="switchDevPane('docs')" class="auto-style-36">📚 API offline Zeal docs</button>
+                <button class="fm-btn auto-style-33" id="dev-tab-compliance-btn" onclick="switchDevPane('compliance')">⚖️ Compliance & GST</button>
+                <button class="fm-btn auto-style-34" id="dev-tab-hoppscotch-btn" onclick="switchDevPane('hoppscotch')">🔌 Hoppscotch REST & httpie</button>
+                <button class="fm-btn auto-style-35" id="dev-tab-toys-btn" onclick="switchDevPane('toys')">🛠️ DevToys swiss-army-knife</button>
+                <button class="fm-btn auto-style-36" id="dev-tab-docs-btn" onclick="switchDevPane('docs')">📚 API offline Zeal docs</button>
             </div>
 
             <div class="window-body auto-style-37">
                 
                 <!-- Pane 1: Compliance & Calculators -->
-                <div class="dev-workspace-pane" id="dev-pane-compliance" class="auto-style-38">
+                <div class="dev-workspace-pane auto-style-38" id="dev-pane-compliance">
                     <div class="auto-style-39">
                         <div class="settings-pane auto-style-40">
                             <div class="settings-group">
                                 <h4 class="auto-style-41">Zero-Loss paise GST Calculator</h4>
                                 <div class="auto-style-42">
-                                    <input type="number" id="gst-amount" class="cmd-input" placeholder="Amount (in paise)" class="auto-style-43" title="input">
-                                    <input type="number" id="gst-rate" class="cmd-input" placeholder="GST Rate %" class="auto-style-44" title="input">
+                                    <input class="cmd-input auto-style-43" type="number" id="gst-amount" placeholder="Amount (in paise)" title="input">
+                                    <input class="cmd-input auto-style-44" type="number" id="gst-rate" placeholder="GST Rate %" title="input">
                                 </div>
                                 <button class="wizard-btn" onclick="calculateGST()">COMPUTE GST</button>
                                 <div id="gst-result" class="auto-style-45">> Result: Ready</div>
@@ -313,7 +313,7 @@
                         <div class="settings-pane auto-style-46">
                             <div class="settings-group auto-style-47">
                                 <h4 class="auto-style-48">BNS Legal Complier</h4>
-                                <input type="text" id="legal-query" class="cmd-input" placeholder="Search BNS section..." class="auto-style-49" title="input">
+                                <input class="cmd-input auto-style-49" type="text" id="legal-query" placeholder="Search BNS section..." title="input">
                                 <button class="wizard-btn" onclick="checkLegalCompliance()">MAP COMPLIANCE</button>
                                 <div id="legal-result" class="auto-style-50">> Mapping Status: Active</div>
                             </div>
@@ -322,7 +322,7 @@
                 </div>
 
                 <!-- Pane 2: Hoppscotch API Client & httpie -->
-                <div class="dev-workspace-pane" id="dev-pane-hoppscotch" class="auto-style-51">
+                <div class="dev-workspace-pane auto-style-51" id="dev-pane-hoppscotch">
                     <div class="auto-style-52">
                         
                         <div class="settings-pane auto-style-53">
@@ -335,11 +335,11 @@
                                         <option value="PUT">PUT</option>
                                         <option value="DELETE">DELETE</option>
                                     </select>
-                                    <input type="text" id="hop-url" class="cmd-input" value="api.sigmaos.internal/v1/attest" class="auto-style-57" title="input" placeholder="input">
+                                    <input class="cmd-input auto-style-57" type="text" id="hop-url" value="api.sigmaos.internal/v1/attest" title="input" placeholder="input">
                                 </div>
                                 <div class="auto-style-58">
                                     <span class="auto-style-59">Request Headers</span>
-                                    <input type="text" id="hop-headers" class="cmd-input" value="Content-Type: application/json, X-PQC-Attestation: Dilithium-5" class="auto-style-60" title="input" placeholder="input">
+                                    <input class="cmd-input auto-style-60" type="text" id="hop-headers" value="Content-Type: application/json, X-PQC-Attestation: Dilithium-5" title="input" placeholder="input">
                                 </div>
                                 <div class="auto-style-61">
                                     <span class="auto-style-62">Request Body (JSON)</span>
@@ -369,7 +369,7 @@
                 </div>
 
                 <!-- Pane 3: DevToys swiss-army-knife -->
-                <div class="dev-workspace-pane" id="dev-pane-toys" class="auto-style-71">
+                <div class="dev-workspace-pane auto-style-71" id="dev-pane-toys">
                     <div class="auto-style-72">
                         
                         <div class="settings-pane auto-style-73">
@@ -408,7 +408,7 @@
                 </div>
 
                 <!-- Pane 4: Zeal / DevDocs offline documentation browser -->
-                <div class="dev-workspace-pane" id="dev-pane-docs" class="auto-style-85">
+                <div class="dev-workspace-pane auto-style-85" id="dev-pane-docs">
                     <div class="auto-style-86">
                         
                         <div class="settings-pane auto-style-87">
@@ -424,7 +424,7 @@
                                 </div>
                                 <div class="auto-style-92">
                                     <span class="auto-style-93">Documentation Search Query</span>
-                                    <input type="text" id="docset-query" class="cmd-input" value="std::atomic" class="auto-style-94" title="input" placeholder="input">
+                                    <input class="cmd-input auto-style-94" type="text" id="docset-query" value="std::atomic" title="input" placeholder="input">
                                 </div>
                                 <button class="wizard-btn" onclick="searchZealOfflineDocs()">SEARCH OFFLINE DOCS</button>
                             </div>
@@ -449,7 +449,7 @@
         </div>
 
         <!-- App: Sovereign App Store (Marketplace) -->
-        <div class="window" id="sigma-market-win" class="auto-style-110">
+        <div class="window auto-style-110" id="sigma-market-win">
             <div class="window-header">
                 <div class="window-title">🛒 <span>Lattice Shard Marketplace</span></div>
                 <div class="window-controls">
@@ -466,7 +466,7 @@
                 
                 <div id="market-core-shards">
                     <h3 class="auto-style-113">Attested Core Shards</h3>
-                    <div class="shard-grid" id="shardContainer" class="auto-style-114">
+                    <div class="shard-grid auto-style-114" id="shardContainer">
                         <!-- Dynamically populated from kernel_loader.js -->
                     </div>
                 </div>
@@ -550,7 +550,7 @@
         </div>
 
         <!-- App: Markup Forge -->
-        <div class="window" id="markup-forge-win" class="auto-style-151">
+        <div class="window auto-style-151" id="markup-forge-win">
             <div class="window-header">
                 <div class="window-title">📥 <span>Zenith System Installer</span></div>
                 <div class="window-controls">
@@ -565,7 +565,7 @@
         </div>
 
         <!-- App: AI/ML Studio & Multi-Agent Orchestrator -->
-        <div class="window" id="sigma-ai-studio-win" class="auto-style-101">
+        <div class="window auto-style-101" id="sigma-ai-studio-win">
             <div class="window-header">
                 <div class="window-title">🤖 <span>Sovereign AI/ML Studio</span></div>
                 <div class="window-controls">
@@ -577,18 +577,18 @@
             
             <!-- Tab Navigation Bar -->
             <div class="auto-style-102">
-                <button class="fm-btn" id="ai-tab-tuner-btn" onclick="switchAIPane('tuner')" class="auto-style-103">🏋️ LlamaFactory Tuner</button>
-                <button class="fm-btn" id="ai-tab-mcp-btn" onclick="switchAIPane('mcp')" class="auto-style-104">🔌 Awesome-MCP Gateway</button>
-                <button class="fm-btn" id="ai-tab-nodes-btn" onclick="switchAIPane('nodes')" class="auto-style-105">🧬 n8n Workflow Nodes</button>
-                <button class="fm-btn" id="ai-tab-memory-btn" onclick="switchAIPane('memory')" class="auto-style-106">💾 Letta Memory & Voice</button>
-                <button class="fm-btn" id="ai-tab-claudecam-btn" onclick="switchAIPane('claudecam')" class="auto-style-107">💻 ClaudeCode & Cam</button>
-                <button class="fm-btn" id="ai-tab-swe-btn" onclick="switchAIPane('swe')" class="auto-style-108">🤖 SWE-Agent & Marimo</button>
+                <button class="fm-btn auto-style-103" id="ai-tab-tuner-btn" onclick="switchAIPane('tuner')">🏋️ LlamaFactory Tuner</button>
+                <button class="fm-btn auto-style-104" id="ai-tab-mcp-btn" onclick="switchAIPane('mcp')">🔌 Awesome-MCP Gateway</button>
+                <button class="fm-btn auto-style-105" id="ai-tab-nodes-btn" onclick="switchAIPane('nodes')">🧬 n8n Workflow Nodes</button>
+                <button class="fm-btn auto-style-106" id="ai-tab-memory-btn" onclick="switchAIPane('memory')">💾 Letta Memory & Voice</button>
+                <button class="fm-btn auto-style-107" id="ai-tab-claudecam-btn" onclick="switchAIPane('claudecam')">💻 ClaudeCode & Cam</button>
+                <button class="fm-btn auto-style-108" id="ai-tab-swe-btn" onclick="switchAIPane('swe')">🤖 SWE-Agent & Marimo</button>
             </div>
 
             <div class="window-body auto-style-109">
                 
                 <!-- Pane 1: LlamaFactory Fine-Tuner -->
-                <div class="ai-studio-pane" id="ai-pane-tuner" class="auto-style-110">
+                <div class="ai-studio-pane auto-style-110" id="ai-pane-tuner">
                     <div class="auto-style-111">
                         
                         <!-- Tuner Parameter Matrix -->
@@ -632,11 +632,11 @@
                                 <div class="auto-style-122">
                                     <div>
                                         <span class="auto-style-123">Dropout</span>
-                                        <input type="number" id="ml-qlora-dropout" class="cmd-input" value="0.05" step="0.01" class="auto-style-124" title="input" placeholder="input">
+                                        <input class="cmd-input auto-style-124" type="number" id="ml-qlora-dropout" value="0.05" step="0.01" title="input" placeholder="input">
                                     </div>
                                     <div>
                                         <span class="auto-style-125">Target Modules</span>
-                                        <input type="text" id="ml-qlora-targets" class="cmd-input" value="q_proj,v_proj" class="auto-style-126" title="input" placeholder="input">
+                                        <input class="cmd-input auto-style-126" type="text" id="ml-qlora-targets" value="q_proj,v_proj" title="input" placeholder="input">
                                     </div>
                                 </div>
                             </div>
@@ -674,16 +674,16 @@
                                 <div class="auto-style-137">
                                     <div>
                                         <span class="auto-style-138">Chunk Size</span>
-                                        <input type="number" id="ml-rag-chunk" class="cmd-input" value="512" class="auto-style-139" title="input" placeholder="input">
+                                        <input class="cmd-input auto-style-139" type="number" id="ml-rag-chunk" value="512" title="input" placeholder="input">
                                     </div>
                                     <div>
                                         <span class="auto-style-140">Overlap</span>
-                                        <input type="number" id="ml-rag-overlap" class="cmd-input" value="64" class="auto-style-141" title="input" placeholder="input">
+                                        <input class="cmd-input auto-style-141" type="number" id="ml-rag-overlap" value="64" title="input" placeholder="input">
                                     </div>
                                 </div>
                                 <div class="auto-style-142">
-                                    <input type="text" id="ml-embed-text" class="cmd-input" placeholder="Type text to RAG chunk..." class="auto-style-143" title="input">
-                                    <button class="wizard-btn" onclick="generateMLEmbedding()" class="auto-style-144">PARSE BLOCK</button>
+                                    <input class="cmd-input auto-style-143" type="text" id="ml-embed-text" placeholder="Type text to RAG chunk..." title="input">
+                                    <button class="wizard-btn auto-style-144" onclick="generateMLEmbedding()">PARSE BLOCK</button>
                                 </div>
                                 <div id="ml-embed-result" class="auto-style-145">
                                     > Vector Space Ready.
@@ -695,7 +695,7 @@
                 </div>
 
                 <!-- Pane 2: Awesome-MCP Server Gateway -->
-                <div class="ai-studio-pane" id="ai-pane-mcp" class="auto-style-146">
+                <div class="ai-studio-pane auto-style-146" id="ai-pane-mcp">
                     <div class="auto-style-147">
                         
                         <!-- MCP Servers Catalog -->
@@ -722,7 +722,7 @@
                                             <strong>⚖️ BNS Legal Compliance Complier</strong><br>
                                             <span class="auto-style-158">Host: 127.0.0.1:8082 | Protocol: stdio</span>
                                         </div>
-                                        <button class="cyber-btn small-btn" onclick="addLog('Σ [MCP]: Connecting to BNS Complier MCP...', 'warning')" class="auto-style-159">CONNECT</button>
+                                        <button class="cyber-btn small-btn auto-style-159" onclick="addLog('Σ [MCP]: Connecting to BNS Complier MCP...', 'warning')">CONNECT</button>
                                     </li>
                                 </ul>
                             </div>
@@ -730,8 +730,8 @@
                             <div class="settings-group">
                                 <h4 class="auto-style-160">🤖 AutoGPT Agent Registrar</h4>
                                 <div class="auto-style-161">
-                                    <input type="text" id="ml-agent-name" class="cmd-input" placeholder="Agent Name..." class="auto-style-162" title="input">
-                                    <input type="text" id="ml-agent-role" class="cmd-input" placeholder="Agent Role..." class="auto-style-163" title="input">
+                                    <input class="cmd-input auto-style-162" type="text" id="ml-agent-name" placeholder="Agent Name..." title="input">
+                                    <input class="cmd-input auto-style-163" type="text" id="ml-agent-role" placeholder="Agent Role..." title="input">
                                 </div>
                                 <div class="auto-style-164">
                                     <select id="ml-agent-depth" class="cmd-input auto-style-165" title="input">
@@ -739,7 +739,7 @@
                                         <option value="3">Depth 3 (Balanced)</option>
                                         <option value="5">Depth 5 (Rigorous)</option>
                                     </select>
-                                    <button class="wizard-btn" onclick="registerMLAgent()" class="auto-style-166">SPAWN AGENT</button>
+                                    <button class="wizard-btn auto-style-166" onclick="registerMLAgent()">SPAWN AGENT</button>
                                 </div>
                             </div>
                         </div>
@@ -759,7 +759,7 @@
                             <div class="settings-group auto-style-172">
                                 <div class="auto-style-173">
                                     <h4 class="auto-style-174">🦉 OWL Multi-Agent Cooperation</h4>
-                                    <button class="cyber-btn small-btn" onclick="runOWLCooperation()" class="auto-style-175">EXECUTE COOPERATION</button>
+                                    <button class="cyber-btn small-btn auto-style-175" onclick="runOWLCooperation()">EXECUTE COOPERATION</button>
                                 </div>
                                 <div id="ml-console" class="auto-style-176">
                                     [OWL] Proxy server listening on MCP port 8080...<br>
@@ -772,10 +772,10 @@
                 </div>
 
                 <!-- Pane 3: n8n Node-Based Workflow Simulator -->
-                <div class="ai-studio-pane" id="ai-pane-nodes" class="auto-style-177">
+                <div class="ai-studio-pane auto-style-177" id="ai-pane-nodes">
                     <div class="auto-style-178">
                         <span class="auto-style-179">Construct autonomous automation pipelines with linked nodes (n8n/Dify/ComfyUI style).</span>
-                        <button class="wizard-btn" onclick="executeWorkflowNodes()" class="auto-style-180">RUN WORKFLOW ENGINE</button>
+                        <button class="wizard-btn auto-style-180" onclick="executeWorkflowNodes()">RUN WORKFLOW ENGINE</button>
                     </div>
 
                     <!-- Workflow Visual Arena -->
@@ -837,7 +837,7 @@
                 </div>
 
                 <!-- Pane 4: Letta Agent-File Memory & VoiceStar Real-Time Voice -->
-                <div class="ai-studio-pane" id="ai-pane-memory" class="auto-style-207">
+                <div class="ai-studio-pane auto-style-207" id="ai-pane-memory">
                     <div class="auto-style-208">
                         
                         <!-- Letta Episodic Memory -->
@@ -878,7 +878,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <button class="cyber-btn small-btn" id="voicestar-stream-btn" onclick="toggleVoiceStreaming()" class="auto-style-225">START VOICE STREAM</button>
+                                <button class="cyber-btn small-btn auto-style-225" id="voicestar-stream-btn" onclick="toggleVoiceStreaming()">START VOICE STREAM</button>
                                 
                                 <span class="auto-style-226">Wave Visualizer Preview:</span>
                                 <div class="auto-style-227">
@@ -891,7 +891,7 @@
                 </div>
 
                 <!-- Pane 5: ClaudeCode CLI Sandbox & DeepLiveCam Swaps -->
-                <div class="ai-studio-pane" id="ai-pane-claudecam" class="auto-style-229">
+                <div class="ai-studio-pane auto-style-229" id="ai-pane-claudecam">
                     <div class="auto-style-230">
                         
                         <!-- ClaudeCode CLI Simulation -->
@@ -899,9 +899,9 @@
                             <div class="settings-group auto-style-232">
                                 <h4 class="auto-style-233">💻 Claude-Code CLI Terminal Sandbox</h4>
                                 <div class="auto-style-234">
-                                    <input type="text" id="claudecode-file" class="cmd-input" value="SovereignBoot.cpp" class="auto-style-235" title="input" placeholder="input">
-                                    <input type="text" id="claudecode-prompt" class="cmd-input" placeholder="Analyze compile locks..." class="auto-style-236" title="input">
-                                    <button class="cyber-btn small-btn" onclick="executeClaudeCodeCLI()" class="auto-style-237">HEAL CODE</button>
+                                    <input class="cmd-input auto-style-235" type="text" id="claudecode-file" value="SovereignBoot.cpp" title="input" placeholder="input">
+                                    <input class="cmd-input auto-style-236" type="text" id="claudecode-prompt" placeholder="Analyze compile locks..." title="input">
+                                    <button class="cyber-btn small-btn auto-style-237" onclick="executeClaudeCodeCLI()">HEAL CODE</button>
                                 </div>
                                 <div id="claudecode-terminal" class="auto-style-238">
                                     admin@sigma-zenith:~/SigmaOS$ claudecode --version<br>
@@ -943,7 +943,7 @@
                 </div>
 
                 <!-- Pane 6: SWE-Agent & Marimo / Streamlit Reactive Sandbox -->
-                <div class="ai-studio-pane" id="ai-pane-swe" class="auto-style-247">
+                <div class="ai-studio-pane auto-style-247" id="ai-pane-swe">
                     <div class="auto-style-248">
                         
                         <!-- SWE-Agent / OpenHands / GPT-Pilot Console -->
@@ -952,7 +952,7 @@
                                 <h4 class="auto-style-251">🤖 SWE-Agent & OpenHands Developer Autopilot</h4>
                                 <div class="auto-style-252">
                                     <span class="auto-style-253">Repository Scope Workspace</span>
-                                    <input type="text" id="swe-repo-path" class="cmd-input" value="/vfs/workspace/SigmaOS" class="auto-style-254" title="input" placeholder="input">
+                                    <input class="cmd-input auto-style-254" type="text" id="swe-repo-path" value="/vfs/workspace/SigmaOS" title="input" placeholder="input">
                                 </div>
                                 <div class="auto-style-255">
                                     <span class="auto-style-256">Autopilot Issue Query</span>
@@ -979,7 +979,7 @@ import numpy as np
 freq = st.slider(&quot;Signal frequency&quot;, 1, 10, 5)
 st.line_chart(np.sin(np.linspace(0, 10, 100) * freq))</textarea>
                                 </div>
-                                <button class="cyber-btn small-btn" onclick="runReactiveSandbox()" class="auto-style-265">RUN REACTIVE CELL</button>
+                                <button class="cyber-btn small-btn auto-style-265" onclick="runReactiveSandbox()">RUN REACTIVE CELL</button>
                                 
                                 <span class="auto-style-266">Reactive Chart Preview:</span>
                                 <div id="marimo-chart-preview" class="auto-style-267">

@@ -29,7 +29,7 @@ public:
             sigma_print("[CRITICAL] Stability threshold exceeded. Initiating Sovereign Rollback...\n");
             int restored_idx = snap_auto_rollback(manager);
             if (restored_idx >= 0) {
-                sigma_print("["] Restored to Snapshot: %s. Rebooting...\n", 
+                sigma_print("[ROLLBACK] Restored to Snapshot: %s. Rebooting...\n", 
                             manager->snaps[restored_idx].name);
                 // Trigger hardware reset
             } else {
@@ -45,6 +45,10 @@ public:
         snap_take(manager, "LastKnownGood", nullptr, 0, 1);
     }
 };
+
+extern "C" {
+
+extern "C" {
 
 void start_rollback_daemon() {
     static SigmaRollbackManager global_rm;

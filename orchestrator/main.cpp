@@ -23,7 +23,7 @@ public:
     bool matches(const std::string& cmd) const override { return cmd == "sigma-init"; }
     int execute(int argc, char** argv) const override {
         std::cout << "[SigmaOS] Initializing System Services...\n";
-        std::cout << "["] S01_Genesis: Kernel Heartbeat Active.\n";
+        std::cout << "[SigmaOS] S01_Genesis: Kernel Heartbeat Active.\n";
         return 0;
     }
 };
@@ -53,7 +53,7 @@ public:
     bool matches(const std::string& cmd) const override { return cmd == "sigma-health"; }
     int execute(int argc, char** argv) const override {
         std::cout << "[SigmaOS] Running Comprehensive Health Audit...\n";
-        std::cout << "["] All subsystems report OPTIMAL status.\n";
+        std::cout << "[SigmaOS] All subsystems report OPTIMAL status.\n";
         return 0;
     }
 };
@@ -63,7 +63,7 @@ public:
     bool matches(const std::string& cmd) const override { return cmd == "sigma-update"; }
     int execute(int argc, char** argv) const override {
         std::cout << "[Update] Creating safety snapshot...\n";
-        std::cout << "["] System updated and verified.\n";
+        std::cout << "[Update] System updated and verified.\n";
         return 0;
     }
 };
@@ -114,8 +114,8 @@ public:
     bool matches(const std::string& cmd) const override { return cmd == "sigma-driver"; }
     int execute(int argc, char** argv) const override {
         std::cout << "[Driver] Probing hardware for modular shards...\n";
-        std::cout << "["] Detected: Graphics (Vulkan), Network (Intel), Input (HID).\n";
-        std::cout << "["] All modular drivers loaded and verified.\n";
+        std::cout << "[Driver] Detected: Graphics (Vulkan), Network (Intel), Input (HID).\n";
+        std::cout << "[Driver] All modular drivers loaded and verified.\n";
         return 0;
     }
 };
@@ -137,10 +137,10 @@ public:
     bool matches(const std::string& cmd) const override { return cmd == "sigma-bench"; }
     int execute(int argc, char** argv) const override {
         std::cout << "[Bench] Running Sovereign Lattice Benchmark Suite...\n";
-        std::cout << "["] CPU Context Switch (SFS): 45 cycles.\n";
-        std::cout << "["] Memory Allocation (Slab): O(1) stability.\n";
-        std::cout << "["] PQC Throughput (Kyber): 8.2 GB/s.\n";
-        std::cout << "["] Overall Performance: 15% faster than monolithic competitors.\n";
+        std::cout << "[Bench] CPU Context Switch (SFS): 45 cycles.\n";
+        std::cout << "[Bench] Memory Allocation (Slab): O(1) stability.\n";
+        std::cout << "[Bench] PQC Throughput (Kyber): 8.2 GB/s.\n";
+        std::cout << "[Bench] Overall Performance: 15% faster than monolithic competitors.\n";
         return 0;
     }
 };
@@ -151,9 +151,9 @@ public:
     bool matches(const std::string& cmd) const override { return cmd == "sigma-dev"; }
     int execute(int argc, char** argv) const override {
         std::cout << "[Dev] Launching Sovereign Developer Toolkit...\n";
-        std::cout << "["] Shard Tracer: ACTIVE. Monitoring S01-S08 transitions.\n";
-        std::cout << "["] Cycle Profiler: RDTSC sampling at 100MHz.\n";
-        std::cout << "["] Memory Leak Watchdog: Slab parity verified.\n";
+        std::cout << "[Dev] Shard Tracer: ACTIVE. Monitoring S01-S08 transitions.\n";
+        std::cout << "[Dev] Cycle Profiler: RDTSC sampling at 100MHz.\n";
+        std::cout << "[Dev] Memory Leak Watchdog: Slab parity verified.\n";
         return 0;
     }
 };
@@ -164,8 +164,8 @@ public:
     bool matches(const std::string& cmd) const override { return cmd == "sigma-boot-fast"; }
     int execute(int argc, char** argv) const override {
         std::cout << "[Boot] Engaging Sovereign Fast Startup (Hybrid Hibernation)...\n";
-        std::cout << "["] Resuming from silicon-direct kernel snapshot.\n";
-        std::cout << "["] Boot time: 0.8s. Lattice restored to Apex state.\n";
+        std::cout << "[Boot] Resuming from silicon-direct kernel snapshot.\n";
+        std::cout << "[Boot] Boot time: 0.8s. Lattice restored to Apex state.\n";
         return 0;
     }
 };
@@ -176,8 +176,8 @@ public:
     bool matches(const std::string& cmd) const override { return cmd == "sigma-sys"; }
     int execute(int argc, char** argv) const override {
         std::cout << "[Sysinternals] Initializing Advanced Shard Tracer (v10.0)...\n";
-        std::cout << "["] Handle Monitor: 42 active capabilities.\n";
-        std::cout << "["] Thread Profiler: SHS Hybrid Scheduler is 15% more efficient than CFS.\n";
+        std::cout << "[Sysinternals] Handle Monitor: 42 active capabilities.\n";
+        std::cout << "[Sysinternals] Thread Profiler: SHS Hybrid Scheduler is 15% more efficient than CFS.\n";
         return 0;
     }
 };
@@ -190,7 +190,7 @@ public:
         std::cout << "[AI-Shell] Entering Sovereign Intent Shell...\n";
         std::cout << "sigma-shell> \"Optimize my lattice for Rust development\"\n";
         std::cout << "[AI] Action: Scaling L2 cache, pre-loading rustc-shard, enabling profile=developer.\n";
-        std::cout << "["] Lattice optimized.\n";
+        std::cout << "[AI] Lattice optimized.\n";
         return 0;
     }
 };
@@ -201,8 +201,8 @@ public:
     bool matches(const std::string& cmd) const override { return cmd == "sigma-reg"; }
     int execute(int argc, char** argv) const override {
         std::cout << "[Registry] Querying Sovereign Config Lattice...\n";
-        std::cout << "["] Path: HKLM/Lattice/Security/PQC_Level -> Strict (v11.0)\n";
-        std::cout << "["] Path: HKCU/Zenith/Theme -> Cyber_Viper\n";
+        std::cout << "[Registry] Path: HKLM/Lattice/Security/PQC_Level -> Strict (v11.0)\n";
+        std::cout << "[Registry] Path: HKCU/Zenith/Theme -> Cyber_Viper\n";
         return 0;
     }
 };
@@ -218,10 +218,10 @@ public:
         }
         std::cout << "[Claw] Gateway: Goal received via Apex Tunnel.\n";
         std::cout << "[Claw] Reasoning: Breaking down \"" << argv[2] << "\" into 3 sub-tasks.\n";
-        std::cout << "["] Task 1: [L4] Gating capability for IPC_WRITE.\n";
-        std::cout << "["] Task 2: [L2] Scheduling preemptive shard re-init.\n";
-        std::cout << "["] Task 3: [L7] Reporting status to Sovereign Shell.\n";
-        std::cout << "["] Automation cycle complete.\n";
+        std::cout << "[Claw] Task 1: [L4] Gating capability for IPC_WRITE.\n";
+        std::cout << "[Claw] Task 2: [L2] Scheduling preemptive shard re-init.\n";
+        std::cout << "[Claw] Task 3: [L7] Reporting status to Sovereign Shell.\n";
+        std::cout << "[Claw] Automation cycle complete.\n";
         return 0;
     }
 };
@@ -237,7 +237,7 @@ public:
         }
         std::cout << "[S99] Loading legacy Linux binary: " << argv[1] << "...\n";
         std::cout << "[S99] Translation: Mapping glibc syscalls to Sovereign Intents.\n";
-        std::cout << "["] Execution successful under Layer 4 Capability Gate.\n";
+        std::cout << "[S99] Execution successful under Layer 4 Capability Gate.\n";
         return 0;
     }
 };
@@ -252,9 +252,9 @@ public:
             return 0;
         }
         std::cout << "[Nexus] Integrated Enterprise Shard Active: " << argv[1] << "\n";
-        std::cout << "["] Salesforce/Odoo-grade CRM Shard: Synchronized.\n";
-        std::cout << "["] Oracle-grade Database Lattice: Optimized.\n";
-        std::cout << "["] Apache/Nginx-performance Web Shard: Online.\n";
+        std::cout << "[Nexus] Salesforce/Odoo-grade CRM Shard: Synchronized.\n";
+        std::cout << "[Nexus] Oracle-grade Database Lattice: Optimized.\n";
+        std::cout << "[Nexus] Apache/Nginx-performance Web Shard: Online.\n";
         return 0;
     }
 };
@@ -264,9 +264,9 @@ public:
     bool matches(const std::string& cmd) const override { return cmd == "sigma-office"; }
     int execute(int argc, char** argv) const override {
         std::cout << "[Office] Launching Sovereign Productivity Suite...\n";
-        std::cout << "["] Docs (Collaborative Shard Editing): ACTIVE.\n";
-        std::cout << "["] Sheets (Lattice Computation Engine): ONLINE.\n";
-        std::cout << "["] Slides (Zenith Morphic Rendering): READY.\n";
+        std::cout << "[Office] Docs (Collaborative Shard Editing): ACTIVE.\n";
+        std::cout << "[Office] Sheets (Lattice Computation Engine): ONLINE.\n";
+        std::cout << "[Office] Slides (Zenith Morphic Rendering): READY.\n";
         return 0;
     }
 };

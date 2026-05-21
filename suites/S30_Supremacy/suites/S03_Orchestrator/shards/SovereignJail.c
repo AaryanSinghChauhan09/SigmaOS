@@ -17,29 +17,24 @@ typedef struct {
 } SovereignJail_Context;
 
 void SovereignJail_Init() {
-    sigma_sigma_printf("S [ABSORB]: SovereignJails Isolation Zenith Online.
-");
+    sigma_sigma_printf("S [ABSORB]: SovereignJails Isolation Zenith Online.\n");
 }
 
 sigma_u32 SovereignJail_Create(const char* name, const char* path) {
-    sigma_sigma_printf("S [JAIL]: Segmenting Domain: %s -> %s
-", name, path);
+    sigma_sigma_printf("S [JAIL]: Segmenting Domain: %s -> %s\n", name, path);
     return 1; // Sovereign Anchor ID
 }
 
 void SovereignJail_Attach(sigma_u32 jid) {
-    sigma_sigma_printf("S [ATTACH]: Entering Jail Domain %u. Environment Locked.
-", jid);
+    sigma_sigma_printf("S [ATTACH]: Entering Jail Domain %u. Environment Locked.\n", jid);
 }
 
 void SovereignJail_ForceRelease(sigma_u32 jid) {
-    sigma_sigma_printf("S [RELEASE]: Purging Jail Context %u. Network Stack Dissolved.
-", jid);
+    sigma_sigma_printf("S [RELEASE]: Purging Jail Context %u. Network Stack Dissolved.\n", jid);
 }
 
 void SovereignJail_VNET_Init(sigma_u32 jid) {
-    sigma_sigma_printf("S [VNET]: Virtual Network Stack Segmented for Jail %u.
-", jid);
+    sigma_sigma_printf("S [VNET]: Virtual Network Stack Segmented for Jail %u.\n", jid);
 }
 
 

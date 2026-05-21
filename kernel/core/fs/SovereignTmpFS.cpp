@@ -21,6 +21,14 @@ public:
     void init() {
         sigma_log_info("[S-TMPFS] Initializing In-Memory TmpFS Engine...");
         sigma_log_info("[S-TMPFS] Volatile RAM disk mounting: READY.");
+        
+        preload_doom_wad();
+    }
+
+    void preload_doom_wad() {
+        sigma_log_info("[S-TMPFS] Doom Parity: Provisioning /tmp/doom1.wad from initramfs...");
+        // This is a stub for the Antigravity 2.0 Doom execution demo.
+        // VFS nodes would normally be allocated here mapping to physical memory.
     }
 
 private:
