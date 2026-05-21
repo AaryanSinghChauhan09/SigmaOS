@@ -9,6 +9,7 @@ SECTIONS
 {
     /* Load at 1MB — above BIOS reserved region */
     . = 0x100000;
+    _kernel_start = .;
 
     /* Text (code) section */
     .text ALIGN(4096) :
@@ -39,6 +40,7 @@ SECTIONS
         *(.bss)
         *(.bss.*)
     }
+    _kernel_end = .;
 
     /* Discard DWARF debug sections in production */
     /DISCARD/ :

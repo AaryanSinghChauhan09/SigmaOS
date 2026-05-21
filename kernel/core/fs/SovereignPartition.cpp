@@ -28,7 +28,7 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C void SovereignPartition_enable() {
+extern "C" void SovereignPartition_enable() {
     SigmaOS::Kernel::Deployment::SovereignPartition::getInstance().enable();
 }
  

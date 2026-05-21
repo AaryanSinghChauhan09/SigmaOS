@@ -28,7 +28,7 @@ public:
 } // namespace Kernel
 } // namespace SigmaOS
 
-extern "C void SovereignSDK_enable() {
+extern "C" void SovereignSDK_enable() {
     SigmaOS::Kernel::Deployment::SovereignSDK::getInstance().enable();
 }
  

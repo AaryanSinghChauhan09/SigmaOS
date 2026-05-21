@@ -113,7 +113,13 @@ void init_main(void) {
     sigma_printf("[init] Phase 3: Mounting Root Filesystem (VFS)...\n");
     init_vfs();
     init_ext4();
-    sigma_printf("[init] Virtual File System (VFS) mounted with ext4 format.\n");
+    extern void tmpfs_init(void);
+    extern void devfs_init(void);
+    extern void devfs_populate_default(void);
+    tmpfs_init();
+    devfs_init();
+    devfs_populate_default();
+    sigma_printf("[init] Virtual File System (VFS) mounted with ext4, tmpfs, and devfs.\n");
 
     // Execute Runlevel 2 (System services, logging, auth)
     execute_runlevel(2);

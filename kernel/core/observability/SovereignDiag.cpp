@@ -22,8 +22,8 @@ SovereignDiagEngine& SovereignDiagEngine::getInstance() {
 
 void SovereignDiagEngine::init() {
     sigma_log_info("[DIAG] Initializing Sovereign Diagnostic Nexus...");
-    this->getInstance().getInstance().getInstance().getInstance().getInstance().getInstance().m_initialized = 1U;
-    getInstance().getInstance().getInstance().getInstance().getInstance().getInstance().m_fault_count = 0U;
+    getInstance().m_initialized = 1U;
+    getInstance().m_fault_count = 0U;
 }
 
 void SovereignDiagEngine::performScan() {
@@ -34,7 +34,7 @@ void SovereignDiagEngine::performScan() {
 
 void SovereignDiagEngine::reportAnomaly(ShardID shard_id, AnomalyDesc description) {
     (void)shard_id; (void)description;
-    sigma_log_err("[DIAG] [CRITICAL] Shard anomaly detected " triggering self-heal.");
+    sigma_log_err("[DIAG] [CRITICAL] Shard anomaly detected -- triggering self-heal.");
     m_fault_count++;
 }
 
