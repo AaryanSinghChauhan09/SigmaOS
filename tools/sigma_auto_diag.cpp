@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA AUTOMOTIVE DIAGNOSTICS (sigma_auto_diag) v1.0
+ * Î£ SIGMAOS: SIGMA AUTOMOTIVE DIAGNOSTICS (sigma_auto_diag) v1.0
  * =========================================================================
  * Mission: CAN bus + OBD integration.
  * Inspiration: Automotive Grade Linux + socketcan.
@@ -21,21 +21,21 @@ public:
 
     void init() {
         m_can_connected = false;
-        sigma_printf("[AUTODIAG] Sigma Automotive Diagnostics v1.0 initialized.");
+        sigma_log_info("[AUTODIAG] Sigma Automotive Diagnostics v1.0 initialized.");
     }
 
     void connect_can_bus() {
         m_can_connected = true;
-        sigma_printf("[AUTODIAG] Connected to CAN bus network interface.");
+        sigma_log_info("[AUTODIAG] Connected to CAN bus network interface.");
     }
 
     void read_obd2() {
         if (!m_can_connected) {
-            sigma_printfor("[AUTODIAG] Not connected to CAN bus.");
+            sigma_log_infoor("[AUTODIAG] Not connected to CAN bus.");
             return;
         }
-        sigma_printf("[AUTODIAG] Requesting standard OBD-II PIDs...");
-        sigma_printf("[AUTODIAG] RPM: 2400 | Speed: 65km/h | Engine Temp: 90C");
+        sigma_log_info("[AUTODIAG] Requesting standard OBD-II PIDs...");
+        sigma_log_info("[AUTODIAG] RPM: 2400 | Speed: 65km/h | Engine Temp: 90C");
     }
 
 private:
@@ -51,3 +51,4 @@ void autodiag_init()        { SigmaOS::Tools::SigmaAutoDiag::getInstance().init(
 void autodiag_connect()     { SigmaOS::Tools::SigmaAutoDiag::getInstance().connect_can_bus(); }
 void autodiag_read_obd()    { SigmaOS::Tools::SigmaAutoDiag::getInstance().read_obd2(); }
 }
+

@@ -1,10 +1,10 @@
-/**
- * SigmaSuite.cpp — Sovereign Productivity Suite
+﻿/**
+ * SigmaSuite.cpp â€” Sovereign Productivity Suite
  * SigmaOS Zenith v15.1
  *
  * Maps to: Syllabus-FCIT Unit IV (Office Automation)
  * Implements: SigmaDocs (Word), SigmaSheets (Excel), SigmaSlides (PowerPoint),
- *             SigmaAccess (MS Access) — all as native SigmaOS applications.
+ *             SigmaAccess (MS Access) â€” all as native SigmaOS applications.
  *
  * All apps read/write SovereignFS via the VFS API.
  * File formats: .sdoc (SigmaDocs), .sxls (SigmaSheets), .sppt (SigmaSlides), .sdb (SigmaAccess)
@@ -13,11 +13,11 @@
 
 namespace Sigma::Suite {
 
-// ═════════════════════════════════════════════════════════════════════════════
-// SIGMA DOCS — Word Processor (maps to MS Word syllabus)
-// ═════════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SIGMA DOCS â€” Word Processor (maps to MS Word syllabus)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-// ─── Text Formatting ──────────────────────────────────────────────────────────
+// â”€â”€â”€ Text Formatting â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 void SigmaDocs::apply_format(TextRange range, const TextFormat& fmt) {
     // Store format run in document's format table
     FormatRun run;
@@ -42,7 +42,7 @@ void SigmaDocs::set_page_margins(float top_cm, float bottom_cm,
     m_page.margin_right  = right_cm;
 }
 
-// ─── Tables ──────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Tables â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 TableId SigmaDocs::insert_table(sigma_u32 rows, sigma_u32 cols,
                                  sigma_u32 cursor_position) {
     DocTable tbl;
@@ -55,7 +55,7 @@ TableId SigmaDocs::insert_table(sigma_u32 rows, sigma_u32 cols,
     float col_width = (m_page.width - m_page.margin_left - m_page.margin_right) / (float)cols;
     for (sigma_u32 c = 0; c < cols; c++) tbl.col_widths[c] = col_width;
     m_tables.push(tbl);
-    sigma_klog(sigma_printf, "[SigmaDocs] INSERT TABLE %dx%d at pos=%u\n", rows, cols, cursor_position);
+    sigma_klog(sigma_log_info, "[SigmaDocs] INSERT TABLE %dx%d at pos=%u\n", rows, cols, cursor_position);
     return tbl.id;
 }
 
@@ -75,7 +75,7 @@ void SigmaDocs::merge_cells(TableId tid, sigma_u32 r1, sigma_u32 c1,
     anchor.rowspan = r2 - r1 + 1;
 }
 
-// ─── Mail Merge ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Mail Merge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 int SigmaDocs::mail_merge(const char* template_path,
                            const char* datasource_path,
                            const char* output_dir) {
@@ -91,27 +91,27 @@ int SigmaDocs::mail_merge(const char* template_path,
         SigmaDocs output_doc = *this;  // Copy template
         output_doc.substitute_fields(record);
         char out_path[512];
-        sigma_printf(out_path, sizeof(out_path), "%s/merged_%04u.sdoc", output_dir, count++);
+        sigma_log_info(out_path, sizeof(out_path), "%s/merged_%04u.sdoc", output_dir, count++);
         output_doc.save(out_path);
     }
-    sigma_klog(sigma_printf, "[SigmaDocs] Mail merge: %u documents generated\n", count);
+    sigma_klog(sigma_log_info, "[SigmaDocs] Mail merge: %u documents generated\n", count);
     return SIGMA_SUITE_OK;
 }
 
 void SigmaDocs::substitute_fields(const MailMergeRecord& rec) {
-    // Replace «FieldName» markers in document text with record values
+    // Replace Â«FieldNameÂ» markers in document text with record values
     for (sigma_u32 i = 0; i < rec.field_count; i++) {
         char marker[128];
-        sigma_printf(marker, sizeof(marker), "<<%s>>", rec.fields[i].name);
+        sigma_log_info(marker, sizeof(marker), "<<%s>>", rec.fields[i].name);
         replace_all_text(marker, rec.fields[i].value);
     }
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
-// SIGMA SHEETS — Spreadsheet (maps to MS Excel syllabus)
-// ═════════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SIGMA SHEETS â€” Spreadsheet (maps to MS Excel syllabus)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-// ─── Data Sorting ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Data Sorting â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 void SigmaSheets::sort_range(CellRange range, sigma_u32 key_col, bool ascending) {
     sigma_u32 n = range.row_end - range.row_start;
     // Insertion sort on rows by key_col value
@@ -130,7 +130,7 @@ void SigmaSheets::sort_range(CellRange range, sigma_u32 key_col, bool ascending)
     }
 }
 
-// ─── Data Filtering (AutoFilter) ──────────────────────────────────────────────
+// â”€â”€â”€ Data Filtering (AutoFilter) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 void SigmaSheets::apply_filter(sigma_u32 header_row, sigma_u32 col,
                                 FilterCondition cond) {
     ActiveFilter f;
@@ -145,7 +145,7 @@ void SigmaSheets::apply_filter(sigma_u32 header_row, sigma_u32 col,
     }
 }
 
-// ─── Pivot Tables ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Pivot Tables â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 PivotTable SigmaSheets::create_pivot(CellRange source, sigma_u32 row_field,
                                       sigma_u32 col_field, sigma_u32 value_field,
                                       AggFunc agg) {
@@ -175,7 +175,7 @@ PivotTable SigmaSheets::create_pivot(CellRange source, sigma_u32 row_field,
     return pt;
 }
 
-// ─── Built-in Formulas ────────────────────────────────────────────────────────
+// â”€â”€â”€ Built-in Formulas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 double SigmaSheets::formula_sum(CellRange r)    { return aggregate(r, AggFunc::SUM); }
 double SigmaSheets::formula_avg(CellRange r)    { return aggregate(r, AggFunc::AVG); }
 double SigmaSheets::formula_max(CellRange r)    { return aggregate(r, AggFunc::MAX); }
@@ -191,9 +191,9 @@ double SigmaSheets::formula_vlookup(const char* val, CellRange table,
     return SIGMA_SHEETS_ERR_NA; // #N/A
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
-// SIGMA SLIDES — Presentation Software (maps to MS PowerPoint syllabus)
-// ═════════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SIGMA SLIDES â€” Presentation Software (maps to MS PowerPoint syllabus)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 SlideId SigmaSlides::add_slide(SlideLayout layout) {
     Slide s;
@@ -261,9 +261,9 @@ int SigmaSlides::export_pdf(const char* output_path) {
     return renderer.write_pdf(output_path);
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
-// SIGMA ACCESS — Database Frontend (maps to MS Access syllabus)
-// ═════════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SIGMA ACCESS â€” Database Frontend (maps to MS Access syllabus)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 int SigmaAccess::open_database(const char* path) {
     // Open or create a SigmaDB file-based database
@@ -271,7 +271,7 @@ int SigmaAccess::open_database(const char* path) {
         // Create new .sdb file with SovereignFS
         if (!m_db.create(path)) return SIGMA_SUITE_ERR_FILE;
     }
-    sigma_klog(sigma_printf, "[SigmaAccess] Opened database: %s\n", path);
+    sigma_klog(sigma_log_info, "[SigmaAccess] Opened database: %s\n", path);
     return SIGMA_SUITE_OK;
 }
 
@@ -280,11 +280,11 @@ int SigmaAccess::run_query(const char* sql, ResultSet* out) {
     QueryParser parser(sql);
     ParsedQuery q = parser.parse();
     if (!q.valid) {
-        sigma_klog(sigma_printf, "[SigmaAccess] Query parse error: %s\n", sql);
+        sigma_klog(sigma_log_info, "[SigmaAccess] Query parse error: %s\n", sql);
         return SIGMA_SUITE_ERR_SQL;
     }
     *out = m_db.execute(q);
-    sigma_klog(sigma_printf, "[SigmaAccess] Query returned %u rows\n", out->row_count);
+    sigma_klog(sigma_log_info, "[SigmaAccess] Query returned %u rows\n", out->row_count);
     return SIGMA_SUITE_OK;
 }
 
@@ -304,3 +304,4 @@ void SigmaAccess::create_form(const char* table_name, FormLayout layout) {
 }
 
 } // namespace Sigma::Suite
+

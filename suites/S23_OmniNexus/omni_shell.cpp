@@ -9,18 +9,31 @@
  */
 
 #include "SigmaOOP.hpp"
+#include "../../../include/sigma_log.h"
 #include "libc/sigma_libc.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignDistroForge.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignCoreUtils.h"
+#include "../../../include/sigma_log.h"
 #include "libc/SovereignLibC.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignSyncZenith.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignDiskZenith.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignOSBasicsZenith.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignXV6Bridge.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignHardwareIOZenith.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignCoordinationZenith.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignDesktopZenith.h"
+#include "../../../include/sigma_log.h"
 #include "SovereignAetherAbsorption.cpp"
+#include "../../../include/sigma_log.h"
 
 namespace SigmaOS {
 namespace Shell {
@@ -179,3 +192,4 @@ int main() {
 
 
 } // extern "C"
+

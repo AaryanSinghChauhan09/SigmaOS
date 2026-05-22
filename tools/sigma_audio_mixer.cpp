@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA AUDIO MIXER (sigma_audio_mixer) v1.0
+ * Î£ SIGMAOS: SIGMA AUDIO MIXER (sigma_audio_mixer) v1.0
  * =========================================================================
  * Mission: Sovereign sound routing and mixing.
  * Inspiration: PipeWire / PulseAudio, but lock-free and deterministic.
@@ -31,8 +31,8 @@ public:
     void init() {
         m_stream_count = 0;
         m_master_volume = 80;
-        sigma_printf("[AUDIO] Sigma Audio Mixer v1.0 initialized.");
-        sigma_printf("[AUDIO] Engine: Lock-Free Zero-Copy Mode");
+        sigma_log_info("[AUDIO] Sigma Audio Mixer v1.0 initialized.");
+        sigma_log_info("[AUDIO] Engine: Lock-Free Zero-Copy Mode");
     }
 
     void register_stream(const char* name, sigma_u32 rate, sigma_u8 channels) {
@@ -44,7 +44,7 @@ public:
         s.channels = channels;
         s.volume = 100;
         s.active = 1;
-        sigma_printf("[AUDIO] Registered stream '%s' (%uHz, %uch)", name, rate, channels);
+        sigma_log_info("[AUDIO] Registered stream '%s' (%uHz, %uch)", name, rate, channels);
     }
 
     void set_volume(const char* name, sigma_u8 vol) {
@@ -54,24 +54,24 @@ public:
             while (m_streams[i].name[j] == name[j] && name[j]) j++;
             if (!name[j] && !m_streams[i].name[j]) {
                 m_streams[i].volume = vol;
-                sigma_printf("[AUDIO] Stream '%s' volume set to %u%%", name, vol);
+                sigma_log_info("[AUDIO] Stream '%s' volume set to %u%%", name, vol);
                 return;
             }
         }
-        sigma_printfor("[AUDIO] Stream '%s' not found.", name);
+        sigma_log_infoor("[AUDIO] Stream '%s' not found.", name);
     }
 
     void set_master_volume(sigma_u8 vol) {
         if (vol > 100) vol = 100;
         m_master_volume = vol;
-        sigma_printf("[AUDIO] Master volume set to %u%%", vol);
+        sigma_log_info("[AUDIO] Master volume set to %u%%", vol);
     }
 
     void list_streams() const {
-        sigma_printf("[AUDIO] ===== Active Audio Streams =====");
-        sigma_printf("[AUDIO] MASTER VOLUME: %u%%", m_master_volume);
+        sigma_log_info("[AUDIO] ===== Active Audio Streams =====");
+        sigma_log_info("[AUDIO] MASTER VOLUME: %u%%", m_master_volume);
         for (sigma_u32 i = 0; i < m_stream_count; i++) {
-            sigma_printf("[AUDIO] %-20s %uHz %uch Vol:%u%%", 
+            sigma_log_info("[AUDIO] %-20s %uHz %uch Vol:%u%%", 
                 m_streams[i].name, m_streams[i].sample_rate, m_streams[i].channels, m_streams[i].volume);
         }
     }
@@ -94,3 +94,4 @@ void audio_set_vol(const char* name, sigma_u8 vol)                 { SigmaOS::To
 void audio_master_vol(sigma_u8 vol)                                { SigmaOS::Tools::SigmaAudioMixer::getInstance().set_master_volume(vol); }
 void audio_list()                                                  { SigmaOS::Tools::SigmaAudioMixer::getInstance().list_streams(); }
 }
+

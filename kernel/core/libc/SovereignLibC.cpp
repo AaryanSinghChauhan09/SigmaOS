@@ -1,4 +1,4 @@
-#define SIGMA_LIBC_INTERNAL
+﻿#define SIGMA_LIBC_INTERNAL
 #include "sigma_kernel_types.h"
 #include "sigma_log.h"
 #include "libc/SovereignLibC.h"
@@ -83,7 +83,7 @@ static void sigma_itoa(sigma_u64 n, char* buf, int base) {
     buf[j] = '\0';
 }
 
-void sigma_printf(const char* format, ...) {
+void sigma_log_info(const char* format, ...) {
     va_list args;
     va_start(args, format);
 
@@ -151,4 +151,5 @@ void sigma_log_industrial(const char* msg) {
 
 } // extern "C"
  
+
 

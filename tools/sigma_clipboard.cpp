@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA CLIPBOARD HUB (sigma_clipboard) v1.0
+ * Î£ SIGMAOS: SIGMA CLIPBOARD HUB (sigma_clipboard) v1.0
  * =========================================================================
  * Mission: Multi-clipboard manager.
  * Inspiration: macOS Universal Clipboard + CopyQ.
@@ -28,7 +28,7 @@ public:
     void init() {
         m_head = 0;
         m_count = 0;
-        sigma_printf("[CLIPBOARD] Sigma Clipboard Hub v1.0 initialized.");
+        sigma_log_info("[CLIPBOARD] Sigma Clipboard Hub v1.0 initialized.");
     }
 
     void copy(const char* text) {
@@ -43,14 +43,14 @@ public:
         } else {
             m_head = (m_head + 1) % MAX_ENTRIES;
         }
-        sigma_printf("[CLIPBOARD] Copied %u bytes to history.", e.length);
+        sigma_log_info("[CLIPBOARD] Copied %u bytes to history.", e.length);
     }
 
     void list_history() const {
-        sigma_printf("[CLIPBOARD] ===== Clipboard History =====");
+        sigma_log_info("[CLIPBOARD] ===== Clipboard History =====");
         for (sigma_u32 i = 0; i < m_count; i++) {
             sigma_u32 idx = (m_head + m_count - 1 - i) % MAX_ENTRIES;
-            sigma_printf("[CLIPBOARD] [%u]: %s", i, m_history[idx].data);
+            sigma_log_info("[CLIPBOARD] [%u]: %s", i, m_history[idx].data);
         }
     }
 
@@ -70,3 +70,4 @@ void clipboard_init()                               { SigmaOS::Tools::SigmaClipb
 void clipboard_copy(const char* text)               { SigmaOS::Tools::SigmaClipboardHub::getInstance().copy(text); }
 void clipboard_list()                               { SigmaOS::Tools::SigmaClipboardHub::getInstance().list_history(); }
 }
+

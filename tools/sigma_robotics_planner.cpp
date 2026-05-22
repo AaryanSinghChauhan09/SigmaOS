@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA ROBOTICS PLANNER (sigma_robotics_planner) v1.0
+ * Î£ SIGMAOS: SIGMA ROBOTICS PLANNER (sigma_robotics_planner) v1.0
  * =========================================================================
  * Mission: Pathfinding and control utilities.
  * Inspiration: ROS 2 + move_base.
@@ -23,21 +23,21 @@ public:
         m_active = false;
         m_current_x = 0.0f;
         m_current_y = 0.0f;
-        sigma_printf("[ROBOTICS] Sigma Robotics Planner v1.0 initialized.");
+        sigma_log_info("[ROBOTICS] Sigma Robotics Planner v1.0 initialized.");
     }
 
     void set_target(float x, float y) {
         m_target_x = x;
         m_target_y = y;
         m_active = true;
-        sigma_printf("[ROBOTICS] Target coordinates set: X=%.2f, Y=%.2f", x, y);
+        sigma_log_info("[ROBOTICS] Target coordinates set: X=%.2f, Y=%.2f", x, y);
     }
 
     void step_kinematics() {
         if (!m_active) return;
-        sigma_printf("[ROBOTICS] Calculating A* pathfinding and motor vectors...");
+        sigma_log_info("[ROBOTICS] Calculating A* pathfinding and motor vectors...");
         /* Simulated stepping */
-        sigma_printf("[ROBOTICS] Motor output generated. Avoiding obstacles.");
+        sigma_log_info("[ROBOTICS] Motor output generated. Avoiding obstacles.");
     }
 
 private:
@@ -57,3 +57,4 @@ void robotics_init()                       { SigmaOS::Tools::SigmaRoboticsPlanne
 void robotics_set_target(float x, float y) { SigmaOS::Tools::SigmaRoboticsPlanner::getInstance().set_target(x, y); }
 void robotics_step()                       { SigmaOS::Tools::SigmaRoboticsPlanner::getInstance().step_kinematics(); }
 }
+
