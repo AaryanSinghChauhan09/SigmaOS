@@ -13,6 +13,16 @@ void SovereignVFS::init() {
     sigma_log_info("[S-VFS] Initializing Sovereign Distributed Virtual File System...");
     this->m_active_shards = 0;
     this->m_files_tracked = 0;
+    
+    // Initialize root vnode
+    this->m_root_vnode = (SovereignVNode*)0x100000; // Stub pointer for root
+    this->m_root_vnode->id = 0;
+    this->m_root_vnode->mode = 0755;
+    this->m_root_vnode->size = 4096;
+    this->m_root_vnode->parent = nullptr;
+    this->m_root_vnode->first_child = nullptr;
+    this->m_root_vnode->next_sibling = nullptr;
+
     sigma_log_info("[S-VFS] [JOURNAL] Sovereign Persistence Journal [ACTIVE].");
 }
 
@@ -67,7 +77,7 @@ bool SovereignVFS::isolate_package_sandbox(const char* pkg_name, const char* san
     return true;
 }
 
-SovereignVFS::SovereignVFS() : m_active_shards(0), m_files_tracked(0), m_system_vector_clock(0), m_drift_correction_ms(2) {}
+SovereignVFS::SovereignVFS() : m_root_vnode(nullptr), m_active_shards(0), m_files_tracked(0), m_system_vector_clock(0), m_drift_correction_ms(2) {}
 
 } // namespace FS
 } // namespace SigmaOS

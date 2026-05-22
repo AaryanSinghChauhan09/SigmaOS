@@ -7,6 +7,37 @@ namespace SigmaOS {
 namespace Kernel {
 namespace HAL {
 
+struct SovereignKObject {
+    const char* name;
+    sigma_u32 refcount;
+    struct SovereignKObject* parent;
+    void* driver_data;
+};
+
+static void kobject_init(SovereignKObject* kobj, const char* name) {
+    kobj->name = name;
+    kobj->refcount = 1;
+    kobj->parent = nullptr;
+    kobj->driver_data = nullptr;
+}
+
+static SovereignKObject* kobject_get(SovereignKObject* kobj) {
+    if (kobj) {
+        kobj->refcount++;
+    }
+    return kobj;
+}
+
+static void kobject_put(SovereignKObject* kobj) {
+    if (kobj) {
+        kobj->refcount--;
+        if (kobj->refcount == 0) {
+            sigma_log_info("S [HAL/KObject]: Releasing KObject '%s'", kobj->name);
+            // Free logic would go here
+        }
+    }
+}
+
 void SovereignHAL::init() {
     sigma_log_info("S [HAL]: Initializing Universal Hardware Abstraction Shard...");
     

@@ -31,15 +31,56 @@ void* SovereignPMM::allocatePage() {
                     sigma_u64 addr = (sigma_u64)(i * 32 + j) * PAGE_SIZE;
                     lockPage(addr);
                     return (void*)addr;
-} // namespace Memory
-} // namespace Kernel
-} // namespace SigmaOS
-
-extern "C" {
-
-}
+                }
+            }
+        }
+    }
     sigma_log("S [PMM]: ERR: Physical Out of Memory Shard!");
     return SIGMA_NULL;
+}
+
+// SLUB Allocator Implementation
+struct SlabCache {
+    sigma_u32 object_size;
+    void* free_list;
+};
+static SlabCache slab_caches[8]; // Simple cache arrays for power-of-2 sizes
+
+void SovereignPMM::initSlabAllocator() {
+    sigma_log("S [PMM]: Initializing SLUB Allocator...");
+    for (int i = 0; i < 8; i++) {
+        slab_caches[i].object_size = 1 << (i + 3); // 8, 16, 32, ..., 1024
+        slab_caches[i].free_list = SIGMA_NULL;
+    }
+}
+
+void* SovereignPMM::allocSlab(sigma_u32 size) {
+    for (int i = 0; i < 8; i++) {
+        if (slab_caches[i].object_size >= size) {
+            if (slab_caches[i].free_list) {
+                void* obj = slab_caches[i].free_list;
+                slab_caches[i].free_list = *(void**)obj;
+                return obj;
+            }
+            // Need a new page for slabs
+            void* page = allocatePage();
+            if (!page) return SIGMA_NULL;
+            
+            // Slice page into objects
+            char* ptr = (char*)page;
+            for (sigma_u32 offset = 0; offset + slab_caches[i].object_size <= PAGE_SIZE; offset += slab_caches[i].object_size) {
+                void* obj = (void*)(ptr + offset);
+                *(void**)obj = slab_caches[i].free_list;
+                slab_caches[i].free_list = obj;
+            }
+            
+            // Pop one off
+            void* obj = slab_caches[i].free_list;
+            slab_caches[i].free_list = *(void**)obj;
+            return obj;
+        }
+    }
+    return allocatePage(); // Fallback for large allocs
 }
 
 void SovereignPMM::lockPage(sigma_u64 addr) {
@@ -95,9 +136,6 @@ extern "C" sigma_u64 pmm_get_used_shard() {
 }
 
 
-
-
-} // extern "C"
 
 } // extern "C"
  

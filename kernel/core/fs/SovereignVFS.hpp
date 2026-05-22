@@ -8,10 +8,21 @@ namespace SigmaOS {
 namespace Kernel {
 namespace FS {
 
-class SovereignDistributedVFS : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignDistributedVFS> {
-    friend class SigmaOS::SigmaSingleton<SovereignDistributedVFS>;
+struct SovereignVNode {
+    sigma_u32 id;
+    sigma_u32 mode;
+    sigma_u32 size;
+    struct SovereignVNode* parent;
+    struct SovereignVNode* next_sibling;
+    struct SovereignVNode* first_child;
+    void* fs_data; // FS specific data
+    char name[64];
+};
+
+class SovereignVFS : public SigmaOS::SigmaObject, public SigmaOS::SigmaSingleton<SovereignVFS> {
+    friend class SigmaOS::SigmaSingleton<SovereignVFS>;
 public:
-    const char* type_name() const noexcept override { return "SovereignDistributedVFS"; }
+    const char* type_name() const noexcept override { return "SovereignVFS"; }
 
     void init();
     void mountDistributedNode(const char* node_address);
@@ -21,14 +32,16 @@ public:
     void close(sigma_u32 fd);
     void writeReplicatedFile(const char* filepath, const char* data);
     void atomicSync();
+    void write_journal(const char* operation, const char* target);
+    bool isolate_package_sandbox(const char* pkg_name, const char* sandbox_path);
 
 private:
-    SovereignDistributedVFS();
-    char shard_nodes[8][32];
-    sigma_u32 active_shards;
-    sigma_u32 files_tracked;
-    sigma_u32 system_vector_clock;
-    sigma_u32 drift_correction_ms;
+    SovereignVFS();
+    SovereignVNode* m_root_vnode;
+    sigma_u32 m_active_shards;
+    sigma_u32 m_files_tracked;
+    sigma_u32 m_system_vector_clock;
+    sigma_u32 m_drift_correction_ms;
 };
 
 } // namespace FS
