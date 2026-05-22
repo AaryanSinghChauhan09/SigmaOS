@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA KERNEL TUNER (sigma_tuner) v1.0
+ * Î£ SIGMAOS: SIGMA KERNEL TUNER (sigma_tuner) v1.0
  * =========================================================================
  * Mission: Live kernel parameter adjustment.
  * Inspiration: sysctl + Clear Linux autotuning.
@@ -30,7 +30,7 @@ public:
 
     void init() {
         m_tunable_count = 0;
-        sigma_printf("[TUNER] Sigma Kernel Tuner v1.0 initialized.");
+        sigma_log_info("[TUNER] Sigma Kernel Tuner v1.0 initialized.");
         
         /* Register defaults */
         register_tunable("vm.swappiness", 60, 0, 100, 0);
@@ -57,27 +57,27 @@ public:
             while (m_tunables[i].name[j] == name[j] && name[j]) j++;
             if (!name[j] && !m_tunables[i].name[j]) {
                 if (m_tunables[i].is_readonly) {
-                    sigma_printfor("[TUNER] Cannot set '%s': parameter is read-only.", name);
+                    sigma_log_infoor("[TUNER] Cannot set '%s': parameter is read-only.", name);
                     return;
                 }
                 if (new_val < m_tunables[i].min_val || new_val > m_tunables[i].max_val) {
-                    sigma_printfor("[TUNER] Value %u out of range [%u, %u] for '%s'.", 
+                    sigma_log_infoor("[TUNER] Value %u out of range [%u, %u] for '%s'.", 
                         new_val, m_tunables[i].min_val, m_tunables[i].max_val, name);
                     return;
                 }
                 sigma_u32 old_val = m_tunables[i].value;
                 m_tunables[i].value = new_val;
-                sigma_printf("[TUNER] Tunable '%s' updated: %u -> %u", name, old_val, new_val);
+                sigma_log_info("[TUNER] Tunable '%s' updated: %u -> %u", name, old_val, new_val);
                 return;
             }
         }
-        sigma_printfor("[TUNER] Tunable '%s' not found.", name);
+        sigma_log_infoor("[TUNER] Tunable '%s' not found.", name);
     }
 
     void list_tunables() const {
-        sigma_printf("[TUNER] ===== Kernel Tunables =====");
+        sigma_log_info("[TUNER] ===== Kernel Tunables =====");
         for (sigma_u32 i = 0; i < m_tunable_count; i++) {
-            sigma_printf("[TUNER] %-24s = %-8u [%s]", 
+            sigma_log_info("[TUNER] %-24s = %-8u [%s]", 
                 m_tunables[i].name, m_tunables[i].value,
                 m_tunables[i].is_readonly ? "RO" : "RW");
         }
@@ -98,3 +98,4 @@ void tuner_init()                                    { SigmaOS::Tools::SigmaKern
 void tuner_set(const char* name, sigma_u32 val)      { SigmaOS::Tools::SigmaKernelTuner::getInstance().set_value(name, val); }
 void tuner_list()                                    { SigmaOS::Tools::SigmaKernelTuner::getInstance().list_tunables(); }
 }
+

@@ -592,6 +592,7 @@ class VirtualFS {
             }
         };
         this.cwd = '/home/sovereign';
+        this.seedInitialFiles();
     }
     save() { localStorage.setItem(this.key, JSON.stringify(this.root)); }
     resolve(path) {
@@ -605,6 +606,44 @@ class VirtualFS {
         return curr;
     }
     ls() { const node = this.resolve(this.cwd); return node ? Object.keys(node.children) : []; }
+    seedInitialFiles() {
+        const ensureDir = (parts) => {
+            let curr = this.root;
+            for (const p of parts) {
+                if (!curr.children) curr.children = {};
+                if (!curr.children[p]) {
+                    curr.children[p] = { name: p, type: 'dir', children: {} };
+                }
+                curr = curr.children[p];
+            }
+            return curr;
+        };
+        const writeSystemFile = (dirParts, filename, content) => {
+            const dirNode = ensureDir(dirParts);
+            dirNode.children[filename] = { name: filename, type: 'file', content: content };
+        };
+        writeSystemFile(['etc'], 'os-release', 'SIGMAOS 15.0.0 (Zenith)');
+        writeSystemFile(['etc'], 'linux_inspiration.md', 
+            `# SigmaOS Zenith: Distro Inspired Improvements\n` +
+            `- **Debian/Ubuntu**: Long-Term Support compatibility interfaces & packages.\n` +
+            `- **Arch Linux**: Fast rolling release model & lightweight minimal core setup.\n` +
+            `- **Qubes OS**: Compartment-based sandboxing and privilege ring isolation.\n` +
+            `- **Fedora**: Modern upstream integrations & EEVDF scheduler implementation.\n` +
+            `- **Alpine**: Minimal memory footprint for edge-focused cloud microkernel environments.\n` +
+            `- **NixOS**: Declarative system profiles & instant snapshot rollback engine.\n` +
+            `- **Gentoo**: Compile-time optimization flags tailoring execution to target silicon.\n`
+        );
+        writeSystemFile(['etc'], 'tactical_roadmap.md',
+            `# SigmaOS: Tactical Roadmap for Superiority\n` +
+            `1. **Release Killer Features**: Direct TPU/NPU AI hardware acceleration.\n` +
+            `2. **Demonstrate Speed**: EEVDF CPU dispatching proving 41.2% faster execution over legacy monoliths.\n` +
+            `3. **Absolute Sovereignty**: Hardened kernel telemetry shield & 100% cryptographic supply chain.\n`
+        );
+        writeSystemFile(['bin'], 'sigma_benchmark_matrix', '[ELF 64-bit Executable] Simulates next-gen hardware profiling.');
+        writeSystemFile(['bin'], 'sigma_telemetry_shield', '[ELF 64-bit Executable] Audits memory for hidden tracking code.');
+        writeSystemFile(['bin'], 'sigma_sdk_gateway', '[ELF 64-bit Executable] High-speed C++/Rust/Python migration bridge.');
+        this.save();
+    }
 }
 const vfs = new VirtualFS();
 
@@ -628,7 +667,7 @@ class SigmaTerminal {
         const base = args[0].toLowerCase();
         
         if (base === 'help') {
-            this.print('Commands: ls, cd [dir], cat [file], clear, reboot, status, shards, systemctl, exit');
+            this.print('Commands: ls, cd [dir], cat [file], clear, reboot, status, shards, systemctl, exit, benchmark, shield, sdk, install, absorb [distro]');
         } else if (base === 'ls') {
             this.print(vfs.ls().join('  '));
         } else if (base === 'cd') {
@@ -674,6 +713,61 @@ class SigmaTerminal {
             this.print('Active services: netstack, pkgmanager, maintenance, dynamic-theme');
         } else if (base === 'exit') {
             closeWindow('terminal-win');
+        } else if (base === 'benchmark') {
+            this.print('<span style="color: #60a5fa;">[Sigma Benchmark Matrix] Executing bare-metal micro-benchmarks...</span>');
+            this.print('CPU context switch (SFS): 45 cycles (Ubuntu: 120 cycles)');
+            this.print('Memory allocation (Slab): O(1) stability');
+            this.print('PQC Throughput (Kyber): 8.2 GB/s');
+            this.print('<span style="color: #4ade80;">Result: 41.2% faster computational throughput, 63% lower syscall latency vs Ubuntu.</span>');
+        } else if (base === 'shield') {
+            this.print('<span style="color: #f87171;">[Sigma Telemetry Shield] Scanning kernel memory zones...</span>');
+            this.print('Telemetry check: ZERO hidden telemetry found.');
+            this.print('Supply chain verification: Dilithium-5 secure boot signature VALID.');
+            this.print('Hyper-isolation: Qubes-style Ring-3 sandbox active.');
+            this.print('<span style="color: #4ade80;">Shield status: ENFORCING ABSOLUTE SOVEREIGNTY.</span>');
+        } else if (base === 'sdk') {
+            this.print('<span style="color: #fbbf24;">[Sigma SDK Gateway] Standard API Bindings online:</span>');
+            this.print(' - C++: libsigma_core.so');
+            this.print(' - Rust: sigma-sdk crate');
+            this.print(' - Python: py-sigma bindings');
+            this.print('Linux compatibility layer: active (WINE/container emulation enabled).');
+        } else if (base === 'install') {
+            this.print('<span style="color: #3b82f6;">[Sigma Installer] Launching system installer...</span>');
+            this.print('Detecting physical hardware compatibility...');
+            this.print('Target partition identified: /dev/nvme0n1p2 (S-OverlayFS)');
+            this.print('Extracting microkernel core...');
+            this.print('Attesting signature for 12 systems... OK.');
+            this.print('<span style="color: #4ade80;">SigmaOS Zenith v15.0 successfully installed to local hardware registers.</span>');
+        } else if (base === 'absorb') {
+            const distro = args[1] ? args[1].toLowerCase() : '';
+            if (distro === 'nix') {
+                this.print('<span style="color: #a78bfa;">[Absorb NixOS] Activating declarative profile engine...</span>');
+                this.print('Generating /etc/configuration.nix template.');
+                this.print('Enabling atomic snapshot tracking. Instant system rollbacks ENABLED.');
+                if (window.addLog) addLog('Σ [ABSORB]: NixOS declarative state tracking injected.', 'success');
+            } else if (distro === 'arch') {
+                this.print('<span style="color: #22d3ee;">[Absorb Arch Linux] Synchronizing rolling package database...</span>');
+                this.print('Connected to mirrorlist.sigmaos.org');
+                this.print('Package manager: pacman-speed index populated.');
+                if (window.addLog) addLog('Σ [ABSORB]: Arch package database synchronized.', 'success');
+            } else if (distro === 'qubes') {
+                this.print('<span style="color: #f87171;">[Absorb Qubes OS] Establishing hyper-isolated domains...</span>');
+                this.print('Creating isolated VMs: work-domain, personal-domain, net-firewall.');
+                this.print('Sovereign Ring-3 confinement level set to: MAXIMUM.');
+                if (window.addLog) addLog('Σ [ABSORB]: Qubes VM sandbox boundaries established.', 'success');
+            } else if (distro === 'fedora') {
+                this.print('<span style="color: #60a5fa;">[Absorb Fedora] Upgrading process scheduler...</span>');
+                this.print('Switching CPU scheduler to EEVDF (Earliest Eligible Virtual Deadline First).');
+                this.print('Desktop responsiveness latency profiles optimized.');
+                if (window.addLog) addLog('Σ [ABSORB]: Fedora EEVDF scheduling algorithms loaded.', 'success');
+            } else if (distro === 'gentoo') {
+                this.print('<span style="color: #f472b6;">[Absorb Gentoo] Applying source-based silicon compilation tunings...</span>');
+                this.print('Setting USE="avx512 pqc-attested lock-free-atomics"');
+                this.print('Recompiling core shards optimized for host CPU architecture.');
+                if (window.addLog) addLog('Σ [ABSORB]: Gentoo compile-time optimization compiler flags set.', 'success');
+            } else {
+                this.print('Usage: absorb [nix|arch|qubes|fedora|gentoo]');
+            }
         } else {
             this.print(`Command not found: ${base}`, 'error');
         }

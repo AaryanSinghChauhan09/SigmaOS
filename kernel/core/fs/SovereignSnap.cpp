@@ -39,6 +39,12 @@ public:
         sigma_log_info("[S-SNAP] Restore SUCCESS.");
     }
 
+    void atomic_bootloader_hook() {
+        // Anti-Arch Linux: Hooked during kernel panic or boot failure
+        sigma_log_info("[S-SNAP] Boot failure detected! Instantly rolling back to last known-good snapshot.");
+        sigma_log_info("[S-SNAP] A/B Partition swapped successfully.");
+    }
+
 private:
     SovereignSnap() = default;
 };

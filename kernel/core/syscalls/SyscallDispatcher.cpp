@@ -8,16 +8,11 @@ namespace SigmaOS {
         // Inline assembly for context switches
         #if defined(__x86_64__)
             __asm__ volatile (
-                "push %rdi 
-"
-                "push %rsi 
-"
-                "call handle_syscall 
-"
-                "pop %rsi 
-"
-                "pop %rdi 
-"
+                "push %rdi\n"
+                "push %rsi\n"
+                "call handle_syscall\n"
+                "pop %rsi\n"
+                "pop %rdi\n"
             );
         #elif defined(__aarch64__)
             // ARM64 fast context switch logic

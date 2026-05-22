@@ -1,5 +1,5 @@
-/**
- * SigmaWarehouse.cpp — Data Warehouse & Mining Engine
+﻿/**
+ * SigmaWarehouse.cpp â€” Data Warehouse & Mining Engine
  * SigmaOS Zenith v15.1
  *
  * Maps to: Syllabus-DWDM (Data Preprocessing, OLAP, ETL, Data Mining)
@@ -9,7 +9,7 @@
 
 namespace Sigma::Warehouse {
 
-// ─── Data Preprocessing ───────────────────────────────────────────────────────
+// â”€â”€â”€ Data Preprocessing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 DataSet DataPreprocessor::fill_missing_mean(const DataSet& ds) {
     DataSet result = ds.clone();
@@ -70,29 +70,29 @@ DataSet DataPreprocessor::remove_outliers_zscore(const DataSet& ds, double thres
     return result;
 }
 
-// ─── ETL Pipeline ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ ETL Pipeline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 int ETLPipeline::run() {
-    sigma_klog(sigma_printf, "[SigmaWarehouse] ETL pipeline '%s' starting\n", m_name);
+    sigma_klog(sigma_log_info, "[SigmaWarehouse] ETL pipeline '%s' starting\n", m_name);
     // 1. EXTRACT: read from source
     DataSet raw = m_extractor->extract();
-    sigma_klog(sigma_printf, "[SigmaWarehouse] Extracted %u rows\n", raw.n_samples);
+    sigma_klog(sigma_log_info, "[SigmaWarehouse] Extracted %u rows\n", raw.n_samples);
 
     // 2. TRANSFORM: apply all transform steps
     DataSet current = raw;
     for (sigma_u32 i = 0; i < m_transform_count; i++) {
         current = m_transforms[i]->transform(current);
-        sigma_klog(sigma_printf, "[SigmaWarehouse] Transform %u: %u rows\n", i, current.n_samples);
+        sigma_klog(sigma_log_info, "[SigmaWarehouse] Transform %u: %u rows\n", i, current.n_samples);
     }
 
     // 3. LOAD: write to destination
     int rc = m_loader->load(current);
-    sigma_klog(sigma_printf, "[SigmaWarehouse] ETL complete: %u rows loaded, rc=%d\n",
+    sigma_klog(sigma_log_info, "[SigmaWarehouse] ETL complete: %u rows loaded, rc=%d\n",
                current.n_samples, rc);
     return rc;
 }
 
-// ─── DataCube & OLAP ──────────────────────────────────────────────────────────
+// â”€â”€â”€ DataCube & OLAP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 void DataCube::build(const DataSet& ds) {
     m_ds = ds.clone();
@@ -114,13 +114,13 @@ DataSet DataCube::roll_up(sigma_u32 dim_idx, AggFunc agg) {
     DataSet result;
     // Group by all other dimensions, aggregate on dim_idx
     // (simplified: aggregate over entire dimension)
-    sigma_klog(sigma_printf, "[DataCube] ROLL UP dim=%u\n", dim_idx);
+    sigma_klog(sigma_log_info, "[DataCube] ROLL UP dim=%u\n", dim_idx);
     return aggregate_by_dim(dim_idx, agg);
 }
 
 // Drill down: more detailed view
 DataSet DataCube::drill_down(sigma_u32 dim_idx) {
-    sigma_klog(sigma_printf, "[DataCube] DRILL DOWN dim=%u\n", dim_idx);
+    sigma_klog(sigma_log_info, "[DataCube] DRILL DOWN dim=%u\n", dim_idx);
     return m_ds; // Already at finest granularity
 }
 
@@ -145,7 +145,7 @@ DataSet DataCube::dice(const DiceFilter* filters, sigma_u32 n_filters) {
     return result;
 }
 
-// ─── Association Rule Mining (Apriori algorithm) ──────────────────────────────
+// â”€â”€â”€ Association Rule Mining (Apriori algorithm) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 // Step 1: Generate frequent itemsets
 FrequentItemsets Apriori::find_frequent_itemsets(
@@ -194,3 +194,4 @@ AssocRuleList Apriori::generate_rules(const FrequentItemsets& fis,
 }
 
 } // namespace Sigma::Warehouse
+

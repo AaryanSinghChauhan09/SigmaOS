@@ -22,19 +22,16 @@ typedef enum {
 } SovereignCapsicum_Rights;
 
 void SovereignCapsicum_Init() {
-    sigma_sigma_printf("S [ABSORB]: SovereignCapsicum Capability Shield Online.
-");
+    sigma_sigma_printf("S [ABSORB]: SovereignCapsicum Capability Shield Online.\n");
 }
 
 int SovereignCapsicum_Enter() {
-    sigma_sigma_printf("S [CAP]: Process Entering Capability Mode. File Namespace Restricted.
-");
+    sigma_sigma_printf("S [CAP]: Process Entering Capability Mode. File Namespace Restricted.\n");
     return 0; // Mode: LOCKED
 }
 
 int SovereignCapsicum_Limit(int fd, sigma_u64 rights) {
-    sigma_sigma_printf("S [LIMIT]: FD %d Rights set to 0x%llx
-", fd, rights);
+    sigma_sigma_printf("S [LIMIT]: FD %d Rights set to 0x%llx\n", fd, rights);
     return 0;
 }
 

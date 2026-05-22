@@ -7,8 +7,7 @@ typedef struct {
 } EntityResolution;
 
 void SovereignBillionShard_Init() {
-    sigma_sigma_printf("S [OPERATION]: Billion-Scale Mesh Operational. Addressing 1B Entities...
-");
+    sigma_sigma_printf("S [OPERATION]: Billion-Scale Mesh Operational. Addressing 1B Entities...\n");
 }
 
 EntityResolution sigma_resolve(sigma_u64 id) {

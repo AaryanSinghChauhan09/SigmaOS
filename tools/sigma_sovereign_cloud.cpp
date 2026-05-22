@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA SOVEREIGN CLOUD OS (sigma_sovereign_cloud) v1.0
+ * Î£ SIGMAOS: SIGMA SOVEREIGN CLOUD OS (sigma_sovereign_cloud) v1.0
  * =========================================================================
  * Mission: Hybrid bare-metal + cloud orchestration.
  * Inspiration: Proxmox + OpenStack.
@@ -22,18 +22,18 @@ public:
 
     void init() {
         m_active_hypervisors = 0;
-        sigma_printf("[CLOUD_OS] Sigma Sovereign Cloud OS v1.0 initialized.");
+        sigma_log_info("[CLOUD_OS] Sigma Sovereign Cloud OS v1.0 initialized.");
     }
 
     void deploy_hypervisor(const char* ip) {
         if (m_active_hypervisors >= 256) return;
         m_active_hypervisors++;
-        sigma_printf("[CLOUD_OS] Deployed Sovereign Hypervisor to bare-metal node %s.", ip);
+        sigma_log_info("[CLOUD_OS] Deployed Sovereign Hypervisor to bare-metal node %s.", ip);
     }
 
     void migrate_shard(const char* shard_name, const char* target_ip) {
-        sigma_printf("[CLOUD_OS] Live migrating shard '%s' to cloud node %s...", shard_name, target_ip);
-        sigma_printf("[CLOUD_OS] Memory delta synced. Execution transferred.");
+        sigma_log_info("[CLOUD_OS] Live migrating shard '%s' to cloud node %s...", shard_name, target_ip);
+        sigma_log_info("[CLOUD_OS] Memory delta synced. Execution transferred.");
     }
 
 private:
@@ -49,3 +49,4 @@ void cloudos_init()                                            { SigmaOS::Tools:
 void cloudos_deploy(const char* ip)                            { SigmaOS::Tools::SigmaSovereignCloudOS::getInstance().deploy_hypervisor(ip); }
 void cloudos_migrate(const char* shard, const char* ip)        { SigmaOS::Tools::SigmaSovereignCloudOS::getInstance().migrate_shard(shard, ip); }
 }
+

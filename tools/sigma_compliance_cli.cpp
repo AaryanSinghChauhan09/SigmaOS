@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA COMPLIANCE DASHBOARD (sigma_compliance_cli) v1.0
+ * Î£ SIGMAOS: SIGMA COMPLIANCE DASHBOARD (sigma_compliance_cli) v1.0
  * =========================================================================
  * Mission: ISO 27001 / GDPR / HIPAA / SOC2 compliance attestation.
  * Inspiration: Fedora CoreOS audit subsystem + Ubuntu Pro security.
@@ -38,18 +38,18 @@ public:
     void init() {
         m_check_count   = 0;
         m_passed_count  = 0;
-        sigma_printf("[COMPLIANCE] Sigma Compliance Dashboard v1.0 initialized.");
-        sigma_printf("[COMPLIANCE] Frameworks: ISO27001 | GDPR | HIPAA | SOC2 | PCI-DSS");
+        sigma_log_info("[COMPLIANCE] Sigma Compliance Dashboard v1.0 initialized.");
+        sigma_log_info("[COMPLIANCE] Frameworks: ISO27001 | GDPR | HIPAA | SOC2 | PCI-DSS");
         run_default_checks();
     }
 
     void report() const {
-        sigma_printf("[COMPLIANCE] ====== COMPLIANCE ATTESTATION REPORT ======");
-        sigma_printf("[COMPLIANCE] Checks: %u total | %u passed | %u failed",
+        sigma_log_info("[COMPLIANCE] ====== COMPLIANCE ATTESTATION REPORT ======");
+        sigma_log_info("[COMPLIANCE] Checks: %u total | %u passed | %u failed",
                        m_check_count, m_passed_count, m_check_count - m_passed_count);
-        sigma_printf("[COMPLIANCE] Compliance Score: %u%%",
+        sigma_log_info("[COMPLIANCE] Compliance Score: %u%%",
                        m_check_count ? (m_passed_count * 100u / m_check_count) : 0u);
-        sigma_printf("[COMPLIANCE] -------------------------------------------");
+        sigma_log_info("[COMPLIANCE] -------------------------------------------");
         for (sigma_u32 i = 0; i < m_check_count; i++) {
             const char* fw = "UNKNOWN";
             switch (m_checks[i].framework) {
@@ -60,10 +60,10 @@ public:
                 case ComplianceFramework::PCI_DSS:  fw = "PCI-DSS";  break;
                 default: break;
             }
-            sigma_printf("[COMPLIANCE] [%s] %-6s %s",
+            sigma_log_info("[COMPLIANCE] [%s] %-6s %s",
                 m_checks[i].passed ? "PASS" : "FAIL", fw, m_checks[i].label);
         }
-        sigma_printf("[COMPLIANCE] ============================================");
+        sigma_log_info("[COMPLIANCE] ============================================");
     }
 
 private:
@@ -115,3 +115,4 @@ extern "C" {
 void compliance_init()   { SigmaOS::Tools::SigmaComplianceDashboard::getInstance().init(); }
 void compliance_report() { SigmaOS::Tools::SigmaComplianceDashboard::getInstance().report(); }
 }
+

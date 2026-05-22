@@ -127,7 +127,7 @@ public:
     void clean() {
         std::cout << "[*] Cleaning lattice artifacts...\n";
         if (fs::exists("build")) fs::remove_all("build");
-        std::cout << "["] Lattice is clean.\n";
+        std::cout << "[*] Lattice is clean.\n";
     }
 
 private:
@@ -200,7 +200,7 @@ private:
         for (const auto& obj : objects) cmd += " " + obj;
         
         if (std::system(cmd.c_str()) == 0) {
-            std::cout << "["] Sovereign Image: " << out << "\n";
+            std::cout << "[*] Sovereign Image: " << out << "\n";
         } else {
             std::cerr << "[✗] Linking failed.\n";
             std::exit(1);

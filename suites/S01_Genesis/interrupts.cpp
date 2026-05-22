@@ -22,6 +22,8 @@ static idt_entry idt[256];
 static idtr idtr_ptr;
 
 // Function to set an IDT gate
+extern "C" {
+
 void sigma_set_idt_gate(int n, sigma_u64 base, sigma_u16 sel, sigma_u8 flags) {
     idt[n].base_low = base & 0xFFFF;
     idt[n].base_mid = (base >> 16) & 0xFFFF;
@@ -70,7 +72,7 @@ void sigma_idt_init() {
     
     // Load IDT
     asm volatile("lidt %0" : : "m"(idtr_ptr));
-    sigma_print("["] IDT Loaded at 0x%p\n", idtr_ptr.base);
+    sigma_print("[SigmaOS] IDT Loaded at 0x%p\n", idtr_ptr.base);
 }
 
 } // extern "C"

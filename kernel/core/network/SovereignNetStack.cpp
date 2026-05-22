@@ -75,6 +75,10 @@ public:
         this->packets_filtered  = 0;
         this->bytes_dispatched  = 0;
         sigma_log("[NET] Data-link DPI firewall ACTIVE. MTU: 1500B (RFC 791).");
+        
+        // Phase 7: Engage Mesh Network
+        extern void zeronet_init();
+        zeronet_init();
     }
 
     void registerInterface(const char* mac_addr, const char* ip_addr) {

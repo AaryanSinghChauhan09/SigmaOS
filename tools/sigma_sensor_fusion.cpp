@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA SENSOR FUSION (sigma_sensor_fusion) v1.0
+ * Î£ SIGMAOS: SIGMA SENSOR FUSION (sigma_sensor_fusion) v1.0
  * =========================================================================
  * Mission: Combine multiple IoT sensor streams.
  * Inspiration: Android Sensor Framework + ROS (Robot Operating System).
@@ -29,7 +29,7 @@ public:
 
     void init() {
         m_sensor_count = 0;
-        sigma_printf("[FUSION] Sigma Sensor Fusion v1.0 initialized.");
+        sigma_log_info("[FUSION] Sigma Sensor Fusion v1.0 initialized.");
     }
 
     void register_sensor(const char* name, sigma_u8 type) {
@@ -40,7 +40,7 @@ public:
         s.type = type;
         s.value_raw = 0;
         s.value_scaled = 0.0f;
-        sigma_printf("[FUSION] Registered sensor '%s' (type %u)", name, type);
+        sigma_log_info("[FUSION] Registered sensor '%s' (type %u)", name, type);
     }
 
     void update_sensor(const char* name, sigma_u32 raw, float scaled) {
@@ -56,15 +56,15 @@ public:
     }
 
     void process_fusion() {
-        sigma_printf("[FUSION] Processing multi-sensor fusion frame...");
+        sigma_log_info("[FUSION] Processing multi-sensor fusion frame...");
         /* In reality, implement Kalman filters or AHRS algorithms here */
-        sigma_printf("[FUSION] Fusion matrix updated.");
+        sigma_log_info("[FUSION] Fusion matrix updated.");
     }
 
     void dump() const {
-        sigma_printf("[FUSION] ===== Sensor Fusion Matrix =====");
+        sigma_log_info("[FUSION] ===== Sensor Fusion Matrix =====");
         for (sigma_u32 i = 0; i < m_sensor_count; i++) {
-            sigma_printf("[FUSION] %-16s | Raw: %-8u | Scaled: %f", 
+            sigma_log_info("[FUSION] %-16s | Raw: %-8u | Scaled: %f", 
                 m_sensors[i].name, m_sensors[i].value_raw, m_sensors[i].value_scaled);
         }
     }
@@ -86,3 +86,4 @@ void fusion_update(const char* name, sigma_u32 raw, float scaled)  { SigmaOS::To
 void fusion_process()                                              { SigmaOS::Tools::SigmaSensorFusion::getInstance().process_fusion(); }
 void fusion_dump()                                                 { SigmaOS::Tools::SigmaSensorFusion::getInstance().dump(); }
 }
+

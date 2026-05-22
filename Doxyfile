@@ -1,21 +1,36 @@
-# Doxyfile for SigmaOS Zenith v15.0
-PROJECT_NAME           = "SigmaOS Zenith"
-PROJECT_NUMBER         = "v15.0.0"
-OUTPUT_DIRECTORY       = docs/api
-GENERATE_LATEX         = NO
-GENERATE_HTML          = YES
-INPUT                  = kernel/core include suites
-FILE_PATTERNS          = *.cpp *.h *.hpp *.c
-RECURSIVE              = YES
+# Doxyfile 1.9.1
+
+PROJECT_NAME           = "SigmaOS Sovereign Microkernel"
+PROJECT_NUMBER         = 15.0
+OUTPUT_DIRECTORY       = docs/api/
+CREATE_SUBDIRS         = NO
+OUTPUT_LANGUAGE        = English
+
+# Extract everything
 EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = YES
+EXTRACT_PRIV_VIRTUAL   = YES
+EXTRACT_PACKAGE        = YES
 EXTRACT_STATIC         = YES
-SOURCE_BROWSER         = YES
-INLINE_SOURCES         = YES
-HAVE_DOT               = YES
-CALL_GRAPH             = YES
-CALLER_GRAPH           = YES
-GRAPHICAL_HIERARCHY    = YES
-DIRECTORY_GRAPH        = YES
-DOT_IMAGE_FORMAT       = svg
-INTERACTIVE_SVG        = YES
+
+# Inputs
+INPUT                  = kernel/ include/
+RECURSIVE              = YES
+EXCLUDE                = build/ docs/
+EXCLUDE_SYMLINKS       = YES
+
+# Formats
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+HTML_FILE_EXTENSION    = .html
+GENERATE_LATEX         = NO
+GENERATE_XML           = NO
+
+# Macros & Macros
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = NO
+
+# Warnings
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = NO

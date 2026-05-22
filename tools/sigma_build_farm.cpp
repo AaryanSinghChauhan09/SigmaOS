@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA BUILD FARM (sigma_build_farm) v1.0
+ * Î£ SIGMAOS: SIGMA BUILD FARM (sigma_build_farm) v1.0
  * =========================================================================
  * Mission: Distributed shard compilation.
  * Inspiration: distcc + Icecream.
@@ -22,23 +22,23 @@ public:
 
     void init() {
         m_active_nodes = 0;
-        sigma_printf("[BUILDFARM] Sigma Build Farm v1.0 initialized.");
+        sigma_log_info("[BUILDFARM] Sigma Build Farm v1.0 initialized.");
     }
 
     void connect_node(const char* ip_address) {
         if (m_active_nodes >= 64) {
-            sigma_printfor("[BUILDFARM] Max cluster nodes reached.");
+            sigma_log_infoor("[BUILDFARM] Max cluster nodes reached.");
             return;
         }
         m_active_nodes++;
-        sigma_printf("[BUILDFARM] Connected build node: %s", ip_address);
+        sigma_log_info("[BUILDFARM] Connected build node: %s", ip_address);
     }
 
     void dispatch_build(const char* shard_target) {
         if (m_active_nodes == 0) {
-            sigma_printfor("[BUILDFARM] No nodes available. Building locally...");
+            sigma_log_infoor("[BUILDFARM] No nodes available. Building locally...");
         } else {
-            sigma_printf("[BUILDFARM] Dispatching compilation of '%s' to %u nodes...", shard_target, m_active_nodes);
+            sigma_log_info("[BUILDFARM] Dispatching compilation of '%s' to %u nodes...", shard_target, m_active_nodes);
         }
     }
 
@@ -55,3 +55,4 @@ void buildfarm_init()                               { SigmaOS::Tools::SigmaBuild
 void buildfarm_connect(const char* ip)              { SigmaOS::Tools::SigmaBuildFarm::getInstance().connect_node(ip); }
 void buildfarm_dispatch(const char* target)         { SigmaOS::Tools::SigmaBuildFarm::getInstance().dispatch_build(target); }
 }
+

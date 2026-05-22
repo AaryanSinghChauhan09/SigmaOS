@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA ACCESSIBILITY HUB (sigma_accessibility) v15.2
+ * Î£ SIGMAOS: SIGMA ACCESSIBILITY HUB (sigma_accessibility) v15.2
  * =========================================================================
  * Mission: One-click accessibility presets.
  * Inspiration: macOS Accessibility features.
@@ -25,12 +25,12 @@ public:
         m_screen_reader = false;
         m_high_contrast = false;
         m_magnifier_zoom = 1.0f;
-        sigma_printf("[ACCESS] Sigma Accessibility Hub v15.2 initialized.");
+        sigma_log_info("[ACCESS] Sigma Accessibility Hub v15.2 initialized.");
     }
 
     void toggle_screen_reader(bool enable) {
         m_screen_reader = enable;
-        sigma_printf("[ACCESS] Screen Reader: %s", enable ? "ON" : "OFF");
+        sigma_log_info("[ACCESS] Screen Reader: %s", enable ? "ON" : "OFF");
         if (enable) {
             SynthesizeSpeechPhoneme("Welcome to SigmaOS. System ready.");
         }
@@ -38,7 +38,7 @@ public:
 
     void toggle_high_contrast(bool enable) {
         m_high_contrast = enable;
-        sigma_printf("[ACCESS] High Contrast Mode: %s", enable ? "ON" : "OFF");
+        sigma_log_info("[ACCESS] High Contrast Mode: %s", enable ? "ON" : "OFF");
         if (enable) {
             // Apply a simulated grayscale + inversion filter
             sigma_u32 sample_pixels[] = {0xFF102030, 0xFF405060};
@@ -49,7 +49,7 @@ public:
     void set_magnifier(float zoom_level) {
         if (zoom_level < 1.0f) zoom_level = 1.0f;
         m_magnifier_zoom = zoom_level;
-        sigma_printf("[ACCESS] Magnifier Zoom Level: %.2fx", zoom_level);
+        sigma_log_info("[ACCESS] Magnifier Zoom Level: %.2fx", zoom_level);
         
         sigma_u32 sample_region[] = {0xAA, 0xBB, 0xCC, 0xDD};
         sigma_u32 magnified[16];
@@ -58,26 +58,26 @@ public:
 
     // --- 1. Screen Reader Text-To-Speech Phoneme Synthesizer ---
     void SynthesizeSpeechPhoneme(const char* text) const {
-        sigma_printf("[ACCESS/TTS]: Synthesizing audio phonemes from string input...\n");
+        sigma_log_info("[ACCESS/TTS]: Synthesizing audio phonemes from string input...\n");
         sigma_size_t i = 0;
         while (text[i] != '\0') {
             char c = text[i];
             // Simulated formant synthesizer matching character types
             if (c >= 'A' && c <= 'Z') {
-                sigma_printf("[ACCESS/TTS]: Formant transition generated for phoneme consonant '%c'.\n", c);
+                sigma_log_info("[ACCESS/TTS]: Formant transition generated for phoneme consonant '%c'.\n", c);
             } else if (c == ' ' || c == '.') {
-                sigma_printf("[ACCESS/TTS]: Pause inserted for syntactic marker.\n");
+                sigma_log_info("[ACCESS/TTS]: Pause inserted for syntactic marker.\n");
             } else {
-                sigma_printf("[ACCESS/TTS]: Formant transition generated for phoneme vowel '%c'.\n", c);
+                sigma_log_info("[ACCESS/TTS]: Formant transition generated for phoneme vowel '%c'.\n", c);
             }
             i++;
         }
-        sigma_printf("[ACCESS/TTS]: Screen reader audio dispatch complete.\n");
+        sigma_log_info("[ACCESS/TTS]: Screen reader audio dispatch complete.\n");
     }
 
     // --- 2. High Contrast Compositor Filter Matrix ---
     void ApplyHighContrastFilter(sigma_u32* pixel_buffer, sigma_size_t length) const {
-        sigma_printf("[ACCESS/SHADER]: Applying high-contrast color transformation matrix...\n");
+        sigma_log_info("[ACCESS/SHADER]: Applying high-contrast color transformation matrix...\n");
         for (sigma_size_t i = 0; i < length; i++) {
             sigma_u32 pixel = pixel_buffer[i];
             
@@ -93,13 +93,13 @@ public:
             
             pixel_buffer[i] = (0xFF000000) | (threshold << 16) | (threshold << 8) | threshold;
         }
-        sigma_printf("[ACCESS/SHADER]: Compositor color transformation complete.\n");
+        sigma_log_info("[ACCESS/SHADER]: Compositor color transformation complete.\n");
     }
 
     // --- 3. Lens Magnification Interpolator ---
     void MagnifyBoundingRegion(const sigma_u32* src_pixels, sigma_u32 width, sigma_u32 height, 
                                sigma_u32* dest_pixels, float zoom) const {
-        sigma_printf("[ACCESS/ZOOM]: Interpolating magnifier lens region at scale %.2f...\n", zoom);
+        sigma_log_info("[ACCESS/ZOOM]: Interpolating magnifier lens region at scale %.2f...\n", zoom);
         
         sigma_u32 dest_width = (sigma_u32)(width * zoom);
         sigma_u32 dest_height = (sigma_u32)(height * zoom);
@@ -120,7 +120,7 @@ public:
                 }
             }
         }
-        sigma_printf("[ACCESS/ZOOM]: Magnified display surface updated.\n");
+        sigma_log_info("[ACCESS/ZOOM]: Magnified display surface updated.\n");
     }
 
 private:
@@ -139,3 +139,4 @@ void access_reader(sigma_u8 enable)         { SigmaOS::Tools::SigmaAccessibility
 void access_contrast(sigma_u8 enable)       { SigmaOS::Tools::SigmaAccessibilityHub::getInstance().toggle_high_contrast(enable != 0); }
 void access_magnify(float zoom)             { SigmaOS::Tools::SigmaAccessibilityHub::getInstance().set_magnifier(zoom); }
 }
+

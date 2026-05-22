@@ -55,8 +55,7 @@ public:
         // ASM-level register saving for minimal latency during task switching
         #if defined(__x86_64__)
             __asm__ volatile (
-                "push %rax 
-"
+                "push %rax\n"
                 // Implement AVX-512 / SIMD register save
             );
         #endif

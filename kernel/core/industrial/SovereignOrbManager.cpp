@@ -83,7 +83,7 @@ public:
                 self.m_installed_orbs++;
             }
         } else {
-            sigma_log("[ORB-MAN] SIGNATURE MISMATCH " Orb rejected by QKD Core.\n");
+            sigma_log("[ORB-MAN] SIGNATURE MISMATCH -- Orb rejected by QKD Core.\n");
         }
     }
 
@@ -225,6 +225,8 @@ void orb_list() {
 
 
  
+
+
 
 
 

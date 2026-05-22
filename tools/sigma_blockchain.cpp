@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA BLOCKCHAIN HUB (sigma_blockchain) v1.0
+ * Î£ SIGMAOS: SIGMA BLOCKCHAIN HUB (sigma_blockchain) v1.0
  * =========================================================================
  * Mission: Distributed ledger integration.
  * Inspiration: Ethereum Light Client + Hyperledger.
@@ -22,18 +22,18 @@ public:
 
     void init() {
         m_synced_blocks = 0;
-        sigma_printf("[BLOCKCHAIN] Sigma Blockchain Hub v1.0 initialized.");
+        sigma_log_info("[BLOCKCHAIN] Sigma Blockchain Hub v1.0 initialized.");
     }
 
     void sync_ledger() {
-        sigma_printf("[BLOCKCHAIN] Syncing Sovereign Ledger (PQC-Hardened)...");
+        sigma_log_info("[BLOCKCHAIN] Syncing Sovereign Ledger (PQC-Hardened)...");
         m_synced_blocks += 1000;
-        sigma_printf("[BLOCKCHAIN] Ledger synced to block %u.", m_synced_blocks);
+        sigma_log_info("[BLOCKCHAIN] Ledger synced to block %u.", m_synced_blocks);
     }
 
     void validate_contract(const char* contract_hash) {
-        sigma_printf("[BLOCKCHAIN] Validating smart contract payload: %s", contract_hash);
-        sigma_printf("[BLOCKCHAIN] Contract validation passed. State machine updated.");
+        sigma_log_info("[BLOCKCHAIN] Validating smart contract payload: %s", contract_hash);
+        sigma_log_info("[BLOCKCHAIN] Contract validation passed. State machine updated.");
     }
 
 private:
@@ -49,3 +49,4 @@ void blockchain_init()                                      { SigmaOS::Tools::Si
 void blockchain_sync()                                      { SigmaOS::Tools::SigmaBlockchainHub::getInstance().sync_ledger(); }
 void blockchain_validate(const char* hash)                  { SigmaOS::Tools::SigmaBlockchainHub::getInstance().validate_contract(hash); }
 }
+

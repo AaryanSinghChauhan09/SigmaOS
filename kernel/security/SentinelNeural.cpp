@@ -1,9 +1,9 @@
-/**
- * SentinelNeural.cpp — AI-Driven Threat Detection Subsystem Implementation
+﻿/**
+ * SentinelNeural.cpp â€” AI-Driven Threat Detection Subsystem Implementation
  * SigmaOS Zenith v15.1
  *
  * Maps to: Syllabus-FCIT Unit III (Virus Detection & Prevention)
- *          Syllabus-AIML Unit II (Machine Learning — Anomaly Detection)
+ *          Syllabus-AIML Unit II (Machine Learning â€” Anomaly Detection)
  */
 #include "SentinelNeural.h"
 #include "sigma_log.h"
@@ -11,7 +11,7 @@
 
 namespace Sigma::Security {
 
-// ─── Mathematical Helpers ─────────────────────────────────────────────────────
+// â”€â”€â”€ Mathematical Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 static float sigma_exp(float x) {
     float sum = 1.0f; float term = 1.0f;
     for (int i = 1; i < 16; i++) { term *= x / (float)i; sum += term; }
@@ -22,7 +22,7 @@ float SentinelNeural::sigmoid(float x) {
     return 1.0f / (1.0f + sigma_exp(-x));
 }
 
-// ─── Singleton & Lifecycle ────────────────────────────────────────────────────
+// â”€â”€â”€ Singleton & Lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 SentinelNeural& SentinelNeural::instance() {
     static SentinelNeural inst;
     return inst;
@@ -63,15 +63,15 @@ void SentinelNeural::init() {
     m_signatures[m_sig_count++] = eicar;
     signatures_loaded = m_sig_count;
 
-    sigma_klog(sigma_printf, "[SentinelNeural] Subsystem initialized. Signatures: %u\n", m_sig_count);
+    sigma_klog(sigma_log_info, "[SentinelNeural] Subsystem initialized. Signatures: %u\n", m_sig_count);
 }
 
 void SentinelNeural::shutdown() {
     delete[] m_signatures;
-    sigma_klog(sigma_printf, "[SentinelNeural] Subsystem shut down.\n");
+    sigma_klog(sigma_log_info, "[SentinelNeural] Subsystem shut down.\n");
 }
 
-// ─── Signature Scanning ───────────────────────────────────────────────────────
+// â”€â”€â”€ Signature Scanning â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 bool SentinelNeural::pattern_match(const sigma_u32* data, sigma_usize len, const VirusSignature& sig) {
     if (len < sig.pattern_len) return false;
     sigma_usize max_offset = len - sig.pattern_len;
@@ -119,16 +119,16 @@ bool SentinelNeural::scan_file(const char* path, ThreatEvent* out_event) {
 }
 
 sigma_u32 SentinelNeural::load_signatures(const char* sigdb_path) {
-    sigma_klog(sigma_printf, "[SentinelNeural] Loading signatures from %s\n", sigdb_path);
+    sigma_klog(sigma_log_info, "[SentinelNeural] Loading signatures from %s\n", sigdb_path);
     return m_sig_count;
 }
 
 int SentinelNeural::update_signatures_from_cloud() {
-    sigma_klog(sigma_printf, "[SentinelNeural] Updating signatures from SovereignCloudFS...\n");
+    sigma_klog(sigma_log_info, "[SentinelNeural] Updating signatures from SovereignCloudFS...\n");
     return 0;
 }
 
-// ─── Behavioral Analysis ──────────────────────────────────────────────────────
+// â”€â”€â”€ Behavioral Analysis â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 void SentinelNeural::observe_process(sigma_u32 pid, const ProcessFeatureVector& features) {
     processes_monitored++;
     // Store in ring buffer
@@ -165,7 +165,7 @@ bool SentinelNeural::check_syscall_sequence(sigma_u32 pid, sigma_u32 syscall_id)
     return true; // true = OK
 }
 
-// ─── ML Anomaly Detection ─────────────────────────────────────────────────────
+// â”€â”€â”€ ML Anomaly Detection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 float SentinelNeural::mlp_forward(const float* input, int input_dim) {
     float h1[32]; float h2[16];
     // Layer 1
@@ -210,10 +210,10 @@ ThreatType SentinelNeural::classify_anomaly(float score, const ProcessFeatureVec
 }
 
 void SentinelNeural::update_model_baseline(const ProcessFeatureVector* samples, sigma_usize count) {
-    sigma_klog(sigma_printf, "[SentinelNeural] Online learning: updating MLP baseline with %u samples\n", (unsigned)count);
+    sigma_klog(sigma_log_info, "[SentinelNeural] Online learning: updating MLP baseline with %u samples\n", (unsigned)count);
 }
 
-// ─── Response Actions ─────────────────────────────────────────────────────────
+// â”€â”€â”€ Response Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 int SentinelNeural::quarantine_file(const char* path) {
     sigma_klog(LOG_WARN, "[SentinelNeural] QUARANTINE FILE: %s\n", path);
     return 0;
@@ -242,3 +242,4 @@ bool SentinelNeural::is_eicar_test_file(const sigma_u32* data, sigma_usize len) 
 }
 
 } // namespace Sigma::Security
+

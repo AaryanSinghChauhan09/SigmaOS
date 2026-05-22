@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA ENERGY SAVER (sigma_energy) v1.0
+ * Î£ SIGMAOS: SIGMA ENERGY SAVER (sigma_energy) v1.0
  * =========================================================================
  * Mission: Intelligent power scaling for laptops/servers.
  * Inspiration: TLP + Intel P-state driver.
@@ -31,30 +31,30 @@ public:
         m_profile = PowerProfile::BALANCED;
         m_battery_pct = 100;
         m_is_plugged_in = true;
-        sigma_printf("[ENERGY] Sigma Energy Saver v1.0 initialized.");
+        sigma_log_info("[ENERGY] Sigma Energy Saver v1.0 initialized.");
         apply_profile(m_profile);
     }
 
     void set_battery_state(sigma_u8 pct, bool plugged_in) {
         m_battery_pct = pct;
         m_is_plugged_in = plugged_in;
-        sigma_printf("[ENERGY] Battery: %u%% | %s", pct, plugged_in ? "AC Power" : "Battery");
+        sigma_log_info("[ENERGY] Battery: %u%% | %s", pct, plugged_in ? "AC Power" : "Battery");
         
         /* Auto-switch profiles based on power source */
         if (plugged_in && m_profile != PowerProfile::PERFORMANCE && m_profile != PowerProfile::BALANCED) {
-            sigma_printf("[ENERGY] AC power detected. Auto-switching to BALANCED.");
+            sigma_log_info("[ENERGY] AC power detected. Auto-switching to BALANCED.");
             apply_profile(PowerProfile::BALANCED);
         } else if (!plugged_in && pct <= 20 && m_profile != PowerProfile::ULTRA_ECO) {
-            sigma_printf("[ENERGY] Critical battery. Auto-switching to ULTRA_ECO.");
+            sigma_log_info("[ENERGY] Critical battery. Auto-switching to ULTRA_ECO.");
             apply_profile(PowerProfile::ULTRA_ECO);
         } else if (!plugged_in && pct > 20 && m_profile == PowerProfile::PERFORMANCE) {
-            sigma_printf("[ENERGY] On battery. Auto-switching to POWERSAVE.");
+            sigma_log_info("[ENERGY] On battery. Auto-switching to POWERSAVE.");
             apply_profile(PowerProfile::POWERSAVE);
         }
     }
 
     void force_profile(PowerProfile p) {
-        sigma_printf("[ENERGY] User override power profile.");
+        sigma_log_info("[ENERGY] User override power profile.");
         apply_profile(p);
     }
 
@@ -66,9 +66,9 @@ public:
             case PowerProfile::POWERSAVE:   p_str = "POWERSAVE";   break;
             case PowerProfile::ULTRA_ECO:   p_str = "ULTRA_ECO";   break;
         }
-        sigma_printf("[ENERGY] === Power Status ===");
-        sigma_printf("[ENERGY] Profile : %s", p_str);
-        sigma_printf("[ENERGY] Battery : %u%% (%s)", m_battery_pct, m_is_plugged_in ? "AC" : "DC");
+        sigma_log_info("[ENERGY] === Power Status ===");
+        sigma_log_info("[ENERGY] Profile : %s", p_str);
+        sigma_log_info("[ENERGY] Battery : %u%% (%s)", m_battery_pct, m_is_plugged_in ? "AC" : "DC");
     }
 
 private:
@@ -79,16 +79,16 @@ private:
         /* Simulate CPU frequency scaling and device sleep toggles */
         switch (p) {
             case PowerProfile::PERFORMANCE:
-                sigma_printf("[ENERGY] Applied: Max CPU freq, no auto-suspend.");
+                sigma_log_info("[ENERGY] Applied: Max CPU freq, no auto-suspend.");
                 break;
             case PowerProfile::BALANCED:
-                sigma_printf("[ENERGY] Applied: Dynamic CPU freq, 5m screen timeout.");
+                sigma_log_info("[ENERGY] Applied: Dynamic CPU freq, 5m screen timeout.");
                 break;
             case PowerProfile::POWERSAVE:
-                sigma_printf("[ENERGY] Applied: Capped CPU freq, aggressive PCI ASPM.");
+                sigma_log_info("[ENERGY] Applied: Capped CPU freq, aggressive PCI ASPM.");
                 break;
             case PowerProfile::ULTRA_ECO:
-                sigma_printf("[ENERGY] Applied: Min CPU freq, disable background tasks, dim display.");
+                sigma_log_info("[ENERGY] Applied: Min CPU freq, disable background tasks, dim display.");
                 break;
         }
     }
@@ -107,3 +107,4 @@ void energy_set_state(sigma_u8 pct, sigma_u8 plugged) { SigmaOS::Tools::SigmaEne
 void energy_force_powersave()                         { SigmaOS::Tools::SigmaEnergySaver::getInstance().force_profile(SigmaOS::Tools::PowerProfile::POWERSAVE); }
 void energy_report()                                  { SigmaOS::Tools::SigmaEnergySaver::getInstance().report(); }
 }
+

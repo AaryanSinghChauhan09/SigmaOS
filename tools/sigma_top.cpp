@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA TOP (sigma_top) v1.0
+ * Î£ SIGMAOS: SIGMA TOP (sigma_top) v1.0
  * =========================================================================
  * Mission: System resource monitor.
  * Inspiration: htop / btop / Windows Task Manager.
@@ -21,20 +21,20 @@ public:
     const char* type_name() const noexcept override { return "SigmaTop"; }
 
     void init() {
-        sigma_printf("[TOP] Sigma Top v1.0 initialized.");
+        sigma_log_info("[TOP] Sigma Top v1.0 initialized.");
     }
 
     void render_frame() const {
-        sigma_printf("[TOP] =================== Σ TOP ===================");
-        sigma_printf("[TOP] CPU [||||||||||||||          ] 54.0%%");
-        sigma_printf("[TOP] RAM [||||||                  ] 2.1G / 16.0G");
-        sigma_printf("[TOP] SWP [                        ] 0.0M /  2.0G");
-        sigma_printf("[TOP] ");
-        sigma_printf("[TOP] PID   USER       SHARD_NAME       CPU%%  MEM%%");
-        sigma_printf("[TOP] 1     root       SovereignBoot     0.0   0.1");
-        sigma_printf("[TOP] 42    sigma      SovereignGUI      8.4   2.4");
-        sigma_printf("[TOP] 88    sigma      SigmaBrowser     14.2   8.8");
-        sigma_printf("[TOP] =============================================");
+        sigma_log_info("[TOP] =================== Î£ TOP ===================");
+        sigma_log_info("[TOP] CPU [||||||||||||||          ] 54.0%%");
+        sigma_log_info("[TOP] RAM [||||||                  ] 2.1G / 16.0G");
+        sigma_log_info("[TOP] SWP [                        ] 0.0M /  2.0G");
+        sigma_log_info("[TOP] ");
+        sigma_log_info("[TOP] PID   USER       SHARD_NAME       CPU%%  MEM%%");
+        sigma_log_info("[TOP] 1     root       SovereignBoot     0.0   0.1");
+        sigma_log_info("[TOP] 42    sigma      SovereignGUI      8.4   2.4");
+        sigma_log_info("[TOP] 88    sigma      SigmaBrowser     14.2   8.8");
+        sigma_log_info("[TOP] =============================================");
     }
 
 private:
@@ -48,3 +48,4 @@ extern "C" {
 void sigmatop_init()            { SigmaOS::Tools::SigmaTop::getInstance().init(); }
 void sigmatop_render()          { SigmaOS::Tools::SigmaTop::getInstance().render_frame(); }
 }
+

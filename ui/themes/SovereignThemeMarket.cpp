@@ -20,7 +20,7 @@ void SovereignThemeMarketEngine::publishTheme(const char* theme_name, const char
     sigma_hardened_strcpy(this->theme_names[this->available_themes], theme_name, 48);
     sigma_hardened_strcpy(this->theme_authors[this->available_themes], author, 32);
     this->available_themes++;
-    sigma_log("[THEME-MKT] Published: '%s' by %s " SAB hash verified.\n", theme_name, author);
+    sigma_log("[THEME-MKT] Published: '%s' by %s SAB hash verified.\n", theme_name, author);
 }
 
 bool SovereignThemeMarketEngine::applyTheme(const char* theme_name) {
@@ -39,15 +39,19 @@ bool SovereignThemeMarketEngine::applyTheme(const char* theme_name) {
 void SovereignThemeMarketEngine::listThemes() {
     sigma_log("[THEME-MKT] %u themes available:\n", this->available_themes);
     for (sigma_u32 i = 0; i < this->available_themes; i++) {
-        sigma_log("  [%s] %s " by %s\n",
+        sigma_log("  [%s] %s by %s\n",
                      i == this->active_theme_idx ? "ACTIVE" : "     ",
                      this->theme_names[i], this->theme_authors[i]);
     }
 }
 
+extern "C" {
+
+extern "C" {
+
 void theme_market_init() { SovereignThemeMarketEngine::init(); }
 void theme_market_publish(const char* name, const char* author) { SovereignThemeMarketEngine::publishTheme(name, author); }
-extern "C" bool theme_market_apply(const char* name) { return SovereignThemeMarketEngine::applyTheme(name); }
+bool theme_market_apply(const char* name) { return SovereignThemeMarketEngine::applyTheme(name); }
 void theme_market_list() { SovereignThemeMarketEngine::listThemes(); }
 
 

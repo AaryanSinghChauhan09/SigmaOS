@@ -9,34 +9,34 @@
 
 void init_security_secure_boot() {
     sigma_print("[SECURE-BOOT] Verifying silicon-direct kernel signature...\n");
-    sigma_print("["] Boot integrity verified (FIPS-140-3 Mode).\n");
+    sigma_print("[SECURE-BOOT] Boot integrity verified (FIPS-140-3 Mode).\n");
 }
 
 void init_security_access_control() {
     sigma_print("[ACCESS-CONTROL] Loading Lattice-Scale Capability Gates...\n");
-    sigma_print("["] Access policies synchronized with Sovereign Registry.\n");
+    sigma_print("[ACCESS-CONTROL] Access policies synchronized with Sovereign Registry.\n");
 }
 
 void init_security_isolation() {
     sigma_print("[ISOLATION] Initializing zero-trust shard boundaries...\n");
-    sigma_print("["] Shard-pod namespaces isolated (L4 Gating).\n");
+    sigma_print("[ISOLATION] Shard-pod namespaces isolated (L4 Gating).\n");
 }
 
 /* --- Performance Modules --- */
 
 void init_perf_scheduler() {
     sigma_print("[SCHEDULER] Engaging Sovereign-Fair Scheduler (SFS)...\n");
-    sigma_print("["] ML-Prediction engine active for quantum pre-calculation.\n");
+    sigma_print("[SCHEDULER] ML-Prediction engine active for quantum pre-calculation.\n");
 }
 
 void init_perf_mm() {
     sigma_print("[MM] Initializing Sovereign Buddy/Slab Allocator Lattice...\n");
-    sigma_print("["] Memory maps verified. Industrial-grade stability online.\n");
+    sigma_print("[MM] Memory maps verified. Industrial-grade stability online.\n");
 }
 
 void init_perf_bench() {
     sigma_print("[BENCH] Running Sovereign Lattice Performance Audit...\n");
-    sigma_print("["] CPU Context Switch: 45 cycles | Memory Latency: O(1).\n");
+    sigma_print("[BENCH] CPU Context Switch: 45 cycles | Memory Latency: O(1).\n");
 }
 
 /* --- Toolkit Modules --- */
@@ -55,5 +55,5 @@ void init_tools_sandbox() {
 
 void init_tools_verification() {
     sigma_print("[VERIFICATION] Running lattice-wide parity checks...\n");
-    sigma_print("["] All 600 shards report OPTIMAL status.\n");
+    sigma_print("[VERIFICATION] All 600 shards report OPTIMAL status.\n");
 }

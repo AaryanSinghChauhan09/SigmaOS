@@ -1,5 +1,5 @@
-/**
- * SigmaWeb.cpp — SigmaWeb Runtime Engine
+﻿/**
+ * SigmaWeb.cpp â€” SigmaWeb Runtime Engine
  * SigmaOS Zenith v15.1
  *
  * Maps to: Syllabus-WebProgramming (HTML5, CSS, JavaScript, PHP)
@@ -9,7 +9,7 @@
 
 namespace Sigma::Web {
 
-// ─── HTML5 Parser ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ HTML5 Parser â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 DOMNode* SigmaWebParser::parse_html(const char* html, sigma_usize len) {
     DOMNode* root = alloc_node(NodeType::DOCUMENT);
@@ -68,9 +68,9 @@ DOMNode* SigmaWebParser::parse_html(const char* html, sigma_usize len) {
     return root;
 }
 
-// ─── Semantic HTML5 Tags → ARIA roles ─────────────────────────────────────────
+// â”€â”€â”€ Semantic HTML5 Tags â†’ ARIA roles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const char* SigmaWebParser::semantic_aria_role(const char* tag) {
-    // Semantic tag → ARIA landmark mapping
+    // Semantic tag â†’ ARIA landmark mapping
     struct { const char* tag; const char* role; } map[] = {
         {"header",  "banner"},     {"nav",     "navigation"},
         {"main",    "main"},       {"article", "article"},
@@ -84,7 +84,7 @@ const char* SigmaWebParser::semantic_aria_role(const char* tag) {
     return "generic";
 }
 
-// ─── CSS Layout Engine ────────────────────────────────────────────────────────
+// â”€â”€â”€ CSS Layout Engine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 void SigmaCSSEngine::apply_stylesheet(const char* css, DOMNode* root) {
     // Parse CSS rules
@@ -113,7 +113,7 @@ LayoutBox SigmaCSSEngine::compute_layout(DOMNode* node, const BoxConstraints& pa
     return layout_block(node, parent);
 }
 
-// ─── JavaScript Bridge ────────────────────────────────────────────────────────
+// â”€â”€â”€ JavaScript Bridge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 JSRuntime* SigmaJSEngine::create_runtime() {
     // Embed QuickJS for JS execution in SigmaOS
@@ -129,7 +129,7 @@ JSValue SigmaJSEngine::eval(JSContext* ctx, const char* code, const char* filena
                    JS_EVAL_TYPE_GLOBAL | JS_EVAL_FLAG_STRICT);
 }
 
-// Web Storage API → SovereignFS
+// Web Storage API â†’ SovereignFS
 void SigmaJSEngine::register_web_storage_api(JSContext* ctx) {
     // localStorage: persisted to /sigma/web/storage/<origin>/local.json
     // sessionStorage: persisted to /sigma/web/storage/<origin>/session.json
@@ -143,19 +143,19 @@ void SigmaJSEngine::register_web_storage_api(JSContext* ctx) {
     JS_SetPropertyStr(ctx, JS_GetGlobalObject(ctx), "localStorage", storage_proto);
 }
 
-// Web Workers → SigmaOS threads
+// Web Workers â†’ SigmaOS threads
 void SigmaJSEngine::register_web_workers_api(JSContext* ctx) {
     JS_SetPropertyStr(ctx, JS_GetGlobalObject(ctx), "Worker",
         JS_NewCFunction(ctx, js_worker_constructor, "Worker", 1));
 }
 
-// WebSockets → SovereignNetStack
+// WebSockets â†’ SovereignNetStack
 void SigmaJSEngine::register_websocket_api(JSContext* ctx) {
     JS_SetPropertyStr(ctx, JS_GetGlobalObject(ctx), "WebSocket",
         JS_NewCFunction(ctx, js_websocket_constructor, "WebSocket", 1));
 }
 
-// Geolocation → HAL GPS driver
+// Geolocation â†’ HAL GPS driver
 void SigmaJSEngine::register_geolocation_api(JSContext* ctx) {
     JSValue nav = JS_GetPropertyStr(ctx, JS_GetGlobalObject(ctx), "navigator");
     JS_SetPropertyStr(ctx, nav, "geolocation",
@@ -163,7 +163,7 @@ void SigmaJSEngine::register_geolocation_api(JSContext* ctx) {
     JS_FreeValue(ctx, nav);
 }
 
-// ─── PHP Bridge ───────────────────────────────────────────────────────────────
+// â”€â”€â”€ PHP Bridge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 int SigmaPHPBridge::execute(const char* script_path, const char* query_string,
                              char* output_buf, sigma_usize output_len) {
     // Fork a PHP-FPM compatible worker process
@@ -172,17 +172,17 @@ int SigmaPHPBridge::execute(const char* script_path, const char* query_string,
     worker.set_env("QUERY_STRING", query_string);
     worker.set_env("REQUEST_METHOD", "GET");
     int rc = worker.execute(output_buf, output_len);
-    sigma_klog(sigma_printf, "[SigmaWeb] PHP %s → %d bytes\n", script_path, (int)output_len);
+    sigma_klog(sigma_log_info, "[SigmaWeb] PHP %s â†’ %d bytes\n", script_path, (int)output_len);
     return rc;
 }
 
-// ─── HTML5 Application Cache / Service Worker ─────────────────────────────────
+// â”€â”€â”€ HTML5 Application Cache / Service Worker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 int SigmaWebCache::cache_resource(const char* url, const char* data,
                                    sigma_usize len) {
     // Store in /sigma/web/cache/<origin>/<url_hash>
     char cache_path[512];
     sigma_u32 hash = fnv1a_hash(url, sigma_strlen(url));
-    sigma_printf(cache_path, sizeof(cache_path),
+    sigma_log_info(cache_path, sizeof(cache_path),
                    "/sigma/web/cache/%08X", hash);
     SigmaFile* f = sigma_fopen(cache_path, "wb");
     if (!f) return -1;
@@ -192,3 +192,4 @@ int SigmaWebCache::cache_resource(const char* url, const char* data,
 }
 
 } // namespace Sigma::Web
+

@@ -1,5 +1,6 @@
 #include "libc/SovereignLibC.h"
 #include "sigma_kernel_types.h"
+#include "../graphics/sigma_framebuffer.h"
 /*
  * =============================================================================
  * Î£ SIGMAOS KERNEL: SYSTEM CALL INTERFACE (v1.0 - PURE C11)
@@ -142,8 +143,20 @@ static sigma_i64 sys_write_impl(SigmaInterruptFrame* f) {
 }
 
 static sigma_i64 sys_read_impl(SigmaInterruptFrame* f) {
-    (void)f;
-    /* TODO: VFS read dispatch */
+    int fd = (int)f->rdi;
+    char* buf = (char*)(sigma_usize)f->rsi;
+    sigma_usize count = (sigma_usize)f->rdx;
+    
+    if (fd == 0) { // stdin
+        extern char sigma_keyboard_getchar(void);
+        sigma_usize i;
+        for (i = 0; i < count; i++) {
+            buf[i] = sigma_keyboard_getchar();
+            if (buf[i] == '\n') { i++; break; } // return on newline
+        }
+        return (sigma_i64)i;
+    }
+    
     return K_ERR_INVAL;
 }
 
@@ -161,10 +174,38 @@ static sigma_i64 sys_yield_impl(SigmaInterruptFrame* f) {
 
 static sigma_i64 sys_mmap_impl(SigmaInterruptFrame* f) {
     sigma_usize length = (sigma_usize)f->rsi;
+    int fd = (int)f->r8;
+    
+    if (fd == 3) { // Assume fd 3 is /dev/fb0 for our Doom parity
+        extern void* sigma_fb_mmap(void);
+        void* fb_ptr = sigma_fb_mmap();
+        return fb_ptr ? (sigma_i64)(sigma_usize)fb_ptr : K_ERR_NOMEM;
+    }
+    
     extern sigma_vaddr_t vmalloc(sigma_u64 npages);
     sigma_u64 npages = (length + PAGE_SIZE - 1) / PAGE_SIZE;
     sigma_vaddr_t va = vmalloc(npages);
     return va ? (sigma_i64)va : K_ERR_NOMEM;
+}
+
+static sigma_i64 sys_ioctl_impl(SigmaInterruptFrame* f) {
+    int fd = (int)f->rdi;
+    unsigned int cmd = (unsigned int)f->rsi;
+    void* argp = (void*)(sigma_usize)f->rdx;
+    
+    if (fd == 3) { // /dev/fb0
+        extern struct sigma_fb_info* sigma_fb_get_info(void);
+        if (cmd == 0x4601) { // SIGMA_IOCTL_FB_GET_INFO
+            struct sigma_fb_info* info = sigma_fb_get_info();
+            if (argp && info) {
+                // Simplified user copy
+                struct sigma_fb_info* uinfo = (struct sigma_fb_info*)argp;
+                *uinfo = *info;
+                return 0;
+            }
+        }
+    }
+    return K_ERR_INVAL;
 }
 
 static sigma_i64 sys_uname_impl(SigmaInterruptFrame* f) {
@@ -218,6 +259,7 @@ static const syscall_fn_t g_syscall_table[SIGMA_NSYSCALLS] = {
     [SYS_YIELD]         = sys_yield_impl,
     [SYS_SCHED_YIELD]   = sys_yield_impl,
     [SYS_MMAP]          = sys_mmap_impl,
+    [SYS_IOCTL]         = sys_ioctl_impl,
     [SYS_UNAME]         = sys_uname_impl,
     [SYS_INFO]          = sys_info_impl,
     [SYS_POWEROFF]      = sys_poweroff_impl,
@@ -231,12 +273,18 @@ static const syscall_fn_t g_syscall_table[SIGMA_NSYSCALLS] = {
  * ========================================================================= */
 static sigma_u64 g_syscall_count = 0;
 
-void syscall_handler(SigmaInterruptFrame* frame) {
-    sigma_u64 sysno = frame->rax;
+void sigma_syscall_handler(SigmaInterruptFrame* f) {
+    if (!f) return;
+    
+    // Anti-eBPF: Zero-Overhead Native Syscall Tracing (The Panopticon)
+    extern void forensic_matrix_syscall_hook(int sysno, unsigned long rdi);
+    forensic_matrix_syscall_hook((int)f->rax, f->rdi);
+
+    sigma_u64 sysno = f->rax;
     sigma_i64 result;
 
     if (sysno < SIGMA_NSYSCALLS && g_syscall_table[sysno]) {
-        result = g_syscall_table[sysno](frame);
+        result = g_syscall_table[sysno](f);
     } else {
         ksigma_printf("[SYSCALL]: Invalid syscall #%llu\n", sysno);
         result = K_ERR_INVAL;

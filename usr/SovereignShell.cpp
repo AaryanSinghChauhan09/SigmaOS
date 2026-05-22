@@ -28,10 +28,22 @@ public:
 
     void executeCommand(const char* cmd) {
         if (sigma_strcmp(cmd, "help") == 0) {
-            sigma_log_info("Commands: help, echo, clear, halt, ls, exec [--zero-trace]\n");
+            sigma_log_info("Commands: help, echo, clear, halt, ls, cat, exec [--zero-trace]\n");
         } else if (sigma_strcmp(cmd, "halt") == 0) {
             sigma_log_info("Halting SigmaOS...\n");
             // syscall_halt()
+        } else if (sigma_strcmp(cmd, "ls") == 0) {
+            sigma_log_info(".\n..\nbin\netc\nusr\nvar\n");
+        } else if (sigma_hardened_strncmp(cmd, "echo ", 5) == 0) {
+            sigma_log_info("%s\n", cmd + 5);
+        } else if (sigma_hardened_strncmp(cmd, "cat ", 4) == 0) {
+            const char* filename = cmd + 4;
+            sigma_log_info("[VFS] Reading contents of %s...\n", filename);
+            if (sigma_strcmp(filename, "/etc/hostname") == 0) {
+                sigma_log_info("sigmaos-zenith\n");
+            } else {
+                sigma_log_info("cat: %s: File not found\n", filename);
+            }
         } else if (sigma_hardened_strncmp(cmd, "exec --zero-trace", 17) == 0) {
             this->zeroTraceExecute("target_shard");
         } else if (sigma_hardened_strncmp(cmd, "sh ", 3) == 0 || sigma_strstr(cmd, ".ssh")) {

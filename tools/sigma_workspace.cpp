@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA WORKSPACE PROFILES (sigma_workspace) v1.0
+ * Î£ SIGMAOS: SIGMA WORKSPACE PROFILES (sigma_workspace) v1.0
  * =========================================================================
  * Mission: Save and restore complete UI/workflow layouts.
  * Inspiration: NixOS declarative configs + macOS Spaces.
@@ -32,7 +32,7 @@ public:
     void init() {
         m_profile_count  = 0;
         m_active_profile = 0xFFFFFFFFu;
-        sigma_printf("[WORKSPACE] Sigma Workspace Profiles v1.0 initialized.");
+        sigma_log_info("[WORKSPACE] Sigma Workspace Profiles v1.0 initialized.");
         /* Create defaults */
         save_profile("default",    "sigma-dark",  0, 1, 1);
         save_profile("coding",     "sigma-focus", 3, 0, 0);
@@ -53,7 +53,7 @@ public:
         p.ai_assist      = ai_assist;
         p.notifications  = 1;
         m_profile_count++;
-        sigma_printf("[WORKSPACE] Profile saved: '%s' (theme=%s, layout=%u, ai=%u)",
+        sigma_log_info("[WORKSPACE] Profile saved: '%s' (theme=%s, layout=%u, ai=%u)",
                        name, theme, layout, ai_assist);
     }
 
@@ -63,18 +63,18 @@ public:
             while (m_profiles[i].name[j] == name[j] && name[j]) j++;
             if (!name[j] && !m_profiles[i].name[j]) {
                 m_active_profile = i;
-                sigma_printf("[WORKSPACE] Loaded profile '%s': theme=%s, layout=%u",
+                sigma_log_info("[WORKSPACE] Loaded profile '%s': theme=%s, layout=%u",
                                m_profiles[i].name, m_profiles[i].theme, m_profiles[i].layout_id);
                 return;
             }
         }
-        sigma_printfor("[WORKSPACE] Profile '%s' not found.", name);
+        sigma_log_infoor("[WORKSPACE] Profile '%s' not found.", name);
     }
 
     void list_profiles() const {
-        sigma_printf("[WORKSPACE] ===== Workspace Profiles =====");
+        sigma_log_info("[WORKSPACE] ===== Workspace Profiles =====");
         for (sigma_u32 i = 0; i < m_profile_count; i++) {
-            sigma_printf("[WORKSPACE] %s %-16s theme=%-12s layout=%u%s",
+            sigma_log_info("[WORKSPACE] %s %-16s theme=%-12s layout=%u%s",
                 (i == m_active_profile) ? ">" : " ",
                 m_profiles[i].name, m_profiles[i].theme,
                 m_profiles[i].layout_id,
@@ -98,3 +98,4 @@ void workspace_init()                         { SigmaOS::Tools::SigmaWorkspacePr
 void workspace_load(const char* name)         { SigmaOS::Tools::SigmaWorkspaceProfiles::getInstance().load_profile(name); }
 void workspace_list()                         { SigmaOS::Tools::SigmaWorkspaceProfiles::getInstance().list_profiles(); }
 }
+

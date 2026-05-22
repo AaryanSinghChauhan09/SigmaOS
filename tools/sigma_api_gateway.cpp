@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA API GATEWAY (sigma_api_gateway) v1.0
+ * Î£ SIGMAOS: SIGMA API GATEWAY (sigma_api_gateway) v1.0
  * =========================================================================
  * Mission: Sovereign API orchestration.
  * Inspiration: Kong + Traefik.
@@ -22,18 +22,18 @@ public:
 
     void init() {
         m_routes = 0;
-        sigma_printf("[API_GATE] Sigma API Gateway v1.0 initialized.");
+        sigma_log_info("[API_GATE] Sigma API Gateway v1.0 initialized.");
     }
 
     void add_route(const char* endpoint, const char* shard_dest) {
         if (m_routes >= 256) return;
         m_routes++;
-        sigma_printf("[API_GATE] Route added: %s -> %s", endpoint, shard_dest);
+        sigma_log_info("[API_GATE] Route added: %s -> %s", endpoint, shard_dest);
     }
 
     void handle_request(const char* endpoint) {
-        sigma_printf("[API_GATE] Intercepted IPC request for %s", endpoint);
-        sigma_printf("[API_GATE] PQC Signature Validated. Forwarding to destination shard...");
+        sigma_log_info("[API_GATE] Intercepted IPC request for %s", endpoint);
+        sigma_log_info("[API_GATE] PQC Signature Validated. Forwarding to destination shard...");
     }
 
 private:
@@ -49,3 +49,4 @@ void apigate_init()                                             { SigmaOS::Tools
 void apigate_add(const char* ep, const char* dest)              { SigmaOS::Tools::SigmaAPIGateway::getInstance().add_route(ep, dest); }
 void apigate_handle(const char* ep)                             { SigmaOS::Tools::SigmaAPIGateway::getInstance().handle_request(ep); }
 }
+

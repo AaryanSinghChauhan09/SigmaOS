@@ -17,7 +17,7 @@ KERNEL_BIN = $(BUILD_DIR)/sigmaos.bin
 ISO_IMAGE = $(BUILD_DIR)/sigmaos.iso
 
 # Directories to search for source files
-SRC_DIRS := kernel/core kernel/core/system kernel/core/syscall kernel/core/hal kernel/core/vulkan kernel/net kernel/storage kernel/telemetry tools usr init fs net lib/libc
+SRC_DIRS := kernel/core kernel/core/drivers/input kernel/core/memory kernel/core/sched kernel/core/system kernel/core/syscall kernel/core/hal kernel/core/vulkan kernel/net kernel/storage kernel/telemetry tools usr init fs net lib/libc
 C_SRCS := $(shell find $(SRC_DIRS) -name '*.c')
 CXX_SRCS := $(shell find $(SRC_DIRS) -name '*.cpp')
 ASM_SRCS := $(shell find $(SRC_DIRS) -name '*.asm')
@@ -44,8 +44,8 @@ $(BUILD_DIR)/%.o: %.asm
 	$(ASM) $(ASMFLAGS) $< -o $@
 
 $(KERNEL_BIN): $(OBJS)
-	# Using a basic linker script logic or raw binary dump for now
-	$(LD) -n -Ttext 0x100000 -o $@ $^
+	# Link using proper linker script
+	$(LD) -n -T linker.ld -o $@ $^
 
 iso: $(KERNEL_BIN)
 	@mkdir -p $(ISO_DIR)/boot/grub
