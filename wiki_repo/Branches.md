@@ -11,6 +11,8 @@ For the full per-branch guide with deep dives, current gaps, and improvement pla
 | Branch Name | Target System Archetype | Optimization Focus | Status |
 | :--- | :--- | :--- | :--- |
 | **`main`** | Stable Production Launch | Standard balanced shard scheduler configuration | ✅ Active |
+| **`master`** | Legacy Compatibility Sync | Kept in perfect parity with main for older CI/CD pipelines | ✅ Active |
+| **`prepare-sigmaos-launch`** | Final Pre-release Staging | Release candidate freezing and launch scripts | 🔨 Dev |
 | **`release/toolchain`** | Sovereign Self-Hosting Toolchain | The native C-subset compiler, assembler, and ELF64 linker | 🔨 Dev |
 | **`release/standalone`** | Bare-Metal Desktop/Workstation | Direct CPU-bound execution and local peripheral integration | 🔨 Dev |
 | **`release/rtos`** | Real-Time Embedded Systems | Deterministic thread scheduling, high-precision timers, zero-latency interrupts | 🔨 Dev |
