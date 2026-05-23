@@ -17,7 +17,7 @@ public:
         sigma_log_info("[OMNI-PKG] Containerized Shard Dependency Resolver: ONLINE.\n");
     }
 
-    bool install_shard(const char* name, uint32_t shard_id) {
+    bool install_shard(const char* name, unsigned int shard_id) {
         sigma_log_info("[OMNI-PKG] Installing shard ID %u\n", shard_id);
         
         // 1. Resolve Dependency Tree Transactionally
@@ -29,7 +29,7 @@ public:
         return true;
     }
 
-    void resolve_dependencies(uint32_t shard_id) {
+    void resolve_dependencies(unsigned int shard_id) {
         sigma_log_info("[OMNI-PKG] Resolving dependencies for shard %u...\n", shard_id);
         // Flatpak-style: the shard declares its own ABI layer, avoiding DLL-hell.
         sigma_log_info("[OMNI-PKG] ABI Layer confirmed. Zero conflicts detected.\n");
@@ -41,10 +41,10 @@ private:
 
 extern "C" {
     void pkg_init(void) { OmniPackageManager::getInstance().init(); }
-    bool pkg_install_shard(const char* name, uint32_t shard_id) { 
+    bool pkg_install_shard(const char* name, unsigned int shard_id) { 
         return OmniPackageManager::getInstance().install_shard(name, shard_id); 
     }
-    void pkg_resolve_dependencies(uint32_t shard_id) {
+    void pkg_resolve_dependencies(unsigned int shard_id) {
         OmniPackageManager::getInstance().resolve_dependencies(shard_id);
     }
 }

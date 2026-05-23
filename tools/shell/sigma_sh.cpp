@@ -58,6 +58,10 @@ extern "C" int sigma_tee_main(int argc, char** argv);
 extern "C" int sigma_diff_main(int argc, char** argv);
 extern "C" int sigma_touch_main(int argc, char** argv);
 extern "C" int sigma_date_main(int argc, char** argv);
+extern "C" int sigma_free_main(int argc, char** argv);
+extern "C" int sigma_umount_main(int argc, char** argv);
+extern "C" int sigma_nano_main(int argc, char** argv);
+extern "C" int sigma_make_main(int argc, char** argv);
 extern "C" int sigma_cc_main(int argc, char** argv);
 extern "C" int sigma_assembler_main(int argc, char** argv);
 extern "C" int sigma_linker_main(int argc, char** argv);
@@ -235,6 +239,10 @@ static void builtin_help() {
     sigma_vga_puts("  asm   [input.s]                 Sovereign assembler\n");
     sigma_vga_puts("  ld    [obj1] [obj2]             Sovereign linker\n");
     sigma_vga_puts("  browser [file.html]             Minimal text browser\n");
+    sigma_vga_puts("  free                            Display memory usage\n");
+    sigma_vga_puts("  umount [target]                 Unmount filesystem\n");
+    sigma_vga_puts("  nano  [file]                    Sovereign text editor\n");
+    sigma_vga_puts("  make  [target]                  Sovereign build tool\n");
 }
 
 /* history: print command history */
@@ -311,6 +319,10 @@ static void dispatch_command(const char* input) {
     else if (sh_streq(argv[0], "asm"))      sigma_assembler_main(argc, argv);
     else if (sh_streq(argv[0], "ld"))       sigma_linker_main(argc, argv);
     else if (sh_streq(argv[0], "browser"))  sigma_browser_main(argc, argv);
+    else if (sh_streq(argv[0], "free"))     sigma_free_main(argc, argv);
+    else if (sh_streq(argv[0], "umount"))   sigma_umount_main(argc, argv);
+    else if (sh_streq(argv[0], "nano"))     sigma_nano_main(argc, argv);
+    else if (sh_streq(argv[0], "make"))     sigma_make_main(argc, argv);
     else {
         sigma_vga_puts("sigma-sh: command not found: ");
         sigma_vga_puts(argv[0]);

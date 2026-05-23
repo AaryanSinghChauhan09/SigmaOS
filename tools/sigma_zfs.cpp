@@ -48,7 +48,7 @@ public:
 
         if (sigma_strcmp(cmd.c_str(), "add") == 0) {
             if (argc < 4) {
-                sigma_log_infoor("[ZFS-CLI] Error: 'add' requires <dev_path> <size_gb>");
+                sigma_log_info("[ZFS-CLI] Error: 'add' requires <dev_path> <size_gb>");
                 return;
             }
             const char* path = argv[2];
@@ -56,7 +56,7 @@ public:
             zfs_pool_add(path, size);
         } else if (sigma_strcmp(cmd.c_str(), "allocate") == 0) {
             if (argc < 4) {
-                sigma_log_infoor("[ZFS-CLI] Error: 'allocate' requires <size_gb> <dataset_name>");
+                sigma_log_info("[ZFS-CLI] Error: 'allocate' requires <size_gb> <dataset_name>");
                 return;
             }
             sigma_u32 size = sigma_atoi(argv[2]);
@@ -64,7 +64,7 @@ public:
             zfs_allocate(size, dataset);
         } else if (sigma_strcmp(cmd.c_str(), "snapshot") == 0) {
             if (argc < 4) {
-                sigma_log_infoor("[ZFS-CLI] Error: 'snapshot' requires <dataset_name> <snapshot_name>");
+                sigma_log_info("[ZFS-CLI] Error: 'snapshot' requires <dataset_name> <snapshot_name>");
                 return;
             }
             const char* dataset = argv[2];

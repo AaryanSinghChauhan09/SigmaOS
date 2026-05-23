@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN PACKAGE MANAGEMENT (S-PKG)
  * =========================================================================
@@ -17,15 +17,15 @@ extern "C" {
 
 typedef struct {
     char name[64];
-    uint32_t version;
-    uint32_t dependency_shard_ids[16];
-    uint32_t dep_count;
+    unsigned int version;
+    unsigned int dependency_shard_ids[16];
+    unsigned int dep_count;
 } sigma_package_t;
 
 /* --- Package Primitives --- */
 void pkg_init(void);
-bool pkg_install_shard(const char* name, uint32_t shard_id);
-void pkg_resolve_dependencies(uint32_t shard_id);
+bool pkg_install_shard(const char* name, unsigned int shard_id);
+void pkg_resolve_dependencies(unsigned int shard_id);
 
 #ifdef __cplusplus
 }

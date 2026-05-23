@@ -47,7 +47,7 @@ public:
 
         if (sigma_strcmp(cmd.c_str(), "create") == 0) {
             if (argc < 6) {
-                sigma_log_infoor("[CGROUP-CLI] Error: 'create' requires <name> <cpu_pct> <mem_mb> <io_weight>");
+                sigma_log_info("[CGROUP-CLI] Error: 'create' requires <name> <cpu_pct> <mem_mb> <io_weight>");
                 return;
             }
             const char* name = argv[2];

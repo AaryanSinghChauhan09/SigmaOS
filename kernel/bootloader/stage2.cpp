@@ -52,7 +52,7 @@ extern "C" void sigma_stage2_main() {
         sigma_vga_printf("Valid ELF found. Jumping to kernel entry: 0x%X\n", elf->e_entry);
         
         // Jump to kernel!
-        void (*kernel_entry)() = (void (*)())elf->e_entry;
+        void (*kernel_entry)() = (void (*)())(unsigned long)elf->e_entry;
         kernel_entry();
     } else {
         sigma_vga_printf("Stage 2 Error: No valid ELF found at 1MB!\n");

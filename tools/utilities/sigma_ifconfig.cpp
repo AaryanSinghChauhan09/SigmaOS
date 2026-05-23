@@ -8,6 +8,7 @@ typedef unsigned char  u8;
 typedef unsigned int   u32;
 
 extern "C" void sigma_vga_printf(const char* fmt, ...);
+extern "C" void sigma_vga_putchar(char c);
 
 struct sigma_net_iface {
     char     name[16];

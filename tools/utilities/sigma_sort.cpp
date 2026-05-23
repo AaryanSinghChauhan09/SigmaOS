@@ -96,7 +96,7 @@ static void qs_sort(u32 lo, u32 hi) {
         while (do_cmp(lines[i], pivot) < 0) i++;
         while (do_cmp(lines[j], pivot) > 0) j--;
         if (i >= j) break;
-        const char* tmp = lines[i]; lines[i] = lines[j]; lines[j] = tmp;
+        char* tmp = lines[i]; lines[i] = lines[j]; lines[j] = tmp;
         i++; if (j > 0) j--;
     }
     if (lo < j) qs_sort(lo, j);

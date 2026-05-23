@@ -233,19 +233,19 @@ extern "C" int sigma_virtio_blk_read(u64 lba, u32 count, u8* buf) {
 
     /* Build 3-descriptor chain: header | data (write) | status (write) */
     /* Desc 0: request header (device reads) */
-    vring_desc[0].addr  = (u64)(u32)&io_req_hdr;
+    vring_desc[0].addr  = (u64)(unsigned long)&io_req_hdr;
     vring_desc[0].len   = sizeof(VirtioBlkReqHdr);
     vring_desc[0].flags = VIRTQ_DESC_F_NEXT;
     vring_desc[0].next  = 1;
 
     /* Desc 1: data buffer (device writes sectors into it) */
-    vring_desc[1].addr  = (u64)(u32)buf;
+    vring_desc[1].addr  = (u64)(unsigned long)buf;
     vring_desc[1].len   = count * 512;
     vring_desc[1].flags = VIRTQ_DESC_F_WRITE | VIRTQ_DESC_F_NEXT;
     vring_desc[1].next  = 2;
 
     /* Desc 2: status byte (device writes VIRTIO_BLK_S_*) */
-    vring_desc[2].addr  = (u64)(u32)&io_status;
+    vring_desc[2].addr  = (u64)(unsigned long)&io_status;
     vring_desc[2].len   = 1;
     vring_desc[2].flags = VIRTQ_DESC_F_WRITE;
     vring_desc[2].next  = 0;
@@ -263,17 +263,17 @@ extern "C" int sigma_virtio_blk_write(u64 lba, u32 count, const u8* buf) {
     io_req_hdr.sector   = lba;
     io_status = 0xFF;
 
-    vring_desc[0].addr  = (u64)(u32)&io_req_hdr;
+    vring_desc[0].addr  = (u64)(unsigned long)&io_req_hdr;
     vring_desc[0].len   = sizeof(VirtioBlkReqHdr);
     vring_desc[0].flags = VIRTQ_DESC_F_NEXT;
     vring_desc[0].next  = 1;
 
-    vring_desc[1].addr  = (u64)(u32)buf; /* Device reads our data */
+    vring_desc[1].addr  = (u64)(unsigned long)buf; /* Device reads our data */
     vring_desc[1].len   = count * 512;
     vring_desc[1].flags = VIRTQ_DESC_F_NEXT; /* No WRITE — device reads */
     vring_desc[1].next  = 2;
 
-    vring_desc[2].addr  = (u64)(u32)&io_status;
+    vring_desc[2].addr  = (u64)(unsigned long)&io_status;
     vring_desc[2].len   = 1;
     vring_desc[2].flags = VIRTQ_DESC_F_WRITE;
     vring_desc[2].next  = 0;
