@@ -40,6 +40,9 @@ static u16 sovereign_checksum(void* data, u32 len) {
     return (u16)(~sum);
 }
 
+extern "C" void sigma_udp_receive(u32 src_ip, u8* payload, u32 len);
+extern "C" void sigma_tcp_receive(u32 src_ip, u8* payload, u32 len);
+
 extern "C" void sigma_ipv4_receive(u8* packet, u32 len) {
     if (len < sizeof(sigma_ipv4_header)) return;
     
@@ -65,6 +68,10 @@ extern "C" void sigma_ipv4_receive(u8* packet, u32 len) {
 
     if (ip->protocol == IPV4_PROTO_ICMP) {
         sigma_icmp_receive(ip->source_ip, payload, payload_len);
+    } else if (ip->protocol == IPV4_PROTO_UDP) {
+        sigma_udp_receive(ip->source_ip, payload, payload_len);
+    } else if (ip->protocol == IPV4_PROTO_TCP) {
+        sigma_tcp_receive(ip->source_ip, payload, payload_len);
     } else {
         sigma_vga_printf("IPv4: Unsupported protocol %u\n", ip->protocol);
     }

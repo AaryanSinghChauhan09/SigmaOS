@@ -26,11 +26,17 @@
 
 ## ⚙️ Core Subsystems
 
-- [Networking Shard (TCP/IP)](Networking-Shard)
+- [**Networking Shard (TCP/IP/UDP)**](Networking-Shard)
 
-- [Storage Shard (LFS/VFS)](Storage-Shard)
+- [**Zenith GUI (Compositor/WM)**](Zenith-GUI)
 
-- [**File System Notes (FAT32/ext2)**](File-System-Notes)
+- [**OmniPackage Manager**](OmniPackage-Manager)
+
+- [**Post-Quantum Security (Dilithium)**](Post-Quantum-Security)
+
+- [Storage Shard (LFS/VFS/S-ZFS)](Storage-Shard)
+
+- [File System Notes (FAT32/ext2)](File-System-Notes)
 
 - [Real-Time Scheduler (CFS)](Real-Time-Scheduler-Shard)
 
