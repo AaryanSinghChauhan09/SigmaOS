@@ -15,18 +15,18 @@
 **Goal:** Bring the system online with a sovereign network stack.
 
 - [x] **Network Interface Cards (NIC):** Intel e1000 (`sigma_e1000`), Realtek RTL8139 (`sigma_rtl8139`).
-- [ ] **Sovereign TCP/IP Stack:** ARP, IPv4, ICMP, UDP, and finally TCP—all written from scratch with zero sockets from libc.
-- [ ] **File System Expansion:** Full read/write support for ext2, moving towards journaled ext4 clone.
-- [ ] **Bootloader:** Custom Stage 1/Stage 2 bootloader replacing GRUB, loading the SigmaOS ELF kernel directly.
+- [x] **Sovereign TCP/IP Stack:** ARP, IPv4, ICMP, UDP, and finally TCP—all written from scratch with zero sockets from libc.
+- [x] **File System Expansion:** Full read/write support for ext2, moving towards journaled ext4 clone.
+- [x] **Bootloader:** Custom Stage 1/Stage 2 bootloader replacing GRUB, loading the SigmaOS ELF kernel directly.
 
 ## 📦 Phase 3: The Userland Singularity (Long-Term)
 **Goal:** Create a modern, graphical, secure OS environment.
 
-- [ ] **OmniPackage Manager:** Transactional, containerized package manager bypassing dependency hell (no `/usr/lib` conflicts).
-- [ ] **Zenith GUI:** A compositor and window manager using the VGA framebuffer, implementing a glassmorphic Sovereign UI.
-- [ ] **Bootstrap Compiler:** A minimal C++ compiler capable of compiling SigmaOS within SigmaOS (Self-Hosting).
-- [ ] **Post-Quantum Security:** Dilithium-5 digital signatures enforcing that only signed shards execute.
-- [ ] **S-ZFS:** Full copy-on-write storage pool with RAID-Z-like striping.
+- [x] **OmniPackage Manager:** Transactional, containerized package manager bypassing dependency hell (no `/usr/lib` conflicts).
+- [x] **Zenith GUI:** A compositor and window manager using the VGA framebuffer, implementing a glassmorphic Sovereign UI.
+- [x] **Bootstrap Compiler:** A minimal C++ compiler capable of compiling SigmaOS within SigmaOS (Self-Hosting).
+- [x] **Post-Quantum Security:** Dilithium-5 digital signatures enforcing that only signed shards execute.
+- [x] **S-ZFS:** Full copy-on-write storage pool with RAID-Z-like striping.
 
 ---
 **Guiding Principle throughout all phases:** Zero `libc`, zero `std::vector`, zero `#include <stdio.h>`. Silicon direct.
