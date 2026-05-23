@@ -47,6 +47,7 @@
 - [Kernel Internals](SigmaOS-Kernel-Internals)
   * [Hardware Drivers](Hardware-Drivers)
   * [Security Architecture](Security-Architecture)
+  * [System Daemons & Utilities](System-Daemons)
 
 - [**Compiler Toolchain (cc/asm/ld)**](Compiler-Toolchain)
 

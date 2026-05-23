@@ -62,6 +62,9 @@ extern "C" int sigma_ssh_main(int argc, char** argv);
 extern "C" int sigma_wget_main(int argc, char** argv);
 extern "C" int sigma_sudo_main(int argc, char** argv);
 extern "C" int sigma_su_main(int argc, char** argv);
+extern "C" int sigma_gzip_main(int argc, char** argv);
+extern "C" int sigma_nc_main(int argc, char** argv);
+extern "C" int sigma_vi_main(int argc, char** argv);
 extern "C" int sigma_free_main(int argc, char** argv);
 extern "C" int sigma_umount_main(int argc, char** argv);
 extern "C" int sigma_nano_main(int argc, char** argv);
@@ -251,6 +254,9 @@ static void builtin_help() {
     sigma_vga_puts("  wget  [url]                     Sovereign HTTP downloader\n");
     sigma_vga_puts("  sudo  [command]                 Execute as superuser\n");
     sigma_vga_puts("  su    [user]                    Switch user\n");
+    sigma_vga_puts("  gzip  [file]                    Compress file with DEFLATE\n");
+    sigma_vga_puts("  nc    [host] [port]             Raw socket connectivity\n");
+    sigma_vga_puts("  vi    [file]                    Modal text editor\n");
 }
 
 /* history: print command history */
@@ -335,6 +341,9 @@ static void dispatch_command(const char* input) {
     else if (sh_streq(argv[0], "wget"))     sigma_wget_main(argc, argv);
     else if (sh_streq(argv[0], "sudo"))     sigma_sudo_main(argc, argv);
     else if (sh_streq(argv[0], "su"))       sigma_su_main(argc, argv);
+    else if (sh_streq(argv[0], "gzip"))     sigma_gzip_main(argc, argv);
+    else if (sh_streq(argv[0], "nc"))       sigma_nc_main(argc, argv);
+    else if (sh_streq(argv[0], "vi"))       sigma_vi_main(argc, argv);
     else {
         sigma_vga_puts("sigma-sh: command not found: ");
         sigma_vga_puts(argv[0]);

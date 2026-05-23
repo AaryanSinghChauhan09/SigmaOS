@@ -1,6 +1,6 @@
 # SigmaOS Multi-Branch Architectural Grid & Parity Map
 
-SigmaOS implements a strict, **12-branch unified system architecture**. The **Branch Uniformity & Synchronization Engine (S-BUSE)** programmatically guarantees that all branches remain identical in codebase structure while serving distinct system compilation targets.
+SigmaOS implements a strict, **13-branch unified system architecture**. The **Branch Uniformity & Synchronization Engine (S-BUSE)** programmatically guarantees that all branches remain identical in codebase structure while serving distinct system compilation targets.
 
 For the full per-branch guide with deep dives, current gaps, and improvement plans, see **[Branch-Guide](Branch-Guide)**.
 
@@ -11,6 +11,7 @@ For the full per-branch guide with deep dives, current gaps, and improvement pla
 | Branch Name | Target System Archetype | Optimization Focus | Status |
 | :--- | :--- | :--- | :--- |
 | **`main`** | Stable Production Launch | Standard balanced shard scheduler configuration | ✅ Active |
+| **`release/toolchain`** | Sovereign Self-Hosting Toolchain | The native C-subset compiler, assembler, and ELF64 linker | 🔨 Dev |
 | **`release/standalone`** | Bare-Metal Desktop/Workstation | Direct CPU-bound execution and local peripheral integration | 🔨 Dev |
 | **`release/rtos`** | Real-Time Embedded Systems | Deterministic thread scheduling, high-precision timers, zero-latency interrupts | 🔨 Dev |
 | **`release/mobile`** | Energy-Aware Mobile Platforms | Dynamic voltage/frequency scaling and battery-friendly background throttling | 🔨 Dev |
