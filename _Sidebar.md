@@ -45,6 +45,7 @@
 - [Security & PQC Shard](Security-Shard)
 
 - [Kernel Internals](SigmaOS-Kernel-Internals)
+  * [Hardware Drivers](Hardware-Drivers)
 
 - [**Compiler Toolchain (cc/asm/ld)**](Compiler-Toolchain)
 
