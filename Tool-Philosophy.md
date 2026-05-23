@@ -15,7 +15,7 @@ SigmaOS does not guarantee a 1:1 POSIX interface. Tools like `ls` or `cat` do no
 To save space and avoid dynamic linking, all standard utilities are compiled into a single binary (`sigma_sh`). The entry point checks `argv[0]` to determine which tool logic to execute.
 
 ## 3. Core Utilities Implemented
-SigmaOS has 19 fully sovereign, zero-dependency utilities:
+SigmaOS has 23 fully sovereign, zero-dependency utilities:
 - `pwd`: Print working directory (`tools/utilities/sigma_pwd.cpp`)
 - `uname`: Display kernel name and system info (`tools/utilities/sigma_uname.cpp`)
 - `ps`: Query and list current system processes and ticks (`tools/utilities/sigma_ps.cpp`)
@@ -35,6 +35,10 @@ SigmaOS has 19 fully sovereign, zero-dependency utilities:
 - `ping`: Send ICMP echo requests and track response time (`tools/utilities/sigma_ping.cpp`)
 - `mount`: Mount ext2 or fat32 filesystems on partitions (`tools/utilities/sigma_mount.cpp`)
 - `lspci`: Enumerate all PCI devices on the system bus (`tools/utilities/sigma_lspci.cpp`)
+- `zfs`: Manage Copy-on-Write storage pools and transactional datasets (`tools/utilities/sigma_zfs.cpp`)
+- `cgroup`: Silicon-level CPU/Memory/IO resource weights manager (`tools/utilities/sigma_cgroup.cpp`)
+- `overlayfs`: Directory union mounts with Copy-Up-On-Write redirection (`tools/utilities/sigma_overlayfs.cpp`)
+- `systemctl`: Daemon init orchestrator and background service governor (`tools/utilities/sigma_systemctl.cpp`)
 
 ## 4. The `sigma_sh` Shell
 The shell is the gateway. It doesn't fork/exec standard ELF binaries initially. It executes built-in function pointers for the utilities. In the future, it will execute statically compiled Sovereign ELFs.
