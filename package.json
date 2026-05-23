@@ -23,7 +23,7 @@
     "eslint-plugin-security": "3.0.1",
     "jsdom": "29.1.1",
     "prettier": "3.5.3",
-    "vite": "8.0.11",
+    "vite": "8.0.14",
     "vitest": "3.2.0"
   }
 }

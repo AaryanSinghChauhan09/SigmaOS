@@ -115,14 +115,16 @@ test(ipc): add SPSC ring buffer overflow test
    - `feat/description` — new features
    - `fix/description` — bug fixes
    - `docs/description` — documentation only
-3. **Pass all tests** before requesting review:
+3. **Use Rebase instead of Merge**: To maintain a cleaner, linear commit history, always `git pull --rebase origin main` before pushing. Do not use `git merge`.
+4. **Pass all tests** before requesting review:
    ```bash
    npm run test
    ```
-4. **Fill out the PR template** completely. Partial PRs will be held until the template is complete.
-5. **Link the issue** in your PR description using `Closes #<issue-number>`.
-6. **Request review** from a CODEOWNER (see `.github/CODEOWNERS`).
-7. PRs require **1 approving review** from a maintainer and **all CI checks green**.
+5. **Fill out the PR template** completely. Partial PRs will be held until the template is complete.
+6. **Link the issue** in your PR description using `Closes #<issue-number>`.
+7. **Request review** from a CODEOWNER (see `.github/CODEOWNERS`).
+8. PRs require **1 approving review** from a maintainer and **all CI checks green**.
+
 
 ---
 
