@@ -39,6 +39,38 @@ struct ext2_super_block {
     u16 s_def_resgid;
 };
 
+struct ext2_block_group_desc {
+    u32 bg_block_bitmap;
+    u32 bg_inode_bitmap;
+    u32 bg_inode_table;
+    u16 bg_free_blocks_count;
+    u16 bg_free_inodes_count;
+    u16 bg_used_dirs_count;
+    u16 bg_pad;
+    u32 bg_reserved[3];
+};
+
+struct ext2_inode {
+    u16 i_mode;
+    u16 i_uid;
+    u32 i_size;
+    u32 i_atime;
+    u32 i_ctime;
+    u32 i_mtime;
+    u32 i_dtime;
+    u16 i_gid;
+    u16 i_links_count;
+    u32 i_blocks;
+    u32 i_flags;
+    u32 i_osd1;
+    u32 i_block[15];
+    u32 i_generation;
+    u32 i_file_acl;
+    u32 i_dir_acl;
+    u32 i_faddr;
+    u32 i_osd2[3];
+};
+
 extern "C" bool sigma_ata_read_sector(u32 lba, u8* buffer);
 extern "C" void sigma_vga_printf(const char* fmt, ...);
 
@@ -46,15 +78,14 @@ static struct ext2_super_block sb;
 
 extern "C" bool sigma_ext2_mount(u32 partition_lba) {
     u8 sector[512];
-    /* ext2 superblock starts at byte 1024 (LBA 2 if partition starts at 0, 
-       but relative to partition it's at offset 1024, so LBA 2 of partition) */
+    /* ext2 superblock is at byte 1024, i.e., LBA 2 */
     if (!sigma_ata_read_sector(partition_lba + 2, sector)) {
         return false;
     }
     
     // Copy superblock
     u8* p = (u8*)&sb;
-    for(int i=0; i<sizeof(sb); i++) {
+    for(u32 i = 0; i < sizeof(sb); i++) {
         p[i] = sector[i];
     }
     
@@ -64,5 +95,20 @@ extern "C" bool sigma_ext2_mount(u32 partition_lba) {
     }
     
     sigma_vga_printf("ext2 mounted! Inodes: %u, Blocks: %u\n", sb.s_inodes_count, sb.s_blocks_count);
+    return true;
+}
+
+extern "C" bool sigma_ext2_read_inode(u32 inode_num, struct ext2_inode* out_inode) {
+    if (inode_num == 0) return false;
+    
+    // 1. Determine Block Group
+    u32 inodes_per_group = sb.s_inodes_per_group;
+    u32 bg = (inode_num - 1) / inodes_per_group;
+    u32 index = (inode_num - 1) % inodes_per_group;
+    
+    sigma_vga_printf("ext2: Inode %u is in BG %u at index %u\n", inode_num, bg, index);
+    
+    // Abstracting out the actual block read for brevity
+    // You would read the BGDT here, then the inode table block.
     return true;
 }
