@@ -58,6 +58,10 @@ extern "C" int sigma_tee_main(int argc, char** argv);
 extern "C" int sigma_diff_main(int argc, char** argv);
 extern "C" int sigma_touch_main(int argc, char** argv);
 extern "C" int sigma_date_main(int argc, char** argv);
+extern "C" int sigma_ssh_main(int argc, char** argv);
+extern "C" int sigma_wget_main(int argc, char** argv);
+extern "C" int sigma_sudo_main(int argc, char** argv);
+extern "C" int sigma_su_main(int argc, char** argv);
 extern "C" int sigma_free_main(int argc, char** argv);
 extern "C" int sigma_umount_main(int argc, char** argv);
 extern "C" int sigma_nano_main(int argc, char** argv);
@@ -243,6 +247,10 @@ static void builtin_help() {
     sigma_vga_puts("  umount [target]                 Unmount filesystem\n");
     sigma_vga_puts("  nano  [file]                    Sovereign text editor\n");
     sigma_vga_puts("  make  [target]                  Sovereign build tool\n");
+    sigma_vga_puts("  ssh   [user@host]               Sovereign SSH client\n");
+    sigma_vga_puts("  wget  [url]                     Sovereign HTTP downloader\n");
+    sigma_vga_puts("  sudo  [command]                 Execute as superuser\n");
+    sigma_vga_puts("  su    [user]                    Switch user\n");
 }
 
 /* history: print command history */
@@ -323,6 +331,10 @@ static void dispatch_command(const char* input) {
     else if (sh_streq(argv[0], "umount"))   sigma_umount_main(argc, argv);
     else if (sh_streq(argv[0], "nano"))     sigma_nano_main(argc, argv);
     else if (sh_streq(argv[0], "make"))     sigma_make_main(argc, argv);
+    else if (sh_streq(argv[0], "ssh"))      sigma_ssh_main(argc, argv);
+    else if (sh_streq(argv[0], "wget"))     sigma_wget_main(argc, argv);
+    else if (sh_streq(argv[0], "sudo"))     sigma_sudo_main(argc, argv);
+    else if (sh_streq(argv[0], "su"))       sigma_su_main(argc, argv);
     else {
         sigma_vga_puts("sigma-sh: command not found: ");
         sigma_vga_puts(argv[0]);
