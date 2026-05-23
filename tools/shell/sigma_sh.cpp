@@ -38,6 +38,10 @@ extern "C" int sigma_ifconfig_main(int argc, char** argv);
 extern "C" int sigma_ping_main(int argc, char** argv);
 extern "C" int sigma_mount_main(int argc, char** argv);
 extern "C" int sigma_lspci_main(int argc, char** argv);
+extern "C" int sigma_zfs_main(int argc, char** argv);
+extern "C" int sigma_cgroup_main(int argc, char** argv);
+extern "C" int sigma_overlayfs_main(int argc, char** argv);
+extern "C" int sigma_systemctl_main(int argc, char** argv);
 
 /* ─────────────── Sovereign String Utilities ─────────────── */
 static u32 sh_strlen(const char* s) {
@@ -187,6 +191,10 @@ static void builtin_help() {
     sigma_vga_puts("  ping  [ip]        Ping a network host\n");
     sigma_vga_puts("  mount -t [fs] [l] Mount partition/LBA\n");
     sigma_vga_puts("  lspci             List all PCI devices\n");
+    sigma_vga_puts("  zfs   [args...]   Manage Copy-on-Write ZFS pools/datasets\n");
+    sigma_vga_puts("  cgroup [args...]  Manage silicon resource and weights governance\n");
+    sigma_vga_puts("  overlayfs [args...] Mount live overlay layers and directory union\n");
+    sigma_vga_puts("  systemctl [args...] Start, stop, or check active background services\n");
 }
 
 /* history: print command history */
@@ -239,6 +247,10 @@ static void dispatch_command(const char* input) {
     else if (sh_streq(argv[0], "ping"))    sigma_ping_main(argc, argv);
     else if (sh_streq(argv[0], "mount"))   sigma_mount_main(argc, argv);
     else if (sh_streq(argv[0], "lspci"))   sigma_lspci_main(argc, argv);
+    else if (sh_streq(argv[0], "zfs"))     sigma_zfs_main(argc, argv);
+    else if (sh_streq(argv[0], "cgroup"))  sigma_cgroup_main(argc, argv);
+    else if (sh_streq(argv[0], "overlayfs")) sigma_overlayfs_main(argc, argv);
+    else if (sh_streq(argv[0], "systemctl")) sigma_systemctl_main(argc, argv);
     else {
         sigma_vga_puts("sigma-sh: command not found: ");
         sigma_vga_puts(argv[0]);
