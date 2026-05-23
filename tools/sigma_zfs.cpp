@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * Î£ SIGMAOS: SIGMA ZFS-COW STORAGE GOVERNOR (sigma_zfs) v1.0
  * =========================================================================
@@ -11,9 +11,15 @@
 #include "sigma_kernel_types.h"
 #include "sigma_log.h"
 #include "SigmaOOP.hpp"
-#include <stdlib.h>
 
-#define sigma_atoi atoi
+static int sigma_atoi(const char* str) {
+    int res = 0;
+    while (*str >= '0' && *str <= '9') {
+        res = res * 10 + (*str - '0');
+        str++;
+    }
+    return res;
+}
 
 // C-bridge imports from the kernel's ZFS implementation
 extern "C" {

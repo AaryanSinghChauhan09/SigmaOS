@@ -12,6 +12,10 @@
 
 - [Architecture Overview](Architecture-Overview)
 
+- [**Driver Development Guide**](Driver-Development-Guide)
+
+- [**Tool Philosophy**](Tool-Philosophy)
+
 - [Omni Computer Science & AI Architecture](Omni-Computer-Science-AI-Architecture)
 
 - [Omni-Distro Principles Absorption](SigmaOS-OmniDistro-Absorption-Principles)
@@ -25,6 +29,8 @@
 - [Networking Shard (TCP/IP)](Networking-Shard)
 
 - [Storage Shard (LFS/VFS)](Storage-Shard)
+
+- [**File System Notes (FAT32/ext2)**](File-System-Notes)
 
 - [Real-Time Scheduler (CFS)](Real-Time-Scheduler-Shard)
 
@@ -75,6 +81,10 @@
 ## 👥 Community & Contribution
 
 - [Getting Started](Getting-Started)
+
+- [**Developer Guide (Build, Test, Contribute)**](Developer-Guide)
+
+- [**SigmaOS vs Linux Distros**](SigmaOS-vs-Linux)
 
 - [Contributor Guidelines](Contributor-Guidelines)
 
