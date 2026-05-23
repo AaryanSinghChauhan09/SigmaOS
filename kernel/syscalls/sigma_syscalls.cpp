@@ -1,0 +1,50 @@
+/*
+ * Σ SigmaOS — sigma_syscalls: Sovereign Syscall Layer
+ * Zero-Dependency: No POSIX, no Linux ABI compatibility.
+ * Defines the core architectural interface between userland and the microkernel.
+ */
+
+typedef unsigned long long u64;
+
+/* 
+ * Sovereign Syscall Numbers
+ * Distinct from POSIX to prevent accidental ABI pollution.
+ */
+#define SIGMA_SYS_DEBUG_PRINT 0x01
+#define SIGMA_SYS_ALLOC_MEM   0x02
+#define SIGMA_SYS_FREE_MEM    0x03
+#define SIGMA_SYS_SEND_MSG    0x04
+#define SIGMA_SYS_RECV_MSG    0x05
+#define SIGMA_SYS_HW_IO       0x06
+
+/* Sovereign Syscall Entry Point (called via SYSCALL instruction or INT 0x80) */
+extern "C" u64 sigma_syscall_handler(u64 syscall_num, u64 arg1, u64 arg2, u64 arg3) {
+    switch (syscall_num) {
+        case SIGMA_SYS_DEBUG_PRINT:
+            /* Route to VGA / Serial driver */
+            return 0;
+            
+        case SIGMA_SYS_ALLOC_MEM:
+            /* Route to sigma_allocator */
+            return 0;
+            
+        case SIGMA_SYS_FREE_MEM:
+            /* Route to sigma_allocator */
+            return 0;
+            
+        case SIGMA_SYS_SEND_MSG:
+            /* Route to IPC subsystem */
+            return 0;
+            
+        case SIGMA_SYS_RECV_MSG:
+            /* Route to IPC subsystem */
+            return 0;
+            
+        case SIGMA_SYS_HW_IO:
+            /* Privileged hardware I/O for drivers running in user-space */
+            return 0;
+            
+        default:
+            return -1; /* ENOSYS equivalent */
+    }
+}

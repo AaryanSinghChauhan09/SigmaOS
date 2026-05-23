@@ -1,32 +1,38 @@
-# 🗺️ SigmaOS Zenith Roadmap
+# SigmaOS Industrial Roadmap
 
-> "Absorb the world's best ideas, build them from scratch with zero dependencies."
+Our ultimate advancement strategy spans several critical phases to achieve total OS sovereignty.
 
-## 🚀 Phase 1: The Sovereign Foundation (Short-Term)
-**Goal:** Establish a robust, self-hosting microkernel that can manage its own memory, read files, and handle basic input/output.
+## Phase 1: Microkernel Foundation (Completed)
+- ✅ Bootloader & Stage 2 Initializer
+- ✅ Interrupt descriptor tables and basic hardware polling
+- ✅ Basic VGA text-mode driver
+- ✅ Sovereign shell (`sigma-sh`)
 
-- [x] **Memory Management:** SLUB-inspired allocator (`sigma_slab_allocator`) and 4-level x86_64 paging.
-- [x] **Basic Drivers:** VGA Framebuffer (`sigma_vga`), PS/2 Keyboard (`sigma_keyboard`), PS/2 Mouse (`sigma_mouse`).
-- [x] **Block Storage:** NVMe driver (`sigma_nvme`), ATA disk driver.
-- [x] **File Systems:** FAT32 read-only implementation (`sigma_fat32`), basic ext2 superblock parser (`sigma_ext2`).
-- [x] **Tools (Phase 1):** BusyBox-inspired shell (`sigma_sh`), `ls`, and `echo` fully implemented via raw syscalls.
+## Phase 2: Core Device Abstraction (Completed)
+- ✅ Universal Sovereign Driver Framework
+- ✅ Storage Drivers (ATA/SATA, VirtIO)
+- ✅ Input Drivers (PS/2 Keyboard)
+- ✅ Network Skeleton (e1000)
 
-## 🌐 Phase 2: The Connectivity Leap (Mid-Term)
-**Goal:** Bring the system online with a sovereign network stack.
+## Phase 3: Sovereign Userland (Completed)
+- ✅ Native POSIX-alternative utilities (`awk`, `sed`, `tar`, `sort`, `uniq`)
+- ✅ Process management (`top`, `ps`, `kill`, `cgroup`)
+- ✅ System telemetry (`strace`, `dmesg`)
+- ✅ Sovereign text-mode browser (`sigma_browser`)
 
-- [x] **Network Interface Cards (NIC):** Intel e1000 (`sigma_e1000`), Realtek RTL8139 (`sigma_rtl8139`).
-- [x] **Sovereign TCP/IP Stack:** ARP, IPv4, ICMP, UDP, and finally TCP—all written from scratch with zero sockets from libc.
-- [x] **File System Expansion:** Full read/write support for ext2, moving towards journaled ext4 clone.
-- [x] **Bootloader:** Custom Stage 1/Stage 2 bootloader replacing GRUB, loading the SigmaOS ELF kernel directly.
+## Phase 4: Networking & Storage Stacks (In Progress)
+- 🚧 Native Zero-Dependency TCP/IP Stack
+- 🚧 `ext2` and `FAT32` full read/write implementations
+- 🚧 Zenith Sovereign Package Manager (`sigma-pkg`)
+- 🚧 Distributed branch cluster management
 
-## 📦 Phase 3: The Userland Singularity (Long-Term)
-**Goal:** Create a modern, graphical, secure OS environment.
+## Phase 5: Zenith Desktop & Applications (Upcoming)
+- 📅 Minimal Wayland-alternative Display Compositor
+- 📅 Sovereign GUI Window Manager
+- 📅 Post-Quantum Cryptography implementations for security shards
+- 📅 Self-hosting compiler framework
 
-- [x] **OmniPackage Manager:** Transactional, containerized package manager bypassing dependency hell (no `/usr/lib` conflicts).
-- [x] **Zenith GUI:** A compositor and window manager using the VGA framebuffer, implementing a glassmorphic Sovereign UI.
-- [x] **Bootstrap Compiler:** A minimal C++ compiler capable of compiling SigmaOS within SigmaOS (Self-Hosting).
-- [x] **Post-Quantum Security:** Dilithium-5 digital signatures enforcing that only signed shards execute.
-- [x] **S-ZFS:** Full copy-on-write storage pool with RAID-Z-like striping.
-
----
-**Guiding Principle throughout all phases:** Zero `libc`, zero `std::vector`, zero `#include <stdio.h>`. Silicon direct.
+## Branch Specific Rollouts
+- **Q3 2026**: Stable `release/rtos` for robotics & IoT.
+- **Q4 2026**: Stable `release/cloud` distributed file system and node agent.
+- **Q1 2027**: Initial bootable `release/mobile` images for ARM64 SBCs.

@@ -46,6 +46,8 @@
 
 - [Kernel Internals](SigmaOS-Kernel-Internals)
 
+- [**Compiler Toolchain (cc/asm/ld)**](Compiler-Toolchain)
+
 - [Self-Healing Engine](Sovereign_Self_Healing)
 
 ## 🚀 Strategic Vision
@@ -83,6 +85,12 @@
 - [Branch Versions & Status](Branch-Versions)
 
 - [Per-Branch Release Notes](Branches)
+
+- [**RTOS Branch Guide**](RTOS-Branch-Guide)
+
+- [**Cloud Branch Guide**](Cloud-Branch-Guide)
+
+- [**Mobile Branch Guide**](Mobile-Branch-Guide)
 
 ## 👥 Community & Contribution
 

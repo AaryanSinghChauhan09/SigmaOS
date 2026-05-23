@@ -42,6 +42,26 @@ extern "C" int sigma_zfs_main(int argc, char** argv);
 extern "C" int sigma_cgroup_main(int argc, char** argv);
 extern "C" int sigma_overlayfs_main(int argc, char** argv);
 extern "C" int sigma_systemctl_main(int argc, char** argv);
+extern "C" int sigma_sort_main(int argc, char** argv);
+extern "C" int sigma_uniq_main(int argc, char** argv);
+extern "C" int sigma_sed_main(int argc, char** argv);
+extern "C" int sigma_awk_main(int argc, char** argv);
+extern "C" int sigma_tar_main(int argc, char** argv);
+extern "C" int sigma_fdisk_main(int argc, char** argv);
+extern "C" int sigma_env_main(int argc, char** argv);
+extern "C" int sigma_strace_main(int argc, char** argv);
+extern "C" int sigma_find_main(int argc, char** argv);
+extern "C" int sigma_xargs_main(int argc, char** argv);
+extern "C" int sigma_chown_main(int argc, char** argv);
+extern "C" int sigma_tail_main(int argc, char** argv);
+extern "C" int sigma_tee_main(int argc, char** argv);
+extern "C" int sigma_diff_main(int argc, char** argv);
+extern "C" int sigma_touch_main(int argc, char** argv);
+extern "C" int sigma_date_main(int argc, char** argv);
+extern "C" int sigma_cc_main(int argc, char** argv);
+extern "C" int sigma_assembler_main(int argc, char** argv);
+extern "C" int sigma_linker_main(int argc, char** argv);
+extern "C" int sigma_browser_main(int argc, char** argv);
 
 /* ─────────────── Sovereign String Utilities ─────────────── */
 static u32 sh_strlen(const char* s) {
@@ -62,7 +82,7 @@ static void sh_strncpy(char* dst, const char* src, u32 n) {
 /* ─────────────── Command Buffer ─────────────── */
 #define CMD_BUF_SIZE  256
 #define MAX_ARGS      16
-#define SIGMA_SH_VER  "1.0.0"
+#define SIGMA_SH_VER  "1.1.0"
 
 static char cmd_buf[CMD_BUF_SIZE];
 static u32  cmd_len;
@@ -195,6 +215,26 @@ static void builtin_help() {
     sigma_vga_puts("  cgroup [args...]  Manage silicon resource and weights governance\n");
     sigma_vga_puts("  overlayfs [args...] Mount live overlay layers and directory union\n");
     sigma_vga_puts("  systemctl [args...] Start, stop, or check active background services\n");
+    sigma_vga_puts("  sort  [-r] [-n] [-u] [file]   Sort lines of a file\n");
+    sigma_vga_puts("  uniq  [-c] [-d] [-u] [-i] [f]  Filter duplicate consecutive lines\n");
+    sigma_vga_puts("  sed   'expr' [file]             Stream editor (s/pat/rep/, /pat/d)\n");
+    sigma_vga_puts("  awk   'prog' [file]             Pattern-action text processor\n");
+    sigma_vga_puts("  tar   [-xtvf] <archive>         List/extract ustar tar archives\n");
+    sigma_vga_puts("  fdisk [-l]                      Show MBR/GPT partition tables\n");
+    sigma_vga_puts("  env   [KEY=VAL ...]             Print or set environment variables\n");
+    sigma_vga_puts("  strace [-s|-S|-d|-c] [-p pid]   Trace SigmaOS syscalls\n");
+    sigma_vga_puts("  find  [path] [-name pat]        Directory traversal utility\n");
+    sigma_vga_puts("  xargs [command]                 Build and execute command lines\n");
+    sigma_vga_puts("  chown [uid:gid] [file]          Change file ownership\n");
+    sigma_vga_puts("  tail  [-n N] [file]             Print last N lines of a file\n");
+    sigma_vga_puts("  tee   [file]                    Copy stdin to stdout and file\n");
+    sigma_vga_puts("  diff  [file1] [file2]           Compare two files line by line\n");
+    sigma_vga_puts("  touch [file]                    Create empty file or update timestamp\n");
+    sigma_vga_puts("  date                            Display current date and time\n");
+    sigma_vga_puts("  cc    [source.c]                Sovereign C compiler\n");
+    sigma_vga_puts("  asm   [input.s]                 Sovereign assembler\n");
+    sigma_vga_puts("  ld    [obj1] [obj2]             Sovereign linker\n");
+    sigma_vga_puts("  browser [file.html]             Minimal text browser\n");
 }
 
 /* history: print command history */
@@ -251,6 +291,26 @@ static void dispatch_command(const char* input) {
     else if (sh_streq(argv[0], "cgroup"))  sigma_cgroup_main(argc, argv);
     else if (sh_streq(argv[0], "overlayfs")) sigma_overlayfs_main(argc, argv);
     else if (sh_streq(argv[0], "systemctl")) sigma_systemctl_main(argc, argv);
+    else if (sh_streq(argv[0], "sort"))     sigma_sort_main(argc, argv);
+    else if (sh_streq(argv[0], "uniq"))     sigma_uniq_main(argc, argv);
+    else if (sh_streq(argv[0], "sed"))      sigma_sed_main(argc, argv);
+    else if (sh_streq(argv[0], "awk"))      sigma_awk_main(argc, argv);
+    else if (sh_streq(argv[0], "tar"))      sigma_tar_main(argc, argv);
+    else if (sh_streq(argv[0], "fdisk"))    sigma_fdisk_main(argc, argv);
+    else if (sh_streq(argv[0], "env"))      sigma_env_main(argc, argv);
+    else if (sh_streq(argv[0], "strace"))   sigma_strace_main(argc, argv);
+    else if (sh_streq(argv[0], "find"))     sigma_find_main(argc, argv);
+    else if (sh_streq(argv[0], "xargs"))    sigma_xargs_main(argc, argv);
+    else if (sh_streq(argv[0], "chown"))    sigma_chown_main(argc, argv);
+    else if (sh_streq(argv[0], "tail"))     sigma_tail_main(argc, argv);
+    else if (sh_streq(argv[0], "tee"))      sigma_tee_main(argc, argv);
+    else if (sh_streq(argv[0], "diff"))     sigma_diff_main(argc, argv);
+    else if (sh_streq(argv[0], "touch"))    sigma_touch_main(argc, argv);
+    else if (sh_streq(argv[0], "date"))     sigma_date_main(argc, argv);
+    else if (sh_streq(argv[0], "cc"))       sigma_cc_main(argc, argv);
+    else if (sh_streq(argv[0], "asm"))      sigma_assembler_main(argc, argv);
+    else if (sh_streq(argv[0], "ld"))       sigma_linker_main(argc, argv);
+    else if (sh_streq(argv[0], "browser"))  sigma_browser_main(argc, argv);
     else {
         sigma_vga_puts("sigma-sh: command not found: ");
         sigma_vga_puts(argv[0]);
