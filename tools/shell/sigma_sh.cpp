@@ -144,14 +144,21 @@ static void builtin_help() {
     sigma_vga_puts("  ls                List root directory\n");
     sigma_vga_puts("  clear             Clear the screen\n");
     sigma_vga_puts("  history           Show command history\n");
-    sigma_vga_puts("  uname             Display system info\n");
-    sigma_vga_puts("  halt              Halt the system\n");
     sigma_vga_puts("  help              Show this help text\n");
-}
-
-/* uname: print system info */
-static void builtin_uname() {
-    sigma_vga_puts("SigmaOS Zenith v15.2 (ZENITH-SINGULARITY) x86_64\n");
+    sigma_vga_puts("  halt              Halt the system\n");
+    sigma_vga_puts("Sovereign Utilities:\n");
+    sigma_vga_puts("  pwd               Print working directory\n");
+    sigma_vga_puts("  uname             Display system info\n");
+    sigma_vga_puts("  ps                Show process status\n");
+    sigma_vga_puts("  top               System monitor\n");
+    sigma_vga_puts("  kill  [pid]       Terminate process\n");
+    sigma_vga_puts("  cp    [src] [dst] Copy file\n");
+    sigma_vga_puts("  mv    [src] [dst] Move file\n");
+    sigma_vga_puts("  rm    [file]      Remove file\n");
+    sigma_vga_puts("  chmod [mode] [f]  Change file permissions\n");
+    sigma_vga_puts("  df                Display disk free space\n");
+    sigma_vga_puts("  grep  [pat] [f]   Search for pattern\n");
+    sigma_vga_puts("  dmesg             Print kernel ring buffer\n");
 }
 
 /* history: print command history */
@@ -183,9 +190,20 @@ static void dispatch_command(const char* input) {
     else if (sh_streq(argv[0], "ls"))      builtin_ls();
     else if (sh_streq(argv[0], "clear"))   builtin_clear();
     else if (sh_streq(argv[0], "help"))    builtin_help();
-    else if (sh_streq(argv[0], "uname"))   builtin_uname();
     else if (sh_streq(argv[0], "history")) builtin_history();
     else if (sh_streq(argv[0], "halt"))    builtin_halt();
+    else if (sh_streq(argv[0], "pwd"))     sigma_pwd_main(argc, argv);
+    else if (sh_streq(argv[0], "uname"))   sigma_uname_main(argc, argv);
+    else if (sh_streq(argv[0], "ps"))      sigma_ps_main(argc, argv);
+    else if (sh_streq(argv[0], "top"))     sigma_top_main(argc, argv);
+    else if (sh_streq(argv[0], "kill"))    sigma_kill_main(argc, argv);
+    else if (sh_streq(argv[0], "cp"))      sigma_cp_main(argc, argv);
+    else if (sh_streq(argv[0], "mv"))      sigma_mv_main(argc, argv);
+    else if (sh_streq(argv[0], "rm"))      sigma_rm_main(argc, argv);
+    else if (sh_streq(argv[0], "chmod"))   sigma_chmod_main(argc, argv);
+    else if (sh_streq(argv[0], "df"))      sigma_df_main(argc, argv);
+    else if (sh_streq(argv[0], "grep"))    sigma_grep_main(argc, argv);
+    else if (sh_streq(argv[0], "dmesg"))   sigma_dmesg_main(argc, argv);
     else {
         sigma_vga_puts("sigma-sh: command not found: ");
         sigma_vga_puts(argv[0]);
