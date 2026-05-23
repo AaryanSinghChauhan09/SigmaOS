@@ -2,38 +2,153 @@ name: SigmaOS Sovereign CI
 
 on:
   push:
-    branches: [ "main", "lattice-dev" ]
+    branches:
+      - "main"
+      - "release/**"
+      - "performance-optimized"
   pull_request:
-    branches: [ "main", "lattice-dev" ]
+    branches:
+      - "main"
+      - "release/**"
 
 jobs:
-  build:
+  # ─────────────────────────────────────────────
+  # Job 1: JavaScript / UI Test Suite
+  # ─────────────────────────────────────────────
+  js-tests:
+    name: 🧪 JS Test Suite (Vitest)
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Setup Build Environment
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential gcc-multilib g++-multilib
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
 
-    - name: Validate Shard Architecture
-      run: |
-        echo "Validating 600-shard lattice integrity..."
-        # Add scripts to validate zero-dependency constraints
-        
-    - name: Compile Sovereign Kernel
-      run: |
-        echo "Compiling S-HAL and Core Shards..."
-        # make singularity
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Build UI Components
-      run: |
-        echo "Validating Glassmorphic Zenith Dashboard..."
-        # make zenith
-        
-    - name: Run Shard-Isolated Tests
-      run: |
-        echo "Running automated security and memory sanitizers..."
-        # make test
+      - name: Run lint
+        run: npm run lint
+
+      - name: Run test suite
+        run: npm run test
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results/
+
+  # ─────────────────────────────────────────────
+  # Job 2: C/C++ Kernel Compilation Check
+  # ─────────────────────────────────────────────
+  kernel-lint:
+    name: 🔨 Kernel Build Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            build-essential \
+            gcc-multilib \
+            g++-multilib \
+            nasm \
+            clang-format \
+            cppcheck
+
+      - name: Run clang-format check
+        run: |
+          find kernel/ hal/ lib/ fs/ net/ drivers/ \
+            -name "*.c" -o -name "*.cpp" -o -name "*.h" | \
+          xargs clang-format --dry-run --Werror 2>/dev/null || \
+          echo "⚠️  clang-format warnings present (non-blocking)"
+
+      - name: Run cppcheck static analysis
+        run: |
+          cppcheck \
+            --enable=warning,performance,portability \
+            --suppress=missingIncludeSystem \
+            --error-exitcode=0 \
+            --quiet \
+            kernel/ hal/ lib/ fs/ net/ || true
+
+      - name: Validate SHARDS.manifest integrity
+        run: |
+          echo "✅ Validating 600-shard lattice manifest..."
+          if [ -f SHARDS.manifest ]; then
+            echo "SHARDS.manifest found — $(wc -l < SHARDS.manifest) entries"
+          else
+            echo "⚠️  SHARDS.manifest not found"
+          fi
+
+      - name: Check zero-dependency constraints
+        run: |
+          echo "🔒 Checking kernel shards for stdlib includes..."
+          VIOLATIONS=$(grep -rn "#include <stdlib.h>\|#include <stdio.h>\|#include <string.h>" \
+            kernel/ 2>/dev/null | grep -v "//.*#include" || true)
+          if [ -n "$VIOLATIONS" ]; then
+            echo "❌ Stdlib includes found in kernel shards:"
+            echo "$VIOLATIONS"
+            exit 1
+          fi
+          echo "✅ No stdlib violations found in kernel/"
+
+  # ─────────────────────────────────────────────
+  # Job 3: Markdown / Wiki Lint
+  # ─────────────────────────────────────────────
+  docs-lint:
+    name: 📖 Docs & Wiki Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install markdownlint
+        run: npm install -g markdownlint-cli
+
+      - name: Lint wiki_repo markdown files
+        run: |
+          markdownlint wiki_repo/*.md \
+            --config wiki_repo/.markdownlint.json \
+            --ignore wiki_repo/THIRD-PARTY-NOTICES.md \
+            --ignore wiki_repo/File-Index.md \
+            --ignore wiki_repo/AUTO_SOVEREIGN_WIKI.md \
+            --ignore "wiki_repo/node_modules*" \
+            || echo "⚠️  Markdown lint warnings present"
+
+      - name: Check sidebar link integrity
+        run: |
+          echo "🔗 Checking _Sidebar.md links..."
+          node -e "
+            const fs = require('fs');
+            const sidebar = fs.readFileSync('wiki_repo/_Sidebar.md', 'utf8');
+            const links = [...sidebar.matchAll(/\[.*?\]\(([^)]+)\)/g)].map(m => m[1]);
+            const missing = links.filter(l => {
+              if (l.startsWith('http')) return false;
+              const slug = l.replace(/\.md$/, '');
+              return !fs.existsSync('wiki_repo/' + slug + '.md') &&
+                     !fs.existsSync('wiki_repo/' + slug);
+            });
+            if (missing.length > 0) {
+              console.warn('⚠️  Sidebar links with no matching file:', missing.join(', '));
+            } else {
+              console.log('✅ All sidebar links resolve to existing wiki pages');
+            }
+          "

@@ -1,0 +1,29 @@
+name: SigmaOS Wiki Sync
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "wiki_repo/**"
+      - "README.md"
+      - "CONTRIBUTING.md"
+      - "CHANGELOG.md"
+
+jobs:
+  wiki-sync:
+    runs-on: ubuntu-latest
+    name: Sync wiki_repo/ → GitHub Wiki
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push wiki_repo/ to GitHub Wiki
+        uses: Andrew-Chen-Wang/github-wiki-action@v4
+        with:
+          path: wiki_repo/
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "🔄 Auto-sync wiki from wiki_repo/ [skip ci]"
+          ignore: "node_modules* profiles/* shards/* *.ps1 scrub_conflicts.ps1"
