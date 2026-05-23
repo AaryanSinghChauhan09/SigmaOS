@@ -84,6 +84,12 @@
 
 - [Per-Branch Release Notes](Branches)
 
+- [**RTOS Branch Guide**](RTOS-Branch-Guide)
+
+- [**Cloud Branch Guide**](Cloud-Branch-Guide)
+
+- [**Mobile Branch Guide**](Mobile-Branch-Guide)
+
 ## 👥 Community & Contribution
 
 - [Getting Started](Getting-Started)

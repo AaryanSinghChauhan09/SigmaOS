@@ -1,45 +1,127 @@
-# 🧰 Tool Philosophy
+# 🔧 Tool Philosophy — SigmaOS Sovereign Utilities
 
-> "BusyBox minimalism, but fully sovereign and statically built into the lattice."
+> **Zero-Dependency. Zero-Compromise. Silicon-Direct.**
 
-SigmaOS replaces GNU coreutils and BusyBox with a custom suite of utilities designed around the SigmaOS system call dispatcher.
+Every tool in SigmaOS is a **Sovereign Shard** — an executable or linked module with:
+- **No `#include <stdio.h>`**, no `#include <stdlib.h>`, no `#include <string.h>`
+- **No glibc, musl, or any predefined library** — not even `printf`
+- **Raw kernel I/O** via `sigma_vga_puts` / `sigma_vga_putchar` / `sigma_vga_printf` (provided by our own VGA shim)
+- **Statically linked** into the SigmaOS kernel binary or `sigma-sh` monolith
 
-## 1. No POSIX Assumption
-SigmaOS does not guarantee a 1:1 POSIX interface. Tools like `ls` or `cat` do not call `open()`, `read()`, or `printf()`. Instead, they invoke:
+This philosophy is absorbed from:
+| Distro | Idea Absorbed |
+|--------|--------------|
+| BusyBox / Alpine | One-binary multi-call architecture |
+| Plan 9 | Everything is a file; tiny, composable tools |
+| GNU coreutils | Feature-complete CLI contracts |
+| FreeBSD Base | Statically-linked system tools |
+| Arch Linux | Minimal, transparent, source-available |
+| Debian / Ubuntu | Broad hardware compat + policy-compliant packaging |
 
-- `sovereign_syscall_opendir()`
-- `sovereign_syscall_readdir()`
-- `sigma_vga_printf()`
+---
 
-## 2. Monolithic Binary (Like BusyBox)
-To save space and avoid dynamic linking, all standard utilities are compiled into a single binary (`sigma_sh`). The entry point checks `argv[0]` to determine which tool logic to execute.
+## 📦 Registered Sovereign Utilities (v1.1.0 — 31 Tools)
 
-## 3. Core Utilities Implemented
-SigmaOS has 23 fully sovereign, zero-dependency utilities:
-- `pwd`: Print working directory (`tools/utilities/sigma_pwd.cpp`)
-- `uname`: Display kernel name and system info (`tools/utilities/sigma_uname.cpp`)
-- `ps`: Query and list current system processes and ticks (`tools/utilities/sigma_ps.cpp`)
-- `top`: Real-time system resource monitor (`tools/utilities/sigma_top.cpp`)
-- `kill`: Terminate a process or task (`tools/utilities/sigma_kill.cpp`)
-- `cp`: Copy file contents byte-by-byte via system calls (`tools/utilities/sigma_cp.cpp`)
-- `mv`: Move/rename directories and files (`tools/utilities/sigma_mv.cpp`)
-- `rm`: Remove files/nodes (`tools/utilities/sigma_rm.cpp`)
-- `chmod`: Modify file permission/mode flags (`tools/utilities/sigma_chmod.cpp`)
-- `df`: Analyze disk space occupancy (`tools/utilities/sigma_df.cpp`)
-- `grep`: Match pattern and locate substrings (`tools/utilities/sigma_grep.cpp`)
-- `dmesg`: View system logs from kernel ring buffer (`tools/utilities/sigma_dmesg.cpp`)
-- `wc`: Count lines, words, and bytes in a file (`tools/utilities/sigma_wc.cpp`)
-- `head`: Display first N lines of a file (`tools/utilities/sigma_head.cpp`)
-- `hexdump`: Read and display file contents in hex and ASCII (`tools/utilities/sigma_hexdump.cpp`)
-- `ifconfig`: View network interfaces, IP addresses, netmasks, MACs (`tools/utilities/sigma_ifconfig.cpp`)
-- `ping`: Send ICMP echo requests and track response time (`tools/utilities/sigma_ping.cpp`)
-- `mount`: Mount ext2 or fat32 filesystems on partitions (`tools/utilities/sigma_mount.cpp`)
-- `lspci`: Enumerate all PCI devices on the system bus (`tools/utilities/sigma_lspci.cpp`)
-- `zfs`: Manage Copy-on-Write storage pools and transactional datasets (`tools/utilities/sigma_zfs.cpp`)
-- `cgroup`: Silicon-level CPU/Memory/IO resource weights manager (`tools/utilities/sigma_cgroup.cpp`)
-- `overlayfs`: Directory union mounts with Copy-Up-On-Write redirection (`tools/utilities/sigma_overlayfs.cpp`)
-- `systemctl`: Daemon init orchestrator and background service governor (`tools/utilities/sigma_systemctl.cpp`)
+### Core Shell Builtins (in `sigma_sh.cpp`)
+| Builtin | Description |
+|---------|-------------|
+| `echo`    | Print text to terminal |
+| `cat`     | Print file from SigmaFAT32 |
+| `ls`      | List root directory entries |
+| `clear`   | Clear VGA screen |
+| `history` | Command history (Arch-inspired ring) |
+| `help`    | List all commands |
+| `halt`    | CPU halt (cli; hlt) |
 
-## 4. The `sigma_sh` Shell
-The shell is the gateway. It doesn't fork/exec standard ELF binaries initially. It executes built-in function pointers for the utilities. In the future, it will execute statically compiled Sovereign ELFs.
+### Process & System (in `tools/utilities/`)
+| Tool | Source | Description |
+|------|--------|-------------|
+| `pwd`     | `sigma_pwd.cpp`     | Print working directory |
+| `uname`   | `sigma_uname.cpp`   | Display system/arch info |
+| `ps`      | `sigma_ps.cpp`      | Show process table |
+| `top`     | `sigma_top.cpp`     | Live process monitor |
+| `kill`    | `sigma_kill.cpp`    | Send signal to process |
+| `strace`  | `sigma_strace.cpp`  | Sovereign syscall ring-buffer tracer |
 
+### File Operations
+| Tool | Source | Description |
+|------|--------|-------------|
+| `cp`      | `sigma_cp.cpp`      | Copy file |
+| `mv`      | `sigma_mv.cpp`      | Move/rename file |
+| `rm`      | `sigma_rm.cpp`      | Remove file |
+| `chmod`   | `sigma_chmod.cpp`   | Change file permissions |
+| `wc`      | `sigma_wc.cpp`      | Word/line/byte count |
+| `head`    | `sigma_head.cpp`    | First N lines of a file |
+| `hexdump` | `sigma_hexdump.cpp` | Hex dump of a file |
+| `tar`     | `sigma_tar.cpp`     | ustar archive list/extract |
+
+### Text Processing
+| Tool | Source | Description |
+|------|--------|-------------|
+| `grep`    | `sigma_grep.cpp`    | Sovereign regex line search |
+| `sed`     | `sigma_sed.cpp`     | Stream editor (s/pat/rep/, /pat/d) |
+| `awk`     | `sigma_awk.cpp`     | Pattern-action text processor |
+| `sort`    | `sigma_sort.cpp`    | QuickSort line sorter (-r/-n/-u) |
+| `uniq`    | `sigma_uniq.cpp`    | Duplicate-line filter (-c/-d/-u/-i) |
+
+### Disk & Storage
+| Tool | Source | Description |
+|------|--------|-------------|
+| `df`      | `sigma_df.cpp`      | Disk free space |
+| `mount`   | `sigma_mount.cpp`   | Mount partition by LBA |
+| `fdisk`   | `sigma_fdisk.cpp`   | MBR + GPT partition table display |
+| `zfs`     | `sigma_zfs.cpp`     | Copy-on-Write pool & dataset manager |
+
+### Network
+| Tool | Source | Description |
+|------|--------|-------------|
+| `ifconfig` | `sigma_ifconfig.cpp` | Network interface display |
+| `ping`     | `sigma_ping.cpp`     | ICMP echo (sovereign IP stack) |
+
+### Hardware
+| Tool | Source | Description |
+|------|--------|-------------|
+| `lspci`    | `sigma_lspci.cpp`    | PCI device enumerator |
+| `dmesg`    | `sigma_dmesg.cpp`    | Kernel ring buffer |
+
+### System Management
+| Tool | Source | Description |
+|------|--------|-------------|
+| `overlayfs` | `sigma_overlayfs.cpp`  | Union directory merger CLI |
+| `cgroup`    | `sigma_cgroup.cpp`     | Silicon resource weight governor |
+| `systemctl` | `sigma_systemctl.cpp`  | Background service manager |
+| `env`       | `sigma_env.cpp`        | Environment variable inspector/setter |
+
+---
+
+## 🛠 Adding a New Tool
+
+1. Create `tools/utilities/sigma_<name>.cpp`
+2. Export `extern "C" int sigma_<name>_main(int argc, char** argv)`
+3. Use **only** these kernel-provided I/O primitives:
+   ```cpp
+   extern "C" void sigma_vga_puts(const char* s);
+   extern "C" void sigma_vga_putchar(char c);
+   extern "C" void sigma_vga_printf(const char* fmt, ...);
+   extern "C" u32  sigma_fat32_read(const char* name, u8* buf, u32 max);
+   ```
+4. Add `extern "C" int sigma_<name>_main(int argc, char** argv);` declaration in `sigma_sh.cpp`
+5. Add dispatch entry: `else if (sh_streq(argv[0], "<name>")) sigma_<name>_main(argc, argv);`
+6. Add help string in `builtin_help()`
+7. Run `sync_branches.ps1` to push to all 19 branches
+
+---
+
+## ⚗️ Sovereignty Checklist
+
+Before merging any utility, verify:
+- [ ] Zero `#include` directives for standard headers
+- [ ] No `printf`, `malloc`, `free`, `strlen`, `memcpy` from libc
+- [ ] All string ops use sovereign `sv_*` / `sed_*` / own helpers
+- [ ] Single `extern "C" int sigma_<name>_main()` export
+- [ ] Registers in `sigma_sh.cpp` dispatcher
+- [ ] Covered in this wiki page
+
+---
+
+*Last updated: Phase 4 — 31 Sovereign Utilities registered.*
