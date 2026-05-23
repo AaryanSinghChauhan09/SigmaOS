@@ -46,6 +46,8 @@
 
 - [Kernel Internals](SigmaOS-Kernel-Internals)
 
+- [**Compiler Toolchain (cc/asm/ld)**](Compiler-Toolchain)
+
 - [Self-Healing Engine](Sovereign_Self_Healing)
 
 ## 🚀 Strategic Vision

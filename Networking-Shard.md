@@ -1,21 +1,85 @@
-# 🌐 Networking Shard
+# 🌐 SigmaOS Networking Stack
 
-> "Sovereign connectivity, from the physical layer up to the transport layer, without importing a single line of libc sockets."
+> **Raw Sovereignty from Ethernet Frame to Application Layer.**
 
-## 1. Network Interface Cards (NIC)
-SigmaOS currently supports the Intel Gigabit Ethernet (`e1000`) and Realtek `RTL8139`. These drivers interface directly with the physical hardware, reading MAC addresses from the EEPROM and setting up TX/RX ring buffers.
+The entire SigmaOS networking stack is built from the ground up with zero reliance on BSD sockets, lwIP, or any POSIX networking APIs.
 
-## 2. Address Resolution Protocol (ARP)
-Before IPv4 can route to a local destination, the MAC address must be resolved. SigmaOS maintains a lightweight ARP cache. If an IP is unknown, an ARP broadcast is issued.
+---
 
-## 3. IPv4 Implementation
-All incoming packets from the NICs are routed through the IPv4 demultiplexer. 
-- The IPv4 header is validated using `sovereign_checksum`.
-- Based on the `protocol` field, the payload is forwarded:
-  - Protocol 1: ICMP (Ping)
-  - Protocol 6: TCP
-  - Protocol 17: UDP
+## Architecture
 
-## 4. Transport Layer (TCP/UDP)
-- **UDP:** A connectionless, stateless implementation for fast packet broadcast/multicast.
-- **TCP:** A robust state machine (WIP). Currently handles header parsing (SYN, ACK, FIN flags) preparing for a full Sovereign Pseudo-Socket layer in userland.
+```
+┌─────────────────────────────┐
+│  sigma_net_dns.cpp (DNS)    │
+│  sigma_firewall.cpp (FW)    │
+├─────────────────────────────┤
+│  sigma_net_socket.cpp       │  ← Sovereign Socket API
+├─────────────────────────────┤
+│  sigma_tcp.cpp (TCP FSM)    │
+│  sigma_ipv6.cpp (IPv6+NDP)  │
+├─────────────────────────────┤
+│  sigma_e1000.cpp (NIC)      │
+│  sigma_rtl8139.cpp (NIC)    │
+└─────────────────────────────┘
+```
+
+---
+
+## Sovereign Socket API (`sigma_net_socket.cpp`)
+
+Replaces POSIX `<sys/socket.h>` entirely.
+
+| Function | Purpose |
+|----------|---------|
+| `sigma_net_socket_create(proto)` | Create TCP/UDP/RAW socket |
+| `sigma_net_socket_bind(sock, ip, port)` | Bind to local address |
+| `sigma_net_socket_connect(sock, ip, port)` | Initiate connection |
+| `sigma_net_socket_send(sock, data, len)` | Send data |
+| `sigma_net_socket_recv(sock, buf, max)` | Receive data |
+| `sigma_net_socket_close(sock)` | Close socket |
+
+- Up to 1024 concurrent sockets
+- Ring buffer TX/RX for zero-copy IPC
+
+---
+
+## TCP Stack (`sigma_tcp.cpp`)
+
+**Absorbs**: RFC 793, Linux `tcp.c` state machine, uIP embedded stack.
+
+Implements the **full TCP finite state machine**:
+- Three-way handshake (SYN → SYN-ACK → ACK)
+- 11 states: CLOSED → LISTEN → SYN_SENT → SYN_RCVD → ESTABLISHED → FIN_WAIT1/2 → CLOSE_WAIT → CLOSING → LAST_ACK → TIME_WAIT
+- RFC 1071 one's complement checksum
+- Retransmission timer (3s RTO)
+
+---
+
+## IPv6 (`sigma_ipv6.cpp`)
+
+**Absorbs**: RFC 8200, Linux `net/ipv6/`.
+
+- Fixed 40-byte header parsing
+- Next-header routing (TCP=6, UDP=17, ICMPv6=58)
+- NDP Neighbor Cache (32 entries)
+- Address comparison for 128-bit addresses
+
+---
+
+## Firewall (`sigma_firewall.cpp`)
+
+**Absorbs**: `iptables` / `nftables` chain architecture.
+
+- 128 firewall rules
+- Match by: source IP/mask, dest IP/mask, dest port, protocol
+- Actions: `ACCEPT`, `DROP`
+- Default policy: ACCEPT
+
+---
+
+## DNS Resolver (`sigma_net_dns.cpp`)
+
+- Manually constructs raw UDP DNS query packets
+- Formats domain names into DNS wire format
+- Sends to port 53 via sovereign socket API
+- Parses A record answers
