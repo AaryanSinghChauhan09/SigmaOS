@@ -40,16 +40,12 @@ static inline u32 mmio_read32(u64 base, u32 offset) {
 }
 ```
 
-## 4. Interrupt Handling
-Registering an interrupt handler is done by exposing an `extern "C"` function that the main IDT (Interrupt Descriptor Table) dispatcher will call:
-
-```cpp
-extern "C" void sigma_my_driver_irq_handler() {
-    // 1. Acknowledge interrupt on device
-    // 2. Read data
-    // 3. Push to lock-free SPSC ring buffer
-}
-```
+## 4. Concrete Driver Implementations
+SigmaOS features several zero-dependency drivers designed around Silicon-Direct hardware access:
+1. **PCI Bus Enumerator (`kernel/drivers/pci/sigma_pci.cpp`)**: Iterates through x86 configuration ports `0xCF8`/`0xCFC` to query and catalog peripheral devices, BAR sizes, and classes.
+2. **AHCI/SATA Controller (`kernel/drivers/storage/sigma_ahci.cpp`)**: Probes host adapters, maps HBA operational registers, detects connected SATA drives, and sets up raw sector reads.
+3. **USB xHCI Driver (`kernel/drivers/usb/sigma_xhci.cpp`)**: Initializes USB 3.0 controllers, resets slots, allocates Device Context structures, and maps port status registers.
+4. **AC97 Audio Driver (`kernel/drivers/sound/sigma_ac97.cpp`)**: Controls master volume registers,PCM channels, sets sample rates, and initiates DMA playback buffers.
 
 ## 5. Ring Buffers (SPSC)
 Drivers should never block. Instead, use a Single-Producer Single-Consumer (SPSC) ring buffer to pass events (like keystrokes or network packets) to the userland or scheduler.
@@ -67,3 +63,4 @@ static void push(struct Event* ev) {
     }
 }
 ```
+
