@@ -1,35 +1,21 @@
-# Sovereign Networking Shard (S-NET)
+# 🌐 Networking Shard
 
-The Networking Shard is a modular, hot-swappable TCP/IP stack implemented independently from the monolithic kernel core. It provides secure sockets and strict network isolation for SigmaOS.
+> "Sovereign connectivity, from the physical layer up to the transport layer, without importing a single line of libc sockets."
 
-## Architecture Diagram
+## 1. Network Interface Cards (NIC)
+SigmaOS currently supports the Intel Gigabit Ethernet (`e1000`) and Realtek `RTL8139`. These drivers interface directly with the physical hardware, reading MAC addresses from the EEPROM and setting up TX/RX ring buffers.
 
-```mermaid
-graph TD
-    A[Userland App] --> | Z-SYSCALL | B(S-NET Socket API)
-    B --> C{PQC Engine}
-    C --> | Encrypted | D[TCP/IP Stack]
-    C --> | Unencrypted | D
-    D --> E[Sovereign HAL]
-    E --> F[Hardware NIC
+## 2. Address Resolution Protocol (ARP)
+Before IPv4 can route to a local destination, the MAC address must be resolved. SigmaOS maintains a lightweight ARP cache. If an IP is unknown, an ARP broadcast is issued.
 
- **TCP/IP Stack**: Full IPv4 (and future IPv6) implementation.
+## 3. IPv4 Implementation
+All incoming packets from the NICs are routed through the IPv4 demultiplexer. 
+- The IPv4 header is validated using `sovereign_checksum`.
+- Based on the `protocol` field, the payload is forwarded:
+  - Protocol 1: ICMP (Ping)
+  - Protocol 6: TCP
+  - Protocol 17: UDP
 
-- **Secure Sockets**: Built-in integration with the Post-Quantum Cryptography (PQC) engine for default-encrypted packet transmission.
-
-- **Hot-swappable**: The network driver and stack can be restarted or updated without rebooting the kernel.
-
-## API Examples
-
-### Creating a Socke
-
-c
-int fd;
-sigma_status status = SovereignNetworkShard::getInstance().socket_create(AF_INET, SOCK_STREAM, 0, &fd);
-if (status == SIGMA_OK) {
-    sigma_log("Socket successfully created.");
-
-### Binding to Por
-
-c
-SovereignNetworkShard::getInstance().socket_bind(fd, 0x7F000001, 8080)
+## 4. Transport Layer (TCP/UDP)
+- **UDP:** A connectionless, stateless implementation for fast packet broadcast/multicast.
+- **TCP:** A robust state machine (WIP). Currently handles header parsing (SYN, ACK, FIN flags) preparing for a full Sovereign Pseudo-Socket layer in userland.
