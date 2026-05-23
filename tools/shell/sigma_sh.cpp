@@ -18,6 +18,27 @@ extern "C" void sigma_vga_printf(const char* fmt, ...);
 extern "C" void sigma_vga_set_color(int fg, int bg);
 extern "C" u32  sigma_fat32_read(const char* name, u8* buf, u32 max_len);
 
+/* ─────────────── Sovereign Utility Declarations ─────────────── */
+extern "C" int sigma_pwd_main(int argc, char** argv);
+extern "C" int sigma_uname_main(int argc, char** argv);
+extern "C" int sigma_ps_main(int argc, char** argv);
+extern "C" int sigma_top_main(int argc, char** argv);
+extern "C" int sigma_kill_main(int argc, char** argv);
+extern "C" int sigma_cp_main(int argc, char** argv);
+extern "C" int sigma_mv_main(int argc, char** argv);
+extern "C" int sigma_rm_main(int argc, char** argv);
+extern "C" int sigma_chmod_main(int argc, char** argv);
+extern "C" int sigma_df_main(int argc, char** argv);
+extern "C" int sigma_grep_main(int argc, char** argv);
+extern "C" int sigma_dmesg_main(int argc, char** argv);
+extern "C" int sigma_wc_main(int argc, char** argv);
+extern "C" int sigma_head_main(int argc, char** argv);
+extern "C" int sigma_hexdump_main(int argc, char** argv);
+extern "C" int sigma_ifconfig_main(int argc, char** argv);
+extern "C" int sigma_ping_main(int argc, char** argv);
+extern "C" int sigma_mount_main(int argc, char** argv);
+extern "C" int sigma_lspci_main(int argc, char** argv);
+
 /* ─────────────── Sovereign String Utilities ─────────────── */
 static u32 sh_strlen(const char* s) {
     u32 n = 0; while (s[n]) n++; return n;
@@ -159,6 +180,13 @@ static void builtin_help() {
     sigma_vga_puts("  df                Display disk free space\n");
     sigma_vga_puts("  grep  [pat] [f]   Search for pattern\n");
     sigma_vga_puts("  dmesg             Print kernel ring buffer\n");
+    sigma_vga_puts("  wc    [file]      Count lines, words, bytes\n");
+    sigma_vga_puts("  head  [-n N] [f]  Display first lines of a file\n");
+    sigma_vga_puts("  hexdump [file]    Display file in hexadecimal\n");
+    sigma_vga_puts("  ifconfig          Display network interfaces\n");
+    sigma_vga_puts("  ping  [ip]        Ping a network host\n");
+    sigma_vga_puts("  mount -t [fs] [l] Mount partition/LBA\n");
+    sigma_vga_puts("  lspci             List all PCI devices\n");
 }
 
 /* history: print command history */
@@ -204,6 +232,13 @@ static void dispatch_command(const char* input) {
     else if (sh_streq(argv[0], "df"))      sigma_df_main(argc, argv);
     else if (sh_streq(argv[0], "grep"))    sigma_grep_main(argc, argv);
     else if (sh_streq(argv[0], "dmesg"))   sigma_dmesg_main(argc, argv);
+    else if (sh_streq(argv[0], "wc"))      sigma_wc_main(argc, argv);
+    else if (sh_streq(argv[0], "head"))    sigma_head_main(argc, argv);
+    else if (sh_streq(argv[0], "hexdump")) sigma_hexdump_main(argc, argv);
+    else if (sh_streq(argv[0], "ifconfig")) sigma_ifconfig_main(argc, argv);
+    else if (sh_streq(argv[0], "ping"))    sigma_ping_main(argc, argv);
+    else if (sh_streq(argv[0], "mount"))   sigma_mount_main(argc, argv);
+    else if (sh_streq(argv[0], "lspci"))   sigma_lspci_main(argc, argv);
     else {
         sigma_vga_puts("sigma-sh: command not found: ");
         sigma_vga_puts(argv[0]);
