@@ -11,6 +11,8 @@ $branches = @(
     "release/mobile",
     "release/rtos",
     "release/standalone",
+    "release/microkernel",
+    "prepare-sigmaos-launch",
     "master",
     "drivers-dev",
     "fs-dev",
@@ -33,9 +35,10 @@ git push origin main
 
 # Push wiki
 Write-Host "--- Pushing wiki ---"
-Set-Location wiki_repo
+Copy-Item -Path "wiki_repo\*" -Destination "..\SigmaOS_wiki\" -Force -Recurse
+Set-Location ..\SigmaOS_wiki
 git add .
-git commit -m "docs: Phase 3 wiki updates - networking, GUI, PQC, OmniPkg" 2>$null
-git push origin master --force 2>$null
+git commit -m "docs: Phase 3 wiki updates - networking, GUI, PQC, OmniPkg, Tools" 2>$null
 git push origin main --force 2>$null
-Set-Location ..
+Set-Location ..\SigmaOS
+
