@@ -21,7 +21,7 @@ jobs:
           fetch-depth: 0
 
       - name: Push wiki_repo/ to GitHub Wiki
-        uses: Andrew-Chen-Wang/github-wiki-action@v4
+        uses: Andrew-Chen-Wang/github-wiki-action@v5
         with:
           path: wiki_repo/
           token: ${{ secrets.GITHUB_TOKEN }}
