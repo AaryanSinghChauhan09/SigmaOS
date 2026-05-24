@@ -4,9 +4,11 @@ This document defines the strict execution boundaries between the Kernel Space a
 
 ---
 
-## 🔒 Privilege Ring Separation
-
-SigmaOS enforces a strict boundary using CPU privilege rings (Ring 0 and Ring 3):
+## 🔒- `drivers/` (Sovereign HAL interactions)
+- `hal/` (Multi-Arch Hardware Abstraction - x86_64, ARM64, RISC-V RV64GC)
+- `security/` (Zero-Trust IPC, Capability Sandbox, Runtime Attestation)
+- `resilience/` (Self-Healing, Process Restarts, Rollback Updates)
+- `net/` (QUIC, IPv6, Mesh Networking, WireGuard VPN) Ring 3):
 
 ```
        +---------------------------------------------+

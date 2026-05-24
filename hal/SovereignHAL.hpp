@@ -70,6 +70,7 @@ public:
 private:
     SovereignHAL();
     CPULatticeArch detectArchitecture();
+    void detectCoreCount();
 
     CPULatticeArch m_arch;
     sigma_u32      m_active_cores;

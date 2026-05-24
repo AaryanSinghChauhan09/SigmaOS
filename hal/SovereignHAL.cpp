@@ -41,18 +41,41 @@ void SovereignHAL::initializeHAL() {
         case CPULatticeArch::X86_64:
             sigma_log_info("[HAL] S-HAL: Detected CPU Architecture -> x86_64 (Intel/AMD).");
             sigma_log_info("[HAL] S-HAL: Bootstrapping APIC and GDT selectors.");
+            // x86_64 specific init
             break;
         case CPULatticeArch::ARM64:
             sigma_log_info("[HAL] S-HAL: Detected CPU Architecture -> ARM64 (Cortex-A).");
             sigma_log_info("[HAL] S-HAL: Configuring GIC (Generic Interrupt Controller) channels.");
+            // ARM64 specific init calls (delegated to arm64_boot.cpp)
             break;
         case CPULatticeArch::RISCV64:
             sigma_log_info("[HAL] S-HAL: Detected CPU Architecture -> RISC-V (RV64GC).");
             sigma_log_info("[HAL] S-HAL: Bootstrapping CLINT and PLIC registers.");
+            // RISCV64 specific init calls (delegated to riscv64_boot.cpp)
             break;
     }
     
+    detectCoreCount();
     sigma_log_info("[HAL] S-HAL: Basic memory discovery mapping online.");
+}
+
+void SovereignHAL::detectCoreCount() {
+    sigma_log_info("[HAL] S-HAL: Detecting online cores...");
+    switch (m_arch) {
+        case CPULatticeArch::X86_64:
+            // Placeholder: ACPI MADT parsing
+            m_active_cores = 4; // Default stub for x86
+            break;
+        case CPULatticeArch::ARM64:
+            // Placeholder: PSCI / MPIDR parsing or Device Tree
+            m_active_cores = 8; // Default stub for ARM64
+            break;
+        case CPULatticeArch::RISCV64:
+            // Placeholder: FDT parsing or SBI hart query
+            m_active_cores = 4; // Default stub for RISCV64
+            break;
+    }
+    sigma_log_info("[HAL] S-HAL: Detected %u active cores.", m_active_cores);
 }
 
 void SovereignHAL::configureInterrupts() {
