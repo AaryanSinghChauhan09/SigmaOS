@@ -4,68 +4,83 @@ This roadmap defines the immediate, medium-term, and long-term milestones requir
 
 ---
 
-## 🛠️ Immediate Milestones (Current Focus)
+## 🔧 Immediate Priorities
 
-### 1. Define Core Vision in GitHub Wiki
-* [x] Publish positioning page: `SigmaOS vs Ubuntu` detailing USP absorption and sovereign differentiators.
-* [x] Establish clear mission manifests for contributors and enterprise partners.
-* [x] Publish the **SigmaOS Strategic Vision** focusing on targeted industrial branches (IoT, HPC, Sovereign Cloud).
+### Hardware Expansion
+* [x] **Core HAL & DDK APIs:** Basic stubs and capabilities for hardware access.
+* [ ] **Drivers:** Add native sovereign drivers for USB 3.x, NVMe, Wi‑Fi, Bluetooth, and modern GPUs.
 
-### 2. Build Developer Ecosystem
-* [x] Deploy native package manager support with dual CLI (`sigma install`) and GUI interfaces.
-* [x] Ensure 100% compatibility with APT/Debian packages and Snap/Flatpak universal binaries.
-* [x] Publish comprehensive onboarding tutorials and starter guides in the GitHub Wiki.
-* [ ] **Toolchain & Compatibility:** Develop POSIX translation shims to attract developers without compromising the libc-free sovereign core.
+### Networking Stack
+* [x] **IPv6 Core headers:** Minimal structural implementations.
+* [ ] **TCP/IP Evolution:** Implement a robust TCP/IP stack with IPv4/IPv6, DHCP, DNS, and firewall modules.
 
-### 3. Release Stable LTS Build & Developer Preview
-* [x] Launch `sigma_lts_developer_preview` showcasing guaranteed 5-year sovereign support.
-* [x] Document step-by-step minimal guided installation and supported hardware matrices.
+### Package Manager
+* [x] **Basic SPM CLI:** Package manager skeleton logic.
+* [ ] **Sovereign Package Manager:** Build a package manager (inspired by Solus’s eopkg or Nix’s nix) featuring reproducible builds and cryptographic verification.
 
-### 4. Benchmark & Showcase Superiority
-* [x] Execute bare-metal performance tests against Ubuntu across AI workloads and syscall latency.
-* [x] Publish definitive benchmark results proving SigmaOS superiority across GitHub and social channels.
-
-### 5. Community Engagement Launch
-* [x] Open official Discord/Slack collaboration channels for real-time developer coordination.
-* [x] Establish structured contributor recognition programs (Badges, Grants, Core Credits).
-* [ ] **Community-Driven Governance:** Adopt the EndeavourOS/Solus model of transparent community feedback, forums, and an independent package ecosystem.
+### Basic Desktop UX
+* [ ] **Polished UX:** Borrow polish from elementary/Zorin: clean UI, accessibility tools (screen readers, high-contrast themes), and intuitive defaults.
 
 ---
 
-## ⚡ Medium-Term Goals
+## ⚡ Mid‑Term Development
 
-### 1. Core Infrastructure Expansion
-* [x] **Hardware Support:** Deepen native driver support for modern GPUs, Wi-Fi chipsets, USB, NVMe, and ARM/embedded hardware.
-* [x] **Networking Stack:** Evolve TCP/IP stack to include advanced features like IPv6, VPN (WireGuard), and robust firewall modules.
-* [ ] **Immutable System Images:** Build rollback capability and atomic upgrades inspired by Fedora CoreOS.
-* [ ] **Declarative Configurations:** Implement a NixOS-style sovereign configuration system ensuring deterministic environments.
-* [ ] **System Recovery Tools:** Create bootable rescue environments, snapshot rollbacks, and forensic auditing toolkits (inspired by SystemRescue/CAINE).
+### File Systems
+* [x] **SovereignFS Foundation:** Basic CoW and Merkle tree stubs.
+* [ ] **Expansion:** Extend beyond FAT32/Ext2 to journaling (Ext4‑like) and copy‑on‑write (Btrfs/ZFS‑like) native equivalents.
 
-### 2. Sovereign Cloud Integration & Virtualization
-* [ ] **Virtualization:** Develop sovereign equivalents to KVM/Docker/Kubernetes for cloud edge dominance.
-* [ ] Provide official, hardened SigmaOS cloud images for AWS, Azure, and GCP.
+### Security Framework
+* [x] **Lattice-Based MAC:** Core structural implementation.
+* [ ] **Enforcement:** Sovereign alternative to SELinux/AppArmor with full mandatory access control applied system-wide.
 
-### 3. Security Differentiation & Hardening
-* [ ] **Security Model:** Implement a sovereignty-aligned security framework (mandatory access control, strict sandboxing, cryptographic isolation).
-* [ ] Complete formal mathematical verification of kernel ring isolation and zero-telemetry memory spaces.
+### Virtualization
+* [ ] **Hypervisor:** Lightweight hypervisor for bare‑metal sovereignty (inspired by KVM/QEMU) directly integrated into the kernel.
 
-### 4. Scheduler & Real-Time Capabilities
-* [ ] Expand scheduling beyond Round Robin/EDF by adding hybrid schedulers, NUMA awareness, and hard real-time guarantees.
-* [ ] **Auto-Tuning Performance:** Dynamic workload optimization and aggressive hardware profiles (inspired by Clear Linux).
+### Declarative Configs
+* [ ] **Reproducibility:** NixOS‑style reproducibility where system states are defined in declarative configs, enabling perfect rollback capability.
 
 ---
 
-## 🚀 Long-Term Vision
+## 🚀 Long‑Term Vision
 
-### 1. AI & Quantum Infrastructure
-* [ ] **AI-Native Scheduling:** Predictive resource allocation using ML models directly in the kernel.
-* [ ] **Quantum-Safe Cryptography:** Complete integration of post-quantum standards across all communication and identity tokens.
+### Sovereign Containers
+* [ ] **Containerization:** A container-first design running independently of Linux namespaces/cgroups (inspired by RancherOS).
 
-### 2. Modern App Ecosystem
-* [ ] **Sovereign Containers:** Full container-first design independent of Linux namespaces (inspired by RancherOS).
-* [ ] **Graphics & Gaming Stack:** Sovereign gaming layer, GPU compute drivers, and WebAssembly-based runtimes for Proton/Wine compatibility (inspired by SteamOS).
-* [ ] **Polished UX:** A lightweight, highly accessible sovereign desktop environment with screen readers and high-contrast themes (inspired by Zorin/Elementary).
+### Immutable Infrastructure
+* [ ] **Atomic Updates:** CoreOS/Flatcar‑style atomic upgrades and image-based reliability.
 
-Position SigmaOS Zenith as the global standard sovereign AI-native OS for governments, enterprises, and next-generation silicon architectures. 
+### Recovery Tools
+* [ ] **Forensics & Recovery:** Rescuezilla/SystemRescue‑like sovereign recovery environments and snapshot rollbacks.
 
-By specializing via **Industrial Branches** (embedded IoT, HPC, sovereign cloud) and focusing on transparency and deterministic performance, SigmaOS will become the only rational choice for sovereignty, AI acceleration, and critical infrastructure.
+### Performance Profiles
+* [ ] **Auto-Tuning:** Clear Linux‑style dynamic auto‑tuning optimized for different silicon targets (x86, ARM, RISC‑V).
+
+### Community Ecosystem
+* [ ] **Governance:** Build forums, clear contributor guidelines, and transparent community-driven governance (like EndeavourOS/Solus).
+
+---
+
+## 🌍 Strategic Differentiation
+
+### Sovereign Cloud OS
+* Position SigmaOS as the ultimate foundation for sovereign cloud deployments and critical infrastructure (defense, finance, healthcare).
+
+### Specialized Branches
+* **IoT/Embedded:** Lightweight, zero-trust, and highly secure.
+* **HPC/AI:** GPU acceleration, parallel throughput, and sovereign AI scheduling.
+* **Enterprise:** Focus on sovereign containers and virtualization.
+
+### Transparency & Verifiability
+* Implement formal verification of kernel modules and sovereign audit tools to mathematically prove system integrity.
+
+---
+
+## 👉 What to do next: (Execution Order)
+
+1. **Start with drivers + networking stack:** Make SigmaOS fundamentally usable on modern hardware.
+2. **Build a package manager + documentation:** Attract early developers and establish the ecosystem.
+3. **Add security + reproducibility features:** Borrow stability concepts from NixOS and CoreOS.
+4. **Develop containers + recovery tools:** Borrow cloud-native paradigms from RancherOS and Rescuezilla.
+5. **Grow a community ecosystem:** Establish transparent governance and community input like Solus/EndeavourOS.
+
+*This staged approach ensures SigmaOS catches up on essentials while simultaneously carving out its sovereign niche.*
