@@ -28,32 +28,44 @@ This roadmap defines the immediate, medium-term, and long-term milestones requir
 ### 5. Community Engagement Launch
 * [x] Open official Discord/Slack collaboration channels for real-time developer coordination.
 * [x] Establish structured contributor recognition programs (Badges, Grants, Core Credits).
+* [ ] **Community-Driven Governance:** Adopt the EndeavourOS/Solus model of transparent community feedback, forums, and an independent package ecosystem.
 
 ---
 
 ## ⚡ Medium-Term Goals
 
 ### 1. Core Infrastructure Expansion
-* [ ] **Hardware Support:** Deepen native driver support for modern GPUs, Wi-Fi chipsets, USB, NVMe, and ARM/embedded hardware.
-* [ ] **File System Diversity:** Introduce support for modern, journaling, and copy-on-write file systems (e.g., Ext4, Btrfs) alongside FAT32/Ext2.
-* [ ] **Networking Stack:** Evolve TCP/IP stack to include advanced features like IPv6, VPN (WireGuard), and robust firewall modules.
+* [x] **Hardware Support:** Deepen native driver support for modern GPUs, Wi-Fi chipsets, USB, NVMe, and ARM/embedded hardware.
+* [x] **Networking Stack:** Evolve TCP/IP stack to include advanced features like IPv6, VPN (WireGuard), and robust firewall modules.
+* [ ] **Immutable System Images:** Build rollback capability and atomic upgrades inspired by Fedora CoreOS.
+* [ ] **Declarative Configurations:** Implement a NixOS-style sovereign configuration system ensuring deterministic environments.
+* [ ] **System Recovery Tools:** Create bootable rescue environments, snapshot rollbacks, and forensic auditing toolkits (inspired by SystemRescue/CAINE).
 
 ### 2. Sovereign Cloud Integration & Virtualization
 * [ ] **Virtualization:** Develop sovereign equivalents to KVM/Docker/Kubernetes for cloud edge dominance.
 * [ ] Provide official, hardened SigmaOS cloud images for AWS, Azure, and GCP.
-* [ ] Deploy bare-metal optimized builds specifically tuned for sovereign cloud data centers.
 
 ### 3. Security Differentiation & Hardening
 * [ ] **Security Model:** Implement a sovereignty-aligned security framework (mandatory access control, strict sandboxing, cryptographic isolation).
 * [ ] Complete formal mathematical verification of kernel ring isolation and zero-telemetry memory spaces.
-* [ ] Enforce continuous cryptographic supply chain auditing across all system shards.
 
 ### 4. Scheduler & Real-Time Capabilities
-* [ ] Expand scheduling beyond Round Robin/EDF by adding hybrid schedulers, NUMA awareness, and hard real-time guarantees for industrial use.
+* [ ] Expand scheduling beyond Round Robin/EDF by adding hybrid schedulers, NUMA awareness, and hard real-time guarantees.
+* [ ] **Auto-Tuning Performance:** Dynamic workload optimization and aggressive hardware profiles (inspired by Clear Linux).
 
 ---
 
 ## 🚀 Long-Term Vision
+
+### 1. AI & Quantum Infrastructure
+* [ ] **AI-Native Scheduling:** Predictive resource allocation using ML models directly in the kernel.
+* [ ] **Quantum-Safe Cryptography:** Complete integration of post-quantum standards across all communication and identity tokens.
+
+### 2. Modern App Ecosystem
+* [ ] **Sovereign Containers:** Full container-first design independent of Linux namespaces (inspired by RancherOS).
+* [ ] **Graphics & Gaming Stack:** Sovereign gaming layer, GPU compute drivers, and WebAssembly-based runtimes for Proton/Wine compatibility (inspired by SteamOS).
+* [ ] **Polished UX:** A lightweight, highly accessible sovereign desktop environment with screen readers and high-contrast themes (inspired by Zorin/Elementary).
+
 Position SigmaOS Zenith as the global standard sovereign AI-native OS for governments, enterprises, and next-generation silicon architectures. 
 
 By specializing via **Industrial Branches** (embedded IoT, HPC, sovereign cloud) and focusing on transparency and deterministic performance, SigmaOS will become the only rational choice for sovereignty, AI acceleration, and critical infrastructure.
