@@ -12,9 +12,12 @@ This roadmap formalizes the remaining gaps between SigmaOS Zenith and legacy com
 | **Performance** | Clear Linux | Telemetry-Driven Auto-Tuner | `SovereignAISched` | 
 | **Reproducibility** | NixOS | Declarative Shard Configs & Rollbacks | `sigma-pkg sync` | 
 | **Recovery** | RescueZilla | Snapshot Diff Engine & Forensic Toolkit | `SovereignSnapshotDiff` | 
-| **Containers** | Fedora CoreOS | Shard Container Orchestrator (K8s) | `SovereignOrchestrator` | 
+| **Containers** | Fedora CoreOS | Sovereign Container Orchestrator (K8s equivalent) | `SovereignOrchestrator` | 
 | **Rolling** | Arch / Solus | Incremental Shard Delta Updates | `sigma-pkg update --delta` | 
 | **Enterprise** | Ubuntu | Hardware Regression Harness | `SovereignRegression` | 
+| **File Systems** | Btrfs / ZFS | Sovereign CoW & Journaling Filesystem | `SovereignFS` |
+| **Networking** | Linux TCP/IP | Sovereign IPv6, Mesh, & VPN Stack | `SovereignNet` |
+| **Compatibility**| WSL / Wine | POSIX Translation Shims (Opt-In) | `SovereignCompat` | 
 
 ## 🚀 Development Phases
 
