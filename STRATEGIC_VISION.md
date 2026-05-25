@@ -6,14 +6,25 @@ Linux is ubiquitous, but its dominance is built on legacy assumptions and fragme
 
 SigmaOS will not "out-Linux" Linux by adopting its legacy debt. Instead, we will **out-sovereign** it, aggressively catching up on hardware and networking essentials while introducing killer differentiators that the Linux architecture structurally cannot support. 
 
-## 🔧 Catch‑Up Essentials (The Table Stakes)
+## 🧱 The Missing Foundations (Catch-Up Essentials)
 
-To obliterate the competition, we must first neutralize their basic advantages:
+To obliterate the competition, we must first neutralize their basic advantages. These are the table stakes where we must achieve parity:
 
-*   **Hardware Expansion:** Absolute support for modern GPUs (NVIDIA/AMD/Intel), Wi-Fi, Bluetooth, USB 3.x, and NVMe. We will implement ARM & RISC-V support to rival and overtake Raspberry Pi distros.
+*   **Hardware Expansion:** Absolute support for modern GPUs (NVIDIA/AMD/Intel), Wi-Fi, Bluetooth, USB 3.x, and NVMe.
+*   **ARM & RISC-V Portability:** Linux dominates embedded and SBCs (Raspberry Pi, BeagleBone). SigmaOS needs native, highly optimized support here to seize this market.
 *   **Networking Stack:** A robust, zero-trust TCP/IP stack with full IPv4/IPv6, DHCP, DNS, VPN integration, and deterministic firewall modules.
 *   **Next-Gen File Systems:** Moving beyond legacy formats to journaling (Ext4-like) and copy-on-write (Btrfs/ZFS-like) capabilities, featuring instantaneous snapshot rollbacks.
-*   **Sovereign Package Manager (SPM):** A ground-up package manager featuring reproducible builds, cryptographic verification, and atomic rollbacks, surpassing Solus's eopkg or Nix's nix.
+*   **Power Management:** Deep ACPI integration, battery optimization, and energy-aware scheduling crucial for laptops and mobile devices.
+*   **Internationalization:** Full multilingual support, dynamic input methods, and global localization to guarantee global accessibility.
+
+## 🌐 Closing the Ecosystem Gaps
+
+A superior kernel is useless without an ecosystem. We will aggressively fill these voids:
+
+*   **Sovereign Graphical Stack:** A ground-up graphics subsystem serving as a hyper-efficient alternative to Wayland/X11 for modern desktop environments.
+*   **Software Distribution (SPM):** A ground-up package manager featuring reproducible builds, cryptographic verification, and atomic rollbacks, surpassing Solus's eopkg or Nix's nix.
+*   **Developer Tooling:** Seamless IDE integration, deterministic debugging/profiling suites, and specialized SDKs for IoT, HPC, and cloud.
+*   **Community Infrastructure:** Comprehensive documentation, interactive forums, frictionless contributor pipelines, and a transparent governance model.
 
 ## 🧬 Strategic Assimilation: Borrowing Strengths from Linux Distros
 
@@ -32,27 +43,21 @@ We will systematically target the core strengths of top Linux distributions and 
 
 These are the structural advantages where Linux's POSIX legacy prevents it from competing:
 
+*   **Sovereign Cloud Integration:** Competing with Fedora CoreOS/Flatcar by offering deterministic, inherently secure sovereign cloud infrastructure.
+*   **Formal Verification:** Mathematically verified kernel modules and sovereign audit tools designed for defense-grade critical infrastructure (an area Linux cannot execute at scale).
+*   **AI‑Native OS Layer:** Deep integration of ML models for predictive resource allocation, dynamic thread scheduling, and native ML runtimes.
 *   **Sovereign Containers:** Native containerization operating entirely independently of Linux namespaces and cgroups, offering true isolation.
 *   **Absolute Security Framework:** A sovereign alternative to SELinux/AppArmor featuring mandatory access control, cryptographic isolation, and zero-trust kernel modules.
-*   **Formal Verification:** Mathematically verified kernel modules and sovereign audit tools designed for defense-grade critical infrastructure.
-*   **AI‑Native Scheduling:** Deep integration of ML models for predictive resource allocation and dynamic thread scheduling.
-*   **Quantum‑Safe Cryptography:** Post-quantum cryptographic primitives baked directly into the lowest levels of the OS.
+*   **Quantum‑Safe Security:** Post-quantum cryptographic primitives baked directly into the lowest levels of the OS.
 *   **Self‑Healing Kernel:** Autonomous fault recovery mechanisms, inspired by biological resilience, allowing the OS to heal from fatal panics without rebooting.
 
-## 🌍 Strategic Positioning & Target Markets
+## 👉 Execution Path: The Uncompromising Agenda
 
-*   **Sovereign Cloud OS:** Competing directly with Fedora CoreOS/Flatcar by offering the definitive deterministic, sovereign cloud infrastructure.
-*   **Industrial Specialization Branches:**
-    *   **IoT/Embedded:** Ultra-lightweight, mathematically secure, and deterministic.
-    *   **HPC/AI:** Sovereign scheduling with native GPU acceleration.
-    *   **Enterprise/Cloud:** Sovereign virtualization, containers, and a verifiable package ecosystem.
-*   **Community Ecosystem:** Launching transparent governance forums, rigorous contributor guidelines, and an independent ecosystem akin to EndeavourOS.
+SigmaOS has covered the basics of sovereignty, but to truly crush Linux distros it must catch up on hardware + ecosystem while leapfrogging with sovereignty features Linux can’t easily replicate. 
 
-## 👉 Execution Path: Immediate Action Items
-
-That’s the path to not just “catch up” but to **out‑sovereign Linux**. Our immediate priorities to execute this offensive are:
-
-1.  **Expand drivers + networking stack:** Make SigmaOS undeniably usable on modern hardware.
-2.  **Build the package manager + documentation:** Attract the initial wave of high-tier developers.
-3.  **Add declarative configs + recovery tools:** Assimilate the best of NixOS and Rescuezilla.
-4.  **Start designing sovereign security + containers:** Cement our impenetrable core differentiators.
+Our immediate priorities are:
+1.  **Port SigmaOS to ARM/RISC-V:** Unlock the massive embedded and SBC markets.
+2.  **Design a Sovereign Graphics Stack:** Enable a polished, hyper-modern desktop UX.
+3.  **Build Power Management & Internationalization:** Make SigmaOS usable globally on laptops and mobile devices.
+4.  **Launch Developer Ecosystem Tools:** Deploy the sovereign package manager, SDKs, and IDE integrations.
+5.  **Accelerate Sovereignty Differentiators:** Double down on formal verification, sovereign containers, and AI scheduling.
