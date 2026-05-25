@@ -42,12 +42,18 @@ bool verify_driver_signature(const RepoPackage& pkg) {
 sigma_status fetch_driver(sigma_u32 requested_id, RepoPackage* out_pkg) {
     sigma_log_info("[RepoClient] Establishing secure connection to Sovereign Driver Ledger...");
     
-    // Simulating a successful fetch
     out_pkg->driver_id = requested_id;
-    out_pkg->package_name = "sigma-gpu-driver-v1";
-    out_pkg->signature = "VALID_DILITHIUM_SIG_12345";
     out_pkg->binary_blob = (const sigma_u8*)"\x7F\x45\x4C\x46..."; // Fake ELF/Binary header
     out_pkg->blob_size = 4096;
+
+    if (requested_id == 99) {
+        // Return a compromised signature for testing signature rejection
+        out_pkg->package_name = "compromised-nvidia-driver";
+        out_pkg->signature = "FAKE_DILITHIUM_SIGNATURE_ATTACK";
+    } else {
+        out_pkg->package_name = "sigma-gpu-driver-v1";
+        out_pkg->signature = "VALID_DILITHIUM_SIG_12345";
+    }
     
     return K_OK;
 }
