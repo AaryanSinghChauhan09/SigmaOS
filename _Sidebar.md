@@ -87,6 +87,8 @@
 
 ## 🔒 Security Framework
 
+- [**Sovereign Recovery Suite**](Sovereign-Recovery-Suite)
+
 - [**Mandatory Access Control (MAC)**](Mandatory-Access-Control)
 
 - [**Cryptographic Identity Manager**](Cryptographic-Identity-Manager)
