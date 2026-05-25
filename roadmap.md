@@ -1,86 +1,78 @@
 # SigmaOS Zenith: Master Strategic Roadmap
 
-This roadmap defines the immediate, medium-term, and long-term milestones required to establish SigmaOS Zenith as the premier sovereign, AI-native operating system. It aligns with our core strategy: we will not out-Linux Linux, but we will **out-sovereign** it.
+This roadmap defines the precise staged milestones required to establish SigmaOS Zenith as the premier sovereign, AI-native operating system. It aligns with our core strategy: we will not out-Linux Linux, but we will **out-sovereign** it by aggressively adopting best-in-class paradigms from the ecosystem.
 
 ---
 
-## 🔧 Immediate Priorities
+## 🔧 Step 1 – Core Foundations
 
-### Hardware Expansion
-* [x] **Core HAL & DDK APIs:** Basic stubs and capabilities for hardware access.
-* [ ] **Drivers:** Add native sovereign drivers for USB 3.x, NVMe, Wi‑Fi, Bluetooth, and modern GPUs.
+### Expand Hardware Drivers
+* Add native sovereign support for USB 3.x, NVMe, Wi‑Fi, Bluetooth, and modern GPUs. Without this, SigmaOS can’t run on everyday hardware.
 
 ### Networking Stack
-* [x] **IPv6 Core headers:** Minimal structural implementations.
-* [ ] **TCP/IP Evolution:** Implement a robust TCP/IP stack with IPv4/IPv6, DHCP, DNS, and firewall modules.
+* Build a complete TCP/IP stack (IPv4/IPv6, DHCP, DNS, firewall). This is essential for internet connectivity and cloud use.
 
 ### Package Manager
-* [x] **Basic SPM CLI:** Package manager skeleton logic.
-* [ ] **Sovereign Package Manager:** Build a package manager (inspired by Solus’s eopkg or Nix’s nix) featuring reproducible builds and cryptographic verification.
-
-### Basic Desktop UX
-* [ ] **Polished UX:** Borrow polish from elementary/Zorin: clean UI, accessibility tools (screen readers, high-contrast themes), and intuitive defaults.
+* Create a sovereign package manager (like Solus’s eopkg or Nix’s nix) with reproducible builds, cryptographic verification, and rollback capabilities.
 
 ---
 
-## ⚡ Mid‑Term Development
+## ⚡ Step 2 – Borrow from Other Distros
 
-### File Systems
-* [x] **SovereignFS Foundation:** Basic CoW and Merkle tree stubs.
-* [ ] **Expansion:** Extend beyond FAT32/Ext2 to journaling (Ext4‑like) and copy‑on‑write (Btrfs/ZFS‑like) native equivalents.
+### From NixOS
+* **Declarative Configs & Reproducibility:** Let users define system states through declarative configurations and roll back easily.
 
-### Security Framework
-* [x] **Lattice-Based MAC:** Core structural implementation.
-* [ ] **Enforcement:** Sovereign alternative to SELinux/AppArmor with full mandatory access control applied system-wide.
+### From Fedora CoreOS / Flatcar
+* **Immutable Infrastructure:** Implement atomic updates for bulletproof reliability.
 
-### Virtualization
-* [ ] **Hypervisor:** Lightweight hypervisor for bare‑metal sovereignty (inspired by KVM/QEMU) directly integrated into the kernel.
+### From Rescuezilla / SystemRescue
+* **Sovereign Recovery Tools:** Build snapshot rollback capabilities and powerful forensic utilities.
 
-### Declarative Configs
-* [ ] **Reproducibility:** NixOS‑style reproducibility where system states are defined in declarative configs, enabling perfect rollback capability.
+### From Clear Linux
+* **Performance Profiles:** Auto‑tuning for different silicon architectures (x86, ARM, RISC‑V) to maximize bare-metal efficiency.
+
+### From Zorin / Elementary
+* **Polished Desktop UX:** Introduce a clean UI, deep accessibility features, and intuitive defaults to attract non‑technical users.
+
+### From SteamOS
+* **GPU & Gaming Stack:** Build a gaming compatibility layer (possibly WebAssembly‑based) along with a robust graphics stack.
 
 ---
 
-## 🚀 Long‑Term Vision
+## 🚀 Step 3 – Strategic Differentiation
 
 ### Sovereign Containers
-* [ ] **Containerization:** A container-first design running independently of Linux namespaces/cgroups (inspired by RancherOS).
+* Design a containerization framework entirely independent of legacy Linux namespaces/cgroups.
 
-### Immutable Infrastructure
-* [ ] **Atomic Updates:** CoreOS/Flatcar‑style atomic upgrades and image-based reliability.
-
-### Recovery Tools
-* [ ] **Forensics & Recovery:** Rescuezilla/SystemRescue‑like sovereign recovery environments and snapshot rollbacks.
-
-### Performance Profiles
-* [ ] **Auto-Tuning:** Clear Linux‑style dynamic auto‑tuning optimized for different silicon targets (x86, ARM, RISC‑V).
+### Security Framework
+* Establish a sovereign alternative to SELinux/AppArmor with strict mandatory access control and cryptographic isolation.
 
 ### Community Ecosystem
-* [ ] **Governance:** Build forums, clear contributor guidelines, and transparent community-driven governance (like EndeavourOS/Solus).
-
----
-
-## 🌍 Strategic Differentiation
-
-### Sovereign Cloud OS
-* Position SigmaOS as the ultimate foundation for sovereign cloud deployments and critical infrastructure (defense, finance, healthcare).
+* Launch dedicated forums, Discord/Matrix channels, and clear contributor guidelines to aggressively grow developer engagement.
 
 ### Specialized Branches
-* **IoT/Embedded:** Lightweight, zero-trust, and highly secure.
-* **HPC/AI:** GPU acceleration, parallel throughput, and sovereign AI scheduling.
-* **Enterprise:** Focus on sovereign containers and virtualization.
-
-### Transparency & Verifiability
-* Implement formal verification of kernel modules and sovereign audit tools to mathematically prove system integrity.
+* **IoT/Embedded:** Lightweight and exceptionally secure.
+* **HPC/AI:** GPU acceleration and sovereign scheduling for massive workloads.
+* **Enterprise/Cloud:** Hardened virtualization and native sovereign containers.
 
 ---
 
-## 👉 What to do next: (Execution Order)
+## 🌍 Step 4 – Long‑Term Vision
 
-1. **Start with drivers + networking stack:** Make SigmaOS fundamentally usable on modern hardware.
-2. **Build a package manager + documentation:** Attract early developers and establish the ecosystem.
-3. **Add security + reproducibility features:** Borrow stability concepts from NixOS and CoreOS.
-4. **Develop containers + recovery tools:** Borrow cloud-native paradigms from RancherOS and Rescuezilla.
-5. **Grow a community ecosystem:** Establish transparent governance and community input like Solus/EndeavourOS.
+### AI‑Native Scheduling
+* Predictive resource allocation using ML models directly within the kernel scheduler.
 
-*This staged approach ensures SigmaOS catches up on essentials while simultaneously carving out its sovereign niche.*
+### Quantum‑Safe Cryptography
+* Integrate post‑quantum primitives across all communication and identity tokens for future‑proof security.
+
+### Self‑Healing Kernel
+* Autonomous recovery from kernel faults and full formal verification of kernel modules.
+
+---
+
+## 👉 Immediate Execution Path
+
+To make SigmaOS practical while laying the groundwork for sovereignty-aligned innovation, we will focus our immediate engineering efforts on:
+1. **Drivers + Networking Stack:** Make SigmaOS usable on modern hardware.
+2. **Package Manager + Documentation:** Attract and retain developers.
+3. **Declarative Configs and Recovery Tools:** Begin experimenting with NixOS/Rescuezilla paradigms.
