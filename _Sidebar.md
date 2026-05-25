@@ -65,6 +65,8 @@
 
 ## 🌐 Sovereign Networking Stack
 
+- [**Sovereign Network Manager (sigma-net)**](Sovereign-Network-Manager)
+
 - [**IPv6 Stack**](Sovereign-IPv6)
 
 - [**VPN (Post-Quantum Tunneling)**](Sovereign-VPN)
