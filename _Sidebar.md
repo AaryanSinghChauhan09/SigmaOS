@@ -54,6 +54,8 @@
 
 ## 🚀 Strategic Vision
 
+- [**Strategic Vision and Competitive Analysis**](STRATEGIC_VISION)
+
 - [Competitive Analysis (vs Linux)](Competitive-Analysis)
 
 - [Linux Competitive Edge](Linux-Competitive-Edge)
