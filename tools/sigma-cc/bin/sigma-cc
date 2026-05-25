@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+import sys
+import os
+import subprocess
+
+# SigmaOS Toolchain Wrapper
+# Intercepts clang/gcc calls and enforces sovereign constraints.
+
+TARGET_ARCH = os.getenv("SIGMA_ARCH", "x86_64")
+LINKER_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "linker_scripts")
+
+def main():
+    args = sys.argv[1:]
+    if not args or args[0] in ('-h', '--help'):
+        print("SigmaCC - The Sovereign Compiler Wrapper")
+        print("Usage: sigma-cc [options] file...")
+        print("Enforces -nostdlib, -ffreestanding, and SigmaOS linker scripts automatically.")
+        sys.exit(0)
+
+    # Base sovereign flags
+    sovereign_flags = [
+        "-nostdlib",
+        "-ffreestanding",
+        "-fno-builtin",
+        "-fno-exceptions",
+        "-fno-rtti",
+        "-Wall",
+        "-Wextra"
+    ]
+
+    # Select Linker script based on target architecture
+    linker_script = os.path.join(LINKER_DIR, f"{TARGET_ARCH}-sigma.ld")
+    
+    if os.path.exists(linker_script):
+        sovereign_flags.append(f"-T{linker_script}")
+    else:
+        print(f"Warning: Linker script for {TARGET_ARCH} not found at {linker_script}")
+
+    # For this mockup, we just echo what we *would* run if clang was present
+    compiler = "clang"
+    full_cmd = [compiler] + sovereign_flags + args
+
+    print("[SigmaCC] Executing Sovereign Compilation:")
+    print(" ".join(full_cmd))
+
+    # In a real environment, we would use subprocess.run:
+    # subprocess.run(full_cmd, check=True)
+
+if __name__ == "__main__":
+    main()
