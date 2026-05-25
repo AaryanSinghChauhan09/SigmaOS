@@ -30,12 +30,34 @@ enum class DriverType : sigma_u8 {
     IOT = 3
 };
 
+struct PCI_Device {
+    sigma_u16 vendor_id;
+    sigma_u16 device_id;
+    sigma_u8  class_code;
+    sigma_u8  subclass;
+};
+
+struct USB_Device {
+    sigma_u16 idVendor;
+    sigma_u16 idProduct;
+    sigma_u8  bDeviceClass;
+    sigma_u8  bDeviceSubClass;
+};
+
 struct BoardTelemetry {
     CPULatticeArch architecture;
     const char* cpu_brand;
     sigma_u32 core_count;
     sigma_u64 total_physical_ram_bytes;
+    
+    PCI_Device* pci_devices;
+    sigma_u32 pci_device_count;
+    
+    USB_Device* usb_devices;
+    sigma_u32 usb_device_count;
 };
+
+void probe_all_hardware(BoardTelemetry* telemetry);
 
 struct UnifiedDriver {
     sigma_u32 id;

@@ -137,6 +137,8 @@ BoardTelemetry SovereignHAL::getSystemTelemetry() const {
         case CPULatticeArch::RISCV64: telemetry.cpu_brand = "RISC-V SiFive Freedom Sovereign-Tuned"; break;
     }
     
+    probe_all_hardware(&telemetry);
+    
     return telemetry;
 }
 
