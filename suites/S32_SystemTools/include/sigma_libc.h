@@ -2,10 +2,7 @@
 #define SIGMA_LIBC_H
 
 // Absolute Zero-Dependency Definitions (No stddef.h, no stdint.h)
-typedef unsigned long sigma_size_t;
-typedef unsigned int sigma_u32;
-typedef unsigned char sigma_u8;
-typedef int sigma_i32;
+#include "../../../include/sigma_kernel_types.h"
 
 extern "C" {
 

@@ -46,7 +46,7 @@ void SovereignPkg_Audit(void) {
 
 CurationLevel_t SovereignPkg_GetCuration(const char* name) {
     for (sigma_u32 i = 0; i < g_pkg_count; i++) {
-        if (sigma_strncmp(g_pkg_registry[i].name, name, 64) == 0) {
+        if (sigma_strcmp(g_pkg_registry[i].name, name) == 0) {
             return g_pkg_registry[i].curation;
         }
     }
