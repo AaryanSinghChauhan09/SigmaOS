@@ -22,8 +22,8 @@ void SovereignPkg_InitRegistry(void) {
 
 int SovereignPkg_Register(const char* name, const char* version, CurationLevel_t curation) {
     if (g_pkg_count >= SIGMA_MAX_PACKAGES) return SIGMA_ERROR;
-    sigma_strncpy(g_pkg_registry[g_pkg_count].name, name, 64);
-    sigma_strncpy(g_pkg_registry[g_pkg_count].version, version, 16);
+    sigma_strcpy(g_pkg_registry[g_pkg_count].name, name, 64);
+    sigma_strcpy(g_pkg_registry[g_pkg_count].version, version, 16);
     g_pkg_registry[g_pkg_count].curation = curation;
     g_pkg_registry[g_pkg_count].seated = SIGMA_TRUE;
     g_pkg_count++;
