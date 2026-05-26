@@ -1,6 +1,4 @@
 #include "../../../../../include/sigma_kernel_types.h"
-#include "../../../../../include/sigma_log.h"
-#include "../../../../../suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 #include "../../../../../suites/S32_SystemTools/include/sigma_libc.h"
 #include "../../../../../include/security/sigma_pkg_registry.h"
 

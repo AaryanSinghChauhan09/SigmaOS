@@ -1,6 +1,5 @@
 #include "sigma_log.h"
 #include "sigma_kernel_types.h"
-#include "hal/sigma_hal.h"
 #include "libc/SovereignLibC.h"
 
 /**

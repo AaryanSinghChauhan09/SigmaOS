@@ -1,5 +1,3 @@
-#include "sigma_hal.h"
-#include "libc/SovereignLibC.h"
 #ifndef POWER_MANAGER_HPP
 #define POWER_MANAGER_HPP
 

@@ -12,7 +12,6 @@
 #define SIGMA_SOVEREIGN_DAL_H
 
 #include "../sigma_kernel_types.h"
-#include "../SigmaOOP.hpp"
 #include "../security/sigma_pkg_registry.h"
 
 namespace SigmaOS {

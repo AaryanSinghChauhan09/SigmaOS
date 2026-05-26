@@ -9,7 +9,6 @@
 #include "../include/sigma_kernel_types.h"
 #include "../include/sigma_log.h"
 #include "../include/recovery/sigma_recovery.h"
-#include "../include/kernel/sigma_vfs.h"
 
 namespace SigmaOS {
 namespace Recovery {
