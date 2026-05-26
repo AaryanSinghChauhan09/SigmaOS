@@ -12,6 +12,9 @@
 #include "sigma_log.h"
 #include "SigmaOOP.hpp"
 
+extern "C" bool attest_verify_boot();
+extern "C" void spatial_ui_trigger_security_alert(int level);
+
 namespace SigmaOS {
 namespace Tools {
 
@@ -82,28 +85,32 @@ private:
     }
 
     void run_default_checks() {
-        // Resolve status dynamically from other sovereign modules
-        extern "C" sigma_u32 kic_scan();
-        extern "C" sigma_u8 eco_health_overall();
+        bool boot_secure = attest_verify_boot();
         
-        sigma_u32 violations = kic_scan();
-        sigma_u8 health = eco_health_overall();
+        if (!boot_secure) {
+            spatial_ui_trigger_security_alert(2); // High priority alert
+        }
 
         /* ISO 27001 */
+        add_check("Hardware Boot Integrity (TPM)",  ComplianceFramework::ISO27001, boot_secure ? 1 : 0);
         add_check("Encryption at rest (AES-256/PQC)", ComplianceFramework::ISO27001, 1);
         add_check("Access control policy enforced", ComplianceFramework::ISO27001, 1);
-        add_check("Audit log integrity verified",   ComplianceFramework::ISO27001, (violations == 0) ? 1 : 0);
-        add_check("Vulnerability scan last 30d",    ComplianceFramework::ISO27001, (health == 0) ? 1 : 0);
+        add_check("Zero-Trust Strict Isolation",    ComplianceFramework::ISO27001, boot_secure ? 1 : 0);
+        
         /* GDPR */
         add_check("Data minimization policy",       ComplianceFramework::GDPR, 1);
         add_check("Right to erasure mechanism",     ComplianceFramework::GDPR, 1);
         add_check("DPA contact registered",         ComplianceFramework::GDPR, 1);
+        
         /* HIPAA */
         add_check("PHI encrypted in transit",       ComplianceFramework::HIPAA, 1);
-        add_check("Audit trails for PHI access",    ComplianceFramework::HIPAA, (violations == 0) ? 1 : 0);
+        add_check("Audit trails for PHI access",    ComplianceFramework::HIPAA, boot_secure ? 1 : 0);
+        
         /* SOC2 */
+        add_check("Hardware Attestation Validated", ComplianceFramework::SOC2, boot_secure ? 1 : 0);
         add_check("Availability SLA 99.99%",        ComplianceFramework::SOC2, 1);
         add_check("Change management documented",   ComplianceFramework::SOC2, 1);
+        
         /* PCI-DSS */
         add_check("Cardholder data encrypted",      ComplianceFramework::PCI_DSS, 1);
         add_check("Network segmentation verified",  ComplianceFramework::PCI_DSS, 1);

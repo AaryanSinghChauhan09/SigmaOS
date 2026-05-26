@@ -1,8 +1,6 @@
-#include "libc/SovereignLibC.h"
-// removed
-
-#include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
+#include "suites/S10_Registry/shards/SovereignLatticeRegistry.h"
 #include "libc/sigma_libc.h"
+#include "security/sigma_pkg_registry.h"
 
 /*
  * Sovereign Package Registry (v1.0).
@@ -12,18 +10,7 @@
 
 #define SIGMA_MAX_PACKAGES 256
 
-typedef enum {
-    CURATION_UNVERIFIED = 0,
-    CURATION_COMMUNITY = 1,
-    CURATION_OFFICIAL = 2
-} CurationLevel_t;
-
-typedef struct {
-    char name[64];
-    char version[16];
-    CurationLevel_t curation;
-    sigma_bool seated;
-} SovereignPkgEntry_t;
+// curation level moved to header
 
 static SovereignPkgEntry_t g_pkg_registry[SIGMA_MAX_PACKAGES];
 static sigma_u32 g_pkg_count = 0;
@@ -59,3 +46,11 @@ void SovereignPkg_Audit(void) {
 
 
 
+CurationLevel_t SovereignPkg_GetCuration(const char* name) {
+    for (sigma_u32 i = 0; i < g_pkg_count; i++) {
+        if (sigma_strcmp(g_pkg_registry[i].name, name) == 0) {
+            return g_pkg_registry[i].curation;
+        }
+    }
+    return CURATION_UNVERIFIED;
+}

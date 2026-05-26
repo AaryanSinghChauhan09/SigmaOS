@@ -92,6 +92,14 @@ public:
                      window_id, snap_zone);
     }
 
+    void triggerSecurityAlert(int level) {
+        if (level > 0) {
+            sigma_log("[SPATIAL-UI] SECURITY ALERT LEVEL %d triggered! Red-border overlay engaged.", level);
+            SovereignAccessibilityManager::getInstance().setHighContrast(true);
+            SovereignAccessibilityManager::getInstance().speakText("Security Alert. Zero trust policy enforcement active.");
+        }
+    }
+
 private:
     SovereignSpatialUIEngine() {}
     char corner_actions[4][32];
@@ -101,6 +109,7 @@ void spatial_ui_init() { SovereignSpatialUIEngine::init(); }
 void spatial_ui_set_corner(sigma_u32 corner, const char* action) { SovereignSpatialUIEngine::setHotCorner((sigma_corner_t)corner, action); }
 void spatial_ui_trigger_corner(sigma_u32 corner) { SovereignSpatialUIEngine::triggerCorner((sigma_corner_t)corner); }
 void spatial_ui_snap_window(sigma_u32 wid, const char* zone) { SovereignSpatialUIEngine::snapWindow(wid, zone); }
+void spatial_ui_trigger_security_alert(int level) { SovereignSpatialUIEngine::getInstance().triggerSecurityAlert(level); }
 
 
 

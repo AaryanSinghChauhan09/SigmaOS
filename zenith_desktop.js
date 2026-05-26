@@ -2575,3 +2575,40 @@ document.addEventListener('mousemove', e => {
         glow.style.opacity = '1';
     }
 });
+
+// App Launcher Logic
+function toggleAppLauncher() {
+    const launcher = document.getElementById('app-launcher');
+    if (launcher) {
+        launcher.classList.toggle('active');
+    }
+}
+
+// Close launcher when clicking outside
+document.addEventListener('click', e => {
+    const launcher = document.getElementById('app-launcher');
+    const dock = document.querySelector('.zenith-dock-container');
+    if (launcher && launcher.classList.contains('active')) {
+        if (!launcher.contains(e.target) && dock && !dock.contains(e.target)) {
+            launcher.classList.remove('active');
+        }
+    }
+});
+
+// Emergency Lattice Sync Logic
+function triggerEmergencySync() {
+    if (confirm("INITIATE EMERGENCY LATTICE SYNC?\n\nThis will freeze VFS state and perform a cryptographically signed atomic snapshot to the recovery partition.")) {
+        const term = document.getElementById('terminal-output');
+        openWindow('terminal-win');
+        if (term) {
+            term.innerHTML += `<div style="color:var(--accent-red)">[RECOVERY] INITIATING EMERGENCY LATTICE SYNC...</div>`;
+            term.innerHTML += `<div style="color:var(--text-white)">[RECOVERY] Calling SovereignRecoverySuite::atomicLatticeSync()...</div>`;
+            setTimeout(() => {
+                term.innerHTML += `<div style="color:var(--accent-gold)">[RECOVERY] Computing FNV-1a cryptographic checksum...</div>`;
+            }, 1000);
+            setTimeout(() => {
+                term.innerHTML += `<div style="color:var(--accent-cyan)">[RECOVERY] SUCCESS: Snapshot ID 'EMERGENCY_SYNC' secured.</div>`;
+            }, 2500);
+        }
+    }
+}

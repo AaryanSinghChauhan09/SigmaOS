@@ -1124,7 +1124,7 @@ st.line_chart(np.sin(np.linspace(0, 10, 100) * freq))</textarea>
                         card.style.border = '1px solid var(--border-glass)';
                         card.style.borderRadius = '10px';
                         card.innerHTML = `
-                            <span class="auto-style-159">● Attested</span>
+                                    <span class="auto-style-159">● Attested</span>
                             <h4 class="auto-style-160">${title.replace(/([A-Z])/g, ' $1').trim()}</h4>
                             <code class="auto-style-161">${shard.shardId.split('_')[0]}</code>
                         `;
@@ -1134,6 +1134,64 @@ st.line_chart(np.sin(np.linspace(0, 10, 100) * freq))</textarea>
             }, 500);
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initNeuralLayout();
+        });
+    </script>
+
+    <!-- macOS-style Floating Dock -->
+    <div class="zenith-dock-container">
+        <div class="zenith-dock">
+            <div class="dock-item" onclick="toggleAppLauncher()" title="App Launcher">
+                <span class="dock-icon">🚀</span>
+            </div>
+            <div class="dock-separator"></div>
+            <div class="dock-item" onclick="openWindow('terminal-win')" title="OmniShell">
+                <span class="dock-icon">💻</span>
+            </div>
+            <div class="dock-item" onclick="openWindow('file-manager-win')" title="Sovereign VFS">
+                <span class="dock-icon">📂</span>
+            </div>
+            <div class="dock-item" onclick="openWindow('lattice-settings-win')" title="Settings">
+                <span class="dock-icon">⚙️</span>
+            </div>
+            <div class="dock-item" onclick="openWindow('sigma-market-win')" title="App Store">
+                <span class="dock-icon">🛒</span>
+            </div>
+            <div class="dock-separator"></div>
+            <div class="dock-item emergency-sync-btn" onclick="triggerEmergencySync()" title="Emergency Lattice Sync">
+                <span class="dock-icon">🔄</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zorin-style App Launcher Overlay -->
+    <div class="app-launcher-overlay" id="app-launcher">
+        <div class="app-launcher-panel">
+            <div class="launcher-header">
+                <h3>SigmaOS Zenith Apps</h3>
+                <input type="text" placeholder="Search apps, files, settings..." class="launcher-search">
+            </div>
+            <div class="launcher-categories">
+                <div class="launcher-category">
+                    <h4>Development</h4>
+                    <div class="launcher-app" onclick="openWindow('utility-nexus-win')">🔧 Developer Workspace</div>
+                    <div class="launcher-app" onclick="openWindow('terminal-win')">💻 OmniShell</div>
+                </div>
+                <div class="launcher-category">
+                    <h4>System & Security</h4>
+                    <div class="launcher-app" onclick="openWindow('lattice-settings-win')">⚙️ System Settings</div>
+                    <div class="launcher-app" onclick="openWindow('browser-win')">📊 Observability Matrix</div>
+                </div>
+                <div class="launcher-category">
+                    <h4>AI & Cloud</h4>
+                    <div class="launcher-app" onclick="openWindow('sigma-ai-studio-win')">🤖 AI Studio</div>
+                    <div class="launcher-app" onclick="openWindow('ai-assistant-win')">🧠 Neural Core</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
- 

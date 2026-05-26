@@ -1,9 +1,11 @@
 #include "sigma_kernel_types.h"
 #include "sigma_log.h"
 #include "security/sigma_sandbox.h"
+#include "security/sigma_pkg_registry.h"
 #include "sigma_log.h"
 #include "hal/sigma_hal.h"
-#include "sigma_log.h"
+
+extern "C" bool attest_verify_boot();
 
 /**
  * SigmaOS Sovereign Sandbox Container
@@ -41,12 +43,30 @@ public:
 
         sigma_log_info("[SANDBOX] CIB: Validating Enclave Key for Container %d...\n", (int)container_id);
         
+        bool boot_verified = attest_verify_boot();
+        if (!boot_verified) {
+            sigma_log("[SANDBOX] CIB: WARNING - Hardware attestation failed. Boot chain tampered!");
+        }
+
+        CurationLevel_t curation = SovereignPkg_GetCuration(binary_path);
+        if (curation == CURATION_UNVERIFIED) {
+            sigma_log("[SANDBOX] CIB: Application is UNVERIFIED. Enforcing maximum zero-trust isolation.");
+            config->strict_isolation = true;
+            config->network_access = false;
+        } else if (curation == CURATION_COMMUNITY) {
+            sigma_log("[SANDBOX] CIB: Application is COMMUNITY (OmniPkg). Activating POSIX Compatibility Shim.");
+            sigma_log("[SANDBOX] CIB: Linux syscall translation layer active via SovereignCompatShim.");
+        } else if (curation == CURATION_OFFICIAL && !boot_verified) {
+            sigma_log("[SANDBOX] CIB: FATAL - Refusing to launch OFFICIAL app in a tampered boot environment.");
+            return false;
+        }
+        
         // --- Qubes-OS-style: Enforce compartmentalization perimeter ---
-        if (config->memory_limit) {
+        if (config->strict_isolation) {
             sigma_log("[SANDBOX] CIB: STRICT ISOLATION MODE ACTIVE — IPC to foreign shards BLOCKED.");
             sigma_log("[SANDBOX] CIB: Syscall allowlist enforcement engaged (seccomp-equivalent).");
         }
-        if (!config->cpu_limit) {
+        if (!config->device_access) {
             sigma_log("[SANDBOX] CIB: Device access DENIED — DMA and MMIO access BLOCKED at HAL boundary.");
         }
         if (!config->network_access) {
