@@ -1,252 +1,57 @@
 # SigmaOS Sovereign Wiki
 
+## 🗺️ Overview
 - [Home (Hub)](Home)
-
-- [Standalone](Home-Zenith-Standalone) | [Dual-boot](Home-Zenith-Dualboot) | [Core](Home-Zenith-Core)
-
-- [Browser](Home-Zenith-Browser) | [App](Home-Zenith-App) | [Stable](Home-Stable) | [Horizon](Home-Horizon)
-
-## 🏛️ Core Concepts
-
-- [Industrial Roadmap](Roadmap)
-
-- [Architecture Overview](Architecture-Overview)
-
-- [**Driver Development Guide**](Driver-Development-Guide)
-
-- [**Tool Philosophy**](Tool-Philosophy)
-
-- [Omni Computer Science & AI Architecture](Omni-Computer-Science-AI-Architecture)
-
-- [Omni-Distro Principles Absorption](SigmaOS-OmniDistro-Absorption-Principles)
-
-- [System Logic & File Topology](Logic)
-
-- [Sovereign Principles](SOVEREIGN_PRINCIPLES)
-
-## ⚙️ Core Subsystems
-
-- [**Networking Shard (TCP/IP/UDP)**](Networking-Shard)
-
-- [**Zenith GUI (Compositor/WM)**](Zenith-GUI)
-
-- [**OmniPackage Manager**](OmniPackage-Manager)
-
-- [**Post-Quantum Security (Dilithium)**](Post-Quantum-Security)
-
-- [Storage Shard (LFS/VFS/S-ZFS)](Storage-Shard)
-
-- [File System Notes (FAT32/ext2)](File-System-Notes)
-
-- [Real-Time Scheduler (CFS)](Real-Time-Scheduler-Shard)
-
-- [Hardware Driver Shards](Driver-Shards)
-
-- [Security & PQC Shard](Security-Shard)
-
-- [Kernel Internals](SigmaOS-Kernel-Internals)
-  * [Hardware Drivers](Hardware-Drivers)
-  * [Security Architecture](Security-Architecture)
-  * [System Daemons & Utilities](System-Daemons)
-
-- [**Compiler Toolchain (cc/asm/ld)**](Compiler-Toolchain)
-
-- [Self-Healing Engine](Sovereign_Self_Healing)
-
-## 🚀 Strategic Vision
-
-- [Competitive Analysis (vs Linux)](Competitive-Analysis)
-
-- [Linux Competitive Edge](Linux-Competitive-Edge)
-
-- [Leapfrog Strategy](Leapfrog-Strategy)
-
-- [Profession Center](PROFESSION-MAP)
-
-- [100-Step Roadmap](ULTIMATE-ADVANCEMENT-STRATEGY)
-
-- [SigmaOS vs The World](SigmaOS_vs_The_World)
-
-## ⚙️ Technical Shards
-
-- [Kernel Modularization](MODULARIZATION_MAP)
-
-- [Post-Quantum Security](Verified-Boot)
-
-- [Zenith UI](ZENITH_UI)
-
-- [Doctor Tool](Doctor_Tool)
-
-- [Trust Graph UI](Trust_Graph)
-
-- [AI Orchestration](AGENTS)
-
-## 🌿 Branch Architecture
-
-- [Branch Guide (All 12 Targets)](Branch-Guide)
-
-- [Branch Versions & Status](Branch-Versions)
-
-- [Per-Branch Release Notes](Branches)
-
-- [**RTOS Branch Guide**](RTOS-Branch-Guide)
-
-- [**Cloud Branch Guide**](Cloud-Branch-Guide)
-
-- [**Mobile Branch Guide**](Mobile-Branch-Guide)
-
-## 👥 Community & Contribution
-
-- [Getting Started](Getting-Started)
-
-- [**Developer Guide (Build, Test, Contribute)**](Developer-Guide)
-
-- [**Hardware Build & Deployment Tutorials**](Hardware-Build-Tutorial)
-
-- [**SigmaOS vs Linux Distros**](SigmaOS-vs-Linux)
-
-- [Contributor Guidelines](Contributor-Guidelines)
-
-- [Developer Roadmap](Developer-Roadmap)
-
-- [Onboarding Guide](Onboarding_Guide)
-
-- [Code of Conduct](CODE_OF_CONDUCT)
-
-- [HACKING Guide](HACKING)
-
-- [RFC Template](RFC_Template)
-
-## 📚 Syllabus Implementation (Zenith v15.1)
-
-- [**Master Implementation Map**](Syllabus-Implementation-Map)
-
-- [Fundamentals of Computer & IT](Syllabus-FCIT)
-
-- [Discrete Mathematics](Syllabus-DiscreteMath)
-
-- [C Programming](Syllabus-C-Programming)
-
-- [C++ Programming](Syllabus-Cpp-Programming)
-
-- [RDBMS & Oracle SQL / PL/SQL](Syllabus-RDBMS)
-
-- [Statistics](Syllabus-Statistics)
-
-- [Web Programming (HTML5/CSS/JS/PHP)](Syllabus-WebProgramming)
-
-- [Operating System Concepts](Syllabus-OS-Concepts)
-
-- [Python Programming](Syllabus-Python)
-
-- [Data Warehousing & Mining](Syllabus-DWDM)
-
-- [R Programming](Syllabus-R-Programming)
-
-- [Advanced Python & Data Science](Syllabus-AdvPython)
-
-- [Artificial Intelligence & ML](Syllabus-AIML)
-
-- [Data Modeling & Visualization](Syllabus-DataModeling)
-
-## 🧠 Intelligence & Analytics Layer
-
-- [SigmaAI Engine](Syllabus-AIML)
-
-- [SigmaStats Toolkit](Syllabus-Statistics)
-
-- [SigmaViz Dashboards](Syllabus-DataModeling)
-
-- [SigmaWarehouse (OLAP/ETL)](Syllabus-DWDM)
-
-## 🗄️ Sovereign Data Suite
-
-- [SigmaDB SQL Engine](Syllabus-RDBMS)
-
-- [S-ZFS Storage Pool](Sovereign_ZFS_Pool)
-
-- [Sovereign OverlayFS](Sovereign_OverlayFS)
-
-## 📊 Niche Parity (vs Linux)
-
-- [Gaming & GPU Utilities](Gaming-Utilities)
-
-- [Performance Optimizer](Performance-Optimizer)
-
-- [IoT & Embedded Toolkit](IoT-and-Embedded)
-
-- [Reproducibility & Rollback](Reproducibility-Guide)
-
-- [Container Orchestration](Container-Orchestration)
-
-- [Rolling Release Strategy](Rolling-Release-Strategy)
-
-- [Enterprise & Regression](Enterprise-Regression)
-
-- [Gap Analysis vs Competitors](Gap-Analysis-vs-Competitors)
-
-- [Competitive Analysis](Competitive-Analysis)
-
-## 📅 Roadmap & Future
-
-- [Contributor Roadmap](CONTRIBUTOR_ROADMAP)
-
-- [Industrial Release Notes](CHANGELOG)
-
+- [Strategic Vision & Competitive Edge](Strategic-Vision)
 - [Distro-Inspired Roadmap](Distro-Inspired-Roadmap)
+- [**100 Competitor-Inspired Features**](Roadmap-Features-Registry)
+- [Strategic Ultimate Advancement](ULTIMATE-ADVANCEMENT-STRATEGY)
 
-- [Feature Roadmap](Feature-Roadmap)
+## ⚙️ Subsystem Docs
+- [Kernel Internals](SigmaOS-Kernel-Internals)
+- [Real-Time Scheduler (CFS)](Real-Time-Scheduler-Shard)
+- [Memory Allocator & Slab](Slab-Allocator)
+- [Driver Development Guide](Driver-Development-Guide)
+- [Hardware Driver Shards](Driver-Shards)
+- [Networking Shard (TCP/IP/UDP)](Networking-Shard)
 
-- [Evolution Roadmap](Evolution-Roadmap)
+## 🔒 Security
+- [Security Architecture](Security-Architecture)
+- [Post-Quantum Security (Dilithium-5)](Post-Quantum-Security)
+- [Security & PQC Shard](Security-Shard)
+- [Secure Sandboxing & Compartmentalization](Sovereign-Security-Framework)
 
-## 🛠️ Developer Reference
-
-- [API Documentation](API-Documentation)
-
-- [CLI Reference](CLI-Reference)
-
-- [Examples and Demos](Examples-and-Demos)
-
-- [Glossary](Glossary)
-
-- [Release Notes](Release-Notes)
-
-- [Implementation Roadmap](Implementation-Roadmap)
-
-- [Subsystem Diagrams](Subsystem-Diagrams)
-
-## 🏛️ Industrial Maintenance
-
-- [Lattice Cleanup & Maintenance](Microkernel-Format)
-
-- [OS Problems & Solutions](Common-OS-Problems-Solutions)
-
-- [Anomaly Resolution Log](ANOMALY_RESOLUTION_LOG)
-
-## 🖥️ OS Format Guides & Toolsets
-
-- [Format: Microkernel (Industrial baseline)](Microkernel-Format)
-
-- [Format: Distributed (Consensus & Network)](Distributed-Format)
-
-- [Format: RTOS (Safety-Critical & Creative)](RTOS-Format)
-
-- [Format: Cloud (Containers & Scaling)](Cloud-Format)
-
-- [Format: Mobile (Multimedia & Productivity)](Mobile-Format)
-
-## 🛠️ Industrial Readiness
-
-- [Kernel Developer Handbook](Kernel-Developer-Handbook)
-
-- [Dual-Boot Compatibility Matrix](Dual-Boot-Compatibility-Matrix)
-
-- [Embedded Hardware Compatibility](Embedded-Hardware-Compatibility)
-
+## ⚡ Performance
+- [Performance Optimizer & Toolkit](Performance-Optimizer)
+- [Gaming & GPU Utilities](Gaming-Utilities)
 - [Performance Benchmarks](Performance-Benchmarks)
+- [System Daemons & Diagnostics](System-Daemons)
 
-- [Security Hardening](Security_Hardening)
+## 🏗️ Architecture
+- [Architecture Overview](Architecture-Overview)
+- [Declarative Config Manager](Reproducibility-Guide)
+- [Container Orchestration](Container-Orchestration)
+- [Modular Driver Loader & Shards](MODULARIZATION_MAP)
+- [Sovereign Data Suite & ZFS](Sovereign_ZFS_Pool)
+
+## 🛠️ Developer Guide
+- [Developer Guide (Build, Test, Contribute)](Developer-Guide)
+- [Hardware Build & Deployment Tutorials](Hardware-Build-Tutorial)
+- [Getting Started & Toolchain Setup](Getting-Started)
+- [Contributor Guidelines & Standards](Contributor-Guidelines)
+- [Compiler Toolchain](Compiler-Toolchain)
+- [Branch Guide & Architecture](Branch-Guide)
+
+## 💾 Recovery & Tools
+- [Resilience & Self-Healing](Resilience)
+- [Snapshotting, Rollback & ZFS](Sovereign_ZFS_Pool)
+- [Recovery ISO & Standalone Mode](Home-Zenith-Standalone)
+
+## 👥 Community
+- [Community Package Templates](Contributor-Guidelines)
+- [App Store & Curated Repository](Home-Zenith-App)
+- [Embedded Hardware Compatibility (RPi)](Embedded-Hardware-Compatibility)
+- [Sovereign OverlayFS Ecosystem](Sovereign_OverlayFS)
 
 ---
-
 ### v15.2 [ZENITH-SINGULARITY]
