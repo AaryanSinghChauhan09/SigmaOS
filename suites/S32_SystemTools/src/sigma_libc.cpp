@@ -1,3 +1,4 @@
+#define SIGMA_LIBC_INTERNAL
 #include "../../../include/sigma_kernel_types.h"
 #include "../include/sigma_libc.h"
 

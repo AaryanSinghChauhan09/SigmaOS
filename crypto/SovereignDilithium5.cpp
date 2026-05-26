@@ -6,9 +6,9 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
-#include "../../include/crypto/sigma_pqc.h"
+#include "../include/sigma_kernel_types.h"
+#include "../include/sigma_log.h"
+#include "../include/crypto/sigma_pqc.h"
 
 namespace SigmaOS {
 namespace Crypto {

@@ -6,10 +6,10 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
-#include "../../include/ui/sigma_wm.h"
-#include "../../include/ui/zenith_desktop.h"
+#include "../include/sigma_kernel_types.h"
+#include "../include/sigma_log.h"
+#include "../include/ui/sigma_wm.h"
+#include "../include/ui/zenith_desktop.h"
 
 namespace SigmaOS {
 namespace UI {
@@ -54,16 +54,18 @@ public:
 
     void drawPanel() {
         /* Stub: Issue draw commands to sigma-wm for the panel */
-        sigma_color_t bg = (m_state.current_theme == THEME_DARK) ? 
-                           (sigma_color_t){30, 30, 30, 240} : (sigma_color_t){240, 240, 240, 240};
+        sigma_color_t bg_dark = {30, 30, 30, 240};
+        sigma_color_t bg_light = {240, 240, 240, 240};
+        sigma_color_t bg = (m_state.current_theme == THEME_DARK) ? bg_dark : bg_light;
         
         sigma_log_info("[Zenith] Drawing Top Panel with color rgba(%u, %u, %u, %u)\n", bg.r, bg.g, bg.b, bg.a);
     }
 
     void drawDock() {
         /* Stub: Issue draw commands for a frosted-glass spatial dock */
-        sigma_color_t bg = (m_state.current_theme == THEME_DARK) ? 
-                           (sigma_color_t){50, 50, 50, 200} : (sigma_color_t){255, 255, 255, 200};
+        sigma_color_t bg_dark = {50, 50, 50, 200};
+        sigma_color_t bg_light = {255, 255, 255, 200};
+        sigma_color_t bg = (m_state.current_theme == THEME_DARK) ? bg_dark : bg_light;
                            
         sigma_log_info("[Zenith] Drawing Spatial Dock (Blur: %s) with color rgba(%u, %u, %u, %u)\n", 
                        m_state.is_blur_enabled ? "ON" : "OFF", bg.r, bg.g, bg.b, bg.a);

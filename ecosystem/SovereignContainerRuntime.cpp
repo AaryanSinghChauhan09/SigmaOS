@@ -28,7 +28,7 @@ public:
         sigma_log_info("[CONTAINER/INIT]: Limits enforced at silicon-level (64MB RAM, 10%% CPU).\n");
     }
 
-    void InjectShard(const SigmaString& processName) {
+    void InjectShard(const SigmaOS::SigmaString& processName) {
         sigma_log_info("[CONTAINER/EXEC]: Injecting '%s' into restricted silicon shard...\n", processName.c_str());
         
         // In a real sovereign OS, we would use our own Process and Scheduler syscalls.

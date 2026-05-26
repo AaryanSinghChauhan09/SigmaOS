@@ -6,9 +6,9 @@
  * =========================================================================
  */
 
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_log.h"
-#include "../../include/ui/sigma_wm.h"
+#include "../include/sigma_kernel_types.h"
+#include "../include/sigma_log.h"
+#include "../include/ui/sigma_wm.h"
 
 namespace SigmaOS {
 namespace UI {

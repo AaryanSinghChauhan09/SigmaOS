@@ -14,7 +14,6 @@
 #include "../../include/kernel/sigma_device_manager.h"
 #include "../../include/kernel/sigma_init_system.h"
 #include "../../include/kernel/sigma_ipc_manager.h"
-#include "../../include/security/sigma_sandbox.h"
 
 /* Simple string comparison wrapper */
 static int shell_strcmp(const char* s1, const char* s2) {
@@ -50,7 +49,6 @@ public:
         registerCmd("ipc", "Show IPC status (queues/shm)", cmd_ipc, SIGMA_FALSE);
         registerCmd("clear", "Clear terminal output", cmd_clear, SIGMA_FALSE);
         registerCmd("echo", "Print text to standard output", cmd_echo, SIGMA_FALSE);
-        registerCmd("sandbox", "Show Sovereign Sandbox status", cmd_sandbox, SIGMA_FALSE);
         registerCmd("reboot", "Restart the system", cmd_reboot, SIGMA_TRUE);
 
         sigma_log("[SHELL] Sovereign Shell (sigma-sh) initialized.");
@@ -197,12 +195,6 @@ private:
             sigma_log_info("%s ", argv[i]);
         }
         sigma_log_info("\n");
-        return 0;
-    }
-
-    static int cmd_sandbox(int argc, const char* argv[]) {
-        SIGMA_UNUSED(argc); SIGMA_UNUSED(argv);
-        sandbox_print_audit_log();
         return 0;
     }
 
