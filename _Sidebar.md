@@ -47,128 +47,13 @@
 - [Kernel Internals](SigmaOS-Kernel-Internals)
   * [Hardware Drivers](Hardware-Drivers)
   * [Security Architecture](Security-Architecture)
+  * [System Daemons & Utilities](System-Daemons)
 
 - [**Compiler Toolchain (cc/asm/ld)**](Compiler-Toolchain)
 
 - [Self-Healing Engine](Sovereign_Self_Healing)
 
-
-## 🔧 Hardware & System Tooling
-
-- [**Driver Development Kit (DDK)**](Driver-Development-Kit)
-
-- [**Hardware Abstraction Layer (HAL)**](Hardware-Abstraction-Layer)
-
-- [**GPU Compute Toolkit**](GPU-Compute-Toolkit)
-
-- [SovereignFS (Journaling / CoW Filesystem)](SovereignFS)
-
-## 🌐 Sovereign Networking Stack
-
-- [**Sovereign Network Manager (sigma-net)**](Sovereign-Network-Manager)
-
-- [**IPv6 Stack**](Sovereign-IPv6)
-
-- [**VPN (Post-Quantum Tunneling)**](Sovereign-VPN)
-
-- [**Mesh Networking (IoT/Defense)**](Sovereign-Mesh-Networking)
-
-- [**Sovereign DNS Resolver**](Sovereign-DNS)
-
-## 🛠️ Developer Toolchain & Ecosystem
-
-- [**SigmaCC Compiler & Toolchain**](SigmaCC-Toolchain)
-
-- [**Sovereign Package Manager (SPM)**](Sovereign-Package-Manager)
-
-- [**POSIX Compatibility Shim**](POSIX-Compatibility-Shim)
-
-- [**WebAssembly Runtime**](WebAssembly-Runtime)
-
-## 🔒 Security Framework
-
-- [**Sovereign Recovery Suite**](Sovereign-Recovery-Suite)
-
-- [**Mandatory Access Control (MAC)**](Mandatory-Access-Control)
-
-- [**Cryptographic Identity Manager**](Cryptographic-Identity-Manager)
-
-- [**Post-Quantum Cryptography Toolkit**](Post-Quantum-Cryptography-Toolkit)
-
-## ⚡ Performance & Scheduling
-
-- [**Hybrid Scheduler (NUMA / RT / Eco)**](Hybrid-Scheduler)
-
-- [**AI Scheduling Engine**](AI-Scheduling-Engine)
-
-## 🖥️ Virtualization
-
-- [**Bare-Metal Hypervisor**](Bare-Metal-Hypervisor)
-
-- [**Sovereign Containers**](Sovereign-Containers)
-
-## 🚀 Bold Future Directions
-
-- [**Self-Healing Kernel**](Self-Healing-Kernel)
-
-
-## 🔧 Hardware & System Tooling
-
-- [**Driver Development Kit (DDK)**](Driver-Development-Kit)
-
-- [**Hardware Abstraction Layer (HAL)**](Hardware-Abstraction-Layer)
-
-- [**GPU Compute Toolkit**](GPU-Compute-Toolkit)
-
-- [SovereignFS (Journaling / CoW Filesystem)](SovereignFS)
-
-## 🌐 Sovereign Networking Stack
-
-- [**IPv6 Stack**](Sovereign-IPv6)
-
-- [**VPN (Post-Quantum Tunneling)**](Sovereign-VPN)
-
-- [**Mesh Networking (IoT/Defense)**](Sovereign-Mesh-Networking)
-
-- [**Sovereign DNS Resolver**](Sovereign-DNS)
-
-## 🛠️ Developer Toolchain & Ecosystem
-
-- [**SigmaCC Compiler & Toolchain**](SigmaCC-Toolchain)
-
-- [**Sovereign Package Manager (SPM)**](Sovereign-Package-Manager)
-
-- [**POSIX Compatibility Shim**](POSIX-Compatibility-Shim)
-
-- [**WebAssembly Runtime**](WebAssembly-Runtime)
-
-## 🔒 Security Framework
-
-- [**Mandatory Access Control (MAC)**](Mandatory-Access-Control)
-
-- [**Cryptographic Identity Manager**](Cryptographic-Identity-Manager)
-
-- [**Post-Quantum Cryptography Toolkit**](Post-Quantum-Cryptography-Toolkit)
-
-## ⚡ Performance & Scheduling
-
-- [**Hybrid Scheduler (NUMA / RT / Eco)**](Hybrid-Scheduler)
-
-- [**AI Scheduling Engine**](AI-Scheduling-Engine)
-
-## 🖥️ Virtualization
-
-- [**Bare-Metal Hypervisor**](Bare-Metal-Hypervisor)
-
-- [**Sovereign Containers**](Sovereign-Containers)
-
-## 🚀 Bold Future Directions
-
-- [**Self-Healing Kernel**](Self-Healing-Kernel)
-
 ## 🚀 Strategic Vision
-
-- [**Strategic Vision and Competitive Analysis**](STRATEGIC_VISION)
 
 - [Competitive Analysis (vs Linux)](Competitive-Analysis)
 
@@ -305,6 +190,8 @@
 - [Contributor Roadmap](CONTRIBUTOR_ROADMAP)
 
 - [Industrial Release Notes](CHANGELOG)
+
+- [Distro-Inspired Roadmap](Distro-Inspired-Roadmap)
 
 - [Feature Roadmap](Feature-Roadmap)
 
