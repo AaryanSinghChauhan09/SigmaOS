@@ -26,6 +26,10 @@ if(CLANG_TIDY_EXE)
     set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE};-checks=-*,readability-*,bugprone-*;--warnings-as-errors=*")
 endif()
 
+# Clear-Linux-inspired: Enable Link-Time Optimization (LTO/IPO) if the toolchain supports it
+include(CheckIPOSupported)
+check_ipo_supported(RESULT ipo_supported OUTPUT ipo_output)
+
 enable_testing()
 
 add_executable(test_kernel 
@@ -38,6 +42,12 @@ add_executable(test_kernel
     ../../kernel/core/security/SovereignSandbox.cpp
 )
 target_link_libraries(test_kernel GTest::gtest_main)
+
+# Apply LTO to the test binary if the toolchain supports it
+if(ipo_supported)
+    set_property(TARGET test_kernel PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    message(STATUS "[SigmaOS] LTO/IPO enabled for test_kernel binary.")
+endif()
 
 include(GoogleTest)
 gtest_discover_tests(test_kernel)

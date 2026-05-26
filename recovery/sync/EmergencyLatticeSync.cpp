@@ -2,6 +2,7 @@
 extern "C" {
     void sigma_log_info(const char* fmt, ...);
     void sigma_log_error(const char* fmt, ...);
+    void commit_config_generation(); // Hook into Config Subsystem
 }
 
 namespace SigmaOS {
@@ -20,6 +21,11 @@ public:
         
         // Air-gapped sector snapshot sync simulation
         std::cout << "[RECOVERY] Snapshot complete: 600 active shards synced to air-gapped recovery sectors.\n";
+        
+        // Trigger Sovereign Package Manager atomic generation commit
+        std::cout << "[RECOVERY] Triggering Atomic Generation Commit to finalize Recovery Point...\n";
+        commit_config_generation();
+        
         std::cout << "[RECOVERY] System integrity verified. Sovereign recovery point established successfully.\n";
     }
 

@@ -7,7 +7,8 @@ CXX = x86_64-linux-gnu-g++
 LD = x86_64-linux-gnu-ld
 ASM = nasm
 
-CFLAGS = -Iinclude -ffreestanding -mno-red-zone -Wall -Wextra -O2 -fno-pie
+# Clear-Linux-inspired: LTO enabled by default for cross-file inlining and dead-code elimination
+CFLAGS = -Iinclude -ffreestanding -mno-red-zone -Wall -Wextra -O2 -fno-pie -flto
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -std=c++17
 ASMFLAGS = -f elf64
 
@@ -27,7 +28,7 @@ OBJS := $(patsubst %.c, $(BUILD_DIR)/%.o, $(C_SRCS)) \
         $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(CXX_SRCS)) \
         $(patsubst %.asm, $(BUILD_DIR)/%.o, $(ASM_SRCS))
 
-.PHONY: all clean iso qemu
+.PHONY: all clean iso qemu pgo-generate pgo-use
 
 all: iso
 
@@ -58,6 +59,20 @@ iso: $(KERNEL_BIN)
 
 qemu: iso
 	qemu-system-x86_64 -cdrom $(ISO_IMAGE) -serial stdio -m 2G
+
+# =========================================================================
+# Clear-Linux-inspired: Profile-Guided Optimization (PGO) skeleton
+# Usage: make pgo-generate  ->  run workload  ->  make pgo-use
+# =========================================================================
+pgo-generate:
+	@echo "[PGO] Phase 1: Compiling instrumented build for profiling..."
+	$(MAKE) CFLAGS="$(CFLAGS) -fprofile-generate=./pgo-data" CXXFLAGS="$(CXXFLAGS) -fprofile-generate=./pgo-data" iso
+	@echo "[PGO] Instrumented build ready. Run your benchmark/boot workload, then run: make pgo-use"
+
+pgo-use:
+	@echo "[PGO] Phase 2: Compiling optimized build using profile data..."
+	$(MAKE) CFLAGS="$(CFLAGS) -fprofile-use=./pgo-data -fprofile-correction" CXXFLAGS="$(CXXFLAGS) -fprofile-use=./pgo-data -fprofile-correction" iso
+	@echo "[PGO] Optimized PGO kernel built successfully."
 
 clean:
 	rm -rf $(BUILD_DIR)
