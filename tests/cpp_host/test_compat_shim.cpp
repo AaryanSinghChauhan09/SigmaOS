@@ -1,5 +1,6 @@
-#include <gtest/gtest.h>
 #include <sys/stat.h>
+
+#define TEST(test_case_name, test_name) void test_##test_case_name##_##test_name()
 
 extern "C" {
     #include "../../tools/compat/compat_shim.h"

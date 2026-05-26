@@ -64,7 +64,7 @@ public:
         return instance;
     }
 
-    static void init() {
+    void init() {
         sigma_log("[SPATIAL-UI] Initializing Sovereign Hot Corners & Split Snapping Engine...");
         for (int i = 0; i < 4; i++) sigma_hardened_strcpy(corner_actions[i], "none", 32);
         
@@ -105,14 +105,10 @@ private:
     char corner_actions[4][32];
 };
 
-void spatial_ui_init() { SovereignSpatialUIEngine::init(); }
-void spatial_ui_set_corner(sigma_u32 corner, const char* action) { SovereignSpatialUIEngine::setHotCorner((sigma_corner_t)corner, action); }
-void spatial_ui_trigger_corner(sigma_u32 corner) { SovereignSpatialUIEngine::triggerCorner((sigma_corner_t)corner); }
-void spatial_ui_snap_window(sigma_u32 wid, const char* zone) { SovereignSpatialUIEngine::snapWindow(wid, zone); }
+extern "C" {
+void spatial_ui_init() { SovereignSpatialUIEngine::getInstance().init(); }
+void spatial_ui_set_corner(sigma_u32 corner, const char* action) { SovereignSpatialUIEngine::getInstance().setHotCorner((sigma_corner_t)corner, action); }
+void spatial_ui_trigger_corner(sigma_u32 corner) { SovereignSpatialUIEngine::getInstance().triggerCorner((sigma_corner_t)corner); }
+void spatial_ui_snap_window(sigma_u32 wid, const char* zone) { SovereignSpatialUIEngine::getInstance().snapWindow(wid, zone); }
 void spatial_ui_trigger_security_alert(int level) { SovereignSpatialUIEngine::getInstance().triggerSecurityAlert(level); }
-
-
-
-
-
 } // extern "C"

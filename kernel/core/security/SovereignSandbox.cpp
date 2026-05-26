@@ -1,9 +1,8 @@
-#include "sigma_kernel_types.h"
-#include "sigma_log.h"
-#include "security/sigma_sandbox.h"
-#include "security/sigma_pkg_registry.h"
-#include "sigma_log.h"
-#include "hal/sigma_hal.h"
+#include "../../include/sigma_kernel_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/security/sigma_sandbox.h"
+#include "../../include/security/sigma_pkg_registry.h"
+#include "../../include/hal/sigma_hal.h"
 
 extern "C" bool attest_verify_boot();
 

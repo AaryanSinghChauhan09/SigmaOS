@@ -125,7 +125,7 @@ public:
 
     // Generate attestation quote (TPM quote analogue)
     sigma_u64 generateQuote() {
-        sigma_u64 quote = 0xSIGMA0000000000ULL;
+        sigma_u64 quote = 0x51610A0000000000ULL;
         for (sigma_u32 i = 0; i < m_measurement_count; i++) {
             quote ^= ((sigma_u64)m_measurements[i].measured_hash[0] << (i % 8 * 8));
         }

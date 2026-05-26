@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN SANDBOX CONTAINER (S-SANDBOX)
  * =========================================================================
@@ -20,6 +20,8 @@ typedef struct {
     bool network_access;
     bool fs_access;
     uint32_t memory_limit;
+    bool strict_isolation;
+    bool device_access;
 } sigma_sandbox_config_t;
 
 /* --- Sandbox Primitives --- */
