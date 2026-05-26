@@ -58,6 +58,4 @@ void sigma_kprint_int(int val) {
     // Minimalist int to string printer
 }
 
-}
-
 } // extern "C"
