@@ -1,6 +1,6 @@
-#include "../../hal/SovereignHAL.hpp"
-
 // Mock implementation of a secure driver repository client
+
+#include "../../include/sigma_kernel_types.h"
 
 extern "C" {
     void sigma_log_info(const char* fmt, ...);

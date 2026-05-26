@@ -3,6 +3,14 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <sys/types.h>
+
+#if defined(_MSC_VER) || defined(_WIN32)
+#ifndef _SSIZE_T_DEFINED
+#define _SSIZE_T_DEFINED
+typedef intptr_t ssize_t;
+#endif
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,6 +63,23 @@ shim_pid_t posix_fork(void);
  * Intercepts POSIX mmap().
  */
 void* posix_mmap(void* addr, size_t length, int prot, int flags, shim_fd_t fd, uint64_t offset);
+
+/**
+ * Intercepts POSIX lseek().
+ */
+off_t posix_lseek(shim_fd_t fd, off_t offset, int whence);
+
+struct stat;
+
+/**
+ * Intercepts POSIX stat().
+ */
+int posix_stat(const char *pathname, struct stat *statbuf);
+
+/**
+ * Intercepts POSIX mkdir().
+ */
+int posix_mkdir(const char *pathname, mode_t mode);
 
 #ifdef __cplusplus
 }

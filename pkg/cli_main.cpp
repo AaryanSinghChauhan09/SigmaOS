@@ -1,7 +1,5 @@
-#include "../include/sigma_kernel_types.h"
 #include <iostream>
 #include <string>
-#include <vector>
 
 // Forward declarations of backend package actions
 extern "C" {

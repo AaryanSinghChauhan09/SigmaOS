@@ -1,6 +1,4 @@
-#include "../../include/sigma_kernel_types.h"
 #include <iostream>
-
 extern "C" {
     void sigma_log_info(const char* fmt, ...);
     void sigma_log_error(const char* fmt, ...);

@@ -7,7 +7,6 @@
 #include "../include/sigma_kernel_types.h"
 #include <iostream>
 #include <string>
-#include <vector>
 
 extern "C" {
     void sigma_log_info(const char* fmt, ...);

@@ -1,4 +1,3 @@
-#include "../include/sigma_kernel_types.h"
 #include <iostream>
 #include <string>
 

@@ -1,6 +1,6 @@
-#include "../../hal/SovereignHAL.hpp"
-
 // Mock snapshot system for driver rollbacks
+
+#include "../../include/sigma_kernel_types.h"
 
 extern "C" {
     void sigma_log_info(const char* fmt, ...);

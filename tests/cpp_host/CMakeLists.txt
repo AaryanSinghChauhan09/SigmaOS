@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(SigmaOSKernelTests CXX)
+project(SigmaOSKernelTests CXX C)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -32,6 +32,8 @@ add_executable(test_kernel
     test_kernel.cpp 
     test_pqc.cpp 
     test_sandbox.cpp
+    test_compat_shim.cpp
+    ../../tools/compat/compat_shim.c
     ../../kernel/core/security/SovereignPQC.cpp
     ../../kernel/core/security/SovereignSandbox.cpp
 )
