@@ -21,6 +21,42 @@ typedef enum {
     CORNER_BOTTOM_RIGHT = 3
 } sigma_corner_t;
 
+class SovereignAccessibilityManager {
+public:
+    static SovereignAccessibilityManager& getInstance() {
+        static SovereignAccessibilityManager instance;
+        return instance;
+    }
+
+    void setHighContrast(bool enable) {
+        high_contrast_enabled = enable;
+        sigma_log("[ACCESSIBILITY] High Contrast mode %s.", enable ? "ENABLED" : "DISABLED");
+        // Instruct compositor to apply high contrast shader passes
+    }
+
+    void setTextScale(float scale) {
+        text_scale_multiplier = scale;
+        sigma_log("[ACCESSIBILITY] UI Text Scale set to %.2fx.", scale);
+    }
+
+    void speakText(const char* text) {
+        if (!screen_reader_enabled) return;
+        sigma_log("[ACCESSIBILITY-TTS] Reading: '%s'", text);
+        // Pipe to synthetic speech daemon
+    }
+
+    void enableScreenReader(bool enable) {
+        screen_reader_enabled = enable;
+        sigma_log("[ACCESSIBILITY] Screen Reader %s.", enable ? "ENABLED" : "DISABLED");
+    }
+
+private:
+    SovereignAccessibilityManager() : high_contrast_enabled(false), text_scale_multiplier(1.0f), screen_reader_enabled(false) {}
+    bool high_contrast_enabled;
+    float text_scale_multiplier;
+    bool screen_reader_enabled;
+};
+
 class SovereignSpatialUIEngine {
 public:
     static SovereignSpatialUIEngine& getInstance() {
@@ -31,12 +67,18 @@ public:
     static void init() {
         sigma_log("[SPATIAL-UI] Initializing Sovereign Hot Corners & Split Snapping Engine...");
         for (int i = 0; i < 4; i++) sigma_hardened_strcpy(corner_actions[i], "none", 32);
+        
+        // Init elementary/Zorin inspired accessibility defaults
+        SovereignAccessibilityManager::getInstance().setTextScale(1.0f);
     }
 
     void setHotCorner(sigma_corner_t corner, const char* action) {
         sigma_hardened_strcpy(this->corner_actions[corner], action, 32);
         const char* names[] = {"TOP-LEFT", "TOP-RIGHT", "BOTTOM-LEFT", "BOTTOM-RIGHT"};
         sigma_log("[SPATIAL-UI] Hot Corner %s -> '%s' registered.\n", names[corner], action);
+        
+        // Accessibility hook
+        SovereignAccessibilityManager::getInstance().speakText("Hot corner modified.");
     }
 
     void triggerCorner(sigma_corner_t corner) {

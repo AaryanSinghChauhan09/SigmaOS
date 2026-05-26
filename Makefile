@@ -72,6 +72,21 @@ arm64-rpi:
 	@echo "[ARM64] Successfully built SigmaOS for Raspberry Pi (embedded profile)."
 
 # =========================================================================
+# Debian-Edu-inspired: Specialized Editions
+# =========================================================================
+iso-iot:
+	@echo "[EDITION: IoT] Stripping GUI, forcing MINIMAL_MODE..."
+	$(MAKE) CFLAGS="$(CFLAGS) -DSIGMA_MINIMAL_MODE=1 -DSIGMA_STRIP_GUI=1" iso
+
+iso-research:
+	@echo "[EDITION: Research] Disabling strict sandboxing for compute clusters..."
+	$(MAKE) CFLAGS="$(CFLAGS) -DSIGMA_RELAX_SANDBOX=1 -DSIGMA_COMPUTE_CLUSTER=1" iso
+
+iso-secure:
+	@echo "[EDITION: Secure] Enforcing strict isolation and Tor routing default..."
+	$(MAKE) CFLAGS="$(CFLAGS) -DSIGMA_STRICT_ISOLATION=1 -DSIGMA_FORCE_TOR=1" iso
+
+# =========================================================================
 # Clear-Linux-inspired: Profile-Guided Optimization (PGO) skeleton
 # Usage: make pgo-generate  ->  run workload  ->  make pgo-use
 # =========================================================================
