@@ -24,6 +24,7 @@ public:
     void init() {
         m_state.is_blur_enabled = SIGMA_TRUE;
         m_state.current_theme = THEME_DARK;
+        m_state.control_center_win_id = 0;
 
         sigma_log("[Zenith] Desktop Environment initializing...");
         
@@ -56,7 +57,12 @@ public:
         /* Stub: Issue draw commands to sigma-wm for the panel */
         sigma_color_t bg_dark = {30, 30, 30, 240};
         sigma_color_t bg_light = {240, 240, 240, 240};
-        sigma_color_t bg = (m_state.current_theme == THEME_DARK) ? bg_dark : bg_light;
+        sigma_color_t bg_hc = {0, 0, 0, 255}; // High Contrast
+        
+        sigma_color_t bg;
+        if (m_state.current_theme == THEME_DARK) bg = bg_dark;
+        else if (m_state.current_theme == THEME_HIGH_CONTRAST) bg = bg_hc;
+        else bg = bg_light;
         
         sigma_log_info("[Zenith] Drawing Top Panel with color rgba(%u, %u, %u, %u)\n", bg.r, bg.g, bg.b, bg.a);
     }
@@ -65,7 +71,12 @@ public:
         /* Stub: Issue draw commands for a frosted-glass spatial dock */
         sigma_color_t bg_dark = {50, 50, 50, 200};
         sigma_color_t bg_light = {255, 255, 255, 200};
-        sigma_color_t bg = (m_state.current_theme == THEME_DARK) ? bg_dark : bg_light;
+        sigma_color_t bg_hc = {255, 255, 0, 255}; // High Contrast Yellow
+        
+        sigma_color_t bg;
+        if (m_state.current_theme == THEME_DARK) bg = bg_dark;
+        else if (m_state.current_theme == THEME_HIGH_CONTRAST) bg = bg_hc;
+        else bg = bg_light;
                            
         sigma_log_info("[Zenith] Drawing Spatial Dock (Blur: %s) with color rgba(%u, %u, %u, %u)\n", 
                        m_state.is_blur_enabled ? "ON" : "OFF", bg.r, bg.g, bg.b, bg.a);
@@ -74,6 +85,19 @@ public:
     void handleClick(int x, int y) {
         /* Simple hit-testing stub */
         sigma_log_info("[Zenith] Click registered at (%d, %d)\n", x, y);
+    }
+
+    void openControlCenter() {
+        if (m_state.control_center_win_id == 0) {
+            sigma_log("[Zenith] Opening Sigma Control Center...");
+            int w = 800, h = 600;
+            m_state.control_center_win_id = wm_create_window(0, "Sigma Control Center", 
+                (WM_SCREEN_WIDTH/2) - (w/2), (WM_SCREEN_HEIGHT/2) - (h/2), w, h);
+            wm_set_z_index(m_state.control_center_win_id, 500);
+        } else {
+            sigma_log("[Zenith] Sigma Control Center is already open. Bringing to front.");
+            wm_set_z_index(m_state.control_center_win_id, 900);
+        }
     }
 
 private:

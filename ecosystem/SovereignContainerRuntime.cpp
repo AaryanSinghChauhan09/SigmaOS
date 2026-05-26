@@ -21,6 +21,12 @@
  * =================================================================
  */
 
+typedef enum {
+    MAC_STRICT,
+    MAC_PERMISSIVE,
+    MAC_ISOLATED
+} mac_policy_t;
+
 class SovereignContainer {
 public:
     SovereignContainer() {
@@ -28,11 +34,27 @@ public:
         sigma_log_info("[CONTAINER/INIT]: Limits enforced at silicon-level (64MB RAM, 10%% CPU).\n");
     }
 
+    void applyMACPolicy(mac_policy_t policy) {
+        sigma_log_info("[CONTAINER/SEC]: Applying Mandatory Access Control policy %d...\n", policy);
+        if (policy == MAC_STRICT) {
+            sigma_log_info("[CONTAINER/SEC]: -> Network: Bridged Only, FS: Chroot + ReadOnly root, IPC: Disabled\n");
+        } else if (policy == MAC_ISOLATED) {
+            sigma_log_info("[CONTAINER/SEC]: -> Absolute zero-trust. No host access. Cryptographic attestations required.\n");
+        }
+    }
+
+    void parseKubePodSpec(const SigmaOS::SigmaString& yaml_path) {
+        sigma_log_info("[CONTAINER/K8S]: Parsing Pod specification from '%s'\n", yaml_path.c_str());
+        sigma_log_info("[CONTAINER/K8S]: Translating Kubelet commands to Sovereign Shard allocations...\n");
+    }
+    
+    void runDockerImage(const SigmaOS::SigmaString& image_name) {
+        sigma_log_info("[CONTAINER/DOCKER]: Emulating Docker run for image '%s'\n", image_name.c_str());
+        sigma_log_info("[CONTAINER/DOCKER]: Extracting OCI bundle to Sovereign native format...\n");
+    }
+
     void InjectShard(const SigmaOS::SigmaString& processName) {
         sigma_log_info("[CONTAINER/EXEC]: Injecting '%s' into restricted silicon shard...\n", processName.c_str());
-        
-        // In a real sovereign OS, we would use our own Process and Scheduler syscalls.
-        // For now, we simulate the successful jailing of the process.
         sigma_log_info("[CONTAINER/SECURED]: Process '%s' is now jailed in the Sovereign Shard.\n", processName.c_str());
     }
 

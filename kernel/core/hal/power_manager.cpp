@@ -22,6 +22,18 @@ void SovereignPowerManager::SetState(PowerState state) {
             m_voltage_mv = 850; m_frequency_mhz = 1200;
             sigma_log("[POWER]: Descending to AMNESIC LOW POWER (Battery Sovereignty).\n");
             break;
+        case PowerState::PROFILE_HPC:
+            m_voltage_mv = 1350; m_frequency_mhz = 6000;
+            sigma_log("[POWER]: Profile [HPC] Active. Unrestricted thermal limits.\n");
+            break;
+        case PowerState::PROFILE_CLOUD:
+            m_voltage_mv = 1000; m_frequency_mhz = 3000;
+            sigma_log("[POWER]: Profile [CLOUD] Active. Optimized for density and throughput.\n");
+            break;
+        case PowerState::PROFILE_EDGE:
+            m_voltage_mv = 800; m_frequency_mhz = 1000;
+            sigma_log("[POWER]: Profile [EDGE] Active. Maximum efficiency for IoT devices.\n");
+            break;
     }
 }
 

@@ -89,10 +89,35 @@ public:
     }
 
     void composite() {
-        /* In a real WM, we would iterate through windows sorted by z_index
-         * and copy their backing store pixels to the master framebuffer.
-         */
-        sigma_log("[WM] Compositor tick: Blitting all windows to master framebuffer.");
+        sigma_window_t* sorted[WM_MAX_WINDOWS];
+        sigma_u32 visible_count = 0;
+        
+        for (sigma_u32 i = 0; i < m_window_count; i++) {
+            if (m_windows[i].win_id != 0 && m_windows[i].is_visible) {
+                sorted[visible_count++] = &m_windows[i];
+            }
+        }
+        
+        /* Bubble sort by z_index */
+        for (sigma_u32 i = 0; i < visible_count; i++) {
+            for (sigma_u32 j = 0; j < visible_count - i - 1; j++) {
+                if (sorted[j]->z_index > sorted[j+1]->z_index) {
+                    sigma_window_t* temp = sorted[j];
+                    sorted[j] = sorted[j+1];
+                    sorted[j+1] = temp;
+                }
+            }
+        }
+        
+        /* Simulated Blitting */
+        sigma_log_info("[WM] Compositing %u visible windows to master framebuffer (0x%llX)...\n", 
+                       visible_count, (unsigned long long)m_master_fb);
+        for (sigma_u32 i = 0; i < visible_count; i++) {
+            sigma_window_t* win = sorted[i];
+            /* In reality: sigma_memcpy(m_master_fb + offset, win->framebuffer, size) */
+            sigma_log_info("  -> Blitting window '%s' [z:%d] from backbuffer (0x%llX)\n", 
+                           win->title, win->z_index, (unsigned long long)win->framebuffer);
+        }
     }
 
 private:

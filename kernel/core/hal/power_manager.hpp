@@ -9,7 +9,7 @@
 namespace SigmaOS {
 namespace Kernel {
 
-enum class PowerState { PEAK_PERFORMANCE, BALANCED_LATTICE, AMNESIC_LOW_POWER };
+enum class PowerState { PEAK_PERFORMANCE, BALANCED_LATTICE, AMNESIC_LOW_POWER, PROFILE_HPC, PROFILE_CLOUD, PROFILE_EDGE };
 
 /*
  * =========================================================================

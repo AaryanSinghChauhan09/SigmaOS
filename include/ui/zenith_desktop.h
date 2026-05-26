@@ -22,6 +22,7 @@ typedef enum {
 typedef struct {
     sigma_u32  dock_win_id;
     sigma_u32  panel_win_id;
+    sigma_u32  control_center_win_id;
     sigma_bool is_blur_enabled;
     zenith_theme_t current_theme;
 } zenith_desktop_state_t;
