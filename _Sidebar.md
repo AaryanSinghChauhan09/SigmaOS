@@ -12,6 +12,10 @@
 
 ## ⚙️ Subsystem Docs
 - [Kernel Internals](SigmaOS-Kernel-Internals)
+- [Process Management & Scheduling](Process-Management)
+- [Init System (sigma-init)](Init-System)
+- [Device Management](Device-Management)
+- [Shell Reference (sigma-sh)](Shell-Reference)
 - [Real-Time Scheduler (CFS)](Real-Time-Scheduler-Shard)
 - [Memory Allocator & Slab](Slab-Allocator)
 - [Driver Development Guide](Driver-Development-Guide)
