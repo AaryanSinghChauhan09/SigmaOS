@@ -73,7 +73,7 @@ public:
     }
 
     void setHotCorner(sigma_corner_t corner, const char* action) {
-        sigma_hardened_strcpy(this->corner_actions[corner], action, 32);
+        sigma_hardened_strcpy(corner_actions[corner], action, 32);
         const char* names[] = {"TOP-LEFT", "TOP-RIGHT", "BOTTOM-LEFT", "BOTTOM-RIGHT"};
         sigma_log("[SPATIAL-UI] Hot Corner %s -> '%s' registered.\n", names[corner], action);
         
@@ -83,7 +83,7 @@ public:
 
     void triggerCorner(sigma_corner_t corner) {
         sigma_log("[SPATIAL-UI] Hot Corner triggered! Executing: '%s'\n",
-                     this->corner_actions[corner]);
+                     corner_actions[corner]);
     }
 
     void snapWindow(sigma_u32 window_id, const char* snap_zone) {

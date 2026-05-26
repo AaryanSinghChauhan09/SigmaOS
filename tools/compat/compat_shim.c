@@ -89,7 +89,7 @@ int posix_stat(const char *pathname, struct stat *statbuf) {
     return 0;
 }
 
-int posix_mkdir(const char *pathname, mode_t mode) {
+int posix_mkdir(const char *pathname, int mode) {
     if (!pathname) return -1;
     // Mock successful directory creation
     return 0;

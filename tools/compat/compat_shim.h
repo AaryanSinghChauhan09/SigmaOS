@@ -79,7 +79,7 @@ int posix_stat(const char *pathname, struct stat *statbuf);
 /**
  * Intercepts POSIX mkdir().
  */
-int posix_mkdir(const char *pathname, mode_t mode);
+int posix_mkdir(const char *pathname, int mode);
 
 #ifdef __cplusplus
 }

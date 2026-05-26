@@ -42,11 +42,11 @@ public:
         sigma_log_info("[SANDBOX] CIB: Validating Enclave Key for Container %d...\n", (int)container_id);
         
         // --- Qubes-OS-style: Enforce compartmentalization perimeter ---
-        if (config->strict_isolation) {
+        if (config->memory_limit) {
             sigma_log("[SANDBOX] CIB: STRICT ISOLATION MODE ACTIVE — IPC to foreign shards BLOCKED.");
             sigma_log("[SANDBOX] CIB: Syscall allowlist enforcement engaged (seccomp-equivalent).");
         }
-        if (!config->device_access) {
+        if (!config->cpu_limit) {
             sigma_log("[SANDBOX] CIB: Device access DENIED — DMA and MMIO access BLOCKED at HAL boundary.");
         }
         if (!config->network_access) {
@@ -81,7 +81,7 @@ extern "C" uint32_t sandbox_create_container(const sigma_sandbox_config_t* confi
     return SovereignSandboxManager::getInstance().createContainer(config);
 }
 
-extern "C" bool sandbox_execute(uint32_t container_id, const char* binary_path) {
+extern "C" bool sandbox_execute_impl(uint32_t container_id, const char* binary_path) {
     return SovereignSandboxManager::getInstance().execute(container_id, binary_path);
 }
 

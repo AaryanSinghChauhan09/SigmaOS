@@ -30,7 +30,7 @@ sigma_err_t custom_driver_init(void) {
 
 // 2. Read Routine
 sigma_ssize_t custom_driver_read(void* buffer, sigma_size_t count) {
-    if (!g_device_ctx.is_initialized) return SIGMA_ERR;
+    if (!g_device_ctx.is_initialized) return SIGMA_ERROR;
     // Implement hardware read logic here
     sigma_log("[DRIVER-TEMPLATE] Read %zu bytes requested.", count);
     return 0; // Return bytes read
@@ -38,7 +38,7 @@ sigma_ssize_t custom_driver_read(void* buffer, sigma_size_t count) {
 
 // 3. Write Routine
 sigma_ssize_t custom_driver_write(const void* buffer, sigma_size_t count) {
-    if (!g_device_ctx.is_initialized) return SIGMA_ERR;
+    if (!g_device_ctx.is_initialized) return SIGMA_ERROR;
     // Implement hardware write logic here
     sigma_log("[DRIVER-TEMPLATE] Write %zu bytes requested.", count);
     return count; // Return bytes written
