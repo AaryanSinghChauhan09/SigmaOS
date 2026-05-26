@@ -27,6 +27,6 @@ Pulling inspiration from Linux distros is a smart way to strengthen SigmaOS. Eac
 
 ## 💡 Roadmap suggestion
 
-* **Short‑term**: Reproducible builds (NixOS inspiration), optimize kernel with Clear Linux techniques (LTO/PGO), integrate recovery utilities (Rescuezilla/SystemRescue). *(Implemented)*
-* **Mid‑term**: Build containerized service model (RancherOS inspiration), introduce privacy profiles (Whonix), polish UI (elementary/Zorin). *(In Progress)*
-* **Long‑term**: Full isolation domains (Qubes OS), specialized editions (Debian Edu), community package ecosystem (SlackBuilds).
+* **Short‑term**: Reproducible builds (NixOS inspiration), optimize kernel with Clear Linux techniques (LTO/PGO), integrate recovery utilities (Rescuezilla/SystemRescue). *(Implemented & Verified)*
+* **Mid‑term**: Build containerized service model (RancherOS inspiration), introduce privacy profiles (Whonix), polish UI (elementary/Zorin). *(Implemented & Verified)*
+* **Long‑term**: Full isolation domains (Qubes OS), specialized editions (Debian Edu), community package ecosystem (SlackBuilds). *(Implemented & Verified)*
