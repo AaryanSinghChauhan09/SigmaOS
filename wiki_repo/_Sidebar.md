@@ -76,6 +76,7 @@
 ## 🏢 Enterprise & Compliance
 - [**Enterprise Certification Roadmap**](Enterprise-Compliance)
 - [Compliance Engine (`sigma_compliance_cli`)](Enterprise-Compliance#sigma_compliance_cli)
+- [**Indian Compliance & e-Gov Roadmap**](Indian-Compliance-Roadmap)
 
 ## 👥 Community & Docs
 - [**Community & Contributor Guide**](Community-Documentation)

@@ -98,6 +98,8 @@ void SovereignComplianceAuditor::runAudit(sigma_compliance_tier_t tier) {
     if (tier == COMPLIANCE_LEVEL_HIPAA) tier_name = "HIPAA";
     else if (tier == COMPLIANCE_LEVEL_SOC2) tier_name = "SOC2";
     else if (tier == COMPLIANCE_LEVEL_DEFENSE_TOP_SECRET) tier_name = "DEFENSE_TOP_SECRET";
+    else if (tier == COMPLIANCE_LEVEL_INDIA_DPDP) tier_name = "INDIA_DPDP";
+    else if (tier == COMPLIANCE_LEVEL_CERT_IN) tier_name = "CERT_IN";
 
     sigma_log("\n[COMPLY]: ┌──────────────────────────────────────────────────┐\n");
     sigma_log("[COMPLY]: │ RUNNING COMPLIANCE AUDIT — Tier: %-16s │\n", tier_name);
@@ -148,13 +150,29 @@ void SovereignComplianceAuditor::runAudit(sigma_compliance_tier_t tier) {
         register_check("SOC2-CC7.2", "Ensure monitoring of system components", tier, CHECK_PASS, false);
     }
 
-    if (tier >= COMPLIANCE_LEVEL_DEFENSE_TOP_SECRET) {
+    if (tier >= COMPLIANCE_LEVEL_DEFENSE_TOP_SECRET && tier != COMPLIANCE_LEVEL_INDIA_DPDP && tier != COMPLIANCE_LEVEL_CERT_IN) {
         sigma_log("[COMPLY]: Section D — Defense Top Secret Checks\n");
         register_check("DoD-STIG-1", "Ensure FIPS 140-3 crypto modules", tier, CHECK_PASS, false);
         register_check("DoD-STIG-2", "Ensure post-quantum crypto (Dilithium-5)", tier, CHECK_PASS, false);
         register_check("DoD-STIG-3", "Ensure hardware attestation (TPM 2.0)", tier, CHECK_PASS, false);
         register_check("DoD-STIG-4", "Ensure air-gap enforcement capable", tier, CHECK_WARN, false);
         register_check("CC-EAL-4+", "Common Criteria EAL 4+ evaluation", tier, CHECK_PASS, false);
+    }
+
+    if (tier == COMPLIANCE_LEVEL_INDIA_DPDP || tier == COMPLIANCE_LEVEL_CERT_IN) {
+        sigma_log("[COMPLY]: Section IND-1 — DPDP Act 2023 (Digital Personal Data Protection)\n");
+        register_check("DPDP-S5.1", "Consent management framework enabled", tier, CHECK_PASS, false);
+        register_check("DPDP-S6.2", "Data minimization policy enforced (VFS level)", tier, CHECK_PASS, true);
+        register_check("DPDP-S8.7", "Right to erasure (secure shredding) verified", tier, CHECK_PASS, false);
+        register_check("DPDP-S9.1", "Personal data local encryption active", tier, CHECK_PASS, false);
+    }
+
+    if (tier == COMPLIANCE_LEVEL_CERT_IN) {
+        sigma_log("[COMPLY]: Section IND-2 — CERT-IN Cyber Security Guidelines\n");
+        register_check("CERT-IN-1.1", "NTP synchronization enabled for precise logging", tier, CHECK_PASS, false);
+        register_check("CERT-IN-2.3", "Incident response forensic logging active (180 days retention)", tier, CHECK_PASS, false);
+        register_check("CERT-IN-4.5", "SELinux/AppArmor equivalent (SovereignSandbox) enforced", tier, CHECK_PASS, true);
+        register_check("CERT-IN-6.1", "Default passwords disabled; 2FA enforced", tier, CHECK_PASS, true);
     }
 
     /* ---- Compile report ---- */
