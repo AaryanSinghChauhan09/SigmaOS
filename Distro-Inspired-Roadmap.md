@@ -6,38 +6,38 @@ To transform **SigmaOS** into the ultimate, "all-in-one" operating system capabl
 
 ## 🔧 Inspiration & Implementation Blueprint
 
-| Distro Class | Distro | Core Inspiration | SigmaOS Gap | Implementation Strategy |
-| :--- | :--- | :--- | :--- | :--- |
-| **UX & Polish** | [elementary OS](https://github.com/elementary) <br> [Zorin OS](https://zorinos.com/) | Polished, beginner-friendly desktop UX, refined widgets. | Lacks a standardized graphical desktop environment. | Build a native, highly responsive spatial interface (`Zenith Desktop`) on top of the zero-dependency `SovereignWindowManager`. |
-| **Gaming** | [SteamOS](https://github.com/ValveSoftware/SteamOS) | Proton, Wine compatibility layers, optimized graphics drivers. | No gaming support or high-fidelity Vulkan stack. | Integrate lightweight Win32 compatibility layers, optimized GPU scheduling, and direct render loops. |
-| **Performance** | [Clear Linux](https://github.com/clearlinux) | Aggressive compiler optimization (LTO/PGO), AVX2/AVX-512 optimization. | Claims bare-metal performance but has limited profile tuning. | Optimize compilation flags (`-flto -O3`) and leverage hardware co-design partnerships. |
-| **Reproducibility** | [NixOS](https://github.com/NixOS) | Declarative configuration management, immutable rollback generations. | Configuration is currently procedurally managed. | Introduce the declarative config engine (`DeclarativeEngine`) and cryptographic package registry. |
-| **Community** | [Slackware](http://slackbuilds.org/) <br> [EndeavourOS](https://github.com/endeavouros-team) | Strong DIY ethos, custom build scripts, and structured developer wikis. | Limited contributor pipeline and developer guides. | Launch a public documentation portal, clear contribution templates, and open-source discussions. |
-| **Forensics & Recovery** | [CAINE](https://www.caine-live.net/) <br> [Rescuezilla](https://github.com/rescuezilla/rescuezilla) <br> [SystemRescue](https://gitlab.com/systemrescue) | Out-of-the-box system recovery, read-only physical mount states, system diagnosis. | No native offline forensic suite or bare-metal recovery tools. | Integrate the `SovereignRecoverySuite` directly, offering raw read-only forensic block mounting and cryptographic rollback. |
-| **Cloud & Containers** | [Fedora CoreOS](https://github.com/coreos/fedora-coreos-tracker) <br> [RancherOS](https://github.com/rancher/os) <br> [Flatcar](https://github.com/flatcar) | Minimal, container-native OS layout, declarative system provisioning. | Lacks container orchestration and microservice scalability. | Create a lightweight, secure container runtime (`SovereignContainerEngine`) bypassing standard Linux namespace overhead. |
-| **Enterprise & Support** | [Ubuntu / Canonical](https://github.com/Canonical) <br> [Red Hat (RHEL)](https://git.centos.org/) | Enterprise subscription modules, strict compliance certification (ISO/IEC, Common Criteria). | No clear compliance path or long-term support infrastructure. | Establish the C++ `ComplianceEngine` executing real-time CIS and ISO 27001 auditing, paving the way for certifications. |
-| **Lightweight Scaling** | [RPi-Distro](https://github.com/RPi-Distro) <br> [Alpine Linux](https://github.com/alpinelinux) | Lightweight footprint, minimal musl/busybox base, ARM/RISC-V scaling. | Needs dedicated HAL implementations for embedded architectures. | Expand `SovereignHAL` to fully support ARM64 and open-source RISC-V targets. |
-| **Curated Packages** | [Solus](https://github.com/GetSolus) | Independent package ecosystem, curated repository structure. | Lacks clear package prioritization and validation layers. | Implement highly curated package distribution categories (`OFFICIAL`, `COMMUNITY`, `UNVERIFIED`) in `OmniPkg`. |
+| Distro Class | Distro | Core Inspiration | SigmaOS Gap | Implementation Strategy | Benefit |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **UX & Polish** | [elementary OS](https://github.com/elementary) <br> [Zorin OS](https://zorinos.com/) | Polished, beginner-friendly desktop UX, refined widgets. | No clear desktop environment strategy; sovereignty vision is strong but abstract for everyday users. | Pick a base (GNOME or KDE) and customize it with SigmaOS branding. Build a Sigma Control Center for unified settings, similar to Zorin’s polished UI. Focus on accessibility, modern design, and performance. | Makes SigmaOS approachable for mainstream users, not just developers. |
+| **Gaming** | [SteamOS](https://github.com/ValveSoftware/SteamOS) | Proton, Wine compatibility layers, optimized graphics drivers. | No gaming stack or GPU optimization. | Integrate Proton/Wine for Windows game compatibility. Bundle GPU drivers (NVIDIA, AMD, Intel) with auto‑update. Optimize kernel scheduling for low‑latency gaming. | SigmaOS becomes a sovereign OS that doesn’t sacrifice entertainment. |
+| **Performance** | [Clear Linux](https://github.com/clearlinux) | Aggressive compiler optimization (LTO/PGO), AVX2/AVX-512 optimization. | Bare‑metal sovereignty claim, but no OEM partnerships. | Collaborate with Intel, ARM, RISC‑V vendors to deliver tuned kernels. Ship performance profiles for different workloads (HPC, cloud, desktop). | Proves SigmaOS’s sovereignty vision with measurable performance gains. |
+| **Reproducibility** | [NixOS](https://github.com/NixOS) | Declarative configuration management, immutable rollback generations. | No reproducible builds or declarative configs. | Create a declarative package/config system. Enable rollback of system states. Provide reproducible builds for sovereign trust. | Ensures reliability and transparency, critical for sovereignty. |
+| **Community** | [Slackware](http://slackbuilds.org/) <br> [EndeavourOS](https://github.com/endeavouros-team) | Strong DIY ethos, custom build scripts, and structured developer wikis. | Sparse documentation, no contributor pipeline. | Launch SigmaOS Wiki + forums. Provide contributor guides and tutorials. Incentivize contributions via GitHub projects and badges. | Builds a grassroots community, the backbone of every successful distro. |
+| **Forensics & Recovery** | [CAINE](https://www.caine-live.net/) <br> [Rescuezilla](https://github.com/rescuezilla/rescuezilla) <br> [SystemRescue](https://gitlab.com/systemrescue) | Out-of-the-box system recovery, read-only physical mount states, system diagnosis. | No built‑in recovery or forensic tools. | Bundle snapshotting and rollback utilities. Add forensic modules for sovereign security. Ship a live recovery environment. | Makes SigmaOS resilient and trustworthy in critical environments. |
+| **Cloud & Containers** | [Fedora CoreOS](https://github.com/coreos/fedora-coreos-tracker) <br> [RancherOS](https://github.com/rancher/os) <br> [Flatcar](https://github.com/flatcar) | Minimal, container-native OS layout, declarative system provisioning. | No cloud‑native orchestration. | Integrate Kubernetes/Docker with sovereign security modules. Provide container‑first builds for enterprise workloads. | Positions SigmaOS as a sovereign cloud OS for modern infrastructure. |
+| **Enterprise & Support** | [Ubuntu / Canonical](https://github.com/Canonical) <br> [Red Hat (RHEL)](https://git.centos.org/) | Enterprise subscription modules, strict compliance certification (ISO/IEC, Common Criteria). | No compliance roadmap. | Build enterprise support model. Pursue ISO/IEC certifications and government security standards. Offer long‑term support releases. | Gains trust from enterprises and governments. |
+| **Lightweight Scaling** | [RPi-Distro](https://github.com/RPi-Distro) <br> [Alpine Linux](https://github.com/alpinelinux) | Lightweight footprint, minimal musl/busybox base, ARM/RISC-V scaling. | No embedded/IoT focus. | Create ARM/RISC‑V builds. Optimize for sovereign IoT and edge devices. | Expands SigmaOS into lightweight, sovereign edge computing. |
+| **Curated Packages** | [Solus](https://github.com/GetSolus) | Independent package ecosystem, curated repository structure. | No curated software ecosystem. | Develop a SigmaOS Store with sovereign‑approved apps. Curate software for security, performance, and sovereignty. | Gives users confidence in app quality and sovereignty compliance. |
 
 ---
 
 ## 🧭 Fusion Roadmap Timeline
 
 ### 📅 Short-term (6–12 months)
-* **Package Management & Compatibility**: Solidify the native package manager (`OmniPkg`) and launch lightweight POSIX shims.
-* **UX & Interfaces**: Roll out a basic desktop environment with polished layout elements, spatial composites, and standard styling guides.
-* **Documentation & Portals**: Establish the collaborative Arch-inspired Wiki, API references, and structured community forums.
+* **Desktop UX**: Select a desktop base (GNOME/KDE), implement custom SigmaOS branding, and design the Sigma Control Center stubs.
+* **Package Management**: Finalize the core package manager (`OmniPkg`), support POSIX shims, and start declarative config integration.
+* **Community Docs**: Launch the Arch-inspired Wiki, forums, and developer contribution guides.
 
 ### 📅 Mid-term (1–2 years)
-* **Hardware Co-design & Optimization**: Form key partnerships with RISC-V and ARM chipmakers to deliver tuned kernels.
-* **Forensics & Recovery Tools**: Integrate system-wide snapshots, atomic physical rollbacks, and complete read-only offline forensics.
-* **High-Fidelity Stack**: Optimize gaming compatibility layers, hardware drivers, and low-latency audio/video routing.
-* **Cloud & Edge Infrastructure**: Deliver container-native scaling, minimal cloud kernels, and Edge IoT nodes.
+* **Hardware Partnerships**: Form chipmaker collaborations (Intel, ARM, RISC-V) to deliver tuned kernels and performance workload profiles.
+* **Recovery & Forensics**: Implement the `SovereignRecoverySuite` with snapshots, rollback features, and live forensic recovery.
+* **Gaming Stack**: Integrate Proton/Wine for gaming support and bundle auto-updating graphics drivers.
+* **Cloud Orchestration**: Support cloud-native container runtimes and Kubernetes/Docker integrations.
 
 ### 📅 Long-term (2–3 years)
-* **Enterprise support model**: Deploy subscription networks, certified auditing tools, and Long-Term Support (LTS) releases.
-* **Global Certifications**: Obtain standard ISO/IEC 27001 and government Common Criteria validations.
-* **Rich Store Ecosystem**: Launch the secure curated app store, custom developer compilers, and verified vendor repositories.
+* **Enterprise Support & Certifications**: Launch the enterprise support program and complete ISO/IEC and security compliance certifications.
+* **IoT Builds**: Provide optimized lightweight edge/embedded builds for ARM and RISC-V architectures.
+* **Curated SigmaOS Store**: Roll out the complete application store curated for security, performance, and sovereignty.
 
 ---
 
