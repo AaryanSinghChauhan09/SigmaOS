@@ -4,7 +4,7 @@
 - [Home (Hub)](Home)
 - [Strategic Vision & Competitive Edge](Strategic-Vision)
 - [SigmaOS Ecosystem Strategy](SigmaOS-Ecosystem-Strategy)
-- [**Flagship Use Cases**](Flagship-Use-Cases)
+- [**Flagship Use Cases**](Flagship-Profiles)
 - [Distro-Inspired Roadmap](Distro-Inspired-Roadmap)
 - [SigmaOS vs Linux Distros](SigmaOS-vs-Linux)
 - [**100 Competitor-Inspired Features**](Roadmap-Features-Registry)
@@ -38,9 +38,9 @@
 
 ## 🔒 Security
 - [Security Architecture](Security-Architecture)
-- [Post-Quantum Security (Dilithium-5)](Post-Quantum-Security)
+- [Post-Quantum Security (Dilithium-5)](Post-Quantum-Crypto)
 - [Security & PQC Shard](Security-Shard)
-- [Secure Sandboxing & Compartmentalization](Sovereign-Security-Framework)
+- [Secure Sandboxing & Compartmentalization](Sovereign-Sandbox)
 
 ## 🔧 Hardware & Silicon
 - [**Hardware Sovereignty & Partnerships**](Hardware-Sovereignty)
