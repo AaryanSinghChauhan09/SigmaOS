@@ -84,6 +84,37 @@ To build the most comprehensive mapping, the table below indexes the primary Lin
 * **EndeavourOS** — [GitHub](https://github.com/endeavouros-team) — *Community-first installer layers and terminal-centric configurations.*
 * **DebianEdu/Skolelinux** — [Salsa Repository](https://salsa.debian.org/debian-edu) — *Custom educational servers and pre-configured classroom networks.*
 
+## 🚀 Strategic Vision
+
+SigmaOS should fuse the best of each distro into a unified, sovereign ecosystem:
+
+* **UX Polish** (elementary/Zorin) — Zenith Desktop Environment with spatial compositing, theming, and accessibility.
+* **Gaming Stack** (SteamOS) — Proton/Wine compatibility, GPU scheduling, and low-latency audio/video.
+* **Performance Tuning** (Clear Linux) — LTO/PGO compilation, AVX-512 optimization, and profiled kernel builds.
+* **Reproducibility** (NixOS) — Declarative configuration engine, atomic rollback generations, and cryptographic manifests.
+* **Community Strength** (Slackware/EndeavourOS) — SigmaOS Wiki, contributor guides, GitHub Discussions, and open API portals.
+* **Recovery Tools** (CAINE/Rescuezilla) — Snapshot engine, forensic audit mode, and immutable read-only block mounting.
+* **Cloud-Native Design** (Fedora CoreOS/RancherOS/Flatcar) — Lightweight container runtime, orchestration primitives, and edge node support.
+* **Enterprise Trust** (Ubuntu/Red Hat) — Compliance engine (ISO 27001, CIS Benchmarks), LTS releases, and subscription networks.
+* **IoT/ARM Builds** (RPi-Distro) — ARM64 and RISC-V HAL implementations for sovereign embedded systems.
+* **Curated App Store** (Solus) — Sovereign Package Registry with `OFFICIAL`, `COMMUNITY`, and `UNVERIFIED` curation levels.
+
 ---
 
-🚀 **The Strategic Vision**: By systematically absorbing these distro blueprints—fusing elementary's visual elegance, SteamOS's gaming stack, Clear Linux's compiler tuning, NixOS's declarative safety, Qubes' zero-trust security isolation, and Fedora CoreOS's container orchestration—SigmaOS will evolve into the definitive, all-in-one desktop ecosystem, while proudly maintaining its absolute, zero-dependency digital sovereignty.
+## ⚡ Zero-Dependency Engineering Philosophy
+
+Unlike Linux distributions that depend on massive chains of trust (`app → glibc → syscall → kernel → hardware`), SigmaOS eliminates every intermediate layer:
+
+```
+Shard → Sigma Syscall Dispatcher → Hardware
+```
+
+**Key Principles:**
+* **No STL** — All containers (`SigmaVector`, `SigmaMap`, `SigmaString`) are implemented from scratch in `SigmaOOP.hpp`.
+* **No libc** — Memory primitives (`sigma_memcpy`, `sigma_memset`, `sigma_strlen`) use inline assembly (`rep movsb`, `rep stosb`).
+* **No external headers** — Every type definition lives in `sigma_kernel_types.h` (C11) or `SigmaOOP.hpp` (C++17).
+* **Full auditability** — Every function that executes in the kernel is one we wrote. Zero third-party attack surface.
+
+> [!TIP]
+> **In short**: SigmaOS can become the "all-in-one" OS by borrowing the best features of each Linux distro, improving what's missing, and layering them into a phased roadmap—while maintaining absolute zero-dependency digital sovereignty at the silicon level.
+
