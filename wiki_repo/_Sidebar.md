@@ -12,9 +12,13 @@
 
 ## ⚙️ Subsystem Docs
 - [Kernel Internals](SigmaOS-Kernel-Internals)
+- [Hardware Abstraction Layer (HAL)](Hardware-Abstraction-Layer)
 - [Process Management & Scheduling](Process-Management)
 - [Init System (sigma-init)](Init-System)
 - [Device Management](Device-Management)
+- [Virtual File System (VFS)](Virtual-File-System)
+- [Network Stack (TCP/IP)](Network-Stack)
+- [Zenith Window Manager (sigma-wm)](Zenith-Window-Manager)
 - [Shell Reference (sigma-sh)](Shell-Reference)
 - [Real-Time Scheduler (CFS)](Real-Time-Scheduler-Shard)
 - [Memory Allocator & Slab](Slab-Allocator)
