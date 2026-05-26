@@ -32,9 +32,9 @@
 - [App Store & Curated Repository](Home-Zenith-App)
 
 ## 🖥️ Desktop Environment
-- [**Zenith GUI Desktop**](Zenith-GUI)
-- [Theme Engine & Accessibility](Zenith-GUI#theme-engine)
-- [Dock & App Launcher](Zenith-GUI#desktop-shell-components)
+- [**Zenith GUI Desktop**](Zenith-Desktop-UX)
+- [Theme Engine & Accessibility](Zenith-Desktop-UX#theme-engine)
+- [Dock & App Launcher](Zenith-Desktop-UX#spatial-design-paradigm)
 
 ## 🔒 Security
 - [Security Architecture](Security-Architecture)
@@ -68,14 +68,14 @@
 - [Branch Guide & Architecture](Branch-Guide)
 
 ## 💾 Recovery & Forensics
-- [**Recovery, Forensics & Reliability**](Recovery-Forensics)
+- [**Recovery, Forensics & Reliability**](Recovery-And-Forensics)
 - [Resilience & Self-Healing](Resilience)
 - [Snapshotting, Rollback & ZFS](Sovereign_ZFS_Pool)
 - [Recovery ISO & Standalone Mode](Home-Zenith-Standalone)
 
 ## 🏢 Enterprise & Compliance
-- [**Enterprise Certification Roadmap**](Enterprise-Certification)
-- [Compliance Engine (`sigma_compliance_cli`)](Enterprise-Certification#built-in-compliance-engine)
+- [**Enterprise Certification Roadmap**](Enterprise-Compliance)
+- [Compliance Engine (`sigma_compliance_cli`)](Enterprise-Compliance#sigma_compliance_cli)
 
 ## 👥 Community & Docs
 - [**Community & Contributor Guide**](Community-Documentation)
