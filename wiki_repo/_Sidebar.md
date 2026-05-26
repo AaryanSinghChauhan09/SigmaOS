@@ -54,6 +54,7 @@
 - [System Daemons & Diagnostics](System-Daemons)
 
 ## 🏗️ Architecture
+- [**Installation Guide (Bare-Metal)**](SigmaOS-Installation-Guide)
 - [Architecture Overview](Architecture-Overview)
 - [Declarative Config Manager](Reproducibility-Guide)
 - [Container Orchestration](Container-Orchestration)
