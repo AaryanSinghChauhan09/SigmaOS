@@ -46,6 +46,9 @@ FFFF_8000 — 0xFFFF_FFFF_FFFF  ▪ Higher-Half Kernel Virtual (future)
 | VGA Display | `kernel/drivers/sigma_vga.cpp` | Direct 0xB8000 mapping, hardware cursor |
 | Touch Input | `kernel/drivers/sigma_touch_driver.cpp` | I2C HID parsing, SPSC ring buffer |
 | Real-Time Sched | `kernel/scheduler/sigma_rt_scheduler.cpp` | EDF algorithm, priority inheritance |
+| Adaptive Sched | `kernel/core/SovereignAdaptiveScheduler.cpp` | EWMA slice predictor, class-aware priorities |
+| Self-Healing | `kernel/core/SovereignSelfHealingKernel.cpp` | Subsystem watches, runtime live patching |
+| Config Rollback | `tools/cli/SovereignConfigRollbackCLI.cpp` | NixOS-style generation management |
 | Registry | `kernel/core/sigma_registry_manager.cpp` | Key-value persistence store |
 | Shell | `usr/sigma_sh.cpp` | BusyBox-inspired, PS/2 keyboard polling |
 | App Signer | `tools/sigma_app_signer.cpp` | Dilithium-5 PQC attestation |
