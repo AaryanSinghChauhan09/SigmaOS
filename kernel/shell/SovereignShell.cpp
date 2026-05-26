@@ -14,6 +14,7 @@
 #include "../../include/kernel/sigma_device_manager.h"
 #include "../../include/kernel/sigma_init_system.h"
 #include "../../include/kernel/sigma_ipc_manager.h"
+#include "../../include/system/SovereignDAL.h"
 
 /* Simple string comparison wrapper */
 static int shell_strcmp(const char* s1, const char* s2) {
@@ -49,6 +50,8 @@ public:
         registerCmd("ipc", "Show IPC status (queues/shm)", cmd_ipc, SIGMA_FALSE);
         registerCmd("clear", "Clear terminal output", cmd_clear, SIGMA_FALSE);
         registerCmd("echo", "Print text to standard output", cmd_echo, SIGMA_FALSE);
+        registerCmd("rollback", "Rollback to previous package generation", cmd_rollback, SIGMA_TRUE);
+        registerCmd("manifest-load", "Load declarative system config", cmd_manifest_load, SIGMA_TRUE);
         registerCmd("reboot", "Restart the system", cmd_reboot, SIGMA_TRUE);
 
         sigma_log("[SHELL] Sovereign Shell (sigma-sh) initialized.");
@@ -202,6 +205,28 @@ private:
         SIGMA_UNUSED(argc); SIGMA_UNUSED(argv);
         sigma_log("System is going down for reboot NOW!");
         /* In real kernel: trigger ACPI reset or triple fault */
+        return 0;
+    }
+
+    static int cmd_rollback(int argc, const char* argv[]) {
+        if (argc < 2) {
+            sigma_log("Usage: rollback <generation_id>");
+            return -1;
+        }
+        int gen = 0;
+        const char* p = argv[1];
+        while (*p >= '0' && *p <= '9') { gen = gen * 10 + (*p - '0'); p++; }
+        
+        sigma_bool success = SigmaOS::Kernel::System::SovereignDAL::getInstance().rollback((sigma_u32)gen);
+        return success ? 0 : -1;
+    }
+
+    static int cmd_manifest_load(int argc, const char* argv[]) {
+        if (argc < 2) {
+            sigma_log("Usage: manifest-load <json_path>");
+            return -1;
+        }
+        SigmaOS::Kernel::System::SovereignDAL::getInstance().loadManifest(argv[1]);
         return 0;
     }
 };

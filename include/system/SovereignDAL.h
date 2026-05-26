@@ -13,6 +13,7 @@
 
 #include "../sigma_kernel_types.h"
 #include "../SigmaOOP.hpp"
+#include "../security/sigma_pkg_registry.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -49,17 +50,31 @@ public:
 
     void initialize() {
         detectProvider();
+        SovereignPkg_InitRegistry();
     }
 
     sigma_bool installPackage(const char* name) {
         /* Route to appropriate backend based on detected provider */
-        (void)name;
+        SovereignPkg_Register(name, "latest", CURATION_UNVERIFIED);
         return SIGMA_TRUE;
     }
 
     sigma_bool removePackage(const char* name) {
         (void)name;
         return SIGMA_TRUE;
+    }
+
+    /* NixOS-style Declarative State Management */
+    void createSnapshot() {
+        SovereignPkg_SnapshotState();
+    }
+
+    sigma_bool rollback(sigma_u32 generationId) {
+        return (SovereignPkg_Rollback(generationId) == 0) ? SIGMA_TRUE : SIGMA_FALSE;
+    }
+
+    void loadManifest(const char* manifestJson) {
+        SovereignPkg_LoadManifest(manifestJson);
     }
 
     sigma_u32 searchPackages(const char* query, PackageInfo* results, sigma_u32 max_results) {

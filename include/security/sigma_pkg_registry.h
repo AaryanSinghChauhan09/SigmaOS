@@ -21,6 +21,12 @@ typedef struct {
 } SovereignPkgEntry_t;
 
 CurationLevel_t SovereignPkg_GetCuration(const char* name);
+void SovereignPkg_InitRegistry(void);
+int SovereignPkg_Register(const char* name, const char* version, CurationLevel_t curation);
+void SovereignPkg_Audit(void);
+void SovereignPkg_SnapshotState(void);
+int SovereignPkg_Rollback(sigma_u32 generation_id);
+void SovereignPkg_LoadManifest(const char* manifest_data);
 
 #ifdef __cplusplus
 }
