@@ -55,6 +55,7 @@
 
 ## 🏗️ Architecture
 - [**Installation Guide (Bare-Metal)**](SigmaOS-Installation-Guide)
+- [**Migration Guide (Windows/Ubuntu)**](Migration-Guide)
 - [Architecture Overview](Architecture-Overview)
 - [Declarative Config Manager](Reproducibility-Guide)
 - [Container Orchestration](Container-Orchestration)
