@@ -101,6 +101,8 @@
 
 - [**Developer Guide (Build, Test, Contribute)**](Developer-Guide)
 
+- [**Hardware Build & Deployment Tutorials**](Hardware-Build-Tutorial)
+
 - [**SigmaOS vs Linux Distros**](SigmaOS-vs-Linux)
 
 - [Contributor Guidelines](Contributor-Guidelines)
