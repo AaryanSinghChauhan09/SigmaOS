@@ -39,6 +39,6 @@ Copy-Item -Path "wiki_repo\*" -Destination "..\SigmaOS_wiki\" -Force -Recurse
 Set-Location ..\SigmaOS_wiki
 git add .
 git commit -m "docs: Phase 3 wiki updates - networking, GUI, PQC, OmniPkg, Tools" 2>$null
-git push origin main --force 2>$null
+git push origin master --force 2>$null
 Set-Location ..\SigmaOS
 
