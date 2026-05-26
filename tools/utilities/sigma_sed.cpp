@@ -19,7 +19,7 @@ static u32 sed_strlen(const char* s) { u32 n=0; while(s[n]) n++; return n; }
 static bool sed_streq(const char* a, const char* b) {
     while (*a && *b && *a==*b) { a++; b++; } return *a==*b;
 }
-static void sed_strcpy(char* d, const char* s) { while ((*d++=*s++)); }
+static void sed_strcpy(char* d, const char* s, u32 max) { u32 i=0; while(i < max-1 && s[i]) { d[i]=s[i]; i++; } d[i]='\0'; }
 static void sed_puts(const char* s) { sigma_vga_puts(s); sigma_vga_putchar('\n'); }
 
 /* ─────────────── Sovereign Regex: Simple Pattern Matcher ─────────────── */
@@ -242,7 +242,7 @@ static void process_line(const char* line, bool* should_quit) {
                 bool changed = sed_substitute(current, c->pattern, c->replace,
                                               c->global, out_line, SED_OUT_BUF);
                 if (changed) {
-                    sed_strcpy(current, out_line);
+                    sed_strcpy(current, out_line, SED_LINE_BUF);
                     if (c->print_match) sed_puts(current);
                 }
                 break;

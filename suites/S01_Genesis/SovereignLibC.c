@@ -102,16 +102,17 @@ void sigma_strcpy(char* dest, const char* src, sigma_size_t n) {
     sigma_hardened_strcpy(dest, src, n);
 }
 
-// --- sigma_strcat ---
-void sigma_strcat(char* dest, const char* src) {
-    char* rd = dest;
-    while (*rd) rd++;
-    while (*src) {
-        *rd = *src;
-        rd++;
-        src++;
+// --- sigma_strcat (CWE-120 hardened) ---
+void sigma_strcat(char* dest, const char* src, sigma_size_t dest_size) {
+    if (!dest || !src || dest_size == 0) return;
+    sigma_size_t dlen = 0;
+    while (dest[dlen] && dlen < dest_size) dlen++;
+    if (dlen >= dest_size) return;
+    sigma_size_t i = 0;
+    for (i = 0; dlen + i < dest_size - 1 && src[i] != '\0'; i++) {
+        dest[dlen + i] = src[i];
     }
-    *rd = '\0';
+    dest[dlen + i] = '\0';
 }
 
 // --- xv6 Parity Syscalls ---

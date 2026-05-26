@@ -11,9 +11,9 @@ extern "C" {
 
 // String Operations
 sigma_size_t sigma_strlen(const char* str);
-void sigma_strcpy(char* dest, const char* src);
+void sigma_strcpy(char* dest, const char* src, sigma_size_t max_len);
 int sigma_strcmp(const char* s1, const char* s2);
-void sigma_strcat(char* dest, const char* src);
+void sigma_strcat(char* dest, const char* src, sigma_size_t dest_size);
 
 // Memory Operations
 void* sigma_memset(void* s, int c, sigma_size_t n);

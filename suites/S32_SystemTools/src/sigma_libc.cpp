@@ -8,9 +8,13 @@ sigma_size_t sigma_strlen(const char* str) {
     return len;
 }
 
-void sigma_strcpy(char* dest, const char* src) {
+void sigma_strcpy(char* dest, const char* src, sigma_size_t max_len) {
+    if (!dest || !src || max_len == 0) return;
     sigma_size_t i = 0;
-    while ((dest[i] = src[i])) i++;
+    for (i = 0; i < max_len - 1 && src[i] != '\0'; i++) {
+        dest[i] = src[i];
+    }
+    dest[i] = '\0';
 }
 
 int sigma_strcmp(const char* s1, const char* s2) {
@@ -21,10 +25,15 @@ int sigma_strcmp(const char* s1, const char* s2) {
     return *(unsigned char*)s1 - *(unsigned char*)s2;
 }
 
-void sigma_strcat(char* dest, const char* src) {
+void sigma_strcat(char* dest, const char* src, sigma_size_t dest_size) {
+    if (!dest || !src || dest_size == 0) return;
     sigma_size_t dlen = sigma_strlen(dest);
+    if (dlen >= dest_size) return; /* Already full */
     sigma_size_t i = 0;
-    while ((dest[dlen + i] = src[i])) i++;
+    for (i = 0; dlen + i < dest_size - 1 && src[i] != '\0'; i++) {
+        dest[dlen + i] = src[i];
+    }
+    dest[dlen + i] = '\0';
 }
 
 void* sigma_memset(void* s, int c, sigma_size_t n) {
