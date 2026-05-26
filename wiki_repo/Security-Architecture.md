@@ -25,3 +25,9 @@ Absorbing the design principles of SELinux and AppArmor, `sigma_mac` assigns exp
 
 ## 3. Privilege Escalation
 We provide `sigma_sudo` and `sigma_su` to elevate a process's security context gracefully, mediated directly through the MAC checking system rather than the vulnerable `setuid` binary bits.
+
+## 4. Intrusion Detection System (`SovereignIDS`)
+- Real-time network and syscall packet inspector mimicking Snort and Suricata capabilities.
+- Live rule definition mapping target ports, protocol headers, and source subnet mask patterns.
+- Automated Ring-0 packet filtering with immediate drop actions on BLOCK signals, and audit event logs for alerts.
+

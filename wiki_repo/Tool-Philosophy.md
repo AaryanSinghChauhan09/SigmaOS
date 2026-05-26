@@ -91,6 +91,9 @@ This philosophy is absorbed from:
 | `cgroup`    | `sigma_cgroup.cpp`     | Silicon resource weight governor |
 | `systemctl` | `sigma_systemctl.cpp`  | Background service manager |
 | `env`       | `sigma_env.cpp`        | Environment variable inspector/setter |
+| `rollback`  | `tools/cli/SovereignConfigRollbackCLI.cpp` | Atomic NixOS-style configuration rollback controller |
+| `schedbench`| `tools/profiler/SovereignSchedulerBench.cpp` | CFS / EDF scheduler fairness and latency testbed |
+| `ecohealth` | `tools/SovereignEcosystemHealth.cpp` | Centralized CI, security, and repository telemetry dashboard |
 
 ---
 

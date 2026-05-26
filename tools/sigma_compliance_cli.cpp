@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * Î£ SIGMAOS: SIGMA COMPLIANCE DASHBOARD (sigma_compliance_cli) v1.0
  * =========================================================================
@@ -82,18 +82,25 @@ private:
     }
 
     void run_default_checks() {
+        // Resolve status dynamically from other sovereign modules
+        extern "C" sigma_u32 kic_scan();
+        extern "C" sigma_u8 eco_health_overall();
+        
+        sigma_u32 violations = kic_scan();
+        sigma_u8 health = eco_health_overall();
+
         /* ISO 27001 */
         add_check("Encryption at rest (AES-256/PQC)", ComplianceFramework::ISO27001, 1);
         add_check("Access control policy enforced", ComplianceFramework::ISO27001, 1);
-        add_check("Audit log integrity verified",   ComplianceFramework::ISO27001, 1);
-        add_check("Vulnerability scan last 30d",    ComplianceFramework::ISO27001, 1);
+        add_check("Audit log integrity verified",   ComplianceFramework::ISO27001, (violations == 0) ? 1 : 0);
+        add_check("Vulnerability scan last 30d",    ComplianceFramework::ISO27001, (health == 0) ? 1 : 0);
         /* GDPR */
         add_check("Data minimization policy",       ComplianceFramework::GDPR, 1);
         add_check("Right to erasure mechanism",     ComplianceFramework::GDPR, 1);
         add_check("DPA contact registered",         ComplianceFramework::GDPR, 1);
         /* HIPAA */
         add_check("PHI encrypted in transit",       ComplianceFramework::HIPAA, 1);
-        add_check("Audit trails for PHI access",    ComplianceFramework::HIPAA, 1);
+        add_check("Audit trails for PHI access",    ComplianceFramework::HIPAA, (violations == 0) ? 1 : 0);
         /* SOC2 */
         add_check("Availability SLA 99.99%",        ComplianceFramework::SOC2, 1);
         add_check("Change management documented",   ComplianceFramework::SOC2, 1);
