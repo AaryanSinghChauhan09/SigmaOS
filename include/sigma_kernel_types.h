@@ -36,6 +36,7 @@ typedef sigma_i32          sigma_s32;
 typedef sigma_i64          sigma_s64;
 typedef sigma_u64          sigma_paddr_t;   /* physical address */
 typedef sigma_u64          sigma_vaddr_t;   /* virtual  address */
+typedef sigma_u64          sigma_addr_t;    /* generic  address */
 typedef int                sigma_bool;
 
 #define SIGMA_TRUE   1

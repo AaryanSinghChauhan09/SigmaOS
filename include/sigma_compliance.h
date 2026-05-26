@@ -10,8 +10,6 @@
 #ifndef SIGMA_COMPLIANCE_H
 #define SIGMA_COMPLIANCE_H
 
-#include "./sigma_kernel_types.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
