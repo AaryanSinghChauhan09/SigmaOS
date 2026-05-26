@@ -61,6 +61,17 @@ qemu: iso
 	qemu-system-x86_64 -cdrom $(ISO_IMAGE) -serial stdio -m 2G
 
 # =========================================================================
+# RPi-Distro-inspired: ARM64 Embedded Scaling Target
+# Usage: make arm64-rpi
+# =========================================================================
+arm64-rpi:
+	@echo "[ARM64] Switching toolchain to aarch64-linux-gnu..."
+	$(MAKE) CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ LD=aarch64-linux-gnu-ld \
+	        CFLAGS="-Iinclude -ffreestanding -mcpu=cortex-a72 -Wall -Wextra -O2 -fno-pie" \
+	        KERNEL_BIN=$(BUILD_DIR)/sigmaos_arm64.bin iso
+	@echo "[ARM64] Successfully built SigmaOS for Raspberry Pi (embedded profile)."
+
+# =========================================================================
 # Clear-Linux-inspired: Profile-Guided Optimization (PGO) skeleton
 # Usage: make pgo-generate  ->  run workload  ->  make pgo-use
 # =========================================================================

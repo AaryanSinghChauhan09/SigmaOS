@@ -8,7 +8,7 @@ Pulling inspiration from Linux distros is a smart way to strengthen SigmaOS. Eac
 
 ## ⚡ Performance & Optimization
 * **Clear Linux**: Aggressive compiler optimizations and tuned libraries. SigmaOS adopts profile‑guided optimization (PGO) and Link-Time Optimization (LTO) in its unified build system.
-* **Slackware**: Minimalism. A “lean mode” for SigmaOS reduces overhead for embedded or resource‑constrained devices.
+* **Slackware / Solus**: Minimalism. SigmaOS includes a “minimal mode” (toggled in `DeclarativeEngine`) that disables the GUI and advanced telemetry, reducing overhead for embedded or resource‑constrained devices.
 
 ## 🏗️ Architecture & Modularity
 * **NixOS**: Declarative configuration and reproducible builds. SigmaOS designed a package/config system (`DeclarativeEngine`, `GenerationManager`) that guarantees rollback and cryptographic reproducibility.
@@ -22,6 +22,8 @@ Pulling inspiration from Linux distros is a smart way to strengthen SigmaOS. Eac
 ## 📦 Ecosystem & Community
 * **SlackBuilds / EndeavourOS**: Easy contribution pathways. SigmaOS provides templates for third‑party drivers and apps via Sovereign Package Manager.
 * **SteamOS**: Gaming focus. SigmaOS experiments with GPU scheduling and optimized graphics stacks (`SovereignVulkan`).
+* **SteamOS / Solus**: Curated app ecosystem. `SovereignPkgRegistry` implements strict Curation Levels (`OFFICIAL`, `COMMUNITY`, `UNVERIFIED`) to maintain a trusted software repository.
+* **RPi-Distro**: Embedded hardware scaling. SigmaOS provides an `arm64-rpi` target and `SovereignHAL_ARM64` to run the OS directly on Raspberry Pi boards.
 
 ## 💡 Roadmap suggestion
 

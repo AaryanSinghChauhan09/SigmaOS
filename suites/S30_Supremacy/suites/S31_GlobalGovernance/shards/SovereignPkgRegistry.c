@@ -12,9 +12,16 @@
 
 #define SIGMA_MAX_PACKAGES 256
 
+typedef enum {
+    CURATION_UNVERIFIED = 0,
+    CURATION_COMMUNITY = 1,
+    CURATION_OFFICIAL = 2
+} CurationLevel_t;
+
 typedef struct {
     char name[64];
     char version[16];
+    CurationLevel_t curation;
     sigma_bool seated;
 } SovereignPkgEntry_t;
 
@@ -26,10 +33,11 @@ void SovereignPkg_InitRegistry(void) {
     sigma_sigma_printf("S [REGISTRY]: Sovereign Package Registry initialized.\n");
 }
 
-sigma_err_t SovereignPkg_Register(const char* name, const char* version) {
+sigma_err_t SovereignPkg_Register(const char* name, const char* version, CurationLevel_t curation) {
     if (g_pkg_count >= SIGMA_MAX_PACKAGES) return SIGMA_ERR;
     sigma_sigma_strcpy(g_pkg_registry[g_pkg_count].name, name, 64);
     sigma_sigma_strcpy(g_pkg_registry[g_pkg_count].version, version, 16);
+    g_pkg_registry[g_pkg_count].curation = curation;
     g_pkg_registry[g_pkg_count].seated = SIGMA_TRUE;
     g_pkg_count++;
     return SIGMA_OK;
@@ -38,7 +46,14 @@ sigma_err_t SovereignPkg_Register(const char* name, const char* version) {
 void SovereignPkg_Audit(void) {
     sigma_sigma_printf("S [PKG-AUDIT]: Verifying %d seated application shards...\n", g_pkg_count);
     for (sigma_u32 i = 0; i < g_pkg_count; i++) {
-        sigma_sigma_printf("  ? [OK]: %s (v%s)  integrity verified.\n", g_pkg_registry[i].name, g_pkg_registry[i].version);
+        const char* curation_str = "UNVERIFIED";
+        if (g_pkg_registry[i].curation == CURATION_OFFICIAL) curation_str = "OFFICIAL";
+        else if (g_pkg_registry[i].curation == CURATION_COMMUNITY) curation_str = "COMMUNITY";
+        
+        sigma_sigma_printf("  ? [OK]: %s (v%s) [%s] integrity verified.\n", 
+            g_pkg_registry[i].name, 
+            g_pkg_registry[i].version,
+            curation_str);
     }
 }
 
