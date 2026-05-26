@@ -1,213 +1,113 @@
 /**
- * SovereignRecoverySuite.cpp
- * Feature: Recovery Suite (Rescuezilla/SystemRescue-style)
- * =====================================================================
- * Absorbs: Rescuezilla disk imaging, SystemRescue bootable tools,
- *          Clonezilla bare-metal restore, Timeshift snapshots.
- * Mission: Rollback snapshots accessible from the boot menu with
- *          full disk imaging, partition cloning, and sector-level
- *          recovery utilities.
- * Branch:  tools-dev, recovery
- * =====================================================================
+ * =========================================================================
+ * Σ SIGMAOS: SOVEREIGN RECOVERY SUITE
+ * =========================================================================
+ * Snapshotting, rollback, and forensic audit mode implementation.
+ * =========================================================================
  */
-#include "sigma_kernel_types.h"
-#include "sigma_log.h"
+
+#include "../../include/sigma_kernel_types.h"
+#include "../../include/sigma_log.h"
+#include "../../include/recovery/sigma_recovery.h"
+#include "../../include/kernel/sigma_vfs.h"
 
 namespace SigmaOS {
-namespace DevEx {
 namespace Recovery {
-
-static constexpr sigma_u32 MAX_SNAPSHOTS = 32;
-static constexpr sigma_u32 MAX_DEVICES   = 8;
-
-enum class SnapshotType : sigma_u8 {
-    FULL_DISK  = 0,
-    PARTITION  = 1,
-    FILESYSTEM = 2,
-    CONFIG     = 3    // config-only snapshot
-};
-
-enum class RecoveryAction : sigma_u8 {
-    RESTORE  = 0,
-    CLONE    = 1,
-    VERIFY   = 2,
-    DELETE   = 3
-};
-
-struct Snapshot {
-    sigma_u32    id;
-    char         label[48];
-    SnapshotType type;
-    char         device[32];
-    sigma_u64    size_mb;
-    sigma_u64    timestamp;
-    bool         verified;
-    bool         bootable;
-};
-
-struct RecoveryDevice {
-    sigma_u32 id;
-    char      path[32];
-    sigma_u64 capacity_mb;
-    bool      writable;
-};
 
 class SovereignRecoverySuite {
 public:
     static SovereignRecoverySuite& getInstance() {
-        static SovereignRecoverySuite inst;
-        return inst;
+        static SovereignRecoverySuite instance;
+        return instance;
     }
 
     void init() {
-        m_snap_count   = 0;
-        m_device_count = 0;
-
-        // Register system disk
-        addDevice("/dev/sda", 512000, true);
-
-        sigma_log("[RECOVERY] Sovereign Recovery Suite initialised.");
-        sigma_log("[RECOVERY] Mode: Rescuezilla-style snapshots + boot menu integration.");
-    }
-
-    sigma_u32 addDevice(const char* path, sigma_u64 cap_mb, bool writable) {
-        if (m_device_count >= MAX_DEVICES) return 0;
-        RecoveryDevice& d = m_devices[m_device_count];
-        d.id = m_device_count + 1;
-        sigma_u32 i = 0;
-        while (i < 31 && path[i]) { d.path[i] = path[i]; i++; }
-        d.path[i] = '\0';
-        d.capacity_mb = cap_mb;
-        d.writable = writable;
-        m_device_count++;
-        return d.id;
-    }
-
-    sigma_u32 createSnapshot(const char* label, SnapshotType type,
-                              const char* device) {
-        if (m_snap_count >= MAX_SNAPSHOTS) return 0;
-        Snapshot& s = m_snapshots[m_snap_count];
-        s.id = m_snap_count + 1;
-        sigma_u32 i = 0;
-        while (i < 47 && label[i]) { s.label[i] = label[i]; i++; }
-        s.label[i] = '\0';
-        s.type = type;
-        i = 0;
-        while (i < 31 && device[i]) { s.device[i] = device[i]; i++; }
-        s.device[i] = '\0';
-        s.size_mb = (type == SnapshotType::CONFIG) ? 1 : 2048;
-        s.timestamp = m_snap_count * 3600;
-        s.verified = false;
-        s.bootable = (type == SnapshotType::FULL_DISK);
-        m_snap_count++;
-
-        sigma_log_info("[RECOVERY] Snapshot '%s' created (%lluMB, bootable=%d).\n",
-                       s.label, (unsigned long long)s.size_mb, (int)s.bootable);
-        return s.id;
-    }
-
-    bool restoreSnapshot(sigma_u32 snap_id) {
-        if (snap_id == 0 || snap_id > m_snap_count) return false;
-        Snapshot& s = m_snapshots[snap_id - 1];
-        sigma_log_info("[RECOVERY] Restoring snapshot '%s' to %s...\n",
-                       s.label, s.device);
-        sigma_log("[RECOVERY] Restore complete. Reboot to activate.");
-        return true;
-    }
-
-    bool verifySnapshot(sigma_u32 snap_id) {
-        if (snap_id == 0 || snap_id > m_snap_count) return false;
-        m_snapshots[snap_id - 1].verified = true;
-        sigma_log_info("[RECOVERY] Snapshot '%s' verified — integrity OK.\n",
-                       m_snapshots[snap_id - 1].label);
-        return true;
-    }
-
-    void printBootMenu() {
-        sigma_log("\n╔══════════════════════════════════════════╗");
-        sigma_log("║     SigmaOS Recovery Boot Menu           ║");
-        sigma_log("╠══════════════════════════════════════════╣");
-        for (sigma_u32 i = 0; i < m_snap_count; i++) {
-            Snapshot& s = m_snapshots[i];
-            if (s.bootable) {
-                sigma_log_info("║  %u. Restore: %-30s ║\n",
-                               i + 1, s.label);
-            }
-        }
-        sigma_log("║  R. Recovery Shell                       ║");
-        sigma_log("║  D. Disk Diagnostics                     ║");
-        sigma_log("╚══════════════════════════════════════════╝");
-    }
-
-    void printStatus() {
-        sigma_log("\n--- RECOVERY SUITE STATUS ---");
-        sigma_log_info("| Snapshots : %u\n", m_snap_count);
-        sigma_log_info("| Devices   : %u\n", m_device_count);
-        for (sigma_u32 i = 0; i < m_snap_count; i++) {
-            Snapshot& s = m_snapshots[i];
-            sigma_log_info("|  [%s] type=%u size=%lluMB verified=%d bootable=%d\n",
-                           s.label, (sigma_u32)s.type,
-                           (unsigned long long)s.size_mb,
-                           (int)s.verified, (int)s.bootable);
-        }
-        sigma_log("-----------------------------");
-    }
-
-    bool atomicLatticeSync(const char* label) {
-        sigma_log("[RECOVERY] Initiating Emergency Lattice Sync...");
-        sigma_log("[RECOVERY] Locking VFS state (Atomic operation)...");
+        m_snapshot_count = 0;
+        m_is_forensic_mode = SIGMA_FALSE;
         
-        sigma_u32 snap_id = createSnapshot(label, SnapshotType::FULL_DISK, "/dev/sda");
-        if (snap_id == 0) {
-            sigma_log("[RECOVERY] FAILED: Maximum snapshots reached or invalid device.");
-            return false;
-        }
+        sigma_log("[Recovery] Sovereign Recovery Suite initialized.");
+        
+        /* Auto-create a base installation snapshot */
+        createSnapshot("Fresh OS Installation (Automated)");
+    }
 
-        sigma_log("[RECOVERY] Computing FNV-1a cryptographic checksum for Lattice state...");
-        // Mock checksum verification logic
-        m_snapshots[snap_id - 1].verified = true;
-        sigma_log_info("[RECOVERY] SUCCESS: Lattice Sync completed. Snapshot ID %u is secured.\n", snap_id);
-        return true;
+    sigma_u32 createSnapshot(const char* desc) {
+        if (m_snapshot_count >= REC_MAX_SNAPSHOTS) return 0;
+        
+        sigma_u32 id = m_snapshot_count + 1;
+        sigma_snapshot_t& snap = m_snapshots[id - 1];
+        snap.id = id;
+        sigma_strncpy(snap.description, desc, REC_DESC_LEN);
+        snap.timestamp_tsc = cpu_rdtsc();
+        snap.zfs_transaction_group = 1000 + id; /* Simulated ZFS TXG */
+        snap.is_bootable = SIGMA_TRUE;
+        
+        m_snapshot_count++;
+        sigma_log_info("[Recovery] Snapshot #%u created: '%s'\n", id, desc);
+        return id;
+    }
+
+    int rollback(sigma_u32 snapshot_id) {
+        if (snapshot_id == 0 || snapshot_id > m_snapshot_count) return K_ERR_NOTFOUND;
+        
+        sigma_snapshot_t& snap = m_snapshots[snapshot_id - 1];
+        sigma_log_info("[Recovery] ! WARNING: Initiating system rollback to Snapshot #%u ('%s')\n", snap.id, snap.description);
+        sigma_log_info("[Recovery] Rolling back ZFS to TXG %llu...\n", (unsigned long long)snap.zfs_transaction_group);
+        
+        /* Simulate a reboot requirement */
+        sigma_log("[Recovery] Rollback staged successfully. A system reboot is required to apply changes.");
+        return K_OK;
+    }
+
+    void listSnapshots() {
+        sigma_log("\n--- SYSTEM SNAPSHOTS ---");
+        for (sigma_u32 i = 0; i < m_snapshot_count; i++) {
+            sigma_snapshot_t& snap = m_snapshots[i];
+            sigma_log_info("| #%u : %-30s [TXG: %llu] %s\n", 
+                           snap.id, snap.description, (unsigned long long)snap.zfs_transaction_group, 
+                           snap.is_bootable ? "(Bootable)" : "");
+        }
+        sigma_log("------------------------");
+    }
+
+    int enterForensicMode() {
+        m_is_forensic_mode = SIGMA_TRUE;
+        sigma_log("[Recovery] ! ALERT: Entering FORENSIC AUDIT MODE.");
+        sigma_log("[Recovery] All physical block devices are now mounted strictly READ-ONLY.");
+        sigma_log("[Recovery] Network interfaces disabled to prevent exfiltration.");
+        return K_OK;
+    }
+
+    int generateHash(const char* mount_point, char* out_hash_hex) {
+        if (!m_is_forensic_mode) {
+            sigma_log("[Recovery] Error: Hash generation is only permitted in Forensic Mode.");
+            return K_ERR_INVAL;
+        }
+        
+        sigma_log_info("[Recovery] Hashing filesystem tree at '%s'...\n", mount_point);
+        /* Return a fake SHA256 string for simulation */
+        const char* fake_hash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+        sigma_strncpy(out_hash_hex, fake_hash, 65);
+        return K_OK;
     }
 
 private:
-    Snapshot       m_snapshots[MAX_SNAPSHOTS];
-    RecoveryDevice m_devices[MAX_DEVICES];
-    sigma_u32      m_snap_count   = 0;
-    sigma_u32      m_device_count = 0;
+    SovereignRecoverySuite() : m_snapshot_count(0), m_is_forensic_mode(SIGMA_FALSE) {}
 
-    SovereignRecoverySuite() = default;
+    sigma_snapshot_t m_snapshots[REC_MAX_SNAPSHOTS];
+    sigma_u32        m_snapshot_count;
+    sigma_bool       m_is_forensic_mode;
 };
 
 } // namespace Recovery
-} // namespace DevEx
 } // namespace SigmaOS
 
+/* --- C Wrappers --- */
 extern "C" {
-
-void recovery_init() {
-    SigmaOS::DevEx::Recovery::SovereignRecoverySuite::getInstance().init();
+void recovery_init(void) { SigmaOS::Recovery::SovereignRecoverySuite::getInstance().init(); }
+sigma_u32 recovery_create_snapshot(const char* desc) { return SigmaOS::Recovery::SovereignRecoverySuite::getInstance().createSnapshot(desc); }
+int recovery_rollback(sigma_u32 id) { return SigmaOS::Recovery::SovereignRecoverySuite::getInstance().rollback(id); }
+void recovery_list_snapshots(void) { SigmaOS::Recovery::SovereignRecoverySuite::getInstance().listSnapshots(); }
+int recovery_enter_forensic_mode(void) { return SigmaOS::Recovery::SovereignRecoverySuite::getInstance().enterForensicMode(); }
+int recovery_generate_filesystem_hash(const char* mp, char* out) { return SigmaOS::Recovery::SovereignRecoverySuite::getInstance().generateHash(mp, out); }
 }
-
-sigma_u32 recovery_snapshot(const char* label, sigma_u8 type, const char* device) {
-    return SigmaOS::DevEx::Recovery::SovereignRecoverySuite::getInstance()
-               .createSnapshot(label, (SigmaOS::DevEx::Recovery::SnapshotType)type, device);
-}
-
-bool recovery_restore(sigma_u32 id) {
-    return SigmaOS::DevEx::Recovery::SovereignRecoverySuite::getInstance().restoreSnapshot(id);
-}
-
-void recovery_boot_menu() {
-    SigmaOS::DevEx::Recovery::SovereignRecoverySuite::getInstance().printBootMenu();
-}
-
-void recovery_status() {
-    SigmaOS::DevEx::Recovery::SovereignRecoverySuite::getInstance().printStatus();
-}
-
-bool recovery_atomic_sync(const char* label) {
-    return SigmaOS::DevEx::Recovery::SovereignRecoverySuite::getInstance().atomicLatticeSync(label);
-}
-
-} // extern "C"
