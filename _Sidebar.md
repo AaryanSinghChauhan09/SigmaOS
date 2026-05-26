@@ -3,6 +3,7 @@
 ## 🗺️ Overview
 - [Home (Hub)](Home)
 - [Strategic Vision & Competitive Edge](Strategic-Vision)
+- [SigmaOS Ecosystem Strategy](SigmaOS-Ecosystem-Strategy)
 - [Distro-Inspired Roadmap](Distro-Inspired-Roadmap)
 - [**100 Competitor-Inspired Features**](Roadmap-Features-Registry)
 - [Strategic Ultimate Advancement](ULTIMATE-ADVANCEMENT-STRATEGY)
