@@ -34,6 +34,7 @@
 ## 🖥️ Desktop Environment
 - [**Zenith GUI Desktop**](Zenith-Desktop-UX)
 - [Theme Engine & Accessibility](Zenith-Desktop-UX#theme-engine)
+- [Customization & Automation Engine](Customization-Automation-Engine)
 - [Dock & App Launcher](Zenith-Desktop-UX#spatial-design-paradigm)
 
 ## 🔒 Security
