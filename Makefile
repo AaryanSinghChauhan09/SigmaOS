@@ -8,7 +8,7 @@ LD = x86_64-linux-gnu-ld
 ASM = nasm
 
 # Clear-Linux-inspired: LTO enabled by default for cross-file inlining and dead-code elimination
-CFLAGS = -Iinclude -ffreestanding -mno-red-zone -Wall -Wextra -O2 -fno-pie -flto
+CFLAGS = -Iinclude -Ilib/musl/include -Ilib/mesa/include -Ilib/linux-drivers/include -Ilib/wayland/src -ffreestanding -mno-red-zone -Wall -Wextra -O2 -fno-pie -flto
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -std=c++17
 ASMFLAGS = -f elf64
 
