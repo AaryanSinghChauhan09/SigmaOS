@@ -24,6 +24,12 @@ void print_banner() {
     printf("            __/ |                  \n");
     printf("           |___/  Migration Assistant v1.0\n");
     printf("\n");
+    printf("=================================================================================\n");
+    printf("  WARNING: SigmaOS does not use a POSIX ABI or a traditional package manager.\n");
+    printf("  Migrated graphical apps (Browsers, IDEs) will run in restricted text-mode\n");
+    printf("  or require the upcoming POSIX Compatibility Shim. Expect limited functionality!\n");
+    printf("=================================================================================\n");
+    printf("\n");
 }
 
 int main(int argc, char** argv) {

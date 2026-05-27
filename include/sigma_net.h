@@ -1,9 +1,10 @@
 /*
  * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN LATTICE NETWORKING (S-NET)
+ * Σ SIGMAOS: SOVEREIGN NETWORKING STACK (S-NET)
  * =========================================================================
- * Mission: Zero-latency, industrial-grade network stack.
- * Principle: PQC-signed packets, DoS-resilient routing.
+ * Mission: A ground-up TCP/IP networking stack designed for security and speed.
+ * Competitor parity: Linux net/ipv4, BSD sockets.
+ * ZERO-DEPENDENCY: Direct ring-buffer manipulation, no POSIX sockets.
  * =========================================================================
  */
 
@@ -16,18 +17,38 @@
 extern "C" {
 #endif
 
+#define SIGMA_MAC_ADDR_LEN 6
+#define SIGMA_IPV4_ADDR_LEN 4
+
+/* --- Network Interface Structure --- */
 typedef struct {
-    sigma_u8  ip[4];
-    sigma_u16 port;
-} sigma_endpoint_t;
+    sigma_u8 mac_address[SIGMA_MAC_ADDR_LEN];
+    sigma_u8 ipv4_address[SIGMA_IPV4_ADDR_LEN];
+    sigma_u8 subnet_mask[SIGMA_IPV4_ADDR_LEN];
+    sigma_u8 gateway[SIGMA_IPV4_ADDR_LEN];
+    bool is_up;
+    char name[16];
+} sigma_net_interface_t;
+
+/* --- Socket Stub --- */
+typedef struct {
+    sigma_u32 socket_id;
+    sigma_u16 local_port;
+    sigma_u16 remote_port;
+    sigma_u8 remote_ip[SIGMA_IPV4_ADDR_LEN];
+    sigma_u8 protocol; /* TCP / UDP */
+    sigma_u32 state;
+} sigma_net_socket_t;
 
 /* --- Networking Primitives --- */
-void      net_init(void);
-int       net_socket(void);
-int       net_bind(int sock, sigma_endpoint_t* ep);
-int       net_send(int sock, const void* data, sigma_usize size);
-int       net_recv(int sock, void* buf, sigma_usize size);
-void      net_close(int sock);
+void sigma_net_init();
+bool sigma_net_register_interface(sigma_net_interface_t* iface);
+sigma_net_socket_t* sigma_net_socket_create(sigma_u8 protocol);
+bool sigma_net_bind(sigma_net_socket_t* sock, sigma_u16 port);
+bool sigma_net_connect(sigma_net_socket_t* sock, const sigma_u8* ip, sigma_u16 port);
+sigma_u32 sigma_net_send(sigma_net_socket_t* sock, const void* data, sigma_u32 len);
+sigma_u32 sigma_net_recv(sigma_net_socket_t* sock, void* buffer, sigma_u32 max_len);
+void sigma_net_close(sigma_net_socket_t* sock);
 
 #ifdef __cplusplus
 }

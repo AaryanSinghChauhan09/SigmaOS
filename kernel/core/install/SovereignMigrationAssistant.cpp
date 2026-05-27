@@ -102,12 +102,14 @@ private:
     bool migrateBrowsers(ForeignOSType os_type) {
         sigma_log("[MIGRATION]: [Extraction Layer] Extracting Firefox/Chrome Profiles...\n");
         sigma_log("[MIGRATION]: [Translation Layer] Mapping foreign paths to ~/.config/...\n");
+        sigma_log_err("[MIGRATION]: WARNING: Browsers require a GUI/Wayland stack. They will not launch without Zenith DE!\n");
         sigma_log("[MIGRATION]: [Integration Layer] Generating SovereignSandbox policy for imported browser configs.\n");
         return true;
     }
 
     bool migrateIDEs(ForeignOSType os_type) {
         sigma_log("[MIGRATION]: [Extraction Layer] Extracting VS Code / JetBrains Settings...\n");
+        sigma_log_err("[MIGRATION]: WARNING: IDEs require a POSIX ABI. They will be sandboxed but may fail to execute natively.\n");
         sigma_log("[MIGRATION]: [Integration Layer] Wrapping IDE plugins in isolated execution containers.\n");
         return true;
     }

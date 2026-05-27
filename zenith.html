@@ -71,12 +71,34 @@
                     <div class="fm-toolbar auto-style-1">
                         <div>
                             <button class="fm-btn" onclick="fmBack()">Back</button>
+                            <button class="fm-btn" onclick="fileManager && fileManager.mountHostDrive()" style="color: var(--accent-gold); border-color: var(--accent-gold);">💾 Mount Host Drive</button>
                             <span class="fm-breadcrumbs" id="fm-breadcrumbs">/home/sovereign</span>
                         </div>
-                        <button class="cyber-btn small-btn auto-style-2" onclick="runRepomixPackager()">📦 Repomix Prompt Packager</button>
+                        <div>
+                            <button class="cyber-btn small-btn auto-style-2" onclick="fileManager && fileManager.createFile()">+ New File</button>
+                            <button class="cyber-btn small-btn auto-style-2" onclick="runRepomixPackager()">📦 Repomix Prompt Packager</button>
+                        </div>
                     </div>
                     <div class="fm-grid" id="fm-grid"></div>
                 </div>
+            </div>
+        </div>
+
+        <!-- App: Text Editor -->
+        <div class="window" id="text-editor-win" style="display:none; width: 600px; height: 400px; top: 15%; left: 25%;">
+            <div class="window-header">
+                <div class="window-title">📝 <span id="editor-filename">Untitled.txt</span></div>
+                <div class="window-controls">
+                    <div class="control-dot min" onclick="closeWindow('text-editor-win')"></div>
+                    <div class="control-dot max"></div>
+                    <div class="control-dot close" onclick="closeWindow('text-editor-win')"></div>
+                </div>
+            </div>
+            <div class="window-body" style="display: flex; flex-direction: column; height: calc(100% - 32px);">
+                <div style="padding: 8px; border-bottom: 1px solid var(--border-glass);">
+                    <button class="cyber-btn small-btn" onclick="fileManager && fileManager.saveCurrentFile()">Save File</button>
+                </div>
+                <textarea id="editor-textarea" style="flex: 1; background: rgba(0,0,0,0.5); color: #fff; border: none; padding: 10px; font-family: 'JetBrains Mono', monospace; font-size: 14px; outline: none; resize: none;"></textarea>
             </div>
         </div>
 
