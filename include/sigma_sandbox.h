@@ -1,7 +1,7 @@
 #ifndef SIGMA_SANDBOX_H
 #define SIGMA_SANDBOX_H
 
-#include <stdint.h>
+#include "sigma_types.h"
 
 // ---------------------------------------------------------
 // SigmaOS Sandbox Capabilities

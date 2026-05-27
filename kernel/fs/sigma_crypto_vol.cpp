@@ -1,4 +1,4 @@
-#include "sigma_vfs_crypto.h"
+#include "../../include/sigma_vfs_crypto.h"
 
 // ---------------------------------------------------------
 // SigmaOS Encrypted Volume Implementation

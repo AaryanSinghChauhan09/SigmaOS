@@ -1,4 +1,4 @@
-#include "sigma_wasi.h"
+#include "../../../include/sigma_wasi.h"
 #include <string.h>
 
 // ---------------------------------------------------------

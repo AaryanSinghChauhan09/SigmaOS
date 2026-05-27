@@ -1,8 +1,7 @@
 #ifndef SIGMA_WASI_H
 #define SIGMA_WASI_H
 
-#include <stdint.h>
-#include <stddef.h>
+#include "sigma_types.h"
 
 // ---------------------------------------------------------
 // SigmaOS WASI Compatibility Layer Definitions

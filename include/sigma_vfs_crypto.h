@@ -1,8 +1,7 @@
 #ifndef SIGMA_VFS_CRYPTO_H
 #define SIGMA_VFS_CRYPTO_H
 
-#include <stdint.h>
-#include <stddef.h>
+#include "sigma_types.h"
 
 // ---------------------------------------------------------
 // SigmaOS Encrypted Volume Management
