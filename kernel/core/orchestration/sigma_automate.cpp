@@ -172,6 +172,22 @@ sigma_status cron_tick(sigma_u32 min, sigma_u32 hour, sigma_u32 day,
     return SIGMA_SUCCESS;
 }
 
+// ─── Systemd-style Timer Tick (called periodically, e.g., every second) ──────
+static sigma_u32 g_system_seconds = 0;
+
+sigma_status systemd_timer_tick(sigma_u32 elapsed_seconds) {
+    g_system_seconds += elapsed_seconds;
+    for (sigma_u32 i = 0; i < g_registry.count; ++i) {
+        Playbook* pb = &g_registry.playbooks[i];
+        if (!pb->enabled || pb->trigger.type != TRIGGER_SYSTEMD_TIMER) continue;
+
+        if (pb->trigger.interval_sec > 0 && (g_system_seconds % pb->trigger.interval_sec == 0)) {
+            execute_playbook(pb);
+        }
+    }
+    return SIGMA_SUCCESS;
+}
+
 // ─── List All Playbooks (for CLI: `sigma-auto list`) ─────────────────────────
 sigma_u32 list_playbooks(Playbook* out, sigma_u32 max_out) {
     sigma_u32 n = (g_registry.count < max_out) ? g_registry.count : max_out;
@@ -218,5 +234,8 @@ extern "C" {
     sigma_status sigma_automate_cron_tick(sigma_u32 m, sigma_u32 h,
                                           sigma_u32 d, sigma_u32 mo, sigma_u32 w) {
         return sigma::automate::cron_tick(m, h, d, mo, w);
+    }
+    sigma_status sigma_automate_timer_tick(sigma_u32 secs) {
+        return sigma::automate::systemd_timer_tick(secs);
     }
 }

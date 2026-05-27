@@ -40,6 +40,8 @@ The `sigma_state_manager` reads a desired configuration file (typically in a JSO
 *   **Sysctl**: Real-time tuning of kernel parameters (direct `/sys` equivalent writes).
 *   **Symlinks**: Native file path management and absolute link provisioning.
 *   **Network**: Active network profile configurations including static IPs and Wi-Fi SSIDs.
+*   **Containers**: Declaratively provision isolated, RancherOS/Flatcar-style micro-sandboxes to run drivers and services inside secure bounds.
+*   **Timers**: Monotonic/calendar background task schedulers (equivalent to systemd timers).
 
 ### Sample Declarative State Manifest (`sigma.state`):
 ```json
@@ -53,7 +55,9 @@ The `sigma_state_manager` reads a desired configuration file (typically in a JSO
     { "type": "user", "desired": "present", "key": "aaryan", "value": "/bin/sigma-sh" },
     { "type": "theme", "desired": "present", "key": "Sigma Dark" },
     { "type": "sysctl", "desired": "present", "key": "net.ipv4.ip_forward", "value": "1" },
-    { "type": "network", "desired": "present", "key": "Office-Fiber", "value": "SSID=SovereignNet;DHCP=true" }
+    { "type": "network", "desired": "present", "key": "Office-Fiber", "value": "SSID=SovereignNet;DHCP=true" },
+    { "type": "container", "desired": "present", "key": "amdgpu-driver", "value": "memory=128M;cpu=50" },
+    { "type": "timer", "desired": "present", "key": "backup-sync", "value": "OnUnitActiveSec=3600" }
   ]
 }
 ```
@@ -87,6 +91,7 @@ The `sigma_automate` daemon functions as a sovereign task orchestrator. It regis
 *   `TRIGGER_ON_LOW_BATTERY`: Drop system power profile, dim Zenith panels, and trigger low-power CPU governor.
 *   `TRIGGER_ON_FILE_CHANGE`: An inotify-style path watcher to trigger auto-syncing or building.
 *   `TRIGGER_CRON_SCHEDULE`: Full cron-compliant scheduling parser.
+*   `TRIGGER_SYSTEMD_TIMER`: Monotonic interval-based timer firing at a defined `interval_sec` (equivalent to systemd timers).
 
 ### Core Actions:
 *   `ACTION_RUN_COMMAND`: Run sandbox-contained CLI utilities.

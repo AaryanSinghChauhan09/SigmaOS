@@ -30,6 +30,7 @@ typedef enum : sigma_u32 {
     TRIGGER_ON_LOW_BATTERY  = 7,   // Fires when ACPI reports < 15%
     TRIGGER_ON_FILE_CHANGE  = 8,   // inotify-style path watcher
     TRIGGER_MANUAL          = 9,   // User-invoked via sigma-run CLI
+    TRIGGER_SYSTEMD_TIMER   = 10,  // Monotonic systemd-style timer (interval-based)
 } TriggerType;
 
 // ─── Action Types ─────────────────────────────────────────────────────────────
@@ -48,6 +49,7 @@ struct TriggerDescriptor {
     TriggerType type;
     char cron_expr[SIGMA_CRON_EXPR_LEN];  // Used when type == TRIGGER_CRON_SCHEDULE
     char watch_path[SIGMA_CMD_LEN];       // Used when type == TRIGGER_ON_FILE_CHANGE
+    sigma_u32 interval_sec;               // Used when type == TRIGGER_SYSTEMD_TIMER (OnCalendar/OnUnitActiveSec equivalent)
 };
 
 // ─── Action Descriptor ────────────────────────────────────────────────────────
