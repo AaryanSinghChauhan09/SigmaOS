@@ -4,6 +4,29 @@
 
 ---
 
+## Current Technical Limitations (The Reality Check)
+
+While SigmaOS is an ambitious, ground-up research operating system focusing on sovereignty, sandboxing, and performance, it is essential for users migrating from mature ecosystems like Linux or Windows to understand our current boundaries.
+
+### 🔧 Core OS Functionality
+- **Limited Driver Support**: SigmaOS currently implements only essential drivers (PS/2 keyboard, VGA framebuffer, ATA/SATA/VirtIO storage, and Intel e1000 networking). In contrast, Linux distros support thousands of devices across GPUs, Wi-Fi chipsets, printers, Bluetooth, etc.
+- **File Systems**: SigmaOS supports FAT32 and Ext2 natively, with a custom Sovereign ZFS pool in development. Linux supports a wide range of advanced filesystems (Ext4, Btrfs, XFS, etc.) with mature journaling.
+- **Syscall ABI**: SigmaOS uses a non-POSIX ABI to enforce its custom security model. This means existing Linux applications cannot run natively without porting.
+
+### 🖥️ Userland & Applications
+- **Minimal Tools**: SigmaOS provides sovereign, clean-room replacements for basic utilities (`ls`, `cat`, `awk`, `sed`, `tar`) and a text-mode HTML browser.
+- **Package Ecosystem**: There is currently no equivalent of `apt`, `dnf`, or `pacman`. Software distribution is handled via source compilation, though the OmniPackage Manager is on our roadmap.
+- **UI/UX**: The current environment is primarily text-mode based. A full GUI (Zenith Window Manager) is planned but currently lacks the maturity of GNOME or KDE.
+
+### 🔒 Security & Stability
+- **Kernel Maturity**: The Linux kernel has decades of rigorous testing, bug fixes, and performance optimization. The SigmaOS kernel is early-stage, with foundational scheduling and memory allocation.
+- **Networking Stack**: SigmaOS currently provides a basic e1000 driver. A fully fledged, hardened TCP/IP stack is under active development.
+
+> [!WARNING]
+> **Summary**: SigmaOS is a fascinating research OS and a glimpse into a sovereign computing future. However, it is more of a proof-of-concept than a daily-driver right now.
+
+---
+
 ## Comparison Matrix
 
 | Feature | Linux (e.g., Arch, Ubuntu) | SigmaOS Zenith |

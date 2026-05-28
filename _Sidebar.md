@@ -34,6 +34,7 @@
 ## 🖥️ Desktop Environment
 - [**Zenith GUI Desktop**](Zenith-Desktop-UX)
 - [Theme Engine & Accessibility](Zenith-Desktop-UX#theme-engine)
+- [Customization & Automation Engine](Customization-Automation-Engine)
 - [Dock & App Launcher](Zenith-Desktop-UX#spatial-design-paradigm)
 
 ## 🔒 Security
@@ -54,6 +55,8 @@
 - [System Daemons & Diagnostics](System-Daemons)
 
 ## 🏗️ Architecture
+- [**Installation Guide (Bare-Metal)**](SigmaOS-Installation-Guide)
+- [**Migration Guide (Windows/Ubuntu)**](Migration-Guide)
 - [Architecture Overview](Architecture-Overview)
 - [Declarative Config Manager](Reproducibility-Guide)
 - [Container Orchestration](Container-Orchestration)
@@ -76,6 +79,7 @@
 ## 🏢 Enterprise & Compliance
 - [**Enterprise Certification Roadmap**](Enterprise-Compliance)
 - [Compliance Engine (`sigma_compliance_cli`)](Enterprise-Compliance#sigma_compliance_cli)
+- [**Indian Compliance & e-Gov Roadmap**](Indian-Compliance-Roadmap)
 
 ## 👥 Community & Docs
 - [**Community & Contributor Guide**](Community-Documentation)

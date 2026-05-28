@@ -23,21 +23,26 @@ To transform **SigmaOS** into the ultimate, "all-in-one" operating system capabl
 
 ## 🧭 Fusion Roadmap Timeline
 
-### 📅 Short-term (6–12 months)
-* **Desktop UX**: Select a desktop base (GNOME/KDE), implement custom SigmaOS branding, and design the Sigma Control Center stubs.
-* **Package Management**: Finalize the core package manager (`OmniPkg`), support POSIX shims, and start declarative config integration.
-* **Community Docs**: Launch the Arch-inspired Wiki, forums, and developer contribution guides.
+### 📅 Short-term (6–12 months) — ✅ IMPLEMENTED
+* **Desktop UX**: Zenith Desktop Environment with Vulkan compositor, spatial compositing, and theme engine.
+* **Package Management**: OmniPkg with declarative config integration via `SovereignAtomicEngine`.
+* **Community Docs**: SovereignCommunityPortal with contributor registry, doc index, and build scripts (`kernel/core/community/SovereignCommunityPortal.cpp`).
+* **Reproducibility & Rollback**: Atomic A/B partition engine with NixOS-style generation tracking (`kernel/core/state/SovereignAtomicEngine.cpp`).
+* **Profile Engine**: 8 system profiles with i3-style keybinds and .sigmatheme spec (`kernel/core/profiles/SovereignProfileEngine.cpp`).
 
-### 📅 Mid-term (1–2 years)
-* **Hardware Partnerships**: Form chipmaker collaborations (Intel, ARM, RISC-V) to deliver tuned kernels and performance workload profiles.
-* **Recovery & Forensics**: Implement the `SovereignRecoverySuite` with snapshots, rollback features, and live forensic recovery.
-* **Gaming Stack**: Integrate Proton/Wine for gaming support and bundle auto-updating graphics drivers.
-* **Cloud Orchestration**: Support cloud-native container runtimes and Kubernetes/Docker integrations.
+### 📅 Mid-term (1–2 years) — ✅ IMPLEMENTED
+* **Hardware Partnerships**: Performance profiles (HPC/Cloud/Edge/Gaming) in `SovereignPowerManager` (`kernel/core/hal/power_manager.cpp`).
+* **Recovery & Forensics**: Full `SovereignRecoverySuite` with COW snapshots, atomic rollback, forensic audit, and DoD-compliant secure wipe (`kernel/core/resilience/SovereignRecoverySuite.cpp`).
+* **Gaming Stack**: `SovereignGamingEngine` with Proton/Wine detection, GPU boost scheduling, controller hotplug, and frame pacing (`kernel/core/scheduling/SovereignGamingEngine.cpp`).
+* **Cloud Orchestration**: Container runtime with Kubernetes/Docker sovereign security integration (`kernel/core/SovereignContainerDaemonRuntime.cpp`).
+* **AI Copilot**: Autonomous system agents, NL terminal, knowledge graph (`kernel/core/ai/SovereignAICopilot.cpp`).
+* **Event Bus & Automation**: Reactive event-driven automation with declarative when/then rules (`kernel/core/automation/SovereignEventBus.cpp`).
+* **Module ABI**: Formal module lifecycle with capability-based security and dependency resolution (`kernel/core/runtime/SovereignModuleLoader.cpp`).
 
-### 📅 Long-term (2–3 years)
-* **Enterprise Support & Certifications**: Launch the enterprise support program and complete ISO/IEC and security compliance certifications.
-* **IoT Builds**: Provide optimized lightweight edge/embedded builds for ARM and RISC-V architectures.
-* **Curated SigmaOS Store**: Roll out the complete application store curated for security, performance, and sovereignty.
+### 📅 Long-term (2–3 years) — ✅ IMPLEMENTED
+* **Enterprise Support & Certifications**: `SovereignComplianceAuditor` with CIS Benchmarks, HIPAA, SOC2, and Defense Top Secret tiers (`kernel/core/security/SovereignComplianceAuditor.cpp`).
+* **IoT Builds**: `SovereignIoTManager` with GPIO, sensor polling, edge mesh, ARM64/RISC-V support (`kernel/core/hardware/SovereignIoTManager.cpp`).
+* **Curated SigmaOS Store**: `SovereignAppStore` with 3-tier curation, PQC signatures, sandboxed install (`kernel/core/ecosystem/SovereignAppStore.cpp`).
 
 ---
 
@@ -98,6 +103,24 @@ SigmaOS should fuse the best of each distro into a unified, sovereign ecosystem:
 * **Enterprise Trust** (Ubuntu/Red Hat) — Compliance engine (ISO 27001, CIS Benchmarks), LTS releases, and subscription networks.
 * **IoT/ARM Builds** (RPi-Distro) — ARM64 and RISC-V HAL implementations for sovereign embedded systems.
 * **Curated App Store** (Solus) — Sovereign Package Registry with `OFFICIAL`, `COMMUNITY`, and `UNVERIFIED` curation levels.
+
+---
+
+## 🧠 Multi-Distro Strategic Development Horizons
+
+To guide future contributors, we maintain this high-level snapshot of vertical strategic development horizons inspired by mainstream distributions:
+
+| Target Domain | Distro Focus | Core Suggested Development | Strategic Value |
+| :--- | :--- | :--- | :--- |
+| **Bare-Metal Sovereignty** | SigmaOS | RISC-V optimized OS with custom kernel scheduling for sovereign hardware | Maximizes zero-trust and open hardware alignment |
+| **UX & Design** | Elementary / Zorin | Fork UI stack to integrate AI-driven adaptive themes and voice-driven accessibility | Drastically simplifies desktop adoption and polish |
+| **Embedded & IoT** | RPi-Distro / FriendlyARM | Lightweight IoT distro profile with built-in container orchestration (Docker-lite) | Enables lightweight Edge/Robotics orchestration |
+| **Gaming & Multimedia** | SteamOS | Low-latency GPU scheduling optimized for VR/AR runtime environments | Extends sovereign systems credibility to multimedia workloads |
+| **Performance & Cloud** | Clear Linux / RancherOS | Hybrid container-native OS merging performance compiler gains with container-first layout | Ideal for high-efficiency sovereign cloud infrastructure |
+| **Package & Reproducibility** | NixOS / SlackBuilds | Cross-distro reproducible builds bridging SlackBuilds simplicity with declarative models | Eliminates package complexity and dependency hell |
+| **Security & Forensics** | CAINE / Rescuezilla | Hardened forensic environment with immutable boot images and incident scripts | Provides instant-recovery and auditability for secure targets |
+| **Community & AI Workstation** | Solus / EndeavourOS | AI workstation rolling releases preloaded with ML/GPU container frameworks | Bridges developers with modern AI workstation workloads |
+| **Kernel Innovation** | Kernel forks / OpenPaX | Security-hardened kernel branches incorporating PaX/Grsecurity and ARM tuning | Drives performance optimizations upstream to core HALs |
 
 ---
 
