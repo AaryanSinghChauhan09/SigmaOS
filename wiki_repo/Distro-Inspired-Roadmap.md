@@ -106,6 +106,24 @@ SigmaOS should fuse the best of each distro into a unified, sovereign ecosystem:
 
 ---
 
+## 🧠 Multi-Distro Strategic Development Horizons
+
+To guide future contributors, we maintain this high-level snapshot of vertical strategic development horizons inspired by mainstream distributions:
+
+| Target Domain | Distro Focus | Core Suggested Development | Strategic Value |
+| :--- | :--- | :--- | :--- |
+| **Bare-Metal Sovereignty** | SigmaOS | RISC-V optimized OS with custom kernel scheduling for sovereign hardware | Maximizes zero-trust and open hardware alignment |
+| **UX & Design** | Elementary / Zorin | Fork UI stack to integrate AI-driven adaptive themes and voice-driven accessibility | Drastically simplifies desktop adoption and polish |
+| **Embedded & IoT** | RPi-Distro / FriendlyARM | Lightweight IoT distro profile with built-in container orchestration (Docker-lite) | Enables lightweight Edge/Robotics orchestration |
+| **Gaming & Multimedia** | SteamOS | Low-latency GPU scheduling optimized for VR/AR runtime environments | Extends sovereign systems credibility to multimedia workloads |
+| **Performance & Cloud** | Clear Linux / RancherOS | Hybrid container-native OS merging performance compiler gains with container-first layout | Ideal for high-efficiency sovereign cloud infrastructure |
+| **Package & Reproducibility** | NixOS / SlackBuilds | Cross-distro reproducible builds bridging SlackBuilds simplicity with declarative models | Eliminates package complexity and dependency hell |
+| **Security & Forensics** | CAINE / Rescuezilla | Hardened forensic environment with immutable boot images and incident scripts | Provides instant-recovery and auditability for secure targets |
+| **Community & AI Workstation** | Solus / EndeavourOS | AI workstation rolling releases preloaded with ML/GPU container frameworks | Bridges developers with modern AI workstation workloads |
+| **Kernel Innovation** | Kernel forks / OpenPaX | Security-hardened kernel branches incorporating PaX/Grsecurity and ARM tuning | Drives performance optimizations upstream to core HALs |
+
+---
+
 ## ⚡ Zero-Dependency Engineering Philosophy
 
 Unlike Linux distributions that depend on massive chains of trust (`app → glibc → syscall → kernel → hardware`), SigmaOS eliminates every intermediate layer:

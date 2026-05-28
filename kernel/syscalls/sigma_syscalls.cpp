@@ -16,6 +16,14 @@ typedef unsigned long long u64;
 #define SIGMA_SYS_SEND_MSG    0x04
 #define SIGMA_SYS_RECV_MSG    0x05
 #define SIGMA_SYS_HW_IO       0x06
+#define SIGMA_SYS_SPAWN_TASK  0x07
+#define SIGMA_SYS_YIELD       0x08
+
+/* Forward declarations for scheduler functions */
+extern "C" {
+    unsigned int sched_add_task(unsigned int pid, int policy, unsigned char priority, unsigned long long deadline_us);
+    void sched_yield(void);
+}
 
 /* Sovereign Syscall Entry Point (called via SYSCALL instruction or INT 0x80) */
 extern "C" u64 sigma_syscall_handler(u64 syscall_num, u64 arg1, u64 arg2, u64 arg3) {
@@ -42,6 +50,14 @@ extern "C" u64 sigma_syscall_handler(u64 syscall_num, u64 arg1, u64 arg2, u64 ar
             
         case SIGMA_SYS_HW_IO:
             /* Privileged hardware I/O for drivers running in user-space */
+            return 0;
+            
+        case SIGMA_SYS_SPAWN_TASK:
+            /* arg1: pid, arg2: policy, arg3: priority */
+            return sched_add_task((unsigned int)arg1, (int)arg2, (unsigned char)arg3, 0);
+            
+        case SIGMA_SYS_YIELD:
+            sched_yield();
             return 0;
             
         default:

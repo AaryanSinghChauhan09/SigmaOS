@@ -14,6 +14,19 @@
 namespace SigmaOS {
 namespace Kernel {
 
+struct sigma_spinlock_t {
+    volatile int lock_state;
+    void init() { lock_state = 0; }
+    void acquire() {
+        while (__sync_lock_test_and_set(&lock_state, 1)) {
+            __asm__ volatile("pause");
+        }
+    }
+    void release() {
+        __sync_lock_release(&lock_state);
+    }
+};
+
 class SovereignScheduler {
 public:
     static SovereignScheduler& getInstance() {
@@ -22,6 +35,7 @@ public:
     }
 
     void init(sigma_u32 num_cpus) {
+        m_lock.init();
         m_num_cpus = (num_cpus > SCHED_MAX_CPUS) ? SCHED_MAX_CPUS : num_cpus;
         m_task_count = 0;
         m_total_switches = 0;
@@ -47,7 +61,11 @@ public:
 
     sigma_u32 addTask(sigma_u32 pid, sigma_sched_policy_t policy,
                       sigma_u8 priority, sigma_u64 deadline_us) {
-        if (m_task_count >= SCHED_MAX_TASKS) return 0;
+        m_lock.acquire();
+        if (m_task_count >= SCHED_MAX_TASKS) {
+            m_lock.release();
+            return 0;
+        }
 
         /* Find empty slot */
         sigma_u32 tid = 0;
@@ -57,7 +75,10 @@ public:
                 break;
             }
         }
-        if (tid == 0) return 0;
+        if (tid == 0) {
+            m_lock.release();
+            return 0;
+        }
 
         sigma_task_t& t = m_tasks[tid - 1];
         t.tid = tid;
@@ -78,16 +99,22 @@ public:
         m_task_count++;
         sigma_log_info("[SCHED] Task added: TID %u (PID %u) Policy: %u\n",
                        tid, pid, (unsigned)policy);
+        m_lock.release();
         return tid;
     }
 
     int removeTask(sigma_u32 tid) {
+        m_lock.acquire();
         sigma_task_t* t = findTask(tid);
-        if (!t) return K_ERR_NOTFOUND;
+        if (!t) {
+            m_lock.release();
+            return K_ERR_NOTFOUND;
+        }
 
         t->state = TASK_STATE_TERMINATED;
         m_task_count--;
         sigma_log_info("[SCHED] Task removed: TID %u\n", tid);
+        m_lock.release();
         return K_OK;
     }
 
@@ -100,7 +127,8 @@ public:
         sigma_u64 elapsed_us = (now_tsc - cpu.last_tick_tsc) / 3000; /* rough 3GHz calc */
         cpu.last_tick_tsc = now_tsc;
 
-        /* Update sleeping tasks */
+        /* Update sleeping tasks with safety lock */
+        m_lock.acquire();
         for (sigma_u32 i = 0; i < SCHED_MAX_TASKS; i++) {
             if (m_tasks[i].state == TASK_STATE_SLEEPING) {
                 if (m_tick_count * 1000 >= m_tasks[i].wake_time_us) {
@@ -108,8 +136,11 @@ public:
                 }
             }
         }
+        m_lock.release();
 
-        /* Update current task */
+        /* Update current task status */
+        bool need_yield = false;
+        m_lock.acquire();
         if (cpu.current_tid != 0) {
             sigma_task_t* curr = findTask(cpu.current_tid);
             if (curr && curr->state == TASK_STATE_RUNNING) {
@@ -123,7 +154,7 @@ public:
                         curr->mlfq_level++;
                     }
                     curr->state = TASK_STATE_READY;
-                    yield(cpu_id); /* Trigger switch */
+                    need_yield = true;
                 }
             } else {
                 cpu.current_tid = 0;
@@ -131,6 +162,11 @@ public:
         } else {
             cpu.idle_time_us += elapsed_us;
             /* Attempt to pick a new task if idle */
+            need_yield = true;
+        }
+        m_lock.release();
+
+        if (need_yield) {
             yield(cpu_id);
         }
 
@@ -142,6 +178,7 @@ public:
 
     void yield(sigma_u32 cpu_id) {
         if (cpu_id >= m_num_cpus) return;
+        m_lock.acquire();
         sigma_cpu_state_t& cpu = m_cpu_states[cpu_id];
 
         /* Put current task back in ready queue if it was running */
@@ -171,6 +208,7 @@ public:
         } else {
             cpu.current_tid = 0; /* Idle */
         }
+        m_lock.release();
     }
 
     void yieldGlobal() {
@@ -179,6 +217,12 @@ public:
     }
 
     void priorityBoost() {
+        m_lock.acquire();
+        priorityBoostLocked();
+        m_lock.release();
+    }
+
+    void priorityBoostLocked() {
         /* Move all MLFQ tasks back to top queue to prevent starvation */
         for (sigma_u32 i = 0; i < SCHED_MAX_TASKS; i++) {
             if (m_tasks[i].state != TASK_STATE_TERMINATED && m_tasks[i].policy == SCHED_POLICY_MLFQ) {
@@ -284,6 +328,7 @@ private:
 
     sigma_task_t      m_tasks[SCHED_MAX_TASKS];
     sigma_cpu_state_t m_cpu_states[SCHED_MAX_CPUS];
+    sigma_spinlock_t  m_lock;
     sigma_u32         m_num_cpus;
     sigma_u32         m_task_count;
     sigma_u64         m_total_switches;

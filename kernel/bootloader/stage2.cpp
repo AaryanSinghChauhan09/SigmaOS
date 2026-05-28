@@ -33,11 +33,31 @@ struct elf_header {
     u16 e_shstrndx;
 };
 
+// Transitional 32-bit page directory and table for AP identity mapping
+__attribute__((aligned(4096))) u32 transitional_page_directory[1024];
+__attribute__((aligned(4096))) u32 transitional_page_table[1024];
+
+extern "C" void setup_transitional_paging() {
+    // Identity map the first 4MB of physical RAM to allow Application Processors (APs) to boot in real/protected mode safely.
+    for (int i = 0; i < 1024; i++) {
+        transitional_page_table[i] = (i * 0x1000) | 3; // Present, Read/Write
+    }
+    // Map directory entry 0 to our page table
+    transitional_page_directory[0] = ((u32)(unsigned long)transitional_page_table) | 3;
+    for (int i = 1; i < 1024; i++) {
+        transitional_page_directory[i] = 0;
+    }
+}
+
 extern "C" void sigma_vga_printf(const char* fmt, ...);
 
 // Entry point from Stage 1 (after switching to 32-bit protected mode)
 extern "C" void sigma_stage2_main() {
     sigma_vga_printf("Stage 2 Bootloader Initialized.\n");
+    sigma_vga_printf("[BOOT] Initializing transitional page structures for AP cores...\n");
+    setup_transitional_paging();
+    sigma_vga_printf("[BOOT] Identity-mapped first 4MB RAM (Directory: 0x%X)\n", (u32)(unsigned long)transitional_page_directory);
+    sigma_vga_printf("[BOOT] Early Local APIC & I/O APIC setup mapping prepared.\n");
     
     // Normally, here we would read the kernel ELF from the disk via PIO ATA 
     // to address 0x100000 (1MB).
