@@ -19,6 +19,9 @@ SigmaOS is a sovereign, zero-dependency operating system built on a **Lattice Ar
 | Stability Playbook | [Stability-Playbook](Stability-Playbook.md) | ✅ Active |
 | Competitor Comparison | [Competitor-Comparison](Competitor-Comparison.md) | ✅ Active |
 | Phase A Checklist | [Phase-A-Execution-Checklist](Phase-A-Execution-Checklist.md) | ✅ Active |
+| Meta-Distro Engine | [Meta-Distro-Unified-Engine](Meta-Distro-Unified-Engine.md) | ✅ Active |
+| Feature Matrix | [Feature-Matrix](Feature-Matrix.md) | ✅ Active |
+| Phase C Checklist | [Phase-C-Execution-Checklist](Phase-C-Execution-Checklist.md) | ✅ Active |
 | Driver Support & Registry | [Driver-Support](Driver-Support.md) | ✅ Phase 5 |
 | Sovereign LibC | [Sovereign-LibC-and-Dependencies](Sovereign-LibC-and-Dependencies.md) | ✅ Phase 5 |
 | Sovereignty Architecture | [Sovereignty-Architecture](Sovereignty-Architecture.md) | ✅ Phase 7 |
