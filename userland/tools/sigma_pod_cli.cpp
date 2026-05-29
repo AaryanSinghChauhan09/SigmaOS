@@ -8,29 +8,7 @@
  */
 
 #include <sigma_libc.h>
-
-enum SigmaPodOrchestratorMsg {
-    SIGMA_MSG_SPAWN_CONTAINER = 1,
-    SIGMA_MSG_STOP_CONTAINER = 2,
-    SIGMA_MSG_LIST_CONTAINERS = 3,
-    SIGMA_MSG_SPAWN_NATIVE_CONTAINER = 4
-};
-
-enum SigmaPodNamespaceFlags {
-    SIGMA_NS_MNT = (1u << 0),
-    SIGMA_NS_PID = (1u << 1),
-    SIGMA_NS_NET = (1u << 2),
-    SIGMA_NS_UTS = (1u << 3),
-    SIGMA_NS_IPC = (1u << 4)
-};
-
-struct SigmaPodNativeSpec {
-    sigma_u64 package_path;
-    sigma_u32 namespace_flags;
-    sigma_u32 cgroup_cpu_millis;
-    sigma_u32 cgroup_mem_mb;
-    sigma_u32 io_weight;
-};
+#include "../../include/sigma_pod_spec.h"
 
 static sigma_u32 parse_u32_or_default(const char* value, sigma_u32 fallback) {
     if (!value) return fallback;

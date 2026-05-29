@@ -7,6 +7,8 @@
 - [**Flagship Use Cases**](Flagship-Profiles)
 - [Distro-Inspired Roadmap](Distro-Inspired-Roadmap)
 - [SigmaOS vs Linux Distros](SigmaOS-vs-Linux)
+- [Competitor Comparison](Competitor-Comparison)
+- [Phase A Execution Checklist](Phase-A-Execution-Checklist)
 - [**100 Competitor-Inspired Features**](Roadmap-Features-Registry)
 - [Strategic Ultimate Advancement](ULTIMATE-ADVANCEMENT-STRATEGY)
 

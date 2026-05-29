@@ -28,6 +28,9 @@
 | [RFC Template](RFC_Template) | Proposal format for new subsystem features |
 | [Changelog](CHANGELOG) | Release history and version notes |
 | [Roadmap](Roadmap) | Strategic improvement sequence |
+| [Competitor Comparison](Competitor-Comparison) | Distro gap analysis and surpass strategy |
+| [Phase A Checklist](Phase-A-Execution-Checklist) | File-level execution tracker |
+| [Problems Manifest](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CURRENT_PROBLEMS_MANIFEST.md) | Active bugs and Phase A status |
 
 ---
 
