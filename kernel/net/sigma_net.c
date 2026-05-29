@@ -104,7 +104,7 @@ static void handle_icmp(eth_hdr_t* eth, ipv4_hdr_t* ip, icmp_hdr_t* icmp, sigma_
         icmp->checksum = calculate_checksum(icmp, packet_len - sizeof(eth_hdr_t) - sizeof(ipv4_hdr_t));
         
         // sys_print("[Net] Sending ICMP Echo Reply...\n");
-        // nic_tx_packet((sigma_u8*)eth, packet_len);
+        nic_tx_packet((sigma_u8*)eth, packet_len);
     }
 }
 
