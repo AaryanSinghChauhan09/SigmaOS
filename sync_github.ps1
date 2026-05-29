@@ -9,7 +9,7 @@ $ErrorActionPreference = "Stop"
 
 $MainRepoUrl = "https://github.com/AaryanSinghChauhan09/SigmaOS.git"
 $WikiRepoUrl = "https://github.com/AaryanSinghChauhan09/SigmaOS.wiki.git"
-$CommitMsg = "SigmaOS Phase 9: Zenith SDK Rust/Python Bindings, Builder CLI, and Dev Guide"
+$CommitMsg = "SigmaOS Phase 10: Sovereign Net Stack, Pod Orchestrator, SBR .sigmabuild Registry"
 
 Write-Host "🚀 Starting Windows GitHub Sync for SigmaOS..." -ForegroundColor Cyan
 

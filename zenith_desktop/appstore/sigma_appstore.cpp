@@ -2,9 +2,10 @@
  * =========================================================================
  * Σ ZENITH SOVEREIGN APP STORE
  * =========================================================================
- * Inspired by Elementary OS AppCenter's pay-what-you-can model and its 
- * curated, sandboxed apps policy. Apps are sourced from the Sovereign Build 
- * Script Registry (.srecipe) and signed with our root key.
+ * Inspired by Elementary OS AppCenter's pay-what-you-can model, NixOS
+ * declarative builds, and SlackBuilds.org source recipes. Apps are sourced 
+ * from the Sovereign Build Script Registry (.sigmabuild) and signed with 
+ * our root key. No binary blobs allowed.
  * =========================================================================
  */
 
@@ -89,8 +90,8 @@ public:
         const AppEntry& app = g_catalogue[index];
         sys_print("[AppStore] Initiating installation of '%s'...\n", app.name);
 
-        // 1. Fetch .srecipe from sovereign registry (mocked)
-        sys_print("[AppStore] Fetching .srecipe from Sovereign Build Registry...\n");
+        // 1. Fetch .sigmabuild from sovereign registry (SlackBuilds style)
+        sys_print("[AppStore] Fetching .sigmabuild recipe from Sovereign Build Registry...\n");
         sys_print("[AppStore] Validating cryptographic signature from sovereign root key...\n");
         sys_print("[AppStore] PASS: Signature verified.\n");
 

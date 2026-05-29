@@ -1,39 +1,56 @@
-# Sovereign Build Script Registry Specification 📦🛠️
+# Sovereign Build Script Registry (SBR) 📦🛠️
 
-SigmaOS implements a SlackBuilds-inspired **Sovereign Build Script Registry**. Rather than distributing untrusted, pre-compiled binary packages that could contain backdoors, the Sovereign Registry publishes reproducible, signed source recipe scripts. The base OS builds packages locally inside highly isolated, temporary orchestrator containers.
+*Inspiration: SlackBuilds.org, Arch AUR, NixOS Packages*
+
+SigmaOS does not ship proprietary binaries or obfuscated package formats. To guarantee **absolute sovereignty**, all userland applications are compiled locally from source within an isolated orchestrator container.
 
 ---
 
-## 🛠️ Recipe Specification Layout (`.srecipe`)
+## 🛠️ Recipe Specification Layout (`.sigmabuild`)
 
-Every package in the registry defines its build instructions inside a declarative, reproducible recipe document:
+Every package in the registry defines its build instructions inside a declarative, reproducible JSON recipe:
 
-```toml
-[package]
-name = "zenith-terminal"
-version = "1.2.0"
-source = "https://sources.sigmaos.org/zenith-terminal-1.2.0.tar.gz"
-sha256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-
-[build]
-# Strictly enforces standard C/Rust build gates inside the sandbox container
-commands = [
-    "cargo build --release --manifest-path ./Cargo.toml",
-    "cp target/release/zenith-terminal $SOVEREIGN_OUT/bin/"
-]
-
-[sandbox]
-# Declares minimum resource requirements for secure deployment
-memory_limit_bytes = 33554432  # 32MB
-network_isolation = true       # Enforce Whonix split gateway rules
+```json
+{
+  "app_id": "org.sigmaos.terminal",
+  "name": "zenith-terminal",
+  "version": "1.2.0",
+  "author": "SigmaOS Core Team",
+  "source": {
+    "url": "https://sources.sigmaos.org/zenith-terminal-1.2.0.tar.gz",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "build": {
+    "language": "rust",
+    "flags": ["--no-std", "--target=sigmaos-unknown-none"],
+    "dependencies": []
+  },
+  "sandbox": {
+    "network": "none",
+    "filesystem_rw": ["/home/user/Downloads"],
+    "gpu": "compositor_ipc_only",
+    "memory_limit_bytes": 33554432
+  }
+}
 ```
 
 ---
 
 ## 🔒 Execution Flow
 
-1.  **Recipe Verification:** The package daemon fetches the target `.srecipe` and verifies the cryptographical GPG signature of the registry publisher.
-2.  **Container Allocation:** The Sovereign Orchestrator spins up a temporary chroot container sandbox (minimal low-footprint Flatcar model).
-3.  **Source Download & Checksum Validation:** The download engine retrieves the source tarball and asserts that the SHA256 matches the baseline.
-4.  **Local Compilation:** The code compiles strictly inside the resource-limited sandbox.
-5.  **Output Bundle:** The final compiled binary is bundled into our secure `.spkg` package format and cryptographically verified.
+1. **Recipe Download:** The Zenith App Store fetches the `.sigmabuild` JSON recipe from the Sovereign Registry.
+2. **Signature Verification:** The recipe is verified against the local **Sovereign Root CA** (no external trust anchors).
+3. **Container Allocation:** `sigma-pod` spins up a fresh ephemeral offline build container (Flatcar-style immutable model).
+4. **Source Download & Hash Check:** Source code is fetched and its SHA256 is asserted against the recipe.
+5. **Local Compilation:** Code compiles inside the resource-limited sandbox via `zenith-build`.
+6. **Output Bundle:** The binary is packaged into an immutable `.spkg` with an embedded `app.json` sandbox manifest.
+7. **Container Teardown:** The ephemeral build container is permanently destroyed.
+
+---
+
+## 🔐 Why No Binaries?
+
+By refusing to distribute pre-compiled binaries:
+1. **No Supply Chain Attacks:** You compile the exact source hash specified.
+2. **Complete Transparency:** Every compiler flag and dependency is visible in the recipe.
+3. **Architecture Tuning:** Binaries are optimized for your exact CPU (x86_64 or ARM64) — no generic blobs.
