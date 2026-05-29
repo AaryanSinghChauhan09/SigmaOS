@@ -19,7 +19,6 @@ patch.py
 *.tmp
 
 # Local junctions for compatibility
-userland
 networking
 node_modules/.vite
 
