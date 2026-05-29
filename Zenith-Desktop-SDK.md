@@ -1,6 +1,30 @@
-# Zenith Desktop Environment & Developer SDK 🎨🔒
+# Zenith Desktop & Developer SDK 🎨🔒
 
 Zenith is the native sovereign desktop environment for SigmaOS. Unlike traditional Linux/UNIX desktop environments (e.g., GNOME, KDE) which run application processes directly on the host system memory with basic Unix user permissions, Zenith applications are **fully containerized and sandboxed by default** via the Sovereign Orchestrator.
+
+---
+
+## 🚀 First-Run Onboarding Wizard
+
+When a new user boots SigmaOS for the first time, they are greeted by a native **Sovereign Onboarding Wizard** (`sigma_onboarding.cpp`) inspired by Zorin OS's layout chooser and Elementary OS's first-run experience.
+
+The wizard guides users through:
+1.  **Welcome**: A clear explanation of what makes SigmaOS sovereign.
+2.  **Profile Selection**: Direct toggle between Standard, Forensic (CAINE), IoT, Enterprise, and Education profiles.
+3.  **Network Configuration**: Boots Whonix-style gateway/workstation firewall splits.
+4.  **Declarative Config Import**: Import saved `settings.json` profiles from previous systems.
+
+---
+
+## 📦 Sovereign App Store
+
+Zenith ships with a curated **Sovereign App Store** (`sigma_appstore.cpp`) inspired by Elementary's AppCenter:
+*   All apps are listed with **explicit permission declarations** (Network access, FS scope, GPU usage).
+*   Each installation fetches the `.srecipe` source build script from the Sovereign Registry.
+*   Apps are compiled **locally** inside isolated orchestrator containers.
+*   The final binary is cryptographically signed as a `.spkg` bundle before deployment.
+
+No untrusted pre-compiled binaries. Ever.
 
 ---
 
@@ -35,9 +59,9 @@ When you launch a GUI application on Zenith:
 
 ## 🛠️ Zenith Developer SDK (Preview)
 
-The SDK provides a native C++ framework for building highly responsive, secure, and beautiful applications that natively bind to our secure backend.
+The SDK provides a native C++ framework for building responsive, secure apps that natively bind to our secure backend. A **Rust crate** (`zenith-sdk`) is also available for memory-safe application development.
 
-### Hello World Reference
+### Hello World Reference (C++)
 
 ```cpp
 #include <zenith.h>
@@ -46,23 +70,25 @@ using namespace Zenith;
 using namespace Zenith::UI;
 
 int main() {
-    // 1. Initialize app & negotiate secure Container Shard automatically
     Application app("Sigma Hello World");
-
-    // 2. Request a backing window from the sandboxed allocator
     app.createWindow(800, 600);
-
-    // 3. Setup declarative widgets
     Label title({ 300, 50, 200, 40 }, "Welcome to Sovereign Desktop");
     Button btn_click({ 325, 120, 150, 50 }, "Click Me!");
-
     app.addWidget(&title);
     app.addWidget(&btn_click);
-
-    // 4. Run native event loop
     app.run();
-
     return SIGMA_SUCCESS;
+}
+```
+
+### Hello World Reference (Rust)
+
+```rust
+use zenith_sdk::Application;
+
+fn main() {
+    let app = Application::new("Sovereign Rust App");
+    app.run();
 }
 ```
 
@@ -71,5 +97,6 @@ int main() {
 ## 🚀 Key SDK Milestones
 
 *   **M4b.1:** Defined unified SDK Architecture (`zenith.h`).
-*   **M4b.2:** Released the initial Developer Preview containing declarative C++ layout components and sandboxing hooks.
-*   **M4b.3:** Extending SDK bindings to Rust and Python (Ongoing).
+*   **M4b.2:** Released the initial Developer Preview with declarative C++ layout components and sandboxing hooks.
+*   **M4b.3:** Rust crate (`zenith-sdk`) released for memory-safe app development.
+*   **M4b.4:** Onboarding Wizard and Sovereign App Store launched.
