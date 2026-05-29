@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN CONTAINER RUNTIME (S-CONTAINER)
  * =========================================================================
@@ -37,20 +37,30 @@ extern "C" {
 #define SIGMA_CTR_NAME_LEN   48u
 
 typedef struct {
+    sigma_u32 pid_ns_id;
+    sigma_u32 net_ns_id;
+    sigma_u32 mnt_ns_id;
+    sigma_u32 ipc_ns_id;
+} sigma_namespace_t;
+
+typedef struct {
     sigma_u32 id;
     char      name[SIGMA_CTR_NAME_LEN];
-    sigma_u32 state;           /* SIGMA_CTR_* state                */
-    sigma_u32 isolation_flags; /* Bitmask of SIGMA_CTR_ISO_*       */
-    sigma_u32 cpu_shares;      /* Relative CPU weight (1-1024)      */
-    sigma_u32 mem_limit_mb;    /* 0 = unlimited                     */
-    sigma_u32 root_pid;        /* Container init PID                */
+    sigma_u8  state;
+    sigma_u32 mem_limit_mb;
+    sigma_u32 cpu_shares;
+    
+    /* Sovereign namespace mapping */
+    sigma_namespace_t ns;
 } sigma_container_t;
 
 typedef struct {
     sigma_container_t containers[SIGMA_CTR_MAX];
-    sigma_u32 count;
-    sigma_u32 running_count;
 } sigma_container_registry_t;
+
+/* Sovereign namespace clone primitive (POSIX-free alternative to linux clone()) */
+sigma_u32 sigma_sys_clone(void (*entry_point)(void*), void* arg, sigma_u32 iso_flags);
+
 
 /* --- Container Primitives --- */
 void      container_runtime_init(void);

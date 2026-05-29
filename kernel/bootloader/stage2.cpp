@@ -49,6 +49,36 @@ extern "C" void setup_transitional_paging() {
     }
 }
 
+// Simulated architecture initialization
+bool init_x86_64() {
+    // sys_print("[stage2] Initializing x86_64 CPU...\n");
+    // e.g., set up GDT, IDT, paging
+    return true;
+}
+
+// Simulated core kernel initialization
+bool init_kernel() {
+    // sys_print("[stage2] Initializing SigmaOS kernel...\n");
+    // Deliberately simulate a failure for testing the fallback path
+    // In production, this returns true if memory, interrupts, etc. initialize correctly.
+    // return true; 
+    return false; /* Simulated failure to trigger Safe Mode */
+}
+
+extern "C" void load_safe_mode(void);
+
+// Safe Mode fallback boot sequence
+void boot_sequence() {
+    if (!init_kernel()) {
+        // sys_print("\n[CRITICAL] Kernel initialization failed!\n");
+        // sys_print("[stage2] Entering Sovereign Safe Mode...\n");
+        load_safe_mode();
+    } else {
+        // sys_print("[stage2] Kernel init successful. Starting normal boot...\n");
+        // start_normal_boot();
+    }
+}
+
 extern "C" void sigma_vga_printf(const char* fmt, ...);
 
 // Entry point from Stage 1 (after switching to 32-bit protected mode)
@@ -56,6 +86,14 @@ extern "C" void sigma_stage2_main() {
     sigma_vga_printf("Stage 2 Bootloader Initialized.\n");
     sigma_vga_printf("[BOOT] Initializing transitional page structures for AP cores...\n");
     setup_transitional_paging();
+    
+    if (!init_x86_64()) {
+        sigma_vga_printf("[stage2] CPU initialization failed. Halting.\n");
+        return;
+    }
+
+    boot_sequence();
+
     sigma_vga_printf("[BOOT] Identity-mapped first 4MB RAM (Directory: 0x%X)\n", (u32)(unsigned long)transitional_page_directory);
     sigma_vga_printf("[BOOT] Early Local APIC & I/O APIC setup mapping prepared.\n");
     

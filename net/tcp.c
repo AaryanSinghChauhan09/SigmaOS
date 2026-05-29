@@ -42,10 +42,16 @@ typedef struct {
     sigma_u32 seq_num;
     sigma_u32 ack_num;
     sigma_u16 window;
+    sigma_u16 cwnd;       /* Congestion window (MSS segments) */
+    sigma_u16 ssthresh;   /* Slow-start threshold */
+    sigma_u32 rto;        /* Retransmission timeout */
     sigma_bool active;
 } sigma_tcp_sock_t;
 
 static sigma_tcp_sock_t tcp_sockets[TCP_MAX_SOCKETS];
+
+/* Forward declaration for routing */
+extern void sigma_ipv4_send(sigma_u32 dst_ip, sigma_u8 protocol, const void* payload, sigma_size_t len);
 
 void tcp_init(void) {
     sigma_memset(tcp_sockets, 0, sizeof(tcp_sockets));
@@ -65,8 +71,8 @@ int tcp_listen(sigma_u16 port) {
     return -1;
 }
 
-void tcp_process_packet(sigma_u32 src_ip, sigma_u16 src_port, sigma_u32 dst_ip, sigma_u16 dst_port, sigma_u8 flags, sigma_u32 seq, sigma_u32 ack) {
-    /* Simplified State Machine dispatcher */
+void tcp_process_packet(sigma_u32 src_ip, sigma_u16 src_port, sigma_u32 dst_ip, sigma_u16 dst_port, sigma_u16 flags, sigma_u32 seq, sigma_u32 ack, const void* payload, sigma_size_t payload_len) {
+    /* Simplified State Machine dispatcher with basic validation */
     for (sigma_u32 i = 0; i < TCP_MAX_SOCKETS; i++) {
         if (tcp_sockets[i].active && tcp_sockets[i].local_port == dst_port) {
             sigma_tcp_sock_t* sock = &tcp_sockets[i];
@@ -79,14 +85,20 @@ void tcp_process_packet(sigma_u32 src_ip, sigma_u16 src_port, sigma_u32 dst_ip, 
                         sock->remote_ip = src_ip;
                         sock->remote_port = src_port;
                         sock->ack_num = seq + 1;
-                        /* Would send SYN-ACK here */
+                        sock->seq_num = 1000; /* Initial ISN */
+                        sock->cwnd = 1;       /* Initial cwnd */
+                        sock->ssthresh = 64;  /* Initial ssthresh */
+                        /* TODO: send SYN-ACK here */
                     }
                     break;
                     
                 case TCP_STATE_SYN_RECV:
                     if (flags & TCP_FLAG_ACK) {
-                        sigma_printf("[tcp] Received ACK from %u:%u. Connection ESTABLISHED.\n", src_ip, src_port);
-                        sock->state = TCP_STATE_ESTABLISHED;
+                        if (ack == sock->seq_num + 1) {
+                            sigma_printf("[tcp] Received ACK from %u:%u. Connection ESTABLISHED.\n", src_ip, src_port);
+                            sock->state = TCP_STATE_ESTABLISHED;
+                            sock->seq_num++;
+                        }
                     }
                     break;
                     
@@ -94,10 +106,35 @@ void tcp_process_packet(sigma_u32 src_ip, sigma_u16 src_port, sigma_u32 dst_ip, 
                     if (flags & TCP_FLAG_FIN) {
                         sigma_printf("[tcp] Received FIN from %u:%u. Transitioning to CLOSE_WAIT.\n", src_ip, src_port);
                         sock->state = TCP_STATE_CLOSE_WAIT;
-                        /* Would send ACK here */
+                        sock->ack_num = seq + 1;
+                        /* TODO: send ACK here */
                     } else if (flags & TCP_FLAG_PSH) {
-                        sigma_printf("[tcp] Received PSH/ACK. Processing payload.\n");
-                        sock->ack_num = seq + 1; /* Simplification */
+                        sigma_printf("[tcp] Received PSH/ACK. Processing %u bytes.\n", (unsigned)payload_len);
+                        /* Basic sequence validation */
+                        if (seq == sock->ack_num) {
+                            sock->ack_num += payload_len;
+                            /* Congestion control: additive increase */
+                            if (sock->cwnd < sock->ssthresh) {
+                                sock->cwnd *= 2; /* slow start */
+                            } else {
+                                sock->cwnd += 1; /* congestion avoidance */
+                            }
+                        } else {
+                            sigma_printf("[tcp] Out-of-order sequence: expected %u, got %u\n", sock->ack_num, seq);
+                        }
+                    }
+                    break;
+                case TCP_STATE_CLOSE_WAIT:
+                    /* Application would close socket here, transitioning to LAST_ACK */
+                    break;
+                case TCP_STATE_FIN_WAIT1:
+                    if (flags & TCP_FLAG_ACK) sock->state = TCP_STATE_FIN_WAIT2;
+                    break;
+                case TCP_STATE_FIN_WAIT2:
+                    if (flags & TCP_FLAG_FIN) {
+                        sock->state = TCP_STATE_TIME_WAIT;
+                        sock->ack_num = seq + 1;
+                        /* TODO: send ACK */
                     }
                     break;
             }

@@ -48,6 +48,53 @@ public:
     }
 };
 
+#include "../sdk/include/zenith.h"
+
+// Fwd declarations for sovereign framebuffer interaction
+extern "C" void sigma_fb_flush(void);
+extern "C" void sigma_fb_draw_rect(int x, int y, int w, int h, uint32_t color);
+extern "C" int sigma_input_poll_event(void);
+
+// Simulated compositor loop avoiding GTK/Qt completely
+void compositor_loop() {
+    bool running = true;
+    while (running) {
+        // 1. Poll input events (simulated)
+        int ev = sigma_input_poll_event();
+        if (ev < 0) {
+            // handle error or exit
+        }
+        
+        // 2. Draw surfaces to framebuffer
+        // Draw background
+        sigma_fb_draw_rect(0, 0, 1920, 1080, 0x1E1E2E); // Catppuccin Mocha Base
+        
+        // Draw some "windows"
+        sigma_fb_draw_rect(100, 100, 800, 600, 0x313244); // Surface0
+        sigma_fb_draw_rect(950, 100, 800, 600, 0x313244); 
+        
+        // 3. Flush framebuffer
+        sigma_fb_flush();
+        
+        // Simulated wait for vblank
+        // sys_yield();
+        break; // break for testing to avoid infinite loop
+    }
+}
+
+class ZenithCompositor {
+public:
+    void Init() {
+        // Initialize DRM/KMS or direct framebuffer
+        sigma_printf("[Compositor] Sovereign Zenith Compositor Initialized.\n");
+    }
+    
+    void Run() {
+        sigma_printf("[Compositor] Entering main compositor loop...\n");
+        compositor_loop();
+    }
+};
+
 class Compositor {
 public:
     static Compositor& getInstance() {

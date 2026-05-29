@@ -1,0 +1,15 @@
+name: coreutils
+version: 1.0
+
+build_depends:
+  - sigma-libc
+  - sigma-gcc
+
+sources:
+  - git://sigmaos.org/coreutils.git
+
+build:
+  - make CC=sigma-gcc CFLAGS="-O2 -nostdlib"
+
+install:
+  - make install DESTDIR=$OUT

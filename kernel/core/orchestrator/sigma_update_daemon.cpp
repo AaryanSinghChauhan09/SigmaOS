@@ -14,8 +14,8 @@
  */
 
 #include <sigma_libc.h>
-#include <sigma_error_codes.h>
-#include <sigma_driver_codes.h>
+#include "../../../include/sigma_error_codes.h"
+#include "../../../include/sigma_driver_codes.h"
 
 // Forward declarations from sibling subsystems
 extern "C" sigma_status sigma_driver_registry_rebuild_dkms(const char* kernel_version);

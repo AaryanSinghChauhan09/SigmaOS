@@ -13,7 +13,7 @@
 #define SIGMA_LIBC_H
 
 #include "./sigma_kernel_types.h"
-#include "./sigma_log.h"
+/* sigma_log.h is NOT included here — include it explicitly if needed. */
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,10 +24,12 @@ extern "C" {
  * ------------------------------------------------------------------------- */
 void*        sigma_malloc(sigma_size_t size);
 void         sigma_free(void* ptr);
+void*        sigma_realloc(void* ptr, sigma_size_t size);
 void*        sigma_memset(void* dst, sigma_u8 val, sigma_size_t n);
 void*        sigma_memcpy(void* dst, const void* src, sigma_size_t n);
 void*        sigma_memmove(void* dst, const void* src, sigma_size_t n);
-int          posix_memalign(void** memptr, sigma_size_t alignment, sigma_size_t size);
+int          sigma_memcmp(const void* a, const void* b, sigma_size_t n);
+int          sigma_posix_memalign(void** memptr, sigma_size_t alignment, sigma_size_t size);
 
 /* -------------------------------------------------------------------------
  * String Operations
@@ -51,9 +53,13 @@ sigma_i32    sigma_abs(sigma_i32 val);
 /* -------------------------------------------------------------------------
  * I/O — Syscall-backed, no FILE*, no glibc
  * ------------------------------------------------------------------------- */
-void         sys_print(const char* fmt, ...);     /* %s %d %u %x %c %% */
+void         sys_print(const char* fmt, ...);     /* %s %d %u %x %p %c %% %ld %lu %lx */
+sigma_size_t sigma_snprintf(char* buf, sigma_size_t max, const char* fmt, ...);
 sigma_status sys_ipc_send(sigma_u32 target_shard, sigma_u32 msg_id,
                            const void* data, sigma_size_t len);
+
+/* ---- CPU Feature Detection (call once at boot) ---- */
+void         sigma_libc_detect_cpu_features(void);
 
 #ifdef __cplusplus
 }
