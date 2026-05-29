@@ -13,6 +13,7 @@
 
 extern "C" void sigma_vga_printf(const char* fmt, ...);
 extern "C" int sigma_service_parse_and_start(const char* service_name);
+extern "C" void sigma_meta_boot_for_profile(sigma_u32 profile_id);
 
 #define PROFILE_MINIMAL   0
 #define PROFILE_DEVELOPER 1
@@ -26,6 +27,8 @@ static const char* profile_names[] = {
 
 extern "C" int sigma_boot_profile(int profile) {
     sigma_vga_printf("[PROFILE] Booting SigmaOS in '%s' mode.\n", profile_names[profile]);
+
+    sigma_meta_boot_for_profile((sigma_u32)profile);
 
     // Common services for all profiles
     sigma_service_parse_and_start("sigma_init");

@@ -23,6 +23,7 @@ typedef enum {
 #define SIGMA_META_ALL_FEATURES 0x7Fu
 
 void sigma_meta_distro_init(sigma_u32 feature_mask);
+void sigma_meta_boot_for_profile(sigma_u32 profile_id);
 const char* sigma_meta_distro_status_json(void);
 
 #ifdef __cplusplus

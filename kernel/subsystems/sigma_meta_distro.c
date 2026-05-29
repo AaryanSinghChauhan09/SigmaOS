@@ -14,6 +14,7 @@ extern void SovereignPkg_InitRegistry(void);
 /* Containers initialized via sigma-pod / orchestrator at user request */
 #endif
 extern void zenith_subsystem_init(sigma_u32 w, sigma_u32 h);
+extern void sigma_orchestrator_init(void);
 
 static sigma_u32 g_features;
 static char g_status[256];
@@ -36,6 +37,9 @@ void sigma_meta_distro_init(sigma_u32 feature_mask) {
     if (feature_mask & SIGMA_FEATURE_RECOVERY) {
         recovery_init();
         recovery_gui_init();
+    }
+    if (feature_mask & SIGMA_FEATURE_CONTAINERS) {
+        sigma_orchestrator_init();
     }
     if (feature_mask & SIGMA_FEATURE_DESKTOP) {
         zenith_subsystem_init(1920, 1080);

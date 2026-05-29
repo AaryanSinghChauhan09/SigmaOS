@@ -41,6 +41,8 @@ Status: `✓` present · `~` partial · `—` not required for branch profile
 | Solus / Ubuntu | Zenith theme + `~/.sigma_profile` | `zenith_desktop/personalization/` |
 | Rescuezilla / SystemRescue | `sigma_automation.sh recovery-check` + Fix-it menu | `scripts/`, `sigma_boot_recovery_menu.c` |
 | RancherOS | `sigma-pod run-native` namespaces/cgroups | `sigma_pod_cli.cpp`, `sigma_cgroup.c` |
+| SlackBuilds | Community `.spkg` recipes + wiki sync | `sigma_pkg_registry/`, `sigma_pkg_recipe.c` |
+| Linux From Scratch | Sovereignty + docs/playbooks | `PHASE_*_EXECUTION_CHECKLIST.md`, wiki |
 
 ## Branch profiles (CI)
 
