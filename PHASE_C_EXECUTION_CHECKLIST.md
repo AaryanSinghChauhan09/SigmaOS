@@ -1,54 +1,56 @@
 # Phase C Execution Checklist — Meta-Distro Integration
 
-Absorb competitor strengths as **sovereign subsystems** under one engine.  
-Status: `[x]` scaffold · `[~]` partial · `[ ]` not started
+Every competitor distro becomes a **subsystem** under `sigma_meta_distro_init()`.
+
+Status: `[x]` done · `[~]` partial · `[ ]` not started
 
 ---
 
-## Integration goals (competitor → subsystem)
+### Integration goals
 
-| Competitor | Subsystem | Status | Canonical path |
-|------------|-----------|--------|----------------|
-| SteamOS | Gaming / Proton layer | [~] | `kernel/subsystems/sigma_game_layer.c` |
-| Clear Linux | Silicon-aware scheduler profiles | [~] | `kernel/scheduler/sigma_sched_profiles.c` |
-| NixOS | Sovereign build registry (`.spkg`) | [~] | `sigma_pkg_registry/`, `include/security/sigma_pkg_registry.h` |
-| Fedora CoreOS / Flatcar | Immutable root + Safe Mode | [~] | `kernel/core/boot/sigma_boot.c`, rollback shards |
-| RancherOS | Native pod orchestration | [~] | `userland/tools/sigma_pod_cli.cpp` |
-| Rescuezilla / SystemRescue | GUI recovery + snapshots | [~] | `kernel/recovery/sigma_recovery.c` |
-| Solus / Ubuntu | Zenith GUI + personalization | [~] | `zenith_desktop/` |
-| SlackBuilds | Community `.spkg` recipes | [~] | `sigma_pkg_registry/recipes/` |
+- [~] `sigma_game_layer.c` → Proton/Wine compatibility (`sigma_game_launch_with_proton`, gamemode → sched)
+- [~] `sigma_sched.c` + `sigma_sched_profiles.c` → silicon-aware scheduler bridge
+- [~] `sigma_pkg_registry/` → sovereign build recipes + community `recipes/COMMUNITY.md`
+- [~] `sigma_boot.c` + `sigma_immutable_root.c` → immutable root + Safe Mode
+- [~] `sigma_pod_cli.cpp` → container orchestration (namespaces/cgroups)
+- [~] `sigma_recovery.c` + `sigma_recovery_gui.c` → recovery wizard UI
+- [~] `sigma_compositor.cpp` + `sigma_tiling_wm.cpp` → Zenith GUI + auto-tiling
+- [x] `sigma_automation.sh` → automation engine
+- [x] `sigma_cli.cpp` → modular CLI (update/backup/sync/profiles)
+- [~] `~/.sigma_profile` → personalization (`sigma_profile_engine.cpp` parser)
+- [x] `sigma_git_sync.sh` → GitHub sync
+- [x] `FEATURE_MATRIX.md` + `ci_branch_check.sh` → branch parity
+- [x] `sigma_meta_distro.c` → unified subsystem registry
 
 ---
 
-## Unified engine surfaces
+### Unified engine
 
-| Surface | Status | Notes |
+| Surface | Status | Entry |
 |---------|--------|-------|
+| Meta-distro init | [x] | `sigma_meta_distro_init(SIGMA_META_ALL_FEATURES)` |
 | Automation | [x] | `scripts/sigma_automation.sh` |
-| CLI | [x] | `sigma_cli` + host wrapper |
-| GUI / UX | [~] | Compositor + tiling + theme |
-| Personalization | [~] | `~/.sigma_profile` |
-| GitHub sync | [x] | `scripts/sigma_git_sync.sh` |
-| Branch parity | [x] | `FEATURE_MATRIX.md` + CI |
-| Wiki auto-sync | [x] | `wiki_repo/` + workflow |
+| CLI | [x] | `sigma-cli` / `scripts/sigma_cli_host.sh` |
+| Wiki | [x] | `wiki_repo/` + `.github/workflows/wiki-sync.yml` |
 
 ---
 
-## Tests
+### Tests
 
 ```bash
+./scripts/sigma_automation.sh meta-check
 ./scripts/ci_branch_check.sh
 ./scripts/sigma_branch_sync.sh --report
-./scripts/sigma_automation.sh recovery-check
+./scripts/sigma_git_sync.sh --dry-run
 ```
 
 ---
 
-## Next milestones
+### Remaining milestones
 
-1. Wire `sigma_game_layer` to container GPU passthrough policy.
-2. Enable PGO + `sigma_sched_profiles` in release `Makefile` targets.
-3. Signed recipe verification in `SovereignPkg_Register`.
-4. VFS-backed `~/.sigma_profile` and recovery GUI wizard.
+1. Live Proton/Wine process spawn inside `sigma-pod` GPU profile.
+2. PGO release targets wiring Clear Linux flags in top-level `Makefile`.
+3. VFS read of real `~/.sigma_profile` on guest boot.
+4. Graphical recovery wizard (framebuffer) atop `sigma_recovery_gui.c`.
 
 See [docs/META_DISTRO_UNIFIED_ENGINE.md](docs/META_DISTRO_UNIFIED_ENGINE.md).

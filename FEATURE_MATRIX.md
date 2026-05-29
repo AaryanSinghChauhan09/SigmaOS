@@ -62,14 +62,16 @@ Status: `✓` present · `~` partial · `—` not required for branch profile
 ./scripts/sigma_automation.sh wiki-sync
 ```
 
-## Phase C meta-distro scaffolds (main branch)
+## Phase C meta-distro (main branch)
 
 | Module | Path | Status |
 |--------|------|--------|
-| Gaming layer | `kernel/subsystems/sigma_game_layer.c` | scaffold |
-| Scheduler profiles | `kernel/scheduler/sigma_sched_profiles.c` | scaffold |
-| Package registry | `sigma_pkg_registry/` | scaffold |
-| Recovery API | `kernel/recovery/sigma_recovery.c` | scaffold |
+| **Registry hub** | `kernel/subsystems/sigma_meta_distro.c` | wired |
+| Gaming layer | `kernel/subsystems/sigma_game_layer.c` | partial |
+| Scheduler bridge | `kernel/scheduler/sigma_sched.c` | partial |
+| Immutable root | `kernel/core/boot/sigma_immutable_root.c` | partial |
+| Package registry | `sigma_pkg_registry/` | partial |
+| Recovery + GUI | `kernel/recovery/sigma_recovery.c`, `sigma_recovery_gui.c` | partial |
 | Zenith unified init | `zenith_desktop/zenith_unified_init.cpp` | wired |
 
 See `PHASE_C_EXECUTION_CHECKLIST.md`.

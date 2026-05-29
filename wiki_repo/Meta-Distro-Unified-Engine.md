@@ -46,9 +46,31 @@ flowchart TB
 
 All `release/*` branches must satisfy profiles in `FEATURE_MATRIX.md`. CI runs `scripts/ci_branch_check.sh` on every push.
 
+## Central registry
+
+All competitor modules are initialized through one call:
+
+```c
+#include "sigma_meta_distro.h"
+
+sigma_meta_distro_init(SIGMA_META_ALL_FEATURES);
+```
+
+Implementation: `kernel/subsystems/sigma_meta_distro.c`
+
+| Flag | Subsystem |
+|------|-----------|
+| `SIGMA_FEATURE_GAMING` | `sigma_game_layer.c` |
+| `SIGMA_FEATURE_PERFORMANCE` | `sigma_sched.c` |
+| `SIGMA_FEATURE_PACKAGES` | `sigma_pkg_registry/` |
+| `SIGMA_FEATURE_IMMUTABLE` | `sigma_immutable_root.c` |
+| `SIGMA_FEATURE_RECOVERY` | `sigma_recovery.c` + GUI |
+| `SIGMA_FEATURE_DESKTOP` | Zenith compositor + tiling + profile |
+
 ## Maintainer workflow
 
 ```bash
+./scripts/sigma_automation.sh meta-check
 ./scripts/sigma_automation.sh update
 ./scripts/ci_branch_check.sh
 ./scripts/sigma_branch_sync.sh --report

@@ -29,6 +29,27 @@ cmd_update_check() {
   log "Run 'make iso' after merging updates."
 }
 
+cmd_meta_check() {
+  log "Meta-distro subsystem file scan..."
+  local ok=0
+  for f in \
+    kernel/subsystems/sigma_meta_distro.c \
+    kernel/subsystems/sigma_game_layer.c \
+    kernel/scheduler/sigma_sched.c \
+    kernel/core/boot/sigma_immutable_root.c \
+    kernel/recovery/sigma_recovery_gui.c \
+    zenith_desktop/zenith_unified_init.cpp \
+    sigma_pkg_registry/README.md; do
+    if [[ -f "${ROOT}/${f}" ]]; then
+      log "OK  ${f}"
+    else
+      log "MISSING ${f}"
+      ok=1
+    fi
+  done
+  return "$ok"
+}
+
 cmd_recovery_check() {
   log "Recovery readiness scan..."
   local ok=0
@@ -76,6 +97,7 @@ Commands:
   update          Fetch status + mirror wiki_repo/ (Phase 7–8)
   update-check    Show git status after fetch
   recovery-check  Verify rollback/resilience files exist
+  meta-check      Verify Phase C meta-distro subsystem files
   wiki-sync       Mirror key docs into wiki_repo/
 EOF
 }
@@ -87,6 +109,7 @@ main() {
     update) cmd_update ;;
     update-check) cmd_update_check ;;
     recovery-check) cmd_recovery_check ;;
+    meta-check) cmd_meta_check ;;
     wiki-sync) cmd_wiki_sync ;;
     *) usage; exit 1 ;;
   esac

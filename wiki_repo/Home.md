@@ -39,6 +39,7 @@
 | [Phase B Checklist](Phase-B-Execution-Checklist) | Unified automation + CLI + GUI |
 | [Phase C Checklist](Phase-C-Execution-Checklist) | Meta-distro subsystem integration |
 | [Meta-Distro Engine](Meta-Distro-Unified-Engine) | Competitor → subsystem map |
+| [Meta-Distro Registry](Meta-Distro-Registry) | `sigma_meta_distro_init()` hub |
 | [Problems Manifest](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CURRENT_PROBLEMS_MANIFEST.md) | Active bugs and Phase A status |
 
 ---

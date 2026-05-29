@@ -1,13 +1,7 @@
 /*
  * Silicon-aware scheduler profiles — Clear Linux-inspired tuning (Phase C).
  */
-#include "../../include/sigma_kernel_types.h"
-
-typedef enum {
-    SIGMA_SCHED_PROFILE_BALANCED = 0,
-    SIGMA_SCHED_PROFILE_PERFORMANCE = 1,
-    SIGMA_SCHED_PROFILE_POWERSAVE = 2,
-} sigma_sched_profile_t;
+#include "../../include/sigma_sched.h"
 
 static sigma_sched_profile_t g_active = SIGMA_SCHED_PROFILE_BALANCED;
 

@@ -67,7 +67,7 @@ static void print_usage() {
     sys_print("Usage:\n");
     sys_print("  sigma-cli profile list|show|use <name>\n");
     sys_print("  sigma-cli alias list|add <name> <cmd>\n");
-    sys_print("  sigma-cli update | backup | sync\n");
+    sys_print("  sigma-cli update | backup | sync | game-mode | recovery\n");
     sys_print("  sigma-cli branch-check\n");
     sys_print("  sigma-cli automation <backup|update|update-check|recovery-check|wiki-sync>\n");
 }
@@ -150,6 +150,16 @@ extern "C" int main(int argc, char** argv) {
 
     if (sigma_strcmp(argv[1], "sync") == 0) {
         sys_print("[cli] Invoke host: scripts/sigma_git_sync.sh\n");
+        return 0;
+    }
+
+    if (sigma_strcmp(argv[1], "game-mode") == 0) {
+        sys_print("[cli] Enable Proton + performance sched (sigma_game_layer + sigma_sched)\n");
+        return 0;
+    }
+
+    if (sigma_strcmp(argv[1], "recovery") == 0) {
+        sys_print("[cli] Open recovery wizard (sigma_recovery_gui)\n");
         return 0;
     }
 

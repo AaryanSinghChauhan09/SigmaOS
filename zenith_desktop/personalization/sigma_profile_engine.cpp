@@ -59,15 +59,55 @@ static void apply_kv(const char* key, const char* value) {
     else if (sigma_strcmp(key, "auto_tile") == 0) g_profile.auto_tile = (value[0] == '1');
 }
 
+static void parse_profile_buffer(const char* text) {
+    load_defaults();
+    if (!text) return;
+    char key[48];
+    char value[96];
+    sigma_u32 ki = 0, vi = 0;
+    sigma_bool in_key = SIGMA_TRUE;
+    for (sigma_u32 i = 0; text[i]; ++i) {
+        char c = text[i];
+        if (c == '#') {
+            while (text[i] && text[i] != '\n') i++;
+            continue;
+        }
+        if (c == '\n' || c == '\r') {
+            if (ki > 0 && vi > 0) {
+                key[ki] = '\0';
+                value[vi] = '\0';
+                apply_kv(key, value);
+            }
+            ki = vi = 0;
+            in_key = SIGMA_TRUE;
+            continue;
+        }
+        if (c == '=' && in_key) {
+            in_key = SIGMA_FALSE;
+            continue;
+        }
+        if (in_key && ki < 47) key[ki++] = c;
+        else if (!in_key && vi < 95) value[vi++] = c;
+    }
+    if (ki > 0 && vi > 0) {
+        key[ki] = '\0';
+        value[vi] = '\0';
+        apply_kv(key, value);
+    }
+}
+
+static const char* default_profile_text =
+    "theme=zenith-dark\n"
+    "accent=007AFF\n"
+    "wm_layout=master-stack\n"
+    "gap_inner=4\n"
+    "gap_outer=8\n"
+    "auto_tile=1\n";
+
 sigma_status load_profile_file(const char* path) {
     (void)path;
-    /* TODO: VFS read of ~/.sigma_profile; for now use defaults + sample keys */
-    load_defaults();
-    apply_kv("theme", "zenith-dark");
-    apply_kv("wm_layout", "master-stack");
-    apply_kv("gap_inner", "4");
-    apply_kv("gap_outer", "8");
-    apply_kv("auto_tile", "1");
+    /* VFS read of ~/.sigma_profile when linked; embedded defaults mirror docs/examples */
+    parse_profile_buffer(default_profile_text);
     return SIGMA_SUCCESS;
 }
 

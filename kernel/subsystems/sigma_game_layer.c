@@ -2,7 +2,8 @@
  * SigmaOS gaming subsystem — SteamOS-class compatibility layer (Phase C).
  * Future: Proton/Wine shim IPC, GPU passthrough policy, sigma-pod game profiles.
  */
-#include "../../include/sigma_kernel_types.h"
+#include "../../include/sigma_game_layer.h"
+#include "../../include/sigma_sched.h"
 
 typedef struct {
     sigma_bool proton_enabled;
@@ -27,6 +28,20 @@ sigma_bool sigma_game_layer_is_proton_enabled(void) {
 }
 
 void sigma_game_layer_apply_gamemode(void) {
-    /* Hook: raise scheduler weight + compositor bypass for focused game window */
     g_game.gamemode_cpu_boost = SIGMA_TRUE;
+    extern void sigma_sched_set_performance(void);
+    sigma_sched_set_performance();
+}
+
+void sigma_game_set_gpu_performance_mode(sigma_bool high_perf) {
+    (void)high_perf;
+    /* Hook: GPU performance P-state via driver shard */
+}
+
+sigma_status sigma_game_launch_with_proton(const char* exe_path, const char* prefix_path) {
+    if (!g_game.proton_enabled) return K_ERR_INVAL;
+    (void)exe_path;
+    (void)prefix_path;
+    /* Future: spawn wine/proton compat process in isolated pod */
+    return K_OK;
 }

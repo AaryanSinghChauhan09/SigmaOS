@@ -53,11 +53,16 @@ CORE_FILES=(
 )
 
 META_SCaffold=(
+  kernel/subsystems/sigma_meta_distro.c
   kernel/subsystems/sigma_game_layer.c
+  kernel/scheduler/sigma_sched.c
   kernel/scheduler/sigma_sched_profiles.c
+  kernel/core/boot/sigma_immutable_root.c
   kernel/recovery/sigma_recovery.c
+  kernel/recovery/sigma_recovery_gui.c
   sigma_pkg_registry/README.md
   zenith_desktop/zenith_unified_init.cpp
+  include/sigma_meta_distro.h
 )
 
 DESKTOP_FILES=(
