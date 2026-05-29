@@ -6,7 +6,8 @@
  * libraries to secure the block layer.
  */
 
-#include "../../../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
+#include "../../include/sigma_vfs_crypto.h"
 
 namespace sigma {
 namespace crypto {

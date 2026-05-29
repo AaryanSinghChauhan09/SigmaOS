@@ -193,7 +193,9 @@ void vga_putc_at(sigma_u8 x, sigma_u8 y, char c, sigma_u8 color);
 
 
 #define SIGMA_OK 0
+#define SIGMA_SUCCESS 0
 #define SIGMA_ERROR -1
+#define SIGMA_NULL ((void*)0)
 
 typedef enum {
     SIGMA_BOOT_STAGE_INIT = 0,

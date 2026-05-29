@@ -39,7 +39,7 @@ bool verify_allocation(const SovereignSandboxContext* ctx, uint64_t requested_by
         return false; // OOM in sandbox
     }
     
-    if (is_executable && !ctx->check_capability(&CapabilityMask::can_allocate_rwx)) {
+    if (is_executable && !ctx->caps.can_allocate_rwx) {
         return false; // W^X violation
     }
     

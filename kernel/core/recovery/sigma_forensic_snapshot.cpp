@@ -44,7 +44,7 @@ sigma_status create_forensic_snapshot(const char* output_path) {
     freeze_userspace();
 
     ForensicDumpHeader header;
-    header.magic = 0xCA1NE001;
+    header.magic = 0xCA1E001;
     header.timestamp = 0; // TODO: Get RTC time
     header.memory_size = 0; // TODO: Get active RAM footprint
     header.active_processes = 0;

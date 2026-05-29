@@ -10,6 +10,7 @@
 #include "../include/sigma_kernel_types.h"
 #include "../include/sigma_log.h"
 #include "../include/kernel/sigma_init_system.h"
+#include "../include/kernel/sigma_journal.h"
 
 namespace SigmaOS {
 namespace Kernel {
@@ -26,10 +27,12 @@ public:
         m_boot_start_tsc = cpu_rdtsc();
         m_current_stage = BOOT_STAGE_FIRMWARE;
 
-        sigma_log("╔══════════════════════════════════════════════════╗");
-        sigma_log("║         Σ SigmaOS — sigma-init v1.0             ║");
-        sigma_log("║    Sovereign Service Manager & Boot Orchestrator ║");
-        sigma_log("╚══════════════════════════════════════════════════╝");
+        journal_init();
+
+        journal_info("init", "╔══════════════════════════════════════════════════╗");
+        journal_info("init", "║         Σ SigmaOS — sigma-init v1.0             ║");
+        journal_info("init", "║    Sovereign Service Manager & Boot Orchestrator ║");
+        journal_info("init", "╚══════════════════════════════════════════════════╝");
 
         /* Register core system services */
         sigma_u32 sandbox_id  = registerService("sigma-sandbox",   BOOT_STAGE_KERNEL,   RESTART_ALWAYS,     SIGMA_TRUE);
@@ -55,22 +58,30 @@ public:
         addDependency(zenith_id, shell_id);         /* zenith needs shell */
         addDependency(zenith_id, net_id);           /* zenith needs network */
 
-        sigma_log_info("[INIT] %u core services registered.\n", m_service_count);
+        journal_info("init", "%u core services registered.", m_service_count);
     }
 
     void boot() {
-        sigma_log("[INIT] ═══════ BOOT SEQUENCE START ═══════");
+        journal_info("init", "═══════ BOOT SEQUENCE START ═══════");
 
         for (sigma_u32 stage = BOOT_STAGE_FIRMWARE; stage <= BOOT_STAGE_USERLAND; stage++) {
             m_current_stage = (sigma_boot_stage_init_t)stage;
             const char* stage_name = stageToStr(m_current_stage);
-            sigma_log_info("[INIT] ──── Stage: %s ────\n", stage_name);
+            journal_info("init", "──── Stage: %s ────", stage_name);
 
-            /* Start all services in this stage (respecting dependencies) */
+            /* Parallel Boot: Determine independent services for this stage */
+            sigma_u32 services_to_start[INIT_MAX_SERVICES];
+            sigma_u32 count = 0;
+
             for (sigma_u32 i = 0; i < m_service_count; i++) {
                 if ((sigma_u32)m_services[i].boot_stage == stage) {
-                    startServiceResolved(i);
+                    services_to_start[count++] = i;
                 }
+            }
+
+            /* For now, just resolve their dependencies recursively and start */
+            for (sigma_u32 i = 0; i < count; i++) {
+                startServiceResolved(services_to_start[i]);
             }
         }
 
@@ -80,10 +91,10 @@ public:
         /* Approximate: assume 3GHz → 1 cycle = 0.33ns */
         m_boot_time_us = boot_cycles / 3000;
 
-        sigma_log("[INIT] ═══════ BOOT SEQUENCE COMPLETE ═══════");
-        sigma_log_info("[INIT] Boot time: ~%llu μs (%llu cycles)\n",
-                       (unsigned long long)m_boot_time_us,
-                       (unsigned long long)boot_cycles);
+        journal_info("init", "═══════ BOOT SEQUENCE COMPLETE ═══════");
+        journal_info("init", "Boot time: ~%llu μs (%llu cycles)",
+                     (unsigned long long)m_boot_time_us,
+                     (unsigned long long)boot_cycles);
     }
 
     sigma_u32 registerService(const char* name, sigma_boot_stage_init_t stage,
@@ -126,8 +137,38 @@ public:
 
         svc->state = SERVICE_STOPPED;
         svc->pid = 0;
-        sigma_log_info("[INIT] Service '%s' stopped.\n", svc->name);
+        journal_info("init", "Service '%s' stopped.", svc->name);
         return K_OK;
+    }
+    
+    void monitorServices() {
+        /* This would run in a loop or be triggered by SIGCHLD equivalent */
+        for (sigma_u32 i = 0; i < m_service_count; i++) {
+            sigma_service_t& svc = m_services[i];
+            
+            /* Check if a running service has failed (mock check) */
+            if (svc.state == SERVICE_RUNNING) {
+                // If waitpid(svc.pid) indicates exit:
+                // svc.state = SERVICE_FAILED;
+                // handleServiceFailure(&svc);
+            }
+        }
+    }
+    
+    void handleServiceFailure(sigma_service_t* svc) {
+        journal_err("init", "Service '%s' (PID %u) failed!", svc->name, svc->pid);
+        
+        if (svc->critical) {
+            journal_crit("init", "Critical service '%s' failed. Halting system.", svc->name);
+            sigma_panic("Critical service failure", 0, 0);
+        }
+        
+        if (svc->restart_policy == RESTART_ALWAYS || svc->restart_policy == RESTART_ON_FAILURE) {
+            svc->restart_count++;
+            journal_warn("init", "Restarting '%s' (Attempt %u)", svc->name, svc->restart_count);
+            svc->state = SERVICE_RESTARTING;
+            startServiceImpl(svc);
+        }
     }
 
     sigma_service_state_t serviceStatus(sigma_u32 service_id) {
@@ -136,24 +177,7 @@ public:
     }
 
     void printBootLog() {
-        sigma_log("\n╔══════════════════════════════════════════════════════════════╗");
-        sigma_log("║                  SIGMA-INIT BOOT LOG                        ║");
-        sigma_log("╠══════╦══════════════════════╦═══════════╦══════════╦═════════╣");
-        sigma_log("║  ID  ║ Service              ║ State     ║ Stage    ║ Crit    ║");
-        sigma_log("╠══════╬══════════════════════╬═══════════╬══════════╬═════════╣");
-
-        for (sigma_u32 i = 0; i < m_service_count; i++) {
-            const sigma_service_t& s = m_services[i];
-            const char* state = stateToStr(s.state);
-            const char* stage = stageToStr(s.boot_stage);
-            sigma_log_info("║ %4u ║ %-20s ║ %-9s ║ %-8s ║ %-7s ║\n",
-                           s.id, s.name, state, stage,
-                           s.critical ? "YES" : "no");
-        }
-
-        sigma_log("╚══════╩══════════════════════╩═══════════╩══════════╩═════════╝");
-        sigma_log_info("[INIT] Boot time: ~%llu μs | Services: %u\n",
-                       (unsigned long long)m_boot_time_us, m_service_count);
+        journal_print_boot_log();
     }
 
     void printServiceTree() {
@@ -191,7 +215,7 @@ private:
         svc->pid = 100 + svc->id; /* simulated PID */
         svc->state = SERVICE_RUNNING;
 
-        sigma_log_info("[INIT]   ✓ %s [RUNNING] (PID %u)\n", svc->name, svc->pid);
+        journal_info("init", "  ✓ %s [RUNNING] (PID %u)", svc->name, svc->pid);
         return K_OK;
     }
 
@@ -207,7 +231,9 @@ private:
         }
 
         /* Then start this service */
-        startServiceImpl(&svc);
+        if (svc.state != SERVICE_RUNNING) {
+            startServiceImpl(&svc);
+        }
     }
 
     static const char* stateToStr(sigma_service_state_t s) {

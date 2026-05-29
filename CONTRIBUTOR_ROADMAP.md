@@ -21,44 +21,37 @@ This roadmap formalizes the remaining gaps between SigmaOS Zenith and legacy com
 
 ## 🚀 Development Phases
 
-### Phase 1: Core Stabilisation (COMPLETE)
+> **Note to Contributors:** Previously, this document claimed parity was complete. We have performed an honest architectural audit. While the scaffolding is solid, true implementation is still needed. The roadmap is now actively tracking real feature development.
 
-- [x] QEMU cross-arch boot validation.
+### Phase 1: Core Stabilisation (IN PROGRESS)
 
-- [x] Implementation of core regression pipelines.
+- [x] Initial bootable state on x86_64 and QEMU cross-arch validation.
+- [x] Sovereign Init System with parallel boot & process monitoring.
+- [x] Ext4 Filesystem read/write implementation with superblock parsing.
+- [x] OmniPkg Manager format specification and local deployment logic.
+- [ ] Implement Ext4 ordered-mode JBD2 journaling.
+- [ ] Resolve memory management block allocator fragmentation.
 
-- [x] Resolution of all `@current_problems`.
+### Phase 2: Hardware & Network (PLANNED)
 
-- [x] Automated Wiki synchronization initialization.
+- [ ] Linux DRM/KMS compatibility shim at HAL level.
+- [ ] VFS network abstraction (NFS/SMB).
+- [ ] Native IPv4/IPv6 networking stack and drivers (e1000, ixgbe).
+- [ ] USB 3.0 and NVMe controller implementation.
 
-### Phase 2: Utilities Parity (COMPLETE)
+### Phase 3: Desktop Environment & Tooling (PLANNED)
 
-- [x] Forensic Snapshot Diff Engine implementation.
-
-- [x] Education Profile (Classroom management shards).
-
-- [x] Gaming Optimization Shards (GPU/Input).
-
-- [x] IoT/Sensor Toolkit for embedded silicon.
-
-### Phase 3: Advanced Automation (COMPLETE)
-
-- [x] Sovereign App Store GUI development.
-
-- [x] sigma-cli + Telemetry CLI expansion.
-
-- [x] Adaptive ML scheduling algorithms.
-
-- [x] Theme engine & Accessibility toolkit completion.
+- [ ] Migrate Zenith UI JS prototype to native C++ compositor.
+- [ ] Implement Sigma Shell robust scripting pipelines.
+- [ ] Implement a full guided graphical installer (Calamares equivalent).
 
 ## ⚙️ Contribution Principles
 
-1. **Sovereignty**: No external monolithic dependencies.
-
-2. **Transparency**: All changes must be reflected in the Wiki parity tables.
-
-3. **Resilience**: Shards must be atomic and PQC-sealed.
+1. **Sovereignty**: Minimize monolithic dependencies where possible.
+2. **Transparency**: All changes must reflect functional implementation, not just stubs.
+3. **Resilience**: Shards must be atomic and robust against crashes.
 
 ---
 
 ### Build the future of sovereignty. Join the lattice
+

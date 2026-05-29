@@ -6,8 +6,8 @@
  * and system daemons inside the kernel or userspace. Monitors CPU and memory boundaries.
  */
 
-#include "../../include/sigma_kernel_types.h"
-#include "../../include/sigma_domain_manager.h"
+#include "../../../include/sigma_kernel_types.h"
+#include "../../../include/sigma_domain_manager.h"
 
 namespace sigma {
 namespace container {
