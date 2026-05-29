@@ -67,7 +67,9 @@ static void print_usage() {
     sys_print("Usage:\n");
     sys_print("  sigma-cli profile list|show|use <name>\n");
     sys_print("  sigma-cli alias list|add <name> <cmd>\n");
-    sys_print("  sigma-cli automation <backup|update-check|recovery-check|wiki-sync>\n");
+    sys_print("  sigma-cli update\n");
+    sys_print("  sigma-cli branch-check\n");
+    sys_print("  sigma-cli automation <backup|update|update-check|recovery-check|wiki-sync>\n");
 }
 
 static void profile_list() {
@@ -133,6 +135,16 @@ extern "C" int main(int argc, char** argv) {
         if (sigma_strcmp(argv[2], "list") == 0) alias_list();
         else if (sigma_strcmp(argv[2], "add") == 0 && argc >= 5) alias_add(argv[3], argv[4]);
         else print_usage();
+        return 0;
+    }
+
+    if (sigma_strcmp(argv[1], "update") == 0) {
+        sys_print("[cli] Invoke host: scripts/sigma_automation.sh update\n");
+        return 0;
+    }
+
+    if (sigma_strcmp(argv[1], "branch-check") == 0) {
+        sys_print("[cli] Invoke host: scripts/ci_branch_check.sh\n");
         return 0;
     }
 

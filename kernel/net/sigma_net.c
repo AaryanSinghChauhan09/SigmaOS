@@ -61,6 +61,40 @@ static sigma_u8 g_local_ip[IPV4_ALEN]  = {192, 168, 1, 100};
 // Mock NIC send function
 extern void nic_tx_packet(sigma_u8* buffer, sigma_u32 len);
 
+extern void sigma_arp_receive(sigma_u8* packet, sigma_u32 len);
+extern void sigma_tcp_receive(sigma_u32 src_ip, sigma_u8* payload, sigma_u32 len);
+
+#define SIGMA_NET_RX_SLOTS 8
+#define SIGMA_NET_RX_SLOT_SIZE 2048
+#define SIGMA_NET_TX_SLOTS 4
+#define SIGMA_NET_TX_SLOT_SIZE 2048
+
+static sigma_u8 g_rx_pool[SIGMA_NET_RX_SLOTS][SIGMA_NET_RX_SLOT_SIZE];
+static sigma_u8 g_tx_pool[SIGMA_NET_TX_SLOTS][SIGMA_NET_TX_SLOT_SIZE];
+static sigma_u32 g_rx_head;
+static sigma_u32 g_tx_head;
+static sigma_bool g_nic_ready = SIGMA_FALSE;
+
+void nic_init(void) {
+    g_rx_head = 0;
+    g_tx_head = 0;
+    g_nic_ready = SIGMA_TRUE;
+}
+
+static sigma_u8* net_rx_alloc(sigma_u32 len) {
+    if (!g_nic_ready || len > SIGMA_NET_RX_SLOT_SIZE) return SIGMA_NULL;
+    sigma_u8* slot = g_rx_pool[g_rx_head % SIGMA_NET_RX_SLOTS];
+    g_rx_head++;
+    return slot;
+}
+
+static sigma_u8* net_tx_alloc(sigma_u32 len) {
+    if (!g_nic_ready || len > SIGMA_NET_TX_SLOT_SIZE) return SIGMA_NULL;
+    sigma_u8* slot = g_tx_pool[g_tx_head % SIGMA_NET_TX_SLOTS];
+    g_tx_head++;
+    return slot;
+}
+
 // ─── Packet Processing ────────────────────────────────────────────────────
 
 static sigma_u16 calculate_checksum(void* data, sigma_u32 bytes) {
@@ -103,8 +137,13 @@ static void handle_icmp(eth_hdr_t* eth, ipv4_hdr_t* ip, icmp_hdr_t* icmp, sigma_
 
         icmp->checksum = calculate_checksum(icmp, packet_len - sizeof(eth_hdr_t) - sizeof(ipv4_hdr_t));
         
-        // sys_print("[Net] Sending ICMP Echo Reply...\n");
-        nic_tx_packet((sigma_u8*)eth, packet_len);
+        sigma_u8* tx = net_tx_alloc(packet_len);
+        if (tx) {
+            for (sigma_u32 i = 0; i < packet_len; i++) tx[i] = ((sigma_u8*)eth)[i];
+            nic_tx_packet(tx, packet_len);
+        } else {
+            nic_tx_packet((sigma_u8*)eth, packet_len);
+        }
     }
 }
 
@@ -112,14 +151,27 @@ static void handle_ipv4(eth_hdr_t* eth, ipv4_hdr_t* ip, sigma_u32 packet_len) {
     if (ip->proto == 1) { // ICMP
         handle_icmp(eth, ip, (icmp_hdr_t*)((sigma_u8*)ip + (ip->ihl_version & 0x0F) * 4), packet_len);
     } else if (ip->proto == 6) { // TCP
-        // TODO: TCP State Machine
+        sigma_u32 ihl = (ip->ihl_version & 0x0F) * 4;
+        sigma_u8* tcp_payload = (sigma_u8*)ip + ihl;
+        sigma_u32 tcp_len = packet_len - sizeof(eth_hdr_t) - ihl;
+        sigma_u32 src_ip =
+            ((sigma_u32)ip->src_ip[0] << 24) | ((sigma_u32)ip->src_ip[1] << 16) |
+            ((sigma_u32)ip->src_ip[2] << 8) | (sigma_u32)ip->src_ip[3];
+        sigma_tcp_receive(src_ip, tcp_payload, tcp_len);
     }
 }
 
 // ─── Entry Point from NIC Driver ──────────────────────────────────────────
 
 extern "C" void sigma_net_receive_frame(sigma_u8* buffer, sigma_u32 len) {
+    if (!g_nic_ready) nic_init();
     if (len < sizeof(eth_hdr_t)) return;
+
+    sigma_u8* rx = net_rx_alloc(len);
+    if (rx) {
+        for (sigma_u32 i = 0; i < len; i++) rx[i] = buffer[i];
+        buffer = rx;
+    }
 
     eth_hdr_t* eth = (eth_hdr_t*)buffer;
     
@@ -137,13 +189,18 @@ extern "C" void sigma_net_receive_frame(sigma_u8* buffer, sigma_u32 len) {
     if (eth->ethertype == 0x0008) {
         handle_ipv4(eth, (ipv4_hdr_t*)(buffer + sizeof(eth_hdr_t)), len);
     } else if (eth->ethertype == 0x0608) {
-        // sys_print("[Net] Handling ARP Packet...\n");
+        sigma_arp_receive(buffer + sizeof(eth_hdr_t), len - sizeof(eth_hdr_t));
     }
 }
 
 // ─── Userland Syscall Interface ───────────────────────────────────────────
 
+extern sigma_u32 sigma_socket_open(sigma_u32 domain, sigma_u32 type, sigma_u32 protocol);
+extern sigma_i32 sigma_socket_send(sigma_u32 sock, const void* data, sigma_u32 len);
+extern sigma_i32 sigma_socket_recv(sigma_u32 sock, void* buffer, sigma_u32 max_len);
+
 extern "C" sigma_status sys_sigma_socket(sigma_u32 domain, sigma_u32 type, sigma_u32 protocol) {
-    // Allocate a socket descriptor from the VFS
-    return ZEN_SUCCESS;
+    sigma_u32 fd = sigma_socket_open(domain, type, protocol);
+    return (fd == (sigma_u32)-1) ? (sigma_status)K_ERR_INVAL : (sigma_status)fd;
 }
+

@@ -10,6 +10,7 @@ extern void sigma_puts(const char* s);
 
 /* Implemented in kernel/resilience */
 extern int sigma_rollback_check_fallback(void);
+extern void sigma_boot_show_fix_it_menu(void);
 
 void boot_sequence(void) {
     if (sigma_rollback_check_fallback() != 0) {
@@ -30,5 +31,6 @@ void boot_sequence(void) {
 /* Safe mode: minimal drivers + rescue shell only */
 void load_safe_mode(void) {
     sigma_puts("[BOOT] Safe Mode: minimal HAL + serial rescue shell.\n");
+    sigma_boot_show_fix_it_menu();
     /* Hand off to resilient fallback entry when linked */
 }

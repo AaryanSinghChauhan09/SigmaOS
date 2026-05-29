@@ -48,10 +48,20 @@ cmd_recovery_check() {
 
 cmd_wiki_sync() {
   log "Syncing docs into wiki_repo/ mirrors..."
+  mkdir -p "${ROOT}/wiki_repo"
   cp -f "${ROOT}/docs/COMPETITOR_COMPARISON.md" "${ROOT}/wiki_repo/Competitor-Comparison.md" 2>/dev/null || true
   cp -f "${ROOT}/PHASE_A_EXECUTION_CHECKLIST.md" "${ROOT}/wiki_repo/Phase-A-Execution-Checklist.md" 2>/dev/null || true
   cp -f "${ROOT}/docs/SIGMAOS_DIFFERENTIATION_BLUEPRINT.md" "${ROOT}/wiki_repo/SigmaOS-Differentiation-Blueprint.md" 2>/dev/null || true
+  cp -f "${ROOT}/docs/PHASE_7_8_ROADMAP.md" "${ROOT}/wiki_repo/Phase-7-8-Roadmap.md" 2>/dev/null || true
+  cp -f "${ROOT}/FEATURE_MATRIX.md" "${ROOT}/wiki_repo/Feature-Matrix.md" 2>/dev/null || true
+  "${ROOT}/scripts/doxygen_wiki_export.sh" || true
   log "wiki_repo mirrors updated (push main to trigger wiki-sync workflow)."
+}
+
+cmd_update() {
+  cmd_update_check
+  cmd_wiki_sync
+  log "Phase 7–8: run ./scripts/ci_branch_check.sh before merge."
 }
 
 usage() {
@@ -59,6 +69,7 @@ usage() {
 Usage: sigma_automation.sh <command>
 Commands:
   backup          Create timestamped source backup tarball
+  update          Fetch status + mirror wiki_repo/ (Phase 7–8)
   update-check    Show git status after fetch
   recovery-check  Verify rollback/resilience files exist
   wiki-sync       Mirror key docs into wiki_repo/
@@ -69,6 +80,7 @@ main() {
   local cmd="${1:-}"
   case "$cmd" in
     backup) cmd_backup ;;
+    update) cmd_update ;;
     update-check) cmd_update_check ;;
     recovery-check) cmd_recovery_check ;;
     wiki-sync) cmd_wiki_sync ;;

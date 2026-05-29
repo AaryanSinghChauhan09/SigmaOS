@@ -12,6 +12,13 @@
 #include "../../../include/sigma_log.h"
 #include "../../../include/sigma_pod_spec.h"
 
+extern "C" {
+    struct sigma_cgroup;
+    struct sigma_cgroup* cgroup_apply_pod_limits(const char* pod_name,
+                                               sigma_u32 cpu_millis,
+                                               sigma_u32 mem_mb);
+}
+
 namespace SigmaOS {
 namespace Orchestrator {
 
@@ -138,6 +145,8 @@ public:
         if (spec->cgroup_cpu_millis > 0 && spec->cgroup_cpu_millis <= 1000) {
             c->cpu_quota_percent = spec->cgroup_cpu_millis / 10;
         }
+
+        cgroup_apply_pod_limits(name, spec->cgroup_cpu_millis, spec->cgroup_mem_mb);
 
         sigma_log_info("[Orchestrator] Native pod [%u] ns=0x%x cpu=%u%% mem=%uMB io=%u",
                        cid, spec->namespace_flags, c->cpu_quota_percent,

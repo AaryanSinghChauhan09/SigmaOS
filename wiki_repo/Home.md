@@ -30,6 +30,12 @@
 | [Roadmap](Roadmap) | Strategic improvement sequence |
 | [Competitor Comparison](Competitor-Comparison) | Distro gap analysis and surpass strategy |
 | [Phase A Checklist](Phase-A-Execution-Checklist) | File-level execution tracker |
+| [Phase 7–8 Roadmap](Phase-7-8-Roadmap) | Automation, CLI, GUI, branch parity |
+| [Feature Matrix](Feature-Matrix) | Branch subsystem parity |
+| [Zenith GUI Toolkit](Zenith-GUI-Toolkit) | Compositor, tiling, profiles |
+| [Automation & CLI](Automation-CLI-Engine) | sigma_automation + sigma-cli |
+| [Containers](Containers-Orchestrator) | sigma-pod native orchestration |
+| [Boot Resilience](Bootloader-Resilience) | Safe Mode + Fix-it menu |
 | [Problems Manifest](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CURRENT_PROBLEMS_MANIFEST.md) | Active bugs and Phase A status |
 
 ---

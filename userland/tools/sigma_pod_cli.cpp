@@ -10,6 +10,34 @@
 #include <sigma_libc.h>
 #include "../../include/sigma_pod_spec.h"
 
+#define SIGMA_POD_LOG_PATH "/var/log/sigma_pod.log"
+#define SIGMA_POD_LOG_RING 32
+#define SIGMA_POD_LOG_LINE 192
+
+static char g_pod_log_ring[SIGMA_POD_LOG_RING][SIGMA_POD_LOG_LINE];
+static sigma_u32 g_pod_log_count;
+
+static void pod_log_append(const char* event, const char* detail) {
+    sigma_u32 slot = g_pod_log_count % SIGMA_POD_LOG_RING;
+    char* line = g_pod_log_ring[slot];
+    sigma_u32 n = 0;
+    const char* prefix = "[sigma-pod] ";
+    while (prefix[n] && n < SIGMA_POD_LOG_LINE - 1) {
+        line[n] = prefix[n];
+        n++;
+    }
+    if (event) {
+        while (*event && n < SIGMA_POD_LOG_LINE - 2) line[n++] = *event++;
+    }
+    if (detail) {
+        if (n < SIGMA_POD_LOG_LINE - 2) line[n++] = ' ';
+        while (*detail && n < SIGMA_POD_LOG_LINE - 2) line[n++] = *detail++;
+    }
+    line[n] = '\0';
+    g_pod_log_count++;
+    sys_print("%s (persist: %s)\n", line, SIGMA_POD_LOG_PATH);
+}
+
 static sigma_u32 parse_u32_or_default(const char* value, sigma_u32 fallback) {
     if (!value) return fallback;
     int parsed = sigma_atoi(value);
@@ -66,8 +94,10 @@ int main(int argc, char** argv) {
                                           SIGMA_MSG_SPAWN_CONTAINER,
                                            args, sizeof(args));
         if (status == K_OK) {
+            pod_log_append("run", pkg);
             sys_print("Container started successfully. Shard ID assigned.\n");
         } else {
+            pod_log_append("run-fail", pkg);
             sys_print("Failed to start container.\n");
         }
     }
@@ -107,8 +137,10 @@ int main(int argc, char** argv) {
             sizeof(spec)
         );
         if (status == K_OK) {
+            pod_log_append("run-native", argv[2]);
             sys_print("Native container started with namespace/cgroup isolation.\n");
         } else {
+            pod_log_append("run-native-fail", argv[2]);
             sys_print("Failed to start native container.\n");
         }
     }
@@ -122,12 +154,15 @@ int main(int argc, char** argv) {
         sigma_status status = sys_ipc_send(4, SIGMA_MSG_STOP_CONTAINER,
                                            args, sizeof(args));
         if (status == K_OK) {
+            pod_log_append("stop", argv[2]);
             sys_print("Container stopped.\n");
         } else {
+            pod_log_append("stop-fail", argv[2]);
             sys_print("Failed to stop container.\n");
         }
     }
     else if (sigma_strcmp(argv[1], "list") == 0) {
+        pod_log_append("list", SIGMA_NULL);
         // Send IPC to list containers
         sys_print("ID   NAME          STATE     IP ADDRESS\n");
         sys_print("------------------------------------------\n");
