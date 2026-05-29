@@ -11,6 +11,7 @@ SigmaOS is a sovereign, zero-dependency operating system built on a **Lattice Ar
 | Area | Wiki Page | Status |
 |---|---|---|
 | Sovereign Orchestrator | [Container-Orchestrator](Container-Orchestrator.md) | ✅ Stable |
+| Differentiation Blueprint | [SigmaOS-Differentiation-Blueprint](SigmaOS-Differentiation-Blueprint.md) | ✅ Active |
 | Zenith Desktop & SDK | [Zenith-Desktop-SDK](Zenith-Desktop-SDK.md) | ✅ Stable |
 | Sovereign System Profiles | [Sovereign-System-Profiles](Sovereign-System-Profiles.md) | ✅ Stable |
 | Packaging & Immutability | [Sovereign-Packaging-and-Immutability](Sovereign-Packaging-and-Immutability.md) | ✅ Stable |
