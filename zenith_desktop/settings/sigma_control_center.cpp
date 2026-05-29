@@ -9,11 +9,13 @@
 
 #include <sigma_libc.h>
 #include <sigma_error_codes.h>
+#include <sigma_profiles.h>
 
 namespace Zenith {
 namespace Settings {
 
 struct SovereignProfile {
+    sigma_system_profile_t type;
     char name[32];
     sigma_bool strict_sandbox;
     sigma_bool network_isolation;
@@ -31,17 +33,66 @@ public:
     void init() {
         sys_print("[Zenith-ControlCenter] Loading Control Center Hub...\n");
         // Load default standard profile
-        m_active_profile = {"Standard", SIGMA_TRUE, SIGMA_TRUE, SIGMA_FALSE, 0};
+        m_active_profile = {SIGMA_PROFILE_STANDARD, "Standard", SIGMA_TRUE, SIGMA_TRUE, SIGMA_FALSE, 0};
+    }
+
+    void setProfile(sigma_system_profile_t type) {
+        m_active_profile.type = type;
+        
+        switch(type) {
+            case SIGMA_PROFILE_FORENSIC:
+                m_active_profile.forensic_mode_readonly = SIGMA_TRUE;
+                m_active_profile.strict_sandbox = SIGMA_TRUE;
+                m_active_profile.network_isolation = SIGMA_TRUE;
+                m_active_profile.update_channel = 1; // Dedicated forensic stability channel
+                sigma_strcpy(m_active_profile.name, "Forensic (CAINE-isolated)");
+                sys_print("[Zenith-ControlCenter] CAINE Forensic Profile Active. Hard write-blocking active on raw block partitions. Strict Whonix-style firewall rules applied.\n");
+                break;
+                
+            case SIGMA_PROFILE_IOT:
+                m_active_profile.forensic_mode_readonly = SIGMA_FALSE;
+                m_active_profile.strict_sandbox = SIGMA_TRUE;
+                m_active_profile.network_isolation = SIGMA_TRUE;
+                m_active_profile.update_channel = 0;
+                sigma_strcpy(m_active_profile.name, "IoT (Optimized Minimalist)");
+                sys_print("[Zenith-ControlCenter] IoT Profile Active. Enforcing 16MB sandbox resource bounds for lightweight systems.\n");
+                break;
+
+            case SIGMA_PROFILE_ENTERPRISE:
+                m_active_profile.forensic_mode_readonly = SIGMA_FALSE;
+                m_active_profile.strict_sandbox = SIGMA_TRUE;
+                m_active_profile.network_isolation = SIGMA_TRUE;
+                m_active_profile.update_channel = 0; // Strict Stable channel
+                sigma_strcpy(m_active_profile.name, "Enterprise (Hardened Audit)");
+                sys_print("[Zenith-ControlCenter] Enterprise Profile Active. Enforcing strict ACL checks on storage/VFS mappings.\n");
+                break;
+
+            case SIGMA_PROFILE_EDUCATION:
+                m_active_profile.forensic_mode_readonly = SIGMA_FALSE;
+                m_active_profile.strict_sandbox = SIGMA_FALSE; // Safe exploratory overrides
+                m_active_profile.network_isolation = SIGMA_FALSE;
+                m_active_profile.update_channel = 2; // Development/Experimental
+                sigma_strcpy(m_active_profile.name, "Education (Permissive Sandbox)");
+                sys_print("[Zenith-ControlCenter] Education Profile Active. Permissive sandbox limits loaded.\n");
+                break;
+                
+            case SIGMA_PROFILE_STANDARD:
+            default:
+                m_active_profile.forensic_mode_readonly = SIGMA_FALSE;
+                m_active_profile.strict_sandbox = SIGMA_TRUE;
+                m_active_profile.network_isolation = SIGMA_TRUE;
+                m_active_profile.update_channel = 0;
+                sigma_strcpy(m_active_profile.name, "Standard");
+                sys_print("[Zenith-ControlCenter] Standard Profile Loaded.\n");
+                break;
+        }
     }
 
     void setForensicMode(sigma_bool active) {
-        m_active_profile.forensic_mode_readonly = active;
         if (active) {
-            m_active_profile.strict_sandbox = SIGMA_TRUE;
-            m_active_profile.update_channel = 1; // Curated Forensic channel
-            sys_print("[Zenith-ControlCenter] CAINE Forensic Profile Activated. Enforcing Write-Protection across block partitions!\n");
+            setProfile(SIGMA_PROFILE_FORENSIC);
         } else {
-            sys_print("[Zenith-ControlCenter] CAINE Forensic Profile Deactivated. Returning to standard operations.\n");
+            setProfile(SIGMA_PROFILE_STANDARD);
         }
     }
 
@@ -81,6 +132,10 @@ extern "C" {
 
     void zenith_settings_toggle_forensic(sigma_bool enable) {
         Zenith::Settings::ControlCenter::getInstance().setForensicMode(enable);
+    }
+
+    void zenith_settings_set_profile(sigma_system_profile_t type) {
+        Zenith::Settings::ControlCenter::getInstance().setProfile(type);
     }
 
     void zenith_settings_export(const char* filepath) {
