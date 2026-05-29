@@ -9,7 +9,7 @@ $ErrorActionPreference = "Stop"
 
 $MainRepoUrl = "https://github.com/AaryanSinghChauhan09/SigmaOS.git"
 $WikiRepoUrl = "https://github.com/AaryanSinghChauhan09/SigmaOS.wiki.git"
-$CommitMsg = "SigmaOS Phase 5: Sovereign LibC impl, Driver Manager, Driver Registry, Driver+LibC wiki"
+$CommitMsg = "SigmaOS Phase 6: A/B Update Daemon, HW Test Suite, Wiki Home overhaul"
 
 Write-Host "🚀 Starting Windows GitHub Sync for SigmaOS..." -ForegroundColor Cyan
 
@@ -49,7 +49,7 @@ Push-Location $TempWikiDir
 try {
     git add .
     try {
-        git commit -m "Docs: Phase 5 - Driver-Support and Sovereign-LibC-and-Dependencies wiki"
+        git commit -m "Docs: Phase 6 - Home.md overhaul with full subsystem table and architecture"
     } catch {
         Write-Host "No wiki changes." -ForegroundColor Gray
     }
