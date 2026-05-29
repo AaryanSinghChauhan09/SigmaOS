@@ -5,6 +5,22 @@
 #include "../../include/sigma_kernel_types.h"
 #include "../../include/sigma_theme.h"
 
+extern "C" void zenith_theme_init(void);
+extern "C" void zenith_theme_set_metrics(sigma_u32 r, sigma_u32 ig, sigma_u32 og);
+extern "C" sigma_status sigma_wm_gaps(sigma_u32 inner, sigma_u32 outer);
+extern "C" sigma_status sigma_wm_layout(sigma_u32 mode);
+extern "C" sigma_status sigma_wm_auto_tile(void);
+
+static sigma_u32 layout_name_to_mode(const char* name) {
+    if (!name) return 6;
+    if (sigma_strcmp(name, "bsp") == 0) return 0;
+    if (sigma_strcmp(name, "columns") == 0) return 1;
+    if (sigma_strcmp(name, "floating") == 0) return 3;
+    if (sigma_strcmp(name, "monocle") == 0) return 4;
+    if (sigma_strcmp(name, "grid") == 0) return 5;
+    return 6;
+}
+
 namespace Zenith {
 namespace Personalization {
 
@@ -63,7 +79,14 @@ void apply_to_desktop() {
     sys_print("[Profile] theme=%s accent=#%s layout=%s gaps=%u/%u auto_tile=%u\n",
               g_profile.theme, g_profile.accent, g_profile.wm_layout,
               g_profile.gap_inner, g_profile.gap_outer, g_profile.auto_tile);
-    /* IPC hooks: theme engine + tiling WM */
+
+    zenith_theme_init();
+    zenith_theme_set_metrics(8, g_profile.gap_inner, g_profile.gap_outer);
+    sigma_wm_gaps(g_profile.gap_inner, g_profile.gap_outer);
+    sigma_wm_layout(layout_name_to_mode(g_profile.wm_layout));
+    if (g_profile.auto_tile) {
+        sigma_wm_auto_tile();
+    }
 }
 
 } // namespace Personalization

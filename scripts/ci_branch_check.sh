@@ -48,6 +48,16 @@ CORE_FILES=(
   userland/tools/sigma_cli.cpp
   FEATURE_MATRIX.md
   PHASE_A_EXECUTION_CHECKLIST.md
+  PHASE_B_EXECUTION_CHECKLIST.md
+  scripts/sigma_branch_sync.sh
+)
+
+META_SCaffold=(
+  kernel/subsystems/sigma_game_layer.c
+  kernel/scheduler/sigma_sched_profiles.c
+  kernel/recovery/sigma_recovery.c
+  sigma_pkg_registry/README.md
+  zenith_desktop/zenith_unified_init.cpp
 )
 
 DESKTOP_FILES=(
@@ -76,6 +86,10 @@ else
 fi
 
 check_list CORE_FILES
+
+for f in "${META_SCaffold[@]}"; do
+  require_file "$f" || true
+done
 
 case "$PROFILE" in
   desktop)

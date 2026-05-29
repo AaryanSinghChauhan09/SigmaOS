@@ -54,7 +54,11 @@ cmd_wiki_sync() {
   cp -f "${ROOT}/docs/SIGMAOS_DIFFERENTIATION_BLUEPRINT.md" "${ROOT}/wiki_repo/SigmaOS-Differentiation-Blueprint.md" 2>/dev/null || true
   cp -f "${ROOT}/docs/PHASE_7_8_ROADMAP.md" "${ROOT}/wiki_repo/Phase-7-8-Roadmap.md" 2>/dev/null || true
   cp -f "${ROOT}/FEATURE_MATRIX.md" "${ROOT}/wiki_repo/Feature-Matrix.md" 2>/dev/null || true
+  cp -f "${ROOT}/PHASE_B_EXECUTION_CHECKLIST.md" "${ROOT}/wiki_repo/Phase-B-Execution-Checklist.md" 2>/dev/null || true
+  cp -f "${ROOT}/PHASE_C_EXECUTION_CHECKLIST.md" "${ROOT}/wiki_repo/Phase-C-Execution-Checklist.md" 2>/dev/null || true
+  cp -f "${ROOT}/docs/META_DISTRO_UNIFIED_ENGINE.md" "${ROOT}/wiki_repo/Meta-Distro-Unified-Engine.md" 2>/dev/null || true
   "${ROOT}/scripts/doxygen_wiki_export.sh" || true
+  "${ROOT}/scripts/sigma_branch_sync.sh" --report 2>/dev/null || true
   log "wiki_repo mirrors updated (push main to trigger wiki-sync workflow)."
 }
 

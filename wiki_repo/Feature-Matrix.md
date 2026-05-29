@@ -62,4 +62,16 @@ Status: `✓` present · `~` partial · `—` not required for branch profile
 ./scripts/sigma_automation.sh wiki-sync
 ```
 
-Last updated: Phase 7–8 roadmap (automation + GUI + branch parity).
+## Phase C meta-distro scaffolds (main branch)
+
+| Module | Path | Status |
+|--------|------|--------|
+| Gaming layer | `kernel/subsystems/sigma_game_layer.c` | scaffold |
+| Scheduler profiles | `kernel/scheduler/sigma_sched_profiles.c` | scaffold |
+| Package registry | `sigma_pkg_registry/` | scaffold |
+| Recovery API | `kernel/recovery/sigma_recovery.c` | scaffold |
+| Zenith unified init | `zenith_desktop/zenith_unified_init.cpp` | wired |
+
+See `PHASE_C_EXECUTION_CHECKLIST.md`.
+
+Last updated: Phase B/C unified engine + branch parity.

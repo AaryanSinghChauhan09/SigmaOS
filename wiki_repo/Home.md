@@ -36,6 +36,9 @@
 | [Automation & CLI](Automation-CLI-Engine) | sigma_automation + sigma-cli |
 | [Containers](Containers-Orchestrator) | sigma-pod native orchestration |
 | [Boot Resilience](Bootloader-Resilience) | Safe Mode + Fix-it menu |
+| [Phase B Checklist](Phase-B-Execution-Checklist) | Unified automation + CLI + GUI |
+| [Phase C Checklist](Phase-C-Execution-Checklist) | Meta-distro subsystem integration |
+| [Meta-Distro Engine](Meta-Distro-Unified-Engine) | Competitor → subsystem map |
 | [Problems Manifest](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CURRENT_PROBLEMS_MANIFEST.md) | Active bugs and Phase A status |
 
 ---

@@ -8,6 +8,12 @@ case "$CMD" in
   update)
     "${ROOT}/scripts/sigma_automation.sh" update
     ;;
+  backup)
+    "${ROOT}/scripts/sigma_automation.sh" backup
+    ;;
+  sync)
+    "${ROOT}/scripts/sigma_git_sync.sh" "${@:2}"
+    ;;
   branch-check)
     "${ROOT}/scripts/ci_branch_check.sh" "${@:2}"
     ;;
@@ -20,7 +26,7 @@ case "$CMD" in
     echo "[sigma-cli] example config: docs/examples/sigma_profile.example"
     ;;
   *)
-    echo "Usage: sigma_cli_host.sh <update|branch-check|automation|profile> [args...]"
+    echo "Usage: sigma_cli_host.sh <update|backup|sync|branch-check|automation|profile> [args...]"
     exit 1
     ;;
 esac
