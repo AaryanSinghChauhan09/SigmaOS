@@ -24,6 +24,17 @@
 namespace sigma {
 namespace shell {
 
+// ─── Structured Data Pipeline (Nushell style) ────────────────────────────────
+#define MAX_TABLE_COLS 8
+#define MAX_TABLE_ROWS 128
+
+struct SigmaTable {
+    char      headers[MAX_TABLE_COLS][32];
+    char      rows[MAX_TABLE_ROWS][MAX_TABLE_COLS][64];
+    sigma_u32 num_cols;
+    sigma_u32 num_rows;
+};
+
 // ─── Token Types ─────────────────────────────────────────────────────────────
 typedef enum : sigma_u32 {
     TOK_WORD     = 0,   // A bare word or quoted string
@@ -144,6 +155,26 @@ const char* history_next() {
     g_history_cursor++;
     if (g_history_cursor >= g_history_count) return nullptr;
     return g_history[g_history_cursor % MAX_HISTORY];
+}
+
+// Fish-style auto-suggestion: return latest history entry starting with prefix
+const char* history_suggest(const char* prefix) {
+    if (!prefix || !prefix[0] || g_history_count == 0) return nullptr;
+    
+    // Search backwards (newest first)
+    for (sigma_i32 i = g_history_count - 1; i >= 0; --i) {
+        const char* entry = g_history[i % MAX_HISTORY];
+        const char* p = prefix;
+        const char* e = entry;
+        sigma_bool match = SIGMA_TRUE;
+        while (*p) {
+            if (*p++ != *e++) { match = SIGMA_FALSE; break; }
+        }
+        if (match && *e != '\0') {
+            return entry; // Found a match longer than prefix
+        }
+    }
+    return nullptr;
 }
 
 // ─── Tokenizer ───────────────────────────────────────────────────────────────
@@ -399,6 +430,10 @@ sigma_status shell_run() {
 
         // Simulate reading a line
         line[0] = '\0';
+
+        // Fish-style auto-suggestion UI hook (in real implementation, triggers on keystroke)
+        // const char* suggestion = history_suggest(line_buffer);
+        // if (suggestion) render_ghost_text(suggestion + strlen(line_buffer));
 
         if (line[0] == '\0') continue;
 

@@ -9,7 +9,7 @@ $ErrorActionPreference = "Stop"
 
 $MainRepoUrl = "https://github.com/AaryanSinghChauhan09/SigmaOS.git"
 $WikiRepoUrl = "https://github.com/AaryanSinghChauhan09/SigmaOS.wiki.git"
-$CommitMsg = "SigmaOS Phase 7: Zenith Native Toolkit, Sovereignty Architecture Manifesto"
+$CommitMsg = "SigmaOS Phase 8: Workspace UX, Auto-Tiling WM, Shell Structured Data, UI Metrics"
 
 Write-Host "🚀 Starting Windows GitHub Sync for SigmaOS..." -ForegroundColor Cyan
 

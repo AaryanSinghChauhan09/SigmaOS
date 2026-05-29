@@ -21,6 +21,9 @@ struct SovereignProfile {
     sigma_bool network_isolation;
     sigma_bool forensic_mode_readonly; // CAINE-style
     sigma_u32 update_channel;           // 0: Stable, 1: Forensic, 2: Dev
+    sigma_u32 wm_inner_gap;
+    sigma_u32 wm_outer_gap;
+    char      shell_prompt[64];
 };
 
 class ControlCenter {
@@ -33,7 +36,7 @@ public:
     void init() {
         sys_print("[Zenith-ControlCenter] Loading Control Center Hub...\n");
         // Load default standard profile
-        m_active_profile = {SIGMA_PROFILE_STANDARD, "Standard", SIGMA_TRUE, SIGMA_TRUE, SIGMA_FALSE, 0};
+        m_active_profile = {SIGMA_PROFILE_STANDARD, "Standard", SIGMA_TRUE, SIGMA_TRUE, SIGMA_FALSE, 0, 4, 8, "\\[\\033[1;36m\\]σ\\[\\033[0m\\] \\w → "};
     }
 
     void setProfile(sigma_system_profile_t type) {
@@ -105,7 +108,10 @@ public:
         sys_print("  \"strict_sandbox\": %s,\n", m_active_profile.strict_sandbox ? "true" : "false");
         sys_print("  \"network_isolation\": %s,\n", m_active_profile.network_isolation ? "true" : "false");
         sys_print("  \"forensic_mode_readonly\": %s,\n", m_active_profile.forensic_mode_readonly ? "true" : "false");
-        sys_print("  \"update_channel\": %u\n", m_active_profile.update_channel);
+        sys_print("  \"update_channel\": %u,\n", m_active_profile.update_channel);
+        sys_print("  \"wm_inner_gap\": %u,\n", m_active_profile.wm_inner_gap);
+        sys_print("  \"wm_outer_gap\": %u,\n", m_active_profile.wm_outer_gap);
+        sys_print("  \"shell_prompt\": \"%s\"\n", m_active_profile.shell_prompt);
         sys_print("}\n");
     }
 
@@ -115,6 +121,19 @@ public:
         m_active_profile.strict_sandbox = SIGMA_TRUE;
         m_active_profile.forensic_mode_readonly = SIGMA_TRUE;
         sys_print("[Zenith-ControlCenter] Success. Declarative state loaded correctly!\n");
+    }
+
+    void setWorkspaceGaps(sigma_u32 inner, sigma_u32 outer) {
+        m_active_profile.wm_inner_gap = inner;
+        m_active_profile.wm_outer_gap = outer;
+        sys_print("[Zenith-ControlCenter] Workspace gaps updated (Inner: %u, Outer: %u).\n", inner, outer);
+    }
+
+    void setShellPrompt(const char* prompt) {
+        sigma_u32 i = 0;
+        while (prompt[i] && i < 63) { m_active_profile.shell_prompt[i] = prompt[i]; i++; }
+        m_active_profile.shell_prompt[i] = '\0';
+        sys_print("[Zenith-ControlCenter] Shell prompt updated.\n");
     }
 
 private:
@@ -144,5 +163,13 @@ extern "C" {
 
     void zenith_settings_import(const char* filepath) {
         Zenith::Settings::ControlCenter::getInstance().importConfig(filepath);
+    }
+
+    void zenith_settings_set_gaps(sigma_u32 inner, sigma_u32 outer) {
+        Zenith::Settings::ControlCenter::getInstance().setWorkspaceGaps(inner, outer);
+    }
+
+    void zenith_settings_set_prompt(const char* prompt) {
+        Zenith::Settings::ControlCenter::getInstance().setShellPrompt(prompt);
     }
 }

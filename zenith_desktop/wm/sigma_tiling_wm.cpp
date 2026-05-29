@@ -22,12 +22,13 @@ namespace wm {
 
 // ─── Layout Modes ────────────────────────────────────────────────────────────
 typedef enum : sigma_u32 {
-    LAYOUT_BSP        = 0,   // Binary space partition (i3-style)
-    LAYOUT_COLUMNS    = 1,   // Master + stack columns (dwm-style)
-    LAYOUT_FIBONACCI  = 2,   // Spiral layout
-    LAYOUT_FLOATING   = 3,   // Traditional floating (macOS-style)
-    LAYOUT_MONOCLE    = 4,   // Fullscreen stack (one visible at a time)
-    LAYOUT_GRID       = 5,   // Equal grid cells
+    LAYOUT_BSP          = 0,   // Binary space partition (i3-style manual)
+    LAYOUT_COLUMNS      = 1,   // Master + stack columns (dwm-style)
+    LAYOUT_FIBONACCI    = 2,   // Spiral layout
+    LAYOUT_FLOATING     = 3,   // Traditional floating (macOS-style)
+    LAYOUT_MONOCLE      = 4,   // Fullscreen stack (one visible at a time)
+    LAYOUT_GRID         = 5,   // Equal grid cells
+    LAYOUT_MASTER_STACK = 6,   // Dynamic master+stack (Hyprland/dwm style)
 } LayoutMode;
 
 // ─── Direction for Navigation/Split ──────────────────────────────────────────
@@ -54,6 +55,8 @@ struct WMWindow {
     char      title[128];
     sigma_u32 min_width;        // Size hints
     sigma_u32 min_height;
+    sigma_u32 border_color;     // Active vs inactive tracking
+    float     opacity;          // For fade animations
 };
 
 // ─── BSP Tree Node ──────────────────────────────────────────────────────────
@@ -183,6 +186,44 @@ static void apply_bsp(sigma_i32 node_idx) {
     }
 }
 
+// ─── Dynamic Layout: Master/Stack (dwm-style) ──────────────────────────────
+static void apply_master_stack(Workspace* ws) {
+    if (ws->window_count == 0) return;
+
+    sigma_u32 master_count = 1; // Number of windows in the master area
+    float master_ratio = 0.55f; // Master gets 55% of screen width
+
+    sigma_u32 usable_w = g_wm.screen.w - g_wm.gap_outer * 2;
+    sigma_u32 usable_h = g_wm.screen.h - g_wm.gap_outer * 2;
+    sigma_i32 base_x   = g_wm.gap_outer;
+    sigma_i32 base_y   = g_wm.gap_outer;
+
+    for (sigma_u32 i = 0; i < ws->window_count; ++i) {
+        WMWindow* w = &g_wm.windows[ws->window_ids[i]];
+        if (w->floating || w->fullscreen) continue;
+
+        if (i < master_count) {
+            // Master area
+            sigma_u32 h = usable_h / master_count;
+            w->frame.x = base_x + g_wm.gap_inner;
+            w->frame.y = base_y + (i * h) + g_wm.gap_inner;
+            w->frame.w = (sigma_u32)((float)usable_w * master_ratio) - g_wm.gap_inner * 2;
+            w->frame.h = h - g_wm.gap_inner * 2;
+        } else {
+            // Stack area
+            sigma_u32 stack_count = ws->window_count - master_count;
+            sigma_u32 h = usable_h / stack_count;
+            sigma_u32 stack_x = base_x + (sigma_u32)((float)usable_w * master_ratio);
+            sigma_u32 stack_w = usable_w - (stack_x - base_x);
+            
+            w->frame.x = stack_x + g_wm.gap_inner;
+            w->frame.y = base_y + ((i - master_count) * h) + g_wm.gap_inner;
+            w->frame.w = stack_w - g_wm.gap_inner * 2;
+            w->frame.h = h - g_wm.gap_inner * 2;
+        }
+    }
+}
+
 // ─── Insert Window into BSP Tree ─────────────────────────────────────────────
 static sigma_i32 insert_into_bsp(sigma_i32 root, sigma_u32 win_idx, sigma_bool split_h) {
     if (root < 0) {
@@ -256,18 +297,31 @@ sigma_status add_window(sigma_u32 surface_id, const char* title) {
     ws->root_node = insert_into_bsp(ws->root_node, idx, alternate);
 
     // Recompute layout
-    if (ws->root_node >= 0) {
-        g_wm.nodes[ws->root_node].area = {
-            (sigma_i32)g_wm.gap_outer, (sigma_i32)g_wm.gap_outer,
-            g_wm.screen.w - g_wm.gap_outer * 2,
-            g_wm.screen.h - g_wm.gap_outer * 2
-        };
-        apply_bsp(ws->root_node);
+    if (ws->layout == LAYOUT_BSP) {
+        if (ws->root_node >= 0) {
+            g_wm.nodes[ws->root_node].area = {
+                (sigma_i32)g_wm.gap_outer, (sigma_i32)g_wm.gap_outer,
+                g_wm.screen.w - g_wm.gap_outer * 2,
+                g_wm.screen.h - g_wm.gap_outer * 2
+            };
+            apply_bsp(ws->root_node);
+        }
+    } else if (ws->layout == LAYOUT_MASTER_STACK) {
+        apply_master_stack(ws);
     }
 
-    // Focus the new window
+    // Unfocus all, focus the new window
+    for (sigma_u32 i = 0; i < g_wm.window_count; ++i) {
+        g_wm.windows[i].focused = SIGMA_FALSE;
+        g_wm.windows[i].border_color = 0x333333FF; // Inactive
+    }
     g_wm.focused_window = idx;
     w->focused = SIGMA_TRUE;
+    w->border_color = 0x63B3EDFF; // Active Accent (Hyprland style)
+    w->opacity = 0.0f; // Start transparent for fade-in animation
+    
+    // Stub: Signal compositor to animate opacity from 0.0 -> 1.0 over 200ms
+    // sys_ipc_send(COMPOSITOR_IPC, ANIMATE_WINDOW_SPAWN, w->surface_id);
 
     return SIGMA_SUCCESS;
 }
@@ -380,8 +434,11 @@ sigma_status focus_direction(Direction dir) {
 
     if (best_idx >= 0) {
         g_wm.windows[g_wm.focused_window].focused = SIGMA_FALSE;
+        g_wm.windows[g_wm.focused_window].border_color = 0x333333FF;
+        
         g_wm.focused_window = (sigma_u32)best_idx;
         g_wm.windows[best_idx].focused = SIGMA_TRUE;
+        g_wm.windows[best_idx].border_color = 0x63B3EDFF; // Active Accent
     }
 
     return SIGMA_SUCCESS;
