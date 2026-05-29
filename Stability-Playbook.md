@@ -35,6 +35,17 @@ Protocol values live in `kernel/net/sigma_net_socket.cpp`:
 - `SIGMA_PROTO_UDP`
 - `SIGMA_PROTO_RAW`
 
+## Container orchestration: native namespace/cgroup intent
+
+- `userland/tools/sigma_pod_cli.cpp` now supports:
+  - `sigma-pod run-native <pkg> [--all-ns|--net|--ipc] [--cpu=<ms>] [--mem=<mb>] [--io=<w>]`
+- The CLI builds a `SigmaPodNativeSpec` and sends it to orchestrator shard IPC as:
+  - `SIGMA_MSG_SPAWN_NATIVE_CONTAINER`
+- Intent:
+  - direct kernel namespace selection (`mnt/pid/uts/net/ipc`)
+  - explicit cgroup limits (CPU, memory, I/O weight)
+  - no Docker/Podman dependency path in SigmaOS runtime
+
 ## Boot resilience: rollback gate → resilient safe mode
 
 Early boot now checks whether repeated boots have failed:
