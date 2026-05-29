@@ -9,7 +9,7 @@ $ErrorActionPreference = "Stop"
 
 $MainRepoUrl = "https://github.com/AaryanSinghChauhan09/SigmaOS.git"
 $WikiRepoUrl = "https://github.com/AaryanSinghChauhan09/SigmaOS.wiki.git"
-$CommitMsg = "SigmaOS Phase 6: A/B Update Daemon, HW Test Suite, Wiki Home overhaul"
+$CommitMsg = "SigmaOS Phase 7: Zenith Native Toolkit, Sovereignty Architecture Manifesto"
 
 Write-Host "🚀 Starting Windows GitHub Sync for SigmaOS..." -ForegroundColor Cyan
 
@@ -49,7 +49,7 @@ Push-Location $TempWikiDir
 try {
     git add .
     try {
-        git commit -m "Docs: Phase 6 - Home.md overhaul with full subsystem table and architecture"
+        git commit -m "Docs: Phase 7 - Add Sovereignty Architecture manifesto"
     } catch {
         Write-Host "No wiki changes." -ForegroundColor Gray
     }
