@@ -5,6 +5,7 @@ SigmaOS is a sovereign, zero-dependency operating system built on a **Lattice Ar
 ## 🚀 Key Technologies
 *   **Sovereign Orchestrator**: Native lightweight containerization engine. [Read more here.](Container-Orchestrator.md)
 *   **Zenith Desktop & SDK**: Secure containerized desktop environment and application toolkit. [Read more here.](Zenith-Desktop-SDK.md)
+*   **Resilience & Control Center**: NixOS declarative profiles and safe diagnostics. [Read more here.](Resilience-and-Control-Center.md)
 *   **Proton Bridge**: Opt-in POSIX/Linux syscall translation for running legacy binaries.
 *   **Zero-Trust VFS**: Explicit Role-Based Access Control (RBAC) enforced deeply at the filesystem level.
 

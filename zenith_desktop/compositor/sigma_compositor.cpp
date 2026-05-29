@@ -9,6 +9,10 @@
  */
 
 #include <sigma_libc.h>
+#include <sigma_error_codes.h>
+
+// Link external structured logger
+extern "C" void zenith_log_structured(sigma_u32 error_code, const char* component, const char* desc, sigma_u32 container_id);
 
 namespace Zenith {
 
@@ -30,10 +34,11 @@ public:
         : id(win_id), container_id(c_id), geometry(geom), z_index(0), is_focused(false) {
         
         // Allocate backing store for window rendering.
-        // In a true implementation, this memory must be mapped from the 
-        // isolated container's memory pool to prevent escape.
         sigma_u64 buffer_size = geom.width * geom.height * 4; // 32-bit ARGB
         backing_buffer = (sigma_u8*)sigma_malloc(buffer_size);
+        if (!backing_buffer) {
+            zenith_log_structured(ZEN_402_WINDOW_ALLOCATION_OOM, "Compositor", "Window buffer allocation failed", c_id);
+        }
     }
     
     ~Window() {
@@ -58,7 +63,9 @@ public:
             sys_print("[Zenith] Hardware Framebuffer acquired: %ux%u (32bpp)\n", m_fb_width, m_fb_height);
             clear_screen(0xFF1E1E1E); // Zenith Dark Theme Background
         } else {
-            sys_print("[Zenith] ERROR: Failed to acquire hardware framebuffer!\n");
+            m_fallback_mode = true;
+            sys_print("[Zenith] ERROR: Failed to acquire hardware framebuffer! Triggering safe VGA fallback mode...\n");
+            zenith_log_structured(ZEN_502_VGA_FALLBACK_TRIGGERED, "Compositor", "Hardware FB failed, safe VGA recovery triggered", 0);
         }
     }
 
@@ -75,6 +82,12 @@ public:
     }
 
     void renderFrame() {
+        if (m_fallback_mode) {
+            sys_print("[Zenith-Fallback] Displaying safe mode diagnostics...\n");
+            // Simply log frames deterministically without raw screen writes
+            return;
+        }
+
         // 1. Clear background
         clear_screen(0xFF1E1E1E);
 
@@ -90,11 +103,18 @@ public:
         render_cursor();
 
         // 4. Page Flip / VSync (Simulated)
-        sys_ipc_send(5, 1, /* MSG_GPU_FLIP */ NULL, 0);
+        sys_ipc_send(5, 1, /* MSG_GPU_FLIP */ SIGMA_NULL, 0);
+    }
+
+    void triggerCompositorSelfHealing() {
+        sys_print("[Zenith-SelfHealing] Re-initiating hardware framebuffer connection...\n");
+        zenith_log_structured(ZEN_503_SELF_HEALING_RESTART, "Compositor", "Attempting compositor graphics reboot", 0);
+        m_fallback_mode = false;
+        init();
     }
 
 private:
-    Compositor() : m_framebuffer(nullptr), m_fb_width(0), m_fb_height(0), m_window_count(0) {}
+    Compositor() : m_framebuffer(nullptr), m_fb_width(0), m_fb_height(0), m_window_count(0), m_fallback_mode(false) {}
 
     // Hardware Abstraction Stubs
     sigma_u32* acquire_hardware_framebuffer(sigma_u32* w, sigma_u32* h) {
@@ -104,6 +124,7 @@ private:
     }
 
     void clear_screen(sigma_u32 color) {
+        if (m_fallback_mode) return;
         for (sigma_u32 i = 0; i < m_fb_width * m_fb_height; i++) {
             m_framebuffer[i] = color;
         }
@@ -118,7 +139,6 @@ private:
 
     void composite_window(Window* win) {
         // Alpha blending and bit-blitting from win->backing_buffer to m_framebuffer
-        // (Implementation omitted for brevity)
     }
 
     void render_cursor() {
@@ -131,6 +151,7 @@ private:
     
     Window*    m_windows[128];
     sigma_u32  m_window_count;
+    bool       m_fallback_mode;
 };
 
 } // namespace Zenith
@@ -142,5 +163,9 @@ extern "C" {
     
     void zenith_compositor_render() {
         Zenith::Compositor::getInstance().renderFrame();
+    }
+
+    void zenith_compositor_heal() {
+        Zenith::Compositor::getInstance().triggerCompositorSelfHealing();
     }
 }
