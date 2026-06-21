@@ -71,8 +71,14 @@ static inline void sigma_invlpg(virt_addr_t addr) {
     __asm__ volatile("invlpg (%0)" : : "r"(addr) : "memory");
 }
 
+static inline bool is_canonical_address(virt_addr_t addr) {
+    u64 temp = addr >> 47;
+    return (temp == 0 || temp == 0x1FFFFULL);
+}
+
 /* ─────────────── API: Map Virtual → Physical Page ─────────────── */
 extern "C" bool sigma_map_page(virt_addr_t vaddr, phys_addr_t paddr, u64 flags) {
+    if (!is_canonical_address(vaddr)) return false;
     u64 cr3 = sigma_read_cr3();
     pte_t* pml4 = (pte_t*)PAGE_FRAME(cr3);
 

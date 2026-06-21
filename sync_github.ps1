@@ -1,67 +1,39 @@
-# =========================================================================
-# SigmaOS Windows GitHub Sync Script (PowerShell)
-# =========================================================================
-# This script commits all recent changes to the main repository and 
-# pushes the docs/wiki folder to the GitHub Wiki repository.
-# =========================================================================
+# SigmaOS: Sovereign Git Sync & Wiki Update Script
+# This script pushes the latest Phase 17 changes to your GitHub repository
+# and updates the associated GitHub Wiki.
 
-$ErrorActionPreference = "Stop"
-
-$MainRepoUrl = "https://github.com/AaryanSinghChauhan09/SigmaOS.git"
-$WikiRepoUrl = "https://github.com/AaryanSinghChauhan09/SigmaOS.wiki.git"
-$CommitMsg = "SigmaOS Phase 10: Sovereign Net Stack, Pod Orchestrator, SBR .sigmabuild Registry"
-
-Write-Host "🚀 Starting Windows GitHub Sync for SigmaOS..." -ForegroundColor Cyan
-
-# 1. Sync the Main Repository
-Write-Host "[1/3] Syncing Main Repository..." -ForegroundColor Yellow
-git add .
-try {
-    git commit -m $CommitMsg
-} catch {
-    Write-Host "No changes to commit in main repo." -ForegroundColor Gray
+$repo_url = Read-Host "Enter your GitHub repository URL (e.g. https://github.com/username/SigmaOS.git)"
+if ([string]::IsNullOrWhiteSpace($repo_url)) {
+    Write-Host "Error: Repository URL cannot be empty." -ForegroundColor Red
+    exit 1
 }
 
-try {
-    git push origin main
-} catch {
-    Write-Host "Failed to push main repo. Are you authenticated?" -ForegroundColor Red
-}
+# 1. Push main codebase
+Write-Host "Pushing codebase to $repo_url..." -ForegroundColor Cyan
+git remote add origin $repo_url 2>$null
+git push -u origin main
 
-# 2. Sync the Wiki Repository
-Write-Host "[2/3] Syncing Wiki Repository..." -ForegroundColor Yellow
-$TempWikiDir = Join-Path $env:TEMP "SigmaOS.wiki"
+# 2. Sync Wiki
+$wiki_url = $repo_url -replace '\.git$', '.wiki.git'
+Write-Host "Syncing wiki to $wiki_url..." -ForegroundColor Cyan
 
-if (Test-Path $TempWikiDir) {
-    Remove-Item -Recurse -Force $TempWikiDir
-}
+$wiki_dir = "$env:TEMP\sigmaos_wiki_temp"
+if (Test-Path $wiki_dir) { Remove-Item -Recurse -Force $wiki_dir }
 
-Write-Host "Cloning Wiki repository..." -ForegroundColor Gray
-git clone $WikiRepoUrl $TempWikiDir
+git clone $wiki_url $wiki_dir
 
-Write-Host "Copying wiki files..." -ForegroundColor Gray
-# Ensure target dir exists
-$TargetDocs = Join-Path $TempWikiDir "*"
-Copy-Item -Path "docs\wiki\*" -Destination $TempWikiDir -Recurse -Force
-
-# Change to temp directory to push wiki
-Push-Location $TempWikiDir
-try {
+if (Test-Path $wiki_dir) {
+    # Copy the updated Sovereignty Architecture doc to the wiki
+    Copy-Item ".\docs\wiki\Sovereignty-Architecture.md" -Destination "$wiki_dir\Sovereignty-Architecture.md" -Force
+    
+    Set-Location $wiki_dir
     git add .
-    try {
-        git commit -m "Docs: Phase 7 - Add Sovereignty Architecture manifesto"
-    } catch {
-        Write-Host "No wiki changes." -ForegroundColor Gray
-    }
+    git commit -m "Update Sovereignty Architecture (Phase 17)"
     git push origin master
-} catch {
-    Write-Host "Failed to push wiki. (Note: Wikis usually use 'master' branch)" -ForegroundColor Red
-} finally {
-    Pop-Location
-    # Clean up
-    Remove-Item -Recurse -Force $TempWikiDir
+    
+    Set-Location $PSScriptRoot
+    Remove-Item -Recurse -Force $wiki_dir
+    Write-Host "GitHub Wiki synced successfully!" -ForegroundColor Green
+} else {
+    Write-Host "Warning: Could not clone wiki repository. Please ensure the Wiki feature is enabled in your GitHub repo settings." -ForegroundColor Yellow
 }
-
-Write-Host "[3/3] ✅ Windows GitHub Sync Complete!" -ForegroundColor Green
-Write-Host "Main Repo: $MainRepoUrl" -ForegroundColor Gray
-Write-Host "Wiki Repo: $WikiRepoUrl" -ForegroundColor Gray

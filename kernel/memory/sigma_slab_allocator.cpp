@@ -50,21 +50,16 @@ struct SlabCache {
 };
 
 static struct SlabCache sigma_caches[SLAB_BUCKET_COUNT];
-static u64 slab_bump_ptr = SLAB_HEAP_BASE;
+extern "C" void* sigma_malloc(u64 size);
+extern "C" void sigma_free(void* ptr);
 
-/* ─────────────── Internal: Bump Allocate a Raw Slab ─────────────── */
+/* ─────────────── Internal: Allocate a Raw Slab via Buddy Allocator ─────────────── */
 static void* slab_raw_alloc(size_t size) {
-    if (slab_bump_ptr + size > SLAB_HEAP_BASE + SLAB_HEAP_SIZE)
-        return nullptr;
-    void* ptr = (void*)slab_bump_ptr;
-    slab_bump_ptr += size;
-    return ptr;
+    return sigma_malloc((u64)size);
 }
 
 /* ─────────────── API: Initialize Slab System ─────────────── */
 extern "C" void sigma_slab_init() {
-    slab_bump_ptr = SLAB_HEAP_BASE;
-
     u32 size = 8;
     for (u32 i = 0; i < SLAB_BUCKET_COUNT; i++) {
         sigma_caches[i].object_size   = size;
@@ -91,8 +86,8 @@ extern "C" void sigma_slab_init() {
     }
 }
 
-/* ─────────────── API: Sovereign malloc() ─────────────── */
-extern "C" void* sigma_alloc(size_t bytes) {
+/* ─────────────── API: Sovereign Slab alloc() ─────────────── */
+extern "C" void* sigma_slab_alloc(size_t bytes) {
     if (bytes == 0) return nullptr;
 
     u32 size = 8;
@@ -123,12 +118,12 @@ extern "C" void* sigma_alloc(size_t bytes) {
         size <<= 1;
     }
 
-    /* Large allocation: raw bump */
+    /* Large allocation: fallback to raw buddy allocator */
     return slab_raw_alloc(bytes);
 }
 
-/* ─────────────── API: Sovereign free() ─────────────── */
-extern "C" void sigma_free(void* ptr, size_t bytes) {
+/* ─────────────── API: Sovereign Slab free() ─────────────── */
+extern "C" void sigma_slab_free(void* ptr, size_t bytes) {
     if (!ptr) return;
 
     u32 size = 8;
@@ -142,5 +137,6 @@ extern "C" void sigma_free(void* ptr, size_t bytes) {
         }
         size <<= 1;
     }
-    /* Large frees: not reclaimed (bump allocator limitation) */
+    /* Large frees: delegate back to buddy allocator */
+    sigma_free(ptr);
 }

@@ -100,11 +100,23 @@ extern "C" void sigma_allocator_init(void* memory_base, u64 size) {
  * Allocate memory (Sovereign malloc)
  * Returns pointer to allocated memory or 0 on failure.
  */
+struct AllocHeader {
+    u64 magic;
+    u64 size;
+};
+
+#define ALLOC_MAGIC 0x5163A05163A0ULL
+#define FREE_MAGIC  0xFBEEFBEEULL
+
+/* 
+ * Allocate memory (Sovereign malloc)
+ * Returns pointer to allocated memory or 0 on failure.
+ */
 extern "C" void* sigma_malloc(u64 size) {
     if (size == 0) return 0;
     
     // Add space for size header to allow proper freeing
-    size += sizeof(u64);
+    size += sizeof(AllocHeader);
     
     /* Calculate order required */
     u64 pages_needed = (size + PAGE_SIZE - 1) / PAGE_SIZE;
@@ -136,11 +148,13 @@ extern "C" void* sigma_malloc(u64 size) {
     
     kernel_allocator.free_pages -= (1ULL << order);
     
-    // Store original requested size (including header) for free()
-    *(u64*)block = size;
+    // Store original requested size (including header) and magic for free()
+    AllocHeader* hdr = (AllocHeader*)block;
+    hdr->magic = ALLOC_MAGIC;
+    hdr->size = size;
     
     // Return pointer after the header
-    return (void*)((u8*)block + sizeof(u64));
+    return (void*)((u8*)block + sizeof(AllocHeader));
 }
 
 /* 
@@ -150,8 +164,19 @@ extern "C" void sigma_free(void* ptr) {
     if (!ptr) return;
 
     // Retrieve original size from header
-    u64* header = (u64*)((u8*)ptr - sizeof(u64));
-    u64 size = *header;
+    AllocHeader* hdr = (AllocHeader*)((u8*)ptr - sizeof(AllocHeader));
+    
+    if (hdr->magic == FREE_MAGIC) {
+        sigma_vga_printf("[Memory Warning] Double free detected at %p!\n", ptr);
+        return;
+    }
+    if (hdr->magic != ALLOC_MAGIC) {
+        sigma_vga_printf("[Memory Warning] Heap corruption or invalid free detected at %p!\n", ptr);
+        return;
+    }
+    
+    u64 size = hdr->size;
+    hdr->magic = FREE_MAGIC; // Mark as free to prevent double-free
     
     u64 pages_freed = (size + PAGE_SIZE - 1) / PAGE_SIZE;
     int order = 0;
@@ -161,7 +186,7 @@ extern "C" void sigma_free(void* ptr) {
     
     kernel_allocator.free_pages += (1ULL << order);
 
-    SigmaFreeNode* block = (SigmaFreeNode*)header;
+    SigmaFreeNode* block = (SigmaFreeNode*)hdr;
     
     // Buddy merging
     while (order < MAX_ORDER) {
@@ -219,8 +244,9 @@ extern "C" void* sigma_realloc(void* ptr, u64 new_size) {
         return 0;
     }
     
-    u64* header = (u64*)((u8*)ptr - sizeof(u64));
-    u64 old_size = *header - sizeof(u64);
+    AllocHeader* hdr = (AllocHeader*)((u8*)ptr - sizeof(AllocHeader));
+    if (hdr->magic != ALLOC_MAGIC) return 0;
+    u64 old_size = hdr->size - sizeof(AllocHeader);
     
     if (new_size <= old_size) return ptr;
     

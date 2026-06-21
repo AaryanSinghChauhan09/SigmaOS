@@ -72,16 +72,9 @@ public:
         sigma_addr_space_t* as = findAS(as_id);
         if (!as) return K_ERR_NOTFOUND;
 
-        /* 4-level page table walk simulation */
-        sigma_u32 pml4_idx = (sigma_u32)((vaddr >> 39) & 0x1FF);
-        sigma_u32 pdpt_idx = (sigma_u32)((vaddr >> 30) & 0x1FF);
-        sigma_u32 pd_idx   = (sigma_u32)((vaddr >> 21) & 0x1FF);
-        sigma_u32 pt_idx   = (sigma_u32)((vaddr >> 12) & 0x1FF);
-
-        SIGMA_UNUSED(pml4_idx);
-        SIGMA_UNUSED(pdpt_idx);
-        SIGMA_UNUSED(pd_idx);
-        SIGMA_UNUSED(pt_idx);
+        /* Call the real x86_64 mapping implementation */
+        extern "C" bool sigma_map_page(sigma_u64 vaddr, sigma_u64 paddr, sigma_u64 flags);
+        sigma_map_page(vaddr, paddr, flags);
 
         as->total_mapped += PAGE_SIZE;
         return K_OK;

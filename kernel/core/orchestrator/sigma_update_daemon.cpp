@@ -13,7 +13,7 @@
  * =========================================================================
  */
 
-#include <sigma_libc.h>
+#include "../../../include/sigma_libc.h"
 #include "../../../include/sigma_error_codes.h"
 #include "../../../include/sigma_driver_codes.h"
 

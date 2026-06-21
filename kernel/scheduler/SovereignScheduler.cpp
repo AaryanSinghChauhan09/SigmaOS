@@ -204,6 +204,12 @@ public:
                 cpu.total_context_switches++;
                 m_total_switches++;
                 cpu.current_tid = next_tid;
+
+                /* Enforce process isolation: Reload page directory (CR3 register) on context switch */
+                #if defined(__x86_64__)
+                sigma_u64 pml4_phys = 0x100000ULL + (sigma_u64)(next->pid - 1) * 4096;
+                __asm__ volatile("mov %0, %%cr3" : : "r"(pml4_phys) : "memory");
+                #endif
             }
         } else {
             cpu.current_tid = 0; /* Idle */
