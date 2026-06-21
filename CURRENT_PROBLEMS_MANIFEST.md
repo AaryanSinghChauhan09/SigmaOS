@@ -1,6 +1,19 @@
 # SigmaOS: Active Problems Manifest
 
-*Last updated: Phase A execution pass. Track status in [PHASE_A_EXECUTION_CHECKLIST.md](PHASE_A_EXECUTION_CHECKLIST.md).*
+*Last updated: Phase C/D implementation pass. Full history in checklists.*
+
+## ✅ Resolved — Phase C/D (this session)
+
+| ID | Area | Status | File |
+|----|------|--------|------|
+| C-01 | Post-Quantum Crypto (Kyber KEM) | **Resolved** | `crypto/SovereignKyber.cpp` |
+| C-02 | Post-Quantum Crypto (Dilithium-5) | **Resolved** | `crypto/SovereignDilithium5.cpp` |
+| C-03 | PQC Type Header | **Resolved** | `include/crypto/sigma_pqc.h` |
+| C-04 | Immutable Audit Trail | **Resolved** | `kernel/security/sigma_immutable_audit_trail.cpp` |
+| C-05 | Adaptive Zero-Trust Engine | **Resolved** | `kernel/security/sigma_adaptive_zerotrust.cpp` |
+| C-06 | Neural UI (AVX-512) | **Resolved** | `zenith_desktop/neural/sigma_neural_ui.cpp` |
+| D-01 | WASM/WASI Runtime | **Resolved** | `runtime/wasm/sigma_wasm_runtime.cpp` |
+| D-02 | Linux ELF Compat Layer | **Resolved** | `runtime/containers/sigma_linux_compat.cpp` |
 
 ## Resolved / In Progress (Phase A)
 
