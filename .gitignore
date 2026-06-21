@@ -1,0 +1,28 @@
+# Build artifacts
+*.o
+*.bin
+*.iso
+*.elf
+
+# Editor/IDE
+.vscode/
+.cache/
+*.swp
+*.swo
+
+# OS junk
+Thumbs.db
+.DS_Store
+
+# Temp scripts
+patch.py
+*.tmp
+
+# Local junctions for compatibility
+networking
+node_modules/.vite
+
+
+# Wiki temp / local scratch only (wiki_repo/ is tracked for GitHub Wiki CI sync)
+wiki_temp/
+node_modules
