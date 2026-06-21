@@ -10,7 +10,7 @@ jobs:
   build_and_audit:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v7
     - name: Set up Environment
       run: sudo apt-get install -y cppcheck gcc-multilib build-essential
     - name: Compile Sovereign Kernel
