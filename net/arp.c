@@ -138,6 +138,8 @@ const sigma_mac_t* arp_lookup(sigma_u32 ip) {
     sigma_printf("[arp] Cache miss for ");
     format_ip(ip, SIGMA_NULL);
     sigma_printf(" — sending ARP request\n");
+    extern void sigma_ethernet_send_arp_request(sigma_u32 target_ip);
+    sigma_ethernet_send_arp_request(ip);
     return SIGMA_NULL;
 }
 

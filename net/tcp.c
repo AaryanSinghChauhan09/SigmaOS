@@ -87,9 +87,10 @@ void tcp_process_packet(sigma_u32 src_ip, sigma_u16 src_port, sigma_u32 dst_ip, 
                         sock->ack_num = seq + 1;
                         sock->seq_num = 1000; /* Initial ISN */
                         sock->cwnd = 1;       /* Initial cwnd */
-                        sock->ssthresh = 64;  /* Initial ssthresh */
-                        /* TODO: send SYN-ACK here */
-                    }
+                        /* Send SYN-ACK */
+                        sigma_u8 header[20] = {0};
+                        header[13] = TCP_FLAG_SYN | TCP_FLAG_ACK;
+                        sigma_ipv4_send(src_ip, 6 /* TCP */, header, sizeof(header));
                     break;
                     
                 case TCP_STATE_SYN_RECV:
@@ -107,7 +108,10 @@ void tcp_process_packet(sigma_u32 src_ip, sigma_u16 src_port, sigma_u32 dst_ip, 
                         sigma_printf("[tcp] Received FIN from %u:%u. Transitioning to CLOSE_WAIT.\n", src_ip, src_port);
                         sock->state = TCP_STATE_CLOSE_WAIT;
                         sock->ack_num = seq + 1;
-                        /* TODO: send ACK here */
+                        /* Send ACK */
+                        sigma_u8 header[20] = {0};
+                        header[13] = TCP_FLAG_ACK;
+                        sigma_ipv4_send(src_ip, 6 /* TCP */, header, sizeof(header));
                     } else if (flags & TCP_FLAG_PSH) {
                         sigma_printf("[tcp] Received PSH/ACK. Processing %u bytes.\n", (unsigned)payload_len);
                         /* Basic sequence validation */
@@ -134,7 +138,10 @@ void tcp_process_packet(sigma_u32 src_ip, sigma_u16 src_port, sigma_u32 dst_ip, 
                     if (flags & TCP_FLAG_FIN) {
                         sock->state = TCP_STATE_TIME_WAIT;
                         sock->ack_num = seq + 1;
-                        /* TODO: send ACK */
+                        /* Send ACK */
+                        sigma_u8 header[20] = {0};
+                        header[13] = TCP_FLAG_ACK;
+                        sigma_ipv4_send(src_ip, 6 /* TCP */, header, sizeof(header));
                     }
                     break;
             }

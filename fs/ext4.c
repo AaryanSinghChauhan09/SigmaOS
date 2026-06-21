@@ -17,16 +17,18 @@ static sigma_bool ext4_mounted = SIGMA_FALSE;
 static sigma_u32  ext4_block_size = 4096;
 static sigma_u32  ext4_device_id = 0;
 
-/* Stub block device read/write */
+extern int sigma_nvme_read(sigma_u64 lba, sigma_u16 count, void* buf);
+extern int sigma_nvme_write(sigma_u64 lba, sigma_u16 count, const void* buf);
+
+/* Real block device read/write bound to NVMe driver */
 static int disk_read_blocks(sigma_u32 dev_id, sigma_u64 lba, sigma_u32 count, void* buf) {
-    /* In a real implementation, this calls the NVMe/SATA driver via HAL */
-    /* For now, just zero the buffer to prevent #PF if tested without a disk */
-    sigma_memset(buf, 0, count * 512);
-    return K_OK;
+    (void)dev_id; /* For now, route all to default NVMe namespace */
+    return sigma_nvme_read(lba, (sigma_u16)count, buf);
 }
 
 static int disk_write_blocks(sigma_u32 dev_id, sigma_u64 lba, sigma_u32 count, const void* buf) {
-    return K_OK;
+    (void)dev_id;
+    return sigma_nvme_write(lba, (sigma_u16)count, buf);
 }
 
 static int read_ext4_block(sigma_u64 block_num, void* buf) {
