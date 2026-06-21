@@ -8,6 +8,13 @@ on:
       - "README.md"
       - "CONTRIBUTING.md"
       - "CHANGELOG.md"
+      - "FEATURE_MATRIX.md"
+      - "docs/PHASE_7_8_ROADMAP.md"
+      - "PHASE_A_EXECUTION_CHECKLIST.md"
+      - "docs/COMPETITOR_COMPARISON.md"
+      - "PHASE_B_EXECUTION_CHECKLIST.md"
+      - "PHASE_C_EXECUTION_CHECKLIST.md"
+      - "docs/META_DISTRO_UNIFIED_ENGINE.md"
 
 jobs:
   wiki-sync:

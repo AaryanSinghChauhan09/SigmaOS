@@ -15,6 +15,7 @@ typedef sigma_u32 sigma_syscall_id_t;
 #define SIGMA_SYS_MALLOC  0x02u
 #define SIGMA_SYS_FREE    0x03u
 #define SIGMA_SYS_SEND    0x04u
+#define SIGMA_SYS_SOCKET  0x05u
 #define SIGMA_OK          0x00u
 
 namespace SigmaOS {
@@ -28,14 +29,14 @@ public:
         return instance;
     }
 
-    static void init() {
+    void init() {
         sigma_log_info("[SYSCALL] Initializing Sovereign FPST Gate...");
-        this->m_initialized  = 1u;
-        this->m_total_calls  = 0u;
+        m_initialized  = 1u;
+        m_total_calls  = 0u;
     }
 
     sigma_u32 dispatch(sigma_syscall_id_t id, sigma_u32 arg1, sigma_u32 arg2, sigma_u32 arg3) {
-        this->m_total_calls++;
+        m_total_calls++;
         sigma_log_info("[SYSCALL] SSG Entry: dispatching service.");
 
         switch (id) {
@@ -57,6 +58,14 @@ public:
                 sigma_log_info("[SYSCALL] SEND: WFAE IPC message queued.");
                 (void)arg1; (void)arg2; (void)arg3;
                 return SIGMA_OK;
+
+            case SIGMA_SYS_SOCKET: {
+                sigma_log_info("[SYSCALL] SOCKET: allocating Sovereign socket handle.");
+                // arg1: protocol (SIGMA_PROTO_TCP/UDP/RAW), arg2/arg3 reserved
+                (void)arg2; (void)arg3;
+                extern sigma_u32 sigma_net_socket_create(sigma_u32 protocol);
+                return sigma_net_socket_create((sigma_u32)arg1);
+            }
 
             default:
                 sigma_log_warn("[SYSCALL] Unknown ID � triggering SELF-HEAL redirection.");
@@ -91,11 +100,11 @@ extern "C" {
 
 /* --- C Bridge --- */
 void syscall_init() {
-    SigmaOS::Kernel::Syscall::SovereignSyscallEngine::init();
+    SigmaOS::Kernel::Syscall::SovereignSyscallEngine::getInstance().init();
 }
 
 extern "C" unsigned int sigma_syscall(unsigned int id, unsigned int arg1, unsigned int arg2, unsigned int arg3) {
-    return (unsigned int)SigmaOS::Kernel::Syscall::SovereignSyscallEngine::dispatch(
+    return (unsigned int)SigmaOS::Kernel::Syscall::SovereignSyscallEngine::getInstance().dispatch(
         (sigma_u32)id, (sigma_u32)arg1, (sigma_u32)arg2, (sigma_u32)arg3);
 }
 
@@ -104,7 +113,7 @@ void syscall_handler_asm() {
 }
 
 extern "C" unsigned long long syscall_get_total_calls() {
-    return (unsigned long long)SigmaOS::Kernel::Syscall::SovereignSyscallEngine::getTotalCalls();
+    return (unsigned long long)SigmaOS::Kernel::Syscall::SovereignSyscallEngine::getInstance().getTotalCalls();
 }
 
 

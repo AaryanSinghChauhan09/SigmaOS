@@ -1,0 +1,13 @@
+# SigmaOS sovereign recipe (SlackBuilds/Nix-inspired)
+name=hello-sigma
+version=1.0.0
+curation=community
+hash=sha256:0000000000000000000000000000000000000000000000000000000000000000
+
+[build]
+steps=./configure --host=sigma-unknown && make && make install DESTDIR=$OUT
+
+[runtime]
+requires_network=false
+requires_display=false
+memory_mb=32

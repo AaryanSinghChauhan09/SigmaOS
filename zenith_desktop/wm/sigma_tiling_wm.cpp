@@ -463,6 +463,27 @@ sigma_status resize_split(Direction dir, float delta) {
     return SIGMA_SUCCESS;
 }
 
+// ─── Auto-tile active workspace (profile-driven) ─────────────────────────────
+sigma_status auto_tile(void) {
+    Workspace* ws = &g_wm.workspaces[g_wm.active_workspace];
+    if (ws->root_node < 0) return SIGMA_SUCCESS;
+
+    g_wm.nodes[ws->root_node].area = {
+        (sigma_i32)g_wm.gap_outer, (sigma_i32)g_wm.gap_outer,
+        g_wm.screen.w - g_wm.gap_outer * 2,
+        g_wm.screen.h - g_wm.gap_outer * 2
+    };
+
+    if (ws->layout == LAYOUT_BSP) {
+        apply_bsp(ws->root_node);
+    } else if (ws->layout == LAYOUT_MASTER_STACK) {
+        apply_master_stack(ws);
+    } else if (ws->layout == LAYOUT_GRID) {
+        apply_master_stack(ws);
+    }
+    return SIGMA_SUCCESS;
+}
+
 // ─── Set Layout Mode ─────────────────────────────────────────────────────────
 sigma_status set_layout(LayoutMode mode) {
     g_wm.workspaces[g_wm.active_workspace].layout = mode;
@@ -502,4 +523,5 @@ extern "C" {
     sigma_status sigma_wm_resize(sigma_u32 dir, float d)             { return sigma::wm::resize_split((sigma::wm::Direction)dir, d); }
     sigma_status sigma_wm_layout(sigma_u32 m)                        { return sigma::wm::set_layout((sigma::wm::LayoutMode)m); }
     sigma_status sigma_wm_gaps(sigma_u32 inner, sigma_u32 outer)     { return sigma::wm::set_gaps(inner, outer); }
+    sigma_status sigma_wm_auto_tile(void)                            { return sigma::wm::auto_tile(); }
 }

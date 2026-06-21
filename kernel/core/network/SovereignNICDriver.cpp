@@ -74,6 +74,8 @@ private:
 };
 
 /* --- C Wrappers --- */
+extern "C" void sigma_net_receive_frame(sigma_u8* buffer, sigma_u32 len);
+
 extern "C" void nic_init() {
     SovereignNICDriverEngine::getInstance().init();
 }
@@ -88,6 +90,17 @@ extern "C" bool nic_transmit(const char* payload, sigma_u32 length) {
 
 extern "C" void nic_rx_interrupt() {
     SovereignNICDriverEngine::getInstance().receiveInterrupt();
+}
+
+/*
+ * Sovereign RX delivery hook.
+ * Real NIC drivers should call this with a full Ethernet frame.
+ */
+extern "C" void nic_rx_deliver(sigma_u8* buffer, sigma_u32 len) {
+    SovereignNICDriverEngine::getInstance().receiveInterrupt();
+    if (buffer && len) {
+        sigma_net_receive_frame(buffer, len);
+    }
 }
 
 

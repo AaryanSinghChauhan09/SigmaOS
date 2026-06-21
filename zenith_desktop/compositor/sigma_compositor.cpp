@@ -160,6 +160,28 @@ public:
         init();
     }
 
+    void poll_input_events() {
+        /* Phase 7–8: drain input shard queue (keyboard/pointer) */
+        sigma_u64 evt[4] = {0, 0, 0, 0};
+        sigma_status st = sys_ipc_send(6, 2, /* MSG_INPUT_POLL */ evt, sizeof(evt));
+        if (st != K_OK) return;
+
+        m_pointer_x = (sigma_i32)evt[0];
+        m_pointer_y = (sigma_i32)evt[1];
+        m_pointer_buttons = (sigma_u32)evt[2];
+
+        if (evt[3] != 0) {
+            focus_window_at(m_pointer_x, m_pointer_y);
+        }
+    }
+
+    void run_event_loop(sigma_u32 frames) {
+        for (sigma_u32 f = 0; f < frames; ++f) {
+            poll_input_events();
+            renderFrame();
+        }
+    }
+
 private:
     Compositor() : m_framebuffer(nullptr), m_fb_width(0), m_fb_height(0), m_window_count(0), m_fallback_mode(false) {}
 
@@ -189,7 +211,24 @@ private:
     }
 
     void render_cursor() {
-        // Draw hardware or software cursor at current (mouseX, mouseY)
+        if (m_fallback_mode || !m_framebuffer) return;
+        sigma_u32 cx = (sigma_u32)m_pointer_x;
+        sigma_u32 cy = (sigma_u32)m_pointer_y;
+        if (cx >= m_fb_width || cy >= m_fb_height) return;
+        m_framebuffer[cy * m_fb_width + cx] = 0xFFFFFFFF;
+    }
+
+    void focus_window_at(sigma_i32 x, sigma_i32 y) {
+        for (sigma_i32 i = (sigma_i32)m_window_count - 1; i >= 0; --i) {
+            Window* w = m_windows[i];
+            if (!w) continue;
+            const Rect& g = w->geometry;
+            if (x >= g.x && x < (g.x + (sigma_i32)g.width) &&
+                y >= g.y && y < (g.y + (sigma_i32)g.height)) {
+                w->is_focused = true;
+                return;
+            }
+        }
     }
 
     sigma_u32* m_framebuffer;
@@ -199,6 +238,9 @@ private:
     Window*    m_windows[128];
     sigma_u32  m_window_count;
     bool       m_fallback_mode;
+    sigma_i32  m_pointer_x = 0;
+    sigma_i32  m_pointer_y = 0;
+    sigma_u32  m_pointer_buttons = 0;
 };
 
 } // namespace Zenith
@@ -214,5 +256,9 @@ extern "C" {
 
     void zenith_compositor_heal() {
         Zenith::Compositor::getInstance().triggerCompositorSelfHealing();
+    }
+
+    void zenith_compositor_run_loop(sigma_u32 frames) {
+        Zenith::Compositor::getInstance().run_event_loop(frames);
     }
 }

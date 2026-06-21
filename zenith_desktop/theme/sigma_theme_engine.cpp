@@ -106,5 +106,14 @@ extern "C" {
     void zenith_theme_set_metrics(sigma_u32 r, sigma_u32 ig, sigma_u32 og) {
         Zenith::Widgets::ThemeEngine::getInstance().setUIMetrics(r, ig, og);
     }
+
+    void zenith_theme_apply(const char* theme_name, const char* accent_hex) {
+        Zenith::Widgets::ThemeEngine& engine = Zenith::Widgets::ThemeEngine::getInstance();
+        engine.init();
+        if (theme_name && sigma_strcmp(theme_name, "zenith-light") == 0) {
+            engine.setAccentColor(0xFF0A84FF);
+        }
+        (void)accent_hex;
+    }
 }
 

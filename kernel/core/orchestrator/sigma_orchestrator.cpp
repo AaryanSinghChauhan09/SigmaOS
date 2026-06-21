@@ -10,6 +10,14 @@
 
 #include "../../../include/sigma_kernel_types.h"
 #include "../../../include/sigma_log.h"
+#include "../../../include/sigma_pod_spec.h"
+
+extern "C" {
+    struct sigma_cgroup;
+    struct sigma_cgroup* cgroup_apply_pod_limits(const char* pod_name,
+                                               sigma_u32 cpu_millis,
+                                               sigma_u32 mem_mb);
+}
 
 namespace SigmaOS {
 namespace Orchestrator {
@@ -42,6 +50,8 @@ struct ContainerShard {
     /* Resource Limits (MVP) */
     sigma_u64        memory_limit_bytes;
     sigma_u32        cpu_quota_percent;
+    sigma_u32        namespace_flags;
+    sigma_u32        io_weight;
 
 #ifdef __aarch64__
     /* ARM64 specific EL2 Virtualization hooks */
@@ -113,6 +123,37 @@ public:
         return K_OK;
     }
 
+    sigma_status spawnNativeContainer(const SigmaPodNativeSpec* spec) {
+        if (!spec) return K_ERR_INVAL;
+
+        char name[32];
+        name[0] = 'p';
+        name[1] = 'o';
+        name[2] = 'd';
+        name[3] = '-';
+        name[4] = (char)('0' + (m_active_containers % 10));
+        name[5] = '\0';
+
+        sigma_u64 mem_limit = (sigma_u64)spec->cgroup_mem_mb * 1024ULL * 1024ULL;
+        sigma_status st = spawnContainer(name, 0, mem_limit);
+        if (st != K_OK) return st;
+
+        sigma_u32 cid = m_active_containers - 1;
+        ContainerShard* c = &m_containers[cid];
+        c->namespace_flags = spec->namespace_flags;
+        c->io_weight = spec->io_weight;
+        if (spec->cgroup_cpu_millis > 0 && spec->cgroup_cpu_millis <= 1000) {
+            c->cpu_quota_percent = spec->cgroup_cpu_millis / 10;
+        }
+
+        cgroup_apply_pod_limits(name, spec->cgroup_cpu_millis, spec->cgroup_mem_mb);
+
+        sigma_log_info("[Orchestrator] Native pod [%u] ns=0x%x cpu=%u%% mem=%uMB io=%u",
+                       cid, spec->namespace_flags, c->cpu_quota_percent,
+                       spec->cgroup_mem_mb, spec->io_weight);
+        return K_OK;
+    }
+
     sigma_status stopContainer(sigma_u32 cid) {
         if (cid >= m_active_containers) return K_ERR_INVAL;
         
@@ -165,6 +206,10 @@ extern "C" {
 
     sigma_status sigma_spawn_container(const char* name, sigma_u32 root_inode, sigma_u64 mem_limit) {
         return SigmaOS::Orchestrator::SovereignOrchestrator::getInstance().spawnContainer(name, root_inode, mem_limit);
+    }
+
+    sigma_status sigma_spawn_native_container(const SigmaPodNativeSpec* spec) {
+        return SigmaOS::Orchestrator::SovereignOrchestrator::getInstance().spawnNativeContainer(spec);
     }
 }
 

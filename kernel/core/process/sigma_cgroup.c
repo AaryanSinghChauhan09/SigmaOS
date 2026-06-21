@@ -110,3 +110,29 @@ void cgroup_set_memory_limit(sigma_cgroup_t* cg, sigma_u64 limit) {
         sigma_printf("[cgroup] Set memory limit for '%s' to %llu bytes\n", cg->name, limit);
     }
 }
+
+void cgroup_set_cpu_weight(sigma_cgroup_t* cg, sigma_u32 weight) {
+    if (cg && cg->active) {
+        if (weight < 1) weight = 1;
+        if (weight > 10000) weight = 10000;
+        cg->resources.cpu_weight = weight;
+        sigma_printf("[cgroup] Set CPU weight for '%s' to %u\n", cg->name, weight);
+    }
+}
+
+sigma_cgroup_t* cgroup_apply_pod_limits(const char* pod_name,
+                                      sigma_u32 cpu_millis,
+                                      sigma_u32 mem_mb) {
+    sigma_cgroup_t* cg = cgroup_create(pod_name, root_cgroup);
+    if (!cg) return SIGMA_NULL;
+
+    if (mem_mb > 0) {
+        cgroup_set_memory_limit(cg, (sigma_u64)mem_mb * 1024ULL * 1024ULL);
+    }
+    if (cpu_millis > 0 && cpu_millis <= 1000) {
+        cgroup_set_cpu_weight(cg, cpu_millis);
+    } else if (cpu_millis > 1000) {
+        cgroup_set_cpu_weight(cg, 1000);
+    }
+    return cg;
+}

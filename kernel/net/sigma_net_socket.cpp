@@ -116,3 +116,24 @@ extern "C" void sigma_net_socket_close(sigma_sock_t sock) {
     socket_table[sock].active = false;
     socket_table[sock].state = SIGMA_SOCK_CLOSED;
 }
+
+/* Canonical ABI aliases (Phase A checklist) */
+extern "C" sigma_sock_t sigma_socket_open(u32 domain, u32 type, u32 protocol) {
+    (void)domain;
+    u32 proto = SIGMA_PROTO_TCP;
+    if (type == 2) proto = SIGMA_PROTO_UDP;
+    if (protocol == 17) proto = SIGMA_PROTO_UDP;
+    return sigma_net_socket_create(proto);
+}
+
+extern "C" int sigma_socket_send(sigma_sock_t sock, const u8* data, u32 len) {
+    return sigma_net_socket_send(sock, data, len);
+}
+
+extern "C" int sigma_socket_recv(sigma_sock_t sock, u8* buffer, u32 max_len) {
+    return sigma_net_socket_recv(sock, buffer, max_len);
+}
+
+extern "C" void sigma_socket_close(sigma_sock_t sock) {
+    sigma_net_socket_close(sock);
+}

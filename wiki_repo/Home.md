@@ -28,6 +28,19 @@
 | [RFC Template](RFC_Template) | Proposal format for new subsystem features |
 | [Changelog](CHANGELOG) | Release history and version notes |
 | [Roadmap](Roadmap) | Strategic improvement sequence |
+| [Competitor Comparison](Competitor-Comparison) | Distro gap analysis and surpass strategy |
+| [Phase A Checklist](Phase-A-Execution-Checklist) | File-level execution tracker |
+| [Phase 7–8 Roadmap](Phase-7-8-Roadmap) | Automation, CLI, GUI, branch parity |
+| [Feature Matrix](Feature-Matrix) | Branch subsystem parity |
+| [Zenith GUI Toolkit](Zenith-GUI-Toolkit) | Compositor, tiling, profiles |
+| [Automation & CLI](Automation-CLI-Engine) | sigma_automation + sigma-cli |
+| [Containers](Containers-Orchestrator) | sigma-pod native orchestration |
+| [Boot Resilience](Bootloader-Resilience) | Safe Mode + Fix-it menu |
+| [Phase B Checklist](Phase-B-Execution-Checklist) | Unified automation + CLI + GUI |
+| [Phase C Checklist](Phase-C-Execution-Checklist) | Meta-distro subsystem integration |
+| [Meta-Distro Engine](Meta-Distro-Unified-Engine) | Competitor → subsystem map |
+| [Meta-Distro Registry](Meta-Distro-Registry) | `sigma_meta_distro_init()` hub |
+| [Problems Manifest](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CURRENT_PROBLEMS_MANIFEST.md) | Active bugs and Phase A status |
 
 ---
 
