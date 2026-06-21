@@ -1,142 +1,56 @@
-# SigmaOS Architecture Overview
+# 🏗️ SigmaOS Architecture Overview
 
-This page describes the high-level structure of the SigmaOS Zenith microkernel.
+> **Σ SigmaOS Zenith** is a sovereign, zero-dependency microkernel operating system built on a 600-shard C++ singleton lattice — targeting x86_64, ARM64, and RISC-V with absolute hardware independence.
 
 ---
 
-## Ring Architecture
+## Memory Layout
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  Ring-3 (Userland)                                  │
-│  sigma-sh | sigma-forensics | Zenith Desktop UI     │
-└─────────────────────┬───────────────────────────────┘
-                      │ syscall / SYSRET
-┌─────────────────────▼───────────────────────────────┐
-│  SyscallDispatcher  (256-slot O(1) C table)         │
-└─────────────────────┬───────────────────────────────┘
-                      │
-┌─────────────────────▼───────────────────────────────┐
-│  Ring-0 (Kernel Lattice)                            │
-│  Scheduler | Allocator | VFS | IPC | PQC Engine     │
-└─────────────────────┬───────────────────────────────┘
-                      │
-┌─────────────────────▼───────────────────────────────┐
-│  S-HAL (Hardware Abstraction Layer)                 │
-│  x86_64 APIC | ARM64 GIC | RISC-V PLIC/CLINT       │
-└─────────────────────┬───────────────────────────────┘
-                      │
-              Physical Hardware
-
+0x0000_0000 — 0x0007_FFFF  ▪ BIOS & Legacy regions (reserved)
+0x0008_0000 — 0x0009_FFFF  ▪ VGA BIOS ROM
+0x000B_8000 — 0x000B_FFFF  ▪ VGA Text Mode Framebuffer (0xB8000)
+0x0010_0000 — 0x001F_FFFF  ▪ Kernel Image (.text, .data, .bss)
+0x0020_0000 — 0x002F_FFFF  ▪ Page Table Pool (sigma_paging)
+0x0030_0000 — 0x003F_FFFF  ▪ Kernel Stack
+0x0040_0000 — 0x013F_FFFF  ▪ Slab Allocator Arena (sigma_slab)
+0x8000_0000 — 0xFFFF_FFFF  ▪ MMIO / Device Registers (e.g., e1000 NIC)
+FFFF_8000 — 0xFFFF_FFFF_FFFF  ▪ Higher-Half Kernel Virtual (future)
 ```
 
 ---
 
-## Key Subsystems
+## Bootloader → Kernel Handoff
 
-| Subsystem | File | Purpose | 
-| :--- | :--- | :--- | 
-| **S-HAL** | `hal/SovereignHAL.cpp` | Platform-agnostic register access | 
-| **Scheduler** | `kernel/scheduler/SovereignScheduler.cpp` | CFS + NUMA + SCHED_SOVEREIGN | 
-| **Allocator** | `kernel/core/SovereignAllocator.cpp` | O(1) lockless slab | 
-| **SPSC IPC** | `kernel/core/ipc/SovereignSPSCQueue.hpp` | Zero-copy ring buffers | 
-| **Syscalls** | `kernel/core/SovereignSyscall.cpp` | Modular C dispatch table | 
-| **VFS** | `kernel/core/SovereignVFS.cpp` | ZFS-inspired virtual FS | 
-| **Vulkan** | `kernel/core/vulkan/sovereign_vulkan.c` | Direct SPIR-V GPU routing | 
-| **UI** | `kernel/core/SovereignZenithUI.cpp` | Glassmorphic compositor | 
-| **PQC** | `kernel/core/SovereignPQC.cpp` | Dilithium-5 attestation | 
+1. **Stage 1**: BIOS loads the 512-byte MBR boot sector from LBA 0.
+2. **Stage 2**: Enters 32-bit Protected Mode, loads the kernel ELF.
+3. **Kernel Init** (`S01_Genesis/init.cpp`):
+   - Calls `sigma_vga_init()` — screen is live.
+   - Calls `sigma_slab_init()` — memory allocator ready.
+   - Calls `sigma_paging_init()` — 4-level page tables activated.
+   - Calls `sigma_fat32_mount()` — filesystem mounted.
+   - Calls `sigma_e1000_init()` — network link up.
+   - Calls `sigma_sh_run()` — drops into the Sovereign Shell.
 
 ---
 
-## Boot Sequence
+## Subsystem Map
 
-1. `SovereignHAL::initializeHAL()` — CPU arch detection, MMIO mapping
-2. `SovereignAllocator::init()` — Slab bucket setup
-3. `syscall_init()` — Dispatch table population
-4. `sigma_scheduler_numa_balance()` — NUMA shard pinning
-5. `SovereignVFS::mount()` — Root filesystem mount
-6. `svk_init()` — GPU command queue reset
-7. Drop to Ring-3, launch `sigma-sh`
-
----
-
-## 🚀 Expanded Layered Architecture Diagram
-
-The **SigmaOS Sovereign Lattice** is built on a decoupled, failure-isolated, 4-tier model integrating advanced computing foundations and Linux distribution models:
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                      TOP LAYER: USER-FACING INTELLIGENCE                    │
-│   ┌──────────────────────────┐  ┌────────────────────────┐  ┌───────────┐   │
-│   │ NLP (spaCy / HF Tokens)  │  │ Bayesian Networks      │  │ GraphQL   │   │
-│   ├──────────────────────────┤  ├────────────────────────┤  ├───────────┤   │
-│   │ Real-Time Forecasters    │  │ Interactive D3/Plotly  │  │ WASM GUI  │   │
-│   └──────────────────────────┘  └────────────────────────┘  └───────────┘   │
-└──────────────────────────────────────┬──────────────────────────────────────┘
-                                       │
-┌──────────────────────────────────────▼──────────────────────────────────────┐
-│                    MIDDLE LAYER: WAREHOUSE, PIPELINES & MODEL                │
-│   ┌──────────────────────────┐  ┌────────────────────────┐  ┌───────────┐   │
-│   │ Galaxy Hybrid Schemas    │  │ Apache Airflow DAGs    │  │ Neo4j     │   │
-│   ├──────────────────────────┤  ├────────────────────────┤  ├───────────┤   │
-│   │ Columnar Parquet / ORC   │  │ Min-Max / Robust CIRT  │  │ Ontologies│   │
-│   └──────────────────────────┘  └────────────────────────┘  └───────────┘   │
-└──────────────────────────────────────┬──────────────────────────────────────┘
-                                       │
-┌──────────────────────────────────────▼──────────────────────────────────────┐
-│                  FOUNDATION LAYER: SOVEREIGN KERNEL & COMPUTE               │
-│   ┌──────────────────────────┐  ┌────────────────────────┐  ┌───────────┐   │
-│   │ PQC Kernel (Dilithium-5) │  │ Ring-3 Xen Micro-VMs   │  │ Formal Coq│   │
-│   ├──────────────────────────┤  ├────────────────────────┤  ├───────────┤   │
-│   │ Dynamic GPU scheduling   │  │ Gentoo Auto-Optimize   │  │ SELinux   │   │
-│   └──────────────────────────┘  └────────────────────────┘  └───────────┘   │
-└─────────────────────────────────────────────────────────────────────────────┘
-  ▲                                                                         ▲
-  └────────────────────────────────────┬────────────────────────────────────┘
-                  CROSS-CUTTING: COMPLIANCE, TRACING & AUDIT
-     ┌─────────────────────────────────────────────────────────────────┐
-     │ Coverity / SonarQube Static analysis | Strace & Perf tracing    │
-     └─────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 📈 Unified Sovereign End-to-End Workflow
-
-The following pipeline demonstrates how a real-time data frame moves from distributed ingestion to core operating system scheduling adjustments:
-
-```
- ┌──────────────────────┐      Ingested SQL Transaction
- │ Relational Ingestion │ ───► Star/Snowflake Hybrid Galaxy DB (ACID + BASE)
- └──────────────────────┘
-            │
-            ▼
- ┌──────────────────────┐      Sovereign Airflow Pipeline
- │   Data Pipeline/ETL  │ ───► Columnar Parquet -> Robust Mean/IQR Imputer
- └──────────────────────┘
-            │
-            ▼
- ┌──────────────────────┐      spaCy Tokenizer & PyTorch model
- │  AI / ML Inference   │ ───► Logistical Predictions & Federated Learning
- └──────────────────────┘
-            │
-            ▼
- ┌──────────────────────┐      GraphQL Subscriptions API
- │  Visual Analytics    │ ───► WASM-boosted Grafana Dashboard (D3.js)
- └──────────────────────┘
-            │
-            ▼
- ┌──────────────────────┐      S-AI-TEL System Telemetry Shield
- │   Lattice Feedback   │ ───► Dynamic CFS Scheduler CPU Boost (SLA Enforced)
- └──────────────────────┘
-```
-
-1.  **Ingestion**: Incoming enterprise data transactions are captured by CockroachDB/YugabyteDB compatible interfaces inside `SovereignOmniMatrix.cpp`.
-2.  **ETL & Preprocessing**: Automated DAG workflows transform raw tabular streams into high-density Columnar Parquet structures. Missing entries are dynamically imputed, and values are normalized via `SovereignDataPreprocess.cpp`.
-3.  **AI Predictions & NLP**: Natural Language processing modules (spaCy style) tokenize query metadata, generating input feature vectors. ML models execute local PyTorch/TensorFlow predictions while federated learning keeps data private.
-4.  **Web Presentation**: A high-efficiency GraphQL subscription API pushes updated analytical points to user browsers, where WebAssembly-accelerated canvases draw interactive Grafana-style dashboards.
-5.  **Adaptive Scheduling Feedback**: The SLA monitor (`sigma_enterprise_sla_manager.cpp`) intercepts long-tail latencies. It signals the microkernel CFS scheduler to elevate worker threads, ensuring system uptime and meeting SLAs.
-
----
-> **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED  
-> *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*
+| Subsystem | File | Technique |
+|:--|:--|:--|
+| Memory Allocator | `kernel/memory/sigma_slab_allocator.cpp` | SLUB power-of-2 buckets, intrusive free lists |
+| Virtual Memory | `kernel/memory/sigma_paging.cpp` | x86_64 4-level paging, TLB flush via `invlpg` |
+| File System | `kernel/fs/sigma_fat32.cpp` | FAT32 BPB parsing, cluster chain traversal |
+| ATA Disk | `kernel/drivers/sigma_ata_driver.cpp` | Port I/O via inline assembly (`inb`, `outb`) |
+| NIC Driver | `kernel/drivers/sigma_e1000.cpp` | Intel e1000 MMIO, TX/RX ring buffers |
+| VGA Display | `kernel/drivers/sigma_vga.cpp` | Direct 0xB8000 mapping, hardware cursor |
+| Touch Input | `kernel/drivers/sigma_touch_driver.cpp` | I2C HID parsing, SPSC ring buffer |
+| Real-Time Sched | `kernel/scheduler/sigma_rt_scheduler.cpp` | EDF algorithm, priority inheritance |
+| Adaptive Sched | `kernel/core/SovereignAdaptiveScheduler.cpp` | EWMA slice predictor, class-aware priorities |
+| Self-Healing | `kernel/core/SovereignSelfHealingKernel.cpp` | Subsystem watches, runtime live patching |
+| Config Rollback | `tools/cli/SovereignConfigRollbackCLI.cpp` | NixOS-style generation management |
+| Registry | `kernel/core/sigma_registry_manager.cpp` | Key-value persistence store |
+| Shell | `usr/sigma_sh.cpp` | BusyBox-inspired, PS/2 keyboard polling |
+| App Signer | `tools/sigma_app_signer.cpp` | Dilithium-5 PQC attestation |
+| Forensics | `tools/sigma_forensics.cpp` | CR0-CR4 register dumps |
+| GST Calc | `tools/gst_court_calculator.cpp` | Fixed-point integer math |
