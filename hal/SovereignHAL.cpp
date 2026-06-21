@@ -8,6 +8,9 @@
 
 #include "SovereignHAL.hpp"
 #include "sigma_log.h"
+#include "sigma_pci.h"
+#include "../drivers/graphics/sigma_kms.h"
+#include "../kernel/power/sigma_perf_governor.h"
 
 namespace SigmaOS {
 namespace HAL {
@@ -57,6 +60,16 @@ void SovereignHAL::initializeHAL() {
     
     detectCoreCount();
     sigma_log_info("[HAL] S-HAL: Basic memory discovery mapping online.");
+
+    /* Phase F: PCIe + KMS + Performance Governor */
+    sigma_log_info("[HAL] S-HAL: Scanning PCI/PCIe bus for devices...");
+    sigma_pci_scan_bus();
+
+    sigma_log_info("[HAL] S-HAL: Bringing up KMS display subsystem...");
+    sigma_kms_init();
+
+    sigma_log_info("[HAL] S-HAL: Initialising CPU performance governor...");
+    sigma_perf_governor_init();
 }
 
 void SovereignHAL::detectCoreCount() {

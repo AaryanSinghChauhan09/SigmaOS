@@ -1,6 +1,6 @@
 # SigmaOS: Active Problems Manifest
 
-*Last updated: Phase E gap-closing pass. Tracks all known issues across subsystems.*
+*Last updated: Phase F — Competitive Strategy integration. All Phase E targets resolved.*
 
 ## ✅ Resolved — Phase E (Gap-Closing)
 
@@ -38,38 +38,46 @@
 | P-A7 | Personalization | **Partial** | `zenith_desktop/personalization/sigma_profile_engine.cpp` |
 | P-A8 | Automation | **Partial** | `scripts/sigma_automation.sh` |
 
-## High Priority (Kernel/Core)
+## ✅ Resolved — Phase F (Competitor Crusher)
 
-- **[#1132] ~~Ext4 Journal Checkpointing~~** ✅ FIXED: JBD2 journal rewritten with CRC32C checksums, real descriptor/commit/revoke blocks, checkpoint flushing, and crash replay.
-- **[#1133] ~~VFS / Block Dev Integration~~** ✅ FIXED: `fs/ext4.c` block reads now correctly bind to NVMe/SATA AHCI drivers via `sigma_nvme_read`.
-- **[#1134] ~~Memory Fragmentation~~** ✅ FIXED: Buddy allocator in `sigma_libc_impl.c` with coalescing.
-- **[#1135] ~~TCP/ARP completion~~** ✅ FIXED: TCP state machine now sends SYN-ACK and ACK packets, ARP resolution sends requests.
+| ID | Area | Status | File |
+|----|------|--------|------|
+| F-01 | Native KMS/GPU (#844) | **Resolved** | `drivers/graphics/sigma_kms.cpp` |
+| F-02 | PCIe MSI-X HAL (#850) | **Resolved** | `hal/sigma_pci.cpp` |
+| F-03 | Cgroup Enforcement (#900) | **Resolved** | `kernel/core/orchestrator/sigma_cgroup.cpp` |
+| F-04 | Sovereign Package Registry (#901) | **Resolved** | `userland/pkg/sigma_registry.cpp` |
+| F-05 | Offline-First CRDT Sync | **Resolved** | `net/sigma_offline_sync.cpp` |
+| F-06 | Native Performance Governor | **Resolved** | `kernel/power/sigma_perf_governor.cpp` |
+| F-07 | HAL Boot Integration (PCI+KMS+PerfGov) | **Resolved** | `hal/SovereignHAL.cpp` |
 
-## Medium Priority (Drivers/HAL)
+## ✅ Resolved — Phase E (Gap-Closing)
 
-- **[#844] Native KMS/GPU:** UEFI/VESA fallback works; AMD/Intel KMS drivers needed for accelerated Zenith compositing.
-- **[#850] PCIe MSI-X:** Interrupt vector drops on NUMA under heavy network I/O.
-- **[#851] ~~Wi-Fi / Bluetooth~~** ⚠️ USB xHCI driver now provides transport; WLAN/BT protocol stacks pending.
-- **[#852] ~~NVMe Storage~~** ✅ FIXED: Full NVMe 1.4 driver with admin/IO queue pairs.
-- **[#853] ~~USB Host Controller~~** ✅ FIXED: xHCI driver with port scanning and speed detection.
+| ID | Area | Status | File |
+|----|------|--------|------|
+| E-01 | NVMe Driver | **Resolved** | `drivers/storage/sigma_nvme.cpp` |
+| E-02 | USB xHCI Driver | **Resolved** | `drivers/usb/sigma_xhci.cpp` |
+| E-03 | Power Management (ACPI) | **Resolved** | `kernel/power/sigma_power_manager.cpp` |
+| E-04 | Crash Reporter | **Resolved** | `kernel/diagnostics/sigma_crash_reporter.cpp` |
+| E-05 | Ext4 Journal (JBD2 rewrite) | **Resolved** | `fs/ext4_journal.c` |
 
-## Medium Priority (System Services)
-
-- **[#900] Cgroup enforcement:** Native pod spec stored; CPU/mem/io limits need kernel cgroup shard binding.
-- **[#901] Sovereign package registry:** Reproducible `.spkg` registry + community recipe pipeline.
-- **[#902] ~~Power Management~~** ✅ FIXED: ACPI S0-S5 states, CPU P/C-states, thermal throttling, battery monitoring.
-- **[#903] ~~Crash Reporting~~** ✅ FIXED: Full crash reporter with register dumps, stack traces, CRC32 checksums.
-
-## Low Priority (Userland/UI)
+## Open — Low Priority (Userland/UI)
 
 - **[#512] Zenith Compositor:** C++ compositor exists; JS prototypes remain in `web_ui/` — consolidate on native path.
 - **[#520] Shell Globbing:** `sigma-sh` wildcard expansion still missing.
 - **[#521] Recovery GUI:** Resilient serial shell exists; Rescuezilla-style GUI recovery not implemented.
 - **[#522] Auto-tiling polish:** `sigma_tiling_wm.cpp` implemented; needs input/compositor integration tests.
 
+## Open — Phase G (Next Targets)
+
+- **[#851-WLAN] Wi-Fi Stack:** IEEE 802.11ax (Wi-Fi 6) driver over xHCI transport.
+- **[#851-BT] Bluetooth 5.3 Stack:** HCI/L2CAP/RFCOMM over USB transport.
+- **[#1000] Developer SDK:** sigma-sdk CLI, debugger (sigma-gdb), profiler (sigma-perf trace).
+- **[#1001] App Sandbox:** Fine-grained capability system (sandboxctl) for third-party apps.
+- **[#1002] Multi-monitor KMS:** Extended desktop and clone mode across multiple KMS adapters.
+
 ## Documentation / Community
 
-- **[#600] Wiki depth:** Phase C/D/E docs added; keep `wiki_repo/` synced.
+- **[#600] Wiki depth:** Phase F docs to be added to `wiki_repo/` — offline sync, perf governor.
 - **[#601] Branch matrix docs:** Document `release/*` branch expectations.
 
 ---
