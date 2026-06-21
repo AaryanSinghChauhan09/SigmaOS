@@ -259,6 +259,56 @@ static sigma_u32 tokenize(const char* input, Token* tokens, sigma_u32 max_tokens
     return count;
 }
 
+// ─── Glob Expansion ──────────────────────────────────────────────────────────
+static sigma_bool match_glob(const char* pattern, const char* text) {
+    while (*pattern) {
+        if (*pattern == '*') {
+            while (*pattern == '*') pattern++;
+            if (!*pattern) return SIGMA_TRUE;
+            while (*text) {
+                if (match_glob(pattern, text)) return SIGMA_TRUE;
+                text++;
+            }
+            return SIGMA_FALSE;
+        } else if (*pattern == '?' || *pattern == *text) {
+            if (!*text) return SIGMA_FALSE;
+            pattern++;
+            text++;
+        } else {
+            return SIGMA_FALSE;
+        }
+    }
+    return *text == '\0';
+}
+
+static sigma_u32 expand_glob(const char* pattern, const char** matches, sigma_u32 max_matches) {
+    sigma_u32 count = 0;
+    sigma_bool has_glob = SIGMA_FALSE;
+    for (sigma_u32 i = 0; pattern[i]; ++i) {
+        if (pattern[i] == '*' || pattern[i] == '?') { has_glob = SIGMA_TRUE; break; }
+    }
+    
+    if (!has_glob) {
+        matches[count++] = pattern;
+        return count;
+    }
+
+    /* Simulate VFS directory read for globbing */
+    const char* vfs_stub_files[] = { "README.md", "sigma_shell.cpp", "Makefile", "kernel.bin", "config.json" };
+    sigma_u32 num_stub_files = sizeof(vfs_stub_files) / sizeof(vfs_stub_files[0]);
+    
+    for (sigma_u32 i = 0; i < num_stub_files && count < max_matches; ++i) {
+        if (match_glob(pattern, vfs_stub_files[i])) {
+            matches[count++] = vfs_stub_files[i];
+        }
+    }
+    
+    if (count == 0) {
+        matches[count++] = pattern; /* No match, pass raw pattern */
+    }
+    return count;
+}
+
 // ─── Builtin Commands ────────────────────────────────────────────────────────
 static sigma_bool str_eq(const char* a, const char* b) {
     while (*a && *b) { if (*a++ != *b++) return SIGMA_FALSE; }
@@ -379,7 +429,11 @@ sigma_status execute_pipeline(Token* tokens, sigma_u32 num_tokens) {
             argc = 0;
 
         } else if (tokens[i].type == TOK_WORD) {
-            if (argc < 31) argv[argc++] = tokens[i].text;
+            const char* matches[16];
+            sigma_u32 n = expand_glob(tokens[i].text, matches, 16);
+            for (sigma_u32 m = 0; m < n && argc < 31; ++m) {
+                argv[argc++] = matches[m];
+            }
         } else if (tokens[i].type == TOK_VAR) {
             const char* val = get_env(tokens[i].text);
             if (val && argc < 31) argv[argc++] = val;

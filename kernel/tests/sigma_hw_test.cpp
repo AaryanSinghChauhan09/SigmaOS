@@ -13,8 +13,10 @@
  * =========================================================================
  */
 
-#include "../include/sigma_kernel_types.h"
+#include "../../include/sigma_kernel_types.h"
 #include "../../include/sigma_driver_codes.h"
+#include "../../include/sigma_profiles.h"
+#include "../../include/sigma_error_codes.h"
 
 extern "C" void   zenith_log_structured(sigma_u32 code, const char* comp,
                                          const char* desc, sigma_u32 cid);

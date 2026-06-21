@@ -8,6 +8,7 @@
  * =========================================================================
  */
 
+#include "../../include/sigma_kernel_types.h"
 #include <sigma_libc.h>
 
 void print_usage() {

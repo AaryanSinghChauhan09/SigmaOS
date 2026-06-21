@@ -57,11 +57,11 @@ static const DriverDescriptor g_driver_table[] = {
       true,  ZEN_DRV_GPU_INIT_FAILED, ZEN_DRV_GPU_FALLBACK_VGA },
 
     { "nvidia",       "gpu",     "NVIDIA (proprietary)",
-      SIGMA_HW_PROFILE_GAMING,
+      (sigma_hw_profile_t)SIGMA_HW_PROFILE_GAMING,
       true,  ZEN_DRV_GPU_INIT_FAILED, ZEN_DRV_GPU_FALLBACK_VGA },
 
     { "vc4",          "gpu",     "Broadcom VC4 (RPi)",
-      SIGMA_HW_PROFILE_IOT_ARM64,
+      (sigma_hw_profile_t)SIGMA_HW_PROFILE_IOT_ARM64,
       false, ZEN_DRV_GPU_INIT_FAILED, ZEN_DRV_GPU_FALLBACK_VGA },
 
     // ---- Networking ---------------------------------------------------------
@@ -74,7 +74,7 @@ static const DriverDescriptor g_driver_table[] = {
       true,  ZEN_DRV_NET_INTEL_ERR,   ZEN_DRV_NET_INIT_FAILED },
 
     { "brcmfmac",     "net",     "Broadcom Wi-Fi (RPi)",
-      SIGMA_HW_PROFILE_IOT_ARM64,
+      (sigma_hw_profile_t)SIGMA_HW_PROFILE_IOT_ARM64,
       true,  ZEN_DRV_NET_BROADCOM_ERR,ZEN_DRV_NET_INIT_FAILED },
 
     // ---- Audio --------------------------------------------------------------
@@ -96,7 +96,7 @@ static const DriverDescriptor g_driver_table[] = {
       false, ZEN_DRV_STORAGE_SATA_ERR, ZEN_DRV_STORAGE_INIT_FAILED },
 
     { "mmc_block",    "storage", "eMMC / SD (ARM64)",
-      SIGMA_HW_PROFILE_IOT_ARM64,
+      (sigma_hw_profile_t)SIGMA_HW_PROFILE_IOT_ARM64,
       false, ZEN_DRV_STORAGE_EMMC_ERR, ZEN_DRV_STORAGE_INIT_FAILED },
 };
 

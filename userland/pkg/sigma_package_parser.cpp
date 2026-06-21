@@ -7,8 +7,9 @@
  * =========================================================================
  */
 
+#include "../../include/sigma_kernel_types.h"
+#include "../../include/sigma_error_codes.h"
 #include <sigma_libc.h>
-#include <sigma_error_codes.h>
 
 namespace SigmaOS {
 namespace Packaging {

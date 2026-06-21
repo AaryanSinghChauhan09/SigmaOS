@@ -21,24 +21,26 @@
  * Canonical names used across the codebase.
  * ------------------------------------------------------------------------- */
 #define SIGMA_SUCCESS       0
+#define SIGMA_ERROR        (-1)
 #define ZEN_SUCCESS         0
 #define ZEN_ERROR          (-1)
 
-/* -------------------------------------------------------------------------
- * Hardware Profile Extensions
- * Extends sigma_profiles.h with driver-specific variants.
- * ------------------------------------------------------------------------- */
-#define SIGMA_HW_PROFILE_STANDARD     SIGMA_PROFILE_STANDARD
-#define SIGMA_HW_PROFILE_FORENSIC     SIGMA_PROFILE_FORENSIC
-#define SIGMA_HW_PROFILE_EDUCATION    SIGMA_PROFILE_EDUCATION
-#define SIGMA_HW_PROFILE_ENTERPRISE   SIGMA_PROFILE_ENTERPRISE
-#define SIGMA_HW_PROFILE_IOT          SIGMA_PROFILE_IOT
-#define SIGMA_HW_PROFILE_GAMING       5   /* High-performance gaming rig    */
-#define SIGMA_HW_PROFILE_SERVER       6   /* Headless / rack-mount server   */
-#define SIGMA_HW_PROFILE_IOT_ARM64    7   /* Raspberry Pi / embedded ARM64  */
+/* Kernel Error Codes */
+#define K_OK                0
+#define K_ERR_INVAL        (-1)
+#define K_ERR_TIMEOUT      (-2)
+#define K_ERR_IO           (-3)
+#define K_ERR_EIO          (-3)
+#define K_ERR_NO_MEM       (-4)
+#define K_ERR_NOMEM        (-4)   /* Alias: out-of-memory */
+#define K_ERR_NOTFOUND     (-5)   /* Resource / entry not found */
+#define K_ERR_PERM         (-6)   /* Permission denied (Zero-Trust) */
+#define K_ERR_BUSY         (-7)   /* Resource busy / locked */
+#define K_ERR_OVERFLOW     (-8)   /* Arithmetic or buffer overflow */
+#define K_ERR_UNIMPL       (-9)   /* Feature not yet implemented */
+typedef int sigma_status;
 
-/* Re-export sigma_system_profile_t as sigma_hw_profile_t for driver code */
-typedef sigma_system_profile_t sigma_hw_profile_t;
+/* Hardware Profile extensions moved to sigma_driver_codes.h */
 
 /* -------------------------------------------------------------------------
  * Categories:

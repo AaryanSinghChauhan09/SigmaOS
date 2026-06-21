@@ -8,8 +8,8 @@
 extern "C" {
 
 // Inline syscall wrapper
-static inline u64 posix_syscall(u64 num, u64 arg1 = 0, u64 arg2 = 0, u64 arg3 = 0) {
-    u64 ret;
+static inline sigma_u64 posix_syscall(sigma_u64 num, sigma_u64 arg1 = 0, sigma_u64 arg2 = 0, sigma_u64 arg3 = 0) {
+    sigma_u64 ret;
 #if defined(__x86_64__)
     __asm__ volatile (
         "syscall"
@@ -31,19 +31,19 @@ static inline u64 posix_syscall(u64 num, u64 arg1 = 0, u64 arg2 = 0, u64 arg3 = 
 }
 
 int open(const char* path, int flags, int mode) {
-    return (int)posix_syscall(2, (u64)path, (u64)flags, (u64)mode);
+    return (int)posix_syscall(2, (sigma_u64)path, (sigma_u64)flags, (sigma_u64)mode);
 }
 
 int read(int fd, void* buf, sigma_size_t count) {
-    return (int)posix_syscall(0, (u64)fd, (u64)buf, (u64)count);
+    return (int)posix_syscall(0, (sigma_u64)fd, (sigma_u64)buf, (sigma_u64)count);
 }
 
 int write(int fd, const void* buf, sigma_size_t count) {
-    return (int)posix_syscall(1, (u64)fd, (u64)buf, (u64)count);
+    return (int)posix_syscall(1, (sigma_u64)fd, (sigma_u64)buf, (sigma_u64)count);
 }
 
 int close(int fd) {
-    return (int)posix_syscall(3, (u64)fd);
+    return (int)posix_syscall(3, (sigma_u64)fd);
 }
 
 int fork(void) {
@@ -51,11 +51,11 @@ int fork(void) {
 }
 
 int execve(const char* pathname, char* const argv[], char* const envp[]) {
-    return (int)posix_syscall(59, (u64)pathname, (u64)argv, (u64)envp);
+    return (int)posix_syscall(59, (sigma_u64)pathname, (sigma_u64)argv, (sigma_u64)envp);
 }
 
 void exit(int status) {
-    posix_syscall(60, (u64)status);
+    posix_syscall(60, (sigma_u64)status);
     while (1) { __asm__ volatile("hlt"); }
 }
 

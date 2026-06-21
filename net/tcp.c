@@ -91,6 +91,7 @@ void tcp_process_packet(sigma_u32 src_ip, sigma_u16 src_port, sigma_u32 dst_ip, 
                         sigma_u8 header[20] = {0};
                         header[13] = TCP_FLAG_SYN | TCP_FLAG_ACK;
                         sigma_ipv4_send(src_ip, 6 /* TCP */, header, sizeof(header));
+                    }
                     break;
                     
                 case TCP_STATE_SYN_RECV:

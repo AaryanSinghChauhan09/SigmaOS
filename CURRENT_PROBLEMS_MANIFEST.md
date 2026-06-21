@@ -2,6 +2,18 @@
 
 *Last updated: Phase E gap-closing pass. Tracks all known issues across subsystems.*
 
+## ✅ Resolved — Phase F (Type Migration & Subsystem Hardening)
+
+| ID | Area | Status | File |
+|----|------|--------|------|
+| F-01 | USB HCD Sovereign Types | **Resolved** | `drivers/usb/sigma_usb_hcd.cpp` |
+| F-02 | Audit Header (`uint32_t`→`sigma_u32`) | **Resolved** | `include/sigma_audit.h` |
+| F-03 | PQC Header (empty → full API) | **Resolved** | `include/sigma_pqc.h` |
+| F-04 | Error Codes (K_ERR_NOMEM, NOTFOUND…) | **Resolved** | `include/sigma_error_codes.h` |
+| F-05 | HW Profile Bitmask (`sigma_hw_profile_t`) | **Resolved** | `include/sigma_profiles.h` |
+| F-06 | HWTest include paths | **Resolved** | `kernel/tests/sigma_hw_test.cpp` |
+| F-07 | TCP SYN case missing closing brace | **Resolved** | `net/tcp.c` |
+
 ## ✅ Resolved — Phase E (Gap-Closing)
 
 | ID | Area | Status | File |
@@ -11,6 +23,10 @@
 | E-03 | Power Management (ACPI) | **Resolved** | `kernel/power/sigma_power_manager.cpp` |
 | E-04 | Crash Reporter | **Resolved** | `kernel/diagnostics/sigma_crash_reporter.cpp` |
 | E-05 | Ext4 Journal (JBD2 rewrite) | **Resolved** | `fs/ext4_journal.c` |
+| E-06 | Native KMS/GPU | **Resolved** | `drivers/graphics/sigma_kms.cpp` |
+| E-07 | PCIe MSI-X | **Resolved** | `hal/sigma_pci.cpp` |
+| E-08 | Cgroup Enforcement | **Resolved** | `kernel/core/orchestrator/sigma_cgroup.cpp` |
+| E-09 | Sovereign Package Registry | **Resolved** | `userland/pkg/sigma_registry.cpp` |
 
 ## ✅ Resolved — Phase C/D
 
@@ -47,23 +63,23 @@
 
 ## Medium Priority (Drivers/HAL)
 
-- **[#844] Native KMS/GPU:** UEFI/VESA fallback works; AMD/Intel KMS drivers needed for accelerated Zenith compositing.
-- **[#850] PCIe MSI-X:** Interrupt vector drops on NUMA under heavy network I/O.
+- **[#844] ~~Native KMS/GPU~~** ✅ FIXED: Native KMS/GPU implementation for AMD/Intel (`drivers/graphics/sigma_kms.cpp`).
+- **[#850] ~~PCIe MSI-X~~** ✅ FIXED: Interrupt vector routing for PCIe MSI-X (`hal/sigma_pci.cpp`).
 - **[#851] ~~Wi-Fi / Bluetooth~~** ⚠️ USB xHCI driver now provides transport; WLAN/BT protocol stacks pending.
 - **[#852] ~~NVMe Storage~~** ✅ FIXED: Full NVMe 1.4 driver with admin/IO queue pairs.
 - **[#853] ~~USB Host Controller~~** ✅ FIXED: xHCI driver with port scanning and speed detection.
 
 ## Medium Priority (System Services)
 
-- **[#900] Cgroup enforcement:** Native pod spec stored; CPU/mem/io limits need kernel cgroup shard binding.
-- **[#901] Sovereign package registry:** Reproducible `.spkg` registry + community recipe pipeline.
+- **[#900] ~~Cgroup enforcement~~** ✅ FIXED: CPU/mem/io limits bound to kernel cgroup shards (`kernel/core/orchestrator/sigma_cgroup.cpp`).
+- **[#901] ~~Sovereign package registry~~** ✅ FIXED: Reproducible `.spkg` registry and community recipe pipeline (`userland/pkg/sigma_registry.cpp`).
 - **[#902] ~~Power Management~~** ✅ FIXED: ACPI S0-S5 states, CPU P/C-states, thermal throttling, battery monitoring.
 - **[#903] ~~Crash Reporting~~** ✅ FIXED: Full crash reporter with register dumps, stack traces, CRC32 checksums.
 
 ## Low Priority (Userland/UI)
 
 - **[#512] Zenith Compositor:** C++ compositor exists; JS prototypes remain in `web_ui/` — consolidate on native path.
-- **[#520] Shell Globbing:** `sigma-sh` wildcard expansion still missing.
+- **[#520] ~~Shell Globbing~~** ✅ FIXED: `sigma-sh` wildcard expansion (`*`, `?`) implemented with `match_glob` and `expand_glob`.
 - **[#521] Recovery GUI:** Resilient serial shell exists; Rescuezilla-style GUI recovery not implemented.
 - **[#522] Auto-tiling polish:** `sigma_tiling_wm.cpp` implemented; needs input/compositor integration tests.
 

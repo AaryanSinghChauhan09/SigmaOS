@@ -34,11 +34,17 @@ void* sigma_memset(void* s, int c, sigma_size_t n);
 
 /* String Manipulation */
 sigma_size_t sigma_strlen(const char* s);
-void sigma_strncpy(char* dest, const char* src, sigma_size_t n);
+char* sigma_strcpy(char* dest, const char* src);
+char* sigma_strncpy(char* dest, const char* src, sigma_size_t n);
 int sigma_strcmp(const char* s1, const char* s2);
+int sigma_strncmp(const char* a, const char* b, sigma_size_t n);
+char* sigma_strcat(char* dst, const char* src);
+const char* sigma_strchr(const char* s, char c);
+const char* sigma_strstr(const char* haystack, const char* needle);
 int sigma_atoi(const char* str);
 
 /* Terminal I/O */
+void sys_print(const char* fmt, ...);
 void sigma_printf(const char* format, ...);
 void sigma_exit(int status);
 sigma_u32 sigma_crc32(const void* data, sigma_size_t n);

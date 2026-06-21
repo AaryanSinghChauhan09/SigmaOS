@@ -8,8 +8,9 @@
  * =========================================================================
  */
 
+#include "../../include/sigma_kernel_types.h"
+#include "../../include/sigma_error_codes.h"
 #include <sigma_libc.h>
-#include <sigma_error_codes.h>
 
 // Link external structured logger
 extern "C" void zenith_log_structured(sigma_u32 error_code, const char* component, const char* desc, sigma_u32 container_id);
