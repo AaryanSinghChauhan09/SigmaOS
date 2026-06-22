@@ -22,6 +22,12 @@ SigmaOS is an experimental, post-POSIX operating system focusing on **Post-Quant
 ### Phase 3: Sovereign Virtualization & Cloud ✅
 - Post-Quantum Secure VM Isolation (`sigma_hypervisor`)
 - Mesh Networking Clusters (`sigma_cluster`)
+- Cluster Migration Simulation Harness (`simulate_cluster.sh`)
+
+### Phase 4: Developer Tooling Revolution ✅
+- Full LSP Client with sigma-jail isolation (`sigma_lsp_bridge`)
+- AI-Native Semantic Debugger (`sigma_ai_debugger`)
+- Zenith IDE Host with Plugin Architecture (`sigma_ide`)
 
 ## Contributing
 Please see our [CONTRIBUTING.md](../SigmaOS/CONTRIBUTING.md) guide in the main repository. All commits must be signed per the [Developer Certificate of Origin](../SigmaOS/DCO.md).
