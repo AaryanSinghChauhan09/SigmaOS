@@ -29,5 +29,15 @@ SigmaOS is an experimental, post-POSIX operating system focusing on **Post-Quant
 - AI-Native Semantic Debugger (`sigma_ai_debugger`)
 - Zenith IDE Host with Plugin Architecture (`sigma_ide`)
 
+### Phase 5: Structural Gap Closure vs Arch Linux ✅
+- Sovereign User Repository — AUR equivalent (`sigma_aur`)
+- Language Runtime Manager — Python, Rust, Go, Node, Zig (`sigma_runtime_mgr`)
+- Sovereign Audio Stack — PipeWire replacement (`sigma_pipewire`)
+- KMS/DRM GPU Driver — VirtIO/Intel/AMD/Software (`sigma_kms`)
+- Wi-Fi 802.11ax Driver — WPA3 + Post-Quantum (`sigma_wifi`)
+- Full Service Manager — systemd replacement (`sigma_init` v2.0)
+- Syscall Tracer — strace equivalent (`sigma_trace`)
+- Performance Profiler — perf equivalent with AI diagnosis (`sigma_perf`)
+
 ## Contributing
 Please see our [CONTRIBUTING.md](../SigmaOS/CONTRIBUTING.md) guide in the main repository. All commits must be signed per the [Developer Certificate of Origin](../SigmaOS/DCO.md).
