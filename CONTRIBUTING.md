@@ -1,217 +1,119 @@
-# Contributing to SigmaOS
+# Contributing
 
-Thank you for your interest in SigmaOS! This guide covers everything you need to get started.
-
----
-
-## Table of Contents
-
-1. [Code of Conduct](#code-of-conduct)
-2. [Getting Started](#getting-started)
-3. [Project Structure](#project-structure)
-4. [Development Workflow](#development-workflow)
-5. [Coding Standards](#coding-standards)
-6. [Issue Labels](#issue-labels)
-7. [Pull Request Process](#pull-request-process)
-8. [Testing](#testing)
-9. [Documentation](#documentation)
+Thank you for considering contributing to SigmaOS! This document explains how to contribute code, drivers, web apps, and documentation.
 
 ---
 
-## Code of Conduct
+## Ways to Contribute
 
-Be respectful. Critique code, not people. All contributors must follow the [Contributor Covenant](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).
+| Area | Skill Required | Good First Issue? |
+|------|---------------|------------------|
+| Kernel drivers | C++ / hardware knowledge | ⚠️ Intermediate |
+| Go daemons | Go | ✅ Yes |
+| Web apps | HTML/JS/CSS | ✅ Yes |
+| Wiki / Docs | Writing | ✅ Yes |
+| Build system | Bash / CMake | ⚠️ Intermediate |
+| Test harnesses | C++ / Go | ✅ Yes |
+
+Look for the `good-first-issue` label in [Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues).
 
 ---
 
-## Getting Started
-
-### Prerequisites
-
-| Tool | Purpose | Version |
-|------|---------|---------|
-| `x86_64-elf-gcc` | Bare-metal cross compiler | ≥ 12.0 |
-| `nasm` | Bootloader assembly | ≥ 2.15 |
-| `qemu-system-x86_64` | VM for testing | ≥ 7.0 |
-| `make` | Build system | ≥ 4.3 |
-| `grub-mkrescue` | ISO generation | ≥ 2.06 |
-| `git` | Version control | ≥ 2.40 |
-
-### Setup
+## Development Setup
 
 ```bash
-# 1. Fork the repo on GitHub
-# 2. Clone your fork
+# 1. Fork and clone
 git clone https://github.com/YOUR_USERNAME/SigmaOS.git
 cd SigmaOS
 
-# 3. Add upstream remote
-git remote add upstream https://github.com/AaryanSinghChauhan09/SigmaOS.git
+# 2. Install C++ tools
+sudo apt install -y build-essential cmake ninja-build clang
 
-# 4. Build the default profile
-make PROFILE=standalone
+# 3. Install Go (≥ 1.21)
+# See: https://go.dev/doc/install
 
-# 5. Boot in QEMU
-./scripts/qemu-boot.sh standalone
+# 4. Build the project
+./build.sh          # Compiles kernel + daemons
+./setup.sh          # Installs Buildroot dependencies
+
+# 5. Run tests
+cmake -B build -G Ninja && ninja -C build
+./build/tests/kernel/test_vmm
+./build/tests/kernel/test_tcp
 ```
-
----
-
-## Project Structure
-
-```
-SigmaOS/
-├── kernel/          # Microkernel core (C/C++)
-├── drivers/         # Bare-metal drivers
-├── net/             # TCP/IP + network stack
-├── fs/              # Ext4 + VFS
-├── crypto/          # PQC implementations (Kyber, Dilithium)
-├── hal/             # Hardware Abstraction Layer
-├── zenith_desktop/  # Compositor + desktop environment
-├── userland/        # Shell, pkg manager, tools
-├── runtime/         # WASM/WASI, Linux compat
-├── scripts/         # Build helpers, QEMU launchers
-├── docs/            # Technical documentation
-├── wiki_repo/       # GitHub Wiki source (synced)
-└── .github/         # CI/CD workflows, issue templates
-```
-
----
-
-## Development Workflow
-
-```
-main ─── feat/your-feature ─── PR ─── review ─── merge
-```
-
-1. **Sync** your fork: `git fetch upstream && git rebase upstream/main`
-2. **Branch** off main: `git checkout -b feat/my-feature`
-3. **Code** following the standards below
-4. **Test** — run the hardware test suite and ensure no regressions
-5. **Commit** using Conventional Commits format (see below)
-6. **Push** and open a PR
 
 ---
 
 ## Coding Standards
 
-### Language Rules
+### C++ (Kernel)
 
-- **C** for kernel core (`kernel/`, `net/`, `fs/`) — C11 standard
-- **C++** for drivers, userland, Zenith — C++17, no exceptions, no RTTI
-- **No external libraries** — zero libc/glibc/musl in kernel space
-- **No `#include <stdlib.h>`, `<stdio.h>`, `<string.h>`** — ever
+- **No POSIX, no libc**: Use only `sigma_stdio.h`, `sigma_types.h`, and klib headers from `klib/include/`.
+- **No RTTI, no exceptions**: Use `sigma_assert()` and return codes instead.
+- **`extern "C"` entry points**: All driver init functions must be `extern "C"`.
+- Use `sigma_printf` (not `printf`), `sigma_malloc` (not `malloc`).
 
-### Type System
-
-Always use the SigmaOS sovereign types from `include/sigma_kernel_types.h`:
-
-```c
+```cpp
 // ✅ Correct
-sigma_u32  my_count;
-sigma_u64  my_address;
-sigma_bool my_flag = SIGMA_TRUE;
+#include <sigma_types.h>
+extern "C" void sigma_mydriver_init() {
+    sigma_printf("[mydriver] Initializing...\n");
+}
 
-// ❌ Wrong — violates zero-dependency mandate
-uint32_t  my_count;
-bool      my_flag = true;
+// ❌ Wrong — do not use standard library
+#include <stdio.h>
+void init() { printf("hello"); }
 ```
 
-### Naming
+### Go (Daemons)
 
-| Entity | Convention | Example |
-|--------|-----------|---------|
-| Files | `snake_case` | `sigma_nvme.cpp` |
-| Functions (C) | `sigma_verb_noun` | `sigma_map_page()` |
-| Classes (C++) | `PascalCase` | `SovereignVMM` |
-| Constants | `SIGMA_UPPER_SNAKE` | `SIGMA_HEAP_SIZE` |
-| Error codes | `K_ERR_UPPER` | `K_ERR_NOMEM` |
+- All daemons must start with `http.HandleFunc` endpoints and a `log.Fatal(http.ListenAndServe(...))`.
+- JSON request/response structs must be exported and documented.
+- Cap checks must happen **before** any privileged operation.
 
-### Commit Format (Conventional Commits)
+### HTML/JS (Web Apps)
 
-```
-<type>(<scope>): <short description>
-
-[optional body]
-[optional footer]
-```
-
-| Type | When |
-|------|------|
-| `feat` | New feature or subsystem |
-| `fix` | Bug fix |
-| `refactor` | Code restructuring (no behavior change) |
-| `docs` | Documentation only |
-| `test` | Adding/fixing tests |
-| `chore` | Build, CI, tooling |
-
-Example:
-```
-fix(net): add missing closing brace in TCP_STATE_LISTEN handler
-
-The if(flags & TCP_FLAG_SYN) block was missing its closing } before
-the break, causing the SYN_RECV case to merge into the LISTEN case.
-
-Fixes #F-07
-```
+- All apps must include a `manifest.json` with a `sigmaos.permissions` array.
+- Guard all `navigator.sigmaos` calls with existence checks.
+- Use `navigator.sigmaos.fs.writeFile` for persistence — never `localStorage` for user data.
 
 ---
 
-## Issue Labels
+## Submitting a Driver
 
-| Label | Meaning |
-|-------|---------|
-| `bug` | Confirmed defect |
-| `feat` | New feature request |
-| `good-first-issue` | Suitable for new contributors |
-| `subsystem:kernel` | Kernel-space change |
-| `subsystem:drivers` | Driver change |
-| `subsystem:net` | Networking stack |
-| `subsystem:zenith` | Desktop compositor |
-| `subsystem:crypto` | PQC / security |
-| `priority:critical` | Blocks boot or breaks builds |
-| `priority:high` | Significant functionality gap |
+1. Create `kernel/drivers/<category>/sigma_<chipset>.cpp`.
+2. Implement `extern "C" void sigma_<chipset>_init()`.
+3. Register in `kernel/drivers/sigma_driver_registry.cpp`.
+4. Add to `CMakeLists.txt` under the appropriate target.
+5. Write a test in `tests/drivers/test_<chipset>.cpp`.
+6. Update [Hardware-Support](Hardware-Support) wiki page.
+7. Submit a PR — CI will run the test harness automatically.
 
 ---
 
-## Pull Request Process
+## Submitting a Web App
 
-1. **Title** follows `<type>(<scope>): description` format
-2. **Description** references the issue: `Fixes #123`
-3. All CI checks must pass (build + lint + tests)
-4. One approving review required from a maintainer
-5. Squash-merge to keep main history clean
-
----
-
-## Testing
-
-### Hardware Test Suite
-
-```bash
-# Run the full hardware test suite (simulated)
-make test-hw
-
-# Run for a specific profile
-make test-hw PROFILE=iot-arm64
-```
-
-The suite is in `kernel/tests/sigma_hw_test.cpp` — add tests there for new drivers.
-
-### Regression Tests
-
-```bash
-make test
-```
+1. Create `userland/web-shell/apps/<appname>/index.html` and `manifest.json`.
+2. Declare all required `sigmaos.permissions` in the manifest.
+3. Add your app to `userland/web-shell/store/apps.json`.
+4. Test locally by running `busybox httpd -p 3000 -h userland/web-shell/` and opening your app.
+5. Submit a PR.
 
 ---
 
-## Documentation
+## Pull Request Checklist
 
-- **Wiki** — update `wiki_repo/` for user-facing docs; changes sync to the GitHub Wiki automatically on push
-- **Code comments** — every public function needs a doc comment
-- **Architecture docs** — major subsystems need a `docs/` entry
+- [ ] Code follows the C++/Go/JS standards above
+- [ ] New driver has an `extern "C"` init function
+- [ ] New Go daemon code has capability checks before privileged ops
+- [ ] Tests pass: `ninja -C build && ./build/tests/kernel/test_vmm`
+- [ ] Wiki page updated if adding a new subsystem
+- [ ] Commit message follows: `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`
 
 ---
 
-*Questions? Open a [Discussion](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions) or ping in Issues.*
+## Getting Help
+
+- Open a [Discussion](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions) for design questions.
+- Open an [Issue](https://github.com/AaryanSinghChauhan09/SigmaOS/issues) for bugs.
+- Read the [Code of Conduct](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CODE_OF_CONDUCT.md).
