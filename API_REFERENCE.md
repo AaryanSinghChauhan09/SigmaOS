@@ -1,52 +1,58 @@
-# API REFERENCE
+# SigmaOS API Reference
 
-1 Complete API mapping for all Sovereign Singleton shards.
-1 1
+Welcome to the SigmaOS API Reference. SigmaOS bypasses standard POSIX/glibc interfaces in favor of a zero-abstraction **Sovereign Interface** for maximum performance and security. 
 
-Per-process syscall gating with bitmask precision.
-1 1
+*(Note: We do provide a POSIX shim via `sigma_musl_shim` for porting existing applications, but native apps should use the APIs below.)*
 
-Hardware-level PQC key isolation.
-1 1
-1 1
-1 1
-1 1
-1 1
-1 1
-1 1
-1 1
-1 1
-1 1
-1 Ring-0 cron replacement with macro recording.
-1 1
+## 1. Process & Isolation (`sigma_jail`)
 
-AI-driven predictive workflow macro engine.
-1 1
-1 Vendor-agnostic GPU compute dispatcher.
-1 1
+SigmaOS isolates all processes into zero-copy shards called "procs" or "realms".
 
-Self-learning PCIe driver shim generator.
-1 1
+```cpp
+#include "sigma_jail.h"
 
-Hardware hang recovery timer.
-1 1
-1 Zero-trust Ring-0 TCP/IP stack.
-1 1
+// Create a new isolation shard
+int sigma_jail_create(const char* name, int flags);
 
-Distributed, multi-node replicated filesystem.
-1 1
+// Drop privileges permanently for the current shard
+int sigma_jail_drop_caps(uint64_t cap_mask);
+```
 
-SovereignVFS bridging for Micro-VM containers.
-1 1
-1 Adaptive ambient-aware UI theme switcher.
-1 1
+## 2. Storage & Vector Embedding (`SemanticFS`)
 
-Ring-0 hardware-accelerated gesture recognition.
-1 1
+Instead of standard inodes, SigmaOS uses a vector-indexed filesystem.
 
-Persona-driven sovereign setup wizard.
-1 1
+```cpp
+#include "sigma_fs.h"
 
-Contextual predictive quick-action engine.
+// Insert a file into SemanticFS
+int sigma_fs_write(const char* path, const void* data, size_t len);
 
-1
+// Query files by semantic meaning (uses native AI inference)
+int sigma_fs_semantic_query(const char* natural_language, char** results, int max_results);
+```
+
+## 3. Mandatory Access Control (`sigma_mac`)
+
+Permissions are label-based, preventing unauthorized syscalls entirely at Ring 0.
+
+```cpp
+#include "sigma_mac.h"
+
+// Check if current shard has permission to access a target label
+bool sigma_mac_enforce(const char* target_label, int action);
+```
+
+## 4. Zenith GUI Framework
+
+Native windowing without X11 or Wayland overhead.
+
+```cpp
+#include "libzenith/zenith.h"
+
+// Initialize native UI connection
+zenith_ctx_t* zenith_init();
+
+// Create an accelerated UI widget
+int zenith_widget_create(zenith_ctx_t* ctx, widget_type_t type, const char* label);
+```
