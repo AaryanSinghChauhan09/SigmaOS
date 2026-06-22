@@ -1,16 +1,25 @@
 # Hardware Abstraction Layer (HAL)
 
-The Sovereign HAL decouples the high-level kernel logic from the underlying CPU architecture, ensuring that SigmaOS remains highly portable.
+The **SovereignHAL** provides a single, architecture-agnostic interface that
+the kernel uses to talk to hardware. Porting SigmaOS to a new CPU means
+implementing one HAL backend — nothing else needs to change.
 
-## Supported Architectures
-- **x86_64** (Primary Target)
-- ARM64 (Planned)
-- RISC-V (Planned)
+## Supported Targets
+| Architecture | Status |
+|---|---|
+| x86_64 | ✅ Active |
+| AArch64 (ARM64) | 🔧 In-progress |
+| RISC-V RV64GC | 📋 Planned |
 
-## Responsibilities
+## Core Abstractions
+```c
+void hal_init(void);
+void hal_set_irq_handler(uint32_t vec, void (*fn)(void));
+void hal_flush_tlb(void);
+uint64_t hal_get_timestamp_ns(void);
+```
 
-The HAL provides unified interfaces for:
-1. **Interrupt Management**: Enabling/disabling hardware interrupts (`cli`/`sti`).
-2. **Port I/O**: Interfacing with legacy hardware via `inb`, `outb`, etc.
-3. **CPU Timing**: Abstracting the Time Stamp Counter (TSC) for high-precision benchmarking and scheduling.
-4. **MMU/TLB**: Flushing the Translation Lookaside Buffer on page table modifications.
+## Roadmap
+- [ ] AArch64 MMU backend
+- [ ] RISC-V SBI wrapper
+- [ ] ACPI/DTB discovery

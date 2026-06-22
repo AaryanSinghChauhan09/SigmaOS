@@ -17,14 +17,8 @@ Linux ELF Binary
 |---|---|
 | `open()` | `sigma_vfs_open()` |
 | `read()` / `write()` | `sigma_io_*()` |
-| `lseek()` | `sigma_vfs_lseek()` |
-| `stat()` | `sigma_vfs_stat()` |
-| `mkdir()` | `sigma_vfs_mkdir()` |
 | `fork()` | `sigma_spawn_shard()` |
 | `pthread_*` | Sovereign task primitives |
-
-## Testing
-A GoogleTest-based unit testing framework exists within `tests/cpp_host` to test the POSIX shim abstractions independent of the bare-metal kernel runtime.
 
 ## What It Does NOT Cover
 - `ioctl()` calls that touch hardware directly (forbidden by capability model)
