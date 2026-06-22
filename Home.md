@@ -4,8 +4,9 @@ SigmaOS is an experimental, post-POSIX operating system focusing on **Post-Quant
 
 ## Architecture & Design
 - [Cognitive Architecture](Cognitive-Architecture)
-- [Semantic Observability](Semantic-Observability) *(New in Phase 2)*
+- [Semantic Observability](Semantic-Observability)
 - [Sovereign Security Model](Sovereign-Security)
+- [Sovereign Virtualization](Sovereign-Virtualization) *(New in Phase 3)*
 
 ## Project Milestones
 
@@ -18,9 +19,9 @@ SigmaOS is an experimental, post-POSIX operating system focusing on **Post-Quant
 - SemanticFS Deep Indexing Daemon (`sigma_fs_indexer`)
 - Natural Language Diagnostics (`sigma_dashboard`)
 
-### Phase 3: Sovereign Virtualization & Cloud (Planned)
-- Post-Quantum Secure VM Isolation
-- Mesh Networking Clusters
+### Phase 3: Sovereign Virtualization & Cloud ✅
+- Post-Quantum Secure VM Isolation (`sigma_hypervisor`)
+- Mesh Networking Clusters (`sigma_cluster`)
 
 ## Contributing
 Please see our [CONTRIBUTING.md](../SigmaOS/CONTRIBUTING.md) guide in the main repository. All commits must be signed per the [Developer Certificate of Origin](../SigmaOS/DCO.md).
