@@ -14,31 +14,46 @@ SigmaOS is designed with a vision of silicon sovereignty, security, and reproduc
 
 ## ⚠️ Areas for Improvement (Gaps vs Linux)
 
-### 1. Hardware & System Support
-- **Driver Breadth**: Linux benefits from decades of hardware vendor support. SigmaOS driver coverage for Wi-Fi, Bluetooth, and audio is growing but still early.
-- **Peripheral Ecosystem**: Lack of native support for printers, webcams, and proprietary GPU driver stacks (NVIDIA/AMD).
+### 🖥️ Hardware & System Layer
+- **Peripheral Drivers**: Printers, webcams, and GPU stacks (especially NVIDIA/AMD proprietary drivers) are not yet addressed.
+- **Power Management**: Advanced battery/thermal management, suspend/resume cycles, and ACPI power-state integrations are missing.
+- **Virtualization**: Lack of hypervisor support (KVM/QEMU equivalents) or bare-metal container runtimes.
 
-### 2. Software & Package Ecosystem
-- **Package Selection**: While `sigma-pkg` is functional and secure, it does not match the massive repositories of APT, Pacman, or RPM.
-- **Mainstream App Compatibility**: Lacks support for complex native desktop applications (Firefox, LibreOffice, VS Code) without heavy compatibility layer translation.
-- **Containerization**: Standard Linux container runtimes (Docker, Podman, Kubernetes) are not natively supported; equivalent sovereign container engines are in active development.
+### 📦 Software & Package Ecosystem
+- **Package Selection**: While `sigma-pkg` is functional and secure, it does not match the massive repositories of Debian (APT), Arch (Pacman), or Fedora (RPM).
+- **Mainstream App Compatibility**: No clear path for native support of web browsers, office suites, or IDEs beyond the Linux ELF compatibility layer.
+- **Containerization & Orchestration**: Missing mature equivalents of Docker, Podman, and Kubernetes.
 
-### 3. Security & Enterprise Features
-- **Service Orchestration**: No direct equivalent to standard init systems or `systemd` with mature service management and dependencies.
-- **Observability**: Lacks standard auditing and logging daemons (`syslog`, `journald`, Prometheus).
+### 🛡️ Security & Enterprise Tooling
+- **Service Orchestration**: No direct equivalent to standard init systems or `systemd` with mature service management and dependency tracking.
+- **Enterprise Security Frameworks**: Zero-trust model is robust, but lacks administrator policy engines like SELinux/AppArmor.
+- **Auditing & Monitoring**: No centralized syslog/journald equivalent or mature observability stack (Prometheus, Grafana).
 
-### 4. User Experience
-- **Installer & Recovery GUI**: Polish of the installer, partition managers, and recovery GUI lags behind Linux live environments.
-- **Accessibility Tools**: Screen readers, input methods (IME), and localization packages need wider coverage.
+### 🧑💻 User Experience
+- **Installer & Recovery GUI**: Polished installation frameworks and Rescuezilla-style live recovery environments are still in development.
+- **Desktop Ecosystem**: Zenith compositor is innovative, but lacks the choice/customization of mature DEs like GNOME, KDE, or XFCE.
+- **Accessibility & Localization**: Screen readers, input methods (IMEs), and multi-language support are not yet present.
+
+### 🌐 Networking & Cloud
+- **Advanced Networking**: Lack of VPN protocols, dynamic firewalls, IPv6 network tuning, and enterprise networking tools.
+- **Cloud Readiness**: No integration with major cloud platforms or orchestration frameworks for hyperscaler deployment.
+
+---
+
+## 📅 Roadmap Gaps & Future Horizon
+
+- **Release Cadence & LTS**: No clearly defined long-term support (LTS) release cadence.
+- **Community Scaling**: Only a handful of contributors compared to the massive developer communities behind Linux.
+- **Documentation Depth**: Manuals and wikis are sparse compared to the extensive ArchWiki or user forums.
 
 ---
 
 ## 🔑 Key Suggestions for Improvement
 
-1. **Accelerate Driver Development**: Focus heavily on completing core PCIe/USB stacks for network and media hardware.
+1. **Accelerate Driver Development**: Focus heavily on completing core PCIe/USB stacks for network, power, and media hardware.
 2. **Ecosystem Bridges**: Build translators or compatibility bridges inside `sigma-pkg` to easily import packages from major Linux repositories.
 3. **Usability Priority**: Build a bootable ISO with a graphical 3-step installer and a Rescuezilla-style recovery tool.
-4. **observability Stacks**: Implement structured logging, service managers, and resource telemetry.
+4. **Enterprise Tooling**: Introduce service managers, auditing logs, and resource telemetry.
 5. **Community Outreach**: Focus on documentation, tutorials, and developer incentive campaigns.
 
 ---
