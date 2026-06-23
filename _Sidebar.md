@@ -8,6 +8,7 @@
 - [Architecture](Architecture)
 - [Security Model](Security-Model)
 - [Hardware Support](Hardware-Support)
+- [SigmaOS vs Linux Comparison](SigmaOS-vs-Linux-Distros-Detailed-Comparison)
 
 ---
 
