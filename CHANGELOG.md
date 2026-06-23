@@ -9,6 +9,7 @@ All notable changes to the SigmaOS Sovereign Lattice will be documented in this 
 - **Wi-Fi 802.11 Stack**: Created initial kernel-space SoftMAC state machine and connection routines in `kernel/net/wifi/sigma_wifi.cpp`.
 - **Bluetooth HCI Layer**: Created low-level controller command and inquiry loop implementation in `kernel/net/bt/sigma_bt_hci.cpp`.
 - **Automated Runtime Error Fixer**: Created userland developer tool `sigma_fixer` in `userland/devtools/sigma_fixer.cpp` to automatically intercept, diagnose, and live-patch runtime errors and page faults via SIE.
+- **AI Model Integration Guide**: Created a comprehensive, step-by-step wiki documentation guide for packaging and deploying specialized AI models on SigmaOS.
 
 ### Improved
 

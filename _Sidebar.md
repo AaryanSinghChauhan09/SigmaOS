@@ -14,6 +14,7 @@
 ### 🛠 Development
 - [Build Guide](Build-Guide)
 - [Contributing](Contributing)
+- [AI Model Integration Guide](AI-Model-Integration-Guide)
 
 ---
 
