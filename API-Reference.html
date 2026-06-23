@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SigmaOS API v0.1</title>
+  <style>
+    body { font-family: system-ui; max-width: 900px; margin: 40px auto; line-height: 1.6; }
+    code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow-x: auto; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 8px; margin-top: 40px; }
+    h3 { margin-top: 24px; color: #444; }
+    table { border-collapse: collapse; width: 100%; }
+    td, th { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    .philosophy { background: #f0f9ff; border-left: 4px solid #58a6ff; padding: 12px 16px; margin: 16px 0; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>SigmaOS API v0.1</h1>
+  <p>SigmaOS exposes OS capabilities to web apps via <code>navigator.sigmaos</code>. All APIs are promise-based and require user permission per site + capability.</p>
+
+  <div class="philosophy">
+    <strong>Unix Philosophy:</strong> <em>"If you can do it in bash, you can do it in a web app."</em>
+    SigmaOS ships low-level primitives (<code>shell</code>, <code>wasm</code>, <code>device</code>) instead of 100 high-level APIs.
+    Apps compose <code>ffmpeg | wasm-filter | save</code> themselves.
+  </div>
+
+  <h2>Installation</h2>
+  <p>Apps must include a <code>sigmaos</code> key in their web manifest to request permissions:</p>
+  <pre>
+{
+  "name": "SigmaNotes",
+  "start_url": "/",
+  "display": "standalone",
+  "sigmaos": {
+    "version": "0.1.0",
+    "permissions": ["fs.read", "fs.write", "shell.exec"],
+    "category": "productivity"
+  }
+}</pre>
+
+  <h2>navigator.sigmaos.version</h2>
+  <p><code>string</code> — Current API version. Example: <code>"0.1.0"</code></p>
+
+  <!-- ================================================================== -->
+  <h2>navigator.sigmaos.fs</h2>
+  <table>
+    <tr><th>Method</th><th>Permission</th><th>Description</th></tr>
+    <tr><td><code>readFile(path)</code></td><td><code>fs.read</code></td><td>Read file inside <code>~/SigmaOS</code>. Returns <code>Promise&lt;Uint8Array&gt;</code></td></tr>
+    <tr><td><code>writeFile(path, data)</code></td><td><code>fs.write</code></td><td>Write <code>Uint8Array</code> to path. Creates dirs. Returns <code>Promise&lt;void&gt;</code></td></tr>
+  </table>
+  <pre>
+await navigator.sigmaos.fs.writeFile("notes/hello.txt",
+  new TextEncoder().encode("Hello SigmaOS"));
+const data = await navigator.sigmaos.fs.readFile("notes/hello.txt");</pre>
+
+  <!-- ================================================================== -->
+  <h2>navigator.sigmaos.shell — The Escape Hatch</h2>
+  <p>Run any installed binary in a bubblewrap sandbox with capability-scoped access. This single primitive replaces <code>screenshot</code>, <code>zip</code>, <code>pdf</code>, <code>ocr</code>, and 100 other APIs.</p>
+  <table>
+    <tr><th>Method</th><th>Permission</th><th>Description</th></tr>
+    <tr><td><code>exec({cmd, args, stdin?, env?, caps})</code></td><td><code>shell.exec</code></td><td>Run a binary. Returns <code>{ok, stdout: Uint8Array, stderr: Uint8Array, code}</code></td></tr>
+    <tr><td><code>pipe(...commands)</code></td><td><code>shell.exec</code></td><td>Chain cmd1 | cmd2 | cmd3. Each command's stdout feeds the next's stdin</td></tr>
+  </table>
+  <pre>
+// Screenshot without a screenshot API
+await navigator.sigmaos.shell.exec({
+  cmd: "/usr/bin/grim", args: ["-"],
+  caps: ["bin:/usr/bin/grim", "wayland"]
+});
+
+// Pipe: tar | gzip
+await navigator.sigmaos.shell.pipe(
+  { cmd: "tar", args: ["cf", "-", "."], caps: ["bin:/usr/bin/tar", "fs:/tmp"] },
+  { cmd: "gzip", caps: ["bin:/usr/bin/gzip"] }
+);</pre>
+
+  <!-- ================================================================== -->
+  <h2>navigator.sigmaos.pkg</h2>
+  <p>Install Alpine packages at runtime. Binary lands in <code>~/.sigmaos/bin</code>.</p>
+  <table>
+    <tr><th>Method</th><th>Permission</th><th>Description</th></tr>
+    <tr><td><code>ensure(packages)</code></td><td><code>pkg.install</code></td><td>Install packages if missing. Returns list of newly installed</td></tr>
+    <tr><td><code>list()</code></td><td><code>pkg.list</code></td><td>List installed packages</td></tr>
+  </table>
+  <pre>
+await navigator.sigmaos.pkg.ensure(["ffmpeg", "tesseract"]);
+// Now shell.exec can use them</pre>
+
+  <!-- ================================================================== -->
+  <h2>navigator.sigmaos.script</h2>
+  <p>Install background scripts (cron + systemd for web apps).</p>
+  <table>
+    <tr><th>Method</th><th>Permission</th><th>Description</th></tr>
+    <tr><td><code>install({name, content, on, caps})</code></td><td><code>script.install</code></td><td>Install a .sh script. <code>on</code> = "boot" | "workspace-active"</td></tr>
+    <tr><td><code>logs(name)</code></td><td><code>script.logs</code></td><td>Get script output log</td></tr>
+  </table>
+  <pre>
+await navigator.sigmaos.script.install({
+  name: "git-backup",
+  content: "#!/bin/sh\ncd ~/.sigmaos && git add -A && git commit -m autosave && git push",
+  on: "workspace-active",
+  caps: ["bin:/usr/bin/git", "fs:~/.sigmaos", "net"]
+});</pre>
+
+  <!-- ================================================================== -->
+  <h2>navigator.sigmaos.wasm — WASI Sandbox</h2>
+  <p>Run <code>.wasm</code> binaries under wasmtime with WASI capabilities. Apps ship C/Rust compiled to WASM.</p>
+  <table>
+    <tr><th>Method</th><th>Permission</th><th>Description</th></tr>
+    <tr><td><code>run({wasm, args?, caps?})</code></td><td><code>wasm.run</code></td><td>Execute WASI binary. Caps: <code>fs:/path</code>, <code>env:K=V</code></td></tr>
+  </table>
+  <pre>
+const wasmBytes = await fetch("/my-filter.wasm").then(r => r.arrayBuffer());
+const result = await navigator.sigmaos.wasm.run({
+  wasm: new Uint8Array(wasmBytes),
+  args: ["--input", "/tmp/photo.png"],
+  caps: ["fs:/tmp"]
+});</pre>
+
+  <!-- ================================================================== -->
+  <h2>navigator.sigmaos.syscall — Filtered Exec</h2>
+  <p>Run user-supplied binaries under seccomp-bpf + bubblewrap with explicit syscall and path restrictions.</p>
+  <table>
+    <tr><th>Method</th><th>Permission</th><th>Description</th></tr>
+    <tr><td><code>exec(binary, {syscalls, paths, args})</code></td><td><code>syscall.raw</code></td><td>Run binary with filtered syscalls. High trust.</td></tr>
+  </table>
+  <pre>
+// App needs ioctl for custom USB device
+const bin = await fetch("/my-driver").then(r => r.arrayBuffer());
+await navigator.sigmaos.syscall.exec(new Uint8Array(bin), {
+  syscalls: ["openat", "read", "write", "ioctl"],
+  paths: ["/dev/ttyACM0"],
+  args: ["--baud", "115200"]
+});</pre>
+
+  <!-- ================================================================== -->
+  <h2>navigator.sigmaos.process</h2>
+  <table>
+    <tr><th>Method</th><th>Permission</th><th>Description</th></tr>
+    <tr><td><code>spawn(cmd, args)</code></td><td><code>process.spawn</code></td><td>Spawn sandboxed runtime. Returns <code>{pid, stdout: ReadableStream}</code></td></tr>
+    <tr><td><code>list()</code></td><td><code>process.list</code></td><td>List running scripts/processes</td></tr>
+  </table>
+
+  <!-- ================================================================== -->
+  <h2>navigator.sigmaos.workspace</h2>
+  <table>
+    <tr><th>Method</th><th>Permission</th><th>Description</th></tr>
+    <tr><td><code>current()</code></td><td>none</td><td>Get current workspace</td></tr>
+    <tr><td><code>list()</code></td><td>none</td><td>List all workspaces</td></tr>
+    <tr><td><code>create(name)</code></td><td><code>workspace.create</code></td><td>Create workspace</td></tr>
+    <tr><td><code>switch(id)</code></td><td><code>workspace.switch</code></td><td>Switch + relaunch Chromium in that profile</td></tr>
+  </table>
+
+  <!-- ================================================================== -->
+  <h2>navigator.sigmaos.ai</h2>
+  <table>
+    <tr><th>Method</th><th>Permission</th><th>Description</th></tr>
+    <tr><td><code>summarize(text)</code></td><td><code>ai.complete</code></td><td>On-device summary. Returns <code>Promise&lt;string&gt;</code></td></tr>
+    <tr><td><code>complete(prompt, {maxTokens})</code></td><td><code>ai.complete</code></td><td>On-device LLM completion</td></tr>
+  </table>
+  <pre>
+// Or use the Unix way:
+await navigator.sigmaos.pkg.ensure(["llama.cpp"]);
+await navigator.sigmaos.shell.exec({
+  cmd: "llama-cli", args: ["-m", "/models/tinyllama.gguf", "-p", "Hello"],
+  caps: ["bin:~/.sigmaos/bin/llama-cli"]
+});</pre>
+
+  <!-- ================================================================== -->
+  <h2>navigator.sigmaos.system</h2>
+  <table>
+    <tr><th>Method</th><th>Permission</th><th>Description</th></tr>
+    <tr><td><code>syncNow()</code></td><td><code>system.sync</code></td><td>Force workspace sync to cloud</td></tr>
+  </table>
+
+  <!-- ================================================================== -->
+  <h2>navigator.sigmaos.clipboard</h2>
+  <p>System clipboard access beyond browser sandbox — images, rich text, binary. Backed by GTK clipboard.</p>
+  <table>
+    <tr><th>Method</th><th>Permission</th><th>Description</th></tr>
+    <tr><td><code>readText()</code></td><td><code>clipboard.read</code></td><td>Read plain text. Returns <code>Promise&lt;string&gt;</code></td></tr>
+    <tr><td><code>writeText(text)</code></td><td><code>clipboard.write</code></td><td>Write text to clipboard</td></tr>
+    <tr><td><code>readImage()</code></td><td><code>clipboard.read</code></td><td>Read PNG image. Returns <code>Promise&lt;Uint8Array&gt;</code></td></tr>
+    <tr><td><code>writeImage(uint8)</code></td><td><code>clipboard.write</code></td><td>Write PNG bytes to clipboard</td></tr>
+  </table>
+
+  <!-- ================================================================== -->
+  <h2>navigator.sigmaos.notification</h2>
+  <p>Native OS notifications via libnotify. Works even when app tab is closed.</p>
+  <table>
+    <tr><th>Method</th><th>Permission</th><th>Description</th></tr>
+    <tr><td><code>show({title, body, icon?})</code></td><td><code>notification.show</code></td><td>Display a native desktop notification</td></tr>
+  </table>
+  <pre>
+await navigator.sigmaos.notification.show({
+  title: "SigmaNotes", body: "Sync complete"
+});</pre>
+
+  <!-- ================================================================== -->
+  <h2>navigator.sigmaos.usb</h2>
+  <p>List and communicate with USB devices.</p>
+  <table>
+    <tr><th>Method</th><th>Permission</th><th>Description</th></tr>
+    <tr><td><code>list()</code></td><td><code>usb.access</code></td><td>List connected USB devices</td></tr>
+    <tr><td><code>requestDevice(filters)</code></td><td><code>usb.access</code></td><td>Find device by vendorId/productId</td></tr>
+    <tr><td><code>bulkTransferOut(device, endpoint, data)</code></td><td><code>usb.access</code></td><td>Write to a bulk OUT endpoint</td></tr>
+  </table>
+
+  <!-- ================================================================== -->
+  <h2>navigator.sigmaos.serial</h2>
+  <p>Talk to serial devices (Arduino, 3D printers, serial consoles).</p>
+  <table>
+    <tr><th>Method</th><th>Permission</th><th>Description</th></tr>
+    <tr><td><code>getPorts()</code></td><td><code>serial.access</code></td><td>List serial ports. Returns <code>["/dev/ttyACM0", ...]</code></td></tr>
+    <tr><td><code>open(port, {baud})</code></td><td><code>serial.access</code></td><td>Open serial port at given baud rate</td></tr>
+    <tr><td><code>write(port, uint8)</code></td><td><code>serial.access</code></td><td>Write bytes to open port</td></tr>
+    <tr><td><code>read(port)</code></td><td><code>serial.access</code></td><td>Read bytes from port. Returns <code>Promise&lt;Uint8Array&gt;</code></td></tr>
+    <tr><td><code>close(port)</code></td><td><code>serial.access</code></td><td>Close serial port</td></tr>
+  </table>
+  <pre>
+const ports = await navigator.sigmaos.serial.getPorts();
+await navigator.sigmaos.serial.open("/dev/ttyACM0", { baud: 9600 });
+await navigator.sigmaos.serial.write("/dev/ttyACM0",
+  new TextEncoder().encode("LED_ON\n"));</pre>
+
+  <!-- ================================================================== -->
+  <h2>navigator.sigmaos.bluetooth</h2>
+  <p>Connect BLE devices via BlueZ D-Bus.</p>
+  <table>
+    <tr><th>Method</th><th>Permission</th><th>Description</th></tr>
+    <tr><td><code>scan()</code></td><td><code>bluetooth.access</code></td><td>List discovered Bluetooth devices</td></tr>
+    <tr><td><code>requestDevice({filters})</code></td><td><code>bluetooth.access</code></td><td>Find + connect device by name prefix</td></tr>
+  </table>
+  <pre>
+const gamepad = await navigator.sigmaos.bluetooth.requestDevice({
+  filters: [{ namePrefix: "Xbox" }]
+});</pre>
+
+  <!-- ================================================================== -->
+  <h2>navigator.sigmaos.theme — Magic Theme</h2>
+  <p>OS-wide theme control. Magic mode auto-matches page background colors.</p>
+  <table>
+    <tr><th>Method</th><th>Permission</th><th>Description</th></tr>
+    <tr><td><code>get()</code></td><td>none</td><td>Get current OS theme ("light" | "dark")</td></tr>
+    <tr><td><code>set(theme)</code></td><td>none</td><td>Set OS theme + <code>data-sigmaos-theme</code> attribute</td></tr>
+    <tr><td><code>matchPage()</code></td><td>none</td><td>Auto-detect page brightness and set theme</td></tr>
+  </table>
+  <pre>
+await navigator.sigmaos.theme.set("dark");
+await navigator.sigmaos.theme.matchPage(); // auto-detect from page CSS</pre>
+
+  <!-- ================================================================== -->
+  <h2>navigator.sigmaos.device — Generic /dev Access</h2>
+  <p>Open any device file with capability checks. Replaces dedicated USB/serial/bluetooth APIs for advanced use.</p>
+  <table>
+    <tr><th>Method</th><th>Permission</th><th>Description</th></tr>
+    <tr><td><code>open(path)</code></td><td><code>device.raw:/dev/...</code></td><td>Open device. Returns fd (integer)</td></tr>
+    <tr><td><code>read(fd)</code></td><td>—</td><td>Read from device. Returns <code>Uint8Array</code></td></tr>
+    <tr><td><code>write(fd, data)</code></td><td>—</td><td>Write to device</td></tr>
+    <tr><td><code>ioctl(fd, req, data)</code></td><td>—</td><td>Send ioctl to device</td></tr>
+    <tr><td><code>close(fd)</code></td><td>—</td><td>Close device</td></tr>
+  </table>
+  <pre>
+// Talk to a 2027 laser cutter — no OS update needed
+const fd = await navigator.sigmaos.device.open("/dev/laser0");
+await navigator.sigmaos.device.write(fd, new TextEncoder().encode("G28\n"));
+await navigator.sigmaos.device.close(fd);</pre>
+
+  <!-- ================================================================== -->
+  <h2>navigator.sigmaos.mem — Shared Memory</h2>
+  <p>Create POSIX shared memory segments for zero-copy IPC with WASM modules.</p>
+  <table>
+    <tr><th>Method</th><th>Permission</th><th>Description</th></tr>
+    <tr><td><code>shm(name, size?)</code></td><td><code>mem.shm</code></td><td>Create <code>/dev/shm/sigmaos_&lt;name&gt;</code>. Returns path</td></tr>
+  </table>
+  <pre>
+const shmPath = await navigator.sigmaos.mem.shm("video_buffer", 1024*1024*64);
+// WASM module can mmap this path for zero-copy access</pre>
+
+  <!-- ================================================================== -->
+  <h2>Permissions</h2>
+  <p>First call to any privileged API shows a prompt. User grants per origin + capability. Revoke in Settings &gt; Apps.</p>
+  <table>
+    <tr><th>Permission</th><th>API</th><th>What it grants</th></tr>
+    <tr><td><code>fs.read</code></td><td>fs.readFile</td><td>Read files in ~/SigmaOS</td></tr>
+    <tr><td><code>fs.write</code></td><td>fs.writeFile</td><td>Write files in ~/SigmaOS</td></tr>
+    <tr><td><code>shell.exec</code></td><td>shell.exec, shell.pipe</td><td>Run binaries in sandbox (per-binary)</td></tr>
+    <tr><td><code>wasm.run</code></td><td>wasm.run</td><td>Execute WASI binaries with caps</td></tr>
+    <tr><td><code>syscall.raw</code></td><td>syscall.exec</td><td>Run binary with filtered syscalls (high trust)</td></tr>
+    <tr><td><code>ai.complete</code></td><td>ai.*</td><td>On-device LLM inference</td></tr>
+    <tr><td><code>clipboard.read</code></td><td>clipboard.readText/Image</td><td>Read system clipboard</td></tr>
+    <tr><td><code>clipboard.write</code></td><td>clipboard.writeText/Image</td><td>Write system clipboard</td></tr>
+    <tr><td><code>notification.show</code></td><td>notification.show</td><td>Native desktop notifications</td></tr>
+    <tr><td><code>usb.access</code></td><td>usb.*</td><td>USB device access</td></tr>
+    <tr><td><code>serial.access</code></td><td>serial.*</td><td>Serial port read/write</td></tr>
+    <tr><td><code>bluetooth.access</code></td><td>bluetooth.*</td><td>Bluetooth scan/connect</td></tr>
+    <tr><td><code>device.raw</code></td><td>device.*</td><td>Raw /dev access (per-path)</td></tr>
+    <tr><td><code>mem.shm</code></td><td>mem.*</td><td>Shared memory segments</td></tr>
+  </table>
+
+  <!-- ================================================================== -->
+  <h2>Design: Unix Primitives Kill Dependency</h2>
+  <table>
+    <tr><th>Old Way</th><th>New Primitive Way</th><th>Why It Scales</th></tr>
+    <tr><td><code>navigator.sigmaos.screenshot()</code></td><td><code>shell.exec({cmd:"grim"})</code></td><td>100s of tools exist. Ship 0.</td></tr>
+    <tr><td><code>navigator.sigmaos.zip()</code></td><td><code>shell.pipe(tar, gzip)</code></td><td>Unix already solved this.</td></tr>
+    <tr><td><code>navigator.sigmaos.pdf()</code></td><td><code>pkg.ensure(["libreoffice"])</code></td><td>Reuse 30-year-old code.</td></tr>
+    <tr><td><code>navigator.sigmaos.ocr()</code></td><td><code>pkg.ensure(["tesseract"])</code></td><td>No ML model to maintain.</td></tr>
+    <tr><td><code>navigator.sigmaos.usb.ioctl()</code></td><td><code>device.ioctl(fd, req)</code></td><td>Any /dev, any ioctl.</td></tr>
+  </table>
+
+</body>
+</html>
