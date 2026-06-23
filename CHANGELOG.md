@@ -2,6 +2,17 @@
 
 All notable changes to the SigmaOS Sovereign Lattice will be documented in this file.
 
+## [v15.3.0] - 2026-06-23
+
+### Added
+
+- **Performance & Stability Macros**: Integrated branch prediction hints (`SIGMA_LIKELY`/`SIGMA_UNLIKELY`), cache-line alignment directives (`SIGMA_CACHE_ALIGN`), and `sigma_cpu_relax()` helper for busy-wait loops to `klib/include/sigma_kernel_types.h`.
+- **`.clangd` Config File**: Added project-wide `.clangd` settings to guarantee proper indexer include path resolution for `klib/include` and set `-std=c++17` for IDE workspace stability.
+
+### Fixed
+
+- **`sigma_perf.cpp`**: Resolved integer truncation bug where 64-bit performance counter values (e.g. 2.4B instructions) overflowed 32-bit signed `long` fields on Windows/non-64-bit-long platforms; updated members to `long long` and print specifiers to `%lld`.
+
 ## [v15.2.0] - 2026-06-23
 
 ### Added
