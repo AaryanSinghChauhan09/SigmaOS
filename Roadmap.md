@@ -1,92 +1,161 @@
-# Roadmap
+# SigmaOS Roadmap
 
-SigmaOS development follows a phased approach. Each phase ships a complete, usable feature set before the next begins.
-
----
-
-## Current Status: Phase G (Active)
+> **Living document** — updated each phase. Track progress in [CURRENT_PROBLEMS_MANIFEST.md](CURRENT_PROBLEMS_MANIFEST.md).
 
 ---
 
-## Phase Timeline
+## Vision
 
-### ✅ Phase E — Core Subsystems (Q2 2026)
-- SovereignVMM: 4-level page tables, CoW, demand paging
-- Zero-Trust Engine: PAM/ACL, capability rings, runtime threat scoring
-- RFC-793 TCP/IP stack from scratch
-- Ext4/JBD2 full read/write filesystem
-- NVMe 1.4 + xHCI USB 3.x drivers
-- ACPI power management
+SigmaOS aims to be the first production-ready, **fully sovereign** operating system:
+- No glibc/musl dependency — sovereign libc only
+- Post-quantum security by default (Kyber-1024, Dilithium-5)
+- Declarative configuration (NixOS-inspired, without Nix)
+- Multiple deployment targets: desktop, server, IoT, cloud, browser (WASM)
 
-### ✅ Phase F — Type Hardening & Security (Q2 2026)
-- Post-quantum crypto: Kyber-1024 KEM + Dilithium-5 signatures
-- sigma-pkg: Reproducible + verifiable `.spkg` packages
-- Immutable CRC32C-checksummed audit log
-- CoW and TCP state machine fuzzing test harnesses
+---
 
-### 🔄 Phase G — Wi-Fi, Audio & Web Desktop (Q3 2026 — Active)
-- [x] mac80211-style 802.11 state machine (`sigma_80211.cpp`)
-- [x] HDA codec enumeration + ALSA mixer API (`sigma_hda.cpp`)
-- [x] Go daemons: `sigmad-process`, `sigmad-ai`, `sigmad-sync`
-- [x] Web shell launcher + App Store (`userland/web-shell/`)
-- [x] `navigator.sigmaos` extension API (`inject.js`)
-- [x] 3 demo apps: SigmaNotes, SigmaTerm, SigmaPaint
-- [x] Capability grant UI (`settings/caps.html`)
-- [x] `pkg.ensure` — Alpine `apk` in user namespace
-- [ ] Intel i915 modesetting: full scanout on real hardware
-- [ ] Wi-Fi PHY driver for Intel AX200/AX210
+## Release Timeline
 
-### 📋 Phase H — Recovery & Forensics (Q3 2026)
-- Recovery GUI shell (boot into recovery mode)
-- Ext4 read-only forensic mounting (`sigma_recovery_mount_ro`)
-- JBD2 journal replay tool
-- Snapshot rollback UI
-- Bootloader repair automation
+### ✅ Phase E — Core Subsystems (Complete — Q2 2026)
+
+| # | Feature | File | Status |
+|---|---------|------|--------|
+| E-01 | NVMe 1.4 Driver | `drivers/storage/sigma_nvme.cpp` | ✅ |
+| E-02 | USB xHCI Driver | `drivers/usb/sigma_xhci.cpp` | ✅ |
+| E-03 | ACPI Power Mgmt | `kernel/power/sigma_power_manager.cpp` | ✅ |
+| E-04 | Crash Reporter | `kernel/diagnostics/sigma_crash_reporter.cpp` | ✅ |
+| E-05 | Ext4 JBD2 Journal | `fs/ext4_journal.c` | ✅ |
+| E-06 | KMS/GPU Stubs | `drivers/graphics/sigma_kms.cpp` | ✅ |
+| E-07 | PCIe MSI-X HAL | `hal/sigma_pci.cpp` | ✅ |
+| E-08 | Cgroup Enforcement | `kernel/core/orchestrator/sigma_cgroup.cpp` | ✅ |
+| E-09 | Sovereign Package Registry | `userland/pkg/sigma_registry.cpp` | ✅ |
+
+### ✅ Phase F — Type Migration & Hardening (Complete — Q2 2026)
+
+| # | Feature | File | Status |
+|---|---------|------|--------|
+| F-01 | USB HCD Sovereign Types | `drivers/usb/sigma_usb_hcd.cpp` | ✅ |
+| F-02 | Audit Header Fix | `include/sigma_audit.h` | ✅ |
+| F-03 | Full PQC API Header | `include/sigma_pqc.h` | ✅ |
+| F-04 | Error Code Expansion | `include/sigma_error_codes.h` | ✅ |
+| F-05 | HW Profile Bitmask | `include/sigma_profiles.h` | ✅ |
+| F-06 | HWTest Include Paths | `kernel/tests/sigma_hw_test.cpp` | ✅ |
+| F-07 | TCP SYN Brace Bug | `net/tcp.c` | ✅ |
+
+---
+
+### 🔄 Phase G — Wireless & Protocol Stacks (In Progress — Q3 2026)
+
+| # | Feature | Target File | Status | Priority |
+|---|---------|-------------|--------|----------|
+| G-01 | Wi-Fi IEEE 802.11 stack | `net/wifi/sigma_wifi.cpp` | ✅ | 🔴 High |
+| G-02 | Bluetooth HCI layer | `net/bt/sigma_bt_hci.cpp` | ✅ | 🔴 High |
+| G-03 | WPA3/SAE authentication | `net/wifi/sigma_wpa3.cpp` | 🔄 | 🟠 Med |
+| G-04 | DNS resolver | `net/dns/sigma_dns.cpp` | 🔄 | 🟠 Med |
+| G-05 | TLS 1.3 (Kyber-hybrid) | `net/tls/sigma_tls.cpp` | 🔄 | 🟠 Med |
+| G-06 | DHCP client | `net/dhcp/sigma_dhcp.cpp` | 🔄 | 🟡 Low |
+
+---
+
+### 📋 Phase H — Recovery GUI & Compositor Integration (Q3 2026)
+
+| # | Feature | Target File | Priority |
+|---|---------|-------------|----------|
+| H-01 | Rescuezilla-style Recovery GUI | `zenith_desktop/recovery/sigma_recovery_gui.cpp` | 🔴 High |
+| H-02 | Compositor ↔ input event wiring | `zenith_desktop/compositor/` | 🔴 High |
+| H-03 | Auto-tiling compositor integration | `zenith_desktop/wm/sigma_tiling_wm.cpp` | 🟠 Med |
+| H-04 | Zenith SDK app framework | `zenith_desktop/sdk/` | 🟠 Med |
+| H-05 | Theme engine hot-reload | `zenith_desktop/themes/` | 🟡 Low |
+
+---
 
 ### 📋 Phase I — First ISO Release (Q4 2026)
-- Polished first-boot experience
-- App store with 10+ community apps
-- `rclone`-based workspace autosync wizard
-- Public ISO download on GitHub Releases
-- `docs.sigmaos.dev` hosted on gh-pages
 
-### 📋 Phase J — v0.2 Features (2027)
-- `navigator.sigmaos.usb` — Arduino/3D printer access
-- `navigator.sigmaos.window` — native frameless OS windows from web apps
-- Magic Theme engine — recolor any site to match OS palette
-- Bluetooth HCI driver
-- Full AMDGPU KMS acceleration
-
-### 📋 Phase K — Mobile & RTOS (2027)
-- ARM64 port (Raspberry Pi 4/5, Apple Silicon via UTM)
-- `release/mobile` profile: touch UI compositor
-- `release/rtos` profile: deterministic scheduling for robotics
-- Power-optimized build for embedded SoCs
+| # | Milestone | Notes |
+|---|-----------|-------|
+| I-01 | Bootable ISO (GRUB2 + SigmaOS kernel) | x86_64 target |
+| I-02 | QEMU boot verified | All profiles |
+| I-03 | Hardware test suite clean | All mandatory tests pass |
+| I-04 | sigma-pkg functional | Install/remove/upgrade .spkg |
+| I-05 | Zenith desktop launches | Compositor + shell + settings |
+| I-06 | v0.1.0 release tag | GitHub Releases + wiki |
 
 ---
 
-## Branch → Phase Mapping
+### 🔮 Phase J+ — Future (2027+)
 
-| Branch | Phase |
-|--------|-------|
-| `main` | Active development |
-| `release/standalone` | Phase I ISO |
-| `release/cloud` | Phase J cloud-native |
-| `release/mobile` | Phase K ARM64 |
-| `release/rtos` | Phase K real-time |
-| `release/browser` | Phase J WASM runtime |
-| `release/dual-boot` | Phase I dual-boot installer |
-| `performance-optimized` | Ongoing — AVX-512, hugepages |
-| `prepare-sigmaos-launch` | Phase I launch assets |
+- **Rust kernel modules** — Rust FFI bridge for memory-safe driver extensions
+- **RISC-V port** — Architecture abstraction for HAL + MMU
+- **Live kernel patching** — Hot-swap kernel modules without reboot
+- **Multi-node Lattice** — Distributed microkernel across cluster nodes
+- **Snap/Flatpak compat shim** — Run existing Linux apps via compat layer
+- **Indian Compliance (MeitY)** — DPDPA 2023 / BIS certification track
 
 ---
 
-## Metrics Goals
+## Build Profiles
 
-| Metric | v0.1 Target | v1.0 Target |
-|--------|-------------|-------------|
-| Boot time (QEMU) | < 5s | < 2s |
-| ISO size | < 200MB | < 150MB |
-| Kernel LOC | ~15k | ~25k |
-| Daemon LOC | ~2.2k Go | ~4k Go |
-| Test coverage | VMM + TCP | All subsystems |
+```bash
+make PROFILE=standalone      # x86_64 desktop (default)
+make PROFILE=browser-wasm    # WebAssembly for browser
+make PROFILE=cloud-native    # Containerized cloud target
+make PROFILE=vm-image        # QEMU/VirtualBox VM image
+make PROFILE=container-docker # Docker base image
+make PROFILE=iot-arm64       # ARM64 embedded (Raspberry Pi)
+make PROFILE=serverless      # Serverless function runtime
+make PROFILE=forensic        # CAINE-style read-only forensic
+```
+
+---
+
+## Contributing to the Roadmap
+
+Have a feature idea? Open an issue with the `feat` label and tag the relevant `subsystem:*` label. Phase G/H features are especially welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+### 🏛️ Phase K — Governance & Community (Q3 2026)
+
+| # | Milestone | File | Status |
+|---|-----------|------|--------|
+| K-01 | Steering Committee charter | `GOVERNANCE.md` | ✅ |
+| K-02 | Security disclosure policy | `SECURITY.md` | ✅ |
+| K-03 | RFC process definition | `GOVERNANCE.md` §3 | ✅ |
+| K-04 | Working Groups (6 WGs formed) | `GOVERNANCE.md` §2.3 | ✅ |
+| K-05 | Contributor recognition tiers | `GOVERNANCE.md` §5 | ✅ |
+| K-06 | SigmaOS Foundation registration | External | 📋 Planned |
+| K-07 | Developer portal + forums | `https://sigma.os/community` | 📋 Planned |
+| K-08 | Hackathon #1 | Community event | 📋 Planned |
+
+---
+
+### 🏢 Phase L — Enterprise & Sovereignty (Q4 2026)
+
+| # | Milestone | File | Status |
+|---|-----------|------|--------|
+| L-01 | ISO 27001 / NIST 800-53 compliance map | `docs/COMPLIANCE.md` | ✅ |
+| L-02 | GDPR / India DPDPA 2023 alignment | `docs/COMPLIANCE.md` | ✅ |
+| L-03 | LTS release policy (18-month cadence) | `docs/LTS_POLICY.md` | ✅ |
+| L-04 | ABI stability guarantee for LTS | `docs/LTS_POLICY.md` §ABI | ✅ |
+| L-05 | Enterprise telemetry dashboard | `userland/devtools/sigma_telemetry_ui.cpp` | 📋 Planned |
+| L-06 | FIPS 140-3 PQC module validation | External | 📋 2027 |
+| L-07 | ISO 27001 third-party audit | External | 📋 Q3 2027 |
+| L-08 | v1.0-LTS "Sigma Prime" release | All subsystems | 📋 Q4 2026 |
+
+---
+
+### 🔮 Phase M — Future Innovations (2027+)
+
+| # | Feature | File | Status |
+|---|---------|------|--------|
+| M-01 | AI-native filesystem (AIFS) | `kernel/fs/sigma_aifs.h` | ✅ Stubbed |
+| M-02 | Self-healing kernel module | `kernel/core/sigma_self_healing.h` | ✅ Stubbed |
+| M-03 | AI-assisted debugger | `userland/devtools/sigma_ai_debug.h` | ✅ Stubbed |
+| M-04 | Unikernel build target | `userland/init/sigma_unikernel_target.h` | ✅ Stubbed |
+| M-05 | RISC-V port | Architecture HAL abstraction | 📋 2027 |
+| M-06 | Live kernel patching | Hot-swap module API | 📋 2027 |
+| M-07 | Multi-node Lattice (distributed μkernel) | Cluster mesh networking | 📋 2028 |
+| M-08 | Snap/Flatpak compat shim | sigma_sandbox_pkg compat layer | 📋 2027 |
+| M-09 | Rust kernel module FFI bridge | Rust-C interop headers | 📋 2027 |
+| M-10 | Quantum-safe PKI infrastructure | SigmaOS Trust Authority (STA) | 📋 2027 |
+
