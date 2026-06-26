@@ -1,15 +1,16 @@
 # Kernel Architecture
 
-The SigmaOS kernel (`vmlinuz-sigma`) is a freestanding x86_64 binary. It does not link against any host libc and includes no hosted standard library headers. Everything it needs is implemented in `klib/` — the sovereign C library.
+The SigmaOS kernel (`vmlinuz-sigma`) is a freestanding x86_64 binary — no glibc, no hosted stdlib headers. All runtime support comes from `klib/`.
 
 ---
 
 ## Design Goals
 
-- **Freestanding**: `-nostdlib -ffreestanding`. No glibc symbols in the output binary.
-- **Modular shards**: Each subsystem is an isolated "shard" that communicates through well-defined interfaces, not shared global state.
-- **Sovereign Singletons**: All active driver and core system shards use Meyer singletons (`SigmaOS::SovereignEngine`) to ensure safe static initialization and eliminate global state races.
-- **Direct hardware**: No HAL abstraction tax in hot paths. Architecture-specific code lives in `arch/x86_64/` and is inlined where performance matters.
+- **Freestanding**: `-nostdlib -ffreestanding`. No glibc symbols in the output.
+- **Modular shards**: Each subsystem is isolated and communicates through well-defined interfaces.
+- **Zero static global state**: All active shards use Meyer singletons (`SigmaOS::SovereignEngine`).
+- **Direct hardware**: Architecture-specific code lives in `arch/x86_64/`; no HAL tax in hot paths.
+- **Honest stub tracking**: The Makefile emits build-time warnings for unimplemented subsystems (Buildroot BR2_BROKEN pattern). Release builds fail if stubs are enabled.
 
 ---
 
@@ -17,178 +18,110 @@ The SigmaOS kernel (`vmlinuz-sigma`) is a freestanding x86_64 binary. It does no
 
 ### Interrupt Descriptor Table (IDT)
 
-Initialized by `sigma_idt_init()` early in `kmain.cpp`, before interrupts are enabled. Registers ISR stubs for CPU exception vectors 0–31 and hardware IRQ vectors 32+.
+Initialized by `sigma_idt_init()` before interrupts are enabled. Registers DPL=0 interrupt gate stubs for CPU exception vectors 0–31 and hardware IRQ vectors 32+. Without a valid IDT, any exception causes a triple-fault CPU reset.
 
-Each IDT gate is a DPL=0 interrupt gate with the kernel code segment selector. When a CPU exception fires:
-1. The CPU saves registers and pushes an error code (for exceptions that have one).
-2. The IDT gate transfers control to the registered ISR stub.
-3. The stub saves all general-purpose registers, calls the C exception handler, then restores registers and returns via `iretq`.
+### Scheduler
 
-Without a valid IDT, any page fault, division by zero, or invalid opcode causes a triple-fault, which resets the CPU.
+**MLFQ + Round-Robin** (default): 4 priority levels; new tasks start at level 0; CPU-bound tasks sink; interactive tasks stay high; periodic boost every 50ms prevents starvation.
 
----
+**SCHED_SOVEREIGN** (real-time, `release/rtos`): Tasks with priority ≥ 80 are promoted to the hard real-time class:
+- Earliest Deadline First (EDF) scheduling within the RT queue
+- Priority inheritance via `SovereignMutex` — no unbounded priority inversion
+- Deadline miss detection with audit log entries
+- Runtime tunables: `sigma-sysctl kernel.sched.rt_threshold` / `kernel.sched.rt_timeslice_us`
 
-### Scheduler (MLFQ + Round-Robin)
-
-The SigmaOS scheduler implements a **Multi-Level Feedback Queue (MLFQ)**:
-
-- **4 priority levels** (0 = highest, 3 = lowest).
-- New tasks start at level 0.
-- A task that uses its full time slice is demoted to the next level.
-- A task that yields early stays at its current level.
-- Periodic priority boost (every 50ms) prevents starvation.
-
-Interactive tasks (keyboard input, shell) naturally stay in high-priority queues. CPU-bound tasks (compilers, codecs) sink to low-priority queues where they don't starve interactive work.
-
-Round-Robin is used within each queue level to ensure fairness among tasks at the same priority.
-
-Future: **SCHED_SOVEREIGN** — a hard real-time class with deterministic execution deadlines, planned for the IoT and industrial SigmaOS profiles.
-
----
+Source: `kernel/core/sched/sigma_sched_sovereign.cpp`
 
 ### Memory Manager (VMM + PMM)
 
-**Physical Memory Manager (PMM)**:
-- Bitmap allocator over the physical memory map (from BIOS/UEFI `e820`).
-- Allocates 4 KB page frames.
-- `QBMP` (Quick Bitmap) with 8-byte alignment and debug assertions.
+**PMM**: QBMP bitmap allocator over the `e820` physical memory map. 4 KB frames, 8-byte aligned, O(1) amortised with `TZCNT`.
 
-**Virtual Memory Manager (VMM)**:
-- 4-level paging (PML4 → PDPT → PD → PT) for full 48-bit virtual address space.
-- Kernel mapped at the higher half (`0xFFFFFFFF80000000+`).
-- Each user process gets its own PML4 root, fully isolating virtual address spaces.
-- On context switch, `cr3` is updated to the new PML4 physical address.
+**VMM**: 4-level paging (PML4→PDPT→PD→PT). Kernel at higher half (`0xFFFFFFFF80000000+`). Each process gets its own PML4 root.
 
-**Slab Allocator** (planned):
-- Fixed-size, lockless O(1) allocator for frequently allocated kernel objects (task structs, socket descriptors, inode entries).
-- Eliminates heap fragmentation from `malloc`/`free`.
+**ASLR** (`kernel/mm/sigma_aslr.cpp`): 42-bit per-region entropy on x86_64. Every `exec()` randomises stack, heap, mmap, and vDSO bases independently. W^X enforcement: `PROT_WRITE|PROT_EXEC` is denied with `-EPERM`.
 
----
+**CoW pages**: Fork is O(1) — child shares parent's page tables with W bits cleared. Physical copy on first write.
+
+### DTrace-style Kernel Tracing
+
+**Inspired by: illumos DTrace SDT**
+
+`SIGMA_PROBE(provider, name, ...)` is a zero-cost NOP when `SIGMA_TRACING_ENABLED` is not defined. When enabled, probes fire through a runtime gate — only active probes have any cost.
+
+```c
+// In kernel/net/sigma_tcp_stack.cpp
+SIGMA_PROBE(tcp, connect__start, dst_ip, dst_port);
+// ...
+SIGMA_PROBE(tcp, connect__done, dst_ip, dst_port, rc);
+
+// In kernel/security/sigma_zerotrust.cpp
+SIGMA_PROBE(zerotrust, flow__decision, src_pid, dst_pid, decision);
+```
+
+CLI:
+```bash
+sigma-traced 'tcp:connect__start { printf("%s:%d\n", ip(arg0), arg1); }'
+sigma-traced 'zerotrust:flow__decision { @[arg2] = count(); }'
+```
+
+Source: `klib/sigma_trace.cpp` / `klib/include/sigma_trace.h`
 
 ### Virtual File System (VFS)
 
-All filesystem operations go through the VFS layer:
+All filesystem operations go through the VFS layer. Drivers (Ext4, FAT32) register `read`/`write` callbacks on mount. User processes call `sigma_read`/`sigma_write` syscalls; the VFS routes without knowing the driver.
 
 ```c
 typedef struct vfs_node {
     char name[128];
     sigma_u32 inode_id;
     sigma_size_t size;
-    sigma_u32 flags;  // FILE | DIRECTORY | BLOCK_DEV | CHAR_DEV
-    sigma_i32 (*read)(struct vfs_node* node, void* buf, sigma_size_t size, sigma_u64 offset);
-    sigma_i32 (*write)(struct vfs_node* node, const void* buf, sigma_size_t size, sigma_u64 offset);
+    sigma_u32 flags;
+    sigma_i32 (*read)(struct vfs_node*, void*, sigma_size_t, sigma_u64);
+    sigma_i32 (*write)(struct vfs_node*, const void*, sigma_size_t, sigma_u64);
 } vfs_node_t;
 ```
 
-Filesystem drivers (Ext4, FAT32) register their `read`/`write` callbacks on mount. User processes call `sigma_read`/`sigma_write` syscalls, which the VFS routes to the correct driver without knowing its implementation.
+### TCP/IP Stack
 
----
-
-### TCP/IP Networking Stack
-
-Custom implementation, no lwIP or Linux kernel code:
-
-- **Loopback NIC** (`lo`, `127.0.0.1`): Virtual network interface for same-host communication.
-- **TCP state machine**: Full 3-way handshake (SYN → SYN-ACK → ACK), FIN/RST handling, retransmission timer.
-- **UDP**: Connectionless datagram socket binding and sending.
-- **DNS resolver**: Local resolver mapping domain names to IPv4 addresses.
-
-Socket API:
-
-```c
-// Allocate a socket
-sigma_i32 net_socket(sigma_i32 domain, sigma_i32 type, sigma_i32 protocol);
-
-// Connect (initiates TCP 3-way handshake)
-sigma_i32 net_connect(sigma_i32 fd, sigma_u32 remote_ip, sigma_u16 remote_port);
-
-// Send data
-sigma_i32 net_send(sigma_i32 fd, const void* data, sigma_size_t size);
-
-// Receive data
-sigma_i32 net_recv(sigma_i32 fd, void* buf, sigma_size_t len);
-```
-
----
+Custom implementation — no lwIP. Loopback NIC (`127.0.0.1`), full 3-way handshake, retransmission timer, UDP, local DNS resolver. Firewall (`sigma_shield`) evaluates rules against actual packet 5-tuples — no mocked data.
 
 ### Init System (PID 1)
 
-`sigma_init.cpp` is PID 1. It runs the boot sequence:
+Dependency-aware service manager with topological sort. **PID 1 must never exit** — the infinite `signalfd` event loop in `sigma_init_loop.c` reaps zombie children (SIGCHLD), restarts failed services (up to 3 retries), and handles SIGTERM for clean shutdown.
 
-1. Read `/etc/sigma-services.conf` and register all declared services.
-2. Start each service in priority order (Runlevels 1–5).
-3. Enter an **infinite wait loop** — PID 1 must never exit. If it does, the kernel panics and halts.
-4. Watch for child process exits. If a registered service exits with a non-zero code, log the failure and restart it (up to 3 times before giving up).
-
-```cpp
-// Correct PID 1 loop — never exits
-for (;;) {
-    sigma_init_watchdog();  // reap zombies, restart failed services
-    __asm__("hlt");         // yield CPU until next interrupt
-}
-```
-
-The service array is bounded at `MAX_SERVICES` (64). Attempts to register more services log an error and are rejected — no array overflow.
-
----
+Optional: **`SIGMA_READONLY_ROOT=1`** (Bottlerocket-inspired) remounts `/` read-only before starting any service — attacker code execution cannot persist across reboots.
 
 ### Syscall Dispatcher
 
-All userland→kernel communication goes through the Sovereign Syscall Dispatcher via `int 0x80` or the `syscall` instruction:
-
-| Syscall ID | Name | Description |
-|---|---|---|
-| `0x01` | `sys_write` | Write buffer to debug serial / VGA |
-| `0x02` | `sys_read` | Read from keyboard input queue |
-| `0x05` | `sys_socket` | Allocate a network socket |
-| `0x06` | `sys_pkg_install` | Install an Alpine package into user namespace |
-
-Dispatch is O(1) via a direct function pointer table indexed by syscall ID. Invalid IDs return `-ENOSYS` immediately.
+O(1) dispatch via direct function pointer table indexed by syscall ID. Invalid IDs return `-ENOSYS` immediately. Every entry point calls `sigma_pledge_check()` to enforce the calling process's promise set.
 
 ---
 
-### Hardware Abstraction Layer (HAL)
-
-The HAL isolates architecture-specific assembly from the kernel core:
-
-```
-hal.h / sigma_hal.h  →  generic operations:
-    cpu_halt()           // execute HLT
-    timer_init(hz)       // program PIT/APIC timer
-    interrupt_init()     // configure APIC/PIC
-    mmu_map(virt, phys, flags)  // map a page
-    read_io(port)        // inb
-    write_io(port, val)  // outb
-```
-
-Architecture stubs:
-- `arch/x86_64/` — NASM assembly for paging, context switch, VMM fast path
-- `arch/SovereignStandardHAL.asm` — standard HAL entry points
-
----
-
-## Build System
-
-The kernel is built with CMake + Ninja. Critical flags:
+## Build Flags
 
 ```cmake
-target_compile_options(vmlinuz-sigma PRIVATE
-    -ffreestanding
-    -nostdinc
-    -fno-stack-protector
-    -mno-red-zone
-    -Wall -Wextra -Werror
-)
-
-target_link_libraries(vmlinuz-sigma sigma_klib)
-
-set_target_properties(vmlinuz-sigma PROPERTIES
-    LINK_FLAGS "-nostdlib -z max-page-size=0x1000 -T ${CMAKE_SOURCE_DIR}/linker.ld"
-)
+-ffreestanding -nostdinc -nostdlib
+-fno-stack-protector   # kernel manages its own stack
+-mno-red-zone
+-mcmodel=kernel
+-Wall -Wextra -Werror
 ```
 
-These flags must **not** be commented out. Without `-nostdlib`, the kernel links against host glibc and will not boot on bare metal.
+The `SIGMA_BROKEN_SUBSYSTEMS` list in the Makefile emits warnings for every known stub. Release builds (`SIGMA_RELEASE_BUILD=1`) fail if any stubs are enabled.
 
 ---
 
-*See also: [Architecture Overview](Architecture-Overview) · [Building from Source](Building-from-Source) · [HAL](HAL)*
+## Known Stubs (tracked)
+
+| Subsystem | Status | Issue |
+|---|---|---|
+| `sigma-jail` | Stub → **fixed** (Round 3) | Real namespace isolation via `sigma_namespace.cpp` |
+| `sigma-mac` | Stub → **partially fixed** | AVC cache added; policy evaluation still basic |
+| `sigma-cryptfs` | **STUB** | `derive_key()` writes zero bytes — filesystem NOT encrypted |
+| `kernel/core/*.cpp` | **Missing** | Scheduler/MM/syscall source files not committed |
+
+The `sigmad/healthd` daemon surfaces all stubs at runtime — run `sigmactl health` to see current status.
+
+---
+
+*See also: [HAL](HAL) · [Security Model](Security-Model) · [Building from Source](Building-from-Source) · [Performance Architecture](Performance-Architecture)*

@@ -1,205 +1,178 @@
 # Building from Source
 
-This guide walks through building a bootable SigmaOS image from source on Ubuntu 22.04 (the only officially supported build host). The output is a bootable `.iso` you can run in QEMU or write to a USB drive.
+Supported build host: **Ubuntu 22.04 LTS (x86_64)**. All branches build from the same repository; the profile/toolchain file selects the target.
 
 ---
 
 ## Prerequisites
 
-### System requirements
-
-- **OS**: Ubuntu 22.04 LTS (x86_64)
-- **RAM**: 8 GB minimum, 16 GB recommended
-- **Disk**: 20 GB free space (Buildroot downloads ~3 GB of packages)
-- **CPU**: Any x86_64 with virtualization extensions (for QEMU testing)
-
-### Install dependencies
-
 ```bash
 sudo apt update
 sudo apt install -y \
-  build-essential nasm gcc g++ make \
+  build-essential nasm gcc g++ make cmake ninja-build \
   qemu-system-x86 \
-  cmake ninja-build \
+  grub-pc-bin grub-efi-amd64-bin xorriso mtools \
+  clang clang-tidy cppcheck \
+  golang-go \
   git curl wget \
   nodejs npm \
-  golang-go \
-  xorriso mtools grub-pc-bin grub-efi-amd64-bin
+  gcc-aarch64-linux-gnu g++-aarch64-linux-gnu  # for ARM64 builds
+
+# Go daemons (healthd, apid, etc.)
+go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+# Pre-commit hooks (Round 2)
+pip install pre-commit && pre-commit install
+
+# Commit conformance (Round 3)
+# Download conform from: https://github.com/siderolabs/conform/releases
 ```
 
 ---
 
-## 1. Clone the repository
+## 1. Clone
 
 ```bash
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
-
-# Initialize submodules (Buildroot, Chromium patches, etc.)
 git submodule update --init --recursive
 ```
 
 ---
 
-## 2. Build the sovereign microkernel
+## 2. Choose a Profile
 
-The kernel is a freestanding x86_64 binary — no host libc, no stdlib headers.
-
-```bash
-# Clean any previous build artifacts
-make clean
-
-# Build the kernel binary
-make kernel
-
-# Expected output: build/vmlinuz-sigma
-```
-
-If you see linker errors about `glibc` symbols, check that `-nostdlib` and `-ffreestanding` are set in `CMakeLists.txt`. The kernel must never link against host libc.
+| Use case | Command |
+|---|---|
+| Workstation (default) | `cmake -B build -DCMAKE_TOOLCHAIN_FILE=profiles/workstation.cmake` |
+| IoT / ARM64 | `cmake -B build -DCMAKE_TOOLCHAIN_FILE=profiles/iot-minimal.cmake` |
+| RTOS / hard real-time | `make SIGMA_USE_ZENITH_DE=0 SIGMA_SCHED_REALTIME=1` |
+| Cloud immutable | `cmake -B build -DSIGMA_PROFILE=cloud-x86 -DSIGMA_IMMUTABLE_ROOT=ON` |
+| Bare microkernel | `make SIGMA_USE_ZENITH_DE=0 SIGMA_USE_AI_ENGINE=0` |
 
 ---
 
-## 3. Build the Go daemons
+## 3. Build
 
 ```bash
-cd sigmad
-go build -o ../build/daemons/sigmad-process   ./sigmad-process
-go build -o ../build/daemons/sigmad-clipboard  ./sigmad-clipboard
-go build -o ../build/daemons/sigmad-hotplug    ./sigmad-hotplug
-go build -o ../build/daemons/sigmad-workspace  ./sigmad-workspace
-cd ..
+# Check for stub warnings first (Buildroot BR2_BROKEN pattern)
+make check-stubs
+
+# Build kernel + ISO
+make clean && make all -j$(nproc)
+
+# Build Go daemons
+cd sigmad/healthd && go build -o ../../build/daemons/sigma-healthd .
+# Repeat for each daemon in sigmad/
 ```
+
+**Stub warnings** — the Makefile emits a banner listing unimplemented subsystems on every build. `SIGMA_RELEASE_BUILD=1` turns these into fatal errors.
 
 ---
 
-## 4. Build the web shell
+## 4. Generate gRPC stubs (api/sigma.proto)
 
 ```bash
-cd web-shell
-npm install
-npm run build   # outputs to web-shell/dist/
-cd ..
+protoc --go_out=. --go-grpc_out=. api/sigma.proto
+# Generates: api/sigma.pb.go, api/sigma_grpc.pb.go
 ```
 
 ---
 
-## 5. Build the Chrome extension
+## 5. Test in QEMU
 
 ```bash
-cd extension
-npm install
-npm run build   # outputs to extension/dist/
-cd ..
+# Standard desktop boot
+qemu-system-x86_64 -cdrom build/sigmaos.iso -serial stdio -m 2G -enable-kvm
+
+# RTOS profile (no GUI)
+qemu-system-x86_64 -kernel build/sigmaos.bin -serial stdio -m 1G -enable-kvm
+
+# ARM64 (mobile profile)
+qemu-system-aarch64 -M virt -cpu cortex-a57 -m 1G \
+  -kernel build/sigmaos-aarch64.bin -serial stdio -display none
 ```
 
 ---
 
-## 6. Assemble the bootable ISO
+## 6. Run the Test Suite
 
 ```bash
-make iso
-# Output: build/sigmaos.iso
-```
+# Google Test unit tests (host-mode)
+cd tests/cpp_host && cmake -B build && cmake --build build
+cd build && ctest --output-on-failure
 
-This step:
-1. Packages the kernel into the ISO's `/boot/` directory.
-2. Copies the compiled daemons into the root filesystem image.
-3. Adds the web shell and extension as startup resources.
-4. Writes a GRUB2 bootloader configuration pointing at `vmlinuz-sigma`.
+# OpenBSD-style kernel regression tests
+make -C tests regress
 
----
+# libFuzzer TCP harness (30-second budget)
+clang++ -fsanitize=fuzzer,address -Iinclude \
+  tests/kernel/fuzz_tcp.cpp kernel/net/sigma_tcpip.c -o fuzz_tcp
+./fuzz_tcp -max_total_time=30
 
-## 7. Test in QEMU
+# pledge violation real test (SIGABRT)
+g++ -std=c++17 -Iinclude -Iklib/include -Ikernel/security/jail \
+  tests/kernel/pledge/test_pledge_sigabrt.cpp \
+  kernel/security/jail/sigma_pledge.cpp \
+  tests/kernel/stubs/sigma_stubs.cpp -o test_pledge && ./test_pledge
 
-```bash
-# Basic boot (serial output to terminal)
-qemu-system-x86_64 \
-  -cdrom build/sigmaos.iso \
-  -serial stdio \
-  -m 2G \
-  -enable-kvm
-
-# With networking (user-mode NAT)
-qemu-system-x86_64 \
-  -cdrom build/sigmaos.iso \
-  -serial stdio \
-  -m 2G \
-  -enable-kvm \
-  -netdev user,id=net0 \
-  -device virtio-net-pci,netdev=net0
-```
-
-Watch the serial output for the boot sequence:
-
-```
-[sigma-init] Starting sovereign boot sequence...
-[sigma-init] Loaded 12 services
-[sigma-idt] IDT initialized: 32 exception vectors registered
-[sigma-mm] Physical memory map: 2048 MB available
-[sigma-vfs] VFS mounted at /
-[sigma-net] TCP/IP stack online: lo 127.0.0.1
-[sigma-init] Launching Chromium...
+# Manifest validator
+cd pkg/sigma-manifest-validator && go run . ../sigma-manifest.toml.example
 ```
 
 ---
 
-## 8. Run the test suite
+## 7. Stub Health Check
 
 ```bash
-npm run test
-```
+# Build-time stub report
+make check-stubs
 
-All tests in `/tests` must be green before submitting patches. The CI pipeline runs this automatically on every pull request.
-
----
-
-## Build Profiles
-
-The build system accepts a `SIGMA_PROFILE` flag to select a target configuration:
-
-```bash
-# Default: full x86_64 desktop
-cmake -B build -G Ninja -DSIGMA_PROFILE=standalone
-
-# Minimal IoT build (ARM64, no Chromium, no GUI)
-cmake -B build -G Ninja -DSIGMA_PROFILE=iot-arm64
-
-# QEMU development build (debug symbols, verbose logging)
-cmake -B build -G Ninja -DSIGMA_PROFILE=qemu-dev
+# Runtime stub report (requires sigma-healthd running)
+sigmactl health
+# Shows: ✗ cryptfs FAILED — derive_key() stub
 ```
 
 ---
 
-## Writing to a USB drive
-
-Once you have `build/sigmaos.iso`, you can write it to a USB drive for bare-metal testing:
+## 8. Write to USB (bare-metal)
 
 ```bash
-# Find your USB device (be careful — this will erase the drive)
+# Find device
 lsblk
 
-# Write the ISO (replace /dev/sdX with your device)
+# Write (DESTRUCTIVE — replaces entire drive)
 sudo dd if=build/sigmaos.iso of=/dev/sdX bs=4M status=progress && sync
 ```
 
-Boot the target machine from the USB drive. SigmaOS should reach the Chromium shell in under 3 seconds on most modern hardware.
+---
+
+## Build Profiles Reference
+
+```bash
+# Explicitly set USE flags
+make SIGMA_USE_HYPERVISOR=1 \
+     SIGMA_USE_AI_ENGINE=1  \
+     SIGMA_USE_ZENITH_DE=1  \
+     SIGMA_USE_CRYPTFS=1    \
+     SIGMA_USE_BLUETOOTH=0  \
+     SIGMA_USE_WIFI=0       \
+     SIGMA_IMMUTABLE_ROOT=0
+```
 
 ---
 
 ## Troubleshooting
 
-**Build fails with "file not found" on kernel/core/*.cpp**
-The core kernel source files (scheduler, memory manager, syscall table) must exist. Check that all submodules are initialized: `git submodule update --init --recursive`.
+**`[STUB] sigma-jail: Only prints to console`** — the namespace isolation replacement is in `kernel/security/jail/sigma_namespace.cpp`. Wire `sigma_jail_create()` to call `sigma_jail_enter()`.
 
-**Kernel binary contains glibc symbols**
-Run `nm build/vmlinuz-sigma | grep GLIBC` — if anything appears, a kernel source file is `#include`-ing a hosted stdlib header (`<stdio.h>`, `<string.h>`, etc.). Replace with equivalents from `klib/`.
+**glibc symbols in kernel binary** — run `nm build/sigmaos.bin | grep GLIBC`. Any match means a kernel source file includes `<stdio.h>` / `<string.h>`. Replace with `klib/` equivalents.
 
-**QEMU triple-faults immediately**
-This usually means the IDT is not initialized before interrupts are enabled. Check that `sigma_idt_init()` is called early in `kmain.cpp`.
+**QEMU triple-faults immediately** — IDT not initialised before interrupts enabled. Check `sigma_idt_init()` is called first in `kmain.cpp`.
 
-**PID 1 exits and kernel panics**
-`sigma_init.cpp` must have an infinite loop after starting services. Check that the `for (int loop = 0; loop < 5; loop++)` bug has been fixed to `for (;;)`.
+**`make check-stubs` shows `kernel/core` missing** — the core kernel source files (scheduler, MM, syscall table) haven't been committed yet. See Contributor Roadmap.
 
 ---
 
-*See also: [Architecture Overview](Architecture-Overview) · [Contributing](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CONTRIBUTING.md)*
+*See also: [Branch Guide](Branch-Guide) · [Contributor Roadmap](Contributor-Roadmap) · [Architecture Overview](Architecture-Overview)*
