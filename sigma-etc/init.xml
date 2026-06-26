@@ -1,0 +1,78 @@
+<!-- /sigma/etc/init.xml — Genode-inspired declarative service routing policy    -->
+<!-- sigma-init reads this on boot and enforces routing at IPC dispatch time.     -->
+<!-- A denied service simply doesn't exist from the requesting component's view.  -->
+<sigma-init version="1">
+
+  <!-- sigma-ds: service discovery — bootstraps first, reaches only parent log -->
+  <start name="sigma-ds" priority="0">
+    <binary>/sigma/sbin/sigma-ds</binary>
+    <route>
+      <service name="sigma-log">   <parent/>   </service>
+      <any-service>                <deny/>     </any-service>
+    </route>
+  </start>
+
+  <!-- sigma-trustd: PQ certificate authority — NO network access ever -->
+  <start name="sigma-trustd" priority="0" budget_ns="500000" period_ns="1000000">
+    <binary>/sigma/sbin/sigma-trustd</binary>
+    <route>
+      <service name="sigma-key">   <child name="sigma-hsm"/>  </service>
+      <service name="sigma-log">   <parent/>                  </service>
+      <service name="sigma-ds">    <child name="sigma-ds"/>   </service>
+      <service name="sigma-net">   <deny/>                    </service>
+      <any-service>                <deny/>                    </any-service>
+    </route>
+  </start>
+
+  <!-- sigma-healthd: health monitoring — no key access -->
+  <start name="sigma-healthd" priority="3">
+    <binary>/sigma/sbin/sigma-healthd</binary>
+    <route>
+      <service name="sigma-net">     <parent/>                  </service>
+      <service name="sigma-log">     <parent/>                  </service>
+      <service name="sigma-ds">      <child name="sigma-ds"/>   </service>
+      <service name="sigma-key">     <deny/>                    </service>
+      <any-service>                  <deny/>                    </any-service>
+    </route>
+  </start>
+
+  <!-- sigma-apid: gRPC management API — network + trustd, NOT raw keys -->
+  <start name="sigma-apid" priority="5">
+    <binary>/sigma/sbin/sigma-apid</binary>
+    <route>
+      <service name="sigma-net">     <parent/>                          </service>
+      <service name="sigma-trustd">  <child name="sigma-trustd"/>       </service>
+      <service name="sigma-log">     <parent/>                          </service>
+      <service name="sigma-ds">      <child name="sigma-ds"/>           </service>
+      <service name="sigma-key">     <deny/>                            </service>
+      <any-service>                  <deny/>                            </any-service>
+    </route>
+  </start>
+
+  <!-- sigma-pkg: package manager — network for downloads, trustd for verification -->
+  <start name="sigma-pkg" priority="7">
+    <binary>/sigma/sbin/sigma-pkg</binary>
+    <route>
+      <service name="sigma-net">     <parent/>                          </service>
+      <service name="sigma-trustd">  <child name="sigma-trustd"/>       </service>
+      <service name="sigma-log">     <parent/>                          </service>
+      <service name="sigma-ds">      <child name="sigma-ds"/>           </service>
+      <any-service>                  <deny/>                            </any-service>
+    </route>
+  </start>
+
+  <!-- zenith-browser: UNTRUSTED — network + display only, zero key/trustd access -->
+  <start name="zenith-browser" priority="10" trust="untrusted">
+    <binary>/sigma/bin/zenith_browser</binary>
+    <route>
+      <service name="sigma-net">     <parent/>   </service>
+      <service name="sigma-display"> <parent/>   </service>
+      <service name="sigma-audio">   <parent/>   </service>
+      <service name="sigma-key">     <deny/>     </service>
+      <service name="sigma-trustd">  <deny/>     </service>
+      <service name="sigma-pkg">     <deny/>     </service>
+      <any-service>                  <deny/>     </any-service>
+    </route>
+  </start>
+
+</sigma-init>
