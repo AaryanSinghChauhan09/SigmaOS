@@ -1,0 +1,53 @@
+# .pre-commit-config.yaml — SigmaOS code quality gates
+# (Gentoo portage + Fedora Bodhi pre-commit conventions)
+#
+# Install: pip install pre-commit && pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  # ── Standard hooks (trailing whitespace, line endings, merge conflicts) ────
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+      - id: check-yaml
+      - id: check-json
+
+  # ── C/C++ formatting (uses .clang-format) ──────────────────────────────────
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v19.1.7
+    hooks:
+      - id: clang-format
+        types_or: [c++, c]
+        args: ['--style=file']
+
+  # ── Go daemons — format, vet, mod tidy ────────────────────────────────────
+  - repo: https://github.com/dnephin/pre-commit-golang
+    rev: v0.5.1
+    hooks:
+      - id: go-fmt
+      - id: go-vet
+      - id: go-mod-tidy
+
+  # ── Local hooks ────────────────────────────────────────────────────────────
+  - repo: local
+    hooks:
+      - id: sigma-spdx-check
+        name: SPDX License Header Check
+        entry: scripts/check-spdx.sh
+        language: script
+        types_or: [c++, c]
+        pass_filenames: true
+
+      - id: sigma-commit-msg
+        name: Commit message format (subsystem/component: description)
+        entry: scripts/check-commit-msg.sh
+        language: script
+        stages: [commit-msg]
+        pass_filenames: true
