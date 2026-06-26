@@ -1,8 +1,6 @@
 #ifndef SOVEREIGN_LATTICE_REGISTRY_H
 #define SOVEREIGN_LATTICE_REGISTRY_H
 #include "sigma_kernel_types.h"
-#include "sigma_log.h"
-#include "SigmaOOP.hpp"
 #ifdef __cplusplus
 namespace SigmaOS { namespace Registry {
 class SovereignLatticeRegistry {

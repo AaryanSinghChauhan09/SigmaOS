@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SIGMA CGROUP RESOURCE MANAGER (sigma_cgroup) v1.0
+ * Î£ SIGMAOS: SIGMA CGROUP RESOURCE MANAGER (sigma_cgroup) v1.0
  * =========================================================================
  * Mission: Zero-dependency resource allocation and silicon governance CLI.
  * Inspiration: Linux cgroups v2 / Kubernetes ResourceQuota.
@@ -11,9 +11,15 @@
 #include "sigma_kernel_types.h"
 #include "sigma_log.h"
 #include "SigmaOOP.hpp"
-#include <stdlib.h>
 
-#define sigma_atoi atoi
+static int sigma_atoi(const char* str) {
+    int res = 0;
+    while (*str >= '0' && *str <= '9') {
+        res = res * 10 + (*str - '0');
+        str++;
+    }
+    return res;
+}
 
 // C-bridge imports from the kernel's cgroup implementation
 extern "C" {
@@ -41,7 +47,7 @@ public:
 
         if (sigma_strcmp(cmd.c_str(), "create") == 0) {
             if (argc < 6) {
-                sigma_printfor("[CGROUP-CLI] Error: 'create' requires <name> <cpu_pct> <mem_mb> <io_weight>");
+                sigma_log_info("[CGROUP-CLI] Error: 'create' requires <name> <cpu_pct> <mem_mb> <io_weight>");
                 return;
             }
             const char* name = argv[2];
@@ -51,7 +57,7 @@ public:
 
             cgroup_create(name, cpu, mem, io);
         } else if (sigma_strcmp(cmd.c_str(), "enforce") == 0) {
-            sigma_printf("[CGROUP-CLI] Triggering automatic governor sweep...");
+            sigma_log_info("[CGROUP-CLI] Triggering automatic governor sweep...");
             cgroup_enforce();
         } else if (sigma_strcmp(cmd.c_str(), "audit") == 0) {
             cgroup_audit();
@@ -61,11 +67,11 @@ public:
     }
 
     void print_usage() {
-        sigma_printf("Σ SigmaOS Cgroup Manager (sigma-cgroup) v1.0");
-        sigma_printf("Usage:");
-        sigma_printf("  sigma-cgroup create <name> <cpu_pct> <mem_mb> <io_weight>");
-        sigma_printf("  sigma-cgroup enforce");
-        sigma_printf("  sigma-cgroup audit");
+        sigma_log_info("Î£ SigmaOS Cgroup Manager (sigma-cgroup) v1.0");
+        sigma_log_info("Usage:");
+        sigma_log_info("  sigma-cgroup create <name> <cpu_pct> <mem_mb> <io_weight>");
+        sigma_log_info("  sigma-cgroup enforce");
+        sigma_log_info("  sigma-cgroup audit");
     }
 
 private:
@@ -80,3 +86,4 @@ extern "C" {
         SigmaOS::Tools::SigmaCgroupCLI::getInstance().run_command(argc, argv);
     }
 }
+

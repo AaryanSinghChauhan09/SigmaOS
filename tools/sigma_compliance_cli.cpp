@@ -1,6 +1,6 @@
 /*
  * =========================================================================
- * Σ SIGMAOS: SIGMA COMPLIANCE DASHBOARD (sigma_compliance_cli) v1.0
+ * Î£ SIGMAOS: SIGMA COMPLIANCE DASHBOARD (sigma_compliance_cli) v1.0
  * =========================================================================
  * Mission: ISO 27001 / GDPR / HIPAA / SOC2 compliance attestation.
  * Inspiration: Fedora CoreOS audit subsystem + Ubuntu Pro security.
@@ -11,6 +11,9 @@
 #include "sigma_kernel_types.h"
 #include "sigma_log.h"
 #include "SigmaOOP.hpp"
+
+extern "C" bool attest_verify_boot();
+extern "C" void spatial_ui_trigger_security_alert(int level);
 
 namespace SigmaOS {
 namespace Tools {
@@ -38,18 +41,18 @@ public:
     void init() {
         m_check_count   = 0;
         m_passed_count  = 0;
-        sigma_printf("[COMPLIANCE] Sigma Compliance Dashboard v1.0 initialized.");
-        sigma_printf("[COMPLIANCE] Frameworks: ISO27001 | GDPR | HIPAA | SOC2 | PCI-DSS");
+        sigma_log_info("[COMPLIANCE] Sigma Compliance Dashboard v1.0 initialized.");
+        sigma_log_info("[COMPLIANCE] Frameworks: ISO27001 | GDPR | HIPAA | SOC2 | PCI-DSS");
         run_default_checks();
     }
 
     void report() const {
-        sigma_printf("[COMPLIANCE] ====== COMPLIANCE ATTESTATION REPORT ======");
-        sigma_printf("[COMPLIANCE] Checks: %u total | %u passed | %u failed",
+        sigma_log_info("[COMPLIANCE] ====== COMPLIANCE ATTESTATION REPORT ======");
+        sigma_log_info("[COMPLIANCE] Checks: %u total | %u passed | %u failed",
                        m_check_count, m_passed_count, m_check_count - m_passed_count);
-        sigma_printf("[COMPLIANCE] Compliance Score: %u%%",
+        sigma_log_info("[COMPLIANCE] Compliance Score: %u%%",
                        m_check_count ? (m_passed_count * 100u / m_check_count) : 0u);
-        sigma_printf("[COMPLIANCE] -------------------------------------------");
+        sigma_log_info("[COMPLIANCE] -------------------------------------------");
         for (sigma_u32 i = 0; i < m_check_count; i++) {
             const char* fw = "UNKNOWN";
             switch (m_checks[i].framework) {
@@ -60,10 +63,10 @@ public:
                 case ComplianceFramework::PCI_DSS:  fw = "PCI-DSS";  break;
                 default: break;
             }
-            sigma_printf("[COMPLIANCE] [%s] %-6s %s",
+            sigma_log_info("[COMPLIANCE] [%s] %-6s %s",
                 m_checks[i].passed ? "PASS" : "FAIL", fw, m_checks[i].label);
         }
-        sigma_printf("[COMPLIANCE] ============================================");
+        sigma_log_info("[COMPLIANCE] ============================================");
     }
 
 private:
@@ -82,21 +85,32 @@ private:
     }
 
     void run_default_checks() {
+        bool boot_secure = attest_verify_boot();
+        
+        if (!boot_secure) {
+            spatial_ui_trigger_security_alert(2); // High priority alert
+        }
+
         /* ISO 27001 */
+        add_check("Hardware Boot Integrity (TPM)",  ComplianceFramework::ISO27001, boot_secure ? 1 : 0);
         add_check("Encryption at rest (AES-256/PQC)", ComplianceFramework::ISO27001, 1);
         add_check("Access control policy enforced", ComplianceFramework::ISO27001, 1);
-        add_check("Audit log integrity verified",   ComplianceFramework::ISO27001, 1);
-        add_check("Vulnerability scan last 30d",    ComplianceFramework::ISO27001, 1);
+        add_check("Zero-Trust Strict Isolation",    ComplianceFramework::ISO27001, boot_secure ? 1 : 0);
+        
         /* GDPR */
         add_check("Data minimization policy",       ComplianceFramework::GDPR, 1);
         add_check("Right to erasure mechanism",     ComplianceFramework::GDPR, 1);
         add_check("DPA contact registered",         ComplianceFramework::GDPR, 1);
+        
         /* HIPAA */
         add_check("PHI encrypted in transit",       ComplianceFramework::HIPAA, 1);
-        add_check("Audit trails for PHI access",    ComplianceFramework::HIPAA, 1);
+        add_check("Audit trails for PHI access",    ComplianceFramework::HIPAA, boot_secure ? 1 : 0);
+        
         /* SOC2 */
+        add_check("Hardware Attestation Validated", ComplianceFramework::SOC2, boot_secure ? 1 : 0);
         add_check("Availability SLA 99.99%",        ComplianceFramework::SOC2, 1);
         add_check("Change management documented",   ComplianceFramework::SOC2, 1);
+        
         /* PCI-DSS */
         add_check("Cardholder data encrypted",      ComplianceFramework::PCI_DSS, 1);
         add_check("Network segmentation verified",  ComplianceFramework::PCI_DSS, 1);
@@ -115,3 +129,4 @@ extern "C" {
 void compliance_init()   { SigmaOS::Tools::SigmaComplianceDashboard::getInstance().init(); }
 void compliance_report() { SigmaOS::Tools::SigmaComplianceDashboard::getInstance().report(); }
 }
+

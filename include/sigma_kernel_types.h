@@ -36,6 +36,7 @@ typedef sigma_i32          sigma_s32;
 typedef sigma_i64          sigma_s64;
 typedef sigma_u64          sigma_paddr_t;   /* physical address */
 typedef sigma_u64          sigma_vaddr_t;   /* virtual  address */
+typedef sigma_u64          sigma_addr_t;    /* generic  address */
 typedef int                sigma_bool;
 
 #define SIGMA_TRUE   1
@@ -122,6 +123,37 @@ static inline void port_outw(sigma_u16 port, sigma_u16 val) {
     __asm__ __volatile__("outw %0, %1" :: "a"(val), "dN"(port));
 }
 
+static inline sigma_u32 port_inw(sigma_u16 port) {
+    sigma_u16 v;
+    __asm__ __volatile__("inw %1, %0" : "=a"(v) : "dN"(port));
+    return v;
+}
+
+static inline void port_outl(sigma_u16 port, sigma_u32 val) {
+    __asm__ __volatile__("outl %0, %1" :: "a"(val), "dN"(port));
+}
+
+static inline sigma_u32 port_inl(sigma_u16 port) {
+    sigma_u32 v;
+    __asm__ __volatile__("inl %1, %0" : "=a"(v) : "dN"(port));
+    return v;
+}
+
+/* ---- CPUID helpers ---- */
+static inline sigma_bool cpu_has_erms(void) {
+    sigma_u32 eax, ebx, ecx, edx;
+    __asm__ __volatile__("cpuid" : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx)
+                                  : "a"(7), "c"(0));
+    return (ebx & (1u << 9)) ? SIGMA_TRUE : SIGMA_FALSE;  /* ERMS = EBX bit 9 */
+}
+
+static inline sigma_bool cpu_has_sse2(void) {
+    sigma_u32 eax, ebx, ecx, edx;
+    __asm__ __volatile__("cpuid" : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx)
+                                  : "a"(1), "c"(0));
+    return (edx & (1u << 26)) ? SIGMA_TRUE : SIGMA_FALSE;  /* SSE2 = EDX bit 26 */
+}
+
 /* =========================================================================
  * SOVEREIGN-ASM: Silicon-Direct Memory Orchestration (No Pre-Defined Functions)
  * ========================================================================= */
@@ -158,10 +190,11 @@ static inline int sigma_strcmp(const char* s1, const char* s2) {
     return *(sigma_u8*)s1 - *(sigma_u8*)s2;
 }
 
-static inline void sigma_strncpy(char* dest, const char* src, sigma_usize n) {
+static inline char* sigma_strncpy(char* dest, const char* src, sigma_usize n) {
     sigma_usize i;
     for (i = 0; i < n - 1 && src[i] != '\0'; i++) dest[i] = src[i];
     dest[i] = '\0';
+    return dest;
 }
 #endif
 
@@ -191,8 +224,10 @@ void vga_putc_at(sigma_u8 x, sigma_u8 y, char c, sigma_u8 color);
 #endif
 
 
+/* Re-export canonical status codes (also defined in sigma_error_codes.h) */
+#ifndef SIGMA_OK
 #define SIGMA_OK 0
-#define SIGMA_ERROR -1
+#endif
 
 typedef enum {
     SIGMA_BOOT_STAGE_INIT = 0,

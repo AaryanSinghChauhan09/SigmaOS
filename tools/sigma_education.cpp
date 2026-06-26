@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA EDUCATION PROFILE (sigma_education) v1.0
+ * Î£ SIGMAOS: SIGMA EDUCATION PROFILE (sigma_education) v1.0
  * =========================================================================
  * Mission: Classroom management shards.
  * Inspiration: Chrome OS Enterprise Education + Edubuntu.
@@ -22,20 +22,20 @@ public:
 
     void init() {
         m_exam_mode_active = false;
-        sigma_printf("[EDU_PROF] Sigma Education Profile v1.0 initialized.");
+        sigma_log_info("[EDU_PROF] Sigma Education Profile v1.0 initialized.");
     }
 
     void toggle_exam_mode(bool enable) {
         m_exam_mode_active = enable;
         if (enable) {
-            sigma_printf("[EDU_PROF] EXAM MODE ENGAGED. Locking network to whitelist, disabling clipboard.");
+            sigma_log_info("[EDU_PROF] EXAM MODE ENGAGED. Locking network to whitelist, disabling clipboard.");
         } else {
-            sigma_printf("[EDU_PROF] Exam Mode Disabled. Normal operation resumed.");
+            sigma_log_info("[EDU_PROF] Exam Mode Disabled. Normal operation resumed.");
         }
     }
 
     void broadcast_screen(const char* teacher_ip) {
-        sigma_printf("[EDU_PROF] Casting screen buffer to teacher terminal at %s...", teacher_ip);
+        sigma_log_info("[EDU_PROF] Casting screen buffer to teacher terminal at %s...", teacher_ip);
     }
 
 private:
@@ -51,3 +51,4 @@ void edu_init()                                    { SigmaOS::Tools::SigmaEducat
 void edu_exam_mode(sigma_u8 enable)                { SigmaOS::Tools::SigmaEducationProfile::getInstance().toggle_exam_mode(enable != 0); }
 void edu_broadcast(const char* ip)                 { SigmaOS::Tools::SigmaEducationProfile::getInstance().broadcast_screen(ip); }
 }
+

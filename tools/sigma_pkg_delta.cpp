@@ -1,10 +1,10 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA PACKAGE DELTA (sigma_pkg_delta) v1.0
+ * Î£ SIGMAOS: SIGMA PACKAGE DELTA (sigma_pkg_delta) v1.0
  * =========================================================================
  * Mission: Incremental shard delta updates.
  * Inspiration: NixOS / Arch rolling updates / Flatpak OCI deltas.
- * Principle: Binary diff-based atomic updates — transfer only changed bytes.
+ * Principle: Binary diff-based atomic updates â€” transfer only changed bytes.
  * =========================================================================
  */
 
@@ -22,21 +22,21 @@ public:
 
     void init() {
         m_pending_deltas = 0;
-        sigma_printf("[PKG_DELTA] Sigma Package Delta v1.0 initialized.");
+        sigma_log_info("[PKG_DELTA] Sigma Package Delta v1.0 initialized.");
     }
 
     void fetch_delta(const char* shard_name, const char* from_hash, const char* to_hash) {
         m_pending_deltas++;
-        sigma_printf("[PKG_DELTA] Fetching delta for '%s': %s -> %s", shard_name, from_hash, to_hash);
-        sigma_printf("[PKG_DELTA] Delta size: 142KB (vs full 18MB). Savings: 99.2%%");
+        sigma_log_info("[PKG_DELTA] Fetching delta for '%s': %s -> %s", shard_name, from_hash, to_hash);
+        sigma_log_info("[PKG_DELTA] Delta size: 142KB (vs full 18MB). Savings: 99.2%%");
     }
 
     void apply_deltas() {
-        sigma_printf("[PKG_DELTA] Applying %u pending shard deltas...", m_pending_deltas);
+        sigma_log_info("[PKG_DELTA] Applying %u pending shard deltas...", m_pending_deltas);
         /* Simulate atomic binary patch */
-        sigma_printf("[PKG_DELTA] PQC signatures verified for all deltas.");
-        sigma_printf("[PKG_DELTA] Rollback snapshot created.");
-        sigma_printf("[PKG_DELTA] All deltas applied atomically. System updated.");
+        sigma_log_info("[PKG_DELTA] PQC signatures verified for all deltas.");
+        sigma_log_info("[PKG_DELTA] Rollback snapshot created.");
+        sigma_log_info("[PKG_DELTA] All deltas applied atomically. System updated.");
         m_pending_deltas = 0;
     }
 
@@ -53,3 +53,4 @@ void pkgdelta_init()                                                        { Si
 void pkgdelta_fetch(const char* shard, const char* from, const char* to)    { SigmaOS::Tools::SigmaPackageDelta::getInstance().fetch_delta(shard, from, to); }
 void pkgdelta_apply()                                                       { SigmaOS::Tools::SigmaPackageDelta::getInstance().apply_deltas(); }
 }
+

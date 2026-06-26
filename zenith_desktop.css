@@ -1337,3 +1337,22 @@ body.high-contrast-active .wizard-btn {
 .auto-style-267 { flex: 1; background: rgba(0,0,0,0.6); border: 1px solid var(--border-glass); border-radius: 4px; padding: 8px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; min-height: 100px; }
 
 .auto-style-268 { font-size: 0.7rem; color: var(--accent-gold); text-align: center; margin-top: 20px; }
+
+/* macOS-style Dock */
+.zenith-dock-container { position: fixed; bottom: 10px; left: 0; right: 0; display: flex; justify-content: center; z-index: 9999; pointer-events: none; }
+.zenith-dock { background: rgba(10, 15, 25, 0.6); backdrop-filter: blur(20px); border: 1px solid var(--border-glass); border-radius: 16px; padding: 8px 16px; display: flex; gap: 12px; align-items: center; pointer-events: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.dock-item { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: rgba(255,255,255,0.05); cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+.dock-item:hover { transform: scale(1.2) translateY(-10px); background: rgba(255,255,255,0.15); box-shadow: 0 0 15px var(--accent-cyan); }
+.dock-separator { width: 2px; height: 32px; background: rgba(255,255,255,0.1); border-radius: 1px; }
+.emergency-sync-btn { background: rgba(255, 50, 50, 0.2); }
+.emergency-sync-btn:hover { background: rgba(255, 50, 50, 0.4); box-shadow: 0 0 15px rgba(255, 50, 50, 0.6); }
+
+/* Zorin-style App Launcher */
+.app-launcher-overlay { position: fixed; bottom: 70px; left: 20px; width: 350px; background: rgba(10, 15, 25, 0.85); backdrop-filter: blur(25px); border: 1px solid var(--border-glass); border-radius: 12px; padding: 20px; opacity: 0; pointer-events: none; transform: translateY(20px); transition: all 0.3s ease; z-index: 9998; box-shadow: 0 15px 40px rgba(0,0,0,0.6); }
+.app-launcher-overlay.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.launcher-header h3 { margin-top: 0; color: var(--accent-cyan); font-weight: 600; margin-bottom: 15px; }
+.launcher-search { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border-glass); padding: 10px; border-radius: 8px; color: white; margin-bottom: 20px; font-family: 'Outfit', sans-serif; }
+.launcher-category { margin-bottom: 15px; }
+.launcher-category h4 { margin: 0 0 10px 0; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+.launcher-app { padding: 10px; border-radius: 8px; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 10px; }
+.launcher-app:hover { background: rgba(255,255,255,0.1); }

@@ -1,0 +1,17 @@
+[
+  "tools/dev/integration_tests/test_sigmactl.py::TestConfig::test_get_all",
+  "tools/dev/integration_tests/test_sigmactl.py::TestConfig::test_get_specific_key",
+  "tools/dev/integration_tests/test_sigmactl.py::TestConfig::test_set_and_get",
+  "tools/dev/integration_tests/test_sigmactl.py::TestPlugins::test_plugin_install_creates_manifest",
+  "tools/dev/integration_tests/test_sigmactl.py::TestPlugins::test_plugin_list_empty",
+  "tools/dev/integration_tests/test_sigmactl.py::TestProfiles::test_profile_create_and_switch",
+  "tools/dev/integration_tests/test_sigmactl.py::TestProfiles::test_profile_list",
+  "tools/dev/integration_tests/test_sigmactl.py::TestProfiles::test_profile_set_alias",
+  "tools/dev/integration_tests/test_sigmactl.py::TestShards::test_shard_add_and_verify",
+  "tools/dev/integration_tests/test_sigmactl.py::TestShards::test_shard_ls",
+  "tools/dev/integration_tests/test_sigmactl.py::TestShards::test_shard_remove",
+  "tools/dev/integration_tests/test_sigmactl.py::TestSigmaConfigJson::test_config_is_valid_json",
+  "tools/dev/integration_tests/test_sigmactl.py::TestSigmaConfigJson::test_profiles_are_valid_json",
+  "tools/dev/integration_tests/test_sigmactl.py::TestStatus::test_status_contains_key_fields",
+  "tools/dev/integration_tests/test_sigmactl.py::TestStatus::test_status_exits_zero"
+]

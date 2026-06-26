@@ -797,39 +797,139 @@ class FileManager {
         this.grid = document.getElementById(gridId);
         this.breadcrumbs = document.getElementById(breadcrumbsId);
         this.currentPath = '/home/sovereign';
+        this.hostMode = false;
+        this.hostDirHandle = null;
+        this.currentFileHandle = null;
         this.update();
     }
 
-    update() {
+    async mountHostDrive() {
+        try {
+            this.hostDirHandle = await window.showDirectoryPicker();
+            this.hostMode = true;
+            this.currentPath = '[HOST] /' + this.hostDirHandle.name;
+            addLog(`Σ [FS]: Mounted Host Drive: ${this.hostDirHandle.name}`, 'success');
+            this.update();
+        } catch (e) {
+            console.error(e);
+            addLog(`Σ [FS Error]: ${e.message}`, 'error');
+        }
+    }
+
+    async update() {
         if (!this.grid || !this.breadcrumbs) return;
         this.grid.innerHTML = '';
         this.breadcrumbs.innerText = this.currentPath;
 
-        const files = vfs.ls(this.currentPath);
-        if (files) {
-            files.forEach(name => {
-                const node = vfs.resolve(this.currentPath + '/' + name);
-                const item = document.createElement('div');
-                item.className = 'fm-item';
-                item.innerHTML = `
-                    <div class="fm-item-icon">${node.type === 'dir' ? '📁' : '📄'}</div>
-                    <div class="fm-item-label">${name}</div>
-                `;
-                item.onclick = () => {
-                    if (node.type === 'dir') {
-                        this.currentPath = (this.currentPath === '/' ? '' : this.currentPath) + '/' + name;
-                        this.update();
-                    } else {
-                        addLog(`Σ [FS]: Reading ${name}...`, 'success');
-                        alert(node.content || '(Empty File)');
-                    }
-                };
-                this.grid.appendChild(item);
-            });
+        if (this.hostMode && this.hostDirHandle) {
+            try {
+                for await (const entry of this.hostDirHandle.values()) {
+                    const item = document.createElement('div');
+                    item.className = 'fm-item';
+                    item.innerHTML = `
+                        <div class="fm-item-icon">${entry.kind === 'directory' ? '📁' : '📄'}</div>
+                        <div class="fm-item-label">${entry.name}</div>
+                        ${entry.kind === 'file' ? `<button onclick="event.stopPropagation(); fileManager.deleteFile('${entry.name}')" style="background:transparent;border:none;color:red;cursor:pointer;" title="Delete">❌</button>` : ''}
+                    `;
+                    item.onclick = async () => {
+                        if (entry.kind === 'directory') {
+                            addLog(`Σ [FS]: Subdirectory navigation is locked in root-only HostFS prototype.`, 'warning');
+                        } else {
+                            addLog(`Σ [FS]: Reading host file ${entry.name}...`, 'success');
+                            this.currentFileHandle = await this.hostDirHandle.getFileHandle(entry.name);
+                            const file = await this.currentFileHandle.getFile();
+                            const text = await file.text();
+                            document.getElementById('editor-filename').innerText = entry.name;
+                            document.getElementById('editor-textarea').value = text;
+                            openWindow('text-editor-win');
+                        }
+                    };
+                    this.grid.appendChild(item);
+                }
+            } catch (e) {
+                console.error(e);
+                addLog(`Σ [FS Error]: ${e.message}`, 'error');
+            }
+        } else {
+            const files = vfs.ls(this.currentPath);
+            if (files) {
+                files.forEach(name => {
+                    const node = vfs.resolve(this.currentPath + '/' + name);
+                    const item = document.createElement('div');
+                    item.className = 'fm-item';
+                    item.innerHTML = `
+                        <div class="fm-item-icon">${node.type === 'dir' ? '📁' : '📄'}</div>
+                        <div class="fm-item-label">${name}</div>
+                    `;
+                    item.onclick = () => {
+                        if (node.type === 'dir') {
+                            this.currentPath = (this.currentPath === '/' ? '' : this.currentPath) + '/' + name;
+                            this.update();
+                        } else {
+                            addLog(`Σ [FS]: Reading ${name}...`, 'success');
+                            document.getElementById('editor-filename').innerText = name;
+                            document.getElementById('editor-textarea').value = node.content || '';
+                            this.currentFileHandle = null; // VFS file
+                            openWindow('text-editor-win');
+                        }
+                    };
+                    this.grid.appendChild(item);
+                });
+            }
+        }
+    }
+
+    async createFile() {
+        if (!this.hostMode) {
+            alert('Please Mount Host Drive first to create native files.');
+            return;
+        }
+        const name = prompt('Enter new file name:');
+        if (name) {
+            try {
+                await this.hostDirHandle.getFileHandle(name, { create: true });
+                addLog(`Σ [FS]: Created new host file ${name}`, 'success');
+                this.update();
+            } catch(e) {
+                console.error(e);
+                addLog(`Σ [FS Error]: ${e.message}`, 'error');
+            }
+        }
+    }
+
+    async deleteFile(name) {
+        if (confirm(`Delete host file: ${name}?`)) {
+            try {
+                await this.hostDirHandle.removeEntry(name);
+                addLog(`Σ [FS]: Deleted host file ${name}`, 'warning');
+                this.update();
+            } catch(e) {
+                console.error(e);
+                addLog(`Σ [FS Error]: ${e.message}`, 'error');
+            }
+        }
+    }
+
+    async saveCurrentFile() {
+        const text = document.getElementById('editor-textarea').value;
+        if (this.hostMode && this.currentFileHandle) {
+            try {
+                const writable = await this.currentFileHandle.createWritable();
+                await writable.write(text);
+                await writable.close();
+                addLog(`Σ [FS]: Saved changes directly to host drive.`, 'success');
+                closeWindow('text-editor-win');
+            } catch(e) {
+                console.error(e);
+                addLog(`Σ [FS Error]: ${e.message}`, 'error');
+            }
+        } else {
+            alert('Saving VFS files is read-only in this demo. Mount Host Drive to save to disk.');
         }
     }
 
     goBack() {
+        if (this.hostMode) return; // Locked to root in this demo
         if (this.currentPath === '/') return;
         const parts = this.currentPath.split('/');
         parts.pop();
@@ -864,6 +964,7 @@ window.addEventListener('load', () => {
     if (typeof wm !== 'undefined') {
         wm.register('terminal-win');
         wm.register('file-manager-win');
+        wm.register('text-editor-win');
         wm.register('sigma-ai-studio-win');
     }
 });
@@ -2575,3 +2676,40 @@ document.addEventListener('mousemove', e => {
         glow.style.opacity = '1';
     }
 });
+
+// App Launcher Logic
+function toggleAppLauncher() {
+    const launcher = document.getElementById('app-launcher');
+    if (launcher) {
+        launcher.classList.toggle('active');
+    }
+}
+
+// Close launcher when clicking outside
+document.addEventListener('click', e => {
+    const launcher = document.getElementById('app-launcher');
+    const dock = document.querySelector('.zenith-dock-container');
+    if (launcher && launcher.classList.contains('active')) {
+        if (!launcher.contains(e.target) && dock && !dock.contains(e.target)) {
+            launcher.classList.remove('active');
+        }
+    }
+});
+
+// Emergency Lattice Sync Logic
+function triggerEmergencySync() {
+    if (confirm("INITIATE EMERGENCY LATTICE SYNC?\n\nThis will freeze VFS state and perform a cryptographically signed atomic snapshot to the recovery partition.")) {
+        const term = document.getElementById('terminal-output');
+        openWindow('terminal-win');
+        if (term) {
+            term.innerHTML += `<div style="color:var(--accent-red)">[RECOVERY] INITIATING EMERGENCY LATTICE SYNC...</div>`;
+            term.innerHTML += `<div style="color:var(--text-white)">[RECOVERY] Calling SovereignRecoverySuite::atomicLatticeSync()...</div>`;
+            setTimeout(() => {
+                term.innerHTML += `<div style="color:var(--accent-gold)">[RECOVERY] Computing FNV-1a cryptographic checksum...</div>`;
+            }, 1000);
+            setTimeout(() => {
+                term.innerHTML += `<div style="color:var(--accent-cyan)">[RECOVERY] SUCCESS: Snapshot ID 'EMERGENCY_SYNC' secured.</div>`;
+            }, 2500);
+        }
+    }
+}

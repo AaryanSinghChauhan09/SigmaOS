@@ -1,37 +1,37 @@
-# Contributing to SigmaOS Zenith
+# Contributing to SigmaOS 🚀
 
-We welcome contributions to the SigmaOS microkernel. Follow these guidelines to build, test, and integrate new modules.
+Thank you for choosing to help shape the future of sovereign computing! SigmaOS is a zero-dependency operating system built for strict privacy, extreme resilience, and declarative configuration. 
 
----
-
-## 🛠️ Build Instructions for Modular Layers
-
-The root `Makefile` lists targets for building the modular parts of the OS:
-
-1. **Kernel Subsystems (`/kernel/`)**:
-   Built as Ring-0 binaries. Avoid standard C library headers. Use `include/sigma_kernel_types.h` for freestanding declarations.
-
-2. **System Libraries (`/lib/`)**:
-   To add core C functions, edit `/lib/libc/sigma_libc.c` and declare prototypes in `sigma_libc.h`. 
-
-3. **Filesystem Drivers (`/fs/`)**:
-   Implement mock and real disk parsing code here. All routines must interface with `/fs/vfs.c` inodes.
-
-4. **Network Drivers (`/net/`)**:
-   Socket interfaces must follow the C prototypes in `/net/tcp_ip.c`.
-
-5. **Userland CLI (`/usr/`)**:
-   To add shell utilities, edit `/usr/sh.c`.
+We welcome contributions from kernel-level hardware engineers, UI developers, and security auditors.
 
 ---
 
-## 🧪 Running Validation Tests
+## 🔒 Strict Quality Gateway
 
-Before submitting pull requests:
+To preserve the zero-trust security paradigm of SigmaOS, all contributions must clear our quality verification guidelines:
+1.  **Zero External Dependencies:** Core kernel, bootloader, and VFS logic must compile without importing standard GNU/Linux or external C headers.
+2.  **No Direct Memory Management in Sandboxes:** Workstation and Zenith applications must rely strictly on our FFI sandbox memory interfaces rather than raw `malloc` sweeps.
+3.  **Audit Logs Mandatory:** All dynamic subsystems must emit structured diagnostic updates matching the `sigma_error_codes.h` format.
+4.  **Local Test Suite Pass:** Ensure your code compiles cleanly and passes:
+    *   `make test` to execute allocator and scheduling mocks.
+    *   No compiler warnings or undefined references under static audit gates.
 
-1. Run the local automated test suites using the command prompt:
-   ```bash
-   cmd /c npm run test
-   ```
-2. Verify all 45 test files return success status.
-3. Keep the directory junctions (`userland` -> `usr`, `networking` -> `net`) untracked to avoid polluting git commits.
+---
+
+## 🛠️ Hybrid C/Rust Development Workflow
+
+SigmaOS utilizes a modern hybrid architecture:
+*   **Kernel Core, VFS & Bootloader:** Authored in robust ISO C11 for direct low-level predictability.
+*   **Zenith SDK, Diagnostic Utilities & GUI Workloads:** Incremental additions and libraries are encouraged in memory-safe **Rust** utilizing our `zenith-sdk` interop crate (`zenith_desktop/sdk/rust/`).
+
+### Submitting a Sovereign Profile Spin
+We natively support **Sovereign System Profiles** (standard, CAINE-inspired forensic, IoT, enterprise, and education) to tailer resource budgets:
+*   To submit an adaptation spin, configure targeted capability filters directly inside `sigma_control_center.cpp` and update `include/sigma_profiles.h`.
+
+---
+
+## 🚀 Getting Started
+
+1.  Clone our main repository and read our [Architecture Blueprint](docs/wiki/Home.md).
+2.  Inspect outstanding tasks in the [Issue Tracker](https://github.com/AaryanSinghChauhan09/SigmaOS/issues).
+3.  Open a Pull Request ensuring your commit description explicitly states the targeted subsystem and security mapping.

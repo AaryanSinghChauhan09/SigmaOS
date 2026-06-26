@@ -40,6 +40,11 @@ private:
 
 extern "C" {
     void e1000_init(sigma_u64 base) { SigmaOS::Kernel::Drivers::SovereignE1000::getInstance().init(base); }
+
+    // Kernel networking stack TX hook (see `kernel/net/sigma_net.c`).
+    void nic_tx_packet(sigma_u8* buffer, sigma_u32 len) {
+        SigmaOS::Kernel::Drivers::SovereignE1000::getInstance().transmit(buffer, len);
+    }
 }
 
  

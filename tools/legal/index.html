@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SigmaLex — Indian Legal Procedure Guide</title>
+  <meta name="description" content="An interactive, step-by-step guide to Indian legal procedures — Civil, Criminal, Labour, and Constitutional cases, backed by statutes and landmark judgments." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Hero Header -->
+    <header class="hero">
+      <div class="hero-glow"></div>
+      <div class="hero-content">
+        <div class="logo-badge">Σ SigmaLex</div>
+        <h1>Indian Legal Procedure Guide</h1>
+        <p class="hero-sub">Interactive step-by-step workflows backed by statutes, landmark case laws, and practical tips.</p>
+        <div class="hero-note">⚠️ For educational purposes only. Consult a qualified advocate for legal advice.</div>
+      </div>
+    </header>
+
+    <!-- Case Type Selector -->
+    <section class="selector-section">
+      <h2>Select a Case Type</h2>
+      <div class="case-grid">
+        <button class="case-card active" data-type="civil" onclick="selectCase('civil')">
+          <span class="case-icon">⚖️</span>
+          <span class="case-label">Civil Case</span>
+          <span class="case-desc">Disputes, property, contracts</span>
+        </button>
+        <button class="case-card" data-type="criminal" onclick="selectCase('criminal')">
+          <span class="case-icon">🔒</span>
+          <span class="case-label">Criminal Case</span>
+          <span class="case-desc">FIR, trial, bail, appeal</span>
+        </button>
+        <button class="case-card" data-type="labour" onclick="selectCase('labour')">
+          <span class="case-icon">🏭</span>
+          <span class="case-label">Labour Dispute</span>
+          <span class="case-desc">Employment, wages, termination</span>
+        </button>
+        <button class="case-card" data-type="constitutional" onclick="selectCase('constitutional')">
+          <span class="case-icon">🏛️</span>
+          <span class="case-label">Constitutional</span>
+          <span class="case-desc">Writ petitions, fundamental rights</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Timeline Section -->
+    <section class="timeline-section">
+      <div class="timeline-header">
+        <h2 id="timeline-title">Civil Case Procedure</h2>
+        <p id="timeline-subtitle">Code of Civil Procedure, 1908</p>
+      </div>
+      <div class="timeline" id="timeline-container"></div>
+    </section>
+
+    <!-- Glossary Footer -->
+    <footer class="glossary">
+      <h3>Key Statutes Referenced</h3>
+      <div class="statute-chips">
+        <span class="chip">CPC — Code of Civil Procedure, 1908</span>
+        <span class="chip">CrPC — Code of Criminal Procedure, 1973</span>
+        <span class="chip">IPC — Indian Penal Code, 1860</span>
+        <span class="chip">IEA — Indian Evidence Act, 1872</span>
+        <span class="chip">LA — Limitation Act, 1963</span>
+        <span class="chip">LC — Labour Codes, 2019-20</span>
+        <span class="chip">Constitution of India, 1950</span>
+      </div>
+      <p class="footer-note">Built as part of SigmaOS — A Sovereign Operating System Project</p>
+    </footer>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

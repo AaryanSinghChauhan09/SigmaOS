@@ -1,5 +1,3 @@
-#include "sigma_hal.h"
-#include "libc/SovereignLibC.h"
 #ifndef POWER_MANAGER_HPP
 #define POWER_MANAGER_HPP
 
@@ -9,7 +7,7 @@
 namespace SigmaOS {
 namespace Kernel {
 
-enum class PowerState { PEAK_PERFORMANCE, BALANCED_LATTICE, AMNESIC_LOW_POWER };
+enum class PowerState { PEAK_PERFORMANCE, BALANCED_LATTICE, AMNESIC_LOW_POWER, PROFILE_HPC, PROFILE_CLOUD, PROFILE_EDGE, PROFILE_GAMING };
 
 /*
  * =========================================================================

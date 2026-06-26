@@ -1,76 +1,78 @@
 # SigmaOS Zenith: Master Strategic Roadmap
 
-This roadmap defines the immediate, medium-term, and long-term milestones required to establish SigmaOS Zenith as the premier sovereign, AI-native operating system.
+This roadmap defines the precise staged milestones required to establish SigmaOS Zenith as the premier sovereign, AI-native operating system. It aligns with our core strategy: we will not out-Linux Linux, but we will **out-sovereign** it by aggressively adopting best-in-class paradigms from the ecosystem.
 
 ---
 
-## 🛠️ Immediate Milestones (Current Focus)
+## 🔧 Step 1 – Core Foundations
 
-### 1. Define Core Vision in GitHub Wiki
-* [x] Publish positioning page: `SigmaOS vs Ubuntu` detailing USP absorption and sovereign differentiators.
-* [x] Establish clear mission manifests for contributors and enterprise partners.
+### Expand Hardware Drivers
+* Add native sovereign support for USB 3.x, NVMe, Wi‑Fi, Bluetooth, and modern GPUs. Without this, SigmaOS can’t run on everyday hardware.
 
-### 2. Build Developer Ecosystem
-* [x] Deploy native package manager support with dual CLI (`sigma install`) and GUI interfaces.
-* [x] Ensure 100% compatibility with APT/Debian packages and Snap/Flatpak universal binaries.
-* [x] Publish comprehensive onboarding tutorials and starter guides in the GitHub Wiki.
+### Networking Stack
+* Build a complete TCP/IP stack (IPv4/IPv6, DHCP, DNS, firewall). This is essential for internet connectivity and cloud use.
 
-### 3. Release Stable LTS Build & Developer Preview
-* [x] Launch `sigma_lts_developer_preview` showcasing guaranteed 5-year sovereign support.
-* [x] Document step-by-step minimal guided installation and supported hardware matrices.
-
-### 4. Benchmark & Showcase Superiority
-* [x] Execute bare-metal performance tests against Ubuntu across AI workloads and syscall latency.
-* [x] Publish definitive benchmark results proving SigmaOS superiority across GitHub and social channels.
-
-### 5. Community Engagement Launch
-* [x] Open official Discord/Slack collaboration channels for real-time developer coordination.
-* [x] Establish structured contributor recognition programs (Badges, Grants, Core Credits).
+### Package Manager
+* Create a sovereign package manager (like Solus’s eopkg or Nix’s nix) with reproducible builds, cryptographic verification, and rollback capabilities.
 
 ---
 
-## ⚡ Medium-Term Goals
+## ⚡ Step 2 – Borrow from Other Distros
 
-### 1. Sovereign Cloud Integration
-* [ ] Provide official, hardened SigmaOS cloud images for AWS, Azure, and GCP.
-* [ ] Deploy bare-metal optimized builds specifically tuned for sovereign cloud data centers.
+### From NixOS
+* **Declarative Configs & Reproducibility:** Let users define system states through declarative configurations and roll back easily.
 
-### 2. Enterprise Adoption & Support SLAs
-* [ ] Roll out comprehensive enterprise support contracts and dedicated compliance engineering teams.
-* [ ] Establish strategic partnerships with national digital sovereignty initiatives.
+### From Fedora CoreOS / Flatcar
+* **Immutable Infrastructure:** Implement atomic updates for bulletproof reliability.
 
-### 3. Security Differentiation & Hardening
-* [ ] Complete formal mathematical verification of kernel ring isolation and zero-telemetry memory spaces.
-* [ ] Enforce continuous cryptographic supply chain auditing across all system shards.
+### From Rescuezilla / SystemRescue
+* **Sovereign Recovery Tools:** Build snapshot rollback capabilities and powerful forensic utilities.
 
-### 4. Hardware Expansion
-* [ ] Deepen native driver support for next-gen ARM, RISC-V, and AI NPU/TPU accelerators.
-* [ ] Optimize direct GPU memory access for massive-scale ML training workloads.
+### From Clear Linux
+* **Performance Profiles:** Auto‑tuning for different silicon architectures (x86, ARM, RISC‑V) to maximize bare-metal efficiency.
 
----
+### From Zorin / Elementary
+* **Polished Desktop UX:** Introduce a clean UI, deep accessibility features, and intuitive defaults to attract non‑technical users.
 
-## 🚀 Long-Term Vision
-Position SigmaOS Zenith as the global standard sovereign AI-native OS for governments, enterprises, and next-generation silicon architectures. Build an unassailable reputation where SigmaOS is recognized as the only rational choice for sovereignty, AI acceleration, and critical infrastructure.
+### From SteamOS
+* **GPU & Gaming Stack:** Build a gaming compatibility layer (possibly WebAssembly‑based) along with a robust graphics stack.
 
 ---
 
-## ⚖️ OS Reliability & Practical Parity (What "Working Perfectly" Means)
-To challenge legacy monoliths, SigmaOS defines operational excellence by meeting the absolute benchmarks of a modern, production-grade operating system:
+## 🚀 Step 3 – Strategic Differentiation
 
-* 🔌 **Universal Boot Reliability** — Boot reliably and deterministically across multiple major hardware architectures (x86_64, ARM64, and RISC-V) both on bare-metal and within hypervisor/VM instances.
-* 🧠 **Zero-Leak Resource Management** — Manage core system resources (CPU scheduling, slab memory allocator, storage, and networking layers) continuously under high throughput without memory leaks or microkernel panic states.
-* 🛡️ **Extensible Driver Ecosystem** — Provide native driver support for essential hardware boundaries including Vulkan graphics pipelines, high-speed Wi-Fi, Ethernet, and standard USB controllers.
-* 📦 **Flexible Application Runtimes** — Enable applications to run natively at zero-overhead or seamlessly inside isolated sandboxed compatibility layers.
-* 🔒 **Atomic System Updates** — Swapping and updating critical microkernel partitions atomically without causing downtime or breaking existing system dependencies.
-* 📖 **Developer & User Accessibility** — Maintaining a comprehensive documentation tree, developer SDKs, and clean APIs to ensure contributors can scale the platform easily.
+### Sovereign Containers
+* Design a containerization framework entirely independent of legacy Linux namespaces/cgroups.
+
+### Security Framework
+* Establish a sovereign alternative to SELinux/AppArmor with strict mandatory access control and cryptographic isolation.
+
+### Community Ecosystem
+* Launch dedicated forums, Discord/Matrix channels, and clear contributor guidelines to aggressively grow developer engagement.
+
+### Specialized Branches
+* **IoT/Embedded:** Lightweight and exceptionally secure.
+* **HPC/AI:** GPU acceleration and sovereign scheduling for massive workloads.
+* **Enterprise/Cloud:** Hardened virtualization and native sovereign containers.
 
 ---
 
-## ⚡ Next Pragmatic Execution Steps for SigmaOS
-To transition from the current stable v15.2 to full sovereign maturity, our tactical roadmap prioritizes the following execution path:
+## 🌍 Step 4 – Long‑Term Vision
 
-1. 💻 **Minimal Bootable Kernel Hardening** — Stabilize a minimal bootable kernel structure designed to run directly on bare-metal architectures and within simulated QEMU virtual machines.
-2. 🔌 **Basic Driver Expansion** — Implement baseline drivers for high-performance block storage, networking hardware layers, and essential screen/display interfaces.
-3. 📦 **Orb Package & Module System Stabilization** — Harden `sigma-pkg` to reliably compile, verify, and dynamically load modular package components and sovereign security shards.
-4. 🛠️ **Unified Developer SDK Release** Expose a modern, clean C++ API boundary coupled with toolchains to allow contributors to easily develop high-level services and custom shards.
-5. 🧪 **Iterative Stress Testing & Verification** — Execute continuous integration pipelines running massive stress workloads (syscall fuzzing, memory leak tracking, scheduling stress) to systematically identify and fix bugs.
+### AI‑Native Scheduling
+* Predictive resource allocation using ML models directly within the kernel scheduler.
+
+### Quantum‑Safe Cryptography
+* Integrate post‑quantum primitives across all communication and identity tokens for future‑proof security.
+
+### Self‑Healing Kernel
+* Autonomous recovery from kernel faults and full formal verification of kernel modules.
+
+---
+
+## 👉 Immediate Execution Path
+
+To make SigmaOS practical while laying the groundwork for sovereignty-aligned innovation, we will focus our immediate engineering efforts on:
+1. **Drivers + Networking Stack:** Make SigmaOS usable on modern hardware.
+2. **Package Manager + Documentation:** Attract and retain developers.
+3. **Declarative Configs and Recovery Tools:** Begin experimenting with NixOS/Rescuezilla paradigms.

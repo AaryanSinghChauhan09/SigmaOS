@@ -1,4 +1,4 @@
-﻿/*
+/*
  * =========================================================================
  * Î£ SIGMAOS: SOVEREIGN GPU COMPUTE DRIVER (S-GPU)
  * =========================================================================
@@ -57,10 +57,22 @@ typedef struct {
     sigma_u32 initialized;
 } sigma_gpu_state_t;
 
+/* --- Advanced GPU Contexts & Buffers --- */
+typedef struct {
+    sigma_u32 context_id;
+    sigma_addr_t page_table_base;
+    sigma_u32 priority;
+} sigma_gpu_context_t;
+
+sigma_gpu_context_t* gpu_create_context(sigma_u32 priority);
+void      gpu_destroy_context(sigma_gpu_context_t* ctx);
+sigma_addr_t gpu_alloc_buffer(sigma_u32 size_mb, sigma_u32 flags);
+void      gpu_free_buffer(sigma_addr_t addr);
+
 /* --- GPU Primitives --- */
 void      gpu_init(sigma_addr_t mmio_base, sigma_u16 vendor_id, sigma_u16 device_id);
 void      gpu_set_mode(sigma_u32 mode);
-sigma_u32 gpu_submit_cmd(const sigma_gpu_cmd_t* cmd);
+sigma_u32 gpu_submit_cmd(sigma_gpu_context_t* ctx, const sigma_gpu_cmd_t* cmd);
 void      gpu_wait_fence(sigma_u32 fence_id);
 const sigma_gpu_state_t* gpu_get_state(void);
 

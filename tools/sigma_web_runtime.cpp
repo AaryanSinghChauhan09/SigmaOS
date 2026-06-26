@@ -1,7 +1,7 @@
-#include "../sigma_libc.h"
+﻿#include "../sigma_libc.h"
 
 // =========================================================================
-// Σ SIGMAOS: SOVEREIGN WEB RUNTIME & BROWSER SANDBOX (v15.2 - PREMIUM)
+// Î£ SIGMAOS: SOVEREIGN WEB RUNTIME & BROWSER SANDBOX (v15.2 - PREMIUM)
 // =========================================================================
 // Zero-Dependency, Free-Standing Stack-Based VM & DOM Diffing Engine
 // Competitor Target: ChromeOS (Browser-Based Web-App Productivity)
@@ -31,7 +31,7 @@ namespace Web {
 
     public:
         void ExecuteWASMBytecode(const sigma_u8* bytecode, sigma_size_t length) {
-            sigma_printf("[WASM/VM]: Initializing isolated VM stack loop...\n");
+            sigma_log_info("[WASM/VM]: Initializing isolated VM stack loop...\n");
             m_sp = 0;
             
             for (sigma_size_t i = 0; i < length; i++) {
@@ -47,7 +47,7 @@ namespace Web {
                             int b = pop();
                             int a = pop();
                             push(a + b);
-                            sigma_printf("[WASM/VM]: executed i32.add (%d + %d)\n", a, b);
+                            sigma_log_info("[WASM/VM]: executed i32.add (%d + %d)\n", a, b);
                         }
                         break;
                     case 0x6B: // i32.sub
@@ -55,14 +55,14 @@ namespace Web {
                             int b = pop();
                             int a = pop();
                             push(a - b);
-                            sigma_printf("[WASM/VM]: executed i32.sub (%d - %d)\n", a, b);
+                            sigma_log_info("[WASM/VM]: executed i32.sub (%d - %d)\n", a, b);
                         }
                         break;
                     default:
                         break;
                 }
             }
-            sigma_printf("[WASM/VM]: VM Loop Complete. Result on Stack Peak: %d\n", pop());
+            sigma_log_info("[WASM/VM]: VM Loop Complete. Result on Stack Peak: %d\n", pop());
         }
     };
 
@@ -76,30 +76,30 @@ namespace Web {
     class SovereignVirtualDOM {
     public:
         void VirtualDOMHeuristicDiff(const VDOMNode* old_tree, int old_count, const VDOMNode* new_tree, int new_count) {
-            sigma_printf("[VDOM/DIFF]: Executing O(N) Fiber Tree Heuristic Diffing...\n");
+            sigma_log_info("[VDOM/DIFF]: Executing O(N) Fiber Tree Heuristic Diffing...\n");
             
             int patches = 0;
             int limit = (old_count < new_count) ? old_count : new_count;
             
             for (int i = 0; i < limit; i++) {
                 if (sigma_strcmp(old_tree[i].tag, new_tree[i].tag) != 0) {
-                    sigma_printf("[VDOM/PATCH]: Replace node %d: %s -> %s\n", i, old_tree[i].tag, new_tree[i].tag);
+                    sigma_log_info("[VDOM/PATCH]: Replace node %d: %s -> %s\n", i, old_tree[i].tag, new_tree[i].tag);
                     patches++;
                 } else if (sigma_strcmp(old_tree[i].key, new_tree[i].key) != 0) {
-                    sigma_printf("[VDOM/PATCH]: Key change at node %d (%s -> %s)\n", i, old_tree[i].key, new_tree[i].key);
+                    sigma_log_info("[VDOM/PATCH]: Key change at node %d (%s -> %s)\n", i, old_tree[i].key, new_tree[i].key);
                     patches++;
                 }
             }
             
             if (new_count > old_count) {
-                sigma_printf("[VDOM/PATCH]: Appending %d new nodes to layout.\n", new_count - old_count);
+                sigma_log_info("[VDOM/PATCH]: Appending %d new nodes to layout.\n", new_count - old_count);
                 patches += (new_count - old_count);
             } else if (old_count > new_count) {
-                sigma_printf("[VDOM/PATCH]: Purging %d obsolete nodes from layout.\n", old_count - new_count);
+                sigma_log_info("[VDOM/PATCH]: Purging %d obsolete nodes from layout.\n", old_count - new_count);
                 patches += (old_count - new_count);
             }
             
-            sigma_printf("[VDOM/DIFF]: Diffing complete. Total patch sequences queued: %d\n", patches);
+            sigma_log_info("[VDOM/DIFF]: Diffing complete. Total patch sequences queued: %d\n", patches);
         }
     };
 
@@ -107,23 +107,23 @@ namespace Web {
     class SovereignQUICParser {
     public:
         void ParseHTTP3QUICFrame(const sigma_u8* packet, sigma_size_t size) {
-            sigma_printf("[NET/QUIC]: Decrypting UDP stream at interrupt level...\n");
+            sigma_log_info("[NET/QUIC]: Decrypting UDP stream at interrupt level...\n");
             if (size < 4) {
-                sigma_printf("[NET/QUIC]: Error, packet size too small.\n");
+                sigma_log_info("[NET/QUIC]: Error, packet size too small.\n");
                 return;
             }
 
             // Extract Connection ID & Frame Type
             sigma_u32 conn_id = ((sigma_u32)packet[0] << 24) | ((sigma_u32)packet[1] << 16) | ((sigma_u32)packet[2] << 8) | packet[3];
-            sigma_printf("[NET/QUIC]: Ingested Connection ID: 0x%x\n", conn_id);
+            sigma_log_info("[NET/QUIC]: Ingested Connection ID: 0x%x\n", conn_id);
 
             sigma_u8 frame_type = packet[4 % size];
             if (frame_type == 0x00) {
-                sigma_printf("[NET/QUIC]: Frame identified: DATA_FRAME (Payload Reassembled).\n");
+                sigma_log_info("[NET/QUIC]: Frame identified: DATA_FRAME (Payload Reassembled).\n");
             } else if (frame_type == 0x01) {
-                sigma_printf("[NET/QUIC]: Frame identified: HEADERS_FRAME (QPACK Decoded).\n");
+                sigma_log_info("[NET/QUIC]: Frame identified: HEADERS_FRAME (QPACK Decoded).\n");
             } else {
-                sigma_printf("[NET/QUIC]: Frame identified: CONTROL_FRAME.\n");
+                sigma_log_info("[NET/QUIC]: Frame identified: CONTROL_FRAME.\n");
             }
         }
     };
@@ -132,11 +132,11 @@ namespace Web {
     class SovereignGraphQLDispatcher {
     public:
         void DispatchGraphQLQuery(const char* query) {
-            sigma_printf("[WEB/GQL]: Parsing Query AST against static schema...\n");
+            sigma_log_info("[WEB/GQL]: Parsing Query AST against static schema...\n");
             if (sigma_strcmp(query, "query { user { id name } }") == 0) {
-                sigma_printf("[WEB/GQL]: Matched target: Schema[User]. Resolving fields: 'id', 'name'.\n");
+                sigma_log_info("[WEB/GQL]: Matched target: Schema[User]. Resolving fields: 'id', 'name'.\n");
             } else {
-                sigma_printf("[WEB/GQL]: Generic Query AST parsed. Dispatching to VFS database.\n");
+                sigma_log_info("[WEB/GQL]: Generic Query AST parsed. Dispatching to VFS database.\n");
             }
         }
     };
@@ -145,7 +145,7 @@ namespace Web {
 } // namespace SigmaOS
 
 void initialize_web_runtime() {
-    sigma_printf("=== [Sigma Web Runtime] Bootstrapping WebAssembly (WASM) sandbox ===\n");
+    sigma_log_info("=== [Sigma Web Runtime] Bootstrapping WebAssembly (WASM) sandbox ===\n");
     
     // 1. WASM Execution
     static const sigma_u8 wasm_program[] = {
@@ -187,3 +187,4 @@ int main(int argc, char** argv) {
     initialize_web_runtime();
     return 0;
 }
+

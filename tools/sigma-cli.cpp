@@ -1,4 +1,4 @@
-#include "sigma_kernel_types.h"
+﻿#include "sigma_kernel_types.h"
 #include "sigma_log.h"
 #include "sigma_recovery.h"
 #include "sigma_iot.h"
@@ -16,7 +16,7 @@
 #include "SigmaOOP.hpp"
 
 /**
- * Σ SIGMAOS: SOVEREIGN UNIFIED CLI (sigma-cli)
+ * Î£ SIGMAOS: SOVEREIGN UNIFIED CLI (sigma-cli)
  * Purpose: Professional interface for shard orchestration, diagnostics, and recovery.
  * Principle: One CLI to rule the Lattice.
  */
@@ -24,22 +24,22 @@
 using namespace SigmaOS;
 
 void print_help() {
-    sigma_printf("Σ SigmaOS Sovereign CLI (sigma-cli) v15.0 [Zenith]");
-    sigma_printf("Usage: sigma-cli <subsystem> <command> [args]");
-    sigma_printf("Subsystems:");
-    sigma_printf("  recover   Shard recovery, snapshots, and forensics.");
-    sigma_printf("  iot       GPIO management and sensor polling.");
-    sigma_printf("  game      GPU boost and controller management.");
-    sigma_printf("  opt       System-wide performance optimization.");
-    sigma_printf("  ui        Theme and accessibility management.");
-    sigma_printf("  ml        Machine Learning model inference.");
-    sigma_printf("  orch      Shard orchestration and replicas.");
-    sigma_printf("  armor     Security policy and MAC enforcement.");
-    sigma_printf("  cloud     Distributed storage and cluster stats.");
-    sigma_printf("  comply    Regulatory auditing and compliance.");
-    sigma_printf("  forensic  Silicon auditing and evidence preservation.");
-    sigma_printf("  regress   Hardware regression and certification.");
-    sigma_printf("  telemetry Query shard health and performance metrics.");
+    sigma_log_info("Î£ SigmaOS Sovereign CLI (sigma-cli) v15.0 [Zenith]");
+    sigma_log_info("Usage: sigma-cli <subsystem> <command> [args]");
+    sigma_log_info("Subsystems:");
+    sigma_log_info("  recover   Shard recovery, snapshots, and forensics.");
+    sigma_log_info("  iot       GPIO management and sensor polling.");
+    sigma_log_info("  game      GPU boost and controller management.");
+    sigma_log_info("  opt       System-wide performance optimization.");
+    sigma_log_info("  ui        Theme and accessibility management.");
+    sigma_log_info("  ml        Machine Learning model inference.");
+    sigma_log_info("  orch      Shard orchestration and replicas.");
+    sigma_log_info("  armor     Security policy and MAC enforcement.");
+    sigma_log_info("  cloud     Distributed storage and cluster stats.");
+    sigma_log_info("  comply    Regulatory auditing and compliance.");
+    sigma_log_info("  forensic  Silicon auditing and evidence preservation.");
+    sigma_log_info("  regress   Hardware regression and certification.");
+    sigma_log_info("  telemetry Query shard health and performance metrics.");
 }
 
 int main(int argc, char* argv[]) {
@@ -142,10 +142,11 @@ int main(int argc, char* argv[]) {
         }
     } else if (sigma_strcmp(subsystem.c_str(), "telemetry") == 0) {
         gaming_report_gpu_load();
-        sigma_printf("[CLI] Lattice Health: 100%% | Shard Status: ALL_ACTIVE");
+        sigma_log_info("[CLI] Lattice Health: 100%% | Shard Status: ALL_ACTIVE");
     } else {
         print_help();
     }
 
     return 0;
 }
+

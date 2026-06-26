@@ -59,10 +59,10 @@ int sigma_atoi(const char* s) {
 int sigma_streq(const char* s1, const char* s2) {
     sigma_size_t i = 0;
     while(s1[i] != '\0' && s2[i] != '\0') {
-        if(s1[i] != s2[i]) return SIGMA_FALSE;
+        if(s1[i] != s2[i]) return 0;
         i++;
     }
-    return (s1[i] == s2[i]) ? SIGMA_TRUE : SIGMA_FALSE;
+    return (s1[i] == s2[i]) ? 1 : 0;
 }
 
 int sigma_compare(const char* s1, const char* s2) {
@@ -102,16 +102,17 @@ void sigma_strcpy(char* dest, const char* src, sigma_size_t n) {
     sigma_hardened_strcpy(dest, src, n);
 }
 
-// --- sigma_strcat ---
-void sigma_strcat(char* dest, const char* src) {
-    char* rd = dest;
-    while (*rd) rd++;
-    while (*src) {
-        *rd = *src;
-        rd++;
-        src++;
+// --- sigma_strcat (CWE-120 hardened) ---
+void sigma_strcat(char* dest, const char* src, sigma_size_t dest_size) {
+    if (!dest || !src || dest_size == 0) return;
+    sigma_size_t dlen = 0;
+    while (dest[dlen] && dlen < dest_size) dlen++;
+    if (dlen >= dest_size) return;
+    sigma_size_t i = 0;
+    for (i = 0; dlen + i < dest_size - 1 && src[i] != '\0'; i++) {
+        dest[dlen + i] = src[i];
     }
-    *rd = '\0';
+    dest[dlen + i] = '\0';
 }
 
 // --- xv6 Parity Syscalls ---
@@ -148,7 +149,7 @@ int sigma_wait(int* wstatus) {
     // x86_64 rax=61 (wait4(pid_t pid, int *status, int options, struct rusage *usage))
     long res;
     register long r10 __asm__("r10") = 0; // options = 0
-    register long r8  __asm__("r8")  = 0; // rusage = SIGMA_NULL
+    register long r8  __asm__("r8")  = 0; // rusage = 0
     __asm__ __volatile__ ("syscall" 
         : "=r"(res) 
         : "a"(61), "D"(-1), "S"(wstatus), "r"(r10), "r"(r8) 
@@ -258,19 +259,19 @@ char* sigma_itoa(int value, char* str, int base) {
 }
 
 // --- Memory Management Shard (Slab v2) ---
-static void* g_heap_start = SIGMA_NULL;
+static void* g_heap_start = 0;
 static sigma_size_t g_heap_used = 0;
 static const sigma_size_t HEAP_SIZE = 1024 * 1024 * 128; // 128MB Shard
 
 void* sigma_slab_alloc_raw(sigma_size_t size) {
-    if (g_heap_start == SIGMA_NULL) {
-        g_heap_start = sigma_mmap(SIGMA_NULL, HEAP_SIZE, 3, 0x22, -1, 0);
+    if (g_heap_start == 0) {
+        g_heap_start = sigma_mmap(0, HEAP_SIZE, 3, 0x22, -1, 0);
     }
     
     // Align to 16 bytes
     size = (size + 15) & ~15;
     
-    if (g_heap_used + size > HEAP_SIZE) return SIGMA_NULL;
+    if (g_heap_used + size > HEAP_SIZE) return 0;
     
     void* ptr = (sigma_u8*)g_heap_start + g_heap_used;
     g_heap_used += size;

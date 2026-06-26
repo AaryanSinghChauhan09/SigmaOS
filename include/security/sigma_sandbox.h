@@ -9,13 +9,16 @@
 #ifndef SIGMA_SANDBOX_H
 #define SIGMA_SANDBOX_H
 
-#include "core/sigma_types.h"
+#include "../sigma_kernel_types.h"
 
 typedef struct {
     sigma_u32 container_id;
     bool      network_access;
     bool      fs_access;
     sigma_u32 memory_limit;
+    /* Qubes-OS-inspired compartmentalization flags */
+    bool      strict_isolation; /* If true: no IPC to other shards, kernel calls filtered via seccomp-style allowlist */
+    bool      device_access;    /* If false: all hardware access (DMA, MMIO) is blocked at the HAL boundary */
 } sigma_sandbox_config_t;
 
 #ifdef __cplusplus

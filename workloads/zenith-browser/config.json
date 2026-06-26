@@ -1,0 +1,127 @@
+{
+  "ociVersion": "1.1.0",
+  "process": {
+    "terminal": false,
+    "user": { "uid": 1000, "gid": 1000 },
+    "args": ["/sigma/bin/zenith_browser", "--headless=false"],
+    "env": [
+      "PATH=/sigma/bin:/sigma/sbin",
+      "SIGMA_DATA_DIR=/sigma/data/zenith",
+      "SIGMA_PROFILE=browser"
+    ],
+    "cwd": "/sigma/data/zenith",
+    "capabilities": {
+      "effective":   [],
+      "permitted":   [],
+      "inheritable": [],
+      "bounding":    [],
+      "ambient":     []
+    },
+    "noNewPrivileges": true,
+    "oomScoreAdj": 300
+  },
+  "root": { "path": "rootfs", "readonly": false },
+  "hostname": "zenith",
+  "mounts": [
+    {
+      "destination": "/proc",
+      "type": "proc",
+      "source": "proc",
+      "options": ["noexec", "nosuid", "nodev"]
+    },
+    {
+      "destination": "/dev",
+      "type": "tmpfs",
+      "source": "tmpfs",
+      "options": ["nosuid", "strictatime", "mode=755", "size=65536k"]
+    },
+    {
+      "destination": "/sigma/data",
+      "type": "bind",
+      "source": "/sigma/data/zenith-user",
+      "options": ["rbind", "rw"]
+    },
+    {
+      "destination": "/sigma/lib",
+      "type": "bind",
+      "source": "/sigma/lib",
+      "options": ["rbind", "ro", "noexec"]
+    }
+  ],
+  "linux": {
+    "namespaces": [
+      { "type": "pid"     },
+      { "type": "network" },
+      { "type": "mount"   },
+      { "type": "ipc"     },
+      { "type": "uts"     },
+      { "type": "user"    }
+    ],
+    "uidMappings": [{ "containerID": 1000, "hostID": 100000, "size": 1 }],
+    "gidMappings": [{ "containerID": 1000, "hostID": 100000, "size": 1 }],
+    "resources": {
+      "memory": {
+        "limit": 536870912,
+        "swap":  0
+      },
+      "cpu": {
+        "shares": 512,
+        "quota":  200000,
+        "period": 100000
+      },
+      "pids": { "limit": 128 },
+      "blockIO": { "weight": 50 }
+    },
+    "seccomp": {
+      "defaultAction": "SCMP_ACT_ERRNO",
+      "architectures": ["SCMP_ARCH_X86_64", "SCMP_ARCH_X86"],
+      "syscalls": [
+        {
+          "names": [
+            "read", "write", "open", "openat", "close", "stat", "fstat",
+            "lstat", "poll", "mmap", "mprotect", "munmap", "brk",
+            "rt_sigaction", "rt_sigprocmask", "rt_sigreturn",
+            "ioctl", "pread64", "pwrite64", "readv", "writev",
+            "access", "pipe", "select", "sched_yield", "madvise",
+            "socket", "connect", "sendto", "recvfrom", "sendmsg",
+            "recvmsg", "shutdown", "getsockname", "getpeername",
+            "getsockopt", "setsockopt", "clone", "fork", "vfork",
+            "execve", "exit", "wait4", "kill", "uname", "fcntl",
+            "flock", "fsync", "fdatasync", "truncate", "ftruncate",
+            "getdents", "getcwd", "chdir", "fchdir", "rename",
+            "mkdir", "rmdir", "unlink", "symlink", "readlink",
+            "chmod", "chown", "getpid", "getuid", "getgid",
+            "gettimeofday", "clock_gettime", "nanosleep",
+            "futex", "set_tid_address", "exit_group", "epoll_create",
+            "epoll_wait", "epoll_ctl", "epoll_pwait", "getrlimit"
+          ],
+          "action": "SCMP_ACT_ALLOW"
+        }
+      ]
+    },
+    "maskedPaths": [
+      "/proc/kcore",
+      "/proc/sysrq-trigger",
+      "/proc/latency_stats",
+      "/proc/timer_list"
+    ],
+    "readonlyPaths": [
+      "/proc/bus",
+      "/proc/fs",
+      "/proc/irq",
+      "/proc/sys",
+      "/proc/sysrq-trigger"
+    ]
+  },
+  "sigmaExtensions": {
+    "trustLabel": "untrusted",
+    "pledgePromises": "stdio rpath wpath net dns",
+    "unveilPaths": [
+      "/sigma/data/zenith:rw",
+      "/sigma/lib:rx",
+      "/tmp:rw"
+    ],
+    "cgroupName": "zenith-browser",
+    "auditLevel": "full"
+  }
+}

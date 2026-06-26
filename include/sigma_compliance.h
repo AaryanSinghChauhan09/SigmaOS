@@ -10,8 +10,6 @@
 #ifndef SIGMA_COMPLIANCE_H
 #define SIGMA_COMPLIANCE_H
 
-#include "./sigma_kernel_types.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -20,7 +18,9 @@ typedef enum {
     COMPLIANCE_LEVEL_STANDARD,
     COMPLIANCE_LEVEL_HIPAA,
     COMPLIANCE_LEVEL_SOC2,
-    COMPLIANCE_LEVEL_DEFENSE_TOP_SECRET
+    COMPLIANCE_LEVEL_DEFENSE_TOP_SECRET,
+    COMPLIANCE_LEVEL_INDIA_DPDP,
+    COMPLIANCE_LEVEL_CERT_IN
 } sigma_compliance_tier_t;
 
 /* --- Compliance Primitives --- */

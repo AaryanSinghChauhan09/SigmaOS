@@ -1,4 +1,4 @@
-/*
+﻿/*
  * =========================================================================
  * SIGMA SYSTEM VR STUDIO (sigma_vr_studio) v15.2
  * =========================================================================
@@ -40,7 +40,7 @@ public:
 
     // --- 2. Hand Gesture Recognizer (Spatial Coordinate Analysis) ---
     const char* ParseHandGesture(const Vector3D* coordinates, sigma_size_t points_count) const {
-        sigma_printf("[VR/GESTURE]: Parsing spatial hand coordinates for gesture detection...\n");
+        sigma_log_info("[VR/GESTURE]: Parsing spatial hand coordinates for gesture detection...\n");
         if (points_count < 2) return "UNKNOWN";
 
         // Calculate thumb-to-index finger distance for pinch detection
@@ -68,7 +68,7 @@ public:
     // --- 3. 3D Spatial Audio: Head-Related Transfer Function (HRTF) Filter ---
     void ProcessHRTFAudio(const float* mono_input, float* left_out, float* right_out, 
                           sigma_size_t samples, float azimuth, float elevation) const {
-        sigma_printf("[VR/AUDIO]: Computing HRTF convolution for azimuth: %.1f, elevation: %.1f...\n", azimuth, elevation);
+        sigma_log_info("[VR/AUDIO]: Computing HRTF convolution for azimuth: %.1f, elevation: %.1f...\n", azimuth, elevation);
         
         // Simple head-shadow model to create stereo spatialization
         float pan_factor = (azimuth + 90.0f) / 180.0f; // Scale from [-90, 90] to [0, 1]
@@ -82,13 +82,13 @@ public:
             left_out[i] = input_val * (1.0f - pan_factor);
             right_out[i] = input_val * pan_factor;
         }
-        sigma_printf("[VR/AUDIO]: HRTF Spatialization Complete.\n");
+        sigma_log_info("[VR/AUDIO]: HRTF Spatialization Complete.\n");
     }
 
     // --- 4. Stereoscopic Projection Matrix Multiplier ---
     void GenerateStereoscopicProjection(const float* vertex_in, float* left_eye_out, float* right_eye_out, 
                                         sigma_size_t vertex_count, float ipd) const {
-        sigma_printf("[VR/PROJECTION]: Calculating stereoscopic viewports with IPD separation %.3fm...\n", ipd);
+        sigma_log_info("[VR/PROJECTION]: Calculating stereoscopic viewports with IPD separation %.3fm...\n", ipd);
         
         // IPD = Interpupillary distance. Shift viewport left/right by half IPD
         float half_ipd = ipd / 2.0f;
@@ -108,7 +108,7 @@ public:
             right_eye_out[i * 3 + 1] = y;
             right_eye_out[i * 3 + 2] = z;
         }
-        sigma_printf("[VR/PROJECTION]: Stereoscopic matrix projections generated.\n");
+        sigma_log_info("[VR/PROJECTION]: Stereoscopic matrix projections generated.\n");
     }
 };
 
@@ -120,12 +120,12 @@ extern "C" {
 void vrstudio_init(void) {
     SigmaOS::Tools::g_hmd_connected  = SIGMA_FALSE;
     SigmaOS::Tools::g_active_windows = 0u;
-    sigma_printf("[VRSTUDIO] Sigma VR Studio initialized.");
+    sigma_log_info("[VRSTUDIO] Sigma VR Studio initialized.");
 }
 
 void vrstudio_connect(void) {
     SigmaOS::Tools::g_hmd_connected = SIGMA_TRUE;
-    sigma_printf("[VRSTUDIO] Head-Mounted Display Connected.");
+    sigma_log_info("[VRSTUDIO] Head-Mounted Display Connected.");
     
     // Demonstrate Spatial workspace components on connect
     SigmaOS::Tools::SovereignVRWorkspace workspace;
@@ -146,16 +146,17 @@ void vrstudio_connect(void) {
 void vrstudio_spawn(const char* app_name, float x, float y, float z) {
     (void)x; (void)y; (void)z;
     if (!SigmaOS::Tools::g_hmd_connected) {
-        sigma_printf("[VRSTUDIO] [ERROR] Cannot spawn window: HMD not connected.");
+        sigma_log_info("[VRSTUDIO] [ERROR] Cannot spawn window: HMD not connected.");
         return;
     }
     SigmaOS::Tools::g_active_windows++;
-    sigma_printf("[VRSTUDIO] Spawning spatial window: %s", app_name);
+    sigma_log_info("[VRSTUDIO] Spawning spatial window: %s", app_name);
 }
 
 void vrstudio_recenter(void) {
     if (!SigmaOS::Tools::g_hmd_connected) return;
-    sigma_printf("[VRSTUDIO] Recentering workspace.");
+    sigma_log_info("[VRSTUDIO] Recentering workspace.");
 }
 
 } /* extern "C" */
+

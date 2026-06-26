@@ -1,90 +1,38 @@
-# 🏛️ SigmaOS: A Modular, Experimental Operating System
+# SigmaOS
 
-SigmaOS is an experimental, bare-metal operating system kernel built to explore extreme modularity using C++ singleton patterns. While currently in a conceptual phase (v100.0), its goal is to provide a clean, zero-dependency alternative to legacy monolithic kernels.
+> **Zero-Dependency. Zero-Compromise. Sovereign Silicon.**
 
-## 🚀 Current Status (What SigmaOS Does Today)
+SigmaOS is an ambitious architectural leap in operating system design. It entirely disregards POSIX standards and `libc` reliance in favor of absolute computational sovereignty. Every driver, file system, and utility is built from scratch to guarantee transparency, security, and deterministic performance.
 
-SigmaOS is **not** a daily-driver operating system. Currently, the kernel can:
+## Architecture Overview
 
-- **Boot reliably in QEMU:** Using a Multiboot2 compliant binary and GRUB.
+SigmaOS utilizes a microkernel design combined with a unified userland shell (`sigma-sh`).
 
-- **Initialize Hardware:** Basic probing of the CPU and establishing serial output (COM1) for debugging.
+- **Bootloader**: Custom `sigma_secure_boot` ensuring only cryptographically verified binaries execute.
+- **Kernel Init**: Minimal footprint handling hardware interrupts, PCI enumeration, and CPU initialization.
+- **Memory Setup**: Sovereign buddy-system allocator (`sigma_allocator`).
+- **Scheduler**: Multi-branch support (e.g., Round Robin in `main`, deterministic EDF in `release/rtos`).
+- **Syscall Layer**: Distinct non-POSIX ABI to prevent external pollution.
 
-- **Allocate Memory:** A simple bare-metal bump allocator (QBMP) with basic guard checks.
+## Sovereign Components
 
-- **Execute Minimal Userland:** A barebones interactive shell (`sigma_sh`) is in development to provide basic I/O.
+- **Drivers**: Keyboard (PS/2), VGA Framebuffer, Storage (ATA/SATA/VirtIO), Network (e1000).
+- **File Systems**: Native sovereign implementations of FAT32 and Ext2.
+- **Tools**: Complete sovereign replacements for `ls`, `cat`, `awk`, `sed`, `tar`, and a minimal text-mode HTML browser.
 
-- **Demonstrate Architecture:** The entire kernel is divided into isolated C++ singletons ("Shards") that communicate via strict C-linkage interfaces.
-
-SigmaOS currently lacks a fully functional filesystem, robust device drivers (e.g., USB, GPU), and a mature networking stack, though stubs exist.
-
-## 🛠️ Building & Running
-
-### Dependencies
-
-- `make`
-
-- `nasm`
-
-- `g++` (multilib / cross-compiler)
-
-- `qemu-system-x86_64`
-
-- `grub-mkrescue` and `xorriso` (for ISO generation)
-
-### 1. Build the Kernel
+## Build Instructions
 
 ```bash
+# Clone the repository
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
+cd SigmaOS
 
-make clean
-make singularity
+# Build the main standalone image
+make PROFILE=standalone iso
 
+# Boot in QEMU
+./qemu-boot.sh standalone
 ```
 
-### This generates `sigmaos.bin`, the core Multiboot2 executable
-
-### 2. Generate a Bootable ISO
-
-```bash
-
-make zenith-iso
-
-```
-
-### Creates a GRUB-bootable ISO image for testing on hardware or VMs
-
-### 3. Run in Emulator
-
-```bash
-
-make qemu
-
-```
-
-### Boots the kernel in QEMU and pipes the internal kernel logs directly to your terminal
-
-## 📚 Glossary: Translating the Vision
-
-SigmaOS uses unique terminology for its architectural concepts. Here is what they mean in standard OS engineering terms: | SigmaOS Term | Standard Technical Meaning | | :------------------------------- | :----------------------------------------------------------------------------------------------- | | **Sovereign Lattice** | The operating system architecture as a whole. | | **Shard** | A distinct subsystem or driver encapsulated as a C++ Singleton class. | | **Amnesic Memory** | Stateless RAM allocation; memory buffers that are eagerly zeroed out after use to prevent leaks. | | **Zenith** | The target milestone version denoting a stable, complete foundation. | | **ZCLN (Zero-Copy Lattice Net)** | A zero-copy networking stack (bypassing redundant buffer copies between kernel and userland). | ## 🤝 Contributing
-
-We welcome contributions to help evolve SigmaOS from an experimental kernel into a fully usable distribution.
-
-- Please read [CONTRIBUTING.md](CONTRIBUTING) for our PR process and coding standards.
-
-## 🚀 Current Status (Zenith Supreme: Singularity Complete)
-
-SigmaOS has reached its architectural zenith. The kernel is now:
-
-- **600-Shard Modular Lattice:** Fully transitioned to OOP-isolated singletons.
-
-- **Neural UI Transpilation:** AVX-512 accelerated Morphic Zenith UI.
-
-- **Atomic Lattice Sync:** Zero-drift distributed filesystem state.
-
-- **Amnesic Security:** Zero-trace execution and quantum-safe identity vaults.
-
-For a detailed look at our implementation history, refer to the project Wiki and GitHub Insights.
-
----
-
-### Σ SIGMAOS: Absolute Sovereignty. Singularity Achieved
+## Branch Strategy
+SigmaOS maintains 19 distinct branches targeting various industrial applications. Check the `docs/ROADMAP.md` for our deployment timeline, or review the GitHub Wiki for per-branch guides.

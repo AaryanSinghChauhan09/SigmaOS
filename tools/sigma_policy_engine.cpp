@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA POLICY ENGINE (sigma_policy_engine) v1.0
+ * Î£ SIGMAOS: SIGMA POLICY ENGINE (sigma_policy_engine) v1.0
  * =========================================================================
  * Mission: Enforce enterprise rules across the lattice.
  * Inspiration: SELinux + Active Directory Group Policies.
@@ -22,18 +22,18 @@ public:
 
     void init() {
         m_policies_enforced = 0;
-        sigma_printf("[POLICY] Sigma Policy Engine v1.0 initialized.");
+        sigma_log_info("[POLICY] Sigma Policy Engine v1.0 initialized.");
     }
 
     void load_policy(const char* policy_name) {
         m_policies_enforced++;
-        sigma_printf("[POLICY] Loaded and enforced enterprise policy: '%s'", policy_name);
+        sigma_log_info("[POLICY] Loaded and enforced enterprise policy: '%s'", policy_name);
     }
 
     bool check_access(const char* subject, const char* object, const char* action) {
-        sigma_printf("[POLICY] Evaluating access: '%s' wants to '%s' on '%s'.", subject, action, object);
+        sigma_log_info("[POLICY] Evaluating access: '%s' wants to '%s' on '%s'.", subject, action, object);
         /* In production, this evaluates against the policy tree */
-        sigma_printf("[POLICY] Access GRANTED.");
+        sigma_log_info("[POLICY] Access GRANTED.");
         return true;
     }
 
@@ -50,3 +50,4 @@ void policy_init()                                                              
 void policy_load(const char* name)                                              { SigmaOS::Tools::SigmaPolicyEngine::getInstance().load_policy(name); }
 sigma_u8 policy_check(const char* sub, const char* obj, const char* act)        { return SigmaOS::Tools::SigmaPolicyEngine::getInstance().check_access(sub, obj, act) ? 1 : 0; }
 }
+

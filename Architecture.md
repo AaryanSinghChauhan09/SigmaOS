@@ -9,7 +9,25 @@ This document defines the strict execution boundaries between the Kernel Space a
 SigmaOS enforces a strict boundary using CPU privilege rings (Ring 0 and Ring 3):
 
 ```
-       +---------------------------------------------+
+[ Ring 3 / EL0 / U-Mode ]  (User Applications / Containers)
+   ^ 
+   | (Syscall Interface - Seccomp filtered via Profile)
+   v
+[ Ring 0 / EL1 / S-Mode ]  (SigmaOS Kernel / Scheduler / VMM / Zero-Trust Enforcer)
+   ^
+   | (SovereignHAL)
+   v
+[ Hardware / EL2/EL3 / M-Mode ] (CPU / PSCI / SBI / Secure Boot TPM)
+```
+
+## Directory Structure
+
+- `kernel/` (Core microkernel operations)
+- `drivers/` (Sovereign HAL interactions)
+- `hal/` (Multi-Arch Hardware Abstraction - x86_64, ARM64, RISC-V RV64GC)
+- `security/` (Zero-Trust IPC, Capability Sandbox, Runtime Attestation)
+- `resilience/` (Self-Healing, Process Restarts, Rollback Updates)
+- `net/` (QUIC, IPv6, Mesh Networking, WireGuard VPN)
        |                 RING 3: USERLAND            |
        |  - sh shell       - coreutils (ls, cat)    |
        |  - UI Renderer    - apps / web applications |

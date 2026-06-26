@@ -1,0 +1,13 @@
+# ~/.sigma_profile — Zenith personalization (key=value)
+# Copy to home directory on SigmaOS guest or merge into image overlay.
+
+theme=zenith-dark
+accent=007AFF
+wm_layout=master-stack
+gap_inner=4
+gap_outer=8
+animations=1
+auto_tile=1
+
+# Boot profile hint (see init/sigma_profile_selector.cpp)
+# boot_profile=desktop

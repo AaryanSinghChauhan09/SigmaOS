@@ -1,0 +1,27 @@
+{
+    "manifest_version": "1.0",
+    "package": {
+        "id": "com.community.example_app",
+        "name": "SigmaOS Example Community App",
+        "version": "1.0.0",
+        "author": "Community Contributor",
+        "license": "MIT",
+        "description": "A SlackBuilds-inspired template for submitting third-party packages to the Sovereign Package Registry."
+    },
+    "requirements": {
+        "architecture": ["x86_64", "arm64-rpi"],
+        "sigma_api_level": 15,
+        "permissions": [
+            "net.socket.bind",
+            "fs.read_only"
+        ]
+    },
+    "sandboxing": {
+        "strict_isolation": true,
+        "ui_integration": "spatial_window"
+    },
+    "build": {
+        "build_command": "make all",
+        "install_command": "make install DESTDIR=/opt/sigmaos/apps/example_app"
+    }
+}

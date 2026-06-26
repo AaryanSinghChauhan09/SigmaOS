@@ -12,3 +12,7 @@
 -nostdlib
 -fno-exceptions
 -fno-rtti
+-Ilib/musl/include
+-Ilib/mesa/include
+-Ilib/linux-drivers/include
+-Ilib/wayland/src

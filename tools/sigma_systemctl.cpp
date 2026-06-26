@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA SYSTEMCTL (sigma_systemctl) v1.0
+ * Î£ SIGMAOS: SIGMA SYSTEMCTL (sigma_systemctl) v1.0
  * =========================================================================
  * Mission: Service management and init orchestrator.
  * Inspiration: systemd / OpenRC / runit.
@@ -22,26 +22,26 @@ public:
 
     void init() {
         m_active_services = 0;
-        sigma_printf("[SYSTEMCTL] Sigma System Orchestrator v1.0 initialized.");
+        sigma_log_info("[SYSTEMCTL] Sigma System Orchestrator v1.0 initialized.");
     }
 
     void start_service(const char* service_name) {
         if (m_active_services >= 1024) return;
         m_active_services++;
-        sigma_printf("[SYSTEMCTL] Resolving dependencies for %s...", service_name);
-        sigma_printf("[SYSTEMCTL] Started service: '%s'. State: RUNNING.", service_name);
+        sigma_log_info("[SYSTEMCTL] Resolving dependencies for %s...", service_name);
+        sigma_log_info("[SYSTEMCTL] Started service: '%s'. State: RUNNING.", service_name);
     }
 
     void stop_service(const char* service_name) {
         if (m_active_services > 0) m_active_services--;
-        sigma_printf("[SYSTEMCTL] Sent SIGTERM to '%s'. State: STOPPED.", service_name);
+        sigma_log_info("[SYSTEMCTL] Sent SIGTERM to '%s'. State: STOPPED.", service_name);
     }
 
     void status_service(const char* service_name) const {
-        sigma_printf("[SYSTEMCTL] Status for '%s':", service_name);
-        sigma_printf("[SYSTEMCTL]  ● active (running) since Boot.");
-        sigma_printf("[SYSTEMCTL]  Tasks: 4 (limit: 512)");
-        sigma_printf("[SYSTEMCTL]  Memory: 12.4M");
+        sigma_log_info("[SYSTEMCTL] Status for '%s':", service_name);
+        sigma_log_info("[SYSTEMCTL]  â— active (running) since Boot.");
+        sigma_log_info("[SYSTEMCTL]  Tasks: 4 (limit: 512)");
+        sigma_log_info("[SYSTEMCTL]  Memory: 12.4M");
     }
 
 private:
@@ -58,3 +58,4 @@ void sysctl_start(const char* srv)              { SigmaOS::Tools::SigmaSystemCtl
 void sysctl_stop(const char* srv)               { SigmaOS::Tools::SigmaSystemCtl::getInstance().stop_service(srv); }
 void sysctl_status(const char* srv)             { SigmaOS::Tools::SigmaSystemCtl::getInstance().status_service(srv); }
 }
+

@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA GPU PROFILER (sigma_gpu_profiler) v1.0
+ * Î£ SIGMAOS: SIGMA GPU PROFILER (sigma_gpu_profiler) v1.0
  * =========================================================================
  * Mission: Real-time graphics performance analysis.
  * Inspiration: NVIDIA Nsight + AMD Radeon Developer Tool Suite.
@@ -25,7 +25,7 @@ public:
         m_vram_used = 0;
         m_gpu_utilization = 0;
         m_temperature_c = 40;
-        sigma_printf("[GPUPROF] Sigma GPU Profiler v1.0 initialized.");
+        sigma_log_info("[GPUPROF] Sigma GPU Profiler v1.0 initialized.");
     }
 
     void update_metrics(sigma_u32 vram_used, sigma_u8 util, sigma_u8 temp) {
@@ -35,13 +35,13 @@ public:
     }
 
     void dump_report() const {
-        sigma_printf("[GPUPROF] ====== GPU PERFORMANCE REPORT ======");
-        sigma_printf("[GPUPROF] VRAM Usage  : %u MB / %u MB", m_vram_used, m_vram_total);
-        sigma_printf("[GPUPROF] Core Util   : %u%%", m_gpu_utilization);
-        sigma_printf("[GPUPROF] Temperature : %u°C", m_temperature_c);
+        sigma_log_info("[GPUPROF] ====== GPU PERFORMANCE REPORT ======");
+        sigma_log_info("[GPUPROF] VRAM Usage  : %u MB / %u MB", m_vram_used, m_vram_total);
+        sigma_log_info("[GPUPROF] Core Util   : %u%%", m_gpu_utilization);
+        sigma_log_info("[GPUPROF] Temperature : %uÂ°C", m_temperature_c);
         
         if (m_temperature_c > 85) {
-            sigma_printf("[GPUPROF] WARNING: Thermal throttling threshold approaching.");
+            sigma_log_info("[GPUPROF] WARNING: Thermal throttling threshold approaching.");
         }
     }
 
@@ -61,3 +61,4 @@ void gpuprof_init()                                                  { SigmaOS::
 void gpuprof_update(sigma_u32 vram, sigma_u8 util, sigma_u8 temp)    { SigmaOS::Tools::SigmaGPUProfiler::getInstance().update_metrics(vram, util, temp); }
 void gpuprof_dump()                                                  { SigmaOS::Tools::SigmaGPUProfiler::getInstance().dump_report(); }
 }
+

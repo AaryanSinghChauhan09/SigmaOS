@@ -1,4 +1,4 @@
-#include "sigma_kernel_types.h"
+﻿#include "sigma_kernel_types.h"
 #include "sigma_hal.h"
 #include "sigma_log.h"
 #include "SigmaOOP.hpp"
@@ -22,8 +22,8 @@ SovereignDiagEngine& SovereignDiagEngine::getInstance() {
 
 void SovereignDiagEngine::init() {
     sigma_log_info("[DIAG] Initializing Sovereign Diagnostic Nexus...");
-    getInstance().m_initialized = 1U;
-    getInstance().m_fault_count = 0U;
+    getInstance().getInstance().m_initialized = 1U;
+    getInstance().getInstance().m_fault_count = 0U;
 }
 
 void SovereignDiagEngine::performScan() {
@@ -78,4 +78,5 @@ void diag_report(const char* shard, const char* desc) {
 
 
  
+
 

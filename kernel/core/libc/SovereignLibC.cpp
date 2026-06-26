@@ -2,10 +2,11 @@
 #include "sigma_kernel_types.h"
 #include "sigma_log.h"
 #include "libc/SovereignLibC.h"
-#include "sigma_log.h"
-#include <stdarg.h>
-#include "sigma_log.h"
 
+typedef __builtin_va_list va_list;
+#define va_start(v, l)  __builtin_va_start(v, l)
+#define va_end(v)       __builtin_va_end(v)
+#define va_arg(v, l)    __builtin_va_arg(v, l)
 extern "C" {
 
 /**
@@ -83,7 +84,7 @@ static void sigma_itoa(sigma_u64 n, char* buf, int base) {
     buf[j] = '\0';
 }
 
-void sigma_printf(const char* format, ...) {
+void sigma_log_info(const char* format, ...) {
     va_list args;
     va_start(args, format);
 
@@ -151,4 +152,5 @@ void sigma_log_industrial(const char* msg) {
 
 } // extern "C"
  
+
 

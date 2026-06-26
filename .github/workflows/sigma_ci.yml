@@ -16,7 +16,7 @@ jobs:
     - name: Install Toolchain
       run: |
         sudo apt-get update
-        sudo apt-get install -y gcc-multilib g++-multilib nasm make cppcheck
+        sudo apt-get install -y gcc-multilib g++-multilib nasm make cppcheck cmake clang-tidy
 
     - name: Clean & Ignite Lattice
       run: |
@@ -32,3 +32,12 @@ jobs:
         # Simple check to ensure critical shards are present
         ls -l sigmaos.bin
         [ -f sigmaos.bin ] || exit 1
+
+    - name: Run C++ Host Tests (GoogleTest & Clang-Tidy)
+      run: |
+        cd tests/cpp_host
+        mkdir build
+        cd build
+        cmake ..
+        cmake --build .
+        ctest --output-on-failure

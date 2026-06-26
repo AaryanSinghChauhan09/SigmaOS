@@ -1,6 +1,6 @@
-/*
+﻿/*
  * =========================================================================
- * Σ SIGMAOS: SIGMA EDGE VISION (sigma_edge_vision) v1.0
+ * Î£ SIGMAOS: SIGMA EDGE VISION (sigma_edge_vision) v1.0
  * =========================================================================
  * Mission: Computer vision toolkit for IoT.
  * Inspiration: OpenCV + NVIDIA DeepStream.
@@ -22,18 +22,18 @@ public:
 
     void init() {
         m_active_streams = 0;
-        sigma_printf("[EDGE_VIS] Sigma Edge Vision v1.0 initialized.");
+        sigma_log_info("[EDGE_VIS] Sigma Edge Vision v1.0 initialized.");
     }
 
     void attach_camera(const char* device_node) {
         if (m_active_streams >= 16) return;
         m_active_streams++;
-        sigma_printf("[EDGE_VIS] Camera attached at %s.", device_node);
+        sigma_log_info("[EDGE_VIS] Camera attached at %s.", device_node);
     }
 
     void process_frame() {
-        sigma_printf("[EDGE_VIS] Processing frame via tensor accelerators...");
-        sigma_printf("[EDGE_VIS] Object detected: Bounding box [100, 150, 300, 400]");
+        sigma_log_info("[EDGE_VIS] Processing frame via tensor accelerators...");
+        sigma_log_info("[EDGE_VIS] Object detected: Bounding box [100, 150, 300, 400]");
     }
 
 private:
@@ -49,3 +49,4 @@ void edgevis_init()                                    { SigmaOS::Tools::SigmaEd
 void edgevis_attach(const char* dev)                   { SigmaOS::Tools::SigmaEdgeVision::getInstance().attach_camera(dev); }
 void edgevis_process()                                 { SigmaOS::Tools::SigmaEdgeVision::getInstance().process_frame(); }
 }
+

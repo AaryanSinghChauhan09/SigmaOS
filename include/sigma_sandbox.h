@@ -1,35 +1,49 @@
-﻿/*
- * =========================================================================
- * Î£ SIGMAOS: SOVEREIGN SANDBOX CONTAINER (S-SANDBOX)
- * =========================================================================
- * Mission: Isolated, zero-trust execution environments for all applications.
- * =========================================================================
- */
-
 #ifndef SIGMA_SANDBOX_H
 #define SIGMA_SANDBOX_H
 
-#include "./sigma_kernel_types.h"
+#include "sigma_types.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+// ---------------------------------------------------------
+// SigmaOS Sandbox Capabilities
+// Defines fine-grained capability isolation rings for processes.
+// ---------------------------------------------------------
 
-typedef struct {
-    uint32_t container_id;
-    bool network_access;
-    bool fs_access;
-    uint32_t memory_limit;
-} sigma_sandbox_config_t;
+namespace sigma {
+namespace security {
 
-/* --- Sandbox Primitives --- */
-void sandbox_init(void);
-uint32_t sandbox_create_container(const sigma_sandbox_config_t* config);
-bool sandbox_execute(uint32_t container_id, const char* binary_path);
-void sandbox_destroy_container(uint32_t container_id);
+enum class SandboxRing : uint8_t {
+    RING_0_KERNEL = 0,
+    RING_1_DRIVER = 1,
+    RING_2_SERVICE = 2,
+    RING_3_USER = 3,
+    RING_4_WASM = 4  // Highest restriction, fully isolated
+};
 
-#ifdef __cplusplus
-}
-#endif
+struct CapabilityMask {
+    bool can_network : 1;
+    bool can_fs_write : 1;
+    bool can_fs_read : 1;
+    bool can_spawn_process : 1;
+    bool can_allocate_rwx : 1;
+};
 
-#endif /* SIGMA_SANDBOX_H */
+struct SovereignSandboxContext {
+    SandboxRing ring_level;
+    CapabilityMask caps;
+    uint64_t max_memory_bytes;
+    uint64_t current_memory_bytes;
+    uint32_t process_id;
+    
+    // Check if the process can perform a specific privileged action
+    bool check_capability(bool CapabilityMask::* cap_field) const {
+        // Ring 0 bypasses checks
+        if (ring_level == SandboxRing::RING_0_KERNEL) return true;
+        
+        return this->caps.*cap_field;
+    }
+};
+
+} // namespace security
+} // namespace sigma
+
+#endif // SIGMA_SANDBOX_H
