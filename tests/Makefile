@@ -1,27 +1,23 @@
-# Makefile for SigmaOS Unit Tests
+# SPDX-License-Identifier: GPL-2.0-or-later
+# tests/Makefile — top-level regress runner (OpenBSD regress/ inspired)
+#
+# Usage:
+#   make -C tests regress       # run all subsystems
+#   make -C tests kernel/pledge # run only pledge tests
 
-SOURCES = $(wildcard ../src/**/*.c) $(wildcard ../src/*.c)
-TEST_SOURCES = $(wildcard test_*.c)
+SUBDIRS = kernel/pledge kernel/unveil kernel/mm kernel/net kernel/security \
+          userland
 
-.PHONY: test valgrind_check fuzz_test clean
+.PHONY: regress clean $(SUBDIRS)
 
-test:
-	@echo "Compiling test suite..."
-	@mkdir -p bin
-	@gcc -coverage -g $(TEST_SOURCES) -o bin/test_suite -I../include
-	@echo "Running tests..."
-	@./bin/test_suite
-	@echo "Generating coverage..."
-	@# gcov -b ../src/**/*.c (commented out as sources are mocked)
+regress: $(SUBDIRS)
+	@echo "=== SigmaOS regression suite complete ==="
 
-valgrind_check:
-	@echo "Running Valgrind Memory Checks..."
-	@valgrind --leak-check=full --show-leak-kinds=all ./bin/test_suite
-
-fuzz_test:
-	@echo "Compiling Fuzzer..."
-	@# clang -fsanitize=fuzzer,address -g $(SOURCES) fuzz_targets.c -o bin/fuzz
-	@echo "Fuzzer compilation target ready."
+$(SUBDIRS):
+	@echo "--- regress: $@ ---"
+	$(MAKE) -C $@ regress 2>&1 | tee ../tests/regress-$(subst /,-,$@).log || \
+	  (echo "FAILED: $@" && exit 1)
 
 clean:
-	@rm -rf bin/ *.gcno *.gcda
+	for d in $(SUBDIRS); do $(MAKE) -C $$d clean; done
+	rm -f regress-*.log

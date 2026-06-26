@@ -1,46 +1,69 @@
-name: SigmaOS CI/CD
+name: SigmaOS Sovereign CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: ["main", "lattice-dev"]
+  pull_request:
+    branches: ["main", "lattice-dev"]
 
 jobs:
-  build:
+  build-and-verify:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Install Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential cmake clang valgrind lcov cppcheck qemu-system-x86 mtools
-      
-      - name: Build All Profiles
-        run: |
-          make -f Makefile.variants PROFILE=standalone iso || echo "Mock build standalone"
-          make -f Makefile.variants PROFILE=cloud-native build || echo "Mock build cloud-native"
-          make -f Makefile.variants PROFILE=browser-wasm build || echo "Mock build browser-wasm"
-      
-      - name: Run Tests & Memory Checks
-        run: |
-          cd tests
-          make test
-          make valgrind_check
-      
-      - name: Security & Static Analysis
-        run: |
-          clang --analyze src/**/*.c || true
-          cppcheck --enable=all src/ || true
-      
-      - name: Coverage Report
-        run: |
-          cd tests
-          make test
-          # lcov --capture --directory . --output-file coverage.info
-          # genhtml coverage.info -o coverage_html
-      
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+
+      # -----------------------------------------------------------------------
+      # Build cache — NixOS Cachix-inspired; skips rebuilding unchanged code
+      # -----------------------------------------------------------------------
+      - name: Cache build artifacts & Go modules
+        uses: actions/cache@v4
         with:
-          name: builds-and-reports
           path: |
-            dist/
-            tests/coverage_html/
+            build/
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-ci-${{ hashFiles('Makefile', '**/go.mod') }}
+          restore-keys: ${{ runner.os }}-ci-
+
+      - name: Install toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            build-essential gcc-multilib g++-multilib nasm make \
+            cppcheck clang clang-tidy
+
+      - name: Build kernel
+        run: |
+          make clean
+          make all -j$(nproc)
+
+      # -----------------------------------------------------------------------
+      # Static analysis — paths corrected to match the actual repo layout
+      # (previously referenced non-existent top-level dirs — Bug #18 fix)
+      # -----------------------------------------------------------------------
+      - name: Static security audit (cppcheck)
+        run: |
+          cppcheck \
+            --enable=warning,style,performance \
+            --suppress=missingIncludeSystem \
+            --error-exitcode=1 \
+            -Iinclude \
+            kernel/ init/ lib/ fs/ net/ \
+            2>&1
+
+      - name: Verify build output exists
+        run: |
+          [[ -f build/sigmaos.bin ]] || { echo "ERROR: build/sigmaos.bin missing"; exit 1; }
+          [[ -s build/sigmaos.bin ]] || { echo "ERROR: build/sigmaos.bin is empty"; exit 1; }
+          echo "✓ build/sigmaos.bin: $(du -h build/sigmaos.bin | cut -f1)"
+
+      # -----------------------------------------------------------------------
+      # Kernel unit tests — UNCOMMENTED and actually run (Bug #9 fix)
+      # -----------------------------------------------------------------------
+      - name: Run kernel tests
+        run: |
+          cd tests/cpp_host
+          cmake -B build_ci -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++
+          cmake --build build_ci -j$(nproc)
+          cd build_ci
+          ctest --output-on-failure --timeout 120

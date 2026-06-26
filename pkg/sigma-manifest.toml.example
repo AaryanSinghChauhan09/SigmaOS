@@ -1,0 +1,60 @@
+# sigma-manifest.toml — SigmaOS Package Manifest Format
+# Inspired by Alpine APK .PKGINFO + NixOS path-info
+# Validated by: sigma-pkg validate <path/to/sigma-manifest.toml>
+
+[package]
+name        = "zenith-browser"
+version     = "0.1.0"
+arch        = "x86_64"          # x86_64 | aarch64 | riscv64 | any
+license     = "GPL-2.0-or-later"
+description = "The SigmaOS Zenith browser shell"
+maintainer  = "sigma-core@sigma.os"  # Required — unmaintained → orphan@sigma.os
+url         = "https://github.com/AaryanSinghChauhan09/SigmaOS"
+
+[dependencies]
+# Each entry: "package >= min_version"
+runtime = [
+    "sigma-net >= 0.1.0",
+    "sigma-klib >= 0.1.0",
+]
+build = [
+    "cmake >= 3.20",
+    "ninja",
+]
+# Shared library → package mapping (Void Linux shlibs-inspired)
+# Prevents "works on my machine" broken installs
+shlibs = [
+    "libsigma_crypto.so.1  sigma-klib:0.1.0",
+    "libsigma_net.so.2     sigma-net:0.1.0",
+    "libzenith_render.so.1 zenith-desktop:0.1.0",
+]
+
+[[files]]
+path   = "/sigma/bin/zenith_browser"
+sha256 = "abc123deadbeef0000000000000000000000000000000000000000000000000"
+mode   = "0755"
+size   = 2097152
+
+[[files]]
+path   = "/sigma/share/zenith/resources.pak"
+sha256 = "cafebabe0000000000000000000000000000000000000000000000000000dead"
+mode   = "0644"
+size   = 8388608
+
+[signing]
+# NOTE ON CRYPTOGRAPHIC PRIMITIVES:
+#   Ed25519  → used for SIGNATURES (fast, well-audited, correct for this purpose)
+#   Dilithium3 → post-quantum alternative for signatures (CRYSTALS-Dilithium)
+#   Kyber-1024 → KEM only — used for KEY EXCHANGE, NOT signatures
+#   Do NOT use Kyber-1024 for package signing. It is a Key Encapsulation
+#   Mechanism, not a signature scheme. The hypervisor must be fixed to use
+#   Dilithium3 for image signature verification.
+algorithm = "ed25519"
+pubkey    = "sigma-official-signing-key-v1"
+signature = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+
+[sbom]
+# Software Bill of Materials — enables CVE scanning (NixOS / Alpine inspired)
+format    = "spdx-2.3"
+# Generated automatically by `sigma-pkg sbom <manifest>` — do not edit by hand
+spdx_id   = "SPDXRef-Package-zenith-browser-0.1.0"

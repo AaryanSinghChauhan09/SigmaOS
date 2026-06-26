@@ -1,0 +1,143 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+// sigma.proto — gRPC management API for SigmaOS daemons (Talos Linux-inspired)
+//
+// sigma-apid listens on /run/sigma/apid.sock and proxies all management
+// operations with mTLS authentication. The CLI (sigmactl) is a thin client.
+// Every call is audit-logged with a real monotonic timestamp.
+//
+// Generate Go stubs:
+//   protoc --go_out=. --go-grpc_out=. api/sigma.proto
+//
+// Generate C++ stubs:
+//   protoc --cpp_out=. --grpc_out=. --plugin=protoc-gen-grpc api/sigma.proto
+
+syntax = "proto3";
+package sigma.v1;
+
+option go_package = "sigma.os/api/v1";
+
+// ── Common types ────────────────────────────────────────────────────────────
+
+message Empty {}
+
+message ServiceRequest  { string name = 1; }
+message PidRequest      { uint32 pid  = 1; }
+message PackageRequest  { string name = 1; string version = 2; }
+message SysctlRequest   { string name = 1; }
+message SysctlSetRequest { string name = 1; string value = 2; }
+
+message ServiceStatus {
+    string  name        = 1;
+    string  state       = 2;  // "active" | "failed" | "inactive" | "starting"
+    uint32  pid         = 3;
+    int64   uptime_secs = 4;
+    int32   restart_count = 5;
+}
+
+message ServiceList { repeated ServiceStatus services = 1; }
+
+message LogLine {
+    int64  timestamp_ns = 1;  // monotonic nanoseconds (never hardcoded)
+    string level        = 2;  // "info" | "warn" | "error"
+    string message      = 3;
+}
+
+message PackageResult {
+    bool   success    = 1;
+    string version    = 2;
+    string error      = 3;
+}
+
+message PackageInfo {
+    string name       = 1;
+    string version    = 2;
+    string arch       = 3;
+    string state      = 4;  // "installed" | "available" | "upgrading"
+}
+
+message PackageList { repeated PackageInfo packages = 1; }
+
+message DeploymentStatus {
+    string current_commit  = 1;
+    string previous_commit = 2;
+    bool   rollback_available = 3;
+}
+
+message SystemInfo {
+    string  version         = 1;
+    string  arch            = 2;
+    string  profile         = 3;   // standalone | rtos | cloud | etc.
+    uint64  uptime_ns       = 4;
+    uint64  mem_total_kb    = 5;
+    uint64  mem_used_kb     = 6;
+    string  kernel_commit   = 7;
+}
+
+message SysctlValue {
+    string name  = 1;
+    string value = 2;
+    bool   readonly = 3;
+}
+
+// ── Security types ───────────────────────────────────────────────────────────
+
+message PledgeStatus {
+    uint32 pid          = 1;
+    bool   pledged      = 2;
+    uint64 promises     = 3;   // bitmask of SIGMA_PROMISE_* flags
+    uint32 violations   = 4;
+    uint32 last_violating_syscall = 5;
+}
+
+message UnveilEntry {
+    string path  = 1;
+    uint32 perms = 2;   // SIGMA_UV_READ | SIGMA_UV_WRITE | SIGMA_UV_EXEC | SIGMA_UV_CREATE
+}
+
+message UnveilList {
+    uint32 pid    = 1;
+    bool   locked = 2;
+    repeated UnveilEntry entries = 3;
+}
+
+message AuditEvent {
+    int64  timestamp_ns = 1;
+    string verdict      = 2;   // "ALLOW" | "DENY" | "REVOKE"
+    uint32 pid          = 3;
+    string spiffe_uri   = 4;
+    string capability   = 5;
+    string reason       = 6;
+}
+
+// ── SigmaAdmin service ────────────────────────────────────────────────────────
+
+service SigmaAdmin {
+    // ── Service management ──────────────────────────────────────────────────
+    rpc ListServices    (Empty)          returns (ServiceList);
+    rpc StartService    (ServiceRequest) returns (ServiceStatus);
+    rpc StopService     (ServiceRequest) returns (ServiceStatus);
+    rpc RestartService  (ServiceRequest) returns (ServiceStatus);
+    rpc GetServiceLogs  (ServiceRequest) returns (stream LogLine);
+
+    // ── Package management ──────────────────────────────────────────────────
+    rpc InstallPackage      (PackageRequest) returns (PackageResult);
+    rpc RemovePackage       (PackageRequest) returns (PackageResult);
+    rpc ListPackages        (Empty)          returns (PackageList);
+    rpc RollbackDeployment  (Empty)          returns (DeploymentStatus);
+    rpc GetDeploymentStatus (Empty)          returns (DeploymentStatus);
+
+    // ── System info ─────────────────────────────────────────────────────────
+    rpc GetSystemInfo (Empty)            returns (SystemInfo);
+    rpc GetSysctl     (SysctlRequest)    returns (SysctlValue);
+    rpc SetSysctl     (SysctlSetRequest) returns (SysctlValue);
+    rpc ListSysctl    (Empty)            returns (stream SysctlValue);
+
+    // ── Security / audit ────────────────────────────────────────────────────
+    rpc GetPledgeStatus  (PidRequest) returns (PledgeStatus);
+    rpc GetUnveilPaths   (PidRequest) returns (UnveilList);
+    rpc GetZeroTrustLogs (Empty)      returns (stream AuditEvent);
+
+    // ── Power ───────────────────────────────────────────────────────────────
+    rpc Reboot   (Empty) returns (Empty);
+    rpc Shutdown (Empty) returns (Empty);
+}

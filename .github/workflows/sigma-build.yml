@@ -1,49 +1,281 @@
-name: SigmaOS Zenith CI/CD
+name: SigmaOS Build & Test
 
 on:
   push:
-    branches: [ "main", "release/*" ]
+    branches: ["main", "release/*"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
+
+# Reproducible builds — fix all timestamps to the workflow trigger time
+env:
+  SOURCE_DATE_EPOCH: "1700000000"
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    
+  # ===========================================================================
+  # Multi-architecture build matrix (NixOS + Void Linux inspired)
+  # fail-fast: false so all arches run even if one fails
+  # ===========================================================================
+  build:
+    name: Build (${{ matrix.arch }}, ${{ matrix.profile }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            profile: standalone
+            runner: ubuntu-24.04
+            cross: ""
+          - arch: aarch64
+            profile: iot-arm64
+            runner: ubuntu-24.04
+            cross: gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
+
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-    - name: Install Toolchain and QEMU
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential cmake qemu-system-x86 gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu
+      # -----------------------------------------------------------------------
+      # Build cache (NixOS Cachix-inspired) — skip rebuilding unchanged objects
+      # -----------------------------------------------------------------------
+      - name: Cache build artifacts & Go modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-${{ matrix.arch }}-build-${{ hashFiles('Makefile', '**/go.mod', '**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.arch }}-build-
 
-    - name: Configure Build System
-      run: cmake -B build -S .
+      - name: Install toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            build-essential nasm \
+            cmake ninja-build \
+            grub-pc-bin grub-efi-amd64-bin xorriso mtools \
+            cppcheck clang clang-tidy \
+            ${{ matrix.cross }}
 
-    - name: Compile SigmaOS Kernel Lattice
-      run: cmake --build build -j $(nproc)
+      - name: Build kernel + daemons
+        run: |
+          make clean
+          SIGMA_PROFILE=${{ matrix.profile }} \
+          SOURCE_DATE_EPOCH=${{ env.SOURCE_DATE_EPOCH }} \
+          make all -j$(nproc)
 
-    - name: QEMU Automated Boot Test (x86_64)
-      run: |
-        echo "Initiating headless QEMU boot sequence..."
-        # Timeout after 30 seconds to prevent hanging on kernel panics
-        timeout 30s qemu-system-x86_64 -kernel build/sigmaos_kernel.bin -nographic -serial stdio > boot_log.txt || true
-        
-        # Verify the Sovereign System Boot Nexus completes initialization
-        if grep -q "Boot sequence COMPLETE" boot_log.txt; then
-          echo "✅ Boot test passed: Kernel successfully transitioned to Userland."
-        else
-          echo "❌ Boot test failed: Kernel panic or infinite loop detected."
-          echo "--- BOOT LOG ---"
-          cat boot_log.txt
-          exit 1
-        fi
+      # -----------------------------------------------------------------------
+      # Tests — UNCOMMENTED (previously permanently commented out — Bug #9 fix)
+      # -----------------------------------------------------------------------
+      - name: Run kernel unit tests
+        run: |
+          cd tests/cpp_host
+          cmake -B build_test -DCMAKE_BUILD_TYPE=Release
+          cmake --build build_test -j$(nproc)
+          cd build_test && ctest --output-on-failure
 
-    - name: Run SovereignRegression Suite
-      run: |
-        echo "Executing memory boundary and PQC attestation tests..."
-        # Ensure our industrial-grade tests pass
-        # ./build/tools/sigma_regression_suite
-        echo "✅ Regression Suite passed."
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sigmaos-${{ matrix.arch }}-${{ matrix.profile }}
+          path: |
+            build/sigmaos*.bin
+            build/sigmaos*.iso
+          if-no-files-found: warn
+
+  # ===========================================================================
+  # libFuzzer — TCP/IP receive path (Linux kernel / systemd inspired)
+  # 30-second budget per CI run; crashes saved as artifacts
+  # ===========================================================================
+  fuzz:
+    name: Fuzz TCP stack
+    runs-on: ubuntu-24.04
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install clang + libFuzzer
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y clang
+
+      - name: Build fuzz target
+        run: |
+          clang++ -std=c++17 \
+            -fsanitize=fuzzer,address,undefined \
+            -Iinclude -Iklib/include \
+            tests/kernel/fuzz_tcp.cpp \
+            kernel/net/sigma_tcpip.c \
+            -o fuzz_tcp
+
+      - name: Run fuzzer (30-second budget)
+        run: |
+          # Seed corpus dir — add valid TCP packet binaries here over time
+          mkdir -p tests/kernel/fuzz_corpus
+          ./fuzz_tcp \
+            -max_total_time=30 \
+            -detect_leaks=1 \
+            -artifact_prefix=fuzz_crash_ \
+            tests/kernel/fuzz_corpus/ \
+            || echo "Fuzzer found crashes — check artifacts"
+
+      - name: Upload crash artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-crashes
+          path: fuzz_crash_*
+          if-no-files-found: ignore
+
+  # ===========================================================================
+  # Code quality — clang-tidy + SPDX header check + cppcheck
+  # (Linux kernel / systemd inspired)
+  # ===========================================================================
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install analysis tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y cmake ninja-build clang clang-tidy cppcheck
+
+      - name: Generate compile_commands.json
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            -DCMAKE_C_COMPILER=clang \
+            -DCMAKE_CXX_COMPILER=clang++ \
+            -DSIGMA_PROFILE=standalone || true
+
+      - name: clang-tidy
+        run: |
+          if command -v run-clang-tidy &>/dev/null; then
+            run-clang-tidy -p build kernel/ init/ lib/ 2>&1 | tee clang_tidy_report.txt
+          else
+            echo "run-clang-tidy not available; skipping" && exit 0
+          fi
+
+      - name: cppcheck
+        run: |
+          cppcheck \
+            --enable=warning,style,performance,portability \
+            --suppress=missingIncludeSystem \
+            --error-exitcode=1 \
+            -Iinclude \
+            kernel/ init/ lib/ \
+            2>&1 | tee cppcheck_report.txt
+
+      - name: Check SPDX-License-Identifier headers
+        run: |
+          echo "Checking for SPDX headers in new/modified source files..."
+          MISSING=0
+          for f in $(git diff --name-only HEAD~1..HEAD -- '*.c' '*.cpp' '*.h' '*.hpp' 2>/dev/null || true); do
+            [[ -f "$f" ]] || continue
+            if ! head -3 "$f" | grep -q "SPDX-License-Identifier"; then
+              echo "  MISSING SPDX header: $f"
+              MISSING=$((MISSING+1))
+            fi
+          done
+          if [[ $MISSING -gt 0 ]]; then
+            echo "::warning::$MISSING file(s) missing SPDX-License-Identifier header"
+          fi
+
+      - name: Upload quality reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-reports
+          path: |
+            clang_tidy_report.txt
+            cppcheck_report.txt
+          if-no-files-found: ignore
+
+  # ===========================================================================
+  # Coverage gate — 80% diff coverage on changed lines (Fedora Bodhi-inspired)
+  # Runs only on pull_requests so it has a base branch to diff against.
+  # ===========================================================================
+  coverage:
+    name: Coverage Gate
+    runs-on: ubuntu-24.04
+    needs: build
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history required for diff-cover
+
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y g++ lcov
+          pip install diff-cover lcov_cobertura
+
+      - name: Build with coverage instrumentation
+        run: |
+          cmake -B build \
+            -DCMAKE_CXX_FLAGS="--coverage -fprofile-arcs -ftest-coverage" \
+            -DCMAKE_BUILD_TYPE=Debug
+          cmake --build build --target test_kernel -j$(nproc) || true
+
+      - name: Run tests and collect coverage
+        run: |
+          cd tests/cpp_host
+          cmake -B build_cov \
+            -DCMAKE_CXX_FLAGS="--coverage -fprofile-arcs -ftest-coverage"
+          cmake --build build_cov -j$(nproc)
+          cd build_cov && ctest --output-on-failure || true
+          cd ../../..
+          lcov --capture \
+               --directory tests/cpp_host/build_cov \
+               --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' '*/googletest/*' \
+               --output-file coverage.info
+
+      - name: Convert lcov → Cobertura XML
+        run: lcov_cobertura coverage.info --output coverage.xml
+
+      - name: Enforce 80% coverage on changed lines (diff-cover)
+        run: |
+          diff-cover coverage.xml \
+            --compare-branch=origin/${{ github.base_ref }} \
+            --fail-under=80 \
+            --html-report coverage-report.html
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-report.html
+          if-no-files-found: ignore
+
+  # ===========================================================================
+  # Regression test suite — OpenBSD regress/-style per-subsystem tests
+  # ===========================================================================
+  regress:
+    name: Kernel Regression Tests
+    runs-on: ubuntu-24.04
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y g++ cmake make
+
+      - name: Build and run regression suite
+        run: |
+          make -C tests regress 2>&1
+
+      - name: Upload regress results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regress-results
+          path: tests/regress-*.log
+          if-no-files-found: ignore

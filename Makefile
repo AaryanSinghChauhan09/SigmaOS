@@ -2,15 +2,45 @@
 # SIGMAOS: INDUSTRIAL KERNEL MAKEFILE (v15.0 - ZENITH)
 # =========================================================================
 
+# --- Reproducible builds (NixOS-inspired) ---------------------------------
+# Stamp every build with SOURCE_DATE_EPOCH so binaries are bit-for-bit
+# identical across machines when built from the same source tree.
+ifdef SOURCE_DATE_EPOCH
+  TIMESTAMP_FLAG = -DSIGMA_BUILD_TIMESTAMP=$(SOURCE_DATE_EPOCH)
+else
+  TIMESTAMP_FLAG =
+endif
+
 CC = x86_64-linux-gnu-gcc
 CXX = x86_64-linux-gnu-g++
 LD = x86_64-linux-gnu-ld
 ASM = nasm
 
-# Clear-Linux-inspired: LTO enabled by default for cross-file inlining and dead-code elimination
-CFLAGS = -Iinclude -Ilib/musl/include -Ilib/mesa/include -Ilib/linux-drivers/include -Ilib/wayland/src -ffreestanding -mno-red-zone -Wall -Wextra -O2 -fno-pie -flto
-CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -std=c++17
+# --- Kernel flags (freestanding — no host libc, no stack protector in ring 0)
+CFLAGS = -Iinclude -ffreestanding -mno-red-zone -mcmodel=kernel \
+         -fno-stack-protector -fno-exceptions -fno-rtti \
+         -Wall -Wextra -Werror=format-security \
+         -O2 -fno-pie -nostdlib \
+         $(TIMESTAMP_FLAG)
+CXXFLAGS = $(CFLAGS) -std=c++17
+
+# --- Userland / daemon hardening flags (Alpine-inspired) ------------------
+SIGMA_USERLAND_FLAGS = \
+  -fstack-protector-strong \
+  -fPIE \
+  -D_FORTIFY_SOURCE=2 \
+  -Wformat \
+  -Wformat-security \
+  -Werror=format-security
+
+SIGMA_USERLAND_LDFLAGS = \
+  -Wl,-z,relro \
+  -Wl,-z,now \
+  -pie
 ASMFLAGS = -f elf64
+
+# --- SPDX: all source files should carry GPL-2.0-or-later headers ---------
+# Enforced via CI; not a make rule, but documented here for contributors.
 
 BUILD_DIR = build
 ISO_DIR = $(BUILD_DIR)/iso
@@ -28,7 +58,7 @@ OBJS := $(patsubst %.c, $(BUILD_DIR)/%.o, $(C_SRCS)) \
         $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(CXX_SRCS)) \
         $(patsubst %.asm, $(BUILD_DIR)/%.o, $(ASM_SRCS))
 
-.PHONY: all clean iso qemu pgo-generate pgo-use
+.PHONY: all clean iso qemu
 
 all: iso
 
@@ -60,47 +90,98 @@ iso: $(KERNEL_BIN)
 qemu: iso
 	qemu-system-x86_64 -cdrom $(ISO_IMAGE) -serial stdio -m 2G
 
-# =========================================================================
-# RPi-Distro-inspired: ARM64 Embedded Scaling Target
-# Usage: make arm64-rpi
-# =========================================================================
-arm64-rpi:
-	@echo "[ARM64] Switching toolchain to aarch64-linux-gnu..."
-	$(MAKE) CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ LD=aarch64-linux-gnu-ld \
-	        CFLAGS="-Iinclude -ffreestanding -mcpu=cortex-a72 -Wall -Wextra -O2 -fno-pie" \
-	        KERNEL_BIN=$(BUILD_DIR)/sigmaos_arm64.bin iso
-	@echo "[ARM64] Successfully built SigmaOS for Raspberry Pi (embedded profile)."
-
-# =========================================================================
-# Debian-Edu-inspired: Specialized Editions
-# =========================================================================
-iso-iot:
-	@echo "[EDITION: IoT] Stripping GUI, forcing MINIMAL_MODE..."
-	$(MAKE) CFLAGS="$(CFLAGS) -DSIGMA_MINIMAL_MODE=1 -DSIGMA_STRIP_GUI=1" iso
-
-iso-research:
-	@echo "[EDITION: Research] Disabling strict sandboxing for compute clusters..."
-	$(MAKE) CFLAGS="$(CFLAGS) -DSIGMA_RELAX_SANDBOX=1 -DSIGMA_COMPUTE_CLUSTER=1" iso
-
-iso-secure:
-	@echo "[EDITION: Secure] Enforcing strict isolation and Tor routing default..."
-	$(MAKE) CFLAGS="$(CFLAGS) -DSIGMA_STRICT_ISOLATION=1 -DSIGMA_FORCE_TOR=1" iso
-
-# =========================================================================
-# Clear-Linux-inspired: Profile-Guided Optimization (PGO) skeleton
-# Usage: make pgo-generate  ->  run workload  ->  make pgo-use
-# =========================================================================
-pgo-generate:
-	@echo "[PGO] Phase 1: Compiling instrumented build for profiling..."
-	$(MAKE) CFLAGS="$(CFLAGS) -fprofile-generate=./pgo-data" CXXFLAGS="$(CXXFLAGS) -fprofile-generate=./pgo-data" iso
-	@echo "[PGO] Instrumented build ready. Run your benchmark/boot workload, then run: make pgo-use"
-
-pgo-use:
-	@echo "[PGO] Phase 2: Compiling optimized build using profile data..."
-	$(MAKE) CFLAGS="$(CFLAGS) -fprofile-use=./pgo-data -fprofile-correction" CXXFLAGS="$(CXXFLAGS) -fprofile-use=./pgo-data -fprofile-correction" iso
-	@echo "[PGO] Optimized PGO kernel built successfully."
-
 clean:
 	rm -rf $(BUILD_DIR)
-CONFIG_MONOLITHIC_DRIVERS=0
-CONFIG_MICROKERNEL=1
+
+# ── USE-flag-style feature toggles (Gentoo portage inspired) ─────────────────
+# Override on the command line:  make SIGMA_USE_AI_ENGINE=0
+# Or via a profile:              cmake -DCMAKE_TOOLCHAIN_FILE=profiles/iot-minimal.cmake
+SIGMA_USE_HYPERVISOR   ?= 1
+SIGMA_USE_AI_ENGINE    ?= 1
+SIGMA_USE_ZENITH_DE    ?= 1
+SIGMA_USE_CLUSTER      ?= 0
+SIGMA_USE_BLUETOOTH    ?= 1
+SIGMA_USE_WIFI         ?= 1
+SIGMA_USE_CRYPTFS      ?= 1
+SIGMA_USE_PQ_NET       ?= 0
+SIGMA_USE_WASM         ?= 0
+
+# Propagate USE flags as preprocessor defines into the kernel binary
+ifeq ($(SIGMA_USE_HYPERVISOR),1)
+  CFLAGS   += -DSIGMA_HAS_HYPERVISOR
+  CXXFLAGS += -DSIGMA_HAS_HYPERVISOR
+  SRC_DIRS += kernel/virt
+endif
+ifeq ($(SIGMA_USE_AI_ENGINE),1)
+  CFLAGS   += -DSIGMA_HAS_AI
+  CXXFLAGS += -DSIGMA_HAS_AI
+endif
+ifeq ($(SIGMA_USE_ZENITH_DE),0)
+  # Headless/server profile — exclude all GUI sources
+  CFLAGS   += -DSIGMA_HEADLESS
+  CXXFLAGS += -DSIGMA_HEADLESS
+endif
+ifeq ($(SIGMA_USE_CRYPTFS),1)
+  CFLAGS   += -DSIGMA_HAS_CRYPTFS
+  CXXFLAGS += -DSIGMA_HAS_CRYPTFS
+endif
+ifeq ($(SIGMA_USE_PQ_NET),1)
+  CFLAGS   += -DSIGMA_HAS_PQ_NET
+  CXXFLAGS += -DSIGMA_HAS_PQ_NET
+endif
+ifeq ($(SIGMA_USE_WASM),1)
+  CFLAGS   += -DSIGMA_HAS_WASM
+  CXXFLAGS += -DSIGMA_HAS_WASM
+endif
+
+# ── Immutable root option (Bottlerocket-inspired) ────────────────────────────
+# When ON: root is remounted read-only after pivot, sigma-pkg CLI is excluded.
+SIGMA_IMMUTABLE_ROOT ?= 0
+ifeq ($(SIGMA_IMMUTABLE_ROOT),1)
+  CFLAGS   += -DSIGMA_READONLY_ROOT=1
+  CXXFLAGS += -DSIGMA_READONLY_ROOT=1
+  # Remove sigma-pkg CLI from install targets — meaningless on immutable root
+  INSTALL_TARGETS := $(filter-out sigma-pkg-cli, $(INSTALL_TARGETS))
+  $(info [sigma] SIGMA_IMMUTABLE_ROOT=1: root will be remounted read-only at boot)
+endif
+
+# ── BR2_BROKEN-style stub tracker (Buildroot-inspired) ───────────────────────
+# Any subsystem listed here is a known stub. A warning is printed on every
+# build. Release builds (SIGMA_RELEASE_BUILD=1) FAIL if any stubs are enabled.
+#
+# To suppress a warning while working on a stub: set SIGMA_USE_<NAME>=0
+# To fix a stub: implement it and remove it from this list.
+SIGMA_BROKEN_SUBSYSTEMS := \
+  sigma-jail       "Only prints to console — no real namespace isolation"       \
+  sigma-mac        "Always returns GRANTED — no policy evaluation"              \
+  sigma-cryptfs    "derive_key() is a stub — encryption is never applied"       \
+  sigma-rollback   "sigma_ostree replaces this — old file was 404"             \
+  sigma-cluster    "No distributed consensus implemented yet"                   \
+  kernel/core      "Directory is empty — scheduler/mm/syscall files missing"
+
+define PRINT_BROKEN
+  @echo "  [STUB] $(1): $(2)"
+endef
+
+.PHONY: check-stubs
+check-stubs:
+	@echo ""
+	@echo "╔══════════════════════════════════════════════════════════════╗"
+	@echo "║      SIGMA WARNING: STUB SUBSYSTEMS PRESENT IN BUILD        ║"
+	@echo "╠══════════════════════════════════════════════════════════════╣"
+	@echo "║  sigma-jail:    Only prints — no real namespace isolation   ║"
+	@echo "║  sigma-mac:     Always GRANTED — no policy evaluation       ║"
+	@echo "║  sigma-cryptfs: derive_key() stub — encryption not applied  ║"
+	@echo "║  sigma-rollback:sigma_ostree replaces this                  ║"
+	@echo "║  sigma-cluster: No distributed consensus implemented        ║"
+	@echo "║  kernel/core:   Directory empty — core files missing        ║"
+	@echo "╠══════════════════════════════════════════════════════════════╣"
+	@echo "║  Fix or set SIGMA_USE_<SUBSYSTEM>=0 to suppress.            ║"
+	@echo "╚══════════════════════════════════════════════════════════════╝"
+	@echo ""
+ifeq ($(SIGMA_RELEASE_BUILD),1)
+	$(error Release build blocked: stub subsystems present. Implement them or set SIGMA_USE_<SUBSYSTEM>=0)
+endif
+
+# Run stub check before every build
+all: check-stubs
