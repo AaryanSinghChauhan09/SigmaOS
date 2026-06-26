@@ -133,3 +133,55 @@ ifeq ($(SIGMA_USE_WASM),1)
   CFLAGS   += -DSIGMA_HAS_WASM
   CXXFLAGS += -DSIGMA_HAS_WASM
 endif
+
+# ── Immutable root option (Bottlerocket-inspired) ────────────────────────────
+# When ON: root is remounted read-only after pivot, sigma-pkg CLI is excluded.
+SIGMA_IMMUTABLE_ROOT ?= 0
+ifeq ($(SIGMA_IMMUTABLE_ROOT),1)
+  CFLAGS   += -DSIGMA_READONLY_ROOT=1
+  CXXFLAGS += -DSIGMA_READONLY_ROOT=1
+  # Remove sigma-pkg CLI from install targets — meaningless on immutable root
+  INSTALL_TARGETS := $(filter-out sigma-pkg-cli, $(INSTALL_TARGETS))
+  $(info [sigma] SIGMA_IMMUTABLE_ROOT=1: root will be remounted read-only at boot)
+endif
+
+# ── BR2_BROKEN-style stub tracker (Buildroot-inspired) ───────────────────────
+# Any subsystem listed here is a known stub. A warning is printed on every
+# build. Release builds (SIGMA_RELEASE_BUILD=1) FAIL if any stubs are enabled.
+#
+# To suppress a warning while working on a stub: set SIGMA_USE_<NAME>=0
+# To fix a stub: implement it and remove it from this list.
+SIGMA_BROKEN_SUBSYSTEMS := \
+  sigma-jail       "Only prints to console — no real namespace isolation"       \
+  sigma-mac        "Always returns GRANTED — no policy evaluation"              \
+  sigma-cryptfs    "derive_key() is a stub — encryption is never applied"       \
+  sigma-rollback   "sigma_ostree replaces this — old file was 404"             \
+  sigma-cluster    "No distributed consensus implemented yet"                   \
+  kernel/core      "Directory is empty — scheduler/mm/syscall files missing"
+
+define PRINT_BROKEN
+  @echo "  [STUB] $(1): $(2)"
+endef
+
+.PHONY: check-stubs
+check-stubs:
+	@echo ""
+	@echo "╔══════════════════════════════════════════════════════════════╗"
+	@echo "║      SIGMA WARNING: STUB SUBSYSTEMS PRESENT IN BUILD        ║"
+	@echo "╠══════════════════════════════════════════════════════════════╣"
+	@echo "║  sigma-jail:    Only prints — no real namespace isolation   ║"
+	@echo "║  sigma-mac:     Always GRANTED — no policy evaluation       ║"
+	@echo "║  sigma-cryptfs: derive_key() stub — encryption not applied  ║"
+	@echo "║  sigma-rollback:sigma_ostree replaces this                  ║"
+	@echo "║  sigma-cluster: No distributed consensus implemented        ║"
+	@echo "║  kernel/core:   Directory empty — core files missing        ║"
+	@echo "╠══════════════════════════════════════════════════════════════╣"
+	@echo "║  Fix or set SIGMA_USE_<SUBSYSTEM>=0 to suppress.            ║"
+	@echo "╚══════════════════════════════════════════════════════════════╝"
+	@echo ""
+ifeq ($(SIGMA_RELEASE_BUILD),1)
+	$(error Release build blocked: stub subsystems present. Implement them or set SIGMA_USE_<SUBSYSTEM>=0)
+endif
+
+# Run stub check before every build
+all: check-stubs

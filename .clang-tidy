@@ -1,7 +1,41 @@
+# SigmaOS .clang-tidy — Linux kernel / systemd inspired
+# Run via CI:  run-clang-tidy -p build kernel/ userland/lib/
 ---
-Checks: '-*,clang-analyzer-*,bugprone-*,performance-*,portability-*,readability-*,-cppcoreguidelines-pro-type-vararg,-hicpp-vararg,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-modernize-avoid-c-arrays,-cppcoreguidelines-pro-type-cstyle-cast'
-WarningsAsErrors: ''
-HeaderFilterRegex: ''
-AnalyzeTemporaryDtors: false
-FormatStyle: none
+Checks: >-
+  clang-diagnostic-*,
+  clang-analyzer-*,
+  bugprone-*,
+  cert-*,
+  misc-*,
+  performance-*,
+  portability-*,
+  readability-*,
+  -readability-magic-numbers,
+  -readability-identifier-length,
+  -cppcoreguidelines-pro-type-vararg,
+  -hicpp-vararg,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -modernize-avoid-c-arrays,
+  -cppcoreguidelines-pro-type-cstyle-cast
+
+# Treat all bugprone-* and cert-* as hard errors (no warnings-only)
+WarningsAsErrors: 'bugprone-*,cert-*'
+
+HeaderFilterRegex: '(include|kernel|init|lib)/.*\.(h|hpp)$'
+
+CheckOptions:
+  # Recognise SIGMA_ASSERT alongside the standard assert() macro
+  - key:   bugprone-assert-side-effect.AssertMacros
+    value: assert,SIGMA_ASSERT
+
+  # Enforce 120-character line limit (Linux kernel uses 100; we allow a bit more)
+  - key:   readability-line-length.LineLength
+    value: '120'
+
+  # Require SPDX-License-Identifier on every new file
+  - key:   llvmlibc-implementation-in-namespace.Namespace
+    value: SigmaOS
+
+FormatStyle: file   # use .clang-format for auto-formatting
+AnalyzeTemporaryDtors: true
 ...

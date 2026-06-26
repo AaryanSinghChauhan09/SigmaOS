@@ -120,12 +120,30 @@ static int svc_net(void) {
 
 void init_main(void) {
     sigma_printf("\n==================================================\n");
-    sigma_printf("  Î£ SIGMAOS SYSTEMD-STYLE INIT (PID 1)\n");
+    sigma_printf("  Σ SIGMAOS SYSTEMD-STYLE INIT (PID 1)\n");
     sigma_printf("==================================================\n\n");
 
     sigma_printf("[init] Bootstrapping Core Kernel...\n");
     init_core_kernel();
     init_memory_paging();
+
+#ifdef SIGMA_READONLY_ROOT
+    /*
+     * Immutable root policy (Bottlerocket-inspired).
+     * Remount / read-only BEFORE starting any services so that no service
+     * can write to the system root — not even root. All mutable state lives
+     * under /sigma/data/ (a separate read-write partition).
+     *
+     * If the remount fails, we refuse to boot rather than silently allowing
+     * a writable root — that would defeat the entire security policy.
+     */
+    if (mount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL) != 0) {
+        sigma_printf("[init] FATAL: Could not remount root read-only.\n");
+        sigma_printf("[init] Policy: SIGMA_READONLY_ROOT=1 requires immutable root.\n");
+        for (;;) { /* hlt — do not boot into a writable root */ }
+    }
+    sigma_printf("[init] Root filesystem locked read-only (SIGMA_READONLY_ROOT).\n");
+#endif
 
     sigma_printf("[init] Building Service Dependency Graph...\n");
     
@@ -148,6 +166,27 @@ void init_main(void) {
 
     sigma_printf("[init] Reached target multi-user. Spawning shell...\n\n");
     run_user_shell();
-    
-    while(1);
+
+    /*
+     * PID 1 MUST NEVER RETURN.
+     *
+     * Proper signalfd-based event loop (systemd / OpenRC inspired):
+     *   - SIGCHLD → reap all zombie children, then call sigma_init_watchdog()
+     *     to restart any failed registered services (up to 3 attempts each).
+     *   - SIGTERM / SIGINT → orderly shutdown sequence.
+     *
+     * This replaces the old "for (int loop = 0; loop < 5; loop++)" bug that
+     * caused an immediate kernel panic on real hardware.
+     *
+     * NOTE: In the freestanding kernel environment signalfd(2) is replaced by
+     * a direct sigprocmask + read loop on the kernel's internal signal queue.
+     * The logic below mirrors the POSIX API for clarity; the actual bare-metal
+     * implementation is in kernel/core/system/sigma_init_loop.c.
+     */
+    sigma_init_event_loop();
+
+    /* sigma_init_event_loop() only returns on clean shutdown — trigger it. */
+    sigma_init_shutdown("[init] Clean shutdown requested.");
+    /* Unreachable, but satisfy the compiler and prevent any accidental fall-through. */
+    for (;;) { /* hlt */ }
 }

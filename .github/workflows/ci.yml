@@ -2,38 +2,68 @@ name: SigmaOS Sovereign CI
 
 on:
   push:
-    branches: [ "main", "lattice-dev" ]
+    branches: ["main", "lattice-dev"]
   pull_request:
-    branches: [ "main", "lattice-dev" ]
+    branches: ["main", "lattice-dev"]
 
 jobs:
-  build:
+  build-and-verify:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-    - name: Setup Build Environment
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential gcc-multilib g++-multilib
+      # -----------------------------------------------------------------------
+      # Build cache — NixOS Cachix-inspired; skips rebuilding unchanged code
+      # -----------------------------------------------------------------------
+      - name: Cache build artifacts & Go modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-ci-${{ hashFiles('Makefile', '**/go.mod') }}
+          restore-keys: ${{ runner.os }}-ci-
 
-    - name: Validate Shard Architecture
-      run: |
-        echo "Validating 600-shard lattice integrity..."
-        # Add scripts to validate zero-dependency constraints
-        
-    - name: Compile Sovereign Kernel
-      run: |
-        echo "Compiling S-HAL and Core Shards..."
-        # make singularity
+      - name: Install toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            build-essential gcc-multilib g++-multilib nasm make \
+            cppcheck clang clang-tidy
 
-    - name: Build UI Components
-      run: |
-        echo "Validating Glassmorphic Zenith Dashboard..."
-        # make zenith
-        
-    - name: Run Shard-Isolated Tests
-      run: |
-        echo "Running automated security and memory sanitizers..."
-        # make test
+      - name: Build kernel
+        run: |
+          make clean
+          make all -j$(nproc)
+
+      # -----------------------------------------------------------------------
+      # Static analysis — paths corrected to match the actual repo layout
+      # (previously referenced non-existent top-level dirs — Bug #18 fix)
+      # -----------------------------------------------------------------------
+      - name: Static security audit (cppcheck)
+        run: |
+          cppcheck \
+            --enable=warning,style,performance \
+            --suppress=missingIncludeSystem \
+            --error-exitcode=1 \
+            -Iinclude \
+            kernel/ init/ lib/ fs/ net/ \
+            2>&1
+
+      - name: Verify build output exists
+        run: |
+          [[ -f build/sigmaos.bin ]] || { echo "ERROR: build/sigmaos.bin missing"; exit 1; }
+          [[ -s build/sigmaos.bin ]] || { echo "ERROR: build/sigmaos.bin is empty"; exit 1; }
+          echo "✓ build/sigmaos.bin: $(du -h build/sigmaos.bin | cut -f1)"
+
+      # -----------------------------------------------------------------------
+      # Kernel unit tests — UNCOMMENTED and actually run (Bug #9 fix)
+      # -----------------------------------------------------------------------
+      - name: Run kernel tests
+        run: |
+          cd tests/cpp_host
+          cmake -B build_ci -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++
+          cmake --build build_ci -j$(nproc)
+          cd build_ci
+          ctest --output-on-failure --timeout 120
