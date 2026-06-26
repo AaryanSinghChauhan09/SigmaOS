@@ -3,6 +3,7 @@
 - [Building from Source](Building-from-Source)
 - [Branch Guide](Branch-Guide)
 - [Contributor Roadmap](Contributor-Roadmap)
+- [Improvements Overview](Improvements-Overview)
 
 ## Architecture
 - [Architecture Overview](Architecture-Overview)
