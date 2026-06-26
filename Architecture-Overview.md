@@ -1,142 +1,126 @@
-# SigmaOS Architecture Overview
+# Architecture Overview
 
-This page describes the high-level structure of the SigmaOS Zenith microkernel.
-
----
-
-## Ring Architecture
+SigmaOS is structured as four clearly separated layers. Each layer communicates only with the one directly below it, enforcing strict isolation boundaries.
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  Ring-3 (Userland)                                  │
-│  sigma-sh | sigma-forensics | Zenith Desktop UI     │
-└─────────────────────┬───────────────────────────────┘
-                      │ syscall / SYSRET
-┌─────────────────────▼───────────────────────────────┐
-│  SyscallDispatcher  (256-slot O(1) C table)         │
-└─────────────────────┬───────────────────────────────┘
-                      │
-┌─────────────────────▼───────────────────────────────┐
-│  Ring-0 (Kernel Lattice)                            │
-│  Scheduler | Allocator | VFS | IPC | PQC Engine     │
-└─────────────────────┬───────────────────────────────┘
-                      │
-┌─────────────────────▼───────────────────────────────┐
-│  S-HAL (Hardware Abstraction Layer)                 │
-│  x86_64 APIC | ARM64 GIC | RISC-V PLIC/CLINT       │
-└─────────────────────┬───────────────────────────────┘
-                      │
-              Physical Hardware
-
+┌─────────────────────────────────────────────────────────────┐
+│                     USER LAYER                              │
+│  SigmaOS Shell (React/Svelte) · PWAs · Browser Extensions  │
+│  Workspaces · AI Kits · Resource Manager · Zenith Desktop   │
+├─────────────────────────────────────────────────────────────┤
+│                    BROWSER LAYER                            │
+│  Custom Chromium Fork · SigmaOS Extension · Multi-profile  │
+│  Native Messaging Host · Tab Suspension · SigmaOS APIs      │
+├─────────────────────────────────────────────────────────────┤
+│                    SYSTEM LAYER (Go Daemons)                │
+│  sigmad-process · sigmad-clipboard · sigmad-bluetooth       │
+│  sigmad-workspace · sigmad-window · sigmad-ai (TinyLlama)   │
+├─────────────────────────────────────────────────────────────┤
+│                    OS BASE LAYER                            │
+│  Buildroot Linux · systemd · bubblewrap · seccomp           │
+│  Sovereign Microkernel · Physical Hardware                  │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Key Subsystems
+## Layer 1: OS Base
 
-| Subsystem | File | Purpose | 
-| :--- | :--- | :--- | 
-| **S-HAL** | `hal/SovereignHAL.cpp` | Platform-agnostic register access | 
-| **Scheduler** | `kernel/scheduler/SovereignScheduler.cpp` | CFS + NUMA + SCHED_SOVEREIGN | 
-| **Allocator** | `kernel/core/SovereignAllocator.cpp` | O(1) lockless slab | 
-| **SPSC IPC** | `kernel/core/ipc/SovereignSPSCQueue.hpp` | Zero-copy ring buffers | 
-| **Syscalls** | `kernel/core/SovereignSyscall.cpp` | Modular C dispatch table | 
-| **VFS** | `kernel/core/SovereignVFS.cpp` | ZFS-inspired virtual FS | 
-| **Vulkan** | `kernel/core/vulkan/sovereign_vulkan.c` | Direct SPIR-V GPU routing | 
-| **UI** | `kernel/core/SovereignZenithUI.cpp` | Glassmorphic compositor | 
-| **PQC** | `kernel/core/SovereignPQC.cpp` | Dilithium-5 attestation | 
+The foundation is a **minimal Linux image built with Buildroot**. There is no traditional desktop environment, no display manager, no package manager visible to the user. The only process that matters at this level is systemd, which starts Chromium directly.
+
+Key components:
+- **Buildroot**: Produces a stripped Linux root filesystem (~50 MB). Only what's needed to run Chromium and the Go daemons is included.
+- **systemd**: PID 1. Starts Chromium in kiosk mode and all `sigmad-*` daemons on boot.
+- **bubblewrap (bwrap)**: Userland sandboxing tool. Every process spawned by a web app is wrapped in isolated Linux namespaces (PID, network, mount, user).
+- **seccomp**: Syscall filtering layer. Limits the syscalls available inside each bwrap container to only what the app's capability manifest declares.
+- **Sovereign Microkernel** (bare-metal mode): Custom x86_64 freestanding kernel with MLFQ scheduler, VMM with 4-level paging, VFS, TCP/IP stack, and shard manager.
 
 ---
 
-## Boot Sequence
+## Layer 2: System Daemons
 
-1. `SovereignHAL::initializeHAL()` — CPU arch detection, MMIO mapping
-2. `SovereignAllocator::init()` — Slab bucket setup
-3. `syscall_init()` — Dispatch table population
-4. `sigma_scheduler_numa_balance()` — NUMA shard pinning
-5. `SovereignVFS::mount()` — Root filesystem mount
-6. `svk_init()` — GPU command queue reset
-7. Drop to Ring-3, launch `sigma-sh`
+Go-language daemons that bridge the kernel/OS to the browser. Each daemon handles one domain and communicates with the Chrome extension via Chrome's native messaging protocol over a Unix socket.
 
----
+| Daemon | Port / Socket | Responsibility |
+|---|---|---|
+| `sigmad-process` | `/run/sigma/process.sock` | Spawn processes, stream stdout/stderr via SSE, manage PTYs |
+| `sigmad-clipboard` | `/run/sigma/clipboard.sock` | Shared clipboard across all web apps |
+| `sigmad-bluetooth` | `/run/sigma/bt.sock` | BlueZ wrapper, device scan/pair/connect |
+| `sigmad-workspace` | `/run/sigma/ws.sock` | Virtual workspace state (create, switch, close) |
+| `sigmad-window` | `/run/sigma/window.sock` | Native frameless window lifecycle |
+| `sigmad-hotplug` | `/run/sigma/hotplug.sock` | USB/storage device events and safe eject |
+| `sigmad-ai` | `localhost:17392` | TinyLlama inference endpoint (`/v1/complete`, `/v1/predict`) |
+| `sigmad-fleet` | `localhost:17400` | Enterprise telemetry streaming via SSE |
 
-## 🚀 Expanded Layered Architecture Diagram
-
-The **SigmaOS Sovereign Lattice** is built on a decoupled, failure-isolated, 4-tier model integrating advanced computing foundations and Linux distribution models:
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                      TOP LAYER: USER-FACING INTELLIGENCE                    │
-│   ┌──────────────────────────┐  ┌────────────────────────┐  ┌───────────┐   │
-│   │ NLP (spaCy / HF Tokens)  │  │ Bayesian Networks      │  │ GraphQL   │   │
-│   ├──────────────────────────┤  ├────────────────────────┤  ├───────────┤   │
-│   │ Real-Time Forecasters    │  │ Interactive D3/Plotly  │  │ WASM GUI  │   │
-│   └──────────────────────────┘  └────────────────────────┘  └───────────┘   │
-└──────────────────────────────────────┬──────────────────────────────────────┘
-                                       │
-┌──────────────────────────────────────▼──────────────────────────────────────┐
-│                    MIDDLE LAYER: WAREHOUSE, PIPELINES & MODEL                │
-│   ┌──────────────────────────┐  ┌────────────────────────┐  ┌───────────┐   │
-│   │ Galaxy Hybrid Schemas    │  │ Apache Airflow DAGs    │  │ Neo4j     │   │
-│   ├──────────────────────────┤  ├────────────────────────┤  ├───────────┤   │
-│   │ Columnar Parquet / ORC   │  │ Min-Max / Robust CIRT  │  │ Ontologies│   │
-│   └──────────────────────────┘  └────────────────────────┘  └───────────┘   │
-└──────────────────────────────────────┬──────────────────────────────────────┘
-                                       │
-┌──────────────────────────────────────▼──────────────────────────────────────┐
-│                  FOUNDATION LAYER: SOVEREIGN KERNEL & COMPUTE               │
-│   ┌──────────────────────────┐  ┌────────────────────────┐  ┌───────────┐   │
-│   │ PQC Kernel (Dilithium-5) │  │ Ring-3 Xen Micro-VMs   │  │ Formal Coq│   │
-│   ├──────────────────────────┤  ├────────────────────────┤  ├───────────┤   │
-│   │ Dynamic GPU scheduling   │  │ Gentoo Auto-Optimize   │  │ SELinux   │   │
-│   └──────────────────────────┘  └────────────────────────┘  └───────────┘   │
-└─────────────────────────────────────────────────────────────────────────────┘
-  ▲                                                                         ▲
-  └────────────────────────────────────┬────────────────────────────────────┘
-                  CROSS-CUTTING: COMPLIANCE, TRACING & AUDIT
-     ┌─────────────────────────────────────────────────────────────────┐
-     │ Coverity / SonarQube Static analysis | Strace & Perf tracing    │
-     └─────────────────────────────────────────────────────────────────┘
-```
+All daemons are **capability-gated**: the Chrome extension checks the app's declared capabilities before forwarding any request. An app without `caps: ["process:spawn"]` cannot call `sigmad-process`.
 
 ---
 
-## 📈 Unified Sovereign End-to-End Workflow
+## Layer 3: Browser (Custom Chromium Fork)
 
-The following pipeline demonstrates how a real-time data frame moves from distributed ingestion to core operating system scheduling adjustments:
+The SigmaOS Chromium fork adds:
 
-```
- ┌──────────────────────┐      Ingested SQL Transaction
- │ Relational Ingestion │ ───► Star/Snowflake Hybrid Galaxy DB (ACID + BASE)
- └──────────────────────┘
-            │
-            ▼
- ┌──────────────────────┐      Sovereign Airflow Pipeline
- │   Data Pipeline/ETL  │ ───► Columnar Parquet -> Robust Mean/IQR Imputer
- └──────────────────────┘
-            │
-            ▼
- ┌──────────────────────┐      spaCy Tokenizer & PyTorch model
- │  AI / ML Inference   │ ───► Logistical Predictions & Federated Learning
- └──────────────────────┘
-            │
-            ▼
- ┌──────────────────────┐      GraphQL Subscriptions API
- │  Visual Analytics    │ ───► WASM-boosted Grafana Dashboard (D3.js)
- └──────────────────────┘
-            │
-            ▼
- ┌──────────────────────┐      S-AI-TEL System Telemetry Shield
- │   Lattice Feedback   │ ───► Dynamic CFS Scheduler CPU Boost (SLA Enforced)
- └──────────────────────┘
-```
-
-1.  **Ingestion**: Incoming enterprise data transactions are captured by CockroachDB/YugabyteDB compatible interfaces inside `SovereignOmniMatrix.cpp`.
-2.  **ETL & Preprocessing**: Automated DAG workflows transform raw tabular streams into high-density Columnar Parquet structures. Missing entries are dynamically imputed, and values are normalized via `SovereignDataPreprocess.cpp`.
-3.  **AI Predictions & NLP**: Natural Language processing modules (spaCy style) tokenize query metadata, generating input feature vectors. ML models execute local PyTorch/TensorFlow predictions while federated learning keeps data private.
-4.  **Web Presentation**: A high-efficiency GraphQL subscription API pushes updated analytical points to user browsers, where WebAssembly-accelerated canvases draw interactive Grafana-style dashboards.
-5.  **Adaptive Scheduling Feedback**: The SLA monitor (`sigma_enterprise_sla_manager.cpp`) intercepts long-tail latencies. It signals the microkernel CFS scheduler to elevate worker threads, ensuring system uptime and meeting SLAs.
+- **`navigator.sigmaos` API surface** — the full platform API available to web apps and PWAs.
+- **SigmaOS Extension** — a privileged Chrome extension acting as the capability gatekeeper. It intercepts `navigator.sigmaos.*` calls, checks permissions, and forwards approved requests to the correct daemon via native messaging.
+- **Multi-profile manager** — each user workspace gets an isolated Chromium profile (cookies, storage, extensions).
+- **Tab suspension** — idle tabs are frozen to reduce memory pressure, similar to The Great Suspender but built in.
+- **Native WebKit Windows** — `navigator.sigmaos.window.create()` spawns a frameless `BrowserWindow`-style floating widget that renders a URL outside the normal tab chrome.
 
 ---
-> **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED  
-> *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*
+
+## Layer 4: User Layer
+
+Everything the user sees and interacts with is a web app.
+
+- **SigmaOS Shell**: The React/Svelte desktop UI. Renders the workspace switcher, taskbar, notification center, and app launcher. Runs as the default Chromium start page.
+- **PWAs**: Any progressive web app can be installed and run. SigmaOS adds platform APIs to PWAs that aren't available in a normal browser.
+- **Zenith Desktop**: The experimental flagship desktop. Features silicon attestation (Kyber-1024), a persistent shard matrix for storage, dynamic theme adjustments via the Neural UI Engine, and automated responses to system events.
+
+---
+
+## Privilege Ring Separation
+
+On bare-metal, SigmaOS enforces CPU privilege ring separation:
+
+```
+       ┌─────────────────────────────────┐
+       │         RING 3: USERLAND        │
+       │  shell · apps · web applications│
+       └──────────────┬──────────────────┘
+                      │  SYSCALL (int 0x80 / syscall)
+       ┌──────────────▼──────────────────┐
+       │         RING 0: KERNEL          │
+       │  MLFQ Scheduler · VMM · VFS     │
+       │  TCP/IP Stack · Device Drivers  │
+       └─────────────────────────────────┘
+```
+
+Userland code cannot directly access hardware I/O ports or kernel memory. Any attempt triggers a General Protection Fault (Ring 3 → I/O) or Page Fault (Ring 3 → kernel memory), which the registered IDT handler catches and terminates the offending process.
+
+---
+
+## Data Flow: Web App Makes a System Call
+
+```
+PWA calls navigator.sigmaos.process.spawn("ffmpeg", [...args])
+         │
+         ▼
+SigmaOS Extension (background.js)
+  checks capability: "process:spawn" ∈ app manifest?
+  YES → forward to native messaging host
+  NO  → reject with PermissionDeniedError
+         │
+         ▼
+Native Messaging Host → Unix socket → sigmad-process (Go)
+         │
+         ▼
+sigmad-process calls bwrap with seccomp profile from capability list
+         │
+         ▼
+ffmpeg runs inside isolated namespace
+stdout/stderr streamed back via SSE → PWA receives output in real time
+```
+
+---
+
+*See also: [Security Model](Security-Model) · [API Reference](API-Reference) · [Kernel](Kernel)*

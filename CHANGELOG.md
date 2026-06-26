@@ -2,72 +2,7 @@
 
 All notable changes to the SigmaOS Sovereign Lattice will be documented in this file.
 
-## [v15.4.0] - 2026-06-23
-
-### Added
-
-- **Wi-Fi 802.11 Stack**: Created initial kernel-space SoftMAC state machine and connection routines in `kernel/net/wifi/sigma_wifi.cpp`.
-- **Bluetooth HCI Layer**: Created low-level controller command and inquiry loop implementation in `kernel/net/bt/sigma_bt_hci.cpp`.
-- **Automated Runtime Error Fixer**: Created userland developer tool `sigma_fixer` in `userland/devtools/sigma_fixer.cpp` to automatically intercept, diagnose, and live-patch runtime errors and page faults via SIE.
-- **AI Model Integration Guide**: Created a comprehensive, step-by-step wiki documentation guide for packaging and deploying specialized AI models on SigmaOS.
-- **Detailed Linux Comparison**: Added a comprehensive comparative analysis of SigmaOS vs. Linux distros, detailing strengths, current hardware/software gaps, and suggestions for future parity.
-
-### Improved
-
-- **Audio HDA Codec Enumeration**: Enhanced `hda_enumerate_codec` in `kernel/drivers/audio/sigma_hda.cpp` to dynamically probe Vendor/Device IDs, iterate nodes, and query widget capabilities (Audio Streams and Pin Complexes).
-
-## [v15.3.0] - 2026-06-23
-
-### Added
-
-- **Performance & Stability Macros**: Integrated branch prediction hints (`SIGMA_LIKELY`/`SIGMA_UNLIKELY`), cache-line alignment directives (`SIGMA_CACHE_ALIGN`), and `sigma_cpu_relax()` helper for busy-wait loops to `klib/include/sigma_kernel_types.h`.
-- **`.clangd` Config File**: Added project-wide `.clangd` settings to guarantee proper indexer include path resolution for `klib/include` and set `-std=c++17` for IDE workspace stability.
-
-### Fixed
-
-- **`sigma_perf.cpp`**: Resolved integer truncation bug where 64-bit performance counter values (e.g. 2.4B instructions) overflowed 32-bit signed `long` fields on Windows/non-64-bit-long platforms; updated members to `long long` and print specifiers to `%lld`.
-
-## [v15.2.0] - 2026-06-23
-
-### Added
-
-- **`sigma_log.h`**: New dedicated logging header in `klib/include/`. Wraps
-  `sigma_kernel_types.h` so kernel modules can include a single logging header
-  instead of the full types header. Provides `sigma_log_warn`, `sigma_log_error`,
-  and `sigma_log_debug` convenience macros.
-
-- **`sigma_test_framework.h`**: New lightweight kernel/userland test harness in
-  `klib/include/`. Provides `SIGMA_ASSERT`, `SIGMA_ASSERT_EQ`, `SIGMA_ASSERT_NE`,
-  `SIGMA_ASSERT_NONNULL` macros plus `sigma_test_begin` / `sigma_test_end` helpers.
-  Fixes all `'sigma_test_framework.h' file not found` errors in `tests/kernel/`.
-
-### Fixed
-
-- **Include path resolution**: Changed six kernel `.cpp` files from relative
-  `"sigma_kernel_types.h"` / `"sigma_log.h"` to angle-bracket form
-  `<sigma_kernel_types.h>` / `<sigma_log.h>` so clangd resolves them via the
-  project-wide `-Iklib/include` flag:
-  - `kernel/core/ai/sigma_inference_engine.cpp`
-  - `kernel/core/hal/sigma_device_tree.cpp`
-  - `kernel/drivers/audio/sigma_hda.cpp`
-  - `kernel/drivers/net/wifi/sigma_80211.cpp`
-  - `kernel/net/mesh/sigma_fleet_protocol.cpp`
-  - `kernel/fs/semantic_fs/sigma_semantic_fs.cpp`
-
-- **`compile_flags.txt`**: Added `-Iklib/include` (relative form) alongside the
-  existing absolute path, and added `-std=c++17`. This ensures clangd can resolve
-  headers when operating from any subdirectory of the project tree.
-
-- Resolved all downstream cascade errors: `Unknown type name 'sigma_inference_req_t'`,
-  `uint32_t`, `uint8_t`, `uint16_t`, `uint64_t`, `sigma_size_t`, `sigma_process_t`;
-  `Use of undeclared identifier 'sigma_log_info'`, `sigma_printf`,
-  `SIGMA_CTX_SYSTEM`, `SIGMA_PERM_WRITE`; and template parse errors in
-  `zenith_terminal.cpp`.
-
----
-
 ## [v15.0.0 Zenith] - 2026-05-15
-
 
 ### Added
 

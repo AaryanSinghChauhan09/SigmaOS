@@ -1,87 +1,73 @@
-# SigmaOS Wiki — Home
+# SigmaOS Wiki
 
-Welcome to the **SigmaOS** developer wiki, the canonical source of truth for the project.
-
----
-
-## 🗺 Navigation
-
-| Section | Description |
-|---------|-------------|
-| [Architecture](Architecture) | Kernel rings, memory model, driver architecture |
-| [Security Model](Security-Model) | Zero-Trust engine, capability rings, PQC crypto |
-| [API Reference](API-Reference) | `navigator.sigmaos` full API docs |
-| [Build Guide](Build-Guide) | How to build the bootable ISO from source |
-| [Daemons](Daemons) | sigmad-process, sigmad-ai, sigmad-sync reference |
-| [Hardware Support](Hardware-Support) | Driver status for NVMe, GPU, Wi-Fi, Audio |
-| [Package Manager](Package-Manager) | sigma-pkg and `pkg.ensure` via Alpine apk |
-| [Roadmap](Roadmap) | Phase timeline and milestone tracking |
-| [Contributing](Contributing) | How to contribute drivers, apps, and docs |
+> **SigmaOS Zenith** — The Sovereign Industrial Microkernel. A minimal, blazing-fast, Chromium-based operating system built for silicon sovereignty.
 
 ---
 
 ## What is SigmaOS?
 
-SigmaOS is the world's most advanced **Sovereign AI Operating System**. It is built entirely from scratch in C++ (kernel) and Go (daemons), with a Chromium-based desktop environment powered by native `navigator.sigmaos` Web APIs.
+SigmaOS is a radical rethinking of what an operating system can be. It boots straight to Chromium in under 3 seconds, turns the browser itself into the OS shell, and gives web apps access to raw Unix primitives — `pipe`, `spawn`, `mmap`, `/dev` files — that were previously locked away behind native APIs.
 
-### Core Architecture (v0.1)
-
-```
-Bootable ISO (Buildroot + GRUB)
-│
-├── SigmaOS Kernel (C++)
-│   ├── SovereignVMM — CoW, demand paging, 4-level page tables
-│   ├── Zero-Trust Engine — PAM/ACL, runtime threat scoring
-│   └── Drivers — NVMe, xHCI, E1000, HDA, 802.11
-│
-├── Go Daemons
-│   ├── sigmad-process :17382 — bwrap shell.exec, pkg.ensure, script.install
-│   ├── sigmad-ai      :17383 — TinyLlama local AI (summarize, complete)
-│   └── sigmad-sync    :17384 — rclone workspace autosync
-│
-├── Chromium + Extension
-│   └── inject.js → navigator.sigmaos (fs, process, ai, workspace, system)
-│
-└── Web Shell (localhost:3000)
-    ├── index.html      — Desktop launcher + App Store
-    ├── settings/caps.html — Capability grant UI
-    ├── docs.html       — API documentation
-    └── apps/
-        ├── notes/      — SigmaNotes (fs + ai demo)
-        ├── terminal/   — SigmaTerm (process.spawn demo)
-        └── paint/      — SigmaPaint (WASM + fs demo)
-```
+Built on a minimal Linux base (Buildroot + systemd), SigmaOS replaces the traditional desktop stack with a browser-first, capability-gated platform where every process runs inside a bubblewrap sandbox.
 
 ---
 
-## Quick Start (Developers)
+## How is it different from ChromeOS?
+
+| Feature | ChromeOS | SigmaOS |
+|---|---|---|
+| Shell environment | Chrome browser + Linux VM | Chrome as the OS shell itself |
+| Unix access for web apps | Crostini (heavy VM) | Direct via native messaging daemons |
+| Package management | `.deb` via Crostini | Zero-install via `navigator.sigmaos.pkg.ensure()` |
+| Process spawn | Not available to PWAs | `navigator.sigmaos.process.spawn()` |
+| Capability system | Origin-based permissions | Explicit per-capability grants |
+| Window management | Browser tabs | Native WebKit frameless floating windows |
+| Boot time | ~10–15 seconds | Under 3 seconds |
+| Kernel | Linux (full) | Custom sovereign microkernel + Buildroot |
+
+---
+
+## Wiki Pages
+
+### Getting Started
+- [Building from Source](Building-from-Source) — Step-by-step build guide for Ubuntu 22.04
+- [Architecture Overview](Architecture-Overview) — Kernel → daemons → extension → web-shell diagram
+- [Security Model](Security-Model) — Capability system, zero-trust enforcement, and sandboxing
+
+### API Reference
+- [navigator.sigmaos API](API-Reference) — Full reference for all `navigator.sigmaos.*` APIs
+- [Syscall Dispatcher](Syscall-Dispatcher) — Kernel syscall table and dispatch mechanism
+- [Hardware Abstraction Layer](HAL) — HAL interface across x86_64, ARM, and RISC-V
+
+### Application Development
+- [Writing Your First SigmaOS App](Your-First-App) — Hello world PWA tutorial
+- [App Manifest Format](App-Manifest) — Schema reference for SigmaOS app manifests
+
+### Subsystems
+- [Kernel Architecture](Kernel) — Scheduler, memory manager, and microkernel design
+- [Networking Stack](Networking) — TCP/IP suite, socket API, and DNS resolver
+- [Zenith Desktop](Zenith-Desktop) — The Sovereign Lattice Desktop environment
+
+---
+
+## Quick Start
 
 ```bash
-git clone https://github.com/AaryanSinghChauhan09/SigmaOS
+# Clone the repo
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
-./build-iso.sh standalone
-# ISO output: output/sigmaos-v0.1-standalone.iso
 
-# Test in QEMU:
-qemu-system-x86_64 -m 2G -cdrom output/sigmaos-v0.1-standalone.iso -boot d
+# Build a bootable ISO
+make clean && make iso
+
+# Boot in QEMU
+qemu-system-x86_64 -cdrom build/sigmaos.iso -serial stdio -m 2G
 ```
 
 ---
 
-## Branches
+## Current Version
 
-| Branch | Purpose |
-|--------|---------|
-| `main` | Stable development trunk |
-| `release/standalone` | Desktop ISO builds |
-| `release/cloud` | Cloud-native container profile |
-| `release/mobile` | ARM64 / mobile profile |
-| `release/rtos` | Real-time / embedded profile |
-| `release/browser` | Browser-WASM profile |
-| `release/dual-boot` | Dual-boot installer |
-| `release/distributed` | Distributed cluster profile |
-| `release/microkernel` | Microkernel research branch |
-| `release/app` | App platform / PWA runtime |
-| `performance-optimized` | AVX-512, hugepages, CPU tuning |
-| `prepare-sigmaos-launch` | v0.1 launch assets and press kit |
-| `gh-pages` | Static documentation site |
+**v15.2 — Zenith Release Microkernel**
+
+See the [Changelog](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CHANGELOG.md) for what's new.
