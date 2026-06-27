@@ -359,3 +359,147 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ---
 
 *See also: [Gap Analysis](Gap-Analysis) · [Feature Roadmap](Feature-Roadmap) · [Architecture Overview](Architecture-Overview)*
+
+---
+
+## Round 21 — IndiaStack Native Integration
+
+| # | Improvement | Inspired By | File |
+|---|---|---|---|
+| 1 | IndiaStack unified header — UPI, GSTN, ABDM, DigiLocker, ONDC, OCEN, AA framework | India MeitY / RBI | `userland/indiastack/sigma_indiastack.h` |
+| 2 | e-RUPI government voucher redemption | NPCI / ABDM | `userland/indiastack/sigma_indiastack.h` |
+| 3 | ONDC buyer+seller node integration | ONDC Network | `userland/indiastack/sigma_indiastack.h` |
+| 4 | Account Aggregator (AA) consent flow | RBI AA Framework | `userland/indiastack/sigma_indiastack.h` |
+| 5 | OCEN loan origination API | DFS / OCEN 4.0 | `userland/indiastack/sigma_indiastack.h` |
+| 6 | DigiLocker document fetch + verification | MeitY DigiLocker | `userland/indiastack/sigma_indiastack.h` |
+| 7 | Aadhaar eKYC + offline XML verify | UIDAI | `userland/indiastack/sigma_indiastack.h` |
+
+---
+
+## Round 22 — Bhashini AI Language Platform
+
+| # | Improvement | Inspired By | File |
+|---|---|---|---|
+| 1 | Bhashini unified header — 22-language ASR, TTS, NMT, transliteration | MeitY Bhashini | `userland/bhashini/sigma_bhashini.h` |
+| 2 | Offline ASR inference (22 Indian languages + sign language recognition) | Bhashini / Vakyansh | `userland/bhashini/sigma_bhashini.h` |
+| 3 | Neural Machine Translation with domain adaptation (legal, medical, agri) | Bhashini NMT | `userland/bhashini/sigma_bhashini.h` |
+| 4 | TTS with natural prosody + dialect variants | IndicTTS | `userland/bhashini/sigma_bhashini.h` |
+| 5 | Transliteration bidirectional (Roman ↔ Devanagari ↔ 22 scripts) | Bhashini | `userland/bhashini/sigma_bhashini.h` |
+| 6 | Streaming pipeline: audio → ASR → NMT → TTS (sub-500ms) | — | `userland/bhashini/sigma_bhashini.h` |
+
+---
+
+## Round 23 — ISRO Space Stack Integration
+
+| # | Improvement | Inspired By | File |
+|---|---|---|---|
+| 1 | ISRO integration header — NavIC, Bhuvan GIS, MOSDAC, IRNSS timing | ISRO | `userland/isro/sigma_isro.h` |
+| 2 | NavIC L1/L5 GNSS receiver API (India's sovereign GPS) | IRNSS / ISRO NAVIC | `userland/isro/sigma_isro.h` |
+| 3 | Bhuvan GIS tile server integration (India's sovereign Google Maps) | ISRO Bhuvan | `userland/isro/sigma_isro.h` |
+| 4 | MOSDAC weather + satellite data feed | SAC/ISRO MOSDAC | `userland/isro/sigma_isro.h` |
+| 5 | IRNSS precision timing for PTP/NTP sync | ISRO IRNSS | `userland/isro/sigma_isro.h` |
+| 6 | Cartosat/ResourceSat imagery API | NRSC / Bhuvan | `userland/isro/sigma_isro.h` |
+
+---
+
+## Round 24 — India Profession Apps (Batch 1: 14 apps)
+
+| # | App | Profession / Regulator | Key Feature |
+|---|---|---|---|
+| 1 | `sigma-accounts` | Business owner (GSTN) | e-Invoice IRN, eWay Bill, double-entry, DID audit trail |
+| 2 | `sigma-ca` | Chartered Accountant (ICAI) | GSTR filing, Form 16, multi-client dashboard |
+| 3 | `sigma-legal` | Advocate (Bar Council) | BNS 2023, eCourts API, DID-signed briefs |
+| 4 | `sigma-health` | Doctor (NMC/ABDM) | ABDM EMR, PMJAY claims, e-prescription |
+| 5 | `sigma-police` | Police officer (BNSS/CCTNS) | FIR drafting, IPC→BNS mapper, e-Challan |
+| 6 | `sigma-agri` | Farmer (PM-KISAN/PMFBY) | eNAM mandi prices, soil test, PMFBY claims |
+| 7 | `sigma-edu` | Teacher (NEP 2020/RTE) | Attendance, marks, e-Shram for contract staff |
+| 8 | `sigma-pos` | Retailer (GSTN) | UPI QR, WhatsApp billing, GST auto, offline |
+| 9 | `sigma-hrms` | HR manager (EPFO/ESIC) | EPF, ESIC, TDS, Form 16, ECR upload |
+| 10 | `sigma-transport` | Truck/fleet owner (MV Act) | Vehicle permit, driver log, eWay Bill |
+| 11 | `sigma-pharma` | Pharmacist (CDSCO) | Schedule H/X log, drug expiry, NDPS register |
+| 12 | `sigma-fssai` | Restaurant/food mfr (FSSAI) | License by turnover, HACCP temp log, allergen |
+| 13 | `sigma-forest` | Forest officer (Forest Act) | FRC claims, fire alerts, M-STrIPES patrol |
+| 14 | `sigma-gram` | Panchayat official (e-Panchayat) | MGNREGA job cards, birth/death reg, JJM status |
+
+---
+
+## Round 25 — India Profession Apps (Batch 2: 22 more apps)
+
+| # | App | Profession / Regulator | Key Feature |
+|---|---|---|---|
+| 1 | `sigma-cma` | Cost Accountant (ICMAI) | Cost audit §148, CMA data for loans, DSCR |
+| 2 | `sigma-cs` | Company Secretary (ICSI) | ROC filings MGT-7/AOC-4, board SS-1/SS-2 |
+| 3 | `sigma-sebi` | Stock broker/RIA (SEBI) | Capital gains, peak margin, SCORES complaint |
+| 4 | `sigma-insurance` | Insurance agent (IRDAI) | All policy types, PMJJBY/PMSBY, premium calc |
+| 5 | `sigma-mfi` | Microfinance/chit fund (RBI) | JLG, 3-lender check, PACS KCC, chit auction |
+| 6 | `sigma-dental` | Dentist (DCI) | FDI tooth charting, CGHS rates, autoclave log |
+| 7 | `sigma-veterinary` | Veterinarian (VCI) | Cattle UID, drug dosage, INAPH sync |
+| 8 | `sigma-mentalhealth` | Psychologist (RCI/MHCA) | PHQ-9/GAD-7, SOAP notes, advance directive |
+| 9 | `sigma-aerb` | Radiologist (AERB/DAE) | X-ray license, TLD dose log, QA tests |
+| 10 | `sigma-electrical` | Electrical engineer (CEA) | Load calc, cable sizing IS 3961, net meter |
+| 11 | `sigma-mining` | Mine manager (DGMS) | Accident report (2-hr), mineral challan, HEMM |
+| 12 | `sigma-marine` | Ship officer (DG Shipping) | COC tracking, stability calc, bunker calc |
+| 13 | `sigma-aviation` | Pilot/AME (DGCA) | Hours log, METAR/TAF, W&B calc |
+| 14 | `sigma-telecom` | Telecom engineer (TRAI) | EMF compliance, QoS report, WPC spectrum |
+| 15 | `sigma-safety` | Safety officer (Factories Act) | Fire drill log, near miss, BOCW cess |
+| 16 | `sigma-power` | Power sector (CERC/SERCs) | Solar DPR, RPO check, AT&C loss, open access |
+| 17 | `sigma-hospitality` | Hotel/travel (MOT/IATA) | Form C (foreign guests), GST by room rent |
+| 18 | `sigma-postal` | Postal worker (India Post) | Tracking, postage rate, COD reconcile |
+| 19 | `sigma-fisheries` | Fisherman (PMMSY) | Fishing ban check, catch log, PMMSY subsidy |
+| 20 | `sigma-waste` | Waste officer (SWM Rules) | BMW colour log, EPR targets, plastic ban |
+| 21 | `sigma-wellness` | Yoga/Ayurveda (AYUSH) | Prakriti assessment, PMJAY AYUSH billing |
+| 22 | `sigma-sports` | Athlete/coach (SAI/NADA) | TOPS application, ACWR, NADA prohibited list |
+
+---
+
+## Round 26 — India Profession Apps (Batch 3: 14 specialty apps)
+
+| # | App | Profession / Regulator | Key Feature |
+|---|---|---|---|
+| 1 | `sigma-film` | Director/producer (CBFC/IPRS) | CBFC application, OTT IT Rules 2021, copyright |
+| 2 | `sigma-creator` | Influencer/YouTuber (ASCI) | Disclosure check, 44ADA tax, brand deal invoice |
+| 3 | `sigma-gaming` | Online game dev (IT Rules 2023) | GST 28%, TDS 194BA, cultural compliance |
+| 4 | `sigma-trust` | NGO/temple (FCRA/80G) | FC-4 return, 80G certificate, hundi count |
+| 5 | `sigma-salon` | Salon owner (Shop & Estab) | Commission calc, color formula, GST invoice |
+| 6 | `sigma-realty` | Real estate (RERA) | Project registration, sale deed, FSI check |
+| 7 | `sigma-coaching` | Coaching institute (UGC) | Admission disclosure, GST 18%, stress monitoring |
+| 8 | `sigma-bloodbank` | Blood bank/lab (NACO/NABL) | eRaktkosh sync, mandatory HIV/HBV testing |
+| 9 | `sigma-security-agency` | Security agency (PSARA 2005) | Guard police verify, roster, patrol log |
+| 10 | `sigma-urbanplanning` | Urban planner (RERA/AMRUT) | Building plan approval, FSI calc, AMRUT status |
+| 11 | `sigma-petroleum` | Oil & gas (PESO/OISD) | Petroleum license, dip measurement, OISD audit |
+| 12 | `sigma-gov` | Government employee (NIC) | 40+ government API integrations |
+| 13 | `sigma-auto` | Connected vehicle (MoRTH) | FAME-II EV compliance, FASTag, VAHAN API |
+| 14 | `sigma-drone` | Drone operator (DGCA RPAS) | Digital Sky NPNT, flight log, geo-fence check |
+
+---
+
+## Round 27 — Self-Heal + Community Internet (Sigma-Heal & Sigma-CommNet)
+
+| # | Improvement | Description | File |
+|---|---|---|---|
+| 1 | **sigma-heal: Autonomous OS repair daemon** | Self-healing for filesystem corruption (btrfs scrub), kernel panic recovery (memory dump + rollback), broken package dependency resolution, network self-heal (DNS fallback, DHCP renew, WiFi module reload) | `sigmad/heal/main.go` |
+| 2 | **Filesystem self-heal** | Detects bad sectors, corrupted inodes, orphaned files; runs btrfs scrub + repair; auto-restores from sigma-mirror if unfixable | `sigmad/heal/main.go` |
+| 3 | **Kernel panic recovery** | Captures full memory dump, boots to recovery kernel, sigma-ai analyzes crash, applies hotfix or rolls back to last known good state | `sigmad/heal/main.go` |
+| 4 | **Security self-heal** | sigma-ids intrusion → auto-isolate process; rootkit detected → integrity restore from verified backup; PQC key compromise → auto-generate new DID keypair | `sigmad/heal/main.go` |
+| 5 | **Hardware self-heal** | GPU driver crash → software rendering fallback; sound card failure → graceful mute; USB disconnect during operation → safe state | `sigmad/heal/main.go` |
+| 6 | **sigma-commnet: Community-owned internet** | Village/colony ISP: one upstream connection shared across nodes via fair-share QoS; DID-based access control; local content caching (NCERT, Govt portals, eNAM) | `sigmad/commnet/main.go` |
+| 7 | **Offline mesh mode** | Local services (health, education, governance) work even when upstream ISP fails; TRAI community Wi-Fi rule compliant (cost-sharing, not reselling) | `sigmad/commnet/main.go` |
+| 8 | **sigma-fleet: Device fleet management** | Remote management of SigmaOS device fleets; OTA updates, health monitoring, compliance reporting for enterprise/government deployments | `sigmad/fleet/main.go` |
+
+---
+
+## Round 28 — Remaining Profession App Headers + Competitive Analysis Wiki
+
+| # | Improvement | Description | File |
+|---|---|---|---|
+| 1 | `sigma-urbanplanning` header | Building plan approval, FSI calc, AMRUT status, RERA compliance | `userland/apps/sigma-urbanplanning/sigma_urbanplanning.h` |
+| 2 | `sigma-bloodbank` header | eRaktkosh sync, mandatory HIV/HBV/HCV testing, NABL audit trail | `userland/apps/sigma-bloodbank/sigma_bloodbank.h` |
+| 3 | `sigma-coaching` header | UGC disclosure, GST 18%, student stress monitoring (PHQ-9), refund policy | `userland/apps/sigma-coaching/sigma_coaching.h` |
+| 4 | `sigma-security-agency` header | PSARA 2005 compliance, guard police verification, patrol log, roster | `userland/apps/sigma-security-agency/sigma_security_agency.h` |
+| 5 | `sigma-petroleum` header | PESO petroleum license, dip measurement, OISD audit, tank calibration | `userland/apps/sigma-petroleum/sigma_petroleum.h` |
+| 6 | `India-Profession-Coverage.md` wiki | Complete map of all 50+ India profession apps with regulator/feature table | wiki |
+| 7 | `SigmaOS-vs-Linux.md` wiki | Definitive competitive analysis vs Ubuntu, Arch, Fedora, Debian, NixOS, Kali, Android | wiki |
+
+---
+
+*See also: [Gap Analysis](Gap-Analysis) · [Feature Roadmap](Feature-Roadmap) · [Architecture Overview](Architecture-Overview) · [India Profession Coverage](India-Profession-Coverage) · [SigmaOS vs Linux Distros](SigmaOS-vs-Linux)*
