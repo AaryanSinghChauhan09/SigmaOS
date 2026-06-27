@@ -61,7 +61,17 @@ This page documents all planned and implemented features, organized by priority 
 | ✓ | DTrace probes | `klib/sigma_trace.cpp` | Zero-cost SDT kernel tracing (illumos-inspired) |
 | ✓ | Hardened fstab | `kernel/fs/sigma_fstab.cpp` | MS_NOEXEC\|MS_NOSUID\|MS_NODEV on all mounts |
 | ✓ | cgroup v2 limits | `userland/pkg/sigma_cgroup.cpp` | CPU/memory/PID/IO limits per workload |
-| 🔧 | Filesystem snapshots | `kernel/fs/sigma_snapshot.h` | Btrfs-style O(1) snapshot + instant restore |
+| 🔧 | dm-verity per package | `userland/sigma-pkg/sigma_pkg_verity.h` | snapd ContainerPlaceInfo-inspired — every read verified |
+| 🔧 | Pkg assertions chain | `sigmad/pkg/assert/sigma_assert.go` | snapd SnapDeclaration — publisher-id, revision, anti-replay |
+| 🔧 | Plug/slot interface system | YAML service manifests | snapd-inspired — explicit service capability contracts |
+| 🔧 | SemanticFS xattrs | `kernel/fs/sigma_semanticfs.h` | Haiku BFS — SIGMA:TRUST, SIGMA:CLASS, SIGMA:SIGNER inline |
+| 🔧 | Attribute index server | `sigmad/indexd/main.go` | Haiku index server — O(log n) attribute queries |
+| 🔧 | Sysroot exclusive lock | `sigmad/pkg/sigma_pkg_txn_lock.go` | rpm-ostree — no concurrent package operations |
+| 🔧 | Two-VM network gateway | `kernel/virt/sigma_netgw.h` | Whonix — workload VM cannot bypass gateway |
+| 🔧 | AppArmor profile gen | `sigmad/mac/apparmor_gen.go` | snapd — auto-generate deny-all + plug exceptions |
+| 🔧 | Package journal | `userland/sigma-pkg/sigma_pkg_journal.h` | rpm-ostree — HMAC-sealed transaction audit log |
+| 🔧 | Display server protocol | `userland/display/sigma_display_protocol.h` | Haiku app_server — browser off framebuffer |
+| ✓ | SIGMA_ASSERT | `klib/include/sigma_assert.h` | Unikraft UK_ASSERT — zero-cost in release, full in debug |
 
 ### Networking
 | Status | Feature | File | Description |
