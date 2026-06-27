@@ -41,6 +41,7 @@
 
 ## India & Business
 - [India Business Strategy](India-Business-Strategy)
+- [SigmaOS Vision for India](SigmaOS-Vision-India)
 - [Indian Compliance Roadmap](Indian-Compliance-Roadmap)
 - [SigmaOS vs Ubuntu](SigmaOS-vs-Ubuntu)
 
