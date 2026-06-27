@@ -1,179 +1,270 @@
-// SPDX-License-Identifier: GPL-2.0-or-later
-#pragma once
-/*
- * sigma_secboot.h — Secure Boot + TPM 2.0 integration
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+/**
+ * sigma_secboot.h — SigmaOS Secure Boot + TPM 2.0 subsystem
  *
- * Provides:
- *   1. UEFI Secure Boot chain verification (PK → KEK → db → image sig)
- *   2. TPM2 PCR extend / seal / unseal with policy assertions
- *   3. Measured Boot — every boot stage hashed into PCRs
- *   4. Remote Attestation — quote + verify against known-good PCR values
- *   5. sigma-cryptfs key unsealing (replaces 32-zero-byte stub)
+ * Inspired by:
+ *   • UEFI Secure Boot (EFI_IMAGE_SECURITY_DATABASE policy)
+ *   • systemd-boot / shim (chain-of-trust loading)
+ *   • TPM 2.0 spec (TCG Part 3: Commands) — PCR extend, seal/unseal
+ *   • Google ChromeOS Verified Boot (vboot) — RO firmware validates RW
+ *   • OpenBSD signify / Minisign — small signature surface
+ *   • Heads project (Trammell Hudson) — measured boot philosophy
  *
- * Boot chain:
- *   UEFI firmware (PCR 0-3) → sigma-bootloader (PCR 4) →
- *   kernel image (PCR 5) → initrd (PCR 6) → sigma_secboot_init() (PCR 7)
+ * Chain of trust:
  *
- * All signing uses Dilithium3 (ML-DSA-65).  Kyber-1024 is used only for
- * the TPM2 session key exchange — never for signatures.
- */
-
-#include <sigma_kernel_types.h>
-#include <stdbool.h>
-
-/* ── PCR index definitions (SigmaOS-reserved) ───────────────────────────── */
-#define SIGMA_PCR_FIRMWARE        0   /* UEFI firmware measurements          */
-#define SIGMA_PCR_OPTION_ROMS     2   /* Option ROM measurements             */
-#define SIGMA_PCR_BOOTLOADER      4   /* sigma-bootloader binary hash        */
-#define SIGMA_PCR_KERNEL          5   /* kernel image hash                   */
-#define SIGMA_PCR_INITRD          6   /* initrd / early userspace            */
-#define SIGMA_PCR_POLICY          7   /* Secure Boot policy + sigma-trustd   */
-#define SIGMA_PCR_CMDLINE         8   /* kernel command line                 */
-#define SIGMA_PCR_IMA             10  /* IMA runtime measurement list        */
-#define SIGMA_PCR_USERLAND        11  /* sigma userland package set hash     */
-#define SIGMA_PCR_APP             23  /* per-app extend at launch            */
-
-#define SIGMA_PCR_SHA256_LEN      32
-
-/* ── TPM2 PCR bank ───────────────────────────────────────────────────────── */
-typedef struct {
-    sigma_u8 sha256[SIGMA_PCR_SHA256_LEN];
-} sigma_pcr_value_t;
-
-typedef struct {
-    sigma_pcr_value_t pcr[24];   /* PCR 0-23 SHA-256 bank snapshot         */
-} sigma_pcr_snapshot_t;
-
-/* ── Secure Boot status ──────────────────────────────────────────────────── */
-typedef enum {
-    SIGMA_SECBOOT_DISABLED   = 0,
-    SIGMA_SECBOOT_SETUP_MODE = 1,   /* no PK enrolled, permissive            */
-    SIGMA_SECBOOT_USER_MODE  = 2,   /* PK enrolled, verification active      */
-    SIGMA_SECBOOT_AUDIT_MODE = 3,   /* log violations but do not block       */
-    SIGMA_SECBOOT_DEPLOYED   = 4,   /* manufacturing lock — no key changes   */
-} sigma_secboot_state_t;
-
-/* ── Image verification result ───────────────────────────────────────────── */
-typedef enum {
-    SIGMA_SIG_OK            = 0,
-    SIGMA_SIG_BAD_SIGNATURE = -1,
-    SIGMA_SIG_KEY_NOT_FOUND = -2,
-    SIGMA_SIG_REVOKED       = -3,
-    SIGMA_SIG_HASH_MISMATCH = -4,
-    SIGMA_SIG_CERT_EXPIRED  = -5,
-} sigma_sig_result_t;
-
-/* ── TPM2 seal/unseal context ────────────────────────────────────────────── */
-typedef struct {
-    sigma_u32  handle;         /* persistent TPM2 object handle              */
-    sigma_u8   pcr_policy[32]; /* SHA-256 of PCR selection + expected values */
-    sigma_u8   nonce[16];      /* anti-replay nonce                          */
-} sigma_tpm_seal_ctx_t;
-
-/* ── Attestation quote ───────────────────────────────────────────────────── */
-typedef struct {
-    sigma_pcr_snapshot_t pcrs;
-    sigma_u8             quote_sig[4628];  /* Dilithium3 signature (max)     */
-    sigma_u32            quote_sig_len;
-    sigma_u8             nonce[32];
-    sigma_u64            timestamp_ns;
-    char                 firmware_version[64];
-} sigma_attest_quote_t;
-
-/* ══════════════════════════════════════════════════════════════════════════ */
-/* Secure Boot API                                                            */
-/* ══════════════════════════════════════════════════════════════════════════ */
-
-/*
- * sigma_secboot_init — read UEFI Secure Boot state and TPM2 PCR bank.
- * Called once early in kernel init.  Panics (halts) if Secure Boot is
- * SETUP_MODE and SIGMA_ENFORCE_SECBOOT=y compile flag is set.
- */
-int sigma_secboot_init(sigma_secboot_state_t* out_state);
-
-/*
- * sigma_secboot_verify_image — verify Dilithium3 signature on a binary.
- * sig_db points to the enrolled certificate chain (PEM or DER).
- * Returns SIGMA_SIG_OK or negative error code.
- */
-sigma_sig_result_t sigma_secboot_verify_image(const void*   image,
-                                               sigma_size_t  image_len,
-                                               const sigma_u8* sig,
-                                               sigma_size_t  sig_len,
-                                               const void*   sig_db,
-                                               sigma_size_t  sig_db_len);
-
-/* ══════════════════════════════════════════════════════════════════════════ */
-/* TPM 2.0 API                                                                */
-/* ══════════════════════════════════════════════════════════════════════════ */
-
-/*
- * sigma_tpm_read_pcr — read current PCR value for a given index.
- */
-int sigma_tpm_read_pcr(int pcr_index, sigma_pcr_value_t* out);
-
-/*
- * sigma_tpm_extend_pcr — extend PCR with SHA-256 of data.
- * Records boot measurement event in the TPM event log.
- */
-int sigma_tpm_extend_pcr(int pcr_index, const void* data, sigma_size_t len);
-
-/*
- * sigma_tpm_seal — seal a secret under current PCR policy.
- * The secret can only be unsealed when PCR values match the snapshot
- * captured at seal time.
+ *   UEFI firmware (OEM key)
+ *       └── shim (signed by Microsoft CA)
+ *           └── sigma-bootloader (signed by SigmaOS CA — Dilithium3)
+ *               └── sigma kernel image (measured into TPM PCR[8])
+ *                   └── initramfs + cmdline (measured into TPM PCR[9])
+ *                       └── TPM unseals disk encryption key (PCR policy)
+ *                           └── dm-verity root hash verified
+ *                               └── userland runs
  *
- * secret / secret_len  — plaintext to seal
- * blob / blob_len_out  — output: TPM2B_SENSITIVE blob (allocates memory)
+ * All signature operations use Dilithium3 (ML-DSA-65).
+ * Kyber-1024 is NOT used here — it is a KEM, not a signature scheme.
  */
-int sigma_tpm_seal(const sigma_tpm_seal_ctx_t* ctx,
-                   const void*    secret,      sigma_size_t  secret_len,
-                   void**         blob,        sigma_size_t* blob_len_out);
 
-/*
- * sigma_tpm_unseal — unseal a blob if PCRs match the sealed policy.
- * This is the replacement for the 32-zero-byte derive_key() stub in
- * sigma-cryptfs.  sigma-cryptfs now calls this to obtain the real AES key.
+#ifndef SIGMA_SECBOOT_H
+#define SIGMA_SECBOOT_H
+
+#include <stddef.h>   /* size_t, NULL */
+#include <stdint.h>   /* uint8_t, uint32_t, uint64_t */
+#include <stdbool.h>  /* bool */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* ── Error codes ─────────────────────────────────────────────────────────── */
+
+typedef enum sigma_secboot_err {
+    SIGMA_SECBOOT_OK              = 0,
+    SIGMA_SECBOOT_ERR_NO_TPM      = -1,   /* TPM 2.0 device not present         */
+    SIGMA_SECBOOT_ERR_TPM_IO      = -2,   /* TPM command failed                 */
+    SIGMA_SECBOOT_ERR_NO_KEY      = -3,   /* no signing key in keystore         */
+    SIGMA_SECBOOT_ERR_BAD_SIG     = -4,   /* signature verification failed      */
+    SIGMA_SECBOOT_ERR_PCR_POLICY  = -5,   /* PCR values don't match seal policy */
+    SIGMA_SECBOOT_ERR_REVOKED     = -6,   /* key is in the revocation list      */
+    SIGMA_SECBOOT_ERR_HASH_MISMATCH = -7, /* measured hash does not match image */
+    SIGMA_SECBOOT_ERR_LOCKED      = -8,   /* NV index is locked                 */
+    SIGMA_SECBOOT_ERR_OVERFLOW    = -9,   /* buffer too small                   */
+} sigma_secboot_err_t;
+
+/* ── Signature constants (Dilithium3 / ML-DSA-65) ────────────────────────── */
+
+#define SIGMA_DILITHIUM3_PK_BYTES   1952u
+#define SIGMA_DILITHIUM3_SK_BYTES   4000u
+#define SIGMA_DILITHIUM3_SIG_BYTES  3293u
+
+/* SHA-256 digest size */
+#define SIGMA_HASH_BYTES            32u
+
+/* ── TPM PCR definitions ─────────────────────────────────────────────────── */
+
+/* SigmaOS-allocated PCR indices (bank: SHA-256) */
+#define SIGMA_PCR_FIRMWARE     0u   /* UEFI firmware measurements (standard)  */
+#define SIGMA_PCR_BOOTLOADER   4u   /* sigma-bootloader measurement           */
+#define SIGMA_PCR_KERNEL       8u   /* kernel image SHA-256                   */
+#define SIGMA_PCR_INITRAMFS    9u   /* initramfs + kernel cmdline             */
+#define SIGMA_PCR_CONFIG      10u   /* /sigma/boot/config.json                */
+#define SIGMA_PCR_DMVERITY    11u   /* dm-verity root hash                    */
+#define SIGMA_PCR_SYSROOT     12u   /* / mount point hash (post-pivot)        */
+
+#define SIGMA_PCR_COUNT        24u
+
+/* ── Image header ────────────────────────────────────────────────────────── */
+
+/**
+ * sigma_secboot_image_header — prepended to every signed binary.
+ * Parsed by sigma-bootloader before handing off to the kernel.
+ */
+typedef struct __attribute__((packed)) sigma_secboot_image_header {
+    uint8_t  magic[8];        /* "SIGMAIMG"                                   */
+    uint32_t version;         /* header format version — must be 1            */
+    uint32_t flags;           /* see SIGMA_IMGFLAG_* below                    */
+    uint64_t image_size;      /* size of payload (after this header)          */
+    uint8_t  sha256[SIGMA_HASH_BYTES];      /* SHA-256 of payload             */
+    uint8_t  signature[SIGMA_DILITHIUM3_SIG_BYTES]; /* Dilithium3 signature   */
+    uint8_t  signer_pubkey[SIGMA_DILITHIUM3_PK_BYTES]; /* signer public key   */
+    uint64_t build_timestamp; /* SOURCE_DATE_EPOCH — for revocation check     */
+    uint8_t  reserved[64];    /* pad to future fields                         */
+} sigma_secboot_image_header_t;
+
+#define SIGMA_IMG_MAGIC  "SIGMAIMG"
+
+/* Image flags */
+#define SIGMA_IMGFLAG_KERNEL      (1u << 0)   /* this is a kernel image       */
+#define SIGMA_IMGFLAG_INITRAMFS   (1u << 1)   /* initramfs blob               */
+#define SIGMA_IMGFLAG_MODULE      (1u << 2)   /* loadable kernel module       */
+#define SIGMA_IMGFLAG_DRIVER      (1u << 3)   /* driver binary                */
+#define SIGMA_IMGFLAG_DEBUG       (1u << 31)  /* debug build — warn loudly    */
+
+/* ── Trust anchor ────────────────────────────────────────────────────────── */
+
+/**
+ * sigma_trust_anchor — a Dilithium3 public key that is trusted to sign images.
+ * Multiple anchors can be registered (primary + recovery).
+ */
+typedef struct sigma_trust_anchor {
+    uint8_t  pubkey[SIGMA_DILITHIUM3_PK_BYTES];
+    uint8_t  key_id[8];     /* first 8 bytes of SHA-256(pubkey) — for logging */
+    bool     revoked;
+} sigma_trust_anchor_t;
+
+/* Maximum trust anchors that can be registered at once */
+#define SIGMA_MAX_TRUST_ANCHORS   4u
+
+/* ── TPM context (opaque to callers) ─────────────────────────────────────── */
+
+typedef struct sigma_tpm_ctx sigma_tpm_ctx_t;
+
+/* ── API ─────────────────────────────────────────────────────────────────── */
+
+/**
+ * sigma_secboot_init — initialise the secure boot subsystem.
  *
- * Returns 0 on success; SIGMA_EPERM if PCR values have changed.
+ * Detects the TPM 2.0 device, performs a TPM_CC_SelfTest, and reads
+ * PCR[0..3] to verify expected firmware measurements.
+ *
+ * @return SIGMA_SECBOOT_OK on success, or an error code.
  */
-int sigma_tpm_unseal(const sigma_tpm_seal_ctx_t* ctx,
-                     const void*    blob,         sigma_size_t blob_len,
-                     void*          secret_out,   sigma_size_t* secret_len_out);
+sigma_secboot_err_t sigma_secboot_init(void);
+
+/**
+ * sigma_secboot_tpm_measure — extend a PCR with a SHA-256 hash.
+ *
+ * Implements TPM2_PCR_Extend.  The hash is computed over @data[@len].
+ *
+ * @param pcr    PCR index (0–23).
+ * @param data   pointer to data to measure.
+ * @param len    length in bytes.
+ */
+sigma_secboot_err_t sigma_secboot_tpm_measure(uint32_t pcr,
+                                               const void *data,
+                                               size_t len);
+
+/**
+ * sigma_secboot_tpm_read_pcr — read the current value of a PCR.
+ *
+ * @param pcr    PCR index.
+ * @param out    output buffer — must be SIGMA_HASH_BYTES wide.
+ */
+sigma_secboot_err_t sigma_secboot_tpm_read_pcr(uint32_t pcr,
+                                                uint8_t out[SIGMA_HASH_BYTES]);
+
+/**
+ * sigma_secboot_tpm_seal — seal a secret blob to a PCR policy.
+ *
+ * Uses TPM2_Create with a PolicyPCR authorisation that matches
+ * the current values of @pcrs[@pcr_count].
+ *
+ * @param secret     plaintext secret to seal (e.g. dm-crypt key).
+ * @param secret_len length of secret (max 256 bytes for NV storage).
+ * @param pcrs       array of PCR indices to include in the policy.
+ * @param pcr_count  number of PCRs.
+ * @param sealed_out pre-allocated buffer for the sealed blob.
+ * @param sealed_len in/out: capacity on entry, bytes written on exit.
+ */
+sigma_secboot_err_t sigma_secboot_tpm_seal(const uint8_t *secret,
+                                            size_t         secret_len,
+                                            const uint32_t *pcrs,
+                                            size_t          pcr_count,
+                                            uint8_t        *sealed_out,
+                                            size_t         *sealed_len);
+
+/**
+ * sigma_secboot_tpm_unseal — unseal a blob, verifying the PCR policy.
+ *
+ * Fails with SIGMA_SECBOOT_ERR_PCR_POLICY if any PCR value has changed
+ * since sealing (e.g. if the kernel image was swapped).
+ *
+ * @param sealed     the sealed blob.
+ * @param sealed_len length of sealed blob.
+ * @param secret_out buffer for recovered secret.
+ * @param secret_len in/out: capacity on entry, bytes written on exit.
+ */
+sigma_secboot_err_t sigma_secboot_tpm_unseal(const uint8_t *sealed,
+                                              size_t         sealed_len,
+                                              uint8_t       *secret_out,
+                                              size_t        *secret_len);
+
+/**
+ * sigma_secboot_verify_image — verify a Dilithium3 signature on an image.
+ *
+ * Checks:
+ *   1. Magic bytes match "SIGMAIMG".
+ *   2. SHA-256 of payload matches header hash.
+ *   3. Dilithium3 signature over (hash || flags || timestamp) is valid.
+ *   4. Signer public key matches a registered trust anchor.
+ *   5. build_timestamp is not before the revocation epoch.
+ *
+ * @param header   pointer to image header.
+ * @param payload  pointer to image payload (immediately after header).
+ */
+sigma_secboot_err_t sigma_secboot_verify_image(
+    const sigma_secboot_image_header_t *header,
+    const void *payload);
+
+/**
+ * sigma_secboot_register_anchor — register a trusted public key.
+ *
+ * Can be called up to SIGMA_MAX_TRUST_ANCHORS times.
+ * The first registered anchor is the primary; subsequent are recovery keys.
+ *
+ * @param pubkey   Dilithium3 public key bytes.
+ */
+sigma_secboot_err_t sigma_secboot_register_anchor(
+    const uint8_t pubkey[SIGMA_DILITHIUM3_PK_BYTES]);
+
+/**
+ * sigma_secboot_revoke_anchor — mark a key as revoked by key_id.
+ *
+ * Future verify_image calls will reject images signed with this key.
+ */
+sigma_secboot_err_t sigma_secboot_revoke_anchor(const uint8_t key_id[8]);
+
+/**
+ * sigma_secboot_lock — lock the secure boot configuration.
+ *
+ * After this call, no new anchors can be registered and no anchors
+ * can be revoked until next boot.  Called by the kernel after loading
+ * all modules.
+ */
+void sigma_secboot_lock(void);
+
+/**
+ * sigma_secboot_is_locked — return true if configuration is locked.
+ */
+bool sigma_secboot_is_locked(void);
+
+/**
+ * sigma_secboot_report — write a human-readable boot attestation report
+ * to @buf[@buflen].  Suitable for logging to sigma_audit_backend.
+ *
+ * Reports PCR values, trust anchor key_ids, and lockdown status.
+ */
+int sigma_secboot_report(char *buf, size_t buflen);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+
+#endif /* SIGMA_SECBOOT_H */
 
 /*
- * sigma_tpm_pcr_snapshot — capture all 24 PCR values atomically.
+ * ── Secure Boot integration points ───────────────────────────────────────────
+ *
+ *  sigma-bootloader (arch/boot/sovereign_boot.asm + C wrapper):
+ *      1. sigma_secboot_init()
+ *      2. sigma_secboot_verify_image(&kernel_header, kernel_payload)
+ *      3. sigma_secboot_tpm_measure(SIGMA_PCR_KERNEL, kernel_sha256, 32)
+ *      4. sigma_secboot_tpm_measure(SIGMA_PCR_INITRAMFS, initrd_sha256, 32)
+ *      5. sigma_secboot_tpm_unseal(sealed_dmcrypt_key, ...) → pass to dm-verity
+ *      6. sigma_secboot_lock()
+ *      7. Hand off to kernel entry point
+ *
+ *  Kernel module loader (kernel/drivers/core/sigma_driver_framework.h):
+ *      • Call sigma_secboot_verify_image() before any insmod-equivalent
+ *      • Reject modules with SIGMA_SECBOOT_ERR_* != OK
  */
-int sigma_tpm_pcr_snapshot(sigma_pcr_snapshot_t* out);
-
-/* ══════════════════════════════════════════════════════════════════════════ */
-/* Remote Attestation                                                         */
-/* ══════════════════════════════════════════════════════════════════════════ */
-
-/*
- * sigma_attest_generate_quote — generate a Dilithium3-signed PCR quote.
- * nonce must be 32 bytes of random data provided by the verifier.
- * Used by sigma-trustd for mutual attestation between nodes.
- */
-int sigma_attest_generate_quote(const sigma_u8*      nonce,
-                                 sigma_attest_quote_t* out);
-
-/*
- * sigma_attest_verify_quote — verify a quote received from a remote node.
- * reference_pcrs may be NULL (skip PCR match check; signature only).
- */
-int sigma_attest_verify_quote(const sigma_attest_quote_t* quote,
-                               const sigma_u8*             nonce,
-                               const sigma_pcr_snapshot_t* reference_pcrs,
-                               const void*                 pubkey,
-                               sigma_size_t                pubkey_len);
-
-/* ── dm-verity integration ───────────────────────────────────────────────── */
-
-/*
- * sigma_secboot_verify_verity_root — confirm that the dm-verity root hash
- * of the active / partition matches the value sealed in TPM PCR 5.
- * Called after unseal; aborts mount if hash mismatches.
- */
-int sigma_secboot_verify_verity_root(const char* verity_dev,
-                                      const sigma_u8* expected_root_hash);
