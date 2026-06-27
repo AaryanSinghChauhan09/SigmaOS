@@ -1,4 +1,4 @@
-# SigmaOS Improvements Overview (Rounds 1–7)
+# SigmaOS Improvements Overview (Rounds 1–13)
 
 A consolidated reference of all OS improvements implemented across seven rounds of development, inspired by production operating systems.
 
@@ -195,6 +195,79 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 | 21 | Atomic A/B system updater | Bottlerocket / OSTree | `sigmad/update/main.go` |
 | 22 | Localisation subsystem — en_US, hi_IN, zh_CN | GNU gettext / Haiku l10n | `userland/a11y/sigma-l10n/sigma_locale.h` |
 | 23 | Secure Boot + TPM 2.0 subsystem | UEFI SB / ChromeOS vboot | `kernel/security/sigma_secboot.h` |
+
+---
+
+## Round 10 — SMP · ACPI · THP · zram · CET+KASLR · RT Scheduler · Journal
+
+| # | Improvement | Inspired By | File |
+|---|---|---|---|
+| 1 | SMP support — LAPIC/IPI/per-CPU data structures | Linux SMP | `kernel/arch/sigma_smp.h` |
+| 2 | ACPI parser — full DSDT/SSDT table walking | ACPICA | `kernel/arch/sigma_acpi.h` |
+| 3 | Transparent Huge Pages + HugeTLB | Linux THP | `kernel/mm/sigma_hugepage.h` |
+| 4 | zram — compressed RAM-backed swap | Linux zram | `kernel/mm/sigma_zram.h` |
+| 5 | CET shadow stack + KASLR kernel randomisation | Intel CET / PAX | `kernel/arch/sigma_cet.h` |
+| 6 | PREEMPT_RT real-time scheduler | PREEMPT_RT patch | `kernel/sched/sigma_rt.h` |
+| 7 | NTP daemon with leap-second handling | chrony / ntpd | `sigmad/ntpd/main.go` |
+| 8 | Structured binary journal (indexed, queryable) | systemd journald | `sigmad/journal/main.go` |
+| 9 | DVFS + thermal management (cpufreq governor) | Linux cpufreq | `sigmad/thermald/main.go` |
+| 10 | Reproducible build verification | Debian repro builds | `cmake/sigma_repro.cmake` |
+| 11 | ARM64 + RISC-V boot stubs | Linux arch/ | `arch/arm64/` + `arch/riscv/` |
+| 12 | Formal verification contracts (Frama-C style) | seL4 proofs | `kernel/formal/sigma_contracts.h` |
+| 13 | sigma-ide — AI-assisted editor integration | Zed / VS Code | `userland/apps/sigma-ide/` |
+
+---
+
+## Round 11 — Driver Shards · VFS · SigmaFS · RAID · DRM · Audio · Namespaces
+
+| # | Improvement | Inspired By | File |
+|---|---|---|---|
+| 1 | Shard-based driver architecture | Genode components | `kernel/drivers/sigma_shard_arch.h` |
+| 2 | Virtual File System (VFS) layer | Linux VFS | `kernel/fs/sigma_vfs.h` |
+| 3 | SigmaFS — native copy-on-write filesystem | Btrfs / ZFS | `kernel/fs/sigmafs/sigma_sigmafs.h` |
+| 4 | Software RAID 0/1/5/6/10 | Linux md RAID | `kernel/fs/sigma_raid.h` |
+| 5 | Full-disk AES-256-GCM encryption (dm-crypt level) | dm-crypt / LUKS2 | `kernel/crypto/sigma_cryptfs_real.h` |
+| 6 | DRM/KMS GPU driver model | Linux DRM | `kernel/drivers/gpu/sigma_drm.h` |
+| 7 | PCM audio pipeline | ALSA PCM | `kernel/drivers/audio/sigma_pcm.h` |
+| 8 | MAC policy enforcement engine (replaces stub) | SELinux policy.33 | `kernel/security/sigma_mac_engine.h` |
+| 9 | Container namespace orchestrator | Linux namespaces | `kernel/ns/sigma_ns_orch.h` |
+| 10 | NVMe driver shard | Linux nvme | `kernel/drivers/nvme/sigma_nvme.h` |
+| 11 | Init shard — s6-style supervised process tree | s6 / runit | `kernel/drivers/init/sigma_init_shard.h` |
+| 12 | WASM browser runtime port | wasmtime / v86 | `browser/sigma_wasm_bridge.c` |
+| 13 | sigma-web Progressive Web App shell | Electron / Tauri | `userland/apps/sigma-web/` |
+| 14 | Network relay daemon | socat / chisel | `sigmad/netrelay/main.go` |
+
+---
+
+## Round 12 — eBPF VM · IPC Tracer · ACPI Power · AHCI · LVM · Professional Apps
+
+| # | Improvement | Inspired By | File |
+|---|---|---|---|
+| 1 | eBPF VM + verifier (safe kernel programmability) | Linux eBPF | `kernel/ebpf/sigma_ebpf_vm.h` |
+| 2 | IPC tracer — strace-equivalent for sigma-bus | strace / bpftrace | `tools/sigma-trace/sigma_ipc_tracer.h` |
+| 3 | ACPI power state daemon | acpid | `sigmad/acpid/main.go` |
+| 4 | AHCI SATA shard | Linux libata | `kernel/drivers/ahci/sigma_ahci.h` |
+| 5 | Driver hot-plug manager (udev equivalent) | udev / mdev | `sigmad/hotplug/sigma_hotplug_mgr.h` |
+| 6 | LVM — logical volume management | Linux LVM2 | `kernel/fs/sigma_lvm.h` |
+| 7 | CodeExplorer React app + AST data backend | LSP / Tree-sitter | `userland/apps/code-explorer/` |
+| 8 | sigma-gov — India e-governance portal | DigitalIndia APIs | `userland/apps/sigma-gov/` |
+| 9 | sigma-realty — property management app | India real estate | `userland/apps/sigma-realty/` |
+| 10 | sigma-agri / sigma-edu / sigma-bank / sigma-labour | India sector apps | `userland/apps/sigma-{agri,edu,bank,labour}/` |
+
+---
+
+## Round 13 — Compositor · CryptFS Fix · IPC SHM · A11y · Cloud Sync · Bench
+
+| # | Improvement | Inspired By | File |
+|---|---|---|---|
+| 1 | Zenith Wayland compositor (VRR, HDR, multi-monitor, animations) | Sway / KWin / Mutter | `userland/compositor/sigma_compositor.h` |
+| 2 | **CryptFS real AES-256-GCM (fixes Issue #44 zero-key stub)** | dm-crypt / fscrypt / LUKS2 | `kernel/crypto/sigma_cryptfs_real.cpp` |
+| 3 | Shared memory, named pipes, message queues | POSIX IPC / Fuchsia VMO | `kernel/ipc/sigma_shm.h` |
+| 4 | Transparent Huge Page API (2 MiB + 1 GiB, khugepaged) | Linux THP / FreeBSD superpages | `kernel/mm/sigma_hugepage.h` |
+| 5 | Privacy-respecting opt-in telemetry daemon (PII scrub, TLS 1.3) | Ubuntu apport / Fedora ABRT | `sigmad/telemetry/main.go` |
+| 6 | Accessibility framework — AT-SPI2, TTS, magnifier, WCAG 2.2 AA | AT-SPI2 / UIAutomation | `userland/accessibility/sigma_a11y.h` |
+| 7 | E2E encrypted cloud sync (Argon2id key, AES-256-GCM chunks) | Nextcloud / Syncthing | `sigmad/cloudsync/main.go` |
+| 8 | System benchmark suite (CPU/mem/disk/net/boot/kernel) | phoronix / sysbench / fio | `tools/sigma-bench/sigma_bench.sh` |
 
 ---
 
