@@ -21,6 +21,9 @@
 - [Security Model](Security-Model)
 - [Post-Quantum Security](Post-Quantum-Security)
 
+## Testing
+- [Testing Infrastructure](Testing-Infrastructure)
+
 ## API Reference
 - [navigator.sigmaos API](API-Reference)
 
@@ -28,11 +31,18 @@
 - [Writing Your First App](Your-First-App)
 - [App Manifest Format](App-Manifest)
 - [Developer Guide](Developer-Guide)
+- [Extension System](Utilities-Roadmap#plugin--extension-system)
 
 ## Profiles & Deployment
 - [Release Profiles](Release-Profiles)
 - [Zenith Desktop](Zenith-Desktop)
 - [Performance Architecture](Performance-Architecture)
+- [Kiosk & Thin Client](Utilities-Roadmap#kiosk--thin-client-mode)
+
+## India & Business
+- [India Business Strategy](India-Business-Strategy)
+- [Indian Compliance Roadmap](Indian-Compliance-Roadmap)
+- [SigmaOS vs Ubuntu](SigmaOS-vs-Ubuntu)
 
 ## Driver Development
 - [Driver Development Guide](Driver-Development)
