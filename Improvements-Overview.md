@@ -1,4 +1,4 @@
-# SigmaOS Improvements Overview (Rounds 1–16)
+# SigmaOS Improvements Overview (Rounds 1–17)
 
 A consolidated reference of all OS improvements implemented across seven rounds of development, inspired by production operating systems.
 
@@ -301,6 +301,14 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 | 1 | TLS 1.3 with HKDF extract/expand/expand-label, Kyber hybrid handshake | RFC 8446 + draft-ietf-tls-hybrid | `net/tls/sigma_tls.cpp` |
 | 2 | DNS resolver: UDP/TCP/DoH, DNSSEC, LRU cache, name encode/decode | RFC 1035 / 8484 (DoH) | `net/dns/sigma_dns.cpp` |
 | 3 | DHCP client: RFC 2131 state machine, option builder, IP helpers | RFC 2131 / 2132 | `net/dhcp/sigma_dhcp.cpp` |
+
+## Round 17 — Full Protocol Implementations
+
+| # | Improvement | Inspired By | File |
+|---|---|---|---|
+| 1 | DHCP RFC 2131/2132 — full state machine (INIT→BOUND→RENEW→REBIND→EXPIRE), option decode, lease management, event tick, socket stubs | RFC 2131 / ISC dhclient | `net/dhcp/sigma_dhcp_full.cpp` |
+| 2 | DNS full RR decoder — A/AAAA/CNAME/NS/MX/SRV/TXT/DNSKEY/DS/RRSIG, response decode, DNSSEC chain validation stub, cache store+prune | RFC 1035 / 4033-4035 | `net/dns/sigma_dns_full.cpp` |
+| 3 | TLS 1.3 full handshake — ClientHello builder with extensions (supported_versions, key_share X25519+Kyber, supported_groups, sig_algos, ALPN), server hello parse, HKDF key derivation chain (early→handshake→master→app traffic), Finished message | RFC 8446 | `net/tls/sigma_tls_handshake.cpp` |
 
 ---
 
