@@ -1,0 +1,126 @@
+.\" SPDX-License-Identifier: GPL-2.0-or-later
+.TH SIGMA-NET 1 "2026-06-27" "SigmaOS" "SigmaOS User Commands"
+
+.SH NAME
+sigma-net \- SigmaOS network configuration and diagnostics
+
+.SH SYNOPSIS
+.B sigma-net
+.IR command
+.RI [ options ]
+
+.SH DESCRIPTION
+.B sigma-net
+manages and diagnoses the SigmaOS network stack. It wraps the
+.BR sigma-netd (8)
+daemon and the sigma_net unified interface, providing TLS 1.3,
+DNS-over-HTTPS, DHCP, WPA3/SAE, firewall, and mesh VPN management.
+
+.SH COMMANDS
+
+.SS status
+Show current network state: interfaces, IP addresses, DHCP lease, DNS.
+.nf
+$ sigma-net status
+eth0: 192.168.1.10/24 (DHCP bound, 3h 42m remaining)
+  DNS: 1.1.1.1 (DoH), DNSSEC: enabled
+  TX: 1.2 GB   RX: 3.4 GB
+wlan0: not connected
+mesh0: 10.152.0.1/24 (sigma-mesh active, 3 peers)
+.fi
+
+.SS connect
+Connect to a WiFi network.
+.nf
+$ sigma-net connect "My-Network" --wpa3    # WPA3-Personal
+$ sigma-net connect "Corp-WiFi" --wpa3-ent --cert /path/to/cert.pem
+$ sigma-net connect "Open-Network" --owe   # WPA3 OWE (encrypted open)
+.fi
+
+.SS disconnect
+Disconnect from a network interface.
+.nf
+$ sigma-net disconnect wlan0
+.fi
+
+.SS dns
+Manage DNS resolver settings.
+.nf
+$ sigma-net dns status             # show resolver config
+$ sigma-net dns set --doh https://dns.quad9.net/dns-query
+$ sigma-net dns set --dot 9.9.9.9  # DNS-over-TLS
+$ sigma-net dns test sigma-os.dev  # resolve + show DNSSEC status
+$ sigma-net dns flush-cache        # clear the resolver cache
+.fi
+
+.SS dhcp
+Manage DHCP leases.
+.nf
+$ sigma-net dhcp status eth0       # show current lease
+$ sigma-net dhcp renew eth0        # force renewal
+$ sigma-net dhcp release eth0      # release lease
+.fi
+
+.SS firewall
+Manage the sigma-shield packet filter.
+.nf
+$ sigma-net firewall status        # active rules + conntrack count
+$ sigma-net firewall allow tcp 443 # allow HTTPS outbound
+$ sigma-net firewall block tcp 25  # block SMTP
+$ sigma-net firewall flush         # clear all user rules
+$ sigma-net firewall list          # list all rules
+.fi
+
+.SS mesh
+Manage the sigma-mesh WireGuard VPN.
+.nf
+$ sigma-net mesh init              # generate keypair, create mesh0
+$ sigma-net mesh pubkey            # show local public key
+$ sigma-net mesh peer add <pubkey> <endpoint>
+$ sigma-net mesh peer list         # list peers + latency
+$ sigma-net mesh status            # mesh interface stats
+.fi
+
+.SS ping
+Test connectivity.
+.nf
+$ sigma-net ping 8.8.8.8
+$ sigma-net ping sigma-os.dev --count 5
+.fi
+
+.SS trace
+Trace route to a destination.
+.nf
+$ sigma-net trace sigma-os.dev
+.fi
+
+.SH SECURITY FEATURES
+
+.TP
+All DNS queries use DNS-over-HTTPS (DoH) by default with DNSSEC validation.
+
+.TP
+WiFi uses WPA3-Personal (SAE) by default when the AP supports it; falls back to WPA2 with a warning.
+
+.TP
+The sigma-mesh VPN uses WireGuard (ChaCha20-Poly1305) for all inter-node communication.
+
+.TP
+All TLS connections use TLS 1.3 with X25519+Kyber-1024 hybrid key exchange.
+
+.SH FILES
+.TP
+.I /run/sigma/netd.sock
+sigma-netd Unix socket.
+
+.TP
+.I /sigma/etc/network/
+Network configuration files.
+
+.SH SEE ALSO
+.BR sigma-netd (8),
+.BR sigmactl (1),
+.BR sigma-pkg (1)
+
+.SH AUTHORS
+SigmaOS Contributors.
