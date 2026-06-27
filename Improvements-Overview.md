@@ -1,4 +1,4 @@
-# SigmaOS Improvements Overview (Rounds 1–14)
+# SigmaOS Improvements Overview (Rounds 1–16)
 
 A consolidated reference of all OS improvements implemented across seven rounds of development, inspired by production operating systems.
 
@@ -279,6 +279,28 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 | 4 | 22-test network stack unit test suite (TLS, DNS, DHCP, WPA3, net init) | Google Test / CTest | `tests/net/test_net_stack.cpp` |
 | 5 | CMakeLists for network stack library + test executable | CMake best practices | `net/CMakeLists.txt` |
 | 6 | `package-lock.json` pinning Electron 42.5.0, ESLint 10.5.0, Vite 8.1.0, Vitest 4.1.9 | npm lockfile | `package-lock.json` |
+
+## Round 15 — Firewall · Watchdog · Metrics · Shell · Rollback · OOM · MM Tests
+
+| # | Improvement | Inspired By | File |
+|---|---|---|---|
+| 1 | Stateful packet filter + NAT engine | OpenBSD pf / nftables | `kernel/net/sigma_firewall.h` |
+| 2 | Hardware + software watchdog daemon (WDT pet + daemon health) | Linux watchdog / systemd-watchdog | `sigmad/watchdog/main.go` |
+| 3 | Prometheus-compatible metrics exporter (CPU/mem/load) | node_exporter / collectd | `sigmad/metrics/main.go` |
+| 4 | POSIX shell (sigma_sh) — pipelines, I/O redir, built-ins, history | dash / busybox sh | `userland/shell/sigma_sh.c` |
+| 5 | Package + OS generation rollback engine (NixOS-style) | NixOS generations / rpm-ostree | `userland/pkg/sigma_rollback.cpp` |
+| 6 | Out-of-Memory killer with per-process score + cgroup integration | Linux OOM / Android LMKD | `kernel/mm/sigma_oom.h` |
+| 7 | Memory management regression tests (mmap, mprotect, THP, OOM) | Linux kselftest/mm | `tests/kernel/test_mm.sh` |
+
+---
+
+## Round 16 — Full TLS 1.3 · DNS Resolver · DHCP Client Implementations
+
+| # | Improvement | Inspired By | File |
+|---|---|---|---|
+| 1 | TLS 1.3 with HKDF extract/expand/expand-label, Kyber hybrid handshake | RFC 8446 + draft-ietf-tls-hybrid | `net/tls/sigma_tls.cpp` |
+| 2 | DNS resolver: UDP/TCP/DoH, DNSSEC, LRU cache, name encode/decode | RFC 1035 / 8484 (DoH) | `net/dns/sigma_dns.cpp` |
+| 3 | DHCP client: RFC 2131 state machine, option builder, IP helpers | RFC 2131 / 2132 | `net/dhcp/sigma_dhcp.cpp` |
 
 ---
 
