@@ -1,4 +1,4 @@
-# SigmaOS Improvements Overview (Rounds 1–13)
+# SigmaOS Improvements Overview (Rounds 1–14)
 
 A consolidated reference of all OS improvements implemented across seven rounds of development, inspired by production operating systems.
 
@@ -268,6 +268,17 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 | 6 | Accessibility framework — AT-SPI2, TTS, magnifier, WCAG 2.2 AA | AT-SPI2 / UIAutomation | `userland/accessibility/sigma_a11y.h` |
 | 7 | E2E encrypted cloud sync (Argon2id key, AES-256-GCM chunks) | Nextcloud / Syncthing | `sigmad/cloudsync/main.go` |
 | 8 | System benchmark suite (CPU/mem/disk/net/boot/kernel) | phoronix / sysbench / fio | `tools/sigma-bench/sigma_bench.sh` |
+
+## Round 14 — Interactive Roadmap SPA · WPA3 Impl · Net Stack Tests · CMakeLists
+
+| # | Improvement | Inspired By | File |
+|---|---|---|---|
+| 1 | **Interactive Utilities Roadmap SPA** — 42 utilities, 5 phases, live filter/search, dependency tracking | GitHub Projects / Linear | `userland/roadmap/index.html` |
+| 2 | WPA3/SAE full implementation (hunting-and-pecking, dragonfly key exchange) | IEEE 802.11-2020 | `net/wifi/sigma_wpa3.cpp` |
+| 3 | Network stack unified init (`sigma_net_init`, config defaults, error strings) | lwIP / gVisor netstack | `net/sigma_net.cpp` |
+| 4 | 22-test network stack unit test suite (TLS, DNS, DHCP, WPA3, net init) | Google Test / CTest | `tests/net/test_net_stack.cpp` |
+| 5 | CMakeLists for network stack library + test executable | CMake best practices | `net/CMakeLists.txt` |
+| 6 | `package-lock.json` pinning Electron 42.5.0, ESLint 10.5.0, Vite 8.1.0, Vitest 4.1.9 | npm lockfile | `package-lock.json` |
 
 ---
 
