@@ -1,4 +1,4 @@
-# SigmaOS Improvements Overview (Rounds 1–17)
+# SigmaOS Improvements Overview (Rounds 1–20)
 
 A consolidated reference of all OS improvements implemented across seven rounds of development, inspired by production operating systems.
 
@@ -309,6 +309,52 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 | 1 | DHCP RFC 2131/2132 — full state machine (INIT→BOUND→RENEW→REBIND→EXPIRE), option decode, lease management, event tick, socket stubs | RFC 2131 / ISC dhclient | `net/dhcp/sigma_dhcp_full.cpp` |
 | 2 | DNS full RR decoder — A/AAAA/CNAME/NS/MX/SRV/TXT/DNSKEY/DS/RRSIG, response decode, DNSSEC chain validation stub, cache store+prune | RFC 1035 / 4033-4035 | `net/dns/sigma_dns_full.cpp` |
 | 3 | TLS 1.3 full handshake — ClientHello builder with extensions (supported_versions, key_share X25519+Kyber, supported_groups, sig_algos, ALPN), server hello parse, HKDF key derivation chain (early→handshake→master→app traffic), Finished message | RFC 8446 | `net/tls/sigma_tls_handshake.cpp` |
+
+---
+
+## Round 18 — Live Kpatch · NetGW · mimalloc · Reproducible Builds · Pkg Templates · Testing
+
+| # | Improvement | Inspired By | File |
+|---|---|---|---|
+| 1 | Live kernel patching without reboot (kpatch stop_machine approach) | Red Hat kpatch | `kernel/kpatch/sigma_kpatch.h`, `tools/sigma-kpatch-build/sigma_kpatch_build.sh` |
+| 2 | Two-VM network gateway (Whonix-level isolation, virtio NIC) | Whonix / Qubes OS | `kernel/net/sigma_netgw.h` |
+| 3 | mimalloc userland allocator (MI_SECURE=2: guard pages, free-list rand) | Chimera Linux / Microsoft mimalloc | `cmake/sigma_mimalloc.cmake` |
+| 4 | Reproducible builds (SOURCE_DATE_EPOCH, sort-section, derivation hash) | GNU Guix / reproducible-builds.org | `cmake/sigma_reproducible.cmake` |
+| 5 | Chimera Linux cports-style Python package templates | Chimera Linux cports | `sigma-pkg/cbuild.py`, `sigma-pkg/templates/sigma-healthd/template.py` |
+| 6 | openQA scenario matrix (35 scenarios: boot, security, pkg, net, kpatch, regression) | openSUSE openQA | `tests/openqa/sigma_scenarios.py` |
+| 7 | Theme engine + dark/light/high-contrast/saffron TOML themes | KDE Plasma themes | `userland/gui/themes/sigma_theme_engine.h` |
+| 8 | Kiosk mode — DID-admin-unlock, session wipe, single-app fullscreen | ATM / CSC kiosk | `userland/kiosk/sigma_kiosk.h` |
+| 9 | Extension framework — Dilithium3-signed, sandbox-isolated plugins | Chrome Extensions / Odoo addons | `userland/extensions/sigma_extension.h` |
+| 10 | First-boot onboarding wizard (7 screens, profession → app auto-install) | Ubuntu OOBE / macOS Setup | `userland/installer/sigma_welcome.cpp` |
+| 11 | Data migration daemon (Tally XML, Windows, Android, Zoho CSV) | Tally→SigmaOS migration | `sigmad/migrate/main.go` |
+| 12 | MLFQ scheduler unit tests (6 tests: demotion, boost, anti-starvation) | kernel selftest | `tests/unit/test_sigma_sched.cpp` |
+| 13 | TCP fuzzer harness (libFuzzer, covers options/conntrack/injection) | libFuzzer / AFL++ | `tests/fuzz/fuzz_sigma_tcp.cpp` |
+| 14 | Boot sequence integration test (QEMU, measures < 5s target) | openQA / kselftest | `tests/integration/test_boot_sequence.sh` |
+
+---
+
+## Round 19 — Screen Reader · India Strategy · Testing Docs
+
+| # | Improvement | Inspired By | File |
+|---|---|---|---|
+| 1 | Package fuzzer (path traversal, JSON, signature, header parse) | libFuzzer best practices | `tests/fuzz/fuzz_sigma_pkg.cpp` |
+| 2 | AT-SPI2 screen reader (TTS, focus tracking, live regions, keyboard nav) | GNOME Orca / AT-SPI2 | `userland/accessibility/sigma_screen_reader.cpp` |
+| 3 | India Business Strategy wiki (Tally/Zoho/Odoo competitive analysis, GTM) | — | wiki: `India-Business-Strategy.md` |
+| 4 | Testing Infrastructure wiki (unit/fuzz/integration/openQA guide) | — | wiki: `Testing-Infrastructure.md` |
+
+---
+
+## Round 20 — CI Pipeline · GST Tests · IPC Tests · Voice Control · Man Pages · Themes
+
+| # | Improvement | Inspired By | File |
+|---|---|---|---|
+| 1 | Full GitHub Actions CI workflow (8 jobs: build, unit, fuzz, memory, POSIX, integration, repro, security) | openSUSE OBS / Fedora Koji | `.github/workflows/sigma_ci.yml` |
+| 2 | GST calculation unit tests (9 tests: slabs, ITC, rounding, inter-state, UT) | Indian tax law | `tests/unit/test_sigma_gst.cpp` |
+| 3 | sigma-bus IPC unit tests (8 tests: routing, wildcard, isolation, overflow) | — | `tests/unit/test_sigma_ipc.cpp` |
+| 4 | Package integration test (install, remove, rollback, dm-verity tamper) | — | `tests/integration/test_sigma_pkg.sh` |
+| 5 | sigma-light theme TOML (WCAG 2.2 AA, GitHub-style palette) | GitHub UI / Linear | `userland/gui/themes/sigma-light/theme.toml` |
+| 6 | Voice control (Whisper.cpp STT, 15 built-in commands, sigma-ai local) | Siri / Google Assistant (offline) | `userland/accessibility/sigma_voice_control.cpp` |
+| 7 | Man pages — sigma-pkg(1), sigmactl(1) (groff format) | POSIX man pages | `userland/docs/man/` |
 
 ---
 
