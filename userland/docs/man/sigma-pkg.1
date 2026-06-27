@@ -1,0 +1,159 @@
+.\" SPDX-License-Identifier: GPL-2.0-or-later
+.\" sigma-pkg(1) — SigmaOS package manager
+.TH SIGMA-PKG 1 "2026-06-27" "SigmaOS" "SigmaOS User Commands"
+
+.SH NAME
+sigma-pkg \- install, remove, update, and manage SigmaOS packages
+
+.SH SYNOPSIS
+.B sigma-pkg
+.IR command
+.RI [ options ]
+.RI [ package... ]
+
+.SH DESCRIPTION
+.B sigma-pkg
+is the SigmaOS package manager. Every package is verified with a
+SHA-256 + BLAKE2b dual hash and a Dilithium3 (ML-DSA-65) post-quantum
+signature before installation. Packages are installed atomically via
+OSTree; a failed install never corrupts the running system.
+
+.SH COMMANDS
+
+.TP
+.BI "install " package...
+Download, verify, and install one or more packages.
+.RS
+.nf
+$ sigma-pkg install vim htop curl
+.fi
+.RE
+
+.TP
+.BI "remove " package...
+Remove installed packages. Configuration files are preserved by default.
+.RS
+.nf
+$ sigma-pkg remove vim
+$ sigma-pkg remove --purge vim    # also remove config files
+.fi
+.RE
+
+.TP
+.BI "update " [package...]
+Update all installed packages (or specified ones) to their latest version.
+.RS
+.nf
+$ sigma-pkg update                 # update everything
+$ sigma-pkg update vim             # update only vim
+.fi
+.RE
+
+.TP
+.B search " keyword"
+Search the package repository by name, description, or HSN category.
+.RS
+.nf
+$ sigma-pkg search accounting      # find accounting apps
+$ sigma-pkg search "GST"
+.fi
+.RE
+
+.TP
+.BI "show " package
+Display detailed package information: version, description, size, dependencies,
+install path (/sigma/store/<hash>-<name>-<ver>/), and Dilithium3 signature.
+
+.TP
+.B list
+List all installed packages with version and derivation hash.
+
+.TP
+.BI "rollback " [generation]
+Roll back to a previous package generation (GNU Guix-style).
+.RS
+.nf
+$ sigma-pkg rollback               # list available generations
+$ sigma-pkg rollback 3             # roll back to generation 3
+.fi
+.RE
+
+.TP
+.BI "verify " package
+Re-verify the integrity of an installed package (dual hash + signature).
+
+.TP
+.BI "import " file
+Import a .spkg archive from disk (offline install).
+
+.SH OPTIONS
+
+.TP
+.B \-\-dry\-run
+Show what would be installed/removed without making changes.
+
+.TP
+.B \-\-no\-verify
+Skip signature verification (DANGEROUS — only for development).
+
+.TP
+.BI "\-\-profile " name
+Use a non-default package profile (e.g. \fIca\fR, \fIdeveloper\fR, \fIhealth\fR).
+
+.TP
+.B \-\-offline
+Do not contact the package repository (use local cache only).
+
+.SH SECURITY
+All packages are:
+.IP \(bu 3
+Verified with SHA-256 + BLAKE2b (dual hash)
+.IP \(bu 3
+Signed with Dilithium3 (ML-DSA-65, NIST FIPS 204)
+.IP \(bu 3
+Installed to /sigma/store/<derivation-hash>-<name>-<ver>/ (Guix-style)
+.IP \(bu 3
+Checked against the dm-verity root hash before activation
+
+.SH EXAMPLES
+.nf
+# Install Tally-compatible accounting app
+$ sigma-pkg install sigma-accounts sigma-gst sigma-payroll
+
+# Search for CA tools
+$ sigma-pkg search --profile ca
+
+# Verify all installed packages
+$ sigma-pkg list | awk '{print $1}' | xargs sigma-pkg verify
+
+# Offline install from USB
+$ sigma-pkg import /media/usb/sigma-vim-9.1.0.spkg
+.fi
+
+.SH FILES
+.TP
+.I /sigma/var/db/pkg/installed.json
+Database of installed packages and their derivation hashes.
+
+.TP
+.I /sigma/var/generations/
+Generation snapshots for rollback (one directory per generation).
+
+.TP
+.I /sigma/store/
+Content-addressed package store (immutable).
+
+.TP
+.I /sigma/etc/pkg/sources.list
+Package repository URLs.
+
+.SH SEE ALSO
+.BR sigma-apid (8),
+.BR sigma-healthd (8),
+.BR sigmactl (1)
+
+.SH BUGS
+Report bugs at https://github.com/AaryanSinghChauhan09/SigmaOS/issues
+
+.SH AUTHORS
+SigmaOS Contributors. See CONTRIBUTORS file.

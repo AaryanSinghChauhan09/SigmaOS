@@ -1,0 +1,145 @@
+.\" SPDX-License-Identifier: GPL-2.0-or-later
+.TH SIGMACTL 1 "2026-06-27" "SigmaOS" "SigmaOS User Commands"
+
+.SH NAME
+sigmactl \- SigmaOS system control CLI
+
+.SH SYNOPSIS
+.B sigmactl
+.IR command
+.RI [ subcommand ]
+.RI [ options ]
+
+.SH DESCRIPTION
+.B sigmactl
+is the unified command-line tool for managing SigmaOS.
+It communicates with
+.BR sigma-apid (8)
+over gRPC (mTLS authenticated) or directly with individual daemons.
+
+.SH COMMANDS
+
+.SS health
+Query system health from sigma-healthd.
+.nf
+$ sigmactl health                  # all subsystems
+$ sigmactl health sigma-cryptfs    # specific subsystem
+$ sigmactl health --watch          # live updates every 2s
+.fi
+
+.SS pkg
+Package management (wraps sigma-pkg).
+.nf
+$ sigmactl pkg install vim
+$ sigmactl pkg remove vim
+$ sigmactl pkg list
+$ sigmactl pkg rollback 3
+$ sigmactl pkg update
+.fi
+
+.SS sysctl
+Read and write kernel parameters.
+.nf
+$ sigmactl sysctl get kernel.sched.rt_threshold
+$ sigmactl sysctl set security.aslr.enabled=1
+$ sigmactl sysctl list security.*
+.fi
+
+.SS audit
+Stream or query the audit log.
+.nf
+$ sigmactl audit stream             # live stream (Ctrl-C to stop)
+$ sigmactl audit query --last 100
+$ sigmactl audit query --pid 1042
+$ sigmactl audit query --event pledge_violation
+.fi
+
+.SS kpatch
+Live kernel patch management.
+.nf
+$ sigmactl kpatch list              # active patches
+$ sigmactl kpatch load cve-2026-42.spatch
+$ sigmactl kpatch revert sigma-kpatch-CVE-2026-42
+$ sigmactl kpatch verify cve-2026-42.spatch
+.fi
+
+.SS service
+Manage system services.
+.nf
+$ sigmactl service list
+$ sigmactl service start sigma-metrics
+$ sigmactl service stop sigma-telemetry
+$ sigmactl service restart sigma-healthd
+$ sigmactl service status sigma-watchdog
+.fi
+
+.SS theme
+Manage the Zenith desktop theme.
+.nf
+$ sigmactl theme list
+$ sigmactl theme set sigma-light
+$ sigmactl theme set high-contrast
+$ sigmactl theme create --name "my-dark" --accent "#ff6b6b"
+$ sigmactl theme export my-dark > my-dark.sigma-theme
+.fi
+
+.SS kiosk
+Manage kiosk mode.
+.nf
+$ sigmactl kiosk enable --app sigma-pos
+$ sigmactl kiosk enable --url https://irctc.in
+$ sigmactl kiosk status
+$ sigmactl kiosk disable --admin-did did:sigma:admin:abc
+.fi
+
+.SS fleet
+Manage sigma-fleet (multi-node deployment).
+.nf
+$ sigmactl fleet status
+$ sigmactl fleet push-update --group retail-stores
+$ sigmactl fleet deploy sigma-pos@1.5.0 --group retail-stores
+.fi
+
+.SS migrate
+Data migration.
+.nf
+$ sigmactl migrate sources          # list supported sources
+$ sigmactl migrate run tally company.xml
+$ sigmactl migrate run windows /mnt/windows-drive
+$ sigmactl migrate progress --job-id mig-12345
+.fi
+
+.SS search
+Global search.
+.nf
+$ sigmactl search "GST filing"
+$ sigmactl search --type file invoice
+$ sigmactl search --type app accounting
+.fi
+
+.SH OPTIONS
+
+.TP
+.B \-\-json
+Output results as JSON instead of human-readable text.
+
+.TP
+.B \-\-quiet
+Suppress informational output; only show errors.
+
+.TP
+.BI "\-\-server " addr
+Connect to sigma-apid at a non-default address (for remote management).
+
+.SH FILES
+.TP
+.I /run/sigma/apid.sock
+Default sigma-apid Unix socket.
+
+.SH SEE ALSO
+.BR sigma-pkg (1),
+.BR sigma-apid (8),
+.BR sigma-healthd (8)
+
+.SH AUTHORS
+SigmaOS Contributors.
