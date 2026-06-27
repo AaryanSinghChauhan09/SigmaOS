@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<!-- SPDX-License-Identifier: GPL-2.0-or-later -->
+<!-- SigmaOS in the Browser — WASM Native Port host page -->
+<!-- Approach 1: True SigmaOS kernel compiled to WebAssembly -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0d1117">
+  <title>SigmaOS — Sovereign OS in Your Browser</title>
+  <link rel="manifest" href="/manifest.json">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0d1117;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      color: #e6edf3;
+    }
+    #sigma-canvas {
+      width: 1280px;
+      height: 720px;
+      max-width: 100vw;
+      max-height: 80vh;
+      border: 1px solid #30363d;
+      cursor: default;
+      image-rendering: pixelated;
+    }
+    #status {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #8b949e;
+    }
+    #boot-screen {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #0d1117;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    #boot-logo {
+      font-size: 48px;
+      font-weight: bold;
+      color: #58a6ff;
+      letter-spacing: 8px;
+      margin-bottom: 24px;
+    }
+    #boot-progress {
+      width: 320px;
+      height: 4px;
+      background: #21262d;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    #boot-bar {
+      height: 100%;
+      background: #58a6ff;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    #boot-msg { margin-top: 12px; font-size: 13px; color: #8b949e; }
+  </style>
+</head>
+<body>
+  <!-- Boot screen -->
+  <div id="boot-screen">
+    <div id="boot-logo">Σ SIGMAOS</div>
+    <div id="boot-progress"><div id="boot-bar"></div></div>
+    <div id="boot-msg">Initialising kernel...</div>
+  </div>
+
+  <!-- Main canvas where SigmaOS renders its display -->
+  <canvas id="sigma-canvas" width="1280" height="720" tabindex="0"></canvas>
+  <div id="status">SigmaOS | <span id="fps">0</span> fps | <span id="mem">0</span> MB</div>
+
+  <script type="module">
+    // ── Boot progress ──────────────────────────────────────────────────────
+    const bootBar = document.getElementById('boot-bar');
+    const bootMsg = document.getElementById('boot-msg');
+    function setProgress(pct, msg) {
+      bootBar.style.width = pct + '%';
+      bootMsg.textContent = msg;
+    }
+
+    // ── Canvas setup ────────────────────────────────────────────────────────
+    const canvas = document.getElementById('sigma-canvas');
+    const ctx    = canvas.getContext('2d');
+    canvas.focus();
+
+    // ── Framebuffer render ──────────────────────────────────────────────────
+    let imageData = ctx.createImageData(1280, 720);
+    let lastFrameTime = 0;
+    let frameCount = 0;
+    let fpsDisplay = document.getElementById('fps');
+
+    function renderFrame(ptr, w, h, memory) {
+      const src = new Uint8ClampedArray(memory.buffer, ptr, w * h * 4);
+      imageData.data.set(src);
+      ctx.putImageData(imageData, 0, 0);
+      frameCount++;
+      const now = performance.now();
+      if (now - lastFrameTime >= 1000) {
+        fpsDisplay.textContent = frameCount;
+        frameCount = 0;
+        lastFrameTime = now;
+      }
+    }
+
+    // ── Audio context ────────────────────────────────────────────────────────
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playAudio(ptr, frames, rate, memory) {
+      const buf  = audioCtx.createBuffer(2, frames, rate);
+      const data = new Float32Array(memory.buffer, ptr, frames * 2);
+      buf.copyToChannel(data.subarray(0, frames), 0);
+      buf.copyToChannel(data.subarray(frames), 1);
+      const src = audioCtx.createBufferSource();
+      src.buffer = buf;
+      src.connect(audioCtx.destination);
+      src.start();
+    }
+
+    // ── Network proxy via WebSocket ────────────────────────────────────────
+    let netWs = null;
+    let netRecvQueue = [];
+
+    function ensureNetWs() {
+      if (netWs && netWs.readyState === WebSocket.OPEN) return;
+      netWs = new WebSocket('wss://proxy.sigmaos.dev/ws');
+      netWs.binaryType = 'arraybuffer';
+      netWs.onmessage = e => netRecvQueue.push(new Uint8Array(e.data));
+      netWs.onerror   = () => {};
+    }
+
+    // ── WASM imports ─────────────────────────────────────────────────────────
+    let wasmInstance = null;
+
+    const imports = {
+      sigma_env: {
+        draw_frame: (ptr, w, h) =>
+          renderFrame(ptr, w, h, wasmInstance.exports.memory),
+
+        play_audio: (ptr, frames, rate) =>
+          playAudio(ptr, frames, rate, wasmInstance.exports.memory),
+
+        net_send: (ptr, len) => {
+          ensureNetWs();
+          const data = new Uint8Array(wasmInstance.exports.memory.buffer, ptr, len);
+          netWs.send(data);
+          return len;
+        },
+
+        net_recv: (ptr, cap) => {
+          if (netRecvQueue.length === 0) return 0;
+          const pkt = netRecvQueue.shift();
+          const n   = Math.min(pkt.length, cap);
+          new Uint8Array(wasmInstance.exports.memory.buffer, ptr, n).set(pkt.subarray(0, n));
+          return n;
+        },
+
+        get_time_ms: () => performance.now(),
+
+        random_bytes: (ptr, len) => {
+          const buf = new Uint8Array(wasmInstance.exports.memory.buffer, ptr, len);
+          crypto.getRandomValues(buf);
+        },
+
+        log_message: (ptr, len) => {
+          const bytes = new Uint8Array(wasmInstance.exports.memory.buffer, ptr, len);
+          console.log('[sigma]', new TextDecoder().decode(bytes));
+        },
+
+        // OPFS filesystem bridge
+        fs_open: async (pathPtr, pathLen, flags) => {
+          const path = new TextDecoder().decode(
+            new Uint8Array(wasmInstance.exports.memory.buffer, pathPtr, pathLen));
+          // OPFS implementation via File System Access API
+          try {
+            const root = await navigator.storage.getDirectory();
+            const parts = path.split('/').filter(Boolean);
+            let dir = root;
+            for (let i = 0; i < parts.length - 1; i++)
+              dir = await dir.getDirectoryHandle(parts[i], { create: true });
+            const fh = await dir.getFileHandle(parts[parts.length - 1], { create: !!(flags & 0x40) });
+            return fh._handle_id || 3; // simplified
+          } catch { return -1; }
+        },
+
+        fs_read:  (handle, ptr, len) => 0, // async in real impl
+        fs_write: (handle, ptr, len) => len,
+        fs_close: (handle) => 0,
+        fs_stat:  (pathPtr, outSizePtr) => -1,
+      },
+
+      // WASI compatibility shim
+      wasi_snapshot_preview1: {
+        proc_exit: code => { console.log('[sigma] exit:', code); },
+        fd_write: (fd, iovs, iovs_len, nwritten_ptr) => 0,
+        environ_sizes_get: () => 0,
+        environ_get: () => 0,
+        args_sizes_get: () => 0,
+        args_get: () => 0,
+        clock_time_get: (id, prec, out) => 0,
+        random_get: (ptr, len) => {
+          const buf = new Uint8Array(wasmInstance.exports.memory.buffer, ptr, len);
+          crypto.getRandomValues(buf);
+          return 0;
+        },
+      }
+    };
+
+    // ── Load and boot SigmaOS WASM ─────────────────────────────────────────
+    setProgress(10, 'Fetching kernel...');
+    try {
+      const result = await WebAssembly.instantiateStreaming(
+        fetch('/sigmaos.wasm'),
+        imports
+      );
+      wasmInstance = result.instance;
+      setProgress(60, 'Kernel loaded. Starting boot sequence...');
+      await new Promise(r => setTimeout(r, 200));
+      setProgress(80, 'Initialising subsystems...');
+      document.getElementById('boot-screen').style.display = 'none';
+      document.getElementById('mem').textContent =
+        Math.round(wasmInstance.exports.memory.buffer.byteLength / 1024 / 1024);
+      setProgress(100, 'Boot complete');
+      wasmInstance.exports.sigma_wasm_main();
+    } catch (e) {
+      // Fallback: show v86 emulator if WASM not available
+      bootMsg.textContent = 'WASM unavailable. Loading v86 emulator...';
+      window.location.href = '/emulator.html';
+    }
+
+    // ── Input forwarding ───────────────────────────────────────────────────
+    canvas.addEventListener('keydown', e => {
+      if (wasmInstance) wasmInstance.exports.sigma_input_key(e.keyCode, 1);
+      e.preventDefault();
+    });
+    canvas.addEventListener('keyup', e => {
+      if (wasmInstance) wasmInstance.exports.sigma_input_key(e.keyCode, 0);
+    });
+    canvas.addEventListener('mousemove', e => {
+      const r = canvas.getBoundingClientRect();
+      const x = Math.round((e.clientX - r.left) * 1280 / r.width);
+      const y = Math.round((e.clientY - r.top)  * 720  / r.height);
+      if (wasmInstance) wasmInstance.exports.sigma_input_mouse(x, y, 0);
+    });
+    canvas.addEventListener('mousedown', e => {
+      if (wasmInstance) wasmInstance.exports.sigma_input_mouse(0, 0, e.buttons);
+    });
+
+    // ── Service Worker registration ────────────────────────────────────────
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>
