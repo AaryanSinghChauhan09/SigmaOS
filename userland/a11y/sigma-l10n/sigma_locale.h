@@ -1,224 +1,130 @@
-/* SPDX-License-Identifier: GPL-2.0-or-later */
-/**
- * sigma_locale.h — SigmaOS Localisation (l10n) subsystem
+// SPDX-License-Identifier: GPL-2.0-or-later
+#pragma once
+/*
+ * sigma_locale.h — Internationalization & localization (i18n/l10n)
  *
- * Inspired by:
- *   • Android ResourceManager (locale-indexed string tables)
- *   • GNU gettext catalogue format (msgid → msgstr)
- *   • Haiku Locale Kit (BLocaleRoster, BLanguage, BCatalog)
- *   • ICU (International Components for Unicode) locale identifiers
+ * Provides string catalog lookup, plural forms, RTL text direction,
+ * number/date formatting, and locale fallback chains.
  *
- * Design goals:
- *   1. Kernel-space safe — no heap allocation in core lookup path.
- *   2. Compile-time fallback to en_US if a string is not translated.
- *   3. Support RTL (right-to-left) layout directives.
- *   4. Support three shipped locales: en_US, hi_IN, zh_CN.
+ * Locale files live at /sigma/share/locale/<lang>/<domain>.scat
+ * Binary format: header + sorted key→value string pairs (mmap-friendly).
+ *
+ * Usage:
+ *   sigma_locale_init("de_DE.UTF-8");
+ *   const char* s = _("Hello");                    // msgstr from catalog
+ *   const char* p = ngettext("%d file", "%d files", n); // plural form
  */
 
-#ifndef SIGMA_LOCALE_H
-#define SIGMA_LOCALE_H
+#include <sigma_kernel_types.h>
+#include <stdbool.h>
 
-#include <stddef.h>   /* size_t, NULL */
-#include <stdint.h>   /* uint8_t, uint32_t */
-#include <stdbool.h>  /* bool */
+/* ── Locale handle ───────────────────────────────────────────────────────── */
+typedef struct sigma_locale sigma_locale_t;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/* ── Locale identifiers ──────────────────────────────────────────────────── */
-
-typedef enum sigma_locale_id {
-    SIGMA_LOCALE_UNKNOWN = 0,
-    SIGMA_LOCALE_EN_US   = 1,   /* English (United States) — default fallback */
-    SIGMA_LOCALE_HI_IN   = 2,   /* Hindi   (India)                            */
-    SIGMA_LOCALE_ZH_CN   = 3,   /* Chinese (Simplified, PRC)                  */
-    SIGMA_LOCALE__COUNT
-} sigma_locale_id_t;
-
-/* Text directionality for layout engine */
-typedef enum sigma_text_dir {
-    SIGMA_TEXT_LTR = 0,  /* left-to-right (en_US, hi_IN)  */
-    SIGMA_TEXT_RTL = 1,  /* right-to-left (future: ar, he) */
+/* ── Text direction ──────────────────────────────────────────────────────── */
+typedef enum {
+    SIGMA_TEXT_LTR = 0,   /* Latin, CJK, etc.          */
+    SIGMA_TEXT_RTL = 1,   /* Arabic, Hebrew, Farsi      */
+    SIGMA_TEXT_TTB = 2,   /* Traditional Mongolian      */
 } sigma_text_dir_t;
 
-/* ── Locale metadata ─────────────────────────────────────────────────────── */
-
-typedef struct sigma_locale_info {
-    sigma_locale_id_t id;
-    const char       *bcp47_tag;    /* e.g. "en-US", "hi-IN", "zh-CN" */
-    const char       *display_name; /* native script: "English", "हिन्दी", "中文" */
-    sigma_text_dir_t  dir;
-    const char       *decimal_sep;  /* "." or "," */
-    const char       *thousands_sep;
-    const char       *date_fmt;     /* strftime format */
-    const char       *time_fmt;
+/* ── Locale descriptor ───────────────────────────────────────────────────── */
+typedef struct {
+    char              locale_id[32];       /* "en_US.UTF-8"                  */
+    char              language[8];         /* "en"                           */
+    char              region[8];           /* "US"                           */
+    char              charset[16];         /* "UTF-8"                        */
+    sigma_text_dir_t  text_direction;
+    char              decimal_sep;         /* '.' or ','                     */
+    char              thousand_sep;        /* ',' or '.'                     */
+    char              date_fmt[32];        /* strftime-style "%m/%d/%Y"      */
+    char              time_fmt[32];        /* "%H:%M:%S" or "%I:%M %p"       */
+    bool              use_24h;
 } sigma_locale_info_t;
 
-/* Built-in locale table — defined in sigma_locale.c */
-extern const sigma_locale_info_t sigma_locale_table[SIGMA_LOCALE__COUNT];
+/* ── Init / teardown ─────────────────────────────────────────────────────── */
 
-/* ── Message catalogue entry ─────────────────────────────────────────────── */
-
-/**
- * A single translated string mapping.
- * msgid is the canonical English key; msgstr is the translation.
- * All strings are UTF-8.
+/*
+ * sigma_locale_init — initialise locale subsystem from POSIX locale string.
+ * Loads catalog for the requested locale, falls back through region→language→C.
+ * Returns 0 on success, -SIGMA_ENOENT if no catalog found (C locale used).
  */
-typedef struct sigma_msg_entry {
-    uint32_t    hash;    /* FNV-1a hash of msgid for O(1) lookup */
-    const char *msgid;   /* canonical key, always en_US */
-    const char *msgstr;  /* translated string */
-} sigma_msg_entry_t;
+int sigma_locale_init(const char* locale_string);
 
-/**
- * A translation catalogue for one locale.
- * Entries must be sorted by hash for binary search.
+/*
+ * sigma_locale_load_domain — load an additional translation domain.
+ * Domain name maps to /sigma/share/locale/<lang>/<domain>.scat
  */
-typedef struct sigma_catalogue {
-    sigma_locale_id_t    locale;
-    const sigma_msg_entry_t *entries;
-    size_t                   count;
-} sigma_catalogue_t;
+int sigma_locale_load_domain(const char* domain);
 
-/* ── Built-in catalogues ─────────────────────────────────────────────────── */
+void sigma_locale_shutdown(void);
 
-/* Defined in sigma_locale_en_US.c / sigma_locale_hi_IN.c / sigma_locale_zh_CN.c */
-extern const sigma_catalogue_t sigma_cat_en_US;
-extern const sigma_catalogue_t sigma_cat_hi_IN;
-extern const sigma_catalogue_t sigma_cat_zh_CN;
+/* ── Translation ─────────────────────────────────────────────────────────── */
 
-/* ── Runtime locale state ────────────────────────────────────────────────── */
+/* Get translated string for msgid.  Returns msgid if not found. */
+const char* sigma_gettext(const char* domain, const char* msgid);
 
-/**
- * sigma_locale_init — set the active locale for this process/session.
- *
- * @param id  locale to activate; pass SIGMA_LOCALE_UNKNOWN for auto-detect
- *            from SIGMA_LANG / LANG / LC_ALL environment variables.
- * @return    the effective locale that was activated.
- */
-sigma_locale_id_t sigma_locale_init(sigma_locale_id_t id);
+/* Plural-aware translation.  n selects the appropriate plural form. */
+const char* sigma_ngettext(const char* domain,
+                            const char* msgid_singular,
+                            const char* msgid_plural,
+                            sigma_u64   n);
 
-/**
- * sigma_locale_get — return the currently active locale id.
- */
-sigma_locale_id_t sigma_locale_get(void);
+/* Convenience macros (set SIGMA_TEXT_DOMAIN before including) */
+#ifndef SIGMA_TEXT_DOMAIN
+#  define SIGMA_TEXT_DOMAIN "sigma"
+#endif
 
-/**
- * sigma_locale_info — return metadata for a locale.
- * Returns en_US info if id is out of range.
- */
-const sigma_locale_info_t *sigma_locale_info(sigma_locale_id_t id);
+#define _(s)          sigma_gettext(SIGMA_TEXT_DOMAIN, (s))
+#define N_(s)         (s)    /* mark-only, no lookup at compile time        */
+#define ngettext(s,p,n) sigma_ngettext(SIGMA_TEXT_DOMAIN, (s), (p), (n))
 
-/* ── Translation lookup ──────────────────────────────────────────────────── */
+/* ── Locale query ────────────────────────────────────────────────────────── */
 
-/**
- * sigma_tr — translate a message key in the active locale.
- *
- * Performs a binary search in the active catalogue.
- * Falls back to en_US if the key is missing in the active locale.
- * Falls back to msgid itself if en_US also lacks it.
- *
- * @param msgid  canonical English key string.
- * @return       pointer to translated UTF-8 string (never NULL).
- *
- * Thread-safe: locale id is read atomically; catalogues are read-only.
- */
-const char *sigma_tr(const char *msgid);
+/* Fill info for the currently active locale. */
+int sigma_locale_query(sigma_locale_info_t* out);
 
-/**
- * Convenience macro — shorter spelling.
- */
-#define _(msgid) sigma_tr(msgid)
-
-/**
- * sigma_tr_locale — translate in a specific locale (not the active one).
- */
-const char *sigma_tr_locale(sigma_locale_id_t id, const char *msgid);
-
-/* ── Plural forms ────────────────────────────────────────────────────────── */
-
-/**
- * sigma_tr_plural — pick singular or plural form.
- *
- * Simplified rule: n == 1 → singular, else → plural.
- * (Sufficient for en_US, hi_IN; Chinese has no grammatical plural.)
- *
- * @param msgid_singular  key for singular form
- * @param msgid_plural    key for plural form
- * @param n               count
- */
-const char *sigma_tr_plural(const char *msgid_singular,
-                             const char *msgid_plural,
-                             unsigned long n);
+/* Return text direction for the active locale. */
+sigma_text_dir_t sigma_locale_text_direction(void);
 
 /* ── Number / date formatting ────────────────────────────────────────────── */
 
-/**
- * sigma_fmt_number — format an integer with locale-appropriate thousands sep.
- * Writes into buf[buflen].  Returns bytes written (excl. NUL) or -1 on error.
+/*
+ * sigma_format_number — format integer with locale thousand separator.
+ * buf must be at least 32 bytes.
  */
-int sigma_fmt_number(long long value, char *buf, size_t buflen);
-
-/**
- * sigma_fmt_date — format a Unix timestamp using the locale date format.
- * Wraps strftime with the locale's date_fmt.
- */
-int sigma_fmt_date(long long unix_ts, char *buf, size_t buflen);
-
-/* ── FNV-1a hash (used internally, exposed for catalogue builders) ──────── */
-
-static inline uint32_t sigma_fnv1a(const char *s) {
-    uint32_t h = 2166136261u;
-    while (*s) {
-        h ^= (uint8_t)*s++;
-        h *= 16777619u;
-    }
-    return h;
-}
-
-/* ── Well-known message keys ────────────────────────────────────────────── */
-/* Use these constants instead of raw strings to avoid typos. */
-
-#define SIGMA_MSG_OK              "ok"
-#define SIGMA_MSG_CANCEL          "cancel"
-#define SIGMA_MSG_ERROR           "error"
-#define SIGMA_MSG_YES             "yes"
-#define SIGMA_MSG_NO              "no"
-#define SIGMA_MSG_LOADING         "loading"
-#define SIGMA_MSG_DONE            "done"
-#define SIGMA_MSG_RETRY           "retry"
-#define SIGMA_MSG_PERMISSION_DENIED "permission_denied"
-#define SIGMA_MSG_NOT_FOUND       "not_found"
-#define SIGMA_MSG_BOOT_OK         "boot_ok"
-#define SIGMA_MSG_BOOT_FAIL       "boot_fail"
-#define SIGMA_MSG_UPDATE_AVAIL    "update_available"
-#define SIGMA_MSG_UPDATE_DONE     "update_done"
-#define SIGMA_MSG_SHUTDOWN        "shutdown"
-#define SIGMA_MSG_REBOOT          "reboot"
-
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
-
-#endif /* SIGMA_LOCALE_H */
+int sigma_format_number(sigma_s64 n, char* buf, int buf_len);
 
 /*
- * ── Usage example ────────────────────────────────────────────────────────────
+ * sigma_format_bytes — human-readable size (KB/MB/GB) in locale language.
+ * e.g., "1,23 GB" (de_DE) or "1.23 GB" (en_US).
+ */
+int sigma_format_bytes(sigma_u64 bytes, char* buf, int buf_len);
+
+/*
+ * sigma_format_date — format Unix timestamp using locale date format.
+ */
+int sigma_format_date(sigma_u64 timestamp_ns, char* buf, int buf_len);
+
+/* ── Charset conversion ──────────────────────────────────────────────────── */
+
+/*
+ * sigma_locale_to_utf8 — convert string from locale charset to UTF-8.
+ * Returns bytes written or negative error code.
+ */
+int sigma_locale_to_utf8(const char* src, int src_len,
+                          char* dst,       int dst_len);
+
+int sigma_utf8_to_locale(const char* src, int src_len,
+                          char* dst,       int dst_len);
+
+/* ── Catalog compilation (build-time tool) ───────────────────────────────── */
+/*
+ * sigma-msgfmt converts .po files to .scat binary catalogs:
+ *   sigma-msgfmt -d sigma -l de_DE messages.po -o sigma.scat
  *
- *   #include "sigma_locale.h"
- *
- *   void boot_message(void) {
- *       sigma_locale_init(SIGMA_LOCALE_UNKNOWN);  // auto-detect from env
- *       printf("%s\n", _(SIGMA_MSG_BOOT_OK));
- *       // en_US → "Boot successful"
- *       // hi_IN → "बूट सफल"
- *       // zh_CN → "启动成功"
- *   }
- *
- * ── Catalogue authoring ──────────────────────────────────────────────────────
- *
- *   Entries must be sorted ascending by hash.  Run:
- *       sigma-locale-gen --sort catalogues/hi_IN.c
- *   from the SDK to regenerate sorted tables.
+ * .scat format:
+ *   [magic: 4B][version: 1B][n_strings: 4B]
+ *   [key_offsets: n×4B][val_offsets: n×4B]
+ *   [string_pool: variable, NUL-terminated pairs]
  */
