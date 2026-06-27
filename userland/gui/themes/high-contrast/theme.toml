@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SigmaOS high-contrast accessibility theme
+# Meets WCAG 2.2 AAA contrast ratio requirements (≥7:1 for body text)
+# Required for: RPwD Act 2016 compliance, government tenders
+
+name    = "high-contrast"
+author  = "SigmaOS Team"
+version = "1.0.0"
+dark_mode      = true
+high_contrast  = true         # enables AAA contrast mode
+
+[colors]
+accent          = "#ffff00"   # bright yellow — maximum visibility
+background      = "#000000"   # pure black
+surface         = "#0a0a0a"
+surface_raised  = "#141414"
+border          = "#ffffff"   # white borders
+text_primary    = "#ffffff"   # white on black — 21:1 contrast ratio
+text_muted      = "#dddddd"   # still meets AAA at ≥7:1
+text_inverse    = "#000000"
+success         = "#00ff00"   # bright green
+warning         = "#ffff00"   # bright yellow
+error           = "#ff4444"   # bright red
+info            = "#00ccff"   # bright cyan
+
+[fonts]
+ui       = "SigmaSans"
+code     = "SigmaMono"
+display  = "SigmaSans"
+size_base   = 16              # larger default for accessibility
+line_height = 1.8             # extra line height for readability
+
+[shape]
+radius_window = 4             # sharper corners (easier to distinguish)
+radius_button  = 4
+radius_card    = 4
+radius_input   = 2
+
+[spacing]
+xs = 6
+sm = 12
+md = 20
+lg = 28
+xl = 40
+
+[animation]
+duration_ms = 0               # disable animations (motion sensitivity)
+easing      = "linear"
+
+[wallpaper]
+path         = "/sigma/share/wallpapers/solid-black.jpg"
+blur         = false
+blur_radius  = 0.0

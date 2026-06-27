@@ -1,71 +1,77 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 /*
- * sigma_kpatch.h — Live kernel function patching (kpatch-inspired)
+ * sigma_kpatch.h — Live kernel patching without reboot
  *
- * Allows security fixes to be applied to a running kernel without reboot.
- * Uses ftrace to redirect calls from the original function to a patched version.
+ * Inspired by kpatch (Red Hat) and Linux Kernel Live Patching (klp).
  *
- * Workflow:
- *   1. sigma-kpatch-build generates a .kpatch module from a diff
- *   2. sigma_kpatch_load() installs the module
- *   3. ftrace redirects old function → new function
- *   4. Original function is still in memory (easy rollback)
- *   5. sigma_kpatch_unload() restores original function
+ * Mechanism:
+ *   1. sigma-kpatch-build diffs baseline vs patched vmlinuz-sigma
+ *   2. Extracts changed functions → links into a .spatch module
+ *   3. Module is Ed25519-signed by the build key
+ *   4. sigma_kpatch_apply() quiesces all CPUs (stop_machine equivalent)
+ *   5. ftrace redirects old function → new function in the patch module
+ *   6. CPUs resume; old code is unreachable but still in memory
  *
- * Safety constraints (matches kpatch safety model):
- *   - Patch can only redirect a function that is NOT currently on any call stack
- *   - Atomic: either ALL functions in a .kpatch are redirected or NONE are
- *   - Patched modules are cryptographically signed (sigma_module_sign)
+ * Practical use: a zerotrust bypass CVE can be patched in seconds on a
+ * live cluster with zero VM downtime.
  */
 #include <sigma_kernel_types.h>
 #include <stdbool.h>
 
-#define SIGMA_KPATCH_MAGIC    0x53474B50  /* "SGKP" */
-#define SIGMA_KPATCH_MAX_FUNCS 64         /* max functions per patch module */
+#define SIGMA_KPATCH_MAGIC       0x5369674B50617463ULL  /* "SigKPatc" */
+#define SIGMA_KPATCH_VERSION     1
+#define SIGMA_KPATCH_MAX_FUNCS   128
 
+/* ── A single function replacement ──────────────────────────────────────── */
 typedef struct {
-    sigma_u64 old_addr;      /* address of original function in kernel      */
-    sigma_u64 new_addr;      /* address of replacement function             */
-    char      name[128];     /* function name (for audit log)               */
-    bool      applied;       /* true after ftrace redirect is installed     */
+    uintptr_t old_addr;        /* VA of function to replace in live kernel  */
+    uintptr_t new_addr;        /* VA of replacement function in patch module */
+    char      func_name[128];  /* Symbol name — for audit log + revert      */
+    sigma_u32 old_size;        /* Size of old function (for overlap check)  */
+    bool      active;          /* true once ftrace redirect is live         */
 } sigma_kpatch_func_t;
 
+/* ── Loadable patch module ───────────────────────────────────────────────── */
 typedef struct {
-    sigma_u32          magic;          /* SIGMA_KPATCH_MAGIC                */
-    sigma_u32          version;        /* patch format version              */
-    char               patch_id[64];  /* e.g. "CVE-2026-1234-fix"          */
-    char               description[256];
+    sigma_u64          magic;                  /* SIGMA_KPATCH_MAGIC         */
+    sigma_u32          version;                /* SIGMA_KPATCH_VERSION       */
+    char               patch_id[64];           /* "sigma-kpatch-CVE-2026-42" */
+    char               target_kernel[32];      /* kernel build ID this fits  */
+    char               description[256];       /* Human-readable description */
+    sigma_u64          timestamp;              /* Unix timestamp of build    */
+    sigma_u8           signature[64];          /* Ed25519 sig over all above */
+    sigma_u32          n_funcs;
     sigma_kpatch_func_t funcs[SIGMA_KPATCH_MAX_FUNCS];
-    int                func_count;
-    sigma_u8           signature[4595]; /* Dilithium3 signature             */
-    bool               loaded;
 } sigma_kpatch_module_t;
 
-/* ── API ──────────────────────────────────────────────────────────────────── */
+/* ── Apply/revert API ────────────────────────────────────────────────────── */
 
 /*
- * Load a kpatch module from a .kpatch file.
- * Verifies the Dilithium3 signature before applying.
- * Atomic: all-or-nothing application.
+ * sigma_kpatch_apply — atomically redirect all functions in the patch.
+ * Uses a stop_machine equivalent: all CPUs quiesced, no CPU inside any
+ * patched function during the redirect.
+ * Returns 0 on success, -EBUSY if a CPU is inside a patched function,
+ * -EBADMSG if signature verification fails.
  */
-int sigma_kpatch_load(const char* kpatch_path);
+int sigma_kpatch_apply(const sigma_kpatch_module_t *patch);
+
+/* List all active patches. cb is called once per active patch_id. */
+void sigma_kpatch_list(void (*cb)(const char *patch_id,
+                                   const char *description,
+                                   sigma_u64   timestamp,
+                                   void       *userdata),
+                       void *userdata);
 
 /*
- * Unload a patch — restores original function pointers.
- * Safe to call even while the patched functions are being executed
- * (waits for all CPUs to exit the patched functions first).
+ * Revert a live patch — restores original function pointer.
+ * The same stop_machine quiesce applies.
  */
-int sigma_kpatch_unload(const char* patch_id);
+int sigma_kpatch_revert(const char *patch_id);
 
-/* List all currently loaded patches to the audit log */
-void sigma_kpatch_list(void);
+/* Query whether a specific patch is currently active. */
+bool sigma_kpatch_is_active(const char *patch_id);
 
-/* Check if a specific function has been patched */
-bool sigma_kpatch_is_patched(const char* func_name);
-
-/*
- * sigma-kpatch-build: generates a .kpatch module from a unified diff.
- * Called offline (not at runtime) — output is signed and deployed.
- * See: scripts/sigma-kpatch-build.sh
- */
+/* Verify Ed25519 signature on a patch module without applying it. */
+int sigma_kpatch_verify(const sigma_kpatch_module_t *patch,
+                         const sigma_u8 *pubkey);
