@@ -147,3 +147,55 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ---
 
 *See also: [Architecture Overview](Architecture-Overview) · [Security Model](Security-Model) · [Kernel Architecture](Kernel) · [Building from Source](Building-from-Source) · [Contributor Roadmap](Contributor-Roadmap)*
+
+---
+
+## Round 8 — dm-verity · SemanticFS · snapd · Haiku · rpm-ostree · Whonix
+
+| # | Improvement | Inspired By | File |
+|---|---|---|---|
+| 1 | dm-verity per-package hash verification | Android Verified Boot / snapd | `userland/sigma-pkg/sigma_pkg_verity.h` |
+| 2 | Package assertions with anti-replay chain | snapd SnapDeclaration | `sigmad/pkg/assert/sigma_assert.go` |
+| 3 | SemanticFS xattrs — SIGMA:TRUST, SIGMA:CLASS, SIGMA:SIGNER | Haiku BFS | `kernel/fs/sigma_semanticfs.h` |
+| 4 | Attribute index server (O(log n) queries) | Haiku index_server | `sigmad/indexd/main.go` |
+| 5 | Sysroot exclusive lock — no concurrent pkg ops | rpm-ostree | `sigmad/pkg/sigma_pkg_txn_lock.go` |
+| 6 | Two-VM network gateway isolation | Whonix | `kernel/virt/sigma_netgw.h` |
+| 7 | Auto-generate AppArmor profiles (deny-all + plug exceptions) | snapd | `sigmad/mac/apparmor_gen.go` |
+| 8 | HMAC-sealed package journal | rpm-ostree | `userland/sigma-pkg/sigma_pkg_journal.h` |
+| 9 | Display server protocol (browser off framebuffer) | Haiku app_server | `userland/display/sigma_display_protocol.h` |
+| 10 | SIGMA_ASSERT — zero-cost in release, full diagnostics in debug | Unikraft UK_ASSERT | `klib/include/sigma_assert.h` |
+| 11 | DNS resolver + TLS 1.3 + Kyber hybrid stack | RFC 8446 / IETF PQ TLS | `net/dns/sigma_dns.h`, `net/tls/sigma_tls.h`, `net/sigma_net.h` |
+
+---
+
+## Round 9 — IPC · Audio · Fonts · Session · Drivers · Syscalls · SDK · Updates · l10n · SecBoot
+
+| # | Improvement | Inspired By | File |
+|---|---|---|---|
+| 1 | sigma-bus IPC subsystem — typed Unix-socket message bus | D-Bus / Mach ports | `userland/ipc/sigma_bus.h` + `sigmad/busd/main.go` |
+| 2 | Audio server protocol | PipeWire / PulseAudio | `userland/audio/sigma_audio_server.h` |
+| 3 | Font subsystem with bitmap + vector support | FreeType / Haiku font_server | `lib/sigma-fonts/sigma_font.h` |
+| 4 | Network daemon (netd) — interface + route + firewall management | Android netd | `sigmad/netd/main.go` |
+| 5 | Session manager header — login, seat, PAM hooks | logind / elogind | `userland/init/sigma_session.h` |
+| 6 | Driver framework — userland driver isolation with capability channels | Fuchsia DDK / Genode | `kernel/drivers/core/sigma_driver_framework.h` |
+| 7 | Syscall table — complete ABI surface with capability checks | Linux + seL4 | `klib/include/sigma_syscall.h` |
+| 8 | POSIX conformance test suite runner | OpenBSD regress | `tests/posix/run_posix_tests.sh` |
+| 9 | Crash reporter — minidump + structured report | Breakpad / Sentry | `userland/daemons/sigma-crash/sigma_crash.h` |
+| 10 | SDK CMake toolchain with hardening flags | Yocto SDK / rustup | `userland/devtools/sigma-sdk/sigma.cmake` + `cmake/sigma_hardening.cmake` |
+| 11 | One-script SDK installer | rustup / Homebrew | `userland/devtools/sigma-sdk/sigma-sdk-setup.sh` |
+| 12 | Amnesic (stateless) mode — tmpfs-only runtime | Tails / Qubes Disposable | `kernel/core/sigma_amnesic.h` |
+| 13 | Live kernel patching | kpatch / livepatch | `kernel/kpatch/sigma_kpatch.h` |
+| 14 | Generation rollback manager | NixOS / rpm-ostree | `sigmad/pkg/generations/generations.go` |
+| 15 | dinit service files for sigma-apid + sigma-trustd | dinit | `sigma-etc/services/sigma-apid.d` + `sigma-etc/services/sigma-trustd.d` |
+| 16 | openQA visual regression tests | SUSE openQA | `tests/openqa/sigma_visual_test.py` |
+| 17 | Legal compliance tool | REUSE / SPDX | `userland/apps/sigma-legal/sigma_legal.h` |
+| 18 | Certificate Authority tool — Dilithium3 PQ certs | CFSSL / step-ca | `userland/apps/sigma-ca/sigma_ca.h` |
+| 19 | Power management daemon — battery, lid, suspend | logind / UPower | `sigmad/power/main.go` |
+| 20 | Notification daemon — urgency levels, auto-expire | freedesktop.org spec | `sigmad/notify/main.go` |
+| 21 | Atomic A/B system updater | Bottlerocket / OSTree | `sigmad/update/main.go` |
+| 22 | Localisation subsystem — en_US, hi_IN, zh_CN | GNU gettext / Haiku l10n | `userland/a11y/sigma-l10n/sigma_locale.h` |
+| 23 | Secure Boot + TPM 2.0 subsystem | UEFI SB / ChromeOS vboot | `kernel/security/sigma_secboot.h` |
+
+---
+
+*See also: [Gap Analysis](Gap-Analysis) · [Feature Roadmap](Feature-Roadmap) · [Architecture Overview](Architecture-Overview)*

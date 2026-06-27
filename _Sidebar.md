@@ -5,6 +5,7 @@
 - [Contributor Roadmap](Contributor-Roadmap)
 - [Improvements Overview](Improvements-Overview)
 - [Feature Roadmap](Feature-Roadmap)
+- [Gap Analysis](Gap-Analysis)
 
 ## Architecture
 - [Architecture Overview](Architecture-Overview)
