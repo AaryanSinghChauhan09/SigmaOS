@@ -8,6 +8,7 @@
 - [Development Roadmap](Development-Roadmap)
 - [Version Timeline](Version-Timeline)
 - [Phase A Execution Checklist](Phase-A-Execution-Checklist)
+- [Branch Development Roadmap](Branch-Development-Roadmap)
 - [Feature Roadmap](Feature-Roadmap)
 - [Utilities Roadmap](Utilities-Roadmap)
 - [Gap Analysis](Gap-Analysis)
@@ -60,6 +61,7 @@
 - [SigmaOS vs Linux Distros](SigmaOS-vs-Linux)
 - [SigmaOS Crushing Linux](SigmaOS-Crushing-Linux)
 - [Windows Parity Roadmap](Windows-Parity-Roadmap)
+- [Windows Compatibility Layer](Windows-Compatibility-Layer-Roadmap)
 
 ## Autonomous Systems
 - [Sigma Self-Heal](Sigma-Self-Heal)
