@@ -20,6 +20,8 @@
 - [Syscall Dispatcher](Syscall-Dispatcher)
 - [OS Technical Superiority](OS-Technical-Superiority)
 - [Competitive Gap Matrix](Competitive-Gap-Matrix)
+- [Zenith System Improvement Plan](Zenith-System-Improvement-Plan)
+- [Differentiation Blueprint](Differentiation-Blueprint)
 
 ## Security
 - [Security Model](Security-Model)
