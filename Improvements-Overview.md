@@ -503,3 +503,48 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ---
 
 *See also: [Gap Analysis](Gap-Analysis) · [Feature Roadmap](Feature-Roadmap) · [Architecture Overview](Architecture-Overview) · [India Profession Coverage](India-Profession-Coverage) · [SigmaOS vs Linux Distros](SigmaOS-vs-Linux)*
+
+---
+
+## Round 29 — sigma-heal + sigma-commnet Full Implementation
+
+| # | Improvement | Description | File |
+|---|---|---|---|
+| 1 | `sigma_heal.h` — Autonomous OS repair header | Full API for filesystem heal (btrfs scrub/restore), kernel panic recovery (kdump+AI analysis), package conflict fix, network self-heal (DNS fallback/DHCP renew/module reload), security heal (process isolation/integrity restore/DID rekey), hardware heal (GPU fallback/sound mute/USB safe state), simulation mode, DID-signed audit events | `sigmad/heal/sigma_heal.h` |
+| 2 | `sigma_commnet.h` — Community internet header | Gateway config (2-NIC, TRAI-compliant), DID-based member enrollment, fair-share QoS (HTB), local content cache (govt/NCERT/eNAM domains), offline mode, bandwidth reporting, UPI cost-split billing, access logging (DoT 6-month retention) | `sigmad/commnet/sigma_commnet.h` |
+
+---
+
+## Round 30 — Continuous Auth + Federated Learning + Digital Twin
+
+| # | Improvement | Description | File |
+|---|---|---|---|
+| 1 | `sigma_continuous_auth.h` — Continuous authentication | Passive biometric signals (typing rhythm, mouse patterns, face liveness, BT proximity, Wi-Fi device presence), confidence-gated access tiers, RBI step-up for transactions >₹5000, full access audit log | `userland/auth/sigma_continuous_auth.h` |
+| 2 | `sigma_fedlearn.h` — Federated learning platform | Round-based FedAvg/FedProx, Kyber-encrypted weight uploads, differential privacy (ε=0.5), 6 built-in networks (agri-disease, tax-anomaly, OCR, medical, ASR, fraud), DPDP Act 2023 compliant, opt-in/opt-out | `userland/ai/sigma_fedlearn.h` |
+| 3 | `sigma_digital_twin.h` — Digital twin platform | IoT sensor framework (13 sensor types), asset health scoring + failure prediction, factory OEE tracking, hospital bed/equipment status, farm NDVI+yield prediction, simulation engine, ISRO satellite integration | `userland/twin/sigma_digital_twin.h` |
+
+---
+
+## Round 31 — AR/VR + Data Sovereignty + Boot Hardening + GameLearn
+
+| # | Improvement | Description | File |
+|---|---|---|---|
+| 1 | `sigma_xr.h` — Extended reality platform | OpenXR 1.1 runtime, AR passthrough overlays (RERA data, building plans, patient vitals, machine manuals, NavIC navigation), VR 3D workspace (3 screens at 4K), VR training simulations (surgery, fire drill, courtroom), HMD + phone AR support | `userland/xr/sigma_xr.h` |
+| 2 | `sigma_datasov.h` — Data sovereignty platform | Encrypted local vault per sigma-* app category, consent-based marketplace (DPDP Act), ZK proofs (income/age/credential/credit without revealing data), Groth16 zk-SNARK, UPI earnings from data sharing | `userland/datasov/sigma_datasov.h` |
+| 3 | `sigma_boot_hardening.h` — Boot architecture header | <2s boot target, UEFI-direct (no GRUB), parallel sigma-init, sigma-dna hardware profiling, A/B slot atomic updates, <3s hibernate resume, Rust memory safety roadmap (Phase 1/2/3), SDF ABI-stability guarantee | `kernel/security/sigma_boot_hardening.h` |
+| 4 | `sigma_gamelearn.h` — Learn OS through games | 8 game modules in 8 Indian languages, scenario/simulation/MCQ question engine, DID-signed completion certificates, UDISE school integration (marks for completion), district leaderboards | `userland/gamelearn/sigma_gamelearn.h` |
+
+---
+
+## Round 32 — Wiki: Self-Heal, CommNet, Crushing Strategy, Advanced Features
+
+| # | Wiki Page | Content |
+|---|---|---|
+| 1 | `Sigma-Self-Heal.md` | Complete guide to sigma-heal: 6 heal categories, CLI commands, simulation output, architecture diagram, comparison table vs Ubuntu/Windows/macOS/Android |
+| 2 | `Sigma-CommNet.md` | Complete guide to sigma-commnet: architecture diagram, TRAI compliance table, QoS algorithm, local cache domain table, setup walkthrough, full CLI reference, hardware requirements |
+| 3 | `SigmaOS-Crushing-Linux.md` | Distro-by-distro crushing strategy: Ubuntu (Snap/memory/updates), Arch (DKMS/AUR/install time), Fedora (SELinux/support cycle), Debian (packages/security), NixOS (learning curve/disk), Kali (root/single-purpose), Android (Google lock-in/updates). Plus boot architecture, driver stability, memory safety roadmap, security depth comparison |
+| 4 | `Advanced-India-Features.md` | 14 advanced features documented: Bhashini AI, AR/VR, sigma-auto, sigma-drone, predictive compliance, continuous auth, federated learning, digital twin, sigma-ultra-lite, sigma-gram, GameLearn, data sovereignty, ISRO integration — with CLI examples and feature tables |
+
+---
+
+*See also: [Gap Analysis](Gap-Analysis) · [Feature Roadmap](Feature-Roadmap) · [Architecture Overview](Architecture-Overview) · [India Profession Coverage](India-Profession-Coverage) · [SigmaOS vs Linux Distros](SigmaOS-vs-Linux)*

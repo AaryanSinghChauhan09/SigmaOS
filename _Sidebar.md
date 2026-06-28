@@ -44,8 +44,14 @@
 - [SigmaOS Vision for India](SigmaOS-Vision-India)
 - [Indian Compliance Roadmap](Indian-Compliance-Roadmap)
 - [India Profession Coverage](India-Profession-Coverage)
+- [Advanced India Features](Advanced-India-Features)
 - [SigmaOS vs Ubuntu](SigmaOS-vs-Ubuntu)
 - [SigmaOS vs Linux Distros](SigmaOS-vs-Linux)
+- [SigmaOS Crushing Linux](SigmaOS-Crushing-Linux)
+
+## Autonomous Systems
+- [Sigma Self-Heal](Sigma-Self-Heal)
+- [Sigma CommNet](Sigma-CommNet)
 
 ## Driver Development
 - [Driver Development Guide](Driver-Development)
