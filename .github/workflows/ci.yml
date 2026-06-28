@@ -17,7 +17,7 @@ jobs:
       # Build cache — NixOS Cachix-inspired; skips rebuilding unchanged code
       # -----------------------------------------------------------------------
       - name: Cache build artifacts & Go modules
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             build/
