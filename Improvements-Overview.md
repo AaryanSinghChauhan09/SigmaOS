@@ -548,3 +548,41 @@ sigma_usercopy.cpp                    → safe kernel↔user memory API
 ---
 
 *See also: [Gap Analysis](Gap-Analysis) · [Feature Roadmap](Feature-Roadmap) · [Architecture Overview](Architecture-Overview) · [India Profession Coverage](India-Profession-Coverage) · [SigmaOS vs Linux Distros](SigmaOS-vs-Linux)*
+
+---
+
+## Round 35 — Extended Profession App Headers (9 more apps)
+
+| # | App | Profession | Regulator | File |
+|---|---|---|---|---|
+| 1 | `sigma-cs` | Company Secretary | ICSI/MCA/SEBI LODR | `userland/apps/sigma-cs/sigma_cs.h` |
+| 2 | `sigma-sebi` | Stock broker/RIA/MFD | SEBI/AMFI/CDSL | `userland/apps/sigma-sebi/sigma_sebi.h` |
+| 3 | `sigma-aviation` | Pilot/AME/ATC | DGCA/AAI/ICAO | `userland/apps/sigma-aviation/sigma_aviation.h` |
+| 4 | `sigma-fssai` | Restaurant/food business | FSSAI/Food Safety Act | `userland/apps/sigma-fssai/sigma_fssai.h` |
+| 5 | `sigma-mining` | Mine manager/officer | DGMS/IBM/MMDR/PESO | `userland/apps/sigma-mining/sigma_mining.h` |
+| 6 | `sigma-textile` | Weaver/garment manufacturer | Textile Commissioner/BIS | `userland/apps/sigma-textile/sigma_textile.h` |
+| 7 | `sigma-marine` | Ship officer/AME | DG Shipping/STCW/IMO | `userland/apps/sigma-marine/sigma_marine.h` |
+| 8 | `sigma-forest` | Forest/wildlife officer | MoEFCC/NTCA/FSI | `userland/apps/sigma-forest/sigma_forest.h` |
+| 9 | `sigma-trust` | NGO/temple/Waqf manager | FCRA/IT Dept/Charity Commissioner | `userland/apps/sigma-trust/sigma_trust.h` |
+
+---
+
+## Round 36 — OS Security Improvements
+
+| # | Improvement | Description | File |
+|---|---|---|---|
+| 1 | `sigma_landlock.h` — Auto-generated Landlock + seccomp-bpf profiles | Per-app filesystem restriction + syscall filter auto-generated from manifest capabilities; audit log every denial via sigma-bus | `kernel/security/sigma_landlock.h` |
+| 2 | `sigma_sbom.h` — Software Bill of Materials | CycloneDX 1.6 + SPDX 2.3 SBOM per package, Dilithium3-signed, OSV vulnerability scan, public transparency log at verify.sigmaos.dev | `userland/pkg/sigma_sbom.h` |
+
+---
+
+## Round 37 — Wiki: Extended Profession Tools + OS Technical Superiority
+
+| # | Wiki Page | Content |
+|---|---|---|
+| 1 | `Extended-Profession-Tools.md` | 9 new profession apps documented: CS/SEBI/aviation/FSSAI/mining/textile/marine/forest/trust — with feature tables, CLI examples, key differentiators |
+| 2 | `OS-Technical-Superiority.md` | 11 things no Linux distro has: kernel AI inference, DID identity, PQC default, SemanticFS, time-travel FS, fleet compute, profession customisation, India compliance, continuous auth, sigma-lex, auto-generated Landlock+seccomp. Security depth comparison (15 layers vs Ubuntu's 6). Performance targets table |
+
+---
+
+*See also: [Gap Analysis](Gap-Analysis) · [Feature Roadmap](Feature-Roadmap) · [Architecture Overview](Architecture-Overview)*

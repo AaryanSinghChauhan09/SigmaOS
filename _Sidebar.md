@@ -18,6 +18,7 @@
 - [Networking Stack](Networking)
 - [System Daemons](System-Daemons)
 - [Syscall Dispatcher](Syscall-Dispatcher)
+- [OS Technical Superiority](OS-Technical-Superiority)
 
 ## Security
 - [Security Model](Security-Model)
@@ -46,6 +47,7 @@
 - [SigmaOS Vision for India](SigmaOS-Vision-India)
 - [Indian Compliance Roadmap](Indian-Compliance-Roadmap)
 - [India Profession Coverage](India-Profession-Coverage)
+- [Extended Profession Tools](Extended-Profession-Tools)
 - [Advanced India Features](Advanced-India-Features)
 - [SigmaOS vs Ubuntu](SigmaOS-vs-Ubuntu)
 - [SigmaOS vs Linux Distros](SigmaOS-vs-Linux)
