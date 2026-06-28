@@ -13,6 +13,7 @@
 - [CLI Commands Roadmap](CLI-Commands-Roadmap)
 - [Quality, Stability & Performance](Quality-Stability-Performance-Roadmap)
 - [Stability & Performance Extended](Stability-Performance-Extended)
+- [Compatibility, Automation & Personalisation](Compatibility-Automation-Personalisation-Roadmap)
 - [Feature Roadmap](Feature-Roadmap)
 - [Utilities Roadmap](Utilities-Roadmap)
 - [Gap Analysis](Gap-Analysis)
