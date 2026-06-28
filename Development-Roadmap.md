@@ -479,4 +479,106 @@ The only OS that is simultaneously:
 
 ---
 
+## Critical Path (What Blocks What)
+
+```
+Kernel implementations (Phase 0)
+    └── Bootable ISO
+        └── QEMU CI
+            └── Real hardware boot
+                └── Network stack (Phase 1)
+                    └── Package repository
+                        └── GPU drivers (Phase 2)
+                            └── Zenith desktop
+                                └── DID login
+                                    └── IME + sigma-ai
+                                        └── India Stack APIs (Phase 3)
+                                            └── Production launch
+```
+
+The kernel implementations in Phase 0 are the **single critical-path item**. Everything else is blocked until a real scheduler, MM, and syscall table exist.
+
+---
+
+## Future Development Ideas (50 Items, 5 Categories)
+
+### Critical (Block Real Boot)
+1. Kernel scheduler/MM/syscall/IRQ implementations
+2. Bootable ISO pipeline
+3. VESA/GOP framebuffer driver
+4. Package repository server
+5. Real Argon2id CryptFS (fix Issue #44)
+6. TCP/UDP socket layer
+7. ABDM FHIR API client
+8. GST IRN API client
+9. Indian language IME
+10. Local LLM backend (sigma-ai)
+
+### New India Apps
+11. sigma-judicial (eCourts)
+12. sigma-msme (Udyam/GeM/TReDS)
+13. sigma-land (DILRMP/Bhu-Naksha)
+14. sigma-climate (CPCB/Carbon)
+15. sigma-port (ICEGATE/PCS1x)
+16. sigma-media (MIB/OTT rules)
+17. sigma-elections (EPIC/ECI)
+18. sigma-ayush (CCIM/AFI)
+19. sigma-water (CWC/CGWB/JJM)
+20. sigma-prison (ePrisons/BNSS)
+21. PM WANI PDO nodes
+22. DigiYatra biometric travel
+23. e-Shram unorganised workers
+24. India Post Banking (IPPB)
+25. IRCTC deep integration
+26. COWIN/U-WIN immunisation
+27. sigma-census enumerator
+28. Multilingual error messages
+29. CBDC e-rupee wallet
+30. AI governance framework
+
+### Advanced Technical
+31. sigma-zkvm (ZK virtual machine)
+32. sigma-mesh-compute (national distributed grid)
+33. sigma-blockchain-lite (govt records DLT)
+34. Full NIST PQC stack (FIPS 203/204/205)
+35. sigma-telco (O-RAN 5G/6G)
+36. sigma-robotics (ROS 2 on SigmaOS)
+37. sigma-neuro (BCI integration)
+38. sigma-space (IN-SPACe tools)
+39. Formal verification (seL4 style)
+40. sigma-print (3D printing)
+
+### Infrastructure
+41. Package signing CA
+42. Reproducible build verifier
+43. Auto-generated API docs
+44. Physical hardware CI farm
+45. sigma-observatory dashboard
+
+### National Vision
+46. BharatOS — NIC partnership
+47. SigmaOS hardware reference design
+48. sigma-EDU national platform
+49. sigma-RuralStack village bundle
+50. ONEST integration (skilling network)
+
+---
+
+## How to Contribute
+
+**Phase 0 — needs urgently:**
+- C++ kernel engineers (scheduler, memory manager, IRQ)
+- UEFI/EDK2 engineers (sigma-boot.efi)
+- Build system engineers (`make iso` pipeline)
+
+**Phase 2–3 — needs:**
+- Rust engineers (network stack, VFS)
+- India fintech engineers (ABDM FHIR, GST IRN, UPI)
+- GPU/graphics engineers (DRM/KMS, Mesa, Vulkan)
+- Language/NLP engineers (Inscript IME, LLM integration)
+
+Open issues: [github.com/AaryanSinghChauhan09/SigmaOS/issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
+
+---
+
 *See also: [Gap Analysis](Gap-Analysis) · [Future Development Ideas](Future-Development-Ideas) · [Improvements Overview](Improvements-Overview) · [SigmaOS Vision for India](SigmaOS-Vision-India)*

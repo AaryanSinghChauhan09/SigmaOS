@@ -159,4 +159,151 @@ Target throughput (KEM operations/sec):
 
 ---
 
-*See also: [Competitive Gap Matrix](Competitive-Gap-Matrix) · [Development Roadmap](Development-Roadmap) · [OS Technical Superiority](OS-Technical-Superiority)*
+## 9. Hardware Abstraction Layer (HAL) Expansion
+
+Broadening hardware support is the fastest way to grow SigmaOS adoption. The **SDF (Sovereign Driver Framework)** runs all drivers in Ring-3 userspace — a crashing driver cannot panic the kernel.
+
+```
+Traditional Linux driver:   crash → kernel panic → data loss
+SigmaOS SDF driver:         crash → sigma-heal restarts it → zero data loss
+```
+
+| Priority | Driver | Target Hardware | Phase |
+|----------|--------|-----------------|-------|
+| 🔴 Critical | GPU DRM/KMS | Intel i915, AMD amdgpu, VirtIO-GPU | Phase 2 |
+| 🔴 Critical | Wi-Fi 802.11ax | Intel iwlwifi, MediaTek mt7921, rtl8xxxu | Phase 1 |
+| 🟠 High | Bluetooth 5.3 | USB HCI, Intel AX, Qualcomm QCA | Phase 2 |
+| 🟠 High | ARM64 BSP | Raspberry Pi 4/5, JioBook | Phase 5 |
+| 🟡 Medium | RISC-V | StarFive VisionFive 2 | Phase 5 |
+| 🟢 Low | Neural accelerators | Qualcomm Hexagon, Hailo-8 | Phase 6 |
+
+`sigma-dna` reads CPUID, DMI, ACPI, and PCI topology at boot to auto-select the right driver set and scheduler tuning for detected silicon.
+
+---
+
+## 10. Security Enhancements
+
+Security is the default execution environment — not a mode you enable.
+
+**Sandboxing by default:**
+```
+sigma-init spawns process
+  → sigma-mac assigns MAC label from .sigma-policy
+    → capability set derived from label
+      → cgroup v2 slice enforced
+        → seccomp-style syscall filter applied
+          → process runs in isolated namespace
+```
+
+**Secure boot chain:**
+```
+sigma-boot.efi (ML-DSA signed)
+  └── Kernel (dm-verity + ML-DSA)
+      └── initramfs (hash-verified)
+          └── root FS (dm-verity read-only)
+              └── TPM2 unseals CryptFS key (Argon2id)
+```
+
+**Memory protection stack:**
+- KASLR at every boot
+- W^X enforcement (no page writable + executable simultaneously)
+- Intel CET shadow stack for ROP mitigation (`arch/x86_64/sigma_cet.asm`)
+- Full ASLR for all userland processes
+
+**Post-quantum default:**
+
+| Algorithm | Standard | Use |
+|-----------|----------|-----|
+| ML-KEM-1024 | FIPS 203 | TLS key exchange, disk encryption |
+| ML-DSA-87 | FIPS 204 | Package + boot chain signing |
+| SLH-DSA-SHAKE-256 | FIPS 205 | Code signing (hash-based) |
+
+---
+
+## 11. Modular Design & Live Patching
+
+Loose coupling ensures any subsystem can be updated without destabilizing the system.
+
+**Shard properties:**
+```
+Each of the 600 shards has:
+  ├── Versioned ABI contract (semver)
+  ├── ML-DSA-signed manifest
+  ├── Capability declarations
+  ├── Recovery handler (sigma-heal target)
+  └── Topological dependency graph
+```
+
+**sigma-kpatch — live patching:**
+```bash
+sigma-pkg install sigma-kpatch-CVE-2026-XXXX
+# → patch Dilithium3-verified
+# → function-level binary patch applied to live kernel
+# No reboot. No downtime.
+```
+
+**Profile hot-swap:**
+```bash
+sigma-svc profile switch --to forensic     # WORM audit + write-block mounts
+sigma-svc profile switch --to gaming       # Vulkan perf mode + no audit overhead
+sigma-svc profile switch --to developer    # debug symbols + relaxed MAC
+sigma-svc profile switch --to container-host  # max cgroup + no GUI
+```
+
+---
+
+## 12. Ecosystem, UX & Future Features
+
+### Application Layer
+
+| API Surface | Description |
+|-------------|-------------|
+| sigma-syscall ABI | Direct syscall interface — C/C++/Rust |
+| sigma-sdk | High-level C++ SDK with India Stack + profession bindings |
+| sigma-web API | 24 browser-accessible Web API drivers |
+
+ABI stability is CI-enforced: `make check-abi` fails if any `SIGMA_STABLE` symbol changes signature.
+
+### Virtualization & Containerization
+
+- `sigma-pod run-native` creates kernel namespaces + cgroup slices with no Docker/containerd dependency
+- `SovereignContainer` provides KVM-backed VM hosting with VirtIO device model
+- `.spkg` images are dm-verity verified before execution
+
+### Energy Efficiency
+
+| Scenario | Linux reference | SigmaOS target |
+|----------|-----------------|----------------|
+| Idle desktop (screen off) | ~4.5 W | **< 2.5 W** |
+| sigma-ultra idle (Pi Zero) | ~0.8 W | **< 0.4 W** |
+| Video playback 1080p H.265 | ~8 W | **< 5 W** (HW decode) |
+| sigma-ai inference 7B Q4 | ~15 W | **< 10 W** (NPU routing) |
+
+Power stack: `sigma-power-manager.cpp` → ACPI P/C-states → silicon-aware `sigma-perf-governor` → per-device runtime PM → `sigma-thermal` proactive throttling.
+
+### AI/ML Integration
+
+sigma-ai runs entirely on-device — no cloud dependency:
+
+```
+sigma-ai daemon
+  ├── sigma-heal: crash analysis + hotfix suggestions
+  ├── sigma-lex: Gazette parser + compliance auto-updates
+  ├── sigma-bhashini: offline ASR/TTS (22 Indian languages)
+  └── sigma-fedlearn: federated learning (no raw data leaves device)
+```
+
+Default model: Sarvam-1 (7B Q4_K_M — runs in 4 GB RAM). Hardware acceleration via AVX-512 / ARM SVE2 / NPU (sigma-dna auto-detects).
+
+### Scalability
+
+```
+sigma-ultra  (16 MB)   → USSD, 5 India Stack apps, offline-first
+sigma-standalone (512 MB) → full desktop + all profession apps + local LLM
+sigma-server (8 GB+)   → SovereignCluster + sigma-fleet (10K devices)
+sigma-cluster (N nodes) → SovereignCloudFS + sigma-mesh-compute national grid
+```
+
+---
+
+*See also: [System Improvement Plan](System-Improvement-Plan) · [Competitive Gap Matrix](Competitive-Gap-Matrix) · [Development Roadmap](Development-Roadmap) · [OS Technical Superiority](OS-Technical-Superiority) · [Gap Analysis](Gap-Analysis)*

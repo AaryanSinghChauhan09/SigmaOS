@@ -141,6 +141,42 @@ Month 42:  1,000 villages → impact at scale
 
 ---
 
+## Competitive Surpass Timeline
+
+```
+NOW:       Design document with 600 shards + 50 profession apps
+Month 3:   First QEMU boot → "SigmaOS is real hardware software"
+Month 6:   Real x86 boot + WiFi → Indian devs can test it
+Month 9:   Zenith desktop + DID login → demo-able product
+Month 14:  GST + ABDM live → first CA/doctor user
+Month 24:  AI native + ZK proofs → technically most advanced India OS
+Month 36:  BharatOS pilot → government traction
+Month 42:  1,000 villages → impact at scale
+```
+
+---
+
+## Critical Path (What Blocks What)
+
+```
+Kernel implementations (Phase 0)
+    └── Bootable ISO
+        └── QEMU CI
+            └── Real hardware boot
+                └── Network stack (Phase 1)
+                    └── Package repository
+                        └── GPU drivers (Phase 2)
+                            └── Zenith desktop
+                                └── DID login
+                                    └── IME + sigma-ai
+                                        └── India Stack APIs (Phase 3)
+                                            └── Production launch
+```
+
+The kernel implementations in Phase 0 are the **single critical-path item**. Everything else is blocked until a real scheduler, MM, and syscall table exist.
+
+---
+
 ## How to Contribute
 
 **Phase 0 — needs urgently:**
