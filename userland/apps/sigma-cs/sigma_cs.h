@@ -1,56 +1,93 @@
-// SPDX-License-Identifier: GPL-2.0-or-later
+// SPDX-License-Identifier: GPL-2.0-only
+// sigma_cs.h — SigmaOS Company Secretary App
+// Regulator: ICSI / MCA / SEBI LODR / Companies Act 2013 / FEMA
+
 #pragma once
-/*
- * sigma_cs.h — Company Secretaries (ICSI compliance suite)
- * Companies Act 2013, Secretarial Standards SS-1/SS-2/SS-4, SEBI LODR
- */
-#include <sigma_kernel_types.h>
-#include <stdbool.h>
+#include <sigma_indiastack.h>
 
-/* ── ROC Filing types ────────────────────────────────────────────────────── */
+// Secretarial Standards
 typedef enum {
-    SIGMA_ROC_MGT7   = 1,  /* Annual Return                       */
-    SIGMA_ROC_MGT7A  = 2,  /* Abridged Annual Return (OPC/Small)  */
-    SIGMA_ROC_AOC4   = 3,  /* Financial Statements                */
-    SIGMA_ROC_AOC4XBRL = 4,/* XBRL Financial Statements           */
-    SIGMA_ROC_DIR3KYC= 5,  /* Director KYC                        */
-    SIGMA_ROC_DIR12  = 6,  /* Change of Directors                 */
-    SIGMA_ROC_SH7    = 7,  /* Alteration of Share Capital         */
-    SIGMA_ROC_INC22A = 8,  /* Active Company Tagging              */
-    SIGMA_ROC_PAS3   = 9,  /* Return of Allotment                 */
-} sigma_roc_form_t;
+    SIGMA_CS_SS1_BOARD_MEETINGS   = 1,
+    SIGMA_CS_SS2_GENERAL_MEETINGS = 2,
+    SIGMA_CS_SS4_BOARD_REPORT     = 4,
+} sigma_cs_standard_t;
 
-/* ── Board Meeting ───────────────────────────────────────────────────────── */
 typedef struct {
-    sigma_u32  id;
-    char       company_cin[22];
-    char       company_name[128];
-    sigma_u64  meeting_date_epoch;
-    char       venue[256];
-    char       chairperson[128];
-    char       directors[16][128];
-    int        n_directors;
-    int        quorum_required;   /* SS-1: 1/3 of total strength, min 2     */
-    int        quorum_present;
-    char       agenda_items[32][256];
-    int        n_agenda;
-    char       minutes_file[256]; /* path to signed minutes PDF             */
-    bool       notice_sent;       /* SS-1: 21 days notice mandatory         */
-    sigma_u64  notice_sent_epoch;
-} sigma_board_meeting_t;
+    char   cin[22];               // Corporate Identity Number
+    char   company_name[128];
+    char   cs_membership[12];     // ICSI membership number
+    char   icsi_cp_no[16];        // Certificate of Practice number
+    bool   listed;                // Listed on stock exchange?
+    char   stock_exchange[8];     // "BSE", "NSE", "BOTH"
+    char   isin[14];
+} sigma_cs_company_t;
 
-/* ── API ─────────────────────────────────────────────────────────────────── */
+// ROC Filings
+typedef struct {
+    char   form_type[16];         // "MGT-7", "AOC-4", "DIR-12", etc.
+    char   cin[22];
+    char   financial_year[8];     // "2025-26"
+    time_t due_date;
+    bool   filed;
+    time_t filed_date;
+    char   srn[16];               // Service Request Number (MCA21)
+    double late_fee;              // ₹ late fee if applicable
+    char   attachment_path[256];
+} sigma_cs_roc_filing_t;
 
-int  sigma_cs_roc_file(const char *cin, sigma_roc_form_t form,
-                        const char *data_json, char *ack_out, size_t ack_max);
+// Board Meeting
+typedef struct {
+    char   meeting_id[32];
+    char   cin[22];
+    char   meeting_type[32];      // "Board", "AGM", "EGM", "Postal Ballot"
+    time_t notice_date;           // SS-1: minimum 7 days notice for board (21 for GM)
+    time_t meeting_date;
+    char   venue[256];
+    char   agenda_items[16][128]; // Agenda points
+    int    agenda_count;
+    bool   quorum_met;
+    int    directors_present;
+    int    total_directors;
+    char   minutes_path[256];     // Path to signed minutes
+    bool   minutes_signed;
+    char   e_voting_platform[64]; // NSDL, CDSL, Karvy
+} sigma_cs_board_meeting_t;
 
-int  sigma_cs_board_meeting_notice(sigma_board_meeting_t *mtg);
-int  sigma_cs_board_meeting_minutes(sigma_board_meeting_t *mtg,
-                                     const char *resolutions_json);
+// SEBI LODR compliance
+typedef struct {
+    char   company[128];
+    char   quarter[8];            // "Q1-FY26", etc.
+    bool   board_meeting_intimated;      // 2 working days before
+    bool   financial_results_filed;      // 45 days post quarter
+    bool   shareholding_pattern_filed;   // 21 days post quarter
+    bool   corporate_governance_filed;   // Annual
+    bool   rpt_disclosed;                // Related Party Transactions
+    bool   insider_trading_policy_reviewed;
+    bool   whistle_blower_policy_reviewed;
+    double compliance_score;             // % complete
+} sigma_cs_lodr_compliance_t;
 
-int  sigma_cs_secretarial_audit(const char *cin, sigma_u32 fy_start,
-                                  char *report_out, size_t report_max);
+// FEMA
+typedef struct {
+    char   transaction_type[32];  // "FC-GPR", "FC-TRS", "APR"
+    char   cin[22];
+    double foreign_investment_inr;
+    char   investor_country[4];   // ISO 3166
+    char   fdi_sector[64];
+    double fdi_cap_pct;           // Sectoral cap
+    bool   approval_required;     // RBI/Govt route
+    bool   filed;
+    char   ebiz_srn[32];
+} sigma_cs_fema_t;
 
-/* IPC ↔ BNS section mapper (useful cross-app; also used by sigma-police) */
-int  sigma_cs_old_section_to_new(const char *act, const char *old_section,
-                                   char *new_section_out, size_t max_len);
+int sigma_cs_roc_file(sigma_cs_roc_filing_t *filing);
+int sigma_cs_board_meeting_notice(sigma_cs_board_meeting_t *meeting,
+                                   const char *output_pdf);
+int sigma_cs_lodr_compliance_check(const char *cin, const char *quarter,
+                                    sigma_cs_lodr_compliance_t *out);
+int sigma_cs_fema_report(sigma_cs_fema_t *fema);
+int sigma_cs_due_date_calendar(const char *cin, const char *fy,
+                                const char *output_json);
+// CLI: sigma-cs roc file MGT-7 --cin U12345MH2020PTC123456
+//      sigma-cs board-meeting agenda --company "XYZ Ltd" --date 2026-07-15
+//      sigma-cs sebi lodr quarterly-compliance --quarter Q1-FY27
