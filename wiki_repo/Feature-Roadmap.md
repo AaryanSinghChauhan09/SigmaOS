@@ -61,7 +61,17 @@ This page documents all planned and implemented features, organized by priority 
 | ✓ | DTrace probes | `klib/sigma_trace.cpp` | Zero-cost SDT kernel tracing (illumos-inspired) |
 | ✓ | Hardened fstab | `kernel/fs/sigma_fstab.cpp` | MS_NOEXEC\|MS_NOSUID\|MS_NODEV on all mounts |
 | ✓ | cgroup v2 limits | `userland/pkg/sigma_cgroup.cpp` | CPU/memory/PID/IO limits per workload |
-| 🔧 | Filesystem snapshots | `kernel/fs/sigma_snapshot.h` | Btrfs-style O(1) snapshot + instant restore |
+| 🔧 | dm-verity per package | `userland/sigma-pkg/sigma_pkg_verity.h` | snapd ContainerPlaceInfo-inspired — every read verified |
+| 🔧 | Pkg assertions chain | `sigmad/pkg/assert/sigma_assert.go` | snapd SnapDeclaration — publisher-id, revision, anti-replay |
+| 🔧 | Plug/slot interface system | YAML service manifests | snapd-inspired — explicit service capability contracts |
+| 🔧 | SemanticFS xattrs | `kernel/fs/sigma_semanticfs.h` | Haiku BFS — SIGMA:TRUST, SIGMA:CLASS, SIGMA:SIGNER inline |
+| 🔧 | Attribute index server | `sigmad/indexd/main.go` | Haiku index server — O(log n) attribute queries |
+| 🔧 | Sysroot exclusive lock | `sigmad/pkg/sigma_pkg_txn_lock.go` | rpm-ostree — no concurrent package operations |
+| 🔧 | Two-VM network gateway | `kernel/virt/sigma_netgw.h` | Whonix — workload VM cannot bypass gateway |
+| 🔧 | AppArmor profile gen | `sigmad/mac/apparmor_gen.go` | snapd — auto-generate deny-all + plug exceptions |
+| 🔧 | Package journal | `userland/sigma-pkg/sigma_pkg_journal.h` | rpm-ostree — HMAC-sealed transaction audit log |
+| 🔧 | Display server protocol | `userland/display/sigma_display_protocol.h` | Haiku app_server — browser off framebuffer |
+| ✓ | SIGMA_ASSERT | `klib/include/sigma_assert.h` | Unikraft UK_ASSERT — zero-cost in release, full in debug |
 
 ### Networking
 | Status | Feature | File | Description |
@@ -196,22 +206,59 @@ Predictive    Natural Language   Autonomous
 
 | Priority | Feature | Phase | File |
 |---|---|---|---|
-| 🔴 Critical | Secrets manager (replace hardcoded creds) | Now | `sigmad/vault/main.go` ✓ |
-| 🔴 Critical | MAC — fix always-GRANTED stub | Now | `sigma_trust_labels.h` ✓ |
-| 🔴 Critical | CryptFS derive_key() — fix zero-key bug | Now | `sigma_cryptfs.cpp` (still stub!) |
-| 🟠 High | REST API gateway | Now | `sigmad/api-gateway/main.go` ✓ |
-| 🟠 High | Global search | Now | `sigmad/search/main.go` ✓ |
-| 🟠 High | eBPF programmable hooks | Phase 1 | `sigma_ebpf.h` 🔧 |
-| 🟠 High | Module signing | Phase 1 | `sigma_module_sign.h` 🔧 |
-| 🟠 High | Filesystem snapshots | Phase 1 | `sigma_snapshot.h` 🔧 |
-| 🟠 High | DNS sinkholing | Phase 1 | `sigma_dns_sinkhole.h` 🔧 |
-| 🟠 High | Universal binary loader | Phase 1 | `sigma_universal_loader.h` 🔧 |
-| 🟡 Medium | GPU memory oversubscription | Phase 2 | Planned |
-| 🟡 Medium | Model registry | Phase 2 | Planned |
-| 🟡 Medium | Mesh VPN | Phase 2 | Planned |
-| 🟡 Medium | Multi-monitor support | Phase 3 | Planned |
-| 🟡 Medium | Cloud sync | Phase 4 | Planned |
+| ✅ Fixed | Secrets manager (replace hardcoded creds) | Done | `sigmad/vault/main.go` ✓ |
+| ✅ Fixed | MAC — fix always-GRANTED stub | Done | `sigma_trust_labels.h` ✓ |
+| ✅ Fixed | CryptFS derive_key() — zero-key bug | Done | `kernel/crypto/sigma_cryptfs_real.cpp` ✓ Round 13 |
+| ✅ Fixed | Wayland compositor (multi-monitor, VRR, HDR) | Done | `userland/compositor/sigma_compositor.h` ✓ Round 13 |
+| ✅ Fixed | Cloud sync E2E encrypted | Done | `sigmad/cloudsync/main.go` ✓ Round 13 |
+| ✅ Fixed | Accessibility (AT-SPI2, TTS, WCAG 2.2) | Done | `userland/accessibility/sigma_a11y.h` ✓ Round 13 |
+| 🔴 Critical | eBPF VM integration | Phase 1 | `kernel/ebpf/sigma_ebpf_vm.h` ✓ Round 12 header |
+| 🟠 High | Module signing (Dilithium3) | Phase 1 | `kernel/security/sigma_module_sign.h` 🔧 |
+| 🟠 High | Filesystem snapshots | Phase 1 | `kernel/fs/sigma_snapshot.h` 🔧 |
+| 🟠 High | DNS sinkholing | Phase 1 | `kernel/net/sigma_dns_sinkhole.h` 🔧 |
+| 🟠 High | Universal binary loader | Phase 1 | `kernel/compat/sigma_universal_loader.h` 🔧 |
+| 🟠 High | GPU memory oversubscription | Phase 2 | DRM shard exists, policy TBD |
+| 🟡 Medium | Model registry (AI model versioning) | Phase 2 | Planned |
+| 🟡 Medium | Mesh VPN (WireGuard-based) | Phase 2 | Planned |
+| 🟡 Medium | System benchmark suite | Phase 3 | `tools/sigma-bench/sigma_bench.sh` ✓ Round 13 |
+| 🟡 Medium | Privacy telemetry (opt-in) | Phase 3 | `sigmad/telemetry/main.go` ✓ Round 13 |
 
 ---
 
 *See also: [Architecture Overview](Architecture-Overview) · [Security Model](Security-Model) · [Improvements Overview](Improvements-Overview) · [Contributor Roadmap](Contributor-Roadmap)*
+
+---
+
+## Rounds 10–13 New Capabilities
+
+### Kernel (Rounds 10–13)
+| Status | Feature | File | Description |
+|---|---|---|---|
+| ✓ | SMP / LAPIC / IPI | `kernel/arch/sigma_smp.h` | Multi-processor support with per-CPU data |
+| ✓ | ACPI parser (DSDT/SSDT) | `kernel/arch/sigma_acpi.h` | Full ACPI table walking |
+| ✓ | Transparent Huge Pages (2 MiB + 1 GiB) | `kernel/mm/sigma_hugepage.h` | khugepaged collapse, per-VMA policy |
+| ✓ | IPC: shared memory / pipes / MQ | `kernel/ipc/sigma_shm.h` | POSIX IPC with capability gating |
+| ✓ | eBPF VM + verifier | `kernel/ebpf/sigma_ebpf_vm.h` | Safe programmable kernel hooks |
+| ✓ | CryptFS real AES-256-GCM | `kernel/crypto/sigma_cryptfs_real.cpp` | **Fixes Issue #44** — TPM2+HKDF key |
+| ✓ | PREEMPT_RT scheduler | `kernel/sched/sigma_rt.h` | Deterministic latency real-time class |
+| ✓ | CET shadow stack + KASLR | `kernel/arch/sigma_cet.h` | Control-flow integrity + kernel ASLR |
+
+### System Daemons (Rounds 10–13)
+| Status | Feature | Socket | Description |
+|---|---|---|---|
+| ✓ | sigma-ntpd | `/run/sigma/ntpd.sock` | NTP with leap-second handling |
+| ✓ | sigma-journald | `/run/sigma/journal.sock` | Structured binary log, indexed |
+| ✓ | sigma-thermald | `/run/sigma/thermald.sock` | DVFS + thermal governor |
+| ✓ | sigma-acpid | `/run/sigma/acpid.sock` | ACPI power state events |
+| ✓ | sigma-telemetry | `/run/sigma/telemetry.sock` | Opt-in PII-scrubbed telemetry |
+| ✓ | sigma-cloudsync | `/run/sigma/cloudsync.sock` | E2E encrypted cloud sync |
+
+### User Layer (Rounds 10–13)
+| Status | Feature | File | Description |
+|---|---|---|---|
+| ✓ | Zenith Wayland compositor | `userland/compositor/sigma_compositor.h` | VRR, HDR, multi-monitor, spring animations |
+| ✓ | Accessibility framework | `userland/accessibility/sigma_a11y.h` | AT-SPI2, TTS (espeak-ng), WCAG 2.2 AA |
+| ✓ | sigma-bench | `tools/sigma-bench/sigma_bench.sh` | CPU/mem/disk/net/boot/kernel benchmarks |
+| ✓ | SigmaFS native filesystem | `kernel/fs/sigmafs/sigma_sigmafs.h` | Copy-on-write, snapshots, checksums |
+| ✓ | Software RAID 0/1/5/6/10 | `kernel/fs/sigma_raid.h` | MD RAID equivalent |
+| ✓ | LVM logical volumes | `kernel/fs/sigma_lvm.h` | Thin provisioning + snapshots |

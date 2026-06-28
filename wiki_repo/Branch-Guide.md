@@ -1,273 +1,156 @@
-# SigmaOS Branch Guide
+# Branch Guide
 
-SigmaOS implements a strict **12-branch unified architecture**. Every branch compiles the same sovereign codebase but targets a distinct hardware archetype, deployment model, or optimization profile.
-
-> **S-BUSE Rule**: All feature development flows through `main`. The Branch Uniformity & Synchronization Engine (`tools/sync_all_branches.js`) propagates changes to all `release/*` branches automatically — ensuring zero merge conflicts and bit-perfect uniformity.
+SigmaOS uses a structured multi-branch model. Each branch targets a specific deployment profile or development area. This page maps every active branch to its purpose, audience, and key differences from `main`.
 
 ---
 
-## 🗺️ Branch Overview Map
+## Development Branches
 
-| Branch | Archetype | Scheduler Model | Optimization Target | Status |
-| :--- | :--- | :--- | :--- | :--- |
-| `main` | Stable Production | Balanced CFS | General-purpose, stable | ✅ Active |
-| `release/standalone` | Bare-Metal Desktop | CPU-bound CFS | Local peripherals, high IOPS | 🔨 Dev |
-| `release/rtos` | Real-Time Embedded | SCHED_SOVEREIGN RT | Zero-latency, deterministic | 🔨 Dev |
-| `release/mobile` | Energy-Aware Mobile | DVFS-aware CFS | ARM64, battery life | 🔨 Dev |
-| `release/microkernel` | Ultra-Minimal | Lock-free SPSC IPC | 120-shard hyper-secure | ✅ Test-verified |
-| `release/dual-boot` | Co-operative Boot | Balanced CFS | GRUB chain-load, rollback | 🔨 Dev |
-| `release/distributed` | Cluster-Native | RPC shard sync | CloudFS, container orchestration | 🔨 Dev |
-| `release/cloud` | Headless Virtualization | Hypervisor-aware CFS | Multi-tenant memory pages | 🔨 Dev |
-| `release/browser` | WebAssembly Runtime | WASM event loop | Sandboxed browser apps | 🔨 Dev |
-| `release/app` | App-Store Sandbox | Static container CFS | Locked FS, pro tool suite | 🔨 Dev |
-| `performance-optimized` | SIMD-Tuned | AVX-512 / ARM Neon | Max PQC throughput | 🔬 Experimental |
-| `gh-pages` | Static Web Portal | N/A | Interactive demo, docs | ✅ Live |
+| Branch | Purpose | Key Additions |
+|---|---|---|
+| `main` | Stable trunk — everything merged here | Full feature set |
+| `kernel-exp` | Kernel subsystem experiments | Scheduler, VMM, IPC research code |
+| `drivers-dev` | Hardware driver development | Unified Driver API, USB, NVMe, Wi-Fi shims |
+| `performance-optimized` | Latency / throughput tuning | NUMA pinning, lockless allocators, AVX-512 paths |
+| `fs-dev` | Filesystem research | Ext4 journaling, CoW layer, SovereignFS prototype |
+| `tools-dev` | Userland toolchain | `sigma-cc`, `sigma-pkg`, CLI utilities |
+| `docs-update` | Documentation sync | Architecture diagrams, API reference updates |
+| `prepare-sigmaos-launch` | Launch readiness | Contributor roadmap, gap analysis, launch checklist |
+| `gh-pages` | GitHub Pages website | Landing page, app store HTML |
 
 ---
 
-## 🌿 Per-Branch Deep Dive
+## Release Branches
+
+Each `release/*` branch is a purpose-built variant of SigmaOS. They all share the same Ring-0 microkernel core but differ in enabled features, target hardware, and build flags.
+
+### `release/standalone`
+
+The reference desktop build. Bundles the Vite frontend, Electron shell, and full Zenith GUI into a self-contained package requiring no host setup.
+
+- **Target**: Developer workstations, laptops
+- **Boot time**: ~3 seconds to Chromium shell
+- **Key features**: Full Zenith DE, SigmaCode IDE, SigmaTerm, SigmaNotes
+- **Build**: `cmake -DCMAKE_TOOLCHAIN_FILE=profiles/workstation.cmake -B build`
 
 ---
 
-### `main` — Stable Production
+### `release/microkernel`
 
-**Purpose**: The source-of-truth branch. All feature development, bugfixes, and documentation flows through `main` first. Represents the most stable, well-tested configuration of SigmaOS.
+The minimal kernel-only build. No GUI, no daemons — just the freestanding Ring-0 binary. Used as the base for all other profiles and for academic/research use.
 
-**Kernel Config**:
-- Standard balanced CFS scheduler with MLFQ fallback
-- Full 600-shard lattice enabled
-- All subsystems active: VFS, NetStack, PQC, Zenith UI
-
-**Current Gaps & Plan**:
-- Stabilize scattered experimental modules
-- Unify HAL across all three ISAs
-- Sync `/docs/` with Wiki via `wiki-sync.yml`
-- Add comprehensive CI/CD coverage
-
-**Who pushes here**: Maintainers only (via reviewed PRs from feature branches).
+- **Target**: Bare-metal servers, hypervisor guests, research
+- **Key features**: MLFQ scheduler, VMM, VFS, TCP/IP stack, PID 1 event loop
+- **Build**: `make SIGMA_USE_ZENITH_DE=0 SIGMA_USE_AI_ENGINE=0`
 
 ---
 
-### `release/standalone` — Bare-Metal Desktop
+### `release/browser`
 
-**Purpose**: Targets direct bare-metal installation on desktop and workstation hardware. Configured for maximum CPU-bound execution throughput and full local peripheral integration.
+SigmaOS with Chromium as the OS shell — the closest analog to ChromeOS but with Unix primitives exposed to web apps via `navigator.sigmaos.*`.
 
-**Kernel Config**:
-- Direct CPU-bound execution tuning
-- PS/2, USB HID, ATA disk, VGA drivers active
-- Full Zenith Desktop UI with Vulkan compositor
-- Local RegistryManager for user preference persistence
-
-**Current Gaps & Plan**:
-- Harden bootloader (GRUB/Limine chain-load)
-- Complete RegistryManager persistence layer
-- Full bare-metal init sequence (`/init/` Runlevel 1→5)
-- ATA hot-swap driver shard
+- **Target**: Consumer laptops, thin clients
+- **Key features**: Full `navigator.sigmaos` API, native messaging host, bwrap sandboxing, zero-install packages
+- **Build**: `cmake -DSIGMA_PROFILE=standalone -DSIGMA_USE_ZENITH_DE=ON -B build`
 
 ---
 
-### `release/rtos` — Real-Time Embedded Systems
+### `release/mobile`
 
-**Purpose**: Deploys SigmaOS on safety-critical real-time embedded hardware. Enforces deterministic thread scheduling with microsecond-precision timer guarantees.
+Tailored for ARM64 and RISC-V architectures. Optimized for low-power operation with adaptive P/C-state scheduling and touch-friendly UI scaling.
 
-**Kernel Config**:
-- `SCHED_SOVEREIGN` real-time class (EDF + priority inheritance)
-- High-resolution timer (HPET) with sub-100μs interrupt latency
-- Zero-latency IPC via lock-free SPSC queues
-- Stripped UI layer — headless by default
-
-**Current Gaps & Plan**:
-- Implement `SCHED_SOVEREIGN` RT scheduling class
-- Add priority inheritance mutex protocol
-- Formal verification of interrupt latency bounds
-- Watchdog shard for crash recovery
+- **Target**: ARM laptops, tablets, Raspberry Pi
+- **Toolchain**: `aarch64-linux-gnu-gcc` / `riscv64-linux-gnu-gcc`
+- **Key features**: Hardware-adaptive scheduler, low-power idle states, responsive Zenith UI
+- **Build**: `cmake -DCMAKE_TOOLCHAIN_FILE=profiles/iot-minimal.cmake -B build`
 
 ---
 
-### `release/mobile` — Energy-Aware Mobile
+### `release/rtos`
 
-**Purpose**: Adapts SigmaOS for mobile and tablet platforms. Implements DVFS (Dynamic Voltage/Frequency Scaling) and battery-aware background task throttling.
+Hard real-time extensions. Tasks with priority > 80 are promoted to `SCHED_SOVEREIGN` — a deterministic scheduling class with strict execution deadlines.
 
-**Kernel Config**:
-- DVFS governor with ARM64 frequency domains
-- Touch-optimized Zenith UI (gesture layer)
-- ARM64 HAL tuned for Cortex-A series
-- Background task throttler with battery-state awareness
-
-**Current Gaps & Plan**:
-- Power governor shard (`sigma_power_gov.c`)
-- Touch input driver (multi-touch capacitive)
-- ARM64 performance counter integration
-- Low-power suspend/resume state machine
+- **Target**: Industrial control systems, robotics, avionics simulators
+- **Key features**:
+  - `SCHED_SOVEREIGN` hard real-time class
+  - Priority inheritance via `SovereignMutex` (prevents priority inversion)
+  - Lock-free SPSC ring buffers for sub-microsecond IPC
+  - Zero-copy memory segments for inter-task messaging
+- **Build**: `make SIGMA_USE_ZENITH_DE=0 SIGMA_SCHED_REALTIME=1`
 
 ---
 
-### `release/microkernel` — Ultra-Minimal (120-Shard)
+### `release/dual-boot`
 
-**Purpose**: Bootstraps a skeletal 120-shard configuration for hyper-secure, resource-constrained critical nodes. Strips all non-essential shards to the absolute minimum viable kernel.
+Coexistence with Windows and Linux. Implements the Multiboot2 specification so standard GRUB installations can chain-load SigmaOS without repartitioning.
 
-**Kernel Config**:
-- 120 active shards (vs full 600)
-- Lock-free SPSC message-passing IPC only
-- Modular driver loading (no statically-linked drivers)
-- Zero-copy IPC for all inter-process communication
-- Formal micro-isolation guarantees
-
-**Current Status**: ✅ Test-verified — 82 tests passing on this branch.
-
-**Current Gaps & Plan**:
-- Optimize IPC throughput (target < 500ns round-trip)
-- Modular driver hot-loading framework
-- Formal proof-of-isolation for shard boundaries
+- **Target**: Users who want SigmaOS alongside an existing OS
+- **Key features**:
+  - Multiboot2 header in `arch/boot/multiboot_header.asm`
+  - ELF64 output at load address `0x100000` (see `linker.ld`)
+  - GRUB configuration generator in `Makefile` (`grub-mkrescue`)
+  - Shared `/home` partition support via VFS mount abstraction
+- **Setup**: See [Building from Source](Building-from-Source) for GRUB chain-load instructions
 
 ---
 
-### `release/dual-boot` — Co-operative Dual-Boot
+### `release/cloud`
 
-**Purpose**: Configures SigmaOS to coexist alongside Windows or Linux bootloaders via GRUB/Limine chain-loading. Optimizes boot sector offsets and partition table handling.
+CoreOS-style immutable cloud image. Root filesystem is read-only. Updates happen via A/B partition swap with attestation validation before commit.
 
-**Kernel Config**:
-- GRUB2 + Limine chain-loading support
-- Shared partition table parser (FAT32/NTFS read access for handoff)
-- Rollback snapshot integration on boot failure
-- Windows PE detection and graceful co-existence
-
-**Current Gaps & Plan**:
-- GRUB/Limine chain-load module
-- Snapshot-on-boot rollback mechanism
-- Windows NTFS partition read driver
-- Boot menu with graphical SigmaOS/Windows/Linux selector
+- **Target**: AWS, Azure, GCP bare-metal and VM instances
+- **Key features**:
+  - Immutable root (handled by `SovereignImmutableHostEngine`)
+  - A/B partition slots — instant rollback if boot attestation fails
+  - Declarative system configuration (NixOS-inspired)
+  - Hardened `sigmad-fleet` telemetry daemon for enterprise monitoring
+- **Build**: `cmake -DSIGMA_PROFILE=cloud-x86 -B build`
 
 ---
 
-### `release/distributed` — Cluster-Native Computing
+### `release/distributed`
 
-**Purpose**: Configures SigmaOS nodes for cluster computing. Pre-configures RPC shard synchronization channels and the SovereignCloudFS distributed filesystem.
+Extends the cloud profile with decentralized coordination. Virtual filesystems sync across nodes via secure sockets. Supports ZeroNet mesh networking and P2P shard replication.
 
-**Kernel Config**:
-- RPC shard sync over UDP multicast
-- SovereignCloudFS (distributed block layer)
-- Container orchestration shard
-- Consensus protocol (Raft-inspired) for cluster state
-
-**Current Gaps & Plan**:
-- SovereignCloudFS implementation
-- Distributed CFS scheduler with cross-node load balancing
-- Container orchestration shard (SovereignKube spec)
+- **Target**: Multi-node clusters, sovereign cloud data centers
+- **Key features**:
+  - Decoupled VFS synced via encrypted sockets (BLAKE2b integrity)
+  - `sigma-cluster` daemon for distributed state coordination
+  - Sovereign Container Orchestrator (Kubernetes-equivalent)
+  - CRDT-based offline-first sync for eventually consistent deployments
+- **Build**: `cmake -DSIGMA_PROFILE=cloud-x86 -DSIGMA_USE_CLUSTER=ON -B build`
 
 ---
 
-### `release/cloud` — Headless Virtualization
-
-**Purpose**: Deploys SigmaOS as a headless hypervisor host. Optimizes memory pages for multi-tenant sharing and virtual machine isolation.
-
-**Kernel Config**:
-- Hypervisor-aware CFS (Xen/KVM paravirt hooks)
-- Immutable OS tree (read-only root + overlay layers)
-- Multi-tenant memory sharing with hardware isolation
-- No graphical subsystem (headless by design)
-
-**Current Gaps & Plan**:
-- Xen/KVM paravirt driver shards
-- Immutable OS tree implementation (OverlayFS-based)
-- SovereignCluster resource manager
-
----
-
-### `release/browser` — WebAssembly Runtime
-
-**Purpose**: Compiles core SigmaOS components to WebAssembly for execution inside standard web browsers. Enables an in-browser OS simulation with sandboxed apps.
-
-**Kernel Config**:
-- WASM compilation targets for core shards
-- Sandboxed WASM app execution environment
-- GPU acceleration via WebGL/WebGPU
-- Lightweight DOM-based Zenith UI renderer
-
-**Current Gaps & Plan**:
-- WASM build pipeline for kernel shards
-- WebGPU-accelerated canvas compositor
-- WASM app sandbox specification
-
----
-
-### `release/app` — App-Store Sandbox Containers
-
-**Purpose**: Configures static container sandboxes with locked filesystem access profiles for App-Store style distribution of SigmaOS applications.
-
-**Kernel Config**:
-- Static container sandboxes with locked FS profiles
-- Professional tool suite fully integrated (GST, forensics, BIS calculators)
-- App signing with PQC attestation
-- Namespace isolation for each sandboxed app
-
-**Current Gaps & Plan**:
-- Professional tools: GST, court fees, BIS, forensic CLI tools
-- App signing pipeline with Dilithium-5
-- Container runtime specification
-
----
-
-### `performance-optimized` — Aggressively Vectorized
-
-**Purpose**: Enables SIMD auto-vectorization (AVX-512 on x86_64, ARM Neon on ARM64) at compile-time for maximum PQC throughput and memory bandwidth.
-
-**Kernel Config**:
-- AVX-512 / ARM Neon auto-vectorization flags
-- Clear Linux–inspired aggressive compiler optimization
-- Adaptive O(1) slab allocator with SIMD-accelerated memcpy
-- Profile-guided optimization (PGO) builds
-
-**Current Gaps & Plan**:
-- PGO (Profile-Guided Optimization) build pipeline
-- AVX-512 accelerated Dilithium-5 PQC path
-- SIMD-optimized slab allocator `memcpy`
-
----
-
-### `gh-pages` — Static Web Portal
-
-**Purpose**: Hosts the interactive SigmaOS desktop UI simulator, documentation portal, and live app installer guides as a GitHub Pages static site.
-
-**Content**:
-- Interactive Zenith Desktop simulator (`zenith.html`)
-- App Store showcase (`app_store.html`)
-- Installer guide (`installer.html`)
-- Roadmap visualization (`roadmap.html`)
-
-**Current Status**: ✅ Live at `https://aaryansinghchauhan09.github.io/SigmaOS/`
-
-**Current Gaps & Plan**:
-- Contributor portal with onboarding flow
-- Interactive subsystem diagram explorer
-- Live branch status dashboard
-
----
-
-## 🔄 S-BUSE Synchronization Pipeline
+## Choosing a Branch
 
 ```
-1.  Developer opens a feature branch from main
-          │
-          ▼
-2.  Code review + CI passes on feature branch
-          │
-          ▼
-3.  PR merged to main
-          │
-          ▼
-4.  S-BUSE (tools/sync_all_branches.js) triggers
-          │
-    ┌─────┴──────────────────────────────────┐
-    ▼       ▼       ▼       ▼       ▼       ▼
-release/ release/ release/ release/ perf-  gh-pages
-standalone rtos   mobile  cloud   optim.
-    └─────┬──────────────────────────────────┘
-          │
-          ▼
-5.  All 12 branches updated — zero merge conflicts
+Are you building for a laptop/desktop?
+  └─ Yes → release/standalone  (or main)
+
+Are you targeting ARM / low-power hardware?
+  └─ Yes → release/mobile  (or profiles/iot-minimal.cmake)
+
+Do you need hard real-time guarantees?
+  └─ Yes → release/rtos
+
+Do you need to coexist with Windows/Linux?
+  └─ Yes → release/dual-boot
+
+Are you deploying to cloud VMs?
+  └─ Immutable single-node  → release/cloud
+  └─ Multi-node cluster     → release/distributed
+
+Are you doing kernel research?
+  └─ release/microkernel  +  kernel-exp
+
+Are you developing drivers?
+  └─ drivers-dev
+
+Are you working on performance?
+  └─ performance-optimized
 ```
 
 ---
 
-> *Last updated: 2026-05-23 · SigmaOS Zenith v15.2 [ZENITH-SINGULARITY]*
+*See also: [Building from Source](Building-from-Source) · [Architecture Overview](Architecture-Overview) · [Contributor Roadmap](Contributor-Roadmap)*
