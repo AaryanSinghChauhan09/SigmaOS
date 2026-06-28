@@ -35,6 +35,7 @@
 - [App Manifest Format](App-Manifest)
 - [Developer Guide](Developer-Guide)
 - [Extension System](Utilities-Roadmap#plugin--extension-system)
+- [Browser Demo](Browser-Demo)
 
 ## Profiles & Deployment
 - [Release Profiles](Release-Profiles)
