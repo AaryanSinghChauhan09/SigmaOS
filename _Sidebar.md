@@ -20,6 +20,7 @@
 - [Modularisation Architecture Roadmap](Modularisation-Architecture-Roadmap)
 - [Sovereignty & User-Defined Roadmap](Sovereignty-UserDefined-Roadmap)
 - [Continuous Improvement Roadmap](Continuous-Improvement-Roadmap)
+- [Final Excellence Roadmap](Final-Excellence-Roadmap)
 - [Feature Roadmap](Feature-Roadmap)
 - [Utilities Roadmap](Utilities-Roadmap)
 - [Gap Analysis](Gap-Analysis)
