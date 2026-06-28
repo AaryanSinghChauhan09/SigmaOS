@@ -16,6 +16,7 @@
 - [Compatibility, Automation & Personalisation](Compatibility-Automation-Personalisation-Roadmap)
 - [Advanced Quality Roadmap](Advanced-Quality-Roadmap)
 - [Systems Excellence Roadmap](Systems-Excellence-Roadmap)
+- [Engineering Principles Roadmap](Engineering-Principles-Roadmap)
 - [Feature Roadmap](Feature-Roadmap)
 - [Utilities Roadmap](Utilities-Roadmap)
 - [Gap Analysis](Gap-Analysis)
