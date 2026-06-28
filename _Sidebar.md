@@ -57,6 +57,7 @@
 - [SigmaOS Vision for India](SigmaOS-Vision-India)
 - [Indian Compliance Roadmap](Indian-Compliance-Roadmap)
 - [India Profession Coverage](India-Profession-Coverage)
+- [India Profession Tools Roadmap](India-Profession-Tools-Roadmap)
 - [Extended Profession Tools](Extended-Profession-Tools)
 - [Advanced India Features](Advanced-India-Features)
 - [SigmaOS vs Ubuntu](SigmaOS-vs-Ubuntu)
