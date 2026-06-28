@@ -575,3 +575,276 @@ Target:  SDF driver crash → sigma-heal restarts it in < 500 ms, no data loss
 ---
 
 *See also: [Gap Analysis](Gap-Analysis) · [Feature Branch Roadmap](Feature-Branch-Roadmap) · [Branch Development Roadmap](Branch-Development-Roadmap) · [Windows Parity Roadmap](Windows-Parity-Roadmap) · [Development Roadmap](Development-Roadmap)*
+
+---
+
+## Energy Efficiency Roadmap
+
+### E1 — Power Management Stack
+
+**Target:** sigma-ultra < 0.4 W idle; laptop < 2.5 W idle (screen off).
+
+| Task | File | Branch | Detail |
+|------|------|--------|--------|
+| ACPI P-state governor | `kernel/power/sigma_perf_governor.cpp` | `performance-optimized` | Write `IA32_PERF_CTL` MSR; ondemand/powersave/performance modes |
+| ACPI C-state idle | `kernel/power/sigma_power_manager.cpp` | `performance-optimized` | `HLT` in idle loop; C3/C6/C8 for deeper sleep |
+| Wakeup source accounting | `kernel/power/sigma_wakeup.cpp` | `performance-optimized` | Every wakeup attributed to a driver/process |
+| Suspend-to-RAM (S3) | `kernel/power/sigma_suspend.cpp` | `release/standalone` | TPM2 state preserved across S3 |
+| Display DPMS via DRM/KMS | `drivers/graphics/sigma_kms.cpp` | `drivers-dev` | Screen off after 3 min idle |
+| USB autosuspend | `drivers/usb/sigma_xhci.cpp` | `drivers-dev` | Suspend idle USB devices after 2 s |
+| Runtime PM per driver | `hal/sigma_rpm.cpp` | `drivers-dev` | Idle drivers cut power automatically |
+| Thermal governor | `kernel/power/sigma_thermal.cpp` | `performance-optimized` | Throttle before hitting thermal limit |
+| Battery status daemon | `userland/daemons/sigma_battery.cpp` | `release/standalone` | `sigma-power status` shows %, rate, ETA |
+| Power regression test | `tests/perf/bench_power.sh` | `performance-optimized` | 60-second idle run; assert < 2.5 W via RAPL |
+
+### E2 — sigma-ultra Power Optimisation (ARM)
+
+| Task | File | Branch | Detail |
+|------|------|--------|--------|
+| ARM WFI idle | `arch/arm64/sigma_idle.asm` | `release/mobile` | `WFI` instruction in idle loop |
+| big.LITTLE core parking | `kernel/sched/sigma_numa.cpp` | `release/mobile` | Park LITTLE cores when load < 20 % |
+| Display off after 30 s idle | `arch/arm64/sigma_bcm2711.cpp` | `release/mobile` | HDMI blanking for Pi 4 |
+| Offline-first: no polling | `userland/sigma_ultra.cpp` | `release/mobile` | Wake on event, not 1-second poll loop |
+
+---
+
+## Reliability Engineering Roadmap
+
+### R1 — Mean Time Between Failures (MTBF) Targets
+
+| Component | Current | Target | Method |
+|-----------|---------|--------|--------|
+| Kernel panic rate | Unknown | 0 panics / 1,000 boot-hours | Watchdog + crash stats |
+| SDF driver crash rate | Unknown | < 1 crash / 10,000 hours | Driver heartbeat monitoring |
+| Filesystem corruption | Unknown | 0 silent corruptions | dm-verity on every read |
+| Network drop rate | Unknown | < 0.01 % packet loss | RX/TX counters in sigma-net |
+| Package install failure | Unknown | < 0.1 % of installs | dm-verity + atomic rollback |
+
+### R2 — Chaos Engineering
+
+Deliberately break components to verify recovery paths work.
+
+| Test | File | Branch | What it checks |
+|------|------|--------|----------------|
+| Kill NIC driver mid-transfer | `tests/chaos/test_nic_crash.sh` | `drivers-dev` | sigma-heal restarts driver, connection resumes |
+| Corrupt 1 block of SigmaFS | `tests/chaos/test_fs_corrupt.sh` | `fs-dev` | dm-verity detects, sigma-fsck repairs |
+| OOM during package install | `tests/chaos/test_oom_install.sh` | `tools-dev` | Install rolls back cleanly, no partial state |
+| Kill compositor mid-render | `tests/chaos/test_compositor_crash.sh` | `release/standalone` | sigma-heal restarts, windows reappear |
+| Force 3 failed boots | `tests/chaos/test_rollback.sh` | all | Automatic rollback to known-good boot |
+| Kill sigma-bus mid-IPC | `tests/chaos/test_bus_crash.sh` | `release/cloud` | IPC clients reconnect automatically |
+| Inject network partition | `tests/chaos/test_net_partition.sh` | `release/distributed` | Raft leader election recovers |
+
+### R3 — Longevity Testing
+
+| Test | Duration | Branch | Pass criteria |
+|------|----------|--------|---------------|
+| QEMU continuous boot | 72 hours | all | No kernel panic or hang |
+| File I/O stress (bonnie++) | 8 hours | `fs-dev` | No data corruption, no journal errors |
+| Network throughput soak | 24 hours | `drivers-dev` | No packet loss, throughput ≥ 800 Mbps |
+| Profession app soak | 4 hours | `release/standalone` | 10,000 GST invoices, zero errors |
+| sigma-pod lifecycle | 1 hour | `release/cloud` | 1,000 create/start/stop/destroy cycles |
+| Memory soak | 8 hours | `kernel-exp` | malloc/free 1M cycles, no leak |
+
+---
+
+## Observability & Monitoring Roadmap
+
+### O1 — sigma-observatory (native monitoring dashboard)
+
+**New file:** `userland/tools/sigma_observatory.cpp`
+
+```
+sigma-observatory             # launch full TUI dashboard
+sigma-observatory --json      # machine-readable JSON stream
+sigma-observatory cpu         # per-core utilization + frequency
+sigma-observatory mem         # RAM usage, slab sizes, page cache
+sigma-observatory net         # per-interface TX/RX bytes/packets
+sigma-observatory io          # per-device IOPS, latency histogram
+sigma-observatory proc        # process list sorted by CPU/mem
+sigma-observatory temp        # CPU + GPU temperature
+sigma-observatory pqc         # PQC ops/sec live counter
+sigma-observatory scheduler   # runqueue depth per CPU
+sigma-observatory power       # RAPL energy counters, battery %
+```
+
+| Task | File | Branch | Detail |
+|------|------|--------|--------|
+| `/proc/sigma/` virtual filesystem | `kernel/vfs/sigma_procfs.cpp` | `kernel-exp` | Expose kernel stats as readable files |
+| Per-CPU stats in procfs | `kernel/vfs/sigma_procfs.cpp` | `kernel-exp` | `/proc/sigma/cpu/N/stat` |
+| Memory stats in procfs | `kernel/vfs/sigma_procfs.cpp` | `kernel-exp` | `/proc/sigma/meminfo` — buddy orders, slab |
+| Network stats in procfs | `kernel/vfs/sigma_procfs.cpp` | `kernel-exp` | `/proc/sigma/net/dev` — RX/TX per interface |
+| sigma-observatory TUI | `userland/tools/sigma_observatory.cpp` | `performance-optimized` | VT100-based dashboard, 1 s refresh |
+| Prometheus metrics endpoint | `userland/tools/sigma_observatory.cpp` | `release/cloud` | `sigma-observatory --prometheus :9090` |
+| OpenTelemetry export | `userland/sigma_otel_export.cpp` | `release/cloud` | Forward metrics to Splunk/Grafana |
+
+### O2 — sigma-audit (tamper-evident logging)
+
+```
+sigma-audit log                    # recent audit entries
+sigma-audit log --follow           # real-time stream
+sigma-audit log --filter kernel    # filter by subsystem
+sigma-audit verify                 # verify Dilithium3 chain
+sigma-audit export audit.json      # export for CERT-In
+sigma-audit push                   # push to sigma-fleet
+```
+
+| Task | File | Branch | Detail |
+|------|------|--------|--------|
+| WORM audit register | `kernel/security/sigma_immutable_audit_trail.cpp` | all | Write-once hardware registers for forensic profile |
+| Dilithium3 on every log entry | `kernel/security/sigma_immutable_audit_trail.cpp` | all | ML-DSA-87 sign each event |
+| Log rotation with integrity | `userland/tools/sigma_audit_cli.cpp` | `tools-dev` | Rotate on size limit; keep chain of custody |
+| CERT-In JSON export format | `userland/tools/sigma_audit_cli.cpp` | `release/standalone` | 6-hour mandatory incident disclosure format |
+
+---
+
+## Release Engineering Roadmap
+
+### RE1 — Release Pipeline
+
+**Current:** `scripts/release.sh`, `scripts/sign_release.sh`, `.github/workflows/sigma_release.yml` exist but are not fully wired.
+
+```bash
+# Full release pipeline:
+sigma-release check          # all quality gates pass
+sigma-release iso            # reproducible build
+sigma-release sign           # ML-DSA-87 sign ISO + packages
+sigma-release publish        # upload to GitHub Releases
+sigma-release notes v16.0    # auto-generate release notes
+sigma-release verify v16.0-rc1.iso  # verify signature
+```
+
+| Task | File | Branch | Detail |
+|------|------|--------|--------|
+| Reproducible build gate | `.github/workflows/sigma_ci.yml` | all | Two builds → identical SHA256 (SOURCE_DATE_EPOCH fixed) |
+| ML-DSA-87 sign ISO | `scripts/sign_release.sh` | `prepare-sigmaos-launch` | `pqc_sign(iso_hash, sk)` → `.sig` file |
+| SBOM generation (CycloneDX) | `scripts/gen_sbom.sh` | `prepare-sigmaos-launch` | Auto-generate Software Bill of Materials |
+| Release notes from git log | `scripts/gen_changelog.sh` | `docs-update` | Conventional commits → CHANGELOG.md |
+| Version bump script | `scripts/bump_version.sh` | `prepare-sigmaos-launch` | Update version in Makefile + headers atomically |
+| Release artifact checksums | `.github/workflows/sigma_release.yml` | `prepare-sigmaos-launch` | SHA256 + Blake3 checksums published with release |
+| India CDN mirror push | `scripts/release.sh` | `prepare-sigmaos-launch` | Push to `packages.sigmaos.dev` + NIC mirror |
+
+### RE2 — Branch Management Quality
+
+| Task | File | Branch | Detail |
+|------|------|--------|--------|
+| Branch parity CI (existing) | `scripts/ci_branch_check.sh` | all | Already works — run on every PR |
+| Protected branches policy | `.github/` settings | all | `main` + `release/*` require CI pass + review |
+| PR template enforces checklist | `.github/PULL_REQUEST_TEMPLATE.md` | all | Tests / docs / CURRENT_PROBLEMS_MANIFEST updated |
+| Auto-label by subsystem | `.github/workflows/` | all | Label `net`, `kernel`, `zenith`, `compat` by file path |
+| Stale branch cleanup | `.github/workflows/` | all | Auto-close PRs inactive > 90 days |
+| Tag signing with ML-DSA | `scripts/sign_release.sh` | all | `git tag -s` using Dilithium3 key |
+
+---
+
+## Community & Contribution Quality
+
+### C1 — Contribution Pipeline
+
+| Task | File | Branch | Detail |
+|------|------|--------|--------|
+| CONTRIBUTING.md completeness | `CONTRIBUTING.md` | `docs-update` | Setup → build → test → PR → review cycle |
+| Code review checklist | `.github/PULL_REQUEST_TEMPLATE.md` | all | Security / performance / docs / test evidence |
+| Good first issues labelled | GitHub issues | all | Tag 20+ `good-first-issue` items from Phase G list |
+| Architecture decision records | `docs/adr/` | `docs-update` | One ADR per major design decision |
+| `sigma_error.h` standard | `include/sigma_error_codes.h` | `tools-dev` | Consistent `sigma_err_t` return everywhere |
+| SPDX header on all new files | CI gate | all | Block merge if header missing |
+
+### C2 — Developer Onboarding
+
+```bash
+# 5-command new contributor setup:
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS
+cd SigmaOS
+./scripts/setup.sh          # install deps (Ubuntu 22.04+)
+make PROFILE=microkernel    # build smallest profile
+make test                   # run unit tests
+```
+
+| Task | File | Branch | Detail |
+|------|------|--------|--------|
+| `setup.sh` installs all deps | `scripts/setup.sh` | all | `apt install build-essential nasm cmake clang` + cross-toolchain |
+| Dev container (`.devcontainer/`) | `.devcontainer/devcontainer.json` | all | Already exists — verify it builds cleanly |
+| `make test` single command | `Makefile` | all | Runs all unit tests, prints pass/fail |
+| GitHub Codespaces ready | `.devcontainer/devcontainer.json` | all | One-click cloud dev environment |
+| Regression test on PR | `.github/workflows/sigma_ci.yml` | all | Every PR runs smoke + unit tests |
+| Architecture video walkthrough | `docs/videos/` | `docs-update` | 10-min video: kernel → SDF → zenith → profession apps |
+
+---
+
+## Per-Branch Summary Table (All Dimensions)
+
+| Branch | Stability | Performance | Quality | Ease of Use | Energy | Observability |
+|--------|-----------|-------------|---------|-------------|--------|---------------|
+| `kernel-exp` | 🔴 Panic handler, no-return-0 stubs, guard pages | 🔴 Context switch < 50 ns, KASLR, ASID | 🔴 Real QEMU CI, ASan/UBSan | 🟡 Human-readable panic | 🟡 ACPI C-state idle | 🟠 `/proc/sigma/` procfs |
+| `drivers-dev` | 🔴 SDF crash → restart < 500 ms | 🔴 Zero-copy DMA NIC/NVMe | 🟠 NIC/NVMe fuzz tests | 🟡 Driver hot-reload CLI | 🟠 USB autosuspend, DPMS | 🟡 Driver stats in procfs |
+| `fs-dev` | 🔴 Journal replay, dm-verity | 🟠 UBC zero-copy, read-ahead | 🟠 VFS fuzz, journal crash test | 🟡 sigma-fsck guided repair | 🟡 Flush on poweroff | 🟡 Cache hit/miss stats |
+| `tools-dev` | 🟠 Rollback on failed install | 🟠 Package install < 0.5 s | 🟠 ABI gate, stub count gate | 🔴 TTY read, tab complete, --help | 🟢 N/A | 🟡 sigma-audit log |
+| `performance-optimized` | 🟡 Memory soak tests | 🔴 All P1–P6 targets | 🔴 PQC CI benchmark, regression gate | 🟡 sigma-observatory TUI | 🔴 RAPL power gate | 🔴 Prometheus endpoint |
+| `release/standalone` | 🟠 Compositor crash → self-heal | 🟠 Vulkan 120 Hz | 🔴 WCAG 2.2 AA gate | 🔴 OOBE < 3 min, app launcher | 🟠 S3 suspend, display DPMS | 🟡 sigma-battery daemon |
+| `release/cloud` | 🟠 cgroup OOM at exact limit | 🟠 100 concurrent containers | 🟠 Container leak test | 🟡 sigma-fleet UX | 🟡 N/A | 🔴 Prometheus + OTEL |
+| `release/mobile` | 🟠 Pi4 boots reliably | 🟠 NEON Kyber ≥ 2.1 M ops/sec | 🟠 Pi Zero battery regression | 🔴 OOBE in < 2 min, sigma-ultra USSD | 🔴 < 0.4 W idle Pi Zero | 🟡 RAPL on ARM (MMIO) |
+| `release/rtos` | 🔴 Zero missed RT deadlines | 🔴 IRQ < 10 µs | 🟠 60-second stress test | 🟡 sigma-rt CLI | 🟡 Power profiling | 🟡 Jitter histogram |
+| `release/microkernel` | 🟠 Kernel < 512 KB | 🟠 Boot < 1 s | 🟠 Formal verification hooks | 🟡 Minimal 8-command CLI | 🟡 WFI idle | 🟡 sigma-bus stats |
+| `release/distributed` | 🟠 Raft consensus liveness | 🟠 Raft < 100 ms election | 🟡 Network partition chaos test | 🟡 sigma-cloudfs CLI | 🟢 N/A | 🟠 Raft leader metrics |
+| `release/dual-boot` | 🟡 NTFS read no corruption | 🟡 Installer < 5 min | 🟡 Partition resize fuzz | 🔴 Guided installer TUI | 🟢 N/A | 🟢 N/A |
+| `docs-update` | 🟢 N/A | 🟢 N/A | 🟠 markdownlint, link check | 🔴 5-command onboarding | 🟢 N/A | 🟢 N/A |
+| `gh-pages` | 🟢 N/A | 🟡 Page load < 2 s | 🟠 Lighthouse score ≥ 90 | 🔴 Interactive demos | 🟢 N/A | 🟢 N/A |
+| `prepare-sigmaos-launch` | 🔴 All Q0 gates pass | 🔴 All P1–P3 targets | 🔴 SBOM, reproducible build | 🔴 All U1–U4 gates | 🟠 Energy profile published | 🟠 Observatory working |
+
+**Priority:** 🔴 Must-have · 🟠 Important · 🟡 Nice-to-have · 🟢 Not applicable
+
+---
+
+## Improvement Tracking: `CURRENT_PROBLEMS_MANIFEST.md` Policy
+
+Every quality, stability, performance, or UX regression must be tracked here:
+
+```bash
+# Add a problem:
+echo "## Phase Q (Quality) — New Issues" >> CURRENT_PROBLEMS_MANIFEST.md
+echo "- [#XXXX] Area: description — file.cpp" >> CURRENT_PROBLEMS_MANIFEST.md
+
+# Required before any PR merges to main:
+./scripts/ci_branch_check.sh
+./scripts/sigma_automation.sh recovery-check
+# CURRENT_PROBLEMS_MANIFEST.md must reflect new status
+```
+
+**Release gate:** `CURRENT_PROBLEMS_MANIFEST.md` must have zero open 🔴 items before any `release/*` tag is created.
+
+---
+
+## Quick Reference — All Quality Commands
+
+```bash
+# Build + test (all in one)
+make check                         # build + unit tests + static analysis
+
+# Stability
+make check-stubs                   # count remaining stubs
+./tests/chaos/test_rollback.sh     # 3 failed boots → rollback
+
+# Performance
+sigma-perf bench pqc               # Kyber/Dilithium ops/sec
+sigma-perf bench sched             # context switch latency
+sigma-observatory                  # live dashboard
+
+# Quality
+./scripts/run_static_analysis.sh   # clang-tidy + cppcheck
+./scripts/regression_check.sh      # regression suite
+
+# Security
+sigma-sec status                   # security posture
+sigma-audit verify                 # verify log chain of custody
+sigma-pqc status                   # PQC algorithms + FIPS level
+
+# Release
+./scripts/sigma_automation.sh wiki-sync    # mirror docs
+./scripts/sigma_automation.sh backup      # source backup
+./scripts/ci_branch_check.sh              # branch parity
+sigma-release check                # all gates before tagging
+```
+
+---
+
+*See also: [Gap Analysis](Gap-Analysis) · [Feature Branch Roadmap](Feature-Branch-Roadmap) · [Branch Development Roadmap](Branch-Development-Roadmap) · [CLI Commands Roadmap](CLI-Commands-Roadmap) · [India Profession Tools Roadmap](India-Profession-Tools-Roadmap) · [Development Roadmap](Development-Roadmap)*

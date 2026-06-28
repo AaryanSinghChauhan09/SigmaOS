@@ -89,6 +89,11 @@ cmd_update() {
   log "Phase 7–8: run ./scripts/ci_branch_check.sh before merge."
 }
 
+cmd_quality_check() {
+  log "Running sigma-quality gate checks..."
+  "${ROOT}/scripts/sigma_quality_check.sh" "${@}"
+}
+
 usage() {
   cat <<EOF
 Usage: sigma_automation.sh <command>
@@ -99,6 +104,8 @@ Commands:
   recovery-check  Verify rollback/resilience files exist
   meta-check      Verify Phase C meta-distro subsystem files
   wiki-sync       Mirror key docs into wiki_repo/
+  quality-check   Run all quality gates (stubs, SPDX, creds, problems)
+  quality-check --strict  Same but fail on warnings too
 EOF
 }
 
@@ -111,6 +118,7 @@ main() {
     recovery-check) cmd_recovery_check ;;
     meta-check) cmd_meta_check ;;
     wiki-sync) cmd_wiki_sync ;;
+    quality-check) cmd_quality_check "${@:2}" ;;
     *) usage; exit 1 ;;
   esac
 }
