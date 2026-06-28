@@ -1,218 +1,250 @@
-# SigmaOS Gap Analysis — Round 9
+# SigmaOS Gap Analysis — Round 32
 
-This page summarises the gap analysis performed after Rounds 1–9, comparing SigmaOS against Tier 1 (Linux distros), Tier 2 (microkernels/research OSes), and Tier 3 (cloud-native OSes). Gaps are rated by severity and assigned to a target round.
+Updated after Rounds 1–32. Compares SigmaOS against Tier 1 (Linux distros), Tier 2 (microkernels/research OSes), Tier 3 (cloud-native OSes), and India-specific requirements.
 
 ---
 
-## How to Read This Document
+## Status Legend
 
 | Symbol | Meaning |
-|--------|---------|
+|---|---|
 | ✅ | Implemented and committed |
 | 🔧 | Header/stub present — full implementation pending |
 | ☐ | Not yet started |
-| 🔴 | Critical gap — blocks production use |
-| 🟠 | High priority — needed for v1.0 |
-| 🟡 | Medium — improves quality / completeness |
-| 🟢 | Low — polish / stretch goal |
+| 🔴 | Critical — blocks production/real hardware boot |
+| 🟠 | High — needed for v1.0 |
+| 🟡 | Medium — quality/completeness |
+| 🟢 | Low — polish/stretch goal |
 
 ---
 
-## Tier 1 Gap Analysis — vs. Linux Distributions
+## 🔴 CRITICAL GAPS — Block Real Hardware Boot
 
-Comparing SigmaOS against Alpine Linux, Debian, Fedora, Ubuntu, and Arch.
+These five gaps mean SigmaOS **cannot run on real hardware today**. All other work is irrelevant until these are resolved.
 
-### Security
+| # | Gap | Status | Notes |
+|---|---|---|---|
+| 1 | Kernel scheduler implementation | ☐ | `kernel/core/sigma_sched.cpp` — MLFQ+MCS bodies missing |
+| 2 | Memory manager implementation | ☐ | `kernel/core/sigma_mm.cpp` — physical/virtual MM missing |
+| 3 | Syscall dispatch implementation | ☐ | `kernel/core/sigma_syscall_dispatch.cpp` missing |
+| 4 | IRQ / interrupt controller | ☐ | `kernel/core/sigma_irq.cpp` — APIC/GIC missing |
+| 5 | GPU / framebuffer driver | ☐ | Zenith compositor cannot run without DRM/KMS or VESA fallback |
+| 6 | WiFi + Ethernet SDF drivers | ☐ | No network = no packages, no updates, no sigma-commnet |
+| 7 | CryptFS real key derivation | 🔧 | `derive_key()` still returns 32 zero bytes — all encryption is fake |
+| 8 | UEFI bootloader binary | ☐ | `sigma-boot.efi` does not exist yet — cannot boot without GRUB |
+| 9 | Working ISO build pipeline | ☐ | `make iso` does not produce a bootable image |
 
-| Gap | Severity | SigmaOS Status | Reference |
-|-----|----------|---------------|-----------|
-| Secure Boot chain of trust | 🔴 | 🔧 `kernel/security/sigma_secboot.h` (Round 9) | shim → grub → kernel |
-| TPM 2.0 seal/unseal for disk key | 🔴 | 🔧 In `sigma_secboot.h` API | systemd-cryptenroll |
-| dm-verity on root partition | 🟠 | 🔧 `userland/sigma-pkg/sigma_pkg_verity.h` | Verified Boot |
-| AppArmor / SELinux profiles | 🟠 | 🔧 `sigmad/mac/apparmor_gen.go` | auto-generated |
-| ASLR + W^X enforcement | ✅ | `kernel/mm/sigma_aslr.cpp` | HardenedBSD |
-| Stack protector (userland) | ✅ | `cmake/sigma_hardening.cmake` | `-fstack-protector-strong` |
-| RELRO + BIND_NOW | ✅ | `cmake/sigma_hardening.cmake` | `-Wl,-z,relro,-z,now` |
-| Hardened mount flags | ✅ | `kernel/fs/sigma_fstab.cpp` | MS_NOEXEC|MS_NOSUID|MS_NODEV |
-| Capability-based security | ✅ | `kernel/security/sigma_cap.cpp` | seL4 model |
-| Audit log chain | ✅ | `kernel/security/sigma_audit_backend.cpp` | SHA-256 chained |
-| eBPF programmable hooks | 🟠 | 🔧 `kernel/security/sigma_ebpf.h` | kernel 5.15+ style |
-| Module signing (Dilithium3) | 🟠 | 🔧 `kernel/security/sigma_module_sign.h` | replaces RSA-4096 |
+---
+
+## 🟠 HIGH PRIORITY — Needed for v1.0
 
 ### Package Management
 
-| Gap | Severity | SigmaOS Status | Reference |
-|-----|----------|---------------|-----------|
-| Atomic A/B OS updates | ✅ | `sigmad/update/main.go` (Round 9) | Bottlerocket / OSTree |
-| Generation rollback | ✅ | `sigmad/pkg/generations/generations.go` | rpm-ostree |
-| Transactional package ops | ✅ | `userland/pkg/sigma_pkg_transaction.h` | Flatpak |
-| Binary delta updates | 🟠 | 🔧 `userland/pkg/sigma_delta.h` | Clear Linux swupd |
-| Pkg assertions / signatures | 🟠 | 🔧 `sigmad/pkg/assert/sigma_assert.go` | snapd SnapDeclaration |
-| dm-verity per package | 🟠 | 🔧 `userland/sigma-pkg/sigma_pkg_verity.h` | snapd |
-| .deb / .rpm / .apk compat | 🟡 | ☐ — format resolver needed | Planned (Phase 1) |
+| Gap | Status | Notes |
+|---|---|---|
+| Package repository server | ☐ | No `sigma-repo-server` — nowhere to host packages |
+| Bootstrap package set (50 pkgs) | ☐ | bash, coreutils, curl, git, Python, GCC, Go minimum |
+| `.deb` / `.rpm` / `.apk` compat | ☐ | Format resolver in sigma-pkg not implemented |
+| Binary delta updates | 🔧 | `sigma_delta.h` exists — no implementation |
+| India CDN mirror infrastructure | ☐ | NIC/DigitalIndia-hosted mirrors for zero foreign dependency |
 
-### Init & Services
+### Display & Login
 
-| Gap | Severity | SigmaOS Status | Reference |
-|-----|----------|---------------|-----------|
-| PID 1 with signalfd loop | ✅ | `init/sigma_init_loop.c` | systemd / s6 |
-| Service supervision + restart | ✅ | `userland/init/sigma_supervisor.cpp` | s6 |
-| dinit service files | ✅ | `sigma-etc/services/` | dinit |
-| Notification daemon | ✅ | `sigmad/notify/main.go` (Round 9) | freedesktop spec |
-| Power management daemon | ✅ | `sigmad/power/main.go` | logind / UPower |
-| D-Bus replacement (sigma-bus) | ✅ | `userland/ipc/sigma_bus.h` + `sigmad/busd/main.go` | custom Unix-socket IPC |
-| Session manager | 🔧 | `userland/init/sigma_session.h` | logind / elogind |
-| GPU driver stack | 🔴 | ☐ — `drivers-dev` branch target | Mesa / DRM / KMS |
-| WiFi / BT drivers | 🔴 | ☐ — `drivers-dev` branch target | mac80211 / BlueZ |
+| Gap | Status | Notes |
+|---|---|---|
+| Display manager (`sigma-dm`) | ☐ | DRM/KMS-based — no X11, no Wayland |
+| DID-based login screen | ☐ | Scan QR → DID auth → session. No username/password |
+| sigma-pam replacement | ☐ | PAM for DID-based pluggable auth |
+| Zenith WM startup | ☐ | Compositor exists as header — not integrated with DRM |
 
-### Developer Tooling
+### Networking
 
-| Gap | Severity | SigmaOS Status | Reference |
-|-----|----------|---------------|-----------|
-| SDK one-liner install | ✅ | `userland/devtools/sigma-sdk/sigma-sdk-setup.sh` (Round 9) | rustup style |
-| CMake toolchain + hardening | ✅ | `userland/devtools/sigma-sdk/sigma.cmake` + `cmake/sigma_hardening.cmake` | |
-| sigma CLI | ✅ | `tools/sigma-cli/main.go` | |
-| POSIX test suite | ✅ | `tests/posix/run_posix_tests.sh` | |
-| openQA visual tests | ✅ | `tests/openqa/sigma_visual_test.py` | SUSE openQA |
-| Crash reporter | 🔧 | `userland/daemons/sigma-crash/sigma_crash.h` | breakpad-style |
-| Distributed tracing | 🟡 | 🔧 DTrace probes at syscall entry | illumos dtrace |
+| Gap | Status | Notes |
+|---|---|---|
+| TCP state machine | ☐ | `net/tcp/sigma_tcp.cpp` — full RFC 793 state machine |
+| IPv6 support | ☐ | ICMPv6, SLAAC, DHCPv6 all missing |
+| UDP socket layer | ☐ | UDP needed for DNS, NTP, DHCP, many apps |
+| sigma-bus capability passing | ☐ | IPC header complete — cap token passing not implemented |
+| sigma-busctl introspection tool | ☐ | D-Bus-compat introspection |
+
+### QEMU CI Integration
+
+| Gap | Status | Notes |
+|---|---|---|
+| Automated QEMU boot test in CI | ☐ | `test_boot_sequence.sh` exists — not wired to GitHub Actions |
+| Hardware CI farm | ☐ | All tests run in software emulation only |
 
 ---
 
-## Tier 2 Gap Analysis — vs. Microkernels & Research OSes
+## 🟡 MEDIUM PRIORITY — Quality & Completeness
 
-Comparing SigmaOS against seL4, MINIX 3, Genode, Redox OS, Haiku.
+### Kernel / Architecture
 
-| Gap | Severity | SigmaOS Status | Notes |
-|-----|----------|---------------|-------|
-| seL4 capability space | ✅ | `kernel/security/sigma_cap.cpp` | unforgeable tokens |
-| MCS hard real-time scheduler | ✅ | `kernel/sched/sigma_mcs.cpp` | budget/period per thread |
-| Reincarnation Server | ✅ | `userland/rs/sigma_rs.cpp` | MINIX 3 style |
-| Service discovery store | ✅ | `sigmad/ds/main.go` | MINIX 3 ds |
-| Genode declarative routing | ✅ | `sigma-etc/init.xml` | |
-| Redox scheme dispatcher | ✅ | `klib/sigma_scheme.cpp` | unified URL API |
-| Haiku SemanticFS xattrs | 🔧 | `kernel/fs/sigma_semanticfs.h` | attribute index |
-| Attribute index server | 🔧 | `sigmad/indexd/main.go` | O(log n) queries |
-| Driver framework isolation | 🔧 | `kernel/drivers/core/sigma_driver_framework.h` | driver in userland |
-| Formal verification | 🔴 | ☐ — no proofs yet | seL4 style; very long-term |
-| IPC capability passing | 🟠 | ☐ — sigma-bus passes caps | extend sigma_bus.h |
-| Kernel live patching | 🔧 | `kernel/kpatch/sigma_kpatch.h` | kpatch / livepatch |
+| Gap | Status | Notes |
+|---|---|---|
+| Rust migration Phase 1 | ☐ | sigma-net, sigma-fs, SDF in Rust — planned, not started |
+| sigma-dna HW profiler implementation | 🔧 | Header exists — CPUID/DMI/PCI reader not written |
+| ARM64 native build | 🔧 | Stubs in `arch/arm64/` — no working cross-compile toolchain |
+| RISC-V native build | 🔧 | Stubs present — not buildable |
+| Formal verification | ☐ | `sigma_contracts.h` exists — no Frama-C proofs |
+| SDF userspace driver ABI | 🔧 | Framework header complete — no actual driver binary produced |
 
----
+### Security
 
-## Tier 3 Gap Analysis — vs. Cloud-Native / Container OSes
+| Gap | Status | Notes |
+|---|---|---|
+| ML-KEM (FIPS 203) full impl | 🔧 | Kyber header present — NIST final standard bindings missing |
+| ML-DSA (FIPS 204) full impl | 🔧 | Dilithium header present — NIST final standard bindings missing |
+| SLH-DSA (FIPS 205) | ☐ | Hash-based signature for code signing — not started |
+| sigma-pentest module | ☐ | IT Act-compliant ethical hacking tools in sigma-jail |
+| TEMPEST compliance profile | ☐ | For air-gapped government/defence use |
+| Module signing enforcement | 🔧 | `sigma_module_sign.h` — no kernel enforcement yet |
 
-Comparing SigmaOS against Talos Linux, Bottlerocket, Flatcar, CoreOS, NixOS.
+### India Stack
 
-| Gap | Severity | SigmaOS Status | Notes |
-|-----|----------|---------------|-------|
-| Immutable root filesystem | ✅ | `init/init.c` + `Makefile` | MS_RDONLY on boot |
-| Atomic A/B slot updates | ✅ | `sigmad/update/main.go` | Bottlerocket style |
-| gRPC management API | 🔧 | `api/sigma.proto` | Talos apid |
-| OCI bundle format | ✅ | `workloads/zenith-browser/config.json` | |
-| cgroup v2 resource limits | ✅ | `userland/pkg/sigma_cgroup.cpp` | OCI runc |
-| Bubblewrap namespace isolation | ✅ | `kernel/security/jail/sigma_namespace.cpp` | |
-| First-boot provisioner | ✅ | `userland/ignite/sigma_ignite.cpp` | Ignition-style |
-| Generation rollback | ✅ | `sigmad/pkg/generations/generations.go` | NixOS style |
-| Amnesic (stateless) mode | 🔧 | `kernel/core/sigma_amnesic.h` | Tails-inspired |
-| Two-VM network gateway | 🔧 | `kernel/virt/sigma_netgw.h` | Whonix style |
-| Declarative system config | 🟠 | ☐ — `Config.sigma` is partial | NixOS full config |
-| Reproducible builds | 🟡 | `SOURCE_DATE_EPOCH` in `Makefile` | NixOS / Guix |
+| Gap | Status | Notes |
+|---|---|---|
+| ABDM OAuth2 + FHIR client | ☐ | sigma-health references ABDM — no actual API client |
+| GST IRN generation (IRP API) | ☐ | sigma-accounts has structs — no IRN call to NIC portal |
+| e-Way Bill API client | ☐ | Transport > ₹50,000 mandatory — not implemented |
+| HSN/SAC offline database | ☐ | 25,000+ codes needed for GST invoicing |
+| ONDC Protocol 1.1 full client | ☐ | Buyer+seller node referenced, not implemented |
+| UPI autopay / mandate | ☐ | Recurring payments via NACH/UPI Autopay |
+| CBDC (e₹) wallet | ☐ | RBI retail CBDC API — not started |
 
----
+### AI / ML
 
-## Cross-Cutting Gaps (All Tiers)
-
-These gaps cut across all three tiers and are tracked separately.
-
-### Must-Fix Before v1.0
-
-| # | Gap | File | Action |
-|---|-----|------|--------|
-| 1 | `sigma-cryptfs` — `derive_key()` returns 32 zero bytes | `kernel/security/sigma_cryptfs.cpp` | Implement PBKDF2-SHA512 or Argon2id |
-| 2 | `kernel/core/` source files missing | `kernel/core/*.cpp` | Implement scheduler, MM, syscall dispatcher |
-| 3 | GPU driver stack absent | `drivers-dev` branch | DRM/KMS minimum for Zenith DE |
-| 4 | WiFi drivers missing | `drivers-dev` branch | mac80211 cfg80211 |
-| 5 | Secure Boot full implementation | `sigma_secboot.h` → `.cpp` | TPM2 ESAPI calls |
-
-### Quality & Completeness
-
-| # | Gap | Target Round | Notes |
-|---|-----|-------------|-------|
-| 6 | Universal binary loader (ELF/OCI/WASM) | Round 10 | `sigma_universal_loader.h` → impl |
-| 7 | eBPF hook runtime | Round 10 | `sigma_ebpf.h` → impl + verifier |
-| 8 | DNS sinkhole | Round 10 | `sigma_dns_sinkhole.h` → impl |
-| 9 | `sigma_locale.c` catalogues (hi_IN, zh_CN) | Round 10 | impl for header in Round 9 |
-| 10 | sigma-bus capability passing | Round 10 | extend sigma_bus.h with cap token passing |
-| 11 | Session manager implementation | Round 10 | `sigma_session.h` → impl |
-| 12 | Crash reporter implementation | Round 10 | `sigma_crash.h` → impl |
-| 13 | REST API gateway full coverage | Round 11 | all daemons exposed via HTTP |
-| 14 | `.deb/.rpm/.apk` compatibility | Round 11 | format resolver in sigma-pkg |
-| 15 | Formal IPC protocol spec | Round 12 | TLA+ or Alloy model of sigma-bus |
+| Gap | Status | Notes |
+|---|---|---|
+| Local LLM backend | ☐ | sigma-heal/sigma-lex reference "sigma-ai analyzes" — no LLM |
+| Indian LLM model integration | ☐ | Sarvam-1, OpenHathi, Krutrim GGUF models |
+| sigma-bhashini offline models | 🔧 | API client exists — offline model files not bundled |
+| Federated learning coordinator | ☐ | sigma_fedlearn.h client exists — no server coordinator |
 
 ---
 
-## Rounds 8–9 New Files Summary
+## 🟢 LOW PRIORITY — Polish & Stretch
 
-All files introduced in Rounds 8 and 9 that were not present before:
+### Developer Experience
 
-| File | Category | Round |
-|------|----------|-------|
-| `userland/ipc/sigma_bus.h` | IPC | 9 |
-| `sigmad/busd/main.go` | IPC daemon | 9 |
-| `userland/audio/sigma_audio_server.h` | Audio | 9 |
-| `lib/sigma-fonts/sigma_font.h` | Fonts | 9 |
-| `sigmad/netd/main.go` | Networking daemon | 9 |
-| `userland/init/sigma_session.h` | Session | 9 |
-| `kernel/drivers/core/sigma_driver_framework.h` | Drivers | 9 |
-| `klib/include/sigma_syscall.h` | Syscall table | 9 |
-| `tests/posix/run_posix_tests.sh` | Testing | 9 |
-| `userland/daemons/sigma-crash/sigma_crash.h` | Reliability | 9 |
-| `userland/devtools/sigma-sdk/sigma.cmake` | SDK | 9 |
-| `userland/devtools/sigma-sdk/sigma-sdk-setup.sh` | SDK | 9 |
-| `cmake/sigma_hardening.cmake` | Build | 9 |
-| `kernel/core/sigma_amnesic.h` | Security | 9 |
-| `kernel/kpatch/sigma_kpatch.h` | Reliability | 9 |
-| `sigmad/pkg/generations/generations.go` | Updates | 9 |
-| `sigma-etc/services/sigma-apid.d` | Init | 9 |
-| `sigma-etc/services/sigma-trustd.d` | Init | 9 |
-| `tests/openqa/sigma_visual_test.py` | Testing | 9 |
-| `userland/apps/sigma-legal/sigma_legal.h` | Compliance | 9 |
-| `userland/apps/sigma-ca/sigma_ca.h` | PKI | 9 |
-| `sigmad/power/main.go` | Power | 9 |
-| `sigmad/notify/main.go` | Notifications | 9 |
-| `sigmad/update/main.go` | A/B Updates | 9 |
-| `userland/a11y/sigma-l10n/sigma_locale.h` | l10n | 9 |
-| `kernel/security/sigma_secboot.h` | Secure Boot | 9 |
-| `kernel/fs/sigma_semanticfs.h` | Filesystem | 8 |
-| `sigmad/indexd/main.go` | Filesystem | 8 |
-| `sigmad/mac/apparmor_gen.go` | Security | 8 |
-| `sigmad/pkg/assert/sigma_assert.go` | Packages | 8 |
-| `sigmad/pkg/sigma_pkg_txn_lock.go` | Packages | 8 |
-| `kernel/virt/sigma_netgw.h` | Networking | 8 |
-| `userland/sigma-pkg/sigma_pkg_verity.h` | Packages | 8 |
-| `userland/sigma-pkg/sigma_pkg_journal.h` | Packages | 8 |
-| `userland/display/sigma_display_protocol.h` | Display | 8 |
-| `klib/include/sigma_assert.h` | Klib | 8 |
-| `net/dns/sigma_dns.h` | Networking | 8 |
-| `net/sigma_net.h` | Networking | 8 |
-| `net/tls/sigma_tls.h` | Networking | 8 |
+| Gap | Status | Notes |
+|---|---|---|
+| Auto-generated API docs | ☐ | Doxygen/Hawkmoth from all .h files |
+| `sigma_error.h` standard | ☐ | Consistent `sigma_err_t` return type across all APIs |
+| Man pages (50 more tools) | ☐ | Round 20 added 2 — need 50+ for all CLI tools |
+| sigma-observatory dashboard | ☐ | Native Prometheus+Grafana equivalent in Zenith |
+| D-Bus compatibility bridge | ☐ | Needed for running existing Linux apps |
+| sigma-bus TLA+/Alloy model | ☐ | Formal IPC protocol specification |
+
+### Multilingual & Accessibility
+
+| Gap | Status | Notes |
+|---|---|---|
+| Indian IME (input method) | ☐ | No Inscript/phonetic keyboard for any Indian language |
+| sigma-l10n catalogues | ☐ | `sigma_locale.h` exists — translation strings not written |
+| Braille display support | ☐ | AT-SPI2 screen reader exists — no Braille output |
+| Switch access (motor impairment) | ☐ | Single-switch scanning interface for motor-disabled users |
 
 ---
 
-## Priority Queue — Round 10 Targets
+## Tier 1 Gap Analysis — vs Linux Distributions
 
-Based on this gap analysis, Round 10 should focus on:
-
-1. **`sigma-cryptfs`** — fix the 32-zero-byte key derivation bug (Critical)
-2. **`kernel/core/` implementations** — scheduler, MM, syscall table bodies (Critical)
-3. **`sigma_universal_loader.cpp`** — implement the ELF/OCI/WASM detector
-4. **`sigma_ebpf.cpp`** — implement the eBPF verifier + runtime
-5. **`sigma_locale_hi_IN.c` + `sigma_locale_zh_CN.c`** — translation catalogues
-6. **`sigma_session.cpp`** — session manager implementation
-7. **`sigma_crash.cpp`** — crash reporter implementation
-8. **GPU minimum viable stack** — DRM/KMS framebuffer on `drivers-dev`
+| Feature Area | Ubuntu 24.04 | Fedora 41 | Debian 12 | SigmaOS |
+|---|---|---|---|---|
+| PQ cryptography | ❌ | ❌ | ❌ | 🔧 (header complete) |
+| Atomic A/B updates | ❌ | ❌ | ❌ | ✅ |
+| DID identity | ❌ | ❌ | ❌ | 🔧 (no login UI yet) |
+| India compliance | ❌ | ❌ | ❌ | 🔧 (no API clients) |
+| Self-heal | ❌ | ❌ | ❌ | 🔧 (header complete) |
+| Live kernel patch | Paid | ❌ | ❌ | 🔧 (header complete) |
+| ABI-stable drivers | ❌ | ❌ | ❌ | 🔧 (framework only) |
+| Memory safety (Rust) | ❌ | ❌ | ❌ | ☐ (Phase 1 planned) |
+| Real-time scheduler | Optional | Optional | Optional | ✅ |
+| Immutable root | ❌ | ❌ | ❌ | ✅ |
+| Reproducible builds | Partial | Partial | ✅ | ✅ |
 
 ---
 
-*See also: [Improvements Overview](Improvements-Overview) · [Feature Roadmap](Feature-Roadmap) · [Architecture Overview](Architecture-Overview) · [Security Model](Security-Model)*
+## Tier 2 Gap Analysis — vs Microkernels / Research OSes
+
+| Feature | seL4 | MINIX 3 | Genode | Haiku | SigmaOS |
+|---|---|---|---|---|---|
+| Capability security | ✅ | ❌ | ✅ | ❌ | ✅ |
+| Reincarnation server | ❌ | ✅ | ❌ | ❌ | ✅ |
+| Formal verification | ✅ | ❌ | ❌ | ❌ | ☐ |
+| Real-time scheduler | ✅ | ❌ | ✅ | ❌ | ✅ |
+| Userspace drivers | ✅ | ✅ | ✅ | ✅ | 🔧 |
+| India compliance | ❌ | ❌ | ❌ | ❌ | 🔧 |
+| PQ cryptography | ❌ | ❌ | ❌ | ❌ | 🔧 |
+| DID identity | ❌ | ❌ | ❌ | ❌ | 🔧 |
+
+---
+
+## Tier 3 Gap Analysis — vs Cloud-Native OSes
+
+| Feature | Talos | Bottlerocket | Flatcar | NixOS | SigmaOS |
+|---|---|---|---|---|---|
+| Immutable root | ✅ | ✅ | ✅ | ❌ | ✅ |
+| Atomic A/B | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Reproducible builds | ❌ | Partial | ❌ | ✅ | ✅ |
+| PQ cryptography | ❌ | ❌ | ❌ | ❌ | 🔧 |
+| India compliance | ❌ | ❌ | ❌ | ❌ | 🔧 |
+| gRPC management API | ✅ | ✅ | ❌ | ❌ | 🔧 |
+| Self-heal | ❌ | ❌ | ❌ | ❌ | 🔧 |
+| Live kernel patch | ❌ | ✅ | ❌ | ❌ | 🔧 |
+
+---
+
+## New Gaps Identified — Rounds 29–32
+
+The following gaps were discovered while implementing self-heal, commnet, continuous auth, federated learning, and the XR/DataSov platform:
+
+| Gap | Discovered While | Priority |
+|---|---|---|
+| No local LLM — sigma-heal AI analysis is a stub | sigma-heal implementation | 🟠 |
+| No ZK-SNARK library — sigma-datasov ZK proofs unimplemented | sigma_datasov.h | 🟡 |
+| No WebXR/OpenXR runtime binary — sigma-xr has no runnable code | sigma_xr.h | 🟡 |
+| No federated learning coordinator server | sigma_fedlearn.h | 🟡 |
+| No IoT sensor protocol stack (MQTT/Modbus/OPC-UA) | sigma_digital_twin.h | 🟡 |
+| No Indian IME for sigma-gamelearn text input | sigma_gamelearn.h | 🟠 |
+| No biometric hardware driver (fingerprint/iris) | sigma_continuous_auth.h | 🟠 |
+| sigma-commnet needs iptables/nftables NAT — no implementation | sigma_commnet.h | 🟠 |
+
+---
+
+## Priority Queue — Recommended Next Rounds
+
+### Round 33 — Make It Boot
+1. VESA/GOP framebuffer driver (get pixels on screen)
+2. Minimal scheduler implementation (`sigma_sched.cpp` — round-robin first)
+3. QEMU boot test in CI (assert boots to shell)
+4. `make iso` pipeline producing a bootable ISO
+
+### Round 34 — Make It Connect  
+1. TCP/UDP socket layer implementation
+2. Basic WiFi SDF driver (iwlwifi or cfg80211 userspace)
+3. sigma-pkg talking to a real repo server
+4. sigma-bus IPC running end-to-end
+
+### Round 35 — Make It Secure
+1. Real Argon2id CryptFS key derivation (fix Issue #44)
+2. TPM2 seal/unseal for disk key
+3. DID login screen replacing username/password
+4. sigma-trustd Dilithium3 certificate chain end-to-end
+
+### Round 36 — Make It Indian
+1. ABDM FHIR client (sigma-health goes live)
+2. GST IRN API client (sigma-accounts e-invoice goes live)
+3. IndiaStack UPI autopay working
+4. Bhashini offline model bundle (22-language ASR/TTS)
+5. Indian IME (Inscript + phonetic for Devanagari)
+
+### Round 37 — Make It Smart
+1. Local LLM integration (sigma-ai with llama.cpp backend)
+2. sigma-heal AI analysis using local model
+3. sigma-lex Gazette parser using local NLP
+4. Federated learning coordinator server
+
+---
+
+*See also: [Future Development Ideas](Future-Development-Ideas) · [Improvements Overview](Improvements-Overview) · [Feature Roadmap](Feature-Roadmap) · [Architecture Overview](Architecture-Overview)*

@@ -8,6 +8,7 @@
 - [Feature Roadmap](Feature-Roadmap)
 - [Utilities Roadmap](Utilities-Roadmap)
 - [Gap Analysis](Gap-Analysis)
+- [Future Development Ideas](Future-Development-Ideas)
 
 ## Architecture
 - [Architecture Overview](Architecture-Overview)
