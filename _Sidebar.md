@@ -18,6 +18,7 @@
 - [Systems Excellence Roadmap](Systems-Excellence-Roadmap)
 - [Engineering Principles Roadmap](Engineering-Principles-Roadmap)
 - [Modularisation Architecture Roadmap](Modularisation-Architecture-Roadmap)
+- [Sovereignty & User-Defined Roadmap](Sovereignty-UserDefined-Roadmap)
 - [Feature Roadmap](Feature-Roadmap)
 - [Utilities Roadmap](Utilities-Roadmap)
 - [Gap Analysis](Gap-Analysis)
