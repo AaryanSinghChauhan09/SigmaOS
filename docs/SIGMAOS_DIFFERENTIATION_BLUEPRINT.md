@@ -68,9 +68,54 @@ Exit criteria:
 
 - No new subsystem is "done" unless it has:
   - runtime tests,
-  - recovery behavior,
-  - docs update,
-  - ownership declaration.
+  - recovery behavior documented,
+  - docs update committed,
+  - ownership declaration in `CODEOWNERS`.
 - Prefer replacing dependency hot paths incrementally over risky all-at-once rewrites.
-- Treat reliability and polish as equal release gates.
+- Treat reliability and polish as equal release gates — not afterthoughts.
+
+## 6) Phase A/B/C Checklist Summary
+
+### Phase A — Core Sovereignty
+
+| Task | File | Status |
+|------|------|--------|
+| NIC TX/RX driver-to-stack loop | `kernel/net/sigma_net.c` | `[~]` |
+| TCP state machine | `kernel/net/sigma_net_tcp.cpp` | `[~]` |
+| ARP resolution (replace stub) | `kernel/net/sigma_net_arp.cpp` | `[~]` |
+| Single socket ABI authority | `kernel/net/sigma_net_socket.cpp` | `[~]` |
+| sigma-pod kernel cgroup enforcement | `kernel/core/process/sigma_cgroup.c` | `[~]` |
+| Boot resilience safe-mode default | `kernel/core/boot/sigma_boot_recovery_menu.c` | `[~]` |
+| Microsecond SYSCALL asm entry | `arch/x86_64/syscall_entry.asm` | `[ ]` |
+
+### Phase B — UX + Recovery
+
+| Task | File | Status |
+|------|------|--------|
+| Compositor input event loop | `zenith_desktop/compositor/` | `[~]` |
+| Auto-tiling WM | `zenith_desktop/wm/sigma_tiling_wm.cpp` | `[~]` |
+| Theme/widget engine | `zenith_desktop/theme/sigma_theme_engine.cpp` | `[~]` |
+| Profile engine (`~/.sigma_profile`) | `zenith_desktop/personalization/sigma_profile_engine.cpp` | `[~]` |
+| Recovery assistant GUI | `kernel/core/boot/sigma_boot_recovery_menu.c` | `[ ]` |
+
+### Phase C — Ecosystem
+
+| Task | File | Status |
+|------|------|--------|
+| Sovereign `.spkg` registry | `sigma-pkg/cbuild.py` | `[~]` |
+| Signed recipe provenance | `userland/pkg/sigma_sbom.h` | `[~]` |
+| CI provenance gating | `.github/workflows/sigma_ci.yml` | `[~]` |
+| Wiki-per-subsystem policy | `wiki_repo/` | `[x]` |
+
+## 7) Benchmark Targets vs. Competitors
+
+| Metric | Ubuntu 24.04 | Fedora 41 | SteamOS | SigmaOS Target |
+|--------|-------------|-----------|---------|----------------|
+| Boot time (NVMe SSD) | 43 s | 9 s | 8 s | **< 2 s** |
+| Idle RAM (desktop) | 847 MB | 900 MB | 600 MB | **< 150 MB** |
+| Context switch | ~1,000 ns | ~300 ns | ~300 ns | **< 50 ns** |
+| PQC Kyber-1024 ops/sec | N/A | N/A | N/A | **5.8 M ops/sec** |
+| Kernel CVE patch | Reboot | Reboot | Reboot | **No reboot (kpatch)** |
+
+See also: [COMPETITOR_COMPARISON.md](COMPETITOR_COMPARISON.md) · [PHASE_A_EXECUTION_CHECKLIST.md](../PHASE_A_EXECUTION_CHECKLIST.md) · [wiki: Differentiation Blueprint](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Differentiation-Blueprint)
 

@@ -74,12 +74,45 @@
 - **[#1000] Developer SDK:** sigma-sdk CLI, debugger (sigma-gdb), profiler (sigma-perf trace).
 - **[#1001] App Sandbox:** Fine-grained capability system (sandboxctl) for third-party apps.
 - **[#1002] Multi-monitor KMS:** Extended desktop and clone mode across multiple KMS adapters.
+- **[#1003] Kernel scheduler implementation:** `kernel/core/sigma_sched.cpp` — MLFQ+MCS bodies — blocks real hardware boot.
+- **[#1004] Memory manager implementation:** `kernel/core/sigma_mm.cpp` — physical/virtual MM — blocks real hardware boot.
+- **[#1005] Syscall dispatch:** `kernel/core/sigma_syscall_dispatch.cpp` — 30 essential syscalls — blocks real hardware boot.
+- **[#1006] IRQ/interrupt controller:** `kernel/core/sigma_irq.cpp` — APIC/GIC — blocks real hardware boot.
+- **[#1007] UEFI bootloader binary:** `sigma-boot.efi` does not exist yet — cannot boot without GRUB.
+- **[#1008] Bootable ISO pipeline:** `make iso` does not produce a bootable image.
+- **[#1009] CryptFS real key derivation (Issue #44):** `derive_key()` still returns 32 zero bytes — all encryption is fake.
+- **[#1010] GPU/framebuffer driver:** Zenith compositor cannot run without DRM/KMS or VESA fallback.
+- **[#1011] Package repository server:** No `sigma-repo-server` — nowhere to host packages.
+- **[#1012] TCP/UDP socket layer:** Full RFC 793 state machine not yet complete.
+- **[#1013] ABDM FHIR API client:** sigma-health references ABDM — no actual API client.
+- **[#1014] GST IRN API client:** sigma-accounts has structs — no IRN call to NIC portal.
+- **[#1015] Indian language IME:** No Inscript/phonetic keyboard for any Indian language.
+- **[#1016] Local LLM backend (sigma-ai):** sigma-heal/sigma-lex reference "sigma-ai analyzes" — no LLM runtime.
 
 ## Documentation / Community
 
-- **[#600] Wiki depth:** Phase F docs to be added to `wiki_repo/` — offline sync, perf governor.
-- **[#601] Branch matrix docs:** Document `release/*` branch expectations.
+- **[#600] Wiki depth:** Phase F/G docs to be added to `wiki_repo/` — offline sync, perf governor.
+- **[#601] Branch matrix docs:** Document `release/*` branch expectations in wiki.
+- **[#602] CURRENT_PROBLEMS sync:** Keep this manifest updated per subsystem PR — required release gate.
+
+---
+
+## Phase H — India Stack & AI (Next after G)
+
+These are blocked until Phase G kernel work completes:
+
+| ID | Area | Blocked By |
+|----|------|------------|
+| H-01 | ABDM FHIR client live | #1013 — needs real API implementation |
+| H-02 | GST IRN + e-Way Bill API | #1014 — needs real API implementation |
+| H-03 | UPI Autopay / mandate | TCP stack (#1012) + API client work |
+| H-04 | Local LLM (sigma-ai) | #1016 — llama.cpp backend integration |
+| H-05 | Indian IME (Inscript + phonetic) | #1015 — desktop stack (#1010) required |
+| H-06 | sigma-bhashini offline models | #1016 + GPU/audio stack |
+| H-07 | Federated learning coordinator | sigma-ai (#1016) + network stack (#1012) |
+| H-08 | CBDC e-rupee wallet | UPI stack (H-03) prerequisite |
 
 ---
 
 *Found a bug? Open an issue with subsystem label (`net`, `boot`, `zenith`, `orchestrator`) and link to checklist item.*
+

@@ -78,4 +78,35 @@ Status: `✓` present · `~` partial · `—` not required for branch profile
 
 See `PHASE_C_EXECUTION_CHECKLIST.md`.
 
-Last updated: Phase B/C unified engine + branch parity.
+---
+
+## Benchmark Targets (All Branches)
+
+| Metric | Ubuntu 24.04 | Fedora 41 | SteamOS | SigmaOS Target |
+|--------|-------------|-----------|---------|----------------|
+| Boot time (NVMe SSD) | 43 s | 9 s | 8 s | **< 2 s** |
+| Idle RAM (desktop) | 847 MB | 900 MB | 600 MB | **< 150 MB** |
+| Context switch latency | ~1,000 ns | ~300 ns | ~300 ns | **< 50 ns** |
+| PQC Kyber-1024 ops/sec | N/A | N/A | N/A | **5.8 M ops/sec** |
+| Kernel CVE patch | Reboot | Reboot | Reboot | **No reboot (kpatch)** |
+| App launch (cold) | 1.5 s | 1.2 s | 1.2 s | **< 0.5 s** |
+
+---
+
+## Development Phase Overview
+
+| Phase | Focus | Target | Status |
+|-------|-------|--------|--------|
+| **Phase 0** | Core boot — scheduler, MM, syscall, ISO | Month 3 | `[ ]` |
+| **Phase 1** | Networking + packages — TCP, drivers, sigma-pkg | Month 6 | `[~]` |
+| **Phase 2** | Desktop + identity — GPU, Zenith, DID, IME | Month 9 | `[~]` |
+| **Phase 3** | India Stack live — ABDM, GST, UPI, NavIC | Month 14 | `[ ]` |
+| **Phase 4** | Security hardening — PQC final, TPM2, sigma-mac | Month 18 | `[~]` |
+| **Phase 5** | Multi-platform — ARM64, RISC-V, sigma-ultra | Month 21 | `[~]` |
+| **Phase 6** | AI & advanced — fedlearn, sigma-lex, ZK proofs | Month 24 | `[ ]` |
+| **Phase 7** | Enterprise & government — BharatOS pilot | Month 36 | `[ ]` |
+| **Phase 8** | Rural India — 1,000 villages | Month 42 | `[ ]` |
+| **Phase 9** | Research — formal verification, Rust | Month 60 | `[ ]` |
+
+Last updated: Phase B/C unified engine + branch parity + Phase G critical items.
+
