@@ -11,6 +11,7 @@
 - [Branch Development Roadmap](Branch-Development-Roadmap)
 - [Feature Branch Roadmap](Feature-Branch-Roadmap)
 - [CLI Commands Roadmap](CLI-Commands-Roadmap)
+- [Quality, Stability & Performance](Quality-Stability-Performance-Roadmap)
 - [Feature Roadmap](Feature-Roadmap)
 - [Utilities Roadmap](Utilities-Roadmap)
 - [Gap Analysis](Gap-Analysis)
