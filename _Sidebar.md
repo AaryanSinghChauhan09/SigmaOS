@@ -19,6 +19,7 @@
 - [System Daemons](System-Daemons)
 - [Syscall Dispatcher](Syscall-Dispatcher)
 - [OS Technical Superiority](OS-Technical-Superiority)
+- [Competitive Gap Matrix](Competitive-Gap-Matrix)
 
 ## Security
 - [Security Model](Security-Model)
