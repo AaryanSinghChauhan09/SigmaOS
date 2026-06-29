@@ -1,0 +1,80 @@
+# =========================================================================
+# SigmaOS OS Profile: bsd (BSD-Style Target)
+# =========================================================================
+# Selected with: make TARGET_OS=bsd
+#                cmake -DTARGET_OS=bsd ..
+#
+# This profile wraps FreeBSD/NetBSD-style driver conventions (newbus,
+# bus_space_*, bus_dma_*) into the SigmaOS Sovereign HAL. Designed for
+# embedded and server workloads where BSD-heritage reliability is needed.
+# =========================================================================
+
+target_os: bsd
+
+meta:
+  description: "SigmaOS BSD target — FreeBSD newbus driver ABI compatibility layer"
+  edition: "Zenith"
+  version: "15.0"
+  license: "BSD-2-Clause"
+  upstream_compat: "FreeBSD 14.x CURRENT driver ABI"
+
+# ── Driver layer ──────────────────────────────────────────────────────────
+drivers:
+  directory: drivers/bsd
+  compat_layer: "BSDCompatLayer"
+  modules:
+    - bsd_compat           # Core FreeBSD newbus / bus_space_* wrapper
+    - bsd_em               # Intel em(4) Gigabit Ethernet (82540EM / 82574L)
+    - bsd_bge              # Broadcom bge(4) Gigabit Ethernet
+    - bsd_ahci             # AHCI SATA controller
+    - bsd_xhci             # xHCI USB via FreeBSD xhci(4) wrapper
+    - bsd_iwm              # Intel Wi-Fi (iwm(4)) wrapper
+
+# ── Kernel subsystems enabled ─────────────────────────────────────────────
+kernel:
+  scheduler: "MLFQ-MCS"           # Unified scheduler unchanged
+  memory_model: "Sovereign-VMM"    # Sovereign VMM; bus_dma_* mapped to DMA API
+  filesystem: "SigmaFS + UFS2"     # Native FS + BSD UFS2 journal compatibility
+  ipc: "Sovereign-IPC"
+  security: "Zero-Trust + PQC"
+  libc: "sigma_libc"               # Freestanding; no FreeBSD libc
+
+# ── Feature flags ─────────────────────────────────────────────────────────
+features:
+  hypervisor:   true
+  ai_engine:    true
+  zenith_de:    false      # Headless by default on BSD target
+  cryptfs:      true
+  pq_net:       true
+  wasm_runtime: false
+  bluetooth:    true
+  wifi:         true
+  ports_compat: false      # BSD ports tree bridge (future Phase H)
+  immutable_root: true     # Immutable root ON for server hardening
+
+# ── System calls ──────────────────────────────────────────────────────────
+syscalls:
+  interface: "Sovereign Syscall Gate"
+  posix_compat: false      # No POSIX shim; sovereign numbering
+  count: 64
+
+# ── Boot configuration ────────────────────────────────────────────────────
+boot:
+  bootloader: "sigma-boot.efi (UEFI)"
+  fallback:   "FreeBSD boot1 (ZFS-aware)"
+  timeout_s:  3
+  safe_mode:  true
+
+# ── Package management ────────────────────────────────────────────────────
+packages:
+  manager: "sigma-pkg"
+  format: ".spkg (Sovereign Package)"
+  repo_url: "https://pkg.sigmaos.dev/bsd-compat"
+  ports_bridge: false      # Planned for Phase H
+
+# ── CI build matrix entry ─────────────────────────────────────────────────
+ci:
+  cmake_flag: "-DTARGET_OS=bsd"
+  make_flag:  "TARGET_OS=bsd"
+  runs_on:    "ubuntu-22.04"     # Cross-compiled on Linux CI agents
+  test_suite: "tests/UniversalOSFormatTest.cpp"

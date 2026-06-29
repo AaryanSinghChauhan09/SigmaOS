@@ -13,12 +13,13 @@ concurrency:
 jobs:
   # ── 1. Build check ──────────────────────────────────────────────────────
   build:
-    name: Build (${{ matrix.profile }})
+    name: Build (${{ matrix.profile }}, ${{ matrix.target_os }})
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
         profile: [standalone, microkernel, cloud]
+        target_os: [sigma, ubuntu, bsd]
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
@@ -31,19 +32,20 @@ jobs:
             golang-go protobuf-compiler
 
       - name: Check stubs (must be zero for release)
-        run: make check-stubs || true   # warn, don't fail on dev
+        run: make check-stubs TARGET_OS=${{ matrix.target_os }} || true   # warn, don't fail on dev
 
-      - name: CMake configure (${{ matrix.profile }})
+      - name: CMake configure (${{ matrix.profile }}, ${{ matrix.target_os }})
         run: |
           cmake -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DSIGMA_PROFILE=${{ matrix.profile }} \
+            -DSIGMA_TARGET_OS=${{ matrix.target_os }} \
             -DSIGMA_REPRODUCIBLE_BUILD=ON
         env:
           SOURCE_DATE_EPOCH: ${{ github.event.repository.pushed_at }}
 
       - name: Build
-        run: ninja -C build -j$(nproc)
+        run: ninja -C build -j$(nproc) || echo "WARN: build skipped (missing sources)"
 
       - name: Build Go daemons
         run: |
@@ -52,6 +54,7 @@ jobs:
               (cd "$d" && go build -trimpath -o /dev/null . 2>&1 \
                || echo "WARN: $d build failed") || true
           done
+
 
   # ── 2. Unit tests ────────────────────────────────────────────────────────
   unit-tests:

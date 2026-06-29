@@ -1,5 +1,16 @@
 # =========================================================================
 # SIGMAOS: INDUSTRIAL KERNEL MAKEFILE (v15.0 - ZENITH)
+# Unified mainline with OS-specific build targets.
+#
+# Usage:
+#   make TARGET_OS=sigma    (default — Native SigmaOS, POSIX-free)
+#   make TARGET_OS=ubuntu   (Ubuntu / Linux compatibility target)
+#   make TARGET_OS=bsd      (BSD-style target)
+#
+# The TARGET_OS value controls:
+#   1. Preprocessor define:  -DTARGET_OS_SIGMA | _UBUNTU | _BSD
+#   2. Driver source directory added to SRC_DIRS
+#   3. OS profile path printed for reference (config/<target>.yaml)
 # =========================================================================
 
 # --- Reproducible builds (NixOS-inspired) ---------------------------------
@@ -11,6 +22,30 @@ else
   TIMESTAMP_FLAG =
 endif
 
+# ── TARGET_OS — OS-specific build target ──────────────────────────────────
+# Selects the driver layer and preprocessor define.
+# Override on the command line:  make TARGET_OS=ubuntu
+TARGET_OS ?= sigma
+
+ifeq ($(TARGET_OS),sigma)
+  OS_DEFINE    := TARGET_OS_SIGMA
+  OS_DRIVER_DIR:= drivers/sigma
+  OS_PROFILE   := config/sigma.yaml
+else ifeq ($(TARGET_OS),ubuntu)
+  OS_DEFINE    := TARGET_OS_UBUNTU
+  OS_DRIVER_DIR:= drivers/linux
+  OS_PROFILE   := config/ubuntu.yaml
+else ifeq ($(TARGET_OS),bsd)
+  OS_DEFINE    := TARGET_OS_BSD
+  OS_DRIVER_DIR:= drivers/bsd
+  OS_PROFILE   := config/bsd.yaml
+else
+  $(error [SigmaOS] Unknown TARGET_OS='$(TARGET_OS)'. Choose: sigma | ubuntu | bsd)
+endif
+
+$(info [SigmaOS] TARGET_OS=$(TARGET_OS)  define=-D$(OS_DEFINE)  drivers=$(OS_DRIVER_DIR))
+$(info [SigmaOS] OS profile : $(OS_PROFILE))
+
 CC = x86_64-linux-gnu-gcc
 CXX = x86_64-linux-gnu-g++
 LD = x86_64-linux-gnu-ld
@@ -21,6 +56,7 @@ CFLAGS = -Iinclude -ffreestanding -mno-red-zone -mcmodel=kernel \
          -fno-stack-protector -fno-exceptions -fno-rtti \
          -Wall -Wextra -Werror=format-security \
          -O2 -fno-pie -nostdlib \
+         -D$(OS_DEFINE) \
          $(TIMESTAMP_FLAG)
 CXXFLAGS = $(CFLAGS) -std=c++17
 
@@ -48,7 +84,8 @@ KERNEL_BIN = $(BUILD_DIR)/sigmaos.bin
 ISO_IMAGE = $(BUILD_DIR)/sigmaos.iso
 
 # Directories to search for source files
-SRC_DIRS := kernel/core kernel/core/drivers/input kernel/core/memory kernel/core/sched kernel/core/system kernel/core/syscall kernel/core/hal kernel/core/vulkan kernel/net kernel/storage kernel/telemetry tools usr init fs net lib/libc
+# OS_DRIVER_DIR is appended based on TARGET_OS (sigma | ubuntu | bsd)
+SRC_DIRS := kernel/core kernel/core/drivers/input kernel/core/memory kernel/core/sched kernel/core/system kernel/core/syscall kernel/core/hal kernel/core/vulkan kernel/net kernel/storage kernel/telemetry tools usr init fs net lib/libc $(OS_DRIVER_DIR)
 C_SRCS := $(shell find $(SRC_DIRS) -name '*.c')
 CXX_SRCS := $(shell find $(SRC_DIRS) -name '*.cpp')
 ASM_SRCS := $(shell find $(SRC_DIRS) -name '*.asm')
