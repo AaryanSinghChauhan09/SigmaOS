@@ -1,0 +1,15 @@
+name: "Compute SOURCE_DATE_EPOCH"
+description: >
+  Single authoritative SOURCE_DATE_EPOCH for all SigmaOS reproducible builds.
+  Uses the last git commit timestamp so the value is deterministic per-commit
+  and identical across sigma-build.yml and ci.yml.
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set SOURCE_DATE_EPOCH
+      shell: bash
+      run: |
+        SDE=$(git -C "$GITHUB_WORKSPACE" log -1 --pretty=%ct)
+        echo "SOURCE_DATE_EPOCH=${SDE}" >> "$GITHUB_ENV"
+        echo "sde=${SDE}" >> "$GITHUB_OUTPUT"

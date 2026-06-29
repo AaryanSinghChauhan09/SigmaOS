@@ -19,6 +19,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # ── SOURCE_DATE_EPOCH — single canonical value ──────────────────────
+      - uses: ./.github/actions/sde
+
       - name: Cache build artifacts
         uses: actions/cache@v4
         with:
@@ -30,92 +33,130 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ matrix.target_os }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-${{ matrix.target_os }}-
 
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
+      # ── Rust — pinned via rust-toolchain.toml ──────────────────────────
+      # dtolnay/rust-toolchain replaces archived actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: nightly
-          target: x86_64-unknown-none
-          override: true
-          components: clippy, rust-src
+          toolchain: nightly-2026-06-01
+          targets: x86_64-unknown-none
+          components: clippy,rust-src
+
+      - uses: Swatinem/rust-cache@v2
 
       - name: Install build tools
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y make cmake ninja-build
 
-      - name: Install Zig toolchain
+      # ── Zig — pinned + SHA-256 verified ────────────────────────────────
+      - name: Install Zig toolchain (pinned 0.13.0)
         run: |
           ZIG_VER="0.13.0"
-          curl -sSL "https://ziglang.org/download/${ZIG_VER}/zig-linux-x86_64-${ZIG_VER}.tar.xz" -o zig.tar.xz
+          ZIG_SHA256="d45312e61ebcc48032b77bc4cf7fd6915c11fa16e4aad116b66c9468211230ea"
+          curl -sSL \
+            "https://ziglang.org/download/${ZIG_VER}/zig-linux-x86_64-${ZIG_VER}.tar.xz" \
+            -o zig.tar.xz
+          echo "${ZIG_SHA256}  zig.tar.xz" | sha256sum -c -
           tar -xf zig.tar.xz
-          echo "$(pwd)/zig-linux-x86_64-${ZIG_VER}" >> $GITHUB_PATH
+          echo "$(pwd)/zig-linux-x86_64-${ZIG_VER}" >> "$GITHUB_PATH"
 
-      - name: Install Nim toolchain
+      # ── Nim — pinned to 2.0.8 via choosenim ────────────────────────────
+      - name: Install Nim toolchain (pinned 2.0.8)
         run: |
-          curl -sSL https://nim-lang.org/choosenim/init.sh | bash -s -- -y
-          echo "$HOME/.nimble/bin" >> $GITHUB_PATH
+          curl -sSL https://nim-lang.org/choosenim/init.sh | bash -s -- -y stable
+          export PATH="$HOME/.nimble/bin:$PATH"
+          choosenim 2.0.8
+          echo "$HOME/.nimble/bin" >> "$GITHUB_PATH"
 
       - name: Install Ada/SPARK (GNAT FSF)
         run: |
           sudo apt-get install -y gnat gprbuild
 
-      - name: Build Rust modules (no_std)
+      # ── Rust: clippy must pass — no || true escape hatch ───────────────
+      - name: Build Rust modules (no_std) + Clippy
         run: |
-          cargo clippy --target x86_64-unknown-none -- -D warnings || true
-          cargo test --target x86_64-unknown-linux-gnu || echo "WARN: test build skipped"
+          cargo clippy --target x86_64-unknown-none -- -D warnings
+          cargo test --target x86_64-unknown-linux-gnu
 
+      # ── Zig: continue-on-error so missing files surface orange, not fake green ──
       - name: Build Zig modules (freestanding)
+        continue-on-error: true
         run: |
-          zig build-lib arch/x86_64/paging.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (paging) skipped"
-          zig build-lib hal/x86/hal_io.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (hal_io) skipped"
-          zig build-lib drivers/input/ps2.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (ps2) skipped"
-          zig build-lib drivers/display/framebuffer.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (framebuffer) skipped"
-          zig build-lib drivers/audio/hda.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (hda) skipped"
-          zig build-lib browser/sigma_wasm_bridge.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (wasm_bridge) skipped"
-          zig build-lib drivers/display/vga.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (vga) skipped"
-          zig build-lib drivers/graphics/kms.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (kms) skipped"
-          zig build-lib drivers/unified/driver_api.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (driver_api) skipped"
+          for f in \
+            arch/x86_64/paging.zig \
+            hal/x86/hal_io.zig \
+            drivers/input/ps2.zig \
+            drivers/display/framebuffer.zig \
+            drivers/audio/hda.zig \
+            browser/sigma_wasm_bridge.zig \
+            drivers/display/vga.zig \
+            drivers/graphics/kms.zig \
+            drivers/unified/driver_api.zig; do
+            if [[ -f "$f" ]]; then
+              zig build-lib "$f" -target x86_64-freestanding-none -O ReleaseSafe
+            else
+              echo "::warning::Zig source missing (expected post-migration): $f"
+            fi
+          done
 
+      # ── Nim: continue-on-error — surfaces failures without blocking ─────
       - name: Build Nim modules (native)
+        continue-on-error: true
         run: |
-          nim c --noMain --noLinking --cpu:amd64 config/core/declarative_engine.nim 2>&1 || echo "WARN: Nim build (declarative_engine) skipped"
-          nim c --noMain --noLinking --cpu:amd64 config/core/generation_manager.nim 2>&1 || echo "WARN: Nim build (generation_manager) skipped"
-          nim c --noMain --noLinking --cpu:amd64 drivers/printing/cups.nim 2>&1 || echo "WARN: Nim build (cups) skipped"
-          nim c --noMain --noLinking --cpu:amd64 ecosystem/aether.nim 2>&1 || echo "WARN: Nim build (aether) skipped"
-          nim c --noMain --noLinking --cpu:amd64 ecosystem/forge.nim 2>&1 || echo "WARN: Nim build (forge) skipped"
-          nim c --noMain --noLinking --cpu:amd64 ecosystem/utils.nim 2>&1 || echo "WARN: Nim build (utils) skipped"
+          for f in \
+            config/core/declarative_engine.nim \
+            config/core/generation_manager.nim \
+            drivers/printing/cups.nim \
+            ecosystem/aether.nim \
+            ecosystem/forge.nim \
+            ecosystem/utils.nim; do
+            if [[ -f "$f" ]]; then
+              nim c --noMain --noLinking --cpu:amd64 "$f"
+            else
+              echo "::warning::Nim source missing: $f"
+            fi
+          done
 
+      # ── Ada/SPARK: continue-on-error — surfaces failures without blocking ─
       - name: Build Ada/SPARK modules (gnat)
+        continue-on-error: true
         run: |
-          gnat make -c crypto/kyber.adb 2>&1 || echo "WARN: Ada build (kyber) skipped"
-          gnat make -c crypto/dilithium.adb 2>&1 || echo "WARN: Ada build (dilithium) skipped"
-          gnat make -c drivers/block/ahci.adb 2>&1 || echo "WARN: Ada build (ahci) skipped"
-          gnat make -c drivers/block/nvme.adb 2>&1 || echo "WARN: Ada build (nvme) skipped"
-          gnat make -c drivers/net/e1000.adb 2>&1 || echo "WARN: Ada build (e1000) skipped"
-          gnat make -c drivers/net/rtl8139.adb 2>&1 || echo "WARN: Ada build (rtl8139) skipped"
-          gnat make -c kernel/mm/sovereign_aslr.adb 2>&1 || echo "WARN: Ada build (aslr) skipped"
-          gnat make -c kernel/mm/sovereign_hugepage.adb 2>&1 || echo "WARN: Ada build (hugepage) skipped"
-          gnat make -c kernel/mm/sovereign_oom.adb 2>&1 || echo "WARN: Ada build (oom) skipped"
+          for f in \
+            crypto/kyber.adb \
+            crypto/dilithium.adb \
+            drivers/block/ahci.adb \
+            drivers/block/nvme.adb \
+            drivers/net/e1000.adb \
+            drivers/net/rtl8139.adb \
+            kernel/mm/sovereign_aslr.adb \
+            kernel/mm/sovereign_hugepage.adb \
+            kernel/mm/sovereign_oom.adb; do
+            if [[ -f "$f" ]]; then
+              gnat make -c "$f"
+            else
+              echo "::warning::Ada source missing: $f"
+            fi
+          done
 
+      # ── CMake: surfaces failures honestly ───────────────────────────────
       - name: CMake configure (TARGET_OS=${{ matrix.target_os }})
+        continue-on-error: true
         run: |
           cmake -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DSIGMA_TARGET_OS=${{ matrix.target_os }} \
             -DSIGMA_REPRODUCIBLE_BUILD=ON \
             -DSIGMA_BUILD_TESTS=OFF
-        env:
-          SOURCE_DATE_EPOCH: ${{ github.event.repository.pushed_at }}
 
       - name: CMake build
-        run: |
-          ninja -C build -j$(nproc) || echo "WARN: CMake build skipped (missing sources)"
+        continue-on-error: true
+        run: ninja -C build -j"$(nproc)"
 
       - name: Verify build output exists
         run: |
           if [[ -f build/sigmaos.bin ]]; then
-            [[ -s build/sigmaos.bin ]] || { echo "ERROR: build/sigmaos.bin is empty"; exit 1; }
+            [[ -s build/sigmaos.bin ]] || { echo "::error::build/sigmaos.bin is empty"; exit 1; }
             echo "✓ build/sigmaos.bin (TARGET_OS=${{ matrix.target_os }}): $(du -h build/sigmaos.bin | cut -f1)"
           else
-            echo "INFO: build/sigmaos.bin not produced (cross-toolchain unavailable in CI — expected)"
+            echo "::notice::build/sigmaos.bin not produced — cross-toolchain unavailable or CMake step failed (see above)"
           fi

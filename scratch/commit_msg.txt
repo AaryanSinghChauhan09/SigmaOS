@@ -1,0 +1,19 @@
+fix(toolchain): Phase 0 - repo stabilization and toolchain fixes
+
+- Add eslint.config.js (ESLint 9+ flat config) replacing broken --ext flag
+- Upgrade eslint-plugin-security to ESLint 10 compatible version
+- Add @eslint/js and globals as devDependencies
+- Fix 10 web_ui script tags: add type=module for Vite bundling
+- Create missing web_ui/components/ stubs (8 Custom Elements)
+- Create web_ui/scripts/sigma_api_service.js (sigma-bus IPC bridge)
+- Clean .gitignore: add node_modules/, sigma-build/, iso_root/, _bld/
+- Untrack node_modules, dist, sigma-build, iso_root from git index
+- Move 16 active maintenance scripts to scripts/maintenance/
+- Delete 52 stale root-level build_*.cjs and fix_*.cjs scripts
+- Suppress 2 false-positive security/detect-object-injection warnings
+  in zenith_desktop/modules/state-manager.js
+
+Verification:
+  npm run lint   - 0 errors, 0 warnings
+  npx vite build - 16 modules transformed, 0 warnings, 249ms
+  npx vitest run - 109/109 tests pass (10 files)

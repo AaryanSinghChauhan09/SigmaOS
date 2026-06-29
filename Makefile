@@ -46,9 +46,13 @@ endif
 $(info [SigmaOS] TARGET_OS=$(TARGET_OS)  define=-D$(OS_DEFINE)  drivers=$(OS_DRIVER_DIR))
 $(info [SigmaOS] OS profile : $(OS_PROFILE))
 
-CC = x86_64-linux-gnu-gcc
-CXX = x86_64-linux-gnu-g++
-LD = x86_64-linux-gnu-ld
+# ── Cross-compilation — override via make CROSS_COMPILE=aarch64-linux-gnu- ──
+# In CI the matrix sets CROSS_COMPILE via the environment; default is empty
+# (native x86_64) so local developer builds work without any extra flags.
+CROSS_COMPILE ?=
+CC  := $(CROSS_COMPILE)gcc
+CXX := $(CROSS_COMPILE)g++
+LD  := $(CROSS_COMPILE)ld
 ASM = nasm
 
 # ── Rust & Zig Toolchains (sovereign — no_std / freestanding) ─────────────
@@ -65,9 +69,11 @@ ZIG_TARGET  = x86_64-freestanding-none
 ZIGFLAGS    = build-obj -target $(ZIG_TARGET) -O ReleaseFast
 
 # --- Kernel flags (freestanding — no host libc, no stack protector in ring 0)
+# -Wformat=2 enables %n checks and extra format-string analysis;
+# -Werror=format-security without it misses many format bugs.
 CFLAGS = -Iinclude -ffreestanding -mno-red-zone -mcmodel=kernel \
          -fno-stack-protector -fno-exceptions -fno-rtti \
-         -Wall -Wextra -Werror=format-security \
+         -Wall -Wextra -Wformat=2 -Werror=format-security -Wformat-signedness \
          -O2 -fno-pie -nostdlib \
          -D$(OS_DEFINE) \
          $(TIMESTAMP_FLAG)
