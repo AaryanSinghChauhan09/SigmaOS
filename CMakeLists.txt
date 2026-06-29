@@ -145,17 +145,124 @@ foreach(_dir ${SIGMA_KERNEL_DIRS})
     endif()
 endforeach()
 
-# ── OS-specific driver sources ────────────────────────────────────────────
+# ── OS-specific driver sources (C/C++ — legacy, kept for reference) ───────
 if(EXISTS "${SIGMA_DRIVER_DIR}")
     file(GLOB_RECURSE _drv_srcs
         "${SIGMA_DRIVER_DIR}/*.c"
         "${SIGMA_DRIVER_DIR}/*.cpp"
     )
     list(APPEND SIGMA_SOURCES ${_drv_srcs})
-    message(STATUS "[SigmaOS] Added ${CMAKE_FILES_DIRECTORY} driver sources from ${SIGMA_DRIVER_DIR}")
+    message(STATUS "[SigmaOS] Added ${CMAKE_FILES_DIRECTORY} C/C++ driver sources from ${SIGMA_DRIVER_DIR}")
 else()
     message(WARNING "[SigmaOS] Driver directory ${SIGMA_DRIVER_DIR} not found — skipping.")
 endif()
+
+# ── Rust & Zig Sovereign Toolchains ───────────────────────────────────────
+find_program(RUSTC_EXECUTABLE rustc)
+find_program(ZIG_EXECUTABLE zig)
+
+if(RUSTC_EXECUTABLE)
+    message(STATUS "[SigmaOS] Rust compiler found: ${RUSTC_EXECUTABLE}")
+else()
+    message(WARNING "[SigmaOS] rustc not found — Rust drivers will be skipped.")
+endif()
+
+if(ZIG_EXECUTABLE)
+    message(STATUS "[SigmaOS] Zig compiler found: ${ZIG_EXECUTABLE}")
+else()
+    message(WARNING "[SigmaOS] zig not found — Zig drivers will be skipped.")
+endif()
+
+set(SIGMA_RUST_TARGET "x86_64-unknown-none")
+set(SIGMA_RUSTFLAGS
+    --edition 2021 --crate-type staticlib
+    --target ${SIGMA_RUST_TARGET}
+    -C opt-level=2 -C panic=abort -C code-model=kernel
+    -C relocation-model=static
+)
+
+set(SIGMA_ZIG_TARGET "x86_64-freestanding-none")
+
+# ── Rust HAL (common to all targets) ──────────────────────────────────────
+set(SIGMA_RUST_HAL
+    ${CMAKE_SOURCE_DIR}/drivers/hal/mod.rs
+    ${CMAKE_SOURCE_DIR}/drivers/hal/mmio.rs
+)
+
+# ── Zig HAL (common to all targets) ──────────────────────────────────────
+set(SIGMA_ZIG_HAL
+    ${CMAKE_SOURCE_DIR}/drivers/hal/port_io.zig
+)
+
+# ── Per-target Rust / Zig driver sources ──────────────────────────────────
+set(SIGMA_RUST_DRIVERS "")
+set(SIGMA_ZIG_DRIVERS "")
+
+if(SIGMA_TARGET_OS STREQUAL "sigma")
+    set(SIGMA_RUST_DRIVERS
+        ${CMAKE_SOURCE_DIR}/drivers/sigma/nvme.rs
+        ${CMAKE_SOURCE_DIR}/drivers/sigma/wifi.rs
+        ${CMAKE_SOURCE_DIR}/drivers/sigma/usb.rs
+    )
+elseif(SIGMA_TARGET_OS STREQUAL "ubuntu")
+    set(SIGMA_RUST_DRIVERS
+        ${CMAKE_SOURCE_DIR}/drivers/linux/ubuntu_compat.rs
+        ${CMAKE_SOURCE_DIR}/drivers/linux/ubuntu_e1000.rs
+    )
+elseif(SIGMA_TARGET_OS STREQUAL "bsd")
+    set(SIGMA_ZIG_DRIVERS
+        ${CMAKE_SOURCE_DIR}/drivers/bsd/bsd_compat.zig
+        ${CMAKE_SOURCE_DIR}/drivers/bsd/bsd_em.zig
+    )
+endif()
+
+set(ALL_RUST_SRCS ${SIGMA_RUST_HAL} ${SIGMA_RUST_DRIVERS})
+set(ALL_ZIG_SRCS  ${SIGMA_ZIG_HAL}  ${SIGMA_ZIG_DRIVERS})
+
+# ── Custom commands: Rust .rs → .a ────────────────────────────────────────
+set(SIGMA_RUST_LIBS "")
+if(RUSTC_EXECUTABLE AND ALL_RUST_SRCS)
+    foreach(_rs ${ALL_RUST_SRCS})
+        get_filename_component(_name ${_rs} NAME_WE)
+        get_filename_component(_dir  ${_rs} DIRECTORY)
+        file(RELATIVE_PATH _reldir ${CMAKE_SOURCE_DIR} ${_dir})
+        set(_out "${CMAKE_BINARY_DIR}/${_reldir}/lib${_name}.a")
+        add_custom_command(
+            OUTPUT  ${_out}
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/${_reldir}"
+            COMMAND ${RUSTC_EXECUTABLE} ${SIGMA_RUSTFLAGS} ${_rs} -o ${_out}
+            DEPENDS ${_rs}
+            COMMENT "[Rust] Compiling ${_rs} → ${_out}"
+        )
+        list(APPEND SIGMA_RUST_LIBS ${_out})
+    endforeach()
+endif()
+
+# ── Custom commands: Zig .zig → .o ───────────────────────────────────────
+set(SIGMA_ZIG_OBJS "")
+if(ZIG_EXECUTABLE AND ALL_ZIG_SRCS)
+    foreach(_zig ${ALL_ZIG_SRCS})
+        get_filename_component(_name ${_zig} NAME_WE)
+        get_filename_component(_dir  ${_zig} DIRECTORY)
+        file(RELATIVE_PATH _reldir ${CMAKE_SOURCE_DIR} ${_dir})
+        set(_out "${CMAKE_BINARY_DIR}/${_reldir}/${_name}.o")
+        add_custom_command(
+            OUTPUT  ${_out}
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/${_reldir}"
+            COMMAND ${ZIG_EXECUTABLE} build-obj -target ${SIGMA_ZIG_TARGET} -O ReleaseFast
+                    ${_zig} -femit-bin=${_out}
+            DEPENDS ${_zig}
+            COMMENT "[Zig] Compiling ${_zig} → ${_out}"
+        )
+        list(APPEND SIGMA_ZIG_OBJS ${_out})
+    endforeach()
+endif()
+
+# ── Custom target to ensure Rust/Zig are built before linking ─────────────
+add_custom_target(sigma_sovereign_drivers
+    DEPENDS ${SIGMA_RUST_LIBS} ${SIGMA_ZIG_OBJS}
+    COMMENT "[SigmaOS] Building sovereign Rust/Zig drivers"
+)
 
 # ── Kernel binary ─────────────────────────────────────────────────────────
 if(SIGMA_SOURCES)
@@ -166,6 +273,11 @@ if(SIGMA_SOURCES)
     set_target_properties(sigmaos.bin PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
     )
+    # Link sovereign Rust/Zig driver artefacts into the kernel
+    if(SIGMA_RUST_LIBS OR SIGMA_ZIG_OBJS)
+        add_dependencies(sigmaos.bin sigma_sovereign_drivers)
+        target_link_libraries(sigmaos.bin PRIVATE ${SIGMA_RUST_LIBS} ${SIGMA_ZIG_OBJS})
+    endif()
 endif()
 
 # ── Tests ─────────────────────────────────────────────────────────────────
@@ -180,6 +292,10 @@ message(STATUS "")
 message(STATUS "SigmaOS configured:")
 message(STATUS "  Target OS      : ${SIGMA_TARGET_OS}")
 message(STATUS "  Driver Dir     : ${SIGMA_DRIVER_DIR}")
+message(STATUS "  Rust Compiler  : ${RUSTC_EXECUTABLE}")
+message(STATUS "  Zig Compiler   : ${ZIG_EXECUTABLE}")
+message(STATUS "  Rust Sources   : ${ALL_RUST_SRCS}")
+message(STATUS "  Zig Sources    : ${ALL_ZIG_SRCS}")
 message(STATUS "  Hypervisor     : ${SIGMA_USE_HYPERVISOR}")
 message(STATUS "  AI Engine      : ${SIGMA_USE_AI_ENGINE}")
 message(STATUS "  Zenith DE      : ${SIGMA_USE_ZENITH_DE}")

@@ -51,6 +51,19 @@ CXX = x86_64-linux-gnu-g++
 LD = x86_64-linux-gnu-ld
 ASM = nasm
 
+# ── Rust & Zig Toolchains (sovereign — no_std / freestanding) ─────────────
+RUSTC       = rustc
+RUST_EDITION = 2021
+RUST_TARGET  = x86_64-unknown-none
+RUSTFLAGS    = --edition $(RUST_EDITION) --crate-type staticlib \
+               --target $(RUST_TARGET) \
+               -C opt-level=2 -C panic=abort -C code-model=kernel \
+               -C relocation-model=static
+
+ZIGC        = zig
+ZIG_TARGET  = x86_64-freestanding-none
+ZIGFLAGS    = build-obj -target $(ZIG_TARGET) -O ReleaseFast
+
 # --- Kernel flags (freestanding — no host libc, no stack protector in ring 0)
 CFLAGS = -Iinclude -ffreestanding -mno-red-zone -mcmodel=kernel \
          -fno-stack-protector -fno-exceptions -fno-rtti \
@@ -90,10 +103,38 @@ C_SRCS := $(shell find $(SRC_DIRS) -name '*.c')
 CXX_SRCS := $(shell find $(SRC_DIRS) -name '*.cpp')
 ASM_SRCS := $(shell find $(SRC_DIRS) -name '*.asm')
 
-# Object files
+# ── Rust sources — HAL (common) + OS-specific drivers ─────────────────────
+RUST_HAL_SRCS := drivers/hal/mod.rs drivers/hal/mmio.rs
+
+ifeq ($(TARGET_OS),sigma)
+  RUST_DRV_SRCS := drivers/sigma/nvme.rs drivers/sigma/wifi.rs drivers/sigma/usb.rs
+  ZIG_DRV_SRCS  :=
+else ifeq ($(TARGET_OS),ubuntu)
+  RUST_DRV_SRCS := drivers/linux/ubuntu_compat.rs drivers/linux/ubuntu_e1000.rs
+  ZIG_DRV_SRCS  :=
+else ifeq ($(TARGET_OS),bsd)
+  RUST_DRV_SRCS :=
+  ZIG_DRV_SRCS  := drivers/bsd/bsd_compat.zig drivers/bsd/bsd_em.zig
+endif
+
+# Zig port_io is common HAL (used by all targets for CPU primitives)
+ZIG_HAL_SRCS := drivers/hal/port_io.zig
+
+ALL_RUST_SRCS := $(RUST_HAL_SRCS) $(RUST_DRV_SRCS)
+ALL_ZIG_SRCS  := $(ZIG_HAL_SRCS) $(ZIG_DRV_SRCS)
+
+# Rust → .a (static library per source)
+RUST_LIBS := $(patsubst %.rs, $(BUILD_DIR)/%.a, $(ALL_RUST_SRCS))
+# Zig  → .o (object file per source)
+ZIG_OBJS  := $(patsubst %.zig, $(BUILD_DIR)/%.o, $(ALL_ZIG_SRCS))
+
+# Object files (C + C++ + ASM)
 OBJS := $(patsubst %.c, $(BUILD_DIR)/%.o, $(C_SRCS)) \
         $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(CXX_SRCS)) \
         $(patsubst %.asm, $(BUILD_DIR)/%.o, $(ASM_SRCS))
+
+$(info [SigmaOS] Rust sources: $(ALL_RUST_SRCS))
+$(info [SigmaOS] Zig  sources: $(ALL_ZIG_SRCS))
 
 .PHONY: all clean iso qemu
 
@@ -111,9 +152,19 @@ $(BUILD_DIR)/%.o: %.asm
 	@mkdir -p $(dir $@)
 	$(ASM) $(ASMFLAGS) $< -o $@
 
-$(KERNEL_BIN): $(OBJS)
-	# Link using proper linker script
-	$(LD) -n -T linker.ld -o $@ $^
+# ── Rust compile rule: .rs → .a (staticlib) ───────────────────────────────
+$(BUILD_DIR)/%.a: %.rs
+	@mkdir -p $(dir $@)
+	$(RUSTC) $(RUSTFLAGS) $< -o $@
+
+# ── Zig compile rule: .zig → .o (freestanding object) ─────────────────────
+$(BUILD_DIR)/%.o: %.zig
+	@mkdir -p $(dir $@)
+	$(ZIGC) $(ZIGFLAGS) $< -femit-bin=$@
+
+$(KERNEL_BIN): $(OBJS) $(RUST_LIBS) $(ZIG_OBJS)
+	# Link C/C++/ASM objects + Rust static libs + Zig objects
+	$(LD) -n -T linker.ld -o $@ $(OBJS) $(RUST_LIBS) $(ZIG_OBJS)
 
 iso: $(KERNEL_BIN)
 	@mkdir -p $(ISO_DIR)/boot/grub
