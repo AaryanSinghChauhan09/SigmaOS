@@ -67,15 +67,15 @@ Government websites, educational content, and farm data are cached locally on th
 
 **Pre-seeded domains:**
 
-| Domain | Content | Category | 
-| --- | --- | --- | 
-| `ncert.nic.in` | School textbooks | Education | 
-| `enam.gov.in` | Mandi prices | Agriculture | 
-| `pmkisan.gov.in` | PM-KISAN status | Government | 
-| `nhp.gov.in` | Health portal | Health | 
-| `digilocker.gov.in` | Document access | Government | 
-| `epfindia.gov.in` | EPF balance | Financial | 
-| `india.gov.in` | Govt services portal | Government | 
+| Domain | Content | Category |
+|---|---|---|
+| `ncert.nic.in` | School textbooks | Education |
+| `enam.gov.in` | Mandi prices | Agriculture |
+| `pmkisan.gov.in` | PM-KISAN status | Government |
+| `nhp.gov.in` | Health portal | Health |
+| `digilocker.gov.in` | Document access | Government |
+| `epfindia.gov.in` | EPF balance | Financial |
+| `india.gov.in` | Govt services portal | Government |
 
 Add any domain to the cache:
 ```bash
@@ -135,13 +135,13 @@ Access logs are maintained for 6 months as required by DoT rules.
 
 sigma-commnet is designed to comply with TRAI's community Wi-Fi regulations:
 
-| Requirement | sigma-commnet | 
-| --- | --- | 
-| Not reselling (cost-sharing only) | ✅ Billing = exact ISP cost ÷ members | 
-| Maximum 20 users per hotspot | ✅ `max_members` enforced at gateway | 
-| Access logs maintained | ✅ 6-month logs, tamper-evident | 
-| ISP T&C compliant | ✅ Gateway has single ISP account | 
-| Hotspot license | ✅ Community setup guide includes license checklist | 
+| Requirement | sigma-commnet |
+|---|---|
+| Not reselling (cost-sharing only) | ✅ Billing = exact ISP cost ÷ members |
+| Maximum 20 users per hotspot | ✅ `max_members` enforced at gateway |
+| Access logs maintained | ✅ 6-month logs, tamper-evident |
+| ISP T&C compliant | ✅ Gateway has single ISP account |
+| Hotspot license | ✅ Community setup guide includes license checklist |
 
 ---
 

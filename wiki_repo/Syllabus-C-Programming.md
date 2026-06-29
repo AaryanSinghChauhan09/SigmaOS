@@ -8,13 +8,13 @@
 
 ### Language Classification in SigmaOS Context
 
-| Language Level | Examples | SigmaOS Layer | 
-| :--- | :--- | :--- | 
-| **Machine Language** | Binary execution opcodes | CPU ISA (x86_64, ARM64, RISC-V) | 
-| **Assembly** | NASM, AT&T syntax | Kernel bootloader (`sigma_boot.asm`) | 
-| **High-Level Procedural** | Freestanding C11 | Kernel C shards, HAL device drivers | 
-| **High-Level OOP** | Modern C++17 | Core microkernel modules | 
-| **Non-Procedural** | SQL, HTML5 | SigmaDB, SigmaWeb runtime | 
+| Language Level | Examples | SigmaOS Layer |
+| :--- | :--- | :--- |
+| **Machine Language** | Binary execution opcodes | CPU ISA (x86_64, ARM64, RISC-V) |
+| **Assembly** | NASM, AT&T syntax | Kernel bootloader (`sigma_boot.asm`) |
+| **High-Level Procedural**| Freestanding C11 | Kernel C shards, HAL device drivers |
+| **High-Level OOP** | Modern C++17 | Core microkernel modules |
+| **Non-Procedural** | SQL, HTML5 | SigmaDB, SigmaWeb runtime |
 
 ### Algorithm → SigmaOS Flow
 
@@ -83,14 +83,14 @@ int truncated = (int)3.99;  /* → 3 */
    ^  →  Bitwise XOR
    |  →  Bitwise OR
    && →  Logical AND
-   | | →  Logical OR
+   || →  Logical OR
    ?: →  Ternary
    = += -= *= /= %=  →  Assignment
 */
 
 /* Bitwise ops critical in kernel */
 sigma_u32 flags = 0;
-flags | = (1 << 3);   /* Set bit 3 */
+flags |= (1 << 3);   /* Set bit 3 */
 flags &= ~(1 << 3);  /* Clear bit 3 */
 flags ^= (1 << 3);   /* Toggle bit 3 */
 
@@ -266,12 +266,12 @@ sigma_fclose(bin);
 
 ## SigmaOS C Developer API Summary
 
-| C Concept | SigmaOS API | File | 
-| :--- | :--- | :--- | 
-| **malloc/free** | `sigma_kmalloc` / `sigma_kfree` | `kernel/core/SovereignAllocator.h` | 
-| **printf** | `sigma_klog(level, fmt, ...)` | `kernel/core/sigma_klog.h` | 
-| **string.h** | `sigma_str*` functions | `kernel/libc/sigma_string.h` | 
-| **fopen/fclose** | `sigma_fopen` / `sigma_fclose` | `kernel/fs/sigma_vfs.h` | 
-| **assert** | `SIGMA_ASSERT(cond, msg)` | `kernel/core/sigma_debug.h` | 
+| C Concept | SigmaOS API | File |
+| :--- | :--- | :--- |
+| **malloc/free** | `sigma_kmalloc` / `sigma_kfree` | `kernel/core/SovereignAllocator.h` |
+| **printf** | `sigma_klog(level, fmt, ...)` | `kernel/core/sigma_klog.h` |
+| **string.h** | `sigma_str*` functions | `kernel/libc/sigma_string.h` |
+| **fopen/fclose** | `sigma_fopen` / `sigma_fclose` | `kernel/fs/sigma_vfs.h` |
+| **assert** | `SIGMA_ASSERT(cond, msg)` | `kernel/core/sigma_debug.h` |
 
 *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

@@ -336,12 +336,12 @@ accuracy <- sum(diag(conf_matrix)) / sum(conf_matrix)
 
 ## SigmaR Integration
 
-| R Feature | SigmaOS Integration | 
-| :--- | :--- | 
-| `ggplot2` | Renders directly via `SigmaViz` engine | 
-| `RMySQL` | Connects directly to `SigmaDB` | 
-| `readLines` | Reads directly from `SovereignFS` | 
-| `parallel` | Uses SigmaOS multi-core kernel scheduler | 
-| `shiny` | Native SigmaWeb runtime integration | 
+| R Feature | SigmaOS Integration |
+| :--- | :--- |
+| `ggplot2` | Renders directly via `SigmaViz` engine |
+| `RMySQL` | Connects directly to `SigmaDB` |
+| `readLines` | Reads directly from `SovereignFS` |
+| `parallel` | Uses SigmaOS multi-core kernel scheduler |
+| `shiny` | Native SigmaWeb runtime integration |
 
 *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

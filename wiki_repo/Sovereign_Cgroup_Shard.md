@@ -8,13 +8,13 @@ By executing directly within the scheduling path, it absorbs the defining advant
 
 ## 🚀 Architectural Design & Parity
 
-| Feature Domain | SigmaOS S-Cgroup | Linux cgroups v2 | Windows Job Objects | Kubernetes | 
-| :--- | :--- | :--- | :--- | :--- | 
-| **Purity** | Freestanding C++17 | Monolithic C / SysFS | Win32 / NT Kernel APIs | YAML Orchestrated | 
-| **CPU Accounting** | Direct scheduler sweep | CFS bandwidth controller | Job Cpu Rate limits | CPU Shares / Limits | 
-| **Memory Isolation** | Transactional Slab accounting | Memory controller / OOM | Memory limit / Job limits | Memory request / Limit | 
-| **I/O Regulation** | Silicon weights matrix | blkio I/O throttle | I/O rate limits | Storage IOPS Quota | 
-| **Execution Path** | Native microkernel scheduler | Kernel cgroup subsystem | Object Manager hooks | Kubelet / containerd | 
+| Feature Domain | SigmaOS S-Cgroup | Linux cgroups v2 | Windows Job Objects | Kubernetes |
+| :--- | :--- | :--- | :--- | :--- |
+| **Purity** | Freestanding C++17 | Monolithic C / SysFS | Win32 / NT Kernel APIs | YAML Orchestrated |
+| **CPU Accounting** | Direct scheduler sweep | CFS bandwidth controller | Job Cpu Rate limits | CPU Shares / Limits |
+| **Memory Isolation** | Transactional Slab accounting | Memory controller / OOM | Memory limit / Job limits | Memory request / Limit |
+| **I/O Regulation** | Silicon weights matrix | blkio I/O throttle | I/O rate limits | Storage IOPS Quota |
+| **Execution Path** | Native microkernel scheduler | Kernel cgroup subsystem | Object Manager hooks | Kubelet / containerd |
 
 ---
 

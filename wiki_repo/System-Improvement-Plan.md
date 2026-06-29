@@ -112,12 +112,12 @@ Target throughput (KEM operations/sec):
 
 ## 6. Unified API Expansion Roadmap
 
-| Phase | Target Subsystem | Improvement Feature | Expected Benefit | 
-| --- | --- | --- | --- | 
-| Phase I | SovereignBoot | Async concurrent shard ignition | Boot time < 400 ms | 
-| Phase II | SovereignVideo | SIMD-accelerated non-linear edits | 4× faster HEVC transcode | 
-| Phase III | SovereignCloudFS | Encrypted multi-node block syncing | Zero-overhead distributed replication | 
-| Phase IV | S-ERA / S-CCF | High-performance batch auditing | Real-time analysis for corporate registers | 
+| Phase | Target Subsystem | Improvement Feature | Expected Benefit |
+|---|---|---|---|
+| Phase I | SovereignBoot | Async concurrent shard ignition | Boot time < 400 ms |
+| Phase II | SovereignVideo | SIMD-accelerated non-linear edits | 4× faster HEVC transcode |
+| Phase III | SovereignCloudFS | Encrypted multi-node block syncing | Zero-overhead distributed replication |
+| Phase IV | S-ERA / S-CCF | High-performance batch auditing | Real-time analysis for corporate registers |
 
 ---
 
@@ -142,27 +142,27 @@ Target throughput (KEM operations/sec):
 
 ## 8. Performance Benchmark Targets
 
-| Metric | Ubuntu 24.04 | Fedora 41 | SigmaOS Target | 
-| --- | --- | --- | --- | 
-| Boot time (NVMe SSD) | 43 s | 9 s | **< 2 s** | 
-| Idle RAM (desktop) | 847 MB | 900 MB | **< 150 MB** | 
-| Context switch latency | ~1,000 ns | ~300 ns | **< 50 ns** | 
-| Kyber-1024 ops/sec | N/A | N/A | **5.8 M ops/sec** | 
-| Kernel CVE patch | Reboot | Reboot | **No reboot (kpatch)** | 
-| App launch (cold) | 1.5 s | 1.2 s | **< 0.5 s** | 
+| Metric | Ubuntu 24.04 | Fedora 41 | SigmaOS Target |
+|---|---|---|---|
+| Boot time (NVMe SSD) | 43 s | 9 s | **< 2 s** |
+| Idle RAM (desktop) | 847 MB | 900 MB | **< 150 MB** |
+| Context switch latency | ~1,000 ns | ~300 ns | **< 50 ns** |
+| Kyber-1024 ops/sec | N/A | N/A | **5.8 M ops/sec** |
+| Kernel CVE patch | Reboot | Reboot | **No reboot (kpatch)** |
+| App launch (cold) | 1.5 s | 1.2 s | **< 0.5 s** |
 
 ---
 
 ## 9. Competitive Improvement Matrix (v15.0/15.1)
 
-| Dimension | Competitor | Competitor USP | SigmaOS Status | SigmaOS Plan | 
-| --- | --- | --- | --- | --- | 
-| **Declarative Consistency** | NixOS | Immutable reproducible builds, transaction rollback | `SovereignRegistry` stubs | **SovereignRegistry + TimeMachine**: CRYSTALS-Dilithium signed JSON boot configs with journal-level rollback across the 600-shard lattice | 
-| **Mathematical Throughput** | Clear Linux | Aggressively vectorized math, auto-tuned CFS | Shard-aware runqueues | **SIMD-Vectorized PQC Engines**: AVX-512 + NEON for Kyber/Dilithium acceleration | 
-| **Forensic Integrity** | CAINE / Tails | Zero-trace RAM scrubbing, write-blocking | Ring-3 driver model + basic secure boot | **SovereignForensics**: Hardware-assisted page scrubbing on namespace termination; WORM audit registers | 
-| **System Recovery** | RescueZilla | One-click GUI disk cloning, Btrfs restores | CLI `sigma_fsck` + checkers | **`sigma-recover`**: Encrypted local backup restores; partition verification at boot stage | 
-| **Immutable Orchestration** | Fedora CoreOS | Container-native, ignition provisioning | Shard-level boundaries | **SovereignCluster + ASI**: Asynchronous Shard Ignition; write-once images; no hypervisor overhead | 
-| **Desktop UX** | SteamOS / Solus | Custom compositor, gamepad integration | Zenith stubs + vanilla CSS | **SovereignThemeEngine + Vulkan**: Direct Vulkan triple-buffer compositor; zero-copy GPU composition | 
+| Dimension | Competitor | Competitor USP | SigmaOS Status | SigmaOS Plan |
+|---|---|---|---|---|
+| **Declarative Consistency** | NixOS | Immutable reproducible builds, transaction rollback | `SovereignRegistry` stubs | **SovereignRegistry + TimeMachine**: CRYSTALS-Dilithium signed JSON boot configs with journal-level rollback across the 600-shard lattice |
+| **Mathematical Throughput** | Clear Linux | Aggressively vectorized math, auto-tuned CFS | Shard-aware runqueues | **SIMD-Vectorized PQC Engines**: AVX-512 + NEON for Kyber/Dilithium acceleration |
+| **Forensic Integrity** | CAINE / Tails | Zero-trace RAM scrubbing, write-blocking | Ring-3 driver model + basic secure boot | **SovereignForensics**: Hardware-assisted page scrubbing on namespace termination; WORM audit registers |
+| **System Recovery** | RescueZilla | One-click GUI disk cloning, Btrfs restores | CLI `sigma_fsck` + checkers | **`sigma-recover`**: Encrypted local backup restores; partition verification at boot stage |
+| **Immutable Orchestration** | Fedora CoreOS | Container-native, ignition provisioning | Shard-level boundaries | **SovereignCluster + ASI**: Asynchronous Shard Ignition; write-once images; no hypervisor overhead |
+| **Desktop UX** | SteamOS / Solus | Custom compositor, gamepad integration | Zenith stubs + vanilla CSS | **SovereignThemeEngine + Vulkan**: Direct Vulkan triple-buffer compositor; zero-copy GPU composition |
 
 ---
 
@@ -245,32 +245,32 @@ Efficient scheduling, memory management, and I/O handling are the foundation. A 
 
 **Scheduling**
 
-| Technique | Description | Implementation | 
-| ----------- | ------------- | ---------------- | 
-| MLFQ + MCS scheduler | Multi-Level Feedback Queue with MCS spinlocks for zero-contention runqueues | `kernel/core/sigma_sched.cpp` | 
-| NUMA-aware placement | Threads allocated to the nearest physical CPU memory node; reads ACPI SRAT at boot | `kernel/sched/sigma_numa.cpp` | 
-| Lock-free CAS queues | Compare-and-swap loops eliminate spinlock pauses under high-contention workloads | `klib/sigma_lockfree.h` | 
-| Real-time policy | SCHED_DEADLINE + EDF for latency-sensitive workloads (audio, sensor, AI inference) | `kernel/sched/sigma_rt.cpp` | 
-| cgroup v2 enforcement | Per-pod CPU/memory/IO quotas enforced in kernel path, not just CLI | `kernel/core/process/sigma_cgroup.c` | 
+| Technique | Description | Implementation |
+|-----------|-------------|----------------|
+| MLFQ + MCS scheduler | Multi-Level Feedback Queue with MCS spinlocks for zero-contention runqueues | `kernel/core/sigma_sched.cpp` |
+| NUMA-aware placement | Threads allocated to the nearest physical CPU memory node; reads ACPI SRAT at boot | `kernel/sched/sigma_numa.cpp` |
+| Lock-free CAS queues | Compare-and-swap loops eliminate spinlock pauses under high-contention workloads | `klib/sigma_lockfree.h` |
+| Real-time policy | SCHED_DEADLINE + EDF for latency-sensitive workloads (audio, sensor, AI inference) | `kernel/sched/sigma_rt.cpp` |
+| cgroup v2 enforcement | Per-pod CPU/memory/IO quotas enforced in kernel path, not just CLI | `kernel/core/process/sigma_cgroup.c` |
 
 **Memory Management**
 
-| Technique | Description | Implementation | 
-| ----------- | ------------- | ---------------- | 
-| Buddy allocator + slab | O(log n) physical page allocation with per-CPU slab caches | `kernel/core/sigma_mm.cpp` | 
-| O(1) slab compaction | CAS-based lock-free free-list defragmentation without pause sweeps | `klib/sigma_slab_lockfree.cpp` | 
-| Huge page support | 2 MB and 1 GB transparent huge pages for large working-set workloads | `kernel/mm/sigma_thp.cpp` | 
-| Memory pressure events | Proactive reclaim notifies userland before OOM — no surprise kills | `kernel/mm/sigma_pressure.cpp` | 
-| Zero-copy DMA paths | Block controller → userspace transfers without intermediate kernel buffers | `kernel/fs/sigma_ubc.h` | 
+| Technique | Description | Implementation |
+|-----------|-------------|----------------|
+| Buddy allocator + slab | O(log n) physical page allocation with per-CPU slab caches | `kernel/core/sigma_mm.cpp` |
+| O(1) slab compaction | CAS-based lock-free free-list defragmentation without pause sweeps | `klib/sigma_slab_lockfree.cpp` |
+| Huge page support | 2 MB and 1 GB transparent huge pages for large working-set workloads | `kernel/mm/sigma_thp.cpp` |
+| Memory pressure events | Proactive reclaim notifies userland before OOM — no surprise kills | `kernel/mm/sigma_pressure.cpp` |
+| Zero-copy DMA paths | Block controller → userspace transfers without intermediate kernel buffers | `kernel/fs/sigma_ubc.h` |
 
 **I/O Handling**
 
-| Technique | Description | Implementation | 
-| ----------- | ------------- | ---------------- | 
-| io_uring equivalent | Submission/completion ring buffers for async I/O with zero syscall overhead per op | `kernel/io/sigma_uring.cpp` | 
-| Pre-emptive read-ahead | Learns sequential access patterns via sigma-ai; prefetches before user IO dispatch | `kernel/fs/sigma_readahead.cpp` | 
-| NVMe multiqueue | Per-CPU submission queues to NVMe controller for lock-free storage I/O | `drivers/storage/sigma_nvme.cpp` | 
-| Relativistic journaling | Log-structured circular ring journal; sequential writes on flash | `kernel/fs/sigmafs/sigma_journal.h` | 
+| Technique | Description | Implementation |
+|-----------|-------------|----------------|
+| io_uring equivalent | Submission/completion ring buffers for async I/O with zero syscall overhead per op | `kernel/io/sigma_uring.cpp` |
+| Pre-emptive read-ahead | Learns sequential access patterns via sigma-ai; prefetches before user IO dispatch | `kernel/fs/sigma_readahead.cpp` |
+| NVMe multiqueue | Per-CPU submission queues to NVMe controller for lock-free storage I/O | `drivers/storage/sigma_nvme.cpp` |
+| Relativistic journaling | Log-structured circular ring journal; sequential writes on flash | `kernel/fs/sigmafs/sigma_journal.h` |
 
 ---
 
@@ -287,16 +287,16 @@ Traditional Linux driver:   driver crash → kernel panic → data loss
 SigmaOS SDF driver:         driver crash → sigma-heal restarts it → zero data loss
 ```
 
-| Driver Category | Priority | Target Hardware | 
-| ---------------- | ---------- | ----------------- | 
+| Driver Category | Priority | Target Hardware |
+|----------------|----------|-----------------|
 | GPU / DRM/KMS | Critical | Intel i915, AMD amdgpu, VirtIO-GPU | 
-| Wi-Fi 802.11ax | Critical | Intel iwlwifi, MediaTek mt7921, Realtek rtl8xxxu | 
-| Bluetooth 5.3 | High | USB HCI, QCA, Intel AX series | 
-| NVMe / AHCI | Done ✓ | All PCIe NVMe and SATA controllers | 
-| USB xHCI | Done ✓ | USB 3.2 host controller | 
-| ARM64 BSP | High | Raspberry Pi 4/5 (BCM2711/2712), JioBook, VisionFive 2 | 
-| RISC-V | Medium | StarFive VisionFive 2, Milk-V Pioneer | 
-| Neural accelerators | Future | Qualcomm Hexagon, Apple Neural Engine, Hailo-8 | 
+| Wi-Fi 802.11ax | Critical | Intel iwlwifi, MediaTek mt7921, Realtek rtl8xxxu |
+| Bluetooth 5.3 | High | USB HCI, QCA, Intel AX series |
+| NVMe / AHCI | Done ✓ | All PCIe NVMe and SATA controllers |
+| USB xHCI | Done ✓ | USB 3.2 host controller |
+| ARM64 BSP | High | Raspberry Pi 4/5 (BCM2711/2712), JioBook, VisionFive 2 |
+| RISC-V | Medium | StarFive VisionFive 2, Milk-V Pioneer |
+| Neural accelerators | Future | Qualcomm Hexagon, Apple Neural Engine, Hailo-8 |
 
 **Hardware Profiling (sigma-dna)**
 
@@ -325,12 +325,12 @@ Process launch sequence:
             → process executes in restricted namespace
 ```
 
-| Mechanism | Description | Implementation | 
-| ----------- | ------------- | ---------------- | 
-| sigma-mac | Mandatory Access Control — policy-driven, AI-suggested rules | `kernel/security/sigma_mac.cpp` | 
-| Capability sandbox | POSIX capabilities + custom sigma-caps for SDF/DMA access | `kernel/security/sigma_caps.h` | 
-| Seccomp-BPF equivalent | Per-process syscall allowlist loaded at exec time | `kernel/security/sigma_seccomp.cpp` | 
-| Namespace isolation | PID, mount, network, IPC, UTS per container — kernel-enforced | `kernel/core/process/sigma_namespace.cpp` | 
+| Mechanism | Description | Implementation |
+|-----------|-------------|----------------|
+| sigma-mac | Mandatory Access Control — policy-driven, AI-suggested rules | `kernel/security/sigma_mac.cpp` |
+| Capability sandbox | POSIX capabilities + custom sigma-caps for SDF/DMA access | `kernel/security/sigma_caps.h` |
+| Seccomp-BPF equivalent | Per-process syscall allowlist loaded at exec time | `kernel/security/sigma_seccomp.cpp` |
+| Namespace isolation | PID, mount, network, IPC, UTS per container — kernel-enforced | `kernel/core/process/sigma_namespace.cpp` |
 
 **Secure Boot Chain**
 
@@ -344,34 +344,34 @@ sigma-boot.efi (ML-DSA signed)
                         └── CryptFS decrypts user partition (Argon2id)
 ```
 
-| Component | Status | Notes | 
-| ----------- | -------- | ------- | 
-| sigma-boot.efi UEFI loader | `[ ]` | Blocked by Phase 0 kernel work | 
-| TPM2 PCR measurement chain | `[~]` | Header complete; needs EFI binary | 
-| dm-verity root FS | `[~]` | Framework exists; build integration pending | 
-| Argon2id CryptFS | `[ ]` | Issue #44 — currently returns zero bytes | 
-| ML-DSA (FIPS 204) package signing | `[~]` | Dilithium header present; NIST final bindings missing | 
+| Component | Status | Notes |
+|-----------|--------|-------|
+| sigma-boot.efi UEFI loader | `[ ]` | Blocked by Phase 0 kernel work |
+| TPM2 PCR measurement chain | `[~]` | Header complete; needs EFI binary |
+| dm-verity root FS | `[~]` | Framework exists; build integration pending |
+| Argon2id CryptFS | `[ ]` | Issue #44 — currently returns zero bytes |
+| ML-DSA (FIPS 204) package signing | `[~]` | Dilithium header present; NIST final bindings missing |
 
 **Memory Protection**
 
-| Feature | Description | Implementation | 
-| --------- | ------------- | ---------------- | 
-| KASLR | Kernel address randomization at every boot | `arch/x86_64/sigma_kaslr.cpp` | 
-| Stack canaries | Compile-time `-fstack-protector-strong` on all kernel code | `Makefile` | 
-| W^X enforcement | No page is simultaneously writable and executable | `kernel/mm/sigma_wxprotect.cpp` | 
-| Shadow stack (CET) | Intel CET shadow stack support for ROP mitigation | `arch/x86_64/sigma_cet.asm` | 
-| ASLR for userland | Full address space randomization for all processes | `kernel/core/sigma_mm.cpp` | 
+| Feature | Description | Implementation |
+|---------|-------------|----------------|
+| KASLR | Kernel address randomization at every boot | `arch/x86_64/sigma_kaslr.cpp` |
+| Stack canaries | Compile-time `-fstack-protector-strong` on all kernel code | `Makefile` |
+| W^X enforcement | No page is simultaneously writable and executable | `kernel/mm/sigma_wxprotect.cpp` |
+| Shadow stack (CET) | Intel CET shadow stack support for ROP mitigation | `arch/x86_64/sigma_cet.asm` |
+| ASLR for userland | Full address space randomization for all processes | `kernel/core/sigma_mm.cpp` |
 
 **Post-Quantum by Default**
 
 All new APIs, package signatures, and network connections use NIST PQC final standards. Legacy RSA/ECDSA accepted only in compatibility mode.
 
-| Algorithm | NIST Standard | Use | 
-| ----------- | --------------- | ----- | 
-| ML-KEM-1024 | FIPS 203 | Key encapsulation (TLS, disk encryption) | 
-| ML-DSA-87 | FIPS 204 | Package signing, boot chain attestation | 
-| SLH-DSA-SHAKE-256 | FIPS 205 | Code signing (hash-based, no lattice assumptions) | 
-| Hybrid X25519+ML-KEM | RFC draft | TLS 1.3 key exchange during transition period | 
+| Algorithm | NIST Standard | Use |
+|-----------|---------------|-----|
+| ML-KEM-1024 | FIPS 203 | Key encapsulation (TLS, disk encryption) |
+| ML-DSA-87 | FIPS 204 | Package signing, boot chain attestation |
+| SLH-DSA-SHAKE-256 | FIPS 205 | Code signing (hash-based, no lattice assumptions) |
+| Hybrid X25519+ML-KEM | RFC draft | TLS 1.3 key exchange during transition period |
 
 ---
 
@@ -401,7 +401,7 @@ sigma-pkg install sigma-kpatch-CVE-2026-XXXX
 # → patch downloaded, Dilithium3-verified
 # → sigma-kpatch applies function-level binary patch to live kernel
 # → /proc/sigma/kpatch shows active patches
-# No reboot. No downtime
+# No reboot. No downtime.
 ```
 
 **Hot-Swap Profiles**
@@ -423,12 +423,12 @@ Each switch reconfigures: MAC policy, service set, cgroup slices, kernel paramet
 
 SigmaOS needs a broad driver matrix to be viable on real hardware. Current coverage and targets:
 
-| Platform | Coverage | Gap | Target Phase | 
-| ---------- | ---------- | ----- | ------------- | 
-| x86_64 (Intel/AMD) | Good — NIC, NVMe, USB | GPU, Wi-Fi, Bluetooth | Phase 1–2 | 
-| ARM64 (Pi 4/5) | Stubs only | Full BSP, GPU, wireless | Phase 5 | 
-| RISC-V | Stubs only | Full BSP | Phase 5 | 
-| Embedded (ARM Cortex-M) | Not started | sigma-ultra target | Phase 5 | 
+| Platform | Coverage | Gap | Target Phase |
+|----------|----------|-----|-------------|
+| x86_64 (Intel/AMD) | Good — NIC, NVMe, USB | GPU, Wi-Fi, Bluetooth | Phase 1–2 |
+| ARM64 (Pi 4/5) | Stubs only | Full BSP, GPU, wireless | Phase 5 |
+| RISC-V | Stubs only | Full BSP | Phase 5 |
+| Embedded (ARM Cortex-M) | Not started | sigma-ultra target | Phase 5 |
 
 **Linux driver compatibility bridge** (`sigma-linux-compat`) allows existing Linux kernel modules to run inside SDF sandboxes as a migration path while native SDF drivers are developed.
 
@@ -457,14 +457,14 @@ make check-abi    # fails if SIGMA_STABLE symbol changes signature
 
 **Developer Tooling Roadmap**
 
-| Tool | Description | Status | 
-| ------ | ------------- | -------- | 
-| `sigma-gdb` | Source-level debugger for SigmaOS binaries | `[ ]` | 
-| `sigma-perf` | Hardware PMU-based profiler (cycles, cache misses, branch mispredictions) | `[ ]` | 
-| `sigma-strace` | Syscall tracer with PQC audit log output | `[~]` | 
-| `sigma-sdk` CLI | Scaffold, build, sign, and publish `.spkg` | `[~]` | 
-| Doxygen API docs | Auto-generated from all `.h` files | `[~]` | 
-| `sigma-observatory` | Native Prometheus+Grafana equivalent in Zenith | `[ ]` | 
+| Tool | Description | Status |
+|------|-------------|--------|
+| `sigma-gdb` | Source-level debugger for SigmaOS binaries | `[ ]` |
+| `sigma-perf` | Hardware PMU-based profiler (cycles, cache misses, branch mispredictions) | `[ ]` |
+| `sigma-strace` | Syscall tracer with PQC audit log output | `[~]` |
+| `sigma-sdk` CLI | Scaffold, build, sign, and publish `.spkg` | `[~]` |
+| Doxygen API docs | Auto-generated from all `.h` files | `[~]` |
+| `sigma-observatory` | Native Prometheus+Grafana equivalent in Zenith | `[ ]` |
 
 ### Virtualization & Containerization
 
@@ -484,12 +484,12 @@ No Docker daemon. No containerd. No OCI registry dependency by default.
 
 **Hypervisor (SovereignContainer):**
 
-| Feature | Description | Status | 
-| --------- | ------------- | -------- | 
-| KVM acceleration | Hardware-assisted virtualization via KVM ioctl interface | `[~]` | 
-| VirtIO device model | VirtIO-net, VirtIO-blk, VirtIO-GPU for guest VMs | `[~]` | 
-| Live migration | VM state snapshot + transfer to another SigmaOS host | `[ ]` | 
-| Nested virtualization | SigmaOS as a guest inside itself or other hypervisors | `[ ]` | 
+| Feature | Description | Status |
+|---------|-------------|--------|
+| KVM acceleration | Hardware-assisted virtualization via KVM ioctl interface | `[~]` |
+| VirtIO device model | VirtIO-net, VirtIO-blk, VirtIO-GPU for guest VMs | `[~]` |
+| Live migration | VM state snapshot + transfer to another SigmaOS host | `[ ]` |
+| Nested virtualization | SigmaOS as a guest inside itself or other hypervisors | `[ ]` |
 
 ---
 
@@ -522,29 +522,29 @@ sigma-cli boot rollback                   # revert to last known-good boot
 
 Documentation is a first-class subsystem, not an afterthought:
 
-| Resource | Location | Status | 
-| ---------- | ---------- | -------- | 
-| Wiki (300+ pages) | `wiki_repo/*.md` → GitHub Wiki | `[x]` | 
-| Doxygen API reference | `Doxyfile` → `docs/api/html/` | `[~]` | 
-| Man pages (sigma-cli tools) | `docs/man/` | `[~]` | 
-| Getting started guide | `wiki_repo/Getting-Started.md` | `[x]` | 
-| Kernel developer handbook | `wiki_repo/Kernel-Developer-Handbook.md` | `[x]` | 
-| Stability playbook | `wiki_repo/Stability-Playbook.md` | `[x]` | 
-| India Stack guide | `wiki_repo/Advanced-India-Features.md` | `[x]` | 
-| Architecture whitepaper | `wiki_repo/ARCHITECTURE_WHITEPAPER.md` | `[x]` | 
+| Resource | Location | Status |
+|----------|----------|--------|
+| Wiki (300+ pages) | `wiki_repo/*.md` → GitHub Wiki | `[x]` |
+| Doxygen API reference | `Doxyfile` → `docs/api/html/` | `[~]` |
+| Man pages (sigma-cli tools) | `docs/man/` | `[~]` |
+| Getting started guide | `wiki_repo/Getting-Started.md` | `[x]` |
+| Kernel developer handbook | `wiki_repo/Kernel-Developer-Handbook.md` | `[x]` |
+| Stability playbook | `wiki_repo/Stability-Playbook.md` | `[x]` |
+| India Stack guide | `wiki_repo/Advanced-India-Features.md` | `[x]` |
+| Architecture whitepaper | `wiki_repo/ARCHITECTURE_WHITEPAPER.md` | `[x]` |
 
 **Doc-per-PR policy:** every subsystem PR is blocked by CI (`sigma_ci.yml`) until docs are updated. No undocumented changes merge to `main`.
 
 ### Community Tools
 
-| Tool | Description | Status | 
-| ------ | ------------- | -------- | 
-| `sigma-monitor` | Real-time system stats (CPU, memory, I/O, network, PQC audit events) | `[~]` | 
-| `sigma-secure` | Security posture dashboard — shows open CVEs, unsigned binaries, policy violations | `[~]` | 
-| `sigma-observatory` | Prometheus-compatible metrics + Grafana-style Zenith dashboard | `[ ]` | 
-| `sigma-pkg` | Package manager with dependency resolution + Dilithium3 verification | `[~]` | 
-| `sigma-automation.sh` | Backup / update / recovery / wiki-sync automation engine | `[x]` | 
-| Bug bounty program | `wiki_repo/BUG_BOUNTY.md` — paid rewards for valid CVE reports | `[x]` | 
+| Tool | Description | Status |
+|------|-------------|--------|
+| `sigma-monitor` | Real-time system stats (CPU, memory, I/O, network, PQC audit events) | `[~]` |
+| `sigma-secure` | Security posture dashboard — shows open CVEs, unsigned binaries, policy violations | `[~]` |
+| `sigma-observatory` | Prometheus-compatible metrics + Grafana-style Zenith dashboard | `[ ]` |
+| `sigma-pkg` | Package manager with dependency resolution + Dilithium3 verification | `[~]` |
+| `sigma-automation.sh` | Backup / update / recovery / wiki-sync automation engine | `[x]` |
+| Bug bounty program | `wiki_repo/BUG_BOUNTY.md` — paid rewards for valid CVE reports | `[x]` |
 
 ---
 
@@ -566,12 +566,12 @@ sigma-ai architecture:
 
 **On-device inference targets:**
 
-| Model | Size | RAM needed | Use | 
-| ------- | ------ | ----------- | ----- | 
-| Sarvam-1 (Q4_K_M) | 4.1 GB | 4 GB | Hindi-English general assistant | 
-| OpenHathi (Q4) | 3.8 GB | 4 GB | Hindi domain specialist | 
-| Krutrim (Q5) | 7.2 GB | 8 GB | Multi-language India assistant | 
-| Custom GST model | 120 MB | 256 MB | Sigma-accounts tax advice | 
+| Model | Size | RAM needed | Use |
+|-------|------|-----------|-----|
+| Sarvam-1 (Q4_K_M) | 4.1 GB | 4 GB | Hindi-English general assistant |
+| OpenHathi (Q4) | 3.8 GB | 4 GB | Hindi domain specialist |
+| Krutrim (Q5) | 7.2 GB | 8 GB | Multi-language India assistant |
+| Custom GST model | 120 MB | 256 MB | Sigma-accounts tax advice |
 
 **Hardware acceleration path:**
 - AVX-512 (Intel/AMD) — 8–12× faster than scalar inference
@@ -612,12 +612,12 @@ sigma-cluster (N nodes):
 
 **Horizontal scaling primitives:**
 
-| Primitive | Description | Implementation | 
-| ----------- | ------------- | ---------------- | 
-| SovereignCloudFS | Encrypted multi-node block sync with zero-overhead replication | `net/sigma_cloudf.cpp` | 
-| sigma-mesh-compute | National distributed computing grid over BharatNet | `net/sigma_mesh.cpp` | 
-| Asynchronous Shard Ignition (ASI) | Parallel boot of independent shards — scales to 600 concurrent | `kernel/core/boot/sigma_boot.c` | 
-| sigma-fleet | Manage 10,000+ devices from single console | `userland/tools/sigma_fleet.cpp` | 
+| Primitive | Description | Implementation |
+|-----------|-------------|----------------|
+| SovereignCloudFS | Encrypted multi-node block sync with zero-overhead replication | `net/sigma_cloudf.cpp` |
+| sigma-mesh-compute | National distributed computing grid over BharatNet | `net/sigma_mesh.cpp` |
+| Asynchronous Shard Ignition (ASI) | Parallel boot of independent shards — scales to 600 concurrent | `kernel/core/boot/sigma_boot.c` |
+| sigma-fleet | Manage 10,000+ devices from single console | `userland/tools/sigma_fleet.cpp` |
 
 ### Energy Efficiency
 
@@ -625,24 +625,24 @@ Critical for sigma-ultra devices and rural/edge deployments running on solar or 
 
 **Power management stack:**
 
-| Feature | Description | Implementation | 
-| --------- | ------------- | ---------------- | 
-| ACPI P/C-states | Full CPU frequency scaling and core parking | `kernel/power/sigma_power_manager.cpp` | 
-| sigma-perf governor | Silicon-aware frequency policy — not just ondemand/powersave | `kernel/power/sigma_perf_governor.cpp` | 
-| Wakeup source accounting | Every wakeup attributed to a process/driver — no mystery power drain | `kernel/power/sigma_wakeup.cpp` | 
-| Suspend-to-RAM (S3) | Full system suspend with TPM2 state preservation | `kernel/power/sigma_suspend.cpp` | 
-| Runtime PM | Per-device runtime power management — idle devices cut power automatically | `hal/sigma_rpm.cpp` | 
-| Display DPMS | Aggressive display power management via DRM/KMS connector properties | `drivers/graphics/sigma_kms.cpp` | 
+| Feature | Description | Implementation |
+|---------|-------------|----------------|
+| ACPI P/C-states | Full CPU frequency scaling and core parking | `kernel/power/sigma_power_manager.cpp` |
+| sigma-perf governor | Silicon-aware frequency policy — not just ondemand/powersave | `kernel/power/sigma_perf_governor.cpp` |
+| Wakeup source accounting | Every wakeup attributed to a process/driver — no mystery power drain | `kernel/power/sigma_wakeup.cpp` |
+| Suspend-to-RAM (S3) | Full system suspend with TPM2 state preservation | `kernel/power/sigma_suspend.cpp` |
+| Runtime PM | Per-device runtime power management — idle devices cut power automatically | `hal/sigma_rpm.cpp` |
+| Display DPMS | Aggressive display power management via DRM/KMS connector properties | `drivers/graphics/sigma_kms.cpp` |
 
 **Energy efficiency targets:**
 
-| Scenario | Reference (Linux) | SigmaOS Target | 
-| ---------- | ------------------ | ---------------- | 
-| Idle (desktop, screen off) | ~4.5 W (laptop) | **< 2.5 W** | 
-| sigma-ultra idle | ~0.8 W (Pi Zero) | **< 0.4 W** | 
-| Video playback (1080p H.265) | ~8 W | **< 5 W** (HW decode) | 
-| sigma-ai inference (7B Q4) | ~15 W | **< 10 W** (NPU routing) | 
-| Server idle (2-socket EPYC) | ~120 W | **< 80 W** (NUMA-aware parking) | 
+| Scenario | Reference (Linux) | SigmaOS Target |
+|----------|------------------|----------------|
+| Idle (desktop, screen off) | ~4.5 W (laptop) | **< 2.5 W** |
+| sigma-ultra idle | ~0.8 W (Pi Zero) | **< 0.4 W** |
+| Video playback (1080p H.265) | ~8 W | **< 5 W** (HW decode) |
+| sigma-ai inference (7B Q4) | ~15 W | **< 10 W** (NPU routing) |
+| Server idle (2-socket EPYC) | ~120 W | **< 80 W** (NUMA-aware parking) |
 
 **Thermal management:**
 - `sigma-thermal`: reads ACPI thermal zones + hardware temperature sensors
@@ -653,32 +653,32 @@ Critical for sigma-ultra devices and rural/edge deployments running on solar or 
 
 ## 15. Implementation Priority Matrix (All Categories)
 
-| Category | Feature | Blocks Boot | Priority | Phase | 
-| ---------- | --------- | ------------- | ---------- | ------- | 
-| **Kernel** | Scheduler (MLFQ) | Yes | 🔴 Critical | Phase 0 | 
-| **Kernel** | Memory manager (buddy+slab) | Yes | 🔴 Critical | Phase 0 | 
-| **Kernel** | Syscall dispatch (30 calls) | Yes | 🔴 Critical | Phase 0 | 
-| **Kernel** | IRQ/APIC controller | Yes | 🔴 Critical | Phase 0 | 
-| **Hardware** | VESA/GOP framebuffer | Yes (desktop) | 🔴 Critical | Phase 0 | 
-| **Hardware** | GPU DRM/KMS | Yes (desktop) | 🟠 High | Phase 2 | 
-| **Hardware** | Wi-Fi drivers | No | 🟠 High | Phase 1 | 
-| **Hardware** | ARM64 BSP | No | 🟠 High | Phase 5 | 
-| **Security** | Argon2id CryptFS (fix #44) | No | 🔴 Critical | Phase 1 | 
-| **Security** | sigma-boot.efi + TPM2 | No | 🟠 High | Phase 4 | 
-| **Security** | ML-DSA (FIPS 204) final | No | 🟠 High | Phase 4 | 
-| **Modular** | sigma-kpatch live patching | No | 🟡 Medium | Phase 4 | 
-| **Ecosystem** | sigma-repo-server | No | 🔴 Critical | Phase 1 | 
-| **Ecosystem** | sigma-sdk + ABI policy | No | 🟠 High | Phase 2 | 
-| **Ecosystem** | KVM/VirtIO hypervisor | No | 🟡 Medium | Phase 3 | 
-| **UX** | Zenith compositor event loop | No | 🟠 High | Phase A | 
-| **UX** | sigma-sh history + completion | No | 🟡 Medium | Phase B | 
-| **UX** | sigma-observatory dashboard | No | 🟢 Low | Phase C | 
-| **AI/ML** | sigma-ai llama.cpp backend | No | 🟠 High | Phase 2 | 
-| **AI/ML** | sigma-heal AI analysis | No | 🟠 High | Phase 6 | 
-| **Scalability** | SovereignCloudFS | No | 🟡 Medium | Phase 3 | 
-| **Scalability** | sigma-fleet (10K devices) | No | 🟡 Medium | Phase 7 | 
-| **Energy** | ACPI P/C-states | No | 🟠 High | Phase 1 | 
-| **Energy** | sigma-ultra < 0.4 W idle | No | 🟡 Medium | Phase 5 | 
+| Category | Feature | Blocks Boot | Priority | Phase |
+|----------|---------|-------------|----------|-------|
+| **Kernel** | Scheduler (MLFQ) | Yes | 🔴 Critical | Phase 0 |
+| **Kernel** | Memory manager (buddy+slab) | Yes | 🔴 Critical | Phase 0 |
+| **Kernel** | Syscall dispatch (30 calls) | Yes | 🔴 Critical | Phase 0 |
+| **Kernel** | IRQ/APIC controller | Yes | 🔴 Critical | Phase 0 |
+| **Hardware** | VESA/GOP framebuffer | Yes (desktop) | 🔴 Critical | Phase 0 |
+| **Hardware** | GPU DRM/KMS | Yes (desktop) | 🟠 High | Phase 2 |
+| **Hardware** | Wi-Fi drivers | No | 🟠 High | Phase 1 |
+| **Hardware** | ARM64 BSP | No | 🟠 High | Phase 5 |
+| **Security** | Argon2id CryptFS (fix #44) | No | 🔴 Critical | Phase 1 |
+| **Security** | sigma-boot.efi + TPM2 | No | 🟠 High | Phase 4 |
+| **Security** | ML-DSA (FIPS 204) final | No | 🟠 High | Phase 4 |
+| **Modular** | sigma-kpatch live patching | No | 🟡 Medium | Phase 4 |
+| **Ecosystem** | sigma-repo-server | No | 🔴 Critical | Phase 1 |
+| **Ecosystem** | sigma-sdk + ABI policy | No | 🟠 High | Phase 2 |
+| **Ecosystem** | KVM/VirtIO hypervisor | No | 🟡 Medium | Phase 3 |
+| **UX** | Zenith compositor event loop | No | 🟠 High | Phase A |
+| **UX** | sigma-sh history + completion | No | 🟡 Medium | Phase B |
+| **UX** | sigma-observatory dashboard | No | 🟢 Low | Phase C |
+| **AI/ML** | sigma-ai llama.cpp backend | No | 🟠 High | Phase 2 |
+| **AI/ML** | sigma-heal AI analysis | No | 🟠 High | Phase 6 |
+| **Scalability** | SovereignCloudFS | No | 🟡 Medium | Phase 3 |
+| **Scalability** | sigma-fleet (10K devices) | No | 🟡 Medium | Phase 7 |
+| **Energy** | ACPI P/C-states | No | 🟠 High | Phase 1 |
+| **Energy** | sigma-ultra < 0.4 W idle | No | 🟡 Medium | Phase 5 |
 
 ---
 

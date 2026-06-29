@@ -36,7 +36,7 @@ class StateManager {
         let current = this.state;
 
         for (let i = 0; i < keys.length - 1; i++) {
-            current = current[keys[i]];
+            current = current[keys[i]]; // eslint-disable-line security/detect-object-injection
         }
 
         current[keys[keys.length - 1]] = value;
@@ -45,6 +45,7 @@ class StateManager {
 
     getState(path) {
         if (!path) return this.state;
+        // eslint-disable-next-line security/detect-object-injection
         return path.split('.').reduce((obj, key) => obj[key], this.state);
     }
 

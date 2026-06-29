@@ -9,4 +9,4 @@ Standalone networking subsystem.
 // Abstract interface for core/net
 void init_core_net();
 
-```text
+```

@@ -6,17 +6,17 @@ SigmaOS uses a structured multi-branch model. Each branch targets a specific dep
 
 ## Development Branches
 
-| Branch | Purpose | Key Additions | 
-| --- | --- | --- | 
-| `main` | Stable trunk — everything merged here | Full feature set | 
-| `kernel-exp` | Kernel subsystem experiments | Scheduler, VMM, IPC research code | 
-| `drivers-dev` | Hardware driver development | Unified Driver API, USB, NVMe, Wi-Fi shims | 
-| `performance-optimized` | Latency / throughput tuning | NUMA pinning, lockless allocators, AVX-512 paths | 
-| `fs-dev` | Filesystem research | Ext4 journaling, CoW layer, SovereignFS prototype | 
-| `tools-dev` | Userland toolchain | `sigma-cc`, `sigma-pkg`, CLI utilities | 
-| `docs-update` | Documentation sync | Architecture diagrams, API reference updates | 
-| `prepare-sigmaos-launch` | Launch readiness | Contributor roadmap, gap analysis, launch checklist | 
-| `gh-pages` | GitHub Pages website | Landing page, app store HTML | 
+| Branch | Purpose | Key Additions |
+|---|---|---|
+| `main` | Stable trunk — everything merged here | Full feature set |
+| `kernel-exp` | Kernel subsystem experiments | Scheduler, VMM, IPC research code |
+| `drivers-dev` | Hardware driver development | Unified Driver API, USB, NVMe, Wi-Fi shims |
+| `performance-optimized` | Latency / throughput tuning | NUMA pinning, lockless allocators, AVX-512 paths |
+| `fs-dev` | Filesystem research | Ext4 journaling, CoW layer, SovereignFS prototype |
+| `tools-dev` | Userland toolchain | `sigma-cc`, `sigma-pkg`, CLI utilities |
+| `docs-update` | Documentation sync | Architecture diagrams, API reference updates |
+| `prepare-sigmaos-launch` | Launch readiness | Contributor roadmap, gap analysis, launch checklist |
+| `gh-pages` | GitHub Pages website | Landing page, app store HTML |
 
 ---
 

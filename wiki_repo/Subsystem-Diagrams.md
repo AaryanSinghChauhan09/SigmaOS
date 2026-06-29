@@ -48,4 +48,4 @@ graph TD
     D --> E[S-VFS Isolation]
     E --> F[Lattice Integration]
 
-```text
+```

@@ -28,4 +28,4 @@ Run the following in the Sovereign CLI:
 sigma-cli install sigma-game-mode
 sigma-cli profile set gaming
 
-```text
+```

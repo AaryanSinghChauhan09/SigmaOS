@@ -6,17 +6,17 @@ A phased, milestone-driven roadmap from the current state (comprehensive design 
 
 ## Where We Are Today (Baseline — Round 33)
 
-| Dimension | Status | 
-| --- | --- | 
-| Architecture & design | ✅ Complete — 33 rounds of documented design | 
-| C/C++ headers | ✅ 200+ `.h` files covering every subsystem | 
-| India profession apps | ✅ 50+ profession app headers | 
-| Wiki documentation | ✅ 30+ pages covering every feature | 
-| Kernel implementations | ❌ Headers only — no `.cpp` bodies | 
-| Bootable ISO | ❌ Does not exist | 
-| GPU / display driver | ❌ Does not exist | 
-| Real hardware boot | ❌ Not possible yet | 
-| Package repository | ❌ Does not exist | 
+| Dimension | Status |
+|---|---|
+| Architecture & design | ✅ Complete — 33 rounds of documented design |
+| C/C++ headers | ✅ 200+ `.h` files covering every subsystem |
+| India profession apps | ✅ 50+ profession app headers |
+| Wiki documentation | ✅ 30+ pages covering every feature |
+| Kernel implementations | ❌ Headers only — no `.cpp` bodies |
+| Bootable ISO | ❌ Does not exist |
+| GPU / display driver | ❌ Does not exist |
+| Real hardware boot | ❌ Not possible yet |
+| Package repository | ❌ Does not exist |
 
 **The honest truth:** SigmaOS is the world's most detailed sovereign OS design. The gap between design and working software is the entire roadmap below.
 
@@ -413,47 +413,47 @@ qemu-system-x86_64 -m 512 -cdrom SigmaOS.iso
 
 ## Milestone Summary
 
-| Milestone | Target Month | Key Deliverable | 
-| --- | --- | --- | 
-| **M0: First Boot** | Month 3 | QEMU boots to shell | 
-| **M1: Real Hardware** | Month 6 | Boots on real x86 laptop, WiFi works | 
-| **M2: First Desktop** | Month 9 | Zenith DE on screen, DID login, Hindi IME | 
-| **M3: India Stack Live** | Month 14 | CA files GSTR, doctor writes prescription | 
-| **M4: Security Audit Pass** | Month 18 | Zero critical CVEs, PQ crypto throughout | 
-| **M5: ARM64 Live** | Month 21 | Boots on Raspberry Pi 4 | 
-| **M6: AI Native** | Month 24 | sigma-ai + sigma-heal + sigma-lex all live | 
-| **M7: Government Pilot** | Month 30 | 1,000 NIC machines running SigmaOS | 
-| **M8: 1,000 Villages** | Month 42 | sigma-RuralStack in 1,000 villages | 
-| **M9: Verified Kernel** | Month 60 | Formally verified IPC and scheduler | 
+| Milestone | Target Month | Key Deliverable |
+|---|---|---|
+| **M0: First Boot** | Month 3 | QEMU boots to shell |
+| **M1: Real Hardware** | Month 6 | Boots on real x86 laptop, WiFi works |
+| **M2: First Desktop** | Month 9 | Zenith DE on screen, DID login, Hindi IME |
+| **M3: India Stack Live** | Month 14 | CA files GSTR, doctor writes prescription |
+| **M4: Security Audit Pass** | Month 18 | Zero critical CVEs, PQ crypto throughout |
+| **M5: ARM64 Live** | Month 21 | Boots on Raspberry Pi 4 |
+| **M6: AI Native** | Month 24 | sigma-ai + sigma-heal + sigma-lex all live |
+| **M7: Government Pilot** | Month 30 | 1,000 NIC machines running SigmaOS |
+| **M8: 1,000 Villages** | Month 42 | sigma-RuralStack in 1,000 villages |
+| **M9: Verified Kernel** | Month 60 | Formally verified IPC and scheduler |
 
 ---
 
 ## Team Requirements
 
-| Phase | Min Team Size | Key Skills Needed | 
-| --- | --- | --- | 
-| Phase 0 (Boot) | 3–5 engineers | Systems C, UEFI, QEMU, kernel | 
-| Phase 1 (Network/Pkg) | 5–8 engineers | Network stack, Go, package management | 
-| Phase 2 (Desktop) | 6–10 engineers | DRM/KMS, compositor, IME, LLM | 
-| Phase 3 (India Stack) | 4–6 engineers | REST APIs, FHIR, GST, India fintech | 
-| Phase 4 (Security) | 3–5 engineers | Cryptography, TPM2, formal methods | 
-| Phase 5 (ARM64) | 3–4 engineers | ARM64 BSP, cross-compile, embedded | 
-| Phase 6 (AI) | 4–6 engineers | ML, ZK proofs, distributed systems | 
-| Phase 7 (Enterprise) | 6–10 engineers | Enterprise IT, govt procurement | 
-| Phase 8 (Rural) | 3–5 engineers | Embedded, offline-first, field ops | 
-| Phase 9 (Research) | 4–8 researchers | Formal verification, Rust, 5G | 
+| Phase | Min Team Size | Key Skills Needed |
+|---|---|---|
+| Phase 0 (Boot) | 3–5 engineers | Systems C, UEFI, QEMU, kernel |
+| Phase 1 (Network/Pkg) | 5–8 engineers | Network stack, Go, package management |
+| Phase 2 (Desktop) | 6–10 engineers | DRM/KMS, compositor, IME, LLM |
+| Phase 3 (India Stack) | 4–6 engineers | REST APIs, FHIR, GST, India fintech |
+| Phase 4 (Security) | 3–5 engineers | Cryptography, TPM2, formal methods |
+| Phase 5 (ARM64) | 3–4 engineers | ARM64 BSP, cross-compile, embedded |
+| Phase 6 (AI) | 4–6 engineers | ML, ZK proofs, distributed systems |
+| Phase 7 (Enterprise) | 6–10 engineers | Enterprise IT, govt procurement |
+| Phase 8 (Rural) | 3–5 engineers | Embedded, offline-first, field ops |
+| Phase 9 (Research) | 4–8 researchers | Formal verification, Rust, 5G |
 
 ---
 
 ## Funding Milestones
 
-| Milestone | Funding Need | Source | 
-| --- | --- | --- | 
-| Phase 0–1 | ₹1–2 crore | Bootstrapped / angel / MeitY startup grant | 
-| Phase 2–3 | ₹5–10 crore | Seed round / NASSCOM / NIC pilot contract | 
-| Phase 4–5 | ₹15–25 crore | Series A / DRDO contract / State govt pilot | 
-| Phase 6–7 | ₹50–100 crore | Series B / NIC national contract / OEM deal | 
-| Phase 8–9 | ₹100–500 crore | Government of India (Digital India / BharatNet) | 
+| Milestone | Funding Need | Source |
+|---|---|---|
+| Phase 0–1 | ₹1–2 crore | Bootstrapped / angel / MeitY startup grant |
+| Phase 2–3 | ₹5–10 crore | Seed round / NASSCOM / NIC pilot contract |
+| Phase 4–5 | ₹15–25 crore | Series A / DRDO contract / State govt pilot |
+| Phase 6–7 | ₹50–100 crore | Series B / NIC national contract / OEM deal |
+| Phase 8–9 | ₹100–500 crore | Government of India (Digital India / BharatNet) |
 
 ---
 

@@ -19,24 +19,24 @@ SigmaOS is built *from the ground up* for India's professionals, laws, languages
 
 ## The 16 Unique Features No Other OS Has
 
-| # | Feature | What it does | 
-| --- | --- | --- | 
-| 1 | **IndiaStack Native** | e-RUPI, ONDC, OCEN, Account Aggregator baked into the OS | 
-| 2 | **Bhashini AI** | 22 languages + sign language, fully offline (Whisper.cpp) | 
-| 3 | **AR/VR Platform** | OpenXR on a sovereign OS, no Meta/Apple dependency | 
-| 4 | **sigma-auto** | Connected vehicle + FAME-II EV compliance | 
-| 5 | **sigma-drone** | DGCA RPAS compliance + AI payloads, offline | 
-| 6 | **Predictive Compliance** | Laws change → OS adapts automatically via sigma-update | 
-| 7 | **Continuous Auth** | Never log in again — DID verifies you continuously | 
-| 8 | **Federated Learning** | AI improves without data leaving your device | 
-| 9 | **Digital Twin** | Physical world mirrored in SigmaOS | 
-| 10 | **sigma-ultra-lite** | 16MB RAM, runs on feature phones, USSD interface | 
-| 11 | **sigma-gram** | Panchayat digital governance tools (PRI Act compliance) | 
-| 12 | **GameLearn** | Learn OS + professional skills through games in Indian languages | 
-| 13 | **Data Sovereignty** | You own and can monetise your own data | 
-| 14 | **ISRO Integration** | NavIC, Bhuvan maps, MOSDAC weather — India's space stack | 
-| 15 | **sigma-heal** | OS repairs itself: FS corruption, kernel panic, network failures | 
-| 16 | **sigma-commnet** | Village-owned internet — share one ISP connection across 20 homes | 
+| # | Feature | What it does |
+|---|---|---|
+| 1 | **IndiaStack Native** | e-RUPI, ONDC, OCEN, Account Aggregator baked into the OS |
+| 2 | **Bhashini AI** | 22 languages + sign language, fully offline (Whisper.cpp) |
+| 3 | **AR/VR Platform** | OpenXR on a sovereign OS, no Meta/Apple dependency |
+| 4 | **sigma-auto** | Connected vehicle + FAME-II EV compliance |
+| 5 | **sigma-drone** | DGCA RPAS compliance + AI payloads, offline |
+| 6 | **Predictive Compliance** | Laws change → OS adapts automatically via sigma-update |
+| 7 | **Continuous Auth** | Never log in again — DID verifies you continuously |
+| 8 | **Federated Learning** | AI improves without data leaving your device |
+| 9 | **Digital Twin** | Physical world mirrored in SigmaOS |
+| 10 | **sigma-ultra-lite** | 16MB RAM, runs on feature phones, USSD interface |
+| 11 | **sigma-gram** | Panchayat digital governance tools (PRI Act compliance) |
+| 12 | **GameLearn** | Learn OS + professional skills through games in Indian languages |
+| 13 | **Data Sovereignty** | You own and can monetise your own data |
+| 14 | **ISRO Integration** | NavIC, Bhuvan maps, MOSDAC weather — India's space stack |
+| 15 | **sigma-heal** | OS repairs itself: FS corruption, kernel panic, network failures |
+| 16 | **sigma-commnet** | Village-owned internet — share one ISP connection across 20 homes |
 
 ---
 
@@ -44,31 +44,31 @@ SigmaOS is built *from the ground up* for India's professionals, laws, languages
 
 SigmaOS ships profession-specific apps pre-installed based on the user's declared profession at setup. Every app integrates with the OS — invoices auto-post to accounts, lab results auto-update EMR, salary auto-feeds EPF.
 
-| App | Profession | Key Capability | 
-| --- | --- | --- | 
-| `sigma-accounts` | Business owners, CAs | Double-entry, GST, e-Invoice IRN, DID audit trail | 
-| `sigma-ca` | Chartered Accountants | Multi-client dashboard, GSTR filing, Form 16 | 
-| `sigma-payroll` | HR managers | EPF, ESIC, TDS, Form 16, ECR upload | 
-| `sigma-pos` | Retailers | UPI QR, WhatsApp billing, GST auto, offline | 
-| `sigma-hrms` | HR professionals | Full Indian labour law compliance | 
-| `sigma-legal` | Lawyers | BNS 2023, eCourts API, DID-signed documents | 
-| `sigma-health` | Doctors | ABDM EMR, PMJAY claims, prescription | 
-| `sigma-cs` | Company Secretaries | ROC filings, board meetings, SEBI LODR | 
-| `sigma-insurance` | Insurance agents | All policy types, IRDAI compliance, claims | 
-| `sigma-aviation` | Pilots, AMEs | DGCA licenses, STCW, weather briefing | 
-| `sigma-fssai` | Restaurant owners | FSSAI license, HACCP, allergen declaration | 
-| `sigma-sebi` | Stock brokers, RIAs | Capital gains, SCORES, peak margin | 
-| `sigma-mining` | Mine managers | DGMS accident reports, mineral challan | 
-| `sigma-electrical` | Electrical engineers | Load calc, cable sizing, net meter application | 
-| `sigma-marine` | Ship officers | STCW tracking, stability, bunker calc | 
-| `sigma-vet` | Veterinarians | Cattle UID, drug dosage, INAPH sync | 
-| `sigma-dental` | Dentists | FDI charting, CGHS rates, BMW compliance | 
-| `sigma-trust` | Temple/NGO managers | FCRA, 80G receipts, hundi count | 
-| `sigma-police` | Police officers | BNS FIR, IPC→BNS mapper, e-Challan | 
-| `sigma-forest` | Forest officers | FRC claims, wildlife schedule, fire alerts | 
-| `sigma-textile` | Textile manufacturers | GI tags, PM Vishwakarma, garment costing | 
-| `sigma-agri` | Farmers | Mandi prices, PM-KISAN, PMFBY claims | 
-| `sigma-gov` | Govt employees | 40+ government API integrations | 
+| App | Profession | Key Capability |
+|---|---|---|
+| `sigma-accounts` | Business owners, CAs | Double-entry, GST, e-Invoice IRN, DID audit trail |
+| `sigma-ca` | Chartered Accountants | Multi-client dashboard, GSTR filing, Form 16 |
+| `sigma-payroll` | HR managers | EPF, ESIC, TDS, Form 16, ECR upload |
+| `sigma-pos` | Retailers | UPI QR, WhatsApp billing, GST auto, offline |
+| `sigma-hrms` | HR professionals | Full Indian labour law compliance |
+| `sigma-legal` | Lawyers | BNS 2023, eCourts API, DID-signed documents |
+| `sigma-health` | Doctors | ABDM EMR, PMJAY claims, prescription |
+| `sigma-cs` | Company Secretaries | ROC filings, board meetings, SEBI LODR |
+| `sigma-insurance` | Insurance agents | All policy types, IRDAI compliance, claims |
+| `sigma-aviation` | Pilots, AMEs | DGCA licenses, STCW, weather briefing |
+| `sigma-fssai` | Restaurant owners | FSSAI license, HACCP, allergen declaration |
+| `sigma-sebi` | Stock brokers, RIAs | Capital gains, SCORES, peak margin |
+| `sigma-mining` | Mine managers | DGMS accident reports, mineral challan |
+| `sigma-electrical` | Electrical engineers | Load calc, cable sizing, net meter application |
+| `sigma-marine` | Ship officers | STCW tracking, stability, bunker calc |
+| `sigma-vet` | Veterinarians | Cattle UID, drug dosage, INAPH sync |
+| `sigma-dental` | Dentists | FDI charting, CGHS rates, BMW compliance |
+| `sigma-trust` | Temple/NGO managers | FCRA, 80G receipts, hundi count |
+| `sigma-police` | Police officers | BNS FIR, IPC→BNS mapper, e-Challan |
+| `sigma-forest` | Forest officers | FRC claims, wildlife schedule, fire alerts |
+| `sigma-textile` | Textile manufacturers | GI tags, PM Vishwakarma, garment costing |
+| `sigma-agri` | Farmers | Mandi prices, PM-KISAN, PMFBY claims |
+| `sigma-gov` | Govt employees | 40+ government API integrations |
 
 ---
 
@@ -78,16 +78,16 @@ India has 1.2 million villages. Most have no IT support. SigmaOS must work witho
 
 When something breaks, sigma-heal fixes it:
 
-| Problem | sigma-heal response | 
-| --- | --- | 
-| Filesystem corruption | btrfs scrub → repair → restore from mirror if needed | 
-| Kernel panic | capture dump → boot recovery kernel → sigma-ai diagnoses → rollback | 
-| Package conflict | dependency solver → auto-rollback to last good generation | 
-| DNS failure | switch to 1.1.1.1 fallback automatically | 
-| No default route | trigger DHCP renew on all interfaces | 
-| WiFi driver crash | reload module automatically | 
-| Security intrusion | isolate compromised process via pledge restriction | 
-| GPU crash | graceful switch to software rendering | 
+| Problem | sigma-heal response |
+|---|---|
+| Filesystem corruption | btrfs scrub → repair → restore from mirror if needed |
+| Kernel panic | capture dump → boot recovery kernel → sigma-ai diagnoses → rollback |
+| Package conflict | dependency solver → auto-rollback to last good generation |
+| DNS failure | switch to 1.1.1.1 fallback automatically |
+| No default route | trigger DHCP renew on all interfaces |
+| WiFi driver crash | reload module automatically |
+| Security intrusion | isolate compromised process via pledge restriction |
+| GPU crash | graceful switch to software rendering |
 
 ---
 

@@ -23,17 +23,17 @@ Multi-node cluster     →  release/distributed  (SIGMA_USE_CLUSTER=ON)
 
 ### USE Flag Matrix
 
-| Flag | standalone | browser | microkernel | mobile | rtos | cloud | distributed | 
-| --- | --- | --- | --- | --- | --- | --- | --- | 
-| `SIGMA_USE_HYPERVISOR` | ON | ON | OFF | OFF | OFF | ON | ON | 
-| `SIGMA_USE_AI_ENGINE` | ON | ON | OFF | OFF | OFF | ON | ON | 
-| `SIGMA_USE_ZENITH_DE` | ON | ON | OFF | OFF | OFF | OFF | OFF | 
-| `SIGMA_USE_CLUSTER` | OFF | OFF | OFF | OFF | OFF | OFF | ON | 
-| `SIGMA_USE_BLUETOOTH` | ON | ON | OFF | ON | OFF | OFF | OFF | 
-| `SIGMA_USE_WIFI` | ON | ON | OFF | ON | OFF | OFF | OFF | 
-| `SIGMA_USE_CRYPTFS` | ON | ON | ON | ON | ON | ON | ON | 
-| `SIGMA_USE_PQ_NET` | OFF | OFF | OFF | ON | OFF | ON | ON | 
-| `SIGMA_USE_WASM` | ON | ON | OFF | OFF | OFF | OFF | OFF | 
+| Flag | standalone | browser | microkernel | mobile | rtos | cloud | distributed |
+|---|---|---|---|---|---|---|---|
+| `SIGMA_USE_HYPERVISOR` | ON | ON | OFF | OFF | OFF | ON | ON |
+| `SIGMA_USE_AI_ENGINE` | ON | ON | OFF | OFF | OFF | ON | ON |
+| `SIGMA_USE_ZENITH_DE` | ON | ON | OFF | OFF | OFF | OFF | OFF |
+| `SIGMA_USE_CLUSTER` | OFF | OFF | OFF | OFF | OFF | OFF | ON |
+| `SIGMA_USE_BLUETOOTH` | ON | ON | OFF | ON | OFF | OFF | OFF |
+| `SIGMA_USE_WIFI` | ON | ON | OFF | ON | OFF | OFF | OFF |
+| `SIGMA_USE_CRYPTFS` | ON | ON | ON | ON | ON | ON | ON |
+| `SIGMA_USE_PQ_NET` | OFF | OFF | OFF | ON | OFF | ON | ON |
+| `SIGMA_USE_WASM` | ON | ON | OFF | OFF | OFF | OFF | OFF |
 
 Set flags on the command line:
 ```bash

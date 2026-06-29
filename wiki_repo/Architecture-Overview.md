@@ -66,7 +66,7 @@ kernel/
 ├── fs/
 │   ├── sigma_vfs       VFS layer — filesystem-agnostic read/write routing
 │   ├── sigmafs/        Native CoW filesystem (Btrfs-inspired)
-│   └── sigma_fstab     Hardened mount flags (MS_NOEXEC | MS_NOSUID | MS_NODEV)
+│   └── sigma_fstab     Hardened mount flags (MS_NOEXEC|MS_NOSUID|MS_NODEV)
 ├── drivers/
 │   └── core/           Unified probe/remove/suspend driver model
 └── kpatch/             Live kernel patching (kpatch-inspired)
@@ -115,18 +115,18 @@ Go-language services bridge the kernel to the browser. Each daemon:
 
 ### Core daemons
 
-| Daemon | Socket | What it does | 
-| --- | --- | --- | 
-| `sigma-busd` | `/run/sigma/busd.sock` | IPC message bus (D-Bus replacement, capability-gated) | 
-| `sigma-healthd` | `/run/sigma/healthd.sock` | Structured per-subsystem health endpoint | 
-| `sigma-apid` | `/run/sigma/apid.sock` | gRPC management API (Talos-inspired) | 
-| `sigma-watchdog` | `/run/sigma/watchdog.sock` | WDT petting + daemon liveness monitoring | 
-| `sigma-metrics` | `/run/sigma/metrics.sock` | Prometheus-compatible `/metrics` exporter | 
-| `sigma-netd` | `/run/sigma/netd.sock` | Network namespace management | 
-| `sigma-power` | `/run/sigma/power.sock` | Battery, lid close/open, suspend/hibernate | 
-| `sigma-telemetry` | `/run/sigma/telemetry.sock` | Opt-in PII-scrubbed anonymous telemetry | 
-| `sigma-cloudsync` | `/run/sigma/cloudsync.sock` | E2E encrypted cloud file sync | 
-| `sigmad-ai` | `localhost:17392` | TinyLlama inference (`/v1/complete`, `/v1/predict`) | 
+| Daemon | Socket | What it does |
+|---|---|---|
+| `sigma-busd` | `/run/sigma/busd.sock` | IPC message bus (D-Bus replacement, capability-gated) |
+| `sigma-healthd` | `/run/sigma/healthd.sock` | Structured per-subsystem health endpoint |
+| `sigma-apid` | `/run/sigma/apid.sock` | gRPC management API (Talos-inspired) |
+| `sigma-watchdog` | `/run/sigma/watchdog.sock` | WDT petting + daemon liveness monitoring |
+| `sigma-metrics` | `/run/sigma/metrics.sock` | Prometheus-compatible `/metrics` exporter |
+| `sigma-netd` | `/run/sigma/netd.sock` | Network namespace management |
+| `sigma-power` | `/run/sigma/power.sock` | Battery, lid close/open, suspend/hibernate |
+| `sigma-telemetry` | `/run/sigma/telemetry.sock` | Opt-in PII-scrubbed anonymous telemetry |
+| `sigma-cloudsync` | `/run/sigma/cloudsync.sock` | E2E encrypted cloud file sync |
+| `sigmad-ai` | `localhost:17392` | TinyLlama inference (`/v1/complete`, `/v1/predict`) |
 
 ### How daemons communicate with the kernel
 
@@ -263,16 +263,16 @@ Every syscall entry point calls `sigma_pledge_check()`. If the calling process h
 
 ## What Makes SigmaOS Different from Linux
 
-| Aspect | Linux | SigmaOS | 
-| --- | --- | --- | 
-| Shell environment | Bash + X11/Wayland desktop | Chromium IS the shell | 
-| Per-process syscall restriction | seccomp (requires BPF expertise) | `sigma_pledge()` — one call, declarative | 
-| Per-process filesystem restriction | chroot (coarse) | `sigma_unveil()` — per-path, per-permission | 
-| Package management | dpkg/rpm/pacman | OSTree atomic updates + staged rollout | 
-| MAC policy | SELinux/AppArmor (complex policy files) | AVC + trust label matrix (O(1) decisions) | 
-| Crypto | bolt-on (openssl CLI) | TLS 1.3 + Kyber-1024 + Dilithium3 built-in | 
-| Build system | Autotools/Make/Meson mix | CMake + Kconfig + USE flags | 
-| Kernel size | 30 million lines | Custom microkernel, minimal surface area | 
+| Aspect | Linux | SigmaOS |
+|---|---|---|
+| Shell environment | Bash + X11/Wayland desktop | Chromium IS the shell |
+| Per-process syscall restriction | seccomp (requires BPF expertise) | `sigma_pledge()` — one call, declarative |
+| Per-process filesystem restriction | chroot (coarse) | `sigma_unveil()` — per-path, per-permission |
+| Package management | dpkg/rpm/pacman | OSTree atomic updates + staged rollout |
+| MAC policy | SELinux/AppArmor (complex policy files) | AVC + trust label matrix (O(1) decisions) |
+| Crypto | bolt-on (openssl CLI) | TLS 1.3 + Kyber-1024 + Dilithium3 built-in |
+| Build system | Autotools/Make/Meson mix | CMake + Kconfig + USE flags |
+| Kernel size | 30 million lines | Custom microkernel, minimal surface area |
 
 ---
 

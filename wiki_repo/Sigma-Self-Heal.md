@@ -197,13 +197,13 @@ Poll loop (60s)
 
 ## Comparison with Other Systems
 
-| OS | Self-Repair Capability | 
-| --- | --- | 
-| Ubuntu | None — manual intervention required | 
-| Windows | `sfc /scannow` — filesystem only, manual | 
-| macOS | Disk First Aid — manual, filesystem only | 
-| Android | Factory reset — destructive | 
-| **SigmaOS** | **6 categories, fully autonomous, DID-audited** | 
+| OS | Self-Repair Capability |
+|---|---|
+| Ubuntu | None — manual intervention required |
+| Windows | `sfc /scannow` — filesystem only, manual |
+| macOS | Disk First Aid — manual, filesystem only |
+| Android | Factory reset — destructive |
+| **SigmaOS** | **6 categories, fully autonomous, DID-audited** |
 
 ---
 

@@ -10,18 +10,18 @@ SigmaOS enforces a strict boundary using CPU privilege rings (Ring 0 and Ring 3)
 
 ```text
        +---------------------------------------------+
-       |                 RING 3: USERLAND            | 
-       |  - sh shell       - coreutils (ls, cat)    | 
-       |  - UI Renderer    - apps / web applications | 
+       |                 RING 3: USERLAND            |
+       |  - sh shell       - coreutils (ls, cat)    |
+       |  - UI Renderer    - apps / web applications |
        +----------------------+----------------------+
-                              | 
+                              |
                      SYSCALL INTERFACE
-                              | 
+                              |
        +----------------------v----------------------+
-       |                RING 0: KERNEL SPACE         | 
-       |  - MLFQ Scheduler    - Page Allocators      | 
-       |  - VFS Vitals        - TCP/IP Stack         | 
-       |  - Device Drivers    - Shard Manager        | 
+       |                RING 0: KERNEL SPACE         |
+       |  - MLFQ Scheduler    - Page Allocators      |
+       |  - VFS Vitals        - TCP/IP Stack         |
+       |  - Device Drivers    - Shard Manager        |
        +---------------------------------------------+
 ```
 
@@ -41,12 +41,12 @@ SigmaOS enforces a strict boundary using CPU privilege rings (Ring 0 and Ring 3)
 
 Communication across the kernel-userland boundary is strictly routed via the Sovereign Syscall Dispatcher (`SovereignSyscall.cpp`), mapped through the `int 0x80` or `syscall` CPU instructions:
 
-| Syscall ID | Name | Source Parameter | Target Action | 
-| --- | --- | --- | --- | 
-| `0x01` | `sys_write` | String buffer, length | Writes data to the COM1 debug serial or VGA screen. | 
-| `0x02` | `sys_read` | Input buffer, maximum length | Reads input data from the keyboard queue. | 
-| `0x05` | `sys_socket` | Domain, type, protocol | Allocates a network socket handler. | 
-| `0x06` | `sys_pkg_install` | Package name, source | Downloads and registers a software package. | 
+| Syscall ID | Name | Source Parameter | Target Action |
+|---|---|---|---|
+| `0x01` | `sys_write` | String buffer, length | Writes data to the COM1 debug serial or VGA screen. |
+| `0x02` | `sys_read` | Input buffer, maximum length | Reads input data from the keyboard queue. |
+| `0x05` | `sys_socket` | Domain, type, protocol | Allocates a network socket handler. |
+| `0x06` | `sys_pkg_install` | Package name, source | Downloads and registers a software package. |
 
 ---
 

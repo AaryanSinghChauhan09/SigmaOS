@@ -1,7 +1,7 @@
 # Sovereign Silicon-Direct Execution Engine (S2DE2)
 
-> **Specification Version:** 15.2-FINAL
-> **Classification:** Definitive Bare-Metal Computational Engine Specification
+> **Specification Version:** 15.2-FINAL  
+> **Classification:** Definitive Bare-Metal Computational Engine Specification  
 > **Target Hardware:** x86_64 (AVX-512/FMA), ARM64 (NEON), RISC-V (V-Extension)
 
 ---
@@ -127,5 +127,5 @@ S2DE2 includes a fully integrated Hardware-in-the-Loop diagnostic pipeline (`sig
   * *Fix Strategy:* S2DE2 monitors physical core temperature sensors via `sigma_power_tuner.cpp`, dynamically scaling SIMD clock frequencies and interleaving sleep cycles to maintain thermal equilibrium.
 
 ---
-> **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED
+> **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED  
 > *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

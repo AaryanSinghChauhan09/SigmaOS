@@ -1,8 +1,8 @@
 # AI Automation Gateway (Sovereign Claw Stack)
 
-> **Specification Version:** 15.2-FINAL
-> **Status:** Standardized & Documented
-> **Architecture Inspiration:** OpenClaw (Autonomous AI Automation Agent)
+> **Specification Version:** 15.2-FINAL  
+> **Status:** Standardized & Documented  
+> **Architecture Inspiration:** OpenClaw (Autonomous AI Automation Agent)  
 
 The **SigmaOS AI Automation Stack** is a specialized implementation inspired by **OpenClaw**, designed for secure, autonomous, intent-driven system orchestration directly on bare-metal.
 
@@ -61,5 +61,5 @@ To guarantee system stability, all automated tasks run under strict quotas:
 *   **I/O Limits**: Network connectivity disabled by default; disk writes restricted to specific workspace directories.
 
 ---
-> **Verification Status:** BUILD-VERIFIED | 100% SECURE | PARITY ACHIEVED
+> **Verification Status:** BUILD-VERIFIED | 100% SECURE | PARITY ACHIEVED  
 > *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

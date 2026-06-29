@@ -9,19 +9,19 @@ Grounded in the actual June 2026 codebase state.
 
 ### What exists and works today
 
-| Command | File | Current state | 
-| --------- | ------ | --------------- | 
-| `sigma-cli profile list/show/use` | `userland/tools/sigma_cli.cpp` | ✅ Real | 
-| `sigma-cli alias list/add` | `userland/tools/sigma_cli.cpp` | ✅ Real | 
-| `sigma-cli update/backup/sync/recovery/branch-check` | `userland/tools/sigma_cli.cpp` | ⚠️ Prints host script path only | 
-| `sigma-cli automation <cmd>` | `userland/tools/sigma_cli.cpp` | ⚠️ Prints host script path only | 
-| `sigma-cli game-mode` | `userland/tools/sigma_cli.cpp` | ⚠️ Prints stub message | 
-| `sigma-automation.sh backup/update/recovery-check/wiki-sync/meta-check` | `scripts/sigma_automation.sh` | ✅ Real (host-side) | 
-| `sigma-git-sync.sh` | `scripts/sigma_git_sync.sh` | ✅ Real | 
-| `ci_branch_check.sh` | `scripts/ci_branch_check.sh` | ✅ Real | 
-| `sigma_cli_host.sh update/backup/sync/branch-check/profile` | `scripts/sigma_cli_host.sh` | ✅ Real (host wrapper) | 
-| `sigma-pod create/start/stop/ps/destroy` | `userland/tools/sigma_pod_cli.cpp` | ⚠️ IPC stubs | 
-| `sigma-sh builtins (cd/export/alias/echo/history/pwd/exit)` | `userland/shell/sigma_shell.cpp` | ✅ Real (no TTY) | 
+| Command | File | Current state |
+|---------|------|---------------|
+| `sigma-cli profile list/show/use` | `userland/tools/sigma_cli.cpp` | ✅ Real |
+| `sigma-cli alias list/add` | `userland/tools/sigma_cli.cpp` | ✅ Real |
+| `sigma-cli update/backup/sync/recovery/branch-check` | `userland/tools/sigma_cli.cpp` | ⚠️ Prints host script path only |
+| `sigma-cli automation <cmd>` | `userland/tools/sigma_cli.cpp` | ⚠️ Prints host script path only |
+| `sigma-cli game-mode` | `userland/tools/sigma_cli.cpp` | ⚠️ Prints stub message |
+| `sigma-automation.sh backup/update/recovery-check/wiki-sync/meta-check` | `scripts/sigma_automation.sh` | ✅ Real (host-side) |
+| `sigma-git-sync.sh` | `scripts/sigma_git_sync.sh` | ✅ Real |
+| `ci_branch_check.sh` | `scripts/ci_branch_check.sh` | ✅ Real |
+| `sigma_cli_host.sh update/backup/sync/branch-check/profile` | `scripts/sigma_cli_host.sh` | ✅ Real (host wrapper) |
+| `sigma-pod create/start/stop/ps/destroy` | `userland/tools/sigma_pod_cli.cpp` | ⚠️ IPC stubs |
+| `sigma-sh builtins (cd/export/alias/echo/history/pwd/exit)` | `userland/shell/sigma_shell.cpp` | ✅ Real (no TTY) |
 
 ### What is referenced but not yet implemented
 
@@ -119,18 +119,18 @@ sigma-cli perf top                      # live CPU/mem view   [❌ build]
 
 **Implementation tasks:**
 
-| Task | File | Detail | 
-| ------ | ------ | -------- | 
-| Wire `update/backup/sync` to real sigma-bus IPC | `userland/tools/sigma_cli.cpp` | Replace `sys_print` stubs with `sigma_bus_call()` | 
-| Add `profile create/edit/export/import` | `userland/tools/sigma_cli.cpp` | Write to `~/.sigma_profile` via VFS | 
-| Add `alias remove/show` | `userland/tools/sigma_cli.cpp` | Remove from `g_aliases[]` array | 
-| Add `pkg` subcommands (proxy to sigma-pkg) | `userland/tools/sigma_cli.cpp` | fork + exec `sigma-pkg` binary | 
-| Add `pod` subcommands (proxy to sigma-pod) | `userland/tools/sigma_cli.cpp` | fork + exec `sigma-pod` binary | 
-| Add `wine` subcommands | `userland/tools/sigma_cli.cpp` | Call `sigma_wine_exec()` / `sigma_wine_inspect()` | 
-| Add `ai ask` → sigma-ai IPC | `userland/tools/sigma_cli.cpp` | sigma-bus call to sigma-ai daemon | 
-| Add `--json` output flag | `userland/tools/sigma_cli.cpp` | Print JSON for all subcommands | 
-| Add `--dry-run` flag | `userland/tools/sigma_cli.cpp` | Show what would happen without doing it | 
-| Add `--help` per-subcommand | `userland/tools/sigma_cli.cpp` | Per-verb help strings | 
+| Task | File | Detail |
+|------|------|--------|
+| Wire `update/backup/sync` to real sigma-bus IPC | `userland/tools/sigma_cli.cpp` | Replace `sys_print` stubs with `sigma_bus_call()` |
+| Add `profile create/edit/export/import` | `userland/tools/sigma_cli.cpp` | Write to `~/.sigma_profile` via VFS |
+| Add `alias remove/show` | `userland/tools/sigma_cli.cpp` | Remove from `g_aliases[]` array |
+| Add `pkg` subcommands (proxy to sigma-pkg) | `userland/tools/sigma_cli.cpp` | fork + exec `sigma-pkg` binary |
+| Add `pod` subcommands (proxy to sigma-pod) | `userland/tools/sigma_cli.cpp` | fork + exec `sigma-pod` binary |
+| Add `wine` subcommands | `userland/tools/sigma_cli.cpp` | Call `sigma_wine_exec()` / `sigma_wine_inspect()` |
+| Add `ai ask` → sigma-ai IPC | `userland/tools/sigma_cli.cpp` | sigma-bus call to sigma-ai daemon |
+| Add `--json` output flag | `userland/tools/sigma_cli.cpp` | Print JSON for all subcommands |
+| Add `--dry-run` flag | `userland/tools/sigma_cli.cpp` | Show what would happen without doing it |
+| Add `--help` per-subcommand | `userland/tools/sigma_cli.cpp` | Per-verb help strings |
 
 ---
 
@@ -163,18 +163,18 @@ kill <pid>                      # [❌ build]
 
 **Implementation tasks:**
 
-| Task | File | Detail | 
-| ------ | ------ | -------- | 
-| Connect TTY via `sigma_sys_read(0,...)` | `userland/shell/sigma_shell.cpp` | Replace empty `line[0] = '\0'` | 
-| `source <file>` builtin | `userland/shell/sigma_shell.cpp` | Open file, execute each line | 
-| `which <cmd>` — PATH search | `userland/shell/sigma_shell.cpp` | Walk `PATH` env dirs via VFS | 
-| `type <cmd>` — builtin/alias/external | `userland/shell/sigma_shell.cpp` | Check builtins[], g_aliases[], then PATH | 
-| `jobs/fg/bg` job control | `userland/shell/sigma_shell.cpp` | Track PIDs in `g_jobs[]` table | 
-| `kill <pid>` | `userland/shell/sigma_shell.cpp` | Emit `sigma_sys_kill(pid, SIGTERM)` | 
-| Script mode `sigma-sh script.sh` | `userland/shell/sigma_shell.cpp` | Open file fd, loop `vfs_read` | 
-| Ctrl+C / Ctrl+D signal handling | `userland/shell/sigma_shell.cpp` | SIGINT → clear line; SIGEOF → exit | 
-| Fish-style tab completion (real) | `userland/shell/sigma_shell.cpp` | Call `vfs_readdir(PWD)` on TAB | 
-| Syntax highlighting (VT100 escape codes) | `userland/shell/sigma_shell.cpp` | Colorize keywords on render | 
+| Task | File | Detail |
+|------|------|--------|
+| Connect TTY via `sigma_sys_read(0,...)` | `userland/shell/sigma_shell.cpp` | Replace empty `line[0] = '\0'` |
+| `source <file>` builtin | `userland/shell/sigma_shell.cpp` | Open file, execute each line |
+| `which <cmd>` — PATH search | `userland/shell/sigma_shell.cpp` | Walk `PATH` env dirs via VFS |
+| `type <cmd>` — builtin/alias/external | `userland/shell/sigma_shell.cpp` | Check builtins[], g_aliases[], then PATH |
+| `jobs/fg/bg` job control | `userland/shell/sigma_shell.cpp` | Track PIDs in `g_jobs[]` table |
+| `kill <pid>` | `userland/shell/sigma_shell.cpp` | Emit `sigma_sys_kill(pid, SIGTERM)` |
+| Script mode `sigma-sh script.sh` | `userland/shell/sigma_shell.cpp` | Open file fd, loop `vfs_read` |
+| Ctrl+C / Ctrl+D signal handling | `userland/shell/sigma_shell.cpp` | SIGINT → clear line; SIGEOF → exit |
+| Fish-style tab completion (real) | `userland/shell/sigma_shell.cpp` | Call `vfs_readdir(PWD)` on TAB |
+| Syntax highlighting (VT100 escape codes) | `userland/shell/sigma_shell.cpp` | Colorize keywords on render |
 
 ---
 
@@ -225,18 +225,18 @@ These are commands that require a bootable kernel. None can work until Phase 0.
 ```
 sigma-sched show           # print runqueue state per CPU
 sigma-sched top            # live task CPU usage (like htop, text mode)
-sigma-sched set-policy <pid> <rr | fifo | deadline> <priority>
+sigma-sched set-policy <pid> <rr|fifo|deadline> <priority>
 sigma-sched budget <tid> <budget_ns> <period_ns>   # MCS budget
 sigma-sched affinity <pid> <cpu_mask>              # NUMA affinity
 sigma-sched stress --tasks 64 --duration 10s       # scheduler stress test
 ```
 
-| Task | File | Detail | 
-| ------ | ------ | -------- | 
-| `sigma-sched show` | `userland/tools/sigma_sched_cli.cpp` | Read `/proc/sigma/sched` via VFS | 
-| `sigma-sched top` (live) | `userland/tools/sigma_sched_cli.cpp` | VT100 cursor control, refresh every 1 s | 
-| `sigma-sched set-policy` | `userland/tools/sigma_sched_cli.cpp` | Syscall `SIGMA_SYS_SCHED_SETPOLICY(pid, policy, prio)` | 
-| `sigma-sched budget` | `userland/tools/sigma_sched_cli.cpp` | Call `sigma_mcs_register()` via syscall | 
+| Task | File | Detail |
+|------|------|--------|
+| `sigma-sched show` | `userland/tools/sigma_sched_cli.cpp` | Read `/proc/sigma/sched` via VFS |
+| `sigma-sched top` (live) | `userland/tools/sigma_sched_cli.cpp` | VT100 cursor control, refresh every 1 s |
+| `sigma-sched set-policy` | `userland/tools/sigma_sched_cli.cpp` | Syscall `SIGMA_SYS_SCHED_SETPOLICY(pid, policy, prio)` |
+| `sigma-sched budget` | `userland/tools/sigma_sched_cli.cpp` | Call `sigma_mcs_register()` via syscall |
 
 ### sigma-mem (memory diagnostics)
 
@@ -250,11 +250,11 @@ sigma-mem compact          # trigger O(1) slab compaction
 sigma-mem pressure         # simulate memory pressure event
 ```
 
-| Task | File | Detail | 
-| ------ | ------ | -------- | 
-| `sigma-mem stats` | `userland/tools/sigma_mem_cli.cpp` | Call `sigma_mem_stats()` via syscall | 
-| `sigma-mem map <pid>` | `userland/tools/sigma_mem_cli.cpp` | Read `/proc/<pid>/maps` via VFS | 
-| `sigma-mem compact` | `userland/tools/sigma_mem_cli.cpp` | Syscall `SIGMA_SYS_MEM_COMPACT` | 
+| Task | File | Detail |
+|------|------|--------|
+| `sigma-mem stats` | `userland/tools/sigma_mem_cli.cpp` | Call `sigma_mem_stats()` via syscall |
+| `sigma-mem map <pid>` | `userland/tools/sigma_mem_cli.cpp` | Read `/proc/<pid>/maps` via VFS |
+| `sigma-mem compact` | `userland/tools/sigma_mem_cli.cpp` | Syscall `SIGMA_SYS_MEM_COMPACT` |
 
 ### sigma-irq (interrupt diagnostics)
 
@@ -280,12 +280,12 @@ sigma-boot slots           # list available boot slots
 sigma-boot commit          # mark current boot as known-good
 ```
 
-| Task | File | Detail | 
-| ------ | ------ | -------- | 
-| `sigma-boot status` | `userland/tools/sigma_boot_cli.cpp` | Read EFI variables + TPM PCR via syscall | 
-| `sigma-boot rollback` | `userland/tools/sigma_boot_cli.cpp` | Write `SigmaBootSlot=B` EFI variable | 
-| `sigma-boot verify` | `userland/tools/sigma_boot_cli.cpp` | Call `pqc_verify()` on kernel blob | 
-| `sigma-boot commit` | `userland/tools/sigma_boot_cli.cpp` | Call `sigma_rollback_mark_boot_successful()` | 
+| Task | File | Detail |
+|------|------|--------|
+| `sigma-boot status` | `userland/tools/sigma_boot_cli.cpp` | Read EFI variables + TPM PCR via syscall |
+| `sigma-boot rollback` | `userland/tools/sigma_boot_cli.cpp` | Write `SigmaBootSlot=B` EFI variable |
+| `sigma-boot verify` | `userland/tools/sigma_boot_cli.cpp` | Call `pqc_verify()` on kernel blob |
+| `sigma-boot commit` | `userland/tools/sigma_boot_cli.cpp` | Call `sigma_rollback_mark_boot_successful()` |
 
 ---
 
@@ -305,12 +305,12 @@ sigma-drv bench <name>     # run driver throughput benchmark
 sigma-drv reload <name>    # unload + load (hot-swap)
 ```
 
-| Task | File | Detail | 
-| ------ | ------ | -------- | 
-| `sigma-drv list` | `userland/tools/sigma_drv_cli.cpp` | Read `/proc/sigma/drivers` via VFS | 
-| `sigma-drv load/unload` | `userland/tools/sigma_drv_cli.cpp` | Syscall `SIGMA_SYS_DRV_LOAD/UNLOAD` | 
-| `sigma-drv probe` | `userland/tools/sigma_drv_cli.cpp` | Call `driver.probe(dev)` via kernel IPC | 
-| `sigma-drv log <name>` | `userland/tools/sigma_drv_cli.cpp` | Read driver ring buffer from kernel | 
+| Task | File | Detail |
+|------|------|--------|
+| `sigma-drv list` | `userland/tools/sigma_drv_cli.cpp` | Read `/proc/sigma/drivers` via VFS |
+| `sigma-drv load/unload` | `userland/tools/sigma_drv_cli.cpp` | Syscall `SIGMA_SYS_DRV_LOAD/UNLOAD` |
+| `sigma-drv probe` | `userland/tools/sigma_drv_cli.cpp` | Call `driver.probe(dev)` via kernel IPC |
+| `sigma-drv log <name>` | `userland/tools/sigma_drv_cli.cpp` | Read driver ring buffer from kernel |
 
 ### sigma-gpu (GPU / display)
 
@@ -322,7 +322,7 @@ sigma-gpu modes            # list available display modes
 sigma-gpu set-mode <WxH@Hz>   # apply display mode via KMS
 sigma-gpu benchmark        # run Vulkan compute benchmark
 sigma-gpu screenshot <file>   # capture framebuffer to PNG
-sigma-gpu power <auto | max | min>  # set GPU P-state
+sigma-gpu power <auto|max|min>  # set GPU P-state
 ```
 
 ### sigma-audio (audio)
@@ -362,12 +362,12 @@ sigma-net firewall allow <rule>
 sigma-net firewall deny <rule>
 ```
 
-| Task | File | Blocked by | 
-| ------ | ------ | ------------ | 
-| `sigma-net status` | `userland/tools/sigma_net_cli.cpp` | ARP + DHCP in kernel | 
-| `sigma-net connect` | `userland/tools/sigma_net_cli.cpp` | iwlwifi/mt7921 driver | 
-| `sigma-net ping` | `userland/tools/sigma_net_cli.cpp` | ICMP exists — wire CLI to it | 
-| `sigma-net firewall *` | `userland/tools/sigma_net_cli.cpp` | sigma-firewall kernel module | 
+| Task | File | Blocked by |
+|------|------|------------|
+| `sigma-net status` | `userland/tools/sigma_net_cli.cpp` | ARP + DHCP in kernel |
+| `sigma-net connect` | `userland/tools/sigma_net_cli.cpp` | iwlwifi/mt7921 driver |
+| `sigma-net ping` | `userland/tools/sigma_net_cli.cpp` | ICMP exists — wire CLI to it |
+| `sigma-net firewall *` | `userland/tools/sigma_net_cli.cpp` | sigma-firewall kernel module |
 
 ---
 
@@ -381,7 +381,7 @@ sigma-net firewall deny <rule>
 sigma-fs list              # list mounted filesystems
 sigma-fs mount <dev> <mnt> [type]   # mount filesystem
 sigma-fs umount <mnt>      # unmount
-sigma-fs mkfs <dev> [--type sigmafs | ext4 | fat32]   # format partition
+sigma-fs mkfs <dev> [--type sigmafs|ext4|fat32]   # format partition
 sigma-fs check <dev>       # fsck — check + repair (sigma-fsck)
 sigma-fs info <dev>        # show superblock, inode count, free space
 sigma-fs snapshot <mnt>    # create immutable snapshot
@@ -393,15 +393,15 @@ sigma-fs cache stats        # show UBC page cache hit/miss
 sigma-fs cache drop         # drop page cache (for benchmarking)
 ```
 
-| Task | File | Blocked by | 
-| ------ | ------ | ------------ | 
-| `sigma-fs list` | `userland/tools/sigma_fs_cli.cpp` | VFS mount table | 
-| `sigma-fs mount/umount` | `userland/tools/sigma_fs_cli.cpp` | `sigma_mount()` syscall | 
-| `sigma-fs mkfs` | `userland/tools/sigma_fs_cli.cpp` | `sigma_mkfs` for SigmaFS | 
-| `sigma-fs check` | `userland/tools/sigma_fs_cli.cpp` | `sigma-fsck` binary | 
-| `sigma-fs snapshot` | `userland/tools/sigma_fs_cli.cpp` | SigmaFS snapshot support | 
-| `sigma-fs verity` | `userland/tools/sigma_fs_cli.cpp` | `sigma_dmverity.cpp` | 
-| `sigma-fs cache stats` | `userland/tools/sigma_fs_cli.cpp` | UBC counters via `/proc/sigma/ubc` | 
+| Task | File | Blocked by |
+|------|------|------------|
+| `sigma-fs list` | `userland/tools/sigma_fs_cli.cpp` | VFS mount table |
+| `sigma-fs mount/umount` | `userland/tools/sigma_fs_cli.cpp` | `sigma_mount()` syscall |
+| `sigma-fs mkfs` | `userland/tools/sigma_fs_cli.cpp` | `sigma_mkfs` for SigmaFS |
+| `sigma-fs check` | `userland/tools/sigma_fs_cli.cpp` | `sigma-fsck` binary |
+| `sigma-fs snapshot` | `userland/tools/sigma_fs_cli.cpp` | SigmaFS snapshot support |
+| `sigma-fs verity` | `userland/tools/sigma_fs_cli.cpp` | `sigma_dmverity.cpp` |
+| `sigma-fs cache stats` | `userland/tools/sigma_fs_cli.cpp` | UBC counters via `/proc/sigma/ubc` |
 
 ### sigma-disk (block device management)
 
@@ -441,19 +441,19 @@ sigma-perf flame <pid>     # generate flamegraph SVG
 sigma-perf kpatch status   # list active live patches
 sigma-perf kpatch apply <patch>  # apply sigma-kpatch live
 sigma-perf governor show   # current P-state + frequency
-sigma-perf governor set <performance | powersave | auto>
+sigma-perf governor set <performance|powersave|auto>
 sigma-perf numa show       # NUMA topology + per-node memory stats
 sigma-perf numa bind <pid> <node>    # bind process to NUMA node
 ```
 
-| Task | File | Detail | 
-| ------ | ------ | -------- | 
-| `sigma-perf top` | `userland/tools/sigma_perf_cli.cpp` | Read `/proc/sigma/stats`, VT100 refresh | 
-| `sigma-perf bench pqc` | `userland/tools/sigma_perf_cli.cpp` | Call `kyber_keygen()` 10000×, report ops/sec | 
-| `sigma-perf bench sched` | `userland/tools/sigma_perf_cli.cpp` | RDTSC before/after context switch via IPC | 
-| `sigma-perf kpatch apply` | `userland/tools/sigma_perf_cli.cpp` | Syscall `SIGMA_SYS_KPATCH_APPLY(patch_fd)` | 
-| `sigma-perf governor set` | `userland/tools/sigma_perf_cli.cpp` | Write `IA32_PERF_CTL` MSR via privileged syscall | 
-| `sigma-perf numa show` | `userland/tools/sigma_perf_cli.cpp` | Read ACPI SRAT topology from kernel | 
+| Task | File | Detail |
+|------|------|--------|
+| `sigma-perf top` | `userland/tools/sigma_perf_cli.cpp` | Read `/proc/sigma/stats`, VT100 refresh |
+| `sigma-perf bench pqc` | `userland/tools/sigma_perf_cli.cpp` | Call `kyber_keygen()` 10000×, report ops/sec |
+| `sigma-perf bench sched` | `userland/tools/sigma_perf_cli.cpp` | RDTSC before/after context switch via IPC |
+| `sigma-perf kpatch apply` | `userland/tools/sigma_perf_cli.cpp` | Syscall `SIGMA_SYS_KPATCH_APPLY(patch_fd)` |
+| `sigma-perf governor set` | `userland/tools/sigma_perf_cli.cpp` | Write `IA32_PERF_CTL` MSR via privileged syscall |
+| `sigma-perf numa show` | `userland/tools/sigma_perf_cli.cpp` | Read ACPI SRAT topology from kernel |
 
 ### sigma-pqc (crypto diagnostics)
 
@@ -501,12 +501,12 @@ sigma-pkg repo list        # list enabled repositories
 sigma-pkg build <recipe>   # build .spkg from recipe file
 ```
 
-| Task | File | Blocked by | 
-| ------ | ------ | ------------ | 
-| `sigma-pkg install` | `userland/sigma-pkg/sigma_pkg_cli.cpp` | sigma-repo-server + VFS write | 
-| `sigma-pkg verify` | `userland/sigma-pkg/sigma_pkg_cli.cpp` | `pqc_verify()` real Dilithium | 
-| `sigma-pkg rollback` | `userland/sigma-pkg/sigma_pkg_cli.cpp` | Atomic staging swap on install | 
-| `sigma-pkg build` | `userland/sigma-pkg/sigma_pkg_cli.cpp` | `.spkg` recipe parser in `sigma_pkg_recipe.c` | 
+| Task | File | Blocked by |
+|------|------|------------|
+| `sigma-pkg install` | `userland/sigma-pkg/sigma_pkg_cli.cpp` | sigma-repo-server + VFS write |
+| `sigma-pkg verify` | `userland/sigma-pkg/sigma_pkg_cli.cpp` | `pqc_verify()` real Dilithium |
+| `sigma-pkg rollback` | `userland/sigma-pkg/sigma_pkg_cli.cpp` | Atomic staging swap on install |
+| `sigma-pkg build` | `userland/sigma-pkg/sigma_pkg_cli.cpp` | `.spkg` recipe parser in `sigma_pkg_recipe.c` |
 
 ### sigma-wine (Windows compatibility)
 
@@ -522,20 +522,20 @@ sigma-wine prefix list                   # list all prefixes
 sigma-wine prefix delete <path>
 sigma-wine prefix shell <path>           # open sigma-sh inside prefix
 sigma-wine dll list                      # show registered DLL stubs
-sigma-wine dll override <dll> builtin | native
+sigma-wine dll override <dll> builtin|native
 sigma-wine reg get HKCU\\Software\\App\\key
 sigma-wine reg set HKCU\\Software\\App\\key <type> <value>
 sigma-wine reg list HKCU\\Software\\App
 sigma-wine version                       # sigma-wine capabilities + compat version
 ```
 
-| Task | File | Detail | 
-| ------ | ------ | -------- | 
-| `sigma-wine exec` | `userland/tools/sigma_wine_cli.cpp` | Call `sigma_wine_exec()` from `sigma_wine.h` | 
-| `sigma-wine info` | `userland/tools/sigma_wine_cli.cpp` | Call `sigma_wine_inspect()` — works today | 
-| `sigma-wine prefix *` | `userland/tools/sigma_wine_cli.cpp` | Call `sigma_wine_create_prefix()` | 
-| `sigma-wine reg *` | `userland/tools/sigma_wine_cli.cpp` | Call `sigma_reg_*()` from `sigma_reg.h` | 
-| `sigma-wine dll override` | `userland/tools/sigma_wine_cli.cpp` | Call `sigma_wine_override_dll()` | 
+| Task | File | Detail |
+|------|------|--------|
+| `sigma-wine exec` | `userland/tools/sigma_wine_cli.cpp` | Call `sigma_wine_exec()` from `sigma_wine.h` |
+| `sigma-wine info` | `userland/tools/sigma_wine_cli.cpp` | Call `sigma_wine_inspect()` — works today |
+| `sigma-wine prefix *` | `userland/tools/sigma_wine_cli.cpp` | Call `sigma_wine_create_prefix()` |
+| `sigma-wine reg *` | `userland/tools/sigma_wine_cli.cpp` | Call `sigma_reg_*()` from `sigma_reg.h` |
+| `sigma-wine dll override` | `userland/tools/sigma_wine_cli.cpp` | Call `sigma_wine_override_dll()` |
 
 ### sigma-zenith (desktop control)
 
@@ -544,9 +544,9 @@ sigma-wine version                       # sigma-wine capabilities + compat vers
 ```
 sigma-zenith restart        # restart compositor (safe)
 sigma-zenith heal           # trigger compositor self-healing
-sigma-zenith layout bsp | columns | grid | master-stack | floating | monocle
+sigma-zenith layout bsp|columns|grid|master-stack|floating|monocle
 sigma-zenith gaps inner <n> outer <n>
-sigma-zenith focus left | right | up | down
+sigma-zenith focus left|right|up|down
 sigma-zenith fullscreen     # toggle focused window fullscreen
 sigma-zenith float          # toggle focused window floating
 sigma-zenith workspace <n>  # switch to workspace 1–10
@@ -555,21 +555,21 @@ sigma-zenith screenshot [file]     # capture screen to PNG
 sigma-zenith theme set <name>      # apply theme from ~/.sigma/themes/
 sigma-zenith theme list            # list available themes
 sigma-zenith theme create <name>   # create new theme skeleton
-sigma-zenith bar show | hide         # taskbar visibility
+sigma-zenith bar show|hide         # taskbar visibility
 sigma-zenith scale <factor>        # HiDPI scaling (1.0, 1.5, 2.0)
 sigma-zenith fps                   # show live frame rate
 sigma-zenith debug                 # overlay: window ids, frame times
 ```
 
-| Task | File | Detail | 
-| ------ | ------ | -------- | 
-| `sigma-zenith layout` | `userland/tools/sigma_zenith_cli.cpp` | IPC to `sigma_wm_layout()` | 
-| `sigma-zenith gaps` | `userland/tools/sigma_zenith_cli.cpp` | IPC to `sigma_wm_gaps()` | 
-| `sigma-zenith focus *` | `userland/tools/sigma_zenith_cli.cpp` | IPC to `sigma_wm_focus()` | 
-| `sigma-zenith workspace *` | `userland/tools/sigma_zenith_cli.cpp` | IPC to `sigma_wm_switch_ws()` | 
-| `sigma-zenith restart/heal` | `userland/tools/sigma_zenith_cli.cpp` | IPC to `zenith_compositor_heal()` | 
-| `sigma-zenith theme set` | `userland/tools/sigma_zenith_cli.cpp` | Write theme to `~/.sigma_profile`, send IPC | 
-| `sigma-zenith screenshot` | `userland/tools/sigma_zenith_cli.cpp` | DMA-BUF read from compositor, encode PNG | 
+| Task | File | Detail |
+|------|------|--------|
+| `sigma-zenith layout` | `userland/tools/sigma_zenith_cli.cpp` | IPC to `sigma_wm_layout()` |
+| `sigma-zenith gaps` | `userland/tools/sigma_zenith_cli.cpp` | IPC to `sigma_wm_gaps()` |
+| `sigma-zenith focus *` | `userland/tools/sigma_zenith_cli.cpp` | IPC to `sigma_wm_focus()` |
+| `sigma-zenith workspace *` | `userland/tools/sigma_zenith_cli.cpp` | IPC to `sigma_wm_switch_ws()` |
+| `sigma-zenith restart/heal` | `userland/tools/sigma_zenith_cli.cpp` | IPC to `zenith_compositor_heal()` |
+| `sigma-zenith theme set` | `userland/tools/sigma_zenith_cli.cpp` | Write theme to `~/.sigma_profile`, send IPC |
+| `sigma-zenith screenshot` | `userland/tools/sigma_zenith_cli.cpp` | DMA-BUF read from compositor, encode PNG |
 
 ### sigma-ai (on-device LLM)
 
@@ -590,12 +590,12 @@ sigma-ai bhashini tts "<text>" [lang]   # offline text→speech WAV
 sigma-ai bhashini translate <text> --from hi --to en
 ```
 
-| Task | File | Blocked by | 
-| ------ | ------ | ------------ | 
-| `sigma-ai ask` | `userland/ai/sigma_ai_cli.cpp` | llama.cpp integration | 
-| `sigma-ai heal` | `userland/ai/sigma_ai_cli.cpp` | sigma-ai daemon + crash dump parser | 
-| `sigma-ai lex` | `userland/ai/sigma_ai_cli.cpp` | PDF parser + sigma-ai daemon | 
-| `sigma-ai bhashini *` | `userland/ai/sigma_ai_cli.cpp` | sigma-bhashini offline models | 
+| Task | File | Blocked by |
+|------|------|------------|
+| `sigma-ai ask` | `userland/ai/sigma_ai_cli.cpp` | llama.cpp integration |
+| `sigma-ai heal` | `userland/ai/sigma_ai_cli.cpp` | sigma-ai daemon + crash dump parser |
+| `sigma-ai lex` | `userland/ai/sigma_ai_cli.cpp` | PDF parser + sigma-ai daemon |
+| `sigma-ai bhashini *` | `userland/ai/sigma_ai_cli.cpp` | sigma-bhashini offline models |
 
 ### sigma-ime (input method)
 
@@ -644,14 +644,14 @@ sigma-pod checkpoint <id>     # CRIU-style checkpoint
 sigma-pod restore <checkpoint>
 ```
 
-| Task | File | Detail | 
-| ------ | ------ | -------- | 
-| Wire `run-native` to kernel orchestrator | `userland/tools/sigma_pod_cli.cpp` | Call kernel IPC: create namespaces + cgroup | 
-| `sigma-pod exec` | `userland/tools/sigma_pod_cli.cpp` | Fork into container namespace, exec cmd | 
-| `sigma-pod logs` | `userland/tools/sigma_pod_cli.cpp` | Read pod log ring buffer from VFS | 
-| `sigma-pod stats` | `userland/tools/sigma_pod_cli.cpp` | Read `/proc/sigma/cgroup/<id>/stat` | 
-| `sigma-pod inspect` | `userland/tools/sigma_pod_cli.cpp` | Return JSON from container registry | 
-| `sigma-pod checkpoint` | `userland/tools/sigma_pod_cli.cpp` | Syscall `SIGMA_SYS_POD_CHECKPOINT` | 
+| Task | File | Detail |
+|------|------|--------|
+| Wire `run-native` to kernel orchestrator | `userland/tools/sigma_pod_cli.cpp` | Call kernel IPC: create namespaces + cgroup |
+| `sigma-pod exec` | `userland/tools/sigma_pod_cli.cpp` | Fork into container namespace, exec cmd |
+| `sigma-pod logs` | `userland/tools/sigma_pod_cli.cpp` | Read pod log ring buffer from VFS |
+| `sigma-pod stats` | `userland/tools/sigma_pod_cli.cpp` | Read `/proc/sigma/cgroup/<id>/stat` |
+| `sigma-pod inspect` | `userland/tools/sigma_pod_cli.cpp` | Return JSON from container registry |
+| `sigma-pod checkpoint` | `userland/tools/sigma_pod_cli.cpp` | Syscall `SIGMA_SYS_POD_CHECKPOINT` |
 
 ### sigma-fleet (enterprise device management)
 
@@ -717,7 +717,7 @@ sigma-cloudfs volume list
 sigma-cloudfs volume delete <name>
 sigma-cloudfs volume snapshot <name>
 sigma-cloudfs volume restore <snapshot>
-sigma-cloudfs bench read | write          # throughput benchmark
+sigma-cloudfs bench read|write          # throughput benchmark
 sigma-cloudfs encrypt enable <volume>   # ML-KEM encrypt at rest
 ```
 
@@ -808,7 +808,7 @@ sigma-rt budget <tid> <budget_ns> <period_ns>   # MCS
 sigma-rt latency test       # measure IRQ + scheduler latency
 sigma-rt latency report     # histogram of latency samples
 sigma-rt stress --tasks 64  # generate RT scheduling stress
-sigma-rt trace start | stop | report
+sigma-rt trace start|stop|report
 sigma-rt jitter show        # show scheduling jitter stats
 ```
 
@@ -853,7 +853,7 @@ sigma-arm freq set <core> <hz>
 sigma-arm thermal           # core temperatures
 sigma-arm dts info          # device tree blob info
 sigma-arm gpio list         # GPIO pin states (RPi GPIO)
-sigma-arm gpio set <pin> <high | low>
+sigma-arm gpio set <pin> <high|low>
 sigma-arm i2c scan <bus>    # scan I2C devices on bus
 sigma-arm spi list          # SPI devices
 sigma-arm power suspend     # suspend to RAM (S3)
@@ -1093,39 +1093,39 @@ sigma-digilocker share <docid> <requestor>
 
 ## Master CLI Command Status Table
 
-| Command | Branch | File | Status | 
-| --------- | -------- | ------ | -------- | 
-| `sigma-cli profile *` | tools-dev | `sigma_cli.cpp` | ✅ Real | 
-| `sigma-cli alias *` | tools-dev | `sigma_cli.cpp` | ✅ Real | 
-| `sigma-cli update/backup/sync` | tools-dev | `sigma_cli.cpp` | ⚠️ Stub | 
-| `sigma-sh builtins` | tools-dev | `sigma_shell.cpp` | ✅ Real | 
-| `sigma-sh TTY read` | tools-dev | `sigma_shell.cpp` | ❌ Missing | 
-| `sigma-pod create/start/stop/ps` | release/cloud | `sigma_pod_cli.cpp` | ⚠️ IPC stub | 
-| `sigma-pod run-native` | release/cloud | `sigma_pod_cli.cpp` | ❌ Missing | 
-| `sigma-automation.sh *` | tools-dev | `sigma_automation.sh` | ✅ Real | 
-| `sigma-git-sync.sh` | tools-dev | `sigma_git_sync.sh` | ✅ Real | 
-| `sigma-ci-branch-check.sh` | tools-dev | `ci_branch_check.sh` | ✅ Real | 
-| `sigma-wine info` | tools-dev | `sigma_pe_loader.cpp` | ✅ Works | 
-| `sigma-wine exec` | tools-dev | `sigma_wine_loader.cpp` | ❌ Needs VMM | 
-| `sigma-pkg install` | tools-dev | to build | ❌ Missing | 
-| `sigma-net ping` | drivers-dev | ICMP exists | ⚠️ No CLI | 
-| `sigma-net status` | drivers-dev | to build | ❌ Missing | 
-| `sigma-boot rollback` | kernel-exp | to build | ❌ Needs EFI | 
-| `sigma-mem stats` | kernel-exp | to build | ❌ Needs kernel | 
-| `sigma-sched show` | kernel-exp | to build | ❌ Needs kernel | 
-| `sigma-perf bench pqc` | performance-optimized | to build | ❌ Needs real NTT | 
-| `sigma-zenith layout` | release/standalone | to build | ❌ Needs IPC | 
-| `sigma-zenith theme` | release/standalone | to build | ❌ Needs VFS | 
-| `sigma-ai ask` | release/standalone | to build | ❌ Needs llama.cpp | 
-| `sigma-fleet status` | release/cloud | to build | ❌ Missing | 
-| `sigma-kube *` | release/distributed | to build | ❌ Missing | 
-| `sigma-cloudfs *` | release/distributed | to build | ❌ Missing | 
-| `sigma-rt set` | release/rtos | to build | ❌ Needs EDF | 
-| `sigma-ultra menu` | release/mobile | to build | ❌ Missing | 
-| `sigma-install run` | release/dual-boot | to build | ❌ Missing | 
-| `sigma-gst irn` | release/standalone | to build | ❌ Needs API | 
-| `sigma-abdm create-id` | release/standalone | to build | ❌ Needs ABDM API | 
-| `sigma-upi pay` | release/standalone | to build | ❌ Needs UPI API | 
+| Command | Branch | File | Status |
+|---------|--------|------|--------|
+| `sigma-cli profile *` | tools-dev | `sigma_cli.cpp` | ✅ Real |
+| `sigma-cli alias *` | tools-dev | `sigma_cli.cpp` | ✅ Real |
+| `sigma-cli update/backup/sync` | tools-dev | `sigma_cli.cpp` | ⚠️ Stub |
+| `sigma-sh builtins` | tools-dev | `sigma_shell.cpp` | ✅ Real |
+| `sigma-sh TTY read` | tools-dev | `sigma_shell.cpp` | ❌ Missing |
+| `sigma-pod create/start/stop/ps` | release/cloud | `sigma_pod_cli.cpp` | ⚠️ IPC stub |
+| `sigma-pod run-native` | release/cloud | `sigma_pod_cli.cpp` | ❌ Missing |
+| `sigma-automation.sh *` | tools-dev | `sigma_automation.sh` | ✅ Real |
+| `sigma-git-sync.sh` | tools-dev | `sigma_git_sync.sh` | ✅ Real |
+| `sigma-ci-branch-check.sh` | tools-dev | `ci_branch_check.sh` | ✅ Real |
+| `sigma-wine info` | tools-dev | `sigma_pe_loader.cpp` | ✅ Works |
+| `sigma-wine exec` | tools-dev | `sigma_wine_loader.cpp` | ❌ Needs VMM |
+| `sigma-pkg install` | tools-dev | to build | ❌ Missing |
+| `sigma-net ping` | drivers-dev | ICMP exists | ⚠️ No CLI |
+| `sigma-net status` | drivers-dev | to build | ❌ Missing |
+| `sigma-boot rollback` | kernel-exp | to build | ❌ Needs EFI |
+| `sigma-mem stats` | kernel-exp | to build | ❌ Needs kernel |
+| `sigma-sched show` | kernel-exp | to build | ❌ Needs kernel |
+| `sigma-perf bench pqc` | performance-optimized | to build | ❌ Needs real NTT |
+| `sigma-zenith layout` | release/standalone | to build | ❌ Needs IPC |
+| `sigma-zenith theme` | release/standalone | to build | ❌ Needs VFS |
+| `sigma-ai ask` | release/standalone | to build | ❌ Needs llama.cpp |
+| `sigma-fleet status` | release/cloud | to build | ❌ Missing |
+| `sigma-kube *` | release/distributed | to build | ❌ Missing |
+| `sigma-cloudfs *` | release/distributed | to build | ❌ Missing |
+| `sigma-rt set` | release/rtos | to build | ❌ Needs EDF |
+| `sigma-ultra menu` | release/mobile | to build | ❌ Missing |
+| `sigma-install run` | release/dual-boot | to build | ❌ Missing |
+| `sigma-gst irn` | release/standalone | to build | ❌ Needs API |
+| `sigma-abdm create-id` | release/standalone | to build | ❌ Needs ABDM API |
+| `sigma-upi pay` | release/standalone | to build | ❌ Needs UPI API |
 
 ---
 

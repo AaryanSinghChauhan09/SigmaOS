@@ -24,7 +24,7 @@ SigmaOS replaces APT/DNF/Pacman with `sigpkg` — a sovereign, POSIX-free, crypt
 ### Core Design Goals
 
 | Goal | Approach |
-| ------ | ---------- |
+|------|----------|
 | **No POSIX dependency** | All package scripts run in a Sovereign WASM sandbox |
 | **Reproducible builds** | Every package carries a content-addressed Merkle hash |
 | **Cryptographic verification** | Ed25519 signatures on all packages and repo manifests |
@@ -33,7 +33,7 @@ SigmaOS replaces APT/DNF/Pacman with `sigpkg` — a sovereign, POSIX-free, crypt
 
 ### Package Format: `.spkg`
 
-```text
+```
 mypackage-1.0.0.spkg
 ├── MANIFEST.toml           # Name, version, deps, checksums
 ├── payload/                # Binary + data files (zstd-compressed)
@@ -43,7 +43,7 @@ mypackage-1.0.0.spkg
 └── scripts/
     ├── pre-install.wasm    # Pre-install hook (WASM sandbox)
     └── post-install.wasm   # Post-install hook (WASM sandbox)
-```text
+```
 
 ### `sigpkg` CLI
 
@@ -55,14 +55,14 @@ sigpkg rollback                   # Revert to previous generation
 sigpkg search  <query>            # Search sovereign package index
 sigpkg verify  <package.spkg>     # Verify Ed25519 signature
 sigpkg list    --installed        # Show installed packages
-```text
+```
 
 ---
 
 ## Update Channels
 
 | Channel | Description | Stability |
-| --------- | ------------- | ----------- |
+|---------|-------------|-----------|
 | `stable` | LTS-quality packages, security patches only | ⭐⭐⭐⭐⭐ |
 | `testing` | Upcoming stable; feature-complete but not yet hardened | ⭐⭐⭐⭐ |
 | `nightly` | Latest main branch builds; may break | ⭐⭐ |
@@ -70,7 +70,7 @@ sigpkg list    --installed        # Show installed packages
 Switch channels:
 ```bash
 sigpkg channel set stable   # or testing, nightly
-```text
+```
 
 ---
 
@@ -81,7 +81,7 @@ When building with `TARGET_OS=ubuntu`, SigmaOS enables an optional APT bridge �
 ```bash
 sigma install --apt firefox      # Resolves via APT bridge
 sigma install --snap vlc         # Resolves via Snap bridge
-```text
+```
 
 > [!WARNING]
 > APT bridge packages run in an isolated Sovereign Sandbox — they cannot access the native SigmaOS kernel ABI directly.

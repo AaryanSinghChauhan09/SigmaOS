@@ -196,20 +196,20 @@ int main(void) {
 
 ## Driver Status
 
-| Driver | File | Status | 
-| --- | --- | --- | 
-| VGA text mode | `kernel/drivers/vga/` | ✓ Working | 
-| PS/2 Keyboard | `kernel/drivers/input/` | ✓ Working | 
-| COM1 Serial | `kernel/core/hal/` | ✓ Working | 
-| ATA Disk (PIO) | `kernel/storage/` | ✓ Working | 
-| Loopback NIC | `kernel/net/` | ✓ Working | 
-| Virtio-net (QEMU) | `kernel/drivers/net/` | ⚠ Partial | 
-| e1000 NIC | `kernel/drivers/net/` | ☐ Planned | 
-| USB 3.0 xHCI | `kernel/drivers/usb/` | ☐ Planned | 
-| NVMe | `kernel/drivers/storage/` | ☐ Planned | 
-| Bluetooth HCI | `kernel/drivers/net/bt/` | ⚠ Partial | 
-| Wi-Fi 802.11 | `kernel/drivers/net/wifi/` | ⚠ Partial | 
-| DRM/KMS shim | `kernel/drivers/gpu/` | ☐ Planned | 
+| Driver | File | Status |
+|---|---|---|
+| VGA text mode | `kernel/drivers/vga/` | ✓ Working |
+| PS/2 Keyboard | `kernel/drivers/input/` | ✓ Working |
+| COM1 Serial | `kernel/core/hal/` | ✓ Working |
+| ATA Disk (PIO) | `kernel/storage/` | ✓ Working |
+| Loopback NIC | `kernel/net/` | ✓ Working |
+| Virtio-net (QEMU) | `kernel/drivers/net/` | ⚠ Partial |
+| e1000 NIC | `kernel/drivers/net/` | ☐ Planned |
+| USB 3.0 xHCI | `kernel/drivers/usb/` | ☐ Planned |
+| NVMe | `kernel/drivers/storage/` | ☐ Planned |
+| Bluetooth HCI | `kernel/drivers/net/bt/` | ⚠ Partial |
+| Wi-Fi 802.11 | `kernel/drivers/net/wifi/` | ⚠ Partial |
+| DRM/KMS shim | `kernel/drivers/gpu/` | ☐ Planned |
 
 ---
 

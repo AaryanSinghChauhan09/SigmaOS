@@ -9,4 +9,4 @@ Pluggable scheduling algorithms.
 // Abstract interface for perf/scheduler
 void init_perf_scheduler();
 
-```text
+```

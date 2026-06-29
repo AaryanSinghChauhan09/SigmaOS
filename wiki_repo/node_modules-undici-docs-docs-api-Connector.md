@@ -123,4 +123,4 @@ function getIssuerCertificate (socket) {
   return certificate
 }
 
-```text
+```

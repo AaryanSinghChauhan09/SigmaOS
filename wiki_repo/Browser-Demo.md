@@ -47,74 +47,74 @@ Each driver is a React hook that wraps a real Web API. All driver state is live 
 
 ### Sensors
 
-| Driver | Web API | What you see | 
-| --- | --- | --- | 
-| **Battery** | Battery Status API | Live % level, charging state, time remaining | 
-| **Network** | Network Information API | Online/offline, connection type, RTT, speed | 
-| **Geolocation** | Geolocation API | GPS coordinates with live tracking | 
-| **Motion** | DeviceMotion + DeviceOrientation | Accelerometer (x/y/z) + gyroscope angles | 
-| **Ambient Light** | AmbientLightSensor + media query | Light/dark environment, lux value | 
+| Driver | Web API | What you see |
+|---|---|---|
+| **Battery** | Battery Status API | Live % level, charging state, time remaining |
+| **Network** | Network Information API | Online/offline, connection type, RTT, speed |
+| **Geolocation** | Geolocation API | GPS coordinates with live tracking |
+| **Motion** | DeviceMotion + DeviceOrientation | Accelerometer (x/y/z) + gyroscope angles |
+| **Ambient Light** | AmbientLightSensor + media query | Light/dark environment, lux value |
 
 ### Storage
 
-| Driver | Web API | What you can do | 
-| --- | --- | --- | 
-| **Filesystem** | File System Access API | Browse your real disk, open/save files | 
-| **OPFS** | Origin Private File System | Persistent in-browser virtual disk (read/write/delete) | 
+| Driver | Web API | What you can do |
+|---|---|---|
+| **Filesystem** | File System Access API | Browse your real disk, open/save files |
+| **OPFS** | Origin Private File System | Persistent in-browser virtual disk (read/write/delete) |
 
 ### Media
 
-| Driver | Web API | What you see | 
-| --- | --- | --- | 
-| **Audio** | Web Audio API + getUserMedia | Microphone with live frequency spectrum visualizer | 
-| **Camera** | getUserMedia (video) | Live webcam feed with snapshot capture | 
-| **Screen Capture** | getDisplayMedia | Screen sharing + WebM recording + download | 
+| Driver | Web API | What you see |
+|---|---|---|
+| **Audio** | Web Audio API + getUserMedia | Microphone with live frequency spectrum visualizer |
+| **Camera** | getUserMedia (video) | Live webcam feed with snapshot capture |
+| **Screen Capture** | getDisplayMedia | Screen sharing + WebM recording + download |
 
 ### Input
 
-| Driver | Web API | What you see | 
-| --- | --- | --- | 
-| **Gamepad** | Gamepad API | Live button states + analog axis bars | 
-| **Speech** | SpeechRecognition + Synthesis | Voice input transcript + text-to-speech | 
-| **Pointer** | Pointer Events API | Mouse/pen/touch with pressure, tilt, twist | 
+| Driver | Web API | What you see |
+|---|---|---|
+| **Gamepad** | Gamepad API | Live button states + analog axis bars |
+| **Speech** | SpeechRecognition + Synthesis | Voice input transcript + text-to-speech |
+| **Pointer** | Pointer Events API | Mouse/pen/touch with pressure, tilt, twist |
 
 ### System
 
-| Driver | Web API | What you can do | 
-| --- | --- | --- | 
-| **Notifications** | Notifications API | Request permission + send system notifications | 
-| **Clipboard** | Clipboard API | Write to and read from system clipboard | 
-| **Wake Lock** | Screen Wake Lock API | Prevent screen sleep | 
-| **Multi-Screen** | Window Management API | Detect monitors, resolution, DPR | 
+| Driver | Web API | What you can do |
+|---|---|---|
+| **Notifications** | Notifications API | Request permission + send system notifications |
+| **Clipboard** | Clipboard API | Write to and read from system clipboard |
+| **Wake Lock** | Screen Wake Lock API | Prevent screen sleep |
+| **Multi-Screen** | Window Management API | Detect monitors, resolution, DPR |
 
 ### Hardware Peripherals
 
-| Driver | Web API | What you see | 
-| --- | --- | --- | 
-| **USB** | WebUSB API | Pair USB devices, vendor/product IDs | 
-| **Bluetooth** | Web Bluetooth API | GATT device scan, connect, disconnect | 
-| **Serial** | Web Serial API | Arduino/ESP32 — send commands, read output | 
-| **HID** | WebHID API | Gamepads, graphics tablets, specialty keyboards | 
-| **MIDI** | Web MIDI API | Instrument inputs, play notes on outputs | 
-| **GPU** | WebGPU API | Adapter info, vendor, supported features, limits | 
-| **Share** | Web Share API | Native OS share sheet | 
+| Driver | Web API | What you see |
+|---|---|---|
+| **USB** | WebUSB API | Pair USB devices, vendor/product IDs |
+| **Bluetooth** | Web Bluetooth API | GATT device scan, connect, disconnect |
+| **Serial** | Web Serial API | Arduino/ESP32 — send commands, read output |
+| **HID** | WebHID API | Gamepads, graphics tablets, specialty keyboards |
+| **MIDI** | Web MIDI API | Instrument inputs, play notes on outputs |
+| **GPU** | WebGPU API | Adapter info, vendor, supported features, limits |
+| **Share** | Web Share API | Native OS share sheet |
 
 ---
 
 ## Browser Support
 
-| Feature | Chrome/Edge | Firefox | Safari | 
-| --- | --- | --- | --- | 
-| Battery | ✅ (Chrome-only) | ❌ | ❌ | 
-| Geolocation | ✅ | ✅ | ✅ | 
-| WebUSB | ✅ | ❌ | ❌ | 
-| Web Bluetooth | ✅ | ❌ | ❌ | 
-| Web Serial | ✅ | ❌ | ❌ | 
-| WebHID | ✅ | ❌ | ❌ | 
-| WebGPU | ✅ (Chrome 113+) | Partial | Partial | 
-| File System Access | ✅ | Partial | ✅ | 
-| Screen Capture | ✅ | ✅ | ✅ | 
-| All other drivers | ✅ | ✅ | ✅ | 
+| Feature | Chrome/Edge | Firefox | Safari |
+|---|---|---|---|
+| Battery | ✅ (Chrome-only) | ❌ | ❌ |
+| Geolocation | ✅ | ✅ | ✅ |
+| WebUSB | ✅ | ❌ | ❌ |
+| Web Bluetooth | ✅ | ❌ | ❌ |
+| Web Serial | ✅ | ❌ | ❌ |
+| WebHID | ✅ | ❌ | ❌ |
+| WebGPU | ✅ (Chrome 113+) | Partial | Partial |
+| File System Access | ✅ | Partial | ✅ |
+| Screen Capture | ✅ | ✅ | ✅ |
+| All other drivers | ✅ | ✅ | ✅ |
 
 **Recommendation:** Use Chrome or Edge for full 24-driver support. The Driver Manager shows each driver's real-time status (Active / Available / Unsupported / Denied).
 
@@ -130,16 +130,16 @@ This browser demo serves three purposes:
 
 The mapping from browser drivers to native kernel drivers:
 
-| Browser (sigma-web) | Native target (Phase 2) | 
-| --- | --- | 
-| Battery Status API | ACPI battery HAL driver | 
-| Network Information API | sigma-netd (DHCP/WiFi/Ethernet) | 
-| getUserMedia (camera) | V4L2 camera SDF driver | 
-| WebUSB | USB host controller SDF driver | 
-| Web Bluetooth | BlueZ userspace SDF driver | 
-| Web Serial | UART/CDC-ACM SDF driver | 
-| WebGPU | sigma-drm-* GPU SDF drivers | 
-| OPFS | SigmaFS / btrfs VFS layer | 
+| Browser (sigma-web) | Native target (Phase 2) |
+|---|---|
+| Battery Status API | ACPI battery HAL driver |
+| Network Information API | sigma-netd (DHCP/WiFi/Ethernet) |
+| getUserMedia (camera) | V4L2 camera SDF driver |
+| WebUSB | USB host controller SDF driver |
+| Web Bluetooth | BlueZ userspace SDF driver |
+| Web Serial | UART/CDC-ACM SDF driver |
+| WebGPU | sigma-drm-* GPU SDF drivers |
+| OPFS | SigmaFS / btrfs VFS layer |
 
 ---
 

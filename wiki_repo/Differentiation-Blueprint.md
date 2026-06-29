@@ -17,13 +17,13 @@ Neither axis alone is sufficient. A technically perfect OS with bad UX loses. A 
 
 ## 2. Current Gaps (Most Material)
 
-| Gap | Impact | Phase to Fix | 
-| --- | --- | --- | 
-| Hardware support breadth (GPU/WiFi/BT) | Blocks real hardware boot | Phase 1–2 | 
-| Container execution depth | sigma-pod CLI exists but kernel enforcement incomplete | Phase A | 
-| Recovery UX | Fallback shell exists but no guided recovery | Phase B | 
-| Desktop completeness | Zenith compositor exists but not production-hardened | Phase B | 
-| Build/package reproducibility | Direction exists, registry lifecycle not formalized | Phase C | 
+| Gap | Impact | Phase to Fix |
+|---|---|---|
+| Hardware support breadth (GPU/WiFi/BT) | Blocks real hardware boot | Phase 1–2 |
+| Container execution depth | sigma-pod CLI exists but kernel enforcement incomplete | Phase A |
+| Recovery UX | Fallback shell exists but no guided recovery | Phase B |
+| Desktop completeness | Zenith compositor exists but not production-hardened | Phase B |
+| Build/package reproducibility | Direction exists, registry lifecycle not formalized | Phase C |
 
 ---
 
@@ -106,17 +106,17 @@ Neither axis alone is sufficient. A technically perfect OS with bad UX loses. A 
 
 ## 4. Competitor-Specific Surpass Strategy
 
-| Competitor | Their Strength | SigmaOS Strategy | 
-| --- | --- | --- | 
-| **SteamOS** | Gaming integration, Proton, polished UX | Sovereign graphics + predictable low-latency desktop + dev tooling | 
-| **Clear Linux** | Intel-tuned performance | Silicon-aware scheduling + cross-vendor PGO, not vendor-specific only | 
-| **NixOS** | Declarative reproducibility | Sovereign `.spkg` recipes + policy-backed registry + first-party automation | 
-| **Fedora CoreOS / Flatcar** | Immutable base, auto-updates | Immutable updates + automatic rollback + stronger local recovery | 
-| **RancherOS** | Container-first, Docker-native | Native container-first without Docker daemon dependency | 
-| **Solus** | Cohesive desktop UX | Zenith + first-class personalization + declarative profile flow | 
-| **Rescuezilla / SystemRescue** | Mature recovery GUI | Integrated recovery mode + rollback built into normal operation | 
-| **CAINE / Tails** | Forensic/anonymity specialization | Secure profile + WORM audit + zero-trace RAM scrubbing | 
-| **Ubuntu / Canonical** | Enterprise support, snaps | Profiles + automation + sovereign orchestration + India-native | 
+| Competitor | Their Strength | SigmaOS Strategy |
+|---|---|---|
+| **SteamOS** | Gaming integration, Proton, polished UX | Sovereign graphics + predictable low-latency desktop + dev tooling |
+| **Clear Linux** | Intel-tuned performance | Silicon-aware scheduling + cross-vendor PGO, not vendor-specific only |
+| **NixOS** | Declarative reproducibility | Sovereign `.spkg` recipes + policy-backed registry + first-party automation |
+| **Fedora CoreOS / Flatcar** | Immutable base, auto-updates | Immutable updates + automatic rollback + stronger local recovery |
+| **RancherOS** | Container-first, Docker-native | Native container-first without Docker daemon dependency |
+| **Solus** | Cohesive desktop UX | Zenith + first-class personalization + declarative profile flow |
+| **Rescuezilla / SystemRescue** | Mature recovery GUI | Integrated recovery mode + rollback built into normal operation |
+| **CAINE / Tails** | Forensic/anonymity specialization | Secure profile + WORM audit + zero-trace RAM scrubbing |
+| **Ubuntu / Canonical** | Enterprise support, snaps | Profiles + automation + sovereign orchestration + India-native |
 
 ---
 
@@ -137,32 +137,32 @@ No new subsystem is "done" unless it has:
 ## 6. Phase A/B/C Checklist Summary
 
 ### Phase A — Core Sovereignty
-| Task | File | Status | 
-| --- | --- | --- | 
-| NIC TX/RX driver-to-stack loop | `kernel/net/sigma_net.c` | `[~]` | 
-| TCP state machine | `kernel/net/sigma_net_tcp.cpp` | `[~]` | 
-| ARP resolution (replace stub) | `kernel/net/sigma_net_arp.cpp` | `[~]` | 
-| Single socket ABI authority | `kernel/net/sigma_net_socket.cpp` | `[~]` | 
-| sigma-pod kernel cgroup enforcement | `kernel/core/process/sigma_cgroup.c` | `[~]` | 
-| Boot resilience safe-mode default | `kernel/core/boot/sigma_boot_recovery_menu.c` | `[~]` | 
-| Microsecond SYSCALL asm entry | `arch/x86_64/syscall_entry.asm` | `[ ]` | 
+| Task | File | Status |
+|---|---|---|
+| NIC TX/RX driver-to-stack loop | `kernel/net/sigma_net.c` | `[~]` |
+| TCP state machine | `kernel/net/sigma_net_tcp.cpp` | `[~]` |
+| ARP resolution (replace stub) | `kernel/net/sigma_net_arp.cpp` | `[~]` |
+| Single socket ABI authority | `kernel/net/sigma_net_socket.cpp` | `[~]` |
+| sigma-pod kernel cgroup enforcement | `kernel/core/process/sigma_cgroup.c` | `[~]` |
+| Boot resilience safe-mode default | `kernel/core/boot/sigma_boot_recovery_menu.c` | `[~]` |
+| Microsecond SYSCALL asm entry | `arch/x86_64/syscall_entry.asm` | `[ ]` |
 
 ### Phase B — UX + Recovery
-| Task | File | Status | 
-| --- | --- | --- | 
-| Compositor input event loop | `zenith_desktop/compositor/` | `[~]` | 
-| Auto-tiling WM | `zenith_desktop/wm/sigma_tiling_wm.cpp` | `[~]` | 
-| Theme/widget engine | `zenith_desktop/theme/sigma_theme_engine.cpp` | `[~]` | 
-| Profile engine | `zenith_desktop/personalization/sigma_profile_engine.cpp` | `[~]` | 
-| Recovery assistant GUI | `kernel/core/boot/sigma_boot_recovery_menu.c` | `[ ]` | 
+| Task | File | Status |
+|---|---|---|
+| Compositor input event loop | `zenith_desktop/compositor/` | `[~]` |
+| Auto-tiling WM | `zenith_desktop/wm/sigma_tiling_wm.cpp` | `[~]` |
+| Theme/widget engine | `zenith_desktop/theme/sigma_theme_engine.cpp` | `[~]` |
+| Profile engine | `zenith_desktop/personalization/sigma_profile_engine.cpp` | `[~]` |
+| Recovery assistant GUI | `kernel/core/boot/sigma_boot_recovery_menu.c` | `[ ]` |
 
 ### Phase C — Ecosystem
-| Task | File | Status | 
-| --- | --- | --- | 
-| Sovereign .spkg registry | `sigma-pkg/cbuild.py` | `[~]` | 
-| Signed recipe provenance | `userland/pkg/sigma_sbom.h` | `[~]` | 
-| CI provenance gating | `.github/workflows/sigma_ci.yml` | `[~]` | 
-| Wiki-per-subsystem policy | `wiki_repo/` | `[x]` | 
+| Task | File | Status |
+|---|---|---|
+| Sovereign .spkg registry | `sigma-pkg/cbuild.py` | `[~]` |
+| Signed recipe provenance | `userland/pkg/sigma_sbom.h` | `[~]` |
+| CI provenance gating | `.github/workflows/sigma_ci.yml` | `[~]` |
+| Wiki-per-subsystem policy | `wiki_repo/` | `[x]` |
 
 ---
 

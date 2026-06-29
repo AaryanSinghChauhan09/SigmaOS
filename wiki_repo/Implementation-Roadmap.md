@@ -10,22 +10,22 @@
 
 All 14 academic subjects have been mapped to SigmaOS architecture layers. See individual pages:
 
-| Subject | SigmaOS Layer | Wiki | 
-| --- | --- | --- | 
-| Fundamentals of CS & IT | Kernel + HAL + CLI + Office Suite | [FCIT](Syllabus-FCIT) | 
-| Discrete Mathematics | Math/Logic Engine | [DiscreteMath](Syllabus-DiscreteMath) | 
-| C Programming | Developer C API Layer | [C-Prog](Syllabus-C-Programming) | 
-| C++ Programming | Kernel Core (C++17) | [Cpp-Prog](Syllabus-Cpp-Programming) | 
-| RDBMS & Oracle SQL | SigmaDB Engine | [RDBMS](Syllabus-RDBMS) | 
-| Statistics | SigmaStats Toolkit | [Statistics](Syllabus-Statistics) | 
-| Web Programming | SigmaWeb Runtime | [WebProg](Syllabus-WebProgramming) | 
-| OS Concepts | Kernel Implementation | [OS-Concepts](Syllabus-OS-Concepts) | 
-| Python Programming | SigmaPy Runtime | [Python](Syllabus-Python) | 
-| Data Warehousing & Mining | SigmaWarehouse + Analytics | [DWDM](Syllabus-DWDM) | 
-| R Programming | SigmaR Runtime | [R-Prog](Syllabus-R-Programming) | 
-| Advanced Python / Data Science | SigmaAI + NumPy Pipeline | [AdvPython](Syllabus-AdvPython) | 
-| AI & Machine Learning | SigmaAI Intelligence Layer | [AIML](Syllabus-AIML) | 
-| Data Modeling & Visualization | SigmaModeler + SigmaViz | [DataModeling](Syllabus-DataModeling) | 
+| Subject | SigmaOS Layer | Wiki |
+| --- | --- | --- |
+| Fundamentals of CS & IT | Kernel + HAL + CLI + Office Suite | [FCIT](Syllabus-FCIT) |
+| Discrete Mathematics | Math/Logic Engine | [DiscreteMath](Syllabus-DiscreteMath) |
+| C Programming | Developer C API Layer | [C-Prog](Syllabus-C-Programming) |
+| C++ Programming | Kernel Core (C++17) | [Cpp-Prog](Syllabus-Cpp-Programming) |
+| RDBMS & Oracle SQL | SigmaDB Engine | [RDBMS](Syllabus-RDBMS) |
+| Statistics | SigmaStats Toolkit | [Statistics](Syllabus-Statistics) |
+| Web Programming | SigmaWeb Runtime | [WebProg](Syllabus-WebProgramming) |
+| OS Concepts | Kernel Implementation | [OS-Concepts](Syllabus-OS-Concepts) |
+| Python Programming | SigmaPy Runtime | [Python](Syllabus-Python) |
+| Data Warehousing & Mining | SigmaWarehouse + Analytics | [DWDM](Syllabus-DWDM) |
+| R Programming | SigmaR Runtime | [R-Prog](Syllabus-R-Programming) |
+| Advanced Python / Data Science | SigmaAI + NumPy Pipeline | [AdvPython](Syllabus-AdvPython) |
+| AI & Machine Learning | SigmaAI Intelligence Layer | [AIML](Syllabus-AIML) |
+| Data Modeling & Visualization | SigmaModeler + SigmaViz | [DataModeling](Syllabus-DataModeling) |
 
 ---
 
@@ -83,23 +83,23 @@ All 14 academic subjects have been mapped to SigmaOS architecture layers. See in
 
 ## 📊 Feature Status Summary
 
-| Feature | Status | Priority | 
-| --- | --- | --- | 
-| SovereignCodec (number systems) | 🟡 Planned | High | 
-| sigma-cli shell | 🟢 Partial | High | 
-| HAL I/O Drivers | 🟢 Partial | High | 
-| S-ZFS Storage | 🟢 Implemented | High | 
-| SigmaDB SQL Engine | 🟡 Planned | High | 
-| SigmaStats Toolkit | 🟡 Planned | Medium | 
-| SigmaWeb Runtime | 🟡 Planned | Medium | 
-| SigmaAI Layer | 🟡 Planned | Medium | 
-| SigmaModeler (ERD) | 🟡 Planned | Low | 
-| SigmaViz Dashboards | 🟡 Planned | Low | 
-| SigmaDocs/Sheets/Slides | 🟡 Planned | Low | 
-| SigmaPy / SigmaR Runtimes | 🟡 Planned | Medium | 
-| SentinelNeural (antivirus) | 🟡 Planned | High | 
-| SovereignCloudFS | 🟢 Partial | Medium | 
-| SovereignNetStack | 🟡 Planned | High | 
+| Feature | Status | Priority |
+| --- | --- | --- |
+| SovereignCodec (number systems) | 🟡 Planned | High |
+| sigma-cli shell | 🟢 Partial | High |
+| HAL I/O Drivers | 🟢 Partial | High |
+| S-ZFS Storage | 🟢 Implemented | High |
+| SigmaDB SQL Engine | 🟡 Planned | High |
+| SigmaStats Toolkit | 🟡 Planned | Medium |
+| SigmaWeb Runtime | 🟡 Planned | Medium |
+| SigmaAI Layer | 🟡 Planned | Medium |
+| SigmaModeler (ERD) | 🟡 Planned | Low |
+| SigmaViz Dashboards | 🟡 Planned | Low |
+| SigmaDocs/Sheets/Slides | 🟡 Planned | Low |
+| SigmaPy / SigmaR Runtimes | 🟡 Planned | Medium |
+| SentinelNeural (antivirus) | 🟡 Planned | High |
+| SovereignCloudFS | 🟢 Partial | Medium |
+| SovereignNetStack | 🟡 Planned | High |
 
 ---
 

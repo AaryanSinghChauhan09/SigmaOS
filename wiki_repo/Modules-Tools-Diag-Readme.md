@@ -9,4 +9,4 @@ Diagnostics Module.
 // Abstract interface for tools/diag
 void init_tools_diag();
 
-```text
+```

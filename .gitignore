@@ -9,6 +9,12 @@ target/
 .cache/
 .pytest_cache/
 
+# Node / JS tooling — never commit these
+node_modules/
+sigma-build/
+iso_root/
+_bld/
+
 # Editor/IDE
 .vscode/
 *.swp

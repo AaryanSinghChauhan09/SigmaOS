@@ -8,13 +8,13 @@ By executing directly within the microkernel storage mount path, it absorbs the 
 
 ## 🚀 Architectural Design & Parity
 
-| Feature Domain | SigmaOS S-OverlayFS | Linux OverlayFS | FreeBSD unionfs | Plan 9 Union Mount | 
-| :--- | :--- | :--- | :--- | :--- | 
-| **Purity** | Bare-metal C++17 | Monolithic C / Virtual FS | BSD Kernel Layer | Distributed Name Spaces | 
-| **Merge Model** | Upper (RW) + Lower (RO) | Upper + Lower + Work | Upper + Lower (stacked) | Unified Directory Union | 
-| **Write Resolution** | Transactional Copy-Up | Copy-Up-On-Write (CFS) | Duplicate-on-Write | Duplicate-on-Write | 
-| **Device Parity** | Physical block virtualization | Virtual block mount | Mount union node | Mount union namespace | 
-| **Integrity Checks** | PQC-verified signatures | Sysfs security hooks | File-level permission check | Plan 9 auth credentials | 
+| Feature Domain | SigmaOS S-OverlayFS | Linux OverlayFS | FreeBSD unionfs | Plan 9 Union Mount |
+| :--- | :--- | :--- | :--- | :--- |
+| **Purity** | Bare-metal C++17 | Monolithic C / Virtual FS | BSD Kernel Layer | Distributed Name Spaces |
+| **Merge Model** | Upper (RW) + Lower (RO) | Upper + Lower + Work | Upper + Lower (stacked) | Unified Directory Union |
+| **Write Resolution** | Transactional Copy-Up | Copy-Up-On-Write (CFS) | Duplicate-on-Write | Duplicate-on-Write |
+| **Device Parity** | Physical block virtualization | Virtual block mount | Mount union node | Mount union namespace |
+| **Integrity Checks** | PQC-verified signatures | Sysfs security hooks | File-level permission check | Plan 9 auth credentials |
 
 ---
 

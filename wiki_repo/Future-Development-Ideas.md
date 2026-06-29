@@ -418,17 +418,17 @@ As sigma-ai becomes real, governance is needed:
 
 ## Summary by Effort
 
-| Idea | Effort | Team Size | Timeline | 
-| --- | --- | --- | --- | 
-| Kernel implementations (1–4) | Massive | 5–10 engineers | 12–18 months | 
-| ISO + boot pipeline | High | 2–3 engineers | 3–6 months | 
-| ABDM + GST API clients | Medium | 1–2 engineers | 2–3 months | 
-| Indian IME | Medium | 1 engineer | 2–3 months | 
-| Local LLM integration | Medium | 1–2 engineers | 1–2 months | 
-| New profession apps (11–20) | Low-Medium each | 1 engineer each | 2–4 weeks each | 
-| sigma-RuralStack bundle | Low (integration) | 1 engineer | 2–4 weeks | 
-| BharatOS partnership | Institutional | Leadership team | 6–12 months | 
-| Formal verification | Research | PhD team | 3–5 years | 
+| Idea | Effort | Team Size | Timeline |
+|---|---|---|---|
+| Kernel implementations (1–4) | Massive | 5–10 engineers | 12–18 months |
+| ISO + boot pipeline | High | 2–3 engineers | 3–6 months |
+| ABDM + GST API clients | Medium | 1–2 engineers | 2–3 months |
+| Indian IME | Medium | 1 engineer | 2–3 months |
+| Local LLM integration | Medium | 1–2 engineers | 1–2 months |
+| New profession apps (11–20) | Low-Medium each | 1 engineer each | 2–4 weeks each |
+| sigma-RuralStack bundle | Low (integration) | 1 engineer | 2–4 weeks |
+| BharatOS partnership | Institutional | Leadership team | 6–12 months |
+| Formal verification | Research | PhD team | 3–5 years |
 
 ---
 

@@ -29,7 +29,7 @@ sigma_pledge(SIGMA_PROMISE_STDIO | SIGMA_PROMISE_RPATH);
 // Any attempt to call socket() after this → SIGABRT + audit log entry
 ```
 
-Source: `kernel/security/jail/sigma_pledge.cpp`
+Source: `kernel/security/jail/sigma_pledge.cpp`  
 Tests: `tests/kernel/pledge/test_pledge_sigabrt.cpp` (real SIGABRT test, not a stub)
 
 ---
@@ -57,14 +57,14 @@ Source: `kernel/security/mac/sigma_unveil.cpp`
 
 Replaces the old 7-line printf stub. `sigma_jail_enter()` calls `unshare(2)` to create real Linux namespaces before `execve()`:
 
-| Namespace | Flag | Effect | 
-| --- | --- | --- | 
-| PID | `CLONE_NEWPID` | Process cannot see other system processes | 
-| Network | `CLONE_NEWNET` | Private network stack (loopback only by default) | 
-| Mount | `CLONE_NEWNS` | Private filesystem view | 
-| IPC | `CLONE_NEWIPC` | Private System V IPC and POSIX message queues | 
-| UTS | `CLONE_NEWUTS` | Private hostname | 
-| User | `CLONE_NEWUSER` | UID mapped to unprivileged host UID (65534 = nobody) | 
+| Namespace | Flag | Effect |
+|---|---|---|
+| PID | `CLONE_NEWPID` | Process cannot see other system processes |
+| Network | `CLONE_NEWNET` | Private network stack (loopback only by default) |
+| Mount | `CLONE_NEWNS` | Private filesystem view |
+| IPC | `CLONE_NEWIPC` | Private System V IPC and POSIX message queues |
+| UTS | `CLONE_NEWUTS` | Private hostname |
+| User | `CLONE_NEWUSER` | UID mapped to unprivileged host UID (65534 = nobody) |
 
 After namespace entry: drops all capabilities (`PR_SET_NO_NEW_PRIVS`), applies seccomp allowlist, then `pivot_root()` into the jail filesystem.
 
@@ -193,18 +193,18 @@ Kyber-1024 (KEM) generates a session keypair bound to the hardware fingerprint. 
 
 ## Threat Model Summary
 
-| Threat | Mitigation | Source | 
-| --- | --- | --- | 
-| Malicious PWA calling system APIs | Extension capability gate | `background.js` | 
-| Process escaping its sandbox | Namespace isolation + seccomp | `sigma_namespace.cpp` | 
-| Symlink jail escape | `sigma_secure_join()` | `sigma_securepath.cpp` | 
-| Buffer overflow in policy engine | `snprintf`/`sigma_strlcpy` everywhere | Round 1 fixes | 
-| W^X bypass / ROP spraying | ASLR + W^X enforcement | `sigma_aslr.cpp` | 
-| MAC policy O(n) bottleneck | Access Vector Cache O(1) | `sigma_avc.cpp` | 
-| Revoked process continuing | ZeroTrust check on every call | `sigma_zerotrust.cpp` | 
-| Fork bomb / memory exhaustion | cgroup v2 pids.max + memory.max | `sigma_cgroup.cpp` | 
-| Stub crypto (zero-key encryption) | healthd surfaces at runtime | `sigmad/healthd` | 
-| XSS in web shell | `textContent` DOM insertion | `web-shell/index.html` | 
+| Threat | Mitigation | Source |
+|---|---|---|
+| Malicious PWA calling system APIs | Extension capability gate | `background.js` |
+| Process escaping its sandbox | Namespace isolation + seccomp | `sigma_namespace.cpp` |
+| Symlink jail escape | `sigma_secure_join()` | `sigma_securepath.cpp` |
+| Buffer overflow in policy engine | `snprintf`/`sigma_strlcpy` everywhere | Round 1 fixes |
+| W^X bypass / ROP spraying | ASLR + W^X enforcement | `sigma_aslr.cpp` |
+| MAC policy O(n) bottleneck | Access Vector Cache O(1) | `sigma_avc.cpp` |
+| Revoked process continuing | ZeroTrust check on every call | `sigma_zerotrust.cpp` |
+| Fork bomb / memory exhaustion | cgroup v2 pids.max + memory.max | `sigma_cgroup.cpp` |
+| Stub crypto (zero-key encryption) | healthd surfaces at runtime | `sigmad/healthd` |
+| XSS in web shell | `textContent` DOM insertion | `web-shell/index.html` |
 
 ---
 

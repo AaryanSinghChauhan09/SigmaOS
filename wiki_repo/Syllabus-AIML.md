@@ -12,12 +12,12 @@ Artificial Intelligence within SigmaOS provides freestanding, zero-dependency an
 
 **Unique Selling Point (USP):** Ability to learn complex non-linear patterns from raw data and automate real-time decision-making with unmatched adaptability and predictive power.
 
-| AI Type | SigmaOS Feature | 
-| :--- | :--- | 
-| **Data-driven AI** | `SigmaAI::DataPipeline` — learns continuous patterns from system telemetry | 
-| **Autonomous Systems** | `SentinelNeural` — self-healing, autonomous threat and anomaly response | 
-| **Recommendation** | `SigmaAssistant` — intelligent application and kernel config recommendations | 
-| **Expert Systems** | `SigmaLegalAI` — legal document compliance and outcome prediction engine | 
+| AI Type | SigmaOS Feature |
+| :--- | :--- |
+| **Data-driven AI** | `SigmaAI::DataPipeline` — learns continuous patterns from system telemetry |
+| **Autonomous Systems** | `SentinelNeural` — self-healing, autonomous threat and anomaly response |
+| **Recommendation** | `SigmaAssistant` — intelligent application and kernel config recommendations |
+| **Expert Systems** | `SigmaLegalAI` — legal document compliance and outcome prediction engine |
 
 ### Core Machine Learning Concepts
 

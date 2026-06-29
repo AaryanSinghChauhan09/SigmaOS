@@ -1,7 +1,7 @@
 # Omni-Layered Implementation Roadmap & Multi-Domain Framework
 
-> **Specification Version:** 15.2-FINAL
-> **Classification:** Definitive Sovereign Ecosystem Implementation Manifest
+> **Specification Version:** 15.2-FINAL  
+> **Classification:** Definitive Sovereign Ecosystem Implementation Manifest  
 > **Execution Scope:** Bare-Metal Microkernel (Ring-0) to Sandboxed Userland (Ring-3)
 
 ---
@@ -284,7 +284,7 @@ app.use(express.json());
 
 app.post('/sigma/api/telemetry', (req, res) => {
     const { pid, cpu_usage } = req.body;
-    if (typeof pid !== 'number' | | typeof cpu_usage !== 'number') {
+    if (typeof pid !== 'number' || typeof cpu_usage !== 'number') {
         return res.status(400).json({ error: "Invalid input parameters" });
     }
     // Process telemetry securely
@@ -352,5 +352,5 @@ In short, treat the entire SigmaOS ecosystem as a unified, multi-layered computa
 3. **Top Layer (`AI / ML + Statistics + Web Apps`):** The user-facing intelligence layer delivering bare-metal neural predictions, rigorous statistical confidence intervals, and globally accessible React/Node.js visual dashboards.
 
 ---
-> **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED
+> **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED  
 > *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

@@ -12,14 +12,14 @@ India's own language AI platform. No Google Translate, no OpenAI, no foreign API
 
 **Capabilities:**
 
-| Feature | Details | 
-| --- | --- | 
-| Offline ASR | 22 languages + major dialects + Indian Sign Language (ISL) | 
-| Neural MT | Any-to-any translation between 22 languages | 
-| Domain adaptation | Legal, medical, agricultural terminology models | 
-| TTS | Natural voice, regional accents, male/female/neutral | 
-| Transliteration | Roman ↔ Devanagari ↔ 22 scripts, bidirectional | 
-| Streaming pipeline | Audio → ASR → NMT → TTS in under 500ms end-to-end | 
+| Feature | Details |
+|---|---|
+| Offline ASR | 22 languages + major dialects + Indian Sign Language (ISL) |
+| Neural MT | Any-to-any translation between 22 languages |
+| Domain adaptation | Legal, medical, agricultural terminology models |
+| TTS | Natural voice, regional accents, male/female/neutral |
+| Transliteration | Roman ↔ Devanagari ↔ 22 scripts, bidirectional |
+| Streaming pipeline | Audio → ASR → NMT → TTS in under 500ms end-to-end |
 
 ```bash
 sigma-bhashini translate --from Hindi --to Tamil --file legal_notice.pdf
@@ -38,13 +38,13 @@ All models run locally. No audio or text leaves the device.
 
 **AR (Augmented Reality) — phone or webcam passthrough:**
 
-| Profession | AR Use Case | 
-| --- | --- | 
-| Architect | Overlay CAD building plan on real construction site (GPS-anchored) | 
-| Doctor | Patient vitals and drug interactions visible while examining | 
-| Electrician | Thermal camera + AR shows wiring behind walls | 
-| Factory engineer | Machine manual overlaid on actual machine while repairing | 
-| Real estate | Point phone at building → RERA registration data pops up | 
+| Profession | AR Use Case |
+|---|---|
+| Architect | Overlay CAD building plan on real construction site (GPS-anchored) |
+| Doctor | Patient vitals and drug interactions visible while examining |
+| Electrician | Thermal camera + AR shows wiring behind walls |
+| Factory engineer | Machine manual overlaid on actual machine while repairing |
+| Real estate | Point phone at building → RERA registration data pops up |
 
 **VR Workspace:**
 - 3 virtual screens at 4K resolution (work without a second monitor)
@@ -156,13 +156,13 @@ sigma-lex explain --rule "Finance Act 2026 Section 42" --language Hindi
 
 **Authentication signals (all passive):**
 
-| Signal | Technology | Accuracy | 
-| --- | --- | --- | 
-| Typing rhythm | Keystroke dynamics | 98% | 
-| Mouse patterns | Movement biometrics | 95% | 
-| Face | Webcam liveness detection | 99% | 
-| Bluetooth | Paired watch/earbuds proximity | 90% | 
-| Wi-Fi device | Phone MAC near gateway | 85% | 
+| Signal | Technology | Accuracy |
+|---|---|---|
+| Typing rhythm | Keystroke dynamics | 98% |
+| Mouse patterns | Movement biometrics | 95% |
+| Face | Webcam liveness detection | 99% |
+| Bluetooth | Paired watch/earbuds proximity | 90% |
+| Wi-Fi device | Phone MAC near gateway | 85% |
 
 **Behaviour based on confidence level:**
 
@@ -200,13 +200,13 @@ sigma-auth train --signal typing  # Improve model over 50 sessions
 
 **Active federated networks:**
 
-| Network | Trains | Benefit | 
-| --- | --- | --- | 
-| `sigma-agri-disease` | Crop photos → disease detection | Better AI for all farmers | 
-| `sigma-tax-anomaly` | GST patterns → error detection | Better audit for all CAs | 
-| `sigma-handwriting-ocr` | Devanagari writing → OCR | Better OCR for all 22 scripts | 
-| `sigma-medical-assist` | Clinical notes → diagnosis support | Better support for all doctors | 
-| `sigma-voice-asr` | Voice recordings → ASR | Better speech recognition | 
+| Network | Trains | Benefit |
+|---|---|---|
+| `sigma-agri-disease` | Crop photos → disease detection | Better AI for all farmers |
+| `sigma-tax-anomaly` | GST patterns → error detection | Better audit for all CAs |
+| `sigma-handwriting-ocr` | Devanagari writing → OCR | Better OCR for all 22 scripts |
+| `sigma-medical-assist` | Clinical notes → diagnosis support | Better support for all doctors |
+| `sigma-voice-asr` | Voice recordings → ASR | Better speech recognition |
 
 **Privacy guarantees:**
 - Differential privacy: ε=0.5 (NIST recommended)
@@ -342,14 +342,14 @@ sigma-gram scheme status --scheme PMAY-G --village Rampur
 
 **Modules:**
 
-| Module | Game Concept | Real Skill | 
-| --- | --- | --- | 
-| Digital Dukaan | Play shopkeeper, make invoices, pay taxes | sigma-accounts, GST basics | 
-| Kisan Ka Khel | Farmer: check MSP, PMFBY, eNAM | sigma-agri fully | 
-| Shasan Gyaan | Village sarpanch: Gram Sabha, MGNREGS | sigma-gram operations | 
-| Suraksha Champion | Attack/defend your DID identity | sigma-sec best practices | 
-| Kanoon ka Rakshak | Solve cases with BNS/BNSS | sigma-legal basics | 
-| Sehat Hero | Health worker in a rural clinic | sigma-health basics | 
+| Module | Game Concept | Real Skill |
+|---|---|---|
+| Digital Dukaan | Play shopkeeper, make invoices, pay taxes | sigma-accounts, GST basics |
+| Kisan Ka Khel | Farmer: check MSP, PMFBY, eNAM | sigma-agri fully |
+| Shasan Gyaan | Village sarpanch: Gram Sabha, MGNREGS | sigma-gram operations |
+| Suraksha Champion | Attack/defend your DID identity | sigma-sec best practices |
+| Kanoon ka Rakshak | Solve cases with BNS/BNSS | sigma-legal basics |
+| Sehat Hero | Health worker in a rural clinic | sigma-health basics |
 
 **Available in:** Hindi, Tamil, Telugu, Marathi, Bengali, Gujarati, Kannada, Punjabi
 

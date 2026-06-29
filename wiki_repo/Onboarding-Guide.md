@@ -32,7 +32,7 @@ public:
         static MyComponent instance;
         return instance;
     }
-
+    
     void run() {
         sigma_log_info("[SUB] Active.");
     }

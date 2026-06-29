@@ -631,4 +631,4 @@ mockAgentHistory?.filterCalls('application/json') // returns an Array of MockCal
 mockAgentHistory?.filterCalls((log) => log.path === '/endpoint') // returns an Array of MockCallHistoryLogs when given function returns true
 mockAgentHistory?.clear() // clear the history
 
-```text
+```

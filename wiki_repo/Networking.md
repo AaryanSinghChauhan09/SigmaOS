@@ -131,11 +131,11 @@ sigma_tls_write(sess, request, req_len);
 
 Three built-in configuration presets:
 
-| Preset | Use case | 
-| --- | --- | 
-| `sigma_net_config_default()` | Sane defaults — DHCP, DoH, no DNSSEC mandatory | 
-| `sigma_net_config_secure()` | Maximum security — DNSSEC required, PQC enabled, WPA3 only | 
-| `sigma_net_config_fast()` | IoT / constrained — caching, no DNSSEC validation | 
+| Preset | Use case |
+|---|---|
+| `sigma_net_config_default()` | Sane defaults — DHCP, DoH, no DNSSEC mandatory |
+| `sigma_net_config_secure()` | Maximum security — DNSSEC required, PQC enabled, WPA3 only |
+| `sigma_net_config_fast()` | IoT / constrained — caching, no DNSSEC validation |
 
 ---
 

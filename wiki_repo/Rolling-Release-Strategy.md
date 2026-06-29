@@ -21,4 +21,4 @@ Synchronize your lattice with the rolling edge:
 ```bash
 sigma-pkg update --rolling
 
-```text
+```

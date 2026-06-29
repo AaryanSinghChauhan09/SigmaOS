@@ -324,13 +324,13 @@ loaded = joblib.load('/sigma/ai/models/anomaly_detector.pkl')
 
 ## SigmaOS Integration Map
 
-| Component | Role | 
-| :--- | :--- | 
-| **NumPy** | Tensor/matrix ops in `SigmaAI::NPURuntime` | 
-| **Pandas** | ETL data frames in `SigmaWarehouse` | 
-| **Matplotlib / Seaborn** | Charts rendered by `SigmaViz` | 
-| **Scikit-Learn** | ML models in `SigmaAI::MLEngine` | 
-| **Joblib** | Model serialization to `SovereignFS` | 
-| **Jupyter-like** | `sigma-jupyter` notebook server | 
+| Component | Role |
+| :--- | :--- |
+| **NumPy** | Tensor/matrix ops in `SigmaAI::NPURuntime` |
+| **Pandas** | ETL data frames in `SigmaWarehouse` |
+| **Matplotlib / Seaborn** | Charts rendered by `SigmaViz` |
+| **Scikit-Learn** | ML models in `SigmaAI::MLEngine` |
+| **Joblib** | Model serialization to `SovereignFS` |
+| **Jupyter-like** | `sigma-jupyter` notebook server |
 
 *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

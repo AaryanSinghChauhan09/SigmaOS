@@ -81,4 +81,4 @@ for await (const data of body) {
   console.log('data', data.toString('utf8')) // data foo
 }
 
-```text
+```

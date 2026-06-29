@@ -16,26 +16,26 @@ An Operating System is foundational system software that manages hardware resour
 
 ### OS Functions → SigmaOS Modules
 
-| OS Function | SigmaOS Module | File | 
-| :--- | :--- | :--- | 
-| **Process Management** | `SovereignScheduler` | `kernel/core/SovereignScheduler.cpp` | 
-| **Memory Management** | `SovereignAllocator` | `kernel/core/SovereignAllocator.cpp` | 
-| **File System** | `SovereignFS` + S-ZFS | `kernel/fs/` | 
-| **Device Management** | HAL Driver Registry | `kernel/core/drivers/` | 
-| **Security** | `SentinelNeural` | `kernel/security/` | 
-| **UI** | `ZenithDesktop` | `userland/desktop/` | 
-| **Networking** | `SovereignNetStack` | `kernel/net/` | 
+| OS Function | SigmaOS Module | File |
+| :--- | :--- | :--- |
+| **Process Management** | `SovereignScheduler` | `kernel/core/SovereignScheduler.cpp` |
+| **Memory Management** | `SovereignAllocator` | `kernel/core/SovereignAllocator.cpp` |
+| **File System** | `SovereignFS` + S-ZFS | `kernel/fs/` |
+| **Device Management** | HAL Driver Registry | `kernel/core/drivers/` |
+| **Security** | `SentinelNeural` | `kernel/security/` |
+| **UI** | `ZenithDesktop` | `userland/desktop/` |
+| **Networking** | `SovereignNetStack` | `kernel/net/` |
 
 ### Types of OS
 
-| Type | Example | SigmaOS Parallel | 
-| :--- | :--- | :--- | 
-| **Batch** | IBM OS/360 | — | 
-| **Time-sharing** | Unix | SigmaOS multi-user interactive | 
-| **Real-time** | VxWorks | RTOS format of SigmaOS | 
-| **Distributed** | Plan 9 | SigmaOS cluster mode | 
-| **Embedded** | FreeRTOS | SigmaOS embedded build | 
-| **Microkernel** | Mach, L4 | **SigmaOS Zenith** | 
+| Type | Example | SigmaOS Parallel |
+| :--- | :--- | :--- |
+| **Batch** | IBM OS/360 | — |
+| **Time-sharing** | Unix | SigmaOS multi-user interactive |
+| **Real-time** | VxWorks | RTOS format of SigmaOS |
+| **Distributed** | Plan 9 | SigmaOS cluster mode |
+| **Embedded** | FreeRTOS | SigmaOS embedded build |
+| **Microkernel** | Mach, L4 | **SigmaOS Zenith** |
 
 ---
 

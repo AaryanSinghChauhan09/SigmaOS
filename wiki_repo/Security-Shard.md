@@ -34,4 +34,4 @@ if (status != SIGMA_OK) {
     // Hardware halt triggered
 }
 
-```text
+```

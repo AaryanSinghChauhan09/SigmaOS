@@ -9,4 +9,4 @@ Abstract storage handling into a pluggable FS layer.
 // Abstract interface for core/fs
 void init_core_fs();
 
-```text
+```
