@@ -109,7 +109,22 @@ RUST_CORE_SRCS := kernel/core/memory/mod.rs kernel/core/memory/pmm.rs \
                   kernel/core/sched/mod.rs kernel/core/sched/sovereign.rs \
                   kernel/core/sched/mlfq.rs \
                   kernel/core/syscall/mod.rs kernel/core/syscall/gate.rs \
-                  kernel/core/syscall/panic.rs kernel/core/syscall/ipc.rs
+                  kernel/core/syscall/panic.rs kernel/core/syscall/ipc.rs \
+                  kernel/core/sovereign_kernel_main.rs \
+                  kernel/core/sovereign_process_manager.rs \
+                  kernel/core/sovereign_ipc.rs \
+                  kernel/core/sovereign_scheduler.rs \
+                  kernel/core/sovereign_compat_shim.rs \
+                  kernel/core/sovereign_self_healing.rs \
+                  kernel/core/sovereign_container_runtime.rs \
+                  kernel/core/sovereign_idt.rs \
+                  kernel/core/sovereign_namespace.rs \
+                  kernel/core/sovereign_registry.rs \
+                  kernel/core/sovereign_zenithd_log.rs \
+                  kernel/syscalls/sovereign_syscalls.rs \
+                  kernel/sched/sovereign_mcs.rs \
+                  security/sovereign_apparmor.rs \
+                  security/sovereign_sandbox_mac.rs
 
 # ── Rust sources — Network Stack ──────────────────────────────────────────
 RUST_NET_SRCS := kernel/net/mod.rs kernel/net/net_stack.rs \

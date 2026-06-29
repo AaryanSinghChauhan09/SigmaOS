@@ -93,6 +93,9 @@ jobs:
           gnat make -c drivers/block/nvme.adb 2>&1 || echo "WARN: Ada build (nvme) skipped"
           gnat make -c drivers/net/e1000.adb 2>&1 || echo "WARN: Ada build (e1000) skipped"
           gnat make -c drivers/net/rtl8139.adb 2>&1 || echo "WARN: Ada build (rtl8139) skipped"
+          gnat make -c kernel/mm/sovereign_aslr.adb 2>&1 || echo "WARN: Ada build (aslr) skipped"
+          gnat make -c kernel/mm/sovereign_hugepage.adb 2>&1 || echo "WARN: Ada build (hugepage) skipped"
+          gnat make -c kernel/mm/sovereign_oom.adb 2>&1 || echo "WARN: Ada build (oom) skipped"
 
       - name: CMake configure (TARGET_OS=${{ matrix.target_os }})
         run: |

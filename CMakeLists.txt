@@ -196,6 +196,21 @@ set(SIGMA_RUST_CORE
     ${CMAKE_SOURCE_DIR}/kernel/core/syscall/gate.rs
     ${CMAKE_SOURCE_DIR}/kernel/core/syscall/panic.rs
     ${CMAKE_SOURCE_DIR}/kernel/core/syscall/ipc.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/sovereign_kernel_main.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/sovereign_process_manager.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/sovereign_ipc.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/sovereign_scheduler.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/sovereign_compat_shim.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/sovereign_self_healing.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/sovereign_container_runtime.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/sovereign_idt.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/sovereign_namespace.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/sovereign_registry.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/sovereign_zenithd_log.rs
+    ${CMAKE_SOURCE_DIR}/kernel/syscalls/sovereign_syscalls.rs
+    ${CMAKE_SOURCE_DIR}/kernel/sched/sovereign_mcs.rs
+    ${CMAKE_SOURCE_DIR}/security/sovereign_apparmor.rs
+    ${CMAKE_SOURCE_DIR}/security/sovereign_sandbox_mac.rs
 )
 
 # ── Rust Network Stack ────────────────────────────────────────────────────
