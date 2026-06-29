@@ -121,6 +121,10 @@ RUST_STORAGE_SRCS := kernel/storage/mod.rs kernel/storage/shard.rs
 # ── Rust sources — Telemetry Stack ────────────────────────────────────────
 RUST_TELEMETRY_SRCS := kernel/telemetry/mod.rs kernel/telemetry/shard.rs
 
+# ── Rust sources — Virt Stack ─────────────────────────────────────────────
+RUST_VIRT_SRCS := kernel/virt/mod.rs kernel/virt/hypervisor.rs \
+                  kernel/virt/vcpu.rs kernel/virt/container.rs
+
 # ── Rust sources — HAL (common) + OS-specific drivers ─────────────────────
 RUST_HAL_SRCS := drivers/hal/mod.rs drivers/hal/mmio.rs
 
@@ -138,7 +142,7 @@ endif
 # Zig port_io is common HAL (used by all targets for CPU primitives)
 ZIG_HAL_SRCS := drivers/hal/port_io.zig
 
-ALL_RUST_SRCS := $(RUST_CORE_SRCS) $(RUST_NET_SRCS) $(RUST_STORAGE_SRCS) $(RUST_TELEMETRY_SRCS) $(RUST_HAL_SRCS) $(RUST_DRV_SRCS)
+ALL_RUST_SRCS := $(RUST_CORE_SRCS) $(RUST_NET_SRCS) $(RUST_STORAGE_SRCS) $(RUST_TELEMETRY_SRCS) $(RUST_VIRT_SRCS) $(RUST_HAL_SRCS) $(RUST_DRV_SRCS)
 ALL_ZIG_SRCS  := $(ZIG_HAL_SRCS) $(ZIG_DRV_SRCS)
 
 # Rust → .a (static library per source)

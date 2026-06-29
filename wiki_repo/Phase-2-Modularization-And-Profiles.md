@@ -46,7 +46,7 @@ kernel/
 ├── net/                # Sovereign TCP/IP stack (Rewritten in Rust no_std)
 ├── storage/            # SigmaFS + ZFS journal shim (Rewritten in Rust no_std)
 ├── telemetry/          # Zero-trust audit & telemetry (Rewritten in Rust no_std)
-└── virt/               # Hypervisor (optional — SIGMA_USE_HYPERVISOR)
+└── virt/               # Hypervisor (optional — SIGMA_USE_HYPERVISOR) (Rewritten in Rust no_std)
 ```
 
 ### USE-Flag Feature Toggles (CMake)
