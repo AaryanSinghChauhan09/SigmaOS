@@ -260,6 +260,14 @@ elseif(SIGMA_TARGET_OS STREQUAL "bsd")
 endif()
 
 set(ALL_RUST_SRCS ${SIGMA_RUST_CORE} ${SIGMA_RUST_NET} ${SIGMA_RUST_STORAGE} ${SIGMA_RUST_TELEMETRY} ${SIGMA_RUST_VIRT} ${SIGMA_RUST_HAL} ${SIGMA_RUST_DRIVERS})
+
+# ── Rust Userspace: sigpkg ───────────────────────────────────────────────────
+set(SIGMA_RUST_SIGPKG
+    ${CMAKE_SOURCE_DIR}/usr/sigpkg/mod.rs
+    ${CMAKE_SOURCE_DIR}/usr/sigpkg/manager.rs
+    ${CMAKE_SOURCE_DIR}/usr/sigpkg/cli.rs
+)
+set(ALL_USR_RUST_SRCS ${SIGMA_RUST_SIGPKG})
 set(ALL_ZIG_SRCS  ${SIGMA_ZIG_HAL}  ${SIGMA_ZIG_DRIVERS})
 
 # ── Custom commands: Rust .rs → .a ────────────────────────────────────────

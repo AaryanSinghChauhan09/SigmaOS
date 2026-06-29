@@ -145,6 +145,10 @@ ZIG_HAL_SRCS := drivers/hal/port_io.zig
 ALL_RUST_SRCS := $(RUST_CORE_SRCS) $(RUST_NET_SRCS) $(RUST_STORAGE_SRCS) $(RUST_TELEMETRY_SRCS) $(RUST_VIRT_SRCS) $(RUST_HAL_SRCS) $(RUST_DRV_SRCS)
 ALL_ZIG_SRCS  := $(ZIG_HAL_SRCS) $(ZIG_DRV_SRCS)
 
+# ── Rust sources — Userspace: sigpkg (Sovereign Package Manager) ────────────
+RUST_SIGPKG_SRCS := usr/sigpkg/mod.rs usr/sigpkg/manager.rs usr/sigpkg/cli.rs
+ALL_USR_RUST_SRCS := $(RUST_SIGPKG_SRCS)
+
 # Rust → .a (static library per source)
 RUST_LIBS := $(patsubst %.rs, $(BUILD_DIR)/%.a, $(ALL_RUST_SRCS))
 # Zig  → .o (object file per source)
