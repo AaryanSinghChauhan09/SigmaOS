@@ -1,3 +1,12 @@
+## 🌐 SigmaOS Roadmap
+- [Master Roadmap](Roadmap)
+- [Phase 1: Foundation & Branch Unification](Phase-1-Foundation-And-Branch-Unification)
+- [Phase 2: Modularization & Profiles](Phase-2-Modularization-And-Profiles)
+- [Phase 3: Package & Update System](Phase-3-Package-And-Update-System)
+- [Phase 4: CI/CD & Testing](Phase-4-CICD-And-Testing)
+- [Phase 5: Ecosystem & Developer Tools](Phase-5-Ecosystem-And-Developer-Tools)
+- [Phase 6: Long-Term Vision](Phase-6-Long-Term-Vision)
+
 ## Getting Started
 - [Home](Home)
 - [Building from Source](Building-from-Source)
