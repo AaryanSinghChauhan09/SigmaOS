@@ -267,7 +267,17 @@ set(SIGMA_RUST_SIGPKG
     ${CMAKE_SOURCE_DIR}/usr/sigpkg/manager.rs
     ${CMAKE_SOURCE_DIR}/usr/sigpkg/cli.rs
 )
-set(ALL_USR_RUST_SRCS ${SIGMA_RUST_SIGPKG})
+
+# ── Rust Userspace: Shell & System Utilities ───────────────────────────────
+set(SIGMA_RUST_SHELL
+    ${CMAKE_SOURCE_DIR}/usr/shell/mod.rs
+    ${CMAKE_SOURCE_DIR}/usr/shell/omni_shell.rs
+    ${CMAKE_SOURCE_DIR}/usr/shell/sh.rs
+    ${CMAKE_SOURCE_DIR}/usr/shell/logd.rs
+    ${CMAKE_SOURCE_DIR}/usr/shell/sigma_env.rs
+    ${CMAKE_SOURCE_DIR}/usr/shell/update_agent.rs
+)
+set(ALL_USR_RUST_SRCS ${SIGMA_RUST_SIGPKG} ${SIGMA_RUST_SHELL})
 set(ALL_ZIG_SRCS  ${SIGMA_ZIG_HAL}  ${SIGMA_ZIG_DRIVERS})
 
 # ── Custom commands: Rust .rs → .a ────────────────────────────────────────

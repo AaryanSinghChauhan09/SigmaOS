@@ -147,7 +147,12 @@ ALL_ZIG_SRCS  := $(ZIG_HAL_SRCS) $(ZIG_DRV_SRCS)
 
 # ── Rust sources — Userspace: sigpkg (Sovereign Package Manager) ────────────
 RUST_SIGPKG_SRCS := usr/sigpkg/mod.rs usr/sigpkg/manager.rs usr/sigpkg/cli.rs
-ALL_USR_RUST_SRCS := $(RUST_SIGPKG_SRCS)
+
+# ── Rust sources — Userspace: shell & system utilities ───────────────────────
+RUST_SHELL_SRCS := usr/shell/mod.rs usr/shell/omni_shell.rs usr/shell/sh.rs \
+                   usr/shell/logd.rs usr/shell/sigma_env.rs usr/shell/update_agent.rs
+
+ALL_USR_RUST_SRCS := $(RUST_SIGPKG_SRCS) $(RUST_SHELL_SRCS)
 
 # Rust → .a (static library per source)
 RUST_LIBS := $(patsubst %.rs, $(BUILD_DIR)/%.a, $(ALL_RUST_SRCS))
