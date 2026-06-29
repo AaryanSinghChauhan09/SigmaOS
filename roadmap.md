@@ -1,78 +1,88 @@
-# SigmaOS Zenith: Master Strategic Roadmap
+# SigmaOS Master Strategic Roadmap
 
-This roadmap defines the precise staged milestones required to establish SigmaOS Zenith as the premier sovereign, AI-native operating system. It aligns with our core strategy: we will not out-Linux Linux, but we will **out-sovereign** it by aggressively adopting best-in-class paradigms from the ecosystem.
-
----
-
-## 🔧 Step 1 – Core Foundations
-
-### Expand Hardware Drivers
-* Add native sovereign support for USB 3.x, NVMe, Wi‑Fi, Bluetooth, and modern GPUs. Without this, SigmaOS can’t run on everyday hardware.
-
-### Networking Stack
-* Build a complete TCP/IP stack (IPv4/IPv6, DHCP, DNS, firewall). This is essential for internet connectivity and cloud use.
-
-### Package Manager
-* Create a sovereign package manager (like Solus’s eopkg or Nix’s nix) with reproducible builds, cryptographic verification, and rollback capabilities.
+This roadmap defines the precise development phases and system enhancements required to establish SigmaOS as the premier sovereign, AI-native operating system. It aligns with our core strategy: we will not out-Linux Linux, but we will **out-sovereign** it by aggressively adopting best-in-class modular paradigms from the ecosystem.
 
 ---
 
-## ⚡ Step 2 – Borrow from Other Distros
+## 🌐 SigmaOS Roadmap (Ubuntu-inspired)
 
-### From NixOS
-* **Declarative Configs & Reproducibility:** Let users define system states through declarative configurations and roll back easily.
+### Phase 1: Foundation & Branch Unification
+- **Single Main Branch**: Consolidate all branches into main, absorbing features from each.
+- **Core Kernel Stability**: Establish a minimal, sovereign kernel with strict modular boundaries.
+- **Driver Framework**: Define a unified driver interface (like Ubuntu’s kernel modules) but tailored for SigmaOS’s non-POSIX design.
 
-### From Fedora CoreOS / Flatcar
-* **Immutable Infrastructure:** Implement atomic updates for bulletproof reliability.
+### Phase 2: Modularization & Profiles
+- **Subsystem Separation**: Create clear modules for networking, storage, graphics, and security.
+- **OS Profiles**: Introduce build profiles (similar to Ubuntu’s flavors: Desktop, Server, Core) for SigmaOS targets:
+  - `sigma-core` (bare-metal minimal)
+  - `sigma-desktop` (UI + drivers)
+  - `sigma-cloud` (optimized for distributed silicon sovereignty)
 
-### From Rescuezilla / SystemRescue
-* **Sovereign Recovery Tools:** Build snapshot rollback capabilities and powerful forensic utilities.
+### Phase 3: Package & Update System
+- **Package Manager**: Develop a sovereign package system (Ubuntu has apt; SigmaOS needs its own).
+- **Update Channels**: Define release cadences (stable, testing, nightly).
+- **Dependency Independence**: Ensure packages don’t rely on libc/POSIX, unlike Ubuntu.
 
-### From Clear Linux
-* **Performance Profiles:** Auto‑tuning for different silicon architectures (x86, ARM, RISC‑V) to maximize bare-metal efficiency.
+### Phase 4: CI/CD & Testing
+- **Automated Builds**: Continuous integration pipelines for each profile.
+- **Regression Testing**: Borrow Ubuntu’s extensive test suites but adapt them to SigmaOS’s microkernel.
+- **Hardware Validation**: Test across diverse silicon architectures (ARM, RISC-V, x86).
 
-### From Zorin / Elementary
-* **Polished Desktop UX:** Introduce a clean UI, deep accessibility features, and intuitive defaults to attract non‑technical users.
+### Phase 5: Ecosystem & Developer Tools
+- **Documentation**: Comprehensive guides (like Ubuntu’s wiki) for developers and contributors.
+- **SDKs**: Provide SigmaOS SDKs for driver and app development.
+- **Community Contributions**: Define contribution guidelines modeled after Ubuntu’s governance.
 
-### From SteamOS
-* **GPU & Gaming Stack:** Build a gaming compatibility layer (possibly WebAssembly‑based) along with a robust graphics stack.
+### Phase 6: Long-Term Vision
+- **Sovereign Cloud Integration**: Position SigmaOS as the base for sovereign cloud deployments.
+- **Hardware Partnerships**: Collaborate with chipmakers to optimize SigmaOS drivers.
+- **Global Adoption**: Like Ubuntu’s LTS releases, SigmaOS should establish predictable sovereign release cycles.
 
----
-
-## 🚀 Step 3 – Strategic Differentiation
-
-### Sovereign Containers
-* Design a containerization framework entirely independent of legacy Linux namespaces/cgroups.
-
-### Security Framework
-* Establish a sovereign alternative to SELinux/AppArmor with strict mandatory access control and cryptographic isolation.
-
-### Community Ecosystem
-* Launch dedicated forums, Discord/Matrix channels, and clear contributor guidelines to aggressively grow developer engagement.
-
-### Specialized Branches
-* **IoT/Embedded:** Lightweight and exceptionally secure.
-* **HPC/AI:** GPU acceleration and sovereign scheduling for massive workloads.
-* **Enterprise/Cloud:** Hardened virtualization and native sovereign containers.
-
----
-
-## 🌍 Step 4 – Long‑Term Vision
-
-### AI‑Native Scheduling
-* Predictive resource allocation using ML models directly within the kernel scheduler.
-
-### Quantum‑Safe Cryptography
-* Integrate post‑quantum primitives across all communication and identity tokens for future‑proof security.
-
-### Self‑Healing Kernel
-* Autonomous recovery from kernel faults and full formal verification of kernel modules.
+> [!NOTE]
+> **Outcome**: A single, unified SigmaOS branch with modular subsystems, robust CI/CD, sovereign package management, and a roadmap that scales like Ubuntu but remains independent of POSIX/libc.
 
 ---
 
-## 👉 Immediate Execution Path
+## 🔧 Core System Enhancements
 
-To make SigmaOS practical while laying the groundwork for sovereignty-aligned innovation, we will focus our immediate engineering efforts on:
-1. **Drivers + Networking Stack:** Make SigmaOS usable on modern hardware.
-2. **Package Manager + Documentation:** Attract and retain developers.
-3. **Declarative Configs and Recovery Tools:** Begin experimenting with NixOS/Rescuezilla paradigms.
+- **Driver Abstraction Layer**: A modular framework so hardware drivers can be swapped easily (like Ubuntu’s kernel modules, but sovereign).
+- **Package Manager**: A SigmaOS-native package system (Ubuntu has apt; SigmaOS could have `sigpkg`) to install/update software without external dependencies.
+- **Service Manager**: Lightweight init system for managing processes and services (Ubuntu uses systemd; SigmaOS could design a sovereign alternative).
+
+---
+
+## 🛠️ Developer Tools
+
+- **SDKs & APIs**: Provide SigmaOS SDKs for driver development, app creation, and kernel extensions.
+- **Build Profiles**: Configurations for different targets (desktop, cloud, embedded).
+- **Cross-Compilation Toolchain**: Allow developers to build SigmaOS apps from other OS environments.
+- **Testing Framework**: Automated regression and hardware validation suites.
+
+---
+
+## 🌐 Networking & Cloud
+
+- **Networking Stack**: Sovereign TCP/IP implementation with modular protocols.
+- **Cloud Integration**: Tools for distributed computing and silicon sovereignty in cloud environments.
+- **Containerization**: A SigmaOS-native container system (Ubuntu has Docker/LXD; SigmaOS could build sovereign isolation tools).
+
+---
+
+## 🔒 Security & Sovereignty
+
+- **Secure Boot**: Ensure SigmaOS only runs verified sovereign code.
+- **Cryptographic Libraries**: Native crypto functions independent of POSIX/libc.
+- **Sandboxing**: Isolate apps and drivers for maximum sovereignty.
+- **Audit & Monitoring Tools**: Sovereign equivalents of Ubuntu’s `auditd` and `AppArmor`.
+
+---
+
+## 🖥️ User & Ecosystem
+
+- **Desktop Environment**: A sovereign UI layer (Ubuntu has GNOME/KDE; SigmaOS could design its own).
+- **Documentation Hub**: Developer and user guides, modeled after Ubuntu’s wiki.
+- **Community Contribution System**: Governance and contribution guidelines to scale development.
+- **Release Cadence**: Predictable sovereign releases (similar to Ubuntu’s LTS cycles).
+
+> [!TIP]
+> **Outcome**: SigmaOS evolves from a kernel into a full ecosystem — with modular drivers, package management, developer SDKs, networking, security, and user tools — while staying true to its sovereign, bare-metal philosophy.
