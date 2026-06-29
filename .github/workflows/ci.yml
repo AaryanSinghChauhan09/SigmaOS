@@ -73,12 +73,17 @@ jobs:
           zig build-lib drivers/audio/hda.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (hda) skipped"
           zig build-lib browser/sigma_wasm_bridge.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (wasm_bridge) skipped"
           zig build-lib drivers/display/vga.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (vga) skipped"
+          zig build-lib drivers/graphics/kms.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (kms) skipped"
+          zig build-lib drivers/unified/driver_api.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (driver_api) skipped"
 
       - name: Build Nim modules (native)
         run: |
           nim c --noMain --noLinking --cpu:amd64 config/core/declarative_engine.nim 2>&1 || echo "WARN: Nim build (declarative_engine) skipped"
           nim c --noMain --noLinking --cpu:amd64 config/core/generation_manager.nim 2>&1 || echo "WARN: Nim build (generation_manager) skipped"
           nim c --noMain --noLinking --cpu:amd64 drivers/printing/cups.nim 2>&1 || echo "WARN: Nim build (cups) skipped"
+          nim c --noMain --noLinking --cpu:amd64 ecosystem/aether.nim 2>&1 || echo "WARN: Nim build (aether) skipped"
+          nim c --noMain --noLinking --cpu:amd64 ecosystem/forge.nim 2>&1 || echo "WARN: Nim build (forge) skipped"
+          nim c --noMain --noLinking --cpu:amd64 ecosystem/utils.nim 2>&1 || echo "WARN: Nim build (utils) skipped"
 
       - name: Build Ada/SPARK modules (gnat)
         run: |

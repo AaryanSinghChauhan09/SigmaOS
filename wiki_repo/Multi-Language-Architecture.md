@@ -35,6 +35,8 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 | `drivers/ddk/ddk.rs` | `drivers/ddk/ddk_api.h`, `ddk_stub.c` |
 | `drivers/gpu/vulkan.rs` | `drivers/gpu/sigma_gpu_vulkan.cpp`, `sigma_graphics_drm.cpp`, `SovereignMesa.cpp`, `SovereignProton.cpp` |
 | `drivers/linux_distros/compat.rs` | `drivers/linux_distros/ArchDriverCompat.cpp`, `DebianDriverCompat.cpp`, `FedoraDriverCompat.cpp`, `UbuntuDriverCompat.cpp` |
+| `drivers/linux_distros/hardware/mod.rs` | Consolidated hardware shims under `drivers/linux_distros/hardware/` |
+| `ecosystem/templates/sovereign_driver_template.rs` | `ecosystem/templates/SovereignDriverTemplate.c` |
 
 ### Zig (bare-metal, no stdlib)
 
@@ -47,6 +49,8 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 | `drivers/audio/hda.zig` | `sigma_audio_hda.cpp` |
 | `browser/sigma_wasm_bridge.zig` | `browser/sigma_wasm_bridge.c` |
 | `drivers/display/vga.zig` | `drivers/display/sigma_vga.cpp`, `sigma_vga_driver.cpp` |
+| `drivers/graphics/kms.zig` | `drivers/graphics/sigma_kms.cpp`, `sigma_kms.h` |
+| `drivers/unified/driver_api.zig` | `drivers/unified/driver_api.h` |
 
 
 ### Nim (compiles to native, no stdlib/libc)
@@ -57,6 +61,9 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 | `config/core/generation_manager.nim` | `config/core/GenerationManager.cpp` |
 | `config/cli_main.nim` | `config/cli_main.cpp` |
 | `drivers/printing/cups.nim` | `drivers/printing/SovereignCUPS.cpp` |
+| `ecosystem/aether.nim` | `ecosystem/SovereignAetherAbsorption.cpp`, `SovereignAetherOrchestrator.cpp` |
+| `ecosystem/forge.nim` | `ecosystem/SovereignDevForge.cpp`, `SovereignDistroForge.cpp`, etc. |
+| `ecosystem/utils.nim` | `ecosystem/SovereignCoreUtils.cpp`, `SovereignCoreUtils.h` |
 
 ### Ada/SPARK (formally verified, no runtime exceptions)
 
