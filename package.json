@@ -17,14 +17,14 @@
     "audit": "npm audit --audit-level=moderate"
   },
   "devDependencies": {
-    "@eslint/js": "9.21.0",
+    "@eslint/js": "10.0.1",
     "@vitest/ui": "4.1.9",
-    "electron": "42.5.0",
-    "eslint": "10.5.0",
+    "electron": "42.5.1",
+    "eslint": "10.6.0",
     "eslint-plugin-security": "^4.0.1",
-    "globals": "16.0.0",
+    "globals": "17.7.0",
     "jsdom": "29.1.1",
-    "prettier": "3.5.3",
+    "prettier": "3.9.3",
     "vite": "8.1.0",
     "vitest": "4.1.9"
   }
