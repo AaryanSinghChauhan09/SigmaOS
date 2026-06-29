@@ -22,7 +22,8 @@ if (Test-Path $wiki_dir) {
     $wiki_docs = @(
         ".\docs\wiki\Sovereignty-Architecture.md",
         ".\docs\wiki\CLI-Reference.md",
-        ".\docs\wiki\CI-Workflows.md"
+        ".\docs\wiki\CI-Workflows.md",
+        ".\docs\wiki\Config-Reference.md"
     )
     foreach ($doc in $wiki_docs) {
         if (Test-Path $doc) {
