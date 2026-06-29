@@ -72,11 +72,13 @@ jobs:
           zig build-lib drivers/display/framebuffer.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (framebuffer) skipped"
           zig build-lib drivers/audio/hda.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (hda) skipped"
           zig build-lib browser/sigma_wasm_bridge.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (wasm_bridge) skipped"
+          zig build-lib drivers/display/vga.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (vga) skipped"
 
       - name: Build Nim modules (native)
         run: |
           nim c --noMain --noLinking --cpu:amd64 config/core/declarative_engine.nim 2>&1 || echo "WARN: Nim build (declarative_engine) skipped"
           nim c --noMain --noLinking --cpu:amd64 config/core/generation_manager.nim 2>&1 || echo "WARN: Nim build (generation_manager) skipped"
+          nim c --noMain --noLinking --cpu:amd64 drivers/printing/cups.nim 2>&1 || echo "WARN: Nim build (cups) skipped"
 
       - name: Build Ada/SPARK modules (gnat)
         run: |
@@ -84,6 +86,8 @@ jobs:
           gnat make -c crypto/dilithium.adb 2>&1 || echo "WARN: Ada build (dilithium) skipped"
           gnat make -c drivers/block/ahci.adb 2>&1 || echo "WARN: Ada build (ahci) skipped"
           gnat make -c drivers/block/nvme.adb 2>&1 || echo "WARN: Ada build (nvme) skipped"
+          gnat make -c drivers/net/e1000.adb 2>&1 || echo "WARN: Ada build (e1000) skipped"
+          gnat make -c drivers/net/rtl8139.adb 2>&1 || echo "WARN: Ada build (rtl8139) skipped"
 
       - name: CMake configure (TARGET_OS=${{ matrix.target_os }})
         run: |

@@ -33,6 +33,8 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 | `bin/powerd/mod.rs` | `bin/powerd/main.cpp` |
 | `drivers/core/hotplug_manager.rs` | `drivers/core/hotplug_manager.cpp` |
 | `drivers/ddk/ddk.rs` | `drivers/ddk/ddk_api.h`, `ddk_stub.c` |
+| `drivers/gpu/vulkan.rs` | `drivers/gpu/sigma_gpu_vulkan.cpp`, `sigma_graphics_drm.cpp`, `SovereignMesa.cpp`, `SovereignProton.cpp` |
+| `drivers/linux_distros/compat.rs` | `drivers/linux_distros/ArchDriverCompat.cpp`, `DebianDriverCompat.cpp`, `FedoraDriverCompat.cpp`, `UbuntuDriverCompat.cpp` |
 
 ### Zig (bare-metal, no stdlib)
 
@@ -44,6 +46,7 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 | `drivers/display/framebuffer.zig` | `sigma_fb.cpp` |
 | `drivers/audio/hda.zig` | `sigma_audio_hda.cpp` |
 | `browser/sigma_wasm_bridge.zig` | `browser/sigma_wasm_bridge.c` |
+| `drivers/display/vga.zig` | `drivers/display/sigma_vga.cpp`, `sigma_vga_driver.cpp` |
 
 
 ### Nim (compiles to native, no stdlib/libc)
@@ -53,6 +56,7 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 | `config/core/declarative_engine.nim` | `config/core/DeclarativeEngine.cpp` |
 | `config/core/generation_manager.nim` | `config/core/GenerationManager.cpp` |
 | `config/cli_main.nim` | `config/cli_main.cpp` |
+| `drivers/printing/cups.nim` | `drivers/printing/SovereignCUPS.cpp` |
 
 ### Ada/SPARK (formally verified, no runtime exceptions)
 
@@ -62,6 +66,8 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 | `crypto/dilithium.ads` + `dilithium.adb` | `crypto/SovereignDilithium5.cpp` |
 | `drivers/block/ahci.ads` + `ahci.adb` | `drivers/block/ahci_shard.cpp` |
 | `drivers/block/nvme.ads` + `nvme.adb` | `drivers/block/nvme_shard.cpp` |
+| `drivers/net/e1000.ads` + `e1000.adb` | `drivers/net/sigma_e1000.cpp` |
+| `drivers/net/rtl8139.ads` + `rtl8139.adb` | `drivers/net/sigma_rtl8139.cpp` |
 
 ---
 
