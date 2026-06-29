@@ -8,13 +8,13 @@ By compiling directly into the microkernel memory manager, it absorbs the defini
 
 ## 🚀 Architectural Design & Parity
 
-| Feature Domain | SigmaOS S-LBU | Alpine Linux LBU | Linux initramfs | Windows PE |
-| :--- | :--- | :--- | :--- | :--- |
-| **Purity** | Bare-metal C++17 | Alpine POSIX sh | Linux kernel script | Closed-source NT |
-| **Storage Dependency** | Diskless RAM (No HD) | Diskless RAM | Memory RAM disk | Memory RAM disk |
-| **Commit Target** | Writable Boot Flash | USB/SD Flash media | Read-only image | RAM execution only |
-| **Security Layer** | PQC Merkle-root hashes | sha256 checksums | Unsigned cpio | Microsoft Cabinet auth |
-| **Restore Model** | Sub-millisecond direct extract | apk-tools extraction | kernel unpack | winpe initialization |
+| Feature Domain | SigmaOS S-LBU | Alpine Linux LBU | Linux initramfs | Windows PE | 
+| :--- | :--- | :--- | :--- | :--- | 
+| **Purity** | Bare-metal C++17 | Alpine POSIX sh | Linux kernel script | Closed-source NT | 
+| **Storage Dependency** | Diskless RAM (No HD) | Diskless RAM | Memory RAM disk | Memory RAM disk | 
+| **Commit Target** | Writable Boot Flash | USB/SD Flash media | Read-only image | RAM execution only | 
+| **Security Layer** | PQC Merkle-root hashes | sha256 checksums | Unsigned cpio | Microsoft Cabinet auth | 
+| **Restore Model** | Sub-millisecond direct extract | apk-tools extraction | kernel unpack | winpe initialization | 
 
 ---
 

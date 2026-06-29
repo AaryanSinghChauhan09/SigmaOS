@@ -118,12 +118,12 @@ Target throughput (KEM operations/sec):
 
 ## 6. Unified API Expansion Roadmap
 
-| Phase | Target Subsystem | Improvement Feature | Expected Benefit |
-|---|---|---|---|
-| Phase I | SovereignBoot | Async concurrent shard ignition | Boot time < 400ms |
-| Phase II | SovereignVideo | SIMD-accelerated non-linear edits | 4x faster HEVC transcode |
-| Phase III | SovereignCloudFS | Encrypted multi-node block syncing | Zero-overhead distributed replication |
-| Phase IV | S-ERA / S-CCF | High-performance batch auditing | Real-time analysis for corporate registers |
+| Phase | Target Subsystem | Improvement Feature | Expected Benefit | 
+| --- | --- | --- | --- | 
+| Phase I | SovereignBoot | Async concurrent shard ignition | Boot time < 400ms | 
+| Phase II | SovereignVideo | SIMD-accelerated non-linear edits | 4x faster HEVC transcode | 
+| Phase III | SovereignCloudFS | Encrypted multi-node block syncing | Zero-overhead distributed replication | 
+| Phase IV | S-ERA / S-CCF | High-performance batch auditing | Real-time analysis for corporate registers | 
 
 ---
 
@@ -148,14 +148,14 @@ Target throughput (KEM operations/sec):
 
 ## 8. Performance Benchmark Targets
 
-| Metric | Ubuntu 24.04 | Fedora 41 | SigmaOS Target |
-|---|---|---|---|
-| Boot time (NVMe SSD) | 43s | 9s | **< 2s** |
-| Idle RAM (desktop) | 847 MB | 900 MB | **< 150 MB** |
-| Context switch | ~1,000 ns | ~300 ns | **< 50 ns** |
-| Kyber-1024 ops/sec | N/A | N/A | **5.8M ops/sec** |
-| Kernel CVE patch | Reboot | Reboot | **No reboot (kpatch)** |
-| App launch (cold) | 1.5s | 1.2s | **< 0.5s** |
+| Metric | Ubuntu 24.04 | Fedora 41 | SigmaOS Target | 
+| --- | --- | --- | --- | 
+| Boot time (NVMe SSD) | 43s | 9s | **< 2s** | 
+| Idle RAM (desktop) | 847 MB | 900 MB | **< 150 MB** | 
+| Context switch | ~1,000 ns | ~300 ns | **< 50 ns** | 
+| Kyber-1024 ops/sec | N/A | N/A | **5.8M ops/sec** | 
+| Kernel CVE patch | Reboot | Reboot | **No reboot (kpatch)** | 
+| App launch (cold) | 1.5s | 1.2s | **< 0.5s** | 
 
 ---
 
@@ -168,14 +168,14 @@ Traditional Linux driver:   crash → kernel panic → data loss
 SigmaOS SDF driver:         crash → sigma-heal restarts it → zero data loss
 ```
 
-| Priority | Driver | Target Hardware | Phase |
-|----------|--------|-----------------|-------|
-| 🔴 Critical | GPU DRM/KMS | Intel i915, AMD amdgpu, VirtIO-GPU | Phase 2 |
-| 🔴 Critical | Wi-Fi 802.11ax | Intel iwlwifi, MediaTek mt7921, rtl8xxxu | Phase 1 |
-| 🟠 High | Bluetooth 5.3 | USB HCI, Intel AX, Qualcomm QCA | Phase 2 |
-| 🟠 High | ARM64 BSP | Raspberry Pi 4/5, JioBook | Phase 5 |
-| 🟡 Medium | RISC-V | StarFive VisionFive 2 | Phase 5 |
-| 🟢 Low | Neural accelerators | Qualcomm Hexagon, Hailo-8 | Phase 6 |
+| Priority | Driver | Target Hardware | Phase | 
+| ---------- | -------- | ----------------- | ------- | 
+| 🔴 Critical | GPU DRM/KMS | Intel i915, AMD amdgpu, VirtIO-GPU | Phase 2 | 
+| 🔴 Critical | Wi-Fi 802.11ax | Intel iwlwifi, MediaTek mt7921, rtl8xxxu | Phase 1 | 
+| 🟠 High | Bluetooth 5.3 | USB HCI, Intel AX, Qualcomm QCA | Phase 2 | 
+| 🟠 High | ARM64 BSP | Raspberry Pi 4/5, JioBook | Phase 5 | 
+| 🟡 Medium | RISC-V | StarFive VisionFive 2 | Phase 5 | 
+| 🟢 Low | Neural accelerators | Qualcomm Hexagon, Hailo-8 | Phase 6 | 
 
 `sigma-dna` reads CPUID, DMI, ACPI, and PCI topology at boot to auto-select the right driver set and scheduler tuning for detected silicon.
 
@@ -212,11 +212,11 @@ sigma-boot.efi (ML-DSA signed)
 
 **Post-quantum default:**
 
-| Algorithm | Standard | Use |
-|-----------|----------|-----|
-| ML-KEM-1024 | FIPS 203 | TLS key exchange, disk encryption |
-| ML-DSA-87 | FIPS 204 | Package + boot chain signing |
-| SLH-DSA-SHAKE-256 | FIPS 205 | Code signing (hash-based) |
+| Algorithm | Standard | Use | 
+| ----------- | ---------- | ----- | 
+| ML-KEM-1024 | FIPS 203 | TLS key exchange, disk encryption | 
+| ML-DSA-87 | FIPS 204 | Package + boot chain signing | 
+| SLH-DSA-SHAKE-256 | FIPS 205 | Code signing (hash-based) | 
 
 ---
 
@@ -239,7 +239,7 @@ Each of the 600 shards has:
 sigma-pkg install sigma-kpatch-CVE-2026-XXXX
 # → patch Dilithium3-verified
 # → function-level binary patch applied to live kernel
-# No reboot. No downtime.
+# No reboot. No downtime
 ```
 
 **Profile hot-swap:**
@@ -256,11 +256,11 @@ sigma-svc profile switch --to container-host  # max cgroup + no GUI
 
 ### Application Layer
 
-| API Surface | Description |
-|-------------|-------------|
-| sigma-syscall ABI | Direct syscall interface — C/C++/Rust |
-| sigma-sdk | High-level C++ SDK with India Stack + profession bindings |
-| sigma-web API | 24 browser-accessible Web API drivers |
+| API Surface | Description | 
+| ------------- | ------------- | 
+| sigma-syscall ABI | Direct syscall interface — C/C++/Rust | 
+| sigma-sdk | High-level C++ SDK with India Stack + profession bindings | 
+| sigma-web API | 24 browser-accessible Web API drivers | 
 
 ABI stability is CI-enforced: `make check-abi` fails if any `SIGMA_STABLE` symbol changes signature.
 
@@ -272,12 +272,12 @@ ABI stability is CI-enforced: `make check-abi` fails if any `SIGMA_STABLE` symbo
 
 ### Energy Efficiency
 
-| Scenario | Linux reference | SigmaOS target |
-|----------|-----------------|----------------|
-| Idle desktop (screen off) | ~4.5 W | **< 2.5 W** |
-| sigma-ultra idle (Pi Zero) | ~0.8 W | **< 0.4 W** |
-| Video playback 1080p H.265 | ~8 W | **< 5 W** (HW decode) |
-| sigma-ai inference 7B Q4 | ~15 W | **< 10 W** (NPU routing) |
+| Scenario | Linux reference | SigmaOS target | 
+| ---------- | ----------------- | ---------------- | 
+| Idle desktop (screen off) | ~4.5 W | **< 2.5 W** | 
+| sigma-ultra idle (Pi Zero) | ~0.8 W | **< 0.4 W** | 
+| Video playback 1080p H.265 | ~8 W | **< 5 W** (HW decode) | 
+| sigma-ai inference 7B Q4 | ~15 W | **< 10 W** (NPU routing) | 
 
 Power stack: `sigma-power-manager.cpp` → ACPI P/C-states → silicon-aware `sigma-perf-governor` → per-device runtime PM → `sigma-thermal` proactive throttling.
 

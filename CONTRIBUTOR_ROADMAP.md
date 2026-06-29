@@ -15,9 +15,9 @@ This roadmap formalizes the remaining gaps between SigmaOS Zenith and legacy com
 | **Containers** | Fedora CoreOS | Sovereign Container Orchestrator (K8s equivalent) | `SovereignOrchestrator` | 
 | **Rolling** | Arch / Solus | Incremental Shard Delta Updates | `sigma-pkg update --delta` | 
 | **Enterprise** | Ubuntu | Hardware Regression Harness | `SovereignRegression` | 
-| **File Systems** | Btrfs / ZFS | Sovereign CoW & Journaling Filesystem | `SovereignFS` |
-| **Networking** | Linux TCP/IP | Sovereign IPv6, Mesh, & VPN Stack | `SovereignNet` |
-| **Compatibility**| WSL / Wine | POSIX Translation Shims (Opt-In) | `SovereignCompat` | 
+| **File Systems** | Btrfs / ZFS | Sovereign CoW & Journaling Filesystem | `SovereignFS` | 
+| **Networking** | Linux TCP/IP | Sovereign IPv6, Mesh, & VPN Stack | `SovereignNet` | 
+| **Compatibility** | WSL / Wine | POSIX Translation Shims (Opt-In) | `SovereignCompat` | 
 
 ## 🚀 Development Phases
 
@@ -54,4 +54,3 @@ This roadmap formalizes the remaining gaps between SigmaOS Zenith and legacy com
 ---
 
 ### Build the future of sovereignty. Join the lattice
-

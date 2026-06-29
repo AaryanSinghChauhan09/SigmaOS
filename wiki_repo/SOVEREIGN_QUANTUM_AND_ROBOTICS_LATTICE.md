@@ -1,7 +1,7 @@
 # Sovereign Quantum & Robotics Lattice
 
-> **Specification Version:** 15.2-FINAL  
-> **Classification:** Advanced Specialized Computational Subsystem Manifest  
+> **Specification Version:** 15.2-FINAL
+> **Classification:** Advanced Specialized Computational Subsystem Manifest
 > **Execution Scope:** Bare-Metal Microkernel Shards (`tools/sigma_quantum_simulator.cpp`, `tools/sigma_robotics_planner.cpp`, `tools/sigma_sensor_fusion.cpp`)
 
 ---
@@ -45,13 +45,13 @@ public:
     explicit SovereignQuantumSimulator(sigma_usize qubits) : m_num_qubits(qubits) {
         sigma_usize states = 1ULL << qubits;
         m_state_vector.resize(states, {0.0, 0.0});
-        m_state_vector[0] = {1.0, 0.0}; // Initialize to |0...0>
+        m_state_vector[0] = {1.0, 0.0}; // Initialize to | 0...0>
     }
 
     void apply_hadamard(sigma_usize target_qubit) {
         sigma_usize states = 1ULL << m_num_qubits;
         double inv_sqrt2 = 1.0 / std::sqrt(2.0);
-        
+
         for (sigma_usize i = 0; i < states; i++) {
             if ((i & (1ULL << target_qubit)) == 0) {
                 sigma_usize j = i | (1ULL << target_qubit);
@@ -135,5 +135,5 @@ public:
   * *Fix Strategy:* S-ZFS VFS wrappers timestamp incoming peripheral packets at the exact hardware interrupt level (`sigma_timestamp()`), allowing the EKF engine to interpolate exact temporal offsets.
 
 ---
-> **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED  
+> **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED
 > *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

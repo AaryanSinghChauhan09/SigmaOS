@@ -1,6 +1,6 @@
 # SigmaCC Compiler & Toolchain
 
-The **SigmaCC** toolchain is a sovereign wrapper around standard compiler technologies (like LLVM/Clang) that strictly enforces SigmaOS compilation requirements. 
+The **SigmaCC** toolchain is a sovereign wrapper around standard compiler technologies (like LLVM/Clang) that strictly enforces SigmaOS compilation requirements.
 
 SigmaOS rejects POSIX/libc dependencies at the kernel level, meaning binaries must be compiled freestanding, with strict memory management policies and custom linker alignments to respect SigmaOS privilege rings.
 

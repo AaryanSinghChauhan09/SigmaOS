@@ -1,7 +1,7 @@
 # Master Enterprise SLA & Compliance Matrix
 
-> **Specification Version:** 15.2-FINAL  
-> **Classification:** Enterprise Governance & Regulatory Compliance Manifest  
+> **Specification Version:** 15.2-FINAL
+> **Classification:** Enterprise Governance & Regulatory Compliance Manifest
 > **Execution Scope:** Ring-3 Userland Daemons (`tools/sigma_legal_compliance_engine.cpp`, `tools/sigma_enterprise_sla_manager.cpp`, `tools/sigma_telemetry_shield.cpp`)
 
 ---
@@ -48,7 +48,7 @@ class SovereignLegalComplianceEngine {
     std::vector<ComplianceRegime> m_active_regimes;
 
 public:
-    explicit SovereignLegalComplianceEngine(const std::vector<ComplianceRegime>& regimes) 
+    explicit SovereignLegalComplianceEngine(const std::vector<ComplianceRegime>& regimes)
         : m_active_regimes(regimes) {}
 
     bool audit_storage_encryption(const std::string& mount_point) {
@@ -115,7 +115,7 @@ class SovereignTelemetryShield {
 public:
     static std::string sanitize_outgoing_log(const std::string& raw_log_line) {
         // Regex pattern to redact potential SSNs, Credit Cards, or unencrypted IP addresses
-        std::regex pii_pattern(r"\b(\d{3}-\d{2}-\d{4}|\d{4}-\d{4}-\d{4}-\d{4})\b");
+        std::regex pii_pattern(r"\b(\d{3}-\d{2}-\d{4} | \d{4}-\d{4}-\d{4}-\d{4})\b");
         return std::regex_replace(raw_log_line, pii_pattern, "[REDACTED_BY_SIGMA_SHIELD]");
     }
 };
@@ -131,5 +131,5 @@ public:
   * *Fix Strategy:* The CFS scheduler enforces strict **Bandwidth Capping (Cgroups v2)**, guaranteeing that Ring-0 kernel workers always preserve a minimum 15% guaranteed CPU allocation quantum regardless of userland SLA escalations.
 
 ---
-> **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED  
+> **Verification Status:** BUILD-VERIFIED | 100% SILICON PURITY | PARITY ACHIEVED
 > *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

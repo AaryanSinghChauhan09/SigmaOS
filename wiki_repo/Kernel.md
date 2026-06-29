@@ -38,7 +38,7 @@ Source: `kernel/core/sched/sigma_sched_sovereign.cpp`
 
 **VMM**: 4-level paging (PML4→PDPT→PD→PT). Kernel at higher half (`0xFFFFFFFF80000000+`). Each process gets its own PML4 root.
 
-**ASLR** (`kernel/mm/sigma_aslr.cpp`): 42-bit per-region entropy on x86_64. Every `exec()` randomises stack, heap, mmap, and vDSO bases independently. W^X enforcement: `PROT_WRITE|PROT_EXEC` is denied with `-EPERM`.
+**ASLR** (`kernel/mm/sigma_aslr.cpp`): 42-bit per-region entropy on x86_64. Every `exec()` randomises stack, heap, mmap, and vDSO bases independently. W^X enforcement: `PROT_WRITE | PROT_EXEC` is denied with `-EPERM`.
 
 **CoW pages**: Fork is O(1) — child shares parent's page tables with W bits cleared. Physical copy on first write.
 
@@ -113,12 +113,12 @@ The `SIGMA_BROKEN_SUBSYSTEMS` list in the Makefile emits warnings for every know
 
 ## Known Stubs (tracked)
 
-| Subsystem | Status | Issue |
-|---|---|---|
-| `sigma-jail` | Stub → **fixed** (Round 3) | Real namespace isolation via `sigma_namespace.cpp` |
-| `sigma-mac` | Stub → **partially fixed** | AVC cache added; policy evaluation still basic |
-| `sigma-cryptfs` | **STUB** | `derive_key()` writes zero bytes — filesystem NOT encrypted |
-| `kernel/core/*.cpp` | **Missing** | Scheduler/MM/syscall source files not committed |
+| Subsystem | Status | Issue | 
+| --- | --- | --- | 
+| `sigma-jail` | Stub → **fixed** (Round 3) | Real namespace isolation via `sigma_namespace.cpp` | 
+| `sigma-mac` | Stub → **partially fixed** | AVC cache added; policy evaluation still basic | 
+| `sigma-cryptfs` | **STUB** | `derive_key()` writes zero bytes — filesystem NOT encrypted | 
+| `kernel/core/*.cpp` | **Missing** | Scheduler/MM/syscall source files not committed | 
 
 The `sigmad/healthd` daemon surfaces all stubs at runtime — run `sigmactl health` to see current status.
 

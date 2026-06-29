@@ -425,7 +425,7 @@ typedef struct {
 int sigma_cryptfs_mount_root(const char* device_path);
 
 // Derive encryption key from passphrase
-int sigma_cryptfs_derive_key(const char* passphrase, 
+int sigma_cryptfs_derive_key(const char* passphrase,
                                const uint8_t* salt, size_t salt_len,
                                uint8_t* key_out);
 
@@ -828,7 +828,7 @@ class EnterpriseDashboard {
   // Connect to telemetry stream
   connect() {
     this.eventSource = new EventSource('/api/telemetry/stream');
-    
+
     this.eventSource.onmessage = (event) => {
       const metric = JSON.parse(event.data);
       this.updateMetric(metric);
@@ -919,7 +919,7 @@ class CloudSync {
   async initiateOAuth(provider) {
     const authUrl = await this.getAuthUrl(provider);
     const authWindow = window.open(authUrl, '_blank', 'width=600,height=800');
-    
+
     // Wait for callback
     return new Promise((resolve, reject) => {
       window.addEventListener('message', (event) => {
@@ -945,7 +945,7 @@ class CloudSync {
     this.status = status;
     const indicator = document.getElementById('sync-status');
     indicator.className = `sync-${status.toLowerCase()}`;
-    indicator.title = error || status;
+    indicator.title = error | | status;
   }
 }
 ```
@@ -970,7 +970,7 @@ class SigmaAIAssistant {
   // Process natural language query (2s target)
   async search(query) {
     const startTime = Date.now();
-    
+
     try {
       // Try AI-powered search
       const results = await fetch('http://localhost:17392/search', {
@@ -978,7 +978,7 @@ class SigmaAIAssistant {
         body: JSON.stringify({ query }),
         headers: { 'Content-Type': 'application/json' }
       }).then(r => r.json());
-      
+
       return this.rankResults(results);
     } catch (error) {
       // Fallback to text-match search
@@ -999,7 +999,7 @@ class SigmaAIAssistant {
       ...this.getFileSystemPaths(),
       ...this.getSystemSettings()
     ];
-    return sources.filter(item => 
+    return sources.filter(item =>
       item.name.toLowerCase().includes(query.toLowerCase())
     );
   }
@@ -1032,9 +1032,9 @@ type ClipboardDaemon struct {
 func (d *ClipboardDaemon) Write(data ClipboardData) {
     d.mu.Lock()
     defer d.mu.Unlock()
-    
+
     d.data = &data
-    
+
     // Broadcast to all registered clients
     for _, ch := range d.clients {
         select {
@@ -1048,18 +1048,18 @@ func (d *ClipboardDaemon) Write(data ClipboardData) {
 func (d *ClipboardDaemon) Read() (*ClipboardData, error) {
     d.mu.RLock()
     defer d.mu.RUnlock()
-    
+
     if d.data == nil {
         return nil, errors.New("clipboard empty")
     }
-    
+
     return d.data, nil
 }
 
 func (d *ClipboardDaemon) Register(clientId string) chan ClipboardData {
     d.mu.Lock()
     defer d.mu.Unlock()
-    
+
     ch := make(chan ClipboardData, 10)
     d.clients[clientId] = ch
     return ch
@@ -1094,7 +1094,7 @@ func (d *ClipboardDaemon) Register(clientId string) chan ClipboardData {
     "capabilities": {
       "type": "array",
       "items": {
-        "enum": ["filesystem.read", "filesystem.write", "network", 
+        "enum": ["filesystem.read", "filesystem.write", "network",
                  "process.spawn", "clipboard", "notification"]
       }
     },
@@ -1133,21 +1133,21 @@ class AppStore {
   // Install application with signature verification
   async install(appId) {
     const app = await fetch(`${this.registryUrl}/apps/${appId}`).then(r => r.json());
-    
+
     // Download package
     const packageData = await fetch(app.downloadUrl).then(r => r.arrayBuffer());
-    
+
     // Verify signature
     const signatureValid = await this.verifySignature(
       packageData,
       app.signature,
       app.publicKey
     );
-    
+
     if (!signatureValid) {
       throw new Error('Package signature verification failed');
     }
-    
+
     // Install
     await this.extractPackage(packageData, app.name);
     this.installedApps.set(app.name, app);
@@ -1161,7 +1161,7 @@ class AppStore {
       false,
       ['verify']
     );
-    
+
     return await crypto.subtle.verify(
       'RSASSA-PKCS1-v1_5',
       key,
@@ -1349,7 +1349,7 @@ interface PackageManifest {
   publicKey: string;
 }
 
-type Capability = 
+type Capability =
   | 'filesystem.read'
   | 'filesystem.write'
   | 'network'
@@ -1591,7 +1591,7 @@ jobs:
       - name: Run unit tests
         run: make test-kernel
       - name: Verify no glibc symbols
-        run: nm build/sigma-kernel | grep -q GLIBC && exit 1 || exit 0
+        run: nm build/sigma-kernel | grep -q GLIBC && exit 1 | | exit 0
       - name: Coverage report
         run: gcov kernel/**/*.c
 
@@ -1611,7 +1611,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Start daemons
-        run: |
+        run: | 
           ./sigmad-process &
           ./sigmad-clipboard &
           ./sigmad-ai &
@@ -2211,46 +2211,46 @@ graph TD
     P0A[Req 1: IDT Init] --> P0B[Req 2: Ring 3 Transition]
     P0A --> P0C[Req 3: CryptFS Mount]
     P0A --> P0D[Req 4: PCI Enumeration]
-    
+
     B23[Bug 23: PID 1 Watchdog] --> P0A
     B27[Bug 27: Freestanding Build] --> P0A
     B29[Bug 29: Complete Sources] --> P0A
-    
+
     P0B --> P1A[Req 5: Window Manager]
     P0C --> P1A
     P0D --> P1A
-    
+
     P1A --> P1B[Req 6: SigmaNotes Preview]
     P1A --> P1C[Req 7: SigmaCode IDE]
     P1A --> P1D[Req 8: Notification Center]
     P1A --> P1E[Req 9: Lock Screen]
-    
+
     P1C --> P2A[Req 10: SigmaTerm PTY]
     P1B --> P2B[Req 11: SigmaNotes AI]
-    
+
     P2B --> P2C[Req 12: SigmaPaint Layers]
     P2A --> P2D[Req 13: Neural UI Engine]
     P2D --> P2E[Req 14: Enterprise Dashboard]
-    
+
     P2A --> P3A[Req 15: Zero-Install Sandbox]
     P2E --> P3B[Req 16: Cloud Sync]
     P2D --> P3C[Req 17: SigmaAI Assistant]
     P1D --> P3D[Req 18: Cross-App Clipboard]
-    
+
     P3A --> P4A[Req 19: App SDK]
     P3A --> P4B[Req 20: App Store Backend]
     P4A --> P4B
     P4B --> P4C[Req 21: GitHub/CI Hygiene]
     P4A --> P4D[Req 22: Documentation Wiki]
-    
+
     B24[Bug 24: ZeroTrust Strings] --> P3A
     B25[Bug 25: Revoked Workload] --> P3A
     B31[Bug 31: Firewall Inspection] --> P3A
     B40[Bug 40: Conntrack Counter] --> P3A
-    
+
     B26[Bug 26: Extension Promises] --> P1A
     B35[Bug 35: XSS Prevention] --> P1A
-    
+
     B30[Bug 30: CI Tests] --> P4C
     B39[Bug 39: CI Paths] --> P4C
 ```
@@ -2426,7 +2426,7 @@ The following requirements contain testable properties where behavior varies mea
 
 For the 18 properties above, implement property-based tests using the following configuration:
 
-**Test Library:** 
+**Test Library:**
 - C/C++ kernel code: Use [theft](https://github.com/silentbicycle/theft) or [rapidcheck](https://github.com/emil-e/rapidcheck)
 - JavaScript web shell: Use [fast-check](https://github.com/dubzzz/fast-check)
 - Go daemons: Use [gopter](https://github.com/leanovate/gopter)
@@ -2434,7 +2434,7 @@ For the 18 properties above, implement property-based tests using the following 
 **Test Configuration:**
 - **Minimum iterations**: 100 per property test
 - **Test tag format**: `Feature: sigmaos-roadmap, Property N: [property title]`
-- **Generator guidance**: 
+- **Generator guidance**:
   - Property 1: Generate exception vectors 0-31
   - Property 2: Generate 10-100 mock process structures with unique IDs
   - Property 5: Generate drag deltas in range [-1000, 1000] pixels
@@ -2456,35 +2456,35 @@ For the 18 properties above, implement property-based tests using the following 
 // Generator for random strings and buffer sizes
 static enum theft_trial_res test_bounded_copy_never_overflows(
     struct theft* t, void* arg1) {
-    
+
     // Generate random input string (0-1000 bytes)
     size_t input_len = theft_random_bits(t, 10);  // 0-1023
     char* input = malloc(input_len + 1);
     theft_random_string(t, input, input_len);
-    
+
     // Generate random buffer size (16-512 bytes)
     size_t buffer_size = 16 + theft_random_bits(t, 9);  // 16-527
     char* buffer = calloc(buffer_size, 1);
-    
+
     // Set canary after buffer
     const uint32_t canary = 0xDEADBEEF;
     uint32_t* canary_ptr = (uint32_t*)(buffer + buffer_size);
     *canary_ptr = canary;
-    
+
     // Call bounded copy
     zerotrust_bounded_strcpy(buffer, input, buffer_size);
-    
+
     // Verify no overflow (canary intact)
     bool canary_intact = (*canary_ptr == canary);
-    
+
     // Verify null termination
     bool null_terminated = (buffer[buffer_size - 1] == '\0');
-    
+
     free(input);
     free(buffer);
-    
-    return (canary_intact && null_terminated) 
-        ? THEFT_TRIAL_PASS 
+
+    return (canary_intact && null_terminated)
+        ? THEFT_TRIAL_PASS
         : THEFT_TRIAL_FAIL;
 }
 
@@ -2495,7 +2495,7 @@ int main(void) {
         .trials = 100,
         .seed = seed
     };
-    
+
     enum theft_run_res res = theft_run(&config, test_bounded_copy_never_overflows);
     return (res == THEFT_RUN_PASS) ? 0 : 1;
 }
@@ -2510,4 +2510,3 @@ This design document specifies the complete technical implementation for the Sig
 The phased implementation plan provides a logical dependency graph with clear milestones, culminating in v1.0.0 with a production-grade, bootable operating system featuring a polished web shell, complete applications, advanced platform capabilities, and a developer ecosystem with SDK and app store.
 
 Property-based testing is applied judiciously to the 18 requirements where input variation reveals edge cases and universal properties can be verified, while the majority of requirements are tested through unit tests, integration tests, end-to-end tests, and security tests appropriate to their nature as infrastructure, UI, configuration, or side-effect operations.
-

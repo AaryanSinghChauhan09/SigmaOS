@@ -78,14 +78,14 @@ blocked until Phase 0 completes (`sigma_sched`, `sigma_mm`, `sigma_syscall_dispa
 
 These are not compat-layer tasks — they are kernel tasks that unblock everything.
 
-| Task | File | Status |
-|------|------|--------|
-| Kernel scheduler (MLFQ) | `kernel/core/sigma_sched.cpp` | `[ ]` |
-| Memory manager (buddy+slab+VMM) | `kernel/core/sigma_mm.cpp` | `[ ]` |
-| Syscall dispatch (30 calls) | `kernel/core/sigma_syscall_dispatch.cpp` | `[ ]` |
-| Virtual memory manager (mmap/munmap/mprotect) | `kernel/mm/sigma_vmm.cpp` | `[ ]` |
-| Process creation (fork/exec model) | `kernel/core/sigma_proc.cpp` | `[ ]` |
-| Dynamic linker foundation | `userland/ldso/sigma_ldso.cpp` | `[ ]` |
+| Task | File | Status | 
+| ------ | ------ | -------- | 
+| Kernel scheduler (MLFQ) | `kernel/core/sigma_sched.cpp` | `[ ]` | 
+| Memory manager (buddy+slab+VMM) | `kernel/core/sigma_mm.cpp` | `[ ]` | 
+| Syscall dispatch (30 calls) | `kernel/core/sigma_syscall_dispatch.cpp` | `[ ]` | 
+| Virtual memory manager (mmap/munmap/mprotect) | `kernel/mm/sigma_vmm.cpp` | `[ ]` | 
+| Process creation (fork/exec model) | `kernel/core/sigma_proc.cpp` | `[ ]` | 
+| Dynamic linker foundation | `userland/ldso/sigma_ldso.cpp` | `[ ]` | 
 
 **Exit gate:** `sigma-compat exec hello.exe` reaches the PE entry point in QEMU.
 
@@ -153,39 +153,39 @@ include/compat/sigma_nt_syscalls.h           ← NtXxx function declarations
 
 ### NT→SigmaOS syscall mapping (priority order)
 
-| NT syscall | Maps to | Notes |
-|------------|---------|-------|
-| `NtReadFile` | `sigma_sys_read` | Handle → fd translation |
-| `NtWriteFile` | `sigma_sys_write` | Handle → fd |
-| `NtCreateFile` | `sigma_sys_open` | ObjectAttributes path extraction |
-| `NtClose` | `sigma_sys_close` | Handle table |
-| `NtAllocateVirtualMemory` | `sigma_sys_mmap` | MEM_COMMIT / MEM_RESERVE |
-| `NtFreeVirtualMemory` | `sigma_sys_munmap` | |
-| `NtProtectVirtualMemory` | `sigma_sys_mprotect` | PAGE_* → PROT_* |
-| `NtCreateProcess` | `sigma_sys_fork` + `exec` | |
-| `NtCreateThread` | `sigma_sys_thread_create` | TEB setup |
-| `NtTerminateProcess` | `sigma_sys_exit` | |
-| `NtTerminateThread` | `sigma_sys_thread_exit` | |
-| `NtQuerySystemInformation` | sigma-dna probe | SystemBasicInfo etc. |
-| `NtQueryInformationProcess` | sigma_proc_query | PEB pointer |
-| `NtQueryInformationThread` | sigma_thread_query | TEB pointer |
-| `NtSetInformationThread` | sigma_thread_set | ThreadBasicInfo |
-| `NtCreateSection` | `sigma_sys_mmap` | File-backed mapping |
-| `NtMapViewOfSection` | `sigma_sys_mmap` | |
-| `NtUnmapViewOfSection` | `sigma_sys_munmap` | |
-| `NtCreateKey` | sigma-reg create | Registry |
-| `NtOpenKey` | sigma-reg open | Registry |
-| `NtQueryValueKey` | sigma-reg query | Registry |
-| `NtSetValueKey` | sigma-reg set | Registry |
-| `NtCreateMutant` | sigma_mutex_create | |
-| `NtCreateEvent` | sigma_event_create | |
-| `NtWaitForSingleObject` | sigma_wait | Handles → sigma-bus |
-| `NtWaitForMultipleObjects` | sigma_wait_multi | |
-| `NtDelayExecution` | sigma_nanosleep | |
-| `NtQueryPerformanceCounter` | sigma_tsc_read | RDTSC-backed |
-| `NtGetTickCount64` | sigma_uptime_ms | |
-| `RtlAllocateHeap` | sigma_slab_alloc | NT heap → sigma slab |
-| `RtlFreeHeap` | sigma_slab_free | |
+| NT syscall | Maps to | Notes | 
+| ------------ | --------- | ------- | 
+| `NtReadFile` | `sigma_sys_read` | Handle → fd translation | 
+| `NtWriteFile` | `sigma_sys_write` | Handle → fd | 
+| `NtCreateFile` | `sigma_sys_open` | ObjectAttributes path extraction | 
+| `NtClose` | `sigma_sys_close` | Handle table | 
+| `NtAllocateVirtualMemory` | `sigma_sys_mmap` | MEM_COMMIT / MEM_RESERVE | 
+| `NtFreeVirtualMemory` | `sigma_sys_munmap` | | 
+| `NtProtectVirtualMemory` | `sigma_sys_mprotect` | PAGE_* → PROT_* | 
+| `NtCreateProcess` | `sigma_sys_fork` + `exec` | | 
+| `NtCreateThread` | `sigma_sys_thread_create` | TEB setup | 
+| `NtTerminateProcess` | `sigma_sys_exit` | | 
+| `NtTerminateThread` | `sigma_sys_thread_exit` | | 
+| `NtQuerySystemInformation` | sigma-dna probe | SystemBasicInfo etc. | 
+| `NtQueryInformationProcess` | sigma_proc_query | PEB pointer | 
+| `NtQueryInformationThread` | sigma_thread_query | TEB pointer | 
+| `NtSetInformationThread` | sigma_thread_set | ThreadBasicInfo | 
+| `NtCreateSection` | `sigma_sys_mmap` | File-backed mapping | 
+| `NtMapViewOfSection` | `sigma_sys_mmap` | | 
+| `NtUnmapViewOfSection` | `sigma_sys_munmap` | | 
+| `NtCreateKey` | sigma-reg create | Registry | 
+| `NtOpenKey` | sigma-reg open | Registry | 
+| `NtQueryValueKey` | sigma-reg query | Registry | 
+| `NtSetValueKey` | sigma-reg set | Registry | 
+| `NtCreateMutant` | sigma_mutex_create | | 
+| `NtCreateEvent` | sigma_event_create | | 
+| `NtWaitForSingleObject` | sigma_wait | Handles → sigma-bus | 
+| `NtWaitForMultipleObjects` | sigma_wait_multi | | 
+| `NtDelayExecution` | sigma_nanosleep | | 
+| `NtQueryPerformanceCounter` | sigma_tsc_read | RDTSC-backed | 
+| `NtGetTickCount64` | sigma_uptime_ms | | 
+| `RtlAllocateHeap` | sigma_slab_alloc | NT heap → sigma slab | 
+| `RtlFreeHeap` | sigma_slab_free | | 
 
 ### Handle table
 Windows uses kernel handles (integers) for all objects — files, threads, events,
@@ -250,31 +250,31 @@ runtime/compat/win32/kernel32/sigma_kernel32_error.cpp     ← GetLastError, Set
 
 **Priority functions (cover 90% of CLI apps):**
 
-| Function | sigma-ntdll call | Notes |
-|----------|-----------------|-------|
-| `CreateFileA/W` | `NtCreateFile` | Path → ObjectAttributes conversion |
-| `ReadFile` | `NtReadFile` | Overlapped → sync wrapper |
-| `WriteFile` | `NtWriteFile` | |
-| `CloseHandle` | `NtClose` | |
-| `GetStdHandle` | handle table | stdin=0, stdout=1, stderr=2 |
-| `WriteConsoleA` | `NtWriteFile(stdout)` | |
-| `VirtualAlloc` | `NtAllocateVirtualMemory` | |
-| `VirtualFree` | `NtFreeVirtualMemory` | |
-| `HeapAlloc` | `RtlAllocateHeap` | |
-| `HeapFree` | `RtlFreeHeap` | |
-| `CreateProcess` | `NtCreateProcess` | lpCommandLine split |
-| `ExitProcess` | `NtTerminateProcess` | |
-| `GetModuleHandleA/W` | PEB Ldr walk | |
-| `LoadLibraryA/W` | sigma-ldso load | |
-| `GetProcAddress` | PE export table scan | |
-| `CreateThread` | `NtCreateThread` | |
-| `WaitForSingleObject` | `NtWaitForSingleObject` | |
-| `GetLastError` | TEB.LastError | |
-| `SetLastError` | TEB.LastError | |
-| `GetTickCount64` | sigma_uptime_ms | |
-| `QueryPerformanceCounter` | RDTSC | |
-| `MultiByteToWideChar` | sigma-locale UTF-8↔UTF-16 | |
-| `WideCharToMultiByte` | sigma-locale | |
+| Function | sigma-ntdll call | Notes | 
+| ---------- | ----------------- | ------- | 
+| `CreateFileA/W` | `NtCreateFile` | Path → ObjectAttributes conversion | 
+| `ReadFile` | `NtReadFile` | Overlapped → sync wrapper | 
+| `WriteFile` | `NtWriteFile` | | 
+| `CloseHandle` | `NtClose` | | 
+| `GetStdHandle` | handle table | stdin=0, stdout=1, stderr=2 | 
+| `WriteConsoleA` | `NtWriteFile(stdout)` | | 
+| `VirtualAlloc` | `NtAllocateVirtualMemory` | | 
+| `VirtualFree` | `NtFreeVirtualMemory` | | 
+| `HeapAlloc` | `RtlAllocateHeap` | | 
+| `HeapFree` | `RtlFreeHeap` | | 
+| `CreateProcess` | `NtCreateProcess` | lpCommandLine split | 
+| `ExitProcess` | `NtTerminateProcess` | | 
+| `GetModuleHandleA/W` | PEB Ldr walk | | 
+| `LoadLibraryA/W` | sigma-ldso load | | 
+| `GetProcAddress` | PE export table scan | | 
+| `CreateThread` | `NtCreateThread` | | 
+| `WaitForSingleObject` | `NtWaitForSingleObject` | | 
+| `GetLastError` | TEB.LastError | | 
+| `SetLastError` | TEB.LastError | | 
+| `GetTickCount64` | sigma_uptime_ms | | 
+| `QueryPerformanceCounter` | RDTSC | | 
+| `MultiByteToWideChar` | sigma-locale UTF-8↔UTF-16 | | 
+| `WideCharToMultiByte` | sigma-locale | | 
 
 ### sigma-user32
 
@@ -490,88 +490,88 @@ sigma-wine --prefix /sigma/wine/office office.exe  # isolated Wine prefix
 ### Phase W0 — Foundation (Months 0–3, parallel to Phase 0 kernel)
 *Do this while waiting for kernel boot to stabilize.*
 
-| Task | File | Exit Gate |
-|------|------|-----------|
-| PE type definitions header | `include/compat/sigma_pe_types.h` | Compiles cleanly |
-| NT type definitions header | `include/compat/sigma_nt_types.h` | NTSTATUS, UNICODE_STRING, PEB, TEB defined |
-| Handle table skeleton | `runtime/compat/win32/sigma_handle_table.cpp` | alloc/free/lookup working |
-| Registry SQLite schema | `runtime/compat/win32/registry/sigma_reg.cpp` | HKLM/HKCU open/read/write |
-| PE loader (static parser) | `runtime/compat/win32/sigma_pe_loader.cpp` | Validates + dumps sections from a test .exe |
-| sigma-wine CLI stub | `runtime/compat/win32/sigma_wine.cpp` | `sigma-wine --info hello.exe` prints PE headers |
+| Task | File | Exit Gate | 
+| ------ | ------ | ----------- | 
+| PE type definitions header | `include/compat/sigma_pe_types.h` | Compiles cleanly | 
+| NT type definitions header | `include/compat/sigma_nt_types.h` | NTSTATUS, UNICODE_STRING, PEB, TEB defined | 
+| Handle table skeleton | `runtime/compat/win32/sigma_handle_table.cpp` | alloc/free/lookup working | 
+| Registry SQLite schema | `runtime/compat/win32/registry/sigma_reg.cpp` | HKLM/HKCU open/read/write | 
+| PE loader (static parser) | `runtime/compat/win32/sigma_pe_loader.cpp` | Validates + dumps sections from a test .exe | 
+| sigma-wine CLI stub | `runtime/compat/win32/sigma_wine.cpp` | `sigma-wine --info hello.exe` prints PE headers | 
 
 ### Phase W1 — Hello World (Months 3–6)
 *Target: run a static Win32 CLI binary that prints to stdout.*
 
-| Task | File | Exit Gate |
-|------|------|-----------|
-| NT syscall table (I/O + memory) | `runtime/compat/win32/sigma_ntdll.cpp` | NtReadFile, NtWriteFile, NtAllocateVirtualMemory mapped |
-| PEB/TEB setup | `runtime/compat/win32/sigma_ntdll.cpp` | gs:[0x60] valid, BeingDebugged=0 |
-| sigma-kernel32 console I/O | `runtime/compat/win32/kernel32/sigma_kernel32_console.cpp` | WriteConsoleA writes to stdout |
-| sigma-msvcrt printf | `runtime/compat/win32/crt/sigma_msvcrt.cpp` | printf("Hello") works |
-| sigma-wine exec pipeline | `runtime/compat/win32/sigma_wine_loader.cpp` | Static hello.exe runs end-to-end |
-| QEMU test harness | `tests/compat/win32/test_hello_exe.sh` | CI passes |
+| Task | File | Exit Gate | 
+| ------ | ------ | ----------- | 
+| NT syscall table (I/O + memory) | `runtime/compat/win32/sigma_ntdll.cpp` | NtReadFile, NtWriteFile, NtAllocateVirtualMemory mapped | 
+| PEB/TEB setup | `runtime/compat/win32/sigma_ntdll.cpp` | gs:[0x60] valid, BeingDebugged=0 | 
+| sigma-kernel32 console I/O | `runtime/compat/win32/kernel32/sigma_kernel32_console.cpp` | WriteConsoleA writes to stdout | 
+| sigma-msvcrt printf | `runtime/compat/win32/crt/sigma_msvcrt.cpp` | printf("Hello") works | 
+| sigma-wine exec pipeline | `runtime/compat/win32/sigma_wine_loader.cpp` | Static hello.exe runs end-to-end | 
+| QEMU test harness | `tests/compat/win32/test_hello_exe.sh` | CI passes | 
 
 **Milestone:** `sigma-wine hello.exe` prints `Hello, SigmaOS!` in QEMU.
 
 ### Phase W2 — CLI App Compatibility (Months 6–12)
 *Target: run cmd.exe, Python for Windows, Git for Windows CLI.*
 
-| Task | File | Exit Gate |
-|------|------|-----------|
-| Full kernel32 file I/O | `sigma_kernel32_file.cpp` | CreateFile/ReadFile/WriteFile on sigma-vfs |
-| Process creation | `sigma_kernel32_process.cpp` | CreateProcess spawns a child |
-| NT synchronization | `sigma_ntdll.cpp` | Mutex, Event, WaitForSingleObject |
-| Thread creation + TLS | `sigma_kernel32_thread.cpp` | CreateThread + TlsAlloc work |
-| Registry (HKCU read/write) | `sigma_reg.cpp` | App settings persist |
-| sigma-ldso DLL loader | `userland/ldso/sigma_ldso.cpp` | LoadLibrary resolves sigma-kernel32 |
-| sigma-msvcrt complete | `sigma_msvcrt*.cpp` | malloc/free/printf/fopen/fread/fwrite |
-| Winsock2 TCP | `sigma_winsock2.cpp` | socket/connect/send/recv via sigma-net |
+| Task | File | Exit Gate | 
+| ------ | ------ | ----------- | 
+| Full kernel32 file I/O | `sigma_kernel32_file.cpp` | CreateFile/ReadFile/WriteFile on sigma-vfs | 
+| Process creation | `sigma_kernel32_process.cpp` | CreateProcess spawns a child | 
+| NT synchronization | `sigma_ntdll.cpp` | Mutex, Event, WaitForSingleObject | 
+| Thread creation + TLS | `sigma_kernel32_thread.cpp` | CreateThread + TlsAlloc work | 
+| Registry (HKCU read/write) | `sigma_reg.cpp` | App settings persist | 
+| sigma-ldso DLL loader | `userland/ldso/sigma_ldso.cpp` | LoadLibrary resolves sigma-kernel32 | 
+| sigma-msvcrt complete | `sigma_msvcrt*.cpp` | malloc/free/printf/fopen/fread/fwrite | 
+| Winsock2 TCP | `sigma_winsock2.cpp` | socket/connect/send/recv via sigma-net | 
 
 **Milestone:** `sigma-wine python.exe -c "print('hello')"` works.
 
 ### Phase W3 — GUI App Compatibility (Months 12–24)
 *Target: run Notepad, simple Win32 GUI apps.*
 
-| Task | File | Exit Gate |
-|------|------|-----------|
-| sigma-user32 window + WM_PAINT | `sigma_user32_window.cpp` | CreateWindow/ShowWindow/GetMessage loop |
-| HWND → Zenith surface mapping | `sigma_user32_dc.cpp` | Window appears on Zenith desktop |
-| Message pump | `sigma_user32_msg.cpp` | WM_KEYDOWN/WM_MOUSEMOVE delivered |
-| sigma-gdi32 text + basic draw | `sigma_gdi32_draw.cpp` | TextOut, Rectangle, FillRect via Vulkan |
-| GDI font (HarfBuzz bridge) | `sigma_gdi32_font.cpp` | CreateFont renders in Zenith |
-| sigma-comctl32 stubs | `sigma_comctl32.cpp` | ListView/TreeView return valid HWNDs |
-| sigma-shell32 stubs | `sigma_shell32.cpp` | ShellExecute, GetOpenFileName |
-| sigma-wine-server IPC | `sigma_wine_server.cpp` | Cross-process handles work |
+| Task | File | Exit Gate | 
+| ------ | ------ | ----------- | 
+| sigma-user32 window + WM_PAINT | `sigma_user32_window.cpp` | CreateWindow/ShowWindow/GetMessage loop | 
+| HWND → Zenith surface mapping | `sigma_user32_dc.cpp` | Window appears on Zenith desktop | 
+| Message pump | `sigma_user32_msg.cpp` | WM_KEYDOWN/WM_MOUSEMOVE delivered | 
+| sigma-gdi32 text + basic draw | `sigma_gdi32_draw.cpp` | TextOut, Rectangle, FillRect via Vulkan | 
+| GDI font (HarfBuzz bridge) | `sigma_gdi32_font.cpp` | CreateFont renders in Zenith | 
+| sigma-comctl32 stubs | `sigma_comctl32.cpp` | ListView/TreeView return valid HWNDs | 
+| sigma-shell32 stubs | `sigma_shell32.cpp` | ShellExecute, GetOpenFileName | 
+| sigma-wine-server IPC | `sigma_wine_server.cpp` | Cross-process handles work | 
 
 **Milestone:** `sigma-wine notepad.exe` opens, renders text, saves a file.
 
 ### Phase W4 — Office / Enterprise Apps (Months 24–36)
 *Target: run Office 2019 / LibreOffice Windows build, VSCode, Electron apps.*
 
-| Task | File | Exit Gate |
-|------|------|-----------|
-| COM/OLE core | `sigma_com.cpp` | CoCreateInstance works for registered CLSIDs |
-| IDispatch (VBA/scripting) | `sigma_com_automation.cpp` | VBA macros execute |
-| sigma-gdi32 BitBlt/DIBits | `sigma_gdi32_bitmap.cpp` | Image rendering works |
-| sigma-d3d11 via DXVK | `sigma_dxvk_d3d11.cpp` | D3D11 device creates on Vulkan |
-| WIC (Windows Imaging) stubs | `sigma_windowscodecs.cpp` | PNG/JPEG decode via libpng/libjpeg |
-| sigma-rpc (MSRPC stubs) | `sigma_rpc.cpp` | OLE automation over sigma-bus |
-| .NET CLR bootstrap | `runtime/compat/win32/dotnet/sigma_clr_bootstrap.cpp` | .NET 6+ apps reach Main() |
-| Electron/Node.js bridge | `runtime/compat/win32/sigma_node_bridge.cpp` | Chromium renderer starts |
+| Task | File | Exit Gate | 
+| ------ | ------ | ----------- | 
+| COM/OLE core | `sigma_com.cpp` | CoCreateInstance works for registered CLSIDs | 
+| IDispatch (VBA/scripting) | `sigma_com_automation.cpp` | VBA macros execute | 
+| sigma-gdi32 BitBlt/DIBits | `sigma_gdi32_bitmap.cpp` | Image rendering works | 
+| sigma-d3d11 via DXVK | `sigma_dxvk_d3d11.cpp` | D3D11 device creates on Vulkan | 
+| WIC (Windows Imaging) stubs | `sigma_windowscodecs.cpp` | PNG/JPEG decode via libpng/libjpeg | 
+| sigma-rpc (MSRPC stubs) | `sigma_rpc.cpp` | OLE automation over sigma-bus | 
+| .NET CLR bootstrap | `runtime/compat/win32/dotnet/sigma_clr_bootstrap.cpp` | .NET 6+ apps reach Main() | 
+| Electron/Node.js bridge | `runtime/compat/win32/sigma_node_bridge.cpp` | Chromium renderer starts | 
 
 **Milestone:** Microsoft Word 2019 opens and renders a document.
 
 ### Phase W5 — Gaming (Months 24–48, parallel to W4)
 *Target: run Steam + Proton games natively on SigmaOS.*
 
-| Task | File | Exit Gate |
-|------|------|-----------|
-| DXVK D3D9/D3D11 complete | `sigma_dxvk_d3d9.cpp`, `sigma_dxvk_d3d11.cpp` | Games render frames |
-| vkd3d-proton D3D12 | `sigma_dxvk_d3d12.cpp` | DX12 titles run |
-| XInput (gamepad) | `runtime/compat/win32/sigma_xinput.cpp` | Controller input works |
-| XAudio2 → sigma-audio | `runtime/compat/win32/sigma_xaudio2.cpp` | Game audio plays |
-| Steam client compat | integration test | Steam launches, downloads a game |
-| sigma-gamescope | `zenith_desktop/gamescope/sigma_gamescope.cpp` | Dedicated gaming compositor mode |
+| Task | File | Exit Gate | 
+| ------ | ------ | ----------- | 
+| DXVK D3D9/D3D11 complete | `sigma_dxvk_d3d9.cpp`, `sigma_dxvk_d3d11.cpp` | Games render frames | 
+| vkd3d-proton D3D12 | `sigma_dxvk_d3d12.cpp` | DX12 titles run | 
+| XInput (gamepad) | `runtime/compat/win32/sigma_xinput.cpp` | Controller input works | 
+| XAudio2 → sigma-audio | `runtime/compat/win32/sigma_xaudio2.cpp` | Game audio plays | 
+| Steam client compat | integration test | Steam launches, downloads a game | 
+| sigma-gamescope | `zenith_desktop/gamescope/sigma_gamescope.cpp` | Dedicated gaming compositor mode | 
 
 **Milestone:** A DX11 Steam game runs at playable framerate on SigmaOS.
 
@@ -659,24 +659,24 @@ include/compat/
 
 ## Compatibility Targets by Phase
 
-| Application | Category | Phase | Key blockers |
-|-------------|----------|-------|--------------|
-| `hello.exe` (static Win32 CLI) | CLI | W1 | PE loader + kernel32 console I/O |
-| Python 3.x for Windows | CLI | W2 | CRT + kernel32 + process creation |
-| Git for Windows | CLI | W2 | CRT + file I/O + winsock |
-| 7-Zip CLI | CLI | W2 | CRT + file I/O |
-| Notepad | GUI | W3 | user32 + GDI text + message pump |
-| Paint | GUI | W3 | GDI bitmap + user32 |
-| PuTTY | Network GUI | W3 | Winsock + user32 |
-| VSCode | Electron GUI | W4 | Electron/Node + D3D11 (Chromium GPU) |
-| Microsoft Word 2019 | Office | W4 | COM + GDI + RPC |
-| Microsoft Excel 2019 | Office | W4 | COM + VBA + GDI |
-| LibreOffice (Win32 build) | Office | W4 | CRT + GDI + COM |
-| .NET 6+ console apps | .NET | W4 | CLR bootstrap |
-| DirectX 9 games | Gaming | W5 | DXVK D3D9 + sigma-audio |
-| DirectX 11 games | Gaming | W5 | DXVK D3D11 + XInput |
-| DirectX 12 games | Gaming | W5 | vkd3d-proton + DX12 caps |
-| Steam client | Gaming platform | W5 | Chromium + D3D11 + Winsock |
+| Application | Category | Phase | Key blockers | 
+| ------------- | ---------- | ------- | -------------- | 
+| `hello.exe` (static Win32 CLI) | CLI | W1 | PE loader + kernel32 console I/O | 
+| Python 3.x for Windows | CLI | W2 | CRT + kernel32 + process creation | 
+| Git for Windows | CLI | W2 | CRT + file I/O + winsock | 
+| 7-Zip CLI | CLI | W2 | CRT + file I/O | 
+| Notepad | GUI | W3 | user32 + GDI text + message pump | 
+| Paint | GUI | W3 | GDI bitmap + user32 | 
+| PuTTY | Network GUI | W3 | Winsock + user32 | 
+| VSCode | Electron GUI | W4 | Electron/Node + D3D11 (Chromium GPU) | 
+| Microsoft Word 2019 | Office | W4 | COM + GDI + RPC | 
+| Microsoft Excel 2019 | Office | W4 | COM + VBA + GDI | 
+| LibreOffice (Win32 build) | Office | W4 | CRT + GDI + COM | 
+| .NET 6+ console apps | .NET | W4 | CLR bootstrap | 
+| DirectX 9 games | Gaming | W5 | DXVK D3D9 + sigma-audio | 
+| DirectX 11 games | Gaming | W5 | DXVK D3D11 + XInput | 
+| DirectX 12 games | Gaming | W5 | vkd3d-proton + DX12 caps | 
+| Steam client | Gaming platform | W5 | Chromium + D3D11 + Winsock | 
 
 ---
 
@@ -718,17 +718,17 @@ on real Windows without expensive third-party tooling.
 
 ## SigmaOS Advantages Over Running Windows in a VM
 
-| Dimension | Windows in VM (Hyper-V/KVM) | sigma-wine (native compat) |
-|-----------|----------------------------|---------------------------|
-| RAM overhead | +2–4 GB for Windows guest OS | Zero — no guest OS |
-| Boot time | 30–60 seconds for VM | Instant — just process launch |
-| GPU passthrough | Complex, limited support | Native Vulkan via DXVK |
-| File access | Shared folders (slow) | Direct sigma-vfs access |
-| Security isolation | Hypervisor boundary | sigma-mac + capability sandbox |
-| Audit trail | None (black box) | Full NT syscall audit log |
-| PQC protection | None | ML-DSA-signed DLL stubs |
-| Integration | Clipboard, network bridges | Full sigma-bus IPC integration |
-| India Stack | Not available in guest | sigma-sdk available to Win32 apps |
+| Dimension | Windows in VM (Hyper-V/KVM) | sigma-wine (native compat) | 
+| ----------- | ---------------------------- | --------------------------- | 
+| RAM overhead | +2–4 GB for Windows guest OS | Zero — no guest OS | 
+| Boot time | 30–60 seconds for VM | Instant — just process launch | 
+| GPU passthrough | Complex, limited support | Native Vulkan via DXVK | 
+| File access | Shared folders (slow) | Direct sigma-vfs access | 
+| Security isolation | Hypervisor boundary | sigma-mac + capability sandbox | 
+| Audit trail | None (black box) | Full NT syscall audit log | 
+| PQC protection | None | ML-DSA-signed DLL stubs | 
+| Integration | Clipboard, network bridges | Full sigma-bus IPC integration | 
+| India Stack | Not available in guest | sigma-sdk available to Win32 apps | 
 
 ---
 
@@ -778,35 +778,35 @@ jobs:
 
 ## Master Status Checklist
 
-| Stage | Component | Status | Phase |
-|-------|-----------|--------|-------|
-| W0 | `include/compat/sigma_pe_types.h` | `[ ]` | Now |
-| W0 | `include/compat/sigma_nt_types.h` | `[ ]` | Now |
-| W0 | `include/compat/sigma_win32_types.h` | `[ ]` | Now |
-| W0 | `include/compat/sigma_wine.h` | `[ ]` | Now |
-| W0 | `sigma_handle_table.cpp` (skeleton) | `[ ]` | Now |
-| W0 | `sigma_reg.cpp` (SQLite schema) | `[ ]` | Now |
-| W0 | `sigma_pe_loader.cpp` (static parser) | `[ ]` | Now |
-| W1 | `sigma_ntdll.cpp` (I/O + memory) | `[ ]` | Month 3 |
-| W1 | `sigma_kernel32_console.cpp` | `[ ]` | Month 3 |
-| W1 | `sigma_msvcrt.cpp` (printf subset) | `[ ]` | Month 3 |
-| W1 | `sigma_wine_loader.cpp` | `[ ]` | Month 3 |
-| W2 | `sigma_kernel32_file.cpp` | `[ ]` | Month 6 |
-| W2 | `sigma_kernel32_process.cpp` | `[ ]` | Month 6 |
-| W2 | `sigma_kernel32_thread.cpp` | `[ ]` | Month 6 |
-| W2 | `sigma_winsock2.cpp` | `[ ]` | Month 6 |
-| W2 | `sigma_ldso.cpp` (DLL loading) | `[ ]` | Month 6 |
-| W3 | `sigma_user32_window.cpp` | `[ ]` | Month 12 |
-| W3 | `sigma_user32_msg.cpp` | `[ ]` | Month 12 |
-| W3 | `sigma_gdi32_draw.cpp` | `[ ]` | Month 18 |
-| W3 | `sigma_wine_server.cpp` | `[ ]` | Month 18 |
-| W4 | `sigma_com.cpp` | `[ ]` | Month 24 |
-| W4 | `sigma_dxvk_d3d11.cpp` | `[ ]` | Month 24 |
-| W4 | `sigma_clr_bootstrap.cpp` | `[ ]` | Month 30 |
-| W5 | `sigma_dxvk_d3d9.cpp` | `[ ]` | Month 24 |
-| W5 | `sigma_dxvk_d3d12.cpp` | `[ ]` | Month 36 |
-| W5 | `sigma_xinput.cpp` | `[ ]` | Month 30 |
-| W5 | `sigma_gamescope.cpp` | `[ ]` | Month 36 |
+| Stage | Component | Status | Phase | 
+| ------- | ----------- | -------- | ------- | 
+| W0 | `include/compat/sigma_pe_types.h` | `[ ]` | Now | 
+| W0 | `include/compat/sigma_nt_types.h` | `[ ]` | Now | 
+| W0 | `include/compat/sigma_win32_types.h` | `[ ]` | Now | 
+| W0 | `include/compat/sigma_wine.h` | `[ ]` | Now | 
+| W0 | `sigma_handle_table.cpp` (skeleton) | `[ ]` | Now | 
+| W0 | `sigma_reg.cpp` (SQLite schema) | `[ ]` | Now | 
+| W0 | `sigma_pe_loader.cpp` (static parser) | `[ ]` | Now | 
+| W1 | `sigma_ntdll.cpp` (I/O + memory) | `[ ]` | Month 3 | 
+| W1 | `sigma_kernel32_console.cpp` | `[ ]` | Month 3 | 
+| W1 | `sigma_msvcrt.cpp` (printf subset) | `[ ]` | Month 3 | 
+| W1 | `sigma_wine_loader.cpp` | `[ ]` | Month 3 | 
+| W2 | `sigma_kernel32_file.cpp` | `[ ]` | Month 6 | 
+| W2 | `sigma_kernel32_process.cpp` | `[ ]` | Month 6 | 
+| W2 | `sigma_kernel32_thread.cpp` | `[ ]` | Month 6 | 
+| W2 | `sigma_winsock2.cpp` | `[ ]` | Month 6 | 
+| W2 | `sigma_ldso.cpp` (DLL loading) | `[ ]` | Month 6 | 
+| W3 | `sigma_user32_window.cpp` | `[ ]` | Month 12 | 
+| W3 | `sigma_user32_msg.cpp` | `[ ]` | Month 12 | 
+| W3 | `sigma_gdi32_draw.cpp` | `[ ]` | Month 18 | 
+| W3 | `sigma_wine_server.cpp` | `[ ]` | Month 18 | 
+| W4 | `sigma_com.cpp` | `[ ]` | Month 24 | 
+| W4 | `sigma_dxvk_d3d11.cpp` | `[ ]` | Month 24 | 
+| W4 | `sigma_clr_bootstrap.cpp` | `[ ]` | Month 30 | 
+| W5 | `sigma_dxvk_d3d9.cpp` | `[ ]` | Month 24 | 
+| W5 | `sigma_dxvk_d3d12.cpp` | `[ ]` | Month 36 | 
+| W5 | `sigma_xinput.cpp` | `[ ]` | Month 30 | 
+| W5 | `sigma_gamescope.cpp` | `[ ]` | Month 36 | 
 
 ---
 

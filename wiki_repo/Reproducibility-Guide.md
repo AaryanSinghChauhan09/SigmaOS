@@ -21,4 +21,4 @@ Edit your `lattice.yaml` and apply:
 ```bash
 sigma-pkg apply ./lattice.yaml
 
-```
+```text

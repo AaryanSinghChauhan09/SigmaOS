@@ -48,13 +48,13 @@
 
 ## 2. Competitive Synthesis Mapping Matrix
 
-| Subsystem Area | Competitor Distro Source | SigmaOS Sovereignty Absorption Idea |
-| :--- | :--- | :--- |
-| **Stabilization** | **Debian Stable** | Strict dependency freeze; all core features are compiled standalone with no external dependency. |
-| **Customisation** | **Arch Linux / Gentoo** | Declarative system profiles (`/etc/sigma/persona.conf`) determining which microkernel modules are loaded during startup. |
-| **Ease of Use** | **Ubuntu Desktop** | Single-command installation (`sigma-pkg install`) coupled with an interactive GUI wizard for workspace setup. |
-| **User Experience** | **macOS / Windows 11** | Snapping tiled layouts and spatial audio mixers built directly into the compositor. |
+| Subsystem Area | Competitor Distro Source | SigmaOS Sovereignty Absorption Idea | 
+| :--- | :--- | :--- | 
+| **Stabilization** | **Debian Stable** | Strict dependency freeze; all core features are compiled standalone with no external dependency. | 
+| **Customisation** | **Arch Linux / Gentoo** | Declarative system profiles (`/etc/sigma/persona.conf`) determining which microkernel modules are loaded during startup. | 
+| **Ease of Use** | **Ubuntu Desktop** | Single-command installation (`sigma-pkg install`) coupled with an interactive GUI wizard for workspace setup. | 
+| **User Experience** | **macOS / Windows 11** | Snapping tiled layouts and spatial audio mixers built directly into the compositor. | 
 
 ---
-> **Verification Status:** COMPLETED | DESIGN-VERIFIED  
+> **Verification Status:** COMPLETED | DESIGN-VERIFIED
 > *Last updated: 2026-05-19 | SigmaOS Zenith Release*

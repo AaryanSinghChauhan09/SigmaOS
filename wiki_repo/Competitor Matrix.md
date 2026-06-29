@@ -56,26 +56,26 @@ By leveraging an atomic A/B slot system and a dedicated rollback daemon, SigmaOS
 
 SigmaOS is designed to absorb the strongest characteristics of its predecessors:
 
-| **Competitor Suite**|**SigmaOS Absorption & Enhancement** | 
+| **Competitor Suite** | **SigmaOS Absorption & Enhancement** | 
 
 | ---------------------- | -------------------------------------- | 
-| **Microsoft 365**|**Productivity**: Collaborative Sovereign Office (S101) with local shard-locking. | 
+| **Microsoft 365** | **Productivity**: Collaborative Sovereign Office (S101) with local shard-locking. | 
 
-| **Google Workspace**|**Sync**: Real-time Global Lattice Sync with Zero-Trust IPC. | 
+| **Google Workspace** | **Sync**: Real-time Global Lattice Sync with Zero-Trust IPC. | 
 
-| **Oracle / Odoo**|**ERP/DB**: High-performance database shards and modular business logic. | 
+| **Oracle / Odoo** | **ERP/DB**: High-performance database shards and modular business logic. | 
 
-| **Salesforce**|**CRM**: AI-driven customer relationship management within the lattice. | 
+| **Salesforce** | **CRM**: AI-driven customer relationship management within the lattice. | 
 
-| **Apple Pro Suite**|**Creative**: 120Hz Direct-Silicon Media Processing (S104). | 
+| **Apple Pro Suite** | **Creative**: 120Hz Direct-Silicon Media Processing (S104). | 
 
-| **Zoho / Bitrix24**|**Communication**: Unified Lattice Mail, Chat, and Task Management. | 
+| **Zoho / Bitrix24** | **Communication**: Unified Lattice Mail, Chat, and Task Management. | 
 
-| **Fedora / Arch**|**Kernel**: SHS v2 Hybrid Scheduler and Layered Modular Architecture. | 
+| **Fedora / Arch** | **Kernel**: SHS v2 Hybrid Scheduler and Layered Modular Architecture. | 
 
-| **openSUSE**|**Resilience**: Automated CoW snapshots and a dedicated rollback daemon. | 
+| **openSUSE** | **Resilience**: Automated CoW snapshots and a dedicated rollback daemon. | 
 
-| **KDE / GNOME**|**Personalization**: Morphic Zenith UI with AI-driven adaptive layouts. | 
+| **KDE / GNOME** | **Personalization**: Morphic Zenith UI with AI-driven adaptive layouts. | 
 
 ---
 

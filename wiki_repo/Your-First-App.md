@@ -94,7 +94,7 @@ const errDiv  = document.getElementById('error');
 async function loadFiles() {
   try {
     const entries = await navigator.sigmaos.fs.readdir('/home/user');
-    
+
     entries
       .filter(e => e.type === 'file' && e.name.endsWith('.txt'))
       .forEach(e => {

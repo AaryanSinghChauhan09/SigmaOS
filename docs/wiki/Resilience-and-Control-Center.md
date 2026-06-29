@@ -1,6 +1,6 @@
 # Resilience, Error Handling, and Control Center ⚙️🛡️
 
-SigmaOS layers strict defensive mechanisms inspired by Qubes, Whonix, NixOS, and CAINE. 
+SigmaOS layers strict defensive mechanisms inspired by Qubes, Whonix, NixOS, and CAINE.
 
 ---
 

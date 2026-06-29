@@ -21,10 +21,10 @@ Statistics is the mathematical science of collecting, organizing, analyzing, int
 
 ### Primary vs Secondary Data
 
-| Type | Source | SigmaOS Analogy |
-| :--- | :--- | :--- |
-| **Primary** | Collected firsthand (surveys, hardware sensors) | Live telemetry from SigmaOS HAL thermal/voltage sensors |
-| **Secondary** | Pre-collected (databases, historical logs) | Historical time-series metrics from SigmaDB |
+| Type | Source | SigmaOS Analogy | 
+| :--- | :--- | :--- | 
+| **Primary** | Collected firsthand (surveys, hardware sensors) | Live telemetry from SigmaOS HAL thermal/voltage sensors | 
+| **Secondary** | Pre-collected (databases, historical logs) | Historical time-series metrics from SigmaDB | 
 
 ### Diagrammatic Representation — SigmaViz Charts
 
@@ -158,7 +158,7 @@ namespace Sigma::Stats {
 
 Bayesian inference updates the probability of a hypothesis ($H$) as more evidence or information ($E$) becomes available, combining prior beliefs with current likelihoods:
 
-$$P(H|E) = \frac{P(E|H) \cdot P(H)}{P(E)}$$
+$$P(H | E) = \frac{P(E | H) \cdot P(H)}{P(E)}$$
 
 ```cpp
 namespace Sigma::Stats {
@@ -202,14 +202,14 @@ namespace Sigma::Stats {
 
 ### Interpretation
 
-| r value | Correlation |
-| :--- | :--- |
-| +1.0 | Perfect positive |
-| +0.7 to +0.9 | Strong positive |
-| +0.4 to +0.6 | Moderate positive |
-| 0 | No correlation |
-| -0.4 to -0.6 | Moderate negative |
-| -1.0 | Perfect negative |
+| r value | Correlation | 
+| :--- | :--- | 
+| +1.0 | Perfect positive | 
+| +0.7 to +0.9 | Strong positive | 
+| +0.4 to +0.6 | Moderate positive | 
+| 0 | No correlation | 
+| -0.4 to -0.6 | Moderate negative | 
+| -1.0 | Perfect negative | 
 
 ---
 
@@ -297,5 +297,5 @@ Consumers:
 └── SigmaDB (aggregate SQL functions)
 ```
 
-**Files:** `userland/apps/SigmaStats/sigma_stats.cpp`, `sigma_stats.h`  
+**Files:** `userland/apps/SigmaStats/sigma_stats.cpp`, `sigma_stats.h`
 *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

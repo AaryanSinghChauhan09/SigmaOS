@@ -8,24 +8,24 @@ This page gives an honest picture of where SigmaOS stands today — what works, 
 
 > The scaffolding is solid. True implementation is still needed in several areas. This roadmap tracks real feature development, not aspirational claims.
 
-| Component | Status | Notes |
-|---|---|---|
-| Freestanding x86_64 kernel boot | ✓ Working | Boots in QEMU, IDT + Ring 3 transition complete |
-| PID 1 signalfd event loop | ✓ Working | Infinite loop with SIGCHLD reaping |
-| MLFQ + Round-Robin scheduler | ✓ Working | 4 priority levels, periodic boost |
-| VMM 4-level paging | ✓ Working | PML4, PDPT, PD, PT; higher-half kernel |
-| VFS + Ext4 read | ✓ Working | Superblock parsing, inode resolution |
-| TCP/IP loopback | ✓ Working | 3-way handshake state machine |
-| bwrap sandboxing | ✓ Working | PID/mount/net namespaces + seccomp |
-| pledge / unveil | ✓ Working | Per-process syscall + FS restriction |
-| Zero-trust workload IDs | ✓ Working | SPIFFE URIs, revocation check on every call |
-| Ext4 JBD2 journaling | ⚠ Partial | Ordered-mode journal not fully wired |
-| PMM fragmentation | ⚠ Known bug | Block allocator fragments under pressure |
-| Zenith UI | ⚠ JS prototype | Native C++ compositor not yet built |
-| NVMe / e1000 drivers | ☐ Planned | Real hardware drivers not committed |
-| USB 3.0 controller | ☐ Planned | Only stub exists |
-| Linux DRM/KMS shim | ☐ Planned | HAL stub only |
-| Graphical installer | ☐ Planned | No Calamares equivalent yet |
+| Component | Status | Notes | 
+| --- | --- | --- | 
+| Freestanding x86_64 kernel boot | ✓ Working | Boots in QEMU, IDT + Ring 3 transition complete | 
+| PID 1 signalfd event loop | ✓ Working | Infinite loop with SIGCHLD reaping | 
+| MLFQ + Round-Robin scheduler | ✓ Working | 4 priority levels, periodic boost | 
+| VMM 4-level paging | ✓ Working | PML4, PDPT, PD, PT; higher-half kernel | 
+| VFS + Ext4 read | ✓ Working | Superblock parsing, inode resolution | 
+| TCP/IP loopback | ✓ Working | 3-way handshake state machine | 
+| bwrap sandboxing | ✓ Working | PID/mount/net namespaces + seccomp | 
+| pledge / unveil | ✓ Working | Per-process syscall + FS restriction | 
+| Zero-trust workload IDs | ✓ Working | SPIFFE URIs, revocation check on every call | 
+| Ext4 JBD2 journaling | ⚠ Partial | Ordered-mode journal not fully wired | 
+| PMM fragmentation | ⚠ Known bug | Block allocator fragments under pressure | 
+| Zenith UI | ⚠ JS prototype | Native C++ compositor not yet built | 
+| NVMe / e1000 drivers | ☐ Planned | Real hardware drivers not committed | 
+| USB 3.0 controller | ☐ Planned | Only stub exists | 
+| Linux DRM/KMS shim | ☐ Planned | HAL stub only | 
+| Graphical installer | ☐ Planned | No Calamares equivalent yet | 
 
 ---
 
@@ -33,20 +33,20 @@ This page gives an honest picture of where SigmaOS stands today — what works, 
 
 Targets from the `prepare-sigmaos-launch` branch gap audit:
 
-| Category | Best Competitor | SigmaOS Target | Shard / File |
-|---|---|---|---|
-| UX & Accessibility | Zorin / Elementary | Adaptive UI scaling + screen reader | `SovereignAccessibility` |
-| IoT / ARM | Raspberry Pi OS | Event-driven GPIO + sensor toolkit | `SovereignIoT` |
-| Gaming | SteamOS | Dynamic GPU scheduler + controller manager | `SovereignGPUSched` |
-| Performance | Clear Linux | Telemetry-driven auto-tuner + PGO | `SovereignAISched` |
-| Reproducibility | NixOS | Declarative shard configs + rollbacks | `sigma-pkg sync` |
-| Recovery | Rescuezilla | Snapshot diff + forensic toolkit | `SovereignSnapshotDiff` |
-| Containers | Fedora CoreOS | Sovereign Container Orchestrator | `SovereignOrchestrator` |
-| Rolling updates | Arch / Solus | Incremental delta updates | `sigma-pkg update --delta` |
-| Enterprise | Ubuntu | Hardware regression harness | `SovereignRegression` |
-| Filesystem | Btrfs / ZFS | Sovereign CoW + journaling FS | `SovereignFS` |
-| Networking | Linux TCP/IP | IPv6, mesh, VPN stack | `SovereignNet` |
-| Compatibility | WSL / Wine | POSIX translation shims (opt-in) | `SovereignCompat` |
+| Category | Best Competitor | SigmaOS Target | Shard / File | 
+| --- | --- | --- | --- | 
+| UX & Accessibility | Zorin / Elementary | Adaptive UI scaling + screen reader | `SovereignAccessibility` | 
+| IoT / ARM | Raspberry Pi OS | Event-driven GPIO + sensor toolkit | `SovereignIoT` | 
+| Gaming | SteamOS | Dynamic GPU scheduler + controller manager | `SovereignGPUSched` | 
+| Performance | Clear Linux | Telemetry-driven auto-tuner + PGO | `SovereignAISched` | 
+| Reproducibility | NixOS | Declarative shard configs + rollbacks | `sigma-pkg sync` | 
+| Recovery | Rescuezilla | Snapshot diff + forensic toolkit | `SovereignSnapshotDiff` | 
+| Containers | Fedora CoreOS | Sovereign Container Orchestrator | `SovereignOrchestrator` | 
+| Rolling updates | Arch / Solus | Incremental delta updates | `sigma-pkg update --delta` | 
+| Enterprise | Ubuntu | Hardware regression harness | `SovereignRegression` | 
+| Filesystem | Btrfs / ZFS | Sovereign CoW + journaling FS | `SovereignFS` | 
+| Networking | Linux TCP/IP | IPv6, mesh, VPN stack | `SovereignNet` | 
+| Compatibility | WSL / Wine | POSIX translation shims (opt-in) | `SovereignCompat` | 
 
 ---
 

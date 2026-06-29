@@ -9,4 +9,4 @@ Hardware Abstraction Layer (HAL).
 // Abstract interface for ext/hal
 void init_ext_hal();
 
-```
+```text

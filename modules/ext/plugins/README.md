@@ -9,4 +9,4 @@ Plugin System.
 // Abstract interface for ext/plugins
 void init_ext_plugins();
 
-```
+```text

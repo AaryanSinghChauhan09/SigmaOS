@@ -130,4 +130,4 @@ const handler = new RetryHandler(dispatchOptions, {
   },
 });
 
-```
+```text

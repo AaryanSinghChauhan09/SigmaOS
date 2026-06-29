@@ -54,13 +54,13 @@ SigmaDB (OLTP)  →  SigmaETL  →  SigmaWarehouse  →  SigmaViz Dashboards
 
 Schema design dictates how multi-dimensional analytical data is structured within the data warehouse:
 
-| Feature | Star Schema | Snowflake Schema |
-| :--- | :--- | :--- |
-| **Structure** | Central fact table connected directly to denormalized dimension tables. | Central fact table connected to normalized, branching dimension tables. |
-| **Normalization** | Denormalized (dimensions contain redundant data). | Normalized (dimensions are split into sub-dimensions E.g., City $\rightarrow$ State $\rightarrow$ Country). |
-| **Query Complexity**| Simple, requiring fewer `JOIN` operations; highly optimized for fast read aggregations. | Complex, requiring extensive multi-table `JOIN` operations. |
-| **Storage Space** | Higher storage footprint due to data redundancy. | Minimal storage footprint due to strict normalization. |
-| **Maintenance** | Prone to update anomalies if dimension attributes change. | Easy to maintain and update due to centralized dimension definitions. |
+| Feature | Star Schema | Snowflake Schema | 
+| :--- | :--- | :--- | 
+| **Structure** | Central fact table connected directly to denormalized dimension tables. | Central fact table connected to normalized, branching dimension tables. | 
+| **Normalization** | Denormalized (dimensions contain redundant data). | Normalized (dimensions are split into sub-dimensions E.g., City $\rightarrow$ State $\rightarrow$ Country). | 
+| **Query Complexity** | Simple, requiring fewer `JOIN` operations; highly optimized for fast read aggregations. | Complex, requiring extensive multi-table `JOIN` operations. | 
+| **Storage Space** | Higher storage footprint due to data redundancy. | Minimal storage footprint due to strict normalization. | 
+| **Maintenance** | Prone to update anomalies if dimension attributes change. | Easy to maintain and update due to centralized dimension definitions. | 
 
 ### Data Cube & OLAP Operations
 

@@ -5,11 +5,11 @@ the kernel uses to talk to hardware. Porting SigmaOS to a new CPU means
 implementing one HAL backend — nothing else needs to change.
 
 ## Supported Targets
-| Architecture | Status |
-|---|---|
-| x86_64 | ✅ Active |
-| AArch64 (ARM64) | 🔧 In-progress |
-| RISC-V RV64GC | 📋 Planned |
+| Architecture | Status | 
+| --- | --- | 
+| x86_64 | ✅ Active | 
+| AArch64 (ARM64) | 🔧 In-progress | 
+| RISC-V RV64GC | 📋 Planned | 
 
 ## Core Abstractions
 ```c

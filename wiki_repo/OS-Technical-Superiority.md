@@ -39,8 +39,7 @@ SigmaOS uses W3C Decentralized Identity (DID) as the **only** authentication mec
 # 2. User scans with sigma-ultra on phone
 # 3. Phone signs challenge with Dilithium3 private key
 # 4. sigma-trustd verifies → session opens
-# 5. No password typed. No password to phish. No password to breach.
-
+# 5. No password typed. No password to phish. No password to breach
 # On headless servers:
 sigma-sec did auth --challenge $(sigma-dm challenge) --key ~/.sigma/keys/primary.pem
 
@@ -200,7 +199,7 @@ sigma-lex laws --profession farmer    # PMFBY, eNAM, PM-KISAN, MSP
 
 # When Finance Minister changes a GST rate:
 sigma-lex notify: "GST on restaurant services: 5% → 12% (effective July 1)"
-sigma-accounts: rates auto-updated  
+sigma-accounts: rates auto-updated
 sigma-ca: GSTR-1 template updated
 sigma-pos: billing auto-corrected
 # All without any user action
@@ -243,8 +242,7 @@ The OS knows when laws that affect you change — before you find out the hard w
 sigma-lex notify: "Finance Ministry: Section 44AB audit limit raised to ₹10Cr"
 sigma-ca: Compliance calendar updated
 sigma-accounts: Tax audit threshold updated
-# You didn't read the Budget speech. You didn't need to.
-
+# You didn't read the Budget speech. You didn't need to
 # July 1, 2026:
 sigma-lex notify: "SEBI: T+1 settlement extended to all indices"
 sigma-sebi: Settlement calendar updated automatically
@@ -266,7 +264,7 @@ SigmaOS generates Landlock filesystem restrictions and seccomp-bpf syscall filte
 
 ```bash
 # sigma-accounts manifest.json declares:
-# caps: ["filesystem:read:/home/$USER/accounts/", 
+# caps: ["filesystem:read:/home/$USER/accounts/",
 #        "filesystem:write:/home/$USER/accounts/",
 #        "network:connect:https://api.gstn.gov.in",
 #        "ipc:sigma-bus"]
@@ -294,16 +292,16 @@ sigma-sec landlock show --app sigma-accounts
 
 ## Performance Targets vs Best Linux Distros
 
-| Benchmark | Pop!_OS 22 | Arch (minimal) | Ubuntu 24.04 | SigmaOS Target |
-|---|---|---|---|---|
-| Boot time (NVMe SSD) | 12s | 5s | 43s | **< 2s** |
-| Idle RAM (desktop) | 650 MB | 280 MB | 847 MB | **< 150 MB** |
-| App launch (cold) | 1.2s | 0.8s | 1.5s | **< 0.5s** |
-| Kernel CVE patch | Reboot | Reboot | Reboot | **No reboot** |
-| Package rollback | No | No | No | **One command** |
-| Indian language IME | Manual setup | Manual | Partial | **Built in** |
-| Post-quantum crypto | No | No | No | **Default** |
-| Self-heal | No | No | No | **6 categories** |
+| Benchmark | Pop!_OS 22 | Arch (minimal) | Ubuntu 24.04 | SigmaOS Target | 
+| --- | --- | --- | --- | --- | 
+| Boot time (NVMe SSD) | 12s | 5s | 43s | **< 2s** | 
+| Idle RAM (desktop) | 650 MB | 280 MB | 847 MB | **< 150 MB** | 
+| App launch (cold) | 1.2s | 0.8s | 1.5s | **< 0.5s** | 
+| Kernel CVE patch | Reboot | Reboot | Reboot | **No reboot** | 
+| Package rollback | No | No | No | **One command** | 
+| Indian language IME | Manual setup | Manual | Partial | **Built in** | 
+| Post-quantum crypto | No | No | No | **Default** | 
+| Self-heal | No | No | No | **6 categories** | 
 
 ---
 

@@ -6,15 +6,15 @@ The problem with Linux is that it was designed by engineers, for engineers. Afte
 
 ## The Core Weakness of Existing Distros
 
-| Distro | Claimed Strength | Real Weakness |
-|---|---|---|
-| Ubuntu | "Easy" | Still requires terminal for anything real; Snap is slow |
-| Arch | Powerful | Breaks every 3 months; AUR has no accountability |
-| Fedora | Cutting edge | Support ends in 13 months; SELinux is impenetrable |
-| Debian | Stable | Packages from 2 years ago; no rollback |
-| NixOS | Reproducible | Requires PhD to configure; no India readiness |
-| Android | Mobile | Google owns your data; no offline sovereignty |
-| Kali | Security | Runs as root by default; single-purpose only |
+| Distro | Claimed Strength | Real Weakness | 
+| --- | --- | --- | 
+| Ubuntu | "Easy" | Still requires terminal for anything real; Snap is slow | 
+| Arch | Powerful | Breaks every 3 months; AUR has no accountability | 
+| Fedora | Cutting edge | Support ends in 13 months; SELinux is impenetrable | 
+| Debian | Stable | Packages from 2 years ago; no rollback | 
+| NixOS | Reproducible | Requires PhD to configure; no India readiness | 
+| Android | Mobile | Google owns your data; no offline sovereignty | 
+| Kali | Security | Runs as root by default; single-purpose only | 
 
 ---
 
@@ -279,13 +279,13 @@ Everything in the SigmaOS professional suite works on `sigma-ultra`:
 
 ### Boot Architecture
 
-| Stage | Linux (Ubuntu) | SigmaOS |
-|---|---|---|
-| Bootloader | GRUB (separate layer) | sigma-boot (UEFI app directly) |
-| Init system | systemd (sequential, complex) | sigma-init (fully parallel) |
-| Kernel | Generic (supports 10,000 configs) | Hardware-profiled via sigma-dna |
-| Boot time | 15–45 seconds | **< 2 seconds** |
-| Hibernate resume | 10–30 seconds | **< 3 seconds** |
+| Stage | Linux (Ubuntu) | SigmaOS | 
+| --- | --- | --- | 
+| Bootloader | GRUB (separate layer) | sigma-boot (UEFI app directly) | 
+| Init system | systemd (sequential, complex) | sigma-init (fully parallel) | 
+| Kernel | Generic (supports 10,000 configs) | Hardware-profiled via sigma-dna | 
+| Boot time | 15–45 seconds | **< 2 seconds** | 
+| Hibernate resume | 10–30 seconds | **< 3 seconds** | 
 
 ### Driver Stability vs Linux DKMS Nightmare
 
@@ -315,15 +315,15 @@ Goal: **zero** memory-safety CVEs in the kernel (Linux averages 50+/year).
 
 ### Security Model Depth
 
-| Layer | Ubuntu | Fedora | SigmaOS |
-|---|---|---|---|
-| Identity | Username + password | Username + password | DID (cryptographic) |
-| Continuous auth | None | None | Typing rhythm + face + BT |
-| MAC policy | AppArmor (opt-in) | SELinux (complex) | sigma-mac (readable, AI-assisted) |
-| PQ cryptography | None | None | Kyber-1024 + Dilithium-3 |
-| Supply chain | GPG (symmetric trust) | GPG + SBOM (partial) | Dilithium3 SBOM, full DID chain |
-| Self-healing | None | None | sigma-heal (6 categories) |
-| India compliance | None | None | Full IndiaStack + 50+ profession apps |
+| Layer | Ubuntu | Fedora | SigmaOS | 
+| --- | --- | --- | --- | 
+| Identity | Username + password | Username + password | DID (cryptographic) | 
+| Continuous auth | None | None | Typing rhythm + face + BT | 
+| MAC policy | AppArmor (opt-in) | SELinux (complex) | sigma-mac (readable, AI-assisted) | 
+| PQ cryptography | None | None | Kyber-1024 + Dilithium-3 | 
+| Supply chain | GPG (symmetric trust) | GPG + SBOM (partial) | Dilithium3 SBOM, full DID chain | 
+| Self-healing | None | None | sigma-heal (6 categories) | 
+| India compliance | None | None | Full IndiaStack + 50+ profession apps | 
 
 ---
 

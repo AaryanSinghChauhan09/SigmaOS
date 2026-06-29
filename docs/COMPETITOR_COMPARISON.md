@@ -6,34 +6,34 @@ A multi-dimensional analysis of SigmaOS strengths, current gaps, and the concret
 
 ## Full Competitor Matrix
 
-| Distro | Strengths | Where SigmaOS is weak | SigmaOS strategy to surpass |
-|--------|-----------|------------------------|------------------------------|
-| **Raspberry Pi OS** | Huge hardware ecosystem, optimized drivers, easy setup | Limited driver matrix (PS/2, VGA, e1000) | Expand HAL + sovereign SDF drivers; ARM64 profile in `init/sigma_profile_selector.cpp` |
-| **SteamOS** | Gaming integration, Proton, polished UX | No mature GPU/gaming layer | Sovereign graphics path + Zenith low-latency WM + Vulkan triple-buffer compositor |
-| **Clear Linux** | Intel-tuned performance, PGO, auto-tuned CFS | Basic scheduler tuning | Silicon-aware NUMA scheduler + cross-vendor PGO build path (`Makefile` pgo targets) |
-| **NixOS** | Declarative builds, reproducibility, rollback generations | Registry/build reproducibility incomplete | Sovereign `.spkg` registry + Dilithium3-signed recipes + CI provenance |
-| **SlackBuilds** | Community build scripts, large contrib ecosystem | No contribution pipeline yet | Sovereign build registry + contributor recipe workflow + wiki playbooks |
-| **Rescuezilla / SystemRescue** | Mature recovery GUI, Btrfs snapshot restore | Recovery mostly fallback/shell | Rollback + resilient mode + recovery automation + Fix-it menu at boot stage |
-| **Fedora CoreOS / Flatcar** | Immutable base, ignition provisioning, auto-updates | Immutable update loop incomplete | A/B update daemon + rollback gate + safe-mode boot (`sigma_boot_recovery_menu.c`) |
-| **RancherOS** | Container-first, Docker-native | Namespace/cgroup enforcement partial | `sigma-pod run-native` + kernel orchestrator enforcement; no Docker daemon dependency |
-| **Solus** | Cohesive desktop UX, curated package set | Zenith still maturing | Theme engine + auto-tiling WM + `~/.sigma_profile` declarative personalization |
-| **Ubuntu / Canonical** | Enterprise support, snaps, cloud | Enterprise packaging/cloud gaps | Profiles + automation + sovereign orchestration + India-native compliance stack |
-| **CAINE / Tails** | Forensics specialization, zero-trace, write-blocking | No forensic profile yet | Secure/forensic profile + WORM audit registers + read-only mount policy |
-| **EndeavourOS** | Rolling updates, flexible installer | Installer/rolling flow early | Profile-based releases + branch matrix + A/B update daemon |
-| **Linux From Scratch** | DIY sovereignty + education depth | Docs depth vs LFS | Wiki playbooks + Phase checklists + transparent CI + Doxygen API docs |
+| Distro | Strengths | Where SigmaOS is weak | SigmaOS strategy to surpass | 
+| -------- | ----------- | ------------------------ | ------------------------------ | 
+| **Raspberry Pi OS** | Huge hardware ecosystem, optimized drivers, easy setup | Limited driver matrix (PS/2, VGA, e1000) | Expand HAL + sovereign SDF drivers; ARM64 profile in `init/sigma_profile_selector.cpp` | 
+| **SteamOS** | Gaming integration, Proton, polished UX | No mature GPU/gaming layer | Sovereign graphics path + Zenith low-latency WM + Vulkan triple-buffer compositor | 
+| **Clear Linux** | Intel-tuned performance, PGO, auto-tuned CFS | Basic scheduler tuning | Silicon-aware NUMA scheduler + cross-vendor PGO build path (`Makefile` pgo targets) | 
+| **NixOS** | Declarative builds, reproducibility, rollback generations | Registry/build reproducibility incomplete | Sovereign `.spkg` registry + Dilithium3-signed recipes + CI provenance | 
+| **SlackBuilds** | Community build scripts, large contrib ecosystem | No contribution pipeline yet | Sovereign build registry + contributor recipe workflow + wiki playbooks | 
+| **Rescuezilla / SystemRescue** | Mature recovery GUI, Btrfs snapshot restore | Recovery mostly fallback/shell | Rollback + resilient mode + recovery automation + Fix-it menu at boot stage | 
+| **Fedora CoreOS / Flatcar** | Immutable base, ignition provisioning, auto-updates | Immutable update loop incomplete | A/B update daemon + rollback gate + safe-mode boot (`sigma_boot_recovery_menu.c`) | 
+| **RancherOS** | Container-first, Docker-native | Namespace/cgroup enforcement partial | `sigma-pod run-native` + kernel orchestrator enforcement; no Docker daemon dependency | 
+| **Solus** | Cohesive desktop UX, curated package set | Zenith still maturing | Theme engine + auto-tiling WM + `~/.sigma_profile` declarative personalization | 
+| **Ubuntu / Canonical** | Enterprise support, snaps, cloud | Enterprise packaging/cloud gaps | Profiles + automation + sovereign orchestration + India-native compliance stack | 
+| **CAINE / Tails** | Forensics specialization, zero-trace, write-blocking | No forensic profile yet | Secure/forensic profile + WORM audit registers + read-only mount policy | 
+| **EndeavourOS** | Rolling updates, flexible installer | Installer/rolling flow early | Profile-based releases + branch matrix + A/B update daemon | 
+| **Linux From Scratch** | DIY sovereignty + education depth | Docs depth vs LFS | Wiki playbooks + Phase checklists + transparent CI + Doxygen API docs | 
 
 ---
 
 ## Competitive USP vs. SigmaOS Implementation Plan
 
-| Dimension | Competitor | Competitor USP | SigmaOS Status | SigmaOS Implementation Plan |
-|-----------|------------|----------------|----------------|------------------------------|
-| **Declarative Consistency** | NixOS | Immutable reproducible builds, declarative profiles, transaction rollback | `SovereignRegistry` stubs + branch configs | **SovereignRegistry + TimeMachine**: CRYSTALS-Dilithium signed JSON boot configs; `SovereignTimeMachine` manages atomic journal-level rollback across the 600-shard lattice |
-| **Mathematical Throughput** | Clear Linux | Aggressively vectorized math, auto-tuned CFS, PGO | Shard-aware runqueues with basic atomic ticks | **SIMD-Vectorized PQC Engines**: Kyber polynomial multiplications + Dilithium checks via AVX-512 (Intel/AMD) and NEON (ARM) |
-| **Forensic Integrity** | CAINE / Tails | Zero-trace RAM scrubbing, write-blocking, hardened logging | Isolated Ring-3 driver model, basic secure boot | **SovereignForensics + Audit**: Hardware-assisted page scrubbing on namespace termination; cryptographically attested records written to WORM hardware registers |
-| **System Recovery** | RescueZilla | One-click GUI disk cloning, Btrfs snapshot restore | CLI `sigma_fsck` + raw filesystem checkers | **`sigma-recover` Utility**: Restores corrupted sectors from encrypted local backups; partition verification inside boot stage — no userspace required |
-| **Immutable Orchestration** | Fedora CoreOS | Container-native, ignition provisioning, immutable OS tree | Shard-level execution boundaries + static manifests | **SovereignCluster + ASI**: Lightweight sandboxes via **Asynchronous Shard Ignition** — no hypervisor overhead; write-once system images |
-| **Desktop UX** | SteamOS / Solus | Custom compositor pipelines, gamepad integration, desktop themes | Zenith styling stubs + vanilla CSS | **SovereignThemeEngine + Vulkan Layer**: Direct Vulkan triple-buffered compositor bypasses X11/Wayland; zero-copy GPU-accelerated UI composition |
+| Dimension | Competitor | Competitor USP | SigmaOS Status | SigmaOS Implementation Plan | 
+| ----------- | ------------ | ---------------- | ---------------- | ------------------------------ | 
+| **Declarative Consistency** | NixOS | Immutable reproducible builds, declarative profiles, transaction rollback | `SovereignRegistry` stubs + branch configs | **SovereignRegistry + TimeMachine**: CRYSTALS-Dilithium signed JSON boot configs; `SovereignTimeMachine` manages atomic journal-level rollback across the 600-shard lattice | 
+| **Mathematical Throughput** | Clear Linux | Aggressively vectorized math, auto-tuned CFS, PGO | Shard-aware runqueues with basic atomic ticks | **SIMD-Vectorized PQC Engines**: Kyber polynomial multiplications + Dilithium checks via AVX-512 (Intel/AMD) and NEON (ARM) | 
+| **Forensic Integrity** | CAINE / Tails | Zero-trace RAM scrubbing, write-blocking, hardened logging | Isolated Ring-3 driver model, basic secure boot | **SovereignForensics + Audit**: Hardware-assisted page scrubbing on namespace termination; cryptographically attested records written to WORM hardware registers | 
+| **System Recovery** | RescueZilla | One-click GUI disk cloning, Btrfs snapshot restore | CLI `sigma_fsck` + raw filesystem checkers | **`sigma-recover` Utility**: Restores corrupted sectors from encrypted local backups; partition verification inside boot stage — no userspace required | 
+| **Immutable Orchestration** | Fedora CoreOS | Container-native, ignition provisioning, immutable OS tree | Shard-level execution boundaries + static manifests | **SovereignCluster + ASI**: Lightweight sandboxes via **Asynchronous Shard Ignition** — no hypervisor overhead; write-once system images | 
+| **Desktop UX** | SteamOS / Solus | Custom compositor pipelines, gamepad integration, desktop themes | Zenith styling stubs + vanilla CSS | **SovereignThemeEngine + Vulkan Layer**: Direct Vulkan triple-buffered compositor bypasses X11/Wayland; zero-copy GPU-accelerated UI composition | 
 
 ---
 
@@ -67,14 +67,14 @@ Ordered by severity — fix these first:
 
 ## Benchmark Targets vs. Competitors
 
-| Metric | Ubuntu 24.04 | Fedora 41 | SteamOS | SigmaOS Target |
-|--------|-------------|-----------|---------|----------------|
-| Boot time (NVMe SSD) | 43 s | 9 s | 8 s | **< 2 s** |
-| Idle RAM (desktop) | 847 MB | 900 MB | 600 MB | **< 150 MB** |
-| Context switch | ~1,000 ns | ~300 ns | ~300 ns | **< 50 ns** |
-| PQC Kyber-1024 ops/sec | N/A | N/A | N/A | **5.8 M ops/sec** |
-| Package install (cached) | ~2 s | ~1.5 s | ~1.5 s | **< 0.5 s** |
-| Kernel CVE patch | Reboot required | Reboot required | Reboot required | **No reboot (kpatch)** |
+| Metric | Ubuntu 24.04 | Fedora 41 | SteamOS | SigmaOS Target | 
+| -------- | ------------- | ----------- | --------- | ---------------- | 
+| Boot time (NVMe SSD) | 43 s | 9 s | 8 s | **< 2 s** | 
+| Idle RAM (desktop) | 847 MB | 900 MB | 600 MB | **< 150 MB** | 
+| Context switch | ~1,000 ns | ~300 ns | ~300 ns | **< 50 ns** | 
+| PQC Kyber-1024 ops/sec | N/A | N/A | N/A | **5.8 M ops/sec** | 
+| Package install (cached) | ~2 s | ~1.5 s | ~1.5 s | **< 0.5 s** | 
+| Kernel CVE patch | Reboot required | Reboot required | Reboot required | **No reboot (kpatch)** | 
 
 ---
 

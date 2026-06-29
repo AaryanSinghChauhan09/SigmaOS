@@ -17,4 +17,4 @@ SPM is the cryptographically secure, deterministic package manager for SigmaOS. 
 spm install SovereignNet
 spm verify SovereignNet
 spm rollback
-```
+```text

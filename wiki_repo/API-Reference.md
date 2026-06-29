@@ -33,14 +33,14 @@ const exitCode = await proc.wait();
 
 **Options:**
 
-| Field | Type | Description |
-|---|---|---|
-| `cmd` | `string` | Binary name to execute |
-| `args` | `string[]` | Argument list |
-| `caps` | `string[]` | Per-invocation capability overrides |
-| `stdin` | `Uint8Array \| ReadableStream` | Optional stdin data |
-| `cwd` | `string` | Working directory inside the sandbox |
-| `env` | `Record<string, string>` | Additional environment variables |
+| Field | Type | Description | 
+| --- | --- | --- | 
+| `cmd` | `string` | Binary name to execute | 
+| `args` | `string[]` | Argument list | 
+| `caps` | `string[]` | Per-invocation capability overrides | 
+| `stdin` | `Uint8Array \ | ReadableStream` | Optional stdin data | 
+| `cwd` | `string` | Working directory inside the sandbox | 
+| `env` | `Record<string, string>` | Additional environment variables | 
 
 **Returns**: `SigmaProcess` object with `stdout`, `stderr` (async iterables), and `wait()` (resolves to exit code).
 
@@ -158,15 +158,15 @@ const win = await navigator.sigmaos.window.create({
 
 **Options:**
 
-| Field | Type | Default | Description |
-|---|---|---|---|
-| `url` | `string` | — | URL to load in the window |
-| `width` | `number` | `800` | Initial width in pixels |
-| `height` | `number` | `600` | Initial height in pixels |
-| `title` | `string` | `""` | Window title bar text |
-| `resizable` | `boolean` | `true` | Whether the user can resize the window |
-| `alwaysOnTop` | `boolean` | `false` | Pin the window above all others |
-| `frameless` | `boolean` | `true` | Hide the OS window chrome |
+| Field | Type | Default | Description | 
+| --- | --- | --- | --- | 
+| `url` | `string` | — | URL to load in the window | 
+| `width` | `number` | `800` | Initial width in pixels | 
+| `height` | `number` | `600` | Initial height in pixels | 
+| `title` | `string` | `""` | Window title bar text | 
+| `resizable` | `boolean` | `true` | Whether the user can resize the window | 
+| `alwaysOnTop` | `boolean` | `false` | Pin the window above all others | 
+| `frameless` | `boolean` | `true` | Hide the OS window chrome | 
 
 **Returns**: `SigmaWindow` with `.close()`, `.focus()`, `.resize(w, h)`, `.move(x, y)`.
 
@@ -277,13 +277,13 @@ console.log(result.stdout);
 
 All `navigator.sigmaos` APIs return Promises that reject with typed errors:
 
-| Error class | When it's thrown |
-|---|---|
-| `PermissionDeniedError` | Required capability not in manifest |
-| `DaemonUnavailableError` | The target daemon is not running |
-| `TimeoutError` | Daemon did not respond within 10 seconds |
-| `ProcessError` | Spawned process exited with non-zero code |
-| `FSError` | Filesystem operation failed (path not found, permission denied, etc.) |
+| Error class | When it's thrown | 
+| --- | --- | 
+| `PermissionDeniedError` | Required capability not in manifest | 
+| `DaemonUnavailableError` | The target daemon is not running | 
+| `TimeoutError` | Daemon did not respond within 10 seconds | 
+| `ProcessError` | Spawned process exited with non-zero code | 
+| `FSError` | Filesystem operation failed (path not found, permission denied, etc.) | 
 
 ```js
 try {

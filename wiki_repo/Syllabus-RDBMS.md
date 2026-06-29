@@ -14,16 +14,16 @@ A Relational Database Management System is foundational software that stores, ma
 
 ### Codd's 12 Rules — SigmaDB Compliance
 
-| Rule | SigmaDB Status |
-| :--- | :--- |
-| **Information Rule** — all data represented in tables | ✅ Fully compliant |
-| **Guaranteed Access** — Table Name + Primary Key + Column | ✅ Fully compliant |
-| **NULL Support** — Systematic treatment of missing data | ✅ Three-valued logic |
-| **Active Online Catalog** (`sigma_catalog`) | ✅ Accessible via standard SQL |
-| **Comprehensive Data Sublanguage** (SQL + PL/SQL) | ✅ Freestanding C++ parser |
-| **View Updatability** | ✅ Automatic view translation |
-| **Physical Data Independence** | ✅ S-ZFS storage abstraction |
-| **Distribution Independence** | ✅ SovereignCloudFS clustering |
+| Rule | SigmaDB Status | 
+| :--- | :--- | 
+| **Information Rule** — all data represented in tables | ✅ Fully compliant | 
+| **Guaranteed Access** — Table Name + Primary Key + Column | ✅ Fully compliant | 
+| **NULL Support** — Systematic treatment of missing data | ✅ Three-valued logic | 
+| **Active Online Catalog** (`sigma_catalog`) | ✅ Accessible via standard SQL | 
+| **Comprehensive Data Sublanguage** (SQL + PL/SQL) | ✅ Freestanding C++ parser | 
+| **View Updatability** | ✅ Automatic view translation | 
+| **Physical Data Independence** | ✅ S-ZFS storage abstraction | 
+| **Distribution Independence** | ✅ SovereignCloudFS clustering | 
 
 ### Normalization & Schema Design
 
@@ -164,5 +164,5 @@ SigmaDB Engine
 └── Storage: SovereignZFSPool (CoW + Snapshots)
 ```
 
-**Files:** `userland/apps/SigmaDB/sql_engine.cpp`, `plsql_runtime.cpp`, `trigger_dispatcher.cpp`  
+**Files:** `userland/apps/SigmaDB/sql_engine.cpp`, `plsql_runtime.cpp`, `trigger_dispatcher.cpp`
 *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

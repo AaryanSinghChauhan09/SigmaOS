@@ -75,15 +75,15 @@ SigmaOS kernel (Ring-0)
 
 **Goal:** sigma-linux namespace infrastructure ready; static binaries run.
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| Expand syscall translator to 100 calls | `runtime/containers/sigma_linux_compat.cpp` | `tools-dev` | Add: stat/fstat/lseek/pipe/dup2/clone/wait4/execve/mprotect/getcwd/socket/connect/send/recv/futex + 85 more |
-| `/proc/self/maps` via sigma-procfs | `kernel/vfs/sigma_procfs.cpp` | `kernel-exp` | glibc reads this at startup |
-| `/proc/cpuinfo` stub | `kernel/vfs/sigma_procfs.cpp` | `kernel-exp` | Expose physical CPU info to Linux app |
-| `/sys/` minimal tree | `kernel/vfs/sigma_sysfs.cpp` | `kernel-exp` | `/sys/class/net/`, `/sys/block/` |
-| `/dev/` device nodes | `kernel/vfs/sigma_devfs.cpp` | `kernel-exp` | `/dev/null`, `/dev/zero`, `/dev/urandom`, `/dev/tty` |
-| Linux signal routing | `runtime/containers/sigma_linux_compat.cpp` | `kernel-exp` | SIGTERM/SIGKILL/SIGINT → sigma kill |
-| `sigma-linux exec <static-binary>` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | Run static ELF: `sigma-linux exec /bin/ls` |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| Expand syscall translator to 100 calls | `runtime/containers/sigma_linux_compat.cpp` | `tools-dev` | Add: stat/fstat/lseek/pipe/dup2/clone/wait4/execve/mprotect/getcwd/socket/connect/send/recv/futex + 85 more | 
+| `/proc/self/maps` via sigma-procfs | `kernel/vfs/sigma_procfs.cpp` | `kernel-exp` | glibc reads this at startup | 
+| `/proc/cpuinfo` stub | `kernel/vfs/sigma_procfs.cpp` | `kernel-exp` | Expose physical CPU info to Linux app | 
+| `/sys/` minimal tree | `kernel/vfs/sigma_sysfs.cpp` | `kernel-exp` | `/sys/class/net/`, `/sys/block/` | 
+| `/dev/` device nodes | `kernel/vfs/sigma_devfs.cpp` | `kernel-exp` | `/dev/null`, `/dev/zero`, `/dev/urandom`, `/dev/tty` | 
+| Linux signal routing | `runtime/containers/sigma_linux_compat.cpp` | `kernel-exp` | SIGTERM/SIGKILL/SIGINT → sigma kill | 
+| `sigma-linux exec <static-binary>` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | Run static ELF: `sigma-linux exec /bin/ls` | 
 
 **Exit gate:** `sigma-linux exec /bin/ls` (static musl) lists `/` directory.
 
@@ -91,15 +91,15 @@ SigmaOS kernel (Ring-0)
 
 **Goal:** glibc-linked Ubuntu binaries run inside sigma-pod namespace.
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| sigma-ldso (ELF dynamic linker) | `userland/ldso/sigma_ldso.cpp` | `tools-dev` | Load ld-linux.so.2 from the distro rootfs |
-| veth pair for Linux network namespace | `kernel/net/sigma_veth.cpp` | `drivers-dev` | Virtual ethernet: sigma-net ↔ Linux net namespace |
-| Linux rootfs .spkg image builder | `tools/sigma_rootfs_builder.sh` | `tools-dev` | `debootstrap` → `.spkg` (dm-verity + ML-DSA-87 signed) |
-| Minimal Ubuntu 24.04 rootfs | `sigma_pkg_registry/linux-images/ubuntu-24.04.spkg` | `tools-dev` | 200 MB minimal Ubuntu rootfs as .spkg |
-| `/etc/resolv.conf` → sigma-dns | `runtime/containers/sigma_linux_compat.cpp` | `tools-dev` | Route DNS from Linux app through sigma-dns-cache |
-| Terminal emulator in Zenith | `zenith_desktop/ui/sigma_terminal.cpp` | `release/standalone` | GPU-accelerated terminal (sigma-term) |
-| `sigma-linux exec ubuntu bash` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | Full Ubuntu shell in < 2 seconds |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| sigma-ldso (ELF dynamic linker) | `userland/ldso/sigma_ldso.cpp` | `tools-dev` | Load ld-linux.so.2 from the distro rootfs | 
+| veth pair for Linux network namespace | `kernel/net/sigma_veth.cpp` | `drivers-dev` | Virtual ethernet: sigma-net ↔ Linux net namespace | 
+| Linux rootfs .spkg image builder | `tools/sigma_rootfs_builder.sh` | `tools-dev` | `debootstrap` → `.spkg` (dm-verity + ML-DSA-87 signed) | 
+| Minimal Ubuntu 24.04 rootfs | `sigma_pkg_registry/linux-images/ubuntu-24.04.spkg` | `tools-dev` | 200 MB minimal Ubuntu rootfs as .spkg | 
+| `/etc/resolv.conf` → sigma-dns | `runtime/containers/sigma_linux_compat.cpp` | `tools-dev` | Route DNS from Linux app through sigma-dns-cache | 
+| Terminal emulator in Zenith | `zenith_desktop/ui/sigma_terminal.cpp` | `release/standalone` | GPU-accelerated terminal (sigma-term) | 
+| `sigma-linux exec ubuntu bash` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | Full Ubuntu shell in < 2 seconds | 
 
 **Exit gate:** `sigma-linux exec ubuntu bash` opens Ubuntu 24.04 bash prompt.
 
@@ -133,20 +133,20 @@ sigma-linux exec fedora -- gnome-text-editor
 sigma-linux exec ubuntu -- code .              # VSCode from Ubuntu
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| Expand syscall translator to 300 calls | `runtime/containers/sigma_linux_compat.cpp` | `tools-dev` | Full Linux x86-64 ABI coverage |
-| X11/Wayland socket bridge | `zenith_desktop/compat/sigma_xwayland_bridge.cpp` | `release/standalone` | Linux X11 apps render in Zenith windows |
-| Vulkan ICD passthrough | `runtime/containers/sigma_linux_compat.cpp` | `release/standalone` | Linux apps use SigmaOS GPU via Vulkan |
-| Audio bridge (PipeWire compat) | `userland/audio/sigma_pipewire_bridge.cpp` | `release/standalone` | Linux audio → sigma-audio HDA |
-| Distro rootfs auto-download | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | `sigma-linux install ubuntu` → fetch + verify + install |
-| Rootfs update command | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | `sigma-linux update ubuntu` → `apt upgrade` inside |
-| Multi-distro storage isolation | `kernel/core/process/sigma_namespace.cpp` | `release/cloud` | Each distro has its own `/home`, `/var`, `/etc` namespace |
-| `sigma-linux list` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | Show installed distros + disk usage |
-| `sigma-linux remove ubuntu` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | Wipe rootfs + config cleanly |
-| `sigma-linux backup ubuntu` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | Export distro rootfs as `.spkg` |
-| `sigma-linux restore ubuntu.spkg` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | Restore from backup |
-| Distro config file | `/sigma/etc/sigma-linux/ubuntu.conf` | `tools-dev` | TOML: rootfs path, resource limits, default shell |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| Expand syscall translator to 300 calls | `runtime/containers/sigma_linux_compat.cpp` | `tools-dev` | Full Linux x86-64 ABI coverage | 
+| X11/Wayland socket bridge | `zenith_desktop/compat/sigma_xwayland_bridge.cpp` | `release/standalone` | Linux X11 apps render in Zenith windows | 
+| Vulkan ICD passthrough | `runtime/containers/sigma_linux_compat.cpp` | `release/standalone` | Linux apps use SigmaOS GPU via Vulkan | 
+| Audio bridge (PipeWire compat) | `userland/audio/sigma_pipewire_bridge.cpp` | `release/standalone` | Linux audio → sigma-audio HDA | 
+| Distro rootfs auto-download | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | `sigma-linux install ubuntu` → fetch + verify + install | 
+| Rootfs update command | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | `sigma-linux update ubuntu` → `apt upgrade` inside | 
+| Multi-distro storage isolation | `kernel/core/process/sigma_namespace.cpp` | `release/cloud` | Each distro has its own `/home`, `/var`, `/etc` namespace | 
+| `sigma-linux list` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | Show installed distros + disk usage | 
+| `sigma-linux remove ubuntu` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | Wipe rootfs + config cleanly | 
+| `sigma-linux backup ubuntu` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | Export distro rootfs as `.spkg` | 
+| `sigma-linux restore ubuntu.spkg` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | Restore from backup | 
+| Distro config file | `/sigma/etc/sigma-linux/ubuntu.conf` | `tools-dev` | TOML: rootfs path, resource limits, default shell | 
 
 ### Phase L3 — GUI & Desktop Integration (Months 9-18)
 
@@ -165,16 +165,16 @@ sigma-linux app ubuntu --display sigma -- gimp  # GIMP in Zenith
 #  - Proper window title and close button
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| sigma-xserver (X11 compatibility server) | `zenith_desktop/compat/sigma_xserver.cpp` | `release/standalone` | Minimal X11 server: maps X11 windows → Zenith surfaces |
-| XWayland bridge (reuse XWayland approach) | `zenith_desktop/compat/sigma_xwayland_bridge.cpp` | `release/standalone` | X11 → Wayland → sigma-display protocol |
-| Linux app icon extraction | `userland/tools/sigma_linux_cli.cpp` | `release/standalone` | Extract `.desktop` file icon → Zenith launcher |
-| Linux app in Zenith launcher | `zenith_desktop/launcher/sigma_launcher.cpp` | `release/standalone` | Show `[Ubuntu] Firefox` in app list |
-| Clipboard sharing | `zenith_desktop/clipboard/sigma_clipboard.cpp` | `release/standalone` | Copy in Zenith, paste in Linux app |
-| Drag-and-drop between worlds | `zenith_desktop/compositor/sigma_compositor.cpp` | `release/standalone` | Drag file from Zenith file manager to Ubuntu Firefox |
-| Font sharing | `zenith_desktop/compositor/sigma_font.cpp` | `release/standalone` | Noto Sans Devanagari available inside Linux apps |
-| IME passthrough | `userland/ime/sigma_ime_cli.cpp` | `release/standalone` | Hindi input works in Linux apps |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| sigma-xserver (X11 compatibility server) | `zenith_desktop/compat/sigma_xserver.cpp` | `release/standalone` | Minimal X11 server: maps X11 windows → Zenith surfaces | 
+| XWayland bridge (reuse XWayland approach) | `zenith_desktop/compat/sigma_xwayland_bridge.cpp` | `release/standalone` | X11 → Wayland → sigma-display protocol | 
+| Linux app icon extraction | `userland/tools/sigma_linux_cli.cpp` | `release/standalone` | Extract `.desktop` file icon → Zenith launcher | 
+| Linux app in Zenith launcher | `zenith_desktop/launcher/sigma_launcher.cpp` | `release/standalone` | Show `[Ubuntu] Firefox` in app list | 
+| Clipboard sharing | `zenith_desktop/clipboard/sigma_clipboard.cpp` | `release/standalone` | Copy in Zenith, paste in Linux app | 
+| Drag-and-drop between worlds | `zenith_desktop/compositor/sigma_compositor.cpp` | `release/standalone` | Drag file from Zenith file manager to Ubuntu Firefox | 
+| Font sharing | `zenith_desktop/compositor/sigma_font.cpp` | `release/standalone` | Noto Sans Devanagari available inside Linux apps | 
+| IME passthrough | `userland/ime/sigma_ime_cli.cpp` | `release/standalone` | Hindi input works in Linux apps | 
 
 ### Phase L4 — Security Integration (Months 12-18)
 
@@ -193,15 +193,15 @@ Security advantages over native Linux:
   8. No root escape    → USER namespace: root inside = unprivileged outside
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| sigma-mac policy for Linux apps | `kernel/security/sigma_mac.cpp` | `release/standalone` | Apply `.sigma-policy` to Linux syscall boundary |
-| dm-verity on distro rootfs | `kernel/fs/sigma_dmverity.cpp` | `release/standalone` | Verify rootfs on every mount read |
-| PQC-TLS wrap all Linux outbound | `net/tls/sigma_tls.cpp` | `drivers-dev` | Transparent TLS upgrade for Linux app HTTP |
-| sigma-audit per Linux syscall | `kernel/security/sigma_immutable_audit_trail.cpp` | `release/standalone` | Log every Linux syscall with DID |
-| Network policy per distro | `kernel/core/process/sigma_namespace.cpp` | `release/cloud` | Kali: only forensic network allowed; Ubuntu: full |
-| Capability grant for Linux app | `include/sigma_caps.h` | `kernel-exp` | `sigma-linux exec --cap net.tx,fs.read ubuntu bash` |
-| Linux app sandbox profile | `/sigma/etc/sigma-linux/profiles/` | `tools-dev` | TOML: per-distro security policy templates |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| sigma-mac policy for Linux apps | `kernel/security/sigma_mac.cpp` | `release/standalone` | Apply `.sigma-policy` to Linux syscall boundary | 
+| dm-verity on distro rootfs | `kernel/fs/sigma_dmverity.cpp` | `release/standalone` | Verify rootfs on every mount read | 
+| PQC-TLS wrap all Linux outbound | `net/tls/sigma_tls.cpp` | `drivers-dev` | Transparent TLS upgrade for Linux app HTTP | 
+| sigma-audit per Linux syscall | `kernel/security/sigma_immutable_audit_trail.cpp` | `release/standalone` | Log every Linux syscall with DID | 
+| Network policy per distro | `kernel/core/process/sigma_namespace.cpp` | `release/cloud` | Kali: only forensic network allowed; Ubuntu: full | 
+| Capability grant for Linux app | `include/sigma_caps.h` | `kernel-exp` | `sigma-linux exec --cap net.tx,fs.read ubuntu bash` | 
+| Linux app sandbox profile | `/sigma/etc/sigma-linux/profiles/` | `tools-dev` | TOML: per-distro security policy templates | 
 
 ---
 
@@ -252,15 +252,15 @@ sigma-linux audit <distro> log --last 50        # audit trail inside distro
 sigma-linux audit <distro> verify               # verify audit chain
 ```
 
-| Task | File | Branch | Priority |
-|------|------|--------|---------|
-| `sigma-linux install` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | 🔴 Core |
-| `sigma-linux exec` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | 🔴 Core |
-| `sigma-linux list/status/stop` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | 🔴 Core |
-| `sigma-linux app` (GUI) | `userland/tools/sigma_linux_cli.cpp` | `release/standalone` | 🟠 Desktop |
-| `sigma-linux policy/audit` | `userland/tools/sigma_linux_cli.cpp` | `release/standalone` | 🟠 Security |
-| `sigma-linux config` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | 🟠 Config |
-| `sigma-linux backup/restore` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | 🟡 Data |
+| Task | File | Branch | Priority | 
+| ------ | ------ | -------- | --------- | 
+| `sigma-linux install` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | 🔴 Core | 
+| `sigma-linux exec` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | 🔴 Core | 
+| `sigma-linux list/status/stop` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | 🔴 Core | 
+| `sigma-linux app` (GUI) | `userland/tools/sigma_linux_cli.cpp` | `release/standalone` | 🟠 Desktop | 
+| `sigma-linux policy/audit` | `userland/tools/sigma_linux_cli.cpp` | `release/standalone` | 🟠 Security | 
+| `sigma-linux config` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | 🟠 Config | 
+| `sigma-linux backup/restore` | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | 🟡 Data | 
 
 ### Phase L2 — Full Distro Library (Months 6-12)
 
@@ -304,17 +304,17 @@ sigma-linux mount ubuntu:24.04 /sigma/data /mnt/sigma
 # sigma-linux = Linux under SigmaOS via namespaces (< 5MB overhead)
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| Ubuntu 24.04 rootfs .spkg | `sigma_pkg_registry/linux-images/ubuntu-24.04.spkg` | `tools-dev` | `debootstrap --variant=minbase` → 200 MB |
-| Fedora 41 rootfs .spkg | `sigma_pkg_registry/linux-images/fedora-41.spkg` | `tools-dev` | `dnf install --installroot` minimal |
-| Kali Linux 2026.1 rootfs | `sigma_pkg_registry/linux-images/kali-2026.spkg` | `tools-dev` | Kali tools for ethical hacking (sigma-mac forensic profile) |
-| Alpine Linux 3.20 rootfs | `sigma_pkg_registry/linux-images/alpine-3.20.spkg` | `tools-dev` | Tiny (5 MB) — musl + busybox |
-| NixOS 24.05 rootfs | `sigma_pkg_registry/linux-images/nixos-24.05.spkg` | `tools-dev` | Nix package manager inside sigma-pod |
-| Arch Linux rootfs | `sigma_pkg_registry/linux-images/arch-latest.spkg` | `tools-dev` | Arch + pacman inside sigma-pod |
-| X11 bridge → Zenith | `zenith_desktop/compat/sigma_x11_bridge.cpp` | `release/standalone` | XWayland-style: Linux X11 apps render in Zenith |
-| `/mnt/sigma` file sharing | `runtime/containers/sigma_linux_compat.cpp` | `tools-dev` | Bind-mount SigmaOS VFS path into Linux namespace |
-| sigma-linux CLI full | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | install/remove/list/exec/mount/shell/stop/kill |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| Ubuntu 24.04 rootfs .spkg | `sigma_pkg_registry/linux-images/ubuntu-24.04.spkg` | `tools-dev` | `debootstrap --variant=minbase` → 200 MB | 
+| Fedora 41 rootfs .spkg | `sigma_pkg_registry/linux-images/fedora-41.spkg` | `tools-dev` | `dnf install --installroot` minimal | 
+| Kali Linux 2026.1 rootfs | `sigma_pkg_registry/linux-images/kali-2026.spkg` | `tools-dev` | Kali tools for ethical hacking (sigma-mac forensic profile) | 
+| Alpine Linux 3.20 rootfs | `sigma_pkg_registry/linux-images/alpine-3.20.spkg` | `tools-dev` | Tiny (5 MB) — musl + busybox | 
+| NixOS 24.05 rootfs | `sigma_pkg_registry/linux-images/nixos-24.05.spkg` | `tools-dev` | Nix package manager inside sigma-pod | 
+| Arch Linux rootfs | `sigma_pkg_registry/linux-images/arch-latest.spkg` | `tools-dev` | Arch + pacman inside sigma-pod | 
+| X11 bridge → Zenith | `zenith_desktop/compat/sigma_x11_bridge.cpp` | `release/standalone` | XWayland-style: Linux X11 apps render in Zenith | 
+| `/mnt/sigma` file sharing | `runtime/containers/sigma_linux_compat.cpp` | `tools-dev` | Bind-mount SigmaOS VFS path into Linux namespace | 
+| sigma-linux CLI full | `userland/tools/sigma_linux_cli.cpp` | `tools-dev` | install/remove/list/exec/mount/shell/stop/kill | 
 
 **Exit gate:** `sigma-linux exec ubuntu:24.04 -- apt install neovim && nvim` works.
 
@@ -337,16 +337,16 @@ sigma-linux exec kali:2026.1 -- burpsuite
 # → Burp Suite in Zenith, network goes through sigma-firewall
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| X11 socket via sigma-display bridge | `zenith_desktop/compat/sigma_x11_bridge.cpp` | `release/standalone` | Linux `DISPLAY=:0` connects to Zenith compositor surface |
-| Wayland protocol bridge | `zenith_desktop/compat/sigma_wayland_bridge.cpp` | `release/standalone` | Linux Wayland apps via XDG surfaces in Zenith |
-| DRI3/DRM passthrough | `drivers/graphics/sigma_kms.cpp` | `drivers-dev` | Linux apps get GPU-accelerated rendering |
-| Clipboard sync (Linux ↔ SigmaOS) | `zenith_desktop/clipboard/sigma_clipboard.cpp` | `release/standalone` | Copy in Ubuntu, paste in sigma-accounts |
-| Font sharing | `zenith_desktop/compositor/sigma_font.cpp` | `release/standalone` | Linux apps use same Noto fonts as Zenith |
-| Sound: Linux ALSA → sigma-audio | `drivers/audio/sigma_hda.cpp` | `drivers-dev` | Linux audio routed through sigma-audio mixer |
-| Input: sigma-input → Linux app | `userland/daemons/sigma_inputd.cpp` | `release/standalone` | Keyboard/pointer events forwarded to X11/Wayland |
-| Window decorations in Zenith | `zenith_desktop/wm/sigma_tiling_wm.cpp` | `release/standalone` | Linux windows tiled by sigma-tiling-wm |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| X11 socket via sigma-display bridge | `zenith_desktop/compat/sigma_x11_bridge.cpp` | `release/standalone` | Linux `DISPLAY=:0` connects to Zenith compositor surface | 
+| Wayland protocol bridge | `zenith_desktop/compat/sigma_wayland_bridge.cpp` | `release/standalone` | Linux Wayland apps via XDG surfaces in Zenith | 
+| DRI3/DRM passthrough | `drivers/graphics/sigma_kms.cpp` | `drivers-dev` | Linux apps get GPU-accelerated rendering | 
+| Clipboard sync (Linux ↔ SigmaOS) | `zenith_desktop/clipboard/sigma_clipboard.cpp` | `release/standalone` | Copy in Ubuntu, paste in sigma-accounts | 
+| Font sharing | `zenith_desktop/compositor/sigma_font.cpp` | `release/standalone` | Linux apps use same Noto fonts as Zenith | 
+| Sound: Linux ALSA → sigma-audio | `drivers/audio/sigma_hda.cpp` | `drivers-dev` | Linux audio routed through sigma-audio mixer | 
+| Input: sigma-input → Linux app | `userland/daemons/sigma_inputd.cpp` | `release/standalone` | Keyboard/pointer events forwarded to X11/Wayland | 
+| Window decorations in Zenith | `zenith_desktop/wm/sigma_tiling_wm.cpp` | `release/standalone` | Linux windows tiled by sigma-tiling-wm | 
 
 **Exit gate:** `LibreOffice Writer` opens from Ubuntu namespace, renders in Zenith, prints via sigma-audio, saves to `/sigma/data/docs/`.
 
@@ -354,26 +354,26 @@ sigma-linux exec kali:2026.1 -- burpsuite
 
 ## sigma-linux vs WSL2 — Technical Comparison
 
-| Dimension | WSL2 (Microsoft) | sigma-linux (SigmaOS) |
-|-----------|-----------------|----------------------|
-| **Architecture** | Lightweight VM (Hyper-V Type-1) | namespace isolation (no VM) |
-| **RAM overhead** | ~128 MB for VM + Linux kernel | < 5 MB for namespace |
-| **Boot time** | 2-4 s (VM boot) | < 1 s (namespace spawn) |
-| **Kernel** | Full Linux kernel in VM | sigma-linux-compat translator |
-| **Security** | VM boundary + Windows NTLM | sigma-mac + ML-DSA-87 signed images |
-| **PQC** | ❌ None | ✅ All traffic ML-KEM encrypted |
-| **Telemetry** | ✅ Microsoft collects | ❌ Zero telemetry |
-| **Vendor lock-in** | Microsoft controls Hyper-V | sigma-linux is fully open |
-| **India Stack** | ❌ Not available | ✅ Full GSTN/ABDM access from inside Linux app |
-| **DID identity** | ❌ Microsoft account | ✅ DID passed into Linux environment |
-| **Audit trail** | Windows Event Log | sigma-audit ML-DSA-87 per entry |
-| **File system** | Plan 9 (9P) — slow | sigma-vfs bind-mount — same speed |
-| **GUI apps** | WSLg (RDP + X11 over RDP) | X11/Wayland → Zenith direct |
-| **GPU** | D3D12 passthrough via Mesa | DRI3/DRM passthrough native |
-| **GPU for AI** | DirectML | Vulkan compute → sigma-ai |
-| **Distro images** | MS Store only | sigma-pkg: any distro |
-| **Reproducibility** | No guarantees | dm-verity + ML-DSA-87 signed |
-| **Open source** | WSL kernel open, host closed | Entirely open source |
+| Dimension | WSL2 (Microsoft) | sigma-linux (SigmaOS) | 
+| ----------- | ----------------- | ---------------------- | 
+| **Architecture** | Lightweight VM (Hyper-V Type-1) | namespace isolation (no VM) | 
+| **RAM overhead** | ~128 MB for VM + Linux kernel | < 5 MB for namespace | 
+| **Boot time** | 2-4 s (VM boot) | < 1 s (namespace spawn) | 
+| **Kernel** | Full Linux kernel in VM | sigma-linux-compat translator | 
+| **Security** | VM boundary + Windows NTLM | sigma-mac + ML-DSA-87 signed images | 
+| **PQC** | ❌ None | ✅ All traffic ML-KEM encrypted | 
+| **Telemetry** | ✅ Microsoft collects | ❌ Zero telemetry | 
+| **Vendor lock-in** | Microsoft controls Hyper-V | sigma-linux is fully open | 
+| **India Stack** | ❌ Not available | ✅ Full GSTN/ABDM access from inside Linux app | 
+| **DID identity** | ❌ Microsoft account | ✅ DID passed into Linux environment | 
+| **Audit trail** | Windows Event Log | sigma-audit ML-DSA-87 per entry | 
+| **File system** | Plan 9 (9P) — slow | sigma-vfs bind-mount — same speed | 
+| **GUI apps** | WSLg (RDP + X11 over RDP) | X11/Wayland → Zenith direct | 
+| **GPU** | D3D12 passthrough via Mesa | DRI3/DRM passthrough native | 
+| **GPU for AI** | DirectML | Vulkan compute → sigma-ai | 
+| **Distro images** | MS Store only | sigma-pkg: any distro | 
+| **Reproducibility** | No guarantees | dm-verity + ML-DSA-87 signed | 
+| **Open source** | WSL kernel open, host closed | Entirely open source | 
 
 ---
 
@@ -429,49 +429,49 @@ sigma-SL architecture (sigma equivalent of WSL):
 
 ### Priority 1 — glibc startup (needed for ANY dynamic binary)
 
-| Syscall | Linux NR | Maps to | Status |
-|---------|---------|---------|--------|
-| `read` | 0 | `sigma_sys_read` | ✅ |
-| `write` | 1 | `sigma_sys_write` | ✅ |
-| `open` | 2 | `sigma_sys_open` | ✅ |
-| `close` | 3 | `sigma_sys_close` | ✅ |
-| `fstat` | 5 | `sigma_sys_stat` | ⚠️ stub |
-| `lseek` | 8 | `sigma_sys_lseek` | ❌ |
-| `mmap` | 9 | `sigma_sys_mmap` | ✅ |
-| `mprotect` | 10 | `sigma_sys_mprotect` | ✅ |
-| `munmap` | 11 | `sigma_sys_munmap` | ✅ |
-| `brk` | 12 | `sigma_sys_brk` | ✅ |
-| `rt_sigaction` | 13 | sigma signal | ❌ |
-| `rt_sigprocmask` | 14 | sigma signal | ❌ |
-| `ioctl` | 16 | sigma device | ❌ |
-| `pread64` | 17 | `sigma_sys_pread` | ❌ |
-| `pwrite64` | 18 | `sigma_sys_pwrite` | ❌ |
-| `readv` | 19 | sigma scatter-gather | ❌ |
-| `writev` | 20 | sigma scatter-gather | ❌ |
-| `access` | 21 | sigma_sys_access | ❌ |
-| `pipe` | 22 | sigma_sys_pipe | ❌ |
-| `dup` | 32 | sigma_sys_dup | ❌ |
-| `dup2` | 33 | sigma_sys_dup2 | ❌ |
-| `pause` | 34 | sigma_sys_pause | ❌ |
-| `nanosleep` | 35 | `sigma_sys_nanosleep` | ✅ |
-| `getpid` | 39 | `sigma_sys_getpid` | ✅ |
-| `socket` | 41 | sigma_sys_socket | ❌ |
-| `connect` | 42 | sigma_sys_connect | ❌ |
-| `accept` | 43 | sigma_sys_accept | ❌ |
-| `sendto` | 44 | sigma_sys_sendto | ❌ |
-| `recvfrom` | 45 | sigma_sys_recvfrom | ❌ |
-| `clone` | 56 | sigma_sys_clone | ❌ |
-| `fork` | 57 | sigma_sys_fork | ❌ |
-| `execve` | 59 | sigma_sys_execve | ❌ |
-| `exit` | 60 | `sigma_sys_exit` | ✅ |
-| `wait4` | 61 | sigma_sys_wait4 | ❌ |
-| `uname` | 63 | sigma_uname stub | ✅ |
-| `getdents64` | 217 | sigma_sys_getdents64 | ❌ |
-| `futex` | 202 | sigma_futex | ❌ |
-| `set_tid_address` | 218 | stub | ✅ |
-| `clock_gettime` | 228 | sigma_tsc_read | ✅ |
-| `exit_group` | 231 | `sigma_sys_exit` | ✅ |
-| `arch_prctl` | 158 | sigma_arch_prctl | ✅ |
+| Syscall | Linux NR | Maps to | Status | 
+| --------- | --------- | --------- | -------- | 
+| `read` | 0 | `sigma_sys_read` | ✅ | 
+| `write` | 1 | `sigma_sys_write` | ✅ | 
+| `open` | 2 | `sigma_sys_open` | ✅ | 
+| `close` | 3 | `sigma_sys_close` | ✅ | 
+| `fstat` | 5 | `sigma_sys_stat` | ⚠️ stub | 
+| `lseek` | 8 | `sigma_sys_lseek` | ❌ | 
+| `mmap` | 9 | `sigma_sys_mmap` | ✅ | 
+| `mprotect` | 10 | `sigma_sys_mprotect` | ✅ | 
+| `munmap` | 11 | `sigma_sys_munmap` | ✅ | 
+| `brk` | 12 | `sigma_sys_brk` | ✅ | 
+| `rt_sigaction` | 13 | sigma signal | ❌ | 
+| `rt_sigprocmask` | 14 | sigma signal | ❌ | 
+| `ioctl` | 16 | sigma device | ❌ | 
+| `pread64` | 17 | `sigma_sys_pread` | ❌ | 
+| `pwrite64` | 18 | `sigma_sys_pwrite` | ❌ | 
+| `readv` | 19 | sigma scatter-gather | ❌ | 
+| `writev` | 20 | sigma scatter-gather | ❌ | 
+| `access` | 21 | sigma_sys_access | ❌ | 
+| `pipe` | 22 | sigma_sys_pipe | ❌ | 
+| `dup` | 32 | sigma_sys_dup | ❌ | 
+| `dup2` | 33 | sigma_sys_dup2 | ❌ | 
+| `pause` | 34 | sigma_sys_pause | ❌ | 
+| `nanosleep` | 35 | `sigma_sys_nanosleep` | ✅ | 
+| `getpid` | 39 | `sigma_sys_getpid` | ✅ | 
+| `socket` | 41 | sigma_sys_socket | ❌ | 
+| `connect` | 42 | sigma_sys_connect | ❌ | 
+| `accept` | 43 | sigma_sys_accept | ❌ | 
+| `sendto` | 44 | sigma_sys_sendto | ❌ | 
+| `recvfrom` | 45 | sigma_sys_recvfrom | ❌ | 
+| `clone` | 56 | sigma_sys_clone | ❌ | 
+| `fork` | 57 | sigma_sys_fork | ❌ | 
+| `execve` | 59 | sigma_sys_execve | ❌ | 
+| `exit` | 60 | `sigma_sys_exit` | ✅ | 
+| `wait4` | 61 | sigma_sys_wait4 | ❌ | 
+| `uname` | 63 | sigma_uname stub | ✅ | 
+| `getdents64` | 217 | sigma_sys_getdents64 | ❌ | 
+| `futex` | 202 | sigma_futex | ❌ | 
+| `set_tid_address` | 218 | stub | ✅ | 
+| `clock_gettime` | 228 | sigma_tsc_read | ✅ | 
+| `exit_group` | 231 | `sigma_sys_exit` | ✅ | 
+| `arch_prctl` | 158 | sigma_arch_prctl | ✅ | 
 
 ### Priority 2 — Networking & I/O (needed for apt, curl, wget)
 
@@ -508,13 +508,13 @@ sendfile(2), splice(2), tee(2)
 inotify_init1, inotify_add_watch (needed by systemd + apt)
 ```
 
-| Task | File | Branch | Count |
-|------|------|--------|-------|
-| Priority 1 syscalls (glibc startup) | `runtime/containers/sigma_linux_compat.cpp` | `tools-dev` | 40 syscalls |
-| Priority 2 syscalls (networking) | `runtime/containers/sigma_linux_compat.cpp` | `drivers-dev` | 30 syscalls |
-| Priority 3 syscalls (process mgmt) | `runtime/containers/sigma_linux_compat.cpp` | `kernel-exp` | 40 syscalls |
-| Priority 4 syscalls (filesystem) | `runtime/containers/sigma_linux_compat.cpp` | `fs-dev` | 50 syscalls |
-| Remaining 200+ syscalls | `runtime/containers/sigma_linux_compat.cpp` | all | Phase L2 |
+| Task | File | Branch | Count | 
+| ------ | ------ | -------- | ------- | 
+| Priority 1 syscalls (glibc startup) | `runtime/containers/sigma_linux_compat.cpp` | `tools-dev` | 40 syscalls | 
+| Priority 2 syscalls (networking) | `runtime/containers/sigma_linux_compat.cpp` | `drivers-dev` | 30 syscalls | 
+| Priority 3 syscalls (process mgmt) | `runtime/containers/sigma_linux_compat.cpp` | `kernel-exp` | 40 syscalls | 
+| Priority 4 syscalls (filesystem) | `runtime/containers/sigma_linux_compat.cpp` | `fs-dev` | 50 syscalls | 
+| Remaining 200+ syscalls | `runtime/containers/sigma_linux_compat.cpp` | all | Phase L2 | 
 
 ---
 
@@ -598,14 +598,14 @@ Policy for ubuntu:24.04 (sandbox profile):
   sigma.cap.display          ✓  can show windows
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| sigma-linux policy templates | `kernel/security/sigma_linux_policies/` | `tools-dev` | developer/forensic/sandbox/india-stack profiles |
-| PQC-TLS enforcement for Linux net | `net/tls/sigma_tls.cpp` | `drivers-dev` | All TCP from Linux namespace tunnelled via sigma-tls |
-| India Stack bridge (opt-in) | `userland/tools/sigma_linux_cli.cpp` | `release/standalone` | `--india-stack` flag exposes sigma-bus India topics |
-| DID identity forwarding | `security/SovereignDID.cpp` | `release/standalone` | `$SIGMA_DID` env var inside Linux namespace |
-| Audit log for Linux syscalls | `runtime/containers/sigma_linux_compat.cpp` | all | Every translated syscall → sigma-audit |
-| dm-verity on all rootfs images | `userland/sigma-pkg/sigma_pkg_cli.cpp` | `tools-dev` | Verify rootfs hash before mount |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| sigma-linux policy templates | `kernel/security/sigma_linux_policies/` | `tools-dev` | developer/forensic/sandbox/india-stack profiles | 
+| PQC-TLS enforcement for Linux net | `net/tls/sigma_tls.cpp` | `drivers-dev` | All TCP from Linux namespace tunnelled via sigma-tls | 
+| India Stack bridge (opt-in) | `userland/tools/sigma_linux_cli.cpp` | `release/standalone` | `--india-stack` flag exposes sigma-bus India topics | 
+| DID identity forwarding | `security/SovereignDID.cpp` | `release/standalone` | `$SIGMA_DID` env var inside Linux namespace | 
+| Audit log for Linux syscalls | `runtime/containers/sigma_linux_compat.cpp` | all | Every translated syscall → sigma-audit | 
+| dm-verity on all rootfs images | `userland/sigma-pkg/sigma_pkg_cli.cpp` | `tools-dev` | Verify rootfs hash before mount | 
 
 ---
 
@@ -613,25 +613,25 @@ Policy for ubuntu:24.04 (sandbox profile):
 
 After Phase L2 (Month 12), these should all work via sigma-linux:
 
-| Application | Distro | Use case | Status target |
-|-------------|--------|---------|--------------|
-| `apt install vim` | Ubuntu | Text editor | Phase L1 |
-| `pip install pandas` | Ubuntu | Data science | Phase L1 |
-| `npm install` | Ubuntu | Node.js dev | Phase L1 |
-| `gcc -o hello hello.c` | Ubuntu | C compilation | Phase L1 |
-| `git clone <repo>` | Ubuntu | Version control | Phase L1 |
-| `docker run hello-world` | Ubuntu | Docker-in-sigma | Phase L2 |
-| LibreOffice Writer | Ubuntu | Office suite | Phase L3 |
-| VSCode (code) | Ubuntu | IDE | Phase L3 |
-| GIMP | Ubuntu | Image editing | Phase L3 |
-| Firefox | Ubuntu | Browser | Phase L3 |
-| `nmap -sV target` | Kali | Security audit | Phase L2 |
-| `metasploit` | Kali | Pen testing | Phase L2 |
-| `burpsuite` | Kali | Web security | Phase L3 |
-| `pacman -S neovim` | Arch | Rolling release | Phase L2 |
-| `nix-env -i git` | NixOS | Reproducible env | Phase L2 |
-| Python ML (TensorFlow) | Ubuntu | AI/ML | Phase L2 |
-| `systemd-nspawn` | Ubuntu | Nested containers | Phase L3 |
+| Application | Distro | Use case | Status target | 
+| ------------- | -------- | --------- | -------------- | 
+| `apt install vim` | Ubuntu | Text editor | Phase L1 | 
+| `pip install pandas` | Ubuntu | Data science | Phase L1 | 
+| `npm install` | Ubuntu | Node.js dev | Phase L1 | 
+| `gcc -o hello hello.c` | Ubuntu | C compilation | Phase L1 | 
+| `git clone <repo>` | Ubuntu | Version control | Phase L1 | 
+| `docker run hello-world` | Ubuntu | Docker-in-sigma | Phase L2 | 
+| LibreOffice Writer | Ubuntu | Office suite | Phase L3 | 
+| VSCode (code) | Ubuntu | IDE | Phase L3 | 
+| GIMP | Ubuntu | Image editing | Phase L3 | 
+| Firefox | Ubuntu | Browser | Phase L3 | 
+| `nmap -sV target` | Kali | Security audit | Phase L2 | 
+| `metasploit` | Kali | Pen testing | Phase L2 | 
+| `burpsuite` | Kali | Web security | Phase L3 | 
+| `pacman -S neovim` | Arch | Rolling release | Phase L2 | 
+| `nix-env -i git` | NixOS | Reproducible env | Phase L2 | 
+| Python ML (TensorFlow) | Ubuntu | AI/ML | Phase L2 | 
+| `systemd-nspawn` | Ubuntu | Nested containers | Phase L3 | 
 
 ---
 
@@ -663,36 +663,36 @@ sigma-linux exec ubuntu:24.04
 # → PID namespace: sigma-linux-init (PID 1) spawns bash
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| `sigma_rootfs_builder.sh` | `tools/sigma_rootfs_builder.sh` | `tools-dev` | Build minimal rootfs for any distro |
-| sigma-linux-init (PID 1 stub) | `runtime/containers/sigma_linux_init.cpp` | `tools-dev` | Minimal init for Linux namespace (no systemd) |
-| OverlayFS for writable layer | `kernel/vfs/sigma_overlayfs.cpp` | `fs-dev` | Read-only rootfs + writable overlay per instance |
-| Rootfs image CI build | `.github/workflows/sigma_linux_images.yml` | `tools-dev` | Weekly: build + sign + publish all distro images |
-| Image size targets | `sigma_pkg_registry/linux-images/` | `tools-dev` | Ubuntu < 250MB, Alpine < 10MB, Kali < 500MB |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| `sigma_rootfs_builder.sh` | `tools/sigma_rootfs_builder.sh` | `tools-dev` | Build minimal rootfs for any distro | 
+| sigma-linux-init (PID 1 stub) | `runtime/containers/sigma_linux_init.cpp` | `tools-dev` | Minimal init for Linux namespace (no systemd) | 
+| OverlayFS for writable layer | `kernel/vfs/sigma_overlayfs.cpp` | `fs-dev` | Read-only rootfs + writable overlay per instance | 
+| Rootfs image CI build | `.github/workflows/sigma_linux_images.yml` | `tools-dev` | Weekly: build + sign + publish all distro images | 
+| Image size targets | `sigma_pkg_registry/linux-images/` | `tools-dev` | Ubuntu < 250MB, Alpine < 10MB, Kali < 500MB | 
 
 ---
 
 ## Per-Branch Tasks for sigma-linux
 
-| Branch | Task | Priority |
-|--------|------|---------|
-| `kernel-exp` | Linux signal routing (SIGTERM/SIGINT/SIGSEGV) | 🔴 |
-| `kernel-exp` | `/proc/` and `/sys/` minimal stubs | 🔴 |
-| `kernel-exp` | `clone(2)` with namespace flags | 🔴 |
-| `fs-dev` | OverlayFS for rootfs writable layer | 🔴 |
-| `fs-dev` | Bind-mount VFS path into Linux namespace | 🟠 |
-| `tools-dev` | Expand syscall table to 100 (Priority 1+2) | 🔴 |
-| `tools-dev` | sigma-linux CLI (install/exec/list/stop) | 🔴 |
-| `tools-dev` | sigma-linux-init (PID 1 stub) | 🔴 |
-| `tools-dev` | sigma_rootfs_builder.sh | 🟠 |
-| `tools-dev` | Ubuntu 24.04 .spkg image | 🟠 |
-| `drivers-dev` | veth network pair for Linux namespace | 🟠 |
-| `drivers-dev` | `/dev/` device nodes (null/zero/urandom/tty) | 🟠 |
-| `release/standalone` | X11 bridge → Zenith compositor | 🟡 |
-| `release/standalone` | Clipboard sync Linux ↔ SigmaOS | 🟡 |
-| `release/standalone` | sigma-terminal (GPU-accelerated term) | 🟠 |
-| `release/cloud` | sigma-linux in cloud profile (headless) | 🟡 |
+| Branch | Task | Priority | 
+| -------- | ------ | --------- | 
+| `kernel-exp` | Linux signal routing (SIGTERM/SIGINT/SIGSEGV) | 🔴 | 
+| `kernel-exp` | `/proc/` and `/sys/` minimal stubs | 🔴 | 
+| `kernel-exp` | `clone(2)` with namespace flags | 🔴 | 
+| `fs-dev` | OverlayFS for rootfs writable layer | 🔴 | 
+| `fs-dev` | Bind-mount VFS path into Linux namespace | 🟠 | 
+| `tools-dev` | Expand syscall table to 100 (Priority 1+2) | 🔴 | 
+| `tools-dev` | sigma-linux CLI (install/exec/list/stop) | 🔴 | 
+| `tools-dev` | sigma-linux-init (PID 1 stub) | 🔴 | 
+| `tools-dev` | sigma_rootfs_builder.sh | 🟠 | 
+| `tools-dev` | Ubuntu 24.04 .spkg image | 🟠 | 
+| `drivers-dev` | veth network pair for Linux namespace | 🟠 | 
+| `drivers-dev` | `/dev/` device nodes (null/zero/urandom/tty) | 🟠 | 
+| `release/standalone` | X11 bridge → Zenith compositor | 🟡 | 
+| `release/standalone` | Clipboard sync Linux ↔ SigmaOS | 🟡 | 
+| `release/standalone` | sigma-terminal (GPU-accelerated term) | 🟠 | 
+| `release/cloud` | sigma-linux in cloud profile (headless) | 🟡 | 
 
 ---
 

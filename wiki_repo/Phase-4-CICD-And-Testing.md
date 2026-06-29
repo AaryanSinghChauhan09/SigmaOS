@@ -11,7 +11,7 @@ SigmaOS uses a multi-dimensional CI matrix to validate every push to `main` acro
 Every push to `main` or `lattice-dev` triggers:
 
 | Dimension | Values |
-|-----------|--------|
+| ----------- | -------- |
 | `profile` | `standalone`, `microkernel`, `cloud` |
 | `target_os` | `sigma`, `ubuntu`, `bsd` |
 | **Total jobs** | **9 parallel jobs** |
@@ -19,7 +19,7 @@ Every push to `main` or `lattice-dev` triggers:
 ### Workflow Files
 
 | File | Purpose |
-|------|---------|
+| ------ | --------- |
 | [`.github/workflows/ci.yml`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/.github/workflows/ci.yml) | Core build + Rust static analysis per `target_os` |
 | [`.github/workflows/sigma_ci.yml`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/.github/workflows/sigma_ci.yml) | Full 3×3 matrix: `profile` × `target_os` |
 
@@ -31,12 +31,12 @@ Every push to `main` or `lattice-dev` triggers:
 
 ```bash
 cargo test --target x86_64-unknown-linux-gnu
-```
+```text
 
-**Current status: Full Rust migration**
+### Current status: Full Rust migration
 
 | Suite | Tests |
-|-------|-------|
+| ------- | ------- |
 | `tests/sovereign/format_tests.rs` | Universal OS Format validation |
 | `tests/sovereign/kernel_tests.rs` | Core kernel module validation |
 
@@ -53,14 +53,14 @@ Runs on every CI push:
 
 ```bash
 cargo clippy --target x86_64-unknown-none -- -D warnings
-```
+```text
 
 ---
 
 ## Hardware Validation Matrix
 
 | Architecture | Target | Status |
-|-------------|--------|--------|
+| ------------- | -------- | -------- |
 | x86_64 | All | ✅ CI Validated |
 | ARM64 | sigma, ubuntu | 🔄 Planned Phase 4B |
 | RISC-V 64 | sigma | 🔄 Planned Phase 4C |
@@ -71,7 +71,7 @@ cargo clippy --target x86_64-unknown-none -- -D warnings
 ## Release Cadence
 
 | Channel | Cadence | LTS? |
-|---------|---------|------|
+| --------- | --------- | ------ |
 | `nightly` | Every push to `main` | No |
 | `testing` | Weekly snapshot | No |
 | `stable` | Quarterly | Yes (2-yr support) |

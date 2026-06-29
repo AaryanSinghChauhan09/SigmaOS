@@ -211,6 +211,7 @@ set(SIGMA_RUST_CORE
     ${CMAKE_SOURCE_DIR}/kernel/sched/sovereign_mcs.rs
     ${CMAKE_SOURCE_DIR}/security/sovereign_apparmor.rs
     ${CMAKE_SOURCE_DIR}/security/sovereign_sandbox_mac.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/memory/sovereign_allocator.rs
 )
 
 # ── Rust Network Stack ────────────────────────────────────────────────────

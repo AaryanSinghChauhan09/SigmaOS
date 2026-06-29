@@ -46,32 +46,32 @@ sigma-web/src/
 
 ## 24 Drivers
 
-| Driver | Web API | What it does |
-|---|---|---|
-| Battery | Battery Status API | Real battery level, charging state |
-| Network | Network Information API | Online/offline, speed, RTT |
-| Geolocation | Geolocation API | GPS with live tracking |
-| Motion | DeviceMotion/Orientation | Accelerometer, gyroscope |
-| Ambient Light | AmbientLightSensor | Light level, auto dark/light |
-| Filesystem | File System Access API | Browse and read real disk files |
-| OPFS | Origin Private File System | Persistent in-browser storage |
-| Audio | Web Audio API | Microphone, frequency visualizer |
-| Camera | getUserMedia (video) | Webcam with snapshot |
-| Screen Capture | getDisplayMedia | Screen share + recording |
-| Gamepad | Gamepad API | Controller buttons + axes |
-| Speech | SpeechRecognition/Synthesis | Voice input + TTS |
-| Notifications | Notifications API | System push notifications |
-| Clipboard | Clipboard API | Read/write system clipboard |
-| Wake Lock | Screen Wake Lock API | Prevent screen sleep |
-| Multi-Screen | Window Management API | Detect multiple monitors |
-| USB | WebUSB API | Pair and enumerate USB devices |
-| Bluetooth | Web Bluetooth API | GATT device connection |
-| Serial | Web Serial API | Arduino/ESP32 communication |
-| HID | WebHID API | Gamepads, tablets, keyboards |
-| MIDI | Web MIDI API | Music instrument input/output |
-| GPU | WebGPU API | GPU info, features, limits |
-| Share | Web Share API | Native OS share sheet |
-| Pointer | Pointer Events API | Mouse/pen/touch with pressure |
+| Driver | Web API | What it does | 
+| --- | --- | --- | 
+| Battery | Battery Status API | Real battery level, charging state | 
+| Network | Network Information API | Online/offline, speed, RTT | 
+| Geolocation | Geolocation API | GPS with live tracking | 
+| Motion | DeviceMotion/Orientation | Accelerometer, gyroscope | 
+| Ambient Light | AmbientLightSensor | Light level, auto dark/light | 
+| Filesystem | File System Access API | Browse and read real disk files | 
+| OPFS | Origin Private File System | Persistent in-browser storage | 
+| Audio | Web Audio API | Microphone, frequency visualizer | 
+| Camera | getUserMedia (video) | Webcam with snapshot | 
+| Screen Capture | getDisplayMedia | Screen share + recording | 
+| Gamepad | Gamepad API | Controller buttons + axes | 
+| Speech | SpeechRecognition/Synthesis | Voice input + TTS | 
+| Notifications | Notifications API | System push notifications | 
+| Clipboard | Clipboard API | Read/write system clipboard | 
+| Wake Lock | Screen Wake Lock API | Prevent screen sleep | 
+| Multi-Screen | Window Management API | Detect multiple monitors | 
+| USB | WebUSB API | Pair and enumerate USB devices | 
+| Bluetooth | Web Bluetooth API | GATT device connection | 
+| Serial | Web Serial API | Arduino/ESP32 communication | 
+| HID | WebHID API | Gamepads, tablets, keyboards | 
+| MIDI | Web MIDI API | Music instrument input/output | 
+| GPU | WebGPU API | GPU info, features, limits | 
+| Share | Web Share API | Native OS share sheet | 
+| Pointer | Pointer Events API | Mouse/pen/touch with pressure | 
 
 ## Quick Start
 

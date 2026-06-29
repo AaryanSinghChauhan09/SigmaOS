@@ -34,7 +34,7 @@ typedef struct vfs_node {
     sigma_u32 inode_id;
     sigma_size_t size;
     sigma_u32 flags; // File, Directory, Block Device, Character Device
-    
+
     // Callback functions mapping directly to drivers
     sigma_i32 (*read)(struct vfs_node* node, void* buf, sigma_size_t size, sigma_u64 offset);
     sigma_i32 (*write)(struct vfs_node* node, const void* buf, sigma_size_t size, sigma_u64 offset);

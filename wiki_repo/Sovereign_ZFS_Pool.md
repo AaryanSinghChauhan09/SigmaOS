@@ -8,13 +8,13 @@ By executing directly on bare-metal block allocations, it absorbs the defining s
 
 ## 🚀 Architectural Design & Parity
 
-| Feature Domain | SigmaOS S-ZFS | OpenZFS | Apple APFS | Windows NTFS |
-| :--- | :--- | :--- | :--- | :--- |
-| **Purity** | Bare-metal C++17 | Monolithic C / SPL | Proprietary macOS | Closed-source NT Driver |
-| **Write Model** | Transactional CoW | Copy-on-Write (ZIL) | Redirect-on-Write | In-place Journaling |
-| **Device Pooling** | Native RAID-Z striping | zpools (vdevs) | Container-based sharing | Dynamic Disk Groups |
-| **Snapshots** | Instant O(1) Merkle-attested | Snapshot rollback | APFS snapshots | Volume Shadow Copy (VSS) |
-| **Integrity Checks** | PQC Merkle-root signatures | fletcher4 / sha256 checksums | Metadata checksums | CHKDSK / Log-based |
+| Feature Domain | SigmaOS S-ZFS | OpenZFS | Apple APFS | Windows NTFS | 
+| :--- | :--- | :--- | :--- | :--- | 
+| **Purity** | Bare-metal C++17 | Monolithic C / SPL | Proprietary macOS | Closed-source NT Driver | 
+| **Write Model** | Transactional CoW | Copy-on-Write (ZIL) | Redirect-on-Write | In-place Journaling | 
+| **Device Pooling** | Native RAID-Z striping | zpools (vdevs) | Container-based sharing | Dynamic Disk Groups | 
+| **Snapshots** | Instant O(1) Merkle-attested | Snapshot rollback | APFS snapshots | Volume Shadow Copy (VSS) | 
+| **Integrity Checks** | PQC Merkle-root signatures | fletcher4 / sha256 checksums | Metadata checksums | CHKDSK / Log-based | 
 
 ---
 

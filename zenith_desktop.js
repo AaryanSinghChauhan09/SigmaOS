@@ -943,6 +943,193 @@ function initFileManager() {
     fileManager = new FileManager('fm-grid', 'fm-breadcrumbs');
 }
 
+// Syscall Database for the Developer Portal
+const SYSCALLS = [
+    { name: 'sys_write', signature: 'sys_write(fd: u64, buf: *const u8, len: u64) -> i64', desc: 'Writes data from buffer to file descriptor. Handled by VFS or console drivers.', code: '0x01' },
+    { name: 'sys_read', signature: 'sys_read(fd: u64, buf: *mut u8, len: u64) -> i64', desc: 'Reads data from file descriptor into buffer.', code: '0x00' },
+    { name: 'sys_exit', signature: 'sys_exit(code: i32) -> !', desc: 'Terminates the calling process instantly. Amnesic cleanup is triggered in Ring-0.', code: '0x3c' },
+    { name: 'sys_getpid', signature: 'sys_getpid() -> u32', desc: 'Returns the current process identifier.', code: '0x27' },
+    { name: 'sys_mmap', signature: 'sys_mmap(addr: *mut u8, len: u64, prot: u32, flags: u32, fd: u64, offset: u64) -> *mut u8', desc: 'Maps virtual memory page ranges.', code: '0x09' },
+    { name: 'sys_zenith_log', signature: 'sys_zenith_log(severity: u32, code: u32, comp: *const u8, msg: *const u8, cid: u32) -> i32', desc: 'Direct interface to the new Rust lock-free ring buffer logger.', code: '0x55' }
+];
+
+// Interactive functions for Dev Portal
+window.switchDevPortalTab = function(tabId, btn) {
+    document.querySelectorAll('.dev-portal-tab-content').forEach(el => el.style.display = 'none');
+    document.getElementById('dev-' + tabId).style.display = 'block';
+    
+    btn.parentNode.querySelectorAll('.settings-tab').forEach(el => el.classList.remove('active'));
+    btn.classList.add('active');
+};
+
+window.searchSyscalls = function() {
+    const q = document.getElementById('syscall-search').value.toLowerCase();
+    const container = document.getElementById('syscall-list-container');
+    container.innerHTML = '';
+    
+    const filtered = SYSCALLS.filter(s => s.name.includes(q) || s.desc.toLowerCase().includes(q));
+    if (filtered.length === 0) {
+        container.innerHTML = '<div style="opacity: 0.7;">No matching syscalls found.</div>';
+        return;
+    }
+    
+    filtered.forEach(s => {
+        const el = document.createElement('div');
+        el.style.cssText = 'background: rgba(255,255,255,0.03); padding: 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08);';
+        el.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="color: #00ffff;">${s.name}</strong>
+                <span style="font-family: monospace; font-size: 0.85em; opacity: 0.6;">Code: ${s.code}</span>
+            </div>
+            <div style="font-family: monospace; font-size: 0.85em; margin: 5px 0; color: #ff79c6;">${s.signature}</div>
+            <div style="font-size: 0.9em; opacity: 0.85;">${s.desc}</div>
+        `;
+        container.appendChild(el);
+    });
+};
+
+window.verifyStep = function(stepNum, btn) {
+    btn.disabled = true;
+    btn.innerText = 'VERIFYING...';
+    setTimeout(() => {
+        btn.parentNode.style.border = '1px solid rgba(57, 255, 20, 0.3)';
+        btn.parentNode.style.background = 'rgba(57, 255, 20, 0.05)';
+        btn.innerText = 'VERIFIED ✓';
+        btn.style.background = '#39ff14';
+        btn.style.color = '#000';
+        if (window.addLog) addLog(`Σ [DEV]: Build step ${stepNum} environment verified successfully.`, 'success');
+    }, 1200);
+};
+
+window.triggerCIBuild = function() {
+    const log = document.getElementById('cicd-log-output');
+    log.innerText = '';
+    const steps = [
+        'Starting SigmaOS mainline CI/CD build...',
+        '[CI] Target: x86_64-freestanding-none',
+        '[CI] Compiling Rust logging module (sovereign_zenithd_log.rs) ... OK',
+        '[CI] Compiling Zig HAL elements (arch/x86_64/paging.zig) ... OK',
+        '[CI] Compiling Nim package manager (pkg/sigpkg.nim) ... OK',
+        '[CI] Formally verifying Kyber-1024 SPARK contracts ... OK',
+        '[CI] Linking boot image ... OK',
+        '[CI] Test suite run: 42 passed, 0 failed.',
+        '*** BUILD SUCCESSFUL (1.8s) ***'
+    ];
+    let i = 0;
+    const interval = setInterval(() => {
+        if (i < steps.length) {
+            log.innerText += steps[i] + '\n';
+            log.scrollTop = log.scrollHeight;
+            i++;
+        } else {
+            clearInterval(interval);
+        }
+    }, 300);
+};
+
+// Interactive functions for Emulator
+let emulatorBooting = false;
+window.bootEmulator = function() {
+    if (emulatorBooting) return;
+    emulatorBooting = true;
+    const consoleEl = document.getElementById('emulator-console');
+    consoleEl.innerHTML = '';
+    
+    const logs = [
+        'GRUB Loading stage 1.5...',
+        'Booting \'SigmaOS Sovereign Zenith\'',
+        'Kernel at 0xffffffff80100000 (x86_64 bare-metal)',
+        '[LOAD] sovereign_zenithd_log.rs (Rust Logger Core) ... OK',
+        '[INIT] VFS storage tree mapping ... OK',
+        '[INIT] Sovereign Kyber-1024 encryption layer ... OK',
+        '[HAL] CPU cores detected: 4. Initializing APIC ... OK',
+        '[SCHED] Swapping to Multi-Core MCS Scheduler ... OK',
+        '[SELF-HEALING] Active watchdog started (watchdog.rs) ... OK',
+        '==================================================',
+        'Σ SIGMAOS ZENITH v15.0.0 (SOVEREIGN DESKTOP)',
+        'Ready. Type "help" to list available commands.',
+        '=================================================='
+    ];
+    
+    let i = 0;
+    const interval = setInterval(() => {
+        if (i < logs.length) {
+            const div = document.createElement('div');
+            if (logs[i].startsWith('[LOAD]') || logs[i].startsWith('[INIT]') || logs[i].startsWith('[HAL]')) {
+                div.style.color = '#00ffff';
+            } else if (logs[i].includes('SUCCESS') || logs[i].includes('OK')) {
+                div.style.color = '#39ff14';
+            }
+            div.innerText = logs[i];
+            consoleEl.appendChild(div);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+            i++;
+        } else {
+            clearInterval(interval);
+            emulatorBooting = false;
+        }
+    }, 200);
+};
+
+window.handleEmulatorCommand = function(e) {
+    if (e.key === 'Enter') {
+        const inputEl = document.getElementById('emulator-input');
+        const q = inputEl.value.trim().toLowerCase();
+        inputEl.value = '';
+        
+        const consoleEl = document.getElementById('emulator-console');
+        const cmdLine = document.createElement('div');
+        cmdLine.style.color = '#fff';
+        cmdLine.innerText = '> ' + q;
+        consoleEl.appendChild(cmdLine);
+        
+        const reply = document.createElement('div');
+        if (q === 'help') {
+            reply.innerText = 'Available commands: boot, help, neofetch, about, clear';
+        } else if (q === 'boot') {
+            bootEmulator();
+            return;
+        } else if (q === 'clear') {
+            consoleEl.innerHTML = '';
+            return;
+        } else if (q === 'neofetch') {
+            reply.style.whiteSpace = 'pre';
+            reply.style.color = '#00ffff';
+            reply.innerText = `
+   /\\_/\\      OS: SigmaOS Sovereign Zenith v15.0
+  ( o.o )     Kernel: 15.0.0-rust-pure
+   > ^ <      Shell: sovereign-sh
+              Uptime: 2 mins
+              Architecture: x86_64 (WASM Simulation)
+              Memory: 128 MB / 4096 MB (Freestanding)
+`;
+        } else if (q === 'about') {
+            reply.innerText = 'SigmaOS is a next-gen, zero-trust sovereign OS written in Rust, Zig, Nim, and Ada/SPARK.';
+        } else {
+            reply.style.color = '#ff5555';
+            reply.innerText = 'Command not found: ' + q;
+        }
+        consoleEl.appendChild(reply);
+        consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+};
+
+// Interactive functions for Test Analytics
+window.runSelectedTests = function() {
+    const btn = event.target;
+    btn.disabled = true;
+    const resEl = document.getElementById('test-run-result');
+    resEl.style.color = '#ffb86c';
+    resEl.innerText = 'Running selected suites...';
+    
+    setTimeout(() => {
+        resEl.style.color = '#39ff14';
+        resEl.innerText = 'All suites passed successfully. (Pass rate: 100%)';
+        btn.disabled = false;
+        if (window.addLog) addLog('Σ [TEST]: Manual run of select kernel tests passed.', 'success');
+    }, 1500);
+};
+
 // Update existing launchApp to handle new windows
 const originalLaunchApp = window.launchApp;
 window.launchApp = function(app) {
@@ -953,6 +1140,13 @@ window.launchApp = function(app) {
         if (fileManager) fileManager.update();
     } else if (app === 'AI Studio' || app === '🤖') {
         openWindow('sigma-ai-studio-win');
+    } else if (app === 'Dev Portal') {
+        openWindow('dev-portal-win');
+        searchSyscalls(); // Populates list initially
+    } else if (app === 'Emulator') {
+        openWindow('emulator-win');
+    } else if (app === 'Analytics') {
+        openWindow('analytics-win');
     } else {
         originalLaunchApp(app);
     }
@@ -966,6 +1160,9 @@ window.addEventListener('load', () => {
         wm.register('file-manager-win');
         wm.register('text-editor-win');
         wm.register('sigma-ai-studio-win');
+        wm.register('dev-portal-win');
+        wm.register('emulator-win');
+        wm.register('analytics-win');
     }
 });
 

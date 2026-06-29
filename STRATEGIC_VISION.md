@@ -2,9 +2,9 @@
 
 ## ⚔️ The Paradigm Shift: Crushing the Linux Monoculture
 
-Linux is ubiquitous, but its dominance is built on legacy assumptions and fragmented ecosystems. SigmaOS is not here to simply exist alongside Linux; it is here to **crush it** in critical domains by offering a fundamentally superior, sovereign architecture. 
+Linux is ubiquitous, but its dominance is built on legacy assumptions and fragmented ecosystems. SigmaOS is not here to simply exist alongside Linux; it is here to **crush it** in critical domains by offering a fundamentally superior, sovereign architecture.
 
-SigmaOS will not "out-Linux" Linux by adopting its legacy debt. Instead, we will **out-sovereign** it, aggressively catching up on hardware and networking essentials while introducing killer differentiators that the Linux architecture structurally cannot support. 
+SigmaOS will not "out-Linux" Linux by adopting its legacy debt. Instead, we will **out-sovereign** it, aggressively catching up on hardware and networking essentials while introducing killer differentiators that the Linux architecture structurally cannot support.
 
 ## 🧱 The Missing Foundations (Hardware & Catch-Up Essentials)
 
@@ -45,7 +45,7 @@ These are the structural advantages where Linux's POSIX legacy prevents it from 
 
 ## 👉 Execution Path: The Uncompromising Agenda
 
-SigmaOS has covered the basics of sovereignty, but to truly crush Linux distros it must catch up on hardware + ecosystem while leapfrogging with sovereignty features Linux can’t easily replicate. 
+SigmaOS has covered the basics of sovereignty, but to truly crush Linux distros it must catch up on hardware + ecosystem while leapfrogging with sovereignty features Linux can’t easily replicate.
 
 Our immediate priorities are:
 1.  **Port SigmaOS to ARM/RISC-V:** Unlock the massive embedded and SBC markets.

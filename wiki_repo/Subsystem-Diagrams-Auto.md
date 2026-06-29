@@ -32,4 +32,4 @@ graph TD
     C --> D[PQC Signature Verifier]
     D --> E[Shard Sandbox]
 
-```
+```text

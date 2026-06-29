@@ -1,14 +1,14 @@
 # Profession-Data-Scientist-Tools: Sovereign Data Science & Machine Learning Architecture
 
-> **Specification Version:** 15.2-FINAL  
-> **Classification:** Industrial-Grade Sovereign AI / Data Science Shard Manifest  
-> **Execution Layer:** L4 (Silicon-Direct Compute, Zero-STL, AVX-512 FMA Accelerated)  
+> **Specification Version:** 15.2-FINAL
+> **Classification:** Industrial-Grade Sovereign AI / Data Science Shard Manifest
+> **Execution Layer:** L4 (Silicon-Direct Compute, Zero-STL, AVX-512 FMA Accelerated)
 
 ---
 
 ## Executive Summary
 
-The **SigmaOS Zenith Data Science & Machine Learning Matrix** represents a paradigm shift in industrial computing. By purging high-level runtime dependencies (Python, PyTorch, TensorFlow, Pandas, NumPy, Scikit-Learn) and operating entirely at the bare-metal C++ microkernel layer, SigmaOS eliminates gigabytes of memory overhead, JIT compilation latency, and garbage collection pauses. 
+The **SigmaOS Zenith Data Science & Machine Learning Matrix** represents a paradigm shift in industrial computing. By purging high-level runtime dependencies (Python, PyTorch, TensorFlow, Pandas, NumPy, Scikit-Learn) and operating entirely at the bare-metal C++ microkernel layer, SigmaOS eliminates gigabytes of memory overhead, JIT compilation latency, and garbage collection pauses.
 
 Every statistical calculation, matrix multiplication, tensor transformation, and data cleaning pass is executed directly on silicon using raw x86_64 AVX-512 FMA (Fused-Multiply-Add) instructions, direct framebuffer rasterization, and wait-free circular buffer sharding. This document defines the **Ten Core Pillars of Data Science Principles** implemented within the SigmaOS sovereign lattice.
 
@@ -58,7 +58,7 @@ $$\mu = \frac{1}{N} \sum_{i=1}^{N} x_i \quad \implies \quad x_{missing} = \mu$$
 
 ### 1.2 Outlier Detection & Treatment
 
-* **Z-Score Filtering:** Computes the standard deviation $\sigma$ and mean $\mu$, purging data points where $|z| > 3.0$.
+* **Z-Score Filtering:** Computes the standard deviation $\sigma$ and mean $\mu$, purging data points where $ | z | > 3.0$.
 
 $$z_i = \frac{x_i - \mu}{\sigma}$$
 
@@ -203,7 +203,7 @@ $$P(x_i | y) = \frac{1}{\sqrt{2\pi\sigma_y^2}} \exp\left(-\frac{(x_i - \mu_y)^2}
 
 * **K-Means Clustering:** Implements Lloyd's algorithm with K-Means++ centroid initialization approximation. Iteratively assigns data points to the nearest cluster centroid minimizing Within-Cluster Sum of Squares (WCSS inertia):
 
-$$\text{WCSS} = \sum_{k=1}^{K} \sum_{x \in S_k} ||x - \mu_k||^2$$
+$$\text{WCSS} = \sum_{k=1}^{K} \sum_{x \in S_k} | |x - \mu_k | |^2$$
 
 * **K-Nearest Neighbors (k-NN):** Instance-based classifier supporting both Euclidean ($L_2$) and Manhattan ($L_1$) distance metrics. Employs majority voting across the $k$ nearest neighbors for robust classification.
 
@@ -217,7 +217,7 @@ Models must be exhaustively benchmarked to verify production readiness. SigmaOS 
 
 * **Mean Squared Error (MSE):** $MSE = \frac{1}{N} \sum (y_i - \hat{y}_i)^2$
 * **Root Mean Squared Error (RMSE):** $RMSE = \sqrt{MSE}$
-* **Mean Absolute Error (MAE):** $MAE = \frac{1}{N} \sum |y_i - \hat{y}_i|$
+* **Mean Absolute Error (MAE):** $MAE = \frac{1}{N} \sum | y_i - \hat{y}_i | $
 * **R-Squared ($R^2$ - Coefficient of Determination):** Evaluates the proportion of variance explained by the model.
 
 $$R^2 = 1 - \frac{\sum (y_i - \hat{y}_i)^2}{\sum (y_i - \bar{y})^2}$$
@@ -270,7 +270,7 @@ Industrial AI requires continuous observability. The `SovereignMLFlow` (`kernel/
 
 * **Drift Detection (KL-Divergence):** Continuously monitors production inference distributions against baseline training distributions using Kullback-Leibler Divergence:
 
-$$D_{KL}(P || Q) = \sum P(x) \ln\left(\frac{P(x)}{Q(x)}\right)$$
+$$D_{KL}(P | | Q) = \sum P(x) \ln\left(\frac{P(x)}{Q(x)}\right)$$
 
 * **Explainable AI (SHAP Value Approximation):** Computes approximate Shapley values from cooperative game theory to identify individual feature contributions to specific neural predictions.
 * **Feature Importance Scoring:** Evaluates permutation importance across dataset shards to rank features by their impact on model loss.
@@ -329,7 +329,7 @@ Kernel log parsing, intrusion detection, and automated root-cause analysis requi
 
 * **Term Frequency-Inverse Document Frequency (TF-IDF):** Transforms unstructured raw text tokens into sparse numerical feature matrices, weighting terms by their local frequency and global rarity across log shards:
 
-$$\text{TF-IDF}(t, d, D) = \text{tf}(t, d) \cdot \left(\ln\left(\frac{1 + |D|}{1 + |\{d \in D : t \in d\}|}\right) + 1\right)$$
+$$\text{TF-IDF}(t, d, D) = \text{tf}(t, d) \cdot \left(\ln\left(\frac{1 + | D | }{1 + | \{d \in D : t \in d\} | }\right) + 1\right)$$
 
 * **N-Gram Tokenization:** Extracts contiguous sliding windows of $N$ words or characters (Bi-grams, Tri-grams) to capture local syntactic context.
 
@@ -337,7 +337,7 @@ $$\text{TF-IDF}(t, d, D) = \text{tf}(t, d) \cdot \left(\ln\left(\frac{1 + |D|}{1
 
 * **Cosine Similarity:** Evaluates semantic similarity between high-dimensional document vectors by computing the normalized dot product:
 
-$$\text{similarity} = \cos(\theta) = \frac{\mathbf{A} \cdot \mathbf{B}}{||\mathbf{A}|| \cdot ||\mathbf{B}||}$$
+$$\text{similarity} = \cos(\theta) = \frac{\mathbf{A} \cdot \mathbf{B}}{ | |\mathbf{A} | | \cdot | |\mathbf{B} | |}$$
 
 ---
 
@@ -359,7 +359,7 @@ $$f(x) = \max(0, x)$$
 
 $$\theta_{t+1} = \theta_t - \frac{\alpha}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t$$
 
-* **L1 (Lasso) & L2 (Ridge) Regularization:** Adds absolute ($\lambda \sum |\theta|$) or squared ($\lambda \sum \theta^2$) weight penalties to the loss function, inducing feature sparsity and preventing overfitting.
+* **L1 (Lasso) & L2 (Ridge) Regularization:** Adds absolute ($\lambda \sum | \theta | $) or squared ($\lambda \sum \theta^2$) weight penalties to the loss function, inducing feature sparsity and preventing overfitting.
 
 ---
 
@@ -367,20 +367,20 @@ $$\theta_{t+1} = \theta_t - \frac{\alpha}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t
 
 The table below maps the Data Science principles defined in this specification to their exact C++ translation units within the SigmaOS repository.
 
-| Data Science Principle | Module / Class Name | Primary Translation Unit | Key C++ Methods |
-| :--- | :--- | :--- | :--- |
-| **Data Cleaning & Imputation** | `SovereignDataZenith` | `ecosystem/SovereignDataPreprocess.cpp` | `Clean()`, `ImputeMissingValues()`, `TransformScaling()` |
-| **EDA & Summary Statistics** | `SovereignGraphPlotter` | `ecosystem/SovereignML.cpp` | `CalculateCentralTendency()`, `CalculateDispersion()`, `PlotScatterMatrix()` |
-| **Hypothesis Testing** | `SovereignStatisticalSolver`| `ecosystem/SovereignML.cpp` | `PerformTTest()`, `PerformChiSquareTest()`, `PerformANOVA()` |
-| **Supervised ML Algorithms** | `SovereignNeuralForge` | `ecosystem/SovereignML.cpp` | `FitLinearRegressionOLS()`, `FitLogisticRegression()`, `FitDecisionTree()` |
-| **Unsupervised ML Algorithms** | `SovereignNeuralForge` | `ecosystem/SovereignML.cpp` | `FitKMeansClustering()`, `FitKNNClassifier()`, `FitNaiveBayes()` |
-| **Model Evaluation Metrics** | `SovereignMLDiagnostics` | `ecosystem/SovereignML.cpp` | `CalculateRegressionMetrics()`, `CalculateConfusionMatrix()`, `KFoldCrossValidation()` |
-| **Experiment Tracking** | `SovereignMLFlow` | `kernel/core/ai/SovereignMLFlow.cpp` | `logMetric()`, `saveExperiment()`, `runGridSearch()` |
-| **Drift & Explainability** | `SovereignMLForge` | `kernel/shards/ml-ai/SovereignMLForge.cpp` | `detectModelDrift()`, `explainPrediction()`, `scoreFeatureImportance()` |
-| **Time Series Forecasting** | `SovereignTimeSeriesForecaster` | `ecosystem/SovereignML.cpp` | `CalculateMovingAverages()`, `CalculateAutocorrelation()`, `PerformADFStationarityTest()` |
-| **Ensemble Learning & Boosting** | `SovereignEnsembleForge` | `ecosystem/SovereignML.cpp` | `FitRandomForestClassifier()`, `FitGradientBoostingMachine()`, `FitAdaBoostClassifier()` |
-| **NLP & Text Analytics** | `SovereignNLPAnalytics` | `ecosystem/SovereignML.cpp` | `ComputeTFIDFMatrix()`, `CalculateCosineSimilarity()`, `ExtractNGrams()` |
-| **Deep Learning Primitives** | `SovereignDeepLearningEngine` | `ecosystem/SovereignML.cpp` | `ForwardPropagateMLP()`, `ExecuteAdamOptimizerStep()`, `CalculateRegularizationPenalty()` |
+| Data Science Principle | Module / Class Name | Primary Translation Unit | Key C++ Methods | 
+| :--- | :--- | :--- | :--- | 
+| **Data Cleaning & Imputation** | `SovereignDataZenith` | `ecosystem/SovereignDataPreprocess.cpp` | `Clean()`, `ImputeMissingValues()`, `TransformScaling()` | 
+| **EDA & Summary Statistics** | `SovereignGraphPlotter` | `ecosystem/SovereignML.cpp` | `CalculateCentralTendency()`, `CalculateDispersion()`, `PlotScatterMatrix()` | 
+| **Hypothesis Testing** | `SovereignStatisticalSolver` | `ecosystem/SovereignML.cpp` | `PerformTTest()`, `PerformChiSquareTest()`, `PerformANOVA()` | 
+| **Supervised ML Algorithms** | `SovereignNeuralForge` | `ecosystem/SovereignML.cpp` | `FitLinearRegressionOLS()`, `FitLogisticRegression()`, `FitDecisionTree()` | 
+| **Unsupervised ML Algorithms** | `SovereignNeuralForge` | `ecosystem/SovereignML.cpp` | `FitKMeansClustering()`, `FitKNNClassifier()`, `FitNaiveBayes()` | 
+| **Model Evaluation Metrics** | `SovereignMLDiagnostics` | `ecosystem/SovereignML.cpp` | `CalculateRegressionMetrics()`, `CalculateConfusionMatrix()`, `KFoldCrossValidation()` | 
+| **Experiment Tracking** | `SovereignMLFlow` | `kernel/core/ai/SovereignMLFlow.cpp` | `logMetric()`, `saveExperiment()`, `runGridSearch()` | 
+| **Drift & Explainability** | `SovereignMLForge` | `kernel/shards/ml-ai/SovereignMLForge.cpp` | `detectModelDrift()`, `explainPrediction()`, `scoreFeatureImportance()` | 
+| **Time Series Forecasting** | `SovereignTimeSeriesForecaster` | `ecosystem/SovereignML.cpp` | `CalculateMovingAverages()`, `CalculateAutocorrelation()`, `PerformADFStationarityTest()` | 
+| **Ensemble Learning & Boosting** | `SovereignEnsembleForge` | `ecosystem/SovereignML.cpp` | `FitRandomForestClassifier()`, `FitGradientBoostingMachine()`, `FitAdaBoostClassifier()` | 
+| **NLP & Text Analytics** | `SovereignNLPAnalytics` | `ecosystem/SovereignML.cpp` | `ComputeTFIDFMatrix()`, `CalculateCosineSimilarity()`, `ExtractNGrams()` | 
+| **Deep Learning Primitives** | `SovereignDeepLearningEngine` | `ecosystem/SovereignML.cpp` | `ForwardPropagateMLP()`, `ExecuteAdamOptimizerStep()`, `CalculateRegularizationPenalty()` | 
 
 ---
 > **Verification Status:** BUILD-VERIFIED | ZERO-STL COMPLIANT | 100% SILICON PURITY

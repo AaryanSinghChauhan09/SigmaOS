@@ -124,7 +124,8 @@ RUST_CORE_SRCS := kernel/core/memory/mod.rs kernel/core/memory/pmm.rs \
                   kernel/syscalls/sovereign_syscalls.rs \
                   kernel/sched/sovereign_mcs.rs \
                   security/sovereign_apparmor.rs \
-                  security/sovereign_sandbox_mac.rs
+                  security/sovereign_sandbox_mac.rs \
+                  kernel/core/memory/sovereign_allocator.rs
 
 # ── Rust sources — Network Stack ──────────────────────────────────────────
 RUST_NET_SRCS := kernel/net/mod.rs kernel/net/net_stack.rs \

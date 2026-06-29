@@ -387,9 +387,8 @@ This plan converts the SigmaOS roadmap design into incremental coding tasks. Imp
     - Add `-nostdlib -nostdinc -ffreestanding` to kernel compile flags in `CMakeLists.txt`
     - Remove any `#include <stdlib.h>`, `#include <stdio.h>`, or `#include <string.h>` from kernel source files; replace with sovereign libc equivalents
     - Link kernel binary against sovereign libc (`-lsigma_libc`) instead of host glibc
-    - Add CI step: `nm build/sigma-kernel | grep -q GLIBC && exit 1 || exit 0`
+    - Add CI step: `nm build/sigma-kernel | grep -q GLIBC && exit 1 | | exit 0`
     - _Requirements: 27.1, 27.2, 27.3, 27.4_
 
 - [ ] 16. Checkpoint — Critical bug fixes verified
   - Ensure all critical bug fix tests pass and `nm` verification confirms no glibc symbols. Ask the user if questions arise.
-

@@ -1,14 +1,14 @@
 # Omni-Computer-Science-AI-Architecture: Sovereign 15-Domain Matrix Manifest
 
-> **Specification Version:** 15.2-FINAL  
-> **Classification:** Industrial-Grade Sovereign Computer Science & AI Omni-Matrix Manifest  
-> **Execution Layer:** L4 (Silicon-Direct Compute, Zero-STL, AVX-512 FMA Accelerated)  
+> **Specification Version:** 15.2-FINAL
+> **Classification:** Industrial-Grade Sovereign Computer Science & AI Omni-Matrix Manifest
+> **Execution Layer:** L4 (Silicon-Direct Compute, Zero-STL, AVX-512 FMA Accelerated)
 
 ---
 
 ## Executive Summary
 
-The **SigmaOS Zenith Omni-Matrix Architecture** represents the ultimate synthesis of computer science, artificial intelligence, data engineering, data visualisation, object oriented programming, and mathematical theory. Operating entirely as a freestanding, zero-dependency C++ microkernel lattice, SigmaOS bypasses all conventional runtime interpreters, virtual machines, and external software libraries. 
+The **SigmaOS Zenith Omni-Matrix Architecture** represents the ultimate synthesis of computer science, artificial intelligence, data engineering, data visualisation, object oriented programming, and mathematical theory. Operating entirely as a freestanding, zero-dependency C++ microkernel lattice, SigmaOS bypasses all conventional runtime interpreters, virtual machines, and external software libraries.
 
 Every algorithm across the fifteen core domains is compiled directly into cache-line-aligned, AVX-512 FMA vectorized x86_64 machine code. This manifest establishes the absolute theoretical foundation, architectural features, operational principles, tools, and Unique Selling Points (USPs) for the fifteen foundational pillars of modern computing within the SigmaOS sovereign ecosystem.
 
@@ -279,7 +279,7 @@ Advanced Statistics provides non-parametric testing, stochastic numerical integr
 * **Kruskal-Wallis One-Way ANOVA on Ranks:** Non-parametric test evaluating whether multiple independent samples originate from identical distribution populations.
 * **Monte Carlo Stochastic Integration:** Approximates complex multidimensional definite integrals and irrational constants ($\pi$) via uniform pseudo-random Monte Carlo sampling.
 * **Weibull Distribution Fitting:** Estimates reliability shape ($k$) and scale ($\lambda$) parameters to model industrial hardware failure rates over time: $f(t) = \frac{k}{\lambda} (\frac{t}{\lambda})^{k-1} e^{-(t/\lambda)^k}$.
-* **Kolmogorov-Smirnov (KS) Test:** Compares empirical cumulative distribution functions ($F_n(x)$) against theoretical baselines by calculating maximum vertical divergence ($D = \sup |F_n(x) - F(x)|$).
+* **Kolmogorov-Smirnov (KS) Test:** Compares empirical cumulative distribution functions ($F_n(x)$) against theoretical baselines by calculating maximum vertical divergence ($D = \sup | F_n(x) - F(x) | $).
 
 ### 12.2 Unique Selling Points (USPs) & Tools
 
@@ -350,23 +350,23 @@ Object Oriented Programming within SigmaOS enforces zero-overhead zero-leak stat
 
 The table below maps the 15 Computer Science, AI, OOP, and Data Visualisation domains defined in this specification to their exact C++ translation units within the SigmaOS repository.
 
-| Domain Pillar | Module / Class Name | Primary Translation Unit | Key C++ Methods |
-| :--- | :--- | :--- | :--- |
-| **Artificial Intelligence** | `SovereignArtificialIntelligence` | `ecosystem/SovereignOmniMatrix.cpp` | `AStarSearch()`, `AlphaBetaPruning()`, `SolveCSPBacktracking()` |
-| **Computer Science** | `SovereignComputerScience` | `ecosystem/SovereignOmniMatrix.cpp` | `ExecuteKnapsackDP()`, `DijkstraShortestPath()`, `FastFourierTransform()` |
-| **Data Mining** | `SovereignDataMining` | `ecosystem/SovereignOmniMatrix.cpp` | `AprioriItemsetMining()`, `IsolationForestAnomaly()`, `DBSCANClustering()` |
-| **Data Modelling** | `SovereignDataModelling` | `ecosystem/SovereignOmniMatrix.cpp` | `GenerateEntityRelationshipSchema()`, `EnforceBoyceCoddNormalForm()`, `BuildStarSchemaDimensions()` |
-| **Data Preprocessing** | `SovereignDataPreprocessingAdvanced`| `ecosystem/SovereignOmniMatrix.cpp` | `MahalanobisDistanceOutliers()`, `SMOTESyntheticSampling()`, `BoxCoxTransformation()` |
-| **Data Warehousing** | `SovereignDataWarehousing` | `ecosystem/SovereignOmniMatrix.cpp` | `ExecuteETLPipeline()`, `ComputeOLAPCubeSlices()`, `TrackSCDType2()` |
-| **Data Science** | `SovereignDataScienceAdvanced` | `ecosystem/SovereignOmniMatrix.cpp` | `CalculatePropensityScores()`, `KaplanMeierSurvivalCurve()`, `CalculateABTestPower()` |
-| **Discrete Mathematics** | `SovereignDiscreteMathematics` | `ecosystem/SovereignOmniMatrix.cpp` | `ComputeCombinationsPermutations()`, `EvaluatePropositionalWFF()`, `ModularExponentiation()` |
-| **Machine Learning** | `SovereignMachineLearningAdvanced` | `ecosystem/SovereignOmniMatrix.cpp` | `FitSVMLinearKernel()`, `ViterbiAlgorithmHMM()`, `QLearningValueIteration()` |
-| **Operating System** | `SovereignOperatingSystem` | `ecosystem/SovereignOmniMatrix.cpp` | `CompletelyFairSchedulerCFS()`, `PageReplacementLRU()`, `BankersAlgorithmDeadlock()` |
-| **RDBMS** | `SovereignRDBMS` | `ecosystem/SovereignOmniMatrix.cpp` | `ParseSQLSelectQuery()`, `BPlusTreeSearchInsert()`, `ExecuteMVCCTransaction()` |
-| **Statistics** | `SovereignStatisticsAdvanced` | `ecosystem/SovereignOmniMatrix.cpp` | `KruskalWallisTest()`, `MonteCarloIntegration()`, `FitWeibullDistribution()` |
-| **Web Programming** | `SovereignWebProgramming` | `ecosystem/SovereignOmniMatrix.cpp` | `ParseHTTP3QUICFrame()`, `VirtualDOMDiffing()`, `ExecuteWASMBytecode()`, `DispatchGraphQLQuery()` |
-| **Data Visualisation** | `SovereignDataVisualisation` | `ecosystem/SovereignOmniMatrix.cpp` | `RendertSNEEmbedding()`, `GenerateUMAPManifold()`, `PlotChoroplethHeatmap()`, `RenderSunburstHierarchy()` |
-| **OOP** | `SovereignOOP` | `ecosystem/SovereignOmniMatrix.cpp` | `SimulateVirtualMethodTableDispatch()`, `ExecuteCRTPStaticPolymorphism()`, `EnforceRAIIMemoryManagement()`, `DemonstrateLiskovSubstitution()` |
+| Domain Pillar | Module / Class Name | Primary Translation Unit | Key C++ Methods | 
+| :--- | :--- | :--- | :--- | 
+| **Artificial Intelligence** | `SovereignArtificialIntelligence` | `ecosystem/SovereignOmniMatrix.cpp` | `AStarSearch()`, `AlphaBetaPruning()`, `SolveCSPBacktracking()` | 
+| **Computer Science** | `SovereignComputerScience` | `ecosystem/SovereignOmniMatrix.cpp` | `ExecuteKnapsackDP()`, `DijkstraShortestPath()`, `FastFourierTransform()` | 
+| **Data Mining** | `SovereignDataMining` | `ecosystem/SovereignOmniMatrix.cpp` | `AprioriItemsetMining()`, `IsolationForestAnomaly()`, `DBSCANClustering()` | 
+| **Data Modelling** | `SovereignDataModelling` | `ecosystem/SovereignOmniMatrix.cpp` | `GenerateEntityRelationshipSchema()`, `EnforceBoyceCoddNormalForm()`, `BuildStarSchemaDimensions()` | 
+| **Data Preprocessing** | `SovereignDataPreprocessingAdvanced` | `ecosystem/SovereignOmniMatrix.cpp` | `MahalanobisDistanceOutliers()`, `SMOTESyntheticSampling()`, `BoxCoxTransformation()` | 
+| **Data Warehousing** | `SovereignDataWarehousing` | `ecosystem/SovereignOmniMatrix.cpp` | `ExecuteETLPipeline()`, `ComputeOLAPCubeSlices()`, `TrackSCDType2()` | 
+| **Data Science** | `SovereignDataScienceAdvanced` | `ecosystem/SovereignOmniMatrix.cpp` | `CalculatePropensityScores()`, `KaplanMeierSurvivalCurve()`, `CalculateABTestPower()` | 
+| **Discrete Mathematics** | `SovereignDiscreteMathematics` | `ecosystem/SovereignOmniMatrix.cpp` | `ComputeCombinationsPermutations()`, `EvaluatePropositionalWFF()`, `ModularExponentiation()` | 
+| **Machine Learning** | `SovereignMachineLearningAdvanced` | `ecosystem/SovereignOmniMatrix.cpp` | `FitSVMLinearKernel()`, `ViterbiAlgorithmHMM()`, `QLearningValueIteration()` | 
+| **Operating System** | `SovereignOperatingSystem` | `ecosystem/SovereignOmniMatrix.cpp` | `CompletelyFairSchedulerCFS()`, `PageReplacementLRU()`, `BankersAlgorithmDeadlock()` | 
+| **RDBMS** | `SovereignRDBMS` | `ecosystem/SovereignOmniMatrix.cpp` | `ParseSQLSelectQuery()`, `BPlusTreeSearchInsert()`, `ExecuteMVCCTransaction()` | 
+| **Statistics** | `SovereignStatisticsAdvanced` | `ecosystem/SovereignOmniMatrix.cpp` | `KruskalWallisTest()`, `MonteCarloIntegration()`, `FitWeibullDistribution()` | 
+| **Web Programming** | `SovereignWebProgramming` | `ecosystem/SovereignOmniMatrix.cpp` | `ParseHTTP3QUICFrame()`, `VirtualDOMDiffing()`, `ExecuteWASMBytecode()`, `DispatchGraphQLQuery()` | 
+| **Data Visualisation** | `SovereignDataVisualisation` | `ecosystem/SovereignOmniMatrix.cpp` | `RendertSNEEmbedding()`, `GenerateUMAPManifold()`, `PlotChoroplethHeatmap()`, `RenderSunburstHierarchy()` | 
+| **OOP** | `SovereignOOP` | `ecosystem/SovereignOmniMatrix.cpp` | `SimulateVirtualMethodTableDispatch()`, `ExecuteCRTPStaticPolymorphism()`, `EnforceRAIIMemoryManagement()`, `DemonstrateLiskovSubstitution()` | 
 
 ---
 > **Verification Status:** BUILD-VERIFIED | ZERO-STL COMPLIANT | 100% SILICON PURITY | 15-DOMAIN COMPLETE

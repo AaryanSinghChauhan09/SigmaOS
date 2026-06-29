@@ -17,7 +17,7 @@ See `recipes/example.hello.sigma.recipe` — declarative name, version, build st
 
 ## API
 
-Kernel/userland: `include/security/sigma_pkg_registry.h`  
+Kernel/userland: `include/security/sigma_pkg_registry.h`
 Functions: `SovereignPkg_Register`, `SovereignPkg_Audit`, `SovereignPkg_Rollback`.
 
 ## Community workflow

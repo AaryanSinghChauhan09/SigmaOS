@@ -304,16 +304,16 @@ gen       = (x**2 for x in range(1000000))               # Generator (memory-eff
 
 ## SigmaPy Integration Points
 
-| Python Feature | SigmaOS Usage |
-| :--- | :--- |
-| `subprocess` | Spawn sigma shard processes |
-| `socket` | SovereignNetStack Python API |
-| `os.path` | SovereignFS path helpers |
-| `json` | Config file parsing |
-| `threading` | Parallel automation scripts |
-| `asyncio` | Async SigmaDB queries |
-| `numpy` / `pandas` | SigmaAI data pipelines |
-| `matplotlib` | SigmaViz chart rendering |
-| `sklearn` | SigmaAI ML training |
+| Python Feature | SigmaOS Usage | 
+| :--- | :--- | 
+| `subprocess` | Spawn sigma shard processes | 
+| `socket` | SovereignNetStack Python API | 
+| `os.path` | SovereignFS path helpers | 
+| `json` | Config file parsing | 
+| `threading` | Parallel automation scripts | 
+| `asyncio` | Async SigmaDB queries | 
+| `numpy` / `pandas` | SigmaAI data pipelines | 
+| `matplotlib` | SigmaViz chart rendering | 
+| `sklearn` | SigmaAI ML training | 
 
 *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

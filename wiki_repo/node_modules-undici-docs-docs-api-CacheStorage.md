@@ -29,4 +29,4 @@ await caches.delete('v1')
 
 await response.text() // the Response's body
 
-```
+```text

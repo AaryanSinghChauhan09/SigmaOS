@@ -33,47 +33,47 @@ Every step must pass automated CI before v15.1 ships.
 
 #### Infrastructure gates
 
-| Gate | Measurement | Target | CI check |
-|------|------------|--------|---------|
-| Boot time (JioBook ARM64) | `bench_boot.sh` | < 10 s | Required |
-| Boot success rate | CI pass rate | ≥ 99.5% | Required |
-| Package install success | sigma-pkg CI | ≥ 99.9% | Required |
-| Reproducible build | SHA256 diff | Identical | Required |
-| ISO size | `ls -lh SigmaOS.iso` | < 500 MB | Required |
-| Kernel size (microkernel) | `size vmlinuz` | < 512 KB | Required |
+| Gate | Measurement | Target | CI check | 
+| ------ | ------------ | -------- | --------- | 
+| Boot time (JioBook ARM64) | `bench_boot.sh` | < 10 s | Required | 
+| Boot success rate | CI pass rate | ≥ 99.5% | Required | 
+| Package install success | sigma-pkg CI | ≥ 99.9% | Required | 
+| Reproducible build | SHA256 diff | Identical | Required | 
+| ISO size | `ls -lh SigmaOS.iso` | < 500 MB | Required | 
+| Kernel size (microkernel) | `size vmlinuz` | < 512 KB | Required | 
 
 #### Security gates
 
-| Gate | Tool | Target | CI check |
-|------|------|--------|---------|
-| Zero critical CVEs | sigma-sec status | 0 | Required |
-| PQC: real NTT (not PRNG) | bench_pqc.cpp | ≥ 1M ops/sec | Required |
-| CryptFS Argon2id working | `sigma-boot status` | Not fake | Required |
-| Signed ISO | ML-DSA-87 sig file | Verifiable | Required |
-| SBOM present | cyclonedx JSON | Valid | Required |
-| No hardcoded secrets | CI grep scan | 0 hits | Required |
+| Gate | Tool | Target | CI check | 
+| ------ | ------ | -------- | --------- | 
+| Zero critical CVEs | sigma-sec status | 0 | Required | 
+| PQC: real NTT (not PRNG) | bench_pqc.cpp | ≥ 1M ops/sec | Required | 
+| CryptFS Argon2id working | `sigma-boot status` | Not fake | Required | 
+| Signed ISO | ML-DSA-87 sig file | Verifiable | Required | 
+| SBOM present | cyclonedx JSON | Valid | Required | 
+| No hardcoded secrets | CI grep scan | 0 hits | Required | 
 
 #### Quality gates
 
-| Gate | Tool | Target | CI check |
-|------|------|--------|---------|
-| Unit test pass rate | GTest/ctest | 100% | Required |
-| Open 🔴 items | CURRENT_PROBLEMS | 0 | Required |
-| Stub count | `make check-stubs` | < 50 | Required |
-| Broken wiki links | `sigma-docs check` | 0 | Required |
-| WCAG 2.2 AA | aXe CI scan | Pass | Required |
-| sigma-doctor healthy | `sigma-doctor --json` | All ✓ | Required |
+| Gate | Tool | Target | CI check | 
+| ------ | ------ | -------- | --------- | 
+| Unit test pass rate | GTest/ctest | 100% | Required | 
+| Open 🔴 items | CURRENT_PROBLEMS | 0 | Required | 
+| Stub count | `make check-stubs` | < 50 | Required | 
+| Broken wiki links | `sigma-docs check` | 0 | Required | 
+| WCAG 2.2 AA | aXe CI scan | Pass | Required | 
+| sigma-doctor healthy | `sigma-doctor --json` | All ✓ | Required | 
 
 #### India Stack gates
 
-| Gate | Test | API | CI check |
-|------|------|-----|---------|
-| GSTN GSTR-1 sandbox | `test_gstn_sandbox.sh` | GSTN IRP | Weekly |
-| ABDM ABHA create | `test_abdm_sandbox.sh` | ABDM NHA | Weekly |
-| sigma-agri MSP lookup | `test_msp_values.cpp` | Offline | Required |
-| sigma-legal BNS map | `test_bns_map.sh` | Offline | Required |
-| Hindi UI render | `test_font_hindi.sh` | N/A | Required |
-| IME phonetic accuracy | `test_phonetic.cpp` | Offline | Required |
+| Gate | Test | API | CI check | 
+| ------ | ------ | ----- | --------- | 
+| GSTN GSTR-1 sandbox | `test_gstn_sandbox.sh` | GSTN IRP | Weekly | 
+| ABDM ABHA create | `test_abdm_sandbox.sh` | ABDM NHA | Weekly | 
+| sigma-agri MSP lookup | `test_msp_values.cpp` | Offline | Required | 
+| sigma-legal BNS map | `test_bns_map.sh` | Offline | Required | 
+| Hindi UI render | `test_font_hindi.sh` | N/A | Required | 
+| IME phonetic accuracy | `test_phonetic.cpp` | Offline | Required | 
 
 ---
 
@@ -105,14 +105,14 @@ Phase 3: Scale (Month 12+)
   Bulk filing mode for large practices
 ```
 
-| Task | File | Branch | Blocked by |
-|------|------|--------|------------|
-| GSTN IRP OAuth2 client | `userland/indiastack/sigma_gstn_client.cpp` | `release/standalone` | TLS 1.3 (sigma-tls) + TCP stack |
-| GSTR-1 JSON schema v1.4 | `userland/apps/sigma-ca/sigma_ca.cpp` | `release/standalone` | GSTN schema download |
-| IRN generation endpoint | `userland/apps/sigma-ca/sigma_ca.cpp` | `release/standalone` | GSTN sandbox credentials |
-| e-Way Bill API | `userland/apps/sigma-ca/sigma_ca.cpp` | `release/standalone` | GSTN IRP client |
-| GSTN sandbox CI weekly | `.github/workflows/sigma_ci.yml` | `release/standalone` | GSTN test GSTIN credentials |
-| Rate limit + retry handler | `userland/indiastack/sigma_gstn_client.cpp` | `release/standalone` | Circuit breaker pattern |
+| Task | File | Branch | Blocked by | 
+| ------ | ------ | -------- | ------------ | 
+| GSTN IRP OAuth2 client | `userland/indiastack/sigma_gstn_client.cpp` | `release/standalone` | TLS 1.3 (sigma-tls) + TCP stack | 
+| GSTR-1 JSON schema v1.4 | `userland/apps/sigma-ca/sigma_ca.cpp` | `release/standalone` | GSTN schema download | 
+| IRN generation endpoint | `userland/apps/sigma-ca/sigma_ca.cpp` | `release/standalone` | GSTN sandbox credentials | 
+| e-Way Bill API | `userland/apps/sigma-ca/sigma_ca.cpp` | `release/standalone` | GSTN IRP client | 
+| GSTN sandbox CI weekly | `.github/workflows/sigma_ci.yml` | `release/standalone` | GSTN test GSTIN credentials | 
+| Rate limit + retry handler | `userland/indiastack/sigma_gstn_client.cpp` | `release/standalone` | Circuit breaker pattern | 
 
 ### IL2 — ABDM Health Stack Go-Live
 
@@ -138,14 +138,14 @@ Phase 3: Scale (Month 18+)
   Telemedicine: sigma-health + sigma-display video call
 ```
 
-| Task | File | Branch | Blocked by |
-|------|------|--------|------------|
-| ABDM OAuth2 M1 (ABHA create) | `userland/indiastack/sigma_abdm_client.cpp` | `release/standalone` | TLS client |
-| FHIR R4 bundle POST | `userland/apps/sigma-health/sigma_health.cpp` | `release/standalone` | ABDM client |
-| NHCX claim API | `userland/apps/sigma-health/sigma_health.cpp` | `release/standalone` | ABDM claim schema |
-| Drug interaction SQLite DB | `userland/apps/sigma-health/sigma_health.cpp` | `release/standalone` | WHO AEDS data bundle |
-| ICD-10 offline lookup | `userland/apps/sigma-health/sigma_health.cpp` | `release/standalone` | ICD-10 SQLite (12K codes) |
-| NMC e-Rx format + DID sign | `userland/apps/sigma-health/sigma_health.cpp` | `release/standalone` | sigma-trust DID |
+| Task | File | Branch | Blocked by | 
+| ------ | ------ | -------- | ------------ | 
+| ABDM OAuth2 M1 (ABHA create) | `userland/indiastack/sigma_abdm_client.cpp` | `release/standalone` | TLS client | 
+| FHIR R4 bundle POST | `userland/apps/sigma-health/sigma_health.cpp` | `release/standalone` | ABDM client | 
+| NHCX claim API | `userland/apps/sigma-health/sigma_health.cpp` | `release/standalone` | ABDM claim schema | 
+| Drug interaction SQLite DB | `userland/apps/sigma-health/sigma_health.cpp` | `release/standalone` | WHO AEDS data bundle | 
+| ICD-10 offline lookup | `userland/apps/sigma-health/sigma_health.cpp` | `release/standalone` | ICD-10 SQLite (12K codes) | 
+| NMC e-Rx format + DID sign | `userland/apps/sigma-health/sigma_health.cpp` | `release/standalone` | sigma-trust DID | 
 
 ### IL3 — Agriculture & Rural Go-Live
 
@@ -167,13 +167,13 @@ Phase 3: Rural stack (Month 9-18)
   MGNREGS payment cycle: attendance → payment in < 24h
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| IMD weather API | `userland/apps/sigma-agri/sigma_agri.cpp` | `release/standalone` | `api.weather.imd.gov.in` REST |
-| eNAM commodity prices | `userland/apps/sigma-agri/sigma_agri.cpp` | `release/standalone` | enam.gov.in daily price API |
-| DILRMP land records | `userland/apps/sigma-agri/sigma_agri.cpp` | `release/standalone` | State land portal APIs |
-| NREGASoft attendance | `userland/apps/sigma-gram/sigma_gram.cpp` | `release/mobile` | MoRD NREGASoft API |
-| sigma-ultra UPI USSD | `userland/sigma_ultra.cpp` | `release/mobile` | NPCI `*99#` USSD protocol |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| IMD weather API | `userland/apps/sigma-agri/sigma_agri.cpp` | `release/standalone` | `api.weather.imd.gov.in` REST | 
+| eNAM commodity prices | `userland/apps/sigma-agri/sigma_agri.cpp` | `release/standalone` | enam.gov.in daily price API | 
+| DILRMP land records | `userland/apps/sigma-agri/sigma_agri.cpp` | `release/standalone` | State land portal APIs | 
+| NREGASoft attendance | `userland/apps/sigma-gram/sigma_gram.cpp` | `release/mobile` | MoRD NREGASoft API | 
+| sigma-ultra UPI USSD | `userland/sigma_ultra.cpp` | `release/mobile` | NPCI `*99#` USSD protocol | 
 
 ---
 
@@ -225,13 +225,13 @@ sigma-hardware-cert run --device JioBook-2026
 # Badge: sigmaos.dev/certified/jiobook-2026
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| Hardware cert test suite | `tests/hardware/sigma_cert.sh` | `prepare-sigmaos-launch` | 9-point checklist script |
-| Compatibility database | `wiki_repo/Hardware-Compatibility.md` | `docs-update` | Device × feature × status table |
-| sigma-dna hardware profiles | `kernel/core/sigma_dna.cpp` | `kernel-exp` | Pre-built profiles for certified devices |
-| OEM partnership doc | `wiki_repo/OEM-Partnership.md` | `docs-update` | How Lava/Micromax can ship SigmaOS |
-| ARM64 reference build | `release/mobile` branch | `release/mobile` | Official JioBook SigmaOS image |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| Hardware cert test suite | `tests/hardware/sigma_cert.sh` | `prepare-sigmaos-launch` | 9-point checklist script | 
+| Compatibility database | `wiki_repo/Hardware-Compatibility.md` | `docs-update` | Device × feature × status table | 
+| sigma-dna hardware profiles | `kernel/core/sigma_dna.cpp` | `kernel-exp` | Pre-built profiles for certified devices | 
+| OEM partnership doc | `wiki_repo/OEM-Partnership.md` | `docs-update` | How Lava/Micromax can ship SigmaOS | 
+| ARM64 reference build | `release/mobile` branch | `release/mobile` | Official JioBook SigmaOS image | 
 
 ### HD3 — Hardware Abstraction Quality
 
@@ -258,14 +258,14 @@ public:
 // 5. No memory leak over 1000 init/shutdown cycles
 ```
 
-| Priority driver | Target device | File | Branch |
-|-----------------|--------------|------|--------|
-| GPU DRM/KMS i915 | Intel UHD (SigmaPro) | `drivers/graphics/sigma_i915.cpp` | `drivers-dev` |
-| GPU DRM/KMS amdgpu | AMD Radeon (SigmaPro) | `drivers/graphics/sigma_amdgpu.cpp` | `drivers-dev` |
-| Wi-Fi mt7921 | JioBook (SigmaBook) | `drivers/net/sigma_mt7921.cpp` | `drivers-dev` |
-| Wi-Fi iwlwifi AX211 | Intel (SigmaPro) | `drivers/net/sigma_iwlwifi.cpp` | `drivers-dev` |
-| HDA audio | All tiers | `drivers/audio/sigma_hda.cpp` | `drivers-dev` |
-| BCM2711 BSP | SigmaBox (RPi Zero 2W) | `arch/arm64/sigma_bcm2711.cpp` | `release/mobile` |
+| Priority driver | Target device | File | Branch | 
+| ----------------- | -------------- | ------ | -------- | 
+| GPU DRM/KMS i915 | Intel UHD (SigmaPro) | `drivers/graphics/sigma_i915.cpp` | `drivers-dev` | 
+| GPU DRM/KMS amdgpu | AMD Radeon (SigmaPro) | `drivers/graphics/sigma_amdgpu.cpp` | `drivers-dev` | 
+| Wi-Fi mt7921 | JioBook (SigmaBook) | `drivers/net/sigma_mt7921.cpp` | `drivers-dev` | 
+| Wi-Fi iwlwifi AX211 | Intel (SigmaPro) | `drivers/net/sigma_iwlwifi.cpp` | `drivers-dev` | 
+| HDA audio | All tiers | `drivers/audio/sigma_hda.cpp` | `drivers-dev` | 
+| BCM2711 BSP | SigmaBox (RPi Zero 2W) | `arch/arm64/sigma_bcm2711.cpp` | `release/mobile` | 
 
 ---
 
@@ -299,14 +299,14 @@ Month 12+:  Ecosystem
   - Regional meetups: Delhi, Mumbai, Bangalore, Chennai
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| Good-first-issues (20+) | GitHub Issues | all | Tag from Phase G list + sigma-nanolib functions |
-| CONTRIBUTING.md complete | `CONTRIBUTING.md` | `docs-update` | 5-minute setup guide verified |
-| Architecture video | `docs/videos/` | `docs-update` | 10-min walkthrough: kernel → SDF → Zenith → profession apps |
-| Bug bounty live | `wiki_repo/BUG_BOUNTY.md` | `prepare-sigmaos-launch` | CVE bounties funded |
-| Community theme gallery | `sigma_pkg_registry/themes/` | `prepare-sigmaos-launch` | Accept community `.sigma-theme` submissions |
-| sigma-script marketplace | `sigma_pkg_registry/scripts/` | `tools-dev` | Community automation scripts via sigma-pkg |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| Good-first-issues (20+) | GitHub Issues | all | Tag from Phase G list + sigma-nanolib functions | 
+| CONTRIBUTING.md complete | `CONTRIBUTING.md` | `docs-update` | 5-minute setup guide verified | 
+| Architecture video | `docs/videos/` | `docs-update` | 10-min walkthrough: kernel → SDF → Zenith → profession apps | 
+| Bug bounty live | `wiki_repo/BUG_BOUNTY.md` | `prepare-sigmaos-launch` | CVE bounties funded | 
+| Community theme gallery | `sigma_pkg_registry/themes/` | `prepare-sigmaos-launch` | Accept community `.sigma-theme` submissions | 
+| sigma-script marketplace | `sigma_pkg_registry/scripts/` | `tools-dev` | Community automation scripts via sigma-pkg | 
 
 ### CG2 — India Developer Ecosystem
 
@@ -322,14 +322,14 @@ Key activities:
   India Open Source Fund: India-specific FOSS funding
 ```
 
-| Task | Detail | Timeline |
-|------|--------|---------|
-| IIT collaboration MOU | Formal verification research agreement | Phase 9 |
-| NIC technical liaison | BharatOS pilot technical support | Phase 7 |
-| NASSCOM member | Access to developer community + events | Phase 3 |
-| MeitY TIDE 2.0 application | ₹30 lakh grant for India OS development | Phase 2-3 |
-| College sigma-dev challenge | Annual hackathon: build a profession app | Annual from Phase 2 |
-| sigma-edu course | "Build a SDF Driver" open online course | Phase 3 |
+| Task | Detail | Timeline | 
+| ------ | -------- | --------- | 
+| IIT collaboration MOU | Formal verification research agreement | Phase 9 | 
+| NIC technical liaison | BharatOS pilot technical support | Phase 7 | 
+| NASSCOM member | Access to developer community + events | Phase 3 | 
+| MeitY TIDE 2.0 application | ₹30 lakh grant for India OS development | Phase 2-3 | 
+| College sigma-dev challenge | Annual hackathon: build a profession app | Annual from Phase 2 | 
+| sigma-edu course | "Build a SDF Driver" open online course | Phase 3 | 
 
 ---
 
@@ -362,14 +362,14 @@ Verification targets (priority order):
      Model: ML-KEM + X25519 hybrid KEM security proof
 ```
 
-| Task | Tool | Branch | Timeline |
-|------|------|--------|---------|
-| sigma-bus deadlock proof | Frama-C WP | `release/microkernel` | Phase 9, Month 36 |
-| MLFQ no-starvation proof | Frama-C ACSL | `kernel-exp` | Phase 9, Month 42 |
-| Allocator correctness | Frama-C Value | `kernel-exp` | Phase 9, Month 40 |
-| DID chain ProVerif | ProVerif | `release/standalone` | Phase 9, Month 48 |
-| TLS Tamarin proof | Tamarin | `drivers-dev` | Phase 9, Month 54 |
-| USENIX/IEEE S&P paper | LaTeX | Phase 9 | Phase 9, Month 60 |
+| Task | Tool | Branch | Timeline | 
+| ------ | ------ | -------- | --------- | 
+| sigma-bus deadlock proof | Frama-C WP | `release/microkernel` | Phase 9, Month 36 | 
+| MLFQ no-starvation proof | Frama-C ACSL | `kernel-exp` | Phase 9, Month 42 | 
+| Allocator correctness | Frama-C Value | `kernel-exp` | Phase 9, Month 40 | 
+| DID chain ProVerif | ProVerif | `release/standalone` | Phase 9, Month 48 | 
+| TLS Tamarin proof | Tamarin | `drivers-dev` | Phase 9, Month 54 | 
+| USENIX/IEEE S&P paper | LaTeX | Phase 9 | Phase 9, Month 60 | 
 
 ### RA2 — Rust Migration Research
 
@@ -416,86 +416,86 @@ Research tasks:
 
 ### G1 — Phase 0 (Months 1-3): Make It Boot
 
-| Month | Key milestones | Branch | Output |
-|-------|---------------|--------|--------|
-| 1 | Round-robin scheduler + buddy allocator | `kernel-exp` | `sigma_sched.cpp`, `sigma_mm.cpp` |
-| 1 | x86-64 page table walker + APIC | `kernel-exp` | `sigma_vmm.cpp`, `sigma_irq.cpp` |
-| 2 | 30-syscall dispatch table | `kernel-exp` | `sigma_syscall_dispatch.cpp` |
-| 2 | VESA/GOP framebuffer | `drivers-dev` | `sigma_vesa.cpp` |
-| 2 | sigma-boot.efi UEFI loader | `kernel-exp` | `sigma-boot.efi` |
-| 3 | `make iso` → bootable ISO | `kernel-exp` | `SigmaOS-0.1.0.iso` |
-| 3 | Real QEMU CI (not echo stubs) | all | CI passes |
-| 3 | Argon2id CryptFS (fix #44) | `kernel-exp` | `sigma_argon2id.cpp` |
+| Month | Key milestones | Branch | Output | 
+| ------- | --------------- | -------- | -------- | 
+| 1 | Round-robin scheduler + buddy allocator | `kernel-exp` | `sigma_sched.cpp`, `sigma_mm.cpp` | 
+| 1 | x86-64 page table walker + APIC | `kernel-exp` | `sigma_vmm.cpp`, `sigma_irq.cpp` | 
+| 2 | 30-syscall dispatch table | `kernel-exp` | `sigma_syscall_dispatch.cpp` | 
+| 2 | VESA/GOP framebuffer | `drivers-dev` | `sigma_vesa.cpp` | 
+| 2 | sigma-boot.efi UEFI loader | `kernel-exp` | `sigma-boot.efi` | 
+| 3 | `make iso` → bootable ISO | `kernel-exp` | `SigmaOS-0.1.0.iso` | 
+| 3 | Real QEMU CI (not echo stubs) | all | CI passes | 
+| 3 | Argon2id CryptFS (fix #44) | `kernel-exp` | `sigma_argon2id.cpp` | 
 
 ### G2 — Phase 1 (Months 3-6): Make It Connect
 
-| Month | Key milestones | Branch | Output |
-|-------|---------------|--------|--------|
-| 3-4 | e1000 DMA TX/RX rings | `drivers-dev` | Real NIC driver |
-| 4 | TCP state machine RFC 793 | `drivers-dev` | `sigma_net_tcp.cpp` |
-| 4 | UDP + DNS + DHCP | `drivers-dev` | Basic networking |
-| 4-5 | sigma-repo-server (Go) | `tools-dev` | `packages.sigmaos.dev` live |
-| 5 | sigma-pkg install end-to-end | `tools-dev` | `sigma-pkg install vim` works |
-| 5 | VFS open/read/write bodies | `fs-dev` | Tmpfs working |
-| 5-6 | sigma-sh TTY connected | `tools-dev` | Interactive shell |
-| 6 | Wi-Fi mt7921/iwlwifi | `drivers-dev` | JioBook connects |
+| Month | Key milestones | Branch | Output | 
+| ------- | --------------- | -------- | -------- | 
+| 3-4 | e1000 DMA TX/RX rings | `drivers-dev` | Real NIC driver | 
+| 4 | TCP state machine RFC 793 | `drivers-dev` | `sigma_net_tcp.cpp` | 
+| 4 | UDP + DNS + DHCP | `drivers-dev` | Basic networking | 
+| 4-5 | sigma-repo-server (Go) | `tools-dev` | `packages.sigmaos.dev` live | 
+| 5 | sigma-pkg install end-to-end | `tools-dev` | `sigma-pkg install vim` works | 
+| 5 | VFS open/read/write bodies | `fs-dev` | Tmpfs working | 
+| 5-6 | sigma-sh TTY connected | `tools-dev` | Interactive shell | 
+| 6 | Wi-Fi mt7921/iwlwifi | `drivers-dev` | JioBook connects | 
 
 ### G3 — Phase 2 (Months 6-9): Make It Visible
 
-| Month | Key milestones | Branch | Output |
-|-------|---------------|--------|--------|
-| 6-7 | VirtIO-GPU + DRM/KMS | `drivers-dev` | Zenith renders |
-| 7 | Compositor composite_window() | `release/standalone` | Windows blend |
-| 7-8 | Input event loop | `release/standalone` | Keyboard/mouse work |
-| 8 | App launcher + taskbar | `release/standalone` | Desktop usable |
-| 8-9 | Indian IME (Inscript) | `release/standalone` | Hindi input |
-| 8-9 | sigma-bhashini offline ASR | `release/standalone` | Voice input |
-| 9 | DID login screen | `release/standalone` | No password login |
-| 9 | sigma-ai llama.cpp daemon | `release/standalone` | Local LLM running |
+| Month | Key milestones | Branch | Output | 
+| ------- | --------------- | -------- | -------- | 
+| 6-7 | VirtIO-GPU + DRM/KMS | `drivers-dev` | Zenith renders | 
+| 7 | Compositor composite_window() | `release/standalone` | Windows blend | 
+| 7-8 | Input event loop | `release/standalone` | Keyboard/mouse work | 
+| 8 | App launcher + taskbar | `release/standalone` | Desktop usable | 
+| 8-9 | Indian IME (Inscript) | `release/standalone` | Hindi input | 
+| 8-9 | sigma-bhashini offline ASR | `release/standalone` | Voice input | 
+| 9 | DID login screen | `release/standalone` | No password login | 
+| 9 | sigma-ai llama.cpp daemon | `release/standalone` | Local LLM running | 
 
 ### G4 — Phase 3 (Months 9-14): Make It Indian
 
-| Month | Key milestones | Branch | Output |
-|-------|---------------|--------|--------|
-| 9-10 | sigma-ca GSTN sandbox | `release/standalone` | GSTR-1 filed |
-| 10-11 | sigma-health ABDM sandbox | `release/standalone` | ABHA created |
-| 10-11 | sigma-accounts IRN | `release/standalone` | e-Invoice generated |
-| 11-12 | UPI pay + collect | `release/standalone` | Payment works |
-| 11-12 | sigma-gram MGNREGS API | `release/mobile` | Attendance submitted |
-| 12-13 | sigma-legal eCourts | `release/standalone` | Case status fetched |
-| 13-14 | sigma-pod kernel enforcement | `release/cloud` | Cgroup limits real |
-| 14 | v15.1 public release | `prepare-sigmaos-launch` | First public ISO |
+| Month | Key milestones | Branch | Output | 
+| ------- | --------------- | -------- | -------- | 
+| 9-10 | sigma-ca GSTN sandbox | `release/standalone` | GSTR-1 filed | 
+| 10-11 | sigma-health ABDM sandbox | `release/standalone` | ABHA created | 
+| 10-11 | sigma-accounts IRN | `release/standalone` | e-Invoice generated | 
+| 11-12 | UPI pay + collect | `release/standalone` | Payment works | 
+| 11-12 | sigma-gram MGNREGS API | `release/mobile` | Attendance submitted | 
+| 12-13 | sigma-legal eCourts | `release/standalone` | Case status fetched | 
+| 13-14 | sigma-pod kernel enforcement | `release/cloud` | Cgroup limits real | 
+| 14 | v15.1 public release | `prepare-sigmaos-launch` | First public ISO | 
 
 ### G5 — Phase 4 (Months 12-18): Make It Trusted
 
-| Month | Key milestones | Branch | Output |
-|-------|---------------|--------|--------|
-| 12-13 | sigma-boot.efi + TPM2 PCR | `kernel-exp` | Secure boot chain |
-| 13 | ML-DSA FIPS 204 final | `performance-optimized` | Real NTT |
-| 13-14 | sigma-mac enforced | `kernel-exp` | Every syscall checked |
-| 14-15 | sigma-pqc-native (no liboqs) | `performance-optimized` | Sovereign PQC |
-| 15-16 | sigma-tls (no OpenSSL) | `drivers-dev` | Sovereign TLS |
-| 16-17 | Physical hardware CI | `prepare-sigmaos-launch` | RPi4 + ThinkPad CI |
-| 17 | sigma-wine W2 (Python CLI) | `tools-dev` | Win32 compat |
-| 18 | v16.0 Apex release | all | Production-grade |
+| Month | Key milestones | Branch | Output | 
+| ------- | --------------- | -------- | -------- | 
+| 12-13 | sigma-boot.efi + TPM2 PCR | `kernel-exp` | Secure boot chain | 
+| 13 | ML-DSA FIPS 204 final | `performance-optimized` | Real NTT | 
+| 13-14 | sigma-mac enforced | `kernel-exp` | Every syscall checked | 
+| 14-15 | sigma-pqc-native (no liboqs) | `performance-optimized` | Sovereign PQC | 
+| 15-16 | sigma-tls (no OpenSSL) | `drivers-dev` | Sovereign TLS | 
+| 16-17 | Physical hardware CI | `prepare-sigmaos-launch` | RPi4 + ThinkPad CI | 
+| 17 | sigma-wine W2 (Python CLI) | `tools-dev` | Win32 compat | 
+| 18 | v16.0 Apex release | all | Production-grade | 
 
 ### G6 — Phase 5-9 (Months 15-60): Make It Universal
 
-| Month | Milestone | Branch |
-|-------|-----------|--------|
-| 21 | ARM64 Raspberry Pi 4/5 boots | `release/mobile` |
-| 21 | sigma-ultra on Pi Zero | `release/mobile` |
-| 24 | sigma-ai + federated learning live | `release/standalone` |
-| 24 | sigma-telco O-RAN research begins | Phase 9 |
-| 30 | BharatOS 1,000 NIC machines | `release/cloud` |
-| 30 | v17.0 Sovereign release | all |
-| 36 | Formal verification proofs begin | `release/microkernel` |
-| 36 | Rust sigma-net migration | `kernel-exp` |
-| 42 | sigma-RuralStack 1,000 villages | `release/mobile` |
-| 42 | v18.0 Singularity release | all |
-| 54 | Rust sigma-tls migration | `drivers-dev` |
-| 60 | Zero memory-safety CVEs (12 months) | all |
-| 60 | Formal verification papers published | Research |
+| Month | Milestone | Branch | 
+| ------- | ----------- | -------- | 
+| 21 | ARM64 Raspberry Pi 4/5 boots | `release/mobile` | 
+| 21 | sigma-ultra on Pi Zero | `release/mobile` | 
+| 24 | sigma-ai + federated learning live | `release/standalone` | 
+| 24 | sigma-telco O-RAN research begins | Phase 9 | 
+| 30 | BharatOS 1,000 NIC machines | `release/cloud` | 
+| 30 | v17.0 Sovereign release | all | 
+| 36 | Formal verification proofs begin | `release/microkernel` | 
+| 36 | Rust sigma-net migration | `kernel-exp` | 
+| 42 | sigma-RuralStack 1,000 villages | `release/mobile` | 
+| 42 | v18.0 Singularity release | all | 
+| 54 | Rust sigma-tls migration | `drivers-dev` | 
+| 60 | Zero memory-safety CVEs (12 months) | all | 
+| 60 | Formal verification papers published | Research | 
 
 ---
 
@@ -503,28 +503,28 @@ Research tasks:
 
 ### KPI1 — Technical KPIs
 
-| KPI | v15.1 | v16.0 | v17.0 | v18.0 |
-|-----|-------|-------|-------|-------|
-| Boot time (NVMe) | Unknown | < 2 s | < 1.5 s | < 1 s |
-| Boot time (ARM64 RPi4) | N/A | < 10 s | < 8 s | < 5 s |
-| Context switch p99 | Unknown | < 100 ns | < 50 ns | < 50 ns |
-| Kyber-1024 (AVX-512) | PRNG | ≥ 1M | ≥ 5.8M | ≥ 5.8M |
-| Idle RAM (desktop) | Unknown | < 200 MB | < 150 MB | < 100 MB |
-| Kernel CVE (12 months) | N/A | N/A | 0 critical | 0 all |
-| Memory-safety CVEs | N/A | N/A | N/A | 0 |
+| KPI | v15.1 | v16.0 | v17.0 | v18.0 | 
+| ----- | ------- | ------- | ------- | ------- | 
+| Boot time (NVMe) | Unknown | < 2 s | < 1.5 s | < 1 s | 
+| Boot time (ARM64 RPi4) | N/A | < 10 s | < 8 s | < 5 s | 
+| Context switch p99 | Unknown | < 100 ns | < 50 ns | < 50 ns | 
+| Kyber-1024 (AVX-512) | PRNG | ≥ 1M | ≥ 5.8M | ≥ 5.8M | 
+| Idle RAM (desktop) | Unknown | < 200 MB | < 150 MB | < 100 MB | 
+| Kernel CVE (12 months) | N/A | N/A | 0 critical | 0 all | 
+| Memory-safety CVEs | N/A | N/A | N/A | 0 | 
 
 ### KPI2 — India Impact KPIs
 
-| KPI | v15.1 | v16.0 | v17.0 | v18.0 |
-|-----|-------|-------|-------|-------|
-| Profession apps working | 3 | 10 | 30 | 55 |
-| CAs filing GST via sigma-ca | 0 | 10 | 1,000 | 10,000 |
-| Doctors using sigma-health | 0 | 10 | 1,000 | 10,000 |
-| Farmers using sigma-agri | 0 | 100 | 10,000 | 100,000 |
-| Panchayats on sigma-gram | 0 | 10 | 1,000 | 25,000 |
-| Managed devices (fleet) | 0 | 0 | 1,000 | 10,000 |
-| Village sigma-RuralStack | 0 | 0 | 100 | 1,000 |
-| Languages fully supported | 0 | 3 | 10 | 22 |
+| KPI | v15.1 | v16.0 | v17.0 | v18.0 | 
+| ----- | ------- | ------- | ------- | ------- | 
+| Profession apps working | 3 | 10 | 30 | 55 | 
+| CAs filing GST via sigma-ca | 0 | 10 | 1,000 | 10,000 | 
+| Doctors using sigma-health | 0 | 10 | 1,000 | 10,000 | 
+| Farmers using sigma-agri | 0 | 100 | 10,000 | 100,000 | 
+| Panchayats on sigma-gram | 0 | 10 | 1,000 | 25,000 | 
+| Managed devices (fleet) | 0 | 0 | 1,000 | 10,000 | 
+| Village sigma-RuralStack | 0 | 0 | 100 | 1,000 | 
+| Languages fully supported | 0 | 3 | 10 | 22 | 
 
 ---
 
@@ -574,19 +574,19 @@ Built in India. For India. By India.
 
 ## 9. All Roadmap Documents — Master Index
 
-| # | Document | Lines | Key focus |
-|---|----------|-------|-----------|
-| 1 | [Quality-Stability-Performance-Roadmap](Quality-Stability-Performance-Roadmap) | ~1,000 | S/P/Q/UX/Security/A11y/DX |
-| 2 | [Stability-Performance-Extended](Stability-Performance-Extended) | ~900 | Energy/Reliability/Observability/Network |
-| 3 | [Compatibility-Automation-Personalisation-Roadmap](Compatibility-Automation-Personalisation-Roadmap) | ~700 | Linux/Win32/POSIX, Automation, Custom |
-| 4 | [Advanced-Quality-Roadmap](Advanced-Quality-Roadmap) | ~700 | PQC/TLS/Enterprise/AI/i18n/Rural |
-| 5 | [Systems-Excellence-Roadmap](Systems-Excellence-Roadmap) | ~700 | Gaming/IoT/DevTools/Packages/Sprint |
-| 6 | [Engineering-Principles-Roadmap](Engineering-Principles-Roadmap) | ~700 | SOLID/OOP/CLI arch/Optimisation |
-| 7 | [Modularisation-Architecture-Roadmap](Modularisation-Architecture-Roadmap) | ~700 | Shards/Caps/Plugins/Feature flags |
-| 8 | [Sovereignty-UserDefined-Roadmap](Sovereignty-UserDefined-Roadmap) | ~700 | sigma-nanolib/sigma-tls/sigma-boot.efi |
-| 9 | [Continuous-Improvement-Roadmap](Continuous-Improvement-Roadmap) | ~800 | Versioning/Review/Tests/Docs/ZDL |
-| 10 | [Final-Excellence-Roadmap](Final-Excellence-Roadmap) | ~800 | Feedback/Boot/IPC/Data/Error/Tools |
-| 11 | [Production-Readiness-Roadmap](Production-Readiness-Roadmap) | ~900 | Go-live gates/India Stack/Gantt/KPIs |
+| # | Document | Lines | Key focus | 
+| --- | ---------- | ------- | ----------- | 
+| 1 | [Quality-Stability-Performance-Roadmap](Quality-Stability-Performance-Roadmap) | ~1,000 | S/P/Q/UX/Security/A11y/DX | 
+| 2 | [Stability-Performance-Extended](Stability-Performance-Extended) | ~900 | Energy/Reliability/Observability/Network | 
+| 3 | [Compatibility-Automation-Personalisation-Roadmap](Compatibility-Automation-Personalisation-Roadmap) | ~700 | Linux/Win32/POSIX, Automation, Custom | 
+| 4 | [Advanced-Quality-Roadmap](Advanced-Quality-Roadmap) | ~700 | PQC/TLS/Enterprise/AI/i18n/Rural | 
+| 5 | [Systems-Excellence-Roadmap](Systems-Excellence-Roadmap) | ~700 | Gaming/IoT/DevTools/Packages/Sprint | 
+| 6 | [Engineering-Principles-Roadmap](Engineering-Principles-Roadmap) | ~700 | SOLID/OOP/CLI arch/Optimisation | 
+| 7 | [Modularisation-Architecture-Roadmap](Modularisation-Architecture-Roadmap) | ~700 | Shards/Caps/Plugins/Feature flags | 
+| 8 | [Sovereignty-UserDefined-Roadmap](Sovereignty-UserDefined-Roadmap) | ~700 | sigma-nanolib/sigma-tls/sigma-boot.efi | 
+| 9 | [Continuous-Improvement-Roadmap](Continuous-Improvement-Roadmap) | ~800 | Versioning/Review/Tests/Docs/ZDL | 
+| 10 | [Final-Excellence-Roadmap](Final-Excellence-Roadmap) | ~800 | Feedback/Boot/IPC/Data/Error/Tools | 
+| 11 | [Production-Readiness-Roadmap](Production-Readiness-Roadmap) | ~900 | Go-live gates/India Stack/Gantt/KPIs | 
 
 **Grand total: 11 documents, ~8,600 lines of engineering roadmap.**
 

@@ -6,14 +6,14 @@ Multi-dimensional comparison of **SigmaOS Zenith** against leading specialized O
 
 ## Competitor USP vs. SigmaOS Implementation
 
-| Dimension | Competitor | Competitor USP | SigmaOS Status | SigmaOS Implementation Plan |
-|---|---|---|---|---|
-| **Declarative Consistency** | NixOS | Immutable reproducible builds, declarative profiles, transaction-based rollback generations | `SovereignRegistry` stubs + branch configs | **SovereignRegistry + TimeMachine**: Enforces CRYSTALS-Dilithium signed JSON boot configs. `SovereignTimeMachine` manages atomic journal-level rollback checkpoints across the 600-shard boot lattice |
-| **Mathematical Throughput** | Clear Linux | Aggressively vectorized math libraries, auto-tuned CFS, profile-guided optimisation | Shard-aware runqueues with basic atomic ticks | **SIMD-Vectorized Crypto Engines**: Accelerates CRYSTALS-Kyber polynomial multiplications + Dilithium signature checks via AVX-512 (Intel/AMD) and NEON (ARM) vector registers |
-| **Forensic Integrity** | CAINE / Tails | Zero-trace RAM scrubbing, automatic write-blocking, hardened kernel logging | Isolated Ring-3 driver models, basic secure boot | **SovereignForensics + Audit**: Hardware-assisted page scrubbing on namespace termination. `SovereignAudit` daemon writes cryptographically attested records to WORM hardware registers |
-| **System Recovery** | RescueZilla | One-click GUI disk cloning, Btrfs snapshot restore, partition reconstruction | CLI `sigma_fsck` + raw filesystem checkers | **`sigma-recover` Utility**: Restores corrupted sectors from encrypted local backups. Integrates partition-level verification inside the boot stage — no userspace required |
-| **Immutable Orchestration** | Fedora CoreOS | Container-native, ignition provisioning, immutable OS tree updates | Shard-level execution boundaries + static manifests | **SovereignCluster Orchestration**: Lightweight sandbox runtimes via **Asynchronous Shard Ignition (ASI)** — no hypervisor overhead. Write-once system images |
-| **Desktop UX** | SteamOS / Solus | Custom compositor pipelines, gamepad integration, desktop themes | Zenith styling stubs + vanilla CSS | **SovereignThemeEngine + Vulkan Layer**: Direct Vulkan triple-buffered compositor bypasses X11/Wayland. Zero-copy GPU-accelerated UI composition |
+| Dimension | Competitor | Competitor USP | SigmaOS Status | SigmaOS Implementation Plan | 
+| --- | --- | --- | --- | --- | 
+| **Declarative Consistency** | NixOS | Immutable reproducible builds, declarative profiles, transaction-based rollback generations | `SovereignRegistry` stubs + branch configs | **SovereignRegistry + TimeMachine**: Enforces CRYSTALS-Dilithium signed JSON boot configs. `SovereignTimeMachine` manages atomic journal-level rollback checkpoints across the 600-shard boot lattice | 
+| **Mathematical Throughput** | Clear Linux | Aggressively vectorized math libraries, auto-tuned CFS, profile-guided optimisation | Shard-aware runqueues with basic atomic ticks | **SIMD-Vectorized Crypto Engines**: Accelerates CRYSTALS-Kyber polynomial multiplications + Dilithium signature checks via AVX-512 (Intel/AMD) and NEON (ARM) vector registers | 
+| **Forensic Integrity** | CAINE / Tails | Zero-trace RAM scrubbing, automatic write-blocking, hardened kernel logging | Isolated Ring-3 driver models, basic secure boot | **SovereignForensics + Audit**: Hardware-assisted page scrubbing on namespace termination. `SovereignAudit` daemon writes cryptographically attested records to WORM hardware registers | 
+| **System Recovery** | RescueZilla | One-click GUI disk cloning, Btrfs snapshot restore, partition reconstruction | CLI `sigma_fsck` + raw filesystem checkers | **`sigma-recover` Utility**: Restores corrupted sectors from encrypted local backups. Integrates partition-level verification inside the boot stage — no userspace required | 
+| **Immutable Orchestration** | Fedora CoreOS | Container-native, ignition provisioning, immutable OS tree updates | Shard-level execution boundaries + static manifests | **SovereignCluster Orchestration**: Lightweight sandbox runtimes via **Asynchronous Shard Ignition (ASI)** — no hypervisor overhead. Write-once system images | 
+| **Desktop UX** | SteamOS / Solus | Custom compositor pipelines, gamepad integration, desktop themes | Zenith styling stubs + vanilla CSS | **SovereignThemeEngine + Vulkan Layer**: Direct Vulkan triple-buffered compositor bypasses X11/Wayland. Zero-copy GPU-accelerated UI composition | 
 
 ---
 
@@ -151,17 +151,17 @@ SigmaOS target:    <50 ns  (custom asm SYSCALL entry)
 
 ## Implementation Priority Matrix
 
-| Feature | Blocks Boot | Complexity | Target Phase |
-|---|---|---|---|
-| NUMA-aware scheduler | No | High | Phase 2 |
-| AVX-512 Kyber | No | Medium | Phase 4 |
-| Vulkan compositor | Yes (desktop) | Very High | Phase 2 |
-| sigma-recover | No | Medium | Phase 1 |
-| SovereignAudit WORM | No | High | Phase 4 |
-| Profile hot-swap | No | Medium | Phase 3 |
-| Lock-free queues | No | High | Phase 2 |
-| Custom SYSCALL asm | Yes (perf) | Medium | Phase 0 |
-| Declarative UI engine | No | Medium | Phase 3 |
+| Feature | Blocks Boot | Complexity | Target Phase | 
+| --- | --- | --- | --- | 
+| NUMA-aware scheduler | No | High | Phase 2 | 
+| AVX-512 Kyber | No | Medium | Phase 4 | 
+| Vulkan compositor | Yes (desktop) | Very High | Phase 2 | 
+| sigma-recover | No | Medium | Phase 1 | 
+| SovereignAudit WORM | No | High | Phase 4 | 
+| Profile hot-swap | No | Medium | Phase 3 | 
+| Lock-free queues | No | High | Phase 2 | 
+| Custom SYSCALL asm | Yes (perf) | Medium | Phase 0 | 
+| Declarative UI engine | No | Medium | Phase 3 | 
 
 ---
 

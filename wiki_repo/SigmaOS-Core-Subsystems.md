@@ -1,6 +1,6 @@
 # SigmaOS Zenith: Core Subsystems & Open-Source Inspirations (v15.2)
 
-To transform SigmaOS Zenith into an industrial-grade sovereign microkernel, we have absorbed and synthesized critical kernel subsystems from leading open-source operating systems and network protocols. 
+To transform SigmaOS Zenith into an industrial-grade sovereign microkernel, we have absorbed and synthesized critical kernel subsystems from leading open-source operating systems and network protocols.
 
 These subsystems operate entirely within the C11 standalone environment, ensuring absolute silicon-direct execution without reliance on POSIX bloat.
 

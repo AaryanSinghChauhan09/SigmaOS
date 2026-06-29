@@ -22,26 +22,26 @@ PATCH: Bug fixes, security patches (via sigma-kpatch where possible)
 channel: stable | rc | beta | nightly
 ```
 
-| Rule | Enforcement | Branch |
-|------|------------|--------|
-| No MAJOR bump without 90-day deprecation notice | Release gate | all |
-| PATCH releases must not break `SIGMA_STABLE` symbols | `make check-abi` CI | all |
-| `SIGMA_EXPERIMENTAL` APIs can break in MINOR | Documented in sigma_abi.h | all |
-| Nightly builds auto-tagged `vX.Y.Z-nightly-YYYYMMDD` | `.github/workflows/sigma_release.yml` | all |
-| RC must pass all Q0 quality gates | `sigma_quality_check.sh --strict` | `prepare-sigmaos-launch` |
-| Every release has signed SBOM | `scripts/gen_sbom.sh` | all |
+| Rule | Enforcement | Branch | 
+| ------ | ------------ | -------- | 
+| No MAJOR bump without 90-day deprecation notice | Release gate | all | 
+| PATCH releases must not break `SIGMA_STABLE` symbols | `make check-abi` CI | all | 
+| `SIGMA_EXPERIMENTAL` APIs can break in MINOR | Documented in sigma_abi.h | all | 
+| Nightly builds auto-tagged `vX.Y.Z-nightly-YYYYMMDD` | `.github/workflows/sigma_release.yml` | all | 
+| RC must pass all Q0 quality gates | `sigma_quality_check.sh --strict` | `prepare-sigmaos-launch` | 
+| Every release has signed SBOM | `scripts/gen_sbom.sh` | all | 
 
 ### VS2 — Branch-to-Version Mapping
 
-| Git branch | Version series | Auto-tag |
-|-----------|---------------|---------|
-| `main` | v15.x stable | On CI green |
-| `tools-dev` | v15.1-dev | Nightly |
-| `kernel-exp` | v16.0-dev | Nightly after boot |
-| `release/standalone` | v16.0-standalone-rc | On CI green |
-| `release/cloud` | v17.0-cloud-rc | On CI green |
-| `release/mobile` | v16.0-mobile-rc | After RPi4 boot |
-| `prepare-sigmaos-launch` | v15.1.0 | Manual tag |
+| Git branch | Version series | Auto-tag | 
+| ----------- | --------------- | --------- | 
+| `main` | v15.x stable | On CI green | 
+| `tools-dev` | v15.1-dev | Nightly | 
+| `kernel-exp` | v16.0-dev | Nightly after boot | 
+| `release/standalone` | v16.0-standalone-rc | On CI green | 
+| `release/cloud` | v17.0-cloud-rc | On CI green | 
+| `release/mobile` | v16.0-mobile-rc | After RPi4 boot | 
+| `prepare-sigmaos-launch` | v15.1.0 | Manual tag | 
 
 ### VS3 — Changelog Automation
 
@@ -62,12 +62,12 @@ sigma_automation.sh gen-changelog
 #   - BREAKING(shard): SigmaShardManifest v2 requires recover() callback
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| Conventional commit validator | `.conform.yaml` | all | Already exists — enforce in CI |
-| Auto-changelog CI job | `.github/workflows/sigma_release.yml` | all | Run `gen_changelog.sh` on tag push |
-| CHANGELOG.md in repo root | `CHANGELOG.md` | all | Updated on every release |
-| Breaking change detection | `.github/workflows/sigma_ci.yml` | all | Scan commit messages for `BREAKING:` |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| Conventional commit validator | `.conform.yaml` | all | Already exists — enforce in CI | 
+| Auto-changelog CI job | `.github/workflows/sigma_release.yml` | all | Run `gen_changelog.sh` on tag push | 
+| CHANGELOG.md in repo root | `CHANGELOG.md` | all | Updated on every release | 
+| Breaking change detection | `.github/workflows/sigma_ci.yml` | all | Scan commit messages for `BREAKING:` | 
 
 ---
 
@@ -109,13 +109,13 @@ Every PR to `main` or `release/*` must answer:
 - [ ] wiki_repo/ updated if new feature or behaviour change
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| PR template with checklist | `.github/PULL_REQUEST_TEMPLATE.md` | all | Mandatory checkboxes — CI fails if unchecked |
-| Auto-assign reviewers | `.github/CODEOWNERS` | all | Subsystem owners auto-requested |
-| Review turnaround SLO | Community policy | all | First review within 48 hours |
-| Stale PR auto-close | `.github/workflows/` | all | No activity 90 days → auto-close with message |
-| Review coverage metric | CI | all | PRs with 0 approvals cannot merge to main |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| PR template with checklist | `.github/PULL_REQUEST_TEMPLATE.md` | all | Mandatory checkboxes — CI fails if unchecked | 
+| Auto-assign reviewers | `.github/CODEOWNERS` | all | Subsystem owners auto-requested | 
+| Review turnaround SLO | Community policy | all | First review within 48 hours | 
+| Stale PR auto-close | `.github/workflows/` | all | No activity 90 days → auto-close with message | 
+| Review coverage metric | CI | all | PRs with 0 approvals cannot merge to main | 
 
 ### CR2 — Architecture Review Process (ADR)
 
@@ -138,12 +138,12 @@ Big decisions get an Architecture Decision Record before implementation:
   - Preemptive EDF only: starvation for non-RT tasks
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| ADR directory | `docs/adr/` | `docs-update` | One `.md` file per major architectural decision |
-| ADR index | `docs/adr/README.md` | `docs-update` | Table of all ADRs with status |
-| Required ADR topics | `docs/adr/` | `docs-update` | Scheduler, PQC algo, SDF design, sigma-bus protocol, .spkg format |
-| ADR review process | `CONTRIBUTING.md` | `docs-update` | Any change affecting 3+ files requires ADR |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| ADR directory | `docs/adr/` | `docs-update` | One `.md` file per major architectural decision | 
+| ADR index | `docs/adr/README.md` | `docs-update` | Table of all ADRs with status | 
+| Required ADR topics | `docs/adr/` | `docs-update` | Scheduler, PQC algo, SDF design, sigma-bus protocol, .spkg format | 
+| ADR review process | `CONTRIBUTING.md` | `docs-update` | Any change affecting 3+ files requires ADR | 
 
 ---
 
@@ -162,15 +162,15 @@ Big decisions get an Architecture Decision Record before implementation:
   /--------------\
 ```
 
-| Layer | Count target | Tool | Branch |
-|-------|-------------|------|--------|
-| Unit tests | ≥ 200 | GTest via CMake | all |
-| Integration tests | ≥ 30 | Shell scripts + QEMU | all |
-| E2E scenarios | ≥ 10 | OpenQA sigma_scenarios.py | all |
-| Fuzz targets | ≥ 10 | AFL++ / libFuzzer | all |
-| Property-based | ≥ 5 | Custom proptest.cpp | `kernel-exp` |
-| Performance benchmarks | ≥ 6 | sigma-perf bench suite | `performance-optimized` |
-| Chaos tests | ≥ 7 | tests/chaos/*.sh | all |
+| Layer | Count target | Tool | Branch | 
+| ------- | ------------- | ------ | -------- | 
+| Unit tests | ≥ 200 | GTest via CMake | all | 
+| Integration tests | ≥ 30 | Shell scripts + QEMU | all | 
+| E2E scenarios | ≥ 10 | OpenQA sigma_scenarios.py | all | 
+| Fuzz targets | ≥ 10 | AFL++ / libFuzzer | all | 
+| Property-based | ≥ 5 | Custom proptest.cpp | `kernel-exp` | 
+| Performance benchmarks | ≥ 6 | sigma-perf bench suite | `performance-optimized` | 
+| Chaos tests | ≥ 7 | tests/chaos/*.sh | all | 
 
 ### TP2 — Test Naming Convention
 
@@ -194,14 +194,14 @@ TEST(SigmaCA, ComputeGSTR1WithInvalidGSTINReturnsErrInval) { ... }
 
 For these subsystems, write tests FIRST before implementation:
 
-| Subsystem | Reason | Required tests before coding |
-|-----------|--------|------------------------------|
-| `sigma_argon2id.cpp` | Security-critical; wrong impl = no encryption | KAT vectors from RFC 9106 |
-| `sigma_kyber1024.cpp` | PQC correctness | NIST KAT test vectors |
-| `sigma_tls_handshake.cpp` | Network security | RFC 8446 test vectors |
-| `sigma_accounts_post()` | Financial data | Double-entry invariant tests |
-| `sigma_pe_loader.cpp` | Binary loading | Known-good PE files |
-| VFS path normaliser | Security | Path traversal fuzz corpus |
+| Subsystem | Reason | Required tests before coding | 
+| ----------- | -------- | ------------------------------ | 
+| `sigma_argon2id.cpp` | Security-critical; wrong impl = no encryption | KAT vectors from RFC 9106 | 
+| `sigma_kyber1024.cpp` | PQC correctness | NIST KAT test vectors | 
+| `sigma_tls_handshake.cpp` | Network security | RFC 8446 test vectors | 
+| `sigma_accounts_post()` | Financial data | Double-entry invariant tests | 
+| `sigma_pe_loader.cpp` | Binary loading | Known-good PE files | 
+| VFS path normaliser | Security | Path traversal fuzz corpus | 
 
 ---
 
@@ -239,13 +239,13 @@ CURRENT_PROBLEMS_MANIFEST.md ← Active issues tracker
 - [ ] Example added to docs/examples/ if new capability introduced
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| Doxygen CI job | `.github/workflows/sigma_ci.yml` | all | Fail if public API missing `@brief` |
-| Man page generator | `scripts/sigma_docs_cli.sh` | `docs-update` | Auto-gen from `--help` output + hand-written sections |
-| Example test runner | `scripts/sigma_docs_cli.sh` | `docs-update` | `sigma-docs test-examples` — verify all examples compile |
-| Wiki freshness check | `scripts/sigma_quality_check.sh` | all | Warn if wiki_repo 7+ days behind main |
-| Broken link scanner | `scripts/sigma_docs_cli.sh` | `docs-update` | `sigma-docs check` — scan all .md for dead links |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| Doxygen CI job | `.github/workflows/sigma_ci.yml` | all | Fail if public API missing `@brief` | 
+| Man page generator | `scripts/sigma_docs_cli.sh` | `docs-update` | Auto-gen from `--help` output + hand-written sections | 
+| Example test runner | `scripts/sigma_docs_cli.sh` | `docs-update` | `sigma-docs test-examples` — verify all examples compile | 
+| Wiki freshness check | `scripts/sigma_quality_check.sh` | all | Warn if wiki_repo 7+ days behind main | 
+| Broken link scanner | `scripts/sigma_docs_cli.sh` | `docs-update` | `sigma-docs check` — scan all .md for dead links | 
 
 ### DS3 — India-Language Documentation
 
@@ -263,13 +263,13 @@ wiki_repo/
     ...
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| Hindi getting-started | `wiki_repo/hi/Getting-Started.md` | `docs-update` | Translate 5-command quick-start to Hindi |
-| Hindi sigma-ca guide | `wiki_repo/hi/Sigma-CA-Guide.md` | `docs-update` | Step-by-step GSTR-3B filing in Hindi |
-| Tamil sigma-agri guide | `wiki_repo/ta/Sigma-Agri-Guide.md` | `docs-update` | MSP + PMFBY in Tamil |
-| i18n doc CI | `.github/workflows/sigma_ci.yml` | `docs-update` | Warn if English doc updated but Hindi not |
-| Community translation tracker | `wiki_repo/Translation-Status.md` | `docs-update` | Table: page × language × status |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| Hindi getting-started | `wiki_repo/hi/Getting-Started.md` | `docs-update` | Translate 5-command quick-start to Hindi | 
+| Hindi sigma-ca guide | `wiki_repo/hi/Sigma-CA-Guide.md` | `docs-update` | Step-by-step GSTR-3B filing in Hindi | 
+| Tamil sigma-agri guide | `wiki_repo/ta/Sigma-Agri-Guide.md` | `docs-update` | MSP + PMFBY in Tamil | 
+| i18n doc CI | `.github/workflows/sigma_ci.yml` | `docs-update` | Warn if English doc updated but Hindi not | 
+| Community translation tracker | `wiki_repo/Translation-Status.md` | `docs-update` | Table: page × language × status | 
 
 ---
 
@@ -300,13 +300,13 @@ On release tag vX.Y.Z:
                     └── sigma_automation.sh publish
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| Wire QEMU to real boot | `.github/workflows/sigma_qemu.yml` | all | Replace `echo` stubs with real qemu invocation |
-| Nightly benchmark CI | `.github/workflows/sigma_ci.yml` | `performance-optimized` | `@daily` schedule: bench_boot + bench_pqc + bench_sched |
-| India Stack sandbox weekly | `.github/workflows/sigma_ci.yml` | `release/standalone` | `@weekly`: GSTN + ABDM sandbox API tests |
-| Release pipeline | `.github/workflows/sigma_release.yml` | `prepare-sigmaos-launch` | Full: ISO → sign → SBOM → publish → notify |
-| Auto-label by subsystem | `.github/workflows/` | all | Label `kernel/net/zenith/compat` by path |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| Wire QEMU to real boot | `.github/workflows/sigma_qemu.yml` | all | Replace `echo` stubs with real qemu invocation | 
+| Nightly benchmark CI | `.github/workflows/sigma_ci.yml` | `performance-optimized` | `@daily` schedule: bench_boot + bench_pqc + bench_sched | 
+| India Stack sandbox weekly | `.github/workflows/sigma_ci.yml` | `release/standalone` | `@weekly`: GSTN + ABDM sandbox API tests | 
+| Release pipeline | `.github/workflows/sigma_release.yml` | `prepare-sigmaos-launch` | Full: ISO → sign → SBOM → publish → notify | 
+| Auto-label by subsystem | `.github/workflows/` | all | Label `kernel/net/zenith/compat` by path | 
 
 ### AP2 — sigma-automation.sh Complete Command Set
 
@@ -335,12 +335,12 @@ sigma_automation.sh size-check       # verify module size budgets
 sigma_automation.sh dep-scan         # foreign dependency audit
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| `cmd_release()` | `scripts/sigma_automation.sh` | `prepare-sigmaos-launch` | `git tag -s vX.Y.Z` + ISO build + sign + upload |
-| `cmd_qemu_test()` | `scripts/sigma_automation.sh` | all | `qemu-system-x86_64 -cdrom SigmaOS.iso` + assert prompt |
-| `cmd_size_check()` | `scripts/sigma_automation.sh` | all | `size` each .so + kernel image vs budget table |
-| `cmd_dep_scan()` | `scripts/sigma_automation.sh` | all | Grep for `#include <openssl/`, `#include <glib.h>` etc. |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| `cmd_release()` | `scripts/sigma_automation.sh` | `prepare-sigmaos-launch` | `git tag -s vX.Y.Z` + ISO build + sign + upload | 
+| `cmd_qemu_test()` | `scripts/sigma_automation.sh` | all | `qemu-system-x86_64 -cdrom SigmaOS.iso` + assert prompt | 
+| `cmd_size_check()` | `scripts/sigma_automation.sh` | all | `size` each .so + kernel image vs budget table | 
+| `cmd_dep_scan()` | `scripts/sigma_automation.sh` | all | Grep for `#include <openssl/`, `#include <glib.h>` etc. | 
 
 ---
 
@@ -423,38 +423,38 @@ sigma_u64 sigma_uptime_ns(void);     // nanoseconds since boot
 sigma_u64 sigma_tsc_read(void);      // raw TSC value
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| Complete `sigma_nanolib.h` | `klib/include/sigma_nanolib.h` | `tools-dev` | All functions above declared |
-| `sigma_nanolib.cpp` implementations | `klib/sigma_nanolib.cpp` | `tools-dev` | Pure C++17, zero `#include <string.h>` |
-| `sigma_secure_memzero` (volatile) | `klib/sigma_nanolib.cpp` | `tools-dev` | Prevents compiler optimising out crypto key wipes |
-| UTF-8/UTF-16 converters | `klib/sigma_nanolib.cpp` | `tools-dev` | Needed by sigma-wine NT path → VFS path |
-| `sigma_printf` → sigma-log | `klib/sigma_nanolib.cpp` | `tools-dev` | Replaces `printf` — routes to serial + sigma-log |
-| CI: scan for forbidden includes | `.github/workflows/sigma_ci.yml` | all | Fail if `#include <string.h>` found in kernel/ or crypto/ |
-| Migrate kernel/*.c to sigma-nanolib | `kernel/core/` | `kernel-exp` | Replace `memcpy/memset/strlen` with sigma_ equivalents |
-| Migrate crypto/*.cpp | `crypto/` | `performance-optimized` | No libc in PQC code |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| Complete `sigma_nanolib.h` | `klib/include/sigma_nanolib.h` | `tools-dev` | All functions above declared | 
+| `sigma_nanolib.cpp` implementations | `klib/sigma_nanolib.cpp` | `tools-dev` | Pure C++17, zero `#include <string.h>` | 
+| `sigma_secure_memzero` (volatile) | `klib/sigma_nanolib.cpp` | `tools-dev` | Prevents compiler optimising out crypto key wipes | 
+| UTF-8/UTF-16 converters | `klib/sigma_nanolib.cpp` | `tools-dev` | Needed by sigma-wine NT path → VFS path | 
+| `sigma_printf` → sigma-log | `klib/sigma_nanolib.cpp` | `tools-dev` | Replaces `printf` — routes to serial + sigma-log | 
+| CI: scan for forbidden includes | `.github/workflows/sigma_ci.yml` | all | Fail if `#include <string.h>` found in kernel/ or crypto/ | 
+| Migrate kernel/*.c to sigma-nanolib | `kernel/core/` | `kernel-exp` | Replace `memcpy/memset/strlen` with sigma_ equivalents | 
+| Migrate crypto/*.cpp | `crypto/` | `performance-optimized` | No libc in PQC code | 
 
 ### PF2 — Replacing Predefined C++ STL in Hot Paths
 
 SigmaOS uses STL in non-kernel code but replaces it on hot paths:
 
-| STL function | Sigma replacement | Reason | File |
-|-------------|-----------------|--------|------|
-| `std::string` | `sigma_string_t` (SBO, stack-alloc) | No heap for short strings | `klib/sigma_string.h` |
-| `std::vector<T>` | `sigma_array<T, N>` (fixed-size) | No dynamic realloc in kernel | `klib/sigma_array.h` |
-| `std::unordered_map` | `sigma_hashmap<K,V>` (open addressing) | Cache-friendly, no indirection | `klib/sigma_hashmap.h` |
-| `std::function` | `sigma_fn<Ret(Args...)>` (no heap) | No heap allocation for callbacks | `klib/sigma_fn.h` |
-| `std::shared_ptr` | Explicit reference counting | Predictable destruction | Manual in drivers |
-| `std::mutex` | `sigma_spinlock_t` (CAS) | Lock-free for kernel | `klib/sigma_lockfree.h` |
-| `std::sort` | `sigma_qsort()` | Zero external dep | `klib/sigma_nanolib.cpp` |
+| STL function | Sigma replacement | Reason | File | 
+| ------------- | ----------------- | -------- | ------ | 
+| `std::string` | `sigma_string_t` (SBO, stack-alloc) | No heap for short strings | `klib/sigma_string.h` | 
+| `std::vector<T>` | `sigma_array<T, N>` (fixed-size) | No dynamic realloc in kernel | `klib/sigma_array.h` | 
+| `std::unordered_map` | `sigma_hashmap<K,V>` (open addressing) | Cache-friendly, no indirection | `klib/sigma_hashmap.h` | 
+| `std::function` | `sigma_fn<Ret(Args...)>` (no heap) | No heap allocation for callbacks | `klib/sigma_fn.h` | 
+| `std::shared_ptr` | Explicit reference counting | Predictable destruction | Manual in drivers | 
+| `std::mutex` | `sigma_spinlock_t` (CAS) | Lock-free for kernel | `klib/sigma_lockfree.h` | 
+| `std::sort` | `sigma_qsort()` | Zero external dep | `klib/sigma_nanolib.cpp` | 
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| `sigma_string_t` (SBO ≤ 15 chars) | `klib/sigma_string.h` | `tools-dev` | Inline buffer for short strings, no `new` |
-| `sigma_array<T,N>` fixed container | `klib/sigma_array.h` | `tools-dev` | Stack-allocated, bounds-checked array |
-| `sigma_hashmap<K,V>` open addressing | `klib/sigma_hashmap.h` | `performance-optimized` | Robin Hood hashing, cache-line aligned |
-| `sigma_fn<>` zero-alloc callable | `klib/sigma_fn.h` | `tools-dev` | No heap, fits in 32 bytes |
-| CI: STL audit in kernel/ | `.github/workflows/sigma_ci.yml` | `kernel-exp` | Fail if `<vector>`, `<string>`, `<map>` found in kernel/ |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| `sigma_string_t` (SBO ≤ 15 chars) | `klib/sigma_string.h` | `tools-dev` | Inline buffer for short strings, no `new` | 
+| `sigma_array<T,N>` fixed container | `klib/sigma_array.h` | `tools-dev` | Stack-allocated, bounds-checked array | 
+| `sigma_hashmap<K,V>` open addressing | `klib/sigma_hashmap.h` | `performance-optimized` | Robin Hood hashing, cache-line aligned | 
+| `sigma_fn<>` zero-alloc callable | `klib/sigma_fn.h` | `tools-dev` | No heap, fits in 32 bytes | 
+| CI: STL audit in kernel/ | `.github/workflows/sigma_ci.yml` | `kernel-exp` | Fail if `<vector>`, `<string>`, `<map>` found in kernel/ | 
 
 ---
 
@@ -508,13 +508,13 @@ india_saffron     = "#E67300"
 india_green       = "#0E6B06"
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| ZDL colour tokens TOML | `zenith_desktop/themes/zdl-dark.sigma-theme` | `release/standalone` | Canonical dark theme as source of truth |
-| ZDL light variant | `zenith_desktop/themes/zdl-light.sigma-theme` | `release/standalone` | Latte-based light theme |
-| ZDL India variant | `zenith_desktop/themes/zdl-india.sigma-theme` | `release/standalone` | Saffron/white/green India flag palette |
-| WCAG 2.2 AA checker | `zenith_desktop/theme/sigma_theme_engine.cpp` | `release/standalone` | Every colour pair must meet 4.5:1 contrast |
-| Token usage enforcement | `scripts/check_theme_tokens.py` | `release/standalone` | Fail if hardcoded hex found outside theme files |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| ZDL colour tokens TOML | `zenith_desktop/themes/zdl-dark.sigma-theme` | `release/standalone` | Canonical dark theme as source of truth | 
+| ZDL light variant | `zenith_desktop/themes/zdl-light.sigma-theme` | `release/standalone` | Latte-based light theme | 
+| ZDL India variant | `zenith_desktop/themes/zdl-india.sigma-theme` | `release/standalone` | Saffron/white/green India flag palette | 
+| WCAG 2.2 AA checker | `zenith_desktop/theme/sigma_theme_engine.cpp` | `release/standalone` | Every colour pair must meet 4.5:1 contrast | 
+| Token usage enforcement | `scripts/check_theme_tokens.py` | `release/standalone` | Fail if hardcoded hex found outside theme files | 
 
 #### ZDL Typography
 
@@ -586,18 +586,18 @@ class SigmaTable : public ISigmaWidget {
 };
 ```
 
-| Component | File | Branch | Priority |
-|-----------|------|--------|---------|
-| SigmaButton | `zenith_desktop/ui/sigma_button.cpp` | `release/standalone` | 🔴 Every app needs this |
-| SigmaInput (with GSTIN/PAN formatters) | `zenith_desktop/ui/sigma_input.cpp` | `release/standalone` | 🔴 Every profession app |
-| SigmaTable (sortable, filterable) | `zenith_desktop/ui/sigma_table.cpp` | `release/standalone` | 🟠 sigma-ca invoice list |
-| SigmaDialog (modal) | `zenith_desktop/ui/sigma_dialog.cpp` | `release/standalone` | 🟠 Confirmation prompts |
-| SigmaToast (notification) | `zenith_desktop/ui/sigma_toast.cpp` | `release/standalone` | 🟠 GST filing success |
-| SigmaProgress (bar + spinner) | `zenith_desktop/ui/sigma_progress.cpp` | `release/standalone` | 🟠 Package install |
-| SigmaCard (info card) | `zenith_desktop/ui/sigma_card.cpp` | `release/standalone` | 🟡 Dashboard widgets |
-| SigmaChart (bar/line/pie) | `zenith_desktop/ui/sigma_chart.cpp` | `release/standalone` | 🟡 GST trend chart |
-| SigmaCalendar | `zenith_desktop/ui/sigma_calendar.cpp` | `release/standalone` | 🟡 Filing deadline picker |
-| SigmaBadge (verified DID) | `zenith_desktop/ui/sigma_badge.cpp` | `release/standalone` | 🟡 "CA ✓" credential |
+| Component | File | Branch | Priority | 
+| ----------- | ------ | -------- | --------- | 
+| SigmaButton | `zenith_desktop/ui/sigma_button.cpp` | `release/standalone` | 🔴 Every app needs this | 
+| SigmaInput (with GSTIN/PAN formatters) | `zenith_desktop/ui/sigma_input.cpp` | `release/standalone` | 🔴 Every profession app | 
+| SigmaTable (sortable, filterable) | `zenith_desktop/ui/sigma_table.cpp` | `release/standalone` | 🟠 sigma-ca invoice list | 
+| SigmaDialog (modal) | `zenith_desktop/ui/sigma_dialog.cpp` | `release/standalone` | 🟠 Confirmation prompts | 
+| SigmaToast (notification) | `zenith_desktop/ui/sigma_toast.cpp` | `release/standalone` | 🟠 GST filing success | 
+| SigmaProgress (bar + spinner) | `zenith_desktop/ui/sigma_progress.cpp` | `release/standalone` | 🟠 Package install | 
+| SigmaCard (info card) | `zenith_desktop/ui/sigma_card.cpp` | `release/standalone` | 🟡 Dashboard widgets | 
+| SigmaChart (bar/line/pie) | `zenith_desktop/ui/sigma_chart.cpp` | `release/standalone` | 🟡 GST trend chart | 
+| SigmaCalendar | `zenith_desktop/ui/sigma_calendar.cpp` | `release/standalone` | 🟡 Filing deadline picker | 
+| SigmaBadge (verified DID) | `zenith_desktop/ui/sigma_badge.cpp` | `release/standalone` | 🟡 "CA ✓" credential | 
 
 ### UX3 — Profession App UX Patterns
 
@@ -620,16 +620,16 @@ Every profession app follows the same layout:
 └──────────────┴──────────────────────────────────────────┘
 ```
 
-| Pattern | Rule | Applied to |
-|---------|------|-----------|
-| Navigation sidebar | Left sidebar, 200px wide, icons + labels | All profession apps |
-| Page header | Title + primary CTA button + user DID badge | All screens |
-| Data tables | Sortable columns, filter bar, ₹ formatted | sigma-ca, sigma-accounts |
-| India number format | ₹1,23,45,678 (lakh/crore) | All monetary displays |
-| Date format | 28 June 2026 (dd Month YYYY) | All date displays |
-| Success toast | Green, 3 s auto-dismiss, action button | After GST filing, invoice create |
-| Error dialog | Red border, error code + human message + fix suggestion | All errors |
-| Loading state | Skeleton screen (not spinner) for initial load | Dashboard, reports |
+| Pattern | Rule | Applied to | 
+| --------- | ------ | ----------- | 
+| Navigation sidebar | Left sidebar, 200px wide, icons + labels | All profession apps | 
+| Page header | Title + primary CTA button + user DID badge | All screens | 
+| Data tables | Sortable columns, filter bar, ₹ formatted | sigma-ca, sigma-accounts | 
+| India number format | ₹1,23,45,678 (lakh/crore) | All monetary displays | 
+| Date format | 28 June 2026 (dd Month YYYY) | All date displays | 
+| Success toast | Green, 3 s auto-dismiss, action button | After GST filing, invoice create | 
+| Error dialog | Red border, error code + human message + fix suggestion | All errors | 
+| Loading state | Skeleton screen (not spinner) for initial load | Dashboard, reports | 
 
 ### UX4 — CLI UX Patterns (deeper)
 
@@ -669,15 +669,15 @@ sigma-agri msp --crop wheat --year 2026 --json
 }
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| Progress bar with ETA | `userland/tools/sigma_progress_bar.cpp` | `tools-dev` | VT100 animated bar, ETA from download speed |
-| `--json` on every command | All CLI tools | `tools-dev` | Structured output for scripting and automation |
-| Success summary format | All mutating commands | `tools-dev` | Standard block: ✓ title + key-value summary |
-| Error with fix suggestion | All CLI tools | `tools-dev` | Error message + "Next step:" guidance |
-| Colour detection | All CLI tools | `tools-dev` | `isatty(1)` — colour in terminal, plain in pipe |
-| India number formatter | `userland/locales/sigma_l10n.cpp` | `release/standalone` | `sigma_format_inr(1234567)` → "₹12,34,567" |
-| Spinner for async ops | `userland/tools/sigma_spinner.cpp` | `tools-dev` | Braille Unicode spinner while waiting |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| Progress bar with ETA | `userland/tools/sigma_progress_bar.cpp` | `tools-dev` | VT100 animated bar, ETA from download speed | 
+| `--json` on every command | All CLI tools | `tools-dev` | Structured output for scripting and automation | 
+| Success summary format | All mutating commands | `tools-dev` | Standard block: ✓ title + key-value summary | 
+| Error with fix suggestion | All CLI tools | `tools-dev` | Error message + "Next step:" guidance | 
+| Colour detection | All CLI tools | `tools-dev` | `isatty(1)` — colour in terminal, plain in pipe | 
+| India number formatter | `userland/locales/sigma_l10n.cpp` | `release/standalone` | `sigma_format_inr(1234567)` → "₹12,34,567" | 
+| Spinner for async ops | `userland/tools/sigma_spinner.cpp` | `tools-dev` | Braille Unicode spinner while waiting | 
 
 ---
 
@@ -707,15 +707,15 @@ App draw call
   ▼ Display (1 frame max @ 120 Hz)
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| Porter-Duff alpha blend (SIMD) | `zenith_desktop/compositor/sigma_compositor.cpp` | `release/standalone` | AVX-512 8-pixel-wide OVER operator |
-| Vulkan command buffer pre-record | `zenith_desktop/compositor/sigma_vk_frame.cpp` | `release/standalone` | Pre-record per window, submit on vblank |
-| HarfBuzz text shaping integration | `zenith_desktop/compositor/sigma_font.cpp` | `release/standalone` | Complex scripts: Devanagari conjuncts |
-| FreeType2 glyph atlas | `zenith_desktop/compositor/sigma_font.cpp` | `release/standalone` | Upload once at startup, reuse every frame |
-| Vulkan compute blur shader | `zenith_desktop/shaders/blur.comp` | `release/standalone` | Gaussian blur for glassmorphism effect |
-| VRR/FreeSync support | `drivers/graphics/sigma_kms.cpp` | `drivers-dev` | `DRM_CAP_ADDFB2_MODIFIERS` + atomic commit |
-| Frame time metric | `zenith_desktop/compositor/sigma_compositor.cpp` | `release/standalone` | Rolling p50/p95/p99 frame time logged |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| Porter-Duff alpha blend (SIMD) | `zenith_desktop/compositor/sigma_compositor.cpp` | `release/standalone` | AVX-512 8-pixel-wide OVER operator | 
+| Vulkan command buffer pre-record | `zenith_desktop/compositor/sigma_vk_frame.cpp` | `release/standalone` | Pre-record per window, submit on vblank | 
+| HarfBuzz text shaping integration | `zenith_desktop/compositor/sigma_font.cpp` | `release/standalone` | Complex scripts: Devanagari conjuncts | 
+| FreeType2 glyph atlas | `zenith_desktop/compositor/sigma_font.cpp` | `release/standalone` | Upload once at startup, reuse every frame | 
+| Vulkan compute blur shader | `zenith_desktop/shaders/blur.comp` | `release/standalone` | Gaussian blur for glassmorphism effect | 
+| VRR/FreeSync support | `drivers/graphics/sigma_kms.cpp` | `drivers-dev` | `DRM_CAP_ADDFB2_MODIFIERS` + atomic commit | 
+| Frame time metric | `zenith_desktop/compositor/sigma_compositor.cpp` | `release/standalone` | Rolling p50/p95/p99 frame time logged | 
 
 ### UI2 — Input Handling Architecture
 
@@ -740,29 +740,29 @@ Hardware event (keyboard/pointer/touch)
   │   App: key input, pointer click
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| sigma-input daemon | `userland/daemons/sigma_inputd.cpp` | `release/standalone` | Consolidate keyboard + pointer events |
-| Key repeat timer | `userland/daemons/sigma_inputd.cpp` | `release/standalone` | 400 ms delay, 30 Hz repeat rate (configurable) |
-| IME event injection | `userland/ime/sigma_ime_cli.cpp` | `release/standalone` | IME inserts composed text via sigma-input |
-| Sticky keys accessibility | `userland/daemons/sigma_inputd.cpp` | `release/standalone` | Single-key modifier sequences |
-| Touch → pointer normalisation | `userland/daemons/sigma_inputd.cpp` | `release/mobile` | Touch events → pointer events for existing apps |
-| Multi-touch gesture recognition | `userland/daemons/sigma_inputd.cpp` | `release/mobile` | Pinch-to-zoom, 3-finger swipe workspace |
-| Input event CI test | `tests/ui/test_input.sh` | `release/standalone` | Inject synthetic events, verify app receives them |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| sigma-input daemon | `userland/daemons/sigma_inputd.cpp` | `release/standalone` | Consolidate keyboard + pointer events | 
+| Key repeat timer | `userland/daemons/sigma_inputd.cpp` | `release/standalone` | 400 ms delay, 30 Hz repeat rate (configurable) | 
+| IME event injection | `userland/ime/sigma_ime_cli.cpp` | `release/standalone` | IME inserts composed text via sigma-input | 
+| Sticky keys accessibility | `userland/daemons/sigma_inputd.cpp` | `release/standalone` | Single-key modifier sequences | 
+| Touch → pointer normalisation | `userland/daemons/sigma_inputd.cpp` | `release/mobile` | Touch events → pointer events for existing apps | 
+| Multi-touch gesture recognition | `userland/daemons/sigma_inputd.cpp` | `release/mobile` | Pinch-to-zoom, 3-finger swipe workspace | 
+| Input event CI test | `tests/ui/test_input.sh` | `release/standalone` | Inject synthetic events, verify app receives them | 
 
 ### UI3 — Window Management Quality
 
 **Current:** BSP/master-stack real, remove_window BSP rebuild is TODO, animation stubs.
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| BSP tree rebuild on `remove_window` | `zenith_desktop/wm/sigma_tiling_wm.cpp` | `release/standalone` | Fix TODO: walk tree, remove leaf, rebalance |
-| Fibonacci layout mode | `zenith_desktop/wm/sigma_tiling_wm.cpp` | `release/standalone` | Spiral partition: first window 50%, next 50% of remainder |
-| Animated window spawn (opacity) | `zenith_desktop/compositor/sigma_compositor.cpp` | `release/standalone` | 200ms fade-in from 0.0 to 1.0 opacity |
-| Animated layout switch | `zenith_desktop/compositor/sigma_compositor.cpp` | `release/standalone` | Smooth 300ms transition between layouts |
-| Snap-to-edge (Windows-style) | `zenith_desktop/wm/sigma_tiling_wm.cpp` | `release/standalone` | Drag to edge → snap to 50% half-screen |
-| Multi-monitor spanning | `zenith_desktop/wm/sigma_tiling_wm.cpp` | `release/standalone` | Windows can span across two monitors |
-| WM smoke test suite | `tests/ui/test_tiling_wm.cpp` | `release/standalone` | 20 scenarios: add/remove/focus/fullscreen/float |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| BSP tree rebuild on `remove_window` | `zenith_desktop/wm/sigma_tiling_wm.cpp` | `release/standalone` | Fix TODO: walk tree, remove leaf, rebalance | 
+| Fibonacci layout mode | `zenith_desktop/wm/sigma_tiling_wm.cpp` | `release/standalone` | Spiral partition: first window 50%, next 50% of remainder | 
+| Animated window spawn (opacity) | `zenith_desktop/compositor/sigma_compositor.cpp` | `release/standalone` | 200ms fade-in from 0.0 to 1.0 opacity | 
+| Animated layout switch | `zenith_desktop/compositor/sigma_compositor.cpp` | `release/standalone` | Smooth 300ms transition between layouts | 
+| Snap-to-edge (Windows-style) | `zenith_desktop/wm/sigma_tiling_wm.cpp` | `release/standalone` | Drag to edge → snap to 50% half-screen | 
+| Multi-monitor spanning | `zenith_desktop/wm/sigma_tiling_wm.cpp` | `release/standalone` | Windows can span across two monitors | 
+| WM smoke test suite | `tests/ui/test_tiling_wm.cpp` | `release/standalone` | 20 scenarios: add/remove/focus/fullscreen/float | 
 
 ---
 
@@ -782,27 +782,27 @@ sigma-audit log --filter security
 
 # Verify chain of custody:
 sigma-audit verify
-# ✓ 1,247 entries verified. Chain intact.
-# ✓ No gaps detected. No tampering detected.
+# ✓ 1,247 entries verified. Chain intact
+# ✓ No gaps detected. No tampering detected
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| ML-DSA-87 per log entry | `kernel/security/sigma_immutable_audit_trail.cpp` | all | Sign every entry individually |
-| Hash chain (each entry includes prev hash) | `kernel/security/sigma_immutable_audit_trail.cpp` | all | Tamper detection: any modification breaks chain |
-| WORM hardware register backup | `kernel/security/sigma_immutable_audit_trail.cpp` | `release/standalone` | Critical entries written to write-once register |
-| Audit replay tool | `userland/tools/sigma_audit_cli.cpp` | `tools-dev` | Verify full chain from genesis entry |
-| CERT-In 6-hour report | `userland/tools/sigma_audit_cli.cpp` | `release/standalone` | Auto-format incident report for MeitY |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| ML-DSA-87 per log entry | `kernel/security/sigma_immutable_audit_trail.cpp` | all | Sign every entry individually | 
+| Hash chain (each entry includes prev hash) | `kernel/security/sigma_immutable_audit_trail.cpp` | all | Tamper detection: any modification breaks chain | 
+| WORM hardware register backup | `kernel/security/sigma_immutable_audit_trail.cpp` | `release/standalone` | Critical entries written to write-once register | 
+| Audit replay tool | `userland/tools/sigma_audit_cli.cpp` | `tools-dev` | Verify full chain from genesis entry | 
+| CERT-In 6-hour report | `userland/tools/sigma_audit_cli.cpp` | `release/standalone` | Auto-format incident report for MeitY | 
 
 ### SEC2 — sigma-ids (Intrusion Detection) Quality
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| Behavioural baseline learning | `kernel/security/sigma_ids.cpp` | `release/cloud` | 7-day baseline before alerting |
-| Anomaly scoring model | `kernel/security/sigma_anomaly_detector.cpp` | `release/cloud` | Isolation Forest on syscall frequency |
-| ML-powered false positive reduction | `userland/ai/sigma_ai_daemon.cpp` | `release/standalone` | sigma-ai confirms anomaly before alert |
-| STIX 2.1 threat intelligence | `userland/tools/sigma_siem_cli.cpp` | `release/cloud` | Import STIX feeds from CERT-In |
-| Automated quarantine | `kernel/security/sigma_ids.cpp` | `release/cloud` | Anomalous process → sigma-pod with no-network cap |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| Behavioural baseline learning | `kernel/security/sigma_ids.cpp` | `release/cloud` | 7-day baseline before alerting | 
+| Anomaly scoring model | `kernel/security/sigma_anomaly_detector.cpp` | `release/cloud` | Isolation Forest on syscall frequency | 
+| ML-powered false positive reduction | `userland/ai/sigma_ai_daemon.cpp` | `release/standalone` | sigma-ai confirms anomaly before alert | 
+| STIX 2.1 threat intelligence | `userland/tools/sigma_siem_cli.cpp` | `release/cloud` | Import STIX feeds from CERT-In | 
+| Automated quarantine | `kernel/security/sigma_ids.cpp` | `release/cloud` | Anomalous process → sigma-pod with no-network cap | 
 
 ---
 
@@ -831,20 +831,19 @@ sigma-observatory                    # full TUI dashboard
 └────────────────────────────────────────────┘
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| `/proc/sigma/` procfs stats | `kernel/vfs/sigma_procfs.cpp` | `kernel-exp` | cpu/mem/net/io/sched stats as VFS files |
-| TUI rendering (VT100) | `userland/tools/sigma_observatory.cpp` | `performance-optimized` | 1 s refresh, cursor positioning |
-| `--json` streaming mode | `userland/tools/sigma_observatory.cpp` | `performance-optimized` | Machine-readable for Grafana |
-| Prometheus endpoint | `userland/tools/sigma_observatory.cpp` | `release/cloud` | `sigma-observatory --prometheus :9090` |
-| Process capability display | `userland/tools/sigma_observatory.cpp` | `release/standalone` | Show each process's sigma-bus capabilities |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| `/proc/sigma/` procfs stats | `kernel/vfs/sigma_procfs.cpp` | `kernel-exp` | cpu/mem/net/io/sched stats as VFS files | 
+| TUI rendering (VT100) | `userland/tools/sigma_observatory.cpp` | `performance-optimized` | 1 s refresh, cursor positioning | 
+| `--json` streaming mode | `userland/tools/sigma_observatory.cpp` | `performance-optimized` | Machine-readable for Grafana | 
+| Prometheus endpoint | `userland/tools/sigma_observatory.cpp` | `release/cloud` | `sigma-observatory --prometheus :9090` | 
+| Process capability display | `userland/tools/sigma_observatory.cpp` | `release/standalone` | Show each process's sigma-bus capabilities | 
 
 ### TE2 — sigma-doctor (Diagnostic Tool)
 
 ```bash
 sigma-doctor
-# Scanning SigmaOS health...
-
+# Scanning SigmaOS health..
 ✓ Kernel: booted successfully (slot A)
 ✓ Boot time: 1.8s (target: < 2s)
 ✓ Memory: 892MB / 8GB used
@@ -863,28 +862,28 @@ Summary: 2 warnings, 1 error
 Run 'sigma-doctor --fix' to auto-resolve warnings
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| sigma-doctor daemon checks | `userland/tools/sigma_doctor_cli.cpp` | `tools-dev` | 15 health checks covering all subsystems |
-| `--fix` auto-remediation | `userland/tools/sigma_doctor_cli.cpp` | `tools-dev` | Run the fix command for each warning |
-| `--json` output | `userland/tools/sigma_doctor_cli.cpp` | `tools-dev` | Machine-readable for CI integration |
-| sigma-doctor on OOBE | `userland/installer/sigma_oobe.cpp` | `release/standalone` | Run after first boot, show results |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| sigma-doctor daemon checks | `userland/tools/sigma_doctor_cli.cpp` | `tools-dev` | 15 health checks covering all subsystems | 
+| `--fix` auto-remediation | `userland/tools/sigma_doctor_cli.cpp` | `tools-dev` | Run the fix command for each warning | 
+| `--json` output | `userland/tools/sigma_doctor_cli.cpp` | `tools-dev` | Machine-readable for CI integration | 
+| sigma-doctor on OOBE | `userland/installer/sigma_oobe.cpp` | `release/standalone` | Run after first boot, show results | 
 
 ---
 
 ## 11. Roadmap Index — All 9 Documents
 
-| Document | Primary dimensions | Approx lines |
-|----------|--------------------|-------------|
-| [Quality-Stability-Performance-Roadmap](Quality-Stability-Performance-Roadmap) | Stability, Performance, Quality, UX, Security, Accessibility, DX | ~1,000 |
-| [Stability-Performance-Extended](Stability-Performance-Extended) | Energy, Reliability, Observability, Release, Network QA, India QA, Hardware, Rust | ~900 |
-| [Compatibility-Automation-Personalisation-Roadmap](Compatibility-Automation-Personalisation-Roadmap) | Linux/Win32/POSIX compat, Automation, Customisation, Personalisation | ~700 |
-| [Advanced-Quality-Roadmap](Advanced-Quality-Roadmap) | PQC depth, Network stack, Enterprise, AI/ML, i18n, Education, Rural, Community | ~700 |
-| [Systems-Excellence-Roadmap](Systems-Excellence-Roadmap) | Gaming, IoT, Dev tools, Packages, Updates, Multi-platform, Sprint plan | ~700 |
-| [Engineering-Principles-Roadmap](Engineering-Principles-Roadmap) | SOLID/OOP, Design patterns, CLI design, Optimisation, Refactoring | ~700 |
-| [Modularisation-Architecture-Roadmap](Modularisation-Architecture-Roadmap) | Shard system, Build modularity, Plugin API, Automation depth | ~700 |
-| [Sovereignty-UserDefined-Roadmap](Sovereignty-UserDefined-Roadmap) | Foreign dep reduction, User extensions, India-first, DID identity | ~700 |
-| [Continuous-Improvement-Roadmap](Continuous-Improvement-Roadmap) | Versioning, Code review, Testing, Docs, Automation pipelines, sigma-nanolib, ZDL, UI arch | ~800 |
+| Document | Primary dimensions | Approx lines | 
+| ---------- | -------------------- | ------------- | 
+| [Quality-Stability-Performance-Roadmap](Quality-Stability-Performance-Roadmap) | Stability, Performance, Quality, UX, Security, Accessibility, DX | ~1,000 | 
+| [Stability-Performance-Extended](Stability-Performance-Extended) | Energy, Reliability, Observability, Release, Network QA, India QA, Hardware, Rust | ~900 | 
+| [Compatibility-Automation-Personalisation-Roadmap](Compatibility-Automation-Personalisation-Roadmap) | Linux/Win32/POSIX compat, Automation, Customisation, Personalisation | ~700 | 
+| [Advanced-Quality-Roadmap](Advanced-Quality-Roadmap) | PQC depth, Network stack, Enterprise, AI/ML, i18n, Education, Rural, Community | ~700 | 
+| [Systems-Excellence-Roadmap](Systems-Excellence-Roadmap) | Gaming, IoT, Dev tools, Packages, Updates, Multi-platform, Sprint plan | ~700 | 
+| [Engineering-Principles-Roadmap](Engineering-Principles-Roadmap) | SOLID/OOP, Design patterns, CLI design, Optimisation, Refactoring | ~700 | 
+| [Modularisation-Architecture-Roadmap](Modularisation-Architecture-Roadmap) | Shard system, Build modularity, Plugin API, Automation depth | ~700 | 
+| [Sovereignty-UserDefined-Roadmap](Sovereignty-UserDefined-Roadmap) | Foreign dep reduction, User extensions, India-first, DID identity | ~700 | 
+| [Continuous-Improvement-Roadmap](Continuous-Improvement-Roadmap) | Versioning, Code review, Testing, Docs, Automation pipelines, sigma-nanolib, ZDL, UI arch | ~800 | 
 
 **Total: 9 documents, ~7,000 lines of actionable engineering roadmap.**
 

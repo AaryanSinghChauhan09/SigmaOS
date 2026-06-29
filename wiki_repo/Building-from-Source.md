@@ -43,13 +43,13 @@ git submodule update --init --recursive
 
 ## 2. Choose a Profile
 
-| Use case | Command |
-|---|---|
-| Workstation (default) | `cmake -B build -DCMAKE_TOOLCHAIN_FILE=profiles/workstation.cmake` |
-| IoT / ARM64 | `cmake -B build -DCMAKE_TOOLCHAIN_FILE=profiles/iot-minimal.cmake` |
-| RTOS / hard real-time | `make SIGMA_USE_ZENITH_DE=0 SIGMA_SCHED_REALTIME=1` |
-| Cloud immutable | `cmake -B build -DSIGMA_PROFILE=cloud-x86 -DSIGMA_IMMUTABLE_ROOT=ON` |
-| Bare microkernel | `make SIGMA_USE_ZENITH_DE=0 SIGMA_USE_AI_ENGINE=0` |
+| Use case | Command | 
+| --- | --- | 
+| Workstation (default) | `cmake -B build -DCMAKE_TOOLCHAIN_FILE=profiles/workstation.cmake` | 
+| IoT / ARM64 | `cmake -B build -DCMAKE_TOOLCHAIN_FILE=profiles/iot-minimal.cmake` | 
+| RTOS / hard real-time | `make SIGMA_USE_ZENITH_DE=0 SIGMA_SCHED_REALTIME=1` | 
+| Cloud immutable | `cmake -B build -DSIGMA_PROFILE=cloud-x86 -DSIGMA_IMMUTABLE_ROOT=ON` | 
+| Bare microkernel | `make SIGMA_USE_ZENITH_DE=0 SIGMA_USE_AI_ENGINE=0` | 
 
 ---
 

@@ -22,4 +22,4 @@ typedef enum {
     SERVICE_RUNNING,
     SERVICE_FAILED
 } service_state_t;
-```
+```text

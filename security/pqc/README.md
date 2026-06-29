@@ -4,11 +4,11 @@ Prepares SigmaOS for the post-quantum era by integrating NIST-selected PQC
 algorithms at the kernel level.
 
 ## Algorithms Integrated
-| Purpose | Algorithm | NIST Status |
-|---|---|---|
-| Key Encapsulation | Kyber-768 / ML-KEM | ✅ Standard |
-| Digital Signatures | Dilithium3 / ML-DSA | ✅ Standard |
-| Hashing | BLAKE3 | 🔧 Best-in-class |
+| Purpose | Algorithm | NIST Status | 
+| --- | --- | --- | 
+| Key Encapsulation | Kyber-768 / ML-KEM | ✅ Standard | 
+| Digital Signatures | Dilithium3 / ML-DSA | ✅ Standard | 
+| Hashing | BLAKE3 | 🔧 Best-in-class | 
 
 ## Integration Points
 - VPN key exchange (Kyber hybrid with X25519)

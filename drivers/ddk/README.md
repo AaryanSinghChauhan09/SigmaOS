@@ -9,11 +9,11 @@ whole system. SigmaOS isolates every driver in its own capability-gated shard
 so a faulty NIC driver can't corrupt the filesystem or scheduler.
 
 ## Key APIs
-| Symbol | Purpose |
-|---|---|
-| `sigma_register_driver(name)` | Register a driver shard with the HAL registry |
-| `sigma_alloc_dma_region(size)` | Allocate physically contiguous, cache-coherent memory |
-| `sigma_irq_install(vector, handler)` | Bind an interrupt vector with formal priority checking |
+| Symbol | Purpose | 
+| --- | --- | 
+| `sigma_register_driver(name)` | Register a driver shard with the HAL registry | 
+| `sigma_alloc_dma_region(size)` | Allocate physically contiguous, cache-coherent memory | 
+| `sigma_irq_install(vector, handler)` | Bind an interrupt vector with formal priority checking | 
 
 ## Directory Layout
 ```

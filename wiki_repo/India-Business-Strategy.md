@@ -17,13 +17,13 @@ The gap SigmaOS fills: a fully sovereign, Indian-law-aware, offline-capable busi
 
 ## Competitive Positioning
 
-| vs | SigmaOS answer |
-|---|---|
-| **Tally** | Modern Tally that files GST directly, has AI, and is free to install |
-| **Zoho** | Everything Zoho does, but your data stays on your server and you pay once |
-| **Odoo** | Odoo without the complexity, with Indian law built in from day one |
-| **ClearTax** | ClearTax is one feature. SigmaOS is your entire business operating system |
-| **SAP** | SAP for the 63 million businesses SAP ignores |
+| vs | SigmaOS answer | 
+| --- | --- | 
+| **Tally** | Modern Tally that files GST directly, has AI, and is free to install | 
+| **Zoho** | Everything Zoho does, but your data stays on your server and you pay once | 
+| **Odoo** | Odoo without the complexity, with Indian law built in from day one | 
+| **ClearTax** | ClearTax is one feature. SigmaOS is your entire business operating system | 
+| **SAP** | SAP for the 63 million businesses SAP ignores | 
 
 ### Why SigmaOS beats Zoho on total cost
 
@@ -68,17 +68,17 @@ BNS 2023 is in `sigma-legal` as part of the OS. When Parliament amends a law, `s
 
 ## Indian Apps Built Into SigmaOS
 
-| App | Replaces | Key India-specific feature |
-|---|---|---|
-| `sigma-accounts` | Tally | Direct GSTR-1, 3B filing; e-Invoice IRN; eWay Bill |
-| `sigma-ca` | CA office software | Multi-client dashboard; ICAI-compliant reports |
-| `sigma-payroll` | Excel/manual | EPF, ESIC, TDS auto-calculation; PF challan |
-| `sigma-legal` | LexisNexis | BNS 2023, CPC, CrPC; eCourts API integration |
-| `sigma-health` | Paper files | ABDM-compliant EMR; PMJAY claim generation |
-| `sigma-agri` | None | Mandi prices (Agmarknet API); PM-KISAN status |
-| `sigma-pos` | Vyapar | UPI QR on every bill; WhatsApp invoice sending |
-| `sigma-gov` | Government portals | Unified dashboard for 40+ government APIs |
-| `sigma-hrms` | HR software | Gratuity, leave, appraisal; Indian labour law |
+| App | Replaces | Key India-specific feature | 
+| --- | --- | --- | 
+| `sigma-accounts` | Tally | Direct GSTR-1, 3B filing; e-Invoice IRN; eWay Bill | 
+| `sigma-ca` | CA office software | Multi-client dashboard; ICAI-compliant reports | 
+| `sigma-payroll` | Excel/manual | EPF, ESIC, TDS auto-calculation; PF challan | 
+| `sigma-legal` | LexisNexis | BNS 2023, CPC, CrPC; eCourts API integration | 
+| `sigma-health` | Paper files | ABDM-compliant EMR; PMJAY claim generation | 
+| `sigma-agri` | None | Mandi prices (Agmarknet API); PM-KISAN status | 
+| `sigma-pos` | Vyapar | UPI QR on every bill; WhatsApp invoice sending | 
+| `sigma-gov` | Government portals | Unified dashboard for 40+ government APIs | 
+| `sigma-hrms` | HR software | Gratuity, leave, appraisal; Indian labour law | 
 
 ---
 
@@ -131,14 +131,14 @@ BNS 2023 is in `sigma-legal` as part of the OS. When Parliament amends a law, `s
 
 ## Revenue Model
 
-| Tier | Price | What's included |
-|---|---|---|
-| **Open Source** | ₹0 forever | Core accounting, GST, payroll, inventory, sigma-legal basic |
-| **Sigma Professional** | ₹999/month per firm | All modules, direct API filing, AI features, priority support |
-| **Sigma Enterprise** | ₹25,000–₹1,00,000/year | On-premise support, SLA, migration from Tally/Zoho/SAP |
-| **Sigma Cloud** | ₹500/user/month | Hosted on Indian data centres (Mumbai/Delhi), MeitY compliant |
-| **Marketplace** | 20% of sales | Third-party sigma-apps — like Odoo's community apps model |
-| **Training** | ₹5,000/exam | sigma-certified-professional certification |
+| Tier | Price | What's included | 
+| --- | --- | --- | 
+| **Open Source** | ₹0 forever | Core accounting, GST, payroll, inventory, sigma-legal basic | 
+| **Sigma Professional** | ₹999/month per firm | All modules, direct API filing, AI features, priority support | 
+| **Sigma Enterprise** | ₹25,000–₹1,00,000/year | On-premise support, SLA, migration from Tally/Zoho/SAP | 
+| **Sigma Cloud** | ₹500/user/month | Hosted on Indian data centres (Mumbai/Delhi), MeitY compliant | 
+| **Marketplace** | 20% of sales | Third-party sigma-apps — like Odoo's community apps model | 
+| **Training** | ₹5,000/exam | sigma-certified-professional certification | 
 
 ---
 

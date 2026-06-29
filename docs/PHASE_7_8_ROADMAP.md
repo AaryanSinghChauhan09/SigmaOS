@@ -8,13 +8,13 @@ Repo: [github.com/AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghCh
 
 ## 1. Core automation & CLI
 
-| Deliverable | Status | Location |
-|-------------|--------|----------|
-| Automation engine (backup, update, recovery, wiki) | Done | `scripts/sigma_automation.sh` |
-| GitHub sync (commit/push + wiki mirror) | Done | `scripts/sigma_git_sync.sh` |
-| Modular CLI (profiles, aliases, automation bridge) | Done | `userland/tools/sigma_cli.cpp` |
-| `sigma-cli update` → automation update-check | Done | `sigma_cli.cpp` |
-| Host `sigma-cli` parity script | Done | `scripts/sigma_cli_host.sh` |
+| Deliverable | Status | Location | 
+| ------------- | -------- | ---------- | 
+| Automation engine (backup, update, recovery, wiki) | Done | `scripts/sigma_automation.sh` | 
+| GitHub sync (commit/push + wiki mirror) | Done | `scripts/sigma_git_sync.sh` | 
+| Modular CLI (profiles, aliases, automation bridge) | Done | `userland/tools/sigma_cli.cpp` | 
+| `sigma-cli update` → automation update-check | Done | `sigma_cli.cpp` | 
+| Host `sigma-cli` parity script | Done | `scripts/sigma_cli_host.sh` | 
 
 **Test**
 
@@ -28,14 +28,14 @@ Repo: [github.com/AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghCh
 
 ## 2. GUI & personalization (Zenith Toolkit)
 
-| Deliverable | Status | Location |
-|-------------|--------|----------|
-| Compositor loop (framebuffer + input poll) | In progress | `zenith_desktop/compositor/sigma_compositor.cpp` |
-| Auto-tiling WM (`auto_tile`, BSP/master-stack) | In progress | `zenith_desktop/wm/sigma_tiling_wm.cpp` |
-| Theme engine (light/dark, accent) | Partial | `zenith_desktop/theme/sigma_theme_engine.cpp` |
-| `~/.sigma_profile` keys | Partial | `zenith_desktop/personalization/sigma_profile_engine.cpp` |
-| Example profile | Done | `docs/examples/sigma_profile.example` |
-| Tiling smoke test | Done | `tools/zenith/sigma_tiling_test.cpp` |
+| Deliverable | Status | Location | 
+| ------------- | -------- | ---------- | 
+| Compositor loop (framebuffer + input poll) | In progress | `zenith_desktop/compositor/sigma_compositor.cpp` | 
+| Auto-tiling WM (`auto_tile`, BSP/master-stack) | In progress | `zenith_desktop/wm/sigma_tiling_wm.cpp` | 
+| Theme engine (light/dark, accent) | Partial | `zenith_desktop/theme/sigma_theme_engine.cpp` | 
+| `~/.sigma_profile` keys | Partial | `zenith_desktop/personalization/sigma_profile_engine.cpp` | 
+| Example profile | Done | `docs/examples/sigma_profile.example` | 
+| Tiling smoke test | Done | `tools/zenith/sigma_tiling_test.cpp` | 
 
 **Test**
 
@@ -48,11 +48,11 @@ Repo: [github.com/AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghCh
 
 ## 3. Branch consistency
 
-| Deliverable | Status | Location |
-|-------------|--------|----------|
-| Feature matrix | Done | `FEATURE_MATRIX.md` |
-| Branch parity CI script | Done | `scripts/ci_branch_check.sh` |
-| GitHub Actions workflow | Done | `.github/workflows/branch-parity.yml` |
+| Deliverable | Status | Location | 
+| ------------- | -------- | ---------- | 
+| Feature matrix | Done | `FEATURE_MATRIX.md` | 
+| Branch parity CI script | Done | `scripts/ci_branch_check.sh` | 
+| GitHub Actions workflow | Done | `.github/workflows/branch-parity.yml` | 
 
 **Test**
 
@@ -64,14 +64,14 @@ Repo: [github.com/AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghCh
 
 ## 4. GitHub Wiki integration
 
-| Deliverable | Status | Location |
-|-------------|--------|----------|
-| Wiki mirror directory | Done | `wiki_repo/` |
-| Auto-sync on push | Done | `.github/workflows/wiki-sync.yml` |
-| Doxygen API export | Configured | `Doxyfile` → `docs/api/html/` |
-| Doxygen → wiki stub export | Done | `scripts/doxygen_wiki_export.sh` |
-| Subsystem guides | Done | `wiki_repo/*.md` (Networking, Containers, Boot, Zenith) |
-| Contributing | Done | `CONTRIBUTING.md` |
+| Deliverable | Status | Location | 
+| ------------- | -------- | ---------- | 
+| Wiki mirror directory | Done | `wiki_repo/` | 
+| Auto-sync on push | Done | `.github/workflows/wiki-sync.yml` | 
+| Doxygen API export | Configured | `Doxyfile` → `docs/api/html/` | 
+| Doxygen → wiki stub export | Done | `scripts/doxygen_wiki_export.sh` | 
+| Subsystem guides | Done | `wiki_repo/*.md` (Networking, Containers, Boot, Zenith) | 
+| Contributing | Done | `CONTRIBUTING.md` | 
 
 **Test**
 

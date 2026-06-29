@@ -5,7 +5,7 @@ SigmaOS Zenith is an industrial-grade, sovereign microkernel operating system bu
 ---
 
 ## 🏛️ Core Vision & Strategic Focus
-Unlike general-purpose operating systems built on decades of legacy POSIX baggage, SigmaOS is designed from the ground up for **absolute sovereignty, zero-dependency purity, and modular scale**. 
+Unlike general-purpose operating systems built on decades of legacy POSIX baggage, SigmaOS is designed from the ground up for **absolute sovereignty, zero-dependency purity, and modular scale**.
 Our core vision positions SigmaOS as a **universal cross-profile operating system**, utilizing a shared high-performance C++ microkernel core at Ring 0, which is dynamically extended via profile configurations to target four critical computing domains:
 1. **Desktop / Workstation**: Immersive glassmorphic environments powered by direct-silicon Vulkan compositing.
 2. **Cloud / Infrastructure**: Container-native, immutable virtual machine scale with A/B partition redundancy.
@@ -138,7 +138,7 @@ SigmaOS implements a rigorous multi-tier testing pipeline to prevent regressions
   ```bash
   # Test x86_64 Singularity Boot
   bash qemu-boot.sh x86_64
-  
+
   # Test ARM64 Emulation
   bash qemu-boot.sh aarch64
   ```

@@ -1,6 +1,6 @@
 # Contributing to SigmaOS
 
-SigmaOS follows an Ubuntu-inspired governance model, but with strict technical constraints to guarantee sovereignty. 
+SigmaOS follows an Ubuntu-inspired governance model, but with strict technical constraints to guarantee sovereignty.
 
 ## Technical Mandates
 

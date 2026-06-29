@@ -9,4 +9,4 @@ Language Runtime Modules.
 // Abstract interface for ext/runtimes
 void init_ext_runtimes();
 
-```
+```text

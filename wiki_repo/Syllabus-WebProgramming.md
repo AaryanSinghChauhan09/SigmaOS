@@ -364,14 +364,14 @@ echo get_memory_info('MB');
 
 ## SigmaWeb Runtime Integration
 
-| Web Standard | SigmaOS Component | File |
-| :--- | :--- | :--- |
-| **HTML5 Parser** | `SigmaDOM` | `userland/sigmaweb/dom/` |
-| **CSS Engine** | `SigmaLayout` | `userland/sigmaweb/css/` |
-| **JS Engine** | QuickJS embed / V8 | `userland/sigmaweb/js/` |
-| **PHP Runtime** | PHP-FPM bridge | `userland/sigmaweb/php/` |
-| **WebSockets** | `SovereignNetStack` | `kernel/net/` |
-| **localStorage** | `SovereignFS` VFS | `kernel/fs/` |
-| **Geolocation** | HAL GPS driver | `kernel/hal/` |
+| Web Standard | SigmaOS Component | File | 
+| :--- | :--- | :--- | 
+| **HTML5 Parser** | `SigmaDOM` | `userland/sigmaweb/dom/` | 
+| **CSS Engine** | `SigmaLayout` | `userland/sigmaweb/css/` | 
+| **JS Engine** | QuickJS embed / V8 | `userland/sigmaweb/js/` | 
+| **PHP Runtime** | PHP-FPM bridge | `userland/sigmaweb/php/` | 
+| **WebSockets** | `SovereignNetStack` | `kernel/net/` | 
+| **localStorage** | `SovereignFS` VFS | `kernel/fs/` | 
+| **Geolocation** | HAL GPS driver | `kernel/hal/` | 
 
 *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

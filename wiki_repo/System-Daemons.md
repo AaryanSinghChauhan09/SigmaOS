@@ -19,17 +19,17 @@ SigmaOS daemons are Go-language services that bridge the kernel to the browser a
 ## Complete Daemon Reference
 
 ### sigma-busd — IPC Message Bus
-**Socket**: `/run/sigma/busd.sock`  
-**Source**: `sigmad/busd/main.go`  
+**Socket**: `/run/sigma/busd.sock`
+**Source**: `sigmad/busd/main.go`
 **Inspired by**: Fuchsia FIDL, D-Bus (but capability-gated)
 
 Replaces D-Bus with a simpler, capability-gated message bus. Every IPC route requires an explicit capability token — a process can't accidentally reach a daemon it wasn't granted access to.
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `/bus/emit` | POST | Emit a message on an interface |
-| `/bus/subscribe` | POST | Subscribe to messages on an interface |
-| `/bus/interfaces` | GET | List all registered interfaces |
+| Endpoint | Method | Description | 
+| --- | --- | --- | 
+| `/bus/emit` | POST | Emit a message on an interface | 
+| `/bus/subscribe` | POST | Subscribe to messages on an interface | 
+| `/bus/interfaces` | GET | List all registered interfaces | 
 
 ```bash
 # Emit a notification via sigma-bus
@@ -41,8 +41,8 @@ curl -s --unix-socket /run/sigma/busd.sock \
 ---
 
 ### sigma-healthd — Structured Health Monitor
-**Socket**: `/run/sigma/healthd.sock`  
-**Source**: `sigmad/healthd/main.go`  
+**Socket**: `/run/sigma/healthd.sock`
+**Source**: `sigmad/healthd/main.go`
 **Inspired by**: CoreOS health endpoints, Flatpak runtime
 
 The system's conscience. Every subsystem reports its status here. Running `sigmactl health` shows which parts are real implementations and which are stubs.
@@ -55,17 +55,17 @@ The system's conscience. Every subsystem reports its status here. Running `sigma
 ✗ nvidia-driver FAILED  driver not loaded — GPU not available
 ```
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `/health` | GET | Overall system health (JSON) |
-| `/health/<subsystem>` | GET | Per-subsystem detailed status |
-| `/health/history` | GET | Last 100 health events |
+| Endpoint | Method | Description | 
+| --- | --- | --- | 
+| `/health` | GET | Overall system health (JSON) | 
+| `/health/<subsystem>` | GET | Per-subsystem detailed status | 
+| `/health/history` | GET | Last 100 health events | 
 
 ---
 
 ### sigma-apid — gRPC Management API
-**Socket**: `/run/sigma/apid.sock`  
-**Source**: `api/sigma.proto`  
+**Socket**: `/run/sigma/apid.sock`
+**Source**: `api/sigma.proto`
 **Inspired by**: Talos Linux management API
 
 Full remote management over gRPC + mTLS. Used by the `sigmactl` CLI and the Zenith admin panel.
@@ -83,20 +83,20 @@ sigmactl audit stream    # live audit event stream
 ---
 
 ### sigma-watchdog — Hardware & Software Watchdog
-**Socket**: `/run/sigma/watchdog.sock`  
-**Source**: `sigmad/watchdog/main.go`  
+**Socket**: `/run/sigma/watchdog.sock`
+**Source**: `sigmad/watchdog/main.go`
 **Inspired by**: Linux watchdog(8), systemd-watchdog
 
 Pets `/dev/watchdog` every 15 seconds to prevent hardware reset. Monitors all registered daemons for missed heartbeats and restarts them via `sigmactl restart <name>` if they go silent.
 
 Pre-registered critical daemons: `sigma-healthd`, `sigma-busd`, `sigma-trustd`, `sigma-netd`.
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `/watchdog/status` | GET | WDT last pet time + all watched daemon statuses |
-| `/watchdog/register` | POST | Register a daemon for monitoring |
-| `/watchdog/heartbeat` | POST | Daemon sends its own heartbeat |
-| `/watchdog/unregister` | POST | Remove a daemon from monitoring |
+| Endpoint | Method | Description | 
+| --- | --- | --- | 
+| `/watchdog/status` | GET | WDT last pet time + all watched daemon statuses | 
+| `/watchdog/register` | POST | Register a daemon for monitoring | 
+| `/watchdog/heartbeat` | POST | Daemon sends its own heartbeat | 
+| `/watchdog/unregister` | POST | Remove a daemon from monitoring | 
 
 ```bash
 # Check watchdog status
@@ -111,8 +111,8 @@ curl -s --unix-socket /run/sigma/watchdog.sock \
 ---
 
 ### sigma-metrics — Prometheus Exporter
-**Socket**: `/run/sigma/metrics.sock`  
-**Source**: `sigmad/metrics/main.go`  
+**Socket**: `/run/sigma/metrics.sock`
+**Source**: `sigmad/metrics/main.go`
 **Inspired by**: Prometheus node_exporter
 
 Exports system metrics in Prometheus text format. Optionally binds TCP `:9100` for Prometheus scraping by setting `SIGMA_METRICS_TCP=1`.
@@ -131,27 +131,27 @@ sigma_mem_available_bytes 6204416000
 sigma_uptime_seconds 3847.2
 ```
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `/metrics` | GET | All metrics (Prometheus format) |
-| `/metrics/cpu` | GET | CPU metrics only |
-| `/metrics/mem` | GET | Memory metrics only |
+| Endpoint | Method | Description | 
+| --- | --- | --- | 
+| `/metrics` | GET | All metrics (Prometheus format) | 
+| `/metrics/cpu` | GET | CPU metrics only | 
+| `/metrics/mem` | GET | Memory metrics only | 
 
 ---
 
 ### sigma-power — Power Management
-**Socket**: `/run/sigma/power.sock`  
-**Source**: `sigmad/power/main.go`  
+**Socket**: `/run/sigma/power.sock`
+**Source**: `sigmad/power/main.go`
 **Inspired by**: systemd-logind, UPower
 
 Monitors battery, handles lid close/open events, manages screen dim on idle, triggers suspend/hibernate. Emits events on the `sigma.Power` bus interface.
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `/power/status` | GET | Battery %, AC plugged, lid state, idle seconds |
-| `/power/suspend` | POST | Trigger immediate suspend |
-| `/power/hibernate` | POST | Trigger hibernate to disk |
-| `/power/activity` | POST | Reset idle timer (user is active) |
+| Endpoint | Method | Description | 
+| --- | --- | --- | 
+| `/power/status` | GET | Battery %, AC plugged, lid state, idle seconds | 
+| `/power/suspend` | POST | Trigger immediate suspend | 
+| `/power/hibernate` | POST | Trigger hibernate to disk | 
+| `/power/activity` | POST | Reset idle timer (user is active) | 
 
 ```bash
 # Check battery status
@@ -162,8 +162,8 @@ curl -s --unix-socket /run/sigma/power.sock http://localhost/power/status
 ---
 
 ### sigma-netd — Network Namespace Daemon
-**Socket**: `/run/sigma/netd.sock`  
-**Source**: `sigmad/netd/main.go`  
+**Socket**: `/run/sigma/netd.sock`
+**Source**: `sigmad/netd/main.go`
 **Inspired by**: Android netd
 
 Creates and manages per-process network namespaces. Associates veth pairs for processes that declare `net:host` capability. Configures per-namespace firewall rules.
@@ -171,35 +171,35 @@ Creates and manages per-process network namespaces. Associates veth pairs for pr
 ---
 
 ### sigma-telemetry — Privacy-Respecting Telemetry
-**Socket**: `/run/sigma/telemetry.sock`  
-**Source**: `sigmad/telemetry/main.go`  
+**Socket**: `/run/sigma/telemetry.sock`
+**Source**: `sigmad/telemetry/main.go`
 **Inspired by**: Ubuntu apport (but opt-in and transparent)
 
 All telemetry is **OFF by default**. Every report is shown to the user before transmission. PII (hostnames, usernames, IP addresses, local paths) is scrubbed automatically before any data leaves the device. Data is sent over TLS 1.3 to `telemetry.sigma-os.dev`.
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `/telemetry/status` | GET | Opt-in status + report count |
-| `/telemetry/optin` | POST | Enable telemetry |
-| `/telemetry/optout` | POST | Disable + purge local ledger |
-| `/telemetry/report` | POST | Submit an event report |
+| Endpoint | Method | Description | 
+| --- | --- | --- | 
+| `/telemetry/status` | GET | Opt-in status + report count | 
+| `/telemetry/optin` | POST | Enable telemetry | 
+| `/telemetry/optout` | POST | Disable + purge local ledger | 
+| `/telemetry/report` | POST | Submit an event report | 
 
 ---
 
 ### sigma-cloudsync — E2E Encrypted Cloud Sync
-**Socket**: `/run/sigma/cloudsync.sock`  
-**Source**: `sigmad/cloudsync/main.go`  
+**Socket**: `/run/sigma/cloudsync.sock`
+**Source**: `sigmad/cloudsync/main.go`
 **Inspired by**: Nextcloud sync client, Syncthing
 
 All data is encrypted client-side with AES-256-GCM **before** upload. The encryption key is derived from the user's passphrase via Argon2id — the server never sees the key. Files are chunked to 4 MiB and deduplicated by BLAKE2b hash.
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `/sync/login` | POST | Derive key from passphrase (key stays in memory only) |
-| `/sync/start` | POST | Begin sync of a folder |
-| `/sync/stop` | POST | Pause sync |
-| `/sync/status` | GET | Files queued, bytes uploaded, last sync time |
-| `/sync/logout` | POST | Wipe encryption key from memory |
+| Endpoint | Method | Description | 
+| --- | --- | --- | 
+| `/sync/login` | POST | Derive key from passphrase (key stays in memory only) | 
+| `/sync/start` | POST | Begin sync of a folder | 
+| `/sync/stop` | POST | Pause sync | 
+| `/sync/status` | GET | Files queued, bytes uploaded, last sync time | 
+| `/sync/logout` | POST | Wipe encryption key from memory | 
 
 ---
 
@@ -211,8 +211,8 @@ Issues Dilithium3-signed certificates for workload identities (SPIFFE URIs). Use
 ---
 
 ### sigma-vault — Secrets Manager
-**Socket**: `/run/sigma/vault.sock`  
-**Source**: `sigmad/vault/main.go`  
+**Socket**: `/run/sigma/vault.sock`
+**Source**: `sigmad/vault/main.go`
 **Inspired by**: HashiCorp Vault, macOS Keychain
 
 AES-256-GCM encrypted secret store with the master key sealed to TPM2. Secrets are bound to the boot measurement (PCR values) — if the boot chain changes (kernel replaced, BIOS tampered), the vault cannot be unsealed.

@@ -9,4 +9,4 @@ Minimal kernel handling scheduling, memory management, and IPC.
 // Abstract interface for core/kernel
 void init_core_kernel();
 
-```
+```text

@@ -37,12 +37,12 @@ sigma_meta_boot_for_profile(PROFILE_DESKTOP);
 
 ### Unified engine
 
-| Surface | Status | Entry |
-|---------|--------|-------|
-| Meta-distro init | [x] | `sigma_meta_distro_init(SIGMA_META_ALL_FEATURES)` |
-| Automation | [x] | `scripts/sigma_automation.sh` |
-| CLI | [x] | `sigma-cli` / `scripts/sigma_cli_host.sh` |
-| Wiki | [x] | `wiki_repo/` + `.github/workflows/wiki-sync.yml` |
+| Surface | Status | Entry | 
+| --------- | -------- | ------- | 
+| Meta-distro init | [x] | `sigma_meta_distro_init(SIGMA_META_ALL_FEATURES)` | 
+| Automation | [x] | `scripts/sigma_automation.sh` | 
+| CLI | [x] | `sigma-cli` / `scripts/sigma_cli_host.sh` | 
+| Wiki | [x] | `wiki_repo/` + `.github/workflows/wiki-sync.yml` | 
 
 ---
 

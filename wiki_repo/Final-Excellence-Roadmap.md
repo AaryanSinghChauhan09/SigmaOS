@@ -26,16 +26,16 @@ sigma-feedback report \
 sigma-ca gst file --period 2026-06
 # ✓ GSTR-3B filed. ARN: AA2706250007XXX
 # Was this helpful? [y/n/s(kip)] y
-# Thanks! Rating saved locally, synced on next update-check.
+# Thanks! Rating saved locally, synced on next update-check
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| sigma-feedback CLI | `userland/tools/sigma_feedback_cli.cpp` | `tools-dev` | `sigma-feedback report/list/sync` |
-| GitHub Issue auto-create | `sigmad/feedback/main.go` | `tools-dev` | POST to GitHub API on `sigma-feedback report` |
-| In-tool rating prompt | All CLI tools | `release/standalone` | Optional y/n after mutating commands |
-| Feedback aggregation | `sigmad/feedback/main.go` | `tools-dev` | Collect ratings locally, sync on `sigma_automation.sh update` |
-| Feedback privacy policy | `wiki_repo/Feedback-Privacy.md` | `docs-update` | No PII collected; only tool + rating + optional message |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| sigma-feedback CLI | `userland/tools/sigma_feedback_cli.cpp` | `tools-dev` | `sigma-feedback report/list/sync` | 
+| GitHub Issue auto-create | `sigmad/feedback/main.go` | `tools-dev` | POST to GitHub API on `sigma-feedback report` | 
+| In-tool rating prompt | All CLI tools | `release/standalone` | Optional y/n after mutating commands | 
+| Feedback aggregation | `sigmad/feedback/main.go` | `tools-dev` | Collect ratings locally, sync on `sigma_automation.sh update` | 
+| Feedback privacy policy | `wiki_repo/Feedback-Privacy.md` | `docs-update` | No PII collected; only tool + rating + optional message | 
 
 ### FL2 — Telemetry-Free Quality Metrics
 
@@ -54,12 +54,12 @@ sigma_automation.sh quality-report
 #   - Wiki freshness (last update per page)
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| `cmd_quality_report()` | `scripts/sigma_automation.sh` | `tools-dev` | Aggregate CI metrics into local Markdown report |
-| Trend tracking (JSON history) | `scripts/sigma_automation.sh` | `tools-dev` | Append metrics to `.sigma/metrics/history.json` |
-| Regression alert | `scripts/sigma_automation.sh` | `tools-dev` | If any metric regresses >10% week-over-week, warn |
-| Weekly CI trigger | `.github/workflows/sigma_ci.yml` | all | `@weekly` schedule generates quality report |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| `cmd_quality_report()` | `scripts/sigma_automation.sh` | `tools-dev` | Aggregate CI metrics into local Markdown report | 
+| Trend tracking (JSON history) | `scripts/sigma_automation.sh` | `tools-dev` | Append metrics to `.sigma/metrics/history.json` | 
+| Regression alert | `scripts/sigma_automation.sh` | `tools-dev` | If any metric regresses >10% week-over-week, warn | 
+| Weekly CI trigger | `.github/workflows/sigma_ci.yml` | all | `@weekly` schedule generates quality report | 
 
 ### FL3 — Benchmark Regression Dashboard
 
@@ -69,7 +69,7 @@ sigmaos.dev/perf  (auto-updated on every merge to main):
 Boot Time (NVMe SSD)
   Target: < 2s   Current: unknown (kernel not bootable yet)
   ────────────────────────────────────── target
-  |                                      |
+  |                                      | 
   Now ──────────────────────── BUILDING ──▶
 
 Context Switch p99
@@ -82,12 +82,12 @@ Kyber-1024 ops/sec (AVX-512)
            PRNG          real NTT     AVX-512
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| `bench_results.json` in repo | `.github/workflows/sigma_ci.yml` | `performance-optimized` | Store benchmark JSON as git notes |
-| D3.js trend charts | `gh-pages` site | `gh-pages` | Plot bench_results.json over time |
-| Regression gate | `.github/workflows/sigma_ci.yml` | `performance-optimized` | Fail if any metric degrades >10% vs last week |
-| Badge in README | `README.md` | all | `![boot-time](badge-url)` shields.io badge |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| `bench_results.json` in repo | `.github/workflows/sigma_ci.yml` | `performance-optimized` | Store benchmark JSON as git notes | 
+| D3.js trend charts | `gh-pages` site | `gh-pages` | Plot bench_results.json over time | 
+| Regression gate | `.github/workflows/sigma_ci.yml` | `performance-optimized` | Fail if any metric degrades >10% vs last week | 
+| Badge in README | `README.md` | all | `![boot-time](badge-url)` shields.io badge | 
 
 ---
 
@@ -114,16 +114,16 @@ t=1800ms sigma-dm login screen shown
 t=2000ms User starts typing — system fully interactive
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| Parallel shard ignition | `kernel/core/sigma_shard_loader.cpp` | `kernel-exp` | Load independent shards concurrently using CPU cores |
-| sigma-dna CPUID at t=280ms | `kernel/core/sigma_dna.cpp` | `kernel-exp` | Non-blocking: probe PCI in background while shards load |
-| Lazy driver init (load on first use) | `hal/SovereignHAL.cpp` | `drivers-dev` | Don't init USB audio until first audio request |
-| Boot time CI metric | `.github/workflows/sigma_ci.yml` | all | `time qemu-boot.sh` — fail if > 2s threshold |
-| Boot time flamegraph | `scripts/sigma_automation.sh` | `performance-optimized` | `sigma-perf record --boot` produces boot flamegraph |
-| Splash screen at t=1200ms | `drivers/display/sigma_vesa.cpp` | `release/standalone` | Show Σ logo on first pixel from GPU |
-| Silent boot option | `Config.sigma` | `release/standalone` | `boot.silent = true` skips splash for kiosks |
-| Boot time display on first run | `userland/installer/sigma_oobe.cpp` | `release/standalone` | OOBE shows: "Booted in 1.8s" |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| Parallel shard ignition | `kernel/core/sigma_shard_loader.cpp` | `kernel-exp` | Load independent shards concurrently using CPU cores | 
+| sigma-dna CPUID at t=280ms | `kernel/core/sigma_dna.cpp` | `kernel-exp` | Non-blocking: probe PCI in background while shards load | 
+| Lazy driver init (load on first use) | `hal/SovereignHAL.cpp` | `drivers-dev` | Don't init USB audio until first audio request | 
+| Boot time CI metric | `.github/workflows/sigma_ci.yml` | all | `time qemu-boot.sh` — fail if > 2s threshold | 
+| Boot time flamegraph | `scripts/sigma_automation.sh` | `performance-optimized` | `sigma-perf record --boot` produces boot flamegraph | 
+| Splash screen at t=1200ms | `drivers/display/sigma_vesa.cpp` | `release/standalone` | Show Σ logo on first pixel from GPU | 
+| Silent boot option | `Config.sigma` | `release/standalone` | `boot.silent = true` skips splash for kiosks | 
+| Boot time display on first run | `userland/installer/sigma_oobe.cpp` | `release/standalone` | OOBE shows: "Booted in 1.8s" | 
 
 ### BE2 — Boot Resilience Depth
 
@@ -149,13 +149,13 @@ Scenario 4: Firmware / hardware fault
   Save to EFI partition as fault_report.txt
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| Fail counter EFI variable | `sigma-boot/sigma_ab_slot.c` | `kernel-exp` | Increment on every boot; reset on `sigma-boot commit` |
-| B-slot auto-select on 3 fails | `sigma-boot/sigma_ab_slot.c` | `kernel-exp` | `fail_count >= 3` → set `SigmaBootSlot=B` |
-| Text recovery menu in sigma-boot | `sigma-boot/sigma_boot.c` | `kernel-exp` | UEFI text mode before kernel loads |
-| Hardware fault report to EFI fs | `sigma-boot/sigma_boot.c` | `kernel-exp` | Write `EFI/sigma/fault_report.txt` on all-fail |
-| Recovery CI scenario | `tests/chaos/test_3boot_fail.sh` | all | 3 forced failed boots → verify B-slot + recovery |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| Fail counter EFI variable | `sigma-boot/sigma_ab_slot.c` | `kernel-exp` | Increment on every boot; reset on `sigma-boot commit` | 
+| B-slot auto-select on 3 fails | `sigma-boot/sigma_ab_slot.c` | `kernel-exp` | `fail_count >= 3` → set `SigmaBootSlot=B` | 
+| Text recovery menu in sigma-boot | `sigma-boot/sigma_boot.c` | `kernel-exp` | UEFI text mode before kernel loads | 
+| Hardware fault report to EFI fs | `sigma-boot/sigma_boot.c` | `kernel-exp` | Write `EFI/sigma/fault_report.txt` on all-fail | 
+| Recovery CI scenario | `tests/chaos/test_3boot_fail.sh` | all | 3 forced failed boots → verify B-slot + recovery | 
 
 ---
 
@@ -174,14 +174,14 @@ Target latencies:
   Remote IPC (fleet): < 10 ms   (sigma-fleet TCP channel)
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| Lock-free MPSC ring buffer | `kernel/ipc/sigma_bus_ring.cpp` | `kernel-exp` | Michael-Scott queue per topic, no mutex |
-| Zero-copy large payload | `kernel/ipc/sigma_bus.cpp` | `kernel-exp` | Payloads > 4KB: share physical page, pass handle |
-| Capability check on hot path | `kernel/ipc/sigma_bus.cpp` | `kernel-exp` | AVC cache lookup: (publisher, topic) → allowed/denied |
-| Message schema validation | `kernel/ipc/sigma_bus.cpp` | `kernel-exp` | Validate payload size + magic number; reject malformed |
-| sigma-bus benchmark CI | `tests/perf/bench_bus.cpp` | `performance-optimized` | 1M messages, measure p50/p99 latency |
-| Dead-letter queue | `userland/daemons/sigma_queue.cpp` | `release/cloud` | Undeliverable → retry 3× with backoff, then DLQ |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| Lock-free MPSC ring buffer | `kernel/ipc/sigma_bus_ring.cpp` | `kernel-exp` | Michael-Scott queue per topic, no mutex | 
+| Zero-copy large payload | `kernel/ipc/sigma_bus.cpp` | `kernel-exp` | Payloads > 4KB: share physical page, pass handle | 
+| Capability check on hot path | `kernel/ipc/sigma_bus.cpp` | `kernel-exp` | AVC cache lookup: (publisher, topic) → allowed/denied | 
+| Message schema validation | `kernel/ipc/sigma_bus.cpp` | `kernel-exp` | Validate payload size + magic number; reject malformed | 
+| sigma-bus benchmark CI | `tests/perf/bench_bus.cpp` | `performance-optimized` | 1M messages, measure p50/p99 latency | 
+| Dead-letter queue | `userland/daemons/sigma_queue.cpp` | `release/cloud` | Undeliverable → retry 3× with backoff, then DLQ | 
 
 ### IQ2 — sigma-bus Observability
 
@@ -194,12 +194,12 @@ sigma-bus list                       # registered services + caps
 sigma-bus capabilities sigma-ca      # list sigma-ca capability tokens
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| `/proc/sigma/bus/` stats | `kernel/vfs/sigma_procfs.cpp` | `kernel-exp` | Per-topic message counts + latency percentiles |
-| `sigma-bus monitor` live trace | `userland/tools/sigma_bus_cli.cpp` | `tools-dev` | Read from procfs, print with timestamp |
-| Topic glob filter | `userland/tools/sigma_bus_cli.cpp` | `tools-dev` | `sigma.*` matches all sigma namespace topics |
-| sigma-bus audit integration | `kernel/ipc/sigma_bus.cpp` | all | Every IPC logged to sigma-audit with DID |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| `/proc/sigma/bus/` stats | `kernel/vfs/sigma_procfs.cpp` | `kernel-exp` | Per-topic message counts + latency percentiles | 
+| `sigma-bus monitor` live trace | `userland/tools/sigma_bus_cli.cpp` | `tools-dev` | Read from procfs, print with timestamp | 
+| Topic glob filter | `userland/tools/sigma_bus_cli.cpp` | `tools-dev` | `sigma.*` matches all sigma namespace topics | 
+| sigma-bus audit integration | `kernel/ipc/sigma_bus.cpp` | all | Every IPC logged to sigma-audit with DID | 
 
 ---
 
@@ -226,15 +226,15 @@ Data ownership model:
       vouchers/           ← DID-signed voucher archive
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| Per-app data directory setup | `userland/daemons/sigma_appd.cpp` | `release/standalone` | Create `/sigma/data/<app>/` on first app launch |
-| Encryption at rest | `kernel/security/sigma_cryptofs.cpp` | `kernel-exp` | All `/sigma/data/` encrypted with Argon2id-derived key |
-| Per-app data backup | `scripts/sigma_automation.sh` | `tools-dev` | `sigma_automation.sh backup` includes all app data |
-| Data export per app | All profession apps | `release/standalone` | `sigma-ca export --format json > ca_data.json` |
-| Data import on migration | `userland/installer/sigma_migrate_*.cpp` | `release/dual-boot` | Import Tally/Excel/EHR data at install time |
-| Retention policy | `Config.sigma` | `release/standalone` | `data.retention_years = 7` for GST (mandatory) |
-| DPDP Act compliance | All profession apps | `release/standalone` | User can delete any data; consent logged |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| Per-app data directory setup | `userland/daemons/sigma_appd.cpp` | `release/standalone` | Create `/sigma/data/<app>/` on first app launch | 
+| Encryption at rest | `kernel/security/sigma_cryptofs.cpp` | `kernel-exp` | All `/sigma/data/` encrypted with Argon2id-derived key | 
+| Per-app data backup | `scripts/sigma_automation.sh` | `tools-dev` | `sigma_automation.sh backup` includes all app data | 
+| Data export per app | All profession apps | `release/standalone` | `sigma-ca export --format json > ca_data.json` | 
+| Data import on migration | `userland/installer/sigma_migrate_*.cpp` | `release/dual-boot` | Import Tally/Excel/EHR data at install time | 
+| Retention policy | `Config.sigma` | `release/standalone` | `data.retention_years = 7` for GST (mandatory) | 
+| DPDP Act compliance | All profession apps | `release/standalone` | User can delete any data; consent logged | 
 
 ### DM2 — Offline-First Data Sync
 
@@ -260,13 +260,13 @@ Data tier model:
     UPI payment (requires internet)
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| CRDT-based sync (Tier 1) | `net/sigma_offline_sync.cpp` | `release/distributed` | Last-write-wins for profession data across devices |
-| TTL cache for API responses | `userland/indiastack/sigma_indiastack_cache.cpp` | `tools-dev` | SQLite cache with expiry column |
-| Graceful degradation UX | All profession apps | `release/standalone` | Show "Last updated: 2h ago" when offline |
-| Offline indicator in Zenith | `zenith_desktop/taskbar/sigma_systray.cpp` | `release/standalone` | Wi-Fi icon greyed + "Offline mode" badge |
-| Conflict resolution UI | `zenith_desktop/ui/sigma_dialog.cpp` | `release/standalone` | Show diff when CRDT conflict detected |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| CRDT-based sync (Tier 1) | `net/sigma_offline_sync.cpp` | `release/distributed` | Last-write-wins for profession data across devices | 
+| TTL cache for API responses | `userland/indiastack/sigma_indiastack_cache.cpp` | `tools-dev` | SQLite cache with expiry column | 
+| Graceful degradation UX | All profession apps | `release/standalone` | Show "Last updated: 2h ago" when offline | 
+| Offline indicator in Zenith | `zenith_desktop/taskbar/sigma_systray.cpp` | `release/standalone` | Wi-Fi icon greyed + "Offline mode" badge | 
+| Conflict resolution UI | `zenith_desktop/ui/sigma_dialog.cpp` | `release/standalone` | Show diff when CRDT conflict detected | 
 
 ---
 
@@ -307,24 +307,24 @@ void sigma_cli_report_error(sigma_err_t e, const char* context) {
 }
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| `sigma_err_to_fix()` lookup | `include/sigma_error_codes.h` | `tools-dev` | Map each error → human fix suggestion |
-| `sigma_err_to_docs_url()` | `include/sigma_error_codes.h` | `tools-dev` | Map each error → wiki URL |
-| `SIGMA_TRY` macro | `include/sigma_error_codes.h` | `tools-dev` | Already designed — implement + adopt everywhere |
-| No `assert()` in production | `.github/workflows/sigma_ci.yml` | all | CI: grep for `assert(` in kernel/ → fail |
-| Error code coverage test | `tests/unit/test_error_codes.cpp` | `tools-dev` | Every `sigma_err_t` value has string + fix |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| `sigma_err_to_fix()` lookup | `include/sigma_error_codes.h` | `tools-dev` | Map each error → human fix suggestion | 
+| `sigma_err_to_docs_url()` | `include/sigma_error_codes.h` | `tools-dev` | Map each error → wiki URL | 
+| `SIGMA_TRY` macro | `include/sigma_error_codes.h` | `tools-dev` | Already designed — implement + adopt everywhere | 
+| No `assert()` in production | `.github/workflows/sigma_ci.yml` | all | CI: grep for `assert(` in kernel/ → fail | 
+| Error code coverage test | `tests/unit/test_error_codes.cpp` | `tools-dev` | Every `sigma_err_t` value has string + fix | 
 
 ### EH2 — Error Recovery Patterns
 
-| Pattern | Where used | Implementation |
-|---------|-----------|----------------|
-| Retry with backoff | India Stack API calls | 1s/2s/4s/8s, max 3 retries |
-| Circuit breaker | GSTN/ABDM client | Open after 3 fails; half-open after 60s |
-| Fallback to cache | All API calls | Return cached response with age warning |
-| Graceful degradation | sigma-ai, sigma-bhashini | "AI unavailable; showing cached response" |
-| Crash-restart loop prevention | SDF drivers | sigma-heal: max 3 restarts per 5 minutes |
-| User notification on persistent error | All daemons | Toast: "GSTN API unreachable since 2h" |
+| Pattern | Where used | Implementation | 
+| --------- | ----------- | ---------------- | 
+| Retry with backoff | India Stack API calls | 1s/2s/4s/8s, max 3 retries | 
+| Circuit breaker | GSTN/ABDM client | Open after 3 fails; half-open after 60s | 
+| Fallback to cache | All API calls | Return cached response with age warning | 
+| Graceful degradation | sigma-ai, sigma-bhashini | "AI unavailable; showing cached response" | 
+| Crash-restart loop prevention | SDF drivers | sigma-heal: max 3 restarts per 5 minutes | 
+| User notification on persistent error | All daemons | Toast: "GSTN API unreachable since 2h" | 
 
 ---
 
@@ -351,30 +351,30 @@ AT-SPI2 accessibility tree (sigma-zenith)
   ▼ User hears spoken UI
 ```
 
-| Feature | File | Branch | Target |
-|---------|------|--------|--------|
-| AT-SPI2 widget tree walker | `userland/a11y/sigma_a11y.cpp` | `release/standalone` | Every widget: name + role + state |
-| Focus change announcement | `userland/a11y/sigma_a11y.cpp` | `release/standalone` | Announce on every Tab/click |
-| sigma-bhashini → HDA pipeline | `userland/a11y/sigma_a11y.cpp` | `release/standalone` | TTS PCM → sigma-audio write |
-| Keyboard-only navigation | `zenith_desktop/compositor/sigma_compositor.cpp` | `release/standalone` | Full UI operable without pointer |
-| Skip navigation links | `zenith_desktop/ui/` | `release/standalone` | Alt+M → main content, Alt+N → nav |
-| High-contrast theme | `zenith_desktop/themes/zdl-high-contrast.sigma-theme` | `release/standalone` | Minimum 7:1 contrast ratio (AAA) |
-| Large text mode (200%) | `zenith_desktop/compositor/sigma_compositor.cpp` | `release/standalone` | Scale all UI elements 2× |
-| Reduce motion mode | `zenith_desktop/compositor/sigma_compositor.cpp` | `release/standalone` | Zero animations when enabled |
-| Braille display (BRLTTY) | `userland/a11y/sigma_braille.cpp` | `release/standalone` | USB Braille device support |
-| Switch access scanning | `userland/a11y/sigma_switch.cpp` | `release/standalone` | Single-switch dwell-time scanning |
-| WCAG 2.2 AA CI gate | `.github/workflows/sigma_ci.yml` | `prepare-sigmaos-launch` | aXe automated scan on Zenith UI |
+| Feature | File | Branch | Target | 
+| --------- | ------ | -------- | -------- | 
+| AT-SPI2 widget tree walker | `userland/a11y/sigma_a11y.cpp` | `release/standalone` | Every widget: name + role + state | 
+| Focus change announcement | `userland/a11y/sigma_a11y.cpp` | `release/standalone` | Announce on every Tab/click | 
+| sigma-bhashini → HDA pipeline | `userland/a11y/sigma_a11y.cpp` | `release/standalone` | TTS PCM → sigma-audio write | 
+| Keyboard-only navigation | `zenith_desktop/compositor/sigma_compositor.cpp` | `release/standalone` | Full UI operable without pointer | 
+| Skip navigation links | `zenith_desktop/ui/` | `release/standalone` | Alt+M → main content, Alt+N → nav | 
+| High-contrast theme | `zenith_desktop/themes/zdl-high-contrast.sigma-theme` | `release/standalone` | Minimum 7:1 contrast ratio (AAA) | 
+| Large text mode (200%) | `zenith_desktop/compositor/sigma_compositor.cpp` | `release/standalone` | Scale all UI elements 2× | 
+| Reduce motion mode | `zenith_desktop/compositor/sigma_compositor.cpp` | `release/standalone` | Zero animations when enabled | 
+| Braille display (BRLTTY) | `userland/a11y/sigma_braille.cpp` | `release/standalone` | USB Braille device support | 
+| Switch access scanning | `userland/a11y/sigma_switch.cpp` | `release/standalone` | Single-switch dwell-time scanning | 
+| WCAG 2.2 AA CI gate | `.github/workflows/sigma_ci.yml` | `prepare-sigmaos-launch` | aXe automated scan on Zenith UI | 
 
 ### AC2 — India-Specific Accessibility
 
-| Feature | Detail | Branch |
-|---------|--------|--------|
-| Hindi screen reader | sigma-bhashini TTS for all UI text | `release/standalone` |
-| Tamil / Telugu / Bengali TTS | sigma-bhashini 22-language offline | `release/standalone` |
-| Voice navigation | Speak command → sigma-bhashini ASR → action | `release/standalone` |
-| Low-literacy mode | Icon-first UI, minimal text | `release/mobile` |
-| USSD accessibility | Text-only USSD menus for feature phones | `release/mobile` |
-| 2G-compatible UI | All UI functional at 2G latency | `release/mobile` |
+| Feature | Detail | Branch | 
+| --------- | -------- | -------- | 
+| Hindi screen reader | sigma-bhashini TTS for all UI text | `release/standalone` | 
+| Tamil / Telugu / Bengali TTS | sigma-bhashini 22-language offline | `release/standalone` | 
+| Voice navigation | Speak command → sigma-bhashini ASR → action | `release/standalone` | 
+| Low-literacy mode | Icon-first UI, minimal text | `release/mobile` | 
+| USSD accessibility | Text-only USSD menus for feature phones | `release/mobile` | 
+| 2G-compatible UI | All UI functional at 2G latency | `release/mobile` | 
 
 ---
 
@@ -433,11 +433,11 @@ AUDIT
 [ ] sigma-ids: behavioural anomaly detection live
 ```
 
-| Task | File | Branch | Detail |
-|------|------|--------|--------|
-| `sigma-sec status` full report | `userland/tools/sigma_sec_cli.cpp` | `tools-dev` | Check all 30+ items, print ✓/✗ per item |
-| Security posture score | `userland/tools/sigma_sec_cli.cpp` | `tools-dev` | Score 0–100; published in quality report |
-| Pre-release security gate | `scripts/sigma_quality_check.sh` | `prepare-sigmaos-launch` | Block release if any critical item fails |
+| Task | File | Branch | Detail | 
+| ------ | ------ | -------- | -------- | 
+| `sigma-sec status` full report | `userland/tools/sigma_sec_cli.cpp` | `tools-dev` | Check all 30+ items, print ✓/✗ per item | 
+| Security posture score | `userland/tools/sigma_sec_cli.cpp` | `tools-dev` | Score 0–100; published in quality report | 
+| Pre-release security gate | `scripts/sigma_quality_check.sh` | `prepare-sigmaos-launch` | Block release if any critical item fails | 
 
 ---
 
@@ -505,15 +505,15 @@ India Stack:
   sigma-feedback    ← user feedback [❌ build]
 ```
 
-| Task | File | Branch | Priority |
-|------|------|--------|---------|
-| sigma-doctor | `userland/tools/sigma_doctor_cli.cpp` | `tools-dev` | 🟠 |
-| sigma-config | `userland/tools/sigma_config_cli.cpp` | `tools-dev` | 🟠 |
-| sigma-feedback | `userland/tools/sigma_feedback_cli.cpp` | `tools-dev` | 🟡 |
-| sigma-update | `userland/daemons/sigma_updated.cpp` | all | 🔴 |
-| sigma-cron | `userland/daemons/sigma_cron.cpp` | `tools-dev` | 🟠 |
-| sigma-hook | `userland/daemons/sigma_hook.cpp` | `tools-dev` | 🟠 |
-| sigma-recovery | `userland/tools/sigma_recover_cli.cpp` | all | 🔴 |
+| Task | File | Branch | Priority | 
+| ------ | ------ | -------- | --------- | 
+| sigma-doctor | `userland/tools/sigma_doctor_cli.cpp` | `tools-dev` | 🟠 | 
+| sigma-config | `userland/tools/sigma_config_cli.cpp` | `tools-dev` | 🟠 | 
+| sigma-feedback | `userland/tools/sigma_feedback_cli.cpp` | `tools-dev` | 🟡 | 
+| sigma-update | `userland/daemons/sigma_updated.cpp` | all | 🔴 | 
+| sigma-cron | `userland/daemons/sigma_cron.cpp` | `tools-dev` | 🟠 | 
+| sigma-hook | `userland/daemons/sigma_hook.cpp` | `tools-dev` | 🟠 | 
+| sigma-recovery | `userland/tools/sigma_recover_cli.cpp` | all | 🔴 | 
 
 ---
 
@@ -595,17 +595,17 @@ Month 18: Zero critical bugs (CURRENT_PROBLEMS 🔴 = 0)
 
 ### MIS2 — Quality Gates Per Milestone
 
-| Milestone | Gate | Verification |
-|-----------|------|-------------|
-| v0.1 First Boot | QEMU reaches shell | CI: `assert boot_prompt` |
-| v0.2 First Network | `ping 10.0.2.2` works | CI: `assert ping success` |
-| v0.3 First Package | `sigma-pkg install vim` | CI: vim binary exists |
-| v0.4 First Desktop | Zenith renders frame | CI: screenshot diff |
-| v0.5 First Profession | sigma-ca computes GST | CI: GSTR-1 JSON valid |
-| v15.1 Launch | All Q0 gates pass | `sigma_quality_check.sh` |
-| v16.0 Apex | Boot < 2s, PQC real | CI benchmark gates |
-| v17.0 Sovereign | Enterprise pilot ready | Fleet 100 devices |
-| v18.0 Singularity | 0 memory-safety CVEs | 12-month clean streak |
+| Milestone | Gate | Verification | 
+| ----------- | ------ | ------------- | 
+| v0.1 First Boot | QEMU reaches shell | CI: `assert boot_prompt` | 
+| v0.2 First Network | `ping 10.0.2.2` works | CI: `assert ping success` | 
+| v0.3 First Package | `sigma-pkg install vim` | CI: vim binary exists | 
+| v0.4 First Desktop | Zenith renders frame | CI: screenshot diff | 
+| v0.5 First Profession | sigma-ca computes GST | CI: GSTR-1 JSON valid | 
+| v15.1 Launch | All Q0 gates pass | `sigma_quality_check.sh` | 
+| v16.0 Apex | Boot < 2s, PQC real | CI benchmark gates | 
+| v17.0 Sovereign | Enterprise pilot ready | Fleet 100 devices | 
+| v18.0 Singularity | 0 memory-safety CVEs | 12-month clean streak | 
 
 ### MIS3 — Contributor Onboarding Path
 
@@ -644,18 +644,18 @@ git commit -m "feat(agri): PMFBY enrollment API integration"
 
 All 10 roadmap documents with page counts:
 
-| # | Document | Key topics | Lines |
-|---|----------|-----------|-------|
-| 1 | [Quality-Stability-Performance-Roadmap](Quality-Stability-Performance-Roadmap) | Stability S1-S4, Performance P1-P6, Quality Q1-Q5, UX U1-U6 | ~1,000 |
-| 2 | [Stability-Performance-Extended](Stability-Performance-Extended) | Energy, Reliability, Observability, Release Engineering, Network QA | ~900 |
-| 3 | [Compatibility-Automation-Personalisation-Roadmap](Compatibility-Automation-Personalisation-Roadmap) | Linux/Win32/POSIX compat, Automation, Customisation, Personalisation | ~700 |
-| 4 | [Advanced-Quality-Roadmap](Advanced-Quality-Roadmap) | PQC production, Network stack, Enterprise, AI/ML, i18n, Rural | ~700 |
-| 5 | [Systems-Excellence-Roadmap](Systems-Excellence-Roadmap) | Gaming, IoT, Dev tools, Packages, Updates, Multi-platform | ~700 |
-| 6 | [Engineering-Principles-Roadmap](Engineering-Principles-Roadmap) | SOLID/OOP, Design patterns, CLI architecture, Refactoring | ~700 |
-| 7 | [Modularisation-Architecture-Roadmap](Modularisation-Architecture-Roadmap) | Shard system, Build modularity, Plugin API, Automation depth | ~700 |
-| 8 | [Sovereignty-UserDefined-Roadmap](Sovereignty-UserDefined-Roadmap) | Foreign dep reduction, User extensions, India-first, DID | ~700 |
-| 9 | [Continuous-Improvement-Roadmap](Continuous-Improvement-Roadmap) | Versioning, Code review, Testing, Docs, ZDL, sigma-nanolib | ~800 |
-| 10 | [Final-Excellence-Roadmap](Final-Excellence-Roadmap) | Feedback, Boot experience, IPC quality, Data mgmt, Error handling, Accessibility, Security checklist, Tools inventory, Master schedule | ~800 |
+| # | Document | Key topics | Lines | 
+| --- | ---------- | ----------- | ------- | 
+| 1 | [Quality-Stability-Performance-Roadmap](Quality-Stability-Performance-Roadmap) | Stability S1-S4, Performance P1-P6, Quality Q1-Q5, UX U1-U6 | ~1,000 | 
+| 2 | [Stability-Performance-Extended](Stability-Performance-Extended) | Energy, Reliability, Observability, Release Engineering, Network QA | ~900 | 
+| 3 | [Compatibility-Automation-Personalisation-Roadmap](Compatibility-Automation-Personalisation-Roadmap) | Linux/Win32/POSIX compat, Automation, Customisation, Personalisation | ~700 | 
+| 4 | [Advanced-Quality-Roadmap](Advanced-Quality-Roadmap) | PQC production, Network stack, Enterprise, AI/ML, i18n, Rural | ~700 | 
+| 5 | [Systems-Excellence-Roadmap](Systems-Excellence-Roadmap) | Gaming, IoT, Dev tools, Packages, Updates, Multi-platform | ~700 | 
+| 6 | [Engineering-Principles-Roadmap](Engineering-Principles-Roadmap) | SOLID/OOP, Design patterns, CLI architecture, Refactoring | ~700 | 
+| 7 | [Modularisation-Architecture-Roadmap](Modularisation-Architecture-Roadmap) | Shard system, Build modularity, Plugin API, Automation depth | ~700 | 
+| 8 | [Sovereignty-UserDefined-Roadmap](Sovereignty-UserDefined-Roadmap) | Foreign dep reduction, User extensions, India-first, DID | ~700 | 
+| 9 | [Continuous-Improvement-Roadmap](Continuous-Improvement-Roadmap) | Versioning, Code review, Testing, Docs, ZDL, sigma-nanolib | ~800 | 
+| 10 | [Final-Excellence-Roadmap](Final-Excellence-Roadmap) | Feedback, Boot experience, IPC quality, Data mgmt, Error handling, Accessibility, Security checklist, Tools inventory, Master schedule | ~800 | 
 
 **Total: 10 documents, ~7,700 lines of actionable engineering roadmap.**
 

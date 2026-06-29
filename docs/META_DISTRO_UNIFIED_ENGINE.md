@@ -32,15 +32,15 @@ flowchart TB
 
 ## Subsystem map
 
-| Distro class | SigmaOS module | User-visible feature |
-|--------------|----------------|----------------------|
-| SteamOS | `sigma_game_layer.c` | Gaming profile + compatibility shim hooks |
-| Clear Linux | `sigma_sched_profiles.c` | Performance / balanced / power-save CPU policy |
-| NixOS | `sigma_pkg_registry/` | Reproducible signed `.spkg` recipes |
-| CoreOS / Flatcar | Boot + rollback | Immutable updates, Safe Mode, Fix-it menu |
-| RancherOS | `sigma_pod_cli` | Namespaced workloads without Docker |
-| Rescuezilla | `sigma_recovery.c` | Snapshots, rollback, forensic audit |
-| Solus | Zenith + profile | Themes, gaps, auto-tile layouts |
+| Distro class | SigmaOS module | User-visible feature | 
+| -------------- | ---------------- | ---------------------- | 
+| SteamOS | `sigma_game_layer.c` | Gaming profile + compatibility shim hooks | 
+| Clear Linux | `sigma_sched_profiles.c` | Performance / balanced / power-save CPU policy | 
+| NixOS | `sigma_pkg_registry/` | Reproducible signed `.spkg` recipes | 
+| CoreOS / Flatcar | Boot + rollback | Immutable updates, Safe Mode, Fix-it menu | 
+| RancherOS | `sigma_pod_cli` | Namespaced workloads without Docker | 
+| Rescuezilla | `sigma_recovery.c` | Snapshots, rollback, forensic audit | 
+| Solus | Zenith + profile | Themes, gaps, auto-tile layouts | 
 
 ## Branch parity
 
@@ -58,14 +58,14 @@ sigma_meta_distro_init(SIGMA_META_ALL_FEATURES);
 
 Implementation: `kernel/subsystems/sigma_meta_distro.c`
 
-| Flag | Subsystem |
-|------|-----------|
-| `SIGMA_FEATURE_GAMING` | `sigma_game_layer.c` |
-| `SIGMA_FEATURE_PERFORMANCE` | `sigma_sched.c` |
-| `SIGMA_FEATURE_PACKAGES` | `sigma_pkg_registry/` |
-| `SIGMA_FEATURE_IMMUTABLE` | `sigma_immutable_root.c` |
-| `SIGMA_FEATURE_RECOVERY` | `sigma_recovery.c` + GUI |
-| `SIGMA_FEATURE_DESKTOP` | Zenith compositor + tiling + profile |
+| Flag | Subsystem | 
+| ------ | ----------- | 
+| `SIGMA_FEATURE_GAMING` | `sigma_game_layer.c` | 
+| `SIGMA_FEATURE_PERFORMANCE` | `sigma_sched.c` | 
+| `SIGMA_FEATURE_PACKAGES` | `sigma_pkg_registry/` | 
+| `SIGMA_FEATURE_IMMUTABLE` | `sigma_immutable_root.c` | 
+| `SIGMA_FEATURE_RECOVERY` | `sigma_recovery.c` + GUI | 
+| `SIGMA_FEATURE_DESKTOP` | Zenith compositor + tiling + profile | 
 
 ## Maintainer workflow
 

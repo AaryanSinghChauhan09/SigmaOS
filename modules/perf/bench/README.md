@@ -9,4 +9,4 @@ Benchmarking Module.
 // Abstract interface for perf/bench
 void init_perf_bench();
 
-```
+```text

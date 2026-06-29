@@ -6,7 +6,8 @@
     <title>Σ SigmaOS Zenith | Sovereign Lattice Desktop</title>
     <meta name="description" content="SigmaOS Zenith v15.0 - Glassmorphic high-performance sovereign operating system interface.">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" crossorigin href="/assets/index-CABfkZjR.css">
+  <script type="module" crossorigin src="/assets/index-D1REhT-y.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DMS8rLXD.css">
 </head>
 <body>
 
@@ -32,10 +33,10 @@
     </header>
 
     <!-- Draggable Premium Windows -->
-    <div class="desktop-area" class="auto-style-1">
+    <div class="desktop-area auto-style-1">
         
         <!-- App: OmniShell Terminal -->
-        <div class="window" id="terminal-win" class="auto-style-2">
+        <div class="window auto-style-2" id="terminal-win">
             <div class="window-header">
                 <div class="window-title">💻 <span>OmniShell v5.1</span></div>
                 <div class="window-controls">
@@ -44,7 +45,7 @@
                     <div class="control-dot close" onclick="closeWindow('terminal-win')"></div>
                 </div>
             </div>
-            <div class="window-body" class="auto-style-3">
+            <div class="window-body auto-style-3">
                 <div class="terminal-container">
                     <div class="terminal-output" id="terminal-output"></div>
                     <div class="terminal-input-line">
@@ -56,7 +57,7 @@
         </div>
 
         <!-- App: File Manager -->
-        <div class="window" id="file-manager-win" class="auto-style-4">
+        <div class="window auto-style-4" id="file-manager-win">
             <div class="window-header">
                 <div class="window-title">📂 <span>Sovereign VFS Browser</span></div>
                 <div class="window-controls">
@@ -77,7 +78,7 @@
         </div>
 
         <!-- App: Observability & Core Vitals -->
-        <div class="window" id="browser-win" class="auto-style-5">
+        <div class="window auto-style-5" id="browser-win">
             <div class="window-header">
                 <div class="window-title">📊 <span>Observability Matrix</span></div>
                 <div class="window-controls">
@@ -86,7 +87,7 @@
                     <div class="control-dot close" onclick="closeWindow('browser-win')"></div>
                 </div>
             </div>
-            <div class="window-body" class="auto-style-6">
+            <div class="window-body auto-style-6">
                 <h3 class="auto-style-7">Σ Sovereign Observer</h3>
                 <sigma-monitor></sigma-monitor>
                 <div class="auto-style-8">
@@ -99,7 +100,7 @@
         </div>
 
         <!-- App: AI Research Assistant -->
-        <div class="window" id="ai-assistant-win" class="auto-style-10">
+        <div class="window auto-style-10" id="ai-assistant-win">
             <div class="window-header">
                 <div class="window-title">🧠 <span>Lattice Neural Core</span></div>
                 <div class="window-controls">
@@ -108,7 +109,7 @@
                     <div class="control-dot close" onclick="closeWindow('ai-assistant-win')"></div>
                 </div>
             </div>
-            <div class="window-body" class="auto-style-11">
+            <div class="window-body auto-style-11">
                 <div class="auto-style-12">
                     <h4 class="auto-style-13">Edge ML Failure Model</h4>
                     <p class="auto-style-14">Predictive attestation running continuously inside Ring-0.</p>
@@ -121,7 +122,7 @@
         </div>
 
         <!-- App: Lattice Settings -->
-        <div class="window" id="lattice-settings-win" class="auto-style-16">
+        <div class="window auto-style-16" id="lattice-settings-win">
             <div class="window-header">
                 <div class="window-title">⚙️ <span>Lattice System Settings</span></div>
                 <div class="window-controls">
@@ -170,7 +171,7 @@
         </div>
 
         <!-- App: Utility Nexus (Statutory Calculators) -->
-        <div class="window" id="utility-nexus-win" class="auto-style-17">
+        <div class="window auto-style-17" id="utility-nexus-win">
             <div class="window-header">
                 <div class="window-title">🔧 <span>Sovereign Pro Calculators</span></div>
                 <div class="window-controls">
@@ -179,21 +180,21 @@
                     <div class="control-dot close" onclick="closeWindow('utility-nexus-win')"></div>
                 </div>
             </div>
-            <div class="window-body" class="auto-style-18">
+            <div class="window-body auto-style-18">
                 <div class="settings-content">
                     <div class="settings-group">
                         <h4 class="auto-style-19">Zero-Loss paise GST Calculator</h4>
                         <div class="auto-style-20">
-                            <input type="number" id="gst-amount" class="cmd-input" placeholder="Amount (in paise)" class="auto-style-21">
-                            <input type="number" id="gst-rate" class="cmd-input" placeholder="GST Rate %" class="auto-style-22">
+                            <input class="cmd-input auto-style-21" type="number" id="gst-amount" placeholder="Amount (in paise)">
+                            <input class="cmd-input auto-style-22" type="number" id="gst-rate" placeholder="GST Rate %">
                         </div>
-                        <button class="wizard-btn" class="auto-style-23" onclick="calculateGST()">COMPUTE GST</button>
+                        <button class="wizard-btn auto-style-23" onclick="calculateGST()">COMPUTE GST</button>
                         <div class="auto-style-24" id="gst-result">> Result: Ready</div>
                     </div>
                     <div class="settings-group">
                         <h4 class="auto-style-25">BNS Legal Complier</h4>
-                        <input type="text" id="legal-query" class="cmd-input" placeholder="Search BNS section..." class="auto-style-26">
-                        <button class="wizard-btn" class="auto-style-27" onclick="checkLegalCompliance()">MAP COMPLIANCE</button>
+                        <input class="cmd-input auto-style-26" type="text" id="legal-query" placeholder="Search BNS section...">
+                        <button class="wizard-btn auto-style-27" onclick="checkLegalCompliance()">MAP COMPLIANCE</button>
                         <div class="auto-style-28" id="legal-result">> Mapping Status: Active</div>
                     </div>
                 </div>
@@ -201,7 +202,7 @@
         </div>
 
         <!-- App: Sovereign App Store (Marketplace) -->
-        <div class="window" id="sigma-market-win" class="auto-style-29">
+        <div class="window auto-style-29" id="sigma-market-win">
             <div class="window-header">
                 <div class="window-title">🛒 <span>Lattice Shard Marketplace</span></div>
                 <div class="window-controls">
@@ -210,7 +211,7 @@
                     <div class="control-dot close" onclick="closeWindow('sigma-market-win')"></div>
                 </div>
             </div>
-            <div class="window-body" class="auto-style-30">
+            <div class="window-body auto-style-30">
                 <div class="auto-style-31">
                     <button class="fm-btn" onclick="switchMarketTab('core-shards')">Core Shards</button>
                     <button class="fm-btn" onclick="switchMarketTab('foss-apps')">FOSS Lattice</button>
@@ -218,7 +219,7 @@
                 
                 <div id="market-core-shards">
                     <h3 class="auto-style-32">Attested Core Shards</h3>
-                    <div class="shard-grid" id="shardContainer" class="auto-style-33">
+                    <div class="shard-grid auto-style-33" id="shardContainer">
                         <!-- Dynamically populated from kernel_loader.js -->
                     </div>
                 </div>
@@ -235,12 +236,12 @@
                                 <div class="auto-style-40">
                                     <strong>DeepSeek / Gemma / Qwen</strong><br>
                                     <span class="auto-style-41">LLM Inference Engines</span><br>
-                                    <button class="fm-btn" class="auto-style-42" onclick="injectFOSS('DeepSeek-LLM')">INJECT ENGINE</button>
+                                    <button class="fm-btn auto-style-42" onclick="injectFOSS('DeepSeek-LLM')">INJECT ENGINE</button>
                                 </div>
                                 <div class="auto-style-43">
                                     <strong>eSpeak & eSpeak NG</strong><br>
                                     <span class="auto-style-44">Speech Synthesis & Speech Recognition</span><br>
-                                    <button class="fm-btn" class="auto-style-45" onclick="injectFOSS('eSpeak-Speech')">INJECT SHARD</button>
+                                    <button class="fm-btn auto-style-45" onclick="injectFOSS('eSpeak-Speech')">INJECT SHARD</button>
                                 </div>
                             </div>
                         </div>
@@ -252,12 +253,12 @@
                                 <div class="auto-style-48">
                                     <strong>KiCad & Fritzing</strong><br>
                                     <span class="auto-style-49">EDA Electronic Design Simulation</span><br>
-                                    <button class="fm-btn" class="auto-style-50" onclick="injectFOSS('KiCad-EDA')">INJECT WORKSPACE</button>
+                                    <button class="fm-btn auto-style-50" onclick="injectFOSS('KiCad-EDA')">INJECT WORKSPACE</button>
                                 </div>
                                 <div class="auto-style-51">
                                     <strong>FreeCAD & OpenSCAD</strong><br>
                                     <span class="auto-style-52">3D Mechanical Design Models</span><br>
-                                    <button class="fm-btn" class="auto-style-53" onclick="injectFOSS('FreeCAD-3D')">INJECT WORKSPACE</button>
+                                    <button class="fm-btn auto-style-53" onclick="injectFOSS('FreeCAD-3D')">INJECT WORKSPACE</button>
                                 </div>
                             </div>
                         </div>
@@ -269,12 +270,12 @@
                                 <div class="auto-style-56">
                                     <strong>Kali Arsenal (Nmap / Ghidra / Volatility)</strong><br>
                                     <span class="auto-style-57">Security Audit Core Vitals</span><br>
-                                    <button class="fm-btn" class="auto-style-58" onclick="injectFOSS('Kali-Arsenal')">INJECT SECURITY</button>
+                                    <button class="fm-btn auto-style-58" onclick="injectFOSS('Kali-Arsenal')">INJECT SECURITY</button>
                                 </div>
                                 <div class="auto-style-59">
                                     <strong>RescueZilla Recovery Hub</strong><br>
                                     <span class="auto-style-60">Declarative Snapshot Rollbacks</span><br>
-                                    <button class="fm-btn" class="auto-style-61" onclick="injectFOSS('RescueZilla-Core')">INJECT SHARD</button>
+                                    <button class="fm-btn auto-style-61" onclick="injectFOSS('RescueZilla-Core')">INJECT SHARD</button>
                                 </div>
                             </div>
                         </div>
@@ -286,12 +287,12 @@
                                 <div class="auto-style-64">
                                     <strong>SageMath / Octave / GeoGebra</strong><br>
                                     <span class="auto-style-65">Numerical Science & Calculus Libraries</span><br>
-                                    <button class="fm-btn" class="auto-style-66" onclick="injectFOSS('SageMath-Calculus')">INJECT TOOLKIT</button>
+                                    <button class="fm-btn auto-style-66" onclick="injectFOSS('SageMath-Calculus')">INJECT TOOLKIT</button>
                                 </div>
                                 <div class="auto-style-67">
                                     <strong>QGIS & OpenStreetMap</strong><br>
                                     <span class="auto-style-68">Geographical Information Systems</span><br>
-                                    <button class="fm-btn" class="auto-style-69" onclick="injectFOSS('QGIS-GIS')">INJECT SHARD</button>
+                                    <button class="fm-btn auto-style-69" onclick="injectFOSS('QGIS-GIS')">INJECT SHARD</button>
                                 </div>
                             </div>
                         </div>
@@ -302,7 +303,7 @@
         </div>
 
         <!-- App: Markup Forge -->
-        <div class="window" id="markup-forge-win" class="auto-style-70">
+        <div class="window auto-style-70" id="markup-forge-win">
             <div class="window-header">
                 <div class="window-title">📥 <span>Zenith System Installer</span></div>
                 <div class="window-controls">
@@ -311,8 +312,190 @@
                     <div class="control-dot close" onclick="closeWindow('markup-forge-win')"></div>
                 </div>
             </div>
-            <div class="window-body" class="auto-style-71">
-                <iframe src="installer.html" title="Zenith System Installer" title="Zenith System Installer" title="Zenith System Installer" class="auto-style-72"></iframe>
+            <div class="window-body auto-style-71">
+                <iframe src="installer.html" title="Zenith System Installer" title="Zenith System Installer" title="Zenith System Installer" class="auto-style-72"></iframe>        <!-- App: Developer Portal -->
+        <div class="window" id="dev-portal-win" style="display: none;">
+            <div class="window-header">
+                <div class="window-title">📖 <span>Interactive Developer Portal</span></div>
+                <div class="window-controls">
+                    <div class="control-dot min" onclick="closeWindow('dev-portal-win')"></div>
+                    <div class="control-dot max"></div>
+                    <div class="control-dot close" onclick="closeWindow('dev-portal-win')"></div>
+                </div>
+            </div>
+            <div class="window-body">
+                <div class="settings-layout">
+                    <div class="settings-tabs">
+                        <div class="settings-tab active" onclick="switchDevPortalTab('syscall-docs', this)">Syscall Docs</div>
+                        <div class="settings-tab" onclick="switchDevPortalTab('setup-wizard', this)">Setup Wizard</div>
+                        <div class="settings-tab" onclick="switchDevPortalTab('cicd-status', this)">CI/CD Pipeline</div>
+                    </div>
+                    <div class="settings-content">
+                        <!-- Syscall Docs -->
+                        <div id="dev-syscall-docs" class="dev-portal-tab-content active">
+                            <h3>Syscall & API Reference</h3>
+                            <input type="text" class="cmd-input" id="syscall-search" placeholder="Search syscalls (e.g., sys_write, sys_exit)..." oninput="searchSyscalls()">
+                            <div class="syscall-list-container" id="syscall-list-container">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                        <!-- Setup Wizard -->
+                        <div id="dev-setup-wizard" class="dev-portal-tab-content">
+                            <h3>Build Environment Setup</h3>
+                            <p>Verify and configure your bare-metal toolchain for SigmaOS development.</p>
+                            <div class="wizard-steps-form">
+                                <div class="wizard-step-card">
+                                    <strong>Step 1: Install LLVM & clang</strong>
+                                    <p>SigmaOS requires LLVM 15+ and clang compiler for target cross-compilation.</p>
+                                    <button class="wizard-btn" onclick="verifyStep(1, this)">VERIFY INSTALLATION</button>
+                                </div>
+                                <div class="wizard-step-card">
+                                    <strong>Step 2: Install Rust Toolchain</strong>
+                                    <p>Rust compiler (nightly channel) with <code>rust-src</code> component for <code>#![no_std]</code> kernel compilation.</p>
+                                    <button class="wizard-btn" onclick="verifyStep(2, this)">VERIFY RUSTC</button>
+                                </div>
+                                <div class="wizard-step-card">
+                                    <strong>Step 3: Setup Zig & Nim Compilers</strong>
+                                    <p>Zig 0.11+ for HAL elements and Nim 1.6+ for declarative packaging system configuration.</p>
+                                    <button class="wizard-btn" onclick="verifyStep(3, this)">VERIFY COMPILERS</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- CI/CD Status -->
+                        <div id="dev-cicd-status" class="dev-portal-tab-content">
+                            <h3>Live Mainline Builds</h3>
+                            <p>Real-time compilation tracking across attested target architectures.</p>
+                            <div class="cicd-status-grid">
+                                <div class="cicd-status-card">
+                                    <strong>x86_64</strong><br>
+                                    <span class="passing-badge">● PASSING</span>
+                                </div>
+                                <div class="cicd-status-card">
+                                    <strong>aarch64</strong><br>
+                                    <span class="passing-badge">● PASSING</span>
+                                </div>
+                                <div class="cicd-status-card">
+                                    <strong>riscv64</strong><br>
+                                    <span class="passing-badge">● PASSING</span>
+                                </div>
+                            </div>
+                            <div class="ci-trigger-section">
+                                <button class="wizard-btn" onclick="triggerCIBuild()">TRIGGER INTEGRATION BUILD</button>
+                                <pre id="cicd-log-output" class="cicd-log-box">Ready to build...</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- App: Kernel Emulator -->
+        <div class="window" id="emulator-win" style="display: none;">
+            <div class="window-header">
+                <div class="window-title">💿 <span>Bare-Metal Kernel Emulator</span></div>
+                <div class="window-controls">
+                    <div class="control-dot min" onclick="closeWindow('emulator-win')"></div>
+                    <div class="control-dot max"></div>
+                    <div class="control-dot close" onclick="closeWindow('emulator-win')"></div>
+                </div>
+            </div>
+            <div class="window-body emulator-terminal">
+                <div id="emulator-console" class="emulator-log-view">
+                    <div class="bootloader-title">*** SIGMA BOOT LOADER v15.0 ***</div>
+                    <div>Press "BOOT" or type "boot" to load the sovereign kernel.</div>
+                </div>
+                <div id="emulator-controls" class="emulator-bottom-panel">
+                    <div class="emulator-input-box">
+                        <span>&gt;</span>
+                        <input type="text" id="emulator-input" class="emulator-terminal-input" placeholder="Type command (boot, help, neofetch)..." onkeydown="handleEmulatorCommand(event)">
+                    </div>
+                    <button class="wizard-btn" onclick="bootEmulator()">BOOT ENGINE</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- App: Build & Test Analytics -->
+        <div class="window" id="analytics-win" style="display: none;">
+            <div class="window-header">
+                <div class="window-title">📈 <span>Build & Test Analytics</span></div>
+                <div class="window-controls">
+                    <div class="control-dot min" onclick="closeWindow('analytics-win')"></div>
+                    <div class="control-dot max"></div>
+                    <div class="control-dot close" onclick="closeWindow('analytics-win')"></div>
+                </div>
+            </div>
+            <div class="window-body">
+                <div class="analytics-stats-grid">
+                    <div class="settings-group analytics-stats-card">
+                        <span class="analytics-label">TOTAL BUILDS</span>
+                        <h2 class="analytics-value-cyan">412</h2>
+                    </div>
+                    <div class="settings-group analytics-stats-card">
+                        <span class="analytics-label">TEST PASS RATE</span>
+                        <h2 class="analytics-value-green">98.4%</h2>
+                    </div>
+                    <div class="settings-group analytics-stats-card">
+                        <span class="analytics-label">AVG BUILD TIME</span>
+                        <h2 class="analytics-value-orange">14.2s</h2>
+                    </div>
+                    <div class="settings-group analytics-stats-card">
+                        <span class="analytics-label">CODE COVERAGE</span>
+                        <h2 class="analytics-value-pink">92.1%</h2>
+                    </div>
+                </div>
+                <div class="analytics-sub-grid">
+                    <div class="settings-group window-card">
+                        <h4>Kernel Build Speed (Seconds)</h4>
+                        <div class="analytics-chart-viewport">
+                            <div class="analytics-chart-bar-wrap">
+                                <div class="analytics-chart-bar" style="height: 120px;"></div>
+                                <span class="chart-label">v11.0</span>
+                            </div>
+                            <div class="analytics-chart-bar-wrap">
+                                <div class="analytics-chart-bar" style="height: 100px;"></div>
+                                <span class="chart-label">v12.0</span>
+                            </div>
+                            <div class="analytics-chart-bar-wrap">
+                                <div class="analytics-chart-bar" style="height: 85px;"></div>
+                                <span class="chart-label">v13.0</span>
+                            </div>
+                            <div class="analytics-chart-bar-wrap">
+                                <div class="analytics-chart-bar" style="height: 70px;"></div>
+                                <span class="chart-label">v14.0</span>
+                            </div>
+                            <div class="analytics-chart-bar-wrap">
+                                <div class="analytics-chart-bar current" style="height: 45px;"></div>
+                                <span class="chart-label">v15.0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-group window-card">
+                        <h4>Test Suites Integration</h4>
+                        <div class="test-suites-form">
+                            <label class="test-suite-option">
+                                <input type="checkbox" class="test-suite-check" checked value="Memory Allocator">
+                                <span>Memory Allocator</span>
+                            </label>
+                            <label class="test-suite-option">
+                                <input type="checkbox" class="test-suite-check" checked value="Scheduler">
+                                <span>Multi-Core Scheduler</span>
+                            </label>
+                            <label class="test-suite-option">
+                                <input type="checkbox" class="test-suite-check" checked value="Security Sandboxing">
+                                <span>Security Sandboxing</span>
+                            </label>
+                            <label class="test-suite-option">
+                                <input type="checkbox" class="test-suite-check" checked value="Rust IPC Shard">
+                                <span>Rust IPC Shard</span>
+                            </label>
+                            <button class="wizard-btn run-suites-btn" onclick="runSelectedTests()">RUN SELECTED SUITES</button>
+                            <div id="test-run-result" class="test-result-console">Ready.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+           </div>
             </div>
         </div>
 
@@ -331,6 +514,9 @@
         <div class="dock-icon" data-tooltip="Pro Tools" onclick="launchApp('Utility Nexus')">🔧</div>
         <div class="dock-icon" data-tooltip="Marketplace" onclick="launchApp('Marketplace')">🛒</div>
         <div class="dock-icon" data-tooltip="Zenith Installer" onclick="launchApp('Markup Forge')">📥</div>
+        <div class="dock-icon" data-tooltip="Developer Portal" onclick="launchApp('Dev Portal')">📖</div>
+        <div class="dock-icon" data-tooltip="Kernel Emulator" onclick="launchApp('Emulator')">💿</div>
+        <div class="dock-icon" data-tooltip="Build Analytics" onclick="launchApp('Analytics')">📈</div>
         <div class="auto-style-74"></div>
         <div class="dock-icon" data-tooltip="Help Matrix" onclick="toggleHelp()">❓</div>
     </div>
@@ -367,8 +553,7 @@
     <!-- Legacy shard loader -->
     <script src="web_ui/scripts/kernel_loader.js"></script>
 
-    <!-- Core window orchestration -->
-    <script src="zenith_desktop.js"></script>
+    <!-- Core window orchestration -->
 
     <script>
         // Additional Pro-Tools handlers

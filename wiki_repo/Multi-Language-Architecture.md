@@ -9,7 +9,7 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 ## Language Assignment
 
 | Language | Role in SigmaOS | OOP Mechanism |
-|----------|----------------|---------------|
+| ---------- | ---------------- | --------------- |
 | **Rust** | Kernel core, IPC, AI scheduler, PQC stubs, agent orchestration, containers | Structs + Traits (`impl`) |
 | **Zig** | Bootloader, x86_64 HAL, paging, PS/2 input, framebuffer, audio drivers | Structs + methods, `comptime`, tagged unions |
 | **Nim** | Config engine, generation manager, CLI, package manager | Objects + methods + generics |
@@ -22,7 +22,7 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 ### Rust (`no_std`, `no_builtins`)
 
 | File | Replaces |
-|------|----------|
+| ------ | ---------- |
 | `klib/ai_scheduler.rs` | `core/ai_scheduler/ai_sched.cpp` |
 | `klib/pqc.rs` | `crypto/SovereignKyber.cpp`, `SovereignDilithium5.cpp` |
 | `init/watchdog.rs` | Self-healing watchdog |
@@ -44,7 +44,7 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 ### Zig (bare-metal, no stdlib)
 
 | File | Replaces |
-|------|----------|
+| ------ | ---------- |
 | `arch/x86_64/paging.zig` | `arch/x86_64/paging.c` |
 | `hal/x86/hal_io.zig` | `hal/x86/` C HAL files |
 | `drivers/input/ps2.zig` | `sigma_keyboard.cpp`, `sigma_mouse.cpp`, `sigma_ps2.cpp` |
@@ -60,7 +60,7 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 ### Nim (compiles to native, no stdlib/libc)
 
 | File | Replaces |
-|------|----------|
+| ------ | ---------- |
 | `config/core/declarative_engine.nim` | `config/core/DeclarativeEngine.cpp` |
 | `config/core/generation_manager.nim` | `config/core/GenerationManager.cpp` |
 | `config/cli_main.nim` | `config/cli_main.cpp` |
@@ -73,7 +73,7 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 ### Ada/SPARK (formally verified, no runtime exceptions)
 
 | File | Replaces |
-|------|----------|
+| ------ | ---------- |
 | `crypto/kyber.ads` + `kyber.adb` | `crypto/SovereignKyber.cpp` |
 | `crypto/dilithium.ads` + `dilithium.adb` | `crypto/SovereignDilithium5.cpp` |
 | `drivers/block/ahci.ads` + `ahci.adb` | `drivers/block/ahci_shard.cpp` |
@@ -92,7 +92,7 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 pub trait SigmaObject { fn initialize(&mut self) -> i32; }
 pub struct AgentOrchestrator { agents: [Option<Agent>; 64], count: usize }
 impl AgentOrchestrator { pub fn register(&mut self, id: usize, priority: u8) -> bool { ... } }
-```
+```text
 
 ### Zig
 ```zig
@@ -101,7 +101,7 @@ pub const Framebuffer = struct {
     base: usize, width: u32, height: u32,
     pub fn put_pixel(self: *const Framebuffer, x: u32, y: u32, color: Color) void { ... }
 };
-```
+```text
 
 ### Nim
 ```nim
@@ -109,7 +109,7 @@ pub const Framebuffer = struct {
 type GenerationManager* = object
   generations*: seq[GenerationInfo]
 proc createGeneration*(mgr: var GenerationManager; label: string): int = ...
-```
+```text
 
 ### Ada/SPARK
 ```ada
@@ -118,7 +118,7 @@ type AHCI_Port is tagged record
    State : Port_State := Idle;
 end record;
 procedure Read_Sector (Port: in out AHCI_Port; ...) with Pre => Port.State = Idle;
-```
+```text
 
 ---
 
@@ -131,7 +131,7 @@ The CI/CD pipeline (`sigma_ci.yml`) builds all four language families:
 - Zig:      zig build-lib --target x86_64-freestanding-none
 - Nim:      nim c --noMain --noLinking --cpu:amd64
 - Ada/SPARK: gprbuild -P sigmaos.gpr
-```
+```text
 
 ---
 

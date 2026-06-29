@@ -9,4 +9,4 @@ Isolate drivers into loadable modules.
 // Abstract interface for core/drivers
 void init_core_drivers();
 
-```
+```text

@@ -193,4 +193,4 @@ in this case opts will be
   path: '/bank-transfer'
 }
 
-```
+```text

@@ -1,8 +1,8 @@
 # Sovereign Multi-Layer Computing Parity Matrix
 
-> **Specification Version:** 15.2-FINAL  
-> **Classification:** Full-Stack Integrated Sovereign Infrastructure Blueprint  
-> **Target OS Parity:** Apple Vision Pro, Linux Enterprise, ChromeOS, macOS, cloud-native bare metal  
+> **Specification Version:** 15.2-FINAL
+> **Classification:** Full-Stack Integrated Sovereign Infrastructure Blueprint
+> **Target OS Parity:** Apple Vision Pro, Linux Enterprise, ChromeOS, macOS, cloud-native bare metal
 
 ---
 
@@ -48,13 +48,13 @@ To establish absolute technological sovereignty, the **SigmaOS Zenith Sovereign 
 
 ## 3. Mathematical Formula Convergence
 
-| Algorithm / Concept | Mathematical Equation | SigmaOS Implementation Shard | Complexity Bounds |
-| :--- | :--- | :--- | :--- |
-| **Banker's Safety** | $\text{Need}[i][j] = \text{Max}[i][j] - \text{Allocation}[i][j]$ | `SovereignOSKernel::IsSafeState` | $O(P \cdot R)$ |
-| **B-Tree Search** | $T(n) = T(n/2) + O(1)$ | `SovereignOLAPEngine::BTreeQueryIndex` | $O(\log N)$ |
-| **PCA Decomposition** | $X^T X v = \lambda v$ | `SovereignDataPipeline::PerformPCADecomposition` | $O(I \cdot D^2)$ |
-| **Logistic Inference** | $P(y = 1 \mid x) = (1 + e^{-z})^{-1}$ | `SovereignAIMLEngine::PredictLogisticProbability`| $O(\text{Taylor Steps})$ |
-| **BFS State Space** | $V + E$ | `SovereignDiscreteMathEngine::ExecuteBFSTraversal`| $O(V + E)$ |
+| Algorithm / Concept | Mathematical Equation | SigmaOS Implementation Shard | Complexity Bounds | 
+| :--- | :--- | :--- | :--- | 
+| **Banker's Safety** | $\text{Need}[i][j] = \text{Max}[i][j] - \text{Allocation}[i][j]$ | `SovereignOSKernel::IsSafeState` | $O(P \cdot R)$ | 
+| **B-Tree Search** | $T(n) = T(n/2) + O(1)$ | `SovereignOLAPEngine::BTreeQueryIndex` | $O(\log N)$ | 
+| **PCA Decomposition** | $X^T X v = \lambda v$ | `SovereignDataPipeline::PerformPCADecomposition` | $O(I \cdot D^2)$ | 
+| **Logistic Inference** | $P(y = 1 \mid x) = (1 + e^{-z})^{-1}$ | `SovereignAIMLEngine::PredictLogisticProbability` | $O(\text{Taylor Steps})$ | 
+| **BFS State Space** | $V + E$ | `SovereignDiscreteMathEngine::ExecuteBFSTraversal` | $O(V + E)$ | 
 
 ---
 
@@ -73,12 +73,12 @@ public:
     const char* type_name() const noexcept override { return "SovereignOSKernel"; }
 
     // Enforces absolute deadlock avoidance in microkernel memory managers
-    sigma_bool IsSafeState(const sigma_u32 available[3], 
-                           const sigma_u32 max[4][3], 
+    sigma_bool IsSafeState(const sigma_u32 available[3],
+                           const sigma_u32 max[4][3],
                            const sigma_u32 allocation[4][3]) const {
         sigma_u32 work[3];
         for (int i = 0; i < 3; i++) work[i] = available[i];
-        
+
         sigma_bool finish[4] = {SIGMA_FALSE, SIGMA_FALSE, SIGMA_FALSE, SIGMA_FALSE};
         sigma_u32 need[4][3];
         // ... evaluates process requirement matrices securely ...
@@ -92,5 +92,5 @@ public:
 ```
 
 ---
-> **Verification Status:** ALL CLEAR | WIKI PARITY ACHIEVED  
+> **Verification Status:** ALL CLEAR | WIKI PARITY ACHIEVED
 > *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

@@ -87,26 +87,26 @@ Array of capability strings the app requires. The user is shown a permission pro
 
 #### Full capability reference
 
-| Capability string | What it grants |
-|---|---|
-| `process:spawn` | Call `navigator.sigmaos.process.spawn()` |
-| `fs:<absolute-path>` | Read and write access to the given path (recursive) |
-| `fs:<absolute-path>:ro` | Read-only access to the given path |
-| `bin:<name>` | Execute a specific binary by name inside a sandbox |
-| `bin:~/.sigmaos/bin/<name>` | Execute a zero-install binary from the user home |
-| `net:none` | Declare no network access (enforced with `--unshare-net`) |
-| `net:host` | Full outbound network access |
-| `net:<host>:<port>` | Access to a specific host:port only |
-| `hw:camera` | Access to `/dev/video*` camera devices |
-| `hw:audio` | Access to ALSA/PulseAudio sockets |
-| `hw:usb` | Access to USB device nodes |
-| `clipboard:read` | Read the shared clipboard |
-| `clipboard:write` | Write to the shared clipboard |
-| `ai:complete` | Call `navigator.sigmaos.ai.complete()` |
-| `ai:predict` | Call `navigator.sigmaos.ai.predict()` |
-| `pkg:install` | Call `navigator.sigmaos.pkg.ensure()` |
-| `window:create` | Call `navigator.sigmaos.window.create()` |
-| `notification:show` | Call `navigator.sigmaos.notification.show()` |
+| Capability string | What it grants | 
+| --- | --- | 
+| `process:spawn` | Call `navigator.sigmaos.process.spawn()` | 
+| `fs:<absolute-path>` | Read and write access to the given path (recursive) | 
+| `fs:<absolute-path>:ro` | Read-only access to the given path | 
+| `bin:<name>` | Execute a specific binary by name inside a sandbox | 
+| `bin:~/.sigmaos/bin/<name>` | Execute a zero-install binary from the user home | 
+| `net:none` | Declare no network access (enforced with `--unshare-net`) | 
+| `net:host` | Full outbound network access | 
+| `net:<host>:<port>` | Access to a specific host:port only | 
+| `hw:camera` | Access to `/dev/video*` camera devices | 
+| `hw:audio` | Access to ALSA/PulseAudio sockets | 
+| `hw:usb` | Access to USB device nodes | 
+| `clipboard:read` | Read the shared clipboard | 
+| `clipboard:write` | Write to the shared clipboard | 
+| `ai:complete` | Call `navigator.sigmaos.ai.complete()` | 
+| `ai:predict` | Call `navigator.sigmaos.ai.predict()` | 
+| `pkg:install` | Call `navigator.sigmaos.pkg.ensure()` | 
+| `window:create` | Call `navigator.sigmaos.window.create()` | 
+| `notification:show` | Call `navigator.sigmaos.notification.show()` | 
 
 ---
 

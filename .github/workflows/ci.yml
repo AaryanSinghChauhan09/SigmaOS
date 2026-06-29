@@ -108,7 +108,8 @@ jobs:
           SOURCE_DATE_EPOCH: ${{ github.event.repository.pushed_at }}
 
       - name: CMake build
-        run: ninja -C build -j$(nproc) || echo "WARN: CMake build skipped (missing sources)"
+        run: |
+          ninja -C build -j$(nproc) || echo "WARN: CMake build skipped (missing sources)"
 
       - name: Verify build output exists
         run: |

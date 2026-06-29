@@ -38,19 +38,19 @@ When you launch a GUI application on Zenith:
 
 ```
 +-------------------------------------------------------------+
-|                     Zenith Compositor                       |
+|                     Zenith Compositor                       | 
 +------------------------------+------------------------------+
                                | verified container memory access
                                v
 +------------------------------+------------------------------+
-|                    Zenith Sandbox Bridge                     |
+|                    Zenith Sandbox Bridge                     | 
 +------------------------------+------------------------------+
                                | IPC Shard Request
                                v
 +------------------------------+------------------------------+
-|                     Sovereign Orchestrator                  |
+|                     Sovereign Orchestrator                  | 
 +--------------+------------------------------+---------------+
-               |                              |
+               |                              | 
                v                              v
       [App Container Shard #1]       [App Container Shard #2]
 ```

@@ -83,13 +83,13 @@ namespace Sigma::Charset {
 
 **Syllabus:**5 generations (vacuum tubes → AI chips), characteristics of each.**SigmaOS Context:**SigmaOS is designed for the**5th Generation** — AI-native, silicon-direct, post-quantum secure.
 
-| Generation | Technology | SigmaOS Parallel |
-| --- | --- | --- |
-| 1st | Vacuum Tubes (1940s) | — |
-| 2nd | Transistors (1950s) | — |
-| 3rd | ICs (1960s) | — |
-| 4th | VLSI Microprocessors (1970s-present) | x86/ARM HAL support |
-| 5th | AI/Quantum (2020s+) | **SigmaOS Zenith** — AI-native kernel |
+| Generation | Technology | SigmaOS Parallel | 
+| --- | --- | --- | 
+| 1st | Vacuum Tubes (1940s) | — | 
+| 2nd | Transistors (1950s) | — | 
+| 3rd | ICs (1960s) | — | 
+| 4th | VLSI Microprocessors (1970s-present) | x86/ARM HAL support | 
+| 5th | AI/Quantum (2020s+) | **SigmaOS Zenith** — AI-native kernel | 
 
 ---
 
@@ -99,14 +99,14 @@ namespace Sigma::Charset {
 
 ### SigmaOS Mapping
 
-| Component | SigmaOS Module |
-| --- | --- |
-| CPU (ALU + CU) | `SovereignScheduler` + HAL ALU |
-| Primary Memory | `SovereignAllocator` (RAM manager) |
-| Secondary Storage | `SovereignZFSPool` (S-ZFS) |
-| Input Devices | HAL input drivers (`/drivers/input/`) |
-| Output Devices | HAL output drivers (`/drivers/output/`) |
-| System Bus | IPC message bus (`SovereignIPC`) |
+| Component | SigmaOS Module | 
+| --- | --- | 
+| CPU (ALU + CU) | `SovereignScheduler` + HAL ALU | 
+| Primary Memory | `SovereignAllocator` (RAM manager) | 
+| Secondary Storage | `SovereignZFSPool` (S-ZFS) | 
+| Input Devices | HAL input drivers (`/drivers/input/`) | 
+| Output Devices | HAL output drivers (`/drivers/output/`) | 
+| System Bus | IPC message bus (`SovereignIPC`) | 
 
 ---
 
@@ -167,14 +167,14 @@ HALDevice input_devices[] = {
 
 ### 💾 Types of Memory
 
-| Type | Description | SigmaOS Mapping |
-| --- | --- | --- |
-| **RAM** | Volatile, fast, primary | `SovereignAllocator` — heap/stack manager |
-| **ROM** | Non-volatile, firmware | Boot ROM mapped at `0x0000_0000` |
-| **PROM** | Programmable ROM | Secure boot key storage in TPM |
-| **EPROM** | Erasable PROM (UV) | Legacy BIOS compatibility layer |
-| **EEPROM** | Electrically erasable | UEFI variable storage, NVram |
-| **Cache** | L1/L2/L3 CPU cache | `SovereignCacheStore` prefetch hints |
+| Type | Description | SigmaOS Mapping | 
+| --- | --- | --- | 
+| **RAM** | Volatile, fast, primary | `SovereignAllocator` — heap/stack manager | 
+| **ROM** | Non-volatile, firmware | Boot ROM mapped at `0x0000_0000` | 
+| **PROM** | Programmable ROM | Secure boot key storage in TPM | 
+| **EPROM** | Erasable PROM (UV) | Legacy BIOS compatibility layer | 
+| **EEPROM** | Electrically erasable | UEFI variable storage, NVram | 
+| **Cache** | L1/L2/L3 CPU cache | `SovereignCacheStore` prefetch hints | 
 
 ```cpp
 // kernel/core/SovereignAllocator.cpp
@@ -196,13 +196,13 @@ namespace Sigma::Memory {
 
 ### 💿 Storage Devices
 
-| Device | Capacity | Speed | SigmaOS Driver |
-| --- | --- | --- | --- |
-| Hard Disk (HDD) | TB range | ~150 MB/s | `SovereignATA.cpp` |
-| SSD (NVMe) | TB range | ~7 GB/s | `SovereignNVMe.cpp` |
-| Flash Drive (USB) | GB range | ~400 MB/s | `SovereignUSBMass.cpp` |
-| Optical Disk (CD/DVD/BD) | 700MB–50GB | ~72 MB/s | `SovereignOptical.cpp` |
-| Cloud Storage | Unlimited | Network-speed | `SovereignCloudFS.cpp` |
+| Device | Capacity | Speed | SigmaOS Driver | 
+| --- | --- | --- | --- | 
+| Hard Disk (HDD) | TB range | ~150 MB/s | `SovereignATA.cpp` | 
+| SSD (NVMe) | TB range | ~7 GB/s | `SovereignNVMe.cpp` | 
+| Flash Drive (USB) | GB range | ~400 MB/s | `SovereignUSBMass.cpp` | 
+| Optical Disk (CD/DVD/BD) | 700MB–50GB | ~72 MB/s | `SovereignOptical.cpp` | 
+| Cloud Storage | Unlimited | Network-speed | `SovereignCloudFS.cpp` | 
 
 ### S-ZFS Unified Storage API
 
@@ -240,14 +240,14 @@ public:
 
 ### ⚙️ Processor Types
 
-| Type | Use Case | SigmaOS Scheduler |
-| --- | --- | --- |
-| CISC (x86-64) | Desktop/Server | Full support, native compilation |
-| RISC (ARM64) | Mobile/Embedded | ARM64 HAL, energy-efficient scheduling |
-| RISC-V | Open Hardware | Community HAL port |
-| GPU (CUDA/OpenCL) | Parallel/AI | `SigmaGPUScheduler` for AI workloads |
-| NPU (AI Chips) | Neural inference | `SigmaAI::NPURuntime` |
-| DSP | Signal processing | `SigmaDSP` audio/signal stack |
+| Type | Use Case | SigmaOS Scheduler | 
+| --- | --- | --- | 
+| CISC (x86-64) | Desktop/Server | Full support, native compilation | 
+| RISC (ARM64) | Mobile/Embedded | ARM64 HAL, energy-efficient scheduling | 
+| RISC-V | Open Hardware | Community HAL port | 
+| GPU (CUDA/OpenCL) | Parallel/AI | `SigmaGPUScheduler` for AI workloads | 
+| NPU (AI Chips) | Neural inference | `SigmaAI::NPURuntime` | 
+| DSP | Signal processing | `SigmaDSP` audio/signal stack | 
 
 ```cpp
 // kernel/core/SovereignScheduler.cpp
@@ -302,14 +302,14 @@ public:
 
 **SigmaOS Implementation:** `SentinelNeural` — real-time integrity checker.
 
-| Protection Layer | Mechanism |
-| --- | --- |
-| Boot Integrity | PQC-signed bootloader (CRYSTALS-Dilithium) |
-| Kernel Integrity | Merkle-tree hash of all kernel modules |
-| Process Isolation | Mandatory Access Control (MAC) sandboxing |
-| File Integrity | Per-file BLAKE3 checksums in S-ZFS |
-| Network | Stateful packet firewall + DPI |
-| Behavior Analysis | `SentinelNeural` ML-based anomaly detection |
+| Protection Layer | Mechanism | 
+| --- | --- | 
+| Boot Integrity | PQC-signed bootloader (CRYSTALS-Dilithium) | 
+| Kernel Integrity | Merkle-tree hash of all kernel modules | 
+| Process Isolation | Mandatory Access Control (MAC) sandboxing | 
+| File Integrity | Per-file BLAKE3 checksums in S-ZFS | 
+| Network | Stateful packet firewall + DPI | 
+| Behavior Analysis | `SentinelNeural` ML-based anomaly detection | 
 
 ```cpp
 // kernel/security/SentinelNeural.cpp
@@ -330,13 +330,13 @@ public:
 
 ### 📄 SigmaDocs (MS Word Equivalent)
 
-| Word Feature | SigmaDocs Equivalent |
-| --- | --- |
-| Text Formatting | Rich text engine (RTF/DOCX/ODF) |
-| Tables | Native table renderer |
-| Mail Merge | Template engine with SigmaDB data source |
-| Track Changes | Git-based document versioning |
-| Styles & Themes | CSS-like style sheets |
+| Word Feature | SigmaDocs Equivalent | 
+| --- | --- | 
+| Text Formatting | Rich text engine (RTF/DOCX/ODF) | 
+| Tables | Native table renderer | 
+| Mail Merge | Template engine with SigmaDB data source | 
+| Track Changes | Git-based document versioning | 
+| Styles & Themes | CSS-like style sheets | 
 
 **File:** `userland/apps/SigmaDocs/`
 
@@ -344,14 +344,14 @@ public:
 
 ### 📊 SigmaSheets (MS Excel Equivalent)
 
-| Excel Feature | SigmaSheets Equivalent |
-| --- | --- |
-| Data Sorting | Multi-column sort engine |
-| Filtering | AutoFilter with regex support |
-| Pivot Tables | `SigmaSheets::PivotEngine` |
-| Formulas | Full formula parser (500+ functions) |
-| Charts | `SigmaViz` chart renderer |
-| Macros | SigmaPy scripting integration |
+| Excel Feature | SigmaSheets Equivalent | 
+| --- | --- | 
+| Data Sorting | Multi-column sort engine | 
+| Filtering | AutoFilter with regex support | 
+| Pivot Tables | `SigmaSheets::PivotEngine` | 
+| Formulas | Full formula parser (500+ functions) | 
+| Charts | `SigmaViz` chart renderer | 
+| Macros | SigmaPy scripting integration | 
 
 **File:** `userland/apps/SigmaSheets/`
 
@@ -359,13 +359,13 @@ public:
 
 ### 🎞️ SigmaSlides (MS PowerPoint Equivalent)
 
-| PowerPoint Feature | SigmaSlides Equivalent |
-| --- | --- |
-| Slides | Vector-based slide canvas |
-| Animations | CSS/WebGL transition engine |
-| Multimedia | Native video/audio embedding |
-| Themes | SVG-based theme system |
-| Presenter Mode | Dual-display manager |
+| PowerPoint Feature | SigmaSlides Equivalent | 
+| --- | --- | 
+| Slides | Vector-based slide canvas | 
+| Animations | CSS/WebGL transition engine | 
+| Multimedia | Native video/audio embedding | 
+| Themes | SVG-based theme system | 
+| Presenter Mode | Dual-display manager | 
 
 **File:** `userland/apps/SigmaSlides/`
 
@@ -373,13 +373,13 @@ public:
 
 ### 🗄️ SigmaDB GUI (MS Access Equivalent)
 
-| Access Feature | SigmaDB Equivalent |
-| --- | --- |
-| Table Designer | Visual schema editor |
-| Query Builder | SQL visual query builder |
-| Forms | Data entry form generator |
-| Reports | PDF/HTML report engine |
-| Relationships | ER diagram viewer |
+| Access Feature | SigmaDB Equivalent | 
+| --- | --- | 
+| Table Designer | Visual schema editor | 
+| Query Builder | SQL visual query builder | 
+| Forms | Data entry form generator | 
+| Reports | PDF/HTML report engine | 
+| Relationships | ER diagram viewer | 
 
 **File:** `userland/apps/SigmaDB/`
 

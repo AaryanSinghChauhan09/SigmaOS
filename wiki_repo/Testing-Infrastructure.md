@@ -33,14 +33,14 @@ cd build && ctest --output-on-failure
 ./build/test_sigma_net
 ```
 
-| Test file | What it covers |
-|---|---|
-| `test_sigma_sched.cpp` | MLFQ scheduler: level demotion, priority boost, anti-starvation |
-| `test_sigma_net.cpp` | TLS 1.3, DNS/DoH, DHCP, WPA3/SAE — 22 tests |
-| `test_sigma_ipc.cpp` | sigma-bus message delivery, capability gating |
-| `test_sigma_fs.cpp` | SemanticFS xattrs, CryptFS key derivation |
-| `test_sigma_gst.cpp` | GST calculation correctness (Indian tax law) |
-| `test_sigma_pkg.cpp` | Package hash verification, manifest validation |
+| Test file | What it covers | 
+| --- | --- | 
+| `test_sigma_sched.cpp` | MLFQ scheduler: level demotion, priority boost, anti-starvation | 
+| `test_sigma_net.cpp` | TLS 1.3, DNS/DoH, DHCP, WPA3/SAE — 22 tests | 
+| `test_sigma_ipc.cpp` | sigma-bus message delivery, capability gating | 
+| `test_sigma_fs.cpp` | SemanticFS xattrs, CryptFS key derivation | 
+| `test_sigma_gst.cpp` | GST calculation correctness (Indian tax law) | 
+| `test_sigma_pkg.cpp` | Package hash verification, manifest validation | 
 
 ---
 
@@ -64,11 +64,11 @@ clang++ -fsanitize=fuzzer,address -std=c++17 -Iinclude \
 ./fuzz_pkg -max_total_time=30 corpus/pkg/
 ```
 
-| Fuzzer | Attack surface |
-|---|---|
-| `fuzz_sigma_tcp.cpp` | TCP packet injection, option parsing, conntrack hash collisions |
-| `fuzz_sigma_pkg.cpp` | Package header parse, manifest JSON, path traversal, signature verify |
-| `fuzz_sigma_fs.cpp` | Malformed filesystem images, SigmaFS metadata |
+| Fuzzer | Attack surface | 
+| --- | --- | 
+| `fuzz_sigma_tcp.cpp` | TCP packet injection, option parsing, conntrack hash collisions | 
+| `fuzz_sigma_pkg.cpp` | Package header parse, manifest JSON, path traversal, signature verify | 
+| `fuzz_sigma_fs.cpp` | Malformed filesystem images, SigmaFS metadata | 
 
 **What fuzzing finds**: buffer overflows, integer overflows, use-after-free, infinite loops in parsers, NULL dereferences on malformed input.
 
@@ -154,7 +154,7 @@ fuzz-tests:
     matrix:
       target: [fuzz_sigma_tcp, fuzz_sigma_pkg]
   steps:
-    - run: |
+    - run: | 
         clang++ -fsanitize=fuzzer,address -Iinclude \
           tests/fuzz/${{ matrix.target }}.cpp -o ${{ matrix.target }}
         ./${{ matrix.target }} -max_total_time=30
@@ -182,14 +182,14 @@ Current regression tests cover:
 
 ## Tools Reference
 
-| Tool | Purpose | Install |
-|---|---|---|
-| libFuzzer | Coverage-guided fuzzing | `clang -fsanitize=fuzzer` |
-| AddressSanitizer | Detects memory bugs | `-fsanitize=address` |
-| KASAN | Kernel address sanitizer | Build flag `SIGMA_KASAN=1` |
-| Google Test | C++ unit test framework | `apt install libgtest-dev` |
-| QEMU | VM for integration tests | `apt install qemu-system-x86` |
-| pytest | Python test runner | `pip install pytest` |
+| Tool | Purpose | Install | 
+| --- | --- | --- | 
+| libFuzzer | Coverage-guided fuzzing | `clang -fsanitize=fuzzer` | 
+| AddressSanitizer | Detects memory bugs | `-fsanitize=address` | 
+| KASAN | Kernel address sanitizer | Build flag `SIGMA_KASAN=1` | 
+| Google Test | C++ unit test framework | `apt install libgtest-dev` | 
+| QEMU | VM for integration tests | `apt install qemu-system-x86` | 
+| pytest | Python test runner | `pip install pytest` | 
 
 ---
 

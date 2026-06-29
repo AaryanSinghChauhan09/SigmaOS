@@ -13,12 +13,12 @@ Linux ELF Binary
 ```
 
 ## What It Covers
-| POSIX Syscall | Sovereign Translation |
-|---|---|
-| `open()` | `sigma_vfs_open()` |
-| `read()` / `write()` | `sigma_io_*()` |
-| `fork()` | `sigma_spawn_shard()` |
-| `pthread_*` | Sovereign task primitives |
+| POSIX Syscall | Sovereign Translation | 
+| --- | --- | 
+| `open()` | `sigma_vfs_open()` | 
+| `read()` / `write()` | `sigma_io_*()` | 
+| `fork()` | `sigma_spawn_shard()` | 
+| `pthread_*` | Sovereign task primitives | 
 
 ## What It Does NOT Cover
 - `ioctl()` calls that touch hardware directly (forbidden by capability model)

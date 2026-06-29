@@ -2,11 +2,7 @@
 # This script pushes the latest Phase 17 changes to your GitHub repository
 # and updates the associated GitHub Wiki.
 
-$repo_url = Read-Host "Enter your GitHub repository URL (e.g. https://github.com/username/SigmaOS.git)"
-if ([string]::IsNullOrWhiteSpace($repo_url)) {
-    Write-Host "Error: Repository URL cannot be empty." -ForegroundColor Red
-    exit 1
-}
+$repo_url = "https://github.com/AaryanSinghChauhan09/SigmaOS.git"
 
 # 1. Push main codebase
 Write-Host "Pushing codebase to $repo_url..." -ForegroundColor Cyan

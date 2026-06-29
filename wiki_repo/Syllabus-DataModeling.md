@@ -33,14 +33,14 @@ Requirements → Conceptual Model (ER) → Logical Model (Relational / OO)
 
 ### Normalization in SigmaModeler
 
-| Normal Form | Rule | SigmaModeler Check |
-| :--- | :--- | :--- |
-| **1NF** | Atomic scalar values, no repeating groups | ✅ Auto-detected |
-| **2NF** | No partial dependencies (full PK functional deps) | ✅ Enforced |
-| **3NF** | No transitive functional dependencies | ✅ Enforced |
-| **BCNF** | Every non-trivial determinant is a candidate key | ✅ Enforced |
-| **4NF** | No multi-valued dependencies | ✅ Warning |
-| **5NF** | No join dependencies | ⚠️ Manual review |
+| Normal Form | Rule | SigmaModeler Check | 
+| :--- | :--- | :--- | 
+| **1NF** | Atomic scalar values, no repeating groups | ✅ Auto-detected | 
+| **2NF** | No partial dependencies (full PK functional deps) | ✅ Enforced | 
+| **3NF** | No transitive functional dependencies | ✅ Enforced | 
+| **BCNF** | Every non-trivial determinant is a candidate key | ✅ Enforced | 
+| **4NF** | No multi-valued dependencies | ✅ Warning | 
+| **5NF** | No join dependencies | ⚠️ Manual review | 
 
 ---
 
@@ -48,14 +48,14 @@ Requirements → Conceptual Model (ER) → Logical Model (Relational / OO)
 
 ### Data Model Types
 
-| Type | Structure | SigmaOS Use |
-| :--- | :--- | :--- |
-| **Hierarchical** | Tree (parent-child) | File system tree, org charts |
-| **Network** | Graph (many-to-many) | Process dependency graph |
-| **Relational** | Tables + Foreign Keys | SigmaDB primary model |
-| **Object-Oriented** | Classes + Inheritance | SigmaDB JSON/BLOB types |
-| **Dimensional** | Fact + Dimension tables | SigmaWarehouse (star schema) |
-| **NoSQL** | Document / Key-Value / Graph | SigmaDB JSON storage mode |
+| Type | Structure | SigmaOS Use | 
+| :--- | :--- | :--- | 
+| **Hierarchical** | Tree (parent-child) | File system tree, org charts | 
+| **Network** | Graph (many-to-many) | Process dependency graph | 
+| **Relational** | Tables + Foreign Keys | SigmaDB primary model | 
+| **Object-Oriented** | Classes + Inheritance | SigmaDB JSON/BLOB types | 
+| **Dimensional** | Fact + Dimension tables | SigmaWarehouse (star schema) | 
+| **NoSQL** | Document / Key-Value / Graph | SigmaDB JSON storage mode | 
 
 ### Entity-Relationship Diagram (ERD)
 

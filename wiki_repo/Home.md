@@ -22,13 +22,13 @@ Traditional OS:                    SigmaOS:
 
 ## Why SigmaOS Exists — The Problem It Solves
 
-| Problem with Today's OSes | SigmaOS Answer |
-|---|---|
-| Web apps are second-class citizens — no access to real system primitives | `navigator.sigmaos.*` exposes `spawn`, `pipe`, `mmap`, `/dev` to any PWA |
-| Browsers are slow, memory-heavy, add 10+ sec to boot | SigmaOS boots *to* Chromium in under 3 sec — no desktop stack loading first |
-| Every app can see everything — no per-app filesystem restriction | `sigma_pledge` + `sigma_unveil` lock each process to exactly what it declared |
-| Crypto is bolt-on, hard to use correctly | Post-quantum (Kyber-1024 + Dilithium3) baked into TLS, package signing, and attestation |
-| Same OS image for laptops, servers, IoT — bloated everywhere | 8 purpose-built profiles from one shared kernel codebase |
+| Problem with Today's OSes | SigmaOS Answer | 
+| --- | --- | 
+| Web apps are second-class citizens — no access to real system primitives | `navigator.sigmaos.*` exposes `spawn`, `pipe`, `mmap`, `/dev` to any PWA | 
+| Browsers are slow, memory-heavy, add 10+ sec to boot | SigmaOS boots *to* Chromium in under 3 sec — no desktop stack loading first | 
+| Every app can see everything — no per-app filesystem restriction | `sigma_pledge` + `sigma_unveil` lock each process to exactly what it declared | 
+| Crypto is bolt-on, hard to use correctly | Post-quantum (Kyber-1024 + Dilithium3) baked into TLS, package signing, and attestation | 
+| Same OS image for laptops, servers, IoT — bloated everywhere | 8 purpose-built profiles from one shared kernel codebase | 
 
 ---
 
@@ -59,16 +59,16 @@ Full diagram → [Architecture Overview](Architecture-Overview)
 
 SigmaOS ships as **8 purpose-built profiles** compiled from a single shared codebase. Each activates different kernel features and daemon sets via CMake feature flags.
 
-| Profile | Branch | Best For | What's Different |
-|---|---|---|---|
-| **Standalone** | `release/standalone` | Developer laptops | Full Zenith DE, sigma IDE, one-command installer |
-| **Browser** | `release/browser` | Consumer / thin clients | `navigator.sigmaos.*` API, zero-install packages |
-| **Microkernel** | `release/microkernel` | Servers, research, hypervisors | No GUI overhead, minimal ring-0 binary |
-| **Mobile** | `release/mobile` | ARM64 / RISC-V tablets | Adaptive P/C-state scheduling, touch UI |
-| **RTOS** | `release/rtos` | Industrial control, robotics | `SCHED_SOVEREIGN` hard real-time EDF class |
-| **Dual-Boot** | `release/dual-boot` | Users keeping Windows/Linux | Multiboot2, GRUB chain-load, NTFS read driver |
-| **Cloud** | `release/cloud` | AWS / Azure / GCP VMs | Immutable root, A/B partition rollback, no GUI |
-| **Distributed** | `release/distributed` | Multi-node clusters | ZeroNet mesh, CRDT sync, container orchestration |
+| Profile | Branch | Best For | What's Different | 
+| --- | --- | --- | --- | 
+| **Standalone** | `release/standalone` | Developer laptops | Full Zenith DE, sigma IDE, one-command installer | 
+| **Browser** | `release/browser` | Consumer / thin clients | `navigator.sigmaos.*` API, zero-install packages | 
+| **Microkernel** | `release/microkernel` | Servers, research, hypervisors | No GUI overhead, minimal ring-0 binary | 
+| **Mobile** | `release/mobile` | ARM64 / RISC-V tablets | Adaptive P/C-state scheduling, touch UI | 
+| **RTOS** | `release/rtos` | Industrial control, robotics | `SCHED_SOVEREIGN` hard real-time EDF class | 
+| **Dual-Boot** | `release/dual-boot` | Users keeping Windows/Linux | Multiboot2, GRUB chain-load, NTFS read driver | 
+| **Cloud** | `release/cloud` | AWS / Azure / GCP VMs | Immutable root, A/B partition rollback, no GUI | 
+| **Distributed** | `release/distributed` | Multi-node clusters | ZeroNet mesh, CRDT sync, container orchestration | 
 
 → [Branch Guide](Branch-Guide) for detailed per-profile feature lists
 
@@ -92,24 +92,24 @@ NIST standardised Kyber-1024 (FIPS 203) and Dilithium3 (FIPS 204) in 2024. Harve
 
 ## Feature Matrix (by profile)
 
-| Feature | main | standalone | browser | rtos | cloud | distributed |
-|---|---|---|---|---|---|---|
-| MLFQ Scheduler | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| SCHED_SOVEREIGN (RT EDF) | ~ | ~ | — | ✓ | — | — |
-| 4-level paging + ASLR | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| W^X enforcement | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| pledge / unveil | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Namespace isolation (bwrap) | ✓ | ✓ | ✓ | — | ✓ | ✓ |
-| Zenith Desktop | ~ | ✓ | ✓ | — | ~ | — |
-| navigator.sigmaos API | ✓ | ✓ | ✓ | — | ~ | ~ |
-| TLS 1.3 + Kyber-1024 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| DNS-over-HTTPS + DNSSEC | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| WPA3/SAE WiFi | ✓ | ✓ | ✓ | ✓ | — | — |
-| Immutable root (A/B) | — | — | — | — | ✓ | ✓ |
-| OSTree atomic updates | — | ✓ | ✓ | — | ✓ | ✓ |
-| Container orchestration | ~ | ✓ | ✓ | — | ✓ | ✓ |
-| Distributed VFS / CRDT | — | — | — | — | ~ | ✓ |
-| AI scheduler (TinyLlama) | ✓ | ✓ | ✓ | — | ✓ | ✓ |
+| Feature | main | standalone | browser | rtos | cloud | distributed | 
+| --- | --- | --- | --- | --- | --- | --- | 
+| MLFQ Scheduler | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | 
+| SCHED_SOVEREIGN (RT EDF) | ~ | ~ | — | ✓ | — | — | 
+| 4-level paging + ASLR | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | 
+| W^X enforcement | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | 
+| pledge / unveil | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | 
+| Namespace isolation (bwrap) | ✓ | ✓ | ✓ | — | ✓ | ✓ | 
+| Zenith Desktop | ~ | ✓ | ✓ | — | ~ | — | 
+| navigator.sigmaos API | ✓ | ✓ | ✓ | — | ~ | ~ | 
+| TLS 1.3 + Kyber-1024 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | 
+| DNS-over-HTTPS + DNSSEC | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | 
+| WPA3/SAE WiFi | ✓ | ✓ | ✓ | ✓ | — | — | 
+| Immutable root (A/B) | — | — | — | — | ✓ | ✓ | 
+| OSTree atomic updates | — | ✓ | ✓ | — | ✓ | ✓ | 
+| Container orchestration | ~ | ✓ | ✓ | — | ✓ | ✓ | 
+| Distributed VFS / CRDT | — | — | — | — | ~ | ✓ | 
+| AI scheduler (TinyLlama) | ✓ | ✓ | ✓ | — | ✓ | ✓ | 
 
 `✓` = present · `~` = partial/optional · `—` = not applicable for this profile
 
@@ -184,18 +184,18 @@ Phase 5 — Desktop & Tooling (planned)
 
 SigmaOS is developed in iterative improvement rounds, each inspired by a real production OS:
 
-| Round | Theme | Key Addition |
-|---|---|---|
-| 1 | Bug fixes | PID 1 loop, buffer overflows, CI tests |
-| 2 | OpenBSD / Gentoo | pledge, unveil, USE flags, staged rollout |
-| 3 | OSTree / Talos | atomic updates, namespace isolation, gRPC API |
-| 4–5 | HardenedBSD / SELinux | ASLR+W^X, AVC, DTrace, cgroup v2 |
-| 6–7 | seL4 / Genode | MCS scheduler, capability space, Dilithium fix |
-| 8 | dm-verity / snapd | verified boot, package assertions, SemanticFS |
-| 9 | Comprehensive | sigma-bus IPC, audio, session, driver framework |
-| 10–12 | SMP / eBPF / drivers | LAPIC, ACPI, eBPF VM, AHCI, LVM, India apps |
-| 13–14 | Compositor / roadmap | Wayland compositor, CryptFS fix, roadmap SPA |
-| 15–17 | Protocols | Full TLS 1.3, DNS, DHCP, firewall, shell, OOM |
+| Round | Theme | Key Addition | 
+| --- | --- | --- | 
+| 1 | Bug fixes | PID 1 loop, buffer overflows, CI tests | 
+| 2 | OpenBSD / Gentoo | pledge, unveil, USE flags, staged rollout | 
+| 3 | OSTree / Talos | atomic updates, namespace isolation, gRPC API | 
+| 4–5 | HardenedBSD / SELinux | ASLR+W^X, AVC, DTrace, cgroup v2 | 
+| 6–7 | seL4 / Genode | MCS scheduler, capability space, Dilithium fix | 
+| 8 | dm-verity / snapd | verified boot, package assertions, SemanticFS | 
+| 9 | Comprehensive | sigma-bus IPC, audio, session, driver framework | 
+| 10–12 | SMP / eBPF / drivers | LAPIC, ACPI, eBPF VM, AHCI, LVM, India apps | 
+| 13–14 | Compositor / roadmap | Wayland compositor, CryptFS fix, roadmap SPA | 
+| 15–17 | Protocols | Full TLS 1.3, DNS, DHCP, firewall, shell, OOM | 
 
 Full history → [Improvements Overview](Improvements-Overview)
 
@@ -203,12 +203,12 @@ Full history → [Improvements Overview](Improvements-Overview)
 
 ## Wiki Navigation
 
-| Section | Pages |
-|---|---|
-| **Getting Started** | [Building from Source](Building-from-Source) · [Branch Guide](Branch-Guide) · [FAQ](FAQ) |
-| **Architecture** | [Architecture Overview](Architecture-Overview) · [Kernel](Kernel) · [HAL](HAL) · [Networking](Networking) |
-| **Security** | [Security Model](Security-Model) · [Post-Quantum Crypto](Post-Quantum-Security) |
-| **Development** | [Developer Guide](Developer-Guide) · [Utilities Roadmap](Utilities-Roadmap) · [Contributor Roadmap](Contributor-Roadmap) |
-| **API** | [navigator.sigmaos API](API-Reference) · [Syscall Dispatcher](Syscall-Dispatcher) · [App Manifest](App-Manifest) |
-| **Profiles** | [Release Profiles](Release-Profiles) · [Zenith Desktop](Zenith-Desktop) · [Branch Guide](Branch-Guide) |
+| Section | Pages | 
+| --- | --- | 
+| **Getting Started** | [Building from Source](Building-from-Source) · [Branch Guide](Branch-Guide) · [FAQ](FAQ) | 
+| **Architecture** | [Architecture Overview](Architecture-Overview) · [Kernel](Kernel) · [HAL](HAL) · [Networking](Networking) | 
+| **Security** | [Security Model](Security-Model) · [Post-Quantum Crypto](Post-Quantum-Security) | 
+| **Development** | [Developer Guide](Developer-Guide) · [Utilities Roadmap](Utilities-Roadmap) · [Contributor Roadmap](Contributor-Roadmap) | 
+| **API** | [navigator.sigmaos API](API-Reference) · [Syscall Dispatcher](Syscall-Dispatcher) · [App Manifest](App-Manifest) | 
+| **Profiles** | [Release Profiles](Release-Profiles) · [Zenith Desktop](Zenith-Desktop) · [Branch Guide](Branch-Guide) | 
 | **Operations** | [System Daemons](System-Daemons) · [Improvements Overview](Improvements-Overview) · [Feature Roadmap](Feature-Roadmap) |

@@ -12,7 +12,7 @@ Phase 5 focuses on making SigmaOS approachable for external developers. It deliv
 
 The **SigmaOS Kernel SDK** provides everything a driver or kernel-extension developer needs, entirely in `no_std` Rust:
 
-```
+```text
 sdk/
 ├── kernel/
 │   ├── mod.rs                  # Root kernel SDK module
@@ -21,7 +21,7 @@ sdk/
 │   └── hal.rs                  # HAL interface — drivers implement this trait
 └── examples/
     └── hello_driver.rs         # Minimal Rust driver skeleton
-```
+```text
 
 ### App / Userspace SDK (Rust)
 
@@ -45,12 +45,12 @@ cmake -B toolchain-build \
   -DSIGMA_TOOLCHAIN_TARGET=x86_64-sigmaos-elf \
   -DSIGMA_SYSROOT=/opt/sigmaos-sysroot
 ninja -C toolchain-build
-```
+```text
 
 Supported host environments:
 
 | Host OS | Cross-Target | Status |
-|---------|-------------|--------|
+| --------- | ------------- | -------- |
 | Ubuntu 22.04+ | x86_64-sigmaos-elf | ✅ Stable |
 | macOS 14+ | x86_64-sigmaos-elf | 🔄 Beta |
 | Windows 11 (WSL2) | x86_64-sigmaos-elf | ✅ Stable |
@@ -60,7 +60,7 @@ Supported host environments:
 ## Documentation Hub
 
 | Resource | Location |
-|----------|---------|
+| ---------- | --------- |
 | Wiki (this site) | [GitHub Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki) |
 | Architecture Overview | [Architecture-Overview](Architecture-Overview) |
 | Driver Development Guide | [Driver-Development](Driver-Development) |
@@ -87,7 +87,7 @@ See [CONTRIBUTING.md](CONTRIBUTING) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT) fo
 ## Release Governance
 
 | Role | Responsibility |
-|------|---------------|
+| ------ | --------------- |
 | **Core Maintainers** | Kernel architecture, security, release signing |
 | **Module Owners** | Own a specific subsystem (net, fs, drivers) |
 | **Community Contributors** | Bug fixes, documentation, new drivers |

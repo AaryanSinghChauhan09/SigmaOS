@@ -17,22 +17,22 @@
 
 ### OOP vs Procedural in SigmaOS
 
-| Paradigm | Procedural (C) | OOP (C++) |
-| :--- | :--- | :--- |
-| **Code style** | Functions operating on external data structures | Objects encapsulating data attributes + behavioral methods |
-| **Kernel use** | Low-level assembly traps, early boot loaders | Core microkernel subsystems, HAL, modular utility shards |
-| **Reuse** | Copy-paste mechanics, macro expansions | Inheritance hierarchies, template metaprogramming |
-| **Safety** | Manual pointer discipline and conventions | Access specifiers, RAII deterministic resource management |
+| Paradigm | Procedural (C) | OOP (C++) | 
+| :--- | :--- | :--- | 
+| **Code style** | Functions operating on external data structures | Objects encapsulating data attributes + behavioral methods | 
+| **Kernel use** | Low-level assembly traps, early boot loaders | Core microkernel subsystems, HAL, modular utility shards | 
+| **Reuse** | Copy-paste mechanics, macro expansions | Inheritance hierarchies, template metaprogramming | 
+| **Safety** | Manual pointer discipline and conventions | Access specifiers, RAII deterministic resource management | 
 
 ### C vs C++ in SigmaOS
 
-| Feature | C | C++ |
-| :--- | :--- | :--- |
-| `struct` | Plain Old Data (POD) only | Data attributes + member methods |
-| **Memory** | `malloc`/`free` manual management | `new`/`delete` + RAII smart pointers |
-| **Type safety**| Implicit C-style casts are unsafe | Explicit `static_cast`, `reinterpret_cast` |
-| **Templates** | Preprocessor macros | Type-safe generic programming |
-| **Namespaces** | Global symbol space only | Hierarchical `Sigma::Core::Memory` |
+| Feature | C | C++ | 
+| :--- | :--- | :--- | 
+| `struct` | Plain Old Data (POD) only | Data attributes + member methods | 
+| **Memory** | `malloc`/`free` manual management | `new`/`delete` + RAII smart pointers | 
+| **Type safety** | Implicit C-style casts are unsafe | Explicit `static_cast`, `reinterpret_cast` | 
+| **Templates** | Preprocessor macros | Type-safe generic programming | 
+| **Namespaces** | Global symbol space only | Hierarchical `Sigma::Core::Memory` | 
 
 ```cpp
 // C++ basics used throughout SigmaOS kernel
@@ -292,13 +292,13 @@ void risky_operation(int fd) {
 
 ## SigmaOS C++ Standards & Conventions
 
-| Rule | Detail |
-| :--- | :--- |
-| **Standard** | C++17 (`-std=c++17`) |
-| **RTTI** | Disabled (`-fno-rtti`) — eliminates `dynamic_cast` runtime overhead |
-| **Exceptions** | Enabled only in userland; microkernel core utilizes explicit error codes |
-| **STL** | Forbidden in Ring-0 kernel memory; sovereign containers only |
-| **Namespaces**| All kernel code encapsulated within `Sigma::` hierarchy |
-| **Virtual dtors**| Mandatory on all base classes containing virtual methods |
+| Rule | Detail | 
+| :--- | :--- | 
+| **Standard** | C++17 (`-std=c++17`) | 
+| **RTTI** | Disabled (`-fno-rtti`) — eliminates `dynamic_cast` runtime overhead | 
+| **Exceptions** | Enabled only in userland; microkernel core utilizes explicit error codes | 
+| **STL** | Forbidden in Ring-0 kernel memory; sovereign containers only | 
+| **Namespaces** | All kernel code encapsulated within `Sigma::` hierarchy | 
+| **Virtual dtors** | Mandatory on all base classes containing virtual methods | 
 
 *Last updated: 2026-05-19 | SigmaOS Zenith v15.2*

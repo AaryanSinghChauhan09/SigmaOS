@@ -108,14 +108,14 @@ If `sigmad-ai` is unavailable, the engine falls back to a static frequency-based
 
 Zenith subscribes to system events from the SigmaOS daemons and reacts automatically:
 
-| Event | Automatic response |
-|---|---|
-| Battery < 15% | Switch to dark theme, reduce animation rate, notify user |
-| Battery < 5% | Freeze all non-critical background apps, prompt to save work |
-| Network disconnected | Show sync-status as "Disconnected", pause cloud sync |
-| Storage > 90% full | Highlight the largest shards in the Storage Manager widget |
-| New USB device | Show hotplug notification with mount/open/eject options |
-| IDS alert from sigma_zerotrust | Flash red status in the security widget, log to audit view |
+| Event | Automatic response | 
+| --- | --- | 
+| Battery < 15% | Switch to dark theme, reduce animation rate, notify user | 
+| Battery < 5% | Freeze all non-critical background apps, prompt to save work | 
+| Network disconnected | Show sync-status as "Disconnected", pause cloud sync | 
+| Storage > 90% full | Highlight the largest shards in the Storage Manager widget | 
+| New USB device | Show hotplug notification with mount/open/eject options | 
+| IDS alert from sigma_zerotrust | Flash red status in the security widget, log to audit view | 
 
 ---
 
@@ -142,17 +142,17 @@ Themes in Zenith are **hardware-accelerated CSS variables** updated in real time
 
 ## Zenith Desktop Components
 
-| Component | Description |
-|---|---|
-| Dock | Bottom launcher with AI-suggested app ordering |
-| Taskbar | Top bar with workspace switcher, clock, status icons |
-| Notification Center | Slide-out panel with timestamped notifications and badge counter |
-| Lock Screen | Full-screen overlay (Ctrl+L) with clock and PIN/credential unlock |
-| Spotlight Search | Cmd+Space natural language search powered by `sigmad-ai` |
-| Window Manager | In-page draggable/resizable iframes (no `window.open()`) |
-| Control Center | Quick-access panel for WiFi, Bluetooth, brightness, volume |
-| Storage Manager | Visual shard matrix browser with size and encryption status |
-| Security Dashboard | Live view of zero-trust policy decisions and audit log |
+| Component | Description | 
+| --- | --- | 
+| Dock | Bottom launcher with AI-suggested app ordering | 
+| Taskbar | Top bar with workspace switcher, clock, status icons | 
+| Notification Center | Slide-out panel with timestamped notifications and badge counter | 
+| Lock Screen | Full-screen overlay (Ctrl+L) with clock and PIN/credential unlock | 
+| Spotlight Search | Cmd+Space natural language search powered by `sigmad-ai` | 
+| Window Manager | In-page draggable/resizable iframes (no `window.open()`) | 
+| Control Center | Quick-access panel for WiFi, Bluetooth, brightness, volume | 
+| Storage Manager | Visual shard matrix browser with size and encryption status | 
+| Security Dashboard | Live view of zero-trust policy decisions and audit log | 
 
 ---
 

@@ -43,4 +43,4 @@ To automate Wiki synchronization, use the following GitHub Action pattern in you
     path: docs/
     token: ${{ secrets.GITHUB_TOKEN }}
 
-```
+```text

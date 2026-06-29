@@ -10,14 +10,14 @@
 
 **Regulator:** ICSI / MCA / SEBI LODR / Companies Act 2013
 
-| Feature | Regulation | Implementation |
-|---|---|---|
-| ROC filings (MGT-7, AOC-4, DIR-12, SH-7) | Companies Act 2013 | `sigma_cs_roc_filing_t` + MCA21 API |
-| Secretarial Standards (SS-1, SS-2, SS-4) | ICSI | Board meeting notice + minutes |
-| SEBI LODR compliance calendar | SEBI LODR 2015 | Quarterly deadline tracker |
-| Board meeting management | SS-1 | 7-day notice, agenda, minutes, e-voting |
-| FEMA reporting (FC-GPR, FC-TRS, APR) | FEMA 1999 | RBI/MCA eBiz portal integration |
-| Secretarial audit (Form MR-3) | Companies Act §204 | Annual audit workflow |
+| Feature | Regulation | Implementation | 
+| --- | --- | --- | 
+| ROC filings (MGT-7, AOC-4, DIR-12, SH-7) | Companies Act 2013 | `sigma_cs_roc_filing_t` + MCA21 API | 
+| Secretarial Standards (SS-1, SS-2, SS-4) | ICSI | Board meeting notice + minutes | 
+| SEBI LODR compliance calendar | SEBI LODR 2015 | Quarterly deadline tracker | 
+| Board meeting management | SS-1 | 7-day notice, agenda, minutes, e-voting | 
+| FEMA reporting (FC-GPR, FC-TRS, APR) | FEMA 1999 | RBI/MCA eBiz portal integration | 
+| Secretarial audit (Form MR-3) | Companies Act §204 | Annual audit workflow | 
 
 ```bash
 sigma-cs roc file MGT-7 --cin U12345MH2020PTC123456
@@ -36,15 +36,15 @@ SEBI regulates India's ₹400 lakh crore market. Every broker, RIA, and MFD curr
 
 **Regulator:** SEBI / AMFI / NSDL / CDSL
 
-| Feature | Regulation | Implementation |
-|---|---|---|
-| Peak margin compliance | SEBI Circular SEBI/HO/MRD2 | Daily peak margin tracking |
-| Capital gains calculation (STCG/LTCG) | Finance Act 2024 | 20%/12.5% rates, ₹1.25L exemption |
-| KYC / IPV tracking | SEBI KYC Reg | Annual IPV renewal alert |
-| IA advice register | SEBI (IA) Regulations 2013 | Mandatory log of all advice |
-| AMFI ARN + EUIN tracking | AMFI | Certificate expiry, CPD log |
-| SCORES complaint filing | SEBI SCORES | Direct portal integration |
-| Grandfathering (pre-2018) cost basis | Finance Act 2018 | Jan 31, 2018 fair market value |
+| Feature | Regulation | Implementation | 
+| --- | --- | --- | 
+| Peak margin compliance | SEBI Circular SEBI/HO/MRD2 | Daily peak margin tracking | 
+| Capital gains calculation (STCG/LTCG) | Finance Act 2024 | 20%/12.5% rates, ₹1.25L exemption | 
+| KYC / IPV tracking | SEBI KYC Reg | Annual IPV renewal alert | 
+| IA advice register | SEBI (IA) Regulations 2013 | Mandatory log of all advice | 
+| AMFI ARN + EUIN tracking | AMFI | Certificate expiry, CPD log | 
+| SCORES complaint filing | SEBI SCORES | Direct portal integration | 
+| Grandfathering (pre-2018) cost basis | Finance Act 2018 | Jan 31, 2018 fair market value | 
 
 ```bash
 sigma-sebi margin peak-report --client CLIENT001 --date today
@@ -63,15 +63,15 @@ DGCA regulates India's ₹1.5 lakh crore aviation sector with 700+ aircraft and 
 
 **Regulator:** DGCA / AAI / BCAS / ICAO / STCW
 
-| Feature | What it does |
-|---|---|
-| Pilot logbook | Digital log: PIC/SIC/IFR/night hours, currency check |
-| STCW certificate tracker | Expiry alerts for all 10+ mandatory certs |
-| FRMS (Fatigue Risk Management) | Duty hour limits per DGCA (FDTL rules) |
-| Weather briefing | METAR + TAF + SIGMET + NOTAM in one view |
-| Weight & Balance | Aircraft-type W&B calculation with CG envelope |
-| AME maintenance records | Task card log, RTS certificate, CAME reference |
-| SDR (Service Difficulty Report) | Direct DGCA filing |
+| Feature | What it does | 
+| --- | --- | 
+| Pilot logbook | Digital log: PIC/SIC/IFR/night hours, currency check | 
+| STCW certificate tracker | Expiry alerts for all 10+ mandatory certs | 
+| FRMS (Fatigue Risk Management) | Duty hour limits per DGCA (FDTL rules) | 
+| Weather briefing | METAR + TAF + SIGMET + NOTAM in one view | 
+| Weight & Balance | Aircraft-type W&B calculation with CG envelope | 
+| AME maintenance records | Task card log, RTS certificate, CAME reference | 
+| SDR (Service Difficulty Report) | Direct DGCA filing | 
 
 ```bash
 sigma-aviation hours log --aircraft VT-ABC --hours 6.5 --date today
@@ -91,16 +91,16 @@ India has 7.5 million food businesses. FSSAI's 2024 mandatory allergen labeling 
 
 **Regulator:** FSSAI / Food Safety and Standards Act 2006
 
-| Feature | Regulation | Implementation |
-|---|---|---|
-| Licence type determination | FSSAI Licensing Regs 2011 | Auto-determine based on turnover/multi-state |
-| Mandatory allergen labeling | FSSAI (Food Products Standards) 2024 | 10-allergen check on every menu item |
-| HACCP CCP monitoring | Codex Alimentarius / FSSAI | IoT sensor integration for CCPs |
-| Temperature log (cold chain) | FSSAI Food Safety | Hourly cold chain records |
-| POS with GST | GST 5%/18% slabs | Restaurant billing with correct slab |
-| Aggregator sync | ONDC/Swiggy/Zomato | Menu + order auto-sync |
-| Recall management | FSSAI Recall Portal | Batch recall filing |
-| Hygiene rating | Eat Right India | Self-assessment checklist |
+| Feature | Regulation | Implementation | 
+| --- | --- | --- | 
+| Licence type determination | FSSAI Licensing Regs 2011 | Auto-determine based on turnover/multi-state | 
+| Mandatory allergen labeling | FSSAI (Food Products Standards) 2024 | 10-allergen check on every menu item | 
+| HACCP CCP monitoring | Codex Alimentarius / FSSAI | IoT sensor integration for CCPs | 
+| Temperature log (cold chain) | FSSAI Food Safety | Hourly cold chain records | 
+| POS with GST | GST 5%/18% slabs | Restaurant billing with correct slab | 
+| Aggregator sync | ONDC/Swiggy/Zomato | Menu + order auto-sync | 
+| Recall management | FSSAI Recall Portal | Batch recall filing | 
+| Hygiene rating | Eat Right India | Self-assessment checklist | 
 
 ```bash
 sigma-fssai licence check --turnover 5000000
@@ -119,15 +119,15 @@ India's ₹2.5 lakh crore mining sector with 1,500+ operational mines. Fatal acc
 
 **Regulator:** DGMS / IBM / MMDR Act 2015 / PESO
 
-| Feature | Regulation | What it does |
-|---|---|---|
-| Accident report (Form I) | Mines Act 1952 §23 | One-tap filing within 2-hour mandatory window |
-| Blasting register | PESO Explosives Rules | Per-shot log with PPV measurement |
-| HEMM maintenance log | DGMS | Mandatory equipment maintenance records |
-| IBM monthly return | MMDR Act | Production + dispatch + royalty auto-calculation |
-| DMF/NMET levy | MMDR §9B + 9C | Auto-calculates 10-30% of royalty |
-| Environmental monitoring | EAC/CPCB | PM10, PM2.5, noise, vibration log |
-| Mineral dispatch challan | MMDR | Electronic MDC generation |
+| Feature | Regulation | What it does | 
+| --- | --- | --- | 
+| Accident report (Form I) | Mines Act 1952 §23 | One-tap filing within 2-hour mandatory window | 
+| Blasting register | PESO Explosives Rules | Per-shot log with PPV measurement | 
+| HEMM maintenance log | DGMS | Mandatory equipment maintenance records | 
+| IBM monthly return | MMDR Act | Production + dispatch + royalty auto-calculation | 
+| DMF/NMET levy | MMDR §9B + 9C | Auto-calculates 10-30% of royalty | 
+| Environmental monitoring | EAC/CPCB | PM10, PM2.5, noise, vibration log | 
+| Mineral dispatch challan | MMDR | Electronic MDC generation | 
 
 ```bash
 sigma-mining accident report --type fatal --date today --location "Level 3"
@@ -146,15 +146,15 @@ India's ₹15 lakh crore textile sector — 2nd largest employer. Mandatory labe
 
 **Regulator:** Textile Commissioner / BIS / CITI / AEPC
 
-| Feature | Regulation | What it does |
-|---|---|---|
-| Mandatory label compliance | Textile (Consumer Protection) Rules 2023 | 8-field mandatory label check |
-| Handloom Mark application | Textile Commissioner | Online application + tracking |
-| GI Tag management | GI Act 1999 | Application + renewal for Banarasi, Kanchipuram etc. |
-| PM Vishwakarma scheme | MSME Ministry | Loan application (₹3L collateral-free) |
-| Production order management | — | Style/size breakdown + fabric consumption |
-| RoSCTL claim | DGFT | Export incentive calculation + filing |
-| Marker efficiency calculation | — | Cutting room waste reduction |
+| Feature | Regulation | What it does | 
+| --- | --- | --- | 
+| Mandatory label compliance | Textile (Consumer Protection) Rules 2023 | 8-field mandatory label check | 
+| Handloom Mark application | Textile Commissioner | Online application + tracking | 
+| GI Tag management | GI Act 1999 | Application + renewal for Banarasi, Kanchipuram etc. | 
+| PM Vishwakarma scheme | MSME Ministry | Loan application (₹3L collateral-free) | 
+| Production order management | — | Style/size breakdown + fabric consumption | 
+| RoSCTL claim | DGFT | Export incentive calculation + filing | 
+| Marker efficiency calculation | — | Cutting room waste reduction | 
 
 ```bash
 sigma-textile label check --product shirt.json
@@ -171,15 +171,15 @@ India has 7,500km of coastline and is the world's largest source of merchant mar
 
 **Regulator:** DG Shipping / MMD / STCW / IMO
 
-| Feature | What it does |
-|---|---|
-| COC + STCW certificate tracker | Expiry alerts for all 10+ mandatory STCW certs |
-| GMDSS log | Daily DSC watch record (mandatory) |
-| Voyage planning | Distance, fuel, ETA, weather routing |
-| Stability calculation | GM, trim, list — IMO minimum compliance |
-| Bunker records | MARPOL Annex VI sulphur content compliance |
-| Port dues calculator | All major Indian ports + foreign ports |
-| INDSAR integration | Indian Seafarer Record portal |
+| Feature | What it does | 
+| --- | --- | 
+| COC + STCW certificate tracker | Expiry alerts for all 10+ mandatory STCW certs | 
+| GMDSS log | Daily DSC watch record (mandatory) | 
+| Voyage planning | Distance, fuel, ETA, weather routing | 
+| Stability calculation | GM, trim, list — IMO minimum compliance | 
+| Bunker records | MARPOL Annex VI sulphur content compliance | 
+| Port dues calculator | All major Indian ports + foreign ports | 
+| INDSAR integration | Indian Seafarer Record portal | 
 
 ```bash
 sigma-marine stcw check --rank "Chief Officer" --expiry-check
@@ -198,15 +198,15 @@ India's 700,000 sq km of forest is managed by 80,000 forest officers. M-STrIPES 
 
 **Regulator:** MoEFCC / NTCA / FSI / WII / CAMPA
 
-| Feature | Regulation | What it does |
-|---|---|---|
-| Forest Rights Claims (FRC) | FRA 2006 | Digital FRC filing + status tracking |
-| M-STrIPES patrol log | NTCA | GPS-tracked patrol + wildlife observation |
-| Forest fire report | Fire Manual | NASA FIRMS integration + incident report |
-| FC Act diversion | FC Act 1980 | NPV + CAMPA levy calculation |
-| WPA species database | WPA 1972 | Schedule I-VI species lookup |
-| CITES permit check | CITES | Import/export permit requirement check |
-| Carbon credit documentation | REDD+ / VCS | Carbon stock calculation + Verra prep |
+| Feature | Regulation | What it does | 
+| --- | --- | --- | 
+| Forest Rights Claims (FRC) | FRA 2006 | Digital FRC filing + status tracking | 
+| M-STrIPES patrol log | NTCA | GPS-tracked patrol + wildlife observation | 
+| Forest fire report | Fire Manual | NASA FIRMS integration + incident report | 
+| FC Act diversion | FC Act 1980 | NPV + CAMPA levy calculation | 
+| WPA species database | WPA 1972 | Schedule I-VI species lookup | 
+| CITES permit check | CITES | Import/export permit requirement check | 
+| Carbon credit documentation | REDD+ / VCS | Carbon stock calculation + Verra prep | 
 
 ```bash
 sigma-forest frc claim --village "Rampur" --area 5.2-hectares
@@ -223,15 +223,15 @@ India has 3 million+ temples, mosques, churches, and gurudwaras. FCRA compliance
 
 **Regulator:** Charity Commissioner / FCRA / IT Dept (12A/80G) / Waqf Board
 
-| Feature | Regulation | What it does |
-|---|---|---|
-| FCRA annual return (FC-4) | FCRA 2010 | Annual return due Sept 30 |
-| 80G receipt generation | IT Act §80G | Form 10BE certificate to donor |
-| Form 10BD aggregation | IT Act | Annual donation statement due May 31 |
-| 12A/80G renewal tracking | IT Act §12AB | 5-year validity renewal alert |
-| Hundi counting record | Charity Commissioner | Witness + count log |
-| CSR fund receipt compliance | Companies Act §135 | CSR project tracking |
-| Waqf Act compliance | Waqf Act 1995 | Waqf Board registration + audit |
+| Feature | Regulation | What it does | 
+| --- | --- | --- | 
+| FCRA annual return (FC-4) | FCRA 2010 | Annual return due Sept 30 | 
+| 80G receipt generation | IT Act §80G | Form 10BE certificate to donor | 
+| Form 10BD aggregation | IT Act | Annual donation statement due May 31 | 
+| 12A/80G renewal tracking | IT Act §12AB | 5-year validity renewal alert | 
+| Hundi counting record | Charity Commissioner | Witness + count log | 
+| CSR fund receipt compliance | Companies Act §135 | CSR project tracking | 
+| Waqf Act compliance | Waqf Act 1995 | Waqf Board registration + audit | 
 
 ```bash
 sigma-trust fcra return FC4 --fy 2025-26
@@ -246,17 +246,17 @@ sigma-trust 12a renewal check --expiry
 
 ## Summary — New Profession App Headers (Round 35)
 
-| App | Profession | Regulator | File |
-|---|---|---|---|
-| `sigma-cs` | Company Secretary | ICSI/MCA/SEBI | `userland/apps/sigma-cs/sigma_cs.h` |
-| `sigma-sebi` | Stock broker/RIA/MFD | SEBI/AMFI | `userland/apps/sigma-sebi/sigma_sebi.h` |
-| `sigma-aviation` | Pilot/AME/ATC | DGCA/AAI | `userland/apps/sigma-aviation/sigma_aviation.h` |
-| `sigma-fssai` | Restaurant/food biz | FSSAI | `userland/apps/sigma-fssai/sigma_fssai.h` |
-| `sigma-mining` | Mine manager/officer | DGMS/IBM/MMDR | `userland/apps/sigma-mining/sigma_mining.h` |
-| `sigma-textile` | Weaver/garment mfr | Textile Commissioner | `userland/apps/sigma-textile/sigma_textile.h` |
-| `sigma-marine` | Ship officer/AME | DG Shipping | `userland/apps/sigma-marine/sigma_marine.h` |
-| `sigma-forest` | Forest/wildlife officer | MoEFCC/NTCA | `userland/apps/sigma-forest/sigma_forest.h` |
-| `sigma-trust` | NGO/temple manager | FCRA/IT Dept | `userland/apps/sigma-trust/sigma_trust.h` |
+| App | Profession | Regulator | File | 
+| --- | --- | --- | --- | 
+| `sigma-cs` | Company Secretary | ICSI/MCA/SEBI | `userland/apps/sigma-cs/sigma_cs.h` | 
+| `sigma-sebi` | Stock broker/RIA/MFD | SEBI/AMFI | `userland/apps/sigma-sebi/sigma_sebi.h` | 
+| `sigma-aviation` | Pilot/AME/ATC | DGCA/AAI | `userland/apps/sigma-aviation/sigma_aviation.h` | 
+| `sigma-fssai` | Restaurant/food biz | FSSAI | `userland/apps/sigma-fssai/sigma_fssai.h` | 
+| `sigma-mining` | Mine manager/officer | DGMS/IBM/MMDR | `userland/apps/sigma-mining/sigma_mining.h` | 
+| `sigma-textile` | Weaver/garment mfr | Textile Commissioner | `userland/apps/sigma-textile/sigma_textile.h` | 
+| `sigma-marine` | Ship officer/AME | DG Shipping | `userland/apps/sigma-marine/sigma_marine.h` | 
+| `sigma-forest` | Forest/wildlife officer | MoEFCC/NTCA | `userland/apps/sigma-forest/sigma_forest.h` | 
+| `sigma-trust` | NGO/temple manager | FCRA/IT Dept | `userland/apps/sigma-trust/sigma_trust.h` | 
 
 Plus from previous round (already committed):
 - `sigma-cs` Company Secretary header

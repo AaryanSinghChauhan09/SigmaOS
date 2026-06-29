@@ -1,6 +1,6 @@
 # SigmaOS Zenith: Advanced Kernel Integrations (v15.2)
 
-To finalize the monolithic aspects of the SigmaOS Zenith microkernel architecture, we have implemented the remaining crucial subsystems required for autonomous hardware scheduling, process containment, and advanced network diagnostics. 
+To finalize the monolithic aspects of the SigmaOS Zenith microkernel architecture, we have implemented the remaining crucial subsystems required for autonomous hardware scheduling, process containment, and advanced network diagnostics.
 
 These subsystems operate entirely within the C11 standalone environment, establishing a zero-dependency kernel runtime.
 

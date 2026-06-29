@@ -1,6 +1,6 @@
 # Zenith SDK: Developer Guide
 
-Welcome to the SigmaOS Zenith Developer Guide! 
+Welcome to the SigmaOS Zenith Developer Guide!
 
 SigmaOS uses a unique **Hybrid Language Architecture**:
 - **Kernel & Drivers**: C/ASM for bare-metal sovereignty and zero dependencies.
@@ -26,10 +26,10 @@ use zenith_sdk::ZenithContext;
 #[no_mangle]
 pub extern "C" fn zenith_main(buffer: *mut u8, width: u32) {
     let ui = ZenithContext::new(buffer, width);
-    
+
     // Customize padding and corner roundness dynamically
     ui.set_metrics(12, 4, 8);
-    
+
     // Draw directly to the compositor frame buffer
     ui.draw_button(100, 100, 200, 50, "Hello Rust", false);
 }

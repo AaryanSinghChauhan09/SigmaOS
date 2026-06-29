@@ -7,18 +7,18 @@ Full details: https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Development-R
 
 ## Milestones
 
-| Milestone | Month | Definition of Done |
-|---|---|---|
-| M0: First Boot | 3 | `qemu-system-x86_64 -cdrom SigmaOS.iso` reaches shell |
-| M1: Real Hardware | 6 | Boots on real x86 laptop, WiFi + packages work |
-| M2: First Desktop | 9 | Zenith DE, DID login, Hindi IME, sigma-ai local |
-| M3: India Stack Live | 14 | CA files GSTR, doctor writes ABDM prescription |
-| M4: Security Audit | 18 | Zero critical CVEs, full PQ crypto, TPM2 boot chain |
-| M5: ARM64 | 21 | Raspberry Pi 4 + sigma-ultra on Pi Zero |
-| M6: AI Native | 24 | sigma-heal+sigma-lex+sigma-fedlearn all live |
-| M7: Govt Pilot | 30 | 1,000 NIC machines, BharatOS pilot |
-| M8: 1,000 Villages | 42 | sigma-RuralStack in 1,000 villages across 5 states |
-| M9: Verified Kernel | 60 | Formally verified IPC + scheduler, Rust network stack |
+| Milestone | Month | Definition of Done | 
+| --- | --- | --- | 
+| M0: First Boot | 3 | `qemu-system-x86_64 -cdrom SigmaOS.iso` reaches shell | 
+| M1: Real Hardware | 6 | Boots on real x86 laptop, WiFi + packages work | 
+| M2: First Desktop | 9 | Zenith DE, DID login, Hindi IME, sigma-ai local | 
+| M3: India Stack Live | 14 | CA files GSTR, doctor writes ABDM prescription | 
+| M4: Security Audit | 18 | Zero critical CVEs, full PQ crypto, TPM2 boot chain | 
+| M5: ARM64 | 21 | Raspberry Pi 4 + sigma-ultra on Pi Zero | 
+| M6: AI Native | 24 | sigma-heal+sigma-lex+sigma-fedlearn all live | 
+| M7: Govt Pilot | 30 | 1,000 NIC machines, BharatOS pilot | 
+| M8: 1,000 Villages | 42 | sigma-RuralStack in 1,000 villages across 5 states | 
+| M9: Verified Kernel | 60 | Formally verified IPC + scheduler, Rust network stack | 
 
 ---
 

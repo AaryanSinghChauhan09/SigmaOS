@@ -56,12 +56,12 @@ void interrupts_disable(void);
 
 ### x86_64 (`arch/x86_64/`)
 
-| File | Contents |
-|---|---|
-| `paging.asm` | PML4/PDPT/PD/PT setup, `cr3` load |
-| `paging.c` | VMM helper functions using the asm primitives |
-| `switch.asm` | Context switch — saves/restores registers, updates `cr3` |
-| `vmm_fast.asm` | Fast path for TLB invalidation and page table walks |
+| File | Contents | 
+| --- | --- | 
+| `paging.asm` | PML4/PDPT/PD/PT setup, `cr3` load | 
+| `paging.c` | VMM helper functions using the asm primitives | 
+| `switch.asm` | Context switch — saves/restores registers, updates `cr3` | 
+| `vmm_fast.asm` | Fast path for TLB invalidation and page table walks | 
 
 The x86_64 HAL uses:
 - **PIT (Programmable Interval Timer)** or **LAPIC timer** for `timer_init`.

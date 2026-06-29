@@ -27,13 +27,13 @@ fn main() {
 
 ## ⚙️ Sovereign System Profiles (Stage 2)
 
-SigmaOS formalizes dynamic security and resource enforcement models using central profile structures. 
+SigmaOS formalizes dynamic security and resource enforcement models using central profile structures.
 
 ```
 +-----------------------------------------------------------------------------------+
-|                            Sovereign Profile Switcher                             |
+|                            Sovereign Profile Switcher                             | 
 +---------------------+-------------------+-------------------+---------------------+
-                      |                   |                   |
+                      |                   |                   | 
                       v                   v                   v
               [CAINE Forensic]          [IoT]            [Enterprise]
               - Read-Only blocks   - 16MB Sandboxes     - Strict VFS ACLs

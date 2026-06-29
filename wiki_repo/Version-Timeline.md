@@ -73,18 +73,18 @@ Target capabilities:
 
 ## Development Phases Overview
 
-| Phase | Focus | Target | Status |
-|---|---|---|---|
-| **Phase 0** | Core boot — scheduler, MM, syscall, ISO | Month 3 | `[ ]` |
-| **Phase 1** | Networking + packages — TCP, drivers, sigma-pkg | Month 6 | `[~]` |
-| **Phase 2** | Desktop + identity — GPU, Zenith, DID, IME | Month 9 | `[~]` |
-| **Phase 3** | India Stack live — ABDM, GST, UPI, NavIC | Month 14 | `[ ]` |
-| **Phase 4** | Security hardening — PQC final, TPM2, sigma-mac | Month 18 | `[~]` |
-| **Phase 5** | Multi-platform — ARM64, RISC-V, sigma-ultra | Month 21 | `[~]` |
-| **Phase 6** | AI & advanced — fedlearn, sigma-lex, ZK proofs | Month 24 | `[ ]` |
-| **Phase 7** | Enterprise & government — BharatOS pilot | Month 36 | `[ ]` |
-| **Phase 8** | Rural India — 1,000 villages | Month 42 | `[ ]` |
-| **Phase 9** | Research — formal verification, Rust | Month 60 | `[ ]` |
+| Phase | Focus | Target | Status | 
+| --- | --- | --- | --- | 
+| **Phase 0** | Core boot — scheduler, MM, syscall, ISO | Month 3 | `[ ]` | 
+| **Phase 1** | Networking + packages — TCP, drivers, sigma-pkg | Month 6 | `[~]` | 
+| **Phase 2** | Desktop + identity — GPU, Zenith, DID, IME | Month 9 | `[~]` | 
+| **Phase 3** | India Stack live — ABDM, GST, UPI, NavIC | Month 14 | `[ ]` | 
+| **Phase 4** | Security hardening — PQC final, TPM2, sigma-mac | Month 18 | `[~]` | 
+| **Phase 5** | Multi-platform — ARM64, RISC-V, sigma-ultra | Month 21 | `[~]` | 
+| **Phase 6** | AI & advanced — fedlearn, sigma-lex, ZK proofs | Month 24 | `[ ]` | 
+| **Phase 7** | Enterprise & government — BharatOS pilot | Month 36 | `[ ]` | 
+| **Phase 8** | Rural India — 1,000 villages | Month 42 | `[ ]` | 
+| **Phase 9** | Research — formal verification, Rust | Month 60 | `[ ]` | 
 
 ---
 

@@ -9,4 +9,4 @@ Independent verification system for boot integrity.
 // Abstract interface for security/secure_boot
 void init_security_secure_boot();
 
-```
+```text
