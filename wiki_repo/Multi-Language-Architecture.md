@@ -29,6 +29,10 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 | `agents/orchestration/agent_orchestrator.rs` | `AgentOrchestrator.cpp` |
 | `agents/orchestration/sovereign_container.rs` | `SovereignContainer.cpp`, `SovereignContainerRuntime.cpp` |
 | `agents/policy/governance_rules.rs` | `GovernanceRules.cpp`, `QuotaManager.cpp` |
+| `bin/ipctrace/mod.rs` | `bin/ipctrace/main.cpp` |
+| `bin/powerd/mod.rs` | `bin/powerd/main.cpp` |
+| `drivers/core/hotplug_manager.rs` | `drivers/core/hotplug_manager.cpp` |
+| `drivers/ddk/ddk.rs` | `drivers/ddk/ddk_api.h`, `ddk_stub.c` |
 
 ### Zig (bare-metal, no stdlib)
 
@@ -39,6 +43,8 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 | `drivers/input/ps2.zig` | `sigma_keyboard.cpp`, `sigma_mouse.cpp`, `sigma_ps2.cpp` |
 | `drivers/display/framebuffer.zig` | `sigma_fb.cpp` |
 | `drivers/audio/hda.zig` | `sigma_audio_hda.cpp` |
+| `browser/sigma_wasm_bridge.zig` | `browser/sigma_wasm_bridge.c` |
+
 
 ### Nim (compiles to native, no stdlib/libc)
 

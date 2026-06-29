@@ -71,6 +71,7 @@ jobs:
           zig build-lib drivers/input/ps2.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (ps2) skipped"
           zig build-lib drivers/display/framebuffer.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (framebuffer) skipped"
           zig build-lib drivers/audio/hda.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (hda) skipped"
+          zig build-lib browser/sigma_wasm_bridge.zig -target x86_64-freestanding-none -O ReleaseSafe 2>&1 || echo "WARN: Zig build (wasm_bridge) skipped"
 
       - name: Build Nim modules (native)
         run: |
