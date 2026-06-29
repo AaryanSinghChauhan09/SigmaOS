@@ -1,5 +1,0 @@
-# DISTROS ABOVE SIGMAOS
-
-
-
-

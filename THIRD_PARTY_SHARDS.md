@@ -1,6 +1,0 @@
-# THIRD PARTY SHARDS
-
-
-
-
-

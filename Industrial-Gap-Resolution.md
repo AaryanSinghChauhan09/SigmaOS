@@ -1,2 +1,0 @@
-# Industrial-Gap-Resolution
-

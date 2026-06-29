@@ -1,1 +1,0 @@
-# Profession-Specific Tools\n\nSigmaOS includes built-in, regulation-compliant tools:\n- [SovereignADRTracker](./SovereignADRTracker-Spec)\n- [SovereignGSTCalculator](./SovereignGSTCalculator-Spec)\n- [SovereignDosageCalc](./SovereignDosageCalc-Spec)\n- [SovereignLoadCalc](./SovereignLoadCalc-Spec)\n- [SovereignMSMERegistry](./SovereignMSMERegistry-Spec)\n
