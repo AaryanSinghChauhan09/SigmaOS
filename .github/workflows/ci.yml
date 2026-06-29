@@ -19,28 +19,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # -----------------------------------------------------------------------
-      # Build cache — NixOS Cachix-inspired; skips rebuilding unchanged code
-      # -----------------------------------------------------------------------
-      - name: Cache build artifacts & Go modules
+      - name: Cache build artifacts
         uses: actions/cache@v4
         with:
           path: |
             build/
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-ci-${{ matrix.target_os }}-${{ hashFiles('Makefile', '**/go.mod') }}
-          restore-keys: ${{ runner.os }}-ci-${{ matrix.target_os }}-
+            ~/.cargo/registry
+            ~/.cargo/git
+            target/
+          key: ${{ runner.os }}-cargo-${{ matrix.target_os }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-${{ matrix.target_os }}-
 
-      - name: Install toolchain
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          target: x86_64-unknown-none
+          override: true
+          components: clippy, rust-src
+
+      - name: Install build tools
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y \
-            build-essential gcc-multilib g++-multilib nasm make cmake ninja-build \
-            cppcheck clang clang-tidy
+          sudo apt-get install -y make cmake ninja-build
 
-      # -----------------------------------------------------------------------
-      # CMake build path (preferred) — uses root CMakeLists.txt
-      # -----------------------------------------------------------------------
       - name: CMake configure (TARGET_OS=${{ matrix.target_os }})
         run: |
           cmake -B build -G Ninja \
@@ -54,30 +56,10 @@ jobs:
       - name: CMake build
         run: ninja -C build -j$(nproc) || echo "WARN: CMake build skipped (missing sources)"
 
-      # -----------------------------------------------------------------------
-      # Makefile build path (parallel verification)
-      # -----------------------------------------------------------------------
-      - name: Make build (TARGET_OS=${{ matrix.target_os }})
+      - name: Static security audit (Clippy)
         run: |
-          make clean || true
-          make all TARGET_OS=${{ matrix.target_os }} -j$(nproc) || \
-            echo "WARN: make build skipped (cross-toolchain not found)"
+          cargo clippy --target x86_64-unknown-none -- -D warnings || true
 
-      # -----------------------------------------------------------------------
-      # Static analysis — cppcheck on kernel, drivers/<target>
-      # -----------------------------------------------------------------------
-      - name: Static security audit (cppcheck — ${{ matrix.target_os }} drivers)
-        run: |
-          cppcheck \
-            --enable=warning,style,performance \
-            --suppress=missingIncludeSystem \
-            -Iinclude \
-            kernel/ init/ lib/ fs/ net/ drivers/${{ matrix.target_os }}/ \
-            2>&1 || true
-
-      # -----------------------------------------------------------------------
-      # Verify build output exists (if build succeeded)
-      # -----------------------------------------------------------------------
       - name: Verify build output exists
         run: |
           if [[ -f build/sigmaos.bin ]]; then
@@ -87,16 +69,6 @@ jobs:
             echo "INFO: build/sigmaos.bin not produced (cross-toolchain unavailable in CI — expected)"
           fi
 
-      # -----------------------------------------------------------------------
-      # Kernel unit tests (host-mode, GTest)
-      # -----------------------------------------------------------------------
-      - name: Run kernel tests (host-mode CMake)
+      - name: Run kernel tests (Rust)
         run: |
-          cmake -B tests/build_ci -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ \
-            -DSIGMA_TARGET_OS=${{ matrix.target_os }}
-          cmake --build tests/build_ci -j$(nproc) || \
-            echo "WARN: test build skipped"
-          if [[ -d tests/build_ci ]]; then
-            cd tests/build_ci && ctest --output-on-failure --timeout 120 || true
-          fi
-        working-directory: tests/cpp_host
+          cargo test --target x86_64-unknown-linux-gnu || echo "WARN: test build skipped"
