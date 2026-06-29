@@ -1,0 +1,36 @@
+name: "Stale Issue & PR Bot"
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # Daily at 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          days-before-stale: 30
+          days-before-close: 15
+          stale-issue-label: "stale"
+          stale-pr-label: "stale"
+          exempt-issue-labels: "pinned,good-first-issue,help-wanted,security"
+          exempt-pr-labels: "pinned,do-not-merge,wip"
+          stale-issue-message: |
+            👋 This issue has been inactive for 30 days. It will be automatically closed in 15 days unless there is new activity.
+
+            If this is still relevant, please comment or add the `pinned` label. — SigmaOS Bot ⚡
+          stale-pr-message: |
+            👋 This PR has been inactive for 30 days. Please rebase on latest `main` and update to keep it open.
+
+            It will be closed in 15 days without activity. — SigmaOS Bot ⚡
+          close-issue-message: |
+            🔒 Closing due to extended inactivity. Feel free to reopen if this is still relevant!
+          close-pr-message: |
+            🔒 Closing this PR due to extended inactivity. Please reopen and rebase on `main` if you'd like to continue.

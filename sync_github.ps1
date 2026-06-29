@@ -1,6 +1,5 @@
 # SigmaOS: Sovereign Git Sync & Wiki Update Script
-# This script pushes the latest Phase 17 changes to your GitHub repository
-# and updates the associated GitHub Wiki.
+# Pushes latest changes to GitHub and syncs the associated Wiki.
 
 $repo_url = "https://github.com/AaryanSinghChauhan09/SigmaOS.git"
 
@@ -19,17 +18,31 @@ if (Test-Path $wiki_dir) { Remove-Item -Recurse -Force $wiki_dir }
 git clone $wiki_url $wiki_dir
 
 if (Test-Path $wiki_dir) {
-    # Copy the updated Sovereignty Architecture doc to the wiki
-    Copy-Item ".\docs\wiki\Sovereignty-Architecture.md" -Destination "$wiki_dir\Sovereignty-Architecture.md" -Force
-    
+    # Copy updated docs to the wiki
+    $wiki_docs = @(
+        ".\docs\wiki\Sovereignty-Architecture.md",
+        ".\docs\wiki\CLI-Reference.md",
+        ".\docs\wiki\CI-Workflows.md"
+    )
+    foreach ($doc in $wiki_docs) {
+        if (Test-Path $doc) {
+            Copy-Item $doc -Destination "$wiki_dir\$(Split-Path -Leaf $doc)" -Force
+        }
+    }
+
     Set-Location $wiki_dir
     git add .
-    git commit -m "Update Sovereignty Architecture (Phase 17)"
-    git push origin master
-    
+    git diff --cached --quiet
+    if ($LASTEXITCODE -ne 0) {
+        git commit -m "Update wiki docs (automated sync)"
+        git push origin master
+        Write-Host "GitHub Wiki synced successfully!" -ForegroundColor Green
+    } else {
+        Write-Host "Wiki is already up to date." -ForegroundColor Yellow
+    }
+
     Set-Location $PSScriptRoot
     Remove-Item -Recurse -Force $wiki_dir
-    Write-Host "GitHub Wiki synced successfully!" -ForegroundColor Green
 } else {
-    Write-Host "Warning: Could not clone wiki repository. Please ensure the Wiki feature is enabled in your GitHub repo settings." -ForegroundColor Yellow
+    Write-Host "Warning: Could not clone wiki. Ensure the Wiki feature is enabled in GitHub repo settings." -ForegroundColor Yellow
 }

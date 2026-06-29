@@ -1,0 +1,62 @@
+# Auto-labels PRs by changed path
+# Docs: https://github.com/actions/labeler
+
+# ── Component labels ──────────────────────────────────────────────────────────
+"area/kernel":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "kernel/**"
+
+"area/drivers":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "drivers/**"
+
+"area/userland":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "userland/**"
+
+"area/tools-cli":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "tools/**"
+
+"area/docs":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "docs/**"
+          - "wiki_repo/**"
+          - "*.md"
+
+"area/ci":
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/**"
+
+"area/web-ui":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "*.html"
+          - "*.css"
+          - "*.js"
+          - "web_ui/**"
+
+"area/security":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "kernel/security/**"
+          - "tools/sigma_secure_boot*"
+          - "tools/sigma_policy*"
+          - "tools/sigma_armor*"
+
+"area/rust":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/*.rs"
+
+"area/hal":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "hal/**"
+          - "kernel/hal/**"

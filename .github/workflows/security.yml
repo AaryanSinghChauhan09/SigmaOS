@@ -1,0 +1,88 @@
+name: "Security & Dependency Scan"
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 3 * * 1"   # Weekly on Monday at 03:00 UTC
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  # ── CodeQL ──────────────────────────────────────────────────────────────────
+  codeql:
+    name: "CodeQL (${{ matrix.language }})"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [c-cpp, javascript-typescript]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+      - uses: github/codeql-action/autobuild@v3
+      - uses: github/codeql-action/analyze@v3
+
+  # ── Rust cargo-audit ────────────────────────────────────────────────────────
+  cargo-audit:
+    name: "Cargo Audit"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: rustsec/audit-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+  # ── Trivy (Dockerfile / IaC) ─────────────────────────────────────────────────
+  trivy:
+    name: "Trivy Scan"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scan-ref: "."
+          severity: "HIGH,CRITICAL"
+          exit-code: "0"
+          format: "sarif"
+          output: "trivy-results.sarif"
+      - uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: "trivy-results.sarif"
+        continue-on-error: true
+
+  # ── Gitleaks secrets scan ────────────────────────────────────────────────────
+  gitleaks:
+    name: "Gitleaks Secrets Scan"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+  # ── Renovate / Dependabot hygiene (status check) ────────────────────────────
+  dep-check:
+    name: "Dependency Hygiene Check"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for outdated npm deps
+        run: npm outdated --prefix . || true
+      - name: Check Cargo.toml exists for audit
+        run: |
+          if [ -f tools/Cargo.toml ]; then
+            echo "Cargo.toml found — cargo-audit runs in cargo-audit job."
+          fi

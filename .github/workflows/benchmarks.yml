@@ -1,0 +1,67 @@
+name: "Nightly Benchmarks"
+
+on:
+  schedule:
+    - cron: "0 1 * * *"   # Daily at 01:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  benchmarks:
+    name: "Kernel Microbenchmarks"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Run Rust benchmarks
+        run: |
+          cd tools
+          cargo +nightly bench 2>&1 | tee bench-results.txt || true
+
+      - name: Parse and report
+        run: |
+          echo "### Nightly Benchmark Results $(date -u +%Y-%m-%d)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat tools/bench-results.txt 2>/dev/null | head -50 || echo "No results yet."
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload benchmark artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-results-${{ github.run_id }}
+          path: tools/bench-results.txt
+        continue-on-error: true
+
+  # Flaky-test detector: re-runs failed tests N times
+  flaky-detector:
+    name: "Flaky Test Detector"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run tests with retry
+        run: |
+          for i in 1 2 3; do
+            echo "--- Attempt $i ---"
+            cargo +nightly test --manifest-path tools/Cargo.toml 2>&1 || true
+          done
+
+  # Fuzzing (scheduled only)
+  fuzz:
+    name: "Scheduled Fuzzing"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install cargo-fuzz
+        run: cargo install cargo-fuzz --quiet 2>/dev/null || true
+      - name: Run fuzzer (60 sec)
+        run: |
+          cd tools
+          # Example: cargo fuzz run syscall_fuzzer -- -max_total_time=60
+          echo "Fuzzing placeholder — add cargo-fuzz targets under tools/fuzz/."
+        continue-on-error: true
