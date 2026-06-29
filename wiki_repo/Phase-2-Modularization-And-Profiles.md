@@ -45,7 +45,7 @@ kernel/
 │   └── hal/            # Hardware Abstraction Layer (Rewritten in Rust no_std & Zig freestanding)
 ├── net/                # Sovereign TCP/IP stack (Rewritten in Rust no_std)
 ├── storage/            # SigmaFS + ZFS journal shim (Rewritten in Rust no_std)
-├── telemetry/          # Zero-trust audit & telemetry
+├── telemetry/          # Zero-trust audit & telemetry (Rewritten in Rust no_std)
 └── virt/               # Hypervisor (optional — SIGMA_USE_HYPERVISOR)
 ```
 

@@ -212,6 +212,12 @@ set(SIGMA_RUST_STORAGE
     ${CMAKE_SOURCE_DIR}/kernel/storage/shard.rs
 )
 
+# ── Rust Telemetry Stack ──────────────────────────────────────────────────
+set(SIGMA_RUST_TELEMETRY
+    ${CMAKE_SOURCE_DIR}/kernel/telemetry/mod.rs
+    ${CMAKE_SOURCE_DIR}/kernel/telemetry/shard.rs
+)
+
 # ── Rust HAL (common to all targets) ──────────────────────────────────────
 set(SIGMA_RUST_HAL
     ${CMAKE_SOURCE_DIR}/drivers/hal/mod.rs
@@ -245,7 +251,7 @@ elseif(SIGMA_TARGET_OS STREQUAL "bsd")
     )
 endif()
 
-set(ALL_RUST_SRCS ${SIGMA_RUST_CORE} ${SIGMA_RUST_NET} ${SIGMA_RUST_STORAGE} ${SIGMA_RUST_HAL} ${SIGMA_RUST_DRIVERS})
+set(ALL_RUST_SRCS ${SIGMA_RUST_CORE} ${SIGMA_RUST_NET} ${SIGMA_RUST_STORAGE} ${SIGMA_RUST_TELEMETRY} ${SIGMA_RUST_HAL} ${SIGMA_RUST_DRIVERS})
 set(ALL_ZIG_SRCS  ${SIGMA_ZIG_HAL}  ${SIGMA_ZIG_DRIVERS})
 
 # ── Custom commands: Rust .rs → .a ────────────────────────────────────────
