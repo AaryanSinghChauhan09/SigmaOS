@@ -1,0 +1,1 @@
+# Sigma Desktop Environment (SDE)\n\nSigmaOS uses a completely sovereign, zero-dependency desktop environment bypassing legacy X11 or Wayland bloat. Features include the SovereignThemeEngine and strict shard-based window isolation
