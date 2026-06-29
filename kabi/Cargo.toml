@@ -1,0 +1,11 @@
+[package]
+name = "kabi"
+version = "15.0.0"
+edition = "2021"
+description = "SigmaOS Kernel ABI boundary types"
+
+[lib]
+crate-type = ["staticlib", "rlib"]
+
+[dependencies]
+# Zero dependencies to remain compatible with no_std.

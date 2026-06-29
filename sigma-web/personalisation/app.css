@@ -985,6 +985,135 @@ html, body {
 .toast-error { border-left: 4px solid var(--color-error); }
 .toast-info { border-left: 4px solid var(--color-info); }
 
+/* ── Workspace Presets ───────────────────────────────────────────────────── */
+.presets-row {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.preset-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.preset-chip {
+  padding: 6px 16px;
+  border-radius: 20px;
+  background: rgba(var(--color-accent-rgb), 0.08);
+  border: 1px solid rgba(var(--color-accent-rgb), 0.2);
+  color: var(--color-accent);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+}
+
+.preset-chip:hover {
+  background: rgba(var(--color-accent-rgb), 0.18);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(var(--color-accent-rgb), 0.2);
+}
+
+.preset-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.preset-name-input {
+  flex: 1;
+  max-width: 200px;
+}
+
+/* ── Wallpaper Upload Slot ───────────────────────────────────────────────── */
+.wallpaper-upload-btn {
+  background: transparent;
+  border: 2px dashed var(--color-border-glass);
+  border-radius: var(--radius);
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  transition: all var(--transition-speed);
+  color: var(--color-text-muted);
+}
+
+.wallpaper-upload-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* ── Do Not Disturb ─────────────────────────────────────────────────────── */
+.dnd-row {
+  margin-bottom: 14px;
+}
+
+.dnd-toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.dnd-toggle-wrap input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+.dnd-toggle-label {
+  font-weight: 500;
+}
+
+.dnd-times {
+  transition: opacity var(--transition-speed);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dnd-time-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dnd-time-input {
+  width: 130px;
+  font-family: var(--font-mono);
+  color-scheme: dark;
+}
+
+.dnd-days-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dnd-day-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--color-border-glass);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+}
+
+.dnd-day-btn.active {
+  background: rgba(var(--color-accent-rgb), 0.12);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
 /* ── Glassmorphism ──────────────────────────────────────────────────────── */
 .glass-panel {
   background: var(--color-bg-glass);

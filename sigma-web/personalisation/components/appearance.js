@@ -17,6 +17,21 @@ const ACCENT_PRESETS = [
   '#06b6d4','#00ffc3','#f59e0b','#818cf8','#f43f5e','#22c55e','#fb923c','#e2e8f0',
 ];
 
+// Workspace presets: named bundles of appearance prefs
+const WORKSPACE_PRESETS_KEY = 'sigma_workspace_presets';
+function loadPresets() {
+  try { return JSON.parse(localStorage.getItem(WORKSPACE_PRESETS_KEY) || '{}'); }
+  catch { return {}; }
+}
+function savePresets(p) { localStorage.setItem(WORKSPACE_PRESETS_KEY, JSON.stringify(p)); }
+
+const BUILTIN_PRESETS = {
+  Work:    { theme_mode:'dark',  accent_color:'#06b6d4', ui_density:'comfortable', wallpaper_id:'circuit'       },
+  Gaming:  { theme_mode:'dark',  accent_color:'#00ffc3', ui_density:'compact',     wallpaper_id:'phosphor-grid' },
+  Creative:{ theme_mode:'dark',  accent_color:'#818cf8', ui_density:'spacious',    wallpaper_id:'aurora'        },
+  Focus:   { theme_mode:'light', accent_color:'#06b6d4', ui_density:'comfortable', wallpaper_id:'minimal-light' },
+};
+
 export async function renderAppearancePage(container, userId, previewContainer) {
   const { data: prefs } = await userPreferences.get(userId);
   let local = { ...prefs };
@@ -26,10 +41,30 @@ export async function renderAppearancePage(container, userId, previewContainer) 
     renderLivePreview(previewContainer, local);
   }
 
+  const allPresets = { ...BUILTIN_PRESETS, ...loadPresets() };
+
   container.innerHTML = `
     <div class="tab-content">
       <h2 class="tab-title">Appearance</h2>
       <p class="tab-subtitle">Customise the look and feel of your SigmaOS environment.</p>
+
+      <!-- Workspace Presets -->
+      <section class="pref-section">
+        <h3 class="pref-section-title">Workspace Presets</h3>
+        <p class="pref-hint">Save and switch complete appearance configurations.</p>
+        <div class="presets-row">
+          <div class="preset-chips" id="preset-chips">
+            ${Object.keys({ ...BUILTIN_PRESETS, ...loadPresets() }).map(name => `
+              <button class="preset-chip" data-preset="${name}">${name}</button>
+            `).join('')}
+          </div>
+          <div class="preset-actions">
+            <input class="form-input preset-name-input" id="preset-name-input"
+                   placeholder="New preset name…" maxlength="24" />
+            <button class="btn btn-ghost btn-sm" id="preset-save-btn">Save Current</button>
+          </div>
+        </div>
+      </section>
 
       <!-- Theme Mode -->
       <section class="pref-section">
@@ -157,6 +192,28 @@ export async function renderAppearancePage(container, userId, previewContainer) 
     });
   });
 
+  // Custom wallpaper upload slot
+  const uploadInput = container.querySelector('#wallpaper-upload-input');
+  if (uploadInput) {
+    uploadInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        // Store data-URL as custom wallpaper_id
+        local.wallpaper_id = ev.target.result;
+        container.querySelectorAll('.wallpaper-item').forEach(b => b.classList.remove('active'));
+        const uploadBtn = container.querySelector('.wallpaper-upload-btn');
+        if (uploadBtn) uploadBtn.classList.add('active');
+        // Update live preview background directly
+        const frame = previewContainer.querySelector('.preview-frame');
+        if (frame) frame.style.background = `center/cover url("${ev.target.result}")`;
+        showToast('Custom wallpaper applied!', 'success');
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
   // Density
   container.querySelectorAll('input[name="density"]').forEach(radio => {
     radio.addEventListener('change', () => {
@@ -180,5 +237,38 @@ export async function renderAppearancePage(container, userId, previewContainer) 
     await userPreferences.update(userId, local);
     renderAppearancePage(container, userId, previewContainer);
     showToast('Reset to defaults.', 'info');
+  });
+
+  // ── Workspace Presets ────────────────────────────────────────────────────
+  container.querySelectorAll('.preset-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const name = chip.dataset.preset;
+      const preset = { ...BUILTIN_PRESETS, ...loadPresets() }[name];
+      if (!preset) return;
+      Object.assign(local, preset);
+      refresh();
+      // Re-render so all controls reflect the loaded preset
+      renderAppearancePage(container, userId, previewContainer);
+      showToast(`Preset "${name}" applied.`, 'success');
+    });
+  });
+
+  document.getElementById('preset-save-btn')?.addEventListener('click', async () => {
+    const nameEl = document.getElementById('preset-name-input');
+    const name = nameEl?.value.trim();
+    if (!name) { showToast('Enter a preset name first.', 'error'); return; }
+    const saved = loadPresets();
+    saved[name] = {
+      theme_mode:  local.theme_mode,
+      accent_color: local.accent_color,
+      ui_density:  local.ui_density,
+      wallpaper_id: local.wallpaper_id,
+    };
+    savePresets(saved);
+    await userPreferences.update(userId, local);
+    showToast(`Preset "${name}" saved!`, 'success');
+    if (nameEl) nameEl.value = '';
+    // Re-render to show new chip
+    renderAppearancePage(container, userId, previewContainer);
   });
 }

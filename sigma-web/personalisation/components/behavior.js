@@ -35,6 +35,10 @@ export async function renderBehaviorPage(container, userId) {
     notification_rules: { ...(prefs.notification_rules || {}) },
     keyboard_shortcuts: { ...SHORTCUTS_DEFAULT, ...(prefs.keyboard_shortcuts || {}) },
     workspace_layout: prefs.workspace_layout || 'default',
+    dnd_enabled: prefs.dnd_enabled ?? false,
+    dnd_from:    prefs.dnd_from    || '22:00',
+    dnd_to:      prefs.dnd_to      || '07:00',
+    dnd_days:    prefs.dnd_days    || [1,2,3,4,5],  // Mon-Fri
   };
 
   let capturingKey = null;
@@ -80,6 +84,30 @@ export async function renderBehaviorPage(container, userId) {
                 </label>`).join('')}
             </div>`;
           }).join('')}
+        </div>
+      </section>
+
+      <!-- Do Not Disturb Scheduler -->
+      <section class="pref-section">
+        <h3 class="pref-section-title">Do Not Disturb</h3>
+        <div class="dnd-row">
+          <label class="dnd-toggle-wrap">
+            <input type="checkbox" id="dnd-enabled" ${local.dnd_enabled ? 'checked' : ''} />
+            <span class="dnd-toggle-label">Enable scheduled DND</span>
+          </label>
+        </div>
+        <div class="dnd-times" id="dnd-times" style="${local.dnd_enabled ? '' : 'opacity:0.4;pointer-events:none'}">
+          <div class="dnd-time-row">
+            <label class="form-label">From</label>
+            <input type="time" id="dnd-from" class="form-input dnd-time-input" value="${local.dnd_from}" />
+            <label class="form-label">To</label>
+            <input type="time" id="dnd-to" class="form-input dnd-time-input" value="${local.dnd_to}" />
+          </div>
+          <div class="dnd-days-row">
+            ${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((d,i) => `
+              <button class="dnd-day-btn ${local.dnd_days.includes(i+1)?'active':''}" data-day="${i+1}">${d}</button>
+            `).join('')}
+          </div>
         </div>
       </section>
 
@@ -171,9 +199,32 @@ export async function renderBehaviorPage(container, userId) {
     const key = e.key === ' ' ? 'Space' : e.key.length === 1 ? e.key.toUpperCase() : e.key;
     if (!['Control','Meta','Alt','Shift'].includes(e.key)) parts.push(key);
     const binding = parts.join('+');
-    local.keyboard_shortcuts[capturingKey] = binding;
+
+    // Conflict detection: find other actions using same binding
+    const conflict = Object.entries(local.keyboard_shortcuts)
+      .find(([action, b]) => b === binding && action !== capturingKey);
+
     const btn = container.querySelector(`[data-action="${capturingKey}"]`);
-    if (btn) { btn.textContent = binding; btn.classList.remove('capturing'); }
+    if (conflict) {
+      const [conflictAction] = conflict;
+      if (btn) {
+        btn.textContent = `⚠ Conflict: ${conflictAction}`;
+        btn.style.color = 'var(--color-error)';
+        btn.classList.remove('capturing');
+      }
+      showToast(`"${binding}" already bound to "${conflictAction}"`, 'error');
+      capturingKey = null;
+      document.getElementById('capture-hint').style.display = 'none';
+      // Restore original binding after 2s
+      setTimeout(() => {
+        const b2 = container.querySelector(`[data-action="${capturingKey || Object.keys(local.keyboard_shortcuts)[0]}"]`);
+        if (btn) { btn.textContent = local.keyboard_shortcuts[conflict[0]] ? binding : btn.textContent; btn.style.color = ''; }
+      }, 2000);
+      return;
+    }
+
+    local.keyboard_shortcuts[capturingKey] = binding;
+    if (btn) { btn.textContent = binding; btn.classList.remove('capturing'); btn.style.color = ''; }
     capturingKey = null;
     document.getElementById('capture-hint').style.display = 'none';
   });
@@ -191,5 +242,28 @@ export async function renderBehaviorPage(container, userId) {
   document.getElementById('behavior-save').addEventListener('click', async () => {
     await functionalPrefs.update(userId, local);
     showToast('Behavior saved!', 'success');
+  });
+
+  // DND toggle
+  document.getElementById('dnd-enabled')?.addEventListener('change', (e) => {
+    local.dnd_enabled = e.target.checked;
+    const dndTimes = document.getElementById('dnd-times');
+    if (dndTimes) dndTimes.style.cssText = local.dnd_enabled ? '' : 'opacity:0.4;pointer-events:none';
+  });
+  document.getElementById('dnd-from')?.addEventListener('change',  (e) => { local.dnd_from = e.target.value; });
+  document.getElementById('dnd-to')?.addEventListener('change',    (e) => { local.dnd_to   = e.target.value; });
+
+  // DND day pills
+  container.querySelectorAll('.dnd-day-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const day = parseInt(btn.dataset.day);
+      if (local.dnd_days.includes(day)) {
+        local.dnd_days = local.dnd_days.filter(d => d !== day);
+        btn.classList.remove('active');
+      } else {
+        local.dnd_days.push(day);
+        btn.classList.add('active');
+      }
+    });
   });
 }

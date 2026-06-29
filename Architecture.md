@@ -1,74 +1,93 @@
-# SigmaOS Privilege & Isolation Boundaries
+# SigmaOS Architecture
 
-This document defines the strict execution boundaries between the Kernel Space and User Space in the SigmaOS Zenith microkernel.
-
----
-
-## 🔒 Privilege Ring Separation
-
-SigmaOS enforces a strict boundary using CPU privilege rings (Ring 0 and Ring 3):
-
-```
-[ Ring 3 / EL0 / U-Mode ]  (User Applications / Containers)
-   ^
-   | (Syscall Interface - Seccomp filtered via Profile)
-   v
-[ Ring 0 / EL1 / S-Mode ]  (SigmaOS Kernel / Scheduler / VMM / Zero-Trust Enforcer)
-   ^
-   | (SovereignHAL)
-   v
-[ Hardware / EL2/EL3 / M-Mode ] (CPU / PSCI / SBI / Secure Boot TPM)
-```
-
-## Directory Structure
-
-- `kernel/` (Core microkernel operations)
-- `drivers/` (Sovereign HAL interactions)
-- `hal/` (Multi-Arch Hardware Abstraction - x86_64, ARM64, RISC-V RV64GC)
-- `security/` (Zero-Trust IPC, Capability Sandbox, Runtime Attestation)
-- `resilience/` (Self-Healing, Process Restarts, Rollback Updates)
-- `net/` (QUIC, IPv6, Mesh Networking, WireGuard VPN)
-       |                 RING 3: USERLAND            | 
-       |  - sh shell       - coreutils (ls, cat)    | 
-       |  - UI Renderer    - apps / web applications | 
-       +----------------------+----------------------+
-                              | 
-                     SYSCALL INTERFACE
-                              | 
-       +----------------------v----------------------+
-       |                RING 0: KERNEL SPACE         | 
-       |  - MLFQ Scheduler    - Page Allocators      | 
-       |  - VFS Vitals        - TCP/IP Stack         | 
-       |  - Device Drivers    - Shard Manager        | 
-       +---------------------------------------------+
-```
-
-### 1. Kernel Space (Ring 0 - Privilege)
-- **Subsystems**: Memory Manager, Scheduler, Device Drivers, VFS Core, Net Core.
-- **Privilege**: Direct access to hardware ports (`outb`/`inb`), page tables, CPU interrupt control registers, and physical disk sectors.
-- **Isolation**: Executed in a flat identity-mapped segment, isolated from user task interference.
-
-### 2. User Space (Ring 3 - Non-Privilege)
-- **Subsystems**: Omni-Shell, user application shards, system packages, standard libraries.
-- **Privilege**: No direct access to memory outside allocated task boundaries. No direct hardware I/O commands.
-- **Isolation**: Each process runs in its own virtual address space managed by the Virtual Memory Manager.
+One-page block diagram and subsystem descriptions for contributors.
 
 ---
 
-## 📞 System Call (Syscall) Dispatcher
+## System Stack (Top-Down)
 
-Communication across the kernel-userland boundary is strictly routed via the Sovereign Syscall Dispatcher (`SovereignSyscall.cpp`), mapped through the `int 0x80` or `syscall` CPU instructions:
-
-| Syscall ID | Name | Source Parameter | Target Action | 
-| --- | --- | --- | --- | 
-| `0x01` | `sys_write` | String buffer, length | Writes data to the COM1 debug serial or VGA screen. | 
-| `0x02` | `sys_read` | Input buffer, maximum length | Reads input data from the keyboard queue. | 
-| `0x05` | `sys_socket` | Domain, type, protocol | Allocates a network socket handler. | 
-| `0x06` | `sys_pkg_install` | Package name, source | Downloads and registers a software package. | 
+```
+╔══════════════════════════════════════════════════════════════════╗
+║                        USER APPLICATIONS                        ║
+║        sigma-shell  ·  browser  ·  apps  ·  containers          ║
+╠══════════════════════════════════════════════════════════════════╣
+║                     ZENITH DESKTOP (Ring 3)                     ║
+║      Compositor  ·  GPU Pipeline  ·  AI Scheduler  ·  IPC Bus   ║
+╠══════════════════════════════════════════════════════════════════╣
+║                   SYSCALL INTERFACE (int 0x80 / syscall)        ║
+║        Seccomp-profile-filtered  ·  Capability-checked          ║
+╠══════════════════════════════════════════════════════════════════╣
+║                     SIGMAOS KERNEL (Ring 0)                     ║
+║  ┌─────────────┐  ┌────────────┐  ┌──────────┐  ┌───────────┐  ║
+║  │  Scheduler  │  │ Page Alloc │  │   VFS    │  │  Net Core │  ║
+║  │  (EEVDF)    │  │ Buddy/SLAB │  │ (sigma-  │  │  (QUIC+   │  ║
+║  │             │  │ /TLSF      │  │  vfs)    │  │   TCP/IP) │  ║
+║  └─────────────┘  └────────────┘  └──────────┘  └───────────┘  ║
+║  ┌─────────────┐  ┌────────────┐  ┌──────────────────────────┐  ║
+║  │  Zero-Trust │  │  IPC/Caps  │  │  Metrics Exporter        │  ║
+║  │  Enforcer   │  │  (Cap-IPC) │  │  /sigma/metrics (procfs) │  ║
+║  └─────────────┘  └────────────┘  └──────────────────────────┘  ║
+╠══════════════════════════════════════════════════════════════════╣
+║               SOVEREIGN HAL  (Zig — architecture leaf)          ║
+║    x86_64 APIC/IOAPIC  ·  ARM64 GIC  ·  RISC-V CLINT/PLIC      ║
+╠══════════════════════════════════════════════════════════════════╣
+║                  HARDWARE / FIRMWARE                            ║
+║     CPU · RAM · NVMe · GPU · TPM · ACPI · UEFI / coreboot      ║
+╚══════════════════════════════════════════════════════════════════╝
+```
 
 ---
 
-## 🛡️ Boundary Enforcement Policies
-1. **Memory Separation**: User space cannot read or write to memory belonging to the kernel. Violation triggers a Page Fault Exception, terminating the user thread.
-2. **I/O Isolation**: Any hardware I/O port manipulation from Ring 3 results in a General Protection Fault.
-3. **No Monolithic Bloat**: File systems (Ext4/FAT32) and protocol parsers are run inside isolated kernel services and exposed through clean, lightweight wrappers.
+## Privilege Rings
+
+| Ring | Name | Runs | Direct HW Access |
+|------|------|------|-----------------|
+| Ring 0 / EL1 / S-Mode | **Kernel** | Scheduler, allocators, VFS, net stack, device drivers | ✅ Full |
+| Ring 3 / EL0 / U-Mode | **Userland** | Shell, compositor, apps, containers | ❌ Syscall-only |
+| EL2/EL3 / M-Mode | **Firmware** | UEFI / coreboot / SBI | ✅ Full |
+
+---
+
+## Key Subsystems
+
+### Kernel (`kernel/`)
+- **Scheduler**: EEVDF by default; `realtime` and `mixed-criticality` via `sigma.toml`.
+- **Allocator**: Buddy (default), SLAB (high-throughput), TLSF (real-time/IoT).
+- **IPC**: Capability-based message passing — no shared memory by default.
+- **VFS**: Log-structured primary FS + read-only verified overlay for airgapped builds.
+- **Metrics**: Zero-overhead virtual exporter at `/sigma/metrics` — see `kernel/core/metrics.rs`.
+
+### Security (`security/`)
+- **Zero-Trust enforcer**: pledge/unveil port, AVC matrix, namespace jailing.
+- **Ada/SPARK proofs**: Formal verification for memory verifier and capability checker.
+- **PQC**: Kyber-1024 hybrid TLS 1.3 in the network stack.
+
+### HAL (`hal/`)
+- Written in Zig for deterministic leaf compilation.
+- One HAL binary per architecture — x86_64, AArch64, RISC-V 64GC.
+
+### FFI Boundary (`kabi/`)
+- All cross-language structs are defined here as `#[repr(C)]` Rust types.
+- Zig, Nim, and Ada modules import from the generated C header — never hand-write ABI.
+
+### Desktop (`desktop/` + `graphics/`)
+- Zenith compositor: tiling + floating + full-screen modes.
+- GPU pipeline: Vulkan-like abstraction over hardware drivers.
+- AI scheduler: cooperative ML workload priority in `zenith_desktop.js`.
+
+---
+
+## Language Map
+
+```
+kernel/         Rust (no_std)
+hal/            Zig
+security/       Ada/SPARK (proof) + Rust (runtime)
+drivers/        Rust + Zig (leaf drivers)
+userland/       Rust + Nim
+tools/          Rust
+sigma-web/      HTML + Vanilla CSS/JS
+kabi/           Rust #[repr(C)] → C header for all consumers
+```
+
+See [LANGUAGE_POLICY.md](./LANGUAGE_POLICY.md) for the full ABI contract.

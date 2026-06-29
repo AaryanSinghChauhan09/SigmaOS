@@ -3,10 +3,14 @@
 *.bin
 *.iso
 *.elf
+build/
+dist/
+target/
+.cache/
+.pytest_cache/
 
 # Editor/IDE
 .vscode/
-.cache/
 *.swp
 *.swo
 
@@ -21,7 +25,6 @@ patch.py
 # Local junctions for compatibility
 networking
 node_modules/.vite
-
 
 # Wiki temp / local scratch only (wiki_repo/ is tracked for GitHub Wiki CI sync)
 wiki_temp/
