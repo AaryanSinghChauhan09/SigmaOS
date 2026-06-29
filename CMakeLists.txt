@@ -198,6 +198,14 @@ set(SIGMA_RUST_CORE
     ${CMAKE_SOURCE_DIR}/kernel/core/syscall/ipc.rs
 )
 
+# ── Rust Network Stack ────────────────────────────────────────────────────
+set(SIGMA_RUST_NET
+    ${CMAKE_SOURCE_DIR}/kernel/net/mod.rs
+    ${CMAKE_SOURCE_DIR}/kernel/net/net_stack.rs
+    ${CMAKE_SOURCE_DIR}/kernel/net/socket.rs
+    ${CMAKE_SOURCE_DIR}/kernel/net/firewall.rs
+)
+
 # ── Rust HAL (common to all targets) ──────────────────────────────────────
 set(SIGMA_RUST_HAL
     ${CMAKE_SOURCE_DIR}/drivers/hal/mod.rs
@@ -231,7 +239,7 @@ elseif(SIGMA_TARGET_OS STREQUAL "bsd")
     )
 endif()
 
-set(ALL_RUST_SRCS ${SIGMA_RUST_CORE} ${SIGMA_RUST_HAL} ${SIGMA_RUST_DRIVERS})
+set(ALL_RUST_SRCS ${SIGMA_RUST_CORE} ${SIGMA_RUST_NET} ${SIGMA_RUST_HAL} ${SIGMA_RUST_DRIVERS})
 set(ALL_ZIG_SRCS  ${SIGMA_ZIG_HAL}  ${SIGMA_ZIG_DRIVERS})
 
 # ── Custom commands: Rust .rs → .a ────────────────────────────────────────

@@ -43,7 +43,7 @@ kernel/
 │   ├── sched/          # MLFQ-MCS scheduler (Rewritten in Rust no_std)
 │   ├── syscall/        # Sovereign syscall gate (Rewritten in Rust no_std)
 │   └── hal/            # Hardware Abstraction Layer (Rewritten in Rust no_std & Zig freestanding)
-├── net/                # Sovereign TCP/IP stack (IPv4/IPv6)
+├── net/                # Sovereign TCP/IP stack (Rewritten in Rust no_std)
 ├── storage/            # SigmaFS + ZFS journal shim
 ├── telemetry/          # Zero-trust audit & telemetry
 └── virt/               # Hypervisor (optional — SIGMA_USE_HYPERVISOR)

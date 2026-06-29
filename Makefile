@@ -111,6 +111,10 @@ RUST_CORE_SRCS := kernel/core/memory/mod.rs kernel/core/memory/pmm.rs \
                   kernel/core/syscall/mod.rs kernel/core/syscall/gate.rs \
                   kernel/core/syscall/panic.rs kernel/core/syscall/ipc.rs
 
+# ── Rust sources — Network Stack ──────────────────────────────────────────
+RUST_NET_SRCS := kernel/net/mod.rs kernel/net/net_stack.rs \
+                 kernel/net/socket.rs kernel/net/firewall.rs
+
 # ── Rust sources — HAL (common) + OS-specific drivers ─────────────────────
 RUST_HAL_SRCS := drivers/hal/mod.rs drivers/hal/mmio.rs
 
@@ -128,7 +132,7 @@ endif
 # Zig port_io is common HAL (used by all targets for CPU primitives)
 ZIG_HAL_SRCS := drivers/hal/port_io.zig
 
-ALL_RUST_SRCS := $(RUST_CORE_SRCS) $(RUST_HAL_SRCS) $(RUST_DRV_SRCS)
+ALL_RUST_SRCS := $(RUST_CORE_SRCS) $(RUST_NET_SRCS) $(RUST_HAL_SRCS) $(RUST_DRV_SRCS)
 ALL_ZIG_SRCS  := $(ZIG_HAL_SRCS) $(ZIG_DRV_SRCS)
 
 # Rust → .a (static library per source)
