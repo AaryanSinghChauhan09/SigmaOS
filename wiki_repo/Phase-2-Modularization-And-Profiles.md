@@ -41,7 +41,7 @@ kernel/
 ├── core/
 │   ├── memory/         # Sovereign VMM, slab allocator, PMM (Rewritten in Rust no_std)
 │   ├── sched/          # MLFQ-MCS scheduler (Rewritten in Rust no_std)
-│   ├── syscall/        # Sovereign syscall gate (64 calls)
+│   ├── syscall/        # Sovereign syscall gate (Rewritten in Rust no_std)
 │   └── hal/            # Hardware Abstraction Layer (Rewritten in Rust no_std & Zig freestanding)
 ├── net/                # Sovereign TCP/IP stack (IPv4/IPv6)
 ├── storage/            # SigmaFS + ZFS journal shim

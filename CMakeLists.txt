@@ -183,7 +183,7 @@ set(SIGMA_RUSTFLAGS
 
 set(SIGMA_ZIG_TARGET "x86_64-freestanding-none")
 
-# ── Rust Core (Memory & Sched) ────────────────────────────────────────────
+# ── Rust Core (Memory & Sched & Syscall) ──────────────────────────────────
 set(SIGMA_RUST_CORE
     ${CMAKE_SOURCE_DIR}/kernel/core/memory/mod.rs
     ${CMAKE_SOURCE_DIR}/kernel/core/memory/pmm.rs
@@ -192,6 +192,10 @@ set(SIGMA_RUST_CORE
     ${CMAKE_SOURCE_DIR}/kernel/core/sched/mod.rs
     ${CMAKE_SOURCE_DIR}/kernel/core/sched/sovereign.rs
     ${CMAKE_SOURCE_DIR}/kernel/core/sched/mlfq.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/syscall/mod.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/syscall/gate.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/syscall/panic.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/syscall/ipc.rs
 )
 
 # ── Rust HAL (common to all targets) ──────────────────────────────────────

@@ -103,11 +103,13 @@ C_SRCS := $(shell find $(SRC_DIRS) -name '*.c')
 CXX_SRCS := $(shell find $(SRC_DIRS) -name '*.cpp')
 ASM_SRCS := $(shell find $(SRC_DIRS) -name '*.asm')
 
-# ── Rust sources — Kernel Core (Memory & Sched) ───────────────────────────
+# ── Rust sources — Kernel Core (Memory & Sched & Syscall) ─────────────────
 RUST_CORE_SRCS := kernel/core/memory/mod.rs kernel/core/memory/pmm.rs \
                   kernel/core/memory/slab.rs kernel/core/memory/vmm.rs \
                   kernel/core/sched/mod.rs kernel/core/sched/sovereign.rs \
-                  kernel/core/sched/mlfq.rs
+                  kernel/core/sched/mlfq.rs \
+                  kernel/core/syscall/mod.rs kernel/core/syscall/gate.rs \
+                  kernel/core/syscall/panic.rs kernel/core/syscall/ipc.rs
 
 # ── Rust sources — HAL (common) + OS-specific drivers ─────────────────────
 RUST_HAL_SRCS := drivers/hal/mod.rs drivers/hal/mmio.rs
