@@ -37,6 +37,9 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 | `drivers/linux_distros/compat.rs` | `drivers/linux_distros/ArchDriverCompat.cpp`, `DebianDriverCompat.cpp`, `FedoraDriverCompat.cpp`, `UbuntuDriverCompat.cpp` |
 | `drivers/linux_distros/hardware/mod.rs` | Consolidated hardware shims under `drivers/linux_distros/hardware/` |
 | `ecosystem/templates/sovereign_driver_template.rs` | `ecosystem/templates/SovereignDriverTemplate.c` |
+| **`hal/sovereign_hal.rs`** | `hal/SovereignHAL.cpp`, `hal/SovereignHAL.hpp`, `hal/hal_stub.c`, `hal/hardware_probe.cpp`, `hal/sigma_pci.cpp`, `hal/sigma_pci.h`, all `include/hal/*.h` |
+| **`graphics/sovereign_gpu.rs`** | `graphics/gpu_compute/gpu_stub.cpp`, `graphics/vulkan_layer/vulkan_layer.cpp`, `include/drivers/sigma_gpu.h`, `include/gfx/drm.h` |
+| **`net/sovereign_net.rs`** | All `include/net/*.h`, `include/network/sigma_aether_firewall.h`, `include/kernel/sigma_network.h` |
 
 ### Zig (bare-metal, no stdlib)
 
@@ -51,6 +54,7 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 | `drivers/display/vga.zig` | `drivers/display/sigma_vga.cpp`, `sigma_vga_driver.cpp` |
 | `drivers/graphics/kms.zig` | `drivers/graphics/sigma_kms.cpp`, `sigma_kms.h` |
 | `drivers/unified/driver_api.zig` | `drivers/unified/driver_api.h` |
+| **`fs/sovereign_vfs.zig`** | `fs/sigmafs/sigmafs.h`, `fs/sovereign_fs/sovereign_fs.h`, `fs/SovereignDiskZenith.h`, all `include/fs/*.h` |
 
 
 ### Nim (compiles to native, no stdlib/libc)
@@ -64,6 +68,7 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 | `ecosystem/aether.nim` | `ecosystem/SovereignAetherAbsorption.cpp`, `SovereignAetherOrchestrator.cpp` |
 | `ecosystem/forge.nim` | `ecosystem/SovereignDevForge.cpp`, `SovereignDistroForge.cpp`, etc. |
 | `ecosystem/utils.nim` | `ecosystem/SovereignCoreUtils.cpp`, `SovereignCoreUtils.h` |
+| **`pkg/sigpkg.nim`** | `include/core/SovereignPackageManager.h` — full sovereign package manager |
 
 ### Ada/SPARK (formally verified, no runtime exceptions)
 
@@ -75,6 +80,7 @@ SigmaOS uses **multiple advanced low-level programming languages**, each chosen 
 | `drivers/block/nvme.ads` + `nvme.adb` | `drivers/block/nvme_shard.cpp` |
 | `drivers/net/e1000.ads` + `e1000.adb` | `drivers/net/sigma_e1000.cpp` |
 | `drivers/net/rtl8139.ads` + `rtl8139.adb` | `drivers/net/sigma_rtl8139.cpp` |
+| **`security/sovereign_security.ads` + `.adb`** | All `include/security/*.h`, `include/observability/*.h`, MAC policy, audit framework |
 
 ---
 
