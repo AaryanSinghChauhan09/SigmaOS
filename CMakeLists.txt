@@ -183,6 +183,17 @@ set(SIGMA_RUSTFLAGS
 
 set(SIGMA_ZIG_TARGET "x86_64-freestanding-none")
 
+# ── Rust Core (Memory & Sched) ────────────────────────────────────────────
+set(SIGMA_RUST_CORE
+    ${CMAKE_SOURCE_DIR}/kernel/core/memory/mod.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/memory/pmm.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/memory/slab.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/memory/vmm.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/sched/mod.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/sched/sovereign.rs
+    ${CMAKE_SOURCE_DIR}/kernel/core/sched/mlfq.rs
+)
+
 # ── Rust HAL (common to all targets) ──────────────────────────────────────
 set(SIGMA_RUST_HAL
     ${CMAKE_SOURCE_DIR}/drivers/hal/mod.rs
@@ -216,7 +227,7 @@ elseif(SIGMA_TARGET_OS STREQUAL "bsd")
     )
 endif()
 
-set(ALL_RUST_SRCS ${SIGMA_RUST_HAL} ${SIGMA_RUST_DRIVERS})
+set(ALL_RUST_SRCS ${SIGMA_RUST_CORE} ${SIGMA_RUST_HAL} ${SIGMA_RUST_DRIVERS})
 set(ALL_ZIG_SRCS  ${SIGMA_ZIG_HAL}  ${SIGMA_ZIG_DRIVERS})
 
 # ── Custom commands: Rust .rs → .a ────────────────────────────────────────

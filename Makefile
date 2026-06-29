@@ -103,6 +103,12 @@ C_SRCS := $(shell find $(SRC_DIRS) -name '*.c')
 CXX_SRCS := $(shell find $(SRC_DIRS) -name '*.cpp')
 ASM_SRCS := $(shell find $(SRC_DIRS) -name '*.asm')
 
+# ── Rust sources — Kernel Core (Memory & Sched) ───────────────────────────
+RUST_CORE_SRCS := kernel/core/memory/mod.rs kernel/core/memory/pmm.rs \
+                  kernel/core/memory/slab.rs kernel/core/memory/vmm.rs \
+                  kernel/core/sched/mod.rs kernel/core/sched/sovereign.rs \
+                  kernel/core/sched/mlfq.rs
+
 # ── Rust sources — HAL (common) + OS-specific drivers ─────────────────────
 RUST_HAL_SRCS := drivers/hal/mod.rs drivers/hal/mmio.rs
 
@@ -120,7 +126,7 @@ endif
 # Zig port_io is common HAL (used by all targets for CPU primitives)
 ZIG_HAL_SRCS := drivers/hal/port_io.zig
 
-ALL_RUST_SRCS := $(RUST_HAL_SRCS) $(RUST_DRV_SRCS)
+ALL_RUST_SRCS := $(RUST_CORE_SRCS) $(RUST_HAL_SRCS) $(RUST_DRV_SRCS)
 ALL_ZIG_SRCS  := $(ZIG_HAL_SRCS) $(ZIG_DRV_SRCS)
 
 # Rust → .a (static library per source)
