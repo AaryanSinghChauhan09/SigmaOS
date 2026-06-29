@@ -1,0 +1,63 @@
+# SigmaOS Air-Gapped / Sovereign Profile Preset
+# Maximum security, no external comms, user-controlled root of trust.
+# sigma image build --profile config/profiles/airgapped.toml
+
+[profile]
+preset = "airgapped"
+arch   = "x86_64"
+board  = "generic-uefi"
+name   = "SigmaOS Sovereign"
+
+[kernel]
+scheduler     = "eevdf"
+allocator     = "slab"
+ipc           = "capability"
+network_stack = "none"
+features      = ["audit","aslr","capabilities","namespaces","zero-trust","immutable-root","pqc-hardening"]
+filesystems   = ["log-structured","read-only-verified"]
+
+[network]
+profile   = "airgapped"
+dns       = "system"
+firewall  = "strict"
+wifi      = false
+bluetooth = false
+vpn       = ""
+
+[theme]
+palette = "phosphor-green"
+font    = "jetbrains-mono"
+density = "comfortable"
+mode    = "dark"
+icons   = "nerd-fonts"
+motion  = false              # Reduce visual attack surface
+
+[security]
+signing_key         = "./keys/org.pub"   # User-controlled cert — true sovereignty
+secure_boot         = true
+capability_profiles = true
+safestack = true
+retguard  = true
+fortify   = true
+
+[packages]
+include = ["sigma-shell","sigma-core","sigma-tui","sigma-forensics","sigma-compliance-cli"]
+exclude = ["sigma-gui","sigma-vr-studio","sigma-ai","sigma-cloud-sync","sigma-net"]
+
+[power]
+profile = "balanced"
+
+[boot]
+bootloader = "coreboot"      # Open firmware — no proprietary blobs
+splash     = true
+motd       = "Σ Sovereign Node — Air-Gapped | Verified Boot | Zero External Trust"
+
+[runtime]
+hot_reload = false
+log_level  = "info"
+telemetry  = false           # Absolutely never
+
+[fleet]
+update_channel = "stable"
+control_plane  = ""          # Peer-to-peer only — no external plane
+attest_tpm     = true

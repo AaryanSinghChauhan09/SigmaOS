@@ -1,0 +1,60 @@
+# SigmaOS Edge / IoT Profile Preset
+# Minimal footprint, real-time scheduler, mesh networking, low power.
+# sigma image build --profile config/profiles/edge.toml
+
+[profile]
+preset = "edge"
+arch   = "aarch64"
+board  = "raspi4"
+name   = "SigmaOS Edge"
+
+[kernel]
+scheduler     = "realtime"
+allocator     = "tlsf"
+ipc           = "message-passing"
+network_stack = "minimal"
+features      = ["aslr","capabilities","zero-trust","power-management"]
+filesystems   = ["log-structured"]
+
+[network]
+profile   = "mesh"
+dns       = "system"
+firewall  = "sigma-shield"
+wifi      = true
+bluetooth = true
+vpn       = "wireguard"
+
+[theme]
+palette = "amber"
+font    = "jetbrains-mono"
+density = "compact"
+mode    = "dark"
+icons   = "ascii"
+motion  = false
+
+[security]
+secure_boot         = true
+capability_profiles = true
+safestack = true
+retguard  = true
+fortify   = true
+
+[packages]
+include = ["sigma-shell","sigma-core","sigma-sensor-fusion","sigma-edge-ml"]
+exclude = ["sigma-gui","sigma-vr-studio","sigma-dev-tools","sigma-ai"]
+
+[power]
+profile = "battery"
+
+[boot]
+bootloader = "u-boot"
+splash     = false
+motd       = "SigmaOS Edge — Sovereign Node"
+
+[runtime]
+hot_reload = false
+log_level  = "warn"
+
+[fleet]
+update_channel = "stable"
+attest_tpm     = false

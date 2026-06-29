@@ -1,0 +1,59 @@
+# SigmaOS Server Profile Preset
+# Headless, immutable root, cloud-optimised, no GUI.
+# sigma image build --profile config/profiles/server.toml
+
+[profile]
+preset = "server"
+arch   = "x86_64"
+board  = "cloud-vm"
+name   = "SigmaOS Server"
+
+[kernel]
+scheduler     = "eevdf"
+allocator     = "slab"
+ipc           = "message-passing"
+network_stack = "full"
+features      = ["audit","aslr","capabilities","namespaces","zero-trust","io_uring_like","immutable-root"]
+filesystems   = ["log-structured"]
+
+[network]
+profile   = "home"
+dns       = "doh"
+firewall  = "strict"
+wifi      = false
+bluetooth = false
+
+[theme]
+palette = "monochrome"
+font    = "jetbrains-mono"
+density = "compact"
+mode    = "dark"
+icons   = "ascii"
+motion  = false
+
+[security]
+secure_boot         = true
+capability_profiles = true
+safestack = true
+retguard  = true
+fortify   = true
+
+[packages]
+include = ["sigma-shell","sigma-core","sigma-net","sigma-container-engine"]
+exclude = ["sigma-gui","sigma-vr-studio","sigma-ai"]
+
+[power]
+profile = "performance"
+
+[boot]
+bootloader = "uefi"
+splash     = false
+motd       = "SigmaOS Server — Sovereign Cloud Node"
+
+[runtime]
+hot_reload = false
+log_level  = "warn"
+
+[fleet]
+update_channel = "stable"
+attest_tpm     = true

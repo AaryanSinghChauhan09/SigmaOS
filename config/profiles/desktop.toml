@@ -1,0 +1,53 @@
+# SigmaOS Desktop Profile Preset
+# Full-featured workstation: GUI, AI, all peripherals, developer tools.
+# sigma image build --profile config/profiles/desktop.toml
+
+[profile]
+preset = "desktop"
+arch   = "x86_64"
+board  = "generic-uefi"
+name   = "SigmaOS Desktop"
+
+[kernel]
+scheduler     = "eevdf"
+allocator     = "buddy"
+ipc           = "capability"
+network_stack = "full"
+features      = ["audit","aslr","capabilities","namespaces","zero-trust","io_uring_like","ai-engine","hypervisor"]
+filesystems   = ["ext-like","log-structured"]
+
+[network]
+profile   = "home"
+dns       = "doh"
+firewall  = "sigma-shield"
+wifi      = true
+bluetooth = true
+
+[theme]
+palette = "phosphor-green"
+font    = "jetbrains-mono"
+density = "comfortable"
+mode    = "dark"
+icons   = "nerd-fonts"
+motion  = true
+
+[security]
+capability_profiles = true
+safestack = true
+retguard  = true
+fortify   = true
+
+[packages]
+include = ["sigma-shell","sigma-core","sigma-tui","sigma-gui","sigma-dev-tools","sigma-ai","sigma-vr-studio"]
+exclude = []
+
+[power]
+profile = "balanced"
+
+[boot]
+bootloader = "uefi"
+splash     = true
+
+[runtime]
+hot_reload = true
+log_level  = "info"
