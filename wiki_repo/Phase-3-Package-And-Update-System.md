@@ -5,7 +5,16 @@
 SigmaOS replaces APT/DNF/Pacman with `sigpkg` — a sovereign, POSIX-free, cryptographically-verified package manager. It is modeled after the reproducibility of Nix and the speed of eopkg (Solus), without any POSIX/libc dependency.
 
 > [!IMPORTANT]
-> **Status**: `sigpkg` is **implemented** in `#![no_std]` Rust (`usr/sigpkg/`). Legacy C/C++ package stubs (`sigma_pkg.c`, `SovereignPkgManager.cpp`) have been removed.
+> **Status**: `sigpkg` and the **entire userspace** is now implemented in `#![no_std]` Rust. All legacy C/C++ files have been removed across:
+> - `usr/sigpkg/` — Sovereign Package Manager (replaces `sigma_pkg.c`, `SovereignPkgManager.cpp`)
+> - `usr/shell/` — OmniShell, sh, logd, sigma_env, update_agent (5 files)
+> - `usr/apps/` — All 22 userspace apps
+> - `usr/ui/` — Zenith Desktop, SovereignShell, UICore, Browser, Spotlight, Launcher, AppStore, Dash, Control, Edit (10 files)
+> - `drivers/network/` — All 24 network driver files
+> - `drivers/storage/` — All 7 storage driver files
+> - `drivers/usb/` — All 3 USB driver files
+> - `drivers/multimedia/` — All 2 multimedia driver files
+> - `drivers/*.cpp`, `drivers/*.c` — 14 top-level driver files
 
 
 ---
