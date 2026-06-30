@@ -1,0 +1,5 @@
+[build]
+target = "x86_64-sigmaos.json" # Custom target for the OS
+
+[target.'cfg(target_os = "none")']
+runner = "qemu-system-x86_64 -kernel"

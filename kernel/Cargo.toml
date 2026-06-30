@@ -1,0 +1,12 @@
+[package]
+name = "sigma_kernel"
+version = "0.1.0"
+edition = "2021"
+authors = ["SigmaOS Contributors"]
+description = "Core kernel for SigmaOS"
+
+[profile.dev]
+panic = "abort" # Disable unwinding on panic
+
+[profile.release]
+panic = "abort" # Disable unwinding on panic
