@@ -1,7 +1,10 @@
 #![no_std] // don't link the Rust standard library
 #![no_main] // disable all Rust-level entry points
 
+mod drivers;
+
 use core::panic::PanicInfo;
+use drivers::DriverRegistry;
 
 /// This function is called on panic.
 #[panic_handler]
@@ -13,15 +16,16 @@ fn panic(_info: &PanicInfo) -> ! {
 /// `_start` is the default entry point name for most linkers.
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    // Basic VGA buffer logic for "Hello World"
-    let vga_buffer = 0xb8000 as *mut u8;
+    // Initialize the Driver Registry (modular, OOP-based framework)
+    let mut registry = DriverRegistry::new();
+    
+    // Initialize all hardware drivers (currently just VGA)
+    registry.init_all();
 
-    for (i, &byte) in b"Welcome to SigmaOS Phase 1!".iter().enumerate() {
-        unsafe {
-            *vga_buffer.offset(i as isize * 2) = byte;
-            *vga_buffer.offset(i as isize * 2 + 1) = 0xb; // Light cyan color
-        }
-    }
+    // Use the safe VGA driver to print to the screen
+    registry.vga.print_str("Welcome to SigmaOS Phase 2!\n");
+    registry.vga.print_str("Modular Driver Framework Initialized successfully.\n");
+    registry.vga.print_str("Booting core systems...");
 
     loop {}
 }
