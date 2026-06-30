@@ -3,6 +3,7 @@
 
 mod drivers;
 mod io;
+mod fs;
 
 use core::panic::PanicInfo;
 use drivers::DriverRegistry;

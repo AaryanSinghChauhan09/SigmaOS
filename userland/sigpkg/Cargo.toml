@@ -1,0 +1,9 @@
+[package]
+name = "sigpkg"
+version = "0.1.0"
+edition = "2021"
+description = "Sovereign Package Manager for SigmaOS"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]

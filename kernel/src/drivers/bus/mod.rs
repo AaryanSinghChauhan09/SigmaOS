@@ -3,6 +3,8 @@
 
 use super::{Driver, BusType};
 
+pub mod pci;
+
 pub trait BusController {
     /// Initialize the bus controller.
     fn init(&mut self) -> Result<(), &'static str>;
