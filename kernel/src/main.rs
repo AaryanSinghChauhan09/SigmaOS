@@ -2,6 +2,7 @@
 #![no_main] // disable all Rust-level entry points
 
 mod drivers;
+mod io;
 
 use core::panic::PanicInfo;
 use drivers::DriverRegistry;

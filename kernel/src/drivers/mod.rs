@@ -1,4 +1,23 @@
 pub mod vga;
+pub mod bus;
+pub mod nic;
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum DeviceClass {
+    Network,
+    Block,
+    Character,
+    Display,
+    Unknown,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum BusType {
+    PCI,
+    USB,
+    Platform,
+    None,
+}
 
 /// Core trait representing a hardware driver in SigmaOS.
 /// This OOP-based approach ensures a consistent interface across all devices.
@@ -11,6 +30,16 @@ pub trait Driver {
     
     /// Get the name of the driver for logging/registration.
     fn name(&self) -> &'static str;
+
+    /// Get the class of the device this driver controls.
+    fn class(&self) -> DeviceClass {
+        DeviceClass::Unknown
+    }
+
+    /// Get the bus type this driver is attached to.
+    fn bus_type(&self) -> BusType {
+        BusType::None
+    }
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -22,9 +51,8 @@ pub enum DriverStatus {
 
 /// A centralized registry to keep track of loaded drivers.
 pub struct DriverRegistry {
-    // In a real implementation with dynamic allocation, this would be a Vec<Box<dyn Driver>>.
-    // For our no_std bare-metal environment, we'll keep it simple for now.
     pub vga: vga::VgaDriver,
+    // In a dynamic system, we would have arrays/vectors of generic drivers here.
 }
 
 impl DriverRegistry {
@@ -34,11 +62,14 @@ impl DriverRegistry {
         }
     }
 
+    /// The sovereign registration function that adds drivers to the central registry.
+    /// In a fully dynamic OS, this would take a `Box<dyn Driver>`.
+    pub fn sigma_register_driver(&mut self, _driver_name: &str) {
+        // Placeholder for dynamic registration logic.
+    }
+
     pub fn init_all(&mut self) {
-        // Initialize VGA Driver
         if let Err(e) = self.vga.init() {
-            // If VGA fails, we can't really print an error to VGA.
-            // In the future, this would log to a serial port.
             panic!("VGA Initialization failed: {}", e);
         }
     }
