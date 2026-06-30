@@ -19,6 +19,7 @@
 | Coding Standards | [Coding-Standards](Coding-Standards.md) | ✅ Stable |
 | Sovereign System Profiles | [Sovereign-System-Profiles](Sovereign-System-Profiles.md) | ✅ Stable |
 | Packaging & Immutability | [Sovereign-Packaging-and-Immutability](Sovereign-Packaging-and-Immutability.md) | ✅ Stable |
+| `sigpkg` Format Spec | [sigpkg-Spec](sigpkg-Spec.md) | ✅ Draft |
 | Zenith Desktop | [Zenith-Desktop-SDK](Zenith-Desktop-SDK.md) | ✅ Stable |
 | Driver API | [Driver-API](Driver-API.md) | ✅ Draft |
 | Hardware Coverage | [Driver-Support](Driver-Support.md) | 🔄 Updated |
