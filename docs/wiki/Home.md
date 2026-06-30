@@ -20,7 +20,8 @@
 | Sovereign System Profiles | [Sovereign-System-Profiles](Sovereign-System-Profiles.md) | ✅ Stable |
 | Packaging & Immutability | [Sovereign-Packaging-and-Immutability](Sovereign-Packaging-and-Immutability.md) | ✅ Stable |
 | Zenith Desktop | [Zenith-Desktop-SDK](Zenith-Desktop-SDK.md) | ✅ Stable |
-| Driver Support | [Driver-Support](Driver-Support.md) | ✅ Phase 5 |
+| Driver API | [Driver-API](Driver-API.md) | ✅ Draft |
+| Hardware Coverage | [Driver-Support](Driver-Support.md) | 🔄 Updated |
 | Container Orchestrator | [Container-Orchestrator](Container-Orchestrator.md) | ✅ Stable |
 | CI/CD Workflows | [CI-Workflows](CI-Workflows.md) | ✅ Stable |
 
