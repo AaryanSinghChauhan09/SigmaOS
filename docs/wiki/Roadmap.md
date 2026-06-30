@@ -1,144 +1,112 @@
 # SigmaOS Roadmap
-**Single source of truth — all phases and milestones**
+**Single source of truth — phases, milestones, and 12-month sprint plan**
+
+SigmaOS leverages proven design patterns from leading Linux distributions (Debian for stability, Fedora for innovation, Arch for modularity, Ubuntu for UX, Bottlerocket for cloud minimal) to guide our sovereign ecosystem strategy.
 
 Status key: ✅ Done · 🔄 In Progress · 🎯 Planned · ❌ Blocked
 
 ---
 
-## v0.1 — Foundation ("Genesis")
+## 🏗️ Phase Plan & Timeline
+
+| Phase | Distro Model | Timeline | Primary Focus | Key Deliverables |
+|---|---|---|---|---|
+| **0. Foundation** | Debian (LTS) | 0–3 months | Stabilize core and documentation | ABI spec; `main` build reproducible; role-based Wiki; CI baseline |
+| **1. Hardware** | Fedora (Fast) | 3–9 months | Drivers and device model | USB, NVMe, basic GPU, audio drivers; driver API docs; CI tests |
+| **2. Security & FS** | Arch (Modular) | 6–12 months | Robust FS and hardening | Journaling FS; encryption; sandboxing; CVE process; formal verification plan |
+| **3. Ecosystem** | Ubuntu (UX) | 9–18 months | `sigpkg` and built-in apps | `sigpkg` MVP; coreutils/shell in Rust/Zig; SigmaVCS prototype; SDK |
+| **4. Profiles** | Bottlerocket | 12–24 months | Desktop, Cloud, RTOS, Mobile | `sigma-desktop` alpha; signed cloud images; RTOS profile; mobile UI |
+| **5. Research** | Theseus/Redox | 18–36 months | Verification and research features | Verified FS module; microkernel variant; WASM runtime; full app ecosystem |
+
+---
+
+## 🏃 Detailed 12-Month Sprint Plan
+
+### Months 0–3: Foundation Sprint
+- **Issue:** Publish ABI spec and LTS policy.
+- **Issue:** Create reproducible build CI job for `main`.
+- **Issue:** Add role-based Wiki pages and contribution templates.
+- **Issue:** Implement `sigma-sh` minimal shell and 3 core utilities (Rust/Zig).
+- **Issue:** Define Security Model and CVE reporting workflow.
+
+### Months 3–6: Drivers & Packaging Sprint
+- **Issue:** Publish Driver API spec and sample USB driver in `drivers-dev`.
+- **Issue:** Create `sigpkg` repo skeleton and package signing spec.
+- **Issue:** Publish FS design doc for journaling and encryption.
+
+### Months 6–12: Ecosystem & Images Sprint
+- **Issue:** Implement NVMe driver and add QEMU tests.
+- **Issue:** Define `sigma-core` meta-manifest and alpha desktop image.
+- **Issue:** `sigpkg` MVP: build, sign, and install a core package.
+
+---
+
+## 📦 Detailed Task Tracking (v0.1 → v1.0)
+
+### v0.1 — Foundation ("Genesis")
 > **DoD:** Boots in QEMU x86_64 → framebuffer login → 3 userspace apps run
 
 | Task | Status | Location |
 |---|---|---|
 | Multiboot2 boot on x86_64 | ✅ Done | `S01_Genesis/` |
-| Physical memory manager (buddy) | ✅ Done | `memory/pmm/` |
-| Virtual memory + paging | ✅ Done | `memory/vmm/` |
+| Physical/Virtual memory | ✅ Done | `memory/` |
 | Basic EEVDF scheduler | ✅ Done | `scheduling/` |
 | Serial (COM1) + VGA output | ✅ Done | `drivers/` |
-| Keyboard PS/2 driver | ✅ Done | `drivers/` |
 | VFS + ramfs | ✅ Done | `fs/` |
 | ELF userland loader | ✅ Done | `userland/` |
-| sigma-shell (minimal) | ✅ Done | `userland/shell/` |
-| QEMU smoke test in CI | ❌ Blocked | CI stabilization |
-| Green CI on `main` | ❌ Blocked | Top priority |
 
----
-
-## v0.2 — Stability & Contributor Funnel
+### v0.2 — Stability & Contributor Funnel (Months 0-3)
 > **Goal:** Green CI, reproducible builds, top-level docs, one canonical build entrypoint
 
 | Task | Status | Location |
 |---|---|---|
-| `just` task runner | ✅ Done | `justfile` |
-| `LANGUAGE_POLICY.md` | ✅ Done | root |
-| `kabi/` unified C-ABI crate | ✅ Done | `kabi/` |
-| `README.md` top-level | ✅ Done | root |
-| `Architecture.md` | ✅ Done | root |
 | `sigma.toml` declarative config | ✅ Done | root |
-| `sigma config validate` CLI | ✅ Done | `tools/` |
 | **sigma-sh v0.2 (full Rust)** | 🔄 In Progress | `sigma-sh/` |
 | **sigpkg v0.2 (resolver + crypto)** | 🔄 In Progress | `userland/sigpkg/` |
-| **Absorption Matrix** | 🔄 In Progress | `docs/Absorption-Matrix.md` |
-| **Security Model doc** | 🔄 In Progress | `docs/Security-Model.md` |
-| **Coding Standards wiki** | 🔄 In Progress | `docs/wiki/` |
-| QEMU boot smoke test CI | 🎯 Planned | `.github/workflows/` |
-| Required status check on `main` | 🎯 Planned | Repo Settings |
+| **Absorption Matrix** | ✅ Done | `docs/Absorption-Matrix.md` |
+| **Security Model doc** | ✅ Done | `docs/Security-Model.md` |
+| Publish ABI spec & LTS policy | 🎯 Planned | `docs/ABI.md` |
+| Reproducible build CI (`main`) | 🎯 Planned | `.github/workflows/` |
+| Role-based Wiki pages | 🎯 Planned | `docs/wiki/` |
 
----
-
-## v0.3 — Networking & Security Hardening
+### v0.3 — Networking & Security Hardening (Months 6-12)
 > **Goal:** Functional TCP/IP + DoH + WireGuard; SPARK proofs gate on merge
 
 | Task | Status | Location |
 |---|---|---|
-| TCP/IP stack | ✅ Done | `net/` |
-| QUIC transport | ✅ Done | `net/quic/` |
+| TCP/IP & QUIC stack | ✅ Done | `net/` |
+| DoH resolver & TLS 1.3 | ✅ Done | `net/` |
 | WireGuard VPN (`sigma-vpn`) | 🎯 Planned | `net/vpn/` |
-| DoH resolver | ✅ Done | `net/dns/` |
-| TLS 1.3 + Kyber-1024 | ✅ Done | `crypto/` |
-| sigma-shield packet filter | 🎯 Planned | `net/firewall/` |
-| Zero-Trust AVC matrix | ✅ Done | `security/` |
-| gnatprove CI gate | 🎯 Planned | Ada/SPARK modules |
-| PQC attestation (cosign) | 🎯 Planned | Release signing |
 | **Syscall audit framework** | 🎯 Planned | `kernel/security/audit/` |
 | **Capability sandbox v1** | 🎯 Planned | `kernel/security/caps/` |
-| **Hardened allocator** | 🎯 Planned | `kernel/memory/hardened/` |
 
----
-
-## v0.4 — Desktop & GPU
+### v0.4 — Desktop & GPU (Months 12-24)
 > **Goal:** Zenith compositor boots, GPU acceleration, basic app model
 
 | Task | Status | Location |
 |---|---|---|
 | Zenith compositor | ✅ Done | `desktop/`, `zenith_desktop.js` |
 | GPU HAL (Vulkan-like) | ✅ Done | `graphics/` |
-| AI scheduler integration | ✅ Done | `zenith_desktop.js` |
-| Browser (sigma-browse) | ✅ Done | `browser/` |
-| Package manager (sigpkg v0.1) | ✅ Done | `sigma-pkg/` |
 | **sigpkg v0.2** (real resolver) | 🔄 In Progress | `userland/sigpkg/` |
-| Sigma Store registry | 🎯 Planned | `sigma_pkg_registry/` |
 | **USB/HID stack** | 🎯 Planned | `drivers/usb/` |
-| **Audio subsystem** | 🎯 Planned | `drivers/audio/` |
 | **NVMe driver** | 🎯 Planned | `drivers/storage/nvme/` |
+| `sigma-core` meta manifest | 🎯 Planned | `config/profiles/` |
 
 ---
 
-## v0.5 — Kernel Observability & Fleet
-> **Goal:** Live kernel metrics, syscall tracing, fleet node orchestration
+## 🗂️ Branch Ownership & Architecture
 
-| Task | Status | Location |
-|---|---|---|
-| Kernel metrics exporter | ✅ Done | `kernel/core/metrics.rs` |
-| `sigma-trace` syscall profiler | ✅ Done | `tools/sigma-trace.rs` |
-| Thermal + power HAL daemon | 🎯 Planned | `hal/thermal/` |
-| cgroup-aware namespace accounting | 🎯 Planned | `security/cgroups/` |
-| Auto-enroll + TPM attestation | 🎯 Planned | `sigmad/` |
-| Policy-as-code GitOps rollout | 🎯 Planned | `sigma update` + GHA |
-| Self-healing A/B rollback | 🎯 Planned | `sigma node rollback` |
-| **SigmaVCS** (sovereign Git) | 🎯 Planned | `sigma-vcs/` |
+To scale development, we use strict branch mapping with specific maintainers and CI gates.
+
+👉 **Read the full guide:** [Branch Ownership & CI Gates](Branch-Ownership.md)
 
 ---
 
-## v1.0 — Sovereign Production
-> **Goal:** Reproducible SLSA L3 ISO, air-gapped deployments, SPARK-proven security
+## 📈 Success Metrics
 
-| Task | Status | Location |
-|---|---|---|
-| Reproducible ISO builds (SLSA L3) | 🎯 Planned | `release.yml` |
-| SBOM (CycloneDX) per release | ✅ Done | `release.yml` |
-| IPFS + CDN mirror distribution | ✅ Done | `mirror_sync.yml` |
-| Air-gapped sovereign profile | ✅ Done | `config/profiles/` |
-| Full sigma CLI (16 subcommands) | ✅ Done | `tools/sigma-cli.rs` |
-| CODEOWNERS per subsystem | 🎯 Planned | `.github/CODEOWNERS` |
-| **sigma-core-utils (full Rust)** | 🎯 Planned | `userland/coreutils/` |
-| **sigma-vault** credential manager | 🎯 Planned | `userland/vault/` |
-| **SovereignFS** (journaling FS) | 🎯 Planned | `fs/sovereign/` |
-| **sigma-sandbox** (CAP-based) | 🎯 Planned | `security/sandbox/` |
-| v1.0 tag + release announcement | 🎯 Planned | — |
-
----
-
-## Absorption Roadmap
-
-See [Absorption-Matrix](Absorption-Matrix.md) for the full map of 70+ external tools → SigmaOS sovereign replacements.
-
-**Current absorption priorities:**
-1. `sigma-core-utils` (GNU Coreutils → Rust)
-2. `sigma-sh` v0.2 (bash/zsh → full Rust shell)
-3. `sigpkg` v0.2 (apt/pacman → Rust pkg manager)
-4. `SovereignFS` (ext4/btrfs ideas → sovereign FS)
-5. `sigma-ssh` (OpenSSH → Rust)
-6. `SigmaVCS` (Git → sovereign VCS)
-
----
-
-## Parked / Experiments Branch
-- Windows-parity syscall compatibility layer
-- NPU/TPU HAL (neural hardware acceleration)
-- VR/XR renderer
-- Multi-tenant cloud orchestrator
-- Android-compatible mobile profile
+- **Short term (0–6 months):** `main` builds reproducibly across 3 targets; ABI/Driver docs published; 3 `good-first-issue` PRs merged.
+- **Mid term (6–18 months):** USB/NVMe drivers functional in CI; `sigpkg` can install signed packages; `sigma-desktop` alpha boots.
+- **Long term (18–36 months):** Signed cloud images deployed on providers; verified FS integrated; active maintainers for all subsystems.
 
 ---
 

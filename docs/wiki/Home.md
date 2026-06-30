@@ -11,6 +11,7 @@
 | Area | Wiki Page | Status |
 |---|---|---|
 | Roadmap (v0.1 → v1.0) | [Roadmap](Roadmap.md) | ✅ Active |
+| Branch Ownership & CI | [Branch-Ownership](Branch-Ownership.md) | ✅ Active |
 | Absorption Matrix | [Absorption-Matrix](Absorption-Matrix.md) | 🔄 Updated |
 | Security Model | [Security-Model](Security-Model.md) | ✅ Formal spec |
 | Architecture | [Architecture](Architecture.md) | ✅ Stable |
