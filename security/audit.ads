@@ -19,6 +19,13 @@ package Sigma.Audit is
       CAP_AUDIT_LOG
    );
 
+   type Severity_T is (
+      SEV_DEBUG,
+      SEV_INFO,
+      SEV_WARNING,
+      SEV_CRITICAL
+   );
+
    type Privilege_Set is array (Capability_T) of SigmaBool;
 
    type Security_Context is record
@@ -30,8 +37,19 @@ package Sigma.Audit is
    type Audit_Record is record
       Event_ID   : SigmaU64;
       Subject_ID : SigmaU32;
+      Severity   : Severity_T;
       Success    : SigmaBool;
       Verified   : SigmaBool;
+   end record;
+
+   --  Static Ring Buffer for audit logging
+   Buffer_Size : constant := 128;
+   type Audit_Buffer_Array is array (1 .. Buffer_Size) of Audit_Record;
+
+   type Audit_Logger is record
+      Buffer : Audit_Buffer_Array;
+      Head   : Positive range 1 .. Buffer_Size;
+      Count  : Natural range 0 .. Buffer_Size;
    end record;
 
    --  Verifies if a subject context possesses a given capability.
@@ -45,10 +63,19 @@ package Sigma.Audit is
       Context   : in  Security_Context;
       Cap       : in  Capability_T;
       Event_ID  : in  SigmaU64;
+      Severity  : in  Severity_T;
       Record_Out : out Audit_Record
    )
      with Post => Record_Out.Success = Has_Capability (Context, Cap) and
                   Record_Out.Verified = SigmaBool (True) and
-                  Record_Out.Subject_ID = Context.Subject_ID;
+                  Record_Out.Subject_ID = Context.Subject_ID and
+                  Record_Out.Severity = Severity;
+
+   --  Pushes an audit log entry into the logger ring buffer.
+   procedure Log_Audit_Event (
+      Logger    : in out Audit_Logger;
+      Item      : in     Audit_Record
+   )
+     with Post => Logger.Count = Natural'Min (Logger.Count'Old + 1, Buffer_Size);
 
 end Sigma.Audit;

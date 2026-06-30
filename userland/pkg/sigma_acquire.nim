@@ -1,6 +1,7 @@
 ## SigmaOS: sigma_acquire.nim — sovereign package acquiring & validation
 ## Migrated from C/C++ to Nim — no stdlib import, no external packages.
 ## All types hand-defined. OOP via object hierarchy + method dispatch.
+## Implements manifest reading, dependency graph resolution, topological sorting, and signature verification.
 {.push raises: [].}
 
 type
@@ -20,12 +21,20 @@ type
     checksum*: SigmaU64
     signature*: array[32, SigmaU8]
 
+  SigmaPackage* = object
+    id*: SigmaU32
+    name*: array[32, char]
+    dep_count*: SigmaU16
+    dependencies*: array[8, SigmaU32] # Array of package ID requirements
+
   PackageAcquirer* = object of RootObj
     initialized*: SigmaBool
     sig_key*: array[32, SigmaU8]
+    pkg_count*: SigmaU16
+    pkg_db*: array[64, SigmaPackage]
 
 proc newPackageAcquirer*(key: array[32, SigmaU8]): PackageAcquirer =
-  result = PackageAcquirer(initialized: true, sig_key: key)
+  result = PackageAcquirer(initialized: true, sig_key: key, pkg_count: 0)
 
 proc verifyChecksum*(self: PackageAcquirer, payload: ptr SigmaU8, len: SigmaUsize, expected: SigmaU64): SigmaBool =
   if not self.initialized: return false
@@ -50,6 +59,48 @@ proc verifySignature*(self: PackageAcquirer, header: PackageHeader): SigmaBool =
     if (header.signature[i] xor self.sig_key[i]) != 0u8:
       matched = false
   return matched
+
+proc registerPackage*(self: var PackageAcquirer, pkg: SigmaPackage): SigmaBool =
+  if self.pkg_count >= 64: return false
+  self.pkg_db[self.pkg_count] = pkg
+  self.pkg_count += 1
+  return true
+
+# Topological sort helper to resolve order of installation
+proc resolveDependencies*(self: PackageAcquirer, target: SigmaU32, order_out: ptr array[64, SigmaU32], count_out: ptr SigmaU16): SigmaBool =
+  var visited: array[64, SigmaBool]
+  var count: SigmaU16 = 0
+
+  proc dfs(pkg_id: SigmaU32): SigmaBool =
+    # Find package in db
+    var found = false
+    var p_idx = 0
+    for i in 0 ..< self.pkg_count.int:
+      if self.pkg_db[i].id == pkg_id:
+        found = true
+        p_idx = i
+        break
+
+    if not found: return false
+    if visited[p_idx]: return true
+
+    visited[p_idx] = true
+
+    # DFS visit dependencies first
+    for d in 0 ..< self.pkg_db[p_idx].dep_count.int:
+      let dep_id = self.pkg_db[p_idx].dependencies[d]
+      if not dfs(dep_id): return false
+
+    # Add to list
+    let out_arr = cast[ptr array[64, SigmaU32]](order_out)
+    out_arr[count] = pkg_id
+    count += 1
+    return true
+
+  if not dfs(target): return false
+  let out_cnt = cast[ptr SigmaU16](count_out)
+  out_cnt[] = count
+  return true
 
 var global_acquirer* = newPackageAcquirer([
   0xDE.SigmaU8, 0xAD, 0xBE, 0xEF, 0xCA, 0xFE, 0xBA, 0xBE,
