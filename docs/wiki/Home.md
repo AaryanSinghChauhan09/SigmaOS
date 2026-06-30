@@ -1,91 +1,118 @@
 # Welcome to the SigmaOS Wiki
 
-SigmaOS is a sovereign, zero-dependency operating system built on a **Lattice Architecture**. It prioritizes extreme simplicity, explicit zero-trust security, and native orchestration.
-
-> *"Fuse Whonix's paranoia, NixOS's reproducibility, Elementary's polish, and Flatcar's immutability into a single sovereign identity."*
+> **SigmaOS** — A sovereign, self-sufficient operating system. No external dependencies. No compromises.
+>
+> *"Fuse the paranoia of Whonix, the reproducibility of NixOS, the polish of Elementary, and the immutability of Flatcar — into one sovereign identity."*
 
 ---
 
-## 🚀 Core Subsystems
+## 🚀 Quick Navigation
 
-| Area | Wiki Page | Status | 
-| --- | --- | --- | 
-| Sovereign Orchestrator | [Container-Orchestrator](Container-Orchestrator.md) | ✅ Stable | 
-| Zenith Desktop & SDK | [Zenith-Desktop-SDK](Zenith-Desktop-SDK.md) | ✅ Stable | 
-| Sovereign System Profiles | [Sovereign-System-Profiles](Sovereign-System-Profiles.md) | ✅ Stable | 
-| Packaging & Immutability | [Sovereign-Packaging-and-Immutability](Sovereign-Packaging-and-Immutability.md) | ✅ Stable | 
-| Resilience & Control Center | [Resilience-and-Control-Center](Resilience-and-Control-Center.md) | ✅ Stable | 
-| Driver Support & Registry | [Driver-Support](Driver-Support.md) | ✅ Phase 5 | 
-| Sovereign LibC | [Sovereign-LibC-and-Dependencies](Sovereign-LibC-and-Dependencies.md) | ✅ Phase 5 | 
-| Sovereignty Architecture | [Sovereignty-Architecture](Sovereignty-Architecture.md) | ✅ Phase 7 | 
+| Area | Wiki Page | Status |
+|---|---|---|
+| Roadmap (v0.1 → v1.0) | [Roadmap](Roadmap.md) | ✅ Active |
+| Absorption Matrix | [Absorption-Matrix](Absorption-Matrix.md) | 🔄 Updated |
+| Security Model | [Security-Model](Security-Model.md) | ✅ Formal spec |
+| Architecture | [Architecture](Architecture.md) | ✅ Stable |
+| Contributing | [Contributing](Contributing.md) | ✅ Active |
+| Coding Standards | [Coding-Standards](Coding-Standards.md) | ✅ Stable |
+| Sovereign System Profiles | [Sovereign-System-Profiles](Sovereign-System-Profiles.md) | ✅ Stable |
+| Packaging & Immutability | [Sovereign-Packaging-and-Immutability](Sovereign-Packaging-and-Immutability.md) | ✅ Stable |
+| Zenith Desktop | [Zenith-Desktop-SDK](Zenith-Desktop-SDK.md) | ✅ Stable |
+| Driver Support | [Driver-Support](Driver-Support.md) | ✅ Phase 5 |
+| Container Orchestrator | [Container-Orchestrator](Container-Orchestrator.md) | ✅ Stable |
+| CI/CD Workflows | [CI-Workflows](CI-Workflows.md) | ✅ Stable |
 
 ---
 
 ## 🏗️ Architecture at a Glance
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    ZENITH DESKTOP (Phase 4)             │
-│  Compositor · Onboarding · App Store · Tiling WM       │
-├─────────────────────────────────────────────────────────┤
-│              SOVEREIGN ORCHESTRATOR (Phase 3)           │
-│  Container Shards · Sandbox Bridge · IPC Bus            │
-├──────────────────────────┬──────────────────────────────┤
-│   KERNEL SUBSYSTEMS      │   USERLAND TOOLS             │
-│  Driver Manager          │  sigma-coreutils (libc-free) │
-│  Driver Registry (DKMS)  │  sigma-shell                 │
-│  Immutable Update Daemon │  sigma-pod-cli               │
-│  HW Test Suite           │  sigma-drv                   │
-│  Sovereign LibC          │  Proton Bridge               │
-├──────────────────────────┴──────────────────────────────┤
-│                  SOVEREIGN LIBC (Phase 5)               │
-│  sigma_malloc · sigma_memcpy · sigma_strcmp             │
-│  sys_print (raw syscall, no glibc) · sigma_itoa         │
-└─────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│               ZENITH DESKTOP (Phase 4)                      │
+│   Compositor · App Store · Tiling WM · AI Scheduler         │
+├─────────────────────────────────────────────────────────────┤
+│           SOVEREIGN ORCHESTRATOR (Phase 3)                  │
+│   sigma-container · sigma-sandbox · IPC Bus                 │
+├──────────────────────────┬──────────────────────────────────┤
+│   KERNEL SUBSYSTEMS      │   SOVEREIGN USERLAND             │
+│   Driver Registry        │   sigma-sh (Rust shell)          │
+│   EEVDF Scheduler        │   sigpkg (package manager)       │
+│   Memory / VMM           │   sigma-core-utils               │
+│   Syscall Audit          │   sigma-crypto-vault             │
+│   sigma-shield (BPF)     │   SigmaVCS (version control)    │
+├──────────────────────────┴──────────────────────────────────┤
+│            SOVEREIGN LIBC (zero glibc dependency)           │
+│   sigma_malloc · sigma_memcpy · sigma_strcmp                │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 📦 Key Design Principles
+## 📦 What SigmaOS Replaces
 
-### 🔒 Zero External Dependencies (Phase 5)
-Kernel-space code **never** links against glibc or musl. All memory, string, and I/O primitives are provided by the Sovereign LibC (`kernel/libc/sigma_libc_impl.c`). See [Sovereign-LibC-and-Dependencies](Sovereign-LibC-and-Dependencies.md).
+SigmaOS systematically absorbs open-source tools and replaces them with sovereign equivalents. See the **[Absorption Matrix](Absorption-Matrix.md)** for the full list (70+ tools mapped).
 
-### 🔧 Profile-Aware Driver Loading (Phase 5)
-The Driver Manager loads only the modules relevant to the active hardware profile. Community drivers are sourced from the Sovereign Driver Registry as signed `.srecipe` build scripts — no pre-built binaries. See [Driver-Support](Driver-Support.md).
-
-### 🔄 Immutable A/B Updates with DKMS (Phase 6)
-The Update Daemon performs atomic A/B partition swaps. After every kernel swap it automatically triggers a DKMS rebuild of all tracked community drivers. If rebuild fails, it rolls back to the previous slot and notifies the user. See [Sovereign-Packaging-and-Immutability](Sovereign-Packaging-and-Immutability.md).
-
-### 🧪 Boot-Time Hardware Tests (Phase 6)
-The Hardware Test Suite (`kernel/tests/sigma_hw_test.cpp`) validates GPU, NIC, audio, and storage for the active hardware profile before the desktop launches. Critical failures boot into VGA safe mode (Rescuezilla model). See [Driver-Support](Driver-Support.md).
-
----
-
-## 🛡️ Security Layers
-
-*   **Zero-Trust VFS**: Explicit RBAC enforced at the filesystem level.
-*   **Whonix-style Network Isolation**: GUI apps are sandboxed from the network by default.
-*   **CAINE Forensic Mode**: All block devices mounted read-only; validated by HW test suite at boot.
-*   **Cryptographic Updates**: Kernel images verified against a sovereign root key before slot swap.
-*   **Heap Corruption Detection**: Every `sigma_malloc` block carries a `0xSIGMA5A5` magic cookie.
+**Key replacements:**
+- `sigma-sh` → Bash/Zsh/Fish
+- `sigpkg` → apt/pacman/npm
+- `SigmaVCS` → Git
+- `sigma-sandbox` → SELinux/AppArmor
+- `sigma-crypto` → OpenSSL/libsodium
+- `sigma-vault` → KeePass/Bitwarden
+- `zenith-compositor` → Wayland/X11
 
 ---
 
-## 🛠️ Contributing
+## 🔒 Security Layers
 
-We enforce a strict quality gateway. Please ensure you run tests locally before submitting a PR.
-*   `make test` — unit test suite.
-*   `make hw_test PROFILE=standard` — hardware test suite (safe to run in QEMU).
-*   `make valgrind_check` — memory leak detection.
-*   The CI/CD pipeline builds all variants and executes static analysis.
+- **Zero-Trust VFS**: Explicit RBAC at filesystem level
+- **Capability Sandbox**: Every process gets minimal cap token (Capsicum-inspired)
+- **Syscall Audit**: BPF-based audit with policy-as-code
+- **Secure Boot**: TPM 2.0 + Ed25519 + A/B rollback
+- **Hardened Allocator**: Magic cookies, guard pages, poison-on-free
+- **PQC Crypto**: Kyber-1024 + Ed25519 + ChaCha20-Poly1305
 
-See [CONTRIBUTING.md](../CONTRIBUTING.md) and the [Sovereign Build Registry](../SOVEREIGN_REGISTRY.md).
+→ Full spec: [Security-Model](Security-Model.md)
 
 ---
 
-## 📚 Resources
+## 🛠️ Getting Started
 
-*   [Developer Guide](../DEVELOPER_GUIDE.md)
-*   [Architecture Blueprint](../Architecture.md)
-*   [Issue Tracker](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
+```bash
+# Clone the repo
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
+cd SigmaOS
+
+# Build the kernel (requires Rust nightly + x86_64-unknown-none target)
+rustup target add x86_64-unknown-none
+cargo build --target x86_64-unknown-none -p sigmaos-kernel
+
+# Build sigma-sh shell
+cargo build -p sigma-sh
+
+# Build sigpkg package manager  
+cargo build -p sigpkg
+
+# Run in QEMU
+just qemu
+```
+
+See [Contributing](Contributing.md) for full setup instructions.
+
+---
+
+## 📊 Current Status
+
+| Milestone | Version | Status |
+|---|---|---|
+| Genesis (boot + VGA + shell) | v0.1 | ✅ Done |
+| Stability + contributor funnel | v0.2 | 🔄 In Progress |
+| Networking + security hardening | v0.3 | 🎯 Planned |
+| Desktop + GPU | v0.4 | 🎯 Planned |
+| Kernel observability + fleet | v0.5 | 🎯 Planned |
+| Sovereign production | v1.0 | 🎯 Planned |
+
+---
+
+*SigmaOS Wiki · [Issue Tracker](https://github.com/AaryanSinghChauhan09/SigmaOS/issues) · [Discussions](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions)*

@@ -1,18 +1,14 @@
 [package]
-name = "sigpkg"
+name = "sigma-sh"
 version = "0.2.0"
 edition = "2021"
-description = "sigpkg — SigmaOS Sovereign Package Manager"
+description = "sigma-sh: The Sovereign Shell for SigmaOS"
 authors = ["SigmaOS Contributors"]
 license = "MIT"
 repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 
 [[bin]]
-name = "sigpkg"
+name = "sigma-sh"
 path = "src/main.rs"
-
-[lib]
-name = "sigpkg_lib"
-path = "src/lib.rs"
 
 [dependencies]
