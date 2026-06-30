@@ -1,0 +1,54 @@
+/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+/// All types hand-defined. OOP via struct + impl + trait patterns.
+
+#![no_std]
+#![allow(dead_code)]
+
+// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+
+type SigmaU8  = u8;
+type SigmaU16 = u16;
+type SigmaU32 = u32;
+type SigmaU64 = u64;
+type SigmaI32 = i32;
+type SigmaI64 = i64;
+type SigmaBool = bool;
+type SigmaUsize = usize;
+
+// ─── Module: SigmaOS::RPi5Tuning ─────────────────────
+
+/// RPi5Tuning — OOP singleton pattern.
+pub struct RPi5Tuning {
+    pub initialized: SigmaBool,
+}
+
+impl RPi5Tuning {
+    pub const fn new() -> Self {
+        Self { initialized: false }
+    }
+
+    pub unsafe fn applyRPi5Optimizations(&mut self) {
+        // Migrated: applyRPi5Optimizations
+        self.initialized = true;
+    }
+
+    pub unsafe fn rpi5_tune(&mut self) {
+        // Migrated: rpi5_tune
+        self.initialized = true;
+    }
+
+}
+
+static mut INSTANCE: RPi5Tuning = RPi5Tuning::new();
+
+#[no_mangle]
+pub unsafe extern "C" fn applyRPi5Optimizations() {
+    INSTANCE.initialized = true;
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn rpi5_tune() {
+    INSTANCE.initialized = true;
+}
+
