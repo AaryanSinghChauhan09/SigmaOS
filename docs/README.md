@@ -15,7 +15,8 @@
 | [Design.md](Design.md) | Core design philosophy and architectural decisions | — |
 | [Doc_Consolidation.md](Doc_Consolidation.md) | Doc sprawl audit, canonical file table, cleanup plan | — |
 | [Hardware_CI_Matrix.md](Hardware_CI_Matrix.md) | QEMU test matrix, real HW CI plan, driver smoke tests, benchmarks | — |
-| [IDEAS_1000.md](IDEAS_1000.md) | 500→1000+ categorised development ideas | `wiki_repo/IDEAS_BACKLOG.md`, `SigmaOS_*_ITEM_BACKLOG.md` |
+| [IDEAS_2000.md](IDEAS_2000.md) | Ideas 1001–2000 across 21 new categories | — |
+| [IDEAS_1000.md](IDEAS_1000.md) | Ideas 1–1000 across 22 categories | — |
 | [License_Map.md](License_Map.md) | Per-directory SPDX licensing, firmware blob policy, cleanroom statement | — |
 | [Minimal_SigmaOS_v0.1.md](Minimal_SigmaOS_v0.1.md) | v0.1 bootable ISO component checklist, build commands, test matrix | `PHASE_*` checklists |
 | [Open_Source_Drivers.md](Open_Source_Drivers.md) | Driver strategy: open/proprietary, SDF guide, roadmap v15→v17 | `DRIVER_ECOSYSTEM.md`, `DRIVER_PORTING_PIPELINE.md` |
