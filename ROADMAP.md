@@ -1,31 +1,55 @@
 # SigmaOS Sovereign Roadmap 🗺️
 
-Transitioning from "Concept Stubs" to "Singularity-Ready OS".
+SigmaOS draws inspiration from the best aspects of various Linux distributions:
 
-## 📍 Phase 1: The Core Hydration (Current)
+- **Debian‑style stability** → predictable releases
+- **Fedora‑style innovation** → cutting‑edge drivers/security
+- **Arch‑style flexibility** → modular FS and userland
+- **Ubuntu‑style ecosystem** → strong community and package management
 
-- [x] **Setup Engine**: Implementation of `sigma_setup.py`.
-- [x] **Parallel Apex Hydration**: Concurrent boot loader for 10x faster startup.
-- [x] **Predictive Booting**: Multi-stage HAL & Security validation at Ring-0.
-- [x] **HAL Implement**: Direct Win32 Silicon Telemetry.
-- [x] **Memory Engine**: ZRAM & Circular Event Bus.
-- [x] **GitHub Sentinel**: Real-time workspace auto-sync.
-- [ ] **Process Scheduler**: Full implementation of the Predictive AI Scheduler.
+## Phase 1: Core System & Stability
 
-## 📍 Phase 2: Userland Maturation (Q2 2026)
+- [ ] Unify branches into a stable main
+- [ ] Kernel scheduler: finalize Round Robin/EDF into a robust, tested default
+- [ ] Memory allocator: stress‑test and formally verify
+- [ ] Syscall layer: expand non‑POSIX ABI for consistency
+- [ ] Release cadence: adopt predictable stable releases
 
-- [ ] **Sovereign CLI**: A fully functional, AI-powered shell.
-- [ ] **Morphic Desktop**: Transition `sigma_gui.py` into a standalone window manager.
-- [ ] **App Store Expansion**: Multi-repository support for S-PKG.
-- [ ] **Vault Hardening**: Biometric integration for SovereignVault.
+## Phase 2: Hardware Support
 
-## 📍 Phase 3: The Mesh Singularity (Q3 2026)
+- [ ] Networking: expand NIC support beyond e1000
+- [ ] Storage: add NVMe, SSD optimizations
+- [ ] USB/HID: implement keyboard, mouse, and USB stack
+- [ ] Graphics: move from VGA framebuffer to modern GPU drivers
+- [ ] Audio: add basic sound subsystem
 
-- [ ] **P2P Kernel Sync**: Scaling the ledger across decentralized nodes.
-- [ ] **Aether Orchestrator**: Live agent-to-agent mission routing.
-- [ ] **Zero-Trust Proofs**: ZK-Proof generation for system compliance.
+## Phase 3: File Systems & Storage
 
-## 📍 Phase 4: Distribution
+- [ ] Enhance FS support: journaling, encryption, sovereign FS
+- [ ] Add modern FS equivalents: ext4‑like, btrfs‑like features
+- [ ] Virtualization drivers: VirtIO for cloud/server use cases
 
-- [ ] **Stable ISO Build**: Automated release pipeline for bootable images.
-- [ ] **Vagrant/OVF Ready**: One-click cloud deployment.
+## Phase 4: Package Management & Build System
+
+- [ ] Develop sigpkg: sovereign package manager
+- [ ] Deterministic builds: reproducible recipes, cryptographic verification
+- [ ] Profiles: sigma-core, sigma-desktop, sigma-cloud
+
+## Phase 5: Security & Sovereignty
+
+- [ ] Sandboxing: sovereign equivalents
+- [ ] Audit framework: syscall monitoring
+- [ ] Secure boot: expand cryptographic verification, rollback protection
+- [ ] Exploit mitigations: hardened allocators, memory safety
+
+## Phase 6: Userland & Ecosystem
+
+- [ ] Expand utilities: sovereign replacements for GNU tools
+- [ ] Shell (sigma-sh): scripting, automation, developer ergonomics
+- [ ] SDK/toolchain: sovereign SDK for driver/app development
+
+## Phase 7: Community & Adoption
+
+- [ ] Contribution workflow: PRs only into main, modular tasks
+- [ ] Wiki expansion: roadmap, coding standards, migration guides
+- [ ] Target domains: secure systems, research, silicon sovereignty
