@@ -20,3 +20,39 @@ SigmaOS follows an Ubuntu-inspired governance model, but with strict technical c
 
 ## Licensing
 All contributions must include the `// SPDX-License-Identifier: GPL-2.0-or-later` header.
+
+## Documentation Guidelines
+
+**Before creating a new doc, check [docs/README.md](docs/README.md) for the canonical file list.**
+
+- New documentation → `docs/<Name>.md`
+- New wiki page → `wiki_repo/<Name>.md`
+- Do not create duplicates of the canonical files in the table.
+- If you want to add a competitive analysis note → edit `docs/Competitive_Analysis.md`.
+- If you want to add a development idea → add to `docs/IDEAS_1000.md`.
+- If you studied an OSS project for cleanroom reference → add to `docs/OSS_Reference_Map.md`.
+
+Doc sprawl hurts contributor onboarding and trust. One canonical file per topic.
+
+## Cleanroom Rule
+
+SigmaOS is MIT/BSD licensed. When drawing inspiration from GPL projects (Linux, Mesa, etc.):
+
+1. **Never copy GPL source code** into any SigmaOS file.
+2. Study architecture, interfaces, and patterns only.
+3. Document what you studied in `docs/OSS_Reference_Map.md`.
+4. Implement independently, without referencing GPL source during coding.
+
+See [docs/License_Map.md](docs/License_Map.md) and
+[wiki_repo/CANONICAL_CLEANROOM_ABSORPTION.md](wiki_repo/CANONICAL_CLEANROOM_ABSORPTION.md).
+
+## SPDX Headers
+
+Every source file must begin with:
+
+```rust
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 SigmaOS Project
+```
+
+Missing headers fail `make check-spdx` in CI.

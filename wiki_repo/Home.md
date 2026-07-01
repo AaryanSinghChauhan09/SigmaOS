@@ -106,7 +106,11 @@ Hardware       → CPU · NVMe · GPU · NIC · USB · TPM2 · UEFI
 | [sigpkg Specification](sigpkg-Spec) | Package format, registry, PKGBUILD |
 | [SDK Guide](SDK-Guide) | Build apps in Rust, JS, Python, Java, .NET |
 | [Component Integration](Component-Integration) | GitHub org structure, component contracts |
+| [OSS Reference Map](OSS-Reference-Map) | What to study from seL4, Nix, Smithay, smoltcp… |
+| [Ideas Backlog (1000+)](Ideas-Backlog-1000) | Development ideas across 8 categories |
 | [Open Source Drivers](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Open_Source_Drivers.md) | Driver strategy, SDF guide |
+| [Hardware CI Matrix](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Hardware_CI_Matrix.md) | QEMU + real HW test matrix |
+| [License Map](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/License_Map.md) | Per-directory SPDX licensing |
 | [Competitive Analysis](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Competitive_Analysis.md) | vs Alpine, Arch, Ubuntu |
 | [Minimal v0.1 Spec](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Minimal_SigmaOS_v0.1.md) | First bootable ISO checklist |
 | [Security Model](Security-Model) | PQC, pledge/unveil, zero-trust |
