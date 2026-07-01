@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="external_styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Σ SigmaOS Zenith | Sovereign Lattice Desktop</title>
+    <meta name="description" content="SigmaOS Zenith v15.0 - Glassmorphic high-performance sovereign operating system interface.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="zenith_desktop.css">
+</head>
+<body>
+
+    <!-- Ambient Mouse Glow -->
+    <div id="mouse-glow"></div>
+
+    <!-- Top Bar (Dynamic Island Status Area) -->
+    <header class="top-bar">
+        <div class="top-bar-left">
+            <h1 class="top-bar-brand">Σ <span>SigmaOS</span></h1>
+            <span class="capsule-badge" id="active-capsule">Zenith Singularity</span>
+        </div>
+        <div class="top-bar-center">
+            <div class="vital-item">CPU: <span id="telemetry-cpu">0%</span></div>
+            <div class="vital-item">MEM: <span id="telemetry-mem">0.0 GB</span></div>
+            <div class="vital-item">FPS: <span id="telemetry-fps">60.0ms</span></div>
+            <div class="vital-item">Silicon Attestation: <span class="auto-style-81">Kyber-1024</span></div>
+        </div>
+        <div class="top-bar-right">
+            <span id="clock-date">Sunday, May 17</span>
+            <span id="clock-time">12:00</span>
+        </div>
+    </header>
+
+    <!-- Draggable Premium Windows -->
+    <div class="desktop-area auto-style-82">
+        
+        <!-- App: OmniShell Terminal -->
+        <div class="window auto-style-83" id="terminal-win">
+            <div class="window-header">
+                <div class="window-title">💻 <span>OmniShell v5.1</span></div>
+                <div class="window-controls">
+                    <div class="control-dot min" onclick="closeWindow('terminal-win')"></div>
+                    <div class="control-dot max"></div>
+                    <div class="control-dot close" onclick="closeWindow('terminal-win')"></div>
+                </div>
+            </div>
+            <div class="window-body auto-style-84">
+                <div class="terminal-container">
+                    <div class="terminal-output" id="terminal-output"></div>
+                    <div class="terminal-input-line">
+                        <span class="term-prompt">sovereign@sigma:~$</span>
+                        <input type="text" class="terminal-input" id="terminal-input" placeholder="Type help..." autofocus autocomplete="off" title="input">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- App: File Manager -->
+        <div class="window auto-style-85" id="file-manager-win">
+            <div class="window-header">
+                <div class="window-title">📂 <span>Sovereign VFS Browser</span></div>
+                <div class="window-controls">
+                    <div class="control-dot min" onclick="closeWindow('file-manager-win')"></div>
+                    <div class="control-dot max"></div>
+                    <div class="control-dot close" onclick="closeWindow('file-manager-win')"></div>
+                </div>
+            </div>
+            <div class="window-body">
+                <div class="fm-layout">
+                    <div class="fm-toolbar auto-style-1">
+                        <div>
+                            <button class="fm-btn" onclick="fmBack()">Back</button>
+                            <button class="fm-btn" onclick="fileManager && fileManager.mountHostDrive()" style="color: var(--accent-gold); border-color: var(--accent-gold);">💾 Mount Host Drive</button>
+                            <span class="fm-breadcrumbs" id="fm-breadcrumbs">/home/sovereign</span>
+                        </div>
+                        <div>
+                            <button class="cyber-btn small-btn auto-style-2" onclick="fileManager && fileManager.createFile()">+ New File</button>
+                            <button class="cyber-btn small-btn auto-style-2" onclick="runRepomixPackager()">📦 Repomix Prompt Packager</button>
+                        </div>
+                    </div>
+                    <div class="fm-grid" id="fm-grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- App: Text Editor -->
+        <div class="window" id="text-editor-win" style="display:none; width: 600px; height: 400px; top: 15%; left: 25%;">
+            <div class="window-header">
+                <div class="window-title">📝 <span id="editor-filename">Untitled.txt</span></div>
+                <div class="window-controls">
+                    <div class="control-dot min" onclick="closeWindow('text-editor-win')"></div>
+                    <div class="control-dot max"></div>
+                    <div class="control-dot close" onclick="closeWindow('text-editor-win')"></div>
+                </div>
+            </div>
+            <div class="window-body" style="display: flex; flex-direction: column; height: calc(100% - 32px);">
+                <div style="padding: 8px; border-bottom: 1px solid var(--border-glass);">
+                    <button class="cyber-btn small-btn" onclick="fileManager && fileManager.saveCurrentFile()">Save File</button>
+                </div>
+                <textarea id="editor-textarea" style="flex: 1; background: rgba(0,0,0,0.5); color: #fff; border: none; padding: 10px; font-family: 'JetBrains Mono', monospace; font-size: 14px; outline: none; resize: none;"></textarea>
+            </div>
+        </div>
+
+        <!-- App: Observability & Core Vitals -->
+        <div class="window auto-style-86" id="browser-win">
+            <div class="window-header">
+                <div class="window-title">📊 <span>Observability Matrix</span></div>
+                <div class="window-controls">
+                    <div class="control-dot min" onclick="closeWindow('browser-win')"></div>
+                    <div class="control-dot max"></div>
+                    <div class="control-dot close" onclick="closeWindow('browser-win')"></div>
+                </div>
+            </div>
+            <div class="window-body auto-style-87">
+                <h3 class="auto-style-88">Σ Sovereign Observer</h3>
+                <sigma-monitor></sigma-monitor>
+                <div class="auto-style-89">
+                    <sigma-pool-inspector></sigma-pool-inspector>
+                </div>
+                <div class="auto-style-90">
+                    <sigma-logs max-entries="50"></sigma-logs>
+                </div>
+            </div>
+        </div>
+
+        <!-- App: AI Research Assistant -->
+        <div class="window auto-style-91" id="ai-assistant-win">
+            <div class="window-header">
+                <div class="window-title">🧠 <span>Lattice Neural Core</span></div>
+                <div class="window-controls">
+                    <div class="control-dot min" onclick="closeWindow('ai-assistant-win')"></div>
+                    <div class="control-dot max"></div>
+                    <div class="control-dot close" onclick="closeWindow('ai-assistant-win')"></div>
+                </div>
+            </div>
+            <div class="window-body auto-style-92">
+                <div class="auto-style-93">
+                    <h4 class="auto-style-94">Edge ML Failure Model</h4>
+                    <p class="auto-style-95">Predictive attestation running continuously inside Ring-0.</p>
+                </div>
+                <sigma-ai-dispatch></sigma-ai-dispatch>
+                <div class="auto-style-96">
+                    <sigma-neural-demo></sigma-neural-demo>
+                </div>
+            </div>
+        </div>
+
+        <!-- App: Lattice Settings -->
+        <div class="window auto-style-97 auto-style-3" id="lattice-settings-win">
+            <div class="window-header">
+                <div class="window-title">⚙️ <span>Lattice System settings</span></div>
+                <div class="window-controls">
+                    <div class="control-dot min" onclick="closeWindow('lattice-settings-win')"></div>
+                    <div class="control-dot max"></div>
+                    <div class="control-dot close" onclick="closeWindow('lattice-settings-win')"></div>
+                </div>
+            </div>
+            <div class="window-body auto-style-4">
+                <div class="settings-layout auto-style-5">
+                    <div class="settings-tabs" id="settings-tabs-list">
+                        <div class="settings-tab active" onclick="switchSettingsTab('appearance')">🎨 Appearance</div>
+                        <div class="settings-tab" onclick="switchSettingsTab('branches')">⚙️ Sovereign Branches</div>
+                        <div class="settings-tab" onclick="switchSettingsTab('profiles')">👤 Work Profiles</div>
+                        <div class="settings-tab" onclick="switchSettingsTab('accessibility')">♿ Accessibility & Rollback</div>
+                    </div>
+                    <div class="settings-content auto-style-6" id="settings-panes-container">
+                        
+                        <!-- Panel 1: Appearance -->
+                        <div class="settings-pane auto-style-7" id="pane-appearance">
+                            <div class="settings-group">
+                                <h4>Dynamic Theme Engine</h4>
+                                <div class="theme-selector-grid">
+                                    <button class="theme-button theme-cyan" onclick="setTheme('cyan')">Cyan</button>
+                                    <button class="theme-button theme-gold" onclick="setTheme('gold')">Gold</button>
+                                    <button class="theme-button theme-solar" onclick="setTheme('solar')">Solar</button>
+                                    <button class="theme-button theme-crimson" onclick="setTheme('crimson')">Crimson</button>
+                                </div>
+                            </div>
+                            <div class="settings-group">
+                                <h4>System UI parameters</h4>
+                                <div class="form-switch auto-style-8">
+                                    <span>Glass Blur Intensity (px)</span>
+                                    <input type="range" min="4" max="40" value="24" oninput="updateGlassBlur(this.value)" class="auto-style-9" title="Range input" placeholder="input">
+                                </div>
+                                <div class="form-switch">
+                                    <span>Accent Color Hue</span>
+                                    <input type="range" min="0" max="360" value="42" oninput="updateAccentHue(this.value)" class="auto-style-10" title="Range input" placeholder="input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 2: Sovereign Branches (The 12 Branches Switcher!) -->
+                        <div class="settings-pane auto-style-11" id="pane-branches">
+                            <div class="settings-group">
+                                <h4>Sovereign Branch Simulator</h4>
+                                <p class="auto-style-12">
+                                    Dynamically swap active kernel modes and architectures across the 12 git-synchronized branches.
+                                </p>
+                                <div class="auto-style-13">
+                                    <button class="fm-btn" onclick="simulateBranch('main')">🌐 main (Stable Core)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('release/standalone')">💾 standalone (Bare-Metal)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('release/rtos')">⏱️ rtos (SCHED_SOVEREIGN)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('release/mobile')">📱 mobile (ARM/EAS)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('release/microkernel')">🧪 microkernel (SPSC IPC)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('release/dual-boot')">💿 dual-boot (GRUB/LIM)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('release/distributed')">🕸️ distributed (CloudFS)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('release/cloud')">☁️ cloud (SovereignCluster)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('release/browser')">🌐 browser (Sandbox OS)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('release/app')">📊 app (Statutory Tools)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('performance-optimized')">⚡ perf-opt (Clear Linux Tuned)</button>
+                                    <button class="fm-btn" onclick="simulateBranch('gh-pages')">📖 gh-pages (Wiki Docs)</button>
+                                </div>
+                            </div>
+                            <div class="settings-group auto-style-14" id="branch-status-box">
+                                <h5 class="auto-style-15">Active Shard Status</h5>
+                                <div id="branch-status-text" class="auto-style-16">
+                                    Branch: main (Active)<br>
+                                    Scheduler: CFS-Affinity socket Balancer<br>
+                                    IPC state: Default zero-copy messaging
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 3: Work Profiles -->
+                        <div class="settings-pane auto-style-17" id="pane-profiles">
+                            <div class="settings-group">
+                                <h4>Identity Profile Selector</h4>
+                                <p class="auto-style-18">
+                                    Switch custom software suite sets and system profiles for special environments.
+                                </p>
+                                <div class="auto-style-19">
+                                    <button class="fm-btn" onclick="selectWorkspaceProfile('Developer')">💻 Developer Mode</button>
+                                    <button class="fm-btn" onclick="selectWorkspaceProfile('Forensic')">🔍 Forensic CLI Audit</button>
+                                    <button class="fm-btn" onclick="selectWorkspaceProfile('Gaming')">🎮 Gaming / Turbo</button>
+                                    <button class="fm-btn" onclick="selectWorkspaceProfile('Container Host')">🐳 Container Cluster Host</button>
+                                </div>
+                            </div>
+                            <div class="settings-group">
+                                <h4>Cron-Like automation scheduler</h4>
+                                <div class="form-switch auto-style-20">
+                                    <span>Enable Neural Layout Engine</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" checked onchange="neural.setMindfulness(this.checked)" title="Enable Neural Layout" aria-label="Enable Neural Layout" placeholder="input">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="form-switch">
+                                    <span>Registry Cron Watchdog</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="cron-toggle" checked onchange="toggleCronWatchdog(this.checked)" title="Toggle Cron" aria-label="Toggle Cron" placeholder="input">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 4: Accessibility & Rollback -->
+                        <div class="settings-pane auto-style-21" id="pane-accessibility">
+                            <div class="settings-group">
+                                <h4>Sovereign accessibility Engine</h4>
+                                <div class="form-switch auto-style-22">
+                                    <span>High Contrast Mode</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="high-contrast-toggle" onchange="toggleHighContrast(this.checked)" title="Toggle High Contrast" aria-label="Toggle High Contrast" placeholder="input">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="form-switch auto-style-23">
+                                    <span>Text Screen Reader Voice</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="screen-reader-toggle" onchange="toggleScreenReader(this.checked)" title="Toggle Screen Reader" aria-label="Toggle Screen Reader" placeholder="input">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="settings-group">
+                                <h4>RescueZilla Snapshot Recovery</h4>
+                                <p class="auto-style-24">
+                                    Capture or roll back running system configurations instantly using the atomic VFS snapshot registers.
+                                </p>
+                                <div class="auto-style-25">
+                                    <input class="cmd-input auto-style-26" type="text" id="snap-name" placeholder="Snapshot label..." title="input">
+                                    <button class="wizard-btn auto-style-27" onclick="createSnapshot()">CAPTURE SNAP</button>
+                                </div>
+                                <ul id="snapshot-list" class="auto-style-28">
+                                    <li class="routine-item routine-border-cyan auto-style-29">
+                                        <strong>Default_Restore_Point</strong> (System)
+                                        <button class="cyber-btn small-btn auto-style-30" onclick="atomicSwap('Default_Restore_Point')">ROLLBACK</button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- App: Sovereign Developer Workspace (Utility Nexus & DevKit) -->
+        <div class="window auto-style-31" id="utility-nexus-win">
+            <div class="window-header">
+                <div class="window-title">🔧 <span>Sovereign Developer Workspace</span></div>
+                <div class="window-controls">
+                    <div class="control-dot min" onclick="closeWindow('utility-nexus-win')"></div>
+                    <div class="control-dot max"></div>
+                    <div class="control-dot close" onclick="closeWindow('utility-nexus-win')"></div>
+                </div>
+            </div>
+            
+            <!-- DevTab Navigation Bar -->
+            <div class="auto-style-32">
+                <button class="fm-btn auto-style-33" id="dev-tab-compliance-btn" onclick="switchDevPane('compliance')">⚖️ Compliance & GST</button>
+                <button class="fm-btn auto-style-34" id="dev-tab-hoppscotch-btn" onclick="switchDevPane('hoppscotch')">🔌 Hoppscotch REST & httpie</button>
+                <button class="fm-btn auto-style-35" id="dev-tab-toys-btn" onclick="switchDevPane('toys')">🛠️ DevToys swiss-army-knife</button>
+                <button class="fm-btn auto-style-36" id="dev-tab-docs-btn" onclick="switchDevPane('docs')">📚 API offline Zeal docs</button>
+            </div>
+
+            <div class="window-body auto-style-37">
+                
+                <!-- Pane 1: Compliance & Calculators -->
+                <div class="dev-workspace-pane auto-style-38" id="dev-pane-compliance">
+                    <div class="auto-style-39">
+                        <div class="settings-pane auto-style-40">
+                            <div class="settings-group">
+                                <h4 class="auto-style-41">Zero-Loss paise GST Calculator</h4>
+                                <div class="auto-style-42">
+                                    <input class="cmd-input auto-style-43" type="number" id="gst-amount" placeholder="Amount (in paise)" title="input">
+                                    <input class="cmd-input auto-style-44" type="number" id="gst-rate" placeholder="GST Rate %" title="input">
+                                </div>
+                                <button class="wizard-btn" onclick="calculateGST()">COMPUTE GST</button>
+                                <div id="gst-result" class="auto-style-45">> Result: Ready</div>
+                            </div>
+                        </div>
+                        <div class="settings-pane auto-style-46">
+                            <div class="settings-group auto-style-47">
+                                <h4 class="auto-style-48">BNS Legal Complier</h4>
+                                <input class="cmd-input auto-style-49" type="text" id="legal-query" placeholder="Search BNS section..." title="input">
+                                <button class="wizard-btn" onclick="checkLegalCompliance()">MAP COMPLIANCE</button>
+                                <div id="legal-result" class="auto-style-50">> Mapping Status: Active</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pane 2: Hoppscotch API Client & httpie -->
+                <div class="dev-workspace-pane auto-style-51" id="dev-pane-hoppscotch">
+                    <div class="auto-style-52">
+                        
+                        <div class="settings-pane auto-style-53">
+                            <div class="settings-group">
+                                <h4 class="auto-style-54">🔌 Hoppscotch REST API tool</h4>
+                                <div class="auto-style-55">
+                                    <select id="hop-method" class="cmd-input auto-style-56" title="input">
+                                        <option value="GET">GET</option>
+                                        <option value="POST" selected>POST</option>
+                                        <option value="PUT">PUT</option>
+                                        <option value="DELETE">DELETE</option>
+                                    </select>
+                                    <input class="cmd-input auto-style-57" type="text" id="hop-url" value="api.sigmaos.internal/v1/attest" title="input" placeholder="input">
+                                </div>
+                                <div class="auto-style-58">
+                                    <span class="auto-style-59">Request Headers</span>
+                                    <input class="cmd-input auto-style-60" type="text" id="hop-headers" value="Content-Type: application/json, X-PQC-Attestation: Dilithium-5" title="input" placeholder="input">
+                                </div>
+                                <div class="auto-style-61">
+                                    <span class="auto-style-62">Request Body (JSON)</span>
+                                    <textarea id="hop-body" class="cmd-input auto-style-63" title="input" placeholder="input">{"payload": "attest-sovereign-kernel-swaps"}</textarea>
+                                </div>
+                                <button class="wizard-btn" onclick="sendHoppRequest()">SEND HTTP REQUEST</button>
+                            </div>
+                        </div>
+
+                        <div class="settings-pane auto-style-64">
+                            <div class="settings-group auto-style-65">
+                                <h4 class="auto-style-66">httpie Snippet & Response</h4>
+                                <div class="auto-style-67">equivalent httpie CLI Command:</div>
+                                <div id="hop-httpie-snippet" class="auto-style-68">
+                                    http POST api.sigmaos.internal/v1/attest payload=attest-sovereign-kernel-swaps
+                                </div>
+                                <div class="auto-style-69">Response Body:</div>
+                                <div id="hop-response-body" class="auto-style-70">
+                                    Status: 200 OK<br>
+                                    Time: 1.25ms<br>
+                                    Payload attestation passed!
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Pane 3: DevToys swiss-army-knife -->
+                <div class="dev-workspace-pane auto-style-71" id="dev-pane-toys">
+                    <div class="auto-style-72">
+                        
+                        <div class="settings-pane auto-style-73">
+                            <div class="settings-group">
+                                <h4 class="auto-style-74">🛠️ Swiss Army Knife DevTools</h4>
+                                <div class="auto-style-75">
+                                    <div>
+                                        <span class="auto-style-76">Conversion Target</span>
+                                        <select id="toy-action-select" class="cmd-input auto-style-77" onchange="updateToyFields()" title="input">
+                                            <option value="json-yaml">JSON ➡️ YAML Converter</option>
+                                            <option value="base64">Base64 Encoder / Decoder</option>
+                                            <option value="cron">Cron Schedule Expression Generator</option>
+                                            <option value="d2">D2 Diagram Scripting Renderer</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="auto-style-78">
+                                    <span id="toy-input-label" class="auto-style-79">JSON Input String</span>
+                                    <textarea id="toy-input-data" class="cmd-input auto-style-80" title="input" placeholder="input">{"title": "SigmaOS", "version": 15.2}</textarea>
+                                </div>
+                                <button class="wizard-btn" onclick="executeToyUtility()">CONVERT / GENERATE</button>
+                            </div>
+                        </div>
+
+                        <div class="settings-pane auto-style-81">
+                            <div class="settings-group auto-style-82">
+                                <h4 class="auto-style-83">Processed Output Preview</h4>
+                                <div id="toy-output-preview" class="auto-style-84">
+                                    title: SigmaOS<br>
+                                    version: 15.2
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Pane 4: Zeal / DevDocs offline documentation browser -->
+                <div class="dev-workspace-pane auto-style-85" id="dev-pane-docs">
+                    <div class="auto-style-86">
+                        
+                        <div class="settings-pane auto-style-87">
+                            <div class="settings-group">
+                                <h4 class="auto-style-88">📚 offline API browser (Zeal style)</h4>
+                                <div class="auto-style-89">
+                                    <span class="auto-style-90">Framework / Language Docset</span>
+                                    <select id="docset-select" class="cmd-input auto-style-91" title="input">
+                                        <option value="cpp">C++ STL Sovereign standard</option>
+                                        <option value="vulkan">SovereignVulkanLayer APIs</option>
+                                        <option value="js">Javascript ES17 web runtime</option>
+                                    </select>
+                                </div>
+                                <div class="auto-style-92">
+                                    <span class="auto-style-93">Documentation Search Query</span>
+                                    <input class="cmd-input auto-style-94" type="text" id="docset-query" value="std::atomic" title="input" placeholder="input">
+                                </div>
+                                <button class="wizard-btn" onclick="searchZealOfflineDocs()">SEARCH OFFLINE DOCS</button>
+                            </div>
+                        </div>
+
+                        <div class="settings-pane auto-style-95">
+                            <div class="settings-group auto-style-96">
+                                <h4 class="auto-style-97">API Documentation Entry</h4>
+                                <div id="docset-preview" class="auto-style-98">
+                                    <strong class="auto-style-99">std::atomic (C++11 STL)</strong><br>
+                                    <code class="auto-style-100">template&lt;class T&gt; struct atomic;</code>
+                                    Each instantiation and specialization of std::atomic defines an atomic type. 
+                                    Guarantees lock-free thread safety direct to CPU silicon pipelines without OS priority inversions.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- App: Sovereign App Store (Marketplace) -->
+        <div class="window auto-style-110" id="sigma-market-win">
+            <div class="window-header">
+                <div class="window-title">🛒 <span>Lattice Shard Marketplace</span></div>
+                <div class="window-controls">
+                    <div class="control-dot min" onclick="closeWindow('sigma-market-win')"></div>
+                    <div class="control-dot max"></div>
+                    <div class="control-dot close" onclick="closeWindow('sigma-market-win')"></div>
+                </div>
+            </div>
+            <div class="window-body auto-style-111">
+                <div class="auto-style-112">
+                    <button class="fm-btn" onclick="switchMarketTab('core-shards')">Core Shards</button>
+                    <button class="fm-btn" onclick="switchMarketTab('foss-apps')">FOSS Lattice</button>
+                </div>
+                
+                <div id="market-core-shards">
+                    <h3 class="auto-style-113">Attested Core Shards</h3>
+                    <div class="shard-grid auto-style-114" id="shardContainer">
+                        <!-- Dynamically populated from kernel_loader.js -->
+                    </div>
+                </div>
+
+                <div id="market-foss-apps" class="auto-style-115">
+                    <h3 class="auto-style-116">FOSS Lattice Packages</h3>
+                    <p class="auto-style-117">Inject verified open-source environments directly into your running shard.</p>
+                    
+                    <div class="auto-style-118">
+                        <!-- AI & Machine Learning Category -->
+                        <div class="settings-group">
+                            <h4 class="auto-style-119">🧠 AI & Large Language Models</h4>
+                            <div class="auto-style-120">
+                                <div class="auto-style-121">
+                                    <strong>DeepSeek / Gemma / Qwen</strong><br>
+                                    <span class="auto-style-122">LLM Inference Engines</span><br>
+                                    <button class="fm-btn auto-style-123" onclick="injectFOSS('DeepSeek-LLM')">INJECT ENGINE</button>
+                                </div>
+                                <div class="auto-style-124">
+                                    <strong>eSpeak & eSpeak NG</strong><br>
+                                    <span class="auto-style-125">Speech Synthesis & Speech Recognition</span><br>
+                                    <button class="fm-btn auto-style-126" onclick="injectFOSS('eSpeak-Speech')">INJECT SHARD</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CAD & EDA Simulation Category -->
+                        <div class="settings-group">
+                            <h4 class="auto-style-127">🔌 CAD, CAE & EDA Simulation</h4>
+                            <div class="auto-style-128">
+                                <div class="auto-style-129">
+                                    <strong>KiCad & Fritzing</strong><br>
+                                    <span class="auto-style-130">EDA Electronic Design Simulation</span><br>
+                                    <button class="fm-btn auto-style-131" onclick="injectFOSS('KiCad-EDA')">INJECT WORKSPACE</button>
+                                </div>
+                                <div class="auto-style-132">
+                                    <strong>FreeCAD & OpenSCAD</strong><br>
+                                    <span class="auto-style-133">3D Mechanical Design Models</span><br>
+                                    <button class="fm-btn auto-style-134" onclick="injectFOSS('FreeCAD-3D')">INJECT WORKSPACE</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Forensics & Security Audit Category -->
+                        <div class="settings-group">
+                            <h4 class="auto-style-135">🔐 Security & Hardened Forensics</h4>
+                            <div class="auto-style-136">
+                                <div class="auto-style-137">
+                                    <strong>Kali Arsenal (Nmap / Ghidra / Volatility)</strong><br>
+                                    <span class="auto-style-138">Security Audit Core Vitals</span><br>
+                                    <button class="fm-btn auto-style-139" onclick="injectFOSS('Kali-Arsenal')">INJECT SECURITY</button>
+                                </div>
+                                <div class="auto-style-140">
+                                    <strong>RescueZilla Recovery Hub</strong><br>
+                                    <span class="auto-style-141">Declarative Snapshot Rollbacks</span><br>
+                                    <button class="fm-btn auto-style-142" onclick="injectFOSS('RescueZilla-Core')">INJECT SHARD</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Data & Mathematics Category -->
+                        <div class="settings-group">
+                            <h4 class="auto-style-143">🧮 Mathematics, GIS & Science</h4>
+                            <div class="auto-style-144">
+                                <div class="auto-style-145">
+                                    <strong>SageMath / Octave / GeoGebra</strong><br>
+                                    <span class="auto-style-146">Numerical Science & Calculus Libraries</span><br>
+                                    <button class="fm-btn auto-style-147" onclick="injectFOSS('SageMath-Calculus')">INJECT TOOLKIT</button>
+                                </div>
+                                <div class="auto-style-148">
+                                    <strong>QGIS & OpenStreetMap</strong><br>
+                                    <span class="auto-style-149">Geographical Information Systems</span><br>
+                                    <button class="fm-btn auto-style-150" onclick="injectFOSS('QGIS-GIS')">INJECT SHARD</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- App: Markup Forge -->
+        <div class="window auto-style-151" id="markup-forge-win">
+            <div class="window-header">
+                <div class="window-title">📥 <span>Zenith System Installer</span></div>
+                <div class="window-controls">
+                    <div class="control-dot min" onclick="closeWindow('markup-forge-win')"></div>
+                    <div class="control-dot max"></div>
+                    <div class="control-dot close" onclick="closeWindow('markup-forge-win')"></div>
+                </div>
+            </div>
+            <div class="window-body auto-style-152">
+                <iframe src="installer.html" title="Zenith System Installer" title="Zenith System Installer" title="Zenith System Installer" class="auto-style-153"></iframe>
+            </div>
+        </div>
+
+        <!-- App: AI/ML Studio & Multi-Agent Orchestrator -->
+        <div class="window auto-style-101" id="sigma-ai-studio-win">
+            <div class="window-header">
+                <div class="window-title">🤖 <span>Sovereign AI/ML Studio</span></div>
+                <div class="window-controls">
+                    <div class="control-dot min" onclick="closeWindow('sigma-ai-studio-win')"></div>
+                    <div class="control-dot max"></div>
+                    <div class="control-dot close" onclick="closeWindow('sigma-ai-studio-win')"></div>
+                </div>
+            </div>
+            
+            <!-- Tab Navigation Bar -->
+            <div class="auto-style-102">
+                <button class="fm-btn auto-style-103" id="ai-tab-tuner-btn" onclick="switchAIPane('tuner')">🏋️ LlamaFactory Tuner</button>
+                <button class="fm-btn auto-style-104" id="ai-tab-mcp-btn" onclick="switchAIPane('mcp')">🔌 Awesome-MCP Gateway</button>
+                <button class="fm-btn auto-style-105" id="ai-tab-nodes-btn" onclick="switchAIPane('nodes')">🧬 n8n Workflow Nodes</button>
+                <button class="fm-btn auto-style-106" id="ai-tab-memory-btn" onclick="switchAIPane('memory')">💾 Letta Memory & Voice</button>
+                <button class="fm-btn auto-style-107" id="ai-tab-claudecam-btn" onclick="switchAIPane('claudecam')">💻 ClaudeCode & Cam</button>
+                <button class="fm-btn auto-style-108" id="ai-tab-swe-btn" onclick="switchAIPane('swe')">🤖 SWE-Agent & Marimo</button>
+            </div>
+
+            <div class="window-body auto-style-109">
+                
+                <!-- Pane 1: LlamaFactory Fine-Tuner -->
+                <div class="ai-studio-pane auto-style-110" id="ai-pane-tuner">
+                    <div class="auto-style-111">
+                        
+                        <!-- Tuner Parameter Matrix -->
+                        <div class="settings-pane auto-style-112">
+                            <div class="settings-group">
+                                <h4 class="auto-style-113">🧠 Select LLM Base Architecture</h4>
+                                <select id="ml-model-select" class="cmd-input auto-style-114" onchange="updateModelInfo()" title="input">
+                                    <option value="0">AI21 Jamba 1.5 Large (398B params, 256K Context)</option>
+                                    <option value="1">Microsoft Phi-4 Reasoning (Open-Weight)</option>
+                                    <option value="2">OpenAI gpt-oss-120b (Open-Source Release)</option>
+                                    <option value="3">OpenAI o3 Advanced Reasoning (High-Efficiency)</option>
+                                    <option value="4">OpenAI gpt-5-nano (Low-Latency Silicon Edge)</option>
+                                </select>
+                                <div id="ml-model-info" class="auto-style-115">
+                                    Type: Hybrid Transformer-Mamba<br>
+                                    Features: 256K Context Window, Structured Output Support
+                                </div>
+                            </div>
+
+                            <div class="settings-group">
+                                <h4 class="auto-style-116">🔧 LlamaFactory QLoRA Hyperparameters</h4>
+                                <div class="auto-style-117">
+                                    <div>
+                                        <span class="auto-style-118">LoRA Rank (r)</span>
+                                        <select id="ml-qlora-rank" class="cmd-input auto-style-119" title="input">
+                                            <option value="8">Rank 8</option>
+                                            <option value="16" selected>Rank 16</option>
+                                            <option value="32">Rank 32</option>
+                                            <option value="64">Rank 64</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <span class="auto-style-120">LoRA Alpha (α)</span>
+                                        <select id="ml-qlora-alpha" class="cmd-input auto-style-121" title="input">
+                                            <option value="16">Alpha 16</option>
+                                            <option value="32" selected>Alpha 32</option>
+                                            <option value="64">Alpha 64</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="auto-style-122">
+                                    <div>
+                                        <span class="auto-style-123">Dropout</span>
+                                        <input class="cmd-input auto-style-124" type="number" id="ml-qlora-dropout" value="0.05" step="0.01" title="input" placeholder="input">
+                                    </div>
+                                    <div>
+                                        <span class="auto-style-125">Target Modules</span>
+                                        <input class="cmd-input auto-style-126" type="text" id="ml-qlora-targets" value="q_proj,v_proj" title="input" placeholder="input">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dataset, SFT Trigger and Embeddings -->
+                        <div class="settings-pane auto-style-127">
+                            <div class="settings-group">
+                                <h4 class="auto-style-128">🏋️ Fine-Tuning Execution</h4>
+                                <select id="ml-dataset" class="cmd-input auto-style-129" title="input">
+                                    <option value="syslogs">Sovereign Lattice System Logs</option>
+                                    <option value="bns">BNS Court Case Matrix</option>
+                                    <option value="gst">Indian GST Ledger Accounts</option>
+                                    <option value="metadata">S-OverlayFS Node Metadata</option>
+                                </select>
+                                <div class="auto-style-130">
+                                    <span>Training Epochs: <strong id="epoch-val">3</strong></span>
+                                    <input type="range" id="ml-epochs" min="1" max="10" value="3" class="auto-style-131" oninput="document.getElementById('epoch-val').innerText = this.value" title="Range input" placeholder="input">
+                                </div>
+                                <button class="wizard-btn" onclick="startMFTraining()">START ATTESTED FINE-TUNING</button>
+                                
+                                <div id="ml-progress-container" class="auto-style-132">
+                                    <div class="auto-style-133">
+                                        <span id="ml-progress-status">Training model...</span>
+                                        <span id="ml-progress-pct">0%</span>
+                                    </div>
+                                    <div class="auto-style-134">
+                                        <div id="ml-progress-bar" class="auto-style-135"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="settings-group">
+                                <h4 class="auto-style-136">🧮 RAG Flow Cosine Similarity Indexer</h4>
+                                <div class="auto-style-137">
+                                    <div>
+                                        <span class="auto-style-138">Chunk Size</span>
+                                        <input class="cmd-input auto-style-139" type="number" id="ml-rag-chunk" value="512" title="input" placeholder="input">
+                                    </div>
+                                    <div>
+                                        <span class="auto-style-140">Overlap</span>
+                                        <input class="cmd-input auto-style-141" type="number" id="ml-rag-overlap" value="64" title="input" placeholder="input">
+                                    </div>
+                                </div>
+                                <div class="auto-style-142">
+                                    <input class="cmd-input auto-style-143" type="text" id="ml-embed-text" placeholder="Type text to RAG chunk..." title="input">
+                                    <button class="wizard-btn auto-style-144" onclick="generateMLEmbedding()">PARSE BLOCK</button>
+                                </div>
+                                <div id="ml-embed-result" class="auto-style-145">
+                                    > Vector Space Ready.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Pane 2: Awesome-MCP Server Gateway -->
+                <div class="ai-studio-pane auto-style-146" id="ai-pane-mcp">
+                    <div class="auto-style-147">
+                        
+                        <!-- MCP Servers Catalog -->
+                        <div class="settings-pane auto-style-148">
+                            <div class="settings-group">
+                                <h4 class="auto-style-149">🔌 Registered MCP Servers (Model Context Protocol)</h4>
+                                <ul id="mcp-servers-list" class="auto-style-150">
+                                    <li class="auto-style-151">
+                                        <div>
+                                            <strong>📂 SovereignVFS Explorer</strong><br>
+                                            <span class="auto-style-152">Host: 127.0.0.1:8081 | Protocol: SSE</span>
+                                        </div>
+                                        <span class="status-success auto-style-153">CONNECTED</span>
+                                    </li>
+                                    <li class="auto-style-154">
+                                        <div>
+                                            <strong>📊 Netdata Telemetry Monitor</strong><br>
+                                            <span class="auto-style-155">Host: 127.0.0.1:19999 | Protocol: stdio</span>
+                                        </div>
+                                        <span class="status-success auto-style-156">CONNECTED</span>
+                                    </li>
+                                    <li class="auto-style-157">
+                                        <div>
+                                            <strong>⚖️ BNS Legal Compliance Complier</strong><br>
+                                            <span class="auto-style-158">Host: 127.0.0.1:8082 | Protocol: stdio</span>
+                                        </div>
+                                        <button class="cyber-btn small-btn auto-style-159" onclick="addLog('Σ [MCP]: Connecting to BNS Complier MCP...', 'warning')">CONNECT</button>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h4 class="auto-style-160">🤖 AutoGPT Agent Registrar</h4>
+                                <div class="auto-style-161">
+                                    <input class="cmd-input auto-style-162" type="text" id="ml-agent-name" placeholder="Agent Name..." title="input">
+                                    <input class="cmd-input auto-style-163" type="text" id="ml-agent-role" placeholder="Agent Role..." title="input">
+                                </div>
+                                <div class="auto-style-164">
+                                    <select id="ml-agent-depth" class="cmd-input auto-style-165" title="input">
+                                        <option value="1">Depth 1 (Fast)</option>
+                                        <option value="3">Depth 3 (Balanced)</option>
+                                        <option value="5">Depth 5 (Rigorous)</option>
+                                    </select>
+                                    <button class="wizard-btn auto-style-166" onclick="registerMLAgent()">SPAWN AGENT</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- OWL Multi-Agent Console -->
+                        <div class="settings-pane auto-style-167">
+                            <div class="settings-group">
+                                <div class="auto-style-168">Spawned Agents:</div>
+                                <ul id="ml-agent-list" class="auto-style-169">
+                                    <li class="auto-style-170">
+                                        <span>🧠 <strong>CoreAgent</strong> (Scheduler Optimization)</span>
+                                        <span class="auto-style-171">Depth 5</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="settings-group auto-style-172">
+                                <div class="auto-style-173">
+                                    <h4 class="auto-style-174">🦉 OWL Multi-Agent Cooperation</h4>
+                                    <button class="cyber-btn small-btn auto-style-175" onclick="runOWLCooperation()">EXECUTE COOPERATION</button>
+                                </div>
+                                <div id="ml-console" class="auto-style-176">
+                                    [OWL] Proxy server listening on MCP port 8080...<br>
+                                    [OWL] Waiting for cooperation trigger.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Pane 3: n8n Node-Based Workflow Simulator -->
+                <div class="ai-studio-pane auto-style-177" id="ai-pane-nodes">
+                    <div class="auto-style-178">
+                        <span class="auto-style-179">Construct autonomous automation pipelines with linked nodes (n8n/Dify/ComfyUI style).</span>
+                        <button class="wizard-btn auto-style-180" onclick="executeWorkflowNodes()">RUN WORKFLOW ENGINE</button>
+                    </div>
+
+                    <!-- Workflow Visual Arena -->
+                    <div class="auto-style-181">
+                        
+                        <!-- Grid Lines overlay -->
+                        <div class="auto-style-182"></div>
+
+                        <!-- Node 1: Trigger -->
+                        <div class="routine-item routine-border-cyan auto-style-183">
+                            <div class="auto-style-184">🔔 Webhook Trigger</div>
+                            <div class="auto-style-185">Rule: CPU > 85%</div>
+                            <!-- Connector dot -->
+                            <div class="auto-style-186"></div>
+                        </div>
+
+                        <!-- Arrow/Line 1 -->
+                        <div id="flow-line-1" class="auto-style-187">
+                            <div id="flow-dot-1" class="auto-style-188"></div>
+                        </div>
+
+                        <!-- Node 2: Netdata fetch -->
+                        <div class="routine-item routine-border-magenta auto-style-189">
+                            <div class="auto-style-190">🔌 RAGFlow Context</div>
+                            <div class="auto-style-191">Index: Syslogs database</div>
+                            <!-- Connectors -->
+                            <div class="auto-style-192"></div>
+                            <div class="auto-style-193"></div>
+                        </div>
+
+                        <!-- Arrow/Line 2 -->
+                        <div id="flow-line-2" class="auto-style-194">
+                            <div id="flow-dot-2" class="auto-style-195"></div>
+                        </div>
+
+                        <!-- Node 3: o3 Reasoning -->
+                        <div class="routine-item routine-border-yellow auto-style-196">
+                            <div class="auto-style-197">🧠 Phi-4 / o3 Agent</div>
+                            <div class="auto-style-198">Task: Load balance audit</div>
+                            <!-- Connectors -->
+                            <div class="auto-style-199"></div>
+                            <div class="auto-style-200"></div>
+                        </div>
+
+                        <!-- Arrow/Line 3 -->
+                        <div id="flow-line-3" class="auto-style-201">
+                            <div id="flow-dot-3" class="auto-style-202"></div>
+                        </div>
+
+                        <!-- Node 4: Action MCP -->
+                        <div class="routine-item routine-border-green auto-style-203">
+                            <div class="auto-style-204">⚙️ MCP Executor</div>
+                            <div class="auto-style-205">Action: Limit cgroup cycles</div>
+                            <!-- Connector -->
+                            <div class="auto-style-206"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Pane 4: Letta Agent-File Memory & VoiceStar Real-Time Voice -->
+                <div class="ai-studio-pane auto-style-207" id="ai-pane-memory">
+                    <div class="auto-style-208">
+                        
+                        <!-- Letta Episodic Memory -->
+                        <div class="settings-pane auto-style-209">
+                            <div class="settings-group">
+                                <h4 class="auto-style-210">💾 Letta-AI agent-file Persistent Memory</h4>
+                                <div class="auto-style-211">
+                                    <span class="auto-style-212">Core Memory Slot</span>
+                                    <textarea id="letta-core-mem" class="cmd-input auto-style-213" title="input" placeholder="input">User identity details: Admin Singh, Kernel target: x86_64 Sovereign.</textarea>
+                                </div>
+                                <div class="auto-style-214">
+                                    <span class="auto-style-215">Episodic Memory Logs</span>
+                                    <textarea id="letta-episodic-mem" class="cmd-input auto-style-216" title="input" placeholder="input">Syslogs loaded, checked memory fragmentation bounds, CPU cycle rate normal.</textarea>
+                                </div>
+                                <button class="wizard-btn" onclick="consolidateLettaMemory()">CONSOLIDATE MEMORY FILE</button>
+                            </div>
+                        </div>
+
+                        <!-- VoiceStar Audio Streaming -->
+                        <div class="settings-pane auto-style-217">
+                            <div class="settings-group auto-style-218">
+                                <h4 class="auto-style-219">🗣️ VoiceStar Real-Time Voice Synthesis Stream</h4>
+                                <div class="auto-style-220">
+                                    <div>
+                                        <span class="auto-style-221">Sample Rate</span>
+                                        <select id="voicestar-rate" class="cmd-input auto-style-222" title="input">
+                                            <option value="16000">16 kHz</option>
+                                            <option value="24000" selected>24 kHz</option>
+                                            <option value="48000">48 kHz</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <span class="auto-style-223">Latency Target</span>
+                                        <select id="voicestar-latency" class="cmd-input auto-style-224" title="input">
+                                            <option value="5">5 ms (Ultra)</option>
+                                            <option value="8.5" selected>8.5 ms</option>
+                                            <option value="15">15 ms</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button class="cyber-btn small-btn auto-style-225" id="voicestar-stream-btn" onclick="toggleVoiceStreaming()">START VOICE STREAM</button>
+                                
+                                <span class="auto-style-226">Wave Visualizer Preview:</span>
+                                <div class="auto-style-227">
+                                    <div id="voice-wave-line" class="auto-style-228"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Pane 5: ClaudeCode CLI Sandbox & DeepLiveCam Swaps -->
+                <div class="ai-studio-pane auto-style-229" id="ai-pane-claudecam">
+                    <div class="auto-style-230">
+                        
+                        <!-- ClaudeCode CLI Simulation -->
+                        <div class="settings-pane auto-style-231">
+                            <div class="settings-group auto-style-232">
+                                <h4 class="auto-style-233">💻 Claude-Code CLI Terminal Sandbox</h4>
+                                <div class="auto-style-234">
+                                    <input class="cmd-input auto-style-235" type="text" id="claudecode-file" value="SovereignBoot.cpp" title="input" placeholder="input">
+                                    <input class="cmd-input auto-style-236" type="text" id="claudecode-prompt" placeholder="Analyze compile locks..." title="input">
+                                    <button class="cyber-btn small-btn auto-style-237" onclick="executeClaudeCodeCLI()">HEAL CODE</button>
+                                </div>
+                                <div id="claudecode-terminal" class="auto-style-238">
+                                    admin@sigma-zenith:~/SigmaOS$ claudecode --version<br>
+                                    claude-code v1.0.4 (attested standalone sandbox)<br>
+                                    Type prompt to run automated debugger.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DeepLiveCam Face Swap -->
+                        <div class="settings-pane auto-style-239">
+                            <div class="settings-group">
+                                <h4 class="auto-style-240">🎭 Deep-Live-Cam face swaps</h4>
+                                <div class="auto-style-241">
+                                    <div>
+                                        <span class="auto-style-242">Face Model</span>
+                                        <select id="deeplivecam-model" class="cmd-input auto-style-243" title="input">
+                                            <option value="InsightFace">InsightFace resnet100</option>
+                                            <option value="GFPGAN">GFPGAN v1.4</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <span class="auto-style-244">Target FPS</span>
+                                        <select id="deeplivecam-fps" class="cmd-input auto-style-245" title="input">
+                                            <option value="30">30 FPS</option>
+                                            <option value="60">60 FPS</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button class="wizard-btn" onclick="startDeepLiveCamSimulation()">MAP CAMERA SOURCE</button>
+                                <div id="deeplivecam-console" class="auto-style-246">
+                                    > Camera source: IDLE.<br>
+                                    > Inference mapping time: 0ms.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Pane 6: SWE-Agent & Marimo / Streamlit Reactive Sandbox -->
+                <div class="ai-studio-pane auto-style-247" id="ai-pane-swe">
+                    <div class="auto-style-248">
+                        
+                        <!-- SWE-Agent / OpenHands / GPT-Pilot Console -->
+                        <div class="settings-pane auto-style-249">
+                            <div class="settings-group auto-style-250">
+                                <h4 class="auto-style-251">🤖 SWE-Agent & OpenHands Developer Autopilot</h4>
+                                <div class="auto-style-252">
+                                    <span class="auto-style-253">Repository Scope Workspace</span>
+                                    <input class="cmd-input auto-style-254" type="text" id="swe-repo-path" value="/vfs/workspace/SigmaOS" title="input" placeholder="input">
+                                </div>
+                                <div class="auto-style-255">
+                                    <span class="auto-style-256">Autopilot Issue Query</span>
+                                    <textarea id="swe-issue-desc" class="cmd-input auto-style-257" title="input" placeholder="input">Optimize context switches lock contention in SovereignBoot.cpp line 110.</textarea>
+                                </div>
+                                <button class="wizard-btn" onclick="startSWEAgentAutopilot()">SPAWN AUTOPILOT AGENT</button>
+                                <div id="swe-agent-terminal" class="auto-style-258">
+                                    SWE-agent v1.2.0 starting...<br>
+                                    Ready to parse target issues.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Marimo / Streamlit / Dash Reactive Sandbox -->
+                        <div class="settings-pane auto-style-259">
+                            <div class="settings-group auto-style-260">
+                                <h4 class="auto-style-261">📊 Streamlit & Marimo Reactive App Sandbox</h4>
+                                <div class="auto-style-262">
+                                    <span class="auto-style-263">Python Reactive Script Input</span>
+                                    <textarea id="marimo-code-input" class="cmd-input auto-style-264" title="input" placeholder="input">import streamlit as st
+import numpy as np
+
+# Slider inputs triggers reactive cell runs
+freq = st.slider(&quot;Signal frequency&quot;, 1, 10, 5)
+st.line_chart(np.sin(np.linspace(0, 10, 100) * freq))</textarea>
+                                </div>
+                                <button class="cyber-btn small-btn auto-style-265" onclick="runReactiveSandbox()">RUN REACTIVE CELL</button>
+                                
+                                <span class="auto-style-266">Reactive Chart Preview:</span>
+                                <div id="marimo-chart-preview" class="auto-style-267">
+                                    <div class="auto-style-268">[REACTIVE PREVIEW INACTIVE]</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Floating System Log Feed -->
+    <div id="kernel-logs" class="auto-style-154"></div>
+
+    <!-- Bottom Dock -->
+    <div class="dock-container">
+        <div class="dock-icon" data-tooltip="File Manager" onclick="launchApp('File Manager')">📂</div>
+        <div class="dock-icon" data-tooltip="OmniShell Terminal" onclick="launchApp('OmniShell')">💻</div>
+        <div class="dock-icon" data-tooltip="Observability Matrix" onclick="launchApp('Sigma Browser')">📊</div>
+        <div class="dock-icon" data-tooltip="Neural Core" onclick="launchApp('AI Assistant')">🧠</div>
+        <div class="dock-icon" data-tooltip="AI/ML Studio" onclick="launchApp('AI Studio')">🤖</div>
+        <div class="dock-icon" data-tooltip="Lattice Settings" onclick="launchApp('Lattice Settings')">⚙️</div>
+        <div class="dock-icon" data-tooltip="Pro Tools" onclick="launchApp('Utility Nexus')">🔧</div>
+        <div class="dock-icon" data-tooltip="Marketplace" onclick="launchApp('Marketplace')">🛒</div>
+        <div class="dock-icon" data-tooltip="Zenith Installer" onclick="launchApp('Markup Forge')">📥</div>
+        <div class="auto-style-155"></div>
+        <div class="dock-icon" data-tooltip="Help Matrix" onclick="toggleHelp()">❓</div>
+    </div>
+
+    <!-- Right-Click Context Menu -->
+    <div id="context-menu">
+        <div class="context-item" onclick="contextAction('refresh')">🔄 Force Refresh</div>
+        <div class="context-item" onclick="contextAction('cleanup')">🧹 Purge Caches</div>
+        <div class="context-item" onclick="contextAction('audit')">🛡️ Attest System</div>
+        <div class="auto-style-156"></div>
+        <div class="context-item" onclick="toggleHelp()">❓ Help Matrix</div>
+    </div>
+
+    <!-- Alt + Space Command Center -->
+    <div id="cmd-palette">
+        <input type="text" class="cmd-input" id="cmd-input" placeholder="Search system commands..." title="input">
+        <div class="cmd-results" id="cmd-results"></div>
+    </div>
+
+    <!-- Sovereign Help Overlay -->
+    <div class="wizard-overlay wizard-overlay--hidden" id="help-overlay"></div>
+
+    <!-- Versioned Kernel API & Decoupled Components -->
+    <script src="web_ui/scripts/sigma_api_service.js"></script>
+    <script src="web_ui/components/sigma-monitor.js"></script>
+    <script src="web_ui/components/sigma-logs.js"></script>
+    <script src="web_ui/components/sigma-pool-inspector.js"></script>
+    <script src="web_ui/components/sigma-ai-dispatch.js"></script>
+    <script src="web_ui/components/sigma-auth-guard.js"></script>
+    <script src="web_ui/components/sigma-neural-demo.js"></script>
+    <script src="web_ui/components/sigma-persistence-panel.js"></script>
+    <script src="web_ui/components/sigma-perf-metrics.js"></script>
+
+    <!-- Legacy shard loader -->
+    <script src="web_ui/scripts/kernel_loader.js"></script>
+
+    <!-- Core window orchestration -->
+    <script src="zenith_desktop.js"></script>
+
+    <script>
+        // Additional Pro-Tools handlers
+        function calculateGST() {
+            const amountInput = document.getElementById('gst-amount');
+            const rateInput = document.getElementById('gst-rate');
+            const resultEl = document.getElementById('gst-result');
+            
+            const amount = parseInt(amountInput.value);
+            const rate = parseFloat(rateInput.value);
+            
+            if (isNaN(amount) || isNaN(rate)) {
+                resultEl.innerHTML = '<span class="auto-style-157">> Error: Invalid input</span>';
+                return;
+            }
+            
+            // paise exact math
+            const gst = Math.round(amount * (rate / 100));
+            const total = amount + gst;
+            
+            resultEl.innerHTML = `> GST: ${gst} paise<br>> Total: ${total} paise<br>> Decimals: ${(total/100).toFixed(2)} INR`;
+            addLog(`Σ [CALC]: GST computed perfectly for ${amount} paise.`, 'success');
+        }
+
+        function checkLegalCompliance() {
+            const queryInput = document.getElementById('legal-query');
+            const resultEl = document.getElementById('legal-result');
+            
+            const q = queryInput.value.trim().toLowerCase();
+            if (!q) {
+                resultEl.innerHTML = '<span class="auto-style-158">> Error: Please input search term</span>';
+                return;
+            }
+            
+            if (q.includes('theft') || q.includes('303') || q.includes('bns')) {
+                resultEl.innerHTML = `> Match: BNS Section 303 (Theft)<br>> Penalties: Bailable / Non-bailable clauses synced.<br>> Compliance: Lattice certified.`;
+            } else if (q.includes('fraud') || q.includes('318')) {
+                resultEl.innerHTML = `> Match: BNS Section 318 (Cheating/Fraud)<br>> Penalties: Up to 3 years imprisonment or fine.<br>> Compliance: Lattice certified.`;
+            } else {
+                resultEl.innerHTML = `> Mapping active. No critical matches for "${q}".<br>> Audit recorded in sovereign ledger.`;
+            }
+            addLog(`Σ [COMPLIANCE]: BNS query processed for "${q}".`, 'success');
+        }
+
+        // Tab Switcher and FOSS Injection for Marketplace
+        function switchMarketTab(tab) {
+            document.getElementById('market-core-shards').style.display = tab === 'core-shards' ? 'block' : 'none';
+            document.getElementById('market-foss-apps').style.display = tab === 'foss-apps' ? 'block' : 'none';
+        }
+
+        function injectFOSS(name) {
+            addLog(`Σ [MARKET]: Attesting PQC signature for ${name}...`, 'success');
+            setTimeout(() => {
+                addLog(`Σ [MARKET]: Dilithium-5 attestation PASSED for ${name}.`, 'success');
+                addLog(`Σ [MARKET]: Injecting ${name} sandbox into Ring-3 active memory.`, 'success');
+                alert(`Σ OS Alert:\n${name} package attested and dynamically injected!`);
+            }, 800);
+        }
+
+        // Boot listener to populate Shards Marketplace
+        window.addEventListener('sigma.core.boot', () => {
+            const container = document.getElementById('shardContainer');
+            if (!container) return;
+            setTimeout(() => {
+                const keys = Object.keys(window).filter(k => k.startsWith('SigmaS'));
+                keys.forEach(key => {
+                    const shard = window[key];
+                    if (shard && shard.shardId) {
+                        const titleMatch = shard.shardId.match(/_([A-Za-z0-9]+)$/);
+                        const title = titleMatch ? titleMatch[1] : shard.shardId;
+                        const card = document.createElement('div');
+                        card.className = 'fm-item';
+                        card.style.background = 'rgba(255,255,255,0.02)';
+                        card.style.border = '1px solid var(--border-glass)';
+                        card.style.borderRadius = '10px';
+                        card.innerHTML = `
+                                    <span class="auto-style-159">● Attested</span>
+                            <h4 class="auto-style-160">${title.replace(/([A-Z])/g, ' $1').trim()}</h4>
+                            <code class="auto-style-161">${shard.shardId.split('_')[0]}</code>
+                        `;
+                        container.appendChild(card);
+                    }
+                });
+            }, 500);
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initNeuralLayout();
+        });
+    </script>
+
+    <!-- macOS-style Floating Dock -->
+    <div class="zenith-dock-container">
+        <div class="zenith-dock">
+            <div class="dock-item" onclick="toggleAppLauncher()" title="App Launcher">
+                <span class="dock-icon">🚀</span>
+            </div>
+            <div class="dock-separator"></div>
+            <div class="dock-item" onclick="openWindow('terminal-win')" title="OmniShell">
+                <span class="dock-icon">💻</span>
+            </div>
+            <div class="dock-item" onclick="openWindow('file-manager-win')" title="Sovereign VFS">
+                <span class="dock-icon">📂</span>
+            </div>
+            <div class="dock-item" onclick="openWindow('lattice-settings-win')" title="Settings">
+                <span class="dock-icon">⚙️</span>
+            </div>
+            <div class="dock-item" onclick="openWindow('sigma-market-win')" title="App Store">
+                <span class="dock-icon">🛒</span>
+            </div>
+            <div class="dock-separator"></div>
+            <div class="dock-item emergency-sync-btn" onclick="triggerEmergencySync()" title="Emergency Lattice Sync">
+                <span class="dock-icon">🔄</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zorin-style App Launcher Overlay -->
+    <div class="app-launcher-overlay" id="app-launcher">
+        <div class="app-launcher-panel">
+            <div class="launcher-header">
+                <h3>SigmaOS Zenith Apps</h3>
+                <input type="text" placeholder="Search apps, files, settings..." class="launcher-search">
+            </div>
+            <div class="launcher-categories">
+                <div class="launcher-category">
+                    <h4>Development</h4>
+                    <div class="launcher-app" onclick="openWindow('utility-nexus-win')">🔧 Developer Workspace</div>
+                    <div class="launcher-app" onclick="openWindow('terminal-win')">💻 OmniShell</div>
+                </div>
+                <div class="launcher-category">
+                    <h4>System & Security</h4>
+                    <div class="launcher-app" onclick="openWindow('lattice-settings-win')">⚙️ System Settings</div>
+                    <div class="launcher-app" onclick="openWindow('browser-win')">📊 Observability Matrix</div>
+                </div>
+                <div class="launcher-category">
+                    <h4>AI & Cloud</h4>
+                    <div class="launcher-app" onclick="openWindow('sigma-ai-studio-win')">🤖 AI Studio</div>
+                    <div class="launcher-app" onclick="openWindow('ai-assistant-win')">🧠 Neural Core</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

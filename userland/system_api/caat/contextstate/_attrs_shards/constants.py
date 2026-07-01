@@ -1,7 +1,0 @@
-
-
-WORK = 'Productivity Focus'
-GAMING = 'High-Performance Gaming'
-WELLNESS = 'Downtime / Wellness'
-TRAVEL = 'Low-Bandwidth / Battery Saver'
-IDLE = 'System Idle (Janitor Window)'

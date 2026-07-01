@@ -1,0 +1,26 @@
+{
+    "profession": "sub_atomic_particle_physicist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "sub-atomic_particle_physicist_workspace",
+        "specialized_analytics",
+        "compliance_manager"
+    ],
+    "rules": [
+        "Industry standards",
+        "professional ethics"
+    ],
+    "calculators": [
+        "Efficiency metrics",
+        "cost analysis"
+    ],
+    "algorithms": [
+        "Workflow optimization",
+        "adaptive assistance"
+    ],
+    "automation": {
+        "self_healing": "Continuous health check for Sub-Atomic Particle Physicist tools",
+        "rollback": "Automatic state snapshots"
+    }
+}

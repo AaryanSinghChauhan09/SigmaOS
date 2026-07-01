@@ -1,0 +1,28 @@
+{
+    "profession": "luthier",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "acoustic-frequency_analyzer",
+        "wood-density_scanner",
+        "micro-planer",
+        "resonance-lattice"
+    ],
+    "rules": [
+        "CITES wood-usage regs",
+        "traditional craft standards"
+    ],
+    "calculators": [
+        "String-tension",
+        "bridge-pressure",
+        "vibrational-mode delta"
+    ],
+    "algorithms": [
+        "Resonance-box simulation",
+        "structural-vibration analysis"
+    ],
+    "automation": {
+        "self_healing": "Workshop-climate sync, resonance-profile verification",
+        "rollback": "Instrument-design snapshots, vibrational-history restoration"
+    }
+}

@@ -1,0 +1,75 @@
+# =========================================================================
+# SigmaOS OS Profile: sigma (Native Sovereign Target)
+# =========================================================================
+# Selected with: make TARGET_OS=sigma
+#                cmake -DTARGET_OS=sigma ..
+#
+# This profile defines the Native SigmaOS build: fully sovereign,
+# POSIX-free, no libc/Linux ABI dependency. Designed for bare-metal
+# and SigmaOS-native userland execution.
+# =========================================================================
+
+target_os: sigma
+
+meta:
+  description: "Native SigmaOS — sovereign microkernel, POSIX-free, AI-native"
+  edition: "Zenith"
+  version: "15.0"
+  license: "GPL-2.0-or-later"
+
+# ── Driver layer ──────────────────────────────────────────────────────────
+drivers:
+  directory: drivers/sigma
+  modules:
+    - sigma_nvme          # Bare-metal NVMe storage (no libata)
+    - sigma_wifi          # WPA3-SAE Wi-Fi with PQC hardening
+    - sigma_usb           # xHCI USB host controller
+    - sigma_gpu           # Direct KMS/DRM framebuffer (no Mesa dependency)
+    - sigma_audio         # PipeWire-free ALSA-inspired audio stack
+
+# ── Kernel subsystems enabled ─────────────────────────────────────────────
+kernel:
+  scheduler: "MLFQ-MCS"         # Multi-level feedback queue + MCS spinlocks
+  memory_model: "Sovereign-VMM"  # Custom virtual memory manager (no mm/slab.c)
+  filesystem: "SigmaFS + ZFS"    # Native sovereign FS + ZFS for data integrity
+  ipc: "Sovereign-IPC"           # Zero-copy message passing
+  security: "Zero-Trust + PQC"   # Kyber-1024 / Dilithium-5 post-quantum crypto
+  libc: none                     # Freestanding — sigma_libc.h only
+
+# ── Feature flags (map to Makefile USE flags) ─────────────────────────────
+features:
+  hypervisor:   true
+  ai_engine:    true
+  zenith_de:    true
+  cryptfs:      true
+  pq_net:       true
+  wasm_runtime: true
+  bluetooth:    true
+  wifi:         true
+  immutable_root: false
+
+# ── System calls ──────────────────────────────────────────────────────────
+syscalls:
+  interface: "Sovereign Syscall Gate"
+  posix_compat: false           # No POSIX, sovereign syscall numbering
+  count: 64                     # Core sovereign syscalls
+
+# ── Boot configuration ────────────────────────────────────────────────────
+boot:
+  bootloader: "sigma-boot.efi (UEFI)"
+  fallback:   "GRUB2 multiboot2"
+  timeout_s:  3
+  safe_mode:  true
+
+# ── Package management ────────────────────────────────────────────────────
+packages:
+  manager: "sigma-pkg"
+  format: ".spkg (Sovereign Package)"
+  repo_url: "https://pkg.sigmaos.dev/sovereign"
+  apt_compat: false             # No APT bridge in native target
+
+# ── CI build matrix entry ─────────────────────────────────────────────────
+ci:
+  cmake_flag: "-DTARGET_OS=sigma"
+  make_flag:  "TARGET_OS=sigma"
+  test_suite: "tests/UniversalOSFormatTest.cpp"

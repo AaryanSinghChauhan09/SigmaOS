@@ -1,0 +1,27 @@
+{
+    "profession": "smart_materials_engineer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "nano-lattice_modeler",
+        "shape-memory-alloy_simulator",
+        "self-healing-polymer_monitor"
+    ],
+    "rules": [
+        "Material safety standards",
+        "nano-tech regulations"
+    ],
+    "calculators": [
+        "Young's modulus delta",
+        "phase-transition temp",
+        "molecular-strain"
+    ],
+    "algorithms": [
+        "Generative material design",
+        "micro-structure simulation"
+    ],
+    "automation": {
+        "self_healing": "Material-property-sync, molecular-model validation",
+        "rollback": "Material-iteration snapshots, chemical-baseline restoration"
+    }
+}

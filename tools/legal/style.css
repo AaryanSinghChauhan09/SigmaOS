@@ -1,0 +1,326 @@
+/* =====================================================
+   SigmaLex — Indian Legal Procedure Guide Styles
+   Sovereign CSS: Zero external UI libraries.
+   ===================================================== */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:          #06070f;
+  --surface:     #0d0e1a;
+  --surface-2:   #12152a;
+  --border:      rgba(140, 120, 255, 0.15);
+  --gold:        #d4a843;
+  --gold-dim:    rgba(212, 168, 67, 0.12);
+  --purple:      #7c5cfc;
+  --purple-glow: rgba(124, 92, 252, 0.25);
+  --cyan:        #38d9f5;
+  --red:         #e05c6b;
+  --green:       #44d9a5;
+  --text:        #e8e6f0;
+  --text-dim:    #8a86a8;
+  --font-body:   'Outfit', sans-serif;
+  --font-serif:  'Crimson Pro', Georgia, serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  min-height: 100vh;
+}
+
+/* ── Hero ── */
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 80px 24px 60px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+.hero-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(124,92,252,0.22) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-content { position: relative; max-width: 720px; margin: 0 auto; }
+
+.logo-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--purple), #b07dfd);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 5px 16px;
+  border-radius: 20px;
+  margin-bottom: 22px;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  background: linear-gradient(135deg, #fff 30%, var(--gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+
+.hero-sub {
+  font-size: 1.05rem;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}
+
+.hero-note {
+  display: inline-block;
+  font-size: 0.82rem;
+  color: var(--gold);
+  background: var(--gold-dim);
+  border: 1px solid rgba(212,168,67,0.25);
+  border-radius: 8px;
+  padding: 8px 18px;
+}
+
+/* ── Case Selector ── */
+.selector-section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 56px 24px 32px;
+}
+.selector-section h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 24px;
+}
+
+.case-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+}
+
+.case-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px 18px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  transition: all 0.25s ease;
+  text-align: left;
+}
+.case-card:hover {
+  background: var(--surface-2);
+  border-color: var(--purple);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px var(--purple-glow);
+}
+.case-card.active {
+  border-color: var(--purple);
+  background: linear-gradient(145deg, rgba(124,92,252,0.1), var(--surface));
+  box-shadow: 0 0 0 1px var(--purple), 0 8px 32px var(--purple-glow);
+}
+.case-icon { font-size: 1.8rem; }
+.case-label { font-size: 1rem; font-weight: 700; color: var(--text); }
+.case-desc  { font-size: 0.8rem; color: var(--text-dim); }
+
+/* ── Timeline Section ── */
+.timeline-section {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+
+.timeline-header {
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.timeline-header h2 {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.timeline-header p {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  margin-top: 4px;
+  font-family: var(--font-serif);
+  font-style: italic;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Timeline Step Card ── */
+.step-card {
+  display: flex;
+  gap: 24px;
+  position: relative;
+  animation: fadeSlideIn 0.45s ease both;
+}
+.step-card + .step-card { margin-top: 0; }
+
+/* Vertical line connector */
+.step-card::before {
+  content: '';
+  position: absolute;
+  left: 22px;
+  top: 56px;
+  bottom: -32px;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--border), transparent);
+}
+.step-card:last-child::before { display: none; }
+
+.step-num-col {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.step-num {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.95rem;
+  background: linear-gradient(135deg, var(--purple), #b07dfd);
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(124,92,252,0.15);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.step-body {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px 24px;
+  margin-bottom: 32px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.step-body:hover {
+  border-color: rgba(124,92,252,0.35);
+  box-shadow: 0 4px 24px rgba(124,92,252,0.1);
+}
+
+.step-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.step-explanation {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+}
+
+.step-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meta-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.84rem;
+}
+
+.meta-badge {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.badge-statute  { background: rgba(56,217,245,0.1);  color: var(--cyan); border: 1px solid rgba(56,217,245,0.25); }
+.badge-caselaw  { background: var(--gold-dim);         color: var(--gold); border: 1px solid rgba(212,168,67,0.25); }
+.badge-tip      { background: rgba(68,217,165,0.1);   color: var(--green); border: 1px solid rgba(68,217,165,0.25); }
+
+.meta-text { color: var(--text-dim); line-height: 1.5; }
+.meta-text em { color: var(--text); font-style: normal; font-weight: 600; }
+
+/* ── Glossary Footer ── */
+.glossary {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 48px 24px;
+  text-align: center;
+}
+.glossary h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 18px;
+}
+
+.statute-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+.chip {
+  font-size: 0.8rem;
+  padding: 6px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text-dim);
+}
+
+.footer-note {
+  font-size: 0.8rem;
+  color: rgba(138,134,168,0.5);
+}
+
+/* ── Animation ── */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.step-card { animation-delay: calc(var(--idx, 0) * 0.07s); }
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .step-card { flex-direction: column; gap: 12px; }
+  .step-card::before { display: none; }
+  .step-num { width: 36px; height: 36px; font-size: 0.8rem; }
+  .step-body { margin-bottom: 20px; }
+}

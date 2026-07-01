@@ -1,0 +1,33 @@
+{
+    "profession": "doctor",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "patient_records",
+        "prescription_management",
+        "lab_results_integration",
+        "telemedicine_tools",
+        "dicom_viewer"
+    ],
+    "rules": [
+        "Medical Council of India guidelines",
+        "Ayushman Bharat protocols",
+        "HIPAA",
+        "GDPR"
+    ],
+    "calculators": [
+        "Dosage",
+        "BMI",
+        "medical billing",
+        "glomerular filtration rate"
+    ],
+    "algorithms": [
+        "Patient record indexing",
+        "diagnostic prediction",
+        "lab result interpretation"
+    ],
+    "automation": {
+        "self_healing": "Medical data integrity scan, prescription conflict detection",
+        "rollback": "Patient record versioning, emergency state restoration"
+    }
+}

@@ -1,0 +1,30 @@
+{
+    "profession": "grid_resilience_engineer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "smart-grid_monitor",
+        "load_balancer-lattice",
+        "phase-angle_sync",
+        "scada-shield"
+    ],
+    "rules": [
+        "IEEE standards",
+        "FERC regulations",
+        "NERC CIP compliance"
+    ],
+    "calculators": [
+        "Frequency stability",
+        "reactive power",
+        "peak-load predictor"
+    ],
+    "algorithms": [
+        "Dynamic line rating",
+        "islanding detection",
+        "black-start optimization"
+    ],
+    "automation": {
+        "self_healing": "Automatic breaker re-closing, load-shedding lattice priority",
+        "rollback": "Pre-fault grid state restoration, historical load profiles"
+    }
+}

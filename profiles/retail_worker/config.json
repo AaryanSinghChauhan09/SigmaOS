@@ -1,0 +1,13 @@
+{
+    "profession": "retail_worker",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "pos",
+        "stock_management",
+        "customer_service_tools"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

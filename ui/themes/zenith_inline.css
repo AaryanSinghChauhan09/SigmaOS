@@ -1,0 +1,119 @@
+/* zenith_inline.css — extracted inline styles */
+
+.zen-live-canvas-inner {
+    min-height: 150px;
+    background: rgba(0,0,0,0.5);
+    border-top: 1px solid rgba(0,255,255,0.2);
+    border-bottom: 1px solid rgba(0,255,255,0.2);
+    padding: 10px;
+    font-size: 0.85em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.zen-text-muted-label {
+    color: var(--text-muted);
+}
+
+.zen-shard-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.zen-market-item-inner {
+    background: rgba(255,255,255,0.05);
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 0.8em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.zen-app-shard-inner {
+    background: rgba(255,255,255,0.05);
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 0.8em;
+}
+
+.zen-shard-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.zen-stat-bar-thin {
+    height: 4px;
+}
+
+.zen-stat-full {
+    width: 100%;
+}
+
+.zen-stat-85 {
+    width: 85%;
+}
+
+.zen-stat-zero {
+    width: 0%;
+}
+
+.zen-kernel-console-panel {
+    position: fixed;
+    bottom: 60px;
+    right: 20px;
+    width: 350px;
+    height: 220px;
+    background: rgba(0,0,0,0.85);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0,255,255,0.2);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+
+.zen-console-header-bar {
+    background: rgba(255,255,255,0.05);
+    padding: 8px 12px;
+    font-size: 0.7em;
+    color: var(--accent);
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.zen-console-output-area {
+    flex: 1;
+    padding: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75em;
+    color: rgba(255,255,255,0.8);
+    overflow-y: auto;
+}
+
+.zen-cognitive-queue-inner {
+    margin-top: 10px;
+    max-height: 40px;
+    overflow: hidden;
+    font-size: 0.8em;
+    color: var(--accent);
+}
+
+.zen-mesh-overlay-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+

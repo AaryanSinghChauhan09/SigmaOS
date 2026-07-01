@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Σ SigmaOS Sovereign Installer</title>
+    <style>
+        :root {
+            --neon-green: #00FF00;
+            --dark-bg: #0A0A0A;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+        }
+        body {
+            background: var(--dark-bg);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .installer-card {
+            background: var(--glass-bg);
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 255, 0, 0.2);
+            padding: 40px;
+            border-radius: 20px;
+            width: 600px;
+            box-shadow: 0 0 50px rgba(0, 255, 0, 0.1);
+        }
+        h1 {
+            color: var(--neon-green);
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+        }
+        .step {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #222;
+            border-radius: 2px;
+            margin-top: 40px;
+            position: relative;
+        }
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+            transition: width 2s ease-in-out;
+        }
+        .btn-install {
+            background: var(--neon-green);
+            color: black;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="installer-card" id="installer-root">
+        <h1>Σ SOVEREIGN INSTALLER</h1>
+        <p>Deploying SigmaOS Sovereign Lattice to hardware...</p>
+        
+        <div class="step">🔍 Probing Silicon Lattice (Detecting SSD/NVMe)</div>
+        <div class="step">🔐 Initializing PQC-LatticeFS (Kyber Encryption)</div>
+        <div class="step">🛰️ Injecting Shards (Kernel, AI, Zenith UI)</div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="install-progress"></div>
+        </div>
+
+        <button class="btn-install" onclick="startInstall()" id="install-btn">INITIALIZE DEPLOYMENT</button>
+    </div>
+
+    <script>
+        function startInstall() {
+            const btn = document.getElementById('install-btn');
+            const progress = document.getElementById('install-progress');
+            btn.disabled = true;
+            btn.innerText = "DEPLOYING...";
+            
+            progress.style.width = "100%";
+            
+            setTimeout(() => {
+                alert("Σ LATTICE DEPLOYED SUCCESSFULLY. Reboot to initialize Sovereign Mode.");
+                window.location.reload();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

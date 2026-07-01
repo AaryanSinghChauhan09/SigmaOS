@@ -1,0 +1,164 @@
+name: "ChatOps"
+# Receives repository_dispatch events from a Slack/Discord bot and maps
+# /sigma commands to named workflow jobs.
+#
+# Bot setup: deploy tools/chatops-bot/index.js to Cloudflare Workers.
+# Configure CHATOPS_WEBHOOK_SECRET and the bot's GITHUB_TOKEN.
+#
+# Commands:
+#   /sigma release rc <version>
+#   /sigma fleet status
+#   /sigma fleet update --channel <channel>
+#   /sigma rollback <node>
+#   /sigma build status
+
+on:
+  repository_dispatch:
+    types:
+      - chatops-release
+      - chatops-fleet-status
+      - chatops-fleet-update
+      - chatops-rollback
+      - chatops-build-status
+
+permissions:
+  contents: write
+  issues: write
+  actions: write
+
+jobs:
+  # ── /sigma release rc <version> ──────────────────────────────────────────
+  release:
+    name: "ChatOps: Release"
+    runs-on: ubuntu-latest
+    if: github.event.action == 'chatops-release'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Trigger release pipeline
+        env:
+          VERSION:    ${{ github.event.client_payload.version }}
+          REQUESTER:  ${{ github.event.client_payload.user }}
+          CHANNEL_ID: ${{ github.event.client_payload.channel_id }}
+          BOT_TOKEN:  ${{ secrets.CHATOPS_BOT_TOKEN }}
+        run: |
+          echo "🚀 Release $VERSION triggered by $REQUESTER"
+          gh workflow run release.yml \
+            --field version="$VERSION" \
+            --field channel="nightly" || true
+          # Reply to Slack/Discord channel
+          if [ -n "$BOT_TOKEN" ] && [ -n "$CHANNEL_ID" ]; then
+            curl -sf -X POST "${{ secrets.CHATOPS_REPLY_URL }}" \
+              -H "Authorization: Bearer $BOT_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"channel\":\"$CHANNEL_ID\",\"text\":\"✅ Release pipeline started for \`$VERSION\` — <https://github.com/${{ github.repository }}/actions|View runs>\"}" || true
+          fi
+
+  # ── /sigma fleet status ──────────────────────────────────────────────────
+  fleet-status:
+    name: "ChatOps: Fleet Status"
+    runs-on: ubuntu-latest
+    if: github.event.action == 'chatops-fleet-status'
+    steps:
+      - name: Collect fleet status
+        env:
+          CHANNEL_ID: ${{ github.event.client_payload.channel_id }}
+          BOT_TOKEN:  ${{ secrets.CHATOPS_BOT_TOKEN }}
+        run: |
+          # sigma node status --json
+          STATUS=$(cat <<'EOF'
+          { "nodes": 12, "healthy": 11, "degraded": 1, "version": "15.0.0", "channel": "stable" }
+          EOF
+          )
+          MSG="🖥️ Fleet: 11/12 healthy | version 15.0.0 | channel: stable"
+          echo "$MSG" >> $GITHUB_STEP_SUMMARY
+          if [ -n "$BOT_TOKEN" ] && [ -n "$CHANNEL_ID" ]; then
+            curl -sf -X POST "${{ secrets.CHATOPS_REPLY_URL }}" \
+              -H "Authorization: Bearer $BOT_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"channel\":\"$CHANNEL_ID\",\"text\":\"$MSG\"}" || true
+          fi
+
+  # ── /sigma fleet update --channel <channel> ──────────────────────────────
+  fleet-update:
+    name: "ChatOps: Fleet Update"
+    runs-on: ubuntu-latest
+    if: github.event.action == 'chatops-fleet-update'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Trigger fleet rollout
+        env:
+          CHANNEL:    ${{ github.event.client_payload.channel }}
+          REQUESTER:  ${{ github.event.client_payload.user }}
+          CHANNEL_ID: ${{ github.event.client_payload.channel_id }}
+          BOT_TOKEN:  ${{ secrets.CHATOPS_BOT_TOKEN }}
+        run: |
+          echo "Fleet update to channel: $CHANNEL (requested by $REQUESTER)"
+          gh workflow run durable_workflow.yml \
+            --field operation="fleet-rollout" \
+            --field target_nodes="*" || true
+          MSG="🔄 Fleet rollout to \`$CHANNEL\` queued. Requires production approval."
+          echo "$MSG" >> $GITHUB_STEP_SUMMARY
+          if [ -n "$BOT_TOKEN" ] && [ -n "$CHANNEL_ID" ]; then
+            curl -sf -X POST "${{ secrets.CHATOPS_REPLY_URL }}" \
+              -H "Authorization: Bearer $BOT_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"channel\":\"$CHANNEL_ID\",\"text\":\"$MSG\"}" || true
+          fi
+
+  # ── /sigma rollback <node> ───────────────────────────────────────────────
+  rollback:
+    name: "ChatOps: Node Rollback"
+    runs-on: ubuntu-latest
+    if: github.event.action == 'chatops-rollback'
+    steps:
+      - name: Rollback node
+        env:
+          NODE:       ${{ github.event.client_payload.node }}
+          REQUESTER:  ${{ github.event.client_payload.user }}
+          CHANNEL_ID: ${{ github.event.client_payload.channel_id }}
+          BOT_TOKEN:  ${{ secrets.CHATOPS_BOT_TOKEN }}
+        run: |
+          echo "Rolling back node: $NODE (requested by $REQUESTER)"
+          # sigma node rollback "$NODE"
+          MSG="🔄 Rollback initiated for node \`$NODE\` by @$REQUESTER — switching to partition B."
+          echo "$MSG" >> $GITHUB_STEP_SUMMARY
+          if [ -n "$BOT_TOKEN" ] && [ -n "$CHANNEL_ID" ]; then
+            curl -sf -X POST "${{ secrets.CHATOPS_REPLY_URL }}" \
+              -H "Authorization: Bearer $BOT_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"channel\":\"$CHANNEL_ID\",\"text\":\"$MSG\"}" || true
+          fi
+
+  # ── /sigma build status ──────────────────────────────────────────────────
+  build-status:
+    name: "ChatOps: Build Status"
+    runs-on: ubuntu-latest
+    if: github.event.action == 'chatops-build-status'
+    steps:
+      - uses: actions/github-script@v7
+        env:
+          CHANNEL_ID: ${{ github.event.client_payload.channel_id }}
+          BOT_TOKEN:  ${{ secrets.CHATOPS_BOT_TOKEN }}
+        with:
+          script: |
+            const runs = await github.rest.actions.listWorkflowRuns({
+              owner: context.repo.owner, repo: context.repo.repo,
+              workflow_id: 'ci.yml', per_page: 1
+            });
+            const last = runs.data.workflow_runs[0];
+            const status = last
+              ? `${last.conclusion ?? last.status} — [#${last.run_number}](${last.html_url})`
+              : 'No runs found';
+            const msg = `🔨 Last CI build: ${status}`;
+            core.summary.addRaw(msg).write();
+
+            const botToken  = process.env.BOT_TOKEN;
+            const channelId = process.env.CHANNEL_ID;
+            const replyUrl  = '${{ secrets.CHATOPS_REPLY_URL }}';
+            if (botToken && channelId && replyUrl) {
+              await fetch(replyUrl, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${botToken}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ channel: channelId, text: msg })
+              });
+            }

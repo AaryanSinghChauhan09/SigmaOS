@@ -1,0 +1,6 @@
+{
+  "module": "S23_SovereignHardening",
+  "dependencies": [
+    "S01_Genesis"
+  ]
+}

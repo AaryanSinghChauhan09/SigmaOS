@@ -1,0 +1,29 @@
+{
+    "profession": "defi_architect",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "liquidity-lattice",
+        "amm-simulator",
+        "yield-curve-nexus",
+        "flash-loan-auditor"
+    ],
+    "rules": [
+        "Smart-contract security standards",
+        "DeFi-governance protocols"
+    ],
+    "calculators": [
+        "Impermanent loss",
+        "slippage-delta",
+        "TVL-ratio",
+        "gas-optimization"
+    ],
+    "algorithms": [
+        "Automated market making",
+        "risk-tranche simulation"
+    ],
+    "automation": {
+        "self_healing": "Contract-state verification, liquidity-mesh sync",
+        "rollback": "Vault-state snapshots, protocol-baseline restoration"
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "profession": "remote_sensing_technician",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "remote_sensing_technician_workspace",
+        "specialized_analytics",
+        "compliance_manager"
+    ],
+    "rules": [
+        "Industry standards",
+        "professional ethics"
+    ],
+    "calculators": [
+        "Efficiency metrics",
+        "cost analysis"
+    ],
+    "algorithms": [
+        "Workflow optimization",
+        "adaptive assistance"
+    ],
+    "automation": {
+        "self_healing": "Continuous health check for Remote Sensing Technician tools",
+        "rollback": "Automatic state snapshots"
+    }
+}

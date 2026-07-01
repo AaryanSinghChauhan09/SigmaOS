@@ -1,0 +1,7 @@
+{
+  "module": "S15_NativeLoader",
+  "dependencies": [
+    "S01_Genesis",
+    "S14_VirtualMemory"
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "name": "Sovereign Server Profile",
+  "shards": ["S01_Genesis", "S03_Orchestrator", "S04_HAL", "S06_Persistence", "S10_Networking"],
+  "features": ["ipc_persistence", "high_availability", "net_stack"]
+}

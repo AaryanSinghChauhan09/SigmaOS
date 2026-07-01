@@ -1,0 +1,16 @@
+{
+  "lattice_version": "10.0",
+  "sovereignty_level": "absolute",
+  "suites": {
+    "S01_Genesis": { "enabled": true, "mode": "bootstrap" },
+    "S03_Orchestrator": { "enabled": true, "priority": "critical" },
+    "S04_HAL": { "enabled": true, "arch": "x86_64" },
+    "S05_Memory": { "enabled": true, "strategy": "adaptive_paging" },
+    "S30_Supremacy": { "enabled": true, "security_level": "maximum" }
+  },
+  "global_settings": {
+    "zero_std": true,
+    "pure_asm_core": true,
+    "metrics_dash": "grafana_sim"
+  }
+}

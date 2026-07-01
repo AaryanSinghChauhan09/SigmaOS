@@ -1,0 +1,12 @@
+{
+  "module": "sigmafs",
+  "version": "1.0.0",
+  "type": "filesystem",
+  "arch": ["x86_64", "aarch64", "riscv64"],
+  "dependencies": ["sha256", "audit_chain"],
+  "capabilities_required": ["CAP_FS_MOUNT"],
+  "capabilities_provided": ["CAP_FS_READ", "CAP_FS_WRITE", "CAP_FS_SNAPSHOT"],
+  "entry_point": "sigmafs_init",
+  "author": "SigmaOS FS Team",
+  "description": "Cryptographically verifiable sovereign filesystem with journaling"
+}

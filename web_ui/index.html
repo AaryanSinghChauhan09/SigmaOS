@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="external_styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SigmaOS | Sovereign Lattice Dashboard</title>
+    <meta name="description" content="SigmaOS Zenith Dashboard — Real-time monitoring of the Sovereign Lattice via decoupled Web Components and a versioned kernel API.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/glassmorphism.css">
+</head>
+<body>
+
+    <!-- Dynamic Island / Top Bar -->
+    <header class="top-bar">
+        <div class="logo-area">
+            <h1>Σ SigmaOS</h1>
+            <span class="status-badge">Kernel v12.5 Online (Sovereign)</span>
+        </div>
+        <div class="metrics">
+            <span class="auto-style-162">Modular Lattice | Web Component Architecture</span>
+        </div>
+    </header>
+
+    <div class="workspace">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-section">
+                <h3>Workspaces</h3>
+                <a href="#" class="nav-item active">Sovereign Lattice Dashboard</a>
+                <a href="#" class="nav-item">Coding Environment</a>
+                <a href="#" class="nav-item">Study Dashboard</a>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>System</h3>
+                <a href="#" class="nav-item">Package Manager (apt-sim)</a>
+                <a href="#" class="nav-item">Terminal (Singularity Core)</a>
+                <a href="#" class="nav-item">Dual Boot Manager</a>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>Observability</h3>
+                <a href="#" class="nav-item">Memory Pools</a>
+                <a href="#" class="nav-item">Kernel Logs</a>
+                <a href="#" class="nav-item">HAL Registry</a>
+            </div>
+        </nav>
+
+        <!-- Main Dashboard -->
+        <main class="dashboard">
+            <div class="dashboard-header zenith-prism" class="auto-style-163">
+                <h2>Sovereign Lattice — Modular Architecture</h2>
+                <p>Contract-based HAL • Declarative Features • Per-Module Memory Pools • Zero-Trust Capabilities • Decoupled Web Components</p>
+            </div>
+
+            <!-- §1: Real-time Vitals via <sigma-monitor> Web Component -->
+            <sigma-monitor></sigma-monitor>
+
+            <!-- §2: Memory Pool Inspector via <sigma-pool-inspector> Web Component -->
+            <div class="auto-style-164">
+                <sigma-pool-inspector></sigma-pool-inspector>
+            </div>
+
+            <!-- §3: Kernel Log Viewer via <sigma-logs> Web Component -->
+            <div class="auto-style-165">
+                <sigma-logs max-entries="150"></sigma-logs>
+                <sigma-ai-dispatch></sigma-ai-dispatch>
+            </div>
+
+            <!-- §4–§6: Kernel Telemetry (Auth-Gated) -->
+            <sigma-auth-guard>
+                <sigma-neural-demo></sigma-neural-demo>
+                <sigma-persistence-panel></sigma-persistence-panel>
+                <sigma-perf-metrics></sigma-perf-metrics>
+            </sigma-auth-guard>
+
+            <!-- §7: Shard Grid rendered dynamically via JS -->
+            <div class="shard-grid" id="shardContainer" class="auto-style-166">
+                <!-- Populated by kernel_loader.js -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Versioned Kernel API (data layer — loaded FIRST) -->
+    <script src="scripts/sigma_api_service.js"></script>
+
+    <!-- Decoupled Web Components (self-contained, Shadow DOM isolated) -->
+    <script src="components/sigma-monitor.js"></script>
+    <script src="components/sigma-logs.js"></script>
+    <script src="components/sigma-pool-inspector.js"></script>
+    <script src="components/sigma-ai-dispatch.js"></script>
+    <script src="components/sigma-auth-guard.js"></script>
+    <script src="components/sigma-neural-demo.js"></script>
+    <script src="components/sigma-persistence-panel.js"></script>
+    <script src="components/sigma-perf-metrics.js"></script>
+
+    <!-- Legacy shard loader (still populates the grid) -->
+    <script src="scripts/kernel_loader.js"></script>
+    <script>
+        window.addEventListener('sigma.core.boot', () => {
+            const container = document.getElementById('shardContainer');
+            setTimeout(() => {
+                const keys = Object.keys(window).filter(k => k.startsWith('SigmaS'));
+                keys.forEach(key => {
+                    const shard = window[key];
+                    if (shard && shard.shardId) {
+                        const titleMatch = shard.shardId.match(/_([A-Za-z0-9]+)$/);
+                        const title = titleMatch ? titleMatch[1] : shard.shardId;
+                        const card = document.createElement('div');
+                        card.className = 'shard-card holographic-card';
+                        card.innerHTML = `
+                            <div class="shard-header">
+                                <span class="shard-id">${shard.shardId.split('_')[0]}</span>
+                                <span class="auto-style-167">● Active</span>
+                            </div>
+                            <h3 class="shard-title">${title.replace(/([A-Z])/g, ' $1').trim()}</h3>
+                            <p class="shard-desc">Sovereign Lattice Shard — contract-isolated module.</p>
+                            <div class="shard-cli">CLI: <code>sigma ${shard.shardId.split('_')[0].toLowerCase()}</code></div>
+                        `;
+                        container.appendChild(card);
+                    }
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>

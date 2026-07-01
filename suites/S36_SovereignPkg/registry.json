@@ -1,0 +1,24 @@
+{
+    "packages": {
+        "S01_Genesis": {
+            "version": "1.2.5",
+            "dependencies": []
+        },
+        "S04_HAL": {
+            "version": "1.0.0",
+            "dependencies": ["S01_Genesis"]
+        },
+        "S08_Security": {
+            "version": "2.0.0",
+            "dependencies": ["S01_Genesis"]
+        },
+        "S02_ZenithUI": {
+            "version": "0.5.0",
+            "dependencies": ["S04_HAL", "S08_Security"]
+        },
+        "sigma-pqc": {
+            "version": "1.0.0",
+            "dependencies": ["S08_Security"]
+        }
+    }
+}

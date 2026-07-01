@@ -1,0 +1,10 @@
+-std=c++11
+-ISigmaOS/include
+-Iinclude
+-I.
+-m64
+-ffreestanding
+-fno-stack-protector
+-nostdlib
+-fno-exceptions
+-fno-rtti

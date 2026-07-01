@@ -1,5 +1,0 @@
-
-
-CANVAS_W = 860
-CANVAS_H = 460
-ITEM_SIZE = 22

@@ -1,0 +1,77 @@
+# .conform.yaml — commit conformance policy (Talos Linux-inspired)
+#
+# Enforced by:  siderolabs/conform  (in CI via sigma-build.yml)
+# Local check:  conform enforce --commit-msg-file .git/COMMIT_EDITMSG
+#
+# Every commit to SigmaOS must:
+#   1. Have a Signed-off-by: line (DCO)
+#   2. Follow conventional commit format with a known scope
+#   3. Have a body explaining WHY (not just what)
+#   4. Include an SPDX-License-Identifier in every new .cpp/.h/.go/.rs file
+
+policies:
+  - type: commit
+    spec:
+      dco: true                 # Requires "Signed-off-by: Name <email>"
+      gpg:
+        required: false         # Set true when project matures and keys are published
+      spellcheck:
+        locale: US
+      header:
+        length: 89              # Talos uses 89; Linux kernel uses 72
+        imperative: true        # "fix crash" not "fixed crash" or "fixes crash"
+        case: lower             # all lowercase header
+        invalidLastCharacters: .
+      body:
+        required: true          # Every commit must explain WHY, not just what
+        minLength: 20
+      conventional:
+        types:
+          - feat                # new feature
+          - fix                 # bug fix
+          - perf                # performance improvement (no behavior change)
+          - refactor            # restructure without behavior change
+          - security            # security fix — flagged urgently in release notes
+          - test                # add or fix tests
+          - ci                  # CI/CD pipeline changes
+          - docs                # documentation only
+          - chore               # maintenance (deps, build system)
+          - revert              # reverts a previous commit
+        scopes:
+          - kernel              # Ring-0 kernel code
+          - security            # pledge, unveil, zero-trust, cryptfs
+          - pkg                 # sigma-pkg, ostree, acquire, staged-update
+          - net                 # TCP/IP stack, firewall, conntrack
+          - hypervisor          # Type-1 hypervisor / virt layer
+          - init                # PID 1, service manager, sigma_init_loop
+          - cryptfs             # encrypted filesystem layer
+          - zerotrust           # SPIFFE workload IDs, policy engine
+          - zenith              # Zenith desktop, compositor, theme engine
+          - ai-engine           # Neural UI, sigmad-ai, TinyLlama integration
+          - cluster             # Distributed / multi-node coordination
+          - hotplug             # USB, storage eject, device events
+          - hal                 # Hardware abstraction layer
+          - drivers             # Hardware drivers (NIC, GPU, USB, NVMe)
+          - fs                  # VFS, Ext4, FAT32, SovereignFS
+          - ci                  # CI workflows, test infrastructure
+          - api                 # gRPC / sigma.proto management API
+          - tools               # sigma-pkg CLI, sigma-sysctl, sigmactl
+          - tests               # Regression tests, fuzzer, test framework
+          - docs                # Documentation, wiki, architecture diagrams
+
+  - type: license
+    spec:
+      includeSuffixes:
+        - .cpp
+        - .h
+        - .hpp
+        - .go
+        - .rs
+        - .c
+      excludeSuffixes:
+        - _generated.h
+        - _pb.h
+        - _pb.go
+        - .pb.go
+      header: |
+        // SPDX-License-Identifier: GPL-2.0-or-later

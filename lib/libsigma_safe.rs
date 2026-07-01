@@ -1,0 +1,6 @@
+#![no_std]
+#[no_mangle]
+pub extern "C" fn sigma_safe_parse_string(ptr: *const u8, len: usize) -> bool {
+    let slice = unsafe { core::slice::from_raw_parts(ptr, len) };
+    core::str::from_utf8(slice).is_ok()
+}

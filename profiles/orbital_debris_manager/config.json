@@ -1,0 +1,27 @@
+{
+    "profession": "orbital_debris_manager",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "debris-tracking_radar",
+        "laser-ablation_monitor",
+        "collision-avoidance_nexus",
+        "tle-lattice"
+    ],
+    "rules": [
+        "IADC space debris mitigation guidelines"
+    ],
+    "calculators": [
+        "Probability of collision (Pc)",
+        "orbital-decay rate",
+        "delta-V for de-orbit"
+    ],
+    "algorithms": [
+        "Cascading collision prediction",
+        "debris-cloud propagation"
+    ],
+    "automation": {
+        "self_healing": "Radar-link consistency, laser-aiming-calibration verification",
+        "rollback": "Orbital-map state snapshots, de-orbit sequence logs"
+    }
+}

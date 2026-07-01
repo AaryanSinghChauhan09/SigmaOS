@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<!-- SPDX-License-Identifier: GPL-2.0-or-later -->
+<!-- SigmaOS in the Browser — Approach 2: v86 x86 emulator -->
+<!-- Boots the actual SigmaOS ISO with zero kernel changes. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SigmaOS — v86 Emulator</title>
+  <meta name="theme-color" content="#0d1117">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0d1117; color: #e6edf3;
+           font-family: 'SF Mono', monospace;
+           display: flex; flex-direction: column; align-items: center;
+           justify-content: center; height: 100vh; }
+    #screen_container { position: relative; }
+    #screen_container canvas {
+      width: 1280px; height: 720px; max-width: 100vw;
+      border: 1px solid #30363d;
+    }
+    #controls {
+      display: flex; gap: 8px; margin-top: 8px;
+      font-size: 13px; color: #8b949e;
+    }
+    button {
+      background: #21262d; border: 1px solid #30363d;
+      color: #e6edf3; padding: 4px 12px; border-radius: 6px;
+      cursor: pointer; font-size: 12px;
+    }
+    button:hover { background: #30363d; }
+    #status { font-size: 11px; color: #6e7681; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <div id="screen_container"></div>
+  <div id="controls">
+    <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    <button onclick="saveState()">💾 Save State</button>
+    <button onclick="restoreState()">📂 Restore</button>
+    <button onclick="sendCtrlAltDel()">⚡ Ctrl+Alt+Del</button>
+    <span id="status">Loading v86...</span>
+  </div>
+
+  <script src="/v86/libv86.js"></script>
+  <script>
+    const status = document.getElementById('status');
+
+    const emulator = new V86({
+      wasm_path:       '/v86/v86.wasm',
+      memory_size:     512 * 1024 * 1024,   // 512 MB RAM
+      vga_memory_size: 16  * 1024 * 1024,   // 16 MB VGA
+      screen_container: document.getElementById('screen_container'),
+      bios:     { url: '/v86/seabios.bin'  },
+      vga_bios: { url: '/v86/vgabios.bin'  },
+      cdrom:    { url: '/sigmaos.iso'       },
+      // Persist filesystem changes between page reloads (IndexedDB)
+      filesystem: {
+        baseurl: '/v86-9p/',
+        basefs:  '/v86-9p/fs.json',
+      },
+      // Route network to sigma-net-relay WebSocket proxy
+      network_relay_url: typeof SIGMA_RELAY_URL !== 'undefined'
+        ? SIGMA_RELAY_URL
+        : 'wss://relay.sigmaos.dev/net',
+      autostart: true,
+    });
+
+    emulator.add_listener('emulator-ready', () => {
+      status.textContent = 'Booting SigmaOS...';
+    });
+
+    emulator.add_listener('screen-set-size-xy', (w, h) => {
+      status.textContent = `Running ${w}×${h}`;
+    });
+
+    // Auto-save state on tab close
+    window.addEventListener('beforeunload', async () => {
+      try {
+        const state = await emulator.save_state();
+        const buf   = new Uint8Array(state);
+        const b64   = btoa(String.fromCharCode(...buf.slice(0, 1024)));
+        localStorage.setItem('sigma_vm_state_ts', Date.now().toString());
+        // Full state → IndexedDB (too large for localStorage)
+        const db = await openStateDB();
+        const tx = db.transaction('states', 'readwrite');
+        tx.objectStore('states').put(state, 'last');
+      } catch {}
+    });
+
+    async function openStateDB() {
+      return new Promise((res, rej) => {
+        const req = indexedDB.open('sigmaos-v86', 1);
+        req.onupgradeneeded = e => e.target.result.createObjectStore('states');
+        req.onsuccess = e => res(e.target.result);
+        req.onerror   = rej;
+      });
+    }
+
+    async function saveState() {
+      status.textContent = 'Saving...';
+      const state = await emulator.save_state();
+      const db    = await openStateDB();
+      const tx    = db.transaction('states', 'readwrite');
+      tx.objectStore('states').put(state, 'last');
+      status.textContent = 'State saved ✓';
+    }
+
+    async function restoreState() {
+      status.textContent = 'Restoring...';
+      const db  = await openStateDB();
+      const tx  = db.transaction('states', 'readonly');
+      const req = tx.objectStore('states').get('last');
+      req.onsuccess = async () => {
+        if (req.result) {
+          await emulator.restore_state(req.result);
+          status.textContent = 'State restored ✓';
+        } else {
+          status.textContent = 'No saved state';
+        }
+      };
+    }
+
+    function sendCtrlAltDel() {
+      emulator.keyboard_send_scancodes([0xe0, 0x1d, 0x38, 0x53,
+                                        0xe0, 0x9d, 0xb8, 0xd3]);
+    }
+
+    function toggleFullscreen() {
+      const el = document.getElementById('screen_container');
+      if (!document.fullscreenElement) el.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  </script>
+</body>
+</html>

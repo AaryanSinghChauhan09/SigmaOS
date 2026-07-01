@@ -1,0 +1,32 @@
+/// SigmaOS: auto_driver_builder module
+/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+/// All types hand-defined. OOP via struct + impl + trait patterns.
+
+#![no_std]
+#![allow(dead_code)]
+
+// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+
+type SigmaU8  = u8;
+type SigmaU16 = u16;
+type SigmaU32 = u32;
+type SigmaU64 = u64;
+type SigmaI32 = i32;
+type SigmaI64 = i64;
+type SigmaBool = bool;
+type SigmaUsize = usize;
+
+// ─── Module: Sigma::auto_driver_builder ─────────────────────
+
+#[no_mangle]
+pub unsafe extern "C" fn generic_mmio_read() {
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn generic_mmio_write() {
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn generic_irq_ack() {
+}
+

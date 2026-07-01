@@ -1,0 +1,30 @@
+{
+    "profession": "data_scientist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "jupyterlab",
+        "pandas",
+        "numpy",
+        "r",
+        "julia",
+        "apache_spark",
+        "matplotlib"
+    ],
+    "rules": [
+        "Industry standards",
+        "professional ethics"
+    ],
+    "calculators": [
+        "Efficiency metrics",
+        "cost analysis"
+    ],
+    "algorithms": [
+        "Workflow optimization",
+        "adaptive assistance"
+    ],
+    "automation": {
+        "self_healing": "Continuous health check for Data Scientist tools",
+        "rollback": "Automatic state snapshots"
+    }
+}

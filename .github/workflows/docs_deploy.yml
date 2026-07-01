@@ -1,0 +1,134 @@
+name: "Docs Deploy"
+# Builds and deploys the docs site to GitHub Pages on every push
+# to docs/** paths; creates a per-PR preview comment via a
+# temporary artifact URL (no extra hosting needed).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "wiki_repo/**"
+      - "**.md"
+      - ".github/workflows/docs_deploy.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "wiki_repo/**"
+      - "**.md"
+
+permissions:
+  contents: write
+  pull-requests: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-docs:
+    name: "Build Docs Site"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install docs dependencies
+        run: |
+          # Use VitePress if available, else fall back to simple static copy
+          if [ -f docs/package.json ]; then
+            npm ci --prefix docs
+          fi
+
+      - name: Build docs
+        run: |
+          mkdir -p site
+          if [ -f docs/package.json ]; then
+            npm run build --prefix docs
+            cp -r docs/.vitepress/dist/* site/
+          else
+            # Simple flat copy: markdown → HTML via pandoc if available, else raw
+            if command -v pandoc; then
+              for f in docs/wiki/*.md wiki_repo/*.md; do
+                base=$(basename "$f" .md)
+                pandoc "$f" -s --metadata title="$base" \
+                  -o "site/${base}.html" 2>/dev/null || cp "$f" "site/${base}.md"
+              done
+            else
+              cp -r docs/wiki/. site/
+              cp -r wiki_repo/. site/ 2>/dev/null || true
+            fi
+            # Generate index
+            echo '<html><head><title>SigmaOS Docs</title></head><body><h1>SigmaOS Documentation</h1><ul>' > site/index.html
+            for f in site/*.html site/*.md; do
+              [ "$f" = "site/index.html" ] && continue
+              n=$(basename "$f")
+              echo "<li><a href=\"$n\">$n</a></li>" >> site/index.html
+            done
+            echo '</ul></body></html>' >> site/index.html
+          fi
+
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/
+
+      - name: Upload preview artifact (for PRs)
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-preview-pr-${{ github.event.number }}
+          path: site/
+          retention-days: 7
+
+  deploy-pages:
+    name: "Deploy to GitHub Pages"
+    runs-on: ubuntu-latest
+    needs: build-docs
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  pr-preview-comment:
+    name: "Post PR Preview Link"
+    runs-on: ubuntu-latest
+    needs: build-docs
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              '## 📖 Docs Preview',
+              '',
+              `Built successfully. Download the preview artifact from the [workflow run](${runUrl}).`,
+              '',
+              '> Preview artifact: `docs-preview-pr-${{ github.event.number }}`',
+            ].join('\n');
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.data.find(c => c.body.startsWith('## 📖 Docs Preview'));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                comment_id: existing.id, body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: context.issue.number, body
+              });
+            }

@@ -1,0 +1,34 @@
+{
+  "name": "sigmaos-zenith-ui",
+  "version": "1.0.0",
+  "description": "Zenith UI Web Components for SigmaOS Sovereign Lattice",
+  "scripts": {
+    "lint": "eslint web_ui/components/**/*.js --max-warnings 0",
+    "lint:fix": "eslint web_ui/components/**/*.js --fix"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "es2022": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 2022,
+      "sourceType": "module"
+    },
+    "rules": {
+      "no-unused-vars": "warn",
+      "no-undef": "warn",
+      "no-console": "off",
+      "semi": ["error", "always"],
+      "eqeqeq": "error"
+    },
+    "globals": {
+      "customElements": "readonly",
+      "HTMLElement": "readonly",
+      "SigmaAPI": "readonly"
+    }
+  }
+}

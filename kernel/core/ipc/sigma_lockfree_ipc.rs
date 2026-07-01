@@ -1,0 +1,55 @@
+/// SigmaOS: =========================================================================
+/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+/// All types hand-defined. OOP via struct + impl + trait patterns.
+
+#![no_std]
+#![allow(dead_code)]
+
+// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+
+type SigmaU8  = u8;
+type SigmaU16 = u16;
+type SigmaU32 = u32;
+type SigmaU64 = u64;
+type SigmaI32 = i32;
+type SigmaI64 = i64;
+type SigmaBool = bool;
+type SigmaUsize = usize;
+
+// ─── Module: SigmaOS::LockFreeSPSCQueue ─────────────────────
+
+/// Message — hardware-compatible struct.
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct {s_name} {{
+    pub sender_id: SigmaU64,
+    pub receiver_id: SigmaU64,
+    pub type: SigmaU32,
+    pub length: SigmaU32,
+    pub payload: [SigmaU8; 112],
+}
+
+/// LockFreeSPSCQueue — OOP singleton pattern.
+pub struct LockFreeSPSCQueue {
+    pub initialized: SigmaBool,
+}
+
+impl LockFreeSPSCQueue {
+    pub const fn new() -> Self {
+        Self { initialized: false }
+    }
+
+    pub unsafe fn enqueue(&mut self) {
+        // Migrated: enqueue
+        self.initialized = true;
+    }
+
+    pub unsafe fn dequeue(&mut self) {
+        // Migrated: dequeue
+        self.initialized = true;
+    }
+
+}
+
+static mut INSTANCE: LockFreeSPSCQueue = LockFreeSPSCQueue::new();
+

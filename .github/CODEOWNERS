@@ -1,0 +1,45 @@
+# SigmaOS CODEOWNERS
+# This file dictates who must review PRs based on the modified files.
+# Assignees map to the Branch Ownership matrix in the Wiki.
+
+# Global fallback (Release Manager)
+*       @AaryanSinghChauhan09
+
+# -------------------------
+# Subsystem Ownership
+# -------------------------
+
+# Kernel & Drivers (Drivers Lead)
+/kernel/drivers/      @AaryanSinghChauhan09
+/kernel/arch/         @AaryanSinghChauhan09
+/kernel/src/pci/      @AaryanSinghChauhan09
+/kernel/src/usb/      @AaryanSinghChauhan09
+/kernel/src/nvme/     @AaryanSinghChauhan09
+
+# Filesystem (FS Lead)
+/fs/                  @AaryanSinghChauhan09
+/kernel/fs/           @AaryanSinghChauhan09
+
+# Security & Verification (Security Lead)
+/security/            @AaryanSinghChauhan09
+/kernel/security/     @AaryanSinghChauhan09
+/crypto/              @AaryanSinghChauhan09
+*.ads                 @AaryanSinghChauhan09
+*.adb                 @AaryanSinghChauhan09
+
+# Package Manager & Build (Packaging Lead)
+/userland/sigpkg/     @AaryanSinghChauhan09
+/config/profiles/     @AaryanSinghChauhan09
+
+# Desktop & GUI (UX Lead)
+/desktop/             @AaryanSinghChauhan09
+/graphics/            @AaryanSinghChauhan09
+/zenith_desktop.js    @AaryanSinghChauhan09
+
+# Shell & Utilities (UX/Packaging Lead)
+/sigma-sh/            @AaryanSinghChauhan09
+/userland/coreutils/  @AaryanSinghChauhan09
+
+# Cloud & Virtualization (Cloud Lead)
+/net/                 @AaryanSinghChauhan09
+/sigma-container/     @AaryanSinghChauhan09

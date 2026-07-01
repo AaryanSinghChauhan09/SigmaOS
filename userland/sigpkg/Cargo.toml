@@ -1,0 +1,18 @@
+[package]
+name = "sigpkg"
+version = "0.2.0"
+edition = "2021"
+description = "sigpkg — SigmaOS Sovereign Package Manager"
+authors = ["SigmaOS Contributors"]
+license = "MIT"
+repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
+
+[[bin]]
+name = "sigpkg"
+path = "src/main.rs"
+
+[lib]
+name = "sigpkg_lib"
+path = "src/lib.rs"
+
+[dependencies]

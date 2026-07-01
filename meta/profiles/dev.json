@@ -1,0 +1,5 @@
+{
+  "name": "Sovereign Developer Profile",
+  "shards": ["S01_Genesis", "S04_HAL", "S13_LuaBridge", "S15_NativeLoader"],
+  "features": ["hot_reload", "lua_scripting", "debug_symbols"]
+}

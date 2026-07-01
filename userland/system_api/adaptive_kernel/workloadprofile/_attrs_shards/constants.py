@@ -1,9 +1,0 @@
-
-
-GAMING = auto()
-AI_ML = auto()
-CLOUD = auto()
-CREATIVE = auto()
-DEVELOPER = auto()
-IDLE = auto()
-BALANCED = auto()

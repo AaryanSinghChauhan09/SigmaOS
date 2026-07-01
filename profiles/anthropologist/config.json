@@ -1,0 +1,12 @@
+{
+    "profession": "anthropologist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "survey_tools",
+        "cultural_data_visualization"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

@@ -1,0 +1,32 @@
+{
+    "profession": "engineer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "compilers",
+        "cad_tools",
+        "simulation_engines",
+        "project_management_dashboards",
+        "finite_element_analysis_(fea)"
+    ],
+    "rules": [
+        "Bureau of Indian Standards (BIS)",
+        "IS codes",
+        "Eurocodes"
+    ],
+    "calculators": [
+        "Structural load",
+        "electrical circuit",
+        "fluid mechanics",
+        "thermal stress"
+    ],
+    "algorithms": [
+        "CAD simulation",
+        "stress analysis",
+        "project scheduling"
+    ],
+    "automation": {
+        "self_healing": "Simulation state verification, build-cache integrity check",
+        "rollback": "Project-wide git-lattice rollback, CAD design versioning"
+    }
+}

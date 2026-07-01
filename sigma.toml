@@ -1,0 +1,95 @@
+# sigma.toml — SigmaOS Declarative System Configuration
+# Single source of truth for build, runtime, fleet, and dashboard.
+# Versionable, diffable, reviewable. Override any section in a profile.
+# Usage: sigma build --config sigma.toml
+#        sigma image build --config sigma.toml
+
+# ── Profile ─────────────────────────────────────────────────────────────────
+[profile]
+preset  = "desktop"          # desktop | server | edge | embedded | airgapped
+arch    = "x86_64"           # x86_64 | aarch64 | riscv64gc
+board   = "generic-uefi"     # generic-uefi | raspi4 | beaglev | cloud-vm
+name    = "SigmaOS"          # Downstream distro name override (white-label)
+version = "15.0.0"
+
+# ── Kernel Feature Flags ─────────────────────────────────────────────────────
+[kernel]
+scheduler  = "eevdf"         # cfs | eevdf | realtime | mixed-criticality
+allocator  = "buddy"         # buddy | slab | tlsf
+ipc        = "capability"    # message-passing | shared-mem | capability
+network_stack = "full"       # full | minimal | none
+features   = [
+  "audit",
+  "io_uring_like",
+  "aslr",
+  "capabilities",
+  "namespaces",
+  "zero-trust",
+]
+filesystems = ["ext-like", "log-structured"]  # available FS drivers
+secure_boot  = false         # rooted in [security].signing_key
+
+# ── Network Profile ──────────────────────────────────────────────────────────
+[network]
+profile   = "home"           # home | travel | airgapped | tor-only | mesh
+dns       = "doh"            # system | doh | doh+dnsec
+firewall  = "sigma-shield"   # none | sigma-shield | strict
+vpn       = ""               # wireguard | tor | "" (disabled)
+wifi      = true
+bluetooth = true
+
+# ── Theme & UI ───────────────────────────────────────────────────────────────
+[theme]
+palette   = "phosphor-green" # phosphor-green | ocean | amber | monochrome | custom
+font      = "jetbrains-mono" # jetbrains-mono | berkeley-mono | fira-code | inter
+density   = "comfortable"    # compact | comfortable | spacious
+mode      = "dark"           # dark | light | auto
+icons     = "nerd-fonts"     # nerd-fonts | ascii | minimal
+motion    = true             # false = accessibility/motion-reduction
+
+# ── Security ─────────────────────────────────────────────────────────────────
+[security]
+signing_key         = ""     # path to org.pub — empty = unsigned dev build
+secure_boot         = false
+capability_profiles = true
+safestack           = true
+retguard            = true
+fortify             = true
+
+# ── Packages ─────────────────────────────────────────────────────────────────
+[packages]
+include = [
+  "sigma-shell",
+  "sigma-core",
+  "sigma-tui",
+]
+exclude = []
+registry = "https://sigma-store.sigmaos.dev"
+
+# ── Power ────────────────────────────────────────────────────────────────────
+[power]
+profile = "balanced"         # performance | balanced | battery | silent
+
+# ── Boot & Identity ──────────────────────────────────────────────────────────
+[boot]
+bootloader  = "uefi"         # uefi | bios | u-boot | coreboot
+splash      = true
+branding    = ""             # custom splash path; empty = default
+motd        = "Σ SigmaOS — Sovereign Operating System"
+
+# ── Runtime ──────────────────────────────────────────────────────────────────
+[runtime]
+hot_reload      = true       # watch /etc/sigma/*.toml at runtime
+capability_mode = "strict"   # strict | permissive | audit
+log_level       = "info"     # trace | debug | info | warn | error
+
+# ── Fleet / Node ─────────────────────────────────────────────────────────────
+[fleet]
+update_channel = "stable"    # nightly | beta | stable
+control_plane  = ""          # URL of sovereign control plane; empty = peer-to-peer
+attest_tpm     = false       # require TPM2 attestation on enroll
+
+# ── CLI Dashboard ────────────────────────────────────────────────────────────
+[dashboard]
+layout    = "default"        # default | developer | creative | minimal
+telemetry = false            # opt-in only — sovereign principle

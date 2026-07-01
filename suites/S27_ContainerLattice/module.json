@@ -1,0 +1,6 @@
+{
+  "module": "S27_ContainerLattice",
+  "dependencies": [
+    "S01_Genesis"
+  ]
+}

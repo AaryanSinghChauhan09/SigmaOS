@@ -1,0 +1,6 @@
+{
+  "module": "S21_WasmAllocator",
+  "dependencies": [
+    "S01_Genesis"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+    "profession": "submarine_navigator",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "sonar-lattice",
+        "pressure-hull_monitor",
+        "bathymetric-map-engine",
+        "silent-running-nexus"
+    ],
+    "rules": [
+        "Maritime law",
+        "deep-sea exploration protocols"
+    ],
+    "calculators": [
+        "Buoyancy-delta",
+        "acoustic-range",
+        "pressure-limit-calc"
+    ],
+    "algorithms": [
+        "Sub-surface obstacle avoidance",
+        "passive sonar triangulation"
+    ],
+    "automation": {
+        "self_healing": "Acoustic-link verification, hull-sensor-integrity scan",
+        "rollback": "Dive-log snapshots, ballast-configuration restoration"
+    }
+}

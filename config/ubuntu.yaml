@@ -1,0 +1,91 @@
+# =========================================================================
+# SigmaOS OS Profile: ubuntu (Ubuntu / Linux Compatibility Target)
+# =========================================================================
+# Selected with: make TARGET_OS=ubuntu
+#                cmake -DTARGET_OS=ubuntu ..
+#
+# This profile wraps Ubuntu/Debian-style kernel driver ABIs into the
+# SigmaOS Sovereign HAL. Designed for dual-boot and live-ISO scenarios
+# where Ubuntu hardware support breadth is required.
+# =========================================================================
+
+target_os: ubuntu
+
+meta:
+  description: "SigmaOS Ubuntu target — Debian/Ubuntu driver ABI compatibility layer"
+  edition: "Zenith"
+  version: "15.0"
+  license: "GPL-2.0-or-later"
+  upstream_compat: "Ubuntu 24.04 LTS (Noble Numbat) kernel series"
+
+# ── Driver layer ──────────────────────────────────────────────────────────
+drivers:
+  directory: drivers/linux
+  compat_layer: "UbuntuCompatLayer"
+  modules:
+    - ubuntu_compat        # Core Debian/Ubuntu driver ABI wrapper
+    - ubuntu_e1000         # Intel E1000 Gigabit Ethernet (e1000 Linux driver)
+    - ubuntu_nvme          # NVMe via Linux nvme.ko ABI shim
+    - ubuntu_xhci          # xHCI USB via Linux xhci-hcd shim
+    - ubuntu_amdgpu        # AMDGPU DRM wrapper
+    - ubuntu_iwlwifi       # Intel Wi-Fi (iwlwifi) wrapper
+  apt_packages:            # Optional: list packages to install into live image
+    - linux-firmware
+    - intel-microcode
+    - amd64-microcode
+
+# ── Kernel subsystems enabled ─────────────────────────────────────────────
+kernel:
+  scheduler: "MLFQ-MCS"          # Same unified scheduler as native target
+  memory_model: "Sovereign-VMM"   # Sovereign VMM; Linux mm shim for driver DMA
+  filesystem: "SigmaFS + ext4"    # Native FS + ext4 via journal shim
+  ipc: "Sovereign-IPC"
+  security: "Zero-Trust + PQC"
+  libc: "sigma_libc + POSIX shim" # Thin POSIX shim for Ubuntu driver compatibility
+
+# ── Feature flags ─────────────────────────────────────────────────────────
+features:
+  hypervisor:   true
+  ai_engine:    true
+  zenith_de:    true
+  cryptfs:      true
+  pq_net:       false      # Off by default; enable with SIGMA_USE_PQ_NET=1
+  wasm_runtime: false
+  bluetooth:    true
+  wifi:         true
+  snap_compat:  true       # Enable Snapd/Flatpak universal runtime bridge
+  apt_compat:   true       # Enable APT package bridge (sigma install → dpkg)
+  immutable_root: false
+
+# ── System calls ──────────────────────────────────────────────────────────
+syscalls:
+  interface: "Sovereign Syscall Gate + POSIX shim"
+  posix_compat: true       # Maps POSIX syscalls to Sovereign equivalents
+  count: 64
+
+# ── Boot configuration ────────────────────────────────────────────────────
+boot:
+  bootloader: "GRUB2 (Ubuntu-style)"
+  timeout_s:  5
+  safe_mode:  true
+  dual_boot:
+    enabled: true
+    entries:
+      - "SigmaOS Zenith (Ubuntu target)"
+      - "Ubuntu 24.04 LTS"
+      - "Windows 11"
+
+# ── Package management ────────────────────────────────────────────────────
+packages:
+  manager: "sigma-pkg (with APT bridge)"
+  native_format: ".spkg"
+  apt_bridge: true
+  repo_url: "https://pkg.sigmaos.dev/ubuntu-compat"
+  ppa_support: true
+
+# ── CI build matrix entry ─────────────────────────────────────────────────
+ci:
+  cmake_flag: "-DTARGET_OS=ubuntu"
+  make_flag:  "TARGET_OS=ubuntu"
+  runs_on:    "ubuntu-22.04"
+  test_suite: "tests/UniversalOSFormatTest.cpp"

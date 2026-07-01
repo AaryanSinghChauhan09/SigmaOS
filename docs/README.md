@@ -1,34 +1,38 @@
-# SigmaOS Complete Architecture & Tooling
+# SigmaOS
 
-Welcome to the internal documentation for **SigmaOS (Singularity Apex)**. This repository houses the world's most advanced, zero-trust, autonomously orchestrating operating system environment.
+> **Zero-Dependency. Zero-Compromise. Sovereign Silicon.**
 
-## 🧠 What is SigmaOS?
+SigmaOS is an ambitious architectural leap in operating system design. It entirely disregards POSIX standards and `libc` reliance in favor of absolute computational sovereignty. Every driver, file system, and utility is built from scratch to guarantee transparency, security, and deterministic performance.
 
-SigmaOS is not just an interface; it's a **Cognitive Mesh**. It aggressively manages hardware, isolates processes automatically, learns from user behavior to predict workflows, and deploys local AI Swarms to replace external services like Zapier, CloudConvert, and CrewAI natively.
+## Architecture Overview
 
-## 🛠 Directory Structure
+SigmaOS utilizes a microkernel design combined with a unified userland shell (`sigma-sh`).
 
-- `/userland/system_api/` - The core application logic and autonomous systems.
-- `/docs/` - System architecture and capability manuals.
-- `_apex_test.py` - The ultimate CI/CD system integrity checker ensuring 100% operational safety.
+- **Bootloader**: Custom `sigma_secure_boot` ensuring only cryptographically verified binaries execute.
+- **Kernel Init**: Minimal footprint handling hardware interrupts, PCI enumeration, and CPU initialization.
+- **Memory Setup**: Sovereign buddy-system allocator (`sigma_allocator`).
+- **Scheduler**: Multi-branch support (e.g., Round Robin in `main`, deterministic EDF in `release/rtos`).
+- **Syscall Layer**: Distinct non-POSIX ABI to prevent external pollution.
 
-## ⚡ Core Systems
+## Sovereign Components
 
-1. **Universal Mode Manager (`mode_manager.py`)**
-   - Radically re-tunes CPU/GPU mapping and DAG caching depending on user context. Features *Sovereign_Orchestrator* to run AI Multi-Agent tasks without overhead.
-2. **OmniAutomator (`omni_automator.py`)**
-   - The OS Native automation mesh. It learns from your habits with the *Routine Evolution Engine* and previews workflows transparently before execution.
-3. **App Prewarmer (`app_prewarmer.py`)**
-   - Uses zero-latency ring-0 hardware locks and Reinforcement Learning to guess your next app launch and keep it in RAM instantly ready.
-4. **Conversion Engine (`conversion_engine.py`)**
-   - Local, Omni-Matrix format overriding. Modifies files without internet connections.
-5. **SigmaHAL (`sigma_hal.py`)**
-   - The Hardware Abstraction Layer that intercepts thermal limits and forces the metal to obey software instructions securely.
+- **Drivers**: Keyboard (PS/2), VGA Framebuffer, Storage (ATA/SATA/VirtIO), Network (e1000).
+- **File Systems**: Native sovereign implementations of FAT32 and Ext2.
+- **Tools**: Complete sovereign replacements for `ls`, `cat`, `awk`, `sed`, `tar`, and a minimal text-mode HTML browser.
 
-## 🛡️ Privacy & Security
+## Build Instructions
 
-- **Forensic Scrubber**: Destroys PII locally. Prevents any sensitive payload from leaving the host machine.
-- **Vanguard Sandbox**: Quarantines erratic programs in custom memory-hardened silos to prevent system contamination.
+```bash
+# Clone the repository
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
+cd SigmaOS
 
----
-Created by The Sovereign Architect | SigmaOS Singularity Branch
+# Build the main standalone image
+make PROFILE=standalone iso
+
+# Boot in QEMU
+./qemu-boot.sh standalone
+```
+
+## Branch Strategy
+SigmaOS maintains 19 distinct branches targeting various industrial applications. Check the `docs/ROADMAP.md` for our deployment timeline, or review the GitHub Wiki for per-branch guides.

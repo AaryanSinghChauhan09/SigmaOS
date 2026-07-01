@@ -1,0 +1,20 @@
+-xc
+-std=c11
+-D__SIGMAOS__
+-DSIGMA_EXCLUDE_STD_ALIASES
+-Iinclude
+-Ilibc
+-I.
+
+-ffreestanding
+-fno-builtin
+-Wall
+-Wno-typedef-redefinition
+-Wno-builtin-requires-header
+-Wno-unknown-attributes
+-nostdinc
+-include suites/S25_ZeroKernel/shards/SovereignPurity.h
+-fms-extensions
+
+
+

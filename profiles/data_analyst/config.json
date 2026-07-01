@@ -1,0 +1,13 @@
+{
+    "profession": "data_analyst",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "data_visualization",
+        "statistical_analysis",
+        "machine_learning_integration"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

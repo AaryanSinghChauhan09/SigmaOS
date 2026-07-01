@@ -1,0 +1,30 @@
+{
+    "profession": "ship_captain",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "ecdis_navigation",
+        "ais-lattice",
+        "weather_routing",
+        "ballast_manager"
+    ],
+    "rules": [
+        "SOLAS",
+        "MARPOL",
+        "STCW"
+    ],
+    "calculators": [
+        "Fuel consumption",
+        "eta",
+        "cargo stability (GM)"
+    ],
+    "algorithms": [
+        "Route optimization",
+        "collision avoidance",
+        "tidal prediction"
+    ],
+    "automation": {
+        "self_healing": "Navigational data sync, engine diagnostic monitoring",
+        "rollback": "Voyage log snapshots, autopilot calibration restoration"
+    }
+}

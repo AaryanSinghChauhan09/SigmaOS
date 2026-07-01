@@ -1,0 +1,31 @@
+{
+    "profession": "architect",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "bim_software",
+        "3d_modeling",
+        "site_analysis_tools",
+        "rendering_engines",
+        "gis_mapping"
+    ],
+    "rules": [
+        "Building bye-laws",
+        "National Building Code (NBC)",
+        "sustainability standards"
+    ],
+    "calculators": [
+        "FSI/FAR",
+        "structural stability",
+        "lighting/ventilation",
+        "carbon footprint"
+    ],
+    "algorithms": [
+        "Generative design",
+        "urban density simulation"
+    ],
+    "automation": {
+        "self_healing": "BIM model consistency check, asset link validation",
+        "rollback": "Iterative design snapshots, client approval state rollback"
+    }
+}

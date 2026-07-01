@@ -1,0 +1,22 @@
+{
+    "module":       "S05_Memory",
+    "version":      "1.0.0",
+    "type":         "kernel_core",
+    "description":  "Virtual memory manager, physical memory manager, slab allocator, and per-module memory pool delegation.",
+    "dependencies": ["S01_Genesis", "S04_HAL"],
+    "features_required": [],
+    "features_optional": ["slab_pools"],
+    "memory": {
+        "pool_pages":   32,
+        "max_alloc_mb": 128,
+        "heap_type":    "slab"
+    },
+    "exports": [
+        "vmm_init", "vmm_map", "vmm_unmap", "vmm_translate", "vmalloc",
+        "pmm_alloc_page", "pmm_free_page",
+        "sigma_slab_alloc", "sigma_slab_free",
+        "sigma_pool_create", "sigma_pool_alloc", "sigma_pool_free",
+        "sigma_pool_audit"
+    ],
+    "test_targets": ["test_vmm", "test_slab", "test_pool_isolation"]
+}

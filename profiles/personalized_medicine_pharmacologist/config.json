@@ -1,0 +1,26 @@
+{
+    "profession": "personalized_medicine_pharmacologist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "personalized_medicine_pharmacologist_workspace",
+        "specialized_analytics",
+        "compliance_manager"
+    ],
+    "rules": [
+        "Industry standards",
+        "professional ethics"
+    ],
+    "calculators": [
+        "Efficiency metrics",
+        "cost analysis"
+    ],
+    "algorithms": [
+        "Workflow optimization",
+        "adaptive assistance"
+    ],
+    "automation": {
+        "self_healing": "Continuous health check for Personalized Medicine Pharmacologist tools",
+        "rollback": "Automatic state snapshots"
+    }
+}

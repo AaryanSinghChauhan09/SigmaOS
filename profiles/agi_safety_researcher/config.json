@@ -1,0 +1,27 @@
+{
+    "profession": "agi_safety_researcher",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "alignment_monitor",
+        "semantic_drift_analyzer",
+        "reward_hacking_detector",
+        "sandbox-lattice"
+    ],
+    "rules": [
+        "Asilomar AI principles",
+        "safety-first development"
+    ],
+    "calculators": [
+        "Complexity-to-safety ratio",
+        "interpretability score"
+    ],
+    "algorithms": [
+        "Formal verification",
+        "recursive self-improvement monitoring"
+    ],
+    "automation": {
+        "self_healing": "Automated kill-switch activation, sandbox containment verification",
+        "rollback": "Safe-state model restoration, audit log immutability"
+    }
+}

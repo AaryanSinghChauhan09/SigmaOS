@@ -1,0 +1,56 @@
+# SigmaOS Embedded Profile Preset
+# Bare-metal MCU-class target: no network, no display, deterministic TLSF.
+# sigma image build --profile config/profiles/embedded.toml
+
+[profile]
+preset = "embedded"
+arch   = "aarch64"
+board  = "generic-uefi"
+name   = "SigmaOS Embedded"
+
+[kernel]
+scheduler     = "realtime"
+allocator     = "tlsf"
+ipc           = "message-passing"
+network_stack = "none"
+features      = ["aslr","capabilities","power-management"]
+filesystems   = ["read-only-verified"]
+
+[network]
+profile   = "airgapped"
+dns       = "system"
+firewall  = "strict"
+wifi      = false
+bluetooth = false
+vpn       = ""
+
+[theme]
+palette = "monochrome"
+font    = "jetbrains-mono"
+density = "compact"
+mode    = "dark"
+icons   = "ascii"
+motion  = false
+
+[security]
+secure_boot         = true
+capability_profiles = true
+safestack = false   # SafeStack has overhead on constrained targets
+retguard  = true
+fortify   = true
+
+[packages]
+include = ["sigma-core"]
+exclude = ["sigma-gui","sigma-vr-studio","sigma-dev-tools","sigma-ai","sigma-shell","sigma-net"]
+
+[power]
+profile = "silent"
+
+[boot]
+bootloader = "u-boot"
+splash     = false
+motd       = ""
+
+[runtime]
+hot_reload = false
+log_level  = "error"

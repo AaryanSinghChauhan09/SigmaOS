@@ -1,0 +1,21 @@
+name: SigmaOS Branch Parity
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main, "release/**", kernel-exp, drivers-dev]
+
+jobs:
+  feature-matrix:
+    runs-on: ubuntu-latest
+    name: Verify FEATURE_MATRIX required files
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run branch parity check
+        run: |
+          chmod +x scripts/ci_branch_check.sh
+          BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+          ./scripts/ci_branch_check.sh --branch "$BRANCH"

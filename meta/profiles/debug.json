@@ -1,0 +1,12 @@
+{
+    "arch": "x86_64",
+    "features": {
+        "network": true,
+        "gui": true,
+        "observability": true,
+        "debug_symbols": true
+    },
+    "build": {
+        "channel": "debug"
+    }
+}

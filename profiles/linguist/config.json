@@ -1,0 +1,13 @@
+{
+    "profession": "linguist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "corpus_analysis",
+        "visualization",
+        "compliance"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

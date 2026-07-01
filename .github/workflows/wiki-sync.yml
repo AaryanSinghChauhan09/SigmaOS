@@ -1,0 +1,67 @@
+name: Sync Wiki
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/wiki/**'
+      - 'docs/Absorption-Matrix.md'
+      - 'docs/Security-Model.md'
+      - 'roadmap.md'
+
+  workflow_dispatch:
+
+jobs:
+  sync-wiki:
+    name: Sync docs/wiki → GitHub Wiki
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Clone the GitHub Wiki repo
+        run: |
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git wiki-repo
+
+      - name: Copy wiki pages
+        run: |
+          # Copy all pages from docs/wiki/ to the wiki repo root
+          cp docs/wiki/*.md wiki-repo/
+
+          # Also copy key top-level docs into the wiki
+          cp docs/Absorption-Matrix.md wiki-repo/Absorption-Matrix.md
+          cp docs/Security-Model.md wiki-repo/Security-Model.md
+          cp roadmap.md wiki-repo/Roadmap.md
+
+      - name: Commit and push wiki
+        run: |
+          cd wiki-repo
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+
+          # Only commit if there are changes
+          if git diff --cached --quiet; then
+            echo "No wiki changes to push."
+          else
+            git commit -m "docs: sync wiki from main [skip ci]
+
+            Auto-synced from docs/wiki/ and docs/ by GitHub Actions.
+            Triggered by: ${{ github.sha }}"
+            git push
+          fi
+
+      - name: Summary
+        run: |
+          echo "## Wiki Sync Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Pages synced:" >> $GITHUB_STEP_SUMMARY
+          ls docs/wiki/*.md | xargs -I{} basename {} .md | while read page; do
+            echo "- [$page](https://github.com/${{ github.repository }}/wiki/$page)" >> $GITHUB_STEP_SUMMARY
+          done

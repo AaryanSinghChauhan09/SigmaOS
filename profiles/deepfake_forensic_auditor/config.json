@@ -1,0 +1,28 @@
+{
+    "profession": "deepfake_forensic_auditor",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "spatial-temporal-consistency-mesh",
+        "frequency-domain-nexus",
+        "lip-sync-auditor",
+        "eye-blink-monitor"
+    ],
+    "rules": [
+        "Media ethics",
+        "digital-authenticity standards"
+    ],
+    "calculators": [
+        "Artifact-density",
+        "GAN-fingerprint-score",
+        "emotional-inconsistency-delta"
+    ],
+    "algorithms": [
+        "Deepfake detection ensemble",
+        "synthetic-voice attribution"
+    ],
+    "automation": {
+        "self_healing": "Auditor-lattice integrity, model-weight-sync",
+        "rollback": "Analysis-state snapshots, authenticity-baseline"
+    }
+}

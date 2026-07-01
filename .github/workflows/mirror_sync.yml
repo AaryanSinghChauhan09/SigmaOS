@@ -1,0 +1,103 @@
+name: "Mirror Sync"
+# Pushes each release to IPFS, a self-hosted CDN endpoint, and an
+# alternative git host — reinforcing the sovereign distribution theme.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to mirror (e.g. v1.2.3)"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ── IPFS pin via web3.storage ─────────────────────────────────────────────
+  ipfs-pin:
+    name: "Pin to IPFS"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: |
+          mkdir -p dist-release
+          gh release download "$TAG" --dir dist-release || true
+          ls dist-release/
+
+      - name: Pin to IPFS (web3.storage)
+        env:
+          W3_TOKEN: ${{ secrets.WEB3_STORAGE_TOKEN }}
+        run: |
+          if [ -z "$W3_TOKEN" ]; then
+            echo "::warning::WEB3_STORAGE_TOKEN not set — skipping IPFS pin"
+            exit 0
+          fi
+          npm install -g @web3-storage/w3cli --quiet 2>/dev/null
+          w3 login --token "$W3_TOKEN" || true
+          CID=$(w3 put dist-release/ --name "sigmaos-${{ github.event.release.tag_name }}" 2>&1 | tail -1) || true
+          echo "### IPFS Pin" >> $GITHUB_STEP_SUMMARY
+          echo "CID: \`$CID\`" >> $GITHUB_STEP_SUMMARY
+          echo "Gateway: https://w3s.link/ipfs/$CID" >> $GITHUB_STEP_SUMMARY
+
+  # ── Self-hosted CDN push ──────────────────────────────────────────────────
+  cdn-push:
+    name: "Push to CDN"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: |
+          mkdir -p dist-release
+          gh release download "$TAG" --dir dist-release || true
+
+      - name: Sync to R2 / S3 bucket
+        env:
+          AWS_ACCESS_KEY_ID:     ${{ secrets.CDN_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.CDN_SECRET_ACCESS_KEY }}
+          CDN_BUCKET:            ${{ secrets.CDN_BUCKET }}
+          CDN_ENDPOINT:          ${{ secrets.CDN_ENDPOINT }}
+        run: |
+          if [ -z "$CDN_BUCKET" ]; then
+            echo "::warning::CDN_BUCKET not configured — skipping CDN push"
+            exit 0
+          fi
+          pip install awscli --quiet
+          aws s3 sync dist-release/ "s3://$CDN_BUCKET/releases/${{ github.event.release.tag_name }}/" \
+            --endpoint-url "$CDN_ENDPOINT" \
+            --acl public-read \
+            --no-progress
+          echo "CDN: $CDN_ENDPOINT/$CDN_BUCKET/releases/${{ github.event.release.tag_name }}/" >> $GITHUB_STEP_SUMMARY
+
+  # ── Alternative git mirror (Codeberg / Gitea) ─────────────────────────────
+  git-mirror:
+    name: "Git Mirror"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Mirror to alternative host
+        env:
+          MIRROR_URL: ${{ secrets.GIT_MIRROR_URL }}
+          MIRROR_TOKEN: ${{ secrets.GIT_MIRROR_TOKEN }}
+        run: |
+          if [ -z "$MIRROR_URL" ]; then
+            echo "::warning::GIT_MIRROR_URL not configured — skipping git mirror"
+            exit 0
+          fi
+          git remote add mirror "https://x-token:${MIRROR_TOKEN}@${MIRROR_URL#https://}" 2>/dev/null || true
+          git push mirror --all --force
+          git push mirror --tags --force
+          echo "Mirrored to: $MIRROR_URL" >> $GITHUB_STEP_SUMMARY

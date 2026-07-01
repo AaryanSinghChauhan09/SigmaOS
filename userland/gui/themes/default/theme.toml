@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SigmaOS default dark theme (sigma-dark)
+# Edit and run: sigma-theme import < theme.toml
+
+name    = "sigma-dark"
+author  = "SigmaOS Team"
+version = "1.0.0"
+dark_mode      = true
+high_contrast  = false
+
+[colors]
+accent          = "#58a6ff"   # blue — buttons, focus rings, highlights
+background      = "#0d1117"   # deepest dark — desktop / window background
+surface         = "#161b22"   # cards, sidebars, panels
+surface_raised  = "#1c2330"   # elevated cards
+border          = "#30363d"   # dividers, input borders
+text_primary    = "#e6edf3"   # primary body text
+text_muted      = "#8b949e"   # captions, placeholders, secondary info
+text_inverse    = "#ffffff"   # text on accent-coloured backgrounds
+success         = "#3fb950"   # green — confirmations, success states
+warning         = "#d29922"   # amber — warnings, caution
+error           = "#f85149"   # red — errors, destructive actions
+info            = "#388bfd"   # blue — informational messages
+
+[fonts]
+ui       = "SigmaSans"        # system UI font
+code     = "SigmaMono"        # monospace for code, terminals
+display  = "SigmaSans"        # headings (heavier weight)
+size_base   = 14              # base font size in points
+line_height = 1.6
+
+[shape]
+radius_window = 12            # main window corners
+radius_button  = 8
+radius_card    = 10
+radius_input   = 6
+
+[spacing]
+xs = 4
+sm = 8
+md = 16
+lg = 24
+xl = 32
+
+[animation]
+duration_ms = 200
+easing      = "ease-in-out"
+
+[wallpaper]
+path         = "/sigma/share/wallpapers/sigma-dark-default.jpg"
+blur         = false
+blur_radius  = 0.0

@@ -1,0 +1,312 @@
+name: SigmaOS Build & Test
+
+on:
+  push:
+    branches: ["main", "release/*"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  # ===========================================================================
+  # SOURCE_DATE_EPOCH — single authoritative value for all reproducible builds
+  # ===========================================================================
+  sde:
+    name: Compute SOURCE_DATE_EPOCH
+    runs-on: ubuntu-24.04
+    outputs:
+      sde: ${{ steps.sde.outputs.sde }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 1 }
+      - id: sde
+        run: echo "sde=$(git log -1 --pretty=%ct)" >> "$GITHUB_OUTPUT"
+
+  # ===========================================================================
+  # Multi-architecture build matrix
+  # fail-fast: false so all arches run even if one fails
+  # ===========================================================================
+  build:
+    name: Build (${{ matrix.arch }}, ${{ matrix.profile }})
+    runs-on: ${{ matrix.runner }}
+    needs: sde
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            profile: standalone
+            runner: ubuntu-24.04
+            cross: ""
+            cross_prefix: ""
+          - arch: aarch64
+            profile: iot-arm64
+            runner: ubuntu-24.04
+            cross: gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
+            cross_prefix: "aarch64-linux-gnu-"
+
+    env:
+      SOURCE_DATE_EPOCH: ${{ needs.sde.outputs.sde }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # -----------------------------------------------------------------------
+      # Build cache — skip rebuilding unchanged objects
+      # -----------------------------------------------------------------------
+      - name: Cache build artifacts & Go modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-${{ matrix.arch }}-build-${{ hashFiles('Makefile', '**/go.mod', '**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.arch }}-build-
+
+      - name: Install toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            build-essential nasm \
+            cmake ninja-build \
+            grub-pc-bin grub-efi-amd64-bin xorriso mtools \
+            cppcheck clang clang-tidy \
+            ${{ matrix.cross }}
+
+      # ── Rust (pinned via rust-toolchain.toml) ──────────────────────────────
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly-2026-06-01
+          targets: x86_64-unknown-none
+          components: clippy,rust-src
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build kernel + daemons
+        run: |
+          # Dry-run: catch dangling Makefile deps from the Rust/Zig migration
+          # before committing to a full build that would fail with exit code 2.
+          if ! make -n all >/dev/null 2>&1; then
+            echo "::error::Makefile has unresolved targets after multi-lang migration."
+            echo "::error::Run 'make -n all' locally and fix dangling .c/.cpp references."
+            exit 1
+          fi
+          SIGMA_PROFILE=${{ matrix.profile }} \
+          CROSS_COMPILE="${{ matrix.cross_prefix }}" \
+          SOURCE_DATE_EPOCH=${{ env.SOURCE_DATE_EPOCH }} \
+          make all -j"$(nproc)"
+
+      # -----------------------------------------------------------------------
+      # Tests — only run when the CMakeLists.txt actually exists.
+      # Conditional via hashFiles() — missing directory skips gracefully
+      # rather than failing the whole job (post Rust/Zig migration).
+      # -----------------------------------------------------------------------
+      - name: Run kernel unit tests
+        if: hashFiles('tests/cpp_host/CMakeLists.txt') != ''
+        run: |
+          cmake -S tests/cpp_host -B tests/cpp_host/build_test \
+            -DCMAKE_BUILD_TYPE=Release
+          cmake --build tests/cpp_host/build_test -j"$(nproc)"
+          ctest --test-dir tests/cpp_host/build_test --output-on-failure
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sigmaos-${{ matrix.arch }}-${{ matrix.profile }}
+          path: |
+            build/sigmaos*.bin
+            build/sigmaos*.iso
+          if-no-files-found: warn
+
+  # ===========================================================================
+  # libFuzzer — TCP/IP receive path
+  # 30-second budget per CI run; crashes are REAL failures (no || echo swallow)
+  # ===========================================================================
+  fuzz:
+    name: Fuzz TCP stack
+    runs-on: ubuntu-24.04
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install clang + libFuzzer
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y clang
+
+      - name: Build fuzz target
+        run: |
+          clang++ -std=c++17 \
+            -fsanitize=fuzzer,address,undefined \
+            -Iinclude -Iklib/include \
+            tests/kernel/fuzz_tcp.cpp \
+            kernel/net/sigma_tcpip.c \
+            -o fuzz_tcp
+
+      - name: Run fuzzer (30-second budget)
+        run: |
+          # Seed corpus: commit real TCP packet binaries under
+          # tests/kernel/fuzz_corpus/seeds/ to improve coverage over time.
+          mkdir -p tests/kernel/fuzz_corpus
+          ./fuzz_tcp \
+            -max_total_time=30 \
+            -fork="$(nproc)" \
+            -detect_leaks=1 \
+            -ignore_crashes=0 \
+            -artifact_prefix=fuzz_crash_ \
+            tests/kernel/fuzz_corpus/
+
+      - name: Upload crash artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-crashes
+          path: fuzz_crash_*
+          if-no-files-found: ignore
+
+  # ===========================================================================
+  # Code quality — clang-tidy + SPDX + cppcheck
+  # ===========================================================================
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install analysis tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y cmake ninja-build clang clang-tidy cppcheck
+
+      - name: Generate compile_commands.json
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            -DCMAKE_C_COMPILER=clang \
+            -DCMAKE_CXX_COMPILER=clang++ \
+            -DSIGMA_PROFILE=standalone || true
+
+      - name: clang-tidy
+        run: |
+          if command -v run-clang-tidy &>/dev/null; then
+            run-clang-tidy -p build kernel/ init/ lib/ 2>&1 | tee clang_tidy_report.txt
+          else
+            echo "run-clang-tidy not available; skipping" && exit 0
+          fi
+
+      - name: cppcheck
+        run: |
+          cppcheck \
+            --enable=warning,style,performance,portability \
+            --suppress=missingIncludeSystem \
+            --error-exitcode=1 \
+            -Iinclude \
+            kernel/ init/ lib/ \
+            2>&1 | tee cppcheck_report.txt
+
+      - name: Check SPDX-License-Identifier headers
+        run: |
+          MISSING=0
+          for f in $(git diff --name-only HEAD~1..HEAD -- '*.c' '*.cpp' '*.h' '*.hpp' '*.rs' 2>/dev/null || true); do
+            [[ -f "$f" ]] || continue
+            if ! head -3 "$f" | grep -q "SPDX-License-Identifier"; then
+              echo "  MISSING SPDX header: $f"
+              MISSING=$((MISSING+1))
+            fi
+          done
+          if [[ $MISSING -gt 0 ]]; then
+            echo "::warning::$MISSING file(s) missing SPDX-License-Identifier header"
+          fi
+
+      - name: Upload quality reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-reports
+          path: |
+            clang_tidy_report.txt
+            cppcheck_report.txt
+          if-no-files-found: ignore
+
+  # ===========================================================================
+  # Coverage gate — 80% diff coverage on changed lines
+  # ===========================================================================
+  coverage:
+    name: Coverage Gate
+    runs-on: ubuntu-24.04
+    needs: build
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y g++ lcov
+          pip install diff-cover lcov_cobertura
+
+      - name: Build with coverage instrumentation
+        run: |
+          cmake -B build \
+            -DCMAKE_CXX_FLAGS="--coverage -fprofile-arcs -ftest-coverage" \
+            -DCMAKE_BUILD_TYPE=Debug
+          cmake --build build --target test_kernel -j"$(nproc)" || true
+
+      - name: Run tests and collect coverage
+        if: hashFiles('tests/cpp_host/CMakeLists.txt') != ''
+        run: |
+          cd tests/cpp_host
+          cmake -B build_cov \
+            -DCMAKE_CXX_FLAGS="--coverage -fprofile-arcs -ftest-coverage"
+          cmake --build build_cov -j"$(nproc)"
+          cd build_cov && ctest --output-on-failure || true
+          cd ../../..
+          lcov --capture \
+               --directory tests/cpp_host/build_cov \
+               --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' '*/googletest/*' \
+               --output-file coverage.info
+          lcov_cobertura coverage.info --output coverage.xml
+          diff-cover coverage.xml \
+            --compare-branch=origin/${{ github.base_ref }} \
+            --fail-under=80 \
+            --html-report coverage-report.html
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-report.html
+          if-no-files-found: ignore
+
+  # ===========================================================================
+  # Regression test suite
+  # ===========================================================================
+  regress:
+    name: Kernel Regression Tests
+    runs-on: ubuntu-24.04
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y g++ cmake make
+
+      - name: Build and run regression suite
+        if: hashFiles('tests/Makefile') != ''
+        run: |
+          make -C tests regress 2>&1
+
+      - name: Upload regress results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regress-results
+          path: tests/regress-*.log
+          if-no-files-found: ignore

@@ -1,0 +1,24 @@
+{
+    "profession": "banker",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "loan_management",
+        "compliance",
+        "transaction_dashboards"
+    ],
+    "rules": [
+        "RBI guidelines",
+        "Basel norms"
+    ],
+    "calculators": [
+        "EMI",
+        "loan interest",
+        "NPA provisioning"
+    ],
+    "algorithms": [
+        "Risk scoring",
+        "fraud detection",
+        "portfolio optimization"
+    ]
+}

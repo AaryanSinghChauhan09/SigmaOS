@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SigmaOS Shard Manifest",
+  "type": "object",
+  "properties": {
+    "shard_name": {
+      "type": "string",
+      "description": "The unique identifier of the sovereign shard."
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic versioning (e.g., 1.0.4)"
+    },
+    "architecture": {
+      "type": "string",
+      "enum": ["x86_64", "aarch64", "riscv64", "universal"]
+    },
+    "crypto_signature": {
+      "type": "string",
+      "description": "SHA-256 or PQC signature of the payload."
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of strictly required shards."
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Required OS-level capabilities (e.g., CAP_NET_BIND_SERVICE equivalent)."
+    }
+  },
+  "required": ["shard_name", "version", "architecture", "crypto_signature"]
+}

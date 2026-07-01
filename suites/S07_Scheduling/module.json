@@ -1,0 +1,19 @@
+{
+    "module":       "S07_Scheduling",
+    "version":      "1.0.0",
+    "type":         "kernel_core",
+    "description":  "AI-optimized hybrid scheduler with CFS, FIFO, and neural-heuristic modes. Predictive burst-length EMA for ML workload batching.",
+    "dependencies": ["S01_Genesis", "S04_HAL", "S05_Memory"],
+    "features_required": [],
+    "features_optional": ["ai"],
+    "memory": {
+        "pool_pages":   8,
+        "max_alloc_mb": 4,
+        "heap_type":    "slab"
+    },
+    "exports": [
+        "sched_init", "sched_create_task", "sched_tick",
+        "sched_yield", "sched_audit"
+    ],
+    "test_targets": ["test_cfs_fairness", "test_fifo_order", "test_ai_burst_prediction"]
+}

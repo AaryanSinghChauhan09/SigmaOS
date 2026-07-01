@@ -1,0 +1,9 @@
+{
+  "plugin_id": "S_EXT_SystemMonitor",
+  "name": "Sovereign System Monitor",
+  "version": "1.0.0",
+  "author": "Lattice Dev Team",
+  "entry_point": "index.js",
+  "capabilities": ["CAP_READ", "CAP_IPC"],
+  "dependencies": ["S03_Orchestrator", "S11_CloudExplorer"]
+}

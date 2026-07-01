@@ -1,0 +1,23 @@
+{
+    "profession": "entrepreneur",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "business_planning",
+        "financial_dashboards",
+        "crm_tools"
+    ],
+    "rules": [
+        "Startup India compliance",
+        "MCA rules"
+    ],
+    "calculators": [
+        "Break-even",
+        "ROI",
+        "funding valuation"
+    ],
+    "algorithms": [
+        "Business plan optimizer",
+        "CRM automation"
+    ]
+}

@@ -1,0 +1,211 @@
+name: SigmaOS CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  # ============================================================
+  # JOB 1: Cross-Platform Build & Cargo Check
+  # ============================================================
+  build-and-test:
+    name: Build & Check (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Install AArch64 + RISC-V cross-toolchain on Ubuntu
+      - name: Install cross-compilers (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            gcc-aarch64-linux-gnu \
+            gcc-riscv64-linux-gnu \
+            binutils-aarch64-linux-gnu \
+            binutils-riscv64-linux-gnu \
+            qemu-system-arm \
+            qemu-system-misc \
+            clang-tidy \
+            python3
+
+      # Install AArch64 + RISC-V cross-toolchain on macOS
+      - name: Install cross-compilers (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install aarch64-elf-gcc riscv64-elf-gcc qemu python3
+
+      # Use the maintained rust-toolchain action (actions-rs is deprecated)
+      - name: Set up Rust (nightly + no_std targets)
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src, clippy, rustfmt
+          targets: >-
+            aarch64-unknown-none,
+            riscv64imac-unknown-none-elf
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      # Cargo check for the Orchestrator (no_std bare-metal)
+      - name: Cargo check — S03_Orchestrator (AArch64)
+        run: |
+          cargo check \
+            --manifest-path suites/S03_Orchestrator/Cargo.toml \
+            --target aarch64-unknown-none \
+            --verbose
+        continue-on-error: false
+
+      # Repair and Verify the environment
+      - name: Repair & Verify Build Environment
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p build
+          touch build/.gitkeep
+          g++ -std=c++20 s-cli.cpp -o s-cli
+          chmod +x ./s-cli
+          echo "[CI] Sovereign Environment Repaired"
+
+      - name: Perform Static Analysis
+        if: runner.os != 'Windows'
+        run: |
+          sudo apt-get install -y cppcheck
+          cppcheck --error-exitcode=0 --force --inline-suppr --quiet suites/ modules/ scripts/
+
+      - name: Build Sovereign Lattice (Native)
+        if: runner.os != 'Windows'
+        run: |
+          ./s-cli build x86_64
+          ./s-cli test
+
+      - name: Run Sovereign Atomic Tests (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          mkdir -Force build
+          New-Item -Path build\.gitkeep -ItemType file -Force
+          g++ -std=c++20 s-cli.cpp -o s-cli.exe
+          .\s-cli.exe build x86_64
+          .\s-cli.exe test
+
+      # Upload build logs and kernel binaries as artifacts
+      - name: Upload Kernel Binary & Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sigmaos-artifacts-${{ matrix.os }}
+          path: |
+            build/
+            *.log
+          retention-days: 7
+
+  # ============================================================
+  # JOB 2: Lint (Rust + C/C++ + JavaScript)
+  # ============================================================
+  lint:
+    name: Lint & Style
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Rust (nightly + clippy)
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: clippy, rustfmt
+          targets: aarch64-unknown-none
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ubuntu-cargo-lint-${{ hashFiles('**/Cargo.toml') }}
+
+      - name: Rust Lint — Clippy (S03_Orchestrator)
+        run: |
+          cargo clippy \
+            --manifest-path suites/S03_Orchestrator/Cargo.toml \
+            --target aarch64-unknown-none \
+            -- -D warnings
+
+      - name: Rust Format Check
+        run: |
+          cargo fmt \
+            --manifest-path suites/S03_Orchestrator/Cargo.toml \
+            -- --check
+
+      - name: Install clang-tidy
+        run: sudo apt-get install -y clang-tidy
+
+      - name: C/C++ Lint — HAL exceptions
+        run: |
+          clang-tidy \
+            suites/S04_HAL/arch/hal_exceptions.c \
+            -- \
+            -I. -Iinclude -Isuites/S04_HAL -Isuites/S01_Genesis \
+            -std=c11 -ffreestanding -nostdlib \
+            || true
+
+      - name: Set up Node.js for ESLint
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: web_ui/package-lock.json
+
+      - name: Install JS dependencies
+        run: |
+          cd web_ui
+          npm ci
+
+      - name: JavaScript Lint — Zenith UI Components
+        run: |
+          cd web_ui
+          npm run lint
+
+  # ============================================================
+  # JOB 3: Formal Verification (Kani Model Checker)
+  # ============================================================
+  verify:
+    name: Formal Verification (Kani)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Rust (stable for Kani)
+        uses: dtolnay/rust-toolchain@stable
+
+      # Use the official Kani GitHub Action (faster than cargo install)
+      - name: Run Kani — IPC/DMA Non-Interference Proofs
+        uses: model-checking/kani-github-action@v1
+        with:
+          working-directory: suites/S08_Security/formal_proofs
+          args: >-
+            --harness ipc_dma_proofs::verify_dma_ipc_non_interference
+            --harness ipc_dma_proofs::verify_dispatch_capability_ownership
+            --harness ipc_dma_proofs::verify_sequence_number_monotonicity
+            --harness ipc_dma_proofs::verify_rollback_atomic_removal
+        continue-on-error: true   # Proofs are advisory until tensor_kani.rs harnesses stabilize
+
+      - name: Upload Verification Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kani-verification-report
+          path: |
+            suites/S08_Security/formal_proofs/kani-output/
+          retention-days: 30

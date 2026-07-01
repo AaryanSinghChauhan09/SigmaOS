@@ -1,0 +1,27 @@
+{
+    "profession": "geo_engineering_analyst",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "albedo-monitor",
+        "stratospheric-aerosol-lattice",
+        "carbon-cycle-modeler"
+    ],
+    "rules": [
+        "UN Environmental protocols",
+        "SRM-governance guidelines"
+    ],
+    "calculators": [
+        "Radiative-forcing-delta",
+        "aerosol-depth-ratio",
+        "precipitation-impact"
+    ],
+    "algorithms": [
+        "Climate-impact simulation",
+        "unintended-consequence modeling"
+    ],
+    "automation": {
+        "self_healing": "Aerosol-delivery-sync, atmospheric-probe verification",
+        "rollback": "Geo-state snapshots, atmospheric-baseline restoration"
+    }
+}

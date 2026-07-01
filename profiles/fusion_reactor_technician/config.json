@@ -1,0 +1,28 @@
+{
+    "profession": "fusion_reactor_technician",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "tokamak-monitor",
+        "magnetic-containment-nexus",
+        "plasma-density-lattice",
+        "tritium-breeder-auditor"
+    ],
+    "rules": [
+        "IAEA fusion safety standards",
+        "high-energy-physics protocols"
+    ],
+    "calculators": [
+        "Plasma-beta-ratio",
+        "Lawson-criterion-delta",
+        "neutron-flux-calc"
+    ],
+    "algorithms": [
+        "Automated plasma stability control",
+        "ELM-suppression orchestration"
+    ],
+    "automation": {
+        "self_healing": "Magnetic-field-calibration sync, containment-integrity verify",
+        "rollback": "Reactor-state snapshots, baseline-plasma-parameters"
+    }
+}

@@ -1,0 +1,28 @@
+{
+    "profession": "terraforming_engineer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "atmospheric_modeler",
+        "lithosphere_stabilizer",
+        "bio-sphere_injector",
+        "planetary_thermal_monitor"
+    ],
+    "rules": [
+        "Planetary protection protocols",
+        "ethical terraforming guidelines"
+    ],
+    "calculators": [
+        "Atmospheric pressure delta",
+        "solar radiation shielding",
+        "oxygen-cycle rate"
+    ],
+    "algorithms": [
+        "Climate engineering simulation",
+        "ecosystem stability prediction"
+    ],
+    "automation": {
+        "self_healing": "Atmospheric probe calibration, bio-dome integrity monitoring",
+        "rollback": "Planetary state snapshots, bio-injection phase rollback"
+    }
+}

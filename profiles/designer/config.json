@@ -1,0 +1,13 @@
+{
+    "profession": "designer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "wireframing_tools",
+        "prototyping",
+        "accessibility_testing"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

@@ -1,0 +1,28 @@
+{
+    "profession": "intelligence_officer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "signals_intelligence_(sigint)_analyzer",
+        "osint-lattice",
+        "secure_satellite_uplink",
+        "steganography_detector"
+    ],
+    "rules": [
+        "Classified protocols",
+        "zero-trust communication"
+    ],
+    "calculators": [
+        "Encryption strength",
+        "signal-to-noise ratio",
+        "geolocation triangulator"
+    ],
+    "algorithms": [
+        "Heuristic pattern matching",
+        "semantic link analysis"
+    ],
+    "automation": {
+        "self_healing": "Secure channel re-establishment, payload sanitization",
+        "rollback": "Redaction-safe state restoration, operational security (OPSEC) baseline"
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "profession": "software_dev",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "ide",
+        "version_control_(git)",
+        "ci/cd_pipelines",
+        "debugging_tools"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

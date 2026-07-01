@@ -1,0 +1,20 @@
+{
+    "module":       "S08_Security",
+    "version":      "1.0.0",
+    "type":         "kernel_core",
+    "description":  "Zero-trust capability engine, post-quantum cryptography, formal verification stubs, and audit logging.",
+    "dependencies": ["S01_Genesis", "S05_Memory"],
+    "features_required": [],
+    "features_optional": ["zkp", "web3"],
+    "memory": {
+        "pool_pages":   16,
+        "max_alloc_mb": 16,
+        "heap_type":    "slab"
+    },
+    "exports": [
+        "zt_init", "zt_issue_capability", "zt_verify", "zt_revoke",
+        "hash_sha256", "encrypt_data", "decrypt_data",
+        "audit_log_event"
+    ],
+    "test_targets": ["test_capability_lifecycle", "test_expired_token", "test_tampered_signature"]
+}

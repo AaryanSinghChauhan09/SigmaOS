@@ -1,0 +1,27 @@
+## SigmaOS: Σ SigmaOS — sigma_pkg_core: Sovereign Package Manager Backend
+## Migrated from C/C++ to Nim — no stdlib import, no external packages.
+## All types hand-defined. OOP via object hierarchy + method dispatch.
+{.push raises: [].}
+
+type
+  SigmaU8*  = uint8
+  SigmaU16* = uint16
+  SigmaU32* = uint32
+  SigmaU64* = uint64
+  SigmaI32* = int32
+  SigmaI64* = int64
+  SigmaBool* = bool
+  SigmaUsize* = uint
+
+type
+  SpkgHeader* = object
+    magic*: SigmaU32
+    flags*: SigmaU32
+    payload_size*: SigmaU32
+
+type
+  RegistryEntry* = object
+
+proc str_copy*() {.exportc.} =
+  discard
+

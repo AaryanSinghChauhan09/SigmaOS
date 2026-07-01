@@ -1,0 +1,28 @@
+{
+    "profession": "viticulturist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "soil-moisture_mesh",
+        "brix-analyzer",
+        "phenolic-maturity_monitor",
+        "weather-lattice"
+    ],
+    "rules": [
+        "Appellation d'origine contrôlée (AOC) standards",
+        "organic certification rules"
+    ],
+    "calculators": [
+        "Pruning density",
+        "irrigation delta",
+        "fermentation heat-rate"
+    ],
+    "algorithms": [
+        "Harvest-window prediction",
+        "yield-estimation simulation"
+    ],
+    "automation": {
+        "self_healing": "Micro-climate sensor sync, pest-pressure verification",
+        "rollback": "Seasonal growth logs, irrigation state history"
+    }
+}

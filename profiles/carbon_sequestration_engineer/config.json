@@ -1,0 +1,27 @@
+{
+    "profession": "carbon_sequestration_engineer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "ccs-nexus",
+        "geological-storage-lattice",
+        "plume-migration-monitor"
+    ],
+    "rules": [
+        "EPA CCS regulations",
+        "carbon-capture standards"
+    ],
+    "calculators": [
+        "Injection-pressure-delta",
+        "storage-capacity-ratio",
+        "leakage-probability"
+    ],
+    "algorithms": [
+        "Plume-migration prediction",
+        "sequestration-efficiency optimization"
+    ],
+    "automation": {
+        "self_healing": "Well-integrity verification, plume-sensor-sync",
+        "rollback": "Injection-state snapshots, geological-baseline restoration"
+    }
+}

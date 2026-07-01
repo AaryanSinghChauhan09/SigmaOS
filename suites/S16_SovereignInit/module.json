@@ -1,0 +1,4 @@
+{
+  "module": "S16_SovereignInit",
+  "dependencies": ["S01_Genesis"]
+}

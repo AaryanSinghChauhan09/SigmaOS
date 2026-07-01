@@ -1,0 +1,31 @@
+[package]
+name    = "sigma-orchestrator"
+version = "0.1.0"
+edition = "2021"
+authors = ["Sovereign-OS"]
+description = "S03 Decentralized Persistence Layer — CRDT, IPC, Process Orchestration"
+
+# No standard library — bare-metal kernel context
+[lib]
+name       = "sigma_orchestrator"
+path       = "lib.rs"
+crate-type = ["staticlib", "rlib"]
+
+[dependencies]
+# No external deps — pure no_std bare-metal
+
+# The build target is defined in .cargo/config.toml:
+#   [build]
+#   target = "aarch64-unknown-none"
+# Or pass --target aarch64-unknown-none explicitly
+
+[profile.release]
+opt-level = "z"     # Optimize for binary size (kernel)
+lto       = true
+codegen-units = 1
+panic     = "abort"
+strip     = "symbols"
+
+[profile.dev]
+panic     = "abort"
+opt-level = 0

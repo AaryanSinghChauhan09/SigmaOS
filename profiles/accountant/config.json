@@ -1,0 +1,34 @@
+{
+    "profession": "accountant",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "ledger_system",
+        "tax_compliance_modules",
+        "balance_sheet_generator",
+        "audit_tools",
+        "tally-lattice_integration"
+    ],
+    "rules": [
+        "Ind-AS",
+        "GST",
+        "Income Tax Act",
+        "Companies Act"
+    ],
+    "calculators": [
+        "GST",
+        "TDS",
+        "depreciation",
+        "advance tax",
+        "annuity"
+    ],
+    "algorithms": [
+        "Automated ledger balancing",
+        "audit trail generation",
+        "tax filing optimization"
+    ],
+    "automation": {
+        "self_healing": "Continuous audit log integrity check, transaction consistency validation",
+        "rollback": "Snapshot-per-transaction, daily fiscal state preservation"
+    }
+}

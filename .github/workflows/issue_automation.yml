@@ -1,0 +1,120 @@
+name: "Issue → Branch → Draft PR Automation"
+# Comment /take on any open issue to claim it:
+# → creates branch issue/<number>-<slug>
+# → self-assigns the issue
+# → opens a draft PR with a structured template
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  take-issue:
+    name: "Claim Issue"
+    runs-on: ubuntu-latest
+    if: |
+      github.event.issue.pull_request == null &&
+      contains(github.event.comment.body, '/take')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/github-script@v7
+        id: claim
+        with:
+          script: |
+            const issue   = context.payload.issue;
+            const actor   = context.payload.comment.user.login;
+            const number  = issue.number;
+
+            // Build branch name: issue/42-fix-kernel-panic
+            const slug = issue.title
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/^-|-$/g, '')
+              .slice(0, 50);
+            const branch = `issue/${number}-${slug}`;
+
+            // Resolve base SHA
+            const { data: ref } = await github.rest.git.getRef({
+              owner: context.repo.owner, repo: context.repo.repo,
+              ref: 'heads/main'
+            });
+
+            // Create branch (idempotent)
+            try {
+              await github.rest.git.createRef({
+                owner: context.repo.owner, repo: context.repo.repo,
+                ref: `refs/heads/${branch}`,
+                sha: ref.object.sha
+              });
+            } catch (e) {
+              if (!e.message.includes('Reference already exists')) throw e;
+            }
+
+            // Self-assign issue
+            await github.rest.issues.addAssignees({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: number,
+              assignees: [actor]
+            });
+
+            // Open draft PR
+            const prBody = [
+              `## Closes #${number}`,
+              '',
+              '### Summary',
+              '<!-- What does this PR do? -->',
+              '',
+              '### Changes',
+              '<!-- List the key changes -->',
+              '',
+              '### Testing',
+              '- [ ] `sigma test` passes locally',
+              '- [ ] `sigma lint` reports no warnings',
+              '- [ ] Tested in QEMU (`sigma run`)',
+              '',
+              '### Checklist',
+              '- [ ] Conventional Commit message',
+              '- [ ] SPDX header on new files',
+              '- [ ] Docs updated if needed',
+            ].join('\n');
+
+            let pr;
+            try {
+              const result = await github.rest.pulls.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title: `fix: ${issue.title} (#${number})`,
+                head: branch,
+                base: 'main',
+                body: prBody,
+                draft: true
+              });
+              pr = result.data;
+            } catch (e) {
+              // PR might already exist
+              pr = { html_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/pulls` };
+            }
+
+            // Reply on issue
+            await github.rest.issues.createComment({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: number,
+              body: [
+                `👋 @${actor} — issue claimed!`,
+                '',
+                `- 🌿 Branch: \`${branch}\``,
+                `- 📬 Draft PR: ${pr.html_url}`,
+                '',
+                'Run `sigma doctor` to verify your environment, then `sigma build` and push commits to the branch.',
+              ].join('\n')
+            });
+
+            core.setOutput('branch', branch);
+            core.setOutput('pr_url', pr.html_url);

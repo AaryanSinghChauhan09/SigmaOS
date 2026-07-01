@@ -1,0 +1,65 @@
+{
+<<<<<<< HEAD
+  "name": "SigmaOS Sovereign Dev Container",
+  "image": "ubuntu:22.04",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "username": "sigma"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/rust:1": {
+      "version": "stable"
+    }
+  },
+  "runArgs": ["--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined"],
+  "postCreateCommand": "apt-get update && apt-get install -y gcc-x86-64-linux-gnu nasm make python3 python3-pytest clang-tidy cppcheck qemu-system-x86 valgrind git && npm install && echo '✅ SigmaOS Dev Environment Ready!'",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.tabSize": 4,
+        "editor.formatOnSave": true,
+        "files.eol": "\n",
+        "C_Cpp.clang_format_style": "{ BasedOnStyle: LLVM, IndentWidth: 4 }"
+      },
+      "extensions": [
+        "ms-vscode.cpptools",
+        "rust-lang.rust-analyzer",
+        "ms-python.python",
+        "esbenp.prettier-vscode",
+        "ms-vscode.makefile-tools",
+        "GitHub.vscode-pull-request-github"
+      ]
+    }
+  },
+  "forwardPorts": [8080],
+  "portsAttributes": {
+    "8080": {
+      "label": "Zenith Dashboard",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "remoteUser": "sigma"
+=======
+    "name": "SigmaOS Development Environment",
+    "build": {
+        "dockerfile": "../Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cmake-tools",
+                "llvm-vs-code-extensions.vscode-clangd",
+                "xaver.clang-format"
+            ]
+        }
+    },
+    "remoteUser": "vscode",
+    "features": {
+        "ghcr.io/devcontainers/features/github-cli:1": {}
+    }
+>>>>>>> ad8016503ce074e8980abb23e1a44b78be830645
+}

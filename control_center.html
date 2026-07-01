@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S SigmaOS | Control Center v15.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050507;
+            --surface: #0d0d12;
+            --primary: #00f5ff;
+            --accent: #8b00ff;
+            --text: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.6);
+            --success: #00ff88;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sidebar-brand {
+            letter-spacing: 2px;
+            color: var(--primary);
+        }
+
+        .main {
+            flex: 1;
+            padding: 4rem;
+            overflow-y: auto;
+            background: radial-gradient(circle at top right, rgba(139, 0, 255, 0.05), transparent);
+        }
+
+        .nav-item {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--primary);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+        }
+
+        h1 { 
+            font-size: 3rem; 
+            margin-bottom: 2.5rem; 
+            background: linear-gradient(135deg, var(--primary), var(--accent)); 
+            -webkit-background-clip: text; 
+            background-clip: text;
+            -webkit-text-fill-color: transparent; 
+        }
+
+        h3 { color: var(--primary); margin-top: 0; }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            color: #000;
+            padding: 0.9rem 1.8rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
+            transition: 0.3s;
+            margin-top: 1rem;
+        }
+
+        .btn:hover { box-shadow: 0 0 20px rgba(0, 245, 255, 0.4); transform: scale(1.05); }
+
+        .status { color: var(--success); font-weight: bold; font-family: 'JetBrains Mono', monospace; }
+        .code { font-family: 'JetBrains Mono', monospace; color: var(--text-dim); font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2 class="sidebar-brand">S CONTROL</h2>
+        <div class="nav-item active">Lattice Shards</div>
+        <div class="nav-item">Zero-Trust Network</div>
+        <div class="nav-item">PQC Security Hub</div>
+        <div class="nav-item">Professional Suites</div>
+        <div class="nav-item">Lattice Telemetry</div>
+    </div>
+    <div class="main">
+        <h1>Sovereign Industrial Shards</h1>
+        
+        <div class="card">
+            <h3>PQC Security Engine (Zenith)</h3>
+            <p>Signature Verification: <span class="status">ENABLED (Dilithium-5)</span></p>
+            <p class="code">Amnesic Wipe: ACTIVE | Entropy Pool: RDRAND-Seeded</p>
+            <button class="btn">Audit Security Shards</button>
+        </div>
+
+        <div class="card">
+            <h3>Sovereign NetStack</h3>
+            <p>Connection: <span class="status">PQC-VPN ACTIVE (Kyber-1024)</span></p>
+            <p class="code">DPI Firewall: ARMED | Shard Isolation: ENFORCED</p>
+            <button class="btn">Manage Network Lattice</button>
+        </div>
+
+        <div class="card">
+            <h3>Indian Professional Suites (S-INDIA)</h3>
+            <p>GST Act 2017: <span class="status">COMPLIANT (v2.1)</span></p>
+            <p>Income Tax Engine: <span class="status">ACTIVE (FY 2024-25 New Regime)</span></p>
+            <p class="code">TDS / EPF / EMI modules: SYNCED</p>
+            <button class="btn">Launch Financial Nexus</button>
+        </div>
+
+        <div class="card">
+            <h3>Hardware Shard Graph</h3>
+            <p>Core Shards: <span class="status">600/600 ONLINE</span></p>
+            <p class="code">PCI Discovery: 255 Buses Scanned | ACPI: RSDP Validated</p>
+            <button class="btn">Enumerated Shard Map</button>
+        </div>
+    </div>
+</body>
+</html>
+ 

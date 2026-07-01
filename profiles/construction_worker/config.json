@@ -1,0 +1,13 @@
+{
+    "profession": "construction_worker",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "project_scheduling",
+        "safety_compliance",
+        "equipment_tracking"
+    ],
+    "rules": [],
+    "calculators": [],
+    "algorithms": []
+}

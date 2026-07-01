@@ -1,0 +1,27 @@
+{
+    "profession": "foley_artist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "sound-lattice",
+        "spectral-layering-engine",
+        "foley-prop-index",
+        "real-time-resynthesizer"
+    ],
+    "rules": [
+        "Audio post-production standards"
+    ],
+    "calculators": [
+        "Sample-rate delta",
+        "reverb-tail-calc",
+        "sync-offset"
+    ],
+    "algorithms": [
+        "Automated footstep matching",
+        "textural sound synthesis"
+    ],
+    "automation": {
+        "self_healing": "Audio-buffer consistency, Prop-Lattice sync",
+        "rollback": "Mix-state snapshots, sound-design-history restoration"
+    }
+}

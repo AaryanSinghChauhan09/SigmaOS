@@ -1,0 +1,77 @@
+/* 
+    Zenith UI CSS Engine
+    Sovereign OS Rendering Pipeline 
+    Zero-Dependency, Native DOM Compositing
+*/
+
+:root {
+    /* Core Sovereign Theme Tokens */
+    --zenith-bg-dark: #0f1115;
+    --zenith-surface: #1a1d24;
+    --zenith-accent: #00ffcc;
+    --zenith-accent-glow: rgba(0, 255, 204, 0.4);
+    
+    /* Typography overrides (Elementary OS neutralization) */
+    --zenith-font-stack: 'Inter', system-ui, -apple-system, sans-serif;
+    --zenith-text-primary: #e0e6ed;
+    --zenith-text-secondary: #8b949e;
+    
+    /* Accessibility Layers */
+    --zenith-contrast-border: rgba(255, 255, 255, 0.1);
+    --zenith-focus-ring: 2px solid var(--zenith-accent);
+}
+
+/* Base Renderer */
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--zenith-bg-dark);
+    color: var(--zenith-text-primary);
+    font-family: var(--zenith-font-stack);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+/* Glassmorphism Window Compositor */
+.zenith-window {
+    background: var(--zenith-surface);
+    border: 1px solid var(--zenith-contrast-border);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Accessible Interactive Elements */
+.zenith-button {
+    background: transparent;
+    color: var(--zenith-accent);
+    border: 1px solid var(--zenith-accent);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.zenith-button:hover {
+    background: var(--zenith-accent);
+    color: var(--zenith-bg-dark);
+    box-shadow: 0 0 12px var(--zenith-accent-glow);
+}
+
+.zenith-button:focus-visible {
+    outline: var(--zenith-focus-ring);
+    outline-offset: 2px;
+}
+
+/* High Contrast Media Query for Accessibility */
+@media (prefers-contrast: more) {
+    :root {
+        --zenith-bg-dark: #000000;
+        --zenith-surface: #111111;
+        --zenith-text-secondary: #ffffff;
+        --zenith-contrast-border: #ffffff;
+    }
+}

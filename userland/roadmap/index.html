@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SigmaOS Utilities Development Roadmap</title>
+<style>
+:root {
+  --bg: #0d1117; --surface: #161b22; --border: #30363d;
+  --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+  --critical: #ff4444; --high: #ff8800; --medium: #ffcc00; --low: #44cc88;
+  --inprog: #1f6feb; --planned: #388bfd; --done: #3fb950;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; }
+header { background: linear-gradient(135deg, #0d1117 0%, #1a2332 100%); border-bottom: 1px solid var(--border); padding: 2rem; text-align: center; }
+header h1 { font-size: 2rem; font-weight: 700; background: linear-gradient(90deg, #58a6ff, #79c0ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+header p { color: var(--muted); margin-top: .5rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+.stats { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; padding: 1.5rem 2rem; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.5rem; text-align: center; min-width: 120px; }
+.stat-card .num { font-size: 2rem; font-weight: 700; color: var(--accent); }
+.stat-card .label { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.controls { display: flex; gap: .75rem; flex-wrap: wrap; padding: 1rem 2rem; background: var(--surface); border-bottom: 1px solid var(--border); }
+.controls input { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: .5rem .75rem; font-size: .875rem; flex: 1; min-width: 180px; }
+.controls select { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: .5rem .75rem; font-size: .875rem; }
+.legend { display: flex; gap: .5rem; flex-wrap: wrap; padding: .75rem 2rem; align-items: center; }
+.badge { display: inline-block; padding: .2rem .6rem; border-radius: 12px; font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.badge.critical { background: #ff444422; color: var(--critical); border: 1px solid var(--critical); }
+.badge.high     { background: #ff880022; color: var(--high);     border: 1px solid var(--high); }
+.badge.medium   { background: #ffcc0022; color: var(--medium);   border: 1px solid var(--medium); }
+.badge.low      { background: #44cc8822; color: var(--low);      border: 1px solid var(--low); }
+.badge.inprog   { background: #1f6feb22; color: #58a6ff;         border: 1px solid #1f6feb; }
+.badge.planned  { background: #30363d;   color: var(--muted);    border: 1px solid var(--border); }
+.badge.done     { background: #3fb95022; color: var(--done);     border: 1px solid var(--done); }
+main { padding: 1.5rem 2rem; max-width: 1100px; margin: 0 auto; }
+.phase { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 1.5rem; overflow: hidden; }
+.phase-header { background: var(--surface); padding: 1rem 1.25rem; cursor: pointer; display: flex; align-items: center; gap: .75rem; user-select: none; }
+.phase-header:hover { background: #1c2330; }
+.phase-header .chevron { transition: transform .2s; font-size: .85rem; }
+.phase.open .phase-header .chevron { transform: rotate(90deg); }
+.phase-title { flex: 1; }
+.phase-title h2 { font-size: 1rem; font-weight: 600; }
+.phase-title p { font-size: .8rem; color: var(--muted); }
+.phase-meta { display: flex; gap: .5rem; align-items: center; }
+.phase-date { font-size: .75rem; color: var(--muted); background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: .2rem .6rem; }
+.phase-body { display: none; padding: 1rem; gap: .75rem; flex-direction: column; }
+.phase.open .phase-body { display: flex; }
+.item { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; transition: border-color .15s; }
+.item:hover { border-color: var(--accent); }
+.item-header { display: flex; gap: .5rem; align-items: flex-start; flex-wrap: wrap; }
+.item-header h3 { flex: 1; font-size: .95rem; font-weight: 600; min-width: 160px; }
+.item-desc { font-size: .82rem; color: var(--muted); margin-top: .35rem; line-height: 1.5; }
+.item-deps { font-size: .75rem; color: var(--accent); margin-top: .3rem; }
+.item.hidden { display: none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>SigmaOS Utilities Development Roadmap</h1>
+  <p>A strategic plan for building the userland utilities ecosystem of SigmaOS — from core shell tools to advanced system applications.</p>
+</header>
+<div class="stats">
+  <div class="stat-card"><div class="num" id="stat-total">42</div><div class="label">Total Items</div></div>
+  <div class="stat-card"><div class="num" id="stat-critical">9</div><div class="label">Critical</div></div>
+  <div class="stat-card"><div class="num" id="stat-inprog">1</div><div class="label">In Progress</div></div>
+  <div class="stat-card"><div class="num" id="stat-cats">13</div><div class="label">Categories</div></div>
+</div>
+<div class="controls">
+  <input type="text" id="search" placeholder="Search utilities…" oninput="filter()">
+  <select id="cat" onchange="filter()">
+    <option value="">All Categories</option>
+    <option>Application</option><option>Compatibility</option><option>Development</option>
+    <option>Documentation</option><option>Editor</option><option>File System</option>
+    <option>Graphics</option><option>Network</option><option>Security</option>
+    <option>Shell</option><option>System</option><option>Terminal</option><option>Text Processing</option>
+  </select>
+  <select id="pri" onchange="filter()">
+    <option value="">All Priorities</option>
+    <option>Critical</option><option>High</option><option>Medium</option><option>Low</option>
+  </select>
+  <select id="status" onchange="filter()">
+    <option value="">All Statuses</option>
+    <option>In Progress</option><option>Planned</option><option>Completed</option>
+  </select>
+</div>
+<div class="legend">
+  <span class="badge critical">Critical</span>
+  <span class="badge high">High</span>
+  <span class="badge medium">Medium</span>
+  <span class="badge low">Low</span>
+  &nbsp;|&nbsp;
+  <span class="badge inprog">In Progress</span>
+  <span class="badge planned">Planned</span>
+  <span class="badge done">Completed</span>
+</div>
+<main id="main"></main>
+<script>
+const PHASES = [
+ { id:"p1", title:"Phase 1: Core System Foundations", theme:"Build the bedrock utilities every OS needs", date:"Q1 2026", status:"In Progress", items:[
+  { id:"p1-1", name:"Process Manager (ps, top, kill)", pri:"Critical", cat:"System", desc:"Interface with kernel process shards: list PIDs, view CPU/memory, send IPC signals.", deps:[] },
+  { id:"p1-2", name:"File System Navigator (ls, cd, mkdir, rm)", pri:"Critical", cat:"File System", desc:"VFS user-space operations: list directories, create/remove nodes, handle permissions.", deps:[] },
+  { id:"p1-3", name:"Text File Viewer (cat, less, head, tail)", pri:"Critical", cat:"File System", desc:"Read files from VFS with pagination, streaming, and line counting.", deps:[] },
+  { id:"p1-4", name:"Shell / Command Interpreter (sh)", pri:"Critical", cat:"Shell", desc:"Interactive shell with IPC dispatch, piping, variable expansion, and scripting.", deps:["p1-1","p1-2"] },
+  { id:"p1-5", name:"Text Editor (nano/vi-style)", pri:"High", cat:"Editor", desc:"Terminal editor for config files, scripts, and kernel parameters. Basic syntax highlighting.", deps:[] },
+  { id:"p1-6", name:"Environment Variable Manager (env, export)", pri:"High", cat:"System", desc:"View/modify environment variables, PATH resolution for shard binaries, shell profiles.", deps:[] },
+  { id:"p1-7", name:"Manual Pages System (man)", pri:"Medium", cat:"Documentation", desc:"Built-in documentation viewer. Every utility ships its own man page from docs/.", deps:["p1-4"] },
+  { id:"p1-8", name:"Date & Time Utilities (date, cal, uptime)", pri:"Low", cat:"System", desc:"Display system time, calendar, and uptime. Essential for scripting and logging.", deps:[] }
+ ]},
+ { id:"p2", title:"Phase 2: Developer & Power Tools", theme:"Equip developers with powerful utilities", date:"Q2 2026", status:"Planned", items:[
+  { id:"p2-1", name:"Text Processing (grep, sed, awk, cut, sort)", pri:"Critical", cat:"Text Processing", desc:"Pattern matching, stream editing, field extraction on files and IPC message streams.", deps:["p1-3"] },
+  { id:"p2-2", name:"File Search & Locate (find, locate, which)", pri:"High", cat:"File System", desc:"Search filesystem by name, content, size, or date. Resolve shard binary locations.", deps:["p1-2"] },
+  { id:"p2-3", name:"Archive Manager (tar, zip, gzip)", pri:"High", cat:"File System", desc:"Create/extract compressed archives. Supports tar, gzip, zip for backups.", deps:["p1-2"] },
+  { id:"p2-4", name:"Network Diagnostics (ping, netstat, ifconfig)", pri:"High", cat:"Network", desc:"Test connectivity via network driver shard, inspect open ports and connections.", deps:[] },
+  { id:"p2-5", name:"Build System (make)", pri:"High", cat:"Development", desc:"Dependency-based build automation. Compile SigmaOS apps, manage incremental builds.", deps:["p1-4"] },
+  { id:"p2-6", name:"Hex Editor / Binary Viewer (xxd, hexdump)", pri:"Medium", cat:"Development", desc:"Inspect binary files and memory dumps. Debug IPC messages and kernel structures.", deps:[] },
+  { id:"p2-7", name:"Diff & Patch Tools (diff, patch)", pri:"Medium", cat:"Development", desc:"Compare files, generate unified diffs, apply patches. Core to version control.", deps:["p1-3"] },
+  { id:"p2-8", name:"Disk Usage Analyzer (df, du, ncdu)", pri:"Medium", cat:"System", desc:"Report disk space by filesystem and directory. Interactive tree for space analysis.", deps:["p1-2"] },
+  { id:"p2-9", name:"System Monitor Dashboard", pri:"Medium", cat:"System", desc:"Real-time CPU, memory, disk, network visualization. TUI graphs and alerts.", deps:["p1-1"] }
+ ]},
+ { id:"p3", title:"Phase 3: Userland Applications", theme:"Build interactive applications users love", date:"Q3 2026", status:"Planned", items:[
+  { id:"p3-1", name:"Package Manager (pkg)", pri:"Critical", cat:"System", desc:"Install, update, remove apps and libraries. Dependency resolution and repo management.", deps:["p2-5"] },
+  { id:"p3-2", name:"Terminal Multiplexer (tmux-style)", pri:"High", cat:"Terminal", desc:"Split panes, manage multiple sessions, detach/reattach workflows.", deps:["p1-4"] },
+  { id:"p3-3", name:"File Manager (mc/ranger-style)", pri:"High", cat:"File System", desc:"Dual-pane file manager with preview, quick nav, batch ops. Keyboard-driven.", deps:["p1-2","p1-3"] },
+  { id:"p3-4", name:"Calculator (bc, dc)", pri:"High", cat:"Application", desc:"Arbitrary precision calculator with scripting support. Float, bases, math functions.", deps:[] },
+  { id:"p3-5", name:"Image Viewer (fim/sxiv-style)", pri:"Medium", cat:"Application", desc:"Fast terminal image viewer with thumbnail mode and slideshow. Integrates with file manager.", deps:["p3-3"] },
+  { id:"p3-6", name:"Music Player (cmus-style)", pri:"Medium", cat:"Application", desc:"Terminal music player with playlist management, gapless playback, library browsing.", deps:[] },
+  { id:"p3-7", name:"IRC/Chat Client (irssi-style)", pri:"Low", cat:"Network", desc:"Terminal IRC client with multi-server, channel management, and scripting.", deps:["p2-4"] },
+  { id:"p3-8", name:"Task / To-Do Manager", pri:"Low", cat:"Application", desc:"Task tracking with priorities, deadlines, categories. Markdown export and shell integration.", deps:[] }
+ ]},
+ { id:"p4", title:"Phase 4: Advanced System & Security", theme:"Harden and extend the system for production", date:"Q4 2026", status:"Planned", items:[
+  { id:"p4-1", name:"User & Permission Manager (useradd, chmod, chown)", pri:"Critical", cat:"Security", desc:"Create and manage user accounts, set file permissions via VFS permission server.", deps:["p1-4"] },
+  { id:"p4-2", name:"Firewall Configuration (iptables-style)", pri:"High", cat:"Security", desc:"Packet filtering, NAT, connection tracking through the network driver shard.", deps:["p2-4"] },
+  { id:"p4-3", name:"SSH Client & Server (openssh)", pri:"High", cat:"Network", desc:"Secure remote shell with key-based auth, port forwarding, and SFTP file transfer.", deps:["p4-1","p2-4"] },
+  { id:"p4-4", name:"Service Manager (systemd-style)", pri:"High", cat:"System", desc:"Start/stop/manage background shards. Dependency-based boot, auto-restart, logging.", deps:["p1-1","p1-4"] },
+  { id:"p4-5", name:"Log Manager (journald/syslog-style)", pri:"High", cat:"System", desc:"Structured logging with query, filtering, rotation. Centralised shard log collection.", deps:["p1-3"] },
+  { id:"p4-6", name:"Container Runtime (docker-style)", pri:"Medium", cat:"System", desc:"Lightweight isolation via SigmaOS namespaces/cgroups. Image build and lifecycle.", deps:["p4-1","p4-4"] },
+  { id:"p4-7", name:"Cryptography Tools (openssl-style)", pri:"Medium", cat:"Security", desc:"Generate keys, create certs, encrypt/decrypt files, compute hashes.", deps:[] },
+  { id:"p4-8", name:"Backup & Restore Utility (rsync-style)", pri:"Medium", cat:"File System", desc:"Incremental file sync with delta transfer, compression, and resume.", deps:["p2-3"] },
+  { id:"p4-9", name:"Performance Profiler (perf-style)", pri:"Low", cat:"Development", desc:"CPU sampling, call graph generation, hotspot identification.", deps:["p1-1"] }
+ ]},
+ { id:"p5", title:"Phase 5: Ecosystem & Developer Experience", theme:"Create a thriving ecosystem around SigmaOS", date:"Q1 2027", status:"Planned", items:[
+  { id:"p5-1", name:"SDK & API Documentation", pri:"Critical", cat:"Documentation", desc:"Headers, libraries, examples. Document all system calls and IPC mechanisms.", deps:[] },
+  { id:"p5-2", name:"POSIX Compatibility Layer", pri:"Critical", cat:"Compatibility", desc:"Shim for POSIX apps. Run existing Unix software with minimal modification.", deps:["p3-1"] },
+  { id:"p5-3", name:"Graphics Subsystem (Wayland/X11-style)", pri:"High", cat:"Graphics", desc:"Windowing and compositing protocol for graphical applications.", deps:["p4-1"] },
+  { id:"p5-4", name:"Web Browser (lynx/w3m-style)", pri:"High", cat:"Network", desc:"Text-mode web browser for documentation and lightweight browsing.", deps:["p2-4"] },
+  { id:"p5-5", name:"Version Control (git-style)", pri:"High", cat:"Development", desc:"Distributed VCS for source code management. Branch, merge, commit, collaborate.", deps:["p2-7"] },
+  { id:"p5-6", name:"Integrated Development Environment (IDE)", pri:"Medium", cat:"Development", desc:"Terminal IDE with project nav, build integration, debugging, LSP support.", deps:["p1-5","p5-5"] },
+  { id:"p5-7", name:"Emulator / VM Support (QEMU integration)", pri:"Medium", cat:"System", desc:"Run other OSes inside SigmaOS. Hardware virtualisation and emulation.", deps:["p4-6"] },
+  { id:"p5-8", name:"App Store / Repository Portal", pri:"Medium", cat:"Application", desc:"Curated SigmaOS app repo with ratings, reviews, and one-click install.", deps:["p3-1"] }
+ ]}
+];
+
+function priClass(p){ return p.toLowerCase().replace(/ /g,''); }
+function statusClass(s){ return s==="In Progress"?"inprog":s==="Completed"?"done":"planned"; }
+
+function render(){
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  PHASES.forEach(ph=>{
+    const div = document.createElement('div');
+    div.className = 'phase' + (ph.id==='p1'?' open':'');
+    div.dataset.status = ph.status;
+    div.innerHTML = `
+      <div class="phase-header" onclick="toggle(this.parentElement)">
+        <span class="chevron">▶</span>
+        <div class="phase-title">
+          <h2>${ph.title}</h2>
+          <p>${ph.theme}</p>
+        </div>
+        <div class="phase-meta">
+          <span class="badge ${statusClass(ph.status)}">${ph.status}</span>
+          <span class="phase-date">${ph.date}</span>
+        </div>
+      </div>
+      <div class="phase-body" id="body-${ph.id}">
+        ${ph.items.map(it=>`
+          <div class="item" id="${it.id}" data-cat="${it.cat}" data-pri="${it.pri}" data-phase="${ph.id}">
+            <div class="item-header">
+              <h3>${it.name}</h3>
+              <span class="badge ${priClass(it.pri)}">${it.pri}</span>
+              <span class="badge planned">${it.cat}</span>
+            </div>
+            <div class="item-desc">${it.desc}</div>
+            ${it.deps.length?`<div class="item-deps">Depends on: ${it.deps.join(', ')}</div>`:''}
+          </div>`).join('')}
+      </div>`;
+    main.appendChild(div);
+  });
+}
+
+function toggle(el){ el.classList.toggle('open'); }
+
+function filter(){
+  const q = document.getElementById('search').value.toLowerCase();
+  const cat = document.getElementById('cat').value;
+  const pri = document.getElementById('pri').value;
+  const st  = document.getElementById('status').value;
+  let visible = 0;
+  document.querySelectorAll('.item').forEach(el=>{
+    const show = (!q || el.innerText.toLowerCase().includes(q))
+      && (!cat || el.dataset.cat === cat)
+      && (!pri || el.dataset.pri === pri);
+    el.classList.toggle('hidden', !show);
+    if(show) visible++;
+  });
+  document.getElementById('stat-total').textContent = visible;
+  // Auto-open phases with visible items
+  document.querySelectorAll('.phase').forEach(ph=>{
+    const hasVisible = [...ph.querySelectorAll('.item')].some(i=>!i.classList.contains('hidden'));
+    if(q||cat||pri) ph.classList.toggle('open', hasVisible);
+  });
+}
+
+render();
+</script>
+</body>
+</html>

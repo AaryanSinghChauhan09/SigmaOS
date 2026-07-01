@@ -1,0 +1,26 @@
+{
+    "profession": "haptic_feedback_system_designer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "haptic_feedback_system_designer_workspace",
+        "specialized_analytics",
+        "compliance_manager"
+    ],
+    "rules": [
+        "Industry standards",
+        "professional ethics"
+    ],
+    "calculators": [
+        "Efficiency metrics",
+        "cost analysis"
+    ],
+    "algorithms": [
+        "Workflow optimization",
+        "adaptive assistance"
+    ],
+    "automation": {
+        "self_healing": "Continuous health check for Haptic Feedback System Designer tools",
+        "rollback": "Automatic state snapshots"
+    }
+}

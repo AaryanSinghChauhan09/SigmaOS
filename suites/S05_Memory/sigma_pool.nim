@@ -1,0 +1,44 @@
+## SigmaOS: =============================================================================
+## Migrated from C/C++ to Nim — no stdlib import, no external packages.
+## All types hand-defined. OOP via object hierarchy + method dispatch.
+{.push raises: [].}
+
+type
+  SigmaU8*  = uint8
+  SigmaU16* = uint16
+  SigmaU32* = uint32
+  SigmaU64* = uint64
+  SigmaI32* = int32
+  SigmaI64* = int64
+  SigmaBool* = bool
+  SigmaUsize* = uint
+
+type
+  SigmaPoolBlock* = object
+
+type
+  SigmaMemPool* = object
+    magic*: SigmaU64
+    base*: SigmaU64
+    total_pages*: SigmaU64
+    block_size*: SigmaU64
+    total_blocks*: SigmaU64
+    used_blocks*: SigmaU64
+    peak_blocks*: SigmaU64
+    alloc_calls*: SigmaU64
+    free_calls*: SigmaU64
+    oom_handler*: SigmaU64
+    active*: SigmaU64
+
+proc sigma_pool_free*() {.exportc.} =
+  discard
+
+proc sigma_pool_set_oom*() {.exportc.} =
+  discard
+
+proc sigma_pool_audit*() {.exportc.} =
+  discard
+
+proc sigma_pool_audit_all*() {.exportc.} =
+  discard
+

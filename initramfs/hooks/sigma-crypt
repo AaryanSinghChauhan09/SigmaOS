@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-or-later
+# =============================================================================
+# initramfs hook: sigma-crypt
+# (Arch mkinitcpio hook system inspired)
+#
+# build() — called at ISO assembly time to add files to the initramfs image.
+# run()   — called at boot time inside the initramfs environment.
+# =============================================================================
+
+build() {
+    # Add the cryptfs unlock binary to the initramfs
+    if [[ -f "$BUILDDIR/bin/sigma_cryptfs_unlock" ]]; then
+        cp "$BUILDDIR/bin/sigma_cryptfs_unlock" "$INITRAMFS_ROOT/bin/"
+        chmod 0755 "$INITRAMFS_ROOT/bin/sigma_cryptfs_unlock"
+    else
+        echo "[sigma-crypt] WARNING: sigma_cryptfs_unlock not built — skipping crypt hook" >&2
+        return 0
+    fi
+
+    # Include the crypttab if it exists in the source tree
+    if [[ -f "etc/sigma/crypttab" ]]; then
+        mkdir -p "$INITRAMFS_ROOT/etc/sigma"
+        cp "etc/sigma/crypttab" "$INITRAMFS_ROOT/etc/sigma/crypttab"
+    fi
+}
+
+run() {
+    # Called inside the minimal initramfs environment at boot
+    [[ -f /etc/sigma/crypttab ]] || return 0
+
+    echo "[sigma-crypt] Unlocking encrypted root volume..."
+    sigma_cryptfs_unlock "$(cat /etc/sigma/crypttab)" || {
+        echo "[sigma-crypt] FATAL: Failed to unlock root. Dropping to rescue shell." >&2
+        exec /bin/sh
+    }
+    echo "[sigma-crypt] Root volume unlocked."
+}

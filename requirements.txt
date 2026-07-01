@@ -1,6 +1,0 @@
-# SigmaOS Sovereign v2.0 Dependency Manifest
-# ============================================
-# 100% Zero-Dependency Core.
-# All functionality is provided by sigma_std.py and Python stdlib only.
-# No external (third-party) packages are required or permitted.
-# This file is intentionally empty of pip-installable entries.

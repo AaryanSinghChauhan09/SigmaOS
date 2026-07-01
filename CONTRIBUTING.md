@@ -1,24 +1,22 @@
-# Contributing to SigmaOS 🌌
+# Contributing to SigmaOS
 
-Welcome to the Sovereign Collective. SigmaOS is an ambitious endeavor to build a post-corporate, AI-native operating system. As we transition from a **Conceptual Prototype** to a **Functional Sovereign**, we need your help.
+SigmaOS follows an Ubuntu-inspired governance model, but with strict technical constraints to guarantee sovereignty.
 
-## 🛠️ How to Contribute
+## Technical Mandates
 
-1. **Hydrate Modules**: Many parts of the kernel and userland are currently stubs. Check the [Roadmap](./ROADMAP.md) for priority implementation areas.
-2. **Sovereign Apps**: Build apps that leverage the `OmniAutomator` and `SovereignVault` APIs.
-3. **Security Audits**: Help us harden the **Zero-Trust Architecture**.
-4. **UI/UX**: Help evolve the Morphic UI into a world-class desktop experience.
+1. **Rust Only**: C and C++ are strictly prohibited in SigmaOS. All components (kernel, drivers, shell, UI, apps) must be written in Rust.
+2. **`no_std` and `no_builtins`**: All code must compile in a `#![no_std]` environment. You must not rely on `std`, `libc`, POSIX, or any external standard libraries.
+3. **No Third-Party Dependencies**: No external crates or third-party submodules are allowed. If you need a feature (e.g., parsing, cryptography, specific data structures), you must implement it from scratch in the SigmaOS repository using our native Rust SDKs.
+4. **Object-Oriented Architecture**: Use Rust Structs and Traits to mirror OOP principles (encapsulation, abstraction, polymorphism).
 
-## 🧬 Development Principles
+## Contribution Workflow
 
-- **Zero-Trust by Default**: Never trust a process; always verify.
-- **Privacy First**: No telemetry, no hardcoded identities.
-- **AI-Native**: Design for LLM-orchestration, not just human input.
+1. **Fork & Branch**: Create a feature branch off `main`.
+2. **Format**: Run `cargo fmt` to adhere to standard Rust formatting.
+3. **Lint**: Ensure `cargo clippy --target x86_64-unknown-none` passes with no warnings (`-D warnings`).
+4. **Testing**: All PRs must maintain 100% existing test pass rate (`cargo test`).
+5. **Review**: 2 core maintainer approvals required for kernel changes.
+6. **CI**: All 9 CI jobs (3 profiles × 3 targets) must pass green.
 
-## 🚀 Getting Started
-
-1. Fork the repo.
-2. Run `python sigma_setup.py` to hydrate your local workspace.
-3. Launch with `python boot.py`.
-
-Join the SigmaOS Mesh. Let's build the universe.
+## Licensing
+All contributions must include the `// SPDX-License-Identifier: GPL-2.0-or-later` header.

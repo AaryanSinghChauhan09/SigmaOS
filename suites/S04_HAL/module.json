@@ -1,0 +1,32 @@
+{
+    "module":       "S04_HAL",
+    "version":      "1.0.0",
+    "type":         "kernel_core",
+    "description":  "Hardware Abstraction Layer — contract-based driver registration, device discovery, interrupt routing.",
+    "dependencies": ["S01_Genesis"],
+    "features_required": [],
+    "features_optional": [],
+    "memory": {
+        "pool_pages":   8,
+        "max_alloc_mb": 4,
+        "heap_type":    "static"
+    },
+    "drivers": {
+        "display":  ["vga_driver.c", "framebuffer_driver.c"],
+        "input":    ["ps2_driver.c"],
+        "storage":  ["ata_driver.c", "ahci_driver.c", "nvme_driver.c"],
+        "network":  ["e1000_driver.c", "virtio_net_driver.c"],
+        "timer":    ["pit_driver.c", "hpet_driver.c"],
+        "serial":   ["uart_driver.c"]
+    },
+    "exports": [
+        "hal_register_display", "hal_register_input",
+        "hal_register_storage", "hal_register_net",
+        "hal_register_timer",   "hal_register_serial",
+        "hal_get_display",      "hal_get_input",
+        "hal_get_storage",      "hal_get_net",
+        "hal_get_timer",        "hal_get_serial",
+        "hal_discover_hardware"
+    ],
+    "test_targets": ["test_hal_registry", "test_mock_display"]
+}

@@ -1,0 +1,28 @@
+{
+    "profession": "asteroid_miner",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "spectroscopic_analyzer",
+        "drill-bit_thermal_monitor",
+        "low-gravity_navigation",
+        "ore-density_mapper"
+    ],
+    "rules": [
+        "Outer Space Treaty compliance",
+        "resource extraction protocols"
+    ],
+    "calculators": [
+        "Delta-V",
+        "ore-yield probability",
+        "trajectory-delta"
+    ],
+    "algorithms": [
+        "Autonomous excavation pathing",
+        "structural stability prediction in vacuum"
+    ],
+    "automation": {
+        "self_healing": "Thruster-link verification, drill-head cooling sync",
+        "rollback": "Excavation state snapshots, orbital-return baseline restoration"
+    }
+}

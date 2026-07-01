@@ -1,0 +1,6 @@
+{
+  "module": "S29_IntentBridge",
+  "dependencies": [
+    "S01_Genesis"
+  ]
+}

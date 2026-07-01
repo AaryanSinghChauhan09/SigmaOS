@@ -1,0 +1,42 @@
+# Makefile.variants
+# Build matrix for SigmaOS across different environments
+
+PROFILES += standalone
+PROFILES += browser-wasm
+PROFILES += cloud-native
+PROFILES += vm-qemu
+PROFILES += embedded-rpi
+PROFILES += docker-container
+PROFILES += live-iso
+PROFILES += serverless-lambda
+
+PROFILE ?= standalone
+
+.PHONY: all iso build container vmdk clean
+
+all: build
+
+build:
+	@echo "Building SigmaOS for profile: $(PROFILE)"
+	@mkdir -p dist/$(PROFILE)
+	@# Simulated build step
+	@touch dist/$(PROFILE)/sigmaos.bin
+	@echo "Build complete."
+
+iso: build
+	@echo "Creating bootable ISO for $(PROFILE)..."
+	@touch dist/$(PROFILE)/sigmaos.iso
+	@echo "ISO creation complete."
+
+container: build
+	@echo "Packaging Docker container for $(PROFILE)..."
+	@touch dist/$(PROFILE)/sigmaos.tar
+	@echo "Container packaging complete."
+
+vmdk: build
+	@echo "Creating VMDK image for $(PROFILE)..."
+	@touch dist/$(PROFILE)/sigmaos.vmdk
+	@echo "VMDK creation complete."
+
+clean:
+	@rm -rf dist/

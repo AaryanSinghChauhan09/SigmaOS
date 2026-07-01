@@ -1,0 +1,33 @@
+{
+    "profession": "lawyer",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "case_indexing",
+        "legal_references",
+        "compliance_document_management",
+        "secure_communication",
+        "bns-ipc_cross-mapper"
+    ],
+    "rules": [
+        "Bharatiya Nyaya Sanhita (BNS) 2023",
+        "Bharatiya Nagarik Suraksha Sanhita (BNSS) 2023",
+        "Bharatiya Sakshya Adhiniyam (BSA) 2023",
+        "Constitution of India"
+    ],
+    "calculators": [
+        "Court fee",
+        "stamp duty",
+        "Limitation Period Calc",
+        "Alimony Estimator"
+    ],
+    "algorithms": [
+        "Case law search",
+        "compliance checker",
+        "automated legal drafting"
+    ],
+    "automation": {
+        "self_healing": "Legal reference sync, document authenticity verification",
+        "rollback": "Case history snapshots, immutable filing records"
+    }
+}

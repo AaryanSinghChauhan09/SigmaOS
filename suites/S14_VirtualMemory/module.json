@@ -1,0 +1,7 @@
+{
+  "module": "S14_VirtualMemory",
+  "dependencies": [
+    "S01_Genesis",
+    "S05_Memory"
+  ]
+}

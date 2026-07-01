@@ -1,0 +1,28 @@
+{
+    "profession": "particle_physicist",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "cern-lattice-link",
+        "collider-event_analyzer",
+        "higgs-boson-search-nexus",
+        "muon-chamber_monitor"
+    ],
+    "rules": [
+        "Open-science protocols",
+        "high-energy safety standards"
+    ],
+    "calculators": [
+        "Energy-to-mass delta",
+        "collision-luminosity",
+        "decay-width"
+    ],
+    "algorithms": [
+        "Automated track reconstruction",
+        "dark-matter candidate search"
+    ],
+    "automation": {
+        "self_healing": "Sensor-lattice calibration, data-stream consistency check",
+        "rollback": "Experiment-state snapshots, baseline-simulation restoration"
+    }
+}

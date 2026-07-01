@@ -1,0 +1,17 @@
+# SigmaOS Vendoring Manifest
+# 
+# Philosophy: We DO NOT use `pip install` for core OS functions.
+# Any absolutely critical third-party code must be audited, stripped, 
+# and explicitly vendored into the sigmaos/vendor/ directory.
+
+[policy]
+allow_dynamic_fetching = false
+enforce_hash_validation = true
+
+[dependencies]
+# Example of a legally vendored minimal crypto library
+[dependencies.minimal_crypto]
+version = "1.0.2"
+source = "https://example.com/minimal_crypto.c"
+sha256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+reason = "Required for SovereignMesh signatures. Stripped OpenSSL dependency."

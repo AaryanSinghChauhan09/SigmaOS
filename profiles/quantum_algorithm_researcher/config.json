@@ -1,0 +1,29 @@
+{
+    "profession": "quantum_algorithm_researcher",
+    "compliance_level": "sovereign-high",
+    "resource_priority": "adaptive",
+    "modules": [
+        "qiskit-lattice",
+        "quip_interpreter",
+        "cryogenic_state_monitor",
+        "entanglement_analyzer"
+    ],
+    "rules": [
+        "Quantum supremacy protocols",
+        "error correction standards"
+    ],
+    "calculators": [
+        "Qubit fidelity",
+        "decoherence rate",
+        "gate-error probability"
+    ],
+    "algorithms": [
+        "Shor's optimization",
+        "Grover's search",
+        "Quantum Fourier Transform"
+    ],
+    "automation": {
+        "self_healing": "Continuous decoherence correction, qubit state validation",
+        "rollback": "Quantum state checkpointing, entanglement-graph restoration"
+    }
+}

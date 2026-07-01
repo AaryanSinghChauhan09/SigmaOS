@@ -1,7 +1,0 @@
-
-
-NONE = 'none'
-TLS13 = 'TLS 1.3'
-QUANTUM_TLS = 'QuantumTLS (Kyber-1024+X25519)'
-ONION = 'Tor Onion'
-MESH_AES = 'MeshAES-256-GCM'

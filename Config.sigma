@@ -1,0 +1,81 @@
+# Config.sigma — SigmaOS Kconfig (Unikraft-inspired component selection)
+# Usage: make menuconfig   (requires Kconfig parser e.g. kconfiglib)
+#        make defconfig ARCH=x86_64
+#        cmake -B build $(scripts/kconfig_to_cmake.py .config)
+
+mainmenu "SigmaOS Configuration"
+
+# ── Platform ────────────────────────────────────────────────────────────────
+menu "Platform Target"
+choice
+    prompt "Platform"
+    default SIGMA_PLAT_STANDALONE
+
+config SIGMA_PLAT_STANDALONE  bool "Standalone bare-metal (x86_64 desktop)"
+config SIGMA_PLAT_KVM         bool "KVM guest (sigma-hypervisor hosted)"
+config SIGMA_PLAT_IOT         bool "Embedded IoT (ARM64, no display)"
+config SIGMA_PLAT_AI_DESKTOP  bool "AI desktop (GPU, full userland)"
+config SIGMA_PLAT_CLOUD       bool "Cloud VM (immutable root, no GUI)"
+endchoice
+endmenu
+
+# ── Kernel Components ────────────────────────────────────────────────────────
+menu "Kernel Components"
+config SIGMA_ZEROTRUST   bool "Zero-Trust enforcer (pledge/unveil/AVC)"  default y
+config SIGMA_CRYPTFS     bool "Encrypted filesystem layer"               default y
+config SIGMA_HYPERVISOR  bool "Type-1 Hypervisor"
+    default n if SIGMA_PLAT_IOT
+    default n if SIGMA_PLAT_CLOUD
+    default y
+config SIGMA_AI_ENGINE   bool "Neural inference engine (sigmad-ai)"
+    default n if SIGMA_PLAT_IOT
+    default y
+config SIGMA_JAIL        bool "Process namespace jailing"                default y
+config SIGMA_MAC         bool "Mandatory Access Control (AVC matrix)"    default y
+config SIGMA_ASLR        bool "Address Space Layout Randomisation (42-bit)" default y
+config SIGMA_MCS         bool "Mixed Criticality Scheduling"             default y
+config SIGMA_PM          bool "Power management states"
+    default y if SIGMA_PLAT_IOT
+    default n
+config SIGMA_IMMUTABLE_ROOT bool "Read-only root filesystem at runtime"
+    default y if SIGMA_PLAT_CLOUD
+    default n
+endmenu
+
+# ── Networking ───────────────────────────────────────────────────────────────
+menu "Networking"
+config SIGMA_NET_TCP     bool "TCP/IP stack"                             default y
+config SIGMA_NET_TLS     bool "TLS 1.3 with Kyber-1024 hybrid"          default y
+config SIGMA_NET_DNS     bool "DNS resolver with DoH"                   default y
+config SIGMA_NET_DHCP    bool "DHCP client"                             default y
+config SIGMA_NET_QUIC    bool "QUIC transport"
+    default y if !SIGMA_PLAT_IOT
+    default n
+config SIGMA_NET_SHIELD  bool "sigma-shield packet filter"              default y
+config SIGMA_NET_WIFI    bool "Wi-Fi 802.11 + WPA3"                    default y
+    depends on !SIGMA_PLAT_CLOUD
+config SIGMA_NET_BT      bool "Bluetooth (separate driver binary)"
+    default y if SIGMA_PLAT_STANDALONE
+    default n
+endmenu
+
+# ── Memory Allocator ─────────────────────────────────────────────────────────
+menu "Memory Allocator"
+choice
+    prompt "Kernel heap allocator"
+    default SIGMA_ALLOC_BUDDY
+
+config SIGMA_ALLOC_BUDDY bool "Buddy allocator (general purpose)"
+config SIGMA_ALLOC_SLAB  bool "SLAB (high throughput, many small objects)"
+config SIGMA_ALLOC_TLSF  bool "TLSF (real-time, O(1) alloc/free)"
+    depends on SIGMA_PLAT_IOT || SIGMA_MCS
+endchoice
+endmenu
+
+# ── Security ─────────────────────────────────────────────────────────────────
+menu "Security Hardening"
+config SIGMA_SAFESTACK   bool "LLVM SafeStack for userland binaries"    default y
+config SIGMA_RETGUARD    bool "RetGuard random stack canary"            default y
+config SIGMA_USERCOPY    bool "sigma_usercopy type-safe kernel↔user API" default y
+config SIGMA_FORTIFY     bool "_FORTIFY_SOURCE=2 on all userland"       default y
+endmenu

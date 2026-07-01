@@ -1,0 +1,6 @@
+{
+  "module": "S35_LatticeConsensusEngine",
+  "dependencies": [
+    "S01_Genesis"
+  ]
+}

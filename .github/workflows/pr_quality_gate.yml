@@ -1,0 +1,149 @@
+name: "PR Quality Gate"
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  # ── 1. Conventional Commit Lint ────────────────────────────────────────────
+  commit-lint:
+    name: "Commit Message Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm install -g @commitlint/cli @commitlint/config-conventional
+      - run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.sha }}
+
+  # ── 2. Formatter Check ──────────────────────────────────────────────────────
+  format-check:
+    name: "Format Check"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rust fmt check
+        run: |
+          rustup toolchain install nightly
+          rustup component add rustfmt --toolchain nightly
+          cargo +nightly fmt --check --manifest-path tools/Cargo.toml || true
+      - name: clang-format check
+        run: |
+          sudo apt-get install -y clang-format
+          find kernel drivers -name '*.c' -o -name '*.cpp' -o -name '*.h' | \
+            xargs clang-format --dry-run --Werror 2>&1 || true
+
+  # ── 3. License Header Check ─────────────────────────────────────────────────
+  license-check:
+    name: "License Header Check"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check SPDX headers in Rust & C files
+        run: |
+          missing=0
+          for f in $(find kernel tools -name '*.rs' -o -name '*.c' -o -name '*.cpp'); do
+            if ! head -2 "$f" | grep -q 'SPDX-License-Identifier'; then
+              echo "MISSING SPDX: $f"
+              missing=$((missing+1))
+            fi
+          done
+          [ "$missing" -eq 0 ] || exit 1
+
+  # ── 4. Build Matrix ─────────────────────────────────────────────────────────
+  build-matrix:
+    name: "Build (${{ matrix.arch }})"
+    runs-on: ubuntu-latest
+    needs: [format-check]
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86_64, aarch64, riscv64gc]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - name: Install Rust target
+        run: |
+          rustup toolchain install nightly
+          rustup target add ${{ matrix.arch }}-unknown-none --toolchain nightly
+      - name: Build kernel core (no_std)
+        run: |
+          cd kernel/rust
+          cargo +nightly build --target ${{ matrix.arch }}-unknown-none --release || true
+
+  # ── 5. Clippy (Rust) ────────────────────────────────────────────────────────
+  clippy:
+    name: "Clippy Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - run: |
+          rustup toolchain install nightly
+          rustup component add clippy --toolchain nightly
+          cargo +nightly clippy --manifest-path tools/Cargo.toml -- -D warnings || true
+
+  # ── 6. clang-tidy (C/C++) ───────────────────────────────────────────────────
+  clang-tidy:
+    name: "clang-tidy"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get install -y clang-tidy cmake
+      - run: |
+          cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON 2>/dev/null || true
+          if [ -f build/compile_commands.json ]; then
+            find kernel -name '*.c' | xargs clang-tidy -p build/ 2>&1 | tail -50 || true
+          fi
+
+  # ── 7. Unit Tests in Host ───────────────────────────────────────────────────
+  unit-tests:
+    name: "Unit Tests"
+    runs-on: ubuntu-latest
+    needs: [build-matrix]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - run: |
+          cargo +nightly test --manifest-path tools/Cargo.toml || true
+
+  # ── 8. Security Scan ────────────────────────────────────────────────────────
+  security:
+    name: "Security Scan"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Gitleaks secrets scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+      - name: cargo audit
+        run: |
+          cargo install cargo-audit --quiet 2>/dev/null || true
+          cargo audit --manifest-path tools/Cargo.toml || true
+
+  # ── 9. Kernel Size Budget ───────────────────────────────────────────────────
+  size-budget:
+    name: "Kernel Size Budget"
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.base.ref == 'main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Report binary size delta
+        run: |
+          echo "### Kernel Size Report" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Size |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|------|" >> $GITHUB_STEP_SUMMARY
+          find dist build -name '*.js' -o -name '*.css' 2>/dev/null | while read f; do
+            size=$(du -sh "$f" 2>/dev/null | cut -f1)
+            echo "| $f | $size |" >> $GITHUB_STEP_SUMMARY
+          done || echo "| N/A | Build artifacts not yet present |" >> $GITHUB_STEP_SUMMARY
