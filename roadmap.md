@@ -1,121 +1,177 @@
-# SigmaOS Sovereign Roadmap 🗺️
+# SigmaOS Master Strategic & Implementation Roadmap 🗺️
+
+This master roadmap integrates our strategic vision, concrete task tracking, subsystem enhancement plans, and detailed timeline milestones from 2026 to 2032. 
 
 SigmaOS draws inspiration from the best aspects of various Linux distributions:
-
 - **Debian‑style stability** → predictable releases
 - **Fedora‑style innovation** → cutting‑edge drivers/security
 - **Arch‑style flexibility** → modular FS and userland
 - **Ubuntu‑style ecosystem** → strong community and package management
 
-## Phase 1: Core System & Stability
+---
 
-- [ ] Unify branches into a stable main
-- [ ] Kernel scheduler: finalize Round Robin/EDF into a robust, tested default
-- [ ] Memory allocator: stress‑test and formally verify
-- [ ] Syscall layer: expand non‑POSIX ABI for consistency
-- [ ] Release cadence: adopt predictable stable releases
+## 🏗️ Strategic Phase Plan & Distro-Inspired Model
 
-## Phase 2: Hardware Support
+### Phase 1: Foundation & Branch Unification (Debian/LTS Model)
+- **Single Main Branch**: Consolidate all branches into main, absorbing features from each.
+- **Core Kernel Stability**: Establish a minimal, sovereign kernel with strict modular boundaries.
+- **Driver Framework**: Define a unified driver interface tailored for SigmaOS's non-POSIX design.
 
-- [ ] Networking: expand NIC support beyond e1000
-- [ ] Storage: add NVMe, SSD optimizations
-- [ ] USB/HID: implement keyboard, mouse, and USB stack
-- [ ] Graphics: move from VGA framebuffer to modern GPU drivers
-- [ ] Audio: add basic sound subsystem
+### Phase 2: Modularization & Profiles (Arch/Modular Model)
+- **Subsystem Separation**: Create clear modules for networking, storage, graphics, and security.
+- **OS Profiles**: Introduce build profiles (similar to Arch packages and Bottlerocket config presets):
+  - `sigma-core` (bare-metal minimal)
+  - `sigma-desktop` (UI + drivers)
+  - `sigma-cloud` (optimized for distributed silicon sovereignty)
 
-## Phase 3: File Systems & Storage
+### Phase 3: Package & Update System (Ubuntu Ecosystem Model)
+- **Package Manager**: Develop a sovereign package system (`sigpkg`) to install/update software without external POSIX dependencies.
+- **Update Channels**: Define release cadences (stable, testing, nightly).
+- **Dependency Independence**: Ensure packages don't rely on libc/POSIX.
 
-- [ ] Enhance FS support: journaling, encryption, sovereign FS
-- [ ] Add modern FS equivalents: ext4‑like, btrfs‑like features
-- [ ] Virtualization drivers: VirtIO for cloud/server use cases
+### Phase 4: CI/CD & Testing
+- **Automated Builds**: Continuous integration pipelines for each profile.
+- **Regression Testing**: Extensive test suites adapted to SigmaOS's microkernel.
+- **Hardware Validation**: Test across diverse silicon architectures (ARM, RISC-V, x86).
 
-## Phase 4: Package Management & Build System
+### Phase 5: Ecosystem & Developer Tools
+- **Documentation**: Comprehensive guides (like Ubuntu's wiki) for developers and contributors.
+- **SDKs**: Provide SigmaOS SDKs for driver and app development.
+- **Community Contributions**: Define contribution guidelines modeled after open-source best practices.
 
-- [ ] Develop sigpkg: sovereign package manager
-- [ ] Deterministic builds: reproducible recipes, cryptographic verification
-- [ ] Profiles: sigma-core, sigma-desktop, sigma-cloud
-
-## Phase 5: Security & Sovereignty
-
-- [ ] Sandboxing: sovereign equivalents
-- [ ] Audit framework: syscall monitoring
-- [ ] Secure boot: expand cryptographic verification, rollback protection
-- [ ] Exploit mitigations: hardened allocators, memory safety
-
-## Phase 6: Userland & Ecosystem
-
-- [ ] Expand utilities: sovereign replacements for GNU tools
-- [ ] Shell (sigma-sh): scripting, automation, developer ergonomics
-- [ ] SDK/toolchain: sovereign SDK for driver/app development
-
-## Phase 7: Community & Adoption
-
-- [ ] Contribution workflow: PRs only into main, modular tasks
-- [ ] Wiki expansion: roadmap, coding standards, migration guides
-- [ ] Target domains: secure systems, research, silicon sovereignty
+### Phase 6: Long-Term Vision
+- **Sovereign Cloud Integration**: Position SigmaOS as the base for sovereign cloud deployments.
+- **Hardware Partnerships**: Collaborate with chipmakers to optimize SigmaOS drivers.
+- **Global Adoption**: Establish predictable sovereign release cycles.
 
 ---
 
-## Future Development Roadmap (2026-2028)
+## 📦 Detailed Task Tracking (v0.1 → v1.0)
+Status key: 🟢 Done · 🟡 In Progress · 🔴 Blocked · ⚪ Planned
 
-### Q3 2026 - Q4 2026: Foundation Consolidation
-- **Kernel Core**: Complete Round Robin/EDF scheduler implementation with formal verification
-- **Memory System**: Finalize memory allocator with stress testing and formal proofs
-- **Syscall Layer**: Implement comprehensive non-POSIX ABI for enhanced functionality
-- **Branch Unification**: Complete merge of all development branches into stable main
-- **Release Management**: Establish predictable stable release cadence (quarterly)
+### v0.1 — Foundation ("Genesis")
+> **Definition of done**: Boots in QEMU x86_64 → framebuffer login → 3 userspace apps run.
 
-### Q1 2027 - Q2 2027: Hardware Expansion
-- **Network Drivers**: Add support for Intel I219-V, Realtek 8111, and Broadcom NICs
-- **Storage Optimization**: Implement NVMe driver stack with TRIM support and SSD wear leveling
-- **USB Stack**: Complete USB 3.0/3.1 support with xHCI controller
-- **HID Implementation**: Full keyboard, mouse, and generic HID device support
-- **Graphics Transition**: Begin transition from VGA to DRM/KMS with basic GPU acceleration
-- **Audio Subsystem**: Implement ALSA-compatible sound layer with basic codec support
+| Task | Status | Notes |
+|------|--------|-------|
+| Multiboot2 boot on x86_64 | 🟢 | `S01_Genesis/` |
+| Physical memory manager (buddy) | 🟢 | `memory/pmm/` |
+| Virtual memory + paging | 🟢 | `memory/vmm/` |
+| Basic EEVDF scheduler | 🟢 | `scheduling/` |
+| Serial (COM1) + VGA output | 🟢 | `drivers/` |
+| Keyboard PS/2 driver | 🟢 | `drivers/` |
+| VFS + ramfs | 🟡 | `fs/` |
+| ELF userland loader | 🟡 | `userland/` |
+| sigma-shell (minimal sh) | 🟡 | `userland/shell/` |
+| QEMU smoke test in CI | 🔴 | See CI stabilization |
+| Green CI on `main` | 🔴 | Top priority |
 
-### Q3 2027 - Q4 2027: File System Revolution
-- **Journaling FS**: Implement ext4-like journaling with crash recovery
-- **Encryption Layer**: Add LUKS-equivalent full-disk encryption
-- **Sovereign FS**: Develop custom file system with built-in integrity verification
-- **Btrfs Features**: Add snapshot, compression, and deduplication capabilities
-- **VirtIO Drivers**: Complete VirtIO block, net, and balloon drivers for cloud deployment
-- **FS Benchmarks**: Comprehensive performance testing against ext4, btrfs, ZFS
+### v0.2 — Stability & Contributor Funnel
+> **Goal**: Green CI, reproducible builds, top-level docs, one canonical build entrypoint.
 
-### Q1 2028 - Q2 2028: Package Management Ecosystem
-- **sigpkg Core**: Complete sovereign package manager with dependency resolution
-- **Build System**: Implement deterministic build system with reproducible recipes
-- **Cryptographic Verification**: Package signing and verification infrastructure
-- **Profile System**: sigma-core (minimal), sigma-desktop (full), sigma-cloud (server)
-- **Repository Network**: Distributed package repository with mirror support
-- **Migration Tools**: Tools for importing packages from Debian/Ubuntu/Fedora
+| Task | Status | Notes |
+|------|--------|-------|
+| `just` task runner | 🟢 | `justfile` |
+| `LANGUAGE_POLICY.md` | 🟢 | FFI rules, domain map |
+| `kabi/` unified C-ABI crate | 🟢 | `kabi/src/lib.rs` |
+| `README.md` top-level | 🟢 | Quick-start + layout |
+| `ARCHITECTURE.md` | 🟢 | Block diagram + rings |
+| Build artifact gitignore | 🟢 | `dist/`, `build/`, `target/` |
+| Pinned toolchain devcontainer | 🟡 | `.devcontainer/` |
+| `sigma.toml` declarative config | 🟢 | 5 profile presets |
+| `sigma config validate` CLI | 🟢 | `tools/sigma-cli.rs` |
+| QEMU boot smoke test CI | ⚪ | Target: v0.2.1 |
+| Required status check on `main` | ⚪ | Repo Settings |
 
-### Q3 2028 - Q4 2028: Security Hardening
-- **Sandboxing**: Implement capability-based security model
-- **Audit Framework**: Complete syscall monitoring and logging system
-- **Secure Boot**: Expand UEFI Secure Boot with custom key management
-- **Rollback Protection**: Implement A/B partition system with automatic rollback
-- **Memory Safety**: Hardened allocator with guard pages and canaries
-- **Exploit Mitigations**: ASLR, stack canaries, CET, and other hardening features
+### v0.3 — Networking & Security Hardening
+> **Goal**: Functional TCP/IP + DoH + WireGuard; SPARK proofs gate on merge.
 
-### 2029+: Userland & Ecosystem
-- **GNU Utilities**: Complete sovereign replacements for coreutils, binutils
-- **Sigma Shell**: Full-featured shell with scripting and automation
-- **Developer SDK**: Complete SDK for driver and application development
-- **IDE Integration**: VS Code/Neovim plugins for SigmaOS development
-- **Claude Code Integration**: Native agentic coding tool integrated into SigmaIDE and sigma-sh
-- **Documentation**: Comprehensive developer and user documentation
-- **Testing Suite**: Automated testing infrastructure for all components
+| Task | Status | Notes |
+|------|--------|-------|
+| TCP/IP stack | 🟡 | `net/` |
+| QUIC transport | 🟡 | `net/quic/` |
+| WireGuard VPN | ⚪ | `net/vpn/` |
+| DoH resolver | 🟡 | `net/dns/` |
+| TLS 1.3 + Kyber-1024 | 🟡 | `crypto/` |
+| sigma-shield packet filter | ⚪ | `net/firewall/` |
+| Zero-Trust AVC matrix | 🟡 | `security/` |
+| gnatprove CI gate | ⚪ | Ada/SPARK modules |
+| PQC attestation (cosign) | ⚪ | Release signing |
 
-### Long-term Vision (2030+)
-- **AI Integration**: Native AI/ML acceleration in kernel and userland
-- **Quantum Readiness**: Post-quantum cryptography throughout the stack
-- **Formal Verification**: SPARK/Ada proofs for critical security components
-- **Silicon Sovereignty**: Custom hardware support and optimization
-- **Research Platform**: Target OS for academic and industry research
+### v0.4 — Desktop & GPU
+> **Goal**: Zenith compositor boots, GPU acceleration, basic app model.
+
+| Task | Status | Notes |
+|------|--------|-------|
+| Zenith compositor | 🟡 | `desktop/`, `zenith_desktop.js` |
+| GPU HAL (Vulkan-like) | 🟡 | `graphics/` |
+| AI scheduler integration | 🟡 | `zenith_desktop.js` |
+| Browser (sigma-browse) | 🟡 | `browser/` |
+| Package manager (sigma-pkg) | 🟡 | `sigma-pkg/` |
+| Sigma Store registry | ⚪ | `sigma_pkg_registry/` |
+
+### v0.5 — Kernel Observability & Fleet
+> **Goal**: Live kernel metrics, syscall tracing, fleet node orchestration.
+
+| Task | Status | Notes |
+|------|--------|-------|
+| Kernel metrics exporter (`/sigma/metrics`) | 🟢 | `kernel/core/metrics.rs` |
+| `sigma-trace` syscall latency profiler | 🟢 | `tools/sigma-trace.rs` |
+| Thermal + power HAL daemon | ⚪ | `hal/thermal/` |
+| cgroup-aware namespace accounting | ⚪ | `security/cgroups/` |
+| Auto-enroll + TPM attestation | ⚪ | `sigmad/` |
+| Policy-as-code GitOps rollout | ⚪ | `sigma update` + GHA |
+| Self-healing A/B rollback | ⚪ | `sigma node rollback` |
+
+### v1.0 — Sovereign Production
+> **Goal**: Reproducible SLSA L3 ISO, air-gapped deployments, SPARK-proven security layer.
+
+| Task | Status | Notes |
+|------|--------|-------|
+| Reproducible ISO builds (SLSA L3) | ⚪ | `release.yml` |
+| SBOM (CycloneDX) per release | 🟡 | `release.yml` |
+| IPFS + CDN mirror distribution | 🟢 | `mirror_sync.yml` |
+| Air-gapped sovereign profile | 🟢 | `config/profiles/airgapped.toml` |
+| Personalisation Hub web panel | 🟢 | `sigma-web/personalisation/` |
+| Full sigma CLI (16 subcommands) | 🟢 | `tools/sigma-cli.rs` |
+| CODEOWNERS per subsystem | ⚪ | `.github/CODEOWNERS` |
+| v1.0 tag + release announcement | ⚪ | — |
 
 ---
 
-## Detailed Implementation Milestones
+## 🔧 Core System & Subsystem Enhancements
+
+### Core System
+- **Driver Abstraction Layer**: A modular framework so hardware drivers can be swapped easily (similar to kernel modules, but sovereign).
+- **Package Manager (`sigpkg`)**: A native package manager to install/update software without external POSIX dependencies.
+- **Service Manager**: Lightweight init system for managing processes and services (sovereign alternative to systemd).
+
+### Developer Tools
+- **SDKs & APIs**: Provide SigmaOS SDKs for driver development, app creation, and kernel extensions.
+- **Build Profiles**: Configurations for different targets (desktop, cloud, embedded).
+- **Cross-Compilation Toolchain**: Allow developers to build SigmaOS apps from other OS environments.
+- **Testing Framework**: Automated regression and hardware validation suites.
+
+### Networking & Cloud
+- **Networking Stack**: Sovereign TCP/IP implementation with modular protocols.
+- **Cloud Integration**: Tools for distributed computing and silicon sovereignty in cloud environments.
+- **Containerization**: A SigmaOS-native container system for isolation without heavy virtualization.
+
+### Security & Sovereignty
+- **Secure Boot**: Ensure SigmaOS only runs verified sovereign code (UEFI Secure Boot).
+- **Cryptographic Libraries**: Native crypto functions independent of POSIX/libc.
+- **Sandboxing**: Isolate apps and drivers for maximum sovereignty.
+- **Audit & Monitoring Tools**: Tamper-detected audit logging and syscall monitoring.
+
+### User & Ecosystem
+- **Desktop Environment**: A sovereign UI layer (Zenith compositor and desktop experience).
+- **Documentation Hub**: Developer and user guides.
+- **Community Contribution System**: Governance and contribution guidelines to scale development.
+- **Release Cadence**: Predictable releases and LTS support.
+
+---
+
+## 📅 Timeline & Detailed Monthly Milestones (2026-2032)
 
 ### 2026 Q3-Q4: Foundation Phase Details
 **Month 1-2 (July-August 2026)**
@@ -263,3 +319,15 @@ SigmaOS draws inspiration from the best aspects of various Linux distributions:
 - Continuous integration for all components
 - Performance regression testing
 - Security vulnerability scanning
+
+---
+
+## 🧪 Parked / Experiments Branch
+These items are real goals but deliberately off the critical path until v0.2 is stable:
+- Windows-parity syscall compatibility layer
+- NPU/TPU HAL (neural hardware acceleration)
+- VR/XR renderer
+- Sigma Browser full engine
+- Multi-tenant cloud orchestrator
+
+See `experiments/` branch for active prototyping.
