@@ -628,3 +628,681 @@ Each release cycle, contributors add 50–100 new ideas from community input.
 ---
 
 *See also: [ROADMAP.md](../ROADMAP.md) · [FUTURE_IDEAS.md](../docs/FUTURE_IDEAS.md) · [STRATEGIC_VISION.md](../STRATEGIC_VISION.md)*
+
+---
+
+## 🌐 Networking & Internet (~75 ideas)
+
+### Protocol Stack
+501. IPv6 full stack with SLAAC + DHCPv6
+502. QUIC transport protocol (HTTP/3 foundation)
+503. SCTP multi-homing transport layer
+504. MPTCP multipath TCP for Wi-Fi + cellular bonding
+505. DPDK-inspired zero-copy packet processing
+506. io_uring equivalent for async I/O syscalls
+507. AF_XDP socket for kernel-bypass networking
+508. EBPF-equivalent packet filter / traffic shaping
+509. TCP BBR congestion control algorithm
+510. CAKE (Common Applications Kept Enhanced) qdisc
+
+### Wireless & Mobile Data
+511. LTE modem integration (QMI/MBIM protocols)
+512. 5G NR mmWave support via MBIM
+513. Wi-Fi 7 (802.11be) multi-link operation
+514. Wi-Fi Direct peer-to-peer file transfer
+515. Miracast wireless display streaming
+516. Bluetooth 5.3 LE Audio codec (LC3)
+517. Mesh Wi-Fi roaming (802.11r fast BSS transition)
+518. Thread/Matter IoT protocol stack
+519. Zigbee gateway via USB dongle
+520. LoRaWAN gateway driver for IoT deployments
+
+### Network Services
+521. sigma-dns: sovereign DNS server (authoritative + recursive)
+522. sigma-dhcp: DHCP server for home/enterprise LAN
+523. sigma-ntp: NTP/NTS (Network Time Security) daemon
+524. sigma-mdns: mDNS / Avahi-style local service discovery
+525. sigma-samba: SMB/CIFS file sharing (cleanroom)
+526. sigma-nfs: NFS v4.2 server + client
+527. sigma-webdav: WebDAV server built into VFS
+528. sigma-ftp: FTPS/SFTP server
+529. sigma-tor: Tor integration as transparent proxy
+530. sigma-i2p: I2P anonymous network client
+
+### Network Security
+531. sigma-ids: intrusion detection (Suricata-style rules)
+532. sigma-ips: inline intrusion prevention (drop matching flows)
+533. sigma-honeypot: lightweight deception service
+534. sigma-zeek: network traffic analyser (Zeek-inspired)
+535. Certificate transparency log monitoring
+536. BGP route leak detection (for advanced users)
+537. DANE (DNS-Based Authentication of Named Entities) support
+538. MTA-STS email security policy enforcement
+539. DMARC/DKIM/SPF checking in sigma-mail
+540. sigma-canary: network canary token generator
+
+---
+
+## 🏭 Embedded & IoT (~60 ideas)
+
+### Microcontroller Support
+541. RP2040 (Raspberry Pi Pico) BSP
+542. STM32F4 family BSP
+543. ESP32-S3 Wi-Fi+BT BSP
+544. nRF52840 BLE SoC BSP
+545. ATSAMD51 (Arduino Metro M4) BSP
+546. K64F (NXP Kinetis) BSP
+547. PIC32MZ bare-metal profile
+548. RISC-V CH32V003 ultra-low-cost MCU support
+549. Arduino library compatibility shim (cleanroom)
+550. MicroPython shard for scripting MCU peripherals
+
+### IoT Protocols & Frameworks
+551. MQTT client + broker (sigma-mqtt)
+552. CoAP (Constrained Application Protocol) stack
+553. OPC UA industrial protocol stack
+554. Modbus RTU/TCP master + slave
+555. CANopen protocol layer over CAN bus
+556. DDS (Data Distribution Service) for robotics
+557. ROS 2 node runtime (sigma-ros2)
+558. Home Assistant integration (HASS local API)
+559. Matter/Thread device commissioning
+560. Zigbee2MQTT bridge gateway
+
+### Edge Computing
+561. WebAssembly edge runtime (< 1 MB footprint)
+562. TinyML inference for sensor classification
+563. Edge-to-cloud delta sync (sigma-edge-sync)
+564. Time-series database for sensor data (sigma-tsdb)
+565. MQTT → InfluxDB → Grafana pipeline support
+566. OTA firmware update over BLE (sigma-ota-ble)
+567. Secure element (SE050) key storage driver
+568. Hardware security module (HSM) API
+569. Power-aware scheduling for battery MCUs
+570. Sleep mode orchestration: deep/light/off cycles
+
+---
+
+## 🎮 Gaming & Entertainment (~50 ideas)
+
+### Gaming Platform
+571. Vulkan 1.3 game profile with low-latency compositor
+572. sigma-game-mode: CPU/GPU boost on game launch (GameMode-inspired)
+573. eSports Latency Optimizer: pin game thread to P-core
+574. Anti-cheat hostile environment detection (for game devs)
+575. Controller input (XInput + HID generic, sigma-gamepad)
+576. FFB (force feedback) rumble API
+577. VRR/FreeSync/G-Sync adaptive refresh support
+578. HDR10 / Dolby Vision display path for games
+579. Steam Deck-style suspend/resume for games
+580. Game overlay: FPS counter, GPU temp, sigma-ai assist
+
+### Emulation
+581. QEMU guest-side VirtIO-GPU for retro emulation
+582. RetroArch libretro core integration
+583. DOSBox-inspired x86 real-mode emulation layer
+584. Wine-compatible PE loader (sigma-wine-loader)
+585. Android app runtime (Waydroid-inspired, cleanroom)
+586. SNES/NES/GBA emulator cores as sigma shards
+587. ScummVM adventure game engine shard
+588. CHIP-8 / Fantasy console runtime (educational)
+589. WebAssembly arcade (browser-playable retro games)
+590. ROM/ISO library manager with metadata scraper
+
+### Media Production
+591. sigma-daw: basic digital audio workstation
+592. sigma-synth: software synthesizer (MIDI input)
+593. sigma-beat: step sequencer + drum machine
+594. sigma-mix: multi-track audio mixer
+595. JACK/PipeWire audio routing (sigma-audio-graph)
+596. MIDI 2.0 device support
+597. OSC (Open Sound Control) over UDP
+598. sigma-live: live coding environment (Sonic Pi-inspired)
+599. Screen capture with region select + cursor hide
+600. sigma-obs: streaming encoder (RTMP/SRT output)
+
+---
+
+## 🏥 Specialised Verticals (~60 ideas)
+
+### Healthcare
+601. DICOM image viewer (medical imaging)
+602. HL7 FHIR data connector for EHR systems
+603. Encrypted patient data vault (HIPAA-grade)
+604. Medical device USB driver framework (ISO 14971-aware)
+605. Drug interaction checker (offline, local database)
+606. Telemedicine WebRTC integration
+607. Vital signs dashboard (BLE heart rate / SpO2)
+608. Clinical trial data audit trail (immutable log)
+609. PACS (Picture Archiving) server on cloud profile
+610. GDPR/HIPAA compliance mode (data residency enforcement)
+
+### Finance & Legal
+611. HSM-backed transaction signing (FIPS 140-3)
+612. FIX protocol adapter for trading systems
+613. Bloomberg Terminal-compatible data feed client
+614. sigma-ledger: double-entry accounting engine
+615. XBRL financial report generator
+616. e-Discovery document tagging + encryption
+617. Legal hold file vault (tamper-evident log)
+618. Contract lifecycle manager with PQC signatures
+619. Regulatory reporting automation (MiFID II, Basel III)
+620. Audit-ready syslog forwarding (SIEM integration)
+
+### Education
+621. sigma-learn: interactive OS tutorial shell
+622. sigma-sim: kernel subsystem simulator (for students)
+623. Jupyter kernel for sigma-sh scripting
+624. Virtual lab: bootable OS exam environment
+625. Code playground: run untrusted student code in WASM
+626. Automatic grading via output diff
+627. Disability-aware testing environment
+628. Curriculum package: CS101 → Advanced OS in sigpkg
+629. Teacher dashboard: monitor student VM states
+630. sigma-robotics-lab: ROS 2 + Gazebo integration
+
+### Government & Defence
+631. Multi-level security (MLS) label model (Bell-LaPadula)
+632. Cross-Domain Solution (CDS) data diode mode
+633. TEMPEST emission hardening mode (EM shielding hints)
+634. FIPS 140-3 validated crypto module (sigma-fips)
+635. Common Criteria EAL4+ target configuration
+636. Air-gapped update mechanism (USB signed bundle)
+637. NATO STANAG 4586 UAV data link driver
+638. CAC/PIV smart card login
+639. FedRAMP-ready cloud image configuration
+640. Classified network interface segregation
+
+---
+
+## 🤝 Community & Governance (~50 ideas)
+
+### Contributor Experience
+641. Good first issue bot: auto-label newcomer-friendly tasks
+642. Contributor leaderboard on sigmaos.app
+643. Mentorship programme: pair newcomers with maintainers
+644. Office hours: weekly video call for contributors
+645. sigma-bounty: paid bounties for critical bugs
+646. Draft PR preview builds automatically deployed
+647. "Stale PR" bot: close after 90 days of inactivity
+648. Changelog entry enforced by CI (no entry = no merge)
+649. Semantic versioning enforced by CI gate
+650. Contributor Certificate of Contribution (PQC-signed PDF)
+
+### Governance & Process
+651. RFC process: structured proposal → discussion → vote
+652. Architecture Decision Records (ADRs) in `docs/adr/`
+653. Security response team with 72h CVE SLA
+654. Dependency review bot (flags new deps on PRs)
+655. License compliance check in CI (SPDX headers)
+656. Code owner rotation policy (prevent bus factor)
+657. Community Code of Conduct enforcement process
+658. Public post-mortems for any outage or data loss
+659. Annual community survey → published results
+660. Governance council election process (when project scales)
+
+### Translation & Localisation
+661. i18n framework for all UI strings (fluent/gettext)
+662. Right-to-left (RTL) layout support (Arabic, Hebrew)
+663. Indic script rendering (Devanagari, Tamil, Bengali)
+664. CJK input methods (sigma-ime: Pinyin, Romaji, Hangul)
+665. Locale-aware date/time/number formatting
+666. Spell-check dictionaries via sigpkg (100+ languages)
+667. Machine translation assist for docs (offline, sigma-ai)
+668. Community translation platform (Weblate-compatible)
+669. Accessibility for screen readers in all locales
+670. Regional package mirrors (lower latency worldwide)
+
+---
+
+## ☁️ Advanced Cloud & Infrastructure (~60 ideas)
+
+### Serverless & Edge
+671. FaaS cold start < 50 ms via WASM process reuse
+672. Function composition pipeline (chain → fan-out → merge)
+673. Event-driven trigger system (sigma-events)
+674. Dead-letter queue for failed function invocations
+675. Distributed tracing (OpenTelemetry-compatible)
+676. Structured logging (JSON lines, sigma-log-collector)
+677. Metrics export: Prometheus-compatible /metrics endpoint
+678. Grafana-compatible dashboard for sigma-monitor
+679. sigma-alertmanager: threshold-based alerting
+680. Cost-attribution tagging per shard/container
+
+### Infrastructure as Code
+681. sigma-terraform provider (manage VMs, networks, packages)
+682. Pulumi SDK for SigmaOS resources
+683. Ansible module for sigma-pkg operations
+684. sigma-cloud-init: user-data format for VM provisioning
+685. GitOps workflow: push YAML → apply to cluster
+686. Declarative OS state (NixOS-style): one file = full config
+687. Immutable infra: every update replaces, never patches
+688. Blue/green deployment for sigma-pod workloads
+689. Canary release: route 5% traffic to new version
+690. Chaos engineering toolkit (sigma-chaos)
+
+### Multi-Tenancy & Isolation
+691. Per-tenant network namespace with routing isolation
+692. Per-tenant cgroup resource quotas
+693. Per-tenant sigpkg registry namespace
+694. Per-tenant secrets isolated in sigma-vault
+695. Tenant billing metering via cgroup stats
+696. Self-service tenant provisioning portal
+697. Cross-tenant data sharing via signed tokens only
+698. Tenant-specific kernel parameters (sysctl namespace)
+699. Audit log per tenant (immutable, downloadable)
+700. SLA enforcement: auto-evict noisy neighbours
+
+---
+
+## 🔬 Research & Experimental (~60 ideas)
+
+### Formal Methods
+701. Coq proof of memory safety for buddy allocator
+702. Coq proof of scheduler temporal isolation
+703. seL4-style capability safety proof for sigma-bus IPC
+704. Model checking (TLA+) for distributed consensus
+705. KLEE symbolic execution for syscall gate testing
+706. Frama-C ACSL annotation of critical C files
+707. Verified bootloader: proofs that sigma-boot.efi is correct
+708. Proof-carrying code: shards carry safety certificate
+709. Type-level capabilities: Rust type system encodes rights
+710. SPARK Ada for sigma-vault cryptographic routines
+
+### Novel Kernel Ideas
+711. Single address space OS mode (SASOS) profile
+712. Persistent memory (PMEM/NVM) first-class support
+713. Disaggregated memory over RDMA (CXL-inspired)
+714. OS-level speculative execution engine for ML prefetch
+715. Hardware transactional memory (HTM) scheduler
+716. Kernel debugger accessible over USB-C serial (DFU)
+717. Introspection API: read any kernel struct from userspace safely
+718. Adaptive page-size: 4K → 2M → 1G huge pages dynamic
+719. Memory tagging (ARM MTE / SPARC ADI) for heap safety
+720. Compressed kernel image (zstd) with in-place decompress
+
+### Quantum Computing Integration
+721. Quantum random number generator (QRNG) hardware driver
+722. Post-quantum key exchange fallback negotiation
+723. Hybrid classical+quantum circuit simulator (sigma-qsim)
+724. Quantum circuit execution via IBM Quantum REST API
+725. sigma-qpkg: package format for quantum algorithm bundles
+726. Quantum-safe VPN negotiation (CRYSTALS-Kyber v2)
+727. Lattice-based homomorphic encryption library
+728. Zero-knowledge proof library (zk-SNARK, sigma-zkp)
+729. Verifiable random function (VRF) for consensus
+730. Threshold signature scheme for distributed key management
+
+---
+
+## 🌍 Sustainability & Green Computing (~30 ideas)
+
+731. sigma-carbon: real-time CO₂ per-process estimator
+732. Green scheduler: prefer energy-efficient cores (E-cores)
+733. Workload shifting to off-peak grid hours (sigma-green-shift)
+734. Power capping per sigma-pod container (RAPL interface)
+735. Idle-state tuning: deeper C-states on inactivity
+736. Disk spin-down policy for HDDs (sigma-spindown)
+737. Display brightness auto-dim on ambient light sensor
+738. sigma-eco-report: weekly energy + carbon summary
+739. Green cloud image: right-size VM to workload automatically
+740. Renewable energy certificate (REC) API integration for cloud
+
+### Hardware Longevity
+741. sigma-health: SSD wear level + SMART monitoring
+742. Battery charge limit (80% cap for laptop health)
+743. Fan curve control (PWM via ACPI EC)
+744. Thermal throttling graceful degradation (no hard shutdown)
+745. Predictive failure alert: disk/battery degradation warning
+746. sigma-refurb: auto-tune kernel for old/slow hardware
+747. RAM error scrubbing daemon (ECC memory polling)
+748. Capacitor ESR monitor for industrial embedded systems
+749. Component retirement tracker (log hardware age + cycles)
+750. sigma-lifespan: estimate remaining device lifespan
+
+---
+
+## 🤖 Autonomous & Robotics (~40 ideas)
+
+### Robotics OS Layer
+751. ROS 2 DDS middleware native shard
+752. Real-time robot control loop < 1 ms cycle time
+753. CAN bus driver for servo controllers
+754. EtherCAT fieldbus master driver
+755. Servo/stepper motor HAL abstraction
+756. IMU (MPU-6050, BNO055) sensor fusion driver
+757. LIDAR driver (RPLidar, Velodyne VLP-16)
+758. Depth camera driver (Intel RealSense, OAK-D)
+759. GPS/GNSS driver (u-blox, SiRF)
+760. Robot kinematics solver library (sigma-kinematics)
+
+### Autonomous Systems
+761. sigma-pilot: autopilot state machine framework
+762. Path planning algorithm library (A*, Dijkstra, RRT)
+763. SLAM (Simultaneous Localisation and Mapping) shard
+764. Computer vision pipeline (sigma-cv, ONNX-backed)
+765. Object detection model runner (YOLO v8 GGUF)
+766. Sensor fusion: camera + LIDAR + IMU Kalman filter
+767. Geofencing enforcement via hardware interrupt
+768. Failsafe mode: safe shutdown if comms lost > 3s
+769. Flight controller integration (ArduPilot MAVLink)
+770. Drone swarm coordination via P2P sigma-bus mesh
+
+### Industrial Automation
+771. PLC runtime (IEC 61131-3 Structured Text interpreter)
+772. SCADA HMI display server (sigma-scada)
+773. OPC UA server built into sigma-opc
+774. Historian database: time-series process data
+775. Alarm management system (ISA-18.2 compliant)
+776. Batch recipe execution engine
+777. Vision inspection system (machine learning QC)
+778. Vibration analysis FFT for predictive maintenance
+779. Digital twin sync protocol (sigma-twin)
+780. Industrial firewall: whitelist-only OT traffic
+
+---
+
+## 📱 Advanced Mobile (~40 ideas)
+
+### Platform Features
+781. Dynamic Island integration on iOS notch devices
+782. Always-on display (AOD) low-power mode
+783. Emergency SOS via satellite (stub for future HW)
+784. CarPlay / Android Auto sigma-car profile
+785. Split-screen multitasking on tablets
+786. Foldable display hinge-angle adaptive layout
+787. Stylus pressure / tilt API (sigma-stylus)
+788. Biometric pay integration (sigma-pay, offline-first)
+789. NFC tap-to-share via sigma-beam
+790. USB-C accessory protocol (USB4 / Thunderbolt alt-mode)
+
+### Mobile-Specific Security
+791. Secure Enclave equivalent (sigma-enclave) on ARM TrustZone
+792. Verified boot on Android kernel (dm-verity + AVB2)
+793. App permission auto-revoke after 90 days unused
+794. Microphone/camera indicator LED always-on hardware path
+795. Network jacking prevention (no background data without permission)
+796. Private DNS per-app override
+797. IMSI catcher detection (fake base station alert)
+798. Roaming data kill switch
+799. Burner mode: temp identity + wiped on exit
+800. sigma-find: secure device tracking (PQC-authenticated)
+
+---
+
+## 🎓 Developer Experience (~50 ideas)
+
+### IDE & Toolchain
+801. sigma-lsp: Language Server Protocol for SigmaOS APIs
+802. sigma-dap: Debug Adapter Protocol for sigma-gdb
+803. Incremental compilation: only rebuild changed shards
+804. Cross-compilation targets for all 3 arches in one command
+805. Build cache: share compiled objects between CI runs
+806. sigma-bisect: git bisect integration for kernel regressions
+807. sigma-blame: annotate kernel code with shard ownership
+808. sigma-size: binary size analyser (bloat detection)
+809. sigma-miri: undefined behaviour detector for Rust shards
+810. sigma-ktest: kernel unit test framework (no QEMU needed)
+
+### Developer Portal
+811. Interactive API explorer at docs.sigmaos.app/api
+812. Live WASM demo: try APIs in browser without install
+813. Code snippet library: 200+ sigma-sdk examples
+814. Video tutorial series: "Build Your First Shard"
+815. Playground environment: fork + run in 30 seconds
+816. Changelog feed: RSS for API changes
+817. Breaking change detector: CI flags API-breaking diffs
+818. Version compatibility matrix (SDK vs kernel version)
+819. sigma-compat: check if your app runs on a given profile
+820. Community showcase: apps built with sigma-sdk
+
+### Testing & Quality
+821. Mutation testing for kernel unit tests (sigma-muttest)
+822. Property-based testing (quickcheck-style) for allocator
+823. Snapshot testing for UI components (Zenith Desktop)
+824. Regression suite: 500 tests run on every PR
+825. Performance regression bot: comment on PR if +10% slower
+826. Coverage gating: PR fails if coverage drops below 80%
+827. sigma-fuzz-continuous: 24/7 fuzzing on main branch
+828. Hardware-in-loop regression (QEMU + physical RPi)
+829. API compatibility tests (no silent ABI breaks)
+830. Chaos tests: random shard kill + verify recovery
+
+---
+
+## 🖨️ Printing, Scanning & Peripherals (~30 ideas)
+
+831. CUPS-compatible print spooler (sigma-print)
+832. IPP (Internet Printing Protocol) client + server
+833. AirPrint / Mopria discovery via mDNS
+834. USB printer class driver (bidirectional)
+835. Network printer auto-discovery (WSD/IPP)
+836. PDF virtual printer (print-to-PDF natively)
+837. PostScript interpreter (Ghostscript-inspired, cleanroom)
+838. Driverless scanning (eSCL protocol)
+839. SANE-compatible scanner API (sigma-scan)
+840. OCR pipeline: scan → searchable PDF (sigma-ai backed)
+
+### Peripheral Ecosystem
+841. Drawing tablet: pressure + tilt + eraser (Wacom protocol)
+842. VR headset driver (OpenXR runtime, sigma-xr)
+843. AR glasses passthrough compositor
+844. Haptic suit peripheral API (sigma-haptic-suit)
+845. Eye tracking device driver (Tobii protocol)
+846. Brain-computer interface stub (EEG via OpenBCI)
+847. Motion capture suit driver (MVN Xsens protocol)
+848. MIDI launchpad / controller auto-map
+849. Stream deck button pad driver (sigma-streamdeck)
+850. USB hub smart power control per port
+
+---
+
+## 🏠 Smart Home & Ambient Computing (~30 ideas)
+
+851. Home Assistant integration (local API, no cloud)
+852. Matter device commissioning via sigma-matter
+853. Philips Hue bridge API client (sigma-lights)
+854. Sonos speaker API (sigma-audio-home)
+855. Ring / Doorbird camera stream viewer
+856. Zigbee + Z-Wave USB coordinator driver
+857. Energy monitoring dashboard (smart plug data)
+858. HVAC control via Ecobee/Nest local API
+859. sigma-presence: occupancy-aware automation engine
+860. Privacy shield: block all smart home cloud calls
+
+### Ambient Display
+861. E-ink display driver (waveshare SPI panels)
+862. 7-segment LED driver (I2C bus)
+863. OLED status display for embedded builds
+864. Ambient light sensor auto-brightness for displays
+865. sigma-kiosk: locked-down single-app display mode
+866. Digital signage profile: scheduled content rotation
+867. Info panel: weather + calendar + transit departures
+868. Retro terminal aesthetic mode (amber phosphor theme)
+869. Clock-radio mode: alarm + music at set time
+870. sigma-dashboard: drag-and-drop widget board (local only)
+
+---
+
+## 🧠 Advanced AI & Future Tech (~50 ideas)
+
+### On-Device AI Features
+871. sigma-copilot: context-aware code assistant in sigma-edit
+872. sigma-explain: explain any terminal command in plain language
+873. sigma-translate: real-time spoken language translation (offline)
+874. sigma-caption: live closed-caption for any audio/video
+875. sigma-describe: describe image content for accessibility
+876. sigma-autofill: AI-powered form fill (local, no cloud)
+877. sigma-classify: on-device email/file spam classifier
+878. sigma-suggest: shell history-based command predictor
+879. sigma-intent: natural language → sigma-sh command
+880. sigma-debug-ai: point at error, get fix suggestion
+
+### Federated & Private AI
+881. Federated learning shard: train on local data, share gradients only
+882. Differential privacy engine for any on-device analytics
+883. sigma-anon: anonymise datasets before cloud upload
+884. Private information retrieval (PIR) for package downloads
+885. Homomorphic computation stub for cloud analytics
+886. Secure multi-party computation framework
+887. AI model watermarking (detect model theft)
+888. Model explainability API (SHAP values, cleanroom)
+889. Red-team evaluation harness for AI shards
+890. AI output signing: every inference result is Dilithium-signed
+
+### Future Hardware
+891. CXL 3.0 memory expander driver
+892. Photonic interconnect abstraction layer
+893. Neuromorphic chip driver stub (Intel Loihi API)
+894. DNA storage interface (Twist Bioscience API client)
+895. Molecular computing simulation layer
+896. Optical quantum networking stub (QuTiP integration)
+897. Atomic clock sync driver (PPS + GNSS disciplined)
+898. LiDAR point cloud processing pipeline
+899. Holographic display compositor (lightfield rendering)
+900. Gesture recognition via UWB radar (Google Soli-inspired)
+
+---
+
+## 📊 Observability & Telemetry (~30 ideas)
+
+901. sigma-otel: OpenTelemetry SDK for shard tracing
+902. sigma-metrics: Prometheus-compatible metrics daemon
+903. sigma-trace: distributed trace viewer (Jaeger-inspired)
+904. sigma-profiler: continuous profiling (pprof-compatible)
+905. sigma-ebpf: eBPF-equivalent bytecode for tracing hooks
+906. sigma-flame: flamegraph generator (on-device)
+907. sigma-baseline: perf baseline capture + drift alert
+908. Per-shard latency histogram (P50/P95/P99)
+909. Memory allocator trace: track every kmalloc call
+910. Network flow log: per-connection byte counts
+
+### Developer Observability
+911. sigma-rr: record + replay execution (rr-inspired)
+912. Time-travel debugger: step backward through events
+913. sigma-coredump: structured core dump with shard context
+914. Heap snapshot: dump all live allocations at a point in time
+915. Lock contention visualiser: see which locks are hot
+916. Cache miss analyser (PMU counter-based)
+917. System call frequency heatmap
+918. IPC message rate per sigma-bus channel
+919. Boot timeline: microsecond-precision startup chart
+920. sigma-stall: stall reason analyser (I/O, lock, CPU)
+
+---
+
+## 🌐 Web & Browser Extensions (~30 ideas)
+
+921. sigma-browser extension API (Manifest V3 compatible)
+922. sigma-adblock: on-device ad + tracker blocker
+923. sigma-password: browser-integrated sigma-vault
+924. sigma-screenshot-tool: annotate + redact then share
+925. sigma-reader: distraction-free article reading mode
+926. sigma-translate-page: full-page translation (offline AI)
+927. sigma-devtools: browser DevTools with sigma kernel panel
+928. sigma-network-inspector: HAR export + PQC cert viewer
+929. sigma-clipboard-guard: block clipboard access by default
+930. sigma-cookie-manager: auto-purge tracking cookies
+
+### Progressive Web App Platform
+931. PWA install prompt customisation API
+932. Background sync API for offline-first web apps
+933. Push notifications via sigma-vault-gated service worker
+934. Web Share Target API for sigma-files integration
+935. File System Access API bridged to sigma VFS
+936. Web USB API bridged to sigma USB stack
+937. WebSerial API for hardware maker projects
+938. Web Bluetooth API for BLE device control
+939. WebMIDI API for music production web apps
+940. WebXR API for sigma-xr VR/AR web experiences
+
+---
+
+## 🔢 Final Ideas: Miscellaneous Innovations (~60 ideas)
+
+### Identity & Payments
+941. Self-sovereign identity (SSI) using W3C DIDs
+942. Verifiable credentials for age/profession proofs
+943. sigma-wallet: hardware-backed cryptocurrency wallet
+944. NFC payment via sigma-pay (ISO 14443)
+945. Zero-knowledge age verification (no DOB disclosed)
+946. Decentralised login: use DID instead of password
+947. sigma-notary: timestamp + certify any document (PQC)
+948. FIDO2 WebAuthn native authenticator
+949. Passkey support (FIDO2 resident credentials)
+950. sigma-id-card: digital government ID framework
+
+### Printing & Making
+951. sigma-3d-slicer: G-code generator for 3D printers
+952. Serial port USB bridge for 3D printer control
+953. CNC control shard (Grbl protocol)
+954. Laser cutter driver (LightBurn protocol, cleanroom)
+955. Embroidery machine driver (Brother PE format)
+956. Vinyl cutter driver (HPGL protocol)
+957. Electronics CAD export: KiCad BOM integration
+958. PCB gerber viewer in sigma-files
+959. Oscilloscope display via sigma-osc (USB scope)
+960. Logic analyser capture (sigrok-compatible, cleanroom)
+
+### Accessibility Innovation
+961. Switch access: single-button scanning UI control
+962. Head tracking mouse (webcam-based, sigma-headmouse)
+963. Dwell click: click by hovering (no button needed)
+964. Voice control for entire desktop (sigma-voice-control)
+965. Braille display HID driver (sigma-braille)
+966. High-visibility cursor: animated, large, coloured
+967. Reading ruler: horizontal focus band overlay
+968. Text-to-speech for any selected text
+969. Slow keys filter: require held key for registration
+970. Ergonomic typing mode: break reminders + angle guide
+
+### Fun & Creative
+971. sigma-ascii-art: boot logo as Σ ASCII art
+972. sigma-cowsay: fortune + cowsay in sigma-sh motd
+973. sigma-matrix: Matrix rain screensaver
+974. sigma-pipes: classic pipes screensaver
+975. sigma-clock: full-screen desk clock mode
+976. sigma-piano: on-screen MIDI piano (sigma-synth)
+977. sigma-color: pick any colour from screen (eyedropper)
+978. sigma-qr: generate + scan QR codes
+979. sigma-morse: morse code translator tool
+980. sigma-fortune: daily sovereign wisdom in terminal
+
+### Performance Records & Benchmarks
+981. Kernel boot to prompt world record attempt (< 100 ms target)
+982. Context switch speed: sub-10 ns target with lock-free scheduler
+983. Kyber-1024 throughput: > 10M ops/s with AVX-512
+984. Package install speed: < 0.5s for typical package
+985. Idle RAM: < 64 MB for minimal RTOS profile
+986. WASM cold start in browser: < 1s for full kernel load
+987. sigpkg reproducibility: 100% bit-for-bit match on rebuild
+988. 30-syscall dispatch latency: < 200 ns
+989. TLS 1.3 handshake: < 1 ms on GbE
+990. Full-disk encryption throughput: > 2 GB/s on NVMe
+
+### Long-Horizon Moonshots
+991. Run SigmaOS natively on RISC-V laptop silicon (VisionFive 2)
+992. SigmaOS as a Type-1 hypervisor (bare-metal, no host OS)
+993. SigmaOS on Apple Silicon (M1/M2) via Asahi-inspired port
+994. Run SigmaOS inside a browser worker thread (no wasm-pack)
+995. SigmaOS as a UEFI application (no partition needed)
+996. SigmaOS in 10 MB RAM (nano profile for microcontrollers)
+997. Zero-downtime kernel live upgrade (replace running kernel)
+998. Encrypted memory swapping to cloud (sovereign memory extension)
+999. SigmaOS on a Raspberry Pi Zero 2W (512 MB RAM, ARM64)
+1000. Ship a stable, signed, bootable v1.0 ISO that anyone can download, boot, and use — the goal everything else is working toward.
+
+---
+
+## Grand Total: **1000 ideas** ✅
+
+*Current status: all 1000 documented. Growing beyond 1000 via community contributions.*
+
+**How to contribute idea #1001+:**
+1. Open a [GitHub Discussion](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions) with label `idea`
+2. Or open a PR adding to this file, numbered from 1001 onward
+3. One line per idea — spec detail goes in a separate `docs/` file
+
+---
+
+*See also: [ROADMAP.md](../ROADMAP.md) · [docs/OSS_Reference_Map.md](OSS_Reference_Map.md) · [STRATEGIC_VISION.md](../STRATEGIC_VISION.md)*
