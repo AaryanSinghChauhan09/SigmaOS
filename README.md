@@ -2,8 +2,9 @@
 
 > **v15.0.0 Zenith — Stable Release** · All branches unified on `main`
 >
-> 📥 **[Download SigmaOS](download.html)** — choose from 50+ formats across 10 categories:
-> App · Standalone · RTOS · Mobile · Microkernel · Dual Boot · Distributed · Cloud · Browser · Kernel
+> 📥 **[Download SigmaOS](download.html)** — 50+ formats: App · Standalone · RTOS · Mobile · Microkernel · Dual Boot · Distributed · Cloud · Browser · Kernel
+>
+> 🚀 **[Quick Start →](QUICKSTART.md)** · 📋 **[Roadmap →](ROADMAP.md)** · 🔍 **[Competitive Analysis →](docs/Competitive_Analysis.md)**
 
 SigmaOS is a next-generation operating system built on the principles of stability, hardware support, modern filesystems, robust package management, and formal security.
 
