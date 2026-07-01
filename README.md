@@ -1,6 +1,11 @@
 # SigmaOS
 
-SigmaOS is a next-generation operating system built on the principles of stability, hardware support, modern filesystems, robust package management, and formal security. 
+> **v15.0.0 Zenith — Stable Release** · All branches unified on `main`
+>
+> 📥 **[Download SigmaOS](download.html)** — choose from 50+ formats across 10 categories:
+> App · Standalone · RTOS · Mobile · Microkernel · Dual Boot · Distributed · Cloud · Browser · Kernel
+
+SigmaOS is a next-generation operating system built on the principles of stability, hardware support, modern filesystems, robust package management, and formal security.
 
 It draws inspiration from the best aspects of various Linux distributions:
 - **Debian‑style stability** → predictable releases.
@@ -49,3 +54,39 @@ It draws inspiration from the best aspects of various Linux distributions:
 - Contribution workflow: PRs only into main, modular tasks.
 - Wiki expansion: roadmap, coding standards, migration guides.
 - Target domains: secure systems, research, silicon sovereignty.
+
+---
+
+## Download
+
+SigmaOS ships in **50+ distribution formats** across 10 categories. All formats are
+PQC-signed (Kyber-1024 + Dilithium-5) and built from a single unified `main` branch
+via CMake profile flags.
+
+| Category | Formats | Status |
+|---|---|---|
+| 📦 App | Native, Electron, Java, .NET, Python, AppImage/Snap/Flatpak, WASM, Mobile, ELF, sigpkg | Stable/Preview |
+| 🖥️ Standalone | Native EXE, AppImage, Portable EXE, Electron, JAR, PyInstaller, WASM Bundle | Stable/Preview |
+| ⚙️ RTOS | Monolithic, Microkernel, Layered, Exokernel, POSIX Layer, Bare-Metal | Stable/Preview |
+| 📱 Mobile | APK/IPA, Hybrid, Cross-Platform, PWA, Game Engines | Stable/Preview |
+| 🧩 Microkernel | Pure, Hybrid, Modular, Exokernel, POSIX Layer | Stable/Preview |
+| 💻 Dual Boot | Traditional, Separate Disk, Chainload, Virtualized, Live USB | Stable/Preview |
+| 🌐 Distributed | Client-Server, P2P, Cluster, Grid, SOA, Ledger, Actor Model | Stable/Preview |
+| ☁️ Cloud | Public, Private, Hybrid, Multi-Cloud, Community, IaaS, PaaS, SaaS, FaaS | Stable/Preview |
+| 🌍 Browser | Native Desktop, Mobile, Embedded/WebViews, Headless, Lite, Specialised | Stable/Preview |
+| 🖥️ Kernel | Monolithic, Microkernel, Hybrid, Exokernel, Nanokernel, Modular, Mono+Modular | Stable/Preview |
+
+👉 **[Open the Download Page →](download.html)**
+
+```bash
+# Quick start — clone and build any profile
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
+cd SigmaOS
+make PROFILE=standalone all -j$(nproc)   # full desktop
+make PROFILE=rtos        all -j$(nproc)   # hard real-time
+make PROFILE=cloud       all -j$(nproc)   # headless cloud
+make PROFILE=microkernel all -j$(nproc)   # <512KB kernel
+make PROFILE=mobile ARCH=arm64 all -j$(nproc)  # ARM64 mobile
+```
+
+---
