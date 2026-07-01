@@ -1,53 +1,40 @@
-# SigmaOS Zenith: Master Strategic Roadmap
+# SigmaOS Roadmap
 
-This roadmap defines the immediate, medium-term, and long-term milestones required to establish SigmaOS Zenith as the premier sovereign, AI-native operating system.
+> Quick navigation hub for all roadmap documents.
 
----
+## Roadmap Documents
 
-## 🛠️ Immediate Milestones (Current Focus)
+| Document | Purpose |
+|----------|---------|
+| [Development-Roadmap](Development-Roadmap) | Master roadmap with phases, versions, and branch priorities |
+| [Branch-Development-Roadmap](Branch-Development-Roadmap) | Per-branch file-level task lists |
+| [Feature-Roadmap](Feature-Roadmap) | Implemented vs planned features |
+| [Version-Timeline](Version-Timeline) | Release history and upcoming versions |
+| [Release-Profiles](Release-Profiles) | All 8 deployment profiles explained |
+| [PHASE_G_ROADMAP](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/PHASE_G_ROADMAP.md) | Phase G kernel completion tasks |
+| [Competitive-Analysis](Competitive-Analysis) | How SigmaOS compares to Linux distros |
+| [Gap-Analysis](Gap-Analysis) | Remaining gaps vs competitors |
 
-### 1. Define Core Vision in GitHub Wiki
-* [x] Publish positioning page: `SigmaOS vs Ubuntu` detailing USP absorption and sovereign differentiators.
-* [x] Establish clear mission manifests for contributors and enterprise partners.
+## Current Status at a Glance
 
-### 2. Build Developer Ecosystem
-* [x] Deploy native package manager support with dual CLI (`sigma install`) and GUI interfaces.
-* [x] Ensure 100% compatibility with APT/Debian packages and Snap/Flatpak universal binaries.
-* [x] Publish comprehensive onboarding tutorials and starter guides in the GitHub Wiki.
+```
+Phase F  ████████████████████  100% ✅  (KMS, cgroup, pkg registry)
+Phase G  ░░░░░░░░░░░░░░░░░░░░    0% ⬜  (kernel boot — ACTIVE)
+Phase H  ░░░░░░░░░░░░░░░░░░░░    0% ⬜  (India Stack — blocked)
+```
 
-### 3. Release Stable LTS Build & Developer Preview
-* [x] Launch `sigma_lts_developer_preview` showcasing guaranteed 5-year sovereign support.
-* [x] Document step-by-step minimal guided installation and supported hardware matrices.
+## The Critical Path
 
-### 4. Benchmark & Showcase Superiority
-* [x] Execute bare-metal performance tests against Ubuntu across AI workloads and syscall latency.
-* [x] Publish definitive benchmark results proving SigmaOS superiority across GitHub and social channels.
+Everything depends on `kernel-exp` shipping Phase 0:
 
-### 5. Community Engagement Launch
-* [x] Open official Discord/Slack collaboration channels for real-time developer coordination.
-* [x] Establish structured contributor recognition programs (Badges, Grants, Core Credits).
+1. `kernel-exp` → bootable kernel
+2. `drivers-dev` → GPU + Wi-Fi drivers
+3. `fs-dev` → VFS + SigmaFS
+4. All `release/*` profiles become functional
 
----
+## Quick Links
 
-## ⚡ Medium-Term Goals
-
-### 1. Sovereign Cloud Integration
-* [ ] Provide official, hardened SigmaOS cloud images for AWS, Azure, and GCP.
-* [ ] Deploy bare-metal optimized builds specifically tuned for sovereign cloud data centers.
-
-### 2. Enterprise Adoption & Support SLAs
-* [ ] Roll out comprehensive enterprise support contracts and dedicated compliance engineering teams.
-* [ ] Establish strategic partnerships with national digital sovereignty initiatives.
-
-### 3. Security Differentiation & Hardening
-* [ ] Complete formal mathematical verification of kernel ring isolation and zero-telemetry memory spaces.
-* [ ] Enforce continuous cryptographic supply chain auditing across all system shards.
-
-### 4. Hardware Expansion
-* [ ] Deepen native driver support for next-gen ARM, RISC-V, and AI NPU/TPU accelerators.
-* [ ] Optimize direct GPU memory access for massive-scale ML training workloads.
-
----
-
-## 🚀 Long-Term Vision
-Position SigmaOS Zenith as the global standard sovereign AI-native OS for governments, enterprises, and next-generation silicon architectures. Build an unassailable reputation where SigmaOS is recognized as the only rational choice for sovereignty, AI acceleration, and critical infrastructure.
+- [CURRENT_PROBLEMS_MANIFEST.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CURRENT_PROBLEMS_MANIFEST.md)
+- [FEATURE_MATRIX.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/FEATURE_MATRIX.md)
+- [CONTRIBUTOR_ROADMAP.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CONTRIBUTOR_ROADMAP.md)
+- [GitHub Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
