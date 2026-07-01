@@ -1,19 +1,11 @@
-## 🌐 SigmaOS Roadmap
-- [Master Roadmap](Roadmap)
-- [Phase 1: Foundation & Branch Unification](Phase-1-Foundation-And-Branch-Unification)
-- [Phase 2: Modularization & Profiles](Phase-2-Modularization-And-Profiles)
-- [Phase 3: Package & Update System](Phase-3-Package-And-Update-System)
-- [Phase 4: CI/CD & Testing](Phase-4-CICD-And-Testing)
-- [Phase 5: Ecosystem & Developer Tools](Phase-5-Ecosystem-And-Developer-Tools)
-- [Phase 6: Long-Term Vision](Phase-6-Long-Term-Vision)
-
 ## Getting Started
 - [Home](Home)
-- [Building from Source](Building-from-Source)
 - [FAQ](FAQ)
+- [Building from Source](Building-from-Source)
+- [Installation](Installation)
 - [Branch Guide](Branch-Guide)
+- [Contributing](Contributing)
 - [Contributor Roadmap](Contributor-Roadmap)
-- [Improvements Overview](Improvements-Overview)
 
 ## Roadmap
 - [Roadmap Hub](Roadmap)
@@ -22,80 +14,59 @@
 - [Feature Roadmap](Feature-Roadmap)
 - [Version Timeline](Version-Timeline)
 - [Release Profiles](Release-Profiles)
-- [Phase A Execution Checklist](Phase-A-Execution-Checklist)
-- [Branch Development Roadmap](Branch-Development-Roadmap)
-- [Feature Branch Roadmap](Feature-Branch-Roadmap)
-- [CLI Commands Roadmap](CLI-Commands-Roadmap)
-- [Quality, Stability & Performance](Quality-Stability-Performance-Roadmap)
-- [Stability & Performance Extended](Stability-Performance-Extended)
-- [Compatibility, Automation & Personalisation](Compatibility-Automation-Personalisation-Roadmap)
-- [Advanced Quality Roadmap](Advanced-Quality-Roadmap)
-- [Systems Excellence Roadmap](Systems-Excellence-Roadmap)
-- [Engineering Principles Roadmap](Engineering-Principles-Roadmap)
-- [Modularisation Architecture Roadmap](Modularisation-Architecture-Roadmap)
-- [Sovereignty & User-Defined Roadmap](Sovereignty-UserDefined-Roadmap)
-- [Continuous Improvement Roadmap](Continuous-Improvement-Roadmap)
-- [Final Excellence Roadmap](Final-Excellence-Roadmap)
-- [Production Readiness Roadmap](Production-Readiness-Roadmap)
-- [Linux as Application Roadmap](Linux-As-Application-Roadmap)
-- [Feature Roadmap](Feature-Roadmap)
-- [Utilities Roadmap](Utilities-Roadmap)
-- [Gap Analysis](Gap-Analysis)
-- [Future Development Ideas](Future-Development-Ideas)
+- [Improvements Overview](Improvements-Overview)
 
 ## Architecture
 - [Architecture Overview](Architecture-Overview)
-- [Kernel Architecture](Kernel)
+- [Kernel Internals](Kernel)
 - [HAL](HAL)
 - [Networking Stack](Networking)
 - [System Daemons](System-Daemons)
 - [Syscall Dispatcher](Syscall-Dispatcher)
-- [OS Technical Superiority](OS-Technical-Superiority)
-- [Competitive Gap Matrix](Competitive-Gap-Matrix)
-- [Zenith System Improvement Plan](Zenith-System-Improvement-Plan)
-- [System Improvement Plan v15](System-Improvement-Plan)
-- [Differentiation Blueprint](Differentiation-Blueprint)
+- [Zenith Desktop](Zenith-Desktop)
 
 ## Security
 - [Security Model](Security-Model)
-- [Post-Quantum Security](Post-Quantum-Security)
+- [PQC Hardening](PQC_HARDENING)
+- [Sandbox Hardening](Sandbox-Hardening)
+- [Verified Boot](Verified-Boot)
+- [Zero-Dependency Architecture](Zero-Dependency-Architecture)
 
-## Testing
+## Development
+- [Developer Guide](Developer_Guide)
+- [Driver Development](Driver-Development)
 - [Testing Infrastructure](Testing-Infrastructure)
+- [Debugging Guide](DEBUGGING_GUIDE)
+- [Performance Guidelines](Performance_Guidelines)
 
 ## API Reference
 - [navigator.sigmaos API](API-Reference)
+- [App Manifest](App-Manifest)
+- [Syscall Table](Syscall-Dispatcher)
+- [sigma-pkg CLI](Package-Manager-Spec)
+- [sigma-cli Reference](CLI-Reference)
 
-## Application Development
-- [Writing Your First App](Your-First-App)
-- [App Manifest Format](App-Manifest)
-- [Developer Guide](Developer-Guide)
-- [Extension System](Utilities-Roadmap#plugin--extension-system)
-- [Browser Demo](Browser-Demo)
-
-## Profiles & Deployment
+## Profiles & Releases
 - [Release Profiles](Release-Profiles)
-- [Zenith Desktop](Zenith-Desktop)
-- [Performance Architecture](Performance-Architecture)
-- [Kiosk & Thin Client](Utilities-Roadmap#kiosk--thin-client-mode)
+- [Release Notes](Release-Notes)
+- [Version Timeline](Version-Timeline)
+- [Dual-Boot Coexistence](Dual-Boot-Coexistence)
+- [Mobile Format](Mobile-Format)
+- [RTOS Format](RTOS-Format)
+- [Cloud Format](Cloud-Format)
+- [Distributed Format](Distributed-Format)
+- [Microkernel Format](Microkernel-Format)
 
-## India & Business
-- [India Business Strategy](India-Business-Strategy)
-- [SigmaOS Vision for India](SigmaOS-Vision-India)
-- [Indian Compliance Roadmap](Indian-Compliance-Roadmap)
-- [India Profession Coverage](India-Profession-Coverage)
-- [India Profession Tools Roadmap](India-Profession-Tools-Roadmap)
-- [Extended Profession Tools](Extended-Profession-Tools)
-- [Advanced India Features](Advanced-India-Features)
-- [SigmaOS vs Ubuntu](SigmaOS-vs-Ubuntu)
-- [SigmaOS vs Linux Distros](SigmaOS-vs-Linux)
-- [SigmaOS Crushing Linux](SigmaOS-Crushing-Linux)
-- [Windows Parity Roadmap](Windows-Parity-Roadmap)
-- [Windows Compatibility Layer](Windows-Compatibility-Layer-Roadmap)
+## Strategy & Vision
+- [Strategic Vision](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/STRATEGIC_VISION.md)
+- [Competitive Analysis](Competitive-Analysis)
+- [Gap Analysis](Gap-Analysis)
+- [India Strategy](India-Business-Strategy)
+- [Surpassing Ubuntu](Surpassing-Ubuntu-Strategy)
+- [SigmaOS vs Linux](SigmaOS-vs-Linux)
 
-## Autonomous Systems
-- [Sigma Self-Heal](Sigma-Self-Heal)
-- [Sigma CommNet](Sigma-CommNet)
-
-## Driver Development
-- [Driver Development Guide](Driver-Development)
+## Community
+- [Code of Conduct](CODE_OF_CONDUCT)
+- [Governance](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/GOVERNANCE.md)
+- [Support](Support-Nexus)
+- [Bug Bounty](BUG_BOUNTY)

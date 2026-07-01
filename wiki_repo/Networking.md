@@ -1,160 +1,124 @@
-# Networking Stack
+# SigmaOS Networking Stack
 
-SigmaOS ships a custom network stack with no external dependencies. All four layers — TLS, DNS, DHCP, and WiFi — are implemented from scratch and integrated into the sigma_net unified interface.
+SigmaOS ships a sovereign, zero-trust network stack built from scratch — no Linux `net/` code, no legacy socket API baggage.
 
 ---
 
 ## Stack Overview
 
 ```
-Application (navigator.sigmaos.process.spawn / sigma_net_connect_secure)
+Applications (user space)
+    │  sys_socket / sys_connect / sys_send / sys_recv
+    ▼
+Socket layer (sigma_socket.cpp)
+    │
+    ├── TLS 1.3 + Kyber-1024 hybrid         (all connections)
+    ├── QUIC (planned)
+    └── Raw TCP/UDP
          │
          ▼
-sigma_net — unified interface (sigma_net.h)
-         │
-    ┌────┴──────────────────┐
-    │   TLS 1.3 + Kyber     │  sigma_tls.h
-    │   DNS-over-HTTPS      │  sigma_dns.h
-    │   DHCP client         │  sigma_dhcp.h
-    │   WPA3/SAE            │  sigma_wpa3.h
-    └────┬──────────────────┘
-         │
-         ▼
-kernel/net/ — TCP/IP state machine, conntrack, sigma-shield firewall
+Transport layer (sigma_tcp.c, sigma_udp.c)
+    │  TCP RFC 793 state machine, UDP
+    ▼
+Network layer (sigma_ip.c)
+    │  IPv4 + IPv6, ICMP, routing table
+    ▼
+Link layer (sigma_ethernet.c)
+    │  Ethernet II frames, ARP
+    ▼
+NIC Driver (SDF layer)
+    │  e1000, iwlwifi, rtl8xxxu, VirtIO-net
+    ▼
+Hardware
 ```
 
 ---
 
-## TLS 1.3 with Post-Quantum Hybrid Key Exchange
+## Implemented Features
 
-Source: `net/tls/sigma_tls.h`
+### Transport
+- TCP state machine (SYN → ESTABLISHED → FIN)
+- UDP datagram sockets
+- ICMP echo (ping)
+- IPv4 + IPv6 dual-stack
+- ARP request/reply
 
-**Key exchange**: X25519 + Kyber-1024 hybrid (`TLS_GROUP_X25519_KYBER1024 = 0xFE01`). Both algorithms must agree on the shared secret — breaking either one is not sufficient.
+### Security & Privacy
+- **TLS 1.3**: `net/tls/` — X25519/Kyber-1024 hybrid key exchange
+- **WPA3/SAE**: dragonfly key exchange (P-256) for Wi-Fi
+- **WireGuard VPN**: `net/vpn/sigma_wireguard.cpp`
+- **DNS-over-HTTPS**: all DNS queries encrypted by default
+- **DNSSEC**: validation via `net/dns/sigma_dnssec.cpp`
+- **Stateful firewall**: `net/firewall/sigma_firewall.cpp`
+- **NAT + conntrack**: `net/sigma_nat.cpp`
+- **Zero-trust**: every connection requires SPIFFE workload identity
 
-**Certificate signatures**: Dilithium5 (ML-DSA-87, NIST FIPS 204). Note: Kyber-1024 is used *only* for key encapsulation, never for signing. See [Security Model](Security-Model) for the Kyber misuse bug fixed in the hypervisor.
+### Connectivity
+- **DHCP client**: RFC 2131/2132 full state machine
+- **CRDT offline sync**: `net/sigma_offline_sync.cpp` — merge without server
+- **Mesh networking**: `net/mesh/` — ZeroNet for `release/distributed`
 
-**Key derivation**: HKDF (RFC 5869) label expansion, exactly as specified in RFC 8446 §7.1.
+---
 
-**AEAD**: AES-256-GCM or ChaCha20-Poly1305, negotiated via cipher suite.
+## DNS Architecture
 
-```c
-sigma_tls_config_t* cfg = sigma_tls_config_new();
-sigma_tls_config_enable_pqc(cfg, true);    // X25519 + Kyber-1024 hybrid
-
-sigma_tls_session_t* sess = sigma_tls_session_new(cfg);
-sigma_tls_connect(sess, "api.example.com", send_cb, recv_cb, ctx);
-// Handshake: ClientHello with hybrid key_share → ServerHello → Finished
-sigma_tls_write(sess, data, len);
+```
+sigma_gethostbyname("example.com")
+    │
+    ▼
+sigma_dns_resolve()
+    ├── Check LRU cache (TTL-aware)
+    ├── HIT → return cached answer
+    └── MISS →
+          ├── Try DNS-over-HTTPS (primary)
+          ├── Fall back to UDP DNS (if DoH unavailable)
+          └── Validate DNSSEC signature
+                └── Cache result → return
 ```
 
 ---
 
-## DNS Resolver with DoH + DNSSEC
+## Network Daemons
 
-Source: `net/dns/sigma_dns.h`
-
-Three transport modes:
-- `DNS_TRANSPORT_UDP` — classic RFC 1035, port 53
-- `DNS_TRANSPORT_HTTPS` — DNS-over-HTTPS (RFC 8484), HTTPS POST with `application/dns-message`
-- `DNS_TRANSPORT_TLS` — DNS-over-TLS (DoT), port 853
-
-DNSSEC validation uses the root KSK 2017 as trust anchor (`SIGMA_DNS_ROOT_KSK_2017`). Responses with `AD=1` (Authenticated Data) and valid RRSIG chains are marked `validated=true`. Broken chains set `bogus=true` and the resolver returns `SERVFAIL`.
-
-```c
-sigma_dns_resolver_t* r = sigma_dns_resolver_new();
-sigma_dns_config_set_doh(&r->config, "https://dns.sigma.os/dns-query", true);
-
-sigma_dns_response_t* resp;
-sigma_dns_resolve(r, "api.example.com", DNS_TYPE_A, &resp);
-// resp->answers[0].data.a.addr = IPv4 address
-// resp->answers[0].validated   = true (DNSSEC OK)
-
-uint8_t ip[4]; uint32_t ttl;
-sigma_dns_get_address_a(resp, ip, &ttl);
-sigma_dns_response_free(resp);
-```
-
-Cache: up to `DNS_CACHE_MAX_ENTRIES` (1024) entries, respects TTL, configurable min/max bounds.
-
-**DNS Sinkhole** (source: `kernel/net/sigma_dns_sinkhole.h`): Blocks malware domains by returning NXDOMAIN or a sinkhole IP. Block lists are signed `.sinkhole` packages installed via sigma-pkg. Subdomain matching is included: blocking `malware.com` also blocks `evil.malware.com`.
+| Daemon | Socket | Purpose |
+|--------|--------|---------|
+| `sigmad-netd` | `/run/sigma/netd.sock` | Interface management, routing |
+| `sigmad-dnsd` | `/run/sigma/dnsd.sock` | Local DNS resolver |
+| `sigmad-dhcpd` | `/run/sigma/dhcpd.sock` | DHCP client daemon |
+| `sigmad-vpnd` | `/run/sigma/vpnd.sock` | WireGuard VPN management |
+| `sigmad-firewalld` | `/run/sigma/fwd.sock` | Firewall rule management |
 
 ---
 
-## DHCP Client
+## Open Issues (Phase G)
 
-Source: `net/dhcp/sigma_dhcp.h`
-
-Full RFC 2131 / RFC 2132 implementation:
-
-1. `SIGMA_ACQ_PENDING` → `sigma_dhcp_discover()` → broadcast DISCOVER
-2. Receive OFFER → `sigma_dhcp_request(ip, server_id)` → send REQUEST
-3. Receive ACK → `DHCP_LEASE_STATE_BOUND` — IP assigned
-4. T1 timer fires → `SIGMA_LEASE_STATE_RENEWING` → unicast REQUEST to original server
-5. T2 timer fires → `SIGMA_LEASE_STATE_REBINDING` → broadcast REQUEST
-6. Lease expires → `SIGMA_LEASE_STATE_EXPIRED` → restart discovery
-
-Lease information (IP, subnet, router, DNS, TFTP, hostname, domain) is stored in `sigma_dhcp_lease_t` and published to sigma-ds at `sigma.net.lease.<interface>`.
+| ID | Issue | Status |
+|----|-------|--------|
+| #851-WLAN | Wi-Fi 6 driver (iwlwifi) | ⬜ Phase G |
+| #851-BT | Bluetooth 5.3 HCI | ⬜ Phase G |
+| #1012 | Full TCP/UDP RFC 793 state machine | ⬜ Phase G |
+| — | QUIC transport | ⬜ Phase H |
 
 ---
 
-## WPA3/SAE Authentication
+## Source Files
 
-Source: `net/wifi/sigma_wpa3.h`
-
-Implements Simultaneous Authentication of Equals (SAE, RFC 7664):
-- Hunting-and-pecking algorithm to derive a password element from the shared passphrase + peer MACs
-- Commit → Confirm exchange using P-256 EC operations
-- Session keys derived via HKDF from the SAE PMK
-
-Also supports OWE (Opportunistic Wireless Encryption) for open networks that still want encryption without a passphrase.
-
----
-
-## Unified Network Stack API
-
-Source: `net/sigma_net.h`
-
-```c
-// Default init — DHCP + DoH + WPA3
-sigma_net_stack_t* net = sigma_net_init();
-
-// Wait for network to come up (DHCP bound + DNS reachable)
-sigma_net_wait_available(net, 30000 /*30s timeout*/);
-
-// Resolve + establish TLS connection in one call
-sigma_tls_session_t* sess;
-sigma_net_connect_secure(net, "pkg.sigma.os", 443, &sess);
-
-// Use the connection
-sigma_tls_write(sess, request, req_len);
-```
-
-Three built-in configuration presets:
-
-| Preset | Use case |
-|---|---|
-| `sigma_net_config_default()` | Sane defaults — DHCP, DoH, no DNSSEC mandatory |
-| `sigma_net_config_secure()` | Maximum security — DNSSEC required, PQC enabled, WPA3 only |
-| `sigma_net_config_fast()` | IoT / constrained — caching, no DNSSEC validation |
+| File | Purpose |
+|------|---------|
+| `net/sigma_net.cpp` | Stack initialisation |
+| `net/tcp.c` | TCP state machine |
+| `net/udp.c` | UDP datagrams |
+| `net/sigma_ip.c` | IPv4 routing |
+| `net/sigma_ethernet.c` | Ethernet II framing |
+| `net/dns.c` | DNS resolver |
+| `net/dhcp.c` | DHCP client |
+| `net/tls/` | TLS 1.3 + PQC |
+| `net/vpn/` | WireGuard |
+| `net/firewall/` | Stateful firewall |
+| `net/mesh/` | ZeroNet mesh |
+| `net/sigma_offline_sync.cpp` | CRDT sync |
+| `drivers/net/sigma_iwlwifi.cpp` | Wi-Fi 6 driver (Phase G) |
 
 ---
 
-## Firewall (sigma-shield)
-
-The `sigma_shield` packet filter evaluates rules against **actual packet 5-tuples** — not mocked data (Bug #10 fix). Rules are evaluated in O(1) via a hash table keyed on `(src_ip, dst_ip, src_port, dst_port, proto)`.
-
-**Conntrack**: The counter is decremented when connections close (Bug #19 fix). A configurable maximum (`sigma-sysctl net.firewall.conntrack_max`) rejects new entries when full.
-
-**eBPF integration**: `kernel/security/sigma_ebpf.h` — custom BPF programs can attach to `SIGMA_EBPF_HOOK_PACKET_RX` and `SIGMA_EBPF_HOOK_PACKET_TX` for programmable packet processing without recompiling the kernel.
-
----
-
-## Network Namespace Isolation
-
-Every process spawned via `sigmad-process` gets its own network namespace (`CLONE_NEWNET`). By default only loopback is available. Adding `net:host` capability to the app manifest adds a veth pair to the host network.
-
-For maximum isolation, `sigma_netgw_config_t` (`kernel/virt/sigma_netgw.h`) allows running a Whonix-style network gateway VM that forces all traffic through Tor and prevents any direct clearnet connections from the workload VM.
-
----
-
-*See also: [Security Model](Security-Model) · [Architecture Overview](Architecture-Overview) · [Building from Source](Building-from-Source)*
+*See also: [Architecture-Overview](Architecture-Overview) · [Security-Model](Security-Model) · [System-Daemons](System-Daemons)*
