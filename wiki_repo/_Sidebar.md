@@ -53,6 +53,9 @@
 - [SDK Guide](SDK-Guide)
 - [Driver Development](Driver-Development)
 - [Open Source Drivers](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Open_Source_Drivers.md)
+- [OSS Reference Map](OSS-Reference-Map)
+- [Hardware CI Matrix](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Hardware_CI_Matrix.md)
+- [License Map](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/License_Map.md)
 - [Your First App](Your-First-App)
 - [Testing Infrastructure](Testing-Infrastructure)
 - [Debugging Guide](DEBUGGING_GUIDE)
@@ -77,6 +80,8 @@
 ## Strategy & Vision
 - [Strategic Vision](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/STRATEGIC_VISION.md)
 - [Competitive Analysis](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Competitive_Analysis.md)
+- [OSS Reference Map](OSS-Reference-Map)
+- [Ideas Backlog (1000+)](Ideas-Backlog-1000)
 - [Gap Analysis](Gap-Analysis)
 - [Leapfrog Strategy](Leapfrog-Strategy)
 - [Surpassing Ubuntu](Surpassing-Ubuntu-Strategy)

@@ -1,6 +1,9 @@
 # SigmaOS — Branch-Wise Development Roadmap
 
-> Last updated: July 2026 | Current version: v15.0.0 Zenith | Next: v16.0.0 Apex
+> ⚠️ **SUPERSEDED** — All branches unified into `main`. See **[ROADMAP.md](ROADMAP.md)** for the current phase-based plan.
+> This file is retained for historical reference only.
+
+> Last updated: July 2026 | Current version: v15.0.0 Zenith
 
 ---
 
