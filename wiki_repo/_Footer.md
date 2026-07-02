@@ -1,9 +1,7 @@
-# Footer
-
 ---
-**SigmaOS Sovereign Lattice** | [GitHub Repository](https://github.com/AaryanSinghChauhan09/SigmaOS) | [Official Site](https://sigmaos.org)
 
-### Sovereignty is the ultimate efficiency
+**[SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS)** — Sovereign, AI-native, automation-first OS · v15.1 · MIT + GPL-2.0
 
-**Version**: v15.0 [HORIZON] | **Last Updated**: 2026-05-12
-© 2026 SigmaOS Sovereign Project.
+[sigma-agent](sigma-agent) · [Workflow Automation](sigma-agent-workflow) · [Migration Guide](Migration-Guide) · [SDK Guide](SDK-Guide) · [Community Governance](Community-Governance) · [SigmaOS vs Linux](SigmaOS-vs-Linux) · [Architecture](Architecture-Overview) · [Security Model](Security-Model)
+
+© 2024–2026 SigmaOS Project · Built with Rust, Nim, Zig, Ada/SPARK · Post-quantum cryptography (Kyber-1024 + Dilithium-5)
