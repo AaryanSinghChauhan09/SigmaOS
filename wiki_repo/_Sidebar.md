@@ -86,6 +86,8 @@
 
 ## Strategy & Vision
 - [Strategic Vision](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/STRATEGIC_VISION.md)
+- [Master Improvement Plan](Improvement-Plan)
+- [Adoption Strategy](Adoption-Strategy)
 - [Competitive Analysis](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Competitive_Analysis.md)
 - [OSS Reference Map](OSS-Reference-Map)
 - [Ideas Backlog (1000)](Ideas-Backlog-1000)
@@ -95,6 +97,13 @@
 - [Surpassing Ubuntu](Surpassing-Ubuntu-Strategy)
 - [SigmaOS vs Linux](SigmaOS-vs-Linux)
 - [India Strategy](India-Business-Strategy)
+
+## Design & UX
+- [Design System](Design-System)
+- [UI/UX Performance Plan](UI-UX-Performance)
+- [OOP Architecture](OOP-Architecture)
+- [App Development Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/App_Development_Roadmap.md)
+- [Performance Targets](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Performance_Targets.md)
 
 ## Integrations
 - [Integration Guide](Integration-Guide)
