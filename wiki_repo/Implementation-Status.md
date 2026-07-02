@@ -1,6 +1,7 @@
 # SigmaOS Implementation Status
 
-> All subsystems implemented in Rust / Zig / Nim / SPARK — zero C or C++.
+> All subsystems in Rust / Zig / Nim / SPARK/Ada — zero C or C++.
+> Last updated: batch 3 (complete)
 
 ---
 
@@ -27,6 +28,7 @@
 |---|---|---|
 | `kernel/memory/sigma_vmm.zig` | x86-64 4-level paging + W^X | ✅ |
 | `kernel/memory/sigma_oom.rs` | OOM killer with scoring | ✅ |
+| `kernel/memory/sigma_hugepages.ads/.adb` | 2MB/1GB huge pages (SPARK proven) | ✅ |
 
 ## Security (Rust + SPARK/Ada)
 
@@ -44,21 +46,24 @@
 | File | Description | Status |
 |---|---|---|
 | `kernel/crypto/sigma_sha256.rs` | SHA-256 + HMAC (cleanroom) | ✅ |
-| `crypto/sigma_kyber.rs` | Kyber-1024 KEM + NTT | 🔄 body TODO |
-| `crypto/sigma_dilithium.ads/.adb` | Dilithium-5 (SPARK proven) | 🔄 body TODO |
+| `crypto/sigma_kyber.rs` | Kyber-1024 KEM + NTT | ✅ |
+| `crypto/sigma_dilithium.ads/.adb` | Dilithium-5 (SPARK proven) | ✅ |
 
 ## Networking (Rust `#![no_std]`)
 
 | File | Description | Status |
 |---|---|---|
 | `kernel/net/sigma_net.rs` | Ethernet + IPv4 + ARP + UDP | ✅ |
-| `kernel/net/sigma_tcp.rs` | TCP state machine | ✅ |
+| `kernel/net/sigma_tcp.rs` | TCP state machine (11 states) | ✅ |
+| `kernel/net/sigma_icmp.rs` | ICMP echo request/reply + checksum | ✅ |
 | `kernel/net/sigma_dhcp.rs` | DHCP client RFC 2131 | ✅ |
-| `kernel/net/sigma_dns.rs` | DNS/DoH resolver | ✅ |
-| `kernel/net/sigma_tls.rs` | TLS 1.3 + Kyber hybrid | ✅ |
+| `kernel/net/sigma_dns.rs` | DNS/DoH resolver + cache | ✅ |
+| `kernel/net/sigma_tls.rs` | TLS 1.3 + Kyber hybrid + HKDF | ✅ |
 | `kernel/net/sigma_firewall.rs` | Stateful firewall + conntrack | ✅ |
-| `kernel/net/sigma_wireguard.rs` | WireGuard VPN + WPA2 key derive | ✅ |
-| `drivers/net/sigma_wifi.rs` | Wi-Fi driver framework + WPA3/SAE | ✅ |
+| `kernel/net/sigma_wireguard.rs` | WireGuard VPN + PTK derivation | ✅ |
+| `drivers/net/sigma_wifi.rs` | Wi-Fi framework + WPA2/WPA3 | ✅ |
+| `drivers/net/sigma_virtio_net.rs` | VirtIO NIC (QEMU/KVM) | ✅ |
+| `drivers/net/sigma_e1000.rs` | Intel e1000 Gigabit NIC | ✅ |
 
 ## Filesystems (Rust `#![no_std]`)
 
@@ -74,12 +79,12 @@
 
 | File | Description | Status |
 |---|---|---|
-| `drivers/net/sigma_e1000.rs` | Intel e1000 Gigabit NIC | ✅ |
 | `drivers/storage/sigma_nvme.rs` | NVMe PCIe | ✅ |
+| `drivers/storage/sigma_ahci.rs` | SATA AHCI controller | ✅ |
 | `drivers/display/sigma_vesa.zig` | VESA/GOP framebuffer | ✅ |
-| `drivers/gpu/sigma_virtio_gpu.zig` | VirtIO GPU (QEMU) | ✅ |
+| `drivers/gpu/sigma_virtio_gpu.zig` | VirtIO GPU (QEMU accelerated) | ✅ |
 | `drivers/input/sigma_hid.zig` | USB HID keyboard + mouse | ✅ |
-| `drivers/usb/sigma_xhci.zig` | xHCI USB 3.x host | ✅ |
+| `drivers/usb/sigma_xhci.zig` | xHCI USB 3.x host controller | ✅ |
 | `drivers/audio/sigma_hda.rs` | Intel HDA audio | ✅ |
 | `drivers/hal/sigma_pci.zig` | PCI bus scan + MSI-X | ✅ |
 | `kernel/power/sigma_power.zig` | ACPI P/C-states governor | ✅ |
@@ -91,49 +96,87 @@
 | `sigma-boot/sigma_boot.zig` | UEFI EFI stub (replaces C) | ✅ |
 | `kernel/core/sigma_irq.zig` | IDT + APIC + PIC | ✅ |
 | `kernel/memory/sigma_vmm.zig` | Page table setup at boot | ✅ |
+| `kernel/core/sigma_timer.zig` | HPET + APIC timer calibration | ✅ |
 
-## Userland (Nim + Rust)
+## Userland — Shell & Tools (Nim + Rust)
 
 | File | Description | Status |
 |---|---|---|
 | `userland/shell/sigma_shell.nim` | sigma-sh full REPL | ✅ |
-| `userland/pkg/sigma_pkg.nim` | sigma-pkg with SHA-256 | ✅ |
-| `userland/coreutils/sigma_coreutils.nim` | ls/cat/cp/mv/rm/grep/wc… | ✅ |
+| `userland/shell/sigma_scripting.nim` | Script runner: vars/if/for/while/funcs | ✅ |
+| `userland/pkg/sigma_pkg.nim` | sigma-pkg with SHA-256 + registry | ✅ |
+| `userland/coreutils/sigma_coreutils.nim` | ls/cat/cp/mv/rm/grep/wc/head/tail… | ✅ |
 | `userland/init/sigma_init.rs` | PID 1 + service supervisor | ✅ |
-| `userland/update/sigma_update.rs` | A/B atomic updater | ✅ |
+| `userland/update/sigma_update.rs` | A/B atomic updater + rollback | ✅ |
 | `userland/vault/sigma_vault.rs` | TPM2-backed secrets store | ✅ |
-| `userland/net/sigma_ssh.nim` | SSH client | ✅ |
-| `userland/daemon/sigmad_health.rs` | Health monitor daemon | ✅ |
-| `userland/desktop/sigma_compositor.rs` | Zenith compositor (scene-graph) | ✅ |
-| `userland/desktop/sigma_wm.rs` | Window manager (tiling/BSP/grid) | ✅ |
-| `userland/ai/sigma_ai.rs` | sigma-ai TinyLlama inference daemon | ✅ |
+| `userland/net/sigma_ssh.nim` | SSH-2.0 client | ✅ |
+| `userland/net/sigma_http.nim` | HTTP/1.1 client (sigma-curl) | ✅ |
+| `userland/tools/sigma_monitor.rs` | CPU/mem/net system monitor | ✅ |
+| `userland/tools/sigma_disks.nim` | Disk partitioner + mkfs | ✅ |
+| `userland/tools/sigma_logs.rs` | Structured log viewer + filter | ✅ |
 
-## Runtime (Rust)
+## Userland — Desktop (Rust)
 
 | File | Description | Status |
 |---|---|---|
+| `userland/desktop/sigma_compositor.rs` | Zenith compositor, alpha blend | ✅ |
+| `userland/desktop/sigma_wm.rs` | Window manager (master/grid/BSP) | ✅ |
+| `userland/desktop/sigma_theme.rs` | Theme engine + 3 built-in themes | ✅ |
+| `userland/desktop/sigma_notifications.rs` | Notification system + DND | ✅ |
+| `userland/desktop/sigma_widgets.rs` | Widget toolkit (Button/TextInput) | ✅ |
+| `userland/desktop/sigma_launcher.rs` | App launcher with fuzzy search | ✅ |
+
+## Userland — Daemons (Rust)
+
+| File | Description | Status |
+|---|---|---|
+| `userland/daemon/sigmad_health.rs` | System health monitor daemon | ✅ |
+| `userland/daemon/sigmad_netd.rs` | Network manager daemon | ✅ |
+
+## AI + Runtime (Rust)
+
+| File | Description | Status |
+|---|---|---|
+| `userland/ai/sigma_ai.rs` | TinyLlama transformer + tokenizer | ✅ |
 | `runtime/wasm/sigma_wasm.rs` | WASM/WASI binary parser | ✅ |
 | `runtime/containers/sigma_container.rs` | sigma-pod OCI container runtime | ✅ |
-| `virtualization/ocirunner/sigma_oci.rs` | OCI runner with ContainerRuntime trait | ✅ |
+| `virtualization/ocirunner/sigma_oci.rs` | OCI runner with ContainerRuntime | ✅ |
 
 ## Tools (Nim + Rust)
 
 | File | Description | Status |
 |---|---|---|
-| `tools/tracing/sigma_tracer.rs` | Syscall + shard tracer | ✅ |
-| `tools/signing/sigma_sign.nim` | cosign + in-toto signing | ✅ |
+| `tools/tracing/sigma_tracer.rs` | Syscall + shard event tracer | ✅ |
+| `tools/signing/sigma_sign.nim` | cosign + in-toto provenance | ✅ |
 
 ---
 
 ## Language Distribution
 
 ```
-Rust     65%  — kernel core, security, net, fs, crypto, userland
+Rust     65%  — kernel core, security, net, fs, crypto, userland, AI
 Zig      20%  — HAL, boot, IRQ, timers, drivers, paging
-Nim      10%  — shell, pkg manager, coreutils, SSH client, signing
-SPARK/Ada 5%  — Dilithium-5 proven crypto
+Nim      10%  — shell, scripting, pkg manager, coreutils, tools, HTTP, SSH
+SPARK/Ada 5%  — Dilithium-5, huge pages (formally proven)
 C / C++   0%  — none
 ```
 
-*Every file is OOP via Traits (Rust), struct methods (Zig), or object+methods (Nim).*
-*No predefined stdlib functions used in kernel crates. No third-party dependencies.*
+---
+
+## Subsystem Coverage
+
+| Category | Planned | Implemented | % |
+|---|---|---|---|
+| Kernel Core | 12 | 12 | 100% |
+| Memory | 3 | 3 | 100% |
+| Security | 6 | 6 | 100% |
+| Crypto | 3 | 3 | 100% |
+| Networking | 11 | 11 | 100% |
+| Filesystems | 5 | 5 | 100% |
+| Drivers | 9 | 9 | 100% |
+| Boot | 4 | 4 | 100% |
+| Shell/Tools | 12 | 12 | 100% |
+| Desktop | 6 | 6 | 100% |
+| Daemons | 2 | 2 | 100% |
+| AI/Runtime | 4 | 4 | 100% |
+| **Total** | **77** | **77** | **100%** |
