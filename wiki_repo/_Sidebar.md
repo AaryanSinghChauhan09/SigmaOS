@@ -102,18 +102,13 @@
 - [sigma-cli Reference](CLI-Reference)
 
 ## Strategy & Vision
-- [Strategic Vision](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/STRATEGIC_VISION.md)
-- [Master Improvement Plan](Improvement-Plan)
-- [Adoption Strategy](Adoption-Strategy)
-- [Competitive Analysis](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Competitive_Analysis.md)
-- [OSS Reference Map](OSS-Reference-Map)
-- [Ideas Backlog (1000)](Ideas-Backlog-1000)
-- [Ideas 1001–2000](Ideas-2000)
-- [Gap Analysis](Gap-Analysis)
-- [Leapfrog Strategy](Leapfrog-Strategy)
-- [Surpassing Ubuntu](Surpassing-Ubuntu-Strategy)
+- [OSS Absorption Strategy](OSS-Absorption-Strategy)
 - [SigmaOS vs Linux](SigmaOS-vs-Linux)
-- [India Strategy](India-Business-Strategy)
+- [Development Analysis](Development-Analysis)
+- [Ideas — New 200+](IDEAS-New-200)
+- [Ideas Backlog 1000+](Ideas-Backlog-1000)
+- [Ideas 1001–2000](Ideas-2000)
+- [Leapfrog Strategy](Leapfrog-Strategy)
 
 ## Design & UX
 - [Design System](Design-System)

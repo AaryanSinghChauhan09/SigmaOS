@@ -42,6 +42,8 @@ import sigma_agent_script_gen
 import sigma_agent_explain
 import sigma_agent_workflow
 import sigma_agent_corpus
+import sigma_agent_capability_store
+import sigma_agent_perf_regression
 
 # ── ANSI colour palette ────────────────────────────────────────────────────────
 const
@@ -601,6 +603,14 @@ proc main() =
   # ── corpus (AI training corpus builder) ──────────────────────────────────────
   of "corpus","dataset","train-corpus":
     corpus_cmd(sub_args)
+
+  # ── capstore (capability-based app store) ─────────────────────────────────────
+  of "capstore","caps","capability-store":
+    capability_store_cmd(sub_args)
+
+  # ── perf (performance regression detector) ────────────────────────────────────
+  of "perf","perf-test","regression":
+    perf_regression_cmd(sub_args)
 
   # ── recipe (declarative package recipe builder) ───────────────────────────────
   of "recipe","pkg-recipe":
