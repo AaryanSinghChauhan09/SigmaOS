@@ -1,174 +1,300 @@
-# SigmaOS API Reference
+# navigator.sigmaos API Reference
 
-## navigator.sigmaos.* — Browser Shell API
-
-The browser profile exposes native system primitives to PWAs via `navigator.sigmaos.*`. All calls are capability-gated — the app must declare required permissions in its `sigma.manifest.json`.
+All SigmaOS platform APIs are exposed under the `navigator.sigmaos` namespace and are available to any PWA or web app running inside the SigmaOS shell, provided the required capability is declared in the app's `manifest.json`.
 
 ---
 
-### Process Management
+## navigator.sigmaos.process
+
+### `.spawn(options)`
+
+Spawns a native process inside a bubblewrap sandbox and streams its output.
+
+**Requires capability**: `process:spawn`
 
 ```js
-// Spawn a subprocess
-const proc = await navigator.sigmaos.spawn("/usr/bin/ls", ["-la", "/home"]);
-proc.stdout.on("data", chunk => console.log(chunk));
-await proc.wait(); // resolves with exit code
-
-// Pipe two processes
-const ls = await navigator.sigmaos.spawn("ls", ["-la"]);
-const grep = await navigator.sigmaos.spawn("grep", [".md"]);
-ls.stdout.pipe(grep.stdin);
-```
-
-### Filesystem (`rpath` / `wpath` capability required)
-
-```js
-// Read a file
-const data = await navigator.sigmaos.readFile("/home/user/doc.txt", "utf8");
-
-// Write a file
-await navigator.sigmaos.writeFile("/home/user/out.txt", "hello sigma\n");
-
-// List directory
-const entries = await navigator.sigmaos.readdir("/home/user");
-
-// File watcher
-const watcher = navigator.sigmaos.watch("/home/user/docs");
-watcher.on("change", (event, filename) => console.log(filename, "changed"));
-```
-
-### Memory Mapping (`mmap` capability required)
-
-```js
-// Map a shared memory region
-const shm = await navigator.sigmaos.mmap({
-    size: 4096,
-    prot: "rw",
-    flags: "shared",
-    name: "my-shm"
+const proc = await navigator.sigmaos.process.spawn({
+  cmd: "ffmpeg",
+  args: ["-i", "input.mp4", "-vcodec", "h264", "output.mp4"],
+  caps: [
+    "bin:ffmpeg",
+    "fs:/home/user/Videos",
+    "fs:/tmp"
+  ]
 });
-const view = new Uint8Array(shm.buffer);
-```
 
-### /dev Access (`dev` capability required)
-
-```js
-// Open a device node
-const cam = await navigator.sigmaos.openDevice("/dev/video0");
-const frame = await cam.read(1280 * 720 * 3);
-```
-
-### System Info
-
-```js
-// CPU + memory stats
-const stats = await navigator.sigmaos.sysinfo();
-console.log(stats.cpuCount, stats.totalRam, stats.freeRam);
-
-// Kernel version
-const ver = await navigator.sigmaos.uname();
-console.log(ver.sysname, ver.release); // "SigmaOS" "16.0.0-Apex"
-```
-
----
-
-## sigma-pkg CLI
-
-```bash
-# Install a package
-sigma-pkg install firefox@latest
-
-# Remove a package
-sigma-pkg remove firefox
-
-# Update all packages
-sigma-pkg update
-
-# Delta update (incremental)
-sigma-pkg update --delta
-
-# Search packages
-sigma-pkg search "text editor"
-
-# Show package info
-sigma-pkg info neovim
-
-# List installed
-sigma-pkg list
-
-# Reproduce-verify a build
-sigma-pkg verify firefox
-```
-
----
-
-## sigma-cli System Tools
-
-```bash
-# System status
-sigma status
-
-# Top-like process viewer
-sigma-top
-
-# Network monitor
-sigma-net status
-sigma-net dns set 1.1.1.1
-
-# Package manager shorthand
-sigma install firefox
-sigma remove firefox
-
-# Profile switcher
-sigma profile set developer
-sigma profile list
-
-# Snapshot management
-sigma snapshot create my-backup
-sigma snapshot restore my-backup
-sigma snapshot diff my-backup HEAD
-```
-
----
-
-## sigma-bus IPC (C++ API)
-
-```cpp
-#include "include/SovereignIPC.h"
-
-// Server side
-auto server = sigma_bus_listen("my.service");
-while (auto req = server->accept()) {
-    auto token = sigma_cap_verify(req->capability, "my.service/read");
-    if (!token) { req->deny(); continue; }
-    req->reply(handle_request(req->payload));
+// Stream stdout in real time
+for await (const chunk of proc.stdout) {
+  console.log(chunk);
 }
 
-// Client side
-auto conn = sigma_bus_connect("my.service");
-auto cap = sigma_cap_request("my.service/read");  // from sigma-trustd
-auto resp = conn->call(cap, payload);
+const exitCode = await proc.wait();
+```
+
+**Options:**
+
+| Field | Type | Description |
+|---|---|---|
+| `cmd` | `string` | Binary name to execute |
+| `args` | `string[]` | Argument list |
+| `caps` | `string[]` | Per-invocation capability overrides |
+| `stdin` | `Uint8Array \| ReadableStream` | Optional stdin data |
+| `cwd` | `string` | Working directory inside the sandbox |
+| `env` | `Record<string, string>` | Additional environment variables |
+
+**Returns**: `SigmaProcess` object with `stdout`, `stderr` (async iterables), and `wait()` (resolves to exit code).
+
+---
+
+### `.kill(pid, signal?)`
+
+Sends a signal to a running process.
+
+```js
+await navigator.sigmaos.process.kill(proc.pid, "SIGTERM");
 ```
 
 ---
 
-## App Manifest (`sigma.manifest.json`)
+## navigator.sigmaos.fs
 
-```json
-{
-  "name": "My SigmaOS App",
-  "version": "1.0.0",
-  "entry": "index.html",
-  "capabilities": ["rpath", "inet", "stdio"],
-  "unveil": [
-    { "path": "/home/$USER/Documents", "perm": "rw" },
-    { "path": "/usr/share/fonts", "perm": "r" }
-  ],
-  "sigma_bus": ["my.service"],
-  "min_sigmaos": "15.0.0"
+### `.read(path)`
+
+Reads a file and returns its contents as a `Uint8Array`.
+
+**Requires capability**: `fs:<path>` covering the target path.
+
+```js
+const bytes = await navigator.sigmaos.fs.read("/home/user/notes.md");
+const text = new TextDecoder().decode(bytes);
+```
+
+---
+
+### `.write(path, data)`
+
+Writes data to a file, creating it if it doesn't exist.
+
+```js
+await navigator.sigmaos.fs.write("/home/user/notes.md", new TextEncoder().encode("Hello"));
+```
+
+---
+
+### `.readdir(path)`
+
+Returns a list of directory entries.
+
+```js
+const entries = await navigator.sigmaos.fs.readdir("/home/user");
+// [{ name: "notes.md", type: "file", size: 1024 }, ...]
+```
+
+---
+
+### `.watch(path, callback)`
+
+Watches a path for changes (uses `inotify` under the hood).
+
+```js
+const unwatch = await navigator.sigmaos.fs.watch("/home/user", (event) => {
+  console.log(event.type, event.path); // "modify" "/home/user/notes.md"
+});
+
+// Stop watching
+unwatch();
+```
+
+---
+
+## navigator.sigmaos.pkg
+
+### `.ensure(packages)`
+
+Ensures one or more Alpine packages are installed in the user's home namespace. Downloads and installs them on first call; no-ops if already present.
+
+**Requires capability**: `process:spawn` (package manager runs in a sandboxed namespace)
+
+```js
+await navigator.sigmaos.pkg.ensure(["ffmpeg", "imagemagick"]);
+
+// Now ffmpeg is available at ~/.sigmaos/bin/ffmpeg
+const result = await navigator.sigmaos.process.spawn({
+  cmd: "ffmpeg",
+  args: ["-version"],
+  caps: ["bin:~/.sigmaos/bin/ffmpeg"]
+});
+```
+
+---
+
+### `.list()`
+
+Returns all currently installed packages.
+
+```js
+const packages = await navigator.sigmaos.pkg.list();
+// [{ name: "ffmpeg", version: "6.0-r1", size: "18.2 MB" }, ...]
+```
+
+---
+
+## navigator.sigmaos.window
+
+### `.create(options)`
+
+Creates a native frameless floating window (WebKit BrowserWindow-style) that renders a URL outside the normal tab chrome.
+
+```js
+const win = await navigator.sigmaos.window.create({
+  url: "https://app.sigmaos/sigma-code",
+  width: 1024,
+  height: 768,
+  title: "SigmaCode",
+  resizable: true,
+  alwaysOnTop: false
+});
+```
+
+**Options:**
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `url` | `string` | — | URL to load in the window |
+| `width` | `number` | `800` | Initial width in pixels |
+| `height` | `number` | `600` | Initial height in pixels |
+| `title` | `string` | `""` | Window title bar text |
+| `resizable` | `boolean` | `true` | Whether the user can resize the window |
+| `alwaysOnTop` | `boolean` | `false` | Pin the window above all others |
+| `frameless` | `boolean` | `true` | Hide the OS window chrome |
+
+**Returns**: `SigmaWindow` with `.close()`, `.focus()`, `.resize(w, h)`, `.move(x, y)`.
+
+---
+
+## navigator.sigmaos.notification
+
+### `.show(options)`
+
+Displays a notification in the Notification Center.
+
+```js
+await navigator.sigmaos.notification.show({
+  title: "Sync Complete",
+  body: "Your files have been synced to Google Drive.",
+  icon: "/app-icons/sync.png",
+  actions: [
+    { label: "View Files", action: "open_files" }
+  ]
+});
+```
+
+---
+
+## navigator.sigmaos.ai
+
+### `.complete(prompt, options?)`
+
+Sends a completion request to the local `sigmad-ai` daemon (TinyLlama on port 17392).
+
+**Requires capability**: `ai:complete`
+
+```js
+const response = await navigator.sigmaos.ai.complete(
+  "Summarize this document:\n\n" + documentText,
+  { maxTokens: 256, temperature: 0.7 }
+);
+
+console.log(response.text);
+```
+
+---
+
+### `.predict(payload)`
+
+Sends a raw prediction request to `localhost:17392/v1/predict`.
+
+```js
+const prediction = await navigator.sigmaos.ai.predict({
+  model: "sigma-ui-v1",
+  features: contextVector
+});
+```
+
+---
+
+## navigator.sigmaos.clipboard
+
+### `.read()`
+
+Reads the current clipboard contents from `sigmad-clipboard`.
+
+**Requires capability**: `clipboard:read`
+
+```js
+const content = await navigator.sigmaos.clipboard.read();
+// { type: "text/plain", data: "Hello world" }
+// or { type: "image/png", data: Uint8Array }
+```
+
+---
+
+### `.write(content)`
+
+Writes to the shared clipboard. All registered apps receive a `clipboard-updated` event.
+
+**Requires capability**: `clipboard:write`
+
+```js
+await navigator.sigmaos.clipboard.write({
+  type: "text/plain",
+  data: "Copied text"
+});
+```
+
+---
+
+## navigator.sigmaos.shell
+
+### `.exec(options)`
+
+Higher-level wrapper combining `pkg.ensure` + `process.spawn` into a single call. Ensures the binary is available before executing.
+
+```js
+const result = await navigator.sigmaos.shell.exec({
+  cmd: "ffmpeg",
+  args: ["-i", "input.mp4", "output.webm"],
+  caps: ["bin:~/.sigmaos/bin/ffmpeg", "fs:/tmp"],
+  stdin: videoBytes  // optional Uint8Array
+});
+
+console.log(result.stdout);
+```
+
+---
+
+## Error Handling
+
+All `navigator.sigmaos` APIs return Promises that reject with typed errors:
+
+| Error class | When it's thrown |
+|---|---|
+| `PermissionDeniedError` | Required capability not in manifest |
+| `DaemonUnavailableError` | The target daemon is not running |
+| `TimeoutError` | Daemon did not respond within 10 seconds |
+| `ProcessError` | Spawned process exited with non-zero code |
+| `FSError` | Filesystem operation failed (path not found, permission denied, etc.) |
+
+```js
+try {
+  await navigator.sigmaos.process.spawn({ cmd: "rm", args: ["-rf", "/"] });
+} catch (e) {
+  if (e instanceof PermissionDeniedError) {
+    console.error("App does not have process:spawn capability");
+  }
 }
 ```
 
 ---
 
-*See also: [App-Manifest](App-Manifest) · [Your-First-App](Your-First-App) · [Security-Model](Security-Model)*
+*See also: [Security Model](Security-Model) · [Writing Your First App](Your-First-App) · [App Manifest Format](App-Manifest)*

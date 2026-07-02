@@ -1,98 +1,181 @@
-# SigmaOS Syscall Dispatcher
+# Syscall Dispatcher
 
-The Sovereign Syscall Dispatcher is the sole gateway between user space (Ring 3) and kernel space (Ring 0). It enforces `sigma_pledge` capability checks before every kernel transition.
-
----
-
-## Entry Points
-
-| Architecture | Instruction | Setup |
-|-------------|-------------|-------|
-| x86_64 | `syscall` | LSTAR MSR points to `sigma_syscall_entry` |
-| ARM64 | `svc #0` | EL1 exception vector |
-| RISC-V | `ecall` | mtvec trap handler |
+The SigmaOS Syscall Dispatcher (`SovereignSyscall.cpp`) is the sole communication channel between Ring 3 userland and Ring 0 kernel space. Every system call flows through it — no direct kernel function calls from user processes.
 
 ---
 
-## Dispatch Flow
+## Mechanism
 
-```
-userland: syscall instruction
-  │
-  ▼
-sigma_syscall_entry (asm stub — saves all registers)
-  │
-  ▼
-sigma_pledge_check(current->pledge_mask, syscall_nr)
-  ├── DENIED → signal SIGABRT to process
-  └── ALLOWED →
-        ▼
-      syscall_table[syscall_nr](args...)
-        ▼
-      return value in rax (x86_64)
-        ▼
-      sysret — restore registers, return to Ring 3
+Userland code triggers a syscall using either `int 0x80` (legacy 32-bit compatibility) or the `syscall` instruction (x86_64 fast path):
+
+```asm
+; Userland: call sigma_write(1, "Hello", 5)
+mov rax, 0x01      ; syscall number: sys_write
+mov rdi, 1         ; fd = 1 (stdout)
+mov rsi, msg       ; buffer pointer
+mov rdx, 5         ; length
+syscall            ; transfer to Ring 0
 ```
 
----
+On `syscall`, the CPU:
+1. Saves `rip` and `rflags` in `rcx` and `r11`.
+2. Loads the kernel `rip` from the `LSTAR` MSR (set during `sigma_idt_init`).
+3. Switches to Ring 0 and the kernel stack.
 
-## Syscall Table (Phase G — 30 Essential Syscalls)
-
-| ID | Name | Signature |
-|----|------|-----------|
-| 0 | `sys_read` | `(int fd, void* buf, size_t len) → ssize_t` |
-| 1 | `sys_write` | `(int fd, const void* buf, size_t len) → ssize_t` |
-| 2 | `sys_open` | `(const char* path, int flags, mode_t mode) → int` |
-| 3 | `sys_close` | `(int fd) → int` |
-| 4 | `sys_stat` | `(const char* path, struct sigma_stat*) → int` |
-| 5 | `sys_fstat` | `(int fd, struct sigma_stat*) → int` |
-| 6 | `sys_lseek` | `(int fd, off_t offset, int whence) → off_t` |
-| 7 | `sys_mmap` | `(void* hint, size_t len, int prot, int flags, int fd, off_t) → void*` |
-| 8 | `sys_munmap` | `(void* addr, size_t len) → int` |
-| 9 | `sys_mprotect` | `(void* addr, size_t len, int prot) → int` |
-| 10 | `sys_brk` | `(void* addr) → void*` |
-| 11 | `sys_fork` | `(void) → pid_t` |
-| 12 | `sys_execve` | `(const char* path, char* const argv[], char* const envp[]) → int` |
-| 13 | `sys_exit` | `(int code) → noreturn` |
-| 14 | `sys_waitpid` | `(pid_t pid, int* status, int options) → pid_t` |
-| 15 | `sys_getpid` | `(void) → pid_t` |
-| 16 | `sys_kill` | `(pid_t pid, int sig) → int` |
-| 17 | `sys_sigaction` | `(int sig, const struct sigma_sigaction*, struct sigma_sigaction*) → int` |
-| 18 | `sys_socket` | `(int domain, int type, int protocol) → int` |
-| 19 | `sys_connect` | `(int fd, const struct sockaddr*, socklen_t) → int` |
-| 20 | `sys_bind` | `(int fd, const struct sockaddr*, socklen_t) → int` |
-| 21 | `sys_listen` | `(int fd, int backlog) → int` |
-| 22 | `sys_accept` | `(int fd, struct sockaddr*, socklen_t*) → int` |
-| 23 | `sys_send` | `(int fd, const void* buf, size_t len, int flags) → ssize_t` |
-| 24 | `sys_recv` | `(int fd, void* buf, size_t len, int flags) → ssize_t` |
-| 25 | `sys_ioctl` | `(int fd, unsigned long req, void* arg) → int` |
-| 26 | `sys_pipe` | `(int fd[2]) → int` |
-| 27 | `sys_dup2` | `(int oldfd, int newfd) → int` |
-| 28 | `sys_pledge` | `(const char* promises, const char* execpromises) → int` |
-| 29 | `sys_unveil` | `(const char* path, const char* permissions) → int` |
+The dispatcher then:
+1. Reads `rax` (syscall number).
+2. Validates it is within the table bounds.
+3. Looks up the handler via `sigma_syscall_table[rax]` — an O(1) function pointer dereference.
+4. Calls the handler with `rdi`, `rsi`, `rdx`, `r10`, `r8`, `r9` as arguments (Linux ABI).
+5. Returns the result in `rax` and restores user context via `sysretq`.
 
 ---
 
-## Adding a Syscall
+## Syscall Table
 
-1. Add entry to `kernel/syscalls/sigma_syscall_table.cpp`
-2. Add handler in `kernel/syscalls/sigma_sys_<subsystem>.cpp`
-3. Declare in `include/sigma_syscall.h`
-4. Add pledge capability check in `kernel/security/sigma_pledge.cpp`
-5. Write a test in `tests/unit/syscalls/`
+```c
+// syscalls.h
+#define SYSCALL_WRITE       0x01
+#define SYSCALL_READ        0x02
+#define SYSCALL_OPEN        0x03
+#define SYSCALL_CLOSE       0x04
+#define SYSCALL_SOCKET      0x05
+#define SYSCALL_PKG_INSTALL 0x06
+#define SYSCALL_GETPID      0x07
+#define SYSCALL_SPAWN       0x08
+#define SYSCALL_MMAP        0x09
+#define SYSCALL_MUNMAP      0x0A
+#define SYSCALL_EXIT        0x0B
+```
+
+The table is a fixed-size array of function pointers:
+
+```c
+// dispatcher.c
+static sigma_syscall_fn sigma_syscall_table[] = {
+    [SYSCALL_WRITE]       = sys_write_handler,
+    [SYSCALL_READ]        = sys_read_handler,
+    [SYSCALL_OPEN]        = sys_open_handler,
+    [SYSCALL_CLOSE]       = sys_close_handler,
+    [SYSCALL_SOCKET]      = sys_socket_handler,
+    [SYSCALL_PKG_INSTALL] = sys_pkg_install_handler,
+    [SYSCALL_GETPID]      = sys_getpid_handler,
+    [SYSCALL_SPAWN]       = sys_spawn_handler,
+    [SYSCALL_MMAP]        = sys_mmap_handler,
+    [SYSCALL_MUNMAP]      = sys_munmap_handler,
+    [SYSCALL_EXIT]        = sys_exit_handler,
+};
+```
+
+An out-of-range syscall number returns `-ENOSYS` (`-38`) without consulting the table.
 
 ---
 
-## Current Status
+## Syscall Reference
 
-| Component | Status |
-|-----------|--------|
-| Syscall table (headers) | ✅ Complete |
-| Syscall entry ASM stub | ⬜ Phase G |
-| pledge enforcement | ✅ Implemented |
-| unveil enforcement | ✅ Implemented |
-| 30 syscall bodies | ⬜ Phase G |
+### `sys_write` (0x01)
+
+```c
+sigma_u64 sys_write(sigma_i32 fd, const void* buf, sigma_size_t count);
+```
+
+Writes `count` bytes from `buf` to the file descriptor `fd`.
+
+- `fd = 1` (stdout): Writes to the VGA text console.
+- `fd = 2` (stderr): Writes to the COM1 serial debug output.
+- Any other fd: Routes to the VFS write callback for the open file.
+
+Returns bytes written on success, `-EBADF` if `fd` is not open, `-EFAULT` if `buf` is not in valid user memory.
 
 ---
 
-*See also: [Kernel](Kernel) · [Security-Model](Security-Model) · [Architecture-Overview](Architecture-Overview)*
+### `sys_read` (0x02)
+
+```c
+sigma_u64 sys_read(sigma_i32 fd, void* buf, sigma_size_t count);
+```
+
+Reads up to `count` bytes into `buf` from file descriptor `fd`.
+
+- `fd = 0` (stdin): Blocks until keyboard input is available, then reads from the PS/2 keyboard buffer.
+- Any other fd: Routes to the VFS read callback.
+
+Returns bytes read on success, `0` on EOF, `-EINTR` if interrupted by a signal.
+
+---
+
+### `sys_socket` (0x05)
+
+```c
+sigma_i32 sys_socket(sigma_i32 domain, sigma_i32 type, sigma_i32 protocol);
+```
+
+Allocates a socket. See [Networking](Networking) for the full socket API.
+
+---
+
+### `sys_spawn` (0x08)
+
+```c
+sigma_i32 sys_spawn(const char* path, const char** argv, const char** envp);
+```
+
+Creates a new process. The kernel:
+1. Allocates a new task struct and virtual address space.
+2. Loads the ELF binary from `path`.
+3. Sets up the user stack with `argv` and `envp`.
+4. Adds the task to the scheduler run queue.
+
+Returns the new process's PID on success, negative error code on failure.
+
+---
+
+### `sys_mmap` (0x09)
+
+```c
+void* sys_mmap(void* addr, sigma_size_t length, sigma_i32 prot, sigma_i32 flags, sigma_i32 fd, sigma_u64 offset);
+```
+
+Maps memory into the process's virtual address space.
+
+- `prot`: Combination of `PROT_READ`, `PROT_WRITE`, `PROT_EXEC`.
+- `flags`: `MAP_ANONYMOUS` (no file backing), `MAP_PRIVATE`, `MAP_SHARED`.
+- Returns: Virtual address of the mapping, or `(void*)-1` on failure.
+
+---
+
+### `sys_exit` (0x0B)
+
+```c
+[[noreturn]] void sys_exit(sigma_i32 status);
+```
+
+Terminates the calling process. The kernel:
+1. Frees all pages in the process's address space.
+2. Closes all open file descriptors.
+3. If the process is a child, delivers `SIGCHLD` to the parent.
+4. Marks the task as a zombie until the parent calls `wait`.
+
+This syscall never returns.
+
+---
+
+## Adding a New Syscall
+
+1. Add a `#define SYSCALL_MYOP 0xNN` to `syscalls.h`.
+2. Implement `sys_myop_handler` in the appropriate kernel source file.
+3. Add it to `sigma_syscall_table` in `dispatcher.c`.
+4. Expose a C wrapper in `lib/libc/sigma_libc.c`:
+
+```c
+sigma_i32 sigma_myop(sigma_i32 arg) {
+    return (sigma_i32)__syscall(SYSCALL_MYOP, arg);
+}
+```
+
+5. Declare the prototype in `sigma_libc.h`.
+6. Write a test in `tests/` and verify it passes: `npm run test`.
+
+---
+
+*See also: [Kernel](Kernel) · [Architecture Overview](Architecture-Overview) · [API Reference](API-Reference)*

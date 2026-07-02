@@ -1,35 +1,85 @@
-# Sovereign Networking Shard (S-NET)
+# 🌐 SigmaOS Networking Stack
 
-The Networking Shard is a modular, hot-swappable TCP/IP stack implemented independently from the monolithic kernel core. It provides secure sockets and strict network isolation for SigmaOS.
+> **Raw Sovereignty from Ethernet Frame to Application Layer.**
 
-## Architecture Diagram
+The entire SigmaOS networking stack is built from the ground up with zero reliance on BSD sockets, lwIP, or any POSIX networking APIs.
 
-```mermaid
-graph TD
-    A[Userland App] --> | Z-SYSCALL | B(S-NET Socket API)
-    B --> C{PQC Engine}
-    C --> | Encrypted | D[TCP/IP Stack]
-    C --> | Unencrypted | D
-    D --> E[Sovereign HAL]
-    E --> F[Hardware NIC
+---
 
- **TCP/IP Stack**: Full IPv4 (and future IPv6) implementation.
+## Architecture
 
-- **Secure Sockets**: Built-in integration with the Post-Quantum Cryptography (PQC) engine for default-encrypted packet transmission.
+```
+┌─────────────────────────────┐
+│  sigma_net_dns.cpp (DNS)    │
+│  sigma_firewall.cpp (FW)    │
+├─────────────────────────────┤
+│  sigma_net_socket.cpp       │  ← Sovereign Socket API
+├─────────────────────────────┤
+│  sigma_tcp.cpp (TCP FSM)    │
+│  sigma_ipv6.cpp (IPv6+NDP)  │
+├─────────────────────────────┤
+│  sigma_e1000.cpp (NIC)      │
+│  sigma_rtl8139.cpp (NIC)    │
+└─────────────────────────────┘
+```
 
-- **Hot-swappable**: The network driver and stack can be restarted or updated without rebooting the kernel.
+---
 
-## API Examples
+## Sovereign Socket API (`sigma_net_socket.cpp`)
 
-### Creating a Socke
+Replaces POSIX `<sys/socket.h>` entirely.
 
-c
-int fd;
-sigma_status status = SovereignNetworkShard::getInstance().socket_create(AF_INET, SOCK_STREAM, 0, &fd);
-if (status == SIGMA_OK) {
-    sigma_log("Socket successfully created.");
+| Function | Purpose |
+|----------|---------|
+| `sigma_net_socket_create(proto)` | Create TCP/UDP/RAW socket |
+| `sigma_net_socket_bind(sock, ip, port)` | Bind to local address |
+| `sigma_net_socket_connect(sock, ip, port)` | Initiate connection |
+| `sigma_net_socket_send(sock, data, len)` | Send data |
+| `sigma_net_socket_recv(sock, buf, max)` | Receive data |
+| `sigma_net_socket_close(sock)` | Close socket |
 
-### Binding to Por
+- Up to 1024 concurrent sockets
+- Ring buffer TX/RX for zero-copy IPC
 
-c
-SovereignNetworkShard::getInstance().socket_bind(fd, 0x7F000001, 8080)
+---
+
+## TCP Stack (`sigma_tcp.cpp`)
+
+**Absorbs**: RFC 793, Linux `tcp.c` state machine, uIP embedded stack.
+
+Implements the **full TCP finite state machine**:
+- Three-way handshake (SYN → SYN-ACK → ACK)
+- 11 states: CLOSED → LISTEN → SYN_SENT → SYN_RCVD → ESTABLISHED → FIN_WAIT1/2 → CLOSE_WAIT → CLOSING → LAST_ACK → TIME_WAIT
+- RFC 1071 one's complement checksum
+- Retransmission timer (3s RTO)
+
+---
+
+## IPv6 (`sigma_ipv6.cpp`)
+
+**Absorbs**: RFC 8200, Linux `net/ipv6/`.
+
+- Fixed 40-byte header parsing
+- Next-header routing (TCP=6, UDP=17, ICMPv6=58)
+- NDP Neighbor Cache (32 entries)
+- Address comparison for 128-bit addresses
+
+---
+
+## Firewall (`sigma_firewall.cpp`)
+
+**Absorbs**: `iptables` / `nftables` chain architecture.
+
+- 128 firewall rules
+- Match by: source IP/mask, dest IP/mask, dest port, protocol
+- Actions: `ACCEPT`, `DROP`
+- Default policy: ACCEPT
+
+---
+
+## DNS Resolver (`sigma_net_dns.cpp`)
+
+- Manually constructs raw UDP DNS query packets
+- Formats domain names into DNS wire format
+- Sends to port 53 via sovereign socket API
+- Parses A record answers

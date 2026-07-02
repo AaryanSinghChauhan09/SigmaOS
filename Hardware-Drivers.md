@@ -1,23 +1,28 @@
-# Sovereign Hardware Framework (HAL)
+# 🔌 Hardware Drivers
 
-SigmaOS achieves universal hardware compatibility via the **Sovereign Driver Lattice**.
+SigmaOS implements hardware drivers completely from scratch, using bare-metal Port I/O (PIO) and Memory-Mapped I/O (MMIO), with zero dependency on external driver frameworks or Linux modules.
 
-## 🎨 S-GPU: Graphics Dominance
+## Networking Drivers
 
-- **Mesa Integration**: Native support for open-source Intel, AMD, and NVIDIA drivers.
+### Intel E1000 Gigabit Ethernet (`sigma_e1000.cpp`)
+The `sigma_e1000` driver manages Intel PRO/1000 NICs commonly found in server hardware and QEMU/VirtualBox environments.
+- **MMIO-based**: Uses 32-bit memory-mapped I/O to access the register set.
+- **Ring Buffers**: Uses ring descriptors in DMA memory to transmit and receive frames.
+- **Features**: Promiscuous mode, hardware checksum offloading (stubbed), MAC filtering.
 
-- **Vulkan-First**: The Zenith compositor is optimized for Vulkan 1.3.
+### Realtek 8139 Fast Ethernet (`sigma_rtl8139.cpp`)
+The `sigma_rtl8139` driver supports the older, widespread Realtek 10/100 NIC.
+- **PIO-based**: Uses `inb`/`outb` instructions via the PCI BAR port mapping.
+- **Contiguous Buffer**: Uses a single contiguous ring buffer for RX and a set of 4 TX descriptors.
+- **Simplicity**: Known for its minimal register complexity.
 
-***Software Fallback**: Systems without hardware acceleration use the**Sovereign Software Rasterizer** to ensure 100% UI compatibility.
+## Storage Drivers
 
-## 🔊 S-AUDIO: Multimedia Parity
+### SATA AHCI Controller (`sigma_ahci.cpp`)
+The Advanced Host Controller Interface (AHCI) is the standard for SATA disks.
+- **Memory-Mapped**: Controlled via MMIO using ABAR (AHCI Base Address Register).
+- **Command Lists**: Uses command lists, FIS (Frame Information Structure) receive areas, and Command Tables.
+- **NCQ**: Capable of Native Command Queuing (up to 32 commands per port).
 
-- **Low-Latency Routing**: PipeWire-parity audio mixing for professional creative shards.
-
-- **Media Encryption**: Audio streams are encrypted via PQC to prevent "hardware-eavesdropping."
-
-## 📶 S-NET: Industrial Connectivity
-
-- **Driver Transpiler**: Allows SigmaOS to utilize open-source WiFi (Realtek/Broadcom) and Ethernet driver logic within safe, isolated shards.
-
-- **PQC Mesh**: All network interfaces are automatically integrated into the Sovereign Security Mesh.
+### VirtIO Block (`sigma_virtio_blk.cpp`)
+- VirtIO legacy PIO block device support for efficient hypervisor I/O.
