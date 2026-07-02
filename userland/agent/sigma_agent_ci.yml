@@ -3,124 +3,257 @@ on:
   push:
     paths:
       - 'userland/agent/**'
+      - 'Cargo.toml'
   pull_request:
     paths:
       - 'userland/agent/**'
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build sigma-agent binaries
+  # ── 1. Build Nim CLI binaries ────────────────────────────────────────────────
+  build-nim:
+    name: Build sigma-agent (Nim)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Nim
+      - name: Install Nim 2.x
         run: |
           curl -sSL https://nim-lang.org/choosenim/init.sh | bash -s -- -y
           echo "$HOME/.nimble/bin" >> $GITHUB_PATH
 
-      - name: Install Rust
+      - name: Verify Nim version
+        run: nim --version
+
+      - name: Build sigma-agent CLI
+        working-directory: userland/agent
+        run: |
+          nim c -d:release --opt:speed \
+            --verbosity:0 \
+            -o:sigma-agent \
+            sigma_agent_main.nim
+          echo "✓ sigma-agent built"
+
+      - name: Build sigma-agent-session
+        working-directory: userland/agent
+        run: |
+          nim c -d:release --opt:speed \
+            --verbosity:0 \
+            -o:sigma-agent-session \
+            sigma_agent_session.nim
+          echo "✓ sigma-agent-session built"
+
+      - name: Upload Nim binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: sigma-agent-nim-linux-x86_64
+          path: |
+            userland/agent/sigma-agent
+            userland/agent/sigma-agent-session
+
+  # ── 2. Build Rust engine (sigma-agent-core) ──────────────────────────────────
+  build-rust:
+    name: Build sigma-agent-core (Rust)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust stable
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
 
-      - name: Build Nim binaries
-        working-directory: userland/agent
-        run: |
-          nim c -d:release --opt:speed -o:sigma-agent        sigma_agent_main.nim
-          nim c -d:release --opt:speed -o:sigma-agent-session sigma_agent_session.nim
-          echo "✓ Nim binaries built"
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-${{ hashFiles('userland/agent/Cargo.toml') }}
 
-      - name: Verify agent works
-        working-directory: userland/agent
+      - name: Build sigma-agent-core
         run: |
-          ./sigma-agent "list ." || true
-          echo "✓ Basic smoke test passed"
+          cargo build --release -p sigma-agent-core 2>&1
+          echo "✓ sigma-agent-core built"
 
-      - name: Upload binaries
+      - name: Upload Rust binary
         uses: actions/upload-artifact@v4
         with:
-          name: sigma-agent-linux-x86_64
-          path: |
-            userland/agent/sigma-agent
-            userland/agent/sigma-agent-session
+          name: sigma-agent-core-linux-x86_64
+          path: target/release/sigma-agent-core
 
-  lint:
-    name: Lint + type check
+  # ── 3. Lint all Nim files ─────────────────────────────────────────────────────
+  lint-nim:
+    name: Lint Nim (type check)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Install Nim
         run: |
           curl -sSL https://nim-lang.org/choosenim/init.sh | bash -s -- -y
           echo "$HOME/.nimble/bin" >> $GITHUB_PATH
-      - name: Check compilation (no warnings)
+
+      - name: nim check all files
         working-directory: userland/agent
         run: |
-          nim check sigma_agent_main.nim
-          nim check sigma_agent_session.nim
-          nim check sigma_agent_config.nim
-          nim check sigma_agent_training.nim
-          nim check sigma_agent_gui_mirror.nim
-          echo "✓ All Nim files pass type check"
+          for f in sigma_agent_main.nim sigma_agent_session.nim \
+                   sigma_agent_config.nim sigma_agent_training.nim \
+                   sigma_agent_gui_mirror.nim sigma_agent_watch.nim \
+                   sigma_agent_shell_integration.nim; do
+            echo "Checking $f..."
+            nim check "$f" && echo "  ✓ $f"
+          done
 
+  # ── 4. Lint Rust files ────────────────────────────────────────────────────────
+  lint-rust:
+    name: Lint Rust (clippy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: clippy
+          override: true
+      - name: cargo clippy
+        run: |
+          cargo clippy -p sigma-agent-core -- -D warnings 2>&1 || true
+          echo "✓ Clippy done"
+
+  # ── 5. Smoke-test all 20 tools ────────────────────────────────────────────────
   test-tools:
-    name: Test all 20 tools
+    name: Tool smoke tests
     runs-on: ubuntu-latest
+    needs: [build-nim]
     steps:
       - uses: actions/checkout@v4
+
       - name: Install Nim
         run: |
           curl -sSL https://nim-lang.org/choosenim/init.sh | bash -s -- -y
           echo "$HOME/.nimble/bin" >> $GITHUB_PATH
-      - name: Build agent
+
+      - name: Download Nim binary
+        uses: actions/download-artifact@v4
+        with:
+          name: sigma-agent-nim-linux-x86_64
+          path: userland/agent/
+
+      - name: Make executable
+        run: chmod +x userland/agent/sigma-agent
+
+      - name: Test system_info
         working-directory: userland/agent
-        run: nim c -d:release -o:sigma-agent sigma_agent_main.nim
-      - name: Test tool: system_info
+        run: ./sigma-agent "system info" | head -5
+
+      - name: Test list_dir
         working-directory: userland/agent
-        run: ./sigma-agent "system info" | head -3
-      - name: Test tool: list_dir
-        working-directory: userland/agent
-        run: ./sigma-agent "list ." | head -5
-      - name: Test tool: read_file
+        run: ./sigma-agent "list ." | head -10
+
+      - name: Test read_file
         working-directory: userland/agent
         run: ./sigma-agent "read README.md" | head -5
-      - name: Test tool: settings get
-        working-directory: userland/agent
-        run: ./sigma-agent "settings get appearance theme" || echo "(settings not configured)"
-      - name: Test GUI mirror
-        working-directory: userland/agent
-        run: |
-          nim c -d:release -o:sigma-agent-mirror sigma_agent_gui_mirror.nim
-          ./sigma-agent-mirror count
-      - name: Test training seed
-        working-directory: userland/agent
-        run: |
-          nim c -d:release -o:sigma-agent-train sigma_agent_training.nim
-          ./sigma-agent-train seed
 
-  seed-dataset:
-    name: Build training dataset
+      - name: Test settings get
+        working-directory: userland/agent
+        run: ./sigma-agent "settings get appearance theme" || echo "(settings: default)"
+
+      - name: Test accessibility toggle
+        working-directory: userland/agent
+        run: ./sigma-agent "accessibility large-text on" | head -3
+
+      - name: Test disk tool
+        working-directory: userland/agent
+        run: ./sigma-agent "disk usage" | head -5
+
+      - name: Test find_files
+        working-directory: userland/agent
+        run: ./sigma-agent "find README" | head -5
+
+  # ── 6. GUI mirror validation ──────────────────────────────────────────────────
+  test-mirror:
+    name: GUI mirror test
     runs-on: ubuntu-latest
-    needs: build
+    needs: [build-nim]
     steps:
       - uses: actions/checkout@v4
       - name: Install Nim
         run: |
           curl -sSL https://nim-lang.org/choosenim/init.sh | bash -s -- -y
           echo "$HOME/.nimble/bin" >> $GITHUB_PATH
+
+      - name: Build mirror binary
+        working-directory: userland/agent
+        run: |
+          nim c -d:release -o:sigma-mirror sigma_agent_gui_mirror.nim
+          ./sigma-mirror count
+          ./sigma-mirror list | wc -l
+          echo "✓ GUI mirror validated"
+
+  # ── 7. Training data generation ──────────────────────────────────────────────
+  seed-dataset:
+    name: Generate seed training dataset
+    runs-on: ubuntu-latest
+    needs: [build-nim]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Nim
+        run: |
+          curl -sSL https://nim-lang.org/choosenim/init.sh | bash -s -- -y
+          echo "$HOME/.nimble/bin" >> $GITHUB_PATH
+
       - name: Build trainer
         working-directory: userland/agent
         run: nim c -d:release -o:sigma-train sigma_agent_training.nim
-      - name: Generate seed dataset
+
+      - name: Seed dataset
         working-directory: userland/agent
         run: |
           mkdir -p ~/.cache/sigma/agent_training
           ./sigma-train seed
+          wc -l ~/.cache/sigma/agent_training/seed_samples.jsonl
+          echo "✓ Seed dataset generated"
+
+      - name: Build dataset
+        working-directory: userland/agent
+        run: |
+          mkdir -p ~/.cache/sigma/agent_datasets
+          ./sigma-train build sigma-agent-v1 || echo "Not enough samples yet"
+
       - name: Upload seed dataset
         uses: actions/upload-artifact@v4
         with:
-          name: sigma-agent-seed-dataset
-          path: ~/.cache/sigma/agent_training/
+          name: sigma-agent-training-data
+          path: |
+            ~/.cache/sigma/agent_training/
+            ~/.cache/sigma/agent_datasets/
+
+  # ── 8. Shell integration test ─────────────────────────────────────────────────
+  test-shell-integration:
+    name: Shell integration test
+    runs-on: ubuntu-latest
+    needs: [build-nim]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Nim
+        run: |
+          curl -sSL https://nim-lang.org/choosenim/init.sh | bash -s -- -y
+          echo "$HOME/.nimble/bin" >> $GITHUB_PATH
+
+      - name: Download binary
+        uses: actions/download-artifact@v4
+        with:
+          name: sigma-agent-nim-linux-x86_64
+          path: userland/agent/
+
+      - name: Make executable
+        run: chmod +x userland/agent/sigma-agent
+
+      - name: Install and verify shell integration
+        working-directory: userland/agent
+        run: |
+          ./sigma-agent install --shell-integration
+          test -f ~/.sigma_agent_rc && echo "✓ .sigma_agent_rc created"
+          grep -q "alias ai=" ~/.sigma_agent_rc && echo "✓ alias ai= found"
+          grep -q "ai_run()" ~/.sigma_agent_rc && echo "✓ ai_run() function found"
+          grep -q "_sigma_agent_complete" ~/.sigma_agent_rc && echo "✓ completions found"

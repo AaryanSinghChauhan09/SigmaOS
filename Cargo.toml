@@ -15,6 +15,7 @@ members = [
     "security",
     "userland/init",
     "userland/update",
+    "userland/agent",
     "tools/tracing",
     "virtualization/ocirunner",
 ]

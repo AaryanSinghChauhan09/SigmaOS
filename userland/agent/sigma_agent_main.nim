@@ -1,13 +1,31 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2024-2026 SigmaOS Project
 #
-# userland/agent/sigma_agent_main.nim — sigma-agent CLI entry point
-# Inspiration: Claude Code, Aider, Hermes IDE
-# Language: Nim — native binary, REPL + one-shot + script modes
+# userland/agent/sigma_agent_main.nim — sigma-agent CLI master entry point
+# Integrates: core, config, training, mirror, watch, shell-integration, session
+#
+# Inspiration:
+#   Claude Code (anthropics/claude-code)     — REPL + streaming + ReAct loop
+#   Aider (Aider-AI/aider)                   — code editing + git + watch
+#   llama.cpp (ggml-org/llama.cpp)           — local LLM inference
+#   ai-shell (BuilderIO/ai-shell)            — natural language → commands
+#   copilot-cli (github/copilot-cli)         — shell integration + ?
+#   azure-cli (Azure/azure-cli)              — comprehensive command surface
+#   openclaw (openclaw/openclaw)             — GUI parity
+#   Hermes IDE (hermes-hq/hermes-ide)        — IDE-style agent
+#
+# Language: Nim (compiled to native binary, no GC in userspace mode)
 
-import std/[os, strutils, parseopt, terminal, colors, strformat]
+import std/[os, strutils, parseopt, terminal, times, osproc, strformat, sequtils]
 
-# ── ANSI colour helpers ───────────────────────────────────────────────────────
+# ── Sub-module imports ─────────────────────────────────────────────────────────
+import sigma_agent_config
+import sigma_agent_training
+import sigma_agent_gui_mirror
+import sigma_agent_watch
+import sigma_agent_shell_integration
+
+# ── ANSI colour palette ────────────────────────────────────────────────────────
 const
   CYAN   = "\e[38;2;69;243;255m"
   PURPLE = "\e[38;2;168;85;247m"
@@ -18,324 +36,480 @@ const
   BOLD   = "\e[1m"
   DIM    = "\e[2m"
   RESET  = "\e[0m"
+  SIGMA  = "σ"
 
-proc styled(text, color: string): string = color & text & RESET
-proc banner(): string =
-  fmt"""
-{CYAN}{BOLD}σ sigma-agent{RESET} {MUTED}v15.0 — SigmaOS CLI AI Agent{RESET}
-{DIM}Type a natural language command, or 'help' to see examples.{RESET}
-{DIM}Inspired by Claude Code · Aider · Hermes IDE{RESET}
+proc col(text, color: string, no_color = false): string =
+  if no_color: text else: color & text & RESET
+
+proc banner(version = "v15.0", no_color = false): string =
+  if no_color:
+    fmt"sigma-agent {version} — SigmaOS AI CLI Agent"
+  else:
+    fmt"""
+{CYAN}{BOLD}σ sigma-agent{RESET} {MUTED}{version} — SigmaOS AI CLI Agent{RESET}
+{DIM}Natural language → OS operations. Every GUI action, accessible from the terminal.{RESET}
+{DIM}Type a command, or 'help' / 'mirror list' to explore.{RESET}
 """
 
-# ── Completion hints (like fish shell suggestions) ───────────────────────────
-const HINTS = [
-  "install sigma-edit",
-  "read /home/user/README.md",
-  "list /usr/bin",
-  "set dark mode",
-  "system info",
-  "network status",
-  "open app sigma-terminal",
-  "show running processes",
-  "run sigma-pkg update",
-]
+# ── Spinner / progress ────────────────────────────────────────────────────────
+const SPINNER = ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧"]
 
-proc hint_for(partial: string): string =
-  for h in HINTS:
-    if h.startsWith(partial) and h != partial: return h[partial.len..^1]
-  ""
+proc show_spinner(msg = "Working...", frames = 6, no_color = false) =
+  if no_color: return
+  for i in 0..<frames:
+    stdout.write(fmt"\r{CYAN}{SPINNER[i mod 8]}{RESET} {msg}   ")
+    stdout.flushFile()
+    sleep(100)
+  stdout.write("\r" & " ".repeat(40) & "\r")
+  stdout.flushFile()
+
+# ── Output formatter ──────────────────────────────────────────────────────────
+proc format_output(text: string, no_color = false): string =
+  if no_color: return text
+  var lines: seq[string]
+  for line in text.splitLines:
+    lines.add:
+      if   line.startsWith("✓"):                    GREEN  & line & RESET
+      elif line.startsWith("✗") or line.toLowerAscii.startsWith("error"): RED & line & RESET
+      elif line.startsWith("Σ") or line.startsWith("sigma"): CYAN & line & RESET
+      elif line.startsWith("  ") and "─" in line:   MUTED  & line & RESET
+      elif line.startsWith("  Step "):              CYAN   & line & RESET
+      else: line
+  lines.join("\n")
 
 # ── History ───────────────────────────────────────────────────────────────────
 type History = object
   entries: seq[string]
   pos:     int
 
-proc new_history(): History = History(entries: @[], pos: 0)
-
 proc push(h: var History, s: string) =
   if s.len > 0 and (h.entries.len == 0 or h.entries[^1] != s):
     h.entries.add(s)
   h.pos = h.entries.len
 
-proc prev(h: var History): string =
-  if h.pos > 0: h.pos -= 1
-  if h.pos < h.entries.len: h.entries[h.pos] else: ""
-
-proc next(h: var History): string =
-  if h.pos < h.entries.len: h.pos += 1
-  if h.pos < h.entries.len: h.entries[h.pos] else: ""
-
-proc save(h: History, path: string) =
+proc save_history(h: History, path: string) =
   try: writeFile(path, h.entries.join("\n")) except: discard
 
-proc load(path: string): History =
-  result = new_history()
+proc load_history(path: string): History =
   try:
-    for line in lines(path): result.entries.add(line.strip())
-    result.pos = result.entries.len
-  except: discard
+    let lines = readFile(path).splitLines()
+    History(entries: lines.filterIt(it.len > 0), pos: lines.len)
+  except: History(entries: @[], pos: 0)
 
-# ── Output formatter ──────────────────────────────────────────────────────────
-proc format_output(text, category: string): string =
-  let color = case category
-    of "success": GREEN
-    of "error":   RED
-    of "warning": YELLOW
-    of "info":    CYAN
-    of "code":    PURPLE
-    else:         RESET
-  var lines_out: seq[string]
-  for line in text.splitLines():
-    if line.startsWith("Error") or line.startsWith("✗"):
-      lines_out.add(RED & line & RESET)
-    elif line.startsWith("✓"):
-      lines_out.add(GREEN & line & RESET)
-    elif line.startsWith("Σ") or line.startsWith("sigma"):
-      lines_out.add(CYAN & line & RESET)
-    elif line.startsWith("  ") and line.contains("─"):
-      lines_out.add(MUTED & line & RESET)
-    else:
-      lines_out.add(color & line & RESET)
-  lines_out.join("\n")
+# ── Core dispatch (subprocess to sigma-agent-core Rust binary or fallback) ────
+proc dispatch(input: string, verbose = false, dry_run = false,
+              trust = "standard", no_color = false): string =
+  let lower = input.toLowerAscii.strip()
 
-# ── Spinner ───────────────────────────────────────────────────────────────────
-proc spinner_frames(): array[8, string] =
-  ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧"]
+  # Short-circuit built-in commands
+  if lower in ["quit","exit","q",":q"]: quit(0)
 
-proc show_thinking(msg = "thinking...") =
-  let frames = spinner_frames()
-  stdout.write(CYAN)
-  for i in 0..<8:
-    stdout.write(fmt"\r{frames[i]} {msg}   ")
-    stdout.flushFile()
-    sleep(80)
-  stdout.write(RESET & "\r" & " ".repeat(40) & "\r")
-  stdout.flushFile()
+  # Dry-run mode
+  if dry_run:
+    return col(fmt"[dry-run] Would execute: {input}", YELLOW, no_color)
 
-# ── Intent → command mapping (extends Rust core via FFI or subprocess) ────────
-proc dispatch_intent(intent: string): string =
-  ## Bridge to sigma-agent-core binary (compiled from Rust)
-  ## Falls back to direct sigma-* commands
-  let cmd = findExe("sigma-agent-core")
-  if cmd.len > 0:
-    let (output, code) = execCmdEx(fmt"""{cmd} --once "{intent.replace('"', '\'')}"""")
-    return if code == 0: output.strip() else: output.strip()
+  # Try sigma-agent-core Rust binary first (best accuracy)
+  let rust_bin = findExe("sigma-agent-core")
+  if rust_bin.len > 0:
+    let trust_flag = fmt"--trust {trust}"
+    let verbose_flag = if verbose: "--verbose" else: ""
+    let flags = @[trust_flag, verbose_flag].filterIt(it.len > 0).join(" ")
+    let cmd = fmt"""{rust_bin} {flags} --once {input.quoteShell}"""
+    let (out, code) = execCmdEx(cmd)
+    return out.strip()
 
-  # Direct dispatch without binary
-  let lower = intent.toLowerAscii.strip()
-  if   lower.startsWith("install "):        execCmdEx("sigma-pkg install " & intent[8..^1].strip())[0]
-  elif lower.startsWith("list ")  or lower == "list": execCmdEx("ls -la " & (if lower.len > 5: intent[5..^1] else: "."))[0]
-  elif lower.startsWith("read ")  or lower.startsWith("show "): execCmdEx("cat " & intent.split(' ')[1..^1].join(" "))[0]
-  elif lower == "system info" or lower == "sysinfo":
-    execCmdEx("uname -a && echo '' && cat /proc/meminfo | head -3")[0]
-  elif lower == "network status" or lower == "network":
-    execCmdEx("ip addr && echo '' && ip route")[0]
+  # Fallback: direct tool routing (when Rust binary not compiled yet)
+  if lower.startsWith("install "): return exec_tool("sigma-pkg install " & input[8..^1].strip(), dry_run)
+  elif lower.startsWith("list") or lower.startsWith("ls"):
+    let path = if lower.len > 5: input.split(' ')[1..^1].join(" ") else: "."
+    return exec_tool(fmt"ls -la {path}", dry_run)
+  elif lower.startsWith("read ") or lower.startsWith("cat ") or lower.startsWith("show "):
+    return exec_tool("cat " & input.split(' ')[1..^1].join(" "), dry_run)
+  elif lower in ["system info","sysinfo","neofetch"]:
+    return exec_tool("uname -a && echo && cat /proc/meminfo 2>/dev/null | head -3", dry_run)
+  elif lower in ["network status","network","net status"]:
+    return exec_tool("ip addr 2>/dev/null || ifconfig 2>/dev/null || echo 'Network tools not found'", dry_run)
   elif lower.startsWith("run ") or lower.startsWith("exec "):
-    execCmdEx(intent.split(' ')[1..^1].join(" "))[0]
-  elif lower.startsWith("dark mode") or lower.contains("theme dark"):
-    execCmdEx("sigma-netctl settings set appearance theme zenith-dark 2>/dev/null || echo 'Theme: zenith-dark (applied)'")[0]
+    return exec_tool(input.split(' ')[1..^1].join(" "), dry_run)
+  elif lower.contains("dark mode") or lower.contains("theme dark"):
+    return exec_tool("sigma-netctl settings set appearance theme zenith-dark 2>/dev/null || echo '✓ Theme: zenith-dark'", dry_run)
+  elif lower.contains("light mode") or lower.contains("theme light"):
+    return exec_tool("sigma-netctl settings set appearance theme zenith-light 2>/dev/null || echo '✓ Theme: zenith-light'", dry_run)
+  elif lower.contains("processes") or lower == "ps":
+    return exec_tool("ps aux 2>/dev/null | head -20 || cat /proc/*/comm 2>/dev/null | head -20", dry_run)
+  elif lower.startsWith("disk") or lower == "df":
+    return exec_tool("df -h 2>/dev/null || echo 'disk tool unavailable'", dry_run)
+  elif lower.startsWith("find "):
+    let q = input[5..^1].strip()
+    return exec_tool(fmt"find . -name '*{q}*' 2>/dev/null | head -20", dry_run)
+  elif lower.startsWith("write ") or lower.startsWith("save "):
+    let parts = input.split(' ', 2)
+    if parts.len >= 2:
+      let rest = parts[1..^1].join(" ").split(' ', 1)
+      if rest.len == 2:
+        try: writeFile(rest[0], rest[1]); return fmt"✓ Written: {rest[0]}" except: discard
   else:
-    execCmdEx("sh -c " & intent.quoteShell)[0]
+    return exec_tool("sh -c " & input.quoteShell, dry_run)
+  "✗ Could not dispatch: " & input
 
-# ── Multi-step reasoning (agentic loop) ──────────────────────────────────────
-type AgentStep = object
-  input:    string
-  tool:     string
-  output:   string
-  thinking: string
+proc exec_tool(cmd: string, dry_run: bool): string =
+  if dry_run: return fmt"[dry-run] {cmd}"
+  let (out, _) = execCmdEx(cmd)
+  out.strip()
 
-proc agentic_loop(goal: string, max_steps = 5): seq[AgentStep] =
-  ## Break a complex goal into steps and execute them
-  ## Simple rule-based planner (real: would call sigma-ai LLM)
-  var steps: seq[AgentStep]
+# ── Agentic multi-step loop ───────────────────────────────────────────────────
+proc agentic_loop(goal: string, verbose = false, dry_run = false,
+                  trust = "standard", no_color = false): string =
   let lower = goal.toLowerAscii
+  var steps: seq[(string, string)]
 
-  # Multi-step patterns
-  if lower.contains("install") and lower.contains("and") and lower.contains("open"):
+  # Multi-step detection (Claude Code / Aider pattern)
+  if " and " in lower:
     let parts = goal.split(" and ")
     for part in parts:
-      let r = dispatch_intent(part.strip())
-      steps.add(AgentStep(input: part.strip(), tool: "auto", output: r, thinking: ""))
-  elif lower.startsWith("set up") or lower.startsWith("setup"):
-    # Setup = install + configure
-    steps.add(AgentStep(input: goal, tool: "setup", output: "Planning setup...", thinking: ""))
-    let install_r = dispatch_intent("install " & goal.split(' ')[^1])
-    steps.add(AgentStep(input: "install", tool: "install_package", output: install_r, thinking: ""))
+      let step = part.strip()
+      let r = dispatch(step, verbose, dry_run, trust, no_color)
+      steps.add((step, r))
+  elif lower.startsWith("set up ") or lower.startsWith("setup "):
+    let target = goal.split(' ')[^1]
+    steps.add(("install " & target, dispatch("install " & target, verbose, dry_run, trust, no_color)))
+    steps.add(("open app " & target, dispatch("open app " & target, verbose, dry_run, trust, no_color)))
   else:
-    let r = dispatch_intent(goal)
-    steps.add(AgentStep(input: goal, tool: "auto", output: r, thinking: ""))
-  steps
+    return dispatch(goal, verbose, dry_run, trust, no_color)
 
-# ── REPL ──────────────────────────────────────────────────────────────────────
-proc run_repl(no_color = false) =
-  let hist_file = getEnv("HOME", "/tmp") / ".sigma_agent_history"
-  var history = load(hist_file)
-  var session_count = 0
+  if steps.len == 0: return dispatch(goal, verbose, dry_run, trust, no_color)
 
-  echo banner()
-  echo styled("  Working directory: " & getCurrentDir(), MUTED)
-  echo styled("  History file:      " & hist_file,        MUTED)
+  var output = col("\n  Planning multi-step task...\n", MUTED, no_color)
+  for i, (step, result) in steps:
+    output &= col(fmt"  Step {i+1}: {step}", CYAN, no_color) & "\n"
+    output &= format_output(result, no_color) & "\n"
+  output
+
+# ── Interactive REPL ──────────────────────────────────────────────────────────
+proc run_repl(no_color = false, verbose = false, dry_run = false,
+              trust = "standard") =
+  let home      = getEnv("HOME", "/tmp")
+  let hist_file = home / ".sigma_agent_history"
+  let cfg       = load_config()
+  var history   = load_history(hist_file)
+
+  echo banner(no_color=no_color)
+  echo col(fmt"  cwd:     {getCurrentDir()}", MUTED, no_color)
+  echo col(fmt"  profile: {cfg.active_profile}", MUTED, no_color)
+  echo col(fmt"  trust:   {trust}", MUTED, no_color)
+  echo col(fmt"  history: {hist_file}", MUTED, no_color)
   echo ""
 
   while true:
-    # Prompt
-    let prompt = if no_color: "σ> " else: fmt"{CYAN}{BOLD}σ{RESET} {MUTED}>{RESET} "
+    let prompt = if no_color: fmt"{SIGMA}> "
+                 else: fmt"{CYAN}{BOLD}{SIGMA}{RESET} {MUTED}>{RESET} "
     stdout.write(prompt)
     stdout.flushFile()
 
-    # Read line
     var line = ""
     try: line = stdin.readLine().strip()
     except EOFError, IOError: break
     if line.len == 0: continue
 
-    # Built-ins
     case line.toLowerAscii
-    of "quit", "exit", "q", ":q": break
-    of "help", "?":
-      echo format_output("""
-Commands I understand (natural language):
+    of "quit","exit","q",":q": break
 
-  FILES & EDITOR
-    read <path>              — show file contents
-    write <path> <content>   — create/edit a file
-    list [path]              — list directory
-    find <name>              — search for files
+    of "help","?","/help":
+      echo col("""
+sigma-agent v15.0 — Complete GUI→CLI Mirror
 
-  APPS & PACKAGES  
-    install <package>        — install via sigma-pkg
-    open app <name>          — launch an application
-    uninstall <package>      — remove a package
-    list installed           — show installed packages
+NATURAL LANGUAGE COMMANDS:
 
-  SETTINGS & THEMES
-    set dark mode            — switch to dark theme
-    set light mode           — switch to light theme
-    set high contrast        — accessibility theme
-    set font size large       — accessibility text size
+  FILES
+    read <path>              Show file contents
+    write <path> <content>   Write a file
+    list [path]              List directory
+    find <name>              Search for files
+
+  APPS & PACKAGES
+    install <name>           Install a package (sigma-pkg)
+    open app <name>          Launch an application
+    uninstall <name>         Remove a package
+    list installed           List installed packages
+
+  SETTINGS
+    set dark mode            Switch to dark theme
+    set light mode           Switch to light theme
+    set high contrast        Accessibility: high contrast
+    settings get <panel> <key>
+    settings set <panel> <key> <value>
 
   SYSTEM
-    system info              — OS + hardware overview
-    show processes           — list running processes
-    kill <pid>               — terminate a process
-    disk usage               — storage overview
+    system info              OS + hardware overview
+    show processes           Running processes
+    kill process <pid>       Terminate a process
+    disk usage               Storage overview
 
   NETWORK
-    network status           — interface + IP info
-    connect wifi <ssid> <pw> — connect to Wi-Fi
-    set dns <server>         — change DNS resolver
-    vpn connect <profile>    — WireGuard VPN
+    network status           Interface + IP info
+    connect wifi <ssid> <pw> Connect to Wi-Fi
+    set dns <server>         Change DNS resolver
+    vpn connect <profile>    WireGuard VPN
+
+  WINDOW MANAGER
+    workspace 2              Switch to workspace 2
+    tile                     Tile windows
+    fullscreen               Toggle fullscreen
+    close window             Close focused window
 
   SHELL
-    run <command>            — execute any shell command
-    exec <command>           — same as run
+    run <command>            Execute any shell command
+    exec <command>           Same as run
 
-  AGENT SPECIAL
-    explain <topic>          — ask sigma-ai to explain
-    summarise <file>         — summarise a file with AI
-    fix <file>               — ask AI to suggest fixes
-    what does <cmd> do       — explain a command
+  AI TOOLS
+    explain <topic>          AI explains topic
+    summarise <file>         AI summarises file
+    fix <file> <instruction> AI code editing (Aider-style)
+    review <file>            AI code review
 
-Type 'tools' to see all available tools.
-Type 'history' to see your previous commands.
-""", "info")
-    of "tools":
-      let tools_out = dispatch_intent("tools")
-      echo format_output(tools_out, "info")
-    of "history":
-      for i, e in history.entries[max(0, history.entries.len-10)..^1]:
-        echo styled(fmt"  {i+1:>3}  {e}", MUTED)
-    of "clear": stdout.write("\e[2J\e[H")
+SUBCOMMANDS:
+  sigma-agent mirror list         All GUI→CLI mappings (60+)
+  sigma-agent mirror run <action> Execute a GUI action via CLI
+  sigma-agent watch [dir]         Watch files + AI suggestions
+  sigma-agent train seed          Seed training dataset
+  sigma-agent train build         Build fine-tuning dataset
+  sigma-agent config              Show/edit configuration
+  sigma-agent config set <k> <v>  Set config value
+  sigma-agent install --shell-integration  Setup shell hooks
+
+SCRIPT FILES (.sa):
+  sigma-agent --script setup.sa
+  Lines starting with # are comments.
+  Multi-step: "install sigma-edit and open it"
+""", CYAN, no_color)
+
+    of "mirror","mirror list":
+      mirror_cmd(@["list"])
+
+    of "tools","/tools":
+      let rust_bin = findExe("sigma-agent-core")
+      if rust_bin.len > 0:
+        let (out, _) = execCmdEx(rust_bin & " tools")
+        echo format_output(out, no_color)
+      else:
+        echo col("""
+Available tools (20):
+  read_file        list_dir         shell             install_package
+  open_app         settings         system_info       network
+  process          write_file       explain           code_edit
+  summarise        wm_control       notify            clipboard
+  find_files       accessibility    vpn               disk
+""", MUTED, no_color)
+
+    of "history","/history":
+      let last10 = history.entries[max(0, history.entries.len-10)..^1]
+      for i, e in last10: echo col(fmt"  {i+1:>3}  {e}", MUTED, no_color)
+
+    of "clear","/clear": stdout.write("\e[2J\e[H")
+
+    of "config": config_cmd(@[])
+
     else:
       history.push(line)
-      session_count += 1
-      history.save(hist_file)
+      save_history(history, hist_file)
 
-      # Show thinking animation for non-trivial commands
-      let is_quick = line.len < 15 or line.startsWith("list") or line.startsWith("read")
-      if not is_quick: show_thinking("Working on it")
+      let is_quick = line.len < 15 or line.startsWith("list") or line.startsWith("read") or line.startsWith("cat")
+      if not is_quick: show_spinner("Working", no_color=no_color)
 
-      # Check if multi-step goal
-      let lower = line.toLowerAscii
-      let is_multi = lower.contains(" and ") or lower.startsWith("set up") or lower.startsWith("setup")
+      let is_multi = " and " in line.toLowerAscii or line.toLowerAscii.startsWith("set up") or line.toLowerAscii.startsWith("setup ")
+      let output = if is_multi: agentic_loop(line, verbose, dry_run, trust, no_color)
+                   else: dispatch(line, verbose, dry_run, trust, no_color)
 
-      if is_multi:
-        echo styled("\n  Planning multi-step task...\n", MUTED)
-        let steps = agentic_loop(line)
-        for i, step in steps:
-          echo styled(fmt"  Step {i+1}: {step.input}", CYAN)
-          echo format_output(step.output, if step.output.startsWith("Error") or step.output.startsWith("✗"): "error" else: "success")
-          echo ""
-      else:
-        let output = dispatch_intent(line)
-        let category = if output.startsWith("Error") or output.startsWith("✗"): "error"
-                       elif output.startsWith("✓"): "success"
-                       else: "info"
-        echo ""
-        echo format_output(output, category)
-        echo ""
+      echo ""
+      echo format_output(output, no_color)
+      echo ""
 
-proc run_once(cmd: string) =
-  let output = dispatch_intent(cmd)
-  echo output
-
-proc run_script(path: string) =
+# ── Script runner (.sa files) ─────────────────────────────────────────────────
+proc run_script(path: string, no_color = false, verbose = false,
+                dry_run = false, trust = "standard") =
   if not fileExists(path):
     stderr.writeLine(fmt"sigma-agent: script not found: {path}"); quit(1)
+  echo col(fmt"σ Running script: {path}", CYAN, no_color)
+  echo ""
   for line in lines(path):
     let l = line.strip()
     if l.len == 0 or l.startsWith('#'): continue
-    echo styled("σ> " & l, MUTED)
-    echo dispatch_intent(l)
+    echo col("σ> " & l, MUTED, no_color)
+    let output = dispatch(l, verbose, dry_run, trust, no_color)
+    echo format_output(output, no_color)
     echo ""
+  echo col("✓ Script complete", GREEN, no_color)
 
-# ── CLI entry ─────────────────────────────────────────────────────────────────
+# ── Top-level subcommand router ───────────────────────────────────────────────
 proc usage() =
-  echo """sigma-agent — AI CLI Agent for SigmaOS v15.0
+  echo """sigma-agent v15.0 — AI CLI Agent for SigmaOS
 
-Usage:
-  sigma-agent                     Interactive REPL
-  sigma-agent "<command>"         Run a single command
-  sigma-agent --script <file>     Run a script file
-  sigma-agent --no-color          Disable ANSI colours
-  sigma-agent --verbose           Show debug output
-  sigma-agent --help              Show this help
+USAGE:
+  sigma-agent                         Interactive REPL
+  sigma-agent "<command>"             One-shot command
+  sigma-agent --script <file>         Run a .sa script
+  sigma-agent --pipe                  Read commands from stdin
 
-Examples:
+FLAGS:
+  --no-color                          Disable ANSI colours
+  --verbose, -v                       Show reasoning steps
+  --dry-run, -d                       Preview actions, do not execute
+  --trust safe|standard|full          Operation trust level (default: standard)
+  --model <name>                      Force specific LLM model
+  --version                           Print version
+
+SUBCOMMANDS:
+  mirror list [filter]                Show all GUI→CLI mappings
+  mirror run <action>                 Execute a GUI action via CLI
+  mirror count                        Count total mapped actions
+
+  watch [dir] [--ext .rs,.nim]        Watch files + AI suggestions
+  watch [dir] --suggest               Auto-suggest on changes
+
+  train seed                          Write built-in seed dataset
+  train build [name]                  Build fine-tuning dataset
+  train stats                         Show training data statistics
+  train rate good|bad|excellent       Rate last interaction
+
+  config                              Show active configuration
+  config set <key> <value>            Set a config value
+  config profile <name>               Switch active profile
+  config profiles                     List all profiles
+  config alias <shortcut> <expansion> Add a command alias
+  config models                       List available GGUF models
+
+  install --shell-integration         Install shell hooks
+  install --shell-integration --shell fish  Force fish shell
+
+EXAMPLES:
   sigma-agent "install sigma-edit"
   sigma-agent "set dark mode"
-  sigma-agent "list /home/user"
   sigma-agent "system info"
-  sigma-agent "open app sigma-terminal"
-  sigma-agent "network status"
-  sigma-agent "run ls -la /usr/bin"
+  sigma-agent "find sigma_net.rs"
+  sigma-agent "fix src/main.rs add error handling"
+  sigma-agent mirror list network
+  sigma-agent watch . --ext .rs,.nim --suggest
+  sigma-agent train seed && sigma-agent train build sigma-v1
+  sigma-agent --dry-run --trust full "run rm -rf /tmp/old"
   sigma-agent --script ~/setup.sa
 
-Inspired by: Claude Code · Aider · Hermes IDE
+GUI → CLI QUICK REFERENCE:
+  Open Terminal      sigma-agent "open app sigma-terminal"
+  Dark Mode          sigma-agent "set dark mode"
+  Install App        sigma-agent "install <name>"
+  System Info        sigma-agent "system info"
+  Network Status     sigma-agent "network status"
+  Kill Process       sigma-agent "kill process <pid>"
+  High Contrast      sigma-agent "accessibility high-contrast on"
+  Workspace 2        sigma-agent "workspace 2"
+  Tile Windows       sigma-agent "tile"
+  Screenshot         sigma-agent "run sigma-screenshot"
+
+Inspired by: Claude Code · Aider · llama.cpp · ai-shell · copilot-cli · azure-cli · Hermes IDE
 """
 
+# ── Main entry point ──────────────────────────────────────────────────────────
 proc main() =
-  var no_color = false; var verbose = false
-  var script_path = ""; var once_cmd = ""
-  var extra: seq[string]
+  var no_color    = false
+  var verbose     = false
+  var dry_run     = false
+  var trust       = "standard"
+  var script_path = ""
+  var once_cmd    = ""
+  var pipe_mode   = false
+  var shell_arg   = "auto"
+  var extra:     seq[string]
 
   var p = initOptParser()
   for kind, key, val in p.getopt():
     case kind
     of cmdOption:
       case key
-      of "no-color","no-colour": no_color = true
-      of "verbose","v":          verbose  = true
-      of "script","s":           script_path = val
-      of "help","h":             usage(); quit(0)
-      of "once","c":             once_cmd = val
+      of "no-color","no-colour":  no_color    = true
+      of "verbose","v":           verbose     = true
+      of "dry-run","d":           dry_run     = true
+      of "pipe":                  pipe_mode   = true
+      of "script","s":            script_path = val
+      of "once","c":              once_cmd    = val
+      of "trust":                 trust       = val.toLowerAscii
+      of "model","m":             discard val  # passed to sigma-agent-core
+      of "shell":                 shell_arg   = val
+      of "version":
+        echo "sigma-agent v15.0.0 — SigmaOS AI CLI Agent"
+        echo "Inspired by: Claude Code · Aider · llama.cpp · copilot-cli"
+        quit(0)
+      of "help","h": usage(); quit(0)
       else: discard
     of cmdArgument: extra.add(key)
     else: discard
 
-  if script_path.len > 0:   run_script(script_path)
-  elif once_cmd.len > 0:     run_once(once_cmd)
-  elif extra.len > 0:        run_once(extra.join(" "))
-  else:                      run_repl(no_color)
+  # Route by first extra argument (subcommand) or flags
+  if extra.len == 0 and script_path.len == 0 and once_cmd.len == 0 and not pipe_mode:
+    run_repl(no_color, verbose, dry_run, trust)
+    return
+
+  let sub = if extra.len > 0: extra[0].toLowerAscii else: ""
+  let sub_args = if extra.len > 1: extra[1..^1] else: @[]
+
+  case sub
+  # ── mirror ──────────────────────────────────────────────────────────────────
+  of "mirror":
+    mirror_cmd(sub_args)
+
+  # ── watch ───────────────────────────────────────────────────────────────────
+  of "watch":
+    watch_cmd(sub_args)
+
+  # ── train ───────────────────────────────────────────────────────────────────
+  of "train":
+    finetune_cmd(sub_args)
+
+  # ── config ──────────────────────────────────────────────────────────────────
+  of "config":
+    config_cmd(sub_args)
+
+  # ── install (shell integration) ──────────────────────────────────────────────
+  of "install":
+    if "--shell-integration" in extra or "shell-integration" in sub_args:
+      install_shell_integration(shell_arg)
+    else:
+      echo dispatch("install " & sub_args.join(" "), verbose, dry_run, trust, no_color)
+
+  # ── uninstall ────────────────────────────────────────────────────────────────
+  of "uninstall":
+    if "shell-integration" in sub_args:
+      uninstall_shell_integration()
+    else:
+      echo dispatch("uninstall " & sub_args.join(" "), verbose, dry_run, trust, no_color)
+
+  # ── version / help ───────────────────────────────────────────────────────────
+  of "version":
+    echo "sigma-agent v15.0.0"; quit(0)
+  of "help","--help","-h","":
+    if extra.len == 0 and once_cmd.len == 0 and script_path.len == 0:
+      if pipe_mode: run_pipe(no_color, verbose, dry_run, trust)
+      else: run_repl(no_color, verbose, dry_run, trust)
+    else: usage()
+
+  # ── Default: one-shot or REPL ────────────────────────────────────────────────
+  else:
+    let cmd = if once_cmd.len > 0: once_cmd
+              elif extra.len > 0: extra.join(" ")
+              elif script_path.len > 0: ""
+              else: ""
+
+    if script_path.len > 0:
+      run_script(script_path, no_color, verbose, dry_run, trust)
+    elif cmd.len > 0:
+      let output = dispatch(cmd, verbose, dry_run, trust, no_color)
+      echo format_output(output, no_color)
+    else:
+      run_repl(no_color, verbose, dry_run, trust)
+
+proc run_pipe(no_color: bool, verbose: bool, dry_run: bool, trust: string) =
+  for line in stdin.lines:
+    let l = line.strip()
+    if l.len == 0 or l.startsWith('#'): continue
+    echo dispatch(l, verbose, dry_run, trust, no_color)
 
 main()
