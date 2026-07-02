@@ -32,12 +32,45 @@ Options:
 User Input (NL / voice / script / pipe / HTTP / memory-injected)
        │
        ▼
-sigma-agent (Nim CLI — 34 modules)
+sigma-agent (Nim CLI — 35 modules)
   ├── IntentParser        → keyword → tool + args
   ├── ReAct Planner       → Thought → Action → Observation loop
   ├── Memory Engine       → persistent facts/prefs/patterns injected into prompts
   ├── Context Engine      → live OS state (CPU/mem/disk/git/logs) in prompts
   ├── LLM Backend         → sigma-ai → Ollama → llama.cpp → offline
+  ├── Tool Executor       → 21 built-in tools (Rust + Nim)
+  ├── Workflow Engine     → n8n-style YAML pipelines + event triggers ← NEW
+  │    ├── 8 built-in templates (backup, update, cpu-alert, security...)
+  │    ├── NL → workflow generator
+  │    ├── Background scheduler (60s tick)
+  │    └── Audit trail + run history
+  ├── Multi-Agent         → 6 specialist sub-agents
+  │    ├── sigma-security  (audit, policy, threat detection)
+  │    ├── sigma-sysadmin  (services, resources, maintenance)
+  │    ├── sigma-developer (code editing, git, build)
+  │    ├── sigma-teacher   (OS concepts, interactive learning)
+  │    ├── sigma-netops    (interfaces, VPN, DNS, firewall)
+  │    └── sigma-pkgops    (packages, updates, registry)
+  ├── Learning Engine     → record → rate → DPO pairs → LoRA fine-tune
+  ├── Voice Pipeline      → mic → Whisper STT → NL command
+  ├── Plugin System       → community .sigplugin skill packages
+  ├── Script Generator    → NL goal → runnable .sa script
+  ├── Explain Engine      → copilot-cli style ??, 45 built-in topics
+  ├── TUI Components      → dashboard, fuzzy picker, interactive diff
+  ├── Benchmark Suite     → 40 golden tests, regression detection
+  ├── Notification Layer  → desktop toasts + event subscriptions
+  ├── Doctor              → full environment self-diagnosis
+  └── Updater             → GitHub releases check + atomic binary swap
+
+Background Daemon (localhost:11430 + /run/sigma/agent.sock):
+  ├── /v1/chat      → inference with context + memory injection
+  ├── /v1/execute   → tool execution
+  ├── /v1/complete  → LLM tab completions
+  ├── /v1/status    → daemon health + backend info
+  ├── /v1/context   → live OS snapshot
+  ├── /v1/feedback  → RLHF data collection
+  └── /v1/sync      → GitHub wiki knowledge sync (hourly)
+```
   ├── Tool Executor       → 21 built-in tools (Rust + Nim)
   ├── Multi-Agent         → 6 specialist sub-agents
   │    ├── sigma-security  (audit, policy, threat detection)
@@ -189,6 +222,51 @@ sigma-agent "??" "what does sigma_pledge do"    # shorthand
 ```
 
 45 built-in topics (no LLM needed): sigma_pledge, sigma_unveil, sigma-pkg, sigma-sh, paging, shard, buddy allocator, sigma-bus, MLFQ, sigma-agent, post-quantum cryptography, and more.
+
+### `workflow` — n8n-style automation engine
+
+Inspired by n8n, Claude Code multi-step, azure-cli automation runbooks.
+
+```bash
+# Install all 8 built-in templates
+sigma-agent workflow install --all
+
+# Run a workflow
+sigma-agent workflow run weekly-backup
+sigma-agent workflow run weekly-backup --dry-run
+sigma-agent workflow run dev-workflow --verbose
+
+# Generate from natural language
+sigma-agent workflow create "backup home folder every Friday"
+sigma-agent workflow create "run security audit nightly" -o nightly.yaml
+
+# Manage
+sigma-agent workflow list
+sigma-agent workflow enable weekly-backup
+sigma-agent workflow disable cpu-alert
+sigma-agent workflow history
+sigma-agent workflow audit
+
+# Background scheduler (checks triggers every 60s)
+sigma-agent workflow scheduler
+```
+
+Built-in templates: `weekly-backup`, `daily-update`, `cpu-alert`, `low-disk-alert`, `dev-workflow`, `security-hardening`, `on-boot-setup`, `pkg-update-notify`.
+
+YAML format:
+```yaml
+name: my-workflow
+trigger: schedule=daily 06:00   # or: manual, cpu>90, disk<10, pkg_update, boot
+steps:
+  - name: step-one
+    action: "sigma-agent natural language command"
+    on_fail: stop|continue|notify
+    condition: "exit_code_of(prev-step) == 0"
+    timeout: 60
+    retries: 1
+```
+
+Full documentation: [sigma-agent-workflow](sigma-agent-workflow)
 
 ### `context` — Live system context
 
@@ -351,14 +429,14 @@ The seed dataset v2 (`sigma_agent_seed_v2.jsonl`) contains 55 high-quality examp
 
 ---
 
-## Module File Structure (34 modules)
+## Module File Structure (35 modules)
 
 ```
 userland/agent/
 ├── main.rs                           Rust binary (sigma-agent-core)
 ├── Cargo.toml
 ├── sigma_agent.rs / core.rs / tools_ext.rs / llm.rs / planner.rs / code.rs
-├── sigma_agent_main.nim              CLI master entry (34 modules imported)
+├── sigma_agent_main.nim              CLI master entry (35 modules imported)
 ├── sigma_agent_session.nim           Session manager
 ├── sigma_agent_config.nim            Profile system
 ├── sigma_agent_training.nim          Training + sync + A/B test
@@ -378,19 +456,19 @@ userland/agent/
 ├── sigma_agent_notify.nim            Notifications + event watcher
 ├── sigma_agent_doctor.nim            Self-diagnosis
 ├── sigma_agent_update.nim            Self-update from GitHub releases
-├── sigma_agent_memory.nim            Persistent memory (CLAUDE.md style)  ← NEW
-├── sigma_agent_script_gen.nim        NL → .sa script generator            ← NEW
-├── sigma_agent_explain.nim           Explain mode (copilot-cli ??)         ← NEW
-├── sigma_agent_seed_v2.jsonl         55 v2 training samples                ← NEW
-├── sigma_agent.nimble
-├── sigma_agent_ci.yml                11-job CI pipeline
+├── sigma_agent_memory.nim            Persistent memory (CLAUDE.md style)
+├── sigma_agent_script_gen.nim        NL → .sa script generator
+├── sigma_agent_explain.nim           Explain mode (copilot-cli ??)
+├── sigma_agent_workflow.nim          n8n-style workflow engine  ← NEW
+├── sigma_agent_seed_v2.jsonl         55 v2 training samples
+├── sigma_agent.nimble                Package v15.1.0
+├── sigma_agent_ci.yml                12-job CI pipeline
 └── README.md
 ```
 
 ---
 
 ## Build
-
 ```bash
 nim c -d:release --opt:speed -o:sigma-agent userland/agent/sigma_agent_main.nim
 cargo build --release -p sigma-agent-core
@@ -408,13 +486,14 @@ cp sigma-agent /usr/bin/ && cp target/release/sigma-agent-core /usr/bin/
 | [llama.cpp](https://github.com/ggml-org/llama.cpp) | Local LLM, GGUF, ChatML, LoRA fine-tune, Whisper STT |
 | [ai-shell](https://github.com/BuilderIO/ai-shell) | NL→shell, error auto-fix, self-update, ??! script generation |
 | [copilot-cli](https://github.com/github/copilot-cli) | ?? explain, shell integration, suggest/execute |
-| [azure-cli](https://github.com/Azure/azure-cli) | Subcommand namespacing, extension system, upgrade |
-| [openclaw](https://github.com/openclaw/openclaw) | GUI parity, feedback loop, plugin system |
+| [azure-cli](https://github.com/Azure/azure-cli) | Subcommand namespacing, extension system, upgrade, automation runbooks |
+| [openclaw](https://github.com/openclaw/openclaw) | GUI parity, feedback loop, event-driven agent actions |
 | [Hermes IDE](https://github.com/hermes-hq/hermes-ide) | Context injection, IDE plugin API, notifications |
 | [openai-cli](https://github.com/openai/openai-cli) | Streaming, conversation history |
 | [chatgpt-cli](https://github.com/j178/chatgpt) | Session persistence, multi-turn context |
 | [claw-code](https://github.com/ultraworkers/claw-code) | Agent routing, multi-provider LLM |
 | [ClaudeCode-Leak](https://github.com/0PeterAdel/ClaudeCode-Leak) | Tool schema, system prompt patterns |
+| n8n | YAML workflow pipelines, event triggers, step conditions, scheduler |
 
 ---
 

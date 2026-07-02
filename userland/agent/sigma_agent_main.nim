@@ -41,6 +41,7 @@ import sigma_agent_memory
 import sigma_agent_script_gen
 import sigma_agent_explain
 import sigma_agent_workflow
+import sigma_agent_corpus
 
 # ── ANSI colour palette ────────────────────────────────────────────────────────
 const
@@ -596,6 +597,17 @@ proc main() =
   # ── workflow (n8n-style automation) ──────────────────────────────────────────
   of "workflow","wf","automate","automation","schedule":
     workflow_cmd(sub_args)
+
+  # ── corpus (AI training corpus builder) ──────────────────────────────────────
+  of "corpus","dataset","train-corpus":
+    corpus_cmd(sub_args)
+
+  # ── compat (Linux binary/package compatibility) ───────────────────────────────
+  of "compat","linux-compat","absorb":
+    if sub_args.len > 0 and sub_args[0] == "absorb":
+      echo dispatch("install " & sub_args[1..^1].join(" "), verbose, dry_run, trust, no_color)
+    else:
+      echo dispatch("run sigma-compat " & sub_args.join(" "), verbose, dry_run, trust, no_color)
 
   # ── install (shell integration) ──────────────────────────────────────────────
   of "install":
