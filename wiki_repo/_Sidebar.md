@@ -107,6 +107,7 @@
 
 ## Integrations
 - [Integration Guide](Integration-Guide)
+- [sigma-agent CLI](sigma-agent)
 - [Firecracker microVM](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/Firecracker.md)
 - [rust-vmm crates](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/rust-vmm.md)
 - [containerd + runc](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/containerd-runc.md)
