@@ -7,6 +7,13 @@
 - [Installation](Installation)
 - [Contributing](Contributing)
 
+## Source Code
+- [Source Files Index](Source-Files-Index)
+- [Language Implementation](Language-Implementation)
+- [Architecture Deep Dive](Architecture-Deep-Dive)
+- [Kernel Boot Sequence](Kernel-Boot-Sequence)
+- [Shard Development Guide](Shard-Development-Guide)
+
 ## Roadmap
 - [Growth Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/ROADMAP.md)
 - [v0.1 Minimal Spec](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Minimal_SigmaOS_v0.1.md)
@@ -88,6 +95,29 @@
 - [Surpassing Ubuntu](Surpassing-Ubuntu-Strategy)
 - [SigmaOS vs Linux](SigmaOS-vs-Linux)
 - [India Strategy](India-Business-Strategy)
+
+## Integrations
+- [Integration Guide](Integration-Guide)
+- [Firecracker microVM](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/Firecracker.md)
+- [rust-vmm crates](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/rust-vmm.md)
+- [containerd + runc](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/containerd-runc.md)
+- [sigstore / cosign](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/sigstore-cosign.md)
+- [rustls TLS](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/rustls.md)
+- [smoltcp TCP/IP](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/smoltcp.md)
+- [Smithay Compositor](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/wlroots-compositor.md)
+- [PipeWire Audio](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/pipewire-audio.md)
+- [Mesa GPU](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/Mesa-GPU.md)
+- [aya eBPF](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/aya-ebpf.md)
+- [OpenTelemetry](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/OpenTelemetry.md)
+- [Nix Repro Builds](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/NixOS-reproducible-builds.md)
+- [TPM2 Attestation](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/tpm2-attestation.md)
+- [gVisor Compat](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/gVisor-compat.md)
+- [OSTree Updates](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/OSTRee-updates.md)
+- [Flatpak Apps](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/Flatpak-AppDistribution.md)
+- [Wine Compat](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/Wine-Windows-Compat.md)
+- [LLVM Toolchain](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/LLVM-Toolchain.md)
+- [svd2rust BSP](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/svd2rust-embedded.md)
+- [QEMU CI](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/integrations/QEMU-CI-Integration.md)
 
 ## Community
 - [Code of Conduct](CODE_OF_CONDUCT)

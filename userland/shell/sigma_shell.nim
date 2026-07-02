@@ -1,96 +1,222 @@
-## SigmaOS: sigma_shell.nim — sovereign shell & built-in command loop
-## Migrated from C/C++ to Nim — no stdlib import, no external packages.
-## All types hand-defined. OOP via object hierarchy + method dispatch.
-## Implements BusyBox/Coreutils equivalents, SigmaVCS (Git replacement),
-## SigmaCurl (Curl/Wget replacement), and SigmaRun (Make task runner replacement).
-{.push raises: [].}
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2024-2026 SigmaOS Project
+#
+# userland/shell/sigma_shell.nim — sigma-sh: Sovereign Shell
+# Replaces: sigma_shell.cpp (C++ stub, removed)
+#
+# Language: Nim — compiles to native, ergonomic, no GC in kernel paths
+# Pattern: OOP via object types + methods
+
+import std/[strutils, os, parseopt, sequtils]
+
+# ── Types ─────────────────────────────────────────────────────────────────────
 
 type
-  SigmaU8*  = uint8
-  SigmaU16* = uint16
-  SigmaU32* = uint32
-  SigmaU64* = uint64
-  SigmaI32* = int32
-  SigmaI64* = int64
-  SigmaBool* = bool
-  SigmaUsize* = uint
+  ShellState = object
+    cwd:     string
+    env:     seq[(string, string)]
+    history: seq[string]
+    running: bool
 
-  ShellCommand* = object
-    name*: array[32, char]
-    arg*: array[64, char]
+  ParsedCmd = object
+    args:   seq[string]
+    stdin_redir:  string
+    stdout_redir: string
+    append_redir: bool
+    pipe_next:    bool
 
-  SigmaShell* = object of RootObj
-    initialized*: SigmaBool
-    prompt*: array[16, char]
-    history_count*: SigmaU32
-    vcs_initialized*: SigmaBool
-    vcs_commit_count*: SigmaU32
+  ShellError = enum
+    ErrNotFound   = "command not found"
+    ErrPermDenied = "permission denied"
+    ErrNoFile     = "no such file or directory"
 
-proc newSigmaShell*(): SigmaShell =
-  result = SigmaShell(
-    initialized: true,
-    history_count: 0,
-    vcs_initialized: false,
-    vcs_commit_count: 0
-  )
-  result.prompt[0] = 's'
-  result.prompt[1] = 'i'
-  result.prompt[2] = 'g'
-  result.prompt[3] = 'm'
-  result.prompt[4] = 'a'
-  result.prompt[5] = '>'
-  result.prompt[6] = ' '
+# ── Shell State ───────────────────────────────────────────────────────────────
 
-proc run_command*(self: var SigmaShell, cmd: ShellCommand): SigmaI32 =
-  if not self.initialized: return -1
-  
-  # Command string match helpers
-  proc match_cmd(c_name: array[32, char], target: string): bool =
-    for i in 0 ..< target.len:
-      if c_name[i] != target[i]: return false
-    return c_name[target.len] == '\0'
+proc newShell(): ShellState =
+  result.cwd     = getEnv("HOME", "/")
+  result.running = true
+  result.history = @[]
+  result.env     = @[
+    ("PATH",    "/usr/bin:/bin"),
+    ("HOME",    "/home/sovereign"),
+    ("SHELL",   "/bin/sigma-sh"),
+    ("TERM",    "xterm-256color"),
+    ("USER",    "sovereign"),
+  ]
 
-  # ─── 1. BusyBox / Coreutils replacements ──────────────────────────────────
-  if match_cmd(cmd.name, "ls"):
-    # List files (mock listing)
-    return 100
-  elif match_cmd(cmd.name, "cat"):
-    # Print file contents
-    return 101
-  elif match_cmd(cmd.name, "echo"):
-    # Print string
-    return 102
-  elif match_cmd(cmd.name, "clear"):
-    # Reset screen console
-    return 103
+proc getEnvVar(sh: ShellState, key: string): string =
+  for (k, v) in sh.env:
+    if k == key: return v
+  return ""
 
-  # ─── 2. Git replacement (SigmaVCS) ────────────────────────────────────────
-  elif match_cmd(cmd.name, "sigmavcs"):
-    if match_cmd(cmd.arg, "init"):
-      self.vcs_initialized = true
-      return 200
-    elif match_cmd(cmd.arg, "commit"):
-      if not self.vcs_initialized: return 202 # error
-      self.vcs_commit_count += 1
-      return 201
-    elif match_cmd(cmd.arg, "log"):
-      if not self.vcs_initialized: return 202
-      return 203
+proc setEnvVar(sh: var ShellState, key, val: string) =
+  for i in 0..<sh.env.len:
+    if sh.env[i][0] == key:
+      sh.env[i] = (key, val)
+      return
+  sh.env.add((key, val))
 
-  # ─── 3. Curl / Wget replacement (SigmaCurl) ───────────────────────────────
-  elif match_cmd(cmd.name, "sigmacurl"):
-    # Fetch web content safely via sovereign stack
-    return 300
+# ── Token Parser ──────────────────────────────────────────────────────────────
 
-  # ─── 4. Make replacement (SigmaRun Task Runner) ───────────────────────────
-  elif match_cmd(cmd.name, "sigmarun"):
-    # Execute sovereign tasks defined in build config
-    return 400
+proc tokenise(line: string): seq[string] =
+  ## Split line into tokens respecting single and double quotes
+  var tokens: seq[string] = @[]
+  var cur = ""
+  var inSingle = false
+  var inDouble = false
 
-  # ─── 5. System configuration (sysctl/sigpkg) ──────────────────────────────
-  elif match_cmd(cmd.name, "sigpkg"):
-    return 500
-  elif match_cmd(cmd.name, "sysctl"):
-    return 501
+  for ch in line:
+    case ch
+    of '\'':
+      if not inDouble: inSingle = not inSingle
+      else: cur.add(ch)
+    of '"':
+      if not inSingle: inDouble = not inDouble
+      else: cur.add(ch)
+    of ' ', '\t':
+      if inSingle or inDouble:
+        cur.add(ch)
+      elif cur.len > 0:
+        tokens.add(cur); cur = ""
+    else:
+      cur.add(ch)
 
-  return 0 # Command not matched/unknown
+  if cur.len > 0: tokens.add(cur)
+  return tokens
+
+proc parseCmd(tokens: seq[string]): ParsedCmd =
+  result.args        = @[]
+  result.pipe_next   = false
+  result.append_redir = false
+
+  var i = 0
+  while i < tokens.len:
+    case tokens[i]
+    of ">":
+      i.inc
+      if i < tokens.len: result.stdout_redir = tokens[i]
+    of ">>":
+      i.inc
+      if i < tokens.len:
+        result.stdout_redir = tokens[i]
+        result.append_redir = true
+    of "<":
+      i.inc
+      if i < tokens.len: result.stdin_redir = tokens[i]
+    of "|":
+      result.pipe_next = true
+    else:
+      result.args.add(tokens[i])
+    i.inc
+
+# ── Built-in Commands ─────────────────────────────────────────────────────────
+
+proc builtin_cd(sh: var ShellState, args: seq[string]): int =
+  let target = if args.len > 1: args[1] else: sh.getEnvVar("HOME")
+  if dirExists(target):
+    sh.cwd = target
+    setCurrentDir(target)
+    return 0
+  else:
+    stderr.writeLine("sigma-sh: cd: " & target & ": " & $ErrNoFile)
+    return 1
+
+proc builtin_echo(args: seq[string]): int =
+  echo args[1..^1].join(" ")
+  return 0
+
+proc builtin_export(sh: var ShellState, args: seq[string]): int =
+  for arg in args[1..^1]:
+    let parts = arg.split('=', maxsplit=1)
+    if parts.len == 2:
+      sh.setEnvVar(parts[0], parts[1])
+    else:
+      sh.setEnvVar(parts[0], "")
+  return 0
+
+proc builtin_pwd(sh: ShellState): int =
+  echo sh.cwd
+  return 0
+
+proc builtin_exit(code: int): int =
+  quit(code)
+
+proc builtin_history(sh: ShellState): int =
+  for i, cmd in sh.history:
+    echo "  ", i + 1, "  ", cmd
+  return 0
+
+proc builtin_help(): int =
+  echo """sigma-sh — Sovereign Shell v15.0
+Builtins: cd, echo, export, pwd, exit, history, help
+External commands loaded from PATH"""
+  return 0
+
+# ── External Command Execution ────────────────────────────────────────────────
+
+proc execExternal(sh: ShellState, cmd: ParsedCmd): int =
+  if cmd.args.len == 0: return 0
+  let exe = cmd.args[0]
+
+  # Search PATH
+  var found = ""
+  for dir in sh.getEnvVar("PATH").split(':'):
+    let candidate = dir / exe
+    if fileExists(candidate):
+      found = candidate
+      break
+
+  if found == "" and not fileExists(exe):
+    stderr.writeLine("sigma-sh: " & exe & ": " & $ErrNotFound)
+    return 127
+
+  let actual = if found != "": found else: exe
+  try:
+    return execShellCmd(actual & " " & cmd.args[1..^1].join(" "))
+  except:
+    stderr.writeLine("sigma-sh: exec error: " & getCurrentExceptionMsg())
+    return 1
+
+# ── Main REPL ─────────────────────────────────────────────────────────────────
+
+proc evalLine(sh: var ShellState, line: string): int =
+  let stripped = line.strip()
+  if stripped.len == 0 or stripped.startsWith("#"): return 0
+  sh.history.add(stripped)
+
+  # Handle semicolon-separated commands
+  for part in stripped.split(';'):
+    let tokens = tokenise(part.strip())
+    if tokens.len == 0: continue
+    let cmd = parseCmd(tokens)
+    if cmd.args.len == 0: continue
+
+    let exit_code = case cmd.args[0]
+      of "cd":      builtin_cd(sh, cmd.args)
+      of "echo":    builtin_echo(cmd.args)
+      of "export":  builtin_export(sh, cmd.args)
+      of "pwd":     builtin_pwd(sh)
+      of "exit":    builtin_exit(if cmd.args.len > 1: parseInt(cmd.args[1]) else: 0)
+      of "history": builtin_history(sh)
+      of "help":    builtin_help()
+      else:         execExternal(sh, cmd)
+
+    if exit_code != 0:
+      result = exit_code
+
+proc main() =
+  var sh = newShell()
+  let isInteractive = isatty(stdin.getFileHandle())
+
+  if isInteractive:
+    echo "sigma-sh v15.0 — Sovereign Shell. Type 'help' for commands."
+
+  while sh.running:
+    if isInteractive:
+      stdout.write("sovereign@sigma:" & sh.cwd & "$ ")
+      stdout.flushFile()
+
+    let line = try: stdin.readLine() except EOFError: break
+    discard evalLine(sh, line)
+
+main()
