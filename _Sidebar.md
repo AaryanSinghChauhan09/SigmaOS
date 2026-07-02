@@ -1,11 +1,27 @@
 ## Getting Started
 - [Home](Home)
+- [Getting Started](Getting-Started)
 - [Quick Start](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/QUICKSTART.md)
 - [Download SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/DOWNLOAD.md)
+- [Migration from Linux](Migration-Guide)
 - [FAQ](FAQ)
 - [Building from Source](Building-from-Source)
 - [Installation](Installation)
-- [Contributing](Contributing)
+
+## Linux Adoption
+- [SigmaOS vs Linux](SigmaOS-vs-Linux)
+- [Linux Absorption Architecture](Linux-Absorption-Architecture)
+- [Migration Guide](Migration-Guide)
+- [Package Absorption (.deb/.rpm)](Linux-Absorption-Architecture#package-absorption)
+- [Run Docker Containers](Linux-Absorption-Architecture#oci-docker-container-support)
+
+## Community
+- [Community Governance](Community-Governance)
+- [Contributing](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CONTRIBUTING.md)
+- [Developer Guide](Developer_Guide)
+- [SDK Guide](SDK-Guide)
+- [Your First App](Your-First-App)
+- [Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/ROADMAP.md)
 
 ## Source Code
 - [Source Files Index](Source-Files-Index)

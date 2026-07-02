@@ -19,15 +19,35 @@ all signed with post-quantum cryptography (Kyber-1024 + Dilithium-5).
 
 | I want to… | Go to |
 |---|---|
-| **Download SigmaOS** | [DOWNLOAD.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/DOWNLOAD.md) · [download.html](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/download.html) |
+| **Download SigmaOS** | [DOWNLOAD.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/DOWNLOAD.md) |
 | **Run it in QEMU right now** | [Quick Start](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/QUICKSTART.md) |
 | **Understand the architecture** | [Architecture Overview](Architecture-Overview) |
-| **Build the bootable ISO (v0.1)** | [Minimal v0.1 Spec](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Minimal_SigmaOS_v0.1.md) |
-| **Contribute code** | [Contributing](Contributing) · [Developer Guide](Developer_Guide) |
+| **Use the AI CLI agent** | [sigma-agent](sigma-agent) |
+| **Automate workflows** | [sigma-agent-workflow](sigma-agent-workflow) |
+| **Migrate from Linux** | [Migration Guide](Migration-Guide) |
 | **Build an app** | [SDK Guide](SDK-Guide) · [Your First App](Your-First-App) |
-| **Add a driver** | [Driver Development](Driver-Development) · [Open Source Drivers](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Open_Source_Drivers.md) |
+| **Add a driver** | [Driver Development](Driver-Development) |
+| **Contribute code** | [Community Governance](Community-Governance) · [Developer Guide](Developer_Guide) |
+| **Compare to other distros** | [SigmaOS vs Linux](SigmaOS-vs-Linux) |
 | **Understand the roadmap** | [ROADMAP.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/ROADMAP.md) |
-| **Compare to other distros** | [Competitive Analysis](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Competitive_Analysis.md) |
+
+---
+
+## 🤖 AI Agent (sigma-agent)
+
+sigma-agent is SigmaOS's built-in AI CLI assistant — 36 modules, 22 subcommands.
+
+```bash
+sigma-agent                          # interactive REPL
+sigma-agent "install sigma-edit"     # one-shot NL command
+sigma-agent "set dark mode"          # any GUI action via NL
+sigma-agent doctor                   # health check
+sigma-agent daemon start             # background AI service
+sigma-agent workflow install --all   # install automation templates
+sigma-agent security scan            # security audit
+```
+
+Every GUI action has a CLI equivalent. Full docs: [sigma-agent](sigma-agent) · [Workflow Automation](sigma-agent-workflow)
 
 ---
 
@@ -102,18 +122,18 @@ Hardware       → CPU · NVMe · GPU · NIC · USB · TPM2 · UEFI
 | Document | Description |
 |---|---|
 | [Architecture Overview](Architecture-Overview) | System layers, subsystems, deployment profiles |
-| [Professional Tools & Apps](Professional-Tools-And-Apps) | Full app and tool ecosystem |
-| [sigpkg Specification](sigpkg-Spec) | Package format, registry, PKGBUILD |
-| [SDK Guide](SDK-Guide) | Build apps in Rust, JS, Python, Java, .NET |
-| [Component Integration](Component-Integration) | GitHub org structure, component contracts |
-| [OSS Reference Map](OSS-Reference-Map) | What to study from seL4, Nix, Smithay, smoltcp… |
-| [Ideas Backlog (1000+)](Ideas-Backlog-1000) | Development ideas across 8 categories |
-| [Open Source Drivers](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Open_Source_Drivers.md) | Driver strategy, SDF guide |
-| [Hardware CI Matrix](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Hardware_CI_Matrix.md) | QEMU + real HW test matrix |
-| [License Map](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/License_Map.md) | Per-directory SPDX licensing |
-| [Competitive Analysis](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Competitive_Analysis.md) | vs Alpine, Arch, Ubuntu |
-| [Minimal v0.1 Spec](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Minimal_SigmaOS_v0.1.md) | First bootable ISO checklist |
+| [sigma-agent](sigma-agent) | AI CLI agent — 36 modules, 22 subcommands |
+| [sigma-agent-workflow](sigma-agent-workflow) | n8n-style workflow automation |
+| [Migration Guide](Migration-Guide) | Moving from Ubuntu/Fedora/Arch to SigmaOS |
+| [SigmaOS vs Linux](SigmaOS-vs-Linux) | Feature-by-feature comparison |
+| [Linux Absorption Architecture](Linux-Absorption-Architecture) | Running Linux apps on SigmaOS |
+| [SDK Guide](SDK-Guide) | Build native SigmaOS apps |
+| [Community Governance](Community-Governance) | Contributor roles, RFC process, voting |
 | [Security Model](Security-Model) | PQC, pledge/unveil, zero-trust |
+| [Professional Tools & Apps](Professional-Tools-And-Apps) | Full app and tool ecosystem |
+| [sigpkg Specification](sigpkg-Spec) | Package format and registry |
+| [OSS Reference Map](OSS-Reference-Map) | Inspirational open-source projects |
+| [Ideas Backlog (1000+)](Ideas-Backlog-1000) | Development ideas backlog |
 | [Profession Profiles](PROFILES) | 1000+ role-specific shard bundles |
 
 ---
