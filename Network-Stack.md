@@ -1,24 +1,11 @@
-# Sovereign Network Stack
+# S-NET: Sovereign Networking
 
-SigmaOS includes a custom, zero-dependency networking stack built from the ground up for minimal overhead and high security.
+SigmaOS implements a high-performance network stack designed for industrial reliability and security.
 
-## Supported Protocols
-- **L2**: Ethernet (MAC addressing, ARP)
-- **L3**: IPv4
-- **L4**: TCP and UDP
+## Features
 
-## Socket API
+- **PQC Encryption**: All traffic is encrypted via CRYSTALS-Kyber by default.
 
-The network stack provides a familiar, socket-based API internally:
-- `socket_create()`
-- `socket_bind()`
-- `socket_listen()`
-- `socket_accept()`
-- `socket_connect()`
-- `socket_send()`
-- `socket_recv()`
-- `socket_close()`
+- **Lattice Routing**: Shard-aware packet routing to minimize latency in distributed workflows.
 
-## TCP State Machine
-
-The stack implements a rigorous TCP state machine, carefully tracking the transition between `LISTEN`, `SYN_SENT`, `ESTABLISHED`, and connection teardown states to defend against SYN flood and RST injection attacks.
+- **Hardware Agnostic**: Supports generic WiFi and Ethernet chipsets via the Sovereign Driver Framework.

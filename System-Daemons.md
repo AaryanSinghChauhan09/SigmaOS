@@ -1,37 +1,149 @@
-# ⚙️ System Daemons & Utilities
+# SigmaOS System Daemons
 
-SigmaOS implements essential background daemons and advanced utilities natively, with zero dependence on the POSIX ecosystem. This ensures maximum control, minimum footprint, and tight security.
+All SigmaOS daemons live in `sigmad/` and expose HTTP APIs on Unix domain sockets. They run in Ring 3 under strict `sigma_pledge` + `sigma_unveil` restrictions.
 
-## Background Daemons
+---
 
-### `sigma_init`
-The root process of the system (PID 1). It mounts all necessary virtual filesystems (`/dev`, `/proc`, `/sys`), forks foundational background daemons (`cron`, `syslog`), drops the user into an interactive `sigma-sh` shell, and functions as an infinite loop to reap zombie child processes via `waitpid`.
+## Daemon Architecture
 
-### `sigma_voice_control`
-NLP-driven intent execution for Voice-First OS control.
+```
+sigma_init (PID 1)
+    │  reads /etc/sigma/services/*.xml
+    │  starts daemons in dependency order
+    ▼
+sigmad-health    sigmad-pkg    sigmad-netd    ...
+    │                │              │
+    │  Unix socket   │  Unix socket │  Unix socket
+    ▼                ▼              ▼
+/run/sigma/      /run/sigma/    /run/sigma/
+  healthd.sock     pkg.sock       netd.sock
+```
 
-### `sigma_p2p_update`
-Decentralized update daemon distributing `.spkg` via mesh.
+Every daemon: `curl --unix-socket /run/sigma/<name>.sock /health`
 
-### `sigma_cron`
-A zero-dependency scheduling daemon absorbing Vixie cron functionality.
-- Uses an in-memory `crontab` structure containing `{minute, hour, command}` combinations.
-- Uses `sigma_sys_sleep` to efficiently idle the CPU between time-checks, and `sigma_sys_fork`/`sigma_sys_execve` to execute scheduled scripts in the background.
+---
 
-### `sigma_syslog`
-A centralized logging daemon (not yet fully fleshed out but conceptually integrated) to intercept kernel buffer outputs and `stdout` multiplexing.
+## Core Daemons
 
-## Archiving & Compression
+### sigmad-health
+- **Purpose**: Structured health monitoring (CoreOS-inspired)
+- **Socket**: `/run/sigma/healthd.sock`
+- **Endpoints**: `GET /health`, `GET /metrics`, `GET /readyz`
+- **pledge**: `stdio inet rpath`
 
-### `sigma_gzip`
-A bare-metal, pure-C++ implementation of DEFLATE compression.
-- Completely free of external `zlib` dependencies.
-- Operates directly on the virtual FAT32 filesystem by reading files into 4KB chunks and writing out standard `.gz` headers (Magic Bytes `0x1F 0x8B`).
+### sigmad-watchdog
+- **Purpose**: Hardware WDT + daemon liveness
+- **Action**: Restarts crashed daemons; triggers kernel WDT if unresponsive
+- **pledge**: `stdio proc`
 
-## Networking & Editors
+### sigmad-metrics
+- **Purpose**: Prometheus-compatible metrics endpoint
+- **Socket**: `/run/sigma/metrics.sock`
+- **Endpoint**: `GET /metrics` — exposes CPU, RAM, I/O, network counters
+- **pledge**: `stdio rpath`
 
-### `sigma_nc`
-A sovereign network tool mimicking standard `netcat`. Allows arbitrary TCP connections and simple listeners on specified ports, binding directly to `sigma_tcp_connect` and `sigma_tcp_listen` syscall equivalents.
+### sigmad-telemetry
+- **Purpose**: Opt-in, PII-scrubbed telemetry
+- **Privacy**: All data anonymised before transmission; user can disable
+- **pledge**: `stdio inet`
 
-### `sigma_vi`
-A terminal-based modal text editor, avoiding massive dependencies like `ncurses`. Uses bare-metal VGA escapes to implement pure `INSERT` and `NORMAL` modes. Allows entering keystrokes to a buffer and features commands like `:w` and `:q`.
+### sigmad-cloudsync
+- **Purpose**: End-to-end encrypted cloud sync
+- **Crypto**: AES-256-GCM + Argon2id key derivation
+- **pledge**: `stdio inet rpath wpath`
+
+### sigmad-netd
+- **Purpose**: Network interface management
+- **Features**: DHCP, routing table, DNS configuration
+- **pledge**: `stdio inet rpath wpath`
+
+### sigmad-pkg
+- **Purpose**: Package manager daemon
+- **Features**: Install, update, remove `.spkg` packages; repo management
+- **pledge**: `stdio rpath wpath cpath inet exec`
+
+### sigmad-vault
+- **Purpose**: Secrets and key management (TPM2-backed)
+- **Features**: Seal/unseal secrets via TPM2 PCR, DID-based identity
+- **pledge**: `stdio rpath wpath`
+
+### sigmad-power
+- **Purpose**: Power management (ACPI P/C-states)
+- **Features**: Battery monitoring, frequency scaling, thermal throttle
+- **pledge**: `stdio rpath`
+
+### sigmad-notify
+- **Purpose**: Desktop notification delivery
+- **pledge**: `stdio`
+
+### sigmad-indexd
+- **Purpose**: Full-text file indexer for sigma-search
+- **pledge**: `stdio rpath`
+
+### sigmad-timed
+- **Purpose**: NTP time synchronisation
+- **pledge**: `stdio inet`
+
+### sigmad-update
+- **Purpose**: OS update management (OSTree A/B)
+- **pledge**: `stdio rpath wpath inet exec`
+
+### sigmad-heal
+- **Purpose**: Self-healing daemon — detects kernel faults, triggers recovery
+- **pledge**: `stdio proc rpath`
+
+---
+
+## Interacting with Daemons
+
+```bash
+# Check health
+curl --unix-socket /run/sigma/healthd.sock /health
+
+# Install a package
+sigma-pkg install firefox
+
+# Behind the scenes:
+curl --unix-socket /run/sigma/pkg.sock /install \
+  -d '{"name":"firefox","version":"latest"}'
+
+# Prometheus metrics
+curl --unix-socket /run/sigma/metrics.sock /metrics
+```
+
+---
+
+## Daemon Configuration
+
+Daemons are configured via `/etc/sigma/services/*.xml`:
+
+```xml
+<service name="sigmad-netd">
+  <exec>/usr/bin/sigmad-netd</exec>
+  <pledge>stdio inet rpath wpath</pledge>
+  <restart>on-failure</restart>
+  <after>sigmad-health</after>
+</service>
+```
+
+---
+
+## Status
+
+| Daemon | Status |
+|--------|--------|
+| sigmad-health | ✅ Implemented |
+| sigmad-watchdog | ✅ Implemented |
+| sigmad-metrics | ✅ Implemented |
+| sigmad-telemetry | ✅ Implemented |
+| sigmad-cloudsync | ✅ Implemented |
+| sigmad-netd | 🔄 Partial |
+| sigmad-pkg | 🔄 Partial |
+| sigmad-vault | 🔄 Partial |
+| sigmad-power | 🔄 Partial |
+| sigmad-update | ⬜ Phase G |
+| sigmad-heal | 🔄 Framework done |
+
+---
+
+*See also: [Kernel](Kernel) · [Networking](Networking) · [Architecture-Overview](Architecture-Overview)*

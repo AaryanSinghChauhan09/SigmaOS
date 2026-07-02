@@ -1,125 +1,122 @@
-# SigmaOS Zenith — Home
+# SigmaOS Wiki
 
-<div align="center">
-
-**v15.2 [ZENITH-SINGULARITY]** · Silicon-Direct · Zero-Dependency · Post-Quantum
-
-</div>
+> **v15.0.0 Zenith — Stable** · One branch (`main`) · PQC-signed · Multi-format
 
 ---
 
-## 🚀 Quick Navigation
+## What is SigmaOS?
 
-| Section | Description |
-| :--- | :--- |
-| [Architecture Overview](Architecture-Overview) | Ring-0/3 layout, HAL, shard map, boot sequence |
-| [Kernel Internals](SigmaOS-Kernel-Internals) | CFS scheduler, NUMA, slab allocator, real-time class |
-| [HAL](HAL) | x86_64 / ARM64 / RISC-V hardware abstraction |
-| [Syscall Dispatcher](SyscallDispatcher) | Modular O(1) C dispatch table, 256-slot registry |
-| [Storage](Storage) | VFS, ZFS-inspired CoW, SovereignCloudFS |
-| [Networking](Networking-Shard) | TCP/IP stack, DNS resolver, loopback NIC |
-| [Security Framework](Sovereign-Security-Framework) | PQC, Dilithium-5 boot chain, MAC policies |
-| [Desktop UI](ZENITH_UI) | Zenith glassmorphic compositor, Vulkan layer |
-| [Branch Guide](Branch-Guide) | 12-branch taxonomy, targets, and status |
-| [Getting Started](Getting-Started) | Build instructions, toolchain setup, QEMU |
-| [Contributing](Contributor-Guidelines) | PR process, code style, commit conventions |
-| [Onboarding Guide](Onboarding_Guide) | Coding standards and environment setup |
-| [Problems & Bugs](Problems) | Active bug ledger and resolution log |
-| [RFC Template](RFC_Template) | Proposal format for new subsystem features |
-| [Changelog](CHANGELOG) | Release history and version notes |
-| [Roadmap](Roadmap) | Strategic improvement sequence |
-| [Competitor Comparison](Competitor-Comparison) | Distro gap analysis and surpass strategy |
-| [Phase A Checklist](Phase-A-Execution-Checklist) | File-level execution tracker |
-| [Phase 7–8 Roadmap](Phase-7-8-Roadmap) | Automation, CLI, GUI, branch parity |
-| [Feature Matrix](Feature-Matrix) | Branch subsystem parity |
-| [Zenith GUI Toolkit](Zenith-GUI-Toolkit) | Compositor, tiling, profiles |
-| [Automation & CLI](Automation-CLI-Engine) | sigma_automation + sigma-cli |
-| [Containers](Containers-Orchestrator) | sigma-pod native orchestration |
-| [Boot Resilience](Bootloader-Resilience) | Safe Mode + Fix-it menu |
-| [Phase B Checklist](Phase-B-Execution-Checklist) | Unified automation + CLI + GUI |
-| [Phase C Checklist](Phase-C-Execution-Checklist) | Meta-distro subsystem integration |
-| [Meta-Distro Engine](Meta-Distro-Unified-Engine) | Competitor → subsystem map |
-| [Meta-Distro Registry](Meta-Distro-Registry) | `sigma_meta_distro_init()` hub |
-| [Problems Manifest](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CURRENT_PROBLEMS_MANIFEST.md) | Active bugs and Phase A status |
+SigmaOS is a sovereign, multi-format operating system built from a single unified codebase.
+It ships in **50+ distribution formats** — from a bare-metal RTOS to a browser-tab WASM app —
+all signed with post-quantum cryptography (Kyber-1024 + Dilithium-5).
+
+> *The only OS that boots on bare metal, runs in a browser, deploys as a cloud container,
+> and installs as a mobile APK — all from one codebase.*
 
 ---
 
-## ⚡ Core Capabilities
+## 🚀 Start Here
 
-| 🔧 Subsystem | ✅ Implementation | 🎯 Advantage |
-| :--- | :--- | :--- |
-| **CFS Scheduler** | NUMA-balanced, inline ASM context switch | Zero-drift thread scheduling |
-| **Slab Allocator** | O(1) lockless, power-of-2 buckets | Fragmentation-free heap |
-| **SPSC IPC** | Lock-free zero-copy ring buffer | Sub-microsecond inter-shard messaging |
-| **S-HAL** | x86_64 · ARM64 · RISC-V | Single codebase for 3 ISAs |
-| **VulkanLayer** | Direct SPIR-V GPU routing | No SDK overhead |
-| **Syscall Table** | 256-slot O(1) C dispatch | Runtime handler registration |
-| **PQC Engine** | Dilithium-5 attestation | Post-quantum secure boot |
-| **Zenith Desktop** | Glassmorphic Vulkan compositor | Hardware-accelerated UI |
-| **SovereignVFS** | ZFS-inspired CoW + OverlayFS | Atomic rollback, zero data loss |
-| **Container Runtime** | Static sandbox with locked FS | App-store grade isolation |
-
----
-
-## 🌿 Branch Architecture (12 Targets)
-
-| Branch | Archetype | Status |
-| :--- | :--- | :--- |
-| `main` | Stable Production | ✅ Active |
-| `release/standalone` | Bare-Metal Desktop | 🔨 Development |
-| `release/rtos` | Real-Time Embedded | 🔨 Development |
-| `release/mobile` | Energy-Aware Mobile | 🔨 Development |
-| `release/microkernel` | Ultra-Minimal (120 shards) | ✅ Test-verified |
-| `release/dual-boot` | Co-operative Boot | 🔨 Development |
-| `release/distributed` | Cluster-Native | 🔨 Development |
-| `release/cloud` | Headless Virtualization | 🔨 Development |
-| `release/browser` | WebAssembly Runtime | 🔨 Development |
-| `release/app` | App-Store Sandbox | 🔨 Development |
-| `performance-optimized` | SIMD AVX-512 / Neon | 🔬 Experimental |
-| `gh-pages` | Static Web Portal | ✅ Live |
-
-See [Branch Guide](Branch-Guide) for the full per-branch breakdown.
+| I want to… | Go to |
+|---|---|
+| **Download SigmaOS** | [DOWNLOAD.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/DOWNLOAD.md) · [download.html](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/download.html) |
+| **Run it in QEMU right now** | [Quick Start](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/QUICKSTART.md) |
+| **Understand the architecture** | [Architecture Overview](Architecture-Overview) |
+| **Build the bootable ISO (v0.1)** | [Minimal v0.1 Spec](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Minimal_SigmaOS_v0.1.md) |
+| **Contribute code** | [Contributing](Contributing) · [Developer Guide](Developer_Guide) |
+| **Build an app** | [SDK Guide](SDK-Guide) · [Your First App](Your-First-App) |
+| **Add a driver** | [Driver Development](Driver-Development) · [Open Source Drivers](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Open_Source_Drivers.md) |
+| **Understand the roadmap** | [ROADMAP.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/ROADMAP.md) |
+| **Compare to other distros** | [Competitive Analysis](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Competitive_Analysis.md) |
 
 ---
 
-## 📐 Architecture at a Glance
+## 📦 Download Formats
+
+| Category | Formats |
+|---|---|
+| App | Native, Electron, Java, .NET, Python, AppImage/Snap/Flatpak, WASM, Mobile, ELF, sigpkg |
+| Standalone | Native ISO, AppImage, Portable EXE, WASM Bundle |
+| RTOS | Monolithic, Microkernel, Layered, Exokernel, POSIX Layer, Bare-Metal |
+| Mobile | APK, IPA, Hybrid, Cross-Platform, PWA |
+| Microkernel | Pure, Hybrid, Modular, Exokernel, POSIX Layer |
+| Dual Boot | Partition, Separate Disk, Chainload, Virtualized, Live USB |
+| Distributed | Client-Server, P2P, Cluster, Grid, SOA, Ledger, Actor |
+| Cloud | Public, Private, Hybrid, Multi, Community, IaaS, PaaS, SaaS, FaaS |
+| Browser | Desktop, Mobile, WebViews, Headless, Lite, Specialised |
+| Kernel | Monolithic, Microkernel, Hybrid, Exokernel, Nanokernel, Modular, Mono+Modular |
+
+---
+
+## 🗺️ Roadmap at a Glance
+
+| Phase | Version | Goal | Status |
+|---|---|---|---|
+| 1 | **v0.1** | Bootable ISO + sigma-sh + sigma-pkg | 🔴 Building |
+| 2 | v1.0 | Desktop + AppImage + 50 packages + SDK | ⬜ Planned Q2 2027 |
+| 3 | v2.0 | Mobile + WASM + Cloud images | ⬜ Planned Q4 2027 |
+| 4 | v3.0 | RTOS + Distributed + Formal verification | ⬜ Planned Q2 2028 |
+
+---
+
+## 🏗️ System Architecture
 
 ```
-┌──────────────────────────────────────────┐
-│  Ring-3 Userland                         │
-│  sigma-sh │ Zenith Desktop │ sigma-forge  │
-└──────────────────┬───────────────────────┘
-                   │ syscall / SYSRET
-┌──────────────────▼───────────────────────┐
-│  SyscallDispatcher  (256-slot O(1))      │
-└──────────────────┬───────────────────────┘
-                   │
-┌──────────────────▼───────────────────────┐
-│  Sovereign Kernel Lattice (Ring-0)       │
-│  CFS · Slab · VFS · SPSC IPC · PQC      │
-└──────────────────┬───────────────────────┘
-                   │
-┌──────────────────▼───────────────────────┐
-│  S-HAL                                   │
-│  x86_64 APIC │ ARM64 GIC │ RISC-V PLIC  │
-└──────────────────┬───────────────────────┘
-                   │
-          ⚙️ Physical Hardware
+User Space     → PWAs · Zenith Desktop · sigma-ai · profession apps
+Browser Shell  → Custom Chromium + navigator.sigmaos.* API
+System Daemons → sigmad-health · sigmad-pkg · sigmad-netd · sigmad-vault
+Syscall Layer  → sigma_pledge + sigma_unveil + seccomp-BPF + AVC
+Kernel (Ring 0)→ MLFQ+EDF+CFS Scheduler · Buddy+Slab MM · PQC Security
+                 TCP/IP+TLS1.3+Kyber · VFS+SigmaFS+Ext4 · IPC · eBPF
+HAL            → x86_64 · ARM64 · RISC-V RV64GC
+Hardware       → CPU · NVMe · GPU · NIC · USB · TPM2 · UEFI
 ```
 
 ---
 
-## 🤝 Contributing
+## 🧩 Ecosystem
 
-Read [CONTRIBUTING.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CONTRIBUTING.md) for the full guide including branch strategy, commit conventions, and PR process.
-
-**Key rules at a glance:**
-- No `stdlib.h` / `stdio.h` in Ring-0 kernel shards
-- Use bounded string ops (`strncpy`, `snprintf`) — never `strcpy`
-- All PRs must pass `npm run test` (82 green tests required)
-- Commit format: `type(scope): message`
+- **600+ shards** — atomic, independently testable capability modules
+- **sigma-pkg** — PQC-signed package manager with reproducible builds
+- **sigma-sdk** — multi-language SDK (Rust, JS/TS, Python, Java, .NET)
+- **Zenith Desktop** — glassmorphic DE with `navigator.sigmaos.*` web API
+- **sigma-vault** — TPM2-backed secrets store
+- **sigma-pod** — OCI-compatible container runtime
+- **sigma-ai** — on-device TinyLlama inference daemon
 
 ---
 
-> **Σ SigmaOS** — Absolute Sovereignty. Singularity Achieved.
-> *v15.2 [ZENITH-SINGULARITY] · Build-Verified · 100% Silicon Purity*
+## 🔒 Security Pillars
+
+1. **Post-Quantum Cryptography** — Kyber-1024 KEM + Dilithium-5 signatures
+2. **sigma_pledge / sigma_unveil** — kernel-enforced capability restriction
+3. **Zero-Trust** — SPIFFE workload identities, per-syscall attestation
+4. **TPM2** — sealed key derivation, remote attestation
+5. **W^X** — no page simultaneously writable and executable
+6. **Reproducible Builds** — cryptographically verifiable binaries
+
+---
+
+## 📚 Key Documents
+
+| Document | Description |
+|---|---|
+| [Architecture Overview](Architecture-Overview) | System layers, subsystems, deployment profiles |
+| [Professional Tools & Apps](Professional-Tools-And-Apps) | Full app and tool ecosystem |
+| [sigpkg Specification](sigpkg-Spec) | Package format, registry, PKGBUILD |
+| [SDK Guide](SDK-Guide) | Build apps in Rust, JS, Python, Java, .NET |
+| [Component Integration](Component-Integration) | GitHub org structure, component contracts |
+| [OSS Reference Map](OSS-Reference-Map) | What to study from seL4, Nix, Smithay, smoltcp… |
+| [Ideas Backlog (1000+)](Ideas-Backlog-1000) | Development ideas across 8 categories |
+| [Open Source Drivers](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Open_Source_Drivers.md) | Driver strategy, SDF guide |
+| [Hardware CI Matrix](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Hardware_CI_Matrix.md) | QEMU + real HW test matrix |
+| [License Map](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/License_Map.md) | Per-directory SPDX licensing |
+| [Competitive Analysis](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Competitive_Analysis.md) | vs Alpine, Arch, Ubuntu |
+| [Minimal v0.1 Spec](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Minimal_SigmaOS_v0.1.md) | First bootable ISO checklist |
+| [Security Model](Security-Model) | PQC, pledge/unveil, zero-trust |
+| [Profession Profiles](PROFILES) | 1000+ role-specific shard bundles |
+
+---
+
+*SigmaOS — Sovereign by Design. One codebase. Every format.*
+*GitHub: [AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS)*

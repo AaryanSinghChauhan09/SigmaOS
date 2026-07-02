@@ -1,85 +1,43 @@
-# 🧠 SigmaOS Kernel Internals
+# SigmaOS Zenith: Advanced Kernel Internals (v15.2)
 
-> **The beating heart of Sovereign Silicon.**
+To push SigmaOS Zenith to industrial maturity, we have introduced a final series of advanced internal abstractions. These logic gates directly emulate the resilience, hardware traversal, and cryptographical frameworks seen in production kernels like Linux and FreeBSD, completely severing any remaining OS dependency.
 
-This page documents the core kernel subsystems that make SigmaOS tick — all implemented from scratch with zero external dependencies.
-
----
-
-## Process Scheduler (`sigma_scheduler.cpp`)
-
-**Absorbs**: Linux CFS (Completely Fair Scheduler), L4Re RTOS EDF, Minix process tables.
-
-SigmaOS uses a **hybrid scheduler** with two scheduling classes:
-
-| Class | Algorithm | Use Case |
-|-------|-----------|----------|
-| `SCHED_NORMAL` | CFS (lowest `vruntime` wins) | General userland processes |
-| `SCHED_RT` | EDF (Earliest Deadline First) | RTOS branch, real-time tasks |
-
-- **Process table**: Up to 256 concurrent processes
-- **States**: `READY`, `RUNNING`, `BLOCKED`, `ZOMBIE`
-- RT tasks always preempt NORMAL tasks
+All code is natively compiled in ISO C11.
 
 ---
 
-## Inter-Process Communication (`sigma_ipc.cpp`)
+## 23. Cryptographic API (Crypto Core)
+**Inspirations:** Linux `crypto/aes_generic.c`, `crypto/sha256_generic.c`
+**Implementation:** `kernel/core/security/sigma_crypto.c`
 
-**Absorbs**: L4 microkernel message passing, Plan 9 channels, LMAX Disruptor ring buffers.
+A modular kernel cryptography provider bypassing external libraries (e.g. OpenSSL). Implements stateful block ciphers and hashing algorithms (AES-256 and SHA-256 stubs) necessary for securing sovereign memory shards and validating cryptographic signatures internally.
 
-| Feature | Detail |
-|---------|--------|
-| Queue depth | 64 messages per queue |
-| Max queues | 32 |
-| Message size | 256 bytes |
-| Mechanism | Lock-free ring buffer |
-| API | `sigma_ipc_send()`, `sigma_ipc_recv()` |
+## 24. Out-of-Memory (OOM) Killer
+**Inspirations:** Linux `mm/oom_kill.c`, FreeBSD `vm_pageout.c`
+**Implementation:** `kernel/core/mem/sigma_oom.c`
 
----
+A ruthless survival mechanism identical to the Linux OOM killer. When physical memory is critically exhausted, it calculates a `badness` score for every running process (weighing total RAM consumed against the `oom_score_adj` heuristic) and deterministically terminates the heaviest users to prevent a kernel panic. Kernel threads are explicitly immune.
 
-## Interrupt Descriptor Table (`sigma_idt.cpp`)
+## 25. IPv4 Routing Table (FIB)
+**Inspirations:** Linux `net/ipv4/fib_trie.c`, FreeBSD `in_rmx.c`
+**Implementation:** `net/routing.c`
 
-**Absorbs**: Intel SDM Vol 3 Ch 6, Linux `arch/x86/kernel/idt.c`.
+Implements a Longest Prefix Match (LPM) algorithm for routing IPv4 traffic. Defines the core Forwarding Information Base (FIB) where gateways, netmasks, and interface metrics are resolved to dictate packet traversal, removing the need for `iproute2` user-space routing daemon dependencies.
 
-- 256 IDT entries for x86_64
-- Named exception handlers (Division Error, Page Fault, GPF, etc.)
-- Page fault handler reads CR2 for faulting address
-- IRQ routing for PIT Timer (IRQ0), Keyboard (IRQ1), Mouse (IRQ12)
-- PIC EOI sent after each IRQ
+## 26. PCI / PCIe Bus Enumerator
+**Inspirations:** Linux `drivers/pci/probe.c`, FreeBSD `pci.c`
+**Implementation:** `kernel/core/hardware/sigma_pci.c`
 
----
+A low-level hardware discovery subsystem mapping the PCI Configuration Space. Automatically probes buses, slots, and functions to resolve Vendor IDs, Device IDs, and Class Codes, building the internal hardware tree required before module initialization.
 
-## Virtual Filesystem (`sigma_vfs.cpp`)
+## 27. USB Core Subsystem (HCI)
+**Inspirations:** Linux `drivers/usb/core/usb.c`, FreeBSD `usb_core.c`
+**Implementation:** `kernel/core/hardware/sigma_usb.c`
 
-**Absorbs**: Linux VFS superblock/inode/dentry model, Plan 9 namespace binding.
+Establishes the USB state machine (Attached, Powered, Default, Address, Configured). Manages the enumeration of device endpoints, speeds (Low, Full, High, Super), and descriptor parsing independent of the underlying Host Controller Interface (UHCI/EHCI/xHCI).
 
-- **Mount table**: 16 simultaneous mount points
-- **FD table**: 256 open file descriptors
-- **Path resolution**: Longest-prefix matching against mount points
-- **Operations**: `open`, `read`, `write`, `close`, `opendir`, `readdir`, `set_owner`
-- FS-agnostic: FAT32 and ext2 plug in via `SigmaFSOps` function pointer tables
+## 28. Real-Time Clock (RTC) / CMOS
+**Inspirations:** Linux `drivers/rtc/rtc-cmos.c`, FreeBSD `acpi_rtc.c`
+**Implementation:** `kernel/core/system/sigma_rtc.c`
 
----
-
-## Memory Allocator (`sigma_allocator.cpp`)
-
-**Absorbs**: Linux buddy allocator, Doug Lea's dlmalloc concepts.
-
-- Buddy system with orders 0–11 (4KB to 8MB contiguous)
-- Linked-list free lists per order
-- `sigma_malloc()` / `sigma_free()` as sovereign replacements for libc
-
----
-
-## Syscall Layer (`sigma_syscalls.cpp`)
-
-Distinct from POSIX. Syscall numbers are designed to prevent accidental ABI pollution:
-
-| Syscall | Number | Purpose |
-|---------|--------|---------|
-| `SIGMA_SYS_DEBUG_PRINT` | 0x01 | Route to VGA/serial |
-| `SIGMA_SYS_ALLOC_MEM` | 0x02 | Allocate memory |
-| `SIGMA_SYS_FREE_MEM` | 0x03 | Free memory |
-| `SIGMA_SYS_SEND_MSG` | 0x04 | IPC send |
-| `SIGMA_SYS_RECV_MSG` | 0x05 | IPC receive |
-| `SIGMA_SYS_HW_IO` | 0x06 | Privileged hardware I/O |
+Interfaces directly with port `0x70/0x71` to read the legacy PC CMOS clock. Automatically parses BCD/Binary formatting and converts the raw hardware date vectors (Year, Month, Day, Hour, Minute, Second) into standard UNIX Epoch Time for kernel timestamping.
