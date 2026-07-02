@@ -623,6 +623,38 @@ proc main() =
     else:
       echo dispatch("run sigma-compat " & sub_args.join(" "), verbose, dry_run, trust, no_color)
 
+  # ── Novel ideas tools (batch 2-4 implementations) ────────────────────────────
+  of "mode","workload-mode","perf-mode":
+    echo dispatch("run sigma-mode " & sub_args.join(" "), verbose, dry_run, trust, no_color)
+  of "audit","chain-audit","sigma-audit":
+    echo dispatch("run sigma-audit " & sub_args.join(" "), verbose, dry_run, trust, no_color)
+  of "compliance","comply":
+    echo dispatch("run sigma-compliance " & sub_args.join(" "), verbose, dry_run, trust, no_color)
+  of "shard-new","shard-gen","new-shard":
+    echo dispatch("run sigma-shard-new " & sub_args.join(" "), verbose, dry_run, trust, no_color)
+  of "swarm","cluster","federation":
+    echo dispatch("run sigma-swarm " & sub_args.join(" "), verbose, dry_run, trust, no_color)
+  of "p2p-update","p2p","decentralised-update":
+    echo dispatch("run sigma-p2p-update " & sub_args.join(" "), verbose, dry_run, trust, no_color)
+  of "dataflow","reactive":
+    echo dispatch("run sigma-dataflow " & sub_args.join(" "), verbose, dry_run, trust, no_color)
+  of "telemetry","syscall-stats","otel":
+    echo dispatch("run sigma-telemetry " & sub_args.join(" "), verbose, dry_run, trust, no_color)
+  of "replay","record-trace","deterministic":
+    echo dispatch("run sigma-replay " & sub_args.join(" "), verbose, dry_run, trust, no_color)
+  of "thermal","cpu-temp":
+    echo dispatch("run sigma-thermal " & sub_args.join(" "), verbose, dry_run, trust, no_color)
+  of "posix","conformance","posix-test":
+    echo dispatch("run sigma-posix " & sub_args.join(" "), verbose, dry_run, trust, no_color)
+  of "kdoc","kernel-doc","man-k":
+    echo dispatch("run sigma-kernel-doc " & sub_args.join(" "), verbose, dry_run, trust, no_color)
+  of "zkp","exec-proof","prove":
+    echo dispatch("run sigma-zkp " & sub_args.join(" "), verbose, dry_run, trust, no_color)
+  of "india","abdm","upi","gst":
+    echo dispatch("run sigma-india " & sub_args.join(" "), verbose, dry_run, trust, no_color)
+  of "ai-sched","transformer-sched":
+    echo dispatch("run sigma-ai-sched " & sub_args.join(" "), verbose, dry_run, trust, no_color)
+
   # ── install (shell integration) ──────────────────────────────────────────────
   of "install":
     if "--shell-integration" in extra or "shell-integration" in sub_args:
