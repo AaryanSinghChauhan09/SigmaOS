@@ -280,6 +280,12 @@ Usage:
   case args[0]
   of "seed":
     seed_dataset(data_dir)
+    # Also copy v2 seed if present
+    let v2_src = getAppDir() / "sigma_agent_seed_v2.jsonl"
+    let v2_dst = data_dir / "seed_samples_v2.jsonl"
+    if fileExists(v2_src) and not fileExists(v2_dst):
+      copyFile(v2_src, v2_dst)
+      echo fmt"✓ v2 seed dataset copied: {v2_dst}"
   of "build":
     let name = if args.len > 1: args[1] else: "sigma-agent-v1"
     let builder = new_builder(data_dir, output_dir)

@@ -37,6 +37,9 @@ import sigma_agent_benchmark
 import sigma_agent_notify
 import sigma_agent_doctor
 import sigma_agent_update
+import sigma_agent_memory
+import sigma_agent_script_gen
+import sigma_agent_explain
 
 # ── ANSI colour palette ────────────────────────────────────────────────────────
 const
@@ -120,6 +123,11 @@ proc dispatch(input: string, verbose = false, dry_run = false,
   # Dry-run mode
   if dry_run:
     return col(fmt"[dry-run] Would execute: {input}", YELLOW, no_color)
+
+  # Inject memory context for the LLM via env var
+  let mem_ctx = build_context_string(input, max_tokens=150)
+  if mem_ctx.len > 0:
+    putEnv("SIGMA_AGENT_MEMORY_CONTEXT", mem_ctx)
 
   # Try sigma-agent-core Rust binary first (best accuracy)
   let rust_bin = findExe("sigma-agent-core")
@@ -571,6 +579,18 @@ proc main() =
   # ── update (self-update) ──────────────────────────────────────────────────────
   of "update","upgrade","self-update":
     update_cmd(sub_args)
+
+  # ── memory (persistent long-term memory) ─────────────────────────────────────
+  of "memory","mem","remember":
+    memory_cmd(sub_args)
+
+  # ── script-gen (NL → .sa script generator) ───────────────────────────────────
+  of "script-gen","script","generate","gen":
+    script_gen_cmd(sub_args)
+
+  # ── explain (educational / copilot-cli ??) ────────────────────────────────────
+  of "explain","why","how","what","??":
+    explain_cmd(sub_args)
 
   # ── install (shell integration) ──────────────────────────────────────────────
   of "install":
