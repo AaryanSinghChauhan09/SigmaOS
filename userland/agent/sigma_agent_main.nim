@@ -602,6 +602,10 @@ proc main() =
   of "corpus","dataset","train-corpus":
     corpus_cmd(sub_args)
 
+  # ── recipe (declarative package recipe builder) ───────────────────────────────
+  of "recipe","pkg-recipe":
+    echo dispatch("run sigma-pkg recipe " & sub_args.join(" "), verbose, dry_run, trust, no_color)
+
   # ── compat (Linux binary/package compatibility) ───────────────────────────────
   of "compat","linux-compat","absorb":
     if sub_args.len > 0 and sub_args[0] == "absorb":
