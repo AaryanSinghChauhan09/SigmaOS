@@ -40,6 +40,7 @@ import sigma_agent_update
 import sigma_agent_memory
 import sigma_agent_script_gen
 import sigma_agent_explain
+import sigma_agent_workflow
 
 # ── ANSI colour palette ────────────────────────────────────────────────────────
 const
@@ -591,6 +592,10 @@ proc main() =
   # ── explain (educational / copilot-cli ??) ────────────────────────────────────
   of "explain","why","how","what","??":
     explain_cmd(sub_args)
+
+  # ── workflow (n8n-style automation) ──────────────────────────────────────────
+  of "workflow","wf","automate","automation","schedule":
+    workflow_cmd(sub_args)
 
   # ── install (shell integration) ──────────────────────────────────────────────
   of "install":

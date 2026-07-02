@@ -1,52 +1,30 @@
 # sigma-agent — AI CLI Agent for SigmaOS
 
 > Every GUI action, accessible from the terminal via natural language.
-> Sovereign. Local. No cloud required.
+> Sovereign. Local. Learns from you. Automates everything.
 
 ---
 
 ## What it does
 
-`sigma-agent` is SigmaOS's native AI CLI agent. It maps natural language to OS operations — every setting, app, file, and system control you can click in the Zenith Desktop GUI has a CLI equivalent. It runs locally, learns from your feedback, scans for security issues, and speaks to specialised sub-agents for complex tasks.
+`sigma-agent` is SigmaOS's native AI CLI agent — 35 modules covering:
+natural language → OS commands, n8n-style workflow automation, security auditing,
+RLHF fine-tuning, multi-agent specialisation, persistent memory, voice input,
+self-diagnosis, smart completions, benchmarking, and plugin extensions.
 
 ```
-σ ~/code › install sigma-edit and open it
+σ ~/code › workflow run weekly-backup
 
-  Planning multi-step task...
+Σ Workflow: weekly-backup  [manual]
+  Backup Code and Documents every Friday night
+  Steps: 4
 
-  Step 1: install sigma-edit      ✓ Installed sigma-edit 1.2.0
-  Step 2: open sigma-edit         ✓ Launched sigma-edit
-```
+  [1/4] backup-code                ✓  892ms
+  [2/4] backup-docs                ✓  341ms
+  [3/4] disk-check                 ✓  45ms
+  [4/4] done                       ✓  12ms
 
----
-
-## Architecture
-
-```
-User Input (natural language / voice)
-       │
-       ▼
- sigma-agent (Nim CLI master entry)
-  ├── IntentParser    — keyword → tool + args
-  ├── ReAct Planner   — multi-step reasoning (Thought→Action→Observation)
-  ├── LLM Backend     — auto-select: sigma-ai → Ollama → llama.cpp → offline
-  ├── Tool Executor   — 21 built-in tools (Rust + Nim)
-  ├── Context Engine  — live OS state injected into LLM prompts
-  └── Multi-agent     — routes to specialist sub-agents
-         ├── sigma-security   (audit, policies, threat detection)
-         ├── sigma-sysadmin   (services, resources, maintenance)
-         ├── sigma-developer  (code editing, git, build tools)
-         ├── sigma-teacher    (OS concepts, interactive learning)
-         ├── sigma-netops     (interfaces, VPN, DNS, firewall)
-         └── sigma-pkgops     (packages, updates, registry)
-
-Background:
-  sigma-agent daemon  — Unix socket + HTTP API (port 11430)
-                        GitHub wiki knowledge sync (hourly)
-                        Live system context for all requests
-
-Learning:
-  sigma-agent learn   — records interactions → DPO pairs → LoRA fine-tune
+  ✓ PASS  Workflow: weekly-backup
 ```
 
 ---
@@ -54,90 +32,146 @@ Learning:
 ## Quick Start
 
 ```bash
-# Interactive REPL
-sigma-agent
+# Install
+nim c -d:release --opt:speed -o:sigma-agent sigma_agent_main.nim
+cp sigma-agent /usr/bin/
 
-# One-shot command
-sigma-agent "install sigma-edit"
-sigma-agent "set dark mode"
-sigma-agent "system info"
+# Verify
+sigma-agent doctor
 
-# Start background daemon (enables context + knowledge sync)
+# Set up shell integration
+sigma-agent install --shell-integration
+
+# Install workflow templates
+sigma-agent workflow install --all
+
+# Start background daemon (knowledge sync + completions)
 sigma-agent daemon start
-
-# Security audit
-sigma-agent security scan
-
-# Voice command
-sigma-agent voice
-
-# Route to specialist
-sigma-agent multi "explain how sigma_pledge works"
-sigma-agent multi --agent developer "fix src/main.rs add error handling"
 ```
 
 ---
 
-## All Subcommands
+## All Subcommands (20 subcommands, 35 modules)
 
 | Subcommand | What it does |
 |---|---|
 | *(no args)* | Interactive REPL |
-| `"<command>"` | One-shot natural language command |
-| `--script <file>` | Run a `.sa` script file |
+| `"<command>"` | One-shot natural language |
+| `--script <file>` | Run a `.sa` script |
 | `--pipe` | Read commands from stdin |
-| `mirror list` | Show all 60+ GUI→CLI mappings |
-| `mirror run <action>` | Execute a GUI action via CLI |
-| `watch [dir]` | File watcher with AI suggestions (Aider-style) |
-| `train seed` | Write seed training dataset |
-| `train build` | Build ChatML + Alpaca + DPO JSONL datasets |
-| `config` | Show/edit configuration and profiles |
-| **`daemon start`** | **Start background daemon (HTTP + Unix socket)** |
-| **`daemon sync`** | **Force GitHub wiki knowledge sync** |
-| **`context`** | **Snapshot live system context** |
-| **`security scan`** | **Full security audit + score** |
-| **`security logs`** | **Scan logs for anomalies** |
-| **`security policies`** | **AI policy recommendations** |
-| **`learn rate good`** | **Rate last interaction (RLHF feedback)** |
-| **`learn correct "<answer>"`** | **Record the right answer (DPO pair)** |
-| **`learn finetune`** | **LoRA fine-tune via llama.cpp** |
-| **`multi <input>`** | **Auto-route to specialist sub-agent** |
-| **`multi --agent developer`** | **Force a specific sub-agent** |
-| **`multi diagnose <problem>`** | **Multi-agent collaborative diagnosis** |
-| **`voice`** | **Voice-to-command (Whisper STT)** |
-| **`voice --session`** | **Continuous hands-free voice session** |
-| `install --shell-integration` | Install bash/zsh/fish/sigma-sh hooks |
+| `doctor` | Self-diagnosis (like `claude doctor`) |
+| `update` | Self-update from GitHub releases |
+| `daemon` | Background HTTP service + knowledge sync |
+| `context` | Live OS state snapshot |
+| `security` | Security audit + policy advisor |
+| `learn` | RLHF feedback + DPO fine-tuning |
+| `multi` | Multi-agent routing (6 specialists) |
+| `voice` | Voice input (Whisper STT) |
+| `memory` | Persistent facts/prefs (CLAUDE.md style) |
+| `script-gen` | NL → `.sa` script generator |
+| `explain` | Explain commands/concepts (copilot-cli `??`) |
+| **`workflow`** | **n8n-style automation pipelines** |
+| `plugin` | Skill extension system |
+| `complete` | LLM-powered tab completion |
+| `tui` | Dashboard, fuzzy picker, interactive diff |
+| `benchmark` | 40-test quality benchmark suite |
+| `notify` | Desktop notifications + event watcher |
+| `train` | Training dataset + GitHub sync + A/B |
+| `watch` | File watcher + AI suggestions |
+| `mirror` | GUI→CLI mapping explorer (60+) |
+| `config` | Profile system + model management |
+| `install` | Shell integration |
 
 ---
 
-## Files
+## Workflow Automation (n8n-style)
+
+```bash
+# Install all 8 built-in templates
+sigma-agent workflow install --all
+
+# Templates: weekly-backup, daily-update, cpu-alert, low-disk-alert,
+#            dev-workflow, security-hardening, on-boot-setup, pkg-update-notify
+
+# Run a workflow
+sigma-agent workflow run weekly-backup
+sigma-agent workflow run weekly-backup --dry-run
+sigma-agent workflow run dev-workflow --verbose
+
+# Generate from natural language
+sigma-agent workflow create "backup home folder every Friday"
+sigma-agent workflow create "run security scan every night at 23:00" -o nightly.yaml
+
+# Manage
+sigma-agent workflow list
+sigma-agent workflow enable weekly-backup
+sigma-agent workflow disable cpu-alert
+sigma-agent workflow history
+sigma-agent workflow audit
+
+# Background scheduler (checks triggers every 60s)
+sigma-agent workflow scheduler
+```
+
+Workflow YAML format:
+```yaml
+name: my-workflow
+description: "What this does"
+enabled: true
+trigger: schedule=daily 06:00    # or: manual, cpu>90, disk<10, pkg_update, boot
+steps:
+  - name: update
+    action: "run sigma-pkg update"
+    on_fail: notify
+    timeout: 300
+    retries: 1
+  - name: scan
+    action: "security scan"
+    condition: "exit_code_of(update) == 0"
+    on_fail: continue
+  - name: done
+    action: "notify 'Done' 'Update and scan complete'"
+```
+
+Trigger formats: `manual`, `schedule=daily HH:MM`, `schedule=every friday 22:00`,
+`schedule=*/30min`, `cpu>90`, `disk<10`, `pkg_update`, `boot`, `file:/path`
+
+---
+
+## Files (35 modules)
 
 ```
 userland/agent/
-├── main.rs                         Rust binary entry (sigma-agent-core)
-├── Cargo.toml                      Rust crate manifest
-├── sigma_agent.rs                  10 core tools (Rust)
-├── sigma_agent_core.rs             Intent parser + Agent + REPL
-├── sigma_agent_tools_ext.rs        10 extended tools
-├── sigma_llm.rs                    LLM backends (llama.cpp/Ollama/sigma-ai/null)
-├── sigma_agent_planner.rs          ReAct planner + command suggestor
-├── sigma_agent_code.rs             Code editing + diff + git (Aider-style)
-├── sigma_agent_main.nim            CLI master entry + subcommand router
-├── sigma_agent_session.nim         Session manager + memory + streaming
-├── sigma_agent_config.nim          Profile system + model management
-├── sigma_agent_training.nim        Seed + fine-tuning pipeline
-├── sigma_agent_gui_mirror.nim      60+ GUI→CLI complete mapping
-├── sigma_agent_watch.nim           File watcher + proactive AI suggestions
-├── sigma_agent_shell_integration.nim  Shell hooks + keybindings + aliases
-├── sigma_agent_daemon.nim          Background daemon (HTTP + socket + knowledge sync)
-├── sigma_agent_context.nim         Live OS state context collection
-├── sigma_agent_security.nim        Security advisor + anomaly scanner
-├── sigma_agent_learn.nim           RLHF feedback + DPO fine-tuning pipeline
-├── sigma_agent_multi.nim           Multi-agent orchestration + specialist routing
-├── sigma_agent_voice.nim           Voice input (Whisper STT pipeline)
-├── sigma_agent.nimble              Nim package definition
-├── sigma_agent_ci.yml              CI pipeline (8 jobs)
-└── README.md                       This file
+├── main.rs + Cargo.toml              Rust engine (sigma-agent-core)
+├── sigma_agent.rs/.core.rs/...       Rust tool implementations
+├── sigma_agent_main.nim              CLI master entry (35 modules)
+├── sigma_agent_workflow.nim          n8n-style workflow engine  ← NEW
+├── sigma_agent_memory.nim            Persistent memory (CLAUDE.md)
+├── sigma_agent_script_gen.nim        NL → .sa script generator
+├── sigma_agent_explain.nim           Explain mode (copilot-cli ??)
+├── sigma_agent_daemon.nim            HTTP daemon + /v1/complete
+├── sigma_agent_context.nim           OS context engine
+├── sigma_agent_security.nim          Security advisor
+├── sigma_agent_learn.nim             RLHF + DPO fine-tuning
+├── sigma_agent_multi.nim             Multi-agent orchestration
+├── sigma_agent_voice.nim             Voice input (Whisper)
+├── sigma_agent_plugin.nim            Plugin skill system
+├── sigma_agent_autocomplete.nim      Smart tab completion
+├── sigma_agent_tui.nim               TUI components
+├── sigma_agent_benchmark.nim         Benchmark suite (40 tests)
+├── sigma_agent_notify.nim            Notifications + events
+├── sigma_agent_doctor.nim            Self-diagnosis
+├── sigma_agent_update.nim            Self-update
+├── sigma_agent_training.nim          Training + sync + A/B
+├── sigma_agent_gui_mirror.nim        60+ GUI→CLI mappings
+├── sigma_agent_watch.nim             File watcher
+├── sigma_agent_shell_integration.nim Shell hooks
+├── sigma_agent_session.nim           Session manager
+├── sigma_agent_config.nim            Profile system
+├── sigma_agent_seed_v2.jsonl         55 training samples
+├── sigma_agent.nimble                Package (v15.1.0)
+├── sigma_agent_ci.yml                12-job CI pipeline
+└── README.md
 ```
 
 ---
@@ -145,91 +179,28 @@ userland/agent/
 ## Build
 
 ```bash
-# Build the Nim CLI
 cd userland/agent
 nim c -d:release --opt:speed -o:sigma-agent sigma_agent_main.nim
-
-# Build the Rust engine (improves accuracy)
 cargo build --release -p sigma-agent-core
-
-# Install both
 cp sigma-agent /usr/bin/
 cp ../../target/release/sigma-agent-core /usr/bin/
-
-# Or via sigma-pkg
-sigma-pkg install sigma-agent
 ```
+
+Or: `sigma-pkg install sigma-agent`
 
 ---
 
-## LLM Setup
+## Training
 
 ```bash
-# Option 1 — sigma-ai daemon (recommended, fully sovereign)
-sigma-pkg install sigma-ai
-
-# Option 2 — Ollama (easy)
-curl -fsSL https://ollama.ai/install.sh | sh && ollama pull tinyllama
-
-# Option 3 — llama.cpp + GGUF model
-sigma-pkg install llama-cpp
-sigma-pkg install sigma-model-tinyllama   # ~700MB, places in ~/.cache/sigma/models/
+sigma-agent train seed          # 65+ built-in samples (v1 + v2)
+sigma-agent train sync          # pull GitHub wiki → samples
+sigma-agent learn rate good     # rate interactions as you use it
+sigma-agent learn build v1      # build fine-tuning dataset
+sigma-agent learn finetune tinyllama-1.1b sigma-v1
 ```
 
 ---
 
-## Training & Fine-tuning
-
-```bash
-# Every interaction is automatically recorded
-sigma-agent "install sigma-edit"       # runs and records
-
-# Rate responses to improve future accuracy
-sigma-agent learn rate good            # thumbs up
-sigma-agent learn rate bad             # thumbs down
-sigma-agent learn correct "sigma-pkg install sigma-edit"  # correct answer
-
-# Build fine-tuning dataset
-sigma-agent learn build sigma-v1
-
-# Fine-tune with llama.cpp LoRA
-sigma-agent learn finetune tinyllama-1.1b sigma-agent-v1
-
-# Use your custom model
-sigma-agent config set model sigma-agent-v1
-```
-
----
-
-## Security
-
-```bash
-sigma-agent security scan         # full audit + score (0–100)
-sigma-agent security logs         # log anomaly detection
-sigma-agent security ports        # suspicious open ports
-sigma-agent security permissions  # file permission + SUID audit
-sigma-agent security policies     # AI policy recommendations
-sigma-agent security telemetry    # privacy / telemetry audit
-```
-
----
-
-## Inspiration
-
-| Project | What we took |
-|---|---|
-| [Claude Code](https://github.com/anthropics/claude-code) | ReAct loop, streaming, tool calling, REPL |
-| [Aider](https://github.com/Aider-AI/aider) | Git-aware code editing, file watching, diff |
-| [llama.cpp](https://github.com/ggml-org/llama.cpp) | Local LLM, GGUF models, ChatML, LoRA fine-tune |
-| [ai-shell](https://github.com/BuilderIO/ai-shell) | NL → shell, error fixing |
-| [copilot-cli](https://github.com/github/copilot-cli) | Shell integration, explain, suggest |
-| [azure-cli](https://github.com/Azure/azure-cli) | Comprehensive subcommand surface |
-| [openclaw](https://github.com/openclaw/openclaw) | GUI parity: every click = CLI command |
-| [Hermes IDE](https://github.com/hermes-hq/hermes-ide) | Context-aware agent, IDE integration |
-| [openai-cli](https://github.com/openai/openai-cli) | Streaming output, conversation history |
-| [chatgpt-cli](https://github.com/j178/chatgpt) | Session management, conversation context |
-
----
-
-*Sovereign AI — local inference, no telemetry, privacy-first.*
+*Sovereign AI — local inference, no telemetry, no external APIs.*
 *Docs: https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/sigma-agent*

@@ -353,3 +353,50 @@ jobs:
         with:
           name: sigma-agent-benchmark
           path: ~/.cache/sigma/bench_*.json
+
+  # ── 12. Workflow automation tests ────────────────────────────────────────────
+  test-workflow:
+    name: Workflow automation engine
+    runs-on: ubuntu-latest
+    needs: [build-nim]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Nim
+        run: |
+          curl -sSL https://nim-lang.org/choosenim/init.sh | bash -s -- -y
+          echo "$HOME/.nimble/bin" >> $GITHUB_PATH
+      - uses: actions/download-artifact@v4
+        with:
+          name: sigma-agent-nim-linux-x86_64
+          path: userland/agent/
+      - run: chmod +x userland/agent/sigma-agent
+      - name: Test workflow help
+        working-directory: userland/agent
+        run: ./sigma-agent workflow help | grep -i "list\|run\|create\|install" && echo "✓ workflow help"
+      - name: Install built-in templates
+        working-directory: userland/agent
+        run: |
+          ./sigma-agent workflow install --all
+          echo "✓ All templates installed"
+      - name: List workflows
+        working-directory: userland/agent
+        run: ./sigma-agent workflow list | grep -i "weekly\|daily\|cpu" && echo "✓ workflow list"
+      - name: Dry-run a workflow
+        working-directory: userland/agent
+        run: ./sigma-agent workflow run weekly-backup --dry-run | grep -i "dry-run\|step\|backup" && echo "✓ dry-run"
+      - name: Test workflow templates list
+        working-directory: userland/agent
+        run: ./sigma-agent workflow templates | grep "weekly-backup" && echo "✓ templates"
+      - name: Test NL workflow creation
+        working-directory: userland/agent
+        run: |
+          ./sigma-agent workflow create "backup home folder every Friday" | grep -i "name\|trigger\|step" && echo "✓ create"
+      - name: Test trigger check
+        working-directory: userland/agent
+        run: ./sigma-agent workflow check && echo "✓ check"
+      - name: Upload workflow test artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sigma-agent-workflows
+          path: ~/.config/sigma/agent/workflows/*.yaml
