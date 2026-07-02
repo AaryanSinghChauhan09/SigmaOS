@@ -24,6 +24,12 @@ import sigma_agent_training
 import sigma_agent_gui_mirror
 import sigma_agent_watch
 import sigma_agent_shell_integration
+import sigma_agent_daemon
+import sigma_agent_context
+import sigma_agent_security
+import sigma_agent_learn
+import sigma_agent_multi
+import sigma_agent_voice
 
 # ── ANSI colour palette ────────────────────────────────────────────────────────
 const
@@ -268,14 +274,48 @@ NATURAL LANGUAGE COMMANDS:
     review <file>            AI code review
 
 SUBCOMMANDS:
-  sigma-agent mirror list         All GUI→CLI mappings (60+)
-  sigma-agent mirror run <action> Execute a GUI action via CLI
-  sigma-agent watch [dir]         Watch files + AI suggestions
-  sigma-agent train seed          Seed training dataset
-  sigma-agent train build         Build fine-tuning dataset
-  sigma-agent config              Show/edit configuration
-  sigma-agent config set <k> <v>  Set config value
-  sigma-agent install --shell-integration  Setup shell hooks
+  mirror list [filter]            All GUI→CLI mappings (60+)
+  mirror run <action>             Execute a GUI action via CLI
+
+  watch [dir] [--ext .rs,.nim]    Watch files + proactive AI suggestions
+
+  train seed                      Write built-in seed training dataset
+  train build [name]              Build fine-tuning dataset (ChatML/Alpaca/DPO)
+  train stats                     Training data statistics
+
+  config                          Show active configuration
+  config set <key> <value>        Update a config value
+
+  daemon start                    Start background AI daemon (HTTP + socket)
+  daemon stop                     Stop daemon
+  daemon status                   Show daemon stats + backend
+  daemon sync                     Force GitHub wiki knowledge sync
+
+  context                         Snapshot live system context (CPU/mem/disk/git)
+  context --json                  Output as JSON for scripting
+
+  security scan                   Full security audit + score
+  security logs                   Scan logs for anomalies
+  security policies               AI policy recommendations
+  security ports                  Open port audit
+
+  learn rate good|bad|excellent   Rate last interaction (RLHF)
+  learn correct "<right answer>"  Provide correct response (builds DPO pair)
+  learn build [name]              Build fine-tuning dataset
+  learn finetune <model>          Run LoRA fine-tune via llama.cpp
+  learn stats                     Learning statistics
+
+  multi <input>                   Auto-route to best specialist sub-agent
+  multi --agent security <input>  Force security sub-agent
+  multi --agent developer <input> Force developer sub-agent
+  multi --agent teacher <input>   Force teacher/educational sub-agent
+  multi --list                    List all sub-agents
+
+  voice                           Record & execute voice command
+  voice --session                 Continuous hands-free voice session
+  voice --secs 10                 Custom recording window
+
+  install --shell-integration     Install shell hooks (bash/zsh/fish/sigma-sh)
 
 SCRIPT FILES (.sa):
   sigma-agent --script setup.sa
@@ -467,6 +507,30 @@ proc main() =
   # ── config ──────────────────────────────────────────────────────────────────
   of "config":
     config_cmd(sub_args)
+
+  # ── daemon ──────────────────────────────────────────────────────────────────
+  of "daemon":
+    daemon_cmd(sub_args)
+
+  # ── context ─────────────────────────────────────────────────────────────────
+  of "context","ctx":
+    context_cmd(sub_args)
+
+  # ── security ─────────────────────────────────────────────────────────────────
+  of "security","sec","audit":
+    security_cmd(sub_args)
+
+  # ── learn ────────────────────────────────────────────────────────────────────
+  of "learn","feedback","rlhf":
+    learn_cmd(sub_args)
+
+  # ── multi / agent routing ─────────────────────────────────────────────────────
+  of "multi","agent","route":
+    multi_cmd(sub_args)
+
+  # ── voice ────────────────────────────────────────────────────────────────────
+  of "voice","listen","speak":
+    voice_cmd(sub_args)
 
   # ── install (shell integration) ──────────────────────────────────────────────
   of "install":

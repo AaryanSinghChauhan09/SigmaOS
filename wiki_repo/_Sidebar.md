@@ -105,6 +105,15 @@
 - [App Development Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/App_Development_Roadmap.md)
 - [Performance Targets](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Performance_Targets.md)
 
+## AI Agent (sigma-agent)
+- [sigma-agent CLI](sigma-agent)
+- [Daemon & HTTP API](sigma-agent#daemon--background-ai-service)
+- [Multi-Agent System](sigma-agent#multi--multi-agent-orchestration)
+- [Security Advisor](sigma-agent#security--security-advisor-sub-agent)
+- [Learning & Fine-tuning](sigma-agent#learn--reinforcement-learning-from-feedback)
+- [Voice Input](sigma-agent#voice--voice-input-whisper-stt)
+- [Context Engine](sigma-agent#context--live-system-context)
+
 ## Integrations
 - [Integration Guide](Integration-Guide)
 - [sigma-agent CLI](sigma-agent)
