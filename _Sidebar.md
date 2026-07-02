@@ -14,6 +14,7 @@
 - [Migration Guide](Migration-Guide)
 - [Package Absorption (.deb/.rpm)](Linux-Absorption-Architecture#package-absorption)
 - [Run Docker Containers](Linux-Absorption-Architecture#oci-docker-container-support)
+- [OSS Absorption Strategy](OSS-Absorption-Strategy)
 
 ## Community
 - [Community Governance](Community-Governance)
