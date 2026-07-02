@@ -17,6 +17,7 @@
 #   GET  /v1/context     — current system context snapshot
 #   POST /v1/feedback    — record interaction quality (RLHF)
 #   POST /v1/sync        — trigger GitHub knowledge sync
+#   POST /v1/complete    — LLM-powered tab completions (streaming-compatible)
 #   GET  /v1/tools       — list all 20+ tools
 #   GET  /v1/history     — last N conversation turns
 #
@@ -302,6 +303,20 @@ proc handle_request(state: var DaemonState, req: JsonNode): JsonNode =
   of "/v1/sync":
     sync_knowledge(state)
     return %*{"status": "synced", "pages": state.knowledge.len, "ts": state.sync_ts}
+
+  # ── POST /v1/complete — streaming token completion ─────────────────────────
+  of "/v1/complete":
+    let partial  = body.getOrDefault("partial").getStr("")
+    let max_tok  = body.getOrDefault("max_tokens").getInt(128)
+    if partial.len == 0: return %*{"error": "partial required"}
+    # Return completions array (streaming is simulated via JSON array)
+    let messages = @[
+      %*{"role":"system","content":"Complete the sigma-agent command. Output 5 completions, one per line, no explanation."},
+      %*{"role":"user","content":fmt"User typed: {partial}\nCompletions:"}
+    ]
+    let response = call_llm(state, messages, max_tok)
+    let completions = response.strip().splitLines().filterIt(it.strip().len > 0)
+    return %*{"partial": partial, "completions": completions, "backend": state.backend_name}
 
   else:
     return %*{"error": fmt"Unknown path: {path}"}

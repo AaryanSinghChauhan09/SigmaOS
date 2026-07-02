@@ -107,12 +107,18 @@
 
 ## AI Agent (sigma-agent)
 - [sigma-agent CLI](sigma-agent)
+- [Doctor & Self-update](sigma-agent#doctor--environment-self-diagnosis)
 - [Daemon & HTTP API](sigma-agent#daemon--background-ai-service)
 - [Multi-Agent System](sigma-agent#multi--multi-agent-orchestration)
-- [Security Advisor](sigma-agent#security--security-advisor-sub-agent)
-- [Learning & Fine-tuning](sigma-agent#learn--reinforcement-learning-from-feedback)
+- [Security Advisor](sigma-agent#security--security-advisor)
+- [Learning & Fine-tuning](sigma-agent#learn--reinforcement-learning)
 - [Voice Input](sigma-agent#voice--voice-input-whisper-stt)
+- [Plugin System](sigma-agent#plugin--skill-extension-system)
+- [Smart Completion](sigma-agent#complete--llm-powered-tab-completion)
+- [TUI Dashboard](sigma-agent#tui--terminal-ui)
+- [Benchmark Suite](sigma-agent#benchmark--quality-benchmarking)
 - [Context Engine](sigma-agent#context--live-system-context)
+- [Notifications](sigma-agent#notify--notifications--event-subscriptions)
 
 ## Integrations
 - [Integration Guide](Integration-Guide)

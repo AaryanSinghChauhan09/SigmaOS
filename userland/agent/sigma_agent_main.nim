@@ -30,6 +30,13 @@ import sigma_agent_security
 import sigma_agent_learn
 import sigma_agent_multi
 import sigma_agent_voice
+import sigma_agent_plugin
+import sigma_agent_autocomplete
+import sigma_agent_tui
+import sigma_agent_benchmark
+import sigma_agent_notify
+import sigma_agent_doctor
+import sigma_agent_update
 
 # ── ANSI colour palette ────────────────────────────────────────────────────────
 const
@@ -204,6 +211,11 @@ proc run_repl(no_color = false, verbose = false, dry_run = false,
   echo col(fmt"  profile: {cfg.active_profile}", MUTED, no_color)
   echo col(fmt"  trust:   {trust}", MUTED, no_color)
   echo col(fmt"  history: {hist_file}", MUTED, no_color)
+
+  # Check for available updates
+  let new_version = check_update_flag()
+  if new_version.len > 0:
+    echo col(fmt"  ⚡ Update available: v{new_version} — run: sigma-agent update", YELLOW, no_color)
   echo ""
 
   while true:
@@ -531,6 +543,34 @@ proc main() =
   # ── voice ────────────────────────────────────────────────────────────────────
   of "voice","listen","speak":
     voice_cmd(sub_args)
+
+  # ── plugin ───────────────────────────────────────────────────────────────────
+  of "plugin","skill","extension":
+    plugin_cmd(sub_args)
+
+  # ── complete (smart tab completion) ──────────────────────────────────────────
+  of "complete","completion","autocomplete":
+    complete_cmd(sub_args)
+
+  # ── tui (terminal UI) ─────────────────────────────────────────────────────────
+  of "tui","dashboard","dash":
+    tui_cmd(sub_args)
+
+  # ── benchmark ─────────────────────────────────────────────────────────────────
+  of "benchmark","bench","eval":
+    benchmark_cmd(sub_args)
+
+  # ── notify ───────────────────────────────────────────────────────────────────
+  of "notify","notification","alert":
+    notify_cmd(sub_args)
+
+  # ── doctor (self-diagnosis) ───────────────────────────────────────────────────
+  of "doctor","diag","diagnose","check":
+    doctor_cmd(sub_args)
+
+  # ── update (self-update) ──────────────────────────────────────────────────────
+  of "update","upgrade","self-update":
+    update_cmd(sub_args)
 
   # ── install (shell integration) ──────────────────────────────────────────────
   of "install":

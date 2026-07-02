@@ -194,6 +194,70 @@ proc seed_dataset(data_dir: string) =
   else:
     echo fmt"Seed dataset already exists: {path}"
 
+proc sync_from_github*(data_dir: string) =
+  ## Pull fresh training data from GitHub repo (wiki + agent conversations)
+  const WIKI_PAGES = [
+    "sigma-agent", "CLI-Reference", "Architecture-Overview",
+    "Zenith-Desktop", "Getting-Started", "Security-Model"
+  ]
+  const REPO = "AaryanSinghChauhan09/SigmaOS"
+  const RAW_BASE = "https://raw.githubusercontent.com/wiki/" & REPO
+  createDir(data_dir)
+  var synced = 0
+  echo "Syncing training data from GitHub..."
+  for page in WIKI_PAGES:
+    let url = fmt"{RAW_BASE}/{page}.md"
+    let (content, code) = execCmdEx(fmt"""curl -sf --max-time 10 "{url}" """)
+    if code == 0 and content.len > 100:
+      # Convert wiki page into training samples (instruction → summary pairs)
+      let sample = %*{
+        "messages": [
+          %*{"role":"system",    "content":"You are sigma-agent, the SigmaOS AI CLI assistant."},
+          %*{"role":"user",      "content":fmt"explain {page.replace(\"-\",\" \").toLowerAscii}"},
+          %*{"role":"assistant", "content":content[0..<min(500, content.len)]}],
+        "quality":  "Good",
+        "source":   "github_wiki"}
+      var f = open(data_dir / fmt"wiki_{page}.jsonl", fmWrite)
+      f.writeLine($sample); f.close()
+      synced += 1
+  echo fmt"✓ Synced {synced}/{WIKI_PAGES.len} wiki pages as training samples"
+
+proc compare_models*(data_dir, model_a, model_b: string) =
+  ## A/B test two models on seed samples and compare pass rates
+  let seed_path = data_dir / "seed_samples.jsonl"
+  if not fileExists(seed_path):
+    echo "✗ Run: sigma-agent train seed  first"; return
+
+  echo fmt"\nComparing models:"
+  echo fmt"  A: {model_a}"
+  echo fmt"  B: {model_b}\n"
+
+  var a_pass = 0; var b_pass = 0; var total = 0
+  for line in lines(seed_path):
+    if line.strip().len == 0: continue
+    try:
+      let j     = parseJson(line)
+      let user  = j["messages"][1]["content"].getStr
+      let ideal = j["messages"][2]["content"].getStr
+
+      for (model, count) in [(model_a, addr a_pass), (model_b, addr b_pass)]:
+        let env_var = fmt"SIGMA_LLM_MODEL={model.quoteShell}"
+        let (out, _) = execCmdEx(fmt"{env_var} sigma-agent-core --once {user.quoteShell} 2>/dev/null")
+        let ok = ideal[0..<min(20,ideal.len)].toLowerAscii in out.toLowerAscii
+        if ok: count[] += 1
+
+      total += 1
+      if total >= 20: break  # quick A/B test on first 20 samples
+    except: discard
+
+  let pct_a = if total > 0: a_pass * 100 div total else: 0
+  let pct_b = if total > 0: b_pass * 100 div total else: 0
+  echo fmt"  Model A ({model_a}): {a_pass}/{total} ({pct_a}%)"
+  echo fmt"  Model B ({model_b}): {b_pass}/{total} ({pct_b}%)"
+  if   pct_b > pct_a: echo fmt"  → B wins by {pct_b-pct_a}%"
+  elif pct_a > pct_b: echo fmt"  → A wins by {pct_a-pct_b}%"
+  else:               echo "  → Tie"
+
 # ── Fine-tuning command ───────────────────────────────────────────────────────
 proc finetune_cmd*(args: seq[string]) =
   let home = getEnv("HOME", "/tmp")
@@ -244,5 +308,11 @@ Usage:
                   elif args.len > 1 and args[1] == "excellent": Excellent
                   else: Good
     echo fmt"✓ Last interaction rated as {quality}"
+  of "sync":
+    sync_from_github(data_dir)
+  of "compare":
+    let model_a = if args.len > 1: args[1] else: "tinyllama"
+    let model_b = if args.len > 2: args[2] else: "sigma-agent-finetuned"
+    compare_models(data_dir, model_a, model_b)
   else:
     echo fmt"Unknown train command: {args[0]}"
