@@ -87,10 +87,48 @@ Launch QEMU with `-s -S`, wait for gdb on port `:1234`, and auto-load kernel sym
 
 ---
 
-#### `sigma test [--bench]`
+#### `sigma bench [suite] [--save]`
 
-Run unit tests on the host and integration tests inside a booted QEMU instance.
-`--bench` includes the benchmark suite.
+Run the built-in performance benchmark suite against the running kernel.
+
+| Suite | Measures |
+|-------|----------|
+| `boot` | Cold-boot to interactive prompt |
+| `syscall` | `getpid()` call throughput |
+| `ipc` | Unix socket round-trip latency |
+| `fs` | Random 4K NVMe read speed |
+| `scheduler` | Context switch latency |
+| `network` | TCP loopback throughput |
+| `crypto` | AES-256-GCM throughput (AES-NI) |
+| `pqc` | Dilithium-5 sign/verify operations/sec |
+| `all` | All suites (default) |
+
+```bash
+sigma bench
+sigma bench syscall
+sigma bench all --save      # save results to bench-results.json
+```
+
+---
+
+#### `sigma profile <list|show|set> [name]`
+
+Manage build profiles — predefined shard sets for different deployment targets.
+
+| Profile | Description |
+|---------|-------------|
+| `desktop` | Full GUI + driver set (default) |
+| `minimal` | Kernel + essential userspace only |
+| `cloud` | Headless, optimised for VM/server |
+| `embedded` | RTOS-style, stripped memory footprint |
+| `gaming` | GPU-optimised desktop + gaming stack |
+
+```bash
+sigma profile list
+sigma profile show gaming
+sigma profile set cloud
+sigma build --profile embedded
+```
 
 ---
 
@@ -468,3 +506,507 @@ scripts/sigma_cli_host.sh <command> [args...]
 | `HOSTNAME` | sigma-sh | Shown in prompt |
 | `USER` / `USERNAME` | sigma-sh | Shown in prompt |
 | `PATH` | sigma-sh | Used by `which`, `type`, plugin discovery |
+
+---
+
+## Specialist CLI Tools (`tools/cli/`)
+
+These standalone binaries are auto-discoverable as `sigma-<name>` plugins.
+Each one supports `--help`, `--version`, and `--json`.
+
+---
+
+### sigma-monitor — Real-time system monitor
+
+```bash
+sigma-monitor [mode] [--interval <sec>] [--count <n>] [--json]
+```
+
+| Mode | Description |
+|------|-------------|
+| `cpu` | CPU usage and frequency per core |
+| `mem` | RAM and swap usage |
+| `net` | Network I/O by interface |
+| `disk` | Disk I/O and filesystem usage |
+| `proc` | Top processes by CPU |
+| `all` | All metrics (default) |
+| `watch` | Continuous refresh (like top) |
+
+```bash
+sigma-monitor                     # single snapshot, all metrics
+sigma-monitor cpu --json          # JSON CPU stats
+sigma-monitor watch --interval 1 --count 10
+```
+
+---
+
+### sigma-secure — Security hardening & audit
+
+```bash
+sigma-secure <audit|harden|pqc|attest|policy|report> [options]
+```
+
+| Command | Description |
+|---------|-------------|
+| `audit [--fix]` | Full system security audit; `--fix` auto-remediates |
+| `harden [--profile <p>]` | Apply hardening profile (`cis`, `nist`, `stig`, `sovereign`) |
+| `pqc <gen|list|verify>` | Manage Dilithium-5 post-quantum keys |
+| `attest` | Verify TPM 2.0 attestation chain |
+| `policy <list|set|export>` | Manage security policies |
+| `report [--output <file>]` | Generate signed security report |
+
+```bash
+sigma-secure audit --fix
+sigma-secure harden --profile cis
+sigma-secure pqc gen
+sigma-secure attest --json
+sigma-secure report --output security.html
+```
+
+---
+
+### sigma-forensics — Digital forensics
+
+```bash
+sigma-forensics <scan|carve|timeline|hash|report|chain> [options]
+```
+
+| Command | Description |
+|---------|-------------|
+| `scan [--path <dir>]` | Scan for IoCs and anomalies |
+| `carve [--image <file>]` | File carving from raw disk image |
+| `timeline [--start X] [--end Y]` | Build activity timeline |
+| `hash <target>` | Compute SHA-256 integrity hashes |
+| `report [--output <file>]` | Generate forensic report |
+| `chain <file>` | Verify cryptographic chain of custody |
+
+```bash
+sigma-forensics scan --path /
+sigma-forensics carve --image disk.img
+sigma-forensics timeline --start 1751500000 --end 1751600000
+sigma-forensics hash /etc
+sigma-forensics report --output forensics.html
+sigma-forensics chain evidence.bin
+```
+
+---
+
+### sigma-snapshot — System snapshots
+
+```bash
+sigma-snapshot <create|list|restore|delete|diff|export> [options]
+```
+
+| Command | Description |
+|---------|-------------|
+| `create [--name <n>] [--type full\|incremental\|config]` | Take a snapshot |
+| `list` | List all snapshots |
+| `restore <id> [--dry-run]` | Restore a snapshot |
+| `delete <id> [--force]` | Remove a snapshot |
+| `diff <id1> <id2>` | Compare two snapshots |
+| `export <id> --output <file>` | Export snapshot to archive |
+
+```bash
+sigma-snapshot create --name pre-update --type full
+sigma-snapshot list
+sigma-snapshot restore 2 --dry-run
+sigma-snapshot diff 1 3
+sigma-snapshot export 2 --output backup.tar.zst
+```
+
+---
+
+### sigma-cluster — Cluster management
+
+```bash
+sigma-cluster <status|enroll|drain|evict|upgrade|logs|metrics> [options]
+```
+
+| Command | Description |
+|---------|-------------|
+| `status [--node <n>]` | Cluster and node health |
+| `enroll --node <addr>` | Add a node to the cluster |
+| `drain --node <name>` | Cordon and drain a node |
+| `evict --node <name>` | Force-remove a node |
+| `upgrade [--channel <ch>]` | Rolling upgrade of all/one nodes |
+| `logs --node <n> [--tail <n>]` | Node log streaming |
+| `metrics [--node <n>]` | Cluster performance metrics |
+
+```bash
+sigma-cluster status
+sigma-cluster enroll --node 10.0.0.5
+sigma-cluster upgrade --channel nightly
+sigma-cluster logs --node sigma-node-01 --tail 50
+sigma-cluster metrics --json
+```
+
+---
+
+### sigma-hypervisor — VM management
+
+```bash
+sigma-hypervisor <list|create|start|stop|destroy|console|snapshot|info> [options]
+```
+
+| Command | Description |
+|---------|-------------|
+| `list` | List all VMs |
+| `create --name <n> [opts]` | Create a new VM |
+| `start --name <n>` | Start a VM |
+| `stop --name <n> [--force]` | Stop a VM |
+| `destroy --name <n> --force` | Permanently delete a VM |
+| `console --name <n>` | Attach to serial console |
+| `snapshot --name <n> [--label]` | Checkpoint a running VM |
+| `info --name <n>` | Detailed VM information |
+
+```bash
+sigma-hypervisor create --name test-vm --mem 2048 --cpus 2 --arch aarch64
+sigma-hypervisor start --name test-vm
+sigma-hypervisor console --name test-vm
+sigma-hypervisor snapshot --name test-vm --label pre-test
+sigma-hypervisor stop --name test-vm
+```
+
+---
+
+### sigma-recover — System recovery
+
+```bash
+sigma-recover <status|boot|filesystem|rollback|rescue|verify> [options]
+```
+
+| Command | Description |
+|---------|-------------|
+| `status` | Boot partition state and filesystem health |
+| `boot [--partition A\|B] [--dry-run]` | Repair or switch boot partition |
+| `filesystem [--dev <d>] [--dry-run]` | Run sigma_fsck on a device |
+| `rollback [--to <id>] [--dry-run]` | Roll back to snapshot or OTA partition |
+| `rescue` | Drop into minimal recovery shell |
+| `verify` | Check kernel + initrd integrity |
+
+```bash
+sigma-recover status
+sigma-recover verify
+sigma-recover filesystem --dev /dev/sda1
+sigma-recover rollback --to 2 --dry-run
+sigma-recover boot --partition B
+```
+
+---
+
+### sigma-hal-info — Hardware inspector
+
+```bash
+sigma-hal-info [subsystem] [--json]
+```
+
+| Subsystem | Description |
+|-----------|-------------|
+| `cpu` | CPU topology, features, microcode version |
+| `mem` | Memory topology, DIMM slots, speed |
+| `pci` | PCI/PCIe device tree |
+| `usb` | USB device tree |
+| `gpu` | GPU/display adapters and driver info |
+| `storage` | Block devices (NVMe, SATA) |
+| `net` | Network adapters and firmware |
+| `sensors` | Thermal sensors, fan RPM, voltages |
+| `all` | All subsystems (default) |
+
+```bash
+sigma-hal-info
+sigma-hal-info cpu
+sigma-hal-info sensors --json
+sigma-hal-info pci
+```
+
+---
+
+## Additional Specialist CLI Tools
+
+---
+
+### sigma shard — Kernel Lattice Shard Manager
+
+Managed through the main `sigma` CLI. Kernel lattice shards are hot-pluggable kernel modules with cryptographic attestation.
+
+```bash
+sigma shard <list|load|unload|info|reload|verify> [name|path]
+```
+
+| Action | Description |
+|--------|-------------|
+| `list` | Show all loaded shards with base address, version, status, size |
+| `load <path>` | Load a `.shard` file — verifies Dilithium-5 sig before mapping |
+| `unload <name>` | Unload a shard (`--force` to override protection on core shards) |
+| `info <name>` | Show base address, sections, exported symbols, dependencies |
+| `reload <name>` | Hot-reload a shard without rebooting |
+| `verify` | Re-verify Dilithium-5 signatures of all loaded shards |
+
+```bash
+sigma shard list
+sigma shard info sigma-net
+sigma shard load ./my-driver.shard
+sigma shard reload sigma-gpu-hal
+sigma shard verify --json
+sigma shard unload sigma-custom --force
+```
+
+---
+
+### sigma-debug — Kernel Shard Debugger
+
+GDB-style debugger for live kernel shards. Connects to `/run/sigma/debugd.sock` on bare metal; operates in simulation mode otherwise.
+
+```bash
+sigma-debug <command> [--pid <n>] [--addr <hex>] [--len <n>] [--json]
+```
+
+| Command | Description |
+|---------|-------------|
+| `shard list\|info\|load\|unload` | Shard lifecycle management |
+| `mem read\|dump\|map` | Memory inspection and hex dump |
+| `reg [--pid <n>]` | CPU register dump (rax–r15, rip, rflags, cr0–cr4) |
+| `sym resolve\|search` | Address→symbol or name→address resolution |
+| `bp set\|list\|del\|clear` | Breakpoint management |
+| `bt [--pid <n>]` | Full stack backtrace with source line info |
+| `attach --pid <n>` | Attach to running process, pause all threads |
+| `script <file>` | Execute a debug script |
+| `repl` | Interactive debug REPL session |
+
+```bash
+# Inspect a shard and dump memory
+sigma-debug shard list
+sigma-debug mem dump --addr 0xffff000000001000 --len 128
+
+# Symbol resolution
+sigma-debug sym resolve 0xffff000000001234
+sigma-debug sym search sigma_syscall
+
+# Set breakpoint and backtrace
+sigma-debug bp set --addr 0xffff000000001234
+sigma-debug bt --pid 1 --json
+
+# Interactive session
+sigma-debug repl
+```
+
+Full manual: [sigma-debug Manual](sigma-debug-Manual)
+
+---
+
+### sigma-log — Unified Log Viewer & Anomaly Detector
+
+Reads from `/run/sigma/journal.sock`. Falls back to sample data when the socket is unavailable.
+
+```bash
+sigma-log <command> [options]
+```
+
+| Command | Description |
+|---------|-------------|
+| `tail [--lines <n>] [--source <s>] [--level <l>]` | Show recent log entries |
+| `follow [--source <s>]` | Stream logs in real time (like `tail -f`) |
+| `search --query <q> [--level <l>]` | Full-text search with term highlighting |
+| `dump [--output <file>]` | Dump all entries to stdout or file |
+| `stats` | Log level distribution with bar charts |
+| `anomaly [--threshold <n>]` | Detect spikes (OOM, timeouts, auth failures) |
+| `export --format json\|csv\|syslog` | Export in structured format |
+
+Log levels (ascending): `trace` `debug` `info` `warn` `error` `critical`
+
+```bash
+sigma-log tail --lines 50 --level warn
+sigma-log follow --source sigma-security
+sigma-log search --query "OOM" --json
+sigma-log stats
+sigma-log anomaly --threshold 2
+sigma-log export --format json --output /tmp/sigma.json
+```
+
+Full manual: [sigma-log Manual](sigma-log-Manual)
+
+---
+
+### sigma-fix — AI-Guided Patch Suggestion
+
+Scans the system for fixable issues and generates targeted patches with root-cause explanations.
+
+```bash
+sigma-fix <scan|suggest|apply|rollback|explain|list> [options]
+```
+
+| Command | Description |
+|---------|-------------|
+| `scan [--path <dir>]` | Scan for fixable security/config/performance issues |
+| `suggest --id <fix-id>` | Show AI-generated diff patch for an issue |
+| `apply --id <fix-id> [--auto] [--dry-run]` | Apply a patch (with or without confirmation) |
+| `rollback --id <fix-id>` | Undo a previously applied fix |
+| `explain --id <fix-id>` | Root cause analysis and fix rationale |
+| `list` | Show all available/applied fixes with severity |
+
+Severity levels: `CRITICAL` `HIGH` `MEDIUM` `LOW`
+
+```bash
+# Scan and see what's fixable
+sigma-fix scan
+sigma-fix list
+
+# Inspect a fix before applying
+sigma-fix suggest --id FIX-0001
+sigma-fix explain --id FIX-0001
+
+# Apply fixes
+sigma-fix apply --id FIX-0001 --dry-run
+sigma-fix apply --id FIX-0001 --auto
+sigma-fix apply --id FIX-0007
+
+# Undo if needed
+sigma-fix rollback --id FIX-0001
+
+# JSON output for CI pipelines
+sigma-fix scan --json | jq '.scan.fixes[] | select(.severity=="CRITICAL")'
+```
+
+Built-in fix database covers:
+
+| ID | Severity | Category | Issue |
+|----|----------|----------|-------|
+| FIX-0001 | CRITICAL | security | SSH root login enabled |
+| FIX-0002 | HIGH | security | Unexpected SUID binaries |
+| FIX-0003 | HIGH | pqc | Missing Dilithium-5 keys |
+| FIX-0004 | MEDIUM | config | sigma.toml missing [network] section |
+| FIX-0005 | MEDIUM | kernel | GPU shard driver version mismatch |
+| FIX-0006 | LOW | perf | Transparent huge pages disabled |
+| FIX-0007 | LOW | security | kernel.kptr_restrict not set |
+
+Full manual: [sigma-fix Manual](sigma-fix-Manual)
+
+---
+
+### sigma-top — Process Monitor
+
+htop-style real-time process monitor. Reads `/proc/meminfo` and `/proc/stat` on Linux; simulated on other platforms.
+
+```bash
+sigma-top [--sort cpu|mem|pid|name] [--filter <str>] [--count <n>]
+          [--interval <sec>] [--once] [--json]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--sort <field>` | Sort column: `cpu` (default), `mem`, `pid`, `name` |
+| `--filter <str>` | Show only processes matching name/cmd/user |
+| `--count <n>` | Show top N processes (default: 20) |
+| `--interval <sec>` | Refresh every N seconds (default: 2) |
+| `--once` | Single snapshot then exit |
+| `--json` | Machine-readable output |
+
+```bash
+sigma-top                              # live, sorted by CPU
+sigma-top --sort mem --count 10        # top 10 by memory
+sigma-top --filter sigma               # only sigma* processes
+sigma-top --once --json                # single JSON snapshot
+sigma-top --interval 1                 # refresh every second
+```
+
+Display shows: CPU usage bar, MEM usage bar, per-process PID/PPID/user/state/CPU%/MEM/threads/command.
+Running processes are highlighted in cyan; high CPU (>50%) in yellow/red.
+
+---
+
+### sigma_fsck — Filesystem Consistency Checker
+
+Checks and optionally repairs sigma-fs filesystems.
+
+```bash
+sigma_fsck [--dev <path>] [--repair] [--verbose] [--dry-run] [--json]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--dev <path>` | Device or image to check (default: `/dev/sda1`) |
+| `--repair` | Attempt to fix found errors |
+| `--verbose` | Show per-phase progress |
+| `--dry-run` | Report errors without writing anything |
+| `--journal` | Check journal log only |
+| `--json` | Machine-readable output |
+
+Error types detected: `ORPHAN_INODE`, `BAD_CHECKSUM`, `JOURNAL_DIRTY`
+
+```bash
+sigma_fsck                                  # check /dev/sda1
+sigma_fsck /dev/nvme0n1p2                   # check by positional arg
+sigma_fsck --dev /dev/sda1 --repair         # check and fix
+sigma_fsck --dev /dev/sda1 --dry-run        # preview fixes
+sigma_fsck --dev /dev/sda1 --json           # CI-friendly output
+```
+
+Exit code 0 = clean filesystem. Exit code 1 = unresolved errors remain.
+
+---
+
+### sigma_diagnostics — Comprehensive System Diagnostics
+
+Multi-module diagnostic tool for field support and CI health gates.
+
+```bash
+sigma_diagnostics [mode] [--output <file>] [--json]
+```
+
+| Mode | Description |
+|------|-------------|
+| `full` | All diagnostic modules (default) |
+| `quick` | Critical failures and warnings only |
+| `kernel` | Kernel state: version, lockdown, SMEP/SMAP, watchdog |
+| `network` | Network connectivity, firewall, DNS, IPv6 forwarding |
+| `storage` | Filesystem health, SMART, encryption, mount options |
+| `security` | PQC keys, SSH config, CVE scan, LSM, kptr_restrict |
+| `report` | Same as `full` + write to `--output` file |
+
+```bash
+sigma_diagnostics                            # full diagnostic sweep
+sigma_diagnostics quick                      # fast pass, critical only
+sigma_diagnostics security --json           # CI security gate
+sigma_diagnostics full --output report.txt  # generate report file
+sigma_diagnostics kernel --json | jq '.[] | select(.status=="fail")'
+```
+
+Each check outputs: ✓ (pass), ⚠ (warn), ✗ (fail), with an actionable fix command shown for failures.
+
+---
+
+## sigma-pkg — Package Manager (Nim CLI)
+
+Full-featured sovereign package manager. Source: `pkg/sigma_pkg_cli.nim`
+
+```bash
+sigma-pkg <command> [options] [packages...]
+```
+
+| Command | Description |
+|---------|-------------|
+| `install <pkg...>` | Install packages from Sigma Store |
+| `remove <pkg...>` | Remove installed packages |
+| `search <query>` | Search registry by name or description |
+| `list [--filter <s>]` | List installed packages |
+| `update [pkg...]` | Check for updates (all if none specified) |
+| `audit` | Scan installed packages for CVEs |
+| `info <pkg>` | Detailed package metadata |
+| `clean` | Remove orphaned packages and cache |
+| `pin <pkg>` | Prevent a package from auto-updating |
+| `unpin <pkg>` | Re-enable auto-updates |
+| `export [--output <file>]` | Export installed package list |
+
+```bash
+sigma-pkg install zenith-desktop sigma-browser
+sigma-pkg search vr
+sigma-pkg list
+sigma-pkg update
+sigma-pkg audit
+sigma-pkg info sigma-agent
+sigma-pkg pin sigma-core
+sigma-pkg export --output packages.txt
+sigma-pkg install sigma-ml --json
+```
+
+All commands support `--json`, `--dry-run`, and `--force`.

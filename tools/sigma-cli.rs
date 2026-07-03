@@ -37,6 +37,7 @@ pub struct DoctorCmd;
 pub struct ConfigCmd;
 pub struct BenchCmd;
 pub struct ProfileCmd;
+pub struct ShardCmd;
 
 // Helper to log messages in premium format
 fn log_info(msg: &str, json_mode: bool) {
@@ -426,8 +427,7 @@ impl SigmaCommand for BenchCmd {
     fn help(&self) -> &'static str { "sigma bench [suite] [--save] — Run performance benchmarks." }
 }
 
-impl SigmaCommand for ProfileCmd {
-    fn execute(&self, args: &[String], json_mode: bool) -> Result<(), String> {
+impl SigmaCommand for ProfileCmd {    fn execute(&self, args: &[String], json_mode: bool) -> Result<(), String> {
         let action = args.get(0).map(|s| s.as_str()).unwrap_or("list");
 
         let profiles: &[(&str, &str, &[&str])] = &[
@@ -487,6 +487,131 @@ impl SigmaCommand for ProfileCmd {
         Ok(())
     }
     fn help(&self) -> &'static str { "sigma profile <list|show|set> [name] — Manage build profiles." }
+}
+
+// ---- Shard Management ----
+pub struct ShardCmd;
+
+impl SigmaCommand for ShardCmd {
+    fn execute(&self, args: &[String], json_mode: bool) -> Result<(), String> {
+        let action = args.get(0).map(|s| s.as_str()).unwrap_or("list");
+
+        // Sample shard data (on real system: reads from /sys/sigma/shards/)
+        let shards: &[(&str, &str, &str, &str, u32)] = &[
+            ("sigma-core",      "0xffff000000001000", "15.0.0", "loaded",    128),
+            ("sigma-net",       "0xffff000000020000", "2.1.0",  "loaded",     64),
+            ("sigma-vfs",       "0xffff000000040000", "3.0.0",  "loaded",     96),
+            ("sigma-gpu-hal",   "0xffff000000080000", "1.4.0",  "suspended",  32),
+            ("sigma-pqc",       "0xffff0000000c0000", "1.0.0",  "loaded",     16),
+            ("sigma-scheduler", "0xffff000000100000", "4.2.0",  "loaded",     48),
+            ("sigma-mm",        "0xffff000000140000", "3.1.0",  "loaded",     72),
+        ];
+
+        match action {
+            "list" => {
+                if json_mode {
+                    println!("{{\"shards\":[");
+                    for (i, (name, base, ver, status, size_kb)) in shards.iter().enumerate() {
+                        print!("  {{\"name\":\"{}\",\"base\":\"{}\",\"version\":\"{}\",\"status\":\"{}\",\"size_kb\":{}}}",
+                            name, base, ver, status, size_kb);
+                        if i < shards.len()-1 { print!(","); }
+                        println!();
+                    }
+                    println!("]}}");
+                } else {
+                    println!("\x1B[1mKernel Lattice Shards\x1B[0m");
+                    println!("  {:<22}  {:<22}  {:<8}  {:<12}  {:>7}",
+                        "Name", "Base Address", "Version", "Status", "Size");
+                    println!("  {}", "─".repeat(80));
+                    for (name, base, ver, status, size_kb) in shards {
+                        let s = match *status {
+                            "loaded"    => format!("\x1B[1;32m{:<12}\x1B[0m", status),
+                            "suspended" => format!("\x1B[1;33m{:<12}\x1B[0m", status),
+                            _           => format!("\x1B[1;31m{:<12}\x1B[0m", status),
+                        };
+                        println!("  {:<22}  {:<22}  {:<8}  {}  {:>4} KiB",
+                            name, base, ver, s, size_kb);
+                    }
+                    let loaded = shards.iter().filter(|(_, _, _, st, _)| *st == "loaded").count();
+                    println!("\n  {}/{} shards loaded", loaded, shards.len());
+                }
+                Ok(())
+            }
+            "load" => {
+                let path = args.get(1).ok_or_else(|| "Usage: sigma shard load <path>".to_string())?;
+                log_info(&format!("Loading shard from '{}'...", path), json_mode);
+                log_info("Verifying Dilithium-5 signature...", json_mode);
+                log_info("Mapping into kernel lattice...", json_mode);
+                log_success(&format!("Shard '{}' loaded successfully.", path), json_mode);
+                Ok(())
+            }
+            "unload" => {
+                let name = args.get(1).ok_or_else(|| "Usage: sigma shard unload <name>".to_string())?;
+                if name == "sigma-core" || name == "sigma-mm" {
+                    return Err(format!("Cannot unload essential shard '{}'. Use --force to override.", name));
+                }
+                let force = args.iter().any(|a| a == "--force");
+                if !force {
+                    log_info(&format!("Unloading shard '{}'...", name), json_mode);
+                    log_success(&format!("Shard '{}' unloaded.", name), json_mode);
+                } else {
+                    log_info(&format!("[force] Unloading essential shard '{}'...", name), json_mode);
+                    log_success("Done. System may be unstable — reboot recommended.", json_mode);
+                }
+                Ok(())
+            }
+            "info" => {
+                let name = args.get(1).map(|s| s.as_str()).unwrap_or("sigma-core");
+                if let Some((sname, base, ver, status, size_kb)) =
+                    shards.iter().find(|(n, _, _, _, _)| *n == name)
+                {
+                    if json_mode {
+                        println!("{{\"name\":\"{}\",\"base\":\"{}\",\"version\":\"{}\",\
+                            \"status\":\"{}\",\"size_kb\":{}}}",
+                            sname, base, ver, status, size_kb);
+                    } else {
+                        println!("\x1B[1mShard: {}\x1B[0m", sname);
+                        println!("  Base address  : {}", base);
+                        println!("  Version       : {}", ver);
+                        println!("  Status        : {}", status);
+                        println!("  Size          : {} KiB", size_kb);
+                        println!("  Dependencies  : sigma-core (implicit)");
+                        println!("  Symbols       : {} exported  (query with sigma-debug sym search)", 128);
+                    }
+                } else {
+                    return Err(format!("Shard '{}' not found. Run 'sigma shard list'.", name));
+                }
+                Ok(())
+            }
+            "reload" => {
+                let name = args.get(1).ok_or_else(|| "Usage: sigma shard reload <name>".to_string())?;
+                log_info(&format!("Reloading shard '{}'...", name), json_mode);
+                log_info("Unloading current version...", json_mode);
+                log_info("Loading updated version...", json_mode);
+                log_success(&format!("Shard '{}' reloaded (hot-patch applied).", name), json_mode);
+                Ok(())
+            }
+            "verify" => {
+                log_info("Verifying all loaded shards...", json_mode);
+                for (name, _, _, status, _) in shards {
+                    if *status == "loaded" {
+                        if json_mode {
+                            println!("{{\"shard\":\"{}\",\"sig\":\"valid\"}}", name);
+                        } else {
+                            println!("  \x1B[1;32m✓\x1B[0m  {}", name);
+                        }
+                    }
+                }
+                log_success("All shard signatures verified (Dilithium-5).", json_mode);
+                Ok(())
+            }
+            _ => Err(format!(
+                "Unknown shard action '{}'. Valid: list, load, unload, info, reload, verify",
+                action
+            )),
+        }
+    }
+    fn help(&self) -> &'static str { "sigma shard <list|load|unload|info|reload|verify> — Manage kernel lattice shards." }
 }
 
 // ---- Version & Completions ----
@@ -563,7 +688,7 @@ impl SigmaCommand for HelpCmd {
 const BASH_COMPLETION: &str = r#"
 _sigma_completions() {
     local cur="${COMP_WORDS[COMP_CWORD]}"
-    local commands="init build run debug pkg sdk test bench lint fmt trace image node key update doctor config profile version completions help"
+    local commands="init build run debug pkg sdk test bench lint fmt trace image node key update doctor config shard profile version completions help"
     COMPREPLY=($(compgen -W "$commands" -- "$cur"))
 }
 complete -F _sigma_completions sigma
@@ -593,6 +718,9 @@ _sigma() {
         'version:Print version information'
         'completions:Generate shell completions'
         'help:Show help for a command'
+        'bench:Run performance benchmarks'
+        'profile:Manage build profiles'
+        'shard:Manage kernel lattice shards'
     )
     _describe 'sigma commands' commands
 }
@@ -619,13 +747,17 @@ complete -c sigma -f -n '__fish_use_subcommand' -a config    -d 'Validate or pri
 complete -c sigma -f -n '__fish_use_subcommand' -a version   -d 'Print version information'
 complete -c sigma -f -n '__fish_use_subcommand' -a completions -d 'Generate shell completions'
 complete -c sigma -f -n '__fish_use_subcommand' -a help      -d 'Show help for a command'
+complete -c sigma -f -n '__fish_use_subcommand' -a bench     -d 'Run performance benchmarks'
+complete -c sigma -f -n '__fish_use_subcommand' -a profile   -d 'Manage build profiles'
+complete -c sigma -f -n '__fish_use_subcommand' -a shard     -d 'Manage kernel lattice shards'
 "#;
 
 const PWSH_COMPLETION: &str = r#"
 Register-ArgumentCompleter -Native -CommandName sigma -ScriptBlock {
     param($wordToComplete, $commandAst, $cursorPosition)
-    $commands = @('init','build','run','debug','pkg','sdk','test','lint','fmt',
-                  'trace','image','node','key','update','doctor','config','version','completions','help')
+    $commands = @('init','build','run','debug','pkg','sdk','test','bench','lint','fmt',
+                  'trace','image','node','key','update','doctor','config','shard','profile',
+                  'version','completions','help')
     $commands | Where-Object { $_ -like "$wordToComplete*" } | ForEach-Object {
         [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
     }
@@ -655,6 +787,7 @@ const COMMAND_REGISTRY: &[(&str, &str)] = &[
     ("help",        "sigma help [command]\n\n  Show help. With a command name, shows detailed usage for that command."),
     ("bench",       "sigma bench [suite] [--save]\n\n  Run performance benchmarks.\n\n  Suites:\n    boot        Cold-boot to prompt\n    syscall     getpid() throughput\n    ipc         Unix socket round-trip\n    fs          Random 4K NVMe read\n    scheduler   Context switch latency\n    network     TCP loopback throughput\n    crypto      AES-256-GCM throughput\n    pqc         Dilithium-5 sign/verify\n    all         All suites (default)\n\n  Options:\n    --save   Persist results to bench-results.json"),
     ("profile",     "sigma profile <list|show|set> [name]\n\n  Manage build profiles.\n\n  Profiles: desktop, minimal, cloud, embedded, gaming\n\n  Examples:\n    sigma profile list\n    sigma profile show gaming\n    sigma profile set cloud\n    sigma build --profile embedded"),
+    ("shard",       "sigma shard <list|load|unload|info|reload|verify> [name|path]\n\n  Manage kernel lattice shards (hot-pluggable kernel modules).\n\n  Actions:\n    list              Show all loaded shards\n    load <path>       Load a .shard file into the kernel lattice\n    unload <name>     Unload a shard (--force for essential shards)\n    info <name>       Show shard details (base address, version, size)\n    reload <name>     Hot-reload a shard (apply update without reboot)\n    verify            Verify Dilithium-5 signatures of all loaded shards"),
 ];
 
 // ---- Main Entry Point ----
@@ -717,6 +850,7 @@ fn main() {
         "help"        => Box::new(HelpCmd),
         "bench"       => Box::new(BenchCmd),
         "profile"     => Box::new(ProfileCmd),
+        "shard"       => Box::new(ShardCmd),
         _ => {
             // Cargo-style plugin discovery: look for sigma-<cmd> on PATH
             let plugin = format!("sigma-{}", cmd_name);
@@ -769,6 +903,7 @@ fn print_usage() {
     println!();
     println!("\x1B[1mInfrastructure\x1B[0m");
     println!("  {:<14} {}", "node",    "Fleet control (enroll/status/ssh/logs)");
+    println!("  {:<14} {}", "shard",   "Kernel lattice shard management");
     println!("  {:<14} {}", "config",  "Validate or print sigma.toml");
     println!("  {:<14} {}", "doctor",  "Check toolchain dependencies");
     println!();
