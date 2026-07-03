@@ -1,150 +1,126 @@
-# SigmaOS Hardware Abstraction Layer (HAL)
+# Hardware Abstraction Layer (HAL)
 
-The SovereignHAL abstracts all architecture-specific hardware operations into a uniform interface. The kernel never calls hardware directly — it always goes through the HAL.
-
----
-
-## HAL Architecture
-
-```
-Kernel subsystems (scheduler, net, fs, drivers...)
-    │  hal_xxx() calls
-    ▼
-SovereignHAL (hal/SovereignHAL.cpp)
-    │
-    ├── x86_64 backend  (hal/x86/)
-    ├── ARM64 backend   (arch/arm64/)     ← Phase G
-    └── RISC-V backend  (arch/riscv64/)   ← Phase H
-```
+The SigmaOS HAL provides architecture-independent access to hardware.
 
 ---
 
-## HAL Interfaces
+## Components
 
-### PCI/PCIe (`hal/sigma_pci.cpp`)
-```cpp
-// Enumerate PCI devices
-sigma_pci_enumerate(pci_probe_callback);
+| Component | Language | File | Status |
+|-----------|----------|------|--------|
+| Port I/O | Zig | `drivers/hal/port_io.zig` | ✅ |
+| MMIO | Rust | `drivers/hal/mmio.rs` | ✅ |
+| PCI enumeration | Rust | `kernel/core/sigma_pci.rs` | ✅ |
+| ACPI parsing | Rust | `kernel/core/sigma_acpi.rs` | ✅ |
+| 4-level paging | Zig | `arch/x86_64/paging.zig` | ✅ |
+| GDT/TSS | NASM | `arch/x86_64/gdt.asm` | ✅ |
+| IDT (256 entries) | NASM | `arch/x86_64/idt.asm` | ✅ |
+| Context switch | NASM | `arch/x86_64/context_switch.asm` | ✅ |
+| PIC (8259) | Rust | `kernel/core/sigma_irq.rs` | ✅ |
+| PIT timer | Rust | `kernel/core/sigma_irq.rs` | ✅ |
+| VGA text | Rust | `drivers/display/vga_console.rs` | ✅ |
+| VESA framebuffer | Rust | `drivers/display/vga_console.rs` | ✅ |
+| PS/2 keyboard | Rust | `drivers/input/keyboard.rs` | ✅ |
+| Serial (COM1) | Rust | `drivers/char/console.rs` | ✅ |
 
-// Read/write config space
-uint32_t val = sigma_pci_read32(bus, dev, func, reg);
-sigma_pci_write32(bus, dev, func, reg, val);
+---
 
-// Map a BAR
-void* bar = sigma_pci_map_bar(device, bar_index);
+## Port I/O
 
-// Enable MSI-X
-sigma_pci_enable_msix(device, vectors, handlers);
-```
-
-### Interrupts
-```cpp
-// Request IRQ
-sigma_irq_request(irq_num, handler, ctx);
-sigma_irq_free(irq_num);
-
-// Mask/unmask
-sigma_irq_mask(irq_num);
-sigma_irq_unmask(irq_num);
-
-// APIC EOI
-sigma_apic_eoi();
-```
-
-### Timers
-```cpp
-// Get monotonic timestamp (nanoseconds)
-uint64_t now = sigma_time_ns();
-
-// Set one-shot timer
-sigma_timer_set_oneshot(delay_ns, callback, ctx);
-
-// Set periodic timer (jiffies)
-sigma_timer_set_periodic(interval_ns, callback, ctx);
-```
-
-### Memory-Mapped I/O
-```cpp
-// Read/write MMIO
-uint32_t val = sigma_mmio_read32(addr);
-sigma_mmio_write32(addr, val);
-
-// Memory barrier
-sigma_mb();   // full barrier
-sigma_rmb();  // read barrier
-sigma_wmb();  // write barrier
-```
-
-### Power Management
-```cpp
-// Set CPU frequency state
-sigma_cpufreq_set(cpu_id, freq_hz);
-
-// Enter low-power state
-sigma_cpu_idle(idle_state);
-
-// ACPI power state transition
-sigma_acpi_enter_state(ACPI_S3);  // suspend
+```zig
+// drivers/hal/port_io.zig
+pub fn inb(port: u16) u8 { ... }   // read byte from I/O port
+pub fn outb(port: u16, val: u8) { ... }  // write byte to I/O port
 ```
 
 ---
 
-## Supported Architectures
+## MMIO
 
-### x86_64 (Primary — `arch/x86_64/`)
-- PML4 4-level paging (`arch/x86_64/paging.asm`, `paging.c`)
-- Context switch (`arch/x86_64/switch.asm`)
-- Fast VMM paths (`arch/x86_64/vmm_fast.asm`)
-- APIC + HPET timer
-- ACPI MADT/SRAT/DSDT parsing
-- MSR access (LSTAR, EFER, FS/GSBASE)
-
-### ARM64 (`arch/arm64/`) — Phase G
-- GIC (Generic Interrupt Controller)
-- ARM MMU page table walker
-- PSCI for power management
-- BCM2711 BSP (Raspberry Pi 4)
-- BCM2712 BSP (Raspberry Pi 5)
-- NEON/SVE SIMD support
-
-### RISC-V RV64GC (`arch/riscv64/`) — Phase H
-- PLIC (Platform-Level Interrupt Controller)
-- SBI (Supervisor Binary Interface) calls
-- MMU Sv39/Sv48 page tables
-
----
-
-## Boot Path (`arch/boot/`)
-
-```asm
-; arch/boot/sovereign_boot.asm
-; Sets up:
-;   - GDT (64-bit code/data segments)
-;   - Initial page tables (identity map first 4 GB)
-;   - Stack (8 KB per CPU)
-;   - Jumps to sigma_kernel_main() in C++
-
-; arch/boot/multiboot_header.asm
-; Multiboot2 magic header for GRUB/limine bootloader
+```rust
+// drivers/hal/mmio.rs
+pub fn mmio_read32(base: *const u32, offset: usize) -> u32 {
+    unsafe { core::ptr::read_volatile(base.byte_add(offset)) }
+}
+pub fn mmio_write32(base: *mut u32, offset: usize, val: u32) {
+    unsafe { core::ptr::write_volatile(base.byte_add(offset), val); }
+}
 ```
 
 ---
 
-## HAL Status
+## PCI Enumeration
 
-| Component | Status |
-|-----------|--------|
-| x86_64 paging | ✅ Implemented |
-| PCI enumeration | ✅ Implemented |
-| PCIe MSI-X | ✅ Implemented |
-| APIC init | ⬜ Phase G |
-| HPET timer | ⬜ Phase G |
-| ACPI parsing | 🔄 Partial |
-| ARM64 GIC | ⬜ Phase G |
-| ARM64 MMU | ⬜ Phase G |
-| RISC-V PLIC | ⬜ Phase H |
-| Power governor | ✅ Implemented |
+```c
+// Enumerate all PCI devices at boot
+sigma_pci_enumerate();
+
+// Read PCI config space
+uint32_t ids = sigma_pci_read_config32(bus, dev, func, 0x00);
+uint16_t vendor = ids & 0xFFFF;
+uint16_t device = (ids >> 16) & 0xFFFF;
+
+// Enable bus mastering + memory space access
+sigma_pci_enable(bus, dev, func);
+```
 
 ---
 
-*See also: [Architecture-Overview](Architecture-Overview) · [Kernel](Kernel) · [Driver-Development](Driver-Development)*
+## ACPI
+
+```c
+// Parse ACPI tables from RSDP (passed by bootloader)
+sigma_acpi_parse(boot_info->rsdp_addr);
+
+// Query results
+size_t ncpus = sigma_acpi_cpu_count();
+uint64_t lapic = sigma_acpi_lapic_base();
+uint64_t ioapic = sigma_acpi_ioapic_base();
+```
+
+---
+
+## Paging (4-level, x86_64)
+
+```zig
+// arch/x86_64/paging.zig
+pub const PageTable = struct {
+    entries: [512]PageEntry,
+    pub fn map(self: *PageTable, index: usize, phys: u64, flags: u64) void;
+    pub fn unmap(self: *PageTable, index: usize) void;
+};
+
+pub const FrameAllocator = struct {
+    pub fn allocate(self: *FrameAllocator) ?u64;
+};
+```
+
+Head64.asm sets up identity-mapped 4GB (2MB huge pages) at boot.
+
+---
+
+## Timer
+
+```c
+// PIT 1000 Hz initialized at boot
+// sigma_clock_ns() = jiffies × 1,000,000 nanoseconds
+
+uint64_t now_ns = sigma_clock_ns();   // nanoseconds since boot
+uint64_t jiffies = sigma_jiffies();   // milliseconds since boot
+```
+
+---
+
+## Serial Debug
+
+```c
+// All kernel log output goes to COM1 (115200 8N1)
+// Viewable with: -serial stdio in QEMU
+
+serial_puts("[BOOT] SigmaOS starting\n");
+sigma_log(msg_ptr, msg_len);   // also goes to VGA
+```
+
+---
+
+*See also: [Bootloader](Bootloader) · [Driver Framework](Driver-Framework) · [Architecture](Architecture-Overview)*

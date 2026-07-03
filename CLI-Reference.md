@@ -87,10 +87,48 @@ Launch QEMU with `-s -S`, wait for gdb on port `:1234`, and auto-load kernel sym
 
 ---
 
-#### `sigma test [--bench]`
+#### `sigma bench [suite] [--save]`
 
-Run unit tests on the host and integration tests inside a booted QEMU instance.
-`--bench` includes the benchmark suite.
+Run the built-in performance benchmark suite against the running kernel.
+
+| Suite | Measures |
+|-------|----------|
+| `boot` | Cold-boot to interactive prompt |
+| `syscall` | `getpid()` call throughput |
+| `ipc` | Unix socket round-trip latency |
+| `fs` | Random 4K NVMe read speed |
+| `scheduler` | Context switch latency |
+| `network` | TCP loopback throughput |
+| `crypto` | AES-256-GCM throughput (AES-NI) |
+| `pqc` | Dilithium-5 sign/verify operations/sec |
+| `all` | All suites (default) |
+
+```bash
+sigma bench
+sigma bench syscall
+sigma bench all --save      # save results to bench-results.json
+```
+
+---
+
+#### `sigma profile <list|show|set> [name]`
+
+Manage build profiles — predefined shard sets for different deployment targets.
+
+| Profile | Description |
+|---------|-------------|
+| `desktop` | Full GUI + driver set (default) |
+| `minimal` | Kernel + essential userspace only |
+| `cloud` | Headless, optimised for VM/server |
+| `embedded` | RTOS-style, stripped memory footprint |
+| `gaming` | GPU-optimised desktop + gaming stack |
+
+```bash
+sigma profile list
+sigma profile show gaming
+sigma profile set cloud
+sigma build --profile embedded
+```
 
 ---
 
@@ -468,3 +506,215 @@ scripts/sigma_cli_host.sh <command> [args...]
 | `HOSTNAME` | sigma-sh | Shown in prompt |
 | `USER` / `USERNAME` | sigma-sh | Shown in prompt |
 | `PATH` | sigma-sh | Used by `which`, `type`, plugin discovery |
+
+---
+
+## Specialist CLI Tools (`tools/cli/`)
+
+These standalone binaries are auto-discoverable as `sigma-<name>` plugins.
+Each one supports `--help`, `--version`, and `--json`.
+
+---
+
+### sigma-monitor — Real-time system monitor
+
+```bash
+sigma-monitor [mode] [--interval <sec>] [--count <n>] [--json]
+```
+
+| Mode | Description |
+|------|-------------|
+| `cpu` | CPU usage and frequency per core |
+| `mem` | RAM and swap usage |
+| `net` | Network I/O by interface |
+| `disk` | Disk I/O and filesystem usage |
+| `proc` | Top processes by CPU |
+| `all` | All metrics (default) |
+| `watch` | Continuous refresh (like top) |
+
+```bash
+sigma-monitor                     # single snapshot, all metrics
+sigma-monitor cpu --json          # JSON CPU stats
+sigma-monitor watch --interval 1 --count 10
+```
+
+---
+
+### sigma-secure — Security hardening & audit
+
+```bash
+sigma-secure <audit|harden|pqc|attest|policy|report> [options]
+```
+
+| Command | Description |
+|---------|-------------|
+| `audit [--fix]` | Full system security audit; `--fix` auto-remediates |
+| `harden [--profile <p>]` | Apply hardening profile (`cis`, `nist`, `stig`, `sovereign`) |
+| `pqc <gen|list|verify>` | Manage Dilithium-5 post-quantum keys |
+| `attest` | Verify TPM 2.0 attestation chain |
+| `policy <list|set|export>` | Manage security policies |
+| `report [--output <file>]` | Generate signed security report |
+
+```bash
+sigma-secure audit --fix
+sigma-secure harden --profile cis
+sigma-secure pqc gen
+sigma-secure attest --json
+sigma-secure report --output security.html
+```
+
+---
+
+### sigma-forensics — Digital forensics
+
+```bash
+sigma-forensics <scan|carve|timeline|hash|report|chain> [options]
+```
+
+| Command | Description |
+|---------|-------------|
+| `scan [--path <dir>]` | Scan for IoCs and anomalies |
+| `carve [--image <file>]` | File carving from raw disk image |
+| `timeline [--start X] [--end Y]` | Build activity timeline |
+| `hash <target>` | Compute SHA-256 integrity hashes |
+| `report [--output <file>]` | Generate forensic report |
+| `chain <file>` | Verify cryptographic chain of custody |
+
+```bash
+sigma-forensics scan --path /
+sigma-forensics carve --image disk.img
+sigma-forensics timeline --start 1751500000 --end 1751600000
+sigma-forensics hash /etc
+sigma-forensics report --output forensics.html
+sigma-forensics chain evidence.bin
+```
+
+---
+
+### sigma-snapshot — System snapshots
+
+```bash
+sigma-snapshot <create|list|restore|delete|diff|export> [options]
+```
+
+| Command | Description |
+|---------|-------------|
+| `create [--name <n>] [--type full\|incremental\|config]` | Take a snapshot |
+| `list` | List all snapshots |
+| `restore <id> [--dry-run]` | Restore a snapshot |
+| `delete <id> [--force]` | Remove a snapshot |
+| `diff <id1> <id2>` | Compare two snapshots |
+| `export <id> --output <file>` | Export snapshot to archive |
+
+```bash
+sigma-snapshot create --name pre-update --type full
+sigma-snapshot list
+sigma-snapshot restore 2 --dry-run
+sigma-snapshot diff 1 3
+sigma-snapshot export 2 --output backup.tar.zst
+```
+
+---
+
+### sigma-cluster — Cluster management
+
+```bash
+sigma-cluster <status|enroll|drain|evict|upgrade|logs|metrics> [options]
+```
+
+| Command | Description |
+|---------|-------------|
+| `status [--node <n>]` | Cluster and node health |
+| `enroll --node <addr>` | Add a node to the cluster |
+| `drain --node <name>` | Cordon and drain a node |
+| `evict --node <name>` | Force-remove a node |
+| `upgrade [--channel <ch>]` | Rolling upgrade of all/one nodes |
+| `logs --node <n> [--tail <n>]` | Node log streaming |
+| `metrics [--node <n>]` | Cluster performance metrics |
+
+```bash
+sigma-cluster status
+sigma-cluster enroll --node 10.0.0.5
+sigma-cluster upgrade --channel nightly
+sigma-cluster logs --node sigma-node-01 --tail 50
+sigma-cluster metrics --json
+```
+
+---
+
+### sigma-hypervisor — VM management
+
+```bash
+sigma-hypervisor <list|create|start|stop|destroy|console|snapshot|info> [options]
+```
+
+| Command | Description |
+|---------|-------------|
+| `list` | List all VMs |
+| `create --name <n> [opts]` | Create a new VM |
+| `start --name <n>` | Start a VM |
+| `stop --name <n> [--force]` | Stop a VM |
+| `destroy --name <n> --force` | Permanently delete a VM |
+| `console --name <n>` | Attach to serial console |
+| `snapshot --name <n> [--label]` | Checkpoint a running VM |
+| `info --name <n>` | Detailed VM information |
+
+```bash
+sigma-hypervisor create --name test-vm --mem 2048 --cpus 2 --arch aarch64
+sigma-hypervisor start --name test-vm
+sigma-hypervisor console --name test-vm
+sigma-hypervisor snapshot --name test-vm --label pre-test
+sigma-hypervisor stop --name test-vm
+```
+
+---
+
+### sigma-recover — System recovery
+
+```bash
+sigma-recover <status|boot|filesystem|rollback|rescue|verify> [options]
+```
+
+| Command | Description |
+|---------|-------------|
+| `status` | Boot partition state and filesystem health |
+| `boot [--partition A\|B] [--dry-run]` | Repair or switch boot partition |
+| `filesystem [--dev <d>] [--dry-run]` | Run sigma_fsck on a device |
+| `rollback [--to <id>] [--dry-run]` | Roll back to snapshot or OTA partition |
+| `rescue` | Drop into minimal recovery shell |
+| `verify` | Check kernel + initrd integrity |
+
+```bash
+sigma-recover status
+sigma-recover verify
+sigma-recover filesystem --dev /dev/sda1
+sigma-recover rollback --to 2 --dry-run
+sigma-recover boot --partition B
+```
+
+---
+
+### sigma-hal-info — Hardware inspector
+
+```bash
+sigma-hal-info [subsystem] [--json]
+```
+
+| Subsystem | Description |
+|-----------|-------------|
+| `cpu` | CPU topology, features, microcode version |
+| `mem` | Memory topology, DIMM slots, speed |
+| `pci` | PCI/PCIe device tree |
+| `usb` | USB device tree |
+| `gpu` | GPU/display adapters and driver info |
+| `storage` | Block devices (NVMe, SATA) |
+| `net` | Network adapters and firmware |
+| `sensors` | Thermal sensors, fan RPM, voltages |
+| `all` | All subsystems (default) |
+
+```bash
+sigma-hal-info
+sigma-hal-info cpu
+sigma-hal-info sensors --json
+sigma-hal-info pci
+```
