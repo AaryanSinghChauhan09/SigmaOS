@@ -1010,3 +1010,99 @@ sigma-pkg install sigma-ml --json
 ```
 
 All commands support `--json`, `--dry-run`, and `--force`.
+
+---
+
+## sigma-net — Network Management CLI
+
+Full-featured network management. Source: `tools/sigma-net.rs`
+
+```bash
+sigma-net <command> [options]
+```
+
+### Interface Commands
+
+| Command | Description |
+|---------|-------------|
+| `status [iface]` | Show all interfaces or one specific (addr, MAC, speed, RX/TX) |
+| `up <iface>` | Bring interface up |
+| `down <iface>` | Take interface down |
+| `ip <iface> <addr/prefix>` | Set static IP address (e.g. `10.0.0.1/24`) |
+| `dhcp <iface>` | Request DHCP lease |
+| `mac <iface> [new-mac]` | Show or set MAC address |
+| `stats [iface]` | RX/TX bytes, packets, errors, drops |
+
+### Routing
+
+| Command | Description |
+|---------|-------------|
+| `route list` | Show routing table |
+| `route add <prefix> via <gw>` | Add static route |
+| `route del <prefix>` | Remove route |
+
+### DNS
+
+| Command | Description |
+|---------|-------------|
+| `dns show` | Show configured DNS servers |
+| `dns set <server>` | Set DNS resolver (supports DoT) |
+| `dns resolve <hostname>` | Perform a DNS lookup |
+
+### Diagnostics
+
+| Command | Description |
+|---------|-------------|
+| `ping <host> [-c n]` | ICMP ping (default 4 packets) |
+| `trace <host>` | Traceroute hop-by-hop |
+| `scan <subnet>` | ARP network discovery |
+| `capture <iface> [-n n]` | Packet capture (writes `/tmp/sigma-cap.pcap`) |
+
+### WiFi
+
+| Command | Description |
+|---------|-------------|
+| `wifi scan` | Scan for available networks with RSSI bars |
+| `wifi connect <ssid> <psk>` | Connect to a WPA3 network |
+| `wifi disconnect` | Disconnect from current network |
+| `wifi status` | Show connection status |
+
+### Firewall
+
+| Command | Description |
+|---------|-------------|
+| `fw list` | Show all sigma-fw rules |
+| `fw allow <rule>` | Add allow rule |
+| `fw deny <rule>` | Add deny rule |
+| `fw flush --force` | Remove all rules |
+
+```bash
+# Interface management
+sigma-net status
+sigma-net up eth0
+sigma-net ip eth0 10.0.0.10/24
+sigma-net dhcp wlan0
+
+# Routing
+sigma-net route list
+sigma-net route add 192.168.1.0/24 via 10.0.0.1
+
+# Diagnostics
+sigma-net ping 8.8.8.8 -c 10
+sigma-net trace sigmaos.app
+sigma-net scan 10.0.0.0/24
+
+# WiFi
+sigma-net wifi scan
+sigma-net wifi connect "MyNetwork" "passphrase"
+sigma-net wifi status
+
+# Firewall
+sigma-net fw list
+sigma-net fw allow "tcp dport 8080"
+sigma-net fw deny "tcp dport 23"
+
+# JSON output for scripts
+sigma-net status --json | jq '.[].addr'
+sigma-net route list --json | jq '.[0].gateway'
+```

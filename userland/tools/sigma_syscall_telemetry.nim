@@ -254,3 +254,9 @@ Examples:
 
   else:
     echo fmt"Unknown telemetry command: {args[0]}"
+
+# ── Main CLI entry point ────────────────────────────────────────────────────
+when isMainModule:
+  import std/os
+  let args = commandLineParams()
+  syscall_telemetry_cmd(if args.len > 0: args else: @["help"])

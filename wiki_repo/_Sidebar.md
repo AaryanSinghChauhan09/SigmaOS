@@ -28,12 +28,15 @@
 - [sigma-top](CLI-Reference#sigma-top--process-monitor)
 - [sigma_fsck](CLI-Reference#sigma_fsck--filesystem-checker)
 - [sigma_diagnostics](CLI-Reference#sigma_diagnostics--system-diagnostics)
+- [sigma-net](CLI-Reference#sigma-net--network-management)
 - [sigma-cli man page](sigma-cli-man-page)
 - [sigma-monitor manual](sigma-monitor-Manual)
 - [sigma-secure manual](sigma-secure-Manual)
 - [sigma-debug manual](sigma-debug-Manual)
 - [sigma-log manual](sigma-log-Manual)
 - [sigma-fix manual](sigma-fix-Manual)
+- [sigma-pkg manual](sigma-pkg-Manual)
+- [sigma-sh scripting](sigma-sh-Scripting)
 
 ## Security
 - [Security Architecture](Security-Architecture)
