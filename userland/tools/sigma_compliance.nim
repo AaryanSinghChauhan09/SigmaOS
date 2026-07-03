@@ -338,3 +338,7 @@ Frameworks:
 
   else:
     echo fmt"Unknown compliance command: {args[0]}"
+
+when isMainModule:
+  import std/os
+  compliance_cmd(commandLineParams())

@@ -268,3 +268,7 @@ Examples:
     else: echo "No traces recorded yet."
 
   else: echo fmt"Unknown command: {args[0]}"
+
+when isMainModule:
+  import std/os
+  replay_cmd(commandLineParams())
