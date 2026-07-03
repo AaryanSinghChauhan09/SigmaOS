@@ -166,6 +166,8 @@
 
 ## Development
 - [Developer Guide](Developer_Guide)
+- [**Developer Workflow & Governance**](Developer-Workflow-And-Governance)
+- [**CI Pipeline Guide**](CI-Pipeline-Guide)
 - [SDK Guide](SDK-Guide)
 - [Driver Development](Driver-Development)
 - [Open Source Drivers](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/Open_Source_Drivers.md)
@@ -256,6 +258,8 @@
 ## Community
 - [Code of Conduct](CODE_OF_CONDUCT)
 - [Governance](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/GOVERNANCE.md)
+- [MAINTAINERS](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/MAINTAINERS)
 - [Bug Bounty](BUG_BOUNTY)
 - [Support](Support-Nexus)
 - [Component Integration](Component-Integration)
+- [RFC Process](Developer-Workflow-And-Governance#rfc-process)
