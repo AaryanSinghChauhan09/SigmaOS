@@ -1233,3 +1233,108 @@ struct-load combo --dl 5 --ll 3 --wind 1.5
 struct-load section --profile "ISMB 300"
 struct-load section --profile "ISMB"    # list all ISMB sections
 ```
+
+---
+
+## sigma-drv — Driver Lifecycle Manager
+
+Source: `tools/sigma-drv.rs` · Pillar 1: Driver & Hardware Support
+
+```bash
+sigma-drv <list|load|unload|probe|log|bench|reload|info|abi|port> [options]
+```
+
+| Command | Description |
+|---------|-------------|
+| `list [--category net\|storage\|gpu\|input\|audio\|usb]` | List loaded SDF drivers with state and device count |
+| `load <name>` | Load a driver (verifies Dilithium-5 ABI sig first) |
+| `unload <name> [--force]` | Unload (sigma-heal auto-restarts if crashes) |
+| `probe --pci <id>` | Run probe() on a PCI device (e.g. `8086:15f3`) |
+| `log <name> [--tail <n>]` | Show driver log ring buffer |
+| `bench <name> [--duration <sec>]` | Driver throughput benchmark |
+| `reload <name>` | Hot-swap driver without reboot |
+| `info <name>` | Version, ABI, vendor, devices |
+| `abi check` | Verify all loaded drivers against SDF ABI v3 |
+| `port --linux <module>` | AI-assisted Linux → SDF driver porting guide |
+
+```bash
+sigma-drv list --category gpu
+sigma-drv probe --pci 8086:15f3
+sigma-drv bench sigma-e1000 --duration 10
+sigma-drv reload sigma-nvidia-hal
+sigma-drv abi check
+sigma-drv port --linux iwlwifi
+sigma-drv list --json | jq '.[] | select(.state=="loaded") | .name'
+```
+
+---
+
+## sigma-ai — Sovereign AI Agent
+
+Source: `tools/sigma-ai.rs` · Pillar 3: AI & Automation
+
+```bash
+sigma-ai <ask|explain|heal|workflow|model|status|script|translate|security|predict> [options]
+```
+
+| Command | Description |
+|---------|-------------|
+| `ask "<prompt>" [--lang hi]` | Query local LLM (offline, no telemetry) |
+| `explain <command>` | Explain a command before running (educational mode) |
+| `heal [--crash <dump>]` | Analyse crash dumps and system anomalies |
+| `workflow <list\|run\|install> [name]` | Manage automation workflows |
+| `model <list\|load\|download> [name]` | Manage GGUF models |
+| `status` | Agent daemon health (uptime, model, request count) |
+| `script "<intent>"` | Generate a .sigma script from natural language |
+| `translate "<cmd>" --to hi` | Translate CLI command to a language |
+| `security <scan\|advise\|explain>` | AI security advisor |
+| `predict <cpu\|mem\|disk\|network>` | ML-based resource usage prediction |
+
+```bash
+sigma-ai ask "why is my system slow?"
+sigma-ai ask "डिस्क क्यों भर रही है?" --lang hi
+sigma-ai explain "sigma-secure audit --fix"
+sigma-ai heal
+sigma-ai script "check security and auto-fix every Sunday"
+sigma-ai workflow run security-hardening
+sigma-ai model list
+sigma-ai security scan
+sigma-ai predict mem
+sigma-ai translate "sigma update --channel nightly" --to hi
+```
+
+All AI commands are logged to `/var/log/sigma/ai-audit.jsonl` for transparency.
+
+---
+
+## sigma-fleet — Enterprise Device Management
+
+Source: `tools/sigma-fleet.rs` · Pillar 5: Community & Enterprise
+
+```bash
+sigma-fleet <status|register|deregister|policy|update|inventory|audit|lock|unlock|list|logs> [options]
+```
+
+| Command | Description |
+|---------|-------------|
+| `status` | Agent heartbeat, policy, health |
+| `register --server <url> --token <t>` | Register device with fleet server |
+| `policy <get\|show\|set>` | Fetch and apply `.sigma-policy` |
+| `update <status\|pull\|apply>` | OTA update lifecycle |
+| `inventory` | Push hardware inventory to fleet server |
+| `audit [--push]` | Show or push tamper-evident audit log |
+| `list` | All managed devices (from fleet server) |
+| `lock [--wipe]` | Lock device remotely |
+| `unlock --token <t>` | Unlock device |
+| `logs <push\|show>` | Fleet log management |
+
+```bash
+sigma-fleet register --server fleet.sigmaos.app --token mytoken
+sigma-fleet status
+sigma-fleet policy set
+sigma-fleet update pull
+sigma-fleet update apply
+sigma-fleet inventory
+sigma-fleet audit --push
+sigma-fleet list --json | jq '.[] | select(.status=="online")'
+```
