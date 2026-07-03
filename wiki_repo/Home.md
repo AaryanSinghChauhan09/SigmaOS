@@ -134,6 +134,7 @@ Hardware       → CPU · NVMe · GPU · NIC · USB · TPM2 · UEFI
 | [sigpkg Specification](sigpkg-Spec) | Package format and registry |
 | [OSS Reference Map](OSS-Reference-Map) | Inspirational open-source projects |
 | [Ideas Backlog (1000+)](Ideas-Backlog-1000) | Development ideas backlog |
+| [999 Structured Ideas (6 Pillars)](Ideas-999-Structured) | Kernel, Packages, AI, Security, UX, Community — 999 actionable tasks |
 | [Profession Profiles](PROFILES) | 1000+ role-specific shard bundles |
 
 ---

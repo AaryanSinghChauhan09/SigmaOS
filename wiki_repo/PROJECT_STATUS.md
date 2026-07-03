@@ -8,7 +8,7 @@
 
 ```
 Phase F (Competitor Crusher)   ████████████████████  100% ✅
-Phase G (Kernel Boot)          ░░░░░░░░░░░░░░░░░░░░    0% ← ACTIVE
+Phase G (Kernel Boot)          ████████████░░░░░░░░   60% ← ACTIVE (was 0%)
 Phase H (India Stack)          ░░░░░░░░░░░░░░░░░░░░    0% (blocked on G)
 ```
 
@@ -18,12 +18,15 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 
 | Subsystem | Component | Status |
 |-----------|-----------|--------|
-| **Kernel** | Scheduler (stub) | 🔄 Headers done, bodies needed |
-| | Physical MM (buddy) | 🔄 Partial |
+| **Kernel** | Scheduler (MLFQ+CFS+EDF) | ✅ Done |
+| | Syscalls — I/O (read/write/open/close/lseek/dup/stat/fcntl/ioctl) | ✅ Done |
+| | Syscalls — Process (fork/execve/wait4/exit/kill/pipe/mkdir) | ✅ Done |
+| | Physical MM (buddy) | ✅ Done |
 | | Virtual MM (paging) | 🔄 Partial |
-| | APIC + timer | ⬜ Phase G |
-| | Syscall dispatch (30) | ⬜ Phase G |
-| | sigma-boot.efi | ⬜ Phase G |
+| | APIC + timer (PIC/PIT) | ✅ Done |
+| | sigma_pledge + sigma_unveil | ✅ Done |
+| | seccomp-BPF filter engine | ✅ Done |
+| | sigma-boot.efi (UEFI) | ✅ Done |
 | | Bootable ISO | ⬜ Phase G |
 | **Security** | sigma_pledge | ✅ Done |
 | | sigma_unveil | ✅ Done |
@@ -34,6 +37,8 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 | | CryptFS (real key) | ⬜ Phase G (#1009) |
 | | Verified boot | ⬜ Phase G |
 | **Network** | TCP/UDP | 🔄 Partial |
+| | Socket syscalls (socket/bind/connect/send/recv) | ✅ Done |
+| | Wi-Fi driver (iwlwifi + DDK) | ✅ Done |
 | | TLS 1.3 + Kyber | ✅ Done |
 | | DNS/DoH/DNSSEC | ✅ Done |
 | | DHCP client | ✅ Done |
@@ -55,7 +60,9 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 | | AMD amdgpu | ⬜ Phase G |
 | | HDA audio | ⬜ Phase G |
 | **Desktop** | Zenith JS prototype | ✅ Done |
-| | Zenith C++ compositor | 🔄 In progress |
+| | Zenith Rust compositor (WM + layout + input) | ✅ Done |
+| | sigma-ai NL→CLI translator | ✅ Done |
+| | sigma-ai GGUF model loader | ✅ Done |
 | | Auto-tiling WM | 🔄 Done (needs input) |
 | | Theme engine | ✅ Done |
 | | Neural UI (AVX-512) | ✅ Done |
@@ -64,7 +71,7 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 | **Runtime** | WASM/WASI | ✅ Done |
 | | Linux ELF compat | ✅ Done |
 | | Container runtime | 🔄 Partial |
-| **Package Mgr** | sigma-pkg CLI | 🔄 Partial |
+| **Package Mgr** | sigma-pkg CLI (install/remove/search/list/update/audit) | ✅ Done |
 | | .spkg format | 🔄 Partial |
 | | Repo server | ⬜ Phase G |
 | | Reproducible builds | 🔄 Framework done |

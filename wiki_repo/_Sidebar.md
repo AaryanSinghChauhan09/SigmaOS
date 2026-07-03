@@ -54,6 +54,7 @@
 
 ## Roadmap
 - [Improvement Plan (6 Pillars)](Roadmap-Improvement-Plan)
+- [**Phase G Implementation Progress**](Implementation-Progress-Phase-G)
 - [Linux Absorption Architecture](Linux-Absorption-Architecture)
 - [Migration Guide](Migration-Guide)
 - [Package Absorption (.deb/.rpm)](Linux-Absorption-Architecture#package-absorption)
@@ -199,6 +200,7 @@
 - [Ideas — New 200+](IDEAS-New-200)
 - [Ideas Backlog 1000+](Ideas-Backlog-1000)
 - [Ideas 1001–2000](Ideas-2000)
+- [**999 Structured Ideas (6 Pillars)**](Ideas-999-Structured)
 - [Leapfrog Strategy](Leapfrog-Strategy)
 
 ## Design & UX
