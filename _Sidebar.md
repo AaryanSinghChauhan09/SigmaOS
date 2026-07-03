@@ -51,6 +51,9 @@
 ## Linux Adoption
 - [SigmaOS vs Linux](SigmaOS-vs-Linux)
 - [SigmaOS vs Windows](SigmaOS-vs-Windows)
+
+## Roadmap
+- [Improvement Plan (6 Pillars)](Roadmap-Improvement-Plan)
 - [Linux Absorption Architecture](Linux-Absorption-Architecture)
 - [Migration Guide](Migration-Guide)
 - [Package Absorption (.deb/.rpm)](Linux-Absorption-Architecture#package-absorption)
