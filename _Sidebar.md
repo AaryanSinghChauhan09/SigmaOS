@@ -36,6 +36,8 @@
 - [sigma-log manual](sigma-log-Manual)
 - [sigma-fix manual](sigma-fix-Manual)
 - [sigma-pkg manual](sigma-pkg-Manual)
+- [sigma-net manual](sigma-net-Manual)
+- [sigma-telemetry manual](sigma-telemetry-Manual)
 - [sigma-sh scripting](sigma-sh-Scripting)
 
 ## Security
@@ -48,6 +50,7 @@
 
 ## Linux Adoption
 - [SigmaOS vs Linux](SigmaOS-vs-Linux)
+- [SigmaOS vs Windows](SigmaOS-vs-Windows)
 - [Linux Absorption Architecture](Linux-Absorption-Architecture)
 - [Migration Guide](Migration-Guide)
 - [Package Absorption (.deb/.rpm)](Linux-Absorption-Architecture#package-absorption)

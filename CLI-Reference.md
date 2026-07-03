@@ -1106,3 +1106,130 @@ sigma-net fw deny "tcp dport 23"
 sigma-net status --json | jq '.[].addr'
 sigma-net route list --json | jq '.[0].gateway'
 ```
+
+---
+
+## Professional Calculator Tools (`tools/cli/`)
+
+---
+
+### dose-calc — Clinical Dosage Calculator
+
+Evidence-based drug dose calculator. Reference tool — clinical decisions require a licensed practitioner.
+
+```bash
+dose-calc <command> [options]
+```
+
+| Command | Description |
+|---------|-------------|
+| `drug <name> --weight <kg>` | Weight-based dosing for named drug |
+| `list [--category <cat>]` | Browse drug database (15 drugs: antibiotics, analgesics, etc.) |
+| `bsa --height <cm> --weight <kg>` | Body surface area (Mosteller formula) |
+| `creatinine --age --weight --scr [--female]` | CrCl via Cockcroft-Gault |
+| `ideal-bw --height <cm> [--female]` | Ideal body weight (Devine formula) |
+| `renal --egfr <n> --drug <name>` | Renal dose adjustment by eGFR |
+| `hepatic --class A\|B\|C --drug <name>` | Hepatic dose adjustment (Child-Pugh) |
+| `aki --baseline <n> --current <n>` | AKI staging (KDIGO 2012) |
+
+```bash
+dose-calc drug paracetamol --weight 70
+dose-calc drug vancomycin --weight 85
+dose-calc list --category antibiotic
+dose-calc creatinine --age 65 --weight 70 --scr 1.4 --female
+dose-calc renal --egfr 28 --drug ciprofloxacin
+dose-calc hepatic --class B --drug paracetamol
+dose-calc aki --baseline 0.9 --current 2.1
+dose-calc bsa --height 170 --weight 75
+```
+
+---
+
+### gst-calc — India GST Calculator
+
+GST, TDS, TCS, HSN/SAC lookups, and e-Invoice IRN helper for Indian businesses.
+
+```bash
+gst-calc <command> [options]
+```
+
+| Command | Description |
+|---------|-------------|
+| `tax --amount <n> --rate <n> [--inter]` | Calculate CGST+SGST or IGST |
+| `invoice --amount <n> --rate <n> --desc <s>` | Generate invoice line item |
+| `hsn <code\|keyword>` | HSN/SAC code lookup (27 codes) |
+| `reverse --amount <n> --rate <n>` | Extract GST from inclusive amount |
+| `tds --amount <n> --section <s>` | TDS calculation (12 sections) |
+| `tcs --amount <n> --rate <n>` | TCS calculation |
+| `cess --amount <n> --rate <n>` | GST Compensation Cess |
+| `irn --gstin <n> --amount <n>` | e-Invoice IRN generation helper |
+| `gstr1 [--period MMYYYY]` | GSTR-1 filing summary |
+
+```bash
+# Standard GST on professional services
+gst-calc tax --amount 50000 --rate 18
+
+# Inter-state (IGST)
+gst-calc tax --amount 100000 --rate 18 --inter
+
+# Extract GST from GST-inclusive price
+gst-calc reverse --amount 59000 --rate 18
+
+# HSN lookup
+gst-calc hsn computer
+gst-calc hsn 8471
+
+# TDS on contractor payment
+gst-calc tds --amount 500000 --section 194C
+
+# Invoice line for JSON export
+gst-calc invoice --amount 25000 --rate 18 --desc "Software Development" --json
+```
+
+---
+
+### struct-load — Structural Load Analysis
+
+Civil/structural engineering load calculations per IS 456:2000 and IS 800:2007.
+
+```bash
+struct-load <command> [options]
+```
+
+| Command | Description |
+|---------|-------------|
+| `beam --span --udl --pl [--cantilever]` | Reactions, max moment and shear |
+| `column --width --depth --height --axial` | IS 456 Cl. 39.3 capacity + utilisation |
+| `slab --span --ly --dl --ll` | Two-way slab moments (IS 456 Table 26) |
+| `foundation --width --depth --axial --sbc` | Isolated footing pressure + adequacy |
+| `wind --vb --cf --area` | Wind load (IS 875 Part 3) |
+| `seismic --seismic-weight --zone --sa --r --i` | Base shear (IS 1893) |
+| `combo --dl --ll --wind` | Load combinations (IS 456 Table 18) |
+| `section --profile <name>` | Steel section properties (IS 808) |
+
+```bash
+# Simply-supported beam: 6m span, 12 kN/m UDL, 20 kN point load
+struct-load beam --span 6 --udl 12 --pl 20
+
+# Cantilever beam
+struct-load beam --span 3 --udl 8 --cantilever
+
+# Column capacity check
+struct-load column --width 0.4 --depth 0.4 --height 3.5 --axial 800
+
+# Two-way slab design moments
+struct-load slab --span 4 --ly 6 --dl 3.5 --ll 2.0
+
+# Isolated footing adequacy
+struct-load foundation --width 1.5 --depth 0.45 --axial 600 --sbc 150
+
+# IS 1893 seismic base shear, Zone III
+struct-load seismic --seismic-weight 5000 --zone III --sa 2.5 --r 5 --i 1
+
+# Load combinations governing
+struct-load combo --dl 5 --ll 3 --wind 1.5
+
+# Steel section lookup
+struct-load section --profile "ISMB 300"
+struct-load section --profile "ISMB"    # list all ISMB sections
+```
