@@ -1,233 +1,334 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 SigmaOS Project
 //
-// kernel/core/sigma_sched.rs — Sovereign Scheduler
-// Replaces: sigma_sched.cpp (C++ stub, removed)
+// kernel/core/sigma_sched.rs — Complete SigmaOS scheduler
 //
-// Architecture: MLFQ (4 queues) + EDF (real-time) + CFS clone (fairness)
-// Language: Rust #![no_std] — no libc, no prelude, no third-party crates
-// Pattern: OOP via Traits (SdfScheduler trait) + concrete implementations
-
+// Implements MLFQ + CFS + EDF in one unified scheduler.
+// MLFQ for interactive tasks, CFS for fair sharing, EDF for RTOS hard-RT.
+//
+// Language: Rust #![no_std]
 #![no_std]
+#![allow(dead_code)]
 
-use core::sync::atomic::{AtomicU64, Ordering};
+use core::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
-// ── Constants ────────────────────────────────────────────────────────────────
+// ── Scheduler policy ──────────────────────────────────────────────────────
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+#[repr(u8)]
+pub enum SchedPolicy {
+    Mlfq     = 0,  // interactive / general
+    Cfs      = 1,  // fair CPU sharing
+    Edf      = 2,  // hard real-time (RTOS profile)
+    Fifo     = 3,  // real-time FIFO
+    Idle     = 4,  // idle tasks only
+}
 
-pub const MLFQ_QUEUES:     usize = 4;
-pub const MAX_TASKS:       usize = 64;
-pub const TIME_SLICE_MS:   u64   = 10;
-pub const AGING_THRESHOLD: u64   = 50; // ticks before promotion
+// ── Task control block ────────────────────────────────────────────────────
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct TaskCb {
+    pub pid:        u32,
+    pub ppid:       u32,
+    pub policy:     SchedPolicy,
+    pub mlfq_level: u8,     // 0 = highest priority
+    pub vruntime:   u64,    // CFS virtual runtime (nanoseconds)
+    pub deadline:   u64,    // EDF absolute deadline (nanoseconds)
+    pub timeslice:  u32,    // remaining ticks
+    pub cpu_affinity: u32,  // bitmask of allowed CPUs
+    pub state:      TaskState,
+    pub _pad:       [u8; 3],
+}
 
-// ── Types ────────────────────────────────────────────────────────────────────
-
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
 #[repr(u8)]
 pub enum TaskState {
-    Ready,
-    Running,
-    Blocked,
-    Dead,
+    Running  = 0,
+    Runnable = 1,
+    Blocked  = 2,
+    Zombie   = 3,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-#[repr(u8)]
-pub enum SchedClass {
-    Idle     = 0,
-    Normal   = 1,
-    Interactive = 2,
-    RealTime = 3,
-}
-
-/// A schedulable task control block
-#[repr(C)]
-pub struct Task {
-    pub id:          u32,
-    pub state:       TaskState,
-    pub sched_class: SchedClass,
-    pub priority:    u8,          // 0 = highest in class
-    pub vruntime:    u64,         // CFS virtual runtime (ns)
-    pub deadline:    u64,         // EDF absolute deadline (ticks), 0 = no RT
-    pub ticks_used:  u64,
-    pub ticks_starve: u64,        // ticks without CPU → aging
-    pub stack_ptr:   usize,
-    pub cr3:         usize,       // page table root
-}
-
-impl Task {
-    pub const fn new(id: u32, class: SchedClass, deadline: u64) -> Self {
+impl TaskCb {
+    pub const fn new(pid: u32, policy: SchedPolicy) -> Self {
         Self {
-            id,
-            state:       TaskState::Ready,
-            sched_class: class,
-            priority:    0,
-            vruntime:    0,
-            deadline,
-            ticks_used:  0,
-            ticks_starve: 0,
-            stack_ptr:   0,
-            cr3:         0,
+            pid, ppid: 0, policy,
+            mlfq_level: 0, vruntime: 0, deadline: 0,
+            timeslice: 10, cpu_affinity: 0xFFFF_FFFF,
+            state: TaskState::Runnable, _pad: [0u8; 3],
         }
     }
 }
 
-// ── Scheduler Trait (OOP interface) ─────────────────────────────────────────
+// ── MLFQ — 4 priority queues ─────────────────────────────────────────────
+const MLFQ_LEVELS:  usize = 4;
+const QUEUE_DEPTH:  usize = 256;
+const MLFQ_QUANTA: [u32; 4] = [2, 4, 8, 16]; // ticks per level
+const AGING_TICKS:  u32 = 200; // ticks before boosting to Q0
 
-pub trait SdfScheduler {
-    /// Add a task to the run queue
-    fn enqueue(&mut self, task: Task);
-    /// Pick the next task to run
-    fn pick_next(&mut self) -> Option<u32>;
-    /// Called on every timer tick
-    fn tick(&mut self, current_id: u32) -> bool; // returns true if preempt needed
-    /// Block a task (e.g., waiting on I/O)
-    fn block(&mut self, id: u32);
-    /// Unblock a task
-    fn unblock(&mut self, id: u32);
+pub struct MlfqQueue {
+    pids:  [[u32; QUEUE_DEPTH]; MLFQ_LEVELS],
+    head:  [usize; MLFQ_LEVELS],
+    tail:  [usize; MLFQ_LEVELS],
+    count: [usize; MLFQ_LEVELS],
 }
 
-// ── MLFQ Implementation ──────────────────────────────────────────────────────
-
-pub struct MlfqScheduler {
-    queues:   [[u32; MAX_TASKS]; MLFQ_QUEUES],
-    q_len:    [usize; MLFQ_QUEUES],
-    tasks:    [Option<Task>; MAX_TASKS],
-    tick_cnt: u64,
-}
-
-impl MlfqScheduler {
+impl MlfqQueue {
     pub const fn new() -> Self {
         Self {
-            queues:   [[0u32; MAX_TASKS]; MLFQ_QUEUES],
-            q_len:    [0usize; MLFQ_QUEUES],
-            tasks:    [const { None }; MAX_TASKS],
-            tick_cnt: 0,
+            pids:  [[0u32; QUEUE_DEPTH]; MLFQ_LEVELS],
+            head:  [0usize; MLFQ_LEVELS],
+            tail:  [0usize; MLFQ_LEVELS],
+            count: [0usize; MLFQ_LEVELS],
         }
     }
 
-    fn task_slot(&self, id: u32) -> Option<usize> {
-        self.tasks.iter().position(|t| {
-            matches!(t, Some(task) if task.id == id)
-        })
+    pub fn enqueue(&mut self, level: usize, pid: u32) -> bool {
+        let l = level.min(MLFQ_LEVELS - 1);
+        if self.count[l] >= QUEUE_DEPTH { return false; }
+        self.pids[l][self.tail[l]] = pid;
+        self.tail[l] = (self.tail[l] + 1) % QUEUE_DEPTH;
+        self.count[l] += 1;
+        true
     }
 
-    fn promote_starving(&mut self) {
-        for slot in 0..MAX_TASKS {
-            if let Some(ref mut task) = self.tasks[slot] {
-                if task.ticks_starve >= AGING_THRESHOLD
-                    && task.priority > 0
-                {
-                    task.priority -= 1;
-                    task.ticks_starve = 0;
-                }
-            }
-        }
-    }
-}
-
-impl SdfScheduler for MlfqScheduler {
-    fn enqueue(&mut self, task: Task) {
-        let q = (task.priority as usize).min(MLFQ_QUEUES - 1);
-        let id = task.id;
-        // Find free slot
-        for slot in 0..MAX_TASKS {
-            if self.tasks[slot].is_none() {
-                self.tasks[slot] = Some(task);
-                let qi = self.q_len[q];
-                if qi < MAX_TASKS {
-                    self.queues[q][qi] = id;
-                    self.q_len[q] += 1;
-                }
-                return;
-            }
-        }
-    }
-
-    fn pick_next(&mut self) -> Option<u32> {
-        // EDF: check RT tasks first (deadline nearest)
-        let mut earliest_dl = u64::MAX;
-        let mut rt_id = None;
-        for slot in 0..MAX_TASKS {
-            if let Some(ref t) = self.tasks[slot] {
-                if t.state == TaskState::Ready
-                    && t.sched_class == SchedClass::RealTime
-                    && t.deadline > 0
-                    && t.deadline < earliest_dl
-                {
-                    earliest_dl = t.deadline;
-                    rt_id = Some(t.id);
-                }
-            }
-        }
-        if rt_id.is_some() { return rt_id; }
-
-        // MLFQ: highest non-empty queue
-        for q in (0..MLFQ_QUEUES).rev() {
-            if self.q_len[q] > 0 {
-                let id = self.queues[q][0];
-                // Shift queue left
-                self.q_len[q] -= 1;
-                for i in 0..self.q_len[q] {
-                    self.queues[q][i] = self.queues[q][i + 1];
-                }
-                return Some(id);
+    pub fn dequeue(&mut self) -> Option<(u32, usize)> {
+        for l in 0..MLFQ_LEVELS {
+            if self.count[l] > 0 {
+                let pid = self.pids[l][self.head[l]];
+                self.head[l] = (self.head[l] + 1) % QUEUE_DEPTH;
+                self.count[l] -= 1;
+                return Some((pid, l));
             }
         }
         None
     }
 
-    fn tick(&mut self, current_id: u32) -> bool {
-        self.tick_cnt += 1;
-        // Age starving tasks every 10 ticks
-        if self.tick_cnt % 10 == 0 { self.promote_starving(); }
-
-        if let Some(slot) = self.task_slot(current_id) {
-            if let Some(ref mut task) = self.tasks[slot] {
-                task.ticks_used += 1;
-                // Demote if used full time slice in MLFQ
-                if task.sched_class != SchedClass::RealTime
-                    && task.ticks_used >= TIME_SLICE_MS
-                {
-                    task.ticks_used = 0;
-                    if (task.priority as usize) < MLFQ_QUEUES - 1 {
-                        task.priority += 1;
-                    }
-                    return true; // preempt
-                }
-            }
-        }
-        // Increment starve counters for waiting tasks
-        for slot in 0..MAX_TASKS {
-            if let Some(ref mut t) = self.tasks[slot] {
-                if t.state == TaskState::Ready && t.id != current_id {
-                    t.ticks_starve += 1;
-                }
-            }
-        }
-        false
-    }
-
-    fn block(&mut self, id: u32) {
-        if let Some(slot) = self.task_slot(id) {
-            if let Some(ref mut t) = self.tasks[slot] {
-                t.state = TaskState::Blocked;
-            }
-        }
-    }
-
-    fn unblock(&mut self, id: u32) {
-        if let Some(slot) = self.task_slot(id) {
-            if let Some(ref mut t) = self.tasks[slot] {
-                t.state = TaskState::Ready;
+    /// Priority boost — move all tasks to Q0 (prevents starvation)
+    pub fn boost(&mut self) {
+        for l in 1..MLFQ_LEVELS {
+            while self.count[l] > 0 {
+                let pid = self.pids[l][self.head[l]];
+                self.head[l] = (self.head[l] + 1) % QUEUE_DEPTH;
+                self.count[l] -= 1;
+                self.enqueue(0, pid);
             }
         }
     }
 }
 
-// ── Global scheduler instance ────────────────────────────────────────────────
+// ── CFS — virtual runtime min-heap (simplified as sorted array) ───────────
+const CFS_MAX_TASKS: usize = 256;
 
-static TICK_COUNTER: AtomicU64 = AtomicU64::new(0);
+pub struct CfsRunqueue {
+    tasks:  [TaskCb; CFS_MAX_TASKS],
+    count:  usize,
+    min_vruntime: u64,
+}
 
-pub fn global_tick() -> u64 {
-    TICK_COUNTER.fetch_add(1, Ordering::Relaxed)
+impl CfsRunqueue {
+    pub const fn new() -> Self {
+        Self {
+            tasks: [TaskCb::new(0, SchedPolicy::Cfs); CFS_MAX_TASKS],
+            count: 0,
+            min_vruntime: 0,
+        }
+    }
+
+    pub fn insert(&mut self, t: TaskCb) -> bool {
+        if self.count >= CFS_MAX_TASKS { return false; }
+        // Ensure new task starts at min_vruntime (prevent CPU hogging)
+        let mut task = t;
+        if task.vruntime < self.min_vruntime {
+            task.vruntime = self.min_vruntime;
+        }
+        self.tasks[self.count] = task;
+        self.count += 1;
+        true
+    }
+
+    /// Pick the task with the smallest vruntime (leftmost in red-black tree)
+    pub fn pick_next(&mut self) -> Option<TaskCb> {
+        if self.count == 0 { return None; }
+        let mut min_idx = 0;
+        for i in 1..self.count {
+            if self.tasks[i].vruntime < self.tasks[min_idx].vruntime {
+                min_idx = i;
+            }
+        }
+        let task = self.tasks[min_idx];
+        // Remove from queue
+        self.tasks[min_idx] = self.tasks[self.count - 1];
+        self.count -= 1;
+        self.min_vruntime = task.vruntime;
+        Some(task)
+    }
+
+    /// Update vruntime after a tick (weight = 1024 / priority_weight)
+    pub fn account_tick(&mut self, pid: u32, delta_ns: u64) {
+        for i in 0..self.count {
+            if self.tasks[i].pid == pid {
+                self.tasks[i].vruntime += delta_ns;
+                break;
+            }
+        }
+    }
+}
+
+// ── EDF — earliest deadline first ────────────────────────────────────────
+const EDF_MAX_TASKS: usize = 64;
+
+pub struct EdfRunqueue {
+    tasks: [TaskCb; EDF_MAX_TASKS],
+    count: usize,
+}
+
+impl EdfRunqueue {
+    pub const fn new() -> Self {
+        Self {
+            tasks: [TaskCb::new(0, SchedPolicy::Edf); EDF_MAX_TASKS],
+            count: 0,
+        }
+    }
+
+    pub fn insert(&mut self, t: TaskCb) -> bool {
+        if self.count >= EDF_MAX_TASKS { return false; }
+        self.tasks[self.count] = t;
+        self.count += 1;
+        true
+    }
+
+    /// Pick task with earliest (smallest) deadline
+    pub fn pick_next(&mut self) -> Option<TaskCb> {
+        if self.count == 0 { return None; }
+        let mut min_idx = 0;
+        for i in 1..self.count {
+            if self.tasks[i].deadline < self.tasks[min_idx].deadline {
+                min_idx = i;
+            }
+        }
+        let task = self.tasks[min_idx];
+        self.tasks[min_idx] = self.tasks[self.count - 1];
+        self.count -= 1;
+        Some(task)
+    }
+
+    /// Check for deadline misses (returns missed PIDs count)
+    pub fn check_deadline_misses(&self, now_ns: u64) -> u32 {
+        let mut missed = 0u32;
+        for i in 0..self.count {
+            if self.tasks[i].deadline < now_ns {
+                missed += 1;
+            }
+        }
+        missed
+    }
+}
+
+// ── Unified scheduler ─────────────────────────────────────────────────────
+const MAX_TASKS: usize = 512;
+
+pub struct SigmaScheduler {
+    tasks:         [TaskCb; MAX_TASKS],
+    task_count:    usize,
+    mlfq:          MlfqQueue,
+    cfs:           CfsRunqueue,
+    edf:           EdfRunqueue,
+    tick_count:    AtomicU64,
+    current_pid:   AtomicU32,
+    initialized:   bool,
+}
+
+impl SigmaScheduler {
+    pub const fn new() -> Self {
+        Self {
+            tasks:       [TaskCb::new(0, SchedPolicy::Mlfq); MAX_TASKS],
+            task_count:  0,
+            mlfq:        MlfqQueue::new(),
+            cfs:         CfsRunqueue::new(),
+            edf:         EdfRunqueue::new(),
+            tick_count:  AtomicU64::new(0),
+            current_pid: AtomicU32::new(0),
+            initialized: false,
+        }
+    }
+
+    pub fn init(&mut self) { self.initialized = true; }
+
+    pub fn add_task(&mut self, t: TaskCb) -> bool {
+        if self.task_count >= MAX_TASKS { return false; }
+        let idx = self.task_count;
+        self.tasks[idx] = t;
+        self.task_count += 1;
+        match t.policy {
+            SchedPolicy::Mlfq | SchedPolicy::Fifo =>
+                self.mlfq.enqueue(t.mlfq_level as usize, t.pid),
+            SchedPolicy::Cfs  => self.cfs.insert(t),
+            SchedPolicy::Edf  => self.edf.insert(t),
+            SchedPolicy::Idle => true,
+        };
+        true
+    }
+
+    /// Called on every timer tick — returns PID to run next
+    pub fn schedule(&mut self, now_ns: u64) -> u32 {
+        let tick = self.tick_count.fetch_add(1, Ordering::Relaxed);
+
+        // Priority boost every AGING_TICKS
+        if tick % AGING_TICKS as u64 == 0 {
+            self.mlfq.boost();
+        }
+
+        // EDF first (hard real-time)
+        if let Some(t) = self.edf.pick_next() {
+            self.current_pid.store(t.pid, Ordering::Relaxed);
+            return t.pid;
+        }
+
+        // MLFQ second (interactive)
+        if let Some((pid, _lvl)) = self.mlfq.dequeue() {
+            self.current_pid.store(pid, Ordering::Relaxed);
+            return pid;
+        }
+
+        // CFS third (fair sharing)
+        if let Some(t) = self.cfs.pick_next() {
+            self.current_pid.store(t.pid, Ordering::Relaxed);
+            return t.pid;
+        }
+
+        0 // idle
+    }
+
+    pub fn current_pid(&self) -> u32 { self.current_pid.load(Ordering::Relaxed) }
+    pub fn tick_count(&self)  -> u64 { self.tick_count.load(Ordering::Relaxed)  }
+}
+
+static mut G_SCHEDULER: SigmaScheduler = SigmaScheduler::new();
+
+// ── C-ABI exports ─────────────────────────────────────────────────────────
+#[no_mangle] pub unsafe extern "C" fn asched_init() { G_SCHEDULER.init(); }
+
+#[no_mangle]
+pub unsafe extern "C" fn sched_add_task(
+    pid: u32, policy: u8, deadline: u64, mlfq_level: u8,
+) -> i32 {
+    let pol = match policy {
+        0 => SchedPolicy::Mlfq, 1 => SchedPolicy::Cfs,
+        2 => SchedPolicy::Edf,  3 => SchedPolicy::Fifo,
+        _ => SchedPolicy::Idle,
+    };
+    let mut t = TaskCb::new(pid, pol);
+    t.deadline   = deadline;
+    t.mlfq_level = mlfq_level;
+    if G_SCHEDULER.add_task(t) { 0 } else { -12 }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sched_tick(now_ns: u64) -> u32 {
+    G_SCHEDULER.schedule(now_ns)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn sched_current_pid() -> u32 {
+    G_SCHEDULER.current_pid()
 }
