@@ -1,124 +1,159 @@
 # SigmaOS Networking Stack
 
-SigmaOS ships a sovereign, zero-trust network stack built from scratch — no Linux `net/` code, no legacy socket API baggage.
+Complete IPv4/IPv6 + TCP/UDP stack implemented in `kernel/net/`.
 
 ---
 
-## Stack Overview
+## Architecture
 
 ```
-Applications (user space)
-    │  sys_socket / sys_connect / sys_send / sys_recv
+User process
+    │  socket() → connect() → send() → recv()
     ▼
-Socket layer (sigma_socket.cpp)
-    │
-    ├── TLS 1.3 + Kyber-1024 hybrid         (all connections)
-    ├── QUIC (planned)
-    └── Raw TCP/UDP
-         │
-         ▼
-Transport layer (sigma_tcp.c, sigma_udp.c)
-    │  TCP RFC 793 state machine, UDP
+Socket API (kernel/net/socket.rs)
+    │  maps POSIX fds to TCP/UDP sockets
     ▼
-Network layer (sigma_ip.c)
-    │  IPv4 + IPv6, ICMP, routing table
-    ▼
-Link layer (sigma_ethernet.c)
-    │  Ethernet II frames, ARP
-    ▼
-NIC Driver (SDF layer)
-    │  e1000, iwlwifi, rtl8xxxu, VirtIO-net
-    ▼
-Hardware
+TCP (kernel/net/tcp.rs)         UDP (kernel/net/udp.rs)
+    │                               │
+    └──────────┬────────────────────┘
+               ▼
+         IPv4/IPv6 Layer (kernel/net/ip.rs)
+               │
+         sigma_ip_send() → sigma-bus IPC_CH_NET_TX
+               │
+         NIC Driver (e1000, virtio-net)
 ```
 
 ---
 
-## Implemented Features
+## TCP Implementation
 
-### Transport
-- TCP state machine (SYN → ESTABLISHED → FIN)
-- UDP datagram sockets
-- ICMP echo (ping)
-- IPv4 + IPv6 dual-stack
-- ARP request/reply
+Full RFC 793 state machine. See [TCP-Stack](TCP-Stack) for full details.
 
-### Security & Privacy
-- **TLS 1.3**: `net/tls/` — X25519/Kyber-1024 hybrid key exchange
-- **WPA3/SAE**: dragonfly key exchange (P-256) for Wi-Fi
-- **WireGuard VPN**: `net/vpn/sigma_wireguard.cpp`
-- **DNS-over-HTTPS**: all DNS queries encrypted by default
-- **DNSSEC**: validation via `net/dns/sigma_dnssec.cpp`
-- **Stateful firewall**: `net/firewall/sigma_firewall.cpp`
-- **NAT + conntrack**: `net/sigma_nat.cpp`
-- **Zero-trust**: every connection requires SPIFFE workload identity
+```c
+int fd = tcp_socket_create();
 
-### Connectivity
-- **DHCP client**: RFC 2131/2132 full state machine
-- **CRDT offline sync**: `net/sigma_offline_sync.cpp` — merge without server
-- **Mesh networking**: `net/mesh/` — ZeroNet for `release/distributed`
+// Client connect
+tcp_connect(fd, 0xC0A80001, 80);   // 192.168.0.1:80
+// state: CLOSED → SYN_SENT → ESTABLISHED
 
----
+// Send data
+tcp_send(fd, data, len);
 
-## DNS Architecture
+// Receive data (returns bytes read, 0 = EOF)
+n = tcp_recv(fd, buf, sizeof(buf));
 
-```
-sigma_gethostbyname("example.com")
-    │
-    ▼
-sigma_dns_resolve()
-    ├── Check LRU cache (TTL-aware)
-    ├── HIT → return cached answer
-    └── MISS →
-          ├── Try DNS-over-HTTPS (primary)
-          ├── Fall back to UDP DNS (if DoH unavailable)
-          └── Validate DNSSEC signature
-                └── Cache result → return
+// Close (graceful FIN handshake)
+tcp_close(fd);
 ```
 
 ---
 
-## Network Daemons
+## UDP Implementation
 
-| Daemon | Socket | Purpose |
-|--------|--------|---------|
-| `sigmad-netd` | `/run/sigma/netd.sock` | Interface management, routing |
-| `sigmad-dnsd` | `/run/sigma/dnsd.sock` | Local DNS resolver |
-| `sigmad-dhcpd` | `/run/sigma/dhcpd.sock` | DHCP client daemon |
-| `sigmad-vpnd` | `/run/sigma/vpnd.sock` | WireGuard VPN management |
-| `sigmad-firewalld` | `/run/sigma/fwd.sock` | Firewall rule management |
-
----
-
-## Open Issues (Phase G)
-
-| ID | Issue | Status |
-|----|-------|--------|
-| #851-WLAN | Wi-Fi 6 driver (iwlwifi) | ⬜ Phase G |
-| #851-BT | Bluetooth 5.3 HCI | ⬜ Phase G |
-| #1012 | Full TCP/UDP RFC 793 state machine | ⬜ Phase G |
-| — | QUIC transport | ⬜ Phase H |
+```c
+int fd = udp_socket();
+udp_bind(fd, 5353);                  // bind port 5353 (mDNS)
+udp_sendto(fd, data, len, dst_ip, dst_port);
+n = udp_recvfrom(fd, buf, sizeof(buf));
+```
 
 ---
 
-## Source Files
+## POSIX Socket API
 
-| File | Purpose |
-|------|---------|
-| `net/sigma_net.cpp` | Stack initialisation |
-| `net/tcp.c` | TCP state machine |
-| `net/udp.c` | UDP datagrams |
-| `net/sigma_ip.c` | IPv4 routing |
-| `net/sigma_ethernet.c` | Ethernet II framing |
-| `net/dns.c` | DNS resolver |
-| `net/dhcp.c` | DHCP client |
-| `net/tls/` | TLS 1.3 + PQC |
-| `net/vpn/` | WireGuard |
-| `net/firewall/` | Stateful firewall |
-| `net/mesh/` | ZeroNet mesh |
-| `net/sigma_offline_sync.cpp` | CRDT sync |
-| `drivers/net/sigma_iwlwifi.cpp` | Wi-Fi 6 driver (Phase G) |
+```c
+// Create socket
+int fd = sigma_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+int fd = sigma_socket(AF_INET, SOCK_DGRAM,  IPPROTO_UDP);
+
+// Connect (TCP)
+struct SockAddrIn addr = { AF_INET, htons(80), htonl(0xC0A80001) };
+sigma_connect(fd, &addr, sizeof(addr));
+
+// Send / receive
+sigma_send(fd, buf, len, 0);
+sigma_recv(fd, buf, len, 0);
+
+// Close
+sigma_socket_close(fd);
+```
 
 ---
 
-*See also: [Architecture-Overview](Architecture-Overview) · [Security-Model](Security-Model) · [System-Daemons](System-Daemons)*
+## IP Layer
+
+```c
+// Send raw IP packet (used by TCP/UDP internally)
+sigma_ip_send(dst_ip, IPPROTO_TCP, payload, len);
+
+// Receive IP packet (called from NIC IRQ handler)
+sigma_ip_rx(data, len);
+```
+
+Features:
+- IPv4 header construction with auto-checksum
+- IPv6 header support
+- ICMP echo request/reply (ping)
+- ARP cache (64 entries, LRU eviction)
+- Routing table (32 routes, longest-prefix match)
+
+---
+
+## DNS + DHCP (Already Implemented)
+
+```bash
+# DNS query (from sigma-sh)
+sigma-net resolve example.com     # → 93.184.216.34
+
+# DHCP (automatic at boot)
+sigmad-netd --dhcp eth0            # RFC 2131 state machine
+```
+
+Sources: `net/sigma_dns.rs`, `net/sigma_dhcp.rs`
+
+---
+
+## TLS 1.3
+
+```bash
+# Secure connection using Kyber-1024 hybrid key exchange
+sigma-net connect --tls https://example.com
+```
+
+Cipher suites:
+- `TLS_AES_256_GCM_SHA384`
+- `TLS_KYBER1024_AES256GCM_SHA384` (PQC hybrid)
+
+Source: `net/sigma_tls.rs`
+
+---
+
+## Network Configuration
+
+```bash
+# Manual IP configuration
+sigma-net set-ip eth0 192.168.0.2/24
+sigma-net set-gw eth0 192.168.0.1
+
+# DHCP
+sigma-net dhcp eth0
+
+# Show interfaces
+sigma-net list
+```
+
+---
+
+## Hardware Drivers
+
+| Driver | Hardware | Status |
+|--------|----------|--------|
+| e1000 | Intel 82540/82545/etc. (QEMU default) | ✅ |
+| virtio-net | QEMU/KVM virtual NIC | 🔄 |
+| rtl8139 | Realtek RTL8139 (QEMU alt) | 🔄 |
+| iwlwifi | Intel Wi-Fi 6 | 🔄 partial |
+
+---
+
+*Sources: `kernel/net/ip.rs`, `kernel/net/tcp.rs`, `kernel/net/udp.rs`, `kernel/net/socket.rs`*

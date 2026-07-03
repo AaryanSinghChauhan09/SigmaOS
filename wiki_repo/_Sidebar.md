@@ -8,6 +8,14 @@
 - [Building from Source](Building-from-Source)
 - [Installation](Installation)
 
+## Security
+- [Security Architecture](Security-Architecture)
+- [Security Model](Security-Model)
+- [PQC Hardening](PQC_HARDENING)
+- [Post-Quantum Security](Post-Quantum-Security)
+- [Verified Boot](Verified-Boot)
+- [Sandbox Hardening](Sandbox-Hardening)
+
 ## Linux Adoption
 - [SigmaOS vs Linux](SigmaOS-vs-Linux)
 - [Linux Absorption Architecture](Linux-Absorption-Architecture)
