@@ -43,21 +43,37 @@
 ## Architecture
 - [Architecture Overview](Architecture-Overview)
 - [Kernel Internals](Kernel)
+- [Scheduler](Scheduler)
+- [Memory Management](Memory-Management)
+- [IPC — sigma-bus](IPC)
+- [Syscall Reference](Syscall-Reference)
 - [HAL](HAL)
 - [Networking Stack](Networking)
 - [System Daemons](System-Daemons)
-- [Syscall Dispatcher](Syscall-Dispatcher)
 - [Zenith Desktop](Zenith-Desktop)
 
 ## Drivers & Compatibility
 - [Driver Framework (SDF)](Driver-Framework)
 - [Kernel ABI Stability](Kernel-ABI-Stability)
 - [Linux Driver Compat](Linux-Driver-Compat)
+- [Linux Absorption Architecture](Linux-Absorption-Architecture)
+- [OCI Container Runtime](OCI-Container-Runtime)
 - [Win32 Compatibility](Win32-Compatibility)
 - [Windows vs Linux vs SigmaOS](Windows-Linux-SigmaOS-Drivers)
 - [Driver Development Guide](Driver-Development-Guide)
-- [Ubuntu Driver Integration](Ubuntu-Driver-Integration)
 - [Hardware Support](Hardware-Support)
+
+## Updates & Packaging
+- [Transactional Updates](Transactional-Updates)
+- [sigpkg Spec](../docs/SIGPKG_SPEC.md)
+- [Reproducible Builds](../docs/REPRODUCIBLE_BUILD.md)
+- [Distribution Formats](../docs/DISTRIBUTION_FORMATS.md)
+
+## Development
+- [12-Week Milestone Plan](12-Week-Milestone-Plan)
+- [Kernel Developer Handbook](../docs/KERNEL_DEVELOPER_HANDBOOK.md)
+- [Linux Compat RFC](../docs/LINUX_COMPAT_RFC.md)
+- [Driver SDK](../sdk/driver/src/lib.rs)
 
 ## Download Formats
 - [All Formats (50+)](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/DOWNLOAD.md)

@@ -1,177 +1,147 @@
 # Linux Absorption Architecture
 
-> SigmaOS doesn't compete with Linux distros — it absorbs them.
-> Every Linux app, package, and workflow runs on SigmaOS, plus you get AI-native automation.
+SigmaOS absorbs Linux workloads through three progressively deeper layers,
+giving users immediate compatibility and a clear path to native performance.
 
 ---
 
-## Strategy: Embrace + Surpass
-
-SigmaOS is not a Linux distro. It is a sovereign OS that absorbs Linux workloads through compatibility layers while offering superior AI-native, automation-first capabilities.
+## Overview
 
 ```
-Linux App/Binary
-       │
-       ▼
-SigmaOS Linux Compat Layer
-  ├── ELF Loader (sigma-compat-loader)
-  ├── Syscall Translation (30+ syscalls mapped)
-  ├── FHS Path Mapping (/usr/lib → /sigma/lib, etc.)
-  ├── Dynamic Linker (ld-sigma-linux.so)
-  └── Signal/Process compatibility
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Layer       │  Mechanism          │  Status    │ Overhead
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. MicroVM  │  QEMU microVM+OCI   │  ✅ Now     │  ~5-15%
+  2. Compat   │  Kernel syscall     │  🔄 Phase B │  ~5-10%
+              │  translation        │            │
+  3. Native   │  Sigma-native       │  ⬜ Phase D │  ~0%
+              │  recompile/port     │            │
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
 
-       │
-       ▼
-SigmaOS Kernel (sovereign, no Linux code)
-  ├── sigma_pledge / sigma_unveil (security)
-  ├── Native syscall interface
-  └── SDF driver framework
+---
+
+## Layer 1: MicroVM + OCI (Available Now)
+
+Run any Docker/OCI image inside a lightweight QEMU microVM:
+
+```bash
+# Run Ubuntu, Alpine, Nginx, etc.
+sigma-compat run ubuntu:22.04 bash
+sigma-compat run nginx:latest
+sigma-compat run python:3.12 python3 -c "print('hello from linux')"
+```
+
+**How it works:**
+1. Pull OCI image via Docker
+2. Extract rootfs
+3. Boot minimal Linux kernel in QEMU microVM
+4. Mount rootfs as VirtIO-blk device
+5. Start container process inside VM
+
+**Security:** Linux kernel is inside the VM — SigmaOS kernel is not exposed.
+
+**Supported images:** Any OCI image that runs on Linux x86-64.
+
+---
+
+## Layer 2: Syscall Translation (Phase B)
+
+Run Linux ELF binaries directly on the SigmaOS kernel via syscall translation.
+
+**ELF Loader** (`kernel/linux_compat/elf_loader.rs`):
+- Parses Linux ELF64 format
+- Maps segments with ASLR randomization
+- Sets up Linux-ABI initial stack (argc/argv/envp/auxv)
+- W^X enforcement (stricter than Linux)
+
+**vDSO Shim** (`kernel/linux_compat/vdso_shim.rs`):
+- `__vdso_clock_gettime` → `sigma_clock_ns()`
+- `__vdso_gettimeofday` → FILETIME conversion
+- `__vdso_time` → Unix seconds
+
+**/proc Shim** (`kernel/linux_compat/proc_shim.rs`):
+- `/proc/cpuinfo` → synthesized CPU info
+- `/proc/meminfo` → `sigma_mm_free_pages()` converted
+- `/proc/self/maps` → VMA list
+- `/dev/urandom` → sigma PRNG
+- `/sys/class/net/` → sigma-bus NIC channels
+
+**Syscall Dispatch** (`kernel/core/syscall_dispatch.rs`):
+- 50+ Linux syscall numbers mapped to SigmaOS primitives
+- Custom `SYS_SIGMA_*` extensions for pledge/unveil/attestation
+
+---
+
+## Layer 3: Native Port (Phase D)
+
+For maximum performance, applications are rebuilt against SigmaOS APIs:
+
+```bash
+# sigma-migrate analyses and suggests porting changes
+sigma-migrate --analyze /path/to/linux-app
+# Output:
+#   Detected: 23 Linux-specific syscalls
+#   Required: open(), read(), write(), socket(), futex()
+#   Suggested: Replace Linux errno.h with sigma_errno.h
+#   Effort: 2-4 days
+
+# AI-assisted migration
+sigma-agent "port this C application to SigmaOS: $(cat myapp.c)"
 ```
 
 ---
 
 ## Package Absorption
 
-Convert any Linux package to .sigpkg format:
+Install packages from Linux distros using the compatibility layer:
 
 ```bash
-# .deb (Debian/Ubuntu)
-sigma-pkg absorb firefox.deb
-sigma-pkg absorb code.deb
+# Install a Debian package in sigma-compat mode
+sigma-pkg absorb-deb nginx_1.24.0_amd64.deb
 
-# .rpm (Red Hat/Fedora)
-sigma-pkg absorb vlc.rpm
+# Install from Ubuntu PPA (runs in microVM)
+sigma-compat apt-install nginx
 
-# AppImage (portable Linux apps)
-sigma-pkg absorb Blender-4.0.AppImage
+# Convert RPM to sigpkg
+sigma-pkg convert-rpm mypackage-1.0.x86_64.rpm
 
-# Flatpak
-sigma-pkg install --flatpak org.mozilla.firefox
-
-# Then install the absorbed package
-sigma-pkg install ~/.cache/sigma/absorbed/firefox-*.sigpkg
-```
-
-Or via sigma-agent (auto-detects format):
-```bash
-sigma-agent "install firefox.deb"   # automatically absorbs + installs
-sigma-agent "run ubuntu container"  # runs OCI container
-```
-
-### Supported Input Formats
-
-| Format | Tool Required | Status |
-|---|---|---|
-| `.deb` (Debian/Ubuntu) | `dpkg-deb` | ✅ Implemented |
-| `.rpm` (Red Hat/Fedora) | `rpm2cpio` | ✅ Implemented |
-| `.AppImage` | None (built-in) | ✅ Implemented |
-| `.flatpak` / `.flatpakref` | `flatpak` | 🔄 Via flatpak compat |
-| `.snap` | `snap` | 🔄 Via snap compat |
-| `.pkg.tar.zst` (Arch) | `pacman` | 🔄 Planned |
-| OCI/Docker image | `sigma-pod` | ✅ Via sigma-pod |
-
-### Dependency Mapping
-
-Linux package dependencies are automatically mapped to SigmaOS equivalents:
-
-| Linux Dep | SigmaOS Equivalent |
-|---|---|
-| `libc6` | `sigma-libc` |
-| `libssl3` | `sigma-tls` |
-| `libgtk-3-0` | `sigma-gtk3-compat` |
-| `python3` | `sigma-python3` |
-| `nodejs` | `sigma-node` |
-| `libvulkan1` | `sigma-vulkan` |
-
----
-
-## Linux Binary Compatibility
-
-Run unmodified Linux ELF binaries directly:
-
-```bash
-# Run any Linux binary
-sigma-compat run /path/to/linux-binary --args
-
-# Check compatibility status
-sigma-compat status
-
-# Translate a Linux path to SigmaOS path
-sigma-compat path /usr/lib/x86_64-linux-gnu
-# → /sigma/lib
-```
-
-### FHS Path Mapping (24 paths)
-
-SigmaOS maps all standard Linux Filesystem Hierarchy Standard paths:
-
-```
-/usr/lib          → /sigma/lib
-/usr/bin          → /sigma/bin
-/usr/share        → /sigma/share
-/etc/apt          → /sigma/compat/apt
-/lib/x86_64-linux-gnu → /sigma/lib
-/proc             → /sigma/proc
-/sys              → /sigma/sys
-... (24 total)
-```
-
-### Syscall Translation
-
-30 core Linux x86_64 syscalls are translated to SigmaOS equivalents at runtime. The translation layer (`kernel/compat/`) handles:
-- `read`, `write`, `open`, `close`, `stat`, `fstat`
-- `mmap`, `mprotect`, `munmap`, `brk`
-- `fork`, `vfork`, `execve`, `exit`, `wait4`, `kill`
-- `getpid`, `getuid`, `getgid`, `uname`
-- `gettimeofday`, `unlink`, `readlink`
-
----
-
-## OCI/Docker Container Support
-
-```bash
-# Run any Docker/OCI image via sigma-pod
-sigma-compat container ubuntu:22.04
-sigma-compat container nginx:latest
-sigma-compat container python:3.11 python3 -c "print('hello')"
-
-# Or via sigma-agent
-sigma-agent "run ubuntu container"
-sigma-agent "start nginx in container"
-```
-
-sigma-pod is SigmaOS's sovereign OCI runtime — runc-compatible, using sigma_pledge/sigma_unveil for isolation instead of cgroups/namespaces fallbacks.
-
----
-
-## What Linux Distros Have That SigmaOS Is Building
-
-| Gap | Current Status | Roadmap |
-|---|---|---|
-| Hardware driver library | SDF framework + drivers for core hardware | Expand via Driver Porting Pipeline |
-| Stable ABI | `kabi/` C-ABI layer defined | Formalize kabi stability guarantee |
-| Package repository | sigma_pkg_registry with core packages | Community package contributions |
-| Container ecosystem | sigma-pod (OCI-compatible) | Full Docker Compose support |
-| Desktop environments | Zenith DE (in progress) | Phase G: native C++ compositor |
-| Linux binary compat | Syscall translation + path mapping | Full gVisor-style compat layer |
-| GPU drivers | sovereigngpu.rs + Mesa integration | Vendor driver absorption |
-
----
-
-## Installation
-
-```bash
-# Install full Linux compatibility layer
-sigma-pkg install sigma-compat-layer
-
-# Install individual tools
-sigma-pkg install dpkg-tools       # .deb absorption
-sigma-pkg install rpm-tools        # .rpm absorption
-sigma-pkg install sigma-pod        # OCI/Docker containers
-sigma-pkg install flatpak          # Flatpak apps
-sigma-pkg install bubblewrap       # Sandbox for Linux apps
+# Run Flatpak
+sigma-compat flatpak run org.mozilla.firefox
 ```
 
 ---
 
-*See also: [Migration Guide](Migration-Guide) · [sigma-pkg](SIGMA_PKG) · [Architecture Overview](Architecture-Overview)*
+## OCI / Docker Container Support
+
+```bash
+# Direct OCI support
+sigma-pod run nginx:latest
+sigma-pod run --port 8080:80 nginx:latest
+
+# Docker Compose equivalent
+sigma-pod compose up -f docker-compose.yml
+
+# Kubernetes (Phase E)
+sigma-pod kube apply -f deployment.yaml
+```
+
+---
+
+## Compatibility Matrix
+
+| Category | Coverage | Status |
+|----------|---------|--------|
+| x86-64 ELF binaries | Growing | 🔄 Phase B |
+| OCI containers | Full (via microVM) | ✅ Now |
+| Debian .deb packages | Growing | 🔄 Phase B |
+| RPM packages | Partial | ⬜ Phase C |
+| Flatpak | Via microVM | 🔄 |
+| Snap | Via microVM | 🔄 |
+| Python packages (pip) | Full (native Python) | ✅ |
+| Node.js packages (npm) | Full (native Node) | ✅ |
+| Rust crates | Full (native) | ✅ |
+
+---
+
+*See also: [OCI Container Runtime](OCI-Container-Runtime) · [Linux Driver Compat](Linux-Driver-Compat) · [Linux Compat RFC](../docs/LINUX_COMPAT_RFC.md)*
