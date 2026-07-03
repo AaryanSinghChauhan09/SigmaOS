@@ -42,15 +42,22 @@
 
 ## Architecture
 - [Architecture Overview](Architecture-Overview)
+- [Bootloader](Bootloader)
 - [Kernel Internals](Kernel)
 - [Scheduler](Scheduler)
 - [Memory Management](Memory-Management)
 - [IPC — sigma-bus](IPC)
 - [Syscall Reference](Syscall-Reference)
+- [VFS & Filesystems](Storage)
 - [HAL](HAL)
 - [Networking Stack](Networking)
 - [System Daemons](System-Daemons)
 - [Zenith Desktop](Zenith-Desktop)
+
+## Roadmaps
+- [Linux Parity Roadmap](Linux-Parity-Roadmap)
+- [12-Week Milestone Plan](12-Week-Milestone-Plan)
+- [Development Roadmap](Development-Roadmap)
 
 ## Drivers & Compatibility
 - [Driver Framework (SDF)](Driver-Framework)
