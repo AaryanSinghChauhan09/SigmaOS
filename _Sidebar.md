@@ -8,6 +8,33 @@
 - [Building from Source](Building-from-Source)
 - [Installation](Installation)
 
+## CLI Tools
+- [CLI Reference (all tools)](CLI-Reference)
+- [sigma — OS Dev CLI](CLI-Reference#sigma--os-development-cli)
+- [sigma — App Dev CLI](CLI-Reference#sigma--developer-app-cli)
+- [sigma-sh — Shell](CLI-Reference#sigma-sh--sovereign-interactive-shell)
+- [sigma-pkg — Package Manager](CLI-Reference#sigma-pkg--package-manager)
+- [sigma-monitor](CLI-Reference#sigma-monitor--real-time-system-monitor)
+- [sigma-secure](CLI-Reference#sigma-secure--security-hardening--audit)
+- [sigma-forensics](CLI-Reference#sigma-forensics--digital-forensics)
+- [sigma-snapshot](CLI-Reference#sigma-snapshot--system-snapshots)
+- [sigma-cluster](CLI-Reference#sigma-cluster--cluster-management)
+- [sigma-hypervisor](CLI-Reference#sigma-hypervisor--vm-management)
+- [sigma-recover](CLI-Reference#sigma-recover--system-recovery)
+- [sigma-hal-info](CLI-Reference#sigma-hal-info--hardware-inspector)
+- [sigma-debug](CLI-Reference#sigma-debug--kernel-debugger)
+- [sigma-log](CLI-Reference#sigma-log--log-viewer--anomaly-detector)
+- [sigma-fix](CLI-Reference#sigma-fix--ai-guided-patch-suggestion)
+- [sigma-top](CLI-Reference#sigma-top--process-monitor)
+- [sigma_fsck](CLI-Reference#sigma_fsck--filesystem-checker)
+- [sigma_diagnostics](CLI-Reference#sigma_diagnostics--system-diagnostics)
+- [sigma-cli man page](sigma-cli-man-page)
+- [sigma-monitor manual](sigma-monitor-Manual)
+- [sigma-secure manual](sigma-secure-Manual)
+- [sigma-debug manual](sigma-debug-Manual)
+- [sigma-log manual](sigma-log-Manual)
+- [sigma-fix manual](sigma-fix-Manual)
+
 ## Security
 - [Security Architecture](Security-Architecture)
 - [Security Model](Security-Model)
@@ -66,7 +93,15 @@
 
 ## Utilities
 - [Coreutils](Coreutils)
-- [sigma-sh Shell](CLI-Reference)
+- [sigma-sh Shell](CLI-Reference#sigma-sh--sovereign-interactive-shell)
+- [sigma-pkg](CLI-Reference#sigma-pkg--package-manager)
+- [Full CLI Reference](CLI-Reference)
+- [sigma-top](CLI-Reference#sigma-top--process-monitor)
+- [sigma-log](CLI-Reference#sigma-log--log-viewer--anomaly-detector)
+- [sigma-debug](CLI-Reference#sigma-debug--kernel-debugger)
+- [sigma-fix](CLI-Reference#sigma-fix--ai-guided-patch-suggestion)
+- [sigma_fsck](CLI-Reference#sigma_fsck--filesystem-checker)
+- [sigma_diagnostics](CLI-Reference#sigma_diagnostics--system-diagnostics)
 
 ## Roadmaps
 - [Linux Parity Roadmap](Linux-Parity-Roadmap)
