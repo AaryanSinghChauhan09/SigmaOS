@@ -54,6 +54,7 @@
 
 ## Roadmap
 - [Improvement Plan (6 Pillars)](Roadmap-Improvement-Plan)
+- [**Phase G Implementation Progress**](Implementation-Progress-Phase-G)
 - [Linux Absorption Architecture](Linux-Absorption-Architecture)
 - [Migration Guide](Migration-Guide)
 - [Package Absorption (.deb/.rpm)](Linux-Absorption-Architecture#package-absorption)
