@@ -49,6 +49,16 @@
 - [Syscall Dispatcher](Syscall-Dispatcher)
 - [Zenith Desktop](Zenith-Desktop)
 
+## Drivers & Compatibility
+- [Driver Framework (SDF)](Driver-Framework)
+- [Kernel ABI Stability](Kernel-ABI-Stability)
+- [Linux Driver Compat](Linux-Driver-Compat)
+- [Win32 Compatibility](Win32-Compatibility)
+- [Windows vs Linux vs SigmaOS](Windows-Linux-SigmaOS-Drivers)
+- [Driver Development Guide](Driver-Development-Guide)
+- [Ubuntu Driver Integration](Ubuntu-Driver-Integration)
+- [Hardware Support](Hardware-Support)
+
 ## Download Formats
 - [All Formats (50+)](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/DOWNLOAD.md)
 - [App Formats](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/download.html)
