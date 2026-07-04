@@ -22,6 +22,9 @@ pub struct Editor {
     pub modified: bool,
     pub line_numbers: bool,
     pub syntax_highlighting: bool,
+    pub undo_stack: Vec<String>,
+    pub redo_stack: Vec<String>,
+    pub search_term: Option<String>,
 }
 
 impl Editor {
@@ -34,6 +37,9 @@ impl Editor {
             modified: false,
             line_numbers: true,
             syntax_highlighting: true,
+            undo_stack: Vec::new(),
+            redo_stack: Vec::new(),
+            search_term: None,
         }
     }
 
@@ -81,6 +87,8 @@ impl Editor {
 
     /// Insert character at cursor position
     pub fn insert_char(&mut self, c: char) {
+        self.save_state_for_undo();
+        
         let lines: Vec<&str> = self.content.lines().collect();
         
         if self.cursor_line < lines.len() {
@@ -114,6 +122,8 @@ impl Editor {
 
     /// Delete character at cursor position
     pub fn delete_char(&mut self) {
+        self.save_state_for_undo();
+        
         let lines: Vec<&str> = self.content.lines().collect();
         
         if self.cursor_line < lines.len() && self.cursor_col > 0 {
@@ -224,11 +234,99 @@ impl Editor {
                 display_line.push_str(&format!("{:4} │ ", i + 1));
             }
             
-            display_line.push_str(line);
+            let display_content = if let Some(ref search) = self.search_term {
+                line.replace(search, &format!("[{}]", search))
+            } else {
+                line.to_string()
+            };
+            
+            display_line.push_str(&display_content);
             rendered.push(display_line);
         }
         
         rendered
+    }
+
+    /// Save current state for undo
+    fn save_state_for_undo(&mut self) {
+        self.undo_stack.push(self.content.clone());
+        if self.undo_stack.len() > 50 {
+            self.undo_stack.remove(0);
+        }
+        self.redo_stack.clear();
+    }
+
+    /// Undo last action
+    pub fn undo(&mut self) -> Result<(), String> {
+        if let Some(prev_content) = self.undo_stack.pop() {
+            self.redo_stack.push(self.content.clone());
+            self.content = prev_content;
+            self.modified = true;
+            Ok(())
+        } else {
+            Err("Nothing to undo".to_string())
+        }
+    }
+
+    /// Redo last undone action
+    pub fn redo(&mut self) -> Result<(), String> {
+        if let Some(next_content) = self.redo_stack.pop() {
+            self.undo_stack.push(self.content.clone());
+            self.content = next_content;
+            self.modified = true;
+            Ok(())
+        } else {
+            Err("Nothing to redo".to_string())
+        }
+    }
+
+    /// Search for text
+    pub fn search(&mut self, term: String) -> Vec<(usize, usize)> {
+        self.search_term = Some(term.clone());
+        let mut results = Vec::new();
+        
+        for (line_num, line) in self.content.lines().enumerate() {
+            if let Some(col) = line.find(&term) {
+                results.push((line_num, col));
+            }
+        }
+        
+        results
+    }
+
+    /// Clear search
+    pub fn clear_search(&mut self) {
+        self.search_term = None;
+    }
+
+    /// Replace text at cursor position
+    pub fn replace(&mut self, old: &str, new: &str) -> Result<usize, String> {
+        self.save_state_for_undo();
+        let count = self.content.matches(old).count();
+        self.content = self.content.replace(old, new);
+        self.modified = true;
+        Ok(count)
+    }
+
+    /// Go to line
+    pub fn goto_line(&mut self, line_num: usize) -> Result<(), String> {
+        let total_lines = self.line_count();
+        if line_num == 0 || line_num > total_lines {
+            return Err(format!("Line number out of range (1-{})", total_lines));
+        }
+        self.cursor_line = line_num - 1;
+        self.cursor_col = 0;
+        Ok(())
+    }
+
+    /// Get word count
+    pub fn word_count(&self) -> usize {
+        self.content.split_whitespace().count()
+    }
+
+    /// Get character count
+    pub fn char_count(&self) -> usize {
+        self.content.chars().count()
     }
 }
 
@@ -281,11 +379,78 @@ fn main() {
             }
             "help" => {
                 println!("Commands:");
-                println!("  open <file>   - Open a file");
-                println!("  save          - Save current file");
-                println!("  quit          - Quit (with unsaved check)");
-                println!("  force         - Force quit without saving");
-                println!("  help          - Show this help");
+                println!("  open <file>      - Open a file");
+                println!("  save            - Save current file");
+                println!("  saveas <file>   - Save to new file");
+                println!("  undo            - Undo last action");
+                println!("  redo            - Redo last undone action");
+                println!("  search <term>   - Search for text");
+                println!("  clear           - Clear search");
+                println!("  replace <old> <new> - Replace text");
+                println!("  goto <line>     - Go to line number");
+                println!("  stats           - Show file statistics");
+                println!("  quit            - Quit (with unsaved check)");
+                println!("  force           - Force quit without saving");
+                println!("  help            - Show this help");
+            }
+            "undo" => {
+                match editor.undo() {
+                    Ok(_) => println!("Undone"),
+                    Err(e) => eprintln!("Error: {}", e),
+                }
+            }
+            "redo" => {
+                match editor.redo() {
+                    Ok(_) => println!("Redone"),
+                    Err(e) => eprintln!("Error: {}", e),
+                }
+            }
+            cmd if cmd.starts_with("search ") => {
+                let term = &cmd[7..];
+                let results = editor.search(term.to_string());
+                println!("Found {} occurrences", results.len());
+                for (line, col) in results {
+                    println!("  Line {}, Column {}", line + 1, col);
+                }
+            }
+            "clear" => {
+                editor.clear_search();
+                println!("Search cleared");
+            }
+            cmd if cmd.starts_with("replace ") => {
+                let parts: Vec<&str> = cmd[8..].splitn(2, ' ').collect();
+                if parts.len() == 2 {
+                    match editor.replace(parts[0], parts[1]) {
+                        Ok(count) => println!("Replaced {} occurrences", count),
+                        Err(e) => eprintln!("Error: {}", e),
+                    }
+                }
+            }
+            cmd if cmd.starts_with("goto ") => {
+                let line_str = &cmd[5..];
+                if let Ok(line_num) = line_str.parse::<usize>() {
+                    match editor.goto_line(line_num) {
+                        Ok(_) => println!("Moved to line {}", line_num),
+                        Err(e) => eprintln!("Error: {}", e),
+                    }
+                }
+            }
+            "stats" => {
+                println!("--- File Statistics ---");
+                println!("Lines: {}", editor.line_count());
+                println!("Words: {}", editor.word_count());
+                println!("Characters: {}", editor.char_count());
+                println!("Modified: {}", editor.is_modified());
+                if let Some(filename) = editor.get_filename() {
+                    println!("File: {}", filename);
+                }
+            }
+            cmd if cmd.starts_with("saveas ") => {
+                let filename = &cmd[7..];
+                match editor.save_file_as(filename) {
+                    Ok(_) => println!("Saved as: {}", filename),
+                    Err(e) => eprintln!("Error: {}", e),
+                }
             }
             _ => {
                 // Treat as text input

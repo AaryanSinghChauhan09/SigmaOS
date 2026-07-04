@@ -151,12 +151,23 @@ fn cmd_mv(args: &[String]) -> i32 {
 
 fn cmd_rm(args: &[String]) -> i32 {
     if args.len() < 2 {
-        eprintln!("sigma-rm: usage: rm <file>...");
+        eprintln!("sigma-rm: usage: rm [-r] <file>...");
         return 1;
     }
 
-    let mut exit_code = 0;
+    let mut recursive = false;
+    let mut files: Vec<&String> = Vec::new();
+    
     for arg in &args[1..] {
+        if arg == "-r" || arg == "--recursive" {
+            recursive = true;
+        } else {
+            files.push(arg);
+        }
+    }
+
+    let mut exit_code = 0;
+    for arg in files {
         let path = Path::new(arg);
         if !path.exists() {
             eprintln!("sigma-rm: {}: No such file or directory", arg);
@@ -165,16 +176,26 @@ fn cmd_rm(args: &[String]) -> i32 {
         }
 
         if path.is_dir() {
-            eprintln!("sigma-rm: {}: is a directory (use -r for recursive)", arg);
-            exit_code = 1;
-            continue;
-        }
-
-        match fs::remove_file(path) {
-            Ok(_) => {}
-            Err(e) => {
-                eprintln!("sigma-rm: {}: {}", arg, e);
+            if recursive {
+                match fs::remove_dir_all(path) {
+                    Ok(_) => {}
+                    Err(e) => {
+                        eprintln!("sigma-rm: {}: {}", arg, e);
+                        exit_code = 1;
+                    }
+                }
+            } else {
+                eprintln!("sigma-rm: {}: is a directory (use -r for recursive)", arg);
                 exit_code = 1;
+                continue;
+            }
+        } else {
+            match fs::remove_file(path) {
+                Ok(_) => {}
+                Err(e) => {
+                    eprintln!("sigma-rm: {}: {}", arg, e);
+                    exit_code = 1;
+                }
             }
         }
     }
@@ -186,20 +207,40 @@ fn cmd_rm(args: &[String]) -> i32 {
 
 fn cmd_mkdir(args: &[String]) -> i32 {
     if args.len() < 2 {
-        eprintln!("sigma-mkdir: usage: mkdir <directory>...");
+        eprintln!("sigma-mkdir: usage: mkdir [-p] <directory>...");
         return 1;
     }
 
-    let mut exit_code = 0;
+    let mut parents = false;
+    let mut dirs: Vec<&String> = Vec::new();
+    
     for arg in &args[1..] {
+        if arg == "-p" || arg == "--parents" {
+            parents = true;
+        } else {
+            dirs.push(arg);
+        }
+    }
+
+    let mut exit_code = 0;
+    for arg in dirs {
         let path = Path::new(arg);
         if path.exists() {
-            eprintln!("sigma-mkdir: {}: File exists", arg);
-            exit_code = 1;
+            // Don't error if directory already exists with -p
+            if !parents {
+                eprintln!("sigma-mkdir: {}: File exists", arg);
+                exit_code = 1;
+            }
             continue;
         }
 
-        match fs::create_dir(path) {
+        let result = if parents {
+            fs::create_dir_all(path)
+        } else {
+            fs::create_dir(path)
+        };
+        
+        match result {
             Ok(_) => {}
             Err(e) => {
                 eprintln!("sigma-mkdir: {}: {}", arg, e);
@@ -211,20 +252,67 @@ fn cmd_mkdir(args: &[String]) -> i32 {
     exit_code
 }
 
+// ─── pwd: Print working directory ───────────────────────────────────────────────────
+
+fn cmd_pwd() -> i32 {
+    match env::current_dir() {
+        Ok(path) => {
+            println!("{}", path.display());
+            0
+        }
+        Err(e) => {
+            eprintln!("sigma-pwd: {}", e);
+            1
+        }
+    }
+}
+
+// ─── echo: Print text to stdout ────────────────────────────────────────────────────
+
+fn cmd_echo(args: &[String]) -> i32 {
+    if args.len() < 2 {
+        println!();
+        return 0;
+    }
+    
+    let text = args[1..].join(" ");
+    println!("{}", text);
+    0
+}
+
 // ─── cat: Concatenate and print files ───────────────────────────────────────────────
 
 fn cmd_cat(args: &[String]) -> i32 {
     if args.len() < 2 {
-        eprintln!("sigma-cat: usage: cat <file>...");
+        eprintln!("sigma-cat: usage: cat [-n] <file>...");
         return 1;
     }
 
-    let mut exit_code = 0;
+    let mut number_lines = false;
+    let mut files: Vec<&String> = Vec::new();
+    
     for arg in &args[1..] {
+        if arg == "-n" || arg == "--number" {
+            number_lines = true;
+        } else {
+            files.push(arg);
+        }
+    }
+
+    let mut exit_code = 0;
+    let mut line_num = 1;
+    for arg in files {
         let path = Path::new(arg);
         match fs::read_to_string(path) {
             Ok(contents) => {
-                print!("{}", contents);
+                if number_lines {
+                    for line in contents.lines() {
+                        println!("{:6}\t{}", line_num, line);
+                        line_num += 1;
+                    }
+                } else {
+                    print!("{}", contents);
+                }
             }
             Err(e) => {
                 eprintln!("sigma-cat: {}: {}", arg, e);
@@ -239,17 +327,19 @@ fn cmd_cat(args: &[String]) -> i32 {
 // ─── Main entry point ───────────────────────────────────────────────────────────
 
 fn print_usage(program: &str) {
-    println!("SigmaOS Core Utilities v1.0");
+    println!("SigmaOS Core Utilities v1.1");
     println!();
     println!("Usage: {} <command> [args...]", program);
     println!();
     println!("Commands:");
-    println!("  ls <dir>       List directory contents");
-    println!("  cp <src> <dst>  Copy files");
-    println!("  mv <src> <dst>  Move/rename files");
-    println!("  rm <file>...   Remove files");
-    println!("  mkdir <dir>...  Create directories");
-    println!("  cat <file>...   Print file contents");
+    println!("  ls <dir>           List directory contents");
+    println!("  cp <src> <dst>      Copy files");
+    println!("  mv <src> <dst>      Move/rename files");
+    println!("  rm [-r] <file>...   Remove files (-r for recursive)");
+    println!("  mkdir [-p] <dir>... Create directories (-p for parents)");
+    println!("  cat [-n] <file>...  Print file contents (-n for line numbers)");
+    println!("  pwd                 Print working directory");
+    println!("  echo <text>         Print text to stdout");
 }
 
 fn main() {
@@ -268,6 +358,8 @@ fn main() {
         "rm" => cmd_rm(&args),
         "mkdir" => cmd_mkdir(&args),
         "cat" => cmd_cat(&args),
+        "pwd" => cmd_pwd(),
+        "echo" => cmd_echo(&args),
         "--help" | "-h" => {
             print_usage(&args[0]);
             0

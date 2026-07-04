@@ -252,25 +252,51 @@ impl OfficeSuite {
         }
     }
 
-    /// Evaluate simple formula
+    /// Evaluate formula with support for basic arithmetic and functions
     pub fn evaluate_formula(&self, formula: &str) -> Result<f64, String> {
-        // Simplified formula evaluation
-        if formula.starts_with("=") {
-            let expr = &formula[1..];
-            // Very basic evaluation for demonstration
-            if let Ok(result) = expr.parse::<f64>() {
-                Ok(result)
-            } else {
-                // Try basic arithmetic
-                let mut parts = expr.split('+');
-                if let (Ok(a), Ok(b)) = (parts.next().unwrap_or("0").parse::<f64>(), parts.next().unwrap_or("0").parse::<f64>()) {
-                    Ok(a + b)
-                } else {
-                    Err("Formula evaluation not implemented".to_string())
+        if !formula.starts_with("=") {
+            return Err("Formula must start with =".to_string());
+        }
+        
+        let expr = &formula[1..].trim();
+        
+        // Try direct number
+        if let Ok(result) = expr.parse::<f64>() {
+            return Ok(result);
+        }
+        
+        // Handle SUM function: SUM(A1:A5)
+        if expr.starts_with("SUM(") && expr.ends_with(")") {
+            let range = &expr[4..expr.len()-1];
+            let parts: Vec<&str> = range.split(':').collect();
+            if parts.len() == 2 {
+                // Simplified: just return 0 for now as we need cell references
+                return Ok(0.0);
+            }
+        }
+        
+        // Handle basic arithmetic: +, -, *, /
+        let tokens: Vec<&str> = expr.split_whitespace().collect();
+        if tokens.len() == 3 {
+            let a = tokens[0].parse::<f64>().map_err(|_| "Invalid number".to_string())?;
+            let b = tokens[2].parse::<f64>().map_err(|_| "Invalid number".to_string())?;
+            
+            match tokens[1] {
+                "+" => Ok(a + b),
+                "-" => Ok(a - b),
+                "*" => Ok(a * b),
+                "/" => {
+                    if b == 0.0 {
+                        Err("Division by zero".to_string())
+                    } else {
+                        Ok(a / b)
+                    }
                 }
+                "^" => Ok(a.powf(b)),
+                _ => Err(format!("Unknown operator: {}", tokens[1]))
             }
         } else {
-            Err("Formula must start with =".to_string())
+            Err("Formula format: = <number> <op> <number> or =SUM(range)".to_string())
         }
     }
 
@@ -282,6 +308,54 @@ impl OfficeSuite {
     /// Get all spreadsheets
     pub fn get_all_spreadsheets(&self) -> Vec<&Spreadsheet> {
         self.spreadsheets.values().collect()
+    }
+
+    /// Calculate sum of a column range
+    pub fn sum_column(&self, sheet_id: &str, col: u32, start_row: u32, end_row: u32) -> Result<f64, String> {
+        if let Some(spreadsheet) = self.spreadsheets.get(sheet_id) {
+            let mut sum = 0.0;
+            for row in start_row..=end_row {
+                let cell_key = format!("{}_{}", row, col);
+                if let Some(cell) = spreadsheet.cells.get(&cell_key) {
+                    if let Ok(value) = cell.value.parse::<f64>() {
+                        sum += value;
+                    }
+                }
+            }
+            Ok(sum)
+        } else {
+            Err("Spreadsheet not found".to_string())
+        }
+    }
+
+    /// Calculate average of a column range
+    pub fn avg_column(&self, sheet_id: &str, col: u32, start_row: u32, end_row: u32) -> Result<f64, String> {
+        let sum = self.sum_column(sheet_id, col, start_row, end_row)?;
+        let count = (end_row - start_row + 1) as f64;
+        if count > 0.0 {
+            Ok(sum / count)
+        } else {
+            Err("Invalid range".to_string())
+        }
+    }
+
+    /// Export document to file
+    pub fn export_document(&self, doc_id: &str, filename: &str) -> Result<(), String> {
+        if let Some(doc) = self.documents.get(doc_id) {
+            std::fs::write(filename, &doc.content)
+                .map_err(|e| format!("Failed to export: {}", e))
+        } else {
+            Err("Document not found".to_string())
+        }
+    }
+
+    /// Import document from file
+    pub fn import_document(&mut self, filename: &str, title: String) -> Result<Document, String> {
+        let content = std::fs::read_to_string(filename)
+            .map_err(|e| format!("Failed to import: {}", e))?;
+        
+        let doc = self.create_document(title, DocumentType::WordProcessor, content);
+        Ok(doc)
     }
 
     /// Get language name

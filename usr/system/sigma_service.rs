@@ -42,6 +42,10 @@ pub struct Service {
     pub enabled: bool,
     pub auto_start: bool,
     pub restart_policy: String,
+    pub restart_count: u32,
+    pub memory_limit: Option<u64>,
+    pub cpu_limit: Option<f64>,
+    pub environment: HashMap<String, String>,
 }
 
 #[derive(Debug, Clone)]
@@ -75,6 +79,8 @@ impl ServiceManager {
     /// Initialize default system services
     fn init_default_services(&mut self) {
         // Network service
+        let mut env = HashMap::new();
+        env.insert("PATH".to_string(), "/usr/bin:/usr/sbin".to_string());
         self.services.insert("network".to_string(), Service {
             name: "network".to_string(),
             description: "Network connectivity".to_string(),
@@ -86,9 +92,15 @@ impl ServiceManager {
             enabled: true,
             auto_start: true,
             restart_policy: "always".to_string(),
+            restart_count: 0,
+            memory_limit: Some(64 * 1024 * 1024),  // 64MB
+            cpu_limit: Some(0.5),  // 50%
+            environment: env,
         });
 
         // SSH service
+        let mut ssh_env = HashMap::new();
+        ssh_env.insert("PATH".to_string(), "/usr/bin:/usr/sbin".to_string());
         self.services.insert("sshd".to_string(), Service {
             name: "sshd".to_string(),
             description: "OpenSSH server daemon".to_string(),
@@ -100,9 +112,15 @@ impl ServiceManager {
             enabled: true,
             auto_start: true,
             restart_policy: "on-failure".to_string(),
+            restart_count: 0,
+            memory_limit: Some(32 * 1024 * 1024),  // 32MB
+            cpu_limit: Some(0.3),  // 30%
+            environment: ssh_env,
         });
 
         // Web server
+        let mut http_env = HashMap::new();
+        http_env.insert("PATH".to_string(), "/usr/bin:/usr/sbin".to_string());
         self.services.insert("httpd".to_string(), Service {
             name: "httpd".to_string(),
             description: "Apache HTTP server".to_string(),
@@ -114,9 +132,16 @@ impl ServiceManager {
             enabled: false,
             auto_start: false,
             restart_policy: "on-failure".to_string(),
+            restart_count: 0,
+            memory_limit: Some(128 * 1024 * 1024),  // 128MB
+            cpu_limit: Some(0.7),  // 70%
+            environment: http_env,
         });
 
         // Database service
+        let mut pg_env = HashMap::new();
+        pg_env.insert("PATH".to_string(), "/usr/bin:/usr/sbin".to_string());
+        pg_env.insert("PGDATA".to_string(), "/var/lib/postgresql/data".to_string());
         self.services.insert("postgresql".to_string(), Service {
             name: "postgresql".to_string(),
             description: "PostgreSQL database server".to_string(),
@@ -128,9 +153,15 @@ impl ServiceManager {
             enabled: false,
             auto_start: false,
             restart_policy: "always".to_string(),
+            restart_count: 0,
+            memory_limit: Some(256 * 1024 * 1024),  // 256MB
+            cpu_limit: Some(0.8),  // 80%
+            environment: pg_env,
         });
 
         // System logger
+        let mut log_env = HashMap::new();
+        log_env.insert("PATH".to_string(), "/usr/bin:/usr/sbin".to_string());
         self.services.insert("syslog".to_string(), Service {
             name: "syslog".to_string(),
             description: "System logging daemon".to_string(),
@@ -142,6 +173,10 @@ impl ServiceManager {
             enabled: true,
             auto_start: true,
             restart_policy: "always".to_string(),
+            restart_count: 0,
+            memory_limit: Some(16 * 1024 * 1024),  // 16MB
+            cpu_limit: Some(0.1),  // 10%
+            environment: log_env,
         });
     }
 
@@ -189,6 +224,9 @@ impl ServiceManager {
 
     /// Restart service
     pub fn restart_service(&mut self, name: &str) -> Result<(), String> {
+        if let Some(service) = self.services.get_mut(name) {
+            service.restart_count += 1;
+        }
         self.stop_service(name)?;
         self.start_service(name)?;
         self.log_event(name, "INFO", "Service restarted");
@@ -198,6 +236,38 @@ impl ServiceManager {
     /// Get service status
     pub fn get_service_status(&self, name: &str) -> Option<&Service> {
         self.services.get(name)
+    }
+
+    /// Set service memory limit
+    pub fn set_memory_limit(&mut self, name: &str, limit: u64) -> Result<(), String> {
+        if let Some(service) = self.services.get_mut(name) {
+            service.memory_limit = Some(limit);
+            self.log_event(name, "INFO", &format!("Memory limit set to {} MB", limit / (1024 * 1024)));
+            Ok(())
+        } else {
+            Err("Service not found".to_string())
+        }
+    }
+
+    /// Set service CPU limit
+    pub fn set_cpu_limit(&mut self, name: &str, limit: f64) -> Result<(), String> {
+        if let Some(service) = self.services.get_mut(name) {
+            service.cpu_limit = Some(limit.min(1.0));
+            self.log_event(name, "INFO", &format!("CPU limit set to {}%", limit * 100.0));
+            Ok(())
+        } else {
+            Err("Service not found".to_string())
+        }
+    }
+
+    /// Set environment variable for service
+    pub fn set_env_var(&mut self, name: &str, key: String, value: String) -> Result<(), String> {
+        if let Some(service) = self.services.get_mut(name) {
+            service.environment.insert(key, value);
+            Ok(())
+        } else {
+            Err("Service not found".to_string())
+        }
     }
 
     /// Enable service (auto-start on boot)
