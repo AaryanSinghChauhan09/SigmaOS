@@ -48,6 +48,14 @@ Phase I  ████████████████░░░  60% 🔄  (D
   - AMD amdgpu Driver: ✅
   - HDA Audio Driver: ✅
   - sigma-ai Daemon: ✅
+Stage 0 ████████████████████  100% ✅  (Bootable Foundation — COMPLETE)
+  - Kernel Scheduler (MLFQ/CFS/EDF): ✅
+  - Memory Manager (Buddy/Slab/ASLR): ✅
+  - Interrupt Controller (APIC/PIC): ✅
+  - Virtual Memory (4-level page tables): ✅
+  - Syscall Gate (30 syscalls): ✅
+  - UEFI Bootloader (sigma-boot.zig): ✅
+  - Bootable ISO (build-iso.sh): ✅
 ```
 
 ## The Critical Path
